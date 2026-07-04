@@ -10,6 +10,34 @@ rules:
     metric: mae
     pass_condition: "paired-bootstrap 95% CI for MAE improvement excludes 0 on the positive side"
 
+  confirm_touch_helps_held_out_impulse_mass:
+    type: touch_helps
+    split: held_out_impulse_mass
+    target: target_displacement
+    base_arm: vision_proprio
+    touch_arm: vision_proprio_touch
+    metric: mae
+    ci_procedure: "paired bootstrap 95% CI, same procedure as honest eval"
+    pass_condition: "paired-bootstrap 95% CI for no-touch-minus-touch MAE improvement excludes 0 on the positive side, matching the positive exploratory direction"
+    exploratory_reference:
+      source: "babyworld-lite/data/honest/eval/results.json"
+      point: 1.2035953143736295
+      ci95: [0.507485437193042, 1.937816014421049]
+
+  confirm_touch_helps_held_out_composition:
+    type: touch_helps
+    split: held_out_composition
+    target: target_displacement
+    base_arm: vision_proprio
+    touch_arm: vision_proprio_touch
+    metric: mae
+    ci_procedure: "paired bootstrap 95% CI, same procedure as honest eval"
+    pass_condition: "paired-bootstrap 95% CI for no-touch-minus-touch MAE improvement excludes 0 on the positive side, matching the positive exploratory direction"
+    exploratory_reference:
+      source: "babyworld-lite/data/honest/eval/results.json"
+      point: 2.071678290087236
+      ci95: [0.40580998408493496, 3.7578847332470136]
+
   honest_negative_escalation:
     type: honest_negative_escalation
     split: held_out_material
