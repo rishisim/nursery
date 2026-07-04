@@ -1,0 +1,20 @@
+version: 1
+registered_at: "2026-07-04"
+rules:
+  touch_helps_held_out_displacement:
+    type: touch_helps
+    split: held_out_material
+    target: target_displacement
+    base_arm: vision_proprio
+    touch_arm: vision_proprio_touch
+    metric: mae
+    pass_condition: "paired-bootstrap 95% CI for MAE improvement excludes 0 on the positive side"
+
+  honest_negative_escalation:
+    type: honest_negative_escalation
+    split: held_out_material
+    target: target_displacement
+    base_arm: vision_proprio
+    touch_arm: vision_proprio_touch
+    r2_threshold: 0.9
+    action_if_triggered: "Report contact force as redundant in this toy setting, then make the task harder rather than fishing."
