@@ -21,6 +21,7 @@ SPLIT_LABELS = {
 }
 
 HONEST_ARMS = ("vision", "vision_proprio", "vision_proprio_touch", "oracle_full_state")
+TOUCH_DELTA_KEY = "target_displacement:vision_proprio_to_vision_proprio_touch:mae_improvement"
 
 
 def b64(path: Path) -> str:
@@ -43,6 +44,46 @@ def format_mae_cell(split: dict, arm: str) -> str:
     return f"{point:.2f} <span class=ci>[{lo:.2f}, {hi:.2f}]</span>"
 
 
+def format_touch_delta_cell(split: dict) -> str:
+    metric = split.get("paired_bootstrap", {}).get("regression", {}).get(TOUCH_DELTA_KEY)
+    if metric is None:
+        return "<span class=muted>not available</span>"
+
+    point = metric["point"]
+    lo, hi = metric["ci95"]
+    return f"{point:+.2f} <span class=ci>[{lo:.2f}, {hi:.2f}]</span>"
+
+
+def record_gif_path(data: Path, rec: dict) -> Path | None:
+    if "gif_path" in rec:
+        gif_path = data / rec["gif_path"]
+        if gif_path.exists():
+            return gif_path
+
+    episode_id = rec.get("episode_id")
+    if episode_id is None:
+        return None
+
+    gif_path = data / "gifs" / f"episode_{episode_id:05d}.gif"
+    if gif_path.exists():
+        return gif_path
+    return None
+
+
+def record_with_embedded_gif(data: Path, rec: dict) -> dict | None:
+    gif_path = record_gif_path(data, rec)
+    if gif_path is None:
+        return None
+
+    rec = dict(rec)
+    rec["gif_b64"] = b64(gif_path)
+    try:
+        rec["gif_path"] = str(gif_path.relative_to(data))
+    except ValueError:
+        rec["gif_path"] = str(gif_path)
+    return rec
+
+
 def honest_eval_section(eval_dir: Path) -> str:
     results_path = eval_dir / "results.json"
     if not results_path.exists():
@@ -56,8 +97,9 @@ def honest_eval_section(eval_dir: Path) -> str:
     rows = []
     for split_name, split in splits.items():
         cells = "".join(f"<td>{format_mae_cell(split, arm)}</td>" for arm in HONEST_ARMS if arm in split["arms"])
+        touch_delta = format_touch_delta_cell(split)
         rows.append(
-            f"<tr><td>{SPLIT_LABELS.get(split_name, split_name)}<br><span class=muted>n_test={split['n_test']}</span></td>{cells}</tr>"
+            f"<tr><td>{SPLIT_LABELS.get(split_name, split_name)}<br><span class=muted>n_test={split['n_test']}</span></td>{cells}<td>{touch_delta}</td></tr>"
         )
 
     rules = results.get("decision_rules", {})
@@ -95,6 +137,7 @@ def honest_eval_section(eval_dir: Path) -> str:
     )
 
     table_header = "".join(f"<th>{ARM_LABELS[arm]}</th>" for arm in HONEST_ARMS)
+    table_header += "<th>touch Δ (paired)<br><span class=muted>positive lowers MAE</span></th>"
     return f"""
 <h2>Honest forward-prediction eval</h2>
 <p>Models predict continuous post-contact rollout targets from frames [0,k]; event labels are used for coverage reporting, not as prediction targets.</p>
@@ -111,20 +154,39 @@ def main() -> None:
     parser.add_argument("--eval-dir", type=str, default=None)
     parser.add_argument("--out", type=str, default="demo.html")
     parser.add_argument("--max-episodes", type=int, default=6)
+    parser.add_argument("--feature-event", type=str, default="topples", help="Put the first rendered episode with this event label first; use an empty value to disable")
     args = parser.parse_args()
 
     data = resolve_existing_dir(Path(args.data))
     eval_dir = resolve_existing_dir(Path(args.eval_dir)) if args.eval_dir else data / "eval"
     records = []
+    featured_record = None
+    seen_episode_ids = set()
+    feature_event = args.feature_event.strip() if args.feature_event else ""
     with (data / "episodes.jsonl").open() as f:
         for line in f:
             rec = json.loads(line)
-            if "gif_path" in rec:
-                gif_path = data / rec["gif_path"]
-                rec["gif_b64"] = b64(gif_path)
-                records.append(rec)
-            if len(records) >= args.max_episodes:
+            embedded = record_with_embedded_gif(data, rec)
+            if embedded is None:
+                continue
+
+            episode_id = embedded["episode_id"]
+            if feature_event and featured_record is None and embedded.get("event_label") == feature_event:
+                featured_record = embedded
+                seen_episode_ids.add(episode_id)
+                if len(records) >= args.max_episodes:
+                    break
+                continue
+
+            if episode_id not in seen_episode_ids and len(records) < args.max_episodes:
+                records.append(embedded)
+                seen_episode_ids.add(episode_id)
+
+            if len(records) >= args.max_episodes and (featured_record is not None or not feature_event):
                 break
+
+    if featured_record is not None:
+        records = [featured_record] + records
 
     honest_section = honest_eval_section(eval_dir)
 
