@@ -1,0 +1,38 @@
+{
+  "status": "pass",
+  "checked_at": "2026-07-04T11:44:25-0700",
+  "episodes_path": "data/confirm_round2/episodes.jsonl",
+  "n_episodes": 6000,
+  "eval_input_type": "json frame traces consumed by build_eval_frame; no rendered pixel frames",
+  "render_frame_guard": "installed; build_eval_frame completed without calling render_frame/render_gif",
+  "gif_path_count": 0,
+  "caption_like_key_count": 0,
+  "pixel_like_key_count": 0,
+  "rendered_files_before_eval": [],
+  "split_supports": {
+    "held_out_impulse_mass": {
+      "n_train": 5230,
+      "n_test": 770,
+      "support": {
+        "impulse>=q0.75|mass>=q0.50": 770,
+        "impulse_threshold": 1.254,
+        "mass_threshold": 1.3042899959932117
+      }
+    },
+    "held_out_composition": {
+      "n_train": 5607,
+      "n_test": 393,
+      "support": {
+        "shape=cup|action=push": 393
+      }
+    },
+    "held_out_material": {
+      "n_train": 4476,
+      "n_test": 1524,
+      "support": {
+        "material=metal": 1524
+      }
+    }
+  },
+  "problems": []
+}

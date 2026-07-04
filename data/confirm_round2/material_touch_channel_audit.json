@@ -1,0 +1,64 @@
+{
+  "status": "complete",
+  "checked_at": "2026-07-04T11:53:08-0700",
+  "source": "read-only static trace of babyworld_lite/sim.py plus aggregation of generated manifest.csv",
+  "static_trace": [
+    "MATERIALS defines hardness, mass, friction, bounciness, tactile_noise per material.",
+    "sample_object copies material-derived mass/friction/bounciness/hardness into ObjectSpec with jitter.",
+    "infer_event uses mass, friction, and bounciness, but not material string or hardness.",
+    "contact_happens is sampled from action-specific miss chance; is_contact depends on contact_happens, time, distance, and radius, not material directly.",
+    "contact_force = intended_impulse * obj.hardness * noise, so force magnitude directly carries material-derived hardness.",
+    "object velocity/friction/bounce dynamics use mass, friction, and bounciness, so later contact counts/normals can be indirectly material-dependent after contact begins."
+  ],
+  "empirical_by_material": [
+    {
+      "material": "foam",
+      "n": 1443,
+      "contact_rate": 0.9092169092169092,
+      "mean_contact_count": 10.805266805266806,
+      "mean_first_contact_force_contact_only": 0.23998009902221748,
+      "mean_max_force_contact_only": 0.26673355183521996,
+      "mean_hardness": 0.24996671450000982,
+      "mean_mass": 0.6106231628834948,
+      "mean_friction": 0.8211298451845094,
+      "mean_bounciness": 0.08090028677011679
+    },
+    {
+      "material": "metal",
+      "n": 1524,
+      "contact_rate": 0.9120734908136483,
+      "mean_contact_count": 14.19488188976378,
+      "mean_first_contact_force_contact_only": 0.8817040272945413,
+      "mean_max_force_contact_only": 0.9935274226812587,
+      "mean_hardness": 0.9198789253882429,
+      "mean_mass": 2.1373737211984394,
+      "mean_friction": 0.29848684737276693,
+      "mean_bounciness": 0.1994053644362431
+    },
+    {
+      "material": "plastic",
+      "n": 1477,
+      "contact_rate": 0.913337846987136,
+      "mean_contact_count": 12.51929587000677,
+      "mean_first_contact_force_contact_only": 0.5238062859051418,
+      "mean_max_force_contact_only": 0.5881629947136636,
+      "mean_hardness": 0.5502503502446555,
+      "mean_mass": 1.017072452121774,
+      "mean_friction": 0.3781793829143129,
+      "mean_bounciness": 0.38026653363936846
+    },
+    {
+      "material": "wood",
+      "n": 1556,
+      "contact_rate": 0.9158097686375322,
+      "mean_contact_count": 13.637532133676093,
+      "mean_first_contact_force_contact_only": 0.677764756253598,
+      "mean_max_force_contact_only": 0.7617143037715591,
+      "mean_hardness": 0.699941210607159,
+      "mean_mass": 1.5182825189668099,
+      "mean_friction": 0.5498629497913311,
+      "mean_bounciness": 0.15881913753540602
+    }
+  ],
+  "conclusion": "Touch is not fully material-invariant: contact occurrence is largely material-invariant in the event/contact gate, but contact-force magnitudes directly propagate material through hardness; event logic uses material-derived mass/friction/bounciness rather than the material label itself."
+}

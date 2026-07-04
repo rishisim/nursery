@@ -1,0 +1,807 @@
+{
+  "n_episodes": 6000,
+  "event_distribution": {
+    "grasp_fail": 362,
+    "grasp_success": 1081,
+    "missed": 524,
+    "rolls_far": 703,
+    "slides": 2440,
+    "small_move": 325,
+    "stays": 256,
+    "topples": 309
+  },
+  "material_distribution": {
+    "foam": 1443,
+    "metal": 1524,
+    "plastic": 1477,
+    "wood": 1556
+  },
+  "grid": {
+    "shape_count": 4,
+    "action_count": 4,
+    "material_count": 4,
+    "expected_cells": 64,
+    "observed_cells": 64,
+    "coverage_fraction": 1.0,
+    "sparse_threshold": 20,
+    "dominant_threshold": 0.95
+  },
+  "degenerate_cells": {
+    "empty": [],
+    "sparse": [],
+    "single_outcome": [],
+    "dominant_outcome": [
+      {
+        "cell": "ball x grasp x wood",
+        "dominant_fraction": 0.954954954954955
+      },
+      {
+        "cell": "block x grasp x plastic",
+        "dominant_fraction": 0.9553571428571429
+      },
+      {
+        "cell": "cup x grasp x metal",
+        "dominant_fraction": 0.9555555555555556
+      },
+      {
+        "cell": "plush x grasp x foam",
+        "dominant_fraction": 0.9655172413793104
+      },
+      {
+        "cell": "plush x grasp x metal",
+        "dominant_fraction": 0.9529411764705882
+      },
+      {
+        "cell": "plush x grasp x wood",
+        "dominant_fraction": 0.9732142857142857
+      }
+    ]
+  },
+  "cells": [
+    {
+      "shape": "ball",
+      "action": "grasp",
+      "material": "foam",
+      "count": 97,
+      "event_counts": {
+        "grasp_success": 86,
+        "missed": 11
+      },
+      "dominant_event_fraction": 0.8865979381443299
+    },
+    {
+      "shape": "ball",
+      "action": "grasp",
+      "material": "metal",
+      "count": 108,
+      "event_counts": {
+        "grasp_fail": 99,
+        "missed": 9
+      },
+      "dominant_event_fraction": 0.9166666666666666
+    },
+    {
+      "shape": "ball",
+      "action": "grasp",
+      "material": "plastic",
+      "count": 74,
+      "event_counts": {
+        "grasp_fail": 68,
+        "missed": 6
+      },
+      "dominant_event_fraction": 0.918918918918919
+    },
+    {
+      "shape": "ball",
+      "action": "grasp",
+      "material": "wood",
+      "count": 111,
+      "event_counts": {
+        "grasp_fail": 106,
+        "missed": 5
+      },
+      "dominant_event_fraction": 0.954954954954955
+    },
+    {
+      "shape": "ball",
+      "action": "poke",
+      "material": "foam",
+      "count": 98,
+      "event_counts": {
+        "missed": 13,
+        "rolls_far": 85
+      },
+      "dominant_event_fraction": 0.8673469387755102
+    },
+    {
+      "shape": "ball",
+      "action": "poke",
+      "material": "metal",
+      "count": 98,
+      "event_counts": {
+        "missed": 13,
+        "rolls_far": 27,
+        "small_move": 58
+      },
+      "dominant_event_fraction": 0.5918367346938775
+    },
+    {
+      "shape": "ball",
+      "action": "poke",
+      "material": "plastic",
+      "count": 99,
+      "event_counts": {
+        "missed": 6,
+        "rolls_far": 80,
+        "small_move": 13
+      },
+      "dominant_event_fraction": 0.8080808080808081
+    },
+    {
+      "shape": "ball",
+      "action": "poke",
+      "material": "wood",
+      "count": 103,
+      "event_counts": {
+        "missed": 10,
+        "rolls_far": 50,
+        "small_move": 43
+      },
+      "dominant_event_fraction": 0.4854368932038835
+    },
+    {
+      "shape": "ball",
+      "action": "push",
+      "material": "foam",
+      "count": 110,
+      "event_counts": {
+        "missed": 7,
+        "rolls_far": 102,
+        "small_move": 1
+      },
+      "dominant_event_fraction": 0.9272727272727272
+    },
+    {
+      "shape": "ball",
+      "action": "push",
+      "material": "metal",
+      "count": 92,
+      "event_counts": {
+        "missed": 5,
+        "rolls_far": 28,
+        "small_move": 59
+      },
+      "dominant_event_fraction": 0.6413043478260869
+    },
+    {
+      "shape": "ball",
+      "action": "push",
+      "material": "plastic",
+      "count": 80,
+      "event_counts": {
+        "missed": 9,
+        "rolls_far": 55,
+        "small_move": 16
+      },
+      "dominant_event_fraction": 0.6875
+    },
+    {
+      "shape": "ball",
+      "action": "push",
+      "material": "wood",
+      "count": 81,
+      "event_counts": {
+        "missed": 7,
+        "rolls_far": 45,
+        "small_move": 29
+      },
+      "dominant_event_fraction": 0.5555555555555556
+    },
+    {
+      "shape": "ball",
+      "action": "tap",
+      "material": "foam",
+      "count": 74,
+      "event_counts": {
+        "missed": 9,
+        "rolls_far": 65
+      },
+      "dominant_event_fraction": 0.8783783783783784
+    },
+    {
+      "shape": "ball",
+      "action": "tap",
+      "material": "metal",
+      "count": 94,
+      "event_counts": {
+        "missed": 11,
+        "rolls_far": 29,
+        "small_move": 54
+      },
+      "dominant_event_fraction": 0.574468085106383
+    },
+    {
+      "shape": "ball",
+      "action": "tap",
+      "material": "plastic",
+      "count": 104,
+      "event_counts": {
+        "missed": 9,
+        "rolls_far": 82,
+        "small_move": 13
+      },
+      "dominant_event_fraction": 0.7884615384615384
+    },
+    {
+      "shape": "ball",
+      "action": "tap",
+      "material": "wood",
+      "count": 110,
+      "event_counts": {
+        "missed": 16,
+        "rolls_far": 55,
+        "small_move": 39
+      },
+      "dominant_event_fraction": 0.5
+    },
+    {
+      "shape": "block",
+      "action": "grasp",
+      "material": "foam",
+      "count": 87,
+      "event_counts": {
+        "grasp_success": 80,
+        "missed": 7
+      },
+      "dominant_event_fraction": 0.9195402298850575
+    },
+    {
+      "shape": "block",
+      "action": "grasp",
+      "material": "metal",
+      "count": 94,
+      "event_counts": {
+        "grasp_fail": 89,
+        "missed": 5
+      },
+      "dominant_event_fraction": 0.9468085106382979
+    },
+    {
+      "shape": "block",
+      "action": "grasp",
+      "material": "plastic",
+      "count": 112,
+      "event_counts": {
+        "grasp_success": 107,
+        "missed": 5
+      },
+      "dominant_event_fraction": 0.9553571428571429
+    },
+    {
+      "shape": "block",
+      "action": "grasp",
+      "material": "wood",
+      "count": 111,
+      "event_counts": {
+        "grasp_success": 97,
+        "missed": 14
+      },
+      "dominant_event_fraction": 0.8738738738738738
+    },
+    {
+      "shape": "block",
+      "action": "poke",
+      "material": "foam",
+      "count": 93,
+      "event_counts": {
+        "missed": 6,
+        "slides": 87
+      },
+      "dominant_event_fraction": 0.9354838709677419
+    },
+    {
+      "shape": "block",
+      "action": "poke",
+      "material": "metal",
+      "count": 110,
+      "event_counts": {
+        "missed": 10,
+        "slides": 89,
+        "stays": 11
+      },
+      "dominant_event_fraction": 0.8090909090909091
+    },
+    {
+      "shape": "block",
+      "action": "poke",
+      "material": "plastic",
+      "count": 70,
+      "event_counts": {
+        "missed": 6,
+        "slides": 64
+      },
+      "dominant_event_fraction": 0.9142857142857143
+    },
+    {
+      "shape": "block",
+      "action": "poke",
+      "material": "wood",
+      "count": 84,
+      "event_counts": {
+        "missed": 6,
+        "slides": 59,
+        "stays": 19
+      },
+      "dominant_event_fraction": 0.7023809523809523
+    },
+    {
+      "shape": "block",
+      "action": "push",
+      "material": "foam",
+      "count": 77,
+      "event_counts": {
+        "missed": 8,
+        "slides": 67,
+        "stays": 2
+      },
+      "dominant_event_fraction": 0.8701298701298701
+    },
+    {
+      "shape": "block",
+      "action": "push",
+      "material": "metal",
+      "count": 85,
+      "event_counts": {
+        "missed": 5,
+        "slides": 73,
+        "stays": 7
+      },
+      "dominant_event_fraction": 0.8588235294117647
+    },
+    {
+      "shape": "block",
+      "action": "push",
+      "material": "plastic",
+      "count": 84,
+      "event_counts": {
+        "missed": 11,
+        "slides": 73
+      },
+      "dominant_event_fraction": 0.8690476190476191
+    },
+    {
+      "shape": "block",
+      "action": "push",
+      "material": "wood",
+      "count": 98,
+      "event_counts": {
+        "missed": 6,
+        "slides": 75,
+        "stays": 17
+      },
+      "dominant_event_fraction": 0.7653061224489796
+    },
+    {
+      "shape": "block",
+      "action": "tap",
+      "material": "foam",
+      "count": 86,
+      "event_counts": {
+        "missed": 8,
+        "slides": 78
+      },
+      "dominant_event_fraction": 0.9069767441860465
+    },
+    {
+      "shape": "block",
+      "action": "tap",
+      "material": "metal",
+      "count": 89,
+      "event_counts": {
+        "missed": 8,
+        "slides": 70,
+        "stays": 11
+      },
+      "dominant_event_fraction": 0.7865168539325843
+    },
+    {
+      "shape": "block",
+      "action": "tap",
+      "material": "plastic",
+      "count": 101,
+      "event_counts": {
+        "missed": 6,
+        "slides": 95
+      },
+      "dominant_event_fraction": 0.9405940594059405
+    },
+    {
+      "shape": "block",
+      "action": "tap",
+      "material": "wood",
+      "count": 76,
+      "event_counts": {
+        "missed": 4,
+        "slides": 58,
+        "stays": 14
+      },
+      "dominant_event_fraction": 0.7631578947368421
+    },
+    {
+      "shape": "cup",
+      "action": "grasp",
+      "material": "foam",
+      "count": 96,
+      "event_counts": {
+        "grasp_success": 87,
+        "missed": 9
+      },
+      "dominant_event_fraction": 0.90625
+    },
+    {
+      "shape": "cup",
+      "action": "grasp",
+      "material": "metal",
+      "count": 90,
+      "event_counts": {
+        "grasp_success": 86,
+        "missed": 4
+      },
+      "dominant_event_fraction": 0.9555555555555556
+    },
+    {
+      "shape": "cup",
+      "action": "grasp",
+      "material": "plastic",
+      "count": 90,
+      "event_counts": {
+        "grasp_success": 84,
+        "missed": 6
+      },
+      "dominant_event_fraction": 0.9333333333333333
+    },
+    {
+      "shape": "cup",
+      "action": "grasp",
+      "material": "wood",
+      "count": 96,
+      "event_counts": {
+        "grasp_success": 88,
+        "missed": 8
+      },
+      "dominant_event_fraction": 0.9166666666666666
+    },
+    {
+      "shape": "cup",
+      "action": "poke",
+      "material": "foam",
+      "count": 99,
+      "event_counts": {
+        "missed": 16,
+        "slides": 5,
+        "stays": 3,
+        "topples": 75
+      },
+      "dominant_event_fraction": 0.7575757575757576
+    },
+    {
+      "shape": "cup",
+      "action": "poke",
+      "material": "metal",
+      "count": 95,
+      "event_counts": {
+        "missed": 16,
+        "slides": 71,
+        "stays": 8
+      },
+      "dominant_event_fraction": 0.7473684210526316
+    },
+    {
+      "shape": "cup",
+      "action": "poke",
+      "material": "plastic",
+      "count": 85,
+      "event_counts": {
+        "missed": 12,
+        "slides": 26,
+        "topples": 47
+      },
+      "dominant_event_fraction": 0.5529411764705883
+    },
+    {
+      "shape": "cup",
+      "action": "poke",
+      "material": "wood",
+      "count": 118,
+      "event_counts": {
+        "missed": 14,
+        "slides": 56,
+        "stays": 21,
+        "topples": 27
+      },
+      "dominant_event_fraction": 0.4745762711864407
+    },
+    {
+      "shape": "cup",
+      "action": "push",
+      "material": "foam",
+      "count": 102,
+      "event_counts": {
+        "missed": 10,
+        "slides": 11,
+        "stays": 2,
+        "topples": 79
+      },
+      "dominant_event_fraction": 0.7745098039215687
+    },
+    {
+      "shape": "cup",
+      "action": "push",
+      "material": "metal",
+      "count": 105,
+      "event_counts": {
+        "missed": 12,
+        "slides": 82,
+        "stays": 10,
+        "topples": 1
+      },
+      "dominant_event_fraction": 0.780952380952381
+    },
+    {
+      "shape": "cup",
+      "action": "push",
+      "material": "plastic",
+      "count": 93,
+      "event_counts": {
+        "missed": 3,
+        "slides": 35,
+        "topples": 55
+      },
+      "dominant_event_fraction": 0.5913978494623656
+    },
+    {
+      "shape": "cup",
+      "action": "push",
+      "material": "wood",
+      "count": 93,
+      "event_counts": {
+        "missed": 3,
+        "slides": 43,
+        "stays": 22,
+        "topples": 25
+      },
+      "dominant_event_fraction": 0.46236559139784944
+    },
+    {
+      "shape": "cup",
+      "action": "tap",
+      "material": "foam",
+      "count": 79,
+      "event_counts": {
+        "missed": 6,
+        "slides": 73
+      },
+      "dominant_event_fraction": 0.9240506329113924
+    },
+    {
+      "shape": "cup",
+      "action": "tap",
+      "material": "metal",
+      "count": 89,
+      "event_counts": {
+        "missed": 8,
+        "slides": 72,
+        "stays": 9
+      },
+      "dominant_event_fraction": 0.8089887640449438
+    },
+    {
+      "shape": "cup",
+      "action": "tap",
+      "material": "plastic",
+      "count": 111,
+      "event_counts": {
+        "missed": 10,
+        "slides": 101
+      },
+      "dominant_event_fraction": 0.9099099099099099
+    },
+    {
+      "shape": "cup",
+      "action": "tap",
+      "material": "wood",
+      "count": 94,
+      "event_counts": {
+        "missed": 8,
+        "slides": 67,
+        "stays": 19
+      },
+      "dominant_event_fraction": 0.7127659574468085
+    },
+    {
+      "shape": "plush",
+      "action": "grasp",
+      "material": "foam",
+      "count": 87,
+      "event_counts": {
+        "grasp_success": 84,
+        "missed": 3
+      },
+      "dominant_event_fraction": 0.9655172413793104
+    },
+    {
+      "shape": "plush",
+      "action": "grasp",
+      "material": "metal",
+      "count": 85,
+      "event_counts": {
+        "grasp_success": 81,
+        "missed": 4
+      },
+      "dominant_event_fraction": 0.9529411764705882
+    },
+    {
+      "shape": "plush",
+      "action": "grasp",
+      "material": "plastic",
+      "count": 98,
+      "event_counts": {
+        "grasp_success": 92,
+        "missed": 6
+      },
+      "dominant_event_fraction": 0.9387755102040817
+    },
+    {
+      "shape": "plush",
+      "action": "grasp",
+      "material": "wood",
+      "count": 112,
+      "event_counts": {
+        "grasp_success": 109,
+        "missed": 3
+      },
+      "dominant_event_fraction": 0.9732142857142857
+    },
+    {
+      "shape": "plush",
+      "action": "poke",
+      "material": "foam",
+      "count": 79,
+      "event_counts": {
+        "missed": 7,
+        "slides": 70,
+        "stays": 2
+      },
+      "dominant_event_fraction": 0.8860759493670886
+    },
+    {
+      "shape": "plush",
+      "action": "poke",
+      "material": "metal",
+      "count": 107,
+      "event_counts": {
+        "missed": 11,
+        "slides": 85,
+        "stays": 11
+      },
+      "dominant_event_fraction": 0.794392523364486
+    },
+    {
+      "shape": "plush",
+      "action": "poke",
+      "material": "plastic",
+      "count": 86,
+      "event_counts": {
+        "missed": 14,
+        "slides": 72
+      },
+      "dominant_event_fraction": 0.8372093023255814
+    },
+    {
+      "shape": "plush",
+      "action": "poke",
+      "material": "wood",
+      "count": 84,
+      "event_counts": {
+        "missed": 10,
+        "slides": 60,
+        "stays": 14
+      },
+      "dominant_event_fraction": 0.7142857142857143
+    },
+    {
+      "shape": "plush",
+      "action": "push",
+      "material": "foam",
+      "count": 93,
+      "event_counts": {
+        "missed": 7,
+        "slides": 83,
+        "stays": 3
+      },
+      "dominant_event_fraction": 0.8924731182795699
+    },
+    {
+      "shape": "plush",
+      "action": "push",
+      "material": "metal",
+      "count": 88,
+      "event_counts": {
+        "missed": 4,
+        "slides": 79,
+        "stays": 5
+      },
+      "dominant_event_fraction": 0.8977272727272727
+    },
+    {
+      "shape": "plush",
+      "action": "push",
+      "material": "plastic",
+      "count": 91,
+      "event_counts": {
+        "missed": 8,
+        "slides": 83
+      },
+      "dominant_event_fraction": 0.9120879120879121
+    },
+    {
+      "shape": "plush",
+      "action": "push",
+      "material": "wood",
+      "count": 96,
+      "event_counts": {
+        "missed": 6,
+        "slides": 72,
+        "stays": 18
+      },
+      "dominant_event_fraction": 0.75
+    },
+    {
+      "shape": "plush",
+      "action": "tap",
+      "material": "foam",
+      "count": 86,
+      "event_counts": {
+        "missed": 4,
+        "slides": 80,
+        "stays": 2
+      },
+      "dominant_event_fraction": 0.9302325581395349
+    },
+    {
+      "shape": "plush",
+      "action": "tap",
+      "material": "metal",
+      "count": 95,
+      "event_counts": {
+        "missed": 9,
+        "slides": 79,
+        "stays": 7
+      },
+      "dominant_event_fraction": 0.8315789473684211
+    },
+    {
+      "shape": "plush",
+      "action": "tap",
+      "material": "plastic",
+      "count": 99,
+      "event_counts": {
+        "missed": 11,
+        "slides": 88
+      },
+      "dominant_event_fraction": 0.8888888888888888
+    },
+    {
+      "shape": "plush",
+      "action": "tap",
+      "material": "wood",
+      "count": 89,
+      "event_counts": {
+        "missed": 11,
+        "slides": 59,
+        "stays": 19
+      },
+      "dominant_event_fraction": 0.6629213483146067
+    }
+  ]
+}

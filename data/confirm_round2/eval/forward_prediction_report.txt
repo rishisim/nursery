@@ -1,0 +1,395 @@
+=== held_out_impulse_mass :: priors_only ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               28.263 [  26.190,   30.220]     41.263     -0.002
+target_delta_y               26.493 [  24.630,   28.477]     37.676     -0.008
+target_displacement          27.846 [  26.252,   29.631]     37.478     -0.022
+target_final_x               36.863 [  34.991,   38.743]     46.363     -0.000
+target_final_y               31.241 [  29.320,   33.267]     41.120     -0.004
+target_topple_angle           1.078 [   0.987,    1.174]      1.703     -0.005
+
+n_train=5230 n_test=770 n_features=None
+
+=== held_out_impulse_mass :: vision ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               29.193 [  27.230,   31.095]     41.127      0.005
+target_delta_y               27.207 [  25.302,   29.164]     37.916     -0.021
+target_displacement          25.709 [  24.149,   27.456]     35.449      0.085
+target_final_x               31.481 [  29.391,   33.667]     43.515      0.119
+target_final_y               28.524 [  26.578,   30.600]     39.412      0.078
+target_topple_angle           0.624 [   0.544,    0.706]      1.333      0.385
+
+n_train=5230 n_test=770 n_features=9
+
+=== held_out_impulse_mass :: vision_proprio ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               28.351 [  26.251,   30.426]     40.639      0.028
+target_delta_y               23.254 [  21.386,   25.073]     34.969      0.131
+target_displacement          12.578 [  11.436,   13.723]     20.340      0.699
+target_final_x               30.542 [  28.513,   32.829]     42.803      0.147
+target_final_y               24.508 [  22.751,   26.514]     36.453      0.211
+target_topple_angle           0.300 [   0.253,    0.347]      0.728      0.816
+
+n_train=5230 n_test=770 n_features=163
+
+=== held_out_impulse_mass :: vision_proprio_touch ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               28.407 [  26.557,   30.483]     40.735      0.024
+target_delta_y               21.903 [  20.041,   23.783]     34.273      0.166
+target_displacement          10.081 [   9.142,   11.115]     17.724      0.771
+target_final_x               30.685 [  28.487,   32.783]     43.092      0.136
+target_final_y               23.825 [  21.941,   25.786]     35.810      0.239
+target_topple_angle           0.288 [   0.247,    0.337]      0.708      0.826
+
+n_train=5230 n_test=770 n_features=176
+
+=== held_out_impulse_mass :: oracle_full_state ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               28.176 [  26.045,   30.104]     40.778      0.022
+target_delta_y               21.663 [  19.866,   23.527]     34.318      0.164
+target_displacement          10.114 [   9.127,   11.258]     17.919      0.766
+target_final_x               30.722 [  28.760,   32.916]     43.362      0.125
+target_final_y               23.520 [  21.777,   25.512]     36.230      0.221
+target_topple_angle           0.308 [   0.256,    0.366]      0.852      0.749
+
+n_train=5230 n_test=770 n_features=180
+
+=== held_out_impulse_mass :: control vision_proprio_hidden_impulse ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               28.892 [  26.941,   30.866]     40.682      0.026
+target_delta_y               24.299 [  22.564,   25.970]     35.593      0.100
+target_displacement          19.996 [  19.015,   21.057]     25.091      0.542
+target_final_x               31.494 [  29.446,   33.613]     43.330      0.126
+target_final_y               25.178 [  23.388,   27.134]     37.041      0.185
+target_topple_angle           0.386 [   0.335,    0.436]      0.842      0.755
+
+n_train=5230 n_test=770 n_features=164
+
+=== held_out_impulse_mass :: control vision_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               29.606 [  27.617,   31.658]     41.993     -0.037
+target_delta_y               26.987 [  25.190,   28.961]     38.196     -0.036
+target_displacement          27.862 [  26.096,   29.590]     37.659     -0.032
+target_final_x               37.289 [  35.351,   39.229]     47.043     -0.030
+target_final_y               31.744 [  29.825,   33.589]     41.835     -0.039
+target_topple_angle           1.082 [   0.987,    1.174]      1.724     -0.029
+
+n_train=5230 n_test=770 n_features=9
+
+=== held_out_impulse_mass :: control vision_proprio_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               28.973 [  26.836,   31.144]     41.437     -0.010
+target_delta_y               26.633 [  24.771,   28.409]     37.776     -0.014
+target_displacement          28.081 [  26.487,   29.729]     37.618     -0.030
+target_final_x               37.004 [  34.952,   39.160]     46.661     -0.013
+target_final_y               31.433 [  29.622,   33.409]     41.344     -0.015
+target_topple_angle           1.073 [   0.983,    1.165]      1.704     -0.005
+
+n_train=5230 n_test=770 n_features=163
+
+=== held_out_impulse_mass :: control vision_proprio_touch_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               28.934 [  26.844,   31.023]     41.379     -0.007
+target_delta_y               28.217 [  26.462,   30.099]     37.898     -0.020
+target_displacement          30.035 [  28.527,   31.593]     37.332     -0.015
+target_final_x               36.981 [  34.941,   39.028]     46.548     -0.008
+target_final_y               32.398 [  30.553,   34.185]     41.531     -0.024
+target_topple_angle           1.451 [   1.366,    1.536]      1.868     -0.208
+
+n_train=5230 n_test=770 n_features=176
+
+=== held_out_impulse_mass :: control oracle_full_state_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               28.751 [  26.754,   30.785]     41.171      0.003
+target_delta_y               27.198 [  25.302,   28.951]     37.992     -0.025
+target_displacement          28.593 [  26.853,   30.279]     37.453     -0.021
+target_final_x               37.163 [  35.012,   39.219]     46.685     -0.014
+target_final_y               31.671 [  29.916,   33.497]     41.392     -0.017
+target_topple_angle           1.229 [   1.146,    1.320]      1.743     -0.051
+
+n_train=5230 n_test=770 n_features=180
+
+=== held_out_impulse_mass :: control vision_proprio_touch_touch_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               28.762 [  26.725,   30.915]     40.775      0.022
+target_delta_y               23.698 [  21.924,   25.513]     34.726      0.144
+target_displacement          13.288 [  12.173,   14.405]     20.793      0.685
+target_final_x               30.898 [  28.809,   32.961]     42.651      0.153
+target_final_y               24.797 [  23.062,   26.720]     36.399      0.213
+target_topple_angle           0.303 [   0.259,    0.347]      0.714      0.824
+
+n_train=5230 n_test=770 n_features=176
+
+=== held_out_impulse_mass :: control oracle_full_state_touch_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               28.547 [  26.377,   30.540]     40.679      0.026
+target_delta_y               22.494 [  20.599,   24.413]     34.734      0.143
+target_displacement          21.998 [  20.479,   23.542]     31.216      0.291
+target_final_x               30.948 [  28.891,   32.924]     42.926      0.142
+target_final_y               23.798 [  21.933,   25.872]     36.132      0.225
+target_topple_angle           0.493 [   0.420,    0.569]      1.198      0.503
+
+n_train=5230 n_test=770 n_features=180
+
+=== held_out_composition :: priors_only ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               52.395 [  49.111,   55.704]     62.034     -0.000
+target_delta_y               41.366 [  38.494,   44.311]     51.234     -0.067
+target_displacement          47.685 [  45.577,   49.827]     52.619     -0.939
+target_final_x               56.815 [  53.851,   59.529]     63.765     -0.000
+target_final_y               44.240 [  41.277,   47.152]     53.408     -0.067
+target_topple_angle           0.755 [   0.739,    0.772]      0.772     -0.000
+
+n_train=5607 n_test=393 n_features=None
+
+=== held_out_composition :: vision ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               52.494 [  49.258,   55.798]     61.741      0.009
+target_delta_y               42.601 [  39.594,   45.719]     52.980     -0.141
+target_displacement          52.358 [  49.500,   55.000]     59.056     -1.443
+target_final_x               54.408 [  51.230,   57.787]     63.637      0.004
+target_final_y               42.817 [  39.254,   45.876]     53.210     -0.059
+target_topple_angle           0.678 [   0.622,    0.736]      0.889     -0.328
+
+n_train=5607 n_test=393 n_features=9
+
+=== held_out_composition :: vision_proprio ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               54.098 [  51.112,   57.093]     62.626     -0.019
+target_delta_y               42.322 [  39.597,   45.201]     50.985     -0.057
+target_displacement          25.184 [  22.941,   27.255]     33.709      0.204
+target_final_x               55.688 [  52.423,   59.111]     64.638     -0.028
+target_final_y               42.711 [  39.869,   45.553]     51.625      0.003
+target_topple_angle           0.640 [   0.568,    0.719]      1.002     -0.687
+
+n_train=5607 n_test=393 n_features=163
+
+=== held_out_composition :: vision_proprio_touch ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               53.003 [  50.046,   56.055]     61.974      0.002
+target_delta_y               41.580 [  38.691,   44.357]     50.548     -0.038
+target_displacement          24.573 [  22.390,   26.741]     32.837      0.245
+target_final_x               54.809 [  51.548,   58.323]     64.332     -0.018
+target_final_y               42.352 [  39.477,   45.035]     51.289      0.016
+target_topple_angle           0.640 [   0.568,    0.711]      1.002     -0.687
+
+n_train=5607 n_test=393 n_features=176
+
+=== held_out_composition :: oracle_full_state ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               52.758 [  49.642,   56.044]     62.023      0.000
+target_delta_y               40.761 [  37.776,   43.633]     49.837     -0.009
+target_displacement          16.143 [  14.753,   17.598]     21.523      0.676
+target_final_x               54.792 [  51.592,   58.036]     64.069     -0.010
+target_final_y               42.512 [  39.705,   45.389]     51.575      0.005
+target_topple_angle           0.640 [   0.564,    0.715]      1.002     -0.687
+
+n_train=5607 n_test=393 n_features=180
+
+=== held_out_composition :: control vision_proprio_hidden_impulse ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               53.700 [  50.633,   56.558]     62.251     -0.007
+target_delta_y               42.124 [  39.384,   44.917]     51.204     -0.066
+target_displacement          22.785 [  21.154,   24.601]     28.958      0.413
+target_final_x               55.284 [  52.196,   58.498]     64.059     -0.009
+target_final_y               42.794 [  40.075,   45.818]     52.122     -0.016
+target_topple_angle           0.640 [   0.568,    0.719]      1.002     -0.687
+
+n_train=5607 n_test=393 n_features=164
+
+=== held_out_composition :: control vision_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               52.865 [  49.634,   56.169]     62.272     -0.008
+target_delta_y               41.405 [  38.649,   44.481]     51.438     -0.075
+target_displacement          47.935 [  45.847,   50.324]     53.184     -0.981
+target_final_x               57.012 [  54.440,   59.903]     63.922     -0.005
+target_final_y               44.347 [  41.169,   47.362]     53.759     -0.081
+target_topple_angle           0.761 [   0.731,    0.794]      0.825     -0.143
+
+n_train=5607 n_test=393 n_features=9
+
+=== held_out_composition :: control vision_proprio_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               52.963 [  49.919,   56.127]     62.317     -0.009
+target_delta_y               41.557 [  38.777,   44.645]     51.316     -0.070
+target_displacement          47.690 [  45.453,   49.895]     52.787     -0.952
+target_final_x               57.124 [  54.257,   60.230]     64.220     -0.014
+target_final_y               44.260 [  41.259,   47.369]     53.553     -0.073
+target_topple_angle           0.766 [   0.743,    0.790]      0.805     -0.087
+
+n_train=5607 n_test=393 n_features=163
+
+=== held_out_composition :: control vision_proprio_touch_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               52.622 [  49.338,   55.825]     62.044     -0.000
+target_delta_y               41.435 [  38.463,   44.373]     51.434     -0.075
+target_displacement          47.725 [  45.639,   49.840]     52.632     -0.940
+target_final_x               57.088 [  54.191,   59.763]     64.083     -0.010
+target_final_y               44.292 [  41.202,   47.270]     53.431     -0.068
+target_topple_angle           0.750 [   0.724,    0.775]      0.793     -0.055
+
+n_train=5607 n_test=393 n_features=176
+
+=== held_out_composition :: control oracle_full_state_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               52.810 [  49.562,   56.177]     62.315     -0.009
+target_delta_y               41.535 [  38.387,   44.588]     51.440     -0.075
+target_displacement          47.827 [  45.582,   50.002]     52.888     -0.959
+target_final_x               56.969 [  53.972,   59.673]     63.967     -0.006
+target_final_y               44.594 [  41.796,   47.504]     53.724     -0.080
+target_topple_angle           0.750 [   0.726,    0.773]      0.785     -0.036
+
+n_train=5607 n_test=393 n_features=180
+
+=== held_out_composition :: control vision_proprio_touch_touch_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               53.805 [  51.030,   56.907]     62.134     -0.003
+target_delta_y               42.258 [  39.633,   44.964]     50.487     -0.036
+target_displacement          25.822 [  23.569,   27.912]     34.768      0.153
+target_final_x               55.837 [  52.573,   58.857]     64.589     -0.026
+target_final_y               42.876 [  40.281,   45.772]     51.237      0.018
+target_topple_angle           0.640 [   0.568,    0.715]      1.002     -0.687
+
+n_train=5607 n_test=393 n_features=176
+
+=== held_out_composition :: control oracle_full_state_touch_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               53.775 [  50.934,   56.645]     62.204     -0.006
+target_delta_y               42.564 [  39.910,   45.292]     50.833     -0.050
+target_displacement          25.864 [  23.781,   28.062]     33.902      0.195
+target_final_x               54.889 [  51.686,   58.123]     63.761      0.000
+target_final_y               43.501 [  40.825,   46.180]     52.029     -0.013
+target_topple_angle           0.640 [   0.564,    0.719]      1.002     -0.687
+
+n_train=5607 n_test=393 n_features=180
+
+=== held_out_material :: priors_only ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               17.881 [  16.677,   19.113]     29.618     -0.003
+target_delta_y               16.526 [  15.568,   17.488]     25.676     -0.000
+target_displacement          28.794 [  28.032,   29.549]     32.766     -0.254
+target_final_x               30.449 [  29.246,   31.581]     38.208     -0.001
+target_final_y               22.654 [  21.627,   23.738]     30.374     -0.000
+target_topple_angle           0.842 [   0.806,    0.886]      1.134     -0.173
+
+n_train=4476 n_test=1524 n_features=None
+
+=== held_out_material :: vision ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               20.318 [  19.175,   21.451]     30.513     -0.064
+target_delta_y               17.889 [  16.898,   18.841]     26.343     -0.053
+target_displacement          27.635 [  26.771,   28.444]     32.535     -0.237
+target_final_x               21.862 [  20.741,   23.132]     32.163      0.291
+target_final_y               18.847 [  17.881,   19.826]     27.260      0.194
+target_topple_angle           0.604 [   0.554,    0.657]      1.171     -0.252
+
+n_train=4476 n_test=1524 n_features=9
+
+=== held_out_material :: vision_proprio ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               19.245 [  18.084,   20.525]     30.574     -0.068
+target_delta_y               16.187 [  15.221,   17.191]     25.075      0.046
+target_displacement          18.657 [  17.774,   19.618]     25.818      0.221
+target_final_x               20.917 [  19.738,   22.104]     31.912      0.302
+target_final_y               16.855 [  15.901,   17.844]     26.004      0.267
+target_topple_angle           0.474 [   0.426,    0.524]      1.079     -0.062
+
+n_train=4476 n_test=1524 n_features=163
+
+=== held_out_material :: vision_proprio_touch ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               19.203 [  17.995,   20.448]     30.656     -0.074
+target_delta_y               15.102 [  14.089,   16.034]     24.560      0.085
+target_displacement          18.257 [  17.321,   19.235]     25.888      0.217
+target_final_x               20.819 [  19.586,   22.116]     31.928      0.301
+target_final_y               15.988 [  15.041,   17.044]     25.447      0.298
+target_topple_angle           0.530 [   0.475,    0.591]      1.248     -0.421
+
+n_train=4476 n_test=1524 n_features=176
+
+=== held_out_material :: oracle_full_state ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               19.013 [  17.844,   20.254]     30.486     -0.062
+target_delta_y               14.359 [  13.402,   15.265]     23.947      0.130
+target_displacement          10.714 [   9.989,   11.413]     17.933      0.624
+target_final_x               20.597 [  19.425,   21.837]     31.717      0.310
+target_final_y               15.631 [  14.698,   16.610]     25.057      0.319
+target_topple_angle           0.337 [   0.300,    0.376]      0.852      0.337
+
+n_train=4476 n_test=1524 n_features=180
+
+=== held_out_material :: control vision_proprio_hidden_impulse ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               18.938 [  17.660,   20.287]     30.592     -0.070
+target_delta_y               15.576 [  14.642,   16.607]     24.587      0.083
+target_displacement          16.760 [  15.990,   17.526]     22.418      0.413
+target_final_x               20.328 [  19.124,   21.562]     31.411      0.323
+target_final_y               16.271 [  15.252,   17.226]     25.489      0.296
+target_topple_angle           0.443 [   0.400,    0.487]      0.998      0.092
+
+n_train=4476 n_test=1524 n_features=164
+
+=== held_out_material :: control vision_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               19.381 [  18.153,   20.596]     30.419     -0.057
+target_delta_y               17.076 [  16.075,   18.086]     26.030     -0.028
+target_displacement          28.735 [  27.896,   29.537]     33.001     -0.272
+target_final_x               31.017 [  29.825,   32.214]     39.008     -0.044
+target_final_y               23.104 [  22.101,   24.158]     30.780     -0.027
+target_topple_angle           0.858 [   0.818,    0.899]      1.170     -0.249
+
+n_train=4476 n_test=1524 n_features=9
+
+=== held_out_material :: control vision_proprio_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               18.581 [  17.402,   19.732]     29.832     -0.017
+target_delta_y               16.951 [  16.039,   17.979]     26.118     -0.035
+target_displacement          28.952 [  28.164,   29.768]     33.079     -0.278
+target_final_x               30.584 [  29.467,   31.760]     38.376     -0.010
+target_final_y               22.866 [  21.818,   23.899]     30.664     -0.019
+target_topple_angle           0.855 [   0.817,    0.898]      1.160     -0.227
+
+n_train=4476 n_test=1524 n_features=163
+
+=== held_out_material :: control vision_proprio_touch_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               18.834 [  17.676,   20.024]     30.059     -0.033
+target_delta_y               17.321 [  16.384,   18.288]     26.042     -0.029
+target_displacement          29.509 [  28.665,   30.323]     33.618     -0.320
+target_final_x               30.763 [  29.675,   32.014]     38.613     -0.023
+target_final_y               23.138 [  22.157,   24.174]     30.858     -0.032
+target_topple_angle           0.923 [   0.883,    0.964]      1.199     -0.311
+
+n_train=4476 n_test=1524 n_features=176
+
+=== held_out_material :: control oracle_full_state_all_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               23.417 [  22.296,   24.541]     32.214     -0.186
+target_delta_y               17.111 [  16.181,   18.097]     25.918     -0.019
+target_displacement          33.565 [  32.803,   34.325]     36.982     -0.598
+target_final_x               30.481 [  29.346,   31.638]     38.318     -0.007
+target_final_y               22.868 [  21.908,   23.817]     30.554     -0.012
+target_topple_angle           1.346 [   1.314,    1.381]      1.488     -1.020
+
+n_train=4476 n_test=1524 n_features=180
+
+=== held_out_material :: control vision_proprio_touch_touch_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               19.149 [  17.922,   20.251]     30.300     -0.049
+target_delta_y               16.736 [  15.761,   17.729]     25.273      0.031
+target_displacement          18.693 [  17.775,   19.550]     25.523      0.239
+target_final_x               20.867 [  19.652,   22.059]     31.295      0.328
+target_final_y               17.298 [  16.288,   18.236]     26.299      0.250
+target_topple_angle           0.463 [   0.417,    0.506]      1.015      0.060
+
+n_train=4476 n_test=1524 n_features=176
+
+=== held_out_material :: control oracle_full_state_touch_features_shuffled ===
+target                          MAE                    MAE CI95       RMSE         R2
+target_delta_x               19.410 [  18.170,   20.576]     30.475     -0.061
+target_delta_y               15.215 [  14.329,   16.159]     24.255      0.108
+target_displacement          14.828 [  14.078,   15.525]     20.854      0.492
+target_final_x               20.791 [  19.664,   21.947]     31.597      0.315
+target_final_y               16.051 [  14.996,   17.081]     25.305      0.306
+target_topple_angle           0.368 [   0.332,    0.405]      0.833      0.367
+
+n_train=4476 n_test=1524 n_features=180

@@ -1,0 +1,24 @@
+# Coverage / Diversity Report
+
+Episodes: 6000
+Grid coverage: 64/64 cells (100.0%)
+Sparse cells (< 20 episodes): 0
+Empty cells: 0
+Single-outcome cells: 0
+Dominant-outcome cells (>= 95% one label): 6
+
+Event distribution:
+- grasp_fail: 362
+- grasp_success: 1081
+- missed: 524
+- rolls_far: 703
+- slides: 2440
+- small_move: 325
+- stays: 256
+- topples: 309
+
+Material distribution:
+- foam: 1443
+- metal: 1524
+- plastic: 1477
+- wood: 1556

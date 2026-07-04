@@ -1,0 +1,20 @@
+{
+  "episodes": 6000,
+  "base_seed": 900000123,
+  "seed_stride": 1009,
+  "seed_min": 900000123,
+  "seed_max": 906053114,
+  "episode_id_offset": 2000000,
+  "episode_id_min": 2000000,
+  "episode_id_max": 2005999,
+  "rendered_gifs": 0,
+  "elapsed_seconds": 3.9254322052001953,
+  "episodes_per_second": 1528.4941087637515,
+  "jsonl": "data/confirm_round2/episodes.jsonl",
+  "manifest": "data/confirm_round2/manifest.csv",
+  "split_configurations": [
+    "held_out_impulse_mass",
+    "held_out_composition",
+    "held_out_material"
+  ]
+}

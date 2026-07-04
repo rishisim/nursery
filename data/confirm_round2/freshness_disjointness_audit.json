@@ -1,0 +1,53 @@
+{
+  "status": "pass",
+  "checked_at": "2026-07-04T11:43:59-0700",
+  "reference_paths": [
+    {
+      "path": "data/honest/episodes.jsonl",
+      "exists": false,
+      "n_records": 0
+    },
+    {
+      "path": "babyworld-lite/data/honest/episodes.jsonl",
+      "exists": true,
+      "n_records": 6000,
+      "seed_min": 123,
+      "seed_max": 6053114,
+      "episode_id_min": 0,
+      "episode_id_max": 5999
+    },
+    {
+      "path": "data/live-demo/episodes.jsonl",
+      "exists": true,
+      "n_records": 6000,
+      "seed_min": 123,
+      "seed_max": 6053114,
+      "episode_id_min": 0,
+      "episode_id_max": 5999
+    }
+  ],
+  "new_dataset": {
+    "episodes": 6000,
+    "base_seed": 900000123,
+    "seed_stride": 1009,
+    "seed_min": 900000123,
+    "seed_max": 906053114,
+    "episode_id_offset": 2000000,
+    "episode_id_min": 2000000,
+    "episode_id_max": 2005999,
+    "rendered_gifs": 0,
+    "elapsed_seconds": 3.9254322052001953,
+    "episodes_per_second": 1528.4941087637515,
+    "jsonl": "data/confirm_round2/episodes.jsonl",
+    "manifest": "data/confirm_round2/manifest.csv",
+    "split_configurations": [
+      "held_out_impulse_mass",
+      "held_out_composition",
+      "held_out_material"
+    ]
+  },
+  "seed_overlap_count": 0,
+  "episode_id_overlap_count": 0,
+  "seed_overlap_examples": [],
+  "episode_id_overlap_examples": []
+}
