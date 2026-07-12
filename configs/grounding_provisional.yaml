@@ -1,0 +1,92 @@
+profile:
+  name: babyworld_grounding_provisional_v1
+  calibration_status: provisional_not_babyview_matched
+  note: Replace these explicitly provisional values with measured aggregate statistics after access.
+
+generation:
+  base_episodes: 96
+  seed: 20260709
+  frame_stride: 2
+  render_frames: true
+
+# These are controlled pre-access assumptions, not empirical BabyView estimates.
+distributions:
+  target_shapes:
+    ball: 0.42
+    block: 0.28
+    cup: 0.20
+    plush: 0.10
+  actions:
+    push: 0.40
+    tap: 0.28
+    grasp: 0.20
+    poke: 0.12
+  materials:
+    plastic: 0.40
+    wood: 0.28
+    foam: 0.22
+    metal: 0.10
+  distractor_count:
+    1: 0.45
+    2: 0.35
+    3: 0.20
+
+# Pre-access calibration targets. Every value below is provisional and is
+# consumed by the generator; the audit reports the realized values.
+calibration_targets:
+  utterance_rate_per_minute: 52.0
+  utterances_per_activity_window:
+    1: 0.25
+    2: 0.50
+    3: 0.25
+  utterance_length_words:
+    8: 0.30
+    10: 0.45
+    12: 0.25
+  inter_utterance_interval_frames:
+    12: 0.30
+    16: 0.45
+    20: 0.25
+  activity_window_frames:
+    20: 0.25
+    24: 0.35
+    28: 0.40
+  target_visibility:
+    visible: 0.85
+    invisible: 0.15
+  target_occlusion_fraction:
+    0.0: 0.50
+    0.25: 0.30
+    0.5: 0.20
+  camera_motion_amplitude_px:
+    0.0: 0.35
+    2.0: 0.40
+    5.0: 0.25
+
+conditions:
+  language_alignment: [strong, weak, shuffled]
+  motor_cues: ["null", synchronized, shuffled, time_shifted]
+  motor_time_shift_frames: 5
+
+weak_alignment:
+  mixture:
+    current: 0.30
+    delayed: 0.22
+    ambiguous: 0.18
+    irrelevant: 0.20
+    silent: 0.10
+  min_delay_frames: 3
+  max_delay_frames: 10
+  irrelevant_utterances:
+    - It is almost time to clean up.
+    - I can hear someone in the other room.
+    - We will have a snack later.
+    - That was a busy morning.
+
+splits:
+  validation_compositions:
+    - {shape: block, action: poke}
+  test_compositions:
+    - {shape: cup, action: push}
+    - {shape: plush, action: grasp}
+  minimum_base_episodes_per_holdout: 3

@@ -1,0 +1,539 @@
+{
+  "status": "pre_access_infrastructure_validated_no_language_effect_claim",
+  "dataset": {
+    "profile": {
+      "calibration_status": [
+        "provisional_not_babyview_matched"
+      ],
+      "name": "babyworld_grounding_provisional_v1"
+    },
+    "counts": {
+      "actions": {
+        "grasp": 18,
+        "poke": 13,
+        "push": 37,
+        "tap": 28
+      },
+      "alignment_conditions": {
+        "shuffled": 384,
+        "strong": 384,
+        "weak": 384
+      },
+      "base_episodes": 96,
+      "examples": 1152,
+      "materials": {
+        "foam": 26,
+        "metal": 7,
+        "plastic": 41,
+        "wood": 22
+      },
+      "motor_conditions": {
+        "null": 288,
+        "shuffled": 288,
+        "synchronized": 288,
+        "time_shifted": 288
+      },
+      "splits": {
+        "test": 156,
+        "train": 948,
+        "validation": 48
+      },
+      "target_shapes": {
+        "ball": 33,
+        "block": 30,
+        "cup": 20,
+        "plush": 13
+      }
+    },
+    "configured_distributions": {
+      "actions": {
+        "grasp": 0.2,
+        "poke": 0.12,
+        "push": 0.4,
+        "tap": 0.28
+      },
+      "distractor_count": {
+        "1": 0.45,
+        "2": 0.35,
+        "3": 0.2
+      },
+      "materials": {
+        "foam": 0.22,
+        "metal": 0.1,
+        "plastic": 0.4,
+        "wood": 0.28
+      },
+      "target_shapes": {
+        "ball": 0.42,
+        "block": 0.28,
+        "cup": 0.2,
+        "plush": 0.1
+      }
+    },
+    "configured_calibration_targets": {
+      "activity_window_frames": {
+        "20": 0.25,
+        "24": 0.35,
+        "28": 0.4
+      },
+      "camera_motion_amplitude_px": {
+        "0.0": 0.35,
+        "2.0": 0.4,
+        "5.0": 0.25
+      },
+      "inter_utterance_interval_frames": {
+        "12": 0.3,
+        "16": 0.45,
+        "20": 0.25
+      },
+      "target_occlusion_fraction": {
+        "0.0": 0.5,
+        "0.25": 0.3,
+        "0.5": 0.2
+      },
+      "target_visibility": {
+        "invisible": 0.15,
+        "visible": 0.85
+      },
+      "utterance_length_words": {
+        "10": 0.45,
+        "12": 0.25,
+        "8": 0.3
+      },
+      "utterance_rate_per_minute": 52.0,
+      "utterances_per_activity_window": {
+        "1": 0.25,
+        "2": 0.5,
+        "3": 0.25
+      }
+    },
+    "realized_calibration": {
+      "activity_window_frames": {
+        "20": 30,
+        "24": 26,
+        "28": 40
+      },
+      "camera_motion_amplitude_px": {
+        "0.0": 35,
+        "2.0": 38,
+        "5.0": 23
+      },
+      "distractor_count": {
+        "1": 40,
+        "2": 38,
+        "3": 18
+      },
+      "inter_utterance_interval_frames": {
+        "12": 19,
+        "16": 40,
+        "20": 20
+      },
+      "silent_activity_frame_fraction": 0.958618,
+      "target_occlusion_fraction": {
+        "0.0": 42,
+        "0.25": 32,
+        "0.5": 22
+      },
+      "target_visibility": {
+        "invisible": 13,
+        "visible": 83
+      },
+      "target_word_frequency": {
+        "ball": 33,
+        "block": 30,
+        "cup": 20,
+        "grasp": 18,
+        "plush": 13,
+        "poke": 13,
+        "push": 37,
+        "tap": 28
+      },
+      "utterance_length_words": {
+        "10": 87,
+        "12": 33,
+        "8": 55
+      },
+      "utterance_rate_per_minute": 53.7543,
+      "utterances_per_activity_window": {
+        "1": 29,
+        "2": 55,
+        "3": 12
+      }
+    },
+    "fairness": {
+      "cross_split_donors": [],
+      "episode_multisets_identical_across_alignment": true,
+      "shuffled_self_matches": [],
+      "split_composition_overlap": {},
+      "split_hash_overlap": {},
+      "utterance_multisets_identical_across_alignment": true
+    },
+    "leakage": {
+      "model_input_violations": {},
+      "oracle_file_separate": true
+    },
+    "renderer": {
+      "policy": "scene_pixels_only_no_text_or_contact_marker"
+    },
+    "audit_valid": true
+  },
+  "pilot": {
+    "source_schema": "grounding-v0",
+    "alignment_condition": "weak",
+    "seeds": [
+      11,
+      22,
+      33
+    ],
+    "n_train": 83,
+    "n_test": 13,
+    "primary_test": {
+      "metric": "action-balanced held-out-composition 2AFC",
+      "motor_input": "hard-masked by omission; motor encoder is never called"
+    },
+    "paired_protocol_checks": {
+      "same_initialization_across_arms": {
+        "11": true,
+        "22": true,
+        "33": true
+      },
+      "same_optimizer_steps_across_arms": {
+        "11": true,
+        "22": true,
+        "33": true
+      },
+      "same_training_order_across_arms": {
+        "11": true,
+        "22": true,
+        "33": true
+      },
+      "same_seeded_schedule": true
+    },
+    "metadata_only_shortcut": {
+      "action_2afc_macro_accuracy": 0.041666666666666664,
+      "chance": 0.5
+    },
+    "paired_lifts": {
+      "synchronized_minus_shuffled": {
+        "mean": -0.20370370370370375,
+        "ci95_low": -0.337962962962963,
+        "ci95_high": -0.01388888888888895,
+        "n_seeds": 3
+      },
+      "synchronized_minus_null": {
+        "mean": -0.24228395061728394,
+        "ci95_low": -0.31481481481481477,
+        "ci95_high": -0.15740740740740744,
+        "n_seeds": 3
+      },
+      "synchronized_minus_time_shifted": {
+        "mean": -0.06327160493827165,
+        "ci95_low": -0.14814814814814825,
+        "ci95_high": 0.0,
+        "n_seeds": 3
+      }
+    }
+  },
+  "machine_devbench": {
+    "official_repository_commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "manifest_count": 20,
+    "target_trials": 3721,
+    "official_protocol_adapter_validated": true,
+    "nursery_full_run_summary": {
+      "overall": 0.34351998582713766,
+      "total": {
+        "overall": 0.34351998582713766,
+        "lexical": 0.5157524982178707,
+        "grammatical": 0.17128747343640463,
+        "gram_comparatives": 0.0392156862745098,
+        "gram_counting": 0.0,
+        "gram_embedded_relative": 0.5345454545454545,
+        "gram_negation": 0.4189189189189189,
+        "gram_order_matters": 0.0,
+        "gram_prepositions": 0.09359605911330049,
+        "gram_subject_adjective": 0.28402366863905326,
+        "gram_subject_verb": 0.0,
+        "lex_adjectives": 0.5323275139974423,
+        "lex_nouns": 0.4991774824382993
+      },
+      "per_style": {
+        "cartoon": {
+          "overall": 0.3651028849890907,
+          "lexical": 0.5290571389909451,
+          "grammatical": 0.20114863098723632,
+          "gram_comparatives": 0.05357142857142857,
+          "gram_counting": 0.0,
+          "gram_embedded_relative": 0.5949367088607594,
+          "gram_negation": 0.5675675675675675,
+          "gram_order_matters": 0.0,
+          "gram_prepositions": 0.08823529411764706,
+          "gram_subject_adjective": 0.3048780487804878,
+          "gram_subject_verb": 0.0,
+          "lex_adjectives": 0.5582379349046015,
+          "lex_nouns": 0.4998763430772887
+        },
+        "realistic": {
+          "overall": 0.32348516907451125,
+          "lexical": 0.5084230168017027,
+          "grammatical": 0.13854732134731987,
+          "gram_comparatives": 0.021739130434782608,
+          "gram_counting": 0.0,
+          "gram_embedded_relative": 0.452991452991453,
+          "gram_negation": 0.2702702702702703,
+          "gram_order_matters": 0.0,
+          "gram_prepositions": 0.09900990099009901,
+          "gram_subject_adjective": 0.26436781609195403,
+          "gram_subject_verb": 0.0,
+          "lex_adjectives": 0.5184990239709802,
+          "lex_nouns": 0.498347009632425
+        }
+      }
+    },
+    "nursery_target_vocabulary_coverage": {
+      "unique_total": 1414,
+      "unique_covered": 13,
+      "unique_fraction": 0.009193776520509194,
+      "trial_weighted_fraction": 0.026068261220102123,
+      "covered_targets": [
+        "ball",
+        "block",
+        "blue",
+        "busy",
+        "cup",
+        "green",
+        "plush",
+        "poke",
+        "purple",
+        "push",
+        "room",
+        "tap",
+        "yellow"
+      ],
+      "most_common_oov_targets": [
+        {
+          "word": "lick",
+          "trials": 37
+        },
+        {
+          "word": "splash",
+          "trials": 32
+        },
+        {
+          "word": "wash",
+          "trials": 31
+        },
+        {
+          "word": "scratch",
+          "trials": 30
+        },
+        {
+          "word": "hug",
+          "trials": 29
+        },
+        {
+          "word": "pull",
+          "trials": 28
+        },
+        {
+          "word": "walk",
+          "trials": 25
+        },
+        {
+          "word": "grab",
+          "trials": 25
+        },
+        {
+          "word": "jump",
+          "trials": 24
+        },
+        {
+          "word": "chase",
+          "trials": 24
+        },
+        {
+          "word": "swim",
+          "trials": 23
+        },
+        {
+          "word": "hold",
+          "trials": 23
+        },
+        {
+          "word": "climb",
+          "trials": 22
+        },
+        {
+          "word": "pet",
+          "trials": 22
+        },
+        {
+          "word": "carry",
+          "trials": 21
+        },
+        {
+          "word": "sit",
+          "trials": 20
+        },
+        {
+          "word": "hop",
+          "trials": 19
+        },
+        {
+          "word": "bite",
+          "trials": 19
+        },
+        {
+          "word": "lift",
+          "trials": 18
+        },
+        {
+          "word": "stretch",
+          "trials": 17
+        },
+        {
+          "word": "run",
+          "trials": 17
+        },
+        {
+          "word": "wrap",
+          "trials": 17
+        },
+        {
+          "word": "drink",
+          "trials": 15
+        },
+        {
+          "word": "dig",
+          "trials": 15
+        },
+        {
+          "word": "fall",
+          "trials": 14
+        },
+        {
+          "word": "cover",
+          "trials": 14
+        },
+        {
+          "word": "lean",
+          "trials": 13
+        },
+        {
+          "word": "wave",
+          "trials": 13
+        },
+        {
+          "word": "crawl",
+          "trials": 12
+        },
+        {
+          "word": "eat",
+          "trials": 12
+        },
+        {
+          "word": "squat",
+          "trials": 11
+        },
+        {
+          "word": "stand",
+          "trials": 11
+        },
+        {
+          "word": "ride",
+          "trials": 11
+        },
+        {
+          "word": "rest",
+          "trials": 10
+        },
+        {
+          "word": "touch",
+          "trials": 9
+        },
+        {
+          "word": "dirty",
+          "trials": 8
+        },
+        {
+          "word": "muddy",
+          "trials": 8
+        },
+        {
+          "word": "black",
+          "trials": 8
+        },
+        {
+          "word": "snowy",
+          "trials": 8
+        },
+        {
+          "word": "sleep",
+          "trials": 8
+        },
+        {
+          "word": "skip",
+          "trials": 8
+        },
+        {
+          "word": "dark",
+          "trials": 7
+        },
+        {
+          "word": "rusty",
+          "trials": 7
+        },
+        {
+          "word": "wavy",
+          "trials": 7
+        },
+        {
+          "word": "slide",
+          "trials": 7
+        },
+        {
+          "word": "kneel",
+          "trials": 7
+        },
+        {
+          "word": "scratched",
+          "trials": 6
+        },
+        {
+          "word": "colorful",
+          "trials": 6
+        },
+        {
+          "word": "cracked",
+          "trials": 6
+        },
+        {
+          "word": "messy",
+          "trials": 6
+        }
+      ]
+    },
+    "interpretation": "The evaluator and adapter run end to end, but the provisional learner's Machine-DevBench score is not scientifically interpretable because exact target-word coverage is under one percent.",
+    "openclip_l_reference": {
+      "observed": {
+        "lexical": 0.8626966177439501,
+        "grammatical": 0.7028959025895053,
+        "overall": 0.7827962601667278
+      },
+      "published_leaderboard": {
+        "lexical": 0.873,
+        "grammatical": 0.704,
+        "overall": 0.788
+      },
+      "absolute_difference": {
+        "lexical": 0.010303382256049876,
+        "grammatical": 0.0011040974104946644,
+        "overall": 0.0052037398332722695
+      }
+    }
+  },
+  "interpretation": {
+    "infrastructure": "The leak-free factorial dataset, paired training protocol, and motor-withheld action-grounding evaluation run end to end.",
+    "effect": "The small single-corpus three-seed pilot does not satisfy the prespecified claim gate. It is pipeline validation only.",
+    "email_rule": "Describe the infrastructure as completed; do not state that synchronized motor experience improves language grounding."
+  }
+}

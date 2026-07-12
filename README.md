@@ -75,6 +75,104 @@ python3 run_honest_eval.py --episodes data/sample/episodes.jsonl --out data/samp
 python3 -m pytest
 ```
 
+## Pre-access grounded-language pilot
+
+The grounding pipeline is deliberately labeled
+`provisional_not_babyview_matched`. It creates the experimental infrastructure
+needed before restricted BabyView access without claiming that its provisional
+rates are empirical estimates.
+
+It generates the same base episodes under three language-alignment conditions
+(`strong`, `weak`, and episode-shuffled) and four whole-trajectory motor
+conditions (`null`, synchronized, split-local episode-shuffled, and
+time-shifted). Model-visible records contain only raw frame paths, timestamped
+utterances, and low-level hand trajectories. Oracle state and causal labels are
+written to a physically separate file. The persistent audit checks allowlisted
+inputs, no-self and no-cross-split donors, composition/hash-disjoint splits,
+equal inventories across alignment arms, and a caption/contact-marker-free
+renderer.
+
+The same config also drives provisional utterance rate/count/length/timing,
+activity-window duration, visibility/occlusion, camera motion, and distractor
+density. The audit records both configured and realized distributions,
+including target-word frequencies and silent-frame fraction, so measured
+BabyView aggregates can later replace the provisional values through the same
+schema.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+python -m babyworld_lite.grounding \
+  --config configs/grounding_provisional.yaml \
+  --out data/grounding_provisional
+
+python train_grounding_pilot.py \
+  --episodes data/grounding_provisional/examples.jsonl \
+  --out data/grounding_pilot \
+  --seeds 11 22 33 \
+  --alignment weak \
+  --device auto
+```
+
+The learner uses actual rendered RGB frames, utterance text, and continuous
+hand `x/y/vx/vy` sequences. All arms share the same video, text, and motor
+encoders, initialization, data order, and optimizer schedule. The locked
+primary evaluation is a balanced held-out-composition action contrast; it
+calls only the video and text encoders, with motor omitted at test. Results are
+written to `pilot_results.json` with paired lift intervals, manipulation
+checks, shortcut diagnostics, and an explicit claim gate. The small default
+run is an infrastructure validation, not evidence that synchronized motor cues
+improve language grounding.
+
+### Official Machine-DevBench integration
+
+The learner can now be saved as a standalone checkpoint and evaluated through
+the public EgoBabyVLM Machine-DevBench protocol. The local runner imports the
+official dataset discovery, task metadata, frequency-balanced aggregator, and
+feature-extractor protocol from a pinned EgoBabyVLM checkout. It changes only
+the Slurm/CUDA launcher so the same trial equations can run on Apple MPS.
+
+```bash
+git clone https://github.com/facebookresearch/egobabyvlm .external/egobabyvlm
+PYTHONPATH=.external/egobabyvlm python -m scripts.eval_data.download_machine_devbench \
+  --cache-dir .external/cache/machine_devbench
+
+python scripts/train_nursery_checkpoint.py \
+  --episodes data/grounding_provisional/examples.jsonl \
+  --out output/machine_devbench/nursery_sync_seed11.pt \
+  --arm synchronized --seed 11 --alignment weak --epochs 8 --device auto
+
+python scripts/run_machine_devbench.py \
+  --model nursery \
+  --checkpoint output/machine_devbench/nursery_sync_seed11.pt \
+  --out output/machine_devbench/nursery_full.json \
+  --device auto
+
+python scripts/audit_machine_devbench_coverage.py \
+  --checkpoint output/machine_devbench/nursery_sync_seed11.pt
+```
+
+The public archive has 20 manifests and 3,721 trials across realistic and
+cartoon styles. The provisional learner completes all of them, but only 13 of
+1,414 unique target words are in its training vocabulary. Its current score is
+therefore an integration diagnostic, not evidence about developmental language
+learning. The post-access corpus must expand and calibrate the vocabulary before
+Machine-DevBench becomes a substantive secondary outcome.
+
+As an external correctness check, the full OpenAI CLIP ViT-L/14 run yields
+86.27 lexical, 70.29 grammatical, and 78.28 overall, versus the published
+CLIP-L row of 87.3 / 70.4 / 78.8. The 0.52-point overall difference provides a
+close macOS/MPS reproduction of the public reference.
+
+The optional two-page pre-access research attachment can be rebuilt with:
+
+```bash
+python scripts/build_frank_attachment.py
+pdftoppm -png output/pdf/frank_preaccess_experimental_plan.pdf tmp/pdfs/frank-plan
+```
+
 ## Why this is deliberately small
 
 The full idea is huge. This pilot isolates the core claim:
@@ -88,5 +186,3 @@ Next extensions:
 - train a small VLM/world-model instead of a classifier;
 - test transfer to real egocentric data or held-out simulated worlds;
 - add a cost-normalized leaderboard: performance per generated hour, per dollar, or per causal event.
-
- 

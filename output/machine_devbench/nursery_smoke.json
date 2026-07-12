@@ -1,0 +1,1012 @@
+{
+  "schema_version": "nursery-machine-devbench-run-v1",
+  "official_source": {
+    "repository": "https://github.com/facebookresearch/egobabyvlm",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "component_sha256": {
+      "core/protocols/feature_extractor.py": "d4f3b9977c074d520c879813055b043aa656df7aec8f301f14754bac391c2e98",
+      "evaluation/data/machine_devbench.py": "5fbf7cbafbd94537d3c9afbdf2be75f542a8d27df1c0ba632f48efb04b7878b9",
+      "evaluation/multimodal/machine_devbench/base.py": "2d2084a9f079a03ce7ed4c14bce494de06d1503dc2cdb7a5816bde974079e004",
+      "evaluation/multimodal/machine_devbench/metrics.py": "71c517c6afadc1ddbdc1fa19f10be008896e528d2a0caea938167e55dc55f7aa"
+    }
+  },
+  "benchmark": {
+    "data_root": "/Users/rishisim/Documents/research/nursery/.external/cache/machine_devbench",
+    "styles": [
+      "realistic",
+      "cartoon"
+    ],
+    "manifest_count": 20,
+    "manifest_set_sha256": "5991c95ce036d22e6e64360d3bb5370f2c3dc145f87ba5c074d6bd67a06bcbba"
+  },
+  "execution": {
+    "batch_size": 2,
+    "max_trials_per_task": 2,
+    "batching_note": "The official collate order and per-trial scoring equations are unchanged; batching only amortizes encoder calls."
+  },
+  "model": {
+    "kind": "nursery",
+    "checkpoint": "output/machine_devbench/nursery_sync_seed11.pt",
+    "checkpoint_sha256": "30e5af777a5015d03b905c7c47768e6ade5a9f14391f38cf061224f1d5906fa9",
+    "checkpoint_metadata": {
+      "arm": "synchronized",
+      "seed": 11,
+      "alignment_condition": "weak",
+      "source_schema": "grounding-v0",
+      "episodes_path": "data/grounding_provisional/examples.jsonl",
+      "n_train": 79,
+      "n_test": 13,
+      "training_protocol": {
+        "initialization_digest": "86971e1ba2e4e004c5189006e298d027e1aa38eec7214dd7a1b173db76e0aea8",
+        "training_order_digest": "d19215f953225457666ae3483eed93afc40b11cf004973cdcb03289f870e40e6",
+        "optimizer_steps": 32,
+        "batches_per_epoch": 4,
+        "training_history": [
+          {
+            "loss": 4.307493209838867,
+            "video_text_loss": 2.8723254799842834,
+            "motor_text_loss": 2.8706440925598145,
+            "motor_video_loss": 2.8700268864631653
+          },
+          {
+            "loss": 4.305448472499847,
+            "video_text_loss": 2.870621085166931,
+            "motor_text_loss": 2.869282364845276,
+            "motor_video_loss": 2.8700270652770996
+          },
+          {
+            "loss": 4.304067313671112,
+            "video_text_loss": 2.870126962661743,
+            "motor_text_loss": 2.8657363653182983,
+            "motor_video_loss": 2.870025396347046
+          },
+          {
+            "loss": 4.304071545600891,
+            "video_text_loss": 2.870180666446686,
+            "motor_text_loss": 2.865543782711029,
+            "motor_video_loss": 2.870019316673279
+          },
+          {
+            "loss": 4.301964521408081,
+            "video_text_loss": 2.870016783475876,
+            "motor_text_loss": 2.857775568962097,
+            "motor_video_loss": 2.8700153827667236
+          },
+          {
+            "loss": 4.300820410251617,
+            "video_text_loss": 2.8698999285697937,
+            "motor_text_loss": 2.8536784946918488,
+            "motor_video_loss": 2.870003581047058
+          },
+          {
+            "loss": 4.299117743968964,
+            "video_text_loss": 2.8696808516979218,
+            "motor_text_loss": 2.8477710485458374,
+            "motor_video_loss": 2.86997589468956
+          },
+          {
+            "loss": 4.29864114522934,
+            "video_text_loss": 2.8694421648979187,
+            "motor_text_loss": 2.846872478723526,
+            "motor_video_loss": 2.869923859834671
+          }
+        ]
+      }
+    },
+    "static_image_rule": "repeat each benchmark image across the checkpoint frame_count",
+    "device": "mps",
+    "feature_dim": 32
+  },
+  "summary": {
+    "overall": 0.1875,
+    "total": {
+      "overall": 0.1875,
+      "lexical": 0.25,
+      "grammatical": 0.125,
+      "gram_comparatives": 0.0,
+      "gram_counting": 0.0,
+      "gram_embedded_relative": 0.25,
+      "gram_negation": 0.5,
+      "gram_order_matters": 0.0,
+      "gram_prepositions": 0.0,
+      "gram_subject_adjective": 0.25,
+      "gram_subject_verb": 0.0,
+      "lex_adjectives": 0.25,
+      "lex_nouns": 0.25
+    },
+    "per_style": {
+      "cartoon": {
+        "overall": 0.03125,
+        "lexical": 0.0,
+        "grammatical": 0.0625,
+        "gram_comparatives": 0.0,
+        "gram_counting": 0.0,
+        "gram_embedded_relative": 0.5,
+        "gram_negation": 0.0,
+        "gram_order_matters": 0.0,
+        "gram_prepositions": 0.0,
+        "gram_subject_adjective": 0.0,
+        "gram_subject_verb": 0.0,
+        "lex_adjectives": 0.0,
+        "lex_nouns": 0.0
+      },
+      "realistic": {
+        "overall": 0.34375,
+        "lexical": 0.5,
+        "grammatical": 0.1875,
+        "gram_comparatives": 0.0,
+        "gram_counting": 0.0,
+        "gram_embedded_relative": 0.0,
+        "gram_negation": 1.0,
+        "gram_order_matters": 0.0,
+        "gram_prepositions": 0.0,
+        "gram_subject_adjective": 0.5,
+        "gram_subject_verb": 0.0,
+        "lex_adjectives": 0.5,
+        "lex_nouns": 0.5
+      }
+    }
+  },
+  "total": {
+    "overall": {
+      "accuracy": 0.1875
+    },
+    "by_task_type": {
+      "lexical": {
+        "accuracy": 0.25
+      },
+      "grammatical": {
+        "accuracy": 0.125
+      }
+    },
+    "by_task": {
+      "gram_comparatives": {
+        "n_trials": 4,
+        "by_freq_bin": {
+          "4": 0.0,
+          "6": 0.0
+        },
+        "accuracy": 0.0
+      },
+      "gram_counting": {
+        "n_trials": 4,
+        "by_freq_bin": {
+          "-1": 0.0
+        },
+        "accuracy": 0.0
+      },
+      "gram_embedded_relative": {
+        "n_trials": 4,
+        "by_freq_bin": {
+          "-1": 0.25
+        },
+        "accuracy": 0.25
+      },
+      "gram_negation": {
+        "n_trials": 4,
+        "by_freq_bin": {
+          "-1": 0.5,
+          "4": 0.5
+        },
+        "accuracy": 0.5
+      },
+      "gram_order_matters": {
+        "n_trials": 4,
+        "by_freq_bin": {
+          "-1": 0.0
+        },
+        "accuracy": 0.0
+      },
+      "gram_prepositions": {
+        "n_trials": 4,
+        "by_freq_bin": {
+          "4": 0.0
+        },
+        "accuracy": 0.0
+      },
+      "gram_subject_adjective": {
+        "n_trials": 4,
+        "by_freq_bin": {
+          "10": 0.5,
+          "4": 0.0
+        },
+        "accuracy": 0.25
+      },
+      "gram_subject_verb": {
+        "n_trials": 4,
+        "by_freq_bin": {
+          "-1": 0.0
+        },
+        "accuracy": 0.0
+      },
+      "lex_adjectives": {
+        "n_trials": 4,
+        "by_freq_bin": {
+          "[1,4)": 0.5,
+          "[8,16)": 0.0
+        },
+        "accuracy": 0.25
+      },
+      "lex_nouns": {
+        "n_trials": 4,
+        "by_freq_bin": {
+          "[1,4)": 0.5,
+          "[8,16)": 0.0
+        },
+        "accuracy": 0.25,
+        "by_category": {
+          "animals": 0.25
+        }
+      }
+    }
+  },
+  "by_style": {
+    "realistic": {
+      "overall": {
+        "accuracy": 0.34375
+      },
+      "by_task_type": {
+        "lexical": {
+          "accuracy": 0.5
+        },
+        "grammatical": {
+          "accuracy": 0.1875
+        }
+      },
+      "by_task": {
+        "gram_comparatives": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "4": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "gram_counting": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "-1": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "gram_embedded_relative": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "-1": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "gram_negation": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "-1": 1.0,
+            "4": 1.0
+          },
+          "accuracy": 1.0
+        },
+        "gram_order_matters": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "-1": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "gram_prepositions": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "4": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "gram_subject_adjective": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "10": 1.0,
+            "4": 0.0
+          },
+          "accuracy": 0.5
+        },
+        "gram_subject_verb": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "-1": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "lex_adjectives": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "[1,4)": 1.0,
+            "[8,16)": 0.0
+          },
+          "accuracy": 0.5
+        },
+        "lex_nouns": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "[1,4)": 1.0,
+            "[8,16)": 0.0
+          },
+          "accuracy": 0.5,
+          "by_category": {
+            "animals": 0.5
+          }
+        }
+      }
+    },
+    "cartoon": {
+      "overall": {
+        "accuracy": 0.03125
+      },
+      "by_task_type": {
+        "lexical": {
+          "accuracy": 0.0
+        },
+        "grammatical": {
+          "accuracy": 0.0625
+        }
+      },
+      "by_task": {
+        "gram_comparatives": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "4": 0.0,
+            "6": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "gram_counting": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "-1": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "gram_embedded_relative": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "-1": 0.5
+          },
+          "accuracy": 0.5
+        },
+        "gram_negation": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "-1": 0.0,
+            "4": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "gram_order_matters": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "-1": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "gram_prepositions": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "4": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "gram_subject_adjective": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "10": 0.0,
+            "4": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "gram_subject_verb": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "-1": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "lex_adjectives": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "[1,4)": 0.0,
+            "[8,16)": 0.0
+          },
+          "accuracy": 0.0
+        },
+        "lex_nouns": {
+          "n_trials": 2,
+          "by_freq_bin": {
+            "[1,4)": 0.0,
+            "[8,16)": 0.0
+          },
+          "accuracy": 0.0,
+          "by_category": {
+            "animals": 0.0
+          }
+        }
+      }
+    }
+  },
+  "raw_records": {
+    "realistic": [
+      {
+        "task_name": "lex_nouns",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "word": "alligator",
+          "category": "animals",
+          "caption_positive": "This is a photo of an alligator.",
+          "caption_negative": "This is a photo of a rhino.",
+          "negative_word": "rhino",
+          "image_positive": "realistic/animals/alligator.png",
+          "image_negative": "realistic/animals/rhino.png",
+          "frequency_bin": "[8,16)",
+          "frequency_count": 15,
+          "frequency_quantile": 0.4742
+        }
+      },
+      {
+        "task_name": "lex_nouns",
+        "prediction": 0,
+        "target": 0,
+        "metadata": {
+          "word": "alpaca",
+          "category": "animals",
+          "caption_positive": "This is a photo of an alpaca.",
+          "caption_negative": "This is a photo of a monkey.",
+          "negative_word": "monkey",
+          "image_positive": "realistic/animals/alpaca.png",
+          "image_negative": "realistic/animals/monkey.png",
+          "frequency_bin": "[2,4)",
+          "frequency_count": 2,
+          "frequency_quantile": 0.0769
+        }
+      },
+      {
+        "task_name": "lex_adjectives",
+        "prediction": 0,
+        "target": 0,
+        "metadata": {
+          "word": "accessible",
+          "caption_positive": "an accessible ramp",
+          "caption_negative": "an inaccessible ramp",
+          "image_positive": "realistic/accessible/pos.png",
+          "image_negative": "realistic/accessible/neg.png",
+          "frequency_bin": "[2,4)",
+          "frequency_count": 3,
+          "frequency_quantile": 0.1042
+        }
+      },
+      {
+        "task_name": "lex_adjectives",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "word": "adjacent",
+          "caption_positive": "adjacent houses",
+          "caption_negative": "a distant house",
+          "image_positive": "realistic/adjacent/pos.png",
+          "image_negative": "realistic/adjacent/neg.png",
+          "frequency_bin": "[8,16)",
+          "frequency_count": 8,
+          "frequency_quantile": 0.362
+        }
+      },
+      {
+        "task_name": "gram_comparatives",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_00",
+          "caption_a": "the chair is more torn than the umbrella",
+          "caption_b": "the umbrella is more torn than the chair",
+          "word": "torn",
+          "image_0": "imgs/realistic/seq_00/img_0.png",
+          "image_1": "imgs/realistic/seq_00/img_1.png",
+          "freq_bin": 4
+        }
+      },
+      {
+        "task_name": "gram_comparatives",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_01",
+          "caption_a": "the house is leafier than the tower",
+          "caption_b": "the tower is leafier than the house",
+          "word": "leafy",
+          "image_0": "imgs/realistic/seq_01/img_0.png",
+          "image_1": "imgs/realistic/seq_01/img_1.png",
+          "freq_bin": 4
+        }
+      },
+      {
+        "task_name": "gram_counting",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_03",
+          "caption_a": "one woman is sitting.",
+          "caption_b": "five women are sitting.",
+          "word": "sit",
+          "image_0": "imgs/realistic/seq_03/img_0.png",
+          "image_1": "imgs/realistic/seq_03/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_counting",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_04",
+          "caption_a": "two bears are leaning",
+          "caption_b": "five bears are leaning",
+          "word": "lean",
+          "image_0": "imgs/realistic/seq_04/img_0.png",
+          "image_1": "imgs/realistic/seq_04/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_embedded_relative",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_01",
+          "caption_a": "the puppy scratches the dog that is dirty",
+          "caption_b": "the puppy that is dirty scratches the dog",
+          "word": "scratch",
+          "image_0": "imgs/realistic/seq_01/img_0.png",
+          "image_1": "imgs/realistic/seq_01/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_embedded_relative",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_03",
+          "caption_a": "the man pokes the squirrel that is small",
+          "caption_b": "the man that is small pokes the squirrel",
+          "word": "poke",
+          "image_0": "imgs/realistic/seq_03/img_0.png",
+          "image_1": "imgs/realistic/seq_03/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_negation",
+        "prediction": 0,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_00",
+          "caption_a": "the toast is burnt",
+          "caption_b": "the toast is not burnt",
+          "word": "burnt",
+          "image_0": "imgs/realistic/seq_00/img_0.png",
+          "image_1": "imgs/realistic/seq_00/img_1.png",
+          "freq_bin": 4
+        }
+      },
+      {
+        "task_name": "gram_negation",
+        "prediction": 0,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_02",
+          "caption_a": "the egg is cracked",
+          "caption_b": "the egg is not cracked",
+          "word": "cracked",
+          "image_0": "imgs/realistic/seq_02/img_0.png",
+          "image_1": "imgs/realistic/seq_02/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_order_matters",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_03",
+          "caption_a": "the horse is scratching the pig",
+          "caption_b": "the pig is scratching the horse",
+          "word": "scratch",
+          "image_0": "imgs/realistic/seq_03/img_0.png",
+          "image_1": "imgs/realistic/seq_03/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_order_matters",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_04",
+          "caption_a": "the duck is poking the rabbit",
+          "caption_b": "the rabbit is poking the duck",
+          "word": "poke",
+          "image_0": "imgs/realistic/seq_04/img_0.png",
+          "image_1": "imgs/realistic/seq_04/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_prepositions",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_00",
+          "caption_a": "the ball is in the compartment",
+          "caption_b": "the ball is beside the compartment",
+          "word": "compartment",
+          "image_0": "imgs/realistic/seq_00/img_0.png",
+          "image_1": "imgs/realistic/seq_00/img_1.png",
+          "freq_bin": 4
+        }
+      },
+      {
+        "task_name": "gram_prepositions",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_01",
+          "caption_a": "the cup is on the counter",
+          "caption_b": "the cup is under the counter",
+          "word": "counter",
+          "image_0": "imgs/realistic/seq_01/img_0.png",
+          "image_1": "imgs/realistic/seq_01/img_1.png",
+          "freq_bin": 4
+        }
+      },
+      {
+        "task_name": "gram_subject_adjective",
+        "prediction": 0,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_00",
+          "caption_a": "a yellow house and a red bicycle",
+          "caption_b": "a red house and a yellow bicycle",
+          "word": "yellow",
+          "image_0": "imgs/realistic/seq_00/img_0.png",
+          "image_1": "imgs/realistic/seq_00/img_1.png",
+          "freq_bin": 10
+        }
+      },
+      {
+        "task_name": "gram_subject_adjective",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_01",
+          "caption_a": "a dark cow and a white horse",
+          "caption_b": "a white cow and a dark horse",
+          "word": "dark",
+          "image_0": "imgs/realistic/seq_01/img_0.png",
+          "image_1": "imgs/realistic/seq_01/img_1.png",
+          "freq_bin": 4
+        }
+      },
+      {
+        "task_name": "gram_subject_verb",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_00",
+          "caption_a": "the cow is sitting and the bear is running",
+          "caption_b": "the cow is running and the bear is sitting",
+          "word": "sit",
+          "image_0": "imgs/realistic/seq_00/img_0.png",
+          "image_1": "imgs/realistic/seq_00/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_subject_verb",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_01",
+          "caption_a": "the horse is walking and the kitten is sleeping",
+          "caption_b": "the horse is sleeping and the kitten is walking",
+          "word": "walk",
+          "image_0": "imgs/realistic/seq_01/img_0.png",
+          "image_1": "imgs/realistic/seq_01/img_1.png",
+          "freq_bin": -1
+        }
+      }
+    ],
+    "cartoon": [
+      {
+        "task_name": "lex_nouns",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "word": "alligator",
+          "category": "animals",
+          "caption_positive": "This is a photo of an alligator.",
+          "caption_negative": "This is a photo of a peacock.",
+          "negative_word": "peacock",
+          "image_positive": "cartoon/animals/alligator.png",
+          "image_negative": "cartoon/animals/peacock.png",
+          "frequency_bin": "[8,16)",
+          "frequency_count": 15,
+          "frequency_quantile": 0.4711
+        }
+      },
+      {
+        "task_name": "lex_nouns",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "word": "alpaca",
+          "category": "animals",
+          "caption_positive": "This is a photo of an alpaca.",
+          "caption_negative": "This is a photo of a duck.",
+          "negative_word": "duck",
+          "image_positive": "cartoon/animals/alpaca.png",
+          "image_negative": "cartoon/animals/duck.png",
+          "frequency_bin": "[2,4)",
+          "frequency_count": 2,
+          "frequency_quantile": 0.074
+        }
+      },
+      {
+        "task_name": "lex_adjectives",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "word": "active",
+          "caption_positive": "an active volcano",
+          "caption_negative": "a dormant volcano",
+          "image_positive": "cartoon/active/pos.png",
+          "image_negative": "cartoon/active/neg.png",
+          "frequency_bin": "[8,16)",
+          "frequency_count": 13,
+          "frequency_quantile": 0.497
+        }
+      },
+      {
+        "task_name": "lex_adjectives",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "word": "agricultural",
+          "caption_positive": "an agricultural tool",
+          "caption_negative": "an industrial tool",
+          "image_positive": "cartoon/agricultural/pos.png",
+          "image_negative": "cartoon/agricultural/neg.png",
+          "frequency_bin": "[2,4)",
+          "frequency_count": 2,
+          "frequency_quantile": 0.0576
+        }
+      },
+      {
+        "task_name": "gram_comparatives",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_01",
+          "caption_a": "the house is leafier than the tower",
+          "caption_b": "the tower is leafier than the house",
+          "word": "leafy",
+          "image_0": "imgs/cartoon/seq_01/img_0.png",
+          "image_1": "imgs/cartoon/seq_01/img_1.png",
+          "freq_bin": 4
+        }
+      },
+      {
+        "task_name": "gram_comparatives",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_05",
+          "caption_a": "the shirt is shinier than the chair",
+          "caption_b": "the chair is shinier than the shirt",
+          "word": "shiny",
+          "image_0": "imgs/cartoon/seq_05/img_0.png",
+          "image_1": "imgs/cartoon/seq_05/img_1.png",
+          "freq_bin": 6
+        }
+      },
+      {
+        "task_name": "gram_counting",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_02",
+          "caption_a": "five girls are drinking",
+          "caption_b": "three girls are drinking",
+          "word": "drink",
+          "image_0": "imgs/cartoon/seq_02/img_0.png",
+          "image_1": "imgs/cartoon/seq_02/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_counting",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_03",
+          "caption_a": "one woman is sitting.",
+          "caption_b": "five women are sitting.",
+          "word": "sit",
+          "image_0": "imgs/cartoon/seq_03/img_0.png",
+          "image_1": "imgs/cartoon/seq_03/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_embedded_relative",
+        "prediction": 0,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_00",
+          "caption_a": "the puppy hugs the duck that is wet",
+          "caption_b": "the puppy that is wet hugs the duck",
+          "word": "hug",
+          "image_0": "imgs/cartoon/seq_00/img_0.png",
+          "image_1": "imgs/cartoon/seq_00/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_embedded_relative",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_02",
+          "caption_a": "the monkey touches the dog that is dirty",
+          "caption_b": "the monkey that is dirty touches the dog",
+          "word": "touch",
+          "image_0": "imgs/cartoon/seq_02/img_0.png",
+          "image_1": "imgs/cartoon/seq_02/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_negation",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_02",
+          "caption_a": "the egg is cracked",
+          "caption_b": "the egg is not cracked",
+          "word": "cracked",
+          "image_0": "imgs/cartoon/seq_02/img_0.png",
+          "image_1": "imgs/cartoon/seq_02/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_negation",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_03",
+          "caption_a": "the ladder is vertical",
+          "caption_b": "the ladder is not vertical",
+          "word": "vertical",
+          "image_0": "imgs/cartoon/seq_03/img_0.png",
+          "image_1": "imgs/cartoon/seq_03/img_1.png",
+          "freq_bin": 4
+        }
+      },
+      {
+        "task_name": "gram_order_matters",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_00",
+          "caption_a": "the rabbit is pulling the mouse",
+          "caption_b": "the mouse is pulling the rabbit",
+          "word": "pull",
+          "image_0": "imgs/cartoon/seq_00/img_0.png",
+          "image_1": "imgs/cartoon/seq_00/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_order_matters",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_01",
+          "caption_a": "the cat is hugging the fox",
+          "caption_b": "the fox is hugging the cat",
+          "word": "hug",
+          "image_0": "imgs/cartoon/seq_01/img_0.png",
+          "image_1": "imgs/cartoon/seq_01/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_prepositions",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_00",
+          "caption_a": "the ball is in the compartment",
+          "caption_b": "the ball is beside the compartment",
+          "word": "compartment",
+          "image_0": "imgs/cartoon/seq_00/img_0.png",
+          "image_1": "imgs/cartoon/seq_00/img_1.png",
+          "freq_bin": 4
+        }
+      },
+      {
+        "task_name": "gram_prepositions",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_01",
+          "caption_a": "the cup is on the counter",
+          "caption_b": "the cup is under the counter",
+          "word": "counter",
+          "image_0": "imgs/cartoon/seq_01/img_0.png",
+          "image_1": "imgs/cartoon/seq_01/img_1.png",
+          "freq_bin": 4
+        }
+      },
+      {
+        "task_name": "gram_subject_adjective",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_00",
+          "caption_a": "a yellow house and a red bicycle",
+          "caption_b": "a red house and a yellow bicycle",
+          "word": "yellow",
+          "image_0": "imgs/cartoon/seq_00/img_0.png",
+          "image_1": "imgs/cartoon/seq_00/img_1.png",
+          "freq_bin": 10
+        }
+      },
+      {
+        "task_name": "gram_subject_adjective",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_01",
+          "caption_a": "a dark cow and a white horse",
+          "caption_b": "a white cow and a dark horse",
+          "word": "dark",
+          "image_0": "imgs/cartoon/seq_01/img_0.png",
+          "image_1": "imgs/cartoon/seq_01/img_1.png",
+          "freq_bin": 4
+        }
+      },
+      {
+        "task_name": "gram_subject_verb",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_00",
+          "caption_a": "the cow is sitting and the bear is running",
+          "caption_b": "the cow is running and the bear is sitting",
+          "word": "sit",
+          "image_0": "imgs/cartoon/seq_00/img_0.png",
+          "image_1": "imgs/cartoon/seq_00/img_1.png",
+          "freq_bin": -1
+        }
+      },
+      {
+        "task_name": "gram_subject_verb",
+        "prediction": 1,
+        "target": 0,
+        "metadata": {
+          "seq": "seq_01",
+          "caption_a": "the horse is walking and the kitten is sleeping",
+          "caption_b": "the horse is sleeping and the kitten is walking",
+          "word": "walk",
+          "image_0": "imgs/cartoon/seq_01/img_0.png",
+          "image_1": "imgs/cartoon/seq_01/img_1.png",
+          "freq_bin": -1
+        }
+      }
+    ]
+  }
+}
