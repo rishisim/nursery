@@ -1,0 +1,6 @@
+{
+  "status": "invalid_superseded_not_used_for_decision",
+  "reason": "runner incorrectly inherited fine-label support when constructing coarse categories, omitting cleaning_grooming and media_leisure; caught during validation before final report",
+  "preserved_artifact": "raw_results_attempt1_invalid_coarse_support.json",
+  "corrected_output": "raw_results_v2.json"
+}

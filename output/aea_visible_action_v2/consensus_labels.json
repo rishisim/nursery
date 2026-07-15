@@ -1,0 +1,370 @@
+{
+  "schema_version": "aea-visible-action-consensus-labels-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "role": "model_assisted_development_labels_not_human_annotations_or_human_interrater_reliability",
+  "modeling_consensus_rule": "exact modeled action plus medium-or-high confidence in both passes",
+  "rows": [
+    {
+      "blind_id": "VA2-01055B0D0EA9",
+      "example_id": "loc5_script5_seq5_rec1_w0001",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-187D47135B1B",
+      "example_id": "loc2_script1_seq6_rec1_w0000",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-1DEB68078C5E",
+      "example_id": "loc2_script4_seq5_rec1_w0002",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-2BAAF874073A",
+      "example_id": "loc3_script3_seq5_rec1_w0010",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-2C41D81AAB4E",
+      "example_id": "loc4_script3_seq3_rec1_w0002",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-2CC887385941",
+      "example_id": "loc2_script4_seq5_rec1_w0005",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-36E05856C337",
+      "example_id": "loc2_script1_seq6_rec1_w0002",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "observable_action": "reach_grasp"
+    },
+    {
+      "blind_id": "VA2-3B9F171498D0",
+      "example_id": "loc1_script3_seq5_rec1_w0007",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-3D5A86B0FA6A",
+      "example_id": "loc2_script4_seq5_rec1_w0003",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-44604D634178",
+      "example_id": "loc3_script3_seq5_rec2_w0004",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-4754B01CE013",
+      "example_id": "loc4_script3_seq3_rec1_w0005",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-552CBEB95CEB",
+      "example_id": "loc3_script4_seq3_rec1_w0001",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-6B7EF1CCC0C0",
+      "example_id": "loc2_script3_seq3_rec2_w0022",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-71E62E651628",
+      "example_id": "loc5_script4_seq5_rec1_w0003",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-89CA93047947",
+      "example_id": "loc1_script3_seq2_rec1_w0001",
+      "sequence_id": "loc1_script3_seq2_rec1",
+      "event_group": "loc1_script3_seq2",
+      "location": 1,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-8B0E777F7EE5",
+      "example_id": "loc1_script2_seq4_rec1_w0007",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "observable_action": "reach_grasp"
+    },
+    {
+      "blind_id": "VA2-8C8C567171AE",
+      "example_id": "loc3_script4_seq3_rec1_w0000",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-9C20B56C41F6",
+      "example_id": "loc5_script4_seq5_rec1_w0012",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-A200E8AD4C3D",
+      "example_id": "loc1_script3_seq5_rec1_w0003",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-B03FB1488213",
+      "example_id": "loc5_script5_seq5_rec1_w0003",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-C2DE1AB873E6",
+      "example_id": "loc4_script2_seq4_rec1_w0001",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-C938F9066543",
+      "example_id": "loc5_script4_seq5_rec1_w0011",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-CB4F5D23CF66",
+      "example_id": "loc5_script4_seq5_rec1_w0008",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-CD9CE17101E9",
+      "example_id": "loc5_script5_seq5_rec1_w0002",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-D63555577FE3",
+      "example_id": "loc1_script2_seq4_rec2_w0002",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-D71B527252DF",
+      "example_id": "loc4_script4_seq2_rec1_w0001",
+      "sequence_id": "loc4_script4_seq2_rec1",
+      "event_group": "loc4_script4_seq2",
+      "location": 4,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-D7B5F26EA5CC",
+      "example_id": "loc2_script4_seq5_rec1_w0007",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-D9AE98225F67",
+      "example_id": "loc2_script1_seq6_rec1_w0001",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-DA6163C01FFC",
+      "example_id": "loc3_script1_seq4_rec1_w0000",
+      "sequence_id": "loc3_script1_seq4_rec1",
+      "event_group": "loc3_script1_seq4",
+      "location": 3,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-DB2621422BFA",
+      "example_id": "loc1_script3_seq5_rec1_w0006",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-E4DF9D41568D",
+      "example_id": "loc4_script2_seq3_rec2_w0004",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-E7DAFA2B3842",
+      "example_id": "loc1_script2_seq4_rec1_w0000",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-E85597F92CD6",
+      "example_id": "loc3_script3_seq5_rec2_w0011",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-EDA412BB9636",
+      "example_id": "loc3_script1_seq5_rec1_w0000",
+      "sequence_id": "loc3_script1_seq5_rec1",
+      "event_group": "loc3_script1_seq5",
+      "location": 3,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-F0339CBC64A2",
+      "example_id": "loc5_script5_seq5_rec1_w0005",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-F0A8D3A9A7C2",
+      "example_id": "loc1_script3_seq5_rec1_w0005",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-F47C81A67607",
+      "example_id": "loc1_script3_seq5_rec1_w0000",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-FC19F364C2CF",
+      "example_id": "loc5_script5_seq5_rec1_w0000",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "state_change_operate"
+    }
+  ],
+  "retained_support": {
+    "food_material_handling": {
+      "windows": 9,
+      "event_groups": 4,
+      "locations": 4,
+      "by_event_group": {
+        "loc1_script3_seq2": 1,
+        "loc2_script4_seq5": 3,
+        "loc4_script3_seq3": 1,
+        "loc5_script4_seq5": 4
+      },
+      "by_location": {
+        "1": 1,
+        "2": 3,
+        "4": 1,
+        "5": 4
+      }
+    },
+    "locomotion_posture": {
+      "windows": 10,
+      "event_groups": 7,
+      "locations": 4,
+      "by_event_group": {
+        "loc1_script2_seq4": 2,
+        "loc1_script3_seq5": 3,
+        "loc2_script1_seq6": 1,
+        "loc3_script3_seq5": 1,
+        "loc4_script2_seq3": 1,
+        "loc4_script2_seq4": 1,
+        "loc4_script4_seq2": 1
+      },
+      "by_location": {
+        "1": 5,
+        "2": 1,
+        "3": 1,
+        "4": 3
+      }
+    },
+    "state_change_operate": {
+      "windows": 11,
+      "event_groups": 6,
+      "locations": 4,
+      "by_event_group": {
+        "loc2_script3_seq3": 1,
+        "loc2_script4_seq5": 1,
+        "loc3_script1_seq5": 1,
+        "loc3_script4_seq3": 2,
+        "loc4_script3_seq3": 1,
+        "loc5_script5_seq5": 5
+      },
+      "by_location": {
+        "2": 2,
+        "3": 3,
+        "4": 1,
+        "5": 5
+      }
+    }
+  }
+}

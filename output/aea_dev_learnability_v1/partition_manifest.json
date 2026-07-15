@@ -1,0 +1,2018 @@
+{
+  "schema_version": "aea-dev-partition-v1",
+  "protocol_id": "aea-dev-learnability-v1",
+  "source_examples_sha256": "7bda9e9b02da94b95a9199e02d14db8dd6d6059cda6389673d92d930ce95a98e",
+  "algorithm": "one_event_group_per_location_metadata_support_optimizer_frozen_in_preregistration",
+  "counts": {
+    "all_windows": 247,
+    "development_windows": 192,
+    "confirmation_windows": 55,
+    "development_event_groups": 18,
+    "confirmation_event_groups": 5
+  },
+  "confirmation_event_groups": [
+    "loc1_script4_seq4",
+    "loc2_script5_seq6",
+    "loc3_script2_seq3",
+    "loc4_script3_seq4",
+    "loc5_script4_seq3"
+  ],
+  "development_event_groups": [
+    "loc1_script2_seq4",
+    "loc1_script3_seq2",
+    "loc1_script3_seq5",
+    "loc2_script1_seq2",
+    "loc2_script1_seq6",
+    "loc2_script2_seq1",
+    "loc2_script3_seq3",
+    "loc2_script4_seq5",
+    "loc3_script1_seq4",
+    "loc3_script1_seq5",
+    "loc3_script3_seq5",
+    "loc3_script4_seq3",
+    "loc4_script2_seq3",
+    "loc4_script2_seq4",
+    "loc4_script3_seq3",
+    "loc4_script4_seq2",
+    "loc5_script4_seq5",
+    "loc5_script5_seq5"
+  ],
+  "entries": [
+    {
+      "example_id": "loc1_script2_seq4_rec1_w0000",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "bring",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec1_w0001",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec1_w0002",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec1_w0003",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec1_w0004",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "grab",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec1_w0005",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "eat",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec1_w0006",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec1_w0007",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "pour",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec2_w0000",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec2_w0001",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec2_w0002",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "grab",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec2_w0003",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec2_w0004",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "pour",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec2_w0005",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "eat",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec2_w0006",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "pour",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script2_seq4_rec2_w0007",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script3_seq2_rec1_w0000",
+      "sequence_id": "loc1_script3_seq2_rec1",
+      "event_group": "loc1_script3_seq2",
+      "location": 1,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script3_seq2_rec1_w0001",
+      "sequence_id": "loc1_script3_seq2_rec1",
+      "event_group": "loc1_script3_seq2",
+      "location": 1,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script3_seq2_rec1_w0002",
+      "sequence_id": "loc1_script3_seq2_rec1",
+      "event_group": "loc1_script3_seq2",
+      "location": 1,
+      "action_verb": "eat",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script3_seq5_rec1_w0000",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "action_verb": "clean",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script3_seq5_rec1_w0001",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script3_seq5_rec1_w0002",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script3_seq5_rec1_w0003",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "action_verb": "grab",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script3_seq5_rec1_w0004",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script3_seq5_rec1_w0005",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script3_seq5_rec1_w0006",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script3_seq5_rec1_w0007",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "action_verb": "cut",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc1_script4_seq4_rec1_w0000",
+      "sequence_id": "loc1_script4_seq4_rec1",
+      "event_group": "loc1_script4_seq4",
+      "location": 1,
+      "action_verb": "put",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc1_script4_seq4_rec1_w0001",
+      "sequence_id": "loc1_script4_seq4_rec1",
+      "event_group": "loc1_script4_seq4",
+      "location": 1,
+      "action_verb": "play",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc1_script4_seq4_rec1_w0002",
+      "sequence_id": "loc1_script4_seq4_rec1",
+      "event_group": "loc1_script4_seq4",
+      "location": 1,
+      "action_verb": "get",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc1_script4_seq4_rec1_w0003",
+      "sequence_id": "loc1_script4_seq4_rec1",
+      "event_group": "loc1_script4_seq4",
+      "location": 1,
+      "action_verb": "cook",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc2_script1_seq2_rec1_w0000",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "action_verb": "turn",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script1_seq2_rec1_w0001",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "action_verb": "walk",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script1_seq2_rec1_w0002",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "action_verb": "turn",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script1_seq2_rec1_w0003",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "action_verb": "walk",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script1_seq2_rec1_w0004",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "action_verb": "walk",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script1_seq6_rec1_w0000",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script1_seq6_rec1_w0001",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "action_verb": "grab",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script1_seq6_rec1_w0002",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "action_verb": "set",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec1_w0000",
+      "sequence_id": "loc2_script2_seq1_rec1",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "take",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec1_w0001",
+      "sequence_id": "loc2_script2_seq1_rec1",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "drink",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec1_w0002",
+      "sequence_id": "loc2_script2_seq1_rec1",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec1_w0003",
+      "sequence_id": "loc2_script2_seq1_rec1",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "take",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec1_w0004",
+      "sequence_id": "loc2_script2_seq1_rec1",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "drink",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec1_w0005",
+      "sequence_id": "loc2_script2_seq1_rec1",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec2_w0000",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "take",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec2_w0001",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "drink",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec2_w0002",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec2_w0003",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec2_w0004",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec2_w0005",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "take",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec2_w0006",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "drink",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec2_w0007",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec2_w0008",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script2_seq1_rec2_w0009",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0001",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "cook",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0002",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "cook",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0003",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "cook",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0004",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0005",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0006",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0007",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0008",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "open",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0009",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0010",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0011",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "cut",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0012",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0013",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0014",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0015",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0016",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0017",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "turn",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0018",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0019",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0020",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0021",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0022",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0023",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0024",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec1_w0025",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "cook",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0001",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "cook",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0002",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "cook",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0003",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "cook",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0004",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0005",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0006",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0007",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "open",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0008",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0009",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0010",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0011",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0012",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0013",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0014",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "turn",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0015",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "cook",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0016",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0017",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0018",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "eat",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0019",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "eat",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0020",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "take",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0021",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0022",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "set",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0023",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "eat",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script3_seq3_rec2_w0024",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script4_seq5_rec1_w0000",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "action_verb": "walk",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script4_seq5_rec1_w0001",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script4_seq5_rec1_w0002",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "action_verb": "wipe",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script4_seq5_rec1_w0003",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script4_seq5_rec1_w0004",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "action_verb": "eat",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script4_seq5_rec1_w0005",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "action_verb": "watch",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script4_seq5_rec1_w0006",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script4_seq5_rec1_w0007",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "action_verb": "wipe",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script4_seq5_rec1_w0008",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "action_verb": "eat",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script4_seq5_rec1_w0009",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "action_verb": "watch",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script4_seq5_rec1_w0010",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc2_script5_seq6_rec1_w0000",
+      "sequence_id": "loc2_script5_seq6_rec1",
+      "event_group": "loc2_script5_seq6",
+      "location": 2,
+      "action_verb": "fold",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script1_seq4_rec1_w0000",
+      "sequence_id": "loc3_script1_seq4_rec1",
+      "event_group": "loc3_script1_seq4",
+      "location": 3,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script1_seq5_rec1_w0000",
+      "sequence_id": "loc3_script1_seq5_rec1",
+      "event_group": "loc3_script1_seq5",
+      "location": 3,
+      "action_verb": "play",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0000",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "make",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0001",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0002",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0003",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0004",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0005",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "press",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0006",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0007",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "turn",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0008",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "open",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0009",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "pour",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0010",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0011",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "pour",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0012",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "take",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0013",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "press",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0014",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0015",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "turn",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0016",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "press",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0017",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "pour",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0018",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "move",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec1_w0019",
+      "sequence_id": "loc3_script2_seq3_rec1",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "press",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0000",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "make",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0001",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0002",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "bring",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0003",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "take",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0004",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0005",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0006",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "press",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0007",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0008",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "turn",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0009",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "open",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0010",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0011",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "pour",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0012",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "take",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0013",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "press",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0014",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0015",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "turn",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0016",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "press",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0017",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "move",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script2_seq3_rec2_w0018",
+      "sequence_id": "loc3_script2_seq3_rec2",
+      "event_group": "loc3_script2_seq3",
+      "location": 3,
+      "action_verb": "press",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0000",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0001",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "clean",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0002",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "take",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0003",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0004",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0005",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0006",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0007",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0008",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0009",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "pour",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0010",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "wash",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0011",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0012",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "take",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec1_w0013",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0000",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0001",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "clean",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0002",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "take",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0003",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0004",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "wash",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0005",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0006",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0007",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "play",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0008",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "grab",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0009",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0010",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script3_seq5_rec2_w0011",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "action_verb": "wash",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script4_seq3_rec1_w0000",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script4_seq3_rec1_w0001",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "action_verb": "play",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc3_script4_seq3_rec1_w0002",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "action_verb": "play",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq3_rec2_w0000",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq3_rec2_w0001",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "action_verb": "serve",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq3_rec2_w0002",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "action_verb": "serve",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq3_rec2_w0003",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq3_rec2_w0004",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "action_verb": "open",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq3_rec2_w0005",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "action_verb": "turn",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq3_rec2_w0006",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq3_rec2_w0007",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq4_rec1_w0001",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq4_rec1_w0002",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "action_verb": "eat",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq4_rec1_w0003",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq4_rec1_w0004",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "action_verb": "cut",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script2_seq4_rec1_w0005",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0001",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0002",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "eat",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0003",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "cook",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0004",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0005",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "read",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0006",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "take",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0007",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0008",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0009",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "move",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0010",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "take",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0011",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0012",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq3_rec1_w0013",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "action_verb": "eat",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc4_script3_seq4_rec1_w0000",
+      "sequence_id": "loc4_script3_seq4_rec1",
+      "event_group": "loc4_script3_seq4",
+      "location": 4,
+      "action_verb": "cook",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc4_script3_seq4_rec1_w0001",
+      "sequence_id": "loc4_script3_seq4_rec1",
+      "event_group": "loc4_script3_seq4",
+      "location": 4,
+      "action_verb": "put",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc4_script3_seq4_rec1_w0002",
+      "sequence_id": "loc4_script3_seq4_rec1",
+      "event_group": "loc4_script3_seq4",
+      "location": 4,
+      "action_verb": "take",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc4_script3_seq4_rec1_w0003",
+      "sequence_id": "loc4_script3_seq4_rec1",
+      "event_group": "loc4_script3_seq4",
+      "location": 4,
+      "action_verb": "grab",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc4_script3_seq4_rec1_w0004",
+      "sequence_id": "loc4_script3_seq4_rec1",
+      "event_group": "loc4_script3_seq4",
+      "location": 4,
+      "action_verb": "set",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc4_script3_seq4_rec1_w0005",
+      "sequence_id": "loc4_script3_seq4_rec1",
+      "event_group": "loc4_script3_seq4",
+      "location": 4,
+      "action_verb": "eat",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc4_script3_seq4_rec1_w0006",
+      "sequence_id": "loc4_script3_seq4_rec1",
+      "event_group": "loc4_script3_seq4",
+      "location": 4,
+      "action_verb": "cook",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc4_script3_seq4_rec1_w0007",
+      "sequence_id": "loc4_script3_seq4_rec1",
+      "event_group": "loc4_script3_seq4",
+      "location": 4,
+      "action_verb": "put",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc4_script3_seq4_rec1_w0008",
+      "sequence_id": "loc4_script3_seq4_rec1",
+      "event_group": "loc4_script3_seq4",
+      "location": 4,
+      "action_verb": "eat",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc4_script3_seq4_rec1_w0009",
+      "sequence_id": "loc4_script3_seq4_rec1",
+      "event_group": "loc4_script3_seq4",
+      "location": 4,
+      "action_verb": "put",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc4_script4_seq2_rec1_w0001",
+      "sequence_id": "loc4_script4_seq2_rec1",
+      "event_group": "loc4_script4_seq2",
+      "location": 4,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq3_rec1_w0000",
+      "sequence_id": "loc5_script4_seq3_rec1",
+      "event_group": "loc5_script4_seq3",
+      "location": 5,
+      "action_verb": "get",
+      "partition": "confirmation"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0000",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "remove",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0001",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0002",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0003",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "remove",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0004",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0005",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "remove",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0006",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0007",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0008",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "remove",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0009",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "remove",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0010",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "remove",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0011",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "press",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0012",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "set",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0013",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0014",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0015",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "put",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script4_seq5_rec1_w0016",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script5_seq5_rec1_w0000",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script5_seq5_rec1_w0001",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "action_verb": "take",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script5_seq5_rec1_w0002",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "action_verb": "make",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script5_seq5_rec1_w0003",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "action_verb": "turn",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script5_seq5_rec1_w0004",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "action_verb": "get",
+      "partition": "development"
+    },
+    {
+      "example_id": "loc5_script5_seq5_rec1_w0005",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "action_verb": "get",
+      "partition": "development"
+    }
+  ]
+}

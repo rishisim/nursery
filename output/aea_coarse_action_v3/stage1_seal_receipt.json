@@ -1,0 +1,63 @@
+{
+  "schema_version": "aea-coarse-action-stage1-seal-receipt-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "sealed_at_utc": "2026-07-15T01:29:19.233182+00:00",
+  "protocol_freeze_checks": {
+    "checks": {
+      "protocol_id": true,
+      "receipt_protocol_id": true,
+      "protocol_hash": true,
+      "preregistration_hash": true,
+      "codebook_hash": true
+    }
+  },
+  "both_passes_complete_before_transcript_release": true,
+  "stage2_outputs_absent_at_seal": true,
+  "passes_compared_or_adjudicated_before_seal": false,
+  "passes": [
+    {
+      "pass": "pass_a",
+      "artifact": "output/aea_coarse_action_v3/model_assisted_pass_a_stage1.json",
+      "artifact_sha256": "7585f9979f806c5828136430137fd01b42b514ed3526936a3ff9c8330daaf4d5",
+      "source_packet": "output/aea_coarse_action_v3/annotation_packet_pass_a_stage1_visual.json",
+      "source_packet_sha256": "85470cf48ce9da8b6248bae6facf57e1627ea9fd695bf67c26aaf32cadbcc62f",
+      "rows": 72,
+      "unique_blind_ids": 72,
+      "checks": {
+        "schema": true,
+        "protocol": true,
+        "pass": true,
+        "stage": true,
+        "source_packet_hash": true,
+        "packet_order_preserved": true,
+        "completed_video_only": true,
+        "other_pass_not_read": true,
+        "prior_completed_labels_not_read": true,
+        "reserve_not_opened": true,
+        "raw_vrs_audio_imu_not_opened": true
+      }
+    },
+    {
+      "pass": "pass_b",
+      "artifact": "output/aea_coarse_action_v3/model_assisted_pass_b_stage1.json",
+      "artifact_sha256": "5b1a9019cc7b6bc16aadf4a6642c5e4c3e109176dec821f4af57dc126a9d3eec",
+      "source_packet": "output/aea_coarse_action_v3/annotation_packet_pass_b_stage1_visual.json",
+      "source_packet_sha256": "6d43adb429bd848205572a01da69841d96e5965212aaca7d8fec26ad21cfa801",
+      "rows": 72,
+      "unique_blind_ids": 72,
+      "checks": {
+        "schema": true,
+        "protocol": true,
+        "pass": true,
+        "stage": true,
+        "source_packet_hash": true,
+        "packet_order_preserved": true,
+        "completed_video_only": true,
+        "other_pass_not_read": true,
+        "prior_completed_labels_not_read": true,
+        "reserve_not_opened": true,
+        "raw_vrs_audio_imu_not_opened": true
+      }
+    }
+  ]
+}

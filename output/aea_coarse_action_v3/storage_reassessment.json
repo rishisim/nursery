@@ -1,0 +1,15 @@
+{
+  "schema_version": "aea-coarse-action-storage-reassessment-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "assessed_at_utc": "2026-07-15T01:54:58.506299+00:00",
+  "source": "output/aea_visible_action_v2/safe_release_metadata.json",
+  "source_sha256": "8b3e5a5dd50a4176b6cf5c316935dd2349dd2c3df658c372ecd708f0e35ae39f",
+  "signed_manifest_reopened": false,
+  "signed_urls_loaded_printed_copied_or_used": false,
+  "release_sequence_count": 143,
+  "remaining_recordings": 103,
+  "remaining_annotations_plus_main_vrs_gib": 181.388,
+  "filesystem_free_bytes_at_decision": 205458477056,
+  "filesystem_free_gib_at_decision": 191.348,
+  "storage_is_ceiling_not_reason_to_acquire": true
+}

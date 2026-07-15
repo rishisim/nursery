@@ -1,0 +1,53 @@
+{
+  "audience": "technical",
+  "delivery_mode": "portable_html",
+  "required_structure_mapping": {
+    "title": "title",
+    "technical_summary": "technical-summary",
+    "key_findings_with_visual_evidence": [
+      "location-finding",
+      "location-chart-block",
+      "family-evidence"
+    ],
+    "scope_data_metric_definitions": "scope-and-definitions",
+    "methodology_and_experimental_design": "experimental-design",
+    "limitations_uncertainty_robustness": [
+      "result-audit",
+      "limitations"
+    ],
+    "recommended_next_steps": "next-steps",
+    "further_questions": "further-questions"
+  },
+  "chart_map": [
+    {
+      "section": "location-finding",
+      "question": "Is synchronized-minus-shuffled lift consistent across held-out locations?",
+      "family": "Comparison & Ranking",
+      "type": "bar",
+      "fields": [
+        "held_out_location",
+        "mean_lift_pp"
+      ],
+      "takeaway": "Shows fold heterogeneity around a zero reference without treating a smoke sign as a finding.",
+      "palette_policy": "single diverging root around zero with labels and a neutral reference line",
+      "delivery": "native canonical artifact chart"
+    }
+  ],
+  "visual_omissions": [
+    "Family intervals are an exact audit table because there are too few family aggregates for an additional honest chart."
+  ],
+  "source_inventory": [
+    "experiment-results",
+    "location-lift-query",
+    "locked-protocol"
+  ],
+  "metric_definitions": [
+    "lift_pp = 100 \u00d7 (synchronized action-balanced 2AFC accuracy \u2212 shuffled accuracy)",
+    "95% CI uses hierarchical resampling over split units and paired seeds"
+  ],
+  "source_filters": [
+    "primary family is leave-one-location-out",
+    "primary test uses RGB and transcript only",
+    "synchronized and shuffled arms are paired within seed and split"
+  ]
+}

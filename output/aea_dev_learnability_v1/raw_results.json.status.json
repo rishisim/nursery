@@ -1,0 +1,7 @@
+{
+  "status": "invalid_superseded_not_used_for_decision",
+  "reason": "This is the first combined-run output, which incorrectly inherited fine-label support when constructing coarse categories and omitted cleaning_grooming and media_leisure.",
+  "preserved_copy": "raw_results_attempt1_invalid_coarse_support.json",
+  "valid_raw_results": "raw_results_v2.json",
+  "canonical_results": "aea_dev_results.json"
+}

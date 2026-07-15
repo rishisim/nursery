@@ -1,0 +1,19 @@
+{
+  "schema_version": "aea-visible-action-acquisition-recommendation-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "gate": {
+    "annotation_gate_passed": false,
+    "capacity_gate_passed": false,
+    "certified_support_bottleneck": false,
+    "power_bottleneck": false,
+    "power_details": {},
+    "passed": false
+  },
+  "recommend_additional_recordings": false,
+  "reason": "The preregistered ontology/capacity/support-or-power gate did not pass; no expansion is justified.",
+  "recommendation": "no_additional_acquisition",
+  "download_performed": false,
+  "license_accepted": false,
+  "signed_urls_used_or_exposed": false,
+  "bounded_plan": null
+}

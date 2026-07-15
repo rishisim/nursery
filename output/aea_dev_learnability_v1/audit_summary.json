@@ -1,0 +1,1391 @@
+{
+  "schema_version": "aea-dev-audit-summary-v1",
+  "protocol_id": "aea-dev-learnability-v1",
+  "scope": "development_only",
+  "confirmation_groups_inspected": [],
+  "coverage": {
+    "actions": 25,
+    "event_groups": 18,
+    "locations": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "frames_per_window": 8
+  },
+  "overall": {
+    "n": 48,
+    "label_counts": {
+      "clear_match": 7,
+      "mismatch": 34,
+      "not_visually_judgeable": 0,
+      "plausible_or_ambiguous": 7
+    },
+    "judgeable": {
+      "successes": 48,
+      "total": 48,
+      "rate": 1.0,
+      "ci95_low": 0.9258998703338824,
+      "ci95_high": 0.9999999999999999,
+      "method": "two-sided 95% Wilson interval"
+    },
+    "clear_match": {
+      "successes": 7,
+      "total": 48,
+      "rate": 0.14583333333333334,
+      "ci95_low": 0.07248249326603709,
+      "ci95_high": 0.27167176524746284,
+      "method": "two-sided 95% Wilson interval"
+    },
+    "clear_or_plausible": {
+      "successes": 14,
+      "total": 48,
+      "rate": 0.2916666666666667,
+      "ci95_low": 0.18241578926516536,
+      "ci95_high": 0.431792598095717,
+      "method": "two-sided 95% Wilson interval"
+    },
+    "mismatch": {
+      "successes": 34,
+      "total": 48,
+      "rate": 0.7083333333333334,
+      "ci95_low": 0.5682074019042831,
+      "ci95_high": 0.8175842107348348,
+      "method": "two-sided 95% Wilson interval"
+    }
+  },
+  "by_action": {
+    "bring": {
+      "n": 1,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 0,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 1
+      },
+      "judgeable": {
+        "successes": 1,
+        "total": 1,
+        "rate": 1.0,
+        "ci95_low": 0.20654931437723745,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 1,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.7934506856227626,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 1,
+        "total": 1,
+        "rate": 1.0,
+        "ci95_low": 0.20654931437723745,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 0,
+        "total": 1,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.7934506856227626,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "clean": {
+      "n": 3,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 1,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 2
+      },
+      "judgeable": {
+        "successes": 3,
+        "total": 3,
+        "rate": 1.0,
+        "ci95_low": 0.4385029682449546,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 3,
+        "rate": 0.0,
+        "ci95_low": 5.551115123125783e-17,
+        "ci95_high": 0.5614970317550454,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 2,
+        "total": 3,
+        "rate": 0.6666666666666666,
+        "ci95_low": 0.2076596008020477,
+        "ci95_high": 0.9385080552796037,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 1,
+        "total": 3,
+        "rate": 0.3333333333333333,
+        "ci95_low": 0.06149194472039621,
+        "ci95_high": 0.7923403991979522,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "cook": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "cut": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "drink": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "eat": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "get": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 1,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 1
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "grab": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 1,
+        "mismatch": 0,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 1
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "make": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "move": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 1,
+        "mismatch": 1,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "open": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 1,
+        "mismatch": 1,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "play": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "pour": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 1,
+        "mismatch": 0,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 1
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "press": {
+      "n": 1,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 1,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 1,
+        "total": 1,
+        "rate": 1.0,
+        "ci95_low": 0.20654931437723745,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 1,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.7934506856227626,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 1,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.7934506856227626,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 1,
+        "total": 1,
+        "rate": 1.0,
+        "ci95_low": 0.20654931437723745,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "put": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 1,
+        "mismatch": 1,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "read": {
+      "n": 1,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 1,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 1,
+        "total": 1,
+        "rate": 1.0,
+        "ci95_low": 0.20654931437723745,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 1,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.7934506856227626,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 1,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.7934506856227626,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 1,
+        "total": 1,
+        "rate": 1.0,
+        "ci95_low": 0.20654931437723745,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "remove": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "serve": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "set": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "take": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "turn": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 1,
+        "mismatch": 1,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "walk": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "wash": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "watch": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 1,
+        "mismatch": 0,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 1
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 1,
+        "total": 2,
+        "rate": 0.5,
+        "ci95_low": 0.09453120573423074,
+        "ci95_high": 0.9054687942657693,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "wipe": {
+      "n": 2,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 2,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 0,
+        "total": 2,
+        "rate": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.6576197724933469,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 2,
+        "total": 2,
+        "rate": 1.0,
+        "ci95_low": 0.34238022750665303,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      }
+    }
+  },
+  "by_coarse_category": {
+    "locomotion_transport": {
+      "n": 13,
+      "label_counts": {
+        "clear_match": 2,
+        "mismatch": 8,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 3
+      },
+      "judgeable": {
+        "successes": 13,
+        "total": 13,
+        "rate": 1.0,
+        "ci95_low": 0.7719046276458016,
+        "ci95_high": 0.9999999999999999,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 2,
+        "total": 13,
+        "rate": 0.15384615384615385,
+        "ci95_low": 0.043258178358081184,
+        "ci95_high": 0.4223463101948254,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 5,
+        "total": 13,
+        "rate": 0.38461538461538464,
+        "ci95_low": 0.17709707797762575,
+        "ci95_high": 0.6447710848733431,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 8,
+        "total": 13,
+        "rate": 0.6153846153846154,
+        "ci95_low": 0.355228915126657,
+        "ci95_high": 0.8229029220223743,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "object_state_manipulation": {
+      "n": 11,
+      "label_counts": {
+        "clear_match": 3,
+        "mismatch": 8,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 0
+      },
+      "judgeable": {
+        "successes": 11,
+        "total": 11,
+        "rate": 1.0,
+        "ci95_low": 0.7411670330319684,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 3,
+        "total": 11,
+        "rate": 0.2727272727272727,
+        "ci95_low": 0.09746059290024889,
+        "ci95_high": 0.5656453011761291,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 3,
+        "total": 11,
+        "rate": 0.2727272727272727,
+        "ci95_low": 0.09746059290024889,
+        "ci95_high": 0.5656453011761291,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 8,
+        "total": 11,
+        "rate": 0.7272727272727273,
+        "ci95_low": 0.43435469882387084,
+        "ci95_high": 0.902539407099751,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "food_drink_preparation": {
+      "n": 12,
+      "label_counts": {
+        "clear_match": 1,
+        "mismatch": 10,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 1
+      },
+      "judgeable": {
+        "successes": 12,
+        "total": 12,
+        "rate": 1.0,
+        "ci95_low": 0.7575059933447592,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 1,
+        "total": 12,
+        "rate": 0.08333333333333333,
+        "ci95_low": 0.014865094404917095,
+        "ci95_high": 0.35387991114111694,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 2,
+        "total": 12,
+        "rate": 0.16666666666666666,
+        "ci95_low": 0.04696514218385378,
+        "ci95_high": 0.4480308622529734,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 10,
+        "total": 12,
+        "rate": 0.8333333333333334,
+        "ci95_low": 0.5519691377470266,
+        "ci95_high": 0.9530348578161463,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "cleaning_grooming": {
+      "n": 7,
+      "label_counts": {
+        "clear_match": 0,
+        "mismatch": 5,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 2
+      },
+      "judgeable": {
+        "successes": 7,
+        "total": 7,
+        "rate": 1.0,
+        "ci95_low": 0.6456695649333126,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 0,
+        "total": 7,
+        "rate": 0.0,
+        "ci95_low": 5.551115123125783e-17,
+        "ci95_high": 0.35433043506668743,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 2,
+        "total": 7,
+        "rate": 0.2857142857142857,
+        "ci95_low": 0.08221892400405678,
+        "ci95_high": 0.6410655481673808,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 5,
+        "total": 7,
+        "rate": 0.7142857142857143,
+        "ci95_low": 0.35893445183261935,
+        "ci95_high": 0.9177810759959433,
+        "method": "two-sided 95% Wilson interval"
+      }
+    },
+    "media_leisure": {
+      "n": 5,
+      "label_counts": {
+        "clear_match": 1,
+        "mismatch": 3,
+        "not_visually_judgeable": 0,
+        "plausible_or_ambiguous": 1
+      },
+      "judgeable": {
+        "successes": 5,
+        "total": 5,
+        "rate": 1.0,
+        "ci95_low": 0.5655175352168251,
+        "ci95_high": 1.0,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_match": {
+        "successes": 1,
+        "total": 5,
+        "rate": 0.2,
+        "ci95_low": 0.03622410863243014,
+        "ci95_high": 0.6244653702374747,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "clear_or_plausible": {
+        "successes": 2,
+        "total": 5,
+        "rate": 0.4,
+        "ci95_low": 0.11762077423264783,
+        "ci95_high": 0.769275718723987,
+        "method": "two-sided 95% Wilson interval"
+      },
+      "mismatch": {
+        "successes": 3,
+        "total": 5,
+        "rate": 0.6,
+        "ci95_low": 0.2307242812760128,
+        "ci95_high": 0.882379225767352,
+        "method": "two-sided 95% Wilson interval"
+      }
+    }
+  },
+  "semantic_high_motion": {
+    "n": 18,
+    "label_counts": {
+      "clear_match": 1,
+      "mismatch": 13,
+      "not_visually_judgeable": 0,
+      "plausible_or_ambiguous": 4
+    },
+    "judgeable": {
+      "successes": 18,
+      "total": 18,
+      "rate": 1.0,
+      "ci95_low": 0.8241207763533425,
+      "ci95_high": 1.0,
+      "method": "two-sided 95% Wilson interval"
+    },
+    "clear_match": {
+      "successes": 1,
+      "total": 18,
+      "rate": 0.05555555555555555,
+      "ci95_low": 0.009875190978303097,
+      "ci95_high": 0.25757300781872594,
+      "method": "two-sided 95% Wilson interval"
+    },
+    "clear_or_plausible": {
+      "successes": 5,
+      "total": 18,
+      "rate": 0.2777777777777778,
+      "ci95_low": 0.12499753379553993,
+      "ci95_high": 0.5087265656029746,
+      "method": "two-sided 95% Wilson interval"
+    },
+    "mismatch": {
+      "successes": 13,
+      "total": 18,
+      "rate": 0.7222222222222222,
+      "ci95_low": 0.4912734343970254,
+      "ci95_high": 0.8750024662044601,
+      "method": "two-sided 95% Wilson interval"
+    }
+  },
+  "modeled_semantic_high_motion_actions": [
+    "get",
+    "move",
+    "take"
+  ],
+  "modeled_semantic_high_motion": {
+    "n": 6,
+    "label_counts": {
+      "clear_match": 1,
+      "mismatch": 4,
+      "not_visually_judgeable": 0,
+      "plausible_or_ambiguous": 1
+    },
+    "judgeable": {
+      "successes": 6,
+      "total": 6,
+      "rate": 1.0,
+      "ci95_low": 0.6096657120978346,
+      "ci95_high": 1.0,
+      "method": "two-sided 95% Wilson interval"
+    },
+    "clear_match": {
+      "successes": 1,
+      "total": 6,
+      "rate": 0.16666666666666666,
+      "ci95_low": 0.030053369748306635,
+      "ci95_high": 0.5635028221864702,
+      "method": "two-sided 95% Wilson interval"
+    },
+    "clear_or_plausible": {
+      "successes": 2,
+      "total": 6,
+      "rate": 0.3333333333333333,
+      "ci95_low": 0.09677141110578041,
+      "ci95_high": 0.700006684861608,
+      "method": "two-sided 95% Wilson interval"
+    },
+    "mismatch": {
+      "successes": 4,
+      "total": 6,
+      "rate": 0.6666666666666666,
+      "ci95_low": 0.299993315138392,
+      "ci95_high": 0.9032285888942195,
+      "method": "two-sided 95% Wilson interval"
+    }
+  },
+  "gates": {
+    "judgeable_pass": true,
+    "clear_or_plausible_pass": false,
+    "mismatch_pass": false,
+    "passed": false
+  },
+  "limitations": [
+    "single auditor",
+    "eight sparse frames rather than continuous video",
+    "plausible category retains timing and agency ambiguity"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": "aea-coarse-action-reserve-access-receipt-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "completed_at_utc": "2026-07-15T01:04:17.056019+00:00",
+  "source_v2_dense_manifest_sha256": "772b194c145aa305775a1feade279c33ae0f38fedfb9e7ccdb945cc03f82077e",
+  "source_v2_access_receipt_sha256": "2f20f459426292945a119b83c2b87b1d59de0694f60fa2f636cc2d2811b72a4b",
+  "fixed_dense_manifest_sha256": "0ea20738cfe5caf5d76be4c38c6b3327e75638a6c113fc25a89b46ebad87711d",
+  "source_checks": {
+    "checks": {
+      "manifest_hash": true,
+      "access_receipt_hash": true,
+      "manifest_protocol": true,
+      "sample_size": true,
+      "manifest_sample_size": true,
+      "sample_digest": true,
+      "unique_ids": true,
+      "sorted_example_id_digest": true,
+      "all_18_development_groups": true,
+      "zero_reserve_groups": true,
+      "manifest_declares_zero_reserve": true,
+      "source_receipt_zero_reserve_rgb": true,
+      "source_receipt_zero_reserve_imu": true,
+      "source_receipt_zero_signed_url_exposure": true,
+      "exactly_31_frames_each": true,
+      "all_evidence_paths_existing_and_beneath_v2_root": true
+    },
+    "referenced_dense_frames": 2232,
+    "evidence_paths_checked": 2448,
+    "additional_rgb_frames_queried": 0,
+    "development_imu_arrays_opened": 0,
+    "reserve_rgb_files_opened": 0,
+    "reserve_imu_arrays_opened": 0,
+    "signed_urls_loaded_printed_copied_or_used": false
+  },
+  "freeze_checks": {
+    "checks": {
+      "protocol_id": true,
+      "receipt_protocol_id": true,
+      "protocol_hash": true,
+      "preregistration_hash": true,
+      "codebook_hash": true
+    }
+  },
+  "v3_existing_dense_frames_referenced": 2232,
+  "v3_dense_images_opened_by_preparation": 0,
+  "v3_additional_development_rgb_queries": 0,
+  "v3_raw_vrs_files_opened": 0,
+  "v3_development_imu_arrays_opened": 0,
+  "reserve_event_groups_opened": [],
+  "reserve_rgb_files_opened": 0,
+  "reserve_imu_arrays_opened": 0,
+  "audio_opened": false,
+  "signed_manifest_loaded": false,
+  "signed_urls_loaded_printed_copied_or_used": false,
+  "v1_or_v2_completed_annotation_files_opened": 0,
+  "packet_sha256": {
+    "annotation_packet_pass_a_stage1_visual.json": "85470cf48ce9da8b6248bae6facf57e1627ea9fd695bf67c26aaf32cadbcc62f",
+    "annotation_packet_pass_a_stage2_language.json": "e2c1fa4753ff0a56d9aa1f70c0fe6441fe7dcb63324cbb116bf640f9432abbaa",
+    "annotation_packet_pass_b_stage1_visual.json": "6d43adb429bd848205572a01da69841d96e5965212aaca7d8fec26ad21cfa801",
+    "annotation_packet_pass_b_stage2_language.json": "89260700101b0ab2bed90142da79e3ad9a6aa017e574de04916959bc55f41f8b"
+  }
+}

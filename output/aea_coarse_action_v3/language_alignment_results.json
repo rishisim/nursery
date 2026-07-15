@@ -1,0 +1,181 @@
+{
+  "schema_version": "aea-coarse-action-language-alignment-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "scientific_role": "adult_partly_scripted_sensor_format_analogue_not_developmental_evidence_not_babyview_like",
+  "n": 72,
+  "definition": {
+    "both_pass_asr_referent": "wearer_action",
+    "both_pass_visible_action_in_modeled_labels": true,
+    "both_pass_temporal_relation_in": [
+      "aligned",
+      "before",
+      "after"
+    ]
+  },
+  "rates": {
+    "wearer_action_pass_a": {
+      "successes": 24,
+      "total": 72,
+      "rate": 0.3333333333333333,
+      "ci95_low": 0.23534643443153785,
+      "ci95_high": 0.448203956433948,
+      "method": "two-sided Wilson 95% interval"
+    },
+    "wearer_action_pass_b": {
+      "successes": 21,
+      "total": 72,
+      "rate": 0.2916666666666667,
+      "ci95_low": 0.1993805618883669,
+      "ci95_high": 0.4050574266934906,
+      "method": "two-sided Wilson 95% interval"
+    },
+    "language_aligned_consensus": {
+      "successes": 7,
+      "total": 72,
+      "rate": 0.09722222222222222,
+      "ci95_low": 0.047896319973655774,
+      "ci95_high": 0.1873504579512686,
+      "method": "two-sided Wilson 95% interval"
+    }
+  },
+  "referent_agreement": {
+    "labels": [
+      "wearer_action",
+      "nonwearer_or_nonliteral",
+      "unclear"
+    ],
+    "confusion_a_rows_b_columns": [
+      [
+        18,
+        3,
+        3
+      ],
+      [
+        2,
+        38,
+        1
+      ],
+      [
+        1,
+        3,
+        3
+      ]
+    ],
+    "exact_agreement": 0.8194444444444444,
+    "cohens_kappa_unweighted": 0.6689069685178635,
+    "confidence_weighted_exact_agreement": 0.8473895582329317,
+    "n": 72
+  },
+  "temporal_agreement": {
+    "labels": [
+      "aligned",
+      "before",
+      "after",
+      "none",
+      "unclear"
+    ],
+    "confusion_a_rows_b_columns": [
+      [
+        5,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      [
+        0,
+        1,
+        1,
+        61,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    ],
+    "exact_agreement": 0.9305555555555556,
+    "cohens_kappa_unweighted": 0.695173581710415,
+    "confidence_weighted_exact_agreement": 0.9437751004016064,
+    "n": 72
+  },
+  "gate_checks": {
+    "consensus_alignment_rate": false,
+    "wearer_action_rate_pass_a": true,
+    "wearer_action_rate_pass_b": true,
+    "referent_exact": true,
+    "referent_kappa": true
+  },
+  "language_alignment_gate_passed": false,
+  "language_conclusion": "STOP_LANGUAGE_ROUTE",
+  "aligned_rows": [
+    {
+      "blind_id": "CA3-316B46334495",
+      "example_id": "loc3_script1_seq4_rec1_w0000",
+      "sequence_id": "loc3_script1_seq4_rec1",
+      "event_group": "loc3_script1_seq4",
+      "location": 3
+    },
+    {
+      "blind_id": "CA3-3F50142B28E7",
+      "example_id": "loc2_script1_seq6_rec1_w0001",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2
+    },
+    {
+      "blind_id": "CA3-47944BBABBC9",
+      "example_id": "loc2_script1_seq2_rec1_w0000",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2
+    },
+    {
+      "blind_id": "CA3-5B3B3CCE2444",
+      "example_id": "loc2_script1_seq2_rec1_w0002",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2
+    },
+    {
+      "blind_id": "CA3-808FEB6D39A9",
+      "example_id": "loc2_script3_seq3_rec1_w0008",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2
+    },
+    {
+      "blind_id": "CA3-AB40754C93AC",
+      "example_id": "loc4_script4_seq2_rec1_w0001",
+      "sequence_id": "loc4_script4_seq2_rec1",
+      "event_group": "loc4_script4_seq2",
+      "location": 4
+    },
+    {
+      "blind_id": "CA3-E190AE6E25AF",
+      "example_id": "loc2_script4_seq5_rec1_w0005",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2
+    }
+  ],
+  "sensor_outcomes_can_override": false,
+  "acquisition_for_language_if_failed": false
+}

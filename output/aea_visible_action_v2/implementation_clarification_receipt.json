@@ -1,0 +1,17 @@
+{
+  "schema_version": "aea-visible-action-implementation-clarification-receipt-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "recorded_at_utc": "2026-07-14T23:58:00Z",
+  "ordering_statement": "Recorded before new v2 media, annotation, split, capacity, or IMU outcomes.",
+  "clarifications": {
+    "path": "docs/aea_visible_action_v2_implementation_clarifications.md",
+    "sha256": "5fe8fc90a92fbe465498a4e964c0b253c98dfb812fba703350effd51aaf4d394"
+  },
+  "annotation_codebook": {
+    "path": "output/aea_visible_action_v2/annotation_codebook.md",
+    "sha256": "9c020cde9e2d55147b81b6eb9242d729a38408a3770c9d2cdba9e4dc18d8c835"
+  },
+  "new_media_viewed_before_recording": false,
+  "new_annotations_viewed_before_recording": false,
+  "new_model_outcomes_viewed_before_recording": false
+}

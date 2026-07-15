@@ -1,0 +1,1239 @@
+{
+  "schema_version": "aea-coarse-action-blinded-language-packet-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "pass": "pass_b",
+  "role": "model_assisted_development_labels_not_human_annotations_or_human_interrater_reliability",
+  "codebook": "/Users/rishisim/Documents/research/nursery/output/aea_coarse_action_v3/annotation_codebook.md",
+  "context_isolation_required": true,
+  "other_pass_access_forbidden": true,
+  "v1_v2_completed_label_or_rationale_access_forbidden": true,
+  "stage": "stage_2_transcript_referent_and_temporal_relation",
+  "requires_sealed_stage_1": true,
+  "stage_1_fields_mutable": false,
+  "rows": [
+    {
+      "packet_rank": 1,
+      "blind_id": "CA3-2CA4F1A124DF",
+      "anchored_asr_verb": "play",
+      "transcript": "pressure. I've just received troubling moves. Usually when you play a character, you work out as an aroma for a character but this I",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-552CBEB95CEB/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-552CBEB95CEB/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-552CBEB95CEB/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-2CA4F1A124DF",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 2,
+      "blind_id": "CA3-4F25163A5146",
+      "anchored_asr_verb": "get",
+      "transcript": "cancer you have to restrict anything. Just go to chemo and get better. Mhm. Or diabetes? Oh my God. So",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2EDB03805707/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2EDB03805707/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2EDB03805707/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-4F25163A5146",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 3,
+      "blind_id": "CA3-B7036DE9D276",
+      "anchored_asr_verb": "cut",
+      "transcript": "Alright. Oh, do you want the cutting board? Uh yes, please. Okay.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3B9F171498D0/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3B9F171498D0/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3B9F171498D0/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-B7036DE9D276",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 4,
+      "blind_id": "CA3-259860F77C81",
+      "anchored_asr_verb": "wash",
+      "transcript": "potatoes. We can maybe wash that. No. Um.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-44604D634178/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-44604D634178/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-44604D634178/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-259860F77C81",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 5,
+      "blind_id": "CA3-DE514C06F855",
+      "anchored_asr_verb": "remove",
+      "transcript": "easier. For instance, you may not have to remove the battery box to be able to get to it but I'm going to",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-71E62E651628/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-71E62E651628/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-71E62E651628/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-DE514C06F855",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 6,
+      "blind_id": "CA3-3447525300F7",
+      "anchored_asr_verb": "open",
+      "transcript": "full size. It's you can open it and check it out if you want to. Oh, really? Yeah. Nice. I rather",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E4DF9D41568D/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E4DF9D41568D/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E4DF9D41568D/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-3447525300F7",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 7,
+      "blind_id": "CA3-6209B7A50B37",
+      "anchored_asr_verb": "walk",
+      "transcript": "Yeah. Yeah. Yeah. I just have a walk through because I'll do the same thing. Okay.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7655E9AF1412/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7655E9AF1412/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7655E9AF1412/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-6209B7A50B37",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 8,
+      "blind_id": "CA3-C6BD9D19E8E0",
+      "anchored_asr_verb": "get",
+      "transcript": "those. Let's get.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-187D47135B1B/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-187D47135B1B/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-187D47135B1B/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-C6BD9D19E8E0",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 9,
+      "blind_id": "CA3-CBFC8E6C2040",
+      "anchored_asr_verb": "play",
+      "transcript": "this I had all pretty much worked out for me but Maggie already played so amazingly. Follow me.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CAA79DDFE332/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CAA79DDFE332/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CAA79DDFE332/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-CBFC8E6C2040",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 10,
+      "blind_id": "CA3-029A6C7E5B0F",
+      "anchored_asr_verb": "take",
+      "transcript": "valve doesn't make a difference. The stock exhaust is going to take you over the sound limits and therefore,",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01055B0D0EA9/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01055B0D0EA9/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01055B0D0EA9/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-029A6C7E5B0F",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 11,
+      "blind_id": "CA3-525665C52804",
+      "anchored_asr_verb": "clean",
+      "transcript": "Yeah, I'm going. Sweet. Alright. Let's get some of this stuff cleaned up. Yeah. Um",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-95643B51E141/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-95643B51E141/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-95643B51E141/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-525665C52804",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 12,
+      "blind_id": "CA3-316B46334495",
+      "anchored_asr_verb": "move",
+      "transcript": "There's one more. Let's move this.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DA6163C01FFC/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DA6163C01FFC/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DA6163C01FFC/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-316B46334495",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 13,
+      "blind_id": "CA3-EE612D22F786",
+      "anchored_asr_verb": "walk",
+      "transcript": "Walking through. Yup. Yup. You're good.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5C79F76DD4BE/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5C79F76DD4BE/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5C79F76DD4BE/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-EE612D22F786",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 14,
+      "blind_id": "CA3-584BC804DAC0",
+      "anchored_asr_verb": "make",
+      "transcript": "actually. Yeah. Do you need some help? Um nope, I got it. I can make it. Okay. Alright. Let me know if I can help you or something. Serve",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-65DB9ECE2B05/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-65DB9ECE2B05/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-65DB9ECE2B05/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-584BC804DAC0",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 15,
+      "blind_id": "CA3-91B29D38DAAB",
+      "anchored_asr_verb": "pour",
+      "transcript": "Alright. I will pour out some pistachios.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E3B4DB21F129/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E3B4DB21F129/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E3B4DB21F129/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-91B29D38DAAB",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 16,
+      "blind_id": "CA3-E2F90CA71FB7",
+      "anchored_asr_verb": "make",
+      "transcript": "control all all-wheel drive. We'll see what happens. Now, before we race, please make sure you subscribe to this channel and hit the bell icon to turn your notifications",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CD9CE17101E9/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CD9CE17101E9/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CD9CE17101E9/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-E2F90CA71FB7",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 17,
+      "blind_id": "CA3-43FEA4D2AA3A",
+      "anchored_asr_verb": "take",
+      "transcript": "like a a female immigrant from Bangladesh. Okay. She took like and also grew up here like she a lot",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-54037A0A95AB/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-54037A0A95AB/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-54037A0A95AB/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-43FEA4D2AA3A",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 18,
+      "blind_id": "CA3-505C5C420660",
+      "anchored_asr_verb": "press",
+      "transcript": "place. Once you have to press the tab on the ECU cover, simply",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C938F9066543/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C938F9066543/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C938F9066543/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-505C5C420660",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 19,
+      "blind_id": "CA3-E7EB29E4D8B8",
+      "anchored_asr_verb": "remove",
+      "transcript": "We want to remove the fuse box lid to gain access to the fuel fuse.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CB4F5D23CF66/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CB4F5D23CF66/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CB4F5D23CF66/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-E7EB29E4D8B8",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 20,
+      "blind_id": "CA3-808FEB6D39A9",
+      "anchored_asr_verb": "open",
+      "transcript": "Yeah. We'll just put the oil so maybe I'll open it up. Yup. Put a little bit little",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01C86650732F/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01C86650732F/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01C86650732F/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-808FEB6D39A9",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 21,
+      "blind_id": "CA3-624AAA87BC4F",
+      "anchored_asr_verb": "put",
+      "transcript": "with advanced technology, researchers have been able to put together a new timeline showing that what's",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3D5A86B0FA6A/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3D5A86B0FA6A/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3D5A86B0FA6A/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-624AAA87BC4F",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 22,
+      "blind_id": "CA3-A3AE89453605",
+      "anchored_asr_verb": "drink",
+      "transcript": "Hey, you want anything to drink? Uh what do you got? Got some Arizona's",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1939AF06A0CA/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1939AF06A0CA/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1939AF06A0CA/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-A3AE89453605",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 23,
+      "blind_id": "CA3-D22D2B0CB12E",
+      "anchored_asr_verb": "cook",
+      "transcript": "Is it cooking? Are they hot? Yeah. A little more time",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01D23F9F8229/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01D23F9F8229/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01D23F9F8229/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-D22D2B0CB12E",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 24,
+      "blind_id": "CA3-0671E35E54E7",
+      "anchored_asr_verb": "clean",
+      "transcript": "Yeah. I am stuck. Sweet. Can you clean that? Yeah. Yeah. I will put this here so",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F47C81A67607/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F47C81A67607/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F47C81A67607/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-0671E35E54E7",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 25,
+      "blind_id": "CA3-39BA43B2F9E4",
+      "anchored_asr_verb": "grab",
+      "transcript": "and I'll get us some porks for the fruit. Okay. I'll grab those pretzels. Uh I got em. You're you're good.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D63555577FE3/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D63555577FE3/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D63555577FE3/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-39BA43B2F9E4",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 26,
+      "blind_id": "CA3-8ED2505125EC",
+      "anchored_asr_verb": "bring",
+      "transcript": "creamer? For my coffee. For your coffee? That'd be great. Yeah. You can bring that over.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E7DAFA2B3842/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E7DAFA2B3842/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E7DAFA2B3842/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-8ED2505125EC",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 27,
+      "blind_id": "CA3-24A41EE2FF9A",
+      "anchored_asr_verb": "turn",
+      "transcript": "Now, before we race, please make sure you subscribe to this channel and hit the bell icon to turn your notifications on that way, you will not miss a single video",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-B03FB1488213/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-B03FB1488213/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-B03FB1488213/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-24A41EE2FF9A",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 28,
+      "blind_id": "CA3-E8E09430905A",
+      "anchored_asr_verb": "move",
+      "transcript": "I felt huge pressure. I've just received troubling moves. Usually when you play a character, you work out as an aroma for a",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C8C567171AE/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C8C567171AE/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C8C567171AE/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-E8E09430905A",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 29,
+      "blind_id": "CA3-1EB5E91D9382",
+      "anchored_asr_verb": "read",
+      "transcript": "an exception. Special. Yes exactly. See? You read my mind. Uh",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-4754B01CE013/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-4754B01CE013/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-4754B01CE013/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-1EB5E91D9382",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 30,
+      "blind_id": "CA3-53B92AC6705D",
+      "anchored_asr_verb": "set",
+      "transcript": "unplugging the electrical connection to the fuel pump and setting the wire off to the side. Next,",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9C20B56C41F6/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9C20B56C41F6/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9C20B56C41F6/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-53B92AC6705D",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 31,
+      "blind_id": "CA3-352AD7C3F0C9",
+      "anchored_asr_verb": "cut",
+      "transcript": "you cannot eat this. You cannot do that. You cannot do that. You get a cut. You can't like get healed quick and stuff.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D0C5D218FFE3/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D0C5D218FFE3/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D0C5D218FFE3/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-352AD7C3F0C9",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 32,
+      "blind_id": "CA3-ACBE2028651D",
+      "anchored_asr_verb": "set",
+      "transcript": "Set some of these.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36E05856C337/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36E05856C337/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36E05856C337/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-ACBE2028651D",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 33,
+      "blind_id": "CA3-1079C11B38B4",
+      "anchored_asr_verb": "watch",
+      "transcript": "bright star shining off into the distance. But if you watch this peculiar light for an hour or two, the object would",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9FDE307ADDA7/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9FDE307ADDA7/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9FDE307ADDA7/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-1079C11B38B4",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 34,
+      "blind_id": "CA3-D70F584519F2",
+      "anchored_asr_verb": "move",
+      "transcript": "really like makes me sad like you moved to a different country. I know you want to move with the trend. Yeah.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3578BA8668D7/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3578BA8668D7/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3578BA8668D7/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-D70F584519F2",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 35,
+      "blind_id": "CA3-3B8D8D4B2F0E",
+      "anchored_asr_verb": "serve",
+      "transcript": "make it. Okay. Alright. Let me know if I can help you or something. Serve the process here. Okay. Glasses.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-403522CD9A65/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-403522CD9A65/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-403522CD9A65/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-3B8D8D4B2F0E",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 36,
+      "blind_id": "CA3-DA3A25711A28",
+      "anchored_asr_verb": "make",
+      "transcript": "a stock exhaust valve or not valve doesn't make a difference. The stock exhaust is going to take you over",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC19F364C2CF/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC19F364C2CF/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC19F364C2CF/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-DA3A25711A28",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 37,
+      "blind_id": "CA3-0D1874FFF6F7",
+      "anchored_asr_verb": "open",
+      "transcript": "thinking we'll just put the oil. So, maybe I'll open it up. You can. Yeah.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36EB0AAD38CC/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36EB0AAD38CC/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36EB0AAD38CC/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-0D1874FFF6F7",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 38,
+      "blind_id": "CA3-E190AE6E25AF",
+      "anchored_asr_verb": "watch",
+      "transcript": "showing that what's really happened. I'm eating and watching YouTube. Where the giant asteroid came. How's my",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2CC887385941/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2CC887385941/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2CC887385941/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-E190AE6E25AF",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 39,
+      "blind_id": "CA3-0149CAF81C5B",
+      "anchored_asr_verb": "wash",
+      "transcript": "mean, this was just boiled water so we don't really need to wash that. Wash that. Yeah. I only got one stove for now.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E85597F92CD6/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E85597F92CD6/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E85597F92CD6/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-0149CAF81C5B",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 40,
+      "blind_id": "CA3-C2BA7D7FB4DD",
+      "anchored_asr_verb": "wash",
+      "transcript": "Let's just pour the water. Yeah, I need a little to wash that. There we go.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2BAAF874073A/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2BAAF874073A/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2BAAF874073A/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-C2BA7D7FB4DD",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 41,
+      "blind_id": "CA3-5F0891D03382",
+      "anchored_asr_verb": "take",
+      "transcript": "Yeah, you want to take a drink of it? I wonder if",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5A9DF65A78ED/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5A9DF65A78ED/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5A9DF65A78ED/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-5F0891D03382",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 42,
+      "blind_id": "CA3-A706276306B0",
+      "anchored_asr_verb": "serve",
+      "transcript": "Looks like they had a nice big. Serving this morning.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6A7729313A76/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6A7729313A76/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6A7729313A76/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-A706276306B0",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 43,
+      "blind_id": "CA3-41CC78732CFB",
+      "anchored_asr_verb": "play",
+      "transcript": "Wow. Who would you want to play for?",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-EDA412BB9636/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-EDA412BB9636/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-EDA412BB9636/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-41CC78732CFB",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 44,
+      "blind_id": "CA3-1B0B0BF63F48",
+      "anchored_asr_verb": "clean",
+      "transcript": "Yeah, I'm going. Alright. Let's get some of this stuff cleaned up. Yeah.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-052C59ECC9C0/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-052C59ECC9C0/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-052C59ECC9C0/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-1B0B0BF63F48",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 45,
+      "blind_id": "CA3-5B3B3CCE2444",
+      "anchored_asr_verb": "turn",
+      "transcript": "way toward the wall so I can walk by. Oh yeah yeah. Totally. Yeah. Turn your head. Alright. Movie magic.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2E4222F33185/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2E4222F33185/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2E4222F33185/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-5B3B3CCE2444",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 46,
+      "blind_id": "CA3-551DE13C0653",
+      "anchored_asr_verb": "cut",
+      "transcript": "we're going to come over the process for us. Yeah, I don't think we need to cut those.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DAE611EDD212/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DAE611EDD212/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DAE611EDD212/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-551DE13C0653",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 47,
+      "blind_id": "CA3-32D78A728502",
+      "anchored_asr_verb": "turn",
+      "transcript": "old are you? Uh I'm thirty. I just turned actually. Cool. I'm",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-0BE4207D1A3C/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-0BE4207D1A3C/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-0BE4207D1A3C/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-32D78A728502",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 48,
+      "blind_id": "CA3-3469D72E7A2B",
+      "anchored_asr_verb": "walk",
+      "transcript": "for this one. You turn your head like all the way toward the wall so I can walk by. Oh yeah yeah. Totally. Yeah. Turn your head. Alright.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B31EFA200D3/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B31EFA200D3/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B31EFA200D3/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-3469D72E7A2B",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 49,
+      "blind_id": "CA3-76CB79A5A739",
+      "anchored_asr_verb": "drink",
+      "transcript": "Yeah. Hey, you want anything to drink? Uh what you got? Got some Arizona,",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89A69B2BC71F/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89A69B2BC71F/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89A69B2BC71F/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-76CB79A5A739",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 50,
+      "blind_id": "CA3-94D600A099D9",
+      "anchored_asr_verb": "put",
+      "transcript": "the Velveeta with the plate. I put it in a bowl. Covered it with the plate and then we can sort that",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DB2621422BFA/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DB2621422BFA/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DB2621422BFA/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-94D600A099D9",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 51,
+      "blind_id": "CA3-2CAAD68FF5C0",
+      "anchored_asr_verb": "grab",
+      "transcript": "grab a bowl.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-A200E8AD4C3D/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-A200E8AD4C3D/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-A200E8AD4C3D/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-2CAAD68FF5C0",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 52,
+      "blind_id": "CA3-9DB238BD455A",
+      "anchored_asr_verb": "wipe",
+      "transcript": "to experience. No, you're good. I'm facing the window. Wiped out life completely on Earth. Go",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D7B5F26EA5CC/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D7B5F26EA5CC/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D7B5F26EA5CC/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-9DB238BD455A",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 53,
+      "blind_id": "CA3-47944BBABBC9",
+      "anchored_asr_verb": "turn",
+      "transcript": "this the I'm just in the living room for this one. You turn your head like all the way toward the wall so I can walk by. Oh yeah yeah.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC9979206A34/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC9979206A34/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC9979206A34/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-47944BBABBC9",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 54,
+      "blind_id": "CA3-AB40754C93AC",
+      "anchored_asr_verb": "get",
+      "transcript": "Getting my coffee.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D71B527252DF/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D71B527252DF/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D71B527252DF/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-AB40754C93AC",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 55,
+      "blind_id": "CA3-074DDC457CB2",
+      "anchored_asr_verb": "get",
+      "transcript": "one-stop car buying comparison site. Now, before we get on with the race, let's do a sound check. I expect this in the",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0339CBC64A2/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0339CBC64A2/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0339CBC64A2/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-074DDC457CB2",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 56,
+      "blind_id": "CA3-DDB2F798DBD4",
+      "anchored_asr_verb": "remove",
+      "transcript": "you go. Next, we will remove the battery box cover from the battery housing. There",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C64988BE3F2/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C64988BE3F2/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C64988BE3F2/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-DDB2F798DBD4",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 57,
+      "blind_id": "CA3-48C0A504A764",
+      "anchored_asr_verb": "get",
+      "transcript": "out. Yeah. A little little hot. Skits getting hot out but. Mm hmm. What did you get from the",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6C51DE5F11AE/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6C51DE5F11AE/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6C51DE5F11AE/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-48C0A504A764",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 58,
+      "blind_id": "CA3-CF4881A7B5A6",
+      "anchored_asr_verb": "put",
+      "transcript": "No. Just trying to put something to put in the beer.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C2DE1AB873E6/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C2DE1AB873E6/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C2DE1AB873E6/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-CF4881A7B5A6",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 59,
+      "blind_id": "CA3-7C243B0A9ADD",
+      "anchored_asr_verb": "eat",
+      "transcript": "That was the for dinner? Mm hmm. Okay. Nice. I didn't eat it for dinner but I had I had it",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7BDB854B0C1C/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7BDB854B0C1C/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7BDB854B0C1C/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-7C243B0A9ADD",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 60,
+      "blind_id": "CA3-37AB0FBF224A",
+      "anchored_asr_verb": "cook",
+      "transcript": "here. We're cooking so don't. We'll cry.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-11BD759FEA58/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-11BD759FEA58/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-11BD759FEA58/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-37AB0FBF224A",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 61,
+      "blind_id": "CA3-5EF95A7E6057",
+      "anchored_asr_verb": "eat",
+      "transcript": "any other disease but not diabetes. You have to be like you cannot eat this. You cannot do that. You cannot do that. You get a cut. You can't",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-76652A431C5D/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-76652A431C5D/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-76652A431C5D/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-5EF95A7E6057",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 62,
+      "blind_id": "CA3-4335FB36D5D8",
+      "anchored_asr_verb": "get",
+      "transcript": "Skits getting hot out but. Mm hmm. What did you get from the store? Um there's Brussels",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89CA93047947/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89CA93047947/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89CA93047947/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-4335FB36D5D8",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 63,
+      "blind_id": "CA3-4335CA330980",
+      "anchored_asr_verb": "eat",
+      "transcript": "anything all day so. Yeah. Trying to eat something healthy. Cuz",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2C41D81AAB4E/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2C41D81AAB4E/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2C41D81AAB4E/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-4335CA330980",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 64,
+      "blind_id": "CA3-3F50142B28E7",
+      "anchored_asr_verb": "grab",
+      "transcript": "Um actually, let's grab.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D9AE98225F67/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D9AE98225F67/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D9AE98225F67/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-3F50142B28E7",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 65,
+      "blind_id": "CA3-AA20CEFF1BDE",
+      "anchored_asr_verb": "pour",
+      "transcript": "bowls and the moleta. Oh yeah. Yeah. We just pour up pistachios. We're good. Okay. Yeah.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6EEC1FCD4A45/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6EEC1FCD4A45/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6EEC1FCD4A45/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-AA20CEFF1BDE",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 66,
+      "blind_id": "CA3-3C21590996B7",
+      "anchored_asr_verb": "pour",
+      "transcript": "bowls and then want it. Oh, yeah. Yeah, we have to pour out pistachios. We're good for that. Yeah.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B0E777F7EE5/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B0E777F7EE5/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B0E777F7EE5/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-3C21590996B7",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 67,
+      "blind_id": "CA3-B5657D63AE40",
+      "anchored_asr_verb": "put",
+      "transcript": "won't put it in the fridge but I'll put it right there. Okay.",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0A8D3A9A7C2/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0A8D3A9A7C2/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0A8D3A9A7C2/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-B5657D63AE40",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 68,
+      "blind_id": "CA3-6C911EAFA23C",
+      "anchored_asr_verb": "get",
+      "transcript": "be like you cannot eat this. You cannot do that. You cannot do that. You get a cut. You can't like get healed quick and",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8BD9B7A455F1/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8BD9B7A455F1/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8BD9B7A455F1/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-6C911EAFA23C",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 69,
+      "blind_id": "CA3-A5C5F3CE0B0A",
+      "anchored_asr_verb": "drink",
+      "transcript": "Hey, you want to take a drink of it? I wonder if my thing",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-511F41CCD34C/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-511F41CCD34C/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-511F41CCD34C/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-A5C5F3CE0B0A",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 70,
+      "blind_id": "CA3-4219884A20FE",
+      "anchored_asr_verb": "wipe",
+      "transcript": "space hit the planet millions of years ago and wiped down the dinosaurs. Now, with advanced",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1DEB68078C5E/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1DEB68078C5E/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1DEB68078C5E/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-4219884A20FE",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 71,
+      "blind_id": "CA3-F213B53C3A40",
+      "anchored_asr_verb": "drink",
+      "transcript": "Yeah, you want to take a drink of it? I wonder if my thing",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-06297A525120/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-06297A525120/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-06297A525120/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-F213B53C3A40",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    },
+    {
+      "packet_rank": 72,
+      "blind_id": "CA3-BB7565A74BA3",
+      "anchored_asr_verb": "set",
+      "transcript": "that could be the next one. Set the table and eat it. Next one. No, we can we can plate",
+      "anchor_guidance": "Centered ASR anchor is between frames 15 and 16; stage-1 visible labels are sealed and immutable.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6B7EF1CCC0C0/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6B7EF1CCC0C0/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6B7EF1CCC0C0/detail_16_30.jpg",
+      "annotation": {
+        "blind_id": "CA3-BB7565A74BA3",
+        "asr_referent": null,
+        "temporal_relation": null,
+        "language_confidence": null,
+        "language_rationale": null
+      }
+    }
+  ]
+}

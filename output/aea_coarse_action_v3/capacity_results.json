@@ -1,0 +1,18 @@
+{
+  "schema_version": "aea-coarse-action-capacity-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "scientific_role": "adult_partly_scripted_sensor_format_analogue_not_developmental_evidence_not_babyview_like",
+  "model_assisted_labels_only": true,
+  "gate_inputs": {
+    "coarse_annotation_gate_passed": false,
+    "split_and_donor_gate_passed": false
+  },
+  "natural_transcripts_used": false,
+  "imu_used": false,
+  "raw_vrs_opened": 0,
+  "reserve_rgb_or_imu_files_opened": 0,
+  "status": "not_run_stage_gate_failed",
+  "capacity_gate_passed": false,
+  "expensive_modeling_stopped": true,
+  "dense_development_rgb_items_opened": 0
+}

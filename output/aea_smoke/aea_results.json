@@ -1,0 +1,1104 @@
+{
+  "schema_version": "aea-grounding-results-v1",
+  "scientific_status": "infrastructure_smoke_test_not_a_real_data_finding",
+  "scientific_role": "adult_partly_scripted_sensor_format_analogue_not_developmental_evidence",
+  "examples_path": "data/aea_smoke_fixture/examples.jsonl",
+  "data_summary": {
+    "windows": 96,
+    "sequences": 12,
+    "locations": {
+      "1": 32,
+      "2": 32,
+      "3": 32
+    },
+    "actions": {
+      "get": 24,
+      "put": 24,
+      "cook": 24,
+      "grab": 24
+    }
+  },
+  "device": "cpu",
+  "pilot_config": {
+    "frame_count": 3,
+    "image_size": 24,
+    "max_text_length": 10,
+    "hidden_dim": 12,
+    "embedding_dim": 8,
+    "batch_size": 24,
+    "epochs": 1,
+    "learning_rate": 0.001,
+    "motor_weight": 0.25,
+    "time_shift": 4,
+    "bootstrap_samples": 200,
+    "motor_sample_count": 15
+  },
+  "paired_seeds": [
+    11,
+    22
+  ],
+  "arms": [
+    "null",
+    "synchronized",
+    "shuffled",
+    "time_shifted"
+  ],
+  "primary_test": {
+    "family": "held_out_location",
+    "metric": "action-balanced 2AFC macro accuracy",
+    "motor": "withheld by omission; motor encoder is never called"
+  },
+  "evaluation_results": [
+    {
+      "name": "held_out_location_1",
+      "family": "held_out_location",
+      "split_audit": {
+        "held_out_location": 1,
+        "location_5_script_scope_limited": false,
+        "train_count": 64,
+        "test_count_before_action_support_filter": 32,
+        "test_count": 32,
+        "purged_count": 0,
+        "supported_actions": [
+          "cook",
+          "get",
+          "grab",
+          "put"
+        ],
+        "train_action_counts": {
+          "get": 16,
+          "put": 16,
+          "cook": 16,
+          "grab": 16
+        },
+        "test_action_counts": {
+          "get": 8,
+          "put": 8,
+          "cook": 8,
+          "grab": 8
+        },
+        "sequence_overlap": [],
+        "concurrent_event_overlap": [],
+        "valid": true
+      },
+      "actions": [
+        "cook",
+        "get",
+        "grab",
+        "put"
+      ],
+      "metadata_only_shortcut": {
+        "action_2afc_macro_accuracy": 0.0,
+        "chance": 0.5
+      },
+      "label_recovery_positive_control": {
+        "action_anchor_present_in_own_transcript_rate": 1.0,
+        "expected": 1.0,
+        "role": "annotation/timestamp integrity control, not evidence of visual grounding"
+      },
+      "paired_protocol_checks": {
+        "11": {
+          "same_initialization_across_arms": true,
+          "same_optimizer_steps_across_arms": true,
+          "same_training_order_across_arms": true
+        },
+        "22": {
+          "same_initialization_across_arms": true,
+          "same_optimizer_steps_across_arms": true,
+          "same_training_order_across_arms": true
+        }
+      },
+      "runs": [
+        {
+          "seed": 11,
+          "arm": "null",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.03125,
+            "text_to_video_recall_at_5": 0.125,
+            "action_2afc_by_action": {
+              "cook": 0.8333333333333334,
+              "get": 0.8333333333333334,
+              "grab": 0.0,
+              "put": 0.3333333333333333
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "e4bffcd40e708c34a0445b24c940b620bd89e8b390fb7823b4aaba3294fe1df9",
+            "training_order_digest": "cddb7ce5135d35bf206f1ee6d15636c2f74fb06e92966dc5ef1ba86363efd80d",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.566024621327718,
+                "video_text_loss": 3.0439252058664956,
+                "motor_text_loss": 3.045449733734131,
+                "motor_video_loss": 3.042948325475057
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 0.25,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.566024621327718,
+            "loss_last_epoch": 4.566024621327718,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 11,
+          "arm": "synchronized",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.03125,
+            "text_to_video_recall_at_5": 0.21875,
+            "action_2afc_by_action": {
+              "cook": 0.8333333333333334,
+              "get": 0.8333333333333334,
+              "grab": 0.0,
+              "put": 0.3333333333333333
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "e4bffcd40e708c34a0445b24c940b620bd89e8b390fb7823b4aaba3294fe1df9",
+            "training_order_digest": "cddb7ce5135d35bf206f1ee6d15636c2f74fb06e92966dc5ef1ba86363efd80d",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.565940539042155,
+                "video_text_loss": 3.043912967046102,
+                "motor_text_loss": 3.0448904037475586,
+                "motor_video_loss": 3.0432194073994956
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 1.0,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.565940539042155,
+            "loss_last_epoch": 4.565940539042155,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 11,
+          "arm": "shuffled",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.0,
+            "text_to_video_recall_at_5": 0.15625,
+            "action_2afc_by_action": {
+              "cook": 0.8333333333333334,
+              "get": 0.8333333333333334,
+              "grab": 0.0,
+              "put": 0.3333333333333333
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "e4bffcd40e708c34a0445b24c940b620bd89e8b390fb7823b4aaba3294fe1df9",
+            "training_order_digest": "cddb7ce5135d35bf206f1ee6d15636c2f74fb06e92966dc5ef1ba86363efd80d",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.566108226776123,
+                "video_text_loss": 3.043931722640991,
+                "motor_text_loss": 3.045603354771932,
+                "motor_video_loss": 3.043102423350016
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 0.375,
+            "shuffled_source_action_match_rate": 0.28125,
+            "shuffled_self_match_rate": 0.0,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": 0.25,
+            "shuffled_training_self_match_rate": 0.0,
+            "shuffled_training_episode_group_match_rate": 0.0
+          },
+          "donor_episode_group_match_rate": 0.0,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.566108226776123,
+            "loss_last_epoch": 4.566108226776123,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 11,
+          "arm": "time_shifted",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.0,
+            "text_to_video_recall_at_5": 0.125,
+            "action_2afc_by_action": {
+              "cook": 0.8333333333333334,
+              "get": 0.8333333333333334,
+              "grab": 0.0,
+              "put": 0.3333333333333333
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "e4bffcd40e708c34a0445b24c940b620bd89e8b390fb7823b4aaba3294fe1df9",
+            "training_order_digest": "cddb7ce5135d35bf206f1ee6d15636c2f74fb06e92966dc5ef1ba86363efd80d",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.566022237141927,
+                "video_text_loss": 3.043923775355021,
+                "motor_text_loss": 3.0451977252960205,
+                "motor_video_loss": 3.043195883433024
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 1.0,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.566022237141927,
+            "loss_last_epoch": 4.566022237141927,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 22,
+          "arm": "null",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.03125,
+            "text_to_video_recall_at_5": 0.15625,
+            "action_2afc_by_action": {
+              "cook": 1.0,
+              "get": 0.16666666666666666,
+              "grab": 0.6666666666666666,
+              "put": 0.16666666666666666
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "a9f9e761135fb75bea92cd23147e3fdb3b17572c82b109400fcd2736a7a56c69",
+            "training_order_digest": "4ae550a64a97eceafebda2e51d2fd0243773ea3a046ffb60502ec97a5cd16c5d",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.565759499867757,
+                "video_text_loss": 3.043991724650065,
+                "motor_text_loss": 3.0441649754842124,
+                "motor_video_loss": 3.0429064432779946
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 0.25,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.565759499867757,
+            "loss_last_epoch": 4.565759499867757,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 22,
+          "arm": "synchronized",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5208333333333333,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.03125,
+            "text_to_video_recall_at_5": 0.15625,
+            "action_2afc_by_action": {
+              "cook": 1.0,
+              "get": 0.25,
+              "grab": 0.6666666666666666,
+              "put": 0.16666666666666666
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "a9f9e761135fb75bea92cd23147e3fdb3b17572c82b109400fcd2736a7a56c69",
+            "training_order_digest": "4ae550a64a97eceafebda2e51d2fd0243773ea3a046ffb60502ec97a5cd16c5d",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.565625031789144,
+                "video_text_loss": 3.0439180533091226,
+                "motor_text_loss": 3.0440359910329184,
+                "motor_video_loss": 3.0427923997243247
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 1.0,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.565625031789144,
+            "loss_last_epoch": 4.565625031789144,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 22,
+          "arm": "shuffled",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.03125,
+            "text_to_video_recall_at_5": 0.15625,
+            "action_2afc_by_action": {
+              "cook": 1.0,
+              "get": 0.16666666666666666,
+              "grab": 0.6666666666666666,
+              "put": 0.16666666666666666
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "a9f9e761135fb75bea92cd23147e3fdb3b17572c82b109400fcd2736a7a56c69",
+            "training_order_digest": "4ae550a64a97eceafebda2e51d2fd0243773ea3a046ffb60502ec97a5cd16c5d",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.565482934315999,
+                "video_text_loss": 3.043963591257731,
+                "motor_text_loss": 3.042914867401123,
+                "motor_video_loss": 3.043162981669108
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 0.25,
+            "shuffled_source_action_match_rate": 0.125,
+            "shuffled_self_match_rate": 0.0,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": 0.296875,
+            "shuffled_training_self_match_rate": 0.0,
+            "shuffled_training_episode_group_match_rate": 0.0
+          },
+          "donor_episode_group_match_rate": 0.0,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.565482934315999,
+            "loss_last_epoch": 4.565482934315999,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 22,
+          "arm": "time_shifted",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.0,
+            "text_to_video_recall_at_5": 0.21875,
+            "action_2afc_by_action": {
+              "cook": 1.0,
+              "get": 0.16666666666666666,
+              "grab": 0.6666666666666666,
+              "put": 0.16666666666666666
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "a9f9e761135fb75bea92cd23147e3fdb3b17572c82b109400fcd2736a7a56c69",
+            "training_order_digest": "4ae550a64a97eceafebda2e51d2fd0243773ea3a046ffb60502ec97a5cd16c5d",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.568312644958496,
+                "video_text_loss": 3.0442679723103843,
+                "motor_text_loss": 3.050546725591024,
+                "motor_video_loss": 3.045631726582845
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 1.0,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.568312644958496,
+            "loss_last_epoch": 4.568312644958496,
+            "loss_nonincreasing": true
+          }
+        }
+      ],
+      "paired_seed_differences": {
+        "synchronized_minus_shuffled": {
+          "11": 0.0,
+          "22": 0.02083333333333326
+        },
+        "synchronized_minus_null": {
+          "11": 0.0,
+          "22": 0.02083333333333326
+        }
+      }
+    },
+    {
+      "name": "held_out_location_2",
+      "family": "held_out_location",
+      "split_audit": {
+        "held_out_location": 2,
+        "location_5_script_scope_limited": false,
+        "train_count": 64,
+        "test_count_before_action_support_filter": 32,
+        "test_count": 32,
+        "purged_count": 0,
+        "supported_actions": [
+          "cook",
+          "get",
+          "grab",
+          "put"
+        ],
+        "train_action_counts": {
+          "get": 16,
+          "put": 16,
+          "cook": 16,
+          "grab": 16
+        },
+        "test_action_counts": {
+          "get": 8,
+          "put": 8,
+          "cook": 8,
+          "grab": 8
+        },
+        "sequence_overlap": [],
+        "concurrent_event_overlap": [],
+        "valid": true
+      },
+      "actions": [
+        "cook",
+        "get",
+        "grab",
+        "put"
+      ],
+      "metadata_only_shortcut": {
+        "action_2afc_macro_accuracy": 0.0,
+        "chance": 0.5
+      },
+      "label_recovery_positive_control": {
+        "action_anchor_present_in_own_transcript_rate": 1.0,
+        "expected": 1.0,
+        "role": "annotation/timestamp integrity control, not evidence of visual grounding"
+      },
+      "paired_protocol_checks": {
+        "11": {
+          "same_initialization_across_arms": true,
+          "same_optimizer_steps_across_arms": true,
+          "same_training_order_across_arms": true
+        },
+        "22": {
+          "same_initialization_across_arms": true,
+          "same_optimizer_steps_across_arms": true,
+          "same_training_order_across_arms": true
+        }
+      },
+      "runs": [
+        {
+          "seed": 11,
+          "arm": "null",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.03125,
+            "text_to_video_recall_at_5": 0.125,
+            "action_2afc_by_action": {
+              "cook": 0.8333333333333334,
+              "get": 0.8333333333333334,
+              "grab": 0.0,
+              "put": 0.3333333333333333
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "e4bffcd40e708c34a0445b24c940b620bd89e8b390fb7823b4aaba3294fe1df9",
+            "training_order_digest": "3bf995565963fde39f6306f7996ba6d3a15e950fa2932fa17af582898ada42bb",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.566024621327718,
+                "video_text_loss": 3.0439252058664956,
+                "motor_text_loss": 3.045449733734131,
+                "motor_video_loss": 3.042948325475057
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 0.25,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.566024621327718,
+            "loss_last_epoch": 4.566024621327718,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 11,
+          "arm": "synchronized",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.03125,
+            "text_to_video_recall_at_5": 0.1875,
+            "action_2afc_by_action": {
+              "cook": 0.8333333333333334,
+              "get": 0.8333333333333334,
+              "grab": 0.0,
+              "put": 0.3333333333333333
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "e4bffcd40e708c34a0445b24c940b620bd89e8b390fb7823b4aaba3294fe1df9",
+            "training_order_digest": "3bf995565963fde39f6306f7996ba6d3a15e950fa2932fa17af582898ada42bb",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.565932750701904,
+                "video_text_loss": 3.0439128081003823,
+                "motor_text_loss": 3.0448625882466636,
+                "motor_video_loss": 3.043217341105143
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 1.0,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.565932750701904,
+            "loss_last_epoch": 4.565932750701904,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 11,
+          "arm": "shuffled",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.0,
+            "text_to_video_recall_at_5": 0.125,
+            "action_2afc_by_action": {
+              "cook": 0.8333333333333334,
+              "get": 0.8333333333333334,
+              "grab": 0.0,
+              "put": 0.3333333333333333
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "e4bffcd40e708c34a0445b24c940b620bd89e8b390fb7823b4aaba3294fe1df9",
+            "training_order_digest": "3bf995565963fde39f6306f7996ba6d3a15e950fa2932fa17af582898ada42bb",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.566112518310547,
+                "video_text_loss": 3.043931802113851,
+                "motor_text_loss": 3.045619169871012,
+                "motor_video_loss": 3.0431037743886313
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 0.375,
+            "shuffled_source_action_match_rate": 0.28125,
+            "shuffled_self_match_rate": 0.0,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": 0.25,
+            "shuffled_training_self_match_rate": 0.0,
+            "shuffled_training_episode_group_match_rate": 0.0
+          },
+          "donor_episode_group_match_rate": 0.0,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.566112518310547,
+            "loss_last_epoch": 4.566112518310547,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 11,
+          "arm": "time_shifted",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.03125,
+            "text_to_video_recall_at_5": 0.15625,
+            "action_2afc_by_action": {
+              "cook": 0.8333333333333334,
+              "get": 0.8333333333333334,
+              "grab": 0.0,
+              "put": 0.3333333333333333
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "e4bffcd40e708c34a0445b24c940b620bd89e8b390fb7823b4aaba3294fe1df9",
+            "training_order_digest": "3bf995565963fde39f6306f7996ba6d3a15e950fa2932fa17af582898ada42bb",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.5660068194071455,
+                "video_text_loss": 3.04392147064209,
+                "motor_text_loss": 3.0451443990071616,
+                "motor_video_loss": 3.0431968371073403
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 1.0,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.5660068194071455,
+            "loss_last_epoch": 4.5660068194071455,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 22,
+          "arm": "null",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.03125,
+            "text_to_video_recall_at_5": 0.15625,
+            "action_2afc_by_action": {
+              "cook": 1.0,
+              "get": 0.16666666666666666,
+              "grab": 0.6666666666666666,
+              "put": 0.16666666666666666
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "a9f9e761135fb75bea92cd23147e3fdb3b17572c82b109400fcd2736a7a56c69",
+            "training_order_digest": "088b9122e3dae29e29c89f2d6ffc65645a396293bdd52ef3b18178745cb80ac8",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.565759499867757,
+                "video_text_loss": 3.043991724650065,
+                "motor_text_loss": 3.0441649754842124,
+                "motor_video_loss": 3.0429064432779946
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 0.25,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.565759499867757,
+            "loss_last_epoch": 4.565759499867757,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 22,
+          "arm": "synchronized",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5208333333333333,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.0625,
+            "text_to_video_recall_at_5": 0.21875,
+            "action_2afc_by_action": {
+              "cook": 1.0,
+              "get": 0.25,
+              "grab": 0.6666666666666666,
+              "put": 0.16666666666666666
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "a9f9e761135fb75bea92cd23147e3fdb3b17572c82b109400fcd2736a7a56c69",
+            "training_order_digest": "088b9122e3dae29e29c89f2d6ffc65645a396293bdd52ef3b18178745cb80ac8",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.565620422363281,
+                "video_text_loss": 3.043917735417684,
+                "motor_text_loss": 3.0440187454223633,
+                "motor_video_loss": 3.042791763941447
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 1.0,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.565620422363281,
+            "loss_last_epoch": 4.565620422363281,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 22,
+          "arm": "shuffled",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.03125,
+            "text_to_video_recall_at_5": 0.09375,
+            "action_2afc_by_action": {
+              "cook": 1.0,
+              "get": 0.16666666666666666,
+              "grab": 0.6666666666666666,
+              "put": 0.16666666666666666
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "a9f9e761135fb75bea92cd23147e3fdb3b17572c82b109400fcd2736a7a56c69",
+            "training_order_digest": "088b9122e3dae29e29c89f2d6ffc65645a396293bdd52ef3b18178745cb80ac8",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.565483411153157,
+                "video_text_loss": 3.0439631938934326,
+                "motor_text_loss": 3.042923927307129,
+                "motor_video_loss": 3.043156941731771
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 0.25,
+            "shuffled_source_action_match_rate": 0.125,
+            "shuffled_self_match_rate": 0.0,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": 0.296875,
+            "shuffled_training_self_match_rate": 0.0,
+            "shuffled_training_episode_group_match_rate": 0.0
+          },
+          "donor_episode_group_match_rate": 0.0,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.565483411153157,
+            "loss_last_epoch": 4.565483411153157,
+            "loss_nonincreasing": true
+          }
+        },
+        {
+          "seed": 22,
+          "arm": "time_shifted",
+          "metrics": {
+            "action_2afc_macro_accuracy": 0.5,
+            "action_4way_macro_accuracy": 0.25,
+            "video_to_text_recall_at_1": 0.03125,
+            "video_to_text_recall_at_5": 0.15625,
+            "text_to_video_recall_at_1": 0.0,
+            "text_to_video_recall_at_5": 0.1875,
+            "action_2afc_by_action": {
+              "cook": 1.0,
+              "get": 0.16666666666666666,
+              "grab": 0.6666666666666666,
+              "put": 0.16666666666666666
+            },
+            "n_test": 32,
+            "primary_test_modalities": [
+              "rendered_rgb_frames",
+              "utterance_text"
+            ],
+            "motor_hard_masked": true
+          },
+          "training_protocol": {
+            "initialization_digest": "a9f9e761135fb75bea92cd23147e3fdb3b17572c82b109400fcd2736a7a56c69",
+            "training_order_digest": "088b9122e3dae29e29c89f2d6ffc65645a396293bdd52ef3b18178745cb80ac8",
+            "optimizer_steps": 3,
+            "batches_per_epoch": 3,
+            "training_history": [
+              {
+                "loss": 4.568297704060872,
+                "video_text_loss": 3.04426646232605,
+                "motor_text_loss": 3.050499200820923,
+                "motor_video_loss": 3.045625845591227
+              }
+            ]
+          },
+          "motor_only_manipulation": {
+            "nearest_centroid_action_macro_accuracy": 1.0,
+            "shuffled_source_action_match_rate": null,
+            "shuffled_self_match_rate": null,
+            "test_episode_derangement_feasible": true,
+            "shuffled_training_source_action_match_rate": null,
+            "shuffled_training_self_match_rate": null,
+            "shuffled_training_episode_group_match_rate": null
+          },
+          "donor_episode_group_match_rate": null,
+          "optimization_positive_control": {
+            "loss_first_epoch": 4.568297704060872,
+            "loss_last_epoch": 4.568297704060872,
+            "loss_nonincreasing": true
+          }
+        }
+      ],
+      "paired_seed_differences": {
+        "synchronized_minus_shuffled": {
+          "11": 0.0,
+          "22": 0.02083333333333326
+        },
+        "synchronized_minus_null": {
+          "11": 0.0,
+          "22": 0.02083333333333326
+        }
+      }
+    }
+  ],
+  "family_summaries": {
+    "held_out_location": {
+      "split_count": 2,
+      "paired_lift": {
+        "mean": 0.01041666666666663,
+        "ci95_low": 0.0,
+        "ci95_high": 0.02083333333333326,
+        "n_split_units": 2,
+        "n_paired_seeds": 2,
+        "method": "hierarchical bootstrap over split units then paired seeds"
+      },
+      "synchronized_minus_null": {
+        "mean": 0.01041666666666663,
+        "ci95_low": 0.0,
+        "ci95_high": 0.02083333333333326,
+        "n_split_units": 2,
+        "n_paired_seeds": 2,
+        "method": "hierarchical bootstrap over split units then paired seeds"
+      }
+    }
+  },
+  "primary_estimand": {
+    "name": "synchronized_minus_split_local_episode_shuffled",
+    "interval": {
+      "mean": 0.01041666666666663,
+      "ci95_low": 0.0,
+      "ci95_high": 0.02083333333333326,
+      "n_split_units": 2,
+      "n_paired_seeds": 2,
+      "method": "hierarchical bootstrap over split units then paired seeds"
+    },
+    "synchronized_minus_null_interval": {
+      "mean": 0.01041666666666663,
+      "ci95_low": 0.0,
+      "ci95_high": 0.02083333333333326,
+      "n_split_units": 2,
+      "n_paired_seeds": 2,
+      "method": "hierarchical bootstrap over split units then paired seeds"
+    },
+    "minimum_effect_threshold": 0.03,
+    "complete_locked_location_folds_and_seed_schedule": false,
+    "locked_training_configuration_match": false,
+    "claim_gate_passed": false,
+    "audit_gates_passed": true
+  },
+  "positive_controls": {
+    "action_anchor_recovery_passed": true,
+    "paired_protocol_passed": true,
+    "shuffled_same_episode_group_rate_zero": true,
+    "optimization_history_retained_per_run": true,
+    "motor_only_manipulation_retained_per_run": true
+  },
+  "limitations": {
+    "adult_partly_scripted": true,
+    "developmental_evidence": false,
+    "action_labels": "ASR lexical anchors, not human action annotations",
+    "wearer_identity": "release-visible session proxy, not persistent identity",
+    "location_5": "contains scripts 4 and 5 only"
+  }
+}

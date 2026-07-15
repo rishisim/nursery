@@ -1,0 +1,8 @@
+{
+  "schema_version": "aea-development-materialization-v1",
+  "partition_manifest_sha256": "fc7b9299c01d09eb20119060134e51c048146c8dfb52a4e76726437d51783794",
+  "development_examples_sha256": "7d6e23a4589a179449ed05bd093be7acbdda75bef451261ebf594d8b343354f0",
+  "development_windows": 192,
+  "development_event_groups": 18,
+  "confirmation_paths_opened": false
+}

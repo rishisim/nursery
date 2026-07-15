@@ -1,0 +1,24 @@
+{
+  "schema_version": "aea-visible-action-protocol-freeze-receipt-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "frozen_at_utc": "2026-07-14T23:54:45Z",
+  "ordering_statement": "Frozen before any new v2 development clip, annotation, split outcome, capacity outcome, or IMU outcome was viewed.",
+  "preregistration_markdown": {
+    "path": "docs/aea_visible_action_v2_preregistration.md",
+    "sha256": "2791016b12ad2772f7c34840fb2b475ec130937e9909c88b7f12c6f29b5c9d51"
+  },
+  "machine_readable_protocol": {
+    "path": "output/aea_visible_action_v2/preregistered_protocol.json",
+    "sha256": "b17ae9869461f508f7b63d7d90ad69ab4779554bd800af1f3a79fc9addf147ab"
+  },
+  "frozen_inputs": {
+    "development_examples_sha256": "7d6e23a4589a179449ed05bd093be7acbdda75bef451261ebf594d8b343354f0",
+    "partition_manifest_sha256": "fc7b9299c01d09eb20119060134e51c048146c8dfb52a4e76726437d51783794",
+    "prior_audit_prelabel_sha256": "8defb972b166e3b785e12cd61c71038c946a437cb411accc625d86115bb02f19"
+  },
+  "new_media_viewed_before_freeze": false,
+  "new_annotations_viewed_before_freeze": false,
+  "new_model_outcomes_viewed_before_freeze": false,
+  "reserve_rgb_or_imu_accessed": false,
+  "signed_urls_loaded_or_printed": false
+}

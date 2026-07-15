@@ -33,6 +33,10 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=4)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--frame-count", type=int, default=6)
+    parser.add_argument(
+        "--motor-sample-count", type=int, default=0,
+        help="Fixed motor samples per window; 0 reuses frame-count.",
+    )
     parser.add_argument("--image-size", type=int, default=48)
     parser.add_argument("--hidden-dim", type=int, default=48)
     parser.add_argument("--embedding-dim", type=int, default=32)
@@ -52,6 +56,7 @@ def main() -> None:
         motor_weight=args.motor_weight,
         time_shift=args.time_shift,
         bootstrap_samples=args.bootstrap_samples,
+        motor_sample_count=args.motor_sample_count,
     )
     result = run_pilot(
         episodes_path=args.episodes,

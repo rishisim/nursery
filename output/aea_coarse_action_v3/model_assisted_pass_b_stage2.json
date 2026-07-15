@@ -1,0 +1,522 @@
+{
+  "schema_version": "aea-coarse-action-model-pass-stage2-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "pass": "pass_b",
+  "stage": "stage_2_transcript_referent_and_temporal_relation",
+  "role": "model_assisted_development_labels_not_human_annotations_or_human_interrater_reliability",
+  "source_packet": "output/aea_coarse_action_v3/annotation_packet_pass_b_stage2_language.json",
+  "source_packet_sha256": "89260700101b0ab2bed90142da79e3ad9a6aa017e574de04916959bc55f41f8b",
+  "sealed_stage_1": "output/aea_coarse_action_v3/model_assisted_pass_b_stage1.json",
+  "sealed_stage_1_sha256": "5b1a9019cc7b6bc16aadf4a6642c5e4c3e109176dec821f4af57dc126a9d3eec",
+  "stage_1_fields_modified": false,
+  "other_pass_read": false,
+  "v1_or_v2_completed_labels_or_rationales_read": false,
+  "reserve_media_opened": false,
+  "raw_vrs_audio_or_imu_opened": false,
+  "rows": [
+    {
+      "blind_id": "CA3-2CA4F1A124DF",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Generic acting discussion from media does not describe a concrete wearer action."
+    },
+    {
+      "blind_id": "CA3-4F25163A5146",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Get better describes hypothetical recovery after chemotherapy, not a visible wearer action."
+    },
+    {
+      "blind_id": "CA3-B7036DE9D276",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "The anchor appears in the object name cutting board; the wearer does not cut."
+    },
+    {
+      "blind_id": "CA3-259860F77C81",
+      "asr_referent": "unclear",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The tentative collective proposal does not identify who would wash, and no washing occurs."
+    },
+    {
+      "blind_id": "CA3-DE514C06F855",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Automotive how-to narration describes removing a battery box, while the wearer handles food."
+    },
+    {
+      "blind_id": "CA3-3447525300F7",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The companion's second-person offer appears addressed to the wearer, but the wearer opens nothing."
+    },
+    {
+      "blind_id": "CA3-6209B7A50B37",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Walk through is a walkthrough phrase rather than physical walking, and the wearer remains stationary."
+    },
+    {
+      "blind_id": "CA3-C6BD9D19E8E0",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "Let's get those includes the wearer in intended retrieval, but only approach motion is visible."
+    },
+    {
+      "blind_id": "CA3-CBFC8E6C2040",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Played explicitly refers to Maggie's performance, not the wearer operating a remote."
+    },
+    {
+      "blind_id": "CA3-029A6C7E5B0F",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Automotive narration uses take causatively for exceeding sound limits, unrelated to wearer phone use."
+    },
+    {
+      "blind_id": "CA3-525665C52804",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "before",
+      "language_confidence": "medium",
+      "language_rationale": "The inclusive cleanup proposal matches the wearer briefly putting a small item down just before the anchor."
+    },
+    {
+      "blind_id": "CA3-316B46334495",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "aligned",
+      "language_confidence": "high",
+      "language_rationale": "Let's move this includes the wearer, whose hands move the small objects through the anchor."
+    },
+    {
+      "blind_id": "CA3-EE612D22F786",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "Subjectless walking through does not match the stationary wearer and likely describes another person."
+    },
+    {
+      "blind_id": "CA3-584BC804DAC0",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "I can make it belongs to the companion actively preparing food; the wearer remains inactive."
+    },
+    {
+      "blind_id": "CA3-91B29D38DAAB",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The first-person future intent likely belongs to the wearer, but no pistachios are poured."
+    },
+    {
+      "blind_id": "CA3-E2F90CA71FB7",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Media narration uses make sure as a viewer instruction, not a concrete wearer action."
+    },
+    {
+      "blind_id": "CA3-43FEA4D2AA3A",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Took refers to a woman discussed in conversation, while only the companion tends the stove."
+    },
+    {
+      "blind_id": "CA3-505C5C420660",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Automotive how-to narration instructs pressing an ECU tab; the wearer instead handles food."
+    },
+    {
+      "blind_id": "CA3-E7EB29E4D8B8",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Automotive narration proposes removing a fuse-box lid; the wearer's food handling is unrelated."
+    },
+    {
+      "blind_id": "CA3-808FEB6D39A9",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "aligned",
+      "language_confidence": "medium",
+      "language_rationale": "The first-person opening plan coincides with the wearer manipulating the indicated food package at the anchor."
+    },
+    {
+      "blind_id": "CA3-624AAA87BC4F",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Researchers put together a timeline is figurative media narration, unrelated to the wearer's actions."
+    },
+    {
+      "blind_id": "CA3-A3AE89453605",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The drink offer's second person likely addresses the wearer, but no drinking occurs."
+    },
+    {
+      "blind_id": "CA3-D22D2B0CB12E",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Cooking describes the food's state, not an action performed by the wearer."
+    },
+    {
+      "blind_id": "CA3-0671E35E54E7",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The cleaning request is directed to the visible companion carrying the item away; the wearer only follows."
+    },
+    {
+      "blind_id": "CA3-39BA43B2F9E4",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "The companion says they will grab the pretzels and explicitly tells the wearer they are good."
+    },
+    {
+      "blind_id": "CA3-8ED2505125EC",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The companion's you directs the wearer to bring creamer, but no carrying or delivery occurs."
+    },
+    {
+      "blind_id": "CA3-24A41EE2FF9A",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Media narration tells viewers to enable notifications, not describing the wearer's phone action."
+    },
+    {
+      "blind_id": "CA3-E8E09430905A",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Troubling moves uses moves as an abstract noun in media discussion, not wearer movement."
+    },
+    {
+      "blind_id": "CA3-1EB5E91D9382",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Read my mind is idiomatic and does not describe literal wearer reading."
+    },
+    {
+      "blind_id": "CA3-53B92AC6705D",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Automotive narration describes a presenter setting a wire aside; the wearer handles food."
+    },
+    {
+      "blind_id": "CA3-352AD7C3F0C9",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Cut denotes a hypothetical injury, not a cutting action by the wearer."
+    },
+    {
+      "blind_id": "CA3-ACBE2028651D",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The imperative plausibly targets the wearer, but reaching toward a refrigerator item is not visibly setting it down."
+    },
+    {
+      "blind_id": "CA3-1079C11B38B4",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Astronomy media addresses a generic viewer; it does not establish a wearer watching action."
+    },
+    {
+      "blind_id": "CA3-D70F584519F2",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Moving countries and moving with a trend concern a discussed person, not visible wearer movement."
+    },
+    {
+      "blind_id": "CA3-3B8D8D4B2F0E",
+      "asr_referent": "unclear",
+      "temporal_relation": "none",
+      "language_confidence": "low",
+      "language_rationale": "The fragment serve the process is semantically unclear, and no wearer serving action is visible."
+    },
+    {
+      "blind_id": "CA3-DA3A25711A28",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Make a difference is an idiom in automotive media, not a wearer action."
+    },
+    {
+      "blind_id": "CA3-0D1874FFF6F7",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "The first-person opening belongs to the companion handling counter items; the wearer remains inactive."
+    },
+    {
+      "blind_id": "CA3-E190AE6E25AF",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "aligned",
+      "language_confidence": "medium",
+      "language_rationale": "The first-person statement matches the wearer actively watching and operating the phone through the anchor."
+    },
+    {
+      "blind_id": "CA3-0149CAF81C5B",
+      "asr_referent": "unclear",
+      "temporal_relation": "none",
+      "language_confidence": "low",
+      "language_rationale": "Two conflicting wash mentions have no clear actor, and the wearer handles a pan without washing it."
+    },
+    {
+      "blind_id": "CA3-C2BA7D7FB4DD",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The first-person washing need appears to belong to the companion at the counter; the wearer only turns nearby."
+    },
+    {
+      "blind_id": "CA3-5F0891D03382",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The companion's second-person drink offer targets the wearer, who does not take a drink."
+    },
+    {
+      "blind_id": "CA3-A706276306B0",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Serving is a noun describing an unspecified quantity or meal, not a wearer action."
+    },
+    {
+      "blind_id": "CA3-41CC78732CFB",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "The sports question addresses a player in media, not the wearer using a remote."
+    },
+    {
+      "blind_id": "CA3-1B0B0BF63F48",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "after",
+      "language_confidence": "medium",
+      "language_rationale": "The inclusive cleanup proposal matches the wearer placing a drinking glass down shortly after the anchor."
+    },
+    {
+      "blind_id": "CA3-5B3B3CCE2444",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "aligned",
+      "language_confidence": "high",
+      "language_rationale": "Turn your head directly instructs the wearer, whose head turn continues across the anchor."
+    },
+    {
+      "blind_id": "CA3-551DE13C0653",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "The statement explicitly says cutting is unnecessary; it does not describe the wearer cutting."
+    },
+    {
+      "blind_id": "CA3-32D78A728502",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Turned refers to reaching an age, not a physical turn by the wearer."
+    },
+    {
+      "blind_id": "CA3-3469D72E7A2B",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "I can walk by describes the companion's intended movement; the wearer instead turns their head."
+    },
+    {
+      "blind_id": "CA3-76CB79A5A739",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The standing companion's drink offer likely addresses the wearer, but the wearer does not drink."
+    },
+    {
+      "blind_id": "CA3-94D600A099D9",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The companion describes having put food in a bowl earlier; the wearer only walks through the kitchen."
+    },
+    {
+      "blind_id": "CA3-2CAAD68FF5C0",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "Grab a bowl is directed toward the wearer, but the wearer only approaches the cabinets."
+    },
+    {
+      "blind_id": "CA3-9DB238BD455A",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Wiped out life describes planetary destruction in media, unrelated to wearer food handling."
+    },
+    {
+      "blind_id": "CA3-47944BBABBC9",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "after",
+      "language_confidence": "high",
+      "language_rationale": "Turn your head directs the wearer, who begins the visible head turn after the anchor."
+    },
+    {
+      "blind_id": "CA3-AB40754C93AC",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "aligned",
+      "language_confidence": "medium",
+      "language_rationale": "The first-person progressive matches the wearer walking into the kitchen to retrieve coffee across the anchor."
+    },
+    {
+      "blind_id": "CA3-074DDC457CB2",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Get on with the race is a media transition, not the wearer's phone action."
+    },
+    {
+      "blind_id": "CA3-DDB2F798DBD4",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Automotive how-to narration describes removing a battery cover; the wearer performs no corresponding action."
+    },
+    {
+      "blind_id": "CA3-48C0A504A764",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "What did you get asks the seated companion about a past store trip, not the wearer."
+    },
+    {
+      "blind_id": "CA3-CF4881A7B5A6",
+      "asr_referent": "unclear",
+      "temporal_relation": "none",
+      "language_confidence": "low",
+      "language_rationale": "The garbled first-person phrase does not resolve who would put something, and no placing occurs."
+    },
+    {
+      "blind_id": "CA3-7C243B0A9ADD",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "The speaker explicitly negates eating it for dinner; no wearer eating action is described."
+    },
+    {
+      "blind_id": "CA3-37AB0FBF224A",
+      "asr_referent": "unclear",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "Inclusive we suggests a joint task, but only the companion is active and wearer cooking is unresolved."
+    },
+    {
+      "blind_id": "CA3-5EF95A7E6057",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Cannot eat this is a hypothetical disease restriction, not a concrete wearer eating action."
+    },
+    {
+      "blind_id": "CA3-4335FB36D5D8",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "The store question's you is the seated companion, whose past purchase is being discussed."
+    },
+    {
+      "blind_id": "CA3-4335CA330980",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The eating intention appears to belong to the companion retrieving food; the wearer only assists at the refrigerator."
+    },
+    {
+      "blind_id": "CA3-3F50142B28E7",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "before",
+      "language_confidence": "medium",
+      "language_rationale": "The inclusive prompt likely refers to the wearer's mug pickup, completed before the anchor; the mugs are then carried."
+    },
+    {
+      "blind_id": "CA3-AA20CEFF1BDE",
+      "asr_referent": "unclear",
+      "temporal_relation": "none",
+      "language_confidence": "low",
+      "language_rationale": "Plural, garbled phrasing leaves the pourer unresolved; only the companion handles the container and no wearer pouring appears."
+    },
+    {
+      "blind_id": "CA3-3C21590996B7",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The collective plan plausibly includes the wearer, who later opens a container, but no pouring is visible."
+    },
+    {
+      "blind_id": "CA3-B5657D63AE40",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "The first-person plan matches the wearer carrying the mug, but the mug is never placed."
+    },
+    {
+      "blind_id": "CA3-6C911EAFA23C",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Get a cut describes a hypothetical injury, not a concrete action by the wearer."
+    },
+    {
+      "blind_id": "CA3-A5C5F3CE0B0A",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "The wearer holds out the beverage while asking you, referring to the seated companion's possible drink."
+    },
+    {
+      "blind_id": "CA3-4219884A20FE",
+      "asr_referent": "nonwearer_or_nonliteral",
+      "temporal_relation": "none",
+      "language_confidence": "high",
+      "language_rationale": "Asteroid media describes wiping out dinosaurs, unrelated to the wearer's phone and food use."
+    },
+    {
+      "blind_id": "CA3-F213B53C3A40",
+      "asr_referent": "wearer_action",
+      "temporal_relation": "none",
+      "language_confidence": "medium",
+      "language_rationale": "The seated companion's second-person offer likely targets the wearer, who continues using the controller."
+    },
+    {
+      "blind_id": "CA3-BB7565A74BA3",
+      "asr_referent": "unclear",
+      "temporal_relation": "none",
+      "language_confidence": "low",
+      "language_rationale": "The table-setting imperative lacks a clear addressee, and the wearer only uses a phone."
+    }
+  ]
+}

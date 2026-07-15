@@ -1,0 +1,14 @@
+{
+  "schema_version": "aea-visible-action-imu-preflight-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "gate_inputs": {
+    "annotation_gate_passed": false,
+    "split_and_donor_gate_passed": false,
+    "action_head_capacity_passed": false
+  },
+  "authorized_by_stage_gates": false,
+  "written_before_imu_access": true,
+  "development_imu_arrays_opened_at_write": 0,
+  "reserve_imu_arrays_opened_at_write": 0,
+  "reserve_rgb_files_opened_at_write": 0
+}

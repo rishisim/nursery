@@ -1,0 +1,22 @@
+{
+  "formal_decision": "STOP",
+  "scientific_conclusion": "STOP_AEA_ROUTE",
+  "language_conclusion": "STOP_LANGUAGE_ROUTE",
+  "sensor_conclusion": "STOP_AEA_ROUTE",
+  "sensor_gate_checks": {
+    "coarse_annotation_support": false,
+    "split_and_donors": false,
+    "video_capacity": false,
+    "imu_viability": false
+  },
+  "failed_sensor_gates": [
+    "coarse_annotation_support",
+    "split_and_donors",
+    "video_capacity",
+    "imu_viability"
+  ],
+  "reason": "one or more frozen coarse annotation, split/donor, capacity, or IMU gates failed",
+  "authorizes": "no further AEA language-grounding or sensor-side-channel development",
+  "aea_survives_as_language_analogue": false,
+  "aea_survives_as_sensor_analogue": false
+}

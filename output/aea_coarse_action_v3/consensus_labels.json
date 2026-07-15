@@ -1,0 +1,403 @@
+{
+  "schema_version": "aea-coarse-action-consensus-labels-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "role": "model_assisted_development_labels_not_human_annotations_or_human_interrater_reliability",
+  "modeling_consensus_rule": "exact modeled coarse action and medium-or-high visible confidence in both passes",
+  "rows": [
+    {
+      "blind_id": "CA3-0149CAF81C5B",
+      "example_id": "loc3_script3_seq5_rec2_w0011",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-0671E35E54E7",
+      "example_id": "loc1_script3_seq5_rec1_w0000",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-074DDC457CB2",
+      "example_id": "loc5_script5_seq5_rec1_w0005",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-1EB5E91D9382",
+      "example_id": "loc4_script3_seq3_rec1_w0005",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-24A41EE2FF9A",
+      "example_id": "loc5_script5_seq5_rec1_w0003",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-259860F77C81",
+      "example_id": "loc3_script3_seq5_rec2_w0004",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-2CA4F1A124DF",
+      "example_id": "loc3_script4_seq3_rec1_w0001",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-2CAAD68FF5C0",
+      "example_id": "loc1_script3_seq5_rec1_w0003",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-316B46334495",
+      "example_id": "loc3_script1_seq4_rec1_w0000",
+      "sequence_id": "loc3_script1_seq4_rec1",
+      "event_group": "loc3_script1_seq4",
+      "location": 3,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-3447525300F7",
+      "example_id": "loc4_script2_seq3_rec2_w0004",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-3469D72E7A2B",
+      "example_id": "loc2_script1_seq2_rec1_w0001",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-39BA43B2F9E4",
+      "example_id": "loc1_script2_seq4_rec2_w0002",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-3C21590996B7",
+      "example_id": "loc1_script2_seq4_rec1_w0007",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-3F50142B28E7",
+      "example_id": "loc2_script1_seq6_rec1_w0001",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-41CC78732CFB",
+      "example_id": "loc3_script1_seq5_rec1_w0000",
+      "sequence_id": "loc3_script1_seq5_rec1",
+      "event_group": "loc3_script1_seq5",
+      "location": 3,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-4219884A20FE",
+      "example_id": "loc2_script4_seq5_rec1_w0002",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-4335CA330980",
+      "example_id": "loc4_script3_seq3_rec1_w0002",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-47944BBABBC9",
+      "example_id": "loc2_script1_seq2_rec1_w0000",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-505C5C420660",
+      "example_id": "loc5_script4_seq5_rec1_w0011",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-525665C52804",
+      "example_id": "loc3_script3_seq5_rec2_w0001",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-551DE13C0653",
+      "example_id": "loc2_script3_seq3_rec1_w0011",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-5B3B3CCE2444",
+      "example_id": "loc2_script1_seq2_rec1_w0002",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-624AAA87BC4F",
+      "example_id": "loc2_script4_seq5_rec1_w0003",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-76CB79A5A739",
+      "example_id": "loc2_script2_seq1_rec1_w0001",
+      "sequence_id": "loc2_script2_seq1_rec1",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-808FEB6D39A9",
+      "example_id": "loc2_script3_seq3_rec1_w0008",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-8ED2505125EC",
+      "example_id": "loc1_script2_seq4_rec1_w0000",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-91B29D38DAAB",
+      "example_id": "loc1_script2_seq4_rec2_w0004",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-94D600A099D9",
+      "example_id": "loc1_script3_seq5_rec1_w0006",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-9DB238BD455A",
+      "example_id": "loc2_script4_seq5_rec1_w0007",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-AA20CEFF1BDE",
+      "example_id": "loc1_script2_seq4_rec2_w0006",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-AB40754C93AC",
+      "example_id": "loc4_script4_seq2_rec1_w0001",
+      "sequence_id": "loc4_script4_seq2_rec1",
+      "event_group": "loc4_script4_seq2",
+      "location": 4,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-ACBE2028651D",
+      "example_id": "loc2_script1_seq6_rec1_w0002",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-B7036DE9D276",
+      "example_id": "loc1_script3_seq5_rec1_w0007",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-BB7565A74BA3",
+      "example_id": "loc2_script3_seq3_rec2_w0022",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-C2BA7D7FB4DD",
+      "example_id": "loc3_script3_seq5_rec1_w0010",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-C6BD9D19E8E0",
+      "example_id": "loc2_script1_seq6_rec1_w0000",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-CBFC8E6C2040",
+      "example_id": "loc3_script4_seq3_rec1_w0002",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-CF4881A7B5A6",
+      "example_id": "loc4_script2_seq4_rec1_w0001",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "observable_action": "gross_body_motion"
+    },
+    {
+      "blind_id": "CA3-DE514C06F855",
+      "example_id": "loc5_script4_seq5_rec1_w0003",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-E190AE6E25AF",
+      "example_id": "loc2_script4_seq5_rec1_w0005",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-E2F90CA71FB7",
+      "example_id": "loc5_script5_seq5_rec1_w0002",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-E7EB29E4D8B8",
+      "example_id": "loc5_script4_seq5_rec1_w0008",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "observable_action": "object_or_body_interaction"
+    },
+    {
+      "blind_id": "CA3-E8E09430905A",
+      "example_id": "loc3_script4_seq3_rec1_w0000",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "observable_action": "object_or_body_interaction"
+    }
+  ],
+  "support": {
+    "gross_body_motion": {
+      "windows": 15,
+      "event_groups": 10,
+      "locations": 4,
+      "by_event_group": {
+        "loc1_script2_seq4": 2,
+        "loc1_script3_seq5": 3,
+        "loc2_script1_seq2": 3,
+        "loc2_script1_seq6": 1,
+        "loc2_script2_seq1": 1,
+        "loc2_script3_seq3": 1,
+        "loc3_script3_seq5": 1,
+        "loc4_script2_seq3": 1,
+        "loc4_script2_seq4": 1,
+        "loc4_script4_seq2": 1
+      },
+      "by_location": {
+        "1": 5,
+        "2": 6,
+        "3": 1,
+        "4": 3
+      }
+    },
+    "object_or_body_interaction": {
+      "windows": 28,
+      "event_groups": 12,
+      "locations": 5,
+      "by_event_group": {
+        "loc1_script2_seq4": 3,
+        "loc1_script3_seq5": 1,
+        "loc2_script1_seq6": 2,
+        "loc2_script3_seq3": 2,
+        "loc2_script4_seq5": 4,
+        "loc3_script1_seq4": 1,
+        "loc3_script1_seq5": 1,
+        "loc3_script3_seq5": 3,
+        "loc3_script4_seq3": 3,
+        "loc4_script3_seq3": 2,
+        "loc5_script4_seq5": 3,
+        "loc5_script5_seq5": 3
+      },
+      "by_location": {
+        "1": 4,
+        "2": 8,
+        "3": 8,
+        "4": 2,
+        "5": 6
+      }
+    }
+  }
+}

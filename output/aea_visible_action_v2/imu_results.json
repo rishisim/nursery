@@ -1,0 +1,15 @@
+{
+  "schema_version": "aea-visible-action-imu-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "scientific_role": "adult_partly_scripted_sensor_format_analogue_not_developmental_evidence_not_babyview_like",
+  "status": "not_run_stage_gate_failed",
+  "gate_inputs": {
+    "annotation_gate_passed": false,
+    "split_and_donor_gate_passed": false,
+    "action_head_capacity_passed": false
+  },
+  "imu_gate_passed": false,
+  "development_imu_arrays_opened": 0,
+  "reserve_imu_arrays_opened": 0,
+  "expensive_modeling_stopped": true
+}

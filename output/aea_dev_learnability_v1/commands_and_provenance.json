@@ -1,0 +1,69 @@
+{
+  "schema_version": "aea-dev-learnability-provenance-v1",
+  "generated_at_utc": "2026-07-14T23:40:36Z",
+  "repository": "/Users/rishisim/Documents/research/nursery",
+  "git": {
+    "head": "0c8a700262c426bd626b858610085b169b5a4b86",
+    "branch": "main",
+    "dirty_checkout_preserved": true,
+    "commit_created": false,
+    "push_performed": false
+  },
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "torch": "2.13.0",
+    "scikit_learn": "1.9.0",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "pillow": "12.3.0",
+    "device": "mps",
+    "mps_available": true
+  },
+  "ordering": [
+    "Preregistration frozen at 2026-07-14T23:06:30Z before new audit labels or model outcomes.",
+    "Partition and pre-label audit manifests generated and hash-checked.",
+    "Implementation clarifications recorded at 2026-07-14T23:14:33Z before model execution or audit-summary inspection.",
+    "Development-only audit completed before model execution.",
+    "Development-only model and IMU diagnostics executed; confirmation files were not opened."
+  ],
+  "commands": [
+    ".venv/bin/python scripts/prepare_aea_dev_partition.py --examples data/aea_processed/examples.jsonl --protocol output/aea_dev_learnability_v1/preregistered_protocol.json --out output/aea_dev_learnability_v1",
+    ".venv/bin/python scripts/materialize_aea_development_examples.py --examples data/aea_processed/examples.jsonl --partition output/aea_dev_learnability_v1/partition_manifest.json --out output/aea_dev_learnability_v1/development_examples.jsonl",
+    ".venv/bin/python scripts/summarize_aea_dev_audit.py --labels output/aea_dev_learnability_v1/audit_labels.json --prelabel output/aea_dev_learnability_v1/audit_manifest_prelabel.json --protocol output/aea_dev_learnability_v1/preregistered_protocol.json --development-examples output/aea_dev_learnability_v1/development_examples.jsonl --out output/aea_dev_learnability_v1/audit_summary.json",
+    ".venv/bin/python scripts/run_aea_dev_imu_diagnostic.py",
+    ".venv/bin/python scripts/run_aea_dev_learnability.py --development-examples output/aea_dev_learnability_v1/development_examples.jsonl --data-root data/aea_processed --protocol output/aea_dev_learnability_v1/preregistered_protocol.json --partition-manifest output/aea_dev_learnability_v1/partition_manifest.json --audit-manifest output/aea_dev_learnability_v1/audit_manifest_prelabel.json --audit-labels output/aea_dev_learnability_v1/audit_labels.json --out output/aea_dev_learnability_v1/raw_results_v2.json --device mps",
+    ".venv/bin/python -m pytest -q",
+    ".venv/bin/python -m compileall -q babyworld_lite scripts",
+    "git diff --check"
+  ],
+  "sha256": {
+    "source_examples": "7bda9e9b02da94b95a9199e02d14db8dd6d6059cda6389673d92d930ce95a98e",
+    "preregistration": "1b7f971331b64ffe12b623fb349eee8d67b658d94f42859011c300397d28ba31",
+    "implementation_clarifications": "5562ab3f738856aa9dc679e8c7b730fe8a151120da91d800655cd722a538f9fc",
+    "protocol_json": "c8f0b82b11452c3142c83e23bb466bfbbf04ac06565db5384129fc0089693c1b",
+    "partition_manifest": "fc7b9299c01d09eb20119060134e51c048146c8dfb52a4e76726437d51783794",
+    "prelabel_audit_manifest": "8defb972b166e3b785e12cd61c71038c946a437cb411accc625d86115bb02f19",
+    "development_examples": "7d6e23a4589a179449ed05bd093be7acbdda75bef451261ebf594d8b343354f0",
+    "audit_labels": "3c7b7f0da384bd491407fed641a7724711a999b39ec763d275fe4938e975ab78",
+    "imu_results": "b94e9613bfc48c7f0fe9408f505ce8894c0739661aa8bd157e80c4ec390342ef",
+    "canonical_results": "f08ed0d554dc4ae0cb45dea3e6213fbef7c9c57f31e09e0e553bf8efc8dba020",
+    "partition_script": "8d9c603c6423ef61637cffc4fd38710c297fb62f1edbc1bee14a6da706c3a813",
+    "materialization_script": "a0bab772f60e413691631de05da98bf9914f09f14ca1199262c7b3195766ff62",
+    "audit_summary_script": "556b8856fca3cbaa936eae3b3201a8a2683880f712f4b0069ac30342e1a81845",
+    "learnability_script": "3017e11334fcb1413f4801fa699a935c172abbc8635eb53adf363fe8434f5fdf",
+    "imu_script": "d2bd4ed0c0f6de503b5ddc1f181c655968ebfae3d944741c5ff0eed33944d895"
+  },
+  "superseded_attempt": {
+    "artifact": "raw_results_attempt1_invalid_coarse_support.json",
+    "status": "invalid_not_used",
+    "reason": "The first runner version incorrectly inherited fine-label support for coarse categories. The artifact was preserved, the five-category rule was tested, and the unchanged frozen budget was rerun to raw_results_v2.json."
+  },
+  "prohibited_actions_not_performed": [
+    "locked five-fold/seven-seed/eight-epoch experiment",
+    "confirmation outcome access",
+    "license acceptance or download",
+    "commit or push",
+    "external email or outreach"
+  ]
+}

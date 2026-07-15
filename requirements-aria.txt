@@ -1,0 +1,2 @@
+# Dedicated preprocessing environment; keep separate from the training venv.
+projectaria-tools==2.1.4

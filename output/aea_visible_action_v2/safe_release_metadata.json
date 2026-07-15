@@ -1,0 +1,206 @@
+{
+  "schema_version": "aea-visible-action-safe-release-metadata-v2",
+  "dataset": {
+    "dataset_name": "AriaEverydayActivities",
+    "release": "1.0.0",
+    "sequence_count": 143,
+    "location_counts": {
+      "1": 29,
+      "2": 43,
+      "3": 38,
+      "4": 19,
+      "5": 14
+    },
+    "component_totals_bytes": {
+      "annotations": 478432,
+      "main_vrs": 308927714830,
+      "mps_artifacts": 34079798931,
+      "mps_eye_gaze": 7695489,
+      "mps_slam_calibration": 179904639,
+      "mps_slam_points": 30924571481,
+      "mps_slam_summary": 107114,
+      "mps_slam_trajectories": 2967478452,
+      "video_main_rgb": 19841291047
+    }
+  },
+  "safe_parser": "load_safe_manifest discards download_url values at input boundary",
+  "signed_urls_serialized_or_printed": false,
+  "components_considered": [
+    "annotations",
+    "main_vrs"
+  ],
+  "existing_40": {
+    "bytes_by_component": {
+      "annotations": 185909,
+      "main_vrs": 114163631269
+    },
+    "total_bytes": 114163817178,
+    "total_gib": 106.323
+  },
+  "remaining_103": {
+    "bytes_by_component": {
+      "annotations": 292523,
+      "main_vrs": 194764083561
+    },
+    "total_bytes": 194764376084,
+    "total_gib": 181.388
+  },
+  "location_script_strata": {
+    "loc1_script1": {
+      "release_recordings": 5,
+      "existing_recordings": 2,
+      "remaining_recordings": 3,
+      "release_declared_bytes": 14482410516,
+      "remaining_declared_bytes": 7892748113
+    },
+    "loc1_script2": {
+      "release_recordings": 12,
+      "existing_recordings": 2,
+      "remaining_recordings": 10,
+      "release_declared_bytes": 23852314859,
+      "remaining_declared_bytes": 18871098181
+    },
+    "loc1_script3": {
+      "release_recordings": 3,
+      "existing_recordings": 2,
+      "remaining_recordings": 1,
+      "release_declared_bytes": 5754513542,
+      "remaining_declared_bytes": 807680104
+    },
+    "loc1_script4": {
+      "release_recordings": 4,
+      "existing_recordings": 1,
+      "remaining_recordings": 3,
+      "release_declared_bytes": 15520402019,
+      "remaining_declared_bytes": 9387707857
+    },
+    "loc1_script5": {
+      "release_recordings": 5,
+      "existing_recordings": 1,
+      "remaining_recordings": 4,
+      "release_declared_bytes": 8989661733,
+      "remaining_declared_bytes": 7529348042
+    },
+    "loc2_script1": {
+      "release_recordings": 7,
+      "existing_recordings": 2,
+      "remaining_recordings": 5,
+      "release_declared_bytes": 15522480024,
+      "remaining_declared_bytes": 11574403510
+    },
+    "loc2_script2": {
+      "release_recordings": 14,
+      "existing_recordings": 2,
+      "remaining_recordings": 12,
+      "release_declared_bytes": 18775480453,
+      "remaining_declared_bytes": 15657931661
+    },
+    "loc2_script3": {
+      "release_recordings": 10,
+      "existing_recordings": 2,
+      "remaining_recordings": 8,
+      "release_declared_bytes": 27969494380,
+      "remaining_declared_bytes": 13150296166
+    },
+    "loc2_script4": {
+      "release_recordings": 5,
+      "existing_recordings": 1,
+      "remaining_recordings": 4,
+      "release_declared_bytes": 24851395514,
+      "remaining_declared_bytes": 22467941762
+    },
+    "loc2_script5": {
+      "release_recordings": 7,
+      "existing_recordings": 1,
+      "remaining_recordings": 6,
+      "release_declared_bytes": 7044761629,
+      "remaining_declared_bytes": 6039201606
+    },
+    "loc3_script1": {
+      "release_recordings": 7,
+      "existing_recordings": 2,
+      "remaining_recordings": 5,
+      "release_declared_bytes": 15060977439,
+      "remaining_declared_bytes": 8894082762
+    },
+    "loc3_script2": {
+      "release_recordings": 11,
+      "existing_recordings": 2,
+      "remaining_recordings": 9,
+      "release_declared_bytes": 15753769806,
+      "remaining_declared_bytes": 11247314909
+    },
+    "loc3_script3": {
+      "release_recordings": 8,
+      "existing_recordings": 2,
+      "remaining_recordings": 6,
+      "release_declared_bytes": 15408409318,
+      "remaining_declared_bytes": 11097205657
+    },
+    "loc3_script4": {
+      "release_recordings": 5,
+      "existing_recordings": 1,
+      "remaining_recordings": 4,
+      "release_declared_bytes": 14476610701,
+      "remaining_declared_bytes": 12455869443
+    },
+    "loc3_script5": {
+      "release_recordings": 7,
+      "existing_recordings": 1,
+      "remaining_recordings": 6,
+      "release_declared_bytes": 8705137005,
+      "remaining_declared_bytes": 7552455682
+    },
+    "loc4_script1": {
+      "release_recordings": 4,
+      "existing_recordings": 2,
+      "remaining_recordings": 2,
+      "release_declared_bytes": 6245026828,
+      "remaining_declared_bytes": 2956075842
+    },
+    "loc4_script2": {
+      "release_recordings": 7,
+      "existing_recordings": 2,
+      "remaining_recordings": 5,
+      "release_declared_bytes": 7844580519,
+      "remaining_declared_bytes": 4556451960
+    },
+    "loc4_script3": {
+      "release_recordings": 4,
+      "existing_recordings": 2,
+      "remaining_recordings": 2,
+      "release_declared_bytes": 7523665916,
+      "remaining_declared_bytes": 1533050746
+    },
+    "loc4_script4": {
+      "release_recordings": 1,
+      "existing_recordings": 1,
+      "remaining_recordings": 0,
+      "release_declared_bytes": 1048522201,
+      "remaining_declared_bytes": 0
+    },
+    "loc4_script5": {
+      "release_recordings": 3,
+      "existing_recordings": 1,
+      "remaining_recordings": 2,
+      "release_declared_bytes": 3719500613,
+      "remaining_declared_bytes": 2480006953
+    },
+    "loc5_script4": {
+      "release_recordings": 7,
+      "existing_recordings": 4,
+      "remaining_recordings": 3,
+      "release_declared_bytes": 28186204785,
+      "remaining_declared_bytes": 11578011069
+    },
+    "loc5_script5": {
+      "release_recordings": 7,
+      "existing_recordings": 4,
+      "remaining_recordings": 3,
+      "release_declared_bytes": 22192873462,
+      "remaining_declared_bytes": 7035494059
+    }
+  },
+  "filesystem_free_bytes_at_decision": 208125247488,
+  "filesystem_free_gib_at_decision": 193.832
+}

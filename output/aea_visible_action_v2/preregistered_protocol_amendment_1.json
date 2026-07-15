@@ -1,0 +1,30 @@
+{
+  "schema_version": "aea-visible-action-preregistration-amendment-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "amendment": 1,
+  "frozen_at_utc": "2026-07-15T00:07:49Z",
+  "parent_protocol_sha256": "b17ae9869461f508f7b63d7d90ad69ab4779554bd800af1f3a79fc9addf147ab",
+  "ordering_statement": "Frozen after metadata-only sampling infeasibility and before any new media, v2 annotation, split, capacity, or IMU outcome.",
+  "reason": "Several development event groups have fewer than four total windows, so exact four-per-group sampling is mathematically impossible.",
+  "media_paths_constructed_before_amendment": false,
+  "new_rgb_or_imu_opened_before_amendment": false,
+  "new_annotations_viewed_before_amendment": false,
+  "new_model_outcomes_viewed_before_amendment": false,
+  "changes": {
+    "sample": {
+      "target_per_event_group": 4,
+      "target_capped_by_total_group_support": true,
+      "minimum_fill": "min(target_per_event_group,total_development_windows_in_group)",
+      "remainder_until_sample_size": [
+        "lowest_current_selected_group_count",
+        "lowest_selected_over_available_group_fraction",
+        "sha256_aea_visible_action_v2_group_event_group",
+        "event_group"
+      ],
+      "within_group_candidate_order_unchanged": true,
+      "sample_size": 72,
+      "prior_audit_ids_included": 48
+    }
+  },
+  "all_other_protocol_fields_unchanged": true
+}

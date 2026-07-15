@@ -1,0 +1,10 @@
+{
+  "schema_version": "aea-visible-action-split-donor-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "status": "not_run_annotation_gate_failed",
+  "annotation_gate_passed": false,
+  "severe_annotation_failure": false,
+  "solver_runs": 0,
+  "relaxation_or_retry_performed": false,
+  "split_gate_passed": false
+}

@@ -1,0 +1,71 @@
+{
+  "schema_version": "aea-coarse-action-annotation-isolation-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "passes": [
+    {
+      "pass": "pass_a",
+      "checks": {
+        "stage1_schema": true,
+        "stage2_schema": true,
+        "stage1_protocol": true,
+        "stage2_protocol": true,
+        "stage1_pass": true,
+        "stage2_pass": true,
+        "stage1_role": true,
+        "stage2_role": true,
+        "stage1_packet_hash_field": true,
+        "stage2_packet_hash_field": true,
+        "stage1_packet_order_preserved": true,
+        "stage2_packet_order_preserved": true,
+        "stage2_seals_exact_stage1": true,
+        "stage1_video_only_attestation": true,
+        "stage1_other_pass_not_read": true,
+        "stage2_other_pass_not_read": true,
+        "stage1_prior_labels_not_read": true,
+        "stage2_prior_labels_not_read": true,
+        "stage2_visible_fields_unmodified": true,
+        "zero_reserve_media": true,
+        "zero_raw_vrs_audio_imu": true
+      },
+      "stage_1_sha256": "7585f9979f806c5828136430137fd01b42b514ed3526936a3ff9c8330daaf4d5",
+      "stage_2_sha256": "8296583f2f39409fb1ad4398ef81cdceb92d48ebe72afe9bccf4820c1e6ea422",
+      "visual_packet_sha256": "85470cf48ce9da8b6248bae6facf57e1627ea9fd695bf67c26aaf32cadbcc62f",
+      "language_packet_sha256": "e2c1fa4753ff0a56d9aa1f70c0fe6441fe7dcb63324cbb116bf640f9432abbaa",
+      "rows": 72
+    },
+    {
+      "pass": "pass_b",
+      "checks": {
+        "stage1_schema": true,
+        "stage2_schema": true,
+        "stage1_protocol": true,
+        "stage2_protocol": true,
+        "stage1_pass": true,
+        "stage2_pass": true,
+        "stage1_role": true,
+        "stage2_role": true,
+        "stage1_packet_hash_field": true,
+        "stage2_packet_hash_field": true,
+        "stage1_packet_order_preserved": true,
+        "stage2_packet_order_preserved": true,
+        "stage2_seals_exact_stage1": true,
+        "stage1_video_only_attestation": true,
+        "stage1_other_pass_not_read": true,
+        "stage2_other_pass_not_read": true,
+        "stage1_prior_labels_not_read": true,
+        "stage2_prior_labels_not_read": true,
+        "stage2_visible_fields_unmodified": true,
+        "zero_reserve_media": true,
+        "zero_raw_vrs_audio_imu": true
+      },
+      "stage_1_sha256": "5b1a9019cc7b6bc16aadf4a6642c5e4c3e109176dec821f4af57dc126a9d3eec",
+      "stage_2_sha256": "96ed42064db3e69dc841af5da5a03d9351b0e5da063e3dc70cff06a3df700d89",
+      "visual_packet_sha256": "6d43adb429bd848205572a01da69841d96e5965212aaca7d8fec26ad21cfa801",
+      "language_packet_sha256": "89260700101b0ab2bed90142da79e3ad9a6aa017e574de04916959bc55f41f8b",
+      "rows": 72
+    }
+  ],
+  "passes_compared_only_after_both_stages_sealed": true,
+  "adjudications": 0,
+  "v1_or_v2_completed_labels_or_rationales_read": false
+}

@@ -1,0 +1,1311 @@
+{
+  "schema_version": "aea-coarse-action-blinded-visual-packet-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "pass": "pass_a",
+  "role": "model_assisted_development_labels_not_human_annotations_or_human_interrater_reliability",
+  "codebook": "/Users/rishisim/Documents/research/nursery/output/aea_coarse_action_v3/annotation_codebook.md",
+  "context_isolation_required": true,
+  "other_pass_access_forbidden": true,
+  "v1_v2_completed_label_or_rationale_access_forbidden": true,
+  "stage": "stage_1_sealed_video_only_visible_action",
+  "transcript_or_anchored_verb_present": false,
+  "must_complete_all_72_before_stage_2": true,
+  "rows": [
+    {
+      "packet_rank": 1,
+      "blind_id": "CA3-A5C5F3CE0B0A",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-511F41CCD34C/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-511F41CCD34C/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-511F41CCD34C/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-511F41CCD34C/frames",
+      "annotation": {
+        "blind_id": "CA3-A5C5F3CE0B0A",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 2,
+      "blind_id": "CA3-47944BBABBC9",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC9979206A34/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC9979206A34/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC9979206A34/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC9979206A34/frames",
+      "annotation": {
+        "blind_id": "CA3-47944BBABBC9",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 3,
+      "blind_id": "CA3-4335FB36D5D8",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89CA93047947/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89CA93047947/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89CA93047947/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89CA93047947/frames",
+      "annotation": {
+        "blind_id": "CA3-4335FB36D5D8",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 4,
+      "blind_id": "CA3-DDB2F798DBD4",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C64988BE3F2/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C64988BE3F2/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C64988BE3F2/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C64988BE3F2/frames",
+      "annotation": {
+        "blind_id": "CA3-DDB2F798DBD4",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 5,
+      "blind_id": "CA3-3F50142B28E7",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D9AE98225F67/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D9AE98225F67/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D9AE98225F67/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D9AE98225F67/frames",
+      "annotation": {
+        "blind_id": "CA3-3F50142B28E7",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 6,
+      "blind_id": "CA3-DA3A25711A28",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC19F364C2CF/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC19F364C2CF/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC19F364C2CF/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-FC19F364C2CF/frames",
+      "annotation": {
+        "blind_id": "CA3-DA3A25711A28",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 7,
+      "blind_id": "CA3-3447525300F7",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E4DF9D41568D/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E4DF9D41568D/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E4DF9D41568D/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E4DF9D41568D/frames",
+      "annotation": {
+        "blind_id": "CA3-3447525300F7",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 8,
+      "blind_id": "CA3-551DE13C0653",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DAE611EDD212/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DAE611EDD212/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DAE611EDD212/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DAE611EDD212/frames",
+      "annotation": {
+        "blind_id": "CA3-551DE13C0653",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 9,
+      "blind_id": "CA3-A706276306B0",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6A7729313A76/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6A7729313A76/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6A7729313A76/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6A7729313A76/frames",
+      "annotation": {
+        "blind_id": "CA3-A706276306B0",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 10,
+      "blind_id": "CA3-624AAA87BC4F",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3D5A86B0FA6A/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3D5A86B0FA6A/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3D5A86B0FA6A/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3D5A86B0FA6A/frames",
+      "annotation": {
+        "blind_id": "CA3-624AAA87BC4F",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 11,
+      "blind_id": "CA3-C2BA7D7FB4DD",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2BAAF874073A/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2BAAF874073A/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2BAAF874073A/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2BAAF874073A/frames",
+      "annotation": {
+        "blind_id": "CA3-C2BA7D7FB4DD",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 12,
+      "blind_id": "CA3-B7036DE9D276",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3B9F171498D0/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3B9F171498D0/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3B9F171498D0/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3B9F171498D0/frames",
+      "annotation": {
+        "blind_id": "CA3-B7036DE9D276",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 13,
+      "blind_id": "CA3-5F0891D03382",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5A9DF65A78ED/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5A9DF65A78ED/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5A9DF65A78ED/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5A9DF65A78ED/frames",
+      "annotation": {
+        "blind_id": "CA3-5F0891D03382",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 14,
+      "blind_id": "CA3-37AB0FBF224A",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-11BD759FEA58/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-11BD759FEA58/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-11BD759FEA58/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-11BD759FEA58/frames",
+      "annotation": {
+        "blind_id": "CA3-37AB0FBF224A",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 15,
+      "blind_id": "CA3-5EF95A7E6057",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-76652A431C5D/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-76652A431C5D/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-76652A431C5D/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-76652A431C5D/frames",
+      "annotation": {
+        "blind_id": "CA3-5EF95A7E6057",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 16,
+      "blind_id": "CA3-EE612D22F786",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5C79F76DD4BE/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5C79F76DD4BE/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5C79F76DD4BE/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-5C79F76DD4BE/frames",
+      "annotation": {
+        "blind_id": "CA3-EE612D22F786",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 17,
+      "blind_id": "CA3-ACBE2028651D",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36E05856C337/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36E05856C337/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36E05856C337/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36E05856C337/frames",
+      "annotation": {
+        "blind_id": "CA3-ACBE2028651D",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 18,
+      "blind_id": "CA3-352AD7C3F0C9",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D0C5D218FFE3/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D0C5D218FFE3/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D0C5D218FFE3/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D0C5D218FFE3/frames",
+      "annotation": {
+        "blind_id": "CA3-352AD7C3F0C9",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 19,
+      "blind_id": "CA3-1EB5E91D9382",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-4754B01CE013/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-4754B01CE013/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-4754B01CE013/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-4754B01CE013/frames",
+      "annotation": {
+        "blind_id": "CA3-1EB5E91D9382",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 20,
+      "blind_id": "CA3-AB40754C93AC",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D71B527252DF/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D71B527252DF/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D71B527252DF/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D71B527252DF/frames",
+      "annotation": {
+        "blind_id": "CA3-AB40754C93AC",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 21,
+      "blind_id": "CA3-3C21590996B7",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B0E777F7EE5/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B0E777F7EE5/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B0E777F7EE5/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B0E777F7EE5/frames",
+      "annotation": {
+        "blind_id": "CA3-3C21590996B7",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 22,
+      "blind_id": "CA3-AA20CEFF1BDE",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6EEC1FCD4A45/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6EEC1FCD4A45/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6EEC1FCD4A45/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6EEC1FCD4A45/frames",
+      "annotation": {
+        "blind_id": "CA3-AA20CEFF1BDE",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 23,
+      "blind_id": "CA3-6209B7A50B37",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7655E9AF1412/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7655E9AF1412/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7655E9AF1412/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7655E9AF1412/frames",
+      "annotation": {
+        "blind_id": "CA3-6209B7A50B37",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 24,
+      "blind_id": "CA3-4335CA330980",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2C41D81AAB4E/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2C41D81AAB4E/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2C41D81AAB4E/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2C41D81AAB4E/frames",
+      "annotation": {
+        "blind_id": "CA3-4335CA330980",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 25,
+      "blind_id": "CA3-9DB238BD455A",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D7B5F26EA5CC/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D7B5F26EA5CC/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D7B5F26EA5CC/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D7B5F26EA5CC/frames",
+      "annotation": {
+        "blind_id": "CA3-9DB238BD455A",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 26,
+      "blind_id": "CA3-3469D72E7A2B",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B31EFA200D3/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B31EFA200D3/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B31EFA200D3/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8B31EFA200D3/frames",
+      "annotation": {
+        "blind_id": "CA3-3469D72E7A2B",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 27,
+      "blind_id": "CA3-8ED2505125EC",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E7DAFA2B3842/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E7DAFA2B3842/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E7DAFA2B3842/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E7DAFA2B3842/frames",
+      "annotation": {
+        "blind_id": "CA3-8ED2505125EC",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 28,
+      "blind_id": "CA3-39BA43B2F9E4",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D63555577FE3/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D63555577FE3/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D63555577FE3/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-D63555577FE3/frames",
+      "annotation": {
+        "blind_id": "CA3-39BA43B2F9E4",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 29,
+      "blind_id": "CA3-4F25163A5146",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2EDB03805707/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2EDB03805707/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2EDB03805707/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2EDB03805707/frames",
+      "annotation": {
+        "blind_id": "CA3-4F25163A5146",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 30,
+      "blind_id": "CA3-1079C11B38B4",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9FDE307ADDA7/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9FDE307ADDA7/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9FDE307ADDA7/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9FDE307ADDA7/frames",
+      "annotation": {
+        "blind_id": "CA3-1079C11B38B4",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 31,
+      "blind_id": "CA3-91B29D38DAAB",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E3B4DB21F129/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E3B4DB21F129/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E3B4DB21F129/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E3B4DB21F129/frames",
+      "annotation": {
+        "blind_id": "CA3-91B29D38DAAB",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 32,
+      "blind_id": "CA3-DE514C06F855",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-71E62E651628/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-71E62E651628/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-71E62E651628/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-71E62E651628/frames",
+      "annotation": {
+        "blind_id": "CA3-DE514C06F855",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 33,
+      "blind_id": "CA3-2CAAD68FF5C0",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-A200E8AD4C3D/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-A200E8AD4C3D/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-A200E8AD4C3D/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-A200E8AD4C3D/frames",
+      "annotation": {
+        "blind_id": "CA3-2CAAD68FF5C0",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 34,
+      "blind_id": "CA3-B5657D63AE40",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0A8D3A9A7C2/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0A8D3A9A7C2/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0A8D3A9A7C2/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0A8D3A9A7C2/frames",
+      "annotation": {
+        "blind_id": "CA3-B5657D63AE40",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 35,
+      "blind_id": "CA3-0D1874FFF6F7",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36EB0AAD38CC/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36EB0AAD38CC/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36EB0AAD38CC/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-36EB0AAD38CC/frames",
+      "annotation": {
+        "blind_id": "CA3-0D1874FFF6F7",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 36,
+      "blind_id": "CA3-C6BD9D19E8E0",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-187D47135B1B/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-187D47135B1B/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-187D47135B1B/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-187D47135B1B/frames",
+      "annotation": {
+        "blind_id": "CA3-C6BD9D19E8E0",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 37,
+      "blind_id": "CA3-32D78A728502",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-0BE4207D1A3C/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-0BE4207D1A3C/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-0BE4207D1A3C/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-0BE4207D1A3C/frames",
+      "annotation": {
+        "blind_id": "CA3-32D78A728502",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 38,
+      "blind_id": "CA3-029A6C7E5B0F",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01055B0D0EA9/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01055B0D0EA9/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01055B0D0EA9/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01055B0D0EA9/frames",
+      "annotation": {
+        "blind_id": "CA3-029A6C7E5B0F",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 39,
+      "blind_id": "CA3-CBFC8E6C2040",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CAA79DDFE332/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CAA79DDFE332/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CAA79DDFE332/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CAA79DDFE332/frames",
+      "annotation": {
+        "blind_id": "CA3-CBFC8E6C2040",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 40,
+      "blind_id": "CA3-4219884A20FE",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1DEB68078C5E/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1DEB68078C5E/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1DEB68078C5E/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1DEB68078C5E/frames",
+      "annotation": {
+        "blind_id": "CA3-4219884A20FE",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 41,
+      "blind_id": "CA3-6C911EAFA23C",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8BD9B7A455F1/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8BD9B7A455F1/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8BD9B7A455F1/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8BD9B7A455F1/frames",
+      "annotation": {
+        "blind_id": "CA3-6C911EAFA23C",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 42,
+      "blind_id": "CA3-94D600A099D9",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DB2621422BFA/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DB2621422BFA/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DB2621422BFA/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DB2621422BFA/frames",
+      "annotation": {
+        "blind_id": "CA3-94D600A099D9",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 43,
+      "blind_id": "CA3-D70F584519F2",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3578BA8668D7/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3578BA8668D7/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3578BA8668D7/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-3578BA8668D7/frames",
+      "annotation": {
+        "blind_id": "CA3-D70F584519F2",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 44,
+      "blind_id": "CA3-808FEB6D39A9",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01C86650732F/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01C86650732F/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01C86650732F/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01C86650732F/frames",
+      "annotation": {
+        "blind_id": "CA3-808FEB6D39A9",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 45,
+      "blind_id": "CA3-259860F77C81",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-44604D634178/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-44604D634178/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-44604D634178/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-44604D634178/frames",
+      "annotation": {
+        "blind_id": "CA3-259860F77C81",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 46,
+      "blind_id": "CA3-525665C52804",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-95643B51E141/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-95643B51E141/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-95643B51E141/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-95643B51E141/frames",
+      "annotation": {
+        "blind_id": "CA3-525665C52804",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 47,
+      "blind_id": "CA3-76CB79A5A739",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89A69B2BC71F/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89A69B2BC71F/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89A69B2BC71F/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-89A69B2BC71F/frames",
+      "annotation": {
+        "blind_id": "CA3-76CB79A5A739",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 48,
+      "blind_id": "CA3-1B0B0BF63F48",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-052C59ECC9C0/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-052C59ECC9C0/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-052C59ECC9C0/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-052C59ECC9C0/frames",
+      "annotation": {
+        "blind_id": "CA3-1B0B0BF63F48",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 49,
+      "blind_id": "CA3-E2F90CA71FB7",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CD9CE17101E9/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CD9CE17101E9/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CD9CE17101E9/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CD9CE17101E9/frames",
+      "annotation": {
+        "blind_id": "CA3-E2F90CA71FB7",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 50,
+      "blind_id": "CA3-2CA4F1A124DF",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-552CBEB95CEB/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-552CBEB95CEB/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-552CBEB95CEB/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-552CBEB95CEB/frames",
+      "annotation": {
+        "blind_id": "CA3-2CA4F1A124DF",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 51,
+      "blind_id": "CA3-E7EB29E4D8B8",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CB4F5D23CF66/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CB4F5D23CF66/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CB4F5D23CF66/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-CB4F5D23CF66/frames",
+      "annotation": {
+        "blind_id": "CA3-E7EB29E4D8B8",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 52,
+      "blind_id": "CA3-7C243B0A9ADD",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7BDB854B0C1C/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7BDB854B0C1C/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7BDB854B0C1C/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-7BDB854B0C1C/frames",
+      "annotation": {
+        "blind_id": "CA3-7C243B0A9ADD",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 53,
+      "blind_id": "CA3-584BC804DAC0",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-65DB9ECE2B05/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-65DB9ECE2B05/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-65DB9ECE2B05/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-65DB9ECE2B05/frames",
+      "annotation": {
+        "blind_id": "CA3-584BC804DAC0",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 54,
+      "blind_id": "CA3-5B3B3CCE2444",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2E4222F33185/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2E4222F33185/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2E4222F33185/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2E4222F33185/frames",
+      "annotation": {
+        "blind_id": "CA3-5B3B3CCE2444",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 55,
+      "blind_id": "CA3-41CC78732CFB",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-EDA412BB9636/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-EDA412BB9636/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-EDA412BB9636/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-EDA412BB9636/frames",
+      "annotation": {
+        "blind_id": "CA3-41CC78732CFB",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 56,
+      "blind_id": "CA3-43FEA4D2AA3A",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-54037A0A95AB/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-54037A0A95AB/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-54037A0A95AB/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-54037A0A95AB/frames",
+      "annotation": {
+        "blind_id": "CA3-43FEA4D2AA3A",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 57,
+      "blind_id": "CA3-E8E09430905A",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C8C567171AE/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C8C567171AE/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C8C567171AE/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-8C8C567171AE/frames",
+      "annotation": {
+        "blind_id": "CA3-E8E09430905A",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 58,
+      "blind_id": "CA3-3B8D8D4B2F0E",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-403522CD9A65/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-403522CD9A65/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-403522CD9A65/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-403522CD9A65/frames",
+      "annotation": {
+        "blind_id": "CA3-3B8D8D4B2F0E",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 59,
+      "blind_id": "CA3-E190AE6E25AF",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2CC887385941/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2CC887385941/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2CC887385941/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-2CC887385941/frames",
+      "annotation": {
+        "blind_id": "CA3-E190AE6E25AF",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 60,
+      "blind_id": "CA3-BB7565A74BA3",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6B7EF1CCC0C0/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6B7EF1CCC0C0/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6B7EF1CCC0C0/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6B7EF1CCC0C0/frames",
+      "annotation": {
+        "blind_id": "CA3-BB7565A74BA3",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 61,
+      "blind_id": "CA3-316B46334495",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DA6163C01FFC/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DA6163C01FFC/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DA6163C01FFC/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-DA6163C01FFC/frames",
+      "annotation": {
+        "blind_id": "CA3-316B46334495",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 62,
+      "blind_id": "CA3-53B92AC6705D",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9C20B56C41F6/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9C20B56C41F6/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9C20B56C41F6/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-9C20B56C41F6/frames",
+      "annotation": {
+        "blind_id": "CA3-53B92AC6705D",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 63,
+      "blind_id": "CA3-F213B53C3A40",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-06297A525120/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-06297A525120/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-06297A525120/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-06297A525120/frames",
+      "annotation": {
+        "blind_id": "CA3-F213B53C3A40",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 64,
+      "blind_id": "CA3-D22D2B0CB12E",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01D23F9F8229/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01D23F9F8229/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01D23F9F8229/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-01D23F9F8229/frames",
+      "annotation": {
+        "blind_id": "CA3-D22D2B0CB12E",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 65,
+      "blind_id": "CA3-48C0A504A764",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6C51DE5F11AE/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6C51DE5F11AE/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6C51DE5F11AE/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-6C51DE5F11AE/frames",
+      "annotation": {
+        "blind_id": "CA3-48C0A504A764",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 66,
+      "blind_id": "CA3-CF4881A7B5A6",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C2DE1AB873E6/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C2DE1AB873E6/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C2DE1AB873E6/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C2DE1AB873E6/frames",
+      "annotation": {
+        "blind_id": "CA3-CF4881A7B5A6",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 67,
+      "blind_id": "CA3-505C5C420660",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C938F9066543/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C938F9066543/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C938F9066543/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-C938F9066543/frames",
+      "annotation": {
+        "blind_id": "CA3-505C5C420660",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 68,
+      "blind_id": "CA3-074DDC457CB2",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0339CBC64A2/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0339CBC64A2/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0339CBC64A2/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F0339CBC64A2/frames",
+      "annotation": {
+        "blind_id": "CA3-074DDC457CB2",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 69,
+      "blind_id": "CA3-0149CAF81C5B",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E85597F92CD6/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E85597F92CD6/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E85597F92CD6/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-E85597F92CD6/frames",
+      "annotation": {
+        "blind_id": "CA3-0149CAF81C5B",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 70,
+      "blind_id": "CA3-0671E35E54E7",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F47C81A67607/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F47C81A67607/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F47C81A67607/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-F47C81A67607/frames",
+      "annotation": {
+        "blind_id": "CA3-0671E35E54E7",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 71,
+      "blind_id": "CA3-24A41EE2FF9A",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-B03FB1488213/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-B03FB1488213/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-B03FB1488213/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-B03FB1488213/frames",
+      "annotation": {
+        "blind_id": "CA3-24A41EE2FF9A",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    },
+    {
+      "packet_rank": 72,
+      "blind_id": "CA3-A3AE89453605",
+      "frame_count": 31,
+      "anchor_guidance": "Temporal midpoint is between frames 15 and 16; no transcript or anchored verb is available in this sealed stage.",
+      "contact_sheet": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1939AF06A0CA/contact_sheet.jpg",
+      "detail_sheet_00_15": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1939AF06A0CA/detail_00_15.jpg",
+      "detail_sheet_16_30": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1939AF06A0CA/detail_16_30.jpg",
+      "frame_directory": "/Users/rishisim/Documents/research/nursery/output/aea_visible_action_v2/dense_evidence/VA2-1939AF06A0CA/frames",
+      "annotation": {
+        "blind_id": "CA3-A3AE89453605",
+        "observable_action": null,
+        "visible_confidence": null,
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "visible_rationale": null
+      }
+    }
+  ]
+}

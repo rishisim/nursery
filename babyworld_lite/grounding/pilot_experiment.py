@@ -51,6 +51,7 @@ class PilotConfig:
     motor_weight: float = 0.25
     time_shift: int = 2
     bootstrap_samples: int = 2000
+    motor_sample_count: int = 0
 
 
 def resolve_device(requested: str) -> torch.device:
@@ -129,6 +130,7 @@ def train_one_arm(
         vocabulary_size=len(tokenizer),
         hidden_dim=config.hidden_dim,
         embedding_dim=config.embedding_dim,
+        motor_dim=int(corpus.motor(train_indices[0]).shape[-1]),
     ).to(device)
     initial_digest = _state_digest(model)
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate)
@@ -269,6 +271,11 @@ def metadata_only_shortcut_check(
     global_counts = np.ones(len(actions), dtype=np.float64)
     for index in train_indices:
         item = corpus.metadata(index)
+        # Leakage-safe splits can deliberately remove train-only actions from
+        # the evaluation inventory.  Those rows remain useful for representation
+        # learning but cannot contribute to this restricted-label baseline.
+        if item.action not in actions:
+            continue
         key = (item.shape, item.color)
         counts.setdefault(key, np.ones(len(actions), dtype=np.float64))
         counts[key][actions.index(item.action)] += 1
@@ -299,9 +306,45 @@ def motor_only_manipulation_check(
     actions: Sequence[str],
     config: PilotConfig,
     seed: int,
-) -> dict[str, float | None]:
+) -> dict[str, Any]:
     train = _make_dataset(corpus, train_indices, tokenizer, arm, config, seed + 7103)
-    test = _make_dataset(corpus, test_indices, tokenizer, arm, config, seed + 7103)
+    training_donor = {
+        "shuffled_training_source_action_match_rate": None,
+        "shuffled_training_self_match_rate": None,
+        "shuffled_training_episode_group_match_rate": None,
+    }
+    if arm == "shuffled":
+        training_donor = {
+            "shuffled_training_source_action_match_rate": float(np.mean([
+                corpus.metadata(index).action
+                == corpus.metadata(train.donors[index]).action
+                for index in train.indices
+            ])),
+            "shuffled_training_self_match_rate": float(np.mean([
+                index == train.donors[index] for index in train.indices
+            ])),
+            "shuffled_training_episode_group_match_rate": float(np.mean([
+                corpus.metadata(index).episode_group
+                == corpus.metadata(train.donors[index]).episode_group
+                for index in train.indices
+            ])),
+        }
+    try:
+        test = _make_dataset(corpus, test_indices, tokenizer, arm, config, seed + 7103)
+    except ValueError:
+        # Some held-out composition cells are concentrated in one episode, so
+        # an episode-level permutation is mathematically impossible inside the
+        # test cell. IMU is omitted from the primary test; report this secondary
+        # manipulation check as unsupported instead of weakening donor rules.
+        if arm == "shuffled":
+            return {
+                "nearest_centroid_action_macro_accuracy": None,
+                "shuffled_source_action_match_rate": None,
+                "shuffled_self_match_rate": None,
+                "test_episode_derangement_feasible": False,
+                **training_donor,
+            }
+        raise
     centroids: list[torch.Tensor] = []
     for action in actions:
         values = [
@@ -330,6 +373,8 @@ def motor_only_manipulation_check(
         "shuffled_self_match_rate": float(np.mean([
             index == test.donors[index] for index in test.indices
         ])) if arm == "shuffled" else None,
+        "test_episode_derangement_feasible": True,
+        **training_donor,
     }
 
 
@@ -379,7 +424,9 @@ def run_pilot(
             records, adapter, resolved_holdouts
         )
     actions = validate_action_inventory(records, adapter)
-    corpus = GroundingCorpus(records, adapter, config.frame_count, config.image_size)
+    corpus = GroundingCorpus(
+        records, adapter, config.frame_count, config.image_size, config.motor_sample_count
+    )
     tokenizer = WordTokenizer.fit([corpus.text(index) for index in train_indices])
     device = resolve_device(device_name)
     runs: list[dict[str, Any]] = []
@@ -458,16 +505,22 @@ def run_pilot(
         "config": asdict(config),
         "episodes_path": str(episodes_path),
         "source_schema": source_schema,
-        "alignment_condition": alignment_condition if source_schema == "grounding-v0" else "perfect_legacy",
+        "alignment_condition": (
+            alignment_condition if source_schema == "grounding-v0"
+            else "asr_lexical_windows" if source_schema == "aea-grounding-v1"
+            else "perfect_legacy"
+        ),
         "device": str(device),
         "seeds": list(seeds),
         "arms": list(arms),
         "held_out_compositions": [list(item) for item in resolved_holdouts],
         "n_train": len(train_indices),
         "n_test": len(test_indices),
-        "model_input_allowlist": [
-            "rendered RGB scene pixels", "utterance text", "low-level hand x/y/vx/vy"
-        ],
+        "model_input_allowlist": (
+            ["AEA RGB frames", "ASR transcript", "six-axis head accelerometer+gyroscope"]
+            if source_schema == "aea-grounding-v1" else
+            ["rendered RGB scene pixels", "utterance text", "low-level hand x/y/vx/vy"]
+        ),
         "primary_test": {
             "metric": "action-balanced held-out-composition 2AFC",
             "motor_input": "hard-masked by omission; motor encoder is never called",

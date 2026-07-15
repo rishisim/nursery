@@ -1,0 +1,13 @@
+{
+  "schema_version": "aea-visible-action-transcript-control-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "scientific_role": "adult_partly_scripted_sensor_format_analogue_not_developmental_evidence_not_babyview_like",
+  "model_assisted_labels_only": true,
+  "gate_inputs": {
+    "annotation_gate_passed": false,
+    "split_and_donor_gate_passed": false
+  },
+  "reserve_rgb_or_imu_files_opened": 0,
+  "status": "not_run_action_head_capacity_not_passed",
+  "decision_gating": false
+}

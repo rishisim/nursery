@@ -1,0 +1,3036 @@
+{
+  "schema_version": "aea-visible-action-agreement-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "scientific_role": "adult_partly_scripted_sensor_format_analogue_not_developmental_evidence_not_babyview_like",
+  "annotation_role": "model_assisted_development_labels_not_human_annotations_or_human_interrater_reliability",
+  "n": 72,
+  "agreement": {
+    "observable_action": {
+      "labels": [
+        "locomotion_posture",
+        "reach_grasp",
+        "transport_place",
+        "state_change_operate",
+        "food_material_handling",
+        "clean_groom",
+        "other_observable",
+        "none_visible",
+        "uncertain"
+      ],
+      "confusion_a_rows_b_columns": [
+        [
+          10,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          6,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1,
+          11,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          9,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0
+        ],
+        [
+          3,
+          1,
+          1,
+          0,
+          1,
+          0,
+          1,
+          18,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "exact_agreement": 0.8194444444444444,
+      "cohens_kappa_unweighted": 0.7770897832817337,
+      "confidence_weighted_exact_agreement": 0.835820895522388,
+      "n": 72
+    },
+    "agency": {
+      "labels": [
+        "wearer",
+        "other_person",
+        "narrated_media_or_phone",
+        "figurative_or_nonaction",
+        "unclear"
+      ],
+      "confusion_a_rows_b_columns": [
+        [
+          13,
+          4,
+          0,
+          0,
+          3
+        ],
+        [
+          4,
+          10,
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          1,
+          16,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1,
+          8,
+          0
+        ],
+        [
+          8,
+          0,
+          0,
+          0,
+          1
+        ]
+      ],
+      "exact_agreement": 0.6666666666666666,
+      "cohens_kappa_unweighted": 0.5684315684315684,
+      "confidence_weighted_exact_agreement": 0.6753731343283582,
+      "n": 72
+    },
+    "temporal_alignment": {
+      "labels": [
+        "aligned_within_window",
+        "action_precedes_anchor",
+        "action_follows_anchor",
+        "no_corresponding_action",
+        "unclear"
+      ],
+      "confusion_a_rows_b_columns": [
+        [
+          2,
+          1,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0,
+          64,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          0
+        ]
+      ],
+      "exact_agreement": 0.9166666666666666,
+      "cohens_kappa_unweighted": 0.507411630558723,
+      "confidence_weighted_exact_agreement": 0.917910447761194,
+      "n": 72
+    },
+    "asr_refers_to_visible_wearer_action": {
+      "labels": [
+        "yes",
+        "no",
+        "unclear"
+      ],
+      "confusion_a_rows_b_columns": [
+        [
+          5,
+          0,
+          0
+        ],
+        [
+          2,
+          64,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ],
+      "exact_agreement": 0.9583333333333334,
+      "cohens_kappa_unweighted": 0.7485448195576253,
+      "confidence_weighted_exact_agreement": 0.9626865671641791,
+      "n": 72
+    }
+  },
+  "rates": {
+    "judgeable_pass_a": {
+      "successes": 72,
+      "total": 72,
+      "rate": 1.0,
+      "ci95_low": 0.9493488274035422,
+      "ci95_high": 1.0,
+      "method": "two-sided Wilson 95% interval"
+    },
+    "judgeable_pass_b": {
+      "successes": 72,
+      "total": 72,
+      "rate": 1.0,
+      "ci95_low": 0.9493488274035422,
+      "ci95_high": 1.0,
+      "method": "two-sided Wilson 95% interval"
+    },
+    "modeled_consensus_yield": {
+      "successes": 38,
+      "total": 72,
+      "rate": 0.5277777777777778,
+      "ci95_low": 0.4140067049007661,
+      "ci95_high": 0.6387348966216531,
+      "method": "two-sided Wilson 95% interval"
+    },
+    "uncertain_pass_a": {
+      "successes": 0,
+      "total": 72,
+      "rate": 0.0,
+      "ci95_low": 0.0,
+      "ci95_high": 0.05065117259645781,
+      "method": "two-sided Wilson 95% interval"
+    },
+    "uncertain_pass_b": {
+      "successes": 0,
+      "total": 72,
+      "rate": 0.0,
+      "ci95_low": 0.0,
+      "ci95_high": 0.05065117259645781,
+      "method": "two-sided Wilson 95% interval"
+    },
+    "asr_refers_yes_pass_a": {
+      "successes": 5,
+      "total": 72,
+      "rate": 0.06944444444444445,
+      "ci95_low": 0.0300253815657701,
+      "ci95_high": 0.15247979483673524,
+      "method": "two-sided Wilson 95% interval"
+    },
+    "asr_refers_yes_pass_b": {
+      "successes": 7,
+      "total": 72,
+      "rate": 0.09722222222222222,
+      "ci95_low": 0.047896319973655774,
+      "ci95_high": 0.1873504579512686,
+      "method": "two-sided Wilson 95% interval"
+    }
+  },
+  "support": {
+    "food_material_handling": {
+      "windows": 9,
+      "event_groups": 4,
+      "locations": 4,
+      "by_event_group": {
+        "loc1_script3_seq2": 1,
+        "loc2_script4_seq5": 3,
+        "loc4_script3_seq3": 1,
+        "loc5_script4_seq5": 4
+      },
+      "by_location": {
+        "1": 1,
+        "2": 3,
+        "4": 1,
+        "5": 4
+      }
+    },
+    "locomotion_posture": {
+      "windows": 10,
+      "event_groups": 7,
+      "locations": 4,
+      "by_event_group": {
+        "loc1_script2_seq4": 2,
+        "loc1_script3_seq5": 3,
+        "loc2_script1_seq6": 1,
+        "loc3_script3_seq5": 1,
+        "loc4_script2_seq3": 1,
+        "loc4_script2_seq4": 1,
+        "loc4_script4_seq2": 1
+      },
+      "by_location": {
+        "1": 5,
+        "2": 1,
+        "3": 1,
+        "4": 3
+      }
+    },
+    "reach_grasp": {
+      "windows": 2,
+      "event_groups": 2,
+      "locations": 2,
+      "by_event_group": {
+        "loc1_script2_seq4": 1,
+        "loc2_script1_seq6": 1
+      },
+      "by_location": {
+        "1": 1,
+        "2": 1
+      }
+    },
+    "state_change_operate": {
+      "windows": 11,
+      "event_groups": 6,
+      "locations": 4,
+      "by_event_group": {
+        "loc2_script3_seq3": 1,
+        "loc2_script4_seq5": 1,
+        "loc3_script1_seq5": 1,
+        "loc3_script4_seq3": 2,
+        "loc4_script3_seq3": 1,
+        "loc5_script5_seq5": 5
+      },
+      "by_location": {
+        "2": 2,
+        "3": 3,
+        "4": 1,
+        "5": 5
+      }
+    },
+    "transport_place": {
+      "windows": 6,
+      "event_groups": 4,
+      "locations": 3,
+      "by_event_group": {
+        "loc1_script3_seq5": 2,
+        "loc2_script1_seq6": 1,
+        "loc3_script1_seq4": 1,
+        "loc3_script3_seq5": 2
+      },
+      "by_location": {
+        "1": 2,
+        "2": 1,
+        "3": 3
+      }
+    }
+  },
+  "retained_support": {
+    "food_material_handling": {
+      "windows": 9,
+      "event_groups": 4,
+      "locations": 4,
+      "by_event_group": {
+        "loc1_script3_seq2": 1,
+        "loc2_script4_seq5": 3,
+        "loc4_script3_seq3": 1,
+        "loc5_script4_seq5": 4
+      },
+      "by_location": {
+        "1": 1,
+        "2": 3,
+        "4": 1,
+        "5": 4
+      }
+    },
+    "locomotion_posture": {
+      "windows": 10,
+      "event_groups": 7,
+      "locations": 4,
+      "by_event_group": {
+        "loc1_script2_seq4": 2,
+        "loc1_script3_seq5": 3,
+        "loc2_script1_seq6": 1,
+        "loc3_script3_seq5": 1,
+        "loc4_script2_seq3": 1,
+        "loc4_script2_seq4": 1,
+        "loc4_script4_seq2": 1
+      },
+      "by_location": {
+        "1": 5,
+        "2": 1,
+        "3": 1,
+        "4": 3
+      }
+    },
+    "state_change_operate": {
+      "windows": 11,
+      "event_groups": 6,
+      "locations": 4,
+      "by_event_group": {
+        "loc2_script3_seq3": 1,
+        "loc2_script4_seq5": 1,
+        "loc3_script1_seq5": 1,
+        "loc3_script4_seq3": 2,
+        "loc4_script3_seq3": 1,
+        "loc5_script5_seq5": 5
+      },
+      "by_location": {
+        "2": 2,
+        "3": 3,
+        "4": 1,
+        "5": 5
+      }
+    }
+  },
+  "gate_checks": {
+    "complete_valid_passes": true,
+    "judgeable_pass_a": true,
+    "judgeable_pass_b": true,
+    "action_exact": true,
+    "action_kappa": true,
+    "agency_exact": false,
+    "agency_kappa": true,
+    "temporal_exact": true,
+    "temporal_kappa": true,
+    "asr_referent_exact": true,
+    "asr_referent_kappa": true,
+    "modeled_consensus_yield": false,
+    "retained_label_count": true
+  },
+  "annotation_gate_passed": false,
+  "severe_failure_checks": {
+    "modeled_consensus_yield_below_0_40": false,
+    "action_exact_below_0_50": false,
+    "fewer_than_two_labels_with_six_windows_three_groups": false
+  },
+  "severe_annotation_failure": false,
+  "consensus_rows": [
+    {
+      "blind_id": "VA2-01055B0D0EA9",
+      "example_id": "loc5_script5_seq5_rec1_w0001",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-187D47135B1B",
+      "example_id": "loc2_script1_seq6_rec1_w0000",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-1DEB68078C5E",
+      "example_id": "loc2_script4_seq5_rec1_w0002",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-2BAAF874073A",
+      "example_id": "loc3_script3_seq5_rec1_w0010",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-2C41D81AAB4E",
+      "example_id": "loc4_script3_seq3_rec1_w0002",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-2CC887385941",
+      "example_id": "loc2_script4_seq5_rec1_w0005",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-36E05856C337",
+      "example_id": "loc2_script1_seq6_rec1_w0002",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "observable_action": "reach_grasp"
+    },
+    {
+      "blind_id": "VA2-3B9F171498D0",
+      "example_id": "loc1_script3_seq5_rec1_w0007",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-3D5A86B0FA6A",
+      "example_id": "loc2_script4_seq5_rec1_w0003",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-44604D634178",
+      "example_id": "loc3_script3_seq5_rec2_w0004",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-4754B01CE013",
+      "example_id": "loc4_script3_seq3_rec1_w0005",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-552CBEB95CEB",
+      "example_id": "loc3_script4_seq3_rec1_w0001",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-6B7EF1CCC0C0",
+      "example_id": "loc2_script3_seq3_rec2_w0022",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-71E62E651628",
+      "example_id": "loc5_script4_seq5_rec1_w0003",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-89CA93047947",
+      "example_id": "loc1_script3_seq2_rec1_w0001",
+      "sequence_id": "loc1_script3_seq2_rec1",
+      "event_group": "loc1_script3_seq2",
+      "location": 1,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-8B0E777F7EE5",
+      "example_id": "loc1_script2_seq4_rec1_w0007",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "observable_action": "reach_grasp"
+    },
+    {
+      "blind_id": "VA2-8C8C567171AE",
+      "example_id": "loc3_script4_seq3_rec1_w0000",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-9C20B56C41F6",
+      "example_id": "loc5_script4_seq5_rec1_w0012",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-A200E8AD4C3D",
+      "example_id": "loc1_script3_seq5_rec1_w0003",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-B03FB1488213",
+      "example_id": "loc5_script5_seq5_rec1_w0003",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-C2DE1AB873E6",
+      "example_id": "loc4_script2_seq4_rec1_w0001",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-C938F9066543",
+      "example_id": "loc5_script4_seq5_rec1_w0011",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-CB4F5D23CF66",
+      "example_id": "loc5_script4_seq5_rec1_w0008",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-CD9CE17101E9",
+      "example_id": "loc5_script5_seq5_rec1_w0002",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-D63555577FE3",
+      "example_id": "loc1_script2_seq4_rec2_w0002",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-D71B527252DF",
+      "example_id": "loc4_script4_seq2_rec1_w0001",
+      "sequence_id": "loc4_script4_seq2_rec1",
+      "event_group": "loc4_script4_seq2",
+      "location": 4,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-D7B5F26EA5CC",
+      "example_id": "loc2_script4_seq5_rec1_w0007",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-D9AE98225F67",
+      "example_id": "loc2_script1_seq6_rec1_w0001",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-DA6163C01FFC",
+      "example_id": "loc3_script1_seq4_rec1_w0000",
+      "sequence_id": "loc3_script1_seq4_rec1",
+      "event_group": "loc3_script1_seq4",
+      "location": 3,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-DB2621422BFA",
+      "example_id": "loc1_script3_seq5_rec1_w0006",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-E4DF9D41568D",
+      "example_id": "loc4_script2_seq3_rec2_w0004",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-E7DAFA2B3842",
+      "example_id": "loc1_script2_seq4_rec1_w0000",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-E85597F92CD6",
+      "example_id": "loc3_script3_seq5_rec2_w0011",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-EDA412BB9636",
+      "example_id": "loc3_script1_seq5_rec1_w0000",
+      "sequence_id": "loc3_script1_seq5_rec1",
+      "event_group": "loc3_script1_seq5",
+      "location": 3,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-F0339CBC64A2",
+      "example_id": "loc5_script5_seq5_rec1_w0005",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-F0A8D3A9A7C2",
+      "example_id": "loc1_script3_seq5_rec1_w0005",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-F47C81A67607",
+      "example_id": "loc1_script3_seq5_rec1_w0000",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-FC19F364C2CF",
+      "example_id": "loc5_script5_seq5_rec1_w0000",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "observable_action": "state_change_operate"
+    }
+  ],
+  "paired_rows": [
+    {
+      "blind_id": "VA2-01055B0D0EA9",
+      "example_id": "loc5_script5_seq5_rec1_w0001",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "pass_a": {
+        "blind_id": "VA2-01055B0D0EA9",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer taps or scrolls the phone; sound-limit narration comes from the phone and no taking action occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-01055B0D0EA9",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer scrolls a phone; take you over sound limits is car-media narration, not the visible operation."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-01C86650732F",
+      "example_id": "loc2_script3_seq3_rec1_w0008",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-01C86650732F",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "transport_place",
+        "confidence": "medium",
+        "evidence_frame_start": 8,
+        "evidence_frame_end": 26,
+        "rationale": "Wearer lifts and repositions a rectangular package across the anchor; no opening action is clearly visible."
+      },
+      "pass_b": {
+        "blind_id": "VA2-01C86650732F",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "aligned_within_window",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer opens and peels back a small package throughout; the first-person opening statement matches and overlaps the anchor."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-01D23F9F8229",
+      "example_id": "loc2_script3_seq3_rec2_w0015",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-01D23F9F8229",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Other person manipulates the pan; wearer remains stationary. Cooking speech therefore has no matching wearer action."
+      },
+      "pass_b": {
+        "blind_id": "VA2-01D23F9F8229",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer passively watches cooking; cooking describes the food's state, not a visible wearer action."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-052C59ECC9C0",
+      "example_id": "loc3_script3_seq5_rec1_w0001",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "pass_a": {
+        "blind_id": "VA2-052C59ECC9C0",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer only watches and converses while another person handles items; no cleaning action is visible."
+      },
+      "pass_b": {
+        "blind_id": "VA2-052C59ECC9C0",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 26,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer stands and begins walking after the anchor; the proposed cleanup is not yet visibly performed."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-06297A525120",
+      "example_id": "loc2_script2_seq1_rec2_w0006",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-06297A525120",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer only converses and gestures; another person holds the drink being offered, and the wearer does not drink."
+      },
+      "pass_b": {
+        "blind_id": "VA2-06297A525120",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains seated, gestures, and statically holds a phone; the drink invitation concerns another person and no drinking occurs."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-0BE4207D1A3C",
+      "example_id": "loc4_script2_seq3_rec2_w0005",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-0BE4207D1A3C",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Other person remains at the counter; wearer only looks on. \u2018Turned\u2019 concerns age, not a visible action."
+      },
+      "pass_b": {
+        "blind_id": "VA2-0BE4207D1A3C",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains passive as another person gestures; turned refers nonphysically to age and has no visible action."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-11BD759FEA58",
+      "example_id": "loc4_script3_seq3_rec1_w0003",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-11BD759FEA58",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains stationary while another person works at the cabinets; cooking speech does not match a wearer action."
+      },
+      "pass_b": {
+        "blind_id": "VA2-11BD759FEA58",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer passively watches another person cook; collective cooking is not visibly performed by the wearer."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-187D47135B1B",
+      "example_id": "loc2_script1_seq6_rec1_w0000",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-187D47135B1B",
+        "asr_refers_to_visible_wearer_action": "unclear",
+        "agency": "wearer",
+        "temporal_alignment": "unclear",
+        "observable_action": "locomotion_posture",
+        "confidence": "medium",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer walks across the kitchen; the incomplete \u2018let\u2019s get\u2019 phrase has an unclear action referent."
+      },
+      "pass_b": {
+        "blind_id": "VA2-187D47135B1B",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer walks toward the oven throughout; the incomplete suggestion to get items has no visible acquisition."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-1939AF06A0CA",
+      "example_id": "loc2_script2_seq1_rec2_w0001",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-1939AF06A0CA",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 22,
+        "rationale": "Wearer walks behind another person toward the couch; the drink question addresses that other person, with no drinking visible."
+      },
+      "pass_b": {
+        "blind_id": "VA2-1939AF06A0CA",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "medium",
+        "evidence_frame_start": 15,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer manipulates a handheld device while following another person; the drink offer concerns the other person, not this action."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-1DEB68078C5E",
+      "example_id": "loc2_script4_seq5_rec1_w0002",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-1DEB68078C5E",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer repeatedly brings a fork to food while phone audio describes an asteroid impact."
+      },
+      "pass_b": {
+        "blind_id": "VA2-1DEB68078C5E",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer eats and stirs from a bowl; dinosaur wiping is narration from the phone and has no matching wearer action."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-2BAAF874073A",
+      "example_id": "loc3_script3_seq5_rec1_w0010",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "pass_a": {
+        "blind_id": "VA2-2BAAF874073A",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 20,
+        "rationale": "Wearer walks from the open refrigerator toward the sink while another person is addressed about washing; no washing occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-2BAAF874073A",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 2,
+        "evidence_frame_end": 21,
+        "rationale": "Wearer walks away from the refrigerator; the planned washing has no visible washing counterpart."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-2C41D81AAB4E",
+      "example_id": "loc4_script3_seq3_rec1_w0002",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-2C41D81AAB4E",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "medium",
+        "evidence_frame_start": 11,
+        "evidence_frame_end": 21,
+        "rationale": "Wearer holds and operates the refrigerator door while another person retrieves a jug; no eating action occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-2C41D81AAB4E",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 11,
+        "evidence_frame_end": 20,
+        "rationale": "Wearer opens the refrigerator around the anchor; the stated healthy eating is not visibly underway."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-2CC887385941",
+      "example_id": "loc2_script4_seq5_rec1_w0005",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-2CC887385941",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "aligned_within_window",
+        "observable_action": "state_change_operate",
+        "confidence": "medium",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer rotates and operates the phone while explicitly saying they are watching YouTube; the action overlaps the anchor."
+      },
+      "pass_b": {
+        "blind_id": "VA2-2CC887385941",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "aligned_within_window",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 12,
+        "evidence_frame_end": 23,
+        "rationale": "Wearer rotates and operates a phone while stating they are watching YouTube; the actions overlap the anchor."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-2E4222F33185",
+      "example_id": "loc2_script1_seq2_rec1_w0002",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-2E4222F33185",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "aligned_within_window",
+        "observable_action": "other_observable",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 15,
+        "rationale": "Wearer turns the head and camera away from the television across the anchor, matching the instruction."
+      },
+      "pass_b": {
+        "blind_id": "VA2-2E4222F33185",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "action_precedes_anchor",
+        "observable_action": "other_observable",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 10,
+        "rationale": "Wearer's head turn finishes before the anchor; the instruction to turn their head matches that preceding action."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-2EDB03805707",
+      "example_id": "loc4_script2_seq4_rec1_w0005",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-2EDB03805707",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer only converses and gestures; \u2018get better\u2019 describes recovery, not a visible action."
+      },
+      "pass_b": {
+        "blind_id": "VA2-2EDB03805707",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains seated and talks; get better concerns recovery rather than a visible physical action."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-3578BA8668D7",
+      "example_id": "loc4_script3_seq3_rec1_w0008",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-3578BA8668D7",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains stationary while another person moves nearby; speech concerns a past relocation and trends."
+      },
+      "pass_b": {
+        "blind_id": "VA2-3578BA8668D7",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains passive while another person works at the stove; moved refers to someone else and has no wearer counterpart."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-36E05856C337",
+      "example_id": "loc2_script1_seq6_rec1_w0002",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-36E05856C337",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "reach_grasp",
+        "confidence": "medium",
+        "evidence_frame_start": 17,
+        "evidence_frame_end": 23,
+        "rationale": "Wearer reaches into the open refrigerator during frames 17\u201323; no setting action is visible."
+      },
+      "pass_b": {
+        "blind_id": "VA2-36E05856C337",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "reach_grasp",
+        "confidence": "high",
+        "evidence_frame_start": 17,
+        "evidence_frame_end": 24,
+        "rationale": "Wearer reaches into the refrigerator and takes a container after the anchor; the unsourced setting command is not performed."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "reach_grasp"
+    },
+    {
+      "blind_id": "VA2-36EB0AAD38CC",
+      "example_id": "loc2_script3_seq3_rec2_w0007",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-36EB0AAD38CC",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "medium",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains stationary while another person cooks and opens something; spoken opening does not describe the wearer."
+      },
+      "pass_b": {
+        "blind_id": "VA2-36EB0AAD38CC",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 15,
+        "rationale": "Wearer walks toward the counter; the stated future opening is not visibly carried out by the wearer."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-3B9F171498D0",
+      "example_id": "loc1_script3_seq5_rec1_w0007",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-3B9F171498D0",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "transport_place",
+        "confidence": "medium",
+        "evidence_frame_start": 9,
+        "evidence_frame_end": 28,
+        "rationale": "Wearer repositions containers and a small item near the cutting board; \u2018cutting board\u2019 names an object, not cutting."
+      },
+      "pass_b": {
+        "blind_id": "VA2-3B9F171498D0",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "transport_place",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 16,
+        "rationale": "Wearer repositions containers and lids; cutting appears only within cutting board, not as a performed action."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-3D5A86B0FA6A",
+      "example_id": "loc2_script4_seq5_rec1_w0003",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-3D5A86B0FA6A",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 14,
+        "rationale": "Wearer eats with a fork before the anchor; timeline-assembly speech comes from the phone and no putting action occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-3D5A86B0FA6A",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 18,
+        "rationale": "Wearer eats with a fork; putting together a timeline is phone narration and does not describe the food handling."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-403522CD9A65",
+      "example_id": "loc4_script2_seq3_rec2_w0001",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-403522CD9A65",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "medium",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains stationary while another person handles objects; garbled serving speech has no wearer match."
+      },
+      "pass_b": {
+        "blind_id": "VA2-403522CD9A65",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer passively watches another person handle items; the fragment about serving has no identifiable wearer action or referent."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-44604D634178",
+      "example_id": "loc3_script3_seq5_rec2_w0004",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "pass_a": {
+        "blind_id": "VA2-44604D634178",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "transport_place",
+        "confidence": "high",
+        "evidence_frame_start": 8,
+        "evidence_frame_end": 27,
+        "rationale": "Wearer carries a plate from the counter to the island and sets it down; no washing occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-44604D634178",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "transport_place",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 27,
+        "rationale": "Wearer carries tableware across the kitchen and sets it down; proposed washing is rejected and not performed."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-4754B01CE013",
+      "example_id": "loc4_script3_seq3_rec1_w0005",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-4754B01CE013",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer stirs eggs continuously; \u2018read my mind\u2019 is figurative and does not describe the visible food handling."
+      },
+      "pass_b": {
+        "blind_id": "VA2-4754B01CE013",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer stirs food continuously; read my mind is figurative and does not describe that action."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-511F41CCD34C",
+      "example_id": "loc2_script2_seq1_rec1_w0004",
+      "sequence_id": "loc2_script2_seq1_rec1",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-511F41CCD34C",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer only converses and gestures while another person holds a drink; the offered drink is not taken."
+      },
+      "pass_b": {
+        "blind_id": "VA2-511F41CCD34C",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains seated without a goal-directed action; the drink invitation concerns another person and no drinking is visible."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-54037A0A95AB",
+      "example_id": "loc4_script3_seq3_rec1_w0010",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "event_group": "loc4_script3_seq3",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-54037A0A95AB",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Other person works at the counter; wearer only converses and gestures. \u2018Took\u2019 refers to someone else."
+      },
+      "pass_b": {
+        "blind_id": "VA2-54037A0A95AB",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer passively watches another person cook; she took refers to someone else and has no wearer action counterpart."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-552CBEB95CEB",
+      "example_id": "loc3_script4_seq3_rec1_w0001",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "pass_a": {
+        "blind_id": "VA2-552CBEB95CEB",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "medium",
+        "evidence_frame_start": 19,
+        "evidence_frame_end": 25,
+        "rationale": "Wearer presses the remote after the anchor; character-playing speech comes from the television."
+      },
+      "pass_b": {
+        "blind_id": "VA2-552CBEB95CEB",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 18,
+        "evidence_frame_end": 25,
+        "rationale": "Wearer deliberately operates a remote after the anchor; playing a character is television narration, not the remote action."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-5A9DF65A78ED",
+      "example_id": "loc2_script2_seq1_rec2_w0005",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-5A9DF65A78ED",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer only converses and gestures; the suggestion to take a drink is not followed by drinking."
+      },
+      "pass_b": {
+        "blind_id": "VA2-5A9DF65A78ED",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains seated, talks, and statically holds a phone; the drink offer's referent is unclear and no drinking occurs."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-5C79F76DD4BE",
+      "example_id": "loc2_script1_seq2_rec1_w0004",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-5C79F76DD4BE",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains seated and stationary while another person is nearby; no wearer walking occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-5C79F76DD4BE",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "other_observable",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 13,
+        "rationale": "Wearer turns their head away from the television before the anchor; walking through refers to another person."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-65DB9ECE2B05",
+      "example_id": "loc4_script2_seq3_rec2_w0000",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-65DB9ECE2B05",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains stationary while another person handles kitchen items; \u2018I can make it\u2019 refers to that person."
+      },
+      "pass_b": {
+        "blind_id": "VA2-65DB9ECE2B05",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer passively watches another person prepare food; that person's claim about making it has no wearer counterpart."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-6A7729313A76",
+      "example_id": "loc4_script2_seq3_rec2_w0002",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-6A7729313A76",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains stationary while another person opens a drawer; \u2018serving this morning\u2019 is not an action description."
+      },
+      "pass_b": {
+        "blind_id": "VA2-6A7729313A76",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer passively watches another person work; serving is used as a food quantity, with no wearer serving action."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-6B7EF1CCC0C0",
+      "example_id": "loc2_script3_seq3_rec2_w0022",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-6B7EF1CCC0C0",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer operates the phone while set-table speech is heard; no table-setting action occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-6B7EF1CCC0C0",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer scrolls and taps a phone throughout; transcript requests table setting, which is not visibly performed."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-6C51DE5F11AE",
+      "example_id": "loc1_script3_seq2_rec1_w0000",
+      "sequence_id": "loc1_script3_seq2_rec1",
+      "event_group": "loc1_script3_seq2",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-6C51DE5F11AE",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains seated and gestures while conversing; the question asks what another person got."
+      },
+      "pass_b": {
+        "blind_id": "VA2-6C51DE5F11AE",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "medium",
+        "evidence_frame_start": 24,
+        "evidence_frame_end": 29,
+        "rationale": "Wearer reaches to the table and handles a small food item after the anchor; the past store acquisition concerns another person."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-6EEC1FCD4A45",
+      "example_id": "loc1_script2_seq4_rec2_w0006",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-6EEC1FCD4A45",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "reach_grasp",
+        "confidence": "medium",
+        "evidence_frame_start": 21,
+        "evidence_frame_end": 29,
+        "rationale": "Wearer reaches into the container and acquires food after the anchor; no pouring is visible."
+      },
+      "pass_b": {
+        "blind_id": "VA2-6EEC1FCD4A45",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 21,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer reaches into a bowl and handles pistachios after the anchor; no pouring occurs despite the collective statement."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-71E62E651628",
+      "example_id": "loc5_script4_seq5_rec1_w0003",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "pass_a": {
+        "blind_id": "VA2-71E62E651628",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer cuts or eats food while holding a phone; removal instructions come from the phone."
+      },
+      "pass_b": {
+        "blind_id": "VA2-71E62E651628",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer cuts and eats food with utensils; removing a battery box is phone narration and has no matching action."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-7655E9AF1412",
+      "example_id": "loc2_script1_seq2_rec1_w0003",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-7655E9AF1412",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains stationary watching television; \u2018walk through\u2019 is used as a noun, not a visible walking action."
+      },
+      "pass_b": {
+        "blind_id": "VA2-7655E9AF1412",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Only passive television viewing is visible; walk through is used as a noun and has no wearer locomotion."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-76652A431C5D",
+      "example_id": "loc4_script2_seq4_rec1_w0002",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-76652A431C5D",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer only converses and gestures; no eating occurs. The diabetes statement describes a general restriction."
+      },
+      "pass_b": {
+        "blind_id": "VA2-76652A431C5D",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer only talks and gestures while seated; prohibited eating addressed to another person is not visibly performed."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-7BDB854B0C1C",
+      "example_id": "loc1_script3_seq2_rec1_w0002",
+      "sequence_id": "loc1_script3_seq2_rec1",
+      "event_group": "loc1_script3_seq2",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-7BDB854B0C1C",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer stays seated and converses; no eating occurs during the window. Past dinner speech has no visible match."
+      },
+      "pass_b": {
+        "blind_id": "VA2-7BDB854B0C1C",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "reach_grasp",
+        "confidence": "medium",
+        "evidence_frame_start": 2,
+        "evidence_frame_end": 7,
+        "rationale": "Wearer briefly reaches toward and handles a tabletop object; the statement about not eating dinner is past and unmatched."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-89A69B2BC71F",
+      "example_id": "loc2_script2_seq1_rec1_w0001",
+      "sequence_id": "loc2_script2_seq1_rec1",
+      "event_group": "loc2_script2_seq1",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-89A69B2BC71F",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains seated and stationary; the drink offer addresses another person and no drinking occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-89A69B2BC71F",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 12,
+        "rationale": "Wearer walks around the table; the drink offer is directed to another person and no drinking occurs."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-89CA93047947",
+      "example_id": "loc1_script3_seq2_rec1_w0001",
+      "sequence_id": "loc1_script3_seq2_rec1",
+      "event_group": "loc1_script3_seq2",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-89CA93047947",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "medium",
+        "evidence_frame_start": 11,
+        "evidence_frame_end": 15,
+        "rationale": "Wearer briefly handles food or utensils at the table; the question asks what another person got from the store."
+      },
+      "pass_b": {
+        "blind_id": "VA2-89CA93047947",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "medium",
+        "evidence_frame_start": 11,
+        "evidence_frame_end": 16,
+        "rationale": "Wearer picks food from the table near the anchor; the question about another person's past store acquisition is unrelated."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-8B0E777F7EE5",
+      "example_id": "loc1_script2_seq4_rec1_w0007",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-8B0E777F7EE5",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "reach_grasp",
+        "confidence": "medium",
+        "evidence_frame_start": 12,
+        "evidence_frame_end": 23,
+        "rationale": "Wearer reaches toward and takes hold of the red container; no pistachio-pouring action occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-8B0E777F7EE5",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "reach_grasp",
+        "confidence": "high",
+        "evidence_frame_start": 15,
+        "evidence_frame_end": 23,
+        "rationale": "Wearer reaches for and acquires a clear container near the anchor; no pistachio pouring is visible."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "reach_grasp"
+    },
+    {
+      "blind_id": "VA2-8B31EFA200D3",
+      "example_id": "loc2_script1_seq2_rec1_w0001",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-8B31EFA200D3",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "other_observable",
+        "confidence": "high",
+        "evidence_frame_start": 14,
+        "evidence_frame_end": 24,
+        "rationale": "Wearer turns the head and camera right while another person speaks about walking past; no wearer walking occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-8B31EFA200D3",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "other_observable",
+        "confidence": "high",
+        "evidence_frame_start": 14,
+        "evidence_frame_end": 23,
+        "rationale": "Wearer turns their head toward the windows; walking by is attributed to another person and is not visible."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-8BD9B7A455F1",
+      "example_id": "loc4_script2_seq4_rec1_w0003",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-8BD9B7A455F1",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer only converses and gestures; \u2018get healed quick\u2019 describes recovery, not a visible goal-directed action."
+      },
+      "pass_b": {
+        "blind_id": "VA2-8BD9B7A455F1",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer remains seated and talks; cut is used as a noun, with no goal-directed action visible."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-8C64988BE3F2",
+      "example_id": "loc5_script4_seq5_rec1_w0010",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "pass_a": {
+        "blind_id": "VA2-8C64988BE3F2",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer eats with utensils while phone instructions describe removing a battery cover."
+      },
+      "pass_b": {
+        "blind_id": "VA2-8C64988BE3F2",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "A phone plays unattended on the table; battery-cover removal is narrated media, and the wearer performs no visible action."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-8C8C567171AE",
+      "example_id": "loc3_script4_seq3_rec1_w0000",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "pass_a": {
+        "blind_id": "VA2-8C8C567171AE",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 23,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer operates a remote after the anchor; \u2018moves\u2019 is media commentary and does not describe the wearer."
+      },
+      "pass_b": {
+        "blind_id": "VA2-8C8C567171AE",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 23,
+        "evidence_frame_end": 27,
+        "rationale": "Wearer operates a remote after the anchor; troubling moves belongs to television narration and does not describe that action."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-95643B51E141",
+      "example_id": "loc3_script3_seq5_rec2_w0001",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "pass_a": {
+        "blind_id": "VA2-95643B51E141",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer only watches and converses while another person handles items; no cleaning action is visible."
+      },
+      "pass_b": {
+        "blind_id": "VA2-95643B51E141",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "transport_place",
+        "confidence": "medium",
+        "evidence_frame_start": 5,
+        "evidence_frame_end": 10,
+        "rationale": "Wearer moves and sets down a phone before the anchor; the collective cleanup proposal is not visibly carried out."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-9C20B56C41F6",
+      "example_id": "loc5_script4_seq5_rec1_w0012",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "pass_a": {
+        "blind_id": "VA2-9C20B56C41F6",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer eats with utensils while phone instructions describe setting a wire aside."
+      },
+      "pass_b": {
+        "blind_id": "VA2-9C20B56C41F6",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer handles and eats food with utensils; setting a wire aside is phone narration and has no matching wearer action."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-9FDE307ADDA7",
+      "example_id": "loc2_script4_seq5_rec1_w0009",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-9FDE307ADDA7",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer holds and watches the phone without operating it; peculiar-light narration comes from the phone."
+      },
+      "pass_b": {
+        "blind_id": "VA2-9FDE307ADDA7",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer statically holds and views a phone; the media's generic watch instruction does not establish a goal-directed wearer action."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-A200E8AD4C3D",
+      "example_id": "loc1_script3_seq5_rec1_w0003",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-A200E8AD4C3D",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Camera translates away from the stove toward cabinets; no bowl is grasped. The grab instruction has no corresponding action."
+      },
+      "pass_b": {
+        "blind_id": "VA2-A200E8AD4C3D",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 27,
+        "rationale": "Wearer walks toward the cabinets; the unsourced command to grab a bowl has no visible grasp."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-B03FB1488213",
+      "example_id": "loc5_script5_seq5_rec1_w0003",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "pass_a": {
+        "blind_id": "VA2-B03FB1488213",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer operates the phone; notification instructions come from the phone and no physical turning action occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-B03FB1488213",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer scrolls a phone; turning notifications on is narrated media and does not describe the visible scrolling."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-C2DE1AB873E6",
+      "example_id": "loc4_script2_seq4_rec1_w0001",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-C2DE1AB873E6",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "medium",
+        "evidence_frame_start": 5,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer walks around the kitchen after closing the refrigerator; another person\u2019s putting statement has no wearer match."
+      },
+      "pass_b": {
+        "blind_id": "VA2-C2DE1AB873E6",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 4,
+        "evidence_frame_end": 14,
+        "rationale": "Wearer walks away from the refrigerator; no object is visibly put into beer despite the stated attempt."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-C938F9066543",
+      "example_id": "loc5_script4_seq5_rec1_w0011",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "pass_a": {
+        "blind_id": "VA2-C938F9066543",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 13,
+        "rationale": "Wearer cuts or eats food with utensils while phone instructions describe pressing an ECU-cover tab."
+      },
+      "pass_b": {
+        "blind_id": "VA2-C938F9066543",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 15,
+        "rationale": "Wearer eats with a fork; pressing an ECU-cover tab is narrated phone media, not the visible food handling."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-CAA79DDFE332",
+      "example_id": "loc3_script4_seq3_rec1_w0002",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "event_group": "loc3_script4_seq3",
+      "location": 3,
+      "pass_a": {
+        "blind_id": "VA2-CAA79DDFE332",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer passively watches television; no goal-directed action is visible. Playing speech comes from television."
+      },
+      "pass_b": {
+        "blind_id": "VA2-CAA79DDFE332",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Only passive television viewing and brief static remote holding are visible; Maggie's prior playing refers to another person."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-CB4F5D23CF66",
+      "example_id": "loc5_script4_seq5_rec1_w0008",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "event_group": "loc5_script4_seq5",
+      "location": 5,
+      "pass_a": {
+        "blind_id": "VA2-CB4F5D23CF66",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 14,
+        "rationale": "Wearer handles and eats food with utensils while phone instructions describe removing a fuse-box lid."
+      },
+      "pass_b": {
+        "blind_id": "VA2-CB4F5D23CF66",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 15,
+        "rationale": "Wearer cuts and eats food with utensils; fuse-box-lid removal is narrated media and has no matching wearer action."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-CD9CE17101E9",
+      "example_id": "loc5_script5_seq5_rec1_w0002",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "pass_a": {
+        "blind_id": "VA2-CD9CE17101E9",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer scrolls or taps the phone; subscription speech comes from phone media and no making action occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-CD9CE17101E9",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer scrolls a phone; making sure to subscribe is media narration and does not describe the visible operation."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-D0C5D218FFE3",
+      "example_id": "loc4_script2_seq4_rec1_w0004",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "event_group": "loc4_script2_seq4",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-D0C5D218FFE3",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer only converses and gestures; \u2018get a cut\u2019 names a result or injury, not a visible cutting action."
+      },
+      "pass_b": {
+        "blind_id": "VA2-D0C5D218FFE3",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "none_visible",
+        "confidence": "high",
+        "evidence_frame_start": null,
+        "evidence_frame_end": null,
+        "rationale": "Wearer only talks and gestures while seated; cut denotes an injury noun, not a visible action."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-D63555577FE3",
+      "example_id": "loc1_script2_seq4_rec2_w0002",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-D63555577FE3",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "medium",
+        "evidence_frame_start": 7,
+        "evidence_frame_end": 16,
+        "rationale": "Wearer walks from the table toward the kitchen; no pretzel grasp is visible, and the speaker is unclear."
+      },
+      "pass_b": {
+        "blind_id": "VA2-D63555577FE3",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 8,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer walks away carrying existing items; no new pretzel grasp is visible despite the first-person claim."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-D71B527252DF",
+      "example_id": "loc4_script4_seq2_rec1_w0001",
+      "sequence_id": "loc4_script4_seq2_rec1",
+      "event_group": "loc4_script4_seq2",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-D71B527252DF",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer walks from the hallway into the kitchen; no coffee acquisition is visible despite first-person speech."
+      },
+      "pass_b": {
+        "blind_id": "VA2-D71B527252DF",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer walks into the kitchen; the claimed coffee acquisition is not visible within the window."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-D7B5F26EA5CC",
+      "example_id": "loc2_script4_seq5_rec1_w0007",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "event_group": "loc2_script4_seq5",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-D7B5F26EA5CC",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 20,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer brings a fork to food after the anchor while phone narration describes life being wiped out."
+      },
+      "pass_b": {
+        "blind_id": "VA2-D7B5F26EA5CC",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "food_material_handling",
+        "confidence": "high",
+        "evidence_frame_start": 20,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer handles and eats food after the anchor; wiping out life is phone narration and has no matching wearer action."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "food_material_handling"
+    },
+    {
+      "blind_id": "VA2-D9AE98225F67",
+      "example_id": "loc2_script1_seq6_rec1_w0001",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "event_group": "loc2_script1_seq6",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-D9AE98225F67",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "transport_place",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 19,
+        "rationale": "Wearer carries two cups through the kitchen; the spoken grabbing action is not visible in this window."
+      },
+      "pass_b": {
+        "blind_id": "VA2-D9AE98225F67",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "action_precedes_anchor",
+        "observable_action": "transport_place",
+        "confidence": "high",
+        "evidence_frame_start": 11,
+        "evidence_frame_end": 19,
+        "rationale": "Wearer acquires red containers before the anchor, then carries and sets them down; the collective grab statement matches the acquisition."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-DA6163C01FFC",
+      "example_id": "loc3_script1_seq4_rec1_w0000",
+      "sequence_id": "loc3_script1_seq4_rec1",
+      "event_group": "loc3_script1_seq4",
+      "location": 3,
+      "pass_a": {
+        "blind_id": "VA2-DA6163C01FFC",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "aligned_within_window",
+        "observable_action": "transport_place",
+        "confidence": "high",
+        "evidence_frame_start": 4,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer deliberately repositions handheld toy pieces across the anchor; \u2018move this\u2019 matches the visible action."
+      },
+      "pass_b": {
+        "blind_id": "VA2-DA6163C01FFC",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "aligned_within_window",
+        "observable_action": "transport_place",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 18,
+        "rationale": "Wearer repositions and sets down an orange object across the anchor; the collective move statement directly matches."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-DAE611EDD212",
+      "example_id": "loc2_script3_seq3_rec1_w0011",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "event_group": "loc2_script3_seq3",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-DAE611EDD212",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 6,
+        "rationale": "Wearer opens a drawer before the anchor; no cutting occurs, matching the spoken decision not to cut."
+      },
+      "pass_b": {
+        "blind_id": "VA2-DAE611EDD212",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 7,
+        "evidence_frame_end": 22,
+        "rationale": "Wearer walks around the kitchen; the negated proposal to cut items has no visible cutting counterpart."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-DB2621422BFA",
+      "example_id": "loc1_script3_seq5_rec1_w0006",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-DB2621422BFA",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer translates across the kitchen while discussing a past placement; no putting action occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-DB2621422BFA",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer walks through the kitchen; the past claim of putting something in a bowl is not visibly repeated."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-E3B4DB21F129",
+      "example_id": "loc1_script2_seq4_rec2_w0004",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-E3B4DB21F129",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "medium",
+        "evidence_frame_start": 10,
+        "evidence_frame_end": 23,
+        "rationale": "Wearer taps or scrolls the phone before reaching toward a bag; no pistachios are poured."
+      },
+      "pass_b": {
+        "blind_id": "VA2-E3B4DB21F129",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "transport_place",
+        "confidence": "high",
+        "evidence_frame_start": 4,
+        "evidence_frame_end": 14,
+        "rationale": "Wearer carries and sets down a bowl in frames 4\u201314; promised pistachio pouring does not occur."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    },
+    {
+      "blind_id": "VA2-E4DF9D41568D",
+      "example_id": "loc4_script2_seq3_rec2_w0004",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "event_group": "loc4_script2_seq3",
+      "location": 4,
+      "pass_a": {
+        "blind_id": "VA2-E4DF9D41568D",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer walks across the kitchen; no container or door is opened despite speech offering that option."
+      },
+      "pass_b": {
+        "blind_id": "VA2-E4DF9D41568D",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 22,
+        "rationale": "Wearer walks toward another person; the addressed opening suggestion is not visibly carried out by the wearer."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-E7DAFA2B3842",
+      "example_id": "loc1_script2_seq4_rec1_w0000",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "event_group": "loc1_script2_seq4",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-E7DAFA2B3842",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 23,
+        "rationale": "Wearer walks across the kitchen toward the refrigerator; later door opening does not correspond to spoken bringing."
+      },
+      "pass_b": {
+        "blind_id": "VA2-E7DAFA2B3842",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 12,
+        "evidence_frame_end": 21,
+        "rationale": "Wearer walks toward the refrigerator around the anchor; the request for another person to bring something is unmatched."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-E85597F92CD6",
+      "example_id": "loc3_script3_seq5_rec2_w0011",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "event_group": "loc3_script3_seq5",
+      "location": 3,
+      "pass_a": {
+        "blind_id": "VA2-E85597F92CD6",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "unclear",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "transport_place",
+        "confidence": "medium",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer tilts and repositions a saucepan; no water or washing motion appears. Speech referent is unclear."
+      },
+      "pass_b": {
+        "blind_id": "VA2-E85597F92CD6",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "wearer",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "transport_place",
+        "confidence": "medium",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer tilts and repositions a frying pan throughout; the washing language is not matched by visible water, wiping, or scrubbing."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-EDA412BB9636",
+      "example_id": "loc3_script1_seq5_rec1_w0000",
+      "sequence_id": "loc3_script1_seq5_rec1",
+      "event_group": "loc3_script1_seq5",
+      "location": 3,
+      "pass_a": {
+        "blind_id": "VA2-EDA412BB9636",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "figurative_or_nonaction",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 14,
+        "evidence_frame_end": 24,
+        "rationale": "Wearer presses the remote across the anchor; the hypothetical team-playing question is not a visible playing action."
+      },
+      "pass_b": {
+        "blind_id": "VA2-EDA412BB9636",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 12,
+        "evidence_frame_end": 24,
+        "rationale": "Wearer operates a remote around the anchor; the television's question about playing for a team does not describe that operation."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-F0339CBC64A2",
+      "example_id": "loc5_script5_seq5_rec1_w0005",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "pass_a": {
+        "blind_id": "VA2-F0339CBC64A2",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer taps or scrolls the phone; racing speech comes from the phone and no \u2018get\u2019 action occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-F0339CBC64A2",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer scrolls a phone; getting on with a race belongs to car media and does not describe the scrolling."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-F0A8D3A9A7C2",
+      "example_id": "loc1_script3_seq5_rec1_w0005",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-F0A8D3A9A7C2",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "aligned_within_window",
+        "observable_action": "transport_place",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer carries a mug to the counter and sets it down across the anchor, matching \u2018put it right there.\u2019"
+      },
+      "pass_b": {
+        "blind_id": "VA2-F0A8D3A9A7C2",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "action_follows_anchor",
+        "observable_action": "transport_place",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer carries a full mug across the anchor and places it at the end, matching the stated placement."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "transport_place"
+    },
+    {
+      "blind_id": "VA2-F47C81A67607",
+      "example_id": "loc1_script3_seq5_rec1_w0000",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "event_group": "loc1_script3_seq5",
+      "location": 1,
+      "pass_a": {
+        "blind_id": "VA2-F47C81A67607",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 9,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer translates around the table while another person is addressed about cleaning; no cleaning occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-F47C81A67607",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "other_person",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "locomotion_posture",
+        "confidence": "high",
+        "evidence_frame_start": 14,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer walks around the table behind another person; the cleaning request concerns that person and no wearer cleaning occurs."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "locomotion_posture"
+    },
+    {
+      "blind_id": "VA2-FC19F364C2CF",
+      "example_id": "loc5_script5_seq5_rec1_w0000",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "event_group": "loc5_script5_seq5",
+      "location": 5,
+      "pass_a": {
+        "blind_id": "VA2-FC19F364C2CF",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer scrolls or taps the phone while media states something \u2018doesn\u2019t make a difference\u2019; no making action occurs."
+      },
+      "pass_b": {
+        "blind_id": "VA2-FC19F364C2CF",
+        "asr_refers_to_visible_wearer_action": "no",
+        "agency": "narrated_media_or_phone",
+        "temporal_alignment": "no_corresponding_action",
+        "observable_action": "state_change_operate",
+        "confidence": "high",
+        "evidence_frame_start": 0,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer scrolls a phone; making a difference is narrated media language and does not describe the visible operation."
+      },
+      "modeled_action_consensus": true,
+      "consensus_observable_action": "state_change_operate"
+    },
+    {
+      "blind_id": "VA2-FC9979206A34",
+      "example_id": "loc2_script1_seq2_rec1_w0000",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "event_group": "loc2_script1_seq2",
+      "location": 2,
+      "pass_a": {
+        "blind_id": "VA2-FC9979206A34",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "action_follows_anchor",
+        "observable_action": "other_observable",
+        "confidence": "high",
+        "evidence_frame_start": 25,
+        "evidence_frame_end": 30,
+        "rationale": "Wearer turns the head and camera right after the instruction to turn, completing the motion in frames 25\u201330."
+      },
+      "pass_b": {
+        "blind_id": "VA2-FC9979206A34",
+        "asr_refers_to_visible_wearer_action": "yes",
+        "agency": "wearer",
+        "temporal_alignment": "aligned_within_window",
+        "observable_action": "other_observable",
+        "confidence": "high",
+        "evidence_frame_start": 14,
+        "evidence_frame_end": 27,
+        "rationale": "Wearer visibly turns their head away from the television around the anchor, matching the directed head-turn instruction."
+      },
+      "modeled_action_consensus": false,
+      "consensus_observable_action": null
+    }
+  ],
+  "input_integrity": {
+    "metadata_checks": {
+      "pass_a_protocol": true,
+      "pass_b_protocol": true,
+      "pass_a_name": true,
+      "pass_b_name": true,
+      "pass_a_role": true,
+      "pass_b_role": true
+    },
+    "dense_manifest_sha256": "772b194c145aa305775a1feade279c33ae0f38fedfb9e7ccdb945cc03f82077e",
+    "reserve_access_receipt_sha256": "2f20f459426292945a119b83c2b87b1d59de0694f60fa2f636cc2d2811b72a4b",
+    "pass_a_sha256": "98cd7d5545e95c80c247c054736a714dfeb8826525f93f57c919ab8919ed55f4",
+    "pass_b_sha256": "fa98003dcc8d805d329d6ac4b25ae663476fcb8b2311fc0dc26093fa4dbee191",
+    "reserve_rgb_files_opened": 0,
+    "reserve_imu_arrays_opened": 0
+  }
+}

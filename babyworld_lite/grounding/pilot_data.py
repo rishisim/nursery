@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import hashlib
 import json
+import math
 from pathlib import Path
 import re
 from typing import Any, Mapping, Protocol, Sequence
@@ -26,6 +28,9 @@ class ExampleMetadata:
     shape: str
     color: str
     action: str
+    episode_group: str = ""
+    location: str = ""
+    wearer_group: str = ""
 
 
 class EpisodeAdapter(Protocol):
@@ -185,6 +190,63 @@ class GroundingRecordAdapter:
         return torch.tensor(values, dtype=torch.float32)
 
 
+class AEAWindowAdapter:
+    """Consumer for preprocessed AEA RGB/ASR/six-axis-head-IMU windows."""
+
+    ACCEL_SCALE_M_S2 = 9.80665
+    GYRO_SCALE_RAD_S = math.pi
+
+    def __init__(self, dataset_root: str | Path):
+        self.dataset_root = Path(dataset_root)
+
+    def metadata(self, record: Mapping[str, Any]) -> ExampleMetadata:
+        target = record["evaluation_targets"]
+        digest = hashlib.sha256(str(record["example_id"]).encode()).digest()
+        return ExampleMetadata(
+            episode_id=int.from_bytes(digest[:8], "big") % (2**63 - 1),
+            shape=str(target.get("object_noun", "")),
+            color="",
+            action=str(target["action_verb"]),
+            # Concurrent AEA recordings of the same performed activity share
+            # event_group. Treat them as one donor unit so the shuffled arm
+            # cannot borrow the partner wearer's synchronized motion trace.
+            episode_group=str(record["event_group"]),
+            location=str(record["location"]),
+            wearer_group=str(record["wearer_session_group"]),
+        )
+
+    def text(self, record: Mapping[str, Any]) -> str:
+        return str(record["model_inputs"]["transcript"])
+
+    def video(
+        self, record: Mapping[str, Any], frame_count: int, image_size: int
+    ) -> torch.Tensor:
+        paths = list(record["model_inputs"]["frame_paths"])
+        indices = _sample_indices(len(paths), frame_count)
+        frames: list[torch.Tensor] = []
+        for index in indices:
+            with Image.open(self.dataset_root / paths[int(index)]) as image:
+                resized = image.convert("RGB").resize(
+                    (image_size, image_size), Image.Resampling.BILINEAR
+                )
+                array = np.asarray(resized, dtype=np.uint8).copy()
+            frames.append(torch.from_numpy(array).permute(2, 0, 1))
+        return torch.stack(frames)
+
+    def motor(self, record: Mapping[str, Any], frame_count: int) -> torch.Tensor:
+        inputs = record["model_inputs"]
+        if len(inputs.get("imu_channels", ())) != 6:
+            raise ValueError("AEA motor input must contain exactly six IMU axes")
+        values = np.load(self.dataset_root / inputs["imu_path"], allow_pickle=False)
+        if values.ndim != 2 or values.shape[1] != 6 or not np.isfinite(values).all():
+            raise ValueError(f"invalid AEA IMU tensor: {values.shape}")
+        indices = _sample_indices(len(values), frame_count)
+        normalized = values[indices].astype(np.float32, copy=True)
+        normalized[:, :3] /= self.ACCEL_SCALE_M_S2
+        normalized[:, 3:] /= self.GYRO_SCALE_RAD_S
+        return torch.from_numpy(normalized)
+
+
 def load_pilot_source(
     path: str | Path, alignment_condition: str = "weak"
 ) -> tuple[list[dict[str, Any]], EpisodeAdapter, str]:
@@ -202,6 +264,8 @@ def load_pilot_source(
                 f"no synchronized {alignment_condition!r} grounding records found"
             )
         return selected, GroundingRecordAdapter(Path(path).parent), "grounding-v0"
+    if records[0].get("schema_version") == "aea-grounding-v1":
+        return records, AEAWindowAdapter(Path(path).parent), "aea-grounding-v1"
     return records, BabyWorldEpisodeAdapter(), "babyworld-legacy"
 
 
@@ -296,6 +360,31 @@ def deranged_index_map(indices: Sequence[int], seed: int) -> dict[int, int]:
     return mapping
 
 
+def group_deranged_index_map(
+    indices: Sequence[int], groups: Mapping[int, str], seed: int
+) -> dict[int, int]:
+    """Permutation whose donor always comes from another whole episode group."""
+    if len(indices) < 2:
+        raise ValueError("at least two examples are required for shuffled motor cues")
+    by_group: dict[str, list[int]] = {}
+    for index in indices:
+        by_group.setdefault(str(groups[index]), []).append(int(index))
+    largest = max(map(len, by_group.values()))
+    if largest > len(indices) - largest:
+        raise ValueError("episode-group derangement is impossible: one group exceeds half the split")
+    rng = np.random.default_rng(seed)
+    ordered: list[int] = []
+    for group in sorted(by_group):
+        values = np.asarray(by_group[group], dtype=np.int64)
+        ordered.extend(map(int, values[rng.permutation(len(values))]))
+    shift = largest
+    donors = ordered[shift:] + ordered[:shift]
+    mapping = {target: donor for target, donor in zip(ordered, donors)}
+    if any(target == donor or groups[target] == groups[donor] for target, donor in mapping.items()):
+        raise AssertionError("failed to construct an episode-group derangement")
+    return mapping
+
+
 class GroundingCorpus:
     def __init__(
         self,
@@ -303,11 +392,13 @@ class GroundingCorpus:
         adapter: EpisodeAdapter,
         frame_count: int,
         image_size: int,
+        motor_sample_count: int = 0,
     ):
         self.records = list(records)
         self.adapter = adapter
         self.frame_count = frame_count
         self.image_size = image_size
+        self.motor_sample_count = motor_sample_count or frame_count
         self._video_cache: dict[int, torch.Tensor] = {}
         self._motor_cache: dict[int, torch.Tensor] = {}
 
@@ -327,7 +418,7 @@ class GroundingCorpus:
     def motor(self, index: int) -> torch.Tensor:
         if index not in self._motor_cache:
             self._motor_cache[index] = self.adapter.motor(
-                self.records[index], self.frame_count
+                self.records[index], self.motor_sample_count
             )
         return self._motor_cache[index]
 
@@ -351,7 +442,17 @@ class ArmDataset(Dataset[dict[str, Any]]):
         self.arm = arm
         self.max_text_length = max_text_length
         self.time_shift = time_shift
-        self.donors = deranged_index_map(self.indices, manipulation_seed)
+        if arm == "shuffled":
+            groups = {
+                index: (
+                    corpus.metadata(index).episode_group
+                    or str(corpus.metadata(index).episode_id)
+                )
+                for index in self.indices
+            }
+            self.donors = group_deranged_index_map(self.indices, groups, manipulation_seed)
+        else:
+            self.donors = {index: index for index in self.indices}
 
     def __len__(self) -> int:
         return len(self.indices)
@@ -448,12 +549,18 @@ def action_prompt(metadata: ExampleMetadata, action: str) -> str:
     description = " ".join(part for part in (metadata.color, metadata.shape) if part)
     # Evaluation candidates are balanced minimal pairs: only the action word
     # changes while the noun, adjective, length, and syntax remain fixed.
-    return f"The action is {action} the {description}."
+    return (
+        f"The action is {action} the {description}."
+        if description else f"The action is {action}."
+    )
 
 
 def validate_action_inventory(records: Sequence[Mapping[str, Any]], adapter: EpisodeAdapter) -> tuple[str, ...]:
     present = {adapter.metadata(record).action for record in records}
-    ordered = tuple(action for action in ACTIONS if action in present)
+    ordered = tuple([
+        *(action for action in ACTIONS if action in present),
+        *(action for action in sorted(present) if action not in ACTIONS),
+    ])
     if len(ordered) < 2:
         raise ValueError("action grounding requires at least two actions")
     return ordered

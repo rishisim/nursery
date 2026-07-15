@@ -1,0 +1,9 @@
+{
+  "schema_version": "aea-coarse-action-split-donor-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "status": "not_run_coarse_annotation_gate_failed",
+  "coarse_annotation_gate_passed": false,
+  "solver_runs": 0,
+  "relaxation_or_retry_performed": false,
+  "split_gate_passed": false
+}

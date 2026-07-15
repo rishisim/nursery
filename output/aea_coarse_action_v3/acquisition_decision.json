@@ -1,0 +1,22 @@
+{
+  "schema_version": "aea-coarse-action-acquisition-decision-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "gate": {
+    "coarse_annotation_gate_passed": false,
+    "capacity_gate_passed": false,
+    "relevant_route_scientifically_viable": false,
+    "certified_group_support_bottleneck": false,
+    "inferential_power_bottleneck": false,
+    "sole_bottleneck": false,
+    "power_details": {},
+    "language_failure_forbids_language_grounding_acquisition": true,
+    "passed": false
+  },
+  "recommend_additional_recordings": false,
+  "recommendation": "no_additional_acquisition",
+  "reason": "The frozen viability and sole group-support/power bottleneck conjunction did not pass; storage use is not justified.",
+  "bounded_plan": null,
+  "download_performed": false,
+  "license_accepted": false,
+  "signed_urls_used_or_exposed": false
+}

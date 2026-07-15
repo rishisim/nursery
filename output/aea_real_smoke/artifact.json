@@ -1,0 +1,392 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "Nursery AEA real-data phase",
+    "description": "Technical report for the Nursery/BabyWorld AEA four-arm real-data phase.",
+    "generatedAt": "2026-07-14T02:29:28.326126+00:00",
+    "cards": [],
+    "charts": [
+      {
+        "id": "location-lift-chart",
+        "title": "Synchronized minus event-shuffled lift by held-out location",
+        "subtitle": "Mean paired-seed difference in action-balanced 2AFC accuracy, percentage points",
+        "intent": "comparison",
+        "question": "Is the synchronized-training lift consistent across held-out locations?",
+        "rationale": "Five discrete location folds are best compared as bars around an explicit zero reference.",
+        "comparisonContext": {
+          "baseline": "split-local whole-performed-event-shuffled IMU",
+          "grain": "held-out location fold",
+          "unit": "percentage points"
+        },
+        "type": "bar",
+        "dataset": "location_lifts",
+        "sourceId": "location-lift-query",
+        "encodings": {
+          "x": {
+            "field": "held_out_location",
+            "type": "ordinal",
+            "label": "Held-out location"
+          },
+          "y": {
+            "field": "mean_lift_pp",
+            "type": "quantitative",
+            "label": "Lift",
+            "unit": "pp",
+            "format": "number"
+          },
+          "tooltip": [
+            {
+              "field": "minimum_seed_lift_pp",
+              "type": "quantitative",
+              "label": "Minimum paired-seed lift",
+              "unit": "pp"
+            },
+            {
+              "field": "maximum_seed_lift_pp",
+              "type": "quantitative",
+              "label": "Maximum paired-seed lift",
+              "unit": "pp"
+            },
+            {
+              "field": "paired_seed_count",
+              "type": "quantitative",
+              "label": "Paired seeds"
+            },
+            {
+              "field": "test_windows",
+              "type": "quantitative",
+              "label": "Test windows"
+            }
+          ]
+        },
+        "valueFormat": "number",
+        "unit": "pp",
+        "layout": "full",
+        "labels": {
+          "values": "all"
+        },
+        "palette": {
+          "kind": "diverging",
+          "midpoint": 0
+        },
+        "referenceLines": [
+          {
+            "axis": "y",
+            "value": 0,
+            "label": "No lift",
+            "color": "neutral",
+            "lineStyle": "solid"
+          }
+        ],
+        "settings": {
+          "sort": "custom",
+          "showValues": true
+        },
+        "surface": {
+          "surface": "card",
+          "showControls": false,
+          "viewMode": "visualization"
+        }
+      }
+    ],
+    "tables": [],
+    "sources": [
+      {
+        "id": "experiment-results",
+        "label": "AEA four-arm experiment results",
+        "path": "aea_results.json"
+      },
+      {
+        "id": "location-lift-query",
+        "label": "Held-out-location paired lift aggregation",
+        "path": "aea_results.json",
+        "query": {
+          "engine": "sqlite",
+          "sql": "SELECT\n  split,\n  held_out_location,\n  ROUND(100.0 * AVG(lift), 4) AS mean_lift_pp,\n  ROUND(100.0 * MIN(lift), 4) AS minimum_seed_lift_pp,\n  ROUND(100.0 * MAX(lift), 4) AS maximum_seed_lift_pp,\n  COUNT(*) AS paired_seed_count,\n  MAX(test_windows) AS test_windows,\n  MAX(supported_action_count) AS supported_action_count,\n  MIN(audit_valid) AS audit_valid\nFROM paired_location_lifts\nGROUP BY split, held_out_location\nORDER BY held_out_location",
+          "description": "Aggregates paired synchronized-minus-shuffled seed differences within held-out location folds.",
+          "tables_used": [
+            "paired_location_lifts"
+          ],
+          "filters": [
+            "family = held_out_location",
+            "paired synchronized and shuffled seed cells only"
+          ],
+          "metric_definitions": [
+            "mean_lift_pp = 100 \u00d7 AVG(synchronized_accuracy \u2212 shuffled_accuracy)"
+          ]
+        }
+      },
+      {
+        "id": "locked-protocol",
+        "label": "Locked AEA protocol",
+        "path": "configs/aea_real.yaml"
+      },
+      {
+        "id": "preprocess-audit",
+        "label": "AEA preprocessing and sensor audit",
+        "path": "preprocess_summary.json"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "title",
+        "type": "markdown",
+        "body": "# Nursery AEA real-data phase",
+        "layout": "full"
+      },
+      {
+        "id": "technical-summary",
+        "type": "markdown",
+        "layout": "full",
+        "sourceId": "experiment-results",
+        "body": "## Technical summary\n\n**Status:** `infrastructure_smoke_test_not_a_real_data_finding`. This is an infrastructure smoke test on real AEA windows, not a real-data effect finding.\n\n**Data represented:** 247 accepted windows from 28 recordings across 5 locations.\n\n**Primary synchronized \u2212 event-shuffled estimate:** +0.08 pp (95% CI -0.06, +0.24). The claim gate did not pass."
+      },
+      {
+        "id": "location-finding",
+        "type": "markdown",
+        "layout": "full",
+        "sourceId": "experiment-results",
+        "body": "## The location-fold pattern is diagnostic, not developmental evidence\n\nEach bar is the mean paired synchronized-minus-shuffled difference within one held-out location. Positive values favor synchronized IMU during training; the zero line marks no lift. The chart is a smoke diagnostic whenever the report status says so, regardless of sign."
+      },
+      {
+        "id": "location-chart-block",
+        "type": "chart",
+        "chartId": "location-lift-chart",
+        "layout": "full"
+      },
+      {
+        "id": "scope-and-definitions",
+        "type": "markdown",
+        "layout": "full",
+        "sourceId": "locked-protocol",
+        "body": "## Scope, population, and metric definitions\n\nAEA contains adult, partly scripted activities and is used only as a sensor-format analogue. It is not developmental evidence and is not BabyView-matched. The primary endpoint is action-balanced 2AFC macro accuracy on RGB plus transcript with IMU absent from the evaluation batch. The primary estimand subtracts a split-local whole-event-shuffled IMU arm from the correctly synchronized arm."
+      },
+      {
+        "id": "family-evidence",
+        "type": "markdown",
+        "layout": "full",
+        "sourceId": "experiment-results",
+        "body": "## Evaluation families stay separate\n\nHeld-out location is primary. Wearer-session-proxy and action-object-composition results are secondary and retain separate uncertainty intervals so they cannot silently replace the locked endpoint.\n\n| Family | Splits | Mean lift, pp | 95% CI, pp | Paired seeds |\n|---|---:|---:|---:|---:|\n| held_out_composition | 3 | +1.08 | [-1.33, +4.58] | 2 |\n| held_out_location | 5 | +0.08 | [-0.06, +0.24] | 2 |\n| held_out_wearer_session | 5 | +0.38 | [-0.10, +1.67] | 2 |"
+      },
+      {
+        "id": "experimental-design",
+        "type": "markdown",
+        "layout": "full",
+        "sourceId": "locked-protocol",
+        "body": "## Four arms isolate synchronization during training\n\nNull, synchronized, split-local event-shuffled, and time-shifted arms share architecture, initialization, batch order, optimizer schedule, and update count within paired seeds. Concurrent recordings of the same performed event share a donor group. The primary test path constructs no motor tensor and never calls the motor encoder. Confidence intervals resample held-out split units and paired seeds hierarchically."
+      },
+      {
+        "id": "result-audit",
+        "type": "markdown",
+        "layout": "full",
+        "sourceId": "experiment-results",
+        "body": "## Claim controls remain closed unless every lock passes\n\nThe audit below checks the leakage, pairing, training-schedule, completion, and motor-withholding conditions that determine whether an estimate is eligible for interpretation.\n\n| Eligibility check | Passed |\n|---|---:|\n| Leakage and pairing gates | yes |\n| Locked training configuration | no |\n| Complete locked folds and seeds | no |\n| IMU omitted from primary test | yes |\n| Claim gate | no |"
+      },
+      {
+        "id": "sensor-audit",
+        "type": "markdown",
+        "layout": "full",
+        "sourceId": "preprocess-audit",
+        "body": "## Sensor coverage is audited before modeling\n\nThe preprocessing audit checks acquisition completeness, finite six-axis arrays, fixed resampled shape, RGB timestamp error, allowlisted model inputs, and absence of unnecessary MPS features.\n\n| Planned | Available VRS | Processed | Accepted windows | Minimum IMU coverage | Max RGB error | Sensor/file errors |\n|---:|---:|---:|---:|---:|---:|---:|\n| 40 | 40 | 28 | 247 | 100.00% | 24.54 ms | 0 |"
+      },
+      {
+        "id": "limitations",
+        "type": "markdown",
+        "layout": "full",
+        "body": "## Limitations prevent a developmental claim\n\nAction targets are ASR lexical anchors rather than human action annotations; object targets are nearby lexical items and may not name the manipulated object. The wearer split uses a release-visible location+script+recording proxy, not persistent identity. Location 5 covers only scripts 4 and 5. AEA cannot establish a benefit in infants or in natural BabyView data."
+      },
+      {
+        "id": "next-steps",
+        "type": "markdown",
+        "layout": "full",
+        "body": "## Recommended next steps\n\n1. Treat smoke numbers only as pipeline validation.\n2. Run the complete locked five-fold, seven-seed, eight-epoch primary schedule before using `real_aea_effect_estimate`.\n3. Inspect positive controls and per-action support before interpreting any aggregate.\n4. Use the AEA result to refine the apples-to-apples BabyView protocol, not as developmental evidence."
+      },
+      {
+        "id": "further-questions",
+        "type": "markdown",
+        "layout": "full",
+        "body": "## Further questions\n\nWould human-verified action/object annotations change the estimate? Does lift vary with head-motion intensity, speech timing, or action class? Which sensor-format differences must be calibrated before an eventual BabyView comparison?"
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-07-14T02:29:28.326126+00:00",
+    "status": "fixture",
+    "datasets": {
+      "headline": [
+        {
+          "windows": 247,
+          "recordings": 28,
+          "locations": 5,
+          "primary_lift_pp": 0.0807,
+          "primary_ci_low_pp": -0.0595,
+          "primary_ci_high_pp": 0.2351,
+          "claim_gate_passed": false
+        }
+      ],
+      "location_lifts": [
+        {
+          "split": "held_out_location_1",
+          "held_out_location": 1,
+          "mean_lift_pp": 0.0,
+          "minimum_seed_lift_pp": 0.0,
+          "maximum_seed_lift_pp": 0.0,
+          "paired_seed_count": 2,
+          "test_windows": 25,
+          "supported_action_count": 5,
+          "audit_valid": 1
+        },
+        {
+          "split": "held_out_location_2",
+          "held_out_location": 2,
+          "mean_lift_pp": 0.1413,
+          "minimum_seed_lift_pp": 0.0,
+          "maximum_seed_lift_pp": 0.2826,
+          "paired_seed_count": 2,
+          "test_windows": 70,
+          "supported_action_count": 10,
+          "audit_valid": 1
+        },
+        {
+          "split": "held_out_location_3",
+          "held_out_location": 3,
+          "mean_lift_pp": 0.1136,
+          "minimum_seed_lift_pp": 0.0,
+          "maximum_seed_lift_pp": 0.2273,
+          "paired_seed_count": 2,
+          "test_windows": 65,
+          "supported_action_count": 11,
+          "audit_valid": 1
+        },
+        {
+          "split": "held_out_location_4",
+          "held_out_location": 4,
+          "mean_lift_pp": 0.1488,
+          "minimum_seed_lift_pp": -0.2976,
+          "maximum_seed_lift_pp": 0.5952,
+          "paired_seed_count": 2,
+          "test_windows": 29,
+          "supported_action_count": 7,
+          "audit_valid": 1
+        },
+        {
+          "split": "held_out_location_5",
+          "held_out_location": 5,
+          "mean_lift_pp": 0.0,
+          "minimum_seed_lift_pp": 0.0,
+          "maximum_seed_lift_pp": 0.0,
+          "paired_seed_count": 2,
+          "test_windows": 14,
+          "supported_action_count": 3,
+          "audit_valid": 1
+        }
+      ],
+      "family_summaries": [
+        {
+          "family": "held_out_composition",
+          "split_count": 3,
+          "mean_lift_pp": 1.0833,
+          "ci95_low_pp": -1.3333,
+          "ci95_high_pp": 4.5833,
+          "paired_seed_count": 2,
+          "split_unit_count": 3
+        },
+        {
+          "family": "held_out_location",
+          "split_count": 5,
+          "mean_lift_pp": 0.0807,
+          "ci95_low_pp": -0.0595,
+          "ci95_high_pp": 0.2351,
+          "paired_seed_count": 2,
+          "split_unit_count": 5
+        },
+        {
+          "family": "held_out_wearer_session",
+          "split_count": 5,
+          "mean_lift_pp": 0.3833,
+          "ci95_low_pp": -0.1,
+          "ci95_high_pp": 1.6667,
+          "paired_seed_count": 2,
+          "split_unit_count": 5
+        }
+      ],
+      "result_audits": [
+        {
+          "check": "Leakage and pairing gates",
+          "passed": true
+        },
+        {
+          "check": "Locked training configuration",
+          "passed": false
+        },
+        {
+          "check": "Complete locked folds and seeds",
+          "passed": false
+        },
+        {
+          "check": "IMU omitted from primary test",
+          "passed": true
+        },
+        {
+          "check": "Claim gate",
+          "passed": false
+        }
+      ],
+      "preprocess_audit": [
+        {
+          "acquisition_complete": true,
+          "plan_recordings": 40,
+          "available_vrs_recordings": 40,
+          "processed_recordings": 28,
+          "accepted_windows": 247,
+          "audit_valid": true,
+          "minimum_imu_coverage": 1.0,
+          "maximum_frame_error_ms": 24.5418,
+          "imu_error_count": 0,
+          "frame_error_count": 0
+        }
+      ]
+    },
+    "accessIssues": []
+  },
+  "sources": [
+    {
+      "id": "experiment-results",
+      "label": "AEA four-arm experiment results",
+      "path": "aea_results.json"
+    },
+    {
+      "id": "location-lift-query",
+      "label": "Held-out-location paired lift aggregation",
+      "path": "aea_results.json",
+      "query": {
+        "engine": "sqlite",
+        "sql": "SELECT\n  split,\n  held_out_location,\n  ROUND(100.0 * AVG(lift), 4) AS mean_lift_pp,\n  ROUND(100.0 * MIN(lift), 4) AS minimum_seed_lift_pp,\n  ROUND(100.0 * MAX(lift), 4) AS maximum_seed_lift_pp,\n  COUNT(*) AS paired_seed_count,\n  MAX(test_windows) AS test_windows,\n  MAX(supported_action_count) AS supported_action_count,\n  MIN(audit_valid) AS audit_valid\nFROM paired_location_lifts\nGROUP BY split, held_out_location\nORDER BY held_out_location",
+        "description": "Aggregates paired synchronized-minus-shuffled seed differences within held-out location folds.",
+        "tables_used": [
+          "paired_location_lifts"
+        ],
+        "filters": [
+          "family = held_out_location",
+          "paired synchronized and shuffled seed cells only"
+        ],
+        "metric_definitions": [
+          "mean_lift_pp = 100 \u00d7 AVG(synchronized_accuracy \u2212 shuffled_accuracy)"
+        ]
+      }
+    },
+    {
+      "id": "locked-protocol",
+      "label": "Locked AEA protocol",
+      "path": "configs/aea_real.yaml"
+    },
+    {
+      "id": "preprocess-audit",
+      "label": "AEA preprocessing and sensor audit",
+      "path": "preprocess_summary.json"
+    }
+  ]
+}

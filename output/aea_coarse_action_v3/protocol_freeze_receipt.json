@@ -1,0 +1,41 @@
+{
+  "schema_version": "aea-coarse-action-protocol-freeze-receipt-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "frozen_at_utc": "2026-07-15T00:50:15Z",
+  "ordering_statement": "Frozen after authorized aggregate v1/v2 review and current code/test/git review, but before reading any v1/v2 completed annotation label or rationale, reviewing any dense image under the v3 interface, or seeing any v3 annotation, split, capacity, language, IMU, or acquisition outcome.",
+  "preregistration_markdown": {
+    "path": "docs/aea_coarse_action_v3_preregistration.md",
+    "sha256": "d08d800b27ded69de0f4f1fe2029800c1fdc81438ff0185eb3ecd4eec7a1d16f"
+  },
+  "machine_readable_protocol": {
+    "path": "output/aea_coarse_action_v3/preregistered_protocol.json",
+    "sha256": "47b218ca099c0c6d852c48c9d8857381a2569583fa247e784b363a30d06db43d"
+  },
+  "annotation_codebook": {
+    "path": "output/aea_coarse_action_v3/annotation_codebook.md",
+    "sha256": "6676b090b73ef0a54e97d9765883d8e83f8aaff428769956d98c81b44a4fd112"
+  },
+  "frozen_inputs": {
+    "v2_dense_manifest_sha256": "772b194c145aa305775a1feade279c33ae0f38fedfb9e7ccdb945cc03f82077e",
+    "v2_reserve_access_receipt_sha256": "2f20f459426292945a119b83c2b87b1d59de0694f60fa2f636cc2d2811b72a4b",
+    "development_examples_sha256": "7d6e23a4589a179449ed05bd093be7acbdda75bef451261ebf594d8b343354f0",
+    "partition_manifest_sha256": "fc7b9299c01d09eb20119060134e51c048146c8dfb52a4e76726437d51783794",
+    "sanitized_release_metadata_sha256": "8b3e5a5dd50a4176b6cf5c316935dd2349dd2c3df658c372ecd708f0e35ae39f"
+  },
+  "pre_freeze_state": {
+    "v1_or_v2_completed_raw_labels_or_rationales_read": false,
+    "v3_dense_images_reviewed": false,
+    "v3_annotation_pass_started": false,
+    "v3_split_outcome_seen": false,
+    "v3_capacity_outcome_seen": false,
+    "v3_language_outcome_seen": false,
+    "v3_imu_outcome_seen": false,
+    "reserve_rgb_or_imu_accessed": false,
+    "signed_urls_loaded_printed_copied_or_used": false
+  },
+  "baseline_verification": {
+    "tests_passed": 59,
+    "git_diff_check_passed": true,
+    "dirty_checkout_preserved": true
+  }
+}

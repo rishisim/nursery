@@ -1,0 +1,31 @@
+{
+  "schema_version": "aea-dev-learnability-preregistration-v1",
+  "protocol_id": "aea-dev-learnability-v1",
+  "frozen_at_utc": "2026-07-14T23:06:30Z",
+  "source_examples": "data/aea_processed/examples.jsonl",
+  "source_examples_sha256": "7bda9e9b02da94b95a9199e02d14db8dd6d6059cda6389673d92d930ce95a98e",
+  "scientific_role": "adult_partly_scripted_sensor_format_analogue_not_developmental_evidence",
+  "prospective_reserve_caveat": "Earlier reduced infrastructure smoke aggregated all records; reserve is prospective only from this iteration onward.",
+  "confirmation_event_groups": [
+    "loc1_script4_seq4",
+    "loc2_script5_seq6",
+    "loc3_script2_seq3",
+    "loc4_script3_seq4",
+    "loc5_script4_seq3"
+  ],
+  "counts": {"all_windows": 247, "development_windows": 192, "confirmation_windows": 55, "development_event_groups": 18, "confirmation_event_groups": 5},
+  "support": {"minimum_windows": 6, "minimum_event_groups": 3},
+  "coarse_mapping": {
+    "locomotion_transport": ["walk", "bring", "take", "get", "move", "remove", "pick", "grab"],
+    "object_state_manipulation": ["put", "set", "open", "close", "turn", "press", "stack", "fold", "cut"],
+    "food_drink_preparation": ["make", "pour", "cook", "serve", "eat", "drink"],
+    "cleaning_grooming": ["wash", "clean", "wipe", "brush", "vacuum"],
+    "media_leisure": ["play", "read", "watch"]
+  },
+  "semantic_high_motion_actions": ["walk", "bring", "take", "get", "move", "remove", "vacuum", "wash", "clean", "wipe"],
+  "audit": {"sample_size": 48, "sampling_salt": "aea-audit-v1", "interval": "wilson_95", "minimum_judgeable": 0.75, "minimum_clear_or_plausible_ci_low": 0.60, "maximum_mismatch_ci_high": 0.25},
+  "folds": {"count": 5, "algorithm": "StratifiedGroupKFold", "shuffle": true, "random_state": 41031, "group": "event_group"},
+  "grounding": {"seeds": [3101, 3102, 3103], "epochs": 30, "frame_count": 8, "image_size": 64, "hidden_dim": 64, "embedding_dim": 48, "batch_size": 24, "learning_rate": 0.001, "bootstrap_samples": 2000, "bootstrap_seed": 42101, "permutation_samples": 2000, "permutation_seed": 42103, "pass_accuracy": 0.60, "chance": 0.50, "positive_control_seed": 3199, "positive_control_epochs": 120, "positive_control_sample_size": 64, "positive_control_accuracy": 0.90, "positive_control_loss_reduction": 0.20},
+  "imu": {"donor_seeds": [5101, 5102, 5103], "classifier": "standardized_multinomial_logistic_regression", "C": 1.0, "class_weight": "balanced", "max_iter": 5000, "bootstrap_samples": 2000, "bootstrap_seed": 52101, "randomization_samples": 10000, "randomization_seed": 52103, "chance_permutation_samples": 2000, "chance_permutation_seed": 52105, "minimum_sync_minus_shuffled": 0.05},
+  "decision": {"go_requires": ["audit", "capacity", "fine_grounding", "fine_imu", "hard_checks"], "revise_alternatives": ["coarse_grounding_and_imu", "semantic_high_motion_grounding_and_imu", "capacity_failure", "integrity_repair"], "stop_when": "capacity and integrity pass but audit fails or no predeclared endpoint jointly passes grounding and IMU"}
+}

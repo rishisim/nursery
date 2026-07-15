@@ -173,6 +173,77 @@ python scripts/build_frank_attachment.py
 pdftoppm -png output/pdf/frank_preaccess_experimental_plan.pdf tmp/pdfs/frank-plan
 ```
 
+## Aria Everyday Activities real-data phase
+
+The real-data adapter uses Meta's Aria Everyday Activities (AEA) release as an
+**adult, partly scripted sensor-format analogue**. It is not developmental
+evidence and is not represented as BabyView-matched. The locked question is
+whether synchronized six-axis head accelerometer+gyroscope input during
+training improves motor-withheld video/ASR action grounding relative to a
+split-local, whole-sequence-shuffled IMU control.
+
+The initial plan selects 40 recordings: eight from each location and eight
+from each script, using only predeclared ASR action-anchor counts and safe
+manifest metadata before VRS inspection. The selected raw VRS budget is about
+106.3 GiB. Annotations and raw VRS are acquired initially; all MPS outputs are
+excluded.
+
+```bash
+# The user must personally accept the AEA license and obtain the expiring JSON.
+python scripts/plan_aea_subset.py \
+  --links "$HOME/Downloads/AriaEverydayActivities_download_urls.json" \
+  --annotations-root data/aea_raw \
+  --out configs/aea_subset_40.yaml
+
+# This flag acknowledges an acceptance already completed by the user; the
+# script never accepts a license. Signed URLs are never printed or copied.
+python scripts/download_aea_subset.py \
+  --links "$HOME/Downloads/AriaEverydayActivities_download_urls.json" \
+  --plan configs/aea_subset_40.yaml \
+  --out data/aea_raw \
+  --components annotations main_vrs \
+  --confirm-license-accepted-by-user
+
+# VRS preprocessing uses a separate Project Aria environment. The existing
+# project venv is Python 3.12, so use its interpreter to create it.
+.venv/bin/python -m venv .venv-aria
+.venv-aria/bin/python -m pip install 'projectaria-tools[all]'
+.venv-aria/bin/python scripts/preprocess_aea.py \
+  --config configs/aea_real.yaml --out data/aea_processed
+
+# Training remains in the existing project environment.
+.venv/bin/python scripts/run_aea_experiment.py \
+  --examples data/aea_processed/examples.jsonl \
+  --config configs/aea_real.yaml --out output/aea_real
+
+# Build the canonical, source-backed technical-report payload. The Codex
+# portable report builder can package this as a self-contained HTML report.
+.venv/bin/python scripts/build_aea_report_artifact.py \
+  --results output/aea_real/aea_results.json \
+  --preprocess data/aea_processed/preprocess_summary.json \
+  --out output/aea_real/artifact.json
+```
+
+The pipeline resamples the three accelerometer and three gyroscope axes together
+at 50 Hz in SI units, keeps every window from a sequence together, groups or
+purges concurrent recordings, uses paired seeds and a hierarchical bootstrap,
+and omits IMU from the primary test code path. Held-out location,
+wearer-session-proxy, and action-object-composition evaluations are reported
+separately. The wearer field is explicitly a release-visible
+location+script+recording proxy, not persistent person identity.
+
+A restricted-data-free end-to-end smoke is available:
+
+```bash
+.venv/bin/python scripts/run_aea_smoke.py
+```
+
+Its outputs are labeled `infrastructure_smoke_test_not_a_real_data_finding`.
+The report artifact records source provenance, metric definitions, the chart
+contract, and the technical-report section mapping alongside the results.
+See [the AEA phase protocol](docs/aea_real_data_phase.md) for acquisition,
+audit, positive-control, inference, and reporting details.
+
 ## Why this is deliberately small
 
 The full idea is huge. This pilot isolates the core claim:

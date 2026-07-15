@@ -1,0 +1,20 @@
+{
+  "schema_version": "aea-visible-action-protocol-amendment-freeze-receipt-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "amendment": 1,
+  "frozen_at_utc": "2026-07-15T00:07:49Z",
+  "ordering_statement": "Frozen after metadata-only infeasibility and before any new media, annotation, split, capacity, or IMU outcome.",
+  "markdown": {
+    "path": "docs/aea_visible_action_v2_preregistration_amendment_1.md",
+    "sha256": "6f61dabfe3b52e585aefc81032bd0f9dd739982f6d282784068915b45fd6f2e2"
+  },
+  "machine_readable": {
+    "path": "output/aea_visible_action_v2/preregistered_protocol_amendment_1.json",
+    "sha256": "7d11d032e2cc340d499011160a1b0d8e7d5f23927b51145edeb612e11c749535"
+  },
+  "parent_protocol_unchanged": true,
+  "new_media_viewed_before_freeze": false,
+  "new_annotations_viewed_before_freeze": false,
+  "new_model_outcomes_viewed_before_freeze": false,
+  "reserve_rgb_or_imu_accessed": false
+}

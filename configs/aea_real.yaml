@@ -1,0 +1,130 @@
+profile:
+  name: aea_action_grounding_v1
+  scientific_role: adult_partly_scripted_sensor_format_analogue_not_developmental_evidence
+  note: AEA matches sensor format, not population or developmental setting.
+
+source:
+  dataset_root: data/aea_raw
+  subset_plan: configs/aea_subset_40.yaml
+  release: 1.0.0
+  annotations_screened_before_vrs_selection: true
+
+window:
+  duration_seconds: 6.0
+  seconds_before_anchor: 3.0
+  rgb_frames: 8
+  imu_stream: imu-left
+  imu_rate_hz: 50.0
+  minimum_same_action_separation_seconds: 2.0
+  max_windows_per_action_per_sequence: 6
+  max_windows_per_sequence: 36
+
+labels:
+  minimum_asr_confidence: 0.25
+  object_max_gap_seconds: 5.0
+  actions:
+    put: [put, putting]
+    take: [take, takes, taking, took]
+    get: [get, gets, getting]
+    grab: [grab, grabs, grabbing, grabbed]
+    make: [make, makes, making, made]
+    pour: [pour, pours, pouring, poured]
+    open: [open, opens, opening, opened]
+    close: [close, closes, closing, closed]
+    wash: [wash, washes, washing, washed]
+    clean: [clean, cleans, cleaning, cleaned]
+    cook: [cook, cooks, cooking, cooked]
+    eat: [eat, eats, eating, ate]
+    drink: [drink, drinks, drinking, drank]
+    fold: [fold, folds, folding, folded]
+    play: [play, plays, playing, played]
+    read: [read, reads, reading]
+    watch: [watch, watches, watching, watched]
+    move: [move, moves, moving, moved]
+    turn: [turn, turns, turning, turned]
+    brush: [brush, brushes, brushing, brushed]
+    wipe: [wipe, wipes, wiping, wiped]
+    set: [set, sets, setting]
+    cut: [cut, cuts, cutting]
+    serve: [serve, serves, serving, served]
+    pick: [pick, picks, picking, picked]
+    bring: [bring, brings, bringing, brought]
+    walk: [walk, walks, walking, walked]
+    press: [press, presses, pressing, pressed]
+    remove: [remove, removes, removing, removed]
+    vacuum: [vacuum, vacuums, vacuuming, vacuumed]
+    stack: [stack, stacks, stacking, stacked]
+  objects:
+    coffee: [coffee]
+    cup: [cup, cups, mug, mugs]
+    water: [water]
+    sugar: [sugar]
+    cream: [cream, creamer]
+    snack: [snack, snacks]
+    food: [food]
+    egg: [egg, eggs]
+    potato: [potato, potatoes]
+    breakfast: [breakfast]
+    dinner: [dinner]
+    fridge: [fridge, refrigerator]
+    freezer: [freezer]
+    dish: [dish, dishes, plate, plates, bowl, bowls]
+    table: [table]
+    sink: [sink]
+    dishwasher: [dishwasher]
+    pan: [pan, pans]
+    pot: [pot, pots]
+    container: [container, containers]
+    laundry: [laundry]
+    clothes: [clothes, clothing, shirt, shirts, pants, sock, socks]
+    washer: [washer]
+    dryer: [dryer]
+    phone: [phone, phones, cellphone]
+    video: [video, videos]
+    game: [game, games, xbox, playstation]
+    controller: [controller, controllers]
+    book: [book, books]
+    door: [door, doors]
+    bag: [bag, bags, suitcase]
+    groceries: [groceries, grocery]
+    vacuum: [vacuum]
+    decoration: [decoration, decorations]
+    teeth: [teeth, tooth]
+    hair: [hair]
+    bed: [bed]
+
+quality:
+  minimum_imu_coverage: 0.98
+  maximum_imu_gap_ms: 50.0
+  maximum_frame_time_error_ms: 100.0
+
+storage:
+  jpeg_quality: 88
+
+experiment:
+  arms: ["null", synchronized, shuffled, time_shifted]
+  primary_estimand: synchronized_minus_split_local_episode_shuffled
+  primary_test_modalities: [rgb, transcript]
+  imu_at_primary_test: withheld_by_code_path
+  seeds: [11, 22, 33, 44, 55, 66, 77]
+  held_out_location_folds: [1, 2, 3, 4, 5]
+  held_out_compositions:
+    - {action: get, object: coffee}
+    - {action: cook, object: egg}
+    - {action: put, object: dish}
+  minimum_test_examples_per_action: 2
+  bootstrap_samples: 2000
+  effect_threshold_absolute_accuracy: 0.03
+  locked_training:
+    frame_count: 8
+    image_size: 64
+    max_text_length: 16
+    hidden_dim: 64
+    embedding_dim: 48
+    batch_size: 24
+    epochs: 8
+    learning_rate: 0.001
+    motor_weight: 0.25
+    time_shift: 20
+    bootstrap_samples: 2000
+    motor_sample_count: 60

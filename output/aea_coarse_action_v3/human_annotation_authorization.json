@@ -1,0 +1,9 @@
+{
+  "schema_version": "aea-coarse-action-human-annotation-authorization-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "status": "not_authorized",
+  "two_independent_human_annotators_authorized": false,
+  "reserve_access_authorized": false,
+  "locked_experiment_authorized": false,
+  "downloads_or_outreach_authorized": false
+}

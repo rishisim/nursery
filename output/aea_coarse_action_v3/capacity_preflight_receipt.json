@@ -1,0 +1,24 @@
+{
+  "schema_version": "aea-coarse-action-capacity-preflight-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "written_before_dense_image_access": true,
+  "gate_inputs": {
+    "coarse_annotation_gate_passed": false,
+    "split_and_donor_gate_passed": false
+  },
+  "authorized_by_stage_gates": false,
+  "dense_development_rgb_items_opened_at_write": 0,
+  "raw_vrs_opened_at_write": 0,
+  "imu_arrays_opened_at_write": 0,
+  "reserve_files_opened_at_write": 0,
+  "natural_transcripts_used": false,
+  "protocol_freeze_checks": {
+    "checks": {
+      "protocol_id": true,
+      "receipt_protocol_id": true,
+      "protocol_hash": true,
+      "preregistration_hash": true,
+      "codebook_hash": true
+    }
+  }
+}

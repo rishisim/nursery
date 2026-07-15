@@ -1,0 +1,360 @@
+{
+  "schema_version": "aea-coarse-action-preregistration-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "frozen_at_utc": "2026-07-15T00:50:15Z",
+  "scientific_role": "adult_partly_scripted_sensor_format_analogue_not_developmental_evidence_not_babyview_like",
+  "status": "terminal_development_diagnostic_not_confirmatory_effect_test",
+  "motivation": {
+    "authorized_by": "aea-visible-action-v2 non-severe REVISE",
+    "authorized_repair_count": 1,
+    "repair_used": "single_coarse_observable_action_ontology_and_two_stage_referent_interface",
+    "v2_aggregate_inputs_only": {
+      "n": 72,
+      "action_exact_agreement": 0.8194444444444444,
+      "action_kappa": 0.7770897832817337,
+      "agency_exact_agreement": 0.6666666666666666,
+      "modeled_consensus_rows": 38,
+      "modeled_consensus_rate": 0.5277777777777778,
+      "asr_visible_wearer_reference_pass_a": 5,
+      "asr_visible_wearer_reference_pass_b": 7,
+      "v2_decision": "REVISE"
+    },
+    "v1_or_v2_completed_raw_labels_read_before_freeze": false,
+    "dense_images_reviewed_under_v3_interface_before_freeze": false,
+    "v3_outcomes_seen_before_freeze": false
+  },
+  "questions": {
+    "sensor": "learnability of a fixed two-class coarse visible action from video and synchronized head IMU across held-out event groups",
+    "language": "natural-speech alignment with the visible wearer's action independent of sensor learnability"
+  },
+  "sources": {
+    "v2_dense_manifest": "output/aea_visible_action_v2/dense_clip_manifest.json",
+    "v2_dense_manifest_sha256": "772b194c145aa305775a1feade279c33ae0f38fedfb9e7ccdb945cc03f82077e",
+    "v2_reserve_access_receipt": "output/aea_visible_action_v2/reserve_access_receipt.json",
+    "v2_reserve_access_receipt_sha256": "2f20f459426292945a119b83c2b87b1d59de0694f60fa2f636cc2d2811b72a4b",
+    "development_examples": "output/aea_dev_learnability_v1/development_examples.jsonl",
+    "development_examples_sha256": "7d6e23a4589a179449ed05bd093be7acbdda75bef451261ebf594d8b343354f0",
+    "partition_manifest": "output/aea_dev_learnability_v1/partition_manifest.json",
+    "partition_manifest_sha256": "fc7b9299c01d09eb20119060134e51c048146c8dfb52a4e76726437d51783794",
+    "sample_size": 72,
+    "sample_digest_v2": "1dfc09d2490bb80c355dab2b326bceaf2eeff82080068dbc316b7fb4a6d04384",
+    "sorted_example_id_digest": "a7868ca5999049852e3f47c1f7207adac2bcea057bdea5fe2f3d1f56c91fe3e3",
+    "development_event_groups": 18,
+    "reserve_windows": 55,
+    "reserve_event_groups": [
+      "loc1_script4_seq4",
+      "loc2_script5_seq6",
+      "loc3_script2_seq3",
+      "loc4_script3_seq4",
+      "loc5_script4_seq3"
+    ],
+    "sanitized_release_metadata": "output/aea_visible_action_v2/safe_release_metadata.json",
+    "sanitized_release_metadata_sha256": "8b3e5a5dd50a4176b6cf5c316935dd2349dd2c3df658c372ecd708f0e35ae39f"
+  },
+  "prohibitions": {
+    "read_v1_or_v2_completed_annotation_labels_or_rationales": true,
+    "reserve_rgb_or_imu_access": true,
+    "construct_reserve_media_path": true,
+    "raw_vrs_or_audio_access": true,
+    "signed_url_load_print_copy_or_use": true,
+    "new_download": true,
+    "license_acceptance": true,
+    "locked_experiment": true,
+    "professor_frank_or_external_outreach": true,
+    "commit_or_push": true,
+    "overwrite_or_delete_prior_outputs": true,
+    "post_outcome_adjudication_relabel_endpoint_subset_or_threshold_change": true,
+    "additional_task_launch": true
+  },
+  "sample": {
+    "membership": "exact_v2_72_rows_no_add_remove_select_or_substitute",
+    "frames_per_row": 31,
+    "window_seconds": 6.0,
+    "evidence": "reference_existing_v2_dense_frames_without_rematerialization",
+    "new_rgb_queries": 0,
+    "blind_id_salt": "aea-coarse-action-v3-blind",
+    "pass_order_salts": {
+      "pass_a": "aea-coarse-action-v3-pass-a",
+      "pass_b": "aea-coarse-action-v3-pass-b"
+    },
+    "anchor_between_frames": [15, 16]
+  },
+  "ontology": {
+    "ordered_labels": [
+      "gross_body_motion",
+      "object_or_body_interaction",
+      "no_goal_directed_visible_action",
+      "uncertain"
+    ],
+    "modeled_labels": [
+      "gross_body_motion",
+      "object_or_body_interaction"
+    ],
+    "definitions": {
+      "gross_body_motion": "wearer locomotion, posture transition, or deliberate body/head orientation without direct object manipulation",
+      "object_or_body_interaction": "reaching/grasping, carrying/placing, operating/state change, food/material handling, cleaning/grooming, or another goal-directed manipulation of an object or body surface",
+      "no_goal_directed_visible_action": "no defensible goal-directed wearer action is visible",
+      "uncertain": "image quality, occlusion, timing ambiguity, or competing evidence prevents a defensible primary label"
+    },
+    "selection_rule": [
+      "direct_manipulation_precedes_gross_motion_when_overlapping",
+      "action_spanning_temporal_midpoint",
+      "nearest_evidence_interval",
+      "longer_evidence_interval",
+      "ontology_order"
+    ],
+    "subtypes": 0,
+    "posthoc_subsets": 0,
+    "transcript_semantics_for_visible_action_forbidden": true
+  },
+  "annotation_interface": {
+    "pass_role": "model_assisted_development_labels_not_human_annotations_or_human_interrater_reliability",
+    "context_isolated_passes": 2,
+    "mutually_blinded": true,
+    "adjudications": 0,
+    "stage_1": {
+      "name": "sealed_video_only_visible_action",
+      "transcript_present": false,
+      "anchored_verb_present": false,
+      "fields": [
+        "blind_id",
+        "observable_action",
+        "visible_confidence",
+        "evidence_frame_start",
+        "evidence_frame_end",
+        "visible_rationale"
+      ],
+      "must_complete_all_rows_before_stage_2": true
+    },
+    "stage_2": {
+      "name": "transcript_referent_and_temporal_relation",
+      "stage_1_fields_mutable": false,
+      "asr_referent_labels": [
+        "wearer_action",
+        "nonwearer_or_nonliteral",
+        "unclear"
+      ],
+      "temporal_relation_labels": [
+        "aligned",
+        "before",
+        "after",
+        "none",
+        "unclear"
+      ],
+      "fields": [
+        "blind_id",
+        "asr_referent",
+        "temporal_relation",
+        "language_confidence",
+        "language_rationale"
+      ]
+    },
+    "confidence_labels": ["high", "medium", "low"],
+    "confidence_weights": {"high": 1.0, "medium": 0.75, "low": 0.5},
+    "rationale_max_words": 25,
+    "evidence_frame_min": 0,
+    "evidence_frame_max": 30,
+    "packet_blinding": [
+      "example_id",
+      "sequence_id",
+      "event_group",
+      "location",
+      "v1_membership_and_labels",
+      "v2_labels_and_rationales",
+      "other_v3_pass",
+      "agreement_support_capacity_imu_and_decisions"
+    ]
+  },
+  "coarse_annotation_gate": {
+    "judgeable_minimum_each_pass": 0.85,
+    "action_exact_minimum": 0.70,
+    "action_kappa_minimum": 0.50,
+    "modeled_consensus_yield_minimum": 0.60,
+    "consensus_confidence_allowed": ["high", "medium"],
+    "minimum_windows_each_modeled_label": 8,
+    "minimum_event_groups_each_modeled_label": 4,
+    "required_modeled_labels": [
+      "gross_body_motion",
+      "object_or_body_interaction"
+    ],
+    "failure": "STOP_AEA_ROUTE",
+    "formal_failure": "STOP"
+  },
+  "language_alignment_gate": {
+    "all_rows_denominator": 72,
+    "aligned_consensus_definition": {
+      "both_pass_asr_referent": "wearer_action",
+      "both_pass_visible_action_in_modeled_labels": true,
+      "both_pass_temporal_relation_in": ["aligned", "before", "after"]
+    },
+    "minimum_consensus_rows": 18,
+    "minimum_consensus_rate": 0.25,
+    "minimum_wearer_action_rows_each_pass": 15,
+    "minimum_wearer_action_rate_each_pass": 0.20,
+    "referent_exact_minimum": 0.75,
+    "referent_kappa_minimum": 0.50,
+    "temporal_agreement": "reported_non_gating_for_sensor_route",
+    "failure": "STOP_LANGUAGE_ROUTE",
+    "acquisition_for_language_if_failed": false
+  },
+  "support": {
+    "endpoint": "fixed_two_class_coarse_observable_action_no_subtypes_or_subsets",
+    "eligible_rows": "exact_modeled_action_consensus_with_medium_or_high_visible_confidence_both_passes"
+  },
+  "folds": {
+    "run_if": ["coarse_annotation_gate_passed"],
+    "count": 3,
+    "development_event_groups_per_fold": 6,
+    "algorithm": "deterministic_constrained_scipy_milp_single_run",
+    "minimum_test_windows_per_label_per_fold": 2,
+    "minimum_test_event_groups_per_label_per_fold": 2,
+    "minimum_train_windows_per_label_per_fold": 4,
+    "minimum_train_event_groups_per_label_per_fold": 3,
+    "objective_order": [
+      "label_count_absolute_deviation",
+      "location_count_absolute_deviation",
+      "salted_sha256_tiebreak"
+    ],
+    "tie_salt": "aea-coarse-action-v3-fold",
+    "solver_runs": 1,
+    "infeasible_action": "persist_certified_infeasibility_no_relaxation_or_retry",
+    "failure": "STOP_AEA_ROUTE"
+  },
+  "donors": {
+    "training_intervention_seeds": [6201, 6202, 6203],
+    "imu_diagnostic_test_seeds": [6301, 6302, 6303],
+    "training_salt": "aea-coarse-action-v3-train",
+    "test_salt": "aea-coarse-action-v3-test",
+    "whole_window_bijection": true,
+    "split_local": true,
+    "self_donor_forbidden": true,
+    "same_event_group_donor_forbidden": true,
+    "feasibility_proof": "largest_group_at_most_half_of_side_and_complete_bipartite_matching",
+    "all_training_sides_required": true,
+    "all_imu_test_sides_required": true,
+    "primary_motor_withheld_test_shuffle_required": false
+  },
+  "capacity": {
+    "run_if": [
+      "coarse_annotation_gate_passed",
+      "split_and_donor_gate_passed"
+    ],
+    "control": "same_row_supervised_coarse_action_from_video",
+    "natural_transcripts_used": false,
+    "imu_used": false,
+    "frames": 12,
+    "frame_source": "even_sample_of_31_dense_frames",
+    "image_size": 64,
+    "hidden_dim": 64,
+    "embedding_dim": 64,
+    "classifier": "single_linear_head",
+    "batch_size": 16,
+    "optimizer": "AdamW",
+    "learning_rate": 0.001,
+    "epochs": 120,
+    "seeds": [7201, 7202, 7203],
+    "class_weight": "inverse_frequency_normalized_to_mean_one",
+    "augmentation": false,
+    "early_stopping": false,
+    "mean_training_balanced_accuracy_minimum": 0.90,
+    "minimum_seed_training_balanced_accuracy": 0.85,
+    "mean_loss_reduction_minimum": 0.50,
+    "failure": "STOP_AEA_ROUTE"
+  },
+  "imu": {
+    "run_if": [
+      "coarse_annotation_gate_passed",
+      "split_and_donor_gate_passed",
+      "action_head_capacity_passed"
+    ],
+    "features": "frozen_v1_v2_129_dimensional_six_axis_summary",
+    "classifier": "train_fold_standardized_class_balanced_l2_logistic_regression",
+    "C": 1.0,
+    "max_iter": 5000,
+    "bootstrap_samples": 2000,
+    "bootstrap_seed": 8201,
+    "chance_permutations": 2000,
+    "chance_permutation_seed": 8203,
+    "paired_randomizations": 10000,
+    "paired_randomization_seed": 8205,
+    "macro_chance": 0.5,
+    "minimum_above_macro_chance": 0.10,
+    "bootstrap_lower_above_macro_chance": true,
+    "chance_permutation_p_maximum": 0.05,
+    "minimum_synchronized_minus_donor": 0.05,
+    "paired_bootstrap_lower_above_zero": true,
+    "paired_randomization_p_maximum": 0.05,
+    "maximum_train_minus_heldout_gap": 0.35,
+    "outcome_directed_reruns": 0,
+    "failure": "STOP_AEA_ROUTE"
+  },
+  "analysis_budget": {
+    "annotation_passes": 2,
+    "annotation_stages_per_pass": 2,
+    "adjudications": 0,
+    "ontology_repairs_after_freeze": 0,
+    "split_solver_runs": 1,
+    "endpoint_variants": 1,
+    "capacity_model_families": 1,
+    "capacity_seeds": 3,
+    "imu_model_families": 1,
+    "outcome_directed_reruns": 0
+  },
+  "decision": {
+    "integrity_failure": {
+      "scientific_conclusion": "INTEGRITY_REPAIR_ONLY",
+      "formal": "REVISE"
+    },
+    "coarse_annotation_split_capacity_or_imu_failure": {
+      "scientific_conclusion": "STOP_AEA_ROUTE",
+      "formal": "STOP"
+    },
+    "all_sensor_gates_pass_language_fails": {
+      "language_conclusion": "STOP_LANGUAGE_ROUTE",
+      "sensor_conclusion": "RETAIN_SENSOR_ANALOG_ONLY",
+      "formal": "REVISE"
+    },
+    "all_gates_pass": {
+      "scientific_conclusion": "GO_TO_TWO_HUMAN_ANNOTATORS",
+      "formal": "GO"
+    },
+    "go_authorizes": "two_genuinely_independent_human_annotators_only",
+    "never_authorizes": [
+      "reserve_access",
+      "locked_experiment",
+      "download",
+      "license_acceptance",
+      "outreach",
+      "scientific_effect_claim"
+    ]
+  },
+  "acquisition": {
+    "reassess_without_signed_manifest": true,
+    "recommend_only_if": [
+      "coarse_annotation_gate_passed",
+      "capacity_gate_passed",
+      "relevant_route_scientifically_viable",
+      "sole_certified_bottleneck_is_group_support_or_inferential_power",
+      "synchronized_minus_donor_at_least_0_05",
+      "synchronized_accuracy_at_least_chance_plus_0_10",
+      "train_minus_heldout_gap_at_most_0_35"
+    ],
+    "language_failure_forbids_language_acquisition": true,
+    "forbidden_if": [
+      "ontology_failure",
+      "capacity_failure",
+      "valid_null",
+      "negative_or_subthreshold_point_estimate",
+      "severe_overfit",
+      "route_not_scientifically_viable"
+    ],
+    "maximum_new_recordings": 12,
+    "maximum_declared_bytes": 42949672960,
+    "maximum_declared_gib": 40.0,
+    "minimum_projected_free_gib": 150.0,
+    "components": ["annotations", "main_vrs"],
+    "safe_metadata_only": true,
+    "download": false,
+    "otherwise": "no_additional_acquisition"
+  }
+}

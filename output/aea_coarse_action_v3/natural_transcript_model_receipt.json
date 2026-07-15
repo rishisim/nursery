@@ -1,0 +1,7 @@
+{
+  "schema_version": "aea-coarse-action-natural-transcript-model-receipt-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "status": "not_run_not_authorized",
+  "reason": "v3 language viability is decided by the frozen pass-consensus alignment gate; natural transcripts cannot substitute for the action-head capacity control",
+  "model_runs": 0
+}

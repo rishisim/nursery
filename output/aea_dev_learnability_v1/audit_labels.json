@@ -1,0 +1,1410 @@
+{
+  "schema_version": "aea-dev-audit-labels-v1",
+  "protocol_id": "aea-dev-learnability-v1",
+  "source_manifest": "output/aea_dev_learnability_v1/audit_manifest_prelabel.json",
+  "source_assignments": "output/aea_dev_learnability_v1/audit_label_assignments_v1.json",
+  "sampling_salt": "aea-audit-v1",
+  "sample_size": 48,
+  "labels_inspected_at_creation": false,
+  "temporal_evidence": {
+    "ordered_frames_inspected_per_window": 8,
+    "contact_sheet_directory": "output/aea_dev_learnability_v1/audit_contact_sheets",
+    "audit_scope": "development_only",
+    "confirmation_groups_inspected": []
+  },
+  "rows": [
+    {
+      "audit_rank": 1,
+      "example_id": "loc1_script2_seq4_rec1_w0000",
+      "event_group": "loc1_script2_seq4",
+      "sequence_id": "loc1_script2_seq4_rec1",
+      "location": 1,
+      "action_verb": "bring",
+      "transcript": "creamer? For my coffee. For your coffee? That'd be great. Yeah. You can bring that over.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc1_script2_seq4_rec1/loc1_script2_seq4_rec1_w0000/frames/000.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec1/loc1_script2_seq4_rec1_w0000/frames/001.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec1/loc1_script2_seq4_rec1_w0000/frames/002.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec1/loc1_script2_seq4_rec1_w0000/frames/003.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec1/loc1_script2_seq4_rec1_w0000/frames/004.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec1/loc1_script2_seq4_rec1_w0000/frames/005.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec1/loc1_script2_seq4_rec1_w0000/frames/006.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec1/loc1_script2_seq4_rec1_w0000/frames/007.jpg"
+      ],
+      "audit_label": "plausible_or_ambiguous",
+      "rationale": "The wearer turns from the speaker to the refrigerator and opens it, compatible with retrieving and bringing creamer, but transport of the requested item is not shown."
+    },
+    {
+      "audit_rank": 2,
+      "example_id": "loc5_script4_seq5_rec1_w0011",
+      "event_group": "loc5_script4_seq5",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "location": 5,
+      "action_verb": "press",
+      "transcript": "place. Once you have to press the tab on the ECU cover, simply",
+      "frame_paths": [
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0011/frames/000.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0011/frames/001.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0011/frames/002.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0011/frames/003.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0011/frames/004.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0011/frames/005.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0011/frames/006.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0011/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "Across the strip the wearer eats while watching a phone; no ECU tab is pressed, and the verb comes from the phone tutorial."
+    },
+    {
+      "audit_rank": 3,
+      "example_id": "loc4_script3_seq3_rec1_w0005",
+      "event_group": "loc4_script3_seq3",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "location": 4,
+      "action_verb": "read",
+      "transcript": "an exception. Special. Yes exactly. See? You read my mind. Uh",
+      "frame_paths": [
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0005/frames/000.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0005/frames/001.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0005/frames/002.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0005/frames/003.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0005/frames/004.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0005/frames/005.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0005/frames/006.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0005/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer continuously stirs a bowl; no reading action occurs and 'read my mind' is figurative."
+    },
+    {
+      "audit_rank": 4,
+      "example_id": "loc4_script2_seq3_rec2_w0001",
+      "event_group": "loc4_script2_seq3",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "location": 4,
+      "action_verb": "serve",
+      "transcript": "make it. Okay. Alright. Let me know if I can help you or something. Serve the process here. Okay. Glasses.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0001/frames/000.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0001/frames/001.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0001/frames/002.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0001/frames/003.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0001/frames/004.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0001/frames/005.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0001/frames/006.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0001/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer watches another person handle a coffee maker and does not visibly serve anything."
+    },
+    {
+      "audit_rank": 5,
+      "example_id": "loc2_script4_seq5_rec1_w0009",
+      "event_group": "loc2_script4_seq5",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "location": 2,
+      "action_verb": "watch",
+      "transcript": "bright star shining off into the distance. But if you watch this peculiar light for an hour or two, the object would",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0009/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0009/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0009/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0009/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0009/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0009/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0009/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0009/frames/007.jpg"
+      ],
+      "audit_label": "plausible_or_ambiguous",
+      "rationale": "The wearer holds and faces a phone screen throughout, compatible with watching, but the spoken target is a narrated light in the phone video rather than an unambiguous wearer action label."
+    },
+    {
+      "audit_rank": 6,
+      "example_id": "loc2_script4_seq5_rec1_w0002",
+      "event_group": "loc2_script4_seq5",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "location": 2,
+      "action_verb": "wipe",
+      "transcript": "space hit the planet millions of years ago and wiped down the dinosaurs. Now, with advanced",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0002/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0002/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0002/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0002/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0002/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0002/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0002/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0002/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer eats while holding a phone; no wiping occurs and 'wiped down the dinosaurs' is narration from the phone."
+    },
+    {
+      "audit_rank": 7,
+      "example_id": "loc3_script3_seq5_rec2_w0001",
+      "event_group": "loc3_script3_seq5",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "location": 3,
+      "action_verb": "clean",
+      "transcript": "Yeah, I'm going. Sweet. Alright. Let's get some of this stuff cleaned up. Yeah. Um",
+      "frame_paths": [
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0001/frames/000.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0001/frames/001.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0001/frames/002.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0001/frames/003.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0001/frames/004.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0001/frames/005.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0001/frames/006.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0001/frames/007.jpg"
+      ],
+      "audit_label": "plausible_or_ambiguous",
+      "rationale": "The wearer moves a place setting and nearby items as the table is being cleared, compatible with cleaning up, but the exact cleaning action and agency are ambiguous."
+    },
+    {
+      "audit_rank": 8,
+      "example_id": "loc1_script3_seq5_rec1_w0007",
+      "event_group": "loc1_script3_seq5",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "location": 1,
+      "action_verb": "cut",
+      "transcript": "Alright. Oh, do you want the cutting board? Uh yes, please. Okay.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0007/frames/000.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0007/frames/001.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0007/frames/002.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0007/frames/003.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0007/frames/004.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0007/frames/005.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0007/frames/006.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0007/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer handles a container or board near food but never cuts; the lexical anchor is from 'cutting board'."
+    },
+    {
+      "audit_rank": 9,
+      "example_id": "loc2_script3_seq3_rec1_w0008",
+      "event_group": "loc2_script3_seq3",
+      "sequence_id": "loc2_script3_seq3_rec1",
+      "location": 2,
+      "action_verb": "open",
+      "transcript": "Yeah. We'll just put the oil so maybe I'll open it up. Yup. Put a little bit little",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script3_seq3_rec1/loc2_script3_seq3_rec1_w0008/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec1/loc2_script3_seq3_rec1_w0008/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec1/loc2_script3_seq3_rec1_w0008/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec1/loc2_script3_seq3_rec1_w0008/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec1/loc2_script3_seq3_rec1_w0008/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec1/loc2_script3_seq3_rec1_w0008/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec1/loc2_script3_seq3_rec1_w0008/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec1/loc2_script3_seq3_rec1_w0008/frames/007.jpg"
+      ],
+      "audit_label": "clear_match",
+      "rationale": "The wearer manipulates a lidded spread container and ends holding it open, visibly instantiating opening."
+    },
+    {
+      "audit_rank": 10,
+      "example_id": "loc2_script1_seq6_rec1_w0002",
+      "event_group": "loc2_script1_seq6",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "location": 2,
+      "action_verb": "set",
+      "transcript": "Set some of these.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0002/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0002/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0002/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0002/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0002/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0002/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0002/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0002/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer reaches into an open refrigerator and takes an item; no setting or placing action is shown."
+    },
+    {
+      "audit_rank": 11,
+      "example_id": "loc3_script3_seq5_rec1_w0010",
+      "event_group": "loc3_script3_seq5",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "location": 3,
+      "action_verb": "wash",
+      "transcript": "Let's just pour the water. Yeah, I need a little to wash that. There we go.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0010/frames/000.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0010/frames/001.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0010/frames/002.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0010/frames/003.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0010/frames/004.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0010/frames/005.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0010/frames/006.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0010/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer observes another person at the counter and does not visibly wash an object."
+    },
+    {
+      "audit_rank": 12,
+      "example_id": "loc2_script2_seq1_rec2_w0001",
+      "event_group": "loc2_script2_seq1",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "location": 2,
+      "action_verb": "drink",
+      "transcript": "Hey, you want anything to drink? Uh what do you got? Got some Arizona's",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0001/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0001/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0001/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0001/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0001/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0001/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0001/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0001/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer faces a seated person during a drink offer; neither the wearer nor the visible person drinks in the strip."
+    },
+    {
+      "audit_rank": 13,
+      "example_id": "loc3_script4_seq3_rec1_w0002",
+      "event_group": "loc3_script4_seq3",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "location": 3,
+      "action_verb": "play",
+      "transcript": "this I had all pretty much worked out for me but Maggie already played so amazingly. Follow me.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0002/frames/000.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0002/frames/001.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0002/frames/002.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0002/frames/003.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0002/frames/004.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0002/frames/005.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0002/frames/006.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0002/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The view remains on an entertainment unit and room; no wearer play action is visible, and the utterance describes someone else having played."
+    },
+    {
+      "audit_rank": 14,
+      "example_id": "loc1_script2_seq4_rec2_w0004",
+      "event_group": "loc1_script2_seq4",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "location": 1,
+      "action_verb": "pour",
+      "transcript": "Alright. I will pour out some pistachios.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0004/frames/000.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0004/frames/001.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0004/frames/002.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0004/frames/003.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0004/frames/004.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0004/frames/005.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0004/frames/006.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0004/frames/007.jpg"
+      ],
+      "audit_label": "clear_match",
+      "rationale": "The wearer positions a pistachio bag over a bowl and dispenses its contents, clearly matching pour."
+    },
+    {
+      "audit_rank": 15,
+      "example_id": "loc2_script1_seq2_rec1_w0001",
+      "event_group": "loc2_script1_seq2",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "location": 2,
+      "action_verb": "walk",
+      "transcript": "for this one. You turn your head like all the way toward the wall so I can walk by. Oh yeah yeah. Totally. Yeah. Turn your head. Alright.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0001/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0001/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0001/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0001/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0001/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0001/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0001/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0001/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer remains seated and turns the head away from the television while another person is instructed to walk by."
+    },
+    {
+      "audit_rank": 16,
+      "example_id": "loc2_script1_seq6_rec1_w0001",
+      "event_group": "loc2_script1_seq6",
+      "sequence_id": "loc2_script1_seq6_rec1",
+      "location": 2,
+      "action_verb": "grab",
+      "transcript": "Um actually, let's grab.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0001/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0001/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0001/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0001/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0001/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0001/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0001/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script1_seq6_rec1/loc2_script1_seq6_rec1_w0001/frames/007.jpg"
+      ],
+      "audit_label": "clear_match",
+      "rationale": "The wearer approaches the counter and takes two mugs into the hands, clearly matching grab."
+    },
+    {
+      "audit_rank": 17,
+      "example_id": "loc5_script4_seq5_rec1_w0008",
+      "event_group": "loc5_script4_seq5",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "location": 5,
+      "action_verb": "remove",
+      "transcript": "We want to remove the fuse box lid to gain access to the fuel fuse.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0008/frames/000.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0008/frames/001.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0008/frames/002.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0008/frames/003.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0008/frames/004.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0008/frames/005.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0008/frames/006.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0008/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer eats while watching a phone; no fuse-box lid is removed and the utterance comes from the phone tutorial."
+    },
+    {
+      "audit_rank": 18,
+      "example_id": "loc5_script5_seq5_rec1_w0003",
+      "event_group": "loc5_script5_seq5",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "location": 5,
+      "action_verb": "turn",
+      "transcript": "Now, before we race, please make sure you subscribe to this channel and hit the bell icon to turn your notifications on that way, you will not miss a single video",
+      "frame_paths": [
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0003/frames/000.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0003/frames/001.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0003/frames/002.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0003/frames/003.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0003/frames/004.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0003/frames/005.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0003/frames/006.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0003/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer holds a phone showing a video and does not visibly turn notifications on; the instruction is phone-video audio."
+    },
+    {
+      "audit_rank": 19,
+      "example_id": "loc2_script3_seq3_rec2_w0015",
+      "event_group": "loc2_script3_seq3",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "location": 2,
+      "action_verb": "cook",
+      "transcript": "Is it cooking? Are they hot? Yeah. A little more time",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0015/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0015/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0015/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0015/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0015/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0015/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0015/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0015/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "Another person handles a pan at the stove while the wearer observes; the wearer does not cook."
+    },
+    {
+      "audit_rank": 20,
+      "example_id": "loc4_script2_seq4_rec1_w0002",
+      "event_group": "loc4_script2_seq4",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "location": 4,
+      "action_verb": "eat",
+      "transcript": "any other disease but not diabetes. You have to be like you cannot eat this. You cannot do that. You cannot do that. You get a cut. You can't",
+      "frame_paths": [
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0002/frames/000.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0002/frames/001.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0002/frames/002.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0002/frames/003.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0002/frames/004.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0002/frames/005.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0002/frames/006.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0002/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer gestures during conversation at a table but does not eat; the utterance is a prohibition about eating."
+    },
+    {
+      "audit_rank": 21,
+      "example_id": "loc2_script2_seq1_rec2_w0005",
+      "event_group": "loc2_script2_seq1",
+      "sequence_id": "loc2_script2_seq1_rec2",
+      "location": 2,
+      "action_verb": "take",
+      "transcript": "Yeah, you want to take a drink of it? I wonder if",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0005/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0005/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0005/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0005/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0005/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0005/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0005/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec2/loc2_script2_seq1_rec2_w0005/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "A seated other person holds the offered drink while the wearer remains opposite; the wearer does not take it."
+    },
+    {
+      "audit_rank": 22,
+      "example_id": "loc3_script1_seq4_rec1_w0000",
+      "event_group": "loc3_script1_seq4",
+      "sequence_id": "loc3_script1_seq4_rec1",
+      "location": 3,
+      "action_verb": "move",
+      "transcript": "There's one more. Let's move this.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc3_script1_seq4_rec1/loc3_script1_seq4_rec1_w0000/frames/000.jpg",
+        "data/aea_processed/windows/loc3_script1_seq4_rec1/loc3_script1_seq4_rec1_w0000/frames/001.jpg",
+        "data/aea_processed/windows/loc3_script1_seq4_rec1/loc3_script1_seq4_rec1_w0000/frames/002.jpg",
+        "data/aea_processed/windows/loc3_script1_seq4_rec1/loc3_script1_seq4_rec1_w0000/frames/003.jpg",
+        "data/aea_processed/windows/loc3_script1_seq4_rec1/loc3_script1_seq4_rec1_w0000/frames/004.jpg",
+        "data/aea_processed/windows/loc3_script1_seq4_rec1/loc3_script1_seq4_rec1_w0000/frames/005.jpg",
+        "data/aea_processed/windows/loc3_script1_seq4_rec1/loc3_script1_seq4_rec1_w0000/frames/006.jpg",
+        "data/aea_processed/windows/loc3_script1_seq4_rec1/loc3_script1_seq4_rec1_w0000/frames/007.jpg"
+      ],
+      "audit_label": "clear_match",
+      "rationale": "The wearer visibly repositions a small craft object immediately after saying 'Let's move this.'"
+    },
+    {
+      "audit_rank": 23,
+      "example_id": "loc4_script2_seq3_rec2_w0000",
+      "event_group": "loc4_script2_seq3",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "location": 4,
+      "action_verb": "make",
+      "transcript": "actually. Yeah. Do you need some help? Um nope, I got it. I can make it. Okay. Alright. Let me know if I can help you or something. Serve",
+      "frame_paths": [
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0000/frames/000.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0000/frames/001.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0000/frames/002.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0000/frames/003.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0000/frames/004.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0000/frames/005.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0000/frames/006.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0000/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer observes another person at a coffee maker; no wearer making action is visible."
+    },
+    {
+      "audit_rank": 24,
+      "example_id": "loc1_script3_seq5_rec1_w0005",
+      "event_group": "loc1_script3_seq5",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "location": 1,
+      "action_verb": "put",
+      "transcript": "won't put it in the fridge but I'll put it right there. Okay.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0005/frames/000.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0005/frames/001.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0005/frames/002.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0005/frames/003.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0005/frames/004.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0005/frames/005.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0005/frames/006.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0005/frames/007.jpg"
+      ],
+      "audit_label": "clear_match",
+      "rationale": "The wearer carries a bowl or container across the counter area and places it at the stated location."
+    },
+    {
+      "audit_rank": 25,
+      "example_id": "loc4_script4_seq2_rec1_w0001",
+      "event_group": "loc4_script4_seq2",
+      "sequence_id": "loc4_script4_seq2_rec1",
+      "location": 4,
+      "action_verb": "get",
+      "transcript": "Getting my coffee.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc4_script4_seq2_rec1/loc4_script4_seq2_rec1_w0001/frames/000.jpg",
+        "data/aea_processed/windows/loc4_script4_seq2_rec1/loc4_script4_seq2_rec1_w0001/frames/001.jpg",
+        "data/aea_processed/windows/loc4_script4_seq2_rec1/loc4_script4_seq2_rec1_w0001/frames/002.jpg",
+        "data/aea_processed/windows/loc4_script4_seq2_rec1/loc4_script4_seq2_rec1_w0001/frames/003.jpg",
+        "data/aea_processed/windows/loc4_script4_seq2_rec1/loc4_script4_seq2_rec1_w0001/frames/004.jpg",
+        "data/aea_processed/windows/loc4_script4_seq2_rec1/loc4_script4_seq2_rec1_w0001/frames/005.jpg",
+        "data/aea_processed/windows/loc4_script4_seq2_rec1/loc4_script4_seq2_rec1_w0001/frames/006.jpg",
+        "data/aea_processed/windows/loc4_script4_seq2_rec1/loc4_script4_seq2_rec1_w0001/frames/007.jpg"
+      ],
+      "audit_label": "plausible_or_ambiguous",
+      "rationale": "The wearer walks from the hall into the kitchen while saying 'Getting my coffee,' compatible with getting it, but acquisition of coffee is not shown."
+    },
+    {
+      "audit_rank": 26,
+      "example_id": "loc4_script2_seq3_rec2_w0002",
+      "event_group": "loc4_script2_seq3",
+      "sequence_id": "loc4_script2_seq3_rec2",
+      "location": 4,
+      "action_verb": "serve",
+      "transcript": "Looks like they had a nice big. Serving this morning.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0002/frames/000.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0002/frames/001.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0002/frames/002.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0002/frames/003.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0002/frames/004.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0002/frames/005.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0002/frames/006.jpg",
+        "data/aea_processed/windows/loc4_script2_seq3_rec2/loc4_script2_seq3_rec2_w0002/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "Another person handles the coffee maker and cup while the wearer observes; the wearer does not serve."
+    },
+    {
+      "audit_rank": 27,
+      "example_id": "loc2_script4_seq5_rec1_w0005",
+      "event_group": "loc2_script4_seq5",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "location": 2,
+      "action_verb": "watch",
+      "transcript": "showing that what's really happened. I'm eating and watching YouTube. Where the giant asteroid came. How's my",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0005/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0005/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0005/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0005/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0005/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0005/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0005/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0005/frames/007.jpg"
+      ],
+      "audit_label": "clear_match",
+      "rationale": "The wearer continuously holds a phone screen in view while eating, clearly matching the stated act of watching YouTube."
+    },
+    {
+      "audit_rank": 28,
+      "example_id": "loc2_script4_seq5_rec1_w0007",
+      "event_group": "loc2_script4_seq5",
+      "sequence_id": "loc2_script4_seq5_rec1",
+      "location": 2,
+      "action_verb": "wipe",
+      "transcript": "to experience. No, you're good. I'm facing the window. Wiped out life completely on Earth. Go",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0007/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0007/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0007/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0007/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0007/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0007/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0007/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script4_seq5_rec1/loc2_script4_seq5_rec1_w0007/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer eats and watches a phone; no wiping occurs and 'wiped out life' is narration from the phone."
+    },
+    {
+      "audit_rank": 29,
+      "example_id": "loc1_script3_seq5_rec1_w0000",
+      "event_group": "loc1_script3_seq5",
+      "sequence_id": "loc1_script3_seq5_rec1",
+      "location": 1,
+      "action_verb": "clean",
+      "transcript": "Yeah. I am stuck. Sweet. Can you clean that? Yeah. Yeah. I will put this here so",
+      "frame_paths": [
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0000/frames/000.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0000/frames/001.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0000/frames/002.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0000/frames/003.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0000/frames/004.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0000/frames/005.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0000/frames/006.jpg",
+        "data/aea_processed/windows/loc1_script3_seq5_rec1/loc1_script3_seq5_rec1_w0000/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "Another person carries a bowl away while the wearer holds a phone; no wearer cleaning action is visible."
+    },
+    {
+      "audit_rank": 30,
+      "example_id": "loc4_script2_seq4_rec1_w0004",
+      "event_group": "loc4_script2_seq4",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "location": 4,
+      "action_verb": "cut",
+      "transcript": "you cannot eat this. You cannot do that. You cannot do that. You get a cut. You can't like get healed quick and stuff.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0004/frames/000.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0004/frames/001.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0004/frames/002.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0004/frames/003.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0004/frames/004.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0004/frames/005.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0004/frames/006.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0004/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer gestures during conversation and does not cut; 'get a cut' refers to an injury."
+    },
+    {
+      "audit_rank": 31,
+      "example_id": "loc2_script3_seq3_rec2_w0007",
+      "event_group": "loc2_script3_seq3",
+      "sequence_id": "loc2_script3_seq3_rec2",
+      "location": 2,
+      "action_verb": "open",
+      "transcript": "thinking we'll just put the oil. So, maybe I'll open it up. You can. Yeah.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0007/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0007/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0007/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0007/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0007/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0007/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0007/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script3_seq3_rec2/loc2_script3_seq3_rec2_w0007/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "Another person handles the cooking supplies while the wearer points and observes; the wearer does not open the oil."
+    },
+    {
+      "audit_rank": 32,
+      "example_id": "loc5_script4_seq5_rec1_w0012",
+      "event_group": "loc5_script4_seq5",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "location": 5,
+      "action_verb": "set",
+      "transcript": "unplugging the electrical connection to the fuel pump and setting the wire off to the side. Next,",
+      "frame_paths": [
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0012/frames/000.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0012/frames/001.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0012/frames/002.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0012/frames/003.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0012/frames/004.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0012/frames/005.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0012/frames/006.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0012/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer eats while watching a phone tutorial; no wire is set aside by the wearer."
+    },
+    {
+      "audit_rank": 33,
+      "example_id": "loc3_script3_seq5_rec2_w0004",
+      "event_group": "loc3_script3_seq5",
+      "sequence_id": "loc3_script3_seq5_rec2",
+      "location": 3,
+      "action_verb": "wash",
+      "transcript": "potatoes. We can maybe wash that. No. Um.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0004/frames/000.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0004/frames/001.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0004/frames/002.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0004/frames/003.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0004/frames/004.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0004/frames/005.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0004/frames/006.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec2/loc3_script3_seq5_rec2_w0004/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer carries a prepared bowl away from the counter; no washing occurs, and the utterance declines the suggested wash ('No')."
+    },
+    {
+      "audit_rank": 34,
+      "example_id": "loc2_script2_seq1_rec1_w0001",
+      "event_group": "loc2_script2_seq1",
+      "sequence_id": "loc2_script2_seq1_rec1",
+      "location": 2,
+      "action_verb": "drink",
+      "transcript": "Yeah. Hey, you want anything to drink? Uh what you got? Got some Arizona,",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script2_seq1_rec1/loc2_script2_seq1_rec1_w0001/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec1/loc2_script2_seq1_rec1_w0001/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec1/loc2_script2_seq1_rec1_w0001/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec1/loc2_script2_seq1_rec1_w0001/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec1/loc2_script2_seq1_rec1_w0001/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec1/loc2_script2_seq1_rec1_w0001/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec1/loc2_script2_seq1_rec1_w0001/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script2_seq1_rec1/loc2_script2_seq1_rec1_w0001/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "A second person approaches holding a beverage during an offer; the wearer does not drink."
+    },
+    {
+      "audit_rank": 35,
+      "example_id": "loc3_script1_seq5_rec1_w0000",
+      "event_group": "loc3_script1_seq5",
+      "sequence_id": "loc3_script1_seq5_rec1",
+      "location": 3,
+      "action_verb": "play",
+      "transcript": "Wow. Who would you want to play for?",
+      "frame_paths": [
+        "data/aea_processed/windows/loc3_script1_seq5_rec1/loc3_script1_seq5_rec1_w0000/frames/000.jpg",
+        "data/aea_processed/windows/loc3_script1_seq5_rec1/loc3_script1_seq5_rec1_w0000/frames/001.jpg",
+        "data/aea_processed/windows/loc3_script1_seq5_rec1/loc3_script1_seq5_rec1_w0000/frames/002.jpg",
+        "data/aea_processed/windows/loc3_script1_seq5_rec1/loc3_script1_seq5_rec1_w0000/frames/003.jpg",
+        "data/aea_processed/windows/loc3_script1_seq5_rec1/loc3_script1_seq5_rec1_w0000/frames/004.jpg",
+        "data/aea_processed/windows/loc3_script1_seq5_rec1/loc3_script1_seq5_rec1_w0000/frames/005.jpg",
+        "data/aea_processed/windows/loc3_script1_seq5_rec1/loc3_script1_seq5_rec1_w0000/frames/006.jpg",
+        "data/aea_processed/windows/loc3_script1_seq5_rec1/loc3_script1_seq5_rec1_w0000/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer points a remote at a television/menu; no wearer playing action is shown, and the question asks whom someone would play for."
+    },
+    {
+      "audit_rank": 36,
+      "example_id": "loc1_script2_seq4_rec2_w0006",
+      "event_group": "loc1_script2_seq4",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "location": 1,
+      "action_verb": "pour",
+      "transcript": "bowls and the moleta. Oh yeah. Yeah. We just pour up pistachios. We're good. Okay. Yeah.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0006/frames/000.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0006/frames/001.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0006/frames/002.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0006/frames/003.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0006/frames/004.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0006/frames/005.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0006/frames/006.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0006/frames/007.jpg"
+      ],
+      "audit_label": "plausible_or_ambiguous",
+      "rationale": "A bowl of pistachios, open bag, and reaching hands are visible, compatible with the just-described pour, but the actual pouring interval is not captured."
+    },
+    {
+      "audit_rank": 37,
+      "example_id": "loc2_script1_seq2_rec1_w0004",
+      "event_group": "loc2_script1_seq2",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "location": 2,
+      "action_verb": "walk",
+      "transcript": "Walking through. Yup. Yup. You're good.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0004/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0004/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0004/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0004/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0004/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0004/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0004/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0004/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer remains seated while the view shifts away from the television; 'walking through' refers to another person."
+    },
+    {
+      "audit_rank": 38,
+      "example_id": "loc1_script2_seq4_rec2_w0002",
+      "event_group": "loc1_script2_seq4",
+      "sequence_id": "loc1_script2_seq4_rec2",
+      "location": 1,
+      "action_verb": "grab",
+      "transcript": "and I'll get us some porks for the fruit. Okay. I'll grab those pretzels. Uh I got em. You're you're good.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0002/frames/000.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0002/frames/001.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0002/frames/002.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0002/frames/003.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0002/frames/004.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0002/frames/005.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0002/frames/006.jpg",
+        "data/aea_processed/windows/loc1_script2_seq4_rec2/loc1_script2_seq4_rec2_w0002/frames/007.jpg"
+      ],
+      "audit_label": "plausible_or_ambiguous",
+      "rationale": "The wearer leaves the table toward the kitchen immediately after saying they will grab pretzels, but the object pickup is outside the strip."
+    },
+    {
+      "audit_rank": 39,
+      "example_id": "loc5_script4_seq5_rec1_w0003",
+      "event_group": "loc5_script4_seq5",
+      "sequence_id": "loc5_script4_seq5_rec1",
+      "location": 5,
+      "action_verb": "remove",
+      "transcript": "easier. For instance, you may not have to remove the battery box to be able to get to it but I'm going to",
+      "frame_paths": [
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0003/frames/000.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0003/frames/001.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0003/frames/002.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0003/frames/003.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0003/frames/004.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0003/frames/005.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0003/frames/006.jpg",
+        "data/aea_processed/windows/loc5_script4_seq5_rec1/loc5_script4_seq5_rec1_w0003/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer cuts and eats food while watching a phone tutorial; no battery box is removed."
+    },
+    {
+      "audit_rank": 40,
+      "example_id": "loc2_script1_seq2_rec1_w0000",
+      "event_group": "loc2_script1_seq2",
+      "sequence_id": "loc2_script1_seq2_rec1",
+      "location": 2,
+      "action_verb": "turn",
+      "transcript": "this the I'm just in the living room for this one. You turn your head like all the way toward the wall so I can walk by. Oh yeah yeah.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0000/frames/000.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0000/frames/001.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0000/frames/002.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0000/frames/003.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0000/frames/004.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0000/frames/005.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0000/frames/006.jpg",
+        "data/aea_processed/windows/loc2_script1_seq2_rec1/loc2_script1_seq2_rec1_w0000/frames/007.jpg"
+      ],
+      "audit_label": "clear_match",
+      "rationale": "The temporal view rotates from the television toward the wall in direct response to 'turn your head,' clearly matching turn."
+    },
+    {
+      "audit_rank": 41,
+      "example_id": "loc4_script3_seq3_rec1_w0003",
+      "event_group": "loc4_script3_seq3",
+      "sequence_id": "loc4_script3_seq3_rec1",
+      "location": 4,
+      "action_verb": "cook",
+      "transcript": "here. We're cooking so don't. We'll cry.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0003/frames/000.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0003/frames/001.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0003/frames/002.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0003/frames/003.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0003/frames/004.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0003/frames/005.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0003/frames/006.jpg",
+        "data/aea_processed/windows/loc4_script3_seq3_rec1/loc4_script3_seq3_rec1_w0003/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "Another person works at the stove and opens a cabinet while the wearer observes; no wearer cooking action occurs."
+    },
+    {
+      "audit_rank": 42,
+      "example_id": "loc1_script3_seq2_rec1_w0002",
+      "event_group": "loc1_script3_seq2",
+      "sequence_id": "loc1_script3_seq2_rec1",
+      "location": 1,
+      "action_verb": "eat",
+      "transcript": "That was the for dinner? Mm hmm. Okay. Nice. I didn't eat it for dinner but I had I had it",
+      "frame_paths": [
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0002/frames/000.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0002/frames/001.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0002/frames/002.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0002/frames/003.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0002/frames/004.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0002/frames/005.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0002/frames/006.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0002/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer converses beside food but does not eat in the strip; the utterance says the referenced food was not eaten for dinner."
+    },
+    {
+      "audit_rank": 43,
+      "example_id": "loc5_script5_seq5_rec1_w0001",
+      "event_group": "loc5_script5_seq5",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "location": 5,
+      "action_verb": "take",
+      "transcript": "valve doesn't make a difference. The stock exhaust is going to take you over the sound limits and therefore,",
+      "frame_paths": [
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0001/frames/000.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0001/frames/001.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0001/frames/002.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0001/frames/003.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0001/frames/004.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0001/frames/005.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0001/frames/006.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0001/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer holds a phone showing an automotive video; 'take you over the sound limits' is tutorial narration, not a wearer taking action."
+    },
+    {
+      "audit_rank": 44,
+      "example_id": "loc3_script4_seq3_rec1_w0000",
+      "event_group": "loc3_script4_seq3",
+      "sequence_id": "loc3_script4_seq3_rec1",
+      "location": 3,
+      "action_verb": "move",
+      "transcript": "I felt huge pressure. I've just received troubling moves. Usually when you play a character, you work out as an aroma for a",
+      "frame_paths": [
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0000/frames/000.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0000/frames/001.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0000/frames/002.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0000/frames/003.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0000/frames/004.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0000/frames/005.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0000/frames/006.jpg",
+        "data/aea_processed/windows/loc3_script4_seq3_rec1/loc3_script4_seq3_rec1_w0000/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer faces an entertainment unit and operates a remote; no object or body movement matching move is visible, and 'moves' is used as a noun in the transcript."
+    },
+    {
+      "audit_rank": 45,
+      "example_id": "loc5_script5_seq5_rec1_w0002",
+      "event_group": "loc5_script5_seq5",
+      "sequence_id": "loc5_script5_seq5_rec1",
+      "location": 5,
+      "action_verb": "make",
+      "transcript": "control all all-wheel drive. We'll see what happens. Now, before we race, please make sure you subscribe to this channel and hit the bell icon to turn your notifications",
+      "frame_paths": [
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0002/frames/000.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0002/frames/001.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0002/frames/002.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0002/frames/003.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0002/frames/004.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0002/frames/005.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0002/frames/006.jpg",
+        "data/aea_processed/windows/loc5_script5_seq5_rec1/loc5_script5_seq5_rec1_w0002/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer holds a phone showing a video; 'make sure' is part of the video's subscription request and is not a visible making action."
+    },
+    {
+      "audit_rank": 46,
+      "example_id": "loc4_script2_seq4_rec1_w0001",
+      "event_group": "loc4_script2_seq4",
+      "sequence_id": "loc4_script2_seq4_rec1",
+      "location": 4,
+      "action_verb": "put",
+      "transcript": "No. Just trying to put something to put in the beer.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0001/frames/000.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0001/frames/001.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0001/frames/002.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0001/frames/003.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0001/frames/004.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0001/frames/005.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0001/frames/006.jpg",
+        "data/aea_processed/windows/loc4_script2_seq4_rec1/loc4_script2_seq4_rec1_w0001/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "Another person handles and carries a mug while the wearer observes; no wearer putting action is visible."
+    },
+    {
+      "audit_rank": 47,
+      "example_id": "loc1_script3_seq2_rec1_w0000",
+      "event_group": "loc1_script3_seq2",
+      "sequence_id": "loc1_script3_seq2_rec1",
+      "location": 1,
+      "action_verb": "get",
+      "transcript": "out. Yeah. A little little hot. Skits getting hot out but. Mm hmm. What did you get from the",
+      "frame_paths": [
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0000/frames/000.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0000/frames/001.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0000/frames/002.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0000/frames/003.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0000/frames/004.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0000/frames/005.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0000/frames/006.jpg",
+        "data/aea_processed/windows/loc1_script3_seq2_rec1/loc1_script3_seq2_rec1_w0000/frames/007.jpg"
+      ],
+      "audit_label": "mismatch",
+      "rationale": "The wearer remains seated and gestures during conversation; no getting or retrieval action occurs in the strip."
+    },
+    {
+      "audit_rank": 48,
+      "example_id": "loc3_script3_seq5_rec1_w0001",
+      "event_group": "loc3_script3_seq5",
+      "sequence_id": "loc3_script3_seq5_rec1",
+      "location": 3,
+      "action_verb": "clean",
+      "transcript": "Yeah, I'm going. Alright. Let's get some of this stuff cleaned up. Yeah.",
+      "frame_paths": [
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0001/frames/000.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0001/frames/001.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0001/frames/002.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0001/frames/003.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0001/frames/004.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0001/frames/005.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0001/frames/006.jpg",
+        "data/aea_processed/windows/loc3_script3_seq5_rec1/loc3_script3_seq5_rec1_w0001/frames/007.jpg"
+      ],
+      "audit_label": "plausible_or_ambiguous",
+      "rationale": "The wearer moves the plate and table items while the other person stands to clear the table, compatible with cleaning up, but the exact cleaning action is not fully visible."
+    }
+  ],
+  "coverage": {
+    "sampled_windows": 48,
+    "sampled_actions": 25,
+    "sampled_event_groups": 18,
+    "sampled_locations": 5,
+    "by_category": {
+      "clear_match": 7,
+      "mismatch": 34,
+      "plausible_or_ambiguous": 7,
+      "not_visually_judgeable": 0
+    },
+    "by_action": {
+      "bring": {
+        "n": 1,
+        "audit_label_counts": {
+          "plausible_or_ambiguous": 1
+        }
+      },
+      "clean": {
+        "n": 3,
+        "audit_label_counts": {
+          "mismatch": 1,
+          "plausible_or_ambiguous": 2
+        }
+      },
+      "cook": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "cut": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "drink": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "eat": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "get": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 1,
+          "plausible_or_ambiguous": 1
+        }
+      },
+      "grab": {
+        "n": 2,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "plausible_or_ambiguous": 1
+        }
+      },
+      "make": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "move": {
+        "n": 2,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "mismatch": 1
+        }
+      },
+      "open": {
+        "n": 2,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "mismatch": 1
+        }
+      },
+      "play": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "pour": {
+        "n": 2,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "plausible_or_ambiguous": 1
+        }
+      },
+      "press": {
+        "n": 1,
+        "audit_label_counts": {
+          "mismatch": 1
+        }
+      },
+      "put": {
+        "n": 2,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "mismatch": 1
+        }
+      },
+      "read": {
+        "n": 1,
+        "audit_label_counts": {
+          "mismatch": 1
+        }
+      },
+      "remove": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "serve": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "set": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "take": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "turn": {
+        "n": 2,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "mismatch": 1
+        }
+      },
+      "walk": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "wash": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "watch": {
+        "n": 2,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "plausible_or_ambiguous": 1
+        }
+      },
+      "wipe": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      }
+    },
+    "by_event_group": {
+      "loc1_script2_seq4": {
+        "n": 4,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "plausible_or_ambiguous": 3
+        }
+      },
+      "loc1_script3_seq2": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "loc1_script3_seq5": {
+        "n": 3,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "mismatch": 2
+        }
+      },
+      "loc2_script1_seq2": {
+        "n": 3,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "mismatch": 2
+        }
+      },
+      "loc2_script1_seq6": {
+        "n": 2,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "mismatch": 1
+        }
+      },
+      "loc2_script2_seq1": {
+        "n": 3,
+        "audit_label_counts": {
+          "mismatch": 3
+        }
+      },
+      "loc2_script3_seq3": {
+        "n": 3,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "mismatch": 2
+        }
+      },
+      "loc2_script4_seq5": {
+        "n": 4,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "mismatch": 2,
+          "plausible_or_ambiguous": 1
+        }
+      },
+      "loc3_script1_seq4": {
+        "n": 1,
+        "audit_label_counts": {
+          "clear_match": 1
+        }
+      },
+      "loc3_script1_seq5": {
+        "n": 1,
+        "audit_label_counts": {
+          "mismatch": 1
+        }
+      },
+      "loc3_script3_seq5": {
+        "n": 4,
+        "audit_label_counts": {
+          "mismatch": 2,
+          "plausible_or_ambiguous": 2
+        }
+      },
+      "loc3_script4_seq3": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "loc4_script2_seq3": {
+        "n": 3,
+        "audit_label_counts": {
+          "mismatch": 3
+        }
+      },
+      "loc4_script2_seq4": {
+        "n": 3,
+        "audit_label_counts": {
+          "mismatch": 3
+        }
+      },
+      "loc4_script3_seq3": {
+        "n": 2,
+        "audit_label_counts": {
+          "mismatch": 2
+        }
+      },
+      "loc4_script4_seq2": {
+        "n": 1,
+        "audit_label_counts": {
+          "plausible_or_ambiguous": 1
+        }
+      },
+      "loc5_script4_seq5": {
+        "n": 4,
+        "audit_label_counts": {
+          "mismatch": 4
+        }
+      },
+      "loc5_script5_seq5": {
+        "n": 3,
+        "audit_label_counts": {
+          "mismatch": 3
+        }
+      }
+    },
+    "by_location": {
+      "1": {
+        "n": 9,
+        "audit_label_counts": {
+          "clear_match": 2,
+          "mismatch": 4,
+          "plausible_or_ambiguous": 3
+        }
+      },
+      "2": {
+        "n": 15,
+        "audit_label_counts": {
+          "clear_match": 4,
+          "mismatch": 10,
+          "plausible_or_ambiguous": 1
+        }
+      },
+      "3": {
+        "n": 8,
+        "audit_label_counts": {
+          "clear_match": 1,
+          "mismatch": 5,
+          "plausible_or_ambiguous": 2
+        }
+      },
+      "4": {
+        "n": 9,
+        "audit_label_counts": {
+          "mismatch": 8,
+          "plausible_or_ambiguous": 1
+        }
+      },
+      "5": {
+        "n": 7,
+        "audit_label_counts": {
+          "mismatch": 7
+        }
+      }
+    }
+  },
+  "uncertainty": {
+    "method": "two-sided Wilson 95% interval; z=1.959963984540054",
+    "judgeable": {
+      "numerator": 48,
+      "denominator": 48,
+      "rate": 1,
+      "wilson_95": {
+        "low": 0.9258998703338824,
+        "high": 0.9999999999999998
+      }
+    },
+    "clear_match": {
+      "numerator": 7,
+      "denominator": 48,
+      "rate": 0.14583333333333334,
+      "wilson_95": {
+        "low": 0.0724824932660371,
+        "high": 0.27167176524746284
+      }
+    },
+    "clear_or_plausible": {
+      "numerator": 14,
+      "denominator": 48,
+      "rate": 0.2916666666666667,
+      "wilson_95": {
+        "low": 0.18241578926516536,
+        "high": 0.43179259809571696
+      }
+    },
+    "mismatch": {
+      "numerator": 34,
+      "denominator": 48,
+      "rate": 0.7083333333333334,
+      "wilson_95": {
+        "low": 0.5682074019042831,
+        "high": 0.8175842107348348
+      }
+    },
+    "not_visually_judgeable": {
+      "numerator": 0,
+      "denominator": 48,
+      "rate": 0,
+      "wilson_95": {
+        "low": 6.424720965888271e-18,
+        "high": 0.0741001296661175
+      }
+    }
+  },
+  "audit_integrity_checks": {
+    "row_count_matches_manifest": true,
+    "all_assignments_unique_and_present": true,
+    "all_rows_have_eight_frames": true,
+    "allowed_labels_only": true,
+    "confirmation_event_group_overlap": []
+  }
+}

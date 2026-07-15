@@ -1,0 +1,109 @@
+{
+  "schema_version": "aea-visible-action-provenance-v2",
+  "protocol_id": "aea-visible-action-v2",
+  "generated_at_utc": "2026-07-15T00:38:31.381221+00:00",
+  "repository": "/Users/rishisim/Documents/research/nursery",
+  "git": {
+    "head": "0c8a700262c426bd626b858610085b169b5a4b86",
+    "branch": "main",
+    "dirty_checkout_preserved": true,
+    "commit_created": false,
+    "push_performed": false
+  },
+  "ordering": [
+    "Read v1 evidence, implementation, dirty diff, and ran the 52-test baseline before v2 work.",
+    "Froze v2 markdown and machine protocol before new media or outcomes.",
+    "Recorded a metadata-only pre-evidence sampling amendment after exact four-per-group proved impossible; original freeze remained unchanged.",
+    "Materialized 31-frame development-only evidence after reserve preflight.",
+    "Ran two separately randomized, context-isolated blinded model-assisted passes.",
+    "Applied agreement/support gates once, then split, capacity, transcript, and IMU stage gates in frozen order.",
+    "Applied the mechanical decision and safe metadata-only acquisition rule once.",
+    "Ran the full suite and git diff --check after implementation."
+  ],
+  "commands": [
+    ".venv/bin/python -m pytest -q  # baseline: 52 passed",
+    ".venv-aria/bin/python scripts/prepare_aea_visible_action_v2.py",
+    "context-isolated delegated annotation pass A -> output/aea_visible_action_v2/model_assisted_pass_a.json",
+    "context-isolated delegated annotation pass B -> output/aea_visible_action_v2/model_assisted_pass_b.json",
+    ".venv/bin/python scripts/summarize_aea_visible_action_v2.py",
+    ".venv/bin/python scripts/run_aea_visible_action_v2_capacity.py --device auto",
+    ".venv/bin/python scripts/run_aea_visible_action_v2_imu.py",
+    ".venv/bin/python scripts/finalize_aea_visible_action_v2.py",
+    ".venv/bin/python -m compileall -q babyworld_lite scripts",
+    ".venv/bin/python -m pytest -q",
+    "git diff --check",
+    ".venv/bin/python scripts/write_aea_visible_action_v2_provenance.py --tests-passed 59 --test-seconds 2.76"
+  ],
+  "verification": {
+    "full_tests_passed": true,
+    "test_count": 59,
+    "pytest_seconds": 2.76,
+    "compileall_passed": true,
+    "git_diff_check_passed": true
+  },
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "torch": "2.13.0",
+    "scikit_learn": "1.9.0",
+    "scipy": "1.18.0",
+    "numpy": "2.5.1",
+    "pillow": "12.3.0",
+    "mps_available": true
+  },
+  "sha256": {
+    "preregistered_protocol.json": "b17ae9869461f508f7b63d7d90ad69ab4779554bd800af1f3a79fc9addf147ab",
+    "protocol_freeze_receipt.json": "62a568fa2fad216afb202bba3e23dd7426464d9db34f6f01d31a64aad5a706c9",
+    "preregistered_protocol_amendment_1.json": "7d11d032e2cc340d499011160a1b0d8e7d5f23927b51145edeb612e11c749535",
+    "protocol_amendment_1_freeze_receipt.json": "28d71c25bd35c72c6c5878f7fb0d90f14bd80111e53e541144820dd47e6a47d8",
+    "implementation_clarification_receipt.json": "5b0928b2cfffce39df8412a77d0def18c89b6c73554eb8156b0a4dadb855ade3",
+    "annotation_codebook.md": "9c020cde9e2d55147b81b6eb9242d729a38408a3770c9d2cdba9e4dc18d8c835",
+    "dense_preflight_receipt.json": "a1dd68d8629dbbf0f98155013c0a56a175c441ff9c88128bf8f18c2301e7ac99",
+    "dense_clip_manifest.json": "772b194c145aa305775a1feade279c33ae0f38fedfb9e7ccdb945cc03f82077e",
+    "reserve_access_receipt.json": "2f20f459426292945a119b83c2b87b1d59de0694f60fa2f636cc2d2811b72a4b",
+    "annotation_packet_pass_a.json": "47adc06b25c724f38cdec5fcdcfd1523f707ebd55b6c17085daddef5ce54ae94",
+    "annotation_packet_pass_b.json": "ea03aaa801ce47eda7dbbf0f04ff41d5e6b5a4b5f4159f6dec274a2da00be202",
+    "model_assisted_pass_a.json": "98cd7d5545e95c80c247c054736a714dfeb8826525f93f57c919ab8919ed55f4",
+    "model_assisted_pass_b.json": "fa98003dcc8d805d329d6ac4b25ae663476fcb8b2311fc0dc26093fa4dbee191",
+    "agreement_report.json": "374c188c9fb5f5001741d21a01ef11a65326d3db6e7ab0293f36afdeab454e82",
+    "agreement_report.md": "04f0abb14565a37f749b6294ec8f973c77fc735fcfca5ca5383f396648991eb1",
+    "consensus_labels.json": "61a56a450e5174c141ed97e34ce4dd8b099ba20156c31052ef1091c4c8eaa198",
+    "split_donor_feasibility.json": "44b5251b8165c375636e3f8be35ef8274e5c9f96a730c698f616cd3a697017a8",
+    "capacity_results.json": "5ce435e792f470441d4cca9d3c4bf1e340f67751482843c5925039b125d22012",
+    "transcript_control_results.json": "3618c674f85e8ef05e8a1e44022cbeeaf5e6f79afa81c35e5fe982fc8a1cfe63",
+    "imu_preflight_receipt.json": "9371327d8d198ceec04f3a895727785b0304d406acb4467abcc7f2903ccc3f27",
+    "imu_results.json": "3d601df1070b7cd95e166000117c0fd87f40f8bc07ad3e4100ef43a1e90c3702",
+    "safe_release_metadata.json": "8b3e5a5dd50a4176b6cf5c316935dd2349dd2c3df658c372ecd708f0e35ae39f",
+    "acquisition_recommendation.json": "de17dd9ae58f3534ee6f98a80ae41bbcc0eb35391eb298a8d745dc66c5cb778d",
+    "human_annotation_packet.json": "e8c02c1acc7a140a05c7592ebff159a85fda63bc0117944a5c350ba632db517b",
+    "aea_visible_action_v2_results.json": "bb445f02a0e59ba796096e32fcfc9df8df53f7a0a0f34cae617475b7d7600949",
+    "scientific_report.md": "b602045032b5e533d98f8e41db128b76cb366aa11c7cebe8d24cf70448b41609"
+  },
+  "dense_evidence_tree": {
+    "files": 2448,
+    "bytes": 676132193,
+    "sha256": "9bd98844c73a8ae3c4a30cf6d4a16438f4f80ae3f8cb57026a6443aab63d171e"
+  },
+  "reserve_and_secret_safeguards": {
+    "dense_reserve_rgb_files_opened": 0,
+    "dense_reserve_imu_arrays_opened": 0,
+    "conditional_reserve_imu_arrays_opened": 0,
+    "signed_urls_loaded_printed_or_copied": false,
+    "external_manifest_serialized": false
+  },
+  "decision": {
+    "recommendation": "REVISE",
+    "reason": "non-severe frozen annotation stability threshold miss",
+    "authorizes": "one prospectively frozen ontology/interface repair only"
+  },
+  "prohibited_actions_not_performed": [
+    "prospective reserve RGB or IMU access",
+    "locked experiment",
+    "new recording download",
+    "license acceptance",
+    "Professor Frank or other external outreach",
+    "commit or push",
+    "overwrite or deletion of v1/smoke artifacts",
+    "signed URL printing, copying, or use"
+  ]
+}

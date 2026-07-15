@@ -1,0 +1,592 @@
+{
+  "schema_version": "aea-coarse-action-model-pass-stage1-v3",
+  "protocol_id": "aea-coarse-action-v3",
+  "pass": "pass_a",
+  "stage": "stage_1_sealed_video_only_visible_action",
+  "role": "model_assisted_development_labels_not_human_annotations_or_human_interrater_reliability",
+  "source_packet": "output/aea_coarse_action_v3/annotation_packet_pass_a_stage1_visual.json",
+  "source_packet_sha256": "85470cf48ce9da8b6248bae6facf57e1627ea9fd695bf67c26aaf32cadbcc62f",
+  "completed_without_transcript_or_anchored_verb": true,
+  "other_pass_read": false,
+  "v1_or_v2_completed_labels_or_rationales_read": false,
+  "reserve_media_opened": false,
+  "raw_vrs_audio_or_imu_opened": false,
+  "rows": [
+    {
+      "blind_id": "CA3-A5C5F3CE0B0A",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "Only the seated nonwearer gestures; the wearer remains visually stationary."
+    },
+    {
+      "blind_id": "CA3-47944BBABBC9",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 24,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer deliberately turns from the television toward the room's right side."
+    },
+    {
+      "blind_id": "CA3-4335FB36D5D8",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 11,
+      "evidence_frame_end": 16,
+      "visible_rationale": "Wearer's hand reaches to the tabletop and manipulates a small utensil or object."
+    },
+    {
+      "blind_id": "CA3-DDB2F798DBD4",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "Tabletop objects remain static with no visible wearer manipulation or body transition."
+    },
+    {
+      "blind_id": "CA3-3F50142B28E7",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 12,
+      "evidence_frame_end": 19,
+      "visible_rationale": "Wearer grasps and lifts two cups or small containers at the counter."
+    },
+    {
+      "blind_id": "CA3-DA3A25711A28",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "The phone is held statically without a defensible visible operation."
+    },
+    {
+      "blind_id": "CA3-3447525300F7",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer walks and turns through the kitchen toward another person."
+    },
+    {
+      "blind_id": "CA3-551DE13C0653",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 6,
+      "evidence_frame_end": 23,
+      "visible_rationale": "Wearer traverses and reorients through the kitchen across the temporal midpoint."
+    },
+    {
+      "blind_id": "CA3-A706276306B0",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "medium",
+      "evidence_frame_start": 14,
+      "evidence_frame_end": 21,
+      "visible_rationale": "Wearer deliberately turns view between the nonwearer and counter around the midpoint."
+    },
+    {
+      "blind_id": "CA3-624AAA87BC4F",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 17,
+      "visible_rationale": "Wearer's right hand uses a utensil and handles food while the left holds a phone."
+    },
+    {
+      "blind_id": "CA3-C2BA7D7FB4DD",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 11,
+      "evidence_frame_end": 27,
+      "visible_rationale": "Wearer deliberately turns away from the nonwearer and across the countertop."
+    },
+    {
+      "blind_id": "CA3-B7036DE9D276",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Both hands continuously handle a container, lid, and food-preparation items."
+    },
+    {
+      "blind_id": "CA3-5F0891D03382",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "The seated wearer only gestures conversationally while the nonwearer handles items."
+    },
+    {
+      "blind_id": "CA3-37AB0FBF224A",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "The nonwearer opens a cabinet while the wearer only observes."
+    },
+    {
+      "blind_id": "CA3-5EF95A7E6057",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "Seated conversational hand gestures do not establish a goal-directed wearer action."
+    },
+    {
+      "blind_id": "CA3-EE612D22F786",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "The room and television view remains static; minor drift is not deliberate orientation."
+    },
+    {
+      "blind_id": "CA3-ACBE2028651D",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 15,
+      "evidence_frame_end": 24,
+      "visible_rationale": "Wearer reaches into the open refrigerator and handles an item on a shelf."
+    },
+    {
+      "blind_id": "CA3-352AD7C3F0C9",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "The wearer's visible hand movement is conversational gesturing, not a defensible goal-directed action."
+    },
+    {
+      "blind_id": "CA3-1EB5E91D9382",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer continuously stirs or mixes contents in the yellow bowl."
+    },
+    {
+      "blind_id": "CA3-AB40754C93AC",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer walks down the hallway and enters the kitchen."
+    },
+    {
+      "blind_id": "CA3-3C21590996B7",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 23,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer lifts, repositions, and closes a clear food container late in the clip."
+    },
+    {
+      "blind_id": "CA3-AA20CEFF1BDE",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 23,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer reaches into the snack bowl and handles food after statically holding a phone."
+    },
+    {
+      "blind_id": "CA3-6209B7A50B37",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "medium",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 7,
+      "visible_rationale": "Wearer deliberately turns to center the television, then remains still."
+    },
+    {
+      "blind_id": "CA3-4335CA330980",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 12,
+      "evidence_frame_end": 24,
+      "visible_rationale": "Wearer opens and holds the moving refrigerator door while the nonwearer retrieves an item."
+    },
+    {
+      "blind_id": "CA3-9DB238BD455A",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 18,
+      "evidence_frame_end": 29,
+      "visible_rationale": "Wearer's right hand handles a utensil or food while the left holds a phone."
+    },
+    {
+      "blind_id": "CA3-3469D72E7A2B",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 13,
+      "evidence_frame_end": 28,
+      "visible_rationale": "Wearer deliberately turns from the television toward the windows and right side."
+    },
+    {
+      "blind_id": "CA3-8ED2505125EC",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 13,
+      "evidence_frame_end": 22,
+      "visible_rationale": "Wearer turns and approaches the refrigerator after viewing the nonwearer."
+    },
+    {
+      "blind_id": "CA3-39BA43B2F9E4",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 8,
+      "evidence_frame_end": 24,
+      "visible_rationale": "Wearer leaves the table and turns toward the distant nonwearer."
+    },
+    {
+      "blind_id": "CA3-4F25163A5146",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "medium",
+      "evidence_frame_start": 25,
+      "evidence_frame_end": 30,
+      "visible_rationale": "A late deliberate head turn pans away from the seated nonwearer."
+    },
+    {
+      "blind_id": "CA3-1079C11B38B4",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "The phone is held statically without visible screen change or finger operation."
+    },
+    {
+      "blind_id": "CA3-91B29D38DAAB",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 10,
+      "evidence_frame_end": 20,
+      "visible_rationale": "Wearer lifts and handles the smartphone from the tabletop across the midpoint."
+    },
+    {
+      "blind_id": "CA3-DE514C06F855",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer continuously uses utensils to cut and handle cake on the plate."
+    },
+    {
+      "blind_id": "CA3-2CAAD68FF5C0",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 27,
+      "visible_rationale": "Wearer turns and walks from the stove toward another counter and nonwearer."
+    },
+    {
+      "blind_id": "CA3-B5657D63AE40",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 8,
+      "evidence_frame_end": 18,
+      "visible_rationale": "Wearer turns from the stove toward the cutting board while statically holding a cup."
+    },
+    {
+      "blind_id": "CA3-0D1874FFF6F7",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "medium",
+      "evidence_frame_start": 20,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer approaches and reorients behind the nonwearer late in the clip."
+    },
+    {
+      "blind_id": "CA3-C6BD9D19E8E0",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 29,
+      "visible_rationale": "Wearer walks and turns across the kitchen toward the wall ovens."
+    },
+    {
+      "blind_id": "CA3-32D78A728502",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "Only the nonwearer gestures and reaches; the wearer remains visually stationary."
+    },
+    {
+      "blind_id": "CA3-029A6C7E5B0F",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "The phone is held statically without a defensible visible operation."
+    },
+    {
+      "blind_id": "CA3-CBFC8E6C2040",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 5,
+      "evidence_frame_end": 8,
+      "visible_rationale": "Wearer raises, aims, and operates a remote before lowering it."
+    },
+    {
+      "blind_id": "CA3-4219884A20FE",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer's right hand uses a spoon and handles food while the left holds a phone."
+    },
+    {
+      "blind_id": "CA3-6C911EAFA23C",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "The wearer only gestures conversationally without goal-directed manipulation or a body transition."
+    },
+    {
+      "blind_id": "CA3-94D600A099D9",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer deliberately pans across the counter from the nonwearer to the preparation area and back."
+    },
+    {
+      "blind_id": "CA3-D70F584519F2",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "The nonwearer gestures and touches their hair while the wearer remains stationary."
+    },
+    {
+      "blind_id": "CA3-808FEB6D39A9",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer lifts, turns, and handles packaged food containers on the counter."
+    },
+    {
+      "blind_id": "CA3-259860F77C81",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 27,
+      "visible_rationale": "Wearer carries food on a utensil from the bowl across the kitchen."
+    },
+    {
+      "blind_id": "CA3-525665C52804",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "medium",
+      "evidence_frame_start": 24,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer's hand reaches toward and operates the smartphone on the table late in the clip."
+    },
+    {
+      "blind_id": "CA3-76CB79A5A739",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 10,
+      "visible_rationale": "Wearer makes a large deliberate turn from the couch area toward the standing nonwearer."
+    },
+    {
+      "blind_id": "CA3-1B0B0BF63F48",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "medium",
+      "evidence_frame_start": 23,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer makes a late deliberate head turn across the table; the glass remains statically held."
+    },
+    {
+      "blind_id": "CA3-E2F90CA71FB7",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Phone content changes repeatedly as the wearer visibly operates the device."
+    },
+    {
+      "blind_id": "CA3-2CA4F1A124DF",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 19,
+      "evidence_frame_end": 24,
+      "visible_rationale": "Wearer raises and aims a remote during the nearest visible action."
+    },
+    {
+      "blind_id": "CA3-E7EB29E4D8B8",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 15,
+      "visible_rationale": "Wearer cuts and handles cake with utensils through the first half."
+    },
+    {
+      "blind_id": "CA3-7C243B0A9ADD",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 20,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer deliberately turns away from the seated nonwearer and back toward the table."
+    },
+    {
+      "blind_id": "CA3-584BC804DAC0",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "medium",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "Only the nonwearer acts at the counter; slight camera drift is not defensibly deliberate."
+    },
+    {
+      "blind_id": "CA3-5B3B3CCE2444",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer deliberately turns from the television across the chairs and windows."
+    },
+    {
+      "blind_id": "CA3-41CC78732CFB",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 13,
+      "evidence_frame_end": 24,
+      "visible_rationale": "Wearer raises, aims, and operates a remote across the temporal midpoint."
+    },
+    {
+      "blind_id": "CA3-43FEA4D2AA3A",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "Only the nonwearer cooks and gestures; no wearer action is visible."
+    },
+    {
+      "blind_id": "CA3-E8E09430905A",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 23,
+      "evidence_frame_end": 27,
+      "visible_rationale": "Wearer raises and aims a remote after the midpoint."
+    },
+    {
+      "blind_id": "CA3-3B8D8D4B2F0E",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "Only the nonwearer handles counter objects while the wearer observes."
+    },
+    {
+      "blind_id": "CA3-E190AE6E25AF",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer actively rotates and operates the smartphone as its screen orientation changes."
+    },
+    {
+      "blind_id": "CA3-BB7565A74BA3",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer taps the phone into a list or text interface and continues operating it."
+    },
+    {
+      "blind_id": "CA3-316B46334495",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Both hands continuously manipulate craft letters or toys in front of the screen."
+    },
+    {
+      "blind_id": "CA3-53B92AC6705D",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "The visible utensil, plate, and wearer hand remain static throughout the clip."
+    },
+    {
+      "blind_id": "CA3-F213B53C3A40",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "The wearer only gestures conversationally while the nonwearer handles an object."
+    },
+    {
+      "blind_id": "CA3-D22D2B0CB12E",
+      "observable_action": "no_goal_directed_visible_action",
+      "visible_confidence": "high",
+      "evidence_frame_start": null,
+      "evidence_frame_end": null,
+      "visible_rationale": "Only the nonwearer cooks and uses a phone; the wearer remains stationary."
+    },
+    {
+      "blind_id": "CA3-48C0A504A764",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "medium",
+      "evidence_frame_start": 24,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer makes a deliberate late head turn from the nonwearer toward the tabletop."
+    },
+    {
+      "blind_id": "CA3-CF4881A7B5A6",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 15,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer turns and walks away from the counter while following the nonwearer."
+    },
+    {
+      "blind_id": "CA3-505C5C420660",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 9,
+      "visible_rationale": "Wearer manipulates utensils and food on the plate before the midpoint."
+    },
+    {
+      "blind_id": "CA3-074DDC457CB2",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Phone content changes repeatedly as the wearer scrolls or operates the device."
+    },
+    {
+      "blind_id": "CA3-0149CAF81C5B",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Wearer repeatedly lifts, tilts, and repositions the frying pan."
+    },
+    {
+      "blind_id": "CA3-0671E35E54E7",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 18,
+      "evidence_frame_end": 30,
+      "visible_rationale": "After lowering a device, wearer deliberately turns view across the dining room."
+    },
+    {
+      "blind_id": "CA3-24A41EE2FF9A",
+      "observable_action": "object_or_body_interaction",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 30,
+      "visible_rationale": "Phone content changes repeatedly as the wearer scrolls or operates the device."
+    },
+    {
+      "blind_id": "CA3-A3AE89453605",
+      "observable_action": "gross_body_motion",
+      "visible_confidence": "high",
+      "evidence_frame_start": 0,
+      "evidence_frame_end": 23,
+      "visible_rationale": "Wearer deliberately reorients to follow the nonwearer moving toward and sitting on the couch."
+    }
+  ]
+}
