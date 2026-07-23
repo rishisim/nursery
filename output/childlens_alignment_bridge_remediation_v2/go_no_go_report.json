@@ -1,0 +1,86 @@
+{
+  "schema_version": "childlens-alignment-bridge-remediation-go-no-go-v2.0.0",
+  "decision": "NO_GO_DO_NOT_PROCEED_TO_LOCKED_ALIGNMENT",
+  "scientific_summary": "Shared dedicated VAD segments repaired most of the median transcript disagreement, showing that mismatched ASR boundaries were a major contributor to v1. The remediation still fails participant-coverage and participant-bootstrap lower-bound gates, so population-level measurement stability is not established.",
+  "development_only": {
+    "participants": 8,
+    "locked_rows_loaded_or_evaluated": 0
+  },
+  "diagnosis": {
+    "speech_segmentation_and_boundaries": {
+      "accepted_segments": 85,
+      "accepted_speech_seconds": 307.422,
+      "participant_median_annotation_precision": 0.98,
+      "participant_median_annotation_recall": 0.719,
+      "participant_median_vad_self_consistency_boundary_f1": 0.911,
+      "boundary_f1_bootstrap_90pct": [
+        0.527,
+        0.986
+      ],
+      "participant_median_duration_change_seconds": 0.013,
+      "participant_median_coverage_ratio": 1.016,
+      "interpretation": "Typical timing behavior was stable, but the frozen 0.65 bootstrap-lower requirement failed and not every development participant produced accepted VAD speech."
+    },
+    "matched_segment_transcripts": {
+      "primary_nonempty_item_fraction": 0.875,
+      "sensitivity_nonempty_item_fraction": 0.875,
+      "primary_german_item_fraction": 0.875,
+      "language_id_agreement_fraction": 0.875,
+      "participant_median_character_similarity": 0.819,
+      "character_similarity_bootstrap_90pct": [
+        0.256,
+        0.948
+      ],
+      "participant_median_embedding_cosine": 0.922,
+      "embedding_cosine_bootstrap_90pct": [
+        0.741,
+        0.985
+      ],
+      "interpretation": "Median lexical and semantic model-model agreement passed after boundary matching, but item coverage remained below 0.90 and the frozen character-similarity lower bound remained below 0.40."
+    },
+    "boundary_mismatch_attribution": {
+      "v1_independent_boundary_character_similarity_median": 0.126,
+      "v2_matched_segment_character_similarity_median": 0.819,
+      "absolute_improvement": 0.693,
+      "boundary_mismatch_was_major_contributor": true,
+      "interpretation": "Low v1 transcript similarity was largely, but not entirely, caused by comparing transcripts generated on different boundaries."
+    },
+    "small_timing_shift_robustness": {
+      "primary_character_self_similarity_median": 0.976,
+      "sensitivity_character_self_similarity_median": 0.888,
+      "primary_embedding_self_similarity_median": 0.998,
+      "sensitivity_embedding_self_similarity_median": 0.979,
+      "gate_pass": true
+    }
+  },
+  "failure_classification": {
+    "a_inadequate_german_asr": "NOT_THE_DOMINANT_MEDIAN_FAILURE_ON_SUPPORTED_SEGMENTS; population coverage and character lower-bound stability still fail, so the ASR route is not qualified.",
+    "b_inadequate_vad_boundary_estimation": "PARTIALLY_SUPPORTED; median and perturbation behavior pass, but the participant-bootstrap boundary lower bound fails.",
+    "c_insufficient_or_unsuitable_childlens_speech_signal": "SUPPORTED_AS_A_STOP_REASON; accepted speech was absent for at least one development participant even though the audio track was not mechanically silent and released speech-like timing support existed.",
+    "d_inability_to_validate_without_german_human": "UNRESOLVED_AND_MATERIAL; model-model stability cannot determine whether unsupported audio contains intelligible German speech or whether either transcript is accurate."
+  },
+  "gates": {
+    "G1_signal_and_vad_pass": false,
+    "G2_matched_asr_pass": false,
+    "G3_timing_shift_robustness_pass": true
+  },
+  "recommendation": {
+    "separately_authorized_locked_evaluation": false,
+    "automatic_locked_evaluation": false,
+    "preferred_disposition": "STOP_MEASUREMENT_REMEDIATION",
+    "bounded_future_option": "Obtain authorized German-speaking human review of a separately frozen, privacy-safe development audit before proposing another measurement protocol.",
+    "another_model_search_now": false,
+    "simulator_or_cue_training": false
+  },
+  "claims": {
+    "human_validation": false,
+    "ground_truth": false,
+    "asr_accuracy": false,
+    "causal_null": false,
+    "v1_reinterpreted": false
+  },
+  "privacy": {
+    "restricted_paths_filenames_ids_intervals_transcripts_audio_embeddings_exported": false,
+    "locked_data_exported": false
+  }
+}

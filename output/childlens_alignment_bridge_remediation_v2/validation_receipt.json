@@ -1,0 +1,80 @@
+{
+  "schema_version": "childlens-alignment-bridge-remediation-validation-v2.0.0",
+  "validated_on": "2026-07-23",
+  "decision": "NO_GO_DO_NOT_PROCEED_TO_LOCKED_ALIGNMENT",
+  "scope": {
+    "development_participants": 8,
+    "locked_rows_loaded_or_evaluated": 0,
+    "alignment_scoring_run": false,
+    "simulator_or_cue_training_run": false,
+    "restricted_values_exported": false
+  },
+  "immutable_v1_bindings": {
+    "v1_protocol_sha256": "0bb98508214c1c668f04bcc5a2722ab3b1117c72ec9c23ac1f5accf91d648639",
+    "v1_development_gate_report_sha256": "ae88ed4ef093c567da20eb3ee63e1a7beb5cf8fcd6381d12ed04de218cb32dda",
+    "v1_restricted_split_manifest_sha256": "926391535972830289315b95e6b4e4893a3e82aeac03b371ab3212ca324b906a",
+    "tracked_v1_diff_empty": true
+  },
+  "frozen_v2_bindings": {
+    "protocol_sha256": "0fd819db4509d23abe2ea195e95a988307871a937aefaec9259f1e2dbd94af97",
+    "restricted_development_manifest_sha256": "9cb87b853eb43636d6baf09c281725eb98255b6cf73439025b47d627e84da5a8",
+    "restricted_segment_manifest_sha256": "a6a17d7d0e12f8003846c906037081732f102cabcbbbc21d49425d79057fd9f9",
+    "restricted_result_sha256": "ab61da2ecdedaf33809591df427afd913bea45763ce65656938d2d463814c44f",
+    "primary_asr_model_sha256": "64d182b440b98d5203c4f9bd541544d84c605196c4f7b845dfa11fb23594d1e2",
+    "sensitivity_asr_model_sha256": "1fc70f774d38eb169993ac391eea357ef47c88757ef72ee5943879b7e8e2bc69",
+    "vad_model_sha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3",
+    "embedding_model_sha256": "eaa086f0ffee582aeb45b36e34cdd1fe2d6de2bef61f8a559a1bbc9bd955917b"
+  },
+  "public_artifact_hashes": {
+    "freeze_receipt.json": "68522996a41c236a2fa197d6ec692a2d443c0907759478462a3e8c1a6bcc82b6",
+    "segment_freeze_receipt.json": "f15860f0d6e822631174f4ceb7309ce79ac155dd1b96def1d6c913bee7196718",
+    "remediation_report.json": "0178f0394cc273d1e79780a6ec31fa49a709fe7ccff8b520b0cb7aa64046f8a6",
+    "go_no_go_report.json": "367133b160e221c58c9d3dd5c2235a2ff2812172b31261cfa677b204e3fa0df0",
+    "go_no_go_report.md": "796cc40d5be45e46ed2de1e560ee0b9af3ffdc148898dda54c1301e698dc7e01"
+  },
+  "implementation_hashes": {
+    "diagnostics.py": "d6b479f58ce5d547fcc2e6400a121b1eb467ca660c2a2b8aaf92c071f9f16ea8",
+    "segmentation.py": "682f060ffb3d5a20af8b992ea8e8b5eeac725549b6a776780b43bae421908b3a",
+    "run_childlens_alignment_bridge_remediation_v2.py": "96544bcb8253f60dfc86833ad4fac84ee80a1649fa872a60cb6b0df8d2243a16",
+    "test_childlens_alignment_bridge_v2.py": "b3af72e50939c9d02f4ccb80e4db65bb24b784bf5516c2be35c2e471b2115de5"
+  },
+  "validation": {
+    "focused_pytest": {
+      "command": "PYTHONPATH=. .venv/bin/pytest -q tests/test_childlens_alignment_bridge_v2.py tests/test_childlens_alignment_bridge_v1.py",
+      "result": "11 passed"
+    },
+    "python_compile": {
+      "result": "passed",
+      "files": 4
+    },
+    "json_parse": {
+      "result": "passed",
+      "files": 6
+    },
+    "locked_status": {
+      "locked_evaluation_authorized": false,
+      "recommendation_for_separate_authorization": false
+    },
+    "privacy_scan": {
+      "result": "passed",
+      "finding": "No restricted identifiers, paths, filenames, intervals, transcripts, audio, embeddings, or row-level scores were present in public artifacts."
+    }
+  },
+  "mechanical_repair_ledger": [
+    {
+      "issue": "The repository virtual environment lacked the pinned VAD runtime.",
+      "repair": "The sandboxed segment worker was bound to the already frozen instrument Python environment.",
+      "scientific_change": false
+    },
+    {
+      "issue": "Aggregate evaluation assumed every development participant had at least one accepted segment.",
+      "repair": "Zero-segment participants are retained and aggregated as empty lists.",
+      "scientific_change": false
+    },
+    {
+      "issue": "The first final pytest invocation omitted the repository root from the import path.",
+      "repair": "The same focused suite was rerun with PYTHONPATH=.",
+      "scientific_change": false
+    }
+  ]
+}

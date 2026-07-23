@@ -1,0 +1,213 @@
+{
+  "schema_version": "childlens-alignment-bridge-remediation-preflight-v2.0.0",
+  "status": "FROZEN_BEFORE_REMEDIATION_SEGMENTATION_OR_ASR_COMPARISON",
+  "preserves_v1": {
+    "v1_protocol_sha256": "0bb98508214c1c668f04bcc5a2722ab3b1117c72ec9c23ac1f5accf91d648639",
+    "v1_restricted_split_manifest_sha256": "926391535972830289315b95e6b4e4893a3e82aeac03b371ab3212ca324b906a",
+    "v1_canonical_development_report_sha256": "ae88ed4ef093c567da20eb3ee63e1a7beb5cf8fcd6381d12ed04de218cb32dda",
+    "v1_decision": "NO_GO_STOP_BEFORE_ALIGNMENT_AND_LOCKED_EVALUATION",
+    "v1_artifacts_may_be_modified": false,
+    "v1_gates_may_be_reinterpreted": false
+  },
+  "objective": "Repair or reject the German speech measurement instrument by separating VAD/boundary instability from matched-segment ASR content instability on the existing ChildLens development participants only.",
+  "scope": {
+    "empirical_source": "CHILDLENS_ONLY",
+    "development_participants": 8,
+    "development_manifest_source": "v1 frozen participant split, development rows only",
+    "locked_rows_may_be_loaded_as_outcomes": false,
+    "locked_evaluation_allowed": false,
+    "real_vs_control_alignment_allowed": false,
+    "simulator_generation_allowed": false,
+    "cue_condition_training_allowed": false,
+    "model_shopping_allowed": false
+  },
+  "ordered_diagnosis": [
+    "D1 speech/non-speech segmentation and utterance-boundary stability",
+    "D2 transcript and language stability conditional on identical frozen audio segments",
+    "D3 boundary-mismatch attribution by comparing v1 independent-boundary agreement with v2 matched-segment agreement"
+  ],
+  "instruments": {
+    "dedicated_vad": {
+      "model": "Silero VAD 6.2.1 ONNX",
+      "source_revision": "7e30209a3e901f9842f81b225f3e93d8199902b1",
+      "sha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3",
+      "license": "MIT",
+      "role": "fixed speech segmentation instrument"
+    },
+    "primary_asr": {
+      "model": "whisper.cpp unquantized OpenAI Whisper large-v3",
+      "whisper_cpp_revision": "f049fff95a089aa9969deb009cdd4892b3e74916",
+      "whisper_cpp_binary_sha256": "9613b31e5380c184ae29ccb1d4046953d7037e8eb55308c9f1a34f145143b892",
+      "model_repository_revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+      "model_sha256": "64d182b440b98d5203c4f9bd541544d84c605196c4f7b845dfa11fb23594d1e2",
+      "decode_language": "auto",
+      "beam_size": 5,
+      "best_of": 5,
+      "temperature": 0.0,
+      "role": "primary local German-capable measurement instrument"
+    },
+    "sole_sensitivity_asr": {
+      "model": "whisper.cpp unquantized OpenAI Whisper large-v3-turbo",
+      "whisper_cpp_revision": "f049fff95a089aa9969deb009cdd4892b3e74916",
+      "whisper_cpp_binary_sha256": "9613b31e5380c184ae29ccb1d4046953d7037e8eb55308c9f1a34f145143b892",
+      "model_repository_revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+      "model_sha256": "1fc70f774d38eb169993ac391eea357ef47c88757ef72ee5943879b7e8e2bc69",
+      "decode_language": "auto",
+      "beam_size": 5,
+      "best_of": 5,
+      "temperature": 0.0,
+      "role": "sole bounded model-model sensitivity"
+    },
+    "text_embedding_diagnostic": {
+      "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "revision": "e8f8c211226b894fcb81acc59f3b34ba3efd5f42",
+      "model_safetensors_sha256": "eaa086f0ffee582aeb45b36e34cdd1fe2d6de2bef61f8a559a1bbc9bd955917b",
+      "pooling": "attention-mask-aware mean pooling followed by L2 normalization",
+      "embedding_dimension": 384,
+      "license": "Apache-2.0",
+      "role": "model-model semantic agreement diagnostic, not truth"
+    },
+    "public_canary": {
+      "input": "macOS German TTS sentence with no ChildLens ancestry",
+      "primary_language": "de",
+      "sensitivity_language": "de",
+      "embedding_cosine": 0.999275,
+      "status": "MECHANICAL_PASS_NOT_SCIENTIFIC_VALIDATION"
+    }
+  },
+  "shared_segmentation": {
+    "audio": "16 kHz mono signed 16-bit PCM extracted from each frozen v1 development sample span",
+    "silero_probability_threshold": 0.5,
+    "silero_negative_threshold": 0.35,
+    "minimum_speech_ms": 300,
+    "minimum_silence_to_split_ms": 500,
+    "speech_padding_ms": 150,
+    "maximum_segment_seconds": 12.0,
+    "long_segment_split": "deterministic contiguous chunks no longer than 12 seconds; discard terminal remainder shorter than 300 ms",
+    "released_annotation_support": {
+      "speech_like_events": [
+        "child_talking",
+        "other_person_talking",
+        "overheard_speech",
+        "singing/humming"
+      ],
+      "annotation_expansion_ms": 250,
+      "minimum_vad_segment_overlap_fraction": 0.5,
+      "released_bouts_are_utterance_truth": false,
+      "purpose": "acceptance support and signal-coverage comparison only"
+    },
+    "asr_input": "both ASR systems receive byte-identical concatenations of the same accepted frozen VAD segments with 500 ms silence separators",
+    "segment_manifest_frozen_before_asr": true,
+    "independent_asr_boundaries_used_for_matched_transcript_comparison": false
+  },
+  "perturbations": {
+    "vad_self_consistency": {
+      "operation": "prepend and append 250 ms digital silence, rerun identical VAD, subtract the leading offset",
+      "boundary_match_tolerance_seconds": 0.5
+    },
+    "transcript_timing_robustness": {
+      "operation": "expand every accepted source segment by 250 ms on each available side without overlap or wrap",
+      "same_expanded_segments_for_both_asr_systems": true
+    }
+  },
+  "metrics": {
+    "timing": [
+      "accepted segment count and durations",
+      "VAD speech seconds and sample-span coverage",
+      "released-speech-mask overlap precision and recall",
+      "base-vs-silence-padded boundary F1",
+      "participant median absolute segment-duration change",
+      "participant speech-coverage ratio under perturbation"
+    ],
+    "matched_transcript": [
+      "item-level automatic language identification and model-model agreement",
+      "primary and sensitivity nonempty item fractions",
+      "matched-segment usable yield",
+      "normalized character similarity on identical segments",
+      "multilingual sentence-embedding cosine on identical segments",
+      "primary and sensitivity transcript self-consistency under 250 ms boundary expansion"
+    ],
+    "attribution": [
+      "v2 matched-segment character similarity minus v1 independent-boundary character similarity",
+      "v2 timing self-consistency",
+      "v2 matched-segment embedding agreement"
+    ],
+    "uncertainty": "participant-cluster percentile bootstrap, 10000 replicates, 90% interval, fixed seed 20260706"
+  },
+  "gates": {
+    "G0_binding_and_privacy": {
+      "v1_protocol_and_split_hashes_match": true,
+      "exactly_8_development_participants": true,
+      "locked_outcomes_loaded": 0,
+      "instruments_hash_match": true,
+      "restricted_inference_network_denied": true
+    },
+    "G1_signal_and_vad": {
+      "development_participant_nonempty_segment_fraction_min": 0.9,
+      "accepted_segments_min": 24,
+      "accepted_speech_seconds_min": 60.0,
+      "participant_median_annotation_overlap_precision_min": 0.6,
+      "participant_median_annotation_overlap_recall_min": 0.6,
+      "participant_median_vad_self_consistency_boundary_f1_min": 0.8,
+      "participant_bootstrap_boundary_f1_90pct_lower_min": 0.65,
+      "participant_median_absolute_duration_change_seconds_max": 0.25,
+      "participant_median_perturbed_to_base_speech_coverage_ratio_range": [
+        0.9,
+        1.1
+      ],
+      "reason": "Remediation-specific timing gates are stricter than v1 boundary gates because one shared segmenter must be mechanically stable before ASR content can be isolated."
+    },
+    "G2_matched_asr": {
+      "primary_nonempty_item_fraction_min": 0.9,
+      "sensitivity_nonempty_item_fraction_min": 0.9,
+      "primary_usable_utterances_min": 24,
+      "usable_utterance_fraction_of_frozen_segments_min": 0.6,
+      "primary_german_item_fraction_min": 0.8,
+      "primary_sensitivity_language_agreement_min": 0.8,
+      "participant_median_normalized_character_similarity_min": 0.55,
+      "participant_cluster_bootstrap_character_90pct_lower_min": 0.4,
+      "participant_median_embedding_cosine_min": 0.8,
+      "participant_cluster_bootstrap_embedding_90pct_lower_min": 0.7,
+      "reason": "The v1 coverage, language, character-median, and character-lower thresholds are unchanged. Embedding gates are additive and allow orthographic variation without lowering lexical stability requirements."
+    },
+    "G3_timing_shift_robustness": {
+      "participant_median_primary_character_self_similarity_min": 0.7,
+      "participant_median_sensitivity_character_self_similarity_min": 0.7,
+      "participant_median_primary_embedding_self_similarity_min": 0.85,
+      "participant_median_sensitivity_embedding_self_similarity_min": 0.85,
+      "reason": "A 250 ms boundary expansion should not materially change a stable transcript instrument."
+    }
+  },
+  "attribution_rules": {
+    "boundary_mismatch_major_contributor": "v2 matched character median improves by at least 0.20 over v1 and v2 matched character gate passes",
+    "inadequate_german_asr": "G1 passes but G2 or G3 fails",
+    "inadequate_vad_boundary_estimation": "signal-yield subgates pass but VAD self-consistency subgates fail",
+    "insufficient_or_unsuitable_childlens_speech_signal": "segment yield, speech seconds, or annotation-support coverage fails",
+    "human_validation_limit": "model-model gates can establish stability but never transcription accuracy or ground truth"
+  },
+  "stop_rules": [
+    "Stop if any required instrument hash or v1 binding fails.",
+    "A G1 failure prevents any pass or locked recommendation. The already bounded matched-segment ASR diagnostic may still complete to distinguish VAD/signal failure from ASR-content failure.",
+    "Stop after matched transcript diagnosis if G2 or G3 fails.",
+    "Do not introduce another ASR, VAD, aligner, text model, threshold, or segmentation rule post hoc.",
+    "A pass recommends only a separately authorized locked alignment evaluation; it does not authorize it.",
+    "Never generate simulator episodes or train side-cue conditions in this remediation."
+  ],
+  "privacy": {
+    "raw_and_restricted_data_location": "existing owner-private ChildLens quarantine only",
+    "public_minimum_cell_size": 5,
+    "public_forbidden": [
+      "paths",
+      "filenames",
+      "participant/session/item identifiers",
+      "exact intervals",
+      "transcripts",
+      "audio",
+      "embeddings",
+      "row-level scores"
+    ],
+    "human_validation_claimed": false,
+    "ground_truth_claimed": false,
+    "retention_review_deadline": "2027-07-31"
+  }
+}
