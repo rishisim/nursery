@@ -6,3 +6,30 @@ __pycache__/
 .venv-aria/
 .external/
 data/
+
+# Local scratch space and rendered working copies.
+tmp/
+babyworld-lite/
+
+# Access-request forms can contain personal or institutional details.
+output/pdf/*.pdf
+
+# Keep compact research decisions, manifests, audits, and receipts in Git, but
+# exclude heavyweight reproducible experiment material and copied source trees.
+output/synthetic_*/**/raw/
+output/synthetic_*/**/persisted_inputs/
+output/synthetic_*/**/*persisted_inputs*/
+output/synthetic_*/**/frozen_source_snapshot/
+output/synthetic_*/**/fixture*/
+output/synthetic_*/**/qualification_run/
+output/synthetic_*/**/negative_recompute_cases/
+output/synthetic_*/**/excluded_rehearsal/
+output/synthetic_*/**/independent_recompute/
+output/synthetic_*/**/recomputable/
+output/synthetic_*/**/isolated_reproduction/
+output/synthetic_*/**/preservation/
+output/synthetic_*/**/construction_qualification/
+output/synthetic_*/**/*_jobs_*/
+output/synthetic_*/**/*.stdout
+output/synthetic_*/**/*.stderr
+output/synthetic_confirmation_adversarial_audit_v1/preservation_proof.json
