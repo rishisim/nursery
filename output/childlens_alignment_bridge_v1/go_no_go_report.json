@@ -1,0 +1,69 @@
+{
+  "schema_version": "childlens-alignment-bridge-go-no-go-v1.0.1",
+  "decision": "NO_GO_STOP_BEFORE_ALIGNMENT_AND_LOCKED_EVALUATION",
+  "scientific_interpretation": "The selected German ASR/timing route is not stable enough on the participant-disjoint development subset to support a credible continuous utterance-frame alignment measurement. This is a model-model measurement failure, not human validation, ground truth, a causal null, or evidence against synchronized side modalities.",
+  "development": {
+    "participants": 8,
+    "locked_participants_analyzed": 0,
+    "primary_nonempty_item_fraction": 0.875,
+    "sensitivity_nonempty_item_fraction": 1.0,
+    "primary_usable_utterance_count": 72,
+    "primary_usable_utterance_fraction": 0.947,
+    "primary_german_item_fraction": 0.75,
+    "language_id_agreement_fraction": 0.75,
+    "character_similarity_participant_median": 0.126,
+    "character_similarity_bootstrap_90pct": [
+      0.036,
+      0.657
+    ],
+    "boundary_f1_participant_median": 0.058,
+    "boundary_f1_bootstrap_90pct": [
+      0.006,
+      0.171
+    ],
+    "gate_G1_pass": false,
+    "gate_G2_pass": false
+  },
+  "not_run_because_of_ordered_stop": [
+    "development utterance-frame embedding scoring",
+    "development matched shuffled and time-shifted controls",
+    "locked evaluation",
+    "simulator calibration or episode generation",
+    "synchronized, shuffled, shifted, uninformative, or absent side-cue learner training"
+  ],
+  "prior_failed_branch_boundary": {
+    "categorical_qwen3_vl_gemma_method_reused": false,
+    "prior_gates_relaxed_or_reinterpreted": false,
+    "causal_endpoint_opened": false
+  },
+  "external_volume": {
+    "is_childlens": false,
+    "is_governance_admissible_as_mounted": false,
+    "used": false
+  },
+  "recommendation": {
+    "proceed_to_full_childlens_calibration": false,
+    "expand_childlens_sample_now": false,
+    "preferred_option": "STOP_LEXICAL_ALIGNMENT_BRIDGE",
+    "permitted_future_options": [
+      "Retain only model-independent ChildLens distribution calibration under a separately scoped protocol.",
+      "Obtain authorized qualified German validation and freeze a new measurement protocol.",
+      "Preregister exactly one new ASR/alignment route in a new protocol without post-hoc model shopping.",
+      "Consider staged ChildLens expansion only for a predeclared identifiability or K-safe aggregation need."
+    ],
+    "synthetic_only_fallback": false,
+    "babyview_role": "FUTURE_CONFIRMATION_ONLY"
+  },
+  "claims": {
+    "human_validation": false,
+    "ground_truth": false,
+    "infant_calibration": false,
+    "provisional_developmental_calibration_ages_3_to_5": true,
+    "positive_mechanism_result": false,
+    "valid_causal_null": false
+  },
+  "privacy": {
+    "minimum_public_cell_size": 5,
+    "restricted_text_intervals_ids_paths_exported": false
+  }
+}

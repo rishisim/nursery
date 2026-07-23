@@ -1,0 +1,51 @@
+{
+  "schema_version": "childlens-alignment-bridge-validation-receipt-v1.0.1",
+  "status": "VERIFIED_STOP",
+  "bindings": {
+    "protocol_sha256": "0bb98508214c1c668f04bcc5a2722ab3b1117c72ec9c23ac1f5accf91d648639",
+    "package_init_sha256": "104a2098d2a58af5cb31362b7abcdedf74d91afe6c49753c6abdf46c7e87ee6c",
+    "preflight_mechanics_sha256": "2c78e2eacf10eeaa04f7b575944ee68b60b88984bebbea4a3159e90fe28eb9f7",
+    "alignment_mechanics_sha256": "13d57746dd14f34793c7d58d8d1f4ceb38ecbefdbb370b30fe81dc6c1b1977d9",
+    "runner_sha256": "18c1b57671c703bb041cd5dde05dcbb30b3048883e662f0adf7b85c08e41a5a3",
+    "tests_sha256": "4fe0d9272704323a37c1d9bd4c48ae193fb67c7a4b57a936f6fcecd1f90e427c",
+    "instrument_activation_receipt_sha256": "c926207bbb9fd02b7cc23316cd17bd1c87298e5f64593ef7ed0a80c32271edf5",
+    "local_instrument_provenance_sha256": "31ab3fc4391b22bc6923bb7db587832648806932ea2ca4b15644f49c9dd88a21",
+    "egobabyvlm_commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "egobabyvlm_midpoint_manifest_interface_sha256": "83b10ed1daee02feb46a3e240e1cdef56f50f7627e6504b9308640164fa799e9",
+    "egobabyvlm_normalized_cosine_interface_sha256": "cf7880f84bd3b4ecc1da40a4eebf42f44ee946d590da50c9b76de32637afd0c5"
+  },
+  "instrument_revisions": {
+    "qwen3_asr_1_7b": "7278e1e70fe206f11671096ffdd38061171dd6e5",
+    "qwen3_forced_aligner_0_6b": "c7cbfc2048c462b0d63a45797104fc9db3ad62b7",
+    "whisper_cpp": "f049fff95a089aa9969deb009cdd4892b3e74916",
+    "whisper_large_v3_turbo_model": "5359861c739e955e79d9a303bcbc70fb988958b1"
+  },
+  "validation": {
+    "focused_pytest": {
+      "command": ".venv/bin/python -m pytest -q tests/test_childlens_alignment_bridge_v1.py",
+      "passed": 8,
+      "failed": 0
+    },
+    "python_compile": {
+      "passed": true,
+      "files": 4
+    },
+    "json_parse_and_freeze_binding": {
+      "passed": true
+    },
+    "locked_status": {
+      "locked_evaluation_allowed": false,
+      "reason": "DEVELOPMENT_STOP_RULE_ACTIVE"
+    },
+    "public_privacy_scan": {
+      "absolute_user_or_volume_paths_found": 0,
+      "restricted_identifier_values_found": 0,
+      "expected_policy_field_names_only": true
+    }
+  },
+  "scientific_claim": {
+    "code_running_is_success": false,
+    "measurement_route_passed": false,
+    "decision": "STOP_BEFORE_ALIGNMENT_AND_LOCKED_EVALUATION"
+  }
+}

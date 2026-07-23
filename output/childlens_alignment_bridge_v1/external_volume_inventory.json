@@ -1,0 +1,67 @@
+{
+  "schema_version": "childlens-alignment-bridge-volume-inventory-v1.0.0",
+  "inspection_mode": "READ_ONLY_AGGREGATE_INVENTORY",
+  "external_physical_volumes_found": 1,
+  "volume": {
+    "filesystem": "ExFAT",
+    "capacity_gb_decimal_rounded": 249.8,
+    "used_gb_decimal_rounded": 117.9,
+    "free_gb_decimal_rounded": 131.9,
+    "free_gib_binary_rounded": 122.8,
+    "recording_payload_count": 40,
+    "recording_payload_format": "VRS",
+    "recording_payload_bytes": 114163631269,
+    "sidecar_counts": {
+      "C32": 60,
+      "CSV": 143,
+      "JSON": 143
+    },
+    "owner_permissions_enforced": false,
+    "mounted_noowners": true,
+    "indexing_excluded": false,
+    "native_encryption_or_restricted_container_evidence": false
+  },
+  "childlens_match_assessment": {
+    "matches_existing_selected_30": false,
+    "reason_codes": [
+      "CORPUS_PATH_EVIDENCE_IDENTIFIES_AEA",
+      "FORTY_RECORDINGS_NOT_THIRTY",
+      "VRS_PAYLOADS_NOT_CHILDLENS_MP4",
+      "NO_CHILDLENS_MARKERS",
+      "ZERO_EXACT_SIZE_OVERLAP_WITH_SELECTED_CHILDLENS_OBJECTS",
+      "ZERO_NONTRIVIAL_SAFE_LOCATOR_TOKEN_OVERLAP"
+    ],
+    "whole_volume_hash_performed": false,
+    "whole_volume_hash_reason": "Contrary corpus provenance and incompatible formats are decisive; hashing 114 GB would add no identification value."
+  },
+  "governance_disposition": {
+    "admissible_for_restricted_childlens_data_as_mounted": false,
+    "reason_codes": [
+      "NO_OWNER_ENFORCEMENT",
+      "INDEXING_ENABLED",
+      "NO_NATIVE_ENCRYPTED_CONTAINER_EVIDENCE"
+    ],
+    "used_for_bridge": false,
+    "files_copied_or_modified": 0
+  },
+  "current_childlens_inventory": {
+    "selected_recordings_present": 30,
+    "original_full_recordings_present": 15,
+    "extension_bounded_clips_present": 15,
+    "all_selected_files_owner_private_mode_0600": true,
+    "combined_participant_distinct": true,
+    "full_release_media_manifest_rows": 192,
+    "additional_full_childlens_media_locally_copied": 0,
+    "historically_eligible_unused_media": 121,
+    "historically_eligible_unused_participants": 42,
+    "expansion_performed": false
+  },
+  "privacy": {
+    "volume_name_exported": false,
+    "mount_path_exported": false,
+    "filenames_exported": false,
+    "participant_or_recording_identifiers_exported": false,
+    "raw_metadata_exported": false
+  },
+  "decision": "EXCLUDE_EXTERNAL_VOLUME_FROM_CHILDLENS_BRIDGE"
+}
