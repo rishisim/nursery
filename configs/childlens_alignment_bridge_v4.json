@@ -1,0 +1,282 @@
+{
+  "schema_version": "childlens-alignment-bridge-transcription-free-preflight-v4.0.0",
+  "status": "FROZEN_BEFORE_DEVELOPMENT_SPLIT_WINDOW_ASSIGNMENT_OR_AUDIOVISUAL_OUTCOME_INSPECTION",
+  "scientific_role": "PROVISIONAL_DEVELOPMENTAL_CALIBRATION_AGES_3_TO_5",
+  "objective": "Test whether a single transcription-free raw-speech/audio-to-vision contrastive route yields participant-disjoint real-pairing lift over both a matched nonoverlapping within-recording time shift and a participant-excluding matched shuffle.",
+  "claim_boundary": "A pass may motivate a separately authorized locked evaluation and eventual simulated cue-lift study under temporal, visual, and audiovisual distributions provisionally calibrated to ChildLens ages 3-5. It is not evidence of infant calibration or validated naturalistic German lexical grounding.",
+  "scope": {
+    "empirical_source": "CHILDLENS_ONLY",
+    "development_participants": 18,
+    "prior_development_participants": 8,
+    "v3_expansion_participants": 10,
+    "locked_participants": 22,
+    "locked_rows_may_be_loaded_scored_summarized_or_inspected": false,
+    "locked_evaluation_allowed": false,
+    "new_recordings_or_downloads_allowed": false,
+    "aea_or_external_volume_allowed": false,
+    "babyview_allowed": false,
+    "asr_translation_language_id_transcripts_or_generative_labels_allowed": false,
+    "simulator_generation_allowed": false,
+    "physical_side_cue_condition_training_allowed": false
+  },
+  "immutable_prior_bindings": {
+    "v1_tree_sha256": "4f668c666636e47e72a3c2162cb30590f89077f0e4e6ef8e69b149f4966df679",
+    "v2_tree_sha256": "30df10121591465cd4c357ead6b4aab8c2dff30b2a292106faa277661c621e45",
+    "v3_tree_sha256": "29718e4741bf31f27e5001e6a6398423745b1d5b8688032b3e9140a3f5ef90fa",
+    "v2_restricted_development_manifest_sha256": "9cb87b853eb43636d6baf09c281725eb98255b6cf73439025b47d627e84da5a8",
+    "v3_restricted_measurement_manifest_sha256": "028efa424ed4dc2fe511a0b723b38f4feccba7f4de7db055934218dff1fe705d",
+    "v3_restricted_plan_sha256": "796eccc748cd61590bd0c9d4499e92e81277327f11e6ad4a19ce106afa4b4cb6",
+    "prior_artifacts_may_be_modified_or_reinterpreted": false
+  },
+  "method_selection": {
+    "selection_basis": "documented methodological suitability plus successful synthetic local loading and inference only; no ChildLens audiovisual score was inspected",
+    "route_count": 1,
+    "automatic_alternative_or_model_shopping_allowed": false,
+    "audio_frontend": {
+      "repository": "facebook/wav2vec2-base",
+      "revision": "0b5b8e868dd84f03fd87d01f9c4ff0f080fecfe8",
+      "weights_file": "pytorch_model.bin",
+      "weights_sha256": "3249fe98bfc62fcbc26067f724716a6ec49d12c4728a2af1df659013905dff21",
+      "config_sha256": "4937977e24d12d1bba70cdce8709c3c04807a8e4ae8ddac4229c48c436ae99ae",
+      "output": "mean last-hidden-state over valid time steps, 768 dimensions",
+      "frozen": true,
+      "tokenizer_decoder_or_ctc_head_loaded": false,
+      "pretraining_note": "self-supervised raw 16 kHz speech audio; no ChildLens ancestry"
+    },
+    "vision_frontend": {
+      "repository": "facebook/dinov2-small",
+      "revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056",
+      "weights_file": "model.safetensors",
+      "weights_sha256": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1",
+      "config_sha256": "1809f83e3bdb1609a501a610ad4a742f4fd8ae44d72ca4aa0df52d1f2ac8628d",
+      "output": "mean of per-frame pooler outputs after per-frame L2 normalization, then L2 normalize, 384 dimensions",
+      "frozen": true,
+      "pretraining_note": "self-supervised image features; no ChildLens ancestry"
+    },
+    "learned_components": {
+      "audio_projection": "bias-free linear 768-to-128",
+      "vision_projection": "bias-free linear 384-to-128",
+      "normalization": "L2 after each projection",
+      "temperature": 0.07,
+      "loss": "symmetric in-batch audio-to-vision and vision-to-audio InfoNCE",
+      "frontend_finetuning": false
+    },
+    "primary_sources": [
+      {
+        "citation": "Baevski et al. (2020), wav2vec 2.0",
+        "url": "https://arxiv.org/abs/2006.11477",
+        "suitability": "self-supervised representations learned from raw speech audio without transcripts"
+      },
+      {
+        "citation": "Oquab et al. (2023), DINOv2",
+        "url": "https://arxiv.org/abs/2304.07193",
+        "suitability": "general-purpose self-supervised visual features usable without task labels"
+      },
+      {
+        "citation": "Morgado et al. (2021), Audio-Visual Instance Discrimination",
+        "url": "https://openaccess.thecvf.com/content/CVPR2021/html/Morgado_Audio-Visual_Instance_Discrimination_with_Cross-Modal_Agreement_CVPR_2021_paper.html",
+        "suitability": "cross-modal contrastive discrimination of co-occurring audio and video"
+      }
+    ]
+  },
+  "development_split": {
+    "unit": "participant",
+    "split_seed": "childlens-bridge-v4-split-20260723",
+    "method": "within each immutable source cohort, sort SHA256(split_seed|cohort|participant_key); assign first 3 to evaluation and all remaining to train",
+    "train_participants": 12,
+    "evaluation_participants": 6,
+    "participant_overlap_allowed": false,
+    "minimum_reportable_cell_participants": 5,
+    "split_must_be_frozen_before": "media decoding, frontend embedding, training, or audiovisual outcome scoring"
+  },
+  "windows": {
+    "candidate_source": "released timed ChildLens speech-like sample segments already bound in the immutable v2 and v3 development manifests",
+    "released_speech_timing_is_lexical_ground_truth": false,
+    "window_seconds": 4.0,
+    "candidate_rule": "one centered 4-second window per released segment shorter than 4 seconds; deterministic contiguous 4-second windows within longer segments",
+    "time_quantization_milliseconds": 1,
+    "real_window_exclusion_buffer_seconds": 0.5,
+    "overlap_resolution": "chronological greedy retention by start then end then row hash",
+    "maximum_windows_per_participant": 12,
+    "cap_order": "SHA256(split_seed|participant_key|item_key|start_ms), then chronological reporting order",
+    "minimum_windows_per_participant": 6,
+    "audio": {
+      "sample_rate_hz": 16000,
+      "channels": 1,
+      "decode": "signed float32 mono with ffmpeg",
+      "normalization": "wav2vec2 feature-extractor zero-mean unit-variance normalization",
+      "augmentation": "none"
+    },
+    "video": {
+      "sampling_hz": 1.0,
+      "timestamps": "window_start + 0.5, 1.5, 2.5, and 3.5 seconds, EgoBabyVLM-compatible midpoint convention",
+      "frames_per_window": 4,
+      "preprocessing": "pinned DINOv2 processor: RGB, shortest edge 256, center crop 224, ImageNet normalization",
+      "augmentation": "none"
+    }
+  },
+  "controls": {
+    "within_recording_time_shift": {
+      "role": "PRIMARY",
+      "paired_modality": "real audio with shifted video",
+      "offset_seconds": 8.0,
+      "direction": "first direction from SHA256(split_seed|shift|row_key), then opposite direction if needed",
+      "wrap_allowed": false,
+      "minimum_gap_from_real_seconds": 1.0,
+      "overlap_with_own_real_window_allowed": false,
+      "participant_room_voice_device_and_session_identity": "held constant"
+    },
+    "cross_participant_shuffle": {
+      "role": "SECONDARY",
+      "paired_modality": "real audio with another evaluation participant's real video",
+      "same_participant_allowed": false,
+      "one_to_one_inventory_preserving_assignment": true,
+      "matching_cost": "4*activity_mismatch + 2*location_mismatch + absolute speech-density difference + 0.1*absolute normalized recording-position difference",
+      "solver": "deterministic minimum-cost bipartite assignment; infeasible same-participant edges forbidden",
+      "matching_variables": [
+        "fixed duration",
+        "released speech density",
+        "coarse activity",
+        "coarse location or unavailable",
+        "normalized recording position"
+      ]
+    },
+    "identical_evaluation_row_inventory_across_real_shift_and_shuffle": true,
+    "shortcut_rule": "real-over-shuffle without real-over-within-recording-shift is failure, never evidence of alignment"
+  },
+  "training": {
+    "pairing": "real audio-real video only on development-train participants",
+    "epochs": 250,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0005,
+    "weight_decay": 0.01,
+    "gradient_clip_norm": 1.0,
+    "batch_construction": "one deterministic cycling window per train participant per step",
+    "steps_per_epoch": 1,
+    "seeds": [
+      20260723,
+      20260724,
+      20260725
+    ],
+    "model_selection": "none; fixed final epoch for every seed",
+    "score_aggregation": "mean projected cosine per row across the three frozen seeds"
+  },
+  "timing_perturbation": {
+    "offsets_seconds": [
+      -0.25,
+      0.25
+    ],
+    "operation": "shift audio and video window together when within recording bounds; run identical decoders and frozen frontends",
+    "minimum_embedding_production_fraction": 0.98,
+    "participant_median_audio_embedding_cosine_min": 0.9,
+    "participant_median_visual_embedding_cosine_min": 0.9
+  },
+  "uncertainty_and_metrics": {
+    "analysis_unit": "participant",
+    "cluster_bootstrap_replicates": 10000,
+    "cluster_bootstrap_confidence": 0.9,
+    "exact_one_sided_sign_flip_when_participants_le_16": true,
+    "permutation_replicates_otherwise": 100000,
+    "seed": 20260723,
+    "primary_alignment_metric": "participant mean real projected cosine minus within-recording-shift projected cosine",
+    "secondary_alignment_metric": "participant mean real projected cosine minus cross-participant-shuffle projected cosine",
+    "retrieval_metrics": [
+      "paired real-beats-shift rate",
+      "paired real-beats-shuffle rate",
+      "three-way real top-1 rate",
+      "three-way reciprocal rank"
+    ],
+    "meaningful_mean_cosine_lift_min_each_control": 0.02,
+    "bootstrap_lower_bound_must_exceed": 0.0,
+    "one_sided_sign_flip_p_max": 0.05,
+    "seed_directional_stability": "at least two of three seed-specific mean lifts must be positive for each control"
+  },
+  "ordered_gates": {
+    "G0_governance_binding_and_immutability": {
+      "prior_tree_hashes_match": true,
+      "restricted_manifest_hashes_match": true,
+      "development_participants_exactly_18_and_distinct": true,
+      "locked_rows_loaded_scored_summarized_or_inspected": 0,
+      "external_volume_aea_babyview_or_new_downloads_used": false,
+      "transcription_language_id_translation_or_generative_labels_used": false,
+      "model_and_code_hashes_match": true
+    },
+    "G1_split_windows_and_support": {
+      "train_participants": 12,
+      "evaluation_participants": 6,
+      "participant_overlap": 0,
+      "minimum_windows_each_participant": 6,
+      "minimum_train_windows": 72,
+      "minimum_evaluation_windows": 36,
+      "evaluation_control_assignment_complete": true,
+      "reportable_evaluation_participants_min": 5
+    },
+    "G2_preprocessing_and_perturbation_stability": {
+      "missing_or_substituted_row_fraction_max": 0.02,
+      "substitution_allowed": false,
+      "thresholds": "timing_perturbation section"
+    },
+    "G3_primary_within_recording_alignment": {
+      "meaningful_mean_lift_min": 0.02,
+      "participant_cluster_bootstrap_90pct_lower_gt": 0.0,
+      "one_sided_sign_flip_p_max": 0.05,
+      "seed_directional_stability_required": true
+    },
+    "G4_secondary_cross_participant_alignment": {
+      "meaningful_mean_lift_min": 0.02,
+      "participant_cluster_bootstrap_90pct_lower_gt": 0.0,
+      "one_sided_sign_flip_p_max": 0.05,
+      "seed_directional_stability_required": true
+    },
+    "G5_privacy_safe_reporting": {
+      "both_control_envelopes_reported": true,
+      "minimum_cell_size": 5,
+      "complementary_suppression": true,
+      "row_level_values_exported": false
+    }
+  },
+  "calibration_vector": {
+    "participant_clustered_model_independent": [
+      "released speech-bout duration, density, gaps, and speech seconds per observation minute",
+      "coarse activity duration and recurrence plus privacy-safe activity/location shares",
+      "released speech-activity overlap and audiovisual candidate-event density where supported",
+      "grayscale adjacent-frame motion, persistence, and scene-change rate",
+      "retained audio duration, RMS energy, non-silent fraction, and clipped-sample fraction"
+    ],
+    "transcription_free_model_based": [
+      "real projected cosine",
+      "within-recording-shift projected cosine",
+      "cross-participant-shuffle projected cosine",
+      "paired retrieval rates and reciprocal rank"
+    ],
+    "scene_change_mean_absolute_grayscale_threshold": 0.2
+  },
+  "privacy": {
+    "raw_and_restricted_location": "existing owner-private local ChildLens quarantine only",
+    "public_minimum_cell_size": 5,
+    "complementary_suppression": true,
+    "public_forbidden": [
+      "paths",
+      "filenames",
+      "participant session item or row identifiers",
+      "exact intervals",
+      "audio",
+      "frames",
+      "transcripts",
+      "embeddings",
+      "row-level scores",
+      "trained projection weights"
+    ],
+    "public_artifacts": "aggregate summaries and cryptographic receipts only",
+    "retention_review_deadline": "2027-07-31"
+  },
+  "stop_rules": [
+    "Evaluate gates in order and fail closed.",
+    "If G0 or G1 fails, do not decode, embed, or train.",
+    "If G2 fails, do not train or score audiovisual outcomes.",
+    "If G3 fails, preserve a terminal NO-GO even if real exceeds the shuffled control.",
+    "If G4 or G5 fails, preserve a terminal NO-GO.",
+    "No failure authorizes a model swap, threshold change, additional recording, locked evaluation, simulator generation, or side-cue condition training.",
+    "A full development pass recommends only a separately authorized locked evaluation."
+  ]
+}
