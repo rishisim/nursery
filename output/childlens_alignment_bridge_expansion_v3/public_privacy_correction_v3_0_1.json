@@ -1,0 +1,17 @@
+{
+  "schema_version": "childlens-alignment-bridge-expansion-public-privacy-correction-v3.0.1",
+  "status": "PUBLIC_DRAFT_REPLACED_BEFORE_COMMIT_OR_EXPORT",
+  "protocol_sha256": "787f64eba92a6a2f206e09a447b2f595691230349ba8f17c800faa0e50108f02",
+  "uncommitted_draft_sha256": "19a04bee3ac4da4384a81892194ed91e7bf295803426c525684d87aad7a64623",
+  "replacement_report_sha256": "d22731f967e79e3d2f1d39b9eaea936e20e1fda8b044da392cc09a96ec68103e",
+  "correction": "Participant-level fractions with a nonzero complementary cell smaller than five are suppressed.",
+  "checks": {
+    "uncommitted_draft_deleted": true,
+    "uncommitted_draft_exported": false,
+    "uncommitted_draft_committed": false,
+    "restricted_results_changed": false,
+    "scientific_decision_changed": false,
+    "replacement_status": "MEASUREMENT_EXPANSION_STOP",
+    "small_complementary_participant_cells_suppressed": true
+  }
+}

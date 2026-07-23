@@ -1,0 +1,93 @@
+{
+  "schema_version": "childlens-alignment-bridge-expansion-go-no-go-v3.0.0",
+  "decision": "NO_GO_DO_NOT_PROCEED_TO_LOCKED_ALIGNMENT",
+  "development_participants": {
+    "prior_v2": 8,
+    "new_expansion": 10,
+    "combined": 18
+  },
+  "repaired_v2_uncertainty_failures": {
+    "boundary_f1_lower": {
+      "v2": 0.527,
+      "v3_combined": 0.772,
+      "minimum": 0.65,
+      "pass": true
+    },
+    "character_similarity_lower": {
+      "v2": 0.256,
+      "v3_combined": 0.758,
+      "minimum": 0.4,
+      "pass": true
+    },
+    "embedding_cosine_lower": {
+      "v2": 0.741,
+      "v3_combined": 0.865,
+      "minimum": 0.7,
+      "pass": true
+    }
+  },
+  "remaining_combined_failures": {
+    "nonempty_segment_participant_fraction": {
+      "value": null,
+      "suppressed": true,
+      "minimum": 0.9
+    },
+    "primary_nonempty_item_fraction": {
+      "value": null,
+      "suppressed": true,
+      "minimum": 0.9
+    },
+    "sensitivity_nonempty_item_fraction": {
+      "value": null,
+      "suppressed": true,
+      "minimum": 0.9
+    },
+    "primary_german_item_fraction": {
+      "value": null,
+      "suppressed": true,
+      "minimum": 0.8
+    }
+  },
+  "new_ten_replication_failures": {
+    "annotation_recall_median": {
+      "value": 0.594,
+      "minimum": 0.6
+    },
+    "primary_german_item_fraction": {
+      "value": null,
+      "suppressed": true,
+      "minimum": 0.8
+    },
+    "primary_character_self_similarity_median": {
+      "value": 0.605,
+      "minimum": 0.7
+    },
+    "primary_embedding_self_similarity_median": {
+      "value": 0.844,
+      "minimum": 0.85
+    }
+  },
+  "diagnosis": {
+    "inadequate_german_asr": "SUPPORTED_AS_AN_UNQUALIFIED_INSTRUMENT; matched content agreement is strong conditional on output, but language classification and primary timing-shift robustness fail.",
+    "inadequate_vad_boundary_estimation": "PARTIALLY_SUPPORTED; boundary-F1 median and lower bound pass, while new-cohort annotation recall and combined accepted-speech coverage fail.",
+    "insufficient_or_unsuitable_childlens_speech_signal": "REMAINS_PLAUSIBLE; ten new participant-distinct recordings do not eliminate the zero-accepted-speech pattern.",
+    "inability_to_validate_without_german_human": "UNRESOLVED_AND_MATERIAL; model-model diagnostics cannot adjudicate intelligibility, true language, or transcript correctness."
+  },
+  "recommendation": {
+    "locked_alignment": false,
+    "further_v3_expansion": false,
+    "simulator_or_cue_training": false,
+    "bounded_next_option": "A separately frozen German-speaking human development audit of unsupported and timing-sensitive signal."
+  },
+  "claims": {
+    "human_validation": false,
+    "ground_truth": false,
+    "asr_accuracy": false,
+    "scientific_hypothesis_tested": false
+  },
+  "privacy": {
+    "restricted_values_exported": false,
+    "small_complementary_participant_cells_suppressed": true,
+    "locked_rows_loaded_or_evaluated": 0
+  }
+}
