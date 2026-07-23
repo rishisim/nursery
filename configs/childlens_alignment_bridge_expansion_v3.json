@@ -1,0 +1,170 @@
+{
+  "schema_version": "childlens-alignment-bridge-measurement-expansion-v3.0.0",
+  "status": "FROZEN_BEFORE_EXPANSION_SELECTION_OR_MEDIA_OPEN",
+  "scientific_role": "VERSIONED_DEVELOPMENT_EXPANSION_OF_THE_V2_MEASUREMENT_REMEDIATION",
+  "objective": "Determine whether ten additional participant-distinct ChildLens development recordings improve the precision and cross-participant stability of the already frozen v2 German speech measurement instrument without changing its models, rules, metrics, or gates.",
+  "preserves_prior_artifacts": {
+    "v1_protocol_sha256": "0bb98508214c1c668f04bcc5a2722ab3b1117c72ec9c23ac1f5accf91d648639",
+    "v1_restricted_split_manifest_sha256": "926391535972830289315b95e6b4e4893a3e82aeac03b371ab3212ca324b906a",
+    "v1_canonical_development_report_sha256": "ae88ed4ef093c567da20eb3ee63e1a7beb5cf8fcd6381d12ed04de218cb32dda",
+    "v2_protocol_sha256": "0fd819db4509d23abe2ea195e95a988307871a937aefaec9259f1e2dbd94af97",
+    "v2_restricted_development_manifest_sha256": "9cb87b853eb43636d6baf09c281725eb98255b6cf73439025b47d627e84da5a8",
+    "v2_restricted_segment_manifest_sha256": "a6a17d7d0e12f8003846c906037081732f102cabcbbbc21d49425d79057fd9f9",
+    "v2_restricted_result_sha256": "ab61da2ecdedaf33809591df427afd913bea45763ce65656938d2d463814c44f",
+    "v2_public_report_sha256": "0178f0394cc273d1e79780a6ec31fa49a709fe7ccff8b520b0cb7aa64046f8a6",
+    "prior_artifacts_may_be_modified": false,
+    "prior_gates_may_be_reinterpreted": false
+  },
+  "scope": {
+    "empirical_source": "CHILDLENS_ONLY",
+    "prior_development_participants_reused_without_rerunning": 8,
+    "additional_participant_distinct_recordings": 10,
+    "combined_development_participants": 18,
+    "all_22_prior_locked_participants_excluded_from_selection_and_processing": true,
+    "selection_unit": "participant",
+    "locked_outcomes_loaded_or_evaluated": 0,
+    "locked_alignment_allowed": false,
+    "simulator_generation_allowed": false,
+    "cue_condition_training_allowed": false,
+    "model_or_threshold_shopping_allowed": false,
+    "maximum_expansion_rounds": 1,
+    "further_expansion_under_this_protocol": false
+  },
+  "selection": {
+    "source": "the already bound 192-row ChildLens restricted release manifest and released timed annotations",
+    "restricted_release_manifest_sha256": "a603239d2c96946662390c4dc45c543f1652055e6edd21e156a6f351f78db22a",
+    "media_or_model_outcomes_used_for_selection": false,
+    "excluded_participants": "all participants in the immutable v1 30-recording split, including development and locked",
+    "eligibility": [
+      "one ChildLens video object available for approved selective copy",
+      "participant absent from every v1 split row",
+      "released speech-presence metadata equals PRESENT",
+      "released timed annotation object is locally hash-verified",
+      "at least 60 seconds of coalesced released speech-like timing",
+      "recording duration and manifest display size are positive"
+    ],
+    "strata": [
+      "coarse activity",
+      "speech-presence bin",
+      "duration tertile",
+      "coarse location or unavailable"
+    ],
+    "selection_order": "iterative least-filled stratum; ties by sha256(release_binding|protocol_sha256|media_key); one recording per participant",
+    "sample_audio_seconds_per_recording": 60,
+    "sample_rule": "a deterministic contiguous 60-second range in the union of released speech-like timing; the union offset is sha256(protocol_sha256|speech-block|media_key) modulo available speech duration",
+    "released_bouts_are_utterance_truth": false,
+    "selection_uses_lexical_text": false,
+    "selection_uses_visual_content": false
+  },
+  "acquisition": {
+    "approved_purpose": "existing noncommercial ChildLens action-language grounding and model-calibration project",
+    "source": "read-only authenticated Keeper selective transfer",
+    "storage": "existing owner-private local ChildLens quarantine only",
+    "external_volume_allowed": false,
+    "maximum_concurrent_full_source_recordings": 1,
+    "full_source_retention": false,
+    "retained_derivative": "bounded audio-video clip spanning the frozen released-speech sample with five-second edge margins",
+    "network_during_measurement": false,
+    "retention_review_deadline": "2027-07-31"
+  },
+  "measurement_instrument": {
+    "binding": "exact v2 instruments and preprocessing",
+    "dedicated_vad": {
+      "model": "Silero VAD 6.2.1 ONNX",
+      "source_revision": "7e30209a3e901f9842f81b225f3e93d8199902b1",
+      "sha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3"
+    },
+    "primary_asr": {
+      "model": "whisper.cpp unquantized OpenAI Whisper large-v3",
+      "whisper_cpp_revision": "f049fff95a089aa9969deb009cdd4892b3e74916",
+      "whisper_cpp_binary_sha256": "9613b31e5380c184ae29ccb1d4046953d7037e8eb55308c9f1a34f145143b892",
+      "model_sha256": "64d182b440b98d5203c4f9bd541544d84c605196c4f7b845dfa11fb23594d1e2"
+    },
+    "sole_sensitivity_asr": {
+      "model": "whisper.cpp unquantized OpenAI Whisper large-v3-turbo",
+      "model_sha256": "1fc70f774d38eb169993ac391eea357ef47c88757ef72ee5943879b7e8e2bc69"
+    },
+    "embedding_diagnostic": {
+      "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "revision": "e8f8c211226b894fcb81acc59f3b34ba3efd5f42",
+      "model_safetensors_sha256": "eaa086f0ffee582aeb45b36e34cdd1fe2d6de2bef61f8a559a1bbc9bd955917b"
+    },
+    "shared_segmentation_rules": "identical to v2, including thresholds, released-annotation support, maximum duration, shared byte-identical ASR input, and plus-or-minus 250 ms perturbations",
+    "new_instrument_or_parameter_allowed": false
+  },
+  "analysis": {
+    "ordered_views": [
+      "new ten-participant expansion cohort alone",
+      "combined eighteen-participant development cohort"
+    ],
+    "prior_eight_outcomes": "reuse the immutable v2 restricted per-participant results; do not rerun or retune",
+    "uncertainty": "participant-cluster percentile bootstrap, 10000 replicates, 90% interval, fixed seed 20260706",
+    "primary_decision_view": "combined eighteen-participant cohort",
+    "replication_safeguard": "a combined pass is insufficient unless the new ten-participant cohort also meets all point-estimate, coverage, yield, and perturbation thresholds; bootstrap-lower thresholds apply to the combined cohort because precision is the stated reason for expansion",
+    "heterogeneity": "report old-eight and new-ten point estimates separately; any direction reversal or new-ten failure blocks a locked recommendation",
+    "success_claim": "measurement qualification only, never ASR accuracy, human validation, ground truth, or hypothesis support"
+  },
+  "gates": {
+    "unchanged_from_v2": true,
+    "G1_signal_and_vad": {
+      "development_participant_nonempty_segment_fraction_min": 0.9,
+      "accepted_segments_min": 24,
+      "accepted_speech_seconds_min": 60.0,
+      "participant_median_annotation_overlap_precision_min": 0.6,
+      "participant_median_annotation_overlap_recall_min": 0.6,
+      "participant_median_vad_self_consistency_boundary_f1_min": 0.8,
+      "participant_bootstrap_boundary_f1_90pct_lower_min": 0.65,
+      "participant_median_absolute_duration_change_seconds_max": 0.25,
+      "participant_median_perturbed_to_base_speech_coverage_ratio_range": [
+        0.9,
+        1.1
+      ]
+    },
+    "G2_matched_asr": {
+      "primary_nonempty_item_fraction_min": 0.9,
+      "sensitivity_nonempty_item_fraction_min": 0.9,
+      "primary_usable_utterances_min": 24,
+      "usable_utterance_fraction_of_frozen_segments_min": 0.6,
+      "primary_german_item_fraction_min": 0.8,
+      "primary_sensitivity_language_agreement_min": 0.8,
+      "participant_median_normalized_character_similarity_min": 0.55,
+      "participant_cluster_bootstrap_character_90pct_lower_min": 0.4,
+      "participant_median_embedding_cosine_min": 0.8,
+      "participant_cluster_bootstrap_embedding_90pct_lower_min": 0.7
+    },
+    "G3_timing_shift_robustness": {
+      "participant_median_primary_character_self_similarity_min": 0.7,
+      "participant_median_sensitivity_character_self_similarity_min": 0.7,
+      "participant_median_primary_embedding_self_similarity_min": 0.85,
+      "participant_median_sensitivity_embedding_self_similarity_min": 0.85
+    }
+  },
+  "stop_rules": [
+    "Stop if fewer than ten participants remain after excluding every prior v1 participant.",
+    "Stop if governance, storage, authentication, exact remote metadata, or source-media validation fails; do not substitute another recording after selection.",
+    "Stop if any frozen instrument or prior binding hash fails.",
+    "Stop if either the new-ten replication safeguard or the combined-eighteen gate set fails.",
+    "Do not inspect or evaluate the v1 locked split.",
+    "Do not run real-vs-shuffled or time-shifted vision-language alignment under this protocol.",
+    "Do not introduce another ASR, VAD, embedding model, threshold, segmentation rule, or sample expansion.",
+    "A pass recommends only a separately authorized locked alignment evaluation."
+  ],
+  "privacy": {
+    "public_minimum_cell_size": 5,
+    "restricted_only": [
+      "paths",
+      "filenames",
+      "participant/session/item identifiers",
+      "source locators",
+      "exact intervals",
+      "transcripts",
+      "audio",
+      "video",
+      "embeddings",
+      "row-level scores"
+    ],
+    "public_output": "aggregate evidence and cryptographic receipts only",
+    "human_validation_claimed": false,
+    "ground_truth_claimed": false
+  }
+}

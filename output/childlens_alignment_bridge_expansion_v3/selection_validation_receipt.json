@@ -1,0 +1,31 @@
+{
+  "schema_version": "childlens-alignment-bridge-expansion-selection-validation-v3.0.0",
+  "status": "SELECTION_VERIFIED_BEFORE_MEDIA_ACQUISITION_OR_MEASUREMENT",
+  "protocol_sha256": "787f64eba92a6a2f206e09a447b2f595691230349ba8f17c800faa0e50108f02",
+  "selection_script_sha256": "88e4afcbe98abb23cc0fa70e67add06e3e65878a880a182c8e2c5a17514c859e",
+  "selection_helpers_sha256": "12b94c99ea6fb8308682fc523fc27ec19835d59edd75975b705c61ffe8a4f7e5",
+  "selection_tests_sha256": "9e5c1cbaa415eef2b99d8e610d7c0e38c5e3bd5737d629c357f21310a1730904",
+  "selection_receipt_sha256": "9decd2b5ad832c29c24d97b416711032df0950aa39fcf82302a75be0cc91d081",
+  "restricted_release_manifest_sha256": "a603239d2c96946662390c4dc45c543f1652055e6edd21e156a6f351f78db22a",
+  "restricted_v1_split_sha256": "926391535972830289315b95e6b4e4893a3e82aeac03b371ab3212ca324b906a",
+  "restricted_v2_result_sha256": "ab61da2ecdedaf33809591df427afd913bea45763ce65656938d2d463814c44f",
+  "restricted_expansion_plan_sha256": "796eccc748cd61590bd0c9d4499e92e81277327f11e6ad4a19ce106afa4b4cb6",
+  "checks": {
+    "eligible_unused_recordings": 77,
+    "eligible_unused_participants": 27,
+    "selected_recordings": 10,
+    "selected_participants": 10,
+    "participant_distinct": true,
+    "overlap_with_prior_30_participants": 0,
+    "prior_locked_participants_excluded": 22,
+    "locked_outcomes_loaded_or_evaluated": 0,
+    "media_content_opened_for_selection": false,
+    "model_output_opened_for_selection": false,
+    "lexical_text_used_for_selection": false,
+    "external_volume_used": false,
+    "focused_tests": "14 passed",
+    "python_compile": "passed",
+    "privacy_scan": "passed"
+  },
+  "restricted_values_exported": false
+}
