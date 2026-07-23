@@ -8,6 +8,10 @@ Current artifacts:
 - `selection_freeze_receipt.json` — privacy-safe selection and capacity receipt.
 - `selection_validation_receipt.json` — protocol, code, test, and restricted-plan
   binding.
+- `acquisition_receipt.json` — aggregate selective-transfer and clip-validation
+  receipt.
+- `acquisition_validation_receipt.json` — acquisition code, test, checkpoint,
+  token-disposal, and privacy validation.
 
 All identifiers, source locators, exact intervals, released annotations, media,
 and row-level data remain in the owner-private ChildLens quarantine. No prior
