@@ -1,0 +1,24 @@
+{
+  "checks": {
+    "all_frozen_files_present": true,
+    "babyworld_lite/sensor_alignment_v2/__init__.py": true,
+    "babyworld_lite/sensor_alignment_v2/analysis.py": true,
+    "babyworld_lite/sensor_alignment_v2/detector.py": true,
+    "babyworld_lite/sensor_alignment_v2/learners.py": true,
+    "babyworld_lite/sensor_alignment_v2/protocol.py": true,
+    "babyworld_lite/sensor_alignment_v2/study.py": true,
+    "babyworld_lite/sensor_alignment_v2/synthetic.py": true,
+    "configs/synthetic_sensor_event_robustness_v2.yaml": true,
+    "docs/synthetic_sensor_event_robustness_v2_primary_sources.json": true,
+    "docs/synthetic_sensor_event_robustness_v2_protocol.md": true,
+    "output/synthetic_sensor_event_robustness_v2/confirmation_reserve_manifest.json": true,
+    "output/synthetic_sensor_event_robustness_v2/frozen_config_snapshot.yaml": true,
+    "output/synthetic_sensor_event_robustness_v2/frozen_protocol_snapshot.md": true,
+    "output/synthetic_sensor_event_robustness_v2/primary_sources_snapshot.json": true,
+    "scripts/run_synthetic_sensor_event_robustness_v2.py": true,
+    "tests/test_synthetic_sensor_event_robustness_v2.py": true,
+    "zero_pre_freeze_outcomes": true
+  },
+  "receipt_sha256": "12fa4dd701cd6e33207ac51a351a3679ac8668f4fe07a3ae095f4486b8377b0e",
+  "valid": true
+}

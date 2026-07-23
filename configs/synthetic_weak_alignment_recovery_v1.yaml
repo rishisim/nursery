@@ -1,0 +1,135 @@
+protocol:
+  id: synthetic-weak-alignment-recovery-v1
+  schema_version: synthetic-weak-alignment-protocol-v1
+  status: frozen
+  study_phase: development_only
+  claim: transferable_synthetic_lexical_action_grounding_not_complete_language_acquisition
+  timestamp_claim_excluded: true
+  ecological_claim_excluded: true
+
+seeds:
+  development:
+    corpus: [1103, 2207, 3301, 4409]
+    model: [17, 29, 43]
+  confirmation_reserve:
+    corpus: [91009, 92009, 93001, 94007]
+    model: [101, 103, 107]
+
+factors:
+  speech_action_lag: [-0.28, 0.0, 0.28]
+  grounded_utterance_rate: [0.45, 0.80]
+  candidate_event_count: [2, 5]
+  action_visibility_rate: [0.55, 0.90]
+  word_occurrence_count: [8, 16]
+  side_informativeness: [0.0, 0.75, 0.95]
+
+design:
+  action_count: 6
+  object_count: 6
+  lexical_panels: 3
+  lexemes_per_panel: 6
+  primary_scoring_panels: [0, 1]
+  anchor_panel: 2
+  action_observation_noise: 0.14
+  evaluation_action_observation_noise: 0.08
+  scene_observation_noise: 0.08
+  factor_design: complete_nonrepetition_grid_balanced_within_each_repetition_level
+  low_repetition_grid_replicates: 1
+  high_repetition_grid_replicates: 2
+  expected_training_episodes_per_corpus: 216
+  matched_underlying_episode_inventory_across_conditions: true
+
+conditions:
+  training_side_modality:
+    - synchronized
+    - shuffled
+    - time_shifted
+    - absent
+    - uninformative
+  shuffled_rule: split_local_candidate_count_matched_group_safe_bijection
+  time_shift_rule: cyclic_one_position_shift_including_null
+  absent_rule: omit_side_field_entirely
+  uninformative_rule: within_episode_random_permutation_preserving_exact_score_multiset
+
+learners:
+  names:
+    - exact_window
+    - latent_mil_single_occurrence
+    - cross_situational_uniform
+    - latent_mil_cross_occurrence
+    - latent_mil_cross_no_null
+    - oracle_alignment
+  iterations: 8
+  posterior_temperature: 0.45
+  visual_weight: 2.0
+  temporal_weight: 0.35
+  side_weight: 3.0
+  temporal_scale: 0.18
+  null_logit: -0.10
+  prototype_smoothing: 0.20
+  matched_update_passes_across_side_conditions: true
+
+evaluation:
+  primary_learner: latent_mil_cross_occurrence
+  primary_metric: heldout_composition_action_6way_macro_accuracy
+  primary_scoring_lexemes: panels_0_and_1_preassigned_and_exposed_only_in_training
+  independent_evaluation_instances: true
+  new_instances_per_lexeme: 8
+  heldout_object_action_compositions: one_randomized_composition_per_action_per_corpus
+  final_modalities:
+    - action_observation
+    - scene_observation
+    - lexical_prototypes
+  auxiliary_modality_at_final_evaluation: structurally_forbidden
+  noun_non_action_control: heldout_composition_noun_control_6way_macro_accuracy
+  zero_exposure_lexical_type_negative_control: true
+
+sensitivity_analysis:
+  learner: latent_mil_cross_occurrence
+  conditions: [synchronized, shuffled]
+  endpoint: supported_primary_lexical_mapping_accuracy
+  refit_separately_within_every_level_of_every_manipulated_factor: true
+  status: secondary_descriptive
+
+inference:
+  independent_unit: corpus_seed_crossed_with_model_seed
+  bootstrap_samples: 5000
+  bootstrap_seed: 2026071501
+  bootstrap: paired_hierarchical_corpus_then_model_seed
+  episode_or_window_resampling_for_primary_ci: forbidden
+  confidence_level: 0.95
+  primary_alpha: 0.05
+  multiplicity: one_primary_contrast_secondary_descriptive_no_adjusted_claims
+
+manipulation_gates:
+  minimum_informative_accuracy_minus_chance: 0.35
+  maximum_uninformative_absolute_accuracy_minus_chance: 0.08
+  minimum_informative_control_gap: 0.30
+
+shortcut_gates:
+  maximum_surface_shortcut_accuracy: 0.35
+  zero_exposure_chance_tolerance: 0.02
+
+learnability_gates:
+  minimum_oracle_action_accuracy: 0.80
+  minimum_observation_capacity: 0.95
+  minimum_noun_control_accuracy: 0.95
+
+decision_rule:
+  primary_contrast: [synchronized, shuffled]
+  go_minimum_absolute_lift: 0.05
+  go_minimum_positive_pairs: 9
+  go_minimum_action_minus_noun_lift: 0.03
+  go_maximum_uninformative_absolute_lift: 0.10
+  go_requires_primary_ci_above_zero: true
+  go_requires_synchronized_above_time_shifted_absent_and_uninformative: true
+  go_requires_all_validity_and_positive_control_gates: true
+  stop_if_any_validity_or_positive_control_gate_fails: true
+  stop_if_primary_ci_entirely_below_zero: true
+  otherwise: REVISE
+  recommendation_scope: later_frozen_synthetic_confirmation_only
+  recommendation_does_not_authorize_confirmation: true
+
+external_endpoints:
+  machine_devbench: excluded_low_coverage_secondary_only_13_of_1414
+  aea: terminal_stop_no_further_language_sensor_or_acquisition_work

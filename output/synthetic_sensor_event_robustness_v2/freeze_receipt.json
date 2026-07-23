@@ -1,0 +1,105 @@
+{
+  "accidental_pre_freeze_outcome_incidents": [],
+  "code_provenance": {
+    "git_branch": "main",
+    "git_head": "e6acf51ce4798dc051cafc0a3aec8b0dc61c535a",
+    "git_status_porcelain_at_freeze": [
+      "?? babyworld_lite/sensor_alignment_v2/",
+      "?? babyworld_lite/weak_alignment/",
+      "?? configs/synthetic_sensor_event_robustness_v2.yaml",
+      "?? configs/synthetic_weak_alignment_recovery_v1.yaml",
+      "?? docs/synthetic_sensor_event_robustness_v2_primary_sources.json",
+      "?? docs/synthetic_sensor_event_robustness_v2_protocol.md",
+      "?? docs/synthetic_weak_alignment_recovery_v1_primary_sources.json",
+      "?? docs/synthetic_weak_alignment_recovery_v1_protocol.md",
+      "?? output/synthetic_sensor_event_robustness_v2/",
+      "?? output/synthetic_weak_alignment_recovery_v1/",
+      "?? scripts/run_synthetic_sensor_event_robustness_v2.py",
+      "?? scripts/run_synthetic_weak_alignment_v1.py",
+      "?? tests/test_synthetic_sensor_event_robustness_v2.py",
+      "?? tests/test_synthetic_weak_alignment_v1.py"
+    ],
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "confirmation_manifest_sha256": "855cf6b90f212ea8758d6ba0f6b36d8587a954ec7b8148c67225d0caed998359",
+  "content_hashes": {
+    "babyworld_lite/sensor_alignment_v2/__init__.py": {
+      "bytes": 157,
+      "sha256": "c57a0e190b8f02bf89a698a272dc0f4fd254a6324cd39ca639165a623e68978c"
+    },
+    "babyworld_lite/sensor_alignment_v2/analysis.py": {
+      "bytes": 29889,
+      "sha256": "4e99ed5d5d567eeba165309831e78d47148d4cbac6025f0ef4f677975b1ff720"
+    },
+    "babyworld_lite/sensor_alignment_v2/detector.py": {
+      "bytes": 16759,
+      "sha256": "6d74817b5bb30b4b265f2ec246b71be432d68ca6f545d50b04a153d77df33b6d"
+    },
+    "babyworld_lite/sensor_alignment_v2/learners.py": {
+      "bytes": 35563,
+      "sha256": "1600c96642b3303d3f12b437a281b8295bae3ddf147f636dd1fb06fb09ea78ef"
+    },
+    "babyworld_lite/sensor_alignment_v2/protocol.py": {
+      "bytes": 16903,
+      "sha256": "a66d16f515d275fcd08c1db7293ca9ba50c14e7e60b820bba5d2eca3c8338bd8"
+    },
+    "babyworld_lite/sensor_alignment_v2/study.py": {
+      "bytes": 45005,
+      "sha256": "a707c89e224ebf0c4fd5014f38fd55c29d787a0b2ec6572ea455ffff2f86c346"
+    },
+    "babyworld_lite/sensor_alignment_v2/synthetic.py": {
+      "bytes": 46948,
+      "sha256": "31aaba45e98455138ba798806497fbc83ab9f02e6843c0364f3378d1056eae1f"
+    },
+    "configs/synthetic_sensor_event_robustness_v2.yaml": {
+      "bytes": 7278,
+      "sha256": "c1e90423ad197bf97e12f1bb719c92886218c1c4873e55ee849ed62dede30d10"
+    },
+    "docs/synthetic_sensor_event_robustness_v2_primary_sources.json": {
+      "bytes": 6169,
+      "sha256": "8eb65b00eb7c475793e00f0c8d521582fb41ee220fe84575dc8e0135eed961a9"
+    },
+    "docs/synthetic_sensor_event_robustness_v2_protocol.md": {
+      "bytes": 12704,
+      "sha256": "9eb8951e837f6b84f6113060a147a0bbc8d55ca4e72e73255c3e9ad9166c404e"
+    },
+    "output/synthetic_sensor_event_robustness_v2/confirmation_reserve_manifest.json": {
+      "bytes": 604,
+      "sha256": "855cf6b90f212ea8758d6ba0f6b36d8587a954ec7b8148c67225d0caed998359"
+    },
+    "output/synthetic_sensor_event_robustness_v2/frozen_config_snapshot.yaml": {
+      "bytes": 7278,
+      "sha256": "c1e90423ad197bf97e12f1bb719c92886218c1c4873e55ee849ed62dede30d10"
+    },
+    "output/synthetic_sensor_event_robustness_v2/frozen_protocol_snapshot.md": {
+      "bytes": 12704,
+      "sha256": "9eb8951e837f6b84f6113060a147a0bbc8d55ca4e72e73255c3e9ad9166c404e"
+    },
+    "output/synthetic_sensor_event_robustness_v2/primary_sources_snapshot.json": {
+      "bytes": 6169,
+      "sha256": "8eb65b00eb7c475793e00f0c8d521582fb41ee220fe84575dc8e0135eed961a9"
+    },
+    "scripts/run_synthetic_sensor_event_robustness_v2.py": {
+      "bytes": 4643,
+      "sha256": "8fe91ddd86ccbc5b6f56e2da9e775c19b362639afd5d0222776ede5791971a1a"
+    },
+    "tests/test_synthetic_sensor_event_robustness_v2.py": {
+      "bytes": 19757,
+      "sha256": "2253d4694449ee740c56be49349c0249f43e796f9ed16eec36209182e1c0a556"
+    }
+  },
+  "created_at_utc": "2026-07-15T21:12:28.206375+00:00",
+  "fixture_only_smoke_checks_before_freeze": true,
+  "outcome_producing_runs_before_freeze": 0,
+  "phase_at_freeze": "pre_outcome_development_protocol_freeze",
+  "protocol_amendments": [],
+  "protocol_id": "synthetic-sensor-event-robustness-v2",
+  "runtime_provenance": {
+    "numpy": "2.5.1",
+    "pid": 83412,
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "python": "3.12.13 (main, Mar 10 2026, 18:18:07) [Clang 21.1.4 ]",
+    "python_executable": ".venv/bin/python"
+  },
+  "schema_version": "synthetic-sensor-event-freeze-receipt-v2"
+}

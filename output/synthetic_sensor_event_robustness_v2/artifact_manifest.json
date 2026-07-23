@@ -1,0 +1,751 @@
+{
+  "deterministic_file_count": 186,
+  "files": {
+    "aggregate_results.json": {
+      "bytes": 44644,
+      "sha256": "457bbc4d8ab24c510fbd40a74a498fdd901b99aa2b73eca5d14da07d08e32af0"
+    },
+    "audits/calibration_boundary.json": {
+      "bytes": 2345,
+      "sha256": "b438d2535dc7f81b6e5c16dd68b078d29a6a38a02eff92a6a6910f2e9a03657e"
+    },
+    "audits/confirmation_reserve_guard.json": {
+      "bytes": 518,
+      "sha256": "b23bc530de41c13fc7dd013aebb5907b15459865fbad7361fb7523790d5649aa"
+    },
+    "audits/detector_validation.json": {
+      "bytes": 1123,
+      "sha256": "fc7b4c7d1ca2563ffc9def22f7d9e7b80463df1b7de74320f8cefd12aaa2b280"
+    },
+    "audits/evaluation_firewall.json": {
+      "bytes": 956,
+      "sha256": "e74bdeec499db907cf814c7413eae2c0a550e330ed169c4245e41d28192cda73"
+    },
+    "audits/leakage.json": {
+      "bytes": 579,
+      "sha256": "a2a14df2dc3fe8a50833cc7209e872b851bf33fd74992acedd6632921a4f03f0"
+    },
+    "audits/learnability.json": {
+      "bytes": 461,
+      "sha256": "414000d95b21c9734b0c1942aa6b4eed0533ce31df6bdd273d15dee849aa7633"
+    },
+    "audits/pairing_fairness.json": {
+      "bytes": 97693,
+      "sha256": "8d4bbd0d1f0718baa216eef5832bd63d87249b23a48833bb2308103bf867ac61"
+    },
+    "audits/protocol_freeze.json": {
+      "bytes": 1304,
+      "sha256": "c85cfad57bfac7498816b29aea00ee4851c735b9fe267bec35b6f8763d3ec43e"
+    },
+    "audits/stochastic_model_replicates.json": {
+      "bytes": 466,
+      "sha256": "d3edd6b641fe204bd70a065784e59ccfcaf1db79846f50d6f324741d13aaac11"
+    },
+    "detector/fit_trace.json": {
+      "bytes": 612,
+      "sha256": "8c3f994ee2108dd2c968a6941b09e41175fa29e974cbe89edd56695c5f547242"
+    },
+    "detector/frozen_detector.json": {
+      "bytes": 1408,
+      "sha256": "a487035deba4692728240eb593ba16e1182d9b5959b43d950b60883d1ed08b33"
+    },
+    "detector/heldout_validation.json": {
+      "bytes": 1123,
+      "sha256": "fc7b4c7d1ca2563ffc9def22f7d9e7b80463df1b7de74320f8cefd12aaa2b280"
+    },
+    "factor_sensitivity.json": {
+      "bytes": 154100,
+      "sha256": "45dc73f0d6fcf2ea53b7c1ed1c51d538f22ab295ebc5250b82f68c99a25e69e9"
+    },
+    "raw/calibration/train_oracle.jsonl": {
+      "bytes": 335636,
+      "sha256": "13b77477f0717e50482a6bf3bde59cf1c7440352a44ae2ad0ea700a54548eaab"
+    },
+    "raw/calibration/train_provenance.json": {
+      "bytes": 725,
+      "sha256": "e3168e2ea94bcb97d83c4f7820182628df99f2cfd1a44ca2fec923e6e295a3b9"
+    },
+    "raw/calibration/train_visible.jsonl": {
+      "bytes": 5274572,
+      "sha256": "36b1f5add974d2df2467a003041f29af0c4863f77a36afc2f62a936d2fc73ebb"
+    },
+    "raw/calibration/validation_oracle.jsonl": {
+      "bytes": 120507,
+      "sha256": "1ba2aa7c03f9011c29b6843318e51e66ed07309c12b6d6432eb9a9c3ffeb51cb"
+    },
+    "raw/calibration/validation_provenance.json": {
+      "bytes": 708,
+      "sha256": "176aae352dc75b595ad4eb7ee035597809336023a690c51d900ecd86d91ff3f8"
+    },
+    "raw/calibration/validation_visible.jsonl": {
+      "bytes": 1884640,
+      "sha256": "9c4bd23933da7655dcea7454b4d493c3af4ed9702640bf2fd1c9170665f42bd5"
+    },
+    "raw/corpora/corpus_12011/evaluation_items.jsonl": {
+      "bytes": 58310,
+      "sha256": "1f5c47fade64cccd88443b0e885c176c638611377ba9eb9f886f4ae0f2dd6a23"
+    },
+    "raw/corpora/corpus_12011/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "5f36e8b89eb80eb940a60fc1c4a3e9ebd2d52387b712687e13fb6b3ef4f4eb2e"
+    },
+    "raw/corpora/corpus_12011/generation_audit.json": {
+      "bytes": 4506,
+      "sha256": "e224c871d8ca9535240daeb2dbf5ab8aee205748cfdb424697f741dabfe7a99a"
+    },
+    "raw/corpora/corpus_12011/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "80c3fcbe83a5796f2ff0d114a542d510612fdd5ee512a1cfe24a04107ac6fedb"
+    },
+    "raw/corpora/corpus_12011/oracle_episodes.jsonl": {
+      "bytes": 362646,
+      "sha256": "32a192847191fa42d481ee62faf447a3d7ae65fe050088c9a52fad62e7ec65d7"
+    },
+    "raw/corpora/corpus_12011/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "249c20b0877407855465a3a88e1ab44b3bd4971d60dcf68119cc2d808a51b4ef"
+    },
+    "raw/corpora/corpus_12011/visible_episodes.jsonl": {
+      "bytes": 4068993,
+      "sha256": "1cb686c384d6836214d85e4ab6817d065df3e2e2a982e8fd2823aa7eba4e16c2"
+    },
+    "raw/corpora/corpus_12037/evaluation_items.jsonl": {
+      "bytes": 58332,
+      "sha256": "c391275b5092c7f5e63bba67c12e636c6704b5133fe1870359810f45f7f9192e"
+    },
+    "raw/corpora/corpus_12037/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "9962853107b5174168416d8a5c38c144c596e7e45ddfb780fe6ef4b0315be93d"
+    },
+    "raw/corpora/corpus_12037/generation_audit.json": {
+      "bytes": 4507,
+      "sha256": "415916deac63ae41469bb040d1074be814fe72f9e0e7507e957111529211df49"
+    },
+    "raw/corpora/corpus_12037/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "78e5e4014b7db96e53b72892c03d88bcc5b73ba6d75df801191e514deb8fe249"
+    },
+    "raw/corpora/corpus_12037/oracle_episodes.jsonl": {
+      "bytes": 362752,
+      "sha256": "91e367efe496f6441248691ab1afd79b28c6284aba0b6d98c29feacae45cf8b2"
+    },
+    "raw/corpora/corpus_12037/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "d1887cf5fe2fb589324763f4879a1ee9557519d98d9e58318e4e0fa43cc0ea31"
+    },
+    "raw/corpora/corpus_12037/visible_episodes.jsonl": {
+      "bytes": 4068203,
+      "sha256": "ee5797754b31ff4ae240a1e57452a199786e23e6618927310f6abd0cf0c2641b"
+    },
+    "raw/corpora/corpus_12049/evaluation_items.jsonl": {
+      "bytes": 58309,
+      "sha256": "c9f65c4e1e17f654daab330b96b5ae17c2b628afe064608857d7aae3ac628678"
+    },
+    "raw/corpora/corpus_12049/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "d0ec99d75a888a4d40915640a6a537077b0c943d6119716fe431c6f9a3a3df47"
+    },
+    "raw/corpora/corpus_12049/generation_audit.json": {
+      "bytes": 4494,
+      "sha256": "8b85a4964fe2bfed6a75fe9feb9252445540f774da10ec385e220a69f4bb1b61"
+    },
+    "raw/corpora/corpus_12049/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "4e3fa8b02986033d73bfaff2471da6c94e5af94a03c0b8832df669da6abfaaa6"
+    },
+    "raw/corpora/corpus_12049/oracle_episodes.jsonl": {
+      "bytes": 362740,
+      "sha256": "0f41e1d0598ffc320a785ce598f20476c32d70210c32412db1b775eb3ccd8cf2"
+    },
+    "raw/corpora/corpus_12049/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "cac95f08ce42cf1088c4e3b6709f9515cd0f5bf8dfe2292ca04fbcfd73624983"
+    },
+    "raw/corpora/corpus_12049/visible_episodes.jsonl": {
+      "bytes": 4067216,
+      "sha256": "0c3667a91170812f4141010b9fc0d9b0ab7ea8cb46961939023098d53b69d947"
+    },
+    "raw/corpora/corpus_12071/evaluation_items.jsonl": {
+      "bytes": 58318,
+      "sha256": "199f6326ef6bb1cb5597d10c93696ed5617f5ed665c8a220c0f3cea63287480d"
+    },
+    "raw/corpora/corpus_12071/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "9282fffc001cfc228ad2c6e2ec2d624ed94c558213c4c27475a90b1a81e834c6"
+    },
+    "raw/corpora/corpus_12071/generation_audit.json": {
+      "bytes": 4495,
+      "sha256": "fd3b0c35b94962cab0cb51ff31cd29446becc492dc4b3bdf959ec07e73b2ae3c"
+    },
+    "raw/corpora/corpus_12071/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "1e3b933591def082a9c9a5eb897716b9feb2ed29776202af3135df0a5e7836dc"
+    },
+    "raw/corpora/corpus_12071/oracle_episodes.jsonl": {
+      "bytes": 362495,
+      "sha256": "c894cbae2863ec0c479600d48d4b74d6e6143e1e7202b836ad3a66f357d6efbc"
+    },
+    "raw/corpora/corpus_12071/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "d637ac2a63142738ddb350167dadf37f38df8ff551a5427c53be8fa29447eef7"
+    },
+    "raw/corpora/corpus_12071/visible_episodes.jsonl": {
+      "bytes": 4068174,
+      "sha256": "3809e686143e5bfb40f70c9724fa8f22ab1ca4e5c1b6fd53d8ed850f35b66fed"
+    },
+    "raw/corpora/corpus_12097/evaluation_items.jsonl": {
+      "bytes": 58313,
+      "sha256": "531d6717605607c40990d2f4e12b92a7273e33e0d15984178fe020b8b23e549f"
+    },
+    "raw/corpora/corpus_12097/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "c65cf2563b3c96f70a5323176a85f5ef5722b18b998ecc651199b0ce62ceb05b"
+    },
+    "raw/corpora/corpus_12097/generation_audit.json": {
+      "bytes": 4507,
+      "sha256": "64a292ed77c57b71e9e836c81a53bac525b9025f8ba066b5f7e52443c2706732"
+    },
+    "raw/corpora/corpus_12097/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "64f29e97474dcdcf317e0d6a1543ba6d6612066c20fa6f238b2ef968e174fa6d"
+    },
+    "raw/corpora/corpus_12097/oracle_episodes.jsonl": {
+      "bytes": 362681,
+      "sha256": "6d1aacefec15bc1c82fd19f0a20c577f5f2b443b6df5973b8c1ba332d30272e1"
+    },
+    "raw/corpora/corpus_12097/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "790e18174f249b64ea013bb01c33b1693a8d572c1537b865e86d3f885f5af57b"
+    },
+    "raw/corpora/corpus_12097/visible_episodes.jsonl": {
+      "bytes": 4068633,
+      "sha256": "e180c57bb44f8acb30a6381ed3f7b99e089bcddd1ab369752db8614c8ca86cc5"
+    },
+    "raw/corpora/corpus_12101/evaluation_items.jsonl": {
+      "bytes": 58303,
+      "sha256": "e8f0ffae9798319c165317f63c1598c4bc8909fe8dc43a967f12d452b9883abb"
+    },
+    "raw/corpora/corpus_12101/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "de16994851ceb065682677d2d19727215a6879d54a8b0a221b282750ad54d0bf"
+    },
+    "raw/corpora/corpus_12101/generation_audit.json": {
+      "bytes": 4507,
+      "sha256": "f68ba6c394d4cf783be1cfa78a11d5f3d5e8288e87b8847dc06e271f0c661297"
+    },
+    "raw/corpora/corpus_12101/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "42ce32d5412a8cf745a06e11bc2e252849dda80ff40650a51e6940b274691917"
+    },
+    "raw/corpora/corpus_12101/oracle_episodes.jsonl": {
+      "bytes": 362765,
+      "sha256": "96e013ac91332d8dea43b43baf284fd41a4321b87832479e46c415eeeb8f64d2"
+    },
+    "raw/corpora/corpus_12101/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "c2edbd24dc152011a6fce5eab147d25eb5248b62e90382d922382d89431c3de3"
+    },
+    "raw/corpora/corpus_12101/visible_episodes.jsonl": {
+      "bytes": 4069120,
+      "sha256": "4553e12aed8d9770219aa6efcd7ced56efdfe73516294f009039c949bc9fc621"
+    },
+    "raw/corpora/corpus_12113/evaluation_items.jsonl": {
+      "bytes": 58308,
+      "sha256": "b2e705ea725d8c362d08349fdc23ae1506614345506bfaa26a3cdc23823ef0a4"
+    },
+    "raw/corpora/corpus_12113/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "e4d75112fb9c4b520d3f43b4da6d25b1aee17f7226b92276c625124d4371f75e"
+    },
+    "raw/corpora/corpus_12113/generation_audit.json": {
+      "bytes": 4508,
+      "sha256": "9b6934b44e4d7caecb04d3431489a9e3972b4a6f3863f46e28ebff4732fc85cb"
+    },
+    "raw/corpora/corpus_12113/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "aedcbda272fb9cbc533f3c3dc2b2a041d6e8de2060e609cc56cf210ae0c85352"
+    },
+    "raw/corpora/corpus_12113/oracle_episodes.jsonl": {
+      "bytes": 362579,
+      "sha256": "1accf94f32e8784aabaf4c84b917db650a12a8e767ebc91f79f7e18c19e51b98"
+    },
+    "raw/corpora/corpus_12113/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "8b4145a6c799f67a2e51e24d93e98d47ad7137eca424c7861bbd473f071732b5"
+    },
+    "raw/corpora/corpus_12113/visible_episodes.jsonl": {
+      "bytes": 4068746,
+      "sha256": "5a73b06561d66ce407cba007a0a777da97f74dbdabad4e18855e8520243ff4e3"
+    },
+    "raw/corpora/corpus_12119/evaluation_items.jsonl": {
+      "bytes": 58323,
+      "sha256": "796840213d4b07b020c0399649653054df1caafb3f2cec0b70f727b99e2feb77"
+    },
+    "raw/corpora/corpus_12119/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "5504e8f43105c366ddea431d8e1b7d8a65436ac71ffd9c6005e8328fdda3778f"
+    },
+    "raw/corpora/corpus_12119/generation_audit.json": {
+      "bytes": 4507,
+      "sha256": "b4aa786128c566dc1f8b778b9637615782a381451ca97877c1dd061d004b052d"
+    },
+    "raw/corpora/corpus_12119/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "9c5fa8b16812e305e17efc6e035e93af38468bf6e5add5549b0a19d3b63d0d3a"
+    },
+    "raw/corpora/corpus_12119/oracle_episodes.jsonl": {
+      "bytes": 362671,
+      "sha256": "5c779e1541029b190ac3c1e8167c0efc14eaa56c6bcccba6ea618a76e513ed26"
+    },
+    "raw/corpora/corpus_12119/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "ff1acef290990c74f9b14ca4d6b29156bc3457965f8f16fff11b891f7699e8f2"
+    },
+    "raw/corpora/corpus_12119/visible_episodes.jsonl": {
+      "bytes": 4068370,
+      "sha256": "46ecf569b405be3d00cb6907e8c7c5a3cbebb08d89667f5252f4ee985cfbd31e"
+    },
+    "raw/corpora/corpus_12143/evaluation_items.jsonl": {
+      "bytes": 58305,
+      "sha256": "78be65dc3d71c6671a3ff0b883ce354f23984067ab5b26ad4dd86e45efd74eb8"
+    },
+    "raw/corpora/corpus_12143/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "ebefebb127d4fbdfa309a28cdcb3f79b933a70bb84e1f6ef770a440ff3e78e23"
+    },
+    "raw/corpora/corpus_12143/generation_audit.json": {
+      "bytes": 4507,
+      "sha256": "9ecd599509510e461220c3e8e2703c299db3f301864ce30b2f33e6aefa7f5991"
+    },
+    "raw/corpora/corpus_12143/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "977bfcfb47f70e1381622fba3f6df98222925cc6aafe7bdba634e3152020f1b4"
+    },
+    "raw/corpora/corpus_12143/oracle_episodes.jsonl": {
+      "bytes": 362668,
+      "sha256": "9fe6060b34d0f0ecf08f2f39c434cf4752a389baf1426a353c2edbb36fd2a20f"
+    },
+    "raw/corpora/corpus_12143/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "fa1054a11a6cf5bb7532cfc29b287c82413a65654e1a550ac5ba1f26df91fc65"
+    },
+    "raw/corpora/corpus_12143/visible_episodes.jsonl": {
+      "bytes": 4068034,
+      "sha256": "f5b3d0a2854f90fabf42ba161ffdf6aa8ebbd9135b09053a82f463ccb4287d08"
+    },
+    "raw/corpora/corpus_12149/evaluation_items.jsonl": {
+      "bytes": 58337,
+      "sha256": "e989ba393e0571db909e3fd2e3827d79d59c89d057f6fa7903c1cd6afa81bcb2"
+    },
+    "raw/corpora/corpus_12149/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "e9bef074cd764c8886afc4612141d347ebe0211a663db8152116d860a140072a"
+    },
+    "raw/corpora/corpus_12149/generation_audit.json": {
+      "bytes": 4507,
+      "sha256": "75223e23c027ba7b8f7621687842d81a8aecc369eb11f86350fb536bcee86161"
+    },
+    "raw/corpora/corpus_12149/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "cf3c875562c1ebffee577b00307dc36e0e12e8480f9f5cc9cb5d89e46b7ad9c8"
+    },
+    "raw/corpora/corpus_12149/oracle_episodes.jsonl": {
+      "bytes": 362777,
+      "sha256": "5c7e4c58533af7ec52755f48c38a8654b32a27a7eb2a93860961065ba6883650"
+    },
+    "raw/corpora/corpus_12149/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "a01a4ce4c5c8d1ae1c93bf1522ee19c259c71af3b51fa97113f58fedafe32268"
+    },
+    "raw/corpora/corpus_12149/visible_episodes.jsonl": {
+      "bytes": 4068213,
+      "sha256": "e892d6d51c93fee13a0e930348f980740e9afa8c2c0e2ee5a8e2933dbbc105ed"
+    },
+    "raw/corpora/corpus_12157/evaluation_items.jsonl": {
+      "bytes": 58335,
+      "sha256": "5df2d754371142b07b8f19b416b04f7aa673eb59efb3a316be11404b66f765f9"
+    },
+    "raw/corpora/corpus_12157/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "cd0ed7c629cd7971e69b0b41b1e7a1e34e0f21c7e7a191725d6a06a3598591fb"
+    },
+    "raw/corpora/corpus_12157/generation_audit.json": {
+      "bytes": 4507,
+      "sha256": "8161c093069105d63f046e34613c2ea16acc8ed0731783e04592a82dc97b1804"
+    },
+    "raw/corpora/corpus_12157/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "ae7044829d1cc47c6ff8092adbca0e6dcbb8ab2ab6ae27e271d4537c89f8750e"
+    },
+    "raw/corpora/corpus_12157/oracle_episodes.jsonl": {
+      "bytes": 362612,
+      "sha256": "ca954eaece1e806fbcdbe3f11903b2197c81ef57e17695eff1acc9f1765e3f70"
+    },
+    "raw/corpora/corpus_12157/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "3fb9118ae7f1922758a2868984f78f2a8a2f9928e796de9247dd4e2bc455c621"
+    },
+    "raw/corpora/corpus_12157/visible_episodes.jsonl": {
+      "bytes": 4068228,
+      "sha256": "4af34ae45eb94c3b101b04fe71c6bc9c4c97d490a8ae26aedb621663597c73a8"
+    },
+    "raw/corpora/corpus_12161/evaluation_items.jsonl": {
+      "bytes": 58316,
+      "sha256": "ef77ed480976e6ab9d8a15a50a9fc1ee854cb107284300c97e07924c176d34ac"
+    },
+    "raw/corpora/corpus_12161/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "d2ecfda0fffdf517d445dbb1af911f88eebfbad17a42134fc0bd6db4d75aaf7f"
+    },
+    "raw/corpora/corpus_12161/generation_audit.json": {
+      "bytes": 4507,
+      "sha256": "7c2f7d70b5a8c59e543836f8c59b8fc732c3c3fca64553fa9ed2b70f1005d96e"
+    },
+    "raw/corpora/corpus_12161/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "bcc9a1b5609011bcbde854f6f880e7f9a213f1327107aa5532aad1fca56da5fc"
+    },
+    "raw/corpora/corpus_12161/oracle_episodes.jsonl": {
+      "bytes": 362545,
+      "sha256": "7c0c73eb06027b9ecbfa5ea01a059f80157220a8ed60a5cfe1bd616a6a89d6cf"
+    },
+    "raw/corpora/corpus_12161/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "ffd01f236fa694234bee70a52e7f7150a8b8f23f06648158740ec1d5c6ee07ff"
+    },
+    "raw/corpora/corpus_12161/visible_episodes.jsonl": {
+      "bytes": 4067710,
+      "sha256": "040a554c448bd7a21c9625a4d9f651a7818487009c62ead33f8bb1aed0a980f4"
+    },
+    "raw/corpora/corpus_12163/evaluation_items.jsonl": {
+      "bytes": 58336,
+      "sha256": "ad89fb04c82768a9045c71eb678c26ba011cc459a87c58438525e6c43ecf75f5"
+    },
+    "raw/corpora/corpus_12163/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "5378b443f42f42b4a4a6604f43192788c433233206949c3db6b55d1b996b18d1"
+    },
+    "raw/corpora/corpus_12163/generation_audit.json": {
+      "bytes": 4508,
+      "sha256": "edce7425626a106d29d13cd382b32a775b55968405677247429fa2d26f94e686"
+    },
+    "raw/corpora/corpus_12163/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "53b49412e38e482e7eb9e2832a8dee88349f903e69ffe5b60aab5b32ba47f83e"
+    },
+    "raw/corpora/corpus_12163/oracle_episodes.jsonl": {
+      "bytes": 362717,
+      "sha256": "138a484dcf551d3a05e7fd4c3f52ac154911cffaa35fbcd74c7f696947aaa92d"
+    },
+    "raw/corpora/corpus_12163/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "e6c8084a4d12909555b87819a9ce5c8b2b00d11244adb655ba16ff3da97907ae"
+    },
+    "raw/corpora/corpus_12163/visible_episodes.jsonl": {
+      "bytes": 4068905,
+      "sha256": "db2744618cad29a038f00986d89f841d2c6de57ca2b0e7dfefcdcf30bbc9395a"
+    },
+    "raw/corpora/corpus_12197/evaluation_items.jsonl": {
+      "bytes": 58296,
+      "sha256": "8a5c016b3b5bfc9f34408510f4cd300d835f2b25f95fa2b8fd8dd1f58efde570"
+    },
+    "raw/corpora/corpus_12197/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "690baeb29953f3c29ee16fa4eafba02db356fb637a68e4f50d38150651e3d763"
+    },
+    "raw/corpora/corpus_12197/generation_audit.json": {
+      "bytes": 4506,
+      "sha256": "14208bfc805492d0ae6c810fde2d75e19cb65a5d791a9f23b2bba57ea43cd7a0"
+    },
+    "raw/corpora/corpus_12197/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "c0ae46e1e98931cf8d681ac93cb545ef77f858ead40f0457f864dc548c62a4ae"
+    },
+    "raw/corpora/corpus_12197/oracle_episodes.jsonl": {
+      "bytes": 362533,
+      "sha256": "470f1c030887340f450b07a9073edab4b778e4c21abb135a1d58cd3bf60d4cbf"
+    },
+    "raw/corpora/corpus_12197/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "21557ad3f27876be8f7c541b126018138be8223fe65d83478646beaded0696c1"
+    },
+    "raw/corpora/corpus_12197/visible_episodes.jsonl": {
+      "bytes": 4067169,
+      "sha256": "f8919943ccbec89cb5f4c9784d363bd3b8fd442ed41c2e65172c6665a4fb0e88"
+    },
+    "raw/corpora/corpus_12203/evaluation_items.jsonl": {
+      "bytes": 58309,
+      "sha256": "c23967c8107053e9681198c1fb9ce6ecf06afe3164c5398a4da10c9dbc4cb830"
+    },
+    "raw/corpora/corpus_12203/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "2e4243687050191f5d62177aa40fa06482fee1b6288785eda2a33e7edfc114e3"
+    },
+    "raw/corpora/corpus_12203/generation_audit.json": {
+      "bytes": 4507,
+      "sha256": "9e625693f741101cde420ccf04731b23ae53351c491cdf0a1daa8a0a32bd7a24"
+    },
+    "raw/corpora/corpus_12203/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "73cf8cd1e0171b8235d5613ad67f400e9efcf54ff122558f9ceab186dd252f71"
+    },
+    "raw/corpora/corpus_12203/oracle_episodes.jsonl": {
+      "bytes": 362630,
+      "sha256": "e2976d1a39d6fcffea6ec81cf347b6d11807b70dc24a9566743a2135a6b0f517"
+    },
+    "raw/corpora/corpus_12203/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "b8ced22826b91dadc20d5108b2a68c840ced2f662dd0f0df83469700d08e0ef7"
+    },
+    "raw/corpora/corpus_12203/visible_episodes.jsonl": {
+      "bytes": 4068775,
+      "sha256": "7730dca0cf617db0a04a58189e91ff820be733bb5c792da7014c3492efc788b0"
+    },
+    "raw/corpora/corpus_12211/evaluation_items.jsonl": {
+      "bytes": 58326,
+      "sha256": "160559c671df2c1fed9e91fe1c5ae4d9466fd0be8fb3efe6e866597f0e0d3a97"
+    },
+    "raw/corpora/corpus_12211/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "590fa5887898cf61845cc8f8ef47d4bade2abb86bcf1a48ec474a55b5949d567"
+    },
+    "raw/corpora/corpus_12211/generation_audit.json": {
+      "bytes": 4493,
+      "sha256": "b1c06f288c3a2e48eba9a67741e40e156023f09ddf31ee6d8cdb4f2f0e3c2aa7"
+    },
+    "raw/corpora/corpus_12211/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "91cab3aea2c0d76bca1614f6e52ed9a6441fd229602a344d07436f2c7e3f2f71"
+    },
+    "raw/corpora/corpus_12211/oracle_episodes.jsonl": {
+      "bytes": 362623,
+      "sha256": "350c2ed126bad3b38df2a713eb1054334cdff7dfae0e9a593b3f28e49100c64e"
+    },
+    "raw/corpora/corpus_12211/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "82b6ccf56a8bd7b1801bd11ea765abd334d891b2a4099b772d3c8ca9235cccdd"
+    },
+    "raw/corpora/corpus_12211/visible_episodes.jsonl": {
+      "bytes": 4068077,
+      "sha256": "f09e98f376cfe0281ca09c124dddc0a54c2aaf1ad9433854cc8461cc0e7915db"
+    },
+    "raw/corpora/corpus_12227/evaluation_items.jsonl": {
+      "bytes": 58312,
+      "sha256": "00a6882fc08d85ee71af033a01486ac22894892c2682c4bff6dfa6d095cf282a"
+    },
+    "raw/corpora/corpus_12227/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "1cb521b745e7b43ad87a1cf38183ab122afcbb10cfcaf5babc3aa2249bdcc1c2"
+    },
+    "raw/corpora/corpus_12227/generation_audit.json": {
+      "bytes": 4507,
+      "sha256": "5ec2b21c6290a6839937f84219c17509601ddcc31bf3bffeef268a02cb63ca8e"
+    },
+    "raw/corpora/corpus_12227/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "74fad0e4086b787dca9c1c1aaa0a578c5b32e468425223b9879501bbec7cb532"
+    },
+    "raw/corpora/corpus_12227/oracle_episodes.jsonl": {
+      "bytes": 362747,
+      "sha256": "b3a314394655022d672deb8dc2b66511b368a5d44402d6ccce2fc9bb8345b729"
+    },
+    "raw/corpora/corpus_12227/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "6138906a927b505c991dd547c86e0a3861af980f9d0b367812e1d48dcd760b8f"
+    },
+    "raw/corpora/corpus_12227/visible_episodes.jsonl": {
+      "bytes": 4068695,
+      "sha256": "5b48f2f17afe29e06c17feb38d6c4aa6a88a6b835b3a7103dc226d0724f13433"
+    },
+    "raw/corpora/corpus_12239/evaluation_items.jsonl": {
+      "bytes": 58300,
+      "sha256": "c8bc444031266b322220a9cfbe01fe3dcd4cec596bfffc83063c23d87376f447"
+    },
+    "raw/corpora/corpus_12239/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "7723a30e91a3ea7c6deacc9a0139d28b9409f9b0c1e3398ff9817ec3fdf98c0d"
+    },
+    "raw/corpora/corpus_12239/generation_audit.json": {
+      "bytes": 4496,
+      "sha256": "276cc935288bf1c17d7f1e45545b27b68c1529cbbb9f2bbabf28f765b2c6a3ba"
+    },
+    "raw/corpora/corpus_12239/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "7872fb813410ffe7593bf421e5d72dc524603b266ae6f11b4a9df676ad4c39da"
+    },
+    "raw/corpora/corpus_12239/oracle_episodes.jsonl": {
+      "bytes": 362659,
+      "sha256": "a08fdbdd8c2a68523d189943124d8510b29e09480f8ec6e292773faa37246354"
+    },
+    "raw/corpora/corpus_12239/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "b9b4dc7d8d7f2895986bd2d76586aa1c5e23df957d80a09b23a30993a77696cf"
+    },
+    "raw/corpora/corpus_12239/visible_episodes.jsonl": {
+      "bytes": 4068719,
+      "sha256": "0ca07c200d3af85873922a1388d3823fba9e57438162a1d1626f37e418d85a35"
+    },
+    "raw/corpora/corpus_12241/evaluation_items.jsonl": {
+      "bytes": 58299,
+      "sha256": "36bf1c55ededdc152a8e38db0ca7e25a4f7acf9bee301392cbb03b98d025c20b"
+    },
+    "raw/corpora/corpus_12241/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "da19e93543be571f938c18dc6936611d5268efde348b7778561848769a460889"
+    },
+    "raw/corpora/corpus_12241/generation_audit.json": {
+      "bytes": 4496,
+      "sha256": "a530c58b900a3f351903c0f5c5544dbe686f31fe94bd431fb8407cf120b412d5"
+    },
+    "raw/corpora/corpus_12241/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "a463dedb8bed572168851bd619dd50ef95f9497fc85fd5ba64b8a0156a342eff"
+    },
+    "raw/corpora/corpus_12241/oracle_episodes.jsonl": {
+      "bytes": 362565,
+      "sha256": "459ca908fa1190c1575f434603269290af96e6f3d71177996cce13dbf77f5d1c"
+    },
+    "raw/corpora/corpus_12241/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "a1f44c9d27f1dc61147b3107655137697ceaa6f4da283071158e7a8ef3f144cc"
+    },
+    "raw/corpora/corpus_12241/visible_episodes.jsonl": {
+      "bytes": 4068826,
+      "sha256": "8e5378af37bca19123d572a34bbb4dd1d1264eadf81fb3ee4a662f7fc8801ee9"
+    },
+    "raw/corpora/corpus_12251/evaluation_items.jsonl": {
+      "bytes": 58311,
+      "sha256": "f4842a98bfefe4f7f931133dff0fd6a3c8abdb9445947b6b67d8125a327724aa"
+    },
+    "raw/corpora/corpus_12251/evaluation_oracle.jsonl": {
+      "bytes": 27636,
+      "sha256": "e99caaf76d9dd7362e4179b11baef30fa5db4101aad423cf30ca8fdd8b915bab"
+    },
+    "raw/corpora/corpus_12251/generation_audit.json": {
+      "bytes": 4496,
+      "sha256": "98084b69180c1e4ecc2150c6b9bf69812cd304e870f1bf5f19480309ee0ae39b"
+    },
+    "raw/corpora/corpus_12251/lexicon_oracle.json": {
+      "bytes": 1493,
+      "sha256": "34d5183733e199a7cbb9a3a1e89056a58da71397b14e407bc27b36b18abe74a6"
+    },
+    "raw/corpora/corpus_12251/oracle_episodes.jsonl": {
+      "bytes": 362855,
+      "sha256": "ab29c942e23cc4dbfe5e4a536060b2f166000393f5994d1dcc04c50b050cccb1"
+    },
+    "raw/corpora/corpus_12251/shuffled_donor_map.json": {
+      "bytes": 11523,
+      "sha256": "f46b48082a605c2e4554a754b155eb85b6231a7cb52ef36cd436faec6064738d"
+    },
+    "raw/corpora/corpus_12251/visible_episodes.jsonl": {
+      "bytes": 4068486,
+      "sha256": "fa65c21f57c61a317858dd0b900ba00c7d38037dad1c131ce50e6b1066073482"
+    },
+    "raw/derived_evidence/corpus_12011.jsonl": {
+      "bytes": 778328,
+      "sha256": "57eba1a2a1aac1a834d3f76039e5176728f605cc5aa48e61747e484656d94fbe"
+    },
+    "raw/derived_evidence/corpus_12037.jsonl": {
+      "bytes": 778771,
+      "sha256": "e130bac8dcc7ad4747f8524f749a7385b855ab633f88b97bb5d8acc8d734aae7"
+    },
+    "raw/derived_evidence/corpus_12049.jsonl": {
+      "bytes": 778912,
+      "sha256": "cadf113df3c99ec39284083d084878b8f7499eb8e98abadeee17571be0fb2ecd"
+    },
+    "raw/derived_evidence/corpus_12071.jsonl": {
+      "bytes": 779050,
+      "sha256": "b81f26b49fb7fba685ca0cf2ebc65851e8c61ff0152e304d72697c49664caa2f"
+    },
+    "raw/derived_evidence/corpus_12097.jsonl": {
+      "bytes": 778912,
+      "sha256": "878fe9452e4603b86617337e535571294a8061ae1f696c03cc3ce0f7d2ac0a7a"
+    },
+    "raw/derived_evidence/corpus_12101.jsonl": {
+      "bytes": 778253,
+      "sha256": "a87e2d0a19fe283d9c628872a880183260616ef4a80c1ba2899f522a89b1333a"
+    },
+    "raw/derived_evidence/corpus_12113.jsonl": {
+      "bytes": 778393,
+      "sha256": "55a2b644037f961d2426147965177e2310bf09a757552f3536e304d009b68575"
+    },
+    "raw/derived_evidence/corpus_12119.jsonl": {
+      "bytes": 779404,
+      "sha256": "e9d06abcc34a93897076130320598021c14f7a30e61f0374c176e87290f6800a"
+    },
+    "raw/derived_evidence/corpus_12143.jsonl": {
+      "bytes": 778749,
+      "sha256": "51c5e2f15b79d653f5156bd44c6603ff538b9a6f28cfee2ca7c8d095b55b7459"
+    },
+    "raw/derived_evidence/corpus_12149.jsonl": {
+      "bytes": 778611,
+      "sha256": "8c91bf1e194883163228394099260ad983a647b178b9caf11f19988f55993d9b"
+    },
+    "raw/derived_evidence/corpus_12157.jsonl": {
+      "bytes": 779102,
+      "sha256": "5567fadb02bc6716f70e6db477d5e3fb16ef4013247ca0c96e20e05486620f2b"
+    },
+    "raw/derived_evidence/corpus_12161.jsonl": {
+      "bytes": 778950,
+      "sha256": "386291d589d9d8cae08aa2489dae7457d158399266abeae35f716f5e0b232ffb"
+    },
+    "raw/derived_evidence/corpus_12163.jsonl": {
+      "bytes": 778824,
+      "sha256": "f54f126becfa6c315b30403437802e44dbf189aa1dd8439b1ef0891ba04962af"
+    },
+    "raw/derived_evidence/corpus_12197.jsonl": {
+      "bytes": 779092,
+      "sha256": "c439f97285984b7306b52c39974ff4515299d91c774b351837d727b18762bf2d"
+    },
+    "raw/derived_evidence/corpus_12203.jsonl": {
+      "bytes": 779735,
+      "sha256": "791c002e8e7502afa851786fd51dc9a0e5c6e116eb4e80c2283c328f5ef54d34"
+    },
+    "raw/derived_evidence/corpus_12211.jsonl": {
+      "bytes": 779017,
+      "sha256": "18f0ca563ba64195bbb941a2b94882f21c838ecb47fef5a6658927e7a07edd77"
+    },
+    "raw/derived_evidence/corpus_12227.jsonl": {
+      "bytes": 778178,
+      "sha256": "f18348911ede02600b0c87fc936a3de3b59ea1907a4ea7f8cdd3815d877824e4"
+    },
+    "raw/derived_evidence/corpus_12239.jsonl": {
+      "bytes": 778888,
+      "sha256": "4883ab2c9aa72c6fc108b61da1137d62bfeabb65b0826eb9d63227368140fff5"
+    },
+    "raw/derived_evidence/corpus_12241.jsonl": {
+      "bytes": 779026,
+      "sha256": "d35485fe2158c45bd4a3291815088623cba8b930c5d0a18686664fc859e3b696"
+    },
+    "raw/derived_evidence/corpus_12251.jsonl": {
+      "bytes": 778718,
+      "sha256": "5cf994c9face4106cfbad34e8c9e04a4fd52dac99dbe7d93cd16fa7bf9691c4c"
+    },
+    "raw/development_runs.jsonl": {
+      "bytes": 11119406,
+      "sha256": "73901ecc68c7acd3e31e908ada94ef2b6146f74257e037d6fb4014bdaa7826dc"
+    },
+    "raw/sensitivity_runs.jsonl": {
+      "bytes": 14420874,
+      "sha256": "ad17d340ab587d6ae302ea009fbaf06b42e3c31e39448b7612f6d981e3ca2c57"
+    },
+    "scientific_report.md": {
+      "bytes": 10378,
+      "sha256": "963446ee3bd7df2a4de676698234f505a10ded49e2a9b33c53f753f23ae7b01e"
+    },
+    "terminal_decision.json": {
+      "bytes": 7844,
+      "sha256": "6909239c9ee9ed3ba11c33b1596ced747185930211ed8246c3d27a8e1d0776cb"
+    },
+    "validation_report.json": {
+      "bytes": 1943,
+      "sha256": "a0e7681d26ea890fea6df9a641f4fee9589b38300d1f6c70f996084becce21b0"
+    },
+    "validation_report.md": {
+      "bytes": 697,
+      "sha256": "10482cabccac5a50fcf0ace5a41d7e8f47120b87a2371f49926667159ffb4700"
+    }
+  },
+  "protocol_id": "synthetic-sensor-event-robustness-v2",
+  "schema_version": "synthetic-sensor-event-artifact-manifest-v2"
+}

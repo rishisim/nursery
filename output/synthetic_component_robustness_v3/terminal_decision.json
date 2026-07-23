@@ -1,0 +1,15 @@
+{
+  "recommendation": "STOP",
+  "confirmation_authorized": false,
+  "confirmation_outcomes_touched": 0,
+  "reasons": [
+    "The unbiased absent/no-sensor action control was exactly 0 in all 120 primary model runs, violating the frozen non-floor gate and reproducing the v2 interpretability failure.",
+    "Shuffled, uninformative, and every signed time-shift control were also exactly 0, while synchronized was exactly 1, producing a saturated and non-discriminating design.",
+    "The frozen studentized-bootstrap analysis failed because every corpus effect was identical and every resampled standard error was zero; no outcome-driven amendment or rerun is permitted.",
+    "The synchronized noun endpoint was 1 while absent nouns were 0, violating the selectivity requirement and indicating that the sensor mechanism was not action-selective."
+  ],
+  "passed_descriptive_gates": ["synchronized_accuracy", "seen_combinations", "structured_combination", "component_accuracy", "manner_pairwise_order", "collapse", "inversion", "positive_corpus_fraction"],
+  "failed_gates": ["non_floor_absent_control", "frozen_primary_interval", "noun_selectivity", "corrupted_channel_non_destructiveness"],
+  "scientific_conclusion": "v3 does not establish synchronized-sensor added value. The perfect synchronized-versus-zero-control separation is a design/learner pathology under the preregistered non-floor rule, not positive evidence.",
+  "later_confirmation_recommendation": "DO_NOT_PROCEED"
+}

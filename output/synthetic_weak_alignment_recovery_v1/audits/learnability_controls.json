@@ -1,0 +1,15 @@
+{
+  "checks": {
+    "action_observation_capacity": true,
+    "noun_non_action_control_learnable": true,
+    "oracle_alignment_positive_control": true,
+    "scene_observation_capacity": true
+  },
+  "results": {
+    "direct_action_observation_capacity": 1.0,
+    "direct_scene_observation_capacity": 1.0,
+    "noun_control_accuracy": 1.0,
+    "oracle_alignment_primary_accuracy": 1.0
+  },
+  "valid": true
+}

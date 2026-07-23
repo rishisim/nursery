@@ -1,0 +1,9 @@
+[
+  {"title":"A Probabilistic Computational Model of Cross-Situational Word Learning","year":2010,"doi":"10.1111/j.1551-6709.2010.01104.x","url":"https://onlinelibrary.wiley.com/doi/10.1111/j.1551-6709.2010.01104.x","design_use":"competitive probabilistic alignment and repeated cross-occurrence accumulation"},
+  {"title":"Using Speakers' Referential Intentions to Model Early Cross-Situational Word Learning","year":2009,"doi":"10.1111/j.1467-9280.2009.02335.x","url":"https://pubmed.ncbi.nlm.nih.gov/19389131/","design_use":"joint uncertainty over referential intent and word meaning; null referent"},
+  {"title":"Calibrating Multimodal Learning","year":2023,"url":"https://proceedings.mlr.press/v202/ma23i.html","design_use":"confidence should not spuriously increase under modality removal or corruption"},
+  {"title":"Provable Dynamic Fusion for Low-Quality Multimodal Data","year":2023,"url":"https://proceedings.mlr.press/v202/zhang23ar.html","design_use":"sample-specific uncertainty-aware modality weighting"},
+  {"title":"Measuring Compositional Generalization: A Comprehensive Method on Realistic Data","year":2020,"url":"https://research.google/pubs/measuring-compositional-generalization-a-comprehensive-method-on-realistic-data/","design_use":"separate atomic exposure from held-out compound generalization"},
+  {"title":"Estimating means of bounded random variables by betting","year":2021,"url":"https://projecteuclid.org/journals/electronic-journal-of-statistics/volume-15/issue-2/Estimating-means-of-bounded-random-variables-by-betting/10.1214/21-EJS1919.full","design_use":"bounded-mean distribution-aware interval sensitivity"},
+  {"title":"Multiparameter Hypothesis Testing and Acceptance Sampling","year":1982,"url":"https://www.jstor.org/stable/1267823","design_use":"intersection-union decision for co-primary claims"}
+]

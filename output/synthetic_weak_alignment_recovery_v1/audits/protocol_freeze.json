@@ -1,0 +1,22 @@
+{
+  "checks": {
+    "all_frozen_files_present": true,
+    "babyworld_lite/weak_alignment/__init__.py": true,
+    "babyworld_lite/weak_alignment/analysis.py": true,
+    "babyworld_lite/weak_alignment/learners.py": true,
+    "babyworld_lite/weak_alignment/protocol.py": true,
+    "babyworld_lite/weak_alignment/study.py": true,
+    "babyworld_lite/weak_alignment/synthetic.py": true,
+    "configs/synthetic_weak_alignment_recovery_v1.yaml": true,
+    "docs/synthetic_weak_alignment_recovery_v1_primary_sources.json": true,
+    "docs/synthetic_weak_alignment_recovery_v1_protocol.md": true,
+    "output/synthetic_weak_alignment_recovery_v1/confirmation_reserve_manifest.json": true,
+    "output/synthetic_weak_alignment_recovery_v1/frozen_config_snapshot.yaml": true,
+    "output/synthetic_weak_alignment_recovery_v1/frozen_protocol_snapshot.md": true,
+    "output/synthetic_weak_alignment_recovery_v1/primary_sources_snapshot.json": true,
+    "scripts/run_synthetic_weak_alignment_v1.py": true,
+    "tests/test_synthetic_weak_alignment_v1.py": true
+  },
+  "receipt_sha256": "5380c7bbc23b0e9ca93bfa0acba0e3669634c50a95ab08b47f6f299381da2f01",
+  "valid": true
+}

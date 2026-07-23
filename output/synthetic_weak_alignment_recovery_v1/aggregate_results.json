@@ -1,0 +1,1947 @@
+{
+  "component_ablation_contrasts_within_synchronized": {
+    "cross_situational_uniform": {
+      "analysis_kind": "main",
+      "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+      "bootstrap_probability_gt_zero": 1.0,
+      "bootstrap_samples": 5000,
+      "ci95_high": 0.7057291666666669,
+      "ci95_low": 0.5598958333333334,
+      "estimand": "heldout_composition_action_6way_macro_accuracy(combined) - heldout_composition_action_6way_macro_accuracy(ablation)",
+      "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+      "learner": "component",
+      "n_corpus_seeds": 4,
+      "n_model_seeds_per_corpus": 3,
+      "n_paired_units": 12,
+      "point_estimate": 0.6354166666666666,
+      "positive_pair_count": 12,
+      "stratum_factor": null,
+      "stratum_level": null,
+      "unit_differences": [
+        {
+          "corpus_seed": 1103,
+          "difference": 0.7291666666666667,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.7291666666666667,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.7291666666666667,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.53125,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.53125,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.53125,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.6354166666666667,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.6354166666666667,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.6354166666666667,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.6458333333333334,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.6458333333333334,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.6458333333333334,
+          "model_seed": 43
+        }
+      ],
+      "zero_pair_count": 0
+    },
+    "exact_window": {
+      "analysis_kind": "main",
+      "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+      "bootstrap_probability_gt_zero": 1.0,
+      "bootstrap_samples": 5000,
+      "ci95_high": 0.3515625,
+      "ci95_low": 0.1041666666666667,
+      "estimand": "heldout_composition_action_6way_macro_accuracy(combined) - heldout_composition_action_6way_macro_accuracy(ablation)",
+      "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+      "learner": "component",
+      "n_corpus_seeds": 4,
+      "n_model_seeds_per_corpus": 3,
+      "n_paired_units": 12,
+      "point_estimate": 0.20572916666666666,
+      "positive_pair_count": 12,
+      "stratum_factor": null,
+      "stratum_level": null,
+      "unit_differences": [
+        {
+          "corpus_seed": 1103,
+          "difference": 0.16666666666666663,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.16666666666666663,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.16666666666666663,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.4166666666666667,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.4166666666666667,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.4166666666666667,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.08333333333333337,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.08333333333333337,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.08333333333333337,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.15625,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.15625,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.15625,
+          "model_seed": 43
+        }
+      ],
+      "zero_pair_count": 0
+    },
+    "latent_mil_cross_no_null": {
+      "analysis_kind": "main",
+      "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+      "bootstrap_probability_gt_zero": 1.0,
+      "bootstrap_samples": 5000,
+      "ci95_high": 0.2916666666666667,
+      "ci95_low": 0.0963541666666667,
+      "estimand": "heldout_composition_action_6way_macro_accuracy(combined) - heldout_composition_action_6way_macro_accuracy(ablation)",
+      "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+      "learner": "component",
+      "n_corpus_seeds": 4,
+      "n_model_seeds_per_corpus": 3,
+      "n_paired_units": 12,
+      "point_estimate": 0.1848958333333334,
+      "positive_pair_count": 12,
+      "stratum_factor": null,
+      "stratum_level": null,
+      "unit_differences": [
+        {
+          "corpus_seed": 1103,
+          "difference": 0.16666666666666663,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.16666666666666663,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.16666666666666663,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.33333333333333337,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.33333333333333337,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.33333333333333337,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.16666666666666663,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.16666666666666663,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.16666666666666663,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.07291666666666674,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.07291666666666674,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.07291666666666674,
+          "model_seed": 43
+        }
+      ],
+      "zero_pair_count": 0
+    },
+    "latent_mil_single_occurrence": {
+      "analysis_kind": "main",
+      "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+      "bootstrap_probability_gt_zero": 1.0,
+      "bootstrap_samples": 5000,
+      "ci95_high": 0.7118055555555555,
+      "ci95_low": 0.5321180555555555,
+      "estimand": "heldout_composition_action_6way_macro_accuracy(combined) - heldout_composition_action_6way_macro_accuracy(ablation)",
+      "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+      "learner": "component",
+      "n_corpus_seeds": 4,
+      "n_model_seeds_per_corpus": 3,
+      "n_paired_units": 12,
+      "point_estimate": 0.6249999999999999,
+      "positive_pair_count": 12,
+      "stratum_factor": null,
+      "stratum_level": null,
+      "unit_differences": [
+        {
+          "corpus_seed": 1103,
+          "difference": 0.6666666666666667,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.65625,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.65625,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.6666666666666667,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.5833333333333334,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.5625,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.75,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.7395833333333333,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.75,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.48958333333333337,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.48958333333333337,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.48958333333333337,
+          "model_seed": 43
+        }
+      ],
+      "zero_pair_count": 0
+    }
+  },
+  "development_run_counts": {
+    "corpora": 4,
+    "main": 360,
+    "model_seeds_per_corpus": 3,
+    "sensitivity": 336
+  },
+  "factor_sensitivity": {
+    "action_visibility_rate": {
+      "0.55": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 0.996,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.3541666666666666,
+        "ci95_low": 0.03472222222222221,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.20138888888888884,
+        "positive_pair_count": 9,
+        "stratum_factor": "action_visibility_rate",
+        "stratum_level": "0.55",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.16666666666666669,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.16666666666666669,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.16666666666666669,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.25,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.25,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.25,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": -0.08333333333333337,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.0,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.0,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.41666666666666663,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.41666666666666663,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.41666666666666663,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 2
+      },
+      "0.9": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 1.0,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.75,
+        "ci95_low": 0.4375,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.5624999999999999,
+        "positive_pair_count": 12,
+        "stratum_factor": "action_visibility_rate",
+        "stratum_level": "0.9",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.41666666666666663,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.41666666666666663,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.41666666666666663,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.8333333333333334,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.8333333333333334,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.8333333333333334,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 0
+      }
+    },
+    "candidate_event_count": {
+      "2": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 1.0,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.47222222222222215,
+        "ci95_low": 0.4166666666666667,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.43750000000000006,
+        "positive_pair_count": 12,
+        "stratum_factor": "candidate_event_count",
+        "stratum_level": "2",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.41666666666666663,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.41666666666666663,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.41666666666666663,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.41666666666666663,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.41666666666666663,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.41666666666666663,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.4166666666666667,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.4166666666666667,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.4166666666666667,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 0
+      },
+      "5": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 1.0,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.5624999999999999,
+        "ci95_low": 0.375,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.4791666666666666,
+        "positive_pair_count": 12,
+        "stratum_factor": "candidate_event_count",
+        "stratum_level": "5",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.33333333333333337,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.33333333333333337,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.33333333333333337,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.5,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5833333333333334,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5833333333333334,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5833333333333334,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 0
+      }
+    },
+    "grounded_utterance_rate": {
+      "0.45": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 1.0,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.625,
+        "ci95_low": 0.2083333333333333,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.4166666666666667,
+        "positive_pair_count": 12,
+        "stratum_factor": "grounded_utterance_rate",
+        "stratum_level": "0.45",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.25,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.25,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.25,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.16666666666666669,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.16666666666666669,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.16666666666666669,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.5,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.75,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.75,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.75,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 0
+      },
+      "0.8": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 1.0,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.3333333333333334,
+        "ci95_low": 0.2708333333333333,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.31250000000000006,
+        "positive_pair_count": 12,
+        "stratum_factor": "grounded_utterance_rate",
+        "stratum_level": "0.8",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.33333333333333337,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.33333333333333337,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.33333333333333337,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.25,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.25,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.25,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.3333333333333333,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.3333333333333333,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.3333333333333333,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.33333333333333337,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.33333333333333337,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.33333333333333337,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 0
+      }
+    },
+    "side_informativeness": {
+      "0.0": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 0.924,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.16666666666666666,
+        "ci95_low": -0.026515151515151547,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.07449494949494949,
+        "positive_pair_count": 8,
+        "stratum_factor": "side_informativeness",
+        "stratum_level": "0.0",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.16666666666666666,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.16666666666666666,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.16666666666666666,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.16666666666666666,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.16666666666666666,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.16666666666666666,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": -0.09090909090909094,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": -0.09090909090909094,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": -0.09090909090909094,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.0,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.08333333333333331,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.08333333333333331,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 1
+      },
+      "0.75": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 1.0,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.8257575757575758,
+        "ci95_low": 0.4583333333333334,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.6420454545454546,
+        "positive_pair_count": 12,
+        "stratum_factor": "side_informativeness",
+        "stratum_level": "0.75",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.8333333333333333,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.8333333333333333,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.8333333333333333,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.41666666666666674,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.41666666666666674,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.41666666666666674,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.5,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.8181818181818181,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.8181818181818181,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.8181818181818181,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 0
+      },
+      "0.95": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 1.0,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.7083333333333334,
+        "ci95_low": 0.5227272727272726,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.6155303030303031,
+        "positive_pair_count": 12,
+        "stratum_factor": "side_informativeness",
+        "stratum_level": "0.95",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5454545454545454,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5454545454545454,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5454545454545454,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.75,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.75,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.75,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.6666666666666667,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.6666666666666667,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.6666666666666667,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 0
+      }
+    },
+    "speech_action_lag": {
+      "-0.28": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 1.0,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.5,
+        "ci95_low": 0.2083333333333333,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.36111111111111116,
+        "positive_pair_count": 12,
+        "stratum_factor": "speech_action_lag",
+        "stratum_level": "-0.28",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.16666666666666669,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.16666666666666669,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.16666666666666669,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.25,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.25,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.33333333333333337,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 0
+      },
+      "0.0": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 1.0,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.3579545454545454,
+        "ci95_low": 0.12499999999999996,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.23295454545454544,
+        "positive_pair_count": 12,
+        "stratum_factor": "speech_action_lag",
+        "stratum_level": "0.0",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.41666666666666663,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.41666666666666663,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.41666666666666663,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.18181818181818182,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.18181818181818182,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.18181818181818182,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.08333333333333331,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.08333333333333331,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.08333333333333331,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.25,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.25,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.25,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 0
+      },
+      "0.28": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 0.9806,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.518939393939394,
+        "ci95_low": 0.041666666666666685,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.28030303030303033,
+        "positive_pair_count": 9,
+        "stratum_factor": "speech_action_lag",
+        "stratum_level": "0.28",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.4545454545454546,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.4545454545454546,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.4545454545454546,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": -0.08333333333333331,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": -0.08333333333333331,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": -0.08333333333333331,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.16666666666666669,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.16666666666666669,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.16666666666666669,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5833333333333334,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5833333333333334,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5833333333333334,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 0
+      }
+    },
+    "word_occurrence_count": {
+      "16": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 0.9966,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.5357142857142857,
+        "ci95_low": 0.125,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.3616071428571428,
+        "positive_pair_count": 9,
+        "stratum_factor": "word_occurrence_count",
+        "stratum_level": "16",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.375,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.375,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.375,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.0,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.0,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.0,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5714285714285714,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5714285714285714,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.5714285714285714,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 3
+      },
+      "8": {
+        "analysis_kind": "sensitivity",
+        "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+        "bootstrap_probability_gt_zero": 1.0,
+        "bootstrap_samples": 5000,
+        "ci95_high": 0.8375000000000002,
+        "ci95_low": 0.325,
+        "estimand": "supported_primary_lexical_mapping_accuracy(synchronized) - supported_primary_lexical_mapping_accuracy(shuffled)",
+        "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+        "learner": "latent_mil_cross_occurrence",
+        "n_corpus_seeds": 4,
+        "n_model_seeds_per_corpus": 3,
+        "n_paired_units": 12,
+        "point_estimate": 0.5854166666666666,
+        "positive_pair_count": 12,
+        "stratum_factor": "word_occurrence_count",
+        "stratum_level": "8",
+        "unit_differences": [
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 1103,
+            "difference": 0.5,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.16666666666666669,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.16666666666666669,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 2207,
+            "difference": 0.16666666666666669,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.875,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.875,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 3301,
+            "difference": 0.875,
+            "model_seed": 43
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.8,
+            "model_seed": 17
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.8,
+            "model_seed": 29
+          },
+          {
+            "corpus_seed": 4409,
+            "difference": 0.8,
+            "model_seed": 43
+          }
+        ],
+        "zero_pair_count": 0
+      }
+    }
+  },
+  "learner_condition_means": {
+    "cross_situational_uniform": {
+      "absent": 0.3203125,
+      "shuffled": 0.3203125,
+      "synchronized": 0.3203125,
+      "time_shifted": 0.3203125,
+      "uninformative": 0.3203125
+    },
+    "exact_window": {
+      "absent": 0.7500000000000001,
+      "shuffled": 0.7500000000000001,
+      "synchronized": 0.7500000000000001,
+      "time_shifted": 0.7500000000000001,
+      "uninformative": 0.7500000000000001
+    },
+    "latent_mil_cross_no_null": {
+      "absent": 0.7760416666666666,
+      "shuffled": 0.43749999999999994,
+      "synchronized": 0.7708333333333334,
+      "time_shifted": 0.11718749999999999,
+      "uninformative": 0.32291666666666663
+    },
+    "latent_mil_cross_occurrence": {
+      "absent": 0.7847222222222222,
+      "shuffled": 0.3541666666666667,
+      "synchronized": 0.9557291666666669,
+      "time_shifted": 0.020833333333333332,
+      "uninformative": 0.2421875
+    },
+    "latent_mil_single_occurrence": {
+      "absent": 0.4036458333333333,
+      "shuffled": 0.2144097222222222,
+      "synchronized": 0.3307291666666667,
+      "time_shifted": 0.10243055555555554,
+      "uninformative": 0.1657986111111111
+    },
+    "oracle_alignment": {
+      "absent": 1.0,
+      "shuffled": 1.0,
+      "synchronized": 1.0,
+      "time_shifted": 1.0,
+      "uninformative": 1.0
+    }
+  },
+  "multiplicity": {
+    "decision_uses_secondary_controls_as_directional_gates_not_additional discoveries": true,
+    "primary_alpha": 0.05,
+    "primary_family": "one predeclared primary metric and one synchronized-minus-shuffled contrast",
+    "secondary_status": "descriptive_exploratory_no_multiplicity_adjusted_claims"
+  },
+  "noun_control_contrast": {
+    "analysis_kind": "main",
+    "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+    "bootstrap_probability_gt_zero": 0.0,
+    "bootstrap_samples": 5000,
+    "ci95_high": 0.0,
+    "ci95_low": 0.0,
+    "estimand": "heldout_composition_noun_control_6way_macro_accuracy(synchronized) - heldout_composition_noun_control_6way_macro_accuracy(shuffled)",
+    "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+    "learner": "latent_mil_cross_occurrence",
+    "n_corpus_seeds": 4,
+    "n_model_seeds_per_corpus": 3,
+    "n_paired_units": 12,
+    "point_estimate": 0.0,
+    "positive_pair_count": 0,
+    "stratum_factor": null,
+    "stratum_level": null,
+    "unit_differences": [
+      {
+        "corpus_seed": 1103,
+        "difference": 0.0,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 1103,
+        "difference": 0.0,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 1103,
+        "difference": 0.0,
+        "model_seed": 43
+      },
+      {
+        "corpus_seed": 2207,
+        "difference": 0.0,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 2207,
+        "difference": 0.0,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 2207,
+        "difference": 0.0,
+        "model_seed": 43
+      },
+      {
+        "corpus_seed": 3301,
+        "difference": 0.0,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 3301,
+        "difference": 0.0,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 3301,
+        "difference": 0.0,
+        "model_seed": 43
+      },
+      {
+        "corpus_seed": 4409,
+        "difference": 0.0,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 4409,
+        "difference": 0.0,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 4409,
+        "difference": 0.0,
+        "model_seed": 43
+      }
+    ],
+    "zero_pair_count": 12
+  },
+  "primary_condition_means": {
+    "absent": 0.7847222222222222,
+    "shuffled": 0.3541666666666667,
+    "synchronized": 0.9557291666666669,
+    "time_shifted": 0.020833333333333332,
+    "uninformative": 0.2421875
+  },
+  "primary_estimand": {
+    "analysis_kind": "main",
+    "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+    "bootstrap_probability_gt_zero": 1.0,
+    "bootstrap_samples": 5000,
+    "ci95_high": 0.6458333333333334,
+    "ci95_low": 0.5755208333333335,
+    "estimand": "heldout_composition_action_6way_macro_accuracy(synchronized) - heldout_composition_action_6way_macro_accuracy(shuffled)",
+    "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+    "learner": "latent_mil_cross_occurrence",
+    "n_corpus_seeds": 4,
+    "n_model_seeds_per_corpus": 3,
+    "n_paired_units": 12,
+    "point_estimate": 0.6015625,
+    "positive_pair_count": 12,
+    "stratum_factor": null,
+    "stratum_level": null,
+    "unit_differences": [
+      {
+        "corpus_seed": 1103,
+        "difference": 0.5833333333333333,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 1103,
+        "difference": 0.5833333333333333,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 1103,
+        "difference": 0.5833333333333333,
+        "model_seed": 43
+      },
+      {
+        "corpus_seed": 2207,
+        "difference": 0.6666666666666667,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 2207,
+        "difference": 0.6666666666666667,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 2207,
+        "difference": 0.6666666666666667,
+        "model_seed": 43
+      },
+      {
+        "corpus_seed": 3301,
+        "difference": 0.5833333333333333,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 3301,
+        "difference": 0.5833333333333333,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 3301,
+        "difference": 0.5833333333333333,
+        "model_seed": 43
+      },
+      {
+        "corpus_seed": 4409,
+        "difference": 0.5729166666666667,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 4409,
+        "difference": 0.5729166666666667,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 4409,
+        "difference": 0.5729166666666667,
+        "model_seed": 43
+      }
+    ],
+    "zero_pair_count": 0
+  },
+  "schema_version": "synthetic-weak-alignment-aggregate-v1",
+  "secondary_condition_contrasts": {
+    "absent": {
+      "analysis_kind": "main",
+      "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+      "bootstrap_probability_gt_zero": 1.0,
+      "bootstrap_samples": 5000,
+      "ci95_high": 0.2465277777777778,
+      "ci95_low": 0.10156250000000006,
+      "estimand": "heldout_composition_action_6way_macro_accuracy(synchronized) - heldout_composition_action_6way_macro_accuracy(absent)",
+      "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+      "learner": "latent_mil_cross_occurrence",
+      "n_corpus_seeds": 4,
+      "n_model_seeds_per_corpus": 3,
+      "n_paired_units": 12,
+      "point_estimate": 0.1710069444444445,
+      "positive_pair_count": 12,
+      "stratum_factor": null,
+      "stratum_level": null,
+      "unit_differences": [
+        {
+          "corpus_seed": 1103,
+          "difference": 0.1875,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.1875,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.1875,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.28125,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.28125,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.28125,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.14583333333333337,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.14583333333333337,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.13541666666666663,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.07291666666666674,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.07291666666666674,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.07291666666666674,
+          "model_seed": 43
+        }
+      ],
+      "zero_pair_count": 0
+    },
+    "time_shifted": {
+      "analysis_kind": "main",
+      "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+      "bootstrap_probability_gt_zero": 1.0,
+      "bootstrap_samples": 5000,
+      "ci95_high": 1.0,
+      "ci95_low": 0.8125,
+      "estimand": "heldout_composition_action_6way_macro_accuracy(synchronized) - heldout_composition_action_6way_macro_accuracy(time_shifted)",
+      "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+      "learner": "latent_mil_cross_occurrence",
+      "n_corpus_seeds": 4,
+      "n_model_seeds_per_corpus": 3,
+      "n_paired_units": 12,
+      "point_estimate": 0.9348958333333335,
+      "positive_pair_count": 12,
+      "stratum_factor": null,
+      "stratum_level": null,
+      "unit_differences": [
+        {
+          "corpus_seed": 1103,
+          "difference": 1.0,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 1.0,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 1.0,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.75,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.75,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.75,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 1.0,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 1.0,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 1.0,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.9895833333333334,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.9895833333333334,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.9895833333333334,
+          "model_seed": 43
+        }
+      ],
+      "zero_pair_count": 0
+    },
+    "uninformative": {
+      "analysis_kind": "main",
+      "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+      "bootstrap_probability_gt_zero": 1.0,
+      "bootstrap_samples": 5000,
+      "ci95_high": 0.7447916666666666,
+      "ci95_low": 0.6822916666666669,
+      "estimand": "heldout_composition_action_6way_macro_accuracy(synchronized) - heldout_composition_action_6way_macro_accuracy(uninformative)",
+      "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+      "learner": "latent_mil_cross_occurrence",
+      "n_corpus_seeds": 4,
+      "n_model_seeds_per_corpus": 3,
+      "n_paired_units": 12,
+      "point_estimate": 0.7135416666666666,
+      "positive_pair_count": 12,
+      "stratum_factor": null,
+      "stratum_level": null,
+      "unit_differences": [
+        {
+          "corpus_seed": 1103,
+          "difference": 0.6979166666666667,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.6979166666666667,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 1103,
+          "difference": 0.6979166666666667,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.6666666666666667,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.6666666666666667,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 2207,
+          "difference": 0.6666666666666667,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.75,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.75,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 3301,
+          "difference": 0.75,
+          "model_seed": 43
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.7395833333333334,
+          "model_seed": 17
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.7395833333333334,
+          "model_seed": 29
+        },
+        {
+          "corpus_seed": 4409,
+          "difference": 0.7395833333333334,
+          "model_seed": 43
+        }
+      ],
+      "zero_pair_count": 0
+    }
+  }
+}

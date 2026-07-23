@@ -1,0 +1,34 @@
+{
+  "command": "scripts/run_synthetic_weak_alignment_v1.py run-development",
+  "completed_at_utc": "2026-07-15T19:46:17.831753+00:00",
+  "confirmation_manifest_sha256": "f3cd4f4951ada8f11ba74c93b06344c84bcd29eac165bc56262319b38656f319",
+  "confirmation_outcomes_generated_trained_evaluated_read_or_summarized": 0,
+  "deterministic_artifact_hashes": {
+    "aggregate_results.json": "f0f8bb850ee795c83f777132171b24d54d1616688488f330e7ed1817bfa13fd8",
+    "audits/confirmation_reserve_guard.json": "c4a6ef04fc2c90d5d8811f4530a1e5f1fbe2ddb23cd11be36fcc0a9362ac546f",
+    "audits/leakage_shortcut_checks.json": "6c11f9b92ed15f6e105dc82157699998168ef654add8d313fbc3604e1d5a2ab5",
+    "audits/learnability_controls.json": "a9ad9a8c2fb7843c473b67cd86dcea30d1bd02e891f1cb588b5cafcbb6723faa",
+    "audits/manipulation_checks.json": "6116fd59ccb440fb41052737d5e3b28b0e906de86e6e1eb6135dfe512e755a0b",
+    "audits/modality_withholding_audit.json": "5bef90aebcde440034c4a22a14d1f2fe1442d8e4f39f610f21c79306144e7a5b",
+    "audits/pairing_fairness_checks.json": "de26669faf2f78bda4b9b52edd9a9618693929fd3a89d7341d361be8bd040ac6",
+    "audits/protocol_freeze.json": "f3132a0ab27dd0d62bec4738db9d298ac5e1d5bc7d084af780f18e22937db0c1",
+    "raw/development_runs.jsonl": "2d32b46751dbe18d4b26e51ddff28523b7d8068dd857eaaa4e515120bc5e3c6f",
+    "raw/sensitivity_runs.jsonl": "920af4f880b4775214e6f75c9fa9d1edc19397a42fbf5b1140c6f228a122ab19",
+    "scientific_report.md": "e69972d5efd0a443ad3bfd103bc3723ee91df257a8811f5aa925c57007017626",
+    "terminal_decision.json": "91238981b51b4a9a7fde0243a9cec4160c3ac4d572ebbbe7c18def6b809546d1"
+  },
+  "elapsed_seconds": 9.781202333979309,
+  "freeze_receipt_sha256": "5380c7bbc23b0e9ca93bfa0acba0e3669634c50a95ab08b47f6f299381da2f01",
+  "protocol_amendments": [],
+  "protocol_id": "synthetic-weak-alignment-recovery-v1",
+  "python_executable": ".venv/bin/python",
+  "raw_main_runs": 360,
+  "raw_sensitivity_runs": 336,
+  "reproduction_commands": [
+    ".venv/bin/python scripts/run_synthetic_weak_alignment_v1.py verify",
+    ".venv/bin/python scripts/run_synthetic_weak_alignment_v1.py run-development --out /tmp/synthetic_weak_alignment_recovery_v1_reproduction",
+    ".venv/bin/python -m pytest tests/test_synthetic_weak_alignment_v1.py -q",
+    ".venv/bin/python -m pytest -q"
+  ],
+  "schema_version": "synthetic-weak-alignment-reproducibility-v1"
+}

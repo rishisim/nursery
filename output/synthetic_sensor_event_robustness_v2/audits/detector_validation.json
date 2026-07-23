@@ -1,0 +1,36 @@
+{
+  "candidate_owner_auc_by_informativeness": {
+    "0": 0.48826058201058203,
+    "0.9": 0.8905917411664538,
+    "1": 0.958739065852451
+  },
+  "checks": {
+    "informative_boundary_f1": true,
+    "informative_candidate_owner_auc": true,
+    "informative_timepoint_precision": true,
+    "informative_timepoint_recall": true,
+    "zero_information_candidate_owner_auc_near_chance": true
+  },
+  "detector_digest": "d058ab5248d6eb9516ed711a2a161c607e0a26871aed1c63da9f4bb864f6bdf6",
+  "heldout_calibration_seeds": [
+    52103,
+    52121
+  ],
+  "informative_boundary": {
+    "f1": 0.9008498583569404,
+    "precision": 0.8688524590163934,
+    "recall": 0.9352941176470588
+  },
+  "informative_candidate_owner_auc": 0.9207792207792208,
+  "informative_timepoint": {
+    "f1": 0.8641304347826086,
+    "precision": 0.8214022140221402,
+    "recall": 0.9115479115479116
+  },
+  "lexical_supervision_used": false,
+  "randomized_mapping_used": false,
+  "referent_supervision_used": false,
+  "schema_version": "synthetic-sensor-event-detector-validation-v2",
+  "valid": true,
+  "zero_information_candidate_owner_auc": 0.48826058201058203
+}

@@ -1,0 +1,19 @@
+{
+  "amendments_after_freeze": 0,
+  "confirmation_outcomes_touched": 0,
+  "content_hashes": {
+    "babyworld_lite/sensor_alignment_v3/__init__.py": "0794535877a795564d47ff2b677591ccdf2342caa2a59f496226bb2a3c9dbc1f",
+    "babyworld_lite/sensor_alignment_v3/study.py": "e11c486f4903c6cca8b3b67446b95ddd12d42f7bc2ffa3def9c8845270f7d9f1",
+    "configs/synthetic_component_robustness_v3.yaml": "176eb21e52f6910e22702022a23f31a56d3ccb8cf5b66533cebd35636482ee7e",
+    "docs/synthetic_component_robustness_v3_primary_sources.json": "c2e589129857779fc3a59ba1aa412ff27d0929da1f03151b1840b7e17167fadf",
+    "docs/synthetic_component_robustness_v3_protocol.md": "dab18e7704c34e116d9dac6aad456ef71c0995eb8844bb67755909b1ecdecafd",
+    "docs/synthetic_component_robustness_v3_source_record.md": "866d173a1a09ee218a2ab376a3dd833271caacb09eea7e45fc7185d5e6d9c60b",
+    "scripts/run_synthetic_component_robustness_v3.py": "68932a2ed1cccbe6cb4b45d4b2c5bdaf47cf5e212f4584ef0f169b32f32ac10d",
+    "tests/test_synthetic_component_robustness_v3.py": "6142d91fcf47cd5b0e98905c69de506c19a054234aea426b6b488eede398f20c"
+  },
+  "detector_hash": "a487035deba4692728240eb593ba16e1182d9b5959b43d950b60883d1ed08b33",
+  "fixture_only_checks_before_freeze": true,
+  "frozen_at_utc": "2026-07-15T22:17:59.903452+00:00",
+  "outcome_runs_before_freeze": 0,
+  "protocol_id": "synthetic-component-identification-robustness-v3"
+}

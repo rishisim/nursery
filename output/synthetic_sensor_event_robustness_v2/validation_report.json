@@ -1,0 +1,86 @@
+{
+  "checks": {
+    "all_saved_audits_valid": true,
+    "co_primary_means_match": true,
+    "co_primary_sign_counts_match": true,
+    "condition_means_match": true,
+    "corpus_is_inferential_unit": true,
+    "main_record_count": true,
+    "primary_bootstrap_not_used": true,
+    "sensitivity_record_count": true
+  },
+  "expected_and_observed_counts": {
+    "main_expected": 2560,
+    "main_observed": 2560,
+    "sensitivity_expected": 2640,
+    "sensitivity_observed": 2640
+  },
+  "protocol_id": "synthetic-sensor-event-robustness-v2",
+  "recomputed_corpus_effects": {
+    "absent": {
+      "mean": 0.38020833333333337,
+      "positive_corpora": 11,
+      "unit_effects": [
+        0.826388888888889,
+        0.0,
+        0.16666666666666666,
+        1.0,
+        0.0,
+        0.0,
+        0.5,
+        0.0,
+        0.5,
+        0.0,
+        0.5,
+        0.0,
+        0.9444444444444444,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.5,
+        1.0,
+        0.6666666666666666
+      ]
+    },
+    "shuffled": {
+      "mean": 0.38020833333333337,
+      "positive_corpora": 11,
+      "unit_effects": [
+        0.826388888888889,
+        0.0,
+        0.16666666666666666,
+        1.0,
+        0.0,
+        0.0,
+        0.5,
+        0.0,
+        0.5,
+        0.0,
+        0.5,
+        0.0,
+        0.9444444444444444,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.5,
+        1.0,
+        0.6666666666666666
+      ]
+    }
+  },
+  "recomputed_primary_condition_means": {
+    "absent": 0.0,
+    "shifted_m16": 0.0,
+    "shifted_m8": 0.0,
+    "shifted_p16": 0.0,
+    "shifted_p8": 0.0,
+    "shuffled": 0.0,
+    "synchronized": 0.3802083333333333,
+    "uninformative": 0.0
+  },
+  "schema_version": "synthetic-sensor-event-independent-validation-v2",
+  "valid": true,
+  "validation_scope": "Independent arithmetic recomputation from raw run records plus saved-audit review; not an independent generator implementation."
+}

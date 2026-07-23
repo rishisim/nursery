@@ -1,0 +1,23 @@
+{
+  "authorization_present": false,
+  "blocked_operations": {
+    "calibrate": true,
+    "evaluate": true,
+    "generate": true,
+    "read": true,
+    "summarize": true,
+    "train": true
+  },
+  "manifest_checks": {
+    "calibration_seeds": true,
+    "corpus_seeds": true,
+    "model_seeds": true,
+    "no_authorization": true,
+    "no_outcomes": true,
+    "protocol_id": true,
+    "status": true
+  },
+  "reserved_outcomes_accessed": 0,
+  "schema_version": "synthetic-sensor-event-reserve-audit-v2",
+  "valid": true
+}

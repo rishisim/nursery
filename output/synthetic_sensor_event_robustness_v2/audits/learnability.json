@@ -1,0 +1,16 @@
+{
+  "checks": {
+    "direct_action_capacity": true,
+    "direct_object_capacity": true,
+    "oracle_alignment_positive_control": true,
+    "v1_pointer_upper_positive_control": true
+  },
+  "results": {
+    "direct_action_observation_capacity": 1.0,
+    "direct_object_observation_capacity": 1.0,
+    "oracle_alignment_accuracy": 1.0,
+    "v1_pointer_upper_accuracy": 1.0
+  },
+  "schema_version": "synthetic-sensor-event-learnability-audit-v2",
+  "valid": true
+}

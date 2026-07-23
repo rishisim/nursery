@@ -1,0 +1,19 @@
+# Forensic audit of v3 protocol fidelity
+
+Disposition: **scientific execution INVALID / NEEDS REVISION; v3 STOP retained; confirmation remains blocked**. V3's generated outcome values must not be interpreted as evidence for or against the scientific hypothesis. The recorded STOP and zero confirmation access remain valid safety decisions.
+
+| Frozen v3 claim | Exact implementation/artifact evidence | Finding |
+|---|---|---|
+| Fixed v2 detector supplies quality/evidence | `study.py:60-61` hashes the JSON in `load_config`; `_condition_evidence` at `study.py:183-189` directly takes mean absolute contact amplitude. No detector object or v2 `candidate_evidence` call is present. The test at `tests/test_synthetic_component_robustness_v3.py:20-22` checks only the file hash. | Confirmed: detector never runs. |
+| Sensor manipulation is action-selective; nouns are a selectivity control | `generate_corpus`, `study.py:139-141`, sets `owners[target]=True` for both family loops introduced at `:127`. The noun branch differs only in event observation construction at `:144-148`. `terminal_decision.json` records synchronized noun accuracy 1 versus absent 0. | Confirmed: noun control is sensor-coupled by construction. |
+| Learner is jointly competitive and iterative | `fit_competitive`, `study.py:198-211`, groups by `(slot, token)` and completes each token independently. Configured `learners.iterations: 12` and `competition_weight: 0.65` are never read. The only test (`test_competitive_behavior_reliability_and_null`) checks nonempty prototypes, reliability bounds, and a null posterior. | Confirmed: no joint lexical competition. |
+| Visibility and lag are factors; factor analyses are level-specific | Visibility appears only in oracle metadata (`study.py:152`). Lag changes `speech_time` at `:151`, but fitting at `:197-211` never reads speech time. `study.py:270-272` emits every factor row with `level="pooled_training_distribution"` and repeats the same final primary accuracy. `factor_results.json` points to that ledger without stratified recomputation. | Confirmed: declared factors are inert and results are pooled copies. |
+| Oracle/direct-capacity controls are executed | `study.py:280-282` loops over the two names with `acc=1.0`, constructs metrics from that constant, and labels them `positive_control`. | Confirmed: both controls are hard-coded. |
+| Independent exact reproduction | `reproduce_study`, `study.py:320-323`, only manifests the existing directory and writes a PASS assertion. The later honest `reproducibility.json` says a byte-for-byte second outcome run was not performed, although its earlier comparison language claimed independent exact recomputation. | Confirmed: no isolated second execution or artifact comparison. |
+| Exact unbiased corpus-level relation balance | `_balanced_distractors`, `study.py:114-121`, cycles relation keys locally while random candidate count/grounding alters totals. Example `output/.../corpus_31013/unbiased_primary/generation_audit.json` is 266/267/266, not exact equality. The test only requires at least three cells. | Confirmed: approximate, not exact, balance. |
+| Frozen studentized bootstrap is valid for observed data | `_studentized_bootstrap`, `study.py:233-238`, drops every resample with zero SE and then unconditionally quantiles `vals`. With all corpus effects equal, `vals` is empty. `aggregate_results.json` and `reproducibility.json` honestly record the degenerate-studentization failure. | Confirmed: failure was recorded honestly, but no predeclared valid degenerate-data branch existed. |
+
+Additional integrity note: `validate_study` at `study.py:307-312` checks record counts/uniqueness and then sets `exact_recomputation: true`; it does not recompute the analysis. The independent validation artifact accurately checks ledger completeness, not protocol fidelity.
+
+No v3 file was changed and v3 was not rerun during this audit.
+

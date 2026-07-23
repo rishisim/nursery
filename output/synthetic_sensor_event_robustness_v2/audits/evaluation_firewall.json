@@ -1,0 +1,30 @@
+{
+  "checks": {
+    "evaluation_item_has_no_training_channel_field": true,
+    "evaluator_has_no_encoding_or_feature_extraction_call": true,
+    "evaluator_rejects_untyped_items": true,
+    "serialized_model_has_no_training_channel_field": true,
+    "signature_has_no_training_channel_argument": true
+  },
+  "evaluation_item_fields": [
+    "evaluation_id",
+    "exposure_role",
+    "action_observation",
+    "object_observation",
+    "action_candidate_phrases",
+    "noun_candidate_words",
+    "zero_candidate_words",
+    "action_answer_index",
+    "noun_answer_index",
+    "zero_answer_index",
+    "composition_id"
+  ],
+  "lexical_model_fields": [
+    "token_prototypes",
+    "learner",
+    "model_seed"
+  ],
+  "schema_version": "synthetic-sensor-event-evaluation-firewall-v2",
+  "signature": "(model: 'LexicalModel', evaluation_items: 'Sequence[EvaluationItem]', *, corpus_seed: 'int', policy: 'EvaluationPolicy') -> 'dict[str, Any]'",
+  "valid": true
+}

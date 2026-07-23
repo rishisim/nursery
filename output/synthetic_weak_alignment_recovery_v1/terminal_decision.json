@@ -1,0 +1,105 @@
+{
+  "claim_boundary": "This recommendation concerns a later synthetic lexical/action-grounding confirmation only; it is not evidence of complete language acquisition, timestamp agreement, infant learning, or BabyView-like ecological validity.",
+  "confirmation_authorized": false,
+  "confirmation_reserve_status": "untouched_and_guarded",
+  "go_checks": {
+    "action_selective_over_noun_control": true,
+    "all_validity_and_control_audits_pass": true,
+    "configured_uninformative_stratum_near_zero": true,
+    "informative_strata_positive": true,
+    "minimum_primary_lift": true,
+    "positive_pair_count": true,
+    "primary_ci_above_zero": true,
+    "synchronized_beats_all_matched_controls": true
+  },
+  "primary_effect": {
+    "analysis_kind": "main",
+    "bootstrap_method": "paired hierarchical bootstrap: resample corpus seeds, then crossed model seeds within sampled corpus; no episode/window resampling",
+    "bootstrap_probability_gt_zero": 1.0,
+    "bootstrap_samples": 5000,
+    "ci95_high": 0.6458333333333334,
+    "ci95_low": 0.5755208333333335,
+    "estimand": "heldout_composition_action_6way_macro_accuracy(synchronized) - heldout_composition_action_6way_macro_accuracy(shuffled)",
+    "independent_unit": "synthetic corpus seed crossed with model initialization seed",
+    "learner": "latent_mil_cross_occurrence",
+    "n_corpus_seeds": 4,
+    "n_model_seeds_per_corpus": 3,
+    "n_paired_units": 12,
+    "point_estimate": 0.6015625,
+    "positive_pair_count": 12,
+    "stratum_factor": null,
+    "stratum_level": null,
+    "unit_differences": [
+      {
+        "corpus_seed": 1103,
+        "difference": 0.5833333333333333,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 1103,
+        "difference": 0.5833333333333333,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 1103,
+        "difference": 0.5833333333333333,
+        "model_seed": 43
+      },
+      {
+        "corpus_seed": 2207,
+        "difference": 0.6666666666666667,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 2207,
+        "difference": 0.6666666666666667,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 2207,
+        "difference": 0.6666666666666667,
+        "model_seed": 43
+      },
+      {
+        "corpus_seed": 3301,
+        "difference": 0.5833333333333333,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 3301,
+        "difference": 0.5833333333333333,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 3301,
+        "difference": 0.5833333333333333,
+        "model_seed": 43
+      },
+      {
+        "corpus_seed": 4409,
+        "difference": 0.5729166666666667,
+        "model_seed": 17
+      },
+      {
+        "corpus_seed": 4409,
+        "difference": 0.5729166666666667,
+        "model_seed": 29
+      },
+      {
+        "corpus_seed": 4409,
+        "difference": 0.5729166666666667,
+        "model_seed": 43
+      }
+    ],
+    "zero_pair_count": 0
+  },
+  "protocol_id": "synthetic-weak-alignment-recovery-v1",
+  "reason": "all frozen development validity, positive-control, effect, selectivity, and sensitivity gates passed",
+  "recommendation_for_later_frozen_synthetic_confirmation": "GO",
+  "schema_version": "synthetic-weak-alignment-terminal-decision-v1",
+  "stop_checks": {
+    "clear_harm": false,
+    "validity_or_positive_control_failure": false
+  },
+  "study_phase": "development_only"
+}

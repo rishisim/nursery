@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "dropout_traces_show_algorithmic_sampling": true,
+    "inference_averages_models_within_corpus": true,
+    "initializations_vary_within_every_corpus": true,
+    "serialized_models_vary_within_every_corpus": true,
+    "two_model_seeds_configured": true
+  },
+  "corpus_count": 20,
+  "independent_empirical_units": 20,
+  "model_seeds": [
+    211,
+    223
+  ],
+  "schema_version": "synthetic-sensor-event-model-replicate-audit-v2",
+  "valid": true
+}

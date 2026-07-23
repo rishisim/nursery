@@ -1,0 +1,89 @@
+protocol:
+  id: synthetic-component-identification-robustness-v3
+  schema_version: nursery-synthetic-v3
+  status: frozen
+  phase: development_only
+  confirmation_authorized: false
+  claim: synchronized training-only raw sensor streams improve cue-free lexical/action compositional generalization in unbiased ambiguity for a non-oracular competitive learner
+seeds:
+  development:
+    corpus: [31013,31019,31033,31039,31051,31063,31069,31079,31091,31121,31123,31139,31147,31151,31153,31159,31177,31181,31183,31189,31193,31219,31223,31231,31237,31247,31249,31253,31259,31267,31271,31277,31279,31283,31289,31307,31319,31321,31327,31333]
+    model: [401,409,419]
+  calibration:
+    train: [61001,61007,61027,61031]
+    validation: [61043,61051]
+  fixture_only: [88001,88003,88007,881,883,887]
+  confirmation_reserve:
+    corpus: [97103,97117,97127,97151]
+    model: [907,911,919]
+    calibration: [97931,97943]
+  forbidden_v1_v2: [1103,2207,3301,4409,70123,91009,92009,93001,94007,99001,7,17,29,43,101,103,107,991,12011,12037,12049,12071,12097,12101,12113,12119,12143,12149,12157,12161,12163,12197,12203,12211,12227,12239,12241,12251,211,223,52021,52027,52051,52057,52103,52121,96103,96137,96149,96157,809,811,821,96931,96959]
+design:
+  regimes: [unbiased_primary, adversarial_plus3_secondary]
+  episodes_per_seen_concept: 48
+  noun_episodes_per_object: 30
+  candidate_counts: [3,5]
+  grounded_rates: [0.60,0.85]
+  repetitions: [1,2]
+  informativeness: [0.0,0.9,1.0]
+  snr: [1.2,2.0]
+  dropout: [0.0,0.15]
+  false_positive_rate: [0.02,0.20]
+  visibility: [0.80,0.95]
+  lag: [-16,0,16]
+  raw_samples: 64
+conditions: [synchronized,shuffled,shifted_m16,shifted_m8,shifted_p8,shifted_p16,absent,uninformative]
+learners:
+  names: [v2_frozen_comparator,competitive_soft_reliability,competitive_no_sensor,oracle_alignment_upper,direct_capacity_upper]
+  primary: competitive_soft_reliability
+  iterations: 12
+  temperature: 0.55
+  null_prior: 0.18
+  sensor_weight: 1.7
+  competition_weight: 0.65
+  reliability_midpoint: 0.55
+  reliability_scale: 0.14
+  sensitivity_iterations: 4
+  posterior_temperature: 0.55
+  visual_weight: 2.3
+  temporal_weight: 0.30
+  temporal_scale_samples: 10.0
+  null_logit: 0.10
+  prototype_smoothing: 0.35
+  reliability_gain_threshold: 0.10
+  reliability_gain_scale: 0.12
+  reliability_mean_quality_threshold: 0.55
+  reliability_mean_quality_scale: 0.015
+  reliability_concentration_change_threshold: 0.055
+  reliability_concentration_change_scale: 0.008
+  minimum_active_trust: 0.18
+  maximum_sensor_trust: 0.80
+  sensor_logit_weight: 2.0
+  cue_dropout_probability: 0.30
+  v1_pointer_correct_probability: 0.90
+inference:
+  independent_unit: corpus_seed
+  model_replicates_averaged_within_corpus: true
+  primary_interval: studentized_bootstrap_t_mean_10000_fixed_resamples
+  sensitivity_interval: student_t
+  alpha: 0.05
+  co_primary: [[synchronized,absent],[synchronized,shuffled]]
+  sign_tests_forbidden: true
+gates:
+  minimum_sync_primary: 0.72
+  minimum_seen: 0.72
+  minimum_structured: 0.62
+  minimum_components: 0.80
+  minimum_lift: 0.05
+  minimum_positive_fraction: 0.75
+  minimum_manner_pairwise: 0.90
+  maximum_collapse_or_inversion_runs: 0.10
+  absent_chance_tolerance: 0.03
+  maximum_noun_lift: 0.05
+  maximum_zero_information_lift: 0.05
+  minimum_oracle: 0.90
+  minimum_direct_capacity: 0.95
+detector:
+  frozen_v2_path: output/synthetic_sensor_event_robustness_v2/detector/frozen_detector.json
+  frozen_v2_sha256: a487035deba4692728240eb593ba16e1182d9b5959b43d950b60883d1ed08b33
+  tuning_to_v3_outcomes_forbidden: true

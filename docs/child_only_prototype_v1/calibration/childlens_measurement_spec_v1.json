@@ -1,0 +1,122 @@
+{
+  "measurement_spec_version": "childlens-child-only-measurements-v1.0.0",
+  "corpus": "CHILDLENS",
+  "corpus_instance_policy": "ONE_RESTRICTED_RELEASE_INSTANCE_ONLY",
+  "empirical_values_status": "ABSENT_DEFINITIONS_ONLY",
+  "unavailable_measure_policy": "RECORD_UNAVAILABLE_WITH_REASON_NEVER_BORROW",
+  "export_policy": {
+    "allowed": "NONIDENTIFYING_AGGREGATES_PERMITTED_BY_DATA_USE_TERMS_ONLY",
+    "forbidden": ["RAW_TRANSCRIPTS", "EXAMPLE_FRAMES", "EXACT_TIMESTAMPS", "PARTICIPANT_IDS", "EPISODE_IDS", "SMALL_IDENTIFIABLE_CELLS"],
+    "destination": "CORPUS_INSTANCE_SPECIFIC_NO_SHARED_PAYLOAD"
+  },
+  "measurements": [
+    {
+      "metric_id": "utterance_rate",
+      "definition": "Valid utterance onsets divided by usable observation duration.",
+      "numerator": "COUNT_VALID_UTTERANCE_ONSETS",
+      "denominator": "USABLE_OBSERVATION_DURATION",
+      "unit": "UTTERANCES_PER_MINUTE",
+      "required_inputs": ["TIMED_TRANSCRIPT", "USABLE_VIDEO_MASK"],
+      "estimator": "PARTICIPANT_THEN_EPISODE_WEIGHTED_RATE",
+      "uncertainty": "PARTICIPANT_CLUSTER_THEN_EPISODE_RESAMPLING_PLUS_ANNOTATION_ERROR",
+      "missingness": "EXCLUDE_UNUSABLE_INTERVALS_AND_REPORT_COVERAGE",
+      "export_constraint": "AGGREGATE_WITH_UNCERTAINTY_AND_COVERAGE_ONLY"
+    },
+    {
+      "metric_id": "utterance_length",
+      "definition": "Corpus-local tokenizer word count for each valid utterance.",
+      "numerator": "CORPUS_LOCAL_WORD_TOKEN_COUNT",
+      "denominator": "VALID_UTTERANCE",
+      "unit": "WORDS_PER_UTTERANCE",
+      "required_inputs": ["TIMED_TRANSCRIPT", "FRESH_CORPUS_LOCAL_TOKENIZER_RULE"],
+      "estimator": "EPISODE_DISTRIBUTION_SUMMARY",
+      "uncertainty": "PARTICIPANT_CLUSTER_THEN_EPISODE_RESAMPLING",
+      "missingness": "REPORT_UNTOKENIZABLE_AND_INVALID_UTTERANCE_FRACTION",
+      "export_constraint": "DISTRIBUTION_SUMMARY_NO_TEXT"
+    },
+    {
+      "metric_id": "speech_occupancy",
+      "definition": "Union duration of valid timed utterance intervals divided by usable observation duration.",
+      "numerator": "UNION_VALID_UTTERANCE_DURATION",
+      "denominator": "USABLE_OBSERVATION_DURATION",
+      "unit": "PROPORTION",
+      "required_inputs": ["TIMED_TRANSCRIPT", "USABLE_VIDEO_MASK"],
+      "estimator": "EPISODE_PROPORTION",
+      "uncertainty": "PARTICIPANT_CLUSTER_THEN_EPISODE_RESAMPLING",
+      "missingness": "UNKNOWN_TIMING_INTERVALS_EXCLUDED_AND_COVERAGE_REPORTED",
+      "export_constraint": "AGGREGATE_ONLY"
+    },
+    {
+      "metric_id": "within_episode_lexical_repetition",
+      "definition": "Repeated corpus-local lexical tokens relative to valid lexical tokens within an episode.",
+      "numerator": "VALID_TOKEN_OCCURRENCES_AFTER_FIRST_WITHIN_EPISODE",
+      "denominator": "VALID_CORPUS_LOCAL_TOKEN_OCCURRENCES",
+      "unit": "PROPORTION",
+      "required_inputs": ["TIMED_TRANSCRIPT", "FRESH_CORPUS_LOCAL_TOKENIZER_RULE"],
+      "estimator": "EPISODE_PROPORTION_BY_FREQUENCY_STRATUM",
+      "uncertainty": "PARTICIPANT_CLUSTER_THEN_EPISODE_RESAMPLING",
+      "missingness": "REPORT_OUT_OF_VOCABULARY_AND_UNUSABLE_TEXT_COVERAGE",
+      "export_constraint": "NO_TOKEN_STRINGS_OUTSIDE_PERMITTED_AGGREGATE_VOCABULARY_EXPORT"
+    },
+    {
+      "metric_id": "utterance_event_lag",
+      "definition": "Signed interval from candidate visible-event boundary to valid utterance onset under the frozen annotation protocol.",
+      "numerator": "SIGNED_UTTERANCE_ONSET_MINUS_EVENT_BOUNDARY_TIME",
+      "denominator": "ANNOTATED_UTTERANCE_EVENT_PAIR",
+      "unit": "SECONDS",
+      "required_inputs": ["TIMED_TRANSCRIPT", "VIDEO", "FROZEN_EVENT_ANNOTATION"],
+      "estimator": "ANNOTATION_AWARE_DISTRIBUTION_SUMMARY",
+      "uncertainty": "PARTICIPANT_EPISODE_CLUSTERING_PLUS_ANNOTATOR_AGREEMENT",
+      "missingness": "NULL_REFERENTS_REPORTED_SEPARATELY_NOT_IMPUTED",
+      "export_constraint": "NO_EXACT_TIMESTAMPS_OR_EXAMPLES"
+    },
+    {
+      "metric_id": "visible_referent_and_null_speech",
+      "definition": "Valid utterances partitioned by at least one visible referent candidate versus explicit null/irrelevant status.",
+      "numerator": "COUNT_BY_FROZEN_REFERENT_STATUS",
+      "denominator": "ANNOTATED_VALID_UTTERANCES",
+      "unit": "PROPORTION_BY_STATUS",
+      "required_inputs": ["TIMED_TRANSCRIPT", "VIDEO", "FROZEN_REFERENT_ANNOTATION"],
+      "estimator": "EPISODE_PROPORTION",
+      "uncertainty": "PARTICIPANT_EPISODE_CLUSTERING_PLUS_ANNOTATOR_AGREEMENT",
+      "missingness": "UNDECIDABLE_STATUS_RETAINED_AS_SEPARATE_CATEGORY",
+      "export_constraint": "AGGREGATE_STATUS_COUNTS_WITH_CELL_SUPPRESSION"
+    },
+    {
+      "metric_id": "candidate_event_ambiguity",
+      "definition": "Count of plausible visible candidate events per valid utterance and proportion with multiple candidates.",
+      "numerator": "PLAUSIBLE_VISIBLE_CANDIDATE_EVENT_COUNT",
+      "denominator": "ANNOTATED_VALID_UTTERANCE",
+      "unit": "COUNT_AND_PROPORTION",
+      "required_inputs": ["TIMED_TRANSCRIPT", "VIDEO", "FROZEN_EVENT_ANNOTATION"],
+      "estimator": "EPISODE_DISTRIBUTION_SUMMARY",
+      "uncertainty": "PARTICIPANT_EPISODE_CLUSTERING_PLUS_ANNOTATOR_AGREEMENT",
+      "missingness": "UNUSABLE_WINDOWS_EXCLUDED_AND_COVERAGE_REPORTED",
+      "export_constraint": "DISTRIBUTION_SUMMARY_NO_EXAMPLES"
+    },
+    {
+      "metric_id": "visual_interaction_context",
+      "definition": "Visible candidate-object count, object image-area proportion, occlusion, image motion, activity duration, and interaction rate under frozen detectors and manual checks.",
+      "numerator": "MEASURE_SPECIFIC_FRAME_OR_EVENT_QUANTITY",
+      "denominator": "USABLE_FRAME_DURATION_OR_ACTIVITY_WINDOW",
+      "unit": "COUNT_PROPORTION_PIXELS_PER_SECOND_SECONDS_AND_EVENTS_PER_MINUTE",
+      "required_inputs": ["VIDEO", "FROZEN_VISUAL_MEASUREMENT_PIPELINE", "MANUAL_RELIABILITY_SUBSET"],
+      "estimator": "EPISODE_DISTRIBUTIONS_WITH_DETECTOR_VERSIONING",
+      "uncertainty": "PARTICIPANT_EPISODE_CLUSTERING_PLUS_MEASUREMENT_ERROR",
+      "missingness": "DETECTOR_FAILURE_AND_OCCLUSION_COVERAGE_REPORTED",
+      "export_constraint": "AGGREGATES_NO_FRAMES_TRACKS_OR_IDENTIFIERS"
+    },
+    {
+      "metric_id": "head_motion_if_available",
+      "definition": "Head angular velocity, acceleration, sampling coverage, and missingness only when genuinely available and permitted.",
+      "numerator": "VALID_HEAD_MOTION_SAMPLES_AND_MAGNITUDES",
+      "denominator": "EXPECTED_USABLE_OBSERVATION_TIME",
+      "unit": "RADIANS_PER_SECOND_METERS_PER_SECOND_SQUARED_AND_PROPORTION",
+      "required_inputs": ["PERMITTED_HEAD_MOTION_STREAM"],
+      "estimator": "EPISODE_DISTRIBUTION_SUMMARY",
+      "uncertainty": "PARTICIPANT_CLUSTER_THEN_EPISODE_RESAMPLING_PLUS_SENSOR_ERROR",
+      "missingness": "MARK_UNAVAILABLE_WHEN_STREAM_ABSENT_NEVER_BORROW",
+      "export_constraint": "AGGREGATES_ONLY_IF_DATA_USE_TERMS_PERMIT"
+    }
+  ]
+}

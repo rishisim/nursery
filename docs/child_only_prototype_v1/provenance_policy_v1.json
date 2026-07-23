@@ -1,0 +1,54 @@
+{
+  "policy_version": "child-only-provenance-policy-v1.0.0",
+  "contract_version": "child-only-scientific-contract-v1.0.0",
+  "default_state": {
+    "selected_corpus": null,
+    "restricted_access_available": false,
+    "claim_tier": "CONSTRUCTION_ONLY",
+    "profile_label": "NONSCIENTIFIC_CONSTRUCTION_FIXTURE",
+    "scientific_outcome_authorized": false
+  },
+  "allowed_source_families": [
+    "SYNTHETIC_FIXTURE",
+    "BABYVIEW",
+    "CHILDLENS",
+    "OFFICIAL_CODE_REFERENCE"
+  ],
+  "forbidden_adult_data_transfer": {
+    "fail_closed": true,
+    "forbidden_source_identifiers": ["AEA", "ARIA_EVERYDAY_ACTIVITIES"],
+    "roles": [
+      "data",
+      "aggregate",
+      "distribution",
+      "prior",
+      "calibration",
+      "language",
+      "tokenizer",
+      "feature",
+      "checkpoint",
+      "weight",
+      "result",
+      "statistic"
+    ]
+  },
+  "one_corpus_at_a_time": {
+    "allowed_selected_values": ["BABYVIEW", "CHILDLENS"],
+    "exactly_one_for_scientific_instance": true,
+    "cross_corpus_samples": "FORBIDDEN",
+    "cross_corpus_tokenizer": "FORBIDDEN",
+    "cross_corpus_weights": "FORBIDDEN",
+    "cross_corpus_distributions": "FORBIDDEN",
+    "replication_policy": "SEPARATE_STUDY_INSTANCE_FRESH_TOKENIZER_AND_MODEL"
+  },
+  "scientific_initialization": {
+    "tokenizer": "FRESH_SELECTED_CORPUS_ONLY",
+    "model": "SCRATCH_NO_PARENT_CHECKPOINT",
+    "external_pretrained": "NONSCIENTIFIC_DIAGNOSTIC_ONLY_NEVER_ANCESTOR"
+  },
+  "construction_fixture": {
+    "required_label": "NONSCIENTIFIC_CONSTRUCTION_FIXTURE",
+    "claim_scope": "NONE",
+    "promotable_by_relabeling": false
+  }
+}

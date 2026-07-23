@@ -1,0 +1,263 @@
+{
+  "claim_boundary": "Synthetic raw-sensor-assisted action lexical grounding only; no infant, ecological, raw-pixel/audio, arbitrary unseen-word, or timestamp-agreement claim.",
+  "co_primary_component_checks": {
+    "absent": {
+      "minimum_lift": true,
+      "one_sided_t_test": true,
+      "substantial_positive_majority": false,
+      "two_sided_ci_above_zero": true
+    },
+    "shuffled": {
+      "minimum_lift": true,
+      "one_sided_t_test": true,
+      "substantial_positive_majority": false,
+      "two_sided_ci_above_zero": true
+    }
+  },
+  "co_primary_effects": {
+    "absent": {
+      "analysis_kind": "main",
+      "ci95_high": 0.57095079419445,
+      "ci95_low": 0.18946587247221672,
+      "degrees_of_freedom": 19,
+      "estimand": "heldout_object_action_composition_action_6way_macro_accuracy(synchronized) - heldout_object_action_composition_action_6way_macro_accuracy(absent)",
+      "exact_sign_test_one_sided_pvalue": 0.00048828125,
+      "exhaustive_sign_flip_one_sided_pvalue": 0.00048828125,
+      "factor": null,
+      "independent_unit": "corpus_seed",
+      "inference_method": "Student t inference over one model-seed-averaged effect per corpus; exact sign and exhaustive sign-flip evidence are corroborating",
+      "learner": "sensor_latent_cross_occurrence",
+      "left_condition": "synchronized",
+      "level": null,
+      "model_seed_handling": "average 2 algorithmic replicates within each corpus before subtraction",
+      "n_independent_corpus_seeds": 20,
+      "negative_corpus_count": 0,
+      "one_sided_95_lower_bound": 0.22262818181494767,
+      "one_sided_t_pvalue": 0.0002586430749756047,
+      "point_estimate": 0.38020833333333337,
+      "positive_corpus_count": 11,
+      "right_condition": "absent",
+      "standard_error": 0.0911324743064355,
+      "t_statistic": 4.172040057366074,
+      "unit_effects": [
+        {
+          "corpus_seed": 12011,
+          "difference": 0.826388888888889
+        },
+        {
+          "corpus_seed": 12037,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12049,
+          "difference": 0.16666666666666666
+        },
+        {
+          "corpus_seed": 12071,
+          "difference": 1.0
+        },
+        {
+          "corpus_seed": 12097,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12101,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12113,
+          "difference": 0.5
+        },
+        {
+          "corpus_seed": 12119,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12143,
+          "difference": 0.5
+        },
+        {
+          "corpus_seed": 12149,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12157,
+          "difference": 0.5
+        },
+        {
+          "corpus_seed": 12161,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12163,
+          "difference": 0.9444444444444444
+        },
+        {
+          "corpus_seed": 12197,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12203,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12211,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12227,
+          "difference": 1.0
+        },
+        {
+          "corpus_seed": 12239,
+          "difference": 0.5
+        },
+        {
+          "corpus_seed": 12241,
+          "difference": 1.0
+        },
+        {
+          "corpus_seed": 12251,
+          "difference": 0.6666666666666666
+        }
+      ],
+      "zero_corpus_count": 9
+    },
+    "shuffled": {
+      "analysis_kind": "main",
+      "ci95_high": 0.57095079419445,
+      "ci95_low": 0.18946587247221672,
+      "degrees_of_freedom": 19,
+      "estimand": "heldout_object_action_composition_action_6way_macro_accuracy(synchronized) - heldout_object_action_composition_action_6way_macro_accuracy(shuffled)",
+      "exact_sign_test_one_sided_pvalue": 0.00048828125,
+      "exhaustive_sign_flip_one_sided_pvalue": 0.00048828125,
+      "factor": null,
+      "independent_unit": "corpus_seed",
+      "inference_method": "Student t inference over one model-seed-averaged effect per corpus; exact sign and exhaustive sign-flip evidence are corroborating",
+      "learner": "sensor_latent_cross_occurrence",
+      "left_condition": "synchronized",
+      "level": null,
+      "model_seed_handling": "average 2 algorithmic replicates within each corpus before subtraction",
+      "n_independent_corpus_seeds": 20,
+      "negative_corpus_count": 0,
+      "one_sided_95_lower_bound": 0.22262818181494767,
+      "one_sided_t_pvalue": 0.0002586430749756047,
+      "point_estimate": 0.38020833333333337,
+      "positive_corpus_count": 11,
+      "right_condition": "shuffled",
+      "standard_error": 0.0911324743064355,
+      "t_statistic": 4.172040057366074,
+      "unit_effects": [
+        {
+          "corpus_seed": 12011,
+          "difference": 0.826388888888889
+        },
+        {
+          "corpus_seed": 12037,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12049,
+          "difference": 0.16666666666666666
+        },
+        {
+          "corpus_seed": 12071,
+          "difference": 1.0
+        },
+        {
+          "corpus_seed": 12097,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12101,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12113,
+          "difference": 0.5
+        },
+        {
+          "corpus_seed": 12119,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12143,
+          "difference": 0.5
+        },
+        {
+          "corpus_seed": 12149,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12157,
+          "difference": 0.5
+        },
+        {
+          "corpus_seed": 12161,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12163,
+          "difference": 0.9444444444444444
+        },
+        {
+          "corpus_seed": 12197,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12203,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12211,
+          "difference": 0.0
+        },
+        {
+          "corpus_seed": 12227,
+          "difference": 1.0
+        },
+        {
+          "corpus_seed": 12239,
+          "difference": 0.5
+        },
+        {
+          "corpus_seed": 12241,
+          "difference": 1.0
+        },
+        {
+          "corpus_seed": 12251,
+          "difference": 0.6666666666666666
+        }
+      ],
+      "zero_corpus_count": 9
+    }
+  },
+  "confirmation_authorized": false,
+  "confirmation_reserve_status": "untouched_and_guarded",
+  "go_checks": {
+    "all_co_primary_components_pass": false,
+    "all_integrity_and_positive_control_audits_pass": true,
+    "beats_exact_window": true,
+    "beats_no_null": true,
+    "beats_no_sensor_cross_occurrence": true,
+    "beats_single_occurrence": true,
+    "corrupted_conditions_within_absence_tolerance": true,
+    "informative_sensor_strata_help": true,
+    "matched_noun_lift_near_zero_empirically": true,
+    "primary_accuracy_threshold": false,
+    "seen_combination_threshold": false,
+    "seen_component_threshold": false,
+    "structured_concept_threshold": false,
+    "zero_information_has_no_synchronized_advantage": true
+  },
+  "protocol_id": "synthetic-sensor-event-robustness-v2",
+  "reason": "the study remained interpretable, but at least one frozen GO gate did not pass",
+  "recommendation_for_later_v2_confirmation": "REVISE",
+  "schema_version": "synthetic-sensor-event-terminal-decision-v2",
+  "stop_checks": {
+    "both_co_primary_intervals_entirely_below_zero": false,
+    "critical_integrity_detector_or_learnability_failure": false
+  },
+  "study_phase": "development_only",
+  "v1_confirmation_authorized": false
+}

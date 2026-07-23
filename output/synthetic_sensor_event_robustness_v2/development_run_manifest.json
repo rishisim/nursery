@@ -1,0 +1,69 @@
+{
+  "command": "scripts/run_synthetic_sensor_event_robustness_v2.py run-development",
+  "confirmation_outcomes_accessed": 0,
+  "development_corpus_seeds": [
+    12011,
+    12037,
+    12049,
+    12071,
+    12097,
+    12101,
+    12113,
+    12119,
+    12143,
+    12149,
+    12157,
+    12161,
+    12163,
+    12197,
+    12203,
+    12211,
+    12227,
+    12239,
+    12241,
+    12251
+  ],
+  "development_model_seeds": [
+    211,
+    223
+  ],
+  "freeze_verification": {
+    "checks": {
+      "all_frozen_files_present": true,
+      "babyworld_lite/sensor_alignment_v2/__init__.py": true,
+      "babyworld_lite/sensor_alignment_v2/analysis.py": true,
+      "babyworld_lite/sensor_alignment_v2/detector.py": true,
+      "babyworld_lite/sensor_alignment_v2/learners.py": true,
+      "babyworld_lite/sensor_alignment_v2/protocol.py": true,
+      "babyworld_lite/sensor_alignment_v2/study.py": true,
+      "babyworld_lite/sensor_alignment_v2/synthetic.py": true,
+      "configs/synthetic_sensor_event_robustness_v2.yaml": true,
+      "docs/synthetic_sensor_event_robustness_v2_primary_sources.json": true,
+      "docs/synthetic_sensor_event_robustness_v2_protocol.md": true,
+      "output/synthetic_sensor_event_robustness_v2/confirmation_reserve_manifest.json": true,
+      "output/synthetic_sensor_event_robustness_v2/frozen_config_snapshot.yaml": true,
+      "output/synthetic_sensor_event_robustness_v2/frozen_protocol_snapshot.md": true,
+      "output/synthetic_sensor_event_robustness_v2/primary_sources_snapshot.json": true,
+      "scripts/run_synthetic_sensor_event_robustness_v2.py": true,
+      "tests/test_synthetic_sensor_event_robustness_v2.py": true,
+      "zero_pre_freeze_outcomes": true
+    },
+    "receipt_sha256": "12fa4dd701cd6e33207ac51a351a3679ac8668f4fe07a3ae095f4486b8377b0e",
+    "valid": true
+  },
+  "generic_calibration_train_seeds": [
+    52021,
+    52027,
+    52051,
+    52057
+  ],
+  "generic_calibration_validation_seeds": [
+    52103,
+    52121
+  ],
+  "invalidated_pre_freeze_outcomes": [],
+  "protocol_amendments": [],
+  "protocol_id": "synthetic-sensor-event-robustness-v2",
+  "schema_version": "synthetic-sensor-event-development-manifest-v2",
+  "started_at_utc": "2026-07-15T21:12:40.244353+00:00"
+}

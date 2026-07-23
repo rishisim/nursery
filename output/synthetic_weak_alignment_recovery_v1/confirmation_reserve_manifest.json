@@ -1,0 +1,20 @@
+{
+  "authorization_present": false,
+  "authorized_operations": [],
+  "corpus_seeds": [
+    91009,
+    92009,
+    93001,
+    94007
+  ],
+  "model_seeds": [
+    101,
+    103,
+    107
+  ],
+  "note": "Identifiers are preregistered only. This manifest contains no generated corpus, model, evaluation, or summary outcome and grants no confirmation authorization.",
+  "outcome_fields": [],
+  "protocol_id": "synthetic-weak-alignment-recovery-v1",
+  "schema_version": "synthetic-confirmation-reserve-manifest-v1",
+  "status": "reserved_untouched_no_outcomes"
+}

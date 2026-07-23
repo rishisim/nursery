@@ -1,0 +1,92 @@
+{
+  "accidental_pre_freeze_outcome_incidents": [],
+  "code_provenance": {
+    "git_branch": "main",
+    "git_head": "e6acf51ce4798dc051cafc0a3aec8b0dc61c535a",
+    "git_status_porcelain_at_freeze": [
+      "?? babyworld_lite/weak_alignment/",
+      "?? configs/synthetic_weak_alignment_recovery_v1.yaml",
+      "?? docs/synthetic_weak_alignment_recovery_v1_primary_sources.json",
+      "?? docs/synthetic_weak_alignment_recovery_v1_protocol.md",
+      "?? output/synthetic_weak_alignment_recovery_v1/",
+      "?? scripts/run_synthetic_weak_alignment_v1.py",
+      "?? tests/test_synthetic_weak_alignment_v1.py"
+    ],
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "confirmation_manifest_sha256": "f3cd4f4951ada8f11ba74c93b06344c84bcd29eac165bc56262319b38656f319",
+  "content_hashes": {
+    "babyworld_lite/weak_alignment/__init__.py": {
+      "bytes": 155,
+      "sha256": "375fb2dcb05d5afb890295e17eabe9d39e49a2e9601309e73765f858cc8c488a"
+    },
+    "babyworld_lite/weak_alignment/analysis.py": {
+      "bytes": 25724,
+      "sha256": "2f1579c96288accbd4ce50f3a5531e5add0ace2baf86f428330df51068a8f36e"
+    },
+    "babyworld_lite/weak_alignment/learners.py": {
+      "bytes": 18494,
+      "sha256": "e76352afcd478973a20bb00429ffefe7f9e20d4e2383392244d4e079614ae881"
+    },
+    "babyworld_lite/weak_alignment/protocol.py": {
+      "bytes": 15901,
+      "sha256": "8184e97e13e866d1d262daabc36d4f546985532b4c887de8c3680ca0c9f07a28"
+    },
+    "babyworld_lite/weak_alignment/study.py": {
+      "bytes": 27453,
+      "sha256": "3b56a1e5b344b57cfcb323fc9bebc4bfbdd3a37faf7f9b1a973180296b84b158"
+    },
+    "babyworld_lite/weak_alignment/synthetic.py": {
+      "bytes": 27142,
+      "sha256": "5e7c90418ff5ea5af29b68d8e17d6376744c66501cbcd91279bac670141d93a6"
+    },
+    "configs/synthetic_weak_alignment_recovery_v1.yaml": {
+      "bytes": 4534,
+      "sha256": "19de1000f0eca2250e63e64a87e9691fce70616bf99f0bef7b80a6eb3b0879ef"
+    },
+    "docs/synthetic_weak_alignment_recovery_v1_primary_sources.json": {
+      "bytes": 4794,
+      "sha256": "5507d369b0569e93021fd76665a346c1ad8c598a858887d1cdf0b7d8a26c55a9"
+    },
+    "docs/synthetic_weak_alignment_recovery_v1_protocol.md": {
+      "bytes": 12156,
+      "sha256": "82ade872a4fe75bd43b0db3138d4bf98ec8b12ebf00f451a195f0941f28b0f90"
+    },
+    "output/synthetic_weak_alignment_recovery_v1/confirmation_reserve_manifest.json": {
+      "bytes": 552,
+      "sha256": "f3cd4f4951ada8f11ba74c93b06344c84bcd29eac165bc56262319b38656f319"
+    },
+    "output/synthetic_weak_alignment_recovery_v1/frozen_config_snapshot.yaml": {
+      "bytes": 4534,
+      "sha256": "19de1000f0eca2250e63e64a87e9691fce70616bf99f0bef7b80a6eb3b0879ef"
+    },
+    "output/synthetic_weak_alignment_recovery_v1/frozen_protocol_snapshot.md": {
+      "bytes": 12156,
+      "sha256": "82ade872a4fe75bd43b0db3138d4bf98ec8b12ebf00f451a195f0941f28b0f90"
+    },
+    "output/synthetic_weak_alignment_recovery_v1/primary_sources_snapshot.json": {
+      "bytes": 4794,
+      "sha256": "5507d369b0569e93021fd76665a346c1ad8c598a858887d1cdf0b7d8a26c55a9"
+    },
+    "scripts/run_synthetic_weak_alignment_v1.py": {
+      "bytes": 4025,
+      "sha256": "5d58a81bf83c76614fb3045fccbfd26a039746c1bbc09d96e21da73a17d34dfc"
+    },
+    "tests/test_synthetic_weak_alignment_v1.py": {
+      "bytes": 11200,
+      "sha256": "ea1f34716785216f534b664bae992da6985ea66ae40efdb1ddb240da6a9bb928"
+    }
+  },
+  "created_at_utc": "2026-07-15T19:45:50.051028+00:00",
+  "outcome_producing_runs_before_freeze": 0,
+  "phase_at_freeze": "pre_outcome_development_protocol_freeze",
+  "protocol_id": "synthetic-weak-alignment-recovery-v1",
+  "runtime_provenance": {
+    "numpy": "2.5.1",
+    "pid": 75824,
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "python": "3.12.13 (main, Mar 10 2026, 18:18:07) [Clang 21.1.4 ]",
+    "python_executable": ".venv/bin/python"
+  },
+  "schema_version": "synthetic-weak-alignment-freeze-receipt-v1"
+}

@@ -1,0 +1,140 @@
+{
+  "checks": {
+    "absent_is_structural": true,
+    "present_conditions_distribution_matched": true,
+    "synchronized_informative_above_chance": true,
+    "synchronized_informative_beats_each_matched_control": true,
+    "synchronized_uninformative_near_chance": true
+  },
+  "results": {
+    "shuffled": {
+      "by_informativeness_level": {
+        "0": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.2881944444444444
+        },
+        "0.75": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.2465277777777778
+        },
+        "0.95": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.2569444444444444
+        }
+      },
+      "configured_informative": {
+        "accuracy_minus_chance": 0.001736111111111105,
+        "mean_chance": 0.25,
+        "n_episodes": 576,
+        "referent_or_null_top1_accuracy": 0.2517361111111111
+      },
+      "configured_uninformative": {
+        "accuracy_minus_chance": 0.03819444444444442,
+        "mean_chance": 0.25,
+        "n_episodes": 288,
+        "referent_or_null_top1_accuracy": 0.2881944444444444
+      },
+      "event_boundary_or_null_binary_accuracy": 0.5254629629629629
+    },
+    "synchronized": {
+      "by_informativeness_level": {
+        "0": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.2708333333333333
+        },
+        "0.75": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.78125
+        },
+        "0.95": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.9756944444444444
+        }
+      },
+      "configured_informative": {
+        "accuracy_minus_chance": 0.6284722222222222,
+        "mean_chance": 0.25,
+        "n_episodes": 576,
+        "referent_or_null_top1_accuracy": 0.8784722222222222
+      },
+      "configured_uninformative": {
+        "accuracy_minus_chance": 0.020833333333333315,
+        "mean_chance": 0.25,
+        "n_episodes": 288,
+        "referent_or_null_top1_accuracy": 0.2708333333333333
+      },
+      "event_boundary_or_null_binary_accuracy": 0.8125
+    },
+    "time_shifted": {
+      "by_informativeness_level": {
+        "0": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.22569444444444445
+        },
+        "0.75": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.0798611111111111
+        },
+        "0.95": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.003472222222222222
+        }
+      },
+      "configured_informative": {
+        "accuracy_minus_chance": -0.20833333333333334,
+        "mean_chance": 0.25,
+        "n_episodes": 576,
+        "referent_or_null_top1_accuracy": 0.041666666666666664
+      },
+      "configured_uninformative": {
+        "accuracy_minus_chance": -0.024305555555555552,
+        "mean_chance": 0.25,
+        "n_episodes": 288,
+        "referent_or_null_top1_accuracy": 0.22569444444444445
+      },
+      "event_boundary_or_null_binary_accuracy": 0.45023148148148145
+    },
+    "uninformative": {
+      "by_informativeness_level": {
+        "0": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.2638888888888889
+        },
+        "0.75": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.2673611111111111
+        },
+        "0.95": {
+          "mean_chance": 0.25,
+          "n_episodes": 288,
+          "referent_or_null_top1_accuracy": 0.22916666666666666
+        }
+      },
+      "configured_informative": {
+        "accuracy_minus_chance": -0.001736111111111105,
+        "mean_chance": 0.25,
+        "n_episodes": 576,
+        "referent_or_null_top1_accuracy": 0.2482638888888889
+      },
+      "configured_uninformative": {
+        "accuracy_minus_chance": 0.013888888888888895,
+        "mean_chance": 0.25,
+        "n_episodes": 288,
+        "referent_or_null_top1_accuracy": 0.2638888888888889
+      },
+      "event_boundary_or_null_binary_accuracy": 0.5636574074074074
+    }
+  },
+  "valid": true
+}

@@ -1,0 +1,27 @@
+{
+  "identifiers": {
+    "calibration": [
+      97931,
+      97943
+    ],
+    "corpus": [
+      97103,
+      97117,
+      97127,
+      97151
+    ],
+    "model": [
+      907,
+      911,
+      919
+    ]
+  },
+  "operations_blocked": [
+    "generate",
+    "fit",
+    "evaluate",
+    "read",
+    "summarize",
+    "calibrate"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "contract_version": "child-only-scientific-contract-v1.0.0",
+  "policy_version": "child-only-provenance-policy-v1.0.0",
+  "study_instance_id": "construction-fixture-instance-v1",
+  "selected_corpus": null,
+  "restricted_access_available": false,
+  "claim_tier": "CONSTRUCTION_ONLY",
+  "profile_label": "NONSCIENTIFIC_CONSTRUCTION_FIXTURE",
+  "scientific_outcome_authorized": false,
+  "audio_tts_status": "DEFERRED",
+  "primary_learner": "TEMPORAL_CLIP_PLUS_SCRATCH",
+  "artifact_nodes": [
+    {
+      "artifact_id": "construction-fixture-root-v1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "role": "SCHEMA_AND_INTERFACE_CONSTRUCTION_FIXTURE",
+      "source_family": "SYNTHETIC_FIXTURE",
+      "study_instance_id": "construction-fixture-instance-v1",
+      "corpus_instance_id": null,
+      "parents": [],
+      "claim_tier": "CONSTRUCTION_ONLY"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "schema_version": "synthetic-weak-alignment-primary-sources-v1",
+  "protocol_id": "synthetic-weak-alignment-recovery-v1",
+  "search_completed_before_outcome_runs": true,
+  "access_date": "2026-07-15",
+  "sources": [
+    {
+      "title": "Infants rapidly learn word-referent mappings via cross-situational statistics",
+      "authors": "Linda B. Smith and Chen Yu",
+      "publication": "Cognition 106(3), 1558-1568 (2008), doi:10.1016/j.cognition.2007.06.010",
+      "url": "https://doi.org/10.1016/j.cognition.2007.06.010",
+      "accessed": "2026-07-15",
+      "justification": "Motivates repeated ambiguous occurrences as the evidence unit for cross-situational lexical recovery."
+    },
+    {
+      "title": "A computational study of cross-situational techniques for learning word-to-meaning mappings",
+      "authors": "Jeffrey Mark Siskind",
+      "publication": "Cognition 61(1-2), 39-91 (1996), doi:10.1016/S0010-0277(96)00728-7",
+      "url": "https://doi.org/10.1016/S0010-0277(96)00728-7",
+      "accessed": "2026-07-15",
+      "justification": "Supports treating noisy multiword input and referential uncertainty as explicit computational problems rather than exact timestamp labels."
+    },
+    {
+      "title": "A Probabilistic Computational Model of Cross-Situational Word Learning",
+      "authors": "Afsaneh Fazly, Afra Alishahi, and Suzanne Stevenson",
+      "publication": "Cognitive Science 34(6), 1017-1063 (2010), doi:10.1111/j.1551-6709.2010.01104.x",
+      "url": "https://doi.org/10.1111/j.1551-6709.2010.01104.x",
+      "accessed": "2026-07-15",
+      "justification": "Justifies probabilistic alignment jointly with accumulation of word-meaning evidence across situations."
+    },
+    {
+      "title": "Solving the multiple instance problem with axis-parallel rectangles",
+      "authors": "Thomas G. Dietterich, Richard H. Lathrop, and Tomas Lozano-Perez",
+      "publication": "Artificial Intelligence 89(1-2), 31-71 (1997), doi:10.1016/S0004-3702(96)00034-3",
+      "url": "https://doi.org/10.1016/S0004-3702(96)00034-3",
+      "accessed": "2026-07-15",
+      "justification": "Provides the canonical multiple-instance framing in which one ambiguous bag contains several candidate instances."
+    },
+    {
+      "title": "UntrimmedNets for Weakly Supervised Action Recognition and Detection",
+      "authors": "Limin Wang, Yuanjun Xiong, Dahua Lin, and Luc Van Gool",
+      "publication": "Proceedings of CVPR, 4325-4334 (2017)",
+      "url": "https://openaccess.thecvf.com/content_cvpr_2017/html/Wang_UntrimmedNets_for_Weakly_CVPR_2017_paper.html",
+      "accessed": "2026-07-15",
+      "justification": "Supports separating bag-level classification from latent temporal/event selection in untrimmed weakly supervised streams."
+    },
+    {
+      "title": "Unifying distillation and privileged information",
+      "authors": "David Lopez-Paz, Leon Bottou, Bernhard Schoelkopf, and Vladimir Vapnik",
+      "publication": "International Conference on Learning Representations (2016), arXiv:1511.03643",
+      "url": "https://arxiv.org/abs/1511.03643",
+      "accessed": "2026-07-15",
+      "justification": "Justifies the train-only privileged-information boundary: synchronized explanations may aid learning but are unavailable at test."
+    },
+    {
+      "title": "Bootstrap Methods: Another Look at the Jackknife",
+      "authors": "Bradley Efron",
+      "publication": "The Annals of Statistics 7(1), 1-26 (1979), doi:10.1214/aos/1176344552",
+      "url": "https://projecteuclid.org/journals/annals-of-statistics/volume-7/issue-1/Bootstrap-Methods-Another-Look-at-the-Jackknife/10.1214/aos/1176344552.full",
+      "accessed": "2026-07-15",
+      "justification": "Supports bootstrap uncertainty; this protocol applies it only to paired corpus/model-seed units."
+    },
+    {
+      "title": "Generalization without Systematicity: On the Compositional Skills of Sequence-to-Sequence Recurrent Networks",
+      "authors": "Brenden M. Lake and Marco Baroni",
+      "publication": "Proceedings of ICML, PMLR 80, 2873-2882 (2018)",
+      "url": "https://proceedings.mlr.press/v80/lake18a.html",
+      "accessed": "2026-07-15",
+      "justification": "Motivates an explicit held-out-composition test rather than interpreting in-distribution accuracy as transferable meaning."
+    },
+    {
+      "title": "EgoBabyVLM: Benchmarking Cross-Modal Learning from Naturalistic Egocentric Video Data",
+      "authors": "Dongyan Lin et al.",
+      "publication": "arXiv:2605.19130 (2026)",
+      "url": "https://arxiv.org/abs/2605.19130",
+      "accessed": "2026-07-15",
+      "justification": "Provides the current weak-alignment and Machine-DevBench context; Nursery excludes the benchmark here because its measured target vocabulary coverage is inadequate."
+    }
+  ]
+}

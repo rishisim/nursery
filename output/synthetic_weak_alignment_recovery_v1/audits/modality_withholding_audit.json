@@ -1,0 +1,28 @@
+{
+  "checks": {
+    "evaluation_item_has_no_auxiliary_field": true,
+    "evaluation_source_has_no_encoder_call": true,
+    "evaluator_signature_has_no_auxiliary_argument": true,
+    "serialized_model_has_no_auxiliary_field_or_encoder": true
+  },
+  "evaluation_item_fields": [
+    "evaluation_id",
+    "evaluation_role",
+    "lexical_panel",
+    "action_observation",
+    "scene_observation",
+    "action_candidate_words",
+    "scene_candidate_words",
+    "action_answer_index",
+    "scene_answer_index",
+    "composition_id"
+  ],
+  "evaluator_signature": "(model: 'LexiconModel', evaluation_items: 'Sequence[EvaluationItem]', *, corpus_seed: 'int', config: 'Mapping[str, Any]') -> 'dict[str, Any]'",
+  "lexicon_model_fields": [
+    "action_prototypes",
+    "scene_prototypes",
+    "learner",
+    "model_seed"
+  ],
+  "valid": true
+}

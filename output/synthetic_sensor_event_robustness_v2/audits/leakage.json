@@ -1,0 +1,16 @@
+{
+  "chance": 0.16666666666666666,
+  "checks": {
+    "calibration_has_no_lexical_or_referent_targets": true,
+    "heldout_compositions_disjoint": true,
+    "oracle_records_physically_separate": true,
+    "randomized_mapping_changes_across_corpora": true,
+    "raw_stream_semantic_key_audits_pass": true,
+    "structured_components_exposed_but_combination_held_out": true,
+    "zero_exposure_panel_at_chance": true
+  },
+  "schema_version": "synthetic-sensor-event-leakage-audit-v2",
+  "unique_mapping_count": 20,
+  "valid": true,
+  "zero_exposure_accuracy": 0.16666666666666666
+}

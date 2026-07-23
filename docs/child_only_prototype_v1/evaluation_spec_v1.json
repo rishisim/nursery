@@ -1,0 +1,46 @@
+{
+  "evaluation_spec_version": "child-only-evaluation-spec-v1.0.0",
+  "status": "CONSTRUCTION_SPECIFICATION_ONLY",
+  "outcome_execution_authorized": false,
+  "model_call_inputs": ["VISION", "TEXT"],
+  "trial_builder_inputs": "PHYSICALLY_SEPARATE_HIDDEN_ORACLE_OFFLINE_ONLY",
+  "corpus_grounding_rule": "ALL_VOCABULARY_CANDIDATE_TEXT_FREQUENCY_MATCHING_AND_SYNTHETIC_LANGUAGE_DERIVE_FROM_EXACTLY_ONE_SELECTED_CHILD_CORPUS",
+  "unsupported_concept_policy": "MARK_ENDPOINT_UNAVAILABLE_NEVER_BORROW_FROM_OTHER_CORPUS",
+  "tasks": {
+    "held_out_noun_object_grounding": {
+      "unit": "SEEN_CORPUS_WORD_ON_HELD_OUT_SYNTHETIC_OBJECT_INSTANCE",
+      "split": "OBJECT_INSTANCES_ASSETS_AND_RENDER_SEEDS_DISJOINT",
+      "scoring": "BALANCED_MINIMAL_PAIR_OR_RETRIEVAL_CONCEPT_MACRO",
+      "claims": "LEXICAL_OBJECT_GROUNDING_ONLY"
+    },
+    "held_out_verb_action_grounding": {
+      "unit": "SEEN_CORPUS_VERB_ON_HELD_OUT_ACTION_INSTANCE_AND_OBJECT",
+      "split": "ACTION_INSTANCES_AND_TARGET_OBJECTS_DISJOINT",
+      "scoring": "BALANCED_MINIMAL_PAIR_OR_RETRIEVAL_CONCEPT_MACRO",
+      "claims": "LEXICAL_ACTION_GROUNDING_ONLY"
+    },
+    "novel_compositions": {
+      "unit": "NOUN_AND_VERB_SEEN_SEPARATELY_WITH_PAIRING_HELD_OUT",
+      "split": "PAIRING_DISJOINT_WITH_COMPONENT_SUPPORT",
+      "scoring": "COMPOSITION_MACRO",
+      "claims": "COMPOSITIONAL_GENERALIZATION_WITHIN_FROZEN_VOCABULARY"
+    },
+    "cross_world_render_seed_generalization": {
+      "unit": "HELD_OUT_WORLD_ASSET_BACKGROUND_LIGHT_CAMERA_AND_RENDER_SEED",
+      "split": "WORLD_AND_RENDER_SEED_DISJOINT",
+      "scoring": "TASK_MACRO_BY_WORLD_AND_CONCEPT",
+      "claims": "SYNTHETIC_CROSS_WORLD_GENERALIZATION_ONLY"
+    }
+  },
+  "machine_devbench": {
+    "role": "SECONDARY_COVERAGE_GATED",
+    "coverage_gate": "MUST_BE_FROZEN_AFTER_SELECTED_CORPUS_ACCESS_AND_BEFORE_ANY SCORE_IS INTERPRETED",
+    "low_coverage_interpretation": "INTEGRATION_DIAGNOSTIC_ONLY"
+  },
+  "reporting": {
+    "paired_unit": "CORPUS_SEED_BY_MODEL_SEED_BUNDLE",
+    "primary_contrast": "WEAK_SYNCHRONIZED_MINUS_WEAK_EPISODE_SHUFFLED",
+    "uncertainty": "HIERARCHICAL_OVER_CORPUS_AND_MODEL_SEEDS",
+    "prohibited_claims": ["INFANT_LEARNING", "BABYVIEW_EQUIVALENCE", "EFFICACY"]
+  }
+}

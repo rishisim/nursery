@@ -1,0 +1,71 @@
+{
+  "detector_fit_trace": {
+    "activity_positive_rate": 0.22772507440476192,
+    "boundary_positive_rate": 0.06566220238095238,
+    "calibration_rows": 336,
+    "calibration_seeds": [
+      52021,
+      52027,
+      52051,
+      52057
+    ],
+    "iterations_per_head": 260,
+    "lexical_supervision_used": false,
+    "model_digest": "d058ab5248d6eb9516ed711a2a161c607e0a26871aed1c63da9f4bb864f6bdf6",
+    "randomized_mapping_used": false,
+    "referent_supervision_used": false,
+    "schema_version": "synthetic-sensor-event-detector-fit-trace-v2",
+    "timepoint_rows": 21504,
+    "training_digest": "92c1b21876ff5007ae666cf2744e87176b1e6bfce9bbab30ef1eaaca243538b5"
+  },
+  "schema_version": "synthetic-sensor-event-calibration-boundary-audit-v2",
+  "train_provenance": {
+    "checks": {
+      "all_seeds_expected": true,
+      "no_lexical_or_referent_fields": true,
+      "oracle_separate": true,
+      "raw_stream_shape_valid": true
+    },
+    "episodes_per_seed": 84,
+    "lexical_targets_present": false,
+    "oracle_digest": "d4178d1897625c7285ecb1f3d8e84bcaeb996aae8c6e8390404042eba8b01379",
+    "protocol_id": "synthetic-sensor-event-robustness-v2",
+    "randomized_word_mappings_present": false,
+    "record_count": 336,
+    "referent_targets_present": false,
+    "schema_version": "synthetic-sensor-calibration-provenance-v2",
+    "seeds": [
+      52021,
+      52027,
+      52051,
+      52057
+    ],
+    "split": "train",
+    "valid": true,
+    "visible_digest": "5075b25770d3f91afd552de12b6439fbddf4e78a8a94a121ae40709ae782590a"
+  },
+  "valid": true,
+  "validation_provenance": {
+    "checks": {
+      "all_seeds_expected": true,
+      "no_lexical_or_referent_fields": true,
+      "oracle_separate": true,
+      "raw_stream_shape_valid": true
+    },
+    "episodes_per_seed": 60,
+    "lexical_targets_present": false,
+    "oracle_digest": "d09da65634b8281c01e4c79a9d3714be5af093870d6a681d945d587eafb219dc",
+    "protocol_id": "synthetic-sensor-event-robustness-v2",
+    "randomized_word_mappings_present": false,
+    "record_count": 120,
+    "referent_targets_present": false,
+    "schema_version": "synthetic-sensor-calibration-provenance-v2",
+    "seeds": [
+      52103,
+      52121
+    ],
+    "split": "validation",
+    "valid": true,
+    "visible_digest": "27330e2e2dd12885d44e435dd65620277a20fa28b8cb2bbf3c9865d0e1e5c69c"
+  }
+}

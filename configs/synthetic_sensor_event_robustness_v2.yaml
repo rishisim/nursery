@@ -1,0 +1,219 @@
+protocol:
+  id: synthetic-sensor-event-robustness-v2
+  schema_version: synthetic-sensor-event-protocol-v2
+  status: frozen
+  study_phase: development_only
+  claim: synthetic_raw_sensor_assisted_weak_action_lexical_grounding
+  ecological_claim_excluded: true
+  confirmation_authorized: false
+
+seeds:
+  development:
+    corpus: [12011, 12037, 12049, 12071, 12097, 12101, 12113, 12119, 12143, 12149, 12157, 12161, 12163, 12197, 12203, 12211, 12227, 12239, 12241, 12251]
+    model: [211, 223]
+  generic_calibration:
+    train: [52021, 52027, 52051, 52057]
+    validation: [52103, 52121]
+  confirmation_reserve:
+    corpus: [96103, 96137, 96149, 96157]
+    model: [809, 811, 821]
+    calibration: [96931, 96959]
+  fixture_only:
+    corpus: 88177
+    corpus_secondary: 88179
+    model: 881
+    model_secondary: 883
+    calibration_train: 88211
+    calibration_validation: 88223
+    reserve_corpus: 88993
+    reserve_model: 887
+    reserve_calibration: 88989
+  v1_forbidden:
+    corpus: [1103, 2207, 3301, 4409, 70123, 91009, 92009, 93001, 94007, 99001]
+    model: [7, 17, 29, 43, 101, 103, 107, 991]
+
+stream:
+  samples: 64
+  imu_axes: 6
+  proprio_axes: 2
+  touch_axes: 1
+  baseline_noise_sd: 0.08
+  minimum_event_width: 5
+  maximum_event_width: 9
+
+factors:
+  speech_action_lag_samples: [-16, 0, 16]
+  grounded_utterance_rate: [0.60, 0.85]
+  candidate_event_count: [3, 5]
+  action_visibility_rate: [0.80, 0.95]
+  lexical_repetition_count: [1, 2]
+  sensor_informativeness: [0.0, 0.90, 1.0]
+  sensor_snr: [1.2, 2.0]
+  sensor_dropout_rate: [0.0, 0.15]
+  false_positive_sensor_rate: [0.02, 0.20]
+  wearer_event_prevalence: [0.35, 0.70]
+
+design:
+  primitive_count: 3
+  manner_count: 2
+  action_concept_count: 6
+  object_count: 6
+  training_action_episodes_per_seen_concept: 24
+  training_noun_episodes_per_object: 20
+  irrelevant_utterance_rate: 0.10
+  structured_distractor_probability_when_grounded: 0.60
+  action_observation_noise: 0.45
+  object_observation_noise: 0.45
+  evaluation_observation_noise: 0.10
+  evaluation_instances_per_concept: 12
+  structured_holdout_combinations_per_corpus: 1
+  heldout_object_action_compositions_per_concept: 1
+  factor_assignment: independent_exact_marginal_permutations_within_action_and_noun_families
+  expected_training_episodes_per_corpus: 240
+
+calibration:
+  episodes_per_train_seed: 84
+  episodes_per_validation_seed: 60
+  detector_iterations: 260
+  detector_learning_rate: 0.12
+  detector_l2: 0.01
+  boundary_tolerance_samples: 2
+  ownership_threshold: 0.50
+  boundary_threshold: 0.48
+  lexical_targets_forbidden: true
+  referent_targets_forbidden: true
+  randomized_word_mappings_forbidden: true
+
+conditions:
+  names:
+    - synchronized
+    - shuffled
+    - shifted_m16
+    - shifted_m8
+    - shifted_p8
+    - shifted_p16
+    - absent
+    - uninformative
+  time_shift_offsets:
+    shifted_m16: -16
+    shifted_m8: -8
+    shifted_p8: 8
+    shifted_p16: 16
+  shuffled_rule: candidate_count_matched_lexical_group_safe_whole_sequence_bijection
+  absent_rule: raw_sensor_field_omitted
+  uninformative_rule: deterministic_four_sample_block_permutation_preserving_all_raw_rows
+
+learners:
+  names:
+    - exact_window_symbolic
+    - sensor_latent_single_occurrence
+    - cross_occurrence_no_sensor
+    - sensor_latent_cross_occurrence
+    - sensor_latent_cross_no_null
+    - structural_absence
+    - oracle_event_alignment_upper
+    - v1_pointer_style_upper
+  primary: sensor_latent_cross_occurrence
+  iterations: 6
+  sensitivity_iterations: 4
+  posterior_temperature: 0.55
+  visual_weight: 2.3
+  temporal_weight: 0.30
+  temporal_scale_samples: 10.0
+  null_logit: 0.10
+  prototype_smoothing: 0.35
+  reliability_gain_threshold: 0.10
+  reliability_gain_scale: 0.12
+  reliability_mean_quality_threshold: 0.55
+  reliability_mean_quality_scale: 0.015
+  reliability_concentration_change_threshold: 0.055
+  reliability_concentration_change_scale: 0.008
+  minimum_active_trust: 0.18
+  maximum_sensor_trust: 0.80
+  sensor_logit_weight: 2.0
+  cue_dropout_probability: 0.30
+  v1_pointer_correct_probability: 0.90
+  matched_update_passes_across_conditions: true
+
+evaluation:
+  primary_metric: heldout_object_action_composition_action_6way_macro_accuracy
+  final_modalities: [learned_token_prototypes, action_observation, object_observation]
+  training_sensor_data_at_final_evaluation: structurally_forbidden
+  detector_state_at_final_evaluation: structurally_forbidden
+  side_derived_scores_at_final_evaluation: structurally_forbidden
+  endpoints:
+    - seen_lexical_component_accuracy_on_independent_tokens
+    - new_action_instance_accuracy
+    - seen_combination_action_6way_accuracy
+    - heldout_object_action_composition_action_6way_macro_accuracy
+    - structured_heldout_concept_action_6way_accuracy
+    - matched_noun_6way_macro_accuracy
+    - zero_exposure_word_6way_accuracy
+
+sensitivity:
+  learner: sensor_latent_cross_occurrence
+  conditions: [synchronized, shuffled, absent]
+  refit_within_each_factor_level: true
+  status: secondary_descriptive
+
+inference:
+  independent_unit: corpus_seed
+  model_seed_role: algorithmic_replicate_averaged_within_corpus
+  confidence_level: 0.95
+  primary_alpha_one_sided: 0.05
+  method: corpus_level_student_t_with_19_df
+  corroboration: exhaustive_corpus_level_sign_flip_and_exact_sign_test
+  bootstrap_primary_inference: forbidden
+  co_primary_contrasts:
+    - [synchronized, absent]
+    - [synchronized, shuffled]
+  multiplicity: intersection_union_both_one_sided_tests_must_pass_no_alpha_splitting
+
+gates:
+  detector:
+    minimum_informative_timepoint_precision: 0.70
+    minimum_informative_timepoint_recall: 0.70
+    minimum_informative_boundary_f1: 0.60
+    minimum_informative_candidate_owner_auc: 0.78
+    maximum_zero_information_auc_distance_from_chance: 0.12
+  co_primary:
+    minimum_absolute_lift: 0.05
+    minimum_positive_corpus_count: 15
+    require_one_sided_t_p_below_alpha: true
+    require_two_sided_t_ci_low_above_zero: true
+  robustness:
+    maximum_corrupted_drop_below_absence: 0.05
+  selectivity:
+    maximum_absolute_matched_noun_lift: 0.05
+    maximum_absolute_zero_information_lift: 0.05
+  transfer:
+    minimum_synchronized_primary_accuracy: 0.72
+    minimum_seen_combination_accuracy: 0.72
+    minimum_structured_concept_accuracy: 0.62
+    minimum_seen_component_accuracy: 0.80
+    maximum_zero_exposure_above_chance: 0.03
+  ablations:
+    minimum_over_exact_window: 0.05
+    minimum_over_single_occurrence: 0.05
+    minimum_over_cross_occurrence_no_sensor: 0.05
+    minimum_over_no_null: 0.02
+  controls:
+    minimum_oracle_alignment_accuracy: 0.90
+    minimum_v1_pointer_upper_accuracy: 0.80
+    minimum_direct_action_observation_capacity: 0.95
+    minimum_direct_object_observation_capacity: 0.95
+
+decision_rule:
+  go_requires_every_co_primary_and_gate: true
+  stop_if_integrity_leakage_reserve_or_test_boundary_fails: true
+  stop_if_detector_or_learnability_positive_control_fails: true
+  stop_if_both_co_primary_two_sided_intervals_entirely_below_zero: true
+  otherwise: REVISE
+  recommendation_scope: later_separately_authorized_frozen_v2_confirmation_only
+  recommendation_does_not_authorize_confirmation: true
+
+external_boundaries:
+  aea: terminal_stop_unchanged
+  machine_devbench: secondary_excluded_coverage_13_of_1414
+  babyview: access_pending
+  childlens: access_pending

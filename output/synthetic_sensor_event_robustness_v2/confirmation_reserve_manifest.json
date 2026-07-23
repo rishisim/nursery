@@ -1,0 +1,24 @@
+{
+  "authorization_present": false,
+  "authorized_operations": [],
+  "calibration_seeds": [
+    96931,
+    96959
+  ],
+  "corpus_seeds": [
+    96103,
+    96137,
+    96149,
+    96157
+  ],
+  "model_seeds": [
+    809,
+    811,
+    821
+  ],
+  "note": "Identifiers only: no reserve corpus, raw stream, detector, model, evaluation, or summary has been generated or read, and no confirmation is authorized.",
+  "outcome_fields": [],
+  "protocol_id": "synthetic-sensor-event-robustness-v2",
+  "schema_version": "synthetic-sensor-event-confirmation-reserve-v2",
+  "status": "reserved_untouched_identifiers_only"
+}

@@ -1,0 +1,21 @@
+{
+  "protocol_id": "synthetic-component-identification-robustness-v3",
+  "analysis_status": "FROZEN_INFERENCE_PIPELINE_FAILED_DEGENERATE_STUDENTIZATION",
+  "independent_validation_only": true,
+  "primary_condition_accuracy": {
+    "synchronized": 1.0,
+    "shuffled": 0.0,
+    "shifted_m16": 0.0,
+    "shifted_m8": 0.0,
+    "shifted_p8": 0.0,
+    "shifted_p16": 0.0,
+    "absent": 0.0,
+    "uninformative": 0.0
+  },
+  "co_primary_descriptive_effects": {
+    "synchronized_minus_absent": {"mean": 1.0, "minimum": 1.0, "q1": 1.0, "median": 1.0, "q3": 1.0, "maximum": 1.0, "positive_corpora": 40, "ties": 0, "corpus_effects": [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]},
+    "synchronized_minus_shuffled": {"mean": 1.0, "minimum": 1.0, "q1": 1.0, "median": 1.0, "q3": 1.0, "maximum": 1.0, "positive_corpora": 40, "ties": 0, "corpus_effects": [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]}
+  },
+  "synchronized_diagnostics": {"seen_accuracy": 1.0, "structured_accuracy": 1.0, "component_accuracy": 1.0, "manner_pairwise_order_accuracy": 1.0, "token_collapse_rate": 0.0, "inversion_rate": 0.0, "noun_accuracy": 1.0},
+  "interpretation": "Descriptive only. No frozen confidence interval or primary test exists because all studentized resamples had zero standard error."
+}

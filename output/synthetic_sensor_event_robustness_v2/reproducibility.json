@@ -1,0 +1,23 @@
+{
+  "artifact_manifest_sha256": "b047028ac84f95a0d4254f738e2b24c06f6684f054edfff891639b773a8d83f9",
+  "command": "scripts/run_synthetic_sensor_event_robustness_v2.py run-development",
+  "completed_at_utc": "2026-07-15T21:15:51.764691+00:00",
+  "confirmation_manifest_sha256": "855cf6b90f212ea8758d6ba0f6b36d8587a954ec7b8148c67225d0caed998359",
+  "confirmation_outcomes_generated_trained_evaluated_read_or_summarized": 0,
+  "deterministic_file_count": 186,
+  "elapsed_seconds": 191.51943620899692,
+  "freeze_receipt_sha256": "12fa4dd701cd6e33207ac51a351a3679ac8668f4fe07a3ae095f4486b8377b0e",
+  "protocol_amendments": [],
+  "protocol_id": "synthetic-sensor-event-robustness-v2",
+  "python_executable": ".venv/bin/python",
+  "raw_main_runs": 2560,
+  "raw_sensitivity_runs": 2640,
+  "reproduction_commands": [
+    ".venv/bin/python scripts/run_synthetic_sensor_event_robustness_v2.py verify",
+    ".venv/bin/python scripts/run_synthetic_sensor_event_robustness_v2.py run-development --out /tmp/synthetic_sensor_event_robustness_v2_reproduction",
+    ".venv/bin/python scripts/run_synthetic_sensor_event_robustness_v2.py compare --left output/synthetic_sensor_event_robustness_v2 --right /tmp/synthetic_sensor_event_robustness_v2_reproduction",
+    ".venv/bin/python -m pytest tests/test_synthetic_sensor_event_robustness_v2.py -q",
+    ".venv/bin/python -m pytest -q"
+  ],
+  "schema_version": "synthetic-sensor-event-reproducibility-v2"
+}

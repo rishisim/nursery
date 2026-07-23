@@ -1,0 +1,19 @@
+{
+  "activity_positive_rate": 0.22772507440476192,
+  "boundary_positive_rate": 0.06566220238095238,
+  "calibration_rows": 336,
+  "calibration_seeds": [
+    52021,
+    52027,
+    52051,
+    52057
+  ],
+  "iterations_per_head": 260,
+  "lexical_supervision_used": false,
+  "model_digest": "d058ab5248d6eb9516ed711a2a161c607e0a26871aed1c63da9f4bb864f6bdf6",
+  "randomized_mapping_used": false,
+  "referent_supervision_used": false,
+  "schema_version": "synthetic-sensor-event-detector-fit-trace-v2",
+  "timepoint_rows": 21504,
+  "training_digest": "92c1b21876ff5007ae666cf2744e87176b1e6bfce9bbab30ef1eaaca243538b5"
+}

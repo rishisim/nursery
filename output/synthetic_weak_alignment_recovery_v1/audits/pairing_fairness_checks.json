@@ -1,0 +1,616 @@
+{
+  "compute_definition": "Within each learner/corpus/model block, conditions receive identical episode order, initial lexical state, update passes, and example count. Structural absence omits the auxiliary tensor but does not alter update-pass count.",
+  "corpus_and_donor_checks": {
+    "1103": {
+      "condition_inventory_identity": true,
+      "donor_bijection": true,
+      "donor_candidate_count_matched": true,
+      "donor_different_group": true,
+      "donor_no_self": true,
+      "generation_audit_valid": true
+    },
+    "2207": {
+      "condition_inventory_identity": true,
+      "donor_bijection": true,
+      "donor_candidate_count_matched": true,
+      "donor_different_group": true,
+      "donor_no_self": true,
+      "generation_audit_valid": true
+    },
+    "3301": {
+      "condition_inventory_identity": true,
+      "donor_bijection": true,
+      "donor_candidate_count_matched": true,
+      "donor_different_group": true,
+      "donor_no_self": true,
+      "generation_audit_valid": true
+    },
+    "4409": {
+      "condition_inventory_identity": true,
+      "donor_bijection": true,
+      "donor_candidate_count_matched": true,
+      "donor_different_group": true,
+      "donor_no_self": true,
+      "generation_audit_valid": true
+    }
+  },
+  "paired_training_checks": {
+    "cross_situational_uniform|corpus=1103|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "cross_situational_uniform|corpus=1103|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "cross_situational_uniform|corpus=1103|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "cross_situational_uniform|corpus=2207|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "cross_situational_uniform|corpus=2207|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "cross_situational_uniform|corpus=2207|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "cross_situational_uniform|corpus=3301|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "cross_situational_uniform|corpus=3301|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "cross_situational_uniform|corpus=3301|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "cross_situational_uniform|corpus=4409|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "cross_situational_uniform|corpus=4409|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "cross_situational_uniform|corpus=4409|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=1103|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=1103|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=1103|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=2207|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=2207|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=2207|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=3301|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=3301|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=3301|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=4409|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=4409|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "exact_window|corpus=4409|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=1103|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=1103|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=1103|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=2207|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=2207|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=2207|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=3301|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=3301|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=3301|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=4409|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=4409|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_no_null|corpus=4409|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=1103|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=1103|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=1103|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=2207|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=2207|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=2207|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=3301|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=3301|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=3301|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=4409|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=4409|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_cross_occurrence|corpus=4409|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=1103|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=1103|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=1103|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=2207|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=2207|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=2207|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=3301|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=3301|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=3301|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=4409|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=4409|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "latent_mil_single_occurrence|corpus=4409|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=1103|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=1103|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=1103|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=2207|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=2207|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=2207|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=3301|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=3301|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=3301|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=4409|model=17": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=4409|model=29": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    },
+    "oracle_alignment|corpus=4409|model=43": {
+      "all_five_conditions": true,
+      "matched_data_order": true,
+      "matched_initialization": true,
+      "matched_inventory": true,
+      "matched_optimizer_steps": true,
+      "matched_training_examples": true
+    }
+  },
+  "valid": true
+}

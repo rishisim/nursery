@@ -1,0 +1,96 @@
+{
+  "access_date": "2026-07-15",
+  "protocol_id": "synthetic-sensor-event-robustness-v2",
+  "schema_version": "synthetic-sensor-event-primary-sources-v2",
+  "search_completed_before_outcome_runs": true,
+  "sources": [
+    {
+      "authors": "Francisco Javier Ordonez and Daniel Roggen",
+      "category": "raw_multimodal_wearable_activity_recognition",
+      "justification": "Supports learning temporal representations directly from minimally processed multimodal wearable streams rather than supplying candidate-wise oracle scores.",
+      "publication": "Sensors 16(1):115 (2016), doi:10.3390/s16010115",
+      "title": "Deep Convolutional and LSTM Recurrent Neural Networks for Multimodal Wearable Activity Recognition",
+      "url": "https://doi.org/10.3390/s16010115"
+    },
+    {
+      "authors": "Roy Adams, Nazir Saleheen, Edison Thomaz, Abhinav Parate, Santosh Kumar, and Benjamin Marlin",
+      "category": "wearable_event_detection_and_segmentation",
+      "justification": "Establishes event detection and temporal segmentation as joint problems over continuous wearable sensor streams.",
+      "publication": "Proceedings of ICML, PMLR 48:334-343 (2016)",
+      "title": "Hierarchical Span-Based Conditional Random Fields for Labeling and Segmenting Events in Wearable Sensor Data Streams",
+      "url": "https://proceedings.mlr.press/v48/adams16.html"
+    },
+    {
+      "authors": "Zheng Shou, Hang Gao, Lei Zhang, Kazuyuki Miyazawa, and Shih-Fu Chang",
+      "category": "weakly_supervised_temporal_localization",
+      "justification": "Motivates separating weak bag-level supervision from explicit temporal-boundary prediction in untrimmed sequences.",
+      "publication": "Proceedings of ECCV, 154-171 (2018)",
+      "title": "AutoLoc: Weakly-supervised Temporal Action Localization in Untrimmed Videos",
+      "url": "https://openaccess.thecvf.com/content_ECCV_2018/html/Zheng_Shou_AutoLoc_Weakly-supervised_Temporal_ECCV_2018_paper.html"
+    },
+    {
+      "authors": "Natalia Neverova, Christian Wolf, Graham W. Taylor, and Florian Nebout",
+      "category": "reliability_aware_multimodal_fusion",
+      "justification": "Supports channel dropout during fusion so a learner remains useful when a modality is missing or corrupted.",
+      "publication": "IEEE TPAMI 38(8):1692-1706 (2016), doi:10.1109/TPAMI.2015.2461544",
+      "title": "ModDrop: Adaptive Multi-Modal Gesture Recognition",
+      "url": "https://doi.org/10.1109/TPAMI.2015.2461544"
+    },
+    {
+      "authors": "Jun-Ho Choi and Jong-Seok Lee",
+      "category": "robust_missing_modality_fusion",
+      "justification": "Motivates bounded, availability-aware fusion rather than forcing every present modality into every prediction.",
+      "publication": "Information Fusion 51:259-270 (2019)",
+      "title": "EmbraceNet: A robust deep learning architecture for multimodal classification",
+      "url": "https://www.sciencedirect.com/science/article/pii/S1566253517308242"
+    },
+    {
+      "authors": "Vladimir Vapnik and Akshay Vashist",
+      "category": "learning_using_privileged_information",
+      "justification": "Supports a strict training-only information boundary: auxiliary explanations may shape learned state but are unavailable at evaluation.",
+      "publication": "Neural Networks 22(5-6):544-557 (2009), doi:10.1016/j.neunet.2009.06.042",
+      "title": "A new learning paradigm: Learning using privileged information",
+      "url": "https://doi.org/10.1016/j.neunet.2009.06.042"
+    },
+    {
+      "authors": "Afsaneh Fazly, Afra Alishahi, and Suzanne Stevenson",
+      "category": "cross_situational_word_learning",
+      "justification": "Supports probabilistic alignment jointly with accumulation of word-meaning evidence across ambiguous situations.",
+      "publication": "Cognitive Science 34(6):1017-1063 (2010), doi:10.1111/j.1551-6709.2010.01104.x",
+      "title": "A Probabilistic Computational Model of Cross-Situational Word Learning",
+      "url": "https://doi.org/10.1111/j.1551-6709.2010.01104.x"
+    },
+    {
+      "authors": "Daniel Keysers et al.",
+      "category": "compositional_generalization",
+      "justification": "Motivates holding out combinations while retaining exposure to their atomic components, and explicitly separating atom from compound generalization.",
+      "publication": "ICLR (2020)",
+      "title": "Measuring Compositional Generalization: A Comprehensive Method on Realistic Data",
+      "url": "https://research.google/pubs/measuring-compositional-generalization-a-comprehensive-method-on-realistic-data/"
+    },
+    {
+      "authors": "Rustam Ibragimov and Ulrich K. Muller",
+      "category": "few_cluster_inference",
+      "justification": "Supports t-based inference over a small number of independent group-level estimates; v2 therefore reduces to one averaged effect per corpus seed before inference.",
+      "publication": "Review of Economics and Statistics 98(1):83-96 (2016), doi:10.1162/REST_a_00545",
+      "title": "Inference with Few Heterogeneous Clusters",
+      "url": "https://www.princeton.edu/~umueller/BehrensFisher.pdf"
+    },
+    {
+      "authors": "Ivan A. Canay, Joseph P. Romano, and Azeem M. Shaikh",
+      "category": "few_cluster_randomization_inference",
+      "justification": "Supports sign-flip randomization evidence when group-level estimates are symmetric or approximately symmetric; v2 reports it as corroboration rather than replacing the corpus-level estimate.",
+      "publication": "Econometrica 85(3):1013-1030 (2017), doi:10.3982/ECTA13081",
+      "title": "Randomization Tests Under an Approximate Symmetry Assumption",
+      "url": "https://doi.org/10.3982/ECTA13081"
+    },
+    {
+      "authors": "Roger L. Berger",
+      "category": "co_primary_multiplicity",
+      "justification": "Supports an intersection-union decision in which the global alternative is established only when every co-primary component rejects at the nominal level, without alpha splitting.",
+      "publication": "Technometrics 24(4):295-300 (1982)",
+      "title": "Multiparameter Hypothesis Testing and Acceptance Sampling",
+      "url": "https://www.jstor.org/stable/1267823"
+    }
+  ]
+}

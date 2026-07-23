@@ -1,0 +1,9 @@
+{
+  "status": "PARTIAL_PASS",
+  "deterministic_generation_and_fit_completed": true,
+  "single_frozen_run_only": true,
+  "independent_record_recomputation_passed": true,
+  "frozen_analysis_reproduction": "reproduces terminal zero-variance exception",
+  "byte_for_byte_second_outcome_run": "not performed because the protocol permits one outcome run",
+  "confirmation_outcomes_touched": 0
+}

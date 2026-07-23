@@ -1,0 +1,2709 @@
+{
+  "compute_definition": "Within learner/corpus/model blocks all conditions use the same non-channel inventory, order, initialization, example count, and update passes.",
+  "corpus_generation_checks": {
+    "0": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "1": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "10": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "11": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "12": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "13": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "14": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "15": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "16": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "17": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "18": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "19": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "2": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "3": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "4": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "5": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "6": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "7": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "8": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    },
+    "9": {
+      "condition_inventory_matched": true,
+      "generation_valid": true,
+      "raw_rows_distribution_matched": true,
+      "shuffled_bijection": true,
+      "shuffled_group_safe": true
+    }
+  },
+  "paired_training_checks": {
+    "cross_occurrence_no_sensor|corpus=12011|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12011|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12037|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12037|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12049|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12049|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12071|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12071|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12097|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12097|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12101|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12101|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12113|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12113|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12119|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12119|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12143|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12143|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12149|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12149|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12157|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12157|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12161|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12161|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12163|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12163|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12197|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12197|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12203|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12203|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12211|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12211|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12227|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12227|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12239|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12239|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12241|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12241|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12251|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "cross_occurrence_no_sensor|corpus=12251|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12011|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12011|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12037|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12037|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12049|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12049|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12071|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12071|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12097|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12097|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12101|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12101|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12113|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12113|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12119|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12119|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12143|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12143|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12149|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12149|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12157|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12157|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12161|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12161|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12163|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12163|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12197|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12197|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12203|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12203|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12211|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12211|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12227|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12227|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12239|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12239|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12241|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12241|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12251|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "exact_window_symbolic|corpus=12251|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12011|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12011|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12037|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12037|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12049|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12049|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12071|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12071|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12097|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12097|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12101|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12101|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12113|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12113|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12119|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12119|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12143|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12143|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12149|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12149|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12157|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12157|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12161|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12161|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12163|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12163|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12197|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12197|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12203|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12203|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12211|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12211|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12227|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12227|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12239|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12239|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12241|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12241|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12251|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "oracle_event_alignment_upper|corpus=12251|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12011|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12011|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12037|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12037|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12049|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12049|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12071|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12071|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12097|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12097|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12101|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12101|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12113|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12113|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12119|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12119|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12143|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12143|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12149|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12149|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12157|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12157|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12161|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12161|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12163|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12163|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12197|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12197|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12203|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12203|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12211|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12211|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12227|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12227|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12239|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12239|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12241|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12241|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12251|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_no_null|corpus=12251|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12011|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12011|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12037|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12037|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12049|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12049|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12071|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12071|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12097|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12097|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12101|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12101|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12113|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12113|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12119|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12119|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12143|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12143|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12149|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12149|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12157|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12157|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12161|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12161|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12163|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12163|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12197|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12197|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12203|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12203|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12211|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12211|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12227|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12227|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12239|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12239|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12241|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12241|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12251|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_cross_occurrence|corpus=12251|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12011|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12011|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12037|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12037|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12049|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12049|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12071|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12071|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12097|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12097|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12101|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12101|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12113|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12113|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12119|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12119|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12143|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12143|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12149|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12149|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12157|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12157|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12161|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12161|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12163|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12163|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12197|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12197|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12203|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12203|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12211|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12211|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12227|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12227|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12239|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12239|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12241|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12241|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12251|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "sensor_latent_single_occurrence|corpus=12251|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12011|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12011|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12037|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12037|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12049|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12049|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12071|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12071|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12097|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12097|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12101|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12101|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12113|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12113|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12119|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12119|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12143|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12143|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12149|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12149|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12157|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12157|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12161|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12161|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12163|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12163|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12197|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12197|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12203|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12203|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12211|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12211|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12227|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12227|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12239|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12239|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12241|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12241|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12251|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "structural_absence|corpus=12251|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12011|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12011|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12037|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12037|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12049|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12049|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12071|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12071|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12097|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12097|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12101|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12101|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12113|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12113|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12119|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12119|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12143|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12143|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12149|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12149|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12157|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12157|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12161|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12161|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12163|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12163|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12197|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12197|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12203|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12203|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12211|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12211|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12227|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12227|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12239|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12239|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12241|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12241|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12251|model=211": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    },
+    "v1_pointer_style_upper|corpus=12251|model=223": {
+      "all_conditions_present": true,
+      "matched_episode_order": true,
+      "matched_examples": true,
+      "matched_initialization": true,
+      "matched_non_channel_inventory": true,
+      "matched_update_passes": true
+    }
+  },
+  "schema_version": "synthetic-sensor-event-pairing-audit-v2",
+  "valid": true
+}

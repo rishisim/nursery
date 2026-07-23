@@ -1,0 +1,21 @@
+{
+  "authorization_present": false,
+  "blocked_without_future_explicit_authorization": {
+    "evaluate": true,
+    "generate": true,
+    "read": true,
+    "summarize": true,
+    "train": true
+  },
+  "manifest_checks": {
+    "corpus_seeds": true,
+    "model_seeds": true,
+    "no_authorization": true,
+    "no_outcome_fields": true,
+    "protocol_id": true,
+    "status": true
+  },
+  "reserved_outcomes_generated": 0,
+  "reserved_outcomes_read": 0,
+  "valid": true
+}

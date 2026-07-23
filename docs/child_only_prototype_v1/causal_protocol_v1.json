@@ -1,0 +1,75 @@
+{
+  "protocol_version": "child-only-causal-protocol-v1.0.0",
+  "contract_version": "child-only-scientific-contract-v1.0.0",
+  "status": "CONSTRUCTION_ONLY_NOT_FROZEN_FOR_OUTCOME",
+  "scientific_outcome_authorized": false,
+  "primary_question": "Under realistically weak speech-event alignment, do synchronized training-only embodied cues improve held-out word-object and word-action grounding beyond identical vision-language experience with matched shuffled cues when all embodied cues are unavailable at evaluation?",
+  "learner": {
+    "architecture": "TEMPORAL_CLIP_PLUS_SCRATCH",
+    "text_tower": "SMALL_BERT_LIKE_BIDIRECTIONAL_TRANSFORMER",
+    "vision_tower": "COMPACT_VIT_PLUS_TEMPORAL_TRANSFORMER",
+    "side_tower": "SMALL_RAW_STREAM_TEMPORAL_ENCODER",
+    "alignment": "TRAINING_ONLY_CANDIDATE_EVENT_PLUS_NULL",
+    "tokenizer": "FRESH_SELECTED_CORPUS_ONLY",
+    "parent_checkpoint": null
+  },
+  "side_bundle": {
+    "first_test": ["HEAD_IMU", "PROPRIOCEPTION", "CONTACT_TOUCH"],
+    "transform_as_one_coupled_bundle": true,
+    "categorical_action_labels_forbidden": true
+  },
+  "conditions": {
+    "strong_alignment_ceiling": {
+      "language_alignment": "STRONG",
+      "training_side": "SYNCHRONIZED",
+      "evaluation_inputs": ["VISION", "TEXT"],
+      "role": "POSITIVE_CONTROL_CEILING"
+    },
+    "weak_vl_baseline": {
+      "language_alignment": "WEAK",
+      "training_side": "SHAPE_MATCHED_NULL",
+      "evaluation_inputs": ["VISION", "TEXT"],
+      "role": "BASELINE"
+    },
+    "weak_synchronized_side": {
+      "language_alignment": "WEAK",
+      "training_side": "SYNCHRONIZED",
+      "evaluation_inputs": ["VISION", "TEXT"],
+      "role": "TARGET_CONSTRUCT"
+    },
+    "weak_episode_shuffled_side": {
+      "language_alignment": "WEAK",
+      "training_side": "WHOLE_BUNDLE_SAME_SPLIT_DERANGEMENT",
+      "evaluation_inputs": ["VISION", "TEXT"],
+      "role": "PRIMARY_MATCHED_CONTROL"
+    },
+    "weak_time_shifted_side": {
+      "language_alignment": "WEAK",
+      "training_side": "WITHIN_EPISODE_NONZERO_SHIFT",
+      "evaluation_inputs": ["VISION", "TEXT"],
+      "role": "TEMPORAL_SPECIFICITY_CONTROL"
+    }
+  },
+  "weak_arm_equality_invariants": [
+    "RGB_TEXT_EXPERIENCE",
+    "EXAMPLES_AND_SPLITS",
+    "TOKENIZER",
+    "MODEL_ARCHITECTURE",
+    "INITIALIZATION_RECEIPT",
+    "BATCH_ORDER",
+    "OPTIMIZER",
+    "UPDATE_COUNT",
+    "BATCH_AND_PADDING_SHAPES",
+    "STOPPING_RULE",
+    "COMPUTE_BUDGET"
+  ],
+  "individual_cue_ablation_branch": {
+    "status": "PREDECLARED_LATER_BRANCH",
+    "trigger": "COMBINED_SIDE_CONSTRUCT_IS_INFORMATIVE_BY_FROZEN_MANIPULATION_CHECK",
+    "must_not_trigger_on_acquisition_effect_direction": true
+  },
+  "adaptation_policy": {
+    "construction_stage": "SOFTWARE_VALIDITY_FIXES_ALLOWED",
+    "later_frozen_outcome_stage": "NO_ADAPTATION_TO_EFFECT_DIRECTION"
+  }
+}

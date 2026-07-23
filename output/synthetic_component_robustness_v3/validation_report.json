@@ -1,0 +1,17 @@
+{
+  "status": "PASS_WITH_TERMINAL_ANALYSIS_FAILURE",
+  "development_records": 2880,
+  "expected_records": 2880,
+  "primary_records": 960,
+  "independent_corpora": 40,
+  "stochastic_model_replicates": 3,
+  "regimes": ["unbiased_primary", "adversarial_plus3_secondary"],
+  "duplicate_cells": 0,
+  "raw_corpus_regime_ledgers": 80,
+  "raw_storage_megabytes": 92,
+  "exact_recomputation": true,
+  "confirmation_outcomes_touched": 0,
+  "frozen_analysis_exception": "IndexError: empty studentized-bootstrap pivot array caused by zero variance in every corpus effect",
+  "rerun_performed": false,
+  "post_outcome_frozen_code_amended": false
+}
