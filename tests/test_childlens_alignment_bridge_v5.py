@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -141,3 +142,104 @@ def test_public_guard_rejects_restricted_fields_and_terminal_record_validates() 
     assert receipt["status"] == "PASS_FOR_TERMINAL_STAGE0_RECORD"
     assert receipt["development_decision"] == "NO_GO_UNINFORMATIVE"
     assert receipt["zero_locked_access_certifiable"] is False
+
+
+def test_administrative_correction_preserves_frozen_method_and_clean_stage0_passes() -> None:
+    config_path = ROOT / "configs/childlens_alignment_bridge_v5.json"
+    assert (
+        hashlib.sha256(config_path.read_bytes()).hexdigest()
+        == "b048ca4f4950eaf37d8e751a88ee358d5eabeb83b5187302502d9e08d62b130d"
+    )
+    correction = json.loads(
+        (
+            ROOT
+            / "output/childlens_alignment_bridge_v5/"
+            "administrative_correction_receipt.json"
+        ).read_text()
+    )
+    stage0 = json.loads(
+        (
+            ROOT
+            / "output/childlens_alignment_bridge_v5/"
+            "clean_stage0_freeze_receipt.json"
+        ).read_text()
+    )
+    assert correction["status"] == "PASS"
+    assert correction["development_participant_count"] == 18
+    assert correction["locked_participant_count"] == 0
+    assert correction["scientific_method_changed"] is False
+    assert stage0["status"] == "FROZEN_BEFORE_SELECTIVE_ACQUISITION_OR_MEDIA_DECODING"
+    assert stage0["support_gate_pass"] is True
+    assert stage0["target_seconds_per_participant"] == 900
+    assert stage0["fold_counts"] == [6, 6, 6]
+    assert min(stage0["minimum_windows_per_participant_by_duration_seconds"].values()) >= 40
+
+
+def test_clean_input_guard_rejects_attestation_with_locked_rows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runner = _runner()
+    runtime = tmp_path / "restricted_manifest"
+    private = (
+        runtime
+        / "provisional_calibration_v1/childlens_alignment_bridge_v5/administrative"
+    )
+    private.mkdir(parents=True, mode=0o700)
+    input_path = private / "development_only_scientific_input.json"
+    attestation_path = private / "development_only_attestation.json"
+    input_path.write_text(
+        json.dumps(
+            {
+                "schema_version": "childlens-v5-development-only-scientific-input-v1.0.0",
+                "clean_run_id": runner.CLEAN_RUN_ID,
+                "frozen_v5_config_sha256": runner.FROZEN_CONFIG_SHA256,
+                "development_participant_count": 18,
+                "locked_participant_count": 1,
+                "items": [],
+            }
+        )
+    )
+    input_path.chmod(0o600)
+    attestation_path.write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "scientific_input_sha256": hashlib.sha256(
+                    input_path.read_bytes()
+                ).hexdigest(),
+                "development_participant_count": 18,
+                "locked_participant_count": 1,
+                "legacy_mixed_scope_inputs_available_to_scientific_process": False,
+            }
+        )
+    )
+    attestation_path.chmod(0o600)
+    public_path = tmp_path / "administrative_correction_receipt.json"
+    public_path.write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "clean_run_id": runner.CLEAN_RUN_ID,
+                "frozen_v5_config_sha256": runner.FROZEN_CONFIG_SHA256,
+                "incident_receipt_sha256": runner.ORIGINAL_INCIDENT_RECEIPT_SHA256,
+                "attestation_sha256": hashlib.sha256(
+                    attestation_path.read_bytes()
+                ).hexdigest(),
+                "scientific_input_sha256": hashlib.sha256(
+                    input_path.read_bytes()
+                ).hexdigest(),
+                "locked_participant_count": 1,
+                "legacy_mixed_scope_inputs_available_to_scientific_process": False,
+            }
+        )
+    )
+    monkeypatch.setattr(runner, "_discover_attested_runtime", lambda: runtime)
+    monkeypatch.setattr(runner, "ADMIN_RECEIPT", public_path)
+    with pytest.raises(BridgeV5Error, match="E_ATTESTED_INPUT"):
+        runner._attested_input()
+
+
+def test_original_incident_cannot_be_overwritten() -> None:
+    runner = _runner()
+    with pytest.raises(BridgeV5Error, match="E_IMMUTABLE_INCIDENT_RECORD"):
+        runner.freeze_and_stop()
