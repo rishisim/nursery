@@ -1,0 +1,295 @@
+{
+  "schema_version": "childlens-calibration-recovery-scale-lag-v5.0.0",
+  "status": "PROSPECTIVE_METHOD_FROZEN_BEFORE_NEW_MEDIA_DECODING_OR_CHILDLENS_AUDIOVISUAL_OUTCOMES; DATA_SELECTION_NOT_FROZEN_DUE_STAGE0_GOVERNANCE_STOP",
+  "scientific_role": "PROVISIONAL_DEVELOPMENTAL_CALIBRATION_AGES_3_TO_5",
+  "objective": "Measure selected natural ChildLens distributions and test one frozen transcription-free participant-cross-validated alignment-versus-lag estimand, as a prerequisite to any later separately authorized apples-to-apples simulation study of synchronized training-only physical side cues.",
+  "claim_boundary": "A development pass could recommend separately authorized locked confirmation and, only after that confirmation and separate authorization, permit simulation calibrated to measured ChildLens ages-3-to-5 distributions with identical instruments and learning architecture. It would not establish infant calibration, German lexical grounding, natural-world causal grounding, or side-cue lift.",
+  "scope": {
+    "empirical_source": "CHILDLENS_ONLY",
+    "development_participants": 18,
+    "prior_development_participants": 8,
+    "v3_expansion_participants": 10,
+    "locked_participants": 22,
+    "locked_rows_may_be_loaded_inspected_scored_summarized_or_decoded": false,
+    "locked_confirmation_allowed": false,
+    "new_participants_allowed": false,
+    "aea_external_volume_or_babyview_allowed": false,
+    "asr_transcripts_german_text_translation_language_id_categorical_referents_or_generative_vlm_allowed": false,
+    "simulator_generation_allowed": false,
+    "side_cue_training_or_causal_cue_lift_claims_allowed": false,
+    "synthetic_data_role": "OUTCOME_BLIND_CODE_AND_INSTRUMENT_SENSITIVITY_ONLY"
+  },
+  "immutable_prior_bindings": {
+    "v1_tree_sha256": "4f668c666636e47e72a3c2162cb30590f89077f0e4e6ef8e69b149f4966df679",
+    "v2_tree_sha256": "30df10121591465cd4c357ead6b4aab8c2dff30b2a292106faa277661c621e45",
+    "v3_tree_sha256": "29718e4741bf31f27e5001e6a6398423745b1d5b8688032b3e9140a3f5ef90fa",
+    "v4_tree_sha256": "d9b62ecd5c747a22779ea0624bca7c5eca707da86c1727d6abce812ecbc673d2",
+    "prior_artifacts_or_gates_may_be_modified_reinterpreted_or_weakened": false
+  },
+  "stage0": {
+    "allowed_inputs": "released metadata, released timed annotations, and manifests proven by an outer scope receipt to contain exactly the 18 development participants",
+    "mixed_scope_manifest_may_be_opened_or_parsed": false,
+    "required_outer_scope_receipt": {
+      "development_participant_count": 18,
+      "locked_participant_count": 0,
+      "participant_set_sha256_matches_immutable_union": true,
+      "content_scope": "DEVELOPMENT_ONLY"
+    },
+    "uniform_duration": {
+      "minimum_seconds_per_participant": 600,
+      "preferred_seconds_per_participant": 900,
+      "maximum_seconds_per_participant": 1200,
+      "quantum_seconds": 60,
+      "minimum_total_hours": 3.0,
+      "selection_rule": "min(preferred, common development-only released availability), floored to the minute; stop if below minimum or total-hour gate"
+    },
+    "strata": {
+      "representative": {
+        "role": "PRIMARY",
+        "rule": "deterministic hash sample from released speech-like timing across quantiles of each participant's available recording time",
+        "outcome_fields_allowed": false
+      },
+      "grounding_enriched": {
+        "role": "CONDITIONAL_SECONDARY",
+        "preregistered_released_activity_labels": [
+          "book_reading",
+          "object_play",
+          "drawing_or_crafting",
+          "pretend_play",
+          "making_music"
+        ],
+        "timed_rule": "use only uniformly bound released timed subevents",
+        "metadata_only_fallback": "because prior outcome-blind v4 availability established that timed subevents are not uniformly bound, do not oversample within recordings; conditionally summarize recording-level coarse-activity matches and suppress unsupported cells",
+        "natural_mixture_weights": "estimate participant-clustered shares from all selected representative observation time; never substitute enriched sampling shares"
+      }
+    },
+    "freeze_before_new_media_decode_or_outcomes": [
+      "source object bindings",
+      "selected intervals and hashes",
+      "acquisition bounds",
+      "folds",
+      "windows and controls",
+      "model revisions and file hashes",
+      "architecture and trainable parameter count",
+      "seeds",
+      "metrics and uncertainty",
+      "privacy",
+      "gates and stop rules"
+    ]
+  },
+  "selective_acquisition": {
+    "destination": "EXISTING_OWNER_PRIVATE_CHILDLENS_QUARANTINE_ONLY",
+    "one_source_object_at_a_time": true,
+    "retain_only_frozen_bounded_clips": true,
+    "transient_full_source_deleted_and_verified_before_next_object": true,
+    "temporary_read_only_access_only": true,
+    "temporary_credential_deleted_and_verified_afterward": true,
+    "external_volume_allowed_for_data_or_storage": false,
+    "fail_closed_conditions": [
+      "governance",
+      "scope binding",
+      "access",
+      "owner-only enforcement",
+      "bounded extraction",
+      "transient deletion",
+      "credential deletion"
+    ]
+  },
+  "instruments": {
+    "audio": {
+      "repository": "facebook/wav2vec2-xls-r-300m",
+      "revision": "1a640f32ac3e39899438a2931f9924c02f080a54",
+      "weights_file": "pytorch_model.bin",
+      "weights_sha256": "d5e490574712ad0a6736923b9ed11d4cd51c78609c36205f704fc4e87b11d2e0",
+      "weights_bytes": 1269737156,
+      "config_sha256": "0bffa0d0e98153e883b828d86491f3c6062cb563dc9d7a9cfd1790da30c286ac",
+      "preprocessor_config_sha256": "a2254a5b58f72cd4de3632f8eee64f3f098b7c1402128d2f419e7d00ae13e335",
+      "sample_rate_hz": 16000,
+      "output_dimension": 1024,
+      "raw_speech_features_only": true,
+      "tokenizer_decoder_ctc_asr_translation_or_language_id_loaded": false,
+      "frozen": true
+    },
+    "vision": {
+      "repository": "facebook/dinov2-small",
+      "revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056",
+      "weights_file": "model.safetensors",
+      "weights_sha256": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1",
+      "weights_bytes": 88249960,
+      "config_sha256": "1809f83e3bdb1609a501a610ad4a742f4fd8ae44d72ca4aa0df52d1f2ac8628d",
+      "preprocessor_config_sha256": "14e780d86fa1861f8751f868d7f45425b5feb55c38ca26f152ca5097ab30f828",
+      "output_dimension": 384,
+      "frozen": true
+    },
+    "upstream_hash_semantics": "Git-LFS OID is SHA256 of downloaded weight bytes; small-file SHA256 is over resolved bytes at the pinned revision"
+  },
+  "learner": {
+    "route_count": 1,
+    "alternative_search_after_childlens_outcomes": false,
+    "temporal_pooling": "masked per-channel mean and standard deviation concatenation",
+    "audio_projector": "LayerNorm(2048), Linear(2048,256), GELU, Dropout(0.10), Linear(256,128), L2 normalize",
+    "vision_projector": "LayerNorm(768), Linear(768,256), GELU, Dropout(0.10), Linear(256,128), L2 normalize",
+    "trainable_parameter_count": 792832,
+    "frontend_finetuning": false,
+    "loss": "symmetric in-batch audio-to-vision and vision-to-audio InfoNCE",
+    "temperature": 0.07,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.01,
+    "gradient_clip_norm": 1.0,
+    "epochs": 80,
+    "steps_per_epoch": 12,
+    "batch_rule": "one deterministic scale-balanced real window per training participant per step",
+    "model_selection": "none; fixed final epoch",
+    "seeds": [
+      20260723,
+      20260724,
+      20260725
+    ],
+    "compute_budget": "3 folds x 3 seeds x 80 epochs x 12 participant-balanced steps; frozen frontend embedding once per unique window/control"
+  },
+  "cross_validation": {
+    "fold_count": 3,
+    "participants_per_evaluation_fold": 6,
+    "participants_per_training_fold": 12,
+    "every_participant_evaluated_once": true,
+    "participant_session_or_window_cross_fold_allowed": false,
+    "seed": "childlens-calibration-recovery-v5-folds-20260723",
+    "stratification_fields": [
+      "immutable prior cohort",
+      "released coarse activity bin",
+      "released coarse location-or-unavailable bin",
+      "released speech-support bin"
+    ],
+    "assignment": "deterministic capacity-constrained greedy minimization frozen in preflight.py",
+    "held_out_outcomes_allowed_for_selection": false
+  },
+  "windows_and_lags": {
+    "window_durations_seconds": [
+      2,
+      6,
+      18
+    ],
+    "scientific_scales": [
+      "short utterance/event",
+      "intermediate interaction",
+      "broader activity context"
+    ],
+    "maximum_real_windows_per_participant_per_duration": 60,
+    "minimum_evaluable_windows_per_participant_per_duration": 40,
+    "sampling": "deterministic, nonoverlapping within duration and spread across recording-time quantiles",
+    "signed_onset_lag_multiples_of_window_duration": [
+      -4,
+      -2,
+      -1,
+      0,
+      1,
+      2,
+      4
+    ],
+    "wrap_allowed": false,
+    "nonzero_lag_windows_must_not_overlap_real_window": true,
+    "matching": {
+      "duration_exact": true,
+      "speech_support_caliper_absolute": 0.1,
+      "activity_and_location_exact_or_explicitly_unavailable": true,
+      "audio_log_rms_caliper_standard_deviations": 0.25,
+      "motion_caliper_standard_deviations": 0.25,
+      "visual_persistence_caliper_absolute": 0.05,
+      "deterministic_tie_break": "SHA256 of frozen seed and private row bindings",
+      "unmatched_rows": "retain in support accounting but exclude from that lag contrast; no substitution after outcomes"
+    },
+    "cross_participant_shuffle": {
+      "role": "SECONDARY_SHORTCUT_AUDIT",
+      "participant_excluding": true,
+      "one_to_one_inventory_preserving": true,
+      "same_nuisance_matching": true
+    },
+    "persistent_scene_audit": "report adjacent-frame and each-lag visual cosine/persistence; a near-tie at a short lag is interpreted jointly with the full curve, never alone"
+  },
+  "inference": {
+    "analysis_unit": "participant",
+    "participant_cluster_bootstrap_replicates": 10000,
+    "confidence": 0.9,
+    "fold_estimates_preserved": true,
+    "signed_lags_preserved": true,
+    "primary_contrast": "zero lag minus mean of signed 2x and 4x duration lags, averaged within participant then across participants",
+    "secondary_contrasts": [
+      "zero minus signed 1x duration lags",
+      "signed-lag asymmetry",
+      "curve amplitude",
+      "zero minus participant-excluding nuisance-matched shuffle"
+    ],
+    "cross_fold_heterogeneity": "inverse-variance I2 plus max-minus-min fold primary contrast",
+    "no_lag_stratum_threshold_epoch_or_preprocessing_selection_from_held_out_outcomes": true
+  },
+  "positive_control": {
+    "role": "SYNTHETIC_EMBEDDING_LEVEL_CODE_SENSITIVITY_ONLY",
+    "seed": 20260723,
+    "participants": 18,
+    "synthetic_training_participants": 12,
+    "synthetic_evaluation_participants": 6,
+    "windows_per_participant": 24,
+    "shared_latent_dimensions": 32,
+    "nonshared_noise_standard_deviation": 0.08,
+    "within_participant_cyclic_lag_rows": 3,
+    "mean_aligned_minus_lagged_cosine_min": 0.1,
+    "participant_cluster_90pct_lower_min": 0.05,
+    "may_count_as_childlens_evidence": false
+  },
+  "decision_gates": {
+    "shared": {
+      "governance": "all bindings pass, v1-v4 immutable, exactly 18 development and zero locked rows loaded, no excluded source or method",
+      "support": "uniform duration at least 600 seconds each, at least 3 total hours, all 18 evaluated once, and at least 40 nuisance-matched rows per participant-duration",
+      "positive_control": "frozen positive-control mean >=0.10 and participant-cluster 90% lower >=0.05",
+      "preprocessing": "at least 98% frozen windows embed without substitution; each fold/scale at least five evaluable participants",
+      "shortcut_interpretable": "within-recording curve available at every scale, persistence audit available, and shuffle not used as standalone evidence",
+      "precision": "primary participant-cluster 90% interval width <=0.04",
+      "heterogeneity": "primary fold I2 <=50% and fold max-minus-min <=0.03"
+    },
+    "PASS_DETECTABLE_STRUCTURE": {
+      "primary_mean_lift_min": 0.02,
+      "primary_participant_cluster_90pct_lower_gt": 0.0,
+      "positive_participants_min": 12,
+      "positive_fold_primary_contrasts_min": 3,
+      "fold_curve_correlation_with_pooled_other_folds_min_each": 0.5,
+      "requires_shared_gates": true
+    },
+    "PASS_PRECISE_WEAK_OR_FLAT": {
+      "primary_equivalence_margin_absolute": 0.02,
+      "primary_participant_cluster_90pct_interval_must_be_inside_equivalence_margin": true,
+      "curve_amplitude_participant_cluster_90pct_upper_max": 0.02,
+      "requires_shared_gates": true,
+      "interpretation": "distributional calibration to reproducibly weak or undetectable alignment, not proof of no true grounding"
+    },
+    "otherwise": "NO_GO_UNINFORMATIVE",
+    "threshold_relaxation_or_rescue_allowed": false
+  },
+  "model_independent_calibration": [
+    "speech-bout duration, density, gaps, and speech seconds per observation minute",
+    "activity duration/recurrence, coarse activity/location shares, and natural mixture weights",
+    "speech-activity overlap and candidate-event density",
+    "motion, adjacent-frame persistence, and scene-change rate",
+    "audio RMS/log energy, non-silent fraction, clipping/quality, and retained-window distributions",
+    "alignment-versus-signed-lag response and cross-participant control envelope"
+  ],
+  "privacy": {
+    "restricted_location": "OWNER_PRIVATE_CHILDLENS_QUARANTINE_ONLY",
+    "public_minimum_cell_participants": 5,
+    "complementary_suppression": true,
+    "public_forbidden": [
+      "restricted paths or filenames",
+      "exact intervals",
+      "participant, item, media, session, or object identifiers",
+      "embeddings",
+      "row-level scores",
+      "learned weights"
+    ]
+  },
+  "terminal_states": [
+    "PASS_DETECTABLE_STRUCTURE",
+    "PASS_PRECISE_WEAK_OR_FLAT",
+    "NO_GO_UNINFORMATIVE"
+  ],
+  "stop_rule": "This is the sole v5 route. Any governance, support, sensitivity, precision, heterogeneity, preprocessing, or shortcut failure terminates v5 as NO_GO_UNINFORMATIVE. Do not start v6 or another model."
+}
