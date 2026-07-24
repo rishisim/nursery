@@ -243,3 +243,53 @@ def test_original_incident_cannot_be_overwritten() -> None:
     runner = _runner()
     with pytest.raises(BridgeV5Error, match="E_IMMUTABLE_INCIDENT_RECORD"):
         runner.freeze_and_stop()
+
+
+def test_generated_clip_is_secured_before_private_guard(tmp_path: Path) -> None:
+    runner = _runner()
+    generated = tmp_path / "derived.mp4"
+    generated.write_bytes(b"synthetic-media-placeholder")
+    generated.chmod(0o644)
+    assert runner._private_file(generated) is False
+    assert runner._secure_generated_file(generated) is True
+    assert generated.stat().st_mode & 0o777 == 0o600
+
+    symlink = tmp_path / "derived-link.mp4"
+    symlink.symlink_to(generated)
+    assert runner._secure_generated_file(symlink) is False
+
+
+def test_temporal_stats_round_trip_through_two_step_sequence() -> None:
+    runner = _runner()
+    numpy = pytest.importorskip("numpy")
+    rng = numpy.random.default_rng(17)
+    mean = rng.normal(size=(5, 7)).astype("float32")
+    standard = numpy.abs(rng.normal(size=(5, 7))).astype("float32")
+    stats = numpy.stack((mean, standard), axis=1)
+    sequence = runner._sequence_from_stats(stats)
+    numpy.testing.assert_allclose(sequence.mean(axis=1), mean, atol=1e-6)
+    numpy.testing.assert_allclose(sequence.std(axis=1), standard, atol=1e-6)
+
+
+def test_nonfinite_private_values_are_safely_suppressed() -> None:
+    runner = _runner()
+    assert runner._finite_json(
+        {"finite": 1.0, "missing": float("nan"), "nested": [float("inf")]}
+    ) == {"finite": 1.0, "missing": None, "nested": [None]}
+
+
+def test_clean_terminal_result_is_support_failure_not_threshold_rescue() -> None:
+    public = ROOT / "output/childlens_alignment_bridge_v5"
+    decision = json.loads((public / "clean_development_decision.json").read_text())
+    validation = json.loads((public / "clean_validation_receipt.json").read_text())
+    assert decision["decision"] == "NO_GO_UNINFORMATIVE"
+    assert decision["gates"]["governance"] is True
+    assert decision["gates"]["positive_control"] is True
+    assert decision["gates"]["preprocessing"] is True
+    assert decision["gates"]["support"] is False
+    assert decision["support_gate_minimum_required"] == 40
+    assert decision["support_gate_minimum_observed"] < 40
+    assert decision["primary_mean_lift"] is None
+    assert validation["development_participant_count"] == 18
+    assert validation["locked_participant_count"] == 0
+    assert validation["simulator_or_side_cue_training_run"] is False
