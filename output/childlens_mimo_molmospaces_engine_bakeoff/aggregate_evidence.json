@@ -1,0 +1,62 @@
+{
+  "decision": "NO_GO_ENGINE_LADDER_EXHAUSTED",
+  "stock_mimo": {
+    "age_months": 24,
+    "steps": 240,
+    "simulation_seconds": 2.4,
+    "simulation_steps_per_wall_second": 38.0,
+    "qpos_shape": [240, 198],
+    "qvel_shape": [240, 183],
+    "proprioception_shape": [240, 621],
+    "touch_shape": [240, 14055],
+    "touch_nonzero_samples": 149613,
+    "vestibular_shape": [240, 6]
+  },
+  "stock_molmospaces": {
+    "scene": "iTHOR FloorPlan1",
+    "bodies": 242,
+    "geometries": 2116,
+    "meshes": 1493,
+    "textures": 44,
+    "joints": 67,
+    "frames_per_wall_second": 93.0,
+    "renderer": "classic MuJoCo"
+  },
+  "hybrid_floorplan1": {
+    "compiled_bodies_approx": 300,
+    "actuators": 90,
+    "sensors": 56,
+    "push": {
+      "target_displacement_m": 0.09664064900584987,
+      "sampled_contact_frames": 6,
+      "maximum_contact_force_n": 5041.39027296934,
+      "frames_per_wall_second": 25.87
+    },
+    "near_miss": {
+      "reported_contact_frames": 0,
+      "target_displacement_m": 0.0,
+      "visual_inspection": "fail_visible_geometry_overlap"
+    },
+    "grasp": {
+      "post_contact_constraint_engaged": true,
+      "sampled_contact_frames": 156,
+      "object_displacement_m": 0.141116227496851,
+      "vertical_displacement_m": 0.01220725971968939
+    }
+  },
+  "hybrid_floorplan201": {
+    "rendered": true,
+    "target_area_fraction": 0.0,
+    "contact_frames": 0,
+    "disposition": "second_context_failed"
+  },
+  "blender_replay": {
+    "frames": 240,
+    "maximum_body_location_error_m": 2.9696507808374406e-8,
+    "minimum_target_area_across_frozen_cameras": 0.02365234375,
+    "all_camera_sensitivities_pass_0_015": true,
+    "appearance_disposition": "furnished and legible, but hand proxy quality/contact alignment fail"
+  },
+  "claim_boundary": "ChildLens-calibrated environmental/timing statistics with an infant-like 24-month simulated embodiment; not age-matched ChildLens and not final infant calibration",
+  "private_childlens_material_in_evidence": false
+}

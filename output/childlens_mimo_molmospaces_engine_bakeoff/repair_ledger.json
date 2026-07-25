@@ -1,0 +1,40 @@
+{
+  "repairs": [
+    {
+      "stage": "MIMo install/runtime",
+      "failure": "Gymnasium 1.2 returns (model, data) from _initialize_simulation",
+      "repair": "bounded compatibility patch in external pinned checkout",
+      "result": "stock MIMo showroom rendered with all required sensors"
+    },
+    {
+      "stage": "external storage",
+      "failure": "many-small-file extraction and AppleDouble metadata made environments and THOR extraction pathologically slow",
+      "repair": "kept repositories/media external but moved environments and bounded asset cache to ignored local .external",
+      "result": "native arm64 installs completed; total bakeoff storage remained below 50 GiB"
+    },
+    {
+      "stage": "MolmoSpaces Filament",
+      "failure": "documented extra targets Linux x86_64 wheel and no macOS arm64 wheel exists",
+      "repair": "verified direct package route, then used documented classic MuJoCo fallback",
+      "result": "furnished iTHOR video, depth, segmentation, and metadata rendered"
+    },
+    {
+      "stage": "hybrid contact",
+      "failure": "scene collisions displaced the infant and target; initial controller axis did not match target slide axis",
+      "repair": "isolated scene collision groups, preserved hand-target/workspace collisions, aligned causal slide with hand approach",
+      "result": "contact-driven 9.66 cm push with six sampled contact frames"
+    },
+    {
+      "stage": "camera/prominence",
+      "failure": "world camera and distant staging repeated the prior target-size failure",
+      "repair": "derived a 0.407 m reach envelope, staged at 0.10-0.17 m, and fixed a deterministic vest camera from settled chest geometry",
+      "result": "Blender replay minimum target area 2.365% across the frozen three-model camera set"
+    },
+    {
+      "stage": "native appearance",
+      "failure": "full MIMo collision geometry severely self-occludes the close chest view",
+      "repair": "exact trajectory replay in Blender with deterministic furnished and articulated five-finger proxies",
+      "result": "replay and depth/segmentation artifacts produced at 2.97e-8 m maximum transform error, but visual hand proxy remained unqualified"
+    }
+  ]
+}

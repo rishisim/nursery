@@ -1,0 +1,65 @@
+{
+  "terminal_decision": "NO_GO_ENGINE_LADDER_EXHAUSTED",
+  "routes": [
+    {
+      "route": "stock_MIMo_v2",
+      "attempted": true,
+      "rendered": true,
+      "sensor_contract": "pass",
+      "appearance": "fail",
+      "evidence": "stock_mimo/stock_mimo_v2_showroom.mp4"
+    },
+    {
+      "route": "stock_MolmoSpaces_classic",
+      "attempted": true,
+      "rendered": true,
+      "furnished_scene": "pass",
+      "depth_and_metadata": "pass",
+      "evidence": "stock_molmospaces/stock_molmospaces_ithor_floorplan1_classic.mp4"
+    },
+    {
+      "route": "stock_MolmoSpaces_Filament",
+      "attempted": true,
+      "rendered": false,
+      "disposition": "no native arm64 macOS wheel after documented-extra and direct-package attempts"
+    },
+    {
+      "route": "hybrid_A_custom_robot_API",
+      "attempted": true,
+      "compiled": true,
+      "actuators": 90,
+      "sensors": 56,
+      "disposition": "schema attachment works; full runtime RobotView/kinematics/controller adapter is outside the bounded prototype"
+    },
+    {
+      "route": "hybrid_B_direct_MJCF",
+      "attempted": true,
+      "rendered_and_exercised": true,
+      "push_contact": "pass",
+      "post_contact_grasp": "pass",
+      "zero_reported_contact_control": "telemetry pass but visible geometry fail",
+      "appearance": "fail"
+    },
+    {
+      "route": "hybrid_C_mesh_import",
+      "attempted": false,
+      "disposition": "not invoked because route B successfully loaded, rendered, and exercised the packaged iTHOR scene"
+    },
+    {
+      "route": "Blender_exact_replay",
+      "attempted": true,
+      "rendered": true,
+      "transform_equivalence": "pass",
+      "camera_prominence": "pass",
+      "furnished_proxy": "pass",
+      "hand_quality_and_contact_alignment": "fail"
+    }
+  ],
+  "frozen_gate_failures": [
+    "near-miss reports zero collision contact but visibly intersects/overlaps the target",
+    "native chest view is dominated by self-occluding MIMo collision geometry",
+    "Blender hand is an exact-transform articulated proxy but is not a validated high-quality skin and shows disconnected joint blobs",
+    "second furnished integrated scene FloorPlan201 rendered no visible target and no causal contact",
+    "bounded grasp moved the object causally but achieved only 1.22 cm vertical displacement and does not establish lift/place"
+  ]
+}

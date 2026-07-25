@@ -1,0 +1,34 @@
+{
+  "host": {"architecture": "arm64", "ram_gib": 32, "os": "macOS", "chip": "Apple M5"},
+  "storage": {
+    "external_root": "/Volumes/EOS_202603/RESEARCH/nursery/engine_bakeoff",
+    "free_gib_after_bakeoff": 160,
+    "ignored_local_environment_gib": 7.1,
+    "external_bakeoff_gib": 16,
+    "bounded_below_50_gib": true
+  },
+  "mimo": {
+    "tag": "v2.0.0",
+    "commit": "040b0ae4914cbfb26afdf830aa81775b90922f3f",
+    "python": "3.11.14",
+    "mujoco": "3.3.0",
+    "gymnasium": "1.2.3",
+    "numpy": "2.0.2",
+    "architecture": "arm64"
+  },
+  "molmospaces": {
+    "version": "0.2.0",
+    "commit": "c2f1b583f087e1d3994e1377574843b759d9d0f8",
+    "python": "3.11.14",
+    "mujoco": "3.5.0",
+    "numpy": "2.4.6",
+    "architecture": "arm64"
+  },
+  "blender": {"version": "4.2.1 LTS", "architecture": "arm64"},
+  "filament": {
+    "attempted": true,
+    "result": "unavailable_on_native_arm64_macos",
+    "evidence": "MolmoSpaces mujoco-filament extra resolves a Linux x86_64 wheel; direct PyPI inspection found manylinux x86_64 only and no macOS arm64 wheel",
+    "fallback": "classic MuJoCo renderer"
+  }
+}
