@@ -1,0 +1,19 @@
+{
+  "schema_version": "childlens-support-repair-estimator-freeze-v1.0.0",
+  "status": "FROZEN_BEFORE_PROJECTION_WEIGHT_OR_REPAIRED_SCORE_ACCESS",
+  "config_sha256": "68a27b9b0aa3d49b3e32f3e707625d1de00be1ac777ff9d2d1e0227a6409e073",
+  "implementation_sha256": "cdd7b5bf1c4d51877740c931cd0ed58e780b98d67d588917872220b81641074b",
+  "runner_sha256": "80360ff5be9a6d10fa1b429c3775d34a9ae3afda11b06a2ae730b8551ea40fcf",
+  "tests_sha256": "2cf29f7ecdfb1816db2d069198f8ad87875814cde6c39a10d36ddf8c34920710",
+  "protocol_sha256": "2234fc166ed267d84988c83a8085843ae0eeaa7c05a1afb9b89beee8d97314b1",
+  "support_feasibility_receipt_sha256": "9f5b31a3cbc053051a238612dc340e11bba30990c30e1dd8727d211497f4e1ef",
+  "v5_feature_manifest_sha256": "f7b4108c956b65470611fe28f103458b3e7c1c67589166d51161813ef25dba42",
+  "v5_frontend_features_sha256": "724618bba42f748f86a9680cf3a5f843e497d8416b39eeb9390e1d2a9d1e4285",
+  "v5_projection_weights_sha256": "a04a656807aba9a040dcfa2f788c2312d89a973cc819cfc3b02fbdb1f8659fa4",
+  "v5_restricted_result_sha256": "e723eacf78e1c6c37835868c68f294810730de65fab161ee4dc9afa3725d2a34",
+  "outcome_blind_feasibility_pass": true,
+  "alignment_scores_read_for_estimator_selection": false,
+  "projection_weights_loaded_for_estimator_selection": false,
+  "locked_participant_count": 0,
+  "alternative_estimators_after_scoring_allowed": false
+}

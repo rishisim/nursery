@@ -53,15 +53,35 @@ recommend separately authorized locked confirmation. It cannot unlock data or
 start simulation. Missing or unverifiable required inputs yields
 `NO_GO_UNINFORMATIVE`.
 
-## Disposition
+## Frozen estimator
 
-The V5 private feature manifest, feature arrays/shards, and restricted result
-were not discoverable, and the original attested-runtime discovery failed
-closed. The empty owner-private quarantine directory is insufficient to bind
-the prior 18-participant development run. No nuisance-only feasibility table
-can therefore be constructed, and no estimator or data-dependent thresholds
-can be defensibly frozen.
+After the owner explicitly authorized read-only recovery from the connected
+external volume, the exact V5 artifacts were found inside the encrypted
+ChildLens bundle and matched every V5 public validation hash. The initial
+missing-input receipt remains preserved in Git history and as an administrative
+record of the disconnected-volume stop.
 
-This attempt stops before score access, estimator application, regeneration,
-locked inspection, or simulator work with terminal state
+The sole repaired estimator is stable approximate balancing weighting:
+separately within every participant, duration, and signed-lag arm, minimize
+squared deviation from uniform weights subject to balancing the preregistered
+nuisance means to the pooled seven-arm participant-duration target. This is the
+minimum-variance approximate-balancing construction described by Zubizarreta
+(2015, DOI 10.1080/01621459.2015.1023805). It controls the arm-level nuisance
+distribution without requiring every individual row to satisfy all pairwise
+calipers.
+
+Continuous covariates are standardized within participant-duration. An
+activity or location category remains exact only if every lag arm has at least
+five rows; all other categories map deterministically to `__OTHER__`. No
+outcome informed this rule. No additional trimming is allowed: a cell fails if
+bounded weights cannot meet balance and support gates.
+
+The nuisance-only table supported prospectively frozen gates of absolute SMD
+at most 0.10, ESS at least 30 per arm, maximum weight at most 0.05, top-10
+weight share at most 0.40, at least 40 raw rows per arm, all 18 participants,
+all three durations, and all 378 participant-duration-lag arms. Any failure is
 `NO_GO_UNINFORMATIVE`.
+
+The estimator configuration, implementation, tests, and outcome-blind
+feasibility receipt are frozen in Git before projection weights or repaired
+alignment scores may be loaded.
