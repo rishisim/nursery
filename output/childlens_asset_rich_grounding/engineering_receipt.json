@@ -1,0 +1,108 @@
+{
+  "schema_version": "childlens-asset-rich-grounding-engineering-receipt-1.0.0",
+  "decision": "NO_GO_ASSET_RICH_FIDELITY",
+  "prospective_config": "configs/childlens_asset_rich_grounding_amendment.json",
+  "engine": {
+    "name": "Blender",
+    "version": "4.2.1 LTS arm64",
+    "render_engine": "BLENDER_EEVEE_NEXT",
+    "canonical_resolution": [640, 360],
+    "canonical_fps": 30,
+    "duration_seconds": 20,
+    "camera": "chest-height 140-degree rectilinear approximation; not head pose"
+  },
+  "assets": {
+    "source": "Poly Haven official API",
+    "license": "CC0",
+    "role": "synthetic rendering assets only; not empirical calibration",
+    "download_manifest_local_sha256": "131771296b5e53fd9cbaa94d6caec19016b1e15cf178093bb8c165dd5ac80feb",
+    "downloaded_asset_ids": [
+      "rubber_duck_toy",
+      "food_apple_01",
+      "baseball_01",
+      "wooden_bowl_01",
+      "wooden_spoon"
+    ],
+    "assets_committed": false
+  },
+  "pilots": [
+    {
+      "episode_id": "playroom_duck_push",
+      "target": "rubber_duck_toy",
+      "nonce_label": "Dax",
+      "action": "schieben",
+      "mp4_sha256": "d6784618b8ed89e07da791ca20142440684a2ae5caf7c62546c29f236f12750f",
+      "wav_sha256": "886a1eb9068f70b7908f02b442bb0cb73baeb4eb65429e7564dcab0084864738",
+      "still_sha256": "16db2775b98bf949d574591af85ad4605ba95831a99ece7091b80dfb238e356c",
+      "render_seconds": 197.0725
+    },
+    {
+      "episode_id": "tabletop_apple_lift",
+      "target": "food_apple_01",
+      "nonce_label": "Koba",
+      "action": "heben",
+      "mp4_sha256": "37f073b9c7ef4c384276f5b547054427cc0d9ae5e4e36df2f66581e1aa5e5cc4",
+      "wav_sha256": "3e6ab894802969f31d76291236f54e76e59cd61fd01452c82e27aae41562173a",
+      "still_sha256": "791bd36b41be6930eb8c851e5f0ac191ee148684ea609b0bf1220b6b4125c4a5",
+      "render_seconds": 194.2248
+    },
+    {
+      "episode_id": "livingroom_ball_roll",
+      "target": "baseball_01",
+      "nonce_label": "Mipa",
+      "action": "rollen",
+      "mp4_sha256": "cd9fbd04c555b88733d992f4e96a78a0e9f9b5427f9fb913cfcce5c0bd07fdb6",
+      "wav_sha256": "29fded19217eb2c4ca63a91f0bd2affa78c17ad95cb4baea665aae758cad5bf5",
+      "still_sha256": "bbf29414ccfeb9fc9f95d6953074cdd7c512ce2352764f6964500984a2671c43",
+      "render_seconds": 192.4673
+    }
+  ],
+  "decoded_media": {
+    "episode_count": 3,
+    "all_playable": true,
+    "all_duration_seconds": 20.0,
+    "all_video": "H.264 640x360 30 fps",
+    "all_audio": "AAC mono 24000 Hz",
+    "aggregate_render_seconds": 583.7646,
+    "aggregate_render_fps": 3.0834,
+    "aggregate_mp4_bytes": 1089112
+  },
+  "visual_inspection": {
+    "performed_on_actual_rendered_stills": true,
+    "representative_rgb_std_range": [0.31115, 0.31628],
+    "representative_edge_energy_range": [0.00810, 0.00898],
+    "representative_bright_pixel_fraction_range": [0.58380, 0.59128],
+    "findings": [
+      "rooms remain sparse, stage-like procedural geometry",
+      "targets occupy too little of the wide-angle frame",
+      "the procedural effector is crude and partly occluded",
+      "touch and manipulation are not consistently visually legible",
+      "three categories each have only one visible instance",
+      "layouts differ mostly by a few primitive furnishings"
+    ]
+  },
+  "frozen_pilot_gate": {
+    "decoded_playable_mp4_wav": "PASS",
+    "minimum_complete_episodes": "PARTIAL_RGB_AUDIO_ONLY",
+    "pbr_artist_authored_targets": "PASS_BOUNDED",
+    "visible_nontelekinetic_effector": "FAIL_VISUAL_LEGIBILITY",
+    "semantic_appearance_fidelity": "FAIL",
+    "instances_per_category": "FAIL_1_VS_3",
+    "complex_mesh_contact_controls": "NOT_RUN_AFTER_APPEARANCE_FAILURE",
+    "required_dense_channels": "NOT_RUN_AFTER_APPEARANCE_FAILURE",
+    "deterministic_replay": "NOT_RUN_AFTER_APPEARANCE_FAILURE",
+    "distribution_generation_permitted": false
+  },
+  "childlens": {
+    "development_participants": 18,
+    "locked_participants_accessed": 0,
+    "assessment_fold_values_viewed": false,
+    "private_media_exported": false
+  },
+  "downstream": {
+    "independent_distribution_generator_built": false,
+    "crossfit_scored": false,
+    "learner_outcomes_run": false,
+    "cue_lift_arms_instantiated": false
+  }
+}
