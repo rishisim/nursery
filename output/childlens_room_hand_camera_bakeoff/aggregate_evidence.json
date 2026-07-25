@@ -1,0 +1,272 @@
+{
+  "schema_version": "childlens-room-hand-bakeoff-evidence-1.0.0",
+  "privacy": "aggregate simulator and prior synthetic-pilot evidence only; no ChildLens frame, path, audio, or transcript",
+  "matrix": {
+    "episode_count": 6,
+    "rooms": [
+      "kitchen",
+      "living_room",
+      "playroom"
+    ],
+    "actions": [
+      "lift_and_place",
+      "near_miss",
+      "push",
+      "roll",
+      "touch"
+    ],
+    "instances_per_category": {
+      "ball": 3,
+      "cup": 3
+    },
+    "has_near_miss": true
+  },
+  "episodes": [
+    {
+      "episode_id": "playroom_ball_push",
+      "room_id": "playroom",
+      "action": "push",
+      "target_projected_fraction_begin_contact_end": [
+        0.003638,
+        0.00351,
+        0.002481
+      ],
+      "target_fraction_minimum": 0.002481,
+      "target_fraction_gate_0_015": false,
+      "causal_contract": {
+        "target_location_keyframes": 0,
+        "mechanism": "rigid_body_collision",
+        "target_displacement_m": 0.543074,
+        "active_contact_frames": 58,
+        "near_miss": false
+      },
+      "image_metrics": {
+        "begin": {
+          "mean_luminance_0_255": 198.8191,
+          "luminance_sd_0_255": 59.1701,
+          "edge_density_fraction": 0.021148
+        },
+        "contact": {
+          "mean_luminance_0_255": 199.2102,
+          "luminance_sd_0_255": 58.88,
+          "edge_density_fraction": 0.020685
+        },
+        "end": {
+          "mean_luminance_0_255": 198.6815,
+          "luminance_sd_0_255": 59.4875,
+          "edge_density_fraction": 0.020318
+        }
+      },
+      "decoded_video_bytes": 328377
+    },
+    {
+      "episode_id": "playroom_ball_nearmiss",
+      "room_id": "playroom",
+      "action": "near_miss",
+      "target_projected_fraction_begin_contact_end": [
+        0.003478,
+        0.003436,
+        0.003512
+      ],
+      "target_fraction_minimum": 0.003436,
+      "target_fraction_gate_0_015": false,
+      "causal_contract": {
+        "target_location_keyframes": 0,
+        "mechanism": "contact_only_control",
+        "target_displacement_m": 0.0,
+        "active_contact_frames": 0,
+        "near_miss": true
+      },
+      "image_metrics": {
+        "begin": {
+          "mean_luminance_0_255": 183.1406,
+          "luminance_sd_0_255": 71.8152,
+          "edge_density_fraction": 0.020012
+        },
+        "contact": {
+          "mean_luminance_0_255": 183.0899,
+          "luminance_sd_0_255": 71.9023,
+          "edge_density_fraction": 0.020127
+        },
+        "end": {
+          "mean_luminance_0_255": 183.3558,
+          "luminance_sd_0_255": 71.8284,
+          "edge_density_fraction": 0.01973
+        }
+      },
+      "decoded_video_bytes": 324456
+    },
+    {
+      "episode_id": "kitchen_cup_lift_place",
+      "room_id": "kitchen",
+      "action": "lift_and_place",
+      "target_projected_fraction_begin_contact_end": [
+        0.002954,
+        0.002954,
+        0.00213
+      ],
+      "target_fraction_minimum": 0.00213,
+      "target_fraction_gate_0_015": false,
+      "causal_contract": {
+        "target_location_keyframes": 0,
+        "mechanism": "logged_grasp_constraint_after_contact",
+        "target_displacement_m": 0.717565,
+        "active_contact_frames": 173,
+        "near_miss": false
+      },
+      "image_metrics": {
+        "begin": {
+          "mean_luminance_0_255": 160.2437,
+          "luminance_sd_0_255": 75.4601,
+          "edge_density_fraction": 0.034375
+        },
+        "contact": {
+          "mean_luminance_0_255": 160.623,
+          "luminance_sd_0_255": 75.5739,
+          "edge_density_fraction": 0.034055
+        },
+        "end": {
+          "mean_luminance_0_255": 160.8284,
+          "luminance_sd_0_255": 75.6354,
+          "edge_density_fraction": 0.033827
+        }
+      },
+      "decoded_video_bytes": 406318
+    },
+    {
+      "episode_id": "kitchen_cup_touch",
+      "room_id": "kitchen",
+      "action": "touch",
+      "target_projected_fraction_begin_contact_end": [
+        0.002954,
+        0.002954,
+        0.002951
+      ],
+      "target_fraction_minimum": 0.002951,
+      "target_fraction_gate_0_015": false,
+      "causal_contract": {
+        "target_location_keyframes": 0,
+        "mechanism": "contact_only_control",
+        "target_displacement_m": 0.0,
+        "active_contact_frames": 69,
+        "near_miss": false
+      },
+      "image_metrics": {
+        "begin": {
+          "mean_luminance_0_255": 160.3037,
+          "luminance_sd_0_255": 75.4747,
+          "edge_density_fraction": 0.034315
+        },
+        "contact": {
+          "mean_luminance_0_255": 160.6472,
+          "luminance_sd_0_255": 75.5823,
+          "edge_density_fraction": 0.034045
+        },
+        "end": {
+          "mean_luminance_0_255": 160.5341,
+          "luminance_sd_0_255": 75.5978,
+          "edge_density_fraction": 0.034136
+        }
+      },
+      "decoded_video_bytes": 404779
+    },
+    {
+      "episode_id": "living_ball_roll",
+      "room_id": "living_room",
+      "action": "roll",
+      "target_projected_fraction_begin_contact_end": [
+        0.003321,
+        0.003213,
+        0.002209
+      ],
+      "target_fraction_minimum": 0.002209,
+      "target_fraction_gate_0_015": false,
+      "causal_contract": {
+        "target_location_keyframes": 0,
+        "mechanism": "rigid_body_collision",
+        "target_displacement_m": 0.597562,
+        "active_contact_frames": 57,
+        "near_miss": false
+      },
+      "image_metrics": {
+        "begin": {
+          "mean_luminance_0_255": 174.1199,
+          "luminance_sd_0_255": 70.1736,
+          "edge_density_fraction": 0.033023
+        },
+        "contact": {
+          "mean_luminance_0_255": 174.1804,
+          "luminance_sd_0_255": 70.1521,
+          "edge_density_fraction": 0.032679
+        },
+        "end": {
+          "mean_luminance_0_255": 174.3636,
+          "luminance_sd_0_255": 70.0977,
+          "edge_density_fraction": 0.032558
+        }
+      },
+      "decoded_video_bytes": 398688
+    },
+    {
+      "episode_id": "living_cup_lift_place",
+      "room_id": "living_room",
+      "action": "lift_and_place",
+      "target_projected_fraction_begin_contact_end": [
+        0.002776,
+        0.00275,
+        0.001879
+      ],
+      "target_fraction_minimum": 0.001879,
+      "target_fraction_gate_0_015": false,
+      "causal_contract": {
+        "target_location_keyframes": 0,
+        "mechanism": "logged_grasp_constraint_after_contact",
+        "target_displacement_m": 0.717565,
+        "active_contact_frames": 173,
+        "near_miss": false
+      },
+      "image_metrics": {
+        "begin": {
+          "mean_luminance_0_255": 159.8473,
+          "luminance_sd_0_255": 75.8984,
+          "edge_density_fraction": 0.036597
+        },
+        "contact": {
+          "mean_luminance_0_255": 159.8148,
+          "luminance_sd_0_255": 76.0112,
+          "edge_density_fraction": 0.03609
+        },
+        "end": {
+          "mean_luminance_0_255": 160.3465,
+          "luminance_sd_0_255": 75.9208,
+          "edge_density_fraction": 0.036528
+        }
+      },
+      "decoded_video_bytes": 451452
+    }
+  ],
+  "prior_pilot_representatives": {
+    "livingroom_ball_roll": {
+      "mean_luminance_0_255": 176.8267,
+      "luminance_sd_0_255": 80.6798,
+      "edge_density_fraction": 0.024049
+    },
+    "playroom_duck_push": {
+      "mean_luminance_0_255": 177.0497,
+      "luminance_sd_0_255": 80.8472,
+      "edge_density_fraction": 0.024141
+    },
+    "tabletop_apple_lift": {
+      "mean_luminance_0_255": 171.0336,
+      "luminance_sd_0_255": 81.1848,
+      "edge_density_fraction": 0.027018
+    }
+  },
+  "aggregate": {
+    "all_videos_present": true,
+    "causal_positive_count": 4,
+    "valid_near_miss_count": 1,
+    "target_fraction_gate_pass_count": 0,
+    "median_render_seconds": 309.67
+  }
+}

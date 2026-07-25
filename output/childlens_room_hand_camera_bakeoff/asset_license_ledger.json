@@ -1,0 +1,44 @@
+{
+  "schema_version": "childlens-room-hand-asset-ledger-1.0.0",
+  "canonical_assets": [
+    {
+      "asset_family": "furnished room geometry",
+      "ids": ["playroom", "kitchen", "living_room"],
+      "source": "self-authored deterministic Blender geometry in babyworld_lite/childlens_asset_rich/pilot_scene.py",
+      "license": "repository license; no third-party mesh or texture",
+      "logos_or_readable_text": false
+    },
+    {
+      "asset_family": "target instances",
+      "ids": ["ball_panelled_a", "ball_dotted_b", "ball_striped_c", "cup_blue_a", "cup_speckled_b", "cup_ridged_c"],
+      "source": "self-authored deterministic Blender geometry and materials",
+      "license": "repository license; no third-party mesh or texture",
+      "logos_or_readable_text": false
+    },
+    {
+      "asset_family": "visible hand and forearm",
+      "ids": ["warm", "light", "medium"],
+      "source": "self-authored segmented anatomical procedural mesh",
+      "license": "repository license; no third-party mesh or texture",
+      "logos_or_readable_text": false,
+      "qualification_note": "auditable and non-capsule, but remains stylized; external CC0 anatomical rig is still required for the frozen plausibility gate"
+    }
+  ],
+  "attempted_routes": [
+    {
+      "route": "ReplicaCAD furnished GLB",
+      "disposition": "not used",
+      "reason": "no locally cached distribution; bounded audit did not identify a direct official license-bearing ungated scene download"
+    },
+    {
+      "route": "Blender Studio Human Base Meshes",
+      "disposition": "not integrated",
+      "reason": "official CC0 bundle identified, but it is an unrigged full-body base-mesh bundle; bounded integration would not supply a production IK hand without material new rigging work"
+    },
+    {
+      "route": "Poly Haven",
+      "disposition": "prior CC0 target assets retained only as baseline ancestry",
+      "reason": "official API and CC0 policy verified; available bounded objects did not solve furnished-room or articulated-hand gates"
+    }
+  ]
+}

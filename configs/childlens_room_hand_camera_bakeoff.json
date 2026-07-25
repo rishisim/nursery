@@ -1,0 +1,102 @@
+{
+  "schema_version": "childlens-room-hand-camera-bakeoff-1.0.0",
+  "frozen_at_utc": "2026-07-25T21:35:00Z",
+  "scope": {
+    "sole_empirical_child_source": "ChildLens",
+    "claim_boundary": "provisional naturalistic child-centered ages-3-to-5 calibration; never infant calibration",
+    "excluded_empirical_ancestry": ["AEA", "BabyView"],
+    "restricted_media_export_permitted": false,
+    "learner_or_cue_lift_authorized": false
+  },
+  "childlens_anchor": {
+    "source": "existing participant-distinct local calibration anchor only",
+    "metadata": {
+      "nominal_resolution": [1920, 1080],
+      "nominal_fps": 30,
+      "mount": "chest/vest",
+      "advertised_wide_angle_degrees": 140,
+      "fov_axis": "unknown"
+    },
+    "permitted_aggregate_features": [
+      "straight-line curvature by normalized image radius",
+      "radial field coverage",
+      "edge motion sensitivity",
+      "target visible-area fraction",
+      "luminance and edge-density summaries"
+    ],
+    "not_identifiable": [
+      "exact intrinsics",
+      "whether 140 degrees is horizontal or diagonal",
+      "manufacturer distortion coefficients"
+    ]
+  },
+  "camera": {
+    "candidates": [
+      {
+        "id": "rectilinear_brown_mild",
+        "projection": "rectilinear",
+        "nominal_diagonal_fov_degrees": 140,
+        "brown_conrady": {"k1": -0.16, "k2": 0.035, "p1": 0.0, "p2": 0.0}
+      },
+      {
+        "id": "equisolid_140_diagonal",
+        "projection": "equisolid",
+        "nominal_diagonal_fov_degrees": 140
+      },
+      {
+        "id": "polynomial_fisheye_mild",
+        "projection": "fisheye_polynomial",
+        "nominal_diagonal_fov_degrees": 140,
+        "polynomial": [0.0, 0.78, 0.0, -0.035, 0.0]
+      }
+    ],
+    "selection_rule": "Retain the smallest model set not contradicted by aggregate straight-line curvature, radial coverage, and edge-motion evidence. If metadata and aggregate evidence cannot separate candidates, carry the set unchanged into later evaluation.",
+    "frozen_result": {
+      "status": "uncertainty_set",
+      "canonical_renderer": "equisolid_140_diagonal",
+      "sensitivity_models": ["rectilinear_brown_mild", "polynomial_fisheye_mild"],
+      "rationale": "The 140-degree axis and lens calibration are absent; a 140-degree horizontal rectilinear assumption is unsupported. Existing permitted evidence establishes wide-angle edge curvature but does not identify coefficients."
+    },
+    "learner_outcome_tuning_forbidden": true
+  },
+  "asset_policy": {
+    "allowed": ["CC0", "CC-BY with recorded attribution", "self-authored procedural geometry"],
+    "forbidden": ["unknown license", "editorial-only", "non-redistributable", "visible logos or readable product text"],
+    "large_assets_location": "/Volumes/EOS_202603/RESEARCH/nursery",
+    "private_childlens_assets_forbidden": true
+  },
+  "qualification_gates": {
+    "rooms_minimum": 2,
+    "instances_per_scored_category_minimum": 3,
+    "episode_count": 6,
+    "duration_seconds": 8,
+    "resolution": [960, 540],
+    "fps": 30,
+    "target_visible_fraction_minimum": 0.015,
+    "target_visible_before_during_after": true,
+    "hand_visible_fraction_minimum_at_contact": 0.025,
+    "causal_motion_only": true,
+    "near_miss_required": true,
+    "synchronized_streams": ["rgb", "depth_keyframes", "instance_segmentation_keyframes", "contact", "action", "hand_joints", "proprioception", "imu_like"],
+    "deterministic_replay": true,
+    "complete_license_ledger": true,
+    "private_media_committed": false
+  },
+  "allowed_adaptive_repairs": [
+    "room source or procedural furnishing",
+    "asset subset and scale",
+    "lighting",
+    "camera implementation within the frozen uncertainty set",
+    "collision proxy",
+    "hand topology, rig, and trajectory",
+    "physics stability parameters"
+  ],
+  "forbidden_repairs": [
+    "changing qualification thresholds",
+    "direct target transform keyframing in scored clips",
+    "using a generative VLM as truth",
+    "diffusion refinement as canonical evidence",
+    "learner-result-driven camera selection"
+  ],
+  "stopping_rule": "Stop with GO only if every frozen gate is verified across more than one room and instance. Otherwise repair the smallest failing component within the bounded routes; issue a precise NO_GO only after safe in-scope routes are exhausted or external access/license action is required."
+}

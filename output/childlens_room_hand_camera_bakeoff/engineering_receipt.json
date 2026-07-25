@@ -1,0 +1,34 @@
+{
+  "schema_version": "childlens-room-hand-engineering-receipt-1.0.0",
+  "decision": "NO_GO_TARGET_PROMINENCE_AND_EFFECTOR_FIDELITY",
+  "scope": {
+    "sole_empirical_source": "ChildLens",
+    "claim": "provisional ages-3-to-5 calibration; not infant calibration",
+    "private_childlens_material_exported": false,
+    "aea_or_babyview_used": false,
+    "learner_outcomes_run": false,
+    "cue_lift_conditions_run": false
+  },
+  "verified": {
+    "episodes": 6,
+    "rooms": 3,
+    "target_instances": {"ball": 3, "cup": 3},
+    "actions": ["push", "roll", "touch", "lift_and_place", "near_miss"],
+    "playable_960x540_30fps_8s": 6,
+    "positive_causal_manipulations": 4,
+    "valid_near_miss_controls": 1,
+    "direct_target_location_keyframes": 0,
+    "synchronized_telemetry_rows_per_episode": 240,
+    "camera_result": "frozen three-model uncertainty set; canonical Eevee surrogate plus two sensitivity models",
+    "deterministic_spec_digests": true,
+    "asset_ledger_complete_for_used_assets": true
+  },
+  "failed": {
+    "target_projected_fraction_gate": {"threshold": 0.015, "observed_range": [0.001879, 0.003436], "passed": 0, "total": 6},
+    "external_quality_anatomical_effector": "self-authored segmented hand is non-capsule and visible but remains stylized",
+    "artist_authored_or_scanned_furnished_rooms": "three furnished procedural layouts are materially richer than baseline but not ReplicaCAD/HSSD/3D-FRONT quality",
+    "depth_and_instance_segmentation_keyframes": "not produced after upstream appearance gate failed",
+    "cycles_reference_stills": "not produced after upstream appearance gate failed"
+  },
+  "scientific_interpretation": "negative appearance preflight; not evidence of a causal null and not permission to run distribution generation or learner evaluation"
+}
