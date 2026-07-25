@@ -1,0 +1,22 @@
+{
+  "schema_version": "childlens-support-repair-validation-v1.0.0",
+  "status": "PASS",
+  "terminal_decision": "NO_GO_UNINFORMATIVE",
+  "estimator_freeze_commit": "d94bf42",
+  "single_frozen_estimator_application": true,
+  "alternative_estimators_or_threshold_changes_after_scoring": false,
+  "development_participant_count": 18,
+  "locked_participant_count": 0,
+  "locked_data_accessed": false,
+  "aea_or_babyview_accessed": false,
+  "new_media_acquired_or_decoded": false,
+  "models_changed_or_retrained": false,
+  "simulator_or_side_cue_condition_run": false,
+  "prior_v1_v2_v3_v4_v5_records_changed": false,
+  "private_row_level_artifacts_exported": false,
+  "support_balance_precision_heterogeneity_positive_control_preprocessing_and_shortcut_interpretability_pass": true,
+  "detectable_structure_gate_pass": false,
+  "precise_weak_or_flat_gate_pass": false,
+  "locked_confirmation_recommended": false,
+  "simulator_fitting_blocked": true
+}
