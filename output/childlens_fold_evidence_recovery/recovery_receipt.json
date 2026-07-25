@@ -1,0 +1,54 @@
+{
+  "schema_version": "childlens-fold-evidence-recovery-receipt-1.0.0",
+  "decision": "NO_GO_CROSSFIT_MEDIA_CALIBRATION",
+  "external_volume": {
+    "name": "EOS_202603",
+    "filesystem": "ExFAT",
+    "capacity_bytes": 249826508800,
+    "free_bytes": 190067245056,
+    "modified": false,
+    "candidate_disk_image_mounted_read_only": true,
+    "candidate_provenance": "VERIFIED_CHILDLENS_RESTRICTED_BACKUP",
+    "unverified_or_AEA_media_used": false
+  },
+  "recovery": {
+    "route": "EXACT_BACKUP_RESTORATION",
+    "clean_run_id": "childlens-v5-clean-20260723-a",
+    "development_participant_count": 18,
+    "locked_participant_count": 0,
+    "source_recording_count": 58,
+    "core_observation_hours": 4.5,
+    "fold_counts": [6, 6, 6],
+    "all_bound_hashes_match": true,
+    "private_permissions": "owner-only",
+    "metadata_never_index": true
+  },
+  "reproduction": {
+    "byte_identical": true,
+    "pooled_summary_sha256": "9797185cd5fcdaf44c19f1c6493dc5caac5e5f8196c64aa6bfeafd12075953e6",
+    "numerical_tolerance_used": false
+  },
+  "blender_replay": {
+    "physical_contract_pass": true,
+    "deterministic_state_replay": true,
+    "deterministic_mp4_replay": true,
+    "physical_state_sha256": "5d32de3e2700ca05156fed8a08d4dcb91007c7ac117bb50b504a5b5428a189c1",
+    "mp4_sha256": "5d148fa3ad1ea1168a62931024d2bf6057676534c2361aeca03fa6775c09dedd"
+  },
+  "crossfit": {
+    "started": true,
+    "generator_configurations_scored": 0,
+    "gate": "FAIL_INDEPENDENT_EMITTED_DISTRIBUTION_SUPPORT",
+    "reason": "The frozen adapter has one deterministic episode specification and no distributional generator; identical replay cannot support participant-disjoint distribution-shape assessment.",
+    "assessment_results_used_for_adaptation": false
+  },
+  "readiness_controls_run": false,
+  "cue_lift_arms_run": false,
+  "adaptation_log": [
+    "Resolved mounted volume identity rather than assuming its path.",
+    "Mounted the plausible sparsebundle read-only after metadata-only discovery.",
+    "Accepted it only after every committed restricted hash matched.",
+    "Restored the original absolute private namespace after the annotation binding rejected an alternate hidden path.",
+    "Stopped cross-fit at the frozen independent-support gate; no outcome-driven adaptation occurred."
+  ]
+}
