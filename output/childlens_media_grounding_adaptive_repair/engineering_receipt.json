@@ -1,0 +1,61 @@
+{
+  "schema_version": "childlens-media-grounding-adaptive-engineering-1.0.0",
+  "decision": "ENGINEERING_LANES_REPAIRED_BLENDER_SELECTED",
+  "tdw": {
+    "controller_environment": "Python 3.11.14; tdw 1.13.0.0; setuptools 80.9.0",
+    "official_build_sha256": "bba12deb2de482725d4b32326b3323ab83f9520a2f5b380e8cbdfe78d30f2c44",
+    "dependency_import": "PASS",
+    "version_handshake": "PASS_ONCE",
+    "native_and_rosetta_physical_episode": "FAIL_STALL_AFTER_HANDSHAKE_BEFORE_PROCGENSCENE",
+    "integration_receipt": null,
+    "gate": "FAIL_RELIABILITY"
+  },
+  "blender": {
+    "version": "4.2.1 LTS arm64",
+    "master_clock_hz": 24000,
+    "physics_hz": 240,
+    "render_fps": 24,
+    "physical_samples": 120,
+    "rgb_frames": 12,
+    "depth_and_segmentation_frames": 12,
+    "playable_mp4": true,
+    "positive_contact": true,
+    "negative_no_contact": true,
+    "joint_change_rad": 1.2999999523162842,
+    "dynamic_gyro_peak_rad_s": 2.6218628883361816,
+    "dynamic_acceleration_peak_m_s2": 3.4366607666015625,
+    "static_joint_velocity_peak_rad_s": 0.0,
+    "static_gyro_peak_rad_s": 0.0,
+    "static_acceleration_peak_m_s2": 0.0,
+    "deterministic_state_replay": true,
+    "deterministic_mp4_replay": true,
+    "local_receipt_sha256": "649164ac2929481942652e67526f75fe1d511902b12e0aab5be3f5a51392eb6b",
+    "physical_state_sha256": "5d32de3e2700ca05156fed8a08d4dcb91007c7ac117bb50b504a5b5428a189c1",
+    "mp4_sha256": "5d148fa3ad1ea1168a62931024d2bf6057676534c2361aeca03fa6775c09dedd",
+    "gate": "PASS",
+    "selected": true
+  },
+  "tts": {
+    "route": "macOS say Anna de_DE 175 WPM; no voice cloning",
+    "script": "Schau, der rote Ball rollt zur Tasse. Jetzt berührt der Ball die Tasse.",
+    "canonical_wav": "mono pcm_s16le 24000 Hz; 12.0 seconds",
+    "wav_sha256": "0c3639552f15fa256792d74bc96e35f7f5ec5d79ea12c17c84ec8580cabb0df6",
+    "repeat_byte_identical": true,
+    "log_rms": -2.64926,
+    "clipped_fraction": 0.0,
+    "gate": "PASS_TECHNICAL"
+  },
+  "learner": {
+    "official_commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "python": "3.12.13 arm64",
+    "torch": "2.8.0",
+    "torchvision": "0.23.0",
+    "submitit": "1.5.3",
+    "mps_available": true,
+    "official_imports": "PASS",
+    "upstream_focused_tests": "31 passed, 1 skipped, 9 deselected",
+    "tiny_cpu_and_mps_multimodal_loss_backprop_eval": "PASS",
+    "gate": "PASS_INTERFACE_SMOKE"
+  },
+  "cue_lift_arms_run": false
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": "childlens-media-grounding-adaptive-repair-1.0.0",
+  "frozen_at_utc": "2026-07-25T20:00:00Z",
+  "terminal_states": [
+    "MEDIA_GROUNDING_ENV_READY",
+    "NO_GO_ADAPTIVE_MEDIA_REPAIR"
+  ],
+  "historical_record": {
+    "decision": "NO_GO_MEDIA_GROUNDING_ENV",
+    "immutable": true,
+    "config_sha256": "ac6542baa58d029780f56e6f36b0e82346ec32f80365f18310e45167c4ba8ecd",
+    "protocol_sha256": "3582b688f6789a553c250a8232374a9b0d2787c6649686160c9e0f85ebc33dcd",
+    "engine_receipt_sha256": "447fb3e353f14b11b58155f15f84f3d92837c65d35dbd02e6d7cde3128c95fdd",
+    "terminal_report_sha256": "13110b599111fffa697e32d33c1304fe2eeb9e21bb1968f3b8ef382ca47ace3c"
+  },
+  "scope": {
+    "sole_empirical_source": "ChildLens",
+    "development_participants": 18,
+    "locked_participants": 22,
+    "locked_participants_must_remain_unread": true,
+    "development_allowlist_sha256": "16a0f2963aac4d33e9fac14d4840112ae97dc807e55fce75371db784a5b0675d",
+    "locked_set_sha256": "8167893911afeb268c19855a112570fa58f8ad5fb23e6004b99cc01c7d5bcaa4",
+    "fold_identity_sha256": "4f59da46104139ad71e39c7f3509c12d90f19d05bd9bf0a0f8a2807477d05be5",
+    "excluded_empirical_ancestry": ["AEA", "BabyView"],
+    "age_claim": "provisional ages-3-to-5 developmental calibration; never infant calibration",
+    "natural_av_calibration_status": "FAILED_IMMUTABLE",
+    "generative_referent_gate_status": "FAILED_IMMUTABLE",
+    "final_cue_lift_experiment_authorized": false
+  },
+  "selected_components": {
+    "engine": {
+      "name": "Blender",
+      "version": "4.2.1 LTS arm64",
+      "selection_reason": "TDW dependency repair succeeded but repeated native and Rosetta controller runs stalled after handshake before ProcGenScene returned; Blender passed the physical measurement contract without learner outcomes"
+    },
+    "tts": {
+      "name": "macOS say",
+      "voice": "Anna",
+      "locale": "de_DE",
+      "rate_words_per_minute": 175,
+      "voice_cloning": false
+    },
+    "learner": {
+      "name": "official egobabyvlm CLIP+ interface",
+      "git_commit": "224621caf0628270b6115845ac75a65b984234a3",
+      "device_order": ["mps", "cpu"]
+    }
+  },
+  "canonical_clock": {
+    "master_hz": 24000,
+    "physics_hz": 240,
+    "render_fps": 24,
+    "learner_fps": 1
+  },
+  "physical_measurement_contract": {
+    "contact": "exact signed distance on evaluated oriented primitive collision geometry",
+    "joint": "position and velocity from evaluated relative transforms; never motor targets",
+    "imu": "central finite differences of evaluated pose with one-sided boundaries and no smoothing",
+    "action": "timestamped command ledger distinct from measured proprioception",
+    "required_controls": ["positive contact", "negative no-contact", "dynamic joint/IMU", "static joint/IMU"]
+  },
+  "calibration_freeze": {
+    "childlens_public_aggregate_sha256": "9797185cd5fcdaf44c19f1c6493dc5caac5e5f8196c64aa6bfeafd12075953e6",
+    "participant_disjoint_policy": "fit on two frozen six-participant folds and assess on the third, rotated across all three folds",
+    "tuning_budget": "maximum 24 generator configurations selected only from calibration folds",
+    "loss": "equal-weight normalized Wasserstein distance over comparable output distributions plus absolute dependence errors",
+    "required_output_classes": [
+      "speech timing and density",
+      "decoded-pixel motion",
+      "scene change and persistence",
+      "speech-activity overlap and recurrence",
+      "candidate-event density",
+      "decoded-waveform statistics"
+    ],
+    "validator_inputs": "decoded MP4/WAV and emitted event streams only; generator target fields forbidden",
+    "readiness_controls": "anti-leakage, official learner smoke, held-out oracle, destroyed mapping",
+    "cue_lift_arms_forbidden": true
+  },
+  "stop_condition": {
+    "code": "E_PARTICIPANT_DISJOINT_CALIBRATION_EVIDENCE_UNAVAILABLE",
+    "reason": "The retained public summary pools all 18 development participants, while the restricted fold-level feature material was intentionally removed after the clean V5 run. It is impossible to tune and independently assess the generator without either restoring the frozen restricted material or reacquiring the exact bounded development selection.",
+    "generator_fit_started": false,
+    "calibration_scored": false,
+    "readiness_controls_run": false,
+    "cue_lift_arms_run": false
+  }
+}
