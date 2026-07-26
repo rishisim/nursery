@@ -49,6 +49,9 @@ history but are not part of the active synthetic-video architecture. See
 [`docs/prior_work.md`](docs/prior_work.md) for the small set of prior findings
 that may inform future work.
 
-No generator, learner, evaluation protocol, or model dependency is currently
-selected. Those choices should be frozen prospectively before an experiment is
-run.
+The architecture review now freezes a CVCL-style frame-plus-transcript learner,
+a modular video and German-TTS architecture, Wan 2.2 TI2V-5B and LTX-2 as the
+only public-pilot generator candidates, and a prospective no-substitution pilot
+protocol. See
+[`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
+No pilot has been executed and no generator dependency has been installed.
