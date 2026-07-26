@@ -1,0 +1,18 @@
+{
+  "cuda_version_text": "",
+  "decision": "STOP_HARDWARE_PRIVACY_NO_LOCAL_CUDA",
+  "machine": "arm64",
+  "media_opened": false,
+  "network_private_data_transfer": false,
+  "next_stage_authorized": false,
+  "nvcc_present": false,
+  "nvidia_smi_present": false,
+  "official_local_path_available": false,
+  "reasons": [
+    "nvidia_smi_absent",
+    "nvcc_absent",
+    "apple_silicon_metal_only_not_official_cuda_path"
+  ],
+  "schema": "ChildLensViewerViewHostPreflightResult.v1",
+  "system": "Darwin"
+}
