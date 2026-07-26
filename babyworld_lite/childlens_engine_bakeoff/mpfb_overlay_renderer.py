@@ -373,9 +373,9 @@ def _target_visual(spec: dict[str, Any]) -> bpy.types.Object:
         visual.parent = root
         handle_radius = 0.007
         capsule_specs = (
-            ((0.0, -0.045, 0.025), (handle_radius, 0.027, handle_radius)),
-            ((0.0, -0.065, 0.0), (handle_radius, handle_radius, 0.032)),
-            ((0.0, -0.045, -0.025), (handle_radius, 0.027, handle_radius)),
+            ((0.0, 0.042, 0.025), (handle_radius, 0.020, handle_radius)),
+            ((0.0, 0.055, 0.0), (handle_radius, handle_radius, 0.032)),
+            ((0.0, 0.042, -0.025), (handle_radius, 0.020, handle_radius)),
         )
         for index, (location, dimensions) in enumerate(capsule_specs):
             bpy.ops.mesh.primitive_uv_sphere_add(segments=32, ring_count=16)
@@ -673,7 +673,7 @@ def run(
         )
         armature.matrix_world = _object_matrix(rotation, scale, translation)
         pose_name = PHASE_POSE.get(str(trace["phase"][frame_index]), "neutral")
-        _pose_fingers(armature, "neutral")
+        _pose_fingers(armature, pose_name)
         _set_pose(target_visual, trace["target_pose"][frame_index])
         camera_location, camera_rotation = _camera_from_trace(
             trace["camera_pose"][frame_index]

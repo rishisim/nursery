@@ -1,0 +1,13 @@
+{
+  "schema": "ChildLensConditionedBatchDeterminism.v1",
+  "episode_indices": [0, 7, 15, 23],
+  "rows": [
+    {"episode_id": "clcb_000_2026072901", "maximum_absolute_error": 0.0, "passed": true},
+    {"episode_id": "clcb_007_2026072908", "maximum_absolute_error": 0.0, "passed": true},
+    {"episode_id": "clcb_015_2026072916", "maximum_absolute_error": 0.0, "passed": true},
+    {"episode_id": "clcb_023_2026072924", "maximum_absolute_error": 0.0, "passed": true}
+  ],
+  "absolute_tolerance": 1e-09,
+  "all_pass": true,
+  "external_receipt_sha256": "4ea6dac50cf0d940795fbedff59bef31e6be35c8016356c5f61846443a2cabd2"
+}

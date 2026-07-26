@@ -287,6 +287,27 @@ def _aim_camera(
     model.cam_quat[camera_id] = quaternion
 
 
+def _conditioned_camera_offset(
+    base_offset: np.ndarray, *, episode_time: float, seed: int
+) -> np.ndarray:
+    """Deterministic one-second head-motion nuisance with four larger turns."""
+    second = min(29, max(0, int(episode_time)))
+    turns = (0.0, 78.0, -68.0, 86.0, -76.0)
+    turn_index = sum(second >= boundary for boundary in (6, 12, 18, 24))
+    rng = np.random.default_rng(seed + second * 7919)
+    angle = np.deg2rad(turns[turn_index] + float(rng.uniform(-28.0, 28.0)))
+    cosine, sine = float(np.cos(angle)), float(np.sin(angle))
+    rotated = np.asarray(
+        [
+            cosine * base_offset[0] - sine * base_offset[1],
+            sine * base_offset[0] + cosine * base_offset[1],
+            base_offset[2] + float(rng.uniform(-0.025, 0.025)),
+        ],
+        dtype=np.float64,
+    )
+    return rotated
+
+
 def _desired_hand_position(
     phase: dict[str, Any],
     *,
@@ -621,6 +642,31 @@ def run_physics_trace(
                 data.eq_active[kernel.grasp_equality_id] = 0
                 grasp.release(time_s=float(data.time))
                 release_done = True
+        if camera.get("follow_target", False):
+            followed_target = data.xpos[kernel.target_body_id].copy()
+            camera_offset = np.asarray(
+                camera["position_offset_m"], dtype=np.float64
+            )
+            if camera.get("conditioned_head_motion", False):
+                camera_offset = _conditioned_camera_offset(
+                    camera_offset,
+                    episode_time=episode_time,
+                    seed=int(value(spec, "seed")),
+                )
+            _aim_camera(
+                model,
+                kernel.camera_id,
+                followed_target + camera_offset,
+                followed_target
+                + np.asarray(
+                    [
+                        0.0,
+                        camera["look_offset_y_m"],
+                        camera["look_offset_z_m"],
+                    ]
+                ),
+            )
+            mujoco.mj_forward(model, data)
         record(desired - previous, frame_wrench, frame_contacts)
     wall_seconds = time.perf_counter() - started
     arrays = {key: np.asarray(items) for key, items in trace.items()}

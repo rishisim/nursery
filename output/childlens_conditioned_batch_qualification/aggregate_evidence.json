@@ -1,0 +1,54 @@
+{
+  "schema": "ChildLensConditionedBatchAggregateEvidence.v1",
+  "terminal_decision": "NO_GO_REQUIRES_USER_CHOICE",
+  "calibration_sha256": "e570533d81cdba47bac17ea51545ad42769c514f2c4fb5b4296eff6a0ffb348a",
+  "accepted_population": {
+    "episode_count": 24,
+    "duration_seconds": 30,
+    "physics_cells_passed_before_storage_disconnect": 24,
+    "horizontal_transport_range_m": [0.12072911389241588, 0.17566065347392257],
+    "maximum_lift_range_m": [0.09969666639007768, 0.14319947402536226],
+    "near_miss_contact_substeps_max": 0,
+    "contact_before_grasp_all": true,
+    "zero_pose_jump_all": true,
+    "released_and_settled_all": true,
+    "shared_clock_samples_per_episode": 901
+  },
+  "schedule_qualification": {
+    "speech_bout_duration_seconds": "PASS",
+    "speech_seconds_per_observation_minute": "PASS",
+    "speech_bout_density_per_minute": "PASS",
+    "speech_gap_seconds": "PASS",
+    "candidate_event_density_per_minute": "PASS",
+    "joint_minimum_unique_vectors": "PASS"
+  },
+  "canonical_visual_distribution": {
+    "motion": {"target_interval_90": [0.1095, 0.1273], "generated_mean": 0.016353189091508586, "passed": false},
+    "adjacent_frame_persistence": {"target_interval_90": [0.6912, 0.733], "generated_mean": 0.9684321731328964, "passed": false},
+    "scene_change_rate": {"target_interval_90": [0.1069, 0.1558], "generated_mean": 0.0, "passed": false},
+    "head_motion_sensitivity_representative": {
+      "motion": 0.17016926,
+      "adjacent_frame_persistence": 0.8136883974075317,
+      "scene_change_rate": 0.27586206896551724,
+      "passed": false
+    }
+  },
+  "other_required_gates": {
+    "canonical_render_receipts": "24/24 PASS",
+    "determinism_frozen_subset": "4/4 exact; maximum absolute error 0",
+    "official_egobabyvlm_video_preprocessing": "PASS via the official macOS OpenCV fallback, 8 RGB frames at 640x480",
+    "batch_checksum_manifest": "PASS"
+  },
+  "evidence_availability": {
+    "external_root": "/Volumes/EOS_202603/RESEARCH/nursery/childlens_conditioned_batch",
+    "status": "AVAILABLE_AFTER_USER_REMOUNT",
+    "batch_checksums_sha256": "f39f9c41ba1b1a202ef68624d200b5a7eb3c860ee0aad97af41ab5185541759c",
+    "canonical_visual_distribution_sha256": "87c263142d25a80a2ada6b7c069614e1eb3fef259270b4e65047acddac119549",
+    "determinism_receipt_sha256": "4ea6dac50cf0d940795fbedff59bef31e6be35c8016356c5f61846443a2cabd2"
+  },
+  "privacy": {
+    "empirical_source": "ChildLens only",
+    "raw_frames_audio_transcripts_paths_identifiers_exported": false,
+    "AEA_or_BabyView_used": false
+  }
+}

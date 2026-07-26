@@ -102,7 +102,9 @@ def run(
     intent = json.loads(intent_path.read_text(encoding="utf-8"))
     if scene_path.stem.removesuffix("_physics") != spec["scene"]["id"]["value"]:
         raise ValueError("scene path does not match ResolvedEpisodeSpec scene id")
-    shutil.copyfile(spec_path, output_dir / "resolved_episode_spec.json")
+    destination_spec = output_dir / "resolved_episode_spec.json"
+    if spec_path.resolve() != destination_spec.resolve():
+        shutil.copyfile(spec_path, destination_spec)
     write_json(output_dir / "episode_intent.json", intent)
     scene_map = iTHORMap.load(str(map_path), agent_radius=0.35)
     candidate = select_free_candidate(

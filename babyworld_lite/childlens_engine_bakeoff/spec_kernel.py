@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 
 class UnsupportedEpisodeIntent(ValueError):
     """Raised when an intent is outside the preregistered kernel support."""
@@ -93,28 +95,67 @@ def compile_episode_intent(
     object_id = intent.get("target", {}).get("asset_id")
     if object_id not in asset_registry:
         raise UnsupportedEpisodeIntent(f"unknown target asset_id: {object_id!r}")
+    conditioned_sample = intent.get("conditioned_sample")
     if mode == "calibrated" and "speech_timing" in intent:
         raise UnsupportedEpisodeIntent(
             "calibrated intent cannot override ChildLens-derived speech timing"
         )
+    if conditioned_sample is not None:
+        if mode != "calibrated":
+            raise UnsupportedEpisodeIntent("conditioned_sample requires calibrated mode")
+        if conditioned_sample.get("calibration_sha256") != calibration.source_sha256:
+            raise UnsupportedEpisodeIntent("conditioned_sample calibration hash mismatch")
 
     seed = int(intent.get("seed", protocol["seed"]))
     duration_s = float(intent.get("duration_s", 30.0))
     if duration_s <= 0 or duration_s > 30.0:
         raise UnsupportedEpisodeIntent("duration_s must be in (0, 30]")
-    phase_duration = duration_s / len(phases)
+    if conditioned_sample is None:
+        phase_durations = [duration_s / len(phases)] * len(phases)
+    else:
+        phase_durations = [
+            float(item) for item in conditioned_sample["phase_durations_s"]
+        ]
+        if len(phase_durations) != len(phases) or any(
+            item <= 0 for item in phase_durations
+        ):
+            raise UnsupportedEpisodeIntent("invalid conditioned phase durations")
+        if abs(sum(phase_durations) - duration_s) > 1e-5:
+            raise UnsupportedEpisodeIntent("conditioned phase durations must sum to duration")
+    phase_edges = np.cumsum([0.0, *phase_durations])
     phase_timestamps = [
         {
             "phase": phase,
-            "start_s": round(index * phase_duration, 9),
-            "end_s": round((index + 1) * phase_duration, 9),
+            "start_s": round(float(phase_edges[index]), 9),
+            "end_s": round(float(phase_edges[index + 1]), 9),
         }
         for index, phase in enumerate(phases)
     ]
     exact_names = int(intent.get("speech", {}).get("name_count", 1))
-    if exact_names not in {0, 1, 2}:
-        raise UnsupportedEpisodeIntent("speech.name_count must be 0, 1, or 2")
-    if mode == "calibrated":
+    if exact_names < 0 or exact_names > 4:
+        raise UnsupportedEpisodeIntent("speech.name_count must be between 0 and 4")
+    if conditioned_sample is not None:
+        sampled_events = conditioned_sample.get("speech_events", [])
+        if len(sampled_events) != exact_names:
+            raise UnsupportedEpisodeIntent("conditioned speech event count mismatch")
+        speech_events = []
+        for event in sampled_events:
+            start_s = float(event["start_s"])
+            event_duration_s = float(event["duration_s"])
+            if start_s < 0 or event_duration_s <= 0 or start_s + event_duration_s > duration_s:
+                raise UnsupportedEpisodeIntent("conditioned speech event outside episode")
+            speech_events.append(
+                {
+                    "start_s": round(start_s, 9),
+                    "duration_s": round(event_duration_s, 9),
+                    "semantic_constraint": "name_target",
+                    "text": event.get("text", intent.get("speech", {}).get("text", "die Tasse")),
+                    "timing_provenance": "childlens_conditioned_sampler",
+                    "status": "local_synthetic_timing_interface_not_human_validation",
+                }
+            )
+        speech_provenance = "childlens_conditioned_sampler"
+    elif mode == "calibrated":
         speech_gap = calibration.speech_gap_s
         speech_start = max(0.5, phase_timestamps[0]["end_s"])
         speech_provenance = "childlens_calibration"
@@ -125,16 +166,18 @@ def compile_episode_intent(
         speech_provenance = (
             "user_intent" if requested else "childlens_calibration"
         )
-    speech_events = [
-        {
-            "start_s": round(speech_start + index * speech_gap, 9),
-            "semantic_constraint": "name_target",
-            "text": intent.get("speech", {}).get("text", "die Tasse"),
-            "timing_provenance": speech_provenance,
-            "status": "local_synthetic_timing_interface_not_human_validation",
-        }
-        for index in range(exact_names)
-    ]
+    if conditioned_sample is None:
+        speech_events = [
+            {
+                "start_s": round(speech_start + index * speech_gap, 9),
+                "duration_s": None,
+                "semantic_constraint": "name_target",
+                "text": intent.get("speech", {}).get("text", "die Tasse"),
+                "timing_provenance": speech_provenance,
+                "status": "local_synthetic_timing_interface_not_human_validation",
+            }
+            for index in range(exact_names)
+        ]
     resolved = {
         "schema": "ResolvedEpisodeSpec",
         "protocol_id": protocol["protocol_id"],

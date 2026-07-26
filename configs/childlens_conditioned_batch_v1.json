@@ -1,0 +1,126 @@
+{
+  "schema": "ChildLensConditionedBatchFreeze.v1",
+  "frozen_before_batch_generation": true,
+  "scientific_role": "provisional_distribution_calibration_ages_3_to_5_not_infant_calibration",
+  "kernel_protocol": "configs/childlens_mimo_molmospaces_spec_kernel.json",
+  "asset_registry": "configs/childlens_mimo_molmospaces_asset_registry.json",
+  "calibration": {
+    "path": "configs/childlens_simulator_bridge.json",
+    "sha256": "e570533d81cdba47bac17ea51545ad42769c514f2c4fb5b4296eff6a0ffb348a",
+    "empirical_ancestry": "ChildLens_only",
+    "raw_or_restricted_material_accessed": false
+  },
+  "feature_roles": {
+    "directly_calibrated": [
+      "speech_bout_duration_seconds",
+      "speech_seconds_per_observation_minute",
+      "speech_bout_density_per_minute",
+      "speech_gap_seconds",
+      "candidate_event_density_per_minute",
+      "motion",
+      "adjacent_frame_persistence",
+      "scene_change_rate"
+    ],
+    "engineered_constraints": [
+      "activity_family",
+      "contact_before_grasp",
+      "near_miss_without_contact",
+      "release_and_settle",
+      "target_visibility",
+      "shared_clock"
+    ],
+    "controlled_lexical_task_factors": [
+      "target_naming_count",
+      "target_noun",
+      "target_identity",
+      "target_appearance"
+    ],
+    "point_or_censored_only": {
+      "activity_duration_seconds": "ChildLens activity duration support exceeds a 30-second episode; episode duration is fixed and reported as right-censored, not distribution-matched",
+      "speech_activity_overlap_fraction": "available aggregate is a point estimate of 1.0; enforced as an engineered support check without inventing a distribution",
+      "contact_density": "ChildLens candidate-event density is directly calibrated; physical contact density is simulator-known and separately reported, not treated as an empirical ChildLens contact label"
+    }
+  },
+  "sampling": {
+    "scenes": [
+      {
+        "id": "FloorPlan1",
+        "version": "iTHOR-20251217_with_occupancy",
+        "asset_sha256": "e5b9e9d5cee3ff29eee4ef8b23eaa0945f664c3f67ae5c197ab5c661c6ef3ce8"
+      },
+      {
+        "id": "FloorPlan201",
+        "version": "iTHOR-20251217_with_occupancy",
+        "asset_sha256": "30fc5366a671aea8e965c132d0630947749e6a2a7576219a63f3753130c5aad0"
+      }
+    ],
+    "targets": ["yellow_cup_authored", "red_ball_authored"],
+    "transport_delta_range_m": {
+      "FloorPlan1": [0.55, 0.62],
+      "FloorPlan201": [0.22, 0.27]
+    },
+    "target_anchor_from_hand_m": {
+      "FloorPlan1": [0.06, -0.09, -0.035],
+      "FloorPlan201": [0.14, -0.09, -0.035]
+    },
+    "phase_duration_weights": [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125],
+    "speech_schedule": {
+      "bout_counts": [3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 2, 2],
+      "duration_cycle_s": [7.43, 7.48, 7.5, 7.52, 7.55, 7.47],
+      "gap_cycle_s": [2.7, 2.9, 6.0, 3.1, 3.0, 6.3]
+    },
+    "controller_base": {
+      "control_substeps": 17,
+      "near_miss_min_collision_separation_m": 0.008,
+      "grasp_contact_required": true,
+      "lift_delta_m": 0.12,
+      "transport_delta_m": 0.24,
+      "target_anchor_from_hand_m": [0.14, -0.09, -0.035],
+      "post_release_settle_s": 0.75,
+      "post_release_max_speed_m_s": 0.08
+    },
+    "camera_base": {
+      "mount": "virtual_chest",
+      "follow_target": true,
+      "conditioned_head_motion": false,
+      "vertical_fov_degrees": 90,
+      "position_offset_m": [0.23, 0.11, 0.17],
+      "look_transport_fraction": 0.25,
+      "look_offset_y_m": 0.02,
+      "look_offset_z_m": 0.04,
+      "candidate_rule": "occupancy_clearance_then_collision_visibility_checks"
+    }
+  },
+  "qualification": {
+    "episode_count": 24,
+    "episode_duration_seconds": 30,
+    "pre_freeze_smoke_seeds": [2026072601, 2026072602, 2026072701],
+    "rejected_batch_seeds": [2026072801, 2026072802, 2026072803, 2026072804, 2026072805, 2026072806, 2026072807, 2026072808, 2026072809, 2026072810, 2026072811, 2026072812, 2026072813, 2026072814, 2026072815, 2026072816, 2026072817, 2026072818, 2026072819, 2026072820, 2026072821, 2026072822, 2026072823, 2026072824],
+    "seeds": [2026072901, 2026072902, 2026072903, 2026072904, 2026072905, 2026072906, 2026072907, 2026072908, 2026072909, 2026072910, 2026072911, 2026072912, 2026072913, 2026072914, 2026072915, 2026072916, 2026072917, 2026072918, 2026072919, 2026072920, 2026072921, 2026072922, 2026072923, 2026072924],
+    "direct_schedule_features": [
+      "speech_bout_duration_seconds",
+      "speech_seconds_per_observation_minute",
+      "speech_bout_density_per_minute",
+      "speech_gap_seconds",
+      "candidate_event_density_per_minute"
+    ],
+    "mean_rule": "generated pooled mean must lie inside the frozen ChildLens participant-clustered 90-percent interval",
+    "multiple_comparison_rule": "all required direct features must pass; no alpha-spending reinterpretation because intervals are fixed calibration tolerances, not null-hypothesis tests",
+    "joint_minimum_unique_vectors": 6,
+    "coverage_rule": "both scenes and both target identities must each occur in at least 25 percent of episodes; at least six unique schedule vectors",
+    "exclusion_retry_policy": {
+      "maximum_attempts_per_seed": 2,
+      "retry_same_seed_and_spec_only": true,
+      "permitted_retry_causes": ["transient_renderer_failure", "interrupted_io", "checksum_write_failure"],
+      "scientific_gate_failure_retry_permitted": false,
+      "replacement_seed_permitted": false,
+      "all_attempts_retained_in_audit": true
+    },
+    "determinism_subset_episode_indices": [0, 7, 15, 23],
+    "visual_qa_episode_indices": [0, 3, 7, 11, 15, 19, 23]
+  },
+  "terminal_decisions": [
+    "GO_CHILDLENS_CONDITIONED_BATCH_READY_FOR_LEARNER_PREFLIGHT",
+    "NO_GO_REQUIRES_USER_CHOICE"
+  ]
+}
