@@ -1,0 +1,13 @@
+{
+  "schema": "SpecKernelLicenseProvenance.v1",
+  "components": [
+    {"name": "MIMo", "version": "2.0.0", "commit": "040b0ae4914cbfb26afdf830aa81775b90922f3f", "license": "MIT"},
+    {"name": "MolmoSpaces", "version": "0.2.0", "commit": "c2f1b583f087e1d3994e1377574843b759d9d0f8", "license": "Apache-2.0"},
+    {"name": "iTHOR scene assets", "license": "CC BY 4.0", "use": "Pinned actual furnished FloorPlan1 and FloorPlan201 scene appearance/physics"},
+    {"name": "MPFB", "version": "2.0.15", "commit": "f4f4f1ffa8203585730a7ce433b66738777ba168", "license": "GPL-3.0 code; generated core character assets CC0", "asset_receipt_sha256": "f6089cba3f15d834b0d73a95835cc337b4fb8efb9c4bc5f8ed3890b7201a1bb2"},
+    {"name": "Blender", "version": "4.2.1 LTS", "license": "GPL"}
+  ],
+  "generated_blend_sha256": "fca025e871089ea95f40a63aee3e19559dfd346449ca3379072df7ac63d75bdb",
+  "paid_gated_or_account_bound_assets": false,
+  "private_childlens_material": false
+}

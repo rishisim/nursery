@@ -1,0 +1,13 @@
+{
+  "schema": "SpecDrivenRepairLedger.v1",
+  "attempts": [
+    {"component": "visual proxy", "prior_failure": "disconnected joint spheres", "route": "MPFB 2.0.15 official generated CC0 character, cropped continuous weighted hand/forearm, five-chain deterministic retarget", "result": "PASS"},
+    {"component": "scene appearance", "prior_failure": "procedural proxy room", "route": "actual pinned furnished MuJoCo RGB/depth plus exact-camera Blender RGBA/metric-depth composition", "result": "PASS"},
+    {"component": "FloorPlan201 staging", "prior_failure": "origin inside geometry", "route": "deterministic occupancy/clearance candidate and collision checks", "result": "PASS"},
+    {"component": "near miss", "prior_failure": "visible overlap despite zero contacts", "route": "all-hand-geom mj_geomDistance at every substep plus rendered masks", "result": "PASS"},
+    {"component": "grasp", "prior_failure": "spring lift only 0.0122 m", "route": "contact-triggered weld following actual MIMo hand pose, then transport and release", "result": "PASS on canonical FloorPlan201"},
+    {"component": "camera/target constants", "prior_failure": "hard-coded kernel offsets", "route": "resolved controller/camera fields with explicit provenance", "result": "PASS"},
+    {"component": "FloorPlan1 transport sensitivity", "prior_failure": null, "route": "same resolved controller applied without filename branch", "result": "DIAGNOSTIC_FAIL: 0.0731 m < 0.10 m; retained, not selected as canonical evidence"}
+  ],
+  "prior_terminal_record": "The earlier NO_GO_ENGINE_LADDER_EXHAUSTED remains valid for the prior outputs and is not reinterpreted."
+}

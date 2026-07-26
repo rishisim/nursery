@@ -168,7 +168,7 @@ def compile_episode_intent(
         "duration_s": _field(duration_s, "user_intent"),
         "phase_timestamps": _field(phase_timestamps, "derived"),
         "controller": _field(intent.get("controller", {}), "controller"),
-        "camera": _field(intent.get("camera", {}), "asset_sampler"),
+        "camera": _field(intent.get("camera", {}), "user_intent"),
         "speech_events": _field(speech_events, speech_provenance),
         "speech_semantic_constraint": _field(
             {

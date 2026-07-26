@@ -348,15 +348,15 @@ def _desired_hand_position(
         return grasp_origin + np.asarray(
             [
                 controller["transport_delta_m"],
-                0.12 * release_alpha,
-                controller["lift_delta_m"] + 0.05 * release_alpha,
+                -0.12 * release_alpha,
+                controller["lift_delta_m"] + 0.15 * release_alpha,
             ]
         )
     return grasp_origin + np.asarray(
         [
             controller["transport_delta_m"],
-            0.12,
-            controller["lift_delta_m"] + 0.05,
+            -0.12,
+            controller["lift_delta_m"] + 0.15,
         ]
     )
 
@@ -371,6 +371,7 @@ def run_physics_trace(
     """Run the resolved episode on a shared clock without appearance rendering."""
     model, data = kernel.model, kernel.data
     controller = value(spec, "controller")
+    camera = value(spec, "camera")
     substeps = int(controller["control_substeps"])
     model.opt.timestep = 1.0 / (fps * substeps)
     data.eq_active[kernel.grasp_equality_id] = 0
@@ -390,7 +391,9 @@ def run_physics_trace(
     data.time = 0.0
     initial_hand = data.xpos[kernel.right_hand_body_id].copy()
     initial_mocap = data.mocap_pos[kernel.mocap_id].copy()
-    target_anchor = initial_hand + np.asarray([0.14, -0.09, -0.035])
+    target_anchor = initial_hand + np.asarray(
+        controller["target_anchor_from_hand_m"], dtype=np.float64
+    )
     target_mocap = initial_mocap + (target_anchor - initial_hand)
     target_joint_id = model.joint("kernel_target_free").id
     target_qpos_adr = int(model.jnt_qposadr[target_joint_id])
@@ -408,12 +411,22 @@ def run_physics_trace(
     model.geom_conaffinity[kernel.target_geom_id] = (
         kernel.hand_target_collision_bit | kernel.target_support_collision_bit
     )
-    camera_position = target_anchor + np.asarray([0.23, 0.11, 0.17])
+    camera_position = target_anchor + np.asarray(
+        camera["position_offset_m"], dtype=np.float64
+    )
     _aim_camera(
         model,
         kernel.camera_id,
         camera_position,
-        target_anchor + np.asarray([0.07, 0.0, 0.04]),
+        target_anchor
+        + np.asarray(
+            [
+                controller["transport_delta_m"]
+                * camera["look_transport_fraction"],
+                camera["look_offset_y_m"],
+                camera["look_offset_z_m"],
+            ]
+        ),
     )
     mujoco.mj_forward(model, data)
     initial_target = data.xpos[kernel.target_body_id].copy()
@@ -523,11 +536,11 @@ def run_physics_trace(
                 previous, desired, fraction
             )
             if grasp.state is GraspState.GRASP_ACTIVE:
-                data.mocap_pos[kernel.grasp_mocap_id] = data.mocap_pos[
-                    kernel.mocap_id
+                data.mocap_pos[kernel.grasp_mocap_id] = data.xpos[
+                    kernel.right_hand_body_id
                 ]
-                data.mocap_quat[kernel.grasp_mocap_id] = data.mocap_quat[
-                    kernel.mocap_id
+                data.mocap_quat[kernel.grasp_mocap_id] = data.xquat[
+                    kernel.right_hand_body_id
                 ]
             mujoco.mj_step(model, data)
             wrench, contacts = contact_sample(kernel)
@@ -584,11 +597,11 @@ def run_physics_trace(
                 phase["phase"] == "post_contact_grasp"
                 and grasp.state is GraspState.CONTACT_SEEN
             ):
-                data.mocap_pos[kernel.grasp_mocap_id] = data.mocap_pos[
-                    kernel.mocap_id
+                data.mocap_pos[kernel.grasp_mocap_id] = data.xpos[
+                    kernel.right_hand_body_id
                 ]
-                data.mocap_quat[kernel.grasp_mocap_id] = data.mocap_quat[
-                    kernel.mocap_id
+                data.mocap_quat[kernel.grasp_mocap_id] = data.xquat[
+                    kernel.right_hand_body_id
                 ]
                 pose_jump_m = activate_weld_preserving_current_pose(
                     model, data, kernel.grasp_equality_id
