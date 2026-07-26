@@ -37,11 +37,40 @@ def _hand_geom_names(mimo_assets: Path) -> tuple[str, ...]:
     )
 
 
-def _component_xml(mimo_assets: Path, root_xy: tuple[float, float]) -> str:
+def _component_xml(
+    mimo_assets: Path,
+    root_xy: tuple[float, float],
+    target_definition: dict[str, Any],
+) -> str:
     contact_pairs = "\n".join(
         f'    <pair geom1="{name}" geom2="target_geom" condim="3"/>'
         for name in _hand_geom_names(mimo_assets)
     )
+    geometry = target_definition["geometry"]
+    rgba = " ".join(str(value) for value in target_definition["rgba"])
+    if geometry == "cylinder_with_three_capsule_handle":
+        target_geoms = f"""
+      <geom name="target_geom" type="cylinder" size="0.04 0.05"
+            mass="0.30" rgba="{rgba}"
+            solref="0.03 1" solimp="0.9 0.95 0.001"
+            friction="1 0.005 0.0002" contype="16" conaffinity="16"/>
+      <geom name="target_handle_upper" type="capsule" size="0.007"
+            fromto="0 -0.025 0.025 0 -0.065 0.025" rgba="{rgba}"
+            contype="0" conaffinity="0" mass="0.002"/>
+      <geom name="target_handle_outer" type="capsule" size="0.007"
+            fromto="0 -0.065 -0.025 0 -0.065 0.025" rgba="{rgba}"
+            contype="0" conaffinity="0" mass="0.002"/>
+      <geom name="target_handle_lower" type="capsule" size="0.007"
+            fromto="0 -0.025 -0.025 0 -0.065 -0.025" rgba="{rgba}"
+            contype="0" conaffinity="0" mass="0.002"/>"""
+    elif geometry == "sphere":
+        target_geoms = f"""
+      <geom name="target_geom" type="sphere" size="0.05"
+            mass="0.30" rgba="{rgba}"
+            solref="0.03 1" solimp="0.9 0.95 0.001"
+            friction="1 0.005 0.0002" contype="16" conaffinity="16"/>"""
+    else:
+        raise ValueError(f"unsupported target geometry: {geometry}")
     return f"""<mujoco model="SpecDrivenMIMoKernel">
   <compiler inertiafromgeom="true" angle="degree" assetdir="{mimo_assets}"/>
   <include file="{mimo_assets / "mimo" / "MIMo_metav2.xml"}"/>
@@ -59,10 +88,7 @@ def _component_xml(mimo_assets: Path, root_xy: tuple[float, float]) -> str:
           quat="0 0 0.996195 0.087156"/>
     <body name="target" pos="{root_xy[0] + 0.23} {root_xy[1] + 0.13} 0.59">
       <joint name="target_free" type="free" damping="0.5" armature="0.001"/>
-      <geom name="target_geom" type="cylinder" size="0.04 0.05"
-            mass="0.30" rgba="0.92 0.72 0.05 1"
-            solref="0.03 1" solimp="0.9 0.95 0.001"
-            friction="1 0.005 0.0002" contype="16" conaffinity="16"/>
+{target_geoms}
     </body>
     <body name="support" pos="{root_xy[0] + 0.28} {root_xy[1] + 0.13} 0.515">
       <geom name="support_geom" type="box" size="0.32 0.22 0.015"
@@ -100,6 +126,8 @@ class KernelModel:
     sensor_slices: dict[str, slice]
     hand_target_collision_bit: int
     target_support_collision_bit: int
+    mimo_body_ids: tuple[int, ...]
+    mimo_body_names: tuple[str, ...]
 
 
 def build_kernel_model(
@@ -108,8 +136,11 @@ def build_kernel_model(
     component_path: Path,
     *,
     root_xy: tuple[float, float],
+    target_definition: dict[str, Any],
 ) -> KernelModel:
-    component_path.write_text(_component_xml(mimo_assets, root_xy), encoding="utf-8")
+    component_path.write_text(
+        _component_xml(mimo_assets, root_xy, target_definition), encoding="utf-8"
+    )
     parent = mujoco.MjSpec.from_file(str(scene_path.resolve()))
     child = mujoco.MjSpec.from_file(str(component_path.resolve()))
     frame = parent.worldbody.add_frame()
@@ -174,6 +205,18 @@ def build_kernel_model(
         start = int(model.sensor_adr[sensor_id])
         return slice(start, start + width)
 
+    mimo_body_ids = tuple(
+        body_id
+        for body_id in range(model.nbody)
+        if (model.body(body_id).name or "").startswith("kernel_")
+        and body_id
+        not in {
+            model.body("kernel_target").id,
+            model.body("kernel_support").id,
+            model.body("kernel_hand_mocap").id,
+            model.body("kernel_grasp_mocap").id,
+        }
+    )
     return KernelModel(
         model=model,
         data=data,
@@ -193,6 +236,8 @@ def build_kernel_model(
         },
         hand_target_collision_bit=hand_target_bit,
         target_support_collision_bit=target_support_bit,
+        mimo_body_ids=mimo_body_ids,
+        mimo_body_names=tuple(model.body(body_id).name for body_id in mimo_body_ids),
     )
 
 
@@ -363,7 +408,7 @@ def run_physics_trace(
     model.geom_conaffinity[kernel.target_geom_id] = (
         kernel.hand_target_collision_bit | kernel.target_support_collision_bit
     )
-    camera_position = initial_hand + np.asarray([-0.10, -0.24, 0.20])
+    camera_position = target_anchor + np.asarray([-0.09, -0.075, 0.105])
     _aim_camera(
         model,
         kernel.camera_id,
@@ -396,6 +441,7 @@ def run_physics_trace(
         "target_pose": [],
         "hand_pose": [],
         "camera_pose": [],
+        "body_pose": [],
     }
     substep_time: list[float] = []
     substep_separation: list[float] = []
@@ -434,6 +480,15 @@ def run_physics_trace(
                     data.cam_xpos[kernel.camera_id],
                     data.cam_xmat[kernel.camera_id].reshape(9),
                 ]
+            )
+        )
+        trace["body_pose"].append(
+            np.concatenate(
+                [
+                    data.xpos[list(kernel.mimo_body_ids)],
+                    data.xquat[list(kernel.mimo_body_ids)],
+                ],
+                axis=1,
             )
         )
 
@@ -556,12 +611,30 @@ def run_physics_trace(
     arrays["substep_signed_separation_m"] = np.asarray(substep_separation)
     arrays["substep_contact_count"] = np.asarray(substep_contact_count)
     target_xyz = arrays["target_pose"][:, :3]
+    target_linear_speed = np.linalg.norm(
+        arrays["qvel"][:, target_dof_adr : target_dof_adr + 3], axis=1
+    )
     release_index = (
         int(np.searchsorted(arrays["time_s"], grasp.release_time_s))
         if grasp.release_time_s is not None
         else len(target_xyz) - 1
     )
     final_speed = float(np.linalg.norm(data.qvel[target_dof_adr : target_dof_adr + 3]))
+    contact_frame = (
+        int(np.searchsorted(arrays["time_s"], first_contact_time_s))
+        if first_contact_time_s is not None
+        else 0
+    )
+    engagement_frame = (
+        int(np.searchsorted(arrays["time_s"], grasp.engagement_time_s))
+        if grasp.engagement_time_s is not None
+        else contact_frame
+    )
+    stability_start_s = max(
+        float(arrays["time_s"][-1]) - float(controller["post_release_settle_s"]),
+        float(grasp.release_time_s or 0.0),
+    )
+    stability_mask = arrays["time_s"] >= stability_start_s
     near_miss_phase = value(spec, "phase_timestamps")[2]
     near_mask = (
         (arrays["substep_time_s"] >= near_miss_phase["start_s"])
@@ -597,12 +670,30 @@ def run_physics_trace(
         ),
         "phase_minimum_signed_separation_m": phase_minimum_separation,
         "maximum_lift_from_initial_m": maximum_target_z - float(initial_target[2]),
+        "contact_driven_pregrasp_displacement_m": float(
+            np.linalg.norm(
+                target_xyz[engagement_frame] - target_xyz[contact_frame]
+            )
+        ),
         "horizontal_transport_m": float(
             np.linalg.norm(target_xyz[-1, :2] - initial_target[:2])
         ),
         "released": release_done,
         "post_release_minimum_height_m": float(np.min(target_xyz[release_index:, 2])),
         "final_target_speed_m_s": final_speed,
+        "post_release_stability": {
+            "window_start_s": stability_start_s,
+            "window_duration_s": float(
+                arrays["time_s"][-1] - stability_start_s
+            ),
+            "maximum_speed_m_s": float(np.max(target_linear_speed[stability_mask])),
+            "mean_speed_m_s": float(np.mean(target_linear_speed[stability_mask])),
+            "threshold_m_s": float(controller["post_release_max_speed_m_s"]),
+            "passes": bool(
+                np.max(target_linear_speed[stability_mask])
+                <= float(controller["post_release_max_speed_m_s"])
+            ),
+        },
         "target_initial_xyz": initial_target.tolist(),
         "target_final_xyz": target_xyz[-1].tolist(),
         "direct_target_transform_after_initialization": False,

@@ -3,12 +3,12 @@
   "mode": "calibrated",
   "activity_family": "object_centered_reach_manipulate",
   "scene": {
-    "id": "FloorPlan201",
+    "id": "FloorPlan1",
     "version": "iTHOR-20251217_with_occupancy",
-    "asset_sha256": "30fc5366a671aea8e965c132d0630947749e6a2a7576219a63f3753130c5aad0"
+    "asset_sha256": "e5b9e9d5cee3ff29eee4ef8b23eaa0945f664c3f67ae5c197ab5c661c6ef3ce8"
   },
   "target": {
-    "asset_id": "yellow_cup_authored"
+    "asset_id": "red_ball_authored"
   },
   "phases": [
     "look_settle",
@@ -22,8 +22,8 @@
   ],
   "duration_s": 30.0,
   "speech": {
-    "name_count": 2,
-    "text": "die gelbe Tasse"
+    "name_count": 1,
+    "text": "der rote Ball"
   },
   "controller": {
     "control_substeps": 17,
@@ -39,5 +39,5 @@
     "vertical_fov_degrees": 90,
     "candidate_rule": "occupancy_clearance_then_collision_visibility_checks"
   },
-  "seed": 20260725
+  "seed": 20260726
 }

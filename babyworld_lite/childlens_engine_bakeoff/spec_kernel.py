@@ -156,6 +156,10 @@ def compile_episode_intent(
                 asset_registry[object_id]["sha256"], "asset_sampler"
             ),
             "scale_m": _field(asset_registry[object_id]["scale_m"], "asset_sampler"),
+            "geometry": _field(
+                asset_registry[object_id]["geometry"], "asset_sampler"
+            ),
+            "rgba": _field(asset_registry[object_id]["rgba"], "asset_sampler"),
         },
         "embodiment": {
             "id": _field("MIMo-v2-24-month", "controller"),

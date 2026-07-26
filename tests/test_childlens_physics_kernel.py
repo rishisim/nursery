@@ -39,7 +39,14 @@ def test_compiled_kernel_has_explicit_all_hand_pairs_and_free_scene_bits(tmp_pat
     if not scene.exists() or not mimo_assets.exists():
         pytest.skip("pinned external scene or MIMo assets unavailable")
     kernel = build_kernel_model(
-        scene, mimo_assets, tmp_path / "component.xml", root_xy=(-0.49, 0.29)
+        scene,
+        mimo_assets,
+        tmp_path / "component.xml",
+        root_xy=(-0.49, 0.29),
+        target_definition={
+            "geometry": "cylinder_with_three_capsule_handle",
+            "rgba": [0.92, 0.72, 0.05, 1.0],
+        },
     )
     model = kernel.model
     paired_hand_geoms = {

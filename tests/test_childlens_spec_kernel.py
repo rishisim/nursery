@@ -14,7 +14,14 @@ PROTOCOL = json.loads(
     Path("configs/childlens_mimo_molmospaces_spec_kernel.json").read_text()
 )
 CALIBRATION = CalibrationPolicy.load(Path("configs/childlens_simulator_bridge.json"))
-ASSETS = {"yellow_cup": {"sha256": "a" * 64, "scale_m": [0.08, 0.08, 0.10]}}
+ASSETS = {
+    "yellow_cup": {
+        "sha256": "a" * 64,
+        "scale_m": [0.08, 0.08, 0.10],
+        "geometry": "cylinder_with_three_capsule_handle",
+        "rgba": [0.92, 0.72, 0.05, 1.0],
+    }
+}
 
 
 def _intent():
