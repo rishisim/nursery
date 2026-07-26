@@ -105,3 +105,30 @@ class ContactTriggeredGrasp:
                 and self.contact_time_s <= self.engagement_time_s
             ),
         }
+
+
+def activate_weld_preserving_current_pose(
+    model: mujoco.MjModel,
+    data: mujoco.MjData,
+    equality_id: int,
+) -> float:
+    """Materialize the current body-relative pose, then activate a weld."""
+    mujoco.mj_forward(model, data)
+    body1_id = int(model.eq_obj1id[equality_id])
+    body2_id = int(model.eq_obj2id[equality_id])
+    rotation1 = data.xmat[body1_id].reshape(3, 3)
+    relative_position = rotation1.T @ (
+        data.xpos[body2_id] - data.xpos[body1_id]
+    )
+    inverse_quaternion1 = data.xquat[body1_id].copy()
+    inverse_quaternion1[1:] *= -1
+    relative_quaternion = np.empty(4)
+    mujoco.mju_mulQuat(
+        relative_quaternion, inverse_quaternion1, data.xquat[body2_id]
+    )
+    model.eq_data[equality_id, 3:6] = relative_position
+    model.eq_data[equality_id, 6:10] = relative_quaternion
+    position_before = data.xpos[body2_id].copy()
+    data.eq_active[equality_id] = 1
+    mujoco.mj_forward(model, data)
+    return float(np.linalg.norm(data.xpos[body2_id] - position_before))
