@@ -40,6 +40,9 @@ def test_compiler_is_deterministic_and_provenance_rich():
     assert first["spec_sha256"] == second["spec_sha256"]
     assert first["speech_events"]["provenance"] == "childlens_calibration"
     assert first["canonical_scientific_batch_admissible"]["value"] is True
+    assert "timing remains calibrated" in first["speech_semantic_constraint"]["value"][
+        "calibrated_mode_status"
+    ]
     assert first["calibration"]["record_sha256"]["value"] == CALIBRATION.source_sha256
 
 

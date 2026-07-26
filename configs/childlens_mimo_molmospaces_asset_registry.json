@@ -1,0 +1,16 @@
+{
+  "yellow_cup_authored": {
+    "sha256": "c75f51e945ab3824a78040944cea88bee08bdf471b5093b77b91c8f21b7a1ef7",
+    "scale_m": [0.08, 0.08, 0.1],
+    "geometry": "hollow_cylinder_with_handle",
+    "license": "repository-authored CC0",
+    "role": "real-scale prototype target; not empirical ChildLens content"
+  },
+  "red_ball_authored": {
+    "sha256": "e3ef864806d990f105a920a08e1938af6e304e3971d1baa6d1debd4db5dca3be",
+    "scale_m": [0.1, 0.1, 0.1],
+    "geometry": "sphere",
+    "license": "repository-authored CC0",
+    "role": "real-scale regression target; not empirical ChildLens content"
+  }
+}

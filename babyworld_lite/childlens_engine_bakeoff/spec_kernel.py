@@ -166,6 +166,17 @@ def compile_episode_intent(
         "controller": _field(intent.get("controller", {}), "controller"),
         "camera": _field(intent.get("camera", {}), "asset_sampler"),
         "speech_events": _field(speech_events, speech_provenance),
+        "speech_semantic_constraint": _field(
+            {
+                "name_count": exact_names,
+                "calibrated_mode_status": (
+                    "permitted_conditional_semantic_constraint; timing remains calibrated"
+                    if mode == "calibrated"
+                    else "demonstration_only"
+                ),
+            },
+            "user_intent",
+        ),
         "seed": _field(seed, "user_intent"),
         "units": _field(protocol["units"], "derived"),
         "coordinate_frames": _field(protocol["coordinate_frames"], "derived"),
