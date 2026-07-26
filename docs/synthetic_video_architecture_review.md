@@ -70,7 +70,7 @@ optimized kernels change.
 
 | Family | Public code / weights | License and research constraint | Official hardware path | Memory / practical clip | Continuation, keyframes, controls | Audio | Privacy, storage, expected pilot cost | Screen |
 |---|---|---|---|---|---|---|---|---|
-| **LTX-2 / current LTX-2.x** | Official inference/training code and weights are public; Diffusers/ComfyUI ecosystem support is documented | LTX-2 Community License, not Apache: use restrictions and a paid-license threshold for entities with ≥$10M annual revenue; institutional legal review required | Official path is Linux/CUDA. No official Apple MPS path. Community MLX ports are not evidence of official support | Joint model is roughly 19–22B parameters depending release; official training guidance recommends 80 GB VRAM, with a 32 GB INT8 training config. Native joint clips are documented around 10 s; older LTX-Video has distinct long-shot modes. Plan ~45–70 GB local model assets | Official multiple-keyframe conditioning, I2V, forward/backward extension, retake/video-to-video, camera/control LoRAs; strongest control surface in this screen | Native synchronized audio/video and audio-conditioned modes. Exact German transcript reproduction is unproven and must be tested separately | Local execution can preserve private inputs, but this pilot is public/synthetic only. High storage; high single-clip compute, likely 80 GB GPU or multi-GPU. Budget roughly 1–3 high-memory GPU-hours per accepted pilot scene including fixed retries | **Advance**, chiefly for keyframes/extension and a bounded comparison of joint versus modular audio; license is a gate |
+| **LTX-2 / current LTX-2.x** | Official inference/training code and weights are public; Diffusers/ComfyUI ecosystem support is documented. Official LTX Desktop runs LTX-2.3 22B locally | LTX-2 Community License, not Apache: use restrictions and a paid-license threshold for entities with ≥$10M annual revenue; institutional legal review required | Two distinct official paths: LTX Desktop local inference on Apple Silicon/macOS 13+ via MPS with ≥15 GB **free RAM at launch**, and Python training on Linux/CUDA. Intel Macs fall back to API-only mode. LTX Desktop is beta | Joint model is roughly 19–22B parameters depending release; official training guidance recommends 80 GB VRAM, with a 32 GB INT8 training config. Native joint clips are documented around 10 s; older LTX-Video has distinct long-shot modes. Desktop requires substantial model/output disk space; plan ~45–70 GB local model assets | Official multiple-keyframe conditioning, I2V, forward/backward extension, retake/video-to-video, camera/control LoRAs; LTX Desktop exposes T2V, I2V, A2V, retake, and LoRAs | Native synchronized audio/video and audio-conditioned modes. Exact German transcript reproduction is unproven and must be tested separately | Local MPS or CUDA video inference can preserve media privacy. Desktop recommends free cloud text encoding, which sends prompts to LTX; its documented fully local text encoder is clearly supported on Windows but not clearly on macOS. Mac throughput is unverified: expect no provider charge for local inference but substantial wall time/energy; retain the earlier planning range of roughly 1–3 high-memory CUDA GPU-hours per accepted scene only for the CUDA path | **Advance**, chiefly for keyframes/extension, official Mac feasibility, and a bounded comparison of joint versus modular audio; license, privacy, and reproducible parameter/seed capture remain gates |
 | **Wan 2.2** | Official code and T2V-A14B, I2V-A14B, TI2V-5B, S2V-14B, and Animate weights are public | Repository and released models state Apache-2.0 | Official path is PyTorch/CUDA; no official MPS path | Official A14B examples call for ≥80 GB VRAM. TI2V-5B is the materially cheaper 720p/24 fps candidate; quantization/offload are possible but not the canonical claim. Nominal demonstrations are short clips, so 60 s requires planned segments | T2V/I2V in official code; first-frame image conditioning. No official arbitrary multi-keyframe or general continuation contract comparable to LTX; S2V adds audio/pose control but is a separate 14B model | T2V/TI2V are silent. S2V takes speech/audio (and optionally pose video) to drive a depicted speaker, not a general egocentric soundtrack generator | Local CUDA preserves privacy. A14B variants can require >50 GB each; TI2V-5B is a smaller asset. Moderate/high cost; budget roughly 0.5–2 high-memory GPU-hours per accepted scene with fixed retries | **Advance TI2V-5B only**; do not pilot A14B or S2V in this bounded screen |
 | **HunyuanVideo 1.5** | Official code, checkpoints, Diffusers, ComfyUI and optimized paths are public | Tencent community model license must be reviewed; not represented here as Apache-2.0. Research use is available subject to its terms | Official requirement is Linux, NVIDIA CUDA, Python ≥3.10; no official MPS path | 8.3B DiT; official minimum is 14 GB VRAM with offload for 10 s 720p, with optional 1080p super-resolution. Plan ~20–35 GB assets | Official T2V and I2V. Sparse attention targets longer sequences, but no equally mature official multi-keyframe/forward-backward extension interface was verified | No native general soundtrack/speech generation in the base model | Local CUDA preserves privacy; lowest documented VRAM threshold of the four larger current families. Moderate storage and low/moderate pilot cost | **Exclude**: efficient, but less control evidence than the two selected families and the pilot cap is two |
 | **CogVideoX / 1.5-5B** | Official SAT and Diffusers code and weights are public | Code and 2B weights are Apache-2.0; 5B/1.5 weights use the separate CogVideoX license and require review | Official CUDA-oriented path; quantization/offload documented. No official MPS support | 1.5-5B supports up to 10 s at 1360×768; official table reports 76 GB BF16 before memory-saving paths. Earlier 2B can run much smaller. Plan ~15–30 GB assets | T2V and I2V. Official arbitrary-resolution I2V exists; interpolation and richer keyframe workflows are community rather than the official scientific interface | Silent | Local inference preserves privacy. Moderate storage; moderate cost with offload, but older quality/control surface | **Exclude**: useful reproducibility fallback, but older and less controllable than selected candidates |
@@ -78,6 +78,8 @@ optimized kernels change.
 Sources: [LTX-2 repository](https://github.com/Lightricks/LTX-2),
 [LTX-2 license](https://github.com/Lightricks/LTX-2/blob/main/LICENSE),
 [LTX-Video repository](https://github.com/Lightricks/LTX-Video),
+[LTX Desktop repository](https://github.com/Lightricks/LTX-Desktop),
+[LTX trainer requirements](https://github.com/Lightricks/LTX-2/blob/main/packages/ltx-trainer/docs/quick-start.md),
 [Wan 2.2 repository](https://github.com/Wan-Video/Wan2.2),
 [Wan 2.2 license](https://github.com/Wan-Video/Wan2.2/blob/main/LICENSE.txt),
 [HunyuanVideo-1.5 repository](https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5),
@@ -87,13 +89,25 @@ Sources: [LTX-2 repository](https://github.com/Lightricks/LTX-2),
 
 ### Interpretation of the screen
 
-Apple Silicon is not a supported canonical generation target for any finalist.
-Community ComfyUI, MLX, or MPS adaptations may be useful for visual exploration
-but cannot establish reproducibility of the official model. A later pilot
-therefore requires local or institutionally controlled CUDA. No restricted
-media may be sent to a hosted generator. Closed services may be tested with the
-same public prompts only as a non-canonical quality ceiling, outside the
-two-candidate decision and without influencing selection.
+Apple Silicon is an officially supported **LTX-2.3 inference** target through
+LTX Desktop, not an LTX training target and not an official Wan target. A Mac
+feasibility preflight must record chip, unified memory, free RAM at launch,
+macOS/Desktop/model revisions, model storage, whether MPS local mode actually
+engaged, wall time, memory pressure/weight streaming, and every API-backed
+feature used. “Local generation” is not equivalent to “offline”: the
+recommended cloud text encoder sends prompts to LTX, and the current
+documentation does not clearly promise a fully local text encoder on macOS.
+Restricted prompts or media therefore remain prohibited until a network-trace
+privacy preflight establishes a fully local path. Community MLX/MPS ports remain
+non-canonical.
+
+The public pilot may run LTX through pinned LTX Desktop/MPS only if it exposes
+and records all frozen prompts, conditioning, seeds, inference settings,
+attempts, and outputs needed by the manifest. Otherwise LTX must use the pinned
+official/Diffusers CUDA runner. Wan still requires local or institutionally
+controlled CUDA. Closed services may be tested with the same public prompts
+only as a non-canonical quality ceiling, outside the two-candidate decision and
+without influencing selection.
 
 Sixty seconds is an episode composition target, not a single model-call claim.
 The canonical runner produces 5–10 s planned segments, carries forward explicit
@@ -257,8 +271,6 @@ no rater flags item 8. The family-level gate is:
 
 - at least 2 of 3 seeds pass in each of the four scenes after the allowed retry;
 - no scene has an identity, contact, or safety failure on all three seeds;
-- median final modular attempt uses no more than 1.5 high-memory GPU-hours and
-  no more than a budget fixed before execution;
 - manifest completeness is 100%.
 
 Inter-rater agreement (Krippendorff's alpha with interval) is reported per
@@ -268,15 +280,18 @@ are not adjudicated after family identities are revealed.
 ### Stop and decision rules
 
 Stop a family immediately for a safety-policy violation attributable to the
-model/pipeline, an unresolvable license prohibition, inability to run official
-code on the approved CUDA environment, or three consecutive invalid media
-outputs under the frozen settings. Do not replace it.
+model/pipeline, an unresolvable license prohibition, inability to run its
+approved official inference path (MPS or CUDA), failure to capture the frozen
+manifest fields, or three consecutive invalid media outputs under the frozen
+settings. Do not replace it.
 
 If exactly one family passes every family-level gate, select it. If both pass,
 select by this fixed lexicographic rule: (1) more seed-level scene passes before
 retry, (2) higher total seed-level scene passes after retry, (3) fewer
-identity/contact failures, (4) lower median GPU-hours per passing attempt,
-(5) lower storage footprint. If neither passes, the decision is **no-go**:
+identity/contact failures, (4) fewer retries used across passing attempts,
+(5) lower model-asset storage footprint. Wall time, energy, provider charges,
+and raw MPS/CUDA accelerator-hours are reported but not compared as equivalent.
+If neither passes, the decision is **no-go**:
 do not start a ChildLens-conditioned or downstream study, do not add a third
 model, and revise the scientific premise/protocol in a new prospective review.
 The joint-audio diagnostic can only support keeping modular audio; it cannot
@@ -287,7 +302,7 @@ change the selected family.
 | Class | Concrete risk / unknown | Frozen mitigation or consequence |
 |---|---|---|
 | Engineering | Segment stitching can create cuts, duplicated actions, or state resets; model and Diffusers APIs change | Pin commits/weights, compile from one plan, hash boundary frames, retain every attempt, deterministic FFmpeg |
-| Hardware / privacy | No official MPS path; CUDA cost and access are unresolved; cloud execution could breach restricted-media governance | Public-only pilot on approved CUDA; later restricted media remain local/institutionally controlled; no hosted API |
+| Hardware / privacy | LTX Desktop officially supports local MPS inference, but free-RAM/throughput limits, beta stability, reproducible manifest capture, and fully local macOS text encoding are unresolved; Wan still needs CUDA | Public-only LTX Mac preflight plus approved MPS/CUDA pilot paths; record all API-backed features; later restricted prompts/media require a verified no-egress path |
 | Generator control | Hands, contact, object identity, camera motion, transition order, and exact speech timing may fail independently | Four-scene gates, disaggregated failure labels, capped retries, no post-hoc candidate cycling |
 | Distributional fidelity | A polished prompt video can omit child-view blur, occlusion, clutter, interaction density, and social/language statistics | Blinded real/synthetic study and predeclared distributional diagnostics are required later; benchmark scores are insufficient |
 | Human evaluation | Raters can infer synthetic origin, disagree on contact, or be biased by audio quality | Blinding, randomized attempts, itemized judgments, multiple raters, agreement intervals, no cherry-picked media |
