@@ -26,10 +26,13 @@ def _scene_option(kernel: KernelModel, *, show_collision_hand: bool) -> mujoco.M
         )
     ]
     model.geom_group[kernel_geom_ids] = 5
+    # The deterministic support is part of the staged activity, not a scene
+    # replacement.  Keep it in both layers while hiding the physics hand/target
+    # from the appearance background.
+    model.geom_group[model.geom("kernel_support_geom").id] = 0
     if show_collision_hand:
         model.geom_group[list(kernel.hand_geom_ids)] = 0
         model.geom_group[kernel.target_geom_id] = 0
-        model.geom_group[model.geom("kernel_support_geom").id] = 0
     option.geomgroup[5] = 0
     return option
 
@@ -106,6 +109,11 @@ def render_trace(
             data.qpos[:] = trace["qpos"][frame_index]
             data.qvel[:] = trace["qvel"][frame_index]
             data.time = float(trace["time_s"][frame_index])
+            camera_pose = trace["camera_pose"][frame_index]
+            model.cam_pos[kernel.camera_id] = camera_pose[:3]
+            camera_quaternion = np.empty(4)
+            mujoco.mju_mat2Quat(camera_quaternion, camera_pose[3:12])
+            model.cam_quat[kernel.camera_id] = camera_quaternion
             mujoco.mj_forward(model, data)
             renderer.update_scene(
                 data, camera="kernel_chest_camera", scene_option=option

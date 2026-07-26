@@ -408,12 +408,12 @@ def run_physics_trace(
     model.geom_conaffinity[kernel.target_geom_id] = (
         kernel.hand_target_collision_bit | kernel.target_support_collision_bit
     )
-    camera_position = target_anchor + np.asarray([-0.09, -0.075, 0.105])
+    camera_position = target_anchor + np.asarray([0.23, 0.11, 0.17])
     _aim_camera(
         model,
         kernel.camera_id,
         camera_position,
-        target_anchor + np.asarray([0.06, 0.0, 0.04]),
+        target_anchor + np.asarray([0.07, 0.0, 0.04]),
     )
     mujoco.mj_forward(model, data)
     initial_target = data.xpos[kernel.target_body_id].copy()
@@ -427,6 +427,7 @@ def run_physics_trace(
         model, data, kernel.hand_geom_ids, kernel.target_geom_id
     ).signed_distance_m
     maximum_target_z = float(initial_target[2])
+    maximum_contact_force_n = 0.0
     trace: dict[str, list[Any]] = {
         "time_s": [],
         "phase": [],
@@ -530,6 +531,9 @@ def run_physics_trace(
                 ]
             mujoco.mj_step(model, data)
             wrench, contacts = contact_sample(kernel)
+            maximum_contact_force_n = max(
+                maximum_contact_force_n, float(np.linalg.norm(wrench[:3]))
+            )
             frame_wrench += wrench
             frame_contacts += contacts
             separation = minimum_hand_target_distance(
@@ -659,6 +663,7 @@ def run_physics_trace(
         "simulation_frames_per_wall_second": frames / wall_seconds,
         "first_contact_time_s": first_contact_time_s,
         "first_contact_geom_pairs": first_contact_pairs,
+        "maximum_hand_target_contact_force_n": maximum_contact_force_n,
         "initial_minimum_signed_separation_m": initial_separation_m,
         "grasp": grasp.receipt(),
         "grasp_activation_pose_jump_m": pose_jump_m,
