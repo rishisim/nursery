@@ -119,7 +119,13 @@ def _configure_ssl(base_config: Path, prior_checkpoint: Path, output_config: Pat
                 "separate_head": True,
             },
             "train": {"OFFICIAL_EPOCH_LENGTH": 8},
-            "optim": {"epochs": 2, "warmup_epochs": 0, "freeze_last_layer_epochs": 0},
+            "optim": {
+                "epochs": 2,
+                "lr": 1e-6,
+                "min_lr": 1e-6,
+                "warmup_epochs": 0,
+                "freeze_last_layer_epochs": 0,
+            },
             "compute_precision": {
                 "grad_scaler": False,
                 **{

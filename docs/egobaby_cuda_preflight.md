@@ -95,6 +95,13 @@ the same two-byte storage/compute class with a wider exponent range; this is a
 recorded engineering-smoke precision override, not an initialization,
 architecture, objective, or learner substitution.
 
+Job `6a66b5c87ef3c0846496a19a` confirmed finite BF16 SSL gradients but caught
+that the SSL student did not update. The pinned `DINOv2SSL` wrapper composes
+the raw DINO config without the outer training setup that normally resolves
+the scaled learning rate, leaving `optim.lr: 0.0`. The smoke config now
+explicitly resolves `lr` and `min_lr` to `1e-6`; this is shared, nonzero, and
+recorded, and exists solely to demonstrate the required optimizer update.
+
 The connector identifies the account as `rishisim`, and the official hardware
 listing exposes `l4x1`. The two allocations consumed 137 seconds of L4 runtime,
 approximately USD 0.03 at the listed rate. Neither produced a retained artifact
