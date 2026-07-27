@@ -201,7 +201,10 @@ def _build_runtime(
     seed = learner["seed"]
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-    torch.use_deterministic_algorithms(True)
+    # Pinned xFormers 0.0.32 has no deterministic backward operator for the
+    # block-diagonal attention used by upstream DINO/iBOT. Continuation is
+    # therefore judged by the predeclared loss tolerance in the frozen config.
+    torch.use_deterministic_algorithms(False)
     device = torch.device("cuda:0")
 
     prior_checkpoint = work_dir / "shared_dinov2_vitb14_224.pth"

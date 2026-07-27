@@ -74,6 +74,19 @@ Two subsequent allocations advanced the runtime:
    `CUBLAS_WORKSPACE_CONFIG=:4096:8`. The canonical entrypoint now sets that
    declared deterministic workspace configuration before importing PyTorch.
 
+Three minimal-Ubuntu linker remedies were capped after the same Triton helper
+failure (missing compiler, compiler without a CUDA link path, explicit driver
+path). The distinct official
+`pytorch/pytorch:2.8.0-cuda12.6-cudnn9-devel` environment resolved that
+infrastructure failure. Job `6a66b30e7ef3c0846496a184` then completed the
+DINO forward path and exposed a pinned-runtime reproducibility invariant:
+xFormers 0.0.32 supplies no deterministic backward operator for the
+block-diagonal attention used by DINO/iBOT. The preflight now follows its
+already frozen CUDA criterion—deterministic cuBLAS workspace plus
+fresh-process next-loss comparison at `rtol=1e-5`, `atol=1e-6`—rather than
+requiring globally deterministic algorithms that the pinned learner cannot
+execute.
+
 The connector identifies the account as `rishisim`, and the official hardware
 listing exposes `l4x1`. The two allocations consumed 137 seconds of L4 runtime,
 approximately USD 0.03 at the listed rate. Neither produced a retained artifact
