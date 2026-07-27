@@ -57,14 +57,18 @@ def _finite_gradients(module: Any) -> dict[str, int]:
 
     checked = 0
     nonzero = 0
-    for parameter in module.parameters():
+    first_nonfinite: str | None = None
+    for name, parameter in module.named_parameters():
         if parameter.grad is None:
             continue
         checked += 1
         if not torch.isfinite(parameter.grad).all():
-            raise AssertionError("non-finite gradient")
+            first_nonfinite = name
+            break
         if torch.count_nonzero(parameter.grad).item():
             nonzero += 1
+    if first_nonfinite is not None:
+        raise AssertionError(f"non-finite gradient in {first_nonfinite}")
     if checked == 0 or nonzero == 0:
         raise AssertionError("objective produced no finite nonzero gradients")
     return {"gradient_tensors": checked, "nonzero_gradient_tensors": nonzero}
@@ -116,6 +120,21 @@ def _configure_ssl(base_config: Path, prior_checkpoint: Path, output_config: Pat
             },
             "train": {"OFFICIAL_EPOCH_LENGTH": 8},
             "optim": {"epochs": 2, "warmup_epochs": 0, "freeze_last_layer_epochs": 0},
+            "compute_precision": {
+                "grad_scaler": False,
+                **{
+                    role: {
+                        component: {
+                            "mixed_precision": {
+                                "param_dtype": "bf16",
+                                "reduce_dtype": "bf16",
+                            }
+                        }
+                        for component in ("backbone", "dino_head", "ibot_head")
+                    }
+                    for role in ("student", "teacher")
+                },
+            },
         },
     )
     OmegaConf.save(cfg, output_config)

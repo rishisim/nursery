@@ -87,6 +87,14 @@ fresh-process next-loss comparison at `rtol=1e-5`, `atol=1e-6`—rather than
 requiring globally deterministic algorithms that the pinned learner cannot
 execute.
 
+Job `6a66b4b3db23d7a7ec1cf152` then completed every objective forward loss,
+including DINO and iBOT, but the strict audit detected a non-finite SSL
+gradient under FP16 mixed precision. The L4 preflight now resolves all DINO
+teacher/student backbone and head mixed-precision dtypes to BF16. BF16 retains
+the same two-byte storage/compute class with a wider exponent range; this is a
+recorded engineering-smoke precision override, not an initialization,
+architecture, objective, or learner substitution.
+
 The connector identifies the account as `rishisim`, and the official hardware
 listing exposes `l4x1`. The two allocations consumed 137 seconds of L4 runtime,
 approximately USD 0.03 at the listed rate. Neither produced a retained artifact
