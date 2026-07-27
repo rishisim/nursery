@@ -5,13 +5,18 @@ research program.
 
 ## Scientific question
 
-Can prompt- and plan-conditioned child-view video with synchronized language
-audio become a useful, scalable complement to natural developmental
-egocentric video?
+Can \(H\) hours of prompt- and plan-conditioned child-view video with
+synchronized language audio produce lexical-grounding performance equivalent
+to \(H\) hours of natural developmental egocentric video, while costing less to
+produce than comparable new real-data collection?
 
-The initial claim is deliberately narrow: synthetic augmentation may reduce
-the amount of real data needed to reach a fixed downstream learning result.
-It is not assumed to replace real experience.
+The initial claim is deliberately narrow: **equal video hours, equivalent
+lexical-grounding performance, and lower measured cost**. The primary
+comparison is synthetic-only versus real-only at the same \(H\)-hour learner
+budget. Mixed real-plus-synthetic and reduced-real analyses are secondary; the
+study does not primarily hypothesize that synthetic video reduces how much
+ChildLens data the learner needs, and it does not claim synthetic experience is
+the same as real linguistic acquisition.
 
 ## Proposed method
 
@@ -21,13 +26,15 @@ referents. Video and audio may be produced by separate components driven by
 the same timeline. Simulator-derived geometry and sensor streams are not
 required for the primary study.
 
-The two primary evaluation families are:
+The claim is evaluated with:
 
-1. Blinded real-versus-synthetic discrimination and supporting distributional
-   diagnostics.
-2. Matched-protocol downstream learning comparisons evaluated on held-out real
-   data, including real-only, synthetic-only, and real-plus-synthetic
-   conditions.
+1. one common generated-image Machine-DevBench Lexical asset for the primary
+   standardized equivalence test;
+2. one child/session-disjoint held-out-real ChildLens temporal-transfer
+   safeguard, reported separately because Machine-DevBench images are
+   generated; and
+3. a prospective like-for-like real-versus-synthetic cost ledger, with blinded
+   fidelity and distributional diagnostics reported separately.
 
 ## Empirical boundary
 
@@ -58,3 +65,5 @@ only public-pilot generator candidates, and a prospective no-substitution pilot
 protocol. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
 No pilot has been executed and no generator dependency has been installed.
+The next stage is public/dummy EgoBabyVLM compatibility work on CUDA—not LTX,
+Wan, TTS, ChildLens preprocessing, generation, or learner training.

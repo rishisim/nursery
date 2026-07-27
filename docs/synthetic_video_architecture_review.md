@@ -17,8 +17,11 @@ as one prespecified macro-average of those two task accuracies. Chance is 50%.
 CVCL is a conceptual predecessor and may be used only as an optional
 interpretability reference; it is neither the primary learner nor endpoint.
 
-The primary estimand is whether synthetic augmentation reduces learner-stage
-real-data requirements:
+The primary estimand is whether the same learner trained on \(H\) synthetic
+hours has **equivalent lexical-grounding performance** to one trained on \(H\)
+real hours. The intended practical benefit is lower measured cost for
+producing the synthetic \(H\)-hour corpus than for collecting and preparing a
+comparable new real \(H\)-hour corpus:
 
 | Arm | Allocated learner data |
 |---|---|
@@ -27,13 +30,16 @@ real-data requirements:
 | `Real-small` | \(r\) real hours |
 | `Mixed` | \(r\) real + \(H-r\) synthetic hours, \(r < H\) |
 
-Success requires `Mixed` to have **equivalent lexical-grounding performance**
-to `Real-full` within a frozen two-sided equivalence margin and to be superior
-to `Real-small`; the margin, alpha, confidence-interval procedure, seeds, \(H\),
-and \(r\) must be preregistered from public/dummy engineering and blinded
-real-only planning, before synthetic scores are opened. `Synthetic-full`
-equivalence to `Real-full` is a stronger secondary result. This does not
-establish “the same linguistic acquisition.”
+Primary performance success requires `Synthetic-full` to be equivalent to
+`Real-full` within a frozen two-sided equivalence margin. The margin, alpha,
+confidence-interval procedure, seeds, and \(H\) must be preregistered from
+public/dummy engineering and blinded real-only planning before synthetic scores
+are opened. The paired cost result reports whether the accepted synthetic
+corpus costs less per usable hour and in total under the frozen accounting
+rules below. `Mixed` equivalence to `Real-full` and superiority to
+`Real-small` is a secondary augmentation/data-efficiency analysis; it is not
+the study's main hypothesis. Equivalent performance does not establish “the
+same linguistic acquisition.”
 
 There is a mandatory readiness gate before any synthetic-arm result is opened:
 the identically configured real-only CLIP+ learner must (a) be meaningfully
@@ -204,9 +210,10 @@ manifest, or learner outcomes, and never regenerate it per arm. Freeze source
 vocabulary/lemma list, part-of-speech and morphology processing, noun
 categories, adjective antonyms, frequency-bin boundaries, prompts, image model
 and weights, generation seeds, filters, final manifests, and hashes. Build both
-official styles once; the realistic-style noun and adjective macro-average is
-primary, with cartoon style diagnostic unless preregistration instead freezes
-their average before any learner result.
+official styles once. The realistic-style noun and adjective macro-average is
+the primary standardized endpoint; realistic noun and adjective accuracies are
+its two required components, and cartoon-style results are secondary
+diagnostics.
 
 Each score report includes per-concept accuracy and, for every arm/budget,
 training exposure count after ASR/translation and frame filtering. Primary
@@ -258,16 +265,17 @@ generated-image lexical transfer, not held-out-real ChildLens performance.
   data hashes match. Record all latest/epoch checkpoints in ignored governed
   run storage; retain only preregistered aggregate results and manifests in Git.
 
-### Real-data accounting and estimand boundary
+### Real-data and cost accounting
 
-**Decision: the first study makes a learner-stage reduction claim conditional
-on one fixed generator-development/calibration corpus \(C\), not an end-to-end
-real-data reduction claim.** Before looking at final outcomes, freeze and
-report \(C\)'s unique children, sessions, hours, permitted derived statistics,
-and every use: vocabulary proposal, generator calibration, prompt/QA tuning,
-benchmark construction, and fidelity reference. No record in \(C\) may enter
-learner training or either evaluation. Final training/evaluation children and
-sessions must be disjoint from \(C\).
+**Decision: the first study makes an equal-hour equivalence claim conditional
+on one fixed generator-development/calibration corpus \(C\), paired with a
+prospective cost comparison. It does not primarily make a learner-stage or
+end-to-end real-data-reduction claim.** Before looking at final outcomes,
+freeze and report \(C\)'s unique children, sessions, hours, permitted derived
+statistics, and every use: vocabulary proposal, generator calibration,
+prompt/QA tuning, benchmark construction, and fidelity reference. No record in
+\(C\) may enter learner training or either evaluation. Final
+training/evaluation children and sessions must be disjoint from \(C\).
 
 The learner's `Real-small` and real portion of `Mixed` are the same nested
 \(r\)-hour subset of the eligible training pool. They may not inherit
@@ -275,9 +283,24 @@ vocabulary, prompts, QA thresholds, translations, embeddings, or summaries
 computed from the remainder of `Real-full`. The fixed generator may use only
 \(C\), public inputs, and its episode plans to produce synthetic data. Thus an
 \(r\)-hour arm never indirectly consumes \(H\) learner-pool hours. Report
-learner real hours and \(C\) hours separately. Any later end-to-end reduction
-claim requires a new protocol that charges \(C\) against the real-data budget;
-it is not implied by this study.
+learner real hours and \(C\) hours separately.
+
+Freeze the cost ledger before generation. For synthetic data it includes
+generator-development labor attributable to this protocol, amortized \(C\)
+collection/access and calibration cost, compute, storage, model/license fees,
+episode planning, all failed attempts, TTS/ASR/translation, QA, human review,
+and accepted-hour yield. For the real comparator it uses a prospective
+like-for-like estimate for collecting and preparing a new \(H\)-hour corpus:
+recruitment/consent, participant and staff time, equipment, collection
+failures, secure transfer/storage, transcription/ASR/translation, QA, and
+usable-hour yield. Report both marginal operating cost and fully loaded cost,
+currency/base year, amortization assumptions, wall time, labor hours, and
+uncertainty ranges. Existing ChildLens acquisition is not treated as zero-cost
+merely because it is sunk. A “lower cost” conclusion requires the
+preregistered synthetic-to-real cost ratio and its uncertainty to fall below
+the frozen threshold while performance equivalence passes. Any later
+real-data-reduction claim requires a new primary protocol and is not implied by
+this study.
 
 ### Held-out-real transfer safeguard
 
@@ -332,16 +355,25 @@ Approved compute is split:
 
 | Topic | Frozen now | Deferred until authorized ChildLens access | No-go trigger |
 |---|---|---|---|
+| Estimand | `Synthetic-full` versus `Real-full` at equal \(H\) is primary; lower prospective cost is the paired benefit; `Mixed`/`Real-small` is secondary | Freeze \(H/r\), equivalence margin, cost-ratio threshold, uncertainty procedures, and seeds | Post-hoc margin/cost rule or reclassifying a failed primary comparison as success via `Mixed` |
 | Learner | CLIP+ `triple`, pinned upstream, common public BERT/DINOv2 prior and strict initialization bridge | Governed CUDA runtime reproduction | Cannot prove matched strict sync, all three objectives, and exact resume |
 | Language/tokenizer | Offline German ASR → English translation; public pinned `bert-base-uncased` | Local model hashes and translation audit on authorized samples | Any network egress or arm-specific processing |
 | Primary benchmark | One frozen English Machine-DevBench Lexical asset for all arms | Vocabulary freeze using only authorized \(C\); generation/filter audit | Per-arm asset, learner-test steering, or unfrozen test |
 | Readiness | Real-only above-chance and positive learning curve before unblinding synthetic | Margins, \(H/r\), nested budgets, seeds from governed design | Gate fails; synthetic outcomes remain sealed |
 | Real safeguard | Child/session-disjoint temporal frame–utterance retrieval | Feasible split counts, duplicate audit, candid model-derived label | No independent test children or irreparable clip leakage |
-| Accounting | Conditional learner-stage claim; \(C\) separate and excluded | Freeze \(C\) ledger and eligible learner pool | `Real-small` indirectly uses the rest of `Real-full` |
+| Accounting | Equal-hour equivalence plus prospective like-for-like cost comparison; \(C\) separate and excluded | Freeze \(C\), eligible learner pool, cost ledger, amortization, and uncertainty rules | Synthetic cost omits failures/development or treats existing real acquisition as free |
 | Compute/privacy | Public/dummy hosted CUDA allowed; restricted data only governed CUDA | Infrastructure approval and egress test | Restricted material would leave governed boundary |
 | Licensing | CC BY-NC research boundary and attribution | Institutional review of all model/data licenses | Commercial use without separate permission/reimplementation |
 
 ## Phased implementation sequence and stop rules
+
+**Current stage:** this record and its dependency-light manifest smoke check
+are planning/static compatibility work only. The immediate next implementation
+stage is the public compatibility package and public/dummy EgoBabyVLM CUDA
+preflight in phases 1–2. LTX/Wan execution, TTS, generation, ChildLens
+preprocessing, learner training, and scientific evaluation are not current
+work and remain prohibited until their stated prerequisites are authorized and
+passed.
 
 1. **Public compatibility package.** Vendor the pinned upstream revision or
    record an immutable dependency, freeze lockfile SHAs and licenses, define
@@ -371,25 +403,34 @@ Approved compute is split:
    validate the above-chance/positive-curve gate. *Stop* and keep synthetic
    results sealed if it fails. *Done when:* the gate decision and uncertainty
    report are frozen without protocol changes.
-6. **Generator and learner datasets.** Freeze one generator after the separate
-   public pilot, create the synthetic allocation without test-concept
-   targeting, run identical audio→ASR→translation, and compile/hash all four
-   arm manifests. *Stop* on leakage, hour/accounting mismatch, or QA selection
-   informed by downstream tests. *Done when:* duration, exposure, lineage, and
-   objective-step ledgers reconcile.
-7. **Final four-arm evaluation.** Train all frozen arm×seed runs, select the
-   common fixed-step checkpoints, evaluate once on the common lexical and
-   held-out-real assets, then test Mixed equivalence to `Real-full` and
-   superiority to `Real-small`; treat `Synthetic-full` parity as secondary.
-   *Done when:* confidence intervals, exposure strata, real-transfer safeguard,
-   failures, and conditional-\(C\) claim are reported.
-8. **Separate blinded fidelity/cost evaluation.** With independent randomized
+6. **Later public generator pilot.** Only after phases 1–5 and separate
+   authorization, execute the already frozen public/self-authored LTX-versus-Wan
+   pilot below; do not use ChildLens or downstream test concepts. *Stop* if
+   neither candidate passes its family-level gates. *Done when:* exactly one
+   generator is selected by the frozen rule, or a no-go is recorded. This is
+   the first phase that runs LTX or Wan.
+7. **Generator and learner datasets.** With the selected generator, create the
+   synthetic allocation without test-concept targeting, run identical
+   audio→ASR→translation, and compile/hash all four arm manifests. *Stop* on
+   leakage, hour/accounting mismatch, or QA selection informed by downstream
+   tests. *Done when:* duration, exposure, lineage, objective-step, and frozen
+   cost ledgers reconcile.
+8. **Final four-arm evaluation.** Train all frozen arm×seed runs, select the
+   common fixed-step checkpoints, and evaluate once on the common lexical and
+   held-out-real assets. First test `Synthetic-full` equivalence to
+   `Real-full`; then report the secondary `Mixed` equivalence to `Real-full`
+   and superiority to `Real-small`. *Done when:* confidence intervals,
+   exposure strata, real-transfer safeguard, failures, and the
+   equal-\(H\)-hour conditional-\(C\) claim are reported.
+9. **Separate blinded fidelity/cost evaluation.** With independent randomized
    samples and raters blinded to source/model, run the already frozen
    audiovisual fidelity protocol and report acceptance rate, retries, wall/GPU
-   time, energy if available, storage, and cost. Its sample/order and judgments
-   stay separate from learner test assets and checkpoint decisions. *Done
-   when:* fidelity/cost results are linked by lineage but cannot alter the
-   four-arm analysis.
+   time, energy if available, storage, labor, marginal cost, and fully loaded
+   cost under the frozen prospective real-versus-synthetic ledger. Its
+   sample/order and judgments stay separate from learner test assets and
+   checkpoint decisions. *Done when:* fidelity/cost results are linked by
+   lineage, the preregistered cost ratio is reported, and neither fidelity nor
+   cost judgments can alter the learner analysis.
 
 ## Bounded public/dummy preflight performed
 
@@ -655,7 +696,7 @@ change the selected family.
 | Generator control | Hands, contact, object identity, camera motion, transition order, and exact speech timing may fail independently | Four-scene gates, disaggregated failure labels, capped retries, no post-hoc candidate cycling |
 | Distributional fidelity | A polished prompt video can omit child-view blur, occlusion, clutter, interaction density, and social/language statistics | Blinded real/synthetic study and predeclared distributional diagnostics are required later; benchmark scores are insufficient |
 | Human evaluation | Raters can infer synthetic origin, disagree on contact, or be biased by audio quality | Blinding, randomized attempts, itemized judgments, multiple raters, agreement intervals, no cherry-picked media |
-| Downstream learning | Synthetic artifacts can create shortcuts; augmentation gains may be compute gains; vocabulary coverage may be too small | Held-out-real testing, nested real fractions, matched steps, synthetic-only secondary arm, vocabulary/task gate, multiple learner seeds |
+| Downstream learning | Synthetic artifacts can create shortcuts; equal-hour parity may reflect generated-image benchmark affinity; secondary augmentation gains may be compute gains; vocabulary coverage may be too small | `Synthetic-full` versus `Real-full` is primary at matched hours/steps; held-out-real safeguard, common benchmark, exposure strata, nested real fractions only for secondary analysis, multiple learner seeds |
 | Licensing / deployment | LTX and some weight licenses are not standard permissive licenses; TTS voices have separate output/use terms | Legal review before pilot, record every license/version, prohibit cloned voices, retain Wan TI2V as permissive alternative |
 | Scientific interpretation | Success on ChildLens ages 3–5 would not establish infant learning or BabyView fidelity | Claims remain ChildLens-specific; BabyView requires separate access and governance |
 
