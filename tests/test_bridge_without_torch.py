@@ -23,3 +23,5 @@ def test_upstream_patch_is_narrow_and_attributed() -> None:
         "diff --git a/apps/baselines/clip/training/checkpoint.py b/apps/baselines/clip/training/checkpoint.py",
         "diff --git a/apps/baselines/clip/training/loop.py b/apps/baselines/clip/training/loop.py",
     ]
+    assert 'dtype=torch.uint8' in patch
+    assert 'device="cpu"' in patch

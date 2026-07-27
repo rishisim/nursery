@@ -144,7 +144,9 @@ The isolated attributed upstream patch adds:
 - immutable Hugging Face revision forwarding for BERT;
 - recognition of an explicitly loaded SSL student prior as pretrained
   initialization;
-- RNG and SSL-iteration checkpoint state required for a fresh-process resume.
+- RNG and SSL-iteration checkpoint state required for a fresh-process resume,
+  including normalization to the CPU `uint8` RNG representation required by
+  PyTorch 2.8 restore APIs.
 
 It does not vendor or fork the full upstream learner.
 
@@ -159,6 +161,15 @@ It does not vendor or fork the full upstream learner.
 3. **Architecture-matched shared-prior adapter — packaged, awaiting CUDA.**
    This is the only contract-preserving candidate. It uses the frozen learner,
    one ViT-B/14 prior, 224-pixel input, and no random fallback.
+
+The L4 run `6a66b781db23d7a7ec1cf176` completed the full objective cycle,
+post-SSL synchronization, and checkpoint save before exposing a PyTorch 2.8
+checkpoint-restore compatibility defect: `torch.set_rng_state` rejected the
+deserialized RNG state because it was not a CPU `ByteTensor`.
+The isolated resume adapter now normalizes saved CPU and CUDA RNG tensors to
+contiguous CPU `uint8` tensors before calling the official restore APIs. This
+does not alter learner weights, scheduling, data lineage, or the reproducibility
+criterion.
 
 The third item has not failed. The three-failed-attempt ENGINEERING NO-GO rule
 has therefore not been reached.

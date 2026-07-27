@@ -78,15 +78,19 @@ index dc2e260..3978ad9 100644
          "best_val_loss": best_val_loss,
          "config": cfg_dict,
      }
-@@ -144,4 +157,13 @@ def load_checkpoint(
+@@ -144,4 +157,17 @@ def load_checkpoint(
      if scheduler is not None:
          scheduler.load_state_dict(payload["scheduler_state"])
  
 +    rng_state = payload.get("rng_state")
 +    if rng_state is not None:
-+        torch.set_rng_state(rng_state["torch"])
++        # Normalize deserialized RNG tensors to the CPU ByteTensor
++        # representation required by the PyTorch restore APIs.
++        cpu_rng = rng_state["torch"].detach().to(device="cpu", dtype=torch.uint8).contiguous()
++        torch.set_rng_state(cpu_rng)
 +        if torch.cuda.is_available() and rng_state.get("cuda"):
-+            torch.cuda.set_rng_state_all(rng_state["cuda"])
++            cuda_rng = [state.detach().to(device="cpu", dtype=torch.uint8).contiguous() for state in rng_state["cuda"]]
++            torch.cuda.set_rng_state_all(cuda_rng)
 +        if "numpy" in rng_state:
 +            import numpy as np
 +
