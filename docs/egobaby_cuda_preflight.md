@@ -171,6 +171,13 @@ contiguous CPU `uint8` tensors before calling the official restore APIs. This
 does not alter learner weights, scheduling, data lineage, or the reproducibility
 criterion.
 
+The follow-up L4 run `6a66b8dc7ef3c0846496a1b2` verified that resume repair,
+including the next scheduled contrastive objective under the frozen tolerance.
+It then exposed a preflight-fixture-only device mismatch: the fabricated
+evaluator tensor targeted CUDA while its deterministic generator defaulted to
+CPU. The fixture now creates its generator on CUDA; no learner or evaluation
+protocol behavior changed.
+
 The third item has not failed. The three-failed-attempt ENGINEERING NO-GO rule
 has therefore not been reached.
 

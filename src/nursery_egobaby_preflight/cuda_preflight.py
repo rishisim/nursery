@@ -457,7 +457,7 @@ def _extractor_wiring(checkpoint: Path, work_dir: Path) -> dict[str, Any]:
     from apps.baselines.clip.trained_extractor import ContrastiveFeatureExtractor
 
     extractor = ContrastiveFeatureExtractor(checkpoint, device="cuda")
-    generator = torch.Generator().manual_seed(9001)
+    generator = torch.Generator(device="cuda").manual_seed(9001)
     images = torch.randn(2, 3, 224, 224, generator=generator, device="cuda")
     features = extractor.extract_features({"image": images, "text": ["a cup", "a red object"]})
     similarities = extractor.compute_similarity(
