@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "proof": "public/dummy engineering compatibility only",
+  "job": {
+    "provider": "hugging-face-jobs",
+    "id": "6a66ba7e7ef3c0846496a1bf",
+    "url": "https://huggingface.co/jobs/rishisim/6a66ba7e7ef3c0846496a1bf",
+    "image": "pytorch/pytorch:2.8.0-cuda12.6-cudnn9-devel",
+    "flavor": "l4x1",
+    "running_seconds": 150,
+    "listed_rate_usd_per_hour": 0.8,
+    "successful_run_cost_usd": 0.033333,
+    "program_preflight_jobs_running_seconds": 1692,
+    "program_preflight_jobs_upper_bound_cost_usd": 0.376
+  },
+  "upstream": {
+    "repository": "https://github.com/facebookresearch/egobabyvlm.git",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "commit_verified": true,
+    "license": "CC-BY-NC-4.0",
+    "patch_sha256": "42c05c60cf61ebb09897edab7b5f8c8a1b6c75a432c10749b318ea596b994042"
+  },
+  "pins": {
+    "vision": {
+      "repository": "facebook/dinov2-base",
+      "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415",
+      "filename": "model.safetensors",
+      "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841",
+      "license": "Apache-2.0"
+    },
+    "text": {
+      "repository": "google-bert/bert-base-uncased",
+      "revision": "86b5e0934494bd15c9632b12f734a8a67f723594",
+      "filename": "model.safetensors",
+      "sha256": "68d45e234eb4a928074dfd868cead0219ab85354cc53d20e772753c6bb9169d3",
+      "license": "Apache-2.0"
+    }
+  },
+  "environment": {
+    "gpu": "NVIDIA L4",
+    "single_gpu": true,
+    "distributed_smoke": "not_run_budget_optional",
+    "driver": null,
+    "cuda_runtime": "12.8",
+    "cudnn": 91002,
+    "torch": "2.8.0+cu128",
+    "python": "3.12.13",
+    "platform": "Linux-6.12.94-123.190.amzn2023.x86_64-x86_64-with-glibc2.35",
+    "pixi_lock_sha256": "360c372997ea7f9ba89abcf87796e57ebcd2fdbc9734489666120073752e7244",
+    "pip_freeze_sha256": "e628e015428aac21df8691708e95db947029fb230b8323ef0fdc3eb1e56f2133",
+    "frozen_config_sha256": "5c1d930629cf1d4a50a642be36fd6ea59b9d58b8bf332c176b657c6dc9d10902"
+  },
+  "initialization": {
+    "architecture": "vit_base14",
+    "image_size": 224,
+    "source_keys": 223,
+    "target_keys": 175,
+    "mapped_source_keys": 223,
+    "missing_keys": [],
+    "unexpected_keys": [],
+    "tensor_shapes_verified": true,
+    "target_dtype": "torch.float32",
+    "position_interpolation": {
+      "source_tokens": 1370,
+      "target_tokens": 257,
+      "mode": "bicubic",
+      "antialias": true
+    },
+    "pre_step_clip_equality": {
+      "keys": 175,
+      "sha256": "71404209846b2487c36fc8da8a92a6b73513fa4aeeab3e10597a990fa058672d"
+    },
+    "pre_step_teacher_equality": {
+      "keys": 175,
+      "sha256": "71404209846b2487c36fc8da8a92a6b73513fa4aeeab3e10597a990fa058672d"
+    }
+  },
+  "data": {
+    "kind": "self-authored/dummy",
+    "rows": 8,
+    "lineage_sha256": "a62eda0034a1b1423bb68e57b471ceaf8c9ea26298f58343c124562402a4af64",
+    "restricted_data_used": false
+  },
+  "schedule": {
+    "ordering": ["contrastive", "contrastive", "contrastive", "contrastive", "mlm", "dinov2"],
+    "contrastive": {
+      "loss": 0.744965672492981,
+      "finite": true,
+      "gradient_tensors": 376,
+      "nonzero_gradient_tensors": 376,
+      "optimizer_update_verified": true
+    },
+    "mlm": {
+      "loss": 11.126591682434082,
+      "finite": true,
+      "gradient_tensors": 6,
+      "nonzero_gradient_tensors": 6,
+      "optimizer_update_verified": true
+    },
+    "dinov2_ibot": {
+      "dino_global_crops_loss": 2.838909149169922,
+      "ibot_loss": 1.4305472373962402,
+      "total_loss": 7.0313098430633545,
+      "finite": true,
+      "gradient_tensors": 191,
+      "nonzero_gradient_tensors": 191,
+      "optimizer_update_verified": true,
+      "post_ssl_sync": {
+        "keys": 175,
+        "sha256": "3cb4cd105c79af8dd555ad8ec85ea3ae56c922ff5546d99f58abf5643575c3c3"
+      }
+    }
+  },
+  "checkpoint_resume": {
+    "checkpoint_sha256": "f198a58369e445acb487ea1bb1ba9b89c6762fbc54380f75d5b37acd06c99a48",
+    "stored_outside_repository": true,
+    "config_and_lineage_equal": true,
+    "scheduler_state_restored": true,
+    "ssl_iteration_restored": 1,
+    "next_objective": "contrastive",
+    "next_loss_within_predeclared_tolerance": true,
+    "criterion": {"rtol": 1e-05, "atol": 1e-06}
+  },
+  "evaluator": {
+    "official_interface": "apps.baselines.clip.trained_extractor.ContrastiveFeatureExtractor",
+    "feature_shape": [2, 64],
+    "similarity_shape": [2, 2],
+    "noun_wiring": "complete",
+    "adjective_wiring": "complete",
+    "lexical_macro_wiring": "complete",
+    "fixture_sha256": "edfd3556180966d436b8a1d03193dd7de2e359d6c846c934c83f1d2700a9fd2e",
+    "scientific_result_retained": false
+  },
+  "runtime": {
+    "entrypoint_wall_time_seconds": 48.722988,
+    "peak_cuda_memory_bytes": 12754437120,
+    "network_destinations": [
+      "github.com/facebookresearch/egobabyvlm",
+      "huggingface.co/facebook/dinov2-base",
+      "huggingface.co/google-bert/bert-base-uncased"
+    ]
+  },
+  "proof_limits": {
+    "scientific_score_retained": false,
+    "restricted_data_used": false,
+    "distributed_behavior": "untested",
+    "driver_version": "not_exposed_by_runtime_probe",
+    "claim": "Engineering compatibility only; no scientific efficacy or commercial clearance."
+  }
+}

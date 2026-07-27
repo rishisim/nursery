@@ -540,6 +540,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         pip_freeze = subprocess.check_output([sys.executable, "-m", "pip", "freeze"], text=True)
         env_hash = hashlib.sha256(pip_freeze.encode()).hexdigest()
         pixi_lock = upstream_root / "pixi.lock"
+        driver_version = subprocess.check_output(
+            ["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
+            text=True,
+        ).strip().splitlines()[0]
         result = {
             "schema_version": 1,
             "status": "PASS",
@@ -559,7 +563,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "cuda_runtime": torch.version.cuda,
                 "cudnn": torch.backends.cudnn.version(),
                 "gpu": torch.cuda.get_device_name(0),
-                "driver": torch.cuda.driver_version() if hasattr(torch.cuda, "driver_version") else None,
+                "driver": driver_version,
                 "single_gpu": torch.cuda.device_count() == 1,
                 "distributed_smoke": "not_run_budget_optional",
                 "pixi_lock_sha256": file_sha256(str(pixi_lock)),
@@ -606,6 +610,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "proof_limits": frozen["proof_limits"],
         }
         output_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+        if torch.distributed.is_initialized():
+            torch.distributed.destroy_process_group()
         return result
 
 

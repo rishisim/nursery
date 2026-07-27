@@ -30,3 +30,5 @@ def test_upstream_patch_is_narrow_and_attributed() -> None:
 def test_cuda_evaluator_fixture_uses_a_cuda_generator() -> None:
     source = Path("src/nursery_egobaby_preflight/cuda_preflight.py").read_text()
     assert 'torch.Generator(device="cuda").manual_seed(9001)' in source
+    assert '"--query-gpu=driver_version"' in source
+    assert "torch.distributed.destroy_process_group()" in source

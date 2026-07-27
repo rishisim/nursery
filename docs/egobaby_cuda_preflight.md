@@ -1,19 +1,19 @@
 # EgoBabyVLM `triple` public/dummy CUDA preflight
 
-**Status:** INFRASTRUCTURE GATE
+**Status:** PASS
 
-**Decision date:** 2026-07-26
+**Decision date:** 2026-07-27
 
 **Scope:** engineering compatibility only. No scientific experiment, score,
 restricted media, ChildLens material, or BabyView material was used.
 
 ## Decision
 
-Local inspection and platform-independent packaging are complete. The user
-approved the bounded CUDA run and Jobs authentication has been restored. Two
-short failed allocations exposed bootstrap/manifest defects before learner
-execution; both were repaired in place. A real end-to-end CUDA result is still
-mandatory before this record can become PASS.
+Hugging Face Job `6a66ba7e7ef3c0846496a1bf` completed the bounded single-L4
+preflight at the immutable upstream and public-weight pins. The reviewed
+machine-readable result is
+[`results/egobaby_cuda_preflight.json`](../results/egobaby_cuda_preflight.json).
+It establishes engineering compatibility only.
 
 Proposed bounded run:
 
@@ -103,9 +103,12 @@ explicitly resolves `lr` and `min_lr` to `1e-6`; this is shared, nonzero, and
 recorded, and exists solely to demonstrate the required optimizer update.
 
 The connector identifies the account as `rishisim`, and the official hardware
-listing exposes `l4x1`. The two allocations consumed 137 seconds of L4 runtime,
-approximately USD 0.03 at the listed rate. Neither produced a retained artifact
-or learner result.
+listing exposes `l4x1`. Across the repair ledger and final pass, L4 jobs
+consumed 1,692 running seconds, an upper-bound USD 0.376 at the listed USD
+0.80/hour rate. The successful job consumed 150 provider seconds (USD 0.0333
+at that rate); its measured preflight entrypoint was 48.72 seconds. No
+checkpoint, weight, raw log, environment, dataset, or scientific learner result
+was retained.
 
 ## Reproduced upstream invariants
 
@@ -158,7 +161,7 @@ It does not vendor or fork the full upstream learner.
 2. **Public prior with bundled SSL architecture — rejected.** Exact static
    architecture invariant: standard MLP keys cannot strictly initialize the
    bundled SwiGLU/block-chunk model.
-3. **Architecture-matched shared-prior adapter — packaged, awaiting CUDA.**
+3. **Architecture-matched shared-prior adapter — passed on CUDA.**
    This is the only contract-preserving candidate. It uses the frozen learner,
    one ViT-B/14 prior, 224-pixel input, and no random fallback.
 
@@ -178,8 +181,9 @@ evaluator tensor targeted CUDA while its deterministic generator defaulted to
 CPU. The fixture now creates its generator on CUDA; no learner or evaluation
 protocol behavior changed.
 
-The third item has not failed. The three-failed-attempt ENGINEERING NO-GO rule
-has therefore not been reached.
+The final L4 run `6a66ba7e7ef3c0846496a1bf` passed every acceptance invariant.
+The bridge candidate is accepted for engineering compatibility; the no-go rule
+was not reached.
 
 ## Runtime acceptance
 
@@ -199,10 +203,8 @@ The CUDA entrypoint fails closed unless it observes:
 - fabricated noun, adjective, and lexical macro-aggregation wiring with no
   scientific score retained.
 
-Checkpoint, downloads, caches, logs, and temporary fixtures remain outside the
-repository. A successful reviewed aggregate JSON will replace this gate with
-PASS. A CUDA failure will be diagnosed within the frozen constraints and
-recorded here; it will not silently change the learner or prior.
+Checkpoint, downloads, caches, logs, and temporary fixtures remained outside
+the repository. Only the compact reviewed aggregate is retained.
 
 The disposable runner contract is:
 
@@ -217,7 +219,7 @@ pixi run nursery-egobaby-cuda-preflight \
   --output "$OS_TEMP/aggregate.json" \
   --provider hugging-face-jobs \
   --maximum-wall-time 1h \
-  --upper-bound-cost-usd 2.50
+  --upper-bound-cost-usd 0.80
 ```
 
 `$OS_TEMP` must be an OS-managed disposable directory and `$NURSERY_ROOT` the
@@ -225,6 +227,7 @@ reviewed checkout; neither is a repository output root.
 
 ## Next authorized stage
 
-Only the bounded public/dummy CUDA job above. Generator implementation,
-ChildLens preparation, video generation, TTS, ASR, translation, and scientific
-training remain unauthorized.
+Phase 2 is complete. The next protocol stage is the separately authorized
+governance and preregistration work in the architecture review. Generator
+implementation, ChildLens preparation, video generation, TTS, ASR, translation,
+and scientific training remain unauthorized.

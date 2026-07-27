@@ -361,7 +361,7 @@ Approved compute is split:
 | Topic | Frozen now | Deferred until authorized ChildLens access | No-go trigger |
 |---|---|---|---|
 | Estimand | `Synthetic-full` versus `Real-full` at equal \(H\) is primary; lower prospective cost is the paired benefit; `Mixed`/`Real-small` is secondary | Freeze \(H/r\), equivalence margin, cost-ratio threshold, uncertainty procedures, and seeds | Post-hoc margin/cost rule or reclassifying a failed primary comparison as success via `Mixed` |
-| Learner | CLIP+ `triple`, pinned upstream, common public BERT/DINOv2 prior and strict initialization bridge | Governed CUDA runtime reproduction | Cannot prove matched strict sync, all three objectives, and exact resume |
+| Learner | CLIP+ `triple`, pinned upstream, common public BERT/DINOv2 prior and strict initialization bridge; public/dummy single-L4 preflight PASS | Governed scientific CUDA and distributed behavior | Cannot preserve the passed pins/synchronization contract in governed execution |
 | Language/tokenizer | Offline German ASR → English translation; public pinned `bert-base-uncased` | Local model hashes and translation audit on authorized samples | Any network egress or arm-specific processing |
 | Primary benchmark | One frozen English Machine-DevBench Lexical asset for all arms | Vocabulary freeze using only authorized \(C\); generation/filter audit | Per-arm asset, learner-test steering, or unfrozen test |
 | Readiness | Real-only above-chance and positive learning curve before unblinding synthetic | Margins, \(H/r\), nested budgets, seeds from governed design | Gate fails; synthetic outcomes remain sealed |
@@ -372,13 +372,12 @@ Approved compute is split:
 
 ## Phased implementation sequence and stop rules
 
-**Current stage:** this record and its dependency-light manifest smoke check
-are planning/static compatibility work only. The immediate next implementation
-stage is the public compatibility package and public/dummy EgoBabyVLM CUDA
-preflight in phases 1–2. LTX/Wan execution, TTS, generation, ChildLens
-preprocessing, learner training, and scientific evaluation are not current
-work and remain prohibited until their stated prerequisites are authorized and
-passed.
+**Current stage:** phases 1–2 are complete. The public/dummy single-L4
+EgoBabyVLM preflight is PASS, with compact evidence linked below. The next
+stage is phase 3 governance and preregistration, subject to separate
+authorization. LTX/Wan execution, TTS, generation, ChildLens preprocessing,
+learner training, and scientific evaluation are not current work and remain
+prohibited until their stated prerequisites are authorized and passed.
 
 1. **Public compatibility package.** Vendor the pinned upstream revision or
    record an immutable dependency, freeze lockfile SHAs and licenses, define
@@ -388,11 +387,13 @@ passed.
 2. **Public/dummy CUDA preflight.** On approved public-data CUDA, resolve the
    official environment, build and verify the common DINOv2 initialization
    bridge, and run a tiny self-authored step for contrastive, MLM, and DINO/iBOT
-   plus checkpoint/resume and a tiny generated lexical evaluator wiring test.
+   plus checkpoint/resume and a tiny fabricated lexical evaluator wiring test.
    No scientific metric is retained. *Stop* on weight mismatch, loss/config,
    architecture-sync, resume, or distributed/single-GPU inconsistency. *Done
    when:* strict pre-step sync, logs, resolved configs, hashes, and proof limits
-   are reviewed.
+   are reviewed. *Complete:* single-L4 PASS in
+   [`results/egobaby_cuda_preflight.json`](../results/egobaby_cuda_preflight.json);
+   distributed behavior remains explicitly untested.
 3. **Governance and preregistration.** Approve governed CUDA, local ASR and
    translator; freeze \(C\), eligible child/session split, \(H/r\), nested
    real-only budgets, margins, seeds, fixed step, sampling, statistics,
@@ -439,20 +440,19 @@ passed.
 
 ## Bounded public/dummy preflight performed
 
-At the evidence cut-off, a shallow OS-temporary checkout at the pinned commit
-was inspected and removed. No weights, datasets, checkpoints, media, or
-environments were downloaded. A self-authored manifest object with real and
-synthetic variants was checked using only the Python standard library for
-required keys, legal `source_kind`, equal field shape, relative frame paths,
-numeric timestamps, and JSON round-trip; the temporary file was removed.
+The pinned learner and shared public-prior bridge passed the single-NVIDIA-L4
+runtime preflight on 2026-07-27. The run demonstrated strict shared-backbone
+initialization, the full 4:1:1 objective cycle with finite losses/gradients and
+updates, post-SSL synchronization, fresh-runtime checkpoint resume, and the
+official feature extractor plus fabricated noun/adjective lexical aggregation
+wiring. See the compact
+[`CUDA preflight decision report`](egobaby_cuda_preflight.md) and
+[`machine-readable aggregate`](../results/egobaby_cuda_preflight.json).
 
-This proves only that the proposed adapter contract is syntactically coherent
-and can project both source types to the same upstream field shape. Static
-inspection also maps trainer/config/preprocessing/evaluation interfaces. It
-does **not** prove imports, dependency resolution, model/tokenizer loading,
-CUDA/MPS runtime compatibility, numerical correctness, DINO/iBOT training,
-checkpoint resume, Machine-DevBench generation/evaluation, or any scientific
-performance.
+This proves only public/dummy single-GPU engineering compatibility. It does
+not establish scientific performance, distributed equivalence, governed
+restricted-data readiness, commercial clearance, or authorization for any
+later protocol stage.
 
 ## Candidate matrix
 
