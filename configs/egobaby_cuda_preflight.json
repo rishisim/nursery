@@ -10,14 +10,14 @@
       "repository": "facebook/dinov2-base",
       "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415",
       "filename": "model.safetensors",
-      "sha256": "1b02d95733922f87e69d7f7a1deae9395dffa5f975b06a05fc0ff10a1a43c065",
+      "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841",
       "license": "Apache-2.0"
     },
     "text": {
       "repository": "google-bert/bert-base-uncased",
       "revision": "86b5e0934494bd15c9632b12f734a8a67f723594",
       "filename": "model.safetensors",
-      "sha256": "44172b48ce7a9d951000a9d76ae331b155df32c9fd4e93239a233d720f471725",
+      "sha256": "68d45e234eb4a928074dfd868cead0219ab85354cc53d20e772753c6bb9169d3",
       "license": "Apache-2.0"
     }
   },

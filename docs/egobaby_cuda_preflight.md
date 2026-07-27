@@ -9,11 +9,11 @@ restricted media, ChildLens material, or BabyView material was used.
 
 ## Decision
 
-Local inspection and platform-independent packaging are complete. A real CUDA
-run is mandatory before this record can become PASS, and no already-running or
-previously approved CUDA job was available. The configured Hugging Face account
-can submit Jobs, but a new GPU Job is billable and therefore awaits explicit
-approval.
+Local inspection and platform-independent packaging are complete. The user
+approved the bounded CUDA run and Jobs authentication has been restored. Two
+short failed allocations exposed bootstrap/manifest defects before learner
+execution; both were repaired in place. A real end-to-end CUDA result is still
+mandatory before this record can become PASS.
 
 Proposed bounded run:
 
@@ -47,19 +47,25 @@ created:
 4. Official local `hf jobs` CLI fallback: rejected locally as not logged in;
    no API submission occurred.
 
-The connector identifies the account as `rishisim`, can list Jobs, and reported
-no running Jobs. The official hardware listing exposes `l4x1`, so the requested
-flavor exists. Because even the minimal CPU validation fails identically, the
-remaining gate is the Jobs connector/account entitlement or its submission
-authorization, not the preflight payload.
+After Jobs authentication was restored, two L4 allocations ran:
 
-**Cost incurred: USD 0.00.** No remote job ID, GPU allocation, artifact, or log
-was created.
+1. Job `6a66ad8adb23d7a7ec1cf0ba` stopped during bootstrap because Pixi 0.49
+   predates the pinned lockfile schema. No learner code executed.
+2. Job `6a66ade6db23d7a7ec1cf0e2` used Pixi 0.69 and reached the preflight. It
+   failed closed before model initialization because the frozen manifest had
+   recorded Hugging Face/Xet ETags rather than the Git LFS file SHA-256 values.
+   Immutable LFS pointers at the pinned revisions establish the corrected
+   DINO SHA-256 `d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841`
+   and BERT SHA-256
+   `68d45e234eb4a928074dfd868cead0219ab85354cc53d20e772753c6bb9169d3`.
 
-Exact unblock action: restore Jobs submission authorization for the connected
-Hugging Face account, or authenticate the local official CLI with an account
-that has Hugging Face Jobs access. After that external action, rerun the already
-approved single-L4 command below without changing the scientific contract.
+These are environment/manifest repairs to the canonical preflight, not bridge
+attempts and not changes to either public prior.
+
+The connector identifies the account as `rishisim`, and the official hardware
+listing exposes `l4x1`. The two allocations consumed 137 seconds of L4 runtime,
+approximately USD 0.03 at the listed rate. Neither produced a retained artifact
+or learner result.
 
 ## Reproduced upstream invariants
 
