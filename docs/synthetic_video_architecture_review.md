@@ -7,10 +7,15 @@
 **Scope:** public sources and public/synthetic-only pilot design; no ChildLens or
 BabyView media were accessed.
 
-**Current engineering gate:** the bounded public/dummy CUDA compatibility
-package is ready locally but awaits approval for a new billable CUDA runner.
-See [`egobaby_cuda_preflight.md`](egobaby_cuda_preflight.md). This is an
-INFRASTRUCTURE GATE, not an engineering no-go or scientific result.
+**Current stage:** Phase 2 is complete: the bounded public/dummy single-L4
+CUDA compatibility preflight passed. Phase 3 safe protocol work is complete
+but remains at an **INFRASTRUCTURE/PERMISSION GATE** pending positive ChildLens
+data-use confirmation, an approved governed CUDA environment, authorized
+read-only aggregate inventory, named independent roles, and the bounded
+public-only ASR/translation selection. See
+[`synthetic_video_preregistration.md`](synthetic_video_preregistration.md).
+The L4 result is engineering-smoke evidence only, not scientific performance,
+restricted-data readiness, a full-training memory estimate, or DDP evidence.
 
 ## Frozen learner and endpoint decision
 
@@ -356,28 +361,28 @@ Approved compute is split:
    controls. Ordinary hosted GPU services and external APIs are prohibited.
    If no suitable governed CUDA path exists, the empirical study is no-go.
 
-## Decision table
+## Phase 3 decision table
 
-| Topic | Frozen now | Deferred until authorized ChildLens access | No-go trigger |
+| Topic | Status | Owner | Exact unblock action |
 |---|---|---|---|
-| Estimand | `Synthetic-full` versus `Real-full` at equal \(H\) is primary; lower prospective cost is the paired benefit; `Mixed`/`Real-small` is secondary | Freeze \(H/r\), equivalence margin, cost-ratio threshold, uncertainty procedures, and seeds | Post-hoc margin/cost rule or reclassifying a failed primary comparison as success via `Mixed` |
-| Learner | CLIP+ `triple`, pinned upstream, common public BERT/DINOv2 prior and strict initialization bridge; public/dummy single-L4 preflight PASS | Governed scientific CUDA and distributed behavior | Cannot preserve the passed pins/synchronization contract in governed execution |
-| Language/tokenizer | Offline German ASR → English translation; public pinned `bert-base-uncased` | Local model hashes and translation audit on authorized samples | Any network egress or arm-specific processing |
-| Primary benchmark | One frozen English Machine-DevBench Lexical asset for all arms | Vocabulary freeze using only authorized \(C\); generation/filter audit | Per-arm asset, learner-test steering, or unfrozen test |
-| Readiness | Real-only above-chance and positive learning curve before unblinding synthetic | Margins, \(H/r\), nested budgets, seeds from governed design | Gate fails; synthetic outcomes remain sealed |
-| Real safeguard | Child/session-disjoint temporal frame–utterance retrieval | Feasible split counts, duplicate audit, candid model-derived label | No independent test children or irreparable clip leakage |
-| Accounting | Equal-hour equivalence plus prospective like-for-like cost comparison; \(C\) separate and excluded | Freeze \(C\), eligible learner pool, cost ledger, amortization, and uncertainty rules | Synthetic cost omits failures/development or treats existing real acquisition as free |
-| Compute/privacy | Public/dummy hosted CUDA allowed; restricted data only governed CUDA | Infrastructure approval and egress test | Restricted material would leave governed boundary |
-| Licensing | CC BY-NC research boundary and attribution | Institutional review of all model/data licenses | Commercial use without separate permission/reimplementation |
+| Estimand, learner, common benchmark, split/credit rules, analysis, cost, sealing | `FROZEN` | PI/statistician/custodian | Preserve the canonical preregistration and fill only its blind numeric fields |
+| ChildLens consent and planned derived uses | `INFRASTRUCTURE/PERMISSION GATE` | Institutional data steward | Issue written permission determination for every material/use class |
+| Governed restricted-data CUDA | `INFRASTRUCTURE/PERMISSION GATE` | Institution/IT security | Qualify a named system, including observed egress and deletion tests |
+| \(H/r\) and independent split feasibility | `REQUIRES CONFIRMATION` | Data steward/statistician | Authorize the minimal aggregate-only inventory and apply the frozen selection algorithm |
+| DDP | `REQUIRES CONFIRMATION` | Technical lead | Size blindly; if multi-process is required, pass a separately approved public/dummy DDP preflight |
+| ASR/translation weights | `REQUIRES CONFIRMATION` | Language/technical lead | Complete the bounded public-language no-egress selection and pin hashes/licenses |
+| Human German validation | `INFRASTRUCTURE/PERMISSION GATE` | PI/data steward | Name and authorize a qualified German-speaking rater or retain model-derived claims only |
+| Confirmed incompatible consent/license, infeasible independent split, or no compliant compute path | `NO-GO` | PI/institution | Stop the empirical study; do not weaken the frozen question |
 
 ## Phased implementation sequence and stop rules
 
-**Current stage:** phases 1–2 are complete. The public/dummy single-L4
-EgoBabyVLM preflight is PASS, with compact evidence linked below. The next
-stage is phase 3 governance and preregistration, subject to separate
-authorization. LTX/Wan execution, TTS, generation, ChildLens preprocessing,
-learner training, and scientific evaluation are not current work and remain
-prohibited until their stated prerequisites are authorized and passed.
+**Current stage:** phases 1–2 are complete. Phase 3's safe decisions and blind
+selection rules are frozen in the canonical
+[`governance/preregistration`](synthetic_video_preregistration.md), but Phase 3
+is **not PASS**: it is at an **INFRASTRUCTURE/PERMISSION GATE** with exact
+unblock actions recorded there. LTX/Wan execution, common asset construction,
+TTS, generation, ChildLens preprocessing, learner training, and scientific
+evaluation remain prohibited.
 
 1. **Public compatibility package.** Vendor the pinned upstream revision or
    record an immutable dependency, freeze lockfile SHAs and licenses, define
@@ -394,12 +399,14 @@ prohibited until their stated prerequisites are authorized and passed.
    are reviewed. *Complete:* single-L4 PASS in
    [`results/egobaby_cuda_preflight.json`](../results/egobaby_cuda_preflight.json);
    distributed behavior remains explicitly untested.
-3. **Governance and preregistration.** Approve governed CUDA, local ASR and
-   translator; freeze \(C\), eligible child/session split, \(H/r\), nested
-   real-only budgets, margins, seeds, fixed step, sampling, statistics,
-   exposure reporting, and blinding. *Stop* if independent test children,
-   permissions, or compute isolation are inadequate. *Done when:* signed
-   lineage/accounting and analysis plans exist without opening synthetic scores.
+3. **Governance and preregistration.** The protocol, blind selection rules,
+   lineage/accounting, analysis, cost, and sealing plans are frozen. Exact
+   numeric ChildLens values remain governed inputs, not guesses. *Current:
+   INFRASTRUCTURE/PERMISSION GATE.* *Done when:* written ChildLens permission,
+   governed CUDA qualification, authorized aggregate inventory, named
+   independent roles, resolved single-GPU/DDP route, and pinned or sole-
+   remaining bounded public-only ASR/translation substage are signed without
+   opening synthetic scores.
 4. **Common evaluation assets.** Using only \(C\) and public resources, freeze
    one Machine-DevBench Lexical asset; from evaluation-only children/sessions,
    freeze the real temporal-retrieval asset. Neither may steer generation.
@@ -707,10 +714,9 @@ change the selected family.
 
 ## Deferred by design
 
-This review does not implement the runner, choose a TTS vendor, set a monetary
-budget, create ChildLens splits, inspect any recordings, run generation, or
-download weights. Those choices require separate engineering, governance, and
-resource approvals. A later protocol may fill in operational constants, but it
-must preserve the learner, two-candidate cap, modular architecture, gates, stop
-rules, and decision rule frozen here unless a new prospective review supersedes
-this document through Git history.
+This review and its canonical preregistration do not create ChildLens splits,
+inspect recordings or participant records, run generation, download new
+weights, or start common assets/training. Numeric governed inputs may be filled
+only through the registered blind procedures. Later amendments update these
+canonical files in place through Git history; they may not silently change the
+learner, question, gates, or decision rules.

@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "phase": 3,
+  "status": "INFRASTRUCTURE_PERMISSION_GATE",
+  "headline_question": "At equal H video hours, does EgoBabyVLM CLIP+ triple trained on Synthetic-full achieve lexical-grounding performance equivalent to Real-full, while the synthetic corpus has lower prospectively measured production cost?",
+  "learner": {
+    "upstream_commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "mode": "triple",
+    "schedule": {
+      "contrastive": 4,
+      "mlm": 1,
+      "dinov2": 1
+    },
+    "single_l4_engineering_pass_commit": "1e8e94dbec4ad1ed701298f2c0ebb58cca26c877",
+    "single_l4_peak_cuda_memory_bytes": 12754437120,
+    "proof_limits": [
+      "public_dummy_only",
+      "not_scientific_performance",
+      "not_restricted_data_readiness",
+      "ddp_untested",
+      "not_full_training_memory_estimate"
+    ]
+  },
+  "arms": {
+    "Real-full": "H_real",
+    "Synthetic-full": "H_synthetic",
+    "Real-small": "r_real",
+    "Mixed": "r_real_plus_H_minus_r_synthetic"
+  },
+  "comparisons": {
+    "primary": "Synthetic-full_minus_Real-full_two_sided_equivalence",
+    "secondary_ordered": [
+      "Mixed_minus_Real-full_two_sided_equivalence",
+      "Mixed_minus_Real-small_one_sided_superiority"
+    ]
+  },
+  "endpoint": {
+    "primary": "mean_of_realistic_noun_macro_accuracy_and_realistic_adjective_macro_accuracy",
+    "common_asset_across_arms": true,
+    "generated_images": true,
+    "held_out_real_safeguard": "model_derived_temporal_frame_utterance_transfer"
+  },
+  "analysis": {
+    "familywise_alpha": 0.05,
+    "equivalence_ci_level": 0.90,
+    "other_ci_level": 0.95,
+    "minimum_common_seeds": 3,
+    "bootstrap_replicates": 10000,
+    "equivalence_margin_bounds_absolute": [
+      0.02,
+      0.05
+    ],
+    "minimum_power": 0.80,
+    "checkpoint_rule": "same_fixed_4_1_1_cycle_count_all_arms_and_seeds",
+    "failed_seed_rule": "exclude_common_seed_from_paired_primary_report_and_run_worst_case_sensitivity",
+    "zero_exposure_in_primary": true
+  },
+  "split": {
+    "minimum_children": {
+      "training": 3,
+      "evaluation": 2,
+      "calibration_C": 2,
+      "validation": 1
+    },
+    "target_proportions": {
+      "training": 0.50,
+      "evaluation": 0.20,
+      "calibration_C": 0.20,
+      "validation": 0.10
+    },
+    "assignment": "largest_remainder_counts_then_keyed_hash_deal_whole_children"
+  },
+  "language": {
+    "learner_path": "identical_offline_German_ASR_to_English_translation",
+    "synthetic_oracle_text": "QA_only",
+    "tokenizer": "bert-base-uncased",
+    "exact_asr_model": null,
+    "exact_translation_model": null,
+    "selection_substage": "bounded_public_language_only"
+  },
+  "gates": {
+    "childlens_data_use_confirmation": "MISSING",
+    "governed_cuda_qualification": "MISSING",
+    "authorized_read_only_aggregate_inventory": "MISSING",
+    "named_independent_roles": "MISSING",
+    "ddp": "MANDATORY_IF_RESOURCE_SIZING_REQUIRES_MULTIPLE_PROCESSES",
+    "asr_translation": "PUBLIC_ONLY_BOUNDED_SELECTION_REQUIRED",
+    "phase4_authorized": false
+  },
+  "no_go_triggers": [
+    "confirmed_consent_or_license_incompatibility",
+    "no_independent_evaluation_design_under_frozen_rules",
+    "no_compliant_restricted_data_compute_path_after_alternatives_exhausted"
+  ],
+  "unblinding": {
+    "synthetic_scores_sealed_until_real_only_gate_passes": true,
+    "hash_commitment": "SHA-256_in_append_only_institutional_store",
+    "no_post_hoc_margin_benchmark_seed_or_primary_claim_change": true
+  },
+  "cost": {
+    "currency": "USD",
+    "base_year": "generation_start_calendar_year",
+    "existing_childlens_cost_is_zero": false,
+    "primary_ratio": "synthetic_fully_loaded_over_prospective_real_fully_loaded",
+    "pass_rule": "upper_95_percent_uncertainty_bound_below_1"
+  }
+}

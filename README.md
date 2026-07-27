@@ -64,10 +64,12 @@ modular video and German-TTS architecture, Wan 2.2 TI2V-5B and LTX-2 as the
 only public-pilot generator candidates, and a prospective no-substitution pilot
 protocol. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
-No pilot has been executed and no generator dependency has been installed.
-The next stage is public/dummy EgoBabyVLM compatibility work on CUDA—not LTX,
-Wan, TTS, ChildLens preprocessing, generation, or learner training.
-The local compatibility package and exact CUDA acceptance contract are
-documented in
-[`docs/egobaby_cuda_preflight.md`](docs/egobaby_cuda_preflight.md); its current
-status is an infrastructure/cost-approval gate.
+No generator pilot has been executed and no generator dependency has been
+installed. The public/dummy single-L4 EgoBabyVLM compatibility preflight is
+complete and passed as engineering evidence only; DDP and restricted-data
+readiness remain unproven. Phase 3 safe governance/preregistration decisions
+are now frozen, but its status is **INFRASTRUCTURE/PERMISSION GATE**, not PASS.
+Exact unblock actions are in
+[`docs/synthetic_video_preregistration.md`](docs/synthetic_video_preregistration.md).
+Common assets, LTX/Wan, TTS, ChildLens preprocessing, generation, and learner
+training remain unauthorized.
