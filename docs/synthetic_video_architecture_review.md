@@ -7,58 +7,406 @@
 **Scope:** public sources and public/synthetic-only pilot design; no ChildLens or
 BabyView media were accessed.
 
-## Decision
+## Frozen learner and endpoint decision
 
-The primary downstream learner will be a **CVCL-style frame-plus-transcript
-contrastive learner**, reproduced from the public method and adapted only where
-needed for the study's frozen vocabulary and language. It consumes sampled
-frames paired with timed, normalized transcripts; it does not consume audio
-waveforms. The primary downstream claim is a real-data-efficiency claim:
-synthetic augmentation reaches a predeclared held-out-real performance target
-with less real training data than real-only training. Synthetic-only parity is
-a stronger secondary target, not the success criterion.
+The fixed learner is **EgoBabyVLM CLIP+ in `triple` mode**: image–text
+InfoNCE steps interleaved 4:1:1 with BERT masked-language-model (MLM) and
+DINOv2 DINO/iBOT self-supervised steps. The primary standardized endpoint is
+**Machine-DevBench Lexical**, reported separately for nouns and adjectives and
+as one prespecified macro-average of those two task accuracies. Chance is 50%.
+CVCL is a conceptual predecessor and may be used only as an optional
+interpretability reference; it is neither the primary learner nor endpoint.
 
-This choice is preferable to raw audiovisual learning because CVCL directly
-tests the intended grounded word-learning mechanism at tractable scale and has
-both the original 61-hour result and a subsequent 500+ hour robustness study.
-It is preferable to a BabyView vision/language baseline because BabyView data
-are unavailable to this project and its reported baselines emphasize broad
-visual transfer rather than the timed word–referent claim. DevBench is retained
-only as an optional external evaluation battery after a vocabulary/task
-coverage gate; it is not the learner or the primary endpoint.
+The primary estimand is whether synthetic augmentation reduces learner-stage
+real-data requirements:
 
-Consequences are explicit:
+| Arm | Allocated learner data |
+|---|---|
+| `Real-full` | \(H\) real hours |
+| `Synthetic-full` | \(H\) synthetic hours |
+| `Real-small` | \(r\) real hours |
+| `Mixed` | \(r\) real + \(H-r\) synthetic hours, \(r < H\) |
 
-- accurate transcripts and word timing relative to visible referents are
-  required;
-- realistic speech waveforms are required for the blinded audiovisual fidelity
-  endpoint, but not for primary learner training;
-- the canonical architecture is **modular video plus separately controlled
-  licensed German TTS**, synchronized from one episode plan;
-- native joint audio is diagnostic-only in the pilot and cannot replace the
-  canonical TTS track unless it passes the same exact transcript/timing gates;
-- the only later technical-pilot candidates are **Wan 2.2 TI2V-5B** and
-  **LTX-2/LTX-2.x**. The frozen pilot compares at most these two families and
-  cannot add a replacement after seeing results.
+Success requires `Mixed` to have **equivalent lexical-grounding performance**
+to `Real-full` within a frozen two-sided equivalence margin and to be superior
+to `Real-small`; the margin, alpha, confidence-interval procedure, seeds, \(H\),
+and \(r\) must be preregistered from public/dummy engineering and blinded
+real-only planning, before synthetic scores are opened. `Synthetic-full`
+equivalence to `Real-full` is a stronger secondary result. This does not
+establish “the same linguistic acquisition.”
 
-## Downstream study contract
+There is a mandatory readiness gate before any synthetic-arm result is opened:
+the identically configured real-only CLIP+ learner must (a) be meaningfully
+above 50% on the frozen lexical aggregate, with its prespecified confidence
+interval excluding 50% by the declared practical margin, and (b) show a
+positive, uncertainty-qualified real-data learning curve over at least three
+nested real-hour budgets. Failure stops the synthetic comparison and triggers
+learner/protocol diagnosis using real-only results; it must not trigger
+benchmark, seed, or arm-specific retuning.
 
-The learner input unit is one transcript utterance paired with sampled frames
-from its temporal window, following CVCL's dual-encoder contrastive setup.
-Before any downstream run, freeze: tokenizer and German normalization,
-vocabulary, utterance inclusion rules, frame sampling, window width, negative
-sampling, initialization, optimization budget, seeds, and held-out-real splits.
-Use the same learner code and optimization budget in every arm.
+Machine-DevBench images are generated (officially, FLUX-generated realistic
+and cartoon styles), not held-out ChildLens frames. It therefore cannot be
+called a held-out-real endpoint. The standardized primary endpoint is paired
+with a required, separately reported **held-out-real ChildLens temporal
+frame–utterance retrieval safeguard** defined below. Both remain in the
+downstream evaluation family.
 
-The later governed study must use nested real-data fractions (provisionally
-`{5, 10, 25, 50, 100}%`), a fixed synthetic allocation rule declared before
-training, and at least three learner seeds. Compare real-only, real+synthetic,
-and synthetic-only on held-out real data. Define one target score from the
-real-only learning curve without reference to synthetic results. The primary
-estimand is the reduction in real examples/hours required to reach that target,
-with seed-level uncertainty. Equal total optimizer steps and a second
-equal-unique-pair analysis should separate data benefit from extra compute.
-No ChildLens split, target, or statistic is defined in this public-only review.
+Consequences for the generator architecture remain:
+
+- learner transcripts require reliable timing, but the learner does not consume
+  waveforms;
+- realistic speech remains necessary for blinded audiovisual fidelity;
+- the canonical generator is modular video plus separately controlled,
+  licensed German TTS driven from one episode plan;
+- native joint audio remains diagnostic-only;
+- the later public technical pilot remains capped at Wan 2.2 TI2V-5B and
+  LTX-2/LTX-2.x.
+
+## EgoBabyVLM compatibility pin and boundary
+
+This review pins public upstream
+[`facebookresearch/egobabyvlm@224621caf0628270b6115845ac75a65b984234a3`](https://github.com/facebookresearch/egobabyvlm/tree/224621caf0628270b6115845ac75a65b984234a3)
+(2026-06-23), associated with
+[EgoBabyVLM arXiv:2605.19130v1](https://arxiv.org/abs/2605.19130v1).
+The repository is **CC BY-NC 4.0**, including a NonCommercial restriction.
+It may support this noncommercial research with attribution and change notices;
+it is not cleared for a future commercial product. Any product use requires a
+separate implementation/license review rather than assuming research clearance.
+Model and dataset licenses remain separate boundaries and must also be checked.
+
+Exact inspected upstream environment bounds are Linux `linux-64`, Python
+3.12.x, PyTorch 2.8.0, torchvision 0.23.0, CUDA 12.6, transformers 4.57.6,
+torchmetrics 1.7.4, xformers 0.0.32.post2, and torchcodec 0.7.0. Some other
+dependencies are ranges or unpinned Git `main` revisions; the later
+implementation must archive the resolved Pixi lock and Git SHAs, not merely
+repeat the declared ranges.
+
+### Source-to-local component map
+
+| Upstream pinned component | Nursery responsibility | Compatibility decision |
+|---|---|---|
+| `apps/data_preprocessing/{frames,transcription,manifests}` | Governed frame extraction, frozen ASR, split ledger, learner manifest | Adapt manifest builder to episode IDs and externally frozen child/session splits; do not use upstream random video-level splitting |
+| `apps/baselines/clip/data/captions.py` + `configs/data/ego4d.yaml` | Load one utterance with one randomly selected in-window frame for train and deterministic validation frame behavior | Reuse interface; add no second learner implementation |
+| `apps/baselines/clip/training` + `configs/mode/triple.yaml` | Four-arm CLIP+ training and checkpoint ledger | Vendor pinned code or a minimal attributed patch; freeze 4:1:1 interleave, initialization, schedules, and selection before governed runs |
+| `apps/baselines/clip/modeling/{text_encoder,dinov2_ssl}.py` | English BERT MLM plus DINO/iBOT auxiliary objectives | Use identical arm-local text and images; no cross-arm auxiliary corpus |
+| `apps/benchmark_creation/pipeline` | Build one corpus-grounded lexical asset | Run once on a frozen development vocabulary, never per arm; retain hashes and generation/filter manifests |
+| `evaluation/multimodal/devbench` | Noun, adjective, and lexical macro-average | Evaluate every checkpoint on the same frozen generated asset |
+| New thin Nursery adapter, later | Held-out-real temporal frame–utterance retrieval | Required because upstream Machine-DevBench has no real-frame transfer endpoint |
+
+Upstream `triple` is a single training process that round-robins four
+contrastive, one MLM, and one DINO/iBOT step, copying the SSL teacher backbone
+into the CLIP vision tower after each SSL block. Its documented reference
+invocation uses four processes/GPUs. **At the pinned commit, that example is
+not runnable as written:** `triple` enables vision sync, but
+`dinov2.pretrained_dir` defaults to null; trainer validation requires a
+pretrained DINO/iBOT checkpoint and also requires the contrastive vision
+backbone to match the SSL teacher's architecture and image size exactly. The
+default Hub DINOv2 encoder plus bundled 224-pixel SSL config does not satisfy
+that contract. This is an upstream compatibility issue, not evidence that
+`triple` ran locally.
+
+Nursery therefore freezes this initialization sequence: pin one public
+DINOv2 ViT-B/14 prior; in public/dummy CUDA preflight, implement or verify the
+smallest attributed bridge that loads those same hashed backbone weights into
+both the bundled 224-pixel `CustomDINOv2VisionEncoder` and the DINO/iBOT
+teacher/student checkpoint format expected by `pretrained_dir`; verify strict
+state-dict sync before the first step. All arms and seeds begin from that same
+public vision prior and public BERT-base prior, with only projection/MLM heads
+seeded per the shared seed schedule. If a byte-identical, architecture-matched
+bridge cannot be demonstrated, the CLIP+ protocol is no-go rather than falling
+back to random or arm-specific initialization. This is a minimal documented
+departure from the upstream example command, not from its trainer's enforced
+contract.
+
+Checkpoints contain model, optional MLM and DINO state,
+optimizer/scheduler state, resolved Hydra config, epoch, step, and best
+validation loss; `latest.pt` supports resume and `best.pt` follows validation
+loss. Nursery will retain those mechanics but freeze a task-independent step
+for primary evaluation rather than select on Machine-DevBench or held-out-real
+test scores.
+
+### Proposed learner input contract
+
+Both real and synthetic episodes compile to the same flat learner manifest:
+
+```json
+{
+  "episode_id": "opaque_stable_id",
+  "source_kind": "real|synthetic",
+  "split": "train|validation|test",
+  "child_id": "governed_real_id|null",
+  "session_id": "governed_session_id|synthetic_plan_id",
+  "utterance_id": "episode_id:u0001",
+  "utterance_de": "private_qa_only_german_text",
+  "utterance_en": "offline_frozen_translation_or_asr_translation",
+  "frame_filenames": ["relative/episode/frame_000123.jpg"],
+  "timestamps_s": [4.1],
+  "utterance_start_s": 3.7,
+  "utterance_end_s": 4.8,
+  "duration_credit_s": 6.0,
+  "asr_pipeline_id": "frozen_local_pipeline_hash",
+  "translation_pipeline_id": "frozen_local_pipeline_hash",
+  "media_sha256": ["..."],
+  "lineage_id": "governed_ledger_reference"
+}
+```
+
+The direct upstream view presented to `Ego4DCaptionsDataset` contains only
+`utterance` (from `utterance_en`), `frame_filenames`, `timestamps`,
+`utterance_num`, `video_filename`, `transcript_filename`, and `num_frames`.
+The richer governed sidecar is authoritative for split, privacy, accounting,
+and lineage. Paths must be relative, stay inside the governed root, and resolve
+only after access authorization. Synthetic rows use null `child_id`, but the
+same schema, sampling, ASR, translation, and inclusion rules.
+
+## Frozen protocol choices
+
+### Language and tokenizer
+
+**Decision: use an identical, offline German-to-English path for all real and
+synthetic learner transcripts and build/evaluate Machine-DevBench in English.**
+German audio remains the generated and fidelity-evaluation language. The
+translator is frozen before data processing, runs only inside the governed
+boundary, preserves utterance/timing IDs, and emits no network telemetry.
+Synthetic oracle German text is QA metadata only: rendered synthetic audio must
+pass through the same frozen ASR and translation path as real audio.
+
+This is preferable now to a German-native benchmark because upstream lexical
+caption templates, adjective antonyms, noun categories, filters, BERT model,
+and evaluations are English-oriented; German case/gender/inflection would
+require morphological lemmatization and native-speaker validation that the
+project currently lacks. Model-derived German judgments cannot substitute for
+that validation. Selecting translation narrows the claim to
+**English-mediated lexical grounding from translated German speech**, with
+translation/ASR noise part of the measurement pipeline. A future German-native
+protocol is deferred, not run in parallel; it would require an authorized
+German-speaking annotator, validated inflection/lemma and distractor rules, and
+a separately preregistered study.
+
+**Tokenizer decision: use the fixed public upstream
+`bert-base-uncased` tokenizer and matching pretrained BERT-base initialization
+in every arm, pinned by immutable Hugging Face revision and file hashes.**
+Do not fit a tokenizer on ChildLens, synthetic text, combined full-real text,
+or per-arm text. A public/dummy-fitted tokenizer would add unnecessary
+departure and weak comparability; per-arm tokenizers would change model
+capacity and leak arm identity. The public English tokenizer consumes no
+ChildLens text and therefore cannot leak `Real-full` vocabulary into
+`Synthetic-full`. This follows upstream exactly, but the immutable model
+revision/hash is an additional Nursery reproducibility requirement.
+
+### One common Machine-DevBench Lexical asset
+
+Create exactly one English noun/adjective benchmark before learner training
+from a **frozen development vocabulary**: public lexical resources plus only
+the authorized generator-development/calibration corpus described in the
+accounting section. Never derive it from `Real-full`, any arm-specific
+manifest, or learner outcomes, and never regenerate it per arm. Freeze source
+vocabulary/lemma list, part-of-speech and morphology processing, noun
+categories, adjective antonyms, frequency-bin boundaries, prompts, image model
+and weights, generation seeds, filters, final manifests, and hashes. Build both
+official styles once; the realistic-style noun and adjective macro-average is
+primary, with cartoon style diagnostic unless preregistration instead freezes
+their average before any learner result.
+
+Each score report includes per-concept accuracy and, for every arm/budget,
+training exposure count after ASR/translation and frame filtering. Primary
+inference uses the full frozen benchmark and reports exposure-stratified
+sensitivity results (`0`, `1–k`, `>k`) without dropping zero-exposure concepts
+post hoc. Vocabulary coverage is a property to report, not a reason to build an
+easier arm-specific test. Test concepts and benchmark images/prompts are
+firewalled from generator prompting, episode selection, retries, QA thresholds,
+and learner checkpoint selection. Accidental overlap with naturally chosen
+episode concepts is measured, not optimized.
+
+The report must state that all Machine-DevBench visual stimuli are generated,
+that the generator differs from or may resemble the training generator, and
+that this creates an evaluation-domain confound. Results are standardized
+generated-image lexical transfer, not held-out-real ChildLens performance.
+
+### Learner fairness contract
+
+- Start every seed/arm from byte-identical public BERT-base and the
+  architecture-matched DINOv2 ViT-B/14 bridge specified above;
+  projection/MLM heads use the same seeded initialization procedure. This
+  common public prior is declared, hashed, and excluded from real-hour counts;
+  no ChildLens-derived initialization pretraining is allowed.
+- Keep `triple`, 4:1:1 interleave, DINO/iBOT configuration, MLM mask rate,
+  augmentations, image resolution, optimizer, learning-rate schedule, batch
+  sizes, precision, gradient accumulation, stopping step, and checkpoint rule
+  identical. Validate that the common DINOv2 backbone and bundled SSL student
+  architectures match before launch.
+- Auxiliary data are arm-local: MLM lines are only that arm's allocated
+  translated utterances and DINO/iBOT images are only that arm's allocated
+  frames. Repetition needed to reach the common step budget is logged. No
+  `Real-small` or `Synthetic-full` auxiliary objective may see `Real-full`.
+- Sample frames at the frozen rate and upstream midpoint convention; use the
+  same utterance-window rule and one seeded in-window frame draw per
+  contrastive access. Store frame-list hashes and sampler seeds.
+- Match credited input duration: every arm totals \(H\) hours except
+  `Real-small` at \(r\). `Mixed` totals \(H\). Also match total optimizer steps
+  and the count of each objective step across arms. Report unique
+  utterances/frames, repetitions, accepted speech duration, and a secondary
+  equal-unique-pair sensitivity analysis.
+- Use at least three prespecified learner seeds shared across arms. Select one
+  fixed optimizer step established without benchmark/test feedback; validation
+  loss may diagnose training but must not create arm-specific stopping.
+- Real audio and rendered synthetic audio use the same frozen local ASR,
+  confidence threshold, utterance normalization, and offline translation.
+  Oracle synthetic transcripts and plan labels are QA/lineage metadata only
+  and cannot enter contrastive or MLM training.
+- Resume only from a same-arm, same-seed checkpoint whose resolved config and
+  data hashes match. Record all latest/epoch checkpoints in ignored governed
+  run storage; retain only preregistered aggregate results and manifests in Git.
+
+### Real-data accounting and estimand boundary
+
+**Decision: the first study makes a learner-stage reduction claim conditional
+on one fixed generator-development/calibration corpus \(C\), not an end-to-end
+real-data reduction claim.** Before looking at final outcomes, freeze and
+report \(C\)'s unique children, sessions, hours, permitted derived statistics,
+and every use: vocabulary proposal, generator calibration, prompt/QA tuning,
+benchmark construction, and fidelity reference. No record in \(C\) may enter
+learner training or either evaluation. Final training/evaluation children and
+sessions must be disjoint from \(C\).
+
+The learner's `Real-small` and real portion of `Mixed` are the same nested
+\(r\)-hour subset of the eligible training pool. They may not inherit
+vocabulary, prompts, QA thresholds, translations, embeddings, or summaries
+computed from the remainder of `Real-full`. The fixed generator may use only
+\(C\), public inputs, and its episode plans to produce synthetic data. Thus an
+\(r\)-hour arm never indirectly consumes \(H\) learner-pool hours. Report
+learner real hours and \(C\) hours separately. Any later end-to-end reduction
+claim requires a new protocol that charges \(C\) against the real-data budget;
+it is not implied by this study.
+
+### Held-out-real transfer safeguard
+
+After authorized access, freeze a ChildLens temporal frame–utterance retrieval
+test before training. Assign whole children to train/development/test where
+sample size permits; otherwise the study is **no-go for confirmatory real-domain
+claims** unless an approved leave-one-child-out design was preregistered.
+Within each held-out child, assign whole sessions to exactly one split. Remove
+near-duplicate/overlapping clips across sessions using timestamps and governed
+hash/embedding duplicate checks. No frame, utterance, temporal neighbor, child,
+or session from test may enter \(C\), generator development, benchmark
+construction, learner training, thresholds, or checkpoint selection.
+
+For each test utterance, choose a prespecified visible frame from its temporal
+window and contrast the correct utterance against matched within-session
+temporal negatives outside an exclusion buffer; run the reciprocal
+utterance-to-frame retrieval as a secondary direction. Freeze negative count,
+time-distance strata, utterance-length strata, frame rule, and Recall@1 /
+mean-reciprocal-rank aggregation. Use the same asset and candidates for every
+arm. Because current transcripts and visibility/alignment may be ASR- and
+model-derived, label this endpoint **model-derived temporal alignment
+transfer**, not referent ground truth or lexical accuracy. It becomes a
+governed real-frame lexical subset only after independent authorized human
+validation of referents and labels under a separate frozen annotation protocol.
+
+### Compute, privacy, and governance
+
+This Apple Silicon host can perform source review, JSON/schema tests, manifest
+hashing, split-logic unit tests, configuration composition only if dependencies
+are already safely available, and tiny dependency-light loader tests. It cannot
+validate the official environment: upstream Pixi supports only `linux-64` and
+declares CUDA 12.6; the trainer chooses CUDA or CPU, never MPS; the documented
+`triple` recipe uses four GPUs; Machine-DevBench evaluation currently selects
+`cuda` directly; benchmark image generation and filtering are GPU/SLURM
+oriented. CPU code paths do not establish practical training support.
+
+Approved compute is split:
+
+1. Public/dummy CI and a tiny public-data triple/evaluation smoke test may run
+   on institutionally approved or ordinary hosted CUDA because it contains no
+   ChildLens material. First reproduce environment resolution, config,
+   checkpoint/resume, one step of each objective, and lexical evaluator wiring
+   at the pinned commit. A single-GPU triple attempt is exploratory until it is
+   shown numerically equivalent to the reference distributed semantics.
+2. ChildLens frames, audio, transcripts, translations, embeddings, prompts
+   derived from them, and restricted metadata may run only on an approved
+   governed CUDA system with storage, access, logging, retention, and egress
+   controls. Ordinary hosted GPU services and external APIs are prohibited.
+   If no suitable governed CUDA path exists, the empirical study is no-go.
+
+## Decision table
+
+| Topic | Frozen now | Deferred until authorized ChildLens access | No-go trigger |
+|---|---|---|---|
+| Learner | CLIP+ `triple`, pinned upstream, common public BERT/DINOv2 prior and strict initialization bridge | Governed CUDA runtime reproduction | Cannot prove matched strict sync, all three objectives, and exact resume |
+| Language/tokenizer | Offline German ASR → English translation; public pinned `bert-base-uncased` | Local model hashes and translation audit on authorized samples | Any network egress or arm-specific processing |
+| Primary benchmark | One frozen English Machine-DevBench Lexical asset for all arms | Vocabulary freeze using only authorized \(C\); generation/filter audit | Per-arm asset, learner-test steering, or unfrozen test |
+| Readiness | Real-only above-chance and positive learning curve before unblinding synthetic | Margins, \(H/r\), nested budgets, seeds from governed design | Gate fails; synthetic outcomes remain sealed |
+| Real safeguard | Child/session-disjoint temporal frame–utterance retrieval | Feasible split counts, duplicate audit, candid model-derived label | No independent test children or irreparable clip leakage |
+| Accounting | Conditional learner-stage claim; \(C\) separate and excluded | Freeze \(C\) ledger and eligible learner pool | `Real-small` indirectly uses the rest of `Real-full` |
+| Compute/privacy | Public/dummy hosted CUDA allowed; restricted data only governed CUDA | Infrastructure approval and egress test | Restricted material would leave governed boundary |
+| Licensing | CC BY-NC research boundary and attribution | Institutional review of all model/data licenses | Commercial use without separate permission/reimplementation |
+
+## Phased implementation sequence and stop rules
+
+1. **Public compatibility package.** Vendor the pinned upstream revision or
+   record an immutable dependency, freeze lockfile SHAs and licenses, define
+   the richer manifest plus upstream view, and add dependency-light schema,
+   split, accounting, and config tests. *Done when:* dummy real/synthetic rows
+   produce identical-shape upstream manifests and no restricted path exists.
+2. **Public/dummy CUDA preflight.** On approved public-data CUDA, resolve the
+   official environment, build and verify the common DINOv2 initialization
+   bridge, and run a tiny self-authored step for contrastive, MLM, and DINO/iBOT
+   plus checkpoint/resume and a tiny generated lexical evaluator wiring test.
+   No scientific metric is retained. *Stop* on weight mismatch, loss/config,
+   architecture-sync, resume, or distributed/single-GPU inconsistency. *Done
+   when:* strict pre-step sync, logs, resolved configs, hashes, and proof limits
+   are reviewed.
+3. **Governance and preregistration.** Approve governed CUDA, local ASR and
+   translator; freeze \(C\), eligible child/session split, \(H/r\), nested
+   real-only budgets, margins, seeds, fixed step, sampling, statistics,
+   exposure reporting, and blinding. *Stop* if independent test children,
+   permissions, or compute isolation are inadequate. *Done when:* signed
+   lineage/accounting and analysis plans exist without opening synthetic scores.
+4. **Common evaluation assets.** Using only \(C\) and public resources, freeze
+   one Machine-DevBench Lexical asset; from evaluation-only children/sessions,
+   freeze the real temporal-retrieval asset. Neither may steer generation.
+   *Done when:* manifests, hashes, filters, overlap audits, and model-derived
+   labeling are locked for every arm.
+5. **Real-only readiness.** Run the preregistered real-only learning curve and
+   validate the above-chance/positive-curve gate. *Stop* and keep synthetic
+   results sealed if it fails. *Done when:* the gate decision and uncertainty
+   report are frozen without protocol changes.
+6. **Generator and learner datasets.** Freeze one generator after the separate
+   public pilot, create the synthetic allocation without test-concept
+   targeting, run identical audio→ASR→translation, and compile/hash all four
+   arm manifests. *Stop* on leakage, hour/accounting mismatch, or QA selection
+   informed by downstream tests. *Done when:* duration, exposure, lineage, and
+   objective-step ledgers reconcile.
+7. **Final four-arm evaluation.** Train all frozen arm×seed runs, select the
+   common fixed-step checkpoints, evaluate once on the common lexical and
+   held-out-real assets, then test Mixed equivalence to `Real-full` and
+   superiority to `Real-small`; treat `Synthetic-full` parity as secondary.
+   *Done when:* confidence intervals, exposure strata, real-transfer safeguard,
+   failures, and conditional-\(C\) claim are reported.
+8. **Separate blinded fidelity/cost evaluation.** With independent randomized
+   samples and raters blinded to source/model, run the already frozen
+   audiovisual fidelity protocol and report acceptance rate, retries, wall/GPU
+   time, energy if available, storage, and cost. Its sample/order and judgments
+   stay separate from learner test assets and checkpoint decisions. *Done
+   when:* fidelity/cost results are linked by lineage but cannot alter the
+   four-arm analysis.
+
+## Bounded public/dummy preflight performed
+
+At the evidence cut-off, a shallow OS-temporary checkout at the pinned commit
+was inspected and removed. No weights, datasets, checkpoints, media, or
+environments were downloaded. A self-authored manifest object with real and
+synthetic variants was checked using only the Python standard library for
+required keys, legal `source_kind`, equal field shape, relative frame paths,
+numeric timestamps, and JSON round-trip; the temporary file was removed.
+
+This proves only that the proposed adapter contract is syntactically coherent
+and can project both source types to the same upstream field shape. Static
+inspection also maps trainer/config/preprocessing/evaluation interfaces. It
+does **not** prove imports, dependency resolution, model/tokenizer loading,
+CUDA/MPS runtime compatibility, numerical correctness, DINO/iBOT training,
+checkpoint resume, Machine-DevBench generation/evaluation, or any scientific
+performance.
 
 ## Candidate matrix
 
@@ -126,6 +474,7 @@ clearer dependency locking, batch semantics, manifest capture, and testing.
 
 | Work | Decision-relevant finding | Limitation for this project |
 |---|---|---|
+| [EgoBabyVLM](https://arxiv.org/abs/2605.19130v1) and [pinned code](https://github.com/facebookresearch/egobabyvlm/tree/224621caf0628270b6115845ac75a65b984234a3) (Lin et al., 2026) | Defines CLIP+ `triple`, corpus-grounded Machine-DevBench, preprocessing, manifests, checkpoints, and evaluation interfaces | English/CUDA-oriented; generated benchmark imagery is not held-out real data; pinned `triple` example needs the initialization repair and CUDA verification described above |
 | [SAYCam](https://pmc.ncbi.nlm.nih.gov/articles/PMC8412186/) (Sullivan et al., 2021) | Longitudinal child headcam video includes natural speech and transcriptions; establishes the naturalistic audiovisual regime | Three children and a different age/language distribution; not ChildLens |
 | [Grounded language acquisition through the eyes and ears of a single child](https://doi.org/10.1126/science.adi1374) (Vong et al., 2024) | CVCL learns word–referent alignment from 61 h using paired frames and transcribed utterances; directly operationalizes the claim | Single child; learner sees transcripts, not waveform; reported evaluations do not prove synthetic transfer |
 | [CVCL supplementary material](https://gwern.net/doc/ai/nn/cnn/2024-vong-supplement.pdf) | Defines utterance windows, frame extraction, DINO visual initialization, and contrastive variants needed for reproduction | Exact reproduction still depends on data preprocessing and vocabulary choices |

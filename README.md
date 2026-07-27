@@ -49,8 +49,11 @@ history but are not part of the active synthetic-video architecture. See
 [`docs/prior_work.md`](docs/prior_work.md) for the small set of prior findings
 that may inform future work.
 
-The architecture review now freezes a CVCL-style frame-plus-transcript learner,
-a modular video and German-TTS architecture, Wan 2.2 TI2V-5B and LTX-2 as the
+The architecture review now freezes EgoBabyVLM CLIP+ in `triple` mode as the
+learner; Machine-DevBench Lexical as the common standardized primary endpoint;
+an above-chance, positive real-only learning-curve readiness gate; and a
+separate held-out-real ChildLens temporal-transfer safeguard. It retains the
+modular video and German-TTS architecture, Wan 2.2 TI2V-5B and LTX-2 as the
 only public-pilot generator candidates, and a prospective no-substitution pilot
 protocol. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
