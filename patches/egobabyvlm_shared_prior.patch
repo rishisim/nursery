@@ -1,0 +1,112 @@
+diff --git a/apps/baselines/clip/modeling/text_encoder.py b/apps/baselines/clip/modeling/text_encoder.py
+index 51ce49b..b040d0f 100644
+--- a/apps/baselines/clip/modeling/text_encoder.py
++++ b/apps/baselines/clip/modeling/text_encoder.py
+@@ -34,6 +34,7 @@ class TextEncoder(nn.Module):
+         self,
+         hf_model_name: str,
+         *,
++        hf_revision: str | None = None,
+         embedding_dim: int = 512,
+         dropout: float = 0.1,
+         freeze: bool = False,
+@@ -44,15 +45,16 @@ class TextEncoder(nn.Module):
+ 
+         self.hf_model_name = hf_model_name
++        self.hf_revision = hf_revision
+         self.embedding_dim = embedding_dim
+         self.freeze = freeze
+         self.pooling: Pooling = pooling
+ 
+-        self.tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
++        self.tokenizer = AutoTokenizer.from_pretrained(hf_model_name, revision=hf_revision)
+         if self.tokenizer.pad_token is None:
+             self.tokenizer.pad_token = self.tokenizer.eos_token
+ 
+-        self.config = AutoConfig.from_pretrained(hf_model_name)
++        self.config = AutoConfig.from_pretrained(hf_model_name, revision=hf_revision)
+         # ``add_pooling_layer=False`` matches the MLM-pretrained BERT checkpoint shape.
+-        self.model = AutoModel.from_pretrained(hf_model_name, add_pooling_layer=False)
++        self.model = AutoModel.from_pretrained(hf_model_name, revision=hf_revision, add_pooling_layer=False)
+ 
+         if "gpt2" in hf_model_name.lower() and hasattr(self.model, "config"):
+             self.model.config.pad_token_id = self.tokenizer.pad_token_id
+diff --git a/apps/baselines/clip/modeling/dinov2_ssl.py b/apps/baselines/clip/modeling/dinov2_ssl.py
+index 9376b10..0c40f8b 100644
+--- a/apps/baselines/clip/modeling/dinov2_ssl.py
++++ b/apps/baselines/clip/modeling/dinov2_ssl.py
+@@ -150,7 +150,10 @@ class DINOv2SSL:
+             ckpt_info = checkpointer.resume_or_load("", resume=True)
+             self._pretrained_iteration = int(ckpt_info.get("iteration", -1)) + 1
+         else:
+-            self._pretrained_iteration = 0
++            # An explicit architecture-matched student prior is loaded by
++            # SSLMetaArch before its strict student->teacher synchronization.
++            # Treat it as initialization, not an FSDP training resume.
++            self._pretrained_iteration = 1 if cfg.student.pretrained_weights else 0
+ 
+         self.optimizer = torch.optim.AdamW(
+             self.model.get_params_groups(),
+diff --git a/apps/baselines/clip/training/checkpoint.py b/apps/baselines/clip/training/checkpoint.py
+index dc2e260..3978ad9 100644
+--- a/apps/baselines/clip/training/checkpoint.py
++++ b/apps/baselines/clip/training/checkpoint.py
+@@ -84,6 +84,17 @@ def save_checkpoint(
+ 
+     from omegaconf import DictConfig, OmegaConf
+ 
++    rng_state = {
++        "torch": torch.get_rng_state(),
++        "cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else [],
++    }
++    try:
++        import numpy as np
++
++        rng_state["numpy"] = np.random.get_state()
++    except ImportError:
++        pass
++
+     cfg_dict = OmegaConf.to_container(config, resolve=True) if isinstance(config, DictConfig) else config
+     cfg_dict = _embed_vision_encoder_dependencies(cast("dict[str, Any]", cfg_dict))
+ 
+@@ -103,6 +114,8 @@ def save_checkpoint(
+         "scheduler_state": scheduler.state_dict(),
+         "epoch": epoch,
+         "step": step,
++        "ssl_iteration": getattr(ssl, "_checkpoint_iteration", 0) if ssl is not None else 0,
++        "rng_state": rng_state,
+         "best_val_loss": best_val_loss,
+         "config": cfg_dict,
+     }
+@@ -144,4 +157,13 @@ def load_checkpoint(
+     if scheduler is not None:
+         scheduler.load_state_dict(payload["scheduler_state"])
+ 
++    rng_state = payload.get("rng_state")
++    if rng_state is not None:
++        torch.set_rng_state(rng_state["torch"])
++        if torch.cuda.is_available() and rng_state.get("cuda"):
++            torch.cuda.set_rng_state_all(rng_state["cuda"])
++        if "numpy" in rng_state:
++            import numpy as np
++
++            np.random.set_state(rng_state["numpy"])
+     return payload
+diff --git a/apps/baselines/clip/training/loop.py b/apps/baselines/clip/training/loop.py
+index 27867cf..792c797 100644
+--- a/apps/baselines/clip/training/loop.py
++++ b/apps/baselines/clip/training/loop.py
+@@ -221,6 +221,7 @@ class ContrastiveTrainer:
+         ssl_batch = self.ssl.prepare_batch(images)
+         results = self.ssl.step(ssl_batch, self.ssl_iteration)
+         self.ssl_iteration += 1
++        self.ssl._checkpoint_iteration = self.ssl_iteration
+         return results
+ 
+     def _on_dinov2_block_exit(self) -> None:
+@@ -340,4 +341,5 @@ class ContrastiveTrainer:
+         self.epoch = int(payload.get("epoch", 0)) + 1
+         self.global_step = int(payload.get("step", 0))
+         self.best_val_loss = float(payload.get("best_val_loss", float("inf")))
++        self.ssl_iteration = int(payload.get("ssl_iteration", 0))
+         logger.info("Resumed from %s at epoch %d, step %d", path, self.epoch, self.global_step)

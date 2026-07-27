@@ -67,3 +67,7 @@ protocol. See
 No pilot has been executed and no generator dependency has been installed.
 The next stage is public/dummy EgoBabyVLM compatibility work on CUDA—not LTX,
 Wan, TTS, ChildLens preprocessing, generation, or learner training.
+The local compatibility package and exact CUDA acceptance contract are
+documented in
+[`docs/egobaby_cuda_preflight.md`](docs/egobaby_cuda_preflight.md); its current
+status is an infrastructure/cost-approval gate.

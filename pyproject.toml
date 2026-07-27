@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nursery-egobaby-preflight"
+version = "0.1.0"
+description = "Public/dummy CUDA compatibility preflight for pinned EgoBabyVLM triple mode"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+nursery-egobaby-cuda-preflight = "nursery_egobaby_preflight.cuda_preflight:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+  "gpu: requires a real CUDA GPU and the pinned EgoBabyVLM environment",
+]

@@ -7,6 +7,11 @@
 **Scope:** public sources and public/synthetic-only pilot design; no ChildLens or
 BabyView media were accessed.
 
+**Current engineering gate:** the bounded public/dummy CUDA compatibility
+package is ready locally but awaits approval for a new billable CUDA runner.
+See [`egobaby_cuda_preflight.md`](egobaby_cuda_preflight.md). This is an
+INFRASTRUCTURE GATE, not an engineering no-go or scientific result.
+
 ## Frozen learner and endpoint decision
 
 The fixed learner is **EgoBabyVLM CLIP+ in `triple` mode**: image–text

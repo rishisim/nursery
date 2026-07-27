@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "upstream": {
+    "repository": "https://github.com/facebookresearch/egobabyvlm.git",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "license": "CC-BY-NC-4.0"
+  },
+  "priors": {
+    "vision": {
+      "repository": "facebook/dinov2-base",
+      "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415",
+      "filename": "model.safetensors",
+      "sha256": "1b02d95733922f87e69d7f7a1deae9395dffa5f975b06a05fc0ff10a1a43c065",
+      "license": "Apache-2.0"
+    },
+    "text": {
+      "repository": "google-bert/bert-base-uncased",
+      "revision": "86b5e0934494bd15c9632b12f734a8a67f723594",
+      "filename": "model.safetensors",
+      "sha256": "44172b48ce7a9d951000a9d76ae331b155df32c9fd4e93239a233d720f471725",
+      "license": "Apache-2.0"
+    }
+  },
+  "learner": {
+    "mode": "triple",
+    "schedule": {
+      "contrastive": 4,
+      "mlm": 1,
+      "dinov2": 1
+    },
+    "vision_arch": "vit_base14",
+    "image_size": 224,
+    "patch_size": 14,
+    "seed": 1729,
+    "reproducibility": {
+      "configuration_and_lineage": "sha256-exact",
+      "shared_backbone_initialization": "byte-exact",
+      "fresh_process_next_loss": {
+        "rtol": 1e-05,
+        "atol": 1e-06
+      },
+      "rationale": "CUDA kernels can be numerically deterministic without guaranteeing cross-process bitwise floating-point identity."
+    }
+  },
+  "proof_limits": {
+    "scientific_score_retained": false,
+    "restricted_data_used": false,
+    "distributed_smoke_required": false,
+    "claim": "Engineering compatibility only; no scientific efficacy or commercial clearance."
+  }
+}
