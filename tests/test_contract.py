@@ -53,16 +53,24 @@ def test_phase3_preregistration_preserves_frozen_contract() -> None:
     assert config["analysis"]["equivalence_margin_bounds_absolute"] == [0.02, 0.05]
     assert config["analysis"]["minimum_common_seeds"] >= 3
     assert sum(config["split"]["target_proportions"].values()) == 1.0
-    assert sum(config["split"]["minimum_children"].values()) == 8
+    assert sum(config["split"]["minimum_children"].values()) == 6
+    assert config["split"]["calibration_C"]["children"] == 18
+    assert config["split"]["eligible_confirmatory_catalog"]["children"] == 40
+    assert config["split"]["eligible_confirmatory_catalog"]["duration_metadata_complete"] is True
+    assert sum(
+        config["split"]["assigned_child_counts_if_all_40_remain_eligible"].values()
+    ) == 40
     assert config["unblinding"]["synthetic_scores_sealed_until_real_only_gate_passes"] is True
     assert config["cost"]["existing_childlens_cost_is_zero"] is False
     assert config["gates"]["phase4_authorized"] is False
     assert config["gates"]["childlens_academic_noncommercial_access"] == "ESTABLISHED"
     assert config["gates"]["childlens_aggregate_reporting"] == "ESTABLISHED"
-    assert config["gates"]["current_childlens_storage_encryption"] == "FAIL_REMEDIABLE"
-    assert config["gates"]["authorized_read_only_aggregate_inventory"] == (
-        "AUTHORIZED_BUT_NOT_RUN"
+    assert config["gates"]["current_childlens_storage_encryption"] == (
+        "PASS_AES_256_ENCRYPTED_SPARSEBUNDLE"
     )
+    assert config["gates"]["storage_migration_regular_files_verified"] == 67087
+    assert config["gates"]["unencrypted_source_removed_after_verification"] is True
+    assert config["gates"]["authorized_read_only_aggregate_inventory"] == "COMPLETE"
     assert config["gates"]["personnel_model"] == (
         "SINGLE_AUTHORIZED_APPLICANT_WITH_STAGED_PROCEDURAL_ROLES"
     )

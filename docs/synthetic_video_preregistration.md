@@ -1,6 +1,7 @@
 # Synthetic-video governance and preregistration
 
-**Phase 3 status:** **INFRASTRUCTURE/PERMISSION GATE**
+**Phase 3 status:** **INFRASTRUCTURE/PERMISSION GATE** *(infrastructure only;
+ChildLens permission is established)*
 
 **Evidence cut-off:** 2026-07-27
 
@@ -50,9 +51,9 @@ Status meanings are `FROZEN`, `REQUIRES CONFIRMATION`,
 |---|---|---|---|---|
 | Learner/runtime | `FROZEN` | Public/dummy single-L4 bridge/runtime PASS; no scientific score; DDP untested | Technical lead | Preserve immutable pins and rerun acceptance inside the approved governed environment |
 | ChildLens academic use and aggregate reporting | `FROZEN` | The signed request explicitly covers ChildLens videos/annotations for non-commercial model calibration/evaluation in grounded learning, with aggregate-only reporting through July 2027. Paul Grohmann accepted the form and granted access | Authorized applicant | Keep every use within that scope, applicant-only, and cite DOI `10.17617/4.fe` |
-| ChildLens local storage | `INFRASTRUCTURE/PERMISSION GATE` | Non-content inspection found the current ChildLens sparsebundle and its APFS volume report no encryption. Permission is established, but this storage does not meet the protocol's secure-storage rule | Authorized applicant | Move the corpus to an encrypted APFS volume or encrypted sparsebundle under applicant-only access, verify encryption at both image/volume level, then securely retire the unencrypted copy |
-| ChildLens inventory | `REQUIRES CONFIRMATION` | The user authorizes ChildLens access and reports downloaded videos, but no content, drive, or identifying records were inspected; \(H\), \(r\), split feasibility, and power inputs remain unknown | Authorized applicant | After storage qualification, run the read-only aggregate inventory in this document inside the governed boundary |
-| Governed CUDA | `INFRASTRUCTURE/PERMISSION GATE` | No approved restricted-data CUDA environment is evidenced | Institution/IT security | Approve a system against every acceptance item below and retain the signed qualification record |
+| ChildLens local storage | `FROZEN` | The corpus was migrated to an AES-256 encrypted sparsebundle with an applicant-only Keychain secret. A read-only checksum comparison matched 67,087 regular files / 47,917,156,217 bytes, 13 symlinks, and 6,353 directories before the unencrypted source was removed | Authorized applicant | Keep the image encrypted and unmounted except for applicant-only governed work |
+| ChildLens inventory | `FROZEN` | Aggregate inventory found 58 catalog children / 192 recordings / complete durations. The preexisting development-only allowlist fixes \(C\) at 18 children / 58 recordings / 14.374241 source hours, leaving 40 children / 134 recordings / 40.362056 source hours for confirmatory allocation with zero child overlap | Authorized applicant | Apply the frozen keyed split and \(H/r\) rules only after governed compute and the identical ASR/translation pipeline are qualified |
+| Governed CUDA | `INFRASTRUCTURE/PERMISSION GATE` | UTD Juno is institution-owned and offers H100/A30 GPUs, but the account is awaiting its welcome email. This Mac is Apple M5/Metal-only, Juno DNS is unavailable before activation/network access, and Juno restricted-data egress/audit/retention/deletion controls are not confirmed | Authorized applicant / UTD HPC administration | Wait for the welcome email; after activation, test read-only login and obtain the acceptance-contract evidence without transferring ChildLens data |
 | DDP/scaling | `REQUIRES CONFIRMATION` | One L4 only; upstream reference is four processes | Technical lead | Size the full run blindly; if more than one GPU/process is required, pass the mandatory public/dummy DDP preflight before any restricted execution |
 | ASR/translation | `REQUIRES CONFIRMATION` | Interface and selection rules are frozen; exact local model weights are not yet selected | Language/technical lead | Run the bounded public-language selection substage below, then freeze revisions, hashes, licenses, and thresholds before ChildLens processing |
 | German human validation | `FROZEN` | No German-speaking human annotator is available, and the agreement prohibits making the dataset accessible to third parties | Authorized applicant | Use no human rater and retain only explicitly model-derived claims; a future rater requires separate MPI authorization |
@@ -61,15 +62,16 @@ Status meanings are `FROZEN`, `REQUIRES CONFIRMATION`,
 | Score sealing/unblinding | `FROZEN` | Synthetic-arm scores remain inaccessible until the real-only gate passes; this is a disclosed single-operator protocol | Authorized applicant | Use separate procedural roles, coded outputs, append-only commitments, and the ordered unblinding script below |
 | Cost comparison | `FROZEN` | Prospective like-for-like marginal and fully loaded ledgers; sunk ChildLens collection is not zero | Authorized applicant in locked cost stage | Insert pre-generation unit prices and distributions, then hash/sign the ledger |
 
-Phase 3 cannot be marked PASS now because the current ChildLens sparsebundle is
-unencrypted and a governed CUDA environment is not yet qualified. Dataset
-access, non-commercial academic model calibration/evaluation, and aggregate
-reporting are established; third-party access is prohibited. The remaining
-status is a remediable infrastructure gate, not a permission, engineering, or
-scientific failure. A confirmed consent/license incompatibility, inability to
-form an independent evaluation split under the rules below, or absence of any
-compliant restricted-data compute path after documented alternatives are
-exhausted changes the status to `NO-GO`.
+Phase 3 cannot be marked PASS because a governed CUDA environment is not yet
+qualified. ChildLens permission, encrypted local storage, complete aggregate
+inventory, calibration lineage, source-duration inventory, and child-level
+split feasibility are established. Exact credited \(H/r\) remains governed by
+the frozen blind post-ASR yield rule rather than an invented source-hour value.
+The remaining status is an infrastructure gate, not a permission, engineering,
+or scientific failure. A confirmed consent/license
+incompatibility, inability to form an independent evaluation split under the
+rules below, or absence of any compliant restricted-data compute path after
+documented alternatives are exhausted changes the status to `NO-GO`.
 
 ## Governance and permission matrix
 
@@ -192,15 +194,21 @@ Inside the governed boundary, the custodian maps direct identifiers to
 versioned, access-controlled, never placed in Git, and distinct from content
 hashes. Allocation operates on opaque IDs.
 
-After eligibility rules are frozen and before media review, determine counts
-from the permitted number \(N\) of eligible children. The minimum allocation
-is 3 training, 2 evaluation, 2 \(C\), and 1 validation child. Allocate children
-above those eight by the largest-remainder method toward final proportions
-50% training, 20% evaluation, 20% \(C\), and 10% validation (ties resolve
-training, evaluation, \(C\), validation). Sort children by the HMAC of
-`study_id || child_id`, then deal the required counts in repeating role order
-evaluation, \(C\), validation, training, skipping a role once its count is
-filled. This makes the assignment deterministic without content or outcomes.
+The preexisting development-only allowlist is now the complete \(C\): 18
+children, 58 source recordings, and 14.374241 source hours. Those children have
+already influenced prior development and can never enter learner training,
+validation, or evaluation. The catalog contains 58 children / 192 recordings;
+the remaining eligible confirmatory catalog therefore contains 40 children /
+134 recordings with zero child overlap with \(C\).
+
+After technical eligibility is complete, allocate the 40 remaining children by
+the largest-remainder method toward 70% training, 20%
+evaluation, and 10% validation, with minima 3/2/1 and tie order training,
+evaluation, validation. If all remain eligible, the fixed counts are 28
+training, 8 evaluation, and 4 validation children. Sort the 40 children by the
+HMAC of `study_id || child_id`, then deal them in repeating role order
+evaluation, validation, training, skipping a role once its count is filled.
+This makes assignment deterministic without content or outcomes.
 Within a child, all sessions stay in that child's partition. If unequal
 duration leaves the training pool too small, \(H\) decreases under the frozen
 rule; children are not reassigned after duration is known. If policy forces one
@@ -209,12 +217,13 @@ allocation is not an automatic substitute. The independent statistician may
 authorize a preregistered leave-one-child-out design only before outcomes and
 must narrow the claim accordingly; otherwise this is `NO-GO`.
 
-The authorized aggregate inventory must return, per opaque child and without
-content: eligible session count, recorded duration, preliminary technically
-readable duration if permitted, date bucket sufficient for overlap detection,
-and missing-metadata flags. It must not return direct IDs, filenames, text,
-frames, hashes of media, or participant attributes. This is the smallest
-missing input for split feasibility and \(H/r\).
+The aggregate inventory returned complete child, recording, file, date, and
+duration fields. A governed join between the frozen development allowlist and
+the preselection metadata found 14.374241 source hours in \(C\) and 40.362056
+source hours in the 40-child eligible catalog, with no missing durations and no
+cross-role child. These are source hours, not credited hours. Direct IDs,
+filenames, text, frames, media hashes, and participant attributes remain inside
+the encrypted boundary.
 
 ### Overlap and near-duplicate audit
 
@@ -474,24 +483,20 @@ The package is protocol-complete but infrastructure-gated. Dataset access,
 project-specific model calibration/evaluation, and aggregate reporting are
 established. The remaining actions are:
 
-1. **Encrypted storage remediation:** create an applicant-only encrypted APFS
-   volume or encrypted sparsebundle, transfer and verify the restricted corpus
-   without changing its contents, confirm both container/image and volume
-   encryption, and securely retire the unencrypted source only after
-   verification. Raw and row-level material remain non-exportable.
-2. **Governed CUDA qualification:** a named system and recorded responses/evidence
+1. **Governed CUDA qualification:** wait for the already requested Juno welcome
+   email and account activation. Then UTD HPC must approve a project-scoped
+   path and provide recorded responses/evidence
    for all ten acceptance-contract items, including observed egress and
    deletion tests.
-3. **Read-only aggregate inventory:** after item 1, the authorized applicant
-   runs the frozen inventory locally. The user's authorization is already
-   recorded; no third party receives media or participant records.
-4. **Single-operator controls:** use the frozen staged-role, commitment, and
-   scripted-unblinding procedure. No additional researcher is required.
+2. **Public-language selection:** after the compute route is known, run only
+   the bounded public/dummy German ASR→English translation substage and freeze
+   model revisions, hashes, licenses, confidence/abstention thresholds, and
+   no-egress evidence. No ChildLens audio may enter this selection.
 
-After 1–4, the applicant applies the frozen blind rules to the permitted
+After 1–2, the applicant applies the frozen blind rules to the completed
 inventory; the technical lead performs public-only resource sizing and, if
 required, requests approval for the precisely scoped DDP job; and the language
-lead performs the bounded public-only ASR/translation selection. Phase 3
-becomes PASS only after those records are signed and the machine-readable
-fields are filled without synthetic outcomes. Phase 4 remains unauthorized
-until then.
+lead records the completed bounded public-only ASR/translation selection.
+Phase 3 becomes PASS only after those records are signed and the
+machine-readable fields are filled without synthetic outcomes. Phase 4 remains
+unauthorized until then.

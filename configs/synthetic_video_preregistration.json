@@ -56,19 +56,35 @@
     "zero_exposure_in_primary": true
   },
   "split": {
+    "calibration_C": {
+      "source": "preexisting_development_only_allowlist",
+      "children": 18,
+      "recordings": 58,
+      "source_hours": 14.374241111111111,
+      "may_enter_training_validation_or_evaluation": false
+    },
+    "eligible_confirmatory_catalog": {
+      "children": 40,
+      "recordings": 134,
+      "source_hours": 40.36205638888889,
+      "duration_metadata_complete": true
+    },
     "minimum_children": {
       "training": 3,
       "evaluation": 2,
-      "calibration_C": 2,
       "validation": 1
     },
     "target_proportions": {
-      "training": 0.50,
+      "training": 0.70,
       "evaluation": 0.20,
-      "calibration_C": 0.20,
       "validation": 0.10
     },
-    "assignment": "largest_remainder_counts_then_keyed_hash_deal_whole_children"
+    "assigned_child_counts_if_all_40_remain_eligible": {
+      "training": 28,
+      "evaluation": 8,
+      "validation": 4
+    },
+    "assignment": "fixed_C_then_largest_remainder_counts_and_keyed_hash_deal_of_remaining_whole_children"
   },
   "language": {
     "learner_path": "identical_offline_German_ASR_to_English_translation",
@@ -83,9 +99,14 @@
     "childlens_project_specific_model_calibration_evaluation": "ESTABLISHED",
     "childlens_aggregate_reporting": "ESTABLISHED",
     "childlens_third_party_access": "PROHIBITED_WITHOUT_SEPARATE_MPI_AUTHORIZATION",
-    "current_childlens_storage_encryption": "FAIL_REMEDIABLE",
+    "current_childlens_storage_encryption": "PASS_AES_256_ENCRYPTED_SPARSEBUNDLE",
+    "storage_migration_regular_files_verified": 67087,
+    "storage_migration_regular_bytes_verified": 47917156217,
+    "storage_migration_symlinks_verified": 13,
+    "unencrypted_source_removed_after_verification": true,
     "governed_cuda_qualification": "MISSING",
-    "authorized_read_only_aggregate_inventory": "AUTHORIZED_BUT_NOT_RUN",
+    "governed_cuda_candidate": "UTD_JUNO_H100_OR_A30_AWAITING_WELCOME_EMAIL_THEN_ADMIN_CONTROL_CONFIRMATION",
+    "authorized_read_only_aggregate_inventory": "COMPLETE",
     "personnel_model": "SINGLE_AUTHORIZED_APPLICANT_WITH_STAGED_PROCEDURAL_ROLES",
     "ddp": "MANDATORY_IF_RESOURCE_SIZING_REQUIRES_MULTIPLE_PROCESSES",
     "asr_translation": "PUBLIC_ONLY_BOUNDED_SELECTION_REQUIRED",

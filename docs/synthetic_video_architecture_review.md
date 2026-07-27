@@ -9,13 +9,18 @@ BabyView media were accessed.
 
 **Current stage:** Phase 2 is complete: the bounded public/dummy single-L4
 CUDA compatibility preflight passed. Phase 3 safe protocol work is complete
-but remains at an **INFRASTRUCTURE/PERMISSION GATE**. The signed, MPI-accepted
+but remains at an **INFRASTRUCTURE/PERMISSION GATE** (infrastructure only;
+ChildLens permission is established). The signed, MPI-accepted
 request establishes non-commercial ChildLens model calibration/evaluation and
 aggregate reporting through July 2027; third-party access is prohibited. The
-permission component is cleared. Remaining infrastructure/technical gates are
-remediation of the currently unencrypted ChildLens sparsebundle, an approved
-governed CUDA environment, the local aggregate inventory, and the bounded
-public-only ASR/translation selection. See
+permission component is cleared. The local corpus is now encrypted and
+checksum-verified. Inventory fixes the 18-child prior development allowlist as
+\(C\), leaving 40 untouched catalog children for confirmatory allocation.
+Complete aggregate metadata establishes 40.362056 source hours across the 134
+eligible recordings. Remaining gates are approved governed Juno CUDA and
+bounded public-only ASR/translation selection. Juno account activation is
+currently waiting on the welcome email; no restricted data may be transferred
+before the governed-compute contract is qualified. See
 [`synthetic_video_preregistration.md`](synthetic_video_preregistration.md).
 The L4 result is engineering-smoke evidence only, not scientific performance,
 restricted-data readiness, a full-training memory estimate, or DDP evidence.
@@ -370,9 +375,10 @@ Approved compute is split:
 |---|---|---|---|
 | Estimand, learner, common benchmark, split/credit rules, analysis, cost, sealing | `FROZEN` | PI/statistician/custodian | Preserve the canonical preregistration and fill only its blind numeric fields |
 | ChildLens academic model use and aggregate reporting | `FROZEN` | Authorized applicant | Stay within the signed July 2026–July 2027 scope, applicant-only, and cite DOI `10.17617/4.fe` |
-| ChildLens local storage | `INFRASTRUCTURE/PERMISSION GATE` | Authorized applicant | Move the unencrypted sparsebundle to verified encrypted storage and retire the old copy only after verification |
+| ChildLens local storage | `FROZEN` | Authorized applicant | Preserve the verified AES-256 sparsebundle and applicant-only Keychain access |
+| \(C\) and catalog lineage | `FROZEN` | Authorized applicant | Keep all 18 prior development children in \(C\); allocate only the remaining 40 children |
 | Governed restricted-data CUDA | `INFRASTRUCTURE/PERMISSION GATE` | Institution/IT security | Qualify a named system, including observed egress and deletion tests |
-| \(H/r\) and independent split feasibility | `REQUIRES CONFIRMATION` | Data steward/statistician | Authorize the minimal aggregate-only inventory and apply the frozen selection algorithm |
+| \(H/r\) and independent split feasibility | `REQUIRES CONFIRMATION` | Authorized applicant in locked statistician stage | Use the complete 40-child/40.362056-source-hour inventory; set credited \(H/r\) only after identical ASR/translation yield is available |
 | DDP | `REQUIRES CONFIRMATION` | Technical lead | Size blindly; if multi-process is required, pass a separately approved public/dummy DDP preflight |
 | ASR/translation weights | `REQUIRES CONFIRMATION` | Language/technical lead | Complete the bounded public-language no-egress selection and pin hashes/licenses |
 | Personnel/unblinding | `FROZEN` | Authorized applicant | Use staged single-operator roles, commitments, and scripted unblinding; disclose lack of personnel independence |
@@ -407,8 +413,8 @@ evaluation remain prohibited.
 3. **Governance and preregistration.** The protocol, blind selection rules,
    lineage/accounting, analysis, cost, and sealing plans are frozen. Exact
    numeric ChildLens values remain governed inputs, not guesses. *Current:
-   INFRASTRUCTURE/PERMISSION GATE.* *Done when:* encrypted storage remediation,
-   governed CUDA qualification, local aggregate inventory,
+   INFRASTRUCTURE/PERMISSION GATE (infrastructure only).* *Done when:* governed
+   Juno CUDA qualification,
    resolved single-GPU/DDP route, and pinned or sole-
    remaining bounded public-only ASR/translation substage are signed without
    opening synthetic scores.

@@ -68,12 +68,16 @@ No generator pilot has been executed and no generator dependency has been
 installed. The public/dummy single-L4 EgoBabyVLM compatibility preflight is
 complete and passed as engineering evidence only; DDP and restricted-data
 readiness remain unproven. Phase 3 safe governance/preregistration decisions
-are now frozen, but its status is **INFRASTRUCTURE/PERMISSION GATE**, not PASS.
+are now frozen, but its status is **INFRASTRUCTURE/PERMISSION GATE**
+(infrastructure only), not PASS.
 MPI accepted the signed project-specific request and granted non-commercial
 ChildLens model calibration/evaluation and aggregate reporting through July
 2027; third-party access remains prohibited. Permission is established. The
-current ChildLens sparsebundle is unencrypted, so encrypted-storage remediation
-and governed CUDA qualification remain infrastructure gates.
+local ChildLens corpus is now in a checksum-verified AES-256 sparsebundle.
+Inventory fixes 18 prior development children / 14.374241 source hours as
+\(C\), leaving 40 untouched catalog children / 134 recordings / 40.362056
+source hours for confirmatory allocation. Governed Juno qualification remains
+required and is waiting on the account welcome email.
 Exact unblock actions are in
 [`docs/synthetic_video_preregistration.md`](docs/synthetic_video_preregistration.md).
 Common assets, LTX/Wan, TTS, ChildLens preprocessing, generation, and learner
