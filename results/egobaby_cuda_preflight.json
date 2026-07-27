@@ -4,15 +4,15 @@
   "proof": "public/dummy engineering compatibility only",
   "job": {
     "provider": "hugging-face-jobs",
-    "id": "6a66ba7e7ef3c0846496a1bf",
-    "url": "https://huggingface.co/jobs/rishisim/6a66ba7e7ef3c0846496a1bf",
+    "id": "6a66bcccdb23d7a7ec1cf1f7",
+    "url": "https://huggingface.co/jobs/rishisim/6a66bcccdb23d7a7ec1cf1f7",
     "image": "pytorch/pytorch:2.8.0-cuda12.6-cudnn9-devel",
     "flavor": "l4x1",
-    "running_seconds": 150,
+    "running_seconds": 152,
     "listed_rate_usd_per_hour": 0.8,
-    "successful_run_cost_usd": 0.033333,
-    "program_preflight_jobs_running_seconds": 1692,
-    "program_preflight_jobs_upper_bound_cost_usd": 0.376
+    "successful_run_cost_usd": 0.033778,
+    "program_preflight_jobs_running_seconds": 1844,
+    "program_preflight_jobs_upper_bound_cost_usd": 0.409778
   },
   "upstream": {
     "repository": "https://github.com/facebookresearch/egobabyvlm.git",
@@ -41,14 +41,14 @@
     "gpu": "NVIDIA L4",
     "single_gpu": true,
     "distributed_smoke": "not_run_budget_optional",
-    "driver": null,
+    "driver": "580.159.03",
     "cuda_runtime": "12.8",
     "cudnn": 91002,
     "torch": "2.8.0+cu128",
     "python": "3.12.13",
     "platform": "Linux-6.12.94-123.190.amzn2023.x86_64-x86_64-with-glibc2.35",
     "pixi_lock_sha256": "360c372997ea7f9ba89abcf87796e57ebcd2fdbc9734489666120073752e7244",
-    "pip_freeze_sha256": "e628e015428aac21df8691708e95db947029fb230b8323ef0fdc3eb1e56f2133",
+    "pip_freeze_sha256": "3c224a0a7bd966e1770b59446dbd7d6a4502898af4d4459a8ba6d11ebd809cd4",
     "frozen_config_sha256": "5c1d930629cf1d4a50a642be36fd6ea59b9d58b8bf332c176b657c6dc9d10902"
   },
   "initialization": {
@@ -99,21 +99,21 @@
       "optimizer_update_verified": true
     },
     "dinov2_ibot": {
-      "dino_global_crops_loss": 2.838909149169922,
-      "ibot_loss": 1.4305472373962402,
-      "total_loss": 7.0313098430633545,
+      "dino_global_crops_loss": 2.8375120162963867,
+      "ibot_loss": 1.4522308111190796,
+      "total_loss": 7.058676362037659,
       "finite": true,
       "gradient_tensors": 191,
       "nonzero_gradient_tensors": 191,
       "optimizer_update_verified": true,
       "post_ssl_sync": {
         "keys": 175,
-        "sha256": "3cb4cd105c79af8dd555ad8ec85ea3ae56c922ff5546d99f58abf5643575c3c3"
+        "sha256": "b84b90b7c78c3786a5a0fb87574833fb86ffa605f16dd8b75afa3e61c18bccbd"
       }
     }
   },
   "checkpoint_resume": {
-    "checkpoint_sha256": "f198a58369e445acb487ea1bb1ba9b89c6762fbc54380f75d5b37acd06c99a48",
+    "checkpoint_sha256": "d9f8679bb40c8e6f1d2cdd4b9c0bfb797f3a1f336af953559c9129483f0fddb3",
     "stored_outside_repository": true,
     "config_and_lineage_equal": true,
     "scheduler_state_restored": true,
@@ -133,7 +133,7 @@
     "scientific_result_retained": false
   },
   "runtime": {
-    "entrypoint_wall_time_seconds": 48.722988,
+    "entrypoint_wall_time_seconds": 49.485631,
     "peak_cuda_memory_bytes": 12754437120,
     "network_destinations": [
       "github.com/facebookresearch/egobabyvlm",
@@ -145,7 +145,7 @@
     "scientific_score_retained": false,
     "restricted_data_used": false,
     "distributed_behavior": "untested",
-    "driver_version": "not_exposed_by_runtime_probe",
+    "driver_version": "580.159.03",
     "claim": "Engineering compatibility only; no scientific efficacy or commercial clearance."
   }
 }

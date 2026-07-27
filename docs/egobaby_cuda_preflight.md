@@ -9,7 +9,7 @@ restricted media, ChildLens material, or BabyView material was used.
 
 ## Decision
 
-Hugging Face Job `6a66ba7e7ef3c0846496a1bf` completed the bounded single-L4
+Hugging Face Job `6a66bcccdb23d7a7ec1cf1f7` completed the bounded single-L4
 preflight at the immutable upstream and public-weight pins. The reviewed
 machine-readable result is
 [`results/egobaby_cuda_preflight.json`](../results/egobaby_cuda_preflight.json).
@@ -104,9 +104,9 @@ recorded, and exists solely to demonstrate the required optimizer update.
 
 The connector identifies the account as `rishisim`, and the official hardware
 listing exposes `l4x1`. Across the repair ledger and final pass, L4 jobs
-consumed 1,692 running seconds, an upper-bound USD 0.376 at the listed USD
-0.80/hour rate. The successful job consumed 150 provider seconds (USD 0.0333
-at that rate); its measured preflight entrypoint was 48.72 seconds. No
+consumed 1,844 running seconds, an upper-bound USD 0.4098 at the listed USD
+0.80/hour rate. The final successful job consumed 152 provider seconds (USD
+0.0338 at that rate); its measured preflight entrypoint was 49.49 seconds. No
 checkpoint, weight, raw log, environment, dataset, or scientific learner result
 was retained.
 
@@ -181,7 +181,8 @@ evaluator tensor targeted CUDA while its deterministic generator defaulted to
 CPU. The fixture now creates its generator on CUDA; no learner or evaluation
 protocol behavior changed.
 
-The final L4 run `6a66ba7e7ef3c0846496a1bf` passed every acceptance invariant.
+The final L4 run `6a66bcccdb23d7a7ec1cf1f7` passed every acceptance invariant
+and recorded NVIDIA driver 580.159.03 with CUDA 12.8.
 The bridge candidate is accepted for engineering compatibility; the no-go rule
 was not reached.
 
