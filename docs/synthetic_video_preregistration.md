@@ -49,44 +49,48 @@ Status meanings are `FROZEN`, `REQUIRES CONFIRMATION`,
 | Topic | Status | Evidence or frozen decision | Owner | Exact unblock action |
 |---|---|---|---|---|
 | Learner/runtime | `FROZEN` | Public/dummy single-L4 bridge/runtime PASS; no scientific score; DDP untested | Technical lead | Preserve immutable pins and rerun acceptance inside the approved governed environment |
-| ChildLens academic use | `FROZEN` | MPI accepted the user's signed access agreement and granted Keeper access. The agreement permits scientific, non-commercial academic use and prohibits commercial use/models and third-party access or redistribution | Authorized applicant | Keep every use non-commercial, secure, applicant-only, and cite DOI `10.17617/4.fe` |
-| ChildLens storage/derived export | `INFRASTRUCTURE/PERMISSION GATE` | The agreement requires institutional secure storage but does not itself qualify the external drive or authorize derived-data export | UTD information-security/data-protection authority | Confirm in writing that the named drive/workstation/governed CUDA arrangement meets UTD requirements and state whether any listed compact aggregate may leave it |
+| ChildLens academic use and aggregate reporting | `FROZEN` | The signed request explicitly covers ChildLens videos/annotations for non-commercial model calibration/evaluation in grounded learning, with aggregate-only reporting through July 2027. Paul Grohmann accepted the form and granted access | Authorized applicant | Keep every use within that scope, applicant-only, and cite DOI `10.17617/4.fe` |
+| ChildLens local storage | `INFRASTRUCTURE/PERMISSION GATE` | Non-content inspection found the current ChildLens sparsebundle and its APFS volume report no encryption. Permission is established, but this storage does not meet the protocol's secure-storage rule | Authorized applicant | Move the corpus to an encrypted APFS volume or encrypted sparsebundle under applicant-only access, verify encryption at both image/volume level, then securely retire the unencrypted copy |
 | ChildLens inventory | `REQUIRES CONFIRMATION` | The user authorizes ChildLens access and reports downloaded videos, but no content, drive, or identifying records were inspected; \(H\), \(r\), split feasibility, and power inputs remain unknown | Authorized applicant | After storage qualification, run the read-only aggregate inventory in this document inside the governed boundary |
 | Governed CUDA | `INFRASTRUCTURE/PERMISSION GATE` | No approved restricted-data CUDA environment is evidenced | Institution/IT security | Approve a system against every acceptance item below and retain the signed qualification record |
 | DDP/scaling | `REQUIRES CONFIRMATION` | One L4 only; upstream reference is four processes | Technical lead | Size the full run blindly; if more than one GPU/process is required, pass the mandatory public/dummy DDP preflight before any restricted execution |
 | ASR/translation | `REQUIRES CONFIRMATION` | Interface and selection rules are frozen; exact local model weights are not yet selected | Language/technical lead | Run the bounded public-language selection substage below, then freeze revisions, hashes, licenses, and thresholds before ChildLens processing |
 | German human validation | `FROZEN` | No German-speaking human annotator is available, and the agreement prohibits making the dataset accessible to third parties | Authorized applicant | Use no human rater and retain only explicitly model-derived claims; a future rater requires separate MPI authorization |
-| \(C,H,r\), margins, seeds | `REQUIRES CONFIRMATION` | Blind rules and bounds are frozen below; numeric values require permitted aggregate inventory and real-only variance | Independent statistician | Apply the registered algorithms without synthetic results and sign/hash the completed config amendment |
+| \(C,H,r\), margins, seeds | `REQUIRES CONFIRMATION` | Blind rules and bounds are frozen below; numeric values require permitted aggregate inventory and real-only variance | Authorized applicant in locked statistician stage | Apply the registered algorithms without synthetic results and sign/hash the completed config amendment |
 | Common benchmark | `FROZEN` | Exactly one asset for all arms; it may use public resources and authorized \(C\) only | Evaluation custodian | Build only after Phase 3 gates clear; hash and seal it before learner training |
 | Score sealing/unblinding | `FROZEN` | Synthetic-arm scores remain inaccessible until the real-only gate passes; this is a disclosed single-operator protocol | Authorized applicant | Use separate procedural roles, coded outputs, append-only commitments, and the ordered unblinding script below |
-| Cost comparison | `FROZEN` | Prospective like-for-like marginal and fully loaded ledgers; sunk ChildLens collection is not zero | Independent cost lead | Insert pre-generation unit prices and distributions, then hash/sign the ledger |
+| Cost comparison | `FROZEN` | Prospective like-for-like marginal and fully loaded ledgers; sunk ChildLens collection is not zero | Authorized applicant in locked cost stage | Insert pre-generation unit prices and distributions, then hash/sign the ledger |
 
-Phase 3 cannot be marked PASS now because the reported external-drive/storage
-arrangement and a governed CUDA environment have not been qualified against
-institutional security requirements. Dataset access and non-commercial
-academic use are established; third-party access is prohibited. This is not an
-engineering or scientific failure. A confirmed consent/license incompatibility,
-inability to form an independent evaluation split under the rules below, or
-absence of any compliant restricted-data compute path after documented
-alternatives are exhausted changes the status to `NO-GO`.
+Phase 3 cannot be marked PASS now because the current ChildLens sparsebundle is
+unencrypted and a governed CUDA environment is not yet qualified. Dataset
+access, non-commercial academic model calibration/evaluation, and aggregate
+reporting are established; third-party access is prohibited. The remaining
+status is a remediable infrastructure gate, not a permission, engineering, or
+scientific failure. A confirmed consent/license incompatibility, inability to
+form an independent evaluation split under the rules below, or absence of any
+compliant restricted-data compute path after documented alternatives are
+exhausted changes the status to `NO-GO`.
 
 ## Governance and permission matrix
 
 “Governed boundary” means the institutionally approved restricted-data system,
 not this repository, ordinary cloud storage, Hugging Face Jobs, external APIs,
-or a personal unmanaged workstation. The following rules are frozen policy
-requirements; the data steward must positively confirm that ChildLens consent,
-agreements, and institutional policy permit them.
+or a personal unmanaged workstation. ChildLens permission is established by
+the accepted signed agreement. The following rules operationalize its secure,
+applicant-only, non-commercial handling conditions.
 
-Established agreement evidence is limited but affirmative: on 2026-07-16 the
-MPI project contact confirmed that the completed form was accepted and access
-would be granted; on 2026-07-21 the Keeper library invitation was sent. The
-agreement permits videos/annotations exclusively for scientific,
-non-commercial academic research; prohibits commercial use, commercial-model
-training, sharing, redistribution, and third-party access; requires secure
-storage following institutional data-protection rules; institutional-email
-correspondence; and citation of DOI `10.17617/4.fe`. It does not certify a
-particular drive, workstation, CUDA host, export, or third-party rater.
+Established agreement evidence is affirmative and project-specific. The signed
+request names “Sensorimotor Cues for Grounded Action-Language Learning,” UTD,
+Dr. Yi Ding, and July 2026–July 2027. It specifies ChildLens videos and
+annotations for non-commercial action-language-grounding research, model
+calibration/evaluation with matched controls, and aggregate-only reporting. On
+2026-07-16 Paul Grohmann confirmed that the completed form was accepted and
+access would be granted; on 2026-07-21 he sent the Keeper library invitation.
+The agreement prohibits commercial use, commercial-model training, sharing,
+redistribution, and third-party access; requires secure storage under
+institutional data-protection rules and institutional-email correspondence;
+and requires citation of DOI `10.17617/4.fe`. It does not certify a particular
+drive, workstation, CUDA host, or third-party rater.
 
 | Material class | Permitted storage/execution | Network and egress | Access roles and logging | Retention and disposition | Git |
 |---|---|---|---|---|---|
@@ -466,15 +470,15 @@ model-derived and no human-validated German claim is made.
 
 ## Exact actions required to clear Phase 3
 
-The package is protocol-complete but gated. Dataset access and the user's
-authority to perform non-commercial academic work are established. The
-remaining actions are:
+The package is protocol-complete but infrastructure-gated. Dataset access,
+project-specific model calibration/evaluation, and aggregate reporting are
+established. The remaining actions are:
 
-1. **Storage/data-protection qualification:** written UTD confirmation that the
-   named external drive, workstation, backups, and proposed governed CUDA path
-   meet institutional requirements, plus a ruling on whether any compact
-   derived aggregate may be exported. Raw/row-level material remains
-   non-exportable and applicant-only.
+1. **Encrypted storage remediation:** create an applicant-only encrypted APFS
+   volume or encrypted sparsebundle, transfer and verify the restricted corpus
+   without changing its contents, confirm both container/image and volume
+   encryption, and securely retire the unencrypted source only after
+   verification. Raw and row-level material remain non-exportable.
 2. **Governed CUDA qualification:** a named system and recorded responses/evidence
    for all ten acceptance-contract items, including observed egress and
    deletion tests.

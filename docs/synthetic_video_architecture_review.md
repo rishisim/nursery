@@ -9,12 +9,13 @@ BabyView media were accessed.
 
 **Current stage:** Phase 2 is complete: the bounded public/dummy single-L4
 CUDA compatibility preflight passed. Phase 3 safe protocol work is complete
-but remains at an **INFRASTRUCTURE/PERMISSION GATE**. MPI has granted the
-authorized applicant non-commercial academic ChildLens access; third-party
-access is prohibited. Remaining gates are UTD qualification of the external
-drive/storage and derived-export rules, an approved governed CUDA environment,
-the local aggregate inventory, and the bounded public-only ASR/translation
-selection. See
+but remains at an **INFRASTRUCTURE/PERMISSION GATE**. The signed, MPI-accepted
+request establishes non-commercial ChildLens model calibration/evaluation and
+aggregate reporting through July 2027; third-party access is prohibited. The
+permission component is cleared. Remaining infrastructure/technical gates are
+remediation of the currently unencrypted ChildLens sparsebundle, an approved
+governed CUDA environment, the local aggregate inventory, and the bounded
+public-only ASR/translation selection. See
 [`synthetic_video_preregistration.md`](synthetic_video_preregistration.md).
 The L4 result is engineering-smoke evidence only, not scientific performance,
 restricted-data readiness, a full-training memory estimate, or DDP evidence.
@@ -368,8 +369,8 @@ Approved compute is split:
 | Topic | Status | Owner | Exact unblock action |
 |---|---|---|---|
 | Estimand, learner, common benchmark, split/credit rules, analysis, cost, sealing | `FROZEN` | PI/statistician/custodian | Preserve the canonical preregistration and fill only its blind numeric fields |
-| ChildLens academic use | `FROZEN` | Authorized applicant | Keep use academic/non-commercial, secure, applicant-only, and cite DOI `10.17617/4.fe` |
-| External drive/storage and aggregate export | `INFRASTRUCTURE/PERMISSION GATE` | UTD information security | Qualify the named arrangement and rule on compact derived exports |
+| ChildLens academic model use and aggregate reporting | `FROZEN` | Authorized applicant | Stay within the signed July 2026–July 2027 scope, applicant-only, and cite DOI `10.17617/4.fe` |
+| ChildLens local storage | `INFRASTRUCTURE/PERMISSION GATE` | Authorized applicant | Move the unencrypted sparsebundle to verified encrypted storage and retire the old copy only after verification |
 | Governed restricted-data CUDA | `INFRASTRUCTURE/PERMISSION GATE` | Institution/IT security | Qualify a named system, including observed egress and deletion tests |
 | \(H/r\) and independent split feasibility | `REQUIRES CONFIRMATION` | Data steward/statistician | Authorize the minimal aggregate-only inventory and apply the frozen selection algorithm |
 | DDP | `REQUIRES CONFIRMATION` | Technical lead | Size blindly; if multi-process is required, pass a separately approved public/dummy DDP preflight |
@@ -406,8 +407,8 @@ evaluation remain prohibited.
 3. **Governance and preregistration.** The protocol, blind selection rules,
    lineage/accounting, analysis, cost, and sealing plans are frozen. Exact
    numeric ChildLens values remain governed inputs, not guesses. *Current:
-   INFRASTRUCTURE/PERMISSION GATE.* *Done when:* UTD storage/data-protection
-   qualification, governed CUDA qualification, local aggregate inventory,
+   INFRASTRUCTURE/PERMISSION GATE.* *Done when:* encrypted storage remediation,
+   governed CUDA qualification, local aggregate inventory,
    resolved single-GPU/DDP route, and pinned or sole-
    remaining bounded public-only ASR/translation substage are signed without
    opening synthetic scores.

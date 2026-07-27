@@ -80,8 +80,10 @@
   },
   "gates": {
     "childlens_academic_noncommercial_access": "ESTABLISHED",
+    "childlens_project_specific_model_calibration_evaluation": "ESTABLISHED",
+    "childlens_aggregate_reporting": "ESTABLISHED",
     "childlens_third_party_access": "PROHIBITED_WITHOUT_SEPARATE_MPI_AUTHORIZATION",
-    "institutional_storage_and_derived_export_qualification": "MISSING",
+    "current_childlens_storage_encryption": "FAIL_REMEDIABLE",
     "governed_cuda_qualification": "MISSING",
     "authorized_read_only_aggregate_inventory": "AUTHORIZED_BUT_NOT_RUN",
     "personnel_model": "SINGLE_AUTHORIZED_APPLICANT_WITH_STAGED_PROCEDURAL_ROLES",
