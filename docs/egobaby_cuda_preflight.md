@@ -22,8 +22,9 @@ Proposed bounded run:
   `224621caf0628270b6115845ac75a65b984234a3`;
 - GPU: one NVIDIA L4 (`l4x1`);
 - maximum wall time: 60 minutes;
-- published reference rate used for the approval ceiling: USD 2.50/hour;
-- upper-bound cost: USD 2.50;
+- current account hardware-list rate: USD 0.80/hour;
+- user-approved ceiling: USD 2.50;
+- operational upper-bound cost at the listed rate: USD 0.80;
 - inputs: public pinned weights and self-authored tensors/text only;
 - network destinations: GitHub for the two public repositories and Hugging
   Face for the two public model repositories.
@@ -31,6 +32,34 @@ Proposed bounded run:
 No distributed run is included in that ceiling. Single-GPU compatibility is
 required; DDP remains explicitly untested unless separately safe within an
 approved budget.
+
+## Remote submission evidence
+
+The user authorized the bounded job. On 2026-07-26, no remote job could be
+created:
+
+1. Hugging Face Jobs connector, Docker argv submission on `l4x1`:
+   `INVALID_ARGUMENT` before job creation.
+2. Hugging Face Jobs connector, Docker string submission on `l4x1`:
+   `INVALID_ARGUMENT` before job creation.
+3. Authenticated connector, minimal two-minute `cpu-basic` UV validation:
+   `INVALID_ARGUMENT` before job creation.
+4. Official local `hf jobs` CLI fallback: rejected locally as not logged in;
+   no API submission occurred.
+
+The connector identifies the account as `rishisim`, can list Jobs, and reported
+no running Jobs. The official hardware listing exposes `l4x1`, so the requested
+flavor exists. Because even the minimal CPU validation fails identically, the
+remaining gate is the Jobs connector/account entitlement or its submission
+authorization, not the preflight payload.
+
+**Cost incurred: USD 0.00.** No remote job ID, GPU allocation, artifact, or log
+was created.
+
+Exact unblock action: restore Jobs submission authorization for the connected
+Hugging Face account, or authenticate the local official CLI with an account
+that has Hugging Face Jobs access. After that external action, rerun the already
+approved single-L4 command below without changing the scientific contract.
 
 ## Reproduced upstream invariants
 
