@@ -62,6 +62,18 @@ After Jobs authentication was restored, two L4 allocations ran:
 These are environment/manifest repairs to the canonical preflight, not bridge
 attempts and not changes to either public prior.
 
+Two subsequent allocations advanced the runtime:
+
+1. Job `6a66aef4db23d7a7ec1cf0fe` validated the corrected file hashes and
+   initialized CUDA/distributed code, then stopped because an unused bundled
+   COCO path interpolation required environment values. Disposable empty paths
+   now satisfy resolution; no dataset was accessed.
+2. Job `6a66afc07ef3c0846496a170` initialized the shared prior and reached the
+   first CUDA contrastive operation. PyTorch deterministic mode correctly
+   rejected cuBLAS execution without a pre-import
+   `CUBLAS_WORKSPACE_CONFIG=:4096:8`. The canonical entrypoint now sets that
+   declared deterministic workspace configuration before importing PyTorch.
+
 The connector identifies the account as `rishisim`, and the official hardware
 listing exposes `l4x1`. The two allocations consumed 137 seconds of L4 runtime,
 approximately USD 0.03 at the listed rate. Neither produced a retained artifact

@@ -15,6 +15,10 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
 
+# Required by torch deterministic algorithms for CUDA >= 10.2. This must be
+# set before the first torch import, including imports inside upstream modules.
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+
 from .bridge import convert_hf_dinov2_base, strict_state_equality
 from .contract import canonical_json_sha256, file_sha256, lexical_macro_wiring, schedule_cycle
 
