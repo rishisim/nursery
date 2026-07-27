@@ -69,6 +69,10 @@ installed. The public/dummy single-L4 EgoBabyVLM compatibility preflight is
 complete and passed as engineering evidence only; DDP and restricted-data
 readiness remain unproven. Phase 3 safe governance/preregistration decisions
 are now frozen, but its status is **INFRASTRUCTURE/PERMISSION GATE**, not PASS.
+MPI has granted the authorized applicant non-commercial academic ChildLens
+access; the remaining permission gate concerns UTD qualification of the
+external-drive/storage arrangement and derived-export rules. Third-party
+access remains prohibited.
 Exact unblock actions are in
 [`docs/synthetic_video_preregistration.md`](docs/synthetic_video_preregistration.md).
 Common assets, LTX/Wan, TTS, ChildLens preprocessing, generation, and learner

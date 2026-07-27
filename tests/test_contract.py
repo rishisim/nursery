@@ -57,9 +57,15 @@ def test_phase3_preregistration_preserves_frozen_contract() -> None:
     assert config["unblinding"]["synthetic_scores_sealed_until_real_only_gate_passes"] is True
     assert config["cost"]["existing_childlens_cost_is_zero"] is False
     assert config["gates"]["phase4_authorized"] is False
+    assert config["gates"]["childlens_academic_noncommercial_access"] == "ESTABLISHED"
+    assert config["gates"]["authorized_read_only_aggregate_inventory"] == (
+        "AUTHORIZED_BUT_NOT_RUN"
+    )
+    assert config["gates"]["personnel_model"] == (
+        "SINGLE_AUTHORIZED_APPLICANT_WITH_STAGED_PROCEDURAL_ROLES"
+    )
+    assert config["unblinding"]["personnel_independence"] is False
     assert all(value == "MISSING" for value in (
-        config["gates"]["childlens_data_use_confirmation"],
+        config["gates"]["institutional_storage_and_derived_export_qualification"],
         config["gates"]["governed_cuda_qualification"],
-        config["gates"]["authorized_read_only_aggregate_inventory"],
-        config["gates"]["named_independent_roles"],
     ))

@@ -9,10 +9,12 @@ BabyView media were accessed.
 
 **Current stage:** Phase 2 is complete: the bounded public/dummy single-L4
 CUDA compatibility preflight passed. Phase 3 safe protocol work is complete
-but remains at an **INFRASTRUCTURE/PERMISSION GATE** pending positive ChildLens
-data-use confirmation, an approved governed CUDA environment, authorized
-read-only aggregate inventory, named independent roles, and the bounded
-public-only ASR/translation selection. See
+but remains at an **INFRASTRUCTURE/PERMISSION GATE**. MPI has granted the
+authorized applicant non-commercial academic ChildLens access; third-party
+access is prohibited. Remaining gates are UTD qualification of the external
+drive/storage and derived-export rules, an approved governed CUDA environment,
+the local aggregate inventory, and the bounded public-only ASR/translation
+selection. See
 [`synthetic_video_preregistration.md`](synthetic_video_preregistration.md).
 The L4 result is engineering-smoke evidence only, not scientific performance,
 restricted-data readiness, a full-training memory estimate, or DDP evidence.
@@ -366,12 +368,14 @@ Approved compute is split:
 | Topic | Status | Owner | Exact unblock action |
 |---|---|---|---|
 | Estimand, learner, common benchmark, split/credit rules, analysis, cost, sealing | `FROZEN` | PI/statistician/custodian | Preserve the canonical preregistration and fill only its blind numeric fields |
-| ChildLens consent and planned derived uses | `INFRASTRUCTURE/PERMISSION GATE` | Institutional data steward | Issue written permission determination for every material/use class |
+| ChildLens academic use | `FROZEN` | Authorized applicant | Keep use academic/non-commercial, secure, applicant-only, and cite DOI `10.17617/4.fe` |
+| External drive/storage and aggregate export | `INFRASTRUCTURE/PERMISSION GATE` | UTD information security | Qualify the named arrangement and rule on compact derived exports |
 | Governed restricted-data CUDA | `INFRASTRUCTURE/PERMISSION GATE` | Institution/IT security | Qualify a named system, including observed egress and deletion tests |
 | \(H/r\) and independent split feasibility | `REQUIRES CONFIRMATION` | Data steward/statistician | Authorize the minimal aggregate-only inventory and apply the frozen selection algorithm |
 | DDP | `REQUIRES CONFIRMATION` | Technical lead | Size blindly; if multi-process is required, pass a separately approved public/dummy DDP preflight |
 | ASR/translation weights | `REQUIRES CONFIRMATION` | Language/technical lead | Complete the bounded public-language no-egress selection and pin hashes/licenses |
-| Human German validation | `INFRASTRUCTURE/PERMISSION GATE` | PI/data steward | Name and authorize a qualified German-speaking rater or retain model-derived claims only |
+| Personnel/unblinding | `FROZEN` | Authorized applicant | Use staged single-operator roles, commitments, and scripted unblinding; disclose lack of personnel independence |
+| Human German validation | `FROZEN` | Authorized applicant | Use no third-party rater; retain model-derived claims unless MPI separately authorizes one |
 | Confirmed incompatible consent/license, infeasible independent split, or no compliant compute path | `NO-GO` | PI/institution | Stop the empirical study; do not weaken the frozen question |
 
 ## Phased implementation sequence and stop rules
@@ -402,9 +406,9 @@ evaluation remain prohibited.
 3. **Governance and preregistration.** The protocol, blind selection rules,
    lineage/accounting, analysis, cost, and sealing plans are frozen. Exact
    numeric ChildLens values remain governed inputs, not guesses. *Current:
-   INFRASTRUCTURE/PERMISSION GATE.* *Done when:* written ChildLens permission,
-   governed CUDA qualification, authorized aggregate inventory, named
-   independent roles, resolved single-GPU/DDP route, and pinned or sole-
+   INFRASTRUCTURE/PERMISSION GATE.* *Done when:* UTD storage/data-protection
+   qualification, governed CUDA qualification, local aggregate inventory,
+   resolved single-GPU/DDP route, and pinned or sole-
    remaining bounded public-only ASR/translation substage are signed without
    opening synthetic scores.
 4. **Common evaluation assets.** Using only \(C\) and public resources, freeze

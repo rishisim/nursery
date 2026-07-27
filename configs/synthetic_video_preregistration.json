@@ -79,10 +79,12 @@
     "selection_substage": "bounded_public_language_only"
   },
   "gates": {
-    "childlens_data_use_confirmation": "MISSING",
+    "childlens_academic_noncommercial_access": "ESTABLISHED",
+    "childlens_third_party_access": "PROHIBITED_WITHOUT_SEPARATE_MPI_AUTHORIZATION",
+    "institutional_storage_and_derived_export_qualification": "MISSING",
     "governed_cuda_qualification": "MISSING",
-    "authorized_read_only_aggregate_inventory": "MISSING",
-    "named_independent_roles": "MISSING",
+    "authorized_read_only_aggregate_inventory": "AUTHORIZED_BUT_NOT_RUN",
+    "personnel_model": "SINGLE_AUTHORIZED_APPLICANT_WITH_STAGED_PROCEDURAL_ROLES",
     "ddp": "MANDATORY_IF_RESOURCE_SIZING_REQUIRES_MULTIPLE_PROCESSES",
     "asr_translation": "PUBLIC_ONLY_BOUNDED_SELECTION_REQUIRED",
     "phase4_authorized": false
@@ -95,6 +97,8 @@
   "unblinding": {
     "synthetic_scores_sealed_until_real_only_gate_passes": true,
     "hash_commitment": "SHA-256_in_append_only_institutional_store",
+    "personnel_independence": false,
+    "single_operator_limitation_must_be_reported": true,
     "no_post_hoc_margin_benchmark_seed_or_primary_claim_change": true
   },
   "cost": {
