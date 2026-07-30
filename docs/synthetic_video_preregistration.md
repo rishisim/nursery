@@ -3,7 +3,7 @@
 **Phase 3 status:** **INFRASTRUCTURE/PERMISSION GATE** *(infrastructure only;
 ChildLens permission is established)*
 
-**Evidence cut-off:** 2026-07-27
+**Evidence cut-off:** 2026-07-30
 
 **Authority boundary:** this record freezes every decision that can be made
 without examining restricted ChildLens content or participant-identifying
@@ -53,7 +53,7 @@ Status meanings are `FROZEN`, `REQUIRES CONFIRMATION`,
 | ChildLens academic use and aggregate reporting | `FROZEN` | The signed request explicitly covers ChildLens videos/annotations for non-commercial model calibration/evaluation in grounded learning, with aggregate-only reporting through July 2027. Paul Grohmann accepted the form and granted access | Authorized applicant | Keep every use within that scope, applicant-only, and cite DOI `10.17617/4.fe` |
 | ChildLens local storage | `FROZEN` | The corpus was migrated to an AES-256 encrypted sparsebundle with an applicant-only Keychain secret. A read-only checksum comparison matched 67,087 regular files / 47,917,156,217 bytes, 13 symlinks, and 6,353 directories before the unencrypted source was removed | Authorized applicant | Keep the image encrypted and unmounted except for applicant-only governed work |
 | ChildLens inventory | `FROZEN` | Aggregate inventory found 58 catalog children / 192 recordings / complete durations. The preexisting development-only allowlist fixes \(C\) at 18 children / 58 recordings / 14.374241 source hours, leaving 40 children / 134 recordings / 40.362056 source hours for confirmatory allocation with zero child overlap | Authorized applicant | Apply the frozen keyed split and \(H/r\) rules only after governed compute and the identical ASR/translation pipeline are qualified |
-| Governed CUDA | `INFRASTRUCTURE/PERMISSION GATE` | UTD Juno is institution-owned and offers H100/A30 GPUs, but the account is awaiting its welcome email. This Mac is Apple M5/Metal-only, Juno DNS is unavailable before activation/network access, and Juno restricted-data egress/audit/retention/deletion controls are not confirmed | Authorized applicant / UTD HPC administration | Wait for the welcome email; after activation, test read-only login and obtain the acceptance-contract evidence without transferring ChildLens data |
+| Governed CUDA | `INFRASTRUCTURE/PERMISSION GATE` | The institution-owned Juno account is active and applicant-only SSH access is verified. Home, work, and scratch targets are mode `0700`; `/groups/yding` is group-restricted. SLURM exposes A30, H100, and H200 partitions with MUNGE authentication, cgroup process/task isolation, and `slurmdbd` job accounting. A login-node egress test reached public Hugging Face and PyPI over HTTPS, so Juno as presently exposed fails the frozen default-deny egress contract. Storage encryption-at-rest, file/network audit scope and retention, backup/deletion verification, and the correct project-scoped SLURM association remain administrator confirmations | Authorized applicant / UTD HPC administration | Complete orientation; obtain an administrator-approved project-scoped no-egress execution/storage path, affirm or correct the observed SLURM associations for the `yding` research role, and record all ten acceptance items plus observed internal-success/public-egress-failure and deletion tests before transferring ChildLens |
 | DDP/scaling | `REQUIRES CONFIRMATION` | One L4 only; upstream reference is four processes | Technical lead | Size the full run blindly; if more than one GPU/process is required, pass the mandatory public/dummy DDP preflight before any restricted execution |
 | ASR/translation | `REQUIRES CONFIRMATION` | Interface and selection rules are frozen; exact local model weights are not yet selected | Language/technical lead | Run the bounded public-language selection substage below, then freeze revisions, hashes, licenses, and thresholds before ChildLens processing |
 | German human validation | `FROZEN` | No German-speaking human annotator is available, and the agreement prohibits making the dataset accessible to third parties | Authorized applicant | Use no human rater and retain only explicitly model-derived claims; a future rater requires separate MPI authorization |
@@ -62,11 +62,12 @@ Status meanings are `FROZEN`, `REQUIRES CONFIRMATION`,
 | Score sealing/unblinding | `FROZEN` | Synthetic-arm scores remain inaccessible until the real-only gate passes; this is a disclosed single-operator protocol | Authorized applicant | Use separate procedural roles, coded outputs, append-only commitments, and the ordered unblinding script below |
 | Cost comparison | `FROZEN` | Prospective like-for-like marginal and fully loaded ledgers; sunk ChildLens collection is not zero | Authorized applicant in locked cost stage | Insert pre-generation unit prices and distributions, then hash/sign the ledger |
 
-Phase 3 cannot be marked PASS because a governed CUDA environment is not yet
-qualified. ChildLens permission, encrypted local storage, complete aggregate
-inventory, calibration lineage, source-duration inventory, and child-level
-split feasibility are established. Exact credited \(H/r\) remains governed by
-the frozen blind post-ASR yield rule rather than an invented source-hour value.
+Phase 3 cannot be marked PASS because Juno is reachable but not yet qualified
+for restricted data. ChildLens permission, encrypted local storage, complete
+aggregate inventory, calibration lineage, source-duration inventory, and
+child-level split feasibility are established. Exact credited \(H/r\) remains
+governed by the frozen blind post-ASR yield rule rather than an invented
+source-hour value.
 The remaining status is an infrastructure gate, not a permission, engineering,
 or scientific failure. A confirmed consent/license
 incompatibility, inability to form an independent evaluation split under the
@@ -145,6 +146,43 @@ Before any restricted execution, a signed qualification must record:
    public preflight; and
 10. capacity qualification from the resource-sizing exercise below, including
     whether the registered run is single-process or DDP.
+
+### Juno candidate qualification evidence
+
+On 2026-07-30 UTD HPC confirmed account activation by institutional email.
+The applicant connected over UTD GlobalProtect to
+`juno.hpcre.utdallas.edu`; both private login addresses presented the same
+ED25519 host fingerprint
+`SHA256:ylbFsrAnLBJNCg9IF2mBfjE6hTg0l32Th8CRIPuihQE`. A dedicated
+passphrase-protected Ed25519 key is stored only on the applicant's Mac and
+loaded through the macOS Keychain. Read-only checks established:
+
+- Rocky Linux 9.5 and SLURM 23.11.10 on login node `juno-l-02`;
+- applicant-only mode `0700` on `/home/dal503972`,
+  `/work/dal503972`, and `/scratch/juno/dal503972`, with advertised quotas of
+  50 GB, 1 TB, and 30 TB respectively; `/groups/yding` is mode `2770` and
+  restricted to the `yding` Unix group;
+- active A30, H100, and H200 partitions; no GPU allocation or job was launched;
+- `auth/munge`, `proctrack/cgroup`, `task/cgroup,task/affinity`,
+  `jobacct_gather/cgroup`, and `accounting_storage/slurmdbd`;
+- default SLURM account `compsci` plus an additional non-`yding` association
+  (the unrelated account name is intentionally omitted from Git), while the
+  applicant's research Unix group is `yding`; this is not treated as proof of
+  the intended project-account boundary until HPC administration affirms or
+  corrects it; and
+- successful public DNS and HTTPS access to Hugging Face and PyPI from the
+  login node. This is affirmative evidence that the current candidate does
+  **not** implement the registered default-deny restricted-job egress policy.
+
+These checks establish account, capacity, basic Unix access control, and
+scheduler-accounting facts only. FUSE/Weka mount details do not establish
+encryption at rest. SLURM accounting does not establish file-access,
+administrator, network-flow, removable-media, export, or backup audit
+coverage. No retention/deletion test was performed. Compute-node egress has
+not been tested because orientation is not yet complete and no job was
+authorized. Therefore no ChildLens media or derived restricted material may be
+transferred to Juno. A compliant path requires an HPC/IT-admin enforced
+project-scoped network boundary—not a user-space promise to avoid the network.
 
 Ordinary Hugging Face Jobs or other hosted services are allowed only for
 public/dummy work. They may never receive ChildLens media, audio, transcripts,
@@ -483,11 +521,17 @@ The package is protocol-complete but infrastructure-gated. Dataset access,
 project-specific model calibration/evaluation, and aggregate reporting are
 established. The remaining actions are:
 
-1. **Governed CUDA qualification:** wait for the already requested Juno welcome
-   email and account activation. Then UTD HPC must approve a project-scoped
-   path and provide recorded responses/evidence
-   for all ten acceptance-contract items, including observed egress and
-   deletion tests.
+1. **Governed CUDA qualification:** the Juno account and applicant-only login
+   are active, but the login node has public HTTPS egress. Complete Juno
+   orientation, then have UTD HPC/IT security approve and enforce a
+   project-scoped no-egress compute/storage path; affirm or correct the
+   observed SLURM associations for the `yding` project; and provide recorded
+   evidence for encryption, access/privilege review,
+   full audit scope and retention, one-way weight ingress, cache/checkpoint/log
+   locations, backup/retention, and deletion. The witnessed acceptance test
+   must show an allowed internal endpoint succeeds while undeclared public DNS
+   and HTTPS fail from the actual compute job, followed by administrator-
+   verified deletion. Do not transfer ChildLens before this sign-off.
 2. **Public-language selection:** after the compute route is known, run only
    the bounded public/dummy German ASR→English translation substage and freeze
    model revisions, hashes, licenses, confidence/abstention thresholds, and

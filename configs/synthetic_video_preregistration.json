@@ -2,6 +2,7 @@
   "schema_version": 1,
   "phase": 3,
   "status": "INFRASTRUCTURE_PERMISSION_GATE",
+  "evidence_cutoff": "2026-07-30",
   "headline_question": "At equal H video hours, does EgoBabyVLM CLIP+ triple trained on Synthetic-full achieve lexical-grounding performance equivalent to Real-full, while the synthetic corpus has lower prospectively measured production cost?",
   "learner": {
     "upstream_commit": "224621caf0628270b6115845ac75a65b984234a3",
@@ -94,6 +95,74 @@
     "exact_translation_model": null,
     "selection_substage": "bounded_public_language_only"
   },
+  "governed_compute": {
+    "candidate": "UTD_JUNO",
+    "institution_owned": true,
+    "account_active": true,
+    "login_host": "juno.hpcre.utdallas.edu",
+    "observed_login_node": "juno-l-02",
+    "host_ed25519_fingerprint": "SHA256:ylbFsrAnLBJNCg9IF2mBfjE6hTg0l32Th8CRIPuihQE",
+    "applicant_only_ssh_key_authentication": "PASS",
+    "platform": "Rocky_Linux_9.5",
+    "slurm_version": "23.11.10",
+    "slurm_controls_observed": [
+      "auth_munge",
+      "proctrack_cgroup",
+      "task_cgroup_and_affinity",
+      "jobacct_gather_cgroup",
+      "accounting_storage_slurmdbd"
+    ],
+    "yding_unix_group_membership": true,
+    "slurm_default_account_observed": "compsci",
+    "additional_non_yding_slurm_account_observed": true,
+    "additional_slurm_account_name_committed_to_git": false,
+    "project_account_boundary": "ADMIN_MUST_AFFIRM_OR_CORRECT_FOR_YDING_ROLE",
+    "storage": {
+      "home": {
+        "quota": "50GB",
+        "mode": "0700"
+      },
+      "work": {
+        "quota": "1TB",
+        "mode": "0700"
+      },
+      "scratch": {
+        "quota": "30TB",
+        "mode": "0700",
+        "backed_up": false,
+        "purge_days": 45
+      },
+      "yding_group": {
+        "mode": "2770"
+      },
+      "encryption_at_rest": "ADMIN_CONFIRMATION_REQUIRED"
+    },
+    "gpu_partitions_observed": [
+      "a30",
+      "a30-2.12gb",
+      "a30-4.6gb",
+      "h100",
+      "h200"
+    ],
+    "gpu_job_launched": false,
+    "orientation": "REQUIRED_BEFORE_GPU_BENCHMARK",
+    "login_node_egress_test": {
+      "huggingface_https_status": 200,
+      "pypi_https_status": 200,
+      "default_deny_contract": "FAIL"
+    },
+    "compute_node_egress_test": "NOT_RUN_BEFORE_ORIENTATION",
+    "administrator_confirmations_required": [
+      "project_scoped_default_deny_network_boundary",
+      "encryption_at_rest_and_key_ownership",
+      "file_privilege_network_export_and_backup_audit_scope_and_retention",
+      "one_way_public_weight_and_package_ingress",
+      "cache_checkpoint_log_crash_dump_swap_and_backup_locations",
+      "retention_and_administrator_verified_deletion",
+      "project_slurm_association_and_revocation_path"
+    ],
+    "restricted_data_transfer_authorized": false
+  },
   "gates": {
     "childlens_academic_noncommercial_access": "ESTABLISHED",
     "childlens_project_specific_model_calibration_evaluation": "ESTABLISHED",
@@ -104,8 +173,8 @@
     "storage_migration_regular_bytes_verified": 47917156217,
     "storage_migration_symlinks_verified": 13,
     "unencrypted_source_removed_after_verification": true,
-    "governed_cuda_qualification": "MISSING",
-    "governed_cuda_candidate": "UTD_JUNO_H100_OR_A30_AWAITING_WELCOME_EMAIL_THEN_ADMIN_CONTROL_CONFIRMATION",
+    "governed_cuda_qualification": "FAIL_OPEN_EGRESS_AND_ADMIN_CONTROLS_UNCONFIRMED",
+    "governed_cuda_candidate": "UTD_JUNO_ACTIVE_ACCOUNT_REQUIRES_PROJECT_SCOPED_NO_EGRESS_PATH_AND_ADMIN_CONTROL_ATTESTATION",
     "authorized_read_only_aggregate_inventory": "COMPLETE",
     "personnel_model": "SINGLE_AUTHORIZED_APPLICANT_WITH_STAGED_PROCEDURAL_ROLES",
     "ddp": "MANDATORY_IF_RESOURCE_SIZING_REQUIRES_MULTIPLE_PROCESSES",

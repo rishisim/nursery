@@ -76,8 +76,12 @@ ChildLens model calibration/evaluation and aggregate reporting through July
 local ChildLens corpus is now in a checksum-verified AES-256 sparsebundle.
 Inventory fixes 18 prior development children / 14.374241 source hours as
 \(C\), leaving 40 untouched catalog children / 134 recordings / 40.362056
-source hours for confirmatory allocation. Governed Juno qualification remains
-required and is waiting on the account welcome email.
+source hours for confirmatory allocation. The Juno account and SSH key are
+active, with applicant-only home/work/scratch permissions and visible
+A30/H100/H200 capacity. Juno is not yet a governed restricted-data boundary:
+public login-node HTTPS egress is open, and administrator evidence for
+project-scoped egress controls, encryption, full audit coverage, retention, and
+verified deletion remains required.
 Exact unblock actions are in
 [`docs/synthetic_video_preregistration.md`](docs/synthetic_video_preregistration.md).
 Common assets, LTX/Wan, TTS, ChildLens preprocessing, generation, and learner

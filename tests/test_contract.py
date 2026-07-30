@@ -75,4 +75,14 @@ def test_phase3_preregistration_preserves_frozen_contract() -> None:
         "SINGLE_AUTHORIZED_APPLICANT_WITH_STAGED_PROCEDURAL_ROLES"
     )
     assert config["unblinding"]["personnel_independence"] is False
-    assert config["gates"]["governed_cuda_qualification"] == "MISSING"
+    assert config["gates"]["governed_cuda_qualification"] == (
+        "FAIL_OPEN_EGRESS_AND_ADMIN_CONTROLS_UNCONFIRMED"
+    )
+    assert config["governed_compute"]["account_active"] is True
+    assert (
+        config["governed_compute"]["login_node_egress_test"]["default_deny_contract"]
+        == "FAIL"
+    )
+    assert config["governed_compute"]["gpu_job_launched"] is False
+    assert config["governed_compute"]["restricted_data_transfer_authorized"] is False
+    assert config["governed_compute"]["additional_slurm_account_name_committed_to_git"] is False

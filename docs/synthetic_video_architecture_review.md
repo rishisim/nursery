@@ -2,10 +2,10 @@
 
 **Status:** frozen decision record
 
-**Evidence cut-off:** 2026-07-26
+**Evidence cut-off:** 2026-07-30
 
-**Scope:** public sources and public/synthetic-only pilot design; no ChildLens or
-BabyView media were accessed.
+**Scope:** architecture plus compact governance/compute evidence; no ChildLens
+or BabyView media content was accessed.
 
 **Current stage:** Phase 2 is complete: the bounded public/dummy single-L4
 CUDA compatibility preflight passed. Phase 3 safe protocol work is complete
@@ -18,9 +18,14 @@ checksum-verified. Inventory fixes the 18-child prior development allowlist as
 \(C\), leaving 40 untouched catalog children for confirmatory allocation.
 Complete aggregate metadata establishes 40.362056 source hours across the 134
 eligible recordings. Remaining gates are approved governed Juno CUDA and
-bounded public-only ASR/translation selection. Juno account activation is
-currently waiting on the welcome email; no restricted data may be transferred
-before the governed-compute contract is qualified. See
+bounded public-only ASR/translation selection. The Juno account and
+applicant-only SSH key are active; read-only qualification confirmed A30,
+H100, and H200 capacity and applicant-only storage permissions, but public
+HTTPS egress is open and administrator evidence for encryption, comprehensive
+audit, retention, and deletion is still missing. Juno therefore remains an
+infrastructure candidate, not a qualified restricted-data boundary. No
+restricted data may be transferred before the governed-compute contract is
+signed. See
 [`synthetic_video_preregistration.md`](synthetic_video_preregistration.md).
 The L4 result is engineering-smoke evidence only, not scientific performance,
 restricted-data readiness, a full-training memory estimate, or DDP evidence.
@@ -377,7 +382,7 @@ Approved compute is split:
 | ChildLens academic model use and aggregate reporting | `FROZEN` | Authorized applicant | Stay within the signed July 2026–July 2027 scope, applicant-only, and cite DOI `10.17617/4.fe` |
 | ChildLens local storage | `FROZEN` | Authorized applicant | Preserve the verified AES-256 sparsebundle and applicant-only Keychain access |
 | \(C\) and catalog lineage | `FROZEN` | Authorized applicant | Keep all 18 prior development children in \(C\); allocate only the remaining 40 children |
-| Governed restricted-data CUDA | `INFRASTRUCTURE/PERMISSION GATE` | Institution/IT security | Qualify a named system, including observed egress and deletion tests |
+| Governed restricted-data CUDA | `INFRASTRUCTURE/PERMISSION GATE` | Institution/IT security | Juno login/key/storage/GPU access is established, but public login-node HTTPS egress is open; complete orientation and obtain an admin-enforced project no-egress path, correct/affirm project SLURM associations, and pass observed compute-node egress plus deletion tests |
 | \(H/r\) and independent split feasibility | `REQUIRES CONFIRMATION` | Authorized applicant in locked statistician stage | Use the complete 40-child/40.362056-source-hour inventory; set credited \(H/r\) only after identical ASR/translation yield is available |
 | DDP | `REQUIRES CONFIRMATION` | Technical lead | Size blindly; if multi-process is required, pass a separately approved public/dummy DDP preflight |
 | ASR/translation weights | `REQUIRES CONFIRMATION` | Language/technical lead | Complete the bounded public-language no-egress selection and pin hashes/licenses |
@@ -413,8 +418,9 @@ evaluation remain prohibited.
 3. **Governance and preregistration.** The protocol, blind selection rules,
    lineage/accounting, analysis, cost, and sealing plans are frozen. Exact
    numeric ChildLens values remain governed inputs, not guesses. *Current:
-   INFRASTRUCTURE/PERMISSION GATE (infrastructure only).* *Done when:* governed
-   Juno CUDA qualification,
+   INFRASTRUCTURE/PERMISSION GATE (infrastructure only).* Juno account access is
+   active, but its present open-egress path is not qualified. *Done when:*
+   governed Juno CUDA qualification,
    resolved single-GPU/DDP route, and pinned or sole-
    remaining bounded public-only ASR/translation substage are signed without
    opening synthetic scores.
