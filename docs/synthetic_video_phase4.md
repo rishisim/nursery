@@ -9,13 +9,13 @@ generation, learner training, score opening, and scientific evaluation.
 
 ## Stage A: prospectively frozen public-language gate
 
-The closed candidate family contains exactly two multilingual ASR checkpoints:
-`openai/whisper-base@e37978b90ca9030d5170a5c07aadb050351a65bb` and
-`openai/whisper-small@973afd24965f72e36ca33b3055d56a652f456b4d`.
+The closed candidate family contains exactly two official multilingual ASR
+checkpoints loaded by `openai-whisper==20250625`: `base.pt` at SHA-256
+`ed3a0b6b…2e34e` and `small.pt` at SHA-256 `9ecf7799…e794`.
 Both use German transcription with word timestamps and the same
 `Helsinki-NLP/opus-mt-de-en@1a922f3b32a8e809e17a47d4b32142d8105924e5`
-translator. All three model cards declare Apache-2.0. No candidate may be
-added after outcomes are observed.
+translator. Whisper is MIT-licensed and the translator is Apache-2.0. No
+candidate may be added after outcomes are observed.
 
 The public ASR set is the first recording for each of the first eight distinct
 sentence IDs in the immutable German FLEURS test manifest at

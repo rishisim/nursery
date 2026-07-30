@@ -6,12 +6,24 @@
   "candidate_order": ["whisper-base-opus-de-en", "whisper-small-opus-de-en"],
   "candidates": {
     "whisper-base-opus-de-en": {
-      "asr": {"repository": "openai/whisper-base", "revision": "e37978b90ca9030d5170a5c07aadb050351a65bb", "license": "apache-2.0"},
+      "asr": {
+        "repository": "https://github.com/openai/whisper",
+        "revision": "v20250625",
+        "artifact_url": "https://openaipublic.azureedge.net/main/whisper/models/ed3a0b6b1c0edf879ad9b11b1af5a0e6ab5db9205f891f668f8b0e6c6326e34e/base.pt",
+        "artifact_sha256": "ed3a0b6b1c0edf879ad9b11b1af5a0e6ab5db9205f891f668f8b0e6c6326e34e",
+        "license": "mit"
+      },
       "translation": "opus-mt-de-en",
       "resource_rank": 1
     },
     "whisper-small-opus-de-en": {
-      "asr": {"repository": "openai/whisper-small", "revision": "973afd24965f72e36ca33b3055d56a652f456b4d", "license": "apache-2.0"},
+      "asr": {
+        "repository": "https://github.com/openai/whisper",
+        "revision": "v20250625",
+        "artifact_url": "https://openaipublic.azureedge.net/main/whisper/models/9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794/small.pt",
+        "artifact_sha256": "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794",
+        "license": "mit"
+      },
       "translation": "opus-mt-de-en",
       "resource_rank": 2
     }
