@@ -1,15 +1,14 @@
 # Synthetic-video governance and preregistration
 
-**Phase 3 status:** **INFRASTRUCTURE/PERMISSION GATE** *(infrastructure only;
-ChildLens permission is established)*
+**Phase 3 status:** **PASS**
 
 **Evidence cut-off:** 2026-07-30
 
-**Authority boundary:** this record freezes every decision that can be made
-without examining restricted ChildLens content or participant-identifying
-records. It does not authorize ChildLens access, common evaluation assets,
-training, generator work, generation, TTS, or scientific evaluation. BabyView
-is unavailable, out of scope, and supplies no empirical ancestry.
+**Authority boundary:** this record freezes every Phase 3 decision. It
+authorizes a separately scoped Phase 4 common-asset task under the controls
+below, but does not itself begin common evaluation assets, real-only training,
+generator work, generation, TTS, or scientific evaluation. BabyView is
+unavailable, out of scope, and supplies no empirical ancestry.
 
 The public/dummy single-NVIDIA-L4 engineering preflight at Nursery commit
 `1e8e94dbec4ad1ed701298f2c0ebb58cca26c877` is a PASS for the pinned
@@ -44,8 +43,7 @@ text is QA-only.
 
 ## Evidence and decision matrix
 
-Status meanings are `FROZEN`, `REQUIRES CONFIRMATION`,
-`INFRASTRUCTURE/PERMISSION GATE`, and `NO-GO`.
+Status meanings are `FROZEN`, `REQUIRES CONFIRMATION`, and `NO-GO`.
 
 | Topic | Status | Evidence or frozen decision | Owner | Exact unblock action |
 |---|---|---|---|---|
@@ -53,7 +51,8 @@ Status meanings are `FROZEN`, `REQUIRES CONFIRMATION`,
 | ChildLens academic use and aggregate reporting | `FROZEN` | The signed request explicitly covers ChildLens videos/annotations for non-commercial model calibration/evaluation in grounded learning, with aggregate-only reporting through July 2027. Paul Grohmann accepted the form and granted access | Authorized applicant | Keep every use within that scope, applicant-only, and cite DOI `10.17617/4.fe` |
 | ChildLens local storage | `FROZEN` | The corpus was migrated to an AES-256 encrypted sparsebundle with an applicant-only Keychain secret. A read-only checksum comparison matched 67,087 regular files / 47,917,156,217 bytes, 13 symlinks, and 6,353 directories before the unencrypted source was removed | Authorized applicant | Keep the image encrypted and unmounted except for applicant-only governed work |
 | ChildLens inventory | `FROZEN` | Aggregate inventory found 58 catalog children / 192 recordings / complete durations. The preexisting development-only allowlist fixes \(C\) at 18 children / 58 recordings / 14.374241 source hours, leaving 40 children / 134 recordings / 40.362056 source hours for confirmatory allocation with zero child overlap | Authorized applicant | Apply the frozen keyed split and \(H/r\) rules only after governed compute and the identical ASR/translation pipeline are qualified |
-| Governed CUDA | `INFRASTRUCTURE/PERMISSION GATE` | The institution-owned Juno account is active and applicant-only SSH access is verified. Home, work, and scratch targets are mode `0700`; `/groups/yding` is group-restricted. SLURM exposes A30, H100, and H200 partitions with MUNGE authentication, cgroup process/task isolation, and `slurmdbd` job accounting. Official self-study orientation is reviewed. Login- and compute-node egress tests both reached public Hugging Face and PyPI over HTTPS, so Juno as presently exposed fails the frozen default-deny egress contract. Storage encryption-at-rest, file/network audit scope and retention, backup/deletion verification, and the correct project-scoped SLURM association remain administrator confirmations | Authorized applicant / UTD HPC administration | Open the Juno general-support/security review with the ten-item acceptance contract; obtain an administrator-approved project-scoped no-egress execution/storage path, affirm or correct the observed SLURM associations for the `yding` research role, and pass witnessed internal-success/public-egress-failure plus deletion tests before transferring ChildLens |
+| Governed CUDA | `FROZEN` | Institution-owned Juno is qualified under the signed agreement and UTD's risk-based policy: applicant-only account, UTD VPN plus SSH, private `0700` home/work/scratch targets, group-restricted `yding` storage, SLURM isolation/accounting, and UTD-managed execution. Open public egress is permitted for pinned public dependency ingress and is not itself a failure; transmission of ChildLens or derived restricted artifacts to APIs, hosted services, Git, cloud storage, telemetry, or other third parties remains prohibited | Authorized applicant | Enforce the frozen restricted-job controls below; keep all restricted files/caches/logs/checkpoints on UTD storage and clean temporary scratch data |
+| SLURM fair-share mapping | `REQUIRES CONFIRMATION` *(non-blocking)* | The applicant is in the `yding` Unix group, but `sacctmgr` lists `compsci` and one unrelated PI association rather than `yding`; CPU test job `310661` was charged to `compsci` | Authorized applicant / UTD HPC administration | Ask HPC to add or affirm the `yding` SLURM association and review/remove the unrelated association; this is an accounting/fair-share correction, not a ChildLens security gate |
 | DDP/scaling | `REQUIRES CONFIRMATION` | One L4 only; upstream reference is four processes | Technical lead | Size the full run blindly; if more than one GPU/process is required, pass the mandatory public/dummy DDP preflight before any restricted execution |
 | ASR/translation | `REQUIRES CONFIRMATION` | Interface and selection rules are frozen; exact local model weights are not yet selected | Language/technical lead | Run the bounded public-language selection substage below, then freeze revisions, hashes, licenses, and thresholds before ChildLens processing |
 | German human validation | `FROZEN` | No German-speaking human annotator is available, and the agreement prohibits making the dataset accessible to third parties | Authorized applicant | Use no human rater and retain only explicitly model-derived claims; a future rater requires separate MPI authorization |
@@ -62,25 +61,26 @@ Status meanings are `FROZEN`, `REQUIRES CONFIRMATION`,
 | Score sealing/unblinding | `FROZEN` | Synthetic-arm scores remain inaccessible until the real-only gate passes; this is a disclosed single-operator protocol | Authorized applicant | Use separate procedural roles, coded outputs, append-only commitments, and the ordered unblinding script below |
 | Cost comparison | `FROZEN` | Prospective like-for-like marginal and fully loaded ledgers; sunk ChildLens collection is not zero | Authorized applicant in locked cost stage | Insert pre-generation unit prices and distributions, then hash/sign the ledger |
 
-Phase 3 cannot be marked PASS because Juno is reachable but not yet qualified
-for restricted data. ChildLens permission, encrypted local storage, complete
-aggregate inventory, calibration lineage, source-duration inventory, and
-child-level split feasibility are established. Exact credited \(H/r\) remains
-governed by the frozen blind post-ASR yield rule rather than an invented
-source-hour value.
-The remaining status is an infrastructure gate, not a permission, engineering,
-or scientific failure. A confirmed consent/license
-incompatibility, inability to form an independent evaluation split under the
-rules below, or absence of any compliant restricted-data compute path after
-documented alternatives are exhausted changes the status to `NO-GO`.
+Phase 3 is PASS. ChildLens permission, encrypted local storage, complete
+aggregate inventory, calibration lineage, source-duration inventory,
+child-level split feasibility, governed Juno handling, cost rules, sealing,
+and unblinding are established. Exact credited \(H/r\) remains governed by the
+frozen blind post-ASR yield rule rather than an invented source-hour value.
+The bounded public-only ASR/translation selection is the sole remaining
+technical substage permitted by the Phase 3 pass rule. DDP remains a mandatory
+public/dummy gate only if blind sizing requires multiple processes. A confirmed
+consent/license incompatibility, inability to form an independent evaluation
+split under the rules below, or loss of every compliant institutional compute
+path changes the status to `NO-GO`.
 
 ## Governance and permission matrix
 
-“Governed boundary” means the institutionally approved restricted-data system,
-not this repository, ordinary cloud storage, Hugging Face Jobs, external APIs,
-or a personal unmanaged workstation. ChildLens permission is established by
-the accepted signed agreement. The following rules operationalize its secure,
-applicant-only, non-commercial handling conditions.
+“Governed boundary” means the encrypted applicant-only local sparsebundle and
+institution-owned Juno storage/execution under UTD policy. It excludes this
+repository, unencrypted personal-device paths, ordinary cloud storage, Hugging
+Face Jobs, external APIs, and hosted experiment trackers. ChildLens permission
+is established by the accepted signed agreement. The following rules
+operationalize its secure, applicant-only, non-commercial handling conditions.
 
 Established agreement evidence is affirmative and project-specific. The signed
 request names “Sensorimotor Cues for Grounded Action-Language Learning,” UTD,
@@ -93,61 +93,76 @@ The agreement prohibits commercial use, commercial-model training, sharing,
 redistribution, and third-party access; requires secure storage under
 institutional data-protection rules and institutional-email correspondence;
 and requires citation of DOI `10.17617/4.fe`. It does not certify a particular
-drive, workstation, CUDA host, or third-party rater.
+drive, workstation, CUDA host, or third-party rater. Dr. Yi Ding is the named
+supervisor/UTD research sponsor; the applicant is the sole current data user
+and pipeline operator. Membership in the `yding` Unix research group records
+that sponsorship, consistent with
+[UTD's PI-sponsored Juno account process](https://hpc.utdallas.edu/getting-started-with-hpc/).
+SLURM fair-share accounting does not define ChildLens authorization.
 
 | Material class | Permitted storage/execution | Network and egress | Access roles and logging | Retention and disposition | Git |
 |---|---|---|---|---|---|
-| ChildLens raw video/audio | Encrypted governed storage and qualified governed compute only | Default-deny outbound; never hosted services/APIs | Named data custodians and authorized preprocessing operators; read/access/export events logged | Source retention follows controlling agreement; custodian verifies deletion of task-local copies | Never |
-| Transcripts, ASR, translations, frames, embeddings, ChildLens-derived prompts/statistics | Same boundary and controls as raw unless the steward explicitly reclassifies a named aggregate | No egress by default; no model telemetry | Least-privilege pipeline operators; artifact creation/read/export logged | Derived retention schedule approved before creation; pipeline owner deletes temporaries and custodian verifies | Never, except a specifically approved compact non-identifying aggregate |
-| Participant/session identifiers and split ledgers | Separate encrypted governed namespace; direct identifiers never exposed to learner operators | No egress | Data custodian only for identity map; split operator sees opaque IDs; all mapping access logged | Identity map retained/deleted by custodian under agreement; analysis ledger archived as authorized | Never |
+| ChildLens raw video/audio | Encrypted applicant-only local storage or applicant-only UTD-managed Juno storage/compute | Public dependency downloads are allowed; dataset content may never be transmitted to hosted services, APIs, cloud storage, Git, telemetry, or other third parties | Authorized applicant only; Unix permissions and SLURM job/provenance records retained | Source retention follows the agreement/project period; applicant removes task-local and scratch copies | Never |
+| Transcripts, ASR, translations, frames, embeddings, ChildLens-derived prompts/statistics | Same boundary and controls as raw unless a named aggregate passes disclosure review | Open network availability grants no export permission; external logging/telemetry disabled and model loading is local/offline during restricted processing | Authorized applicant only; artifact creation and disposition recorded in the governed run manifest | Derived retention schedule fixed before creation; applicant deletes temporaries and expired outputs | Never, except a specifically approved compact non-identifying aggregate |
+| Participant/session identifiers and split ledgers | Separate applicant-only governed namespace; direct identifiers never enter learner-facing manifests | No third-party transfer | Authorized applicant sees the identity map; learner pipeline receives opaque keyed IDs; mapping operations recorded | Identity map follows the agreement/project period; analysis ledger archived as authorized | Never |
 | Public/dummy media and public model weights | Repository-external public cache or hosted/public CUDA | Ordinary network allowed only for declared public sources | Technical staff; provenance and hashes logged | Reproducible caches may be deleted; immutable pins retained | Source/config/hash metadata only; not weights/media |
-| Synthetic outputs, failed generations, QA labels, manifests | Public-only development outputs may use approved public compute; study outputs are governed because plans/statistics may derive from \(C\) | Study outputs inherit default-deny; public-only outputs may use declared public services | Generator/QA roles; every attempt, access, label, and disposition logged | Retain all attempts through locked analysis in governed run storage, then archive/delete per approved schedule | No media, attempts, prompts derived from \(C\), or row-level manifests; compact approved aggregates/config only |
+| Synthetic outputs, failed generations, QA labels, manifests | Public-only development outputs may use approved public compute; study outputs are governed when plans/statistics derive from \(C\) | Restricted study artifacts may not be sent to third parties; public-only outputs may use declared public services | Generator/QA roles; every attempt, label, and disposition recorded | Retain all attempts through locked analysis in governed run storage, then archive/delete per approved schedule | No media, attempts, prompts derived from \(C\), or row-level manifests; compact approved aggregates/config only |
 | Compact permitted aggregates | Governed staging until disclosure review; then approved institutional/repository location | Export only after documented disclosure review | Data steward approves; exporter and exact fields logged | Curated decision records retained with provenance | Allowed only if non-identifying, authorized, compact, and no reconstructive content |
 | Human-rater materials | Governed rater interface only; no local downloads/screenshots | No outbound transfer | Named authorized raters, rater manager, and auditor; item access and decisions logged | Rater caches deleted at session end; labels follow approved retention | Aggregate agreement/decision only if approved |
 
-Deletion/archival responsibility is explicit: the data custodian owns raw and
-identity records; pipeline owners delete their derived temporaries and caches;
-the compute administrator verifies workspace/cache/checkpoint deletion; the
-generator lead accounts for every synthetic attempt; the rater manager clears
-rater workspaces; the repository maintainer admits only approved compact
-records. “De-identified,” a keyed hash, or an embedding does not itself permit
-egress.
+Deletion/archival responsibility is explicit: the authorized applicant owns
+raw and identity records and removes expired Juno work/scratch copies,
+pipeline owners delete their derived temporaries and caches, the generator
+lead accounts for every synthetic attempt, the rater manager clears any later
+authorized rater workspace, and the repository maintainer admits only approved
+compact records. Administrator-witnessed deletion is not required by the
+agreement or UTD policy. “De-identified,” a keyed hash, or an embedding does
+not itself permit third-party transfer.
 
-## Governed CUDA acceptance contract
+## Governed CUDA handling contract
 
-Before any restricted execution, a signed qualification must record:
+The signed ChildLens agreement requires secure access and storage following
+institutional data-protection guidelines. It does not require internet-disabled
+compute, dedicated nodes, one-way ingress, immutable file/network audit logs,
+or administrator-witnessed deletion. [UTDBP3096](https://policy.utdallas.edu/utdbp3096)
+applies risk-based controls, prefers UT-managed servers, requires encryption
+for confidential personal-device copies and remote access over unsecured
+networks, and prohibits unapproved third-party storage. The prospective
+qualification therefore requires:
 
-1. institution and physical/legal owner, facility or approved tenancy, system
-   identifier, administrator, and applicable agreement;
-2. encryption at rest and in transit, key owner, encrypted temporary workspace,
-   secure boot where required, and backup behavior;
-3. named-user authentication, MFA, least privilege, prohibition on shared
-   accounts, privileged-access review, and immediate revocation procedure;
-4. immutable audit coverage for login, file access, job execution, privilege
-   change, removable media, network connection, and export, with retention and
-   reviewer;
-5. outbound default-deny firewall/DNS/proxy policy. The qualification egress
-   test must show a permitted internal endpoint succeeds and undeclared HTTPS,
-   DNS, model telemetry, package-manager, object-store, and paste/upload
-   destinations fail, with administrator-observed logs;
-6. an ingress procedure in which a separate internet-connected machine obtains
-   pinned public weights/packages, verifies license/revision/SHA-256, malware
-   scans them, and transfers them one-way through an approved staging process;
-   the restricted job never gains outbound access;
-7. absolute locations and quotas for input, temporary frames/audio, model
-   caches, compiler caches, checkpoints, logs, crash dumps, swap, and backups;
-   none may resolve to Git, a home-directory sync service, or an unmanaged disk;
-8. retention periods and accountable deleters for every location, followed by
-   deletion verification that checks ordinary files, caches, recycle areas,
-   snapshots/backups, scheduler scratch, and failed-job remnants;
+1. institution-owned or institution-approved execution; Juno satisfies this
+   ownership requirement;
+2. access through the applicant's individual UTD account over GlobalProtect
+   VPN and SSH, with no shared credentials;
+3. raw and derived restricted material only in applicant-only `0700` Juno
+   paths, or a deliberately approved `yding` path when collaboration is later
+   authorized; encrypted applicant-only storage for any personal-Mac copy;
+4. public packages and weights may be downloaded, but must be pinned by
+   revision/license/SHA-256 and cached before restricted processing;
+5. restricted jobs load models from local files, disable telemetry and
+   external experiment tracking, and never send ChildLens media, transcripts,
+   translations, frames, embeddings, prompts/statistics, identifiers, logs,
+   checkpoints, or other derived restricted artifacts to an API, hosted GPU,
+   cloud store, Git, paste/upload endpoint, or other third party;
+6. input, temporary frames/audio, model caches, compiler caches, checkpoints,
+   logs, and crash outputs resolve only to declared UTD-managed locations; no
+   restricted value may enter a filename, URL, scheduler job name, environment
+   variable, or outward error report;
+7. scratch follows copy-in, process, copy-out, and cleanup. The applicant
+   records completion in the governed manifest and removes task temporaries,
+   failed-job remnants, and expired outputs under the project retention plan;
+8. scheduler/job records plus a compact governed provenance manifest record
+   execution and disposition. Agreement compliance does not depend on
+   immutable file/network audit coverage not required by UTD policy;
 9. the immutable upstream commit, patch/config hashes, public weight hashes,
    resolved environment lock, driver/CUDA/GPU inventory, container hash,
-   deterministic settings, and the same fail-closed runtime assertions as the
-   public preflight; and
-10. capacity qualification from the resource-sizing exercise below, including
-    whether the registered run is single-process or DDP.
+   deterministic settings, and fail-closed path/telemetry assertions are
+   recorded; and
+10. capacity qualification resolves single-process versus DDP. If multiple
+    processes are required, the registered public/dummy DDP preflight remains
+    mandatory before restricted execution.
 
-### Juno candidate qualification evidence
+### Juno qualification evidence
 
 On 2026-07-30 UTD HPC confirmed account activation by institutional email.
 The applicant connected over UTD GlobalProtect to
@@ -174,28 +189,24 @@ and one minimal public/dummy CPU job established:
 - active A30, H100, and H200 partitions; no GPU allocation or job was launched;
 - `auth/munge`, `proctrack/cgroup`, `task/cgroup,task/affinity`,
   `jobacct_gather/cgroup`, and `accounting_storage/slurmdbd`;
-- default SLURM account `compsci` plus an additional non-`yding` association
-  (the unrelated account name is intentionally omitted from Git), while the
-  applicant's research Unix group is `yding`; this is not treated as proof of
-  the intended project-account boundary until HPC administration affirms or
-  corrects it; and
+- SLURM associations for `compsci` plus one unrelated PI account, but no
+  `yding` SLURM association (the unrelated name is intentionally omitted from
+  Git), while the applicant's research Unix group is `yding`;
 - successful public DNS and HTTPS access to Hugging Face and PyPI from the
   login node; and
 - successful public DNS plus HTTP 200 responses from Hugging Face and PyPI
   inside public/dummy CPU-only SLURM job `310661` on `dev` (one task, one CPU,
-  512 MiB, two-minute cap). SingularityCE 4.2.2 exposes optional network
-  namespace flags, but a job-selected namespace is not accepted as an
-  administrator-enforced restricted-project boundary.
+  512 MiB, two-minute cap); the job completed in 25 seconds and was charged to
+  `compsci`. SingularityCE 4.2.2 also exposes optional network namespaces.
 
-These checks establish account, capacity, basic Unix access control, and
-scheduler-accounting facts only. FUSE/Weka mount details do not establish
-encryption at rest. SLURM accounting does not establish file-access,
-administrator, network-flow, removable-media, export, or backup audit
-coverage. No retention/deletion test was performed. Both login and compute
-nodes affirmatively fail the default-deny egress criterion. Therefore no
-ChildLens media or derived restricted material may be transferred to Juno. A
-compliant path requires an HPC/IT-admin enforced project-scoped network
-boundary—not a user-space promise or job-selected container flag.
+These checks establish institution-managed compute, individual access,
+private filesystem targets, scheduler isolation/accounting, orientation, and
+GPU availability. Open public egress is documented but is not a failure under
+the signed agreement or UTDBP3096. It permits pinned public dependency ingress;
+it does not authorize restricted-data egress. Juno is qualified for
+applicant-only ChildLens processing under the handling contract above.
+Adding/affirming `yding` as the SLURM fair-share account and removing the
+unrelated PI association remain non-blocking administrative corrections.
 
 Ordinary Hugging Face Jobs or other hosted services are allowed only for
 public/dummy work. They may never receive ChildLens media, audio, transcripts,
@@ -493,8 +504,8 @@ stopping, score sealing, or unblinding.
 ## Offline ASR/translation and human-access gate
 
 Exact ASR and translation models are selected in one bounded public-language
-substage, not with ChildLens. Candidate models must: run fully offline in the
-qualified environment after one-way weight ingress; have immutable
+substage, not with ChildLens. Candidate models must: run fully offline from
+locally cached weights during restricted processing; have immutable
 revision/file SHA-256 hashes and licenses permitting the research and
 restricted local processing; expose no telemetry; support German ASR with word
 timestamps and German→English translation; preserve episode/utterance IDs,
@@ -504,16 +515,17 @@ flags; and fit the sized governed resource.
 Use a fixed, redistributable public German speech set plus self-authored German
 audio/text covering child-directed vocabulary, overlap, silence, noise, and
 long utterances. No large weights are downloaded and no experiment runs in
-Phase 3. The later substage passes only if a network-deny test succeeds,
-timestamps are monotonic and within audio duration for 100% of non-abstained
-items, ID/word/timestamp round-trip tests pass, license/hash manifests are
-complete, no crashes or silent truncation occur, and blind selection minimizes
-public-set word error rate then translation adequacy under a frozen resource
-tie-break. Before launch, the language lead must set public-only numeric WER,
-translation, timestamp-error, confidence, and maximum-abstention thresholds
-without ChildLens. Confidence below threshold, missing/nonmonotonic timestamps,
-empty output, language mismatch, or translation failure causes abstention and
-zero credited time.
+Phase 3. The later substage passes only if local-files-only execution succeeds
+with telemetry and external tracking disabled, timestamps are monotonic and
+within audio duration for 100% of non-abstained items, ID/word/timestamp
+round-trip tests pass, license/hash manifests are complete, no crashes or
+silent truncation occur, and blind selection minimizes public-set word error
+rate then translation adequacy under a frozen resource tie-break. Before
+launch, the language lead must set public-only numeric WER, translation,
+timestamp-error, confidence, and maximum-abstention thresholds without
+ChildLens. Confidence below threshold, missing/nonmonotonic timestamps, empty
+output, language mismatch, or translation failure causes abstention and zero
+credited time.
 
 The chosen immutable pipeline and thresholds process real audio and rendered
 synthetic audio identically. Synthetic oracle text may measure QA error but may
@@ -528,33 +540,28 @@ least-privilege item assignment, access logging, and retention/deletion
 approval. Without that authorization, the safeguard remains explicitly
 model-derived and no human-validated German claim is made.
 
-## Exact actions required to clear Phase 3
+## Phase 3 pass and post-pass gates
 
-The package is protocol-complete but infrastructure-gated. Dataset access,
-project-specific model calibration/evaluation, and aggregate reporting are
-established. The remaining actions are:
+Phase 3 is PASS. Dataset access, project-specific model
+calibration/evaluation, aggregate reporting, governed Juno handling, and every
+safe protocol decision are established. The following frozen gates still
+control later execution:
 
-1. **Governed CUDA qualification:** the Juno account, applicant-only login,
-   and official self-study orientation are complete, but both login and
-   compute nodes have public DNS/HTTPS egress. Open a Juno general-support or
-   security-review ticket and have UTD HPC/IT security approve and enforce a
-   project-scoped no-egress compute/storage path; affirm or correct the
-   observed SLURM associations for the `yding` project; and provide recorded
-   evidence for encryption, access/privilege review,
-   full audit scope and retention, one-way weight ingress, cache/checkpoint/log
-   locations, backup/retention, and deletion. The witnessed acceptance test
-   must show an allowed internal endpoint succeeds while undeclared public DNS
-   and HTTPS fail from the actual compute job, followed by administrator-
-   verified deletion. Do not transfer ChildLens before this sign-off.
-2. **Public-language selection:** after the compute route is known, run only
-   the bounded public/dummy German ASR→English translation substage and freeze
-   model revisions, hashes, licenses, confidence/abstention thresholds, and
-   no-egress evidence. No ChildLens audio may enter this selection.
+1. **Public-language selection:** before any ChildLens audio processing, run
+   only the bounded public/dummy German ASR→English translation substage and
+   freeze model revisions, hashes, licenses, confidence/abstention thresholds,
+   and local-files-only/no-telemetry evidence.
+2. **Resource sizing/DDP:** perform public/dummy conservative sizing. If it
+   requires multiple processes, pass the final-topology public/dummy DDP gate
+   before restricted multi-process execution.
+3. **Restricted-job setup:** cache and hash public dependencies first; then use
+   only declared applicant-private UTD paths, local model loading, disabled
+   telemetry/external tracking, governed manifests, and scratch cleanup.
+4. **SLURM administration (non-blocking):** ask HPC to add or affirm `yding`
+   fair-share association and review/remove the unrelated PI association. This
+   does not block Phase 4 or compliant applicant-only ChildLens work.
 
-After 1–2, the applicant applies the frozen blind rules to the completed
-inventory; the technical lead performs public-only resource sizing and, if
-required, requests approval for the precisely scoped DDP job; and the language
-lead records the completed bounded public-only ASR/translation selection.
-Phase 3 becomes PASS only after those records are signed and the
-machine-readable fields are filled without synthetic outcomes. Phase 4 remains
-unauthorized until then.
+A separately scoped Phase 4 common-asset task is authorized. This task does
+not begin it. ChildLens audio processing remains blocked by item 1; generator
+work, real-only training, synthetic-score opening, and scientific evaluation
+remain blocked by their later phase gates.

@@ -37,7 +37,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase3_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["status"] == "INFRASTRUCTURE_PERMISSION_GATE"
+    assert config["schema_version"] == 2
+    assert config["status"] == "PASS"
     assert schedule_cycle(config["learner"]["schedule"]) == [
         "contrastive",
         "contrastive",
@@ -62,7 +63,6 @@ def test_phase3_preregistration_preserves_frozen_contract() -> None:
     ) == 40
     assert config["unblinding"]["synthetic_scores_sealed_until_real_only_gate_passes"] is True
     assert config["cost"]["existing_childlens_cost_is_zero"] is False
-    assert config["gates"]["phase4_authorized"] is False
     assert config["gates"]["childlens_academic_noncommercial_access"] == "ESTABLISHED"
     assert config["gates"]["childlens_aggregate_reporting"] == "ESTABLISHED"
     assert config["gates"]["current_childlens_storage_encryption"] == (
@@ -76,26 +76,40 @@ def test_phase3_preregistration_preserves_frozen_contract() -> None:
     )
     assert config["unblinding"]["personnel_independence"] is False
     assert config["gates"]["governed_cuda_qualification"] == (
-        "FAIL_OPEN_EGRESS_AND_ADMIN_CONTROLS_UNCONFIRMED"
+        "PASS_PROPORTIONATE_INSTITUTIONAL_CONTROLS"
     )
     assert config["governed_compute"]["account_active"] is True
-    assert (
-        config["governed_compute"]["login_node_egress_test"]["default_deny_contract"]
-        == "FAIL"
-    )
+    assert config["governed_compute"]["login_node_egress_test"][
+        "open_egress_observed"
+    ] is True
+    assert config["governed_compute"]["login_node_egress_test"][
+        "phase3_blocking"
+    ] is False
     assert config["governed_compute"]["orientation"]["status"] == (
         "OFFICIAL_SELF_STUDY_REVIEWED"
     )
-    assert (
-        config["governed_compute"]["compute_node_egress_test"]["default_deny_contract"]
-        == "FAIL"
-    )
+    assert config["governed_compute"]["compute_node_egress_test"][
+        "open_egress_observed"
+    ] is True
+    assert config["governed_compute"]["compute_node_egress_test"][
+        "phase3_blocking"
+    ] is False
     assert (
         config["governed_compute"]["compute_node_egress_test"]["gpu_requested"] is False
     )
     assert config["governed_compute"]["container_runtime"][
-        "accepted_as_admin_enforced_boundary"
+        "network_namespace_required"
     ] is False
     assert config["governed_compute"]["gpu_job_launched"] is False
-    assert config["governed_compute"]["restricted_data_transfer_authorized"] is False
+    assert config["governed_compute"]["restricted_data_transfer_to_juno_authorized"] is True
+    assert "no_restricted_artifact_API_hosted_GPU_cloud_Git_or_third_party_transfer" in (
+        config["governed_compute"]["restricted_job_controls"]
+    )
+    assert "add_or_affirm_yding_slurm_fair_share_association" in config[
+        "governed_compute"
+    ]["administrative_followup_nonblocking"]
+    assert config["gates"]["phase4_authorized"] is True
+    assert config["gates"]["childlens_audio_processing_authorized"] is False
+    assert config["gates"]["generator_work_authorized"] is False
+    assert config["gates"]["real_only_training_authorized"] is False
     assert config["governed_compute"]["additional_slurm_account_name_committed_to_git"] is False

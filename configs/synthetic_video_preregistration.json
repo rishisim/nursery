@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "phase": 3,
-  "status": "INFRASTRUCTURE_PERMISSION_GATE",
+  "status": "PASS",
   "evidence_cutoff": "2026-07-30",
   "headline_question": "At equal H video hours, does EgoBabyVLM CLIP+ triple trained on Synthetic-full achieve lexical-grounding performance equivalent to Real-full, while the synthetic corpus has lower prospectively measured production cost?",
   "learner": {
@@ -116,7 +116,7 @@
     "slurm_default_account_observed": "compsci",
     "additional_non_yding_slurm_account_observed": true,
     "additional_slurm_account_name_committed_to_git": false,
-    "project_account_boundary": "ADMIN_MUST_AFFIRM_OR_CORRECT_FOR_YDING_ROLE",
+    "project_account_boundary": "NONBLOCKING_SLURM_FAIR_SHARE_CORRECTION_REQUIRED",
     "storage": {
       "home": {
         "quota": "50GB",
@@ -135,7 +135,7 @@
       "yding_group": {
         "mode": "2770"
       },
-      "encryption_at_rest": "ADMIN_CONFIRMATION_REQUIRED"
+      "encryption_at_rest": "UTD_MANAGED_SERVER_ACCEPTED_UNDER_RISK_BASED_POLICY"
     },
     "gpu_partitions_observed": [
       "a30",
@@ -155,7 +155,8 @@
     "login_node_egress_test": {
       "huggingface_https_status": 200,
       "pypi_https_status": 200,
-      "default_deny_contract": "FAIL"
+      "open_egress_observed": true,
+      "phase3_blocking": false
     },
     "compute_node_egress_test": {
       "date": "2026-07-30",
@@ -166,24 +167,39 @@
       "huggingface_https_status": 200,
       "pypi_https_status": 200,
       "public_dns_resolved": true,
-      "default_deny_contract": "FAIL"
+      "open_egress_observed": true,
+      "phase3_blocking": false,
+      "charged_slurm_account": "compsci"
     },
     "container_runtime": {
       "implementation": "singularity-ce",
       "version": "4.2.2-1.el9",
       "network_namespace_options_observed": true,
-      "accepted_as_admin_enforced_boundary": false
+      "network_namespace_required": false
     },
-    "administrator_confirmations_required": [
-      "project_scoped_default_deny_network_boundary",
-      "encryption_at_rest_and_key_ownership",
-      "file_privilege_network_export_and_backup_audit_scope_and_retention",
-      "one_way_public_weight_and_package_ingress",
-      "cache_checkpoint_log_crash_dump_swap_and_backup_locations",
-      "retention_and_administrator_verified_deletion",
-      "project_slurm_association_and_revocation_path"
+    "policy_basis": [
+      "signed_childlens_agreement_secure_storage_under_institutional_guidelines",
+      "UTDBP3096_risk_based_controls",
+      "UTD_managed_server_preference",
+      "encrypted_VPN_and_SSH_remote_access",
+      "encrypted_personal_device_copies",
+      "no_unapproved_third_party_storage"
     ],
-    "restricted_data_transfer_authorized": false
+    "restricted_job_controls": [
+      "applicant_only_UTD_managed_paths",
+      "public_dependencies_pinned_and_cached_before_restricted_processing",
+      "offline_or_local_files_only_model_loading_during_restricted_processing",
+      "telemetry_and_external_experiment_tracking_disabled",
+      "no_restricted_artifact_API_hosted_GPU_cloud_Git_or_third_party_transfer",
+      "all_caches_logs_checkpoints_and_temporaries_on_UTD_managed_storage",
+      "scratch_copy_in_process_copy_out_cleanup",
+      "project_retention_and_applicant_verified_cleanup"
+    ],
+    "administrative_followup_nonblocking": [
+      "add_or_affirm_yding_slurm_fair_share_association",
+      "review_and_remove_unrelated_pi_slurm_association"
+    ],
+    "restricted_data_transfer_to_juno_authorized": true
   },
   "gates": {
     "childlens_academic_noncommercial_access": "ESTABLISHED",
@@ -195,13 +211,16 @@
     "storage_migration_regular_bytes_verified": 47917156217,
     "storage_migration_symlinks_verified": 13,
     "unencrypted_source_removed_after_verification": true,
-    "governed_cuda_qualification": "FAIL_OPEN_EGRESS_AND_ADMIN_CONTROLS_UNCONFIRMED",
-    "governed_cuda_candidate": "UTD_JUNO_ACTIVE_ACCOUNT_REQUIRES_PROJECT_SCOPED_NO_EGRESS_PATH_AND_ADMIN_CONTROL_ATTESTATION",
+    "governed_cuda_qualification": "PASS_PROPORTIONATE_INSTITUTIONAL_CONTROLS",
+    "governed_cuda_candidate": "UTD_JUNO_QUALIFIED_FOR_APPLICANT_ONLY_CHILDLENS_PROCESSING",
     "authorized_read_only_aggregate_inventory": "COMPLETE",
     "personnel_model": "SINGLE_AUTHORIZED_APPLICANT_WITH_STAGED_PROCEDURAL_ROLES",
     "ddp": "MANDATORY_IF_RESOURCE_SIZING_REQUIRES_MULTIPLE_PROCESSES",
-    "asr_translation": "PUBLIC_ONLY_BOUNDED_SELECTION_REQUIRED",
-    "phase4_authorized": false
+    "asr_translation": "PUBLIC_ONLY_BOUNDED_SELECTION_IS_SOLE_REMAINING_TECHNICAL_SUBSTAGE",
+    "phase4_authorized": true,
+    "childlens_audio_processing_authorized": false,
+    "generator_work_authorized": false,
+    "real_only_training_authorized": false
   },
   "no_go_triggers": [
     "confirmed_consent_or_license_incompatibility",

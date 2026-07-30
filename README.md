@@ -44,9 +44,11 @@ infant ground truth. BabyView is unavailable and must not be accessed or
 claimed as an empirical target until its access and governance requirements
 are satisfied.
 
-Raw or restricted ChildLens material must remain local. It may not be uploaded
-to cloud services, model APIs, or unauthorized annotators. Only permitted
-aggregates may leave the governed boundary.
+Raw or restricted ChildLens material must remain in the encrypted
+applicant-only local store or applicant-private UTD-managed Juno paths. It may
+not be sent to cloud services, model APIs, hosted GPU services, Git, telemetry,
+or unauthorized annotators. Only permitted aggregates may leave the governed
+boundary.
 
 ## Repository state
 
@@ -66,10 +68,8 @@ protocol. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
 No generator pilot has been executed and no generator dependency has been
 installed. The public/dummy single-L4 EgoBabyVLM compatibility preflight is
-complete and passed as engineering evidence only; DDP and restricted-data
-readiness remain unproven. Phase 3 safe governance/preregistration decisions
-are now frozen, but its status is **INFRASTRUCTURE/PERMISSION GATE**
-(infrastructure only), not PASS.
+complete and passed as engineering evidence only; DDP remains untested.
+Phase 3 governance/preregistration is **PASS**.
 MPI accepted the signed project-specific request and granted non-commercial
 ChildLens model calibration/evaluation and aggregate reporting through July
 2027; third-party access remains prohibited. Permission is established. The
@@ -78,12 +78,15 @@ Inventory fixes 18 prior development children / 14.374241 source hours as
 \(C\), leaving 40 untouched catalog children / 134 recordings / 40.362056
 source hours for confirmatory allocation. The Juno account and SSH key are
 active, with applicant-only home/work/scratch permissions and visible
-A30/H100/H200 capacity. Official Juno self-study orientation is reviewed.
-Juno is not yet a governed restricted-data boundary: public DNS/HTTPS egress is
-open from both login and compute nodes, and administrator evidence for
-project-scoped egress controls, encryption, full audit coverage, retention, and
-verified deletion remains required.
-Exact unblock actions are in
+A30/H100/H200 capacity. Official Juno self-study orientation is reviewed. Juno
+is qualified for applicant-only ChildLens processing under the proportionate
+UTD policy controls frozen in the preregistration. Public egress is available
+for pinned dependency ingress, but ChildLens and derived restricted artifacts
+may not be sent to APIs, hosted services, Git, cloud storage, telemetry, or
+other third parties. The missing `yding` SLURM association is a non-blocking
+fair-share/accounting correction. Post-pass gates are in
 [`docs/synthetic_video_preregistration.md`](docs/synthetic_video_preregistration.md).
-Common assets, LTX/Wan, TTS, ChildLens preprocessing, generation, and learner
-training remain unauthorized.
+A separately scoped Phase 4 common-asset task may begin. ChildLens audio
+processing awaits the bounded public-only ASR/translation selection; LTX/Wan,
+TTS, generation, real-only training, and scientific evaluation remain
+unauthorized.

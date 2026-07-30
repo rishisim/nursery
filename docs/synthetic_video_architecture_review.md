@@ -8,25 +8,25 @@
 or BabyView media content was accessed.
 
 **Current stage:** Phase 2 is complete: the bounded public/dummy single-L4
-CUDA compatibility preflight passed. Phase 3 safe protocol work is complete
-but remains at an **INFRASTRUCTURE/PERMISSION GATE** (infrastructure only;
-ChildLens permission is established). The signed, MPI-accepted
+CUDA compatibility preflight passed. Phase 3 governance/preregistration is
+**PASS**. The signed, MPI-accepted
 request establishes non-commercial ChildLens model calibration/evaluation and
 aggregate reporting through July 2027; third-party access is prohibited. The
 permission component is cleared. The local corpus is now encrypted and
 checksum-verified. Inventory fixes the 18-child prior development allowlist as
 \(C\), leaving 40 untouched catalog children for confirmatory allocation.
 Complete aggregate metadata establishes 40.362056 source hours across the 134
-eligible recordings. Remaining gates are approved governed Juno CUDA and
-bounded public-only ASR/translation selection. The Juno account and
+eligible recordings. Juno is qualified for applicant-only ChildLens work under
+the proportionate signed-agreement and UTD-policy controls. The bounded
+public-only ASR/translation selection is the sole remaining technical substage
+before ChildLens audio processing. The Juno account and
 applicant-only SSH key are active; read-only qualification confirmed A30,
 H100, and H200 capacity and applicant-only storage permissions. Official
-self-study orientation is reviewed, but both login- and compute-node public
-HTTPS egress are open and administrator evidence for encryption, comprehensive
-audit, retention, and deletion is still missing. Juno therefore remains an
-infrastructure candidate, not a qualified restricted-data boundary. No
-restricted data may be transferred before the governed-compute contract is
-signed. See
+self-study orientation is reviewed. Login- and compute-node public HTTPS
+egress are open; this permits pinned public dependency ingress but never
+ChildLens or derived-artifact transfer to APIs, hosted services, Git, cloud
+storage, telemetry, or other third parties. The missing `yding` SLURM
+association is a non-blocking fair-share/accounting correction. See
 [`synthetic_video_preregistration.md`](synthetic_video_preregistration.md).
 The L4 result is engineering-smoke evidence only, not scientific performance,
 restricted-data readiness, a full-training memory estimate, or DDP evidence.
@@ -328,8 +328,8 @@ this study.
 
 ### Held-out-real transfer safeguard
 
-After authorized access, freeze a ChildLens temporal frame–utterance retrieval
-test before training. Assign whole children to train/development/test where
+In Phase 4, freeze a ChildLens temporal frame–utterance retrieval test before
+training. Assign whole children to train/development/test where
 sample size permits; otherwise the study is **no-go for confirmatory real-domain
 claims** unless an approved leave-one-child-out design was preregistered.
 Within each held-out child, assign whole sessions to exactly one split. Remove
@@ -383,23 +383,23 @@ Approved compute is split:
 | ChildLens academic model use and aggregate reporting | `FROZEN` | Authorized applicant | Stay within the signed July 2026–July 2027 scope, applicant-only, and cite DOI `10.17617/4.fe` |
 | ChildLens local storage | `FROZEN` | Authorized applicant | Preserve the verified AES-256 sparsebundle and applicant-only Keychain access |
 | \(C\) and catalog lineage | `FROZEN` | Authorized applicant | Keep all 18 prior development children in \(C\); allocate only the remaining 40 children |
-| Governed restricted-data CUDA | `INFRASTRUCTURE/PERMISSION GATE` | Institution/IT security | Juno login/key/storage/GPU access and official self-study orientation are established, but login and compute nodes have public DNS/HTTPS egress; obtain an admin-enforced project no-egress path, correct/affirm project SLURM associations, and pass witnessed internal-success/public-egress-failure plus deletion tests |
+| Governed restricted-data CUDA | `FROZEN` | Authorized applicant | Use Juno through UTD VPN/SSH, applicant-private UTD paths, pinned local dependency caches, disabled telemetry/external tracking, no third-party restricted transfer, governed manifests, and scratch cleanup |
+| SLURM fair-share mapping | `REQUIRES CONFIRMATION` *(non-blocking)* | Authorized applicant / UTD HPC administration | Add or affirm `yding` SLURM association and review/remove the unrelated PI association; do not treat this accounting correction as a ChildLens security gate |
 | \(H/r\) and independent split feasibility | `REQUIRES CONFIRMATION` | Authorized applicant in locked statistician stage | Use the complete 40-child/40.362056-source-hour inventory; set credited \(H/r\) only after identical ASR/translation yield is available |
 | DDP | `REQUIRES CONFIRMATION` | Technical lead | Size blindly; if multi-process is required, pass a separately approved public/dummy DDP preflight |
-| ASR/translation weights | `REQUIRES CONFIRMATION` | Language/technical lead | Complete the bounded public-language no-egress selection and pin hashes/licenses |
+| ASR/translation weights | `REQUIRES CONFIRMATION` | Language/technical lead | Complete the bounded public-language local-files-only/no-telemetry selection and pin hashes/licenses |
 | Personnel/unblinding | `FROZEN` | Authorized applicant | Use staged single-operator roles, commitments, and scripted unblinding; disclose lack of personnel independence |
 | Human German validation | `FROZEN` | Authorized applicant | Use no third-party rater; retain model-derived claims unless MPI separately authorizes one |
 | Confirmed incompatible consent/license, infeasible independent split, or no compliant compute path | `NO-GO` | PI/institution | Stop the empirical study; do not weaken the frozen question |
 
 ## Phased implementation sequence and stop rules
 
-**Current stage:** phases 1–2 are complete. Phase 3's safe decisions and blind
-selection rules are frozen in the canonical
-[`governance/preregistration`](synthetic_video_preregistration.md), but Phase 3
-is **not PASS**: it is at an **INFRASTRUCTURE/PERMISSION GATE** with exact
-unblock actions recorded there. LTX/Wan execution, common asset construction,
-TTS, generation, ChildLens preprocessing, learner training, and scientific
-evaluation remain prohibited.
+**Current stage:** phases 1–2 are complete and Phase 3 is **PASS**. Its
+decisions and blind selection rules are frozen in the canonical
+[`governance/preregistration`](synthetic_video_preregistration.md). A separately
+scoped Phase 4 common-asset task may begin, subject to the public-language gate
+before ChildLens audio processing. LTX/Wan execution, TTS, generation,
+real-only training, and scientific evaluation remain prohibited.
 
 1. **Public compatibility package.** Vendor the pinned upstream revision or
    record an immutable dependency, freeze lockfile SHAs and licenses, define
@@ -417,15 +417,12 @@ evaluation remain prohibited.
    [`results/egobaby_cuda_preflight.json`](../results/egobaby_cuda_preflight.json);
    distributed behavior remains explicitly untested.
 3. **Governance and preregistration.** The protocol, blind selection rules,
-   lineage/accounting, analysis, cost, and sealing plans are frozen. Exact
-   numeric ChildLens values remain governed inputs, not guesses. *Current:
-   INFRASTRUCTURE/PERMISSION GATE (infrastructure only).* Juno account access is
-   active and orientation is reviewed, but its present open-egress path is not
-   qualified. *Done when:*
-   governed Juno CUDA qualification,
-   resolved single-GPU/DDP route, and pinned or sole-
-   remaining bounded public-only ASR/translation substage are signed without
-   opening synthetic scores.
+   lineage/accounting, analysis, cost, sealing plans, and proportionate Juno
+   controls are frozen. Exact numeric ChildLens values remain governed inputs,
+   not guesses. *Complete: PASS.* Juno is qualified; DDP is a mandatory
+   public/dummy gate only if blind sizing requires it, and bounded public-only
+   ASR/translation selection is the sole remaining technical substage before
+   ChildLens audio processing.
 4. **Common evaluation assets.** Using only \(C\) and public resources, freeze
    one Machine-DevBench Lexical asset; from evaluation-only children/sessions,
    freeze the real temporal-retrieval asset. Neither may steer generation.
@@ -723,7 +720,7 @@ change the selected family.
 | Class | Concrete risk / unknown | Frozen mitigation or consequence |
 |---|---|---|
 | Engineering | Segment stitching can create cuts, duplicated actions, or state resets; model and Diffusers APIs change | Pin commits/weights, compile from one plan, hash boundary frames, retain every attempt, deterministic FFmpeg |
-| Hardware / privacy | LTX Desktop officially supports local MPS inference, but free-RAM/throughput limits, beta stability, reproducible manifest capture, and fully local macOS text encoding are unresolved; Wan still needs CUDA | Public-only LTX Mac preflight plus approved MPS/CUDA pilot paths; record all API-backed features; later restricted prompts/media require a verified no-egress path |
+| Hardware / privacy | LTX Desktop officially supports local MPS inference, but free-RAM/throughput limits, beta stability, reproducible manifest capture, and fully local macOS text encoding are unresolved; Wan still needs CUDA | Public-only LTX Mac preflight plus approved MPS/CUDA pilot paths; record all API-backed features; restricted prompts/media remain on governed storage with local model loading, telemetry disabled, and no third-party transfer |
 | Generator control | Hands, contact, object identity, camera motion, transition order, and exact speech timing may fail independently | Four-scene gates, disaggregated failure labels, capped retries, no post-hoc candidate cycling |
 | Distributional fidelity | A polished prompt video can omit child-view blur, occlusion, clutter, interaction density, and social/language statistics | Blinded real/synthetic study and predeclared distributional diagnostics are required later; benchmark scores are insufficient |
 | Human evaluation | Raters can infer synthetic origin, disagree on contact, or be biased by audio quality | Blinding, randomized attempts, itemized judgments, multiple raters, agreement intervals, no cherry-picked media |
