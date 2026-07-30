@@ -11,6 +11,7 @@ dependencies = []
 
 [project.scripts]
 nursery-egobaby-cuda-preflight = "nursery_egobaby_preflight.cuda_preflight:main"
+nursery-synthetic-video-language-gate = "nursery_egobaby_preflight.language_gate:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

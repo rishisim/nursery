@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "gate": "phase4_public_language_pipeline",
+  "frozen_before_outcomes": true,
+  "candidate_family_closed": true,
+  "candidate_order": ["whisper-base-opus-de-en", "whisper-small-opus-de-en"],
+  "candidates": {
+    "whisper-base-opus-de-en": {
+      "asr": {"repository": "openai/whisper-base", "revision": "e37978b90ca9030d5170a5c07aadb050351a65bb", "license": "apache-2.0"},
+      "translation": "opus-mt-de-en",
+      "resource_rank": 1
+    },
+    "whisper-small-opus-de-en": {
+      "asr": {"repository": "openai/whisper-small", "revision": "973afd24965f72e36ca33b3055d56a652f456b4d", "license": "apache-2.0"},
+      "translation": "opus-mt-de-en",
+      "resource_rank": 2
+    }
+  },
+  "translations": {
+    "opus-mt-de-en": {
+      "repository": "Helsinki-NLP/opus-mt-de-en",
+      "revision": "1a922f3b32a8e809e17a47d4b32142d8105924e5",
+      "license": "apache-2.0"
+    }
+  },
+  "public_set": {
+    "repository": "google/fleurs",
+    "revision": "70bb2e84b976b7e960aa89f1c648e09c59f894dd",
+    "license": "cc-by-4.0",
+    "language": "de_de",
+    "split": "test",
+    "selection": "first_recording_for_each_of_first_8_distinct_sentence_ids_in_test_tsv",
+    "item_count": 8
+  },
+  "self_authored_set": {
+    "voice": "Anna",
+    "locale": "de_DE",
+    "cases": [
+      {"id": "child_directed", "kind": "speech", "de": "Sieh mal, der rote Becher steht neben dem kleinen Ball.", "en": "Look, the red cup is next to the small ball."},
+      {"id": "long_utterance", "kind": "speech", "de": "Nimm bitte den gelben Bauklotz vom Tisch, gib ihn mir und stelle danach den blauen Becher vorsichtig neben die Schüssel.", "en": "Please take the yellow building block from the table, give it to me, and then carefully place the blue cup next to the bowl."},
+      {"id": "noise", "kind": "noise_overlay", "de": "Wo ist der Löffel? Der Löffel liegt in der Schüssel.", "en": "Where is the spoon? The spoon is in the bowl.", "snr_db": 10},
+      {"id": "overlap", "kind": "overlap", "de": "Zeig mir das kleine Auto.", "en": "Show me the small car.", "secondary_de": "Der Ball ist hier."},
+      {"id": "silence", "kind": "silence", "de": "", "en": ""}
+    ]
+  },
+  "thresholds": {
+    "public_set_corpus_wer_max": 0.45,
+    "translation_chrf_min": 0.45,
+    "mean_word_confidence_min": 0.35,
+    "max_abstention_rate": 0.20,
+    "timestamp_monotonic_in_bounds_fraction": 1.0,
+    "timestamp_max_boundary_error_seconds": 0.05,
+    "round_trip_fraction": 1.0,
+    "manifest_completeness_fraction": 1.0,
+    "silent_truncation_allowed": false,
+    "crashes_allowed": false
+  },
+  "selection": ["lowest_public_set_corpus_wer", "highest_translation_chrf", "lowest_resource_rank"],
+  "resource_ceiling": {
+    "execution": "local_cpu_or_mps_public_only",
+    "processes": 1,
+    "accelerators": 0,
+    "wall_time_hours": 6,
+    "download_gib": 5,
+    "stored_model_gib": 5,
+    "paid_cost_usd": 0
+  },
+  "environment": {
+    "local_files_only_reload_required": true,
+    "telemetry_disabled": true,
+    "external_tracking_disabled": true,
+    "restricted_material_prohibited": true
+  }
+}
