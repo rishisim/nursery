@@ -145,13 +145,35 @@
       "h200"
     ],
     "gpu_job_launched": false,
-    "orientation": "REQUIRED_BEFORE_GPU_BENCHMARK",
+    "orientation": {
+      "status": "OFFICIAL_SELF_STUDY_REVIEWED",
+      "reviewed_on": "2026-07-30",
+      "deck_revision": "Juno_Orientation_v14",
+      "deck_sha256": "f1f585a8a5871a091a19c5b0ecc2d75bcb9493206d378a44fb3fcb1ae617a2be",
+      "formal_welcome_email_pending": true
+    },
     "login_node_egress_test": {
       "huggingface_https_status": 200,
       "pypi_https_status": 200,
       "default_deny_contract": "FAIL"
     },
-    "compute_node_egress_test": "NOT_RUN_BEFORE_ORIENTATION",
+    "compute_node_egress_test": {
+      "date": "2026-07-30",
+      "slurm_job_id": 310661,
+      "partition": "dev",
+      "gpu_requested": false,
+      "public_dummy_cpu_only": true,
+      "huggingface_https_status": 200,
+      "pypi_https_status": 200,
+      "public_dns_resolved": true,
+      "default_deny_contract": "FAIL"
+    },
+    "container_runtime": {
+      "implementation": "singularity-ce",
+      "version": "4.2.2-1.el9",
+      "network_namespace_options_observed": true,
+      "accepted_as_admin_enforced_boundary": false
+    },
     "administrator_confirmations_required": [
       "project_scoped_default_deny_network_boundary",
       "encryption_at_rest_and_key_ownership",

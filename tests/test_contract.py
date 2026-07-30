@@ -83,6 +83,19 @@ def test_phase3_preregistration_preserves_frozen_contract() -> None:
         config["governed_compute"]["login_node_egress_test"]["default_deny_contract"]
         == "FAIL"
     )
+    assert config["governed_compute"]["orientation"]["status"] == (
+        "OFFICIAL_SELF_STUDY_REVIEWED"
+    )
+    assert (
+        config["governed_compute"]["compute_node_egress_test"]["default_deny_contract"]
+        == "FAIL"
+    )
+    assert (
+        config["governed_compute"]["compute_node_egress_test"]["gpu_requested"] is False
+    )
+    assert config["governed_compute"]["container_runtime"][
+        "accepted_as_admin_enforced_boundary"
+    ] is False
     assert config["governed_compute"]["gpu_job_launched"] is False
     assert config["governed_compute"]["restricted_data_transfer_authorized"] is False
     assert config["governed_compute"]["additional_slurm_account_name_committed_to_git"] is False

@@ -53,7 +53,7 @@ Status meanings are `FROZEN`, `REQUIRES CONFIRMATION`,
 | ChildLens academic use and aggregate reporting | `FROZEN` | The signed request explicitly covers ChildLens videos/annotations for non-commercial model calibration/evaluation in grounded learning, with aggregate-only reporting through July 2027. Paul Grohmann accepted the form and granted access | Authorized applicant | Keep every use within that scope, applicant-only, and cite DOI `10.17617/4.fe` |
 | ChildLens local storage | `FROZEN` | The corpus was migrated to an AES-256 encrypted sparsebundle with an applicant-only Keychain secret. A read-only checksum comparison matched 67,087 regular files / 47,917,156,217 bytes, 13 symlinks, and 6,353 directories before the unencrypted source was removed | Authorized applicant | Keep the image encrypted and unmounted except for applicant-only governed work |
 | ChildLens inventory | `FROZEN` | Aggregate inventory found 58 catalog children / 192 recordings / complete durations. The preexisting development-only allowlist fixes \(C\) at 18 children / 58 recordings / 14.374241 source hours, leaving 40 children / 134 recordings / 40.362056 source hours for confirmatory allocation with zero child overlap | Authorized applicant | Apply the frozen keyed split and \(H/r\) rules only after governed compute and the identical ASR/translation pipeline are qualified |
-| Governed CUDA | `INFRASTRUCTURE/PERMISSION GATE` | The institution-owned Juno account is active and applicant-only SSH access is verified. Home, work, and scratch targets are mode `0700`; `/groups/yding` is group-restricted. SLURM exposes A30, H100, and H200 partitions with MUNGE authentication, cgroup process/task isolation, and `slurmdbd` job accounting. A login-node egress test reached public Hugging Face and PyPI over HTTPS, so Juno as presently exposed fails the frozen default-deny egress contract. Storage encryption-at-rest, file/network audit scope and retention, backup/deletion verification, and the correct project-scoped SLURM association remain administrator confirmations | Authorized applicant / UTD HPC administration | Complete orientation; obtain an administrator-approved project-scoped no-egress execution/storage path, affirm or correct the observed SLURM associations for the `yding` research role, and record all ten acceptance items plus observed internal-success/public-egress-failure and deletion tests before transferring ChildLens |
+| Governed CUDA | `INFRASTRUCTURE/PERMISSION GATE` | The institution-owned Juno account is active and applicant-only SSH access is verified. Home, work, and scratch targets are mode `0700`; `/groups/yding` is group-restricted. SLURM exposes A30, H100, and H200 partitions with MUNGE authentication, cgroup process/task isolation, and `slurmdbd` job accounting. Official self-study orientation is reviewed. Login- and compute-node egress tests both reached public Hugging Face and PyPI over HTTPS, so Juno as presently exposed fails the frozen default-deny egress contract. Storage encryption-at-rest, file/network audit scope and retention, backup/deletion verification, and the correct project-scoped SLURM association remain administrator confirmations | Authorized applicant / UTD HPC administration | Open the Juno general-support/security review with the ten-item acceptance contract; obtain an administrator-approved project-scoped no-egress execution/storage path, affirm or correct the observed SLURM associations for the `yding` research role, and pass witnessed internal-success/public-egress-failure plus deletion tests before transferring ChildLens |
 | DDP/scaling | `REQUIRES CONFIRMATION` | One L4 only; upstream reference is four processes | Technical lead | Size the full run blindly; if more than one GPU/process is required, pass the mandatory public/dummy DDP preflight before any restricted execution |
 | ASR/translation | `REQUIRES CONFIRMATION` | Interface and selection rules are frozen; exact local model weights are not yet selected | Language/technical lead | Run the bounded public-language selection substage below, then freeze revisions, hashes, licenses, and thresholds before ChildLens processing |
 | German human validation | `FROZEN` | No German-speaking human annotator is available, and the agreement prohibits making the dataset accessible to third parties | Authorized applicant | Use no human rater and retain only explicitly model-derived claims; a future rater requires separate MPI authorization |
@@ -155,7 +155,16 @@ The applicant connected over UTD GlobalProtect to
 ED25519 host fingerprint
 `SHA256:ylbFsrAnLBJNCg9IF2mBfjE6hTg0l32Th8CRIPuihQE`. A dedicated
 passphrase-protected Ed25519 key is stored only on the applicant's Mac and
-loaded through the macOS Keychain. Read-only checks established:
+loaded through the macOS Keychain. Khalid Warraich directed the applicant to
+the [official Juno orientation materials](https://hpc.utdallas.edu/systems-resources/juno/)
+as the quick-start path. The current
+88-page PDF, `Juno_Orientation_v14` (2026-07-15), was reviewed on 2026-07-30
+and identified by SHA-256
+`f1f585a8a5871a091a19c5b0ecc2d75bcb9493206d378a44fb3fcb1ae617a2be`;
+the PDF itself remains untracked. The deck has no quiz, acknowledgement, or
+completion-certificate mechanism. Sreshtha's formal welcome email remains
+pending, but no further local orientation step is identified. Read-only checks
+and one minimal public/dummy CPU job established:
 
 - Rocky Linux 9.5 and SLURM 23.11.10 on login node `juno-l-02`;
 - applicant-only mode `0700` on `/home/dal503972`,
@@ -171,18 +180,22 @@ loaded through the macOS Keychain. Read-only checks established:
   the intended project-account boundary until HPC administration affirms or
   corrects it; and
 - successful public DNS and HTTPS access to Hugging Face and PyPI from the
-  login node. This is affirmative evidence that the current candidate does
-  **not** implement the registered default-deny restricted-job egress policy.
+  login node; and
+- successful public DNS plus HTTP 200 responses from Hugging Face and PyPI
+  inside public/dummy CPU-only SLURM job `310661` on `dev` (one task, one CPU,
+  512 MiB, two-minute cap). SingularityCE 4.2.2 exposes optional network
+  namespace flags, but a job-selected namespace is not accepted as an
+  administrator-enforced restricted-project boundary.
 
 These checks establish account, capacity, basic Unix access control, and
 scheduler-accounting facts only. FUSE/Weka mount details do not establish
 encryption at rest. SLURM accounting does not establish file-access,
 administrator, network-flow, removable-media, export, or backup audit
-coverage. No retention/deletion test was performed. Compute-node egress has
-not been tested because orientation is not yet complete and no job was
-authorized. Therefore no ChildLens media or derived restricted material may be
-transferred to Juno. A compliant path requires an HPC/IT-admin enforced
-project-scoped network boundary—not a user-space promise to avoid the network.
+coverage. No retention/deletion test was performed. Both login and compute
+nodes affirmatively fail the default-deny egress criterion. Therefore no
+ChildLens media or derived restricted material may be transferred to Juno. A
+compliant path requires an HPC/IT-admin enforced project-scoped network
+boundary—not a user-space promise or job-selected container flag.
 
 Ordinary Hugging Face Jobs or other hosted services are allowed only for
 public/dummy work. They may never receive ChildLens media, audio, transcripts,
@@ -521,9 +534,10 @@ The package is protocol-complete but infrastructure-gated. Dataset access,
 project-specific model calibration/evaluation, and aggregate reporting are
 established. The remaining actions are:
 
-1. **Governed CUDA qualification:** the Juno account and applicant-only login
-   are active, but the login node has public HTTPS egress. Complete Juno
-   orientation, then have UTD HPC/IT security approve and enforce a
+1. **Governed CUDA qualification:** the Juno account, applicant-only login,
+   and official self-study orientation are complete, but both login and
+   compute nodes have public DNS/HTTPS egress. Open a Juno general-support or
+   security-review ticket and have UTD HPC/IT security approve and enforce a
    project-scoped no-egress compute/storage path; affirm or correct the
    observed SLURM associations for the `yding` project; and provide recorded
    evidence for encryption, access/privilege review,

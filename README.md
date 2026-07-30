@@ -78,8 +78,9 @@ Inventory fixes 18 prior development children / 14.374241 source hours as
 \(C\), leaving 40 untouched catalog children / 134 recordings / 40.362056
 source hours for confirmatory allocation. The Juno account and SSH key are
 active, with applicant-only home/work/scratch permissions and visible
-A30/H100/H200 capacity. Juno is not yet a governed restricted-data boundary:
-public login-node HTTPS egress is open, and administrator evidence for
+A30/H100/H200 capacity. Official Juno self-study orientation is reviewed.
+Juno is not yet a governed restricted-data boundary: public DNS/HTTPS egress is
+open from both login and compute nodes, and administrator evidence for
 project-scoped egress controls, encryption, full audit coverage, retention, and
 verified deletion remains required.
 Exact unblock actions are in
