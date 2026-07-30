@@ -1,14 +1,15 @@
 # Synthetic-video governance and preregistration
 
-**Phase 3 status:** **PASS**
+**Phase 4 status:** **IN PROGRESS — STAGE A PASS, STAGE B RESOURCE APPROVAL REQUIRED**
 
 **Evidence cut-off:** 2026-07-30
 
-**Authority boundary:** this record freezes every Phase 3 decision. It
-authorizes a separately scoped Phase 4 common-asset task under the controls
-below, but does not itself begin common evaluation assets, real-only training,
-generator work, generation, TTS, or scientific evaluation. BabyView is
-unavailable, out of scope, and supplies no empirical ancestry.
+**Authority boundary:** this record preserves every frozen Phase 3 decision
+and records the Phase 4 public-language PASS. It authorizes governed
+construction of the two common evaluation asset families under the controls
+below, but does not authorize real-only training, generator work, generation,
+TTS, score opening, or scientific evaluation. BabyView remains unavailable,
+out of scope, and supplies no empirical ancestry.
 
 The public/dummy single-NVIDIA-L4 engineering preflight at Nursery commit
 `1e8e94dbec4ad1ed701298f2c0ebb58cca26c877` is a PASS for the pinned
@@ -547,10 +548,13 @@ calibration/evaluation, aggregate reporting, governed Juno handling, and every
 safe protocol decision are established. The following frozen gates still
 control later execution:
 
-1. **Public-language selection:** before any ChildLens audio processing, run
-   only the bounded public/dummy German ASR→English translation substage and
-   freeze model revisions, hashes, licenses, confidence/abstention thresholds,
-   and local-files-only/no-telemetry evidence.
+1. **Public-language selection — PASS:** the bounded public/self-authored gate
+   selected `openai-whisper==20250625` `small.pt` at SHA-256
+   `9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794`
+   plus `Helsinki-NLP/opus-mt-de-en` at immutable revision
+   `1a922f3b32a8e809e17a47d4b32142d8105924e5`. This exact local-files-only,
+   no-telemetry pipeline is now mandatory and identical for real and synthetic
+   audio.
 2. **Resource sizing/DDP:** perform public/dummy conservative sizing. If it
    requires multiple processes, pass the final-topology public/dummy DDP gate
    before restricted multi-process execution.
@@ -561,7 +565,6 @@ control later execution:
    fair-share association and review/remove the unrelated PI association. This
    does not block Phase 4 or compliant applicant-only ChildLens work.
 
-A separately scoped Phase 4 common-asset task is authorized. This task does
-not begin it. ChildLens audio processing remains blocked by item 1; generator
-work, real-only training, synthetic-score opening, and scientific evaluation
-remain blocked by their later phase gates.
+Governed Phase 4 common-asset construction is authorized under the exact
+selected pipeline. Generator work, real-only training, synthetic-score
+opening, and scientific evaluation remain blocked by their later phase gates.

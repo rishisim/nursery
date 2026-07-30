@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "phase": 3,
-  "status": "PASS",
+  "phase": 4,
+  "status": "IN_PROGRESS_STAGE_A_PASS_STAGE_B_RESOURCE_APPROVAL_REQUIRED",
   "evidence_cutoff": "2026-07-30",
   "headline_question": "At equal H video hours, does EgoBabyVLM CLIP+ triple trained on Synthetic-full achieve lexical-grounding performance equivalent to Real-full, while the synthetic corpus has lower prospectively measured production cost?",
   "learner": {
@@ -91,9 +91,11 @@
     "learner_path": "identical_offline_German_ASR_to_English_translation",
     "synthetic_oracle_text": "QA_only",
     "tokenizer": "bert-base-uncased",
-    "exact_asr_model": null,
-    "exact_translation_model": null,
-    "selection_substage": "bounded_public_language_only"
+    "exact_asr_model": "openai-whisper==20250625 small.pt sha256:9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794",
+    "exact_translation_model": "Helsinki-NLP/opus-mt-de-en@1a922f3b32a8e809e17a47d4b32142d8105924e5",
+    "selection_substage": "PASS",
+    "identical_real_synthetic_pipeline_frozen": true,
+    "language_gate_decision_sha256": "8aade43587eaa0d65dc10984219b5006ceaf9ace1312a964e6f33541f5c53669"
   },
   "governed_compute": {
     "candidate": "UTD_JUNO",
@@ -216,9 +218,9 @@
     "authorized_read_only_aggregate_inventory": "COMPLETE",
     "personnel_model": "SINGLE_AUTHORIZED_APPLICANT_WITH_STAGED_PROCEDURAL_ROLES",
     "ddp": "MANDATORY_IF_RESOURCE_SIZING_REQUIRES_MULTIPLE_PROCESSES",
-    "asr_translation": "PUBLIC_ONLY_BOUNDED_SELECTION_IS_SOLE_REMAINING_TECHNICAL_SUBSTAGE",
+    "asr_translation": "PASS_IMMUTABLE_OFFLINE_PIPELINE_FROZEN",
     "phase4_authorized": true,
-    "childlens_audio_processing_authorized": false,
+    "childlens_audio_processing_authorized": true,
     "generator_work_authorized": false,
     "real_only_training_authorized": false
   },

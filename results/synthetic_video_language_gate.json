@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "gate": "phase4_public_language_pipeline",
+  "status": "PASS",
+  "signed_by_role": "language_technical_lead",
+  "signed_on": "2026-07-30",
+  "public_and_self_authored_only": true,
+  "childlens_touched": false,
+  "candidate_family_closed_before_outcomes": true,
+  "config_sha256": "8d4b43b8959bdec54fb752e87440e5a317cc9f53f5bbe21bb4034f48641df734",
+  "decision_sha256": "8aade43587eaa0d65dc10984219b5006ceaf9ace1312a964e6f33541f5c53669",
+  "artifact_manifest_sha256": "8d32e8b4d08f70c6fabcbff621bedb6e7edc0085ef5b49e4cc730a80468031e4",
+  "deterministic_aggregate_rerun_pass": true,
+  "selected_candidate": "whisper-small-opus-de-en",
+  "selected_pipeline": {
+    "asr": {
+      "implementation": "openai-whisper==20250625",
+      "checkpoint_sha256": "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794",
+      "license": "MIT"
+    },
+    "translation": {
+      "repository": "Helsinki-NLP/opus-mt-de-en",
+      "revision": "1a922f3b32a8e809e17a47d4b32142d8105924e5",
+      "license": "Apache-2.0"
+    },
+    "identical_for_real_and_synthetic": true,
+    "local_files_only": true,
+    "telemetry_and_external_tracking_disabled": true
+  },
+  "aggregate_evidence": {
+    "whisper-base-opus-de-en": {
+      "gate": "PASS",
+      "public_corpus_wer": 0.223529,
+      "translation_chrf": 0.534784,
+      "mean_word_confidence": 0.834688,
+      "abstention_rate": 0.0769,
+      "timestamp_valid_fraction": 1.0,
+      "round_trip_fraction": 1.0,
+      "offline_reload_pass": true
+    },
+    "whisper-small-opus-de-en": {
+      "gate": "PASS",
+      "public_corpus_wer": 0.147059,
+      "translation_chrf": 0.584424,
+      "mean_word_confidence": 0.910202,
+      "abstention_rate": 0.0769,
+      "timestamp_valid_fraction": 1.0,
+      "round_trip_fraction": 1.0,
+      "offline_reload_pass": true
+    }
+  },
+  "selection_basis": "lower public-set corpus WER",
+  "next_gate": {
+    "status": "USER_RESOURCE_APPROVAL_REQUIRED",
+    "public_dummy_preflight": "4x Juno A30, 30 minute cap, 2 aggregate GPU-hours, USD 0 direct",
+    "governed_asset_build_ceiling": "4x Juno A30, 12 hour cap, 48 aggregate GPU-hours, USD 0 direct",
+    "job_submitted": false
+  },
+  "limitations": [
+    "small public and synthetic-voice qualification sample",
+    "not ChildLens performance",
+    "not human German validation",
+    "not learner or scientific outcome evidence"
+  ]
+}

@@ -1,6 +1,7 @@
 # Synthetic-video Phase 4 common evaluation assets
 
-**Status:** Stage A **PASS**; Stage B pending governed execution
+**Status:** Stage A **PASS**; Stage B blocked on explicit institutional GPU
+resource approval
 
 **Scope:** public-only language-pipeline qualification followed, only on a
 signed PASS, by governed construction and sealing of the two common evaluation
@@ -65,12 +66,14 @@ Only then may Stage B begin.
 ### Stage A decision
 
 Both frozen candidates passed. `whisper-small-opus-de-en` was selected by the
-first lexicographic criterion: public-set corpus WER 0.1412 versus 0.2824 for
-`base`. Its translation chrF was 0.5742, mean word confidence 0.9100,
+first lexicographic criterion: public-set corpus WER 0.147059 versus 0.223529
+for `base`. Its translation chrF was 0.584424, mean word confidence 0.910202,
 abstention rate 0.0769, timestamp-valid fraction 1.0, and round-trip fraction
-1.0. Local-files-only reload and disabled telemetry/tracking passed. These are
-compact qualification aggregates, not ChildLens or scientific outcomes. The
-signed compact decision is `results/synthetic_video_language_gate.json`.
+1.0. A second deterministic aggregate rerun matched every gate metric and the
+selected candidate. Local-files-only reload, complete artifact/license hashes,
+and disabled telemetry/tracking passed. These are compact qualification
+aggregates, not ChildLens or scientific outcomes. The signed compact decision
+is `results/synthetic_video_language_gate.json`.
 
 ## Stage B boundary
 
@@ -88,3 +91,17 @@ validation requires all later arms to reference identical commitment hashes.
 Machine-DevBench images are generated and are not held-out-real ChildLens
 evaluation. The temporal safeguard is model-derived, supplies no referent
 ground truth, and has no human German validation.
+
+### Stage B resource gate
+
+Applicant-only Juno SSH and the encrypted local ChildLens mount are reachable,
+but no restricted corpus is currently staged in the Juno governed store. The
+pinned upstream Machine-DevBench image path uses FLUX.2-klein-4B and documents
+four-way GPU execution. Before restricted multi-process work, the frozen
+controls require an approved public/dummy final-topology preflight. The
+proposed bounded request is 4 × Juno A30 GPUs for at most 30 minutes
+(2 aggregate GPU-hours, zero direct USD charge), followed only on PASS by at
+most 4 × A30 for 12 hours (48 aggregate GPU-hours, zero direct USD charge) for
+the governed two-style lexical image build. No job has been submitted. Stage B
+remains incomplete until this resource ceiling is explicitly approved and both
+assets are constructed and sealed.

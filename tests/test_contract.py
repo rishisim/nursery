@@ -35,10 +35,12 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
         lexical_macro_wiring({"adjective": [0, 1], "noun": [1, 0]})
 
 
-def test_phase3_preregistration_preserves_frozen_contract() -> None:
+def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 2
-    assert config["status"] == "PASS"
+    assert config["status"] == (
+        "IN_PROGRESS_STAGE_A_PASS_STAGE_B_RESOURCE_APPROVAL_REQUIRED"
+    )
     assert schedule_cycle(config["learner"]["schedule"]) == [
         "contrastive",
         "contrastive",
@@ -109,7 +111,8 @@ def test_phase3_preregistration_preserves_frozen_contract() -> None:
         "governed_compute"
     ]["administrative_followup_nonblocking"]
     assert config["gates"]["phase4_authorized"] is True
-    assert config["gates"]["childlens_audio_processing_authorized"] is False
+    assert config["gates"]["childlens_audio_processing_authorized"] is True
+    assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
     assert config["gates"]["generator_work_authorized"] is False
     assert config["gates"]["real_only_training_authorized"] is False
     assert config["governed_compute"]["additional_slurm_account_name_committed_to_git"] is False

@@ -2,8 +2,9 @@
 
 Phase 4 uses the prospectively frozen public-only language gate in
 `configs/synthetic_video_language_gate.json` and
-`docs/synthetic_video_phase4.md`. ChildLens audio processing remains blocked
-until that gate records one immutable offline pipeline PASS.
+`docs/synthetic_video_phase4.md`. Stage A selected one immutable offline
+pipeline; governed Stage B common-asset construction is the only current
+authorization.
 
 This branch is the clean workspace for the Nursery/BabyWorld synthetic-video
 research program.
