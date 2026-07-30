@@ -10,3 +10,6 @@ def test_runner_uses_frozen_candidate_family_and_offline_reload():
     assert "HF_HUB_OFFLINE" in source
     assert "asr[\"artifact_sha256\"]" in source
     assert len(config["candidates"]) == 2
+    assert config["decoding"]["temperature"] == 0
+    assert config["decoding"]["beam_size"] == 5
+    assert "temperature=decoding[\"temperature\"]" in source

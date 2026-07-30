@@ -1,6 +1,6 @@
 # Synthetic-video Phase 4 common evaluation assets
 
-**Status:** Stage A protocol frozen; outcomes not yet observed
+**Status:** Stage A **PASS**; Stage B pending governed execution
 
 **Scope:** public-only language-pipeline qualification followed, only on a
 signed PASS, by governed construction and sealing of the two common evaluation
@@ -46,6 +46,12 @@ nonsilent speech, missing/invalid timestamps, mean word confidence below 0.35,
 language mismatch, or translation failure. Silence is expected to abstain and
 is counted in the common maximum-abstention rate.
 
+Decoding is deterministic: German transcription, temperature 0, beam size 5,
+word timestamps enabled, and prior-text conditioning disabled. This was made
+explicit after a pre-decision engineering rerun exposed Whisper's default
+temperature fallback; candidates, data, thresholds, and selection order were
+unchanged, and only results from the repaired frozen config are admissible.
+
 The run is limited to one local public-only CPU/MPS process, six wall-clock
 hours, 5 GiB download/model storage per frozen family, and zero paid cost. This
 cannot trigger the DDP gate. Data, weights, audio, caches, logs, predictions,
@@ -55,6 +61,16 @@ If neither candidate passes, Phase 4 stops with a signed no-go. No candidate is
 added and no threshold is relaxed. If one passes, its exact revision and
 artifact hashes become the sole identical real/synthetic language pipeline.
 Only then may Stage B begin.
+
+### Stage A decision
+
+Both frozen candidates passed. `whisper-small-opus-de-en` was selected by the
+first lexicographic criterion: public-set corpus WER 0.1412 versus 0.2824 for
+`base`. Its translation chrF was 0.5742, mean word confidence 0.9100,
+abstention rate 0.0769, timestamp-valid fraction 1.0, and round-trip fraction
+1.0. Local-files-only reload and disabled telemetry/tracking passed. These are
+compact qualification aggregates, not ChildLens or scientific outcomes. The
+signed compact decision is `results/synthetic_video_language_gate.json`.
 
 ## Stage B boundary
 

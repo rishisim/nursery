@@ -68,6 +68,14 @@
     "crashes_allowed": false
   },
   "selection": ["lowest_public_set_corpus_wer", "highest_translation_chrf", "lowest_resource_rank"],
+  "decoding": {
+    "language": "de",
+    "task": "transcribe",
+    "temperature": 0.0,
+    "beam_size": 5,
+    "condition_on_previous_text": false,
+    "word_timestamps": true
+  },
   "resource_ceiling": {
     "execution": "local_cpu_or_mps_public_only",
     "processes": 1,

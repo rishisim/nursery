@@ -13,6 +13,7 @@ import resource
 import shutil
 import subprocess
 import sys
+import tarfile
 import time
 import urllib.request
 import wave
@@ -84,13 +85,34 @@ def prepare(config: dict, root: Path) -> None:
                 continue
             seen.add(sentence_id)
             audio = data / "public" / filename
-            download(f"{base}/data/de_de/audio/test/{filename}", audio)
             selected.append({
                 "id": f"fleurs-{sentence_id}", "kind": "public",
                 "audio": str(audio.relative_to(root)), "reference_de": normalized,
             })
             if len(selected) == public["item_count"]:
                 break
+    archive = data / "fleurs_de_de_test.tar.gz"
+    download(f"{base}/data/de_de/audio/test.tar.gz", archive)
+    download(
+        f"https://huggingface.co/datasets/{public['repository']}/resolve/"
+        f"{public['revision']}/README.md",
+        data / "FLEURS_README.md",
+    )
+    requested = {Path(item["audio"]).name for item in selected}
+    with tarfile.open(archive) as bundle:
+        members = {
+            Path(member.name).name: member for member in bundle.getmembers()
+            if member.isfile() and Path(member.name).name in requested
+        }
+        if set(members) != requested:
+            raise RuntimeError("FLEURS archive lacks a frozen selected item")
+        for filename, member in members.items():
+            target = data / "public" / filename
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with bundle.extractfile(member) as source, target.open("wb") as sink:
+                if source is None:
+                    raise RuntimeError(f"cannot extract {filename}")
+                shutil.copyfileobj(source, sink)
 
     authored = data / "self_authored"
     authored.mkdir(exist_ok=True)
@@ -138,26 +160,30 @@ def prepare(config: dict, root: Path) -> None:
     download("https://raw.githubusercontent.com/openai/whisper/v20250625/LICENSE",
              models / "WHISPER_LICENSE")
     manifest = {"items": selected, "artifacts": []}
-    for path in sorted(root.rglob("*")):
-        if path.is_file() and path.name != "manifest.json":
-            manifest["artifacts"].append({
-                "path": str(path.relative_to(root)), "bytes": path.stat().st_size,
-                "sha256": sha256(path),
-            })
+    for artifact_root in (data, models):
+        for path in sorted(artifact_root.rglob("*")):
+            if path.is_file():
+                manifest["artifacts"].append({
+                    "path": str(path.relative_to(root)), "bytes": path.stat().st_size,
+                    "sha256": sha256(path),
+                })
     (root / "manifest.json").write_bytes(canonical_json(manifest))
 
 
-def transcribe(model, audio: Path) -> dict:
+def transcribe(model, audio: Path, decoding: dict) -> dict:
     result = model.transcribe(
-        str(audio), language="de", task="transcribe", word_timestamps=True,
-        condition_on_previous_text=False, fp16=False, verbose=False,
+        str(audio), language=decoding["language"], task=decoding["task"],
+        temperature=decoding["temperature"], beam_size=decoding["beam_size"],
+        word_timestamps=decoding["word_timestamps"],
+        condition_on_previous_text=decoding["condition_on_previous_text"],
+        fp16=False, verbose=False,
     )
     words = []
     for segment in result["segments"]:
         for word in segment.get("words", []):
             words.append({
-                "word": word["word"], "start": word["start"], "end": word["end"],
-                "probability": word["probability"],
+                "word": word["word"], "start": float(word["start"]),
+                "end": float(word["end"]), "probability": float(word["probability"]),
             })
     return {"text": result["text"].strip(), "language": result["language"], "words": words}
 
@@ -181,8 +207,8 @@ def run_candidate(config: dict, root: Path, candidate_id: str) -> dict:
     for item in manifest["items"]:
         try:
             audio = root / item["audio"]
-            prediction = transcribe(asr, audio)
-            valid = validate_timestamps(prediction["words"], duration(audio))
+            prediction = transcribe(asr, audio, config["decoding"])
+            valid = bool(validate_timestamps(prediction["words"], duration(audio)))
             confidence = (
                 sum(word["probability"] for word in prediction["words"]) / len(prediction["words"])
                 if prediction["words"] else 0.0
@@ -232,6 +258,12 @@ def run_candidate(config: dict, root: Path, candidate_id: str) -> dict:
     prediction_path = output_dir / f"{candidate_id}.json"
     prediction_path.write_bytes(canonical_json(predictions))
     artifact_manifest_hash = hashlib.sha256(canonical_json(manifest["artifacts"])).hexdigest()
+    required_manifest_paths = {
+        "data/FLEURS_README.md", "models/WHISPER_LICENSE",
+        "models/opus-mt-de-en/README.md",
+        f"models/{model_path.name}",
+    }
+    manifested_paths = {item["path"] for item in manifest["artifacts"]}
     result = {
         "candidate_id": candidate_id,
         "public_corpus_wer": corpus_wer(public_items),
@@ -240,7 +272,10 @@ def run_candidate(config: dict, root: Path, candidate_id: str) -> dict:
         "abstention_rate": sum(item["abstained"] for item in predictions) / len(predictions),
         "timestamp_valid_fraction": timestamp_fraction,
         "round_trip_fraction": round_trip,
-        "manifest_completeness_fraction": 1.0 if len(predictions) == len(manifest["items"]) else 0.0,
+        "manifest_completeness_fraction": (
+            1.0 if len(predictions) == len(manifest["items"])
+            and required_manifest_paths <= manifested_paths else 0.0
+        ),
         "crashes": crashes,
         "silent_truncations": truncations,
         "offline_reload_pass": True,
