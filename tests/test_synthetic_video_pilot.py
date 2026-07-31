@@ -183,6 +183,34 @@ def test_runner_merges_downloaded_family_roots(config: dict, tmp_path: Path) -> 
     assert (run_root / "gallery" / "index.html").exists()
 
 
+def test_cloud_plan_is_bound_to_passed_preflight_and_twenty_dollar_cap() -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/run_synthetic_video_public_pilot.py",
+            "cloud-plan",
+            "--run-id",
+            "preview-test",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    plan = json.loads(result.stdout)
+    assert plan["status"] == "READY_REQUIRES_EXPLICIT_SPEND_CONFIRMATION"
+    assert plan["maximum_preview_gpu_charge_usd"] == 20.0
+    assert plan["launch_order"] == ["wan", "ltx"]
+    assert [job["family"] for job in plan["jobs"]] == ["wan", "ltx"]
+    assert all(job["flavor"] == "a100-large" for job in plan["jobs"])
+    assert all(job["timeout"] == "4h" for job in plan["jobs"])
+    assert all(job["maximum_charge_usd"] == 10.0 for job in plan["jobs"])
+    assert all(job["secrets"] == ["HF_TOKEN"] for job in plan["jobs"])
+    assert all(
+        plan["validated_nursery_commit"] in job["script"] for job in plan["jobs"]
+    )
+    assert all("--profile" in job["script_args"] for job in plan["jobs"])
+
+
 @pytest.mark.skipif(
     shutil.which("ffmpeg") is None or shutil.which("ffprobe") is None,
     reason="ffmpeg and ffprobe are required",

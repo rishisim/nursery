@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import sys
 from pathlib import Path
 
@@ -28,6 +29,9 @@ from nursery_egobaby_preflight.synthetic_video_pilot import (
 )
 
 DEFAULT_CONFIG = REPOSITORY_ROOT / "configs" / "synthetic_video_public_pilot.json"
+DEFAULT_PREFLIGHT_RESULT = (
+    REPOSITORY_ROOT / "results" / "synthetic_video_public_pilot_preflight.json"
+)
 
 
 def _json(value: object) -> None:
@@ -183,6 +187,79 @@ def command_gallery(args: argparse.Namespace) -> None:
     _json({"status": "READY", "gallery": str(gallery), "attempt_count": len(work_order["attempts"])})
 
 
+def command_cloud_plan(args: argparse.Namespace) -> None:
+    config = load_config(args.config)
+    preflight = json.loads(Path(args.preflight_result).read_text())
+    protocol_sha256 = canonical_json_sha256(config)
+    if preflight["status"] != "PASS" or preflight["protocol_sha256"] != protocol_sha256:
+        raise ValueError("cloud plan requires a PASS preflight for the current protocol hash")
+    revision = preflight["nursery_commit"]
+    script_url = (
+        "https://raw.githubusercontent.com/rishisim/nursery/"
+        f"{revision}/scripts/run_synthetic_video_hf_job.py"
+    )
+    cloud = config["cloud"]
+    specs = []
+    for family in ("wan", "ltx"):
+        script_args = [
+            "--nursery-revision",
+            revision,
+            "--expected-protocol-sha256",
+            protocol_sha256,
+            "--family",
+            family,
+            "--profile",
+            "preview",
+            "--run-id",
+            args.run_id,
+            "--output-repository",
+            args.output_repository or cloud["output_repository_default"],
+        ]
+        shell = [
+            "hf",
+            "jobs",
+            "uv",
+            "run",
+            "--detach",
+            "--flavor",
+            cloud["hardware_flavor"],
+            "--timeout",
+            cloud["gpu_timeout_per_family"],
+            "--secrets",
+            "HF_TOKEN",
+            script_url,
+            *script_args,
+        ]
+        specs.append(
+            {
+                "family": family,
+                "operation": "uv",
+                "script": script_url,
+                "script_args": script_args,
+                "flavor": cloud["hardware_flavor"],
+                "timeout": cloud["gpu_timeout_per_family"],
+                "secrets": ["HF_TOKEN"],
+                "maximum_charge_usd": cloud["maximum_gpu_charge_per_family_usd"],
+                "shell_preview": shlex.join(shell),
+            }
+        )
+    _json(
+        {
+            "status": "READY_REQUIRES_EXPLICIT_SPEND_CONFIRMATION",
+            "run_id": args.run_id,
+            "protocol_sha256": protocol_sha256,
+            "validated_nursery_commit": revision,
+            "output_repository": args.output_repository
+            or cloud["output_repository_default"],
+            "jobs": specs,
+            "maximum_preview_gpu_charge_usd": cloud[
+                "maximum_preview_gpu_charge_usd"
+            ],
+            "launch_order": ["wan", "ltx"],
+        }
+    )
+
+
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(description=__doc__)
     root.add_argument("--config", default=str(DEFAULT_CONFIG))
@@ -237,6 +314,18 @@ def parser() -> argparse.ArgumentParser:
     gallery.add_argument("--run-root", required=True)
     gallery.add_argument("--output")
     gallery.set_defaults(func=command_gallery)
+
+    cloud_plan = commands.add_parser(
+        "cloud-plan",
+        help="emit exact paid job specs without launching or spending money",
+    )
+    cloud_plan.add_argument("--run-id", required=True)
+    cloud_plan.add_argument(
+        "--preflight-result",
+        default=str(DEFAULT_PREFLIGHT_RESULT),
+    )
+    cloud_plan.add_argument("--output-repository")
+    cloud_plan.set_defaults(func=command_cloud_plan)
     return root
 
 

@@ -115,6 +115,18 @@ accepted Google's gated Gemma license for
 Piper/voice lineage restrictions remain applicable. This repository treats the
 preview as non-commercial research and does not grant broader product rights.
 
+Generate the exact two paid job specifications without launching anything:
+
+```bash
+python scripts/run_synthetic_video_public_pilot.py cloud-plan \
+  --run-id public-preview-20260730
+```
+
+The command is bound to the passed preflight's Nursery commit and current
+protocol hash. It emits both the structured Hugging Face Jobs arguments and
+copyable shell previews, along with the $10-per-family and $20-total ceilings.
+It never submits a job.
+
 Official references:
 
 - [Wan 2.2 repository](https://github.com/Wan-Video/Wan2.2)
