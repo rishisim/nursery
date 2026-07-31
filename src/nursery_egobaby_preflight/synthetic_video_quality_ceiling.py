@@ -6,6 +6,7 @@ import html
 import json
 import os
 import re
+import shutil
 import subprocess
 import time
 import urllib.error
@@ -552,7 +553,9 @@ def write_comparison_work_order(
         key: value for key, value in work_order.items() if key != "blinding_key"
     }
     _write_json(root / "work_order.json", public_order)
-    _write_json(root / "blinding_key.json", work_order["blinding_key"])
+    blinding_key_path = root / "blinding_key.json"
+    _write_json(blinding_key_path, work_order["blinding_key"])
+    blinding_key_path.chmod(0o600)
     for attempt in work_order["attempts"]:
         _write_json(root / attempt["paths"]["request"], attempt["request"])
         _write_json(
@@ -882,6 +885,7 @@ def _run_one_attempt(
     run_root: Path,
     client: FalQueueClient,
     *,
+    implementation_commit: str,
     poll_interval_seconds: float,
     ffmpeg_executable: str,
     ffprobe_executable: str,
@@ -957,6 +961,7 @@ def _run_one_attempt(
             "provider": {
                 "name": "fal",
                 "endpoint": quality_config["candidate"]["endpoint"],
+                "nursery_adapter_commit": implementation_commit,
                 "request_id": submission["request_id"],
                 "request_sha256": attempt["request_sha256"],
                 "automatic_retries_disabled": True,
@@ -994,6 +999,8 @@ def _run_one_attempt(
                 "status": "failed",
                 "started_at": started_at,
                 "failed_at": utc_now(),
+                "nursery_adapter_commit": implementation_commit,
+                "provider_submission_created": paths["submission"].exists(),
                 "error_type": type(error).__name__,
                 "error": str(error),
             },
@@ -1010,6 +1017,7 @@ def execute_comparison(
     run_root: str | Path,
     approved_spend_usd: Decimal,
     api_key: str,
+    implementation_commit: str = "",
     poll_interval_seconds: float = 10.0,
     ffmpeg_executable: str = "ffmpeg",
     ffprobe_executable: str = "ffprobe",
@@ -1021,6 +1029,10 @@ def execute_comparison(
     _require(
         approved_spend_usd == ceiling,
         f"approved spend must exactly match the frozen ceiling {ceiling}",
+    )
+    _require(
+        bool(re.fullmatch(r"[0-9a-f]{40}", implementation_commit)),
+        "a clean 40-character Git execution commit is required",
     )
     _require(
         Decimal(str(work_order["planned_cost_usd"])) == ceiling,
@@ -1038,6 +1050,7 @@ def execute_comparison(
             "schema_version": 1,
             "approved_spend_usd": float(approved_spend_usd),
             "frozen_maximum_generation_charge_usd": float(ceiling),
+            "nursery_adapter_commit": implementation_commit,
             "recorded_at": utc_now(),
         },
     )
@@ -1057,6 +1070,7 @@ def execute_comparison(
                 baseline_by_scene[attempt["scene_id"]],
                 root,
                 client,
+                implementation_commit=implementation_commit,
                 poll_interval_seconds=poll_interval_seconds,
                 ffmpeg_executable=ffmpeg_executable,
                 ffprobe_executable=ffprobe_executable,
@@ -1073,6 +1087,7 @@ def execute_comparison(
                 "comparison_id": work_order["comparison_id"],
                 "run_id": work_order["run_id"],
                 "status": "failed",
+                "nursery_adapter_commit": implementation_commit,
                 "started_at": started_at,
                 "finished_at": utc_now(),
                 "completed_attempt_ids": completed,
@@ -1087,6 +1102,7 @@ def execute_comparison(
                 "comparison_id": work_order["comparison_id"],
                 "run_id": work_order["run_id"],
                 "status": "running",
+                "nursery_adapter_commit": implementation_commit,
                 "started_at": started_at,
                 "completed_attempt_ids": completed,
                 "failed_attempt_ids": failed,
@@ -1097,6 +1113,7 @@ def execute_comparison(
         "comparison_id": work_order["comparison_id"],
         "run_id": work_order["run_id"],
         "status": "complete",
+        "nursery_adapter_commit": implementation_commit,
         "started_at": started_at,
         "finished_at": utc_now(),
         "completed_attempt_ids": completed,
@@ -1140,12 +1157,13 @@ def render_blinded_gallery(
                 video = root / card["paths"]["final_video"]
             qa = root / "qa" / f"{card['blinded_display_id']}.json"
             alias = alias_root / f"{card['blinded_display_id']}.mp4"
+            if alias.exists() or alias.is_symlink():
+                alias.unlink()
             if video.exists():
-                target = os.path.relpath(video, alias.parent)
-                if alias.is_symlink() and os.readlink(alias) != target:
-                    alias.unlink()
-                if not alias.exists() and not alias.is_symlink():
-                    alias.symlink_to(target)
+                try:
+                    os.link(video, alias)
+                except OSError:
+                    shutil.copy2(video, alias)
             video_rel = os.path.relpath(alias, output.parent)
             qa_rel = os.path.relpath(qa, output.parent)
             missing = (
@@ -1207,6 +1225,594 @@ def render_blinded_gallery(
 """
     output.write_text(page)
     return output
+
+
+def _validate_completed_qa(
+    public_pilot: Mapping[str, Any],
+    work_order: Mapping[str, Any],
+    qa: Mapping[str, Any],
+    *,
+    expected_scene_id: str,
+    expected_blind_id: str,
+) -> None:
+    _require("family" not in qa and "attempt_id" not in qa, "QA record is unblinded")
+    _require(
+        qa.get("comparison_id") == work_order["comparison_id"]
+        and qa.get("run_id") == work_order["run_id"],
+        "QA record comparison identity changed",
+    )
+    _require(qa.get("scene_id") == expected_scene_id, "QA scene ID changed")
+    _require(
+        qa.get("blinded_display_id") == expected_blind_id,
+        "QA blinded display ID changed",
+    )
+    rater_id = qa.get("rater_id")
+    _require(isinstance(rater_id, str) and bool(rater_id.strip()), "QA rater ID is missing")
+    rated_at = qa.get("rated_at")
+    _require(isinstance(rated_at, str), "QA rated_at is missing")
+    try:
+        parsed_at = datetime.fromisoformat(rated_at.replace("Z", "+00:00"))
+    except ValueError:
+        raise ValueError("QA rated_at is not an ISO-8601 timestamp") from None
+    _require(parsed_at.tzinfo is not None, "QA rated_at must include a timezone")
+
+    expected_items = public_pilot["human_qa"]["items"]
+    items = qa.get("items")
+    _require(isinstance(items, list), "QA items must be a list")
+    _require(
+        [item.get("id") for item in items]
+        == [item["id"] for item in expected_items],
+        "QA item order or identity changed",
+    )
+    allowed_responses = set(public_pilot["human_qa"]["response_values"])
+    allowed_confidence = set(public_pilot["human_qa"]["confidence_values"])
+    for item, expected in zip(items, expected_items, strict=True):
+        _require(item.get("question") == expected["question"], "QA question changed")
+        _require(
+            item.get("response") in allowed_responses,
+            f"QA response for {item['id']} is incomplete or invalid",
+        )
+        _require(
+            item.get("confidence") in allowed_confidence,
+            f"QA confidence for {item['id']} is incomplete or invalid",
+        )
+        _require(
+            item.get("note") is None or isinstance(item.get("note"), str),
+            f"QA note for {item['id']} must be text or null",
+        )
+
+
+def inspect_blinded_review_status(
+    quality_config: Mapping[str, Any],
+    public_pilot: Mapping[str, Any],
+    work_order: Mapping[str, Any],
+    *,
+    run_root: str | Path,
+) -> dict[str, Any]:
+    """Report QA completeness without loading or exposing the blinding key."""
+
+    validate_work_order(quality_config, public_pilot, work_order)
+    root = Path(run_root).resolve()
+    records: list[dict[str, Any]] = []
+    rater_ids: set[str] = set()
+    for pair in work_order["pairs"]:
+        for card in pair["presentation"]:
+            blind_id = card["blinded_display_id"]
+            qa_path = root / "qa" / f"{blind_id}.json"
+            state = "missing"
+            issue = "QA record is missing"
+            if qa_path.is_file():
+                qa = json.loads(qa_path.read_text())
+                try:
+                    _validate_completed_qa(
+                        public_pilot,
+                        work_order,
+                        qa,
+                        expected_scene_id=pair["scene_id"],
+                        expected_blind_id=blind_id,
+                    )
+                except ValueError as error:
+                    state = "pending"
+                    issue = str(error)
+                else:
+                    state = "complete"
+                    issue = None
+                    rater_ids.add(str(qa["rater_id"]).strip())
+            records.append(
+                {
+                    "blinded_display_id": blind_id,
+                    "scene_id": pair["scene_id"],
+                    "state": state,
+                    "issue": issue,
+                }
+            )
+    counts = {
+        state: sum(record["state"] == state for record in records)
+        for state in ("complete", "pending", "missing")
+    }
+    expected_raters = int(quality_config["review"]["required_unique_raters"])
+    ready = (
+        counts["complete"] == len(records)
+        and len(rater_ids) == expected_raters
+    )
+    return {
+        "schema_version": 1,
+        "comparison_id": work_order["comparison_id"],
+        "run_id": work_order["run_id"],
+        "status": "READY_TO_UNBLIND" if ready else "BLINDED_QA_INCOMPLETE",
+        "record_counts": counts,
+        "unique_completed_rater_count": len(rater_ids),
+        "required_unique_rater_count": expected_raters,
+        "records": records,
+    }
+
+
+def _verify_candidate_execution(
+    quality_config: Mapping[str, Any],
+    public_pilot: Mapping[str, Any],
+    work_order: Mapping[str, Any],
+    run_root: Path,
+    *,
+    ffprobe_executable: str,
+) -> dict[str, Any]:
+    run_status = json.loads((run_root / "run_status.json").read_text())
+    expected_ids = [attempt["attempt_id"] for attempt in work_order["attempts"]]
+    _require(run_status.get("status") == "complete", "candidate run is not complete")
+    _require(
+        run_status.get("completed_attempt_ids") == expected_ids,
+        "candidate completed-attempt order changed",
+    )
+    _require(
+        run_status.get("failed_attempt_ids") == [],
+        "candidate run contains generated-attempt failures",
+    )
+    records = []
+    for attempt in work_order["attempts"]:
+        paths = {key: run_root / value for key, value in attempt["paths"].items()}
+        _require(paths["submission"].is_file(), "candidate submission record is missing")
+        _require(paths["record"].is_file(), "candidate attempt record is missing")
+        _require(paths["final_video"].is_file(), "candidate final media is missing")
+        record = json.loads(paths["record"].read_text())
+        _require(record.get("status") == "media_valid", "candidate media is invalid")
+        _require(
+            record["attempt"]["request_sha256"] == attempt["request_sha256"],
+            "candidate request hash changed",
+        )
+        _require(
+            record["final_media"]["sha256"] == file_sha256(str(paths["final_video"])),
+            "candidate final hash changed",
+        )
+        summary = media_summary(paths["final_video"], ffprobe_executable)
+        _require(
+            validate_final_media(public_pilot, summary) == [],
+            "candidate final media no longer conforms",
+        )
+        records.append(
+            {
+                "attempt_id": attempt["attempt_id"],
+                "scene_id": attempt["scene_id"],
+                "status": record["status"],
+                "request_id": record["provider"]["request_id"],
+                "request_sha256": attempt["request_sha256"],
+                "returned_seed": record["provider"]["output"]["returned_seed"],
+                "started_at": record["started_at"],
+                "finished_at": record["finished_at"],
+                "final_sha256": record["final_media"]["sha256"],
+                "nursery_adapter_commit": record["provider"][
+                    "nursery_adapter_commit"
+                ],
+            }
+        )
+    submissions = len(list(run_root.glob("attempts/*/submission.json")))
+    return {
+        "planned_attempt_count": len(expected_ids),
+        "provider_submission_count": submissions,
+        "media_valid_count": len(records),
+        "generated_attempt_failure_count": submissions - len(records),
+        "generated_attempt_failure_rate": (
+            (submissions - len(records)) / submissions if submissions else None
+        ),
+        "estimated_successful_output_charge_usd": float(
+            sum(
+                Decimal(str(attempt["planned_charge_usd"]))
+                for attempt in work_order["attempts"]
+            )
+        ),
+        "actual_provider_invoice_usd": None,
+        "records": records,
+    }
+
+
+def _family_review_metrics(
+    clips: list[dict[str, Any]],
+    quality_config: Mapping[str, Any],
+) -> dict[str, Any]:
+    visual_ids = set(quality_config["review"]["visual_item_ids"])
+    critical_ids = set(quality_config["review"]["critical_visual_item_ids"])
+    item_counts = {
+        item_id: {"pass": 0, "fail": 0, "cannot_judge": 0}
+        for item_id in (
+            quality_config["review"]["visual_item_ids"]
+            + quality_config["review"]["audio_control_item_ids"]
+        )
+    }
+    for clip in clips:
+        for item_id, response in clip["responses"].items():
+            item_counts[item_id][response] += 1
+    visual = [
+        response
+        for clip in clips
+        for item_id, response in clip["responses"].items()
+        if item_id in visual_ids
+    ]
+    critical_failures = sum(
+        response == "fail"
+        for clip in clips
+        for item_id, response in clip["responses"].items()
+        if item_id in critical_ids
+    )
+    counts = {
+        response: sum(value == response for value in visual)
+        for response in ("pass", "fail", "cannot_judge")
+    }
+    judgeable = counts["pass"] + counts["fail"]
+    return {
+        "clip_count": len(clips),
+        "visual_counts": counts,
+        "visual_judgeable_count": judgeable,
+        "visual_pass_rate": counts["pass"] / judgeable if judgeable else None,
+        "critical_visual_failure_count": critical_failures,
+        "safety_failure_count": item_counts["safety"]["fail"],
+        "item_counts": item_counts,
+    }
+
+
+def _recommendation_markdown(summary: Mapping[str, Any]) -> str:
+    family = summary["qualitative"]["families"]
+    scenes = summary["qualitative"]["scene_comparisons"]
+    lines = [
+        "# LTX-2.3 versus Seedance 2.0 public quality-ceiling result",
+        "",
+        f"**Decision:** `{summary['decision']['label']}`",
+        "",
+        "This is a single-rater, four-scene qualitative screen using only the "
+        "frozen public prompts. It is not a formal model-selection result and "
+        "does not authorize Seedance output as learner training data.",
+        "",
+        "## Technical and cost result",
+        "",
+        "| Family | Planned | Media valid | Generated failures |",
+        "|---|---:|---:|---:|",
+        "| LTX-2.3 | 4 | 4 | 0 |",
+        (
+            "| Seedance 2.0 | 4 | "
+            f"{summary['technical']['seedance']['media_valid_count']} | "
+            f"{summary['technical']['seedance']['generated_attempt_failure_count']} |"
+        ),
+        "",
+        (
+            "Estimated Seedance successful-output charge: "
+            f"${summary['cost']['estimated_successful_output_charge_usd']:.3f}. "
+            "The actual provider invoice was not available to the runner."
+        ),
+        "",
+        "## Blinded qualitative result",
+        "",
+        "| Family | Visual pass | Visual fail | Cannot judge | Pass rate | Critical failures |",
+        "|---|---:|---:|---:|---:|---:|",
+    ]
+    for family_id, label in (("ltx", "LTX-2.3"), ("seedance", "Seedance 2.0")):
+        metrics = family[family_id]
+        rate = (
+            f"{metrics['visual_pass_rate']:.1%}"
+            if metrics["visual_pass_rate"] is not None
+            else "n/a"
+        )
+        lines.append(
+            f"| {label} | {metrics['visual_counts']['pass']} | "
+            f"{metrics['visual_counts']['fail']} | "
+            f"{metrics['visual_counts']['cannot_judge']} | {rate} | "
+            f"{metrics['critical_visual_failure_count']} |"
+        )
+    lines.extend(
+        [
+            "",
+            "| Scene | Result | LTX passes | Seedance passes |",
+            "|---|---|---:|---:|",
+        ]
+    )
+    for scene in scenes:
+        lines.append(
+            f"| {scene['scene_id']} | {scene['winner']} | "
+            f"{scene['ltx_visual_pass_count']} | "
+            f"{scene['seedance_visual_pass_count']} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Decision boundary",
+            "",
+            summary["decision"]["explanation"],
+            "",
+            "Even a material Seedance win means only: pursue written provider "
+            "and institutional clearance. ChildLens/BabyView-derived prompts "
+            "or inputs remain prohibited, and no learner may consume Seedance "
+            "outputs until the separate training-use gate is cleared.",
+            "",
+            "## Provenance",
+            "",
+            f"- Quality protocol SHA-256: `{summary['provenance']['quality_protocol_sha256']}`",
+            f"- Work-order SHA-256: `{summary['provenance']['work_order_sha256']}`",
+            f"- Blinded QA bundle SHA-256: `{summary['provenance']['qa_bundle_sha256']}`",
+            f"- Adapter commit: `{summary['provenance']['nursery_adapter_commit']}`",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def finalize_blinded_review(
+    quality_config: Mapping[str, Any],
+    public_pilot: Mapping[str, Any],
+    work_order: Mapping[str, Any],
+    *,
+    repository_root: str | Path,
+    run_root: str | Path,
+    ffprobe_executable: str = "ffprobe",
+) -> dict[str, Any]:
+    """Freeze complete blinded QA, then unblind and compute the frozen screen."""
+
+    validate_work_order(quality_config, public_pilot, work_order)
+    root = Path(run_root).resolve()
+    review_status = inspect_blinded_review_status(
+        quality_config,
+        public_pilot,
+        work_order,
+        run_root=root,
+    )
+    _require(
+        review_status["status"] == "READY_TO_UNBLIND",
+        "all eight blinded QA records must be complete before unblinding",
+    )
+
+    qa_records: dict[str, dict[str, Any]] = {}
+    qa_hashes: dict[str, str] = {}
+    rater_ids: set[str] = set()
+    for pair in work_order["pairs"]:
+        for card in pair["presentation"]:
+            blind_id = card["blinded_display_id"]
+            qa_path = root / "qa" / f"{blind_id}.json"
+            qa = json.loads(qa_path.read_text())
+            qa_records[blind_id] = qa
+            qa_hashes[blind_id] = file_sha256(str(qa_path))
+            rater_ids.add(str(qa["rater_id"]).strip())
+    qa_bundle_sha256 = canonical_json_sha256(qa_hashes)
+    freeze_path = root / "review" / "qa_freeze.json"
+    freeze = {
+        "schema_version": 1,
+        "comparison_id": work_order["comparison_id"],
+        "run_id": work_order["run_id"],
+        "frozen_at": utc_now(),
+        "work_order_sha256": work_order["work_order_sha256"],
+        "blinding_key_sha256": work_order["blinding_key_sha256"],
+        "qa_file_sha256": qa_hashes,
+        "qa_bundle_sha256": qa_bundle_sha256,
+        "rater_id_set_sha256": canonical_json_sha256(sorted(rater_ids)),
+    }
+    if freeze_path.exists():
+        existing_freeze = json.loads(freeze_path.read_text())
+        _require(
+            existing_freeze["qa_bundle_sha256"] == qa_bundle_sha256,
+            "QA files changed after the existing freeze",
+        )
+        freeze = existing_freeze
+    else:
+        _write_json(freeze_path, freeze)
+
+    blinding_key = json.loads((root / "blinding_key.json").read_text())
+    _require(
+        canonical_json_sha256(blinding_key) == work_order["blinding_key_sha256"],
+        "blinding key hash mismatch",
+    )
+    _require(
+        set(blinding_key) == set(qa_records),
+        "blinding key and QA record sets differ",
+    )
+
+    baseline = verify_ltx_baseline(quality_config, public_pilot, repository_root)
+    candidate = _verify_candidate_execution(
+        quality_config,
+        public_pilot,
+        work_order,
+        root,
+        ffprobe_executable=ffprobe_executable,
+    )
+    clips_by_family: dict[str, list[dict[str, Any]]] = {"ltx": [], "seedance": []}
+    for blind_id, qa in qa_records.items():
+        mapping = blinding_key[blind_id]
+        responses = {item["id"]: item["response"] for item in qa["items"]}
+        clips_by_family[mapping["family"]].append(
+            {
+                "scene_id": mapping["scene_id"],
+                "blinded_display_id": blind_id,
+                "responses": responses,
+            }
+        )
+    family_metrics = {
+        family: _family_review_metrics(clips, quality_config)
+        for family, clips in clips_by_family.items()
+    }
+    scene_comparisons = []
+    candidate_scene_wins = 0
+    candidate_scene_losses = 0
+    incomparable_scenes = 0
+    visual_ids = set(quality_config["review"]["visual_item_ids"])
+    for scene_id in SCENE_IDS:
+        by_family = {
+            family: next(clip for clip in clips if clip["scene_id"] == scene_id)
+            for family, clips in clips_by_family.items()
+        }
+        scene_counts = {}
+        for family, clip in by_family.items():
+            visual = [
+                response
+                for item_id, response in clip["responses"].items()
+                if item_id in visual_ids
+            ]
+            scene_counts[family] = {
+                "pass": sum(response == "pass" for response in visual),
+                "judgeable": sum(response != "cannot_judge" for response in visual),
+            }
+        comparable = (
+            scene_counts["ltx"]["judgeable"]
+            == scene_counts["seedance"]["judgeable"]
+        )
+        if not comparable:
+            winner = "inconclusive"
+            incomparable_scenes += 1
+        elif scene_counts["seedance"]["pass"] > scene_counts["ltx"]["pass"]:
+            winner = "seedance"
+            candidate_scene_wins += 1
+        elif scene_counts["seedance"]["pass"] < scene_counts["ltx"]["pass"]:
+            winner = "ltx"
+            candidate_scene_losses += 1
+        else:
+            winner = "tie"
+        scene_comparisons.append(
+            {
+                "scene_id": scene_id,
+                "winner": winner,
+                "judgeable_counts_equal": comparable,
+                "ltx_visual_pass_count": scene_counts["ltx"]["pass"],
+                "seedance_visual_pass_count": scene_counts["seedance"]["pass"],
+            }
+        )
+
+    rule = quality_config["review"]["material_visual_win_rule"]
+    visual_pass_advantage = (
+        family_metrics["seedance"]["visual_counts"]["pass"]
+        - family_metrics["ltx"]["visual_counts"]["pass"]
+    )
+    criteria = {
+        "candidate_media_valid_count": (
+            candidate["media_valid_count"]
+            == rule["candidate_media_valid_count_required"]
+        ),
+        "minimum_total_visual_pass_advantage": (
+            visual_pass_advantage >= rule["minimum_total_visual_pass_advantage"]
+        ),
+        "minimum_candidate_scene_wins": (
+            candidate_scene_wins >= rule["minimum_candidate_scene_wins"]
+        ),
+        "maximum_candidate_scene_losses": (
+            candidate_scene_losses <= rule["maximum_candidate_scene_losses"]
+        ),
+        "equal_judgeable_visual_items_per_scene": incomparable_scenes == 0,
+        "critical_failures_not_increased": (
+            family_metrics["seedance"]["critical_visual_failure_count"]
+            <= family_metrics["ltx"]["critical_visual_failure_count"]
+        ),
+        "maximum_candidate_safety_failures": (
+            family_metrics["seedance"]["safety_failure_count"]
+            <= rule["maximum_candidate_safety_failures"]
+        ),
+    }
+    labels = quality_config["review"]["decision_labels"]
+    if incomparable_scenes:
+        decision_label = labels["inconclusive"]
+        explanation = (
+            "At least one scene had unequal judgeable-item denominators, so the "
+            "prospective visual-win rule cannot be applied."
+        )
+    elif all(criteria.values()):
+        decision_label = labels["material_win"]
+        explanation = (
+            "Seedance met every prospectively frozen material-visual-win "
+            "criterion. This supports pursuing written terms and governance "
+            "clearance only; it does not authorize training use."
+        )
+    else:
+        decision_label = labels["no_material_win"]
+        explanation = (
+            "Seedance did not meet every prospectively frozen material-visual-win "
+            "criterion, so LTX remains the reproducible quality baseline."
+        )
+
+    baseline_records = [
+        {
+            "attempt_id": baseline[scene_id]["attempt_id"],
+            "scene_id": scene_id,
+            "final_sha256": baseline[scene_id]["record"]["final_media"]["sha256"],
+        }
+        for scene_id in SCENE_IDS
+    ]
+    adapter_commits = {
+        record["nursery_adapter_commit"] for record in candidate["records"]
+    }
+    _require(len(adapter_commits) == 1, "candidate adapter commits differ")
+    summary = {
+        "schema_version": 1,
+        "comparison_id": work_order["comparison_id"],
+        "run_id": work_order["run_id"],
+        "status": "COMPLETE_QUALITATIVE_SCREEN",
+        "finalized_at": utc_now(),
+        "technical": {
+            "ltx": {
+                "planned_attempt_count": 4,
+                "media_valid_count": 4,
+                "generated_attempt_failure_count": 0,
+                "records": baseline_records,
+            },
+            "seedance": candidate,
+        },
+        "qualitative": {
+            "profile": quality_config["review"]["profile"],
+            "families": family_metrics,
+            "scene_comparisons": scene_comparisons,
+            "candidate_visual_pass_advantage": visual_pass_advantage,
+            "candidate_scene_wins": candidate_scene_wins,
+            "candidate_scene_losses": candidate_scene_losses,
+            "incomparable_scene_count": incomparable_scenes,
+        },
+        "cost": {
+            "currency": "USD",
+            "estimated_successful_output_charge_usd": candidate[
+                "estimated_successful_output_charge_usd"
+            ],
+            "actual_provider_invoice_usd": None,
+            "billing_note": (
+                "Estimate uses the frozen per-second rate; actual provider "
+                "invoice data was not available to the runner."
+            ),
+        },
+        "decision": {
+            "label": decision_label,
+            "criteria": criteria,
+            "explanation": explanation,
+            "scientific_training_use_authorized": False,
+        },
+        "provenance": {
+            "quality_protocol_sha256": work_order["quality_protocol_sha256"],
+            "public_pilot_protocol_sha256": work_order[
+                "public_pilot_protocol_sha256"
+            ],
+            "work_order_sha256": work_order["work_order_sha256"],
+            "blinding_key_sha256": work_order["blinding_key_sha256"],
+            "qa_bundle_sha256": freeze["qa_bundle_sha256"],
+            "nursery_adapter_commit": next(iter(adapter_commits)),
+        },
+    }
+    summary_path = root / "review" / "review_summary.json"
+    recommendation_path = root / "review" / "recommendation.md"
+    _write_json(summary_path, summary)
+    recommendation_path.write_text(_recommendation_markdown(summary))
+    return {
+        "status": summary["status"],
+        "decision": decision_label,
+        "summary": str(summary_path),
+        "recommendation": str(recommendation_path),
+        "qa_freeze": str(freeze_path),
+    }
 
 
 def load_default_configs(

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
 from decimal import Decimal
 from pathlib import Path
@@ -17,6 +18,8 @@ from nursery_egobaby_preflight.contract import canonical_json_sha256
 from nursery_egobaby_preflight.synthetic_video_quality_ceiling import (
     compile_comparison_work_order,
     execute_comparison,
+    finalize_blinded_review,
+    inspect_blinded_review_status,
     load_default_configs,
     planned_cost_usd,
     render_blinded_gallery,
@@ -52,6 +55,25 @@ def _run_root(args: argparse.Namespace) -> Path:
         / "synthetic_video_quality_ceiling"
         / args.run_id
     ).resolve()
+
+
+def _clean_execution_commit() -> str:
+    status = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=REPOSITORY_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    if status:
+        raise RuntimeError("paid execution requires a clean Git worktree")
+    return subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=REPOSITORY_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
 
 
 def command_validate(args: argparse.Namespace) -> None:
@@ -123,6 +145,7 @@ def command_run(args: argparse.Namespace) -> None:
     work_order = _load_work_order(args.work_order or run_root / "work_order.json")
     credential_name = quality["candidate"]["credential_environment_variable"]
     api_key = os.environ.get(credential_name, "")
+    implementation_commit = _clean_execution_commit()
     status = execute_comparison(
         quality,
         public,
@@ -131,6 +154,7 @@ def command_run(args: argparse.Namespace) -> None:
         run_root=run_root,
         approved_spend_usd=Decimal(args.approved_spend_usd),
         api_key=api_key,
+        implementation_commit=implementation_commit,
         poll_interval_seconds=args.poll_interval_seconds,
         ffmpeg_executable=args.ffmpeg,
         ffprobe_executable=args.ffprobe,
@@ -157,6 +181,36 @@ def command_gallery(args: argparse.Namespace) -> None:
             "pair_count": len(work_order["pairs"]),
             "blinding_key": str(run_root / "blinding_key.json"),
         }
+    )
+
+
+def command_review_status(args: argparse.Namespace) -> None:
+    quality, public = _configs(args)
+    run_root = _run_root(args)
+    work_order = _load_work_order(args.work_order or run_root / "work_order.json")
+    _json(
+        inspect_blinded_review_status(
+            quality,
+            public,
+            work_order,
+            run_root=run_root,
+        )
+    )
+
+
+def command_finalize_review(args: argparse.Namespace) -> None:
+    quality, public = _configs(args)
+    run_root = _run_root(args)
+    work_order = _load_work_order(args.work_order or run_root / "work_order.json")
+    _json(
+        finalize_blinded_review(
+            quality,
+            public,
+            work_order,
+            repository_root=REPOSITORY_ROOT,
+            run_root=run_root,
+            ffprobe_executable=args.ffprobe,
+        )
     )
 
 
@@ -209,6 +263,25 @@ def parser() -> argparse.ArgumentParser:
     gallery.add_argument("--work-order")
     gallery.add_argument("--output")
     gallery.set_defaults(func=command_gallery)
+
+    review_status = commands.add_parser(
+        "review-status",
+        help="validate blinded QA completeness without opening the family key",
+    )
+    review_status.add_argument("--run-id", required=True)
+    review_status.add_argument("--run-root")
+    review_status.add_argument("--work-order")
+    review_status.set_defaults(func=command_review_status)
+
+    finalize_review = commands.add_parser(
+        "finalize-review",
+        help="freeze complete blinded QA, unblind, score, and write the recommendation",
+    )
+    finalize_review.add_argument("--run-id", required=True)
+    finalize_review.add_argument("--run-root")
+    finalize_review.add_argument("--work-order")
+    finalize_review.add_argument("--ffprobe", default="ffprobe")
+    finalize_review.set_defaults(func=command_finalize_review)
     return root
 
 

@@ -100,7 +100,9 @@ normalized, hashed, and recorded before the next request is submitted. An
 interrupted invocation resumes the existing provider request rather than
 creating a duplicate charge. The runner rejects approvals above or below the
 frozen `$6.068` ceiling and rejects any modified work order before contacting
-the provider.
+the provider. Paid execution also requires a clean Git worktree and records
+the exact 40-character adapter commit in the approval, run status, and every
+candidate attempt record.
 
 ## Blinded review
 
@@ -111,10 +113,11 @@ python scripts/run_synthetic_video_quality_ceiling.py gallery \
   --run-id quality-ceiling-20260731
 ```
 
-The gallery uses opaque media symlinks and labels cards only as Clip A or Clip
-B. Family order is independently randomized per scene. The mapping lives in
-`blinding_key.json`, which must remain unopened until all eight QA records are
-frozen.
+The gallery uses opaque hard-linked media aliases (or copies when hard links
+are unavailable) and labels cards only as Clip A or Clip B, so local link
+targets cannot disclose the family. Family order is independently randomized
+per scene. The mapping lives in mode-`0600` `blinding_key.json`, which must
+remain unopened until all eight QA records are frozen.
 
 The review uses the same eight items as the completed preview: continuous
 egocentric shot, anatomy, contact/action completion, identity, transition
@@ -129,6 +132,28 @@ visual passes in total, at least two scene wins and no scene losses, no increase
 in critical visual failures, no safety failure, and equal judgeable-item
 denominators within every scene. Anything weaker retains LTX as the
 reproducible baseline; a technical or judgeability shortfall is inconclusive.
+
+Before unblinding, validate the eight edited QA records:
+
+```bash
+python scripts/run_synthetic_video_quality_ceiling.py review-status \
+  --run-id quality-ceiling-20260731
+```
+
+Once this reports `READY_TO_UNBLIND`, freeze and finalize the comparison:
+
+```bash
+python scripts/run_synthetic_video_quality_ceiling.py finalize-review \
+  --run-id quality-ceiling-20260731
+```
+
+The finalizer hashes and freezes the complete family-free QA bundle before
+opening `blinding_key.json`. It then re-verifies all eight media records and
+hashes, computes per-family and per-scene adherence, technical validity,
+generated-attempt failure rate, and the frozen-price cost estimate, and writes
+`review/review_summary.json` plus `review/recommendation.md` under the ignored
+run root. The provider invoice remains a separate billing source and is never
+inferred as an observed value.
 
 ## Decision boundary
 

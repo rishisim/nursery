@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 
+import nursery_egobaby_preflight.synthetic_video_quality_ceiling as quality_module
 from nursery_egobaby_preflight.contract import (
     canonical_json_sha256,
     file_sha256,
@@ -24,6 +25,8 @@ from nursery_egobaby_preflight.synthetic_video_quality_ceiling import (
     _audio_payload_sha256,
     compile_comparison_work_order,
     execute_comparison,
+    finalize_blinded_review,
+    inspect_blinded_review_status,
     load_quality_config,
     normalize_seedance_with_ltx_audio,
     planned_cost_usd,
@@ -158,6 +161,7 @@ def test_paid_runner_requires_exact_frozen_spend(
             run_root=tmp_path / "run",
             approved_spend_usd=Decimal("7"),
             api_key="unused",
+            implementation_commit="0" * 40,
         )
 
 
@@ -176,6 +180,7 @@ def test_work_order_separates_blinding_key_and_family_free_qa(
     key = json.loads((tmp_path / "blinding_key.json").read_text())
     assert "blinding_key" not in public_order
     assert canonical_json_sha256(key) == public_order["blinding_key_sha256"]
+    assert (tmp_path / "blinding_key.json").stat().st_mode & 0o777 == 0o600
     qa_paths = sorted((tmp_path / "qa").glob("*.json"))
     assert len(qa_paths) == 8
     for qa_path in qa_paths:
@@ -184,6 +189,121 @@ def test_work_order_separates_blinding_key_and_family_free_qa(
         assert "attempt_id" not in qa
         assert qa["blinded_display_id"] == qa_path.stem
         assert len(qa["items"]) == 8
+
+
+def test_blinded_review_status_does_not_require_or_expose_family_key(
+    quality_config: dict,
+    public_config: dict,
+    tmp_path: Path,
+) -> None:
+    order = compile_comparison_work_order(
+        quality_config,
+        public_config,
+        "seedance-preview-test",
+    )
+    write_comparison_work_order(tmp_path, order, public_config)
+    public_order = json.loads((tmp_path / "work_order.json").read_text())
+    status = inspect_blinded_review_status(
+        quality_config,
+        public_config,
+        public_order,
+        run_root=tmp_path,
+    )
+    assert status["status"] == "BLINDED_QA_INCOMPLETE"
+    assert status["record_counts"] == {
+        "complete": 0,
+        "pending": 8,
+        "missing": 0,
+    }
+    serialized = json.dumps(status)
+    assert '"family"' not in serialized
+    assert '"attempt_id"' not in serialized
+
+
+def test_finalize_review_freezes_qa_before_governance_bounded_decision(
+    quality_config: dict,
+    public_config: dict,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    order = compile_comparison_work_order(
+        quality_config,
+        public_config,
+        "seedance-preview-test",
+    )
+    write_comparison_work_order(tmp_path, order, public_config)
+    for qa_path in (tmp_path / "qa").glob("*.json"):
+        qa = json.loads(qa_path.read_text())
+        family = order["blinding_key"][qa["blinded_display_id"]]["family"]
+        qa["rater_id"] = "blinded-rater-1"
+        qa["rated_at"] = "2026-07-31T04:00:00Z"
+        for item in qa["items"]:
+            item["response"] = (
+                "pass"
+                if family == "seedance" or item["id"] == "speech"
+                else "fail"
+            )
+            item["confidence"] = "high"
+        qa_path.write_text(json.dumps(qa))
+
+    fake_baseline = {
+        scene_id: {
+            "attempt_id": f"ltx__{scene_id}__s314159__a1__modular",
+            "record": {"final_media": {"sha256": f"ltx-{scene_id}-sha"}},
+        }
+        for scene_id in quality_config["comparison"]["scene_ids"]
+    }
+    fake_candidate = {
+        "planned_attempt_count": 4,
+        "provider_submission_count": 4,
+        "media_valid_count": 4,
+        "generated_attempt_failure_count": 0,
+        "generated_attempt_failure_rate": 0.0,
+        "estimated_successful_output_charge_usd": 6.068,
+        "actual_provider_invoice_usd": None,
+        "records": [
+            {
+                "attempt_id": attempt["attempt_id"],
+                "scene_id": attempt["scene_id"],
+                "status": "media_valid",
+                "request_id": f"request-{index}",
+                "request_sha256": attempt["request_sha256"],
+                "returned_seed": index,
+                "started_at": "2026-07-31T04:00:00Z",
+                "finished_at": "2026-07-31T04:01:00Z",
+                "final_sha256": f"seedance-{index}-sha",
+                "nursery_adapter_commit": "a" * 40,
+            }
+            for index, attempt in enumerate(order["attempts"])
+        ],
+    }
+    monkeypatch.setattr(
+        quality_module,
+        "verify_ltx_baseline",
+        lambda *_args, **_kwargs: fake_baseline,
+    )
+    monkeypatch.setattr(
+        quality_module,
+        "_verify_candidate_execution",
+        lambda *_args, **_kwargs: fake_candidate,
+    )
+    result = finalize_blinded_review(
+        quality_config,
+        public_config,
+        order,
+        repository_root=tmp_path,
+        run_root=tmp_path,
+    )
+    summary = json.loads(Path(result["summary"]).read_text())
+    assert result["decision"] == (
+        "PURSUE_WRITTEN_PROVIDER_AND_INSTITUTIONAL_CLEARANCE"
+    )
+    assert summary["decision"]["scientific_training_use_authorized"] is False
+    assert summary["qualitative"]["candidate_visual_pass_advantage"] == 28
+    assert summary["qualitative"]["candidate_scene_wins"] == 4
+    assert summary["technical"]["seedance"]["generated_attempt_failure_rate"] == 0
+    assert Path(result["qa_freeze"]).is_file()
+    assert Path(result["recommendation"]).is_file()
 
 
 class _FakeResponse:
@@ -311,7 +431,8 @@ def test_gallery_hides_family_names_and_paths(
     assert "/seedance/" not in page
     aliases = list((gallery.parent / "media").glob("*.mp4"))
     assert len(aliases) == 8
-    assert all(path.is_symlink() for path in aliases)
+    assert all(not path.is_symlink() for path in aliases)
+    assert all(path.read_bytes() == b"placeholder" for path in aliases)
 
 
 @pytest.mark.skipif(
