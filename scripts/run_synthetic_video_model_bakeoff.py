@@ -180,7 +180,7 @@ def command_plan(args: argparse.Namespace) -> None:
         and Decimal(
             str(bakeoff["provider_cost"]["user_authorized_new_spend_usd"])
         )
-        == planned_cost_usd(bakeoff)
+        >= planned_cost_usd(bakeoff)
     )
     _json(
         {

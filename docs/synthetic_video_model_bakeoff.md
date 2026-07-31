@@ -1,7 +1,8 @@
 # Gemini Omni Flash and MiniMax H3 public model bakeoff
 
-**Status:** frozen and compiled without API calls; blocked at the new
-credential and `$4.66` spend gate.
+**Status:** execution authorized after both credentials were installed. The
+user approved up to `$6.00`; the immutable runner remains hard-limited to the
+eight-call `$4.66` maximum expected plan.
 
 **Canonical protocol:** `configs/synthetic_video_model_bakeoff.json`
 
@@ -155,15 +156,15 @@ mode-`0600` blinding key without contacting either provider. `plan`
 hash-verifies all four LTX and all four Seedance finals and reports only
 credential presence, never credential values.
 
-At the current gate, both `GEMINI_API_KEY` and `MINIMAX_API_KEY` are missing,
-paid execution is not authorized in the frozen config, and no new provider
-request has been sent.
+Both `GEMINI_API_KEY` and `MINIMAX_API_KEY` are supplied from a mode-`0600`
+user-owned environment file. Credential values are neither printed nor
+persisted in the run. Paid execution is authorized up to `$6.00`, while the
+runner accepts only the frozen `$4.66` plan value.
 
 ## Paid execution and review
 
-After both credentials are present and the user separately approves the new
-`$4.66` ceiling, the protocol authorization is committed before execution.
-The clean-commit runner then uses:
+With both credentials present and the user's `$6.00` ceiling recorded, the
+clean-commit runner still uses the narrower frozen plan value:
 
 ```bash
 python3 scripts/run_synthetic_video_model_bakeoff.py run \

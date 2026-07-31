@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "comparison_id": "synthetic-video-four-family-quality-ceiling",
-  "status": "FROZEN_AWAITING_CREDENTIALS_AND_SPEND_APPROVAL",
+  "status": "FROZEN_EXECUTION_AUTHORIZED",
   "frozen_on": "2026-07-31",
   "authorization": {
     "public_only_qualitative_comparison_authorized": true,
     "authorization_basis": "user-directed extension of the completed LTX-2.3 versus Seedance 2.0 public-only quality screen to Gemini Omni Flash and MiniMax H3",
-    "paid_execution_authorized": false,
+    "paid_execution_authorized": true,
     "scientific_training_use_authorized": false,
     "governed_or_child_derived_generator_work_authorized": false
   },
@@ -217,7 +217,7 @@
       "closed_beta_768p_not_used": true
     },
     "maximum_expected_new_charge_usd": 4.66,
-    "user_authorized_new_spend_usd": null,
+    "user_authorized_new_spend_usd": 6.0,
     "paid_launch_requires_explicit_new_spend_confirmation": true,
     "failed_or_moderated_request_billing": "provider-dependent; no automatic or protocol retry is authorized"
   },

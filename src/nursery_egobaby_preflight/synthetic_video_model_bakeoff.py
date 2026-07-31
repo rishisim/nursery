@@ -127,9 +127,12 @@ def validate_bakeoff_config(
         _require(authorized_spend is None, "pre-approval spend must be null")
     else:
         _require(paid_authorized is True, "execution status requires paid authorization")
+        authorized_ceiling = Decimal(str(authorized_spend))
         _require(
-            Decimal(str(authorized_spend)) == planned_cost_usd(config),
-            "authorized spend must match the frozen ceiling",
+            planned_cost_usd(config)
+            <= authorized_ceiling
+            <= Decimal("6.0"),
+            "authorized spend must cover the frozen plan without exceeding the user ceiling",
         )
 
     distinction = config.get("scientific_distinction", {})
@@ -1419,8 +1422,8 @@ def execute_bakeoff(
     )
     _require(
         Decimal(str(config["provider_cost"]["user_authorized_new_spend_usd"]))
-        == ceiling,
-        "protocol authorization does not match the frozen ceiling",
+        >= ceiling,
+        "protocol authorization does not cover the frozen ceiling",
     )
     _require(
         bool(COMMIT_SHA.fullmatch(implementation_commit)),

@@ -77,8 +77,8 @@ def test_bakeoff_contract_is_frozen_public_only_and_cost_bounded(
         REPOSITORY_ROOT,
     )
     assert planned_cost_usd(bakeoff_config) == Decimal("4.66")
-    assert bakeoff_config["authorization"]["paid_execution_authorized"] is False
-    assert bakeoff_config["provider_cost"]["user_authorized_new_spend_usd"] is None
+    assert bakeoff_config["authorization"]["paid_execution_authorized"] is True
+    assert bakeoff_config["provider_cost"]["user_authorized_new_spend_usd"] == 6
     assert bakeoff_config["authorization"]["scientific_training_use_authorized"] is False
     assert bakeoff_config["comparison"]["provider_specific_prompt_changes"] == "none"
     assert bakeoff_config["new_families"]["gemini_omni_flash"]["model"] == (
@@ -222,10 +222,20 @@ def test_paid_runner_refuses_preapproval_protocol_before_contacting_providers(
     completed_quality: dict,
     tmp_path: Path,
 ) -> None:
-    order = _order(bakeoff_config, public_config, completed_quality)
+    awaiting = copy.deepcopy(bakeoff_config)
+    awaiting["status"] = "FROZEN_AWAITING_CREDENTIALS_AND_SPEND_APPROVAL"
+    awaiting["authorization"]["paid_execution_authorized"] = False
+    awaiting["provider_cost"]["user_authorized_new_spend_usd"] = None
+    order = compile_bakeoff_work_order(
+        awaiting,
+        public_config,
+        completed_quality,
+        REPOSITORY_ROOT,
+        "model-bakeoff-test",
+    )
     with pytest.raises(ValueError, match="not authorized"):
         execute_bakeoff(
-            bakeoff_config,
+            awaiting,
             public_config,
             completed_quality,
             order,
