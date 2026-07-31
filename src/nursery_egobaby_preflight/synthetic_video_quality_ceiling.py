@@ -814,7 +814,7 @@ def _audio_payload_sha256(
     return result.stdout.strip().split("=", 1)[1]
 
 
-def normalize_seedance_with_ltx_audio(
+def normalize_candidate_with_ltx_audio(
     public_pilot: Mapping[str, Any],
     *,
     raw_video: str | Path,
@@ -823,7 +823,7 @@ def normalize_seedance_with_ltx_audio(
     final_video: str | Path,
     ffmpeg_executable: str = "ffmpeg",
 ) -> dict[str, str]:
-    """Normalize Seedance video and stream-copy the exact paired LTX audio."""
+    """Normalize candidate video and stream-copy the exact paired LTX audio."""
 
     delivery = public_pilot["delivery"]
     raw = str(Path(raw_video).resolve())
@@ -890,6 +890,27 @@ def normalize_seedance_with_ltx_audio(
         "baseline_audio_payload_sha256": baseline_hash,
         "candidate_audio_payload_sha256": final_hash,
     }
+
+
+def normalize_seedance_with_ltx_audio(
+    public_pilot: Mapping[str, Any],
+    *,
+    raw_video: str | Path,
+    ltx_final_video: str | Path,
+    video_only: str | Path,
+    final_video: str | Path,
+    ffmpeg_executable: str = "ffmpeg",
+) -> dict[str, str]:
+    """Backward-compatible Seedance name for the shared normalization path."""
+
+    return normalize_candidate_with_ltx_audio(
+        public_pilot,
+        raw_video=raw_video,
+        ltx_final_video=ltx_final_video,
+        video_only=video_only,
+        final_video=final_video,
+        ffmpeg_executable=ffmpeg_executable,
+    )
 
 
 def _sanitized_provider_output(response: Mapping[str, Any]) -> dict[str, Any]:

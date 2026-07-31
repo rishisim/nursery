@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "comparison_id": "synthetic-video-four-family-quality-ceiling",
+  "status": "FROZEN_AWAITING_CREDENTIALS_AND_SPEND_APPROVAL",
+  "frozen_on": "2026-07-31",
+  "authorization": {
+    "public_only_qualitative_comparison_authorized": true,
+    "authorization_basis": "user-directed extension of the completed LTX-2.3 versus Seedance 2.0 public-only quality screen to Gemini Omni Flash and MiniMax H3",
+    "paid_execution_authorized": false,
+    "scientific_training_use_authorized": false,
+    "governed_or_child_derived_generator_work_authorized": false
+  },
+  "scientific_distinction": {
+    "completed_public_pilot": "configs/synthetic_video_public_pilot.json",
+    "completed_public_pilot_sha256": "956a76f07b1aa41eaf713bee4d157d8b38b0fe3a04de575587598da615a0a316",
+    "completed_two_family_protocol": "configs/synthetic_video_quality_ceiling.json",
+    "completed_two_family_protocol_sha256": "81a57c921c0e2a39dfd726919fc32175b37d1a125a413e1b38559e772cc1ce41",
+    "completed_two_family_result": "results/synthetic_video_quality_ceiling.json",
+    "completed_two_family_result_file_sha256": "cab5ee3451dce0757f248fecb4403f8ec2dd016c696533c3879d908977408eb0",
+    "shared_source_of_truth": "the four frozen public-only scenes, exact compiled LTX prompts, paired LTX audio, and hash-verified LTX and Seedance media",
+    "new_question": "Do Gemini Omni Flash or MiniMax H3 show a clear task-specific qualitative advantage over LTX-2.3, and are they competitive with Seedance 2.0, on the same four frozen public-only scenes?",
+    "prior_result_is_not_mutated": true
+  },
+  "privacy_boundary": {
+    "allowed": [
+      "the four self-authored public-only episode plans in the completed pilot",
+      "the exact compiled LTX prompts from the completed pilot",
+      "the completed public-only LTX and Seedance media",
+      "the completed public-only modular German audio",
+      "Gemini Omni Flash and MiniMax H3 outputs and engineering manifests produced only from those public inputs"
+    ],
+    "prohibited": [
+      "ChildLens or BabyView media",
+      "ChildLens or BabyView transcripts, filenames, identifiers, vocabulary, prompts, statistics, embeddings, or other derivatives",
+      "restricted-data tuning or calibration",
+      "restricted or private paths, credentials, or personal identifiers in API payloads or persisted records"
+    ],
+    "provider_request_payload_storage": false,
+    "provider_native_audio_retained_in_comparison_final": false,
+    "provider_download_policy": "download immediately after each successful generation; keep provider URLs only in the ignored run root",
+    "credential_storage": "environment only; never print or persist API keys"
+  },
+  "reference_families": {
+    "ltx": {
+      "label": "LTX-2.3 22B Distilled 1.1",
+      "source_protocol": "configs/synthetic_video_quality_ceiling.json#baseline",
+      "local_run_root": "runs/synthetic_video_public_pilot/public-preview-20260730/families/ltx",
+      "seed": 314159,
+      "expected_media_valid_count": 4
+    },
+    "seedance": {
+      "label": "Seedance 2.0 standard",
+      "source_protocol": "configs/synthetic_video_quality_ceiling.json#candidate",
+      "source_result": "results/synthetic_video_quality_ceiling.json",
+      "local_run_root": "runs/synthetic_video_quality_ceiling/quality-ceiling-20260731",
+      "seed_control": "unsupported; provider-returned seeds are retained in the completed result",
+      "expected_media_valid_count": 4
+    }
+  },
+  "new_families": {
+    "gemini_omni_flash": {
+      "label": "Gemini Omni Flash Preview",
+      "developer": "Google",
+      "provider": "Gemini Developer API",
+      "provider_status": "official paid preview API",
+      "model": "gemini-omni-flash-preview",
+      "endpoint_url": "https://generativelanguage.googleapis.com/v1beta/interactions",
+      "credential_environment_variable": "GEMINI_API_KEY",
+      "request": {
+        "model": "gemini-omni-flash-preview",
+        "response_format": {
+          "type": "video",
+          "aspect_ratio": "16:9",
+          "duration": "5",
+          "delivery": "uri"
+        },
+        "generation_config": {
+          "video_config": {
+            "task": "text_to_video"
+          }
+        },
+        "store": false,
+        "background": false,
+        "stream": false
+      },
+      "prompt_field": "input",
+      "input_seed_control": "not documented for Gemini Omni Flash video generation; no seed is sent",
+      "native_output": "720p, 24 fps, video with model-generated audio",
+      "provider_retries": 0,
+      "protocol_retries": 0,
+      "attempts_per_scene": 1
+    },
+    "minimax_h3": {
+      "label": "MiniMax H3",
+      "developer": "MiniMax",
+      "provider": "MiniMax API",
+      "provider_status": "official paid API",
+      "model": "MiniMax-H3",
+      "endpoint_url": "https://api.minimax.io/v2/video_generation",
+      "query_url_template": "https://api.minimax.io/v2/query/video_generation/{task_id}",
+      "credential_environment_variable": "MINIMAX_API_KEY",
+      "request": {
+        "model": "MiniMax-H3",
+        "resolution": "2K",
+        "duration": 5,
+        "ratio": "16:9"
+      },
+      "prompt_field": "content[0].text",
+      "input_seed_control": "unsupported by the official MiniMax H3 V2 schema; no seed is sent",
+      "native_output": "2K, 16:9, five-second video",
+      "provider_retries": 0,
+      "protocol_retries": 0,
+      "attempts_per_scene": 1
+    }
+  },
+  "comparison": {
+    "scene_ids": [
+      "pick_up",
+      "transfer",
+      "occlusion_persistence",
+      "action_transition"
+    ],
+    "prompt_source": "compile_prompt(completed_public_pilot, family='ltx', scene_id)",
+    "provider_specific_prompt_changes": "none",
+    "new_attempt_count": 8,
+    "new_attempts_per_family": 4,
+    "generation_seconds_per_attempt": 5,
+    "native_audio_policy": "discard both new providers' native audio; every comparison final uses the exact AAC audio stream from its paired LTX final",
+    "delivery_policy": "scale and center-crop every new output to 1280x704, normalize to 24 fps and 121 frames, then stream-copy the paired LTX audio",
+    "reference_media_policy": "reuse and hash-verify the completed LTX and Seedance finals; do not regenerate either reference family",
+    "blinding": "randomize all four family cards independently within each scene from the work-order hash and keep the family key outside the gallery",
+    "no_polished_subset": true
+  },
+  "review": {
+    "profile": "single-rater four-family blinded qualitative screening; exploratory and not a formal model ranking",
+    "required_unique_raters": 1,
+    "response_values": [
+      "pass",
+      "fail",
+      "cannot_judge"
+    ],
+    "confidence_values": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "primary_visual_item_ids": [
+      "continuous_egocentric_shot",
+      "anatomy",
+      "contact_action",
+      "identity",
+      "transition_order",
+      "referent_timing",
+      "safety"
+    ],
+    "audio_control_item_ids": [
+      "speech"
+    ],
+    "secondary_presentation_items": [
+      {
+        "id": "presentation_text_artifacts",
+        "question": "Does the visible image avoid unintended pseudo-caption text, intrusive logos, or provider branding that interferes with qualitative use?"
+      },
+      {
+        "id": "presentation_frame_composition",
+        "question": "Is the frame fully and coherently composed without unintended bars, malformed borders, or severe cropping?"
+      }
+    ],
+    "critical_visual_item_ids": [
+      "anatomy",
+      "contact_action",
+      "identity",
+      "transition_order",
+      "safety"
+    ],
+    "clear_task_advantage_over_ltx_rule": {
+      "media_valid_count_required": 4,
+      "minimum_total_primary_visual_pass_advantage": 4,
+      "minimum_scene_wins": 2,
+      "maximum_scene_losses": 0,
+      "equal_judgeable_primary_items_required_per_scene": true,
+      "critical_failures_must_not_exceed_ltx": true,
+      "maximum_safety_failures": 0
+    },
+    "competitive_with_seedance_rule": {
+      "media_valid_count_required": 4,
+      "minimum_total_primary_visual_pass_difference": -2,
+      "minimum_scene_wins_or_ties": 3,
+      "maximum_additional_critical_failures": 1,
+      "equal_judgeable_primary_items_required_per_scene": true,
+      "maximum_safety_failures": 0
+    },
+    "family_labels": {
+      "clear_task_advantage": "CLEAR_TASK_ADVANTAGE_OVER_LTX",
+      "competitive": "COMPETITIVE_WITH_SEEDANCE_ON_THIS_SCREEN",
+      "below_screen": "BELOW_SEEDANCE_ON_THIS_SCREEN",
+      "inconclusive": "INCONCLUSIVE_NO_RETRY_WITHOUT_NEW_AUTHORIZATION"
+    },
+    "speech_exclusion_reason": "Every final uses the exact paired LTX AAC stream, so speech is an identity control and is excluded from visual comparison rules.",
+    "cannot_judge_policy": "Report cannot-judge counts; a pairwise scene with unequal judgeable primary-item counts is inconclusive and cannot count as a win or tie."
+  },
+  "provider_cost": {
+    "currency": "USD",
+    "pricing_frozen_on": "2026-07-31",
+    "gemini": {
+      "video_output_tokens_per_second_720p": 5792,
+      "video_output_usd_per_million_tokens": 17.5,
+      "text_input_usd_per_million_tokens": 1.5,
+      "planned_generated_seconds": 20,
+      "conservative_maximum_input_tokens": 8000,
+      "maximum_expected_charge_usd": 2.06
+    },
+    "minimax": {
+      "two_k_usd_per_second": 0.13,
+      "planned_generated_seconds": 20,
+      "maximum_expected_charge_usd": 2.6,
+      "closed_beta_768p_not_used": true
+    },
+    "maximum_expected_new_charge_usd": 4.66,
+    "user_authorized_new_spend_usd": null,
+    "paid_launch_requires_explicit_new_spend_confirmation": true,
+    "failed_or_moderated_request_billing": "provider-dependent; no automatic or protocol retry is authorized"
+  },
+  "governance": {
+    "qualitative_public_only_comparison": "AUTHORIZED",
+    "gemini_output_as_training_data": "BLOCKED_PENDING_WRITTEN_PROVIDER_AND_INSTITUTIONAL_CLEARANCE",
+    "minimax_output_as_training_data": "BLOCKED_PENDING_WRITTEN_PROVIDER_AND_INSTITUTIONAL_CLEARANCE",
+    "selection_rule": "A qualitative win may inform later provider selection, but cannot authorize learner-training use by itself."
+  },
+  "evidence": {
+    "gemini_model": "https://ai.google.dev/gemini-api/docs/models/gemini-omni-flash",
+    "gemini_video_guide": "https://ai.google.dev/gemini-api/docs/omni",
+    "gemini_interactions_api": "https://ai.google.dev/api/interactions-api",
+    "gemini_pricing": "https://ai.google.dev/gemini-api/docs/pricing",
+    "gemini_model_card": "https://deepmind.google/models/model-cards/gemini-omni-flash/",
+    "minimax_model_release": "https://platform.minimax.io/docs/release-notes/models",
+    "minimax_video_guide": "https://platform.minimax.io/docs/guides/video-generation",
+    "minimax_v2_openapi": "https://platform.minimax.io/docs/api-reference/video/generation/api/v2-video-generation.json",
+    "minimax_pricing": "https://platform.minimax.io/docs/guides/pricing-paygo"
+  }
+}

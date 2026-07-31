@@ -18,6 +18,13 @@ remains the reproducible baseline. Seedance training use remains blocked
 pending written provider and institutional clearance. See
 [`docs/synthetic_video_quality_ceiling.md`](docs/synthetic_video_quality_ceiling.md).
 
+A scientifically distinct four-family extension is now frozen and compiled.
+It will reuse the completed LTX and Seedance media and add one Gemini Omni
+Flash and one MiniMax H3 attempt for each of the same four public scenes. No
+provider call has been made: execution is gated on both provider credentials
+and a new explicit `$4.66` spend approval. See
+[`docs/synthetic_video_model_bakeoff.md`](docs/synthetic_video_model_bakeoff.md).
+
 This branch is the clean workspace for the Nursery/BabyWorld synthetic-video
 research program.
 
