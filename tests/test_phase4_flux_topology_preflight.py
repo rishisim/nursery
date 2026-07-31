@@ -15,3 +15,13 @@ def test_preflight_freezes_approved_final_topology_and_offline_controls():
     assert "local_files_only=True" in source
     assert 'dist.init_process_group("nccl"' in source
     assert "public_dummy_only" in source
+
+
+def test_public_container_preparation_is_cpu_only_and_bounded():
+    batch = Path("scripts/phase4_prepare_public_container.sbatch").read_text()
+    assert "#SBATCH --partition=dev" in batch
+    assert "#SBATCH --mem=16G" in batch
+    assert "#SBATCH --time=00:30:00" in batch
+    assert "#SBATCH --gpus" not in batch
+    assert "SINGULARITY_TMPDIR" in batch
+    assert "pytorch:2.8.0-cuda12.6-cudnn9-runtime" in batch
