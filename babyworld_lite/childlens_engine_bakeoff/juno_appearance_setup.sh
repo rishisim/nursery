@@ -145,6 +145,11 @@ snapshot_download(
     revision="0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
     allow_patterns=("*.json", "*.txt"),
 )
+snapshot_download(
+    repo_id="nvidia/Cosmos-Reason1-7B",
+    revision="3210bec0495fdc7a8d3dbb8d58da5711eab4b423",
+    allow_patterns=("*.json", "*.txt", "*.jinja", "*.model", "*.tiktoken"),
+)
 hf_hub_download(
     repo_id="Wan-AI/Wan2.2-TI2V-5B",
     revision="921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
@@ -181,6 +186,7 @@ receipt = {
         "cosmos3_nano": "411f42a8fdfb8c5b2583cb8786e0938f49796eaa",
         "oscar_2b": "c9781ffa7dd8556d862d7d9f338a2ea008a58ca6",
         "cosmos_reason1_7b": "375e24000b24baed78f4618d3dd779e47cd96323",
+        "cosmos_reason1_7b_processor": "3210bec0495fdc7a8d3dbb8d58da5711eab4b423",
         "qwen3_vl_tokenizer": "0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
         "wan2_2_vae": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
         "wan2_1_vae": "37ec512624d61f7aa208f7ea8140a131f93afc9a",

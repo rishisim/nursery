@@ -91,6 +91,7 @@
       "base_model_license": "NVIDIA Open Model License",
       "text_encoder": "nvidia/Cosmos-Reason1-7B",
       "text_encoder_revision": "375e24000b24baed78f4618d3dd779e47cd96323",
+      "text_encoder_processor_revision": "3210bec0495fdc7a8d3dbb8d58da5711eab4b423",
       "vision_vae_model": "Wan-AI/Wan2.1-T2V-1.3B",
       "vision_vae_revision": "37ec512624d61f7aa208f7ea8140a131f93afc9a",
       "vision_vae_filename": "Wan2.1_VAE.pth",
@@ -145,7 +146,9 @@
     "discovered_after_freeze": [
       "Cosmos inference-only imports omitted by its declared base dependency group",
       "OSCAR public wrapper requires torchrun rendezvous and runtime-only Python imports not listed in requirements_minimal.txt",
-      "Transformer Engine expects CUDA runtime compatibility aliases absent from the cu128 wheel layout"
+      "Transformer Engine expects CUDA runtime compatibility aliases absent from the cu128 wheel layout",
+      "Cosmos loads its optional sound tokenizer unless sound generation is explicitly disabled at model construction, even when every sample requests silent video",
+      "OSCAR's public text processor registry is pinned separately from the local Reason1 text-encoder weights"
     ]
   }
 }

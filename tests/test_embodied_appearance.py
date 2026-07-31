@@ -22,6 +22,10 @@ def test_appearance_windows_and_seeds_are_frozen_before_outcomes():
     assert len(config["methods"]["cosmos3_nano"]["vision_vae_revision"]) == 40
     assert len(config["methods"]["oscar_2b"]["model_revision"]) == 40
     assert len(config["methods"]["oscar_2b"]["text_encoder_revision"]) == 40
+    assert (
+        len(config["methods"]["oscar_2b"]["text_encoder_processor_revision"])
+        == 40
+    )
     assert len(config["methods"]["oscar_2b"]["vision_vae_revision"]) == 40
     assert [window["id"] for window in config["windows"]] == [
         "near_miss",
@@ -37,6 +41,15 @@ def test_appearance_windows_and_seeds_are_frozen_before_outcomes():
         assert np.isclose(
             window["sample_span_s"], (window["frames"] - 1) / window["fps"]
         )
+
+
+def test_juno_run_explicitly_disables_neural_audio_model_loading():
+    run_script = Path(
+        "babyworld_lite/childlens_engine_bakeoff/juno_appearance_run.sh"
+    ).read_text()
+    assert "model.config.sound_gen=false" in run_script
+    assert "model.config.sound_dim=null" in run_script
+    assert "model.config.sound_tokenizer=null" in run_script
 
 
 def test_depth_edge_and_protected_mask_encodings_are_bounded():

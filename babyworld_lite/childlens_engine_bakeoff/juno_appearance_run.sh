@@ -38,6 +38,10 @@ cosmos_status=0
         -i "${input_root}/prepared/cosmos_specs/*.json" \
         -o "${run_root}/cosmos_official" \
         --checkpoint-path "${work_root}/models/cosmos3_nano" \
+        --experiment-overrides \
+        model.config.sound_gen=false \
+        model.config.sound_dim=null \
+        model.config.sound_tokenizer=null \
         --no-guardrails
 ) || cosmos_status=$?
 
