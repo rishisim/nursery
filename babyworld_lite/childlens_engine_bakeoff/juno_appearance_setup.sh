@@ -22,8 +22,6 @@ mkdir -p \
     "${work_root}/source"
 chmod 700 "${work_root}"
 
-module load python/3.11.11
-
 uv_bin="${work_root}/bin/uv"
 if [[ ! -x "${uv_bin}" ]]; then
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="${work_root}/bin" sh
@@ -32,6 +30,7 @@ fi
 
 export HF_HOME="${work_root}/cache/huggingface"
 export UV_CACHE_DIR="${work_root}/cache/uv"
+export UV_PYTHON_INSTALL_DIR="${work_root}/python"
 
 verify_checkout() {
     local repository="$1"
@@ -66,25 +65,25 @@ verify_checkout \
 cosmos_env="${work_root}/envs/cosmos"
 (
     cd "${work_root}/source/cosmos-framework"
-    UV_PROJECT_ENVIRONMENT="${cosmos_env}" \
+    env LD_LIBRARY_PATH= UV_PROJECT_ENVIRONMENT="${cosmos_env}" \
         "${uv_bin}" sync \
-        --python "$(command -v python3)" \
+        --python 3.13 \
         --no-dev \
         --group=cu128
 )
 
 oscar_env="${work_root}/envs/oscar"
 if [[ ! -x "${oscar_env}/bin/python" ]]; then
-    "${uv_bin}" venv --python "$(command -v python3)" "${oscar_env}"
+    env LD_LIBRARY_PATH= "${uv_bin}" venv --python 3.13 "${oscar_env}"
 fi
-"${uv_bin}" pip install \
+env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     --python "${oscar_env}/bin/python" \
     torch==2.10.0 torchvision==0.25.0 \
     --index-url https://download.pytorch.org/whl/cu128
-"${uv_bin}" pip install \
+env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     --python "${oscar_env}/bin/python" \
     -r "${work_root}/source/oscar-public/requirements_minimal.txt"
-"${uv_bin}" pip install \
+env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     --python "${oscar_env}/bin/python" \
     'transformer-engine==2.12.0+cu128.torch210' \
     --index-url https://nvidia-cosmos.github.io/cosmos-dependencies/v1.5.0
