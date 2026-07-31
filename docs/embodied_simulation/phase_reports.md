@@ -132,3 +132,79 @@ flagged.
 
 Smallest next step: instantiate the unchanged event semantics in sparse,
 household, and messy clutter variants and run the Phase 1 hard gates per scene.
+
+## Phase 2 — scene and controller stress qualification
+
+Gate decision: **PASS**.
+
+The unchanged 19.5-second event sequence passes every Phase 1 physics,
+camera, contact, synchronization, identity, determinism, rendering, and native
+appearance check in the required sparse (3 distractors) and household (12
+distractors) FloorPlan201 variants. The 24-distractor messy variant is retained
+as the explicitly permitted bounded diagnostic failure: the released cup meets
+authored `clutter_15` at 17.0125 s, reaches -0.005532 m with 8 persistent
+penetration frames, and therefore fails the unchanged 0.002 m / 0-frame gate.
+Its replay is byte-identical, the failure pair and time are stable, and it does
+not affect either required variant.
+
+Canonical files changed:
+
+- `physics_kernel.py` adds co-located physical and visible clutter layers while
+  excluding static clutter from MIMo body dynamics;
+- `run_kernel_episode.py` resolves the frozen ordered scene-family prefixes and
+  records variant provenance without changing action semantics;
+- `trace_render.py` keeps group-4 scene/clutter collision proxies hidden from
+  authoritative RGB and measures visible authored clutter;
+- `run_scene_stress.py` is the canonical three-variant Phase 2 entry point;
+- `configs/embodied_simulation_vertical_slice.json` freezes the 23 placements
+  before Phase 2 outcomes, and focused tests plus the compact aggregate record
+  were updated in place.
+
+Validation and experiment evidence:
+
+- Full repository validation passes: 15 tests. All three episode manifests were
+  rehashed successfully; each HDF5 bundle contains 586 depth frames at 480x640,
+  586 segmentation frames at 480x640x2, and 586 clutter-area samples. FFprobe
+  confirms 586 H.264 frames at 640x480/30 fps for every variant.
+- Every scene produces 4,680 physics steps and 1,171 truth samples. Camera-mount
+  errors remain `4.44e-16` m / `4.89e-16` rad; shared-clock error remains
+  `7.85e-13` s; object identity changes and replay numeric error remain 0.
+- Sparse and household both keep the true near miss at 0.03857 m with 0 contact
+  substeps, first contact at 7.5125 s with five finger bodies, and the flagged
+  assist at 9.15 s with a 0.000167 m engagement jump. Their minimum relevant
+  distance is -0.001601 m with 0 persistent penetration frames.
+- Sparse uses 651 relevant collision geoms; authored clutter is visible in
+  0.2986 of frames and covers at most 0.01006 of the image. Household uses 660
+  relevant geoms; clutter is visible in every frame and covers at most 0.04291.
+  Both render contact to 4.444 px / 0.005990 m, with 0 collision-proxy pixels
+  and 0 skin-artifact pixels.
+- Messy uses 672 relevant collision geoms. All non-penetration checks pass,
+  including its exact replay SHA-256
+  `ee0e42e3e7b88fa710fae56b00acba52a0d2b9a5de0ab1d5ad089a91445d80b5`;
+  clutter is visible in every frame and reaches 0.08733 image area. Its isolated
+  release/clutter penetration is the sole failed hard check.
+
+Actual artifacts are under ignored
+`runs/embodied_simulation/phase_2/stress`, with per-scene baseline/external
+videos, synchronized traces and render streams, QA receipts, contact sheets,
+and hashed episode manifests. `phase_2_stress_qa.json` is the ignored aggregate
+run receipt. Task-created preflight runs, stdout logs, and the MuJoCo root log
+were moved to the macOS Trash and remain recoverable; no pre-existing run was
+removed.
+
+Repository status: verified implementation and compact aggregate commit
+`abb6f7c` (`Qualify embodied scene stress variants`) is pushed to
+`origin/embodied-simulation`; this checkpoint record is committed and pushed
+separately. No generated run artifact is tracked.
+
+Deviation from the Phase 0 freeze: the exact root-relative clutter placements
+were resolved and frozen immediately before the first Phase 2 outcome because
+Phase 0 had frozen counts and semantics but not coordinates. No action, physics,
+camera, contact, synchronization, appearance, or determinism threshold changed.
+The messy failure was not repaired by moving a post-outcome placement or
+weakening a threshold; it remains the allowed reproducible diagnostic. The
+native-MIMo appearance decision remains in force and MPFB was not rerun.
+
+Smallest next step: extract the four frozen 3–5 second windows from a qualified
+required-scene trace, then preflight and run geometry-protected Cosmos 3 Nano
+and OSCAR-2B appearance cells on Juno using public/synthetic inputs only.
