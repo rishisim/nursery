@@ -11,7 +11,8 @@ authorized while institutional GPU access is delayed. It uses only four
 self-authored scenes, pinned public Wan/LTX/Piper assets, one seed, and private
 cloud outputs. It contains no ChildLens/BabyView input or derivative and cannot
 select the final generator or support a scientific result. Paid GPU launch
-still requires an explicit USD ceiling confirmation. See
+still requires an explicit USD ceiling confirmation. The remote CPU-only
+protocol/persistence preflight passed; no generator inference was executed. See
 [`docs/synthetic_video_public_pilot.md`](docs/synthetic_video_public_pilot.md).
 
 This branch is the clean workspace for the Nursery/BabyWorld synthetic-video

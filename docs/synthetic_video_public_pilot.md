@@ -1,7 +1,7 @@
 # Public-only synthetic-video qualitative pilot
 
-**Status:** frozen and locally validated; paid GPU launch requires an explicit
-USD ceiling confirmation
+**Status:** frozen, locally validated, and cloud CPU preflight **PASS**; paid
+GPU launch requires an explicit USD ceiling confirmation
 
 **Canonical protocol:** `configs/synthetic_video_public_pilot.json`
 
@@ -92,6 +92,15 @@ Execution is staged:
    immediately; and
 4. the two family roots are downloaded under one ignored run root and compiled
    into the local side-by-side gallery.
+
+The CPU-only cloud preflight passed at Nursery commit
+`8e572a3df54f13363980665024549716dd389802`. Hugging Face Job
+`6a6bf5e123ed89c748ec8c38` checked out that exact commit, matched protocol hash
+`956a76f…0a316`, compiled zero inference attempts, created the private output
+dataset, and persisted all three control records. It ran for seven seconds
+(twelve seconds including scheduling), conservatively less than $0.00004 at
+the frozen CPU price. The compact signed record is
+`results/synthetic_video_public_pilot_preflight.json`.
 
 The frozen GPU flavor is one Hugging Face `a100-large` (A100 80 GB). At the
 2026-07-30 published price of $2.50 per hour, each family job has a four-hour

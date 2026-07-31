@@ -42,6 +42,18 @@ def test_frozen_public_only_contract(config: dict) -> None:
     assert config["cloud"]["paid_launch_requires_explicit_spend_confirmation"] is True
 
 
+def test_compact_cloud_preflight_matches_frozen_protocol(config: dict) -> None:
+    result = json.loads(
+        Path("results/synthetic_video_public_pilot_preflight.json").read_text()
+    )
+    assert result["status"] == "PASS"
+    assert result["protocol_sha256"] == canonical_json_sha256(config)
+    assert result["inference_executed"] is False
+    assert result["restricted_or_child_derived_input_used"] is False
+    assert result["persistence"]["private_verified"] is True
+    assert result["next_gate"]["maximum_preview_gpu_charge_usd"] == 20.0
+
+
 def test_preview_compiles_exactly_eight_initial_attempts(config: dict) -> None:
     order = compile_work_order(config, "preview", "preview-test")
     assert len(order["attempts"]) == 8
