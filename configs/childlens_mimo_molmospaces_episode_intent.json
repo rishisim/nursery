@@ -1,0 +1,48 @@
+{
+  "schema": "EpisodeIntent",
+  "mode": "calibrated",
+  "activity_family": "object_centered_reach_manipulate",
+  "scene": {
+    "id": "FloorPlan201",
+    "version": "iTHOR-20251217_with_occupancy",
+    "asset_sha256": "30fc5366a671aea8e965c132d0630947749e6a2a7576219a63f3753130c5aad0"
+  },
+  "target": {
+    "asset_id": "yellow_cup_authored"
+  },
+  "phases": [
+    "look_settle",
+    "reach",
+    "near_miss",
+    "touch_push",
+    "post_contact_grasp",
+    "lift_place",
+    "release_drop",
+    "object_naming"
+  ],
+  "duration_s": 30.0,
+  "speech": {
+    "name_count": 2,
+    "text": "die gelbe Tasse"
+  },
+  "controller": {
+    "control_substeps": 17,
+    "near_miss_min_collision_separation_m": 0.008,
+    "grasp_contact_required": true,
+    "lift_delta_m": 0.12,
+    "transport_delta_m": 0.22,
+    "target_anchor_from_hand_m": [0.14, -0.09, -0.035],
+    "post_release_settle_s": 0.75,
+    "post_release_max_speed_m_s": 0.08
+  },
+  "camera": {
+    "mount": "virtual_chest",
+    "vertical_fov_degrees": 90,
+    "position_offset_m": [0.23, 0.11, 0.17],
+    "look_transport_fraction": 0.25,
+    "look_offset_y_m": 0.02,
+    "look_offset_z_m": 0.04,
+    "candidate_rule": "occupancy_clearance_then_collision_visibility_checks"
+  },
+  "seed": 20260725
+}

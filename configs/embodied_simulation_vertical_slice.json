@@ -1,0 +1,191 @@
+{
+  "schema": "EmbodiedSimulationVerticalSliceContract",
+  "frozen_at_utc": "2026-07-31T17:15:00Z",
+  "frozen_before_phase_1_outcomes": true,
+  "scientific_scope": "public_synthetic_engineering_qualification_only",
+  "empirical_boundary": {
+    "sole_child_source": "ChildLens",
+    "childlens_age_years": [3, 5],
+    "restricted_media_permitted": false,
+    "restricted_media_remote_execution_permitted": false,
+    "morphology_statement": "MIMo v2 maximum 24-month morphology is a provisional proxy; it is not age-matched, infant-calibrated, or an infant-trained model",
+    "measurement_status": "STOP_HARDWARE_PRIVACY_NO_LOCAL_CUDA remains in force; no ChildLens viewer-view scoring or controller repair is authorized"
+  },
+  "activity": {
+    "duration_s": 19.5,
+    "bounded_action_vocabulary": [
+      "look",
+      "reorient",
+      "approach",
+      "reach",
+      "touch",
+      "grasp",
+      "inspect",
+      "rotate",
+      "shake",
+      "bang",
+      "transfer",
+      "drop",
+      "retrieve"
+    ],
+    "vertical_slice": [
+      {"phase": "look", "start_s": 0.0, "end_s": 1.5},
+      {"phase": "reorient", "start_s": 1.5, "end_s": 3.0},
+      {"phase": "approach", "start_s": 3.0, "end_s": 5.0},
+      {"phase": "reach_past_distractor", "start_s": 5.0, "end_s": 7.0},
+      {"phase": "fingertip_contact", "start_s": 7.0, "end_s": 8.0},
+      {"phase": "grasp", "start_s": 8.0, "end_s": 9.5},
+      {"phase": "lift", "start_s": 9.5, "end_s": 11.0},
+      {"phase": "inspect_rotate", "start_s": 11.0, "end_s": 13.5},
+      {"phase": "head_turn_maintain_contact", "start_s": 13.5, "end_s": 16.0},
+      {"phase": "release", "start_s": 16.0, "end_s": 17.0},
+      {"phase": "settle", "start_s": 17.0, "end_s": 19.5}
+    ],
+    "event_semantics_immutable_across_scene_variants": true,
+    "planner_may_emit_joint_trajectories": false
+  },
+  "scene_family": {
+    "source_scene": "iTHOR FloorPlan201_physics",
+    "source_version": "20251217_with_occupancy",
+    "source_sha256": "30fc5366a671aea8e965c132d0630947749e6a2a7576219a63f3753130c5aad0",
+    "license": "CC BY 4.0",
+    "variants": [
+      {"id": "sparse", "distractor_count": 3, "required_to_pass_phase_2": true},
+      {"id": "household", "distractor_count": 12, "required_to_pass_phase_2": true},
+      {"id": "messy", "distractor_count": 24, "required_to_pass_phase_2": false}
+    ],
+    "target": {
+      "persistent_id": "yellow_cup_authored",
+      "sha256": "b519991ba817ddde463dcbdc4fa9163e632d4cc0dc372a6f719db4bfe35e9b9f",
+      "license": "repository-authored CC0"
+    }
+  },
+  "embodiment": {
+    "model": "MIMo v2",
+    "morphology_months": 24,
+    "camera_body": "head",
+    "camera_mount": {
+      "translation_head_m": [0.0, 0.045, 0.025],
+      "quaternion_head_wxyz": [0.7071067811865476, 0.7071067811865475, 0.0, 0.0],
+      "immutable": true,
+      "world_pose_equation": "T_world_camera(t) = T_world_head(t) * T_head_camera"
+    },
+    "camera": {
+      "vertical_fov_degrees": 90.0,
+      "near_plane_m": 0.02,
+      "resolution_px": [640, 480]
+    },
+    "motion_authority": ["root", "torso", "neck", "head", "shoulder", "elbow", "wrist", "five_finger_hand"],
+    "locomotion_assist": {
+      "permitted": true,
+      "maximum_root_speed_m_s": 0.35,
+      "maximum_root_acceleration_m_s2": 0.8,
+      "must_be_collision_checked": true,
+      "must_be_flagged": true
+    }
+  },
+  "rates_hz": {
+    "physics": 240,
+    "controller": 60,
+    "truth": 60,
+    "render": 30,
+    "audio": 48000
+  },
+  "seeds": {
+    "controller": 20260731,
+    "physics": 20260731,
+    "scene": 20260732,
+    "baseline_render": 20260733,
+    "neural_render": [20260734, 20260735, 20260736]
+  },
+  "collision_policy": {
+    "static_for_entire_episode": true,
+    "relevant_groups": ["torso", "upper_arm", "forearm", "palm", "fingers", "target", "distractors", "support", "furniture"],
+    "runtime_collision_disabling_permitted": false,
+    "collision_proxies_visible_in_authoritative_rgb": false,
+    "object_direct_pose_keyframes_permitted": false
+  },
+  "grasp": {
+    "physical_multifinger_first": true,
+    "physical_attempt_limit": 2,
+    "minimum_distinct_finger_contacts_for_assist": 2,
+    "minimum_contact_duration_s_for_assist": 0.10,
+    "assist_type": "soft_relative_pose_spring",
+    "assist_max_linear_stiffness_n_m": 80.0,
+    "assist_max_angular_stiffness_nm_rad": 1.5,
+    "assist_pose_jump_tolerance_m": 0.002,
+    "assist_pose_jump_tolerance_degrees": 1.0,
+    "assist_must_preserve_collisions": true,
+    "assist_must_be_flagged_per_frame": true
+  },
+  "frozen_gates": {
+    "camera_mount_translation_error_m_max": 1e-9,
+    "camera_mount_rotation_error_rad_max": 1e-9,
+    "replay_numeric_absolute_error_max": 1e-9,
+    "near_miss_clearance_m_min": 0.008,
+    "near_miss_contact_count_max": 0,
+    "visible_contact_alignment_m_max": 0.006,
+    "visible_contact_alignment_px_max": 6,
+    "rgb_truth_event_frame_offset_max": 1,
+    "penetration_depth_m_max": 0.002,
+    "persistent_penetration_frames_max": 0,
+    "minimum_lift_m": 0.08,
+    "minimum_rotation_degrees": 25.0,
+    "head_turn_degrees_min": 20.0,
+    "contact_retention_fraction_during_head_turn_min": 0.95,
+    "release_settle_speed_m_s_max": 0.08,
+    "release_settle_duration_s_min": 0.75,
+    "imu_angular_velocity_rmse_rad_s_max": 0.02,
+    "imu_linear_acceleration_rmse_m_s2_max": 0.10,
+    "stream_timestamp_error_s_max": 1e-9,
+    "object_identity_changes_max": 0,
+    "unflagged_assist_frames_max": 0,
+    "collision_proxy_pixels_max": 0,
+    "skin_artifact_pixels_max": 0
+  },
+  "provenance": {
+    "MIMo": {"version": "2.0.0", "commit": "040b0ae4914cbfb26afdf830aa81775b90922f3f", "license": "MIT"},
+    "MolmoSpaces": {"version": "0.2.0", "commit": "c2f1b583f087e1d3994e1377574843b759d9d0f8", "license": "Apache-2.0"},
+    "MPFB": {"version": "2.0.15", "commit": "f4f4f1ffa8203585730a7ce433b66738777ba168", "code_license": "GPL-3.0", "generated_core_asset_license": "CC0"},
+    "Blender": {"version": "4.2.1 LTS", "license": "GPL"},
+    "MuJoCo": {"mimo_runtime_version": "3.3.0", "molmospaces_runtime_version": "3.5.0", "license": "Apache-2.0"},
+    "iTHOR": {"asset_version": "20251217_with_occupancy", "license": "CC BY 4.0"}
+  },
+  "execution": {
+    "local": {
+      "host": "Apple M5, arm64, 32 GiB, macOS 26.6",
+      "python_runtime": "3.11 available",
+      "cuda": false,
+      "role": "MuJoCo engineering, deterministic baseline, compact QA"
+    },
+    "juno": {
+      "login_host": "juno-l-01",
+      "partitions": {
+        "a30": "2 x NVIDIA A30 per node; full GPU 24 GiB; 2 day maximum",
+        "a30-2.12gb": "4 x A30 2g.12gb MIG slices; 2 day maximum",
+        "a30-4.6gb": "8 x A30 1g.6gb MIG slices; 2 day maximum",
+        "h100": "4 x H100 80GB HBM3, 1 x H100 NVL, and 4 x H100 NVL 3g.47gb slices; 2 day maximum",
+        "h200": "2 x H200 NVL per node; 2 day maximum"
+      },
+      "cuda_module": "12.4 at /opt/ohpc/pub/apps/cuda/12.4",
+      "container_runtime": "SingularityCE 4.2.2",
+      "driver_status": "compute-node query pending allocation; login nodes intentionally lack nvidia-smi",
+      "home_quota": "47 GiB total, 46 GiB available at preflight",
+      "scratch_filesystem": "401 TiB total, 123 TiB available; no pre-created user directory discovered",
+      "public_model_endpoint": "https://huggingface.co returned HTTP 200 from login node",
+      "restricted_childlens_permitted": false
+    }
+  },
+  "output_hygiene": {
+    "ignored_run_root": "runs/embodied_simulation",
+    "phase_layout": "runs/embodied_simulation/phase_<n>/<run_id>",
+    "complete_runs_committed": false,
+    "compact_records": [
+      "configs/embodied_simulation_vertical_slice.json",
+      "docs/embodied_simulation/phase_reports.md",
+      "docs/embodied_simulation/aggregate_results.json",
+      "docs/embodied_simulation/final_decision.md",
+      "docs/embodied_simulation/artifact_manifest.json"
+    ]
+  }
+}
