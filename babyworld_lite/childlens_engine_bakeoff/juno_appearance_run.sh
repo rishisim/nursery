@@ -64,6 +64,7 @@ fi
 
 oscar_status=0
 export COSMOS_REASON_PATH="${work_root}/models/cosmos_reason1_7b"
+export WAN_VAE_PATH="${work_root}/models/wan2_1_vae/Wan2.1_VAE.pth"
 export PYTHONPATH="${work_root}/source/oscar-public:${input_root}/repo"
 oscar_site_packages="$(${work_root}/envs/oscar/bin/python - <<'PY'
 import site

@@ -114,7 +114,7 @@ fi
 import sys
 from pathlib import Path
 
-from huggingface_hub import snapshot_download
+from huggingface_hub import hf_hub_download, snapshot_download
 
 root = Path(sys.argv[1])
 models = (
@@ -145,6 +145,17 @@ snapshot_download(
     revision="0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
     allow_patterns=("*.json", "*.txt"),
 )
+hf_hub_download(
+    repo_id="Wan-AI/Wan2.2-TI2V-5B",
+    revision="921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+    filename="Wan2.2_VAE.pth",
+)
+hf_hub_download(
+    repo_id="Wan-AI/Wan2.1-T2V-1.3B",
+    revision="37ec512624d61f7aa208f7ea8140a131f93afc9a",
+    filename="Wan2.1_VAE.pth",
+    local_dir=root / "models/wan2_1_vae",
+)
 PY
 
 "${cosmos_env}/bin/python" - "${work_root}" <<'PY'
@@ -170,6 +181,9 @@ receipt = {
         "cosmos3_nano": "411f42a8fdfb8c5b2583cb8786e0938f49796eaa",
         "oscar_2b": "c9781ffa7dd8556d862d7d9f338a2ea008a58ca6",
         "cosmos_reason1_7b": "375e24000b24baed78f4618d3dd779e47cd96323",
+        "qwen3_vl_tokenizer": "0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
+        "wan2_2_vae": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+        "wan2_1_vae": "37ec512624d61f7aa208f7ea8140a131f93afc9a",
     },
 }
 path = root / "runs/appearance/setup_receipt.json"
