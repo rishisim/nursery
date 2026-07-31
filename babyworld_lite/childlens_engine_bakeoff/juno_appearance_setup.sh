@@ -74,7 +74,8 @@ cosmos_env="${work_root}/envs/cosmos"
 env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     --python "${cosmos_env}/bin/python" \
     'fvcore==0.1.5.post20221221' \
-    'iopath==0.1.10'
+    'iopath==0.1.10' \
+    'multi-storage-client==0.44.0'
 
 oscar_env="${work_root}/envs/oscar"
 if [[ ! -x "${oscar_env}/bin/python" ]]; then
@@ -91,6 +92,16 @@ env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     --python "${oscar_env}/bin/python" \
     'transformer-engine==2.12.0+cu128.torch210' \
     --find-links https://nvidia-cosmos.github.io/cosmos-dependencies/v1.5.0/transformer-engine
+oscar_site_packages="$(${oscar_env}/bin/python - <<'PY'
+import site
+
+print(site.getsitepackages()[0])
+PY
+)"
+cuda_runtime_alias="${oscar_site_packages}/nvidia/cuda_cudart"
+if [[ ! -e "${cuda_runtime_alias}" ]]; then
+    ln -s cuda_runtime "${cuda_runtime_alias}"
+fi
 
 "${cosmos_env}/bin/python" - "${work_root}" <<'PY'
 import sys
