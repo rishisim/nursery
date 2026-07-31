@@ -32,7 +32,7 @@ model: gemini-omni-flash-preview
 endpoint: POST https://generativelanguage.googleapis.com/v1beta/interactions
 duration: 5 seconds
 aspect ratio: 16:9
-delivery: URI
+delivery: inline
 store: false
 background: false
 stream: false
@@ -44,7 +44,9 @@ generates native audio, but that audio is discarded.
 
 The REST payload encodes the duration as `"5s"`. Google's live Interactions
 OpenAPI marks this field as `google-duration`, whose ProtoJSON representation
-requires the trailing `s`.
+requires the trailing `s`. Delivery remains inline because the live endpoint
+requires `store: true` for URI delivery, which conflicts with this protocol's
+request-storage boundary.
 
 MiniMax uses the official H3 V2 API:
 

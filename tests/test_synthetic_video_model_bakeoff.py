@@ -123,6 +123,7 @@ def test_work_order_compiles_eight_exact_prompt_requests_and_sixteen_cards(
             assert attempt["request"]["input"] == prompt
             assert attempt["request"]["store"] is False
             assert attempt["request"]["response_format"]["duration"] == "5s"
+            assert attempt["request"]["response_format"]["delivery"] == "inline"
             assert attempt["planned_charge_usd"] == pytest.approx(0.515)
         else:
             assert attempt["request"]["content"] == [

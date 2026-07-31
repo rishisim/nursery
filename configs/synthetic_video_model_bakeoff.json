@@ -72,7 +72,7 @@
           "type": "video",
           "aspect_ratio": "16:9",
           "duration": "5s",
-          "delivery": "uri"
+          "delivery": "inline"
         },
         "generation_config": {
           "video_config": {
@@ -85,7 +85,7 @@
       },
       "prompt_field": "input",
       "input_seed_control": "not documented for Gemini Omni Flash video generation; no seed is sent",
-      "native_output": "720p, 24 fps, video with model-generated audio",
+      "native_output": "720p, 24 fps, inline video with model-generated audio",
       "provider_retries": 0,
       "protocol_retries": 0,
       "attempts_per_scene": 1

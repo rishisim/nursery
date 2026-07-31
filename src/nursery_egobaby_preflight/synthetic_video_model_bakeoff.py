@@ -218,7 +218,7 @@ def validate_bakeoff_config(
                 "type": "video",
                 "aspect_ratio": "16:9",
                 "duration": "5s",
-                "delivery": "uri",
+                "delivery": "inline",
             },
             "generation_config": {"video_config": {"task": "text_to_video"}},
             "store": False,
