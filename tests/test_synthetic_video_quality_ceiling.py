@@ -67,6 +67,19 @@ def test_quality_ceiling_contract_is_public_only_and_cost_bounded(
     assert quality_config["governance"]["seedance_output_as_training_data"].startswith(
         "BLOCKED"
     )
+    assert quality_config["review"]["visual_item_ids"] == [
+        "continuous_egocentric_shot",
+        "anatomy",
+        "contact_action",
+        "identity",
+        "transition_order",
+        "referent_timing",
+        "safety",
+    ]
+    assert quality_config["review"]["audio_control_item_ids"] == ["speech"]
+    assert quality_config["review"]["material_visual_win_rule"][
+        "minimum_total_visual_pass_advantage"
+    ] == 4
 
 
 def test_comparison_compiles_exact_ltx_prompts_and_four_seedance_requests(

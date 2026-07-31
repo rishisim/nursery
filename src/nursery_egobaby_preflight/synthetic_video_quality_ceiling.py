@@ -203,6 +203,80 @@ def validate_quality_config(
         "the full four-scene result must be retained",
     )
 
+    review = config.get("review", {})
+    expected_item_ids = tuple(
+        item["id"] for item in public_pilot["human_qa"]["items"]
+    )
+    visual_item_ids = tuple(review.get("visual_item_ids", ()))
+    audio_control_item_ids = tuple(review.get("audio_control_item_ids", ()))
+    _require(
+        review.get("profile")
+        == "single-rater blinded qualitative screening; not a formal model-selection result",
+        "unexpected review profile",
+    )
+    _require(
+        review.get("required_unique_raters") == 1,
+        "quality-ceiling review must use one blinded rater",
+    )
+    _require(
+        tuple(review.get("response_values", ()))
+        == tuple(public_pilot["human_qa"]["response_values"]),
+        "review response values changed",
+    )
+    _require(
+        tuple(review.get("confidence_values", ()))
+        == tuple(public_pilot["human_qa"]["confidence_values"]),
+        "review confidence values changed",
+    )
+    _require(
+        visual_item_ids
+        == (
+            "continuous_egocentric_shot",
+            "anatomy",
+            "contact_action",
+            "identity",
+            "transition_order",
+            "referent_timing",
+            "safety",
+        ),
+        "visual review items changed",
+    )
+    _require(
+        audio_control_item_ids == ("speech",),
+        "speech must remain the sole audio-control item",
+    )
+    _require(
+        set(visual_item_ids + audio_control_item_ids) == set(expected_item_ids),
+        "review items do not cover the frozen QA instrument exactly",
+    )
+    _require(
+        tuple(review.get("critical_visual_item_ids", ()))
+        == ("anatomy", "contact_action", "identity", "transition_order", "safety"),
+        "critical visual review items changed",
+    )
+    _require(
+        review.get("material_visual_win_rule")
+        == {
+            "candidate_media_valid_count_required": 4,
+            "minimum_total_visual_pass_advantage": 4,
+            "minimum_candidate_scene_wins": 2,
+            "maximum_candidate_scene_losses": 0,
+            "equal_judgeable_visual_items_required_per_scene": True,
+            "candidate_critical_failures_must_not_exceed_baseline": True,
+            "maximum_candidate_safety_failures": 0,
+        },
+        "material visual-win rule changed",
+    )
+    _require(
+        review.get("decision_labels")
+        == {
+            "material_win": "PURSUE_WRITTEN_PROVIDER_AND_INSTITUTIONAL_CLEARANCE",
+            "no_material_win": "NO_CLEAR_ADVANTAGE_KEEP_LTX_REPRODUCIBLE_BASELINE",
+            "inconclusive": "INCONCLUSIVE_REQUIRES_NEW_AUTHORIZATION_TO_REPEAT",
+        },
+        "review decision labels changed",
+    )
+
     provider_cost = config.get("provider_cost", {})
     rate = Decimal(str(provider_cost.get("standard_720p_text_to_video_usd_per_second")))
     count = int(provider_cost.get("planned_scene_count", 0))

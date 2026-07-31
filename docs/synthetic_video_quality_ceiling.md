@@ -121,6 +121,15 @@ egocentric shot, anatomy, contact/action completion, identity, transition
 order, referent timing, exact speech, and safety. All four Seedance attempts
 remain in the result; no polished subset may be substituted.
 
+The qualitative screening rule is frozen before Seedance output is viewed.
+Speech is reported only as an identity control because each candidate final
+contains the exact paired LTX audio stream. A material Seedance visual win
+requires all four candidate files to be technically valid, at least four more
+visual passes in total, at least two scene wins and no scene losses, no increase
+in critical visual failures, no safety failure, and equal judgeable-item
+denominators within every scene. Anything weaker retains LTX as the
+reproducible baseline; a technical or judgeability shortfall is inconclusive.
+
 ## Decision boundary
 
 A clear Seedance visual win means “pursue terms and governance clearance,” not

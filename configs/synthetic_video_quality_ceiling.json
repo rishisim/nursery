@@ -95,6 +95,55 @@
     "review_items_source": "configs/synthetic_video_public_pilot.json#human_qa",
     "no_polished_subset": true
   },
+  "review": {
+    "profile": "single-rater blinded qualitative screening; not a formal model-selection result",
+    "required_unique_raters": 1,
+    "response_values": [
+      "pass",
+      "fail",
+      "cannot_judge"
+    ],
+    "confidence_values": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "visual_item_ids": [
+      "continuous_egocentric_shot",
+      "anatomy",
+      "contact_action",
+      "identity",
+      "transition_order",
+      "referent_timing",
+      "safety"
+    ],
+    "audio_control_item_ids": [
+      "speech"
+    ],
+    "critical_visual_item_ids": [
+      "anatomy",
+      "contact_action",
+      "identity",
+      "transition_order",
+      "safety"
+    ],
+    "material_visual_win_rule": {
+      "candidate_media_valid_count_required": 4,
+      "minimum_total_visual_pass_advantage": 4,
+      "minimum_candidate_scene_wins": 2,
+      "maximum_candidate_scene_losses": 0,
+      "equal_judgeable_visual_items_required_per_scene": true,
+      "candidate_critical_failures_must_not_exceed_baseline": true,
+      "maximum_candidate_safety_failures": 0
+    },
+    "decision_labels": {
+      "material_win": "PURSUE_WRITTEN_PROVIDER_AND_INSTITUTIONAL_CLEARANCE",
+      "no_material_win": "NO_CLEAR_ADVANTAGE_KEEP_LTX_REPRODUCIBLE_BASELINE",
+      "inconclusive": "INCONCLUSIVE_REQUIRES_NEW_AUTHORIZATION_TO_REPEAT"
+    },
+    "speech_exclusion_reason": "Every final candidate uses the exact paired LTX AAC stream, so speech is an identity control and is excluded from the visual-win rule.",
+    "cannot_judge_policy": "Report cannot-judge counts; a scene with unequal judgeable visual-item counts is inconclusive and cannot count as a family win."
+  },
   "provider_cost": {
     "currency": "USD",
     "pricing_frozen_on": "2026-07-31",
