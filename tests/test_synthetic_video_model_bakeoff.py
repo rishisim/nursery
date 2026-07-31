@@ -122,7 +122,7 @@ def test_work_order_compiles_eight_exact_prompt_requests_and_sixteen_cards(
         if attempt["family"] == "gemini_omni_flash":
             assert attempt["request"]["input"] == prompt
             assert attempt["request"]["store"] is False
-            assert attempt["request"]["response_format"]["duration"] == "5"
+            assert attempt["request"]["response_format"]["duration"] == "5s"
             assert attempt["planned_charge_usd"] == pytest.approx(0.515)
         else:
             assert attempt["request"]["content"] == [

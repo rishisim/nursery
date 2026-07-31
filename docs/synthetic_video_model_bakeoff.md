@@ -42,6 +42,10 @@ credential: GEMINI_API_KEY
 Google documents Gemini Omni Flash output as 720p at 24 fps. The model
 generates native audio, but that audio is discarded.
 
+The REST payload encodes the duration as `"5s"`. Google's live Interactions
+OpenAPI marks this field as `google-duration`, whose ProtoJSON representation
+requires the trailing `s`.
+
 MiniMax uses the official H3 V2 API:
 
 ```text
@@ -133,8 +137,15 @@ $2.06 Gemini maximum expected charge
 ```
 
 Actual invoices remain provider billing records and are not inferred by the
-runner. A failed or moderated call may be billed according to provider policy.
-No replacement or retry is authorized.
+runner. A failed or moderated call after provider acceptance may be billed
+according to provider policy. No replacement or quality retry is authorized
+after an accepted provider submission.
+
+A request rejected at schema validation before an interaction/task ID or media
+exists is retained as a transport diagnostic and does not count as one of the
+eight generated attempts. Such a correction must update the canonical request,
+pass validation, and run from a clean Git commit; provider billing remains
+unknown.
 
 ## No-cost setup
 

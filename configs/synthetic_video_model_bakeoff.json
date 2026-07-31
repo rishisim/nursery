@@ -71,7 +71,7 @@
         "response_format": {
           "type": "video",
           "aspect_ratio": "16:9",
-          "duration": "5",
+          "duration": "5s",
           "delivery": "uri"
         },
         "generation_config": {
@@ -219,7 +219,8 @@
     "maximum_expected_new_charge_usd": 4.66,
     "user_authorized_new_spend_usd": 6.0,
     "paid_launch_requires_explicit_new_spend_confirmation": true,
-    "failed_or_moderated_request_billing": "provider-dependent; no automatic or protocol retry is authorized"
+    "failed_or_moderated_request_billing": "provider-dependent; no automatic or protocol retry is authorized after an accepted provider submission",
+    "pre_submission_validation_policy": "a schema rejection with no provider interaction or task ID and no media is retained as a transport diagnostic rather than counted as one of the eight generated attempts; actual provider billing remains unknown"
   },
   "governance": {
     "qualitative_public_only_comparison": "AUTHORIZED",
@@ -231,8 +232,10 @@
     "gemini_model": "https://ai.google.dev/gemini-api/docs/models/gemini-omni-flash",
     "gemini_video_guide": "https://ai.google.dev/gemini-api/docs/omni",
     "gemini_interactions_api": "https://ai.google.dev/api/interactions-api",
+    "gemini_interactions_openapi": "https://ai.google.dev/static/api/interactions.openapi.json",
     "gemini_pricing": "https://ai.google.dev/gemini-api/docs/pricing",
     "gemini_model_card": "https://deepmind.google/models/model-cards/gemini-omni-flash/",
+    "protobuf_protojson": "https://protobuf.dev/programming-guides/json/",
     "minimax_model_release": "https://platform.minimax.io/docs/release-notes/models",
     "minimax_video_guide": "https://platform.minimax.io/docs/guides/video-generation",
     "minimax_v2_openapi": "https://platform.minimax.io/docs/api-reference/video/generation/api/v2-video-generation.json",
