@@ -77,7 +77,9 @@ oscar_cuda_libraries="$(
         | paste -sd: -
 )"
 env LD_LIBRARY_PATH="${oscar_cuda_libraries}:${oscar_site_packages}/torch/lib" \
-    "${work_root}/envs/oscar/bin/python" \
+    "${work_root}/envs/oscar/bin/torchrun" \
+    --standalone \
+    --nproc-per-node=1 \
     -m babyworld_lite.childlens_engine_bakeoff.appearance_experiment \
     run-oscar \
     "${input_root}/embodied_simulation_appearance.json" \

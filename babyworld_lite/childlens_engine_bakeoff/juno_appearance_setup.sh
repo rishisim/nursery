@@ -75,7 +75,8 @@ env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     --python "${cosmos_env}/bin/python" \
     'fvcore==0.1.5.post20221221' \
     'iopath==0.1.10' \
-    'multi-storage-client==0.44.0'
+    'multi-storage-client==0.44.0' \
+    'qwen-vl-utils==0.0.14'
 
 oscar_env="${work_root}/envs/oscar"
 if [[ ! -x "${oscar_env}/bin/python" ]]; then
