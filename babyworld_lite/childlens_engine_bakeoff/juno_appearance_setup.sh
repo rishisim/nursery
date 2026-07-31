@@ -71,6 +71,10 @@ cosmos_env="${work_root}/envs/cosmos"
         --no-dev \
         --group=cu128
 )
+env LD_LIBRARY_PATH= "${uv_bin}" pip install \
+    --python "${cosmos_env}/bin/python" \
+    'fvcore==0.1.5.post20221221' \
+    'iopath==0.1.10'
 
 oscar_env="${work_root}/envs/oscar"
 if [[ ! -x "${oscar_env}/bin/python" ]]; then

@@ -64,7 +64,18 @@ fi
 oscar_status=0
 export COSMOS_REASON_PATH="${work_root}/models/cosmos_reason1_7b"
 export PYTHONPATH="${work_root}/source/oscar-public:${input_root}/repo"
-env LD_LIBRARY_PATH= \
+oscar_site_packages="$(${work_root}/envs/oscar/bin/python - <<'PY'
+import site
+
+print(site.getsitepackages()[0])
+PY
+)"
+oscar_cuda_libraries="$(
+    find "${oscar_site_packages}/nvidia" -mindepth 2 -maxdepth 2 -type d -name lib -print \
+        | sort \
+        | paste -sd: -
+)"
+env LD_LIBRARY_PATH="${oscar_cuda_libraries}:${oscar_site_packages}/torch/lib" \
     "${work_root}/envs/oscar/bin/python" \
     -m babyworld_lite.childlens_engine_bakeoff.appearance_experiment \
     run-oscar \
