@@ -21,6 +21,8 @@ from .contract import canonical_json_bytes, canonical_json_sha256, file_sha256
 FAMILY_IDS = ("wan", "ltx")
 PROFILE_IDS = ("cloud_preflight", "preview", "formal")
 SAFE_ID = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
+WAN_STRICT_ATTENTION_IMPORT = b"from .attention import flash_attention\n"
+WAN_FALLBACK_ATTENTION_IMPORT = b"from .attention import attention as flash_attention\n"
 
 
 @dataclass(frozen=True)
@@ -345,6 +347,36 @@ def write_work_order(root: str | Path, config: Mapping[str, Any], work_order: Ma
         (attempt_root / "planned_attempt.json").write_bytes(canonical_json_bytes(attempt))
         (attempt_root / "qa.json").write_bytes(canonical_json_bytes(qa_template(config, attempt)))
     return work_order_path
+
+
+def patch_wan_sdpa_fallback(source_root: str | Path) -> dict[str, str]:
+    """Bind Wan TI2V to its official FlashAttention-or-SDPA dispatcher."""
+
+    source = Path(source_root).resolve()
+    target = source / "wan" / "modules" / "model.py"
+    original = target.read_bytes()
+    matches = original.count(WAN_STRICT_ATTENTION_IMPORT)
+    if matches != 1:
+        raise RuntimeError(
+            "frozen Wan source no longer has exactly one strict attention import"
+        )
+    original_sha256 = file_sha256(str(target))
+    target.write_bytes(
+        original.replace(
+            WAN_STRICT_ATTENTION_IMPORT,
+            WAN_FALLBACK_ATTENTION_IMPORT,
+            1,
+        )
+    )
+    return {
+        "path": str(target.relative_to(source)),
+        "reason": (
+            "the frozen TI2V model imports the strict FlashAttention entrypoint; "
+            "bind the official attention dispatcher so its SDPA fallback is reachable"
+        ),
+        "original_sha256": original_sha256,
+        "patched_sha256": file_sha256(str(target)),
+    }
 
 
 def build_model_command(

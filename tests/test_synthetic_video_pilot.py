@@ -17,6 +17,7 @@ from nursery_egobaby_preflight.synthetic_video_pilot import (
     load_config,
     media_summary,
     mux_modular_audio,
+    patch_wan_sdpa_fallback,
     qa_template,
     render_gallery,
     validate_final_media,
@@ -129,6 +130,26 @@ def test_commands_use_pinned_official_runners_and_common_delivery(config: dict, 
     assert "--enhance-prompt" not in ltx.argv
     assert ltx.argv[ltx.argv.index("--num-frames") + 1] == "121"
     assert ltx.argv[ltx.argv.index("--offload") + 1] == "cpu"
+
+
+def test_wan_sdpa_runtime_adaptation_is_exact_and_auditable(tmp_path: Path) -> None:
+    target = tmp_path / "wan" / "modules" / "model.py"
+    target.parent.mkdir(parents=True)
+    target.write_text(
+        "import torch\n"
+        "from .attention import flash_attention\n"
+        "\n"
+        "def forward(q, k, v):\n"
+        "    return flash_attention(q, k, v)\n"
+    )
+
+    record = patch_wan_sdpa_fallback(tmp_path)
+
+    assert record["path"] == "wan/modules/model.py"
+    assert record["original_sha256"] != record["patched_sha256"]
+    assert "attention as flash_attention" in target.read_text()
+    with pytest.raises(RuntimeError, match="exactly one strict attention import"):
+        patch_wan_sdpa_fallback(tmp_path)
 
 
 def test_work_order_writes_qa_templates_without_media(config: dict, tmp_path: Path) -> None:

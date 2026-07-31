@@ -138,10 +138,15 @@ def write_json(path: Path, value: Any, canonical_json_bytes: Any) -> None:
     path.write_bytes(canonical_json_bytes(value))
 
 
-def setup_wan(config: dict[str, Any], external_root: Path) -> tuple[Path, Path, str, list[str]]:
+def setup_wan(
+    config: dict[str, Any],
+    external_root: Path,
+    patch_wan_sdpa_fallback: Any,
+) -> tuple[Path, Path, str, list[str], list[dict[str, str]]]:
     model = config["models"]["wan"]
     source = external_root / "Wan2.2"
     clone_at(model["source_repository"], model["source_commit"], source)
+    runtime_source_adaptations = [patch_wan_sdpa_fallback(source)]
     weights = external_root / "weights" / "wan"
     snapshot_download(
         repo_id=model["weights_repository"],
@@ -162,10 +167,18 @@ def setup_wan(config: dict[str, Any], external_root: Path) -> tuple[Path, Path, 
         ["uv", "pip", "freeze", "--python", str(environment / "bin" / "python")],
         capture=True,
     ).stdout.splitlines()
-    return source, weights, str(environment / "bin" / "python"), freeze
+    return (
+        source,
+        weights,
+        str(environment / "bin" / "python"),
+        freeze,
+        runtime_source_adaptations,
+    )
 
 
-def setup_ltx(config: dict[str, Any], external_root: Path) -> tuple[Path, Path, str, list[str]]:
+def setup_ltx(
+    config: dict[str, Any], external_root: Path
+) -> tuple[Path, Path, str, list[str], list[dict[str, str]]]:
     model = config["models"]["ltx"]
     source = external_root / "LTX-2"
     clone_at(model["source_repository"], model["source_commit"], source)
@@ -188,7 +201,7 @@ def setup_ltx(config: dict[str, Any], external_root: Path) -> tuple[Path, Path, 
         ["uv", "pip", "freeze", "--python", str(source / ".venv" / "bin" / "python")],
         capture=True,
     ).stdout.splitlines()
-    return source, weights, sys.executable, freeze
+    return source, weights, sys.executable, freeze, []
 
 
 def setup_tts(config: dict[str, Any], external_root: Path) -> Path:
@@ -275,6 +288,7 @@ def main() -> None:
         load_config,
         media_summary,
         mux_modular_audio,
+        patch_wan_sdpa_fallback,
         render_gallery,
         synthesize_tts,
         utc_now,
@@ -333,11 +347,19 @@ def main() -> None:
 
     ensure_ffmpeg()
     if args.family == "wan":
-        model_source, weights_root, model_python, freeze = setup_wan(config, external_root)
+        model_source, weights_root, model_python, freeze, runtime_source_adaptations = setup_wan(
+            config,
+            external_root,
+            patch_wan_sdpa_fallback,
+        )
     else:
-        model_source, weights_root, model_python, freeze = setup_ltx(config, external_root)
+        model_source, weights_root, model_python, freeze, runtime_source_adaptations = setup_ltx(
+            config,
+            external_root,
+        )
     voice_model = setup_tts(config, external_root)
     environment_record["resolved_python_packages"] = freeze
+    environment_record["runtime_source_adaptations"] = runtime_source_adaptations
     environment_record["model_source_commit"] = config["models"][args.family]["source_commit"]
     environment_record["model_weights_revision"] = config["models"][args.family]["weights_revision"]
     environment_record["tts_voice_revision"] = config["tts"]["voice_revision"]
@@ -347,8 +369,11 @@ def main() -> None:
     status["status"] = "running"
     write_json(family_root / "run_status.json", status, canonical_json_bytes)
     persist_control_files(api, args.output_repository, args.run_id, args.family, family_root)
+    active_attempt_id: str | None = None
+    active_generator_log: Path | None = None
     try:
         for attempt in work_order["attempts"]:
+            active_attempt_id = attempt["attempt_id"]
             attempt_root = family_root / "attempts" / attempt["attempt_id"]
             raw_video = attempt_root / "raw.mp4"
             video_only = attempt_root / "video_only.mp4"
@@ -359,6 +384,7 @@ def main() -> None:
             monitor = PeakGpuMonitor()
             monitor.start()
             try:
+                active_generator_log = attempt_root / "generator.log"
                 command = build_model_command(
                     config,
                     attempt,
@@ -368,7 +394,30 @@ def main() -> None:
                     python_executable=model_python,
                     uv_executable="uv",
                 )
-                run(command.argv, cwd=Path(command.cwd), output_log=attempt_root / "generator.log")
+                run(command.argv, cwd=Path(command.cwd), output_log=active_generator_log)
+            except Exception:
+                if active_attempt_id not in status["failed_attempt_ids"]:
+                    status["failed_attempt_ids"].append(active_attempt_id)
+                if active_generator_log.exists():
+                    log_tail = active_generator_log.read_text(errors="replace")[-16000:]
+                    print("Generator log tail follows:", file=sys.stderr)
+                    print(log_tail, file=sys.stderr)
+                    try:
+                        upload_file(
+                            api,
+                            args.output_repository,
+                            active_generator_log,
+                            (
+                                f"{args.run_id}/families/{args.family}/attempts/"
+                                f"{active_attempt_id}/generator.log"
+                            ),
+                        )
+                    except Exception as upload_error:
+                        print(
+                            f"Could not persist generator log: {upload_error}",
+                            file=sys.stderr,
+                        )
+                raise
             finally:
                 monitor.stop()
             generation_seconds = time.monotonic() - monotonic_started
@@ -422,6 +471,12 @@ def main() -> None:
             "type": type(error).__name__,
             "message": str(error),
             "traceback": traceback.format_exc(),
+            "active_attempt_id": active_attempt_id,
+            "generator_log_tail": (
+                active_generator_log.read_text(errors="replace")[-16000:]
+                if active_generator_log is not None and active_generator_log.exists()
+                else None
+            ),
         }
         write_json(family_root / "failure.json", failure, canonical_json_bytes)
         write_json(family_root / "run_status.json", status, canonical_json_bytes)
