@@ -73,6 +73,7 @@ cosmos_env="${work_root}/envs/cosmos"
 )
 env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     --python "${cosmos_env}/bin/python" \
+    'boto3==1.43.62' \
     'fvcore==0.1.5.post20221221' \
     'iopath==0.1.10' \
     'multi-storage-client==0.44.0' \
@@ -102,6 +103,10 @@ PY
 cuda_runtime_alias="${oscar_site_packages}/nvidia/cuda_cudart"
 if [[ ! -e "${cuda_runtime_alias}" ]]; then
     ln -s cuda_runtime "${cuda_runtime_alias}"
+fi
+cuda_runtime_library="${oscar_site_packages}/nvidia/cuda_runtime/lib/libcudart.so"
+if [[ ! -e "${cuda_runtime_library}" ]]; then
+    ln -s libcudart.so.12 "${cuda_runtime_library}"
 fi
 
 "${cosmos_env}/bin/python" - "${work_root}" <<'PY'
