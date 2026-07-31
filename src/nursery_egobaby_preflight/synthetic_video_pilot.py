@@ -23,6 +23,14 @@ PROFILE_IDS = ("cloud_preflight", "preview", "formal")
 SAFE_ID = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 WAN_STRICT_ATTENTION_IMPORT = b"from .attention import flash_attention\n"
 WAN_FALLBACK_ATTENTION_IMPORT = b"from .attention import attention as flash_attention\n"
+WAN_EAGER_OPTIONAL_IMPORTS = (
+    b"from .image2video import WanI2V\n"
+    b"from .speech2video import WanS2V\n"
+    b"from .text2video import WanT2V\n"
+    b"from .textimage2video import WanTI2V\n"
+    b"from .animate import WanAnimate"
+)
+WAN_TI2V_IMPORT = b"from .textimage2video import WanTI2V"
 
 
 @dataclass(frozen=True)
@@ -373,6 +381,37 @@ def patch_wan_sdpa_fallback(source_root: str | Path) -> dict[str, str]:
         "reason": (
             "the frozen TI2V model imports the strict FlashAttention entrypoint; "
             "bind the official attention dispatcher so its SDPA fallback is reachable"
+        ),
+        "original_sha256": original_sha256,
+        "patched_sha256": file_sha256(str(target)),
+    }
+
+
+def patch_wan_ti2v_import_surface(source_root: str | Path) -> dict[str, str]:
+    """Avoid importing unrelated Wan pipelines and their optional dependencies."""
+
+    source = Path(source_root).resolve()
+    target = source / "wan" / "__init__.py"
+    original = target.read_bytes()
+    matches = original.count(WAN_EAGER_OPTIONAL_IMPORTS)
+    if matches != 1:
+        raise RuntimeError(
+            "frozen Wan source no longer has exactly one eager optional import block"
+        )
+    original_sha256 = file_sha256(str(target))
+    target.write_bytes(
+        original.replace(
+            WAN_EAGER_OPTIONAL_IMPORTS,
+            WAN_TI2V_IMPORT,
+            1,
+        )
+    )
+    return {
+        "path": str(target.relative_to(source)),
+        "reason": (
+            "the frozen package eagerly imports unrelated S2V and Animate pipelines; "
+            "expose only the prespecified TI2V runner so unused optional dependencies "
+            "cannot block TI2V startup"
         ),
         "original_sha256": original_sha256,
         "patched_sha256": file_sha256(str(target)),

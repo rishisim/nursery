@@ -18,6 +18,7 @@ from nursery_egobaby_preflight.synthetic_video_pilot import (
     media_summary,
     mux_modular_audio,
     patch_wan_sdpa_fallback,
+    patch_wan_ti2v_import_surface,
     qa_template,
     render_gallery,
     validate_final_media,
@@ -133,21 +134,42 @@ def test_commands_use_pinned_official_runners_and_common_delivery(config: dict, 
 
 
 def test_wan_sdpa_runtime_adaptation_is_exact_and_auditable(tmp_path: Path) -> None:
-    target = tmp_path / "wan" / "modules" / "model.py"
-    target.parent.mkdir(parents=True)
-    target.write_text(
+    model = tmp_path / "wan" / "modules" / "model.py"
+    model.parent.mkdir(parents=True)
+    model.write_text(
         "import torch\n"
         "from .attention import flash_attention\n"
         "\n"
         "def forward(q, k, v):\n"
         "    return flash_attention(q, k, v)\n"
     )
+    package = tmp_path / "wan" / "__init__.py"
+    package.write_text(
+        "from . import configs, distributed, modules\n"
+        "from .image2video import WanI2V\n"
+        "from .speech2video import WanS2V\n"
+        "from .text2video import WanT2V\n"
+        "from .textimage2video import WanTI2V\n"
+        "from .animate import WanAnimate"
+    )
 
-    record = patch_wan_sdpa_fallback(tmp_path)
+    records = [
+        patch_wan_ti2v_import_surface(tmp_path),
+        patch_wan_sdpa_fallback(tmp_path),
+    ]
 
-    assert record["path"] == "wan/modules/model.py"
-    assert record["original_sha256"] != record["patched_sha256"]
-    assert "attention as flash_attention" in target.read_text()
+    assert [record["path"] for record in records] == [
+        "wan/__init__.py",
+        "wan/modules/model.py",
+    ]
+    assert all(
+        record["original_sha256"] != record["patched_sha256"] for record in records
+    )
+    assert package.read_text().endswith("from .textimage2video import WanTI2V")
+    assert "WanS2V" not in package.read_text()
+    assert "attention as flash_attention" in model.read_text()
+    with pytest.raises(RuntimeError, match="exactly one eager optional import block"):
+        patch_wan_ti2v_import_surface(tmp_path)
     with pytest.raises(RuntimeError, match="exactly one strict attention import"):
         patch_wan_sdpa_fallback(tmp_path)
 

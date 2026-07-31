@@ -33,6 +33,7 @@ OFFLINE_SAFE_ENV = {
     "COMET_DISABLE_AUTO_LOGGING": "1",
     "TOKENIZERS_PARALLELISM": "false",
 }
+WAN_SUPPLEMENTAL_REQUIREMENTS = ("einops==0.8.2",)
 
 
 def now() -> str:
@@ -141,12 +142,12 @@ def write_json(path: Path, value: Any, canonical_json_bytes: Any) -> None:
 def setup_wan(
     config: dict[str, Any],
     external_root: Path,
-    patch_wan_sdpa_fallback: Any,
+    runtime_patchers: tuple[Any, ...],
 ) -> tuple[Path, Path, str, list[str], list[dict[str, str]]]:
     model = config["models"]["wan"]
     source = external_root / "Wan2.2"
     clone_at(model["source_repository"], model["source_commit"], source)
-    runtime_source_adaptations = [patch_wan_sdpa_fallback(source)]
+    runtime_source_adaptations = [patcher(source) for patcher in runtime_patchers]
     weights = external_root / "weights" / "wan"
     snapshot_download(
         repo_id=model["weights_repository"],
@@ -162,6 +163,7 @@ def setup_wan(
         if not clean or clean.startswith("#") or clean.lower().startswith("flash_attn"):
             continue
         requirements.append(clean)
+    requirements.extend(WAN_SUPPLEMENTAL_REQUIREMENTS)
     run(["uv", "pip", "install", "--python", str(environment / "bin" / "python"), *requirements])
     freeze = run(
         ["uv", "pip", "freeze", "--python", str(environment / "bin" / "python")],
@@ -289,6 +291,7 @@ def main() -> None:
         media_summary,
         mux_modular_audio,
         patch_wan_sdpa_fallback,
+        patch_wan_ti2v_import_surface,
         render_gallery,
         synthesize_tts,
         utc_now,
@@ -350,7 +353,7 @@ def main() -> None:
         model_source, weights_root, model_python, freeze, runtime_source_adaptations = setup_wan(
             config,
             external_root,
-            patch_wan_sdpa_fallback,
+            (patch_wan_ti2v_import_surface, patch_wan_sdpa_fallback),
         )
     else:
         model_source, weights_root, model_python, freeze, runtime_source_adaptations = setup_ltx(
