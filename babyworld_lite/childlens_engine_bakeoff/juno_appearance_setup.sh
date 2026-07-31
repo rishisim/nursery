@@ -67,7 +67,10 @@ cosmos_env="${work_root}/envs/cosmos"
 (
     cd "${work_root}/source/cosmos-framework"
     UV_PROJECT_ENVIRONMENT="${cosmos_env}" \
-        "${uv_bin}" sync --no-dev --group=cu128
+        "${uv_bin}" sync \
+        --python "$(command -v python3)" \
+        --no-dev \
+        --group=cu128
 )
 
 oscar_env="${work_root}/envs/oscar"
