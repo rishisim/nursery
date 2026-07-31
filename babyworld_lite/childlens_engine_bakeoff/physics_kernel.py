@@ -143,11 +143,34 @@ def _target_xml(target_definition: dict[str, Any]) -> str:
             contype="{TARGET_COLLISION_BIT}" conaffinity="{TARGET_COLLISION_BIT | 8}" mass="0.002"/>"""
 
 
+def _clutter_xml(
+    root_xy: tuple[float, float], clutter_layout: list[dict[str, Any]]
+) -> str:
+    rows = []
+    for item in clutter_layout:
+        identifier = item["id"]
+        offset = np.asarray(item["offset_xyz_m"], dtype=np.float64)
+        position = np.asarray([root_xy[0], root_xy[1], 0.0]) + offset
+        size = " ".join(str(value_) for value_ in item["half_size_xyz_m"])
+        rgba = " ".join(str(value_) for value_ in item["rgba"])
+        rows.append(
+            f'''    <body name="{identifier}" pos="{' '.join(str(value_) for value_ in position)}">
+      <geom name="clutter_physical_{identifier}" type="box" size="{size}"
+            group="4" rgba="0 1 0 1" friction="1.2 0.01 0.0005"
+            contype="8" conaffinity="{TARGET_COLLISION_BIT | 7}"/>
+      <geom name="clutter_visual_{identifier}" type="box" size="{size}"
+            group="0" rgba="{rgba}" contype="0" conaffinity="0"/>
+    </body>'''
+        )
+    return "\n".join(rows)
+
+
 def _component_xml(
     mimo_assets: Path,
     embodied_model_path: Path,
     root_xy: tuple[float, float],
     target_definition: dict[str, Any],
+    clutter_layout: list[dict[str, Any]],
 ) -> str:
     contact_pairs = "\n".join(
         f'    <pair geom1="{name}" geom2="target_geom" condim="4" margin="0.006" gap="0.001" friction="2.0 0.01 0.0005 0.0001 0.0001" solref="0.03 1" solimp="0.9 0.98 0.002"/>'
@@ -170,6 +193,7 @@ def _component_xml(
             "target_handle_lower",
         )
     )
+    clutter_xml = _clutter_xml(root_xy, clutter_layout)
     return f"""<mujoco model="EmbodiedMIMoKernel">
   <compiler inertiafromgeom="true" angle="radian" assetdir="{mimo_assets}"/>
   <include file="{mimo_assets / 'mimo' / 'MIMo_metav2.xml'}"/>
@@ -201,6 +225,7 @@ def _component_xml(
             rgba="0.1 0.35 0.8 1" mass="0.08" contype="2"
             conaffinity="{TARGET_COLLISION_BIT | 12}"/>
     </body>
+{clutter_xml}
     <camera name="external_qa" pos="{root_xy[0] - 0.7} {root_xy[1] - 0.9} 1.25"
             mode="targetbody" target="mimo_location" fovy="55"/>
   </worldbody>
@@ -221,6 +246,8 @@ class KernelModel:
     target_geom_id: int
     target_geom_ids: tuple[int, ...]
     reach_distractor_geom_id: int
+    clutter_geom_ids: tuple[int, ...]
+    clutter_visual_geom_ids: tuple[int, ...]
     target_body_id: int
     target_qpos_adr: int
     target_dof_adr: int
@@ -258,6 +285,7 @@ def build_kernel_model(
     *,
     root_xy: tuple[float, float],
     target_definition: dict[str, Any],
+    clutter_layout: list[dict[str, Any]] | None = None,
     camera_mount_position: tuple[float, float, float] = (0.081, 0.0, 0.067375),
     camera_mount_quaternion: tuple[float, float, float, float] = (
         0.2642907803854001,
@@ -277,7 +305,13 @@ def build_kernel_model(
         camera_mount_quaternion=camera_mount_quaternion,
     )
     component_path.write_text(
-        _component_xml(mimo_assets, embodied_model_path, root_xy, target_definition),
+        _component_xml(
+            mimo_assets,
+            embodied_model_path,
+            root_xy,
+            target_definition,
+            clutter_layout or [],
+        ),
         encoding="utf-8",
     )
     parent = mujoco.MjSpec.from_file(str(scene_path))
@@ -309,6 +343,20 @@ def build_kernel_model(
         and model.geom(geom_id).name != "kernel_target_free"
     )
     target_geom_id = model.geom("kernel_target_geom").id
+    clutter_geom_ids = tuple(
+        geom_id
+        for geom_id in range(model.ngeom)
+        if (model.geom(geom_id).name or "").startswith(
+            "kernel_clutter_physical_"
+        )
+    )
+    clutter_visual_geom_ids = tuple(
+        geom_id
+        for geom_id in range(model.ngeom)
+        if (model.geom(geom_id).name or "").startswith(
+            "kernel_clutter_visual_"
+        )
+    )
     hand_contype_union = int(np.bitwise_or.reduce(model.geom_contype[list(hand_geom_ids)]))
     model.geom_conaffinity[list(target_geom_ids)] = (
         hand_contype_union | 8 | TARGET_COLLISION_BIT
@@ -317,11 +365,14 @@ def build_kernel_model(
         "kernel_cb", "kernel_ub", "kernel_neck", "kernel_head",
         "kernel_right_uarm", "kernel_right_larm", "kernel_geom:right_",
         "kernel_target_", "kernel_support", "kernel_reach_distractor_geom",
+        "kernel_clutter_physical_",
     )
     relevant_collision_geom_ids: list[int] = []
     for geom_id in range(model.ngeom):
         name = model.geom(geom_id).name or ""
-        if name.startswith("kernel_visual:"):
+        if name.startswith("kernel_visual:") or name.startswith(
+            "kernel_clutter_visual_"
+        ):
             continue
         is_existing_scene_collider = (
             not name.startswith("kernel_")
@@ -335,9 +386,15 @@ def build_kernel_model(
             if name.startswith("kernel_") and model.geom_conaffinity[geom_id] == 0:
                 model.geom_conaffinity[geom_id] = 15
     for body_id in range(model.nbody):
-        if (model.body(body_id).name or "").startswith("kernel_") and model.body(body_id).name not in {
-            "kernel_target", "kernel_support", "kernel_reach_distractor"
-        }:
+        if (
+            (model.body(body_id).name or "").startswith("kernel_")
+            and model.body(body_id).name not in {
+                "kernel_target", "kernel_support", "kernel_reach_distractor"
+            }
+            and not (model.body(body_id).name or "").startswith(
+                "kernel_clutter_"
+            )
+        ):
             model.body_gravcomp[body_id] = 0.85
 
     def sensor_slice(name: str, width: int) -> slice:
@@ -370,6 +427,7 @@ def build_kernel_model(
         and model.body(body_id).name not in {
             "kernel_target", "kernel_support", "kernel_reach_distractor"
         }
+        and not (model.body(body_id).name or "").startswith("kernel_clutter_")
     )
     collision_rows = [
         [model.geom(i).name, int(model.geom_contype[i]), int(model.geom_conaffinity[i])]
@@ -388,6 +446,8 @@ def build_kernel_model(
         target_geom_id=target_geom_id,
         target_geom_ids=target_geom_ids,
         reach_distractor_geom_id=model.geom("kernel_reach_distractor_geom").id,
+        clutter_geom_ids=clutter_geom_ids,
+        clutter_visual_geom_ids=clutter_visual_geom_ids,
         target_body_id=model.body("kernel_target").id,
         target_qpos_adr=int(model.jnt_qposadr[target_joint]),
         target_dof_adr=int(model.jnt_dofadr[target_joint]),

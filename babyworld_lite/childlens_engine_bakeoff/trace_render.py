@@ -20,11 +20,13 @@ def _scene_option(
 ) -> mujoco.MjvOption:
     option = mujoco.MjvOption()
     # Group 3 is the static physical authority for the right arm/hand. Group 2
-    # is the co-articulated native appearance copy. MolmoSpaces uses group 4
-    # for its scene collision meshes, which must remain hidden in RGB.
+    # is the co-articulated native appearance copy. MolmoSpaces and the frozen
+    # authored clutter use group 4 for collision meshes. Both physical layers
+    # remain hidden in authoritative RGB and are exposed only in the external
+    # diagnostic view.
     option.geomgroup[2] = int(appearance)
     option.geomgroup[3] = int(collision_diagnostic)
-    option.geomgroup[4] = 0
+    option.geomgroup[4] = int(collision_diagnostic)
     return option
 
 
@@ -104,15 +106,16 @@ def render_trace(
     collision_ids = {
         geom_id
         for geom_id in range(model.ngeom)
-        if int(model.geom_group[geom_id]) == 3
-        and (model.geom(geom_id).name or "").startswith("kernel_")
+        if int(model.geom_group[geom_id]) in {3, 4}
     }
     appearance_ids = {
         geom_id
         for geom_id in range(model.ngeom)
         if (model.geom(geom_id).name or "").startswith("kernel_visual:")
     }
+    clutter_visual_ids = set(kernel.clutter_visual_geom_ids)
     target_area = np.zeros(frame_count, dtype=np.float64)
+    clutter_area = np.zeros(frame_count, dtype=np.float64)
     collision_proxy_pixels = 0
     skin_artifact_pixels = 0
     maximum_replay_translation_error = 0.0
@@ -209,7 +212,9 @@ def render_trace(
                 target_mask = _mask(segmentation, target_ids)
                 appearance_mask = _mask(segmentation, appearance_ids)
                 collision_mask = _mask(segmentation, collision_ids)
+                clutter_mask = _mask(segmentation, clutter_visual_ids)
                 target_area[frame_index] = float(target_mask.mean())
+                clutter_area[frame_index] = float(clutter_mask.mean())
                 collision_proxy_pixels += int(collision_mask.sum())
                 magenta = (
                     (rgb[..., 0] >= 180)
@@ -260,6 +265,7 @@ def render_trace(
                     imageio.imwrite(path, rgb)
                     inspection_paths.append(path)
             h5.create_dataset("target_area_fraction", data=target_area)
+            h5.create_dataset("clutter_area_fraction", data=clutter_area)
     finally:
         baseline_writer.close()
         external_writer.close()
@@ -300,6 +306,9 @@ def render_trace(
         "minimum_target_area_fraction": float(target_area.min()),
         "maximum_target_area_fraction": float(target_area.max()),
         "visible_frame_fraction": float(np.mean(target_area > 0)),
+        "authored_clutter_visual_count": len(clutter_visual_ids),
+        "clutter_visible_frame_fraction": float(np.mean(clutter_area > 0)),
+        "maximum_clutter_area_fraction": float(clutter_area.max()),
         "collision_proxy_pixels": collision_proxy_pixels,
         "skin_artifact_pixels": skin_artifact_pixels,
         "maximum_replay_camera_translation_error_m": maximum_replay_translation_error,

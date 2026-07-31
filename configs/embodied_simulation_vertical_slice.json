@@ -69,6 +69,38 @@
       "target_offset_from_root_m": [0.34, -0.15, 0.10],
       "support_offset_from_root_m": [0.34, -0.15, 0.025],
       "selection_rule": "maximum-clearance collision-free candidate among the bounded furnished-scene staging candidates"
+    },
+    "clutter_layout": {
+      "frozen_before_phase_2_outcomes_at_utc": "2026-07-31T20:23:00Z",
+      "coordinate_frame": "root-relative metres",
+      "selection_rule": "each variant uses the ordered prefix distractor_count - 1 in addition to the fixed reach distractor",
+      "physical_group": 4,
+      "visual_group": 0,
+      "placements": [
+        {"id": "clutter_01", "offset_xyz_m": [-0.35, -0.45, 0.05], "half_size_xyz_m": [0.035, 0.035, 0.05], "rgba": [0.62, 0.18, 0.10, 1.0]},
+        {"id": "clutter_02", "offset_xyz_m": [-0.40, 0.45, 0.04], "half_size_xyz_m": [0.045, 0.030, 0.04], "rgba": [0.12, 0.44, 0.72, 1.0]},
+        {"id": "clutter_03", "offset_xyz_m": [0.05, -0.58, 0.035], "half_size_xyz_m": [0.030, 0.050, 0.035], "rgba": [0.78, 0.36, 0.08, 1.0]},
+        {"id": "clutter_04", "offset_xyz_m": [0.60, 0.40, 0.045], "half_size_xyz_m": [0.040, 0.040, 0.045], "rgba": [0.20, 0.55, 0.22, 1.0]},
+        {"id": "clutter_05", "offset_xyz_m": [0.75, -0.45, 0.05], "half_size_xyz_m": [0.055, 0.030, 0.05], "rgba": [0.62, 0.20, 0.62, 1.0]},
+        {"id": "clutter_06", "offset_xyz_m": [-0.55, -0.10, 0.04], "half_size_xyz_m": [0.035, 0.055, 0.04], "rgba": [0.10, 0.62, 0.62, 1.0]},
+        {"id": "clutter_07", "offset_xyz_m": [0.05, 0.62, 0.06], "half_size_xyz_m": [0.030, 0.030, 0.06], "rgba": [0.75, 0.58, 0.08, 1.0]},
+        {"id": "clutter_08", "offset_xyz_m": [0.85, 0.15, 0.035], "half_size_xyz_m": [0.060, 0.025, 0.035], "rgba": [0.50, 0.30, 0.12, 1.0]},
+        {"id": "clutter_09", "offset_xyz_m": [-0.62, 0.35, 0.05], "half_size_xyz_m": [0.030, 0.045, 0.05], "rgba": [0.20, 0.32, 0.68, 1.0]},
+        {"id": "clutter_10", "offset_xyz_m": [0.55, 0.62, 0.04], "half_size_xyz_m": [0.050, 0.025, 0.04], "rgba": [0.68, 0.24, 0.16, 1.0]},
+        {"id": "clutter_11", "offset_xyz_m": [0.90, -0.65, 0.055], "half_size_xyz_m": [0.035, 0.035, 0.055], "rgba": [0.30, 0.62, 0.18, 1.0]},
+        {"id": "clutter_12", "offset_xyz_m": [0.20, 0.28, 0.04], "half_size_xyz_m": [0.035, 0.035, 0.04], "rgba": [0.74, 0.18, 0.16, 1.0]},
+        {"id": "clutter_13", "offset_xyz_m": [0.27, 0.18, 0.045], "half_size_xyz_m": [0.040, 0.025, 0.045], "rgba": [0.12, 0.48, 0.74, 1.0]},
+        {"id": "clutter_14", "offset_xyz_m": [0.28, -0.30, 0.05], "half_size_xyz_m": [0.030, 0.050, 0.05], "rgba": [0.76, 0.44, 0.10, 1.0]},
+        {"id": "clutter_15", "offset_xyz_m": [0.38, 0.02, 0.035], "half_size_xyz_m": [0.045, 0.030, 0.035], "rgba": [0.18, 0.64, 0.34, 1.0]},
+        {"id": "clutter_16", "offset_xyz_m": [0.45, -0.02, 0.055], "half_size_xyz_m": [0.025, 0.040, 0.055], "rgba": [0.62, 0.18, 0.56, 1.0]},
+        {"id": "clutter_17", "offset_xyz_m": [0.50, 0.18, 0.04], "half_size_xyz_m": [0.050, 0.025, 0.04], "rgba": [0.08, 0.58, 0.64, 1.0]},
+        {"id": "clutter_18", "offset_xyz_m": [0.60, -0.15, 0.05], "half_size_xyz_m": [0.035, 0.035, 0.05], "rgba": [0.72, 0.55, 0.08, 1.0]},
+        {"id": "clutter_19", "offset_xyz_m": [0.18, -0.32, 0.045], "half_size_xyz_m": [0.045, 0.025, 0.045], "rgba": [0.38, 0.22, 0.66, 1.0]},
+        {"id": "clutter_20", "offset_xyz_m": [-0.10, 0.25, 0.04], "half_size_xyz_m": [0.030, 0.055, 0.04], "rgba": [0.70, 0.26, 0.12, 1.0]},
+        {"id": "clutter_21", "offset_xyz_m": [0.35, 0.35, 0.05], "half_size_xyz_m": [0.040, 0.040, 0.05], "rgba": [0.16, 0.52, 0.24, 1.0]},
+        {"id": "clutter_22", "offset_xyz_m": [0.70, 0.00, 0.035], "half_size_xyz_m": [0.055, 0.025, 0.035], "rgba": [0.16, 0.38, 0.72, 1.0]},
+        {"id": "clutter_23", "offset_xyz_m": [0.15, -0.45, 0.06], "half_size_xyz_m": [0.025, 0.035, 0.06], "rgba": [0.72, 0.34, 0.14, 1.0]}
+      ]
     }
   },
   "embodiment": {

@@ -4,6 +4,8 @@ from pathlib import Path
 import numpy as np
 
 from babyworld_lite.childlens_engine_bakeoff.determinism import compare
+from babyworld_lite.childlens_engine_bakeoff.physics_kernel import _clutter_xml
+from babyworld_lite.childlens_engine_bakeoff.run_kernel_episode import _scene_variant
 
 
 def test_engine_bakeoff_protocol_is_frozen_and_childlens_only():
@@ -66,3 +68,31 @@ def test_mpfb_replay_is_trace_driven_and_depth_occluded():
     assert "_pose_mimo_chains" in overlay
     assert "foreground_depth" in composite
     assert "+ 0.001" in composite
+
+
+def test_scene_variants_use_frozen_ordered_clutter_prefixes():
+    contract = json.loads(
+        Path("configs/embodied_simulation_vertical_slice.json").read_text()
+    )
+    expected = {"sparse": 3, "household": 12, "messy": 24}
+    for variant, count in expected.items():
+        resolved, placements, resolved_count = _scene_variant(contract, variant)
+        assert resolved == variant
+        assert resolved_count == count
+        assert len(placements) == count - 1
+        assert [item["id"] for item in placements] == [
+            f"clutter_{index:02d}" for index in range(1, count)
+        ]
+
+
+def test_authored_clutter_has_separate_hidden_physics_and_visible_layers():
+    contract = json.loads(
+        Path("configs/embodied_simulation_vertical_slice.json").read_text()
+    )
+    _, placements, _ = _scene_variant(contract, "household")
+    xml = _clutter_xml((0.0, 0.0), placements)
+    assert xml.count('name="clutter_physical_') == 11
+    assert xml.count('name="clutter_visual_') == 11
+    assert xml.count('group="4"') == 11
+    assert xml.count('group="0"') == 11
+    assert xml.count('contype="0" conaffinity="0"') == 11

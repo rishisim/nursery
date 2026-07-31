@@ -42,6 +42,73 @@
       "authoritative_appearance": "native MIMo co-articulated appearance group 2",
       "mpfb_role": "diagnostic_only_not_phase_1_gate",
       "mpfb_diagnostic_status": "appearance_qualification_failed"
+    },
+    "2": {
+      "gate": "PASS",
+      "run": "runs/embodied_simulation/phase_2/stress",
+      "required_variants_passed": ["sparse", "household"],
+      "diagnostic_variants": ["messy"],
+      "event_semantics_changed": false,
+      "shared": {
+        "duration_s": 19.5,
+        "truth_samples": 1171,
+        "physics_steps": 4680,
+        "render_frames": 586,
+        "render_fps": 30,
+        "camera_mount_max_translation_error_m": 4.440892098500626e-16,
+        "camera_mount_max_rotation_error_rad": 4.88785852497018e-16,
+        "near_miss_clearance_m": 0.038567536151354685,
+        "near_miss_contact_substeps": 0,
+        "first_contact_time_s": 7.5125,
+        "maximum_distinct_finger_contacts": 5,
+        "grasp_assist_engagement_time_s": 9.15,
+        "grasp_assist_pose_jump_m": 0.0001669892992907391,
+        "maximum_timestamp_error_s": 7.851497230149107e-13,
+        "maximum_replay_numeric_error": 0.0,
+        "object_identity_changes": 0,
+        "maximum_projected_contact_error_px": 4.443746767654479,
+        "maximum_3d_contact_surface_distance_m": 0.005989539151226785,
+        "collision_proxy_pixels": 0,
+        "skin_artifact_pixels": 0
+      },
+      "scenes": {
+        "sparse": {
+          "passed": true,
+          "distractor_count": 3,
+          "relevant_collision_geom_count": 651,
+          "collision_policy_sha256": "93a920dee29f626565e4b7f38471c1dac5c75fc87bcb9ddf287498d38be1bb16",
+          "minimum_relevant_contact_distance_m": -0.0016009251104572237,
+          "persistent_penetration_frames": 0,
+          "trace_sha256": "92fc1f5f55e06698d93497f18f4c7f29015dad1f014e3218a32797c3af724004",
+          "clutter_visible_frame_fraction": 0.2986348122866894,
+          "maximum_clutter_area_fraction": 0.010061848958333333
+        },
+        "household": {
+          "passed": true,
+          "distractor_count": 12,
+          "relevant_collision_geom_count": 660,
+          "collision_policy_sha256": "a79af59f350681d6d4ef4657bce413782f10e441234fe00ccc2c7c5476779050",
+          "minimum_relevant_contact_distance_m": -0.0016009251104572237,
+          "persistent_penetration_frames": 0,
+          "trace_sha256": "92fc1f5f55e06698d93497f18f4c7f29015dad1f014e3218a32797c3af724004",
+          "clutter_visible_frame_fraction": 1.0,
+          "maximum_clutter_area_fraction": 0.042913411458333335
+        },
+        "messy": {
+          "passed": false,
+          "status": "bounded_deterministic_diagnostic_failure",
+          "distractor_count": 24,
+          "relevant_collision_geom_count": 672,
+          "collision_policy_sha256": "731893b6d696ec9412ba931c40c22cce412627290d325ad4627b0d580298e6b7",
+          "minimum_relevant_contact_distance_m": -0.005532249052531278,
+          "minimum_relevant_contact_pair": ["kernel_target_geom", "kernel_clutter_physical_clutter_15"],
+          "minimum_relevant_contact_time_s": 17.0125,
+          "persistent_penetration_frames": 8,
+          "trace_sha256": "ee0e42e3e7b88fa710fae56b00acba52a0d2b9a5de0ab1d5ad089a91445d80b5",
+          "clutter_visible_frame_fraction": 1.0,
+          "maximum_clutter_area_fraction": 0.087333984375
+        }
+      }
     }
   }
 }

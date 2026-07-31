@@ -33,11 +33,37 @@ def _target_definition(contract: dict[str, Any]) -> dict[str, Any]:
     return {"geometry": target["geometry"], "rgba": target["rgba"]}
 
 
+def _scene_variant(
+    contract: dict[str, Any], scene_variant: str | None
+) -> tuple[str, list[dict[str, Any]], int]:
+    """Resolve one frozen scene-family member without changing event semantics."""
+    if scene_variant is None:
+        return "phase_1_base", [], 1
+    variants = {
+        item["id"]: item for item in contract["scene_family"]["variants"]
+    }
+    if scene_variant not in variants:
+        raise ValueError(
+            f"unknown scene variant {scene_variant!r}; expected one of "
+            f"{sorted(variants)}"
+        )
+    count = int(variants[scene_variant]["distractor_count"])
+    placements = contract["scene_family"]["clutter_layout"]["placements"]
+    selected = placements[: count - 1]
+    if len(selected) != count - 1:
+        raise ValueError(
+            f"scene variant {scene_variant!r} requires {count - 1} authored "
+            f"clutter placements, but only {len(selected)} are available"
+        )
+    return scene_variant, selected, count
+
+
 def _build(
     contract: dict[str, Any],
     scene_path: Path,
     mimo_assets: Path,
     component_path: Path,
+    clutter_layout: list[dict[str, Any]],
 ):
     placement = contract["scene_family"]["qualified_placement"]
     mount = contract["embodiment"]["camera_mount"]
@@ -47,6 +73,7 @@ def _build(
         component_path,
         root_xy=tuple(placement["root_xy_m"]),
         target_definition=_target_definition(contract),
+        clutter_layout=clutter_layout,
         camera_mount_position=tuple(mount["translation_head_m"]),
         camera_mount_quaternion=tuple(mount["quaternion_head_wxyz"]),
     )
@@ -269,6 +296,7 @@ def run(
     output_dir: Path,
     *,
     render: bool = True,
+    scene_variant: str | None = None,
     blender_path: Path | None = None,
     mpfb_blend_path: Path | None = None,
 ) -> dict[str, Any]:
@@ -276,17 +304,33 @@ def run(
     _assert_ignored(repo_root, output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    variant_id, clutter_layout, distractor_count = _scene_variant(
+        contract, scene_variant
+    )
     copied_contract = output_dir / "vertical_slice_contract.json"
     shutil.copyfile(contract_path, copied_contract)
 
     kernel = _build(
-        contract, scene_path, mimo_assets, output_dir / "kernel_component.xml"
+        contract,
+        scene_path,
+        mimo_assets,
+        output_dir / "kernel_component.xml",
+        clutter_layout,
     )
     truth_hz = int(contract["rates_hz"]["truth"])
     physics_hz = int(contract["rates_hz"]["physics"])
     trace, physics_qa = run_physics_trace(
         kernel, contract, truth_hz=truth_hz, physics_hz=physics_hz
     )
+    physics_qa["scene_variant"] = {
+        "id": variant_id,
+        "distractor_count": distractor_count,
+        "fixed_reach_distractor_count": 1,
+        "authored_clutter_count": len(clutter_layout),
+        "physical_clutter_geom_count": len(kernel.clutter_geom_ids),
+        "visual_clutter_geom_count": len(kernel.clutter_visual_geom_ids),
+        "event_semantics_unchanged": True,
+    }
     trace_path = output_dir / "episode_trace.npz"
     np.savez_compressed(trace_path, **trace)
     write_json(output_dir / "body_names.json", list(kernel.mimo_body_names))
@@ -297,7 +341,11 @@ def run(
     write_json(output_dir / "shared_clock_qa.json", clock_qa)
 
     replay_kernel = _build(
-        contract, scene_path, mimo_assets, output_dir / "replay_component.xml"
+        contract,
+        scene_path,
+        mimo_assets,
+        output_dir / "replay_component.xml",
+        clutter_layout,
     )
     replay_trace, _ = run_physics_trace(
         replay_kernel, contract, truth_hz=truth_hz, physics_hz=physics_hz
@@ -427,6 +475,8 @@ def run(
         str(mimo_assets),
         str(output_dir),
     ]
+    if scene_variant is not None:
+        regeneration_command.extend(["--scene-variant", variant_id])
     if blender_path is not None and mpfb_blend_path is not None:
         regeneration_command.extend(
             [
@@ -443,6 +493,8 @@ def run(
         provenance={
             **contract["provenance"],
             "scene_sha256": sha256_file(scene_path),
+            "scene_variant": variant_id,
+            "distractor_count": distractor_count,
             "mujoco_runtime": mujoco.__version__,
             "blender_executable_sha256": (
                 sha256_file(blender_path) if blender_path else None
@@ -459,6 +511,8 @@ def run(
     result = {
         "passed": qualification["passed"],
         "output_dir": str(output_dir),
+        "scene_variant": variant_id,
+        "distractor_count": distractor_count,
         "truth_samples": int(len(trace["time_s"])),
         "physics_qa": physics_qa,
         "determinism_qa": determinism_qa,
@@ -479,6 +533,7 @@ def main() -> None:
     parser.add_argument("mimo_assets", type=Path)
     parser.add_argument("output_dir", type=Path)
     parser.add_argument("--no-render", action="store_true")
+    parser.add_argument("--scene-variant", choices=("sparse", "household", "messy"))
     parser.add_argument("--blender", type=Path)
     parser.add_argument("--mpfb-blend", type=Path)
     args = parser.parse_args()
@@ -488,6 +543,7 @@ def main() -> None:
         args.mimo_assets,
         args.output_dir,
         render=not args.no_render,
+        scene_variant=args.scene_variant,
         blender_path=args.blender,
         mpfb_blend_path=args.mpfb_blend,
     )
