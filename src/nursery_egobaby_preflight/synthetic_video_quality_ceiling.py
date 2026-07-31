@@ -30,9 +30,6 @@ from .synthetic_video_pilot import (
 COMPARISON_ID = "synthetic-video-ltx-seedance-quality-ceiling"
 SCENE_IDS = ("pick_up", "transfer", "occlusion_persistence", "action_transition")
 SAFE_ID = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
-FAL_CDN_TOKEN_URL = (
-    "https://rest.fal.ai/storage/auth/token?storage_type=fal-cdn-v3"
-)
 
 
 def utc_now() -> str:
@@ -63,6 +60,11 @@ def validate_quality_config(
 
     _require(config.get("schema_version") == 1, "schema_version must be 1")
     _require(config.get("comparison_id") == COMPARISON_ID, "unexpected comparison_id")
+    _require(
+        config.get("status")
+        == "FROZEN_EXECUTION_AUTHORIZED_WITH_TRANSPORT_RECOVERY",
+        "unexpected quality-ceiling protocol status",
+    )
     authorization = config.get("authorization", {})
     _require(
         authorization.get("public_only_quality_ceiling_authorized") is True,
@@ -95,8 +97,9 @@ def validate_quality_config(
         "provider request payload storage must be disabled",
     )
     _require(
-        privacy.get("provider_output_acl") == "private_to_calling_fal_account",
-        "provider outputs must use the private ACL",
+        privacy.get("provider_output_acl")
+        == "public_unguessable_url_expiring_after_one_day",
+        "provider output transport policy changed",
     )
     _require(
         privacy.get("provider_output_expiration_seconds") == 86400,
@@ -156,10 +159,7 @@ def validate_quality_config(
         "Seedance returned-seed policy changed",
     )
     expected_lifecycle = canonical_json_bytes(
-        {
-            "expiration_duration_seconds": 86400,
-            "initial_acl": {"default": "forbid", "rules": []},
-        }
+        {"expiration_duration_seconds": 86400}
     ).decode()
     expected_headers = {
         "X-Fal-No-Retry": "1",
@@ -175,6 +175,28 @@ def validate_quality_config(
         and candidate.get("protocol_retries") == 0
         and candidate.get("attempts_per_scene") == 1,
         "comparison must retain one request per scene and no retries",
+    )
+    _require(
+        candidate.get("transport_recovery")
+        == {
+            "authorized_replacement_scene_id": "pick_up",
+            "reason": (
+                "The first unseen Seedance output was generated under a private "
+                "ACL but fal's partner endpoint denied the documented owner-token, "
+                "signed-URL, and ACL-management paths. It is excluded as an "
+                "infrastructure delivery failure, not a quality rejection."
+            ),
+            "diagnostic_run_root": (
+                "runs/synthetic_video_quality_ceiling/diagnostics/"
+                "private-acl-inaccessible-20260731"
+            ),
+            "diagnostic_result_path": (
+                "results/synthetic_video_quality_ceiling_transport_diagnostic.json"
+            ),
+            "replacement_was_quality_blind": True,
+            "additional_replacements_authorized": 0,
+        },
+        "transport-recovery record changed",
     )
 
     comparison = config.get("comparison", {})
@@ -287,6 +309,28 @@ def validate_quality_config(
     _require(
         computed == Decimal(str(provider_cost.get("maximum_generation_charge_usd"))),
         "frozen cost ceiling does not match rate, scenes, and duration",
+    )
+    diagnostic_estimate = Decimal(
+        str(provider_cost.get("known_inaccessible_generation_estimated_charge_usd"))
+    )
+    _require(
+        diagnostic_estimate == Decimal("1.517"),
+        "inaccessible generation cost estimate changed",
+    )
+    expected_total = Decimal(
+        str(provider_cost.get("maximum_expected_total_after_transport_recovery_usd"))
+    )
+    _require(
+        expected_total == Decimal("7.585")
+        and expected_total == computed + diagnostic_estimate,
+        "transport-recovery total estimate changed",
+    )
+    user_ceiling = Decimal(
+        str(provider_cost.get("user_authorized_total_ceiling_usd"))
+    )
+    _require(
+        user_ceiling == Decimal("10.0") and expected_total <= user_ceiling,
+        "user-authorized total ceiling changed",
     )
     _require(
         provider_cost.get("paid_launch_requires_explicit_spend_confirmation") is True,
@@ -637,7 +681,7 @@ def verify_ltx_baseline(
 
 
 class FalQueueClient:
-    """Minimal secret-safe client for fal's persistent queue and private CDN."""
+    """Minimal secret-safe client for fal's queue and expiring public CDN."""
 
     def __init__(
         self,
@@ -653,7 +697,6 @@ class FalQueueClient:
         self._platform_headers = dict(platform_headers)
         self._timeout_seconds = timeout_seconds
         self._opener = opener
-        self._cdn_token: str | None = None
 
     @staticmethod
     def _require_https_host(
@@ -723,25 +766,12 @@ class FalQueueClient:
         self._require_https_host(response_url, exact_host="queue.fal.run")
         return self._json_request("GET", response_url)
 
-    def _get_cdn_token(self) -> str:
-        if self._cdn_token is None:
-            response = self._json_request("POST", FAL_CDN_TOKEN_URL, body={})
-            token = response.get("token")
-            if not isinstance(token, str) or not token:
-                raise RuntimeError("fal CDN token response is missing token")
-            self._cdn_token = token
-        return self._cdn_token
-
-    def download_private_file(self, url: str, output_path: str | Path) -> None:
+    def download_public_file(self, url: str, output_path: str | Path) -> None:
         self._require_https_host(url, host_suffix="fal.media")
         destination = Path(output_path).resolve()
         destination.parent.mkdir(parents=True, exist_ok=True)
         partial = destination.with_suffix(destination.suffix + ".partial")
-        request = urllib.request.Request(
-            url,
-            headers={"Authorization": f"Bearer {self._get_cdn_token()}"},
-            method="GET",
-        )
+        request = urllib.request.Request(url, method="GET")
         try:
             with self._opener(request, timeout=self._timeout_seconds) as response:
                 with partial.open("wb") as handle:
@@ -940,7 +970,7 @@ def _run_one_attempt(
         video_url = response.get("video", {}).get("url")
         if not isinstance(video_url, str) or not video_url:
             raise RuntimeError("fal result is missing video.url")
-        client.download_private_file(video_url, paths["raw_video"])
+        client.download_public_file(video_url, paths["raw_video"])
         audio_hashes = normalize_seedance_with_ltx_audio(
             public_pilot,
             raw_video=paths["raw_video"],
@@ -1038,6 +1068,7 @@ def execute_comparison(
         Decimal(str(work_order["planned_cost_usd"])) == ceiling,
         "work-order cost differs from frozen ceiling",
     )
+    verify_transport_recovery_diagnostic(quality_config, repository_root)
     root = Path(run_root).resolve()
     baseline_by_scene = verify_ltx_baseline(
         quality_config,
@@ -1423,6 +1454,96 @@ def _verify_candidate_execution(
     }
 
 
+def verify_transport_recovery_diagnostic(
+    quality_config: Mapping[str, Any],
+    repository_root: str | Path,
+) -> dict[str, Any]:
+    recovery = quality_config["candidate"]["transport_recovery"]
+    repository = Path(repository_root).resolve()
+    path = (repository / recovery["diagnostic_result_path"]).resolve()
+    _require(
+        path.is_relative_to(repository),
+        "transport diagnostic path escapes the repository",
+    )
+    _require(path.is_file(), "transport diagnostic result is missing")
+    record = json.loads(path.read_text())
+    _require(
+        record.get("schema_version") == 1
+        and record.get("comparison_id") == COMPARISON_ID,
+        "transport diagnostic identity changed",
+    )
+    _require(
+        record.get("status") == "EXCLUDED_UNVIEWED_TRANSPORT_FAILURE",
+        "transport diagnostic status changed",
+    )
+    _require(
+        record.get("scene_id") == recovery["authorized_replacement_scene_id"],
+        "transport diagnostic scene changed",
+    )
+    _require(
+        record.get("endpoint") == quality_config["candidate"]["endpoint"],
+        "transport diagnostic endpoint changed",
+    )
+    _require(
+        record.get("provider_terminal_status") == "COMPLETED"
+        and record.get("provider_generation_completed") is True,
+        "transport diagnostic was not a completed provider generation",
+    )
+    _require(
+        record.get("media_downloaded") is False
+        and record.get("media_viewed") is False
+        and record.get("quality_screened") is False,
+        "transport replacement is not demonstrably quality-blind",
+    )
+    _require(
+        record.get("replacement_basis")
+        == "QUALITY_BLIND_INFRASTRUCTURE_RECOVERY",
+        "transport replacement basis changed",
+    )
+    provenance = record.get("provider_provenance", {})
+    _require(
+        bool(
+            re.fullmatch(
+                r"[0-9a-f]{64}",
+                str(provenance.get("request_id_utf8_sha256")),
+            )
+        )
+        and bool(
+            re.fullmatch(
+                r"[0-9a-f]{64}",
+                str(provenance.get("output_url_utf8_sha256")),
+            )
+        ),
+        "transport diagnostic identifier hashes are invalid",
+    )
+    estimated_charge = Decimal(str(record.get("cost", {}).get("estimated_charge_usd")))
+    _require(
+        estimated_charge
+        == Decimal(
+            str(
+                quality_config["provider_cost"][
+                    "known_inaccessible_generation_estimated_charge_usd"
+                ]
+            )
+        ),
+        "transport diagnostic cost changed",
+    )
+    return {
+        "status": record["status"],
+        "scene_id": record["scene_id"],
+        "provider_generation_completed": True,
+        "usable_media": False,
+        "media_viewed": False,
+        "quality_screened": False,
+        "estimated_charge_usd": float(estimated_charge),
+        "actual_provider_invoice_usd": record["cost"][
+            "actual_provider_invoice_usd"
+        ],
+        "record_path": recovery["diagnostic_result_path"],
+        "record_sha256": file_sha256(str(path)),
+    }
+
+
 def _family_review_metrics(
     clips: list[dict[str, Any]],
     quality_config: Mapping[str, Any],
@@ -1470,6 +1591,7 @@ def _family_review_metrics(
 def _recommendation_markdown(summary: Mapping[str, Any]) -> str:
     family = summary["qualitative"]["families"]
     scenes = summary["qualitative"]["scene_comparisons"]
+    seedance_technical = summary["technical"]["seedance"]
     lines = [
         "# LTX-2.3 versus Seedance 2.0 public quality-ceiling result",
         "",
@@ -1486,13 +1608,26 @@ def _recommendation_markdown(summary: Mapping[str, Any]) -> str:
         "| LTX-2.3 | 4 | 4 | 0 |",
         (
             "| Seedance 2.0 | 4 | "
-            f"{summary['technical']['seedance']['media_valid_count']} | "
-            f"{summary['technical']['seedance']['generated_attempt_failure_count']} |"
+            f"{seedance_technical['media_valid_count']} | "
+            f"{seedance_technical['generated_attempt_failure_count']} |"
         ),
         "",
         (
-            "Estimated Seedance successful-output charge: "
-            f"${summary['cost']['estimated_successful_output_charge_usd']:.3f}. "
+            "Across the comparison and its quality-blind transport diagnostic, "
+            f"fal completed {seedance_technical['overall_provider_completed_generation_count']} "
+            f"of {seedance_technical['overall_provider_generation_count']} provider "
+            "generations. Four media files were usable; the inaccessible, unseen "
+            "diagnostic is one end-to-end artifact failure "
+            f"({seedance_technical['overall_end_to_end_artifact_failure_rate']:.1%})."
+        ),
+        "",
+        (
+            "Estimated Seedance charge: "
+            f"${summary['cost']['estimated_canonical_comparison_charge_usd']:.3f} "
+            "for the four comparison clips plus "
+            f"${summary['cost']['estimated_inaccessible_diagnostic_charge_usd']:.3f} "
+            "for the inaccessible diagnostic, "
+            f"${summary['cost']['estimated_total_charge_usd']:.3f} total. "
             "The actual provider invoice was not available to the runner."
         ),
         "",
@@ -1626,6 +1761,46 @@ def finalize_blinded_review(
         work_order,
         root,
         ffprobe_executable=ffprobe_executable,
+    )
+    transport_diagnostic = verify_transport_recovery_diagnostic(
+        quality_config,
+        repository_root,
+    )
+    candidate = dict(candidate)
+    overall_provider_generation_count = candidate["provider_submission_count"] + 1
+    overall_completed_generation_count = (
+        candidate["media_valid_count"]
+        + int(transport_diagnostic["provider_generation_completed"])
+    )
+    overall_model_generation_failure_count = (
+        overall_provider_generation_count - overall_completed_generation_count
+    )
+    overall_usable_media_count = candidate["media_valid_count"]
+    overall_artifact_failure_count = (
+        overall_provider_generation_count - overall_usable_media_count
+    )
+    candidate.update(
+        {
+            "overall_provider_generation_count": overall_provider_generation_count,
+            "overall_provider_completed_generation_count": (
+                overall_completed_generation_count
+            ),
+            "overall_usable_media_count": overall_usable_media_count,
+            "overall_model_generation_failure_count": (
+                overall_model_generation_failure_count
+            ),
+            "overall_model_generation_failure_rate": (
+                overall_model_generation_failure_count
+                / overall_provider_generation_count
+            ),
+            "overall_end_to_end_artifact_failure_count": (
+                overall_artifact_failure_count
+            ),
+            "overall_end_to_end_artifact_failure_rate": (
+                overall_artifact_failure_count / overall_provider_generation_count
+            ),
+            "transport_recovery_diagnostic": transport_diagnostic,
+        }
     )
     clips_by_family: dict[str, list[dict[str, Any]]] = {"ltx": [], "seedance": []}
     for blind_id, qa in qa_records.items():
@@ -1776,6 +1951,18 @@ def finalize_blinded_review(
         },
         "cost": {
             "currency": "USD",
+            "estimated_canonical_comparison_charge_usd": candidate[
+                "estimated_successful_output_charge_usd"
+            ],
+            "estimated_inaccessible_diagnostic_charge_usd": (
+                transport_diagnostic["estimated_charge_usd"]
+            ),
+            "estimated_total_charge_usd": float(
+                Decimal(
+                    str(candidate["estimated_successful_output_charge_usd"])
+                )
+                + Decimal(str(transport_diagnostic["estimated_charge_usd"]))
+            ),
             "estimated_successful_output_charge_usd": candidate[
                 "estimated_successful_output_charge_usd"
             ],
@@ -1800,6 +1987,9 @@ def finalize_blinded_review(
             "blinding_key_sha256": work_order["blinding_key_sha256"],
             "qa_bundle_sha256": freeze["qa_bundle_sha256"],
             "nursery_adapter_commit": next(iter(adapter_commits)),
+            "transport_diagnostic_record_sha256": transport_diagnostic[
+                "record_sha256"
+            ],
         },
     }
     summary_path = root / "review" / "review_summary.json"

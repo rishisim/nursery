@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "record_id": "seedance-private-acl-transport-diagnostic-20260731",
+  "comparison_id": "synthetic-video-ltx-seedance-quality-ceiling",
+  "status": "EXCLUDED_UNVIEWED_TRANSPORT_FAILURE",
+  "scene_id": "pick_up",
+  "provider": "fal",
+  "endpoint": "bytedance/seedance-2.0/text-to-video",
+  "provider_terminal_status": "COMPLETED",
+  "provider_generation_completed": true,
+  "provider_submission_created": true,
+  "media_downloaded": false,
+  "media_viewed": false,
+  "quality_screened": false,
+  "replacement_basis": "QUALITY_BLIND_INFRASTRUCTURE_RECOVERY",
+  "exclusion_reason": "The provider generated an output, but the partner endpoint denied the documented private-file owner-token, signed-URL, and ACL-management paths. The output was never downloaded or viewed, so replacement was independent of quality.",
+  "original_protocol": {
+    "quality_protocol_sha256": "be0027998db140e28a6270ea2f1ae117fdc7e6728003938ea6c231d57da281e7",
+    "public_pilot_protocol_sha256": "956a76f07b1aa41eaf713bee4d157d8b38b0fe3a04de575587598da615a0a316",
+    "work_order_sha256": "5db9db4c04ef16ae614234326bf4e6a6321512b9b2fae6a94cbdbc95b0855b7e",
+    "nursery_adapter_commit": "a731f6267c71b4b1249f68fb5bae05cea57f532b"
+  },
+  "provider_provenance": {
+    "request_id_utf8_sha256": "88b72a7062cad5216bb3b56f03e607aef382efdad5a68ae97af391573c43f6c8",
+    "output_url_utf8_sha256": "0e8b2f806565d173ae9f56148b167f7726b0bf686e8d90df402888506eea092e",
+    "returned_seed": 20879353,
+    "reported_content_type": "video/mp4",
+    "reported_file_size_bytes": 8260486,
+    "provider_inference_seconds": 163.5739769935608
+  },
+  "failure": {
+    "failed_at": "2026-07-31T03:34:36Z",
+    "error_type": "HTTPError",
+    "http_status": 403,
+    "documented_access_paths_attempted": [
+      "owner-token Bearer download",
+      "owner-token signed-URL request",
+      "FAL_KEY ACL inspection"
+    ],
+    "all_access_paths_http_status": 403
+  },
+  "cost": {
+    "currency": "USD",
+    "frozen_rate_usd_per_generated_second": 0.3034,
+    "generated_seconds": 5,
+    "estimated_charge_usd": 1.517,
+    "actual_provider_invoice_usd": null
+  },
+  "privacy": {
+    "input_class": "PUBLIC_ONLY_SELF_AUTHORED_PROMPT",
+    "restricted_inputs_sent": false,
+    "raw_request_id_retained_in_tracked_record": false,
+    "raw_provider_url_retained_in_tracked_record": false
+  },
+  "ignored_diagnostic_run_root": "runs/synthetic_video_quality_ceiling/diagnostics/private-acl-inaccessible-20260731",
+  "ignored_artifact_sha256": {
+    "submission_json": "22a6937b8a587ddbbb6c1d9b596420b088d88cd554b8e5ac3253dce3468c4d59",
+    "provider_status_json": "63d366b683448b57535f95133239cb35619d4544324bf5ebcc4f2f96a720203e",
+    "provider_response_json": "d752145f9059666f37b2d68ce4a930e54aeecc08395bd08708e169e0ae12f28e",
+    "failure_json": "3e8093816801591b62507bf06a07deb811789c626697805b765948ed786cf77a"
+  }
+}

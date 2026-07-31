@@ -23,6 +23,7 @@ from nursery_egobaby_preflight.synthetic_video_quality_ceiling import (
     load_default_configs,
     planned_cost_usd,
     render_blinded_gallery,
+    verify_transport_recovery_diagnostic,
     verify_ltx_baseline,
     write_comparison_work_order,
 )
@@ -78,6 +79,7 @@ def _clean_execution_commit() -> str:
 
 def command_validate(args: argparse.Namespace) -> None:
     quality, public = _configs(args)
+    diagnostic = verify_transport_recovery_diagnostic(quality, REPOSITORY_ROOT)
     _json(
         {
             "status": "PASS",
@@ -86,6 +88,17 @@ def command_validate(args: argparse.Namespace) -> None:
             "public_pilot_protocol_sha256": canonical_json_sha256(public),
             "candidate_endpoint": quality["candidate"]["endpoint"],
             "planned_generation_charge_usd": float(planned_cost_usd(quality)),
+            "known_inaccessible_generation_estimated_charge_usd": quality[
+                "provider_cost"
+            ]["known_inaccessible_generation_estimated_charge_usd"],
+            "maximum_expected_total_after_transport_recovery_usd": quality[
+                "provider_cost"
+            ]["maximum_expected_total_after_transport_recovery_usd"],
+            "user_authorized_total_ceiling_usd": quality["provider_cost"][
+                "user_authorized_total_ceiling_usd"
+            ],
+            "transport_diagnostic_status": diagnostic["status"],
+            "transport_diagnostic_record_sha256": diagnostic["record_sha256"],
             "scientific_training_use_authorized": quality["authorization"][
                 "scientific_training_use_authorized"
             ],
@@ -116,9 +129,14 @@ def command_plan(args: argparse.Namespace) -> None:
     order = compile_comparison_work_order(quality, public, args.run_id)
     baseline = verify_ltx_baseline(quality, public, REPOSITORY_ROOT)
     credential_name = quality["candidate"]["credential_environment_variable"]
+    credential_present = bool(os.environ.get(credential_name))
     _json(
         {
-            "status": "READY_REQUIRES_CREDENTIAL_AND_EXPLICIT_SPEND_CONFIRMATION",
+            "status": (
+                "READY_FOR_AUTHORIZED_PAID_EXECUTION"
+                if credential_present
+                else "READY_REQUIRES_CREDENTIAL"
+            ),
             "run_id": args.run_id,
             "candidate_endpoint": quality["candidate"]["endpoint"],
             "candidate_attempt_ids": [
@@ -131,10 +149,23 @@ def command_plan(args: argparse.Namespace) -> None:
                 for scene_id in quality["comparison"]["scene_ids"]
             ],
             "credential_environment_variable": credential_name,
-            "credential_present": bool(os.environ.get(credential_name)),
+            "credential_present": credential_present,
             "maximum_generation_charge_usd": float(planned_cost_usd(quality)),
+            "known_inaccessible_generation_estimated_charge_usd": quality[
+                "provider_cost"
+            ]["known_inaccessible_generation_estimated_charge_usd"],
+            "maximum_expected_total_after_transport_recovery_usd": quality[
+                "provider_cost"
+            ]["maximum_expected_total_after_transport_recovery_usd"],
+            "user_authorized_total_ceiling_usd": quality["provider_cost"][
+                "user_authorized_total_ceiling_usd"
+            ],
             "scientific_training_use_authorized": False,
-            "next_gate": "provide FAL_KEY securely and explicitly approve the frozen API charge",
+            "next_gate": (
+                "run with the exact approved $6.068 comparison ceiling"
+                if credential_present
+                else "provide FAL_KEY securely"
+            ),
         }
     )
 

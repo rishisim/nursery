@@ -38,6 +38,9 @@ from nursery_egobaby_preflight.synthetic_video_quality_ceiling import (
 
 QUALITY_CONFIG_PATH = Path("configs/synthetic_video_quality_ceiling.json")
 PUBLIC_CONFIG_PATH = Path("configs/synthetic_video_public_pilot.json")
+TRANSPORT_DIAGNOSTIC_PATH = Path(
+    "results/synthetic_video_quality_ceiling_transport_diagnostic.json"
+)
 
 
 @pytest.fixture
@@ -66,6 +69,21 @@ def test_quality_ceiling_contract_is_public_only_and_cost_bounded(
     )
     assert quality_config["candidate"]["platform_headers"]["X-Fal-No-Retry"] == "1"
     assert quality_config["candidate"]["platform_headers"]["X-Fal-Store-IO"] == "0"
+    assert json.loads(
+        quality_config["candidate"]["platform_headers"][
+            "X-Fal-Object-Lifecycle-Preference"
+        ]
+    ) == {"expiration_duration_seconds": 86400}
+    assert quality_config["privacy_boundary"]["provider_output_acl"] == (
+        "public_unguessable_url_expiring_after_one_day"
+    )
+    assert quality_config["provider_cost"][
+        "known_inaccessible_generation_estimated_charge_usd"
+    ] == 1.517
+    assert quality_config["provider_cost"][
+        "maximum_expected_total_after_transport_recovery_usd"
+    ] == 7.585
+    assert quality_config["provider_cost"]["user_authorized_total_ceiling_usd"] == 10
     assert quality_config["authorization"]["scientific_training_use_authorized"] is False
     assert quality_config["governance"]["seedance_output_as_training_data"].startswith(
         "BLOCKED"
@@ -287,6 +305,14 @@ def test_finalize_review_freezes_qa_before_governance_bounded_decision(
         "_verify_candidate_execution",
         lambda *_args, **_kwargs: fake_candidate,
     )
+    diagnostic_path = (
+        tmp_path
+        / quality_config["candidate"]["transport_recovery"][
+            "diagnostic_result_path"
+        ]
+    )
+    diagnostic_path.parent.mkdir(parents=True)
+    shutil.copyfile(TRANSPORT_DIAGNOSTIC_PATH, diagnostic_path)
     result = finalize_blinded_review(
         quality_config,
         public_config,
@@ -302,6 +328,18 @@ def test_finalize_review_freezes_qa_before_governance_bounded_decision(
     assert summary["qualitative"]["candidate_visual_pass_advantage"] == 28
     assert summary["qualitative"]["candidate_scene_wins"] == 4
     assert summary["technical"]["seedance"]["generated_attempt_failure_rate"] == 0
+    assert summary["technical"]["seedance"][
+        "overall_provider_generation_count"
+    ] == 5
+    assert summary["technical"]["seedance"][
+        "overall_model_generation_failure_rate"
+    ] == 0
+    assert summary["technical"]["seedance"][
+        "overall_end_to_end_artifact_failure_rate"
+    ] == pytest.approx(0.2)
+    assert summary["cost"]["estimated_canonical_comparison_charge_usd"] == 6.068
+    assert summary["cost"]["estimated_inaccessible_diagnostic_charge_usd"] == 1.517
+    assert summary["cost"]["estimated_total_charge_usd"] == 7.585
     assert Path(result["qa_freeze"]).is_file()
     assert Path(result["recommendation"]).is_file()
 
@@ -330,7 +368,6 @@ def test_fal_client_applies_privacy_headers_without_serializing_key(
             b'{"request_id":"request-1","response_url":"https://queue.fal.run/response","status_url":"https://queue.fal.run/status"}',
             b'{"status":"COMPLETED","metrics":{"inference_time":12.5}}',
             b'{"video":{"url":"https://v3b.fal.media/files/b/a/video.mp4"},"seed":314159}',
-            b'{"token":"cdn-token"}',
             b"video-bytes",
         ]
     )
@@ -351,7 +388,7 @@ def test_fal_client_applies_privacy_headers_without_serializing_key(
     status = client.status(submission["status_url"])
     result = client.result(submission["response_url"])
     destination = tmp_path / "raw.mp4"
-    client.download_private_file(result["video"]["url"], destination)
+    client.download_public_file(result["video"]["url"], destination)
 
     assert status["status"] == "COMPLETED"
     assert destination.read_bytes() == b"video-bytes"
@@ -364,7 +401,7 @@ def test_fal_client_applies_privacy_headers_without_serializing_key(
     download_headers = {
         key.lower(): value for key, value in calls[-1][0].header_items()
     }
-    assert download_headers["authorization"] == "Bearer cdn-token"
+    assert "authorization" not in download_headers
     serialized = json.dumps(
         {
             "submission": submission,
@@ -373,7 +410,6 @@ def test_fal_client_applies_privacy_headers_without_serializing_key(
         }
     )
     assert "secret-value" not in serialized
-    assert "cdn-token" not in serialized
 
 
 def test_fal_client_rejects_untrusted_credential_destination(
@@ -388,7 +424,7 @@ def test_fal_client_rejects_untrusted_credential_destination(
     with pytest.raises(ValueError, match="untrusted URL"):
         client.status("https://example.com/request/status")
     with pytest.raises(ValueError, match="untrusted URL"):
-        client.download_private_file(
+        client.download_public_file(
             "https://example.com/video.mp4",
             tmp_path / "unused.mp4",
         )

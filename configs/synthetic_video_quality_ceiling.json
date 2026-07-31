@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "comparison_id": "synthetic-video-ltx-seedance-quality-ceiling",
-  "status": "FROZEN_READY_FOR_CREDENTIAL_AND_SPEND_GATE",
+  "status": "FROZEN_EXECUTION_AUTHORIZED_WITH_TRANSPORT_RECOVERY",
   "frozen_on": "2026-07-31",
   "authorization": {
     "public_only_quality_ceiling_authorized": true,
@@ -31,7 +31,7 @@
       "restricted or private paths, credentials, or personal identifiers in API payloads or persisted records"
     ],
     "provider_request_payload_storage": false,
-    "provider_output_acl": "private_to_calling_fal_account",
+    "provider_output_acl": "public_unguessable_url_expiring_after_one_day",
     "provider_output_expiration_seconds": 86400
   },
   "baseline": {
@@ -71,11 +71,19 @@
     "platform_headers": {
       "X-Fal-No-Retry": "1",
       "X-Fal-Store-IO": "0",
-      "X-Fal-Object-Lifecycle-Preference": "{\"expiration_duration_seconds\":86400,\"initial_acl\":{\"default\":\"forbid\",\"rules\":[]}}"
+      "X-Fal-Object-Lifecycle-Preference": "{\"expiration_duration_seconds\":86400}"
     },
     "provider_retries": 0,
     "protocol_retries": 0,
-    "attempts_per_scene": 1
+    "attempts_per_scene": 1,
+    "transport_recovery": {
+      "authorized_replacement_scene_id": "pick_up",
+      "reason": "The first unseen Seedance output was generated under a private ACL but fal's partner endpoint denied the documented owner-token, signed-URL, and ACL-management paths. It is excluded as an infrastructure delivery failure, not a quality rejection.",
+      "diagnostic_run_root": "runs/synthetic_video_quality_ceiling/diagnostics/private-acl-inaccessible-20260731",
+      "diagnostic_result_path": "results/synthetic_video_quality_ceiling_transport_diagnostic.json",
+      "replacement_was_quality_blind": true,
+      "additional_replacements_authorized": 0
+    }
   },
   "comparison": {
     "scene_ids": [
@@ -152,8 +160,11 @@
     "planned_seconds_per_scene": 5,
     "planned_generated_seconds": 20,
     "maximum_generation_charge_usd": 6.068,
+    "known_inaccessible_generation_estimated_charge_usd": 1.517,
+    "maximum_expected_total_after_transport_recovery_usd": 7.585,
+    "user_authorized_total_ceiling_usd": 10.0,
     "paid_launch_requires_explicit_spend_confirmation": true,
-    "failed_or_moderated_request_billing": "provider-dependent; no replacement attempt is authorized"
+    "failed_or_moderated_request_billing": "provider-dependent; no replacement beyond the one quality-blind transport recovery is authorized"
   },
   "governance": {
     "qualitative_public_only_comparison": "AUTHORIZED",
@@ -172,6 +183,7 @@
     "fal_async_queue": "https://fal.ai/docs/documentation/model-apis/inference/queue",
     "fal_data_retention": "https://fal.ai/docs/documentation/model-apis/media-expiration",
     "fal_file_acl": "https://fal.ai/docs/documentation/model-apis/file-access-controls",
+    "fal_partner_private_acl_observation": "The documented private-file owner-token flow returned HTTP 403 for the unseen first Seedance partner output; the canonical public-only workflow therefore uses immediate download from an expiring unguessable URL.",
     "fal_terms": "https://fal.ai/legal/terms-of-service",
     "byteplus_specific_terms": "https://docs.byteplus.com/en/docs/ModelArk/Specific_Terms_for_the_BytePlus_Video_Generation_Model_Services"
   }
