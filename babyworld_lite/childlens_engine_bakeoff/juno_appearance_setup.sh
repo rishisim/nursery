@@ -86,7 +86,7 @@ env LD_LIBRARY_PATH= "${uv_bin}" pip install \
 env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     --python "${oscar_env}/bin/python" \
     'transformer-engine==2.12.0+cu128.torch210' \
-    --index-url https://nvidia-cosmos.github.io/cosmos-dependencies/v1.5.0
+    --find-links https://nvidia-cosmos.github.io/cosmos-dependencies/v1.5.0/transformer-engine
 
 "${cosmos_env}/bin/python" - "${work_root}" <<'PY'
 import sys
