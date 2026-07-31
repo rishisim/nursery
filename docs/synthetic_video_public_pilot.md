@@ -1,7 +1,7 @@
 # Public-only synthetic-video qualitative pilot
 
-**Status:** frozen, locally validated, and cloud CPU preflight **PASS**; paid
-GPU launch requires an explicit USD ceiling confirmation
+**Status:** frozen preview **COMPLETE**; all eight media outputs are valid, with
+qualitative failures retained and formal human QA pending
 
 **Canonical protocol:** `configs/synthetic_video_public_pilot.json`
 
@@ -93,21 +93,27 @@ Execution is staged:
 4. the two family roots are downloaded under one ignored run root and compiled
    into the local side-by-side gallery.
 
-The CPU-only cloud preflight passed at Nursery commit
-`8e572a3df54f13363980665024549716dd389802`. Hugging Face Job
-`6a6bf5e123ed89c748ec8c38` checked out that exact commit, matched protocol hash
-`956a76f…0a316`, compiled zero inference attempts, created the private output
-dataset, and persisted all three control records. It ran for seven seconds
-(twelve seconds including scheduling), conservatively less than $0.00004 at
-the frozen CPU price. The compact signed record is
+The final CPU-only cloud preflight passed at Nursery inference commit
+`9c2983355f7ecc41981661cb0dfac0bfa0f6f9d2`. Hugging Face Job
+`6a6bfb08b36a6516e96a35eb` checked out that exact commit, matched protocol hash
+`956a76f…0a316`, compiled zero inference attempts, verified the private output
+dataset, and persisted its control records. The compact record is
 `results/synthetic_video_public_pilot_preflight.json`.
 
-The frozen GPU flavor is one Hugging Face `a100-large` (A100 80 GB). At the
-2026-07-30 published price of $2.50 per hour, each family job has a four-hour
-timeout and a $10 maximum; the complete preview has a $20 GPU ceiling. The
-timeout is a ceiling, not an expected charge. Hugging Face bills Jobs by
-starting/running time, and every completed attempt is uploaded before the next
-one begins.
+The frozen GPU flavor was one Hugging Face `a100-large` (A100 80 GB), at the
+frozen price of $2.50 per hour. The approved ceiling was $20. The successful
+Wan job (`6a6bfb6323ed89c748ec8c95`) ran for 2,037.65 seconds and the successful
+LTX job (`6a6c03d8b36a6516e96a362f`) ran for 609.10 seconds. Their computed
+cost is $1.838. Including a conservative four-minute upper bound for two Wan
+setup-only failures, total GPU cost remained below $2.005. Each completed
+attempt was uploaded before the next one began.
+
+The two failed Wan setup jobs reached no inference. They exposed a strict
+FlashAttention import and then an incomplete/eager upstream import surface.
+The canonical worker now applies two narrow, hash-recorded runtime source
+adaptations: it exposes only the prespecified TI2V runner, and binds the
+upstream attention dispatcher so its SDPA fallback is reachable. The final
+environment record contains the original and patched source hashes.
 
 The LTX job requires that the authenticated Hugging Face account has already
 accepted Google's gated Gemma license for
@@ -162,10 +168,12 @@ python scripts/run_synthetic_video_public_pilot.py gallery \
   --run-root runs/synthetic_video_public_pilot/public-preview-20260730
 ```
 
-The command creates
+For the completed run, the command creates
 `runs/synthetic_video_public_pilot/public-preview-20260730/gallery/index.html`.
 It places Wan and LTX clips side by side for each scene and links to the blank
-QA record for each attempt.
+QA record for each attempt. The complete generated run remains ignored by Git
+and is also retained in the private dataset
+`rishisim/nursery-synthetic-video-public-pilot`.
 
 ## Review
 
@@ -175,5 +183,14 @@ transition order, referent timing, exact speech, and safety. Free-form notes
 may describe failure modes, but they cannot become prompt edits or a generator
 selection rule.
 
-The handoff must report all eight clips, invalid outputs, setup/runtime cost,
-and missing attempts. A polished subset must never be presented as the pilot.
+The initial unblinded assistant screen retained several important failures.
+LTX followed the first-person action structure more closely, but all four
+clips contain pseudo-subtitle text. Its cup finishes tilted and its spoon
+scene duplicates the referent. Wan repeatedly drifts into a third-person view;
+its transfer is incomplete and its spoon scene shows a child's face. These
+observations are diagnostic only and do not replace the eight pending blinded
+human QA records.
+
+The compact execution, integrity, cost, and screening record is
+`results/synthetic_video_public_pilot_preview.json`. A polished subset must
+never be presented as the pilot.
