@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
+import urllib.parse
 from decimal import Decimal
 from pathlib import Path
 
@@ -11,7 +12,7 @@ import nursery_egobaby_preflight.synthetic_video_model_bakeoff as bakeoff_module
 from nursery_egobaby_preflight.contract import canonical_json_sha256
 from nursery_egobaby_preflight.synthetic_video_model_bakeoff import (
     GeminiInteractionsClient,
-    MiniMaxVideoClient,
+    OpenRouterVideoClient,
     compile_bakeoff_work_order,
     execute_bakeoff,
     finalize_blinded_review,
@@ -84,7 +85,12 @@ def test_bakeoff_contract_is_frozen_public_only_and_cost_bounded(
     assert bakeoff_config["new_families"]["gemini_omni_flash"]["model"] == (
         "gemini-omni-flash-preview"
     )
-    assert bakeoff_config["new_families"]["minimax_h3"]["model"] == "MiniMax-H3"
+    assert bakeoff_config["new_families"]["minimax_h3"]["model"] == (
+        "minimax/hailuo-3"
+    )
+    assert bakeoff_config["new_families"]["minimax_h3"][
+        "credential_environment_variable"
+    ] == "OPENROUTER_API_KEY"
     assert bakeoff_config["provider_cost"]["gemini"][
         "maximum_expected_charge_usd"
     ] == 2.06
@@ -126,11 +132,12 @@ def test_work_order_compiles_eight_exact_prompt_requests_and_sixteen_cards(
             assert attempt["request"]["response_format"]["delivery"] == "inline"
             assert attempt["planned_charge_usd"] == pytest.approx(0.515)
         else:
-            assert attempt["request"]["content"] == [
-                {"type": "text", "text": prompt}
-            ]
+            assert attempt["request"]["prompt"] == prompt
+            assert attempt["request"]["model"] == "minimax/hailuo-3"
             assert attempt["request"]["resolution"] == "2K"
             assert attempt["request"]["duration"] == 5
+            assert attempt["request"]["aspect_ratio"] == "16:9"
+            assert attempt["request"]["generate_audio"] is True
             assert attempt["planned_charge_usd"] == pytest.approx(0.65)
 
 
@@ -244,7 +251,7 @@ def test_paid_runner_refuses_preapproval_protocol_before_contacting_providers(
             run_root=tmp_path,
             approved_spend_usd=Decimal("4.66"),
             gemini_api_key="unused",
-            minimax_api_key="unused",
+            openrouter_api_key="unused",
             implementation_commit="a" * 40,
         )
 
@@ -282,7 +289,7 @@ def test_authorized_protocol_still_requires_exact_spend(
             run_root=tmp_path,
             approved_spend_usd=Decimal("5"),
             gemini_api_key="unused",
-            minimax_api_key="unused",
+            openrouter_api_key="unused",
             implementation_commit="a" * 40,
         )
 
@@ -321,14 +328,90 @@ def test_provider_clients_reject_untrusted_urls_and_parse_documented_outputs(
         "v1beta/files/file_123:download?alt=media"
     ) == "file_123"
 
-    minimax = MiniMaxVideoClient("secret")
+    openrouter = OpenRouterVideoClient("secret")
     with pytest.raises(ValueError, match="untrusted"):
-        minimax.submit("https://example.com/v2/video_generation", {"model": "x"})
+        openrouter.submit("https://example.com/api/v1/videos", {"model": "x"})
     with pytest.raises(ValueError, match="untrusted"):
-        minimax.download_public_file(
+        openrouter.download_content(
             "https://example.com/output.mp4",
             Path("unused"),
         )
+
+
+def test_openrouter_h3_submit_poll_and_download_contract(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+    tmp_path: Path,
+) -> None:
+    calls = []
+
+    class Response:
+        def __init__(self, payload: bytes) -> None:
+            self.payload = payload
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return None
+
+        def read(self) -> bytes:
+            return self.payload
+
+    def opener(request, *, timeout):
+        calls.append(request)
+        path = urllib.parse.urlparse(request.full_url).path
+        if request.method == "POST":
+            return Response(
+                json.dumps({"id": "job-123", "status": "pending"}).encode()
+            )
+        if path.endswith("/content"):
+            return Response(b"synthetic-mp4")
+        return Response(
+            json.dumps(
+                {
+                    "id": "job-123",
+                    "generation_id": "generation-123",
+                    "model": "minimax/hailuo-3",
+                    "status": "completed",
+                    "unsigned_urls": [
+                        "https://openrouter.ai/api/v1/videos/job-123/content?index=0"
+                    ],
+                    "usage": {"cost": 0.65, "is_byok": False},
+                }
+            ).encode()
+        )
+
+    order = _order(bakeoff_config, public_config, completed_quality)
+    attempt = next(
+        item for item in order["attempts"] if item["family"] == "minimax_h3"
+    )
+    paths = {
+        key: tmp_path / value
+        for key, value in attempt["paths"].items()
+    }
+    client = OpenRouterVideoClient("secret", opener=opener)
+    submission, terminal = bakeoff_module._run_openrouter_h3_attempt(
+        bakeoff_config,
+        attempt,
+        paths,
+        client,
+        poll_interval_seconds=0,
+    )
+
+    assert submission["id"] == "job-123"
+    assert terminal["status"] == "completed"
+    assert terminal["usage"]["cost"] == 0.65
+    assert paths["raw_video"].read_bytes() == b"synthetic-mp4"
+    request_body = json.loads(calls[0].data)
+    assert request_body["model"] == "minimax/hailuo-3"
+    assert request_body["prompt"] == attempt["prompt"]
+    assert [request.method for request in calls] == ["POST", "GET", "GET"]
+    assert all(
+        request.get_header("Authorization") == "Bearer secret"
+        for request in calls
+    )
 
 
 def test_finalizer_freezes_sixteen_records_before_four_family_decisions(

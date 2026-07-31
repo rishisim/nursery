@@ -211,7 +211,7 @@ def command_plan(args: argparse.Namespace) -> None:
                 "run exactly eight calls with --approved-spend-usd 4.66"
                 if credential_ready and spend_ready
                 else (
-                    "provide GEMINI_API_KEY and MINIMAX_API_KEY, then explicitly "
+                    "provide GEMINI_API_KEY and OPENROUTER_API_KEY, then explicitly "
                     "approve the new $4.66 maximum expected charge"
                 )
             ),
@@ -237,7 +237,7 @@ def command_run(args: argparse.Namespace) -> None:
             ],
             "",
         ),
-        minimax_api_key=os.environ.get(
+        openrouter_api_key=os.environ.get(
             bakeoff["new_families"]["minimax_h3"][
                 "credential_environment_variable"
             ],

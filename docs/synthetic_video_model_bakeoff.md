@@ -1,8 +1,9 @@
 # Gemini Omni Flash and MiniMax H3 public model bakeoff
 
-**Status:** execution authorized after both credentials were installed. The
+**Status:** execution authorized and the H3 route updated to OpenRouter. The
 user approved up to `$6.00`; the immutable runner remains hard-limited to the
-eight-call `$4.66` maximum expected plan.
+eight-call `$4.66` maximum expected plan. `OPENROUTER_API_KEY` must replace the
+obsolete `MINIMAX_API_KEY` in the user-owned environment file before execution.
 
 **Canonical protocol:** `configs/synthetic_video_model_bakeoff.json`
 
@@ -48,21 +49,27 @@ requires the trailing `s`. Delivery remains inline because the live endpoint
 requires `store: true` for URI delivery, which conflicts with this protocol's
 request-storage boundary.
 
-MiniMax uses the official H3 V2 API:
+MiniMax H3 is routed through OpenRouter's asynchronous video API:
 
 ```text
-model: MiniMax-H3
-endpoint: POST https://api.minimax.io/v2/video_generation
+model: minimax/hailuo-3
+endpoint: POST https://openrouter.ai/api/v1/videos
 duration: 5 seconds
 resolution: 2K
 aspect ratio: 16:9
-credential: MINIMAX_API_KEY
+credential: OPENROUTER_API_KEY
 ```
 
-The public MiniMax H3 schema currently exposes only 2K. Its less expensive
-768p tier is documented as closed beta, so it is not assumed available. H3 is
-asynchronous: the runner persists the task ID before polling the official
-query endpoint and downloads the time-limited result immediately.
+OpenRouter's live catalog identifies this route as MiniMax H3 and exposes only
+2K at `$0.13` per generated second. Its less expensive 768p tier is not
+available on this route. H3 is asynchronous: the runner persists the job ID,
+polls only an OpenRouter-owned URL, and downloads the result through the
+authenticated OpenRouter content endpoint.
+
+OpenRouter necessarily retains asynchronous job state and content temporarily;
+its ZDR enforcement cannot be enabled for video generation. This is acceptable
+for this screen because all submitted prompts are public-only and contain no
+ChildLens/BabyView input or derivative.
 
 Neither documented model-specific request exposes a supported input seed.
 No seed is sent. Each provider receives the exact compiled LTX prompt with no
@@ -169,10 +176,10 @@ mode-`0600` blinding key without contacting either provider. `plan`
 hash-verifies all four LTX and all four Seedance finals and reports only
 credential presence, never credential values.
 
-Both `GEMINI_API_KEY` and `MINIMAX_API_KEY` are supplied from a mode-`0600`
-user-owned environment file. Credential values are neither printed nor
-persisted in the run. Paid execution is authorized up to `$6.00`, while the
-runner accepts only the frozen `$4.66` plan value.
+Both `GEMINI_API_KEY` and `OPENROUTER_API_KEY` must be supplied from a
+mode-`0600` user-owned environment file. Credential values are neither printed
+nor persisted in the run. Paid execution is authorized up to `$6.00`, while
+the runner accepts only the frozen `$4.66` plan value.
 
 ## Paid execution and review
 
@@ -208,6 +215,6 @@ in Git.
 - [Gemini Omni Flash model](https://ai.google.dev/gemini-api/docs/models/gemini-omni-flash)
 - [Gemini Omni Flash video guide](https://ai.google.dev/gemini-api/docs/omni)
 - [Gemini Developer API pricing](https://ai.google.dev/gemini-api/docs/pricing)
-- [MiniMax H3 video guide](https://platform.minimax.io/docs/guides/video-generation)
-- [MiniMax H3 V2 OpenAPI schema](https://platform.minimax.io/docs/api-reference/video/generation/api/v2-video-generation.json)
-- [MiniMax pay-as-you-go pricing](https://platform.minimax.io/docs/guides/pricing-paygo)
+- [OpenRouter video-generation guide](https://openrouter.ai/docs/guides/overview/multimodal/video-generation)
+- [OpenRouter video-generation API](https://openrouter.ai/docs/api/api-reference/video-generation/create-videos)
+- [OpenRouter live video-model catalog](https://openrouter.ai/api/v1/videos/models)

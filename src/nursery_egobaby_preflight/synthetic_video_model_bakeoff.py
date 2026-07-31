@@ -228,28 +228,34 @@ def validate_bakeoff_config(
         "Gemini request settings changed",
     )
     minimax = families["minimax_h3"]
-    _require(minimax.get("model") == "MiniMax-H3", "MiniMax model changed")
+    _require(minimax.get("model") == "minimax/hailuo-3", "MiniMax model changed")
     _require(
         minimax.get("endpoint_url")
-        == "https://api.minimax.io/v2/video_generation",
+        == "https://openrouter.ai/api/v1/videos",
         "MiniMax endpoint changed",
     )
     _require(
         minimax.get("query_url_template")
-        == "https://api.minimax.io/v2/query/video_generation/{task_id}",
+        == "https://openrouter.ai/api/v1/videos/{job_id}",
         "MiniMax query endpoint changed",
     )
     _require(
-        minimax.get("credential_environment_variable") == "MINIMAX_API_KEY",
+        minimax.get("content_url_template")
+        == "https://openrouter.ai/api/v1/videos/{job_id}/content?index=0",
+        "MiniMax content endpoint changed",
+    )
+    _require(
+        minimax.get("credential_environment_variable") == "OPENROUTER_API_KEY",
         "MiniMax credential variable changed",
     )
     _require(
         minimax.get("request")
         == {
-            "model": "MiniMax-H3",
+            "model": "minimax/hailuo-3",
             "resolution": "2K",
             "duration": 5,
-            "ratio": "16:9",
+            "aspect_ratio": "16:9",
+            "generate_audio": True,
         },
         "MiniMax request settings changed",
     )
@@ -434,10 +440,7 @@ def _candidate_request(
     if family == "gemini_omni_flash":
         return {**settings, "input": prompt}
     if family == "minimax_h3":
-        return {
-            **settings,
-            "content": [{"type": "text", "text": prompt}],
-        }
+        return {**settings, "prompt": prompt}
     raise ValueError(f"unsupported candidate family {family!r}")
 
 
@@ -992,11 +995,10 @@ class GeminiInteractionsClient(_JSONAPIClient):
         _write_bytes_atomic(destination, payload)
 
 
-class MiniMaxVideoClient(_JSONAPIClient):
-    """Minimal client for the official asynchronous MiniMax H3 V2 API."""
+class OpenRouterVideoClient(_JSONAPIClient):
+    """Minimal client for OpenRouter's asynchronous video-generation API."""
 
-    API_HOST = "api.minimax.io"
-    DOWNLOAD_SUFFIXES = ("minimax.io", "minimax.chat", "hailuoai.com")
+    API_HOST = "openrouter.ai"
 
     def __init__(
         self,
@@ -1019,18 +1021,7 @@ class MiniMaxVideoClient(_JSONAPIClient):
             or (parsed.hostname or "").lower() != cls.API_HOST
             or parsed.username is not None
         ):
-            raise ValueError("refusing MiniMax credentials to an untrusted URL")
-
-    @classmethod
-    def _require_download_url(cls, url: str) -> None:
-        parsed = urllib.parse.urlparse(url)
-        host = (parsed.hostname or "").lower()
-        allowed = any(
-            host == suffix or host.endswith(f".{suffix}")
-            for suffix in cls.DOWNLOAD_SUFFIXES
-        )
-        if parsed.scheme != "https" or not allowed or parsed.username is not None:
-            raise ValueError("refusing MiniMax download from an untrusted URL")
+            raise ValueError("refusing OpenRouter credentials to an untrusted URL")
 
     def submit(
         self,
@@ -1053,9 +1044,16 @@ class MiniMaxVideoClient(_JSONAPIClient):
             headers={"Authorization": f"Bearer {self._api_key}"},
         )
 
-    def download_public_file(self, url: str, destination: str | Path) -> None:
-        self._require_download_url(url)
-        payload = self._request("GET", url, headers={"Accept": "video/mp4"})
+    def download_content(self, url: str, destination: str | Path) -> None:
+        self._require_api_url(url)
+        payload = self._request(
+            "GET",
+            url,
+            headers={
+                "Authorization": f"Bearer {self._api_key}",
+                "Accept": "video/mp4",
+            },
+        )
         _write_bytes_atomic(destination, payload)
 
 
@@ -1097,28 +1095,25 @@ def _sanitized_gemini_response(
     }
 
 
-def _sanitized_minimax_status(response: Mapping[str, Any]) -> dict[str, Any]:
-    task = response.get("task", {})
-    content = task.get("content", {}) if isinstance(task, Mapping) else {}
-    url = str(content.get("url", ""))
-    return {
-        "task": {
-            "id_utf8_sha256": canonical_json_sha256(str(task.get("id", ""))),
-            "model": task.get("model"),
-            "status": task.get("status"),
-            "error": task.get("error"),
-            "created_at": task.get("created_at"),
-            "updated_at": task.get("updated_at"),
-            "resolution": task.get("resolution"),
-            "duration": task.get("duration"),
-            "usage": task.get("usage"),
-            "ratio": task.get("ratio"),
-            "task_type": task.get("task_type"),
-            "content": {
-                "url_utf8_sha256": canonical_json_sha256(url) if url else None,
-                "host": urllib.parse.urlparse(url).hostname if url else None,
-            },
+def _sanitized_openrouter_status(response: Mapping[str, Any]) -> dict[str, Any]:
+    unsigned_urls = response.get("unsigned_urls", [])
+    hosts = sorted(
+        {
+            urllib.parse.urlparse(url).hostname
+            for url in unsigned_urls
+            if isinstance(url, str) and urllib.parse.urlparse(url).hostname
         }
+    )
+    return {
+        "id_utf8_sha256": canonical_json_sha256(str(response.get("id", ""))),
+        "generation_id_utf8_sha256": canonical_json_sha256(
+            str(response.get("generation_id", ""))
+        ),
+        "model": response.get("model"),
+        "status": response.get("status"),
+        "error": response.get("error"),
+        "usage": response.get("usage"),
+        "unsigned_url_hosts": hosts,
     }
 
 
@@ -1215,11 +1210,11 @@ def _run_gemini_attempt(
     return submission, response_record
 
 
-def _run_minimax_attempt(
+def _run_openrouter_h3_attempt(
     config: Mapping[str, Any],
     attempt: Mapping[str, Any],
     paths: Mapping[str, Path],
-    client: MiniMaxVideoClient,
+    client: OpenRouterVideoClient,
     *,
     poll_interval_seconds: float,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -1230,40 +1225,38 @@ def _run_minimax_attempt(
             response_record = (
                 json.loads(paths["provider_response"].read_text())
                 if paths["provider_response"].exists()
-                else {"task": {"status": "succeeded"}}
+                else {"status": "completed"}
             )
             return submission, response_record
     else:
         submission = client.submit(family["endpoint_url"], attempt["request"])
         _write_json(paths["submission"], submission)
-    task_id = submission.get("task_id")
-    if not isinstance(task_id, str) or not task_id:
-        raise RuntimeError("MiniMax submission is missing task_id")
+    job_id = submission.get("id")
+    if not isinstance(job_id, str) or not job_id:
+        raise RuntimeError("OpenRouter MiniMax submission is missing id")
     _require(
-        bool(re.fullmatch(r"[A-Za-z0-9_-]+", task_id)),
-        "MiniMax task_id is invalid",
+        bool(re.fullmatch(r"[A-Za-z0-9_-]+", job_id)),
+        "OpenRouter MiniMax job id is invalid",
     )
-    query_url = family["query_url_template"].format(task_id=task_id)
+    query_url = family["query_url_template"].format(job_id=job_id)
     while True:
         status_response = client.status(query_url)
-        sanitized = _sanitized_minimax_status(status_response)
+        sanitized = _sanitized_openrouter_status(status_response)
         _write_json(paths["provider_status"], sanitized)
-        task = status_response.get("task", {})
-        state = task.get("status")
-        if state == "succeeded":
+        state = status_response.get("status")
+        if state == "completed":
             break
         if state in {"failed", "cancelled", "expired"}:
             raise RuntimeError(
-                f"MiniMax generation ended as {state}: {task.get('error')}"
+                f"OpenRouter MiniMax generation ended as {state}: "
+                f"{status_response.get('error')}"
             )
-        if state not in {"queued", "running"}:
-            raise RuntimeError(f"unexpected MiniMax task state {state!r}")
+        if state not in {"pending", "in_progress"}:
+            raise RuntimeError(f"unexpected OpenRouter MiniMax job state {state!r}")
         time.sleep(poll_interval_seconds)
-    video_url = task.get("content", {}).get("url")
-    if not isinstance(video_url, str) or not video_url:
-        raise RuntimeError("MiniMax success response is missing content.url")
     _write_json(paths["provider_response"], sanitized)
-    client.download_public_file(video_url, paths["raw_video"])
+    content_url = family["content_url_template"].format(job_id=job_id)
+    client.download_content(content_url, paths["raw_video"])
     return submission, sanitized
 
 
@@ -1274,7 +1267,7 @@ def _run_one_attempt(
     ltx_reference: Mapping[str, Any],
     run_root: Path,
     gemini_client: GeminiInteractionsClient,
-    minimax_client: MiniMaxVideoClient,
+    openrouter_client: OpenRouterVideoClient,
     *,
     implementation_commit: str,
     poll_interval_seconds: float,
@@ -1310,15 +1303,15 @@ def _run_one_attempt(
             provider_name = "Gemini Developer API"
             provider_identifier = submission.get("interaction_id")
         elif attempt["family"] == "minimax_h3":
-            submission, provider_response = _run_minimax_attempt(
+            submission, provider_response = _run_openrouter_h3_attempt(
                 config,
                 attempt,
                 paths,
-                minimax_client,
+                openrouter_client,
                 poll_interval_seconds=poll_interval_seconds,
             )
-            provider_name = "MiniMax API"
-            provider_identifier = submission.get("task_id")
+            provider_name = "OpenRouter (MiniMax H3)"
+            provider_identifier = submission.get("id")
         else:
             raise RuntimeError(f"unsupported family {attempt['family']!r}")
 
@@ -1395,7 +1388,7 @@ def execute_bakeoff(
     run_root: str | Path,
     approved_spend_usd: Decimal,
     gemini_api_key: str,
-    minimax_api_key: str,
+    openrouter_api_key: str,
     implementation_commit: str,
     poll_interval_seconds: float = 10.0,
     ffmpeg_executable: str = "ffmpeg",
@@ -1455,7 +1448,7 @@ def execute_bakeoff(
         },
     )
     gemini_client = GeminiInteractionsClient(gemini_api_key)
-    minimax_client = MiniMaxVideoClient(minimax_api_key)
+    openrouter_client = OpenRouterVideoClient(openrouter_api_key)
     completed: list[str] = []
     failed: list[str] = []
     started_at = utc_now()
@@ -1468,7 +1461,7 @@ def execute_bakeoff(
                 references["ltx"][attempt["scene_id"]],
                 root,
                 gemini_client,
-                minimax_client,
+                openrouter_client,
                 implementation_commit=implementation_commit,
                 poll_interval_seconds=poll_interval_seconds,
                 ffmpeg_executable=ffmpeg_executable,
