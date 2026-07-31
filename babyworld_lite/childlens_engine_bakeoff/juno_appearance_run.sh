@@ -16,6 +16,7 @@ mkdir -p "${run_root}/raw/cosmos3_nano" "${run_root}/raw/oscar_2b"
 
 export HF_HOME="${work_root}/cache/huggingface"
 export HF_HUB_OFFLINE=1
+export COSMOS_TRAINING=0
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export TOKENIZERS_PARALLELISM=false
 
