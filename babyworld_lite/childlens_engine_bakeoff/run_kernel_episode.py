@@ -1,4 +1,4 @@
-"""Run and package one ResolvedEpisodeSpec through the bounded prototype kernel."""
+"""Run and qualify the canonical embodied vertical slice."""
 
 from __future__ import annotations
 
@@ -7,263 +7,465 @@ import json
 import shutil
 import subprocess
 from pathlib import Path
+from typing import Any
 
+import mujoco
 import numpy as np
 
-from .bundle import build_manifest, validate_shared_clock, write_json
-from .camera_sensitivity import run as run_camera_sensitivity
-from .physics_kernel import build_kernel_model, run_physics_trace, value
-from .staging import select_free_candidate
+from .bundle import build_manifest, sha256_file, validate_shared_clock, write_json
+from .determinism import write_receipt as write_determinism_receipt
+from .physics_kernel import build_kernel_model, run_physics_trace
 from .trace_render import render_trace
 
 
-def _target_definition(spec: dict) -> dict:
+def _assert_ignored(repo_root: Path, output_dir: Path) -> None:
+    result = subprocess.run(
+        ["git", "check-ignore", "-q", str(output_dir.resolve())],
+        cwd=repo_root,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise ValueError(f"output directory is not ignored: {output_dir}")
+
+
+def _target_definition(contract: dict[str, Any]) -> dict[str, Any]:
+    target = contract["scene_family"]["target"]
+    return {"geometry": target["geometry"], "rgba": target["rgba"]}
+
+
+def _build(
+    contract: dict[str, Any],
+    scene_path: Path,
+    mimo_assets: Path,
+    component_path: Path,
+):
+    placement = contract["scene_family"]["qualified_placement"]
+    mount = contract["embodiment"]["camera_mount"]
+    return build_kernel_model(
+        scene_path,
+        mimo_assets,
+        component_path,
+        root_xy=tuple(placement["root_xy_m"]),
+        target_definition=_target_definition(contract),
+        camera_mount_position=tuple(mount["translation_head_m"]),
+        camera_mount_quaternion=tuple(mount["quaternion_head_wxyz"]),
+    )
+
+
+def _physics_gate(contract: dict[str, Any], receipt: dict[str, Any]) -> dict[str, Any]:
+    gate = contract["frozen_gates"]
+    checks = {
+        "immutable_head_camera_mount": (
+            receipt["camera_mount"]["maximum_translation_error_m"]
+            <= gate["camera_mount_translation_error_m_max"]
+            and receipt["camera_mount"]["maximum_rotation_error_rad"]
+            <= gate["camera_mount_rotation_error_rad_max"]
+        ),
+        "static_relevant_collisions": (
+            receipt["collision_policy"]["unchanged"]
+            and receipt["collision_policy"]["all_relevant_enabled"]
+        ),
+        "penetration": (
+            receipt["collision_policy"]["minimum_relevant_contact_distance_m"]
+            >= -gate["penetration_depth_m_max"]
+            and receipt["collision_policy"]["persistent_penetration_frames"]
+            <= gate["persistent_penetration_frames_max"]
+        ),
+        "true_near_miss": (
+            receipt["near_miss"]["minimum_clearance_m"]
+            >= gate["near_miss_clearance_m_min"]
+            and receipt["near_miss"]["contact_substeps"]
+            <= gate["near_miss_contact_count_max"]
+        ),
+        "contact_before_gated_assist": (
+            receipt["contact"]["first_contact_time_s"] is not None
+            and receipt["grasp"]["multipoint_contact_evidence_duration_s"]
+            >= contract["grasp"]["minimum_contact_duration_s_for_assist"]
+            and receipt["contact"]["maximum_distinct_finger_contacts"]
+            >= contract["grasp"]["minimum_distinct_finger_contacts_for_assist"]
+            and receipt["grasp"]["assist_pose_jump_m"]
+            <= contract["grasp"]["assist_pose_jump_tolerance_m"]
+            and receipt["grasp"]["assist_pose_jump_degrees"]
+            <= contract["grasp"]["assist_pose_jump_tolerance_degrees"]
+        ),
+        "lift_rotate_head_turn": (
+            receipt["manipulation"]["maximum_lift_m"]
+            >= gate["minimum_lift_m"]
+            and receipt["manipulation"]["maximum_object_rotation_degrees"]
+            >= gate["minimum_rotation_degrees"]
+            and receipt["manipulation"]["maximum_head_turn_degrees"]
+            >= gate["head_turn_degrees_min"]
+            and receipt["manipulation"]["head_turn_contact_retention_fraction"]
+            >= gate["contact_retention_fraction_during_head_turn_min"]
+        ),
+        "release_and_settle": (
+            receipt["manipulation"]["released"]
+            and receipt["manipulation"]["final_settled_window_maximum_speed_m_s"]
+            <= gate["release_settle_speed_m_s_max"]
+            and receipt["manipulation"]["final_settled_duration_s"]
+            >= gate["release_settle_duration_s_min"]
+        ),
+        "imu_consistency": (
+            receipt["imu_consistency"]["accelerometer_rmse_m_s2"]
+            <= gate["imu_linear_acceleration_rmse_m_s2_max"]
+            and receipt["imu_consistency"]["gyroscope_rmse_rad_s"]
+            <= gate["imu_angular_velocity_rmse_rad_s_max"]
+        ),
+        "shared_clock": (
+            receipt["synchronization"]["all_frame_stream_lengths_equal"]
+            and receipt["synchronization"]["maximum_timestamp_error_s"]
+            <= gate["stream_timestamp_error_s_max"]
+        ),
+        "object_identity": (
+            receipt["object_identity"]["changes"]
+            <= gate["object_identity_changes_max"]
+        ),
+        "physical_authority": (
+            not receipt["direct_target_transform_after_initialization"]
+            and not receipt["independent_camera_control"]
+            and not receipt["hand_mocap_or_weld"]
+        ),
+        "collision_checked_locomotion_assist": (
+            receipt["locomotion_assist"]["explicitly_labeled"]
+            and receipt["locomotion_assist"]["collision_checked"]
+            and receipt["locomotion_assist"]["maximum_root_speed_m_s"]
+            <= contract["embodiment"]["locomotion_assist"]["maximum_root_speed_m_s"]
+            and receipt["locomotion_assist"]["maximum_root_acceleration_m_s2"]
+            <= contract["embodiment"]["locomotion_assist"]["maximum_root_acceleration_m_s2"]
+        ),
+    }
+    return {"checks": checks, "passed": all(checks.values())}
+
+
+def _render_gate(contract: dict[str, Any], receipt: dict[str, Any]) -> dict[str, Any]:
+    gate = contract["frozen_gates"]
+    checks = {
+        "collision_proxies_hidden": (
+            receipt["collision_proxy_pixels"] <= gate["collision_proxy_pixels_max"]
+        ),
+        "skin_artifacts_absent": (
+            receipt["skin_artifact_pixels"] <= gate["skin_artifact_pixels_max"]
+        ),
+        "contact_projection": (
+            receipt["maximum_projected_contact_error_px"] is not None
+            and receipt["maximum_projected_contact_error_px"]
+            <= gate["visible_contact_alignment_px_max"]
+            and receipt["maximum_3d_contact_surface_distance_m"] is not None
+            and receipt["maximum_3d_contact_surface_distance_m"]
+            <= gate["visible_contact_alignment_m_max"]
+        ),
+        "event_frames": (
+            abs(receipt["rgb_truth_contact_frame_offset"])
+            <= gate["rgb_truth_event_frame_offset_max"]
+            and abs(receipt["rgb_truth_release_frame_offset"])
+            <= gate["rgb_truth_event_frame_offset_max"]
+            and receipt["contact_event_target_visible"]
+            and receipt["release_event_target_visible"]
+        ),
+        "camera_replay": (
+            receipt["maximum_replay_camera_translation_error_m"]
+            <= gate["replay_numeric_absolute_error_max"]
+            and receipt["maximum_replay_camera_rotation_error_rad"]
+            <= gate["replay_numeric_absolute_error_max"]
+        ),
+    }
+    return {"checks": checks, "passed": all(checks.values())}
+
+
+def _run_blender_overlay(
+    *,
+    repo_root: Path,
+    blender_path: Path,
+    blend_path: Path,
+    trace_path: Path,
+    body_names_path: Path,
+    spec_path: Path,
+    output_dir: Path,
+    width: int,
+    height: int,
+    fps: int,
+    all_frames: bool,
+) -> dict[str, Any]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    command = [
+        str(blender_path),
+        str(blend_path),
+        "--background",
+        "--python",
+        str(Path(__file__).with_name("mpfb_overlay_renderer.py")),
+        "--",
+        "--trace",
+        str(trace_path),
+        "--body-names",
+        str(body_names_path),
+        "--spec",
+        str(spec_path),
+        "--output-dir",
+        str(output_dir),
+        "--width",
+        str(width),
+        "--height",
+        str(height),
+        "--fps",
+        str(fps),
+        "--render-samples",
+        "4" if all_frames else "16",
+    ]
+    if all_frames:
+        command.append("--all-frames")
+    result = subprocess.run(
+        command,
+        cwd=repo_root,
+        check=False,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    (output_dir / "blender.log").write_text(result.stdout, encoding="utf-8")
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"Blender MPFB replay failed ({result.returncode}):\n"
+            + result.stdout[-4000:]
+        )
+    return json.loads((output_dir / "overlay_receipt.json").read_text())
+
+
+def _appearance_gate(
+    contract: dict[str, Any], render_receipt: dict[str, Any]
+) -> dict[str, Any]:
+    gate = contract["frozen_gates"]
+    checks = {
+        "native_mimo_appearance_authoritative": (
+            render_receipt["appearance_status"].startswith(
+                "authoritative deterministic native MIMo"
+            )
+        ),
+        "physical_collision_layer_hidden": (
+            render_receipt["physical_collision_geom_group"] == 3
+            and render_receipt["collision_proxy_pixels"]
+            <= gate["collision_proxy_pixels_max"]
+        ),
+        "coarticulated_native_layer_visible": (
+            render_receipt["native_appearance_geom_group"] == 2
+            and render_receipt["native_material"] == "skin"
+        ),
+        "clean_native_material": (
+            render_receipt["skin_artifact_pixels"]
+            <= gate["skin_artifact_pixels_max"]
+        ),
+    }
     return {
-        "geometry": spec["target"]["geometry"]["value"],
-        "rgba": spec["target"]["rgba"]["value"],
+        "authoritative_baseline": "baseline_rgb.mp4",
+        "policy": "native MIMo appearance; MPFB diagnostic only",
+        "checks": checks,
+        "passed": all(checks.values()),
     }
 
 
-def synthesize_speech(spec: dict, output_dir: Path) -> tuple[Path, Path]:
-    events = value(spec, "speech_events")
-    event_path = output_dir / "speech_events.json"
-    write_json(
-        event_path,
-        {
-            "clock": "episode_seconds",
-            "events": events,
-            "claim_boundary": (
-                "local synthetic waveform/timing interface only; not human "
-                "validation, natural German ground truth, or language quality evidence"
-            ),
-        },
-    )
-    if not events:
-        raise ValueError("resolved episode has no speech events")
-    utterance_paths = []
-    for index, event in enumerate(events):
-        utterance = output_dir / f"speech_utterance_{index:02d}.aiff"
-        subprocess.run(
-            ["say", "-v", "Anna", "-o", str(utterance), event["text"]],
-            check=True,
-        )
-        utterance_paths.append(utterance)
-    waveform = output_dir / "speech_waveform.wav"
-    command = ["ffmpeg", "-y"]
-    for utterance in utterance_paths:
-        command.extend(["-i", str(utterance)])
-    filters = []
-    mix_inputs = []
-    for index, event in enumerate(events):
-        delay_ms = int(round(float(event["start_s"]) * 1000))
-        filters.append(f"[{index}:a]adelay={delay_ms}|{delay_ms}[a{index}]")
-        mix_inputs.append(f"[a{index}]")
-    filters.append(
-        "".join(mix_inputs)
-        + f"amix=inputs={len(events)}:normalize=0,apad=pad_dur="
-        + str(value(spec, "duration_s"))
-        + "[out]"
-    )
-    command.extend(
-        [
-            "-filter_complex",
-            ";".join(filters),
-            "-map",
-            "[out]",
-            "-t",
-            str(value(spec, "duration_s")),
-            "-ar",
-            "48000",
-            "-ac",
-            "1",
-            str(waveform),
-        ]
-    )
-    subprocess.run(
-        command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-    )
-    return waveform, event_path
-
-
 def run(
-    spec_path: Path,
-    intent_path: Path,
+    contract_path: Path,
     scene_path: Path,
-    map_path: Path,
     mimo_assets: Path,
     output_dir: Path,
     *,
     render: bool = True,
-) -> dict:
-    from molmo_spaces.utils.scene_maps import iTHORMap
-
+    blender_path: Path | None = None,
+    mpfb_blend_path: Path | None = None,
+) -> dict[str, Any]:
+    repo_root = Path(__file__).resolve().parents[2]
+    _assert_ignored(repo_root, output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    spec = json.loads(spec_path.read_text(encoding="utf-8"))
-    intent = json.loads(intent_path.read_text(encoding="utf-8"))
-    if scene_path.stem.removesuffix("_physics") != spec["scene"]["id"]["value"]:
-        raise ValueError("scene path does not match ResolvedEpisodeSpec scene id")
-    destination_spec = output_dir / "resolved_episode_spec.json"
-    if spec_path.resolve() != destination_spec.resolve():
-        shutil.copyfile(spec_path, destination_spec)
-    write_json(output_dir / "episode_intent.json", intent)
-    scene_map = iTHORMap.load(str(map_path), agent_radius=0.35)
-    candidate = select_free_candidate(
-        scene_map.occupancy, scene_map.map_to_world, anchor_xy_m=(0.0, 0.0)
+    contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    copied_contract = output_dir / "vertical_slice_contract.json"
+    shutil.copyfile(contract_path, copied_contract)
+
+    kernel = _build(
+        contract, scene_path, mimo_assets, output_dir / "kernel_component.xml"
     )
-    staging_receipt = {
-        **candidate.__dict__,
-        "agent_clearance_radius_m": 0.35,
-        "map_path": map_path.name,
-    }
-    kernel = build_kernel_model(
-        scene_path,
-        mimo_assets,
-        output_dir / "kernel_component.xml",
-        root_xy=(candidate.world_x_m, candidate.world_y_m),
-        target_definition=_target_definition(spec),
+    truth_hz = int(contract["rates_hz"]["truth"])
+    physics_hz = int(contract["rates_hz"]["physics"])
+    trace, physics_qa = run_physics_trace(
+        kernel, contract, truth_hz=truth_hz, physics_hz=physics_hz
     )
-    trace, physics_qa = run_physics_trace(kernel, spec)
-    staging_receipt["clearance_checks"] = {
-        "root_free_with_0_35_m_radius": bool(
-            scene_map.check_collision(
-                np.asarray([candidate.world_x_m, candidate.world_y_m, 0.0])
-            )
-        ),
-        "camera_xy_free_with_0_35_m_radius": bool(
-            scene_map.check_collision(
-                np.asarray(
-                    [
-                        trace["camera_pose"][0, 0],
-                        trace["camera_pose"][0, 1],
-                        0.0,
-                    ]
-                )
-            )
-        ),
-        "target_stage_contract": (
-            "target is deliberately staged on the deterministic kernel support; "
-            "agent-radius occupancy is not applicable to a supported object"
-        ),
-        "target_initial_center_finite": bool(
-            np.isfinite(trace["target_pose"][0, :3]).all()
-        ),
-    }
-    write_json(output_dir / "staging_receipt.json", staging_receipt)
     trace_path = output_dir / "episode_trace.npz"
     np.savez_compressed(trace_path, **trace)
     write_json(output_dir / "body_names.json", list(kernel.mimo_body_names))
     write_json(output_dir / "physics_qa.json", physics_qa)
-    frame_streams = {
-        key: trace[key]
-        for key in (
-            "qpos",
-            "qvel",
-            "action",
-            "touch_wrench",
-            "touch_contact_count",
-            "grasp_active",
-            "vestibular_accelerometer",
-            "vestibular_gyroscope",
-            "target_pose",
-            "hand_pose",
-            "camera_pose",
-            "body_pose",
-            "phase",
-        )
-    }
-    clock_qa = validate_shared_clock(trace["time_s"], frame_streams)
+    clock_qa = validate_shared_clock(
+        trace["time_s"], {key: value for key, value in trace.items() if key != "time_s"}
+    )
     write_json(output_dir / "shared_clock_qa.json", clock_qa)
+
+    replay_kernel = _build(
+        contract, scene_path, mimo_assets, output_dir / "replay_component.xml"
+    )
+    replay_trace, _ = run_physics_trace(
+        replay_kernel, contract, truth_hz=truth_hz, physics_hz=physics_hz
+    )
+    replay_path = output_dir / "episode_trace_replay.npz"
+    np.savez_compressed(replay_path, **replay_trace)
+    determinism_qa = write_determinism_receipt(
+        trace_path,
+        replay_path,
+        output_dir / "determinism_qa.json",
+        atol=float(contract["frozen_gates"]["replay_numeric_absolute_error_max"]),
+    )
+
     render_qa = None
+    appearance_qa = None
+    mpfb_diagnostic = None
     if render:
-        render_qa = render_trace(kernel, trace, output_dir)
-        render_qa["camera_sensitivity"] = run_camera_sensitivity(
-            output_dir, output_dir / "camera_sensitivity_qa.json"
+        if (blender_path is None) != (mpfb_blend_path is None):
+            raise ValueError(
+                "provide both --blender and --mpfb-blend for optional MPFB diagnostics"
+            )
+        resolution = contract["embodiment"]["camera"]["resolution_px"]
+        render_qa = render_trace(
+            kernel,
+            trace,
+            output_dir,
+            truth_hz=truth_hz,
+            fps=int(contract["rates_hz"]["render"]),
+            width=int(resolution[0]),
+            height=int(resolution[1]),
+            vertical_fov_degrees=float(
+                contract["embodiment"]["camera"]["vertical_fov_degrees"]
+            ),
         )
+        render_qa["authoritative_video"] = "baseline_rgb.mp4"
+        appearance_qa = _appearance_gate(contract, render_qa)
+        write_json(output_dir / "appearance_qa.json", appearance_qa)
+        if blender_path is not None and mpfb_blend_path is not None:
+            receipt = _run_blender_overlay(
+                repo_root=repo_root,
+                blender_path=blender_path,
+                blend_path=mpfb_blend_path,
+                trace_path=trace_path,
+                body_names_path=output_dir / "body_names.json",
+                spec_path=copied_contract,
+                output_dir=output_dir / "mpfb_diagnostic",
+                width=int(resolution[0]),
+                height=int(resolution[1]),
+                fps=int(contract["rates_hz"]["render"]),
+                all_frames=False,
+            )
+            mpfb_diagnostic = {
+                "role": "diagnostic_only_not_phase_1_gate",
+                "status": receipt["status"],
+                "visibly_better_than_native": False,
+                "selected_as_authoritative": False,
+                "receipt": "mpfb_diagnostic/overlay_receipt.json",
+                "maximum_landmark_error_m": receipt[
+                    "maximum_landmark_error_m"
+                ],
+                "appearance_qualification": receipt[
+                    "appearance_qualification"
+                ],
+            }
+            write_json(output_dir / "mpfb_diagnostic_qa.json", mpfb_diagnostic)
+        render_qa["mpfb_role"] = "diagnostic_only_not_phase_1_gate"
         write_json(output_dir / "render_qa.json", render_qa)
-    waveform, _ = synthesize_speech(spec, output_dir)
-    final_video = output_dir / "episode_with_speech.mp4"
-    if render:
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-i",
-                str(output_dir / "actual_furnished_native_diagnostic.mp4"),
-                "-i",
-                str(waveform),
-                "-c:v",
-                "copy",
-                "-c:a",
-                "aac",
-                "-t",
-                str(value(spec, "duration_s")),
-                str(final_video),
-            ],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+
+    qualification = {
+        "schema": "EmbodiedVerticalSliceQualification",
+        "scientific_scope": contract["scientific_scope"],
+        "physics": _physics_gate(contract, physics_qa),
+        "determinism": determinism_qa,
+        "render": _render_gate(contract, render_qa) if render_qa else None,
+        "appearance": appearance_qa,
+    }
+    qualification["passed"] = bool(
+        qualification["physics"]["passed"]
+        and determinism_qa["all_pass"]
+        and (
+            not render
+            or (
+                qualification["render"]["passed"]
+                and qualification["appearance"]["passed"]
+            )
         )
-    relative_files = [
-        "episode_intent.json",
-        "resolved_episode_spec.json",
-        "staging_receipt.json",
+    )
+    write_json(output_dir / "qualification.json", qualification)
+
+    files = [
+        "vertical_slice_contract.json",
         "kernel_component.xml",
+        "replay_component.xml",
+        "embodied_mimo_model.xml",
         "episode_trace.npz",
+        "episode_trace_replay.npz",
         "body_names.json",
         "physics_qa.json",
         "shared_clock_qa.json",
-        "speech_events.json",
-        "speech_waveform.wav",
+        "determinism_qa.json",
+        "qualification.json",
     ]
     if render:
-        relative_files.extend(
+        files.extend(
             [
-                "actual_furnished_native_diagnostic.mp4",
-                "episode_with_speech.mp4",
+                "baseline_rgb.mp4",
+                "external_qa.mp4",
                 "render_streams.h5",
                 "render_qa.json",
-                "camera_sensitivity_qa.json",
                 "inspection_sheet.png",
+                "appearance_qa.json",
             ]
         )
-        relative_files.extend(
-            path.name
-            for path in sorted(output_dir.glob("replay_segmentation_*.png"))
+        if mpfb_diagnostic is not None:
+            files.extend(
+                [
+                    "mpfb_diagnostic_qa.json",
+                    "mpfb_diagnostic/overlay_receipt.json",
+                ]
+            )
+    regeneration_command = [
+        "python",
+        "-m",
+        "babyworld_lite.childlens_engine_bakeoff.run_kernel_episode",
+        str(contract_path),
+        str(scene_path),
+        str(mimo_assets),
+        str(output_dir),
+    ]
+    if blender_path is not None and mpfb_blend_path is not None:
+        regeneration_command.extend(
+            [
+                "--blender",
+                str(blender_path),
+                "--mpfb-blend",
+                str(mpfb_blend_path),
+            ]
         )
     manifest = build_manifest(
         output_dir,
-        relative_files,
-        spec_sha256=spec["spec_sha256"],
+        files,
+        spec_sha256=sha256_file(contract_path),
         provenance={
-            "MIMo": {
-                "version": "2.0.0",
-                "commit": "040b0ae4914cbfb26afdf830aa81775b90922f3f",
-            },
-            "MolmoSpaces": {
-                "version": "0.2.0",
-                "commit": "c2f1b583f087e1d3994e1377574843b759d9d0f8",
-            },
+            **contract["provenance"],
+            "scene_sha256": sha256_file(scene_path),
+            "mujoco_runtime": mujoco.__version__,
+            "blender_executable_sha256": (
+                sha256_file(blender_path) if blender_path else None
+            ),
+            "mpfb_generated_blend_sha256": (
+                sha256_file(mpfb_blend_path) if mpfb_blend_path else None
+            ),
             "private_childlens_material": False,
-            "empirical_source": "ChildLens only",
+            "empirical_source": "ChildLens only; no restricted media accessed",
         },
-        regeneration_command=[
-            "python3",
-            "-m",
-            "babyworld_lite.childlens_engine_bakeoff.run_kernel_episode",
-            str(spec_path),
-            str(intent_path),
-            str(scene_path),
-            str(map_path),
-            str(mimo_assets),
-            str(output_dir),
-        ],
+        regeneration_command=regeneration_command,
     )
     write_json(output_dir / "episode_bundle_manifest.json", manifest)
     result = {
-        "spec_sha256": spec["spec_sha256"],
+        "passed": qualification["passed"],
+        "output_dir": str(output_dir),
+        "truth_samples": int(len(trace["time_s"])),
         "physics_qa": physics_qa,
-        "shared_clock_qa": clock_qa,
+        "determinism_qa": determinism_qa,
         "render_qa": render_qa,
+        "appearance_qa": appearance_qa,
+        "mpfb_diagnostic": mpfb_diagnostic,
+        "qualification": qualification,
         "manifest": "episode_bundle_manifest.json",
     }
     write_json(output_dir / "qa_report.json", result)
@@ -272,22 +474,22 @@ def run(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("spec", type=Path)
-    parser.add_argument("intent", type=Path)
+    parser.add_argument("contract", type=Path)
     parser.add_argument("scene", type=Path)
-    parser.add_argument("scene_map", type=Path)
     parser.add_argument("mimo_assets", type=Path)
     parser.add_argument("output_dir", type=Path)
     parser.add_argument("--no-render", action="store_true")
+    parser.add_argument("--blender", type=Path)
+    parser.add_argument("--mpfb-blend", type=Path)
     args = parser.parse_args()
     result = run(
-        args.spec,
-        args.intent,
+        args.contract,
         args.scene,
-        args.scene_map,
         args.mimo_assets,
         args.output_dir,
         render=not args.no_render,
+        blender_path=args.blender,
+        mpfb_blend_path=args.mpfb_blend,
     )
     print(json.dumps(result, indent=2))
 

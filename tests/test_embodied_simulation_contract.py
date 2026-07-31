@@ -26,6 +26,16 @@ def test_camera_and_collision_authority_are_immutable():
     assert collision["static_for_entire_episode"] is True
     assert collision["runtime_collision_disabling_permitted"] is False
     assert collision["object_direct_pose_keyframes_permitted"] is False
+    appearance = CONTRACT["appearance_policy"]
+    assert appearance["mpfb_role"] == "diagnostic_only_not_phase_1_gate"
+    assert appearance["physical_collision_geometry_enabled"] is True
+    assert appearance["physical_collision_geometry_visible_in_rgb"] is False
+    assert (
+        appearance[
+            "frozen_physics_camera_contact_sync_determinism_thresholds_changed"
+        ]
+        is False
+    )
 
 
 def test_assist_requires_contact_and_never_disables_collision():
@@ -51,3 +61,11 @@ def test_all_code_pins_are_complete_hashes():
         commit = provenance[component]["commit"]
         assert len(commit) == 40
         int(commit, 16)
+    blender = provenance["Blender"]
+    assert blender["build_hash"] == "396f546c9d82"
+    for key in (
+        "macos_arm64_distribution_sha256",
+        "executable_sha256",
+    ):
+        assert len(blender[key]) == 64
+        int(blender[key], 16)

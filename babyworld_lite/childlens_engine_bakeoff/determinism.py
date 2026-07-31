@@ -28,8 +28,22 @@ def compare(first_path: Path, second_path: Path, *, atol: float = 1e-9) -> dict:
         if left.shape != right.shape or left.dtype != right.dtype:
             raise ValueError(f"EpisodeTrace stream schema differs: {name}")
         if np.issubdtype(left.dtype, np.number):
-            maximum = float(np.max(np.abs(left - right))) if left.size else 0.0
-            passed = bool(maximum <= atol)
+            nan_pattern_equal = bool(
+                np.array_equal(np.isnan(left), np.isnan(right))
+            )
+            finite = np.isfinite(left) & np.isfinite(right)
+            maximum = (
+                float(np.max(np.abs(left[finite] - right[finite])))
+                if np.any(finite)
+                else 0.0
+            )
+            infinity_equal = bool(
+                np.array_equal(np.isposinf(left), np.isposinf(right))
+                and np.array_equal(np.isneginf(left), np.isneginf(right))
+            )
+            passed = bool(
+                nan_pattern_equal and infinity_equal and maximum <= atol
+            )
         else:
             maximum = None
             passed = bool(np.array_equal(left, right))

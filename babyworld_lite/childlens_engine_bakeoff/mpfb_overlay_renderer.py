@@ -23,6 +23,7 @@ from typing import Any
 
 import bpy
 import numpy as np
+import OpenImageIO as oiio
 from mathutils import Matrix, Quaternion, Vector
 
 
@@ -49,16 +50,29 @@ MIMO_CHAINS = {
     "little": ("right_lfknuckle", "right_lfmiddle", "right_lfdistal"),
 }
 ALIGNMENT_RMS_GATE_M = 0.006
-ALIGNMENT_MAX_GATE_M = 0.012
+ALIGNMENT_MAX_GATE_M = 0.006
+MIMO_DISTAL_SURFACE_OFFSET_M = {
+    "thumb": 0.02201,
+    "index": 0.01633,
+    "middle": 0.01800,
+    "ring": 0.01663,
+    "little": 0.01477,
+}
+DISTAL_SKIN_THICKNESS_SCALE = 1.0
+CONTACT_SKIN_EXTENSION_M = 0.005
+CONTACT_SKIN_MAX_ORIGIN_DISTANCE_M = 0.030
 PHASE_POSE = {
-    "look_settle": "neutral",
-    "object_naming": "neutral",
-    "reach": "open",
-    "near_miss": "open",
-    "touch_push": "contact",
-    "post_contact_grasp": "grasp",
-    "lift_place": "grasp",
-    "release_drop": "open",
+    "look": "neutral",
+    "reorient": "neutral",
+    "approach": "neutral",
+    "reach_past_distractor": "open",
+    "fingertip_contact": "contact",
+    "grasp": "grasp",
+    "lift": "grasp",
+    "inspect_rotate": "grasp",
+    "head_turn_maintain_contact": "grasp",
+    "release": "open",
+    "settle": "neutral",
 }
 FLEXION_DEGREES = {
     "neutral": (0.0, 0.0, 0.0),
@@ -214,7 +228,10 @@ def _calibrate_finger_rest_pose(
         if len(origins_local) < 2:
             raise RuntimeError(f"insufficient MIMo chain points for {finger}")
         terminal_vector = origins_local[-1] - origins_local[-2]
-        terminal_length = max(terminal_vector.length * 0.78, 0.004 / scale)
+        # MIMo exposes the distal phalanx origin but no terminal body origin.
+        # Continue the final measured segment by one segment length so the
+        # visible fingertip reaches the physical distal capsule surface.
+        terminal_length = max(terminal_vector.length, 0.004 / scale)
         terminal_direction = terminal_vector.normalized()
         tails = origins_local[1:] + [
             origins_local[-1] + terminal_direction * terminal_length
@@ -223,6 +240,10 @@ def _calibrate_finger_rest_pose(
         for bone_name, head, tail in zip(mpfb_chain, origins_local, tails):
             bone = armature.data.edit_bones[bone_name]
             bone.use_connect = False
+            # The MakeHuman hierarchy includes intermediate palm controls that
+            # do not exist in the MIMo chain.  Detach the deform phalanges so
+            # each authoritative segment can receive an absolute pose matrix.
+            bone.parent = None
             bone.head = head
             bone.tail = tail
             bone.roll = 0.0
@@ -269,6 +290,7 @@ def _pose_fingers(armature: bpy.types.Object, pose_name: str) -> None:
     for pose_bone in armature.pose.bones:
         pose_bone.rotation_mode = "XYZ"
         pose_bone.rotation_euler = (0.0, 0.0, 0.0)
+        pose_bone.scale = (1.0, 1.0, 1.0)
     flexion = FLEXION_DEGREES[pose_name]
     for finger, chain in MPFB_CHAINS.items():
         multiplier = 0.75 if finger == "thumb" else 1.0
@@ -276,6 +298,99 @@ def _pose_fingers(armature: bpy.types.Object, pose_name: str) -> None:
             armature.pose.bones[bone_name].rotation_euler.x = math.radians(
                 flexion[index] * multiplier
             )
+
+
+def _pose_mimo_chains(
+    armature: bpy.types.Object,
+    body_pose: np.ndarray,
+    body_index: dict[str, int],
+    contact_position: np.ndarray,
+) -> dict[str, Any]:
+    """Pose the calibrated MPFB bones on the authoritative MIMo chain.
+
+    Edit-bone calibration establishes one neutral bind pose.  Episode frames
+    then use pose matrices, which deforms the weighted MPFB skin while leaving
+    its thickness and bind topology intact.
+    """
+    for pose_bone in armature.pose.bones:
+        pose_bone.matrix_basis = Matrix.Identity(4)
+    world_to_armature = armature.matrix_world.inverted()
+    selected_contact_finger = None
+    contact_distance = None
+    if np.isfinite(contact_position).all():
+        distal_distances = {
+            finger: float(
+                np.linalg.norm(
+                    body_pose[body_index[MIMO_CHAINS[finger][-1]], :3]
+                    - contact_position
+                )
+            )
+            for finger in MIMO_CHAINS
+        }
+        candidate = min(distal_distances, key=distal_distances.get)
+        if distal_distances[candidate] <= CONTACT_SKIN_MAX_ORIGIN_DISTANCE_M:
+            selected_contact_finger = candidate
+            contact_distance = distal_distances[candidate]
+    for finger, mpfb_chain in MPFB_CHAINS.items():
+        mimo_chain = MIMO_CHAINS[finger]
+        origins = [
+            world_to_armature
+            @ Vector(body_pose[body_index[name], :3].tolist())
+            for name in mimo_chain
+        ]
+        distal_pose = body_pose[body_index[mimo_chain[-1]]]
+        distal_rotation = Quaternion(tuple(float(value) for value in distal_pose[3:7]))
+        distal_surface_world = Vector(distal_pose[:3].tolist()) + (
+            distal_rotation
+            @ Vector((0.0, 0.0, MIMO_DISTAL_SURFACE_OFFSET_M[finger]))
+        )
+        if finger == selected_contact_finger:
+            origin_world = Vector(distal_pose[:3].tolist())
+            contact_world = Vector(contact_position.tolist())
+            contact_direction = (contact_world - origin_world).normalized()
+            distal_surface_world = contact_world + (
+                contact_direction * CONTACT_SKIN_EXTENSION_M
+            )
+        tails = origins[1:] + [world_to_armature @ distal_surface_world]
+        for bone_name, head, tail in zip(mpfb_chain, origins, tails):
+            direction = tail - head
+            length = max(direction.length, 1e-8)
+            rest_bone = armature.data.bones[bone_name]
+            rest_direction = rest_bone.vector.normalized()
+            delta_rotation = rest_direction.rotation_difference(
+                direction.normalized()
+            ).to_matrix()
+            desired_rotation = (
+                delta_rotation @ rest_bone.matrix_local.to_3x3().normalized()
+            ).to_4x4()
+            rest_length = max(rest_bone.length, 1e-8)
+            transverse_scale = (
+                DISTAL_SKIN_THICKNESS_SCALE
+                if bone_name == mpfb_chain[-1]
+                else 1.0
+            )
+            scale = Matrix.Diagonal(
+                (
+                    transverse_scale,
+                    length / rest_length,
+                    transverse_scale,
+                    1.0,
+                )
+            )
+            armature.pose.bones[bone_name].matrix = (
+                Matrix.Translation(head) @ desired_rotation @ scale
+            )
+    bpy.context.view_layer.update()
+    return {
+        "active": selected_contact_finger is not None,
+        "finger": selected_contact_finger,
+        "distal_origin_to_contact_m": contact_distance,
+        "extension_beyond_contact_m": (
+            CONTACT_SKIN_EXTENSION_M
+            if selected_contact_finger is not None
+            else 0.0
+        ),
+    }
 
 
 def _camera_from_trace(pose: np.ndarray) -> tuple[Vector, Matrix]:
@@ -311,11 +426,30 @@ def _configure_scene(
     camera.data.clip_start = 0.005
     scene.camera = camera
     lamp_data = bpy.data.lights.new("OverlayKey", "AREA")
-    lamp_data.energy = 24.0
+    lamp_data.energy = 80.0
     lamp_data.size = 0.4
     lamp = bpy.data.objects.new("OverlayKey", lamp_data)
     bpy.context.collection.objects.link(lamp)
     return camera
+
+
+def _apply_skin_material(mesh: bpy.types.Object) -> bpy.types.Material:
+    """Use an explicit local material so missing MPFB textures cannot turn gray."""
+    material = bpy.data.materials.new("MPFBProvisionalSkinMaterial")
+    material.diffuse_color = (0.46, 0.24, 0.15, 1.0)
+    material.roughness = 0.68
+    material.use_nodes = True
+    principled = material.node_tree.nodes.get("Principled BSDF")
+    if principled is not None:
+        principled.inputs["Base Color"].default_value = (0.46, 0.24, 0.15, 1.0)
+        principled.inputs["Roughness"].default_value = 0.68
+        if "Subsurface Weight" in principled.inputs:
+            principled.inputs["Subsurface Weight"].default_value = 0.035
+    mesh.data.materials.clear()
+    mesh.data.materials.append(material)
+    for polygon in mesh.data.polygons:
+        polygon.material_index = 0
+    return material
 
 
 def _sleeve_cuff(armature: bpy.types.Object) -> bpy.types.Object:
@@ -341,10 +475,10 @@ def _sleeve_cuff(armature: bpy.types.Object) -> bpy.types.Object:
 
 
 def _target_visual(spec: dict[str, Any]) -> bpy.types.Object:
-    target = spec["target"]
-    geometry = target["geometry"]["value"]
-    rgba = tuple(float(value) for value in target["rgba"]["value"])
-    scale = np.asarray(target["scale_m"]["value"], dtype=float)
+    target = spec["scene_family"]["target"]
+    geometry = target["geometry"]
+    rgba = tuple(float(value) for value in target["rgba"])
+    scale = np.asarray(target["scale_m"], dtype=float)
     material = bpy.data.materials.new("ResolvedTargetMaterial")
     material.diffuse_color = rgba
     root = bpy.data.objects.new("ResolvedTarget", None)
@@ -373,9 +507,9 @@ def _target_visual(spec: dict[str, Any]) -> bpy.types.Object:
         visual.parent = root
         handle_radius = 0.007
         capsule_specs = (
-            ((0.0, 0.042, 0.025), (handle_radius, 0.020, handle_radius)),
-            ((0.0, 0.055, 0.0), (handle_radius, handle_radius, 0.032)),
-            ((0.0, 0.042, -0.025), (handle_radius, 0.020, handle_radius)),
+            ((0.0, -0.045, 0.025), (handle_radius, 0.020, handle_radius)),
+            ((0.0, -0.065, 0.0), (handle_radius, handle_radius, 0.032)),
+            ((0.0, -0.045, -0.025), (handle_radius, 0.020, handle_radius)),
         )
         for index, (location, dimensions) in enumerate(capsule_specs):
             bpy.ops.mesh.primitive_uv_sphere_add(segments=32, ring_count=16)
@@ -388,6 +522,23 @@ def _target_visual(spec: dict[str, Any]) -> bpy.types.Object:
     else:
         raise ValueError(f"unsupported resolved target geometry for overlay: {geometry}")
     return root
+
+
+def _set_render_hidden(root: bpy.types.Object, hidden: bool) -> None:
+    root.hide_render = hidden
+    for child in root.children_recursive:
+        child.hide_render = hidden
+
+
+def _distractor_visual() -> bpy.types.Object:
+    material = bpy.data.materials.new("ReachDistractorMaterial")
+    material.diffuse_color = (0.08, 0.28, 0.72, 1.0)
+    material.roughness = 0.62
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=32, ring_count=16, radius=0.035)
+    visual = bpy.context.object
+    visual.name = "ReachDistractor"
+    visual.data.materials.append(material)
+    return visual
 
 
 def _set_pose(object_: bpy.types.Object, pose: np.ndarray) -> None:
@@ -418,11 +569,38 @@ def _save_depth(output: Path, width: int, height: int) -> dict[str, Any]:
     }
 
 
+def _render_depth_array(work_path: Path) -> np.ndarray:
+    """Return the current metric Z pass, using one overwritten ignored EXR."""
+    scene = bpy.context.scene
+    prior_format = scene.render.image_settings.file_format
+    prior_mode = scene.render.image_settings.color_mode
+    scene.render.image_settings.file_format = "OPEN_EXR_MULTILAYER"
+    scene.render.image_settings.color_mode = "RGBA"
+    bpy.data.images["Render Result"].save_render(str(work_path), scene=scene)
+    scene.render.image_settings.file_format = prior_format
+    scene.render.image_settings.color_mode = prior_mode
+    image_input = oiio.ImageInput.open(str(work_path))
+    if image_input is None:
+        raise RuntimeError(f"OpenImageIO could not open {work_path}")
+    try:
+        spec = image_input.spec()
+        channel_names = list(spec.channelnames)
+        if "ViewLayer.Depth.Z" not in channel_names:
+            raise RuntimeError(f"missing Depth.Z channel in {channel_names}")
+        pixels = np.asarray(image_input.read_image(), dtype=np.float32)
+        return pixels[..., channel_names.index("ViewLayer.Depth.Z")].copy()
+    finally:
+        image_input.close()
+
+
 def _inspection_indices(
-    trace: dict[str, np.ndarray], *, all_frames: bool
+    trace: dict[str, np.ndarray], *, all_frames: bool, fps: int
 ) -> list[int]:
     if all_frames:
-        return list(range(len(trace["time_s"])))
+        truth_hz = int(round(1.0 / np.median(np.diff(trace["time_s"]))))
+        if truth_hz % fps:
+            raise ValueError("trace truth rate must be divisible by requested fps")
+        return list(range(0, len(trace["time_s"]), truth_hz // fps))
     phases = trace["phase"].astype(str)
     result = [0]
     near_miss = _near_miss_closest_sample(trace)
@@ -444,31 +622,22 @@ def _inspection_indices(
 def _near_miss_closest_sample(
     trace: dict[str, np.ndarray],
 ) -> dict[str, Any]:
-    frame_mask = trace["phase"].astype(str) == "near_miss"
-    frame_indices = np.flatnonzero(frame_mask)
+    frame_mask = trace["phase"].astype(str) == "reach_past_distractor"
+    frame_indices = np.flatnonzero(
+        frame_mask & np.isfinite(trace["near_miss_clearance_m"])
+    )
     if not frame_indices.size:
-        raise ValueError("trace has no near_miss phase")
-    start_s = float(trace["time_s"][frame_indices[0]])
-    end_s = float(trace["time_s"][frame_indices[-1]])
-    substep_mask = (
-        (trace["substep_time_s"] >= start_s)
-        & (trace["substep_time_s"] <= end_s)
-    )
-    substep_indices = np.flatnonzero(substep_mask)
-    local = int(
-        np.argmin(trace["substep_signed_separation_m"][substep_indices])
-    )
-    substep_index = int(substep_indices[local])
-    time_s = float(trace["substep_time_s"][substep_index])
-    nearest_frame = int(np.argmin(np.abs(trace["time_s"] - time_s)))
+        raise ValueError("trace has no sampled near-miss clearance")
+    local = int(np.argmin(trace["near_miss_clearance_m"][frame_indices]))
+    nearest_frame = int(frame_indices[local])
+    time_s = float(trace["time_s"][nearest_frame])
     return {
-        "substep_index": substep_index,
         "time_s": time_s,
         "signed_separation_m": float(
-            trace["substep_signed_separation_m"][substep_index]
+            trace["near_miss_clearance_m"][nearest_frame]
         ),
         "nearest_frame_index": nearest_frame,
-        "nearest_frame_time_s": float(trace["time_s"][nearest_frame]),
+        "nearest_frame_time_s": time_s,
     }
 
 
@@ -491,7 +660,9 @@ def _render_alpha_mask(
     bpy.data.images.remove(saved)
     for obj, hidden in prior.items():
         obj.hide_render = hidden
-    return pixels[:, :, 3] > 0.05
+    # Blender image-buffer rows are bottom-up; saved PNG/projected pixels use
+    # the conventional top-left image origin.
+    return np.flipud(pixels[:, :, 3] > 0.05)
 
 
 def _mask_gap(
@@ -499,6 +670,7 @@ def _mask_gap(
     target_mask: np.ndarray,
     *,
     metres_per_pixel: float,
+    threshold_pixels: float,
 ) -> dict[str, Any]:
     hand_yx = np.argwhere(hand_mask)
     target_yx = np.argwhere(target_mask)
@@ -527,10 +699,38 @@ def _mask_gap(
     return {
         "gap_pixels": gap_pixels,
         "metres_per_pixel": metres_per_pixel,
-        "gap_m": gap_m,
-        "threshold_m": 0.003,
-        "passed": bool(gap_m >= 0.003),
+        "approximate_planar_gap_m": gap_m,
+        "screen_space_nonoverlap_threshold_pixels": threshold_pixels,
+        "passed": bool(gap_pixels >= threshold_pixels),
     }
+
+
+def _project_world_point(
+    point: np.ndarray,
+    camera: bpy.types.Object,
+    *,
+    width: int,
+    height: int,
+) -> np.ndarray:
+    camera_point = camera.matrix_world.inverted() @ Vector(point.tolist())
+    depth = -float(camera_point.z)
+    if depth <= 0.0:
+        return np.asarray([np.nan, np.nan])
+    focal = height / (2.0 * math.tan(math.radians(90.0) / 2.0))
+    return np.asarray(
+        [
+            width / 2.0 + focal * float(camera_point.x) / depth,
+            height / 2.0 - focal * float(camera_point.y) / depth,
+        ]
+    )
+
+
+def _nearest_mask_distance(pixel_xy: np.ndarray, mask: np.ndarray) -> float:
+    if not np.isfinite(pixel_xy).all() or not np.any(mask):
+        return float("inf")
+    coordinates_yx = np.argwhere(mask)
+    differences = coordinates_yx[:, ::-1] - pixel_xy
+    return float(np.sqrt(np.min(np.sum(differences * differences, axis=1))))
 
 
 def run(
@@ -543,10 +743,19 @@ def run(
     height: int,
     all_frames: bool,
     render_samples: int,
+    fps: int,
 ) -> dict[str, Any]:
     trace_archive = np.load(trace_path, allow_pickle=False)
     spec = json.loads(spec_path.read_text(encoding="utf-8"))
-    required = {"body_pose", "camera_pose", "target_pose", "phase", "time_s"}
+    required = {
+        "body_pose",
+        "camera_pose",
+        "target_pose",
+        "reach_distractor_pose",
+        "touch_contact_position",
+        "phase",
+        "time_s",
+    }
     missing = sorted(required - set(trace_archive.files))
     if missing:
         raise ValueError(f"EpisodeTrace missing required streams: {missing}")
@@ -575,11 +784,18 @@ def run(
         if obj not in {armature, mesh}:
             obj.hide_render = True
     retained_vertices = _crop_to_forearm(mesh, armature)
+    skin_material = _apply_skin_material(mesh)
     camera = _configure_scene(
         width, height, render_samples=render_samples
     )
     cuff = _sleeve_cuff(armature)
     target_visual = _target_visual(spec)
+    distractor_visual = _distractor_visual()
+    if all_frames:
+        # The MuJoCo background already contains the authoritative target and
+        # distractor.  The all-frame overlay replaces only the visible skin.
+        _set_render_hidden(target_visual, True)
+        distractor_visual.hide_render = True
     rest = _rest_points(armature)
     source = np.asarray(
         [list(rest["wrist"])] + [list(rest[finger]) for finger in MIMO_BASES],
@@ -614,19 +830,21 @@ def run(
     alignment_labels = ["right_hand"] + [
         name for chain in MIMO_CHAINS.values() for name in chain
     ]
-    alignment_source = np.asarray(
-        [list(rest["wrist"])]
-        + [
-            list(armature.data.bones[bone_name].head_local)
-            for chain in MPFB_CHAINS.values()
-            for bone_name in chain
-        ],
-        dtype=np.float64,
-    )
     near_miss_closest = _near_miss_closest_sample(trace)
     rendered_near_miss_gap = None
+    projected_contact_records = []
     frame_records = []
-    for frame_index in _inspection_indices(trace, all_frames=all_frames):
+    render_indices = _inspection_indices(trace, all_frames=all_frames, fps=fps)
+    depth_memmap = None
+    depth_work_path = output_dir / "overlay_depth_work.exr"
+    if all_frames:
+        depth_memmap = np.lib.format.open_memmap(
+            output_dir / "overlay_depth_m.npy",
+            mode="w+",
+            dtype=np.float32,
+            shape=(len(render_indices), height, width),
+        )
+    for output_index, frame_index in enumerate(render_indices):
         body_pose = trace["body_pose"][frame_index]
         target = np.asarray(
             [body_pose[body_index["right_hand"], :3]]
@@ -637,30 +855,6 @@ def run(
             dtype=np.float64,
         )
         rotation, scale, translation, mapped = _similarity(source, target)
-        _calibrate_finger_rest_pose(
-            armature,
-            body_pose,
-            body_index,
-            rotation,
-            scale,
-            translation,
-        )
-        rest = _rest_points(armature)
-        source = np.asarray(
-            [list(rest["wrist"])]
-            + [list(rest[finger]) for finger in MIMO_BASES],
-            dtype=np.float64,
-        )
-        rotation, scale, translation, mapped = _similarity(source, target)
-        alignment_source = np.asarray(
-            [list(rest["wrist"])]
-            + [
-                list(armature.data.bones[bone_name].head_local)
-                for chain in MPFB_CHAINS.values()
-                for bone_name in chain
-            ],
-            dtype=np.float64,
-        )
         alignment_target = np.asarray(
             [
                 body_pose[body_index[name], :3]
@@ -668,13 +862,39 @@ def run(
             ],
             dtype=np.float64,
         )
-        alignment_mapped = (
-            alignment_source @ rotation * scale + translation
-        )
         armature.matrix_world = _object_matrix(rotation, scale, translation)
         pose_name = PHASE_POSE.get(str(trace["phase"][frame_index]), "neutral")
-        _pose_fingers(armature, pose_name)
+        skin_contact_calibration = _pose_mimo_chains(
+            armature,
+            body_pose,
+            body_index,
+            trace["touch_contact_position"][frame_index],
+        )
+        wrist_world = armature.matrix_world @ rest["wrist"]
+        chain_heads_world = [
+            armature.matrix_world @ armature.pose.bones[bone_name].head
+            for chain in MPFB_CHAINS.values()
+            for bone_name in chain
+        ]
+        alignment_mapped = np.asarray(
+            [list(wrist_world)] + [list(point) for point in chain_heads_world],
+            dtype=np.float64,
+        )
+        mapped = np.asarray(
+            [list(wrist_world)]
+            + [
+                list(
+                    armature.matrix_world
+                    @ armature.pose.bones[MPFB_CHAINS[finger][0]].head
+                )
+                for finger in MIMO_BASES
+            ],
+            dtype=np.float64,
+        )
         _set_pose(target_visual, trace["target_pose"][frame_index])
+        distractor_visual.location = Vector(
+            trace["reach_distractor_pose"][frame_index, :3]
+        )
         camera_location, camera_rotation = _camera_from_trace(
             trace["camera_pose"][frame_index]
         )
@@ -697,14 +917,22 @@ def run(
             Vector(trace["target_pose"][frame_index, :3]) - key.location
         ).to_track_quat("-Z", "Y").to_euler()
         bpy.context.view_layer.update()
-        output = output_dir / f"overlay_{frame_index:04d}_{pose_name}.png"
+        output = output_dir / (
+            f"overlay_{output_index:04d}.png"
+            if all_frames
+            else f"overlay_{frame_index:04d}_{pose_name}.png"
+        )
         bpy.context.scene.render.filepath = str(output)
         bpy.ops.render.render(write_still=True)
-        depth_record = _save_depth(
-            output_dir / f"overlay_{frame_index:04d}_{pose_name}_depth_z.exr",
-            width,
-            height,
-        )
+        depth_record = None
+        if all_frames:
+            depth_memmap[output_index] = _render_depth_array(depth_work_path)
+        else:
+            depth_record = _save_depth(
+                output_dir / f"overlay_{frame_index:04d}_{pose_name}_depth_z.exr",
+                width,
+                height,
+            )
         mask_record = None
         if (
             not all_frames
@@ -713,9 +941,60 @@ def run(
             hand_mask_path = (
                 output_dir / f"overlay_{frame_index:04d}_hand_mask.png"
             )
-            target_mask_path = (
-                output_dir / f"overlay_{frame_index:04d}_target_mask.png"
+            distractor_mask_path = (
+                output_dir / f"overlay_{frame_index:04d}_distractor_mask.png"
             )
+            hand_mask = _render_alpha_mask(
+                hand_mask_path, {mesh, cuff}, width, height
+            )
+            distractor_mask = _render_alpha_mask(
+                distractor_mask_path, {distractor_visual}, width, height
+            )
+            camera_inverse = camera.matrix_world.inverted()
+            hand_depth = -float(
+                (camera_inverse @ Vector(body_pose[body_index["right_hand"], :3]))[
+                    2
+                ]
+            )
+            distractor_depth = -float(
+                (
+                    camera_inverse
+                    @ Vector(trace["reach_distractor_pose"][frame_index, :3])
+                )[2]
+            )
+            metres_per_pixel = (
+                2.0
+                * min(hand_depth, distractor_depth)
+                * math.tan(math.radians(90.0) / 2.0)
+                / height
+            )
+            mask_record = _mask_gap(
+                hand_mask,
+                distractor_mask,
+                metres_per_pixel=metres_per_pixel,
+                # The frozen 0.008 m near-miss threshold is a 3-D geom-distance
+                # gate and is enforced by physics QA.  Its screen-space visual
+                # counterpart is non-overlap, not a perspective-scaled 3-D
+                # distance.  Require at least one full pixel of separation.
+                threshold_pixels=1.0,
+            )
+            mask_record.update(
+                {
+                    "hand_mask": hand_mask_path.name,
+                    "hand_mask_sha256": _sha256(hand_mask_path),
+                    "distractor_mask": distractor_mask_path.name,
+                    "distractor_mask_sha256": _sha256(distractor_mask_path),
+                    "hand_camera_depth_m": hand_depth,
+                    "distractor_camera_depth_m": distractor_depth,
+                    "camera_vertical_fov_deg": 90.0,
+                }
+            )
+            rendered_near_miss_gap = mask_record
+        contact_record = None
+        contact_position = trace["touch_contact_position"][frame_index]
+        if not all_frames and np.isfinite(contact_position).all():
+            hand_mask_path = output_dir / f"overlay_{frame_index:04d}_contact_hand_mask.png"
+            target_mask_path = output_dir / f"overlay_{frame_index:04d}_contact_target_mask.png"
             hand_mask = _render_alpha_mask(
                 hand_mask_path, {mesh, cuff}, width, height
             )
@@ -727,41 +1006,24 @@ def run(
             target_mask = _render_alpha_mask(
                 target_mask_path, target_meshes, width, height
             )
-            camera_inverse = camera.matrix_world.inverted()
-            hand_depth = -float(
-                (camera_inverse @ Vector(body_pose[body_index["right_hand"], :3]))[
-                    2
-                ]
+            projected = _project_world_point(
+                contact_position, camera, width=width, height=height
             )
-            target_depth = -float(
-                (
-                    camera_inverse
-                    @ Vector(trace["target_pose"][frame_index, :3])
-                )[2]
-            )
-            metres_per_pixel = (
-                2.0
-                * min(hand_depth, target_depth)
-                * math.tan(math.radians(90.0) / 2.0)
-                / height
-            )
-            mask_record = _mask_gap(
-                hand_mask,
-                target_mask,
-                metres_per_pixel=metres_per_pixel,
-            )
-            mask_record.update(
-                {
-                    "hand_mask": hand_mask_path.name,
-                    "hand_mask_sha256": _sha256(hand_mask_path),
-                    "target_mask": target_mask_path.name,
-                    "target_mask_sha256": _sha256(target_mask_path),
-                    "hand_camera_depth_m": hand_depth,
-                    "target_camera_depth_m": target_depth,
-                    "camera_vertical_fov_deg": 90.0,
-                }
-            )
-            rendered_near_miss_gap = mask_record
+            target_distance = _nearest_mask_distance(projected, target_mask)
+            hand_distance = _nearest_mask_distance(projected, hand_mask)
+            contact_record = {
+                "frame_index": frame_index,
+                "time_s": float(trace["time_s"][frame_index]),
+                "projected_pixel_xy": projected.tolist(),
+                "target_distance_px": target_distance,
+                "hand_distance_px": hand_distance,
+                "visible_union_distance_px": min(
+                    target_distance, hand_distance
+                ),
+                "hand_mask": hand_mask_path.name,
+                "target_mask": target_mask_path.name,
+            }
+            projected_contact_records.append(contact_record)
         errors = np.linalg.norm(alignment_mapped - alignment_target, axis=1)
         frame_records.append(
             {
@@ -794,12 +1056,19 @@ def run(
                 "frame": output.name,
                 "frame_sha256": _sha256(output),
                 "depth": depth_record,
-                "rendered_skin_target_gap": mask_record,
+                "rendered_skin_distractor_gap": mask_record,
+                "projected_contact": contact_record,
+                "contact_skin_calibration": skin_contact_calibration,
             }
         )
+    if depth_memmap is not None:
+        depth_memmap.flush()
+        del depth_memmap
+        if depth_work_path.exists():
+            depth_work_path.unlink()
     receipt = {
         "schema_version": "mpfb_episode_trace_overlay.v1",
-        "status": "diagnostic_overlay_not_appearance_qualification",
+        "status": "pending_gate_evaluation",
         "trace": str(trace_path),
         "trace_sha256": _sha256(trace_path),
         "body_names_sha256": _sha256(body_names_path),
@@ -809,9 +1078,11 @@ def run(
         "blend_sha256": _sha256(Path(bpy.data.filepath)),
         "blender_version": bpy.app.version_string,
         "render_mode": "all_frames" if all_frames else "inspection_frames",
+        "fps": fps,
         "render_samples": render_samples,
         "near_miss_closest_sample": near_miss_closest,
         "rendered_near_miss_gap": rendered_near_miss_gap,
+        "projected_contact_records": projected_contact_records,
         "coordinate_contract": "MuJoCo and Blender right-handed Z-up; camera right/up/backward matrix",
         "mapping": {
             "global_fit": ["right_hand", *MIMO_BASES.values()],
@@ -822,6 +1093,14 @@ def run(
                 "do not override physics alignment"
             ),
             "phase_pose": PHASE_POSE,
+            "mimo_distal_surface_offset_m": MIMO_DISTAL_SURFACE_OFFSET_M,
+            "distal_skin_thickness_scale": DISTAL_SKIN_THICKNESS_SCALE,
+            "contact_skin_calibration": {
+                "source": "simulator-truth contact position",
+                "maximum_distal_origin_distance_m": CONTACT_SKIN_MAX_ORIGIN_DISTANCE_M,
+                "extension_beyond_contact_m": CONTACT_SKIN_EXTENSION_M,
+                "authority": "appearance deformation only; no physics or trace mutation",
+            },
             "finger_chains": MPFB_CHAINS,
             "flexion_degrees": FLEXION_DEGREES,
         },
@@ -829,11 +1108,16 @@ def run(
             "mesh": mesh.name,
             "retained_vertices": retained_vertices,
             "five_finger_chains": len(MPFB_CHAINS),
+            "material": skin_material.name,
+            "claim_boundary": (
+                "provisional MPFB appearance proxy; not age-matched, infant-"
+                "calibrated, human-validated, or infant-trained"
+            ),
         },
         "resolved_target_visual": {
-            "geometry": spec["target"]["geometry"]["value"],
-            "rgba": spec["target"]["rgba"]["value"],
-            "scale_m": spec["target"]["scale_m"]["value"],
+            "geometry": spec["scene_family"]["target"]["geometry"],
+            "rgba": spec["scene_family"]["target"]["rgba"],
+            "scale_m": spec["scene_family"]["target"]["scale_m"],
             "cup_handle": "three visible rounded capsule elements",
         },
         "frames": frame_records,
@@ -863,6 +1147,41 @@ def run(
         and receipt["alignment_gate"]["observed_maximum_landmark_error_m"]
         <= ALIGNMENT_MAX_GATE_M
     )
+    near_miss_gate_passed = bool(
+        all_frames
+        or (
+            rendered_near_miss_gap is not None
+            and rendered_near_miss_gap["passed"]
+        )
+    )
+    contact_gate_passed = bool(
+        all_frames
+        or (
+            projected_contact_records
+            and max(
+                record["visible_union_distance_px"]
+                for record in projected_contact_records
+            )
+            <= float(spec["frozen_gates"]["visible_contact_alignment_px_max"])
+        )
+    )
+    receipt["appearance_qualification"] = {
+        "alignment_passed": receipt["alignment_gate"]["passed"],
+        "rendered_near_miss_gap_passed": near_miss_gate_passed,
+        "projected_contact_alignment_passed": contact_gate_passed,
+        "all_frame_depth_stream_present": bool(
+            not all_frames or (output_dir / "overlay_depth_m.npy").is_file()
+        ),
+        "physics_and_camera_authority": "read-only EpisodeTrace replay",
+    }
+    receipt["appearance_qualification"]["passed"] = bool(
+        all(receipt["appearance_qualification"].values())
+    )
+    receipt["status"] = (
+        "appearance_qualified"
+        if receipt["appearance_qualification"]["passed"]
+        else "appearance_qualification_failed"
+    )
     receipt_path = output_dir / "overlay_receipt.json"
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     return receipt
@@ -879,6 +1198,7 @@ def main() -> None:
     parser.add_argument("--height", type=int, default=480)
     parser.add_argument("--all-frames", action="store_true")
     parser.add_argument("--render-samples", type=int, default=16)
+    parser.add_argument("--fps", type=int, default=30)
     args = parser.parse_args(arguments)
     print(
         json.dumps(
@@ -891,6 +1211,7 @@ def main() -> None:
                 height=args.height,
                 all_frames=args.all_frames,
                 render_samples=args.render_samples,
+                fps=args.fps,
             ),
             indent=2,
         )

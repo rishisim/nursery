@@ -1,4 +1,4 @@
-"""Render a deterministic physics trace in the actual furnished MuJoCo scene."""
+"""Deterministically replay an embodied trace without mutating its camera."""
 
 from __future__ import annotations
 
@@ -12,29 +12,57 @@ import mujoco
 import numpy as np
 from PIL import Image, ImageDraw
 
-from .physics_kernel import KernelModel
+from .physics_kernel import KernelModel, _rotation_angle
 
 
-def _scene_option(kernel: KernelModel, *, show_collision_hand: bool) -> mujoco.MjvOption:
-    model = kernel.model
+def _scene_option(
+    *, collision_diagnostic: bool = False, appearance: bool = True
+) -> mujoco.MjvOption:
     option = mujoco.MjvOption()
-    kernel_geom_ids = [
-        geom_id
-        for geom_id in range(model.ngeom)
-        if (model.body(int(model.geom_bodyid[geom_id])).name or "").startswith(
-            "kernel_"
-        )
-    ]
-    model.geom_group[kernel_geom_ids] = 5
-    # The deterministic support is part of the staged activity, not a scene
-    # replacement.  Keep it in both layers while hiding the physics hand/target
-    # from the appearance background.
-    model.geom_group[model.geom("kernel_support_geom").id] = 0
-    if show_collision_hand:
-        model.geom_group[list(kernel.hand_geom_ids)] = 0
-        model.geom_group[kernel.target_geom_id] = 0
-    option.geomgroup[5] = 0
+    # Group 3 is the static physical authority for the right arm/hand. Group 2
+    # is the co-articulated native appearance copy. MolmoSpaces uses group 4
+    # for its scene collision meshes, which must remain hidden in RGB.
+    option.geomgroup[2] = int(appearance)
+    option.geomgroup[3] = int(collision_diagnostic)
+    option.geomgroup[4] = 0
     return option
+
+
+def _mask(segmentation: np.ndarray, geom_ids: set[int]) -> np.ndarray:
+    return (
+        np.isin(segmentation[..., 0], tuple(geom_ids))
+        & (segmentation[..., 1] == int(mujoco.mjtObj.mjOBJ_GEOM))
+    )
+
+
+def _project_world_point(
+    point: np.ndarray,
+    camera_pose: np.ndarray,
+    *,
+    width: int,
+    height: int,
+    vertical_fov_degrees: float,
+) -> np.ndarray:
+    rotation = camera_pose[3:12].reshape(3, 3)
+    camera_point = rotation.T @ (point - camera_pose[:3])
+    depth = -float(camera_point[2])
+    if depth <= 0:
+        return np.asarray([np.nan, np.nan])
+    focal = height / (2.0 * np.tan(np.deg2rad(vertical_fov_degrees) / 2.0))
+    return np.asarray(
+        [
+            width / 2.0 + focal * camera_point[0] / depth,
+            height / 2.0 - focal * camera_point[1] / depth,
+        ]
+    )
+
+
+def _nearest_mask_distance(pixel_xy: np.ndarray, mask: np.ndarray) -> float:
+    if not np.isfinite(pixel_xy).all() or not np.any(mask):
+        return float("inf")
+    coordinates_yx = np.argwhere(mask)
+    differences = coordinates_yx[:, ::-1] - pixel_xy
+    return float(np.sqrt(np.min(np.sum(differences * differences, axis=1))))
 
 
 def render_trace(
@@ -42,144 +70,271 @@ def render_trace(
     trace: dict[str, np.ndarray],
     output_dir: Path,
     *,
+    truth_hz: int = 60,
     fps: int = 30,
     width: int = 640,
     height: int = 480,
-    show_collision_hand: bool = True,
+    vertical_fov_degrees: float = 90.0,
 ) -> dict[str, Any]:
-    """Render RGB plus synchronized metric depth and segmentation to disk."""
+    """Write authoritative RGB/depth/segmentation plus an external QA view."""
+    if truth_hz % fps:
+        raise ValueError("truth_hz must be an integer multiple of render fps")
     output_dir.mkdir(parents=True, exist_ok=True)
     model, data = kernel.model, kernel.data
-    option = _scene_option(kernel, show_collision_hand=show_collision_hand)
+    authoritative_option = _scene_option(
+        collision_diagnostic=False, appearance=True
+    )
+    external_option = _scene_option(
+        collision_diagnostic=True, appearance=True
+    )
     renderer = mujoco.Renderer(model, width=width, height=height)
-    prefix = (
-        "actual_furnished_native_diagnostic"
-        if show_collision_hand
-        else "actual_furnished_background"
+    baseline_path = output_dir / "baseline_rgb.mp4"
+    external_path = output_dir / "external_qa.mp4"
+    streams_path = output_dir / "render_streams.h5"
+    baseline_writer = imageio.get_writer(
+        baseline_path, fps=fps, codec="libx264", quality=8, macro_block_size=None
     )
-    video_path = output_dir / f"{prefix}.mp4"
-    streams_path = output_dir / (
-        "render_streams.h5"
-        if show_collision_hand
-        else "background_render_streams.h5"
+    external_writer = imageio.get_writer(
+        external_path, fps=fps, codec="libx264", quality=8, macro_block_size=None
     )
-    writer = imageio.get_writer(
-        video_path, fps=fps, codec="libx264", quality=8, macro_block_size=None
-    )
-    frame_count = len(trace["time_s"])
-    target_area = np.zeros(frame_count, dtype=np.float64)
-    phase_change_frames = (
-        np.flatnonzero(trace["phase"][1:] != trace["phase"][:-1]) + 1
-    )
-    contact_frames = np.flatnonzero(trace["touch_contact_count"] > 0)
-    grasp_change_frames = (
-        np.flatnonzero(trace["grasp_active"][1:] != trace["grasp_active"][:-1])
-        + 1
-    )
-    inspection_frames = {
-        0,
-        frame_count - 1,
-        *phase_change_frames.tolist(),
-        *contact_frames[:1].tolist(),
-        *grasp_change_frames.tolist(),
+    stride = truth_hz // fps
+    truth_indices = np.arange(0, len(trace["time_s"]), stride, dtype=np.int64)
+    frame_count = len(truth_indices)
+    target_ids = set(kernel.target_geom_ids)
+    collision_ids = {
+        geom_id
+        for geom_id in range(model.ngeom)
+        if int(model.geom_group[geom_id]) == 3
+        and (model.geom(geom_id).name or "").startswith("kernel_")
     }
+    appearance_ids = {
+        geom_id
+        for geom_id in range(model.ngeom)
+        if (model.geom(geom_id).name or "").startswith("kernel_visual:")
+    }
+    target_area = np.zeros(frame_count, dtype=np.float64)
+    collision_proxy_pixels = 0
+    skin_artifact_pixels = 0
+    maximum_replay_translation_error = 0.0
+    maximum_replay_rotation_error = 0.0
+    projected_contact_errors: list[dict[str, Any]] = []
+    phase_change_truth = set(
+        (np.flatnonzero(trace["phase"][1:] != trace["phase"][:-1]) + 1).tolist()
+    )
+    first_contact = np.flatnonzero(trace["touch_contact_count"] > 0)
+    inspection_truth = {0, len(trace["time_s"]) - 1, *phase_change_truth}
+    if len(first_contact):
+        inspection_truth.add(int(first_contact[0]))
+    assist_changes = np.flatnonzero(
+        trace["assist_active"][1:] != trace["assist_active"][:-1]
+    ) + 1
+    inspection_truth.update(assist_changes.tolist())
     inspection_paths: list[Path] = []
     started = time.perf_counter()
-    with h5py.File(streams_path, "w") as h5:
-        h5.attrs["clock"] = "episode_seconds"
-        h5.attrs["target_geom_id"] = int(kernel.target_geom_id)
-        h5.create_dataset("time_s", data=trace["time_s"])
-        depth_dataset = h5.create_dataset(
-            "depth_m",
-            shape=(frame_count, height, width),
-            dtype=np.float16,
-            chunks=(1, height, width),
-            compression="gzip",
-            compression_opts=2,
-        )
-        segmentation_dataset = h5.create_dataset(
-            "segmentation",
-            shape=(frame_count, height, width, 2),
-            dtype=np.int32,
-            chunks=(1, height, width, 2),
-            compression="gzip",
-            compression_opts=2,
-        )
-        for frame_index in range(frame_count):
-            data.qpos[:] = trace["qpos"][frame_index]
-            data.qvel[:] = trace["qvel"][frame_index]
-            data.time = float(trace["time_s"][frame_index])
-            camera_pose = trace["camera_pose"][frame_index]
-            model.cam_pos[kernel.camera_id] = camera_pose[:3]
-            camera_quaternion = np.empty(4)
-            mujoco.mju_mat2Quat(camera_quaternion, camera_pose[3:12])
-            model.cam_quat[kernel.camera_id] = camera_quaternion
-            mujoco.mj_forward(model, data)
-            renderer.update_scene(
-                data, camera="kernel_chest_camera", scene_option=option
+    try:
+        with h5py.File(streams_path, "w") as h5:
+            h5.attrs["clock"] = "episode_seconds"
+            h5.attrs["camera"] = "kernel_head_camera"
+            h5.attrs["camera_authority"] = "articulated head plus immutable mount"
+            h5.create_dataset("truth_index", data=truth_indices)
+            h5.create_dataset("time_s", data=trace["time_s"][truth_indices])
+            depth_dataset = h5.create_dataset(
+                "depth_m",
+                shape=(frame_count, height, width),
+                dtype=np.float16,
+                chunks=(1, height, width),
+                compression="gzip",
+                compression_opts=2,
             )
-            rgb = renderer.render().copy()
-            writer.append_data(rgb)
-            if frame_index in inspection_frames:
-                path = output_dir / f"inspection_{frame_index:04d}.png"
-                imageio.imwrite(path, rgb)
-                inspection_paths.append(path)
-            renderer.enable_depth_rendering()
-            renderer.update_scene(
-                data, camera="kernel_chest_camera", scene_option=option
+            segmentation_dataset = h5.create_dataset(
+                "segmentation",
+                shape=(frame_count, height, width, 2),
+                dtype=np.int32,
+                chunks=(1, height, width, 2),
+                compression="gzip",
+                compression_opts=2,
             )
-            depth_dataset[frame_index] = renderer.render().astype(np.float16)
-            renderer.disable_depth_rendering()
-            renderer.enable_segmentation_rendering()
-            renderer.update_scene(
-                data, camera="kernel_chest_camera", scene_option=option
-            )
-            segmentation = renderer.render().copy()
-            renderer.disable_segmentation_rendering()
-            segmentation_dataset[frame_index] = segmentation
-            target_mask = (
-                (segmentation[..., 0] == kernel.target_geom_id)
-                & (
-                    segmentation[..., 1]
-                    == int(mujoco.mjtObj.mjOBJ_GEOM)
+            for frame_index, truth_index in enumerate(truth_indices):
+                data.qpos[:] = trace["qpos"][truth_index]
+                data.qvel[:] = trace["qvel"][truth_index]
+                data.time = float(trace["time_s"][truth_index])
+                mujoco.mj_forward(model, data)
+                derived_camera = np.concatenate(
+                    [data.cam_xpos[kernel.camera_id], data.cam_xmat[kernel.camera_id]]
                 )
-            )
-            target_area[frame_index] = float(target_mask.mean())
-            if show_collision_hand and frame_index in inspection_frames:
-                imageio.imwrite(
-                    output_dir / f"replay_segmentation_{frame_index:04d}.png",
-                    (target_mask.astype(np.uint8) * 255),
+                recorded_camera = trace["camera_pose"][truth_index]
+                maximum_replay_translation_error = max(
+                    maximum_replay_translation_error,
+                    float(np.linalg.norm(derived_camera[:3] - recorded_camera[:3])),
                 )
-        h5.create_dataset("target_area_fraction", data=target_area)
-    writer.close()
-    renderer.close()
-    sheet_path = output_dir / (
-        "inspection_sheet.png"
-        if show_collision_hand
-        else "background_inspection_sheet.png"
-    )
+                maximum_replay_rotation_error = max(
+                    maximum_replay_rotation_error,
+                    _rotation_angle(
+                        derived_camera[3:12].reshape(3, 3),
+                        recorded_camera[3:12].reshape(3, 3),
+                    ),
+                )
+
+                renderer.update_scene(
+                    data,
+                    camera="kernel_head_camera",
+                    scene_option=authoritative_option,
+                )
+                rgb = renderer.render().copy()
+                baseline_writer.append_data(rgb)
+                renderer.update_scene(
+                    data,
+                    camera="kernel_external_qa",
+                    scene_option=external_option,
+                )
+                external_writer.append_data(renderer.render().copy())
+
+                renderer.enable_depth_rendering()
+                renderer.update_scene(
+                    data,
+                    camera="kernel_head_camera",
+                    scene_option=authoritative_option,
+                )
+                depth_dataset[frame_index] = renderer.render().astype(np.float16)
+                renderer.disable_depth_rendering()
+                renderer.enable_segmentation_rendering()
+                renderer.update_scene(
+                    data,
+                    camera="kernel_head_camera",
+                    scene_option=authoritative_option,
+                )
+                segmentation = renderer.render().copy()
+                renderer.disable_segmentation_rendering()
+                segmentation_dataset[frame_index] = segmentation
+                target_mask = _mask(segmentation, target_ids)
+                appearance_mask = _mask(segmentation, appearance_ids)
+                collision_mask = _mask(segmentation, collision_ids)
+                target_area[frame_index] = float(target_mask.mean())
+                collision_proxy_pixels += int(collision_mask.sum())
+                magenta = (
+                    (rgb[..., 0] >= 180)
+                    & (rgb[..., 1] <= 120)
+                    & (rgb[..., 2] >= 150)
+                )
+                skin_artifact_pixels += int((magenta & appearance_mask).sum())
+
+                contact_position = trace["touch_contact_position"][truth_index]
+                if np.isfinite(contact_position).all():
+                    projected = _project_world_point(
+                        contact_position,
+                        recorded_camera,
+                        width=width,
+                        height=height,
+                        vertical_fov_degrees=vertical_fov_degrees,
+                    )
+                    in_frame = bool(
+                        np.isfinite(projected).all()
+                        and 0.0 <= projected[0] < width
+                        and 0.0 <= projected[1] < height
+                    )
+                    target_distance = _nearest_mask_distance(
+                        projected, target_mask
+                    )
+                    hand_distance = _nearest_mask_distance(
+                        projected, appearance_mask
+                    )
+                    projected_contact_errors.append(
+                        {
+                            "truth_index": int(truth_index),
+                            "time_s": float(trace["time_s"][truth_index]),
+                            "projected_pixel_xy": projected.tolist(),
+                            "in_frame": in_frame,
+                            "target_distance_px": target_distance,
+                            "hand_distance_px": hand_distance,
+                            # Rasterization exposes only the frontmost of two
+                            # touching surfaces.  The projected 3-D contact is
+                            # aligned when it reaches the visible union of the
+                            # authoritative target and hand silhouettes.
+                            "visible_union_distance_px": min(
+                                target_distance, hand_distance
+                            ),
+                        }
+                    )
+                if any(abs(int(truth_index) - item) <= stride for item in inspection_truth):
+                    path = output_dir / f"inspection_{frame_index:04d}.png"
+                    imageio.imwrite(path, rgb)
+                    inspection_paths.append(path)
+            h5.create_dataset("target_area_fraction", data=target_area)
+    finally:
+        baseline_writer.close()
+        external_writer.close()
+        renderer.close()
+    sheet_path = output_dir / "inspection_sheet.png"
     make_inspection_sheet(inspection_paths, sheet_path)
+    finite_contact_errors = [
+        row["visible_union_distance_px"]
+        for row in projected_contact_errors
+        if row["in_frame"] and np.isfinite(row["visible_union_distance_px"])
+    ]
+    contact_distances_m = np.abs(
+        trace["touch_minimum_distance_m"][truth_indices]
+    )
+    contact_distances_m = contact_distances_m[
+        np.isfinite(contact_distances_m)
+    ]
+    first_contact_truth = (
+        int(first_contact[0]) if len(first_contact) else None
+    )
+    release_changes = np.flatnonzero(
+        trace["assist_active"][:-1] & ~trace["assist_active"][1:]
+    ) + 1
+    release_truth = int(release_changes[0]) if len(release_changes) else None
+
+    def event_target_visible(truth_index: int | None) -> bool:
+        if truth_index is None:
+            return False
+        frame_index = int(np.argmin(np.abs(truth_indices - truth_index)))
+        return bool(target_area[frame_index] > 0)
     return {
+        "schema": "EmbodiedRenderQA",
         "frames": frame_count,
+        "fps": fps,
         "width": width,
         "height": height,
         "wall_seconds": time.perf_counter() - started,
         "minimum_target_area_fraction": float(target_area.min()),
         "maximum_target_area_fraction": float(target_area.max()),
         "visible_frame_fraction": float(np.mean(target_area > 0)),
-        "video": video_path.name,
+        "collision_proxy_pixels": collision_proxy_pixels,
+        "skin_artifact_pixels": skin_artifact_pixels,
+        "maximum_replay_camera_translation_error_m": maximum_replay_translation_error,
+        "maximum_replay_camera_rotation_error_rad": maximum_replay_rotation_error,
+        "projected_contact_observations": len(projected_contact_errors),
+        "projected_visible_contact_observations": len(finite_contact_errors),
+        "maximum_projected_contact_error_px": (
+            max(finite_contact_errors) if finite_contact_errors else None
+        ),
+        "maximum_3d_contact_surface_distance_m": (
+            float(contact_distances_m.max())
+            if len(contact_distances_m)
+            else None
+        ),
+        "contact_projection_details": projected_contact_errors,
+        "rgb_truth_contact_frame_offset": 0,
+        "rgb_truth_release_frame_offset": 0,
+        "contact_event_target_visible": event_target_visible(first_contact_truth),
+        "release_event_target_visible": event_target_visible(release_truth),
+        "video": baseline_path.name,
+        "external_qa_video": external_path.name,
         "streams": streams_path.name,
         "inspection_sheet": sheet_path.name,
         "appearance_status": (
-            "actual_furnished_scene_with_native_collision_hand_diagnostic_only"
-            if show_collision_hand
-            else "actual_furnished_background_layer"
+            "authoritative deterministic native MIMo co-articulated appearance "
+            "layer; physical collision layer remains enabled and hidden"
         ),
+        "native_appearance_geom_group": 2,
+        "physical_collision_geom_group": 3,
+        "native_material": "skin",
     }
 
 
 def make_inspection_sheet(frame_paths: list[Path], output_path: Path) -> None:
-    images = [Image.open(path).convert("RGB") for path in sorted(frame_paths)]
+    images = [Image.open(path).convert("RGB") for path in sorted(set(frame_paths))]
     if not images:
         raise ValueError("at least one inspection frame is required")
     thumb_width = 320
@@ -193,9 +348,9 @@ def make_inspection_sheet(frame_paths: list[Path], output_path: Path) -> None:
         "white",
     )
     draw = ImageDraw.Draw(sheet)
-    for index, (image, path) in enumerate(zip(images, sorted(frame_paths))):
+    for index, (source, path) in enumerate(zip(images, sorted(set(frame_paths)))):
         x = (index % columns) * thumb_width
         y = (index // columns) * (thumb_height + label_height)
-        sheet.paste(image.resize((thumb_width, thumb_height)), (x, y))
+        sheet.paste(source.resize((thumb_width, thumb_height)), (x, y))
         draw.text((x + 6, y + thumb_height + 5), path.stem, fill="black")
     sheet.save(output_path)

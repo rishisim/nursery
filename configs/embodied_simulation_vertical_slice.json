@@ -57,7 +57,18 @@
     "target": {
       "persistent_id": "yellow_cup_authored",
       "sha256": "b519991ba817ddde463dcbdc4fa9163e632d4cc0dc372a6f719db4bfe35e9b9f",
+      "scale_m": [0.08, 0.08, 0.10],
+      "geometry": "cylinder_with_three_capsule_handle",
+      "rgba": [0.92, 0.72, 0.05, 1.0],
       "license": "repository-authored CC0"
+    },
+    "qualified_placement": {
+      "root_xy_m": [-4.123, 2.206],
+      "occupancy_pixel_xy": [1092, 1191],
+      "occupancy_clearance_m": 0.715,
+      "target_offset_from_root_m": [0.34, -0.15, 0.10],
+      "support_offset_from_root_m": [0.34, -0.15, 0.025],
+      "selection_rule": "maximum-clearance collision-free candidate among the bounded furnished-scene staging candidates"
     }
   },
   "embodiment": {
@@ -65,9 +76,10 @@
     "morphology_months": 24,
     "camera_body": "head",
     "camera_mount": {
-      "translation_head_m": [0.0, 0.045, 0.025],
-      "quaternion_head_wxyz": [0.7071067811865476, 0.7071067811865475, 0.0, 0.0],
+      "translation_head_m": [0.081, 0.0, 0.067375],
+      "quaternion_head_wxyz": [0.2642907803854001, -0.48706974071026582, 0.4375916206381148, 0.70811512103260366],
       "immutable": true,
+      "calibration": "one fixed pre-qualification transform selected to view the authored interaction workspace; never aimed, followed, or offset at runtime",
       "world_pose_equation": "T_world_camera(t) = T_world_head(t) * T_head_camera"
     },
     "camera": {
@@ -104,6 +116,26 @@
     "runtime_collision_disabling_permitted": false,
     "collision_proxies_visible_in_authoritative_rgb": false,
     "object_direct_pose_keyframes_permitted": false
+  },
+  "appearance_policy": {
+    "decision_at_utc": "2026-07-31T20:00:00Z",
+    "authoritative_deterministic_baseline": "native MIMo five-finger hand and forearm co-articulated appearance layer",
+    "native_appearance_geom_group": 2,
+    "physical_collision_geom_group": 3,
+    "physical_collision_geometry_enabled": true,
+    "physical_collision_geometry_visible_in_rgb": false,
+    "native_material": "skin",
+    "mpfb_role": "diagnostic_only_not_phase_1_gate",
+    "deviation_from_preferred_architecture": "MPFB replay was not visibly better than the clean native MIMo appearance in the bounded Phase 1 comparison; native MIMo is authoritative until a later appearance method passes geometry and event invariants",
+    "frozen_physics_camera_contact_sync_determinism_thresholds_changed": false,
+    "neural_appearance_must_preserve": [
+      "hand_geometry",
+      "finger_count",
+      "contact_and_release_timing",
+      "object_pose_and_identity",
+      "camera_trajectory",
+      "occlusion_ordering"
+    ]
   },
   "grasp": {
     "physical_multifinger_first": true,
@@ -147,8 +179,26 @@
     "MIMo": {"version": "2.0.0", "commit": "040b0ae4914cbfb26afdf830aa81775b90922f3f", "license": "MIT"},
     "MolmoSpaces": {"version": "0.2.0", "commit": "c2f1b583f087e1d3994e1377574843b759d9d0f8", "license": "Apache-2.0"},
     "MPFB": {"version": "2.0.15", "commit": "f4f4f1ffa8203585730a7ce433b66738777ba168", "code_license": "GPL-3.0", "generated_core_asset_license": "CC0"},
-    "Blender": {"version": "4.2.1 LTS", "license": "GPL"},
-    "MuJoCo": {"mimo_runtime_version": "3.3.0", "molmospaces_runtime_version": "3.5.0", "license": "Apache-2.0"},
+    "Blender": {
+      "version": "4.2.1 LTS",
+      "build_hash": "396f546c9d82",
+      "macos_arm64_distribution_sha256": "6d97bcc4a265c16f9376be31e178ab72768c6d18f405edfeb48dbeee49d8d3e4",
+      "executable_sha256": "b5737da97b0e164cc18e227be115c4ea2791d11e9577f7e302c73f4871f9249c",
+      "license": "GPL"
+    },
+    "MuJoCo": {
+      "mimo_runtime_version": "3.3.0",
+      "molmospaces_source_runtime_version": "3.5.0",
+      "license": "Apache-2.0"
+    },
+    "local_python_dependencies": {
+      "python": "3.11.15",
+      "numpy": "2.0.2",
+      "h5py": "3.16.0",
+      "imageio": "2.37.4",
+      "Pillow": "11.3.0",
+      "ffmpeg": "8.0.1"
+    },
     "iTHOR": {"asset_version": "20251217_with_occupancy", "license": "CC BY 4.0"}
   },
   "execution": {
