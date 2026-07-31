@@ -79,7 +79,8 @@
       "control_guidance": 1.5,
       "shift": 10.0,
       "guardrails": false,
-      "generate_audio": false
+      "generate_audio": false,
+      "runtime_compatibility": "load the checkpoint-bundled public sound tokenizer required by the omni model, but request no sound for every sample and reject any audio stream"
     },
     "oscar_2b": {
       "role": "orthogonal_neural_comparison",
@@ -147,7 +148,7 @@
       "Cosmos inference-only imports omitted by its declared base dependency group",
       "OSCAR public wrapper requires torchrun rendezvous and runtime-only Python imports not listed in requirements_minimal.txt",
       "Transformer Engine expects CUDA runtime compatibility aliases absent from the cu128 wheel layout",
-      "Cosmos loads its optional sound tokenizer unless sound generation is explicitly disabled at model construction, even when every sample requests silent video",
+      "Cosmos constructs its sound tokenizer even when every sample requests silent video; use the checkpoint-bundled public tokenizer while retaining the frozen no-audio output gate",
       "OSCAR's public text processor registry is pinned separately from the local Reason1 text-encoder weights"
     ]
   }

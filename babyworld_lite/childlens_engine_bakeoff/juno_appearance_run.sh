@@ -28,6 +28,44 @@ driver_record="${run_root}/gpu_preflight.txt"
     nvidia-smi
 } >"${driver_record}" 2>&1
 
+cosmos_runtime_checkpoint="${run_root}/runtime/cosmos3_nano"
+"${work_root}/envs/cosmos/bin/python" - "${work_root}" <<'PY'
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+source = root / "models/cosmos3_nano"
+runtime = root / "runs/appearance/runtime/cosmos3_nano"
+runtime.mkdir(parents=True, exist_ok=True)
+for child in source.iterdir():
+    if child.name in {".cache", "config.json"}:
+        continue
+    link = runtime / child.name
+    if link.is_symlink() and link.resolve() == child.resolve():
+        continue
+    link.unlink(missing_ok=True)
+    link.symlink_to(child, target_is_directory=child.is_dir())
+
+source_config = source / "config.json"
+config = json.loads(source_config.read_text())
+sound = config["model"]["config"]["sound_tokenizer"]
+sound["from_checkpoint"] = True
+runtime_config = runtime / "config.json"
+runtime_config.write_text(json.dumps(config, indent=2, sort_keys=True) + "\n")
+receipt = {
+    "schema": "EmbodiedCosmosRuntimeConfig.v1",
+    "source_config_sha256": hashlib.sha256(source_config.read_bytes()).hexdigest(),
+    "runtime_config_sha256": hashlib.sha256(runtime_config.read_bytes()).hexdigest(),
+    "sound_tokenizer_source": "checkpoint-bundled public asset",
+    "sound_generation_enabled_in_samples": False,
+}
+(runtime.parent / "runtime_config_receipt.json").write_text(
+    json.dumps(receipt, indent=2, sort_keys=True) + "\n"
+)
+PY
+
 cosmos_status=0
 (
     cd "${work_root}/source/cosmos-framework"
@@ -37,11 +75,7 @@ cosmos_status=0
         --parallelism-preset=latency \
         -i "${input_root}/prepared/cosmos_specs/*.json" \
         -o "${run_root}/cosmos_official" \
-        --checkpoint-path "${work_root}/models/cosmos3_nano" \
-        --experiment-overrides \
-        model.config.sound_gen=false \
-        model.config.sound_dim=null \
-        model.config.sound_tokenizer=null \
+        --checkpoint-path "${cosmos_runtime_checkpoint}" \
         --no-guardrails
 ) || cosmos_status=$?
 

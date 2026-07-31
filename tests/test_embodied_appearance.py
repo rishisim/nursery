@@ -43,13 +43,13 @@ def test_appearance_windows_and_seeds_are_frozen_before_outcomes():
         )
 
 
-def test_juno_run_explicitly_disables_neural_audio_model_loading():
+def test_juno_run_uses_bundled_cosmos_tokenizer_but_keeps_samples_silent():
     run_script = Path(
         "babyworld_lite/childlens_engine_bakeoff/juno_appearance_run.sh"
     ).read_text()
-    assert "model.config.sound_gen=false" in run_script
-    assert "model.config.sound_dim=null" in run_script
-    assert "model.config.sound_tokenizer=null" in run_script
+    assert 'sound["from_checkpoint"] = True' in run_script
+    assert '"sound_generation_enabled_in_samples": False' in run_script
+    assert "--experiment-overrides" not in run_script
 
 
 def test_depth_edge_and_protected_mask_encodings_are_bounded():
