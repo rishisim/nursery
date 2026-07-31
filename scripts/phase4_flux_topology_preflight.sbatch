@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=phase4-flux-public-preflight
 #SBATCH --partition=a30
-#SBATCH --nodes=2
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=2
 #SBATCH --gpus-per-node=2
 #SBATCH --cpus-per-task=4

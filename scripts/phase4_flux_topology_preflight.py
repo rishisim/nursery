@@ -27,8 +27,8 @@ def main() -> None:
     rank = int(os.environ["SLURM_PROCID"])
     local_rank = int(os.environ["SLURM_LOCALID"])
     world_size = int(os.environ["SLURM_NTASKS"])
-    if world_size != 4:
-        raise RuntimeError(f"expected exactly four ranks, got {world_size}")
+    if world_size != 2:
+        raise RuntimeError(f"expected exactly two ranks, got {world_size}")
     torch.cuda.set_device(local_rank)
     dist.init_process_group("nccl", rank=rank, world_size=world_size)
     started = time.monotonic()
@@ -72,7 +72,7 @@ def main() -> None:
         result = {
             "schema_version": 1,
             "gate": "phase4_flux_public_dummy_final_topology",
-            "status": "PASS" if node_count == 2 and all(item["finite_output"] for item in gathered) else "FAIL",
+            "status": "PASS" if node_count == 1 and all(item["finite_output"] for item in gathered) else "FAIL",
             "public_dummy_only": True,
             "world_size": world_size,
             "node_count": node_count,

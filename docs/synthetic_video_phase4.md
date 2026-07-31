@@ -99,9 +99,13 @@ but no restricted corpus is currently staged in the Juno governed store. The
 pinned upstream Machine-DevBench image path uses FLUX.2-klein-4B and documents
 four-way GPU execution. Before restricted multi-process work, the frozen
 controls require an approved public/dummy final-topology preflight. The
-proposed bounded request is 4 × Juno A30 GPUs for at most 30 minutes
-(2 aggregate GPU-hours, zero direct USD charge), followed only on PASS by at
-most 4 × A30 for 12 hours (48 aggregate GPU-hours, zero direct USD charge) for
-the governed two-style lexical image build. No job has been submitted. Stage B
-remains incomplete until this resource ceiling is explicitly approved and both
-assets are constructed and sealed.
+approved ceiling was 4 × Juno A30 GPUs for at most 30 minutes, followed only
+on PASS by at most 4 × A30 for 12 hours. Juno exposes two two-GPU A30 nodes,
+but one complete node is reserved through 2026-08-05. Because image generation
+is independently sharded rather than DDP-coupled, the runnable final topology
+is frozen at 1 node × 2 A30s: a 30-minute public/dummy preflight (1 aggregate
+GPU-hour), then at most 2 × A30 for 12 hours (24 aggregate GPU-hours) for the
+governed build. This is within the approved ceiling and changes throughput
+only. The unavailable 2-node request was cancelled before allocation. Stage B
+remains incomplete until the resized topology passes and both assets are
+constructed and sealed.
