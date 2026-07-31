@@ -522,9 +522,13 @@ The public pilot may run LTX through pinned LTX Desktop/MPS only if it exposes
 and records all frozen prompts, conditioning, seeds, inference settings,
 attempts, and outputs needed by the manifest. Otherwise LTX must use the pinned
 official/Diffusers CUDA runner. Wan still requires local or institutionally
-controlled CUDA. Closed services may be tested with the same public prompts
-only as a non-canonical quality ceiling, outside the two-candidate decision and
-without influencing selection.
+controlled CUDA. Closed services may be tested with the same public prompts as
+a scientifically separate quality ceiling. A visual win may support a
+recommendation to pursue provider terms and governance clearance, but cannot
+authorize learner training use, restricted prompt transfer, or replacement of
+the reproducible sensitivity baseline by itself. The canonical follow-on is
+`configs/synthetic_video_quality_ceiling.json`, documented in
+[`synthetic_video_quality_ceiling.md`](synthetic_video_quality_ceiling.md).
 
 Sixty seconds is an episode composition target, not a single model-call claim.
 The canonical runner produces 5–10 s planned segments, carries forward explicit

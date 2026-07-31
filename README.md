@@ -6,14 +6,16 @@ Phase 4 uses the prospectively frozen public-only language gate in
 pipeline; governed Stage B common-asset construction remains the only current
 authorization involving ChildLens-derived assets.
 
-A separate public-only qualitative generator preview is now frozen and
-authorized while institutional GPU access is delayed. It uses only four
-self-authored scenes, pinned public Wan/LTX/Piper assets, one seed, and private
-cloud outputs. It contains no ChildLens/BabyView input or derivative and cannot
-select the final generator or support a scientific result. Paid GPU launch
-still requires an explicit USD ceiling confirmation. The remote CPU-only
-protocol/persistence preflight passed; no generator inference was executed. See
+A separate public-only qualitative generator preview is complete. It produced
+all eight frozen Wan/LTX clips with the public Piper track, retained the
+qualitative failures, and used no ChildLens/BabyView input or derivative. See
 [`docs/synthetic_video_public_pilot.md`](docs/synthetic_video_public_pilot.md).
+
+The active follow-on is a scientifically distinct, public-only LTX-2.3 versus
+Seedance 2.0 quality-ceiling comparison. It reuses the exact four LTX prompts,
+media, and audio without changing the completed protocol. Seedance training
+use remains blocked pending written provider and institutional clearance. See
+[`docs/synthetic_video_quality_ceiling.md`](docs/synthetic_video_quality_ceiling.md).
 
 This branch is the clean workspace for the Nursery/BabyWorld synthetic-video
 research program.
@@ -73,17 +75,18 @@ history but are not part of the active synthetic-video architecture. See
 [`docs/prior_work.md`](docs/prior_work.md) for the small set of prior findings
 that may inform future work.
 
-The architecture review now freezes EgoBabyVLM CLIP+ in `triple` mode as the
+The architecture review freezes EgoBabyVLM CLIP+ in `triple` mode as the
 learner; Machine-DevBench Lexical as the common standardized primary endpoint;
 an above-chance, positive real-only learning-curve readiness gate; and a
 separate held-out-real ChildLens temporal-transfer safeguard. It retains the
 modular video and German-TTS architecture, Wan 2.2 TI2V-5B and LTX-2 as the
-only public-pilot generator candidates, and a prospective no-substitution pilot
-protocol. See
+reproducible public-pilot generator candidates, and a prospective
+no-substitution pilot protocol. Seedance is evaluated separately as a hosted
+quality ceiling whose training use requires an additional terms/governance
+gate. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
-No generator clip has been executed and no generator dependency has been
-installed. The public/dummy single-L4 EgoBabyVLM compatibility preflight is
-complete and passed as engineering evidence only; DDP remains untested.
+The public/dummy single-L4 EgoBabyVLM compatibility preflight is complete and
+passed as engineering evidence only; DDP remains untested.
 Phase 3 governance/preregistration is **PASS**.
 MPI accepted the signed project-specific request and granted non-commercial
 ChildLens model calibration/evaluation and aggregate reporting through July
