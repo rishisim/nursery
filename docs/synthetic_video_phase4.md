@@ -103,9 +103,12 @@ approved ceiling was 4 × Juno A30 GPUs for at most 30 minutes, followed only
 on PASS by at most 4 × A30 for 12 hours. Juno exposes two two-GPU A30 nodes,
 but one complete node is reserved through 2026-08-05. Because image generation
 is independently sharded rather than DDP-coupled, the runnable final topology
-is frozen at 1 node × 2 A30s: a 30-minute public/dummy preflight (1 aggregate
-GPU-hour), then at most 2 × A30 for 12 hours (24 aggregate GPU-hours) for the
-governed build. This is within the approved ceiling and changes throughput
-only. The unavailable 2-node request was cancelled before allocation. Stage B
-remains incomplete until the resized topology passes and both assets are
-constructed and sealed.
+was initially frozen at 1 node × 2 A30s. The user subsequently authorized the
+technically appropriate Juno GPU type under the same time limits. H200 was
+selected because FLUX fits comfortably and Juno exposes many two-GPU H200
+nodes, preserving the single-node/two-shard topology while avoiding the A30
+reservation. The final request is therefore 2 × H200 for a 30-minute
+public/dummy preflight (1 aggregate GPU-hour), then at most 2 × H200 for
+12 hours (24 aggregate GPU-hours) for the governed build. The unavailable A30
+requests consumed no allocation. Stage B remains incomplete until the H200
+topology passes and both assets are constructed and sealed.
