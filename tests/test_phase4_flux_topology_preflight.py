@@ -11,6 +11,8 @@ def test_preflight_freezes_approved_final_topology_and_offline_controls():
     assert "#SBATCH --time=00:30:00" in batch
     assert "singularity exec --nv" in batch
     assert "pytorch-2.8.0-cu126.sif" in batch
+    assert "phase4-pydeps.tar" in batch
+    assert 'export PYTHONPATH="$local_tmp/pydeps"' in batch
     assert "world_size != 2" in source
     assert "local_files_only=True" in source
     assert 'dist.init_process_group("nccl"' in source
@@ -25,3 +27,6 @@ def test_public_container_preparation_is_cpu_only_and_bounded():
     assert "#SBATCH --gpus" not in batch
     assert "SINGULARITY_TMPDIR" in batch
     assert "pytorch:2.8.0-cuda12.6-cudnn9-runtime" in batch
+    assert "--no-deps" in batch
+    assert "phase4-pydeps.tar" in batch
+    assert "CONTAINER_ENVIRONMENT_READY" in batch
