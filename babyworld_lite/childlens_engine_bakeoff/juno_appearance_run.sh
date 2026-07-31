@@ -67,9 +67,20 @@ receipt = {
 PY
 
 cosmos_status=0
+cosmos_site_packages="$(${work_root}/envs/cosmos/bin/python - <<'PY'
+import site
+
+print(site.getsitepackages()[0])
+PY
+)"
+cosmos_cuda_libraries="$(
+    find "${cosmos_site_packages}/nvidia" -mindepth 2 -maxdepth 2 -type d -name lib -print \
+        | sort \
+        | paste -sd: -
+)"
 (
     cd "${work_root}/source/cosmos-framework"
-    env LD_LIBRARY_PATH= \
+    env LD_LIBRARY_PATH="${cosmos_cuda_libraries}:${cosmos_site_packages}/torch/lib" \
         "${work_root}/envs/cosmos/bin/python" \
         -m cosmos_framework.scripts.inference \
         --parallelism-preset=latency \
