@@ -89,7 +89,8 @@ env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     --index-url https://download.pytorch.org/whl/cu128
 env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     --python "${oscar_env}/bin/python" \
-    -r "${work_root}/source/oscar-public/requirements_minimal.txt"
+    -r "${work_root}/source/oscar-public/requirements_minimal.txt" \
+    'pytest==9.0.2'
 env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     --python "${oscar_env}/bin/python" \
     'transformer-engine==2.12.0+cu128.torch210' \
@@ -139,6 +140,11 @@ for repository, revision, destination in models:
         revision=revision,
         local_dir=destination,
     )
+snapshot_download(
+    repo_id="Qwen/Qwen3-VL-8B-Instruct",
+    revision="0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
+    allow_patterns=("*.json", "*.txt"),
+)
 PY
 
 "${cosmos_env}/bin/python" - "${work_root}" <<'PY'

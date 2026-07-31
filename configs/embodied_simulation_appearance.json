@@ -61,6 +61,9 @@
       "code_revision": "404b9bf2144640834c63ae7d9e7269e0f4ea02cb",
       "framework_repository": "https://github.com/NVIDIA/cosmos-framework.git",
       "framework_revision": "5e67049cd94acb667786f1e6dd0dab821cb90c97",
+      "tokenizer_model": "Qwen/Qwen3-VL-8B-Instruct",
+      "tokenizer_revision": "0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
+      "tokenizer_license": "Apache-2.0",
       "mode": "video2video_multi_control",
       "controls": {
         "depth": {"weight": 0.34},
@@ -128,5 +131,13 @@
     "juno_work_root": "/work/dal503972/embodied_phase3",
     "juno_run_root": "/work/dal503972/embodied_phase3/runs/appearance",
     "privacy": "public/synthetic inputs only; no ChildLens media or restricted derivative may be transferred"
+  },
+  "bounded_environment_repairs": {
+    "scope": "dependency and launcher compatibility only; no experiment cell, seed, conditioning, compositing, or gate changed",
+    "discovered_after_freeze": [
+      "Cosmos inference-only imports omitted by its declared base dependency group",
+      "OSCAR public wrapper requires torchrun rendezvous and runtime-only Python imports not listed in requirements_minimal.txt",
+      "Transformer Engine expects CUDA runtime compatibility aliases absent from the cu128 wheel layout"
+    ]
   }
 }

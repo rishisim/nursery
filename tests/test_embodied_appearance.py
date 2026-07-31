@@ -17,6 +17,10 @@ def test_appearance_windows_and_seeds_are_frozen_before_outcomes():
     )
     assert config["frozen_before_phase_3_outcomes_at_utc"]
     assert config["seeds"] == [20260734, 20260735, 20260736]
+    assert len(config["methods"]["cosmos3_nano"]["model_revision"]) == 40
+    assert len(config["methods"]["cosmos3_nano"]["tokenizer_revision"]) == 40
+    assert len(config["methods"]["oscar_2b"]["model_revision"]) == 40
+    assert len(config["methods"]["oscar_2b"]["text_encoder_revision"]) == 40
     assert [window["id"] for window in config["windows"]] == [
         "near_miss",
         "contact_grasp",
