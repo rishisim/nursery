@@ -55,3 +55,80 @@ scientific threshold.
 Smallest next step: replace the recovered chest/mocap/weld kernel with an
 articulated head-camera/body-hand implementation while preserving the frozen
 contract and static collision policy.
+
+## Phase 1 — embodied geometry and physical authority
+
+Gate decision: **PASS**.
+
+The 19.5-second vertical slice now executes as one deterministic MIMo/MuJoCo
+trace in the furnished FloorPlan201 scene. The head-view camera is derived only
+from the articulated root/torso/head chain and the immutable mount. The right
+arm, forearm, palm, and five fingers use a static physical collision layer that
+remains enabled for the entire episode. RGB exposes a separate co-articulated,
+non-colliding native MIMo appearance layer with the clean `skin` material.
+
+Canonical files changed:
+
+- `physics_kernel.py`, `run_kernel_episode.py`, `trace_render.py`, and
+  `determinism.py` implement the authoritative trace, gates, replay, and bundle;
+- `mpfb_overlay_renderer.py` and `depth_composite.py` retain bounded diagnostic
+  appearance tooling without governing the Phase 1 result;
+- `configs/embodied_simulation_vertical_slice.json` records exact runtime pins,
+  the fixed mount/scene placement, and the native-MIMo appearance decision;
+- focused coverage was added to `tests/test_childlens_engine_bakeoff.py` and
+  `tests/test_embodied_simulation_contract.py`;
+- compact metrics are in `docs/embodied_simulation/aggregate_results.json`.
+
+Validation and experiment evidence:
+
+- Full repository validation passes: 13 tests.
+- Physics produced 4,680 steps and 1,171 synchronized truth samples. Two
+  complete executions produced byte-identical trace SHA-256
+  `92fc1f5f55e06698d93497f18f4c7f29015dad1f014e3218a32797c3af724004`;
+  maximum numeric replay error is 0.
+- Maximum camera-mount errors are `4.44e-16` m and `4.89e-16` rad. Shared-clock
+  error is `7.85e-13` s; IMU-like acceleration and gyro comparisons both have
+  RMSE 0; persistent object identity changes are 0.
+- The static 649-geom relevant collision policy hash remains unchanged. The
+  minimum relevant distance is `-0.00160093` m, below the frozen 0.002 m depth
+  allowance, with 0 persistent penetration frames. The near miss has 0 contact
+  substeps and 0.03857 m clearance.
+- First contact occurs at 7.5125 s, reaches five distinct finger bodies and
+  67.50 N. After two physical attempts, the frozen contact-gated soft assist
+  engages at 9.15 s following 1.4917 s of multipoint evidence; its engagement
+  jump is 0.000167 m / 0.0167 degrees and collisions remain enabled.
+- Lift is 0.08550 m, object rotation 80.84 degrees, head turn 22.83 degrees,
+  and head-turn contact retention 1.0. Release is physical; the final settled
+  window is 2.433 s with 0.01415 m/s maximum speed.
+- The authoritative render has 586 frames at 640x480/30 fps. Collision-proxy
+  and skin-artifact pixel counts are both 0. Contact/release frame offsets are
+  0; maximum visible contact error is 4.444 px and 0.005990 m; the target is
+  visible in every rendered frame. Manifest hashes and HDF5 stream shapes were
+  independently rechecked, and FFprobe confirms 586 H.264 frames.
+
+Actual artifacts are under ignored
+`runs/embodied_simulation/phase_1/qualified`: `baseline_rgb.mp4`,
+`external_qa.mp4`, `episode_trace.npz`, `episode_trace_replay.npz`,
+`render_streams.h5`, QA JSON records, `inspection_sheet.png`, and
+`episode_bundle_manifest.json`. The ignored `mpfb_diagnostic/` comparison is
+retained; it aligns landmarks to 0.000271 m maximum but fails its projected
+contact appearance check and is not authoritative. Superseded preflight and
+all-frame MPFB-composition intermediates were moved to the macOS Trash and are
+recoverable; no pre-existing user run was removed.
+
+Repository status: implementation commit `4a5bb6c` (`Qualify embodied MIMo
+vertical slice`) is pushed to `origin/embodied-simulation`. Complete runs,
+media, dependency checkouts, and logs remain ignored.
+
+Deviation from the preferred architecture: following the explicit design
+decision and bounded visual comparison, native MIMo is the authoritative
+deterministic visible hand/forearm and MPFB is diagnostic only. This changes no
+frozen physics, camera, synchronization, contact, penetration, or determinism
+threshold. A one-time fixed camera-mount calibration was made before hard-gate
+qualification because the provisional eye-axis transform faced the floor; the
+mount is immutable during execution. Root translation is explicitly recorded
+as bounded collision-checked locomotion assist, and grasp assist is fully
+flagged.
+
+Smallest next step: instantiate the unchanged event semantics in sparse,
+household, and messy clutter variants and run the Phase 1 hard gates per scene.
