@@ -41,6 +41,7 @@ PUBLIC_CONFIG_PATH = Path("configs/synthetic_video_public_pilot.json")
 TRANSPORT_DIAGNOSTIC_PATH = Path(
     "results/synthetic_video_quality_ceiling_transport_diagnostic.json"
 )
+CURATED_RESULT_PATH = Path("results/synthetic_video_quality_ceiling.json")
 
 
 @pytest.fixture
@@ -138,6 +139,47 @@ def test_comparison_compiles_exact_ltx_prompts_and_four_seedance_requests(
         assert attempt["provider_seed_requested"] is None
         assert attempt["request"]["duration"] == "5"
         assert attempt["planned_charge_usd"] == 1.517
+
+
+def test_curated_result_matches_frozen_protocol_and_work_order(
+    quality_config: dict,
+    public_config: dict,
+) -> None:
+    result = json.loads(CURATED_RESULT_PATH.read_text())
+    order = compile_comparison_work_order(
+        quality_config,
+        public_config,
+        result["run_id"],
+    )
+    assert result["status"] == "COMPLETE_QUALITATIVE_SCREEN"
+    assert result["protocol"]["quality_protocol_sha256"] == canonical_json_sha256(
+        quality_config
+    )
+    assert result["protocol"]["public_pilot_protocol_sha256"] == (
+        canonical_json_sha256(public_config)
+    )
+    assert len(result["protocol"]["work_order_sha256"]) == 64
+    int(result["protocol"]["work_order_sha256"], 16)
+    assert [record["scene_id"] for record in result["seedance_attempts"]] == [
+        attempt["scene_id"] for attempt in order["attempts"]
+    ]
+    assert [record["request_sha256"] for record in result["seedance_attempts"]] == [
+        attempt["request_sha256"] for attempt in order["attempts"]
+    ]
+    assert all(
+        record["status"] == "media_valid"
+        for record in result["seedance_attempts"]
+    )
+    assert result["technical"]["seedance_canonical_comparison"][
+        "media_valid_count"
+    ] == 4
+    assert result["technical"]["seedance_including_transport_diagnostic"][
+        "end_to_end_artifact_failure_rate"
+    ] == pytest.approx(0.2)
+    assert result["cost"]["estimated_total_charge_usd"] == 7.585
+    assert result["material_visual_win_rule"]["all_criteria_met"] is False
+    assert result["decision"]["scientific_training_use_authorized"] is False
+    assert '"request_id":' not in CURATED_RESULT_PATH.read_text()
 
 
 def test_work_order_rejects_rehashed_request_tampering(

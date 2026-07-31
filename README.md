@@ -11,10 +11,11 @@ all eight frozen Wan/LTX clips with the public Piper track, retained the
 qualitative failures, and used no ChildLens/BabyView input or derivative. See
 [`docs/synthetic_video_public_pilot.md`](docs/synthetic_video_public_pilot.md).
 
-The active follow-on is a scientifically distinct, public-only LTX-2.3 versus
-Seedance 2.0 quality-ceiling comparison. It reuses the exact four LTX prompts,
-media, and audio without changing the completed protocol. Seedance training
-use remains blocked pending written provider and institutional clearance. See
+The scientifically distinct, public-only LTX-2.3 versus Seedance 2.0
+quality-ceiling comparison is complete. Seedance was visibly cleaner but did
+not clear the prospectively frozen material-improvement threshold, so LTX
+remains the reproducible baseline. Seedance training use remains blocked
+pending written provider and institutional clearance. See
 [`docs/synthetic_video_quality_ceiling.md`](docs/synthetic_video_quality_ceiling.md).
 
 This branch is the clean workspace for the Nursery/BabyWorld synthetic-video

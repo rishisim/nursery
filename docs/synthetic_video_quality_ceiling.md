@@ -1,8 +1,8 @@
 # LTX-2.3 versus Seedance 2.0 public quality ceiling
 
-**Status:** frozen execution authorized; one unseen private-ACL transport
-diagnostic is preserved, and the four-call comparison uses an expiring public
-delivery path
+**Status:** complete; all four canonical Seedance clips are valid, the blinded
+screen is finalized, and the compact result is
+`results/synthetic_video_quality_ceiling.json`
 
 **Canonical protocol:** `configs/synthetic_video_quality_ceiling.json`
 
@@ -15,6 +15,27 @@ LTX media, and German audio remain the shared source of truth.
 The comparison may support a recommendation to pursue Seedance access and
 legal/governance clearance. It does not authorize using Seedance output as
 learner training data.
+
+## Result
+
+Seedance completed all four canonical calls with valid media and no canonical
+generation failure. In the single-rater blinded screen it received 25 of 28
+visual passes (89.3%) versus 23 of 28 (82.1%) for LTX, with three versus four
+critical failures. Seedance clearly won the occlusion scene; pick-up, transfer,
+and action-transition tied.
+
+That is a visual-pass advantage of two and one scene win. The prospectively
+frozen material-win rule required an advantage of at least four and at least
+two scene wins, so the decision is
+`NO_CLEAR_ADVANTAGE_KEEP_LTX_REPRODUCIBLE_BASELINE`.
+
+This conservative decision does not mean the outputs look identical. Seedance
+is visibly cleaner and avoids the pseudo-caption and pillarbox artifacts seen
+in all four LTX clips. It also produces the better occlusion sequence. However,
+its cup finishes tilted rather than upright, and its clean action-transition
+clip does not complete the required circular stir or final lift. The tiny,
+single-rater frame-based screen therefore does not justify replacing the
+reproducible LTX baseline.
 
 ## Why fal
 
