@@ -3,8 +3,16 @@
 Phase 4 uses the prospectively frozen public-only language gate in
 `configs/synthetic_video_language_gate.json` and
 `docs/synthetic_video_phase4.md`. Stage A selected one immutable offline
-pipeline; governed Stage B common-asset construction is the only current
-authorization.
+pipeline; governed Stage B common-asset construction remains the only current
+authorization involving ChildLens-derived assets.
+
+A separate public-only qualitative generator preview is now frozen and
+authorized while institutional GPU access is delayed. It uses only four
+self-authored scenes, pinned public Wan/LTX/Piper assets, one seed, and private
+cloud outputs. It contains no ChildLens/BabyView input or derivative and cannot
+select the final generator or support a scientific result. Paid GPU launch
+still requires an explicit USD ceiling confirmation. See
+[`docs/synthetic_video_public_pilot.md`](docs/synthetic_video_public_pilot.md).
 
 This branch is the clean workspace for the Nursery/BabyWorld synthetic-video
 research program.
@@ -72,7 +80,7 @@ modular video and German-TTS architecture, Wan 2.2 TI2V-5B and LTX-2 as the
 only public-pilot generator candidates, and a prospective no-substitution pilot
 protocol. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
-No generator pilot has been executed and no generator dependency has been
+No generator clip has been executed and no generator dependency has been
 installed. The public/dummy single-L4 EgoBabyVLM compatibility preflight is
 complete and passed as engineering evidence only; DDP remains untested.
 Phase 3 governance/preregistration is **PASS**.
@@ -92,7 +100,8 @@ may not be sent to APIs, hosted services, Git, cloud storage, telemetry, or
 other third parties. The missing `yding` SLURM association is a non-blocking
 fair-share/accounting correction. Post-pass gates are in
 [`docs/synthetic_video_preregistration.md`](docs/synthetic_video_preregistration.md).
-A separately scoped Phase 4 common-asset task may begin. ChildLens audio
-processing awaits the bounded public-only ASR/translation selection; LTX/Wan,
-TTS, generation, real-only training, and scientific evaluation remain
-unauthorized.
+A separately scoped Phase 4 common-asset task may begin. The bounded
+public-only ASR/translation selection is complete. LTX/Wan and TTS execution
+are authorized only for the self-authored qualitative preview described above;
+governed or ChildLens-derived generator work, real-only training, and
+scientific evaluation remain unauthorized.

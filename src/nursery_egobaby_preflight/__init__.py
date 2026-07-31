@@ -11,12 +11,16 @@ from .bridge import (
     strict_state_equality,
 )
 from .contract import canonical_json_sha256, lexical_macro_wiring, schedule_cycle
+from .synthetic_video_pilot import compile_prompt, compile_work_order, validate_config
 
 __all__ = [
     "ConversionRecord",
     "canonical_json_sha256",
+    "compile_prompt",
+    "compile_work_order",
     "convert_hf_dinov2_base",
     "lexical_macro_wiring",
     "schedule_cycle",
     "strict_state_equality",
+    "validate_config",
 ]

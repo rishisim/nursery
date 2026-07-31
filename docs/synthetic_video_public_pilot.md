@@ -1,0 +1,158 @@
+# Public-only synthetic-video qualitative pilot
+
+**Status:** frozen and locally validated; paid GPU launch requires an explicit
+USD ceiling confirmation
+
+**Canonical protocol:** `configs/synthetic_video_public_pilot.json`
+
+This pilot makes the proposed episode-plan architecture visible before
+governed ChildLens work can run. It produces eight short clips: the same four
+self-authored scenes rendered once by Wan 2.2 TI2V-5B and once by LTX-2.3. The
+clips are an engineering preview only. They cannot select the final generator,
+support an equivalence claim, tune a ChildLens-facing prompt, or replace the
+larger frozen formal pilot.
+
+## Boundary
+
+The only semantic inputs are the four episode plans committed in the canonical
+config. Cloud jobs may receive those plans, pinned public code and weights, the
+public Piper German voice, and the resulting generated artifacts.
+
+The following may never enter the cloud job or its output repository:
+
+- ChildLens or BabyView video, audio, frames, or transcripts;
+- filenames, identifiers, vocabulary, statistics, prompts, embeddings, or
+  other derivatives from either restricted corpus;
+- governed paths, calibration decisions, or restricted-data tuning; and
+- API-generated prompt expansions.
+
+The Hugging Face output dataset is private by default. This is a precaution,
+not a statement that the generated media are restricted ChildLens data.
+
+## Frozen preview
+
+Each family receives the same semantic scene and seed (`314159`):
+
+1. pick up and hold a matte red cup;
+2. transfer one blue wooden block from the left hand to the right;
+3. partly occlude and reveal the same yellow toy car; and
+4. walk toward a table, grasp a silver spoon, and stir once.
+
+Every native clip is 121 frames at 24 fps and is normalized to 1280 × 704.
+Wan produces silent video. LTX produces joint audio-video, but its native audio
+is stripped from every modular comparison clip. The same pinned Piper German
+voice is then placed on the episode timeline and muxed into both families.
+LTX's native audio remains eligible only for the separately prespecified
+scene-1 diagnostic; it is not used in this eight-clip preview.
+
+There are no preview retries. A visibly bad clip remains part of the result.
+The formal profile retains three frozen seeds and at most one taxonomy-bound
+retry, but this preview does not authorize executing that profile.
+
+## Local validation and compilation
+
+All generated files live below the ignored `runs/` root.
+
+```bash
+python scripts/run_synthetic_video_public_pilot.py validate
+
+python scripts/run_synthetic_video_public_pilot.py compile \
+  --profile preview \
+  --run-id public-preview-20260730
+```
+
+Compilation records exact family prompts, prompt hashes, planned output paths,
+and blank blinded QA records. It does not download a model or run inference.
+To inspect the exact official command without executing it:
+
+```bash
+python scripts/run_synthetic_video_public_pilot.py show-model-command \
+  --work-order runs/synthetic_video_public_pilot/public-preview-20260730/work_order.json \
+  --attempt-id wan__pick_up__s314159__a1__modular \
+  --source-root /path/to/pinned/Wan2.2 \
+  --weights-root /path/to/pinned/Wan2.2-TI2V-5B \
+  --raw-output /tmp/raw.mp4
+```
+
+## Cloud execution design
+
+The first cloud target is Hugging Face Jobs because both model families publish
+their official weights on the Hub and the job can persist every attempt to one
+private dataset repository. The worker is
+`scripts/run_synthetic_video_hf_job.py`.
+
+Execution is staged:
+
+1. one CPU-only job clones the exact Nursery commit, verifies the protocol
+   hash, creates the private output dataset, and proves persistence without
+   inference;
+2. one Wan job runs all four Wan attempts and uploads each completed attempt
+   immediately;
+3. one LTX job runs all four LTX attempts and uploads each completed attempt
+   immediately; and
+4. the two family roots are downloaded under one ignored run root and compiled
+   into the local side-by-side gallery.
+
+The frozen GPU flavor is one Hugging Face `a100-large` (A100 80 GB). At the
+2026-07-30 published price of $2.50 per hour, each family job has a four-hour
+timeout and a $10 maximum; the complete preview has a $20 GPU ceiling. The
+timeout is a ceiling, not an expected charge. Hugging Face bills Jobs by
+starting/running time, and every completed attempt is uploaded before the next
+one begins.
+
+The LTX job requires that the authenticated Hugging Face account has already
+accepted Google's gated Gemma license for
+`google/gemma-3-12b-it-qat-q4_0-unquantized`. The LTX Community License and the
+Piper/voice lineage restrictions remain applicable. This repository treats the
+preview as non-commercial research and does not grant broader product rights.
+
+Official references:
+
+- [Wan 2.2 repository](https://github.com/Wan-Video/Wan2.2)
+- [Wan 2.2 TI2V-5B weights](https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B)
+- [LTX-2 repository](https://github.com/Lightricks/LTX-2)
+- [LTX-2.3 weights](https://huggingface.co/Lightricks/LTX-2.3)
+- [Piper](https://github.com/OHF-Voice/piper1-gpl)
+- [Hugging Face Jobs pricing](https://huggingface.co/docs/hub/en/jobs-pricing)
+
+## Persistence and local viewing
+
+The remote layout is:
+
+```text
+<run-id>/
+  families/
+    wan/
+      work_order.json
+      environment.json
+      run_status.json
+      attempts/...
+    ltx/
+      work_order.json
+      environment.json
+      run_status.json
+      attempts/...
+```
+
+After downloading that run root, build the comparison page:
+
+```bash
+python scripts/run_synthetic_video_public_pilot.py gallery \
+  --run-root runs/synthetic_video_public_pilot/public-preview-20260730
+```
+
+The command creates
+`runs/synthetic_video_public_pilot/public-preview-20260730/gallery/index.html`.
+It places Wan and LTX clips side by side for each scene and links to the blank
+QA record for each attempt.
+
+## Review
+
+The preview reviewer answers the eight frozen pass/fail/cannot-judge items:
+continuous egocentric shot, anatomy, contact/action completion, identity,
+transition order, referent timing, exact speech, and safety. Free-form notes
+may describe failure modes, but they cannot become prompt edits or a generator
+selection rule.
+
+The handoff must report all eight clips, invalid outputs, setup/runtime cost,
+and missing attempts. A polished subset must never be presented as the pilot.

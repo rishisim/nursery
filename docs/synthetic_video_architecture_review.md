@@ -597,6 +597,21 @@ after the public pilot; it must not ensemble winners per scene.
 
 ## Frozen public/synthetic-only technical pilot
 
+### Public qualitative preview authorization
+
+On 2026-07-30, the investigator separately authorized an eight-clip,
+public-only qualitative preview while institutional GPU access is delayed.
+The canonical preview contract is
+`configs/synthetic_video_public_pilot.json`, with operating instructions in
+[`synthetic_video_public_pilot.md`](synthetic_video_public_pilot.md).
+
+The preview reuses the four self-authored scenes below but executes only one
+frozen seed per family, with no retries. It may use private commercial cloud
+GPU infrastructure because no ChildLens/BabyView input or derivative is
+permitted. It cannot select a generator, alter the formal pilot, tune prompts
+for governed work, or support a scientific result. The full pilot and all
+decision rules below remain frozen and unexecuted.
+
 ### Question and inputs
 
 The pilot asks one question: **which of the two frozen model families can
