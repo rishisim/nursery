@@ -1,9 +1,10 @@
 # Gemini Omni Flash and MiniMax H3 public model bakeoff
 
-**Status:** execution authorized and the H3 route updated to OpenRouter. The
-user approved up to `$6.00`; the immutable runner remains hard-limited to the
-eight-call `$4.66` maximum expected plan. `OPENROUTER_API_KEY` must replace the
-obsolete `MINIMAX_API_KEY` in the user-owned environment file before execution.
+**Status:** complete; all eight new media outputs are valid, the 16-clip
+blinded screen is finalized, and the compact result is
+`results/synthetic_video_model_bakeoff.json`. The user approved up to `$6.00`;
+the executed plan remained inside its narrower `$4.66` maximum expected
+charge.
 
 **Canonical protocol:** `configs/synthetic_video_model_bakeoff.json`
 
@@ -23,6 +24,34 @@ MiniMax.
 No ChildLens/BabyView input or derivative is permitted. The comparison may
 inform qualitative model selection, but it does not authorize using either
 provider's output as learner training data.
+
+## Result
+
+Gemini Omni Flash was strongest in this single-rater, four-scene screen. It
+received 27 of 28 primary visual passes (96.4%), versus 25 (89.3%) for MiniMax
+H3, 24 (85.7%) for Seedance, and 19 (67.9%) for LTX. Gemini had no critical
+visual failures; MiniMax and Seedance each had three, and LTX had eight. All
+four Gemini and all four MiniMax outputs passed both presentation checks.
+
+Gemini beat LTX on all four scenes with a primary-pass advantage of eight. It
+beat Seedance on two scenes and tied two, for an advantage of three. MiniMax
+beat LTX on three scenes and tied one, for an advantage of six; against
+Seedance it won one and tied three, for an advantage of one. Both new families
+therefore satisfy the prospectively frozen `CLEAR_TASK_ADVANTAGE_OVER_LTX`
+rule and remain inside the Seedance competitiveness band.
+
+Qualitatively, Gemini completed all four intended actions. Its only primary
+failure was referent timing: the car in the occlusion scene emerged after the
+frozen target-word window began. MiniMax produced clean transfer and
+spoon-action clips, but its cup ended tilted and its car never became
+meaningfully occluded. These findings support Gemini as the best next
+qualitative prototype candidate, while remaining far too small to constitute
+a formal model ranking.
+
+OpenRouter reported `$2.574` of H3 usage across the four calls. Gemini reported
+115,840 video-output tokens and 1,006 input tokens but no billed-dollar value,
+so the result does not invent a combined actual invoice. The frozen maximum
+expected charge for all eight calls remains `$4.66`.
 
 ## Frozen providers and requests
 

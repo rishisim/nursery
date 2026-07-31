@@ -35,6 +35,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 BAKEOFF_CONFIG_PATH = Path("configs/synthetic_video_model_bakeoff.json")
 PUBLIC_CONFIG_PATH = Path("configs/synthetic_video_public_pilot.json")
 COMPLETED_QUALITY_PATH = Path("configs/synthetic_video_quality_ceiling.json")
+CURATED_RESULT_PATH = Path("results/synthetic_video_model_bakeoff.json")
 
 
 @pytest.fixture
@@ -97,6 +98,68 @@ def test_bakeoff_contract_is_frozen_public_only_and_cost_bounded(
     assert bakeoff_config["provider_cost"]["minimax"][
         "maximum_expected_charge_usd"
     ] == 2.6
+
+
+def test_curated_result_matches_frozen_protocol_and_work_order(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+) -> None:
+    result = json.loads(CURATED_RESULT_PATH.read_text())
+    order = compile_bakeoff_work_order(
+        bakeoff_config,
+        public_config,
+        completed_quality,
+        REPOSITORY_ROOT,
+        result["run_id"],
+    )
+    assert result["status"] == "COMPLETE_QUALITATIVE_SCREEN"
+    assert result["protocol"]["bakeoff_protocol_sha256"] == canonical_json_sha256(
+        bakeoff_config
+    )
+    assert result["protocol"]["public_pilot_protocol_sha256"] == (
+        canonical_json_sha256(public_config)
+    )
+    assert result["protocol"]["completed_quality_protocol_sha256"] == (
+        canonical_json_sha256(completed_quality)
+    )
+    assert len(result["protocol"]["work_order_sha256"]) == 64
+    int(result["protocol"]["work_order_sha256"], 16)
+    for family in bakeoff_module.NEW_FAMILIES:
+        records = result["execution"]["new_families"][family]["attempts"]
+        expected = [
+            attempt
+            for attempt in order["attempts"]
+            if attempt["family"] == family
+        ]
+        assert [record["scene_id"] for record in records] == [
+            attempt["scene_id"] for attempt in expected
+        ]
+        assert [record["request_sha256"] for record in records] == [
+            attempt["request_sha256"] for attempt in expected
+        ]
+        assert all(record["status"] == "media_valid" for record in records)
+    assert result["execution"]["new_media_valid_count"] == 8
+    assert result["blinded_qualitative_screen"]["family_metrics"][
+        "gemini_omni_flash"
+    ]["primary_visual"]["pass"] == 27
+    assert result["decisions"]["gemini_omni_flash"][
+        "competitive_with_seedance"
+    ] is True
+    assert result["decisions"]["minimax_h3"][
+        "competitive_with_seedance"
+    ] is True
+    assert result["provider_usage_and_cost"]["maximum_expected_new_charge_usd"] == (
+        4.66
+    )
+    assert result["provider_usage_and_cost"][
+        "openrouter_reported_minimax_usage"
+    ]["cost_usd"] == pytest.approx(2.574)
+    result_text = CURATED_RESULT_PATH.read_text()
+    assert '"interaction_id":' not in result_text
+    assert '"generation_id":' not in result_text
+    assert "OPENROUTER_API_KEY" not in result_text
+    assert "GEMINI_API_KEY" not in result_text
 
 
 def test_work_order_compiles_eight_exact_prompt_requests_and_sixteen_cards(
@@ -465,7 +528,14 @@ def test_finalizer_freezes_sixteen_records_before_four_family_decisions(
         attempt["attempt_id"]: {
             "attempt": attempt,
             "status": "media_valid",
-            "provider": {"nursery_adapter_commit": "a" * 40},
+            "provider": {
+                "nursery_adapter_commit": (
+                    "b" * 40
+                    if attempt["attempt_id"]
+                    == order["attempts"][0]["attempt_id"]
+                    else "a" * 40
+                )
+            },
             "final_media": {"sha256": f"{attempt['attempt_id']}-sha"},
         }
         for attempt in order["attempts"]
@@ -510,4 +580,13 @@ def test_finalizer_freezes_sixteen_records_before_four_family_decisions(
         "counts_by_scope"
     ]["primary_visual"]["pass"] == 28
     assert summary["provenance"]["qa_bundle_sha256"]
+    assert summary["provenance"]["nursery_adapter_commits"] == [
+        "a" * 40,
+        "b" * 40,
+    ]
+    assert {
+        record["nursery_adapter_commit"]
+        for records in summary["technical"]["new_families"].values()
+        for record in records
+    } == {"a" * 40, "b" * 40}
     assert (tmp_path / "review" / "qa_freeze.json").is_file()

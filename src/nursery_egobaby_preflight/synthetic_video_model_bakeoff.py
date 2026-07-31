@@ -2052,6 +2052,10 @@ def _recommendation_markdown(summary: Mapping[str, Any]) -> str:
         "gemini_omni_flash": "Gemini Omni Flash",
         "minimax_h3": "MiniMax H3",
     }
+    adapter_commits = ", ".join(
+        f"`{commit}`"
+        for commit in summary["provenance"]["nursery_adapter_commits"]
+    )
     lines = [
         "# Four-family public synthetic-video quality screen",
         "",
@@ -2111,7 +2115,7 @@ def _recommendation_markdown(summary: Mapping[str, Any]) -> str:
             f"- Bakeoff protocol SHA-256: `{summary['provenance']['bakeoff_protocol_sha256']}`",
             f"- Work-order SHA-256: `{summary['provenance']['work_order_sha256']}`",
             f"- Blinded QA bundle SHA-256: `{summary['provenance']['qa_bundle_sha256']}`",
-            f"- Adapter commit: `{summary['provenance']['nursery_adapter_commit']}`",
+            f"- Adapter commits: {adapter_commits}",
             "",
         ]
     )
@@ -2255,11 +2259,12 @@ def finalize_blinded_review(
             config,
         )
 
-    commits = {
-        record["provider"]["nursery_adapter_commit"]
-        for record in execution["records"].values()
-    }
-    _require(len(commits) == 1, "new-family adapter commits differ")
+    commits = sorted(
+        {
+            record["provider"]["nursery_adapter_commit"]
+            for record in execution["records"].values()
+        }
+    )
     reference_records = {
         family: [
             {
@@ -2281,6 +2286,9 @@ def finalize_blinded_review(
                 "request_sha256": record["attempt"]["request_sha256"],
                 "final_sha256": record["final_media"]["sha256"],
                 "status": record["status"],
+                "nursery_adapter_commit": record["provider"][
+                    "nursery_adapter_commit"
+                ],
             }
             for attempt_id, record in execution["records"].items()
             if record["attempt"]["family"] == family
@@ -2353,7 +2361,7 @@ def finalize_blinded_review(
             "work_order_sha256": work_order["work_order_sha256"],
             "blinding_key_sha256": work_order["blinding_key_sha256"],
             "qa_bundle_sha256": freeze["qa_bundle_sha256"],
-            "nursery_adapter_commit": next(iter(commits)),
+            "nursery_adapter_commits": commits,
         },
     }
     summary_path = root / "review" / "review_summary.json"
