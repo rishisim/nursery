@@ -487,3 +487,101 @@ was accessed, decoded, moved, or transferred.
 Smallest next step: assemble the selected ignored run into the final accepted
 bundle, add a compact preview and replay/verification entry point, independently
 rehash every component, and write the final cross-domain decision report.
+
+## Phase 6 — accepted child-view episode and simulator-truth bundle
+
+Gate decision: **PASS**.
+
+The frozen Phase 5 selection is now an accepted 60.0-second child-view episode
+and self-contained simulator-truth package. The episode is one continuous
+MuJoCo trace with an immutable articulated-head camera mount, authoritative
+native-MIMo RGB, separately generated speech, depth/segmentation, all physical
+and embodied side streams, exact replay evidence, cross-modal QA, provenance,
+and a 16-sample human-viewable preview. No neural appearance output is included.
+
+Canonical files and compact records changed:
+
+- `final_bundle.py` verifies the hash-bound Phase 5 source, copies only the
+  required deliverables into the ignored final root, describes every NPZ/HDF5
+  truth stream, builds the preview, records exact public-source/environment
+  provenance and replay instructions, evaluates 19 final acceptance checks,
+  and emits a hash manifest;
+- `configs/embodied_simulation_final_bundle.json` freezes the selected cell,
+  source/config hashes, required files and streams, preview samples,
+  authoritative appearance policy, and unchanged acceptance/governance bounds
+  before assembly;
+- `tests/test_embodied_final_bundle.py` covers the frozen selection and
+  deliverables, truth-schema construction, preview composition, strict gate
+  behavior, and manifest corruption detection;
+- this report and `aggregate_results.json` are the only compact Phase 6 outcome
+  records retained in Git.
+
+Validation and experiment evidence:
+
+- Full repository validation passes: 35 tests. The final gate passes 19/19
+  checks. An independent rehash finds zero mismatches across all 50 manifest
+  entries; 51 files exist including the manifest. The copied trace and replay
+  are byte-identical SHA-256
+  `c0519057e3a55aa6eeef23cbc85a3f2190d5e4ed9a3211e1655268a4bca8968e`,
+  and an independent array-by-array comparison is exact, including NaNs.
+- Physics contains 14,400 steps and 3,601 truth samples from 0 to
+  60.00000000002078 s. Hidden reset count, object-identity changes, persistent
+  penetration frames, and replay numeric error are all 0. Camera-mount error is
+  `4.44e-16` m / `5.07e-16` rad; both IMU consistency RMSE values are 0.
+- The near miss remains non-contact at 0.038999 m. RGB contact/release offsets
+  are both 0 frames. The latest bound surface/depth contact QA evaluates 808
+  observations (301 visible, 507 depth-occluded) and reaches 1.3191 px /
+  0.0059973 m under the unchanged 6 px / 0.006 m gates. Collision-proxy and
+  skin-artifact pixel counts are 0, and the preview was visually reviewed with
+  no pink limb, duplicate hand, exposed collision proxy, or identity change.
+- HDF5 contains exactly 1,801 synchronized depth frames at 480x640 and
+  segmentation frames at 480x640x2; its render times match the indexed truth
+  samples exactly. The accepted mux SHA-256 is
+  `93885e1f6cdf9eaed34ab32d8795f489e67ee6541cc7795765a0330aa0f378c3`.
+  FFprobe confirms 1,801 640x480 H.264 frames at 30 fps plus one 48 kHz mono AAC
+  stream over 60.033333 s. The authoritative baseline SHA-256 is
+  `3761381ee08be564f8caa5a01deff2bea8577b79ce7109098a2ff04f3bc43446`.
+- The two contact-gated grasp-assist intervals remain fully disclosed: 2,061
+  truth frames / 34.3333 s total, with 0 unflagged frames. Collision-checked
+  locomotion assist is flagged for 181 truth frames. This is therefore an
+  assist-heavy qualified engineering episode, not an unassisted dexterity
+  result. The 12-cell operating envelope remains 9 passes and three exact
+  red-ball/base-placement retrieve failures.
+
+Actual artifacts are under ignored
+`runs/embodied_simulation/phase_6/final` (about 516 MiB). The accepted episode
+is `accepted_episode.mp4`; `baseline_rgb.mp4` is the authoritative visual
+stream; `episode_trace.npz`, `render_streams.h5`, `speech.wav`, transcript and
+alignment, QA receipts, truth schema, public-asset/dependency provenance, and
+replay instructions form the synchronized package. `qa_preview.png` is the
+16-sample contact/behavior sheet. `final_bundle_manifest.json` has SHA-256
+`352285da5d1c81229abaa864e604416e8b5e0a631eb36d8eaa56eaefa5044be0`.
+All media, traces, XML replay components, and generated records remain ignored.
+
+Repository status: implementation/config/test commit `f47ec5e` (`Assemble
+accepted embodied episode bundle`) is pushed to
+`origin/embodied-simulation`; this compact checkpoint and aggregate are
+committed and pushed separately. No complete run, media, model, dependency
+environment, cache, log, or binary artifact is tracked.
+
+Deviations from the frozen Phase 6 contract: none. Before that contract was
+frozen, the selected source cell was requalified with the already recorded
+Phase 5 contact-surface/depth QA repair so the final bundle did not preserve an
+older midpoint-only receipt. Its physics trace, baseline, mux, HDF5, controller,
+camera, collisions, seeds, event timing, and all thresholds remained unchanged.
+The earlier explicit architecture deviation remains: native MIMo is the
+authoritative visible hand/forearm, MPFB is diagnostic only, and no neural
+appearance passed Phase 3 invariants.
+
+Qualification boundaries remain explicit. Engineering qualification passes.
+The ChildLens viewer-view path remains
+`STOP_HARDWARE_PRIVACY_NO_LOCAL_CUDA`; restricted media was not inspected,
+decoded, moved, or transferred. Measurement validity is not established and no
+ChildLens scoring occurred. All three provisional ChildLens ages-3-to-5 visual
+distribution intervals remain unmet, so this is not naturalistic or infant
+calibration and not human validation. Appearance validity is deterministic
+baseline only. No learner comparison or causal evidence was produced.
+
+Smallest next step: preserve the ignored bundle and compact manifest as the
+qualified simulator deliverable; any learner comparison, BabyView confirmation,
+or causal study requires a separate governed protocol and authorization.

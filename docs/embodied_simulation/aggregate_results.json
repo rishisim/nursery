@@ -339,6 +339,86 @@
       "reviv_vipe_synthetic_instrument_check": "not run; optional and not needed for the engineering gate",
       "restricted_childlens_accessed": false,
       "causal_result_claimed": false
+    },
+    "6": {
+      "gate": "PASS",
+      "run": "runs/embodied_simulation/phase_6/final",
+      "config_sha256": "f069c270116542a4453e11abf1c4a8cab0274486f266b321ea0a1c3f459ea05c",
+      "selected_cell_id": "sparse__yellow_cup_authored__20260731",
+      "authoritative_render": "deterministic_native_mimo_baseline",
+      "neural_appearance_selected": false,
+      "duration_s": 60.0,
+      "mux_duration_s": 60.033333,
+      "physics_steps": 14400,
+      "truth_samples": 3601,
+      "render_frames": 1801,
+      "resolution": [640, 480],
+      "render_fps": 30,
+      "accepted_mux": {
+        "path": "accepted_episode.mp4",
+        "sha256": "93885e1f6cdf9eaed34ab32d8795f489e67ee6541cc7795765a0330aa0f378c3",
+        "video": "H.264 640x480 30 fps 1801 frames",
+        "audio": "AAC 48 kHz mono; separately generated authoritative speech"
+      },
+      "authoritative_baseline_sha256": "3761381ee08be564f8caa5a01deff2bea8577b79ce7109098a2ff04f3bc43446",
+      "trace_sha256": "c0519057e3a55aa6eeef23cbc85a3f2190d5e4ed9a3211e1655268a4bca8968e",
+      "replay_trace_sha256": "c0519057e3a55aa6eeef23cbc85a3f2190d5e4ed9a3211e1655268a4bca8968e",
+      "render_streams_sha256": "ada262a976f1d697eb54fdc002b7992b4756bcb678d9dd519726c4c311440bd5",
+      "speech_sha256": "eabb32a6fed82103cdd33826f6f139086944f5d8daaec086e34d99d5d4e03397",
+      "final_bundle_manifest_sha256": "352285da5d1c81229abaa864e604416e8b5e0a631eb36d8eaa56eaefa5044be0",
+      "manifest_entries": 50,
+      "bundle_files_including_manifest": 51,
+      "bundle_size_mib_approx": 516,
+      "final_acceptance_checks": {
+        "passed": 19,
+        "failed": 0
+      },
+      "engineering": {
+        "status": "PASS",
+        "maximum_replay_numeric_error": 0.0,
+        "camera_mount_max_translation_error_m": 4.440892098500626e-16,
+        "camera_mount_max_rotation_error_rad": 5.0727538348952e-16,
+        "persistent_penetration_frames": 0,
+        "object_identity_changes": 0,
+        "hidden_world_reset_count": 0,
+        "maximum_projected_contact_error_px": 1.3190690530810314,
+        "maximum_3d_contact_surface_distance_m": 0.005997312853897754,
+        "rgb_truth_contact_frame_offset": 0,
+        "rgb_truth_release_frame_offset": 0,
+        "collision_proxy_pixels": 0,
+        "skin_artifact_pixels": 0,
+        "generalization_passes": 9,
+        "generalization_episodes": 12
+      },
+      "assistance": {
+        "grasp_assist_intervals": 2,
+        "grasp_assist_duration_s": 34.333333333343745,
+        "grasp_assist_truth_frames": 2061,
+        "locomotion_assist_truth_frames": 181,
+        "unflagged_assist_frames": 0,
+        "interpretation": "accepted engineering trace is assist-heavy and is not an unassisted dexterity result"
+      },
+      "truth_streams": {
+        "depth_shape": [1801, 480, 640],
+        "segmentation_shape": [1801, 480, 640, 2],
+        "render_clock_matches_truth_index_exactly": true,
+        "trace_and_replay_arrays_exact": true
+      },
+      "preview": {
+        "path": "qa_preview.png",
+        "samples": 16,
+        "sha256": "eb8349ffcc669d86b403cca14dbae39512456d98ea047e343e1271938cab238f",
+        "manually_reviewed": true
+      },
+      "qualification_boundaries": {
+        "hardware_privacy": "STOP_HARDWARE_PRIVACY_NO_LOCAL_CUDA unchanged; restricted ChildLens media untouched",
+        "measurement_validity": "NOT_ESTABLISHED; no ChildLens scoring occurred",
+        "naturalistic_calibration": "TARGET_INTERVALS_NOT_MET; provisional ChildLens ages-3-to-5 aggregate bridge only",
+        "appearance": "DETERMINISTIC_BASELINE_ONLY; neural methods rejected and MPFB diagnostic only",
+        "causal_evidence": "NOT_PRODUCED"
+      },
+      "restricted_childlens_accessed": false,
+      "causal_result_claimed": false
     }
   }
 }
