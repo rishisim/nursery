@@ -1,0 +1,228 @@
+{
+  "schema": "EmbodiedSimulationFinalBundle.v1",
+  "frozen_before_phase_6_bundle_outcomes_at_utc": "2026-08-01T04:14:30Z",
+  "scientific_scope": "public_synthetic_engineering_qualification_only",
+  "source_selection": {
+    "policy": "Use the Phase 5 candidate selected by the frozen qualification and ranking policy; do not visually cherry-pick or rerun physics with changed thresholds.",
+    "cell_id": "sparse__yellow_cup_authored__20260731",
+    "source_run": "runs/embodied_simulation/phase_5/batch/cells/sparse__yellow_cup_authored__20260731",
+    "scene_variant": "sparse",
+    "target_persistent_id": "yellow_cup_authored",
+    "controller_seed": 20260731,
+    "bindings": {
+      "vertical_slice_config": {
+        "path": "configs/embodied_simulation_vertical_slice.json",
+        "sha256": "92c83fe8f11cbefcfbf8518cdf9bb3e11f52f33b0d20798054bc52d80c9962de"
+      },
+      "continuous_episode_config": {
+        "path": "configs/embodied_simulation_episode.json",
+        "sha256": "a28056a4805dca4c11b89f227b0d42f1f7fea083af0ef53e947ab024cbe21b48"
+      },
+      "appearance_config": {
+        "path": "configs/embodied_simulation_appearance.json",
+        "sha256": "addcda3dfa9c4ef326053761853c9ad7f51b49f89a87bc601313fbfa00f6df87"
+      },
+      "generalization_config": {
+        "path": "configs/embodied_simulation_generalization.json",
+        "sha256": "79d4b61a3e1e75269488578f15aa45c480a7b323f182d3c5f0b80113a39a7f5c"
+      },
+      "asset_registry": {
+        "path": "configs/childlens_mimo_molmospaces_asset_registry.json",
+        "sha256": "3657cc399c795abe9637a378e7a686dd29c320a62e2de5b99e3cb4f1e754ca72"
+      },
+      "phase_5_batch_aggregate": {
+        "path": "runs/embodied_simulation/phase_5/batch/batch_aggregate.json",
+        "sha256": "c9d67c61b0176441020371e336ce385ab54cbc23dcd812b43247129aaff9daa9"
+      },
+      "phase_5_batch_qualification": {
+        "path": "runs/embodied_simulation/phase_5/batch/batch_qualification.json",
+        "sha256": "181cbd3701f79fa923f8cebe97da42793f0c314e6225ba73080a10986d05bc06"
+      },
+      "phase_5_frozen_batch_manifest": {
+        "path": "runs/embodied_simulation/phase_5/batch/frozen_batch_manifest.json",
+        "sha256": "bb818caef7b4ca69a2661a3ea22e73422ae17ebbd8162ed39061259f99bec496"
+      },
+      "phase_5_visual_distribution_qa": {
+        "path": "runs/embodied_simulation/phase_5/batch/visual_distribution_qa.json",
+        "sha256": "a0954aab3d4acddb5de38c1683d439eab8cb96f4acdd0a3137cfb8fded583c6c"
+      },
+      "selected_continuous_manifest": {
+        "path": "runs/embodied_simulation/phase_5/batch/cells/sparse__yellow_cup_authored__20260731/continuous_episode_manifest.json",
+        "sha256": "31801536e8687aef20f79c05e1667f689c9b32006bfd024208ef6a05907c4911"
+      }
+    },
+    "expected_artifacts": {
+      "episode_trace.npz": "c0519057e3a55aa6eeef23cbc85a3f2190d5e4ed9a3211e1655268a4bca8968e",
+      "episode_trace_replay.npz": "c0519057e3a55aa6eeef23cbc85a3f2190d5e4ed9a3211e1655268a4bca8968e",
+      "accepted_episode.mp4": "93885e1f6cdf9eaed34ab32d8795f489e67ee6541cc7795765a0330aa0f378c3",
+      "baseline_rgb.mp4": "3761381ee08be564f8caa5a01deff2bea8577b79ce7109098a2ff04f3bc43446",
+      "render_streams.h5": "ada262a976f1d697eb54fdc002b7992b4756bcb678d9dd519726c4c311440bd5",
+      "speech.wav": "eabb32a6fed82103cdd33826f6f139086944f5d8daaec086e34d99d5d4e03397"
+    }
+  },
+  "authoritative_appearance": {
+    "rgb": "deterministic_native_mimo_baseline",
+    "accepted_episode": "baseline_rgb_with_separately_generated_authoritative_speech",
+    "neural_appearance_selected": false,
+    "phase_3_outcome": "no neural method passed every geometry, identity, timing, contact, and occlusion invariant",
+    "physical_collision_geometry": "enabled_for_physics_and_hidden_from_rgb",
+    "visible_hand_forearm": "co_articulated_non_colliding_native_mimo_appearance_layer",
+    "mpfb_role": "diagnostic_only"
+  },
+  "bundle": {
+    "output_root": "runs/embodied_simulation/phase_6/final",
+    "copy_selected_files": [
+      "accepted_episode.mp4",
+      "activity_language_plan.json",
+      "appearance_qa.json",
+      "baseline_rgb.mp4",
+      "body_names.json",
+      "cell_episode_contract.json",
+      "cell_result.json",
+      "cell_vertical_contract.json",
+      "continuous_episode_manifest.json",
+      "continuous_qa_report.json",
+      "continuous_qualification.json",
+      "cross_modal_qa.json",
+      "determinism_qa.json",
+      "embodied_mimo_model.xml",
+      "episode_bundle_manifest.json",
+      "episode_trace.npz",
+      "episode_trace_replay.npz",
+      "external_qa.mp4",
+      "inspection_sheet.png",
+      "kernel_component.xml",
+      "mux_qa.json",
+      "physics_qa.json",
+      "qa_report.json",
+      "qualification.json",
+      "render_qa.json",
+      "render_streams.h5",
+      "replay_component.xml",
+      "resolved_episode_contract.json",
+      "shared_clock_qa.json",
+      "speech.wav",
+      "speech_alignment.json",
+      "speech_qa.json",
+      "transcript.txt",
+      "vertical_slice_contract.json"
+    ],
+    "copy_bound_records": {
+      "configs/embodied_simulation_vertical_slice.json": "canonical_vertical_slice_config.json",
+      "configs/embodied_simulation_episode.json": "canonical_continuous_episode_config.json",
+      "configs/embodied_simulation_appearance.json": "canonical_appearance_config.json",
+      "configs/embodied_simulation_generalization.json": "canonical_generalization_config.json",
+      "configs/childlens_mimo_molmospaces_asset_registry.json": "asset_registry.json",
+      "runs/embodied_simulation/phase_5/batch/batch_aggregate.json": "phase5_batch_aggregate.json",
+      "runs/embodied_simulation/phase_5/batch/batch_qualification.json": "phase5_batch_qualification.json",
+      "runs/embodied_simulation/phase_5/batch/frozen_batch_manifest.json": "phase5_frozen_batch_manifest.json",
+      "runs/embodied_simulation/phase_5/batch/visual_distribution_qa.json": "phase5_visual_distribution_qa.json"
+    },
+    "generated_files": [
+      "asset_dependency_provenance.json",
+      "final_acceptance_qa.json",
+      "final_bundle_contract.json",
+      "final_bundle_manifest.json",
+      "final_decision_report.json",
+      "qa_preview.png",
+      "replay_instructions.md",
+      "truth_schema.json"
+    ]
+  },
+  "truth_contract": {
+    "duration_s": 60.0,
+    "physics_hz": 240,
+    "truth_hz": 60,
+    "render_hz": 30,
+    "truth_samples": 3601,
+    "render_frames": 1801,
+    "resolution_px": [640, 480],
+    "required_trace_streams": [
+      "time_s",
+      "phase",
+      "behavior_action",
+      "qpos",
+      "qvel",
+      "action",
+      "touch_wrench",
+      "touch_contact_count",
+      "distinct_finger_contacts",
+      "assist_active",
+      "locomotion_assist_active",
+      "vestibular_accelerometer",
+      "vestibular_gyroscope",
+      "target_pose",
+      "hand_pose",
+      "head_pose",
+      "camera_pose",
+      "body_pose",
+      "touch_contact_position",
+      "touch_minimum_distance_m",
+      "support_contact_count",
+      "support_contact_force_n",
+      "world_reset"
+    ],
+    "required_render_streams": [
+      "time_s",
+      "truth_index",
+      "depth_m",
+      "segmentation",
+      "target_area_fraction",
+      "clutter_area_fraction"
+    ],
+    "segmentation_channels": ["geom_id", "object_type_id"],
+    "pose_convention": "positions in world meters followed by quaternion wxyz, except camera_pose which stores world translation and row-major 3x3 rotation",
+    "camera_mount_source": "cell_vertical_contract.json:embodiment.camera_mount"
+  },
+  "preview": {
+    "columns": 4,
+    "thumbnail_px": [320, 240],
+    "samples": [
+      {"time_s": 0.5, "label": "look"},
+      {"time_s": 6.5, "label": "approach"},
+      {"time_s": 9.0, "label": "near miss"},
+      {"time_s": 10.5, "label": "contact"},
+      {"time_s": 12.2, "label": "flagged grasp assist"},
+      {"time_s": 16.0, "label": "lift"},
+      {"time_s": 21.0, "label": "rotate"},
+      {"time_s": 25.0, "label": "head turn + contact"},
+      {"time_s": 30.0, "label": "shake"},
+      {"time_s": 34.0, "label": "bang"},
+      {"time_s": 37.0, "label": "transfer"},
+      {"time_s": 39.0, "label": "release"},
+      {"time_s": 44.0, "label": "settle"},
+      {"time_s": 50.0, "label": "retrieve"},
+      {"time_s": 56.0, "label": "second lift"},
+      {"time_s": 59.2, "label": "final dwell"}
+    ]
+  },
+  "acceptance": {
+    "threshold_source": "configs/embodied_simulation_vertical_slice.json:frozen_gates and configs/embodied_simulation_episode.json:qualification",
+    "required_batch_passes": 9,
+    "required_scene_passes": 6,
+    "maximum_bounded_batch_failures": 3,
+    "exact_replay_required": true,
+    "hidden_world_reset_count_max": 0,
+    "unflagged_assist_frames_max": 0,
+    "neural_appearance_permitted": false,
+    "frozen_thresholds_changed": false
+  },
+  "qualification_boundaries": {
+    "engineering": "The selected synthetic episode and the documented 12-cell operating envelope may pass engineering qualification.",
+    "hardware_privacy": "ChildLens Viewer-View Calibration remains STOP_HARDWARE_PRIVACY_NO_LOCAL_CUDA; restricted media must remain local and untouched.",
+    "measurement_validity": "No ChildLens scoring or measurement-validity result is permitted; synthetic DINO/ReViV/ViPE checks can characterize an instrument only.",
+    "naturalistic_calibration": "ChildLens-derived ages-3-to-5 aggregate intervals are provisional young-child bridge targets, not infant calibration or human validation.",
+    "appearance": "Only deterministic native MIMo baseline RGB is authoritative unless a later neural layer passes every invariant.",
+    "causal_evidence": "No causal result or learner comparison is produced by this build."
+  },
+  "privacy_and_governance": {
+    "restricted_childlens_access_permitted": false,
+    "restricted_childlens_remote_transfer_permitted": false,
+    "public_synthetic_inputs_only": true,
+    "empirical_source": "ChildLens aggregate intervals only",
+    "aea_or_babyview_empirical_ancestry_permitted": false,
+    "human_validation_claim_permitted": false,
+    "infant_calibration_claim_permitted": false,
+    "causal_claim_permitted": false
+  }
+}
