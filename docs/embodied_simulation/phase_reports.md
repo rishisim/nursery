@@ -384,3 +384,106 @@ weakened or moved.
 Smallest next step: run the frozen 12-episode engineering/generalization batch
 across scene variants, targets/distractors, clutter, and seeds, then select the
 final candidate by compact predeclared criteria rather than visual preference.
+
+## Phase 5 — generalization and bridge-oriented qualification
+
+Gate decision: **REPAIR-AND-CONTINUE → PASS**.
+
+The frozen 12-cell matrix completed across sparse, household, and messy scene
+variants; authored yellow-cup and red-ball targets; and two bounded placement
+seeds. Nine episodes pass the unchanged continuous physics, synchronization,
+determinism, render, speech, and cross-modal contract. Each scene contributes
+three passes, both required scenes exceed the frozen batch minimum, and the
+three remaining failures define an exact, bounded operating boundary rather
+than an architecture gate.
+
+Canonical files and compact records changed:
+
+- `generalization_batch.py` materializes the frozen product matrix, validates
+  bound contracts/assets, executes or revalidates each 60-second episode,
+  measures the exact pinned DINO/grayscale bridge vector, applies the frozen
+  selection order, and retains only compact cell and aggregate receipts;
+- `physics_kernel.py` and `run_kernel_episode.py` support recorded bounded
+  target/support/distractor offsets and both registry target geometries while
+  preserving the Phase 4 base trace byte-for-byte;
+- `trace_render.py` now projects the physical MuJoCo contact surface endpoints
+  and uses authoritative depth to identify genuinely occluded contact points;
+- `configs/embodied_simulation_generalization.json` freezes the 3×2×2 matrix,
+  calibration instrument, gates, selection policy, and bounded QA repair;
+- focused coverage is in `tests/test_embodied_generalization_batch.py`, and the
+  compact outcome is consolidated in `aggregate_results.json`.
+
+Validation and experiment evidence:
+
+- Full repository validation passes: 30 tests. All 12 continuous manifests
+  independently rehash, all bundles share one schema, and every HDF5 file has
+  depth shape 1,801×480×640 and segmentation shape 1,801×480×640×2. FFprobe
+  confirms every accepted mux has 1,801 H.264 frames plus one AAC stream.
+- All 12 cells execute 14,400 physics steps and 3,601 truth samples. All replay
+  with maximum numeric error 0; object identity changes, persistent penetration
+  frames, unflagged assist frames, collision-proxy pixels, and skin-artifact
+  pixels are 0 in every cell. Maximum mount error is `4.58e-16` m / `5.18e-16`
+  rad and maximum shared-clock error is `2.08e-11` s. Near-miss clearance spans
+  0.03125–0.11348 m with zero near-miss contacts.
+- The repaired visible-contact check reaches at most 5.8915 px and 0.0059994 m,
+  within the unchanged 6 px / 0.006 m limits. The first matrix attempt had only
+  two required-scene passes because the QA calculation projected a MuJoCo
+  margin midpoint and scored depth-occluded contacts. Projecting the two
+  physical surface endpoints and excluding only points hidden by a nearer
+  authoritative depth sample repaired the measurement; it did not change a
+  trace, rendered geometry, seed, threshold, camera, controller, or collision.
+- Nine cells pass end-to-end: cup 6/6 and ball 3/6; sparse, household, and messy
+  each pass 3/4. All nine passing cells use two flagged contact-gated assist
+  intervals totaling 34.3333 s (2,061 truth frames); none is an unassisted
+  physical-grasp-only result. Across all cells, lift spans 0.11259–0.16171 m,
+  rotation 91.79–117.69 degrees, head turn 22.85–23.05 degrees with 1.0 contact
+  retention, shake 0.03623–0.04773 m, and transfer 0.06346–0.21580 m.
+- The three failures are the red ball at seed `20260731` in all three clutter
+  variants. The same trace SHA-256
+  `0a0ed33bf7d72ee65570229c5ff1c2190130ab3abc9f3f285985dde2686b31c5`
+  has 26 retrieve-contact samples but no second assisted lift and only one
+  assist interval. Its failure is therefore target/placement controller scope,
+  not clutter or nondeterminism; the red ball passes in every scene at the
+  second frozen seed.
+- Exact 1 Hz bridge measurement with hash-bound `facebook/dinov2-small` gives
+  motion mean 0.06762 (range 0.06466–0.07207), adjacent DINO persistence mean
+  0.81942 (0.81071–0.83886), and scene-change mean 0.00424 (0–0.01695). All
+  12 cells miss all unchanged ChildLens intervals 0.1095–0.1273,
+  0.6912–0.7330, and 0.1069–0.1558 respectively. This remains a transparent
+  model–model/provisional young-child distribution diagnostic; it is not human
+  validation, infant calibration, a simulator-truth failure, or a causal null.
+- Inspection sheets for the selected cup, the passing ball, and the bounded
+  failing ball were reviewed. Object identity and finger count remain stable;
+  no pink limb, collision proxy, duplicate hand, or hidden reset is visible.
+  The deterministic native-MIMo appearance remains simplified but acceptable.
+
+Actual artifacts are under ignored
+`runs/embodied_simulation/phase_5/batch` (about 5.6 GiB): 11 newly executed
+episodes plus the revalidated Phase 4 reference cell, per-cell authoritative
+videos/audio, traces, HDF5 truth renders, QA sheets, manifests, the first-attempt
+compact receipts, final `batch_aggregate.json`, and
+`visual_distribution_qa.json`. The exact frozen selection chooses
+`sparse__yellow_cup_authored__20260731`, with trace SHA-256
+`c0519057e3a55aa6eeef23cbc85a3f2190d5e4ed9a3211e1655268a4bca8968e`
+and accepted mux SHA-256
+`93885e1f6cdf9eaed34ab32d8795f489e67ee6541cc7795765a0330aa0f378c3`.
+Task-created preflights and root MuJoCo logs were moved to the recoverable
+macOS Trash after compact evidence was retained; no pre-existing run was
+deleted.
+
+Repository status: implementation commit `3fc6b1d` and bounded contact-QA
+repair commit `d92c0d7` are pushed to `origin/embodied-simulation`; this
+checkpoint and compact aggregate are committed and pushed separately. Full
+runs, model weights, environments, downloads, media, and logs remain ignored.
+
+Deviations from the frozen plan are limited to the recorded contact-projection
+QA repair. The matrix, target definitions, placements, seeds, action semantics,
+physics, render, speech, selection order, and all acceptance thresholds stayed
+fixed. ReViV/ViPE was not run because its synthetic-only instrument check was
+optional and could not substitute for the already frozen ChildLens hardware/
+privacy stop or improve this engineering gate. No restricted ChildLens media
+was accessed, decoded, moved, or transferred.
+
+Smallest next step: assemble the selected ignored run into the final accepted
+bundle, add a compact preview and replay/verification entry point, independently
+rehash every component, and write the final cross-domain decision report.

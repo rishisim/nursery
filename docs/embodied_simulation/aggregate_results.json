@@ -225,6 +225,120 @@
       "mux_sha256": "c6410d5b931408e6057d2900924afa9b1fc29ee928aeb6f0fae255efd6a2a4de",
       "support_repair": "collision-enabled authored catch tray; no reset or direct object pose intervention",
       "restricted_childlens_accessed": false
+    },
+    "5": {
+      "gate": "PASS",
+      "run": "runs/embodied_simulation/phase_5/batch",
+      "config_sha256": "79d4b61a3e1e75269488578f15aa45c480a7b323f182d3c5f0b80113a39a7f5c",
+      "matrix_episode_count": 12,
+      "continuous_qualification_passed": 9,
+      "bounded_diagnostic_failures": 3,
+      "required_scene_passes": 6,
+      "passes_by_scene": {
+        "sparse": 3,
+        "household": 3,
+        "messy": 3
+      },
+      "passes_by_target": {
+        "yellow_cup_authored": 6,
+        "red_ball_authored": 3
+      },
+      "passes_by_seed": {
+        "20260731": 3,
+        "20260801": 6
+      },
+      "failure_operating_boundary": {
+        "cells": [
+          "sparse__red_ball_authored__20260731",
+          "household__red_ball_authored__20260731",
+          "messy__red_ball_authored__20260731"
+        ],
+        "taxonomy": ["ACTION_COMPLETION", "VISUAL_DISTRIBUTION_MISS"],
+        "reproducible_trace_sha256": "0a0ed33bf7d72ee65570229c5ff1c2190130ab3abc9f3f285985dde2686b31c5",
+        "retrieve_contact_samples": 26,
+        "retrieve_lift_m": 0.0,
+        "assist_interval_count": 1,
+        "interpretation": "the base-placement sphere completes the first manipulation but does not establish the second contact-gated assisted lift; the failure is scene-clutter invariant and exactly replayable"
+      },
+      "shared_hard_gate_evidence": {
+        "physics_steps_per_episode": 14400,
+        "truth_samples_per_episode": 3601,
+        "render_frames_per_episode": 1801,
+        "maximum_camera_mount_translation_error_m": 4.577566798522237e-16,
+        "maximum_camera_mount_rotation_error_rad": 5.177735492072796e-16,
+        "maximum_timestamp_error_s": 2.078337502098293e-11,
+        "minimum_relevant_contact_distance_m": 0.0,
+        "maximum_persistent_penetration_frames": 0,
+        "near_miss_clearance_range_m": [0.031246142586500762, 0.11348458310163495],
+        "maximum_replay_numeric_error": 0.0,
+        "object_identity_changes": 0,
+        "collision_proxy_pixels": 0,
+        "skin_artifact_pixels": 0,
+        "maximum_projected_contact_error_px": 5.891442232407151,
+        "maximum_3d_contact_surface_distance_m": 0.005999392053367273,
+        "unflagged_assist_frames": 0,
+        "validated_manifests": 12,
+        "bundle_schema_variants": 1
+      },
+      "action_ranges_all_cells": {
+        "maximum_lift_m": [0.1125903876883605, 0.16171320349484308],
+        "maximum_rotation_degrees": [91.7921506886051, 117.69095464625002],
+        "maximum_head_turn_degrees": [22.850262273746125, 23.054860826998656],
+        "head_turn_contact_retention_fraction": [1.0, 1.0],
+        "shake_vertical_range_m": [0.03623423079886934, 0.04772564432806459],
+        "bang_support_contact_samples": [1, 170],
+        "transfer_lateral_range_m": [0.06346437197666521, 0.21580257321086083],
+        "retrieve_lift_m": [0.0, 0.11136891931135462]
+      },
+      "assist": {
+        "passed_cells_with_two_flagged_intervals": 9,
+        "passed_cell_assist_duration_s": 34.333333333343745,
+        "passed_cell_assist_active_truth_frames": 2061,
+        "unassisted_passed_cells": 0,
+        "interpretation": "qualified operation is contact-gated and assisted, not physical-grasp-only"
+      },
+      "visual_distribution": {
+        "sampling_hz": 1.0,
+        "motion": {
+          "target_interval_90": [0.1095, 0.1273],
+          "generated_mean": 0.06761989618341128,
+          "generated_range": [0.06465809047222137, 0.07206794619560242],
+          "cells_passed": 0
+        },
+        "adjacent_dino_persistence": {
+          "target_interval_90": [0.6912, 0.733],
+          "generated_mean": 0.8194245596726736,
+          "generated_range": [0.8107137084007263, 0.838861882686615],
+          "cells_passed": 0
+        },
+        "scene_change_rate": {
+          "target_interval_90": [0.1069, 0.1558],
+          "generated_mean": 0.00423728813559322,
+          "generated_range": [0.0, 0.01694915254237288],
+          "cells_passed": 0
+        },
+        "dino_repository": "facebook/dinov2-small",
+        "dino_revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056",
+        "dino_weights_sha256": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1",
+        "status": "failed unchanged provisional ChildLens intervals; transparent model-model diagnostic, not human validation or a core simulator-truth failure"
+      },
+      "bounded_render_qa_repair": {
+        "initial_batch_passed": false,
+        "initial_required_scene_passes": 2,
+        "repair": "project MuJoCo contact surface endpoints and exclude depth-proven occluded points",
+        "thresholds_or_seeds_changed": false,
+        "repaired_maximum_visible_contact_error_px": 5.891442232407151
+      },
+      "selected_candidate": {
+        "cell_id": "sparse__yellow_cup_authored__20260731",
+        "run": "runs/embodied_simulation/phase_5/batch/cells/sparse__yellow_cup_authored__20260731",
+        "trace_sha256": "c0519057e3a55aa6eeef23cbc85a3f2190d5e4ed9a3211e1655268a4bca8968e",
+        "mux_sha256": "93885e1f6cdf9eaed34ab32d8795f489e67ee6541cc7795765a0330aa0f378c3",
+        "selection_basis": "frozen eligibility and ranking; no manual visual cherry-picking"
+      },
+      "reviv_vipe_synthetic_instrument_check": "not run; optional and not needed for the engineering gate",
+      "restricted_childlens_accessed": false,
+      "causal_result_claimed": false
     }
   }
 }
