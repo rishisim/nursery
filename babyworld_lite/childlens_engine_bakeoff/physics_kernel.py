@@ -143,6 +143,21 @@ def _target_xml(target_definition: dict[str, Any]) -> str:
             contype="{TARGET_COLLISION_BIT}" conaffinity="{TARGET_COLLISION_BIT | 8}" mass="0.002"/>"""
 
 
+def _target_geom_names(target_definition: dict[str, Any]) -> tuple[str, ...]:
+    if target_definition["geometry"] == "sphere":
+        return ("target_geom",)
+    if target_definition["geometry"] == "cylinder_with_three_capsule_handle":
+        return (
+            "target_geom",
+            "target_handle_upper",
+            "target_handle_outer",
+            "target_handle_lower",
+        )
+    raise ValueError(
+        f"unsupported target geometry: {target_definition['geometry']}"
+    )
+
+
 def _clutter_xml(
     root_xy: tuple[float, float], clutter_layout: list[dict[str, Any]]
 ) -> str:
@@ -172,6 +187,9 @@ def _component_xml(
     target_definition: dict[str, Any],
     support_definition: dict[str, Any],
     clutter_layout: list[dict[str, Any]],
+    target_offset_from_root: tuple[float, float, float],
+    support_offset_from_root: tuple[float, float, float],
+    reach_distractor_offset_from_root: tuple[float, float, float],
 ) -> str:
     contact_pairs = "\n".join(
         f'    <pair geom1="{name}" geom2="target_geom" condim="4" margin="0.006" gap="0.001" friction="2.0 0.01 0.0005 0.0001 0.0001" solref="0.03 1" solimp="0.9 0.98 0.002"/>'
@@ -179,22 +197,14 @@ def _component_xml(
     )
     target_support_pairs = "\n".join(
         f'    <pair geom1="{target_name}" geom2="{support_name}" condim="4" margin="0.003" gap="0.001" friction="3.0 0.01 0.0005 0.0001 0.0001" solref="0.008 1" solimp="0.98 0.999 0.0005"/>'
-        for target_name in (
-            "target_geom", "target_handle_upper", "target_handle_outer",
-            "target_handle_lower",
-        )
+        for target_name in _target_geom_names(target_definition)
         for support_name in (
             "support_catch_tray", "support_geom", "support_rim_back"
         )
     )
     target_floor_pairs = "\n".join(
         f'    <pair geom1="{target_name}" geom2="floor" condim="4" margin="0.003" gap="0.001" friction="2.0 0.01 0.0005 0.0001 0.0001" solref="0.002 1" solimp="0.98 0.999 0.0005"/>'
-        for target_name in (
-            "target_geom",
-            "target_handle_upper",
-            "target_handle_outer",
-            "target_handle_lower",
-        )
+        for target_name in _target_geom_names(target_definition)
     )
     clutter_xml = _clutter_xml(root_xy, clutter_layout)
     catch_radius = float(support_definition["catch_tray_radius_m"])
@@ -208,6 +218,21 @@ def _component_xml(
     pedestal_half_height = float(
         support_definition["pedestal_half_height_m"]
     )
+    target_position = np.asarray(
+        [root_xy[0], root_xy[1], 0.55], dtype=np.float64
+    ) + np.asarray(target_offset_from_root, dtype=np.float64)
+    support_position = np.asarray(
+        [root_xy[0], root_xy[1], 0.55], dtype=np.float64
+    ) + np.asarray(support_offset_from_root, dtype=np.float64)
+    distractor_position = np.asarray(
+        [root_xy[0], root_xy[1], 0.55], dtype=np.float64
+    ) + np.asarray(reach_distractor_offset_from_root, dtype=np.float64)
+    # Preserve the already-qualified decimal-authored base heights exactly;
+    # binary addition of 0.55 and 0.025 otherwise serializes as
+    # 0.5750000000000001 and needlessly changes the frozen base model.
+    target_position[2] = round(float(target_position[2]), 12)
+    support_position[2] = round(float(support_position[2]), 12)
+    distractor_position[2] = round(float(distractor_position[2]), 12)
     return f"""<mujoco model="EmbodiedMIMoKernel">
   <compiler inertiafromgeom="true" angle="radian" assetdir="{mimo_assets}"/>
   <include file="{mimo_assets / 'mimo' / 'MIMo_metav2.xml'}"/>
@@ -218,11 +243,11 @@ def _component_xml(
       <joint name="root_yaw" type="hinge" axis="0 0 1" range="-0.25 0.25" damping="30" armature="0.1"/>
       <include file="{embodied_model_path}"/>
     </body>
-    <body name="target" pos="{root_xy[0] + 0.34} {root_xy[1] - 0.15} 0.65">
+    <body name="target" pos="{' '.join(str(item) for item in target_position)}">
       <joint name="target_free" type="free" damping="3.0" armature="0.001"/>
 {_target_xml(target_definition)}
     </body>
-    <body name="support" pos="{root_xy[0] + 0.34} {root_xy[1] - 0.15} 0.575">
+    <body name="support" pos="{' '.join(str(item) for item in support_position)}">
       <geom name="support_catch_tray" type="cylinder" pos="0 0 -{catch_center_below}"
             size="{catch_radius} {catch_half_height}" rgba="0.24 0.13 0.06 1" friction="3 0.005 0.0002"
             solref="0.008 1" solimp="0.98 0.999 0.0005" contype="8"
@@ -238,7 +263,7 @@ def _component_xml(
             solimp="0.98 0.999 0.0005" contype="8"
             conaffinity="{TARGET_COLLISION_BIT | 7}"/>
     </body>
-    <body name="reach_distractor" pos="{root_xy[0] + 0.23} {root_xy[1] + 0.02} 0.65">
+    <body name="reach_distractor" pos="{' '.join(str(item) for item in distractor_position)}">
       <geom name="reach_distractor_geom" type="sphere" size="0.035"
             rgba="0.1 0.35 0.8 1" mass="0.08" contype="2"
             conaffinity="{TARGET_COLLISION_BIT | 12}"/>
@@ -306,6 +331,13 @@ def build_kernel_model(
     target_definition: dict[str, Any],
     support_definition: dict[str, Any] | None = None,
     clutter_layout: list[dict[str, Any]] | None = None,
+    target_offset_from_root: tuple[float, float, float] = (0.34, -0.15, 0.10),
+    support_offset_from_root: tuple[float, float, float] = (0.34, -0.15, 0.025),
+    reach_distractor_offset_from_root: tuple[float, float, float] = (
+        0.23,
+        0.02,
+        0.10,
+    ),
     camera_mount_position: tuple[float, float, float] = (0.081, 0.0, 0.067375),
     camera_mount_quaternion: tuple[float, float, float, float] = (
         0.2642907803854001,
@@ -339,6 +371,9 @@ def build_kernel_model(
                 "catch_tray_center_below_support_origin_m": 0.025,
             },
             clutter_layout or [],
+            target_offset_from_root,
+            support_offset_from_root,
+            reach_distractor_offset_from_root,
         ),
         encoding="utf-8",
     )
@@ -2242,7 +2277,10 @@ def run_physics_trace(
             ),
             "maximum_timestamp_error_s": float(np.max(np.abs(arrays["time_s"] - np.arange(len(arrays["time_s"])) / truth_hz))),
         },
-        "object_identity": {"persistent_id": "yellow_cup_authored", "changes": 0},
+        "object_identity": {
+            "persistent_id": spec["scene_family"]["target"]["persistent_id"],
+            "changes": 0,
+        },
         "continuous_episode": {
             "single_physics_trace": True,
             "hidden_world_reset_count": int(arrays["world_reset"].sum()),

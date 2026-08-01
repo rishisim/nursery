@@ -75,6 +75,17 @@ def _build(
         target_definition=_target_definition(contract),
         support_definition=contract["scene_family"].get("support"),
         clutter_layout=clutter_layout,
+        target_offset_from_root=tuple(
+            placement["target_offset_from_root_m"]
+        ),
+        support_offset_from_root=tuple(
+            placement["support_offset_from_root_m"]
+        ),
+        reach_distractor_offset_from_root=tuple(
+            placement.get(
+                "reach_distractor_offset_from_root_m", [0.23, 0.02, 0.10]
+            )
+        ),
         camera_mount_position=tuple(mount["translation_head_m"]),
         camera_mount_quaternion=tuple(mount["quaternion_head_wxyz"]),
     )

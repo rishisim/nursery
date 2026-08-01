@@ -1,0 +1,145 @@
+{
+  "schema": "EmbodiedSimulationGeneralizationBatch.v1",
+  "frozen_before_phase_5_outcomes_at_utc": "2026-08-01T02:11:04Z",
+  "scientific_scope": "public_synthetic_engineering_qualification_only",
+  "canonical_episode_contract": {
+    "path": "configs/embodied_simulation_episode.json",
+    "sha256": "a28056a4805dca4c11b89f227b0d42f1f7fea083af0ef53e947ab024cbe21b48"
+  },
+  "canonical_vertical_slice_contract": {
+    "path": "configs/embodied_simulation_vertical_slice.json",
+    "sha256": "92c83fe8f11cbefcfbf8518cdf9bb3e11f52f33b0d20798054bc52d80c9962de"
+  },
+  "asset_registry": {
+    "path": "configs/childlens_mimo_molmospaces_asset_registry.json",
+    "sha256": "3657cc399c795abe9637a378e7a686dd29c320a62e2de5b99e3cb4f1e754ca72"
+  },
+  "matrix": {
+    "product_order": ["scene_variants", "target_objects", "seeds"],
+    "episode_count": 12,
+    "scene_variants": ["sparse", "household", "messy"],
+    "required_scene_variants": ["sparse", "household"],
+    "diagnostic_scene_variants": ["messy"],
+    "target_objects": [
+      {
+        "persistent_id": "yellow_cup_authored",
+        "requested_label": "yellow cup",
+        "noun": "cup",
+        "color_noun": "yellow cup"
+      },
+      {
+        "persistent_id": "red_ball_authored",
+        "requested_label": "red ball",
+        "noun": "ball",
+        "color_noun": "red ball"
+      }
+    ],
+    "seeds": [
+      {
+        "seed": 20260731,
+        "target_and_support_delta_m": [0.0, 0.0, 0.0],
+        "reach_distractor_delta_m": [0.0, 0.0, 0.0]
+      },
+      {
+        "seed": 20260801,
+        "target_and_support_delta_m": [-0.01, 0.008, 0.0],
+        "reach_distractor_delta_m": [0.005, -0.005, 0.0]
+      }
+    ],
+    "seed_semantics": "Each seed deterministically selects the recorded bounded target/support and reach-distractor placement delta; physics and rendering remain deterministic and no random camera motion is introduced.",
+    "event_schedule_changed_between_cells": false,
+    "camera_mount_changed_between_cells": false,
+    "physics_or_qualification_threshold_changed_between_cells": false
+  },
+  "reuse": {
+    "cell_id": "household__yellow_cup_authored__20260731",
+    "source_run": "runs/embodied_simulation/phase_4/candidate",
+    "required_trace_sha256": "c0519057e3a55aa6eeef23cbc85a3f2190d5e4ed9a3211e1655268a4bca8968e",
+    "required_mux_sha256": "c6410d5b931408e6057d2900924afa9b1fc29ee928aeb6f0fae255efd6a2a4de",
+    "policy": "Count the already qualified Phase 4 episode as one matrix cell only after revalidating its contract, manifest, trace, render, speech, and hard-gate receipts; do not copy the complete run."
+  },
+  "visual_distribution": {
+    "status": "diagnostic_bridge_measurement_not_an_engineering_pass_gate",
+    "calibration_source": {
+      "empirical_source": "ChildLens only",
+      "age_years": [3, 5],
+      "config_path": "configs/childlens_simulator_bridge.json",
+      "config_sha256": "e570533d81cdba47bac17ea51545ad42769c514f2c4fb5b4296eff6a0ffb348a",
+      "naturalistic_status": "provisional young-child aggregate intervals; not infant calibration, human validation, or causal evidence"
+    },
+    "sampling": {
+      "sampling_hz": 1.0,
+      "timestamps": "episode start + 0.5 + integer seconds",
+      "duration_s": 60,
+      "frames_per_episode": 60,
+      "grayscale_size_px": [64, 64],
+      "scene_change_motion_threshold": 0.2
+    },
+    "metrics": {
+      "motion": {
+        "definition": "mean adjacent-frame mean absolute grayscale difference divided by 255",
+        "target_interval_90": [0.1095, 0.1273]
+      },
+      "adjacent_frame_persistence": {
+        "definition": "mean adjacent-frame cosine of the exact frozen DINOv2-small pooler embeddings",
+        "target_interval_90": [0.6912, 0.733]
+      },
+      "scene_change_rate": {
+        "definition": "fraction of adjacent grayscale-motion values at least 0.20",
+        "target_interval_90": [0.1069, 0.1558]
+      }
+    },
+    "vision_frontend": {
+      "repository": "facebook/dinov2-small",
+      "revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056",
+      "weights_file": "model.safetensors",
+      "weights_sha256": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1",
+      "config_sha256": "1809f83e3bdb1609a501a610ad4a742f4fd8ae44d72ca4aa0df52d1f2ac8628d",
+      "preprocessing": "pinned processor: RGB, shortest edge 256, center crop 224, ImageNet normalization",
+      "device": "CPU",
+      "model_model_sensitivity_only": true
+    },
+    "interpretation": "Report every metric against its unchanged interval. Missing all intervals does not invalidate simulator truth and cannot be repaired with independent camera jitter."
+  },
+  "failure_taxonomy": [
+    "ENGINEERING_HARD_GATE",
+    "ACTION_COMPLETION",
+    "DETERMINISM",
+    "RENDER_OR_CROSS_MODAL",
+    "OBJECT_IDENTITY",
+    "BOUNDED_DIAGNOSTIC_CLUTTER",
+    "VISUAL_DISTRIBUTION_MISS",
+    "EXECUTION_ERROR"
+  ],
+  "batch_gate": {
+    "matrix_cells_completed": 12,
+    "minimum_required_scene_continuous_passes": 4,
+    "each_required_scene_has_at_least_one_pass": true,
+    "target_objects_executed": 2,
+    "all_failures_must_be_bounded_and_replay_qualified": true,
+    "passed_bundle_schemas_must_match": true,
+    "at_least_one_selectable_candidate": true,
+    "messy_clutter_may_remain_a_deterministic_diagnostic_failure": true,
+    "visual_distribution_is_not_a_core_truth_gate": true
+  },
+  "selection_policy": {
+    "eligibility": "continuous qualification, authoritative baseline render, speech/cross-modal mux, deterministic replay, identity, and all unchanged hard gates pass",
+    "ranking": [
+      "fewest unflagged assist frames",
+      "shortest total flagged grasp-assist duration",
+      "smallest normalized L1 distance to the three unchanged visual-distribution interval centers when the exact frontend is valid",
+      "frozen matrix order"
+    ],
+    "visual_manual_cherry_picking_permitted": false,
+    "neural_appearance_permitted": false,
+    "authoritative_rgb": "deterministic_native_mimo_baseline"
+  },
+  "privacy_and_governance": {
+    "restricted_childlens_access_permitted": false,
+    "restricted_childlens_remote_transfer_permitted": false,
+    "public_synthetic_inputs_only": true,
+    "aea_or_babyview_empirical_ancestry_permitted": false,
+    "reviv_or_vipe_synthetic_instrument_check_required": false,
+    "causal_claim_permitted": false
+  }
+}
