@@ -9,6 +9,7 @@ from nursery_egobaby_preflight.contract import (
     canonical_json_sha256,
     lexical_macro_wiring,
     schedule_cycle,
+    validate_phase_state,
 )
 
 
@@ -38,9 +39,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 2
-    assert config["status"] == (
-        "IN_PROGRESS_STAGE_A_PASS_STAGE_B_RESOURCE_APPROVAL_REQUIRED"
-    )
+    assert config["status"] == "REOPENED_PHASE4_VALIDITY_REPAIR_IN_PROGRESS"
+    validate_phase_state(config)
     assert schedule_cycle(config["learner"]["schedule"]) == [
         "contrastive",
         "contrastive",
@@ -116,3 +116,10 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["generator_work_authorized"] is False
     assert config["gates"]["real_only_training_authorized"] is False
     assert config["governed_compute"]["additional_slurm_account_name_committed_to_git"] is False
+
+
+def test_phase_state_validator_rejects_contradictory_nested_state() -> None:
+    config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
+    config["gates"]["phase4_status"] = "PASS_BOTH_COMMON_ASSET_FAMILIES_HASHED_AND_SEALED"
+    with pytest.raises(ValueError, match="contradictory Phase 4 states"):
+        validate_phase_state(config)

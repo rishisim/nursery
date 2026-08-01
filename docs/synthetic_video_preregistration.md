@@ -1,14 +1,14 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **PASS — BOTH COMMON ASSET FAMILIES HASHED AND SEALED**
+**Phase 4 status:** **REOPENED — PRIOR STAGE B ASSETS PROVISIONAL PENDING VALIDITY REPAIR**
 
 **Evidence cut-off:** 2026-08-01
 
 **Authority boundary:** this record preserves every frozen Phase 3 decision
-and records the completed Phase 4 public-language and common-asset gates. It
+and records the public-language PASS plus the reopened common-asset gate. It
 does not itself execute or authorize generator work, generation, TTS, score
-opening, or scientific evaluation. Phase 5 real-only training/readiness is the
-next separately launched scope. BabyView remains unavailable,
+opening, or scientific evaluation. Confirmatory Phase 5 is not authorized.
+BabyView remains unavailable,
 out of scope, and supplies no empirical ancestry.
 
 The public/dummy single-NVIDIA-L4 engineering preflight at Nursery commit
@@ -557,14 +557,13 @@ control later execution:
    audio.
 2. **Resource sizing/DDP — PASS:** the final 1-node/2-H200/2-process topology
    passed public/dummy qualification before restricted execution.
-3. **Restricted common assets — PASS:** both asset families were built under
-   applicant-private UTD controls, hashed file-by-file, and sealed before any
-   learner training.
+3. **Restricted common assets — REOPENED:** prior commitments are provisional
+   pending literal allocation, abstention, overlap, and upstream-loader/filter
+   repairs.
 4. **SLURM administration (non-blocking):** ask HPC to add or affirm `yding`
    fair-share association and review/remove the unrelated PI association. This
    does not block Phase 4 or compliant applicant-only ChildLens work.
 
-Phase 4 is complete. The next separately launched scope is Phase 5 real-only
-learner training and the readiness gate. Generator work, synthetic generation,
-synthetic-score opening, and scientific evaluation remain blocked by their
-later phase gates.
+The prior Stage B commitments are provisional and superseded pending repair.
+Confirmatory Phase 5, generator work, synthetic generation, score opening, and
+scientific evaluation remain blocked.

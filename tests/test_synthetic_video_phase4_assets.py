@@ -65,7 +65,8 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "PASS"
+    assert result["status"] == "PROVISIONAL_SUPERSEDED_PENDING_REPAIR"
+    assert result["scientifically_accepted"] is False
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
     assert len({canonical(value) for value in references.values()}) == 1

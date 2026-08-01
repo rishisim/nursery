@@ -49,3 +49,17 @@ def lexical_macro_wiring(task_results: Mapping[str, Sequence[float]]) -> dict[st
             raise ValueError(f"{task} fixture must contain binary correctness wiring values")
         means[task] = sum(values) / len(values)
     return {**means, "lexical_macro": (means["noun"] + means["adjective"]) / 2}
+
+
+def validate_phase_state(config: Mapping[str, Any]) -> None:
+    """Reject scientifically contradictory top-level and nested Phase 4 states."""
+    top = str(config.get("status", ""))
+    nested = str(config.get("gates", {}).get("phase4_status", ""))
+    if not top or not nested:
+        raise ValueError("phase status and gates.phase4_status are required")
+    top_provisional = "REOPENED" in top or "PROVISIONAL" in top
+    nested_provisional = "PROVISIONAL" in nested or "SUPERSEDED" in nested
+    top_pass = top.startswith("PASS") or "COMPLETE" in top
+    nested_pass = nested.startswith("PASS")
+    if top_provisional != nested_provisional or top_pass != nested_pass:
+        raise ValueError(f"contradictory Phase 4 states: {top!r} vs {nested!r}")

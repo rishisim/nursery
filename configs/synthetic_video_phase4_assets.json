@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "PASS_ASSETS_HASHED_AND_SEALED",
+  "status": "PROVISIONAL_SUPERSEDED_PENDING_VALIDITY_REPAIR",
   "catalog_sha256": "9bc338b31291b3e7e5c157003e9d55a569f780d7745a28187ac361633b536ce0",
   "allocation": {
     "calibration_children": 18,
@@ -56,6 +56,7 @@
     "score_opening_allowed": false,
     "test_assets_may_steer_later_work": false,
     "lexical_commitment": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1",
-    "temporal_commitment": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f"
+    "temporal_commitment": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f",
+    "commitment_status": "PROVISIONAL_SUPERSEDED_PENDING_REPAIR"
   }
 }

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "status": "OPEN_VALIDITY_REPAIR",
+  "observed_information_scope": "aggregate engineering and asset-count information only; no learner or scientific outcomes",
+  "prior_commit": "b9bbba4a3294eb3b9a007423a301e3b9cc0c6751",
+  "prior_commitments_status": "PROVISIONAL_SUPERSEDED_PENDING_REPAIR",
+  "current_blocker": {
+    "area": "whole_child_allocation_encoding",
+    "reason": "Phase 3 names HMAC input study_id || child_id but does not freeze the study_id byte value or text encoding/concatenation convention; materially different assignments are possible",
+    "required_decision": "freeze one exact study_id byte string and child-ID encoding before corrected assignments are computed"
+  },
+  "deviations": [
+    {
+      "area": "phase_state",
+      "frozen": "top-level and nested scientific state must agree",
+      "implemented": "stale top-level preregistration state coexisted with a nested Phase 4 PASS",
+      "repair_basis": "clerical consistency independent of asset content and outcomes"
+    },
+    {
+      "area": "whole_child_allocation",
+      "frozen": "keyed HMAC-SHA-256 order followed by repeating evaluation, validation, training deal",
+      "implemented": "unkeyed SHA-256 concatenation followed by contiguous training, evaluation, validation slices",
+      "repair_basis": "literal preregistered algorithm; no content, counts beyond frozen role totals, or outcomes used"
+    },
+    {
+      "area": "language_abstention",
+      "frozen": "shared German, nonempty, timestamp, confidence, translation, and no-truncation adapter",
+      "implemented": "same weights but governed processing omitted the full frozen abstention contract",
+      "repair_basis": "reuse the public-gate rules verbatim for every later real and synthetic input"
+    },
+    {
+      "area": "cross_split_overlap",
+      "frozen": "exact source-ID, session/time, content-hash, and near-duplicate audit with earliest-role resolution",
+      "implemented": "child overlap and exact frame duplicate aggregates only",
+      "repair_basis": "complete the preregistered independence audit before resealing"
+    },
+    {
+      "area": "lexical_compatibility_filtering",
+      "frozen": "pinned upstream loader plus upstream alignment and contrastive filtering",
+      "implemented": "custom manifests and images without the complete pinned-upstream validation/filter path",
+      "repair_basis": "apply immutable upstream defaults without learner results or replacement concepts"
+    }
+  ]
+}

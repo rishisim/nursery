@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "phase": 4,
-  "status": "IN_PROGRESS_STAGE_A_PASS_STAGE_B_RESOURCE_APPROVAL_REQUIRED",
-  "evidence_cutoff": "2026-07-30",
+  "status": "REOPENED_PHASE4_VALIDITY_REPAIR_IN_PROGRESS",
+  "evidence_cutoff": "2026-08-01",
   "headline_question": "At equal H video hours, does EgoBabyVLM CLIP+ triple trained on Synthetic-full achieve lexical-grounding performance equivalent to Real-full, while the synthetic corpus has lower prospectively measured production cost?",
   "learner": {
     "upstream_commit": "224621caf0628270b6115845ac75a65b984234a3",
@@ -220,13 +220,13 @@
     "ddp": "MANDATORY_IF_RESOURCE_SIZING_REQUIRES_MULTIPLE_PROCESSES",
     "asr_translation": "PASS_IMMUTABLE_OFFLINE_PIPELINE_FROZEN",
     "phase4_authorized": true,
-    "phase4_status": "PASS_BOTH_COMMON_ASSET_FAMILIES_HASHED_AND_SEALED",
+    "phase4_status": "PROVISIONAL_SUPERSEDED_PENDING_VALIDITY_REPAIR",
     "phase4_lexical_commitment": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1",
     "phase4_temporal_commitment": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f",
     "childlens_audio_processing_authorized": true,
     "generator_work_authorized": false,
     "real_only_training_authorized": false,
-    "next_authorized_scope": "SEPARATELY_LAUNCHED_PHASE5_REAL_ONLY_TRAINING_AND_READINESS_GATE"
+    "next_authorized_scope": "PHASE4_VALIDITY_REPAIR_ONLY_NO_CONFIRMATORY_PHASE5"
   },
   "no_go_triggers": [
     "confirmed_consent_or_license_incompatibility",

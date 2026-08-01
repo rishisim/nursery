@@ -1,7 +1,7 @@
 # Synthetic-video Phase 4 common evaluation assets
 
-**Status:** **PASS** — Stage A and both Stage B common asset families are
-complete, hashed, and sealed
+**Status:** **REOPENED** — Stage A remains PASS; the first Stage B assets are
+provisional and scientifically superseded pending validity repair
 
 **Scope:** public-only language-pipeline qualification followed, only on a
 signed PASS, by governed construction and sealing of the two common evaluation
@@ -114,7 +114,7 @@ requests consumed no allocation. The two-process H200 public/dummy preflight
 passed in 2:13 with commitment `3271b7b8…c4b7`. The governed build then ran
 under the same final topology and offline controls.
 
-### Stage B decision
+### Provisional Stage B engineering record
 
 Whole-child allocation retained all 18 C children and assigned the remaining
 40 children as 28 training, 8 evaluation, and 4 validation. The shared lexical
@@ -125,7 +125,8 @@ from 8 evaluation children across 19 sessions; its 14,689 manifest/frame files
 have commitment `0261dca9…45f`. Calibration/evaluation child overlap is zero,
 all candidate counts are exact, 145 duplicate frames are recorded and retained,
 and five complete query rows were excluded without substitution after a frame
-decode failure. Every later arm references exactly these two commitments.
+decode failure. Every later arm referenced exactly these two commitments, but
+they are now `PROVISIONAL_SUPERSEDED_PENDING_REPAIR`, not accepted assets.
 
 The governed manifests retain row-level provenance, hashes, filters, and audits;
 Git retains only the compact non-identifying decision in
@@ -133,8 +134,12 @@ Git retains only the compact non-identifying decision in
 not held-out-real ChildLens evaluation. Temporal labels remain model-derived,
 with neither referent ground truth nor human German validation.
 
-Phase 4 performed no learner training, generator/TTS execution, synthetic
-generation, score opening, or scientific evaluation. The next separately
-launched scope is Phase 5 real-only learner training and its readiness gate.
-Generator/TTS execution, synthetic generation, synthetic-score opening, and
-final evaluation remain unauthorized.
+The audit found validity-critical deviations in the keyed allocation deal,
+shared abstention adapter, cross-split overlap audit, and pinned-upstream
+lexical loader/filter path. The repair is outcome-independent because only
+aggregate engineering and asset-count information was observed; no learner or
+scientific score was opened. The allocation repair is paused before assignment
+because Phase 3 did not freeze the byte value/encoding of `study_id` in
+`HMAC(key, study_id || child_id)`; this must be resolved prospectively rather
+than inferred from provisional assets. Confirmatory Phase 5, generator/TTS execution,
+synthetic generation, score opening, and final evaluation remain unauthorized.

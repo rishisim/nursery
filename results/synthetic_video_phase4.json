@@ -1,11 +1,12 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "PASS",
+  "status": "PROVISIONAL_SUPERSEDED_PENDING_REPAIR",
+  "scientifically_accepted": false,
   "signed_by_role": "authorized_applicant_technical_lead",
   "signed_on": "2026-08-01",
   "stage_a": {
-    "status": "PASS",
+    "status": "PROVISIONAL_ENGINEERING_RUN_NOT_SCIENTIFICALLY_ACCEPTED",
     "selected_candidate": "whisper-small-opus-de-en",
     "decision_sha256": "8aade43587eaa0d65dc10984219b5006ceaf9ace1312a964e6f33541f5c53669"
   },
@@ -58,5 +59,5 @@
     "single authorized operator; score sealing and all preregistered unblinding rules remain in force",
     "no learner training, generator/TTS execution, synthetic generation, score opening, or scientific evaluation occurred"
   ],
-  "next_authorized_scope": "separately launched Phase 5 real-only learner training and readiness gate; generator, TTS, synthetic generation, synthetic-score opening, and final scientific evaluation remain unauthorized"
+  "next_authorized_scope": "Phase 4 validity repair only; no confirmatory Phase 5 launch or claim"
 }
