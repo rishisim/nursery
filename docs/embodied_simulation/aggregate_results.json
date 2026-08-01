@@ -109,6 +109,63 @@
           "maximum_clutter_area_fraction": 0.087333984375
         }
       }
+    },
+    "3": {
+      "gate": "PASS",
+      "run": "runs/embodied_simulation/phase_3/appearance",
+      "authoritative_render": "deterministic_baseline_only",
+      "authoritative_trace_sha256": "92fc1f5f55e06698d93497f18f4c7f29015dad1f014e3218a32797c3af724004",
+      "windows": {
+        "near_miss": {"frames": 49, "fps": 15, "protected_core_pixel_fraction": 0.09136007918792517},
+        "contact_grasp": {"frames": 49, "fps": 15, "protected_core_pixel_fraction": 0.11731398809523809},
+        "inspect_head_turn": {"frames": 61, "fps": 15, "protected_core_pixel_fraction": 0.2664978227459016},
+        "release_settle": {"frames": 53, "fps": 15, "protected_core_pixel_fraction": 0.06071276778694969}
+      },
+      "seeds": [20260734, 20260735, 20260736],
+      "baseline": {
+        "cells": 12,
+        "passed": 12,
+        "byte_identical_across_seed_labels_per_window": true,
+        "resolution": [640, 480],
+        "audio_streams": 0
+      },
+      "cosmos3_nano": {
+        "cells": 12,
+        "generated": 12,
+        "accepted": 0,
+        "exact_frame_count_cells": 12,
+        "audio_streams": 0,
+        "actual_resolution": [736, 544],
+        "required_resolution": [640, 480],
+        "rejection": "all cells changed frozen resolution; post-outcome resize or crop was not permitted"
+      },
+      "oscar_2b": {
+        "cells": 12,
+        "generated": 12,
+        "automated_invariants_passed": 12,
+        "protected_core_maximum_pixel_error": 0,
+        "encoded_protected_core_maximum_pixel_error": 0,
+        "camera_pose_error_m": 0.0,
+        "camera_rotation_error_rad": 0.0,
+        "event_frame_offset": 0,
+        "object_identity_changes_in_protected_authoritative_stream": 0,
+        "appearance_proxy_improved": 2,
+        "manual_artifact_reviewed": 12,
+        "accepted": 0,
+        "rejection": "unprotected neural regions introduced duplicate or malformed hands, altered cup identity/pose, and incorrect occlusion"
+      },
+      "juno": {
+        "setup_job": "311790",
+        "execution_job": "311795",
+        "execution_elapsed": "00:42:29",
+        "gpu": "NVIDIA H200 NVL",
+        "gpu_memory_mib": 143771,
+        "driver": "550.163.01",
+        "reported_cuda": "12.4",
+        "public_synthetic_only": true,
+        "restricted_childlens_transferred": false
+      },
+      "neural_audio_authoritative": false
     }
   }
 }

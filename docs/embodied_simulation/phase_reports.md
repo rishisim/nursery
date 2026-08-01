@@ -208,3 +208,84 @@ native-MIMo appearance decision remains in force and MPFB was not rerun.
 Smallest next step: extract the four frozen 3–5 second windows from a qualified
 required-scene trace, then preflight and run geometry-protected Cosmos 3 Nano
 and OSCAR-2B appearance cells on Juno using public/synthetic inputs only.
+
+## Phase 3 — controlled appearance experiments on Juno
+
+Gate decision: **PASS** (deterministic baseline retained; no neural render was
+accepted).
+
+All 36 frozen cells completed: four qualified trace windows, three seeds, and
+three render conditions. The deterministic baseline is the only authoritative
+acceptable render. Cosmos 3 Nano failed the frozen output-resolution invariant
+in every cell. OSCAR-2B passed the automated protected-foreground checks, but
+manual artifact review rejected every cell for changes outside the protected
+core that altered visible hand/object geometry or occlusion. This is the
+explicit Phase 3 option-(b) pass and does not change simulator truth.
+
+Canonical files and compact records changed:
+
+- `appearance_experiment.py` prepares frozen cells, validates outputs, performs
+  protected-foreground compositing, and writes compact QA receipts;
+- `juno_appearance_setup.sh` and `juno_appearance_run.sh` pin and execute the
+  public Cosmos 3 Nano and OSCAR-2B environments on Juno;
+- `configs/embodied_simulation_appearance.json` freezes windows, seeds,
+  conditioning, masks, resolution, timing, acceptance rules, and exact source
+  and model revisions;
+- `tests/test_embodied_appearance.py` covers cell preparation, mask protection,
+  resolution/timing rejection, audio rejection, and acceptance logic;
+- `docs/embodied_simulation/aggregate_results.json` records the compact outcome.
+
+Validation and experiment evidence:
+
+- The baseline produced 12/12 valid cells at 640x480 and 15 fps with exact
+  frozen frame counts (49, 49, 61, and 53 by window), zero audio streams, and
+  byte-identical output across seed labels within each window.
+- Cosmos 3 Nano generated 12/12 cells with exact frame counts and no output
+  audio, but all were 736x544 rather than the frozen 640x480. All 12 were
+  rejected; no post-outcome crop, resize, seed, mask, or threshold change was
+  applied.
+- OSCAR-2B generated 12/12 cells at the required resolution, rate, and length.
+  All passed automated invariants: protected-core decoded and encoded maximum
+  pixel error 0, camera translation/rotation error 0, event-frame offset 0,
+  authoritative object-identity changes 0, and audio streams 0. The appearance
+  proxy improved in 2/12 cells.
+- All 12 OSCAR inspection sheets were reviewed. Every cell was rejected for one
+  or more hard visual failures outside the protected core: duplicate/oversized
+  or malformed hands, changed finger geometry/count, duplicated or changed cup
+  pose/identity, and incorrect occlusion/release state. The two proxy-improved
+  cells failed the same hand-geometry requirement.
+- Juno setup job `311790` and execution job `311795` passed; execution took
+  42:29 on an NVIDIA H200 NVL with 143,771 MiB, driver 550.163.01, and reported
+  CUDA 12.4. Samples had sound generation disabled and all accepted candidates
+  were required to contain no audio.
+- Exact public pins include Cosmos source
+  `404b9bf2144640834c63ae7d9e7269e0f4ea02cb`, Cosmos3 Nano
+  `411f42a8fdfb8c5b2583cb8786e0938f49796eaa`, OSCAR source
+  `4dea2f657e221b0ff24c895fcc8ab4d46d5a9adb`, and OSCAR-2B
+  `c9781ffa7dd8556d862d7d9f338a2ea008a58ca6`; the full dependency receipt is in
+  the ignored run.
+
+Actual artifacts are under ignored
+`runs/embodied_simulation/phase_3/appearance`: prepared conditioning inputs,
+12 baseline cells, 12 raw Cosmos outputs, 12 raw OSCAR outputs, protected
+composites, per-cell QA JSON, inspection sheets, and the manual-review record.
+The corresponding Juno run is at `/work/dal503972/embodied_phase3`; only compact
+records and manifests are committed. No ChildLens media or other restricted
+input was read, copied, decoded, or transferred.
+
+Repository status: the verified Phase 3 implementation and bounded Juno repair
+commits through `5fe84d4` are pushed to `origin/embodied-simulation`; this
+checkpoint and compact aggregate are committed and pushed separately. Complete
+runs, model weights, environments, downloads, media, and logs remain ignored.
+
+Deviations from the frozen plan were bounded to execution compatibility. Juno
+required pinned CUDA/NPP and FFmpeg/PyAV library exposure, and Cosmos model
+construction required its checkpoint-bundled public sound tokenizer even
+though sound generation was disabled. Several failed setup/execution attempts
+are preserved in ignored receipts. The frozen cells, seeds, source trace,
+masks, event timing, geometry rules, and thresholds did not change. Cosmos's
+resolution mismatch was rejected rather than repaired after seeing the result.
+
+Smallest next step: add the canonical bounded prompt/language composer and
+compile one uninterrupted approximately 60-second authoritative physics trace
+with synchronized speech, then render and bundle it without hidden resets.
