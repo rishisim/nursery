@@ -111,6 +111,17 @@
     "VISUAL_DISTRIBUTION_MISS",
     "EXECUTION_ERROR"
   ],
+  "bounded_repairs": [
+    {
+      "recorded_at_utc": "2026-08-01T03:21:29Z",
+      "evidence": "The first complete matrix exposed projected-contact errors of 6.6007 px for the shifted cup and 15.4690-35.1852 px for the sphere even though 3-D surface distances remained within 0.006 m and all collision/contact truth gates passed.",
+      "classification": "render_QA_measurement_defect",
+      "repair": "Project the two MuJoCo physical surface endpoints for each hand/target contact and exclude a contact point only when authoritative depth shows a nearer occluder by more than the unchanged 0.006 m spatial tolerance.",
+      "why_bounded": "The renderer, trace, controller, object state, contact timing, camera, collision policy, event schedule, seeds, and all numeric gates are unchanged; only the QA mapping from existing 3-D contact geometry to visible pixels is corrected.",
+      "thresholds_or_seeds_changed": false,
+      "required_rerun": "all initially affected matrix cells"
+    }
+  ],
   "batch_gate": {
     "matrix_cells_completed": 12,
     "minimum_required_scene_continuous_passes": 4,

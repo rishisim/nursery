@@ -67,6 +67,99 @@ def _nearest_mask_distance(pixel_xy: np.ndarray, mask: np.ndarray) -> float:
     return float(np.sqrt(np.min(np.sum(differences * differences, axis=1))))
 
 
+def _contact_surface_points(kernel: KernelModel) -> list[np.ndarray]:
+    """Return the two physical surface points for each hand/target contact."""
+    hand_ids = set(kernel.hand_geom_ids)
+    target_ids = set(kernel.target_geom_ids)
+    points = []
+    for contact_index in range(kernel.data.ncon):
+        contact = kernel.data.contact[contact_index]
+        pair = {int(contact.geom1), int(contact.geom2)}
+        if not pair.intersection(hand_ids) or not pair.intersection(target_ids):
+            continue
+        midpoint = np.asarray(contact.pos, dtype=np.float64)
+        normal = np.asarray(contact.frame[:3], dtype=np.float64)
+        half_separation = 0.5 * float(contact.dist) * normal
+        points.extend((midpoint - half_separation, midpoint + half_separation))
+    return points
+
+
+def _project_contact_candidates(
+    points: list[np.ndarray],
+    camera_pose: np.ndarray,
+    target_mask: np.ndarray,
+    hand_mask: np.ndarray,
+    depth_m: np.ndarray,
+    *,
+    width: int,
+    height: int,
+    vertical_fov_degrees: float,
+    occlusion_tolerance_m: float,
+) -> dict[str, Any]:
+    """Project physical surface points and retain only non-occluded ones."""
+    rows = []
+    rotation = camera_pose[3:12].reshape(3, 3)
+    for point in points:
+        projected = _project_world_point(
+            point,
+            camera_pose,
+            width=width,
+            height=height,
+            vertical_fov_degrees=vertical_fov_degrees,
+        )
+        in_frame = bool(
+            np.isfinite(projected).all()
+            and 0.0 <= projected[0] < width
+            and 0.0 <= projected[1] < height
+        )
+        camera_point = rotation.T @ (point - camera_pose[:3])
+        contact_depth = -float(camera_point[2])
+        rendered_depth = None
+        occluded = False
+        if in_frame:
+            pixel_x = int(np.clip(round(float(projected[0])), 0, width - 1))
+            pixel_y = int(np.clip(round(float(projected[1])), 0, height - 1))
+            rendered_depth = float(depth_m[pixel_y, pixel_x])
+            occluded = bool(
+                rendered_depth < contact_depth - occlusion_tolerance_m
+            )
+        target_distance = _nearest_mask_distance(projected, target_mask)
+        hand_distance = _nearest_mask_distance(projected, hand_mask)
+        rows.append(
+            {
+                "world_xyz": point.tolist(),
+                "projected_pixel_xy": projected.tolist(),
+                "in_frame": in_frame,
+                "contact_depth_m": contact_depth,
+                "rendered_depth_m": rendered_depth,
+                "occluded": occluded,
+                "target_distance_px": target_distance,
+                "hand_distance_px": hand_distance,
+                "visible_union_distance_px": min(
+                    target_distance, hand_distance
+                ),
+            }
+        )
+    visible = [
+        row
+        for row in rows
+        if row["in_frame"]
+        and not row["occluded"]
+        and np.isfinite(row["visible_union_distance_px"])
+    ]
+    selected = min(
+        visible,
+        key=lambda row: row["visible_union_distance_px"],
+        default=None,
+    )
+    return {
+        "candidates": rows,
+        "selected": selected,
+        "in_frame": any(row["in_frame"] for row in rows),
+        "occluded": bool(rows) and not visible,
+    }
+
+
 def render_trace(
     kernel: KernelModel,
     trace: dict[str, np.ndarray],
@@ -77,6 +170,7 @@ def render_trace(
     width: int = 640,
     height: int = 480,
     vertical_fov_degrees: float = 90.0,
+    contact_occlusion_tolerance_m: float = 0.006,
 ) -> dict[str, Any]:
     """Write authoritative RGB/depth/segmentation plus an external QA view."""
     if truth_hz % fps:
@@ -198,7 +292,8 @@ def render_trace(
                     camera="kernel_head_camera",
                     scene_option=authoritative_option,
                 )
-                depth_dataset[frame_index] = renderer.render().astype(np.float16)
+                depth_m = renderer.render().copy()
+                depth_dataset[frame_index] = depth_m.astype(np.float16)
                 renderer.disable_depth_rendering()
                 renderer.enable_segmentation_rendering()
                 renderer.update_scene(
@@ -225,38 +320,47 @@ def render_trace(
 
                 contact_position = trace["touch_contact_position"][truth_index]
                 if np.isfinite(contact_position).all():
-                    projected = _project_world_point(
-                        contact_position,
+                    surface_points = _contact_surface_points(kernel)
+                    if not surface_points:
+                        surface_points = [contact_position]
+                    projection = _project_contact_candidates(
+                        surface_points,
                         recorded_camera,
+                        target_mask,
+                        appearance_mask,
+                        depth_m,
                         width=width,
                         height=height,
                         vertical_fov_degrees=vertical_fov_degrees,
+                        occlusion_tolerance_m=contact_occlusion_tolerance_m,
                     )
-                    in_frame = bool(
-                        np.isfinite(projected).all()
-                        and 0.0 <= projected[0] < width
-                        and 0.0 <= projected[1] < height
-                    )
-                    target_distance = _nearest_mask_distance(
-                        projected, target_mask
-                    )
-                    hand_distance = _nearest_mask_distance(
-                        projected, appearance_mask
-                    )
+                    selected = projection["selected"]
                     projected_contact_errors.append(
                         {
                             "truth_index": int(truth_index),
                             "time_s": float(trace["time_s"][truth_index]),
-                            "projected_pixel_xy": projected.tolist(),
-                            "in_frame": in_frame,
-                            "target_distance_px": target_distance,
-                            "hand_distance_px": hand_distance,
-                            # Rasterization exposes only the frontmost of two
-                            # touching surfaces.  The projected 3-D contact is
-                            # aligned when it reaches the visible union of the
-                            # authoritative target and hand silhouettes.
-                            "visible_union_distance_px": min(
-                                target_distance, hand_distance
+                            "in_frame": projection["in_frame"],
+                            "occluded": projection["occluded"],
+                            "surface_candidates": projection["candidates"],
+                            "projected_pixel_xy": (
+                                selected["projected_pixel_xy"]
+                                if selected
+                                else None
+                            ),
+                            "target_distance_px": (
+                                selected["target_distance_px"]
+                                if selected
+                                else None
+                            ),
+                            "hand_distance_px": (
+                                selected["hand_distance_px"]
+                                if selected
+                                else None
+                            ),
+                            "visible_union_distance_px": (
+                                selected["visible_union_distance_px"]
+                                if selected
+                                else None
                             ),
                         }
                     )
@@ -275,7 +379,10 @@ def render_trace(
     finite_contact_errors = [
         row["visible_union_distance_px"]
         for row in projected_contact_errors
-        if row["in_frame"] and np.isfinite(row["visible_union_distance_px"])
+        if row["in_frame"]
+        and not row["occluded"]
+        and row["visible_union_distance_px"] is not None
+        and np.isfinite(row["visible_union_distance_px"])
     ]
     contact_distances_m = np.abs(
         trace["touch_minimum_distance_m"][truth_indices]
@@ -315,6 +422,9 @@ def render_trace(
         "maximum_replay_camera_rotation_error_rad": maximum_replay_rotation_error,
         "projected_contact_observations": len(projected_contact_errors),
         "projected_visible_contact_observations": len(finite_contact_errors),
+        "projected_occluded_contact_observations": sum(
+            row["occluded"] for row in projected_contact_errors
+        ),
         "maximum_projected_contact_error_px": (
             max(finite_contact_errors) if finite_contact_errors else None
         ),
@@ -324,6 +434,11 @@ def render_trace(
             else None
         ),
         "contact_projection_details": projected_contact_errors,
+        "contact_projection_method": (
+            "MuJoCo hand/target contact surface endpoints; depth-occluded "
+            "points excluded before applying unchanged spatial/pixel gates"
+        ),
+        "contact_occlusion_tolerance_m": contact_occlusion_tolerance_m,
         "rgb_truth_contact_frame_offset": 0,
         "rgb_truth_release_frame_offset": 0,
         "contact_event_target_visible": event_target_visible(first_contact_truth),

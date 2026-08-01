@@ -12,6 +12,9 @@ from babyworld_lite.childlens_engine_bakeoff.generalization_batch import (
 from babyworld_lite.childlens_engine_bakeoff.physics_kernel import (
     _target_geom_names,
 )
+from babyworld_lite.childlens_engine_bakeoff.trace_render import (
+    _project_contact_candidates,
+)
 
 
 CONFIG = json.loads(
@@ -53,6 +56,7 @@ def test_generalization_matrix_is_frozen_and_complete():
         ]
         is False
     )
+    assert CONFIG["bounded_repairs"][-1]["thresholds_or_seeds_changed"] is False
 
 
 def test_materialized_ball_cell_changes_identity_language_and_placement_only():
@@ -122,3 +126,39 @@ def test_visual_motion_uses_frozen_grayscale_definition():
     assert len(images) == 3
     assert metrics["motion"] == 1.0
     assert metrics["scene_change_rate"] == 1.0
+
+
+def test_contact_projection_uses_surface_points_and_excludes_occlusion():
+    camera_pose = np.concatenate([np.zeros(3), np.eye(3).reshape(-1)])
+    target_mask = np.zeros((20, 20), dtype=bool)
+    target_mask[10, 10] = True
+    hand_mask = np.zeros_like(target_mask)
+    background_depth = np.full((20, 20), 2.0, dtype=np.float32)
+    visible = _project_contact_candidates(
+        [np.asarray([0.0, 0.0, -1.0])],
+        camera_pose,
+        target_mask,
+        hand_mask,
+        background_depth,
+        width=20,
+        height=20,
+        vertical_fov_degrees=90.0,
+        occlusion_tolerance_m=0.006,
+    )
+    assert visible["selected"]["visible_union_distance_px"] == 0.0
+    assert visible["occluded"] is False
+
+    foreground_depth = np.full((20, 20), 0.5, dtype=np.float32)
+    occluded = _project_contact_candidates(
+        [np.asarray([0.0, 0.0, -1.0])],
+        camera_pose,
+        target_mask,
+        hand_mask,
+        foreground_depth,
+        width=20,
+        height=20,
+        vertical_fov_degrees=90.0,
+        occlusion_tolerance_m=0.006,
+    )
+    assert occluded["selected"] is None
+    assert occluded["occluded"] is True

@@ -391,6 +391,9 @@ def run(
             vertical_fov_degrees=float(
                 contract["embodiment"]["camera"]["vertical_fov_degrees"]
             ),
+            contact_occlusion_tolerance_m=float(
+                contract["frozen_gates"]["visible_contact_alignment_m_max"]
+            ),
         )
         render_qa["authoritative_video"] = "baseline_rgb.mp4"
         appearance_qa = _appearance_gate(contract, render_qa)
