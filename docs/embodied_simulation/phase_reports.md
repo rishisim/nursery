@@ -289,3 +289,98 @@ resolution mismatch was rejected rather than repaired after seeing the result.
 Smallest next step: add the canonical bounded prompt/language composer and
 compile one uninterrupted approximately 60-second authoritative physics trace
 with synchronized speech, then render and bundle it without hidden resets.
+
+## Phase 4 — prompt, language, and continuous 60-second candidate
+
+Gate decision: **PASS**.
+
+One 60.0-second prompt-to-episode candidate now compiles, executes, replays,
+renders, receives separately generated speech, and bundles end-to-end. It is a
+single uninterrupted MuJoCo trace with no hidden reset. The deterministic
+native-MIMo baseline remains authoritative; no Phase 3 neural output was used.
+
+Canonical files and compact records changed:
+
+- `compile_episode.py` resolves the prompt into a bounded action/language plan
+  and validates the real `yellow_cup_authored` scene identity before execution;
+- `physics_kernel.py` composes look/reorient/approach/reach/touch/grasp,
+  inspect/rotate/head-turn, shake/bang/transfer, physical release/settle, and a
+  second contact-gated retrieve without directly posing the object or camera;
+- `run_continuous_episode.py` is the canonical compile/execute/render/audio/QA
+  entry point, and `speech_audio.py` creates authoritative local speech plus
+  transcript and deterministic timing records;
+- `configs/embodied_simulation_episode.json` freezes the 60-second schedule,
+  six utterances, action vocabulary, speech settings, and Phase 4 gates;
+- `configs/embodied_simulation_vertical_slice.json` now records the authored
+  collision-enabled support catch tray used for physical put-down/retrieval;
+- focused coverage is in `tests/test_embodied_continuous_episode.py`, with the
+  compact outcome in `docs/embodied_simulation/aggregate_results.json`.
+
+Validation and experiment evidence:
+
+- Full repository validation passes: 24 tests. Both the 30-file continuous
+  manifest and nested 17-file simulator manifest rehash without mismatch.
+  HDF5 contains 1,801 depth frames at 480x640 and 1,801 segmentation frames at
+  480x640x2. FFprobe confirms the accepted mux has 1,801 H.264 frames at
+  640x480/30 fps plus one 48 kHz mono AAC stream and lasts 60.033333 seconds.
+- Physics produced 14,400 steps and 3,601 synchronized truth samples from 0 to
+  60 seconds. Independent execution produced the exact same trace SHA-256
+  `c0519057e3a55aa6eeef23cbc85a3f2190d5e4ed9a3211e1655268a4bca8968e`;
+  maximum replay error is 0, object identity changes are 0, hidden resets are
+  0, and the largest consecutive target-position step is 0.012021 m.
+- Camera-mount error is `4.44e-16` m / `5.07e-16` rad. Shared-clock error is
+  `2.08e-11` s and both IMU-like RMSE values are 0. All 661 relevant collision
+  geoms stayed enabled; minimum relevant distance is 0.0 m with 0 persistent
+  penetration frames.
+- The near miss remains non-contact at 0.038999 m. First cup contact occurs at
+  10.5125 s with five finger bodies. Two physical attempts precede each of two
+  flagged assists, engaged at 12.15 and 52.15 s; maximum engagement jump is
+  0.000259 m / 0.0225 degrees and collisions remain enabled.
+- Maximum lift is 0.11980 m, rotation 91.79 degrees, and head turn 22.85
+  degrees with 1.0 contact retention. Shake spans 0.04032 m vertically, bang
+  records a 4.37 N support contact, lateral transfer spans 0.21580 m, and the
+  retrieve has 221 contact samples and lifts 0.11137 m. Physical release is
+  followed by a 6.0-second settled interval with 0.06193 m/s maximum speed.
+- Rendering produces 1,801 authoritative frames with 0 collision-proxy pixels,
+  0 skin-artifact pixels, 0 camera replay error, and 0 contact/release frame
+  offset. Maximum contact alignment is 5.891 px / 0.005997 m, within the
+  unchanged 6 px / 0.006 m limits. The target is visible in every frame; the
+  full inspection sheet was visually reviewed with no pink limb or exposed
+  collision proxy.
+- Six local English utterances produce an exact 60.0-second PCM16/48 kHz mono
+  waveform with 0 clipped samples. All six starts match their planned behavior
+  phase and show the target. Transcript, utterance intervals, deterministic
+  word subdivisions, and waveform hashes are recorded; neural-render audio is
+  absent. This is synthetic engineering language, not developmental or human
+  validation.
+
+Actual artifacts are under ignored
+`runs/embodied_simulation/phase_4/candidate` (about 510 MiB):
+`accepted_episode.mp4`, authoritative `baseline_rgb.mp4`, `external_qa.mp4`,
+two exact traces, depth/segmentation HDF5, activity/language plan, speech WAV,
+transcript/alignment, cross-modal QA, contact sheet, manifests, and replay
+receipts. Superseded Phase 4 preflights and regression outputs were moved to a
+recoverable macOS Trash location after their compact repair evidence was
+consolidated. No pre-existing run was removed and no restricted ChildLens media
+was accessed, decoded, moved, or transferred.
+
+Repository status: plan commit `6304cd2`, implementation commit `ce6e7b8`, and
+bundle-metadata commit `a556260` are pushed to
+`origin/embodied-simulation`; this checkpoint and aggregate are committed and
+pushed separately. Complete traces, media, dependency material, logs, and run
+intermediates remain ignored.
+
+Deviations from the initial Phase 4 freeze were bounded and explicit. Before
+the first Phase 4 simulator outcome, utterance `u06` moved from 58.5 to 59.0 s
+so it begins in `final_dwell`. Failed preflights then motivated phase-relative
+IK tracking, support-aware hand feedback, a collision-enabled 0.18 m authored
+catch tray, and a side/above retrieve approach. The tray keeps a physically
+released cup reachable without a reset or direct object pose intervention; a
+rerun of the 19.5-second Phase 1 physics qualification passed with the added
+collider. No frozen camera, collision-enablement, penetration, contact,
+synchronization, determinism, plan-action, seed, or acceptance threshold was
+weakened or moved.
+
+Smallest next step: run the frozen 12-episode engineering/generalization batch
+across scene variants, targets/distractors, clutter, and seeds, then select the
+final candidate by compact predeclared criteria rather than visual preference.
