@@ -220,9 +220,13 @@
     "ddp": "MANDATORY_IF_RESOURCE_SIZING_REQUIRES_MULTIPLE_PROCESSES",
     "asr_translation": "PASS_IMMUTABLE_OFFLINE_PIPELINE_FROZEN",
     "phase4_authorized": true,
+    "phase4_status": "PASS_BOTH_COMMON_ASSET_FAMILIES_HASHED_AND_SEALED",
+    "phase4_lexical_commitment": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1",
+    "phase4_temporal_commitment": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f",
     "childlens_audio_processing_authorized": true,
     "generator_work_authorized": false,
-    "real_only_training_authorized": false
+    "real_only_training_authorized": false,
+    "next_authorized_scope": "SEPARATELY_LAUNCHED_PHASE5_REAL_ONLY_TRAINING_AND_READINESS_GATE"
   },
   "no_go_triggers": [
     "confirmed_consent_or_license_incompatibility",

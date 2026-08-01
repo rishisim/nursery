@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "phase": 4,
+  "status": "PASS",
+  "signed_by_role": "authorized_applicant_technical_lead",
+  "signed_on": "2026-08-01",
+  "stage_a": {
+    "status": "PASS",
+    "selected_candidate": "whisper-small-opus-de-en",
+    "decision_sha256": "8aade43587eaa0d65dc10984219b5006ceaf9ace1312a964e6f33541f5c53669"
+  },
+  "stage_b": {
+    "status": "PASS",
+    "final_topology_preflight": {
+      "status": "PASS",
+      "topology": "1_node_2_H200_2_processes",
+      "commitment": "3271b7b8c7f01d8650e97bece6c9168587416136815287337e7512174618c4b7"
+    },
+    "allocation_commitment": "d3963d57dbab81e5061e975243bbb24800860434773b6786572418674577c8e0",
+    "acquisition_commitment": "ca66f9cfa39cc2bdf590c20c57171211338333696737b1be9e6f8d4608f1602b",
+    "stage_commitment": "561d35934bb6773050bade6c7f8c140627e784cd5be7694e613b7eccf46cce36",
+    "governed_tree_commitment": "15c014e12ae927c2f0543cfc93d03901d583f9928c0ce19ee643d0aaf50cd753",
+    "asset_build_job": {"status": "COMPLETED", "elapsed": "00:09:15", "exit_code": "0:0"},
+    "canonical_seal_rerun": {"status": "COMPLETED", "elapsed": "00:03:45", "exit_code": "0:0"}
+  },
+  "lexical_commitment": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1",
+  "temporal_commitment": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f",
+  "common_asset_references": {
+    "Real-full": {"lexical": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1", "temporal": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f"},
+    "Synthetic-full": {"lexical": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1", "temporal": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f"},
+    "Real-small": {"lexical": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1", "temporal": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f"},
+    "Mixed": {"lexical": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1", "temporal": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f"}
+  },
+  "contract_identical_all_arms": true,
+  "hash_inventory": {"lexical_files": 524, "temporal_files": 14689},
+  "audits": {
+    "lexical_noun_count": 30,
+    "lexical_adjective_count": 24,
+    "lexical_style_count": 2,
+    "evaluation_child_count": 8,
+    "evaluation_session_count": 19,
+    "calibration_evaluation_child_overlap_count": 0,
+    "temporal_row_count": 3672,
+    "temporal_frame_count": 14688,
+    "frame_duplicate_count": 145,
+    "decode_excluded_row_count": 5,
+    "all_candidate_counts_exact": true
+  },
+  "filters": {
+    "lexical_source": "calibration_C_only",
+    "temporal_source": "evaluation_children_sessions_only",
+    "frame_decode_failure": "exclude_complete_query_row_without_substitution"
+  },
+  "limitations": [
+    "Machine-DevBench images are generated and are not held-out-real ChildLens evaluation",
+    "temporal labels are model-derived with no referent ground truth and no human German validation",
+    "duplicate frames are audited and retained under the frozen common-asset contract",
+    "single authorized operator; score sealing and all preregistered unblinding rules remain in force",
+    "no learner training, generator/TTS execution, synthetic generation, score opening, or scientific evaluation occurred"
+  ],
+  "next_authorized_scope": "separately launched Phase 5 real-only learner training and readiness gate; generator, TTS, synthetic generation, synthetic-score opening, and final scientific evaluation remain unauthorized"
+}

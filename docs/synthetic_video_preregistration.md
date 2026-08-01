@@ -1,14 +1,14 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **IN PROGRESS — STAGE A PASS, STAGE B RESOURCE APPROVAL REQUIRED**
+**Phase 4 status:** **PASS — BOTH COMMON ASSET FAMILIES HASHED AND SEALED**
 
-**Evidence cut-off:** 2026-07-30
+**Evidence cut-off:** 2026-08-01
 
 **Authority boundary:** this record preserves every frozen Phase 3 decision
-and records the Phase 4 public-language PASS. It authorizes governed
-construction of the two common evaluation asset families under the controls
-below, but does not authorize real-only training, generator work, generation,
-TTS, score opening, or scientific evaluation. BabyView remains unavailable,
+and records the completed Phase 4 public-language and common-asset gates. It
+does not itself execute or authorize generator work, generation, TTS, score
+opening, or scientific evaluation. Phase 5 real-only training/readiness is the
+next separately launched scope. BabyView remains unavailable,
 out of scope, and supplies no empirical ancestry.
 
 The public/dummy single-NVIDIA-L4 engineering preflight at Nursery commit
@@ -54,11 +54,11 @@ Status meanings are `FROZEN`, `REQUIRES CONFIRMATION`, and `NO-GO`.
 | ChildLens inventory | `FROZEN` | Aggregate inventory found 58 catalog children / 192 recordings / complete durations. The preexisting development-only allowlist fixes \(C\) at 18 children / 58 recordings / 14.374241 source hours, leaving 40 children / 134 recordings / 40.362056 source hours for confirmatory allocation with zero child overlap | Authorized applicant | Apply the frozen keyed split and \(H/r\) rules only after governed compute and the identical ASR/translation pipeline are qualified |
 | Governed CUDA | `FROZEN` | Institution-owned Juno is qualified under the signed agreement and UTD's risk-based policy: applicant-only account, UTD VPN plus SSH, private `0700` home/work/scratch targets, group-restricted `yding` storage, SLURM isolation/accounting, and UTD-managed execution. Open public egress is permitted for pinned public dependency ingress and is not itself a failure; transmission of ChildLens or derived restricted artifacts to APIs, hosted services, Git, cloud storage, telemetry, or other third parties remains prohibited | Authorized applicant | Enforce the frozen restricted-job controls below; keep all restricted files/caches/logs/checkpoints on UTD storage and clean temporary scratch data |
 | SLURM fair-share mapping | `REQUIRES CONFIRMATION` *(non-blocking)* | The applicant is in the `yding` Unix group, but `sacctmgr` lists `compsci` and one unrelated PI association rather than `yding`; CPU test job `310661` was charged to `compsci` | Authorized applicant / UTD HPC administration | Ask HPC to add or affirm the `yding` SLURM association and review/remove the unrelated association; this is an accounting/fair-share correction, not a ChildLens security gate |
-| DDP/scaling | `REQUIRES CONFIRMATION` | One L4 only; upstream reference is four processes | Technical lead | Size the full run blindly; if more than one GPU/process is required, pass the mandatory public/dummy DDP preflight before any restricted execution |
-| ASR/translation | `REQUIRES CONFIRMATION` | Interface and selection rules are frozen; exact local model weights are not yet selected | Language/technical lead | Run the bounded public-language selection substage below, then freeze revisions, hashes, licenses, and thresholds before ChildLens processing |
+| DDP/scaling | `FROZEN` | Final-topology public/dummy 1-node/2-H200/2-process preflight passed before restricted multi-process execution | Technical lead | Preserve the tested topology and frozen 12-hour ceiling for the completed Phase 4 build record |
+| ASR/translation | `FROZEN` | Public gate selected immutable Whisper small plus OPUS-MT German→English; offline reload, timestamps, confidence, round trip, and telemetry controls passed | Language/technical lead | Use only the selected identical pipeline for later real and synthetic audio |
 | German human validation | `FROZEN` | No German-speaking human annotator is available, and the agreement prohibits making the dataset accessible to third parties | Authorized applicant | Use no human rater and retain only explicitly model-derived claims; a future rater requires separate MPI authorization |
 | \(C,H,r\), margins, seeds | `REQUIRES CONFIRMATION` | Blind rules and bounds are frozen below; numeric values require permitted aggregate inventory and real-only variance | Authorized applicant in locked statistician stage | Apply the registered algorithms without synthetic results and sign/hash the completed config amendment |
-| Common benchmark | `FROZEN` | Exactly one asset for all arms; it may use public resources and authorized \(C\) only | Evaluation custodian | Build only after Phase 3 gates clear; hash and seal it before learner training |
+| Common benchmark | `FROZEN` | Exactly one lexical asset and one held-out-real temporal safeguard are hashed, sealed, and referenced identically by every later arm | Evaluation custodian | Preserve commitments `68f9490a…d5c1` and `0261dca9…45f`; prohibit test steering |
 | Score sealing/unblinding | `FROZEN` | Synthetic-arm scores remain inaccessible until the real-only gate passes; this is a disclosed single-operator protocol | Authorized applicant | Use separate procedural roles, coded outputs, append-only commitments, and the ordered unblinding script below |
 | Cost comparison | `FROZEN` | Prospective like-for-like marginal and fully loaded ledgers; sunk ChildLens collection is not zero | Authorized applicant in locked cost stage | Insert pre-generation unit prices and distributions, then hash/sign the ledger |
 
@@ -555,16 +555,16 @@ control later execution:
    `1a922f3b32a8e809e17a47d4b32142d8105924e5`. This exact local-files-only,
    no-telemetry pipeline is now mandatory and identical for real and synthetic
    audio.
-2. **Resource sizing/DDP:** perform public/dummy conservative sizing. If it
-   requires multiple processes, pass the final-topology public/dummy DDP gate
-   before restricted multi-process execution.
-3. **Restricted-job setup:** cache and hash public dependencies first; then use
-   only declared applicant-private UTD paths, local model loading, disabled
-   telemetry/external tracking, governed manifests, and scratch cleanup.
+2. **Resource sizing/DDP — PASS:** the final 1-node/2-H200/2-process topology
+   passed public/dummy qualification before restricted execution.
+3. **Restricted common assets — PASS:** both asset families were built under
+   applicant-private UTD controls, hashed file-by-file, and sealed before any
+   learner training.
 4. **SLURM administration (non-blocking):** ask HPC to add or affirm `yding`
    fair-share association and review/remove the unrelated PI association. This
    does not block Phase 4 or compliant applicant-only ChildLens work.
 
-Governed Phase 4 common-asset construction is authorized under the exact
-selected pipeline. Generator work, real-only training, synthetic-score
-opening, and scientific evaluation remain blocked by their later phase gates.
+Phase 4 is complete. The next separately launched scope is Phase 5 real-only
+learner training and the readiness gate. Generator work, synthetic generation,
+synthetic-score opening, and scientific evaluation remain blocked by their
+later phase gates.

@@ -1,7 +1,7 @@
 # Synthetic-video Phase 4 common evaluation assets
 
-**Status:** Stage A **PASS**; Stage B blocked on explicit institutional GPU
-resource approval
+**Status:** **PASS** — Stage A and both Stage B common asset families are
+complete, hashed, and sealed
 
 **Scope:** public-only language-pipeline qualification followed, only on a
 signed PASS, by governed construction and sealing of the two common evaluation
@@ -110,5 +110,31 @@ nodes, preserving the single-node/two-shard topology while avoiding the A30
 reservation. The final request is therefore 2 × H200 for a 30-minute
 public/dummy preflight (1 aggregate GPU-hour), then at most 2 × H200 for
 12 hours (24 aggregate GPU-hours) for the governed build. The unavailable A30
-requests consumed no allocation. Stage B remains incomplete until the H200
-topology passes and both assets are constructed and sealed.
+requests consumed no allocation. The two-process H200 public/dummy preflight
+passed in 2:13 with commitment `3271b7b8…c4b7`. The governed build then ran
+under the same final topology and offline controls.
+
+### Stage B decision
+
+Whole-child allocation retained all 18 C children and assigned the remaining
+40 children as 28 training, 8 evaluation, and 4 validation. The shared lexical
+asset contains 30 nouns and 24 adjectives in both official styles; its 524
+manifest/image files have commitment `68f9490a…d5c1`. The held-out-real
+temporal safeguard contains 3,672 eight-candidate query rows and 14,688 frames
+from 8 evaluation children across 19 sessions; its 14,689 manifest/frame files
+have commitment `0261dca9…45f`. Calibration/evaluation child overlap is zero,
+all candidate counts are exact, 145 duplicate frames are recorded and retained,
+and five complete query rows were excluded without substitution after a frame
+decode failure. Every later arm references exactly these two commitments.
+
+The governed manifests retain row-level provenance, hashes, filters, and audits;
+Git retains only the compact non-identifying decision in
+`results/synthetic_video_phase4.json`. Machine-DevBench images are generated,
+not held-out-real ChildLens evaluation. Temporal labels remain model-derived,
+with neither referent ground truth nor human German validation.
+
+Phase 4 performed no learner training, generator/TTS execution, synthetic
+generation, score opening, or scientific evaluation. The next separately
+launched scope is Phase 5 real-only learner training and its readiness gate.
+Generator/TTS execution, synthetic generation, synthetic-score opening, and
+final evaluation remain unauthorized.

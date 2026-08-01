@@ -16,11 +16,18 @@ export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
 export WANDB_DISABLED=true TOKENIZERS_PARALLELISM=false PYTHONNOUSERSITE=1
 export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
 tmp="/tmp/phase4-build-${SLURM_JOB_ID}"
-mkdir -p "$tmp/pydeps"
+mkdir -p "$tmp/pydeps" "$tmp/bin"
 trap 'find "$tmp" -mindepth 1 -delete 2>/dev/null || true; rmdir "$tmp" 2>/dev/null || true' EXIT
 tar -C "$tmp/pydeps" -xf "${PHASE4_PUBLIC_ROOT}/models/phase4-language-pydeps.tar"
 export PYTHONPATH="$tmp/pydeps:${PHASE4_EGOBABY_ROOT}"
 export PATH="$tmp/pydeps/bin:$PATH"
+ffmpeg_exe=$(singularity exec \
+  --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT}" \
+  "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" \
+  python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')
+ln -s "$ffmpeg_exe" "$tmp/bin/ffmpeg"
+export PATH="$tmp/bin:$PATH"
+export SINGULARITYENV_PREPEND_PATH="$tmp/bin"
 export MASTER_ADDR=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -1)
 export MASTER_PORT=29543
 srun --kill-on-bad-exit=1 singularity exec --nv \

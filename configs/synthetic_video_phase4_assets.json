@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "FROZEN_BEFORE_STAGE_B_ASSET_CONSTRUCTION",
+  "status": "PASS_ASSETS_HASHED_AND_SEALED",
   "catalog_sha256": "9bc338b31291b3e7e5c157003e9d55a569f780d7745a28187ac361633b536ce0",
   "allocation": {
     "calibration_children": 18,
@@ -27,6 +27,7 @@
     "seeds": [20260801, 20260802, 20260803, 20260804],
     "generator": "black-forest-labs/FLUX.2-klein-4B",
     "generator_revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
+    "generator_license": "Apache-2.0",
     "noun_minimum_count": 3,
     "adjective_minimum_count": 3,
     "frequency_bins": 3,
@@ -38,6 +39,8 @@
     "source": "evaluation_children_sessions_only",
     "window_seconds": 4.0,
     "frame_offsets_seconds": [0.5, 1.5, 2.5, 3.5],
+    "frame_decode_failure": "exclude_complete_query_row_without_substitution",
+    "frame_decode_timeout_seconds": 120,
     "temporal_exclusion_buffer_seconds": 8.0,
     "candidate_count": 8,
     "matched_negative_strata": ["same_session", "same_child_other_session", "other_child"],
@@ -51,6 +54,8 @@
     "hash": "sha256_canonical_json",
     "all_later_arms": ["Real-full", "Synthetic-full", "Real-small", "Mixed"],
     "score_opening_allowed": false,
-    "test_assets_may_steer_later_work": false
+    "test_assets_may_steer_later_work": false,
+    "lexical_commitment": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1",
+    "temporal_commitment": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f"
   }
 }

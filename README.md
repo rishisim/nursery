@@ -3,8 +3,9 @@
 Phase 4 uses the prospectively frozen public-only language gate in
 `configs/synthetic_video_language_gate.json` and
 `docs/synthetic_video_phase4.md`. Stage A selected one immutable offline
-pipeline; governed Stage B common-asset construction is the only current
-authorization.
+pipeline and Stage B sealed both common evaluation asset families. Phase 4 is
+complete; the next separately launched scope is Phase 5 real-only learner
+training and its readiness gate.
 
 This branch is the clean workspace for the Nursery/BabyWorld synthetic-video
 research program.
@@ -92,7 +93,9 @@ may not be sent to APIs, hosted services, Git, cloud storage, telemetry, or
 other third parties. The missing `yding` SLURM association is a non-blocking
 fair-share/accounting correction. Post-pass gates are in
 [`docs/synthetic_video_preregistration.md`](docs/synthetic_video_preregistration.md).
-A separately scoped Phase 4 common-asset task may begin. ChildLens audio
-processing awaits the bounded public-only ASR/translation selection; LTX/Wan,
-TTS, generation, real-only training, and scientific evaluation remain
-unauthorized.
+The compact signed Phase 4 decision is
+[`results/synthetic_video_phase4.json`](results/synthetic_video_phase4.json).
+Generator/TTS execution, synthetic generation, synthetic-score opening, and
+final scientific evaluation remain unauthorized. Phase 5 real-only training
+and its readiness gate require a separate launch and remain subject to every
+frozen learner, split, score-sealing, and stop rule.
