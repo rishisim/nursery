@@ -1,5 +1,6 @@
 import json
 import importlib.util
+import hmac
 from pathlib import Path
 
 
@@ -11,6 +12,7 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 canonical = MODULE.canonical
 digest = MODULE.digest
+deal_children = MODULE.deal_children
 
 
 def test_phase4_asset_config_freezes_shared_assets_and_split():
@@ -26,6 +28,17 @@ def test_phase4_asset_config_freezes_shared_assets_and_split():
 def test_canonical_digest_is_order_independent():
     assert canonical({"b": 2, "a": 1}) == b'{"a":1,"b":2}'
     assert digest({"a": 1, "b": 2}) == digest({"b": 2, "a": 1})
+
+
+def test_allocation_uses_literal_hmac_and_repeating_deal():
+    children = [f"child-{index}" for index in range(8)]
+    allocation = {"study_id_utf8": "synthetic-video", "counts": {"training": 4, "evaluation": 2, "validation": 2}, "deal_order": ["evaluation", "validation", "training"]}
+    key = b"fixed-test-key"
+    ranked = sorted(children, key=lambda child: hmac.digest(key, b"synthetic-video" + child.encode(), "sha256"))
+    result = deal_children(children, key, allocation)
+    assert result["evaluation"] == [ranked[0], ranked[3]]
+    assert result["validation"] == [ranked[1], ranked[4]]
+    assert result["training"] == [ranked[2], ranked[5], ranked[6], ranked[7]]
 
 
 def test_language_model_preparation_is_public_cpu_only_and_offline_validated():

@@ -41,23 +41,16 @@ def write_json(path: Path, value):
     os.chmod(path, 0o600)
 
 
-def translate_segments(tokenizer, translator, segments):
+def translate_segments(tokenizer, translator, segments, language, audio_duration, confidence_min):
+    from synthetic_video_language_adapter import translate_accepted, validate_asr_prediction
     out = []
     for segment in segments:
-        text = segment.get("text", "").strip()
-        if not text:
-            continue
-        encoded = tokenizer(text, return_tensors="pt", truncation=True)
-        encoded = {k: v.to(translator.device) for k, v in encoded.items()}
+        prediction = {"text": segment.get("text", ""), "language": language, "words": segment.get("words", [])}
+        adjudication = validate_asr_prediction(prediction, audio_duration, confidence_min)
         with torch.inference_mode():
-            generated = translator.generate(**encoded, max_new_tokens=128)
-        english = tokenizer.batch_decode(generated, skip_special_tokens=True)[0].strip()
-        words = [
-            {"word": w["word"], "start": float(w["start"]), "end": float(w["end"]), "probability": float(w["probability"])}
-            for w in segment.get("words", [])
-        ]
-        if english and words:
-            out.append({"start": float(segment["start"]), "end": float(segment["end"]), "de": text, "en": english, "words": words})
+            adjudication = translate_accepted(adjudication, tokenizer, translator)
+        if adjudication["status"] == "ACCEPT":
+            out.append({"start": adjudication["words"][0]["start"], "end": adjudication["words"][-1]["end"], "de": adjudication["text_de"], "en": adjudication["text_en"], "words": adjudication["words"], "status": "ACCEPT"})
     return out
 
 
@@ -66,6 +59,8 @@ def transcribe_inventory(root: Path, public: Path, rows, checkpoint_name: str):
     from transformers import MarianMTModel, MarianTokenizer
     checkpoint_path = root / checkpoint_name
     checkpoint = json.loads(checkpoint_path.read_text()) if checkpoint_path.exists() else {"items": {}}
+    if checkpoint.get("adapter_contract") != "frozen_language_adapter_v1":
+        checkpoint = {"adapter_contract": "frozen_language_adapter_v1", "items": {}}
     asr = whisper.load_model(str(public / "models/whisper/small.pt"), device="cuda")
     translator_root = public / "models/opus-mt-de-en"
     tokenizer = MarianTokenizer.from_pretrained(translator_root, local_files_only=True)
@@ -79,8 +74,9 @@ def transcribe_inventory(root: Path, public: Path, rows, checkpoint_name: str):
             beam_size=5, word_timestamps=True, condition_on_previous_text=False,
             fp16=True, verbose=False,
         )
-        segments = translate_segments(tokenizer, translator, result["segments"])
-        checkpoint["items"][key] = {"segments": segments, "language": result.get("language"), "child_key": row["child_key"], "session_key": row["session_key"], "file": row["file"]}
+        audio_duration = len(whisper.load_audio(str(root / row["file"]))) / whisper.audio.SAMPLE_RATE
+        segments = translate_segments(tokenizer, translator, result["segments"], result.get("language"), audio_duration, 0.35)
+        checkpoint["items"][key] = {"segments": segments, "language": result.get("language"), "child_key": row["child_key"], "session_key": row["session_key"], "file": row["file"], "accepted_segments": len(segments), "total_segments": len(result["segments"])}
         write_json(checkpoint_path, checkpoint)
     del asr, translator
     torch.cuda.empty_cache()

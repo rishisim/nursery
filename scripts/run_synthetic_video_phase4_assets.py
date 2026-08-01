@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import hashlib
+import hmac
 import json
 import os
 from pathlib import Path
@@ -88,6 +89,23 @@ def calibration_children(mount: Path) -> set[str]:
     return children
 
 
+def deal_children(eligible: list[str], key: bytes, allocation: dict[str, object]) -> dict[str, list[str]]:
+    study_id = str(allocation["study_id_utf8"]).encode("utf-8")
+    ranked = sorted(eligible, key=lambda child: hmac.digest(key, study_id + child.encode("utf-8"), "sha256"))
+    counts = allocation["counts"]
+    assignments = {role: [] for role in counts}
+    deal_order = allocation["deal_order"]
+    role_index = 0
+    for child in ranked:
+        while len(assignments[deal_order[role_index]]) >= counts[deal_order[role_index]]:
+            role_index = (role_index + 1) % len(deal_order)
+        assignments[deal_order[role_index]].append(child)
+        role_index = (role_index + 1) % len(deal_order)
+    if {role: len(items) for role, items in assignments.items()} != counts:
+        raise Phase4Error("E_ALLOCATION_COUNTS")
+    return assignments
+
+
 def allocate(mount: Path, private_root: Path) -> dict[str, object]:
     cfg = json.loads(CONFIG.read_text())
     catalog_path = locate_catalog(mount, cfg["catalog_sha256"])
@@ -105,15 +123,8 @@ def allocate(mount: Path, private_root: Path) -> dict[str, object]:
         key_path.write_bytes(secrets.token_bytes(cfg["allocation"]["secret_bytes"]))
         os.chmod(key_path, 0o600)
     key = key_path.read_bytes()
-    ranked = sorted(eligible, key=lambda x: hashlib.sha256(key + b"\0" + x.encode()).digest())
     counts = cfg["allocation"]["counts"]
-    train_end = counts["training"]
-    eval_end = train_end + counts["evaluation"]
-    assignments = {
-        "training": ranked[:train_end],
-        "evaluation": ranked[train_end:eval_end],
-        "validation": ranked[eval_end:],
-    }
+    assignments = deal_children(eligible, key, cfg["allocation"])
     media = catalog["media"]
     objects = {row["object_key"]: row for row in catalog["objects"]}
     eval_set = set(assignments["evaluation"])
@@ -123,6 +134,8 @@ def allocate(mount: Path, private_root: Path) -> dict[str, object]:
             continue
         obj = objects[row["object_key"]]
         evaluation_media.append({**row, "source_locator": obj["source_locator"]})
+    previous_path = private_root / "restricted_allocation.json"
+    previous = json.loads(previous_path.read_text()) if previous_path.exists() else None
     ledger = {
         "schema_version": 1,
         "catalog_sha256": cfg["catalog_sha256"],
@@ -131,7 +144,17 @@ def allocate(mount: Path, private_root: Path) -> dict[str, object]:
         "assignments": assignments,
         "evaluation_media": evaluation_media,
     }
-    write_private(private_root / "restricted_allocation.json", ledger)
+    overlap = None
+    if previous is not None:
+        prior_assignments = previous["assignments"]
+        overlap = {
+            new_role: {old_role: len(set(assignments[new_role]) & set(prior_assignments[old_role])) for old_role in counts}
+            for new_role in counts
+        }
+        superseded = private_root / "superseded_allocation.json"
+        if not superseded.exists():
+            write_private(superseded, previous)
+    write_private(previous_path, ledger)
     return {
         "status": "PASS",
         "calibration_children": len(calibration),
@@ -140,6 +163,7 @@ def allocate(mount: Path, private_root: Path) -> dict[str, object]:
         "evaluation_children": len(assignments["evaluation"]),
         "validation_children": len(assignments["validation"]),
         "evaluation_recordings": len(evaluation_media),
+        "old_new_role_overlap_counts": overlap,
         "allocation_commitment": digest(ledger),
     }
 
@@ -158,9 +182,18 @@ def read_token() -> str:
 class Client:
     def __init__(self, cfg: dict[str, object], token: str):
         self.api = str(cfg["api_base_url"]).rstrip("/")
-        self.repo = str(cfg["repository_id"])
         self.allowed = {urllib.parse.urlsplit(str(x)).netloc for x in cfg["allowed_download_origins"]}
         self.auth = f"Bearer {token}"
+        if "repository_id" in cfg:
+            self.repo = str(cfg["repository_id"])
+        else:
+            needle = str(cfg["repository_name_contains_casefold"]).casefold()
+            with self.request(f"{self.api}/api2/repos/") as response:
+                repositories = json.loads(response.read(4 * 1024 * 1024))
+            matches = [row["id"] for row in repositories if needle in str(row.get("name", "")).casefold()]
+            if len(matches) != 1:
+                raise Phase4Error("E_REPOSITORY_DISCOVERY")
+            self.repo = matches[0]
 
     def request(self, url: str):
         req = urllib.request.Request(url, headers={"Authorization": self.auth, "Accept-Encoding": "identity"})
@@ -213,7 +246,7 @@ def acquire(private_root: Path, transfer_config: Path, workers: int) -> dict[str
     def fetch(item):
         index, row, key = item
         size = client.metadata(row["source_locator"])
-        target = media_root / f"{index:04d}.bin"
+        target = media_root / f"{key}.bin"
         sha = client.download(row["source_locator"], target, size)
         return key, {"status": "COMPLETE", "size_bytes": size, "sha256": sha, "file": target.name}
 
@@ -225,6 +258,67 @@ def acquire(private_root: Path, transfer_config: Path, workers: int) -> dict[str
             write_private(checkpoint_path, checkpoint)
     completed = sum(x.get("status") == "COMPLETE" for x in checkpoint["items"].values())
     return {"status": "PASS", "evaluation_recordings": len(ledger["evaluation_media"]), "completed": completed, "bytes": sum(x["size_bytes"] for x in checkpoint["items"].values()), "acquisition_commitment": digest(checkpoint)}
+
+
+def audit_overlap(mount: Path, private_root: Path) -> dict[str, object]:
+    cfg = json.loads(CONFIG.read_text())
+    catalog = json.loads(locate_catalog(mount, cfg["catalog_sha256"]).read_text())
+    allocation_path = private_root / "restricted_allocation.json"
+    allocation = json.loads(allocation_path.read_text())
+    calibration = calibration_children(mount)
+    child_role = {child: "calibration" for child in calibration}
+    for role, children in allocation["assignments"].items():
+        for child in children:
+            if child in child_role:
+                raise Phase4Error("E_CHILD_ROLE_OVERLAP")
+            child_role[child] = role
+    objects = {row["object_key"]: row for row in catalog["objects"]}
+    role_order = cfg["overlap_audit"]["earliest_role_order"]
+    priority = {role: index for index, role in enumerate(role_order)}
+    rows = []
+    for media in catalog["media"]:
+        obj = objects[media["object_key"]]
+        rows.append({
+            "role": child_role[media["participant_key"]], "media_key": media["media_key"],
+            "object_key": media["object_key"], "session_key": media["session_key"],
+            "duration_milliseconds": media["duration_milliseconds"],
+            "content_sha256": obj.get("source_checksum_sha256") or obj.get("local_sha256"),
+        })
+    quarantine = set()
+    pre_counts = {"object_key": 0, "session_time_interval": 0, "content_sha256": 0}
+    for field in ("object_key", "session_key", "content_sha256"):
+        groups = {}
+        for row in rows:
+            value = row[field]
+            if value:
+                groups.setdefault(value, []).append(row)
+        label = "session_time_interval" if field == "session_key" else field
+        for members in groups.values():
+            roles = {row["role"] for row in members}
+            if len(roles) < 2:
+                continue
+            pre_counts[label] += 1
+            earliest = min(roles, key=priority.__getitem__)
+            quarantine.update(row["media_key"] for row in members if row["role"] != earliest)
+    quarantined_by_role = {role: sum(row["media_key"] in quarantine and row["role"] == role for row in rows) for role in role_order}
+    audit = {
+        "schema_version": 1, "status": "PASS", "earliest_role_order": role_order,
+        "pre_resolution_cross_role_group_counts": pre_counts,
+        "quarantined_media_keys": sorted(quarantine), "quarantined_by_role": quarantined_by_role,
+        "post_resolution_unresolved_exact_or_temporal_count": 0,
+        "perceptual_hash": {"status": "PENDING_STAGED_MEDIA_DIAGNOSTIC", "blocking": False, "hamming_max": cfg["overlap_audit"]["perceptual_hash_hamming_max_diagnostic"]},
+        "embedding": {"status": "PENDING_PUBLIC_MODEL_QUALIFICATION", "blocking": False},
+    }
+    write_private(private_root / "restricted_overlap_audit.json", audit)
+    allocation["quarantined_media_keys"] = sorted(quarantine)
+    allocation["evaluation_media"] = [row for row in allocation["evaluation_media"] if row["media_key"] not in quarantine]
+    write_private(allocation_path, allocation)
+    return {
+        "status": "PASS", "pre_resolution_cross_role_group_counts": pre_counts,
+        "quarantined_by_role": quarantined_by_role,
+        "post_resolution_unresolved_exact_or_temporal_count": 0,
+        "allocation_commitment_after_resolution": digest(allocation),
+    }
 
 
 def stage(mount: Path, private_root: Path) -> dict[str, object]:
@@ -274,7 +368,10 @@ def stage(mount: Path, private_root: Path) -> dict[str, object]:
     allocation = json.loads((private_root / "restricted_allocation.json").read_text())
     acquisition = json.loads((private_root / "restricted_acquisition.json").read_text())
     evaluation = []
+    quarantine = set(allocation.get("quarantined_media_keys", []))
     for row in allocation["evaluation_media"]:
+        if row["media_key"] in quarantine:
+            continue
         key = digest({"participant_key": row["participant_key"], "media_key": row["media_key"]})
         item = acquisition["items"].get(key)
         if not item or item.get("status") != "COMPLETE":
@@ -290,12 +387,15 @@ def main() -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     a = sub.add_parser("allocate"); a.add_argument("--mount", type=Path, required=True); a.add_argument("--private-root", type=Path, required=True)
     q = sub.add_parser("acquire"); q.add_argument("--private-root", type=Path, required=True); q.add_argument("--transfer-config", type=Path, required=True); q.add_argument("--workers", type=int, choices=range(1, 5), default=4)
+    o = sub.add_parser("audit-overlap"); o.add_argument("--mount", type=Path, required=True); o.add_argument("--private-root", type=Path, required=True)
     s = sub.add_parser("stage"); s.add_argument("--mount", type=Path, required=True); s.add_argument("--private-root", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "allocate":
         result = allocate(args.mount.resolve(), args.private_root.resolve())
     elif args.command == "acquire":
         result = acquire(args.private_root.resolve(), args.transfer_config.resolve(), args.workers)
+    elif args.command == "audit-overlap":
+        result = audit_overlap(args.mount.resolve(), args.private_root.resolve())
     else:
         result = stage(args.mount.resolve(), args.private_root.resolve())
     print(json.dumps(result, sort_keys=True))

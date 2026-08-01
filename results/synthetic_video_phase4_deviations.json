@@ -4,10 +4,28 @@
   "observed_information_scope": "aggregate engineering and asset-count information only; no learner or scientific outcomes",
   "prior_commit": "b9bbba4a3294eb3b9a007423a301e3b9cc0c6751",
   "prior_commitments_status": "PROVISIONAL_SUPERSEDED_PENDING_REPAIR",
-  "current_blocker": {
+  "resolved_allocation_ambiguity": {
     "area": "whole_child_allocation_encoding",
     "reason": "Phase 3 names HMAC input study_id || child_id but does not freeze the study_id byte value or text encoding/concatenation convention; materially different assignments are possible",
-    "required_decision": "freeze one exact study_id byte string and child-ID encoding before corrected assignments are computed"
+    "approved_interpretation": "HMAC-SHA-256(secret_split_key, UTF8('synthetic-video') || UTF8(child_id)), no delimiter",
+    "decision_timing": "before corrected assignments or corrected asset contents were observed"
+  },
+  "corrected_allocation_aggregate": {
+    "status": "PASS",
+    "commitment_before_exact_overlap_resolution": "1bbd50e4ebf0c1569c3f26d978a7a45e4a0740ed4ba6ddedfe6a29c6419b6421",
+    "counts": {"training": 28, "evaluation": 8, "validation": 4},
+    "old_new_role_overlap_counts": {
+      "training": {"training": 19, "evaluation": 6, "validation": 3},
+      "evaluation": {"training": 6, "evaluation": 1, "validation": 1},
+      "validation": {"training": 3, "evaluation": 1, "validation": 0}
+    }
+  },
+  "blocking_overlap_audit_aggregate": {
+    "status": "PASS",
+    "pre_resolution_cross_role_groups": {"source_id": 0, "session_time_interval": 0, "content_sha256": 0},
+    "quarantined_by_role": {"calibration": 0, "training": 0, "validation": 0, "evaluation": 0},
+    "post_resolution_unresolved_exact_or_temporal_count": 0,
+    "allocation_commitment_after_resolution": "2e545ef59f24d88963c2715e99e3effcecdf79deb30d5cb6235a5417d71d6ffa"
   },
   "deviations": [
     {

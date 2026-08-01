@@ -85,7 +85,9 @@
       "evaluation": 8,
       "validation": 4
     },
-    "assignment": "fixed_C_then_largest_remainder_counts_and_keyed_hash_deal_of_remaining_whole_children"
+    "assignment": "fixed_C_then_largest_remainder_counts_and_HMAC_SHA256_deal_of_remaining_whole_children",
+    "assignment_hmac_message": "UTF8('synthetic-video') || UTF8(child_id), no delimiter",
+    "assignment_deal_order": ["evaluation", "validation", "training"]
   },
   "language": {
     "learner_path": "identical_offline_German_ASR_to_English_translation",

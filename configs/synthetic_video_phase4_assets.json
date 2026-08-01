@@ -6,7 +6,11 @@
     "calibration_children": 18,
     "eligible_children": 40,
     "counts": {"training": 28, "evaluation": 8, "validation": 4},
-    "method": "sort SHA256(secret_key || NUL || participant_key), then deal training, evaluation, validation",
+    "method": "sort HMAC-SHA-256(secret_split_key, UTF8('synthetic-video') || UTF8(child_id)), then repeating deal evaluation, validation, training while skipping filled roles",
+    "study_id_utf8": "synthetic-video",
+    "child_id_encoding": "UTF-8",
+    "message_delimiter": "none",
+    "deal_order": ["evaluation", "validation", "training"],
     "unit": "whole_child",
     "secret_bytes": 32
   },
@@ -16,6 +20,9 @@
     "asr_sha256": "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794",
     "translation": "Helsinki-NLP/opus-mt-de-en",
     "translation_revision": "1a922f3b32a8e809e17a47d4b32142d8105924e5",
+    "mean_word_confidence_min": 0.35,
+    "required_language": "de",
+    "timestamp_decimals": 6,
     "offline_identical_real_synthetic": true,
     "oracle_synthetic_text_qa_only": true
   },
@@ -49,6 +56,12 @@
     "referent_ground_truth": false,
     "human_german_validation": false,
     "label_role": "model_derived_temporal_frame_utterance_retrieval"
+  },
+  "overlap_audit": {
+    "earliest_role_order": ["calibration", "training", "validation", "evaluation"],
+    "blocking_exact_keys": ["object_key", "session_time_interval", "content_sha256"],
+    "perceptual_hash_hamming_max_diagnostic": 4,
+    "embedding_near_duplicate_role": "diagnostic_nonblocking"
   },
   "sealing": {
     "hash": "sha256_canonical_json",

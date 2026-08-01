@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "api_base_url": "https://keeper.mpdl.mpg.de",
+  "repository_name_contains_casefold": "childlens",
+  "allowed_download_origins": ["https://keeper.mpdl.mpg.de"],
+  "authorization_source": "macOS Keychain applicant-only read-only token",
+  "restricted_output_required": true
+}

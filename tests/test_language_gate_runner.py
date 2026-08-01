@@ -13,3 +13,4 @@ def test_runner_uses_frozen_candidate_family_and_offline_reload():
     assert config["decoding"]["temperature"] == 0
     assert config["decoding"]["beam_size"] == 5
     assert "temperature=decoding[\"temperature\"]" in source
+    assert "synthetic_video_language_adapter" in source

@@ -194,6 +194,7 @@ def run_candidate(config: dict, root: Path, candidate_id: str) -> dict:
     import torch
     import whisper
     from transformers import MarianMTModel, MarianTokenizer
+    from synthetic_video_language_adapter import translate_accepted, validate_asr_prediction, whisper_prediction
 
     model_path = root / "models" / Path(candidate["asr"]["artifact_url"]).name
     translator_path = root / "models" / "opus-mt-de-en"
@@ -207,30 +208,19 @@ def run_candidate(config: dict, root: Path, candidate_id: str) -> dict:
     for item in manifest["items"]:
         try:
             audio = root / item["audio"]
-            prediction = transcribe(asr, audio, config["decoding"])
-            valid = bool(validate_timestamps(prediction["words"], duration(audio)))
-            confidence = (
-                sum(word["probability"] for word in prediction["words"]) / len(prediction["words"])
-                if prediction["words"] else 0.0
-            )
+            prediction = whisper_prediction(asr, audio, config["decoding"])
             expected_silence = not item["reference_de"]
-            abstained = expected_silence or not prediction["text"] or not valid or (
-                confidence < config["thresholds"]["mean_word_confidence_min"]
-            ) or prediction["language"] != "de"
-            translation = ""
-            if not abstained:
-                encoded = tokenizer(prediction["text"], return_tensors="pt", truncation=True)
-                if encoded["input_ids"].shape[1] >= tokenizer.model_max_length:
-                    truncations += 1
-                with torch.no_grad():
-                    generated = translator.generate(**encoded, max_new_tokens=256)
-                translation = tokenizer.batch_decode(generated, skip_special_tokens=True)[0]
-                if not translation:
-                    abstained = True
+            adjudication = validate_asr_prediction(prediction, duration(audio), config["thresholds"]["mean_word_confidence_min"])
+            if expected_silence:
+                adjudication.update({"status": "ABSTAIN", "reason": "EXPECTED_SILENCE"})
+            adjudication = translate_accepted(adjudication, tokenizer, translator, max_new_tokens=256)
+            if adjudication["reason"] == "SILENT_TRUNCATION":
+                truncations += 1
             predictions.append({
-                **item, "hypothesis_de": prediction["text"], "hypothesis_en": translation,
-                "words": prediction["words"], "confidence": confidence,
-                "timestamps_valid": valid, "abstained": abstained,
+                **item, "hypothesis_de": adjudication["text_de"], "hypothesis_en": adjudication.get("text_en", ""),
+                "words": adjudication["words"], "confidence": adjudication["mean_word_confidence"],
+                "timestamps_valid": adjudication["reason"] != "INVALID_TIMESTAMP",
+                "abstained": adjudication["status"] == "ABSTAIN", "abstention_reason": adjudication["reason"],
             })
         except Exception as error:
             crashes += 1
