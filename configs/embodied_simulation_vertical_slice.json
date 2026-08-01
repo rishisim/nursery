@@ -62,6 +62,18 @@
       "rgba": [0.92, 0.72, 0.05, 1.0],
       "license": "repository-authored CC0"
     },
+    "support": {
+      "persistent_id": "authored_cup_support",
+      "pedestal_radius_m": 0.025,
+      "pedestal_half_height_m": 0.025,
+      "catch_tray_radius_m": 0.18,
+      "catch_tray_half_height_m": 0.01,
+      "catch_tray_center_below_support_origin_m": 0.025,
+      "collision_enabled": true,
+      "visible_in_authoritative_rgb": true,
+      "phase_4_repair_recorded_at_utc": "2026-08-01T01:48:46Z",
+      "repair_reason": "a collision-enabled catch surface keeps a physically released cup in the bounded reachable workspace without a reset or direct object pose intervention"
+    },
     "qualified_placement": {
       "root_xy_m": [-4.123, 2.206],
       "occupancy_pixel_xy": [1092, 1191],

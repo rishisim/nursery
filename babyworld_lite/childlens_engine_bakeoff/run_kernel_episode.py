@@ -73,6 +73,7 @@ def _build(
         component_path,
         root_xy=tuple(placement["root_xy_m"]),
         target_definition=_target_definition(contract),
+        support_definition=contract["scene_family"].get("support"),
         clutter_layout=clutter_layout,
         camera_mount_position=tuple(mount["translation_head_m"]),
         camera_mount_quaternion=tuple(mount["quaternion_head_wxyz"]),

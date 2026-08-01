@@ -66,7 +66,7 @@
       {"id": "u03", "text": "Up goes the cup.", "start_s": 14.3, "event": "lift", "must_end_by_s": 17.0},
       {"id": "u04", "text": "Shake, tap, and move it.", "start_s": 28.2, "event": "shake_bang_transfer", "must_end_by_s": 32.0},
       {"id": "u05", "text": "Cup again.", "start_s": 46.4, "event": "retrieve_reorient", "must_end_by_s": 48.0},
-      {"id": "u06", "text": "Yellow cup.", "start_s": 58.5, "event": "final_dwell", "must_end_by_s": 60.0}
+      {"id": "u06", "text": "Yellow cup.", "start_s": 59.0, "event": "final_dwell", "must_end_by_s": 60.0}
     ],
     "speech": {
       "engine": "macOS say",
@@ -86,12 +86,24 @@
     "second_grasp_uses_same_frozen_contact_gate": true,
     "shake_frequency_hz": 1.5,
     "shake_vertical_amplitude_m": 0.018,
+    "shake_tracking": "bounded IK endpoints plus compliant object-state feedback through the articulated hand",
     "bang_cycles": 2,
     "bang_clearance_amplitude_m": 0.025,
     "transfer_lateral_distance_m": 0.055,
     "transfer_scope": "right-hand lateral transport; not an inter-hand transfer",
+    "retrieve_contact_offset_from_object_m": [-0.065, 0.040, 0.050],
     "direct_object_pose_control_permitted": false
   },
+  "bounded_repairs": [
+    {
+      "recorded_at_utc": "2026-08-01T01:48:46Z",
+      "evidence_runs": ["preflight_01", "preflight_02", "preflight_03", "preflight_04", "preflight_05", "preflight_06"],
+      "changes": "added phase-relative IK tracking, a collision-enabled support catch tray, support-aware put-down feedback, and a higher side/above retrieve contact approach",
+      "reason": "the initial long-horizon controller under-tracked shake/bang/transfer and allowed the released cup to leave the reachable support; later bounded attempts exposed transition and support-contact penetration",
+      "frozen_plan_timeline_seeds_and_thresholds_changed": false,
+      "final_preflight_gate": "PASS"
+    }
+  ],
   "qualification": {
     "duration_absolute_error_s_max": 1e-9,
     "truth_samples": 3601,

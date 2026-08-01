@@ -6,6 +6,10 @@ import pytest
 from babyworld_lite.childlens_engine_bakeoff.compile_episode import (
     compose_embodied_prompt_plan,
 )
+from babyworld_lite.childlens_engine_bakeoff.run_continuous_episode import (
+    _execution_spec,
+)
+from babyworld_lite.childlens_engine_bakeoff.speech_audio import _word_alignment
 
 
 EPISODE = json.loads(
@@ -66,3 +70,34 @@ def test_phase_4_reuses_hard_gates_and_forbids_neural_audio():
     assert EPISODE["selection_policy"]["authoritative_rgb"] == (
         "deterministic_native_mimo_baseline"
     )
+    assert EPISODE["bounded_repairs"][-1][
+        "frozen_plan_timeline_seeds_and_thresholds_changed"
+    ] is False
+    assert VERTICAL["scene_family"]["support"]["collision_enabled"] is True
+    assert VERTICAL["scene_family"]["support"]["catch_tray_radius_m"] == 0.18
+
+
+def test_execution_spec_preserves_frozen_physics_gates_and_mount():
+    plan = compose_embodied_prompt_plan(EPISODE, VERTICAL)
+    resolved = _execution_spec(EPISODE, VERTICAL, plan)
+    assert resolved["frozen_gates"] == VERTICAL["frozen_gates"]
+    assert (
+        resolved["embodiment"]["camera_mount"]
+        == VERTICAL["embodiment"]["camera_mount"]
+    )
+    assert resolved["collision_policy"] == VERTICAL["collision_policy"]
+    assert resolved["continuous_episode"]["vertical_slice_hard_gates_changed"] is False
+
+
+def test_recorded_word_alignment_is_monotonic_and_bounded():
+    rows = _word_alignment("Shake, tap, and move it.", 28.2, 29.7)
+    assert [row["word"] for row in rows] == [
+        "Shake",
+        "tap",
+        "and",
+        "move",
+        "it",
+    ]
+    assert rows[0]["start_s"] == 28.2
+    assert rows[-1]["end_s"] == 29.7
+    assert all(left["end_s"] == right["start_s"] for left, right in zip(rows, rows[1:]))

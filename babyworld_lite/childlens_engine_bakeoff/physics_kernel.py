@@ -170,6 +170,7 @@ def _component_xml(
     embodied_model_path: Path,
     root_xy: tuple[float, float],
     target_definition: dict[str, Any],
+    support_definition: dict[str, Any],
     clutter_layout: list[dict[str, Any]],
 ) -> str:
     contact_pairs = "\n".join(
@@ -182,7 +183,9 @@ def _component_xml(
             "target_geom", "target_handle_upper", "target_handle_outer",
             "target_handle_lower",
         )
-        for support_name in ("support_geom", "support_rim_back")
+        for support_name in (
+            "support_catch_tray", "support_geom", "support_rim_back"
+        )
     )
     target_floor_pairs = "\n".join(
         f'    <pair geom1="{target_name}" geom2="floor" condim="4" margin="0.003" gap="0.001" friction="2.0 0.01 0.0005 0.0001 0.0001" solref="0.002 1" solimp="0.98 0.999 0.0005"/>'
@@ -194,6 +197,17 @@ def _component_xml(
         )
     )
     clutter_xml = _clutter_xml(root_xy, clutter_layout)
+    catch_radius = float(support_definition["catch_tray_radius_m"])
+    catch_half_height = float(
+        support_definition["catch_tray_half_height_m"]
+    )
+    catch_center_below = float(
+        support_definition["catch_tray_center_below_support_origin_m"]
+    )
+    pedestal_radius = float(support_definition["pedestal_radius_m"])
+    pedestal_half_height = float(
+        support_definition["pedestal_half_height_m"]
+    )
     return f"""<mujoco model="EmbodiedMIMoKernel">
   <compiler inertiafromgeom="true" angle="radian" assetdir="{mimo_assets}"/>
   <include file="{mimo_assets / 'mimo' / 'MIMo_metav2.xml'}"/>
@@ -209,7 +223,11 @@ def _component_xml(
 {_target_xml(target_definition)}
     </body>
     <body name="support" pos="{root_xy[0] + 0.34} {root_xy[1] - 0.15} 0.575">
-      <geom name="support_geom" type="cylinder" size="0.025 0.025"
+      <geom name="support_catch_tray" type="cylinder" pos="0 0 -{catch_center_below}"
+            size="{catch_radius} {catch_half_height}" rgba="0.24 0.13 0.06 1" friction="3 0.005 0.0002"
+            solref="0.008 1" solimp="0.98 0.999 0.0005" contype="8"
+            conaffinity="{TARGET_COLLISION_BIT | 7}"/>
+      <geom name="support_geom" type="cylinder" size="{pedestal_radius} {pedestal_half_height}"
             rgba="0.34 0.19 0.08 1" friction="3 0.005 0.0002"
             solref="0.008 1"
             solimp="0.98 0.999 0.0005" contype="8"
@@ -245,6 +263,7 @@ class KernelModel:
     hand_geom_ids: tuple[int, ...]
     target_geom_id: int
     target_geom_ids: tuple[int, ...]
+    support_geom_ids: tuple[int, ...]
     reach_distractor_geom_id: int
     clutter_geom_ids: tuple[int, ...]
     clutter_visual_geom_ids: tuple[int, ...]
@@ -285,6 +304,7 @@ def build_kernel_model(
     *,
     root_xy: tuple[float, float],
     target_definition: dict[str, Any],
+    support_definition: dict[str, Any] | None = None,
     clutter_layout: list[dict[str, Any]] | None = None,
     camera_mount_position: tuple[float, float, float] = (0.081, 0.0, 0.067375),
     camera_mount_quaternion: tuple[float, float, float, float] = (
@@ -310,6 +330,14 @@ def build_kernel_model(
             embodied_model_path,
             root_xy,
             target_definition,
+            support_definition
+            or {
+                "pedestal_radius_m": 0.025,
+                "pedestal_half_height_m": 0.025,
+                "catch_tray_radius_m": 0.18,
+                "catch_tray_half_height_m": 0.01,
+                "catch_tray_center_below_support_origin_m": 0.025,
+            },
             clutter_layout or [],
         ),
         encoding="utf-8",
@@ -343,6 +371,14 @@ def build_kernel_model(
         and model.geom(geom_id).name != "kernel_target_free"
     )
     target_geom_id = model.geom("kernel_target_geom").id
+    support_geom_ids = tuple(
+        model.geom(name).id
+        for name in (
+            "kernel_support_catch_tray",
+            "kernel_support_geom",
+            "kernel_support_rim_back",
+        )
+    )
     clutter_geom_ids = tuple(
         geom_id
         for geom_id in range(model.ngeom)
@@ -445,6 +481,7 @@ def build_kernel_model(
         hand_geom_ids=hand_geom_ids,
         target_geom_id=target_geom_id,
         target_geom_ids=target_geom_ids,
+        support_geom_ids=support_geom_ids,
         reach_distractor_geom_id=model.geom("kernel_reach_distractor_geom").id,
         clutter_geom_ids=clutter_geom_ids,
         clutter_visual_geom_ids=clutter_visual_geom_ids,
@@ -490,6 +527,29 @@ def phase_at(spec: dict[str, Any], time_s: float) -> dict[str, Any]:
         if phase["start_s"] <= time_s < phase["end_s"]:
             return phase
     return phases[-1]
+
+
+def _phase_action(phase: dict[str, Any]) -> str:
+    """Return the bounded planner action for an internal behavior phase."""
+    if "action" in phase:
+        return str(phase["action"])
+    aliases = {
+        "reach_past_distractor": "reach",
+        "fingertip_contact": "touch",
+        "lift": "grasp",
+        "inspect_rotate": "rotate",
+        "head_turn_maintain_contact": "inspect",
+        "release": "drop",
+        "settle": "drop",
+    }
+    return aliases.get(str(phase["phase"]), str(phase["phase"]))
+
+
+def _named_phase(spec: dict[str, Any], name: str) -> dict[str, Any] | None:
+    return next(
+        (phase for phase in _phase_schedule(spec) if phase["phase"] == name),
+        None,
+    )
 
 
 def _smooth(alpha: float) -> float:
@@ -651,6 +711,31 @@ def _target_contacts(kernel: KernelModel) -> tuple[np.ndarray, int, set[int], fl
     )
 
 
+def _contacts_between(
+    kernel: KernelModel, first_ids: tuple[int, ...], second_ids: tuple[int, ...]
+) -> tuple[int, float]:
+    """Count contacts and return the maximum resultant force between sets."""
+    first = set(first_ids)
+    second = set(second_ids)
+    count = 0
+    maximum_force = 0.0
+    for contact_index in range(kernel.data.ncon):
+        contact = kernel.data.contact[contact_index]
+        geom1, geom2 = int(contact.geom1), int(contact.geom2)
+        if not (
+            (geom1 in first and geom2 in second)
+            or (geom2 in first and geom1 in second)
+        ):
+            continue
+        local = np.zeros(6)
+        mujoco.mj_contactForce(
+            kernel.model, kernel.data, contact_index, local
+        )
+        count += 1
+        maximum_force = max(maximum_force, float(np.linalg.norm(local[:3])))
+    return count, maximum_force
+
+
 def _relevant_contact_distances(
     kernel: KernelModel,
 ) -> tuple[float, float, tuple[str, str] | None, tuple[str, str] | None]:
@@ -728,6 +813,7 @@ def _apply_hand_task_control(
     *,
     gentle: bool,
     grasped: bool,
+    tracking_gain_scale: float = 1.0,
 ) -> None:
     """Apply bounded operational-space control through articulated arm joints."""
     model, data = kernel.model, kernel.data
@@ -766,6 +852,12 @@ def _apply_hand_task_control(
         position_kp, position_kd, force_limit = 120.0, 7.0, 14.0
         rotation_kp, rotation_kd, torque_limit = 3.0, 0.20, 1.5
         joint_limit = 4.0
+    if tracking_gain_scale <= 0.0:
+        raise ValueError("tracking_gain_scale must be positive")
+    position_kp *= tracking_gain_scale
+    position_kd *= np.sqrt(tracking_gain_scale)
+    force_limit *= tracking_gain_scale
+    joint_limit *= tracking_gain_scale
     task_force = np.clip(
         position_kp * (target_position - data.xpos[kernel.right_hand_body_id])
         - position_kd * velocity[3:],
@@ -795,6 +887,7 @@ def _desired_hand(
     episode_time: float,
     initial_hand: np.ndarray,
     target: np.ndarray,
+    spec: dict[str, Any],
 ) -> tuple[np.ndarray, float]:
     alpha = _smooth((episode_time - phase["start_s"]) / (phase["end_s"] - phase["start_s"]))
     name = phase["phase"]
@@ -819,13 +912,95 @@ def _desired_hand(
         return contact, cycle
     if name == "lift":
         return contact * (1 - alpha) + lifted * alpha, 0.20
+    if name == "inspect":
+        return lifted + np.asarray([0.010, -0.005, 0.0]), 0.20
+    if name == "rotate":
+        return lifted + np.asarray([0.010, -0.005, 0.0]), 0.20
     if name == "inspect_rotate":
         return lifted + np.asarray([0.010 * alpha, -0.005 * alpha, 0.005 * np.sin(np.pi * alpha)]), 0.20
     if name == "head_turn_maintain_contact":
         return lifted + np.asarray([0.010, -0.005, 0.0]), 0.20
+    if name == "shake":
+        controller = spec.get("controller", {})
+        frequency = float(controller.get("shake_frequency_hz", 1.5))
+        amplitude = float(controller.get("shake_vertical_amplitude_m", 0.018))
+        return (
+            lifted
+            + np.asarray(
+                [
+                    0.010,
+                    -0.005,
+                    amplitude
+                    * np.sin(
+                        2.0
+                        * np.pi
+                        * frequency
+                        * (episode_time - phase["start_s"])
+                    ),
+                ]
+            ),
+            0.20,
+        )
+    if name == "bang":
+        controller = spec.get("controller", {})
+        cycles = int(controller.get("bang_cycles", 2))
+        amplitude = float(controller.get("bang_clearance_amplitude_m", 0.025))
+        inspect_position = lifted + np.asarray([0.010, -0.005, 0.0])
+        high_position = contact + np.asarray([0.010, -0.005, amplitude])
+        if alpha < 0.25:
+            descend = _smooth(alpha / 0.25)
+            return (
+                inspect_position * (1.0 - descend)
+                + high_position * descend,
+                0.20,
+            )
+        progress = (alpha - 0.25) / 0.75
+        clearance = amplitude * (
+            0.5 + 0.5 * np.cos(2.0 * np.pi * cycles * progress)
+        )
+        return contact + np.asarray([0.010, -0.005, clearance]), 0.20
+    if name == "transfer":
+        controller = spec.get("controller", {})
+        distance = float(controller.get("transfer_lateral_distance_m", 0.055))
+        amplitude = float(controller.get("bang_clearance_amplitude_m", 0.025))
+        return (
+            contact
+            + np.asarray(
+                [0.010, -0.005 + distance * np.sin(np.pi * alpha), amplitude]
+            ),
+            0.20,
+        )
     if name == "release":
         retract = _smooth(max(0.0, (alpha - 0.55) / 0.45))
+        if _duration(spec) > 30.0:
+            amplitude = float(
+                spec.get("controller", {}).get(
+                    "bang_clearance_amplitude_m", 0.025
+                )
+            )
+            return (
+                contact
+                + np.asarray(
+                    [
+                        0.010,
+                        -0.005 - 0.10 * retract,
+                        amplitude + 0.04 * retract,
+                    ]
+                ),
+                0.20 * max(0.0, 1.0 - alpha / 0.45),
+            )
         return lifted + np.asarray([0.010, -0.005 - 0.10 * retract, 0.04 * retract]), 0.20 * max(0.0, 1.0 - alpha / 0.45)
+    if name in {"settle", "retrieve_reorient"}:
+        if _duration(spec) > 30.0:
+            return contact + np.asarray([0.010, -0.105, 0.065]), 0.0
+    if name in {
+        "retrieve",
+        "retrieve_grasp",
+        "retrieve_lift",
+        "retrieve_inspect",
+        "final_dwell",
+    }:
+        return initial_hand, 0.0
     return lifted + np.asarray([0.010, -0.105, 0.04]), 0.0
 
 
@@ -937,7 +1112,7 @@ def run_physics_trace(
     total_steps = int(round(_duration(spec) * physics_hz))
     trace: dict[str, list[Any]] = {
         key: [] for key in (
-            "time_s", "phase", "qpos", "qvel", "action", "touch_wrench",
+            "time_s", "phase", "behavior_action", "qpos", "qvel", "action", "touch_wrench",
             "touch_contact_count", "distinct_finger_contacts", "assist_active",
             "locomotion_assist_active", "vestibular_accelerometer",
             "vestibular_gyroscope", "vestibular_kinematic_accelerometer",
@@ -945,10 +1120,12 @@ def run_physics_trace(
             "hand_pose", "head_pose", "camera_pose", "body_pose",
             "reach_distractor_pose",
             "touch_contact_position", "touch_minimum_distance_m",
+            "support_contact_count", "support_contact_force_n",
             "minimum_relevant_contact_distance_m",
             "minimum_body_environment_contact_distance_m",
             "near_miss_clearance_m",
             "camera_mount_translation_error_m", "camera_mount_rotation_error_rad",
+            "world_reset",
         )
     }
     local_camera_rotation = np.empty(9)
@@ -962,6 +1139,8 @@ def run_physics_trace(
     assist_relative_position = np.zeros(3)
     assist_relative_rotation = np.eye(3)
     assist_engagement_time: float | None = None
+    assist_engagement_times: list[float] = []
+    assist_release_times: list[float] = []
     assist_pose_jump_m = 0.0
     assist_pose_jump_degrees = 0.0
     assist_before_position: np.ndarray | None = None
@@ -977,16 +1156,74 @@ def run_physics_trace(
     minimum_body_environment_time_s: float | None = None
     maximum_lift = 0.0
     physical_lift_before_assist = 0.0
+    current_grasp_physical_lift = 0.0
+    current_grasp_start_height = float(initial_target[2])
     head_turn_contact_samples = 0
     head_turn_samples = 0
     near_miss_separations: list[float] = []
     near_miss_contacts = 0
     last_action = np.zeros(len(kernel.root_qpos_ids) + len(kernel.arm_joint_ids) + len(kernel.finger_joint_ids))
     attention_head_target = base_head_target.copy()
+    previous_phase_key: tuple[str, float] | None = None
+    retrieve_start_arm = initial_arm_target.copy()
+    retrieve_contact_target = contact_target.copy()
+    retrieve_contact_position = contact_position.copy()
+    retrieve_start_hand_position = initial_hand.copy()
+    retrieve_lift_waypoints = lift_waypoints.copy()
+    retrieve_lift_start_height = float(initial_target[2])
+    retrieve_inspect_target = inspect_target.copy()
+    shake_anchor_position = lift_position.copy()
+    shake_anchor_object_position = initial_target.copy()
+    shake_anchor_arm = inspect_target.copy()
+    shake_low_target = inspect_target.copy()
+    shake_high_target = inspect_target.copy()
+    bang_start_position = lift_position.copy()
+    bang_start_object_position = initial_target.copy()
+    bang_start_arm = inspect_target.copy()
+    bang_low_position = contact_position.copy()
+    bang_high_position = contact_position.copy()
+    bang_low_target = contact_target.copy()
+    bang_high_target = contact_target.copy()
+    transfer_start_position = contact_position.copy()
+    transfer_end_position = contact_position.copy()
+    transfer_start_arm = contact_target.copy()
+    transfer_out_target = contact_target.copy()
+    transfer_end_target = contact_target.copy()
+    release_start_position = contact_position.copy()
+    release_start_arm = contact_target.copy()
+    release_retract_target = miss_target.copy()
+    approach_phase = _named_phase(spec, "approach")
+    if approach_phase is None:
+        raise ValueError("episode schedule must contain an approach phase")
+    attention_stride = (
+        control_stride
+        if _duration(spec) <= 30.0
+        else max(control_stride, physics_hz // 10)
+    )
+
+    def root_target_at(time_s: float) -> np.ndarray:
+        active = phase_at(spec, time_s)
+        if active["phase"] == "approach":
+            alpha = _smooth(
+                (time_s - active["start_s"])
+                / (active["end_s"] - active["start_s"])
+            )
+            forward = 0.11 * alpha
+        else:
+            forward = 0.11 if time_s >= approach_phase["end_s"] else 0.0
+        target = np.asarray([forward, 0.0, 0.0])
+        if active["phase"] == "reorient":
+            alpha = _smooth(
+                (time_s - active["start_s"])
+                / (active["end_s"] - active["start_s"])
+            )
+            target[2] = np.deg2rad(-8.0) * np.sin(np.pi * alpha)
+        return target
 
     def record() -> None:
         nonlocal head_turn_contact_samples, head_turn_samples
-        phase = phase_at(spec, float(data.time))["phase"]
+        phase_definition = phase_at(spec, float(data.time))
+        phase = phase_definition["phase"]
         head_rotation = data.xmat[kernel.head_body_id].reshape(3, 3)
         expected_position = data.xpos[kernel.head_body_id] + head_rotation @ kernel.camera_mount_position
         expected_rotation = head_rotation @ local_camera_rotation
@@ -994,6 +1231,9 @@ def run_physics_trace(
         translation_error = float(np.linalg.norm(data.cam_xpos[kernel.camera_id] - expected_position))
         rotation_error = _rotation_angle(expected_rotation, camera_rotation)
         wrench, contacts, finger_bodies, contact_distance = _target_contacts(kernel)
+        support_contacts, support_force = _contacts_between(
+            kernel, kernel.target_geom_ids, kernel.support_geom_ids
+        )
         relevant_distance, body_environment_distance, _, _ = (
             _relevant_contact_distances(kernel)
         )
@@ -1011,6 +1251,7 @@ def run_physics_trace(
             head_turn_contact_samples += int(contacts > 0 or assist_active)
         trace["time_s"].append(float(data.time))
         trace["phase"].append(phase)
+        trace["behavior_action"].append(_phase_action(phase_definition))
         trace["qpos"].append(data.qpos.copy())
         trace["qvel"].append(data.qvel.copy())
         trace["action"].append(last_action.copy())
@@ -1044,6 +1285,8 @@ def run_physics_trace(
         )
         trace["touch_contact_position"].append(contact_position)
         trace["touch_minimum_distance_m"].append(contact_distance)
+        trace["support_contact_count"].append(support_contacts)
+        trace["support_contact_force_n"].append(support_force)
         trace["minimum_relevant_contact_distance_m"].append(relevant_distance)
         trace["minimum_body_environment_contact_distance_m"].append(
             body_environment_distance
@@ -1060,50 +1303,351 @@ def run_physics_trace(
         )
         trace["camera_mount_translation_error_m"].append(translation_error)
         trace["camera_mount_rotation_error_rad"].append(rotation_error)
+        trace["world_reset"].append(False)
 
     record()
     started = time.perf_counter()
     for step in range(total_steps):
         episode_time = step / physics_hz
         phase = phase_at(spec, episode_time)
-        hand_position, closure = _desired_hand(
-            phase, episode_time, initial_hand, target_center
-        )
         phase_alpha = _smooth((episode_time - phase["start_s"]) / (phase["end_s"] - phase["start_s"]))
-        root_target = np.asarray([0.11 * phase_alpha if phase["phase"] == "approach" else (0.11 if episode_time >= 5.0 else 0.0), 0.0, 0.0])
-        if phase["phase"] == "reorient":
-            root_target[2] = np.deg2rad(-8.0) * np.sin(np.pi * phase_alpha)
+        root_target = root_target_at(episode_time)
         next_time = min(_duration(spec), episode_time + 1.0 / physics_hz)
-        next_phase = phase_at(spec, next_time)
-        next_phase_alpha = _smooth(
-            (next_time - next_phase["start_s"])
-            / (next_phase["end_s"] - next_phase["start_s"])
-        )
-        next_root_target = np.asarray(
-            [
-                0.11 * next_phase_alpha
-                if next_phase["phase"] == "approach"
-                else (0.11 if next_time >= 5.0 else 0.0),
-                0.0,
-                0.0,
-            ]
-        )
-        if next_phase["phase"] == "reorient":
-            next_root_target[2] = np.deg2rad(-8.0) * np.sin(
-                np.pi * next_phase_alpha
-            )
+        next_root_target = root_target_at(next_time)
         data.qpos[list(kernel.root_qpos_ids)] = root_target
         data.qvel[list(kernel.root_dof_ids)] = (
             next_root_target - root_target
         ) * physics_hz
         mujoco.mj_forward(model, data)
+        phase_name = phase["phase"]
+        phase_key = (phase_name, float(phase["start_s"]))
+        if phase_key != previous_phase_key:
+            action_rotation = desired_hand_rotation
+            if phase_name in {"grasp", "retrieve_grasp"}:
+                assist_qualified_time = 0.0
+                assist_contact_qualified = False
+                contact_window_finger_bodies = set()
+                current_grasp_physical_lift = 0.0
+                current_grasp_start_height = float(
+                    data.xpos[kernel.target_body_id, 2]
+                )
+            if phase_name == "shake":
+                shake_anchor_position = data.xpos[
+                    kernel.right_hand_body_id
+                ].copy()
+                shake_anchor_object_position = data.xpos[
+                    kernel.target_body_id
+                ].copy()
+                shake_anchor_arm = data.qpos[
+                    list(kernel.arm_qpos_ids)
+                ].copy()
+                shake_rotation = data.xmat[
+                    kernel.right_hand_body_id
+                ].reshape(3, 3).copy()
+                shake_amplitude = float(
+                    spec.get("controller", {}).get(
+                        "shake_vertical_amplitude_m", 0.018
+                    )
+                )
+                shake_seed = data.qpos.copy()
+                shake_high_target = solve_arm_ik(
+                    kernel,
+                    shake_seed,
+                    shake_anchor_position
+                    + np.asarray([0.0, 0.0, shake_amplitude]),
+                    shake_rotation,
+                    iterations=140,
+                )
+                shake_seed[list(kernel.arm_qpos_ids)] = shake_high_target
+                shake_low_target = solve_arm_ik(
+                    kernel,
+                    shake_seed,
+                    shake_anchor_position
+                    - np.asarray([0.0, 0.0, shake_amplitude]),
+                    shake_rotation,
+                    iterations=140,
+                )
+            if phase_name == "bang":
+                bang_start_position = data.xpos[
+                    kernel.right_hand_body_id
+                ].copy()
+                bang_start_object_position = data.xpos[
+                    kernel.target_body_id
+                ].copy()
+                bang_start_arm = data.qpos[list(kernel.arm_qpos_ids)].copy()
+                held_offset = (
+                    data.xpos[kernel.target_body_id]
+                    - data.xpos[kernel.right_hand_body_id]
+                )
+                bang_low_position = initial_target - held_offset
+                bang_high_position = bang_low_position + np.asarray(
+                    [
+                        0.0,
+                        0.0,
+                        float(
+                            spec.get("controller", {}).get(
+                                "bang_clearance_amplitude_m", 0.025
+                            )
+                        ),
+                    ]
+                )
+                bang_seed = data.qpos.copy()
+                bang_high_target = solve_arm_ik(
+                    kernel,
+                    bang_seed,
+                    bang_high_position,
+                    action_rotation,
+                    iterations=180,
+                )
+                bang_seed[list(kernel.arm_qpos_ids)] = bang_high_target
+                bang_low_target = solve_arm_ik(
+                    kernel,
+                    bang_seed,
+                    bang_low_position,
+                    action_rotation,
+                    iterations=180,
+                )
+            if phase_name == "transfer":
+                transfer_start_position = data.xpos[
+                    kernel.right_hand_body_id
+                ].copy()
+                transfer_start_arm = data.qpos[
+                    list(kernel.arm_qpos_ids)
+                ].copy()
+                held_offset = (
+                    data.xpos[kernel.target_body_id]
+                    - data.xpos[kernel.right_hand_body_id]
+                )
+                transfer_end_position = initial_target - held_offset
+                transfer_end_position[2] += float(
+                    spec.get("controller", {}).get(
+                        "bang_clearance_amplitude_m", 0.025
+                    )
+                )
+                transfer_out_position = transfer_end_position + np.asarray(
+                    [
+                        0.0,
+                        float(
+                            spec.get("controller", {}).get(
+                                "transfer_lateral_distance_m", 0.055
+                            )
+                        ),
+                        0.0,
+                    ]
+                )
+                transfer_seed = data.qpos.copy()
+                transfer_out_target = solve_arm_ik(
+                    kernel,
+                    transfer_seed,
+                    transfer_out_position,
+                    action_rotation,
+                    iterations=180,
+                )
+                transfer_seed[list(kernel.arm_qpos_ids)] = transfer_out_target
+                transfer_end_target = solve_arm_ik(
+                    kernel,
+                    transfer_seed,
+                    transfer_end_position,
+                    action_rotation,
+                    iterations=180,
+                )
+            if phase_name == "release":
+                release_start_position = data.xpos[
+                    kernel.right_hand_body_id
+                ].copy()
+                release_start_arm = data.qpos[
+                    list(kernel.arm_qpos_ids)
+                ].copy()
+                release_seed = data.qpos.copy()
+                release_retract_target = solve_arm_ik(
+                    kernel,
+                    release_seed,
+                    release_start_position + np.asarray([0.0, -0.10, 0.04]),
+                    action_rotation,
+                    iterations=180,
+                )
+            if phase_name == "retrieve":
+                retrieve_start_arm = data.qpos[
+                    list(kernel.arm_qpos_ids)
+                ].copy()
+                retrieve_start_hand_position = data.xpos[
+                    kernel.right_hand_body_id
+                ].copy()
+                retrieve_contact_position = data.xpos[
+                    kernel.target_body_id
+                ].copy() + np.asarray([-0.065, 0.040, 0.050])
+                retrieve_seed = data.qpos.copy()
+                retrieve_contact_target = solve_arm_ik(
+                    kernel,
+                    retrieve_seed,
+                    retrieve_contact_position,
+                    desired_hand_rotation,
+                    iterations=180,
+                )
+            if phase_name == "retrieve_lift":
+                retrieve_lift_start_height = float(
+                    data.xpos[kernel.target_body_id, 2]
+                )
+                retrieve_seed = data.qpos.copy()
+                start_position = data.xpos[kernel.right_hand_body_id].copy()
+                retrieve_lift_waypoints_rows = []
+                for lift_alpha in np.linspace(0.0, 1.0, 31):
+                    position = start_position + np.asarray(
+                        [0.0, 0.0, 0.14 * lift_alpha]
+                    )
+                    arm = solve_arm_ik(
+                        kernel,
+                        retrieve_seed,
+                        position,
+                        desired_hand_rotation,
+                        iterations=60,
+                    )
+                    retrieve_seed[list(kernel.arm_qpos_ids)] = arm
+                    retrieve_lift_waypoints_rows.append(arm)
+                retrieve_lift_waypoints = np.asarray(
+                    retrieve_lift_waypoints_rows
+                )
+                retrieve_inspect_target = retrieve_lift_waypoints[-1].copy()
+                retrieve_inspect_target[wrist_index] = np.clip(
+                    retrieve_inspect_target[wrist_index] + np.deg2rad(20.0),
+                    model.jnt_range[wrist_joint, 0],
+                    model.jnt_range[wrist_joint, 1],
+                )
+            previous_phase_key = phase_key
+
+        hand_position, closure = _desired_hand(
+            phase, episode_time, initial_hand, target_center, spec
+        )
+        if phase_name == "shake":
+            frequency = float(
+                spec.get("controller", {}).get("shake_frequency_hz", 1.5)
+            )
+            amplitude = float(
+                spec.get("controller", {}).get(
+                    "shake_vertical_amplitude_m", 0.018
+                )
+            )
+            desired_object_position = shake_anchor_object_position + np.asarray(
+                [
+                    0.0,
+                    0.0,
+                    amplitude
+                    * np.sin(
+                        2.0
+                        * np.pi
+                        * frequency
+                        * (episode_time - phase["start_s"])
+                    ),
+                ]
+            )
+            hand_position = data.xpos[kernel.right_hand_body_id] + (
+                desired_object_position - data.xpos[kernel.target_body_id]
+            )
+            closure = 0.20
+        elif phase_name == "bang":
+            amplitude = float(
+                spec.get("controller", {}).get(
+                    "bang_clearance_amplitude_m", 0.025
+                )
+            )
+            cycles = int(spec.get("controller", {}).get("bang_cycles", 2))
+            if phase_alpha < 0.25:
+                descend = _smooth(phase_alpha / 0.25)
+                desired_object_position = (
+                    bang_start_object_position * (1.0 - descend)
+                    + (initial_target + np.asarray([0.0, 0.0, amplitude]))
+                    * descend
+                )
+            else:
+                progress = (phase_alpha - 0.25) / 0.75
+                clearance = amplitude * (
+                    0.5
+                    + 0.5 * np.cos(2.0 * np.pi * cycles * progress)
+                )
+                desired_object_position = initial_target + np.asarray(
+                    [0.0, 0.0, clearance]
+                )
+            hand_position = data.xpos[kernel.right_hand_body_id] + (
+                desired_object_position - data.xpos[kernel.target_body_id]
+            )
+            closure = 0.20
+        elif phase_name == "transfer":
+            distance = float(
+                spec.get("controller", {}).get(
+                    "transfer_lateral_distance_m", 0.055
+                )
+            )
+            desired_object_position = initial_target + np.asarray(
+                [
+                    0.0,
+                    distance * np.sin(np.pi * phase_alpha),
+                    float(
+                        spec.get("controller", {}).get(
+                            "bang_clearance_amplitude_m", 0.025
+                        )
+                    ),
+                ]
+            )
+            hand_position = data.xpos[kernel.right_hand_body_id] + (
+                desired_object_position - data.xpos[kernel.target_body_id]
+            )
+            closure = 0.20
+        elif phase_name == "release" and _duration(spec) > 30.0:
+            retract = _smooth(max(0.0, (phase_alpha - 0.55) / 0.45))
+            if phase_alpha < 0.30:
+                desired_object_position = initial_target + np.asarray(
+                    [
+                        0.0,
+                        0.0,
+                        float(
+                            spec.get("controller", {}).get(
+                                "bang_clearance_amplitude_m", 0.025
+                            )
+                        ),
+                    ]
+                )
+                hand_position = data.xpos[kernel.right_hand_body_id] + (
+                    desired_object_position - data.xpos[kernel.target_body_id]
+                )
+            else:
+                hand_position = release_start_position + np.asarray(
+                    [0.0, -0.10 * retract, 0.04 * retract]
+                )
+            closure = 0.20 * max(0.0, 1.0 - phase_alpha / 0.45)
+        elif phase_name == "retrieve":
+            hand_position = (
+                retrieve_start_hand_position * (1.0 - phase_alpha)
+                + retrieve_contact_position * phase_alpha
+            )
+            closure = 0.15 * phase_alpha
+        elif phase_name == "retrieve_grasp":
+            hand_position = retrieve_contact_position
+            if phase_alpha < 0.32:
+                closure = 0.15 + 0.50 * phase_alpha / 0.32
+            elif phase_alpha < 0.45:
+                closure = 0.65 - 0.40 * (phase_alpha - 0.32) / 0.13
+            elif phase_alpha < 0.75:
+                closure = 0.25 + 0.40 * (phase_alpha - 0.45) / 0.30
+            else:
+                closure = 0.65
+        elif phase_name == "retrieve_lift":
+            hand_position = (
+                retrieve_contact_position
+                + np.asarray([0.0, 0.0, 0.14 * phase_alpha])
+            )
+            closure = 0.20
+        elif phase_name in {"retrieve_inspect", "final_dwell"}:
+            hand_position = retrieve_contact_position + np.asarray(
+                [0.0, 0.0, 0.14]
+            )
+            closure = 0.20
         head_values = base_head_target.copy()
         if phase["phase"] == "look":
             head_values[0] += np.deg2rad(-8.0) * np.sin(np.pi * phase_alpha)
         elif phase["phase"] == "reorient":
             head_values[0] += np.deg2rad(10.0) * np.sin(np.pi * phase_alpha)
         elif phase["phase"] == "reach_past_distractor":
-            if step % control_stride == 0:
+            if step % attention_stride == 0:
                 attention_head_target = solve_head_attention(
                     kernel,
                     data.qpos.copy(),
@@ -1129,8 +1673,35 @@ def run_physics_trace(
             head_values[0] += np.deg2rad(22.0) * turn
             head_values[1] += np.deg2rad(5.0) * turn
             head_values[2] -= np.deg2rad(5.0) * turn
+        elif phase["phase"] in {
+            "shake",
+            "bang",
+            "transfer",
+            "retrieve_reorient",
+            "retrieve",
+            "retrieve_grasp",
+            "retrieve_lift",
+            "retrieve_inspect",
+            "final_dwell",
+        }:
+            if step % attention_stride == 0:
+                attention_head_target = solve_head_attention(
+                    kernel,
+                    data.qpos.copy(),
+                    data.xpos[kernel.target_body_id].copy(),
+                )
+            attention_alpha = (
+                _smooth(min(1.0, phase_alpha / 0.65))
+                if phase["phase"]
+                in {"retrieve_reorient", "retrieve", "retrieve_lift"}
+                else 1.0
+            )
+            head_values = (
+                base_head_target * (1.0 - attention_alpha)
+                + attention_head_target * attention_alpha
+            )
         elif phase["phase"] in {"release", "settle"}:
-            if step % control_stride == 0:
+            if step % attention_stride == 0:
                 attention_head_target = solve_head_attention(
                     kernel,
                     data.qpos.copy(),
@@ -1154,7 +1725,6 @@ def run_physics_trace(
                 )
             )
 
-        phase_name = phase["phase"]
         if phase_name in {"look", "reorient", "approach"}:
             ik_target = initial_arm_target
         elif phase_name == "reach_past_distractor":
@@ -1166,15 +1736,105 @@ def run_physics_trace(
             ik_target = contact_target
         elif phase_name == "lift":
             ik_target = _interpolate_waypoints(lift_waypoints, phase_alpha)
+        elif phase_name == "inspect":
+            ik_target = lift_target
+        elif phase_name == "rotate":
+            ik_target = _interpolate_waypoints(inspect_waypoints, phase_alpha)
         elif phase_name == "inspect_rotate":
             ik_target = _interpolate_waypoints(inspect_waypoints, phase_alpha)
         elif phase_name == "head_turn_maintain_contact":
             ik_target = inspect_target
-        elif phase_name == "release":
-            retract_alpha = _smooth(max(0.0, (phase_alpha - 0.55) / 0.45))
+        elif phase_name == "shake":
+            shake_fraction = 0.5 + 0.5 * np.sin(
+                2.0
+                * np.pi
+                * float(
+                    spec.get("controller", {}).get(
+                        "shake_frequency_hz", 1.5
+                    )
+                )
+                * (episode_time - phase["start_s"])
+            )
             ik_target = (
-                inspect_target * (1.0 - retract_alpha)
-                + miss_target * retract_alpha
+                shake_low_target * (1.0 - shake_fraction)
+                + shake_high_target * shake_fraction
+            )
+        elif phase_name == "bang":
+            if phase_alpha < 0.25:
+                descend = _smooth(phase_alpha / 0.25)
+                ik_target = (
+                    bang_start_arm * (1.0 - descend)
+                    + bang_high_target * descend
+                )
+            else:
+                progress = (phase_alpha - 0.25) / 0.75
+                high_fraction = 0.5 + 0.5 * np.cos(
+                    2.0
+                    * np.pi
+                    * int(spec.get("controller", {}).get("bang_cycles", 2))
+                    * progress
+                )
+                ik_target = (
+                    bang_low_target * (1.0 - high_fraction)
+                    + bang_high_target * high_fraction
+                )
+        elif phase_name == "transfer":
+            if phase_alpha < 0.5:
+                fraction = _smooth(phase_alpha / 0.5)
+                ik_target = (
+                    transfer_start_arm * (1.0 - fraction)
+                    + transfer_out_target * fraction
+                )
+            else:
+                fraction = _smooth((phase_alpha - 0.5) / 0.5)
+                ik_target = (
+                    transfer_out_target * (1.0 - fraction)
+                    + transfer_end_target * fraction
+                )
+        elif phase_name == "release":
+            retract_alpha = _smooth(
+                max(
+                    0.0,
+                    min(
+                        1.0,
+                        (
+                            (phase_alpha - 0.55) / 0.45
+                            if _duration(spec) > 30.0
+                            else (phase_alpha - 0.55) / 0.45
+                        ),
+                    ),
+                )
+            )
+            if _duration(spec) > 30.0:
+                ik_target = (
+                    release_start_arm * (1.0 - retract_alpha)
+                    + release_retract_target * retract_alpha
+                )
+            else:
+                ik_target = (
+                    inspect_target * (1.0 - retract_alpha)
+                    + miss_target * retract_alpha
+                )
+        elif phase_name in {"settle", "retrieve_reorient"} and _duration(
+            spec
+        ) > 30.0:
+            ik_target = release_retract_target
+        elif phase_name == "retrieve":
+            ik_target = (
+                retrieve_start_arm * (1.0 - phase_alpha)
+                + retrieve_contact_target * phase_alpha
+            )
+        elif phase_name == "retrieve_grasp":
+            ik_target = retrieve_contact_target
+        elif phase_name == "retrieve_lift":
+            ik_target = _interpolate_waypoints(
+                retrieve_lift_waypoints, phase_alpha
+            )
+        elif phase_name in {"retrieve_inspect", "final_dwell"}:
+            inspect_alpha = phase_alpha if phase_name == "retrieve_inspect" else 1.0
+            ik_target = (
+                retrieve_lift_waypoints[-1] * (1.0 - inspect_alpha)
+                + retrieve_inspect_target * inspect_alpha
             )
         else:
             ik_target = miss_target
@@ -1194,7 +1854,10 @@ def run_physics_trace(
                 phase_name
                 in {
                     "fingertip_contact", "grasp", "lift", "inspect_rotate",
-                    "head_turn_maintain_contact", "release",
+                    "inspect", "rotate", "head_turn_maintain_contact",
+                    "shake", "bang", "transfer", "release", "retrieve",
+                    "retrieve_grasp", "retrieve_lift", "retrieve_inspect",
+                    "final_dwell",
                 }
                 and hand_target_center_distance < 0.11
                 and not assist_active
@@ -1202,19 +1865,51 @@ def run_physics_trace(
             grasped_arm=assist_active,
         )
         desired_task_rotation = desired_hand_rotation
-        if phase_name in {"inspect_rotate", "head_turn_maintain_contact", "release", "settle"}:
-            rotation_alpha = phase_alpha if phase_name == "inspect_rotate" else 1.0
+        if phase_name in {
+            "rotate",
+            "inspect_rotate",
+            "head_turn_maintain_contact",
+            "shake",
+            "bang",
+            "transfer",
+            "release",
+            "settle",
+        }:
+            rotation_alpha = (
+                phase_alpha if phase_name in {"rotate", "inspect_rotate"} else 1.0
+            )
             desired_task_rotation = desired_hand_rotation @ _axis_angle_rotation(
                 np.asarray([1.0, 0.0, 0.0]),
                 np.deg2rad(35.0) * rotation_alpha,
             )
-        if assist_active or phase_name in {"fingertip_contact", "grasp"}:
+        if assist_active or phase_name in {
+            "fingertip_contact",
+            "grasp",
+            "retrieve",
+            "retrieve_grasp",
+        }:
             _apply_hand_task_control(
                 kernel,
                 hand_position,
                 desired_task_rotation,
                 gentle=False,
                 grasped=assist_active,
+                tracking_gain_scale=(
+                    1.5
+                    if _duration(spec) > 30.0
+                    and phase_name
+                    in {
+                        "shake",
+                        "transfer",
+                        "release",
+                        "retrieve",
+                        "retrieve_grasp",
+                        "retrieve_lift",
+                        "retrieve_inspect",
+                        "final_dwell",
+                    }
+                    else 1.0
+                ),
             )
             applied = data.qfrc_applied.copy()
 
@@ -1238,7 +1933,7 @@ def run_physics_trace(
         maximum_force = max(maximum_force, float(np.linalg.norm(wrench[:3])))
         if contacts and first_contact_time is None:
             first_contact_time = episode_time
-        if phase["phase"] == "grasp":
+        if phase_name in {"grasp", "retrieve_grasp"}:
             if contacts > 0:
                 assist_qualified_time += 1.0 / physics_hz
                 contact_window_finger_bodies.update(finger_bodies)
@@ -1249,30 +1944,41 @@ def run_physics_trace(
                     assist_contact_qualified = (
                         assist_contact_qualified or assist_qualified_time >= 0.10
                     )
-        two_attempts_complete = episode_time >= 9.15
-        if assist_engagement_time is None:
+        two_attempts_complete = episode_time >= float(phase["start_s"]) + 1.15
+        if not assist_active and phase_name in {"grasp", "retrieve_grasp"}:
+            current_grasp_physical_lift = max(
+                current_grasp_physical_lift,
+                float(
+                    data.xpos[kernel.target_body_id, 2]
+                    - current_grasp_start_height
+                ),
+            )
             physical_lift_before_assist = max(
-                physical_lift_before_assist,
-                float(data.xpos[kernel.target_body_id, 2] - initial_target[2]),
+                physical_lift_before_assist, current_grasp_physical_lift
             )
         if (
-            phase["phase"] == "grasp"
+            phase_name in {"grasp", "retrieve_grasp"}
             and two_attempts_complete
             and not assist_active
             and assist_contact_qualified
-            and physical_lift_before_assist < 0.02
+            and current_grasp_physical_lift < 0.02
         ):
             hand_rotation = data.xmat[kernel.right_hand_body_id].reshape(3, 3)
             assist_relative_position = hand_rotation.T @ (data.xpos[kernel.target_body_id] - data.xpos[kernel.right_hand_body_id])
             assist_relative_rotation = hand_rotation.T @ data.xmat[kernel.target_body_id].reshape(3, 3)
             assist_active = True
-            assist_engagement_time = episode_time
+            if assist_engagement_time is None:
+                assist_engagement_time = episode_time
+            assist_engagement_times.append(episode_time)
             assist_before_position = data.xpos[kernel.target_body_id].copy()
             assist_before_rotation = data.xmat[kernel.target_body_id].reshape(3, 3).copy()
-        if phase["phase"] == "settle" or (
-            phase["phase"] == "release" and phase_alpha >= 0.25
+        was_assist_active = assist_active
+        if phase_name == "settle" or (
+            phase_name == "release" and phase_alpha >= 0.25
         ):
             assist_active = False
+        if was_assist_active and not assist_active:
+            assist_release_times.append(episode_time)
         if assist_active:
             hand_rotation = data.xmat[kernel.right_hand_body_id].reshape(3, 3)
             desired_object = data.xpos[kernel.right_hand_body_id] + hand_rotation @ assist_relative_position
@@ -1402,6 +2108,34 @@ def run_physics_trace(
         if np.any(locomotion_mask)
         else 0.0
     )
+    shake_mask = arrays["phase"] == "shake"
+    bang_mask = arrays["phase"] == "bang"
+    transfer_mask = arrays["phase"] == "transfer"
+    retrieve_mask = np.isin(
+        arrays["phase"],
+        ("retrieve", "retrieve_grasp", "retrieve_lift", "retrieve_inspect"),
+    )
+    retrieve_lift_mask = arrays["phase"] == "retrieve_lift"
+    target_steps = np.linalg.norm(np.diff(target_xyz, axis=0), axis=1)
+
+    assist_intervals = []
+    interval_start: float | None = None
+    for index, active in enumerate(arrays["assist_active"].astype(bool)):
+        if active and interval_start is None:
+            interval_start = float(arrays["time_s"][index])
+        if interval_start is not None and (
+            not active or index == len(arrays["assist_active"]) - 1
+        ):
+            end_index = index if not active else index
+            assist_intervals.append(
+                {
+                    "start_s": interval_start,
+                    "end_s": float(arrays["time_s"][end_index]),
+                }
+            )
+            interval_start = None
+
+    unique_actions = sorted(set(arrays["behavior_action"].tolist()))
     receipt = {
         "schema": "EmbodiedPhysicsQA",
         "duration_s": _duration(spec),
@@ -1448,6 +2182,9 @@ def run_physics_trace(
             "physical_lift_before_assist_m": physical_lift_before_assist,
             "assist_engaged": assist_engagement_time is not None,
             "assist_engagement_time_s": assist_engagement_time,
+            "assist_engagement_times_s": assist_engagement_times,
+            "assist_release_times_s": assist_release_times,
+            "assist_intervals": assist_intervals,
             "assist_contact_gate_s": 0.10,
             "multipoint_contact_evidence_duration_s": maximum_multipoint_contact_duration,
             "multipoint_contact_duration_rule": "cumulative contacting substeps during the frozen grasp phase with at least two distinct finger bodies observed",
@@ -1460,7 +2197,9 @@ def run_physics_trace(
             "maximum_object_rotation_degrees": float(np.rad2deg(target_rotation_angle)),
             "maximum_head_turn_degrees": float(np.rad2deg(head_turn_angle)),
             "head_turn_contact_retention_fraction": head_turn_contact_samples / max(1, head_turn_samples),
-            "released": not bool(arrays["assist_active"][-1]),
+            "released": bool(assist_release_times) or not bool(
+                arrays["assist_active"][-1]
+            ),
             "settle_peak_speed_m_s": float(settle_speeds.max()) if len(settle_speeds) else None,
             "final_settled_window_maximum_speed_m_s": (
                 float(settle_speeds[-final_settled_samples:].max())
@@ -1498,6 +2237,44 @@ def run_physics_trace(
             "maximum_timestamp_error_s": float(np.max(np.abs(arrays["time_s"] - np.arange(len(arrays["time_s"])) / truth_hz))),
         },
         "object_identity": {"persistent_id": "yellow_cup_authored", "changes": 0},
+        "continuous_episode": {
+            "single_physics_trace": True,
+            "hidden_world_reset_count": int(arrays["world_reset"].sum()),
+            "maximum_target_truth_step_m": (
+                float(target_steps.max()) if len(target_steps) else 0.0
+            ),
+            "bounded_actions_observed": unique_actions,
+            "shake_vertical_range_m": (
+                float(np.ptp(target_xyz[shake_mask, 2]))
+                if np.any(shake_mask)
+                else 0.0
+            ),
+            "bang_support_contact_samples": int(
+                np.sum(arrays["support_contact_count"][bang_mask] > 0)
+            ),
+            "bang_maximum_support_force_n": (
+                float(arrays["support_contact_force_n"][bang_mask].max())
+                if np.any(bang_mask)
+                else 0.0
+            ),
+            "transfer_lateral_range_m": (
+                float(np.ptp(target_xyz[transfer_mask, 1]))
+                if np.any(transfer_mask)
+                else 0.0
+            ),
+            "retrieve_contact_samples": int(
+                np.sum(arrays["touch_contact_count"][retrieve_mask] > 0)
+            ),
+            "retrieve_lift_m": (
+                float(
+                    target_xyz[retrieve_lift_mask, 2].max()
+                    - retrieve_lift_start_height
+                )
+                if np.any(retrieve_lift_mask)
+                else 0.0
+            ),
+            "assist_interval_count": len(assist_intervals),
+        },
         "direct_target_transform_after_initialization": False,
         "independent_camera_control": False,
         "hand_mocap_or_weld": False,
