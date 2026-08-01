@@ -51,6 +51,7 @@ def test_juno_run_uses_bundled_cosmos_tokenizer_but_keeps_samples_silent():
     assert '"sound_generation_enabled_in_samples": False' in run_script
     assert "--experiment-overrides" not in run_script
     assert 'cosmos_site_packages}/nvidia' in run_script
+    assert 'cosmos_site_packages}/av.libs' in run_script
 
 
 def test_depth_edge_and_protected_mask_encodings_are_bounded():

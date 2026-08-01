@@ -150,7 +150,7 @@
       "Transformer Engine expects CUDA runtime compatibility aliases absent from the cu128 wheel layout",
       "Cosmos constructs its sound tokenizer even when every sample requests silent video; use the checkpoint-bundled public tokenizer while retaining the frozen no-audio output gate",
       "OSCAR's public text processor registry is pinned separately from the local Reason1 text-encoder weights",
-      "TorchCodec requires the CUDA NPP wheel directories on its runtime library path"
+      "TorchCodec requires the CUDA NPP wheel directories and PyAV's pinned FFmpeg shared libraries on its runtime library path"
     ]
   }
 }

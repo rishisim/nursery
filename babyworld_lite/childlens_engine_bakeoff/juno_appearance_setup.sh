@@ -78,6 +78,29 @@ env LD_LIBRARY_PATH= "${uv_bin}" pip install \
     'iopath==0.1.10' \
     'multi-storage-client==0.44.0' \
     'qwen-vl-utils==0.0.14'
+cosmos_site_packages="$(${cosmos_env}/bin/python - <<'PY'
+import site
+
+print(site.getsitepackages()[0])
+PY
+)"
+"${cosmos_env}/bin/python" - "${cosmos_site_packages}/av.libs" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+library_dir = Path(sys.argv[1])
+for library in sorted(library_dir.glob("*.so.*")):
+    match = re.fullmatch(
+        r"(?P<stem>lib(?:av|sw)[^-]+)-[^.]+\.so\.(?P<major>\d+).*",
+        library.name,
+    )
+    if match is None:
+        continue
+    alias = library_dir / f"{match.group('stem')}.so.{match.group('major')}"
+    alias.unlink(missing_ok=True)
+    alias.symlink_to(library.name)
+PY
 
 oscar_env="${work_root}/envs/oscar"
 if [[ ! -x "${oscar_env}/bin/python" ]]; then

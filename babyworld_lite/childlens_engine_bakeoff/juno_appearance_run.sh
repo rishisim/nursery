@@ -78,9 +78,10 @@ cosmos_cuda_libraries="$(
         | sort \
         | paste -sd: -
 )"
+cosmos_av_libraries="${cosmos_site_packages}/av.libs"
 (
     cd "${work_root}/source/cosmos-framework"
-    env LD_LIBRARY_PATH="${cosmos_cuda_libraries}:${cosmos_site_packages}/torch/lib" \
+    env LD_LIBRARY_PATH="${cosmos_av_libraries}:${cosmos_cuda_libraries}:${cosmos_site_packages}/torch/lib" \
         "${work_root}/envs/cosmos/bin/python" \
         -m cosmos_framework.scripts.inference \
         --parallelism-preset=latency \
