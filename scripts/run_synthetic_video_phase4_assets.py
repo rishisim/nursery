@@ -1,0 +1,306 @@
+#!/usr/bin/env python3
+"""Governed Phase 4 allocation, selective acquisition, sealing, and verification.
+
+Restricted paths, identifiers, text, and row-level manifests are written only
+below the caller-provided private root. Stdout contains compact aggregates.
+"""
+
+from __future__ import annotations
+
+import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import secrets
+import shutil
+import stat
+import subprocess
+import urllib.error
+import urllib.parse
+import urllib.request
+
+
+ROOT = Path(__file__).resolve().parents[1]
+CONFIG = ROOT / "configs/synthetic_video_phase4_assets.json"
+TOKEN_SERVICE = "ChildLens-v1.2-Keeper-Repo-Token"
+TOKEN_ACCOUNT = "childlens-v1.2-read-only"
+TOKEN_PATTERN = re.compile(r"^[A-Za-z0-9._~+/=-]{16,1024}$")
+
+
+class Phase4Error(RuntimeError):
+    pass
+
+
+def canonical(value: object) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+
+
+def digest(value: object) -> str:
+    return hashlib.sha256(canonical(value)).hexdigest()
+
+
+def file_digest(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(4 * 1024 * 1024), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def private_dir(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True, mode=0o700)
+    os.chmod(path, 0o700)
+    if stat.S_IMODE(path.stat().st_mode) & 0o077:
+        raise Phase4Error("E_PRIVATE_MODE")
+
+
+def write_private(path: Path, value: object) -> None:
+    private_dir(path.parent)
+    payload = canonical(value) + b"\n"
+    pending = path.parent / f".pending-{secrets.token_hex(8)}"
+    pending.write_bytes(payload)
+    os.chmod(pending, 0o600)
+    os.replace(pending, path)
+
+
+def locate_catalog(mount: Path, expected_hash: str) -> Path:
+    matches = [p for p in mount.rglob("*.json") if p.is_file() and file_digest(p) == expected_hash]
+    if not matches:
+        raise Phase4Error("E_CATALOG")
+    return matches[0]
+
+
+def calibration_children(mount: Path) -> set[str]:
+    children: set[str] = set()
+    for name in ("restricted_development_manifest.json", "restricted_measurement_manifest.json"):
+        for path in mount.rglob(name):
+            try:
+                value = json.loads(path.read_text())
+            except (OSError, json.JSONDecodeError):
+                continue
+            for row in value.get("items", []) if isinstance(value, dict) else []:
+                child = row.get("participant_key") if isinstance(row, dict) else None
+                if isinstance(child, str):
+                    children.add(child)
+    return children
+
+
+def allocate(mount: Path, private_root: Path) -> dict[str, object]:
+    cfg = json.loads(CONFIG.read_text())
+    catalog_path = locate_catalog(mount, cfg["catalog_sha256"])
+    catalog = json.loads(catalog_path.read_text())
+    all_children = sorted({row["participant_key"] for row in catalog["media"]})
+    calibration = calibration_children(mount)
+    if len(calibration) != 18 or len(all_children) != 58 or not calibration <= set(all_children):
+        raise Phase4Error("E_CHILD_INVENTORY")
+    eligible = sorted(set(all_children) - calibration)
+    if len(eligible) != 40:
+        raise Phase4Error("E_ELIGIBLE_INVENTORY")
+    private_dir(private_root)
+    key_path = private_root / "allocation.key"
+    if not key_path.exists():
+        key_path.write_bytes(secrets.token_bytes(cfg["allocation"]["secret_bytes"]))
+        os.chmod(key_path, 0o600)
+    key = key_path.read_bytes()
+    ranked = sorted(eligible, key=lambda x: hashlib.sha256(key + b"\0" + x.encode()).digest())
+    counts = cfg["allocation"]["counts"]
+    train_end = counts["training"]
+    eval_end = train_end + counts["evaluation"]
+    assignments = {
+        "training": ranked[:train_end],
+        "evaluation": ranked[train_end:eval_end],
+        "validation": ranked[eval_end:],
+    }
+    media = catalog["media"]
+    objects = {row["object_key"]: row for row in catalog["objects"]}
+    eval_set = set(assignments["evaluation"])
+    evaluation_media = []
+    for row in media:
+        if row["participant_key"] not in eval_set:
+            continue
+        obj = objects[row["object_key"]]
+        evaluation_media.append({**row, "source_locator": obj["source_locator"]})
+    ledger = {
+        "schema_version": 1,
+        "catalog_sha256": cfg["catalog_sha256"],
+        "config_sha256": file_digest(CONFIG),
+        "calibration_children": sorted(calibration),
+        "assignments": assignments,
+        "evaluation_media": evaluation_media,
+    }
+    write_private(private_root / "restricted_allocation.json", ledger)
+    return {
+        "status": "PASS",
+        "calibration_children": len(calibration),
+        "eligible_children": len(eligible),
+        "training_children": len(assignments["training"]),
+        "evaluation_children": len(assignments["evaluation"]),
+        "validation_children": len(assignments["validation"]),
+        "evaluation_recordings": len(evaluation_media),
+        "allocation_commitment": digest(ledger),
+    }
+
+
+def read_token() -> str:
+    result = subprocess.run(
+        ["/usr/bin/security", "find-generic-password", "-s", TOKEN_SERVICE, "-a", TOKEN_ACCOUNT, "-w"],
+        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, check=False,
+    )
+    token = result.stdout.rstrip(b"\r\n").decode("utf-8") if result.returncode == 0 else ""
+    if not TOKEN_PATTERN.fullmatch(token):
+        raise Phase4Error("E_TOKEN")
+    return token
+
+
+class Client:
+    def __init__(self, cfg: dict[str, object], token: str):
+        self.api = str(cfg["api_base_url"]).rstrip("/")
+        self.repo = str(cfg["repository_id"])
+        self.allowed = {urllib.parse.urlsplit(str(x)).netloc for x in cfg["allowed_download_origins"]}
+        self.auth = f"Bearer {token}"
+
+    def request(self, url: str):
+        req = urllib.request.Request(url, headers={"Authorization": self.auth, "Accept-Encoding": "identity"})
+        return urllib.request.urlopen(req, timeout=120)
+
+    def api_value(self, endpoint: str, locator: str):
+        path = locator[len("/ChildLens"):] if locator.startswith("/ChildLens/") else locator
+        query = urllib.parse.urlencode({"p": path, "reuse": "1"})
+        url = f"{self.api}/api2/repos/{urllib.parse.quote(self.repo, safe='')}/{endpoint}/?{query}"
+        with self.request(url) as response:
+            return json.loads(response.read(1024 * 1024))
+
+    def metadata(self, locator: str) -> int:
+        value = self.api_value("file/detail", locator)
+        size = value.get("size") if isinstance(value, dict) else None
+        if not isinstance(size, int) or size <= 0:
+            raise Phase4Error("E_REMOTE_SIZE")
+        return size
+
+    def download(self, locator: str, target: Path, expected: int) -> str:
+        link = self.api_value("file", locator)
+        if not isinstance(link, str) or urllib.parse.urlsplit(link).netloc not in self.allowed:
+            raise Phase4Error("E_DOWNLOAD_ORIGIN")
+        h = hashlib.sha256(); size = 0
+        pending = target.parent / f".pending-{secrets.token_hex(8)}"
+        with self.request(link) as response, pending.open("wb") as handle:
+            for block in iter(lambda: response.read(4 * 1024 * 1024), b""):
+                size += len(block); h.update(block); handle.write(block)
+        if size != expected:
+            pending.unlink(missing_ok=True)
+            raise Phase4Error("E_DOWNLOAD_SIZE")
+        os.chmod(pending, 0o600); os.replace(pending, target)
+        return h.hexdigest()
+
+
+def acquire(private_root: Path, transfer_config: Path, workers: int) -> dict[str, object]:
+    ledger = json.loads((private_root / "restricted_allocation.json").read_text())
+    cfg = json.loads(transfer_config.read_text())
+    client = Client(cfg, read_token())
+    media_root = private_root / "evaluation_media"; private_dir(media_root)
+    checkpoint_path = private_root / "restricted_acquisition.json"
+    checkpoint = json.loads(checkpoint_path.read_text()) if checkpoint_path.exists() else {"items": {}}
+    pending_rows = []
+    for index, row in enumerate(ledger["evaluation_media"]):
+        key = digest({"participant_key": row["participant_key"], "media_key": row["media_key"]})
+        if checkpoint["items"].get(key, {}).get("status") == "COMPLETE":
+            continue
+        pending_rows.append((index, row, key))
+
+    def fetch(item):
+        index, row, key = item
+        size = client.metadata(row["source_locator"])
+        target = media_root / f"{index:04d}.bin"
+        sha = client.download(row["source_locator"], target, size)
+        return key, {"status": "COMPLETE", "size_bytes": size, "sha256": sha, "file": target.name}
+
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = [executor.submit(fetch, item) for item in pending_rows]
+        for future in as_completed(futures):
+            key, result = future.result()
+            checkpoint["items"][key] = result
+            write_private(checkpoint_path, checkpoint)
+    completed = sum(x.get("status") == "COMPLETE" for x in checkpoint["items"].values())
+    return {"status": "PASS", "evaluation_recordings": len(ledger["evaluation_media"]), "completed": completed, "bytes": sum(x["size_bytes"] for x in checkpoint["items"].values()), "acquisition_commitment": digest(checkpoint)}
+
+
+def stage(mount: Path, private_root: Path) -> dict[str, object]:
+    plan = checkpoint = None
+    for path in mount.rglob("*.json"):
+        try:
+            value = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        items = value.get("items", []) if isinstance(value, dict) else []
+        if len(items) != 58 or not items:
+            continue
+        keys = set(items[0])
+        if {"participant_key", "source_object_key", "media_key"} <= keys:
+            plan = value
+        if {"source_object_key", "clips", "status"} <= keys:
+            checkpoint = value
+    if plan is None or checkpoint is None:
+        raise Phase4Error("E_CALIBRATION_MANIFEST")
+    participant = {row["source_object_key"]: row for row in plan["items"]}
+    media_by_signature: dict[tuple[int, str], Path] = {}
+    expected = {(clip["bytes"], clip["sha256"]) for row in checkpoint["items"] for clip in row["clips"]}
+    expected_sizes = {x[0] for x in expected}
+    for path in mount.rglob("*"):
+        try:
+            if path.is_file() and not path.is_symlink() and path.stat().st_size in expected_sizes:
+                sha = file_digest(path)
+                if (path.stat().st_size, sha) in expected:
+                    media_by_signature[(path.stat().st_size, sha)] = path
+        except OSError:
+            continue
+    calibration_root = private_root / "stage/calibration"
+    private_dir(calibration_root)
+    calibration = []
+    index = 0
+    for source in checkpoint["items"]:
+        meta = participant[source["source_object_key"]]
+        for clip in source["clips"]:
+            src = media_by_signature.get((clip["bytes"], clip["sha256"]))
+            if src is None:
+                raise Phase4Error("E_CALIBRATION_CLIP")
+            target = calibration_root / f"{index:04d}.bin"
+            if not target.exists():
+                shutil.copyfile(src, target); os.chmod(target, 0o600)
+            calibration.append({"asset_key": digest([source["source_object_key"], clip["ordinal"]]), "child_key": meta["participant_key"], "session_key": meta["media_key"], "file": str(target.relative_to(private_root))})
+            index += 1
+    allocation = json.loads((private_root / "restricted_allocation.json").read_text())
+    acquisition = json.loads((private_root / "restricted_acquisition.json").read_text())
+    evaluation = []
+    for row in allocation["evaluation_media"]:
+        key = digest({"participant_key": row["participant_key"], "media_key": row["media_key"]})
+        item = acquisition["items"].get(key)
+        if not item or item.get("status") != "COMPLETE":
+            raise Phase4Error("E_EVALUATION_ACQUISITION")
+        evaluation.append({"asset_key": key, "child_key": row["participant_key"], "session_key": row["session_key"], "file": f"evaluation_media/{item['file']}"})
+    manifest = {"schema_version": 1, "calibration": calibration, "evaluation": evaluation}
+    write_private(private_root / "restricted_stage_manifest.json", manifest)
+    return {"status": "PASS", "calibration_clips": len(calibration), "evaluation_recordings": len(evaluation), "stage_commitment": digest(manifest)}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    sub = parser.add_subparsers(dest="command", required=True)
+    a = sub.add_parser("allocate"); a.add_argument("--mount", type=Path, required=True); a.add_argument("--private-root", type=Path, required=True)
+    q = sub.add_parser("acquire"); q.add_argument("--private-root", type=Path, required=True); q.add_argument("--transfer-config", type=Path, required=True); q.add_argument("--workers", type=int, choices=range(1, 5), default=4)
+    s = sub.add_parser("stage"); s.add_argument("--mount", type=Path, required=True); s.add_argument("--private-root", type=Path, required=True)
+    args = parser.parse_args()
+    if args.command == "allocate":
+        result = allocate(args.mount.resolve(), args.private_root.resolve())
+    elif args.command == "acquire":
+        result = acquire(args.private_root.resolve(), args.transfer_config.resolve(), args.workers)
+    else:
+        result = stage(args.mount.resolve(), args.private_root.resolve())
+    print(json.dumps(result, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

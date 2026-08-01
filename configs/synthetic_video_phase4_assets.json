@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "status": "FROZEN_BEFORE_STAGE_B_ASSET_CONSTRUCTION",
+  "catalog_sha256": "9bc338b31291b3e7e5c157003e9d55a569f780d7745a28187ac361633b536ce0",
+  "allocation": {
+    "calibration_children": 18,
+    "eligible_children": 40,
+    "counts": {"training": 28, "evaluation": 8, "validation": 4},
+    "method": "sort SHA256(secret_key || NUL || participant_key), then deal training, evaluation, validation",
+    "unit": "whole_child",
+    "secret_bytes": 32
+  },
+  "language_pipeline": {
+    "asr": "openai-whisper==20250625",
+    "asr_checkpoint": "small.pt",
+    "asr_sha256": "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794",
+    "translation": "Helsinki-NLP/opus-mt-de-en",
+    "translation_revision": "1a922f3b32a8e809e17a47d4b32142d8105924e5",
+    "offline_identical_real_synthetic": true,
+    "oracle_synthetic_text_qa_only": true
+  },
+  "lexical": {
+    "source": "calibration_C_only",
+    "styles": ["realistic", "cartoon"],
+    "images_per_concept_per_style": 4,
+    "image_size": 512,
+    "seeds": [20260801, 20260802, 20260803, 20260804],
+    "generator": "black-forest-labs/FLUX.2-klein-4B",
+    "generator_revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
+    "noun_minimum_count": 3,
+    "adjective_minimum_count": 3,
+    "frequency_bins": 3,
+    "nouns_per_frequency_bin": 10,
+    "adjectives_per_frequency_bin": 8,
+    "prohibited_sources": ["arm_specific_text", "real_full_text", "learner_outcomes", "generator_targeting"]
+  },
+  "temporal": {
+    "source": "evaluation_children_sessions_only",
+    "window_seconds": 4.0,
+    "frame_offsets_seconds": [0.5, 1.5, 2.5, 3.5],
+    "temporal_exclusion_buffer_seconds": 8.0,
+    "candidate_count": 8,
+    "matched_negative_strata": ["same_session", "same_child_other_session", "other_child"],
+    "metrics": ["Recall@1", "MRR"],
+    "aggregation": "macro_child_then_overall_mean",
+    "referent_ground_truth": false,
+    "human_german_validation": false,
+    "label_role": "model_derived_temporal_frame_utterance_retrieval"
+  },
+  "sealing": {
+    "hash": "sha256_canonical_json",
+    "all_later_arms": ["Real-full", "Synthetic-full", "Real-small", "Mixed"],
+    "score_opening_allowed": false,
+    "test_assets_may_steer_later_work": false
+  }
+}
