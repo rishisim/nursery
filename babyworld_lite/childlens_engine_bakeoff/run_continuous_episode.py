@@ -314,6 +314,18 @@ def run(
         speech=speech,
     )
     write_json(output_dir / "continuous_qualification.json", qualification)
+    result = {
+        "passed": qualification["passed"],
+        "output_dir": str(output_dir),
+        "plan_sha256": plan["plan_sha256"],
+        "kernel": kernel_result,
+        "speech_qa": speech_qa,
+        "cross_modal_qa": cross_modal_qa,
+        "mux_qa": mux_qa,
+        "qualification": qualification,
+        "manifest": "continuous_episode_manifest.json",
+    }
+    write_json(output_dir / "continuous_qa_report.json", result)
     files = [
         "activity_language_plan.json",
         "resolved_episode_contract.json",
@@ -321,6 +333,9 @@ def run(
         "episode_trace.npz",
         "episode_trace_replay.npz",
         "body_names.json",
+        "kernel_component.xml",
+        "replay_component.xml",
+        "embodied_mimo_model.xml",
         "physics_qa.json",
         "shared_clock_qa.json",
         "determinism_qa.json",
@@ -328,6 +343,7 @@ def run(
         "qa_report.json",
         "episode_bundle_manifest.json",
         "continuous_qualification.json",
+        "continuous_qa_report.json",
     ]
     if render:
         files.extend(
@@ -379,18 +395,6 @@ def run(
         ],
     )
     write_json(output_dir / "continuous_episode_manifest.json", manifest)
-    result = {
-        "passed": qualification["passed"],
-        "output_dir": str(output_dir),
-        "plan_sha256": plan["plan_sha256"],
-        "kernel": kernel_result,
-        "speech_qa": speech_qa,
-        "cross_modal_qa": cross_modal_qa,
-        "mux_qa": mux_qa,
-        "qualification": qualification,
-        "manifest": "continuous_episode_manifest.json",
-    }
-    write_json(output_dir / "continuous_qa_report.json", result)
     return result
 
 

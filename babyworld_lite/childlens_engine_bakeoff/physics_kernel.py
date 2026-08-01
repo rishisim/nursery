@@ -2136,6 +2136,10 @@ def run_physics_trace(
             interval_start = None
 
     unique_actions = sorted(set(arrays["behavior_action"].tolist()))
+    grasp_episode_count = sum(
+        phase["phase"] in {"grasp", "retrieve_grasp"}
+        for phase in _phase_schedule(spec)
+    )
     receipt = {
         "schema": "EmbodiedPhysicsQA",
         "duration_s": _duration(spec),
@@ -2178,7 +2182,9 @@ def run_physics_trace(
             "maximum_distinct_finger_contacts": int(arrays["distinct_finger_contacts"].max()),
         },
         "grasp": {
-            "physical_attempts": 2,
+            "physical_attempts": 2 * grasp_episode_count,
+            "physical_attempts_per_grasp": 2,
+            "grasp_episode_count": grasp_episode_count,
             "physical_lift_before_assist_m": physical_lift_before_assist,
             "assist_engaged": assist_engagement_time is not None,
             "assist_engagement_time_s": assist_engagement_time,
