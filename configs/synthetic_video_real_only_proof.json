@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "status": "FROZEN_PENDING_CORRECTED_PHASE4_PASS_AND_RESOURCE_SIZING",
+  "claim_role": "exploratory_real_only_proof_of_life_not_confirmatory_readiness",
+  "learner": {
+    "repository": "facebookresearch/egobabyvlm",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "mode": "triple",
+    "schedule": {"contrastive": 4, "mlm": 1, "dinov2": 1},
+    "text_encoder": "bert-base-uncased",
+    "seed": 42
+  },
+  "budgets_credited_hours": [1, 3, 6],
+  "nested_order": "HMAC-SHA-256(secret_budget_key, UTF8('train-budget') || UTF8(opaque_session_id)); then the same keyed order within session",
+  "acquisition": "advance through the frozen session order until six credited hours plus complete boundary handling are available or eligible training is exhausted",
+  "credited_time": "union of unique accepted source-timeline ASR windows with decodable eligible frames; adapter abstentions receive zero",
+  "frame_offsets_seconds": [0.5, 1.5, 2.5, 3.5],
+  "epochs": 30,
+  "checkpoint_rule": "final successfully completed epoch 30 checkpoint for every budget; validation is diagnostic only and never selects a checkpoint",
+  "diagnostic_signal": {
+    "six_hour_realistic_lexical_macro_min": 0.52,
+    "log_hour_slope": "positive",
+    "six_minus_one_hour_improvement_min": 0.02
+  },
+  "reporting": [
+    "realistic_noun",
+    "realistic_adjective",
+    "realistic_lexical_macro",
+    "cartoon_noun_diagnostic",
+    "cartoon_adjective_diagnostic",
+    "held_out_real_temporal_safeguard"
+  ],
+  "prohibitions": [
+    "synthetic_data",
+    "generator_or_TTS_execution",
+    "synthetic_scores",
+    "equivalence_testing",
+    "unblinding",
+    "threshold_or_benchmark_changes_from_outcomes",
+    "confirmatory_readiness_claim"
+  ]
+}

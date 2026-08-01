@@ -127,13 +127,15 @@ def allocate(mount: Path, private_root: Path) -> dict[str, object]:
     assignments = deal_children(eligible, key, cfg["allocation"])
     media = catalog["media"]
     objects = {row["object_key"]: row for row in catalog["objects"]}
-    eval_set = set(assignments["evaluation"])
-    evaluation_media = []
+    role_sets = {role:set(children) for role,children in assignments.items()}
+    role_media = {role:[] for role in assignments}
     for row in media:
-        if row["participant_key"] not in eval_set:
-            continue
-        obj = objects[row["object_key"]]
-        evaluation_media.append({**row, "source_locator": obj["source_locator"]})
+        for role,children in role_sets.items():
+            if row["participant_key"] in children:
+                obj = objects[row["object_key"]]
+                role_media[role].append({**row,"source_locator":obj["source_locator"]})
+                break
+    evaluation_media = role_media["evaluation"]
     previous_path = private_root / "restricted_allocation.json"
     previous = json.loads(previous_path.read_text()) if previous_path.exists() else None
     ledger = {
@@ -142,6 +144,7 @@ def allocate(mount: Path, private_root: Path) -> dict[str, object]:
         "config_sha256": file_digest(CONFIG),
         "calibration_children": sorted(calibration),
         "assignments": assignments,
+        "role_media": role_media,
         "evaluation_media": evaluation_media,
     }
     overlap = None
@@ -163,6 +166,7 @@ def allocate(mount: Path, private_root: Path) -> dict[str, object]:
         "evaluation_children": len(assignments["evaluation"]),
         "validation_children": len(assignments["validation"]),
         "evaluation_recordings": len(evaluation_media),
+        "role_recording_counts": {role:len(rows) for role,rows in role_media.items()},
         "old_new_role_overlap_counts": overlap,
         "allocation_commitment": digest(ledger),
     }

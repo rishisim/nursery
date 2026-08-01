@@ -123,3 +123,12 @@ def test_phase_state_validator_rejects_contradictory_nested_state() -> None:
     config["gates"]["phase4_status"] = "PASS_BOTH_COMMON_ASSET_FAMILIES_HASHED_AND_SEALED"
     with pytest.raises(ValueError, match="contradictory Phase 4 states"):
         validate_phase_state(config)
+
+
+def test_real_only_proof_is_exploratory_nested_and_exact_schedule() -> None:
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    assert config["budgets_credited_hours"] == [1, 3, 6]
+    assert config["learner"]["seed"] == 42
+    assert schedule_cycle(config["learner"]["schedule"]) == ["contrastive"] * 4 + ["mlm", "dinov2"]
+    assert config["epochs"] == 30
+    assert "confirmatory_readiness_claim" in config["prohibitions"]
