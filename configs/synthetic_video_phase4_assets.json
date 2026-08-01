@@ -35,6 +35,16 @@
     "generator": "black-forest-labs/FLUX.2-klein-4B",
     "generator_revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
     "generator_license": "Apache-2.0",
+    "upstream_filter": {
+      "implementation_commit": "224621caf0628270b6115845ac75a65b984234a3",
+      "model": "facebook/PE-Core-L14-336",
+      "model_revision": "bafb0f76541d399057e980a25947f67acec76575",
+      "weights_sha256": "0cdab5b338cbaa1e7a5dcd1b2fb4c9f4d5df1abd289564658edbab64a650e7e8",
+      "model_license": "Apache-2.0",
+      "min_score": 0.15,
+      "require_contrastive": true,
+      "threshold_source": "pinned_upstream_defaults_frozen_before_corrected_filter_scores"
+    },
     "noun_minimum_count": 3,
     "adjective_minimum_count": 3,
     "frequency_bins": 3,
@@ -61,6 +71,10 @@
     "earliest_role_order": ["calibration", "training", "validation", "evaluation"],
     "blocking_exact_keys": ["object_key", "session_time_interval", "content_sha256"],
     "perceptual_hash_hamming_max_diagnostic": 4,
+    "perceptual_sample_seconds": 2.0,
+    "embedding_model": "facebook/PE-Core-L14-336",
+    "embedding_model_revision": "bafb0f76541d399057e980a25947f67acec76575",
+    "embedding_cosine_min_diagnostic": 0.98,
     "embedding_near_duplicate_role": "diagnostic_nonblocking"
   },
   "sealing": {

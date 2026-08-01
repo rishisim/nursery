@@ -27,6 +27,14 @@
     "post_resolution_unresolved_exact_or_temporal_count": 0,
     "allocation_commitment_after_resolution": "2e545ef59f24d88963c2715e99e3effcecdf79deb30d5cb6235a5417d71d6ffa"
   },
+  "upstream_filter_preflight": {
+    "status": "PASS",
+    "public_dummy_only": true,
+    "model_revision": "bafb0f76541d399057e980a25947f67acec76575",
+    "weights_sha256": "0cdab5b338cbaa1e7a5dcd1b2fb4c9f4d5df1abd289564658edbab64a650e7e8",
+    "thresholds": {"minimum_alignment": 0.15, "require_contrastive": true},
+    "threshold_source": "pinned upstream defaults frozen before corrected asset scores"
+  },
   "deviations": [
     {
       "area": "phase_state",

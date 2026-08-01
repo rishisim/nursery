@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "public_dummy_only": true,
+  "restricted_material_touched": false,
+  "topology": "1_node_1_H200_1_process",
+  "elapsed": "00:00:22",
+  "model": "facebook/PE-Core-L14-336",
+  "revision": "bafb0f76541d399057e980a25947f67acec76575",
+  "weights_sha256": "0cdab5b338cbaa1e7a5dcd1b2fb4c9f4d5df1abd289564658edbab64a650e7e8",
+  "license": "Apache-2.0",
+  "offline_reload": true,
+  "upstream_score_matrix_shape": [2, 2],
+  "thresholds_observed": false,
+  "scientific_score": false
+}

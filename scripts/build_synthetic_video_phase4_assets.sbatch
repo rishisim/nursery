@@ -13,13 +13,14 @@
 set -euo pipefail
 umask 077
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+export HF_HOME="${PHASE4_PUBLIC_ROOT}/models/pe-hf-home"
 export WANDB_DISABLED=true TOKENIZERS_PARALLELISM=false PYTHONNOUSERSITE=1
 export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
 tmp="/tmp/phase4-build-${SLURM_JOB_ID}"
 mkdir -p "$tmp/pydeps" "$tmp/bin"
 trap 'find "$tmp" -mindepth 1 -delete 2>/dev/null || true; rmdir "$tmp" 2>/dev/null || true' EXIT
 tar -C "$tmp/pydeps" -xf "${PHASE4_PUBLIC_ROOT}/models/phase4-language-pydeps.tar"
-export PYTHONPATH="$tmp/pydeps:${PHASE4_EGOBABY_ROOT}"
+export PYTHONPATH="${PHASE4_PUBLIC_ROOT}/models/evaluator-pydeps:$tmp/pydeps:${PHASE4_EGOBABY_ROOT}"
 export PATH="$tmp/pydeps/bin:$PATH"
 ffmpeg_exe=$(singularity exec \
   --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT}" \

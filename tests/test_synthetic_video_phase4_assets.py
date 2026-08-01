@@ -21,6 +21,9 @@ def test_phase4_asset_config_freezes_shared_assets_and_split():
     assert cfg["lexical"]["styles"] == ["realistic", "cartoon"]
     assert cfg["temporal"]["candidate_count"] == 8
     assert cfg["temporal"]["frame_decode_failure"] == "exclude_complete_query_row_without_substitution"
+    assert cfg["lexical"]["upstream_filter"]["min_score"] == 0.15
+    assert cfg["lexical"]["upstream_filter"]["require_contrastive"] is True
+    assert cfg["lexical"]["upstream_filter"]["implementation_commit"] == "224621caf0628270b6115845ac75a65b984234a3"
     assert cfg["sealing"]["all_later_arms"] == ["Real-full", "Synthetic-full", "Real-small", "Mixed"]
     assert cfg["sealing"]["test_assets_may_steer_later_work"] is False
 
@@ -52,6 +55,15 @@ def test_language_model_preparation_is_public_cpu_only_and_offline_validated():
     assert "LANGUAGE_ENVIRONMENT_READY" in batch
 
 
+def test_lexical_filter_dummy_preflight_is_public_offline_and_bounded():
+    batch = Path("scripts/phase4_filter_dummy_preflight.sbatch").read_text()
+    assert "#SBATCH --partition=h200" in batch
+    assert "#SBATCH --gpus-per-node=1" in batch
+    assert "#SBATCH --time=00:30:00" in batch
+    assert "HF_HUB_OFFLINE=1" in batch
+    assert "score_image_text_matrix" in batch
+
+
 def test_governed_build_freezes_final_topology_and_seals_common_assets():
     batch = Path("scripts/build_synthetic_video_phase4_assets.sbatch").read_text()
     source = Path("scripts/build_synthetic_video_phase4_assets.py").read_text()
@@ -73,6 +85,9 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
     assert "E_CALIBRATION_EVALUATION_CHILD_OVERLAP" in source
     assert "public_provenance" in source
     assert "test_assets_may_steer_later_work" in source
+    assert "score_image_text_matrix" in source
+    assert "MachineDevBenchLexicalDataset" in source
+    assert "official_evaluator_structural_smoke" in source
 
 
 def test_phase4_seal_contract_is_identical_for_every_later_arm():

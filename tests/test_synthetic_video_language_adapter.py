@@ -56,3 +56,20 @@ def test_adapter_abstains_before_silent_translation_truncation():
     result = ADAPTER.translate_accepted(accepted, FakeTokenizer(), FakeTranslator())
     assert result["status"] == "ABSTAIN"
     assert result["reason"] == "SILENT_TRUNCATION"
+
+
+def test_adapter_abstains_on_empty_translation():
+    tokenizer = FakeTokenizer()
+    tokenizer.model_max_length = 10
+    accepted = ADAPTER.validate_asr_prediction(prediction(), 1.0)
+    result = ADAPTER.translate_accepted(accepted, tokenizer, FakeTranslator())
+    assert result["status"] == "ABSTAIN"
+    assert result["reason"] == "EMPTY_TRANSLATION"
+
+
+def test_same_adapter_is_used_by_public_and_governed_entrypoints():
+    public_source = Path("scripts/run_synthetic_video_language_gate.py").read_text()
+    governed_source = Path("scripts/build_synthetic_video_phase4_assets.py").read_text()
+    assert "from synthetic_video_language_adapter import" in public_source
+    assert "from synthetic_video_language_adapter import" in governed_source
+    assert 'segment.get("status") != "ACCEPT"' in governed_source
