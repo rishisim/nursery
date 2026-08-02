@@ -1,7 +1,14 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "status": "REAL_1H_GATE_FAILED_REAL_3H_EXTENSION_FROZEN_PRE_SCORE",
   "claim_role": "one_seed_exploratory_directional_pilot_not_equivalence_or_confirmatory_phase5",
+  "prospective_amendment": {
+    "effective_on": "2026-08-01",
+    "timing": "after the Real-1h gate result but before any matched synthetic generation or synthetic learner score",
+    "authorization_basis": "user-directed applicant amendment selecting MiniMax H3 and permitting hosted use of public episode prompts sampled from disclosure-reviewed compact non-identifying C aggregates",
+    "outcome_independence": "the Real-1h result requires the already frozen Real-3h extension; no generator outcome from the matched corpus and no synthetic learner score was observed",
+    "unchanged": "the Real-1h result and Real-3h rule; equal credited duration; fixed learner seed initialization schedule steps checkpoint evaluation assets language adapter gates and directional interpretation rule"
+  },
   "learner": {
     "repository": "facebookresearch/egobabyvlm",
     "commit": "224621caf0628270b6115845ac75a65b984234a3",
@@ -37,12 +44,14 @@
     "semantic_boundary": "public semantic categories and frequency bands only; never exact C vocabulary transcripts or sealed evaluation concepts",
     "estimation_contract": "freeze immutable public model revisions and hashes, fixed bins plus quartiles, explicit missingness and abstention, bootstrap uncertainty with public seed 42, and one governed commitment before generation",
     "limitations": "small feature set only; measured and unavailable features reported separately; no full distributional calibration claim",
-    "disclosure": "export only approved compact non-identifying bins targets uncertainty and commitment; never raw media text vocabulary embeddings row-level statistics IDs or reconstructive combinations",
+    "disclosure": "after applicant disclosure review and commitment, export only compact non-identifying bins targets uncertainty and missingness; suppress sparse or reconstructive cells; never export raw media text exact vocabulary embeddings row-level per-child or per-session statistics IDs or reconstructive combinations",
     "episode_plan": "freeze a public nonrestricted episode-plan distribution matched axis-by-axis to approved targets using only public lexical resources and no sealed evaluation concepts or outcomes",
+    "hosted_provider_payload": "MiniMax receives only public self-authored prompt wording sampled from the frozen episode-plan distribution; prompts may be conditioned by approved coarse C aggregates but contain no numeric C target table exact C vocabulary transcript identifier embedding row-level value or reconstructive combination",
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "hosted_provider_gate": "BLOCKED_PENDING_AFFIRMATIVE_CHILDLENS_INSTITUTIONAL_PERMISSION_FOR_DISCLOSURE_REVIEWED_AGGREGATE_CONDITIONING"
+    "hosted_provider_gate": "CONDITIONALLY_AUTHORIZED_AFTER_GOVERNED_DISCLOSURE_REVIEW_AND_AGGREGATE_COMMITMENT",
+    "authorization_interpretation": "the signed ChildLens scope permits non-commercial model calibration evaluation and aggregate reporting; this amendment treats the disclosure-reviewed compact non-identifying aggregate as the permitted research output while retaining the absolute prohibition on third-party dataset access raw material and restricted or reconstructive derivatives"
   },
   "budgets_credited_hours": {"primary": 1, "conditional_real_extension": 3, "automatic_six_hour_disabled": true},
   "nested_order": "HMAC-SHA-256(secret_budget_key, UTF8('train-budget') || UTF8(opaque_session_id)); then HMAC-SHA-256(secret_budget_key, UTF8('train-item') || UTF8(opaque_media_id))",
@@ -67,19 +76,22 @@
     "failure_action": "stop_without_synthetic_comparison_or_automatic_6h_run"
   },
   "generator_gate": {
-    "status": "SELECTED_BLOCKED_PENDING_LOCAL_OPEN_WEIGHT_PROVENANCE_OR_WRITTEN_PROVIDER_AND_INSTITUTIONAL_TRAINING_USE_CLEARANCE",
+    "status": "SELECTED_CONDITIONALLY_AUTHORIZED_PENDING_REAL_3H_GATE_C_AGGREGATE_COMMITMENT_AND_EXACT_COST_LOCK",
     "selected": "minimax/hailuo-3",
     "selection_basis": "prospective user-directed MiniMax H3 selection made before synthetic learner scores; the completed blinded screen actually ranked Gemini first at 27/28 with zero critical failures, while MiniMax H3 scored 25/28, clearly beat LTX at 19/28, and was competitive with Seedance at 24/28",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
     "bakeoff_interpretation": "Gemini was the screen leader; this amendment is a user selection and must never be described as the bakeoff ranking MiniMax first",
     "request": {"endpoint": "POST https://openrouter.ai/api/v1/videos", "model": "minimax/hailuo-3", "resolution": "2K", "duration_seconds": 5, "aspect_ratio": "16:9", "generate_audio": true, "input_seed": "unsupported_and_not_sent"},
     "current_route_verified_on": "2026-08-01",
-    "current_price": "$0.13 per generated second at 2K on the frozen OpenRouter route; the completed four-attempt bakeoff reported $2.574 total for 20 seconds",
-    "open_weight_status": "NOT_YET_VERIFIED_AS_AN_OFFICIAL_IMMUTABLE_HAILUO_3_VIDEO_WEIGHT_RELEASE_WITH_TRAINING_COMPATIBLE_LICENSE; the official MiniMax GitHub and Hugging Face inventories inspected on 2026-08-01 did not expose Hailuo 3 video weights",
-    "local_execution_gate": "requires official immutable weight and code revisions, license allowing this academic learner-training use, governed local execution, blind resource sizing, and an exact approved resource ceiling before generation",
-    "privacy": "OpenRouter video generation is asynchronous and ineligible for ZDR; only public/self-authored nonrestricted episode plans may be submitted, never ChildLens/BabyView input, derivatives, restricted vocabulary, evaluation concepts/assets, governed prompts, or C aggregate-conditioned prompts without affirmative permission",
+    "availability": "PASS; live OpenRouter video-model catalog returned canonical slug minimax/hailuo-03-20260730 with 2K and 16:9 support",
+    "current_price": "$0.13 per generated second at 2K on the live OpenRouter route; the completed four-attempt bakeoff reported $2.574 total for 20 seconds",
+    "adapter_provenance": "reuse the tested asynchronous submit poll authenticated-download and cost-accounting path from synthetic-video-seedance-bakeoff@ad506b39583ce186faa4b75368300eed415ee79d; four H3 calls completed without transport failure in cd5d030",
+    "credential": {"environment_variable": "OPENROUTER_API_KEY", "storage": "external user-owned mode-0600 environment file never Git", "preflight": "PASS_AUTHENTICATED_READ_ONLY_2026-08-01"},
+    "open_weight_status": "OpenRouter currently describes H3 as open-weights, but no official immutable local weight and license manifest is locked; local execution is not required for this hosted lean prototype",
+    "privacy": "OpenRouter video generation is asynchronous and ineligible for ZDR. Submit only the public self-authored prompt payload allowed by calibration_C.hosted_provider_payload; never submit ChildLens/BabyView media text exact vocabulary IDs row-level values embeddings evaluation concepts/assets or reconstructive derivatives",
     "storage": "provider temporarily retains asynchronous job state and video content for polling and download; prompt/output logging remains disabled, but video ZDR cannot be enforced",
-    "output_rights": "UNVERIFIED_FOR_LEARNER_TRAINING; requires written provider and institutional clearance for hosted output use",
+    "terms_review": {"reviewed_on": "2026-08-01", "openrouter_terms": "https://openrouter.ai/terms", "minimax_terms": "https://chat.minimax.io/doc/terms-of-service.html", "finding": "current published terms contain no express prohibition on non-commercial academic learner training with lawfully generated output; MiniMax states that it does not claim ownership of user-generated content while receiving a broad service license; OpenRouter defers output ownership to model terms", "qualification": "documented protocol interpretation not a provider warranty; recheck unchanged terms at paid-run lock"},
+    "cost_gate": {"price_usd_per_generated_second_2k": 0.13, "minimum_exact_one_hour_usd": 468.0, "planning_one_hour_plus_10_percent_attempt_reserve_usd": 514.8, "status": "PAID_CORPUS_GENERATION_REQUIRES_EXACT_ATTEMPT_RETRY_AND_TOTAL_SPEND_CEILING_BEFORE_FIRST_CALL"},
     "audio": "discard native audio when retaining frozen modular German TTS",
     "no_substitution": true
   },

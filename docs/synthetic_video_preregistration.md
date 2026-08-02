@@ -573,3 +573,35 @@ initialized 0h, Real-1h, conditional nested Real-3h only if Real-1h fails, and a
 matched synthetic arm only if both real learnability and the bounded public
 generator gate pass. Confirmatory multi-seed Phase 5, automatic 6h acquisition,
 equivalence testing, and inferential scientific claims remain blocked.
+
+### Prospective lean generator amendment
+
+After the frozen Real-1h gate result but before any matched-corpus generation
+or synthetic learner score, the authorized applicant selected MiniMax H3
+(`minimax/hailuo-3` through OpenRouter) for the lean pilot. This is a
+user-directed selection, not a reinterpretation of the completed blinded
+bakeoff: Gemini led that screen at 27/28 primary checks, while MiniMax scored
+25/28, Seedance 24/28, and LTX 19/28. The tested H3 API transport is reused
+from `synthetic-video-seedance-bakeoff@ad506b3`; the live route and external
+credential passed a no-cost check on 2026-08-01.
+
+The ChildLens boundary remains strict for source and reconstructive material.
+Only after governed measurement, disclosure review, sparse-cell suppression,
+and commitment may compact non-identifying aggregate targets from \(C\)
+condition a public episode-plan distribution. The hosted provider receives
+only public/self-authored prompt wording sampled from that frozen distribution,
+not media, transcripts, exact vocabulary, identifiers, embeddings, row-level
+or per-child/session values, numeric target tables, evaluation concepts, or
+reconstructive combinations. This applies the signed permission for
+non-commercial calibration/evaluation and aggregate reporting; it does not
+grant third-party access to ChildLens.
+
+Current published provider terms contain no express prohibition on using
+lawfully generated output for this non-commercial academic learner-training
+prototype, so a blanket written-clearance gate is not retained. This is a
+documented protocol interpretation rather than a provider warranty, and terms
+must be unchanged at the paid-run lock. OpenRouter video remains asynchronous
+and ineligible for ZDR, with temporary provider retention. No paid corpus call
+is authorized until the Real-3h gate passes, the \(C\) aggregate and public
+episode-plan commitments are frozen, and an exact attempts/retries/storage and
+total-spend ceiling is locked.

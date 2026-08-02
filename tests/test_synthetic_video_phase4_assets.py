@@ -119,13 +119,18 @@ def test_lean_equal_duration_proof_is_frozen_before_scores():
     assert proof["conditional_real_3h_gate"]["objective_steps"] == 570
     assert proof["conditional_real_3h_gate"]["failure_action"].startswith("stop_without_synthetic")
     assert proof["generator_gate"]["selected"] == "minimax/hailuo-3"
-    assert "LOCAL_OPEN_WEIGHT_PROVENANCE" in proof["generator_gate"]["status"]
+    assert proof["schema_version"] == 3
+    assert proof["generator_gate"]["status"].startswith("SELECTED_CONDITIONALLY_AUTHORIZED")
     assert proof["generator_gate"]["request"]["input_seed"] == "unsupported_and_not_sent"
-    assert proof["generator_gate"]["open_weight_status"].startswith("NOT_YET_VERIFIED")
+    assert proof["generator_gate"]["credential"]["environment_variable"] == "OPENROUTER_API_KEY"
+    assert proof["generator_gate"]["credential"]["preflight"].startswith("PASS_AUTHENTICATED")
+    assert proof["generator_gate"]["cost_gate"]["minimum_exact_one_hour_usd"] == 468.0
+    assert "no express prohibition" in proof["generator_gate"]["terms_review"]["finding"]
     assert "Gemini was the screen leader" in proof["generator_gate"]["bakeoff_interpretation"]
     assert proof["generator_gate"]["no_substitution"] is True
     assert proof["calibration_C"]["source"] == "development_set_C_only_never_training_validation_or_evaluation"
-    assert proof["calibration_C"]["hosted_provider_gate"].startswith("BLOCKED_PENDING_AFFIRMATIVE")
+    assert proof["calibration_C"]["hosted_provider_gate"].startswith("CONDITIONALLY_AUTHORIZED")
+    assert "public self-authored prompt wording" in proof["calibration_C"]["hosted_provider_payload"]
     assert "no full distributional calibration claim" in proof["calibration_C"]["limitations"]
     assert len(proof["calibration_C"]["axes"]) == 8
     assert proof["calibration_C"]["joint_distributions"] == [

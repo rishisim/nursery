@@ -54,8 +54,11 @@ are satisfied.
 Raw or restricted ChildLens material must remain in the encrypted
 applicant-only local store or applicant-private UTD-managed Juno paths. It may
 not be sent to cloud services, model APIs, hosted GPU services, Git, telemetry,
-or unauthorized annotators. Only permitted aggregates may leave the governed
-boundary.
+or unauthorized annotators. Only compact non-identifying aggregates that pass
+the frozen disclosure review may leave the governed boundary; those aggregates
+may condition a public episode-plan distribution without exposing ChildLens
+media, text, vocabulary, identifiers, row-level values, embeddings, or
+reconstructive combinations.
 
 ## Repository state
 
@@ -69,13 +72,15 @@ The architecture review now freezes EgoBabyVLM CLIP+ in `triple` mode as the
 learner; Machine-DevBench Lexical as the common standardized primary endpoint;
 an above-chance, positive real-only learning-curve readiness gate; and a
 separate held-out-real ChildLens temporal-transfer safeguard. It retains the
-modular video and German-TTS architecture, Wan 2.2 TI2V-5B and LTX-2 as the
-only public-pilot generator candidates, and a prospective no-substitution pilot
-protocol. See
+modular video and German-TTS architecture. A completed four-family public-only
+bakeoff ranked Gemini first, but the prospective lean-pilot amendment selects
+MiniMax H3 through its tested OpenRouter route; this user selection must not be
+reported as the bakeoff ranking. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
-No generator pilot has been executed and no generator dependency has been
-installed. The public/dummy single-L4 EgoBabyVLM compatibility preflight is
-complete and passed as engineering evidence only; DDP remains untested.
+A public generator pilot and bakeoff have been executed without ChildLens or
+BabyView inputs. The corrected governed common assets passed on the final
+two-H100 DDP topology. Real-1h failed its frozen learnability gate, so the
+already frozen nested Real-3h extension is now the next learner gate.
 Phase 3 governance/preregistration is **PASS**.
 MPI accepted the signed project-specific request and granted non-commercial
 ChildLens model calibration/evaluation and aggregate reporting through July
@@ -97,5 +102,7 @@ The corrected Phase 4 common-asset record is
 [`results/synthetic_video_phase4.json`](results/synthetic_video_phase4.json).
 Its deviation ledger is
 [`results/synthetic_video_phase4_deviations.json`](results/synthetic_video_phase4_deviations.json).
-Generator/TTS execution, synthetic generation, confirmatory Phase 5,
-synthetic-score opening, and final scientific evaluation remain unauthorized.
+Matched synthetic generation remains conditional on Real-3h learnability,
+sealed \(C\)-aggregate/public-plan calibration, and an exact paid-run ceiling.
+Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
+generation remain unauthorized.

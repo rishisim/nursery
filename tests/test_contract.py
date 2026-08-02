@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 2
-    assert config["status"] == "REOPENED_PHASE4_VALIDITY_REPAIR_IN_PROGRESS"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEAN_EQUAL_DURATION_PILOT_IN_PROGRESS"
     validate_phase_state(config)
     assert schedule_cycle(config["learner"]["schedule"]) == [
         "contrastive",
@@ -127,8 +127,14 @@ def test_phase_state_validator_rejects_contradictory_nested_state() -> None:
 
 def test_real_only_proof_is_exploratory_nested_and_exact_schedule() -> None:
     config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert config["budgets_credited_hours"] == [1, 3, 6]
+    assert config["budgets_credited_hours"] == {
+        "primary": 1,
+        "conditional_real_extension": 3,
+        "automatic_six_hour_disabled": True,
+    }
     assert config["learner"]["seed"] == 42
     assert schedule_cycle(config["learner"]["schedule"]) == ["contrastive"] * 4 + ["mlm", "dinov2"]
-    assert config["epochs"] == 30
-    assert "confirmatory_readiness_claim" in config["prohibitions"]
+    assert config["learner"]["objective_steps"] == 570
+    assert config["conditional_real_3h_gate"]["nested_credited_hours"] == 3
+    assert "automatic_1_3_6_curve" in config["prohibitions"]
+    assert "multi_seed_confirmatory_phase5" in config["prohibitions"]
