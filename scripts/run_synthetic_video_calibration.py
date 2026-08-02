@@ -849,7 +849,7 @@ def qualify_public(args: argparse.Namespace) -> dict[str, Any]:
     write_private(
         _public_repair_root(args.public_root) / "public_qualification.json", result
     )
-    return result
+    return {key: result[key] for key in PUBLIC_QUALIFICATION_FIELDS}
 
 
 def _bootstrap_categorical(
