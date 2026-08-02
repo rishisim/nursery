@@ -156,18 +156,20 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert preparation["restricted_mount_present"] is False
     assert preparation["valid_for_candidate_inference"] is False
     sizing = result["governed_C_activity_checkpoint_sizing_amendment"]
-    assert sizing["status"] == (
-        "FROZEN_CONTROLS_RETAINED_RESTARTING_AFTER_PREINFERENCE_SAFE_LOAD_REPAIR"
-    )
+    assert sizing["status"] == "IN_PROGRESS_ONE_OF_THREE_PASS_CONTROLS_RETAINED"
     assert sizing["fixture_labels_used"] is False
     assert sizing["scores_predictions_or_scientific_metrics_retained"] is False
     assert sizing["aggregate_GPU_hours_through_C_including_sizing_max"] == 20.0
     safe_load = result["governed_C_activity_checkpoint_safe_load_repair"]
-    assert safe_load["status"] == "FROZEN_DYNAMIC_FLOAT64_DTYPE_REPAIR_BEFORE_MODEL_OUTPUT"
+    assert safe_load["status"] == "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING"
     assert safe_load["unsafe_global_count"] == 13
     assert safe_load["dynamic_safe_type_count"] == 1
     assert safe_load["weights_only_remains_true"] is True
-    assert safe_load["model_inference_executed"] is False
+    assert safe_load["model_inference_executed"] is True
+    sizing_progress = result["governed_C_activity_checkpoint_sizing_progress"]
+    assert sizing_progress["status"] == "IN_PROGRESS_ONE_OF_THREE_PASS"
+    assert sizing_progress["record_commitment_verified"] is True
+    assert sizing_progress["score_or_prediction_retained"] is False
     assert result["governance_incident"]["restricted_execution_paused"] is False
 
 

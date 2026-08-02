@@ -85,8 +85,6 @@ PUBLIC_QUALIFICATION_HASH_FIELDS = frozenset(
 ACTIVITY_CANDIDATE_FIELDS = frozenset(
     {
         "status",
-        "candidate_id",
-        "partition",
         "item_count",
         "failure_count",
         "invalid_record_count",
@@ -117,7 +115,6 @@ ACTIVITY_PREP_HASH_FIELDS = frozenset(
 ACTIVITY_SIZING_FIELDS = frozenset(
     {
         "status",
-        "candidate_id",
         "item_count",
         "output_width",
         "expected_output_width",
@@ -138,7 +135,6 @@ ACTIVITY_SELECTION_FIELDS = frozenset(
         "status",
         "candidate_count",
         "eligible_candidate_count",
-        "winner_candidate_id",
         "winner_macro_f1",
         "winner_worst_class_recall",
         "winner_nonabstained_coverage",

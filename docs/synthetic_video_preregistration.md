@@ -995,3 +995,13 @@ dynamically constructed type that its scanner cannot enumerate,
 constructor. The repair therefore adds only that exact runtime type to the safe
 context. It does not broaden the static-name gate or permit
 `weights_only=false`, and no inference output was produced by either attempt.
+
+The third safe-load attempt passed and completed the label-blind EgoHOD sizing
+forward pass. Its committed record reports width 8/8, 12.71 seconds total and
+2.432 GiB peak device use, with no external call, retained score/prediction or
+scientific metric. The batch job then exited only because the terminal-safe
+serializer rejected the lowercase public candidate ID after the record was
+atomically sealed; the record commitment `fa6a684a…1280` verifies. The terminal
+schema is therefore narrowed to omit candidate and partition strings for all
+sizing, development and selection summaries. This output-only repair does not
+rerun or alter the valid EgoHOD sizing record.

@@ -234,6 +234,10 @@ def test_activity_sizing_is_label_blind_and_retains_no_scores() -> None:
     assert '"scientific_metric_computed": False' in source
     assert '"fixture_manifest_ordinal": 0' in source
     assert '"external_call_count": 0' in source
+    assert "candidate_id" not in MODULE.ACTIVITY_SIZING_FIELDS
+    assert "candidate_id" not in MODULE.ACTIVITY_CANDIDATE_FIELDS
+    assert "partition" not in MODULE.ACTIVITY_CANDIDATE_FIELDS
+    assert "winner_candidate_id" not in MODULE.ACTIVITY_SELECTION_FIELDS
 
 
 def test_egohod_optional_import_compatibility_is_inference_only() -> None:

@@ -534,13 +534,15 @@
           "next_gate": "repeat public preparation with the frozen exact safe-global allowlist, seal a new dependency manifest, then restart blind sizing"
         },
         "safe_load_engineering_repair": {
-          "status": "FROZEN_DYNAMIC_FLOAT64_DTYPE_REPAIR_BEFORE_MODEL_OUTPUT",
+          "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",
           "failed_candidate": "egohod_egovideo_l_zero_shot",
           "failed_stage": "torch_weights_only_checkpoint_deserialization",
-          "model_state_loaded": false,
-          "model_inference_executed": false,
-          "score_or_prediction_produced": false,
-          "safe_load_attempt_count": 2,
+          "model_state_loaded": true,
+          "model_inference_executed": true,
+          "transient_sizing_output_produced_and_discarded": true,
+          "score_or_prediction_retained": false,
+          "scientific_metric_computed": false,
+          "safe_load_attempt_count": 3,
           "second_stop": "after the 13-name static global check passed, the weights-only builder required the single dynamically constructed numpy.dtypes.Float64DType that the static scanner cannot report",
           "old_dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
           "new_dependency_manifest_commitment_sha256": "5fb4a9d3c4375621bc94b8d7c25a26f434c7c1de9226fadd9f50ffdd3023e81d",
@@ -561,6 +563,31 @@
           "model_inference_executed": false,
           "valid_for_candidate_inference": true,
           "next_gate": "restart the already frozen blind single-item sizing"
+        },
+        "blind_sizing_progress": {
+          "status": "IN_PROGRESS_ONE_OF_THREE_PASS",
+          "candidate_results": {
+            "egohod_egovideo_l_zero_shot": {
+              "status": "PASS_BLIND_RESOURCE_SIZING",
+              "item_count": 1,
+              "output_width": 8,
+              "expected_output_width": 8,
+              "load_runtime_seconds": 11.950469084084034,
+              "item_runtime_seconds": 0.7430373085662723,
+              "total_runtime_seconds": 12.709058766253293,
+              "peak_vram_gib": 2.431640625,
+              "expected_peak_vram_gib_max": 48.0,
+              "external_call_count": 0,
+              "score_or_prediction_retained": false,
+              "scientific_metric_computed": false,
+              "activity_sizing_commitment_sha256": "fa6a684ab7a350838dc5fa966416cf1e7b621bed3d317332d23eef6d31fe1280",
+              "terminal_job_status": "FAILED_AFTER_RECORD_SEAL_ON_COMPACT_OUTPUT_CANDIDATE_ID_GUARD",
+              "sealed_record_commitment_verified": true
+            }
+          },
+          "completed_candidate_count": 1,
+          "passing_candidate_count": 1,
+          "scientific_candidate_outcomes_opened": false
         },
         "bounded_candidates": [
           {
