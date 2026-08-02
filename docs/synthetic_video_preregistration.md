@@ -691,3 +691,16 @@ learner seeds. Corrected evaluation assets, language-adapter abstention rules,
 4:1:1 schedule, 4,668 steps, byte-identical initialization, and checkpoint rule
 remain unchanged. There is no automatic 3h arm, more than one accepted
 synthetic hour, extra seed, hosted provider, or outcome-driven tuning.
+
+### Governance pause during calibration schema inspection
+
+Before any C feature outcome was computed, one schema-inspection command
+unintentionally expanded a dictionary and printed 94 opaque asset-level
+SHA-256 keys into the Codex task output. The keys are unkeyed hashes over a
+restricted source-object key and clip ordinal. No media, audio, text, filename,
+path, child/session key, direct participant identifier, embedding, prompt, or
+outcome was printed, and no key was copied into Git or a local artifact.
+Restricted execution stopped immediately. The prospective extension and all
+prior seals remain preserved, but governed work may resume only after the
+authorized applicant and applicable data steward or institutional protocol
+review incident handling and explicitly affirm continuation.

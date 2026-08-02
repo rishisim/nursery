@@ -123,5 +123,11 @@ C calibration and a public episode-plan commitment, followed by public/dummy
 LTX topology sizing. Any later corpus remains capped at exactly one accepted
 credited hour and cannot support directional-competitiveness, equivalence,
 noninferiority, same-quality, or confirmatory claims.
+Restricted execution is currently paused: a schema-inspection command
+unintentionally printed 94 opaque asset-level SHA-256 keys to the Codex task
+output. No media, text, filenames, paths, child/session keys, direct identifiers,
+embeddings, prompts, or outcomes were exposed, and the keys were not copied into
+Git. Applicant data-steward or institutional-protocol review is required before
+governed C processing resumes.
 Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
 generation remain unauthorized.

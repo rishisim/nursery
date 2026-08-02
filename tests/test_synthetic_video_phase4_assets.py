@@ -93,7 +93,7 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_POST_GATE_DESCRIPTIVE_EXTENSION_CALIBRATION_PENDING"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_POST_GATE_EXTENSION_BLOCKED_GOVERNANCE_REVIEW"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -105,12 +105,13 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert result["coverage_redesign"]["gate_pass"] is False
     assert result["coverage_redesign"]["gate_components"]["mean_gain_at_least_0_02"] is False
     assert result["post_gate_descriptive_extension"]["preserves_coverage_redesign_stop"] is True
-    assert result["post_gate_descriptive_extension"]["status"] == "PROSPECTIVELY_AUTHORIZED_CALIBRATION_PENDING"
+    assert result["post_gate_descriptive_extension"]["status"] == "PROSPECTIVELY_AUTHORIZED_BUT_PAUSED_GOVERNANCE_REVIEW"
+    assert result["governance_incident"]["restricted_execution_paused"] is True
 
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "POST_GATE_DESCRIPTIVE_SYNTHETIC_1H_AUTHORIZED_CALIBRATION_PENDING"
+    assert proof["status"] == "BLOCKED_GOVERNANCE_REVIEW_OPAQUE_ROW_KEYS_EXPOSED"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,
@@ -128,7 +129,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
     assert proof["schema_version"] == 6
-    assert proof["generator_gate"]["status"].startswith("SELECTED_LOCAL_POST_GATE")
+    assert proof["generator_gate"]["status"].startswith("SELECTED_LOCAL_PAUSED")
     assert proof["generator_gate"]["implementation"]["commit"] == "9377758131b1ffde4b7f766804590a6617bf2ab9"
     assert proof["generator_gate"]["weights"]["revision"] == "4229404625088d21c4f112eb640fb04a0900ee25"
     assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["accepted_credited_seconds_exact"] == 3600
@@ -137,7 +138,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert "LTX 19/28" in proof["generator_gate"]["bakeoff_interpretation"]
     assert proof["generator_gate"]["no_substitution"] is True
     assert proof["calibration_C"]["source"] == "development_set_C_only_never_training_validation_or_evaluation"
-    assert proof["calibration_C"]["local_generator_gate"].startswith("USER_AUTHORIZED_POST_GATE")
+    assert proof["calibration_C"]["local_generator_gate"].startswith("PAUSED_GOVERNANCE_REVIEW")
     assert "governed Juno" in proof["calibration_C"]["local_generator_input"]
     assert "no full distributional calibration claim" in proof["calibration_C"]["limitations"]
     assert len(proof["calibration_C"]["axes"]) == 8
