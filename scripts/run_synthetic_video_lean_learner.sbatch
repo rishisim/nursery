@@ -14,6 +14,7 @@ set -euo pipefail
 umask 077
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 WANDB_DISABLED=true TOKENIZERS_PARALLELISM=false PYTHONNOUSERSITE=1
 export HF_HOME="${PHASE4_PUBLIC_ROOT}/models/learner-hf-home"
+export MASTER_ADDR=127.0.0.1 MASTER_PORT=29631 RANK=0 WORLD_SIZE=1 LOCAL_RANK=0 LOCAL_WORLD_SIZE=1
 tmp="/tmp/lean-learner-${SLURM_JOB_ID}"
 mkdir -p "$tmp/pydeps"
 trap 'find "$tmp" -mindepth 1 -delete 2>/dev/null || true; rmdir "$tmp" 2>/dev/null || true' EXIT
