@@ -118,19 +118,19 @@ def test_lean_equal_duration_proof_is_frozen_before_scores():
     assert proof["real_1h_gate"]["improvement_over_initialized_min"] == 0.02
     assert proof["conditional_real_3h_gate"]["objective_steps"] == 570
     assert proof["conditional_real_3h_gate"]["failure_action"].startswith("stop_without_synthetic")
-    assert proof["generator_gate"]["selected"] == "minimax/hailuo-3"
-    assert proof["schema_version"] == 3
-    assert proof["generator_gate"]["status"].startswith("SELECTED_CONDITIONALLY_AUTHORIZED")
-    assert proof["generator_gate"]["request"]["input_seed"] == "unsupported_and_not_sent"
-    assert proof["generator_gate"]["credential"]["environment_variable"] == "OPENROUTER_API_KEY"
-    assert proof["generator_gate"]["credential"]["preflight"].startswith("PASS_AUTHENTICATED")
-    assert proof["generator_gate"]["cost_gate"]["minimum_exact_one_hour_usd"] == 468.0
-    assert "no express prohibition" in proof["generator_gate"]["terms_review"]["finding"]
-    assert "Gemini was the screen leader" in proof["generator_gate"]["bakeoff_interpretation"]
+    assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
+    assert proof["schema_version"] == 4
+    assert proof["generator_gate"]["status"].startswith("SELECTED_LOCAL")
+    assert proof["generator_gate"]["implementation"]["commit"] == "9377758131b1ffde4b7f766804590a6617bf2ab9"
+    assert proof["generator_gate"]["implementation"]["seed"] == 314159
+    assert proof["generator_gate"]["weights"]["revision"] == "4229404625088d21c4f112eb640fb04a0900ee25"
+    assert proof["generator_gate"]["resource_projection"]["juno_direct_monetary_cost_usd"] == 0
+    assert proof["generator_gate"]["resource_projection"]["one_raw_hour_plus_10_percent_attempt_reserve_gpu_hours"] == 33.223
+    assert "LTX 19/28" in proof["generator_gate"]["bakeoff_interpretation"]
     assert proof["generator_gate"]["no_substitution"] is True
     assert proof["calibration_C"]["source"] == "development_set_C_only_never_training_validation_or_evaluation"
-    assert proof["calibration_C"]["hosted_provider_gate"].startswith("CONDITIONALLY_AUTHORIZED")
-    assert "public self-authored prompt wording" in proof["calibration_C"]["hosted_provider_payload"]
+    assert proof["calibration_C"]["local_generator_gate"].startswith("CONDITIONALLY_AUTHORIZED")
+    assert "governed Juno" in proof["calibration_C"]["local_generator_input"]
     assert "no full distributional calibration claim" in proof["calibration_C"]["limitations"]
     assert len(proof["calibration_C"]["axes"]) == 8
     assert proof["calibration_C"]["joint_distributions"] == [

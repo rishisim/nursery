@@ -73,9 +73,9 @@ learner; Machine-DevBench Lexical as the common standardized primary endpoint;
 an above-chance, positive real-only learning-curve readiness gate; and a
 separate held-out-real ChildLens temporal-transfer safeguard. It retains the
 modular video and German-TTS architecture. A completed four-family public-only
-bakeoff ranked Gemini first, but the prospective lean-pilot amendment selects
-MiniMax H3 through its tested OpenRouter route; this user selection must not be
-reported as the bakeoff ranking. See
+bakeoff ranked Gemini first, but the prospective cost amendment selects locally
+run LTX-2.3 for the lean pilot. LTX scored 19/28 versus Gemini's 27/28 and must
+not be reported as the quality winner. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
 A public generator pilot and bakeoff have been executed without ChildLens or
 BabyView inputs. The corrected governed common assets passed on the final
@@ -103,6 +103,9 @@ The corrected Phase 4 common-asset record is
 Its deviation ledger is
 [`results/synthetic_video_phase4_deviations.json`](results/synthetic_video_phase4_deviations.json).
 Matched synthetic generation remains conditional on Real-3h learnability,
-sealed \(C\)-aggregate/public-plan calibration, and an exact paid-run ceiling.
+sealed \(C\)-aggregate/public-plan calibration, and a passing bounded LTX
+preflight with an exact Juno resource ceiling. LTX has zero direct Juno charge,
+but all GPU time, yield loss, retries, storage, energy, QA, and labor remain in
+the cost ledger.
 Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
 generation remain unauthorized.

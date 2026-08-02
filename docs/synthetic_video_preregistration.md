@@ -577,31 +577,32 @@ equivalence testing, and inferential scientific claims remain blocked.
 ### Prospective lean generator amendment
 
 After the frozen Real-1h gate result but before any matched-corpus generation
-or synthetic learner score, the authorized applicant selected MiniMax H3
-(`minimax/hailuo-3` through OpenRouter) for the lean pilot. This is a
-user-directed selection, not a reinterpretation of the completed blinded
-bakeoff: Gemini led that screen at 27/28 primary checks, while MiniMax scored
-25/28, Seedance 24/28, and LTX 19/28. The tested H3 API transport is reused
-from `synthetic-video-seedance-bakeoff@ad506b3`; the live route and external
-credential passed a no-cost check on 2026-08-01.
+or synthetic learner score, the authorized applicant selected locally run
+LTX-2.3 22B Distilled 1.1 for the lean pilot because the hosted MiniMax and
+Gemini one-hour prices were unsuitable for the prototype budget. This
+cost-driven amendment supersedes the hosted MiniMax selection recorded at
+`821fddc`, whose provenance remains in Git history. It is not a reinterpretation
+of the completed blinded bakeoff: Gemini led that screen at 27/28 primary
+checks, followed by MiniMax at 25/28, Seedance at 24/28, and LTX at 19/28. LTX
+must not be described as the quality winner.
 
 The ChildLens boundary remains strict for source and reconstructive material.
 Only after governed measurement, disclosure review, sparse-cell suppression,
 and commitment may compact non-identifying aggregate targets from \(C\)
-condition a public episode-plan distribution. The hosted provider receives
-only public/self-authored prompt wording sampled from that frozen distribution,
-not media, transcripts, exact vocabulary, identifiers, embeddings, row-level
-or per-child/session values, numeric target tables, evaluation concepts, or
-reconstructive combinations. This applies the signed permission for
-non-commercial calibration/evaluation and aggregate reporting; it does not
-grant third-party access to ChildLens.
+condition a public episode-plan distribution. The target table, plans, prompts,
+attempts, outputs, logs, and QA remain on applicant-governed Juno storage. No
+hosted generator receives ChildLens media, transcripts, exact vocabulary,
+identifiers, embeddings, row-level or per-child/session values, evaluation
+concepts, or reconstructive combinations.
 
-Current published provider terms contain no express prohibition on using
-lawfully generated output for this non-commercial academic learner-training
-prototype, so a blanket written-clearance gate is not retained. This is a
-documented protocol interpretation rather than a provider warranty, and terms
-must be unchanged at the paid-run lock. OpenRouter video remains asynchronous
-and ineligible for ZDR, with temporary provider retention. No paid corpus call
-is authorized until the Real-3h gate passes, the \(C\) aggregate and public
-episode-plan commitments are frozen, and an exact attempts/retries/storage and
-total-spend ceiling is locked.
+Execution pins `Lightricks/LTX-2@9377758`, LTX-2.3 weights revision
+`4229404`, and Gemma text-encoder revision `68f7ee4`, using the official
+distilled two-stage runner, seed 314159, no prompt enhancement, and the frozen
+modular German TTS path. The completed public pilot produced four valid clips
+on one A100 80 GB in 609.10 seconds, projecting about 30.2 A100-equivalent GPU
+hours per raw output hour before credited-yield loss or retries. Juno has zero
+direct monetary charge, but GPU time, storage, energy, failures, QA, and labor
+remain in the cost ledger. No corpus generation is authorized until Real-3h
+passes, the \(C\) aggregate and episode-plan commitments are frozen, and a
+bounded public/dummy preflight locks the final Juno topology and exact GPU-hour,
+wall-time, storage, attempt, and retry ceilings.
