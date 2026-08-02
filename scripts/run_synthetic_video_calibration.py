@@ -114,6 +114,25 @@ ACTIVITY_PREP_FIELDS = frozenset(
 ACTIVITY_PREP_HASH_FIELDS = frozenset(
     {"dependency_manifest_commitment_sha256"}
 )
+ACTIVITY_SIZING_FIELDS = frozenset(
+    {
+        "status",
+        "candidate_id",
+        "item_count",
+        "output_width",
+        "expected_output_width",
+        "load_runtime_seconds",
+        "item_runtime_seconds",
+        "total_runtime_seconds",
+        "peak_vram_gib",
+        "expected_peak_vram_gib_max",
+        "external_call_count",
+        "activity_sizing_commitment_sha256",
+    }
+)
+ACTIVITY_SIZING_HASH_FIELDS = frozenset(
+    {"activity_sizing_commitment_sha256"}
+)
 ACTIVITY_SELECTION_FIELDS = frozenset(
     {
         "status",
@@ -1342,6 +1361,109 @@ def _gpu_peak_gib(device: str) -> float:
         except ValueError:
             continue
     return max(values, default=0.0)
+
+
+def size_activity_candidate(args: argparse.Namespace) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    amendment = _activity_config(cfg)
+    _verify_activity_dependency_manifest(args.public_root, amendment)
+    candidate = _activity_candidate(amendment, args.candidate_id)
+    labels = _activity_labels(cfg)
+    manifest = _verify_activity_manifest(
+        args.manifest,
+        amendment,
+        args.public_root / "public/charades",
+    )
+    if (
+        os.environ.get("HF_HUB_OFFLINE") != "1"
+        or os.environ.get("TRANSFORMERS_OFFLINE") != "1"
+    ):
+        raise RuntimeError("E_ACTIVITY_OFFLINE_ENVIRONMENT")
+    sizing = amendment["resource_ceiling"]["blind_sizing"]
+    if sizing != {
+        "fixture": "development manifest ordinal zero under the already frozen manifest order",
+        "item_count_per_candidate": 1,
+        "ordered_clip_only": True,
+        "fixture_labels_used": False,
+        "score_or_prediction_retention": "PROHIBITED",
+        "scientific_metric_computation": "PROHIBITED",
+        "recorded_fields": [
+            "load_success",
+            "finite_output_width",
+            "wall_time",
+            "peak_VRAM",
+            "local_files_only_reload",
+            "external_call_count",
+        ],
+        "per_candidate_wall_time_hours_max": 0.5,
+        "aggregate_GPU_hours_max": 1.5,
+        "pass_rule": "all three candidates load and emit the prospectively expected finite output width within their frozen VRAM and sizing wall-time ceilings with zero external calls",
+    }:
+        raise RuntimeError("E_ACTIVITY_SIZING_CONTRACT")
+    fixture = manifest["partitions"]["development"][0]
+    started = time.monotonic()
+    infer, frame_count, _ = _load_activity_adapter(
+        args.public_root, candidate, cfg, labels, args.device
+    )
+    load_runtime = time.monotonic() - started
+    peak_vram = _gpu_peak_gib(args.device)
+    media = (
+        args.public_root
+        / "public/charades/CharadesEgo_v1_480"
+        / f"{fixture['id']}.mp4"
+    )
+    item_started = time.monotonic()
+    frames, _ = _decode_uniform_activity_frames(media, frame_count)
+    output = infer(frames)
+    output_width = len(output)
+    if not output or not all(math.isfinite(float(value)) for value in output):
+        raise RuntimeError("E_ACTIVITY_SIZING_INVALID_OUTPUT")
+    expected_width = int(candidate["expected_sizing_output_width"])
+    if output_width != expected_width:
+        raise RuntimeError("E_ACTIVITY_SIZING_OUTPUT_WIDTH")
+    item_runtime = time.monotonic() - item_started
+    total_runtime = time.monotonic() - started
+    peak_vram = max(peak_vram, _gpu_peak_gib(args.device))
+    expected_peak = float(candidate["expected_peak_vram_gib_max"])
+    if peak_vram > expected_peak:
+        raise RuntimeError("E_ACTIVITY_SIZING_VRAM_CEILING")
+    if total_runtime > float(sizing["per_candidate_wall_time_hours_max"]) * 3600:
+        raise RuntimeError("E_ACTIVITY_SIZING_WALL_CEILING")
+    result = {
+        "schema_version": 1,
+        "status": "PASS_BLIND_RESOURCE_SIZING",
+        "candidate_id": candidate["candidate_id"],
+        "candidate_weight_sha256": candidate["weight_sha256"],
+        "dependency_manifest_commitment_sha256": amendment[
+            "runtime_environment"
+        ]["shared"]["dependency_manifest_commitment_sha256"],
+        "fixture_partition": "development",
+        "fixture_manifest_ordinal": 0,
+        "fixture_labels_used": False,
+        "score_or_prediction_retained": False,
+        "scientific_metric_computed": False,
+        "ordered_clip_only": True,
+        "item_count": 1,
+        "output_width": output_width,
+        "expected_output_width": expected_width,
+        "load_runtime_seconds": load_runtime,
+        "item_runtime_seconds": item_runtime,
+        "total_runtime_seconds": total_runtime,
+        "peak_vram_gib": peak_vram,
+        "expected_peak_vram_gib_max": expected_peak,
+        "external_call_count": 0,
+        "local_files_only_reload": True,
+        "telemetry_tracking_disabled": True,
+        "restricted_mount_present": False,
+    }
+    result["activity_sizing_commitment_sha256"] = digest(result)
+    write_private(
+        _activity_run_root(args.public_root)
+        / "sizing"
+        / f"{candidate['candidate_id']}.json",
+        result,
+    )
+    return {key: result[key] for key in ACTIVITY_SIZING_FIELDS}
 
 
 def run_activity_candidate(args: argparse.Namespace) -> dict[str, Any]:
@@ -3008,6 +3130,12 @@ def main() -> None:
     activity_prepare_parser.add_argument("--public-root", type=Path, required=True)
     activity_prepare_parser.add_argument("--manifest", type=Path, required=True)
     activity_prepare_parser.add_argument("--config", type=Path, required=True)
+    activity_size_parser = subparsers.add_parser("activity-size")
+    activity_size_parser.add_argument("--public-root", type=Path, required=True)
+    activity_size_parser.add_argument("--manifest", type=Path, required=True)
+    activity_size_parser.add_argument("--config", type=Path, required=True)
+    activity_size_parser.add_argument("--candidate-id", required=True)
+    activity_size_parser.add_argument("--device", default="cuda")
     activity_candidate_parser = subparsers.add_parser("activity-candidate")
     activity_candidate_parser.add_argument("--public-root", type=Path, required=True)
     activity_candidate_parser.add_argument("--manifest", type=Path, required=True)
@@ -3057,6 +3185,15 @@ def main() -> None:
                 value,
                 allowed_fields=ACTIVITY_PREP_FIELDS,
                 sha256_fields=ACTIVITY_PREP_HASH_FIELDS,
+            )
+        )
+    elif args.command == "activity-size":
+        value = size_activity_candidate(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=ACTIVITY_SIZING_FIELDS,
+                sha256_fields=ACTIVITY_SIZING_HASH_FIELDS,
             )
         )
     elif args.command == "activity-candidate":

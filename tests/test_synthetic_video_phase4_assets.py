@@ -154,6 +154,11 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     )
     assert preparation["scientific_outcome_observed"] is False
     assert preparation["restricted_mount_present"] is False
+    sizing = result["governed_C_activity_checkpoint_sizing_amendment"]
+    assert sizing["status"] == "FROZEN_BEFORE_SIZING_INFERENCE"
+    assert sizing["fixture_labels_used"] is False
+    assert sizing["scores_predictions_or_scientific_metrics_retained"] is False
+    assert sizing["aggregate_GPU_hours_through_C_including_sizing_max"] == 20.0
     assert result["governance_incident"]["restricted_execution_paused"] is False
 
 

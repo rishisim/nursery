@@ -122,6 +122,17 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     assert preparation["candidate_count"] == 3
     assert preparation["model_inference_executed"] is False
     assert preparation["restricted_mount_present"] is False
+    assert [
+        candidate["expected_sizing_output_width"]
+        for candidate in selection["bounded_candidates"]
+    ] == [8, 8, 1024]
+    sizing = selection["resource_ceiling"]["blind_sizing"]
+    assert sizing["fixture_labels_used"] is False
+    assert sizing["score_or_prediction_retention"] == "PROHIBITED"
+    assert sizing["scientific_metric_computation"] == "PROHIBITED"
+    assert sizing["item_count_per_candidate"] == 1
+    assert sizing["aggregate_GPU_hours_max"] == 1.5
+    assert selection["resource_ceiling"]["aggregate_GPU_hours_through_C_max"] == 20.0
 
 
 def test_activity_temporal_permutation_is_deterministic_and_not_identity() -> None:
@@ -198,6 +209,18 @@ def test_activity_preparation_does_not_upgrade_pinned_container_torch() -> None:
     assert 'candidate_id == "egohod_egovideo_l_zero_shot"' in source
     assert "E_ACTIVITY_CONTAINER_TORCH_SHADOWED" in guard
     assert "E_ACTIVITY_CONTAINER_TORCH_VERSION" in guard
+
+
+def test_activity_sizing_is_label_blind_and_retains_no_scores() -> None:
+    import inspect
+
+    source = inspect.getsource(MODULE.size_activity_candidate)
+    assert "fixture['labels']" not in source
+    assert '"rows"' not in source
+    assert '"score_or_prediction_retained": False' in source
+    assert '"scientific_metric_computed": False' in source
+    assert '"fixture_manifest_ordinal": 0' in source
+    assert '"external_call_count": 0' in source
 
 
 def test_egohod_optional_import_compatibility_is_inference_only() -> None:

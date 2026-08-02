@@ -235,6 +235,23 @@
     "scientific_outcome_observed": false,
     "next_step": "blind one-item public H100 sizing for each frozen candidate, then the one frozen development comparison"
   },
+  "governed_C_activity_checkpoint_sizing_amendment": {
+    "status": "FROZEN_BEFORE_SIZING_INFERENCE",
+    "dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
+    "topology": "one_H100_80GB_single_process_no_DDP",
+    "fixture": "development_manifest_ordinal_zero",
+    "item_count_per_candidate": 1,
+    "ordered_clip_only": true,
+    "fixture_labels_used": false,
+    "scores_predictions_or_scientific_metrics_retained": false,
+    "per_candidate_wall_time_hours_max": 0.5,
+    "aggregate_GPU_hours_max": 1.5,
+    "direct_monetary_cost_USD": 0,
+    "candidate_development_aggregate_GPU_hours_max_unchanged": 4.5,
+    "complete_public_holdout_GPU_hours_max_unchanged": 6.0,
+    "governed_C_GPU_hours_max_unchanged": 8.0,
+    "aggregate_GPU_hours_through_C_including_sizing_max": 20.0
+  },
   "governance_incident": {
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_PROCESSING_RESUMED",
     "observed_on": "2026-08-02",

@@ -958,3 +958,13 @@ mount and recorded `model_inference_executed=false`. Candidate loading remains
 gated on that exact manifest. The next operation is blind single-item resource
 sizing for each frozen candidate, followed by the one frozen development
 comparison; no holdout or governed-C outcome has been opened.
+
+The sizing command is itself frozen before model loading. For each candidate it
+uses only manifest ordinal zero from the public development partition, runs the
+ordered clip once, and discards the numerical output immediately after finite
+width validation. It cannot retain a score, prediction, public ID or label and
+cannot compute a scientific metric. Each single-process one-H100 job is capped
+at 30 minutes, for 1.5 aggregate sizing GPU-hours, 160 GiB within the existing
+public storage ceiling and zero direct monetary cost. This adds at most 1.5
+GPU-hours to the previously frozen path, making the through-C ceiling 20.0
+GPU-hours. The development, holdout and C ceilings themselves are unchanged.
