@@ -256,9 +256,9 @@
     "aggregate_GPU_hours_through_C_including_sizing_max": 20.0
   },
   "governed_C_activity_checkpoint_sizing_progress": {
-    "status": "IN_PROGRESS_ONE_OF_THREE_PASS",
-    "passing_candidate_count": 1,
-    "completed_candidate_count": 1,
+    "status": "IN_PROGRESS_TWO_OF_THREE_PASS",
+    "passing_candidate_count": 2,
+    "completed_candidate_count": 2,
     "egohod_output_width": 8,
     "egohod_load_runtime_seconds": 11.950469084084034,
     "egohod_item_runtime_seconds": 0.7430373085662723,
@@ -273,7 +273,14 @@
     "videoprism_compatibility_repair_frozen": "two tokenizer attributes and one gfile attribute with raising hosted-path helpers plus exact pinned-source reference guards; frozen local SentencePiece and local checkpoint bytes remain the only tokenization and weight-loading paths",
     "videoprism_third_engineering_stop": "official model and local checkpoint loaded, then Torch module discovery rejected the temporary TensorFlow stub before preprocessing or numerical forward",
     "videoprism_stub_lifetime_repair_frozen": "remove the temporary TensorFlow namespace immediately after official VideoPrism import; the already imported utility keeps only its local raising gfile object",
-    "next_step": "commit the import-only VideoPrism repair then size the remaining two frozen candidates"
+    "videoprism_output_width": 8,
+    "videoprism_load_runtime_seconds": 7.715867379680276,
+    "videoprism_item_runtime_seconds": 43.915111588314176,
+    "videoprism_total_runtime_seconds": 51.6437055086717,
+    "videoprism_peak_vram_gib": 6.62890625,
+    "videoprism_sizing_commitment_sha256": "6619aa2eadc5a2e49ed12e54af1183934ba6207b394384f80a7fca0625dfe1e7",
+    "videoprism_record_commitment_verified": true,
+    "next_step": "size the final frozen V-JEPA 2 candidate"
   },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",

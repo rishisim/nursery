@@ -1031,3 +1031,10 @@ removes it immediately after official VideoPrism import. The already imported
 utility retains only its local raising `gfile` object, so hosted fallback stays
 impossible while later libraries correctly observe that TensorFlow is absent.
 No score or prediction was produced by this attempt.
+
+The repaired VideoPrism sizing then passed: width 8/8, 7.72-second load,
+43.92-second one-item forward, 51.64 seconds total and 6.629 GiB peak use versus
+the 24 GiB ceiling. It made zero external calls and retained no score,
+prediction or scientific metric. Its sealed record commitment
+`6619aa2e…e1e7` verifies. Two of three blind sizing checks now pass; V-JEPA 2
+remains unopened.

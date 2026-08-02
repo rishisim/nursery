@@ -167,7 +167,10 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert safe_load["weights_only_remains_true"] is True
     assert safe_load["model_inference_executed"] is True
     sizing_progress = result["governed_C_activity_checkpoint_sizing_progress"]
-    assert sizing_progress["status"] == "IN_PROGRESS_ONE_OF_THREE_PASS"
+    assert sizing_progress["status"] == "IN_PROGRESS_TWO_OF_THREE_PASS"
+    assert sizing_progress["completed_candidate_count"] == 2
+    assert sizing_progress["passing_candidate_count"] == 2
+    assert sizing_progress["videoprism_record_commitment_verified"] is True
     assert sizing_progress["record_commitment_verified"] is True
     assert sizing_progress["score_or_prediction_retained"] is False
     assert result["governance_incident"]["restricted_execution_paused"] is False

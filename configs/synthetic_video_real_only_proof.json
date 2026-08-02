@@ -566,7 +566,7 @@
           "next_gate": "restart the already frozen blind single-item sizing"
         },
         "blind_sizing_progress": {
-          "status": "IN_PROGRESS_ONE_OF_THREE_PASS",
+          "status": "IN_PROGRESS_TWO_OF_THREE_PASS",
           "candidate_results": {
             "egohod_egovideo_l_zero_shot": {
               "status": "PASS_BLIND_RESOURCE_SIZING",
@@ -584,10 +584,27 @@
               "activity_sizing_commitment_sha256": "fa6a684ab7a350838dc5fa966416cf1e7b621bed3d317332d23eef6d31fe1280",
               "terminal_job_status": "FAILED_AFTER_RECORD_SEAL_ON_COMPACT_OUTPUT_CANDIDATE_ID_GUARD",
               "sealed_record_commitment_verified": true
+            },
+            "videoprism_lvt_l_zero_shot": {
+              "status": "PASS_BLIND_RESOURCE_SIZING",
+              "item_count": 1,
+              "output_width": 8,
+              "expected_output_width": 8,
+              "load_runtime_seconds": 7.715867379680276,
+              "item_runtime_seconds": 43.915111588314176,
+              "total_runtime_seconds": 51.6437055086717,
+              "peak_vram_gib": 6.62890625,
+              "expected_peak_vram_gib_max": 24.0,
+              "external_call_count": 0,
+              "score_or_prediction_retained": false,
+              "scientific_metric_computed": false,
+              "activity_sizing_commitment_sha256": "6619aa2eadc5a2e49ed12e54af1183934ba6207b394384f80a7fca0625dfe1e7",
+              "terminal_job_status": "COMPLETED",
+              "sealed_record_commitment_verified": true
             }
           },
-          "completed_candidate_count": 1,
-          "passing_candidate_count": 1,
+          "completed_candidate_count": 2,
+          "passing_candidate_count": 2,
           "scientific_candidate_outcomes_opened": false
         },
         "bounded_candidates": [
