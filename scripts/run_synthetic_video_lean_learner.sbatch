@@ -17,6 +17,9 @@ export HF_HOME="${PHASE4_PUBLIC_ROOT}/models/learner-hf-home"
 export MASTER_ADDR=127.0.0.1 MASTER_PORT=29631 RANK=0 WORLD_SIZE=1 LOCAL_RANK=0 LOCAL_WORLD_SIZE=1
 export CC="${PHASE4_PUBLIC_ROOT}/models/triton-compiler/bin/x86_64-conda-linux-gnu-cc"
 export PATH="${PHASE4_PUBLIC_ROOT}/models/triton-compiler/bin:$PATH"
+log_root="${PHASE4_RESTRICTED_ROOT}/real_only_proof/logs"
+mkdir -p "$log_root"
+exec >"${log_root}/learner-${SLURM_JOB_ID}.out" 2>"${log_root}/learner-${SLURM_JOB_ID}.err"
 tmp="/tmp/lean-learner-${SLURM_JOB_ID}"
 mkdir -p "$tmp/pydeps"
 trap 'find "$tmp" -mindepth 1 -delete 2>/dev/null || true; rmdir "$tmp" 2>/dev/null || true' EXIT
