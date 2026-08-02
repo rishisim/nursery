@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "FROZEN_PENDING_CORRECTED_PHASE4_PASS_AND_RESOURCE_SIZING",
+  "status": "FROZEN_CORRECTED_PHASE4_PASS_PENDING_RESOURCE_SIZING",
   "claim_role": "exploratory_real_only_proof_of_life_not_confirmatory_readiness",
   "learner": {
     "repository": "facebookresearch/egobabyvlm",

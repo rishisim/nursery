@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=phase4-common-assets
-#SBATCH --partition=h200
+#SBATCH --partition=h100
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=2
 #SBATCH --gpus-per-node=2

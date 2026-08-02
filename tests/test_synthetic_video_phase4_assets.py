@@ -67,7 +67,7 @@ def test_lexical_filter_dummy_preflight_is_public_offline_and_bounded():
 def test_governed_build_freezes_final_topology_and_seals_common_assets():
     batch = Path("scripts/build_synthetic_video_phase4_assets.sbatch").read_text()
     source = Path("scripts/build_synthetic_video_phase4_assets.py").read_text()
-    assert "#SBATCH --partition=h200" in batch
+    assert "#SBATCH --partition=h100" in batch
     assert "#SBATCH --ntasks-per-node=2" in batch
     assert "#SBATCH --gpus-per-node=2" in batch
     assert "#SBATCH --time=12:00:00" in batch
@@ -93,8 +93,8 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "PROVISIONAL_SUPERSEDED_PENDING_REPAIR"
-    assert result["scientifically_accepted"] is False
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_REAL_ONLY_PROOF_IN_PROGRESS"
+    assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
     assert len({canonical(value) for value in references.values()}) == 1

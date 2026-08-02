@@ -386,12 +386,30 @@ def stage(mount: Path, private_root: Path) -> dict[str, object]:
     return {"status": "PASS", "calibration_clips": len(calibration), "evaluation_recordings": len(evaluation), "stage_commitment": digest(manifest)}
 
 
+def verify_acquisition(private_root: Path) -> dict[str, object]:
+    allocation=json.loads((private_root/"restricted_allocation.json").read_text())
+    acquisition=json.loads((private_root/"restricted_acquisition.json").read_text())
+    verified=[]
+    for row in allocation["evaluation_media"]:
+        key=digest({"participant_key":row["participant_key"],"media_key":row["media_key"]})
+        item=acquisition["items"].get(key)
+        if not item or item.get("status")!="COMPLETE": raise Phase4Error("E_EVALUATION_ACQUISITION")
+        media_path=private_root/"evaluation_media"/item["file"]
+        if not media_path.is_file() or media_path.stat().st_size!=item["size_bytes"] or file_digest(media_path)!=item["sha256"]:
+            raise Phase4Error("E_EVALUATION_VERIFY")
+        verified.append({"asset_key":key,"size_bytes":item["size_bytes"],"sha256":item["sha256"]})
+    record={"schema_version":1,"status":"PASS","items":verified}
+    write_private(private_root/"restricted_acquisition_verification.json",record)
+    return {"status":"PASS","verified_recordings":len(verified),"verified_bytes":sum(x["size_bytes"] for x in verified),"verification_commitment":digest(record)}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
     a = sub.add_parser("allocate"); a.add_argument("--mount", type=Path, required=True); a.add_argument("--private-root", type=Path, required=True)
     q = sub.add_parser("acquire"); q.add_argument("--private-root", type=Path, required=True); q.add_argument("--transfer-config", type=Path, required=True); q.add_argument("--workers", type=int, choices=range(1, 5), default=4)
     o = sub.add_parser("audit-overlap"); o.add_argument("--mount", type=Path, required=True); o.add_argument("--private-root", type=Path, required=True)
+    v = sub.add_parser("verify-acquisition"); v.add_argument("--private-root", type=Path, required=True)
     s = sub.add_parser("stage"); s.add_argument("--mount", type=Path, required=True); s.add_argument("--private-root", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "allocate":
@@ -400,6 +418,8 @@ def main() -> int:
         result = acquire(args.private_root.resolve(), args.transfer_config.resolve(), args.workers)
     elif args.command == "audit-overlap":
         result = audit_overlap(args.mount.resolve(), args.private_root.resolve())
+    elif args.command == "verify-acquisition":
+        result = verify_acquisition(args.private_root.resolve())
     else:
         result = stage(args.mount.resolve(), args.private_root.resolve())
     print(json.dumps(result, sort_keys=True))

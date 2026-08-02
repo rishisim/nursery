@@ -93,7 +93,7 @@ may not be sent to APIs, hosted services, Git, cloud storage, telemetry, or
 other third parties. The missing `yding` SLURM association is a non-blocking
 fair-share/accounting correction. Post-pass gates are in
 [`docs/synthetic_video_preregistration.md`](docs/synthetic_video_preregistration.md).
-The provisional Phase 4 record is
+The corrected Phase 4 common-asset record is
 [`results/synthetic_video_phase4.json`](results/synthetic_video_phase4.json).
 Its deviation ledger is
 [`results/synthetic_video_phase4_deviations.json`](results/synthetic_video_phase4_deviations.json).

@@ -1,63 +1,67 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "PROVISIONAL_SUPERSEDED_PENDING_REPAIR",
-  "scientifically_accepted": false,
+  "status": "CORRECTED_COMMON_ASSETS_PASS_REAL_ONLY_PROOF_IN_PROGRESS",
+  "scientifically_accepted": true,
+  "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
   "signed_on": "2026-08-01",
-  "stage_a": {
-    "status": "PROVISIONAL_ENGINEERING_RUN_NOT_SCIENTIFICALLY_ACCEPTED",
-    "selected_candidate": "whisper-small-opus-de-en",
-    "decision_sha256": "8aade43587eaa0d65dc10984219b5006ceaf9ace1312a964e6f33541f5c53669"
+  "prior_commitments": {
+    "status": "PROVISIONAL_SUPERSEDED",
+    "lexical": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1",
+    "temporal": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f"
   },
-  "stage_b": {
+  "corrected_stage_b": {
     "status": "PASS",
-    "final_topology_preflight": {
-      "status": "PASS",
-      "topology": "1_node_2_H200_2_processes",
-      "commitment": "3271b7b8c7f01d8650e97bece6c9168587416136815287337e7512174618c4b7"
+    "topology": "1_node_2_H100_80GB_2_processes",
+    "wall_time_cap_hours": 12,
+    "asset_build_job": {
+      "status": "COMPLETED",
+      "elapsed": "00:57:45",
+      "exit_code": "0:0"
     },
-    "allocation_commitment": "d3963d57dbab81e5061e975243bbb24800860434773b6786572418674577c8e0",
-    "acquisition_commitment": "ca66f9cfa39cc2bdf590c20c57171211338333696737b1be9e6f8d4608f1602b",
-    "stage_commitment": "561d35934bb6773050bade6c7f8c140627e784cd5be7694e613b7eccf46cce36",
-    "governed_tree_commitment": "15c014e12ae927c2f0543cfc93d03901d583f9928c0ce19ee643d0aaf50cd753",
-    "asset_build_job": {"status": "COMPLETED", "elapsed": "00:09:15", "exit_code": "0:0"},
-    "canonical_seal_rerun": {"status": "COMPLETED", "elapsed": "00:03:45", "exit_code": "0:0"}
+    "acquisition_verification": {
+      "status": "PASS",
+      "recordings": 23,
+      "bytes": 28082044928,
+      "commitment": "00bb095cfba4a50a295f9d2bf52e1dd8b9bbe147cc0751021ade270d03d75aa1"
+    },
+    "blocking_overlap_audit_commitment": "df1c9285c080b303b3464eeb66e2052d719ef48941c302c204486d91f4c3278f",
+    "blocking_overlap_post_resolution_unresolved": 0
   },
-  "lexical_commitment": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1",
-  "temporal_commitment": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f",
+  "lexical_commitment": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4",
+  "temporal_commitment": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e",
   "common_asset_references": {
-    "Real-full": {"lexical": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1", "temporal": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f"},
-    "Synthetic-full": {"lexical": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1", "temporal": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f"},
-    "Real-small": {"lexical": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1", "temporal": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f"},
-    "Mixed": {"lexical": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1", "temporal": "0261dca958f22f03918da124d218b71b4f466bf38290868ffe27a0d32da2545f"}
+    "Real-full": {"lexical": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4", "temporal": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e"},
+    "Synthetic-full": {"lexical": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4", "temporal": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e"},
+    "Real-small": {"lexical": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4", "temporal": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e"},
+    "Mixed": {"lexical": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4", "temporal": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e"}
   },
   "contract_identical_all_arms": true,
-  "hash_inventory": {"lexical_files": 524, "temporal_files": 14689},
   "audits": {
-    "lexical_noun_count": 30,
-    "lexical_adjective_count": 24,
-    "lexical_style_count": 2,
     "evaluation_child_count": 8,
-    "evaluation_session_count": 19,
+    "evaluation_session_count": 18,
     "calibration_evaluation_child_overlap_count": 0,
-    "temporal_row_count": 3672,
-    "temporal_frame_count": 14688,
-    "frame_duplicate_count": 145,
-    "decode_excluded_row_count": 5,
-    "all_candidate_counts_exact": true
+    "temporal_row_count": 3209,
+    "temporal_frame_count": 12836,
+    "decode_excluded_row_count": 4,
+    "official_loader_all_manifests": true,
+    "official_evaluator_structural_smoke": true,
+    "near_duplicate_diagnostics_blocking": false,
+    "cross_role_phash_pairs_at_threshold": 0,
+    "cross_role_embedding_pairs_at_threshold": 0
   },
-  "filters": {
-    "lexical_source": "calibration_C_only",
-    "temporal_source": "evaluation_children_sessions_only",
-    "frame_decode_failure": "exclude_complete_query_row_without_substitution"
+  "lexical_filter_retained_removed": {
+    "cartoon_adjectives": {"retained": 41, "removed": 55},
+    "cartoon_nouns": {"retained": 53, "removed": 47},
+    "realistic_adjectives": {"retained": 29, "removed": 67},
+    "realistic_nouns": {"retained": 41, "removed": 59}
   },
   "limitations": [
     "Machine-DevBench images are generated and are not held-out-real ChildLens evaluation",
     "temporal labels are model-derived with no referent ground truth and no human German validation",
-    "duplicate frames are audited and retained under the frozen common-asset contract",
-    "single authorized operator; score sealing and all preregistered unblinding rules remain in force",
-    "no learner training, generator/TTS execution, synthetic generation, score opening, or scientific evaluation occurred"
+    "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
+    "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "Phase 4 validity repair only; no confirmatory Phase 5 launch or claim"
+  "next_authorized_scope": "one-seed real-only 1/3/6-hour proof-of-life only; no synthetic arm or confirmatory equivalence test"
 }

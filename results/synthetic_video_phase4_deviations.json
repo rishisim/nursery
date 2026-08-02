@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "status": "OPEN_VALIDITY_REPAIR",
+  "status": "CLOSED_CORRECTED_ASSETS_RESEALED",
   "observed_information_scope": "aggregate engineering and asset-count information only; no learner or scientific outcomes",
   "prior_commit": "b9bbba4a3294eb3b9a007423a301e3b9cc0c6751",
-  "prior_commitments_status": "PROVISIONAL_SUPERSEDED_PENDING_REPAIR",
+  "prior_commitments_status": "PROVISIONAL_SUPERSEDED",
   "resolved_allocation_ambiguity": {
     "area": "whole_child_allocation_encoding",
     "reason": "Phase 3 names HMAC input study_id || child_id but does not freeze the study_id byte value or text encoding/concatenation convention; materially different assignments are possible",
@@ -12,7 +12,7 @@
   },
   "corrected_allocation_aggregate": {
     "status": "PASS",
-    "commitment_before_exact_overlap_resolution": "1bbd50e4ebf0c1569c3f26d978a7a45e4a0740ed4ba6ddedfe6a29c6419b6421",
+    "commitment_before_exact_overlap_resolution": "74a3a883291681783c78f46546cbb0b91e26f8e3896d0a84cdc6311902260b35",
     "counts": {"training": 28, "evaluation": 8, "validation": 4},
     "old_new_role_overlap_counts": {
       "training": {"training": 19, "evaluation": 6, "validation": 3},
@@ -25,7 +25,8 @@
     "pre_resolution_cross_role_groups": {"source_id": 0, "session_time_interval": 0, "content_sha256": 0},
     "quarantined_by_role": {"calibration": 0, "training": 0, "validation": 0, "evaluation": 0},
     "post_resolution_unresolved_exact_or_temporal_count": 0,
-    "allocation_commitment_after_resolution": "2e545ef59f24d88963c2715e99e3effcecdf79deb30d5cb6235a5417d71d6ffa"
+    "allocation_commitment_after_resolution": "fe4034c53aa45586d39fb31e386ec592c69c140e58d4aab72272ce4b6c72cb8c",
+    "sealed_blocking_audit_commitment": "df1c9285c080b303b3464eeb66e2052d719ef48941c302c204486d91f4c3278f"
   },
   "upstream_filter_preflight": {
     "status": "PASS",
@@ -34,6 +35,10 @@
     "weights_sha256": "0cdab5b338cbaa1e7a5dcd1b2fb4c9f4d5df1abd289564658edbab64a650e7e8",
     "thresholds": {"minimum_alignment": 0.15, "require_contrastive": true},
     "threshold_source": "pinned upstream defaults frozen before corrected asset scores"
+  },
+  "corrected_seals": {
+    "lexical": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4",
+    "temporal": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e"
   },
   "deviations": [
     {
