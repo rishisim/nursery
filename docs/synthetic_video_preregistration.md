@@ -854,3 +854,74 @@ stopped. Resumption requires the same official EgoVLPv2 checkpoint to become
 locally obtainable with an immutable byte hash and explicit academic-local
 weight terms. The compact feasibility record commitment is
 `b5dd6c03…a49d0`.
+
+### Prospective activity/context checkpoint selection amendment
+
+The preceding pre-model no-go remains final for its frozen EgoVLPv2 stack. It
+is the third preserved failure in sequence, after the original governed-C
+missingness no-go (`28ef267c…e3d5`) and the PE-Core + OWLv2 public specificity
+no-go (`042e9ba4…fa7f`). On 2026-08-02 the user prospectively authorized a new,
+bounded selection study that may replace only the unavailable activity/context
+component. It does not reopen those results, alter the other extractor
+families, or change any public-holdout or governed-C threshold.
+
+Primary-source research kept unlike evidence separate. In particular,
+zero-shot, public-probe, fine-tuned, retrieval, classification, and
+anticipation results are not treated as one leaderboard:
+
+| Family | Relevant published evidence | Temporal/text recipe | Artifact and terms decision |
+| --- | --- | --- | --- |
+| EVA02-AT B/L | strongest reviewed egocentric video-text evidence; L reports Charades-Ego zero-shot mAP 30.9 and substantially stronger fine-tuned and EK100 results | joint spatial-temporal attention; 4-frame pretraining and 16-frame downstream settings | ineligible: official delivery is Baidu-only here; bytes, SHA-256, and separate checkpoint terms were not resolved |
+| EgoHOD EgoVideo-L | zero-shot EK100 MIR mAP 41.8, EK100 action top-1 24.0, EGTEA mean/top-1 47.1/51.7, EgoMCQ intra/inter 65.5/95.9; no Charades-Ego result | 16-frame egocentric video-text encoder with motion adapter | eligible; official Apache-2.0 code/model record and complete 5,130,482,632-byte checkpoint, SHA-256 `71faa0b6…880da` |
+| LaViLa TSF-L | zero-shot Charades-Ego mAP 28.9; EK100 MIR mAP 35.0/36.1 for 4/16 frames | Ego4D video-text dual encoder, 16-frame Charades evaluation | ineligible: MIT code, but no separately stated terms for the external checkpoint |
+| V-JEPA 2 / 2.1 | V-JEPA 2 ViT-L reports public attentive-probe SSv2 73.7 and Diving48 89.0, plus EK100 anticipation action R@5 32.7; these are not zero-shot | 64-frame self-supervised temporal encoder; no text alignment, so this study permits one frozen public-only probe | V-JEPA 2 ViT-L eligible under its official Meta model card; V-JEPA 2.1 excluded because its direct checkpoint record lacks separate weight terms |
+| EgoVLP / HierVL | older direct Charades-Ego zero-shot mAP 25.0/26.0; HierVL adds long-term hierarchy | short-term video-text transfer, with hierarchical aggregation only in HierVL | not shortlisted: weaker directly relevant evidence and/or less explicit checkpoint provenance than the bounded candidates |
+| EgoVideo 2024 / InternVideo2-CLIP | predecessor reports strong EK100 MIR; InternVideo2-CLIP reports general zero-shot Charades 32.9 | four-frame predecessor; eight-frame 1B general video-text model | predecessor is superseded by EgoHOD; relevant InternVideo2 1B bytes returned unauthorized behind its access gate |
+| VideoPrism-LvT-L | public zero-shot Charades mAP 32.4 and ActivityNet retrieval 49.1/51.3; frozen-backbone 53.2 Charades and 64.6 SSv2 are explicitly probe results | released 8-frame factorized temporal video-text encoder | eligible; official Apache-2.0 code, CC-BY-4.0 non-software materials statement, and complete 2,319,542,188-byte checkpoint, SHA-256 `eb951c65…0936b` |
+
+The bounded candidate set is exactly EgoHOD EgoVideo-L zero-shot,
+VideoPrism-LvT-L zero-shot, and V-JEPA 2 ViT-L with one frozen public-only
+multilabel probe. Their exact official repository commits, model revisions,
+local file SHA-256 values, preprocessing, frame counts, prompts/probe recipe,
+expected VRAM, and limitations are in schema 10 of the canonical proof config.
+No fourth candidate may be added after any result.
+
+The public activity fixture is now fixed without opening model outcomes. It
+uses 96 verified 5–60-second first-person Charades-Ego videos: 48 development
+items from 24 public subjects and 48 untouched holdout items from 19 different
+public subjects. Subject and video overlap are both zero. The frozen public
+action-code mapping supplies multilabel versions of the existing eight coarse
+contexts; the least represented label has 9 development positives and 8
+holdout positives. The external row/file manifest—including public IDs and
+per-file hashes—remains outside Git. Its commitment is
+`7a44e6cd…2441f8`; the official video and annotation archive hashes are
+`3df448ab…b1110` and `ee54787f…e66e`.
+
+Candidate selection uses four subject-group cross-fitted development folds.
+Label thresholds and explicit abstention margins are learned only from the
+other folds; V-JEPA's eight independent L2 logistic probes are also trained
+only on other-fold subjects. A candidate is eligible to win only with macro-F1
+at least `0.60`, worst-class recall at least `0.40`, coverage at least `0.80`,
+zero unaccounted failures/external calls, and the frozen positive directional
+tests on ordered versus shuffled and repeated-center motion clips. Eligible
+candidates are ranked once by macro-F1, worst-class recall, coverage, temporal
+sensitivity, peak VRAM, runtime, then candidate ID. Exactly one winner is
+refit/calibrated on all development data and sealed before the untouched
+holdout. Winning development is not a public-gate pass.
+
+The run is single-process on one H100 80GB: at most 1.5 hours per candidate,
+4.5 candidate GPU-hours total, 6 additional hours for the complete public
+holdout, and—only after a complete holdout pass—8 hours for governed C. Public
+and governed incremental storage ceilings are 160 and 80 GiB; direct monetary
+cost is zero and institutional GPU time is accounted. This exact narrowing is
+covered by the user's existing broad GPU authorization. No DDP or other GPU
+topology is authorized. All media, annotations, weights, predictions,
+embeddings, probes, caches, and logs stay outside Git; no restricted mount is
+permitted during public work, and inference is network-disabled after cache
+preparation.
+
+At amendment freeze, no candidate inference, public holdout inference,
+governed-C reopening, LTX work, generation, or synthetic learner score has
+occurred. The next authorized operation is implementation qualification and
+the one frozen public-development comparison. The complete extractor must
+still pass every unchanged strengthened holdout gate before C can reopen.

@@ -90,6 +90,25 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     assert feasibility["checkpoint_sha256_resolved"] is False
     assert feasibility["checkpoint_specific_weight_terms_found"] is False
 
+    selection = calibration["extractor"]["activity_checkpoint_selection_amendment"]
+    assert selection["status"] == "FROZEN_BEFORE_EMPIRICAL_CANDIDATE_OUTCOMES"
+    assert [candidate["candidate_id"] for candidate in selection["bounded_candidates"]] == [
+        "egohod_egovideo_l_zero_shot",
+        "videoprism_lvt_l_zero_shot",
+        "vjepa2_vitl_public_probe",
+    ]
+    assert all(len(candidate["weight_sha256"]) == 64 for candidate in selection["bounded_candidates"])
+    assert selection["public_activity_fixture"]["manifest_commitment_sha256"] == "7a44e6cd72043e3720c98111e9d6e92b5a043ac43d66cdad5355bc01782441f8"
+    assert selection["public_activity_fixture"]["subject_overlap_count"] == 0
+    assert selection["public_activity_fixture"]["video_overlap_count"] == 0
+    assert selection["public_activity_fixture"]["holdout_outcomes_opened"] is False
+    assert selection["development_comparison"]["candidate_count"] == 3
+    assert selection["development_comparison"]["eligibility_floors"]["macro_f1_min"] == 0.6
+    assert selection["development_comparison"]["eligibility_floors"]["nonabstained_coverage_min"] == 0.8
+    assert selection["independent_holdout"]["activity_context_macro_f1_min_unchanged"] == 0.6
+    assert selection["resource_ceiling"]["GPU_count"] == 1
+    assert selection["execution_controls"]["DDP"] is False
+
 
 def test_bucket_and_union_duration_are_frozen_and_exact() -> None:
     assert MODULE.bucket(0.03, [0.0, 0.03, 0.07, 1.0]) == "bin_1"

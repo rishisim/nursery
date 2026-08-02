@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_PRIOR_CALIBRATION_NO_GOS_PRESERVED_ACTIVITY_CHECKPOINT_SELECTION_FROZEN",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -63,14 +63,16 @@
     "interpretation": "the multi-pass Real-1h positive control missed only the frozen mean-gain component; this remains inconclusive about data quality and does not authorize generator or synthetic-arm work"
   },
   "post_gate_descriptive_extension": {
-    "status": "STOPPED_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO",
+    "status": "PENDING_FROZEN_ACTIVITY_CHECKPOINT_SELECTION_THEN_UNCHANGED_PUBLIC_AND_C_GATES",
     "effective_on": "2026-08-02",
     "preserves_coverage_redesign_stop": true,
     "authorization": "explicit user-authorized scientifically weaker one-accepted-hour descriptive Synthetic-1h LTX extension",
     "question": "does this particular one-accepted-hour LTX corpus produce a directionally similar training effect under the identical learner procedure",
     "generator": "locally governed LTX-2.3; user-directed practical choice; LTX scored 19/28 and did not win the blinded bakeoff",
     "execution_order": ["governed_C_calibration_and_episode_plan_commitment", "public_dummy_LTX_final_topology_preflight", "freeze_and_approve_exact_resource_ceiling_if_required", "generate_and_seal_exactly_3600_credited_seconds", "three_matched_seed_synthetic_learner_runs"],
-    "claim_limits": ["descriptive_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_more_than_one_accepted_synthetic_hour"]
+    "claim_limits": ["descriptive_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_more_than_one_accepted_synthetic_hour"],
+    "prior_stop_preserved": "STOPPED_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO",
+    "synthetic_work_status": "NOT_RUN_ACTIVITY_CHECKPOINT_SELECTION_PENDING"
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -154,6 +156,70 @@
     "feasibility_record_commitment_sha256": "b5dd6c03d7b75e3be2f437c5247b66424f9f6aee28fbaaebbba6d0fa2f0a49d0",
     "stop_reason": "the frozen EgoVLPv2 checkpoint cannot be downloaded from its official URL to resolve immutable bytes and SHA-256 and the official project record does not separately state checkpoint weight terms; no substitution is permitted"
   },
+  "governed_C_activity_checkpoint_selection": {
+    "status": "FROZEN_BEFORE_EMPIRICAL_CANDIDATE_OUTCOMES",
+    "effective_on": "2026-08-02",
+    "authorization": "explicit prospective user authorization to replace only the unavailable EgoVLPv2 activity-context component through one bounded public-development selection",
+    "prior_failure_sequence_preserved": [
+      "28ef267cd0608a33b50037a50e44a622875dc5aad5d1b2a422aa6612347fe3d5",
+      "042e9ba45fa64abda183eb7e575c5aa2e4990cebf1e54d25c0bffdd34b86fa7f",
+      "b5dd6c03d7b75e3be2f437c5247b66424f9f6aee28fbaaebbba6d0fa2f0a49d0"
+    ],
+    "unchanged_stack": [
+      "EgoHOS_hand_object_action",
+      "Grounding_DINO_plus_SAM_2_1_scene_and_referent_tracking",
+      "DINOv2_diversity_embeddings",
+      "deterministic_visual_regime",
+      "deterministic_temporal_continuity_recurrence",
+      "shared_language_adapter"
+    ],
+    "bounded_candidate_ids": [
+      "egohod_egovideo_l_zero_shot",
+      "videoprism_lvt_l_zero_shot",
+      "vjepa2_vitl_public_probe"
+    ],
+    "candidate_weight_sha256": [
+      "71faa0b6e5ebfb912238a099b16b1ff8b6b0a74cbb5b9eb43d5ad8bc92f880da",
+      "eb951c65a5f6b1f793a40deb3a7492a3a68b28b61e1358a893086e5e4300936b",
+      "25466aef85727d16546c6cf8c99f12fcfad9cbca8225d45f23685e2e025b786b"
+    ],
+    "public_fixture": {
+      "source": "Charades-Ego_first_person",
+      "development_items": 48,
+      "development_subjects": 24,
+      "holdout_items": 48,
+      "holdout_subjects": 19,
+      "subject_overlap_count": 0,
+      "video_overlap_count": 0,
+      "manifest_commitment_sha256": "7a44e6cd72043e3720c98111e9d6e92b5a043ac43d66cdad5355bc01782441f8",
+      "holdout_outcomes_opened": false
+    },
+    "development_outcomes_opened": false,
+    "winner_selected": false,
+    "winner_sealed": false,
+    "public_holdout_opened": false,
+    "governed_C_reopened": false,
+    "generator_or_synthetic_learner_outcome_opened": false,
+    "unchanged_public_activity_macro_f1_min": 0.6,
+    "unchanged_public_activity_coverage_min": 0.8,
+    "unchanged_governed_C_missingness_max": 0.2,
+    "unchanged_governed_C_measured_axes_min": 6,
+    "resource_ceiling": {
+      "GPU_type": "NVIDIA_H100_80GB",
+      "GPU_count": 1,
+      "candidate_development_aggregate_GPU_hours_max": 4.5,
+      "complete_public_holdout_GPU_hours_max": 6.0,
+      "governed_C_rerun_GPU_hours_max": 8.0,
+      "aggregate_GPU_hours_through_C_max": 18.5,
+      "public_storage_GiB_max": 160,
+      "governed_incremental_storage_GiB_max": 80,
+      "direct_monetary_cost_USD": 0,
+      "DDP": false
+    },
+    "commitment_scope": "canonical JSON of this compact result object excluding selection_amendment_commitment_sha256",
+    "selection_amendment_commitment_sha256": "9030e1de95366f38a763905c733eee781c873932eb21eaa78115bba4a9097ea9",
+    "next_step": "implement and validate the three frozen adapters then run exactly one public-development comparison; no holdout or governed C access before the applicable seals"
+  },
   "governance_incident": {
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_PROCESSING_RESUMED",
     "observed_on": "2026-08-02",
@@ -197,5 +263,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "none within the frozen extractor repair; a different extractor or public gate would require a new explicit prospective user decision, while governed C rerun LTX preflight generation and synthetic learner training remain stopped"
+  "next_authorized_scope": "frozen public-development activity checkpoint selection, followed only on pass by winner seal and the unchanged complete public holdout; governed C and LTX remain gated"
 }

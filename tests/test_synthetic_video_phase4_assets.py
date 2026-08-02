@@ -93,7 +93,7 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_PRIOR_CALIBRATION_NO_GOS_PRESERVED_ACTIVITY_CHECKPOINT_SELECTION_FROZEN"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -105,7 +105,8 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert result["coverage_redesign"]["gate_pass"] is False
     assert result["coverage_redesign"]["gate_components"]["mean_gain_at_least_0_02"] is False
     assert result["post_gate_descriptive_extension"]["preserves_coverage_redesign_stop"] is True
-    assert result["post_gate_descriptive_extension"]["status"] == "STOPPED_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO"
+    assert result["post_gate_descriptive_extension"]["status"] == "PENDING_FROZEN_ACTIVITY_CHECKPOINT_SELECTION_THEN_UNCHANGED_PUBLIC_AND_C_GATES"
+    assert result["post_gate_descriptive_extension"]["prior_stop_preserved"] == "STOPPED_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO"
     assert result["governed_C_calibration"]["critical_axis_failure"] == "audiovisual_grounding_opportunity_high_missingness"
     assert result["governed_C_calibration"]["provisional_episode_plan_executable"] is False
     repair = result["governed_C_calibration_extractor_repair"]
@@ -128,12 +129,30 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert redesign["first_repair_public_commitment_preserved"] == repair["public_qualification_commitment_sha256"]
     commitment = redesign.pop("feasibility_record_commitment_sha256")
     assert digest(redesign) == commitment
+    selection = result["governed_C_activity_checkpoint_selection"]
+    assert selection["status"] == "FROZEN_BEFORE_EMPIRICAL_CANDIDATE_OUTCOMES"
+    assert selection["prior_failure_sequence_preserved"] == [
+        result["governed_C_calibration"]["calibration_commitment_sha256"],
+        repair["public_qualification_commitment_sha256"],
+        commitment,
+    ]
+    assert selection["bounded_candidate_ids"] == [
+        "egohod_egovideo_l_zero_shot",
+        "videoprism_lvt_l_zero_shot",
+        "vjepa2_vitl_public_probe",
+    ]
+    assert selection["development_outcomes_opened"] is False
+    assert selection["winner_selected"] is False
+    assert selection["public_holdout_opened"] is False
+    assert selection["governed_C_reopened"] is False
+    selection_commitment = selection.pop("selection_amendment_commitment_sha256")
+    assert digest(selection) == selection_commitment
     assert result["governance_incident"]["restricted_execution_paused"] is False
 
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "STOP_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO"
+    assert proof["status"] == "ACTIVITY_CHECKPOINT_SELECTION_FROZEN_PRIOR_NO_GOS_PRESERVED_PENDING_PUBLIC_DEVELOPMENT"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,
@@ -150,8 +169,8 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
-    assert proof["schema_version"] == 9
-    assert proof["generator_gate"]["status"] == "SELECTED_LOCAL_NOT_RUN_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO"
+    assert proof["schema_version"] == 10
+    assert proof["generator_gate"]["status"] == "SELECTED_LOCAL_NOT_RUN_ACTIVITY_CHECKPOINT_SELECTION_PENDING"
     assert proof["generator_gate"]["implementation"]["commit"] == "9377758131b1ffde4b7f766804590a6617bf2ab9"
     assert proof["generator_gate"]["weights"]["revision"] == "4229404625088d21c4f112eb640fb04a0900ee25"
     assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["accepted_credited_seconds_exact"] == 3600
@@ -160,7 +179,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert "LTX 19/28" in proof["generator_gate"]["bakeoff_interpretation"]
     assert proof["generator_gate"]["no_substitution"] is True
     assert proof["calibration_C"]["source"] == "development_set_C_only_never_training_validation_or_evaluation"
-    assert proof["calibration_C"]["local_generator_gate"] == "NO_GO_DOMAIN_APPROPRIATE_EXTRACTOR_PREMODEL_FEASIBILITY"
+    assert proof["calibration_C"]["local_generator_gate"] == "PENDING_FROZEN_ACTIVITY_CHECKPOINT_SELECTION_THEN_UNCHANGED_PUBLIC_AND_C_GATES"
     repair_result = proof["calibration_C"]["extractor_repair_result"]
     assert repair_result["status"] == "NO_GO"
     assert repair_result["hand_negative_correct_count"] == 1

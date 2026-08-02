@@ -159,6 +159,17 @@ feasibility gate: the official EgoVLPv2 zero-shot Charades-Ego checkpoint URL
 returned HTTP 403, so checkpoint bytes and SHA-256 could not be resolved, and
 the official record did not separately state checkpoint-weight terms. No model
 inference, public development/holdout, C reopening, LTX run, generation, or
-synthetic training occurred. Resumption requires that same official checkpoint
-with immutable bytes/hash and explicit academic-local weight terms; model
-substitution and threshold relaxation remain prohibited.
+synthetic training occurred.
+
+That third failure is also preserved. The user has now prospectively authorized
+one bounded activity-checkpoint selection amendment, without changing EgoHOS,
+Grounding DINO/SAM 2.1, DINOv2, the strengthened public gates, or the governed-C
+gate. Primary-source and actual-download screening froze exactly three
+candidates before outcomes: EgoHOD EgoVideo-L zero-shot, VideoPrism-LvT-L
+zero-shot, and V-JEPA 2 ViT-L with one public-only probe. Their immutable local
+weight hashes and a subject-disjoint 48-development/48-holdout Charades-Ego
+fixture commitment are recorded in schema 10 of the canonical proof config.
+No candidate inference or holdout result has yet been opened. The next
+authorized operation is the frozen cross-fitted public-development comparison;
+the winner must then pass the unchanged complete public holdout before C may be
+reopened. LTX preflight, generation, and synthetic training remain stopped.
