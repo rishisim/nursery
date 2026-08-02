@@ -18,7 +18,7 @@ tmp="/tmp/lean-learner-${SLURM_JOB_ID}"
 mkdir -p "$tmp/pydeps"
 trap 'find "$tmp" -mindepth 1 -delete 2>/dev/null || true; rmdir "$tmp" 2>/dev/null || true' EXIT
 tar -C "$tmp/pydeps" -xf "${PHASE4_PUBLIC_ROOT}/models/phase4-language-pydeps.tar"
-export PYTHONPATH="${PHASE4_PUBLIC_ROOT}/source:${PHASE4_PUBLIC_ROOT}/models/evaluator-pydeps:$tmp/pydeps:${PHASE4_EGOBABY_ROOT}"
+export PYTHONPATH="${PHASE4_PUBLIC_ROOT}/source:${PHASE4_PUBLIC_ROOT}/models/evaluator-pydeps:$tmp/pydeps:${PHASE4_EGOBABY_ROOT}:${PHASE4_EGOBABY_ROOT}/apps/baselines/dinov2/third_party"
 singularity exec --nv --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${PHASE4_RESTRICTED_ROOT}:${PHASE4_RESTRICTED_ROOT},${PHASE4_EGOBABY_ROOT}:${PHASE4_EGOBABY_ROOT}" \
   "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_lean_learner.py" \
   --upstream "${PHASE4_EGOBABY_ROOT}" --root "${PHASE4_RESTRICTED_ROOT}/real_only_proof" --public "${PHASE4_PUBLIC_ROOT}" --restricted "${PHASE4_RESTRICTED_ROOT}" --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json"
