@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_CALIBRATION_EXTRACTOR_REPAIR_FROZEN_PUBLIC_QUALIFICATION_PENDING",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_CALIBRATION_EXTRACTOR_REPAIR_PUBLIC_NO_GO",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -63,7 +63,7 @@
     "interpretation": "the multi-pass Real-1h positive control missed only the frozen mean-gain component; this remains inconclusive about data quality and does not authorize generator or synthetic-arm work"
   },
   "post_gate_descriptive_extension": {
-    "status": "ORIGINAL_CALIBRATION_NO_GO_PRESERVED_EXTRACTOR_REPAIR_PENDING",
+    "status": "STOPPED_CALIBRATION_EXTRACTOR_REPAIR_PUBLIC_NO_GO",
     "effective_on": "2026-08-02",
     "preserves_coverage_redesign_stop": true,
     "authorization": "explicit user-authorized scientifically weaker one-accepted-hour descriptive Synthetic-1h LTX extension",
@@ -96,17 +96,27 @@
     "interpretation": "the frozen estimator did not provide sufficient C support for a critical axis or the later six-of-eight-axis condition; changing its margin estimator or missingness rule after observing this result is prohibited"
   },
   "governed_C_calibration_extractor_repair": {
-    "status": "FROZEN_PUBLIC_QUALIFICATION_PENDING",
+    "status": "NO_GO_PUBLIC_QUALIFICATION",
     "effective_on": "2026-08-02",
     "authorization": "explicit user request to prospectively improve the extractor and obtain the bounded C aggregate features",
     "outcome_independence": "frozen after preserving the original no-go and before any repaired C output LTX preflight synthetic generation or synthetic learner score",
     "single_candidate": "PE-Core-L14-336 prompt ensemble plus google/owlv2-base-patch16-ensemble@cfd3195ba4ea9592eec887ded089f4c08eff231d",
     "public_gate": "eight fixed COCO validation fixtures with frozen activity object hand box-validity and proxy-completeness thresholds; pass or no-go with no candidate cycling",
+    "topology": "1_H100",
+    "elapsed": "00:00:20",
+    "direct_monetary_cost_usd": 0,
+    "public_only": true,
+    "restricted_mount_present": false,
+    "counts": {"fixtures": 8, "activity_correct": 7, "expected_object_hits": 8, "hand_positive_hits": 4, "hand_positive_total": 5, "hand_negative_correct": 1, "hand_negative_total": 3, "proxy_complete": 8, "invalid_boxes": 0},
+    "thresholds": {"activity_correct_min": 4, "expected_object_hits_min": 5, "hand_positive_hits_min": 2, "hand_negative_correct_min": 2, "proxy_complete_required": 8, "invalid_box_count_max": 0},
+    "extractor_repair_commitment_sha256": "fd454059303b5569b8cbaac8d0a6c94676d7291ab3f688cce342f92d7b1a332d",
+    "public_qualification_commitment_sha256": "042e9ba45fa64abda183eb7e575c5aa2e4990cebf1e54d25c0bffdd34b86fa7f",
+    "failed_component": "hand_negative_specificity",
     "unchanged_missingness_max": 0.2,
     "governed_pass_rule": "all critical axes within the unchanged missingness ceiling and at least six of eight axes measured",
     "original_calibration_commitment_preserved": "28ef267cd0608a33b50037a50e44a622875dc5aad5d1b2a422aa6612347fe3d5",
     "original_episode_plan_commitment_preserved_non_executable": "57803d35fc2d7b43cb84b7883e8b5a479848001faa205bb586081fe27625dc54",
-    "ltx_preflight_status": "BLOCKED_PENDING_REPAIR",
+    "ltx_preflight_status": "NOT_RUN_PUBLIC_NO_GO",
     "synthetic_generation_status": "NOT_RUN",
     "synthetic_learner_status": "NOT_RUN"
   },
@@ -153,5 +163,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "run the single frozen public extractor qualification; only on PASS rerun bounded governed C calibration into the separate calibration_repair root under the unchanged 20% and critical-axis rules; LTX preflight generation and synthetic learner training remain blocked"
+  "next_authorized_scope": "none within the frozen extractor repair; a different extractor or public gate would require a new explicit prospective user decision, while governed C rerun LTX preflight generation and synthetic learner training remain stopped"
 }

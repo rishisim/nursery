@@ -1,6 +1,6 @@
 {
-  "schema_version": 7,
-  "status": "CALIBRATION_EXTRACTOR_REPAIR_FROZEN_PUBLIC_QUALIFICATION_PENDING",
+  "schema_version": 8,
+  "status": "STOP_CALIBRATION_EXTRACTOR_REPAIR_PUBLIC_QUALIFICATION_NO_GO",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -70,7 +70,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "EXTRACTOR_REPAIR_FROZEN_PUBLIC_QUALIFICATION_PENDING_ORIGINAL_NO_GO_PRESERVED",
+    "status": "NO_GO_ORIGINAL_AND_REPAIRED_PUBLIC_QUALIFICATION",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -240,8 +240,8 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "BLOCKED_PENDING_PUBLIC_EXTRACTOR_QUALIFICATION_AND_GOVERNED_REPAIRED_C_RERUN",
-    "authorization_interpretation": "the original calibration no-go remains valid; the user prospectively authorized one coverage-focused extractor repair using a single frozen public model combination, unchanged 20% missingness ceiling, public qualification first, and no C-driven tuning",
+    "local_generator_gate": "NO_GO_FROZEN_PUBLIC_EXTRACTOR_QUALIFICATION_HAND_NEGATIVE_SPECIFICITY",
+    "authorization_interpretation": "the original calibration no-go remains valid; the single prospectively frozen coverage repair failed its public hand-negative specificity component, so no governed C rerun candidate cycling or threshold change is authorized",
     "governed_result": {
       "status": "NO_GO",
       "job_topology": "1_H100",
@@ -263,6 +263,34 @@
       "episode_plan_status": "PROVISIONAL_NOT_EXECUTABLE_CALIBRATION_NO_GO",
       "engineering_attempts": {"pre_result_failure_count": 1, "failure_class": "EDGE_GRID_SHAPE_MISMATCH", "scientific_or_calibration_output_from_failed_attempt": false, "canonical_repair_commit": "e2a5863"},
       "stop_reason": "the critical audiovisual-grounding axis exceeded the frozen missingness ceiling and only three of eight axes are measured, so the preregistered six-axis scale-up condition cannot be assessed without changing the observed protocol"
+    },
+    "extractor_repair_result": {
+      "status": "NO_GO",
+      "topology": "1_H100",
+      "elapsed": "00:00:20",
+      "direct_monetary_cost_usd": 0,
+      "public_only": true,
+      "restricted_mount_present": false,
+      "fixture_count": 8,
+      "activity_correct_count": 7,
+      "activity_correct_min": 4,
+      "expected_object_hit_count": 8,
+      "expected_object_hits_min": 5,
+      "hand_positive_hit_count": 4,
+      "hand_positive_count": 5,
+      "hand_positive_hits_min": 2,
+      "hand_negative_correct_count": 1,
+      "hand_negative_count": 3,
+      "hand_negative_correct_min": 2,
+      "proxy_complete_count": 8,
+      "proxy_complete_required": 8,
+      "invalid_box_count": 0,
+      "invalid_box_count_max": 0,
+      "extractor_repair_commitment_sha256": "fd454059303b5569b8cbaac8d0a6c94676d7291ab3f688cce342f92d7b1a332d",
+      "public_qualification_commitment_sha256": "042e9ba45fa64abda183eb7e575c5aa2e4990cebf1e54d25c0bffdd34b86fa7f",
+      "failed_component": "hand_negative_specificity",
+      "governed_C_rerun_status": "NOT_RUN_PUBLIC_NO_GO",
+      "interpretation": "the candidate over-detected hands on the frozen negative fixtures; thresholds fixtures and labels are not changed after observing the result"
     }
   },
   "budgets_credited_hours": {"real": 1, "synthetic_accepted": 1, "synthetic_above_one_hour_prohibited": true},
@@ -282,7 +310,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_NOT_RUN_CALIBRATION_EXTRACTOR_REPAIR_PENDING",
+    "status": "SELECTED_LOCAL_NOT_RUN_CALIBRATION_EXTRACTOR_REPAIR_PUBLIC_NO_GO",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
@@ -299,7 +327,7 @@
     "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "NOT_RUN; original calibration no-go preserved and one prospectively frozen extractor repair is pending public qualification and governed C rerun; unchanged critical-axis and missingness rules still apply",
+  "synthetic_arm": "NOT_RUN; original calibration no-go is preserved and the single prospectively frozen extractor repair failed public hand-negative specificity, so governed C rerun LTX preflight generation and learner training remain stopped",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
   "former_directionally_competitive_rule_not_permitted_for_post_gate_extension": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",

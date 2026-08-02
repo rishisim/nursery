@@ -142,9 +142,11 @@ After that no-go was sealed, the user prospectively authorized one extractor
 repair. The original result and governed files remain preserved. A single
 candidate—PE-Core prompt ensembling plus pinned Apache-2.0 OWLv2 object/hand
 detection—is frozen before new C outcomes. It must first pass an eight-image
-public-only qualification with no restricted mount. If it passes, C is rerun
-once into the separate governed `calibration_repair` root with the same 20%
-missingness ceiling, all critical axes required, and at least six of eight axes
-measured. LTX remains blocked until that repaired governed gate passes.
+public-only qualification with no restricted mount. That gate returned a
+no-go: activity was 7/8, expected objects 8/8, hand positives 4/5, all eight
+proxy rows were complete, and boxes were valid, but only 1/3 hand-negative
+fixtures stayed negative (2/3 required). No thresholds or labels were changed,
+no second detector was tried, and C was not reopened. Governed C repair, LTX
+preflight, generation, and synthetic learner training remain stopped.
 Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
 generation remain unauthorized.

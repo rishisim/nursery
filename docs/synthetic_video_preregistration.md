@@ -765,3 +765,21 @@ public network ingress; qualification must reload every weight and fixture
 locally with telemetry disabled and no restricted mount. Failure is a no-go:
 no new model, threshold change, candidate cycling, or C-driven tuning is
 permitted in this repair.
+
+### Extractor-repair public result — frozen no-go
+
+The public-only qualification completed on one H100 in `00:00:20` with no
+restricted mount and zero direct monetary cost. The combined extractor passed
+the coarse activity check (7/8 against 4 required), expected-object check (8/8
+against 5), positive-hand check (4/5 with 2 hits required), proxy completeness
+(8/8), and box validity (zero invalid). It failed the frozen hand-negative
+check: only 1/3 negative fixtures remained negative, below the required 2/3.
+The extractor-repair commitment is `fd454059…a332d` and the public-result
+commitment is `042e9ba4…fa7f`.
+
+This is a detector-specificity no-go, not evidence about C and not a new C
+calibration result. No ChildLens material was reopened, and no repaired C
+targets or episode plans were created. The observed fixtures, labels, score
+thresholds, and pass criteria are not changed; no second detector is tried.
+Governed C rerun, LTX preflight, generation, and synthetic learner training
+remain stopped.
