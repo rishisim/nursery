@@ -121,4 +121,12 @@ def test_lean_equal_duration_proof_is_frozen_before_scores():
     assert proof["calibration_C"]["source"] == "development_set_C_only_never_training_validation_or_evaluation"
     assert proof["calibration_C"]["hosted_provider_gate"].startswith("BLOCKED_PENDING_AFFIRMATIVE")
     assert "no full distributional calibration claim" in proof["calibration_C"]["limitations"]
+    assert len(proof["calibration_C"]["axes"]) == 8
+    assert proof["calibration_C"]["joint_distributions"] == [
+        "naming_by_referent_visibility",
+        "naming_by_hand_object_action",
+        "clutter_by_occlusion",
+        "motion_by_blur",
+    ]
+    assert proof["calibration_C"]["omnibus_score"] == "PROHIBITED"
     assert "automatic_1_3_6_curve" in proof["prohibitions"]

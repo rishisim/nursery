@@ -19,21 +19,25 @@
   "calibration_C": {
     "status": "FROZEN_PRE_GENERATION_GOVERNED_MEASUREMENT_PENDING",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
-    "features": [
-      "clip_and_accepted_utterance_duration",
-      "speech_silence_overlap_and_noise_rates",
-      "head_camera_motion_magnitude_and_shot_discontinuity",
-      "blur_and_brightness",
-      "clutter_object_count_proxy",
-      "hand_visibility",
-      "occlusion",
-      "action_transition_density",
-      "model_derived_referent_visibility_timing"
+    "axes": [
+      "activity_context_mixture",
+      "egocentric_visual_regime_head_motion_framing_blur_lighting",
+      "scene_complexity_clutter_occlusion_distractors",
+      "hand_object_action_structure_visibility_contact_type_completion",
+      "temporal_continuity_recurrence_persistence_idle_transition",
+      "language_environment_speech_silence_length_repetition_turn_timing_public_semantic_speech_act_mix",
+      "audiovisual_grounding_opportunity_referent_timing_ambiguity_naming_with_action_and_null_cases",
+      "diversity_heterogeneity_between_child_session_dispersion_long_tail_and_near_duplicate_rate"
     ],
+    "joint_distributions": ["naming_by_referent_visibility", "naming_by_hand_object_action", "clutter_by_occlusion", "motion_by_blur"],
+    "semantic_boundary": "public semantic categories and frequency bands only; never exact C vocabulary transcripts or sealed evaluation concepts",
     "estimation_contract": "freeze immutable public model revisions and hashes, fixed bins plus quartiles, explicit missingness and abstention, bootstrap uncertainty with public seed 42, and one governed commitment before generation",
     "limitations": "small feature set only; measured and unavailable features reported separately; no full distributional calibration claim",
     "disclosure": "export only approved compact non-identifying bins targets uncertainty and commitment; never raw media text vocabulary embeddings row-level statistics IDs or reconstructive combinations",
-    "episode_plan": "freeze a public nonrestricted episode-plan distribution matched feature-by-feature to approved targets using only public lexical resources and no sealed evaluation concepts or outcomes",
+    "episode_plan": "freeze a public nonrestricted episode-plan distribution matched axis-by-axis to approved targets using only public lexical resources and no sealed evaluation concepts or outcomes",
+    "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
+    "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
+    "omnibus_score": "PROHIBITED",
     "hosted_provider_gate": "BLOCKED_PENDING_AFFIRMATIVE_CHILDLENS_INSTITUTIONAL_PERMISSION_FOR_DISCLOSURE_REVIEWED_AGGREGATE_CONDITIONING"
   },
   "budgets_credited_hours": {"primary": 1, "conditional_real_extension": 3, "automatic_six_hour_disabled": true},
