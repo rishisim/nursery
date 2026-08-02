@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 3
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_POST_GATE_EXTENSION_BLOCKED_GOVERNANCE_REVIEW"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_POST_GATE_DESCRIPTIVE_EXTENSION_CALIBRATION_PENDING"
     validate_phase_state(config)
     assert schedule_cycle(config["learner"]["schedule"]) == [
         "contrastive",
@@ -113,7 +113,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["phase4_authorized"] is True
     assert config["gates"]["childlens_audio_processing_authorized"] is True
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
-    assert config["gates"]["generator_work_authorized"] is False
+    assert config["gates"]["generator_work_authorized"] is True
     assert config["gates"]["real_only_training_authorized"] is False
     assert config["governed_compute"]["additional_slurm_account_name_committed_to_git"] is False
 
@@ -141,6 +141,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"
-    assert config["governance_incident"]["status"].startswith("RESTRICTED_EXECUTION_PAUSED")
+    assert config["governance_incident"]["status"].startswith("REVIEWED_NO_FURTHER_ACTION")
+    assert config["governance_incident"]["containment_verification"]["restricted_asset_key_matches_in_all_git_tracked_content"] == 0
     assert "more_than_one_accepted_synthetic_hour" in config["prohibitions"]
     assert "confirmatory_phase5" in config["prohibitions"]

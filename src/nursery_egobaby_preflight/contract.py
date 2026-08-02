@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
+import re
 from collections.abc import Mapping, Sequence
 from typing import Any
 
@@ -22,6 +24,47 @@ def file_sha256(path: str) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+_COMPACT_ENUM = re.compile(r"[A-Z][A-Z0-9_]{0,95}\Z")
+_SHA256 = re.compile(r"[0-9a-f]{64}\Z")
+
+
+def compact_aggregate_json(
+    record: Mapping[str, Any],
+    *,
+    allowed_fields: set[str] | frozenset[str],
+    sha256_fields: set[str] | frozenset[str] = frozenset(),
+) -> str:
+    """Serialize one terminal-safe, flat aggregate record.
+
+    Governed commands must explicitly whitelist every output field. Values may
+    only be finite numbers, booleans, short uppercase enum strings, or a SHA-256
+    commitment in an explicitly designated field. Containers and arbitrary
+    strings are rejected so identifiers, row lists, text, and paths cannot be
+    printed accidentally.
+    """
+    unknown = set(record) - set(allowed_fields)
+    missing = set(allowed_fields) - set(record)
+    if unknown or missing:
+        raise ValueError("compact aggregate fields do not match the whitelist")
+    if not set(sha256_fields) <= set(allowed_fields):
+        raise ValueError("SHA-256 fields must be output-whitelisted")
+    clean: dict[str, Any] = {}
+    for key, value in record.items():
+        if isinstance(value, bool):
+            clean[key] = value
+        elif isinstance(value, int) and not isinstance(value, bool):
+            clean[key] = value
+        elif isinstance(value, float) and math.isfinite(value):
+            clean[key] = value
+        elif key in sha256_fields and isinstance(value, str) and _SHA256.fullmatch(value):
+            clean[key] = value
+        elif isinstance(value, str) and _COMPACT_ENUM.fullmatch(value):
+            clean[key] = value
+        else:
+            raise ValueError(f"unsafe compact aggregate value for {key!r}")
+    return json.dumps(clean, sort_keys=True, separators=(",", ":"))
 
 
 def schedule_cycle(schedule: Mapping[str, int]) -> list[str]:

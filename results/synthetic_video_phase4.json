@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_POST_GATE_EXTENSION_BLOCKED_GOVERNANCE_REVIEW",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_POST_GATE_DESCRIPTIVE_EXTENSION_CALIBRATION_PENDING",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -63,7 +63,7 @@
     "interpretation": "the multi-pass Real-1h positive control missed only the frozen mean-gain component; this remains inconclusive about data quality and does not authorize generator or synthetic-arm work"
   },
   "post_gate_descriptive_extension": {
-    "status": "PROSPECTIVELY_AUTHORIZED_BUT_PAUSED_GOVERNANCE_REVIEW",
+    "status": "PROSPECTIVELY_AUTHORIZED_CALIBRATION_PENDING",
     "effective_on": "2026-08-02",
     "preserves_coverage_redesign_stop": true,
     "authorization": "explicit user-authorized scientifically weaker one-accepted-hour descriptive Synthetic-1h LTX extension",
@@ -73,13 +73,15 @@
     "claim_limits": ["descriptive_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_more_than_one_accepted_synthetic_hour"]
   },
   "governance_incident": {
-    "status": "BLOCKING_REVIEW_REQUIRED",
+    "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_PROCESSING_RESUMED",
     "observed_on": "2026-08-02",
     "scope": "94 opaque asset-level SHA-256 keys unintentionally appeared in one Codex task schema-probe output",
     "direct_or_content_bearing_material_exposed": false,
-    "restricted_execution_paused": true,
+    "restricted_execution_paused": false,
     "keys_retained_in_git": false,
-    "required_resolution": "applicant data-steward or institutional-protocol review and explicit affirmation before governed processing resumes"
+    "resolution": "authorized applicant and data-steward determined no additional institutional reporting or remediation is required and explicitly authorized governed processing to resume",
+    "containment_verification": {"restricted_asset_key_matches_in_all_git_tracked_content": 0, "restricted_asset_key_matches_in_compact_records_and_docs": 0, "scientific_contract_or_asset_affected": false},
+    "prior_rendered_task_output_reverted_or_deleted": false
   },
   "common_asset_references": {
     "Real-full": {"lexical": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4", "temporal": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e"},
@@ -113,5 +115,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "governance incident review only; corrected assets, failed Real-1h gate, and prospective descriptive extension remain preserved but no restricted execution may resume without explicit resolution"
+  "next_authorized_scope": "bounded governed ChildLens-C calibration and public episode-plan commitment for the user-authorized post-gate descriptive Synthetic-1h LTX extension; corrected assets and the failed Real-1h gate remain sealed"
 }

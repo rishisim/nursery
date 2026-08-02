@@ -700,7 +700,13 @@ SHA-256 keys into the Codex task output. The keys are unkeyed hashes over a
 restricted source-object key and clip ordinal. No media, audio, text, filename,
 path, child/session key, direct participant identifier, embedding, prompt, or
 outcome was printed, and no key was copied into Git or a local artifact.
-Restricted execution stopped immediately. The prospective extension and all
-prior seals remain preserved, but governed work may resume only after the
-authorized applicant and applicable data steward or institutional protocol
-review incident handling and explicitly affirm continuation.
+Restricted execution stopped immediately. The authorized applicant/data-steward
+subsequently reviewed the incident, determined that no additional institutional
+reporting or remediation was required, and explicitly authorized governed
+processing to resume. Aggregate-only containment checks found zero restricted
+asset-key matches in all tracked Git content and in permitted compact records;
+the experiment manifest, split, scores, seeds, thresholds, calibration target,
+and seals were unchanged. The prior rendered task output is not claimed to have
+been reverted or deleted. Future governed inspection uses a flat explicit-field
+whitelist that rejects lists, nested values, arbitrary strings, and hashes
+outside designated commitment fields.

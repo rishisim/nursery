@@ -1,6 +1,6 @@
 {
   "schema_version": 6,
-  "status": "BLOCKED_GOVERNANCE_REVIEW_OPAQUE_ROW_KEYS_EXPOSED",
+  "status": "POST_GATE_DESCRIPTIVE_SYNTHETIC_1H_AUTHORIZED_CALIBRATION_PENDING",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -25,12 +25,14 @@
   },
   "governance_incident": {
     "observed_on": "2026-08-02",
-    "status": "RESTRICTED_EXECUTION_PAUSED_PENDING_APPLICANT_DATA_STEWARD_OR_INSTITUTIONAL_REVIEW",
+    "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_GOVERNED_PROCESSING_RESUMED",
     "scope": "one schema-inspection command unintentionally printed 94 opaque asset-level SHA-256 keys to the Codex task output",
     "derivation": "unkeyed SHA-256 over a restricted source-object key and clip ordinal",
     "not_exposed": ["media", "audio", "text", "filenames", "paths", "child_keys", "session_keys", "direct_participant_identifiers", "embeddings", "prompts", "outcomes"],
-    "containment": ["stopped_restricted_execution", "did_not_copy_keys_into_Git_or_local_files", "will_not_repeat_keys"],
-    "required_resolution": "authorized applicant plus applicable data steward or institutional protocol must determine incident handling and affirm whether governed processing may resume; user approval alone does not waive the ChildLens agreement"
+    "containment": ["stopped_restricted_execution", "did_not_copy_keys_into_Git_or_local_files", "will_not_repeat_keys", "installed_flat_whitelisted_aggregate_output_guard"],
+    "resolution": "authorized applicant and data-steward reviewed the incident, determined no additional institutional reporting or remediation is required, and explicitly authorized governed processing to resume",
+    "containment_verification": {"restricted_asset_key_matches_in_all_git_tracked_content": 0, "restricted_asset_key_matches_in_compact_records_and_docs": 0, "experiment_manifest_affected": false, "split_affected": false, "score_affected": false, "seed_affected": false, "threshold_affected": false, "calibration_target_affected": false, "seal_affected": false},
+    "rendered_output_deletion_claim": "NONE; prior task output is preserved and is not described as reverted or deleted"
   },
   "sealed_prior_570_step_pilot": {
     "status": "PRESERVED_NOT_REINTERPRETED",
@@ -90,7 +92,7 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "PAUSED_GOVERNANCE_REVIEW_OPAQUE_ROW_KEYS_EXPOSED",
+    "local_generator_gate": "USER_AUTHORIZED_POST_GATE_DESCRIPTIVE_EXTENSION_CALIBRATION_PENDING",
     "authorization_interpretation": "local applicant-only LTX execution keeps every C aggregate and aggregate-conditioned generator input inside governed UTD storage and grants no third-party access"
   },
   "budgets_credited_hours": {"real": 1, "synthetic_accepted": 1, "synthetic_above_one_hour_prohibited": true},
@@ -110,7 +112,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_PAUSED_GOVERNANCE_REVIEW",
+    "status": "SELECTED_LOCAL_POST_GATE_DESCRIPTIVE_EXTENSION_CALIBRATION_PENDING",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
@@ -127,7 +129,7 @@
     "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "USER_AUTHORIZED_POST_GATE_DESCRIPTIVE_EXTENSION_BUT_PAUSED_PENDING_GOVERNANCE_REVIEW; execution remains conditional on incident resolution, governed C calibration and episode-plan commitment, bounded LTX final-topology preflight, exact resource ceiling approval if still required, and an accepted-corpus seal of exactly 3600 credited seconds",
+  "synthetic_arm": "USER_AUTHORIZED_POST_GATE_DESCRIPTIVE_EXTENSION; execution remains conditional on governed C calibration and episode-plan commitment, bounded LTX final-topology preflight, exact resource ceiling approval if still required, and an accepted-corpus seal of exactly 3600 credited seconds",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
   "former_directionally_competitive_rule_not_permitted_for_post_gate_extension": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",
