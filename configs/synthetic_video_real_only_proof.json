@@ -9,7 +9,11 @@
     "schedule": {"contrastive": 4, "mlm": 1, "dinov2": 1},
     "text_encoder": "bert-base-uncased",
     "seed": 42,
-    "initialization": "byte_identical_for_initialized_real_and_synthetic_arms"
+    "initialization": "byte_identical_for_initialized_real_and_synthetic_arms",
+    "embedding_dim": 512,
+    "batch_size": 2,
+    "objective_steps": 570,
+    "objective_step_basis": "30 times 19 upstream-sized batches from the frozen Real-1h manifest; all matched trained arms stop after exactly 570 scheduler steps"
   },
   "corrected_assets": {
     "lexical": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4",
@@ -46,7 +50,7 @@
   "validation": "small_keyed_tranche_for_runtime_health_only_never_checkpoint_selection",
   "credited_time": "union of unique accepted source-timeline ASR windows with decodable eligible frames; adapter abstentions receive zero",
   "frame_offsets_seconds": [0.5, 1.5, 2.5, 3.5],
-  "checkpoint_rule": "same prospectively fixed objective-step count and final successfully completed checkpoint for matched real and synthetic arms; no arm-specific tuning stopping or selection",
+  "checkpoint_rule": "initialized checkpoint before any optimizer step; matched trained arms use the checkpoint immediately after exactly 570 scheduler steps; no arm-specific tuning stopping or selection",
   "initialized_baseline": "evaluate byte-identical 0h initialization before training without adapting any rule",
   "real_1h_gate": {
     "realistic_lexical_macro_min": 0.52,

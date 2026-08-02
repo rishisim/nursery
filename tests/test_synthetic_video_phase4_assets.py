@@ -112,6 +112,8 @@ def test_lean_equal_duration_proof_is_frozen_before_scores():
     }
     assert proof["learner"]["schedule"] == {"contrastive": 4, "mlm": 1, "dinov2": 1}
     assert proof["learner"]["initialization"].startswith("byte_identical")
+    assert proof["learner"]["batch_size"] == 2
+    assert proof["learner"]["objective_steps"] == 570
     assert proof["real_1h_gate"]["realistic_lexical_macro_min"] == 0.52
     assert proof["real_1h_gate"]["improvement_over_initialized_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "gemini-omni-flash-preview"
