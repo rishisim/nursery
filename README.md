@@ -138,5 +138,13 @@ measured within the ceiling. Its governed target and provisional plan
 commitments are retained, but the plan is non-executable. The frozen threshold
 was not relaxed and the estimator was not replaced. LTX topology preflight,
 generation, and Synthetic-1h learner training were not run.
+After that no-go was sealed, the user prospectively authorized one extractor
+repair. The original result and governed files remain preserved. A single
+candidate—PE-Core prompt ensembling plus pinned Apache-2.0 OWLv2 object/hand
+detection—is frozen before new C outcomes. It must first pass an eight-image
+public-only qualification with no restricted mount. If it passes, C is rerun
+once into the separate governed `calibration_repair` root with the same 20%
+missingness ceiling, all critical axes required, and at least six of eight axes
+measured. LTX remains blocked until that repaired governed gate passes.
 Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
 generation remain unauthorized.

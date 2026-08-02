@@ -14,7 +14,7 @@ set -euo pipefail
 umask 077
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 WANDB_DISABLED=true TOKENIZERS_PARALLELISM=false PYTHONNOUSERSITE=1
 export HF_HOME="${PHASE4_PUBLIC_ROOT}/models/pe-hf-home"
-output_root="${PHASE4_RESTRICTED_ROOT}/synthetic_one_hour/calibration"
+output_root="${PHASE4_RESTRICTED_ROOT}/synthetic_one_hour/calibration_repair"
 mkdir -p "$output_root/logs"
 exec >"$output_root/logs/calibration-${SLURM_JOB_ID}.out" 2>"$output_root/logs/calibration-${SLURM_JOB_ID}.err"
 scratch="${TMPDIR:-/tmp}/synthetic-video-calibration-${SLURM_JOB_ID}"

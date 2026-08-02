@@ -729,3 +729,37 @@ provisional and non-executable. Lowering the 0.02 public-vision abstention
 margin, changing the estimator, or weakening missingness after observing this
 result would be post hoc and is prohibited. LTX final-topology preflight,
 generation, and Synthetic-1h learner training therefore did not run.
+
+### Prospective calibration-extractor repair
+
+After the original no-go and commitments above were sealed, the user explicitly
+requested one better extraction attempt. This is a new, coverage-focused
+measurement repair, not a reinterpretation of the original result. Before any
+repaired C output, LTX run, synthetic corpus, or synthetic learner score, one
+candidate was frozen: the existing immutable PE-Core model with three-prompt
+activity prototypes plus the Apache-2.0
+`google/owlv2-base-patch16-ensemble@cfd3195ba4ea9592eec887ded089f4c08eff231d`
+open-vocabulary detector. OWLv2 supplies public-category object, hand,
+visibility, contact, framing, distractor, and occlusion proxies; PE-Core emits
+the coarse activity class and retains its margin as a low/medium/high
+uncertainty band.
+
+The scientific gates are not relaxed. The maximum axis missing fraction stays
+at `0.20`, all critical axes must remain within that ceiling, and at least six
+of eight axes must be measured. A valid finite detector inference with no boxes
+is the measured `none`/`no_hand` condition, not imputation; decode or inference
+failure remains missing. The earlier margin-abstention output and its governed
+files remain untouched under their original commitment. Repaired artifacts are
+written to the semantically distinct governed `calibration_repair` root and
+explicitly supersede the provisional plan only if the repaired gate passes.
+
+Before C may be reopened, this exact combined extractor must pass one bounded
+public-only qualification using eight frozen COCO 2017 validation images with
+retained Creative Commons licenses and immutable image hashes. The frozen gate
+requires at least 4/8 coarse activity matches, 5/8 expected public-object hits,
+2 positive hand detections, 2 correct hand-negative fixtures, complete proxy
+records for all eight images, and zero invalid boxes. Model preparation may use
+public network ingress; qualification must reload every weight and fixture
+locally with telemetry disabled and no restricted mount. Failure is a no-go:
+no new model, threshold change, candidate cycling, or C-driven tuning is
+permitted in this repair.

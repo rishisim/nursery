@@ -16,6 +16,7 @@ import re
 import shutil
 import subprocess
 from typing import Any
+import urllib.request
 
 from nursery_egobaby_preflight.contract import compact_aggregate_json
 
@@ -30,12 +31,43 @@ TERMINAL_FIELDS = frozenset(
         "missing_axis_count",
         "suppressed_cell_count",
         "episode_plan_count",
+        "scheduled_frame_count",
+        "decode_failure_count",
         "calibration_commitment_sha256",
         "episode_plan_commitment_sha256",
+        "extractor_repair_commitment_sha256",
     }
 )
 TERMINAL_HASH_FIELDS = frozenset(
-    {"calibration_commitment_sha256", "episode_plan_commitment_sha256"}
+    {
+        "calibration_commitment_sha256",
+        "episode_plan_commitment_sha256",
+        "extractor_repair_commitment_sha256",
+    }
+)
+PUBLIC_TERMINAL_FIELDS = frozenset(
+    {
+        "status",
+        "fixture_count",
+        "activity_correct_count",
+        "expected_object_hit_count",
+        "hand_positive_hit_count",
+        "hand_positive_count",
+        "hand_negative_correct_count",
+        "hand_negative_count",
+        "proxy_complete_count",
+        "invalid_box_count",
+        "model_file_count",
+        "fixture_file_count",
+        "extractor_repair_commitment_sha256",
+        "public_qualification_commitment_sha256",
+    }
+)
+PUBLIC_TERMINAL_HASH_FIELDS = frozenset(
+    {
+        "extractor_repair_commitment_sha256",
+        "public_qualification_commitment_sha256",
+    }
 )
 ACTIVITY_AXIS = "activity_context_mixture"
 VISUAL_AXIS = "egocentric_visual_regime"
@@ -251,20 +283,50 @@ def _load_vision(public: Path, cfg: dict[str, Any], device: str):
     model = model.to(device).eval()
     transform = transforms.get_image_transform(model.image_size)
     tokenizer = transforms.get_text_tokenizer(model.context_length)
-    prompt_groups = cfg["calibration_C"]["extractor"]["regular_frame_prompt_groups"]
+    extractor = cfg["calibration_C"]["extractor"]
+    repair = extractor.get("coverage_repair")
+    prompt_groups = (
+        repair["prompt_ensembles"]
+        if repair and repair.get("status") == "FROZEN_ACTIVE"
+        else extractor["regular_frame_prompt_groups"]
+    )
     flattened: list[str] = []
-    slices: dict[str, tuple[int, int, list[str]]] = {}
+    prompt_ranges: dict[str, list[tuple[str, int, int]]] = {}
     for group, prompts in prompt_groups.items():
-        start = len(flattened)
-        labels = list(prompts)
-        flattened.extend(prompts[label] for label in labels)
-        slices[group] = (start, len(flattened), labels)
+        prompt_ranges[group] = []
+        for label, values in prompts.items():
+            values = values if isinstance(values, list) else [values]
+            start = len(flattened)
+            flattened.extend(values)
+            prompt_ranges[group].append((label, start, len(flattened)))
     with torch.inference_mode():
-        text = model.encode_text(tokenizer(flattened).to(device), normalize=True).cpu()
+        encoded = model.encode_text(
+            tokenizer(flattened).to(device), normalize=True
+        ).cpu()
+        prototypes = []
+        slices: dict[str, tuple[int, int, list[str]]] = {}
+        for group, ranges in prompt_ranges.items():
+            start = len(prototypes)
+            labels = []
+            for label, first, last in ranges:
+                prototype = encoded[first:last].mean(dim=0)
+                prototype = prototype / prototype.norm().clamp_min(1e-12)
+                prototypes.append(prototype)
+                labels.append(label)
+            slices[group] = (start, len(prototypes), labels)
+        text = torch.stack(prototypes)
     return model, transform, text, slices
 
 
-def _vision_batch(model, transform, text, slices, images, margin: float, device: str):
+def _vision_batch(
+    model,
+    transform,
+    text,
+    slices,
+    images,
+    margin: float | None,
+    device: str,
+):
     import torch
 
     with torch.inference_mode():
@@ -272,16 +334,449 @@ def _vision_batch(model, transform, text, slices, images, margin: float, device:
         features = model.encode_image(batch, normalize=True).cpu()
         scores = features @ text.T
     labels: list[dict[str, str | None]] = []
+    margins: list[dict[str, float]] = []
     for row in scores:
         values: dict[str, str | None] = {}
+        row_margins: dict[str, float] = {}
         for group, (start, stop, names) in slices.items():
             part = row[start:stop]
             order = torch.argsort(part, descending=True)
             top = int(order[0])
             gap = float(part[top] - part[int(order[1])]) if len(order) > 1 else 1.0
-            values[group] = names[top] if gap >= margin else None
+            values[group] = names[top] if margin is None or gap >= margin else None
+            row_margins[group] = gap
         labels.append(values)
-    return features, labels
+        margins.append(row_margins)
+    return features, labels, margins
+
+
+def _repair_config(cfg: dict[str, Any]) -> dict[str, Any]:
+    repair = cfg["calibration_C"]["extractor"].get("coverage_repair")
+    if not isinstance(repair, dict) or repair.get("status") != "FROZEN_ACTIVE":
+        raise RuntimeError("E_EXTRACTOR_REPAIR_NOT_FROZEN")
+    return repair
+
+
+def _detector_model_root(public: Path, repair: dict[str, Any]) -> Path:
+    model = repair["detector_model"]
+    repository = model["repository"].replace("/", "--")
+    return (
+        public
+        / "models/owlv2-hf-home/hub"
+        / f"models--{repository}"
+        / "snapshots"
+        / model["revision"]
+    )
+
+
+def _verify_detector_files(root: Path, repair: dict[str, Any]) -> None:
+    required = repair["detector_model"]["required_files_sha256"]
+    for name, expected in required.items():
+        path = root / name
+        if not path.is_file() or file_digest(path) != expected:
+            raise RuntimeError("E_FROZEN_DETECTOR_MODEL")
+
+
+def _load_detector(public: Path, cfg: dict[str, Any], device: str):
+    from transformers import Owlv2ForObjectDetection, Owlv2Processor
+
+    repair = _repair_config(cfg)
+    root = _detector_model_root(public, repair)
+    _verify_detector_files(root, repair)
+    processor = Owlv2Processor.from_pretrained(root, local_files_only=True)
+    model = Owlv2ForObjectDetection.from_pretrained(
+        root, local_files_only=True, use_safetensors=True
+    )
+    return model.to(device).eval(), processor
+
+
+def _box_iou(first: list[float], second: list[float]) -> float:
+    left = max(first[0], second[0])
+    top = max(first[1], second[1])
+    right = min(first[2], second[2])
+    bottom = min(first[3], second[3])
+    intersection = max(0.0, right - left) * max(0.0, bottom - top)
+    first_area = max(0.0, first[2] - first[0]) * max(0.0, first[3] - first[1])
+    second_area = max(0.0, second[2] - second[0]) * max(0.0, second[3] - second[1])
+    union = first_area + second_area - intersection
+    return intersection / union if union > 0 else 0.0
+
+
+def _nms_detections(
+    detections: list[dict[str, Any]], threshold: float
+) -> list[dict[str, Any]]:
+    retained: list[dict[str, Any]] = []
+    for detection in sorted(detections, key=lambda value: -value["score"]):
+        if all(
+            detection["kind"] != prior["kind"]
+            or _box_iou(detection["box"], prior["box"]) < threshold
+            for prior in retained
+        ):
+            retained.append(detection)
+    return retained
+
+
+def _detector_batch(
+    model,
+    processor,
+    images,
+    repair: dict[str, Any],
+    device: str,
+) -> list[dict[str, Any]]:
+    import torch
+
+    queries = repair["detector_queries"]
+    texts = [value["text"] for value in queries]
+    minimum_threshold = min(
+        repair["detector_score_thresholds"][value["kind"]] for value in queries
+    )
+    output: list[dict[str, Any]] = []
+    batch_size = repair["detector_batch_size"]
+    for start in range(0, len(images), batch_size):
+        chunk = images[start : start + batch_size]
+        inputs = processor(
+            text=[texts for _ in chunk], images=chunk, return_tensors="pt"
+        )
+        inputs = {key: value.to(device) for key, value in inputs.items()}
+        with torch.inference_mode():
+            raw = model(**inputs)
+        target_sizes = torch.tensor(
+            [[image.height, image.width] for image in chunk], device=device
+        )
+        rows = processor.post_process_object_detection(
+            outputs=raw,
+            target_sizes=target_sizes,
+            threshold=minimum_threshold,
+        )
+        for image, row in zip(chunk, rows, strict=True):
+            detections = []
+            invalid = 0
+            for score, label, box in zip(
+                row["scores"], row["labels"], row["boxes"], strict=True
+            ):
+                query = queries[int(label)]
+                threshold = repair["detector_score_thresholds"][query["kind"]]
+                score_value = float(score)
+                if score_value < threshold:
+                    continue
+                values = [float(value) for value in box]
+                if not all(math.isfinite(value) for value in values):
+                    invalid += 1
+                    continue
+                values = [
+                    min(max(values[0], 0.0), image.width),
+                    min(max(values[1], 0.0), image.height),
+                    min(max(values[2], 0.0), image.width),
+                    min(max(values[3], 0.0), image.height),
+                ]
+                if values[2] <= values[0] or values[3] <= values[1]:
+                    invalid += 1
+                    continue
+                detections.append(
+                    {
+                        "kind": query["kind"],
+                        "label": query["label"],
+                        "score": score_value,
+                        "box": values,
+                    }
+                )
+            detections = _nms_detections(
+                detections, repair["detector_nms_iou"]
+            )
+            output.append(
+                {
+                    "detections": detections,
+                    "invalid_box_count": invalid,
+                    "width": image.width,
+                    "height": image.height,
+                }
+            )
+    return output
+
+
+def _box_gap(first: list[float], second: list[float]) -> float:
+    dx = max(first[0] - second[2], second[0] - first[2], 0.0)
+    dy = max(first[1] - second[3], second[1] - first[3], 0.0)
+    return math.hypot(dx, dy)
+
+
+def _detector_proxies(
+    record: dict[str, Any], repair: dict[str, Any]
+) -> dict[str, str]:
+    detections = record["detections"]
+    hands = [value for value in detections if value["kind"] == "hand"]
+    objects = [value for value in detections if value["kind"] == "object"]
+    width = float(record["width"])
+    height = float(record["height"])
+    diagonal = max(math.hypot(width, height), 1.0)
+    contact = any(_box_iou(hand["box"], obj["box"]) > 0 for hand in hands for obj in objects)
+    near = any(
+        _box_gap(hand["box"], obj["box"]) / diagonal
+        <= repair["hand_object_near_gap_fraction"]
+        for hand in hands
+        for obj in objects
+    )
+    if not hands:
+        hand_action = "no_hand"
+    elif contact:
+        hand_action = "grasp_hold"
+    elif near:
+        hand_action = "reach"
+    else:
+        hand_action = "visible_no_contact"
+    count = len(objects)
+    if count == 0:
+        referent = "none"
+    elif count == 1:
+        referent = "clear_one"
+    else:
+        referent = "ambiguous_many"
+    distractors = "one" if count <= 1 else "few" if count <= 4 else "many"
+    edge_margin = repair["box_edge_margin_fraction"]
+    edge_count = sum(
+        box["box"][0] <= width * edge_margin
+        or box["box"][1] <= height * edge_margin
+        or box["box"][2] >= width * (1 - edge_margin)
+        or box["box"][3] >= height * (1 - edge_margin)
+        for box in objects
+    )
+    overlap = max(
+        (
+            _box_iou(objects[first]["box"], objects[second]["box"])
+            for first in range(len(objects))
+            for second in range(first)
+        ),
+        default=0.0,
+    )
+    if objects and (
+        edge_count / len(objects) >= repair["heavy_occlusion_edge_fraction"]
+        or overlap >= repair["heavy_occlusion_pair_iou"]
+    ):
+        occlusion = "heavy"
+    elif edge_count or overlap >= repair["partial_occlusion_pair_iou"]:
+        occlusion = "partial"
+    else:
+        occlusion = "clear"
+    if not objects:
+        framing = "distributed"
+    elif len(objects) > 1:
+        centers = [
+            ((value["box"][0] + value["box"][2]) / (2 * width))
+            for value in objects
+        ]
+        if max(centers) - min(centers) >= repair["distributed_center_span"]:
+            framing = "distributed"
+        else:
+            main = max(objects, key=lambda value: value["score"])
+            x = (main["box"][0] + main["box"][2]) / (2 * width)
+            y = (main["box"][1] + main["box"][3]) / (2 * height)
+            framing = "peripheral" if min(x, y, 1 - x, 1 - y) < repair["peripheral_center_margin"] else "centered"
+    else:
+        main = objects[0]
+        x = (main["box"][0] + main["box"][2]) / (2 * width)
+        y = (main["box"][1] + main["box"][3]) / (2 * height)
+        framing = "peripheral" if min(x, y, 1 - x, 1 - y) < repair["peripheral_center_margin"] else "centered"
+    return {
+        "hand_visibility": "visible" if hands else "not_visible",
+        "hand_action": hand_action,
+        "referent": referent,
+        "distractors": distractors,
+        "occlusion": occlusion,
+        "framing": framing,
+    }
+
+
+def _temporal_hand_completion(by_position: dict[str, dict[str, str]]) -> str | None:
+    if set(by_position) != {"before", "during", "after"}:
+        return None
+    before = by_position["before"]["hand_action"]
+    during = by_position["during"]["hand_action"]
+    after = by_position["after"]["hand_action"]
+    contact = {"grasp_hold"}
+    if during in contact and after not in contact:
+        return "completed"
+    if before not in contact and during in contact:
+        return "contact_onset"
+    if before in contact and during in contact and after in contact:
+        return "persistent_contact"
+    if during == "reach" or after == "reach":
+        return "reach_without_contact"
+    return "no_detected_transition"
+
+
+def _public_repair_root(public: Path) -> Path:
+    return public / "runs/synthetic-video-calibration/extractor-repair"
+
+
+def prepare_public(args: argparse.Namespace) -> dict[str, Any]:
+    from huggingface_hub import snapshot_download
+
+    cfg = json.loads(args.config.read_text())
+    repair = _repair_config(cfg)
+    model_cfg = repair["detector_model"]
+    cache = args.public_root / "models/owlv2-hf-home/hub"
+    cache.mkdir(parents=True, exist_ok=True, mode=0o700)
+    os.environ["HF_HOME"] = str(args.public_root / "models/owlv2-hf-home")
+    os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+    snapshot_download(
+        repo_id=model_cfg["repository"],
+        revision=model_cfg["revision"],
+        cache_dir=cache,
+        allow_patterns=sorted(model_cfg["required_files_sha256"]),
+    )
+    model_root = _detector_model_root(args.public_root, repair)
+    _verify_detector_files(model_root, repair)
+    fixture_root = args.public_root / "models/calibration-public-fixtures"
+    fixture_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    for fixture in repair["public_qualification"]["fixtures"]:
+        target = fixture_root / fixture["file"]
+        if not target.is_file() or file_digest(target) != fixture["sha256"]:
+            partial = target.with_suffix(target.suffix + ".partial")
+            request = urllib.request.Request(
+                fixture["url"], headers={"User-Agent": "synthetic-video-research/1"}
+            )
+            with urllib.request.urlopen(request, timeout=120) as response:
+                partial.write_bytes(response.read())
+            os.chmod(partial, 0o600)
+            if file_digest(partial) != fixture["sha256"]:
+                partial.unlink(missing_ok=True)
+                raise RuntimeError("E_PUBLIC_FIXTURE_HASH")
+            partial.replace(target)
+    manifest = {
+        "schema_version": 1,
+        "status": "PASS",
+        "extractor_repair_commitment_sha256": digest(repair),
+        "model": {
+            "repository": model_cfg["repository"],
+            "revision": model_cfg["revision"],
+            "license": model_cfg["license"],
+            "files_sha256": {
+                name: file_digest(model_root / name)
+                for name in sorted(model_cfg["required_files_sha256"])
+            },
+        },
+        "fixtures": [
+            {
+                "file": fixture["file"],
+                "sha256": file_digest(fixture_root / fixture["file"]),
+                "license": fixture["license"],
+            }
+            for fixture in repair["public_qualification"]["fixtures"]
+        ],
+        "local_files_only_required_after_preparation": True,
+    }
+    manifest["public_dependency_commitment_sha256"] = digest(manifest)
+    write_private(_public_repair_root(args.public_root) / "dependency_manifest.json", manifest)
+    return {
+        "status": "PASS",
+        "fixture_file_count": len(manifest["fixtures"]),
+        "model_file_count": len(manifest["model"]["files_sha256"]),
+        "extractor_repair_commitment_sha256": digest(repair),
+    }
+
+
+def qualify_public(args: argparse.Namespace) -> dict[str, Any]:
+    from PIL import Image
+
+    cfg = json.loads(args.config.read_text())
+    repair = _repair_config(cfg)
+    repair_commitment = digest(repair)
+    manifest_path = _public_repair_root(args.public_root) / "dependency_manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    if (
+        manifest.get("status") != "PASS"
+        or manifest.get("extractor_repair_commitment_sha256") != repair_commitment
+    ):
+        raise RuntimeError("E_PUBLIC_DEPENDENCY_MANIFEST")
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+    model, transform, text_features, slices = _load_vision(
+        args.public_root, cfg, args.device
+    )
+    detector, processor = _load_detector(args.public_root, cfg, args.device)
+    fixture_root = args.public_root / "models/calibration-public-fixtures"
+    fixtures = repair["public_qualification"]["fixtures"]
+    images = []
+    for fixture in fixtures:
+        path = fixture_root / fixture["file"]
+        if file_digest(path) != fixture["sha256"]:
+            raise RuntimeError("E_PUBLIC_FIXTURE_HASH")
+        with Image.open(path) as image:
+            images.append(image.convert("RGB").copy())
+    _, labels, _ = _vision_batch(
+        model, transform, text_features, slices, images, None, args.device
+    )
+    detection_rows = _detector_batch(
+        detector, processor, images, repair, args.device
+    )
+    activity_correct = expected_object_hits = 0
+    hand_positive_hits = hand_positive_count = 0
+    hand_negative_correct = hand_negative_count = 0
+    proxy_complete = invalid_boxes = 0
+    proxy_fields = {
+        "hand_visibility",
+        "hand_action",
+        "referent",
+        "distractors",
+        "occlusion",
+        "framing",
+    }
+    for fixture, label, row in zip(fixtures, labels, detection_rows, strict=True):
+        activity_correct += label["activity"] == fixture["expected_activity"]
+        detected_labels = {
+            value["label"] for value in row["detections"] if value["kind"] == "object"
+        }
+        expected_object_hits += bool(
+            detected_labels.intersection(fixture["expected_object_labels"])
+        )
+        hand_visible = any(
+            value["kind"] == "hand" for value in row["detections"]
+        )
+        if fixture["expected_hand_visible"]:
+            hand_positive_count += 1
+            hand_positive_hits += hand_visible
+        else:
+            hand_negative_count += 1
+            hand_negative_correct += not hand_visible
+        proxies = _detector_proxies(row, repair)
+        proxy_complete += set(proxies) == proxy_fields and all(proxies.values())
+        invalid_boxes += row["invalid_box_count"]
+    thresholds = repair["public_qualification"]["thresholds"]
+    passed = all(
+        [
+            activity_correct >= thresholds["activity_correct_min"],
+            expected_object_hits >= thresholds["expected_object_hits_min"],
+            hand_positive_hits >= thresholds["hand_positive_hits_min"],
+            hand_negative_correct >= thresholds["hand_negative_correct_min"],
+            proxy_complete == len(fixtures),
+            invalid_boxes == 0,
+        ]
+    )
+    result = {
+        "schema_version": 1,
+        "status": "PASS" if passed else "NO_GO",
+        "fixture_count": len(fixtures),
+        "activity_correct_count": int(activity_correct),
+        "expected_object_hit_count": int(expected_object_hits),
+        "hand_positive_hit_count": int(hand_positive_hits),
+        "hand_positive_count": hand_positive_count,
+        "hand_negative_correct_count": int(hand_negative_correct),
+        "hand_negative_count": hand_negative_count,
+        "proxy_complete_count": int(proxy_complete),
+        "invalid_box_count": invalid_boxes,
+        "model_file_count": len(repair["detector_model"]["required_files_sha256"]),
+        "fixture_file_count": len(fixtures),
+        "thresholds": thresholds,
+        "extractor_repair_commitment_sha256": repair_commitment,
+        "local_files_only_reload": True,
+        "telemetry_disabled": True,
+        "selection_rule": "single_frozen_combined_extractor_no_candidate_cycling",
+    }
+    result["public_qualification_commitment_sha256"] = digest(result)
+    write_private(
+        _public_repair_root(args.public_root) / "public_qualification.json", result
+    )
+    return result
 
 
 def _bootstrap_categorical(
@@ -399,7 +894,10 @@ def _speech_line(kind: str, noun: dict[str, str]) -> str:
 
 
 def _build_episode_plans(
-    cfg: dict[str, Any], targets: dict[str, Any], calibration_commitment: str
+    cfg: dict[str, Any],
+    targets: dict[str, Any],
+    calibration_commitment: str,
+    executable: bool = True,
 ) -> dict[str, Any]:
     plan_cfg = cfg["calibration_C"]["episode_plan"]
     count = plan_cfg["candidate_plan_count"]
@@ -487,7 +985,7 @@ def _build_episode_plans(
         )
     value = {
         "schema_version": 1,
-        "status": "FROZEN",
+        "status": "FROZEN_EXECUTABLE" if executable else "PROVISIONAL_NO_GO",
         "calibration_commitment_sha256": calibration_commitment,
         "plan_seed": seed,
         "selection": plan_cfg["selection"],
@@ -504,6 +1002,28 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
 
     cfg = json.loads(args.config.read_text())
     extractor = cfg["calibration_C"]["extractor"]
+    repair = _repair_config(cfg)
+    repair_commitment = digest(repair)
+    qualification_path = (
+        _public_repair_root(args.public_root) / "public_qualification.json"
+    )
+    qualification = json.loads(qualification_path.read_text())
+    if (
+        qualification.get("status") != "PASS"
+        or qualification.get("extractor_repair_commitment_sha256")
+        != repair_commitment
+    ):
+        raise RuntimeError("E_PUBLIC_EXTRACTOR_QUALIFICATION")
+    original_path = (
+        args.restricted_root
+        / "synthetic_one_hour/calibration/restricted_calibration_targets.json"
+    )
+    original = json.loads(original_path.read_text())
+    expected_original_commitment = cfg["calibration_C"]["governed_result"][
+        "calibration_commitment_sha256"
+    ]
+    if original.get("calibration_commitment_sha256") != expected_original_commitment:
+        raise RuntimeError("E_ORIGINAL_CALIBRATION_PROVENANCE")
     stage = json.loads((args.restricted_root / "restricted_stage_manifest.json").read_text())
     checkpoint = json.loads(
         (args.restricted_root / "asr/restricted_calibration.json").read_text()
@@ -516,6 +1036,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     model, transform, text_features, slices = _load_vision(
         args.public_root, cfg, args.device
     )
+    detector, detector_processor = _load_detector(
+        args.public_root, cfg, args.device
+    )
     observations: dict[str, dict[str, list[tuple[str, str | None]]]] = defaultdict(
         lambda: defaultdict(list)
     )
@@ -523,9 +1046,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     all_features = []
     all_recording_indices = []
     sampled_frames = grounding_events = 0
+    scheduled_frames = decode_failures = 0
     recording_index = 0
     bins = extractor["fixed_numeric_bins"]
-    margin = extractor["vision_abstention_top1_margin_min"]
+    margin = None
     scratch = args.scratch_root
     scratch.mkdir(parents=True, exist_ok=True, mode=0o700)
     for row in sorted(rows, key=lambda value: value["asset_key"]):
@@ -547,29 +1071,89 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             decoded_times = []
             metrics = []
             previous = None
+            child = row["child_key"]
             for timestamp in regular_times:
+                scheduled_frames += 1
                 image = _decode_frame(ffmpeg, local, timestamp, extractor["decoded_image_size"])
                 if image is None:
+                    decode_failures += 1
+                    for axis, feature in (
+                        (ACTIVITY_AXIS, "activity"),
+                        (ACTIVITY_AXIS, "activity_confidence"),
+                        (VISUAL_AXIS, "framing"),
+                        (VISUAL_AXIS, "brightness"),
+                        (VISUAL_AXIS, "blur_edge_strength"),
+                        (VISUAL_AXIS, "motion"),
+                        (SCENE_AXIS, "occlusion"),
+                        (SCENE_AXIS, "distractors"),
+                        (SCENE_AXIS, "clutter_edge_fraction"),
+                        (HAND_AXIS, "hand_visibility"),
+                        (HAND_AXIS, "hand_action"),
+                        (TEMPORAL_AXIS, "idle_transition"),
+                        (GROUNDING_AXIS, "regular_referent"),
+                        (GROUNDING_AXIS, "speech_referent_null"),
+                        (DIVERSITY_AXIS, "cross_recording_near_duplicate"),
+                        (DIVERSITY_AXIS, "activity_long_tail"),
+                    ):
+                        _add(observations, axis, feature, child, None)
                     continue
                 images.append(image)
                 decoded_times.append(timestamp)
                 metrics.append(_image_metrics(image, previous))
                 previous = image
             if images:
-                features, labels = _vision_batch(
+                features, labels, vision_margins = _vision_batch(
                     model, transform, text_features, slices, images, margin, args.device
                 )
+                detector_rows = _detector_batch(
+                    detector,
+                    detector_processor,
+                    images,
+                    repair,
+                    args.device,
+                )
+                detector_proxies = [
+                    _detector_proxies(value, repair) for value in detector_rows
+                ]
             else:
                 features = np.empty((0, 1), dtype=np.float32)
                 labels = []
-            for index, (timestamp, metric, label) in enumerate(zip(decoded_times, metrics, labels, strict=True)):
-                child = row["child_key"]
+                vision_margins = []
+                detector_rows = []
+                detector_proxies = []
+            for index, (timestamp, metric, label, vision_margin, proxy, detector_row) in enumerate(
+                zip(
+                    decoded_times,
+                    metrics,
+                    labels,
+                    vision_margins,
+                    detector_proxies,
+                    detector_rows,
+                    strict=True,
+                )
+            ):
                 _add(observations, ACTIVITY_AXIS, "activity", child, label["activity"])
-                _add(observations, VISUAL_AXIS, "framing", child, label["framing"])
-                _add(observations, SCENE_AXIS, "occlusion", child, label["occlusion"])
-                _add(observations, SCENE_AXIS, "distractors", child, label["distractors"])
-                _add(observations, HAND_AXIS, "hand_action", child, label["hand_action"])
-                _add(observations, GROUNDING_AXIS, "regular_referent", child, label["referent"])
+                activity_margin = vision_margin["activity"]
+                activity_confidence = (
+                    "low"
+                    if activity_margin < repair["activity_margin_bands"][0]
+                    else "medium"
+                    if activity_margin < repair["activity_margin_bands"][1]
+                    else "high"
+                )
+                _add(
+                    observations,
+                    ACTIVITY_AXIS,
+                    "activity_confidence",
+                    child,
+                    activity_confidence,
+                )
+                _add(observations, VISUAL_AXIS, "framing", child, proxy["framing"])
+                _add(observations, SCENE_AXIS, "occlusion", child, proxy["occlusion"])
+                _add(observations, SCENE_AXIS, "distractors", child, proxy["distractors"])
+                _add(observations, HAND_AXIS, "hand_visibility", child, proxy["hand_visibility"])
+                _add(observations, HAND_AXIS, "hand_action", child, proxy["hand_action"])
+                _add(observations, GROUNDING_AXIS, "regular_referent", child, proxy["referent"])
                 for feature in ("brightness", "blur_edge_strength", "clutter_edge_fraction"):
                     axis = SCENE_AXIS if feature == "clutter_edge_fraction" else VISUAL_AXIS
                     _add(observations, axis, feature, child, bucket(float(metric[feature]), bins[feature]))
@@ -584,15 +1168,21 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                     segment.get("status") == "ACCEPT" and segment["start"] <= timestamp <= segment["end"]
                     for segment in item.get("segments", [])
                 )
-                null_label = f"{'speech' if speech_here else 'silence'}|{label['referent'] or 'abstain'}"
+                null_label = f"{'speech' if speech_here else 'silence'}|{proxy['referent']}"
                 _add(observations, GROUNDING_AXIS, "speech_referent_null", child, null_label)
+                combined_labels = {
+                    "activity": label["activity"],
+                    "activity_confidence": activity_confidence,
+                    **proxy,
+                }
                 restricted_features.append({
                     "asset_key": asset_key,
                     "child_key": child,
                     "session_key": row["session_key"],
                     "timestamp": timestamp,
                     "metrics": metric,
-                    "labels": label,
+                    "labels": combined_labels,
+                    "detector_invalid_box_count": detector_row["invalid_box_count"],
                 })
                 sampled_frames += 1
             if len(features):
@@ -632,25 +1222,97 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             for event_ordinal, (index, segment, act) in enumerate(ordered_events):
                 midpoint = (float(segment["start"]) + float(segment["end"])) / 2
                 for position, offset in zip(("before", "during", "after"), extractor["naming_offsets_seconds"], strict=True):
+                    scheduled_frames += 1
                     image = _decode_frame(ffmpeg, local, min(max(0.0, midpoint + offset), max(0.0, duration - 0.01)), extractor["decoded_image_size"])
                     if image is not None:
                         grounding_images.append(image)
                         grounding_meta.append((event_ordinal, position, act))
                         grounding_metrics.append(_image_metrics(image, None))
-            if grounding_images:
-                _, grounding_labels = _vision_batch(model, transform, text_features, slices, grounding_images, margin, args.device)
-                grouped: dict[int, list[tuple[str, str, dict[str, str | None], dict[str, float | None]]]] = defaultdict(list)
-                for meta, label, metric in zip(grounding_meta, grounding_labels, grounding_metrics, strict=True):
-                    grouped[meta[0]].append((meta[1], meta[2], label, metric))
-                for event_index, group in grouped.items():
-                    for position, act, label, metric in group:
+                    else:
+                        decode_failures += 1
                         if act == "naming":
-                            _add(observations, GROUNDING_AXIS, f"naming_referent_{position}", row["child_key"], label["referent"])
+                            _add(
+                                observations,
+                                GROUNDING_AXIS,
+                                f"naming_referent_{position}",
+                                row["child_key"],
+                                None,
+                            )
                         if position == "during":
-                            _add(observations, GROUNDING_AXIS, "naming_by_referent_visibility", row["child_key"], f"{act == 'naming'}|{label['referent'] or 'abstain'}")
-                            _add(observations, GROUNDING_AXIS, "naming_by_hand_action", row["child_key"], f"{act == 'naming'}|{label['hand_action'] or 'abstain'}")
+                            for axis, feature in (
+                                (GROUNDING_AXIS, "naming_by_referent_visibility"),
+                                (GROUNDING_AXIS, "naming_by_hand_action"),
+                                (SCENE_AXIS, "clutter_by_occlusion"),
+                                (HAND_AXIS, "action_completion"),
+                            ):
+                                _add(
+                                    observations,
+                                    axis,
+                                    feature,
+                                    row["child_key"],
+                                    None,
+                                )
+            if grounding_images:
+                _, grounding_labels, _ = _vision_batch(
+                    model,
+                    transform,
+                    text_features,
+                    slices,
+                    grounding_images,
+                    margin,
+                    args.device,
+                )
+                grounding_detector_rows = _detector_batch(
+                    detector,
+                    detector_processor,
+                    grounding_images,
+                    repair,
+                    args.device,
+                )
+                grounding_proxies = [
+                    _detector_proxies(value, repair)
+                    for value in grounding_detector_rows
+                ]
+                grouped: dict[
+                    int,
+                    list[
+                        tuple[
+                            str,
+                            str,
+                            dict[str, str | None],
+                            dict[str, float | None],
+                            dict[str, str],
+                        ]
+                    ],
+                ] = defaultdict(list)
+                for meta, label, metric, proxy in zip(
+                    grounding_meta,
+                    grounding_labels,
+                    grounding_metrics,
+                    grounding_proxies,
+                    strict=True,
+                ):
+                    grouped[meta[0]].append((meta[1], meta[2], label, metric, proxy))
+                for event_index, group in grouped.items():
+                    position_proxies = {
+                        position: proxy for position, _, _, _, proxy in group
+                    }
+                    completion = _temporal_hand_completion(position_proxies)
+                    for position, act, label, metric, proxy in group:
+                        if act == "naming":
+                            _add(observations, GROUNDING_AXIS, f"naming_referent_{position}", row["child_key"], proxy["referent"])
+                        if position == "during":
+                            _add(observations, GROUNDING_AXIS, "naming_by_referent_visibility", row["child_key"], f"{act == 'naming'}|{proxy['referent']}")
+                            _add(observations, GROUNDING_AXIS, "naming_by_hand_action", row["child_key"], f"{act == 'naming'}|{proxy['hand_action']}")
+                            _add(
+                                observations,
+                                HAND_AXIS,
+                                "action_completion",
+                                row["child_key"],
+                                completion,
+                            )
                             clutter = bucket(float(metric["clutter_edge_fraction"]), bins["clutter_edge_fraction"])
-                            _add(observations, SCENE_AXIS, "clutter_by_occlusion", row["child_key"], f"{clutter}|{label['occlusion'] or 'abstain'}")
+                            _add(observations, SCENE_AXIS, "clutter_by_occlusion", row["child_key"], f"{clutter}|{proxy['occlusion']}")
                             grounding_events += 1
             _add(observations, LANGUAGE_AXIS, "overlap", row["child_key"], "present" if sum(stop-start for start,stop in intervals) - union_duration(intervals) > 0.01 else "absent")
         finally:
@@ -713,37 +1375,72 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         blur_label = bucket(float(row["metrics"]["blur_edge_strength"]), bins["blur_edge_strength"])
         _add(observations, VISUAL_AXIS, "motion_by_blur", row["child_key"], f"{motion_label}|{blur_label}")
     targets, missing_axes, suppressed = _summarize(observations, cfg)
+    critical_axes = set(
+        extractor["generated_comparison_tolerances"]["critical_axes"]
+    )
+    blocking_statuses = {"INSUFFICIENT_SUPPORT", "HIGH_MISSINGNESS"}
+    critical_failure = any(
+        targets[axis]["status"] in blocking_statuses for axis in critical_axes
+    )
+    measured_axis_count = len(AXES) - missing_axes
+    calibration_pass = (
+        not critical_failure
+        and measured_axis_count
+        >= extractor["generated_comparison_tolerances"][
+            "axes_required_within_tolerance"
+        ]
+    )
     measurement = {
-        "schema_version": 1,
-        "status": "PASS" if missing_axes == 0 else "PASS_WITH_DECLARED_MISSINGNESS",
+        "schema_version": 2,
+        "status": "PASS" if calibration_pass else "NO_GO",
         "source": "development_set_C_only",
         "extractor_contract": extractor,
+        "extractor_repair_commitment_sha256": repair_commitment,
+        "public_qualification_commitment_sha256": qualification[
+            "public_qualification_commitment_sha256"
+        ],
+        "supersedes_original_calibration_commitment_sha256": expected_original_commitment,
         "measured_axes": list(AXES),
         "unmeasured": ["human_activity_labels", "speaker_diarization", "human_referent_ground_truth", "exact_object_counts", "full_distributional_fidelity"],
         "targets": targets,
         "joint_features": ["naming_by_referent_visibility", "naming_by_hand_action", "clutter_by_occlusion", "motion_by_blur"],
         "sampled_frame_count": sampled_frames,
+        "scheduled_frame_count": scheduled_frames,
+        "decode_failure_count": decode_failures,
         "grounding_event_count": grounding_events,
+        "detector_invalid_box_count": sum(
+            row["detector_invalid_box_count"] for row in restricted_features
+        ),
+        "measured_axis_count": measured_axis_count,
+        "critical_axis_failure": critical_failure,
         "ffmpeg_sha256": file_digest(Path(ffmpeg)),
         "row_level_features_retained_governed_only": True,
         "external_target_values_exported": False,
         "omnibus_score": None,
     }
     measurement["calibration_commitment_sha256"] = digest(measurement)
-    plan = _build_episode_plans(cfg, targets, measurement["calibration_commitment_sha256"])
-    output = args.restricted_root / "synthetic_one_hour/calibration"
+    plan = _build_episode_plans(
+        cfg,
+        targets,
+        measurement["calibration_commitment_sha256"],
+        executable=calibration_pass,
+    )
+    output = args.restricted_root / "synthetic_one_hour/calibration_repair"
     write_private(output / "restricted_calibration_features.json", {"schema_version": 1, "rows": restricted_features})
     write_private(output / "restricted_calibration_targets.json", measurement)
     write_private(output / "restricted_episode_plans.json", plan)
     compact = {
-        "status": "PASS" if missing_axes == 0 else "PASS_WITH_DECLARED_MISSINGNESS",
+        "status": "PASS" if calibration_pass else "NO_GO",
         "axis_count": len(AXES),
         "joint_count": 4,
         "sampled_frame_count": sampled_frames,
+        "scheduled_frame_count": scheduled_frames,
+        "decode_failure_count": decode_failures,
         "grounding_event_count": grounding_events,
         "missing_axis_count": missing_axes,
         "suppressed_cell_count": suppressed,
         "episode_plan_count": len(plan["plans"]),
+        "extractor_repair_commitment_sha256": repair_commitment,
         "calibration_commitment_sha256": measurement["calibration_commitment_sha256"],
         "episode_plan_commitment_sha256": plan["episode_plan_commitment_sha256"],
     }
@@ -752,7 +1449,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def report(args: argparse.Namespace) -> dict[str, Any]:
-    path = args.restricted_root / "synthetic_one_hour/calibration/compact_calibration_result.json"
+    path = args.restricted_root / "synthetic_one_hour/calibration_repair/compact_calibration_result.json"
     value = json.loads(path.read_text())
     print(
         compact_aggregate_json(
@@ -765,9 +1462,9 @@ def report(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def report_axis_status(args: argparse.Namespace) -> dict[str, Any]:
-    path = args.restricted_root / "synthetic_one_hour/calibration/restricted_calibration_targets.json"
+    path = args.restricted_root / "synthetic_one_hour/calibration_repair/restricted_calibration_targets.json"
     value = json.loads(path.read_text())
-    record: dict[str, Any] = {"status": "PASS"}
+    record: dict[str, Any] = {"status": value["status"]}
     for index, axis in enumerate(AXES, start=1):
         target = value["targets"][axis]
         record[f"axis_{index}_status"] = target["status"]
@@ -779,6 +1476,13 @@ def report_axis_status(args: argparse.Namespace) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
+    prepare_parser = subparsers.add_parser("prepare-public")
+    prepare_parser.add_argument("--public-root", type=Path, required=True)
+    prepare_parser.add_argument("--config", type=Path, required=True)
+    qualify_parser = subparsers.add_parser("qualify-public")
+    qualify_parser.add_argument("--public-root", type=Path, required=True)
+    qualify_parser.add_argument("--config", type=Path, required=True)
+    qualify_parser.add_argument("--device", default="cuda")
     run_parser = subparsers.add_parser("run")
     run_parser.add_argument("--restricted-root", type=Path, required=True)
     run_parser.add_argument("--public-root", type=Path, required=True)
@@ -790,7 +1494,25 @@ def main() -> None:
     axis_parser = subparsers.add_parser("report-axis-status")
     axis_parser.add_argument("--restricted-root", type=Path, required=True)
     args = parser.parse_args()
-    if args.command == "run":
+    if args.command == "prepare-public":
+        value = prepare_public(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=PUBLIC_TERMINAL_FIELDS,
+                sha256_fields=PUBLIC_TERMINAL_HASH_FIELDS,
+            )
+        )
+    elif args.command == "qualify-public":
+        value = qualify_public(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=PUBLIC_TERMINAL_FIELDS,
+                sha256_fields=PUBLIC_TERMINAL_HASH_FIELDS,
+            )
+        )
+    elif args.command == "run":
         value = run(args)
         print(
             compact_aggregate_json(

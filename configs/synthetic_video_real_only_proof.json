@@ -1,6 +1,6 @@
 {
-  "schema_version": 6,
-  "status": "STOP_POST_GATE_DESCRIPTIVE_SYNTHETIC_1H_CALIBRATION_CRITICAL_MISSINGNESS_NO_GO",
+  "schema_version": 7,
+  "status": "CALIBRATION_EXTRACTOR_REPAIR_FROZEN_PUBLIC_QUALIFICATION_PENDING",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -70,7 +70,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "NO_GO_CRITICAL_AXIS_HIGH_MISSINGNESS_5_OF_8",
+    "status": "EXTRACTOR_REPAIR_FROZEN_PUBLIC_QUALIFICATION_PENDING_ORIGINAL_NO_GO_PRESERVED",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -95,6 +95,93 @@
       "decoder": "imageio-ffmpeg==0.6.0 bundled ffmpeg; runtime binary SHA-256 retained in governed provenance",
       "vision_model": {"repository": "facebook/PE-Core-L14-336", "revision": "bafb0f76541d399057e980a25947f67acec76575", "weights_sha256": "0cdab5b338cbaa1e7a5dcd1b2fb4c9f4d5df1abd289564658edbab64a650e7e8", "license": "Apache-2.0", "role": "model-derived public zero-shot categorical proxies and diagnostic embeddings retained only in governed storage"},
       "vision_abstention_top1_margin_min": 0.02,
+      "coverage_repair": {
+        "status": "FROZEN_ACTIVE",
+        "effective_on": "2026-08-02",
+        "timing": "after the original governed calibration no-go was sealed and before any repaired C output LTX preflight synthetic generation or synthetic learner score",
+        "scientific_role": "prospective coverage-focused extractor repair; it does not reinterpret or replace the original no-go commitment",
+        "candidate_set": ["PE-Core-L14-336_prompt_ensemble_plus_google_OWLv2-base-patch16-ensemble"],
+        "selection_rule": "the single frozen combined extractor must pass the bounded public qualification; no candidate cycling threshold relaxation or C-driven tuning",
+        "unchanged_gate": {"maximum_axis_missing_fraction": 0.2, "critical_axes_must_all_pass": true, "measured_axes_min": 6, "no_imputation": true},
+        "semantic_missingness": "a valid finite model inference emits an explicit closed-set class; low PE margin is retained as a confidence band and zero detector boxes is the measured none/no-hand class rather than missing; only decode or inference failure is missing",
+        "prompt_ensembles": {
+          "activity": {
+            "play": ["a child playing with toys", "an indoor child play activity", "a child-view scene of active toy play"],
+            "meal": ["a child-view scene during a meal or snack", "food and drinks on a table during eating", "an ordinary family meal scene"],
+            "book_learning": ["a child-view scene with a book or learning activity", "someone reading or looking at a book", "an ordinary reading and learning scene"],
+            "household_routine": ["a child-view household routine", "an ordinary task happening inside a home", "a person doing a household activity"],
+            "dressing_care": ["a child-view dressing or personal-care routine", "an ordinary getting dressed activity", "a personal care activity at home"],
+            "mobility_outdoor": ["a child moving around or outdoors", "an outdoor movement or sports activity", "people moving through an outdoor scene"],
+            "quiet_observation": ["a child quietly observing a scene", "a quiet indoor observation with little activity", "a calm scene viewed from inside a home"],
+            "other": ["another ordinary child-view activity", "an ordinary scene that is not meal play reading care or outdoor movement", "another everyday context"]
+          }
+        },
+        "activity_argmax_abstention": "NONE_AFTER_VALID_INFERENCE",
+        "activity_margin_bands": [0.01, 0.03],
+        "detector_model": {
+          "repository": "google/owlv2-base-patch16-ensemble",
+          "revision": "cfd3195ba4ea9592eec887ded089f4c08eff231d",
+          "license": "Apache-2.0",
+          "intended_use": "local research open-vocabulary object detection",
+          "weights_dtype": "float32",
+          "required_files_sha256": {
+            "added_tokens.json": "e5dc0da35d20111e8ff3fdfc03682beca23d5f94ed74331bce81786b2636a24f",
+            "config.json": "ba9df8c25a4b8461887dd0a93d9252c9cd84697fe8d49a9d8794ce409af9acb2",
+            "merges.txt": "9fd691f7c8039210e0fced15865466c65820d09b63988b0174bfe25de299051a",
+            "model.safetensors": "e8643bcae4afdfa3a3019a6c271d19090b2e2fc6",
+            "preprocessor_config.json": "cf3e396635b797ee1a464e1b2836e98748f8edac19e89aaa2c93b55ac15b0064",
+            "special_tokens_map.json": "d6e2b9cf664efbad2d22998b8d3da986abcbeed3e0825ad33605c9401f9cf73e",
+            "tokenizer_config.json": "b55cda6198e152ded427c8a9b3faf1cccf27a7fa080697a62f6ff143f511f44f",
+            "vocab.json": "e089ad92ba36837a0d31433e555c8f45fe601ab5c221d4f607ded32d9f7a4349"
+          }
+        },
+        "detector_queries": [
+          {"kind": "hand", "label": "hand", "text": "a human hand"},
+          {"kind": "hand", "label": "hand", "text": "a person's hand"},
+          {"kind": "object", "label": "sports_ball", "text": "a sports ball"},
+          {"kind": "object", "label": "book", "text": "a book"},
+          {"kind": "object", "label": "cup", "text": "a cup"},
+          {"kind": "object", "label": "bottle", "text": "a bottle"},
+          {"kind": "object", "label": "bowl", "text": "a bowl"},
+          {"kind": "object", "label": "plate", "text": "a plate"},
+          {"kind": "object", "label": "food", "text": "a food item"},
+          {"kind": "object", "label": "chair", "text": "a chair"},
+          {"kind": "object", "label": "pet", "text": "a pet animal"},
+          {"kind": "object", "label": "toy", "text": "a child's toy"},
+          {"kind": "object", "label": "household_object", "text": "a household object"}
+        ],
+        "detector_score_thresholds": {"hand": 0.05, "object": 0.1},
+        "detector_batch_size": 4,
+        "detector_nms_iou": 0.5,
+        "hand_object_near_gap_fraction": 0.08,
+        "box_edge_margin_fraction": 0.02,
+        "heavy_occlusion_edge_fraction": 0.5,
+        "heavy_occlusion_pair_iou": 0.5,
+        "partial_occlusion_pair_iou": 0.1,
+        "distributed_center_span": 0.25,
+        "peripheral_center_margin": 0.2,
+        "invalid_detector_box_action": "drop_invalid_box_and_count; valid finite frame inference remains measured",
+        "public_qualification": {
+          "source": "fixed COCO 2017 validation images selected and labeled before model outcomes; individual Creative Commons licenses retained below",
+          "fixtures": [
+            {"file": "000000022935.jpg", "url": "http://images.cocodataset.org/val2017/000000022935.jpg", "sha256": "90fad7bfc9fab88492d9722ea1aa14ee77514d8c10dbda86086bd37d8a05acf0", "license": "CC-BY-NC-SA-2.0", "expected_activity": "mobility_outdoor", "expected_object_labels": ["sports_ball"], "expected_hand_visible": true},
+            {"file": "000000074733.jpg", "url": "http://images.cocodataset.org/val2017/000000074733.jpg", "sha256": "d99c93fb6d22a5d51bbb6e09ca5f10c11bdcf90a711abf6cc83188df52cc456a", "license": "CC-BY-2.0", "expected_activity": "meal", "expected_object_labels": ["cup", "food", "plate"], "expected_hand_visible": false},
+            {"file": "000000084362.jpg", "url": "http://images.cocodataset.org/val2017/000000084362.jpg", "sha256": "078d217235bc234a17e34325cd551fa0944ea693a7e51c5647d0df7702bc840e", "license": "CC-BY-NC-2.0", "expected_activity": "quiet_observation", "expected_object_labels": ["pet", "chair", "household_object"], "expected_hand_visible": false},
+            {"file": "000000099182.jpg", "url": "http://images.cocodataset.org/val2017/000000099182.jpg", "sha256": "3d9c89c248fd430464263a6539687f9448b7191f1a978ad5095d2c0da9d156b7", "license": "CC-BY-NC-SA-2.0", "expected_activity": "book_learning", "expected_object_labels": ["book"], "expected_hand_visible": true},
+            {"file": "000000279730.jpg", "url": "http://images.cocodataset.org/val2017/000000279730.jpg", "sha256": "25a359df54d4bdf4c6f6ab705b3dcc99795097c0053e8da3dfb02bba856b1a8c", "license": "CC-BY-NC-SA-2.0", "expected_activity": "meal", "expected_object_labels": ["cup", "food"], "expected_hand_visible": true},
+            {"file": "000000397133.jpg", "url": "http://images.cocodataset.org/val2017/000000397133.jpg", "sha256": "09e1d25c75f7879bdaa69c327fece5cabacd53939c8c2ef9e87f1c97a2e478c4", "license": "CC-BY-2.0", "expected_activity": "household_routine", "expected_object_labels": ["bottle", "bowl", "cup", "household_object"], "expected_hand_visible": false},
+            {"file": "000000410735.jpg", "url": "http://images.cocodataset.org/val2017/000000410735.jpg", "sha256": "100e3482a768dddcdccb9603682ae0b00921a31854d86b8924e7fc723bcbacac", "license": "CC-BY-2.0", "expected_activity": "meal", "expected_object_labels": ["bowl", "food", "plate"], "expected_hand_visible": true},
+            {"file": "000000502737.jpg", "url": "http://images.cocodataset.org/val2017/000000502737.jpg", "sha256": "b8fcea1fecb77c46986dcaf94629b90d8815c863ecfaa2925af8de74cf6fc78e", "license": "CC-BY-2.0", "expected_activity": "meal", "expected_object_labels": ["cup", "food", "plate"], "expected_hand_visible": true}
+          ],
+          "thresholds": {"activity_correct_min": 4, "expected_object_hits_min": 5, "hand_positive_hits_min": 2, "hand_negative_correct_min": 2, "proxy_complete_required": 8, "invalid_box_count_max": 0},
+          "selection_order": "single_candidate_pass_or_no_go",
+          "local_files_only_reload_required": true,
+          "telemetry_disabled_required": true
+        },
+        "governed_output_root": "synthetic_one_hour/calibration_repair",
+        "original_output_root_preserved": "synthetic_one_hour/calibration",
+        "governed_pass_rule": "all critical axes at or below unchanged 0.20 missingness and at least six of eight axes measured; otherwise repaired calibration no-go"
+      },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},
         "framing": {"centered": "one main object centered in a child-view frame", "distributed": "several objects distributed across a child-view frame", "peripheral": "the main content is near the edge of a child-view frame"},
@@ -144,8 +231,8 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "NO_GO_FROZEN_CRITICAL_AXIS_MISSINGNESS_STOP_BEFORE_LTX_PREFLIGHT",
-    "authorization_interpretation": "local applicant-only LTX execution would keep every C aggregate and aggregate-conditioned generator input inside governed UTD storage and grant no third-party access, but the frozen calibration no-go prevents execution",
+    "local_generator_gate": "BLOCKED_PENDING_PUBLIC_EXTRACTOR_QUALIFICATION_AND_GOVERNED_REPAIRED_C_RERUN",
+    "authorization_interpretation": "the original calibration no-go remains valid; the user prospectively authorized one coverage-focused extractor repair using a single frozen public model combination, unchanged 20% missingness ceiling, public qualification first, and no C-driven tuning",
     "governed_result": {
       "status": "NO_GO",
       "job_topology": "1_H100",
@@ -186,7 +273,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_NOT_RUN_CALIBRATION_NO_GO",
+    "status": "SELECTED_LOCAL_NOT_RUN_CALIBRATION_EXTRACTOR_REPAIR_PENDING",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
@@ -203,7 +290,7 @@
     "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "NOT_RUN_FROZEN_CALIBRATION_NO_GO; user authorization remains documented but cannot override the prospectively frozen critical-axis and missingness rules",
+  "synthetic_arm": "NOT_RUN; original calibration no-go preserved and one prospectively frozen extractor repair is pending public qualification and governed C rerun; unchanged critical-axis and missingness rules still apply",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
   "former_directionally_competitive_rule_not_permitted_for_post_gate_extension": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",
