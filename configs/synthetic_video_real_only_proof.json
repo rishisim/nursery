@@ -493,6 +493,7 @@
             "c4_en_sentencepiece_sha256": "1e5036bed065526c3c212dfbe288752391797c4bb1a284aa18c9a0b23fcaf8ec",
             "c4_en_sentencepiece_bytes": 798330,
             "tokenizer_compatibility": "instantiate the frozen public SentencePiece bytes locally and apply the official VideoPrism canonicalization and fixed length-64 padding behavior without GCS access",
+            "optional_import_compatibility": "before importing the pinned official models module, supply only its two tokenizer namespace attributes used by type annotation and the unused hosted-tokenizer helper; the helper raises if called, while the frozen local SentencePiece adapter remains the sole tokenization path; an exact source-surface guard stops if the pinned models module references any other tokenizer attribute",
             "direct_python_requirements": [
               "absl-py==2.3.1",
               "decord==0.6.0",

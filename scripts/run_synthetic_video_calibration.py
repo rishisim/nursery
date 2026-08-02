@@ -1268,6 +1268,29 @@ def _videoprism_token_ids(model_path: Path, prompts: list[str]):
     return np.asarray(rows, dtype=np.int32), np.asarray(paddings, dtype=np.float32)
 
 
+def _install_videoprism_tokenizer_import_compatibility(code_root: Path) -> None:
+    import types
+    from typing import Protocol
+
+    source = (code_root / "videoprism/models.py").read_text()
+    references = set(re.findall(r"tokenizers\.([A-Za-z_][A-Za-z0-9_]*)", source))
+    if references != {"SentencePieceTokenizer", "Tokenizer"}:
+        raise RuntimeError("E_VIDEOPRISM_TOKENIZER_IMPORT_SURFACE")
+
+    class Tokenizer(Protocol):
+        pass
+
+    class SentencePieceTokenizer:
+        def __init__(self, *args, **kwargs):
+            del args, kwargs
+            raise RuntimeError("E_VIDEOPRISM_HOSTED_TOKENIZER_PATH_PROHIBITED")
+
+    tokenizers = types.ModuleType("videoprism.tokenizers")
+    tokenizers.Tokenizer = Tokenizer
+    tokenizers.SentencePieceTokenizer = SentencePieceTokenizer
+    sys.modules["videoprism.tokenizers"] = tokenizers
+
+
 def _load_videoprism_activity_adapter(
     public: Path,
     candidate: dict[str, Any],
@@ -1280,6 +1303,7 @@ def _load_videoprism_activity_adapter(
     os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
     code_root = _activity_code_root(public, candidate["candidate_id"])
     _verify_repository_commit(code_root, candidate["code_commit"])
+    _install_videoprism_tokenizer_import_compatibility(code_root)
     sys.path.insert(0, str(code_root))
     import jax
     import jax.numpy as jnp

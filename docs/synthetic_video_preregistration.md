@@ -1005,3 +1005,14 @@ atomically sealed; the record commitment `fa6a684a…1280` verifies. The termina
 schema is therefore narrowed to omit candidate and partition strings for all
 sizing, development and selection summaries. This output-only repair does not
 rerun or alter the valid EgoHOD sizing record.
+
+The first VideoPrism sizing load then stopped before model construction because
+the pinned official `models.py` imports its TensorFlow-backed tokenizer module.
+That module is needed there only for the `Tokenizer` annotation and an unused
+`SentencePieceTokenizer` helper; this adapter already freezes the same public
+SentencePiece bytes, canonicalization and 64-token padding locally. The
+prospective import-only repair supplies exactly those two namespace attributes,
+makes the hosted/GCS helper raise if invoked, and verifies from the pinned source
+that no other tokenizer attribute is referenced. It does not modify VideoPrism
+parameters, preprocessing, text IDs or forward computation and adds no new
+dependency.

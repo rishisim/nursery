@@ -299,6 +299,39 @@ def test_egohod_checkpoint_load_keeps_weights_only_and_exact_global_gate() -> No
     assert "weights_only=False" not in source
 
 
+def test_videoprism_import_compatibility_cannot_replace_local_tokenization(
+    tmp_path, monkeypatch
+) -> None:
+    import sys
+
+    code = tmp_path / "videoprism"
+    code.mkdir()
+    (code / "models.py").write_text(
+        "x: tokenizers.Tokenizer\n"
+        "def load(): return tokenizers.SentencePieceTokenizer('hosted')\n"
+    )
+    previous = sys.modules.get("videoprism.tokenizers")
+    try:
+        MODULE._install_videoprism_tokenizer_import_compatibility(tmp_path)
+        tokenizers = sys.modules["videoprism.tokenizers"]
+        import pytest
+
+        with pytest.raises(
+            RuntimeError, match="E_VIDEOPRISM_HOSTED_TOKENIZER_PATH_PROHIBITED"
+        ):
+            tokenizers.SentencePieceTokenizer("hosted")
+        (code / "models.py").write_text("x = tokenizers.new_surface\n")
+        with pytest.raises(
+            RuntimeError, match="E_VIDEOPRISM_TOKENIZER_IMPORT_SURFACE"
+        ):
+            MODULE._install_videoprism_tokenizer_import_compatibility(tmp_path)
+    finally:
+        if previous is None:
+            sys.modules.pop("videoprism.tokenizers", None)
+        else:
+            sys.modules["videoprism.tokenizers"] = previous
+
+
 def test_bucket_and_union_duration_are_frozen_and_exact() -> None:
     assert MODULE.bucket(0.03, [0.0, 0.03, 0.07, 1.0]) == "bin_1"
     assert MODULE.bucket(1.0, [0.0, 0.03, 0.07, 1.0]) == "bin_2"
