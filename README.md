@@ -112,7 +112,11 @@ at 24/28, and LTX at 19/28. No generation may begin unless the redesigned
 multi-pass Real-1h positive control passes, followed by governed C calibration
 and a bounded final-topology LTX preflight. Synthetic data remains capped at
 exactly one accepted credited hour.
-Juno connectivity was restored on 2026-08-02, authorizing submission of only
-the frozen three-seed redesigned Real-1h positive-control jobs.
+The three redesigned Real-1h seeds completed. Mean realistic macro rose from
+`0.51836` at initialization to `0.53602`; two seeds improved and every temporal
+safeguard was non-catastrophic. The mean gain of `0.01766` nevertheless missed
+the frozen `0.02` positive-signal threshold, so the exploratory stop rule fired.
+This is inconclusive about data quality and does not authorize C calibration,
+LTX preflight, generation, or a synthetic learner arm.
 Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
 generation remain unauthorized.

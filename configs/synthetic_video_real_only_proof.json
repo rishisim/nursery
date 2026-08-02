@@ -1,6 +1,6 @@
 {
   "schema_version": 5,
-  "status": "FROZEN_COVERAGE_REDESIGN_REAL_1H_POSITIVE_CONTROL_PENDING_SUBMISSION",
+  "status": "STOP_COVERAGE_REDESIGN_REAL_1H_POSITIVE_CONTROL_FAILED_MEAN_GAIN",
   "claim_role": "three_seed_exploratory_directional_equal_one_accepted_hour_pilot_not_equivalence_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -68,7 +68,7 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "BLOCKED_UNTIL_REAL_1H_POSITIVE_CONTROL_PASS_THEN_GOVERNED_C_AGGREGATE_AND_EPISODE_PLAN_COMMITMENTS",
+    "local_generator_gate": "NOT_REACHED_REAL_1H_POSITIVE_CONTROL_FAILED",
     "authorization_interpretation": "local applicant-only LTX execution keeps every C aggregate and aggregate-conditioned generator input inside governed UTD storage and grants no third-party access"
   },
   "budgets_credited_hours": {"real": 1, "synthetic_accepted": 1, "synthetic_above_one_hour_prohibited": true},
@@ -80,7 +80,7 @@
   "checkpoint_rule": "for each matched seed save byte-identical initialized state before optimization; Real-1h and Synthetic-1h use the checkpoint immediately after exactly 4668 scheduler steps; no arm-specific tuning stopping or selection",
   "initialized_baseline": "evaluate byte-identical 0h initialization before training without adapting any rule",
   "real_1h_positive_control_gate": {
-    "status": "FROZEN_PRE_SCORE_PENDING_SUBMISSION",
+    "status": "FAILED_MEAN_GAIN_0_017661900756938558_BELOW_0_02",
     "realistic_lexical_macro_seed_mean_min": 0.52,
     "mean_improvement_over_seed_matched_initialization_min": 0.02,
     "minimum_seeds_with_positive_improvement": 2,
@@ -88,7 +88,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_BLOCKED_UNTIL_REAL_1H_POSITIVE_CONTROL_PASS",
+    "status": "SELECTED_LOCAL_NOT_REACHED_REAL_1H_POSITIVE_CONTROL_FAILED",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
@@ -105,7 +105,7 @@
     "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "only after the redesigned multi-pass Real-1h positive control passes and the governed C commitment plus LTX topology/resource preflight pass; produce exactly one accepted credited hour and reuse it for every matched learner seed",
+  "synthetic_arm": "NOT_AUTHORIZED because the redesigned Real-1h positive control failed its frozen mean-gain threshold; no C calibration LTX preflight corpus generation or synthetic learner score",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
   "directionally_competitive_rule": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",

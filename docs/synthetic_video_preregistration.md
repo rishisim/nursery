@@ -647,3 +647,16 @@ retries and two attempts per plan), within 72 hours and 100 GiB. The same accept
 hour is reused for all learner seeds. More than one accepted synthetic hour,
 confirmatory equivalence claims, and evaluation-driven generator tuning are
 prohibited.
+
+### Coverage-redesign gate result
+
+All three frozen Real-1h seeds completed at exactly 4,668 steps with the
+registered mode counts and finite runtime-health diagnostics. The seed-mean
+realistic macro was `0.5183627698` at initialization and `0.5360246706` after
+training, a mean gain of `0.0176619008`. Two of three seed gains were positive;
+all temporal safeguards were non-catastrophic; and the trained mean exceeded
+`0.52`. The gate nevertheless failed because the mean gain was below the frozen
+`0.02` requirement. Per the prospective rule, this is inconclusive about data
+quality and stops before governed C calibration, LTX topology preflight,
+generation, or synthetic learner training. No evaluation-driven threshold,
+budget, seed, or generator change is permitted inside this amendment.

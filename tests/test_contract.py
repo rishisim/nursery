@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 3
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_COVERAGE_REDESIGN_REAL_GATE_PENDING"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_COVERAGE_REDESIGN_STOPPED_REAL_GATE_FAILED"
     validate_phase_state(config)
     assert schedule_cycle(config["learner"]["schedule"]) == [
         "contrastive",
@@ -114,9 +114,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["childlens_audio_processing_authorized"] is True
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
     assert config["gates"]["generator_work_authorized"] is False
-    assert config["gates"]["real_only_training_authorized"] == (
-        "ONLY_FROZEN_THREE_SEED_4668_STEP_REAL_1H_POSITIVE_CONTROL"
-    )
+    assert config["gates"]["real_only_training_authorized"] is False
     assert config["governed_compute"]["additional_slurm_account_name_committed_to_git"] is False
 
 

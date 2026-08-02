@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_PRIOR_STOP_PRESERVED_COVERAGE_REDESIGN_FROZEN",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_COVERAGE_REDESIGN_STOPPED_REAL_GATE_FAILED",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -43,15 +43,24 @@
     "interpretation": "the pinned learner and frozen one-seed 1h/3h budgets did not demonstrate primary realistic lexical learnability; no interpretable equal-duration synthetic comparison is authorized"
   },
   "coverage_redesign": {
-    "status": "FROZEN_PRE_OUTCOME_REAL_1H_POSITIVE_CONTROL_PENDING_SUBMISSION",
+    "status": "STOP_REAL_1H_POSITIVE_CONTROL_FAILED_MEAN_GAIN",
     "effective_on": "2026-08-02",
     "scientific_distinction": "separate exploratory one-accepted-hour protocol correcting less-than-one-pass contrastive coverage; it does not alter or erase the prior 570-step stop",
     "arms": {"real_accepted_hours": 1.0, "synthetic_accepted_hours": 1.0},
     "seeds": [436034264, 1285938051, 151347827],
     "schedule": {"reference_records_per_arm": 1244, "batch_size": 2, "complete_cycles": 778, "scheduler_steps": 4668, "contrastive_updates": 3112, "mlm_updates": 778, "dinov2_updates": 778, "contrastive_equivalent_passes": 5.003215434083601},
-    "generator": {"selected": "LTX-2.3-22B-Distilled-1.1", "selection_role": "user_directed_practical_local_execution_not_bakeoff_winner", "status": "BLOCKED_UNTIL_REAL_1H_POSITIVE_CONTROL_PASS"},
-    "execution_status": "Juno connectivity restored on 2026-08-02; no redesigned learner score existed when submission status was recorded",
-    "interpretation": "point estimates only; compare each arm with its seed-matched initialization and report the synthetic-real gap; a similar null or decline is inconclusive about corpus quality"
+    "generator": {"selected": "LTX-2.3-22B-Distilled-1.1", "selection_role": "user_directed_practical_local_execution_not_bakeoff_winner", "status": "NOT_REACHED_REAL_1H_POSITIVE_CONTROL_FAILED"},
+    "execution": {"completed_seed_count": 3, "objective_steps_each": 4668, "runtime_health_finite_all": true, "pre_score_engineering_failures": 3, "engineering_failure": "scalar initialization-state hash serialization", "repair_commit": "8b913a3", "scientific_output_from_failed_attempts": false},
+    "commitments": ["091ec2612b436874c998a75e59a56c507e38853b00cd746079eac42551eb8aa9", "4ab5d42d07b2d06e1b932ed745fa79743f7409adc83bad6585b047ca12a16a5f", "b8557d364db12eed902c1815419afa29cbd17a78d4770c36e99ab8e615cf3164"],
+    "initialized_seed_mean": {"realistic_nouns": 0.43902439024390244, "realistic_adjectives": 0.5977011494252874, "realistic_macro": 0.518362769834595, "cartoon_nouns": 0.4213836477987421, "cartoon_adjectives": 0.4878048780487805, "temporal_recall_at_1": 0.12402617637893425, "temporal_mrr": 0.3408898336523773},
+    "real_1h_seed_mean": {"realistic_nouns": 0.5203252032520326, "realistic_adjectives": 0.5517241379310345, "realistic_macro": 0.5360246705915336, "cartoon_nouns": 0.49685534591194963, "cartoon_adjectives": 0.5203252032520326, "temporal_recall_at_1": 0.1319206398670406, "temporal_mrr": 0.34448117150672575},
+    "mean_realistic_macro_gain": 0.017661900756938558,
+    "positive_gain_seed_count": 2,
+    "temporal_noncatastrophic_all_seeds": true,
+    "gate_components": {"trained_macro_at_least_0_52": true, "mean_gain_at_least_0_02": false, "at_least_two_positive_seeds": true, "all_temporal_noncatastrophic": true},
+    "gate_pass": false,
+    "synthetic_arm_status": "NOT_RUN_STOP_RULE",
+    "interpretation": "the multi-pass Real-1h positive control missed only the frozen mean-gain component; this remains inconclusive about data quality and does not authorize generator or synthetic-arm work"
   },
   "common_asset_references": {
     "Real-full": {"lexical": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4", "temporal": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e"},
@@ -85,5 +94,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "run only the frozen three-seed multi-pass Real-1h positive-control gate; C calibration LTX preflight generation and synthetic learning remain blocked until it passes"
+  "next_authorized_scope": "none within this coverage redesign; any further training budget or changed learning-signal rule requires a new prospective user-authorized protocol and cannot be described as confirmatory Phase 5"
 }
