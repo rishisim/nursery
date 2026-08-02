@@ -840,6 +840,11 @@ def prepare_activity_public(args: argparse.Namespace) -> dict[str, Any]:
                     str(target),
                     "--report",
                     str(report),
+                    *(
+                        ["--no-deps"]
+                        if candidate_id == "egohod_egovideo_l_zero_shot"
+                        else []
+                    ),
                     *requirements,
                 ],
                 stdout=handle,
@@ -1029,6 +1034,66 @@ def _convert_egohod_flash_state(state: dict[str, Any]) -> dict[str, Any]:
     return converted
 
 
+def _install_egohod_optional_import_compatibility() -> None:
+    import types
+    import torch
+
+    ipdb = types.ModuleType("ipdb")
+    ipdb.set_trace = lambda: None
+    cv2 = types.ModuleType("cv2")
+
+    class DropPath(torch.nn.Module):
+        def __init__(self, drop_prob: float = 0.0):
+            super().__init__()
+            self.drop_prob = float(drop_prob)
+
+        def forward(self, value):
+            if self.drop_prob != 0.0 and self.training:
+                raise RuntimeError("E_EGOHOD_UNEXPECTED_STOCHASTIC_DEPTH")
+            return value
+
+    layers = types.ModuleType("timm.models.layers")
+    layers.DropPath = DropPath
+    layers.to_2tuple = lambda value: value if isinstance(value, tuple) else (value, value)
+    layers.trunc_normal_ = torch.nn.init.trunc_normal_
+    timm_models = types.ModuleType("timm.models")
+    timm_models.layers = layers
+    timm = types.ModuleType("timm")
+    timm.models = timm_models
+
+    def constant_init(module, value, bias=0):
+        if getattr(module, "weight", None) is not None:
+            torch.nn.init.constant_(module.weight, value)
+        if getattr(module, "bias", None) is not None:
+            torch.nn.init.constant_(module.bias, bias)
+
+    def trunc_normal_init(module, mean=0.0, std=1.0, a=-2.0, b=2.0, bias=0):
+        if getattr(module, "weight", None) is not None:
+            torch.nn.init.trunc_normal_(module.weight, mean=mean, std=std, a=a, b=b)
+        if getattr(module, "bias", None) is not None:
+            torch.nn.init.constant_(module.bias, bias)
+
+    weight_init = types.ModuleType("mmengine.model.weight_init")
+    weight_init.constant_init = constant_init
+    weight_init.trunc_normal_init = trunc_normal_init
+    mmengine_model = types.ModuleType("mmengine.model")
+    mmengine_model.weight_init = weight_init
+    mmengine = types.ModuleType("mmengine")
+    mmengine.model = mmengine_model
+    sys.modules.update(
+        {
+            "ipdb": ipdb,
+            "cv2": cv2,
+            "timm": timm,
+            "timm.models": timm_models,
+            "timm.models.layers": layers,
+            "mmengine": mmengine,
+            "mmengine.model": mmengine_model,
+            "mmengine.model.weight_init": weight_init,
+        }
+    )
+
+
 def _load_egohod_activity_adapter(
     public: Path,
     candidate: dict[str, Any],
@@ -1044,6 +1109,7 @@ def _load_egohod_activity_adapter(
     runtime = _activity_config(cfg)["runtime_environment"]["egohod"]
     _verify_repository_commit(code_root, candidate["code_commit"])
     _verify_repository_commit(clip_root, runtime["openai_CLIP_commit"])
+    _install_egohod_optional_import_compatibility()
     sys.path.insert(0, str(clip_root))
     sys.path.insert(0, str(code_root))
     import clip

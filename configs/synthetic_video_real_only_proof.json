@@ -445,6 +445,7 @@
             "openai_CLIP_repository": "https://github.com/openai/CLIP.git",
             "openai_CLIP_commit": "d05afc436d78f1c48dc0dbf8e5980a9d471f35f6",
             "official_checkpoint_compatibility": "construct the official EgoHOD ViT-L/14-336 model locally without downloading OpenAI initialization weights, load the complete frozen EgoHOD state dict strictly, and disable author tracking and cluster clients",
+            "optional_import_compatibility": "the canonical adapter supplies local no-op modules only for unused author debug and visualization imports (ipdb and cv2), the three timm layer utilities used by the model with Torch-native equivalents, and the two mmengine weight-initialization helpers with Torch-native equivalents; no model forward computation or checkpoint tensor is substituted",
             "input_resolution": 336,
             "input_frames": 16,
             "direct_python_requirements": [
@@ -452,12 +453,9 @@
               "easydict==1.13",
               "einops==0.8.1",
               "ftfy==6.3.1",
-              "ipdb==0.13.13",
-              "mmengine==0.10.7",
-              "omegaconf==2.3.0",
-              "opencv-python-headless==4.12.0.88",
               "regex==2025.7.34",
-              "timm==0.5.4"
+              "tqdm==4.67.1",
+              "wcwidth==0.2.13"
             ]
           },
           "videoprism": {

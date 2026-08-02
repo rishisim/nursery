@@ -186,8 +186,56 @@ def test_activity_preparation_does_not_upgrade_pinned_container_torch() -> None:
     source = inspect.getsource(MODULE.prepare_activity_public)
     guard = inspect.getsource(MODULE._verify_container_torch_not_shadowed)
     assert '"--upgrade"' not in source
+    assert source.count('"--no-deps"') == 1
+    assert 'candidate_id == "egohod_egovideo_l_zero_shot"' in source
     assert "E_ACTIVITY_CONTAINER_TORCH_SHADOWED" in guard
     assert "E_ACTIVITY_CONTAINER_TORCH_VERSION" in guard
+
+
+def test_egohod_optional_import_compatibility_is_inference_only() -> None:
+    import sys
+
+    import pytest
+
+    torch = pytest.importorskip("torch")
+
+    names = {
+        "ipdb",
+        "cv2",
+        "timm",
+        "timm.models",
+        "timm.models.layers",
+        "mmengine",
+        "mmengine.model",
+        "mmengine.model.weight_init",
+    }
+    previous = {name: sys.modules.get(name) for name in names}
+    try:
+        MODULE._install_egohod_optional_import_compatibility()
+        from mmengine.model.weight_init import constant_init, trunc_normal_init
+        from timm.models.layers import DropPath, to_2tuple, trunc_normal_
+
+        value = torch.tensor([1.0, 2.0])
+        assert torch.equal(DropPath(0.0).eval()(value), value)
+        with pytest.raises(RuntimeError, match="E_EGOHOD_UNEXPECTED_STOCHASTIC_DEPTH"):
+            DropPath(0.1).train()(value)
+        assert to_2tuple(4) == (4, 4)
+        assert to_2tuple((3, 5)) == (3, 5)
+        assert trunc_normal_ is torch.nn.init.trunc_normal_
+
+        linear = torch.nn.Linear(2, 2)
+        constant_init(linear, 0.25, bias=-0.5)
+        assert torch.all(linear.weight == 0.25)
+        assert torch.all(linear.bias == -0.5)
+        trunc_normal_init(linear, mean=0.0, std=0.01, bias=0.75)
+        assert torch.isfinite(linear.weight).all()
+        assert torch.all(linear.bias == 0.75)
+    finally:
+        for name, module in previous.items():
+            if module is None:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = module
 
 
 def test_bucket_and_union_duration_are_frozen_and_exact() -> None:

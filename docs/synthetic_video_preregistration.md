@@ -938,3 +938,14 @@ configs are separately hashed. The CUDA container is pinned at
 hashed install report before inference are recorded in the canonical config.
 No model output had been observed when these compatibility details were
 committed.
+
+The CPU dependency preflight then exposed that isolated `pip --target`
+resolution would otherwise pull a future Torch/CUDA stack through Timm. Before
+any model load, the EgoHOD environment was narrowed to its actual inference
+imports. The adapter supplies Torch-native equivalents for the three Timm
+layer utilities and two MMEngine initialization helpers used by the official
+model, plus no-op modules for unused `ipdb`/OpenCV debug visualization imports.
+The checkpoint still must load every tensor with no missing or unexpected
+keys, and the forward implementation remains official EgoHOD code. A runtime
+guard rejects any dependency target that shadows the pinned Torch or
+Torchvision container versions.
