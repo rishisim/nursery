@@ -233,7 +233,9 @@
     "restricted_mount_present": false,
     "model_inference_executed": false,
     "scientific_outcome_observed": false,
-    "next_step": "blind one-item public H100 sizing for each frozen candidate, then the one frozen development comparison"
+    "valid_for_candidate_inference": false,
+    "subsequent_engineering_status": "SUPERSEDED_AFTER_SAFE_WEIGHTS_ONLY_LOAD_REFUSED_AN_UNALLOWLISTED_OMEGACONF_GLOBAL_BEFORE_MODEL_STATE_OR_INFERENCE",
+    "next_step": "repeat public preparation under the frozen safe-global allowlist and seal a new dependency commitment before restarting blind sizing"
   },
   "governed_C_activity_checkpoint_sizing_amendment": {
     "status": "FROZEN_BEFORE_SIZING_INFERENCE",
@@ -251,6 +253,21 @@
     "complete_public_holdout_GPU_hours_max_unchanged": 6.0,
     "governed_C_GPU_hours_max_unchanged": 8.0,
     "aggregate_GPU_hours_through_C_including_sizing_max": 20.0
+  },
+  "governed_C_activity_checkpoint_safe_load_repair": {
+    "status": "FROZEN_BEFORE_REPREPARATION_OR_MODEL_OUTPUT",
+    "candidate_id": "egohod_egovideo_l_zero_shot",
+    "failure_stage": "torch_weights_only_checkpoint_deserialization",
+    "error_code": "UNALLOWLISTED_OMEGACONF_LISTCONFIG",
+    "old_dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
+    "unsafe_global_count": 13,
+    "exact_allowlist_frozen": true,
+    "weights_only_remains_true": true,
+    "model_state_loaded": false,
+    "model_inference_executed": false,
+    "score_or_prediction_produced": false,
+    "candidate_threshold_or_selection_rule_changed": false,
+    "next_step": "public CPU re-preparation and a new immutable dependency-manifest seal"
   },
   "governance_incident": {
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_PROCESSING_RESUMED",

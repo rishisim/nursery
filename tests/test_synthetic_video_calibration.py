@@ -115,13 +115,18 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     assert runtime["videoprism"]["c4_en_sentencepiece_sha256"] == "1e5036bed065526c3c212dfbe288752391797c4bb1a284aa18c9a0b23fcaf8ec"
     assert runtime["vjepa2"]["config_sha256"] == "3dec96fe962e94e569182d3a7b9ef0dd74b6b8c89c337a428e43e10d593e70c9"
     assert runtime["shared"]["dependency_manifest_commitment_sha256"] == (
-        "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca"
+        "PENDING_SAFE_LOAD_REPREPARATION"
     )
     preparation = selection["public_preparation_result"]
     assert preparation["status"] == "PASS_PREPARED_NO_MODEL_INFERENCE"
     assert preparation["candidate_count"] == 3
     assert preparation["model_inference_executed"] is False
     assert preparation["restricted_mount_present"] is False
+    assert preparation["valid_for_candidate_inference"] is False
+    safe_load = runtime["egohod"]["checkpoint_safe_load"]
+    assert safe_load["weights_only"] is True
+    assert safe_load["weights_only_false"] == "PROHIBITED"
+    assert len(safe_load["exact_allowed_globals"]) == 13
     assert [
         candidate["expected_sizing_output_width"]
         for candidate in selection["bounded_candidates"]
@@ -267,6 +272,17 @@ def test_egohod_optional_import_compatibility_is_inference_only() -> None:
                 sys.modules.pop(name, None)
             else:
                 sys.modules[name] = module
+
+
+def test_egohod_checkpoint_load_keeps_weights_only_and_exact_global_gate() -> None:
+    import inspect
+
+    source = inspect.getsource(MODULE._load_egohod_activity_adapter)
+    assert "get_unsafe_globals_in_checkpoint" in source
+    assert "E_EGOHOD_UNEXPECTED_CHECKPOINT_GLOBAL" in source
+    assert "torch.serialization.safe_globals" in source
+    assert "weights_only=True" in source
+    assert "weights_only=False" not in source
 
 
 def test_bucket_and_union_duration_are_frozen_and_exact() -> None:

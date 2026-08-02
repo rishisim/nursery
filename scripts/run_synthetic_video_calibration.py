@@ -1113,6 +1113,35 @@ def _install_egohod_optional_import_compatibility() -> None:
     )
 
 
+def _egohod_checkpoint_safe_globals() -> list[Any]:
+    import argparse
+    import builtins
+    import collections
+    import typing
+
+    import numpy
+    from omegaconf.base import ContainerMetadata, Metadata
+    from omegaconf.dictconfig import DictConfig
+    from omegaconf.listconfig import ListConfig
+    from omegaconf.nodes import AnyNode
+
+    return [
+        argparse.Namespace,
+        builtins.dict,
+        builtins.int,
+        builtins.list,
+        collections.defaultdict,
+        (numpy.core.multiarray.scalar, "numpy.core.multiarray.scalar"),
+        numpy.dtype,
+        ContainerMetadata,
+        Metadata,
+        DictConfig,
+        ListConfig,
+        AnyNode,
+        typing.Any,
+    ]
+
+
 def _load_egohod_activity_adapter(
     public: Path,
     candidate: dict[str, Any],
@@ -1138,7 +1167,19 @@ def _load_egohod_activity_adapter(
     checkpoint = _activity_checkpoint_root(public, candidate["candidate_id"]) / candidate["weight_file"]
     if not checkpoint.is_file() or file_digest(checkpoint) != candidate["weight_sha256"]:
         raise RuntimeError("E_ACTIVITY_WEIGHT_COMMITMENT")
-    loaded = torch.load(checkpoint, map_location="cpu", mmap=True, weights_only=True)
+    checkpoint_loading = runtime["checkpoint_safe_load"]
+    unsafe_globals = set(
+        torch.serialization.get_unsafe_globals_in_checkpoint(checkpoint)
+    )
+    if unsafe_globals != set(checkpoint_loading["exact_allowed_globals"]):
+        raise RuntimeError("E_EGOHOD_UNEXPECTED_CHECKPOINT_GLOBAL")
+    with torch.serialization.safe_globals(_egohod_checkpoint_safe_globals()):
+        loaded = torch.load(
+            checkpoint,
+            map_location="cpu",
+            mmap=True,
+            weights_only=True,
+        )
     state = loaded.get("state_dict", loaded)
     state = {key.removeprefix("module."): value for key, value in state.items()}
     state = _convert_egohod_flash_state(state)

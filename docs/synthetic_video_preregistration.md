@@ -968,3 +968,15 @@ at 30 minutes, for 1.5 aggregate sizing GPU-hours, 160 GiB within the existing
 public storage ceiling and zero direct monetary cost. This adds at most 1.5
 GPU-hours to the previously frozen path, making the through-C ceiling 20.0
 GPU-hours. The development, holdout and C ceilings themselves are unchanged.
+
+The first EgoHOD sizing attempt stopped before model-state loading or inference:
+Torch's `weights_only=true` loader found an OmegaConf `ListConfig` in the
+official checkpoint and refused to deserialize it because that class was not
+allowlisted. No score or prediction was produced. The prior dependency manifest
+`20bc4ad8…bca` remains preserved but is not valid for candidate inference. A
+new engineering-only repair is frozen before retry: retain `weights_only=true`,
+install pinned OmegaConf/PyYAML/ANTLR runtimes, ask the pinned Torch scanner for
+the checkpoint's unsafe globals, require an exact match to the 13 names recorded
+in the canonical config, and allow only those names during deserialization. Any
+new global stops the run before loading. The repaired environment must receive
+a new dependency-manifest commitment before sizing resumes.
