@@ -331,6 +331,10 @@ def test_videoprism_import_compatibility_cannot_replace_local_tokenization(
             RuntimeError, match="E_VIDEOPRISM_HOSTED_GFILE_PATH_PROHIBITED"
         ):
             sys.modules["tensorflow.io.gfile"].GFile("hosted")
+        MODULE._remove_videoprism_tensorflow_import_compatibility()
+        assert "tensorflow" not in sys.modules
+        assert "tensorflow.io" not in sys.modules
+        assert "tensorflow.io.gfile" not in sys.modules
         (code / "models.py").write_text("x = tokenizers.new_surface\n")
         with pytest.raises(
             RuntimeError, match="E_VIDEOPRISM_TOKENIZER_IMPORT_SURFACE"

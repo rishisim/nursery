@@ -1305,10 +1305,19 @@ def _install_videoprism_tokenizer_import_compatibility(code_root: Path) -> None:
     tensorflow_io.gfile = gfile
     tensorflow = types.ModuleType("tensorflow")
     tensorflow.io = tensorflow_io
+    tensorflow._phase4_import_stub = True
     sys.modules["videoprism.tokenizers"] = tokenizers
     sys.modules["tensorflow"] = tensorflow
     sys.modules["tensorflow.io"] = tensorflow_io
     sys.modules["tensorflow.io.gfile"] = gfile
+
+
+def _remove_videoprism_tensorflow_import_compatibility() -> None:
+    tensorflow = sys.modules.get("tensorflow")
+    if getattr(tensorflow, "_phase4_import_stub", False) is not True:
+        raise RuntimeError("E_VIDEOPRISM_TENSORFLOW_STUB_IDENTITY")
+    for name in ("tensorflow.io.gfile", "tensorflow.io", "tensorflow"):
+        sys.modules.pop(name, None)
 
 
 def _load_videoprism_activity_adapter(
@@ -1329,6 +1338,7 @@ def _load_videoprism_activity_adapter(
     import jax.numpy as jnp
     import numpy as np
     from videoprism import models as videoprism
+    _remove_videoprism_tensorflow_import_compatibility()
 
     checkpoint_root = _activity_checkpoint_root(public, candidate["candidate_id"])
     checkpoint = checkpoint_root / candidate["weight_file"]

@@ -271,6 +271,8 @@
     "terminal_job_status": "FAILED_AFTER_RECORD_SEAL_ON_COMPACT_OUTPUT_CANDIDATE_ID_GUARD",
     "videoprism_engineering_stop_before_model_load": "official models and utility modules imported TensorFlow only through tokenizer type annotations an unused hosted-tokenizer helper and one hosted-path gfile fallback",
     "videoprism_compatibility_repair_frozen": "two tokenizer attributes and one gfile attribute with raising hosted-path helpers plus exact pinned-source reference guards; frozen local SentencePiece and local checkpoint bytes remain the only tokenization and weight-loading paths",
+    "videoprism_third_engineering_stop": "official model and local checkpoint loaded, then Torch module discovery rejected the temporary TensorFlow stub before preprocessing or numerical forward",
+    "videoprism_stub_lifetime_repair_frozen": "remove the temporary TensorFlow namespace immediately after official VideoPrism import; the already imported utility keeps only its local raising gfile object",
     "next_step": "commit the import-only VideoPrism repair then size the remaining two frozen candidates"
   },
   "governed_C_activity_checkpoint_safe_load_repair": {

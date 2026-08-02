@@ -1023,3 +1023,11 @@ The compatibility namespace therefore adds exactly that one attribute and
 makes it raise if reached. A pinned-source guard requires the complete gfile
 reference surface to remain exactly `{GFile}`. TensorFlow is still absent, no
 hosted path can execute, and model/preprocessing behavior is unchanged.
+
+VideoPrism and its local checkpoint then loaded, but Torch's module discovery
+encountered the temporary TensorFlow namespace during preprocessing and stopped
+before the numerical forward. The import adapter now marks that namespace and
+removes it immediately after official VideoPrism import. The already imported
+utility retains only its local raising `gfile` object, so hosted fallback stays
+impossible while later libraries correctly observe that TensorFlow is absent.
+No score or prediction was produced by this attempt.
