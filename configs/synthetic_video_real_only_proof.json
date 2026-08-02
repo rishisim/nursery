@@ -136,6 +136,14 @@
             "vocab.json": "e089ad92ba36837a0d31433e555c8f45fe601ab5c221d4f607ded32d9f7a4349"
           }
         },
+        "runtime_dependency": {
+          "package": "scipy",
+          "version": "1.16.1",
+          "wheel": "scipy-1.16.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "wheel_sha256": "adccd93a2fa937a27aae826d33e3bfa5edf9aa672376a4852d23a7cd67a2e5b7",
+          "license": "BSD-3-Clause",
+          "role": "required by the pinned Transformers OWLv2 image processor; public local dependency only"
+        },
         "detector_queries": [
           {"kind": "hand", "label": "hand", "text": "a human hand"},
           {"kind": "hand", "label": "hand", "text": "a person's hand"},

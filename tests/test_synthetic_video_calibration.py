@@ -38,6 +38,14 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     }
     assert repair["detector_model"]["revision"] == "cfd3195ba4ea9592eec887ded089f4c08eff231d"
     assert repair["detector_model"]["license"] == "Apache-2.0"
+    assert repair["runtime_dependency"] == {
+        "package": "scipy",
+        "version": "1.16.1",
+        "wheel": "scipy-1.16.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+        "wheel_sha256": "adccd93a2fa937a27aae826d33e3bfa5edf9aa672376a4852d23a7cd67a2e5b7",
+        "license": "BSD-3-Clause",
+        "role": "required by the pinned Transformers OWLv2 image processor; public local dependency only",
+    }
     assert len(repair["public_qualification"]["fixtures"]) == 8
     assert repair["public_qualification"]["thresholds"] == {
         "activity_correct_min": 4,
@@ -158,6 +166,7 @@ def test_public_qualification_jobs_never_mount_restricted_data() -> None:
     assert "#SBATCH --time=01:00:00" in qualify
     assert "qualify-public" in qualify
     assert "HF_HUB_OFFLINE=1" in qualify
+    assert "calibration-repair-pydeps" in qualify
     assert "PHASE4_RESTRICTED_ROOT" not in qualify
 
 

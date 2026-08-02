@@ -742,7 +742,9 @@ activity prototypes plus the Apache-2.0
 open-vocabulary detector. OWLv2 supplies public-category object, hand,
 visibility, contact, framing, distractor, and occlusion proxies; PE-Core emits
 the coarse activity class and retains its margin as a low/medium/high
-uncertainty band.
+uncertainty band. The official Transformers image processor uses pinned
+`scipy==1.16.1` from the CPython 3.11 manylinux wheel with SHA-256
+`adccd93a…e5b7` under BSD-3-Clause.
 
 The scientific gates are not relaxed. The maximum axis missing fraction stays
 at `0.20`, all critical axes must remain within that ceiling, and at least six

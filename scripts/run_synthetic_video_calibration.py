@@ -15,6 +15,8 @@ import random
 import re
 import shutil
 import subprocess
+import sys
+import tempfile
 from typing import Any
 import urllib.request
 
@@ -635,6 +637,62 @@ def prepare_public(args: argparse.Namespace) -> dict[str, Any]:
     )
     model_root = _detector_model_root(args.public_root, repair)
     _verify_detector_files(model_root, repair)
+    dependency = repair["runtime_dependency"]
+    wheel_root = args.public_root / "models/calibration-repair-wheels"
+    wheel_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    wheel = wheel_root / dependency["wheel"]
+    if not wheel.is_file() or file_digest(wheel) != dependency["wheel_sha256"]:
+        with tempfile.TemporaryDirectory(prefix="calibration-repair-wheel-") as temp:
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "download",
+                    "--disable-pip-version-check",
+                    "--no-deps",
+                    "--only-binary=:all:",
+                    "--dest",
+                    temp,
+                    f"{dependency['package']}=={dependency['version']}",
+                ],
+                check=True,
+            )
+            downloaded = Path(temp) / dependency["wheel"]
+            if not downloaded.is_file() or file_digest(downloaded) != dependency["wheel_sha256"]:
+                raise RuntimeError("E_RUNTIME_DEPENDENCY_HASH")
+            shutil.copy2(downloaded, wheel)
+            os.chmod(wheel, 0o600)
+    dependency_root = args.public_root / "models/calibration-repair-pydeps"
+    dependency_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--disable-pip-version-check",
+            "--no-deps",
+            "--upgrade",
+            "--target",
+            str(dependency_root),
+            str(wheel),
+        ],
+        check=True,
+    )
+    dependency_check = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import scipy; print(scipy.__version__)",
+        ],
+        env={**os.environ, "PYTHONPATH": str(dependency_root)},
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    if dependency_check.stdout.strip() != dependency["version"]:
+        raise RuntimeError("E_RUNTIME_DEPENDENCY_VERSION")
     fixture_root = args.public_root / "models/calibration-public-fixtures"
     fixture_root.mkdir(parents=True, exist_ok=True, mode=0o700)
     for fixture in repair["public_qualification"]["fixtures"]:
@@ -663,6 +721,12 @@ def prepare_public(args: argparse.Namespace) -> dict[str, Any]:
                 name: file_digest(model_root / name)
                 for name in sorted(model_cfg["required_files_sha256"])
             },
+        },
+        "runtime_dependency": {
+            "package": dependency["package"],
+            "version": dependency["version"],
+            "license": dependency["license"],
+            "wheel_sha256": file_digest(wheel),
         },
         "fixtures": [
             {
