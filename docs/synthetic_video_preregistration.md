@@ -568,7 +568,8 @@ control later execution:
    does not block Phase 4 or compliant applicant-only ChildLens work.
 
 The prior Stage B commitments are provisional and superseded by the corrected
-seals. Only the frozen one-seed 1/3/6-hour real-only proof-of-life is now in
-scope. Confirmatory multi-seed Phase 5, generator work, synthetic generation,
-synthetic score opening, equivalence testing, and scientific claims remain
-blocked.
+seals. Only the frozen one-seed lean equal-duration pilot is now in scope:
+initialized 0h, Real-1h, conditional nested Real-3h only if Real-1h fails, and a
+matched synthetic arm only if both real learnability and the bounded public
+generator gate pass. Confirmatory multi-seed Phase 5, automatic 6h acquisition,
+equivalence testing, and inferential scientific claims remain blocked.

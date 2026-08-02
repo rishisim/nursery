@@ -93,10 +93,25 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_REAL_ONLY_PROOF_IN_PROGRESS"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEAN_EQUAL_DURATION_PILOT_IN_PROGRESS"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
     assert len({canonical(value) for value in references.values()}) == 1
     assert references["Real-full"]["lexical"] == result["lexical_commitment"]
     assert references["Real-full"]["temporal"] == result["temporal_commitment"]
+
+
+def test_lean_equal_duration_proof_is_frozen_before_scores():
+    proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    assert proof["status"] == "FROZEN_LEAN_EQUAL_DURATION_PILOT_PRE_SCORE"
+    assert proof["budgets_credited_hours"] == {
+        "primary": 1,
+        "conditional_real_extension": 3,
+        "automatic_six_hour_disabled": True,
+    }
+    assert proof["learner"]["schedule"] == {"contrastive": 4, "mlm": 1, "dinov2": 1}
+    assert proof["learner"]["initialization"].startswith("byte_identical")
+    assert proof["real_1h_gate"]["realistic_lexical_macro_min"] == 0.52
+    assert proof["real_1h_gate"]["improvement_over_initialized_min"] == 0.02
+    assert "automatic_1_3_6_curve" in proof["prohibitions"]

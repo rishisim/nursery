@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_REAL_ONLY_PROOF_IN_PROGRESS",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_LEAN_EQUAL_DURATION_PILOT_IN_PROGRESS",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -63,5 +63,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "one-seed real-only 1/3/6-hour proof-of-life only; no synthetic arm or confirmatory equivalence test"
+  "next_authorized_scope": "one-seed initialized then Real-1h learnability gate, conditional nested Real-3h only on failure, and matched synthetic arm only after both real and public generator gates pass"
 }
