@@ -73,9 +73,9 @@ learner; Machine-DevBench Lexical as the common standardized primary endpoint;
 an above-chance, positive real-only learning-curve readiness gate; and a
 separate held-out-real ChildLens temporal-transfer safeguard. It retains the
 modular video and German-TTS architecture. A completed four-family public-only
-bakeoff ranked Gemini first, but the latest prospective user amendment selects
-MiniMax H3 for the lean pilot. MiniMax scored 25/28 versus Gemini's 27/28 and
-must not be reported as the bakeoff winner. See
+bakeoff ranked Gemini first, while the latest practical generator choice is
+locally governed LTX-2.3. LTX scored 19/28 versus Gemini's 27/28 and must not
+be reported as the bakeoff winner. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
 A public generator pilot and bakeoff have been executed without ChildLens or
 BabyView inputs. The corrected governed common assets passed on the final
@@ -150,3 +150,13 @@ no second detector was tried, and C was not reopened. Governed C repair, LTX
 preflight, generation, and synthetic learner training remain stopped.
 Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
 generation remain unauthorized.
+
+The user has now authorized one prospective domain-appropriate calibration
+extractor redesign without changing either prior no-go. The single frozen
+stack is EgoVLPv2 + EgoHOS + Grounding DINO/SAM 2.1 + DINOv2, retaining the
+working deterministic and shared-language modules. Before any new inference,
+its exact code, checkpoints, hashes, code/weight terms, dependencies, local
+reload behavior, and Juno feasibility must pass. Only then may it face a
+disjoint Charades-Ego/VISOR/self-authored egocentric-video development and
+sealed holdout gate. C, LTX, generation, and synthetic training remain blocked
+until the complete public gate and unchanged governed C gate pass.

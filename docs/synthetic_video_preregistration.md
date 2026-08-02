@@ -1,8 +1,8 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — EXPLORATORY REAL-ONLY PROOF IN PROGRESS**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — DOMAIN-APPROPRIATE CALIBRATION EXTRACTOR FEASIBILITY PENDING**
 
-**Evidence cut-off:** 2026-08-01
+**Evidence cut-off:** 2026-08-02
 
 **Authority boundary:** this record preserves every frozen Phase 3 decision
 and records the public-language PASS plus the reopened common-asset gate. It
@@ -783,3 +783,45 @@ targets or episode plans were created. The observed fixtures, labels, score
 thresholds, and pass criteria are not changed; no second detector is tried.
 Governed C rerun, LTX preflight, generation, and synthetic learner training
 remain stopped.
+
+### Prospective domain-appropriate extractor redesign
+
+After preserving both failures above, the user authorized one new extractor
+amendment before any further model inference, C reopening, LTX outcome, or
+synthetic learner score. It asks only whether one fixed public stack can pass
+a disjoint egocentric-video qualification and then measure C under the
+unchanged gate: every passing axis has missingness at most `0.20`, every
+critical axis passes, and at least six of eight axes are measured. The earlier
+commitments and no-gos are not reinterpreted or overwritten.
+
+The single stack is frozen to EgoVLPv2 temporal video-language scoring for the
+existing eight activity/context labels; EgoHOS for left/right hands, contact,
+and first-order interacting objects; Grounding DINO with a public coarse
+ontology followed by SAM 2.1 mask propagation for scene and referent timing;
+and DINOv2 for governed-only dispersion and near-duplicate embeddings. The
+already functioning deterministic visual, temporal-continuity, and shared
+language modules remain. SAM 3, DINOv3, alternate checkpoints, and post-hoc
+candidate cycling are prohibited.
+
+Public qualification is prospectively split into threshold-development and
+sealed holdout partitions using first-person Charades-Ego, VISOR validation,
+and fixed self-authored German audiovisual micro-clips. Partitions are
+source-participant/video disjoint and use public seed `20260802`. All fixtures,
+annotations, licenses, and hashes remain outside Git and must be committed as
+one manifest hash before holdout inference. C is never used for model or
+threshold selection. The exact metric floors are frozen in canonical proof
+schema 9: per-module coverage at least `0.80`; activity macro-F1 at least
+`0.60`; hand sensitivity and specificity each at least `0.80`; contact and
+scene-complexity macro-F1 at least `0.60`; tracked-category presence F1 at
+least `0.70` with median mask IoU above `0.50`; audiovisual timing macro-F1
+at least `0.65`, no-referent specificity above `0.80`, and event coverage
+at least `0.80`; near-duplicate balanced accuracy at least `0.90`; and zero
+crashes, silent truncations, invalid records, external calls, or unaccounted
+failures.
+
+Before adapters, fixtures, or model inference, every repository and checkpoint
+must have an immutable revision and resolved byte hash, explicit code and
+weight terms compatible with local academic processing, feasible pinned
+dependencies and Juno resource expectations, and a successful local-files-only
+reload plan. A failure of any component is a no-go for this single stack; no
+replacement model or threshold relaxation is permitted.

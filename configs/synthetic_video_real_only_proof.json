@@ -1,6 +1,6 @@
 {
-  "schema_version": 8,
-  "status": "STOP_CALIBRATION_EXTRACTOR_REPAIR_PUBLIC_QUALIFICATION_NO_GO",
+  "schema_version": 9,
+  "status": "CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_PENDING",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -70,7 +70,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "NO_GO_ORIGINAL_AND_REPAIRED_PUBLIC_QUALIFICATION",
+    "status": "ORIGINAL_AND_FIRST_REPAIR_NO_GOS_PRESERVED_DOMAIN_APPROPRIATE_REDESIGN_FEASIBILITY_PENDING",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -191,6 +191,148 @@
         "original_output_root_preserved": "synthetic_one_hour/calibration",
         "governed_pass_rule": "all critical axes at or below unchanged 0.20 missingness and at least six of eight axes measured; otherwise repaired calibration no-go"
       },
+      "domain_appropriate_redesign": {
+        "status": "FROZEN_PENDING_PREMODEL_FEASIBILITY",
+        "effective_on": "2026-08-02",
+        "authorization": "explicit user-authorized prospective extractor redesign after preserving the original governed C no-go and the PE-Core plus OWLv2 public no-go",
+        "scientific_question": "can one fixed domain-appropriate public extractor stack pass a disjoint egocentric-video public holdout and then measure C under the unchanged missingness and critical-axis gate without using C or learner or generator outcomes for model or threshold selection",
+        "outcome_independence": "stack partitions mappings metrics thresholds and no-substitution rule are frozen before any new model inference public holdout result repaired C result LTX preflight synthetic generation or synthetic learner score",
+        "single_stack": {
+          "activity_context": {
+            "repository": "https://github.com/facebookresearch/EgoVLPv2.git",
+            "commit": "550c0596b8aa7426083398502111430454571c84",
+            "checkpoint": "EgoVLPv2_smallproj_epoch1.pth",
+            "checkpoint_url": "https://www.cis.jhu.edu/~shraman/EgoVLPv2/ckpts/Pre-trained/EgoVLPv2_smallproj_epoch1.pth",
+            "code_license": "MIT",
+            "code_license_sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+            "weight_license_terms": "PREMODEL_VERIFICATION_REQUIRED",
+            "resolved_weight_sha256": "PREMODEL_VERIFICATION_REQUIRED",
+            "role": "short temporal-window video-language scoring over the existing eight public coarse context labels with fixed prompt ensembles and explicit ambiguous abstention"
+          },
+          "hand_object_action": {
+            "repository": "https://github.com/owenzlz/EgoHOS.git",
+            "commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+            "checkpoint_bundle_url": "https://drive.google.com/file/d/1DEJBeQ3cR1q7cjjzwDUIQVSoptT-y9U7/view",
+            "code_license": "MIT",
+            "code_license_sha256": "b3e2caf44fe59ac8163bc9425d332bb4eedb42b4b619b6670ab63483da311785",
+            "weight_license_terms": "PREMODEL_VERIFICATION_REQUIRED",
+            "resolved_weight_sha256": "PREMODEL_VERIFICATION_REQUIRED",
+            "role": "left and right hand masks dense contact boundary and first-order interacting-object masks"
+          },
+          "scene_and_referent_detection": {
+            "repository": "https://github.com/IDEA-Research/GroundingDINO.git",
+            "commit": "856dde20aee659246248e20734ef9ba5214f5e44",
+            "checkpoint": "groundingdino_swint_ogc.pth",
+            "checkpoint_url": "https://github.com/IDEA-Research/GroundingDINO/releases/download/v0.1.0-alpha/groundingdino_swint_ogc.pth",
+            "code_license": "Apache-2.0",
+            "code_license_sha256": "b403c98ec1ffaccb0124632592a3d99642cddc3031ca412b402568e6c06c202a",
+            "weight_license_terms": "PREMODEL_VERIFICATION_REQUIRED",
+            "resolved_weight_sha256": "PREMODEL_VERIFICATION_REQUIRED",
+            "role": "fixed public-coarse-ontology boxes only; no exact C word is a prompt or export"
+          },
+          "mask_tracking": {
+            "repository": "https://github.com/facebookresearch/sam2.git",
+            "commit": "2b90b9f5ceec907a1c18123530e92e794ad901a4",
+            "checkpoint": "sam2.1_hiera_base_plus.pt",
+            "checkpoint_url": "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_base_plus.pt",
+            "code_license": "Apache-2.0",
+            "weight_license": "Apache-2.0",
+            "code_and_weight_license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+            "resolved_weight_sha256": "PREMODEL_VERIFICATION_REQUIRED",
+            "role": "propagate accepted Grounding DINO masks and identities through frozen before during and after windows"
+          },
+          "diversity_embeddings": {
+            "repository": "https://github.com/facebookresearch/dinov2.git",
+            "commit": "7764ea0f912e53c92e82eb78a2a1631e92725fc8",
+            "checkpoint": "dinov2_vitb14_pretrain.pth",
+            "checkpoint_url": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vitb14/dinov2_vitb14_pretrain.pth",
+            "code_license": "Apache-2.0",
+            "weight_license": "Apache-2.0",
+            "code_and_weight_license_sha256": "600cc67cc4cb2f5ea317dcfc687ad1c74dc4bec8782bbe9db0afd83513b935b7",
+            "resolved_weight_sha256": "PREMODEL_VERIFICATION_REQUIRED",
+            "role": "between-child and between-session dispersion plus frozen near-duplicate diagnostics; embeddings remain governed and never become semantic labels"
+          }
+        },
+        "retained_modules": ["deterministic egocentric visual-regime metrics", "deterministic temporal continuity and recurrence metrics", "repaired shared language adapter and language-environment metrics"],
+        "prohibited_substitutions": ["SAM_3", "DINOv3", "any_unregistered_model_or_checkpoint"],
+        "public_semantic_ontology": {
+          "mapping": "accepted shared-adapter English tokens map in governed memory through a frozen WordNet-style coarse hypernym table; unmatched polysemous or ambiguous tokens abstain",
+          "coarse_categories": ["artifact", "food", "drinkware", "container", "utensil", "furniture", "clothing", "personal_care_object", "toy_or_game", "vehicle", "animal", "plant"],
+          "exact_C_words_in_prompts_or_exports": false,
+          "sealed_evaluation_concepts_permitted": false
+        },
+        "public_suite": {
+          "seed": 20260802,
+          "partition_independence": "threshold-development and sealed holdout are disjoint by source participant and video or authored scene; thresholds may use development only",
+          "charades_ego": {"source": "https://prior.allenai.org/projects/charades-ego", "license": "AllenAI non-commercial academic research license", "selection": "first-person videos only; eight coarse contexts; public-seed stratified subject-disjoint selection", "development_items": 48, "holdout_items": 48},
+          "visor": {"source": "https://doi.org/10.5523/bris.2v6cgv1x04ol22qp9rm9x2j6a7", "license": "CC-BY-NC-4.0", "selection": "validation sparse frames and clips stratified for hand visibility contact active objects occlusion and track persistence; public-seed participant-video-disjoint partitions", "development_clips": 40, "holdout_clips": 40},
+          "self_authored_german_microclips": {"license": "CC0-1.0 dedication by the authors", "selection": "fixed balanced audiovisual scenes covering visibility timing recurrence contact clutter occlusion ambiguity null speech null referent motion blur and true hand negatives", "development_clips": 32, "holdout_clips": 32},
+          "fixture_requirement": "all media annotations licenses and per-file SHA-256 values must be frozen outside Git before development inference; one commitment over disjoint partition manifests must be committed before opening holdout"
+        },
+        "public_development_rule": "calibrate confidence and ambiguity thresholds only on the frozen public development partition then commit the resulting numeric thresholds and fixture commitments before sealed holdout inference",
+        "public_holdout_gates": {
+          "module_inference_and_serialization_coverage_min_each": 0.8,
+          "valid_nonabstained_geometry_and_time_fraction_required": 1.0,
+          "activity_context_macro_f1_min": 0.6,
+          "activity_context_nonabstained_coverage_min": 0.8,
+          "hand_visibility_sensitivity_min": 0.8,
+          "hand_visibility_specificity_min": 0.8,
+          "contact_no_contact_macro_f1_min": 0.6,
+          "scene_complexity_macro_f1_min_each_of_clutter_occlusion_distractors": 0.6,
+          "tracked_category_temporal_presence_f1_min": 0.7,
+          "tracked_category_median_mask_iou_strictly_greater_than": 0.5,
+          "audiovisual_referent_timing_macro_f1_min": 0.65,
+          "audiovisual_no_referent_specificity_strictly_greater_than": 0.8,
+          "audiovisual_event_coverage_min": 0.8,
+          "near_duplicate_balanced_accuracy_min": 0.9,
+          "crashes_silent_truncations_invalid_records_external_calls_unaccounted_failures_max": 0
+        },
+        "annotation_metric_mapping": {
+          "activity_context": "Charades-Ego temporal action annotations map prospectively to the eight frozen coarse contexts",
+          "hand_contact_and_tracking": "VISOR hand and active-object masks support visibility contact temporal presence and mask IoU",
+          "scene_complexity": "programmatically authored holdout layers provide exact clutter occlusion and distractor ordinal labels because VISOR does not provide all three as direct labels",
+          "audiovisual_timing": "self-authored clips provide exact before during after ambiguity and no-referent labels",
+          "near_duplicates": "frozen transformed-positive and source-disjoint-negative public pairs are thresholded on development and evaluated once on holdout"
+        },
+        "missingness_semantics": {
+          "decode_or_inference_failure": "MISSING",
+          "low_confidence_or_ambiguous": "ABSTAIN_MISSING",
+          "valid_negative": "MEASURED_ONLY_AFTER_RELEVANT_MODULE_PASSES_PUBLIC_NEGATIVE_SPECIFICITY",
+          "unconditional_argmax": "PROHIBITED",
+          "imputation": "PROHIBITED",
+          "model_derived_labels": "PROXY_NOT_HUMAN_GROUND_TRUTH"
+        },
+        "premodel_feasibility_requirements": {
+          "exact_repository_commits": true,
+          "immutable_checkpoint_urls_or_revisions": true,
+          "resolved_checkpoint_file_sha256": true,
+          "separate_code_and_weight_license_terms_compatible_with_academic_local_processing": true,
+          "pinned_dependency_plan": true,
+          "expected_peak_vram_and_storage_recorded": true,
+          "Juno_compatibility_recorded": true,
+          "local_files_only_reload_demonstrated": true,
+          "telemetry_and_external_tracking_disabled": true,
+          "no_network_during_public_inference_after_cache_preparation": true,
+          "no_restricted_mount_during_public_qualification": true,
+          "failure_action": "STOP_SINGLE_STACK_WITH_EXACT_BLOCKER_NO_SUBSTITUTION"
+        },
+        "governed_C_gate_unchanged": {"maximum_axis_missing_fraction": 0.2, "critical_axes_must_all_pass": true, "measured_axes_min": 6, "axis_count": 8, "joint_count": 4, "omnibus_score": "PROHIBITED"},
+        "execution_controls": {
+          "canonical_entry_point": "scripts/run_synthetic_video_calibration.py",
+          "public_output_root": "runs/synthetic-video-calibration/extractor-redesign",
+          "governed_output_root": "synthetic_one_hour/calibration_repair/domain_appropriate",
+          "old_governed_outputs_preserved": true,
+          "isolated_pinned_component_environments_permitted": true,
+          "local_files_only_reload_required": true,
+          "telemetry_and_tracking_disabled": true,
+          "network_during_public_inference": false,
+          "restricted_mount_during_public_qualification": false,
+          "governed_C_network": false,
+          "terminal_and_chat_output": "approved_compact_nonidentifying_aggregates_only",
+          "no_substitution": true
+        },
+        "execution_order": ["premodel_feasibility", "adapter_tests", "public_fixture_freeze", "public_threshold_development", "sealed_public_holdout", "governed_C_rerun_if_public_pass", "episode_plan_commitment_if_C_pass", "LTX_preflight_if_C_pass"]
+      },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},
         "framing": {"centered": "one main object centered in a child-view frame", "distributed": "several objects distributed across a child-view frame", "peripheral": "the main content is near the edge of a child-view frame"},
@@ -240,8 +382,8 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "NO_GO_FROZEN_PUBLIC_EXTRACTOR_QUALIFICATION_HAND_NEGATIVE_SPECIFICITY",
-    "authorization_interpretation": "the original calibration no-go remains valid; the single prospectively frozen coverage repair failed its public hand-negative specificity component, so no governed C rerun candidate cycling or threshold change is authorized",
+    "local_generator_gate": "BLOCKED_PENDING_DOMAIN_APPROPRIATE_EXTRACTOR_PREMODEL_FEASIBILITY_AND_PUBLIC_HOLDOUT",
+    "authorization_interpretation": "the original calibration no-go and first public-repair no-go remain valid; the new single-stack redesign is prospective and may proceed only through its pre-model feasibility and public egocentric holdout before C can be reopened",
     "governed_result": {
       "status": "NO_GO",
       "job_topology": "1_H100",
@@ -310,7 +452,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_NOT_RUN_CALIBRATION_EXTRACTOR_REPAIR_PUBLIC_NO_GO",
+    "status": "SELECTED_LOCAL_BLOCKED_PENDING_DOMAIN_APPROPRIATE_EXTRACTOR_GATES",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
@@ -327,7 +469,7 @@
     "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "NOT_RUN; original calibration no-go is preserved and the single prospectively frozen extractor repair failed public hand-negative specificity, so governed C rerun LTX preflight generation and learner training remain stopped",
+  "synthetic_arm": "NOT_RUN; both earlier calibration no-gos are preserved and the user-authorized domain-appropriate extractor redesign must pass pre-model feasibility public egocentric qualification and the unchanged governed C gate before LTX work",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
   "former_directionally_competitive_rule_not_permitted_for_post_gate_extension": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",

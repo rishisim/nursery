@@ -120,7 +120,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "STOP_CALIBRATION_EXTRACTOR_REPAIR_PUBLIC_QUALIFICATION_NO_GO"
+    assert proof["status"] == "CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_PENDING"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,
@@ -137,8 +137,8 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
-    assert proof["schema_version"] == 8
-    assert proof["generator_gate"]["status"] == "SELECTED_LOCAL_NOT_RUN_CALIBRATION_EXTRACTOR_REPAIR_PUBLIC_NO_GO"
+    assert proof["schema_version"] == 9
+    assert proof["generator_gate"]["status"] == "SELECTED_LOCAL_BLOCKED_PENDING_DOMAIN_APPROPRIATE_EXTRACTOR_GATES"
     assert proof["generator_gate"]["implementation"]["commit"] == "9377758131b1ffde4b7f766804590a6617bf2ab9"
     assert proof["generator_gate"]["weights"]["revision"] == "4229404625088d21c4f112eb640fb04a0900ee25"
     assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["accepted_credited_seconds_exact"] == 3600
@@ -147,7 +147,9 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert "LTX 19/28" in proof["generator_gate"]["bakeoff_interpretation"]
     assert proof["generator_gate"]["no_substitution"] is True
     assert proof["calibration_C"]["source"] == "development_set_C_only_never_training_validation_or_evaluation"
-    assert proof["calibration_C"]["local_generator_gate"].startswith("NO_GO_FROZEN_PUBLIC_EXTRACTOR")
+    assert proof["calibration_C"]["local_generator_gate"] == (
+        "BLOCKED_PENDING_DOMAIN_APPROPRIATE_EXTRACTOR_PREMODEL_FEASIBILITY_AND_PUBLIC_HOLDOUT"
+    )
     repair_result = proof["calibration_C"]["extractor_repair_result"]
     assert repair_result["status"] == "NO_GO"
     assert repair_result["hand_negative_correct_count"] == 1

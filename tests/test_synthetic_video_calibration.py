@@ -56,6 +56,33 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
         "invalid_box_count_max": 0,
     }
 
+    redesign = calibration["extractor"]["domain_appropriate_redesign"]
+    assert redesign["status"] == "FROZEN_PENDING_PREMODEL_FEASIBILITY"
+    assert set(redesign["single_stack"]) == {
+        "activity_context",
+        "hand_object_action",
+        "scene_and_referent_detection",
+        "mask_tracking",
+        "diversity_embeddings",
+    }
+    assert redesign["governed_C_gate_unchanged"] == {
+        "maximum_axis_missing_fraction": 0.2,
+        "critical_axes_must_all_pass": True,
+        "measured_axes_min": 6,
+        "axis_count": 8,
+        "joint_count": 4,
+        "omnibus_score": "PROHIBITED",
+    }
+    assert redesign["execution_controls"]["canonical_entry_point"] == "scripts/run_synthetic_video_calibration.py"
+    assert redesign["execution_controls"]["no_substitution"] is True
+    gates = redesign["public_holdout_gates"]
+    assert gates["activity_context_macro_f1_min"] == 0.6
+    assert gates["hand_visibility_sensitivity_min"] == 0.8
+    assert gates["hand_visibility_specificity_min"] == 0.8
+    assert gates["tracked_category_temporal_presence_f1_min"] == 0.7
+    assert gates["audiovisual_referent_timing_macro_f1_min"] == 0.65
+    assert gates["near_duplicate_balanced_accuracy_min"] == 0.9
+
 
 def test_bucket_and_union_duration_are_frozen_and_exact() -> None:
     assert MODULE.bucket(0.03, [0.0, 0.03, 0.07, 1.0]) == "bin_1"

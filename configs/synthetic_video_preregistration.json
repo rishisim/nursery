@@ -1,9 +1,9 @@
 {
   "schema_version": 3,
   "phase": 4,
-  "status": "PHASE4_CORRECTED_ASSETS_PASS_POST_GATE_DESCRIPTIVE_EXTENSION_STOPPED_CALIBRATION_NO_GO",
+  "status": "PHASE4_CORRECTED_ASSETS_PASS_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_PENDING",
   "evidence_cutoff": "2026-08-02",
-  "active_exploratory_amendment": "configs/synthetic_video_real_only_proof.json schema 6 user-authorized post-gate descriptive equal-one-accepted-hour LTX extension",
+  "active_exploratory_amendment": "configs/synthetic_video_real_only_proof.json schema 9 user-authorized domain-appropriate calibration-extractor redesign within the post-gate descriptive equal-one-accepted-hour LTX extension",
   "headline_question": "At equal H video hours, does EgoBabyVLM CLIP+ triple trained on Synthetic-full achieve lexical-grounding performance equivalent to Real-full, while the synthetic corpus has lower prospectively measured production cost?",
   "learner": {
     "upstream_commit": "224621caf0628270b6115845ac75a65b984234a3",
@@ -223,13 +223,13 @@
     "ddp": "MANDATORY_IF_RESOURCE_SIZING_REQUIRES_MULTIPLE_PROCESSES",
     "asr_translation": "PASS_IMMUTABLE_OFFLINE_PIPELINE_FROZEN",
     "phase4_authorized": true,
-    "phase4_status": "CORRECTED_COMMON_ASSETS_PASS_POST_GATE_DESCRIPTIVE_EXTENSION_STOPPED_CALIBRATION_NO_GO",
+    "phase4_status": "CORRECTED_COMMON_ASSETS_PASS_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_PENDING",
     "phase4_lexical_commitment": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4",
     "phase4_temporal_commitment": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e",
     "childlens_audio_processing_authorized": true,
     "generator_work_authorized": false,
     "real_only_training_authorized": false,
-    "next_authorized_scope": "NONE_WITHIN_POST_GATE_DESCRIPTIVE_EXTENSION_FROZEN_CALIBRATION_CRITICAL_MISSINGNESS_NO_GO"
+    "next_authorized_scope": "PUBLIC_ONLY_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_THEN_EGOCENTRIC_QUALIFICATION_IF_FEASIBLE"
   },
   "no_go_triggers": [
     "confirmed_consent_or_license_incompatibility",
