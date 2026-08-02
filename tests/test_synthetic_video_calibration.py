@@ -79,5 +79,7 @@ def test_terminal_report_is_flat_and_guarded() -> None:
     source = Path("scripts/run_synthetic_video_calibration.py").read_text()
     assert "compact_aggregate_json" in source
     assert "TERMINAL_FIELDS" in source
+    assert "AXIS_STATUS_FIELDS" in source
+    assert "report-axis-status" in source
     assert "restricted_calibration_features.json" in source
     assert 'print(json.dumps' not in source

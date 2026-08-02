@@ -55,6 +55,11 @@ AXES = (
     GROUNDING_AXIS,
     DIVERSITY_AXIS,
 )
+AXIS_STATUS_FIELDS = frozenset(
+    {"status"}
+    | {f"axis_{index}_status" for index in range(1, len(AXES) + 1)}
+    | {f"axis_{index}_missing_fraction" for index in range(1, len(AXES) + 1)}
+)
 
 
 def canonical(value: Any) -> bytes:
@@ -759,6 +764,18 @@ def report(args: argparse.Namespace) -> dict[str, Any]:
     return value
 
 
+def report_axis_status(args: argparse.Namespace) -> dict[str, Any]:
+    path = args.restricted_root / "synthetic_one_hour/calibration/restricted_calibration_targets.json"
+    value = json.loads(path.read_text())
+    record: dict[str, Any] = {"status": "PASS"}
+    for index, axis in enumerate(AXES, start=1):
+        target = value["targets"][axis]
+        record[f"axis_{index}_status"] = target["status"]
+        record[f"axis_{index}_missing_fraction"] = float(target["missing_fraction"])
+    print(compact_aggregate_json(record, allowed_fields=AXIS_STATUS_FIELDS))
+    return record
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -770,6 +787,8 @@ def main() -> None:
     run_parser.add_argument("--device", default="cuda")
     report_parser = subparsers.add_parser("report")
     report_parser.add_argument("--restricted-root", type=Path, required=True)
+    axis_parser = subparsers.add_parser("report-axis-status")
+    axis_parser.add_argument("--restricted-root", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "run":
         value = run(args)
@@ -780,8 +799,10 @@ def main() -> None:
                 sha256_fields=TERMINAL_HASH_FIELDS,
             )
         )
-    else:
+    elif args.command == "report":
         report(args)
+    else:
+        report_axis_status(args)
 
 
 if __name__ == "__main__":
