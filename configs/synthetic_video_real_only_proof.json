@@ -16,6 +16,26 @@
     "temporal": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e"
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
+  "calibration_C": {
+    "status": "FROZEN_PRE_GENERATION_GOVERNED_MEASUREMENT_PENDING",
+    "source": "development_set_C_only_never_training_validation_or_evaluation",
+    "features": [
+      "clip_and_accepted_utterance_duration",
+      "speech_silence_overlap_and_noise_rates",
+      "head_camera_motion_magnitude_and_shot_discontinuity",
+      "blur_and_brightness",
+      "clutter_object_count_proxy",
+      "hand_visibility",
+      "occlusion",
+      "action_transition_density",
+      "model_derived_referent_visibility_timing"
+    ],
+    "estimation_contract": "freeze immutable public model revisions and hashes, fixed bins plus quartiles, explicit missingness and abstention, bootstrap uncertainty with public seed 42, and one governed commitment before generation",
+    "limitations": "small feature set only; measured and unavailable features reported separately; no full distributional calibration claim",
+    "disclosure": "export only approved compact non-identifying bins targets uncertainty and commitment; never raw media text vocabulary embeddings row-level statistics IDs or reconstructive combinations",
+    "episode_plan": "freeze a public nonrestricted episode-plan distribution matched feature-by-feature to approved targets using only public lexical resources and no sealed evaluation concepts or outcomes",
+    "hosted_provider_gate": "BLOCKED_PENDING_AFFIRMATIVE_CHILDLENS_INSTITUTIONAL_PERMISSION_FOR_DISCLOSURE_REVIEWED_AGGREGATE_CONDITIONING"
+  },
   "budgets_credited_hours": {"primary": 1, "conditional_real_extension": 3, "automatic_six_hour_disabled": true},
   "nested_order": "HMAC-SHA-256(secret_budget_key, UTF8('train-budget') || UTF8(opaque_session_id)); then HMAC-SHA-256(secret_budget_key, UTF8('train-item') || UTF8(opaque_media_id))",
   "acquisition": "stop after exactly 1.0 credited real hour plus 10 percent accepted-yield reserve; retain keyed resumability; extend to nested 3.0 hours only if Real-1h fails",
