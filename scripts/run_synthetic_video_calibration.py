@@ -45,7 +45,15 @@ TERMINAL_HASH_FIELDS = frozenset(
         "extractor_repair_commitment_sha256",
     }
 )
-PUBLIC_TERMINAL_FIELDS = frozenset(
+PUBLIC_PREP_FIELDS = frozenset(
+    {
+        "status",
+        "model_file_count",
+        "fixture_file_count",
+        "extractor_repair_commitment_sha256",
+    }
+)
+PUBLIC_QUALIFICATION_FIELDS = frozenset(
     {
         "status",
         "fixture_count",
@@ -1499,7 +1507,7 @@ def main() -> None:
         print(
             compact_aggregate_json(
                 value,
-                allowed_fields=PUBLIC_TERMINAL_FIELDS,
+                allowed_fields=PUBLIC_PREP_FIELDS,
                 sha256_fields=PUBLIC_TERMINAL_HASH_FIELDS,
             )
         )
@@ -1508,7 +1516,7 @@ def main() -> None:
         print(
             compact_aggregate_json(
                 value,
-                allowed_fields=PUBLIC_TERMINAL_FIELDS,
+                allowed_fields=PUBLIC_QUALIFICATION_FIELDS,
                 sha256_fields=PUBLIC_TERMINAL_HASH_FIELDS,
             )
         )
