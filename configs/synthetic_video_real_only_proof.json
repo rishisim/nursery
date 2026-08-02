@@ -29,7 +29,20 @@
     "improvement_over_initialized_min": 0.02,
     "temporal_rule": "Recall@1 and MRR must both be finite and neither may decline by more than 0.05 absolute from initialized"
   },
-  "generator_gate": "concurrent frozen public_self_authored_5_to_10_second_LTX_vs_Wan_control_pilot_no_substitution",
+  "generator_gate": {
+    "status": "SELECTED_BLOCKED_PENDING_INSTITUTIONAL_TRAINING_USE_CLEARANCE",
+    "selected": "gemini-omni-flash-preview",
+    "selection_basis": "user-directed lower-cost selection consistent with the completed blinded bakeoff lead; Gemini 27/28 with zero critical failures, MiniMax H3 25/28, Seedance 24/28, LTX 19/28",
+    "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
+    "request": {"endpoint": "POST https://generativelanguage.googleapis.com/v1beta/interactions", "duration": "5s", "aspect_ratio": "16:9", "delivery": "inline", "store": false, "background": false, "stream": false},
+    "current_price_verified_on": "2026-08-01",
+    "current_price": "$17.50 per million video-output tokens at 5792 tokens/second of 720p video, approximately $0.10/second; text input $1.50 per million tokens",
+    "privacy": "paid API only; public/self-authored nonrestricted episode plans only; never ChildLens/BabyView input, derivatives, restricted vocabulary, evaluation concepts/assets, or governed prompts",
+    "storage": "store=false inline response; paid-service prompts and responses may still be logged for a limited abuse-monitoring period and may be processed in countries where Google or its agents operate",
+    "output_rights": "Google does not claim ownership of generated content; user remains responsible for lawful use",
+    "audio": "discard native audio when retaining frozen modular German TTS",
+    "no_substitution": true
+  },
   "synthetic_arm": "only after real learnability and generator gates pass; exactly match accepted credited duration and objective steps",
   "directionally_competitive_rule": "both trained arms improve realistic macro by at least 0.02 over initialization and synthetic-real absolute macro gap is at most 0.05",
   "reporting": ["realistic_noun", "realistic_adjective", "realistic_lexical_macro", "cartoon_noun_diagnostic", "cartoon_adjective_diagnostic", "held_out_real_temporal_safeguard", "deltas", "vocabulary_exposure", "zero_exposure", "cost_and_yield"],

@@ -114,4 +114,8 @@ def test_lean_equal_duration_proof_is_frozen_before_scores():
     assert proof["learner"]["initialization"].startswith("byte_identical")
     assert proof["real_1h_gate"]["realistic_lexical_macro_min"] == 0.52
     assert proof["real_1h_gate"]["improvement_over_initialized_min"] == 0.02
+    assert proof["generator_gate"]["selected"] == "gemini-omni-flash-preview"
+    assert proof["generator_gate"]["status"].endswith("INSTITUTIONAL_TRAINING_USE_CLEARANCE")
+    assert proof["generator_gate"]["request"]["store"] is False
+    assert proof["generator_gate"]["no_substitution"] is True
     assert "automatic_1_3_6_curve" in proof["prohibitions"]
