@@ -212,7 +212,7 @@ def _image_metrics(image, previous) -> dict[str, float | None]:
     dy = np.abs(np.diff(gray, axis=0))
     edge_strength = float((dx.mean() + dy.mean()) / 2)
     edge_fraction = float(
-        ((dx[:, :-1] + dy[:-1, :]) / 2 > 0.12).mean()
+        ((dx[:-1, :] + dy[:, :-1]) / 2 > 0.12).mean()
     )
     motion = None
     if previous is not None:

@@ -35,6 +35,17 @@ def test_bucket_and_union_duration_are_frozen_and_exact() -> None:
     assert MODULE.union_duration([(0, 2), (1, 3), (5, 6)]) == 4
 
 
+def test_image_metric_gradients_share_the_same_interior_grid() -> None:
+    import numpy as np
+    from PIL import Image
+
+    pixels = np.zeros((8, 8, 3), dtype=np.uint8)
+    pixels[:, 4:, :] = 255
+    metrics = MODULE._image_metrics(Image.fromarray(pixels), None)
+    assert 0.0 <= metrics["clutter_edge_fraction"] <= 1.0
+    assert metrics["blur_edge_strength"] > 0.0
+
+
 def test_public_speech_act_rules_do_not_need_c_vocabulary() -> None:
     rules = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())["calibration_C"]["extractor"]["language_rules"]
     assert MODULE.classify_speech_act("This is a toy.", rules) == "naming"
