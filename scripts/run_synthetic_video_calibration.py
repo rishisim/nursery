@@ -71,7 +71,8 @@ PUBLIC_QUALIFICATION_FIELDS = frozenset(
         "public_qualification_commitment_sha256",
     }
 )
-PUBLIC_TERMINAL_HASH_FIELDS = frozenset(
+PUBLIC_PREP_HASH_FIELDS = frozenset({"extractor_repair_commitment_sha256"})
+PUBLIC_QUALIFICATION_HASH_FIELDS = frozenset(
     {
         "extractor_repair_commitment_sha256",
         "public_qualification_commitment_sha256",
@@ -1508,7 +1509,7 @@ def main() -> None:
             compact_aggregate_json(
                 value,
                 allowed_fields=PUBLIC_PREP_FIELDS,
-                sha256_fields=PUBLIC_TERMINAL_HASH_FIELDS,
+                sha256_fields=PUBLIC_PREP_HASH_FIELDS,
             )
         )
     elif args.command == "qualify-public":
@@ -1517,7 +1518,7 @@ def main() -> None:
             compact_aggregate_json(
                 value,
                 allowed_fields=PUBLIC_QUALIFICATION_FIELDS,
-                sha256_fields=PUBLIC_TERMINAL_HASH_FIELDS,
+                sha256_fields=PUBLIC_QUALIFICATION_HASH_FIELDS,
             )
         )
     elif args.command == "run":
