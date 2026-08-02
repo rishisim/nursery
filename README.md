@@ -115,8 +115,13 @@ exactly one accepted credited hour.
 The three redesigned Real-1h seeds completed. Mean realistic macro rose from
 `0.51836` at initialization to `0.53602`; two seeds improved and every temporal
 safeguard was non-catastrophic. The mean gain of `0.01766` nevertheless missed
-the frozen `0.02` positive-signal threshold, so the exploratory stop rule fired.
-This is inconclusive about data quality and does not authorize C calibration,
-LTX preflight, generation, or a synthetic learner arm.
+the frozen `0.02` positive-signal threshold, so that exploratory stop rule
+fired and remains sealed. After that result, the user prospectively authorized
+a scientifically weaker descriptive Synthetic-1h LTX extension. It does not
+reinterpret the failed gate. Its next conditional stage is bounded governed
+C calibration and a public episode-plan commitment, followed by public/dummy
+LTX topology sizing. Any later corpus remains capped at exactly one accepted
+credited hour and cannot support directional-competitiveness, equivalence,
+noninferiority, same-quality, or confirmatory claims.
 Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
 generation remain unauthorized.

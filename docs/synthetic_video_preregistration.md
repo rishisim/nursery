@@ -660,3 +660,34 @@ all temporal safeguards were non-catastrophic; and the trained mean exceeded
 quality and stops before governed C calibration, LTX topology preflight,
 generation, or synthetic learner training. No evaluation-driven threshold,
 budget, seed, or generator change is permitted inside this amendment.
+
+### User-authorized post-gate descriptive extension (prospective)
+
+After the coverage-redesign Real-1h failure above was sealed, and before any
+governed C calibration, new LTX outcome, synthetic corpus, or synthetic learner
+score, the user explicitly authorized one scientifically weaker descriptive
+Synthetic-1h extension. The failed gate is not reclassified: trained mean
+realistic macro remains `0.5360246706`, mean gain remains `0.0176619008` against
+the frozen `0.02` requirement, two of three seeds improved, and all temporal
+safeguards were non-catastrophic.
+
+The extension asks only whether one particular locally governed LTX-2.3 corpus
+of exactly 3,600 accepted credited seconds produces a directionally similar
+training effect under the already frozen three-seed learner procedure. It has
+no binary success gate. Results will be point estimates and seed dispersion;
+a positive synthetic effect resembling the observed real effect may be called
+only encouraging descriptive evidence. Because the formal real gate failed,
+“directionally competitive,” “equivalent,” “noninferior,” “same quality,” and
+confirmatory Phase 5 language are prohibited. Similar flat or declining arms
+are inconclusive.
+
+The execution order is frozen: first complete the bounded governed eight-axis
+C calibration and commit the aggregate-conditioned public episode-plan
+distribution; then run a public/dummy LTX final-topology preflight; then freeze
+and, where required, obtain approval for exact Juno GPU, wall-time, GPU-hour,
+storage, attempt/retry, and cost ceilings. Only after those gates pass may one
+accepted synthetic hour be produced and reused across the same three public
+learner seeds. Corrected evaluation assets, language-adapter abstention rules,
+4:1:1 schedule, 4,668 steps, byte-identical initialization, and checkpoint rule
+remain unchanged. There is no automatic 3h arm, more than one accepted
+synthetic hour, extra seed, hosted provider, or outcome-driven tuning.

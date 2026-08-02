@@ -1,7 +1,7 @@
 {
-  "schema_version": 5,
-  "status": "STOP_COVERAGE_REDESIGN_REAL_1H_POSITIVE_CONTROL_FAILED_MEAN_GAIN",
-  "claim_role": "three_seed_exploratory_directional_equal_one_accepted_hour_pilot_not_equivalence_or_confirmatory_phase5",
+  "schema_version": 6,
+  "status": "POST_GATE_DESCRIPTIVE_SYNTHETIC_1H_AUTHORIZED_CALIBRATION_PENDING",
+  "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
     "timing": "after sealing the under-covered 570-step Real-1h and Real-3h stop, before any redesigned learner outcome, generator outcome, synthetic corpus, or synthetic learner score",
@@ -9,6 +9,19 @@
     "scientific_distinction": "the prior stop remains valid for its 570-step protocol but is not evidence that one accepted hour is intrinsically insufficient; this separate exploratory protocol tests matched one-hour arms after at least five contrastive-equivalent data passes",
     "outcome_independence": "the schedule seeds gates and ceilings are frozen without any synthetic learner outcome and without changing the corrected assets or prior sealed result",
     "unchanged": "exactly one accepted credited hour per arm; pinned learner triple 4:1:1 schedule; shared adapter; corrected assets; modular German TTS; point estimates only; no grammar aggregate equivalence inference or evaluation-driven generator tuning"
+  },
+  "post_gate_descriptive_extension": {
+    "effective_on": "2026-08-02",
+    "timing": "after the redesigned Real-1h result was sealed and before C calibration, any new LTX outcome, synthetic corpus, or synthetic learner score",
+    "authorization_basis": "explicit user direction to go ahead with one scientifically weaker descriptive Synthetic-1h LTX arm despite the failed formal Real-1h gate",
+    "preserved_gate_result": {"status": "FAILED_NOT_REINTERPRETED", "initialized_mean_realistic_macro": 0.518362769834595, "trained_mean_realistic_macro": 0.5360246705915336, "mean_gain": 0.017661900756938558, "required_mean_gain": 0.02, "positive_gain_seed_count": 2, "seed_count": 3, "temporal_noncatastrophic_all_seeds": true},
+    "question": "does this particular one-accepted-hour locally governed LTX corpus produce a directionally similar training effect under the identical learner procedure",
+    "scientific_strength": "descriptive_point_estimates_and_seed_dispersion_only",
+    "binary_success_gate": "NONE",
+    "permitted_interpretation": "a positive synthetic training effect resembling the observed real effect may be described only as encouraging descriptive evidence",
+    "prohibited_interpretation": ["directionally_competitive", "equivalent", "noninferior", "same_quality", "confirmatory_phase5", "proof_of_synthetic_data_quality"],
+    "inconclusive_rule": "if both matched arms are flat or decline the comparison is inconclusive",
+    "outcome_independence": "the extension generator corpus cap learner seeds steps checkpoints evaluation assets calibration axes and resource-gate order are frozen before any synthetic learner outcome"
   },
   "sealed_prior_570_step_pilot": {
     "status": "PRESERVED_NOT_REINTERPRETED",
@@ -68,7 +81,7 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "NOT_REACHED_REAL_1H_POSITIVE_CONTROL_FAILED",
+    "local_generator_gate": "USER_AUTHORIZED_POST_GATE_DESCRIPTIVE_EXTENSION_CALIBRATION_PENDING",
     "authorization_interpretation": "local applicant-only LTX execution keeps every C aggregate and aggregate-conditioned generator input inside governed UTD storage and grants no third-party access"
   },
   "budgets_credited_hours": {"real": 1, "synthetic_accepted": 1, "synthetic_above_one_hour_prohibited": true},
@@ -88,7 +101,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_NOT_REACHED_REAL_1H_POSITIVE_CONTROL_FAILED",
+    "status": "SELECTED_LOCAL_POST_GATE_DESCRIPTIVE_EXTENSION_CALIBRATION_PENDING",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
@@ -98,16 +111,16 @@
     "text_encoder": {"repository": "google/gemma-3-12b-it-qat-q4_0-unquantized", "revision": "68f7ee4fbd59087436ada77ed2d62f373fdd4482", "license_acceptance_required": true},
     "execution": "applicant-only local execution on governed Juno storage with pinned cached dependencies local-files-only loading disabled telemetry and no hosted API",
     "runtime_evidence": {"source": "synthetic-video-public-pilot@e5009d6", "hardware": "1x_A100_80GB", "valid_clips": 4, "raw_output_seconds": 20.166667, "job_wall_seconds": 609.097055, "measured_cloud_cost_usd": 0.422984},
-    "preflight_gate": "only after the Real-1h positive control passes, run bounded public/dummy final-topology sizing and freeze the actual Juno GPU count type wall-time aggregate GPU-hours and storage before generation",
+    "preflight_gate": "after the post-gate extension is committed and governed C calibration plus episode-plan commitment pass, run bounded public/dummy final-topology sizing and freeze the actual Juno GPU count type wall-time aggregate GPU-hours and storage before generation",
     "production_ceiling_provisional_until_preflight": {"accepted_credited_seconds_exact": 3600, "learner_record_count_exact": 1244, "attempt_frames": 121, "frames_per_second": 24, "raw_generated_seconds_max": 5399.625, "attempts_max": 1071, "retries_max": 357, "attempts_per_plan_max": 2, "wall_time_hours_max": 72, "governed_storage_gib_max": 100, "provider_monetary_cost_usd": 0, "accounting": "retain GPU time energy storage failed attempts retries QA labor accepted-hour yield and all attributable costs"},
     "privacy": "all C aggregates aggregate-conditioned prompts plans attempts outputs logs media QA and artifacts remain in applicant-governed Juno storage; no ChildLens or BabyView material or derivative is sent to a hosted provider",
     "quality_limitation": "LTX had the weakest completed-bakeoff primary score and more critical failures; do not tune evaluation assets plans retries or QA thresholds from learner outcomes",
     "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "NOT_AUTHORIZED because the redesigned Real-1h positive control failed its frozen mean-gain threshold; no C calibration LTX preflight corpus generation or synthetic learner score",
+  "synthetic_arm": "USER_AUTHORIZED_POST_GATE_DESCRIPTIVE_EXTENSION; execution remains conditional on governed C calibration and episode-plan commitment, bounded LTX final-topology preflight, exact resource ceiling approval if still required, and an accepted-corpus seal of exactly 3600 credited seconds",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
-  "directionally_competitive_rule": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
+  "former_directionally_competitive_rule_not_permitted_for_post_gate_extension": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",
   "reporting": ["realistic_noun", "realistic_adjective", "realistic_lexical_macro", "cartoon_noun_diagnostic", "cartoon_adjective_diagnostic", "held_out_real_temporal_safeguard", "deltas", "vocabulary_exposure", "zero_exposure", "cost_and_yield"],
   "prohibitions": ["more_than_one_accepted_synthetic_hour", "automatic_real_budget_extension", "confirmatory_phase5", "equivalence_or_significance_inference", "grammar_or_overall_aggregate", "evaluation_steering", "arm_specific_tuning", "evaluation_driven_generator_tuning", "separate_confirmatory_synthetic_score"]
