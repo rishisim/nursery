@@ -17,8 +17,12 @@ export HF_HOME="${PHASE4_PUBLIC_ROOT}/models/learner-hf-home"
 export MASTER_ADDR=127.0.0.1 MASTER_PORT=29631 RANK=0 WORLD_SIZE=1 LOCAL_RANK=0 LOCAL_WORLD_SIZE=1
 export CC="${PHASE4_PUBLIC_ROOT}/models/triton-compiler/bin/x86_64-conda-linux-gnu-cc"
 export PATH="${PHASE4_PUBLIC_ROOT}/models/triton-compiler/bin:$PATH"
-export COCO_DATA_ROOT="${PHASE4_PUBLIC_ROOT}/models/unused-coco"
-mkdir -p "$COCO_DATA_ROOT"
+unused_upstream_data="${PHASE4_PUBLIC_ROOT}/models/unused-upstream-data"
+mkdir -p "$unused_upstream_data"
+for upstream_data_var in BABYVIEW_DATA_ROOT BABYVIEW_EXTRA_ROOT COCO_DATA_ROOT COCO_EXTRA_ROOT COCO_MC_DATA_ROOT COCO_MC_EXTRA_ROOT EGO4D_DATA_ROOT EGO4D_EXTRA_ROOT HOWTO_DATA_ROOT HOWTO_EXTRA_ROOT; do
+  export "${upstream_data_var}=${unused_upstream_data}"
+done
+export DINOV2_OUTPUT_DIR="${PHASE4_RESTRICTED_ROOT}/real_only_proof/checkpoints"
 log_root="${PHASE4_RESTRICTED_ROOT}/real_only_proof/logs"
 mkdir -p "$log_root"
 exec >"${log_root}/learner-${SLURM_JOB_ID}.out" 2>"${log_root}/learner-${SLURM_JOB_ID}.err"
