@@ -925,3 +925,16 @@ governed-C reopening, LTX work, generation, or synthetic learner score has
 occurred. The next authorized operation is implementation qualification and
 the one frozen public-development comparison. The complete extractor must
 still pass every unchanged strengthened holdout gate before C can reopen.
+
+Before candidate inference, implementation qualification resolved two local
+runtime details prospectively. EgoHOD EgoVideo-L uses the official ViT-L/14
+input size of 336 pixels with the already frozen 16 uniform frames (the earlier
+224-pixel prose was incompatible with that checkpoint architecture); its
+complete state dict must load strictly without fetching an OpenAI
+initialization checkpoint. VideoPrism's public `c4_en` SentencePiece artifact
+is pinned at SHA-256 `1e5036be…f8ec`, and V-JEPA 2's local model and processor
+configs are separately hashed. The CUDA container is pinned at
+`f274f1ac…5792`. Exact isolated dependency versions and the requirement for a
+hashed install report before inference are recorded in the canonical config.
+No model output had been observed when these compatibility details were
+committed.

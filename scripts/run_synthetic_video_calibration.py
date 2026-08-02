@@ -14,9 +14,11 @@ from pathlib import Path
 import random
 import re
 import shutil
+import statistics
 import subprocess
 import sys
 import tempfile
+import time
 from typing import Any
 import urllib.request
 
@@ -80,6 +82,55 @@ PUBLIC_QUALIFICATION_HASH_FIELDS = frozenset(
         "public_qualification_commitment_sha256",
     }
 )
+ACTIVITY_CANDIDATE_FIELDS = frozenset(
+    {
+        "status",
+        "candidate_id",
+        "partition",
+        "item_count",
+        "failure_count",
+        "invalid_record_count",
+        "silent_truncation_count",
+        "external_call_count",
+        "peak_vram_gib",
+        "median_item_runtime_seconds",
+        "candidate_output_commitment_sha256",
+    }
+)
+ACTIVITY_CANDIDATE_HASH_FIELDS = frozenset(
+    {"candidate_output_commitment_sha256"}
+)
+ACTIVITY_PREP_FIELDS = frozenset(
+    {
+        "status",
+        "candidate_count",
+        "weight_file_count",
+        "code_repository_count",
+        "public_item_count",
+        "installed_distribution_count",
+        "dependency_manifest_commitment_sha256",
+    }
+)
+ACTIVITY_PREP_HASH_FIELDS = frozenset(
+    {"dependency_manifest_commitment_sha256"}
+)
+ACTIVITY_SELECTION_FIELDS = frozenset(
+    {
+        "status",
+        "candidate_count",
+        "eligible_candidate_count",
+        "winner_candidate_id",
+        "winner_macro_f1",
+        "winner_worst_class_recall",
+        "winner_nonabstained_coverage",
+        "winner_temporal_shuffled_positive_fraction",
+        "winner_temporal_repeated_positive_fraction",
+        "activity_selection_commitment_sha256",
+    }
+)
+ACTIVITY_SELECTION_HASH_FIELDS = frozenset(
+    {"activity_selection_commitment_sha256"}
+)
 ACTIVITY_AXIS = "activity_context_mixture"
 VISUAL_AXIS = "egocentric_visual_regime"
 SCENE_AXIS = "scene_complexity"
@@ -121,6 +172,1307 @@ def file_digest(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             result.update(chunk)
     return result.hexdigest()
+
+
+def _activity_config(cfg: dict[str, Any]) -> dict[str, Any]:
+    try:
+        value = cfg["calibration_C"]["extractor"][
+            "activity_checkpoint_selection_amendment"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_ACTIVITY_SELECTION_NOT_FROZEN") from error
+    if value.get("status") != "FROZEN_BEFORE_EMPIRICAL_CANDIDATE_OUTCOMES":
+        raise RuntimeError("E_ACTIVITY_SELECTION_NOT_FROZEN")
+    candidates = value.get("bounded_candidates")
+    if not isinstance(candidates, list) or not 1 <= len(candidates) <= 4:
+        raise RuntimeError("E_ACTIVITY_CANDIDATE_SET")
+    candidate_ids = [candidate.get("candidate_id") for candidate in candidates]
+    if any(not isinstance(candidate_id, str) for candidate_id in candidate_ids):
+        raise RuntimeError("E_ACTIVITY_CANDIDATE_ID")
+    if len(candidate_ids) != len(set(candidate_ids)):
+        raise RuntimeError("E_ACTIVITY_CANDIDATE_DUPLICATE")
+    if value["development_comparison"]["candidate_count"] != len(candidates):
+        raise RuntimeError("E_ACTIVITY_CANDIDATE_COUNT")
+    return value
+
+
+def _activity_candidate(
+    amendment: dict[str, Any], candidate_id: str
+) -> dict[str, Any]:
+    matches = [
+        value
+        for value in amendment["bounded_candidates"]
+        if value["candidate_id"] == candidate_id
+    ]
+    if len(matches) != 1:
+        raise RuntimeError("E_UNREGISTERED_ACTIVITY_CANDIDATE")
+    return matches[0]
+
+
+def _activity_labels(cfg: dict[str, Any]) -> list[str]:
+    prompts = cfg["calibration_C"]["extractor"]["coverage_repair"][
+        "prompt_ensembles"
+    ]["activity"]
+    labels = list(prompts)
+    if len(labels) != 8 or len(labels) != len(set(labels)):
+        raise RuntimeError("E_ACTIVITY_LABEL_SET")
+    return labels
+
+
+def _verify_activity_manifest(
+    path: Path, amendment: dict[str, Any], media_root: Path | None = None
+) -> dict[str, Any]:
+    if not path.is_file() or file_digest(path) != amendment[
+        "public_activity_fixture"
+    ]["manifest_commitment_sha256"]:
+        raise RuntimeError("E_ACTIVITY_MANIFEST_COMMITMENT")
+    manifest = json.loads(path.read_text())
+    if manifest.get("schema_version") != 1:
+        raise RuntimeError("E_ACTIVITY_MANIFEST_SCHEMA")
+    if manifest.get("seed") != amendment["public_activity_fixture"]["seed"]:
+        raise RuntimeError("E_ACTIVITY_MANIFEST_SEED")
+    partitions = manifest.get("partitions")
+    if set(partitions or {}) != {"development", "holdout"}:
+        raise RuntimeError("E_ACTIVITY_MANIFEST_PARTITIONS")
+    expected_counts = {
+        "development": amendment["public_activity_fixture"]["development_items"],
+        "holdout": amendment["public_activity_fixture"]["holdout_items"],
+    }
+    seen_ids: set[str] = set()
+    subjects: dict[str, set[str]] = {}
+    labels = set(manifest.get("label_code_map", {}))
+    if len(labels) != 8:
+        raise RuntimeError("E_ACTIVITY_MANIFEST_LABELS")
+    for partition, expected_count in expected_counts.items():
+        rows = partitions[partition]
+        if len(rows) != expected_count:
+            raise RuntimeError("E_ACTIVITY_MANIFEST_COUNT")
+        subjects[partition] = set()
+        for row in rows:
+            if set(row) != {
+                "id",
+                "labels",
+                "length_seconds",
+                "media_bytes",
+                "media_sha256",
+                "source",
+                "subject",
+            }:
+                raise RuntimeError("E_ACTIVITY_MANIFEST_ROW_SCHEMA")
+            if row["id"] in seen_ids or not set(row["labels"]).issubset(labels):
+                raise RuntimeError("E_ACTIVITY_MANIFEST_ROW_VALUE")
+            if not row["labels"] or not math.isfinite(float(row["length_seconds"])):
+                raise RuntimeError("E_ACTIVITY_MANIFEST_ROW_VALUE")
+            seen_ids.add(row["id"])
+            subjects[partition].add(row["subject"])
+            if media_root is not None:
+                media = media_root / "CharadesEgo_v1_480" / f"{row['id']}.mp4"
+                if (
+                    not media.is_file()
+                    or media.stat().st_size != row["media_bytes"]
+                    or file_digest(media) != row["media_sha256"]
+                ):
+                    raise RuntimeError("E_ACTIVITY_MEDIA_COMMITMENT")
+    if subjects["development"].intersection(subjects["holdout"]):
+        raise RuntimeError("E_ACTIVITY_SUBJECT_OVERLAP")
+    return manifest
+
+
+def _activity_fold(subject: str, seed: int) -> int:
+    return int(digest([seed, "fold", subject])[:16], 16) % 4
+
+
+def _deterministic_nonidentity_permutation(
+    count: int, seed: int, public_id: str
+) -> list[int]:
+    if count < 2:
+        raise ValueError("temporal control needs at least two frames")
+    order = list(range(count))
+    generator = random.Random(int(digest([seed, "temporal_shuffle", public_id])[:16], 16))
+    generator.shuffle(order)
+    if order == list(range(count)):
+        order = order[1:] + order[:1]
+    return order
+
+
+def _finite_vector(value: Any, width: int, error_code: str) -> list[float]:
+    if not isinstance(value, list) or len(value) != width:
+        raise RuntimeError(error_code)
+    output = [float(item) for item in value]
+    if not all(math.isfinite(item) for item in output):
+        raise RuntimeError(error_code)
+    return output
+
+
+def _binary_f1(y_true: list[bool], y_pred: list[bool]) -> float:
+    true_positive = sum(expected and predicted for expected, predicted in zip(y_true, y_pred, strict=True))
+    false_positive = sum(not expected and predicted for expected, predicted in zip(y_true, y_pred, strict=True))
+    false_negative = sum(expected and not predicted for expected, predicted in zip(y_true, y_pred, strict=True))
+    denominator = 2 * true_positive + false_positive + false_negative
+    return 2 * true_positive / denominator if denominator else 0.0
+
+
+def _classification_metrics(
+    expected: list[set[str]], predicted: list[set[str]], labels: list[str]
+) -> dict[str, float]:
+    f1_values = []
+    recall_values = []
+    for label in labels:
+        truth = [label in row for row in expected]
+        guesses = [label in row for row in predicted]
+        f1_values.append(_binary_f1(truth, guesses))
+        positive_count = sum(truth)
+        recall_values.append(
+            sum(want and got for want, got in zip(truth, guesses, strict=True))
+            / positive_count
+            if positive_count
+            else 0.0
+        )
+    return {
+        "macro_f1": sum(f1_values) / len(f1_values),
+        "worst_class_recall": min(recall_values),
+        "nonabstained_coverage": sum(bool(row) for row in predicted)
+        / len(predicted),
+    }
+
+
+def _threshold_candidates(values: list[float]) -> list[float]:
+    unique = sorted(set(values))
+    if not unique:
+        raise RuntimeError("E_ACTIVITY_THRESHOLD_VALUES")
+    scale = max(1.0, max(abs(value) for value in unique))
+    epsilon = scale * 1e-9
+    return [unique[0] - epsilon] + [
+        (first + second) / 2 for first, second in zip(unique, unique[1:])
+    ] + [unique[-1] + epsilon]
+
+
+def _choose_label_threshold(values: list[float], truth: list[bool]) -> float:
+    ranked = []
+    for threshold in _threshold_candidates(values):
+        score = _binary_f1(truth, [value >= threshold for value in values])
+        ranked.append((score, threshold))
+    return max(ranked, key=lambda item: (item[0], item[1]))[1]
+
+
+def _predict_score_rows(
+    rows: list[list[float]], labels: list[str], thresholds: list[float], margin: float
+) -> list[set[str]]:
+    return [
+        {
+            label
+            for label, score, threshold in zip(labels, row, thresholds, strict=True)
+            if score >= threshold + margin
+        }
+        for row in rows
+    ]
+
+
+def _choose_abstention_margin(
+    rows: list[list[float]],
+    expected: list[set[str]],
+    labels: list[str],
+    thresholds: list[float],
+    margins: list[float],
+    coverage_min: float,
+) -> float | None:
+    eligible = []
+    for margin in margins:
+        predictions = _predict_score_rows(rows, labels, thresholds, margin)
+        metrics = _classification_metrics(expected, predictions, labels)
+        if metrics["nonabstained_coverage"] >= coverage_min:
+            eligible.append((metrics["macro_f1"], margin))
+    return max(eligible, key=lambda item: (item[0], item[1]))[1] if eligible else None
+
+
+def _robust_parameters(rows: list[list[float]]) -> tuple[list[float], list[float]]:
+    width = len(rows[0])
+    centers = []
+    scales = []
+    for index in range(width):
+        values = [row[index] for row in rows]
+        center = statistics.median(values)
+        mad = statistics.median(abs(value - center) for value in values)
+        centers.append(center)
+        scales.append(1.4826 * mad + 1e-6)
+    return centers, scales
+
+
+def _robust_transform(
+    rows: list[list[float]], centers: list[float], scales: list[float]
+) -> list[list[float]]:
+    return [
+        [
+            (value - center) / scale
+            for value, center, scale in zip(row, centers, scales, strict=True)
+        ]
+        for row in rows
+    ]
+
+
+def _fit_probe_scores(
+    train_embeddings: list[list[float]],
+    train_expected: list[set[str]],
+    score_embeddings: dict[str, list[list[float]]],
+    labels: list[str],
+    recipe: dict[str, Any],
+) -> tuple[dict[str, list[list[float]]], list[dict[str, Any]]]:
+    from sklearn.linear_model import LogisticRegression
+
+    outputs = {name: [[] for _ in values] for name, values in score_embeddings.items()}
+    models = []
+    for label in labels:
+        truth = [int(label in row) for row in train_expected]
+        if len(set(truth)) != 2:
+            raise RuntimeError("E_ACTIVITY_PROBE_CLASS_SUPPORT")
+        model = LogisticRegression(
+            solver=recipe["solver"],
+            C=float(recipe["C"]),
+            class_weight=recipe["class_weight"],
+            max_iter=int(recipe["max_iter"]),
+            tol=float(recipe["tolerance"]),
+            random_state=int(recipe["seed"]),
+        )
+        model.fit(train_embeddings, truth)
+        for name, values in score_embeddings.items():
+            probabilities = model.predict_proba(values)[:, 1].tolist()
+            for row, probability in zip(outputs[name], probabilities, strict=True):
+                row.append(float(probability))
+        models.append(
+            {
+                "label": label,
+                "coefficient": [float(value) for value in model.coef_[0]],
+                "intercept": float(model.intercept_[0]),
+                "classes": [int(value) for value in model.classes_],
+            }
+        )
+    return outputs, models
+
+
+def _candidate_output_rows(
+    output: dict[str, Any],
+    manifest_rows: list[dict[str, Any]],
+    candidate_id: str,
+    labels: list[str],
+) -> list[dict[str, Any]]:
+    if (
+        output.get("schema_version") != 1
+        or output.get("status") != "COMPLETE"
+        or output.get("candidate_id") != candidate_id
+        or output.get("partition") != "development"
+        or output.get("failure_count") != 0
+        or output.get("invalid_record_count") != 0
+        or output.get("silent_truncation_count") != 0
+        or output.get("external_call_count") != 0
+    ):
+        raise RuntimeError("E_ACTIVITY_CANDIDATE_OUTPUT_STATUS")
+    commitment = output.get("candidate_output_commitment_sha256")
+    payload = dict(output)
+    payload.pop("candidate_output_commitment_sha256", None)
+    if not isinstance(commitment, str) or digest(payload) != commitment:
+        raise RuntimeError("E_ACTIVITY_CANDIDATE_OUTPUT_COMMITMENT")
+    rows = output.get("rows")
+    if not isinstance(rows, list) or len(rows) != len(manifest_rows):
+        raise RuntimeError("E_ACTIVITY_CANDIDATE_OUTPUT_ROWS")
+    expected_by_id = {row["id"]: row for row in manifest_rows}
+    if len(expected_by_id) != len(manifest_rows):
+        raise RuntimeError("E_ACTIVITY_CANDIDATE_OUTPUT_ROWS")
+    seen: set[str] = set()
+    is_probe = candidate_id == "vjepa2_vitl_public_probe"
+    for row in rows:
+        public_id = row.get("id")
+        expected = expected_by_id.get(public_id)
+        if expected is None or public_id in seen:
+            raise RuntimeError("E_ACTIVITY_CANDIDATE_OUTPUT_ID")
+        seen.add(public_id)
+        if row.get("subject") != expected["subject"] or row.get("labels") != expected["labels"]:
+            raise RuntimeError("E_ACTIVITY_CANDIDATE_OUTPUT_ALIGNMENT")
+        key = "embedding" if is_probe else "scores"
+        width = None if is_probe else len(labels)
+        for control in ("ordered", "shuffled", "repeated_center"):
+            value = row.get(control, {}).get(key)
+            if is_probe:
+                if not isinstance(value, list) or not value:
+                    raise RuntimeError("E_ACTIVITY_CANDIDATE_OUTPUT_VECTOR")
+                _finite_vector(value, len(value), "E_ACTIVITY_CANDIDATE_OUTPUT_VECTOR")
+            else:
+                _finite_vector(value, int(width), "E_ACTIVITY_CANDIDATE_OUTPUT_VECTOR")
+        if int(row.get("decoded_frame_count", -1)) != int(row.get("required_frame_count", -2)):
+            raise RuntimeError("E_ACTIVITY_CANDIDATE_SILENT_TRUNCATION")
+    return rows
+
+
+def _crossfit_activity_candidate(
+    output: dict[str, Any],
+    manifest_rows: list[dict[str, Any]],
+    candidate: dict[str, Any],
+    amendment: dict[str, Any],
+    labels: list[str],
+) -> dict[str, Any]:
+    candidate_id = candidate["candidate_id"]
+    rows = _candidate_output_rows(output, manifest_rows, candidate_id, labels)
+    seed = amendment["public_activity_fixture"]["seed"]
+    folds = [_activity_fold(row["subject"], seed) for row in rows]
+    expected = [set(row["labels"]) for row in rows]
+    prediction_by_index: dict[int, set[str]] = {}
+    temporal_ordered: dict[int, list[float]] = {}
+    temporal_shuffled: dict[int, list[float]] = {}
+    temporal_repeated: dict[int, list[float]] = {}
+    calibration_records = []
+    calibration_failure_count = 0
+    is_probe = candidate_id == "vjepa2_vitl_public_probe"
+    for fold in range(4):
+        train_indices = [index for index, value in enumerate(folds) if value != fold]
+        test_indices = [index for index, value in enumerate(folds) if value == fold]
+        if not train_indices or not test_indices:
+            raise RuntimeError("E_ACTIVITY_FOLD_EMPTY")
+        train_expected = [expected[index] for index in train_indices]
+        if is_probe:
+            embedding_keys = {
+                "train": [rows[index]["ordered"]["embedding"] for index in train_indices],
+                "test_ordered": [rows[index]["ordered"]["embedding"] for index in test_indices],
+                "test_shuffled": [rows[index]["shuffled"]["embedding"] for index in test_indices],
+                "test_repeated": [rows[index]["repeated_center"]["embedding"] for index in test_indices],
+            }
+            scored, probe_models = _fit_probe_scores(
+                embedding_keys["train"],
+                train_expected,
+                embedding_keys,
+                labels,
+                candidate["probe_recipe"],
+            )
+            train_scores = scored["train"]
+            test_ordered = scored["test_ordered"]
+            test_shuffled = scored["test_shuffled"]
+            test_repeated = scored["test_repeated"]
+            robust = None
+        else:
+            raw_train = [rows[index]["ordered"]["scores"] for index in train_indices]
+            centers, scales = _robust_parameters(raw_train)
+            train_scores = _robust_transform(raw_train, centers, scales)
+            test_ordered = _robust_transform(
+                [rows[index]["ordered"]["scores"] for index in test_indices], centers, scales
+            )
+            test_shuffled = _robust_transform(
+                [rows[index]["shuffled"]["scores"] for index in test_indices], centers, scales
+            )
+            test_repeated = _robust_transform(
+                [rows[index]["repeated_center"]["scores"] for index in test_indices], centers, scales
+            )
+            robust = {"centers": centers, "scales": scales}
+            probe_models = None
+        thresholds = [
+            _choose_label_threshold(
+                [row[label_index] for row in train_scores],
+                [label in truth for truth in train_expected],
+            )
+            for label_index, label in enumerate(labels)
+        ]
+        comparison = amendment["development_comparison"]
+        margin = _choose_abstention_margin(
+            train_scores,
+            train_expected,
+            labels,
+            thresholds,
+            [float(value) for value in comparison["abstention_margin_grid"]],
+            float(comparison["eligibility_floors"]["nonabstained_coverage_min"]),
+        )
+        if margin is None:
+            calibration_failure_count += 1
+            margin = 0.0
+        fold_predictions = _predict_score_rows(test_ordered, labels, thresholds, margin)
+        for index, prediction, ordered, shuffled, repeated in zip(
+            test_indices,
+            fold_predictions,
+            test_ordered,
+            test_shuffled,
+            test_repeated,
+            strict=True,
+        ):
+            prediction_by_index[index] = prediction
+            temporal_ordered[index] = ordered
+            temporal_shuffled[index] = shuffled
+            temporal_repeated[index] = repeated
+        calibration_records.append(
+            {
+                "fold": fold,
+                "train_item_count": len(train_indices),
+                "test_item_count": len(test_indices),
+                "thresholds": dict(zip(labels, thresholds, strict=True)),
+                "margin": margin,
+                "robust_standardization": robust,
+                "probe_models": probe_models,
+            }
+        )
+    predictions = [prediction_by_index[index] for index in range(len(rows))]
+    metrics = _classification_metrics(expected, predictions, labels)
+    temporal_labels = set(amendment["temporal_controls"]["eligible_public_labels"])
+    shuffled_differences = []
+    repeated_differences = []
+    for index, truth in enumerate(expected):
+        target_indices = [labels.index(label) for label in labels if label in truth & temporal_labels]
+        if not target_indices:
+            continue
+        ordered_score = statistics.mean(temporal_ordered[index][position] for position in target_indices)
+        shuffled_score = statistics.mean(temporal_shuffled[index][position] for position in target_indices)
+        repeated_score = statistics.mean(temporal_repeated[index][position] for position in target_indices)
+        shuffled_differences.append(ordered_score - shuffled_score)
+        repeated_differences.append(ordered_score - repeated_score)
+    if not shuffled_differences or not repeated_differences:
+        raise RuntimeError("E_ACTIVITY_TEMPORAL_CONTROL_SUPPORT")
+    temporal = {
+        "item_count": len(shuffled_differences),
+        "ordered_minus_shuffled_mean": statistics.mean(shuffled_differences),
+        "ordered_minus_repeated_mean": statistics.mean(repeated_differences),
+        "ordered_over_shuffled_positive_fraction": sum(value > 0 for value in shuffled_differences) / len(shuffled_differences),
+        "ordered_over_repeated_positive_fraction": sum(value > 0 for value in repeated_differences) / len(repeated_differences),
+    }
+    floors = amendment["development_comparison"]["eligibility_floors"]
+    failures = (
+        int(output["failure_count"])
+        + int(output["invalid_record_count"])
+        + int(output["silent_truncation_count"])
+        + int(output["external_call_count"])
+        + calibration_failure_count
+    )
+    eligible = all(
+        [
+            metrics["macro_f1"] >= floors["macro_f1_min"],
+            metrics["worst_class_recall"] >= floors["worst_class_recall_min"],
+            metrics["nonabstained_coverage"] >= floors["nonabstained_coverage_min"],
+            temporal["ordered_minus_shuffled_mean"]
+            > floors["ordered_target_score_mean_advantage_over_shuffled_strictly_greater_than"],
+            temporal["ordered_minus_repeated_mean"]
+            > floors["ordered_target_score_mean_advantage_over_repeated_center_strictly_greater_than"],
+            temporal["ordered_over_shuffled_positive_fraction"]
+            >= floors["ordered_target_score_positive_fraction_over_shuffled_min"],
+            temporal["ordered_over_repeated_positive_fraction"]
+            >= floors["ordered_target_score_positive_fraction_over_repeated_center_min"],
+            failures
+            <= floors["crashes_silent_truncations_invalid_records_external_calls_unaccounted_failures_max"],
+        ]
+    )
+    return {
+        "candidate_id": candidate_id,
+        **metrics,
+        "temporal": temporal,
+        "peak_vram_gib": float(output["peak_vram_gib"]),
+        "median_item_runtime_seconds": float(output["median_item_runtime_seconds"]),
+        "failure_count": failures,
+        "eligible": eligible,
+        "cross_fitted_calibration": calibration_records,
+    }
+
+
+def _activity_selection_key(value: dict[str, Any], precision: float) -> tuple[Any, ...]:
+    digits = max(0, int(round(-math.log10(precision))))
+    temporal_floor = min(
+        value["temporal"]["ordered_over_shuffled_positive_fraction"],
+        value["temporal"]["ordered_over_repeated_positive_fraction"],
+    )
+    return (
+        -round(value["macro_f1"], digits),
+        -round(value["worst_class_recall"], digits),
+        -round(value["nonabstained_coverage"], digits),
+        -round(temporal_floor, digits),
+        round(value["peak_vram_gib"], digits),
+        round(value["median_item_runtime_seconds"], digits),
+        value["candidate_id"],
+    )
+
+
+def _select_activity_winner(
+    candidates: list[dict[str, Any]], precision: float
+) -> dict[str, Any] | None:
+    eligible = [value for value in candidates if value["eligible"]]
+    return min(eligible, key=lambda value: _activity_selection_key(value, precision)) if eligible else None
+
+
+def _activity_run_root(public: Path) -> Path:
+    return public / "runs/synthetic-video-calibration/extractor-redesign/activity-checkpoint-selection"
+
+
+def _activity_code_root(public: Path, candidate_id: str) -> Path:
+    names = {
+        "egohod_egovideo_l_zero_shot": "EgoHOD",
+        "videoprism_lvt_l_zero_shot": "videoprism",
+        "vjepa2_vitl_public_probe": "vjepa2",
+    }
+    try:
+        return public / "models/activity-code" / names[candidate_id]
+    except KeyError as error:
+        raise RuntimeError("E_UNREGISTERED_ACTIVITY_CANDIDATE") from error
+
+
+def _activity_checkpoint_root(public: Path, candidate_id: str) -> Path:
+    return public / "models/activity-checkpoints" / candidate_id
+
+
+def _link_public_artifact(source: Path, target: Path, expected_sha256: str) -> None:
+    if target.is_file():
+        if file_digest(target) != expected_sha256:
+            raise RuntimeError("E_ACTIVITY_STAGED_ARTIFACT_CONFLICT")
+        return
+    if not source.is_file() or file_digest(source) != expected_sha256:
+        raise RuntimeError("E_ACTIVITY_STAGED_ARTIFACT")
+    target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    os.link(source, target)
+    os.chmod(target, 0o600)
+
+
+def _installed_distributions(target: Path) -> list[dict[str, str]]:
+    import importlib.metadata
+
+    values = {}
+    for distribution in importlib.metadata.distributions(path=[str(target)]):
+        name = str(distribution.metadata.get("Name", distribution.name)).lower()
+        values[name] = str(distribution.version)
+    return [
+        {"name": name, "version": values[name]} for name in sorted(values)
+    ]
+
+
+def prepare_activity_public(args: argparse.Namespace) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    amendment = _activity_config(cfg)
+    runtime = amendment["runtime_environment"]
+    manifest = _verify_activity_manifest(
+        args.manifest,
+        amendment,
+        args.public_root / "public/charades",
+    )
+    staged = args.public_root / "models/activity-checkpoints"
+    staged_names = {
+        "egohod_egovideo_l_zero_shot": "egovideo_large_best.pt",
+        "videoprism_lvt_l_zero_shot": "videoprism_lvt_large.npz",
+        "vjepa2_vitl_public_probe": "vjepa2_vitl.safetensors",
+    }
+    for candidate in amendment["bounded_candidates"]:
+        _verify_repository_commit(
+            _activity_code_root(args.public_root, candidate["candidate_id"]),
+            candidate["code_commit"],
+        )
+        _link_public_artifact(
+            staged / staged_names[candidate["candidate_id"]],
+            _activity_checkpoint_root(args.public_root, candidate["candidate_id"])
+            / candidate["weight_file"],
+            candidate["weight_sha256"],
+        )
+    videoprism_root = _activity_checkpoint_root(
+        args.public_root, "videoprism_lvt_l_zero_shot"
+    )
+    _link_public_artifact(
+        staged / "c4_en_sentencepiece.model",
+        videoprism_root / "c4_en_sentencepiece.model",
+        runtime["videoprism"]["c4_en_sentencepiece_sha256"],
+    )
+    vjepa_root = _activity_checkpoint_root(
+        args.public_root, "vjepa2_vitl_public_probe"
+    )
+    _link_public_artifact(
+        staged / "vjepa2_config.json",
+        vjepa_root / "config.json",
+        runtime["vjepa2"]["config_sha256"],
+    )
+    _link_public_artifact(
+        staged / "vjepa2_video_preprocessor_config.json",
+        vjepa_root / "video_preprocessor_config.json",
+        runtime["vjepa2"]["video_preprocessor_config_sha256"],
+    )
+    clip_root = args.public_root / "models/activity-code/CLIP"
+    if not clip_root.exists():
+        subprocess.run(
+            [
+                "git",
+                "clone",
+                "--filter=blob:none",
+                runtime["egohod"]["openai_CLIP_repository"],
+                str(clip_root),
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=True,
+        )
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(clip_root),
+                "checkout",
+                "--detach",
+                runtime["egohod"]["openai_CLIP_commit"],
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=True,
+        )
+    _verify_repository_commit(
+        clip_root, runtime["egohod"]["openai_CLIP_commit"]
+    )
+    dependency_root = args.public_root / "models/activity-pydeps"
+    logs = _activity_run_root(args.public_root) / "logs"
+    logs.mkdir(parents=True, exist_ok=True, mode=0o700)
+    runtime_keys = {
+        "egohod_egovideo_l_zero_shot": "egohod",
+        "videoprism_lvt_l_zero_shot": "videoprism",
+        "vjepa2_vitl_public_probe": "vjepa2",
+    }
+    environment_records = []
+    for candidate in amendment["bounded_candidates"]:
+        candidate_id = candidate["candidate_id"]
+        target = dependency_root / candidate_id
+        target.mkdir(parents=True, exist_ok=True, mode=0o700)
+        report = _activity_run_root(args.public_root) / f"{candidate_id}-pip-report.json"
+        log = logs / f"{candidate_id}-prepare.log"
+        requirements = runtime[runtime_keys[candidate_id]][
+            "direct_python_requirements"
+        ]
+        with log.open("w") as handle:
+            os.chmod(log, 0o600)
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--disable-pip-version-check",
+                    "--upgrade",
+                    "--target",
+                    str(target),
+                    "--report",
+                    str(report),
+                    *requirements,
+                ],
+                stdout=handle,
+                stderr=subprocess.STDOUT,
+                check=True,
+            )
+        os.chmod(report, 0o600)
+        environment_records.append(
+            {
+                "candidate_id": candidate_id,
+                "direct_requirements": requirements,
+                "pip_report_sha256": file_digest(report),
+                "installed_distributions": _installed_distributions(target),
+            }
+        )
+    dependency_manifest = {
+        "schema_version": 1,
+        "status": "PASS_PREPARED_NO_MODEL_INFERENCE",
+        "container": runtime["container"],
+        "public_fixture_commitment_sha256": amendment[
+            "public_activity_fixture"
+        ]["manifest_commitment_sha256"],
+        "public_item_count": sum(
+            len(values) for values in manifest["partitions"].values()
+        ),
+        "candidates": [
+            {
+                "candidate_id": candidate["candidate_id"],
+                "code_commit": candidate["code_commit"],
+                "weight_sha256": candidate["weight_sha256"],
+            }
+            for candidate in amendment["bounded_candidates"]
+        ],
+        "environments": environment_records,
+        "network_required_after_preparation": False,
+        "restricted_mount_present": False,
+        "model_inference_executed": False,
+    }
+    dependency_manifest["dependency_manifest_commitment_sha256"] = digest(
+        dependency_manifest
+    )
+    write_private(
+        _activity_run_root(args.public_root) / "dependency_manifest.json",
+        dependency_manifest,
+    )
+    return {
+        "status": "PASS_PREPARED_NO_MODEL_INFERENCE",
+        "candidate_count": len(amendment["bounded_candidates"]),
+        "weight_file_count": len(amendment["bounded_candidates"]),
+        "code_repository_count": len(amendment["bounded_candidates"]) + 1,
+        "public_item_count": dependency_manifest["public_item_count"],
+        "installed_distribution_count": sum(
+            len(value["installed_distributions"])
+            for value in environment_records
+        ),
+        "dependency_manifest_commitment_sha256": dependency_manifest[
+            "dependency_manifest_commitment_sha256"
+        ],
+    }
+
+
+def _verify_activity_dependency_manifest(
+    public: Path, amendment: dict[str, Any]
+) -> dict[str, Any]:
+    path = _activity_run_root(public) / "dependency_manifest.json"
+    value = json.loads(path.read_text())
+    commitment = value.pop("dependency_manifest_commitment_sha256", None)
+    expected = amendment["runtime_environment"]["shared"][
+        "dependency_manifest_commitment_sha256"
+    ]
+    if (
+        not isinstance(commitment, str)
+        or commitment != expected
+        or digest(value) != commitment
+        or value.get("status") != "PASS_PREPARED_NO_MODEL_INFERENCE"
+        or value.get("restricted_mount_present") is not False
+        or value.get("model_inference_executed") is not False
+    ):
+        raise RuntimeError("E_ACTIVITY_DEPENDENCY_MANIFEST")
+    value["dependency_manifest_commitment_sha256"] = commitment
+    return value
+
+
+def _verify_repository_commit(path: Path, expected: str) -> None:
+    completed = subprocess.run(
+        ["git", "-C", str(path), "rev-parse", "HEAD"],
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    if completed.stdout.strip() != expected:
+        raise RuntimeError("E_ACTIVITY_CODE_COMMIT")
+    dirty = subprocess.run(
+        ["git", "-C", str(path), "diff", "--quiet"], check=False
+    )
+    if dirty.returncode != 0:
+        raise RuntimeError("E_ACTIVITY_CODE_DIRTY")
+
+
+def _decode_uniform_activity_frames(
+    media: Path, frame_count: int
+) -> tuple[Any, int]:
+    import decord
+    import numpy as np
+
+    reader = decord.VideoReader(str(media), ctx=decord.cpu(0), num_threads=1)
+    source_count = len(reader)
+    if source_count < 1:
+        raise RuntimeError("E_ACTIVITY_DECODE_EMPTY")
+    indices = np.linspace(0, source_count - 1, frame_count, dtype=np.int64)
+    frames = reader.get_batch(indices.tolist()).asnumpy()
+    if frames.shape[0] != frame_count or frames.ndim != 4 or frames.shape[-1] != 3:
+        raise RuntimeError("E_ACTIVITY_SILENT_TRUNCATION")
+    return frames, source_count
+
+
+def _activity_frame_controls(frames, seed: int, public_id: str):
+    import numpy as np
+
+    order = _deterministic_nonidentity_permutation(len(frames), seed, public_id)
+    shuffled = frames[np.asarray(order, dtype=np.int64)]
+    repeated = np.repeat(frames[len(frames) // 2 : len(frames) // 2 + 1], len(frames), axis=0)
+    return {"ordered": frames, "shuffled": shuffled, "repeated_center": repeated}
+
+
+def _resize_center_crop_torch(frames, size: int):
+    import torch
+    from torchvision.transforms import InterpolationMode
+    from torchvision.transforms import functional as transform
+
+    tensor = torch.from_numpy(frames).permute(0, 3, 1, 2).float() / 255.0
+    tensor = transform.resize(
+        tensor, size, interpolation=InterpolationMode.BICUBIC, antialias=True
+    )
+    return transform.center_crop(tensor, [size, size])
+
+
+def _convert_egohod_flash_state(state: dict[str, Any]) -> dict[str, Any]:
+    converted = {}
+    replacements = {
+        ".attn.Wqkv.weight": ".attn.in_proj_weight",
+        ".attn.Wqkv.bias": ".attn.in_proj_bias",
+        ".mlp.fc1.weight": ".mlp.c_fc.weight",
+        ".mlp.fc1.bias": ".mlp.c_fc.bias",
+        ".mlp.fc2.weight": ".mlp.c_proj.weight",
+        ".mlp.fc2.bias": ".mlp.c_proj.bias",
+    }
+    for key, value in state.items():
+        target = key
+        for source, replacement in replacements.items():
+            if source in target:
+                target = target.replace(source, replacement)
+        if target in converted:
+            raise RuntimeError("E_EGOHOD_STATE_KEY_COLLISION")
+        converted[target] = value
+    return converted
+
+
+def _load_egohod_activity_adapter(
+    public: Path,
+    candidate: dict[str, Any],
+    cfg: dict[str, Any],
+    labels: list[str],
+    device: str,
+):
+    import torch
+    import torch.nn.functional as functional
+
+    code_root = _activity_code_root(public, candidate["candidate_id"])
+    clip_root = public / "models/activity-code/CLIP"
+    runtime = _activity_config(cfg)["runtime_environment"]["egohod"]
+    _verify_repository_commit(code_root, candidate["code_commit"])
+    _verify_repository_commit(clip_root, runtime["openai_CLIP_commit"])
+    sys.path.insert(0, str(clip_root))
+    sys.path.insert(0, str(code_root))
+    import clip
+    from model.clip import CLIP
+    from model.transformer import TextTransformer, VisionTransformer
+
+    checkpoint = _activity_checkpoint_root(public, candidate["candidate_id"]) / candidate["weight_file"]
+    if not checkpoint.is_file() or file_digest(checkpoint) != candidate["weight_sha256"]:
+        raise RuntimeError("E_ACTIVITY_WEIGHT_COMMITMENT")
+    loaded = torch.load(checkpoint, map_location="cpu", mmap=True, weights_only=True)
+    state = loaded.get("state_dict", loaded)
+    state = {key.removeprefix("module."): value for key, value in state.items()}
+    state = _convert_egohod_flash_state(state)
+    temporal = state.get("visual.temporal_embedding")
+    if temporal is None or temporal.ndim != 2:
+        raise RuntimeError("E_EGOHOD_TEMPORAL_STATE")
+    native_frames = int(temporal.shape[0])
+    convolution = state.get("visual.conv1.weight")
+    if convolution is None:
+        raise RuntimeError("E_EGOHOD_CONV_STATE")
+    use_fast_conv1 = convolution.ndim == 2
+    vision = VisionTransformer(
+        336,
+        14,
+        1024,
+        24,
+        16,
+        4,
+        output_dim=512,
+        num_frames=native_frames,
+        patch_dropout=0.0,
+        drop_path_rate=0.0,
+        use_fast_conv1=use_fast_conv1,
+        use_flash_attn=False,
+    )
+    text_model = TextTransformer(
+        context_length=77,
+        vocab_size=49408,
+        width=768,
+        heads=12,
+        layers=12,
+        output_dim=512,
+        causal_mask=True,
+    )
+    model = CLIP(
+        embed_dim=512,
+        vision_model=vision,
+        text_model=text_model,
+        freeze_temperature=True,
+    )
+    missing, unexpected = model.load_state_dict(state, strict=False)
+    if missing or unexpected:
+        raise RuntimeError(
+            f"E_EGOHOD_STRICT_STATE missing={len(missing)} unexpected={len(unexpected)}"
+        )
+    model = model.to(device).eval().half()
+    prompt_groups = cfg["calibration_C"]["extractor"]["coverage_repair"][
+        "prompt_ensembles"
+    ]["activity"]
+    flattened = [prompt for label in labels for prompt in prompt_groups[label]]
+    with torch.inference_mode():
+        tokens = clip.tokenize(flattened, context_length=77, truncate=True).to(device)
+        text = functional.normalize(model.encode_text(tokens), dim=-1)
+        text = text.reshape(len(labels), 3, -1).mean(dim=1)
+        text = functional.normalize(text, dim=-1)
+
+    def score(frames):
+        tensor = _resize_center_crop_torch(frames, 336)
+        mean = torch.tensor((0.48145466, 0.4578275, 0.40821073)).view(1, 3, 1, 1)
+        standard = torch.tensor((0.26862954, 0.26130258, 0.27577711)).view(1, 3, 1, 1)
+        tensor = ((tensor - mean) / standard).permute(1, 0, 2, 3).unsqueeze(0)
+        tensor = tensor.to(device=device, dtype=torch.float16)
+        with torch.inference_mode():
+            video = model.encode_image(tensor)[0]
+            video = functional.normalize(video, dim=-1)
+            values = (video @ text.T).float().cpu()[0].tolist()
+        return _finite_vector(values, len(labels), "E_ACTIVITY_NONFINITE_SCORE")
+
+    return score, int(runtime["input_frames"]), "scores"
+
+
+def _videoprism_token_ids(model_path: Path, prompts: list[str]):
+    import numpy as np
+    import sentencepiece
+    from videoprism import utils
+
+    processor = sentencepiece.SentencePieceProcessor(model_file=str(model_path))
+    rows = []
+    paddings = []
+    for prompt in prompts:
+        ids = list(processor.encode(utils.canonicalize_text(prompt), out_type=int))
+        if processor.bos_id() >= 0:
+            ids = [processor.bos_id()] + ids
+        ids = ids[:64]
+        padding = [0.0] * len(ids) + [1.0] * (64 - len(ids))
+        ids = ids + [0] * (64 - len(ids))
+        rows.append(ids)
+        paddings.append(padding)
+    return np.asarray(rows, dtype=np.int32), np.asarray(paddings, dtype=np.float32)
+
+
+def _load_videoprism_activity_adapter(
+    public: Path,
+    candidate: dict[str, Any],
+    cfg: dict[str, Any],
+    labels: list[str],
+    device: str,
+):
+    del device
+    os.environ["JAX_PLATFORMS"] = "cuda"
+    os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
+    code_root = _activity_code_root(public, candidate["candidate_id"])
+    _verify_repository_commit(code_root, candidate["code_commit"])
+    sys.path.insert(0, str(code_root))
+    import jax
+    import jax.numpy as jnp
+    import numpy as np
+    from videoprism import models as videoprism
+
+    checkpoint_root = _activity_checkpoint_root(public, candidate["candidate_id"])
+    checkpoint = checkpoint_root / candidate["weight_file"]
+    runtime = _activity_config(cfg)["runtime_environment"]["videoprism"]
+    tokenizer_path = checkpoint_root / "c4_en_sentencepiece.model"
+    if not checkpoint.is_file() or file_digest(checkpoint) != candidate["weight_sha256"]:
+        raise RuntimeError("E_ACTIVITY_WEIGHT_COMMITMENT")
+    if not tokenizer_path.is_file() or file_digest(tokenizer_path) != runtime["c4_en_sentencepiece_sha256"]:
+        raise RuntimeError("E_VIDEOPRISM_TOKENIZER_COMMITMENT")
+    model = videoprism.get_model("videoprism_lvt_public_v1_large")
+    state = videoprism.load_pretrained_weights(
+        "videoprism_lvt_public_v1_large", checkpoint_path=str(checkpoint)
+    )
+    prompt_groups = cfg["calibration_C"]["extractor"]["coverage_repair"][
+        "prompt_ensembles"
+    ]["activity"]
+    flattened = [prompt for label in labels for prompt in prompt_groups[label]]
+    text_ids, text_paddings = _videoprism_token_ids(tokenizer_path, flattened)
+    text_ids = jnp.asarray(text_ids)
+    text_paddings = jnp.asarray(text_paddings)
+
+    @jax.jit
+    def forward(video):
+        return model.apply(state, video, text_ids, text_paddings, train=False)[:2]
+
+    def score(frames):
+        tensor = _resize_center_crop_torch(frames, 288)
+        video = jnp.asarray(tensor.permute(0, 2, 3, 1).numpy()[None, ...], dtype=jnp.float32)
+        video_embedding, text_embedding = forward(video)
+        values = np.asarray(video_embedding @ text_embedding.T)[0]
+        values = values.reshape(len(labels), 3).mean(axis=1).tolist()
+        return _finite_vector(values, len(labels), "E_ACTIVITY_NONFINITE_SCORE")
+
+    return score, 8, "scores"
+
+
+def _load_vjepa2_activity_adapter(
+    public: Path,
+    candidate: dict[str, Any],
+    cfg: dict[str, Any],
+    labels: list[str],
+    device: str,
+):
+    del labels
+    import torch
+    import torch.nn.functional as functional
+    from transformers import AutoModel, AutoVideoProcessor
+
+    code_root = _activity_code_root(public, candidate["candidate_id"])
+    _verify_repository_commit(code_root, candidate["code_commit"])
+    checkpoint_root = _activity_checkpoint_root(public, candidate["candidate_id"])
+    checkpoint = checkpoint_root / candidate["weight_file"]
+    runtime = _activity_config(cfg)["runtime_environment"]["vjepa2"]
+    if not checkpoint.is_file() or file_digest(checkpoint) != candidate["weight_sha256"]:
+        raise RuntimeError("E_ACTIVITY_WEIGHT_COMMITMENT")
+    if file_digest(checkpoint_root / "config.json") != runtime["config_sha256"]:
+        raise RuntimeError("E_VJEPA_CONFIG_COMMITMENT")
+    if file_digest(checkpoint_root / "video_preprocessor_config.json") != runtime["video_preprocessor_config_sha256"]:
+        raise RuntimeError("E_VJEPA_PROCESSOR_COMMITMENT")
+    model = AutoModel.from_pretrained(
+        checkpoint_root, local_files_only=True, use_safetensors=True
+    ).to(device).eval()
+    processor = AutoVideoProcessor.from_pretrained(
+        checkpoint_root, local_files_only=True
+    )
+
+    def embed(frames):
+        video = torch.from_numpy(frames).permute(0, 3, 1, 2)
+        values = processor(video, return_tensors="pt")["pixel_values_videos"].to(device)
+        with torch.inference_mode():
+            features = model.get_vision_features(values)
+            pooled = functional.normalize(features.float().mean(dim=1), dim=-1)
+        return _finite_vector(
+            pooled.cpu()[0].tolist(), pooled.shape[-1], "E_ACTIVITY_NONFINITE_EMBEDDING"
+        )
+
+    return embed, 64, "embedding"
+
+
+def _load_activity_adapter(
+    public: Path,
+    candidate: dict[str, Any],
+    cfg: dict[str, Any],
+    labels: list[str],
+    device: str,
+):
+    loaders = {
+        "egohod_egovideo_l_zero_shot": _load_egohod_activity_adapter,
+        "videoprism_lvt_l_zero_shot": _load_videoprism_activity_adapter,
+        "vjepa2_vitl_public_probe": _load_vjepa2_activity_adapter,
+    }
+    return loaders[candidate["candidate_id"]](public, candidate, cfg, labels, device)
+
+
+def _gpu_peak_gib(device: str) -> float:
+    if not device.startswith("cuda"):
+        return 0.0
+    completed = subprocess.run(
+        [
+            "nvidia-smi",
+            "--query-compute-apps=used_memory",
+            "--format=csv,noheader,nounits",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    values = []
+    for line in completed.stdout.splitlines():
+        try:
+            values.append(float(line.strip()) / 1024)
+        except ValueError:
+            continue
+    return max(values, default=0.0)
+
+
+def run_activity_candidate(args: argparse.Namespace) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    amendment = _activity_config(cfg)
+    _verify_activity_dependency_manifest(args.public_root, amendment)
+    candidate = _activity_candidate(amendment, args.candidate_id)
+    labels = _activity_labels(cfg)
+    manifest = _verify_activity_manifest(
+        args.manifest,
+        amendment,
+        args.public_root / "public/charades",
+    )
+    if args.partition != "development":
+        raise RuntimeError("E_ACTIVITY_HOLDOUT_BEFORE_WINNER_SEAL")
+    if os.environ.get("HF_HUB_OFFLINE") != "1" or os.environ.get("TRANSFORMERS_OFFLINE") != "1":
+        raise RuntimeError("E_ACTIVITY_OFFLINE_ENVIRONMENT")
+    infer, frame_count, output_key = _load_activity_adapter(
+        args.public_root, candidate, cfg, labels, args.device
+    )
+    rows = []
+    runtimes = []
+    failure_count = invalid_count = truncation_count = 0
+    peak_vram = _gpu_peak_gib(args.device)
+    for fixture in manifest["partitions"][args.partition]:
+        media = args.public_root / "public/charades/CharadesEgo_v1_480" / f"{fixture['id']}.mp4"
+        started = time.monotonic()
+        try:
+            frames, source_frame_count = _decode_uniform_activity_frames(media, frame_count)
+            controls = _activity_frame_controls(
+                frames, amendment["public_activity_fixture"]["seed"], fixture["id"]
+            )
+            outputs = {control: infer(values) for control, values in controls.items()}
+            if any(len(value) == 0 or not all(math.isfinite(float(item)) for item in value) for value in outputs.values()):
+                invalid_count += 1
+                raise RuntimeError("E_ACTIVITY_INVALID_OUTPUT")
+            row = {
+                "id": fixture["id"],
+                "subject": fixture["subject"],
+                "labels": fixture["labels"],
+                "required_frame_count": frame_count,
+                "decoded_frame_count": len(frames),
+                "source_frame_count": source_frame_count,
+            }
+            for control, values in outputs.items():
+                row[control] = {output_key: values}
+            rows.append(row)
+        except RuntimeError as error:
+            failure_count += 1
+            if str(error) == "E_ACTIVITY_SILENT_TRUNCATION":
+                truncation_count += 1
+            rows.append(
+                {
+                    "id": fixture["id"],
+                    "subject": fixture["subject"],
+                    "labels": fixture["labels"],
+                    "status": "FAILED",
+                    "error_code": str(error).split()[0],
+                    "required_frame_count": frame_count,
+                    "decoded_frame_count": 0,
+                }
+            )
+        runtimes.append(time.monotonic() - started)
+        peak_vram = max(peak_vram, _gpu_peak_gib(args.device))
+    result = {
+        "schema_version": 1,
+        "status": "COMPLETE" if failure_count == 0 else "FAILED",
+        "candidate_id": candidate["candidate_id"],
+        "partition": args.partition,
+        "candidate_weight_sha256": candidate["weight_sha256"],
+        "candidate_code_commit": candidate["code_commit"],
+        "manifest_commitment_sha256": amendment["public_activity_fixture"]["manifest_commitment_sha256"],
+        "item_count": len(rows),
+        "failure_count": failure_count,
+        "invalid_record_count": invalid_count,
+        "silent_truncation_count": truncation_count,
+        "external_call_count": 0,
+        "peak_vram_gib": peak_vram,
+        "median_item_runtime_seconds": statistics.median(runtimes),
+        "local_files_only_reload": True,
+        "telemetry_tracking_disabled": True,
+        "rows": rows,
+    }
+    result["candidate_output_commitment_sha256"] = digest(result)
+    output = _activity_run_root(args.public_root) / "predictions" / f"{candidate['candidate_id']}-{args.partition}.json"
+    write_private(output, result)
+    return {key: result[key] for key in ACTIVITY_CANDIDATE_FIELDS}
+
+
+def _fit_final_activity_calibration(
+    output: dict[str, Any],
+    manifest_rows: list[dict[str, Any]],
+    candidate: dict[str, Any],
+    amendment: dict[str, Any],
+    labels: list[str],
+) -> dict[str, Any]:
+    rows = _candidate_output_rows(
+        output, manifest_rows, candidate["candidate_id"], labels
+    )
+    expected = [set(row["labels"]) for row in rows]
+    if candidate["candidate_id"] == "vjepa2_vitl_public_probe":
+        embeddings = [row["ordered"]["embedding"] for row in rows]
+        scored, models = _fit_probe_scores(
+            embeddings,
+            expected,
+            {"ordered": embeddings},
+            labels,
+            candidate["probe_recipe"],
+        )
+        scores = scored["ordered"]
+        transform = {"kind": "public_logistic_probe", "models": models}
+    else:
+        raw = [row["ordered"]["scores"] for row in rows]
+        centers, scales = _robust_parameters(raw)
+        scores = _robust_transform(raw, centers, scales)
+        transform = {
+            "kind": "robust_standardization",
+            "centers": dict(zip(labels, centers, strict=True)),
+            "scales": dict(zip(labels, scales, strict=True)),
+        }
+    thresholds = [
+        _choose_label_threshold(
+            [row[index] for row in scores],
+            [label in truth for truth in expected],
+        )
+        for index, label in enumerate(labels)
+    ]
+    comparison = amendment["development_comparison"]
+    margin = _choose_abstention_margin(
+        scores,
+        expected,
+        labels,
+        thresholds,
+        [float(value) for value in comparison["abstention_margin_grid"]],
+        float(comparison["eligibility_floors"]["nonabstained_coverage_min"]),
+    )
+    if margin is None:
+        raise RuntimeError("E_ACTIVITY_FINAL_MARGIN")
+    return {
+        "transform": transform,
+        "thresholds": dict(zip(labels, thresholds, strict=True)),
+        "abstention_margin": margin,
+        "training_partition": "development_only",
+        "training_item_count": len(rows),
+    }
+
+
+def select_activity_public(args: argparse.Namespace) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    amendment = _activity_config(cfg)
+    labels = _activity_labels(cfg)
+    manifest = _verify_activity_manifest(args.manifest, amendment)
+    manifest_rows = manifest["partitions"]["development"]
+    candidate_outputs = []
+    metrics = []
+    for candidate in amendment["bounded_candidates"]:
+        path = _activity_run_root(args.public_root) / "predictions" / f"{candidate['candidate_id']}-development.json"
+        output = json.loads(path.read_text())
+        candidate_outputs.append(output)
+        metrics.append(
+            _crossfit_activity_candidate(
+                output, manifest_rows, candidate, amendment, labels
+            )
+        )
+    precision = float(amendment["development_comparison"]["metric_tie_precision"])
+    winner = _select_activity_winner(metrics, precision)
+    result = {
+        "schema_version": 1,
+        "status": "PASS_WINNER_SEALED" if winner is not None else "NO_GO_NO_ELIGIBLE_CANDIDATE",
+        "candidate_count": len(metrics),
+        "eligible_candidate_count": sum(value["eligible"] for value in metrics),
+        "manifest_commitment_sha256": amendment["public_activity_fixture"]["manifest_commitment_sha256"],
+        "thresholds_and_selection_rule_frozen_before_outcomes": True,
+        "candidate_metrics": metrics,
+        "winner_candidate_id": winner["candidate_id"] if winner else "NONE",
+        "winner_macro_f1": winner["macro_f1"] if winner else 0.0,
+        "winner_worst_class_recall": winner["worst_class_recall"] if winner else 0.0,
+        "winner_nonabstained_coverage": winner["nonabstained_coverage"] if winner else 0.0,
+        "winner_temporal_shuffled_positive_fraction": winner["temporal"]["ordered_over_shuffled_positive_fraction"] if winner else 0.0,
+        "winner_temporal_repeated_positive_fraction": winner["temporal"]["ordered_over_repeated_positive_fraction"] if winner else 0.0,
+        "holdout_opened": False,
+        "governed_C_opened": False,
+    }
+    if winner is not None:
+        winner_index = [
+            candidate["candidate_id"]
+            for candidate in amendment["bounded_candidates"]
+        ].index(winner["candidate_id"])
+        candidate = amendment["bounded_candidates"][winner_index]
+        final_calibration = _fit_final_activity_calibration(
+            candidate_outputs[winner_index],
+            manifest_rows,
+            candidate,
+            amendment,
+            labels,
+        )
+        seal = {
+            "schema_version": 1,
+            "status": "SEALED_BEFORE_HOLDOUT",
+            "candidate_id": winner["candidate_id"],
+            "candidate_weight_sha256": candidate["weight_sha256"],
+            "candidate_code_commit": candidate["code_commit"],
+            "manifest_commitment_sha256": amendment["public_activity_fixture"]["manifest_commitment_sha256"],
+            "development_metrics": {
+                key: winner[key]
+                for key in (
+                    "macro_f1",
+                    "worst_class_recall",
+                    "nonabstained_coverage",
+                    "temporal",
+                    "peak_vram_gib",
+                    "median_item_runtime_seconds",
+                )
+            },
+            "final_development_calibration": final_calibration,
+            "holdout_outcomes_opened": False,
+        }
+        seal["winner_seal_commitment_sha256"] = digest(seal)
+        result["winner_seal_commitment_sha256"] = seal[
+            "winner_seal_commitment_sha256"
+        ]
+        write_private(_activity_run_root(args.public_root) / "winner_seal.json", seal)
+    result["activity_selection_commitment_sha256"] = digest(result)
+    write_private(
+        _activity_run_root(args.public_root) / "development_selection.json", result
+    )
+    return {key: result[key] for key in ACTIVITY_SELECTION_FIELDS}
 
 
 def write_private(path: Path, value: Any) -> None:
@@ -1556,6 +2908,23 @@ def main() -> None:
     qualify_parser.add_argument("--public-root", type=Path, required=True)
     qualify_parser.add_argument("--config", type=Path, required=True)
     qualify_parser.add_argument("--device", default="cuda")
+    activity_prepare_parser = subparsers.add_parser("activity-prepare")
+    activity_prepare_parser.add_argument("--public-root", type=Path, required=True)
+    activity_prepare_parser.add_argument("--manifest", type=Path, required=True)
+    activity_prepare_parser.add_argument("--config", type=Path, required=True)
+    activity_candidate_parser = subparsers.add_parser("activity-candidate")
+    activity_candidate_parser.add_argument("--public-root", type=Path, required=True)
+    activity_candidate_parser.add_argument("--manifest", type=Path, required=True)
+    activity_candidate_parser.add_argument("--config", type=Path, required=True)
+    activity_candidate_parser.add_argument("--candidate-id", required=True)
+    activity_candidate_parser.add_argument(
+        "--partition", choices=("development", "holdout"), required=True
+    )
+    activity_candidate_parser.add_argument("--device", default="cuda")
+    activity_select_parser = subparsers.add_parser("activity-select")
+    activity_select_parser.add_argument("--public-root", type=Path, required=True)
+    activity_select_parser.add_argument("--manifest", type=Path, required=True)
+    activity_select_parser.add_argument("--config", type=Path, required=True)
     run_parser = subparsers.add_parser("run")
     run_parser.add_argument("--restricted-root", type=Path, required=True)
     run_parser.add_argument("--public-root", type=Path, required=True)
@@ -1583,6 +2952,33 @@ def main() -> None:
                 value,
                 allowed_fields=PUBLIC_QUALIFICATION_FIELDS,
                 sha256_fields=PUBLIC_QUALIFICATION_HASH_FIELDS,
+            )
+        )
+    elif args.command == "activity-prepare":
+        value = prepare_activity_public(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=ACTIVITY_PREP_FIELDS,
+                sha256_fields=ACTIVITY_PREP_HASH_FIELDS,
+            )
+        )
+    elif args.command == "activity-candidate":
+        value = run_activity_candidate(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=ACTIVITY_CANDIDATE_FIELDS,
+                sha256_fields=ACTIVITY_CANDIDATE_HASH_FIELDS,
+            )
+        )
+    elif args.command == "activity-select":
+        value = select_activity_public(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=ACTIVITY_SELECTION_FIELDS,
+                sha256_fields=ACTIVITY_SELECTION_HASH_FIELDS,
             )
         )
     elif args.command == "run":

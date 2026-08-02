@@ -108,6 +108,66 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     assert selection["independent_holdout"]["activity_context_macro_f1_min_unchanged"] == 0.6
     assert selection["resource_ceiling"]["GPU_count"] == 1
     assert selection["execution_controls"]["DDP"] is False
+    runtime = selection["runtime_environment"]
+    assert runtime["container"]["sha256"] == "f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792"
+    assert runtime["egohod"]["input_resolution"] == 336
+    assert runtime["egohod"]["input_frames"] == 16
+    assert runtime["videoprism"]["c4_en_sentencepiece_sha256"] == "1e5036bed065526c3c212dfbe288752391797c4bb1a284aa18c9a0b23fcaf8ec"
+    assert runtime["vjepa2"]["config_sha256"] == "3dec96fe962e94e569182d3a7b9ef0dd74b6b8c89c337a428e43e10d593e70c9"
+
+
+def test_activity_temporal_permutation_is_deterministic_and_not_identity() -> None:
+    first = MODULE._deterministic_nonidentity_permutation(16, 20260802, "public-fixture")
+    second = MODULE._deterministic_nonidentity_permutation(16, 20260802, "public-fixture")
+    assert first == second
+    assert sorted(first) == list(range(16))
+    assert first != list(range(16))
+
+
+def test_activity_threshold_and_abstention_are_conservative_and_explicit() -> None:
+    threshold = MODULE._choose_label_threshold([0.1, 0.2, 0.8, 0.9], [False, False, True, True])
+    assert 0.2 < threshold < 0.8
+    labels = ["a", "b"]
+    rows = [[0.7, 0.2], [0.1, 0.8], [0.51, 0.49]]
+    predictions = MODULE._predict_score_rows(rows, labels, [0.5, 0.5], 0.05)
+    assert predictions == [{"a"}, {"b"}, set()]
+    margin = MODULE._choose_abstention_margin(
+        rows,
+        [{"a"}, {"b"}, set()],
+        labels,
+        [0.5, 0.5],
+        [0.0, 0.05],
+        2 / 3,
+    )
+    assert margin == 0.05
+
+
+def test_activity_selection_order_uses_frozen_metrics_then_resources() -> None:
+    base = {
+        "eligible": True,
+        "macro_f1": 0.7,
+        "worst_class_recall": 0.6,
+        "nonabstained_coverage": 0.9,
+        "temporal": {
+            "ordered_over_shuffled_positive_fraction": 0.7,
+            "ordered_over_repeated_positive_fraction": 0.8,
+        },
+        "peak_vram_gib": 20.0,
+        "median_item_runtime_seconds": 2.0,
+    }
+    slower = {**base, "candidate_id": "slower", "median_item_runtime_seconds": 3.0}
+    faster = {**base, "candidate_id": "faster"}
+    assert MODULE._select_activity_winner([slower, faster], 1e-6)["candidate_id"] == "faster"
+    assert MODULE._select_activity_winner([{**faster, "eligible": False}], 1e-6) is None
+
+
+def test_activity_vector_guard_rejects_nonfinite_or_wrong_width() -> None:
+    import pytest
+
+    with pytest.raises(RuntimeError, match="E_TEST"):
+        MODULE._finite_vector([0.1, float("nan")], 2, "E_TEST")
+    with pytest.raises(RuntimeError, match="E_TEST"):
+        MODULE._finite_vector([0.1], 2, "E_TEST")
 
 
 def test_bucket_and_union_duration_are_frozen_and_exact() -> None:
@@ -213,11 +273,14 @@ def test_public_qualification_jobs_never_mount_restricted_data() -> None:
     qualify = Path("scripts/qualify_synthetic_video_calibration.sbatch").read_text()
     assert "#SBATCH --partition=dev" in prepare
     assert "prepare-public" in prepare
+    assert "activity-prepare" in prepare
     assert "PHASE4_RESTRICTED_ROOT" not in prepare
     assert "#SBATCH --partition=h100" in qualify
     assert "#SBATCH --gpus-per-node=1" in qualify
-    assert "#SBATCH --time=01:00:00" in qualify
+    assert "#SBATCH --time=01:30:00" in qualify
     assert "qualify-public" in qualify
+    assert "activity-candidate" in qualify
+    assert "--net --network none" in qualify
     assert "HF_HUB_OFFLINE=1" in qualify
     assert "calibration-repair-pydeps" in qualify
     assert "PHASE4_RESTRICTED_ROOT" not in qualify
@@ -232,4 +295,7 @@ def test_terminal_report_is_flat_and_guarded() -> None:
     assert "restricted_calibration_features.json" in source
     assert "synthetic_one_hour/calibration_repair" in source
     assert "E_ORIGINAL_CALIBRATION_PROVENANCE" in source
+    assert "ACTIVITY_CANDIDATE_FIELDS" in source
+    assert "ACTIVITY_SELECTION_FIELDS" in source
+    assert "E_ACTIVITY_HOLDOUT_BEFORE_WINNER_SEAL" in source
     assert 'print(json.dumps' not in source

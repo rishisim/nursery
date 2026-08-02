@@ -425,6 +425,74 @@
           "Juno_single_GPU_compatibility_required": true,
           "unofficial_mirror_rule": "ineligible unless official authors establish artifact identity and terms and bytes match an authoritative digest"
         },
+        "runtime_environment": {
+          "container": {
+            "file": "pytorch-2.8.0-cu126.sif",
+            "sha256": "f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792",
+            "bytes": 3731320832,
+            "python": "3.11",
+            "torch": "2.8.0+cu126",
+            "torchvision": "0.23.0+cu126"
+          },
+          "shared": {
+            "decord": "0.6.0",
+            "scikit_learn": "1.7.2",
+            "offline_inference": true,
+            "environment_manifest_and_install_report_commitment_required_before_candidate_inference": true,
+            "dependency_manifest_commitment_sha256": "PENDING_PUBLIC_PREPARATION"
+          },
+          "egohod": {
+            "openai_CLIP_repository": "https://github.com/openai/CLIP.git",
+            "openai_CLIP_commit": "d05afc436d78f1c48dc0dbf8e5980a9d471f35f6",
+            "official_checkpoint_compatibility": "construct the official EgoHOD ViT-L/14-336 model locally without downloading OpenAI initialization weights, load the complete frozen EgoHOD state dict strictly, and disable author tracking and cluster clients",
+            "input_resolution": 336,
+            "input_frames": 16,
+            "direct_python_requirements": [
+              "decord==0.6.0",
+              "easydict==1.13",
+              "einops==0.8.1",
+              "ftfy==6.3.1",
+              "ipdb==0.13.13",
+              "mmengine==0.10.7",
+              "omegaconf==2.3.0",
+              "opencv-python-headless==4.12.0.88",
+              "regex==2025.7.34",
+              "timm==0.5.4"
+            ]
+          },
+          "videoprism": {
+            "jax": "0.6.2",
+            "flax": "0.11.1",
+            "sentencepiece": "0.2.1",
+            "c4_en_sentencepiece_url": "https://storage.googleapis.com/t5-data/vocabs/cc_en.32000/sentencepiece.model",
+            "c4_en_sentencepiece_sha256": "1e5036bed065526c3c212dfbe288752391797c4bb1a284aa18c9a0b23fcaf8ec",
+            "c4_en_sentencepiece_bytes": 798330,
+            "tokenizer_compatibility": "instantiate the frozen public SentencePiece bytes locally and apply the official VideoPrism canonicalization and fixed length-64 padding behavior without GCS access",
+            "direct_python_requirements": [
+              "absl-py==2.3.1",
+              "decord==0.6.0",
+              "einops==0.8.1",
+              "einshape==1.0",
+              "flax==0.11.1",
+              "huggingface-hub==0.34.4",
+              "jax[cuda12]==0.6.2",
+              "sentencepiece==0.2.1"
+            ]
+          },
+          "vjepa2": {
+            "transformers": "4.55.4",
+            "safetensors": "0.6.2",
+            "config_sha256": "3dec96fe962e94e569182d3a7b9ef0dd74b6b8c89c337a428e43e10d593e70c9",
+            "video_preprocessor_config_sha256": "d2fab4418fc0390b62c4cd72ade56908a7929f80c62288adbe10dd8d23421227",
+            "preprocessing": "official local AutoVideoProcessor with 292-short-edge resize, 256 center crop, ImageNet normalization, and exact 64 frames",
+            "direct_python_requirements": [
+              "decord==0.6.0",
+              "safetensors==0.6.2",
+              "scikit-learn==1.7.2",
+              "transformers==4.55.4"
+            ]
+          }
+        },
         "bounded_candidates": [
           {
             "candidate_id": "egohod_egovideo_l_zero_shot",
@@ -441,11 +509,11 @@
             "artifact_validation": "complete local download and valid PyTorch ZIP central directory with 1787 members",
             "training_domain": "7.4M egocentric and instructional clips with fine-grained hand-object-dynamics narrations",
             "temporal_mechanism": "ViT-L video-text backbone plus spatial and temporal motion adapter",
-            "frame_recipe": "16 uniform frames at 224 square pixels; one temporal view; no spatial multi-crop",
+            "frame_recipe": "16 uniform frames at 336 square pixels; one temporal view; no spatial multi-crop",
             "text_alignment": "native CLIP-style text encoder; fixed three-prompt ensemble per existing label",
             "published_evidence": "zero-shot EK100 MIR mAP 41.8 and nDCG 37.0; EK100 action top-1 24.0; EGTEA mean 47.1 and top-1 51.7; EgoMCQ intra 65.5 and inter 95.9; no published Charades-Ego result",
             "published_evidence_type": "zero_shot_direct_video_text_not_directly_comparable_across_all_tasks",
-            "expected_peak_vram_gib_max": 24,
+            "expected_peak_vram_gib_max": 48,
             "known_limitations": "no published Charades-Ego result; official adapter code requires a small local-only evaluation wrapper and removal of tracking and cluster-path assumptions"
           },
           {
