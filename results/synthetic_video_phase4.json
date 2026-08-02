@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_POST_GATE_DESCRIPTIVE_EXTENSION_CALIBRATION_PENDING",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_POST_GATE_DESCRIPTIVE_EXTENSION_STOPPED_CALIBRATION_NO_GO",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -63,7 +63,7 @@
     "interpretation": "the multi-pass Real-1h positive control missed only the frozen mean-gain component; this remains inconclusive about data quality and does not authorize generator or synthetic-arm work"
   },
   "post_gate_descriptive_extension": {
-    "status": "PROSPECTIVELY_AUTHORIZED_CALIBRATION_PENDING",
+    "status": "STOPPED_FROZEN_CALIBRATION_CRITICAL_MISSINGNESS_NO_GO",
     "effective_on": "2026-08-02",
     "preserves_coverage_redesign_stop": true,
     "authorization": "explicit user-authorized scientifically weaker one-accepted-hour descriptive Synthetic-1h LTX extension",
@@ -71,6 +71,29 @@
     "generator": "locally governed LTX-2.3; user-directed practical choice; LTX scored 19/28 and did not win the blinded bakeoff",
     "execution_order": ["governed_C_calibration_and_episode_plan_commitment", "public_dummy_LTX_final_topology_preflight", "freeze_and_approve_exact_resource_ceiling_if_required", "generate_and_seal_exactly_3600_credited_seconds", "three_matched_seed_synthetic_learner_runs"],
     "claim_limits": ["descriptive_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_more_than_one_accepted_synthetic_hour"]
+  },
+  "governed_C_calibration": {
+    "status": "NO_GO",
+    "topology": "1_H100",
+    "elapsed": "00:05:03",
+    "direct_monetary_cost_usd": 0,
+    "sampled_frame_count": 3193,
+    "grounding_event_count": 653,
+    "axis_count": 8,
+    "joint_count": 4,
+    "measured_axis_count": 3,
+    "high_missingness_axis_count": 5,
+    "frozen_missingness_max": 0.2,
+    "axis_missingness": {"activity_context_mixture": 0.6482931412464767, "egocentric_visual_regime": 0.17889132477294079, "scene_complexity": 0.5498436278342456, "hand_object_action_structure": 0.7660507359849671, "temporal_continuity_and_recurrence": 0.010091250670960838, "language_environment": 0.0, "audiovisual_grounding_opportunity": 0.4125129802699896, "diversity_and_heterogeneity": 0.2729070533948583},
+    "critical_axis_failure": "audiovisual_grounding_opportunity_high_missingness",
+    "calibration_commitment_sha256": "28ef267cd0608a33b50037a50e44a622875dc5aad5d1b2a422aa6612347fe3d5",
+    "provisional_episode_plan_commitment_sha256": "57803d35fc2d7b43cb84b7883e8b5a479848001faa205bb586081fe27625dc54",
+    "provisional_episode_plan_count": 1428,
+    "provisional_episode_plan_executable": false,
+    "ltx_preflight_status": "NOT_RUN_CALIBRATION_NO_GO",
+    "synthetic_generation_status": "NOT_RUN_CALIBRATION_NO_GO",
+    "synthetic_learner_status": "NOT_RUN_CALIBRATION_NO_GO",
+    "interpretation": "the frozen estimator did not provide sufficient C support for a critical axis or the later six-of-eight-axis condition; changing its margin estimator or missingness rule after observing this result is prohibited"
   },
   "governance_incident": {
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_PROCESSING_RESUMED",
@@ -115,5 +138,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "bounded governed ChildLens-C calibration and public episode-plan commitment for the user-authorized post-gate descriptive Synthetic-1h LTX extension; corrected assets and the failed Real-1h gate remain sealed"
+  "next_authorized_scope": "none within the post-gate descriptive extension; LTX preflight generation and synthetic learner training are stopped by the frozen calibration no-go, while corrected assets and the failed Real-1h gate remain sealed"
 }

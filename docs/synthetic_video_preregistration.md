@@ -710,3 +710,22 @@ and seals were unchanged. The prior rendered task output is not claimed to have
 been reverted or deleted. Future governed inspection uses a flat explicit-field
 whitelist that rejects lists, nested values, arbitrary strings, and hashes
 outside designated commitment fields.
+
+### Governed C-calibration result — frozen no-go
+
+The bounded calibration completed on one H100 in `00:05:03`, sampling 3,193
+frames and 653 grounding events. Five of eight axes exceeded the prospectively
+frozen 20% missingness ceiling. Activity/context was 64.83% missing, scene
+complexity 54.98%, hand-object action 76.61%, audiovisual grounding 41.25%, and
+diversity/heterogeneity 27.29%. Egocentric visual regime (17.89%), temporal
+continuity/recurrence (1.01%), and language environment (0%) were measured
+within the ceiling.
+
+Audiovisual grounding is a frozen critical axis, and three measured axes cannot
+support the later requirement that at least six of eight axes be within
+calibration tolerance. The calibration commitment is `28ef267c…e3d5`; a
+1,428-plan governed episode-plan commitment `57803d35…dc54` is retained as
+provisional and non-executable. Lowering the 0.02 public-vision abstention
+margin, changing the estimator, or weakening missingness after observing this
+result would be post hoc and is prohibited. LTX final-topology preflight,
+generation, and Synthetic-1h learner training therefore did not run.

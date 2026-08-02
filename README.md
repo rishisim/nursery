@@ -131,5 +131,12 @@ Git. The authorized applicant/data-steward reviewed the incident, required no
 additional reporting or remediation, and authorized processing to resume. An
 aggregate-only containment check found zero restricted-key matches in tracked
 Git content, and future governed inspection uses a flat whitelisted reporter.
+The resumed bounded C calibration then stopped the descriptive extension. Five
+of eight axes exceeded the frozen 20% missingness ceiling; the critical
+audiovisual-grounding axis had 41.25% missingness, and only three axes were
+measured within the ceiling. Its governed target and provisional plan
+commitments are retained, but the plan is non-executable. The frozen threshold
+was not relaxed and the estimator was not replaced. LTX topology preflight,
+generation, and Synthetic-1h learner training were not run.
 Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
 generation remain unauthorized.

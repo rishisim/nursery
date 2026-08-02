@@ -1,6 +1,6 @@
 {
   "schema_version": 6,
-  "status": "POST_GATE_DESCRIPTIVE_SYNTHETIC_1H_AUTHORIZED_CALIBRATION_PENDING",
+  "status": "STOP_POST_GATE_DESCRIPTIVE_SYNTHETIC_1H_CALIBRATION_CRITICAL_MISSINGNESS_NO_GO",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -70,7 +70,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "FROZEN_PRE_GENERATION_GOVERNED_MEASUREMENT_PENDING",
+    "status": "NO_GO_CRITICAL_AXIS_HIGH_MISSINGNESS_5_OF_8",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -144,8 +144,30 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "USER_AUTHORIZED_POST_GATE_DESCRIPTIVE_EXTENSION_CALIBRATION_PENDING",
-    "authorization_interpretation": "local applicant-only LTX execution keeps every C aggregate and aggregate-conditioned generator input inside governed UTD storage and grants no third-party access"
+    "local_generator_gate": "NO_GO_FROZEN_CRITICAL_AXIS_MISSINGNESS_STOP_BEFORE_LTX_PREFLIGHT",
+    "authorization_interpretation": "local applicant-only LTX execution would keep every C aggregate and aggregate-conditioned generator input inside governed UTD storage and grant no third-party access, but the frozen calibration no-go prevents execution",
+    "governed_result": {
+      "status": "NO_GO",
+      "job_topology": "1_H100",
+      "job_elapsed": "00:05:03",
+      "direct_monetary_cost_usd": 0,
+      "sampled_frame_count": 3193,
+      "grounding_event_count": 653,
+      "axis_count": 8,
+      "joint_count": 4,
+      "missing_axis_count": 5,
+      "suppressed_cell_count": 37,
+      "axis_missingness": {"activity_context_mixture": {"fraction": 0.6482931412464767, "status": "HIGH_MISSINGNESS"}, "egocentric_visual_regime": {"fraction": 0.17889132477294079, "status": "MEASURED"}, "scene_complexity": {"fraction": 0.5498436278342456, "status": "HIGH_MISSINGNESS"}, "hand_object_action_structure": {"fraction": 0.7660507359849671, "status": "HIGH_MISSINGNESS"}, "temporal_continuity_and_recurrence": {"fraction": 0.010091250670960838, "status": "MEASURED"}, "language_environment": {"fraction": 0.0, "status": "MEASURED"}, "audiovisual_grounding_opportunity": {"fraction": 0.4125129802699896, "status": "HIGH_MISSINGNESS_CRITICAL"}, "diversity_and_heterogeneity": {"fraction": 0.2729070533948583, "status": "HIGH_MISSINGNESS"}},
+      "frozen_missingness_max": 0.2,
+      "later_axes_required_within_tolerance": 6,
+      "measured_axis_count": 3,
+      "calibration_commitment_sha256": "28ef267cd0608a33b50037a50e44a622875dc5aad5d1b2a422aa6612347fe3d5",
+      "provisional_episode_plan_commitment_sha256": "57803d35fc2d7b43cb84b7883e8b5a479848001faa205bb586081fe27625dc54",
+      "provisional_episode_plan_count": 1428,
+      "episode_plan_status": "PROVISIONAL_NOT_EXECUTABLE_CALIBRATION_NO_GO",
+      "engineering_attempts": {"pre_result_failure_count": 1, "failure_class": "EDGE_GRID_SHAPE_MISMATCH", "scientific_or_calibration_output_from_failed_attempt": false, "canonical_repair_commit": "e2a5863"},
+      "stop_reason": "the critical audiovisual-grounding axis exceeded the frozen missingness ceiling and only three of eight axes are measured, so the preregistered six-axis scale-up condition cannot be assessed without changing the observed protocol"
+    }
   },
   "budgets_credited_hours": {"real": 1, "synthetic_accepted": 1, "synthetic_above_one_hour_prohibited": true},
   "nested_order": "HMAC-SHA-256(secret_budget_key, UTF8('train-budget') || UTF8(opaque_session_id)); then HMAC-SHA-256(secret_budget_key, UTF8('train-item') || UTF8(opaque_media_id))",
@@ -164,7 +186,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_POST_GATE_DESCRIPTIVE_EXTENSION_CALIBRATION_PENDING",
+    "status": "SELECTED_LOCAL_NOT_RUN_CALIBRATION_NO_GO",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
@@ -181,7 +203,7 @@
     "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "USER_AUTHORIZED_POST_GATE_DESCRIPTIVE_EXTENSION; execution remains conditional on governed C calibration and episode-plan commitment, bounded LTX final-topology preflight, exact resource ceiling approval if still required, and an accepted-corpus seal of exactly 3600 credited seconds",
+  "synthetic_arm": "NOT_RUN_FROZEN_CALIBRATION_NO_GO; user authorization remains documented but cannot override the prospectively frozen critical-axis and missingness rules",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
   "former_directionally_competitive_rule_not_permitted_for_post_gate_extension": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",
