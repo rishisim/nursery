@@ -1,6 +1,6 @@
 {
   "schema_version": 5,
-  "status": "FROZEN_COVERAGE_REDESIGN_REAL_1H_POSITIVE_CONTROL_PENDING",
+  "status": "FROZEN_COVERAGE_REDESIGN_REAL_1H_POSITIVE_CONTROL_BLOCKED_EXTERNAL_JUNO_DNS_BEFORE_SUBMISSION",
   "claim_role": "three_seed_exploratory_directional_equal_one_accepted_hour_pilot_not_equivalence_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -80,7 +80,7 @@
   "checkpoint_rule": "for each matched seed save byte-identical initialized state before optimization; Real-1h and Synthetic-1h use the checkpoint immediately after exactly 4668 scheduler steps; no arm-specific tuning stopping or selection",
   "initialized_baseline": "evaluate byte-identical 0h initialization before training without adapting any rule",
   "real_1h_positive_control_gate": {
-    "status": "FROZEN_PRE_SCORE",
+    "status": "FROZEN_PRE_SCORE_BLOCKED_EXTERNAL_JUNO_DNS_BEFORE_SUBMISSION",
     "realistic_lexical_macro_seed_mean_min": 0.52,
     "mean_improvement_over_seed_matched_initialization_min": 0.02,
     "minimum_seeds_with_positive_improvement": 2,

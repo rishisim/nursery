@@ -112,5 +112,8 @@ at 24/28, and LTX at 19/28. No generation may begin unless the redesigned
 multi-pass Real-1h positive control passes, followed by governed C calibration
 and a bounded final-topology LTX preflight. Synthetic data remains capped at
 exactly one accepted credited hour.
+The redesigned Real-1h jobs have not been submitted because the institutional
+Juno hostname was not resolvable from the applicant workstation on 2026-08-02;
+resume from the frozen canonical config after UTD connectivity is restored.
 Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
 generation remain unauthorized.
