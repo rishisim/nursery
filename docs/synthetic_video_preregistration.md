@@ -568,23 +568,21 @@ control later execution:
    does not block Phase 4 or compliant applicant-only ChildLens work.
 
 The prior Stage B commitments are provisional and superseded by the corrected
-seals. Only the frozen one-seed lean equal-duration pilot is now in scope:
-initialized 0h, Real-1h, conditional nested Real-3h only if Real-1h fails, and a
-matched synthetic arm only if both real learnability and the bounded public
-generator gate pass. Confirmatory multi-seed Phase 5, automatic 6h acquisition,
+seals. The frozen one-seed lean equal-duration pilot evaluated initialized 0h,
+Real-1h, and the sole permitted nested Real-3h extension. Both trained budgets
+failed the realistic lexical learnability gate, so the stop rule fired before
+synthetic generation. Confirmatory multi-seed Phase 5, automatic 6h acquisition,
 equivalence testing, and inferential scientific claims remain blocked.
 
 ### Prospective lean generator amendment
 
 After the frozen Real-1h gate result but before any matched-corpus generation
-or synthetic learner score, the authorized applicant selected locally run
-LTX-2.3 22B Distilled 1.1 for the lean pilot because the hosted MiniMax and
-Gemini one-hour prices were unsuitable for the prototype budget. This
-cost-driven amendment supersedes the hosted MiniMax selection recorded at
-`821fddc`, whose provenance remains in Git history. It is not a reinterpretation
-of the completed blinded bakeoff: Gemini led that screen at 27/28 primary
-checks, followed by MiniMax at 25/28, Seedance at 24/28, and LTX at 19/28. LTX
-must not be described as the quality winner.
+or synthetic learner score, the authorized applicant selected MiniMax H3 for
+the lean pilot. This latest prospective choice supersedes the intervening
+Gemini and local-LTX selections while preserving them in Git history. It is not
+a reinterpretation of the completed blinded bakeoff: Gemini led that screen at
+27/28 primary checks, followed by MiniMax at 25/28, Seedance at 24/28, and LTX
+at 19/28. MiniMax must not be described as the bakeoff winner.
 
 The ChildLens boundary remains strict for source and reconstructive material.
 Only after governed measurement, disclosure review, sparse-cell suppression,
@@ -595,14 +593,11 @@ hosted generator receives ChildLens media, transcripts, exact vocabulary,
 identifiers, embeddings, row-level or per-child/session values, evaluation
 concepts, or reconstructive combinations.
 
-Execution pins `Lightricks/LTX-2@9377758`, LTX-2.3 weights revision
-`4229404`, and Gemma text-encoder revision `68f7ee4`, using the official
-distilled two-stage runner, seed 314159, no prompt enhancement, and the frozen
-modular German TTS path. The completed public pilot produced four valid clips
-on one A100 80 GB in 609.10 seconds, projecting about 30.2 A100-equivalent GPU
-hours per raw output hour before credited-yield loss or retries. Juno has zero
-direct monetary charge, but GPU time, storage, energy, failures, QA, and labor
-remain in the cost ledger. No corpus generation is authorized until Real-3h
-passes, the \(C\) aggregate and episode-plan commitments are frozen, and a
-bounded public/dummy preflight locks the final Juno topology and exact GPU-hour,
-wall-time, storage, attempt, and retry ceilings.
+The selected hosted route is `minimax/hailuo-3` through OpenRouter using the
+exact request frozen by the completed bakeoff. Video generation is asynchronous
+and ineligible for ZDR, and hosted outputs remain blocked for learner training
+without written provider and institutional clearance. As of 2026-08-01, no
+official immutable Hailuo 3 video-weight release with a verified compatible
+license had been established for governed local execution. No corpus was
+generated because Real-3h failed the learnability gate; a later generator route
+cannot revive this stopped pilot without a new prospective protocol.

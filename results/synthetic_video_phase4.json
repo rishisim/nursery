@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_REAL_1H_FAILED_REAL_3H_IN_PROGRESS",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_LEAN_PILOT_STOPPED_REAL_3H_LEARNABILITY_FAILURE",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -32,14 +32,15 @@
   "lexical_commitment": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4",
   "temporal_commitment": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e",
   "lean_pilot": {
-    "status": "REAL_1H_LEARNABILITY_GATE_FAILED_CONDITIONAL_REAL_3H_AUTHORIZED",
-    "learner_result_commitment": "5b3f4fd97eb471f18355609d75eef9b7d79d4739d346ef7f7a363375f09f4c3e",
-    "initialized_realistic_macro": 0.4781328847771237,
-    "real_1h_realistic_macro": 0.40201850294365016,
-    "real_1h_minus_initialized": -0.07611438183347352,
-    "real_1h_temporal_noncatastrophic": true,
-    "real_1h_gate_pass": false,
-    "next_action": "run_once_at_nested_exact_3_credited_hours_with_same_seed_570_steps_and_gate; stop on failure"
+    "status": "STOP_REAL_1H_AND_REAL_3H_LEARNABILITY_GATES_FAILED",
+    "prepare_3h_commitment": "5d4415dbaaa7af857818a9cd55037f35c0555d05dd4c286e85d474f5906f4eae",
+    "real_1h_commitment": "5b3f4fd97eb471f18355609d75eef9b7d79d4739d346ef7f7a363375f09f4c3e",
+    "real_3h_commitment": "e9f0de8c7ef361cdea2acd0913ca719506300e886c2cc8146a455ee3333782fb",
+    "initialized": {"realistic_nouns": 0.43902439024390244, "realistic_adjectives": 0.5172413793103449, "realistic_macro": 0.4781328847771237, "cartoon_nouns": 0.5094339622641509, "cartoon_adjectives": 0.4634146341463415, "temporal_recall_at_1": 0.12963540043627297, "temporal_mrr": 0.34290722521479844},
+    "real_1h": {"realistic_nouns": 0.3902439024390244, "realistic_adjectives": 0.41379310344827586, "realistic_macro": 0.40201850294365016, "cartoon_nouns": 0.4528301886792453, "cartoon_adjectives": 0.4634146341463415, "temporal_recall_at_1": 0.12246805858522904, "temporal_mrr": 0.3418747866862551, "minus_initialized": -0.07611438183347352, "temporal_noncatastrophic": true, "gate_pass": false},
+    "real_3h": {"credited_seconds": 10800.0, "reserve_accepted_seconds": 1316.3099999999831, "realistic_nouns": 0.3902439024390244, "realistic_adjectives": 0.41379310344827586, "realistic_macro": 0.40201850294365016, "cartoon_nouns": 0.5471698113207547, "cartoon_adjectives": 0.5609756097560976, "temporal_recall_at_1": 0.1274540355250857, "temporal_mrr": 0.3393947825312738, "minus_initialized": -0.07611438183347352, "temporal_noncatastrophic": true, "gate_pass": false},
+    "synthetic_arm_status": "NOT_RUN_STOP_RULE",
+    "interpretation": "the pinned learner and frozen one-seed 1h/3h budgets did not demonstrate primary realistic lexical learnability; no interpretable equal-duration synthetic comparison is authorized"
   },
   "common_asset_references": {
     "Real-full": {"lexical": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4", "temporal": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e"},
@@ -73,5 +74,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "one-seed initialized then Real-1h learnability gate, conditional nested Real-3h only on failure, and matched synthetic arm only after both real and public generator gates pass"
+  "next_authorized_scope": "none within this lean pilot; any further learner budget or synthetic comparison requires a new prospective user-authorized protocol and must not be described as confirmatory Phase 5"
 }

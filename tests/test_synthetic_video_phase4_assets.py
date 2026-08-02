@@ -93,7 +93,7 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_REAL_1H_FAILED_REAL_3H_IN_PROGRESS"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEAN_PILOT_STOPPED_REAL_3H_LEARNABILITY_FAILURE"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -104,7 +104,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_lean_equal_duration_proof_is_frozen_before_scores():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "REAL_1H_GATE_FAILED_REAL_3H_EXTENSION_FROZEN_PRE_SCORE"
+    assert proof["status"] == "STOP_REAL_3H_LEARNABILITY_GATE_FAILED"
     assert proof["budgets_credited_hours"] == {
         "primary": 1,
         "conditional_real_extension": 3,
@@ -118,19 +118,17 @@ def test_lean_equal_duration_proof_is_frozen_before_scores():
     assert proof["real_1h_gate"]["improvement_over_initialized_min"] == 0.02
     assert proof["conditional_real_3h_gate"]["objective_steps"] == 570
     assert proof["conditional_real_3h_gate"]["failure_action"].startswith("stop_without_synthetic")
-    assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
+    assert proof["synthetic_arm"].startswith("NOT_AUTHORIZED")
+    assert proof["generator_gate"]["selected"] == "minimax/hailuo-3"
     assert proof["schema_version"] == 4
-    assert proof["generator_gate"]["status"].startswith("SELECTED_LOCAL")
-    assert proof["generator_gate"]["implementation"]["commit"] == "9377758131b1ffde4b7f766804590a6617bf2ab9"
-    assert proof["generator_gate"]["implementation"]["seed"] == 314159
-    assert proof["generator_gate"]["weights"]["revision"] == "4229404625088d21c4f112eb640fb04a0900ee25"
-    assert proof["generator_gate"]["resource_projection"]["juno_direct_monetary_cost_usd"] == 0
-    assert proof["generator_gate"]["resource_projection"]["one_raw_hour_plus_10_percent_attempt_reserve_gpu_hours"] == 33.223
-    assert "LTX 19/28" in proof["generator_gate"]["bakeoff_interpretation"]
+    assert "LOCAL_OPEN_WEIGHT_PROVENANCE" in proof["generator_gate"]["status"]
+    assert proof["generator_gate"]["request"]["input_seed"] == "unsupported_and_not_sent"
+    assert proof["generator_gate"]["open_weight_status"].startswith("NOT_YET_VERIFIED")
+    assert "Gemini led" in proof["generator_gate"]["bakeoff_interpretation"]
     assert proof["generator_gate"]["no_substitution"] is True
     assert proof["calibration_C"]["source"] == "development_set_C_only_never_training_validation_or_evaluation"
-    assert proof["calibration_C"]["local_generator_gate"].startswith("CONDITIONALLY_AUTHORIZED")
-    assert "governed Juno" in proof["calibration_C"]["local_generator_input"]
+    assert proof["calibration_C"]["hosted_provider_gate"].startswith("BLOCKED_PENDING_AFFIRMATIVE")
+    assert "public self-authored" in proof["calibration_C"]["hosted_generator_input"]
     assert "no full distributional calibration claim" in proof["calibration_C"]["limitations"]
     assert len(proof["calibration_C"]["axes"]) == 8
     assert proof["calibration_C"]["joint_distributions"] == [
