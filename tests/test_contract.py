@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 3
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_PENDING"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO"
     validate_phase_state(config)
     assert schedule_cycle(config["learner"]["schedule"]) == [
         "contrastive",

@@ -1,6 +1,6 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — DOMAIN-APPROPRIATE CALIBRATION EXTRACTOR FEASIBILITY PENDING**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — DOMAIN-APPROPRIATE CALIBRATION EXTRACTOR PRE-MODEL NO-GO**
 
 **Evidence cut-off:** 2026-08-02
 
@@ -825,3 +825,32 @@ weight terms compatible with local academic processing, feasible pinned
 dependencies and Juno resource expectations, and a successful local-files-only
 reload plan. A failure of any component is a no-go for this single stack; no
 replacement model or threshold relaxation is permitted.
+
+### Domain-appropriate extractor pre-model result — frozen no-go
+
+The official repositories were pinned before inference: EgoVLPv2 at
+`550c0596…c84`, EgoHOS at `cd9bdf42…3e7`, Grounding DINO at
+`856dde20…e44`, SAM 2.1 at `2b90b9f5…1a4`, and DINOv2 at
+`7764ea0f…fc8`. All five code-license records were resolved. SAM 2.1 and
+DINOv2 explicitly cover their code and model checkpoints under Apache-2.0.
+No model inference or public fixture selection occurred.
+
+The pre-model gate failed on the first validity-critical component. The
+official EgoVLPv2 zero-shot Charades-Ego checkpoint URL returned HTTP `403`
+for both HEAD and ranged GET requests, including three user-agent variants.
+Its bytes and SHA-256 therefore could not be resolved. The official project
+record applies MIT to EgoVLPv2 but does not separately state terms for the
+externally hosted checkpoint artifact, so the required weight-terms record is
+also unresolved. A Juno-side cross-check was not available because SSH
+public-key authentication was unavailable in this session; that does not
+change the local 403 or missing checkpoint-specific terms.
+
+The single-stack feasibility status is `NO-GO`. Per the frozen rule, no
+alternate checkpoint or model is tried. Dependency integration, VRAM/storage
+sizing, local-files-only reload, adapters, public development, sealed holdout,
+and the governed C rerun were not reached. Both earlier no-gos and commitments
+remain intact; LTX preflight, generation, and synthetic learner training remain
+stopped. Resumption requires the same official EgoVLPv2 checkpoint to become
+locally obtainable with an immutable byte hash and explicit academic-local
+weight terms. The compact feasibility record commitment is
+`b5dd6c03…a49d0`.

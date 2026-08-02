@@ -1,6 +1,6 @@
 {
   "schema_version": 9,
-  "status": "CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_PENDING",
+  "status": "STOP_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -70,7 +70,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "ORIGINAL_AND_FIRST_REPAIR_NO_GOS_PRESERVED_DOMAIN_APPROPRIATE_REDESIGN_FEASIBILITY_PENDING",
+    "status": "ORIGINAL_AND_FIRST_REPAIR_NO_GOS_PRESERVED_DOMAIN_APPROPRIATE_REDESIGN_PREMODEL_FEASIBILITY_NO_GO",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -192,7 +192,7 @@
         "governed_pass_rule": "all critical axes at or below unchanged 0.20 missingness and at least six of eight axes measured; otherwise repaired calibration no-go"
       },
       "domain_appropriate_redesign": {
-        "status": "FROZEN_PENDING_PREMODEL_FEASIBILITY",
+        "status": "NO_GO_PREMODEL_FEASIBILITY",
         "effective_on": "2026-08-02",
         "authorization": "explicit user-authorized prospective extractor redesign after preserving the original governed C no-go and the PE-Core plus OWLv2 public no-go",
         "scientific_question": "can one fixed domain-appropriate public extractor stack pass a disjoint egocentric-video public holdout and then measure C under the unchanged missingness and critical-axis gate without using C or learner or generator outcomes for model or threshold selection",
@@ -205,8 +205,8 @@
             "checkpoint_url": "https://www.cis.jhu.edu/~shraman/EgoVLPv2/ckpts/Pre-trained/EgoVLPv2_smallproj_epoch1.pth",
             "code_license": "MIT",
             "code_license_sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
-            "weight_license_terms": "PREMODEL_VERIFICATION_REQUIRED",
-            "resolved_weight_sha256": "PREMODEL_VERIFICATION_REQUIRED",
+            "weight_license_terms": "UNRESOLVED_NO_CHECKPOINT_SPECIFIC_TERMS_IN_OFFICIAL_RECORD",
+            "resolved_weight_sha256": "UNRESOLVED_OFFICIAL_CHECKPOINT_URL_HTTP_403",
             "role": "short temporal-window video-language scoring over the existing eight public coarse context labels with fixed prompt ensembles and explicit ambiguous abstention"
           },
           "hand_object_action": {
@@ -316,6 +316,43 @@
           "no_restricted_mount_during_public_qualification": true,
           "failure_action": "STOP_SINGLE_STACK_WITH_EXACT_BLOCKER_NO_SUBSTITUTION"
         },
+        "premodel_feasibility_result": {
+          "schema_version": 1,
+          "status": "NO_GO",
+          "checked_on": "2026-08-02",
+          "public_only": true,
+          "new_model_inference_executed": false,
+          "public_development_opened": false,
+          "public_holdout_opened": false,
+          "restricted_mount_present": false,
+          "governed_C_reopened": false,
+          "stack_component_count": 5,
+          "repository_commit_pin_count": 5,
+          "code_license_record_count": 5,
+          "blocking_component": "EgoVLPv2_activity_context",
+          "blocking_checkpoint": "EgoVLPv2_smallproj_epoch1.pth",
+          "official_checkpoint_HEAD_http_status": 403,
+          "official_checkpoint_ranged_GET_http_status": 403,
+          "user_agent_variants_checked": 3,
+          "checkpoint_bytes_resolved": false,
+          "checkpoint_sha256_resolved": false,
+          "checkpoint_specific_weight_terms_found": false,
+          "repository_code_license": "MIT",
+          "Juno_crosscheck": "NOT_RUN_SSH_PUBLICKEY_AUTH_UNAVAILABLE",
+          "dependency_VRAM_storage_and_local_reload_status": "NOT_RUN_AFTER_BLOCKING_COMPONENT_FAILED",
+          "other_component_status": {
+            "EgoHOS": "CODE_PINNED_WEIGHT_TERMS_AND_BYTES_UNRESOLVED_NOT_RUN_AFTER_BLOCKER",
+            "GroundingDINO": "CODE_PINNED_CHECKPOINT_HASH_NOT_RUN_AFTER_BLOCKER",
+            "SAM_2_1": "CODE_AND_WEIGHT_TERMS_RESOLVED_CHECKPOINT_HASH_NOT_RUN_AFTER_BLOCKER",
+            "DINOv2": "CODE_AND_WEIGHT_TERMS_RESOLVED_CHECKPOINT_HASH_NOT_RUN_AFTER_BLOCKER"
+          },
+          "stop_reason": "the frozen EgoVLPv2 checkpoint cannot be downloaded from its official URL to resolve immutable bytes and SHA-256 and the official project record does not separately state checkpoint weight terms; the single-stack feasibility gate therefore fails before inference",
+          "resume_condition": "the same official EgoVLPv2 checkpoint must become locally obtainable with immutable byte hash and explicit academic-local weight terms; then repeat only this pre-model gate without substituting a model or changing thresholds"
+        },
+        "compact_feasibility_result": {
+          "record": "results/synthetic_video_phase4.json#governed_C_calibration_extractor_redesign",
+          "commitment_sha256": "b5dd6c03d7b75e3be2f437c5247b66424f9f6aee28fbaaebbba6d0fa2f0a49d0"
+        },
         "governed_C_gate_unchanged": {"maximum_axis_missing_fraction": 0.2, "critical_axes_must_all_pass": true, "measured_axes_min": 6, "axis_count": 8, "joint_count": 4, "omnibus_score": "PROHIBITED"},
         "execution_controls": {
           "canonical_entry_point": "scripts/run_synthetic_video_calibration.py",
@@ -382,8 +419,8 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "BLOCKED_PENDING_DOMAIN_APPROPRIATE_EXTRACTOR_PREMODEL_FEASIBILITY_AND_PUBLIC_HOLDOUT",
-    "authorization_interpretation": "the original calibration no-go and first public-repair no-go remain valid; the new single-stack redesign is prospective and may proceed only through its pre-model feasibility and public egocentric holdout before C can be reopened",
+    "local_generator_gate": "NO_GO_DOMAIN_APPROPRIATE_EXTRACTOR_PREMODEL_FEASIBILITY",
+    "authorization_interpretation": "the original calibration no-go and first public-repair no-go remain valid; the new single-stack redesign stopped before inference because the frozen EgoVLPv2 checkpoint could not be immutably resolved or separately licensed",
     "governed_result": {
       "status": "NO_GO",
       "job_topology": "1_H100",
@@ -452,7 +489,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_BLOCKED_PENDING_DOMAIN_APPROPRIATE_EXTRACTOR_GATES",
+    "status": "SELECTED_LOCAL_NOT_RUN_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
@@ -469,7 +506,7 @@
     "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "NOT_RUN; both earlier calibration no-gos are preserved and the user-authorized domain-appropriate extractor redesign must pass pre-model feasibility public egocentric qualification and the unchanged governed C gate before LTX work",
+  "synthetic_arm": "NOT_RUN; both earlier calibration no-gos are preserved and the user-authorized domain-appropriate extractor redesign stopped at its pre-model EgoVLPv2 checkpoint availability and weight-terms gate before public inference C reopening or LTX work",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
   "former_directionally_competitive_rule_not_permitted_for_post_gate_extension": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",

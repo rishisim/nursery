@@ -151,12 +151,14 @@ preflight, generation, and synthetic learner training remain stopped.
 Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
 generation remain unauthorized.
 
-The user has now authorized one prospective domain-appropriate calibration
+The user then authorized one prospective domain-appropriate calibration
 extractor redesign without changing either prior no-go. The single frozen
-stack is EgoVLPv2 + EgoHOS + Grounding DINO/SAM 2.1 + DINOv2, retaining the
-working deterministic and shared-language modules. Before any new inference,
-its exact code, checkpoints, hashes, code/weight terms, dependencies, local
-reload behavior, and Juno feasibility must pass. Only then may it face a
-disjoint Charades-Ego/VISOR/self-authored egocentric-video development and
-sealed holdout gate. C, LTX, generation, and synthetic training remain blocked
-until the complete public gate and unchanged governed C gate pass.
+stack was EgoVLPv2 + EgoHOS + Grounding DINO/SAM 2.1 + DINOv2, retaining the
+working deterministic and shared-language modules. It stopped at the pre-model
+feasibility gate: the official EgoVLPv2 zero-shot Charades-Ego checkpoint URL
+returned HTTP 403, so checkpoint bytes and SHA-256 could not be resolved, and
+the official record did not separately state checkpoint-weight terms. No model
+inference, public development/holdout, C reopening, LTX run, generation, or
+synthetic training occurred. Resumption requires that same official checkpoint
+with immutable bytes/hash and explicit academic-local weight terms; model
+substitution and threshold relaxation remain prohibited.

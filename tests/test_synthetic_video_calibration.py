@@ -57,7 +57,7 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     }
 
     redesign = calibration["extractor"]["domain_appropriate_redesign"]
-    assert redesign["status"] == "FROZEN_PENDING_PREMODEL_FEASIBILITY"
+    assert redesign["status"] == "NO_GO_PREMODEL_FEASIBILITY"
     assert set(redesign["single_stack"]) == {
         "activity_context",
         "hand_object_action",
@@ -82,6 +82,13 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     assert gates["tracked_category_temporal_presence_f1_min"] == 0.7
     assert gates["audiovisual_referent_timing_macro_f1_min"] == 0.65
     assert gates["near_duplicate_balanced_accuracy_min"] == 0.9
+    feasibility = redesign["premodel_feasibility_result"]
+    assert feasibility["status"] == "NO_GO"
+    assert feasibility["blocking_component"] == "EgoVLPv2_activity_context"
+    assert feasibility["new_model_inference_executed"] is False
+    assert feasibility["checkpoint_bytes_resolved"] is False
+    assert feasibility["checkpoint_sha256_resolved"] is False
+    assert feasibility["checkpoint_specific_weight_terms_found"] is False
 
 
 def test_bucket_and_union_duration_are_frozen_and_exact() -> None:
