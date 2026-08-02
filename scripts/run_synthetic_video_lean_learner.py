@@ -34,7 +34,7 @@ def state_hash(state: dict[str, torch.Tensor]) -> str:
         digest.update(key.encode())
         digest.update(str(tensor.dtype).encode())
         digest.update(canonical(list(tensor.shape)))
-        digest.update(tensor.view(torch.uint8).numpy().tobytes())
+        digest.update(tensor.reshape(-1).view(torch.uint8).numpy().tobytes())
     return digest.hexdigest()
 
 
