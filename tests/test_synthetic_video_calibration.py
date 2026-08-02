@@ -91,7 +91,7 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     assert feasibility["checkpoint_specific_weight_terms_found"] is False
 
     selection = calibration["extractor"]["activity_checkpoint_selection_amendment"]
-    assert selection["status"] == "FROZEN_BEFORE_EMPIRICAL_CANDIDATE_OUTCOMES"
+    assert selection["status"] == "PUBLIC_DEVELOPMENT_NO_GO_NO_ELIGIBLE_CANDIDATE"
     assert [candidate["candidate_id"] for candidate in selection["bounded_candidates"]] == [
         "egohod_egovideo_l_zero_shot",
         "videoprism_lvt_l_zero_shot",
@@ -108,6 +108,13 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     assert selection["independent_holdout"]["activity_context_macro_f1_min_unchanged"] == 0.6
     assert selection["resource_ceiling"]["GPU_count"] == 1
     assert selection["execution_controls"]["DDP"] is False
+    development = selection["development_selection_result"]
+    assert development["status"] == "NO_GO_NO_ELIGIBLE_CANDIDATE"
+    assert development["eligible_candidate_count"] == 0
+    assert development["winner_selected"] is False
+    assert development["holdout_opened"] is False
+    assert development["governed_C_reopened"] is False
+    assert development["selection_commitment_verified"] is True
     runtime = selection["runtime_environment"]
     assert runtime["container"]["sha256"] == "f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792"
     assert runtime["egohod"]["input_resolution"] == 336

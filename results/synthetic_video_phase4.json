@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_PRIOR_CALIBRATION_NO_GOS_PRESERVED_ACTIVITY_CHECKPOINT_SELECTION_FROZEN",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO_PRIOR_FAILURES_PRESERVED",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -63,7 +63,7 @@
     "interpretation": "the multi-pass Real-1h positive control missed only the frozen mean-gain component; this remains inconclusive about data quality and does not authorize generator or synthetic-arm work"
   },
   "post_gate_descriptive_extension": {
-    "status": "PENDING_FROZEN_ACTIVITY_CHECKPOINT_SELECTION_THEN_UNCHANGED_PUBLIC_AND_C_GATES",
+    "status": "STOPPED_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO",
     "effective_on": "2026-08-02",
     "preserves_coverage_redesign_stop": true,
     "authorization": "explicit user-authorized scientifically weaker one-accepted-hour descriptive Synthetic-1h LTX extension",
@@ -72,7 +72,7 @@
     "execution_order": ["governed_C_calibration_and_episode_plan_commitment", "public_dummy_LTX_final_topology_preflight", "freeze_and_approve_exact_resource_ceiling_if_required", "generate_and_seal_exactly_3600_credited_seconds", "three_matched_seed_synthetic_learner_runs"],
     "claim_limits": ["descriptive_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_more_than_one_accepted_synthetic_hour"],
     "prior_stop_preserved": "STOPPED_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO",
-    "synthetic_work_status": "NOT_RUN_ACTIVITY_CHECKPOINT_SELECTION_PENDING"
+    "synthetic_work_status": "NOT_RUN_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO"
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -288,7 +288,31 @@
     "vjepa2_sizing_commitment_sha256": "89b03f90d3c60c5afa07cff084162377b721437b9675646cdc322cb6fa56a617",
     "vjepa2_record_commitment_verified": true,
     "aggregate_total_runtime_seconds": 92.71850577741861,
-    "next_step": "run the one frozen public-development comparison sequentially on one H100"
+    "next_step_at_sizing_pass": "run the one frozen public-development comparison sequentially on one H100",
+    "subsequent_status": "PUBLIC_DEVELOPMENT_NO_GO_NO_ELIGIBLE_CANDIDATE"
+  },
+  "governed_C_activity_checkpoint_development_result": {
+    "status": "NO_GO_NO_ELIGIBLE_CANDIDATE",
+    "candidate_count": 3,
+    "eligible_candidate_count": 0,
+    "candidate_output_commitments": {
+      "egohod_egovideo_l_zero_shot": "ce0483551a68f0b7aae85a915ba32683c2f4c2f1d1f048d2ba55e98e502ed718",
+      "videoprism_lvt_l_zero_shot": "2d6bb6a83f6b958163f4b9375f2462f0efa0b192affa3f81230d908521c7aa46",
+      "vjepa2_vitl_public_probe": "bdc199f8112c8c68547b9cc92db609bc00318dcd71f3549348c0a94c47910f32"
+    },
+    "candidates": {
+      "egohod_egovideo_l_zero_shot": {"macro_f1": 0.6679572962200891, "worst_class_recall": 0.6470588235294118, "coverage": 1.0, "ordered_minus_shuffled_mean": -0.09132890249034191, "ordered_minus_repeated_mean": -0.7401739383021395, "ordered_over_shuffled_positive_fraction": 0.3548387096774194, "ordered_over_repeated_positive_fraction": 0.2903225806451613, "failure_count": 0, "eligible": false},
+      "videoprism_lvt_l_zero_shot": {"macro_f1": 0.6409613198003572, "worst_class_recall": 0.5555555555555556, "coverage": 1.0, "ordered_minus_shuffled_mean": 0.011689159065161272, "ordered_minus_repeated_mean": -0.5451872211630308, "ordered_over_shuffled_positive_fraction": 0.5161290322580645, "ordered_over_repeated_positive_fraction": 0.1935483870967742, "failure_count": 0, "eligible": false},
+      "vjepa2_vitl_public_probe": {"macro_f1": 0.5732847302881054, "worst_class_recall": 0.2222222222222222, "coverage": 1.0, "ordered_minus_shuffled_mean": -0.0043282662057571, "ordered_minus_repeated_mean": 0.045649368270144416, "ordered_over_shuffled_positive_fraction": 0.3225806451612903, "ordered_over_repeated_positive_fraction": 1.0, "failure_count": 0, "eligible": false}
+    },
+    "selection_commitment_sha256": "e11727dd309a01ee820264ff18afee33cf56b83fa2449301ce1be6e12670c29d",
+    "selection_commitment_verified": true,
+    "winner_selected": false,
+    "holdout_opened": false,
+    "governed_C_reopened": false,
+    "generator_or_synthetic_learner_outcome_opened": false,
+    "stop_rule_applied_without_relaxation_or_substitution": true,
+    "interpretation": "EgoHOD and VideoPrism cleared classification floors but failed frozen temporal controls; V-JEPA 2 also missed classification and shuffled-order controls; winning development was never itself sufficient for public-gate pass"
   },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",
@@ -311,7 +335,7 @@
     "new_dependency_manifest_commitment_sha256": "5fb4a9d3c4375621bc94b8d7c25a26f434c7c1de9226fadd9f50ffdd3023e81d",
     "repreparation_wall_time_seconds": 435,
     "installed_distribution_count": 91,
-    "next_step": "restart the already frozen blind one-item sizing"
+    "subsequent_status": "BLIND_SIZING_PASS_THEN_PUBLIC_DEVELOPMENT_NO_GO"
   },
   "governance_incident": {
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_PROCESSING_RESUMED",
@@ -356,5 +380,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "frozen public-development activity checkpoint selection, followed only on pass by winner seal and the unchanged complete public holdout; governed C and LTX remain gated"
+  "next_authorized_scope": "STOPPED_AT_FROZEN_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO; holdout governed C episode-plan rebuild LTX generation and synthetic learner remain unauthorized"
 }

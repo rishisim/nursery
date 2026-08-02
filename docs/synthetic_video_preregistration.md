@@ -1,6 +1,6 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — DOMAIN-APPROPRIATE CALIBRATION EXTRACTOR PRE-MODEL NO-GO**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ACTIVITY CHECKPOINT PUBLIC-DEVELOPMENT NO-GO**
 
 **Evidence cut-off:** 2026-08-02
 
@@ -1046,3 +1046,17 @@ passed with zero external calls, crashes, invalid output widths or retained
 scores; aggregate measured runtime was 92.72 seconds. The next authorized gate
 is the already frozen 48-item public-development comparison, run sequentially
 on one H100. Holdout and C remain unopened.
+
+The one frozen public-development comparison then ran once. All three
+candidates completed all 48 items with zero crashes, truncations, invalid
+records or external calls. EgoHOD had macro-F1 0.6680, worst-class recall
+0.6471 and coverage 1.0, but every temporal-control floor failed. VideoPrism
+had macro-F1 0.6410, worst-class recall 0.5556 and coverage 1.0; its ordered
+score exceeded shuffled on average, but it missed the repeated-frame mean and
+both positive-fraction floors. V-JEPA 2 had macro-F1 0.5733, worst-class recall
+0.2222 and coverage 1.0; it missed both classification floors plus the
+shuffled-order mean and positive-fraction floors. Thus `0/3` candidates were
+eligible. Selection commitment `e11727dd…c29d` verifies. The frozen action is
+`NO_GO_NO_ELIGIBLE_CANDIDATE`: no winner, holdout opening, governed-C rerun,
+episode-plan rebuild, LTX work or synthetic learner work is permitted, and no
+candidate or threshold may be added or relaxed in this task.

@@ -1,6 +1,6 @@
 {
   "schema_version": 10,
-  "status": "ACTIVITY_CHECKPOINT_BLIND_SIZING_PASS_PRIOR_NO_GOS_PRESERVED_PENDING_PUBLIC_DEVELOPMENT",
+  "status": "ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO_NO_ELIGIBLE_CANDIDATE_PRIOR_FAILURES_PRESERVED",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -372,7 +372,7 @@
       },
       "activity_checkpoint_selection_amendment": {
         "schema_version": 1,
-        "status": "FROZEN_BEFORE_EMPIRICAL_CANDIDATE_OUTCOMES",
+        "status": "PUBLIC_DEVELOPMENT_NO_GO_NO_ELIGIBLE_CANDIDATE",
         "effective_on": "2026-08-02",
         "authorization": "explicit user-authorized prospective replacement of only the unavailable EgoVLPv2 activity-context component after three preserved failures",
         "scientific_question": "which one bounded, immutable, locally executable temporal representation most defensibly measures the existing eight public activity-context labels on public egocentric video without using C or any learner generator or evaluation outcome",
@@ -623,7 +623,60 @@
           "completed_candidate_count": 3,
           "passing_candidate_count": 3,
           "aggregate_total_runtime_seconds": 92.71850577741861,
-          "scientific_candidate_outcomes_opened": false
+          "scientific_candidate_outcomes_opened_during_sizing": false
+        },
+        "development_selection_result": {
+          "status": "NO_GO_NO_ELIGIBLE_CANDIDATE",
+          "candidate_count": 3,
+          "eligible_candidate_count": 0,
+          "public_item_count_per_candidate": 48,
+          "candidate_output_commitments": {
+            "egohod_egovideo_l_zero_shot": "ce0483551a68f0b7aae85a915ba32683c2f4c2f1d1f048d2ba55e98e502ed718",
+            "videoprism_lvt_l_zero_shot": "2d6bb6a83f6b958163f4b9375f2462f0efa0b192affa3f81230d908521c7aa46",
+            "vjepa2_vitl_public_probe": "bdc199f8112c8c68547b9cc92db609bc00318dcd71f3549348c0a94c47910f32"
+          },
+          "candidate_metrics": {
+            "egohod_egovideo_l_zero_shot": {
+              "macro_f1": 0.6679572962200891,
+              "worst_class_recall": 0.6470588235294118,
+              "nonabstained_coverage": 1.0,
+              "ordered_minus_shuffled_mean": -0.09132890249034191,
+              "ordered_minus_repeated_mean": -0.7401739383021395,
+              "ordered_over_shuffled_positive_fraction": 0.3548387096774194,
+              "ordered_over_repeated_positive_fraction": 0.2903225806451613,
+              "failure_count": 0,
+              "failed_floors": ["ordered_minus_shuffled_mean", "ordered_minus_repeated_mean", "ordered_over_shuffled_positive_fraction", "ordered_over_repeated_positive_fraction"]
+            },
+            "videoprism_lvt_l_zero_shot": {
+              "macro_f1": 0.6409613198003572,
+              "worst_class_recall": 0.5555555555555556,
+              "nonabstained_coverage": 1.0,
+              "ordered_minus_shuffled_mean": 0.011689159065161272,
+              "ordered_minus_repeated_mean": -0.5451872211630308,
+              "ordered_over_shuffled_positive_fraction": 0.5161290322580645,
+              "ordered_over_repeated_positive_fraction": 0.1935483870967742,
+              "failure_count": 0,
+              "failed_floors": ["ordered_minus_repeated_mean", "ordered_over_shuffled_positive_fraction", "ordered_over_repeated_positive_fraction"]
+            },
+            "vjepa2_vitl_public_probe": {
+              "macro_f1": 0.5732847302881054,
+              "worst_class_recall": 0.2222222222222222,
+              "nonabstained_coverage": 1.0,
+              "ordered_minus_shuffled_mean": -0.0043282662057571,
+              "ordered_minus_repeated_mean": 0.045649368270144416,
+              "ordered_over_shuffled_positive_fraction": 0.3225806451612903,
+              "ordered_over_repeated_positive_fraction": 1.0,
+              "failure_count": 0,
+              "failed_floors": ["macro_f1", "worst_class_recall", "ordered_minus_shuffled_mean", "ordered_over_shuffled_positive_fraction"]
+            }
+          },
+          "activity_selection_commitment_sha256": "e11727dd309a01ee820264ff18afee33cf56b83fa2449301ce1be6e12670c29d",
+          "selection_commitment_verified": true,
+          "winner_selected": false,
+          "holdout_opened": false,
+          "governed_C_reopened": false,
+          "generator_or_synthetic_learner_outcome_opened": false,
+          "stop_rule": "seal public-development no-go and stop without candidate substitution threshold relaxation holdout C or LTX"
         },
         "bounded_candidates": [
           {
@@ -880,8 +933,8 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "PENDING_FROZEN_ACTIVITY_CHECKPOINT_SELECTION_THEN_UNCHANGED_PUBLIC_AND_C_GATES",
-    "authorization_interpretation": "the original calibration no-go and first public-repair no-go remain valid; the new single-stack redesign stopped before inference because the frozen EgoVLPv2 checkpoint could not be immutably resolved or separately licensed",
+    "local_generator_gate": "STOP_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO",
+    "authorization_interpretation": "the original calibration no-go, first public-repair no-go and EgoVLPv2 pre-model no-go remain valid; the user-authorized bounded replacement study also stopped with zero eligible candidates at its frozen public-development gate",
     "governed_result": {
       "status": "NO_GO",
       "job_topology": "1_H100",
@@ -950,7 +1003,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_NOT_RUN_ACTIVITY_CHECKPOINT_SELECTION_PENDING",
+    "status": "SELECTED_LOCAL_NOT_RUN_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
@@ -967,7 +1020,7 @@
     "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "NOT_RUN; both earlier calibration no-gos are preserved and the user-authorized domain-appropriate extractor redesign stopped at its pre-model EgoVLPv2 checkpoint availability and weight-terms gate before public inference C reopening or LTX work",
+  "synthetic_arm": "NOT_RUN; all three prior calibration failures remain preserved and the bounded replacement activity-checkpoint study stopped at its frozen public-development no-go with zero eligible candidates before holdout C reopening or LTX work",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
   "former_directionally_competitive_rule_not_permitted_for_post_gate_extension": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",
