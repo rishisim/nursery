@@ -101,12 +101,12 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert references["Real-full"]["lexical"] == result["lexical_commitment"]
     assert references["Real-full"]["temporal"] == result["temporal_commitment"]
     assert result["lean_pilot"]["status"].startswith("STOP_REAL_1H_AND_REAL_3H")
-    assert result["coverage_redesign"]["status"] == "FROZEN_PRE_OUTCOME_BLOCKED_EXTERNAL_JUNO_DNS_BEFORE_JOB_SUBMISSION"
+    assert result["coverage_redesign"]["status"] == "FROZEN_PRE_OUTCOME_REAL_1H_POSITIVE_CONTROL_PENDING_SUBMISSION"
 
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "FROZEN_COVERAGE_REDESIGN_REAL_1H_POSITIVE_CONTROL_BLOCKED_EXTERNAL_JUNO_DNS_BEFORE_SUBMISSION"
+    assert proof["status"] == "FROZEN_COVERAGE_REDESIGN_REAL_1H_POSITIVE_CONTROL_PENDING_SUBMISSION"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,

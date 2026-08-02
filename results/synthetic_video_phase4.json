@@ -43,14 +43,14 @@
     "interpretation": "the pinned learner and frozen one-seed 1h/3h budgets did not demonstrate primary realistic lexical learnability; no interpretable equal-duration synthetic comparison is authorized"
   },
   "coverage_redesign": {
-    "status": "FROZEN_PRE_OUTCOME_BLOCKED_EXTERNAL_JUNO_DNS_BEFORE_JOB_SUBMISSION",
+    "status": "FROZEN_PRE_OUTCOME_REAL_1H_POSITIVE_CONTROL_PENDING_SUBMISSION",
     "effective_on": "2026-08-02",
     "scientific_distinction": "separate exploratory one-accepted-hour protocol correcting less-than-one-pass contrastive coverage; it does not alter or erase the prior 570-step stop",
     "arms": {"real_accepted_hours": 1.0, "synthetic_accepted_hours": 1.0},
     "seeds": [436034264, 1285938051, 151347827],
     "schedule": {"reference_records_per_arm": 1244, "batch_size": 2, "complete_cycles": 778, "scheduler_steps": 4668, "contrastive_updates": 3112, "mlm_updates": 778, "dinov2_updates": 778, "contrastive_equivalent_passes": 5.003215434083601},
     "generator": {"selected": "LTX-2.3-22B-Distilled-1.1", "selection_role": "user_directed_practical_local_execution_not_bakeoff_winner", "status": "BLOCKED_UNTIL_REAL_1H_POSITIVE_CONTROL_PASS"},
-    "execution_blocker": "Juno institutional hostname did not resolve from the applicant workstation on 2026-08-02; no redesigned learner job was submitted and no new score exists",
+    "execution_status": "Juno connectivity restored on 2026-08-02; no redesigned learner score existed when submission status was recorded",
     "interpretation": "point estimates only; compare each arm with its seed-matched initialization and report the synthetic-real gap; a similar null or decline is inconclusive about corpus quality"
   },
   "common_asset_references": {
@@ -85,5 +85,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "restore UTD Juno connectivity then run only the frozen three-seed multi-pass Real-1h positive-control gate; C calibration LTX preflight generation and synthetic learning remain blocked until it passes"
+  "next_authorized_scope": "run only the frozen three-seed multi-pass Real-1h positive-control gate; C calibration LTX preflight generation and synthetic learning remain blocked until it passes"
 }
