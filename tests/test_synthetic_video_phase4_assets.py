@@ -130,3 +130,17 @@ def test_lean_equal_duration_proof_is_frozen_before_scores():
     ]
     assert proof["calibration_C"]["omnibus_score"] == "PROHIBITED"
     assert "automatic_1_3_6_curve" in proof["prohibitions"]
+
+
+def test_lean_real_preparation_uses_shared_adapter_and_exact_credit():
+    source = Path("scripts/run_synthetic_video_lean_pilot.py").read_text()
+    batch = Path("scripts/prepare_synthetic_video_lean_pilot.sbatch").read_text()
+    assert "translate_segments" in source
+    assert "frozen_language_adapter_v1" in source
+    assert "3960.0" in source
+    assert "build_manifest(root, train, \"training\", 3600.0)" in source
+    assert "E_EXACT_CREDIT" in source
+    assert "#SBATCH --partition=h100" in batch
+    assert "#SBATCH --gpus-per-node=1" in batch
+    assert "#SBATCH --time=04:00:00" in batch
+    assert "HF_HUB_OFFLINE=1" in batch
