@@ -238,7 +238,7 @@
     "next_step": "repeat public preparation under the frozen safe-global allowlist and seal a new dependency commitment before restarting blind sizing"
   },
   "governed_C_activity_checkpoint_sizing_amendment": {
-    "status": "IN_PROGRESS_ONE_OF_THREE_PASS_CONTROLS_RETAINED",
+    "status": "PASS_ALL_THREE_CONTROLS_RETAINED",
     "initial_dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
     "active_dependency_manifest_commitment_sha256": "5fb4a9d3c4375621bc94b8d7c25a26f434c7c1de9226fadd9f50ffdd3023e81d",
     "topology": "one_H100_80GB_single_process_no_DDP",
@@ -256,9 +256,9 @@
     "aggregate_GPU_hours_through_C_including_sizing_max": 20.0
   },
   "governed_C_activity_checkpoint_sizing_progress": {
-    "status": "IN_PROGRESS_TWO_OF_THREE_PASS",
-    "passing_candidate_count": 2,
-    "completed_candidate_count": 2,
+    "status": "PASS_ALL_THREE",
+    "passing_candidate_count": 3,
+    "completed_candidate_count": 3,
     "egohod_output_width": 8,
     "egohod_load_runtime_seconds": 11.950469084084034,
     "egohod_item_runtime_seconds": 0.7430373085662723,
@@ -280,7 +280,15 @@
     "videoprism_peak_vram_gib": 6.62890625,
     "videoprism_sizing_commitment_sha256": "6619aa2eadc5a2e49ed12e54af1183934ba6207b394384f80a7fca0625dfe1e7",
     "videoprism_record_commitment_verified": true,
-    "next_step": "size the final frozen V-JEPA 2 candidate"
+    "vjepa2_output_width": 1024,
+    "vjepa2_load_runtime_seconds": 26.002885622903705,
+    "vjepa2_item_runtime_seconds": 2.35031954664737,
+    "vjepa2_total_runtime_seconds": 28.36574150249362,
+    "vjepa2_peak_vram_gib": 2.498046875,
+    "vjepa2_sizing_commitment_sha256": "89b03f90d3c60c5afa07cff084162377b721437b9675646cdc322cb6fa56a617",
+    "vjepa2_record_commitment_verified": true,
+    "aggregate_total_runtime_seconds": 92.71850577741861,
+    "next_step": "run the one frozen public-development comparison sequentially on one H100"
   },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",

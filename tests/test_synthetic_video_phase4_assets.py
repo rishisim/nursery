@@ -156,7 +156,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert preparation["restricted_mount_present"] is False
     assert preparation["valid_for_candidate_inference"] is False
     sizing = result["governed_C_activity_checkpoint_sizing_amendment"]
-    assert sizing["status"] == "IN_PROGRESS_ONE_OF_THREE_PASS_CONTROLS_RETAINED"
+    assert sizing["status"] == "PASS_ALL_THREE_CONTROLS_RETAINED"
     assert sizing["fixture_labels_used"] is False
     assert sizing["scores_predictions_or_scientific_metrics_retained"] is False
     assert sizing["aggregate_GPU_hours_through_C_including_sizing_max"] == 20.0
@@ -167,10 +167,11 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert safe_load["weights_only_remains_true"] is True
     assert safe_load["model_inference_executed"] is True
     sizing_progress = result["governed_C_activity_checkpoint_sizing_progress"]
-    assert sizing_progress["status"] == "IN_PROGRESS_TWO_OF_THREE_PASS"
-    assert sizing_progress["completed_candidate_count"] == 2
-    assert sizing_progress["passing_candidate_count"] == 2
+    assert sizing_progress["status"] == "PASS_ALL_THREE"
+    assert sizing_progress["completed_candidate_count"] == 3
+    assert sizing_progress["passing_candidate_count"] == 3
     assert sizing_progress["videoprism_record_commitment_verified"] is True
+    assert sizing_progress["vjepa2_record_commitment_verified"] is True
     assert sizing_progress["record_commitment_verified"] is True
     assert sizing_progress["score_or_prediction_retained"] is False
     assert result["governance_incident"]["restricted_execution_paused"] is False
@@ -178,7 +179,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "ACTIVITY_CHECKPOINT_SAFE_LOAD_DEPENDENCIES_RESEALED_PRIOR_NO_GOS_PRESERVED_PENDING_BLIND_SIZING"
+    assert proof["status"] == "ACTIVITY_CHECKPOINT_BLIND_SIZING_PASS_PRIOR_NO_GOS_PRESERVED_PENDING_PUBLIC_DEVELOPMENT"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,

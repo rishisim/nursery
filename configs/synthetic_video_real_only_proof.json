@@ -1,6 +1,6 @@
 {
   "schema_version": 10,
-  "status": "ACTIVITY_CHECKPOINT_SAFE_LOAD_DEPENDENCIES_RESEALED_PRIOR_NO_GOS_PRESERVED_PENDING_BLIND_SIZING",
+  "status": "ACTIVITY_CHECKPOINT_BLIND_SIZING_PASS_PRIOR_NO_GOS_PRESERVED_PENDING_PUBLIC_DEVELOPMENT",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -566,7 +566,7 @@
           "next_gate": "restart the already frozen blind single-item sizing"
         },
         "blind_sizing_progress": {
-          "status": "IN_PROGRESS_TWO_OF_THREE_PASS",
+          "status": "PASS_ALL_THREE",
           "candidate_results": {
             "egohod_egovideo_l_zero_shot": {
               "status": "PASS_BLIND_RESOURCE_SIZING",
@@ -601,10 +601,28 @@
               "activity_sizing_commitment_sha256": "6619aa2eadc5a2e49ed12e54af1183934ba6207b394384f80a7fca0625dfe1e7",
               "terminal_job_status": "COMPLETED",
               "sealed_record_commitment_verified": true
+            },
+            "vjepa2_vitl_public_probe": {
+              "status": "PASS_BLIND_RESOURCE_SIZING",
+              "item_count": 1,
+              "output_width": 1024,
+              "expected_output_width": 1024,
+              "load_runtime_seconds": 26.002885622903705,
+              "item_runtime_seconds": 2.35031954664737,
+              "total_runtime_seconds": 28.36574150249362,
+              "peak_vram_gib": 2.498046875,
+              "expected_peak_vram_gib_max": 32.0,
+              "external_call_count": 0,
+              "score_or_prediction_retained": false,
+              "scientific_metric_computed": false,
+              "activity_sizing_commitment_sha256": "89b03f90d3c60c5afa07cff084162377b721437b9675646cdc322cb6fa56a617",
+              "terminal_job_status": "COMPLETED",
+              "sealed_record_commitment_verified": true
             }
           },
-          "completed_candidate_count": 2,
-          "passing_candidate_count": 2,
+          "completed_candidate_count": 3,
+          "passing_candidate_count": 3,
+          "aggregate_total_runtime_seconds": 92.71850577741861,
           "scientific_candidate_outcomes_opened": false
         },
         "bounded_candidates": [

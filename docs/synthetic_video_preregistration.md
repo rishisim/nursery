@@ -1038,3 +1038,11 @@ the 24 GiB ceiling. It made zero external calls and retained no score,
 prediction or scientific metric. Its sealed record commitment
 `6619aa2e…e1e7` verifies. Two of three blind sizing checks now pass; V-JEPA 2
 remains unopened.
+
+V-JEPA 2 also passed blind sizing: width 1024/1024, 26.00-second load,
+2.35-second one-item forward, 28.37 seconds total and 2.498 GiB peak use versus
+the 32 GiB ceiling, with commitment `89b03f90…a617`. All three candidates
+passed with zero external calls, crashes, invalid output widths or retained
+scores; aggregate measured runtime was 92.72 seconds. The next authorized gate
+is the already frozen 48-item public-development comparison, run sequentially
+on one H100. Holdout and C remain unopened.
