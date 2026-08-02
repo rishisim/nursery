@@ -1016,3 +1016,10 @@ makes the hosted/GCS helper raise if invoked, and verifies from the pinned sourc
 that no other tokenizer attribute is referenced. It does not modify VideoPrism
 parameters, preprocessing, text IDs or forward computation and adds no new
 dependency.
+The next import check exposed the same narrow issue in official `utils.py`,
+where `gfile.GFile` is used only if a checkpoint path is nonlocal; the frozen
+checkpoint is an existing local file and follows the preceding NumPy branch.
+The compatibility namespace therefore adds exactly that one attribute and
+makes it raise if reached. A pinned-source guard requires the complete gfile
+reference surface to remain exactly `{GFile}`. TensorFlow is still absent, no
+hosted path can execute, and model/preprocessing behavior is unchanged.

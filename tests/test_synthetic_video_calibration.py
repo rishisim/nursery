@@ -310,7 +310,14 @@ def test_videoprism_import_compatibility_cannot_replace_local_tokenization(
         "x: tokenizers.Tokenizer\n"
         "def load(): return tokenizers.SentencePieceTokenizer('hosted')\n"
     )
-    previous = sys.modules.get("videoprism.tokenizers")
+    (code / "utils.py").write_text("def load(): return gfile.GFile('hosted')\n")
+    names = {
+        "videoprism.tokenizers",
+        "tensorflow",
+        "tensorflow.io",
+        "tensorflow.io.gfile",
+    }
+    previous = {name: sys.modules.get(name) for name in names}
     try:
         MODULE._install_videoprism_tokenizer_import_compatibility(tmp_path)
         tokenizers = sys.modules["videoprism.tokenizers"]
@@ -320,16 +327,21 @@ def test_videoprism_import_compatibility_cannot_replace_local_tokenization(
             RuntimeError, match="E_VIDEOPRISM_HOSTED_TOKENIZER_PATH_PROHIBITED"
         ):
             tokenizers.SentencePieceTokenizer("hosted")
+        with pytest.raises(
+            RuntimeError, match="E_VIDEOPRISM_HOSTED_GFILE_PATH_PROHIBITED"
+        ):
+            sys.modules["tensorflow.io.gfile"].GFile("hosted")
         (code / "models.py").write_text("x = tokenizers.new_surface\n")
         with pytest.raises(
             RuntimeError, match="E_VIDEOPRISM_TOKENIZER_IMPORT_SURFACE"
         ):
             MODULE._install_videoprism_tokenizer_import_compatibility(tmp_path)
     finally:
-        if previous is None:
-            sys.modules.pop("videoprism.tokenizers", None)
-        else:
-            sys.modules["videoprism.tokenizers"] = previous
+        for name, module in previous.items():
+            if module is None:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = module
 
 
 def test_bucket_and_union_duration_are_frozen_and_exact() -> None:

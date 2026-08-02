@@ -1276,6 +1276,12 @@ def _install_videoprism_tokenizer_import_compatibility(code_root: Path) -> None:
     references = set(re.findall(r"tokenizers\.([A-Za-z_][A-Za-z0-9_]*)", source))
     if references != {"SentencePieceTokenizer", "Tokenizer"}:
         raise RuntimeError("E_VIDEOPRISM_TOKENIZER_IMPORT_SURFACE")
+    utility_source = (code_root / "videoprism/utils.py").read_text()
+    gfile_references = set(
+        re.findall(r"gfile\.([A-Za-z_][A-Za-z0-9_]*)", utility_source)
+    )
+    if gfile_references != {"GFile"}:
+        raise RuntimeError("E_VIDEOPRISM_GFILE_IMPORT_SURFACE")
 
     class Tokenizer(Protocol):
         pass
@@ -1288,7 +1294,21 @@ def _install_videoprism_tokenizer_import_compatibility(code_root: Path) -> None:
     tokenizers = types.ModuleType("videoprism.tokenizers")
     tokenizers.Tokenizer = Tokenizer
     tokenizers.SentencePieceTokenizer = SentencePieceTokenizer
+    gfile = types.ModuleType("tensorflow.io.gfile")
+
+    def prohibited_gfile(*args, **kwargs):
+        del args, kwargs
+        raise RuntimeError("E_VIDEOPRISM_HOSTED_GFILE_PATH_PROHIBITED")
+
+    gfile.GFile = prohibited_gfile
+    tensorflow_io = types.ModuleType("tensorflow.io")
+    tensorflow_io.gfile = gfile
+    tensorflow = types.ModuleType("tensorflow")
+    tensorflow.io = tensorflow_io
     sys.modules["videoprism.tokenizers"] = tokenizers
+    sys.modules["tensorflow"] = tensorflow
+    sys.modules["tensorflow.io"] = tensorflow_io
+    sys.modules["tensorflow.io.gfile"] = gfile
 
 
 def _load_videoprism_activity_adapter(

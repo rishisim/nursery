@@ -269,8 +269,8 @@
     "scientific_metric_computed": false,
     "record_commitment_verified": true,
     "terminal_job_status": "FAILED_AFTER_RECORD_SEAL_ON_COMPACT_OUTPUT_CANDIDATE_ID_GUARD",
-    "videoprism_engineering_stop_before_model_load": "official models module imported TensorFlow only through tokenizer type annotations and an unused hosted-tokenizer helper",
-    "videoprism_compatibility_repair_frozen": "two-attribute import namespace with a raising hosted-tokenizer helper plus an exact pinned-source reference guard; frozen local SentencePiece remains the only tokenization path",
+    "videoprism_engineering_stop_before_model_load": "official models and utility modules imported TensorFlow only through tokenizer type annotations an unused hosted-tokenizer helper and one hosted-path gfile fallback",
+    "videoprism_compatibility_repair_frozen": "two tokenizer attributes and one gfile attribute with raising hosted-path helpers plus exact pinned-source reference guards; frozen local SentencePiece and local checkpoint bytes remain the only tokenization and weight-loading paths",
     "next_step": "commit the import-only VideoPrism repair then size the remaining two frozen candidates"
   },
   "governed_C_activity_checkpoint_safe_load_repair": {
