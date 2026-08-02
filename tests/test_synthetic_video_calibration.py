@@ -170,6 +170,16 @@ def test_activity_vector_guard_rejects_nonfinite_or_wrong_width() -> None:
         MODULE._finite_vector([0.1], 2, "E_TEST")
 
 
+def test_repository_commit_verification_works_inside_gitless_container(tmp_path, monkeypatch) -> None:
+    expected = "a" * 40
+    repository = tmp_path / "repo"
+    (repository / ".git/refs/heads").mkdir(parents=True)
+    (repository / ".git/HEAD").write_text("ref: refs/heads/main\n")
+    (repository / ".git/refs/heads/main").write_text(expected + "\n")
+    monkeypatch.setattr(MODULE.shutil, "which", lambda _: None)
+    MODULE._verify_repository_commit(repository, expected)
+
+
 def test_bucket_and_union_duration_are_frozen_and_exact() -> None:
     assert MODULE.bucket(0.03, [0.0, 0.03, 0.07, 1.0]) == "bin_1"
     assert MODULE.bucket(1.0, [0.0, 0.03, 0.07, 1.0]) == "bin_2"
@@ -274,6 +284,7 @@ def test_public_qualification_jobs_never_mount_restricted_data() -> None:
     assert "#SBATCH --partition=dev" in prepare
     assert "prepare-public" in prepare
     assert "activity-prepare" in prepare
+    assert "PHASE4_ACTIVITY_CODE_CLEAN=1" in prepare
     assert "PHASE4_RESTRICTED_ROOT" not in prepare
     assert "#SBATCH --partition=h100" in qualify
     assert "#SBATCH --gpus-per-node=1" in qualify

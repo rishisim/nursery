@@ -28,6 +28,11 @@ if [[ "$prep_mode" == "legacy-repair" ]]; then
 fi
 export PYTHONPATH="${PHASE4_PUBLIC_ROOT}/source:$scratch/pydeps"
 if [[ "$prep_mode" == "activity-selection" ]]; then
+  for repository in EgoHOD videoprism vjepa2 CLIP; do
+    git -C "${PHASE4_PUBLIC_ROOT}/models/activity-code/${repository}" diff --quiet
+    git -C "${PHASE4_PUBLIC_ROOT}/models/activity-code/${repository}" diff --cached --quiet
+  done
+  export PHASE4_ACTIVITY_CODE_CLEAN=1
   singularity exec --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${scratch}:${scratch}" \
     "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" \
     python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" activity-prepare \

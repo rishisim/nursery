@@ -781,31 +781,7 @@ def prepare_activity_public(args: argparse.Namespace) -> dict[str, Any]:
     )
     clip_root = args.public_root / "models/activity-code/CLIP"
     if not clip_root.exists():
-        subprocess.run(
-            [
-                "git",
-                "clone",
-                "--filter=blob:none",
-                runtime["egohod"]["openai_CLIP_repository"],
-                str(clip_root),
-            ],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=True,
-        )
-        subprocess.run(
-            [
-                "git",
-                "-C",
-                str(clip_root),
-                "checkout",
-                "--detach",
-                runtime["egohod"]["openai_CLIP_commit"],
-            ],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=True,
-        )
+        raise RuntimeError("E_ACTIVITY_CLIP_CODE_NOT_STAGED")
     _verify_repository_commit(
         clip_root, runtime["egohod"]["openai_CLIP_commit"]
     )
@@ -878,6 +854,10 @@ def prepare_activity_public(args: argparse.Namespace) -> dict[str, Any]:
         "network_required_after_preparation": False,
         "restricted_mount_present": False,
         "model_inference_executed": False,
+        "host_clean_tree_preflight": os.environ.get(
+            "PHASE4_ACTIVITY_CODE_CLEAN"
+        )
+        == "1",
     }
     dependency_manifest["dependency_manifest_commitment_sha256"] = digest(
         dependency_manifest
@@ -918,6 +898,7 @@ def _verify_activity_dependency_manifest(
         or value.get("status") != "PASS_PREPARED_NO_MODEL_INFERENCE"
         or value.get("restricted_mount_present") is not False
         or value.get("model_inference_executed") is not False
+        or value.get("host_clean_tree_preflight") is not True
     ):
         raise RuntimeError("E_ACTIVITY_DEPENDENCY_MANIFEST")
     value["dependency_manifest_commitment_sha256"] = commitment
@@ -925,19 +906,44 @@ def _verify_activity_dependency_manifest(
 
 
 def _verify_repository_commit(path: Path, expected: str) -> None:
-    completed = subprocess.run(
-        ["git", "-C", str(path), "rev-parse", "HEAD"],
-        text=True,
-        capture_output=True,
-        check=True,
-    )
-    if completed.stdout.strip() != expected:
+    git = shutil.which("git")
+    if git is not None:
+        completed = subprocess.run(
+            [git, "-C", str(path), "rev-parse", "HEAD"],
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        if completed.stdout.strip() != expected:
+            raise RuntimeError("E_ACTIVITY_CODE_COMMIT")
+        dirty = subprocess.run(
+            [git, "-C", str(path), "diff", "--quiet"], check=False
+        )
+        if dirty.returncode != 0:
+            raise RuntimeError("E_ACTIVITY_CODE_DIRTY")
+        return
+    git_root = path / ".git"
+    head_path = git_root / "HEAD"
+    if not head_path.is_file():
         raise RuntimeError("E_ACTIVITY_CODE_COMMIT")
-    dirty = subprocess.run(
-        ["git", "-C", str(path), "diff", "--quiet"], check=False
-    )
-    if dirty.returncode != 0:
-        raise RuntimeError("E_ACTIVITY_CODE_DIRTY")
+    head = head_path.read_text().strip()
+    if head.startswith("ref: "):
+        reference = head.removeprefix("ref: ")
+        loose = git_root / reference
+        if loose.is_file():
+            head = loose.read_text().strip()
+        else:
+            packed = git_root / "packed-refs"
+            matches = [
+                line.split()[0]
+                for line in packed.read_text().splitlines()
+                if line and not line.startswith(("#", "^")) and line.split()[1] == reference
+            ] if packed.is_file() else []
+            if len(matches) != 1:
+                raise RuntimeError("E_ACTIVITY_CODE_COMMIT")
+            head = matches[0]
+    if head != expected:
+        raise RuntimeError("E_ACTIVITY_CODE_COMMIT")
 
 
 def _decode_uniform_activity_frames(
