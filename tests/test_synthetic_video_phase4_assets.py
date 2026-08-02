@@ -156,12 +156,14 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert preparation["restricted_mount_present"] is False
     assert preparation["valid_for_candidate_inference"] is False
     sizing = result["governed_C_activity_checkpoint_sizing_amendment"]
-    assert sizing["status"] == "FROZEN_BEFORE_SIZING_INFERENCE"
+    assert sizing["status"] == (
+        "FROZEN_CONTROLS_RETAINED_RESTARTING_AFTER_PREINFERENCE_SAFE_LOAD_REPAIR"
+    )
     assert sizing["fixture_labels_used"] is False
     assert sizing["scores_predictions_or_scientific_metrics_retained"] is False
     assert sizing["aggregate_GPU_hours_through_C_including_sizing_max"] == 20.0
     safe_load = result["governed_C_activity_checkpoint_safe_load_repair"]
-    assert safe_load["status"] == "FROZEN_BEFORE_REPREPARATION_OR_MODEL_OUTPUT"
+    assert safe_load["status"] == "PASS_REPREPARED_NO_MODEL_OUTPUT_PENDING_BLIND_SIZING"
     assert safe_load["unsafe_global_count"] == 13
     assert safe_load["weights_only_remains_true"] is True
     assert safe_load["model_inference_executed"] is False
@@ -170,7 +172,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "ACTIVITY_CHECKPOINT_SAFE_LOAD_REPAIR_FROZEN_PRIOR_NO_GOS_PRESERVED_PENDING_PUBLIC_REPREPARATION"
+    assert proof["status"] == "ACTIVITY_CHECKPOINT_SAFE_LOAD_DEPENDENCIES_RESEALED_PRIOR_NO_GOS_PRESERVED_PENDING_BLIND_SIZING"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,

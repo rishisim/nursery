@@ -1,6 +1,6 @@
 {
   "schema_version": 10,
-  "status": "ACTIVITY_CHECKPOINT_SAFE_LOAD_REPAIR_FROZEN_PRIOR_NO_GOS_PRESERVED_PENDING_PUBLIC_REPREPARATION",
+  "status": "ACTIVITY_CHECKPOINT_SAFE_LOAD_DEPENDENCIES_RESEALED_PRIOR_NO_GOS_PRESERVED_PENDING_BLIND_SIZING",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -439,7 +439,7 @@
             "scikit_learn": "1.7.2",
             "offline_inference": true,
             "environment_manifest_and_install_report_commitment_required_before_candidate_inference": true,
-            "dependency_manifest_commitment_sha256": "PENDING_SAFE_LOAD_REPREPARATION"
+            "dependency_manifest_commitment_sha256": "5fb4a9d3c4375621bc94b8d7c25a26f434c7c1de9226fadd9f50ffdd3023e81d"
           },
           "egohod": {
             "openai_CLIP_repository": "https://github.com/openai/CLIP.git",
@@ -531,15 +531,31 @@
           "next_gate": "repeat public preparation with the frozen exact safe-global allowlist, seal a new dependency manifest, then restart blind sizing"
         },
         "safe_load_engineering_repair": {
-          "status": "FROZEN_BEFORE_REPREPARATION_OR_MODEL_OUTPUT",
+          "status": "PASS_REPREPARED_NO_MODEL_OUTPUT_PENDING_BLIND_SIZING",
           "failed_candidate": "egohod_egovideo_l_zero_shot",
           "failed_stage": "torch_weights_only_checkpoint_deserialization",
           "model_state_loaded": false,
           "model_inference_executed": false,
           "score_or_prediction_produced": false,
           "old_dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
+          "new_dependency_manifest_commitment_sha256": "5fb4a9d3c4375621bc94b8d7c25a26f434c7c1de9226fadd9f50ffdd3023e81d",
           "repair": "install the pinned OmegaConf runtime and allow exactly the globals prospectively enumerated by the pinned Torch checkpoint scanner while retaining weights_only=true",
           "threshold_candidate_or_scientific_contract_changed": false
+        },
+        "public_repreparation_result": {
+          "status": "PASS_PREPARED_NO_MODEL_INFERENCE",
+          "candidate_count": 3,
+          "code_repository_count": 4,
+          "weight_file_count": 3,
+          "public_item_count": 96,
+          "installed_distribution_count": 91,
+          "wall_time_seconds": 435,
+          "dependency_manifest_commitment_sha256": "5fb4a9d3c4375621bc94b8d7c25a26f434c7c1de9226fadd9f50ffdd3023e81d",
+          "supersedes_dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
+          "restricted_mount_present": false,
+          "model_inference_executed": false,
+          "valid_for_candidate_inference": true,
+          "next_gate": "restart the already frozen blind single-item sizing"
         },
         "bounded_candidates": [
           {

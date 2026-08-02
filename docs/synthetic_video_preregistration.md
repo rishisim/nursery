@@ -980,3 +980,10 @@ the checkpoint's unsafe globals, require an exact match to the 13 names recorded
 in the canonical config, and allow only those names during deserialization. Any
 new global stops the run before loading. The repaired environment must receive
 a new dependency-manifest commitment before sizing resumes.
+
+That CPU-only re-preparation passed in 435 seconds without model inference. It
+sealed 91 installed distributions at commitment `5fb4a9d3…e81d`, explicitly
+superseding the unusable environment commitment while preserving its record.
+The three checkpoints, four repositories and 96 public items were reverified;
+no restricted mount was present. Blind sizing may now restart under the
+unchanged one-item, one-H100 controls.

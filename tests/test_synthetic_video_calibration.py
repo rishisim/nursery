@@ -115,7 +115,7 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     assert runtime["videoprism"]["c4_en_sentencepiece_sha256"] == "1e5036bed065526c3c212dfbe288752391797c4bb1a284aa18c9a0b23fcaf8ec"
     assert runtime["vjepa2"]["config_sha256"] == "3dec96fe962e94e569182d3a7b9ef0dd74b6b8c89c337a428e43e10d593e70c9"
     assert runtime["shared"]["dependency_manifest_commitment_sha256"] == (
-        "PENDING_SAFE_LOAD_REPREPARATION"
+        "5fb4a9d3c4375621bc94b8d7c25a26f434c7c1de9226fadd9f50ffdd3023e81d"
     )
     preparation = selection["public_preparation_result"]
     assert preparation["status"] == "PASS_PREPARED_NO_MODEL_INFERENCE"
@@ -127,6 +127,11 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     assert safe_load["weights_only"] is True
     assert safe_load["weights_only_false"] == "PROHIBITED"
     assert len(safe_load["exact_allowed_globals"]) == 13
+    repreparation = selection["public_repreparation_result"]
+    assert repreparation["status"] == "PASS_PREPARED_NO_MODEL_INFERENCE"
+    assert repreparation["installed_distribution_count"] == 91
+    assert repreparation["valid_for_candidate_inference"] is True
+    assert repreparation["model_inference_executed"] is False
     assert [
         candidate["expected_sizing_output_width"]
         for candidate in selection["bounded_candidates"]

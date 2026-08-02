@@ -238,8 +238,9 @@
     "next_step": "repeat public preparation under the frozen safe-global allowlist and seal a new dependency commitment before restarting blind sizing"
   },
   "governed_C_activity_checkpoint_sizing_amendment": {
-    "status": "FROZEN_BEFORE_SIZING_INFERENCE",
-    "dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
+    "status": "FROZEN_CONTROLS_RETAINED_RESTARTING_AFTER_PREINFERENCE_SAFE_LOAD_REPAIR",
+    "initial_dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
+    "active_dependency_manifest_commitment_sha256": "5fb4a9d3c4375621bc94b8d7c25a26f434c7c1de9226fadd9f50ffdd3023e81d",
     "topology": "one_H100_80GB_single_process_no_DDP",
     "fixture": "development_manifest_ordinal_zero",
     "item_count_per_candidate": 1,
@@ -255,7 +256,7 @@
     "aggregate_GPU_hours_through_C_including_sizing_max": 20.0
   },
   "governed_C_activity_checkpoint_safe_load_repair": {
-    "status": "FROZEN_BEFORE_REPREPARATION_OR_MODEL_OUTPUT",
+    "status": "PASS_REPREPARED_NO_MODEL_OUTPUT_PENDING_BLIND_SIZING",
     "candidate_id": "egohod_egovideo_l_zero_shot",
     "failure_stage": "torch_weights_only_checkpoint_deserialization",
     "error_code": "UNALLOWLISTED_OMEGACONF_LISTCONFIG",
@@ -267,7 +268,10 @@
     "model_inference_executed": false,
     "score_or_prediction_produced": false,
     "candidate_threshold_or_selection_rule_changed": false,
-    "next_step": "public CPU re-preparation and a new immutable dependency-manifest seal"
+    "new_dependency_manifest_commitment_sha256": "5fb4a9d3c4375621bc94b8d7c25a26f434c7c1de9226fadd9f50ffdd3023e81d",
+    "repreparation_wall_time_seconds": 435,
+    "installed_distribution_count": 91,
+    "next_step": "restart the already frozen blind one-item sizing"
   },
   "governance_incident": {
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_PROCESSING_RESUMED",
