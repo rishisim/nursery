@@ -116,9 +116,11 @@ def test_lean_equal_duration_proof_is_frozen_before_scores():
     assert proof["learner"]["objective_steps"] == 570
     assert proof["real_1h_gate"]["realistic_lexical_macro_min"] == 0.52
     assert proof["real_1h_gate"]["improvement_over_initialized_min"] == 0.02
-    assert proof["generator_gate"]["selected"] == "gemini-omni-flash-preview"
-    assert proof["generator_gate"]["status"].endswith("INSTITUTIONAL_TRAINING_USE_CLEARANCE")
-    assert proof["generator_gate"]["request"]["store"] is False
+    assert proof["generator_gate"]["selected"] == "minimax/hailuo-3"
+    assert "LOCAL_OPEN_WEIGHT_PROVENANCE" in proof["generator_gate"]["status"]
+    assert proof["generator_gate"]["request"]["input_seed"] == "unsupported_and_not_sent"
+    assert proof["generator_gate"]["open_weight_status"].startswith("NOT_YET_VERIFIED")
+    assert "Gemini was the screen leader" in proof["generator_gate"]["bakeoff_interpretation"]
     assert proof["generator_gate"]["no_substitution"] is True
     assert proof["calibration_C"]["source"] == "development_set_C_only_never_training_validation_or_evaluation"
     assert proof["calibration_C"]["hosted_provider_gate"].startswith("BLOCKED_PENDING_AFFIRMATIVE")
