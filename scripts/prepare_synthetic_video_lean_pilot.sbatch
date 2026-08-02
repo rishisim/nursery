@@ -27,4 +27,5 @@ singularity exec --nv \
   --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${PHASE4_RESTRICTED_ROOT}:${PHASE4_RESTRICTED_ROOT}" \
   "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" \
   python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_lean_pilot.py" prepare \
-    --root "${PHASE4_RESTRICTED_ROOT}/real_only_proof" --public "${PHASE4_PUBLIC_ROOT}"
+    --root "${PHASE4_RESTRICTED_ROOT}/real_only_proof" --public "${PHASE4_PUBLIC_ROOT}" \
+    --credited-hours "${CREDITED_HOURS:-1}"

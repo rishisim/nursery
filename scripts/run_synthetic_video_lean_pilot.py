@@ -116,29 +116,31 @@ def build_manifest(root: Path, checkpoint: dict, role: str, credited_limit: floa
     return records, credited
 
 
-def prepare(root: Path, public: Path) -> dict:
+def prepare(root: Path, public: Path, credited_hours: int) -> dict:
     train_rows, validation_rows = load_rows(root, "training"), load_rows(root, "validation")
-    train = transcribe_until(root, public, train_rows, root / "restricted_training_asr.json", 3960.0)
+    credited_target = float(credited_hours * 3600)
+    reserve_target = credited_target * 1.1
+    train = transcribe_until(root, public, train_rows, root / "restricted_training_asr.json", reserve_target)
     accepted = sum(max(0.0, s["end"] - s["start"]) for x in train["items"].values()
                    for s in x["segments"] if s["status"] == "ACCEPT")
-    if accepted < 3960.0:
-        raise PilotError(f"E_REAL_1H_YIELD:{accepted:.3f}")
+    if accepted < reserve_target:
+        raise PilotError(f"E_REAL_{credited_hours}H_YIELD:{accepted:.3f}")
     validation = transcribe_until(root, public, validation_rows, root / "restricted_validation_asr.json", None)
-    train_manifest, credited = build_manifest(root, train, "training", 3600.0)
+    train_manifest, credited = build_manifest(root, train, "training", credited_target)
     validation_manifest, _ = build_manifest(root, validation, "validation", None)
-    if abs(credited - 3600.0) > 1e-6:
+    if abs(credited - credited_target) > 1e-6:
         raise PilotError("E_EXACT_CREDIT")
-    write_json(root / "restricted_train_1h_manifest.json", train_manifest)
+    write_json(root / f"restricted_train_{credited_hours}h_manifest.json", train_manifest)
     write_json(root / "restricted_validation_manifest.json", validation_manifest)
-    text_path = root / "restricted_train_1h_text.txt"
+    text_path = root / f"restricted_train_{credited_hours}h_text.txt"
     text_path.write_text("\n".join(row["utterance"] for row in train_manifest) + "\n")
     os.chmod(text_path, 0o600)
-    record = {"status": "PASS", "credited_seconds": credited, "reserve_accepted_seconds": accepted - credited,
+    record = {"status": "PASS", "credited_hours": credited_hours, "credited_seconds": credited, "reserve_accepted_seconds": accepted - credited,
               "training_record_count": len(train_manifest), "validation_record_count": len(validation_manifest),
               "training_source_recordings_processed": len(train["items"]),
               "validation_source_recordings_processed": len(validation["items"])}
     record["commitment"] = hashlib.sha256(canonical(record)).hexdigest()
-    write_json(root / "compact_prepare_result.json", record)
+    write_json(root / f"compact_prepare_{credited_hours}h_result.json", record)
     return record
 
 
@@ -147,8 +149,9 @@ def main() -> None:
     parser.add_argument("prepare", nargs="?")
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--public", type=Path, required=True)
+    parser.add_argument("--credited-hours", type=int, choices=(1, 3), default=1)
     args = parser.parse_args()
-    print(json.dumps(prepare(args.root.resolve(), args.public.resolve()), sort_keys=True))
+    print(json.dumps(prepare(args.root.resolve(), args.public.resolve(), args.credited_hours), sort_keys=True))
 
 
 if __name__ == "__main__":

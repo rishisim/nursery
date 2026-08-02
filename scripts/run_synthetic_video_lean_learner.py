@@ -27,7 +27,7 @@ def write_private(path: Path, value) -> None:
     os.chmod(path, 0o600)
 
 
-def build_runtime(upstream: Path, root: Path, public: Path, frozen: dict):
+def build_runtime(upstream: Path, root: Path, public: Path, frozen: dict, credited_hours: int):
     from apps.baselines.clip.data import MLMCollator, TextOnlyDataset, build_eval_transform, build_train_transform, contrastive_collate
     from apps.baselines.clip.data.captions import Ego4DCaptionsDataset
     from apps.baselines.clip.modeling import DINOv2SSL, MLMHead, MultiModalModel
@@ -61,12 +61,12 @@ def build_runtime(upstream: Path, root: Path, public: Path, frozen: dict):
     mlm_head = MLMHead(text).to(device)
     ssl = DINOv2SSL(ssl_config_path, device=device)
     strict_state_equality(converted, {k:v.detach().cpu() for k,v in ssl.teacher_backbone_state_dict().items()})
-    train_ds = Ego4DCaptionsDataset(root / "restricted_train_1h_manifest.json", root / "frames/training", transform=build_train_transform(augment=False), multiple_frames=True)
+    train_ds = Ego4DCaptionsDataset(root / f"restricted_train_{credited_hours}h_manifest.json", root / "frames/training", transform=build_train_transform(augment=False), multiple_frames=True)
     val_ds = Ego4DCaptionsDataset(root / "restricted_validation_manifest.json", root / "frames/validation", transform=build_eval_transform(), multiple_frames=False)
     batch_size = frozen["learner"]["batch_size"]
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, collate_fn=contrastive_collate, drop_last=True)
     val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True, collate_fn=contrastive_collate)
-    text_ds = TextOnlyDataset(root / "restricted_train_1h_text.txt", text.tokenizer, max_seq_len=512)
+    text_ds = TextOnlyDataset(root / f"restricted_train_{credited_hours}h_text.txt", text.tokenizer, max_seq_len=512)
     mlm_loader = DataLoader(text_ds, batch_size=batch_size, shuffle=True, num_workers=2, collate_fn=MLMCollator(text.tokenizer, mlm_probability=0.15), drop_last=True)
     model_optim = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=0.01)
     seen=set(); mlm_params=[]
@@ -110,8 +110,8 @@ def evaluate(checkpoint: Path, restricted: Path) -> dict:
 
 
 def main() -> None:
-    parser=argparse.ArgumentParser(); parser.add_argument("--upstream",type=Path,required=True); parser.add_argument("--root",type=Path,required=True); parser.add_argument("--public",type=Path,required=True); parser.add_argument("--restricted",type=Path,required=True); parser.add_argument("--config",type=Path,required=True); args=parser.parse_args()
-    frozen=json.loads(args.config.read_text()); trainer,model,loader,config=build_runtime(args.upstream,args.root,args.public,frozen)
+    parser=argparse.ArgumentParser(); parser.add_argument("--upstream",type=Path,required=True); parser.add_argument("--root",type=Path,required=True); parser.add_argument("--public",type=Path,required=True); parser.add_argument("--restricted",type=Path,required=True); parser.add_argument("--config",type=Path,required=True); parser.add_argument("--credited-hours",type=int,choices=(1,3),default=1); args=parser.parse_args()
+    frozen=json.loads(args.config.read_text()); trainer,model,loader,config=build_runtime(args.upstream,args.root,args.public,frozen,args.credited_hours)
     checkpoints=args.root/"checkpoints"; checkpoints.mkdir(parents=True,exist_ok=True,mode=0o700)
     from omegaconf import OmegaConf
     initial=checkpoints/"initialized.pt"; torch.save({"model_state_dict":model.state_dict(),"config":OmegaConf.to_container(config,resolve=True)},initial); os.chmod(initial,0o600)
@@ -123,14 +123,14 @@ def main() -> None:
         mode,advanced=trainer.scheduler.step(); trainer._dispatch_step(mode,batch)
         if advanced and mode=="dinov2": trainer._on_dinov2_block_exit()
         trainer.global_step+=1
-    final=trainer._save("real_1h_step_570")
+    arm=f"real_{args.credited_hours}h"; final=trainer._save(f"{arm}_step_570")
     health=trainer.validate(); real=evaluate(final,args.restricted)
-    result={"status":"PASS","objective_steps":trainer.global_step,"initialized":initialized,"real_1h":real,
+    result={"status":"PASS","credited_hours":args.credited_hours,"objective_steps":trainer.global_step,"initialized":initialized,arm:real,
       "delta_real_minus_initialized":real["realistic_macro"]-initialized["realistic_macro"],
       "temporal_noncatastrophic":real["temporal_recall_at_1"]>=initialized["temporal_recall_at_1"]-0.05 and real["temporal_mrr"]>=initialized["temporal_mrr"]-0.05,
       "validation_runtime_health_finite":health is not None and all(__import__('math').isfinite(v) for v in health.values())}
-    result["real_1h_gate_pass"] = real["realistic_macro"]>=0.52 and result["delta_real_minus_initialized"]>=0.02 and result["temporal_noncatastrophic"]
-    result["commitment"]=hashlib.sha256(canonical(result)).hexdigest(); write_private(args.root/"compact_learner_result.json",result); print(json.dumps(result,sort_keys=True))
+    result[f"{arm}_gate_pass"] = real["realistic_macro"]>=0.52 and result["delta_real_minus_initialized"]>=0.02 and result["temporal_noncatastrophic"]
+    result["commitment"]=hashlib.sha256(canonical(result)).hexdigest(); write_private(args.root/f"compact_learner_{args.credited_hours}h_result.json",result); print(json.dumps(result,sort_keys=True))
 
 
 if __name__ == "__main__": main()

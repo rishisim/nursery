@@ -93,7 +93,7 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEAN_EQUAL_DURATION_PILOT_IN_PROGRESS"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_REAL_1H_FAILED_REAL_3H_IN_PROGRESS"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -104,7 +104,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_lean_equal_duration_proof_is_frozen_before_scores():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "FROZEN_LEAN_EQUAL_DURATION_PILOT_PRE_SCORE"
+    assert proof["status"] == "REAL_1H_GATE_FAILED_REAL_3H_EXTENSION_FROZEN_PRE_SCORE"
     assert proof["budgets_credited_hours"] == {
         "primary": 1,
         "conditional_real_extension": 3,
@@ -116,6 +116,8 @@ def test_lean_equal_duration_proof_is_frozen_before_scores():
     assert proof["learner"]["objective_steps"] == 570
     assert proof["real_1h_gate"]["realistic_lexical_macro_min"] == 0.52
     assert proof["real_1h_gate"]["improvement_over_initialized_min"] == 0.02
+    assert proof["conditional_real_3h_gate"]["objective_steps"] == 570
+    assert proof["conditional_real_3h_gate"]["failure_action"].startswith("stop_without_synthetic")
     assert proof["generator_gate"]["selected"] == "minimax/hailuo-3"
     assert "LOCAL_OPEN_WEIGHT_PROVENANCE" in proof["generator_gate"]["status"]
     assert proof["generator_gate"]["request"]["input_seed"] == "unsupported_and_not_sent"
@@ -141,8 +143,9 @@ def test_lean_real_preparation_uses_shared_adapter_and_exact_credit():
     batch = Path("scripts/prepare_synthetic_video_lean_pilot.sbatch").read_text()
     assert "translate_segments" in source
     assert "frozen_language_adapter_v1" in source
-    assert "3960.0" in source
-    assert "build_manifest(root, train, \"training\", 3600.0)" in source
+    assert "credited_target = float(credited_hours * 3600)" in source
+    assert "reserve_target = credited_target * 1.1" in source
+    assert "choices=(1, 3)" in source
     assert "E_EXACT_CREDIT" in source
     assert "#SBATCH --partition=h100" in batch
     assert "#SBATCH --gpus-per-node=1" in batch
@@ -157,10 +160,11 @@ def test_lean_learner_freezes_initialized_and_real_step_contract():
     assert "strict_state_equality" in source
     assert 'checkpoints/"initialized.pt"' in source
     assert "objective_steps" in source
-    assert 'trainer._save("real_1h_step_570")' in source
+    assert 'trainer._save(f"{arm}_step_570")' in source
+    assert "choices=(1,3)" in source
     assert "MachineDevBenchLexicalDataset" in source
     assert "temporal_recall_at_1" in source
-    assert "real_1h_gate_pass" in source
+    assert 'result[f"{arm}_gate_pass"]' in source
     assert "#SBATCH --partition=h100" in batch
     assert "#SBATCH --time=06:00:00" in batch
     assert "HF_HUB_OFFLINE=1" in batch

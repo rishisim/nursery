@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "FROZEN_LEAN_EQUAL_DURATION_PILOT_PRE_SCORE",
+  "status": "REAL_1H_GATE_FAILED_REAL_3H_EXTENSION_FROZEN_PRE_SCORE",
   "claim_role": "one_seed_exploratory_directional_pilot_not_equivalence_or_confirmatory_phase5",
   "learner": {
     "repository": "facebookresearch/egobabyvlm",
@@ -56,6 +56,15 @@
     "realistic_lexical_macro_min": 0.52,
     "improvement_over_initialized_min": 0.02,
     "temporal_rule": "Recall@1 and MRR must both be finite and neither may decline by more than 0.05 absolute from initialized"
+  },
+  "conditional_real_3h_gate": {
+    "status": "AUTHORIZED_AFTER_FROZEN_REAL_1H_GATE_FAILURE",
+    "nested_credited_hours": 3,
+    "objective_steps": 570,
+    "realistic_lexical_macro_min": 0.52,
+    "improvement_over_initialized_min": 0.02,
+    "temporal_rule": "Recall@1 and MRR must both be finite and neither may decline by more than 0.05 absolute from initialized",
+    "failure_action": "stop_without_synthetic_comparison_or_automatic_6h_run"
   },
   "generator_gate": {
     "status": "SELECTED_BLOCKED_PENDING_LOCAL_OPEN_WEIGHT_PROVENANCE_OR_WRITTEN_PROVIDER_AND_INSTITUTIONAL_TRAINING_USE_CLEARANCE",

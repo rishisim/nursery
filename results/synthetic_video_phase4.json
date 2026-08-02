@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_LEAN_EQUAL_DURATION_PILOT_IN_PROGRESS",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_REAL_1H_FAILED_REAL_3H_IN_PROGRESS",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -31,6 +31,16 @@
   },
   "lexical_commitment": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4",
   "temporal_commitment": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e",
+  "lean_pilot": {
+    "status": "REAL_1H_LEARNABILITY_GATE_FAILED_CONDITIONAL_REAL_3H_AUTHORIZED",
+    "learner_result_commitment": "5b3f4fd97eb471f18355609d75eef9b7d79d4739d346ef7f7a363375f09f4c3e",
+    "initialized_realistic_macro": 0.4781328847771237,
+    "real_1h_realistic_macro": 0.40201850294365016,
+    "real_1h_minus_initialized": -0.07611438183347352,
+    "real_1h_temporal_noncatastrophic": true,
+    "real_1h_gate_pass": false,
+    "next_action": "run_once_at_nested_exact_3_credited_hours_with_same_seed_570_steps_and_gate; stop on failure"
+  },
   "common_asset_references": {
     "Real-full": {"lexical": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4", "temporal": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e"},
     "Synthetic-full": {"lexical": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4", "temporal": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e"},
