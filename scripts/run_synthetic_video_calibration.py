@@ -1133,6 +1133,7 @@ def _egohod_checkpoint_safe_globals() -> list[Any]:
         collections.defaultdict,
         (numpy.core.multiarray.scalar, "numpy.core.multiarray.scalar"),
         numpy.dtype,
+        numpy.dtypes.Float64DType,
         ContainerMetadata,
         Metadata,
         DictConfig,

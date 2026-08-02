@@ -987,3 +987,11 @@ superseding the unusable environment commitment while preserving its record.
 The three checkpoints, four repositories and 96 public items were reverified;
 no restricted mount was present. Blind sizing may now restart under the
 unchanged one-item, one-H100 controls.
+
+On the restarted EgoHOD sizing load, all 13 statically reported globals matched
+exactly. Torch's safe builder then stopped before state loading on the one
+dynamically constructed type that its scanner cannot enumerate,
+`numpy.dtypes.Float64DType`; the checkpoint pickle contains only one NumPy dtype
+constructor. The repair therefore adds only that exact runtime type to the safe
+context. It does not broaden the static-name gate or permit
+`weights_only=false`, and no inference output was produced by either attempt.

@@ -256,12 +256,15 @@
     "aggregate_GPU_hours_through_C_including_sizing_max": 20.0
   },
   "governed_C_activity_checkpoint_safe_load_repair": {
-    "status": "PASS_REPREPARED_NO_MODEL_OUTPUT_PENDING_BLIND_SIZING",
+    "status": "FROZEN_DYNAMIC_FLOAT64_DTYPE_REPAIR_BEFORE_MODEL_OUTPUT",
     "candidate_id": "egohod_egovideo_l_zero_shot",
     "failure_stage": "torch_weights_only_checkpoint_deserialization",
     "error_code": "UNALLOWLISTED_OMEGACONF_LISTCONFIG",
     "old_dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
     "unsafe_global_count": 13,
+    "dynamic_safe_type_count": 1,
+    "dynamic_safe_type": "numpy.dtypes.Float64DType",
+    "safe_load_attempt_count": 2,
     "exact_allowlist_frozen": true,
     "weights_only_remains_true": true,
     "model_state_loaded": false,

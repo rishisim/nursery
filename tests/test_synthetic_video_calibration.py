@@ -127,6 +127,9 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     assert safe_load["weights_only"] is True
     assert safe_load["weights_only_false"] == "PROHIBITED"
     assert len(safe_load["exact_allowed_globals"]) == 13
+    assert safe_load["additional_dynamic_safe_types_not_reported_by_static_scanner"] == [
+        "numpy.dtypes.Float64DType"
+    ]
     repreparation = selection["public_repreparation_result"]
     assert repreparation["status"] == "PASS_PREPARED_NO_MODEL_INFERENCE"
     assert repreparation["installed_distribution_count"] == 91
@@ -286,6 +289,8 @@ def test_egohod_checkpoint_load_keeps_weights_only_and_exact_global_gate() -> No
     assert "get_unsafe_globals_in_checkpoint" in source
     assert "E_EGOHOD_UNEXPECTED_CHECKPOINT_GLOBAL" in source
     assert "torch.serialization.safe_globals" in source
+    globals_source = inspect.getsource(MODULE._egohod_checkpoint_safe_globals)
+    assert "numpy.dtypes.Float64DType" in globals_source
     assert "weights_only=True" in source
     assert "weights_only=False" not in source
 

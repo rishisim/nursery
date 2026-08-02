@@ -478,6 +478,9 @@
                 "omegaconf.nodes.AnyNode",
                 "typing.Any"
               ],
+              "additional_dynamic_safe_types_not_reported_by_static_scanner": [
+                "numpy.dtypes.Float64DType"
+              ],
               "unexpected_global_action": "STOP_BEFORE_DESERIALIZATION",
               "weights_only_false": "PROHIBITED"
             }
@@ -531,12 +534,14 @@
           "next_gate": "repeat public preparation with the frozen exact safe-global allowlist, seal a new dependency manifest, then restart blind sizing"
         },
         "safe_load_engineering_repair": {
-          "status": "PASS_REPREPARED_NO_MODEL_OUTPUT_PENDING_BLIND_SIZING",
+          "status": "FROZEN_DYNAMIC_FLOAT64_DTYPE_REPAIR_BEFORE_MODEL_OUTPUT",
           "failed_candidate": "egohod_egovideo_l_zero_shot",
           "failed_stage": "torch_weights_only_checkpoint_deserialization",
           "model_state_loaded": false,
           "model_inference_executed": false,
           "score_or_prediction_produced": false,
+          "safe_load_attempt_count": 2,
+          "second_stop": "after the 13-name static global check passed, the weights-only builder required the single dynamically constructed numpy.dtypes.Float64DType that the static scanner cannot report",
           "old_dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
           "new_dependency_manifest_commitment_sha256": "5fb4a9d3c4375621bc94b8d7c25a26f434c7c1de9226fadd9f50ffdd3023e81d",
           "repair": "install the pinned OmegaConf runtime and allow exactly the globals prospectively enumerated by the pinned Torch checkpoint scanner while retaining weights_only=true",
