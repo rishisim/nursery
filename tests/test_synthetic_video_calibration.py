@@ -180,6 +180,16 @@ def test_repository_commit_verification_works_inside_gitless_container(tmp_path,
     MODULE._verify_repository_commit(repository, expected)
 
 
+def test_activity_preparation_does_not_upgrade_pinned_container_torch() -> None:
+    import inspect
+
+    source = inspect.getsource(MODULE.prepare_activity_public)
+    guard = inspect.getsource(MODULE._verify_container_torch_not_shadowed)
+    assert '"--upgrade"' not in source
+    assert "E_ACTIVITY_CONTAINER_TORCH_SHADOWED" in guard
+    assert "E_ACTIVITY_CONTAINER_TORCH_VERSION" in guard
+
+
 def test_bucket_and_union_duration_are_frozen_and_exact() -> None:
     assert MODULE.bucket(0.03, [0.0, 0.03, 0.07, 1.0]) == "bin_1"
     assert MODULE.bucket(1.0, [0.0, 0.03, 0.07, 1.0]) == "bin_2"

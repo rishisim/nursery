@@ -732,6 +732,30 @@ def _installed_distributions(target: Path) -> list[dict[str, str]]:
     ]
 
 
+def _verify_container_torch_not_shadowed(
+    target: Path, container: dict[str, Any]
+) -> None:
+    distributions = {
+        value["name"] for value in _installed_distributions(target)
+    }
+    if distributions.intersection({"torch", "torchvision"}):
+        raise RuntimeError("E_ACTIVITY_CONTAINER_TORCH_SHADOWED")
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import torch,torchvision; print(torch.__version__); print(torchvision.__version__)",
+        ],
+        env={**os.environ, "PYTHONPATH": str(target)},
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    versions = completed.stdout.splitlines()
+    if versions != [container["torch"], container["torchvision"]]:
+        raise RuntimeError("E_ACTIVITY_CONTAINER_TORCH_VERSION")
+
+
 def prepare_activity_public(args: argparse.Namespace) -> dict[str, Any]:
     cfg = json.loads(args.config.read_text())
     amendment = _activity_config(cfg)
@@ -812,7 +836,6 @@ def prepare_activity_public(args: argparse.Namespace) -> dict[str, Any]:
                     "pip",
                     "install",
                     "--disable-pip-version-check",
-                    "--upgrade",
                     "--target",
                     str(target),
                     "--report",
@@ -824,6 +847,7 @@ def prepare_activity_public(args: argparse.Namespace) -> dict[str, Any]:
                 check=True,
             )
         os.chmod(report, 0o600)
+        _verify_container_torch_not_shadowed(target, runtime["container"])
         environment_records.append(
             {
                 "candidate_id": candidate_id,
