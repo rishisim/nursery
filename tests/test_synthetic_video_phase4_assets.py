@@ -93,42 +93,48 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEAN_PILOT_STOPPED_REAL_3H_LEARNABILITY_FAILURE"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_PRIOR_STOP_PRESERVED_COVERAGE_REDESIGN_FROZEN"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
     assert len({canonical(value) for value in references.values()}) == 1
     assert references["Real-full"]["lexical"] == result["lexical_commitment"]
     assert references["Real-full"]["temporal"] == result["temporal_commitment"]
+    assert result["lean_pilot"]["status"].startswith("STOP_REAL_1H_AND_REAL_3H")
+    assert result["coverage_redesign"]["status"] == "FROZEN_PRE_OUTCOME_REAL_1H_POSITIVE_CONTROL_PENDING"
 
 
-def test_lean_equal_duration_proof_is_frozen_before_scores():
+def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "STOP_REAL_3H_LEARNABILITY_GATE_FAILED"
+    assert proof["status"] == "FROZEN_COVERAGE_REDESIGN_REAL_1H_POSITIVE_CONTROL_PENDING"
     assert proof["budgets_credited_hours"] == {
-        "primary": 1,
-        "conditional_real_extension": 3,
-        "automatic_six_hour_disabled": True,
+        "real": 1,
+        "synthetic_accepted": 1,
+        "synthetic_above_one_hour_prohibited": True,
     }
+    assert proof["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
     assert proof["learner"]["schedule"] == {"contrastive": 4, "mlm": 1, "dinov2": 1}
     assert proof["learner"]["initialization"].startswith("byte_identical")
     assert proof["learner"]["batch_size"] == 2
-    assert proof["learner"]["objective_steps"] == 570
-    assert proof["real_1h_gate"]["realistic_lexical_macro_min"] == 0.52
-    assert proof["real_1h_gate"]["improvement_over_initialized_min"] == 0.02
-    assert proof["conditional_real_3h_gate"]["objective_steps"] == 570
-    assert proof["conditional_real_3h_gate"]["failure_action"].startswith("stop_without_synthetic")
-    assert proof["synthetic_arm"].startswith("NOT_AUTHORIZED")
-    assert proof["generator_gate"]["selected"] == "minimax/hailuo-3"
-    assert proof["schema_version"] == 4
-    assert "LOCAL_OPEN_WEIGHT_PROVENANCE" in proof["generator_gate"]["status"]
-    assert proof["generator_gate"]["request"]["input_seed"] == "unsupported_and_not_sent"
-    assert proof["generator_gate"]["open_weight_status"].startswith("NOT_YET_VERIFIED")
-    assert "Gemini led" in proof["generator_gate"]["bakeoff_interpretation"]
+    assert proof["learner"]["objective_steps"] == 4668
+    assert proof["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
+    assert proof["learner"]["complete_4_1_1_cycles"] * 6 == proof["learner"]["objective_steps"]
+    assert proof["learner"]["seeds"] == [436034264, 1285938051, 151347827]
+    assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
+    assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
+    assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
+    assert proof["schema_version"] == 5
+    assert proof["generator_gate"]["status"].startswith("SELECTED_LOCAL_BLOCKED")
+    assert proof["generator_gate"]["implementation"]["commit"] == "9377758131b1ffde4b7f766804590a6617bf2ab9"
+    assert proof["generator_gate"]["weights"]["revision"] == "4229404625088d21c4f112eb640fb04a0900ee25"
+    assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["accepted_credited_seconds_exact"] == 3600
+    assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["raw_generated_seconds_max"] == 5399.625
+    assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["attempts_max"] == 1071
+    assert "LTX 19/28" in proof["generator_gate"]["bakeoff_interpretation"]
     assert proof["generator_gate"]["no_substitution"] is True
     assert proof["calibration_C"]["source"] == "development_set_C_only_never_training_validation_or_evaluation"
-    assert proof["calibration_C"]["hosted_provider_gate"].startswith("BLOCKED_PENDING_AFFIRMATIVE")
-    assert "public self-authored" in proof["calibration_C"]["hosted_generator_input"]
+    assert proof["calibration_C"]["local_generator_gate"].startswith("BLOCKED_UNTIL_REAL")
+    assert "governed Juno" in proof["calibration_C"]["local_generator_input"]
     assert "no full distributional calibration claim" in proof["calibration_C"]["limitations"]
     assert len(proof["calibration_C"]["axes"]) == 8
     assert proof["calibration_C"]["joint_distributions"] == [
@@ -138,7 +144,7 @@ def test_lean_equal_duration_proof_is_frozen_before_scores():
         "motion_by_blur",
     ]
     assert proof["calibration_C"]["omnibus_score"] == "PROHIBITED"
-    assert "automatic_1_3_6_curve" in proof["prohibitions"]
+    assert "more_than_one_accepted_synthetic_hour" in proof["prohibitions"]
 
 
 def test_lean_real_preparation_uses_shared_adapter_and_exact_credit():
@@ -156,18 +162,23 @@ def test_lean_real_preparation_uses_shared_adapter_and_exact_credit():
     assert "HF_HUB_OFFLINE=1" in batch
 
 
-def test_lean_learner_freezes_initialized_and_real_step_contract():
+def test_lean_learner_freezes_matched_coverage_and_seed_contract():
     source = Path("scripts/run_synthetic_video_lean_learner.py").read_text()
     batch = Path("scripts/run_synthetic_video_lean_learner.sbatch").read_text()
     assert "_load_shared_prior" in source
     assert "strict_state_equality" in source
     assert 'checkpoints/"initialized.pt"' in source
     assert "objective_steps" in source
-    assert 'trainer._save(f"{arm}_step_570")' in source
-    assert "choices=(1,3)" in source
+    assert 'trainer._save(f"{arm}_seed_{args.seed}_step_{trainer.global_step}")' in source
+    assert "E_UNREGISTERED_SEED" in source
+    assert "E_RECORD_COUNT" in source
+    assert "ssl_iterator" in source
+    assert 'mode == "contrastive"' in source
+    assert 'mode == "dinov2"' in source
     assert "MachineDevBenchLexicalDataset" in source
     assert "temporal_recall_at_1" in source
-    assert 'result[f"{arm}_gate_pass"]' in source
+    assert "initialization_state_hash" in source
+    assert "E_MODE_COUNTS" in source
     assert "#SBATCH --partition=h100" in batch
     assert "#SBATCH --time=06:00:00" in batch
     assert "HF_HUB_OFFLINE=1" in batch

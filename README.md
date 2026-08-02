@@ -79,9 +79,11 @@ must not be reported as the bakeoff winner. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
 A public generator pilot and bakeoff have been executed without ChildLens or
 BabyView inputs. The corrected governed common assets passed on the final
-two-H100 DDP topology. Real-1h and the sole permitted nested Real-3h extension
-both failed their frozen realistic lexical learnability gates, so the lean
-pilot stopped without synthetic generation or a synthetic learner score.
+two-H100 DDP topology. The original 570-step Real-1h/Real-3h pilot remains
+sealed as stopped, but it used fewer than one contrastive-equivalent pass over
+Real-1h. A separate prospective redesign now freezes three matched seeds and
+778 complete 4:1:1 cycles (4,668 steps; 3,112 contrastive updates), equivalent
+to about 5.003 passes over each 1,244-record one-hour learner manifest.
 Phase 3 governance/preregistration is **PASS**.
 MPI accepted the signed project-specific request and granted non-commercial
 ChildLens model calibration/evaluation and aggregate reporting through July
@@ -103,11 +105,12 @@ The corrected Phase 4 common-asset record is
 [`results/synthetic_video_phase4.json`](results/synthetic_video_phase4.json).
 Its deviation ledger is
 [`results/synthetic_video_phase4_deviations.json`](results/synthetic_video_phase4_deviations.json).
-MiniMax H3 was selected before any synthetic learner score, but its OpenRouter
-video route is not ZDR and hosted-output learner-training rights remain blocked
-pending written provider and institutional clearance; an official immutable
-local Hailuo 3 video-weight release with a compatible license was not verified.
-These generator gates were not reached because the real learnability stop rule
-fired first.
+The latest prospective user choice selects locally governed LTX-2.3 for the
+redesigned pilot. This is a practical execution choice, not a quality claim:
+Gemini led the blinded screen at 27/28, followed by MiniMax at 25/28, Seedance
+at 24/28, and LTX at 19/28. No generation may begin unless the redesigned
+multi-pass Real-1h positive control passes, followed by governed C calibration
+and a bounded final-topology LTX preflight. Synthetic data remains capped at
+exactly one accepted credited hour.
 Confirmatory Phase 5, multi-seed equivalence inference, and full-corpus
 generation remain unauthorized.

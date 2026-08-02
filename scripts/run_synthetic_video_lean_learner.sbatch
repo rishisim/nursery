@@ -17,13 +17,24 @@ export HF_HOME="${PHASE4_PUBLIC_ROOT}/models/learner-hf-home"
 export MASTER_ADDR=127.0.0.1 MASTER_PORT=29631 RANK=0 WORLD_SIZE=1 LOCAL_RANK=0 LOCAL_WORLD_SIZE=1
 export CC="${PHASE4_PUBLIC_ROOT}/models/triton-compiler/bin/x86_64-conda-linux-gnu-cc"
 export PATH="${PHASE4_PUBLIC_ROOT}/models/triton-compiler/bin:$PATH"
+learner_arm="${LEARNER_ARM:-real}"
+learner_seed="${LEARNER_SEED:?LEARNER_SEED is required}"
+if [[ "$learner_arm" == "real" ]]; then
+  data_root="${PHASE4_RESTRICTED_ROOT}/real_only_proof"
+elif [[ "$learner_arm" == "synthetic" ]]; then
+  data_root="${PHASE4_RESTRICTED_ROOT}/synthetic_one_hour"
+else
+  exit 64
+fi
+output_root="${PHASE4_RESTRICTED_ROOT}/coverage_redesign/${learner_arm}/${learner_seed}"
+mkdir -p "$output_root"
 unused_upstream_data="${PHASE4_PUBLIC_ROOT}/models/unused-upstream-data"
 mkdir -p "$unused_upstream_data"
 for upstream_data_var in BABYVIEW_DATA_ROOT BABYVIEW_EXTRA_ROOT COCO_DATA_ROOT COCO_EXTRA_ROOT COCO_MC_DATA_ROOT COCO_MC_EXTRA_ROOT EGO4D_DATA_ROOT EGO4D_EXTRA_ROOT HOWTO_DATA_ROOT HOWTO_EXTRA_ROOT; do
   export "${upstream_data_var}=${unused_upstream_data}"
 done
-export DINOV2_OUTPUT_DIR="${PHASE4_RESTRICTED_ROOT}/real_only_proof/checkpoints"
-log_root="${PHASE4_RESTRICTED_ROOT}/real_only_proof/logs"
+export DINOV2_OUTPUT_DIR="${output_root}/checkpoints"
+log_root="${output_root}/logs"
 mkdir -p "$log_root"
 exec >"${log_root}/learner-${SLURM_JOB_ID}.out" 2>"${log_root}/learner-${SLURM_JOB_ID}.err"
 tmp="/tmp/lean-learner-${SLURM_JOB_ID}"
@@ -33,5 +44,6 @@ tar -C "$tmp/pydeps" -xf "${PHASE4_PUBLIC_ROOT}/models/phase4-language-pydeps.ta
 export PYTHONPATH="${PHASE4_PUBLIC_ROOT}/source:${PHASE4_PUBLIC_ROOT}/models/learner-pydeps:${PHASE4_PUBLIC_ROOT}/models/evaluator-pydeps:$tmp/pydeps:${PHASE4_EGOBABY_ROOT}:${PHASE4_EGOBABY_ROOT}/apps/baselines/dinov2/third_party"
 singularity exec --nv --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${PHASE4_RESTRICTED_ROOT}:${PHASE4_RESTRICTED_ROOT},${PHASE4_EGOBABY_ROOT}:${PHASE4_EGOBABY_ROOT}" \
   "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_lean_learner.py" \
-  --upstream "${PHASE4_EGOBABY_ROOT}" --root "${PHASE4_RESTRICTED_ROOT}/real_only_proof" --public "${PHASE4_PUBLIC_ROOT}" --restricted "${PHASE4_RESTRICTED_ROOT}" --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json" \
-  --credited-hours "${CREDITED_HOURS:-1}"
+  --upstream "${PHASE4_EGOBABY_ROOT}" --data-root "$data_root" --output-root "$output_root" \
+  --public "${PHASE4_PUBLIC_ROOT}" --restricted "${PHASE4_RESTRICTED_ROOT}" \
+  --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json" --arm "$learner_arm" --seed "$learner_seed"

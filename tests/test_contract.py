@@ -38,8 +38,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 2
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEAN_EQUAL_DURATION_PILOT_IN_PROGRESS"
+    assert config["schema_version"] == 3
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_PRIOR_STOP_PRESERVED_COVERAGE_REDESIGN_REAL_GATE_PENDING"
     validate_phase_state(config)
     assert schedule_cycle(config["learner"]["schedule"]) == [
         "contrastive",
@@ -114,7 +114,9 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["childlens_audio_processing_authorized"] is True
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
     assert config["gates"]["generator_work_authorized"] is False
-    assert config["gates"]["real_only_training_authorized"] is False
+    assert config["gates"]["real_only_training_authorized"] == (
+        "ONLY_FROZEN_THREE_SEED_4668_STEP_REAL_1H_POSITIVE_CONTROL"
+    )
     assert config["governed_compute"]["additional_slurm_account_name_committed_to_git"] is False
 
 
@@ -125,16 +127,17 @@ def test_phase_state_validator_rejects_contradictory_nested_state() -> None:
         validate_phase_state(config)
 
 
-def test_real_only_proof_is_exploratory_nested_and_exact_schedule() -> None:
+def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     assert config["budgets_credited_hours"] == {
-        "primary": 1,
-        "conditional_real_extension": 3,
-        "automatic_six_hour_disabled": True,
+        "real": 1,
+        "synthetic_accepted": 1,
+        "synthetic_above_one_hour_prohibited": True,
     }
-    assert config["learner"]["seed"] == 42
+    assert len(config["learner"]["seeds"]) == 3
     assert schedule_cycle(config["learner"]["schedule"]) == ["contrastive"] * 4 + ["mlm", "dinov2"]
-    assert config["learner"]["objective_steps"] == 570
-    assert config["conditional_real_3h_gate"]["nested_credited_hours"] == 3
-    assert "automatic_1_3_6_curve" in config["prohibitions"]
-    assert "multi_seed_confirmatory_phase5" in config["prohibitions"]
+    assert config["learner"]["objective_steps"] == 4668
+    assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
+    assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
+    assert "more_than_one_accepted_synthetic_hour" in config["prohibitions"]
+    assert "confirmatory_phase5" in config["prohibitions"]

@@ -601,3 +601,49 @@ official immutable Hailuo 3 video-weight release with a verified compatible
 license had been established for governed local execution. No corpus was
 generated because Real-3h failed the learnability gate; a later generator route
 cannot revive this stopped pilot without a new prospective protocol.
+
+### Coverage-based one-hour exploratory redesign (prospective)
+
+On 2026-08-02, before any redesigned learner outcome, new generator outcome,
+synthetic corpus, or synthetic learner score, the applicant authorized a
+separate exploratory amendment. It preserves the prior 570-step stop and its
+commitments, but does not treat that run as evidence that one hour is
+intrinsically insufficient: roughly 380 contrastive updates at batch size two
+provided only about 760 example exposures for 1,244 Real-1h records.
+
+Both active arms contain exactly one accepted credited hour and exactly 1,244
+learner records. Batch size remains two. Five contrastive-equivalent passes
+require 3,110 contrastive batches; rounding upward to complete 4:1:1 cycles
+freezes 778 cycles, 4,668 total scheduler steps, 3,112 contrastive updates, 778
+MLM updates, and 778 DINOv2 updates. Contrastive and DINO streams use separate
+deterministic iterators so auxiliary steps do not silently consume
+contrastive coverage. The three public hash-derived seeds are `436034264`,
+`1285938051`, and `151347827`; Real-1h and Synthetic-1h use matched seeds,
+byte-identical per-seed initialization, steps, optimizers, and checkpoints.
+
+The Real-1h positive control passes only if its realistic noun/adjective macro
+averages at least 0.52, its mean seed-matched gain over initialization is at
+least 0.02, at least two of three seed gains are positive, and every seed's
+temporal Recall@1 and MRR are finite and decline by no more than 0.05. Failure
+is inconclusive about corpus quality and stops C calibration and generation.
+No grammar or overall aggregate is introduced.
+
+The latest prospective generator choice is locally governed LTX-2.3 using
+`Lightricks/LTX-2@9377758`, LTX-2.3 weights revision `4229404`, and Gemma
+text-encoder revision `68f7ee4`. It is a practical local-execution choice, not
+a reinterpretation of the blinded screen: Gemini scored 27/28, MiniMax 25/28,
+Seedance 24/28, and LTX 19/28. All C aggregates, aggregate-conditioned prompts,
+plans, attempts, media, QA, logs, and artifacts remain on applicant-governed
+Juno storage; no hosted provider receives ChildLens material or derivatives.
+Modular German TTS and the repaired common language adapter remain mandatory.
+
+Only after the Real positive control passes may governed C calibration and a
+public/dummy LTX topology preflight occur. Before generation, that preflight
+must replace the provisional ceiling with exact Juno GPU type/count, wall-time,
+aggregate GPU-hours, storage, attempt/retry, and cost-accounting ceilings.
+Generation stops at exactly 3,600 accepted credited seconds and may create at
+most 5,399.625 raw seconds (1,071 attempts of 121 frames at 24 fps, at most 357
+retries and two attempts per plan), within 72 hours and 100 GiB. The same accepted synthetic
+hour is reused for all learner seeds. More than one accepted synthetic hour,
+confirmatory equivalence claims, and evaluation-driven generator tuning are
+prohibited.
