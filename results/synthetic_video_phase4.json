@@ -220,6 +220,21 @@
     "selection_amendment_commitment_sha256": "9030e1de95366f38a763905c733eee781c873932eb21eaa78115bba4a9097ea9",
     "next_step": "implement and validate the three frozen adapters then run exactly one public-development comparison; no holdout or governed C access before the applicable seals"
   },
+  "governed_C_activity_checkpoint_preparation": {
+    "status": "PASS_PREPARED_NO_MODEL_INFERENCE",
+    "selection_amendment_commitment_sha256": "9030e1de95366f38a763905c733eee781c873932eb21eaa78115bba4a9097ea9",
+    "dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
+    "candidate_count": 3,
+    "code_repository_count": 4,
+    "weight_file_count": 3,
+    "public_item_count": 96,
+    "installed_distribution_count": 88,
+    "wall_time_seconds": 438,
+    "restricted_mount_present": false,
+    "model_inference_executed": false,
+    "scientific_outcome_observed": false,
+    "next_step": "blind one-item public H100 sizing for each frozen candidate, then the one frozen development comparison"
+  },
   "governance_incident": {
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_PROCESSING_RESUMED",
     "observed_on": "2026-08-02",

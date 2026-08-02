@@ -949,3 +949,12 @@ The checkpoint still must load every tensor with no missing or unexpected
 keys, and the forward implementation remains official EgoHOD code. A runtime
 guard rejects any dependency target that shadows the pinned Torch or
 Torchvision container versions.
+
+The repaired CPU-only preparation then passed in 438 seconds without loading
+any model. It verified three checkpoint files, four pinned repositories and 96
+public fixture items, and sealed 88 installed public distributions under
+dependency-manifest commitment `20bc4ad8…bca`. The public run had no restricted
+mount and recorded `model_inference_executed=false`. Candidate loading remains
+gated on that exact manifest. The next operation is blind single-item resource
+sizing for each frozen candidate, followed by the one frozen development
+comparison; no holdout or governed-C outcome has been opened.

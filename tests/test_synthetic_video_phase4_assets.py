@@ -147,12 +147,19 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert selection["governed_C_reopened"] is False
     selection_commitment = selection.pop("selection_amendment_commitment_sha256")
     assert digest(selection) == selection_commitment
+    preparation = result["governed_C_activity_checkpoint_preparation"]
+    assert preparation["status"] == "PASS_PREPARED_NO_MODEL_INFERENCE"
+    assert preparation["dependency_manifest_commitment_sha256"] == (
+        "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca"
+    )
+    assert preparation["scientific_outcome_observed"] is False
+    assert preparation["restricted_mount_present"] is False
     assert result["governance_incident"]["restricted_execution_paused"] is False
 
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "ACTIVITY_CHECKPOINT_SELECTION_FROZEN_PRIOR_NO_GOS_PRESERVED_PENDING_PUBLIC_DEVELOPMENT"
+    assert proof["status"] == "ACTIVITY_CHECKPOINT_DEPENDENCIES_SEALED_PRIOR_NO_GOS_PRESERVED_PENDING_BLIND_SIZING"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,

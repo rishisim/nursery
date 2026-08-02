@@ -1,6 +1,6 @@
 {
   "schema_version": 10,
-  "status": "ACTIVITY_CHECKPOINT_SELECTION_FROZEN_PRIOR_NO_GOS_PRESERVED_PENDING_PUBLIC_DEVELOPMENT",
+  "status": "ACTIVITY_CHECKPOINT_DEPENDENCIES_SEALED_PRIOR_NO_GOS_PRESERVED_PENDING_BLIND_SIZING",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -439,7 +439,7 @@
             "scikit_learn": "1.7.2",
             "offline_inference": true,
             "environment_manifest_and_install_report_commitment_required_before_candidate_inference": true,
-            "dependency_manifest_commitment_sha256": "PENDING_PUBLIC_PREPARATION"
+            "dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca"
           },
           "egohod": {
             "openai_CLIP_repository": "https://github.com/openai/CLIP.git",
@@ -490,6 +490,19 @@
               "transformers==4.55.4"
             ]
           }
+        },
+        "public_preparation_result": {
+          "status": "PASS_PREPARED_NO_MODEL_INFERENCE",
+          "candidate_count": 3,
+          "code_repository_count": 4,
+          "weight_file_count": 3,
+          "public_item_count": 96,
+          "installed_distribution_count": 88,
+          "wall_time_seconds": 438,
+          "dependency_manifest_commitment_sha256": "20bc4ad80b661eba4822630f157de09a3406fad50e5bb5ba0777b838a46d0bca",
+          "restricted_mount_present": false,
+          "model_inference_executed": false,
+          "next_gate": "blind single-item public sizing before the frozen development comparison"
         },
         "bounded_candidates": [
           {

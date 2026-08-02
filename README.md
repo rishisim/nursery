@@ -169,7 +169,9 @@ candidates before outcomes: EgoHOD EgoVideo-L zero-shot, VideoPrism-LvT-L
 zero-shot, and V-JEPA 2 ViT-L with one public-only probe. Their immutable local
 weight hashes and a subject-disjoint 48-development/48-holdout Charades-Ego
 fixture commitment are recorded in schema 10 of the canonical proof config.
-No candidate inference or holdout result has yet been opened. The next
-authorized operation is the frozen cross-fitted public-development comparison;
+The public dependency preparation passed without model inference and is sealed
+at commitment `20bc4ad8…bca`; no candidate or holdout result has yet been
+opened. The next authorized operation is blind one-item H100 sizing, then the
+frozen cross-fitted public-development comparison;
 the winner must then pass the unchanged complete public holdout before C may be
 reopened. LTX preflight, generation, and synthetic training remain stopped.
