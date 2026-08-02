@@ -146,3 +146,19 @@ def test_lean_real_preparation_uses_shared_adapter_and_exact_credit():
     assert "#SBATCH --gpus-per-node=1" in batch
     assert "#SBATCH --time=04:00:00" in batch
     assert "HF_HUB_OFFLINE=1" in batch
+
+
+def test_lean_learner_freezes_initialized_and_real_step_contract():
+    source = Path("scripts/run_synthetic_video_lean_learner.py").read_text()
+    batch = Path("scripts/run_synthetic_video_lean_learner.sbatch").read_text()
+    assert "_load_shared_prior" in source
+    assert "strict_state_equality" in source
+    assert 'checkpoints/"initialized.pt"' in source
+    assert "objective_steps" in source
+    assert 'trainer._save("real_1h_step_570")' in source
+    assert "MachineDevBenchLexicalDataset" in source
+    assert "temporal_recall_at_1" in source
+    assert "real_1h_gate_pass" in source
+    assert "#SBATCH --partition=h100" in batch
+    assert "#SBATCH --time=06:00:00" in batch
+    assert "HF_HUB_OFFLINE=1" in batch
