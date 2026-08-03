@@ -1,6 +1,6 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ACTIVITY CHECKPOINT PUBLIC-DEVELOPMENT NO-GO**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — VISOR-HOS CORRECTION AMENDMENT FROZEN BEFORE NEW OUTCOMES**
 
 **Evidence cut-off:** 2026-08-02
 
@@ -1313,7 +1313,70 @@ zero. The compact no-go record is sealed at `dee0a375…13e7`.
 This is `NO_GO_ANNOTATION_ONLY_FIXTURE_SOURCE_YIELD`. It occurred before fixture
 media rendering, model inference, public-development or holdout opening,
 governed-C reopening, LTX preflight or generation, and synthetic learner work.
-The four earlier calibration no-gos remain unchanged. Under the frozen repair
-rule, no additional source, stratum, threshold, or model substitution is
-authorized in this protocol; the one-hour descriptive extension therefore
-stops without a synthetic result.
+The four earlier calibration no-gos remain unchanged. That no-go remains final
+for its frozen sparse-relationship and sequential shared-cap fixture recipe.
+
+### Prospective VISOR-HOS contact-source and allocation correction
+
+After the `dee0a375…13e7` result was sealed, the user prospectively authorized
+one narrow fixture correction before any new public source inventory, model
+outcome, C value, generator outcome, or learner score. This is a new amendment,
+not a claim that the old no-go passed or was wrong. The old implementation
+inferred contact from a nonempty relationship and allocated strata in JSON
+order through one shared per-video counter. The new question is whether the
+same fixed learner-effective extractor stack can pass its complete combined
+public gate when contact truth and allocation match official VISOR-HOS
+semantics.
+
+The source is exactly the official VISOR DOI deposit's 115 training plus 43
+validation GroundTruth-SparseAnnotations JSONs: 158 files and 868,821,446
+bytes. The official CKAN records publish no cryptographic content hashes, so a
+sorted external file-hash manifest is locally resolved and committed at
+`771ce947…c095`; row hashes and annotations remain outside Git. The deposited
+README and project page state CC-BY-NC-4.0. Conflicting catalogue metadata is
+retained, and the more restrictive noncommercial academic boundary governs
+use. The official VISOR-HOS repository is fixed at
+`8566507382add7dd037a83e7233950e0ad1ea78e` solely as a semantic reference. It
+has no license file, so its code is not copied, imported, or executed; the
+canonical implementation independently applies the documented data fields.
+
+Contact evaluation is conditional on one valid visible left/right hand
+instance. A valid linked object identifier is contact; exact
+`hand-not-in-contact` is no-contact. None-of-the-above, inconclusive, missing,
+null, malformed, unresolved, or invalid-geometry relations abstain. Boolean
+coercion is forbidden. Hand presence is evaluated separately. No-hand frames
+never enter contact F1: annotation absence only nominates candidates, and the
+authorized applicant must visually verify each public negative blind to model
+outputs before inference. The first 48 verified negatives per partition are
+retained from at most the first 192 candidates in the frozen hash order.
+
+Participants are partitioned first by the seeded SHA-256 order, alternating
+development and holdout. One simultaneous deterministic min-cost allocation
+then targets 48 contact, 48 explicit no-contact, and 48 verified no-hand items
+per partition, with four items maximum per video and stratum and one selected
+item maximum per frame. Participant, video, and frame overlap across partitions
+must all be zero. Raw-eligible, post-partition, post-cap, and final counts are
+reported separately for every stratum. Input and mapping permutations must
+produce the same selection commitment. All independent source checks run
+before one combined source decision; no first-failure shortcut is permitted.
+
+Development may choose only the already frozen finite confidence grids. Those
+thresholds and fixture commitments are sealed before holdout. The holdout runs
+every independent axis metric before one decision. All five critical axes must
+pass, at least six of seven axes must validate, and the separate genuinely
+order-dependent action control must pass. One supporting axis may be
+unmeasured and then contributes no C target or claim. Broad activity/context
+is descriptive and has no shuffle-degradation requirement. Gates, models,
+sources, and thresholds cannot be substituted or relaxed after outcomes. The
+complete amendment commitment is `34cb7b52…931b`.
+
+Only a combined public PASS authorizes the previously frozen single-applicant
+governed C transfer audit and learner-effective C measurement. C still cannot
+tune thresholds, every critical transfer gate must pass, each included passing
+axis must have missingness at most 0.20, at least six of seven axes must be
+measured, and public-ontology coverage must be at least 0.60. Only a combined C
+PASS authorizes aggregate-conditioned public-word episode planning, local
+LTX-2.3 preflight, exactly 3,600 accepted credited synthetic seconds, and the
+same three 4,668-step learner seeds. The Real-1h formal failure and all earlier
+no-gos remain final; no equivalence, noninferiority, same-quality, or
+directionally-competitive claim is authorized.

@@ -1,6 +1,6 @@
 {
-  "schema_version": 13,
-  "status": "MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN",
+  "schema_version": 14,
+  "status": "VISOR_HOS_CORRECTION_AMENDMENT_FROZEN_PENDING_COMPLETE_PUBLIC_COMBINED_GATE_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -22,7 +22,7 @@
     "prohibited_interpretation": ["directionally_competitive", "equivalent", "noninferior", "same_quality", "confirmatory_phase5", "proof_of_synthetic_data_quality"],
     "inconclusive_rule": "if both matched arms are flat or decline the comparison is inconclusive",
     "outcome_independence": "the extension generator corpus cap learner seeds steps checkpoints evaluation assets and resource-gate order were frozen before any synthetic learner outcome; the later user-authorized mechanistic training-tuple calibration amendment is separately prospective and preserves every observed calibration no-go",
-    "execution_status": "STOPPED_BY_FROZEN_PUBLIC_FIXTURE_SOURCE_YIELD_NO_GO_BEFORE_RENDERING_C_OR_SYNTHETIC_WORK"
+    "execution_status": "AUTHORIZED_PENDING_VISOR_HOS_CORRECTED_COMPLETE_PUBLIC_AND_GOVERNED_C_COMBINED_GATES_BEFORE_SYNTHETIC_WORK"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",
@@ -71,7 +71,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO",
+    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_VISOR_HOS_CORRECTION_FROZEN_PENDING_COMPLETE_PUBLIC_COMBINED_GATE",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -1584,6 +1584,124 @@
         "synthetic_learner_run": false,
         "stop_rule": "the frozen annotation-only feasibility repair requires a fixture-source no-go with no further source model threshold or stratum substitution when any exact family yield fails"
       },
+      "mechanistic_training_tuple_visor_hos_correction_amendment": {
+        "status": "FROZEN_BEFORE_NEW_PUBLIC_SOURCE_INVENTORY_MODEL_C_GENERATOR_OR_LEARNER_OUTCOMES",
+        "effective_on": "2026-08-02",
+        "authorization": "explicit user authorization for a new prospective VISOR-HOS label-source and allocation correction followed by the complete learner-effective combined gate",
+        "scientific_scope": "repair only the public hand-presence and visible-hand contact fixture truth and its order-dependent allocation; retain the learner-effective seven-axis construct, fixed extractor stack, thresholds, C transfer rules, one-hour cap, learner rules, and descriptive claim boundary",
+        "prior_result_preserved": {
+          "status": "NO_GO_REMAINS_FINAL_FOR_ITS_FROZEN_RECIPE",
+          "fixture_feasibility_commitment_sha256": "dee0a37548d75fc29f829159ce3ad648a63288339c7bc173f8201483e51213e7",
+          "implemented_source": "VISOR GroundTruth-SparseAnnotations",
+          "implemented_contact_rule": "nonempty in_contact_object relationship inferred as contact",
+          "implemented_allocation": "one shared four-frames-per-video counter allocated strata sequentially in JSON order",
+          "observed_result": "post-allocation development and holdout each had 16 contact 0 no-contact and 12 no-hand selected items against the old 12-per-stratum target",
+          "interpretation": "the zero was a post-allocation count and remains a valid no-go for that committed recipe; it is not a raw-source inventory claim and is not retroactively changed"
+        },
+        "outcome_independence": "the correction is based only on official annotation semantics, the documented allocation defect, and published aggregate source evidence; no new public extractor result, C tuple measurement, generator result, synthetic corpus, or synthetic learner score was observed",
+        "official_annotation_artifact": {
+          "name": "EPIC-KITCHENS VISOR GroundTruth-SparseAnnotations train-plus-validation contact source set",
+          "doi": "10.5523/bris.2v6cgv1x04ol22qp9rm9x2j6a7",
+          "dataset_id": "27bf8382-b67c-4124-88b3-d76358caedd1",
+          "dataset_revision_id": "3c0cafe4-2a13-4b33-a11a-6927b283ad77",
+          "metadata_modified": "2022-08-19T11:33:37.053514",
+          "train_resource": {"dataset_id": "b0cad676b4fa0bb37f0909be6c4f1db1", "revision_id": "9545f79e-c8d6-42f6-9440-b9371496140a", "JSON_file_count": 115, "bytes": 685510350},
+          "validation_resource": {"dataset_id": "9fc235ca3842ebe9854fabc6f4b74106", "revision_id": "c0e45166-ae2b-48e7-9bd6-5911eea010dd", "JSON_file_count": 43, "bytes": 183311096},
+          "combined_JSON_file_count": 158,
+          "combined_bytes": 868821446,
+          "official_catalog_hash_limitation": "the official CKAN hash fields are blank; all byte hashes below are locally resolved from official URLs and are not author-published digests",
+          "external_sorted_relative_path_and_SHA256_manifest_commitment_sha256": "771ce947b88966602b071f0e51765b6e726a4af219458cc9282f2633a526c095",
+          "external_path_size_and_bytes_framed_content_commitment_sha256": "103ee93153ebf5a920e2c4617531722611ce4a81cdd8484c9223e4e4d9490536",
+          "dataset_README_url": "https://data.bris.ac.uk/datasets/2v6cgv1x04ol22qp9rm9x2j6a7/README.txt",
+          "dataset_README_sha256": "667d7cb63aa531899d692a7a63cee36d9f86d5f5d8755b43d926218c80b60728",
+          "data_terms": "deposited README and official VISOR project page state CC-BY-NC-4.0; CKAN catalog metadata reports uk-ncgl, so this noncommercial academic local prototype applies the more restrictive CC-BY-NC-4.0 boundary and preserves the metadata discrepancy",
+          "execution": "download and parse locally from official URLs; no hosted inference; retain annotations manifests frames and fixture rows outside Git"
+        },
+        "official_semantic_reference": {
+          "repository": "https://github.com/epic-kitchens/VISOR-HOS",
+          "commit": "8566507382add7dd037a83e7233950e0ad1ea78e",
+          "archive_sha256": "6e588c80835976c41164e71b0dbfc5e3447fcabcdfd3221f5fd50b07eb57188e",
+          "gen_coco_format_py_sha256": "686a052c8676c8378438efcf90e97e71cd6abca576381b0ca560e6cb07759cd7",
+          "correct_json_sha256": "fecffd6d3eb5fb08d392e72f5ca35fd5476e89de2a0f088de24ab46fc34dba95",
+          "README_sha256": "48ffb9e649bc49dacb90d362bef7a49d5cf767e04c9668ace9bc725989bd8de8",
+          "code_terms": "NO_LICENSE_FILE_AND_GITHUB_LICENSE_NULL",
+          "use_boundary": "reference-only: do not copy import or execute repository code; independently implement the paper and deposited-README field semantics; the unlicensed correction table is used only to exclude named source frames from eligibility and is never redistributed or used to rewrite labels",
+          "model_unchanged": "EgoHOS@cd9bdf427ef1d94582334ebba4188d5aa18433e7 and its already pinned weights and numeric thresholds remain fixed"
+        },
+        "truth_contract": {
+          "unit": "one ground-truth visible left-or-right hand instance for contact state; one exhaustively reviewed frame for no-hand state",
+          "contact": "in_contact_object is an exact annotation object identifier resolving to a valid object mask",
+          "explicit_no_contact": "in_contact_object is the exact string hand-not-in-contact",
+          "abstain_contact_values": ["none-of-the-above", "inconclusive", "missing", "null", "wrong_type", "unresolved_object_identifier", "invalid_hand_geometry", "invalid_object_geometry", "ambiguous_hand_side"],
+          "boolean_values_are_invalid": true,
+          "mixed_contact_state_frame_rule": "each hand remains a separate candidate but at most one hand-instance item may be selected from a source frame; deterministic joint allocation chooses at most one",
+          "glove_rule": "an on-hand glove may be merged with the corresponding visible left-or-right hand only when the visible hand annotation exists and the glove relation and side are conclusive; a glove alone never manufactures a visible-hand positive",
+          "hand_presence_task": "visible-hand positives use valid left-or-right hand masks regardless of contact state; no-hand specificity uses visually verified frames only",
+          "no_hand_nomination": "an original sparse frame with valid exhaustive annotation geometry and no left-hand right-hand or on-hand-glove annotation may enter the fixed verification queue but is not truth merely because the converted HOS list is empty",
+          "no_hand_verification": "the authorized applicant visually verifies the public frame blind to EgoHOS output before inference; the first 48 valid frames per partition in frozen hash order are retained from at most the first 192 nominated frames; any visible hand ambiguous visibility decode failure or incomplete annotation abstains",
+          "contact_metric": "macro-F1 over explicit contact versus explicit no-contact conditional on the selected visible-hand instance; verified no-hand frames never enter its denominator",
+          "hand_presence_metric": "sensitivity over the selected visible-hand frames and specificity over the separately verified no-hand frames",
+          "prediction_side_mapping": "EgoHOS left right or both hand/contact masks are matched to the target ground-truth side; unmatched ambiguous or invalid masks abstain"
+        },
+        "partition_and_joint_sampler": {
+          "seed": 20260802,
+          "participant_first": "sort unique participant keys by SHA256(UTF8('20260802|visor_hos_participant|') || UTF8(participant_key)); even rank goes to development and odd rank to holdout before any stratum allocation",
+          "partitions": ["development", "holdout"],
+          "strata": ["contact", "explicit_no_contact", "verified_no_hand"],
+          "quota_per_partition_per_stratum": 48,
+          "final_item_count_per_partition": 144,
+          "per_video_per_stratum_cap": 4,
+          "per_source_frame_cap_across_strata": 1,
+          "candidate_order": "SHA256(UTF8('20260802|visor_hos_joint|') || UTF8(partition) || UTF8('|') || UTF8(stratum) || UTF8('|') || UTF8(video_key) || UTF8('|') || UTF8(frame_key) || UTF8('|') || UTF8(hand_side_or_none)) then canonical public keys",
+          "algorithm": "one deterministic integer maximum-flow allocation per partition with all strata and candidates inserted in the frozen full-candidate hash order, stratum quota edges of 48, per-video-per-stratum capacity four, candidate capacity one, and a shared-frame capacity one; exact quota saturation is required",
+          "order_invariance": "source-document row and stratum-map permutations must produce an identical selected commitment",
+          "disjointness": "zero participant video and frame overlap between development and holdout",
+          "reporting": "for every partition and stratum retain raw-eligible pre-partition, post-partition, post-cap, and final counts separately plus compact invalid and abstention counts; row selections remain outside Git",
+          "deficit_rule": "collect and report all deficits after every independent source check; never stop at the first stratum family or module failure"
+        },
+        "public_fixture_counts_per_partition": {
+          "language_and_lexical_items": 48,
+          "referent_attribute_microclips": 64,
+          "recurrence_pairs": 64,
+          "hand_contact_items": 144,
+          "sensor_perturbation_clips": 48,
+          "order_dependent_action_clips": 48,
+          "total": 416
+        },
+        "public_execution_and_combined_gate": {
+          "source_feasibility": "run every independent COCO composite VISOR-HOS Charades language recurrence and sensor check before one combined source decision; a dependent metric may be unavailable after its source failure but cannot rescue another failure",
+          "development": "run every independent learner-effective module and only the already frozen finite threshold grids; seal chosen thresholds and fixture commitments before holdout",
+          "holdout": "run all independent axis metrics and genuine order-dependent action controls before one combined decision; broad activity-context is descriptive and frame shuffling need not degrade it",
+          "critical_axes": ["adapter_qualified_yield", "noun_adjective_exposure", "utterance_centered_referent_visibility_dominance_ambiguity", "cross_episode_recurrence", "adjective_attribute_contrast"],
+          "supporting_axes": ["hand_action_coupling", "egocentric_sensor_regime"],
+          "combined_pass_rule": "all five critical axes pass their unchanged gates, at least six of seven axes validate, the separate genuinely order-dependent action control passes, every dependent integrity rule passes, and there are zero crashes silent truncations invalid retained records external calls or unaccounted failures",
+          "one_supporting_axis_may_be_unmeasured": true,
+          "unvalidated_axis_use": "contributes no C target and supports no claim",
+          "broad_activity_context": "DESCRIPTIVE_NONBLOCKING",
+          "threshold_relaxation_or_source_model_substitution_after_outcomes": "PROHIBITED",
+          "public_data_only": true,
+          "restricted_mount_present": false
+        },
+        "governed_C_and_downstream_rule": {
+          "entry": "only after the complete combined public gate passes",
+          "transfer_audit": "retain the already frozen sole-authorized-applicant keyed C audit, blind to extractor outputs, with concealed duplicate recodes and no inter-rater claim",
+          "critical_transfer_failure": "STOP",
+          "supporting_transfer_failure": "exclude that axis without changing its threshold",
+          "C_gate": "all five critical axes pass, at least six of seven included axes are measured, each passing included axis missingness is at most 0.20, public-ontology coverage is at least 0.60, and all independent metrics are completed before one decision",
+          "disclosure": "export only approved compact aggregate bins quantiles counts statuses uncertainty and commitments; no restricted rows identifiers filenames paths text vocabulary hashes embeddings media prompts or reconstructive combinations",
+          "downstream": "only on C PASS freeze the nonrestricted public-word episode plan, run the already authorized local LTX-2.3 preflight, produce exactly 3600 accepted credited synthetic seconds within frozen ceilings, and train the same three seeds for exactly 4668 scheduler steps",
+          "prohibited": ["reinterpret_prior_no_go", "reinterpret_real_gate", "more_than_one_accepted_synthetic_hour", "automatic_three_hour_arm", "extra_seed", "generator_substitution", "evaluation_driven_tuning", "equivalence_or_noninferiority_claim", "directionally_competitive_phrase"]
+        },
+        "resource_and_governance": {
+          "public_source_feasibility": "local CPU or one Juno CPU process; zero paid monetary cost",
+          "public_model_and_governed_C_ceiling": "unchanged previously authorized one-H100 non-DDP topology and aggregate 15 GPU-hour ceiling through C; any overage or multiprocess topology requires a new exact approval and preflight",
+          "all_outputs": "datasets annotations media weights predictions embeddings caches logs manifests and run records outside Git under verified ignored or applicant-governed roots",
+          "network": "public artifact ingress only before inference; public inference and every governed C run local-files-only with telemetry and tracking disabled; no hosted service receives ChildLens material or derivatives",
+          "terminal_and_chat": "approved compact aggregate fields only"
+        },
+        "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
+        "amendment_commitment_sha256": "34cb7b5299a7d88d71d7d350530b88cbac7616e61ace9f3d1372880272a9931b"
+      },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},
         "framing": {"centered": "one main object centered in a child-view frame", "distributed": "several objects distributed across a child-view frame", "peripheral": "the main content is near the edge of a child-view frame"},
@@ -1633,8 +1751,8 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "STOPPED_BY_MECHANISTIC_TRAINING_TUPLE_PUBLIC_FIXTURE_SOURCE_NO_GO",
-    "authorization_interpretation": "all four earlier calibration no-gos remain final for their frozen questions; the new mechanistic training-tuple calibration also stopped at its frozen public fixture-source yield rule before model qualification governed C or generation",
+    "local_generator_gate": "PENDING_VISOR_HOS_CORRECTED_COMPLETE_PUBLIC_AND_GOVERNED_C_COMBINED_GATES",
+    "authorization_interpretation": "all four earlier calibration no-gos and the dee0a375 fixture-source no-go remain final for their frozen questions; a new user-authorized VISOR-HOS semantics and joint-allocation correction is prospective and can authorize generation only after complete combined public and governed C passes",
     "governed_result": {
       "status": "NO_GO",
       "job_topology": "1_H100",
@@ -1703,7 +1821,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_NOT_RUN_BLOCKED_BY_MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO",
+    "status": "SELECTED_LOCAL_NOT_RUN_PENDING_VISOR_HOS_CORRECTED_COMPLETE_PUBLIC_AND_GOVERNED_C_COMBINED_GATES",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",

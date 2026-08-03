@@ -38,8 +38,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 4
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO_PRIOR_NO_GOS_PRESERVED"
+    assert config["schema_version"] == 5
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_VISOR_HOS_CORRECTION_AMENDMENT_FROZEN_PENDING_COMPLETE_PUBLIC_COMBINED_GATE_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
@@ -86,6 +86,20 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert fixture_result["model_inference_executed"] is False
     assert fixture_result["governed_C_reopened"] is False
     assert fixture_result["LTX_or_synthetic_learner_run"] is False
+    correction = config["mechanistic_training_tuple_visor_hos_correction_amendment"]
+    assert correction["status"] == (
+        "FROZEN_BEFORE_NEW_PUBLIC_SOURCE_INVENTORY_MODEL_C_GENERATOR_OR_LEARNER_OUTCOMES"
+    )
+    assert correction["amendment_commitment_sha256"] == (
+        "34cb7b5299a7d88d71d7d350530b88cbac7616e61ace9f3d1372880272a9931b"
+    )
+    assert correction["prior_fixture_no_go_preserved"] == (
+        "dee0a37548d75fc29f829159ce3ad648a63288339c7bc173f8201483e51213e7"
+    )
+    assert correction["per_partition_counts"] == [48, 48, 48]
+    assert correction["five_critical_axes_must_pass"] is True
+    assert correction["axes_required"] == 6
+    assert correction["public_outcome_opened"] is False
     runtime_preparation = config[
         "mechanistic_training_tuple_runtime_preparation_result"
     ]
@@ -217,7 +231,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 13
+    assert config["schema_version"] == 14
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"

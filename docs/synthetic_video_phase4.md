@@ -1,11 +1,12 @@
 # Synthetic-video Phase 4 common evaluation assets
 
-**Status:** **CORRECTED COMMON ASSETS PASS; EXPLORATORY TUPLE CALIBRATION
-STOPPED** — Stage A remains PASS; the first Stage B assets remain
+**Status:** **CORRECTED COMMON ASSETS PASS; PROSPECTIVE VISOR-HOS FIXTURE
+CORRECTION FROZEN** — Stage A remains PASS; the first Stage B assets remain
 provisional/superseded, and the corrected lexical and temporal assets are
-sealed. The active exploratory mechanistic tuple-calibration passed artifact
-and local-reload sizing gates but fired its frozen public fixture-source no-go;
-this is not confirmatory Phase 5 and no synthetic arm ran.
+sealed. The prior mechanistic tuple-calibration fixture recipe fired its frozen
+public source no-go and remains final. A new user-authorized correction is
+frozen before new public or restricted outcomes; this is not confirmatory
+Phase 5 and no synthetic arm has run.
 
 **Scope:** public-only language-pipeline qualification followed, only on a
 signed PASS, by governed construction and sealing of the two common evaluation
@@ -236,6 +237,36 @@ All checked subject/video/object overlap counts were zero. Compact record
 commitment `dee0a375…13e7` verifies the result. No fixture media was rendered,
 no model inference or public model outcome was opened, the large Charades video
 archive was not downloaded, and governed C, LTX, generation, and synthetic
-training were not run. This exact source no-go ends the active exploratory
-route without permitting another source, stratum, threshold, or model
-substitution.
+training were not run. This exact source no-go remains final for that frozen
+relationship-derived label and sequential shared-cap recipe.
+
+### Prospective VISOR-HOS fixture correction
+
+Before any new source inventory or extractor outcome, the user authorized a
+narrow correction at commitment `34cb7b52…931b`. It does not reinterpret the
+`dee0a375…13e7` no-go. The correction pins the official VISOR DOI deposit's
+115 training and 43 validation annotation JSONs (868,821,446 bytes) under a
+locally resolved external-manifest commitment `771ce947…c095`. The deposit is
+handled as CC-BY-NC-4.0 noncommercial academic data. The official VISOR-HOS
+repository is pinned only as a semantic reference because it contains no
+license file; repository code is neither copied nor executed.
+
+Contact truth is now per visible left/right hand instance: a resolved object
+identifier is contact, exact `hand-not-in-contact` is no-contact, and
+none-of-the-above, inconclusive, missing, null, malformed, or unresolved
+relations abstain. Hand presence and contact state are separate tasks. No-hand
+frames never enter contact F1 and must be visually verified before inference;
+annotation absence merely nominates a frame. Participants are split first by
+the frozen public-seed hash deal. A simultaneous order-invariant sampler then
+targets 48 contact, 48 explicit no-contact, and 48 verified no-hand fixtures in
+each partition, with a cap of four per video and stratum, one selected item per
+frame, and zero participant/video/frame overlap.
+
+The public stage must run every independent source and model check before one
+combined decision. All five critical learner-effective axes, at least six of
+seven axes overall, and the separate genuinely order-dependent action control
+must pass their unchanged gates; one supporting axis may be unmeasured and
+broad activity remains descriptive. Only a complete public PASS authorizes the
+governed C transfer audit. Only a later combined C PASS can authorize the
+already bounded local LTX path and exactly 3,600 accepted credited synthetic
+seconds for the same three-seed descriptive learner run.

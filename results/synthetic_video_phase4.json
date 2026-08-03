@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_VISOR_HOS_CORRECTION_AMENDMENT_FROZEN_PENDING_COMPLETE_PUBLIC_COMBINED_GATE_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -63,7 +63,7 @@
     "interpretation": "the multi-pass Real-1h positive control missed only the frozen mean-gain component; this remains inconclusive about data quality and does not authorize generator or synthetic-arm work"
   },
   "post_gate_descriptive_extension": {
-    "status": "STOPPED_BY_MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO",
+    "status": "AUTHORIZED_PENDING_VISOR_HOS_CORRECTED_COMPLETE_PUBLIC_COMBINED_GATE",
     "effective_on": "2026-08-02",
     "preserves_coverage_redesign_stop": true,
     "authorization": "explicit user-authorized scientifically weaker one-accepted-hour descriptive Synthetic-1h LTX extension",
@@ -72,7 +72,7 @@
     "execution_order": ["governed_C_calibration_and_episode_plan_commitment", "public_dummy_LTX_final_topology_preflight", "freeze_and_approve_exact_resource_ceiling_if_required", "generate_and_seal_exactly_3600_credited_seconds", "three_matched_seed_synthetic_learner_runs"],
     "claim_limits": ["descriptive_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_more_than_one_accepted_synthetic_hour"],
     "prior_stop_preserved": "REAL_1H_FORMAL_GATE_AND_ALL_FOUR_CALIBRATION_NO_GOS_PRESERVED",
-    "synthetic_work_status": "NOT_RUN_FIXTURE_SOURCE_NO_GO_BEFORE_PUBLIC_MODEL_OUTCOMES_GOVERNED_C_OR_GENERATION"
+    "synthetic_work_status": "NOT_RUN_NEW_PROSPECTIVE_PUBLIC_CORRECTION_AND_COMBINED_GATE_PENDING"
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -498,6 +498,25 @@
     "synthetic_learner_run": false,
     "stop_rule": "the frozen annotation-only feasibility repair requires a fixture-source no-go with no further source model threshold or stratum substitution when any exact family yield fails"
   },
+  "mechanistic_training_tuple_visor_hos_correction_amendment": {
+    "status": "FROZEN_BEFORE_NEW_PUBLIC_SOURCE_INVENTORY_MODEL_C_GENERATOR_OR_LEARNER_OUTCOMES",
+    "amendment_commitment_sha256": "34cb7b5299a7d88d71d7d350530b88cbac7616e61ace9f3d1372880272a9931b",
+    "prior_fixture_no_go_status": "FINAL_FOR_PRIOR_FROZEN_RECIPE",
+    "prior_fixture_no_go_commitment_sha256": "dee0a37548d75fc29f829159ce3ad648a63288339c7bc173f8201483e51213e7",
+    "official_VISOR_HOS_annotation_JSON_count": 158,
+    "official_VISOR_HOS_annotation_bytes": 868821446,
+    "official_annotation_manifest_commitment_sha256": "771ce947b88966602b071f0e51765b6e726a4af219458cc9282f2633a526c095",
+    "hand_presence_and_contact_state_separate": true,
+    "development_target_counts": [48, 48, 48],
+    "holdout_target_counts": [48, 48, 48],
+    "five_critical_axes_must_pass": true,
+    "minimum_validated_axes": 6,
+    "axis_count": 7,
+    "order_action_control_separately_blocking": true,
+    "public_outcome_opened": false,
+    "governed_C_reopened": false,
+    "LTX_or_synthetic_learner_run": false
+  },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",
     "candidate_id": "egohod_egovideo_l_zero_shot",
@@ -564,5 +583,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "NONE_UNDER_ACTIVE_MECHANISTIC_TRAINING_TUPLE_PROTOCOL; fixture-source no-go stops public model qualification, governed C, LTX, and synthetic learner work"
+  "next_authorized_scope": "RUN_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_THEN_ALL_INDEPENDENT_PUBLIC_DEVELOPMENT_AND_HOLDOUT_METRICS_UNDER_THE_FROZEN_VISOR_HOS_CORRECTION; ONLY_A_COMBINED_PASS_AUTHORIZES_GOVERNED_C_AND_THEN_THE_EXACTLY_ONE_ACCEPTED_HOUR_DESCRIPTIVE_LTX_ARM"
 }

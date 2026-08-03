@@ -498,6 +498,58 @@ def _tuple_fixture_feasibility_repair(cfg: dict[str, Any]) -> dict[str, Any]:
     return value
 
 
+def _tuple_visor_hos_correction_amendment(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    try:
+        value = cfg["calibration_C"]["extractor"][
+            "mechanistic_training_tuple_visor_hos_correction_amendment"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_VISOR_HOS_CORRECTION_NOT_FROZEN") from error
+    if value.get("status") != (
+        "FROZEN_BEFORE_NEW_PUBLIC_SOURCE_INVENTORY_MODEL_C_GENERATOR_OR_LEARNER_OUTCOMES"
+    ):
+        raise RuntimeError("E_VISOR_HOS_CORRECTION_NOT_FROZEN")
+    copy = json.loads(json.dumps(value))
+    expected = copy.pop("amendment_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(copy) != expected:
+        raise RuntimeError("E_VISOR_HOS_CORRECTION_COMMITMENT")
+    artifact = value.get("official_annotation_artifact", {})
+    sampler = value.get("partition_and_joint_sampler", {})
+    counts = value.get("public_fixture_counts_per_partition", {})
+    gate = value.get("public_execution_and_combined_gate", {})
+    truth = value.get("truth_contract", {})
+    if (
+        artifact.get("combined_JSON_file_count") != 158
+        or artifact.get("combined_bytes") != 868821446
+        or sampler.get("seed") != 20260802
+        or sampler.get("partitions") != ["development", "holdout"]
+        or sampler.get("quota_per_partition_per_stratum") != 48
+        or sampler.get("final_item_count_per_partition") != 144
+        or sampler.get("per_video_per_stratum_cap") != 4
+        or sampler.get("per_source_frame_cap_across_strata") != 1
+        or "visor_hos_joint" not in str(sampler.get("candidate_order", ""))
+        or counts.get("hand_contact_items") != 144
+        or counts.get("total") != 416
+        or truth.get("boolean_values_are_invalid") is not True
+        or "visually verifies" not in str(truth.get("no_hand_verification", ""))
+    ):
+        raise RuntimeError("E_VISOR_HOS_CORRECTION_SCHEMA")
+    if gate.get("critical_axes") != list(TUPLE_CRITICAL_AXIS_IDS) or gate.get(
+        "supporting_axes"
+    ) != list(TUPLE_SUPPORTING_AXIS_IDS):
+        raise RuntimeError("E_VISOR_HOS_CORRECTION_COMBINED_GATE")
+    if (
+        gate.get("one_supporting_axis_may_be_unmeasured") is not True
+        or gate.get("broad_activity_context") != "DESCRIPTIVE_NONBLOCKING"
+        or "all five critical axes" not in str(gate.get("combined_pass_rule", ""))
+        or "at least six of seven" not in str(gate.get("combined_pass_rule", ""))
+    ):
+        raise RuntimeError("E_VISOR_HOS_CORRECTION_COMBINED_GATE")
+    return value
+
+
 def _tuple_sizing_validation(cfg: dict[str, Any]) -> dict[str, Any]:
     try:
         value = cfg["calibration_C"]["extractor"][
@@ -1256,6 +1308,569 @@ def _select_visor_fixtures(
                     f"E_TUPLE_VISOR_FIXTURE_YIELD_{partition}_{stratum}"
                 )
     return output
+
+
+# The functions above intentionally retain the fixture semantics used by the
+# sealed annotation-only source no-go.  The prospective VISOR-HOS correction
+# uses the isolated helpers below so that the earlier result remains
+# reproducible and cannot silently acquire the repaired label semantics.
+VISOR_HOS_STRATA = (
+    "contact",
+    "explicit_no_contact",
+    "verified_no_hand",
+)
+VISOR_HOS_GLOVE_NAMES = frozenset(
+    {
+        "oven glove",
+        "gloves",
+        "rubber glove",
+        "left glove",
+        "right glove",
+        "glove",
+    }
+)
+TUPLE_CRITICAL_AXIS_IDS = (
+    "adapter_qualified_yield",
+    "noun_adjective_exposure",
+    "utterance_centered_referent_visibility_dominance_ambiguity",
+    "cross_episode_recurrence",
+    "adjective_attribute_contrast",
+)
+TUPLE_SUPPORTING_AXIS_IDS = (
+    "hand_action_coupling",
+    "egocentric_sensor_regime",
+)
+
+
+def _visor_hos_normalized_identifier(value: Any) -> str | None:
+    """Normalize an official annotation ID without accepting JSON booleans."""
+
+    if value is None or isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, float):
+        if not math.isfinite(value) or not value.is_integer():
+            return None
+        return str(int(value))
+    if isinstance(value, str) and value and value == value.strip():
+        return value
+    return None
+
+
+def _visor_hos_contact_truth(
+    hand: dict[str, Any], annotations: list[dict[str, Any]]
+) -> dict[str, Any]:
+    """Decode the explicit VISOR-HOS contact state for one visible hand.
+
+    A resolved object annotation ID is contact and the one exact official
+    negative sentinel is no-contact.  Missing, null, boolean, unresolved, and
+    official ambiguous relations abstain rather than manufacturing a label.
+    """
+
+    if str(hand.get("name", "")) not in {"left hand", "right hand"}:
+        return {"status": "ABSTAIN", "reason": "NOT_VISIBLE_HAND"}
+    if not _valid_visor_segments(hand.get("segments")):
+        return {"status": "ABSTAIN", "reason": "INVALID_HAND_MASK"}
+    if "in_contact_object" not in hand:
+        return {"status": "ABSTAIN", "reason": "MISSING_CONTACT_LABEL"}
+    relation = hand["in_contact_object"]
+    if isinstance(relation, bool):
+        return {"status": "ABSTAIN", "reason": "BOOLEAN_CONTACT_LABEL"}
+    if relation == "hand-not-in-contact":
+        return {
+            "status": "MEASURED",
+            "reason": None,
+            "contact_state": "no_contact",
+            "contact": False,
+        }
+    if relation is None or relation in {
+        "",
+        "none",
+        "null",
+        "none-of-the-above",
+        "inconclusive",
+    }:
+        return {"status": "ABSTAIN", "reason": "AMBIGUOUS_CONTACT_LABEL"}
+    relation_id = _visor_hos_normalized_identifier(relation)
+    if relation_id is None:
+        return {"status": "ABSTAIN", "reason": "INVALID_CONTACT_OBJECT_ID"}
+    matches = [
+        item
+        for item in annotations
+        if _visor_hos_normalized_identifier(item.get("id")) == relation_id
+    ]
+    if len(matches) != 1:
+        return {"status": "ABSTAIN", "reason": "UNRESOLVED_CONTACT_OBJECT_ID"}
+    if not _valid_visor_segments(matches[0].get("segments")):
+        return {"status": "ABSTAIN", "reason": "INVALID_CONTACT_OBJECT_MASK"}
+    return {
+        "status": "MEASURED",
+        "reason": None,
+        "contact_state": "contact",
+        "contact": True,
+    }
+
+
+def _visor_hos_frame_candidates(row: dict[str, Any]) -> dict[str, Any]:
+    """Return independent presence/contact candidates for one VISOR-HOS frame."""
+
+    image = row.get("image")
+    annotations = row.get("annotations")
+    if not isinstance(image, dict) or not isinstance(annotations, list):
+        return {"status": "INVALID", "reason": "INVALID_FRAME_RECORD"}
+    name = str(image.get("name", ""))
+    video = str(image.get("video", ""))
+    path = str(image.get("image_path", ""))
+    participant = video.split("_", 1)[0]
+    if (
+        not name
+        or not video
+        or not re.fullmatch(r"P\d{2}", participant)
+        or Path(name).name != name
+        or Path(path).is_absolute()
+        or ".." in Path(path).parts
+    ):
+        return {"status": "INVALID", "reason": "INVALID_FRAME_IDENTITY"}
+    if any(
+        not isinstance(item, dict)
+        or not _valid_visor_segments(item.get("segments"))
+        for item in annotations
+    ):
+        return {"status": "INVALID", "reason": "INVALID_ANNOTATION_MASK"}
+    hands = [
+        (ordinal, item)
+        for ordinal, item in enumerate(annotations)
+        if str(item.get("name", "")) in {"left hand", "right hand"}
+    ]
+    on_hand_glove_present = any(
+        str(item.get("name", "")) in VISOR_HOS_GLOVE_NAMES
+        and item.get("on_which_hand") not in (None, [], "")
+        for item in annotations
+    )
+    base = {
+        "participant": participant,
+        "video": video,
+        "frame_name": name,
+        "image_path": path,
+    }
+    if not hands:
+        if on_hand_glove_present:
+            return {
+                "status": "ABSTAIN",
+                "reason": "ON_HAND_GLOVE_WITHOUT_VISIBLE_HAND",
+                "candidates": [],
+                "abstained_hand_count": 1,
+            }
+        return {
+            "status": "NOMINEE",
+            "reason": None,
+            "candidates": [
+                {
+                    **base,
+                    "stratum": "no_hand_nominee",
+                    "hand_visible": False,
+                    "contact": None,
+                    "target_hand_side": None,
+                    "target_hand_ordinal": None,
+                    "target_hand_segments": None,
+                }
+            ],
+            "abstained_hand_count": 0,
+        }
+    candidates = []
+    abstained = 0
+    for ordinal, hand in hands:
+        truth = _visor_hos_contact_truth(hand, annotations)
+        if truth["status"] != "MEASURED":
+            abstained += 1
+            continue
+        candidates.append(
+            {
+                **base,
+                "stratum": (
+                    "contact" if truth["contact"] else "explicit_no_contact"
+                ),
+                "hand_visible": True,
+                "contact": truth["contact"],
+                "target_hand_side": str(hand["name"]),
+                "target_hand_ordinal": ordinal,
+                "target_hand_segments": hand["segments"],
+            }
+        )
+    return {
+        "status": "ELIGIBLE" if candidates else "ABSTAIN",
+        "reason": None if candidates else "NO_CONCLUSIVE_HAND_CONTACT_STATE",
+        "candidates": candidates,
+        "abstained_hand_count": abstained,
+    }
+
+
+def _visor_hos_participant_partitions(
+    participants: set[str] | list[str] | tuple[str, ...], seed: int
+) -> dict[str, str]:
+    """Partition participants first by a frozen SHA-256 order and alternating deal."""
+
+    unique = sorted(set(participants))
+    if any(not re.fullmatch(r"P\d{2}", item) for item in unique):
+        raise RuntimeError("E_VISOR_HOS_PARTICIPANT_SET")
+    ordered = sorted(
+        unique,
+        key=lambda item: (_fixture_order(seed, "visor_hos_participant", item), item),
+    )
+    return {
+        participant: ("development" if ordinal % 2 == 0 else "holdout")
+        for ordinal, participant in enumerate(ordered)
+    }
+
+
+def _visor_hos_add_flow_edge(
+    graph: dict[Any, list[list[Any]]], source: Any, target: Any, capacity: int
+) -> None:
+    forward: list[Any] = [target, len(graph[target]), int(capacity)]
+    reverse: list[Any] = [source, len(graph[source]), 0]
+    graph[source].append(forward)
+    graph[target].append(reverse)
+
+
+def _visor_hos_max_flow(
+    graph: dict[Any, list[list[Any]]], source: Any, sink: Any
+) -> int:
+    """Small deterministic Dinic solver for the joint fixture constraints."""
+
+    total = 0
+    while True:
+        levels = {source: 0}
+        queue = [source]
+        for node in queue:
+            for target, _reverse, capacity in graph[node]:
+                if capacity > 0 and target not in levels:
+                    levels[target] = levels[node] + 1
+                    queue.append(target)
+        if sink not in levels:
+            return total
+        cursors = {node: 0 for node in graph}
+
+        def send(node: Any, available: int) -> int:
+            if node == sink:
+                return available
+            while cursors[node] < len(graph[node]):
+                edge_index = cursors[node]
+                target, reverse_index, capacity = graph[node][edge_index]
+                if capacity > 0 and levels.get(target) == levels[node] + 1:
+                    amount = send(target, min(available, capacity))
+                    if amount:
+                        graph[node][edge_index][2] -= amount
+                        graph[target][reverse_index][2] += amount
+                        return amount
+                cursors[node] += 1
+            return 0
+
+        while True:
+            amount = send(source, 10**9)
+            if not amount:
+                break
+            total += amount
+
+
+def _visor_hos_frame_key_set(
+    values: set[tuple[str, str]] | frozenset[tuple[str, str]] | None,
+    error_code: str,
+) -> set[tuple[str, str]]:
+    output: set[tuple[str, str]] = set()
+    for item in values or ():
+        if (
+            not isinstance(item, tuple)
+            or len(item) != 2
+            or not all(isinstance(value, str) and value for value in item)
+            or Path(item[1]).name != item[1]
+        ):
+            raise RuntimeError(error_code)
+        output.add(item)
+    return output
+
+
+def _visor_hos_candidate_order(
+    seed: int, partition: str, row: dict[str, Any]
+) -> tuple[str, str, str, str, str, int]:
+    side = str(row.get("target_hand_side") or "none")
+    return (
+        _fixture_order(
+            seed,
+            "visor_hos_joint",
+            partition,
+            row["stratum"],
+            row["video"],
+            row["frame_name"],
+            side,
+        ),
+        row["stratum"],
+        row["video"],
+        row["frame_name"],
+        side,
+        int(row.get("target_hand_ordinal") or 0),
+    )
+
+
+def _visor_hos_joint_sampler(
+    annotation_documents: list[dict[str, Any]],
+    *,
+    seed: int,
+    target_per_stratum: int = 48,
+    per_video_stratum_cap: int = 4,
+    verified_no_hand_frames: set[tuple[str, str]]
+    | frozenset[tuple[str, str]]
+    | None = None,
+    correction_excluded_frame_keys: set[tuple[str, str]]
+    | frozenset[tuple[str, str]]
+    | None = None,
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
+    """Jointly allocate explicit HOS strata without source-order dependence.
+
+    Raw sparse frames with no hand annotation are nominees only.  They enter
+    the specificity stratum solely when their exact public frame key appears
+    in the independent, pre-inference verification set.
+    """
+
+    if target_per_stratum <= 0 or per_video_stratum_cap <= 0:
+        raise RuntimeError("E_VISOR_HOS_SAMPLER_LIMIT")
+    verified_no_hand = _visor_hos_frame_key_set(
+        verified_no_hand_frames, "E_VISOR_HOS_VERIFIED_NO_HAND_KEY"
+    )
+    correction_excluded = _visor_hos_frame_key_set(
+        correction_excluded_frame_keys, "E_VISOR_HOS_CORRECTION_EXCLUSION_KEY"
+    )
+    participants: set[str] = set()
+    parsed_all: list[dict[str, Any]] = []
+    invalid_frame_count = 0
+    abstained_frame_count = 0
+    abstained_hand_count = 0
+    for document in annotation_documents:
+        rows = document.get("video_annotations")
+        if not isinstance(rows, list):
+            invalid_frame_count += 1
+            continue
+        for row in rows:
+            image = row.get("image") if isinstance(row, dict) else None
+            video = str(image.get("video", "")) if isinstance(image, dict) else ""
+            participant = video.split("_", 1)[0]
+            if re.fullmatch(r"P\d{2}", participant):
+                participants.add(participant)
+            result = _visor_hos_frame_candidates(row) if isinstance(row, dict) else {
+                "status": "INVALID"
+            }
+            if result["status"] == "INVALID":
+                invalid_frame_count += 1
+                continue
+            abstained_hand_count += int(result["abstained_hand_count"])
+            if result["status"] == "ABSTAIN":
+                abstained_frame_count += 1
+            parsed_all.extend(result["candidates"])
+    partitions = _visor_hos_participant_partitions(participants, seed)
+    no_hand_nominees = [
+        row for row in parsed_all if row["stratum"] == "no_hand_nominee"
+    ]
+    excluded_source_frames = {
+        (row["video"], row["frame_name"])
+        for row in parsed_all
+        if (row["video"], row["frame_name"]) in correction_excluded
+    }
+    parsed: list[dict[str, Any]] = []
+    for row in parsed_all:
+        frame_key = (row["video"], row["frame_name"])
+        if frame_key in correction_excluded:
+            continue
+        if row["stratum"] == "no_hand_nominee":
+            if frame_key not in verified_no_hand:
+                continue
+            parsed.append({**row, "stratum": "verified_no_hand"})
+        else:
+            parsed.append(row)
+    raw_eligible = {
+        stratum: sum(row["stratum"] == stratum for row in parsed)
+        for stratum in VISOR_HOS_STRATA
+    }
+    selected: dict[str, list[dict[str, Any]]] = {
+        "development": [],
+        "holdout": [],
+    }
+    post_partition: dict[str, dict[str, int]] = {}
+    post_cap: dict[str, dict[str, int]] = {}
+    final: dict[str, dict[str, int]] = {}
+    deficits: list[dict[str, Any]] = []
+    for partition in ("development", "holdout"):
+        candidates = [
+            row for row in parsed if partitions[row["participant"]] == partition
+        ]
+        post_partition[partition] = {
+            stratum: sum(row["stratum"] == stratum for row in candidates)
+            for stratum in VISOR_HOS_STRATA
+        }
+        by_stratum_video: dict[tuple[str, str], set[tuple[str, str]]] = defaultdict(set)
+        representative: dict[tuple[str, tuple[str, str]], dict[str, Any]] = {}
+        for row in candidates:
+            frame = (row["video"], row["frame_name"])
+            stratum = row["stratum"]
+            by_stratum_video[(stratum, row["video"])].add(frame)
+            key = (stratum, frame)
+            prior = representative.get(key)
+            if prior is None or _visor_hos_candidate_order(
+                seed, partition, row
+            ) < _visor_hos_candidate_order(seed, partition, prior):
+                representative[key] = row
+        post_cap[partition] = {
+            stratum: sum(
+                min(len(frames), per_video_stratum_cap)
+                for (item_stratum, _video), frames in by_stratum_video.items()
+                if item_stratum == stratum
+            )
+            for stratum in VISOR_HOS_STRATA
+        }
+
+        source = ("source", partition)
+        sink = ("sink", partition)
+        graph: dict[Any, list[list[Any]]] = defaultdict(list)
+        stratum_nodes = {stratum: ("stratum", stratum) for stratum in VISOR_HOS_STRATA}
+        for stratum in sorted(VISOR_HOS_STRATA):
+            _visor_hos_add_flow_edge(
+                graph, source, stratum_nodes[stratum], target_per_stratum
+            )
+        all_frames = sorted(
+            {(row["video"], row["frame_name"]) for row in candidates},
+            key=lambda frame: min(
+                _visor_hos_candidate_order(seed, partition, row)
+                for row in candidates
+                if (row["video"], row["frame_name"]) == frame
+            ),
+        )
+        for frame in all_frames:
+            _visor_hos_add_flow_edge(graph, ("frame", *frame), sink, 1)
+        video_nodes: dict[tuple[str, str], Any] = {}
+        for key in sorted(by_stratum_video):
+            stratum, video = key
+            node = ("video_stratum", stratum, video)
+            video_nodes[key] = node
+            _visor_hos_add_flow_edge(
+                graph, stratum_nodes[stratum], node, per_video_stratum_cap
+            )
+            for frame in sorted(
+                by_stratum_video[key],
+                key=lambda item: _visor_hos_candidate_order(
+                    seed, partition, representative[(stratum, item)]
+                ),
+            ):
+                _visor_hos_add_flow_edge(graph, node, ("frame", *frame), 1)
+        _visor_hos_max_flow(graph, source, sink)
+        for (stratum, video), node in video_nodes.items():
+            for target, _reverse, capacity in graph[node]:
+                if (
+                    isinstance(target, tuple)
+                    and target[:1] == ("frame",)
+                    and capacity == 0
+                ):
+                    frame = (target[1], target[2])
+                    selected[partition].append(representative[(stratum, frame)])
+        selected[partition].sort(
+            key=lambda row: _visor_hos_candidate_order(seed, partition, row)
+        )
+        final[partition] = {
+            stratum: sum(row["stratum"] == stratum for row in selected[partition])
+            for stratum in VISOR_HOS_STRATA
+        }
+        for stratum in VISOR_HOS_STRATA:
+            if final[partition][stratum] != target_per_stratum:
+                deficits.append(
+                    {
+                        "partition": partition,
+                        "stratum": stratum,
+                        "required_count": target_per_stratum,
+                        "available_count": final[partition][stratum],
+                    }
+                )
+    development = selected["development"]
+    holdout = selected["holdout"]
+    development_participants = {row["participant"] for row in development}
+    holdout_participants = {row["participant"] for row in holdout}
+    development_videos = {row["video"] for row in development}
+    holdout_videos = {row["video"] for row in holdout}
+    development_frames = {(row["video"], row["frame_name"]) for row in development}
+    holdout_frames = {(row["video"], row["frame_name"]) for row in holdout}
+    report = {
+        "status": "PASS" if not deficits else "NO_GO",
+        "raw_eligible_counts": raw_eligible,
+        "post_partition_counts": post_partition,
+        "post_cap_counts": post_cap,
+        "final_counts": final,
+        "deficits": deficits,
+        "invalid_frame_count": invalid_frame_count,
+        "abstained_frame_count": abstained_frame_count,
+        "abstained_hand_count": abstained_hand_count,
+        "no_hand_nominee_count": len(no_hand_nominees),
+        "verified_no_hand_input_count": len(verified_no_hand),
+        "matched_verified_no_hand_count": sum(
+            (row["video"], row["frame_name"]) in verified_no_hand
+            and (row["video"], row["frame_name"]) not in correction_excluded
+            for row in no_hand_nominees
+        ),
+        "unverified_no_hand_nominee_count": sum(
+            (row["video"], row["frame_name"]) not in verified_no_hand
+            for row in no_hand_nominees
+        ),
+        "correction_excluded_frame_count": len(excluded_source_frames),
+        "participant_overlap_count": len(
+            development_participants & holdout_participants
+        ),
+        "video_overlap_count": len(development_videos & holdout_videos),
+        "frame_overlap_count": len(development_frames & holdout_frames),
+    }
+    return selected, report
+
+
+def _tuple_combined_public_gate(
+    axis_results: dict[str, dict[str, Any]],
+    action_control_result: dict[str, Any],
+    broad_activity_result: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Apply the frozen five-critical-plus-six-of-seven decision once."""
+
+    axis_ids = (*TUPLE_CRITICAL_AXIS_IDS, *TUPLE_SUPPORTING_AXIS_IDS)
+    unexpected = sorted(set(axis_results) - set(axis_ids))
+    if unexpected:
+        raise RuntimeError("E_TUPLE_COMBINED_GATE_AXIS_SET")
+    statuses = {
+        axis_id: str(axis_results.get(axis_id, {}).get("status", "UNMEASURED"))
+        for axis_id in axis_ids
+    }
+    critical_failures = [
+        axis_id
+        for axis_id in TUPLE_CRITICAL_AXIS_IDS
+        if statuses[axis_id] != "PASS"
+    ]
+    validated_axis_count = sum(status == "PASS" for status in statuses.values())
+    action_status = str(action_control_result.get("status", "UNMEASURED"))
+    failures = [f"critical_axis:{axis_id}" for axis_id in critical_failures]
+    if validated_axis_count < 6:
+        failures.append("validated_axes_minimum:6_of_7")
+    if action_status != "PASS":
+        failures.append("order_dependent_action_control")
+    return {
+        "status": "PASS" if not failures else "NO_GO",
+        "axis_statuses": statuses,
+        "critical_axis_pass_count": 5 - len(critical_failures),
+        "critical_axis_required_count": 5,
+        "validated_axis_count": validated_axis_count,
+        "validated_axis_required_count": 6,
+        "critical_axis_failures": critical_failures,
+        "unvalidated_axis_ids": [
+            axis_id for axis_id in axis_ids if statuses[axis_id] != "PASS"
+        ],
+        "action_control_status": action_status,
+        "broad_activity_status": str(
+            (broad_activity_result or {}).get("status", "UNMEASURED")
+        ),
+        "broad_activity_used_in_gate": False,
+        "combined_gate_failures": failures,
+    }
 
 
 def _refuse_git_output(path: Path) -> None:

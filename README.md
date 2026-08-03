@@ -244,6 +244,21 @@ required 12. Holdout had the same 16/0/12 aggregate counts, and all checked
 subject/video/object overlap counts were zero. Record commitment
 `dee0a375…13e7` verifies the compact result. No fixture media or model outcome
 was produced, the Charades archive was not downloaded, and public development,
-governed C, LTX, and Synthetic-1h training were not opened. The active protocol
-therefore stops here; another public source, stratum, threshold, or model may
-not be substituted after this result.
+governed C, LTX, and Synthetic-1h training were not opened. That no-go remains
+final for its source semantics and sequential shared-cap allocation.
+
+The user has now prospectively authorized a new, narrowly scoped VISOR-HOS
+fixture correction at commitment `34cb7b52…931b`, before any new source
+inventory or extractor outcome. It freezes the official 158-file VISOR
+train-plus-validation annotation set, explicit contact versus explicit
+`hand-not-in-contact` truth, a separate visually verified no-hand task,
+participant-first splitting, and a simultaneous order-invariant 48/48/48
+contact/no-contact/no-hand allocation in each public partition. The official
+VISOR-HOS repository is an unlicensed semantic reference only: its code is not
+copied or executed. Public qualification must collect every independent module
+metric and then apply one decision: all five critical learner-effective axes,
+at least six of seven axes overall, and the separate genuinely
+order-dependent action control must pass. Broad activity remains descriptive.
+Only that combined public PASS can authorize the governed C transfer audit;
+only a subsequent combined C PASS can authorize the already bounded,
+exactly-one-accepted-hour descriptive LTX arm.

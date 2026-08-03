@@ -379,6 +379,36 @@ def test_tuple_fixture_feasibility_repair_preserves_scientific_gates() -> None:
         MODULE._tuple_fixture_feasibility_repair(config)
 
 
+def test_tuple_visor_hos_correction_amendment_is_committed_and_guarded() -> None:
+    import pytest
+
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    amendment = MODULE._tuple_visor_hos_correction_amendment(config)
+    assert amendment["official_annotation_artifact"]["combined_JSON_file_count"] == 158
+    assert amendment["official_annotation_artifact"]["combined_bytes"] == 868821446
+    assert amendment["partition_and_joint_sampler"][
+        "quota_per_partition_per_stratum"
+    ] == 48
+    assert amendment["partition_and_joint_sampler"]["per_video_per_stratum_cap"] == 4
+    assert amendment["partition_and_joint_sampler"][
+        "per_source_frame_cap_across_strata"
+    ] == 1
+    assert amendment["public_execution_and_combined_gate"]["critical_axes"] == list(
+        MODULE.TUPLE_CRITICAL_AXIS_IDS
+    )
+
+    changed = json.loads(json.dumps(config))
+    value = changed["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_visor_hos_correction_amendment"
+    ]
+    value["partition_and_joint_sampler"]["quota_per_partition_per_stratum"] = 47
+    scope = json.loads(json.dumps(value))
+    scope.pop("amendment_commitment_sha256")
+    value["amendment_commitment_sha256"] = MODULE.digest(scope)
+    with pytest.raises(RuntimeError, match="E_VISOR_HOS_CORRECTION_SCHEMA"):
+        MODULE._tuple_visor_hos_correction_amendment(changed)
+
+
 def test_task_matched_language_fixture_has_frozen_accept_and_abstention_mix() -> None:
     config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     preparation = MODULE._tuple_fixture_preparation_amendment(config)
@@ -485,6 +515,275 @@ def test_visor_fixture_availability_reports_frozen_stratum_shortfall() -> None:
         [{"video_annotations": rows}], preparation
     )
     assert counts["development"]["hand_no_contact"] == 4
+
+
+def _visor_hos_row(
+    participant: str,
+    video_ordinal: int,
+    frame_ordinal: int,
+    relation: object,
+    *,
+    hand_side: str = "left hand",
+) -> dict[str, object]:
+    video = f"{participant}_{video_ordinal:02d}"
+    annotations: list[dict[str, object]] = [
+        {
+            "id": f"hand-{frame_ordinal}",
+            "name": hand_side,
+            "segments": [[[1.0, 1.0], [4.0, 1.0], [4.0, 4.0]]],
+            "in_contact_object": relation,
+        }
+    ]
+    if relation == "object":
+        annotations.append(
+            {
+                "id": "object",
+                "name": "cup",
+                "segments": [[[5.0, 1.0], [8.0, 1.0], [8.0, 4.0]]],
+            }
+        )
+    return {
+        "image": {
+            "name": f"frame-{frame_ordinal:04d}.jpg",
+            "image_path": f"{video}/frame-{frame_ordinal:04d}.jpg",
+            "video": video,
+        },
+        "annotations": annotations,
+    }
+
+
+def _visor_hos_no_hand_row(
+    participant: str, video_ordinal: int, frame_ordinal: int
+) -> dict[str, object]:
+    video = f"{participant}_{video_ordinal:02d}"
+    return {
+        "image": {
+            "name": f"frame-{frame_ordinal:04d}.jpg",
+            "image_path": f"{video}/frame-{frame_ordinal:04d}.jpg",
+            "video": video,
+        },
+        "annotations": [
+            {
+                "id": f"object-{frame_ordinal}",
+                "name": "cup",
+                "segments": [[[5.0, 1.0], [8.0, 1.0], [8.0, 4.0]]],
+            }
+        ],
+    }
+
+
+def test_visor_hos_contact_truth_uses_explicit_labels_and_abstains() -> None:
+    contact_row = _visor_hos_row("P01", 1, 1, "object")
+    hand = contact_row["annotations"][0]
+    assert MODULE._visor_hos_contact_truth(hand, contact_row["annotations"]) == {
+        "status": "MEASURED",
+        "reason": None,
+        "contact_state": "contact",
+        "contact": True,
+    }
+    hand["in_contact_object"] = "hand-not-in-contact"
+    assert MODULE._visor_hos_contact_truth(hand, contact_row["annotations"])[
+        "contact_state"
+    ] == "no_contact"
+    for invalid in (None, True, False, "none-of-the-above", "inconclusive", "none"):
+        hand["in_contact_object"] = invalid
+        assert (
+            MODULE._visor_hos_contact_truth(hand, contact_row["annotations"])[
+                "status"
+            ]
+            == "ABSTAIN"
+        )
+    hand.pop("in_contact_object")
+    assert MODULE._visor_hos_contact_truth(hand, contact_row["annotations"]) == {
+        "status": "ABSTAIN",
+        "reason": "MISSING_CONTACT_LABEL",
+    }
+
+
+def test_visor_hos_no_hand_is_separate_from_contact_state() -> None:
+    parsed = MODULE._visor_hos_frame_candidates(_visor_hos_no_hand_row("P01", 1, 1))
+    assert parsed["status"] == "NOMINEE"
+    assert parsed["candidates"][0]["stratum"] == "no_hand_nominee"
+    assert parsed["candidates"][0]["contact"] is None
+    assert parsed["candidates"][0]["hand_visible"] is False
+    glove = _visor_hos_no_hand_row("P01", 1, 2)
+    glove["annotations"][0].update(
+        {"name": "glove", "on_which_hand": ["left hand"]}
+    )
+    parsed_glove = MODULE._visor_hos_frame_candidates(glove)
+    assert parsed_glove["status"] == "ABSTAIN"
+    assert parsed_glove["reason"] == "ON_HAND_GLOVE_WITHOUT_VISIBLE_HAND"
+
+
+def test_visor_hos_joint_sampler_is_order_invariant_and_collects_deficits() -> None:
+    rows = []
+    for participant_index in range(1, 9):
+        participant = f"P{participant_index:02d}"
+        for stratum_ordinal, relation in enumerate(
+            ("object", "hand-not-in-contact", None)
+        ):
+            for video_offset in range(2):
+                for frame_offset in range(4):
+                    frame = stratum_ordinal * 100 + video_offset * 10 + frame_offset
+                    if relation is None:
+                        rows.append(
+                            _visor_hos_no_hand_row(
+                                participant, stratum_ordinal * 2 + video_offset, frame
+                            )
+                        )
+                    else:
+                        rows.append(
+                            _visor_hos_row(
+                                participant,
+                                stratum_ordinal * 2 + video_offset,
+                                frame,
+                                relation,
+                            )
+                        )
+    verified_no_hand_frames = {
+        (row["image"]["video"], row["image"]["name"])
+        for row in rows
+        if not any(
+            item["name"] in {"left hand", "right hand"}
+            for item in row["annotations"]
+        )
+    }
+    first, first_report = MODULE._visor_hos_joint_sampler(
+        [{"video_annotations": rows}],
+        seed=20260802,
+        target_per_stratum=12,
+        verified_no_hand_frames=verified_no_hand_frames,
+    )
+    second, second_report = MODULE._visor_hos_joint_sampler(
+        [{"video_annotations": list(reversed(rows))}],
+        seed=20260802,
+        target_per_stratum=12,
+        verified_no_hand_frames=verified_no_hand_frames,
+    )
+    compact = lambda value: [
+        (row["video"], row["frame_name"], row["stratum"])
+        for partition in ("development", "holdout")
+        for row in value[partition]
+    ]
+    assert compact(first) == compact(second)
+    assert first_report == second_report
+    assert first_report["status"] == "PASS"
+    assert first_report["participant_overlap_count"] == 0
+    assert first_report["video_overlap_count"] == 0
+    assert first_report["frame_overlap_count"] == 0
+    for partition in ("development", "holdout"):
+        assert first_report["final_counts"][partition] == {
+            "contact": 12,
+            "explicit_no_contact": 12,
+            "verified_no_hand": 12,
+        }
+        frames = [
+            (row["video"], row["frame_name"]) for row in first[partition]
+        ]
+        assert len(frames) == len(set(frames))
+        for stratum in MODULE.VISOR_HOS_STRATA:
+            video_counts = {
+                video: sum(
+                    row["video"] == video and row["stratum"] == stratum
+                    for row in first[partition]
+                )
+                for video in {row["video"] for row in first[partition]}
+            }
+            assert max(video_counts.values()) <= 4
+
+    _selected, deficient = MODULE._visor_hos_joint_sampler(
+        [{"video_annotations": rows[:4]}], seed=20260802, target_per_stratum=3
+    )
+    assert deficient["status"] == "NO_GO"
+    assert len(deficient["deficits"]) >= 3
+    assert {item["partition"] for item in deficient["deficits"]} == {
+        "development",
+        "holdout",
+    }
+    _selected, empty = MODULE._visor_hos_joint_sampler(
+        [], seed=20260802, target_per_stratum=3
+    )
+    assert len(empty["deficits"]) == 6
+
+
+def test_visor_hos_no_hand_requires_external_verification_and_honors_exclusion() -> None:
+    first = _visor_hos_no_hand_row("P01", 1, 1)
+    second = _visor_hos_no_hand_row("P02", 1, 2)
+    contact = _visor_hos_row("P01", 2, 3, "object")
+    selected, report = MODULE._visor_hos_joint_sampler(
+        [{"video_annotations": [first, second, contact]}],
+        seed=20260802,
+        target_per_stratum=1,
+        verified_no_hand_frames={("P01_01", "frame-0001.jpg")},
+        correction_excluded_frame_keys={("P01_02", "frame-0003.jpg")},
+    )
+    retained_no_hand = [
+        row
+        for partition in selected.values()
+        for row in partition
+        if row["stratum"] == "verified_no_hand"
+    ]
+    assert len(retained_no_hand) == 1
+    assert retained_no_hand[0]["frame_name"] == "frame-0001.jpg"
+    assert report["no_hand_nominee_count"] == 2
+    assert report["verified_no_hand_input_count"] == 1
+    assert report["matched_verified_no_hand_count"] == 1
+    assert report["unverified_no_hand_nominee_count"] == 1
+    assert report["correction_excluded_frame_count"] == 1
+    assert all(
+        row["frame_name"] != "frame-0003.jpg"
+        for partition in selected.values()
+        for row in partition
+    )
+
+
+def test_tuple_combined_public_gate_collects_all_failures() -> None:
+    axes = {
+        axis: {"status": "PASS"}
+        for axis in (
+            *MODULE.TUPLE_CRITICAL_AXIS_IDS,
+            *MODULE.TUPLE_SUPPORTING_AXIS_IDS,
+        )
+    }
+    axes[MODULE.TUPLE_CRITICAL_AXIS_IDS[0]] = {"status": "FAIL"}
+    axes[MODULE.TUPLE_CRITICAL_AXIS_IDS[1]] = {"status": "UNMEASURED"}
+    result = MODULE._tuple_combined_public_gate(
+        axes,
+        {"status": "FAIL"},
+        {"status": "FAIL"},
+    )
+    assert result["status"] == "NO_GO"
+    assert result["critical_axis_failures"] == [
+        MODULE.TUPLE_CRITICAL_AXIS_IDS[0],
+        MODULE.TUPLE_CRITICAL_AXIS_IDS[1],
+    ]
+    assert result["validated_axis_count"] == 5
+    assert result["combined_gate_failures"] == [
+        f"critical_axis:{MODULE.TUPLE_CRITICAL_AXIS_IDS[0]}",
+        f"critical_axis:{MODULE.TUPLE_CRITICAL_AXIS_IDS[1]}",
+        "validated_axes_minimum:6_of_7",
+        "order_dependent_action_control",
+    ]
+    assert result["broad_activity_used_in_gate"] is False
+
+
+def test_tuple_combined_public_gate_allows_one_supporting_axis_unmeasured() -> None:
+    axes = {
+        axis: {"status": "PASS"}
+        for axis in (
+            *MODULE.TUPLE_CRITICAL_AXIS_IDS,
+            *MODULE.TUPLE_SUPPORTING_AXIS_IDS,
+        )
+    }
+    axes[MODULE.TUPLE_SUPPORTING_AXIS_IDS[0]] = {"status": "UNMEASURED"}
+    first = MODULE._tuple_combined_public_gate(
+        axes, {"status": "PASS"}, {"status": "FAIL"}
+    )
+    second = MODULE._tuple_combined_public_gate(
+        axes, {"status": "PASS"}, {"status": "PASS"}
+    )
+    assert first["status"] == second["status"] == "PASS"
+    assert first["validated_axis_count"] == 6
 
 
 def test_tuple_zip_extraction_blocks_path_traversal(tmp_path: Path) -> None:

@@ -102,7 +102,16 @@ def validate_phase_state(config: Mapping[str, Any]) -> None:
         raise ValueError("phase status and gates.phase4_status are required")
     top_provisional = "REOPENED" in top or "PROVISIONAL" in top
     nested_provisional = "PROVISIONAL" in nested or "SUPERSEDED" in nested
-    top_pass = top.startswith("PASS") or "COMPLETE" in top
-    nested_pass = nested.startswith("PASS")
-    if top_provisional != nested_provisional or top_pass != nested_pass:
+    top_pass = top.startswith("PASS") or "CORRECTED_ASSETS_PASS" in top
+    nested_pass = nested.startswith("PASS") or "CORRECTED_COMMON_ASSETS_PASS" in nested
+    active_markers = (
+        "VISOR_HOS_CORRECTION_AMENDMENT_FROZEN_PENDING_COMPLETE_PUBLIC_COMBINED_GATE",
+        "MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO",
+    )
+    marker_mismatch = any((marker in top) != (marker in nested) for marker in active_markers)
+    if (
+        top_provisional != nested_provisional
+        or top_pass != nested_pass
+        or marker_mismatch
+    ):
         raise ValueError(f"contradictory Phase 4 states: {top!r} vs {nested!r}")
