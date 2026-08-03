@@ -93,7 +93,7 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_ARTIFACT_GATE_PASS_PENDING_LOCAL_RELOAD_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -117,6 +117,15 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert tuple_amendment["generator_or_synthetic_learner_outcome_opened"] is False
     assert tuple_amendment["prior_pre_clarification_amendment_commitment_sha256"] == "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222"
     assert tuple_amendment["amendment_commitment_sha256"] == "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf"
+    premodel = result["mechanistic_training_tuple_premodel_result"]
+    assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
+    assert premodel["dependency_manifest_commitment_sha256"] == (
+        "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"
+    )
+    assert premodel["engineering_failure_count_before_pass"] == 3
+    assert premodel["model_inference_executed"] is False
+    assert premodel["restricted_mount_present"] is False
+    assert premodel["governed_C_reopened"] is False
     assert result["governed_C_calibration"]["critical_axis_failure"] == "audiovisual_grounding_opportunity_high_missingness"
     assert result["governed_C_calibration"]["provisional_episode_plan_executable"] is False
     repair = result["governed_C_calibration_extractor_repair"]
@@ -196,7 +205,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "MECHANISTIC_TRAINING_TUPLE_CALIBRATION_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
+    assert proof["status"] == "MECHANISTIC_TRAINING_TUPLE_ARTIFACT_GATE_PASS_PENDING_LOCAL_RELOAD_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,
@@ -214,6 +223,13 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
     assert proof["schema_version"] == 11
+    premodel = proof["calibration_C"]["extractor"]["mechanistic_training_tuple_premodel_result"]
+    assert premodel["dependency_manifest_commitment_sha256"] == (
+        "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"
+    )
+    assert premodel["counts"]["artifact_bytes"] == 14621041722
+    assert premodel["counts"]["egohos_archive_license_file_count"] == 0
+    assert premodel["model_inference_executed"] is False
     assert proof["generator_gate"]["status"] == "SELECTED_LOCAL_NOT_RUN_MECHANISTIC_TRAINING_TUPLE_CALIBRATION_PENDING"
     assert proof["generator_gate"]["implementation"]["commit"] == "9377758131b1ffde4b7f766804590a6617bf2ab9"
     assert proof["generator_gate"]["weights"]["revision"] == "4229404625088d21c4f112eb640fb04a0900ee25"

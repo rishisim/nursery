@@ -39,8 +39,14 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 4
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_ARTIFACT_GATE_PASS_PENDING_LOCAL_RELOAD_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
+    premodel = config["mechanistic_training_tuple_premodel_result"]
+    assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
+    assert premodel["dependency_manifest_commitment_sha256"] == (
+        "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"
+    )
+    assert premodel["model_inference_executed"] is False
     assert schedule_cycle(config["learner"]["schedule"]) == [
         "contrastive",
         "contrastive",

@@ -1,6 +1,6 @@
 {
   "schema_version": 11,
-  "status": "MECHANISTIC_TRAINING_TUPLE_CALIBRATION_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
+  "status": "MECHANISTIC_TRAINING_TUPLE_ARTIFACT_GATE_PASS_PENDING_LOCAL_RELOAD_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -70,7 +70,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION",
+    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_ARTIFACT_GATE_PASS_PENDING_LOCAL_RELOAD_AND_PUBLIC_QUALIFICATION",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -1098,6 +1098,47 @@
         },
         "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
         "amendment_commitment_sha256": "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf"
+      },
+      "mechanistic_training_tuple_premodel_result": {
+        "status": "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING",
+        "observed_on": "2026-08-02",
+        "amendment_commitment_sha256": "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf",
+        "dependency_manifest_commitment_sha256": "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527",
+        "engineering_attempts": [
+          {"status": "FAILED_NO_SCIENTIFIC_OUTCOME", "reason": "approved container lacked git and curl; replaced only artifact ingress with immutable commit archives and resumable Python HTTPS"},
+          {"status": "FAILED_NO_SCIENTIFIC_OUTCOME", "reason": "initial implementation assumed a preexisting PE-Core cache"},
+          {"status": "FAILED_NO_SCIENTIFIC_OUTCOME", "reason": "approved container lacked huggingface_hub; replaced only PE transport with a pinned direct HTTPS artifact"},
+          {"status": "PASS_ARTIFACTS_READY", "reason": "all immutable public artifacts resolved and hashed"}
+        ],
+        "counts": {"component_count": 7, "repository_count": 4, "weight_and_resource_file_count": 10, "license_record_count": 8, "artifact_bytes": 14621041722, "egohos_archive_license_file_count": 0},
+        "repository_archives": {
+          "EgoHOS": {"commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7", "archive_sha256": "702df6782483dd9364f114113e44a921b76fd41a38446fc845402282385e821f", "code_license_sha256": "b3e2caf44fe59ac8163bc9425d332bb4eedb42b4b619b6670ab63483da311785"},
+          "GroundingDINO": {"commit": "856dde20aee659246248e20734ef9ba5214f5e44", "archive_sha256": "d1045d1113de0acff91b6328672d4c3f168c4a8e4115b52cb4bbf19fcbe4e4c0", "code_license_sha256": "b403c98ec1ffaccb0124632592a3d99642cddc3031ca412b402568e6c06c202a"},
+          "SAM2": {"commit": "2b90b9f5ceec907a1c18123530e92e794ad901a4", "archive_sha256": "fe93082a71a885a427894b1eab76341768781b6b58a298a0717e03862097d137", "code_and_weight_license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"},
+          "DINOv2": {"commit": "7764ea0f912e53c92e82eb78a2a1631e92725fc8", "archive_sha256": "04276715cddb29d45d05bff3a6fc132224dc27749b279ac98ad2ce4620e20d48", "code_and_weight_license_sha256": "600cc67cc4cb2f5ea317dcfc687ad1c74dc4bec8782bbe9db0afd83513b935b7"}
+        },
+        "artifact_sha256": {
+          "groundingdino_swint_ogc.pth": "3b3ca2563c77c69f651d7bd133e97139c186df06231157a64c507099c52bc799",
+          "sam2.1_hiera_base_plus.pt": "a2345aede8715ab1d5d31b4a509fb160c5a4af1970f199d9054ccfb746c004c5",
+          "dinov2_vitb14_pretrain.pth": "0b8b82f85de91b424aded121c7e1dcc2b7bc6d0adeea651bf73a13307fad8c73",
+          "egohos_work_dirs.zip": "2a26ef11ae0afbd4716b0db355e4d5d13698a0e92ab4361214d9a611627836e4",
+          "PE-Core-L14-336.pt": "0cdab5b338cbaa1e7a5dcd1b2fb4c9f4d5df1abd289564658edbab64a650e7e8",
+          "egohod_large_best.pt": "71faa0b6e5ebfb912238a099b16b1ff8b6b0a74cbb5b9eb43d5ad8bc92f880da",
+          "wordnet.zip": "cbda5ea6eef7f36a97a43d4a75f85e07fccbb4f23657d27b4ccbc93e2646ab59",
+          "averaged_perceptron_tagger_eng.zip": "6025f530624335c67d6547d44757b357b4e79bae030a0383e9887a92c1718f0b",
+          "nltk-3.9.1-py3-none-any.whl": "4fa26829c5b00715afe3061398a8989dc643b92ce7dd93fb4585a70930d168a1",
+          "wordfreq-3.0.2-py3-none-any.whl": "c5bfdf26cc26437d670ef145326e4e395cf0a4f4de2da85a331ddf3d2a334588"
+        },
+        "license_interpretation": {
+          "EgoHOS_weights": "eligible for this academic local-processing prototype under the official MIT-licensed project's own checkpoint distribution; the downloaded checkpoint archive contains no separate license file",
+          "GroundingDINO_weights": "official release asset under the Apache-2.0 project record",
+          "SAM2_DINOv2_PECore_EgoHOD": "official public code/model records permit local academic processing",
+          "limitation": "no broader commercial-use conclusion is claimed from the EgoHOS archive"
+        },
+        "restricted_mount_present": false,
+        "model_inference_executed": false,
+        "external_experiment_tracking": false,
+        "next_gate": "install and seal exact local dependencies then run one-item label-blind final-runtime sizing with network disabled"
       },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},

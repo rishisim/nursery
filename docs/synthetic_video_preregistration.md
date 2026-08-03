@@ -1157,3 +1157,15 @@ public storage, 100 GiB governed incremental storage, and zero direct monetary
 cost. This is within the user's existing broad GPU authorization. DDP is not
 authorized. LTX retains its separate final-topology/resource gate and the
 synthetic corpus remains capped at exactly one accepted credited hour.
+
+The public artifact subgate subsequently passed under dependency-manifest
+commitment `8c787a01…b527`: all four repository archives and ten public
+weight/resource files were resolved to immutable SHA-256 values (14.62 GB),
+with no model inference and no restricted mount. Three preceding preparation
+attempts were engineering-only failures caused by missing container transport
+dependencies and opened no scientific outcome. The official MIT-licensed
+EgoHOS project distributes its checkpoint bundle, but that archive contains no
+separate license file; the eligibility record is limited to academic local
+prototype processing and makes no broader commercial-use claim. Exact local
+dependency installation, network-disabled reload, and label-blind sizing are
+the next gate; public development and holdout remain unopened.

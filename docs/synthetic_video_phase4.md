@@ -3,7 +3,8 @@
 **Status:** **CORRECTED COMMON ASSETS PASS** — Stage A remains PASS; the first
 Stage B assets remain provisional/superseded, and the corrected lexical and
 temporal assets are sealed. The active exploratory mechanistic tuple-calibration
-amendment is pending public qualification and is not confirmatory Phase 5.
+artifact gate passed and local-reload sizing plus public qualification remain;
+this is not confirmatory Phase 5.
 
 **Scope:** public-only language-pipeline qualification followed, only on a
 signed PASS, by governed construction and sealing of the two common evaluation
@@ -156,7 +157,13 @@ provisional/superseded. Later exploratory real-only runs and four preserved
 calibration no-gos are recorded in the canonical preregistration and compact
 Phase 4 result. Schema 11 now freezes a distinct mechanistic training-tuple
 calibration amendment at commitment `c9a48206…adaf`. Only its public
-qualification is presently authorized. Governed C measurement requires that
+qualification is presently authorized. Its public artifact manifest passed at
+commitment `8c787a01…b527` with seven components, four immutable repository
+archives, and ten weight/resource files (14.62 GB), without model inference or
+a restricted mount. The EgoHOS bundle is distributed by the official
+MIT-licensed project but contains no separate archive license file; this record
+asserts academic local prototype use only and no broader license conclusion.
+Local-files-only reload and blind sizing remain pending. Governed C measurement requires that
 pass, and LTX generation remains further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is
 authorized.

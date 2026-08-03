@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_ARTIFACT_GATE_PASS_PENDING_LOCAL_RELOAD_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -335,7 +335,22 @@
     "pre_outcome_implementation_clarification": "English noun and adjective mentions share their accepted ASR-translation segment timing because OPUS-MT supplies no English-token alignment; no per-English-word timestamp is fabricated",
     "prior_pre_clarification_amendment_commitment_sha256": "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222",
     "amendment_commitment_sha256": "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf",
-    "next_gate": "implement and qualify the frozen modular extractors on task-matched public development and sealed holdout fixtures"
+    "next_gate": "install and seal exact local dependencies then run one-item label-blind final-runtime sizing before task-matched public development and sealed holdout"
+  },
+  "mechanistic_training_tuple_premodel_result": {
+    "status": "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING",
+    "dependency_manifest_commitment_sha256": "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527",
+    "component_count": 7,
+    "repository_count": 4,
+    "weight_and_resource_file_count": 10,
+    "artifact_bytes": 14621041722,
+    "engineering_failure_count_before_pass": 3,
+    "model_inference_executed": false,
+    "restricted_mount_present": false,
+    "egohos_archive_license_file_count": 0,
+    "license_limitation": "official MIT project distributes the checkpoint bundle but the archive contains no separate license file; record supports academic local prototype processing and no broader claim",
+    "governed_C_reopened": false,
+    "generator_or_synthetic_learner_outcome_opened": false
   },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",

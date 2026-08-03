@@ -191,7 +191,8 @@ governed C transfer audit, missingness/matching rules, and one-H100 resource
 ceiling before any new outcome. An implementation clarification anchors English
 mentions to their accepted translation segment because OPUS-MT emits no
 English-token alignment; no timestamp is fabricated. The active commitment is
-`c9a48206…adaf`. Public
-qualification is the only currently authorized execution stage; C measurement,
+`c9a48206…adaf`. The public artifact subgate passed at `8c787a01…b527`
+without model inference or a restricted mount; local-reload sizing and modular
+public qualification are next. C measurement,
 LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
 and descriptive-only claim boundary are unchanged.
