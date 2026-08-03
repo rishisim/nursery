@@ -663,31 +663,33 @@ The target is a free MuJoCo box. The room and visible hand use matching box
 collision/mesh dimensions, and no target state is written after initialization.
 
 Focused validation on the ignored run
-`runs/embodied_simulation/native_filament_episode` found 500 clock-aligned RGB,
-metric-depth, and object-ID frames, 500 synchronized state rows, exact
-same-machine replay (maximum checked error 0), persistent
-`target_block_001` identity, and no attachment/assist mechanisms. Bilateral
-target contact starts at 4.548 s; the free target lifts 0.226 m and is released.
-The source-level validator rejects equality/connect/mocap/external-force
-attachment mechanisms. The RGB, depth, and ID renders are separate Filament
-passes over the same retained transforms and camera. Metal selected Apple M5;
-the official source/version/license findings in the preceding preflight remain
+`runs/embodied_simulation/native_filament_episode` now finds 500 clock-aligned
+RGB, metric-depth, and object-ID frames and 500 synchronized state rows.
+Full retained-sample replay is byte-for-byte equal, including dynamic poses,
+actions, camera, contacts, and forces. Identity remains `target_block_001`.
+Bilateral support begins at 4.132 s and persists continuously through the
+declared 6.6–11.46 s hold window, ending at 11.492 s only when the 11.5 s
+opening command is issued. The free target reaches 0.276 m lift, is still above
+0.400 m at the end of that hold, then descends to the table without bilateral
+contact. The source-level validator rejects equality/connect/mocap/external
+force attachment mechanisms and requires all these timing conditions.
+
+Visible contact geometry is retained and rendered for the palm, bilateral
+fingers, their physical support pads, head, torso, and target. The repaired
+minimum finger-target distance is -0.004949 m and target-table distance is
+-0.001924 m, both inside the 5 mm limit. The head-derived mount yaw range is
+24.82 degrees, and the physically retained target moves 57.1 mm during the
+7.2–9.2 s inspect-shake interval. RGB, depth, and ID are separate Filament
+passes over those exact transforms and camera. Metal selected Apple M5; the
+official source/version/license findings in the preceding preflight remain
 unchanged. No restricted media or ChildLens threshold was used.
 
-The penetration diagnostic remains a real visible-geometry concern: its
-minimum bilateral contact distance is -0.02736 m, exceeding the 5 mm repair
-threshold. It is retained rather than hidden because the current box-finger
-grip needs collision-margin/shape tuning before it can be considered visually
-credible.
-
-Normal-speed inspection of the 640×480, 500-frame, 16.0-second MP4 confirms
-continuous reorientation, reach, visible bilateral enclosure, lifted target,
-and release rather than the rejected blank clip. The physical/truth contract
-is therefore promising. Appearance is still an intentionally procedural,
-low-detail block scene with no skinned child mesh, textured room, or realistic
-lighting; it does not demonstrate material visual credibility over prior
-footage. The bounded repair is first to reduce the recorded finger-target
-penetration below 5 mm while preserving the same physical grasp, then a single
-Unity/official-plugin appearance pass using that trace and registration
-contract once the user activates a Unity license. Do not change the physics
-episode, camera rule, or grasp rule.
+Reproducible `ffprobe`/`ffmpeg` inspection confirms a 640×480, 500-frame,
+16.0-second H.264-only MP4 and the look, reach, contact, lift/shake, controlled
+opening, and aftermath frames at their retained timestamps. Appearance is still
+an intentionally procedural low-detail block scene with no skinned child mesh,
+textured room, or realistic lighting; it does not demonstrate material visual
+credibility over prior footage. The bounded remaining repair is one
+Unity/official-plugin appearance pass using this unchanged truth/registration
+contract once the user activates Unity; do not weaken or change the physics,
+camera, or grasp conditions.

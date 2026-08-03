@@ -73,14 +73,14 @@ struct Vertex {
 struct TraceSample {
   double time_s;
   struct Pose { std::array<double, 3> position; std::array<double, 9> rotation; };
-  Pose torso, head, palm, left_finger, right_finger, target, camera_mount;
+  Pose torso, head, palm, left_finger, right_finger, left_tip, right_tip, target, camera_mount;
   std::array<double, 5> action;
   std::array<double, 5> qpos, qvel;
   std::array<double, 6> head_cvel, target_cvel;
   int contact_count;
   bool left_target_contact, right_target_contact;
   std::array<double, 6> left_target_wrench, right_target_wrench;
-  double left_target_distance = 1.0, right_target_distance = 1.0;
+  double left_target_distance = 1.0, right_target_distance = 1.0, target_table_distance = 1.0;
 };
 
 constexpr std::array<Vertex, 8> kCubeVertices{{
@@ -135,30 +135,32 @@ EpisodeTrace RunPhysicalEpisode() {
   static constexpr const char* kMjcf = R"(
 <mujoco model="native_physical_grasp">
   <option timestep="0.004" gravity="0 0 -9.81" integrator="implicitfast"/>
-  <default><joint damping="1"/><geom friction="4 0.01 0.001" condim="4"/>
+  <default><joint damping="1"/><geom friction="10 0.01 0.001" condim="4" solref=".01 1" solimp=".99 .99 .001"/>
     <position kp="650" forcelimited="true" forcerange="-180 180"/></default>
   <worldbody>
     <geom name="floor" type="plane" size="3 3 .1" rgba=".2 .2 .2 1"/>
-    <body name="table" pos=".45 0 .30"><geom name="table_top" type="box" size=".35 .30 .03" rgba=".45 .25 .12 1"/></body>
+    <body name="table" pos=".45 0 .30"><geom name="table_top" type="box" size=".35 .30 .03" solref="-10000 -100" solimp=".999 .999 .00001" rgba=".45 .25 .12 1"/></body>
     <body name="child_root" pos="0 0 .33">
       <geom name="torso" type="box" pos="0 0 .15" size=".12 .10 .15" rgba=".85 .56 .38 1"/>
-      <body name="head" pos="0 0 .36"><joint name="neck_yaw" type="hinge" axis="0 0 1" range="-.5 .5" limited="true"/>
-        <geom name="head_geom" type="box" size=".13 .12 .13" rgba=".95 .72 .55 1"/><site name="camera_mount" pos=".105 0 .02"/></body>
+      <body name="head" pos="0 0 .36"><joint name="neck_yaw" type="hinge" axis="0 0 1" range="-.7 .7" limited="true"/>
+        <geom name="head_geom" type="box" size=".13 .12 .13" mass=".5" rgba=".95 .72 .55 1"/><site name="camera_mount" pos=".105 0 .02"/></body>
       <body name="wrist" pos="0 0 .10"><joint name="wrist_x" type="slide" axis="1 0 0" range="-.08 .55"/>
         <joint name="wrist_z" type="slide" axis="0 0 1" range="-.05 .38"/>
-        <geom name="palm" type="box" size=".055 .105 .045" rgba=".93 .61 .43 1"/>
+        <geom name="palm" type="box" pos="-.10 0 .06" size=".055 .105 .045" rgba=".93 .61 .43 1"/>
         <body name="left_finger" pos=".06 -.10 -.06"><joint name="left_close" type="slide" axis="0 1 0" range="0 .075"/>
-          <geom name="left_finger_geom" type="box" pos=".055 0 0" size=".055 .017 .017" rgba=".93 .61 .43 1"/></body>
+          <geom name="left_finger_geom" type="box" pos=".055 0 0" size=".055 .017 .017" rgba=".93 .61 .43 1"/>
+          <geom name="left_tip_geom" type="box" pos=".055 0 -.045" size=".055 .017 .010" rgba=".93 .61 .43 1"/></body>
         <body name="right_finger" pos=".06 .10 -.06"><joint name="right_close" type="slide" axis="0 -1 0" range="0 .075"/>
-          <geom name="right_finger_geom" type="box" pos=".055 0 0" size=".055 .017 .017" rgba=".93 .61 .43 1"/></body>
+          <geom name="right_finger_geom" type="box" pos=".055 0 0" size=".055 .017 .017" rgba=".93 .61 .43 1"/>
+          <geom name="right_tip_geom" type="box" pos=".055 0 -.045" size=".055 .017 .010" rgba=".93 .61 .43 1"/></body>
       </body>
     </body>
-    <body name="target" pos=".47 0 .40"><joint name="target_free" type="free"/>
-      <geom name="target_geom" type="box" size=".043 .043 .043" mass=".16" rgba=".97 .78 .10 1"/></body>
+    <body name="target" pos=".47 0 .374"><joint name="target_free" type="free"/>
+      <geom name="target_geom" type="box" size=".043 .043 .043" mass=".03" solref="-10000 -100" solimp=".999 .999 .00001" rgba=".97 .78 .10 1"/></body>
   </worldbody>
-  <actuator><position name="neck" joint="neck_yaw" kp="20" forcelimited="true" forcerange="-20 20"/><position name="reach" joint="wrist_x"/>
-    <position name="lift" joint="wrist_z"/><position name="left" joint="left_close"/>
-    <position name="right" joint="right_close"/></actuator>
+  <actuator><position name="neck" joint="neck_yaw" kp="60" forcelimited="true" forcerange="-30 30"/><position name="reach" joint="wrist_x" kp="5000" forcelimited="true" forcerange="-1000 1000"/>
+    <position name="lift" joint="wrist_z" kp="3000" forcelimited="true" forcerange="-800 800"/><position name="left" joint="left_close" kp="3000" forcelimited="true" forcerange="-500 500"/>
+    <position name="right" joint="right_close" kp="3000" forcelimited="true" forcerange="-500 500"/></actuator>
 </mujoco>)";
   mjVFS vfs;
   mj_defaultVFS(&vfs);
@@ -173,7 +175,10 @@ EpisodeTrace RunPhysicalEpisode() {
   const int neck_joint = mj_name2id(model, mjOBJ_JOINT, "neck_yaw");
   const int left_geom = mj_name2id(model, mjOBJ_GEOM, "left_finger_geom");
   const int right_geom = mj_name2id(model, mjOBJ_GEOM, "right_finger_geom");
+  const int left_tip_geom = mj_name2id(model, mjOBJ_GEOM, "left_tip_geom");
+  const int right_tip_geom = mj_name2id(model, mjOBJ_GEOM, "right_tip_geom");
   const int target_geom = mj_name2id(model, mjOBJ_GEOM, "target_geom");
+  const int table_geom = mj_name2id(model, mjOBJ_GEOM, "table_top");
   const int camera_site = mj_name2id(model, mjOBJ_SITE, "camera_mount");
   const int torso_geom = mj_name2id(model, mjOBJ_GEOM, "torso");
   const int head_geom = mj_name2id(model, mjOBJ_GEOM, "head_geom");
@@ -185,22 +190,24 @@ EpisodeTrace RunPhysicalEpisode() {
   double initial_z = 0.0;
   for (int step = 0; step < 4000; ++step) {
     const double t = step * model->opt.timestep;
-    const double reorient = std::clamp((t - 2.0) / 1.8, 0.0, 1.0);
-    data->ctrl[0] = t < 2.0 ? -0.42 : (-0.42 + 0.50 * reorient + 0.035 * std::sin(t * 0.7));
-    data->ctrl[1] = t < 3.0 ? 0.02 : (t < 6.0 ? 0.38 : 0.39);
+    const double reorient = std::clamp((t - 1.7) / 1.5, 0.0, 1.0);
+    data->ctrl[0] = t < 1.7 ? -0.52 : (-0.52 + 0.78 * reorient + (t >= 6.0 && t < 11.5 ? .07 * std::sin((t - 6.0) * 1.4) : 0.0));
+    data->ctrl[1] = t < 2.5 ? 0.02 : (t < 6.0 ? 0.38 : (t < 11.5 ? 0.39 + .025 * std::sin((t - 6.0) * 5.0) : 0.12));
     const double lift_ramp = std::clamp((t - 5.8) / 1.2, 0.0, 1.0);
-    data->ctrl[2] = t < 5.8 ? 0.00 : (t < 11.5 ? lift_ramp * (.27 + .018 * std::sin((t - 6.0) * 2.0)) : 0.00);
-    data->ctrl[3] = (t >= 4.5 && t < 11.5) ? 0.070 : 0.0;
-    data->ctrl[4] = (t >= 4.5 && t < 11.5) ? 0.070 : 0.0;
+    const double place_ramp = std::clamp((t - 9.5) / 2.0, 0.0, 1.0);
+    const double held_lift = lift_ramp * (.27 + .012 * std::sin((t - 6.0) * 4.0));
+    data->ctrl[2] = t < 5.8 ? 0.00 : (t < 9.5 ? held_lift : (t < 12.2 ? (.03 + (1.0 - place_ramp) * .24) : 0.00));
+    data->ctrl[3] = (t >= 4.0 && t < 11.5) ? 0.050 : 0.0;
+    data->ctrl[4] = (t >= 4.0 && t < 11.5) ? 0.050 : 0.0;
     mj_step(model, data);
     const double z = data->xpos[3 * target_body + 2];
     if (step == 750) initial_z = z;
     if (step >= 750) receipt.maximum_lift_m = std::max(receipt.maximum_lift_m, z - initial_z);
     for (int c = 0; c < data->ncon; ++c) {
       const auto& contact = data->contact[c];
-      const bool left = (contact.geom1 == left_geom || contact.geom2 == left_geom) &&
+      const bool left = (contact.geom1 == left_geom || contact.geom2 == left_geom || contact.geom1 == left_tip_geom || contact.geom2 == left_tip_geom) &&
                         (contact.geom1 == target_geom || contact.geom2 == target_geom);
-      const bool right = (contact.geom1 == right_geom || contact.geom2 == right_geom) &&
+      const bool right = (contact.geom1 == right_geom || contact.geom2 == right_geom || contact.geom1 == right_tip_geom || contact.geom2 == right_tip_geom) &&
                          (contact.geom1 == target_geom || contact.geom2 == target_geom);
       if (left || right) {
         if (receipt.first_contact_step < 0) receipt.first_contact_step = step;
@@ -217,6 +224,7 @@ EpisodeTrace RunPhysicalEpisode() {
       };
       record_geom(torso_geom, sample.torso); record_geom(head_geom, sample.head); record_geom(palm_geom, sample.palm);
       record_geom(left_geom, sample.left_finger); record_geom(right_geom, sample.right_finger);
+      record_geom(left_tip_geom, sample.left_tip); record_geom(right_tip_geom, sample.right_tip);
       record_geom(target_geom, sample.target);
       std::copy_n(data->site_xpos + 3 * camera_site, 3, sample.camera_mount.position.begin());
       std::copy_n(data->site_xmat + 9 * camera_site, 9, sample.camera_mount.rotation.begin());
@@ -233,15 +241,18 @@ EpisodeTrace RunPhysicalEpisode() {
       sample.contact_count = data->ncon;
       for (int c = 0; c < data->ncon; ++c) {
         const auto& contact = data->contact[c];
-        const bool left = (contact.geom1 == left_geom || contact.geom2 == left_geom) &&
+        const bool left = (contact.geom1 == left_geom || contact.geom2 == left_geom || contact.geom1 == left_tip_geom || contact.geom2 == left_tip_geom) &&
                           (contact.geom1 == target_geom || contact.geom2 == target_geom);
-        const bool right = (contact.geom1 == right_geom || contact.geom2 == right_geom) &&
+        const bool right = (contact.geom1 == right_geom || contact.geom2 == right_geom || contact.geom1 == right_tip_geom || contact.geom2 == right_tip_geom) &&
+                           (contact.geom1 == target_geom || contact.geom2 == target_geom);
+        const bool table = (contact.geom1 == table_geom || contact.geom2 == table_geom) &&
                            (contact.geom1 == target_geom || contact.geom2 == target_geom);
         if (left || right) {
           double force[6] = {}; mj_contactForce(model, data, c, force);
           if (left) { sample.left_target_contact = true; sample.left_target_distance = std::min(sample.left_target_distance, contact.dist); std::copy_n(force, 6, sample.left_target_wrench.begin()); }
           if (right) { sample.right_target_contact = true; sample.right_target_distance = std::min(sample.right_target_distance, contact.dist); std::copy_n(force, 6, sample.right_target_wrench.begin()); }
         }
+        if (table) sample.target_table_distance = std::min(sample.target_table_distance, contact.dist);
       }
       trace.samples.push_back(sample);
     }
@@ -257,10 +268,7 @@ bool SameTrace(const EpisodeTrace& left, const EpisodeTrace& right, double* maxi
   if (left.samples.size() != right.samples.size()) return false;
   for (size_t i = 0; i < left.samples.size(); ++i) {
     const auto& a = left.samples[i]; const auto& b = right.samples[i];
-    const std::array<double, 3> values_a{a.time_s, a.target.position[0], a.target.position[2]};
-    const std::array<double, 3> values_b{b.time_s, b.target.position[0], b.target.position[2]};
-    for (size_t j = 0; j < values_a.size(); ++j) *maximum_error = std::max(*maximum_error, std::abs(values_a[j] - values_b[j]));
-    if (a.left_target_contact != b.left_target_contact || a.right_target_contact != b.right_target_contact) return false;
+    if (std::memcmp(&a, &b, sizeof(TraceSample)) != 0) return false;
   }
   return *maximum_error == 0.0;
 }
@@ -270,7 +278,7 @@ void WriteTruthStreams(const std::filesystem::path& root, const EpisodeTrace& tr
   stream << "tick,time_s,action_neck,action_reach,action_lift,action_left,action_right,neck_q,wrist_x,wrist_z,left_q,right_q,neck_qvel,wrist_xvel,wrist_zvel,left_qvel,right_qvel,"
          << "head_angx,head_angy,head_angz,head_linx,head_liny,head_linz,target_x,target_y,target_z,target_r00,target_r01,target_r02,target_r10,target_r11,target_r12,target_r20,target_r21,target_r22,"
          << "camera_x,camera_y,camera_z,camera_r00,camera_r01,camera_r02,camera_r10,camera_r11,camera_r12,camera_r20,camera_r21,camera_r22,"
-         << "left_contact,right_contact,left_distance,right_distance,left_normal_force,right_normal_force,object_id\n";
+         << "left_contact,right_contact,left_distance,right_distance,target_table_distance,left_normal_force,right_normal_force,object_id\n";
   for (size_t i = 0; i < trace.samples.size(); ++i) {
     const auto& s = trace.samples[i];
     stream << i << ',' << s.time_s;
@@ -282,7 +290,7 @@ void WriteTruthStreams(const std::filesystem::path& root, const EpisodeTrace& tr
     for (double value : s.target.rotation) stream << ',' << value;
     for (double value : s.camera_mount.position) stream << ',' << value;
     for (double value : s.camera_mount.rotation) stream << ',' << value;
-    stream << ',' << s.left_target_contact << ',' << s.right_target_contact << ',' << s.left_target_distance << ',' << s.right_target_distance
+    stream << ',' << s.left_target_contact << ',' << s.right_target_contact << ',' << s.left_target_distance << ',' << s.right_target_distance << ',' << s.target_table_distance
            << ',' << s.left_target_wrench[0] << ',' << s.right_target_wrench[0] << ",target_block_001\n";
   }
   std::ofstream manifest(root / "stream_manifest.json");
@@ -404,15 +412,18 @@ int main(int argc, char** argv) {
   Entity torso = make_cube({.83f,.43f,.25f,1});
   Entity head = make_cube({.96f,.70f,.52f,1});
   Entity palm = make_cube({.94f,.63f,.43f,1}), left_finger = make_cube({.94f,.63f,.43f,1});
-  Entity right_finger = make_cube({.94f,.63f,.43f,1}), target = make_cube({.96f,.74f,.06f,1});
+  Entity right_finger = make_cube({.94f,.63f,.43f,1}), left_tip = make_cube({.94f,.63f,.43f,1});
+  Entity right_tip = make_cube({.94f,.63f,.43f,1}), target = make_cube({.96f,.74f,.06f,1});
   const std::vector<filament::math::float4> rgb_colors{
       {.30f,.45f,.63f,1}, {.48f,.23f,.08f,1}, {.55f,.42f,.25f,1}, {.72f,.62f,.50f,1},
       {.18f,.56f,.52f,1}, {.72f,.18f,.18f,1}, {.83f,.43f,.25f,1}, {.96f,.70f,.52f,1},
-      {.94f,.63f,.43f,1}, {.94f,.63f,.43f,1}, {.94f,.63f,.43f,1}, {.96f,.74f,.06f,1}};
+      {.94f,.63f,.43f,1}, {.94f,.63f,.43f,1}, {.94f,.63f,.43f,1}, {.94f,.63f,.43f,1},
+      {.94f,.63f,.43f,1}, {.96f,.74f,.06f,1}};
   const std::vector<filament::math::float4> id_colors{
       {.04f,.04f,.04f,1}, {.10f,.10f,.10f,1}, {.16f,.16f,.16f,1}, {.22f,.22f,.22f,1},
       {.28f,.28f,.28f,1}, {.34f,.34f,.34f,1}, {.40f,.40f,.40f,1}, {.46f,.46f,.46f,1},
-      {.52f,.52f,.52f,1}, {.58f,.58f,.58f,1}, {.64f,.64f,.64f,1}, {.95f,.95f,.95f,1}};
+      {.52f,.52f,.52f,1}, {.58f,.58f,.58f,1}, {.64f,.64f,.64f,1}, {.70f,.70f,.70f,1},
+      {.76f,.76f,.76f,1}, {.95f,.95f,.95f,1}};
   using filament::math::float3;
   using filament::math::mat4f;
   auto set_cube = [&](Entity entity, float3 position, float3 scale) {
@@ -442,7 +453,9 @@ int main(int argc, char** argv) {
     set_pose(torso, sample.torso, {.12f,.10f,.15f}); set_pose(head, sample.head, {.13f,.12f,.13f});
     set_pose(palm, sample.palm, {.055f,.105f,.045f});
     set_pose(left_finger, sample.left_finger, {.055f,.017f,.017f});
-    set_pose(right_finger, sample.right_finger, {.055f,.017f,.017f}); set_pose(target, sample.target, {.043f,.043f,.043f});
+    set_pose(right_finger, sample.right_finger, {.055f,.017f,.017f});
+    set_pose(left_tip, sample.left_tip, {.055f,.017f,.010f}); set_pose(right_tip, sample.right_tip, {.055f,.017f,.010f});
+    set_pose(target, sample.target, {.043f,.043f,.043f});
     const auto& r = sample.camera_mount.rotation; const auto& p = sample.camera_mount.position;
     // Full mount frame plus one fixed optical transform: the optical axis is
     // child-head +X with a 45-degree downward pitch, and optical +Y is head
@@ -484,7 +497,7 @@ int main(int argc, char** argv) {
     render_channel("depth", 2.0f, rgb_colors);
   }
   std::cerr << "stage=frames_complete\n";
-  for (Entity entity : {floor, table, shelf, wall, book, blocks, torso, head, palm, left_finger, right_finger, target}) engine->destroy(entity);
+  for (Entity entity : {floor, table, shelf, wall, book, blocks, torso, head, palm, left_finger, right_finger, left_tip, right_tip, target}) engine->destroy(entity);
   std::cerr << "stage=entities_destroyed\n";
   for (auto* instance : material_instances) engine->destroy(instance);
   engine->flushAndWait();
