@@ -15,8 +15,11 @@ umask 077
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 WANDB_DISABLED=true TOKENIZERS_PARALLELISM=false PYTHONNOUSERSITE=1
 candidate_id="${PHASE4_ACTIVITY_CANDIDATE:-legacy-repair}"
 activity_run_mode="${PHASE4_ACTIVITY_RUN_MODE:-development}"
+tuple_run_mode="${PHASE4_TUPLE_RUN_MODE:-none}"
 export HF_HOME="${PHASE4_PUBLIC_ROOT}/models/pe-hf-home"
-if [[ "$candidate_id" == "legacy-repair" ]]; then
+if [[ "$tuple_run_mode" == "sizing" ]]; then
+  output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/mechanistic-tuples"
+elif [[ "$candidate_id" == "legacy-repair" ]]; then
   output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/extractor-repair"
 else
   case "$candidate_id" in
@@ -30,7 +33,17 @@ exec >"$output_root/logs/qualify-${SLURM_JOB_ID}.out" 2>"$output_root/logs/quali
 scratch="${TMPDIR:-/tmp}/synthetic-calibration-qualify-${SLURM_JOB_ID}"
 mkdir -p "$scratch/pydeps"
 trap 'find "$scratch" -mindepth 1 -delete 2>/dev/null || true; rmdir "$scratch" 2>/dev/null || true' EXIT
-if [[ "$candidate_id" == "legacy-repair" ]]; then
+if [[ "$tuple_run_mode" == "sizing" ]]; then
+  export PYTHONPATH="${PHASE4_PUBLIC_ROOT}/models/mechanistic-tuples/runtime-pydeps:${PHASE4_PUBLIC_ROOT}/source:${PHASE4_PUBLIC_ROOT}/models/mechanistic-tuples/code/egobabyvlm:${PHASE4_PUBLIC_ROOT}/models/activity-pydeps/egohod_egovideo_l_zero_shot"
+  singularity exec --nv --net --network none \
+    --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${scratch}:${scratch}" \
+    "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" \
+    python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" tuple-size \
+    --public-root "${PHASE4_PUBLIC_ROOT}" \
+    --scratch-root "$scratch" \
+    --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json" \
+    --device cuda
+elif [[ "$candidate_id" == "legacy-repair" ]]; then
   tar -C "$scratch/pydeps" -xf "${PHASE4_PUBLIC_ROOT}/models/phase4-language-pydeps.tar"
   export PYTHONPATH="${PHASE4_PUBLIC_ROOT}/models/calibration-repair-pydeps:${PHASE4_PUBLIC_ROOT}/source:${PHASE4_PUBLIC_ROOT}/models/evaluator-pydeps:$scratch/pydeps:${PHASE4_EGOBABY_ROOT}"
   singularity exec --nv --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${PHASE4_EGOBABY_ROOT}:${PHASE4_EGOBABY_ROOT},${scratch}:${scratch}" \

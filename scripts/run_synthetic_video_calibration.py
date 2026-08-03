@@ -178,6 +178,21 @@ TUPLE_RUNTIME_PREP_FIELDS = frozenset(
 TUPLE_RUNTIME_PREP_HASH_FIELDS = frozenset(
     {"runtime_dependency_commitment_sha256"}
 )
+TUPLE_SIZING_FIELDS = frozenset(
+    {
+        "status",
+        "module_count",
+        "finite_output_count",
+        "failure_count",
+        "external_call_count",
+        "scientific_metric_count",
+        "retained_prediction_count",
+        "peak_vram_gib",
+        "total_runtime_seconds",
+        "tuple_sizing_commitment_sha256",
+    }
+)
+TUPLE_SIZING_HASH_FIELDS = frozenset({"tuple_sizing_commitment_sha256"})
 NLTK_DATA_COMMIT = "550b6625bcef1f2abff2ff770a5a0d272c9c6b2a"
 NLTK_RESOURCE_ARCHIVES = {
     "wordnet.zip": {
@@ -1061,6 +1076,100 @@ def prepare_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
             "runtime_dependency_commitment_sha256"
         ],
     }
+
+
+def _verify_tuple_runtime_manifest(
+    public: Path, cfg: dict[str, Any]
+) -> dict[str, Any]:
+    runtime = _tuple_runtime_amendment(cfg)
+    path = _tuple_run_root(public) / "runtime_manifest.json"
+    value = json.loads(path.read_text())
+    commitment = value.pop("runtime_dependency_commitment_sha256", None)
+    expected_base = cfg["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_premodel_result"
+    ]["dependency_manifest_commitment_sha256"]
+    if (
+        not isinstance(commitment, str)
+        or digest(value) != commitment
+        or value.get("status")
+        != "PASS_RUNTIME_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
+        or value.get("runtime_amendment_commitment_sha256")
+        != runtime["runtime_amendment_commitment_sha256"]
+        or value.get("base_dependency_manifest_commitment_sha256") != expected_base
+        or value.get("restricted_mount_present") is not False
+        or value.get("model_inference_executed") is not False
+    ):
+        raise RuntimeError("E_TUPLE_RUNTIME_MANIFEST")
+    value["runtime_dependency_commitment_sha256"] = commitment
+    return value
+
+
+def _release_cuda(*values: Any) -> None:
+    import gc
+    import torch
+
+    for value in values:
+        del value
+    gc.collect()
+    torch.cuda.empty_cache()
+
+
+def _install_egohos_segmentation_compatibility() -> None:
+    import types
+    import numpy as np
+    import torch
+
+    for name, value in {"int": int, "float": float, "bool": bool}.items():
+        if name not in np.__dict__:
+            setattr(np, name, value)
+
+    def prohibited(*_args, **_kwargs):
+        raise RuntimeError("E_TUPLE_EGOHOS_UNUSED_MMCV_OP_INVOKED")
+
+    class ProhibitedOperation(torch.nn.Module):
+        def __init__(self, *_args, **_kwargs):
+            super().__init__()
+            raise RuntimeError("E_TUPLE_EGOHOS_UNUSED_MMCV_OP_INVOKED")
+
+    ops = types.ModuleType("mmcv.ops")
+    ops.sigmoid_focal_loss = prohibited
+    ops.point_sample = prohibited
+    ops.PSAMask = ProhibitedOperation
+    ops.CrissCrossAttention = ProhibitedOperation
+    sys.modules["mmcv.ops"] = ops
+
+
+def _grounding_fallback_consistency(device: str) -> None:
+    import torch
+    from groundingdino.models.GroundingDINO.ms_deform_attn import (
+        multi_scale_deformable_attn_pytorch,
+    )
+
+    generator = torch.Generator().manual_seed(20260802)
+    value = torch.rand((1, 4, 1, 2), generator=generator)
+    shapes = torch.tensor([[2, 2]], dtype=torch.long)
+    locations = torch.rand((1, 2, 1, 1, 2, 2), generator=generator)
+    weights = torch.rand((1, 2, 1, 1, 2), generator=generator)
+    weights = weights / weights.sum(dim=(-1, -2), keepdim=True)
+    expected = multi_scale_deformable_attn_pytorch(
+        value, shapes, locations, weights
+    )
+    observed = multi_scale_deformable_attn_pytorch(
+        value.to(device), shapes.to(device), locations.to(device), weights.to(device)
+    ).cpu()
+    if not torch.allclose(observed, expected, rtol=1e-4, atol=1e-5):
+        raise RuntimeError("E_TUPLE_GROUNDING_FALLBACK_NUMERICS")
+
+
+def _tuple_dummy_image(size: int = 384):
+    import numpy as np
+
+    grid_y, grid_x = np.indices((size, size))
+    image = np.zeros((size, size, 3), dtype=np.uint8)
+    image[..., 0] = (grid_x % 256).astype(np.uint8)
+    image[..., 1] = (grid_y % 256).astype(np.uint8)
+    image[..., 2] = (((grid_x // 32 + grid_y // 32) % 2) * 255).astype(np.uint8)
+    return image
 
 
 def _activity_config(cfg: dict[str, Any]) -> dict[str, Any]:
@@ -2019,13 +2128,16 @@ def _load_egohod_activity_adapter(
     cfg: dict[str, Any],
     labels: list[str],
     device: str,
+    runtime_override: dict[str, Any] | None = None,
 ):
     import torch
     import torch.nn.functional as functional
 
     code_root = _activity_code_root(public, candidate["candidate_id"])
     clip_root = public / "models/activity-code/CLIP"
-    runtime = _activity_config(cfg)["runtime_environment"]["egohod"]
+    runtime = runtime_override or _activity_config(cfg)["runtime_environment"][
+        "egohod"
+    ]
     _verify_repository_commit(code_root, candidate["code_commit"])
     _verify_repository_commit(clip_root, runtime["openai_CLIP_commit"])
     _install_egohod_optional_import_compatibility()
@@ -2120,6 +2232,390 @@ def _load_egohod_activity_adapter(
         return _finite_vector(values, len(labels), "E_ACTIVITY_NONFINITE_SCORE")
 
     return score, int(runtime["input_frames"]), "scores"
+
+
+def _size_tuple_grounding_and_sam(
+    public: Path, device: str, image_array
+) -> dict[str, Any]:
+    import torch
+    from PIL import Image
+
+    model_root = _tuple_model_root(public)
+    grounding_root = model_root / "code/GroundingDINO"
+    sys.path.insert(0, str(grounding_root))
+    from groundingdino.datasets import transforms as grounding_transforms
+    from groundingdino.models import build_model
+    from groundingdino.util.misc import clean_state_dict
+    from groundingdino.util.slconfig import SLConfig
+
+    _grounding_fallback_consistency(device)
+    arguments = SLConfig.fromfile(
+        str(grounding_root / "groundingdino/config/GroundingDINO_SwinT_OGC.py")
+    )
+    arguments.device = device
+    arguments.text_encoder_type = str(model_root / "bert-base-uncased")
+    grounding = build_model(arguments)
+    checkpoint_path = model_root / "weights/groundingdino_swint_ogc.pth"
+    if file_digest(checkpoint_path) != (
+        "3b3ca2563c77c69f651d7bd133e97139c186df06231157a64c507099c52bc799"
+    ):
+        raise RuntimeError("E_TUPLE_GROUNDING_WEIGHT")
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    grounding.load_state_dict(clean_state_dict(checkpoint["model"]), strict=False)
+    grounding = grounding.to(device).eval()
+    transform = grounding_transforms.Compose(
+        [
+            grounding_transforms.RandomResize([800], max_size=1333),
+            grounding_transforms.ToTensor(),
+            grounding_transforms.Normalize(
+                [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
+            ),
+        ]
+    )
+    tensor, _ = transform(Image.fromarray(image_array), None)
+    with torch.inference_mode():
+        outputs = grounding(tensor[None].to(device), captions=["public object."])
+    tensors = [outputs["pred_logits"], outputs["pred_boxes"]]
+    if any(not torch.isfinite(value).all() for value in tensors):
+        raise RuntimeError("E_TUPLE_GROUNDING_NONFINITE")
+    grounding_width = sum(int(value.numel()) for value in tensors)
+    del outputs, tensors, tensor, checkpoint, grounding
+    _release_cuda()
+
+    sam_root = model_root / "code/sam2"
+    sys.path.insert(0, str(sam_root))
+    from sam2.build_sam import build_sam2
+    from sam2.sam2_image_predictor import SAM2ImagePredictor
+
+    sam_path = model_root / "weights/sam2.1_hiera_base_plus.pt"
+    if file_digest(sam_path) != (
+        "a2345aede8715ab1d5d31b4a509fb160c5a4af1970f199d9054ccfb746c004c5"
+    ):
+        raise RuntimeError("E_TUPLE_SAM_WEIGHT")
+    sam = build_sam2(
+        "configs/sam2.1/sam2.1_hiera_b+.yaml",
+        str(sam_path),
+        device=device,
+        apply_postprocessing=False,
+    )
+    predictor = SAM2ImagePredictor(sam)
+    predictor.set_image(image_array)
+    import numpy as np
+
+    masks, scores, logits = predictor.predict(
+        box=np.asarray([64, 64, image_array.shape[1] - 64, image_array.shape[0] - 64]),
+        multimask_output=False,
+    )
+    if (
+        masks.shape[0] != 1
+        or not np.isfinite(masks).all()
+        or not np.isfinite(scores).all()
+        or not np.isfinite(logits).all()
+    ):
+        raise RuntimeError("E_TUPLE_SAM_NONFINITE")
+    sam_width = int(masks.size + scores.size + logits.size)
+    del predictor, sam, masks, scores, logits
+    _release_cuda()
+    return {"finite": True, "output_width": grounding_width + sam_width}
+
+
+def _size_tuple_dinov2(public: Path, device: str) -> dict[str, Any]:
+    import torch
+
+    model_root = _tuple_model_root(public)
+    sys.path.insert(0, str(model_root / "code/dinov2"))
+    from dinov2.hub.backbones import dinov2_vitb14
+
+    checkpoint_path = model_root / "weights/dinov2_vitb14_pretrain.pth"
+    if file_digest(checkpoint_path) != (
+        "0b8b82f85de91b424aded121c7e1dcc2b7bc6d0adeea651bf73a13307fad8c73"
+    ):
+        raise RuntimeError("E_TUPLE_DINOV2_WEIGHT")
+    model = dinov2_vitb14(pretrained=False).to(device).eval()
+    state = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    model.load_state_dict(state, strict=True)
+    image = torch.zeros((1, 3, 224, 224), device=device)
+    with torch.inference_mode():
+        output = model(image)
+    if output.shape != (1, 768) or not torch.isfinite(output).all():
+        raise RuntimeError("E_TUPLE_DINOV2_OUTPUT")
+    width = int(output.numel())
+    del output, image, state, model
+    _release_cuda()
+    return {"finite": True, "output_width": width}
+
+
+def _size_tuple_pe_core(
+    public: Path, cfg: dict[str, Any], device: str, image_array
+) -> dict[str, Any]:
+    import torch
+    from PIL import Image
+
+    model, transform, text, slices = _load_vision(public, cfg, device)
+    features, labels, margins = _vision_batch(
+        model,
+        transform,
+        text,
+        slices,
+        [Image.fromarray(image_array)],
+        None,
+        device,
+    )
+    values = [float(value) for group in margins for value in group.values()]
+    if not torch.isfinite(features).all() or not values or not all(
+        math.isfinite(value) for value in values
+    ):
+        raise RuntimeError("E_TUPLE_PE_OUTPUT")
+    width = int(features.numel() + len(values) + sum(len(row) for row in labels))
+    del features, labels, margins, text, transform, model
+    _release_cuda()
+    return {"finite": True, "output_width": width}
+
+
+def _load_egohos_segmentor(config_path: Path, checkpoint_path: Path, device: str):
+    import numpy
+    import torch
+    import mmcv
+    from mmseg.models import build_segmentor
+
+    config = mmcv.Config.fromfile(str(config_path))
+    config.model.pretrained = None
+    config.model.train_cfg = None
+    model = build_segmentor(config.model, test_cfg=config.get("test_cfg"))
+    unsafe = set(torch.serialization.get_unsafe_globals_in_checkpoint(checkpoint_path))
+    expected_unsafe = {"numpy.core.multiarray.scalar", "numpy.dtype"}
+    if unsafe != expected_unsafe:
+        raise RuntimeError("E_TUPLE_EGOHOS_CHECKPOINT_GLOBAL")
+    safe = [
+        (numpy.core.multiarray.scalar, "numpy.core.multiarray.scalar"),
+        numpy.dtype,
+        numpy.dtypes.Float64DType,
+    ]
+    with torch.serialization.safe_globals(safe):
+        checkpoint = torch.load(
+            checkpoint_path,
+            map_location="cpu",
+            mmap=True,
+            weights_only=True,
+        )
+    state = {
+        key.removeprefix("module."): value
+        for key, value in checkpoint["state_dict"].items()
+    }
+    missing, unexpected = model.load_state_dict(state, strict=False)
+    if missing or unexpected:
+        raise RuntimeError(
+            f"E_TUPLE_EGOHOS_STATE missing={len(missing)} unexpected={len(unexpected)}"
+        )
+    return model.to(device).eval(), config
+
+
+def _size_tuple_egohos(
+    public: Path, device: str, image_array, scratch: Path
+) -> dict[str, Any]:
+    import numpy as np
+    import torch
+    from PIL import Image
+
+    _install_egohos_segmentation_compatibility()
+    model_root = _tuple_model_root(public)
+    sys.path.insert(0, str(model_root / "code/EgoHOS/mmsegmentation"))
+    sys.path.insert(0, str(model_root / "code/EgoHOS"))
+    work = model_root / "egohos-checkpoints/work_dirs"
+    media_root = scratch / "egohos"
+    image_root = media_root / "images"
+    image_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    image_path = image_root / "public-dummy.png"
+    Image.fromarray(image_array[:360, :480]).save(image_path)
+    os.chmod(image_path, 0o600)
+    tensor = torch.from_numpy(image_array[:360, :480].astype(np.float32))
+    mean = torch.tensor([123.675, 116.28, 103.53])
+    standard = torch.tensor([58.395, 57.12, 57.375])
+    tensor = ((tensor - mean) / standard).permute(2, 0, 1).unsqueeze(0).to(device)
+    stages = [
+        ("seg_twohands_ccda", "best_mIoU_iter_56000.pth", "pred_twohands"),
+        ("twohands_to_cb_ccda", "best_mIoU_iter_76000.pth", "pred_cb"),
+        ("twohands_cb_to_obj1_ccda", "best_mIoU_iter_34000.pth", None),
+    ]
+    width = 0
+    for folder, checkpoint_name, output_folder in stages:
+        root = work / folder
+        model, config = _load_egohos_segmentor(
+            root / f"{folder}.py", root / checkpoint_name, device
+        )
+        metadata = {
+            "filename": str(image_path),
+            "ori_shape": (360, 480, 3),
+            "img_shape": (360, 480, 3),
+            "pad_shape": (360, 480, 3),
+            "scale_factor": 1.0,
+            "flip": False,
+            "additional_channel": str(config.get("additional_channel", "")),
+        }
+        with torch.inference_mode():
+            logits = model.encode_decode(tensor, [metadata])
+        if logits.ndim != 4 or not torch.isfinite(logits).all():
+            raise RuntimeError("E_TUPLE_EGOHOS_OUTPUT")
+        prediction = logits.argmax(dim=1)[0].byte().cpu().numpy()
+        width += int(logits.numel())
+        if output_folder is not None:
+            target_root = media_root / output_folder
+            target_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+            target = target_root / "public-dummy.png"
+            Image.fromarray(prediction).save(target)
+            os.chmod(target, 0o600)
+        del prediction, logits, model
+        _release_cuda()
+    del tensor
+    _release_cuda()
+    return {"finite": True, "output_width": width}
+
+
+def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
+    import torch
+
+    started = time.monotonic()
+    cfg = json.loads(args.config.read_text())
+    amendment = _tuple_amendment(cfg)
+    runtime = _tuple_runtime_amendment(cfg)
+    dependency = _verify_tuple_runtime_manifest(args.public_root, cfg)
+    if torch.cuda.device_count() != 1 or args.device != "cuda":
+        raise RuntimeError("E_TUPLE_SIZING_TOPOLOGY")
+    torch.cuda.reset_peak_memory_stats()
+    image_array = _tuple_dummy_image(512)
+    modules = []
+
+    from synthetic_video_language_adapter import validate_asr_prediction
+
+    language = validate_asr_prediction(
+        {
+            "text": "Ein Ball",
+            "language": "de",
+            "words": [
+                {"word": "Ein", "start": 0.0, "end": 0.4, "probability": 0.9},
+                {"word": "Ball", "start": 0.4, "end": 0.8, "probability": 0.9},
+            ],
+        },
+        1.0,
+    )
+    if language.get("status") != "ACCEPT":
+        raise RuntimeError("E_TUPLE_LANGUAGE_SIZING")
+    modules.append({"module": "adapter", "finite": True, "output_width": 1})
+
+    import nltk
+    from nltk.corpus import wordnet
+    from nltk.stem import WordNetLemmatizer
+    from wordfreq import zipf_frequency
+
+    nltk.data.path[:] = [str(args.public_root / "models/nltk_data")]
+    mentions = _lexical_mentions(
+        "The red ball",
+        nltk.pos_tag,
+        WordNetLemmatizer().lemmatize,
+        zipf_frequency,
+        amendment["axes"][1]["frequency_bands"],
+    )
+    if not mentions:
+        raise RuntimeError("E_TUPLE_LEXICAL_SIZING")
+    modules.append(
+        {"module": "lexical", "finite": True, "output_width": len(mentions)}
+    )
+
+    from PIL import Image
+
+    first = Image.fromarray(image_array)
+    second = Image.fromarray(image_array[:, ::-1].copy())
+    sensor = _image_metrics(second, first)
+    if not all(value is None or math.isfinite(value) for value in sensor.values()):
+        raise RuntimeError("E_TUPLE_SENSOR_SIZING")
+    modules.append(
+        {"module": "sensor", "finite": True, "output_width": len(sensor)}
+    )
+
+    grounding = _size_tuple_grounding_and_sam(args.public_root, args.device, image_array)
+    modules.append({"module": "grounding_and_tracking", **grounding})
+    modules.append(
+        {"module": "recurrence", **_size_tuple_dinov2(args.public_root, args.device)}
+    )
+    modules.append(
+        {"module": "attribute", **_size_tuple_pe_core(args.public_root, cfg, args.device, image_array)}
+    )
+    modules.append(
+        {"module": "hand_contact", **_size_tuple_egohos(args.public_root, args.device, image_array, args.scratch_root)}
+    )
+
+    activity = cfg["calibration_C"]["extractor"][
+        "activity_checkpoint_selection_amendment"
+    ]
+    candidate = next(
+        value
+        for value in activity["bounded_candidates"]
+        if value["candidate_id"] == "egohod_egovideo_l_zero_shot"
+    )
+    labels = _activity_labels(cfg)
+    score, frame_count, _ = _load_egohod_activity_adapter(
+        args.public_root,
+        candidate,
+        cfg,
+        labels,
+        args.device,
+        runtime_override=activity["runtime_environment"]["egohod"],
+    )
+    action_output = score(
+        image_array[None].repeat(frame_count, axis=0)
+    )
+    if len(action_output) != len(labels) or not all(
+        math.isfinite(value) for value in action_output
+    ):
+        raise RuntimeError("E_TUPLE_ACTION_SIZING")
+    modules.append(
+        {"module": "order_action", "finite": True, "output_width": len(action_output)}
+    )
+    del score, action_output
+    _release_cuda()
+
+    if len(modules) != runtime["local_reload_gate"]["module_count"]:
+        raise RuntimeError("E_TUPLE_SIZING_MODULE_COUNT")
+    if any(not row["finite"] or row["output_width"] <= 0 for row in modules):
+        raise RuntimeError("E_TUPLE_SIZING_OUTPUT")
+    peak = _gpu_peak_gib(args.device)
+    if peak > float(runtime["local_reload_gate"]["peak_VRAM_GiB_max"]):
+        raise RuntimeError("E_TUPLE_SIZING_VRAM")
+    record = {
+        "schema_version": 1,
+        "status": "PASS_LABEL_BLIND_LOCAL_RELOAD_SIZING",
+        "amendment_commitment_sha256": amendment["amendment_commitment_sha256"],
+        "runtime_amendment_commitment_sha256": runtime[
+            "runtime_amendment_commitment_sha256"
+        ],
+        "runtime_dependency_commitment_sha256": dependency[
+            "runtime_dependency_commitment_sha256"
+        ],
+        "modules": modules,
+        "fixture_labels_used": False,
+        "scientific_metric_computed": False,
+        "prediction_or_score_retained": False,
+        "external_call_count": 0,
+        "restricted_mount_present": False,
+        "peak_vram_gib": peak,
+        "total_runtime_seconds": time.monotonic() - started,
+    }
+    record["tuple_sizing_commitment_sha256"] = digest(record)
+    write_private(_tuple_run_root(args.public_root) / "sizing_result.json", record)
+    return {
+        "status": "PASS_LABEL_BLIND_SIZING",
+        "module_count": len(modules),
+        "finite_output_count": len(modules),
+        "failure_count": 0,
+        "external_call_count": 0,
+        "scientific_metric_count": 0,
+        "retained_prediction_count": 0,
+        "peak_vram_gib": peak,
+        "total_runtime_seconds": record["total_runtime_seconds"],
+        "tuple_sizing_commitment_sha256": record[
+            "tuple_sizing_commitment_sha256"
+        ],
+    }
 
 
 def _videoprism_token_ids(model_path: Path, prompts: list[str]):
@@ -2818,12 +3314,19 @@ def _load_vision(public: Path, cfg: dict[str, Any], device: str):
     )
 
     frozen = cfg["calibration_C"]["extractor"]["vision_model"]
-    candidates = list(
+    candidates = [
+        public / "models/mechanistic-tuples/weights/PE-Core-L14-336.pt"
+    ] + list(
         (public / "models/pe-hf-home/hub").glob(
             f"models--facebook--PE-Core-L14-336/snapshots/{frozen['revision']}/PE-Core-L14-336.pt"
         )
     )
-    if len(candidates) != 1 or file_digest(candidates[0]) != frozen["weights_sha256"]:
+    candidates = [
+        path
+        for path in candidates
+        if path.is_file() and file_digest(path) == frozen["weights_sha256"]
+    ]
+    if len(candidates) != 1:
         raise RuntimeError("E_FROZEN_VISION_MODEL")
     model = pe.CLIP.from_config("PE-Core-L14-336", pretrained=False)
     model.load_ckpt(str(candidates[0]))
@@ -4121,6 +4624,11 @@ def main() -> None:
     tuple_runtime_parser = subparsers.add_parser("tuple-runtime-prepare")
     tuple_runtime_parser.add_argument("--public-root", type=Path, required=True)
     tuple_runtime_parser.add_argument("--config", type=Path, required=True)
+    tuple_size_parser = subparsers.add_parser("tuple-size")
+    tuple_size_parser.add_argument("--public-root", type=Path, required=True)
+    tuple_size_parser.add_argument("--scratch-root", type=Path, required=True)
+    tuple_size_parser.add_argument("--config", type=Path, required=True)
+    tuple_size_parser.add_argument("--device", default="cuda")
     run_parser = subparsers.add_parser("run")
     run_parser.add_argument("--restricted-root", type=Path, required=True)
     run_parser.add_argument("--public-root", type=Path, required=True)
@@ -4202,6 +4710,15 @@ def main() -> None:
                 value,
                 allowed_fields=TUPLE_RUNTIME_PREP_FIELDS,
                 sha256_fields=TUPLE_RUNTIME_PREP_HASH_FIELDS,
+            )
+        )
+    elif args.command == "tuple-size":
+        value = size_tuple_runtime(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=TUPLE_SIZING_FIELDS,
+                sha256_fields=TUPLE_SIZING_HASH_FIELDS,
             )
         )
     elif args.command == "run":

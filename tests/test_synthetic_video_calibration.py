@@ -375,6 +375,19 @@ def test_tuple_runtime_prep_is_resource_only_and_hash_sealed() -> None:
     assert "restricted_root" not in source
 
 
+def test_tuple_sizing_is_label_blind_and_retains_no_predictions() -> None:
+    import inspect
+
+    source = inspect.getsource(MODULE.size_tuple_runtime)
+    assert '"fixture_labels_used": False' in source
+    assert '"scientific_metric_computed": False' in source
+    assert '"prediction_or_score_retained": False' in source
+    assert '"external_call_count": 0' in source
+    assert '"module_count"' in source
+    assert "activity['development_selection_result']" not in source
+    assert "restricted_root" not in source
+
+
 def test_grounding_fallback_patch_is_narrow_and_extension_conditional() -> None:
     import inspect
 
@@ -817,6 +830,8 @@ def test_public_qualification_jobs_never_mount_restricted_data() -> None:
     assert "HF_HUB_OFFLINE=1" in qualify
     assert "calibration-repair-pydeps" in qualify
     assert "PHASE4_RESTRICTED_ROOT" not in qualify
+    assert "PHASE4_TUPLE_RUN_MODE" in qualify
+    assert "tuple-size" in qualify
 
 
 def test_terminal_report_is_flat_and_guarded() -> None:
@@ -832,7 +847,9 @@ def test_terminal_report_is_flat_and_guarded() -> None:
     assert "ACTIVITY_SELECTION_FIELDS" in source
     assert "TUPLE_PREP_FIELDS" in source
     assert "TUPLE_RUNTIME_PREP_FIELDS" in source
+    assert "TUPLE_SIZING_FIELDS" in source
     assert "tuple-prepare" in source
     assert "tuple-runtime-prepare" in source
+    assert "tuple-size" in source
     assert "E_ACTIVITY_HOLDOUT_BEFORE_WINNER_SEAL" in source
     assert 'print(json.dumps' not in source
