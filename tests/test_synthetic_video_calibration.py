@@ -416,6 +416,10 @@ def test_tuple_sizing_is_label_blind_and_retains_no_predictions() -> None:
     assert '"external_call_count": 0' in source
     assert '"module_count"' in source
     assert "_verify_activity_dependency_manifest" in source
+    assert MODULE.TUPLE_LANGUAGE_ADAPTER_SHA256 == (
+        "005f368bef97dfc791f43e45da8bbfe01ea22e8790b2032e9580b14b1ea62ac8"
+    )
+    assert "E_TUPLE_LANGUAGE_ADAPTER_SOURCE" in source
     assert "_tuple_fixture_protocol" in source
     assert "prompt_groups_override=action_protocol" in source
     assert "public_fixture_protocol_commitment_sha256" in source

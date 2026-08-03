@@ -207,6 +207,9 @@ NLTK_RESOURCE_ARCHIVES = {
 GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256 = (
     "42aa71c7c47e6f930f48100924393adac95eb94aae0eef779bd7cad2d5bcc95d"
 )
+TUPLE_LANGUAGE_ADAPTER_SHA256 = (
+    "005f368bef97dfc791f43e45da8bbfe01ea22e8790b2032e9580b14b1ea62ac8"
+)
 ACTIVITY_AXIS = "activity_context_mixture"
 VISUAL_AXIS = "egocentric_visual_regime"
 SCENE_AXIS = "scene_complexity"
@@ -2529,6 +2532,13 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
     image_array = _tuple_dummy_image(512)
     modules = []
 
+    adapter_path = Path(__file__).resolve().with_name(
+        "synthetic_video_language_adapter.py"
+    )
+    if not adapter_path.is_file() or file_digest(adapter_path) != (
+        TUPLE_LANGUAGE_ADAPTER_SHA256
+    ):
+        raise RuntimeError("E_TUPLE_LANGUAGE_ADAPTER_SOURCE")
     from synthetic_video_language_adapter import validate_asr_prediction
 
     language = validate_asr_prediction(
