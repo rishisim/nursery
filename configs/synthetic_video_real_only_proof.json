@@ -223,7 +223,7 @@
     "status": "PASS_IMPLEMENTED_AND_REGRESSION_TESTED_BEFORE_NO_HAND_REVIEW_OR_PUBLIC_MODEL_OUTCOME",
     "implemented_on": "2026-08-03",
     "canonical_entry_point": "scripts/run_synthetic_video_calibration.py",
-    "implementation_source_sha256": "bfef49ff7bf194a2c810a94d5638202317cf9778ffd9fca9865e3cfdfe890a3f",
+    "implementation_source_sha256": "ddf2a59c6e6344688fe86b9dad9b95b0592115859afa281c88c951c33b905273",
     "config_schema_version": 17,
     "prospective_amendment_preserved": "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39",
     "ltx_sole_generator_compiler_amendment_preserved": "cb4a7cd2dd60fb14f3430aaf2544d79db95064d42a3f22ad6107206832319c62",
@@ -257,12 +257,16 @@
     "server_declared_bytes": 285776823,
     "server_status": 200,
     "server_content_type": "application/zip",
-    "repair": "the canonical public downloader now verifies declared response length retries silent truncation and fails closed after the frozen retry limit",
+    "repair": "the canonical public downloader now verifies declared response length retries silent truncation and fails closed after the frozen retry limit; the 124 unique frozen archives are materialized with four bounded workers under the already frozen four-CPU topology",
+    "sequential_retry_stopped_before_model_inference": true,
+    "completed_archives_retained_at_stop": 20,
+    "unpromoted_partial_count_retained": 1,
+    "archive_download_worker_count": 4,
     "model_inference_executed": false,
     "public_development_or_holdout_opened": false,
     "governed_C_reopened": false,
     "scientific_threshold_or_fixture_changed": false,
-    "completed_valid_downloads_and_resumable_state_retained": true
+    "completed_valid_downloads_and_unpromoted_partial_retained": true
   },
   "governance_incident": {
     "observed_on": "2026-08-02",

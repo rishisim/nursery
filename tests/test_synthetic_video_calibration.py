@@ -1912,6 +1912,7 @@ def test_no_hand_review_materializes_only_frozen_nominee_frames(
         )
     )
     assert record["archive_count"] == 2
+    assert record["archive_download_worker_count"] == 2
     assert record["source_frame_count"] == 2
     assert record["model_inference_executed"] is False
     assert record["restricted_mount_present"] is False

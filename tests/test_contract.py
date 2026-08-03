@@ -292,12 +292,13 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert runner["action_integrity_privacy_provenance_and_external_call_failures_remain_blocking"] is True
     assert runner["public_model_or_extractor_outcome_opened"] is False
     assert runner["implementation_source_sha256"] == (
-        "bfef49ff7bf194a2c810a94d5638202317cf9778ffd9fca9865e3cfdfe890a3f"
+        "ddf2a59c6e6344688fe86b9dad9b95b0592115859afa281c88c951c33b905273"
     )
     repair = config["public_no_hand_preparation_engineering_repair"]
     assert repair["failure_class"] == "ENGINEERING_FAILURE_NOT_SCIENTIFIC_NO_GO"
     assert repair["model_inference_executed"] is False
     assert repair["scientific_threshold_or_fixture_changed"] is False
+    assert repair["archive_download_worker_count"] == 4
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"

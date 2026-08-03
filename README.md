@@ -166,6 +166,9 @@ The first public-only review-preparation attempt stopped before inference when
 one frame archive was silently truncated; the canonical downloader now verifies
 declared response length and retries under the unchanged ceiling. This is an
 engineering retry, not a scientific no-go or protocol change.
+The retry uses four bounded archive workers within the already frozen four-CPU
+topology; exact source selection and deterministic manifest sealing are
+unchanged.
 
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema

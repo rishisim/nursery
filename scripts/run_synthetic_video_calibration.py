@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor
 import csv
 from io import BytesIO
 import hashlib
@@ -10719,6 +10720,37 @@ def _materialize_active_visor_hos_no_hand_review_frames(
     frame_root = review_root / "source-frames"
     base = preparation["source_archives"]["EPIC_KITCHENS_VISOR_validation"]
     archive_root = fixture_root / "sources/VISOR-HOS/frame-archives"
+    archive_specs: dict[str, tuple[str, Path]] = {}
+    for partition in ("development", "holdout"):
+        for row in queues[partition]:
+            split = row["source_split"]
+            participant = row["participant"]
+            video = row["video"]
+            archive_url = (
+                f"{base['repository_root'].rstrip('/')}/rgb_frames/"
+                f"{split}/{participant}/{video}.zip"
+            )
+            archive_path = archive_root / split / participant / f"{video}.zip"
+            archive_key = str(archive_path.relative_to(fixture_root))
+            spec = (archive_url, archive_path)
+            if archive_key in archive_specs and archive_specs[archive_key] != spec:
+                raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_ARCHIVE_COLLISION")
+            archive_specs[archive_key] = spec
+
+    def ensure_archive(spec: tuple[str, Path]) -> None:
+        archive_url, archive_path = spec
+        if not archive_path.is_file() or not zipfile.is_zipfile(archive_path):
+            _download_public_file(archive_url, archive_path)
+        if not zipfile.is_zipfile(archive_path):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_ARCHIVE_INVALID")
+
+    ordered_specs = [archive_specs[key] for key in sorted(archive_specs)]
+    worker_count = min(4, len(ordered_specs))
+    with ThreadPoolExecutor(max_workers=worker_count) as executor:
+        futures = [executor.submit(ensure_archive, spec) for spec in ordered_specs]
+        for future in futures:
+            future.result()
+
     archive_records: dict[str, dict[str, Any]] = {}
     frame_records: list[dict[str, Any]] = []
     target_paths: set[Path] = set()
@@ -10732,8 +10764,6 @@ def _materialize_active_visor_hos_no_hand_review_frames(
                 f"{split}/{participant}/{video}.zip"
             )
             archive_path = archive_root / split / participant / f"{video}.zip"
-            if not archive_path.is_file() or not zipfile.is_zipfile(archive_path):
-                _download_public_file(archive_url, archive_path)
             archive_key = str(archive_path.relative_to(fixture_root))
             archive_records.setdefault(
                 archive_key,
@@ -10803,6 +10833,7 @@ def _materialize_active_visor_hos_no_hand_review_frames(
             construct_aligned_amendment_commitment_sha256
         ),
         "archive_count": len(archive_records),
+        "archive_download_worker_count": worker_count,
         "source_frame_count": len(frame_records),
         "archives": [archive_records[key] for key in sorted(archive_records)],
         "frames": frame_records,

@@ -391,7 +391,12 @@ and was not a complete ZIP. Twelve completed archives remain valid. The
 canonical downloader now checks declared response length, retries silent
 truncation, and fails closed at the existing retry ceiling. This repair changes
 no fixture, threshold, label, split, or scientific gate; the bounded
-preparation retry is authorized from the retained cache.
+preparation retry is authorized from the retained cache. Because the frozen
+queue references 124 unique public archives, the sequential retry was stopped
+before inference with 20 complete archives and one unpromoted partial retained.
+The canonical preparation now uses four bounded download workers under the
+already frozen four-CPU, two-hour topology; archive order in the sealed manifest
+remains deterministic.
 
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan

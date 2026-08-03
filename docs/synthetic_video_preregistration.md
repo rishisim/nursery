@@ -1568,6 +1568,11 @@ downloader was repaired to verify that length, retry incomplete responses, and
 fail closed after the unchanged retry limit. Completed valid archives are
 retained. No fixture, threshold, label, split, public outcome, or scientific
 gate changed, so the bounded preparation retry remains authorized.
+The frozen queue spans 124 unique public archives. A sequential retry was
+stopped before inference with 20 complete archives retained; the canonical
+preparation now uses four bounded download workers under the existing
+four-CPU, two-hour ceiling while preserving deterministic manifest order and
+the exact source, row, hash, and fixture contracts.
 
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
