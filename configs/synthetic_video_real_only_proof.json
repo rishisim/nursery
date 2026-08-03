@@ -1,6 +1,6 @@
 {
-  "schema_version": 14,
-  "status": "NO_GO_LEARNER_EFFECTIVE_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_CHARADES_ORDER_ACTION_YIELD_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN",
+  "schema_version": 15,
+  "status": "PROSPECTIVE_AMBITIOUS_LEARNER_EFFECTIVE_H3_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_H3_US_AND_OUTPUT_TRAINING_LICENSE_BLOCKED_NO_NEW_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -11,6 +11,7 @@
     "unchanged": "exactly one accepted credited hour per arm; pinned learner triple 4:1:1 schedule; shared adapter; corrected assets; modular German TTS; point estimates only; no grammar aggregate equivalence inference or evaluation-driven generator tuning"
   },
   "post_gate_descriptive_extension": {
+    "status": "HISTORICAL_LTX_ROUTE_STOPPED_AND_PROSPECTIVELY_SUPERSEDED_BY_SCHEMA_15_H3_AMENDMENT",
     "effective_on": "2026-08-02",
     "timing": "after the redesigned Real-1h result was sealed and before C calibration, any new LTX outcome, synthetic corpus, or synthetic learner score",
     "authorization_basis": "explicit user direction to go ahead with one scientifically weaker descriptive Synthetic-1h LTX arm despite the failed formal Real-1h gate",
@@ -23,6 +24,59 @@
     "inconclusive_rule": "if both matched arms are flat or decline the comparison is inconclusive",
     "outcome_independence": "the extension generator corpus cap learner seeds steps checkpoints evaluation assets and resource-gate order were frozen before any synthetic learner outcome; the later user-authorized mechanistic training-tuple calibration amendment is separately prospective and preserves every observed calibration no-go",
     "execution_status": "STOPPED_AT_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO_NO_GOVERNED_C_OR_SYNTHETIC_WORK"
+  },
+  "ambitious_learner_effective_h3_amendment": {
+    "status": "FROZEN_BEFORE_NEW_PUBLIC_EXTRACTOR_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES",
+    "effective_on": "2026-08-03",
+    "authorization": "explicit user authorization to adopt an ambitious construct-aligned learner-effective calibration goal, make the order-dependent action control supporting rather than separately blocking, and prospectively select locally governed MiniMax H3 open weights instead of LTX",
+    "scientific_question": "can a task-matched calibration of the learning opportunities delivered through the frozen adapter produce one C-calibrated MiniMax-H3 synthetic hour whose training effect can be compared descriptively with the already sealed Real-1h effect under the identical learner procedure",
+    "scientific_strength": "ambitious_end_to_end_descriptive_exploration_not_equivalence_noninferiority_same_quality_or_confirmatory_phase5",
+    "prior_results_preserved": {
+      "formal_real_1h_gate": "FAILED_NOT_REINTERPRETED_MEAN_GAIN_0_017661900756938558_BELOW_0_02",
+      "original_governed_C_missingness_no_go": "28ef267cd0608a33b50037a50e44a622875dc5aad5d1b2a422aa6612347fe3d5",
+      "PE_Core_OWLv2_public_specificity_no_go": "042e9ba45fa64abda183eb7e575c5aa2e4990cebf1e54d25c0bffdd34b86fa7f",
+      "EgoVLPv2_premodel_no_go": "b5dd6c03d7b75e3be2f437c5247b66424f9f6aee28fbaaebbba6d0fa2f0a49d0",
+      "activity_checkpoint_public_development_no_go": "e11727dd309a01ee820264ff18afee33cf56b83fa2449301ce1be6e12670c29d",
+      "VISOR_sparse_fixture_source_no_go": "dee0a37548d75fc29f829159ce3ad648a63288339c7bc173f8201483e51213e7",
+      "complete_source_no_go": "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37"
+    },
+    "hierarchy": {
+      "critical_axes": ["adapter_qualified_yield", "noun_adjective_exposure", "utterance_centered_referent_visibility_dominance_ambiguity", "cross_episode_recurrence", "adjective_attribute_contrast"],
+      "supporting_axes": ["hand_action_coupling", "egocentric_sensor_regime"],
+      "descriptive_only": ["broad_activity_context", "global_visual_similarity"],
+      "public_and_governed_C_combined_pass_rule": "all five critical axes pass, at least six of seven learner-effective axes validate, every blocking integrity and privacy rule passes, and broad activity or the separate action-direction diagnostic cannot rescue a failed axis",
+      "generated_attempt_and_accepted_corpus_rule": "measure attempts and accepted corpus separately; all five critical axes and at least six of seven axes must meet the already frozen per-feature tolerances, with no severe joint-distribution miss and no omnibus fidelity score"
+    },
+    "order_action_role_amendment": {
+      "prior_no_go_status": "FINAL_FOR_THE_PRIOR_SEPARATELY_BLOCKING_48_PER_PARTITION_RECIPE",
+      "prior_observed_counts": {"development": 44, "holdout": 44},
+      "new_role": "SUPPORTING_DIAGNOSTIC_NONBLOCKING",
+      "construct_rationale": "ordered versus reversed or repeated-frame behavior tests direction-sensitive action representations, not whether the noun/adjective learner receives calibrated lexical and grounding opportunities",
+      "fixtures": "retain the existing subject/video-disjoint 44 development and 44 holdout items without adding a source, replacing a label, or relaxing any model-performance threshold",
+      "scope": "score only genuinely order-dependent open/close take/put sit/stand and turn-on/turn-off examples; report class counts macro-F1 coverage and ordered-versus-control behavior with uncertainty",
+      "gate_effect": "does not enter the five-critical-plus-six-of-seven decision, does not count as an eighth axis, and cannot rescue hand/action coupling or any critical failure",
+      "outcome_independence": "made after a source-quota no-go but before action-model inference, public development or holdout extractor outcomes, governed C reopening, MiniMax-H3 generation, or any synthetic learner score"
+    },
+    "execution_order": [
+      "commit_and_push_this_amendment",
+      "implement_and_test_config_aware_nonblocking_action_diagnostic",
+      "complete_blind_no_hand_review",
+      "run_all_public_development_modules_and_seal_thresholds",
+      "run_all_sealed_public_holdout_modules_and_apply_one_combined_gate",
+      "run_governed_blind_C_transfer_audit_if_public_pass",
+      "measure_and_seal_disclosure_safe_C_targets_if_transfer_pass",
+      "freeze_feature_matched_public_word_episode_plan",
+      "resolve_MiniMax_H3_US_territory_and_output_training_license",
+      "run_offline_ComfyUI_final_topology_preflight",
+      "freeze_exact_attempt_retry_wall_time_GPU_hour_storage_and_cost_ceiling",
+      "generate_and_seal_exactly_3600_accepted_credited_seconds",
+      "train_and_evaluate_the_same_three_matched_learner_seeds_once"
+    ],
+    "completion_goal": "continue through every passing gate to a complete initialized-versus-Real-1h-versus-Synthetic-1h descriptive result; stop only on a combined public or C failure, immutable license or governance blocker, frozen local-H3 qualification no-go, or exact resource approval requirement",
+    "immutables": ["one_accepted_synthetic_hour_maximum", "same_1244_learner_records_per_arm", "same_three_public_seeds", "same_4668_scheduler_steps", "same_byte_identical_initialization", "same_CLIP_plus_triple_4_1_1_schedule", "same_shared_adapter", "same_corrected_evaluation_assets", "modular_German_TTS", "oracle_text_QA_only", "no_evaluation_driven_tuning"],
+    "claim_limits": ["no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_proof_of_synthetic_data_quality"],
+    "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
+    "amendment_commitment_sha256": "d907d2479ba88c7e51d25e935e429cb5860e550a82620313e502482383e2855d"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",
@@ -71,7 +125,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_ACTIVE_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO",
+    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_PROSPECTIVE_AMBITIOUS_PUBLIC_QUALIFICATION_PENDING",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -89,9 +143,9 @@
     "active_calibration_contract_sources": {
       "axes": "/calibration_C/extractor/mechanistic_training_tuple_amendment/axes",
       "joint_distributions": "/calibration_C/extractor/mechanistic_training_tuple_amendment/joint_distributions",
-      "public_combined_gate": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_correction_amendment/public_execution_and_combined_gate",
+      "public_combined_gate": "/ambitious_learner_effective_h3_amendment/hierarchy/public_and_governed_C_combined_pass_rule",
       "public_combined_gate_result": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_complete_source_result",
-      "governed_C_and_episode_plan_order": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_correction_amendment/governed_C_and_downstream_rule",
+      "governed_C_and_episode_plan_order": "/ambitious_learner_effective_h3_amendment/execution_order",
       "generated_attempt_and_accepted_corpus_matching": "/calibration_C/extractor/mechanistic_training_tuple_amendment/generated_attempt_and_accepted_corpus_matching"
     },
     "semantic_boundary": "public semantic categories and frequency bands only; never exact C vocabulary transcripts or sealed evaluation concepts",
@@ -1974,12 +2028,12 @@
     "limitations": "small feature set only; measured and unavailable features reported separately; no full distributional calibration claim",
     "disclosure": "Git and external reporting receive only compact non-identifying bins targets uncertainty missingness and a commitment after applicant disclosure review; suppress sparse or reconstructive cells and never export raw media text exact vocabulary embeddings row-level per-child or per-session statistics IDs or reconstructive combinations",
     "episode_plan_contract": "freeze a public nonrestricted episode-plan distribution matched axis-by-axis to approved targets using only public lexical resources and no sealed evaluation concepts or outcomes",
-    "local_generator_input": "inside applicant-governed Juno storage LTX may consume the committed compact C aggregate target table and public self-authored episode-plan distribution; neither the table nor aggregate-conditioned prompts leave the governed boundary",
+    "local_generator_input": "inside applicant-governed Juno storage MiniMax H3 may consume only the committed compact C aggregate target table, public-word episode-plan distribution, public or self-authored reference images, and modular German TTS; neither the table nor aggregate-conditioned plans prompts or media leave the governed boundary",
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "scale_up_evidence_status": "LEGACY_PRE_REAL_GATE_SCALE_UP_RULE_PRESERVED_NOT_ACTIVE_FOR_THE_USER_AUTHORIZED_POST_GATE_DESCRIPTIVE_EXTENSION",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "STOPPED_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO",
+    "local_generator_gate": "BLOCKED_PENDING_AMBITIOUS_PUBLIC_AND_C_PASS_PLUS_WRITTEN_MINIMAX_US_TERRITORY_AND_OUTPUT_TRAINING_LICENSE",
     "authorization_interpretation": "all four earlier calibration no-gos and the dee0a375 fixture-source no-go remain final for their frozen questions; a new user-authorized VISOR-HOS semantics and joint-allocation correction is prospective and can authorize generation only after complete combined public and governed C passes",
     "governed_result": {
       "status": "NO_GO",
@@ -2049,24 +2103,89 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_NOT_RUN_STOPPED_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO",
-    "selected": "LTX-2.3-22B-Distilled-1.1",
-    "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
+    "status": "SELECTED_PROSPECTIVELY_BLOCKED_PENDING_WRITTEN_US_TERRITORY_AND_OUTPUT_TRAINING_LICENSE",
+    "selected": "MiniMax-H3-Base-Ref2VA-open-weights-via-native-ComfyUI",
+    "selection_basis": "latest prospective user-directed choice after the August 2 2026 open-weight release and before any new public extractor C generator or synthetic learner outcome; the local route is chosen for stronger completed bakeoff evidence and governed multimodal reference control, not because it won the bakeoff",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
-    "bakeoff_interpretation": "Gemini led at 27/28 primary checks, MiniMax H3 scored 25/28, Seedance 24/28, and LTX 19/28; LTX is a practical local choice and must never be described as the bakeoff quality winner",
-    "implementation": {"repository": "https://github.com/Lightricks/LTX-2.git", "commit": "9377758131b1ffde4b7f766804590a6617bf2ab9", "runner": "official_ltx_pipelines_distilled_two_stage", "prompt_enhancement": false, "seed": 314159},
-    "weights": {"repository": "Lightricks/LTX-2.3", "revision": "4229404625088d21c4f112eb640fb04a0900ee25", "checkpoint": "ltx-2.3-22b-distilled-1.1.safetensors", "spatial_upsampler": "ltx-2.3-spatial-upscaler-x2-1.1.safetensors", "license": "LTX-2 Community License"},
-    "text_encoder": {"repository": "google/gemma-3-12b-it-qat-q4_0-unquantized", "revision": "68f7ee4fbd59087436ada77ed2d62f373fdd4482", "license_acceptance_required": true},
-    "execution": "applicant-only local execution on governed Juno storage with pinned cached dependencies local-files-only loading disabled telemetry and no hosted API",
-    "runtime_evidence": {"source": "synthetic-video-public-pilot@e5009d6", "hardware": "1x_A100_80GB", "valid_clips": 4, "raw_output_seconds": 20.166667, "job_wall_seconds": 609.097055, "measured_cloud_cost_usd": 0.422984},
-    "preflight_gate": "after the post-gate extension is committed and governed C calibration plus episode-plan commitment pass, run bounded public/dummy final-topology sizing and freeze the actual Juno GPU count type wall-time aggregate GPU-hours and storage before generation",
-    "production_ceiling_provisional_until_preflight": {"accepted_credited_seconds_exact": 3600, "learner_record_count_exact": 1244, "attempt_frames": 121, "frames_per_second": 24, "raw_generated_seconds_max": 5399.625, "attempts_max": 1071, "retries_max": 357, "attempts_per_plan_max": 2, "wall_time_hours_max": 72, "governed_storage_gib_max": 100, "provider_monetary_cost_usd": 0, "accounting": "retain GPU time energy storage failed attempts retries QA labor accepted-hour yield and all attributable costs"},
+    "bakeoff_interpretation": "Gemini led at 27/28 primary checks, MiniMax H3 scored 25/28, Seedance 24/28, and LTX 19/28; MiniMax H3 did not win the completed screen and the newly released local weights have not been shown equivalent to the hosted bakeoff route",
+    "selection_history": [
+      {"generator": "Gemini Omni Flash", "role": "completed_bakeoff_winner_not_active"},
+      {"generator": "MiniMax H3 hosted", "role": "prior_user_selection_blocked_on_provider_and_institutional_training_use_clearance"},
+      {"generator": "LTX-2.3", "role": "prior_user_directed_local_choice_stopped_before_generation_and_now_prospectively_superseded"},
+      {"generator": "MiniMax H3 open weights", "role": "active_prospective_choice_blocked_on_written_license"}
+    ],
+    "official_release": {
+      "repository": "MiniMaxAI/MiniMax-H3",
+      "revision": "5d9b308a59ab12e67147f191e184baf704185bd1",
+      "release_date": "2026-08-02",
+      "variant": "H3-Base-Ref2VA",
+      "output": "approximately_768p_24fps_native_stereo_audio_base_model",
+      "hosted_components_prohibited": ["H3_Context_IR_API", "H3_Regenerate_2K_API"],
+      "license": "MiniMax H3 Community License Agreement",
+      "license_sha256": "59b99642b95ea21630e311198ddbfffbfe05aadba0c2f5d884cbdf4efcc90f44",
+      "license_QA_sha256": "26900a2868636f886d241efe94002ad11d858b3c3eb005e58c0c2ad60f0de7ae",
+      "text_encoder_upstream": "Qwen3-VL-32B Apache-2.0"
+    },
+    "license_gate": {
+      "status": "BLOCKING",
+      "territory_issue": "the community license excludes the United States, where UTD Juno is located",
+      "training_use_issue": "section V.3 prohibits using MiniMax H3 outputs to improve another artificial-intelligence model, while this pilot would train EgoBabyVLM on those outputs",
+      "required_resolution": "written MiniMax authorization expressly covering local U.S. academic execution and use of generated video as EgoBabyVLM learner-training data, plus any required UTD institutional acceptance",
+      "weight_download_or_inference_before_resolution": "PROHIBITED",
+      "api_fallback": "PROHIBITED",
+      "license_claim": "open weights do not by themselves authorize this U.S. synthetic-training use"
+    },
+    "implementation": {
+      "runner": "native_ComfyUI_headless_local_backend",
+      "repository": "https://github.com/Comfy-Org/ComfyUI.git",
+      "commit": "14b05228cef127ce529bc0c08660770d4af3e9a8",
+      "version": "0.30.0",
+      "native_H3_support_commit": "57500fc5bc92566a63f2046824f522cd55c335ca",
+      "native_H3_node_file_sha256": "5c3f78efef772850f90660c5ff82e31078b5baef10f427053ed82fb8b4a7ecd1",
+      "code_license": "GPL-3.0",
+      "workflow_repository": "https://github.com/Comfy-Org/workflow_templates.git",
+      "workflow_revision": "7653f1cdef1d92394b6ef9946018c0a8aa4136b8",
+      "upstream_R2V_template": "templates/video_minimax_h3_r2v.json",
+      "canonical_workflow_rule": "derive one governed headless R2V graph from the native template, replace randomized noise with the frozen per-attempt seed schedule, disable dynamic prompts and network-bearing nodes, and seal the exact graph before public qualification",
+      "custom_nodes": "PROHIBITED_UNLESS_PROSPECTIVELY_PINNED_AS_A_MINIMAL_COMPATIBILITY_REQUIREMENT_BEFORE_OUTCOMES",
+      "manager_cloud_partner_nodes": "PROHIBITED",
+      "telemetry_and_tracking": "DISABLED",
+      "network_after_cache": "DISABLED"
+    },
+    "weights": {
+      "repository": "Comfy-Org/MiniMax-H3",
+      "revision": "0543966fbdce5ba05709a8f2031c94bdba629b4a",
+      "role": "MiniMax-recommended ComfyUI repackaging; exact quantized and pruned local variant requires its own public qualification and cannot inherit hosted-bakeoff performance",
+      "required_file_count": 4,
+      "required_bytes": 42470585471,
+      "required_files": {
+        "diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors": {"bytes": 20970379616, "sha256": "9255f52b6677845ad238f20dfaafa94727053694127ab7f255c048f0f9365779"},
+        "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors": {"bytes": 15687142551, "sha256": "35a88d51044231fe332301d7a62aa81e3f2cba62febeb446e2c1e3e0ef76f2c6"},
+        "vae/minimax_h3_video_vae_fp16.safetensors": {"bytes": 5207808496, "sha256": "7c1f131492e7eddacaac9069a61b81bdd39de5cc96561e677c5eab1cdce5e522"},
+        "vae/minimax_h3_audio_vae_fp32.safetensors": {"bytes": 605254808, "sha256": "8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48"}
+      }
+    },
+    "generation_recipe": {
+      "mode": "Ref2VA_for_every_episode",
+      "inputs": "public or self-authored nonrestricted reference image plus modular German TTS audio and the committed governed aggregate-conditioned public-word episode prompt",
+      "native_audio": "discard and remux the exact modular German TTS input before the shared adapter and credited-time computation",
+      "prompt_enhancement": false,
+      "seed_master": 314159,
+      "per_attempt_seed": "first eight bytes of SHA256(UTF8('synthetic-video|minimax-h3|314159|') || UTF8(episode_index) || UTF8('|') || UTF8(attempt_index)) interpreted as an unsigned 63-bit integer",
+      "output_grid": "24fps with frame count on the native 17k_plus_5 grid",
+      "local_only": true,
+      "evaluation_steering": "PROHIBITED"
+    },
+    "local_qualification_gate": "after written license resolution and before C-conditioned generation, run one frozen public or self-authored local-H3 control screen for offline reload, deterministic graph and seed serialization, continuity, identity recurrence, referent and speech timing, safety, adapter-qualified yield, no silent truncation, and zero external calls; this is a single-runner feasibility gate, not a new candidate bakeoff",
+    "execution": "applicant-only local execution on governed Juno storage with pinned cached dependencies local-files-only loading disabled telemetry no hosted API and compact aggregate-only output",
+    "preflight_gate": "after public and governed C calibration plus the episode-plan commitment and written MiniMax license pass, run a bounded one-process public/dummy ComfyUI load and one-clip sizing; freeze exact Juno GPU type count wall-time GPU-hours storage attempt retry and cost ceilings before material generation; any multiprocess topology requires its own final-topology preflight",
+    "production_ceiling_provisional_until_preflight": {"accepted_credited_seconds_exact": 3600, "learner_record_count_exact": 1244, "accepted_synthetic_hours_max": 1, "raw_generated_seconds_max": "PENDING_LICENSED_FINAL_TOPOLOGY_PREFLIGHT", "attempts_max": "PENDING_LICENSED_FINAL_TOPOLOGY_PREFLIGHT", "retries_max": "PENDING_LICENSED_FINAL_TOPOLOGY_PREFLIGHT", "attempts_per_plan_max": 2, "wall_time_hours_max": "PENDING_LICENSED_FINAL_TOPOLOGY_PREFLIGHT", "governed_storage_gib_max": "PENDING_LICENSED_FINAL_TOPOLOGY_PREFLIGHT", "provider_monetary_cost_usd": 0, "accounting": "retain GPU time energy storage failed attempts retries QA labor accepted-hour yield and all attributable institutional resource costs"},
     "privacy": "all C aggregates aggregate-conditioned prompts plans attempts outputs logs media QA and artifacts remain in applicant-governed Juno storage; no ChildLens or BabyView material or derivative is sent to a hosted provider",
-    "quality_limitation": "LTX had the weakest completed-bakeoff primary score and more critical failures; do not tune evaluation assets plans retries or QA thresholds from learner outcomes",
-    "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
+    "quality_limitation": "the hosted MiniMax H3 bakeoff result does not validate the newly released pruned quantized local ComfyUI route; do not tune evaluation assets plans retries QA thresholds workflow parameters or generation settings from learner outcomes",
+    "audio": "use modular German TTS as a governed Ref2VA timing reference, discard H3 native audio, remux the exact TTS waveform, and apply the repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "NOT_RUN; four prior calibration no-gos and the mechanistic training-tuple fixture-source no-go remain preserved; no public development model outcome governed C measurement C-conditioned plan LTX generation or synthetic learner score was opened",
+  "synthetic_arm": "NOT_RUN; all prior calibration and fixture-source no-gos remain preserved; the new learner-effective public and C gates are pending and MiniMax H3 generation is additionally blocked until written U.S.-territory and output-training authorization is obtained",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
   "former_directionally_competitive_rule_not_permitted_for_post_gate_extension": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",

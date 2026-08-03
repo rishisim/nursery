@@ -73,9 +73,10 @@ learner; Machine-DevBench Lexical as the common standardized primary endpoint;
 an above-chance, positive real-only learning-curve readiness gate; and a
 separate held-out-real ChildLens temporal-transfer safeguard. It retains the
 modular video and German-TTS architecture. A completed four-family public-only
-bakeoff ranked Gemini first, while the latest practical generator choice is
-locally governed LTX-2.3. LTX scored 19/28 versus Gemini's 27/28 and must not
-be reported as the bakeoff winner. See
+bakeoff ranked Gemini first. The latest prospective generator choice is local
+MiniMax H3 through native ComfyUI, subject to written MiniMax permission for
+U.S. execution and use of H3 output as learner-training data. MiniMax scored
+25/28 versus Gemini's 27/28 and must not be reported as the bakeoff winner. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
 A public generator pilot and bakeoff have been executed without ChildLens or
 BabyView inputs. The corrected governed common assets passed on the final
@@ -105,10 +106,12 @@ The corrected Phase 4 common-asset record is
 [`results/synthetic_video_phase4.json`](results/synthetic_video_phase4.json).
 Its deviation ledger is
 [`results/synthetic_video_phase4_deviations.json`](results/synthetic_video_phase4_deviations.json).
-The latest prospective user choice selects locally governed LTX-2.3 for the
-redesigned pilot. This is a practical execution choice, not a quality claim:
-Gemini led the blinded screen at 27/28, followed by MiniMax at 25/28, Seedance
-at 24/28, and LTX at 19/28. The original coverage-redesign rule required the
+The generator-selection history remains explicit: Gemini led the blinded
+screen at 27/28, followed by MiniMax at 25/28, Seedance at 24/28, and LTX at
+19/28. LTX was then selected as a practical local route but no LTX generation
+occurred. On 2026-08-03 the user prospectively selected newly released local
+MiniMax H3 instead; that choice does not change the bakeoff ranking. The
+original coverage-redesign rule required the
 multi-pass Real-1h positive control to pass before generation; that rule fired
 and remains sealed. It is not the active authorization path for the later
 descriptive extension. Synthetic data remains capped at exactly one accepted
@@ -133,6 +136,23 @@ items in each partition, with frozen `turn_on`/`turn_off` deficits. No model
 qualification, governed C run, LTX generation, synthetic hour, or synthetic
 learner result was opened. The descriptive extension is therefore stopped
 under its current protocol.
+
+A new ambitious learner-effective amendment at `d907d247…e2855d` preserves
+that no-go while prospectively treating the existing 44/44 order-action set as
+a supporting, nonblocking diagnostic. The active gate still requires every one
+of the five critical learner-effective axes and at least six of seven axes;
+broad activity and global visual similarity are descriptive. If public and
+governed C gates pass, the intended route is feature-matched episode planning,
+exactly 3,600 accepted synthetic seconds, and the same three 4,668-step learner
+seeds. MiniMax H3 is technically suitable for a governed headless ComfyUI
+runner, with native local Ref2VA nodes and fixed-seed workflow serialization.
+However, its 2026-08-02 community license excludes the United States and
+prohibits using outputs to improve another AI model. H3 weight download,
+inference, and synthetic generation therefore remain blocked until written
+MiniMax authorization covers both U.S. academic use and training EgoBabyVLM on
+the outputs. Public extractor work may proceed independently only after the
+canonical runner implements and passes regression tests for the new
+nonblocking action-diagnostic role without overwriting the prior no-go.
 Restricted execution was paused after a schema-inspection command
 unintentionally printed 94 opaque asset-level SHA-256 keys to the Codex task
 output. No media, text, filenames, paths, child/session keys, direct identifiers,
@@ -222,8 +242,9 @@ initializer required missing Submitit. Active runtime commitment
 `df15ff20…c0c4`, without model inference or a restricted mount. The subsequent
 eight-module label-blind sizing passed at `b6275905…e029`, with no fixture
 outcome or retained prediction. No
-fixture outcome, model substitution, or gate change is involved. C measurement,
-LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
+fixture outcome, model substitution, or gate change is involved. Under that
+now-historical route, C measurement, LTX generation, and Synthetic-1h training
+remained conditional. The one-hour cap
 and descriptive-only claim boundary are unchanged.
 
 The action-control implementation is prospectively frozen at fixture-protocol
@@ -265,15 +286,16 @@ train-plus-validation annotation set, explicit contact versus explicit
 participant-first splitting, and a simultaneous order-invariant 48/48/48
 contact/no-contact/no-hand allocation in each public partition. The official
 VISOR-HOS repository is an unlicensed semantic reference only: its code is not
-copied or executed. Public qualification must collect every independent module
-metric and then apply one decision: all five critical learner-effective axes,
-at least six of seven axes overall, and the separate genuinely
-order-dependent action control must pass. Broad activity remains descriptive.
-Only that combined public PASS can authorize the governed C transfer audit;
-only a subsequent combined C PASS can authorize the already bounded,
-exactly-one-accepted-hour descriptive LTX arm.
+copied or executed. That frozen correction required public qualification to
+collect every independent module metric and then apply one decision: all five
+critical learner-effective axes, at least six of seven axes overall, and the
+separate genuinely order-dependent action control had to pass. Broad activity
+was descriptive. Only that combined public PASS could authorize the governed C
+transfer audit; only a subsequent combined C PASS could authorize the
+then-selected exactly-one-accepted-hour descriptive LTX arm.
 The complete source stage under that correction is now sealed as
 `NO_GO_COMPLETE_SOURCE_FEASIBILITY` at `5f4aeff2…13b37`: the order-action
 family retained only 44/44 items and missed frozen `turn_on`/`turn_off`
 direction quotas. The conditional public-model, governed-C, and LTX stages
-therefore remain unrun and unauthorized.
+therefore remained unrun. The current prospective route and its separate H3
+license blocker are summarized above.

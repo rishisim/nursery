@@ -1,7 +1,7 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_AMBITIOUS_LEARNER_EFFECTIVE_H3_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_GENERATION_LICENSE_BLOCKED_NO_NEW_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -73,6 +73,27 @@
     "claim_limits": ["descriptive_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_more_than_one_accepted_synthetic_hour"],
     "prior_stop_preserved": "REAL_1H_FORMAL_GATE_AND_ALL_FOUR_CALIBRATION_NO_GOS_PRESERVED",
     "synthetic_work_status": "NOT_RUN_STOPPED_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO"
+  },
+  "prospective_ambitious_h3_extension": {
+    "status": "FROZEN_NO_NEW_SCIENTIFIC_OUTCOME",
+    "effective_on": "2026-08-03",
+    "canonical_config": "configs/synthetic_video_real_only_proof.json schema 15",
+    "amendment_commitment_sha256": "d907d2479ba88c7e51d25e935e429cb5860e550a82620313e502482383e2855d",
+    "prior_real_gate_preserved": true,
+    "all_prior_calibration_no_gos_preserved": true,
+    "prior_complete_source_no_go_preserved": "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37",
+    "scientific_change": "the previously separate blocking order-action source requirement is prospectively reclassified as a nonblocking supporting diagnostic; the unchanged learner-effective decision still requires all five critical axes and at least six of seven axes",
+    "order_action_counts_reused_without_substitution": {"development": 44, "holdout": 44},
+    "selected_generator": "MiniMax-H3-Base-Ref2VA-open-weights-via-native-ComfyUI",
+    "generator_selection_role": "user_directed_prospective_open_weight_local_choice_not_bakeoff_winner",
+    "bakeoff_scores": {"Gemini": 27, "MiniMax_H3": 25, "Seedance": 24, "LTX": 19},
+    "comfyui_applicability": "TECHNICALLY_APPLICABLE_NATIVE_LOCAL_HEADLESS_RUNNER_PENDING_LICENSE_AND_PUBLIC_PREFLIGHT",
+    "license_blockers": ["community_license_excludes_United_States", "community_license_prohibits_using_H3_outputs_to_improve_another_AI_model"],
+    "required_written_resolution": "MiniMax authorization covering local U.S. academic execution and use of H3 outputs as EgoBabyVLM training data, plus any required UTD acceptance",
+    "public_extractor_or_C_outcome_opened": false,
+    "H3_weight_download_or_inference_run": false,
+    "synthetic_generation_run": false,
+    "synthetic_learner_run": false
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -649,5 +670,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "NONE_UNDER_THE_FROZEN_LEARNER_EFFECTIVE_ROUTE_AFTER_COMPLETE_PUBLIC_SOURCE_NO_GO; GOVERNED_C_LTX_GENERATION_AND_SYNTHETIC_LEARNER_REMAIN_UNAUTHORIZED"
+  "next_authorized_scope": "IMPLEMENT_AND_TEST_THE_SCHEMA_15_LEARNER_EFFECTIVE_RUNNER_WITHOUT_OVERWRITING_PRIOR_NO_GOS; PUBLIC QUALIFICATION_THEN_REQUIRES_ITS_OWN_VERIFIED_COMMIT; GOVERNED_C_IS_CONDITIONAL_ON_PUBLIC_PASS; MINIMAX_H3_WEIGHT_DOWNLOAD_INFERENCE_GENERATION_AND_SYNTHETIC_LEARNER_ARE_BLOCKED_PENDING_WRITTEN_LICENSE"
 }

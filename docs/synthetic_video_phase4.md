@@ -313,3 +313,44 @@ direction pair, relaxing six-per-direction yield, or replacing the action
 control after observing this result. Consequently public model development and
 holdout, governed C, LTX preflight or generation, and the Synthetic-1h learner
 were not run. No downstream operation is authorized under this frozen route.
+
+### Prospective ambitious route and MiniMax H3 gate
+
+The complete source no-go above remains final. A 2026-08-03 prospective
+amendment (`d907d247…e2855d`) now preserves its 44/44 action inventory as a
+nonblocking supporting diagnostic rather than claiming that the prior
+48-per-partition requirement passed. The active combined gate is all five
+critical learner-effective axes plus at least six of seven axes, with integrity
+and privacy checks blocking. Broad activity and global visual similarity are
+descriptive. The action-direction diagnostic cannot rescue any failed axis or
+contribute an extra axis.
+
+The active end-to-end goal is deliberately ambitious: finish public
+development and sealed holdout qualification, the blind governed C transfer
+audit, disclosure-safe C target measurement, feature-matched episode planning,
+exactly 3,600 accepted synthetic seconds, and the same three matched learner
+seeds. Generated attempts and accepted media must each be audited against the
+frozen learner-effective tolerances. The Real-1h formal failure remains
+unchanged, so any final result is descriptive only.
+
+MiniMax H3 Base Ref2VA prospectively replaces LTX as the intended local
+generator. MiniMax did not win the bakeoff—Gemini scored 27/28 and MiniMax
+25/28—and the local pruned/quantized route has no inherited performance claim.
+Native ComfyUI 0.30.0 is technically applicable as a governed headless runner:
+its H3 graph is local and serializable, exposes fixed-seed sampling, and
+supports image/audio references. The frozen plan prohibits Comfy Cloud,
+manager/partner nodes, hosted H3 Context-IR and 2K regeneration, and all
+network access after cache preparation. Modular German TTS is supplied as a
+reference, H3 native audio is discarded, and the exact TTS input is remuxed
+before the repaired shared adapter runs.
+
+Generation is nevertheless blocked by the official MiniMax H3 Community
+License. It excludes U.S. use of the open weights and separately prohibits
+using H3 outputs to improve another AI model. This study is U.S.-based and
+would train EgoBabyVLM on H3 output. Written MiniMax permission must expressly
+cover both local U.S. academic execution and output-as-training-data use, with
+any required UTD acceptance, before weights are downloaded, a ComfyUI
+preflight runs, or synthetic media is generated. Public learner-effective
+extractor qualification is independent of that license, but it unlocks only
+after the canonical runner implements and tests the new nonblocking diagnostic
+role without overwriting the prior source no-go.

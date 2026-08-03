@@ -38,8 +38,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 5
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO_PRIOR_NO_GOS_PRESERVED"
+    assert config["schema_version"] == 6
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_AMBITIOUS_LEARNER_EFFECTIVE_H3_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_GENERATION_LICENSE_BLOCKED"
     validate_phase_state(config)
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
@@ -217,6 +217,8 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     ]["administrative_followup_nonblocking"]
     assert config["gates"]["phase4_authorized"] is True
     assert config["gates"]["childlens_audio_processing_authorized"] is True
+    assert config["gates"]["learner_effective_implementation_authorized"] is True
+    assert config["gates"]["learner_effective_public_qualification_authorized"] is False
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
     assert config["gates"]["generator_work_authorized"] is False
     assert config["gates"]["real_only_training_authorized"] is False
@@ -242,7 +244,17 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 14
+    assert config["schema_version"] == 15
+    amendment = config["ambitious_learner_effective_h3_amendment"]
+    commitment = amendment.pop("amendment_commitment_sha256")
+    assert commitment == canonical_json_sha256(amendment)
+    assert commitment == "d907d2479ba88c7e51d25e935e429cb5860e550a82620313e502482383e2855d"
+    assert amendment["order_action_role_amendment"]["new_role"] == (
+        "SUPPORTING_DIAGNOSTIC_NONBLOCKING"
+    )
+    assert amendment["hierarchy"]["public_and_governed_C_combined_pass_rule"].startswith(
+        "all five critical axes pass"
+    )
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"
@@ -267,8 +279,12 @@ def test_active_tuple_contract_is_not_confused_with_legacy_broad_calibration() -
         assert value is not None
 
     results = json.loads(Path("results/synthetic_video_phase4.json").read_text())
-    assert results["post_gate_descriptive_extension"]["execution_order"][:3] == [
-        "corrected_public_source_feasibility_and_all_independent_public_module_metrics",
-        "corrected_public_five_critical_plus_six_of_seven_plus_order_action_combined_gate",
-        "governed_C_transfer_audit_and_combined_calibration_gate",
-    ]
+    active = results["prospective_ambitious_h3_extension"]
+    assert active["amendment_commitment_sha256"] == (
+        "d907d2479ba88c7e51d25e935e429cb5860e550a82620313e502482383e2855d"
+    )
+    assert active["order_action_counts_reused_without_substitution"] == {
+        "development": 44,
+        "holdout": 44,
+    }
+    assert active["H3_weight_download_or_inference_run"] is False

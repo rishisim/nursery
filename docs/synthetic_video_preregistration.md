@@ -628,7 +628,7 @@ temporal Recall@1 and MRR are finite and decline by no more than 0.05. Failure
 is inconclusive about corpus quality and stops C calibration and generation.
 No grammar or overall aggregate is introduced.
 
-The latest prospective generator choice is locally governed LTX-2.3 using
+At that prospective stage, the generator choice was locally governed LTX-2.3 using
 `Lightricks/LTX-2@9377758`, LTX-2.3 weights revision `4229404`, and Gemma
 text-encoder revision `68f7ee4`. It is a practical local-execution choice, not
 a reinterpretation of the blinded screen: Gemini scored 27/28, MiniMax 25/28,
@@ -1443,3 +1443,89 @@ changed after this outcome. Public development/holdout, governed C, LTX, the
 one accepted synthetic hour, and Synthetic-1h learner training remain unrun and
 unauthorized. A future route would require a new explicit prospective user
 authorization; it cannot be represented as this recipe passing.
+
+### Ambitious learner-effective descriptive extension — prospective amendment
+
+On 2026-08-03, before any public extractor, governed C, newly selected
+generator, or synthetic learner outcome, the user authorized a new
+construct-aligned route at commitment `d907d247…e2855d`. Every preceding
+no-go remains final for its frozen question, including the complete source
+no-go at `5f4aeff2…13b37`. The new route does not call 44/44 action fixtures a
+pass. It prospectively retains those subject/video-disjoint fixtures without
+adding a source and treats their ordered/reversed/repeated-frame result as a
+supporting, nonblocking diagnostic. This control measures direction-sensitive
+action representation rather than whether the frozen learner receives useful
+noun, adjective, and referent-learning opportunities.
+
+The ambitious combined decision remains strict where it is construct-valid:
+all five critical axes—adapter-qualified yield, noun/adjective exposure,
+utterance-centered referent visibility/dominance/ambiguity, cross-episode
+recurrence, and adjective–attribute contrast—must pass, and at least six of
+the seven learner-effective axes must validate. Hand/action coupling and the
+egocentric sensor regime are supporting axes; broad activity/context and
+global visual similarity are descriptive. Action-direction behavior cannot
+rescue a failed axis or count as an eighth axis. Development may still choose
+only the previously frozen finite grids, holdout remains sealed until those
+choices are committed, and all independent module metrics are collected before
+one decision. Integrity, offline execution, abstention, privacy, and
+aggregate-only output rules remain blocking.
+
+Only a combined public pass authorizes the blind single-applicant C transfer
+audit. Only a passing transfer audit authorizes C measurement. C still cannot
+tune thresholds; all critical transfer checks must pass, at least six of seven
+axes must be measured, each included passing axis must have missingness at most
+0.20, and public-ontology coverage must be at least 0.60. Generated attempts
+and the accepted corpus are measured separately. All five critical axes and at
+least six of seven axes must satisfy the already frozen categorical total
+variation, normalized Wasserstein, and joint-distribution tolerances, with no
+severe joint miss and no omnibus fidelity score.
+
+The same prospective amendment selects MiniMax H3 open weights instead of
+LTX-2.3. This is a user-directed local-execution choice, not a reinterpretation
+of the completed bakeoff: Gemini scored 27/28, MiniMax H3 25/28, Seedance
+24/28, and LTX 19/28. The hosted MiniMax result does not validate the newly
+released pruned/quantized local runner.
+
+The intended local implementation is MiniMax H3 Base Ref2VA through native
+ComfyUI 0.30.0 at `Comfy-Org/ComfyUI@14b0522` (native H3 support introduced at
+`57500fc`), using the native R2V workflow at
+`Comfy-Org/workflow_templates@7653f1c`. The selected converted bundle is
+`Comfy-Org/MiniMax-H3@0543966` and totals 42,470,585,471 bytes:
+
+| Required local file | SHA-256 |
+| --- | --- |
+| `minimax_h3_ref2va_pruned_int8_convrot.safetensors` | `9255f52b…9365779` |
+| `qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors` | `35a88d51…76f2c6` |
+| `minimax_h3_video_vae_fp16.safetensors` | `7c1f1314…e5e522` |
+| `minimax_h3_audio_vae_fp32.safetensors` | `8e505d95…4db48` |
+
+ComfyUI is applicable because its H3 nodes and sampling graph are local,
+serializable, seedable, and callable headlessly. The canonical graph must
+replace the example workflow's randomized seed with the frozen per-attempt
+seed schedule, use no manager, cloud, partner, or unpinned custom node, disable
+network access after cache preparation, and seal all graph and dependency
+hashes before the one-model public control screen. H3 Context-IR and
+Regenerate-2K remain hosted and are prohibited. Every episode uses a public or
+self-authored reference image, modular German TTS, and a public-word
+aggregate-conditioned episode plan. H3 native audio is discarded; the exact
+TTS input is remuxed and processed by the same repaired adapter.
+
+The open-weight release is not currently executable for this study. The
+MiniMax H3 Community License dated 2026-08-02 excludes the United States, where
+UTD Juno is located. Section V.3 also prohibits using H3 outputs to improve
+another AI model, while this experiment would train EgoBabyVLM on those
+outputs. The license and official Q&A are pinned by SHA-256
+`59b99642…90f44` and `26900a28…e7ae`. No H3 weights may be downloaded or run,
+and no API fallback is permitted, until MiniMax provides written authorization
+expressly covering local U.S. academic execution and use of H3 output as
+EgoBabyVLM training data, with any required UTD acceptance.
+
+After both calibration and license gates pass, a bounded local ComfyUI
+public/dummy preflight must freeze exact GPU topology, wall time, GPU hours,
+storage, attempt/retry count, and attributable cost before production. The
+corpus remains capped at exactly 3,600 accepted credited seconds and 1,244
+learner records, reused across the same three seeds and 4,668-step learner
+contract. The final goal is a complete initialized/Real-1h/Synthetic-1h
+descriptive result—not a memo or preflight—but it cannot support equivalence,
+noninferiority, same-quality, directionally-competitive, or confirmatory
+language.
