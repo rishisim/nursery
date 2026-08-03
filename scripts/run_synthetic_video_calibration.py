@@ -189,6 +189,9 @@ NLTK_RESOURCE_ARCHIVES = {
         "sha256": "6025f530624335c67d6547d44757b357b4e79bae030a0383e9887a92c1718f0b",
     },
 }
+GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256 = (
+    "42aa71c7c47e6f930f48100924393adac95eb94aae0eef779bd7cad2d5bcc95d"
+)
 ACTIVITY_AXIS = "activity_context_mixture"
 VISUAL_AXIS = "egocentric_visual_regime"
 SCENE_AXIS = "scene_complexity"
@@ -600,6 +603,32 @@ def _download_exact_public_artifact(
     partial.replace(target)
 
 
+def _apply_grounding_dino_fallback_patch(code_root: Path) -> dict[str, str]:
+    path = (
+        code_root
+        / "groundingdino/models/GroundingDINO/ms_deform_attn.py"
+    )
+    original = "if torch.cuda.is_available() and value.is_cuda:"
+    replacement = (
+        "if '_C' in globals() and torch.cuda.is_available() and value.is_cuda:"
+    )
+    text = path.read_text()
+    if original in text:
+        if file_digest(path) != GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256:
+            raise RuntimeError("E_TUPLE_GROUNDING_PATCH_SOURCE")
+        if text.count(original) != 1:
+            raise RuntimeError("E_TUPLE_GROUNDING_PATCH_COUNT")
+        path.write_text(text.replace(original, replacement))
+        os.chmod(path, 0o600)
+    elif replacement not in text or text.count(replacement) != 1:
+        raise RuntimeError("E_TUPLE_GROUNDING_PATCH_STATE")
+    return {
+        "original_sha256": GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256,
+        "patched_sha256": file_digest(path),
+        "semantic_scope": "use_official_pytorch_fallback_only_when_official_compiled_extension_is_absent",
+    }
+
+
 def _safe_extract_zip(source: Path, target: Path) -> list[str]:
     with zipfile.ZipFile(source) as archive:
         names = archive.namelist()
@@ -893,6 +922,9 @@ def prepare_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
         egobaby_root,
         "e668cfe2504c4ffa4bbc7dbd63d3302d7561f4df107cfe0ac693c0fe3fa6f01d",
     )
+    grounding_patch = _apply_grounding_dino_fallback_patch(
+        model_root / "code/GroundingDINO"
+    )
 
     bert = runtime["additional_public_artifacts"]["bert_base_uncased"]
     bert_root = model_root / "bert-base-uncased"
@@ -911,7 +943,7 @@ def prepare_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
 
     wheel_root = model_root / "runtime-distributions"
     wheel_root.mkdir(parents=True, exist_ok=True, mode=0o700)
-    source_only = {"antlr4-python3-runtime", "mmcv"}
+    source_only = {"antlr4-python3-runtime", "fvcore", "iopath", "mmcv"}
     requirements = [
         f"{package}=={version}"
         for package, version in sorted(runtime["dependency_versions"].items())
@@ -1007,6 +1039,7 @@ def prepare_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
         ],
         "installed_distributions": distributions,
         "compatibility_adapters": runtime["compatibility_adapters"],
+        "grounding_dino_compatibility_patch": grounding_patch,
         "local_files_only_required": True,
         "network_disabled_for_inference": True,
         "telemetry_tracking_disabled": True,

@@ -367,9 +367,23 @@ def test_tuple_runtime_prep_is_resource_only_and_hash_sealed() -> None:
     assert '"--no-build-isolation"' in source
     assert '"MMCV_WITH_OPS": "0"' in source
     assert '"SAM2_BUILD_CUDA": "0"' in source
+    assert '"fvcore", "iopath", "mmcv"' in source
     assert '"model_inference_executed": False' in source
     assert "runtime_dependency_commitment_sha256" in source
+    assert "_apply_grounding_dino_fallback_patch" in source
     assert "restricted_root" not in source
+
+
+def test_grounding_fallback_patch_is_narrow_and_extension_conditional() -> None:
+    import inspect
+
+    source = inspect.getsource(MODULE._apply_grounding_dino_fallback_patch)
+    assert MODULE.GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256 == (
+        "42aa71c7c47e6f930f48100924393adac95eb94aae0eef779bd7cad2d5bcc95d"
+    )
+    assert '"if torch.cuda.is_available() and value.is_cuda:"' in source
+    assert "if '_C' in globals() and torch.cuda.is_available() and value.is_cuda:" in source
+    assert "text.count(original) != 1" in source
 
 
 def test_tuple_window_uses_segment_midpoint_and_never_fabricates_word_time() -> None:
