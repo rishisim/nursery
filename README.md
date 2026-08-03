@@ -193,13 +193,14 @@ mentions to their accepted translation segment because OPUS-MT emits no
 English-token alignment; no timestamp is fabricated. The active commitment is
 `c9a48206…adaf`. The public artifact subgate passed at `8c787a01…b527`
 without model inference or a restricted mount. The exact 53-package overlay
-then passed preparation at `968f2570…1f10`, also without inference or a
-restricted mount; label-blind local-reload sizing and modular public
-qualification are next. The exact local overlay and compatibility
+first passed preparation at `968f2570…1f10`, also without inference or a
+restricted mount. The exact local overlay and compatibility
 surface are now frozen at active commitment `ee70ae31…b41b`. A sizing attempt
 stopped before model inference because the sealed NLTK resources needed their
 standard `taggers/` and `corpora/` namespace; the repair verifies every sealed
-hash and adds only scratch-local symlinks. No model substitution or
+hash and adds only scratch-local symlinks. The repaired overlay was resealed at
+`9810a618…48f9`; label-blind local-reload sizing and modular public
+qualification are next. No model substitution or
 gate change is involved. C measurement,
 LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
 and descriptive-only claim boundary are unchanged.

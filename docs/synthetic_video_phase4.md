@@ -165,12 +165,13 @@ MIT-licensed project but contains no separate archive license file; this record
 asserts academic local prototype use only and no broader license conclusion.
 The 53-package runtime overlay then passed resource-only preparation at
 commitment `968f2570…1f10`, with neither a restricted mount nor model
-inference. That runtime record is preserved but must be resealed under active
+inference. That runtime record is preserved but was superseded under active
 runtime commitment `ee70ae31…b41b`: a label-blind sizing attempt stopped before
 model load because the official NLTK archives needed scratch-local
 `taggers/`/`corpora/` namespace symlinks. Every source resource hash is checked
-before those links are made. Local-files-only model reload and blind sizing
-remain pending.
+before those links are made. The active runtime was resealed at
+`9810a618…48f9`, again without model inference or a restricted mount.
+Local-files-only model reload and blind sizing remain pending.
 Governed C measurement requires that pass, and LTX generation remains further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is
 authorized.

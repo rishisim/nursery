@@ -1199,6 +1199,11 @@ the EgoBabyVLM PE-Core loader are additional hashed dependencies. The sizing
 run remains label blind, retains no scores, uses one item per component, and is
 capped at one H100 GPU-hour.
 
+The active overlay was resealed successfully in 8 minutes 38 seconds under
+runtime-manifest commitment `9810a618…48f9`, again with no restricted mount or
+model inference. It authorizes the unchanged label-blind sizing gate only; it
+is not an extractor qualification result.
+
 Before that sizing run, the task-matched public-fixture implementation was
 made exact at commitment `506a1f41…251d`, without opening a model outcome. The
 blocking action module uses the pinned EgoHOD checkpoint with three fixed
