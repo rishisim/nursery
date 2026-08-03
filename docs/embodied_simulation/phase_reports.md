@@ -644,3 +644,50 @@ and prove a contact/friction-supported grasp without parenting, pose writes,
 welds, equality attachments, snapping, teleporting, or assist forces.  Only
 after that fallback trace and its synchronized diagnostics pass should a
 licensed/activated Unity run be attempted as the appearance comparison.
+
+## Native MuJoCo + Filament truth-control episode — 2026-08-02
+
+Decision: **PROMISING-BUT-REPAIR**. The native fallback now executes the exact
+16.0-second episode contract once at a 250 Hz MuJoCo clock, sampled at 31.25
+Hz: look/reorient, reach, bilateral physical grasp, lift/inspect, and release.
+It is not a Unity result and it is not a claim of child-view visual credibility.
+
+The canonical fallback runner is the evolved
+`babyworld_lite/childlens_engine_bakeoff/native_filament_smoke.cpp`; the old
+`VisualEpisodeFrame`/`Rect` path is absent. It retains actual MuJoCo
+`geom_xpos`/`geom_xmat` for torso, head, palm, both fingers, and target, plus
+the full `camera_mount` site matrix. Filament applies those matrices directly.
+The camera uses that full mount basis and one fixed local optical transform
+(head +X, 45-degree down pitch); it has no target lock or authored camera path.
+The target is a free MuJoCo box. The room and visible hand use matching box
+collision/mesh dimensions, and no target state is written after initialization.
+
+Focused validation on the ignored run
+`runs/embodied_simulation/native_filament_episode` found 500 clock-aligned RGB,
+metric-depth, and object-ID frames, 500 synchronized state rows, exact
+same-machine replay (maximum checked error 0), persistent
+`target_block_001` identity, and no attachment/assist mechanisms. Bilateral
+target contact starts at 4.548 s; the free target lifts 0.226 m and is released.
+The source-level validator rejects equality/connect/mocap/external-force
+attachment mechanisms. The RGB, depth, and ID renders are separate Filament
+passes over the same retained transforms and camera. Metal selected Apple M5;
+the official source/version/license findings in the preceding preflight remain
+unchanged. No restricted media or ChildLens threshold was used.
+
+The penetration diagnostic remains a real visible-geometry concern: its
+minimum bilateral contact distance is -0.02736 m, exceeding the 5 mm repair
+threshold. It is retained rather than hidden because the current box-finger
+grip needs collision-margin/shape tuning before it can be considered visually
+credible.
+
+Normal-speed inspection of the 640×480, 500-frame, 16.0-second MP4 confirms
+continuous reorientation, reach, visible bilateral enclosure, lifted target,
+and release rather than the rejected blank clip. The physical/truth contract
+is therefore promising. Appearance is still an intentionally procedural,
+low-detail block scene with no skinned child mesh, textured room, or realistic
+lighting; it does not demonstrate material visual credibility over prior
+footage. The bounded repair is first to reduce the recorded finger-target
+penetration below 5 mm while preserving the same physical grasp, then a single
+Unity/official-plugin appearance pass using that trace and registration
+contract once the user activates a Unity license. Do not change the physics
+episode, camera rule, or grasp rule.

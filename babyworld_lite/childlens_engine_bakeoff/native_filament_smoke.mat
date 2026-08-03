@@ -2,14 +2,27 @@ material {
   name: "NurseryVertexColor",
   shadingModel: unlit,
   requires: [color],
-  parameters: [],
-  vertexDomain: device,
+  parameters: [
+    { type: float4, name: baseColor },
+    { type: float4, name: cameraEye },
+    { type: float4, name: cameraForward },
+    { type: float, name: renderMode }
+  ],
   culling: none
 }
 
 fragment {
   void material(inout MaterialInputs material) {
     prepareMaterial(material);
-    material.baseColor = getColor();
+    float4 rgb = materialParams.baseColor * getColor();
+    if (materialParams.renderMode < 0.5) {
+      material.baseColor = rgb;
+    } else if (materialParams.renderMode < 1.5) {
+      material.baseColor = materialParams.baseColor;
+    } else {
+      float metric_depth = clamp(dot(getWorldPosition() - materialParams.cameraEye.xyz,
+          materialParams.cameraForward.xyz) / 2.0, 0.0, 1.0);
+      material.baseColor = float4(metric_depth, metric_depth, metric_depth, 1.0);
+    }
   }
 }
