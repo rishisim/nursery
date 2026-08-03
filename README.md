@@ -196,7 +196,10 @@ without model inference or a restricted mount. The exact 53-package overlay
 then passed preparation at `968f2570…1f10`, also without inference or a
 restricted mount; label-blind local-reload sizing and modular public
 qualification are next. The exact local overlay and compatibility
-surface were frozen beforehand at active commitment `c59a81f4…0acc`; no model substitution or
+surface are now frozen at active commitment `ee70ae31…b41b`. A sizing attempt
+stopped before model inference because the sealed NLTK resources needed their
+standard `taggers/` and `corpora/` namespace; the repair verifies every sealed
+hash and adds only scratch-local symlinks. No model substitution or
 gate change is involved. C measurement,
 LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
 and descriptive-only claim boundary are unchanged.

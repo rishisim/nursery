@@ -233,7 +233,7 @@ def test_tuple_runtime_amendment_is_exact_and_rejects_mutation() -> None:
     config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     runtime = MODULE._tuple_runtime_amendment(config)
     assert runtime["runtime_amendment_commitment_sha256"] == (
-        "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc"
+        "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b"
     )
     assert len(runtime["dependency_versions"]) == 53
     assert runtime["dependency_versions"]["einops"] == "0.8.0"
@@ -241,6 +241,10 @@ def test_tuple_runtime_amendment_is_exact_and_rejects_mutation() -> None:
         "all_seven_axes_and_order_dependent_action_control_must_pass"
     ] is True
     assert runtime["local_reload_gate"]["module_count"] == 8
+    assert len(runtime["compatibility_adapters"]) == 7
+    assert runtime["prior_runtime_amendment_commitments_sha256"][-1] == (
+        "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc"
+    )
     config["calibration_C"]["extractor"][
         "mechanistic_training_tuple_runtime_amendment"
     ]["dependency_versions"]["numpy"] = "2.4.6"
@@ -288,6 +292,52 @@ def test_tuple_zip_extraction_blocks_path_traversal(tmp_path: Path) -> None:
         handle.writestr("../escape", "blocked")
     with pytest.raises(RuntimeError, match="E_TUPLE_ARCHIVE_PATH"):
         MODULE._safe_extract_zip(archive, tmp_path / "output")
+
+
+def test_tuple_nltk_namespace_is_scratch_only_and_hash_guarded(tmp_path: Path) -> None:
+    import pytest
+
+    public = tmp_path / "public"
+    resource = public / "models/nltk_data"
+    tagger = resource / "averaged_perceptron_tagger_eng/model.json"
+    wordnet = resource / "wordnet/index.noun"
+    tagger.parent.mkdir(parents=True)
+    wordnet.parent.mkdir(parents=True)
+    tagger.write_text("{}")
+    wordnet.write_text("noun")
+    payload = {
+        "nltk_resource_files": [
+            {
+                "relative_path": "averaged_perceptron_tagger_eng/model.json",
+                "sha256": MODULE.file_digest(tagger),
+            },
+            {
+                "relative_path": "wordnet/index.noun",
+                "sha256": MODULE.file_digest(wordnet),
+            },
+        ]
+    }
+    commitment = MODULE.digest(payload)
+    manifest = {**payload, "tuple_dependency_commitment_sha256": commitment}
+    manifest_path = MODULE._tuple_run_root(public) / "dependency_manifest.json"
+    manifest_path.parent.mkdir(parents=True)
+    manifest_path.write_text(json.dumps(manifest))
+    config = {
+        "calibration_C": {
+            "extractor": {
+                "mechanistic_training_tuple_premodel_result": {
+                    "dependency_manifest_commitment_sha256": commitment
+                }
+            }
+        }
+    }
+    staged = MODULE._stage_tuple_nltk_resources(public, tmp_path / "scratch", config)
+    assert (staged / "taggers/averaged_perceptron_tagger_eng").is_symlink()
+    assert (staged / "corpora/wordnet").is_symlink()
+    assert not (resource / "taggers").exists()
+    wordnet.write_text("tampered")
+    with pytest.raises(RuntimeError, match="E_TUPLE_NLTK_RESOURCE_HASH"):
+        MODULE._stage_tuple_nltk_resources(public, tmp_path / "scratch-2", config)
 
 
 def test_tuple_repository_archive_records_bytes_and_commit(
@@ -420,6 +470,7 @@ def test_tuple_sizing_is_label_blind_and_retains_no_predictions() -> None:
         "005f368bef97dfc791f43e45da8bbfe01ea22e8790b2032e9580b14b1ea62ac8"
     )
     assert "E_TUPLE_LANGUAGE_ADAPTER_SOURCE" in source
+    assert "_stage_tuple_nltk_resources" in source
     assert "_tuple_fixture_protocol" in source
     assert "prompt_groups_override=action_protocol" in source
     assert "public_fixture_protocol_commitment_sha256" in source

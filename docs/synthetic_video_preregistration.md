@@ -1177,10 +1177,16 @@ runtime PASS, not extractor qualification; the next gate remains the
 network-disabled one-H100 reload of all seven axes plus the separate action
 control, with no labels, retained scores, or scientific metrics.
 
-Before that reload, the exact runtime overlay and six narrowly scoped
-compatibility adapters were frozen, then clarified before inference at active
-commitment `c59a81f4…0acc` (the earlier `adcac3fc…b285` and
-`6c3c76e3…dec1` commitments remain in Git history). One clarification records
+Before that reload, the exact runtime overlay and compatibility surface were
+frozen and clarified before inference. A second label-blind sizing attempt
+then exposed that the official NLTK resource archives had been extracted as
+top-level resource directories while NLTK 3.9.1 resolves them under
+`taggers/` and `corpora/`. The attempt stopped before any model loaded. The
+active runtime commitment `ee70ae31…b41b` therefore adds one narrow adapter:
+after verifying every resource file against the already sealed manifest, it
+creates scratch-only namespace symlinks without modifying source bytes. The
+prior runtime commitments `adcac3fc…b285`, `6c3c76e3…dec1`, and
+`c59a81f4…0acc` remain preserved. Earlier clarifications record
 that seven calibration axes plus the separate blocking order-action control
 require eight sizing modules; the other pins the PE-Core loader's required
 `einops==0.8.0`. They retain

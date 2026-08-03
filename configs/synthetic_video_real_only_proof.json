@@ -1,6 +1,6 @@
 {
   "schema_version": 11,
-  "status": "MECHANISTIC_TRAINING_TUPLE_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
+  "status": "MECHANISTIC_TRAINING_TUPLE_RUNTIME_REPAIR_FROZEN_REPREPARATION_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -70,7 +70,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION",
+    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_RUNTIME_REPAIR_FROZEN_REPREPARATION_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -1144,6 +1144,8 @@
         "status": "FROZEN_BEFORE_LOCAL_RELOAD_SIZING_OR_PUBLIC_MODEL_OUTCOMES",
         "effective_on": "2026-08-02",
         "scientific_effect": "none; this resolves the execution environment for the already frozen model identities and gates without changing a model threshold fixture label or outcome",
+        "prior_runtime_amendment_commitments_sha256": ["adcac3fc45133ab8697923fd473fd692d9c79de48b5cc10b58e4d01cad92b285", "6c3c76e3c5661255dba0131f9b20c6d4daf3b994a8e8c9013bbddbc8213ddec1", "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc"],
+        "pre_outcome_engineering_clarification": "the official pinned NLTK archives extract their resource directories without NLTK's taggers/corpora namespace; after the label-blind sizing job failed before model inference, verify every previously sealed resource hash and expose scratch-only namespace symlinks without changing any bytes model threshold fixture or outcome",
         "base_container": {"file": "pytorch-2.8.0-cu126.sif", "sha256": "f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792", "python": "3.11.13", "torch": "2.8.0+cu126", "compiler_present": false},
         "additional_public_artifacts": {
           "egobaby_loader": {"repository": "https://github.com/facebookresearch/egobabyvlm.git", "commit": "224621caf0628270b6115845ac75a65b984234a3", "license": "CC-BY-NC-4.0", "role": "pinned PE-Core loader compatibility only"},
@@ -1222,7 +1224,8 @@
           "EgoHOS": "use official mmcv 1.6.0 pure-Python surfaces and inject placeholders only for unused mmcv.ops registry imports; fail if the selected Swin/UPerNet path invokes any placeholder",
           "DINOv2": "instantiate the pinned official ViT-B/14 architecture directly and load the exact state dict locally; xformers remains optional and is not required",
           "PECore": "point the pinned EgoBabyVLM loader to the already hashed local PE-Core checkpoint; no loader algorithm change",
-          "numpy_legacy_aliases": "provide int float and bool aliases only for the pinned legacy EgoHOS/mmseg import surface; no numeric operation or output is altered"
+          "numpy_legacy_aliases": "provide int float and bool aliases only for the pinned legacy EgoHOS/mmseg import surface; no numeric operation or output is altered",
+          "NLTK_resource_namespace": "after verifying every file against the sealed public dependency manifest create scratch-only taggers/averaged_perceptron_tagger_eng and corpora/wordnet directory symlinks required by NLTK 3.9.1; source bytes remain unchanged"
         },
         "local_reload_gate": {
           "network": "disabled with Singularity network namespace",
@@ -1241,10 +1244,10 @@
         },
         "failure_rule": "ordinary dependency or documented minimal compatibility defects may be repaired in this canonical runtime before public outcomes; inability to run any frozen component locally within this runtime gate is a premodel no-go and no model may be substituted",
         "runtime_amendment_commitment_scope": "canonical JSON of this runtime amendment excluding runtime_amendment_commitment_sha256",
-        "runtime_amendment_commitment_sha256": "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc"
+        "runtime_amendment_commitment_sha256": "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b"
       },
       "mechanistic_training_tuple_runtime_preparation_result": {
-        "status": "PASS_RUNTIME_READY_LOCAL_RELOAD_BLIND_SIZING_PENDING",
+        "status": "PASS_RESOURCE_PREPARATION_SUPERSEDED_BY_PRE_OUTCOME_NLTK_NAMESPACE_REPAIR_REPREPARATION_PENDING",
         "job_id": 313843,
         "elapsed": "00:08:45",
         "dependency_count": 53,
@@ -1259,7 +1262,7 @@
         "restricted_mount_present": false,
         "model_inference_executed": false,
         "external_model_call_count": 0,
-        "validity": "resource and immutable-runtime preparation only; it authorizes the committed label-blind local reload sizing but is not a public extractor pass"
+        "validity": "resource and immutable-runtime preparation under prior runtime commitment c59a81f4; preserved as engineering evidence but the active runtime must be resealed before another sizing attempt"
       },
       "mechanistic_training_tuple_public_fixture_protocol": {
         "status": "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES",

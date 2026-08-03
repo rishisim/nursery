@@ -352,6 +352,49 @@ def _tuple_fixture_protocol(cfg: dict[str, Any]) -> dict[str, Any]:
     return value
 
 
+def _stage_tuple_nltk_resources(
+    public: Path, scratch: Path, cfg: dict[str, Any]
+) -> Path:
+    manifest_path = _tuple_run_root(public) / "dependency_manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    commitment = manifest.pop("tuple_dependency_commitment_sha256", None)
+    expected = cfg["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_premodel_result"
+    ]["dependency_manifest_commitment_sha256"]
+    if not isinstance(commitment, str) or commitment != expected or digest(manifest) != expected:
+        raise RuntimeError("E_TUPLE_NLTK_MANIFEST")
+    records = manifest.get("nltk_resource_files")
+    if not isinstance(records, list) or not records:
+        raise RuntimeError("E_TUPLE_NLTK_MANIFEST")
+    source = public / "models/nltk_data"
+    top_levels = set()
+    for record in records:
+        relative = Path(str(record.get("relative_path", "")))
+        if relative.is_absolute() or ".." in relative.parts or not relative.parts:
+            raise RuntimeError("E_TUPLE_NLTK_RESOURCE_PATH")
+        path = source / relative
+        if not path.is_file() or file_digest(path) != record.get("sha256"):
+            raise RuntimeError("E_TUPLE_NLTK_RESOURCE_HASH")
+        if len(relative.parts) > 1:
+            top_levels.add(relative.parts[0])
+    if top_levels != {"averaged_perceptron_tagger_eng", "wordnet"}:
+        raise RuntimeError("E_TUPLE_NLTK_RESOURCE_SET")
+    target = scratch / "nltk_data"
+    (target / "taggers").mkdir(parents=True, exist_ok=False, mode=0o700)
+    (target / "corpora").mkdir(parents=True, exist_ok=False, mode=0o700)
+    os.symlink(
+        source / "averaged_perceptron_tagger_eng",
+        target / "taggers/averaged_perceptron_tagger_eng",
+        target_is_directory=True,
+    )
+    os.symlink(
+        source / "wordnet",
+        target / "corpora/wordnet",
+        target_is_directory=True,
+    )
+    return target
+
+
 def _tuple_segment_window(
     segment: dict[str, Any], media_duration: float, amendment: dict[str, Any]
 ) -> dict[str, Any]:
@@ -2561,7 +2604,13 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
     from nltk.stem import WordNetLemmatizer
     from wordfreq import zipf_frequency
 
-    nltk.data.path[:] = [str(args.public_root / "models/nltk_data")]
+    nltk.data.path[:] = [
+        str(
+            _stage_tuple_nltk_resources(
+                args.public_root, args.scratch_root, cfg
+            )
+        )
+    ]
     mentions = _lexical_mentions(
         "The red ball",
         nltk.pos_tag,
