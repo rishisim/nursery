@@ -167,3 +167,10 @@ Local-files-only reload and blind sizing remain pending. Governed C measurement 
 pass, and LTX generation remains further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is
 authorized.
+
+The task-matched fixture implementation is separately frozen before model
+outcomes at commitment `506a1f41…251d`. Its action control uses fixed
+open/close, take/put, sit-down/stand-up, and turn-on/turn-off prompts and
+localized Charades-Ego intervals disjoint from the failed broad-context study.
+Exact public fixture manifests are still pending and must be sealed before
+development inference.

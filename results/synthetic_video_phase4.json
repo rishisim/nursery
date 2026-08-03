@@ -365,6 +365,19 @@
     "model_substitution": false,
     "public_model_outcome_opened": false
   },
+  "mechanistic_training_tuple_public_fixture_protocol": {
+    "status": "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES",
+    "protocol_commitment_sha256": "506a1f41a3685ca777f3c9d23f6f9b884523acec2a78080d5de2547b3324251d",
+    "scientific_role": "task-matched implementation detail for the existing mechanistic tuple amendment; no prior no-go or axis threshold changes",
+    "order_action_label_count": 8,
+    "order_action_prompt_count_per_label": 3,
+    "order_action_development_items": 48,
+    "order_action_holdout_items": 48,
+    "prior_broad_context_subject_and_video_overlap_allowed": false,
+    "task_matched_fixture_manifest_commitments": "PENDING_PREPARATION_BEFORE_DEVELOPMENT_INFERENCE",
+    "public_model_outcome_opened": false,
+    "governed_C_reopened": false
+  },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",
     "candidate_id": "egohod_egovideo_l_zero_shot",

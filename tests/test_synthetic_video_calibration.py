@@ -248,6 +248,37 @@ def test_tuple_runtime_amendment_is_exact_and_rejects_mutation() -> None:
         MODULE._tuple_runtime_amendment(config)
 
 
+def test_tuple_fixture_protocol_freezes_task_matched_action_semantics() -> None:
+    import pytest
+
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    protocol = MODULE._tuple_fixture_protocol(config)
+    assert protocol["protocol_commitment_sha256"] == (
+        "506a1f41a3685ca777f3c9d23f6f9b884523acec2a78080d5de2547b3324251d"
+    )
+    action = protocol["order_dependent_action_control"]
+    assert action["labels"] == [
+        "open",
+        "close",
+        "take",
+        "put",
+        "sit_down",
+        "stand_up",
+        "turn_on",
+        "turn_off",
+    ]
+    assert all(len(action["prompt_ensembles"][label]) == 3 for label in action["labels"])
+    assert action["class_code_pairs"][0]["matched_codes"][0] == ["c008", "c006"]
+    assert action["class_code_pairs"][2]["matched_codes"] == [["c151", "c154"]]
+    assert action["class_code_pairs"][3]["matched_codes"] == [["c104", "c105"]]
+    assert "prior 96 broad-context fixture" in action["eligible_interval"]
+    config["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_public_fixture_protocol"
+    ]["order_dependent_action_control"]["labels"][0] = "opening"
+    with pytest.raises(RuntimeError, match="E_TUPLE_FIXTURE_PROTOCOL_COMMITMENT"):
+        MODULE._tuple_fixture_protocol(config)
+
+
 def test_tuple_zip_extraction_blocks_path_traversal(tmp_path: Path) -> None:
     import pytest
     import zipfile
@@ -385,6 +416,9 @@ def test_tuple_sizing_is_label_blind_and_retains_no_predictions() -> None:
     assert '"external_call_count": 0' in source
     assert '"module_count"' in source
     assert "_verify_activity_dependency_manifest" in source
+    assert "_tuple_fixture_protocol" in source
+    assert "prompt_groups_override=action_protocol" in source
+    assert "public_fixture_protocol_commitment_sha256" in source
     assert "activity['development_selection_result']" not in source
     assert "restricted_root" not in source
 

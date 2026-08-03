@@ -47,6 +47,13 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
         "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"
     )
     assert premodel["model_inference_executed"] is False
+    fixture_protocol = config["mechanistic_training_tuple_public_fixture_protocol"]
+    assert fixture_protocol["status"] == "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES"
+    assert fixture_protocol["protocol_commitment_sha256"] == (
+        "506a1f41a3685ca777f3c9d23f6f9b884523acec2a78080d5de2547b3324251d"
+    )
+    assert fixture_protocol["action_direction_labels"] == 8
+    assert fixture_protocol["public_outcome_opened"] is False
     assert schedule_cycle(config["learner"]["schedule"]) == [
         "contrastive",
         "contrastive",

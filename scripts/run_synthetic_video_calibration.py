@@ -311,6 +311,44 @@ def _tuple_runtime_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     return value
 
 
+def _tuple_fixture_protocol(cfg: dict[str, Any]) -> dict[str, Any]:
+    try:
+        value = cfg["calibration_C"]["extractor"][
+            "mechanistic_training_tuple_public_fixture_protocol"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_FIXTURE_PROTOCOL_NOT_FROZEN") from error
+    if value.get("status") != "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES":
+        raise RuntimeError("E_TUPLE_FIXTURE_PROTOCOL_NOT_FROZEN")
+    copy = json.loads(json.dumps(value))
+    expected = copy.pop("protocol_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(copy) != expected:
+        raise RuntimeError("E_TUPLE_FIXTURE_PROTOCOL_COMMITMENT")
+    action = value.get("order_dependent_action_control")
+    labels = action.get("labels") if isinstance(action, dict) else None
+    prompts = action.get("prompt_ensembles") if isinstance(action, dict) else None
+    code_pairs = action.get("class_code_pairs") if isinstance(action, dict) else None
+    if (
+        labels
+        != [
+            "open",
+            "close",
+            "take",
+            "put",
+            "sit_down",
+            "stand_up",
+            "turn_on",
+            "turn_off",
+        ]
+        or set(prompts or {}) != set(labels)
+        or any(len(prompts[label]) != 3 for label in labels)
+        or not isinstance(code_pairs, list)
+        or len(code_pairs) != 4
+    ):
+        raise RuntimeError("E_TUPLE_ACTION_FIXTURE_SET")
+    return value
+
+
 def _tuple_segment_window(
     segment: dict[str, Any], media_duration: float, amendment: dict[str, Any]
 ) -> dict[str, Any]:
@@ -2129,6 +2167,7 @@ def _load_egohod_activity_adapter(
     labels: list[str],
     device: str,
     runtime_override: dict[str, Any] | None = None,
+    prompt_groups_override: dict[str, list[str]] | None = None,
 ):
     import torch
     import torch.nn.functional as functional
@@ -2209,9 +2248,13 @@ def _load_egohod_activity_adapter(
             f"E_EGOHOD_STRICT_STATE missing={len(missing)} unexpected={len(unexpected)}"
         )
     model = model.to(device).eval().half()
-    prompt_groups = cfg["calibration_C"]["extractor"]["coverage_repair"][
-        "prompt_ensembles"
-    ]["activity"]
+    prompt_groups = prompt_groups_override or cfg["calibration_C"]["extractor"][
+        "coverage_repair"
+    ]["prompt_ensembles"]["activity"]
+    if set(prompt_groups) != set(labels) or any(
+        len(prompt_groups[label]) != 3 for label in labels
+    ):
+        raise RuntimeError("E_EGOHOD_PROMPT_ENSEMBLE")
     flattened = [prompt for label in labels for prompt in prompt_groups[label]]
     with torch.inference_mode():
         tokens = clip.tokenize(flattened, context_length=77, truncate=True).to(device)
@@ -2478,6 +2521,7 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
     cfg = json.loads(args.config.read_text())
     amendment = _tuple_amendment(cfg)
     runtime = _tuple_runtime_amendment(cfg)
+    fixture_protocol = _tuple_fixture_protocol(cfg)
     dependency = _verify_tuple_runtime_manifest(args.public_root, cfg)
     if torch.cuda.device_count() != 1 or args.device != "cuda":
         raise RuntimeError("E_TUPLE_SIZING_TOPOLOGY")
@@ -2555,7 +2599,8 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
         for value in activity["bounded_candidates"]
         if value["candidate_id"] == "egohod_egovideo_l_zero_shot"
     )
-    labels = _activity_labels(cfg)
+    action_protocol = fixture_protocol["order_dependent_action_control"]
+    labels = action_protocol["labels"]
     score, frame_count, _ = _load_egohod_activity_adapter(
         args.public_root,
         candidate,
@@ -2563,6 +2608,7 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
         labels,
         args.device,
         runtime_override=activity["runtime_environment"]["egohod"],
+        prompt_groups_override=action_protocol["prompt_ensembles"],
     )
     action_output = score(
         image_array[None].repeat(frame_count, axis=0)
@@ -2590,6 +2636,9 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
         "amendment_commitment_sha256": amendment["amendment_commitment_sha256"],
         "runtime_amendment_commitment_sha256": runtime[
             "runtime_amendment_commitment_sha256"
+        ],
+        "public_fixture_protocol_commitment_sha256": fixture_protocol[
+            "protocol_commitment_sha256"
         ],
         "runtime_dependency_commitment_sha256": dependency[
             "runtime_dependency_commitment_sha256"

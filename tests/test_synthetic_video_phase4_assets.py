@@ -117,6 +117,16 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert tuple_amendment["generator_or_synthetic_learner_outcome_opened"] is False
     assert tuple_amendment["prior_pre_clarification_amendment_commitment_sha256"] == "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222"
     assert tuple_amendment["amendment_commitment_sha256"] == "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf"
+    fixture_protocol = result["mechanistic_training_tuple_public_fixture_protocol"]
+    assert fixture_protocol["status"] == "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES"
+    assert fixture_protocol["protocol_commitment_sha256"] == (
+        "506a1f41a3685ca777f3c9d23f6f9b884523acec2a78080d5de2547b3324251d"
+    )
+    assert fixture_protocol["order_action_label_count"] == 8
+    assert fixture_protocol["task_matched_fixture_manifest_commitments"].startswith(
+        "PENDING_PREPARATION"
+    )
+    assert fixture_protocol["public_model_outcome_opened"] is False
     premodel = result["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
     assert premodel["dependency_manifest_commitment_sha256"] == (

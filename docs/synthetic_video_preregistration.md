@@ -1185,3 +1185,16 @@ the selected Swin/UPerNet path calls one. The pinned public BERT snapshot and
 the EgoBabyVLM PE-Core loader are additional hashed dependencies. The sizing
 run remains label blind, retains no scores, uses one item per component, and is
 capped at one H100 GPU-hour.
+
+Before that sizing run, the task-matched public-fixture implementation was
+made exact at commitment `506a1f41…251d`, without opening a model outcome. The
+blocking action module uses the pinned EgoHOD checkpoint with three fixed
+prompts for each of eight directions: open/close, take/put, sit down/stand up,
+and turn on/turn off. Official Charades-Ego action codes are paired by object;
+eligible localized intervals must be first-person, verified, 1–12 seconds,
+free of an overlapping opposite action, and disjoint by subject and video from
+the prior 96-item broad-context fixture. Development and holdout each contain
+six clips per direction under the frozen public-seed ordering. Exact action
+margin, reversal, and repeated-center semantics are registered in the
+canonical config. The remaining task-matched fixture manifests and byte hashes
+must still be prepared and committed before development inference.

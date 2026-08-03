@@ -1243,6 +1243,65 @@
         "runtime_amendment_commitment_scope": "canonical JSON of this runtime amendment excluding runtime_amendment_commitment_sha256",
         "runtime_amendment_commitment_sha256": "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc"
       },
+      "mechanistic_training_tuple_public_fixture_protocol": {
+        "status": "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES",
+        "effective_on": "2026-08-02",
+        "relationship": "pre-outcome implementation detail for the already frozen mechanistic tuple amendment; it does not reopen any prior no-go or change an axis gate",
+        "known_before_freeze": "no tuple sizing score, public fixture metric, governed C tuple measurement, generator outcome, synthetic corpus, or synthetic learner score",
+        "task_matched_modules": {
+          "adapter_and_lexical": "48 development and 48 holdout cases from inherited redistributable FLEURS and self-authored German plus fixed English noun adjective lemma frequency repetition null and abstention truth",
+          "referent_and_attribute": "64 development and 64 holdout self-authored CC0 audiovisual object composites with exact masks and visibility dominance ambiguity adjective contrast and null truth",
+          "recurrence": "64 development and 64 holdout positive negative transformed and near-duplicate public-object track pairs",
+          "hand_and_contact": "40 development and 40 holdout EPIC-KITCHENS VISOR validation clips with hand active-object contact occlusion and true hand-negative truth",
+          "sensor": "48 development and 48 holdout deterministic motion blur brightness framing cut and continuity perturbations",
+          "order_action": "48 development and 48 holdout temporally localized first-person Charades-Ego action intervals, exactly six per direction label"
+        },
+        "development_holdout_rule": "source subject video object crop and authored scene are disjoint; public development alone selects only the registered threshold grids; every source byte label transformation and manifest hash is sealed before development inference, and final thresholds are committed before holdout opens",
+        "order_dependent_action_control": {
+          "model": "EgoHOD EgoVideo-L checkpoint and adapter already pinned by the mechanistic amendment",
+          "labels": ["open", "close", "take", "put", "sit_down", "stand_up", "turn_on", "turn_off"],
+          "prompt_ensembles": {
+            "open": ["a first-person video of opening an object", "someone opens an object", "the action of opening something"],
+            "close": ["a first-person video of closing an object", "someone closes an object", "the action of closing something"],
+            "take": ["a first-person video of taking an object from somewhere", "someone picks up an object", "the action of removing an object from a place"],
+            "put": ["a first-person video of putting an object somewhere", "someone places an object down", "the action of placing an object in a location"],
+            "sit_down": ["a first-person video of sitting down", "someone goes from standing to sitting", "the action of lowering into a seated position"],
+            "stand_up": ["a first-person video of standing up", "someone goes from sitting to standing", "the action of rising from a seated position"],
+            "turn_on": ["a first-person video of turning on a light", "someone switches a light on", "the action of activating a light"],
+            "turn_off": ["a first-person video of turning off a light", "someone switches a light off", "the action of deactivating a light"]
+          },
+          "class_code_pairs": [
+            {"pair": ["open", "close"], "matched_codes": [["c008", "c006"], ["c027", "c025"], ["c041", "c039"], ["c048", "c046"], ["c090", "c089"], ["c113", "c112"], ["c143", "c142"]]},
+            {"pair": ["take", "put"], "matched_codes": [["c002", "c001"], ["c018", "c017"], ["c023", "c022"], ["c030", "c028"], ["c035", "c034"], ["c043", "c042"], ["c050", "c049"], ["c056", "c054"], ["c063", "c062"], ["c069", "c068"], ["c073", "c071"], ["c079", "c077"], ["c100", "c099"], ["c110", "c109"], ["c117", "c116"], ["c120", "c119"]]},
+            {"pair": ["sit_down", "stand_up"], "matched_codes": [["c151", "c154"]]},
+            {"pair": ["turn_on", "turn_off"], "matched_codes": [["c104", "c105"]]}
+          ],
+          "official_source": {
+            "page": "https://prior.allenai.org/projects/charades-ego",
+            "annotation_archive": "https://ai2-public-datasets.s3-us-west-2.amazonaws.com/charades/CharadesEgo.zip",
+            "annotation_archive_sha256": "ee54787f666a0b2dddee4863b53388385544e2095653760ee82e7ae5b3e7e66e",
+            "video_archive_sha256": "3df448ab1a004bb48fe8f188e0738f5cbb73f04e24217a655b6b0390784b1110",
+            "license": "AllenAI non-commercial academic or nonprofit research license"
+          },
+          "eligible_interval": "first-person verified Yes; annotated target interval from 1 through 12 seconds after clipping to source bounds; no temporally overlapping opposite-direction code; video and subject absent from the prior 96 broad-context fixture",
+          "partition": "SHA256(20260802|mechanistic_action_partition|public_subject) parity over pooled official train and test annotations; development and holdout subjects and videos must have zero overlap",
+          "selection": "within each partition and direction label take six unique videos by SHA256(20260802|mechanistic_action|partition|label|video_id|start|end); a video may supply only its first eligible interval in that immutable order",
+          "clip_and_sampling": "retain the exact annotated interval plus at most 0.25 seconds in-bounds context on each side and sample 16 uniform RGB frames; ordered, exact time reversal, and repeated center-frame controls share identical decoded frames",
+          "development_abstention_margin_grid": [0.0, 0.005, 0.01, 0.02, 0.05],
+          "margin_selection": "maximize eight-label development macro-F1 subject to non-abstained coverage at least 0.80; ties choose the higher margin, then lexicographically smallest numeric value",
+          "prediction": "within the registered inverse pair, accept the higher raw cosine score only when target-minus-opposite absolute margin meets the selected threshold; otherwise abstain",
+          "metric_semantics": {
+            "ordered_action_direction_macro_f1": "macro-F1 over the eight accepted direction labels with abstentions counted as misses",
+            "opposite_pair_correct_margin_fraction": "fraction of covered ordered clips whose true-direction raw cosine exceeds its registered opposite",
+            "ordered_over_time_reversed_target_score_fraction": "fraction of covered clips whose ordered true-direction raw cosine strictly exceeds the same score on exact time reversal",
+            "ordered_over_repeated_center_confidence_fraction": "fraction of covered clips whose ordered true-minus-opposite margin strictly exceeds that margin on the repeated-center control"
+          }
+        },
+        "label_blind_sizing": "one deterministic public dummy per seven axes plus the action adapter loaded with the exact eight registered prompt ensembles; no fixture label metric prediction or score is retained",
+        "manifest_commitments": "PENDING_PREPARATION; exact task-matched development and holdout source/media/label commitments must be added and committed before development inference",
+        "protocol_commitment_scope": "canonical JSON of this fixture protocol excluding protocol_commitment_sha256",
+        "protocol_commitment_sha256": "506a1f41a3685ca777f3c9d23f6f9b884523acec2a78080d5de2547b3324251d"
+      },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},
         "framing": {"centered": "one main object centered in a child-view frame", "distributed": "several objects distributed across a child-view frame", "peripheral": "the main content is near the edge of a child-view frame"},

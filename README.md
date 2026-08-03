@@ -198,3 +198,10 @@ surface were frozen beforehand at active commitment `c59a81f4…0acc`; no model 
 gate change is involved. C measurement,
 LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
 and descriptive-only claim boundary are unchanged.
+
+The action-control implementation is prospectively frozen at fixture-protocol
+commitment `506a1f41…251d`: eight inverse direction labels use fixed three-prompt
+ensembles and subject/video-disjoint localized Charades-Ego development and
+holdout clips. This is a genuinely order-dependent control, not a revival of
+the failed broad-context temporal gate. Exact task-matched fixture manifests
+remain pending and must be sealed before public development inference.
