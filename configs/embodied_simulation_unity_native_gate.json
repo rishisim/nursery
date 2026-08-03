@@ -1,0 +1,15 @@
+{
+  "schema": "embodied.unity_native.gate.v1",
+  "question": "Can one Unity ArticulationBody/PhysX authority compile bounded prompts into credible embodied episodes with synchronized simulator truth?",
+  "unity": {"editor": "6000.0.80f1", "architecture": "arm64", "graphics_api": "Metal", "physics_hz": 240, "render_hz": 30, "steps_per_frame": 8},
+  "camera": {"profile_id": "child_head_neutral_fov68_v1", "vertical_fov_deg": 68, "near_clip_m": 0.03, "target_dependent_mount": false},
+  "embodiment_reach_profile": {"profile_id": "mpfb_child_right_arm_measured_v1", "measurement_source": "stage_d/final_minimal_cell2/driven_approach_receipt.json and stage_b_final/skin_registration_report.json", "rest_shoulder_m": [0.121492, 0.90775, -0.001654], "rest_wrist_m": [0.3372, 0.683849, 0.136297], "rest_fingertip_centroid_m": [0.36558, 0.620784, 0.216518], "nominal_driven_fingertip_centroid_m": [0.3589, 0.6592, 0.2535], "permitted_drive_ranges_deg": {"shoulder": [-60, 60], "elbow": [-60, 60], "wrist": [-60, 60]}, "shoulder_target_radius_m": [0.15, 0.55], "target_lateral_x_m": [0.20, 0.48], "target_vertical_y_m": [0.58, 0.72], "target_forward_z_m": [0.25, 0.48], "nominal_fingertip_target_max_m": 0.14, "approach_direction": "+Z"},
+  "prompts": [
+    {"id": "playroom", "seed": 2026080301, "room_family": "playroom", "duration_s": 15, "text": "Find the red toy on the low play table, pick it up, look at it, turn it gently, put it back, and look away."},
+    {"id": "living_area", "seed": 2026080302, "room_family": "living_area", "duration_s": 16, "text": "Find the blue cup beside the book, touch it, lift it, move it onto the tray, release it, and look toward the window."},
+    {"id": "art_corner", "seed": 2026080303, "room_family": "art_corner", "duration_s": 15, "text": "Find the yellow block among the craft toys, pick it up, inspect it, place it in the shallow bin, and withdraw your hand."}
+  ],
+  "frozen_tolerances": {"collider_skin_max_m": 0.0075, "finger_object_penetration_max_m": 0.003, "support_penetration_max_m": 0.002, "minimum_lift_m": 0.08, "minimum_manipulation_deg": 20, "minimum_digits": 3, "camera_roll_max_deg": 8, "camera_skin_clearance_min_m": 0.02, "rerender_min_psnr_db": 60},
+  "authority": {"physics": "Unity ArticulationBody/PhysX", "renderer": "Unity", "object_attachment": false, "direct_object_pose_after_initialization": false, "assistance_ledger_expected_entries": 0},
+  "assets": {"avatar_fbx_sha256": "b766981d9d3504cea220c0d72ad8aa56cbd80453e910fc76dc8c8814fbd980de", "avatar_license": "CC0", "furniture_archive_sha256": "68afa4e6dc8a53942379fb47f1e84ec735d46b77bb1c1ceb968e245693dde067", "furniture_license": "CC0"}
+}
