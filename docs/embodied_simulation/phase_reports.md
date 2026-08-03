@@ -585,3 +585,62 @@ baseline only. No learner comparison or causal evidence was produced.
 Smallest next step: preserve the ignored bundle and compact manifest as the
 qualified simulator deliverable; any learner comparison, BabyView confirmation,
 or causal study requires a separate governed protocol and authorization.
+
+## Unity–MuJoCo feasibility preflight — 2026-08-02
+
+Gate decision: **PROMISING-BUT-REPAIR**.
+
+This is a new, bounded architectural feasibility check for the requested
+Unity-rendered, MuJoCo-authoritative child-view replacement.  It deliberately
+does not reuse or qualify the prior MIMo appearance shell, its camera, or its
+contact-gated grasp assist.  The retained question is narrower: can this host
+bootstrap the required official components and render through the designated
+native truth-control fallback without touching restricted media?
+
+Findings:
+
+- Local discovery found no Unity Editor, Unity Hub, Unity activation file,
+  Filament installation, or Python MuJoCo package.  These are missing
+  dependencies, not hardware failures.  Unity Personal is conditionally
+  feasible only if the account holder verifies its current eligibility; an
+  agent must not create an account, accept terms, or assert the user's revenue
+  or funding status.  Thus Unity activation is a user-action condition, not a
+  failed runtime test.
+- The official MuJoCo Unity package was checked at tag `3.3.7`, commit
+  `f1d45bd5422c74beddfb0d1deb590a02583d21de`, Apache-2.0.  Its `MjScene`
+  performs the MuJoCo step from Unity `FixedUpdate`, then synchronizes Unity
+  state.  A future Unity run must lock Unity's fixed delta to the MJCF timestep,
+  have exactly one `MjScene.StepScene` per tick, disable PhysX authority for
+  target objects, and sample every stream from that tick.
+- Official source builds succeeded in ignored `.external/native_fallback/`:
+  MuJoCo `3.3.7` at the above commit and Filament `v1.71.5` at
+  `b0f2090cccf3c11f524ed8053746aba3de6be199`, both Apache-2.0.  Filament's
+  off-screen Metal backend selected the Apple M5 and produced a valid 320×240
+  RGB image.  The compact source smoke test is
+  `native_filament_smoke.cpp`; its generated image and two-second playable
+  clip are ignored run evidence, not episode evidence.
+- The initial native render exposed two ordinary integration defects: the
+  material was compiled for OpenGL rather than Metal, and PPM export retained
+  the alpha byte.  Recompiling with `matc -a metal` and writing RGB triples
+  repaired both.  No scene, camera, object, or dynamics result is inferred
+  from this smoke test.
+- Apple Silicon/Metal is therefore supported by the native fallback build;
+  neither an unsupported platform nor an actual renderer failure has been
+  found.  No restricted ChildLens media was accessed, decoded, moved, uploaded,
+  or used for thresholds or tuning.
+
+Required episode evidence is **not yet produced**: no furnished room,
+child-proportioned articulated rig, physical unassisted grasp, synchronized
+truth bundle, depth/object-ID stream, contact timing, mesh/collision
+registration, penetration report, identity report, or replay receipt exists
+for this preflight.  The smoke render must not be represented as a child-view
+episode or as a physical qualification.
+
+The one warranted repair is to implement the existing 15–20 second contract
+once, in the native MuJoCo + Filament truth-control fallback: the new rig must
+derive camera pose exclusively from root/torso/neck/head plus a fixed mount,
+drive reach and fingers via deterministic scene-conditioned primitives and IK,
+and prove a contact/friction-supported grasp without parenting, pose writes,
+welds, equality attachments, snapping, teleporting, or assist forces.  Only
+after that fallback trace and its synchronized diagnostics pass should a
+licensed/activated Unity run be attempted as the appearance comparison.
