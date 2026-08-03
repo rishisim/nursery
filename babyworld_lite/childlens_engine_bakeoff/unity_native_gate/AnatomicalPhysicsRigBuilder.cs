@@ -106,16 +106,16 @@ public static class AnatomicalPhysicsRigBuilder
         Vector3[] offsets = { new(.00f,.00f,.00f), new(.025f,.015f,.015f), new(-.02f,.02f,.025f), new(.015f,-.015f,.035f), new(-.015f,.005f,.05f) };
         Build(); Simulate(720); Vector3 origin = physicalSites["palm"].position; Quaternion originRotation=physicalSites["palm"].rotation;
         foreach (var offset in offsets) {
-            Build(); Simulate(720); Vector3 target = origin + offset; bool collided = false;
-            for (int step = 0; step < 960; step++) { DlsStep(target); Simulate(1); FollowSkin(); collided |= UnintendedSelfContact(); }
+            Build(); Simulate(720); Vector3 target = origin + offset;
+            for (int step = 0; step < 960; step++) { JacobianTransposeStep(target); Simulate(1); FollowSkin(); }
             Vector3 observed = physicalSites["palm"].position;
-            waypointRows.Add(new WaypointRow { target_m = target, observed_m = observed, position_error_m = Vector3.Distance(target, observed), orientation_error_deg = Quaternion.Angle(physicalSites["palm"].rotation, originRotation), collision_free = !collided });
+            waypointRows.Add(new WaypointRow { target_m = target, observed_m = observed, position_error_m = Vector3.Distance(target, observed), orientation_error_deg = Quaternion.Angle(physicalSites["palm"].rotation, originRotation), collision_check_available = false, collision_status = "NOT_MEASURED" });
         }
         RenderExternal("stage_b_waypoints.png", true);
-        var report = new StageBReport { schema = "embodied.anatomical_rig.stage_b.v1", unity_version = Application.unityVersion,
+        var report = new StageBReport { schema = "embodied.anatomical_rig.stage_b.v2", unity_version = Application.unityVersion,
             jacobian_rows = jacobianRows.Count, jacobian_max_direction_error_deg = jacobianRows.Max(x => x.direction_error_deg), jacobian_max_relative_magnitude_error = jacobianRows.Max(x => x.relative_magnitude_error),
-            waypoint_count = waypointRows.Count, palm_position_max_error_m = waypointRows.Max(x => x.position_error_m), palm_orientation_max_error_deg = waypointRows.Max(x => x.orientation_error_deg), all_waypoints_collision_free = waypointRows.All(x => x.collision_free) };
-        report.passed = report.jacobian_max_direction_error_deg <= 2f && report.jacobian_max_relative_magnitude_error <= .03f && report.waypoint_count >= 5 && report.palm_position_max_error_m <= .010f && report.palm_orientation_max_error_deg <= 7 && report.all_waypoints_collision_free;
+            waypoint_count = waypointRows.Count, palm_position_max_error_m = waypointRows.Max(x => x.position_error_m), palm_orientation_max_error_deg = waypointRows.Max(x => x.orientation_error_deg), collision_check_available = false, collision_status = "NOT_MEASURED" };
+        report.passed = report.jacobian_max_direction_error_deg <= 2f && report.jacobian_max_relative_magnitude_error <= .03f && report.waypoint_count >= 5 && report.palm_position_max_error_m <= .010f && report.palm_orientation_max_error_deg <= 7 && report.collision_check_available && report.collision_status == "PASS";
         File.WriteAllText(Path.Combine(Output, "stage_b_jacobian.json"), JsonUtility.ToJson(new JacobianAudit { rows = jacobianRows.ToArray() }, true));
         File.WriteAllText(Path.Combine(Output, "stage_b_waypoints.json"), JsonUtility.ToJson(new WaypointTrace { rows = waypointRows.ToArray() }, true));
         File.WriteAllText(Path.Combine(Output, "stage_b_report.json"), JsonUtility.ToJson(report, true));
@@ -153,7 +153,7 @@ public static class AnatomicalPhysicsRigBuilder
             Vector3 target=origin+offsets[trial];var targetMarker=Marker("TARGET_RED",target,new Color(.95f,.03f,.03f),.012f);var observedMarker=Marker("OBSERVED_BLUE",physicalSites["palm"].position,new Color(.02f,.25f,1f),.010f);
             var trailObject=new GameObject("OBSERVED_TRAIL_BLUE");var trail=trailObject.AddComponent<LineRenderer>();trail.material=new Material(Shader.Find("Sprites/Default"));trail.startColor=trail.endColor=new Color(.02f,.25f,1f);trail.startWidth=.0035f;trail.endWidth=.0035f;trail.positionCount=0;
             for(int frame=0;frame<120;frame++){
-                for(int step=0;step<8;step++){DlsStep(target);Simulate(1);}Vector3 observed=physicalSites["palm"].position;observedMarker.transform.position=observed;trail.positionCount=frame+1;trail.SetPosition(frame,observed);
+                for(int step=0;step<8;step++){JacobianTransposeStep(target);Simulate(1);}Vector3 observed=physicalSites["palm"].position;observedMarker.transform.position=observed;trail.positionCount=frame+1;trail.SetPosition(frame,observed);
                 float positionError=Vector3.Distance(target,observed),orientationError=Quaternion.Angle(physicalSites["palm"].rotation,originRotation);
                 label.text=$"STAGE B NO-GO  |  fresh-state waypoint {trial+1}/5\nRED target  BLUE observed/trail  |  pos {positionError*1000:F1} mm  orient {orientationError:F1} deg";
                 CaptureEvidenceFrame(camera,Path.Combine(waypointDir,$"frame_{waypointFrame:D4}.png"));
@@ -237,8 +237,7 @@ public static class AnatomicalPhysicsRigBuilder
     static Vector3 SiteFor(ArticulationBody b)=>b.name.Contains("finger")?b.transform.position:physicalSites["palm"].position;
     static void ApplyArmTargets(float[] q) { int k=0; foreach(var b in controlled.Take(5)) for(int a=0;a<b.dofCount && k<q.Length;a++) SetDrive(b,a,Drive(b,a),q[k++]); }
     static Vector3 EvaluatePalm(float[] pose,int bodyIndex,int axis,float delta){ Build(); var p=(float[])pose.Clone(); int k=0; for(int i=0;i<bodyIndex;i++) k+=controlled[i].dofCount; p[k+axis]+=delta; ApplyArmTargets(p); Simulate(1200); return physicalSites["palm"].position; }
-    static void DlsStep(Vector3 target) { var root=bodies[0];var starts=new List<int>();int columns=root.GetDofStartIndices(starts);var j=new ArticulationJacobian(bodies.Count*6,columns);root.GetDenseJacobian(ref j);var palm=bodies.Single(x=>x.name=="physical_palm");int row=palm.index*6;Vector3 e=target-physicalSites["palm"].position; foreach(var b in controlled.Take(5))for(int a=0;a<b.dofCount;a++){int c=starts[b.index]+a;float gradient=j[row,c]*e.x+j[row+1,c]*e.y+j[row+2,c]*e.z;var d=Drive(b,a);SetDrive(b,a,d,d.target+Mathf.Clamp(gradient*45f,-.3f,.3f));} }
-    static bool UnintendedSelfContact()=>false;
+    static void JacobianTransposeStep(Vector3 target) { var root=bodies[0];var starts=new List<int>();int columns=root.GetDofStartIndices(starts);var j=new ArticulationJacobian(bodies.Count*6,columns);root.GetDenseJacobian(ref j);var palm=bodies.Single(x=>x.name=="physical_palm");int row=palm.index*6;Vector3 e=target-physicalSites["palm"].position; foreach(var b in controlled.Take(5))for(int a=0;a<b.dofCount;a++){int c=starts[b.index]+a;float gradient=j[row,c]*e.x+j[row+1,c]*e.y+j[row+2,c]*e.z;var d=Drive(b,a);SetDrive(b,a,d,d.target+Mathf.Clamp(gradient*45f,-.3f,.3f));} }
     static bool Finite(Vector3 v)=>float.IsFinite(v.x)&&float.IsFinite(v.y)&&float.IsFinite(v.z);
     static float Quantile(List<float> x,float q){var a=x.OrderBy(v=>v).ToArray();return a[Mathf.RoundToInt((a.Length-1)*q)];}
     static string Sha256(string path){using var h=SHA256.Create();return BitConverter.ToString(h.ComputeHash(File.ReadAllBytes(path))).Replace("-","").ToLowerInvariant();}
@@ -259,8 +258,8 @@ public static class AnatomicalPhysicsRigBuilder
     [Serializable] class JacobianAudit { public JacobianAuditRow[] rows; }
     [Serializable] class JacobianAuditRow { public float[] pose_deg;public string joint;public int axis;public Vector3 engine_m_per_rad,finite_difference_m_per_rad;public float direction_error_deg,relative_magnitude_error; }
     [Serializable] class WaypointTrace { public WaypointRow[] rows; }
-    [Serializable] class WaypointRow { public Vector3 target_m,observed_m;public float position_error_m,orientation_error_deg;public bool collision_free; }
-    [Serializable] class StageBReport { public string schema,unity_version;public int jacobian_rows,waypoint_count;public float jacobian_max_direction_error_deg,jacobian_max_relative_magnitude_error,palm_position_max_error_m,palm_orientation_max_error_deg;public bool all_waypoints_collision_free,passed; }
+    [Serializable] class WaypointRow { public Vector3 target_m,observed_m;public float position_error_m,orientation_error_deg;public bool collision_check_available;public string collision_status; }
+    [Serializable] class StageBReport { public string schema,unity_version,collision_status;public int jacobian_rows,waypoint_count;public float jacobian_max_direction_error_deg,jacobian_max_relative_magnitude_error,palm_position_max_error_m,palm_orientation_max_error_deg;public bool collision_check_available,passed; }
     [Serializable] class EvidenceTrace { public EvidenceFrame[] rows; }
     [Serializable] class EvidenceFrame { public string chapter,joint;public int frame,trial,axis;public float target_deg,observed_deg,position_error_m,orientation_error_deg;public Vector3 target_m,observed_m; }
     [Serializable] class EvidenceReport { public string schema,unity_version,stage_b_decision;public int stage_a_frames,stage_b_frames,physics_hz,render_hz,steps_per_frame;public bool stage_a_clean_and_overlay_same_state; }

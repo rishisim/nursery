@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 
 from babyworld_lite.childlens_engine_bakeoff.unity_native_gate.anatomical_rig import (
@@ -11,6 +13,11 @@ def test_manifest_is_single_authority_and_exact_clock():
     assert manifest["authority"]["physics"].endswith("ArticulationBody/PhysX")
     assert manifest["authority"]["assistance_ledger_expected_entries"] == 0
     assert manifest["clock"] == {"physics_hz": 240, "render_hz": 30, "steps_per_frame": 8}
+    source = Path("babyworld_lite/childlens_engine_bakeoff/unity_native_gate/AnatomicalPhysicsRigBuilder.cs").read_text()
+    assert 'collision_check_available = false' in source
+    assert 'collision_status = "NOT_MEASURED"' in source
+    assert "UnintendedSelfContact" not in source
+    assert "DlsStep" not in source
 
 
 def test_measured_anatomical_lengths_are_child_sized_and_nonzero():

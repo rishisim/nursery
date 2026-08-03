@@ -29,18 +29,25 @@ ArticulationBody, the prompt system, or the research program.
 | Gate | Result | Evidence |
 |---|---|---|
 | A — anatomical rig/static registration | PASS | 22 controlled DOFs; coordinate round-trip 0.000123 mm; collider-to-skin median/p95/max 0.646/2.559/6.694 mm; one weighted skin; no deformation-bone `ArticulationBody`; no independent animation |
-| B — FK/Jacobian/five waypoints | NO-GO | settled zero-offset error 0.0016 mm / 0.247 degrees, but four nontrivial waypoint errors 28.5–122.4 mm and 13.7–75.7 degrees; engine-vs-central-difference maximum direction/magnitude errors 167.45 degrees / 83.06% |
+| B — FK/Jacobian/five waypoints | NO-GO | settled zero-offset error 0.964 mm / 0.801 degrees, but four nontrivial waypoint errors 21.4–41.5 mm and 10.2–69.9 degrees; engine-vs-central-difference maximum direction/magnitude errors 144.68 degrees / 93.58%; collision status NOT_MEASURED |
 | C — contact-free reach/preshape | NOT RUN | prohibited after Stage-B failure |
 | D — grasp/lift/rotate/place/release | NOT RUN | prohibited after Stage-B failure |
 | E — robustness/replay/synchronized capture | NOT RUN | prohibited after Stage-B failure |
 
-The second Stage-B run repaired two invalid qualification mechanics from the
-first attempt: every finite-difference cell used a fresh build with a 1-degree
+The corrected Stage-B protocol repaired two invalid qualification mechanics
+from the first attempt: every finite-difference cell used a fresh build with a 1-degree
 central perturbation and 1,200 manual 240 Hz convergence steps, and every
 waypoint was defined from a separately settled 720-step fresh state. The
 zero-offset cell then passed tightly, but the nontrivial cells and Jacobian
 columns still failed by large margins. This repeated result is the hard-stop
 condition, not a scene-layout reinterpretation.
+
+The no-object waypoint harness does not implement a qualified self-collision or
+penetration audit. Canonical Stage-B schema v2 therefore records
+`collision_check_available=false` and `collision_status=NOT_MEASURED` for every
+waypoint and the aggregate report. This unavailable field is required to be
+true with status `PASS` before Stage B can pass. Earlier `collision_free=true`
+values came from a hardcoded placeholder and are rejected, not evidence.
 
 ## Immutable ignored-run receipts
 
@@ -51,11 +58,11 @@ Root: `runs/embodied_simulation/anatomical_physics_gate/`
 - `stage_a/stage_a_sweep.json` — SHA-256
   `43ef607432b3e577249263187951b80bae370949b36484268bc23bfeb632aa12`
 - `stage_b/stage_b_report.json` — SHA-256
-  `c05ca65fba37eddde41ca83c631492c7fdb1039e0beafdc568bf13fd9f585b93`
+  `41604efba092dd39216f27aa4cfc529fa9387984e2c8ca341b92482458211a4a`
 - `stage_b/stage_b_jacobian.json` — SHA-256
-  `de4ccad0002bf67c9a51b57f25ef40262b27970e3e651d3db4d1fb1f4e97a005`
+  `71099e87ca7b9225cc12b1ccba096e7bcada693d74fe7a9637f6496159580c16`
 - `stage_b/stage_b_waypoints.json` — SHA-256
-  `756d984ea56fb5630519036ef6ebbea4e146bbc4749847270a357000312be1d4`
+  `783f2da72824f50a16f6d3a78b1d750cb767cfdba49808b837fe68b98e220a64`
 - `stage_b/evidence/capture_report.json` — SHA-256
   `7c4daabf493f2ea405b2b070944cedb6eb30513318507069d98c2b5bc342cda4`
 - `stage_b/evidence/frame_ledger.json` — SHA-256
