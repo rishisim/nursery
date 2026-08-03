@@ -445,6 +445,48 @@ def test_visor_valid_negative_requires_valid_annotation_geometry() -> None:
     assert MODULE._visor_frame_truth(row) is None
 
 
+def test_visor_fixture_availability_reports_frozen_stratum_shortfall() -> None:
+    participant = next(
+        value
+        for value in (f"P{index:02d}" for index in range(1, 100))
+        if MODULE._fixture_partition(20260802, "visor_partition", value)
+        == "development"
+    )
+    rows = []
+    for index in range(6):
+        rows.append(
+            {
+                "image": {
+                    "name": f"frame-{index}.jpg",
+                    "image_path": f"{participant}_01/frame-{index}.jpg",
+                    "video": f"{participant}_01",
+                },
+                "annotations": [
+                    {
+                        "id": f"hand-{index}",
+                        "name": "left hand",
+                        "segments": [[[1.0, 1.0], [4.0, 1.0], [4.0, 4.0]]],
+                    }
+                ],
+            }
+        )
+    preparation = {
+        "seed": 20260802,
+        "partitions": ["development"],
+        "visor_selection": {
+            "strata_per_partition": {
+                "hand_contact": 0,
+                "hand_no_contact": 5,
+                "true_no_hand": 0,
+            }
+        },
+    }
+    _selected, counts = MODULE._visor_fixture_availability(
+        [{"video_annotations": rows}], preparation
+    )
+    assert counts["development"]["hand_no_contact"] == 4
+
+
 def test_tuple_zip_extraction_blocks_path_traversal(tmp_path: Path) -> None:
     import pytest
     import zipfile

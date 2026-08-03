@@ -230,6 +230,11 @@ TUPLE_FIXTURE_FEASIBILITY_FIELDS = frozenset(
         "action_item_count",
         "partition_count",
         "failing_family_count",
+        "blocking_family",
+        "blocking_partition",
+        "blocking_stratum",
+        "required_count",
+        "available_count",
         "source_subject_overlap_count",
         "source_video_overlap_count",
         "source_object_overlap_count",
@@ -1175,9 +1180,9 @@ def _visor_frame_truth(row: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
-def _select_visor_fixtures(
+def _visor_fixture_availability(
     annotation_documents: list[dict[str, Any]], preparation: dict[str, Any]
-) -> dict[str, list[dict[str, Any]]]:
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, dict[str, int]]]:
     seed = int(preparation["seed"])
     targets = preparation["visor_selection"]["strata_per_partition"]
     candidates: dict[str, dict[str, list[dict[str, Any]]]] = {
@@ -1197,8 +1202,10 @@ def _select_visor_fixtures(
                 {**truth, "participant": participant}
             )
     output: dict[str, list[dict[str, Any]]] = {}
+    counts: dict[str, dict[str, int]] = {}
     for partition in preparation["partitions"]:
         output[partition] = []
+        counts[partition] = {}
         video_counts: Counter[str] = Counter()
         for stratum, required in targets.items():
             ordered = sorted(
@@ -1221,10 +1228,7 @@ def _select_visor_fixtures(
                 selected += 1
                 if selected == int(required):
                     break
-            if selected != int(required):
-                raise RuntimeError(
-                    f"E_TUPLE_VISOR_FIXTURE_YIELD_{partition}_{stratum}"
-                )
+            counts[partition][stratum] = selected
         output[partition].sort(
             key=lambda row: (
                 list(targets).index(row["stratum"]),
@@ -1237,6 +1241,20 @@ def _select_visor_fixtures(
                 ),
             )
         )
+    return output, counts
+
+
+def _select_visor_fixtures(
+    annotation_documents: list[dict[str, Any]], preparation: dict[str, Any]
+) -> dict[str, list[dict[str, Any]]]:
+    output, counts = _visor_fixture_availability(annotation_documents, preparation)
+    targets = preparation["visor_selection"]["strata_per_partition"]
+    for partition in preparation["partitions"]:
+        for stratum, required in targets.items():
+            if counts[partition][stratum] != int(required):
+                raise RuntimeError(
+                    f"E_TUPLE_VISOR_FIXTURE_YIELD_{partition}_{stratum}"
+                )
     return output
 
 
@@ -2529,7 +2547,98 @@ def prepare_tuple_fixture_feasibility(
     _, _, visor_documents, visor_provenance = _load_visor_annotation_documents(
         fixture_root, preparation
     )
-    visor = _select_visor_fixtures(visor_documents, preparation)
+    visor, visor_counts = _visor_fixture_availability(
+        visor_documents, preparation
+    )
+    visor_targets = preparation["visor_selection"]["strata_per_partition"]
+    visor_deficits = [
+        (partition, stratum, int(required), visor_counts[partition][stratum])
+        for partition in preparation["partitions"]
+        for stratum, required in visor_targets.items()
+        if visor_counts[partition][stratum] != int(required)
+    ]
+    if visor_deficits:
+        partition, stratum, required, available = visor_deficits[0]
+        visor_subject_sets = {
+            name: {row["participant"] for row in visor[name]}
+            for name in preparation["partitions"]
+        }
+        visor_video_sets = {
+            name: {row["video"] for row in visor[name]}
+            for name in preparation["partitions"]
+        }
+        object_sets = {
+            name: {row["image_id"] for row in coco[name]}
+            for name in preparation["partitions"]
+        }
+        audits = {
+            "source_subject_overlap_count": len(
+                visor_subject_sets["development"] & visor_subject_sets["holdout"]
+            ),
+            "source_video_overlap_count": len(
+                visor_video_sets["development"] & visor_video_sets["holdout"]
+            ),
+            "source_object_overlap_count": len(
+                object_sets["development"] & object_sets["holdout"]
+            ),
+        }
+        record = {
+            "schema_version": 1,
+            "status": "NO_GO_ANNOTATION_ONLY_FIXTURE_SOURCE_YIELD",
+            "fixture_preparation_amendment_commitment_sha256": preparation[
+                "preparation_amendment_commitment_sha256"
+            ],
+            "fixture_feasibility_repair_commitment_sha256": repair[
+                "fixture_feasibility_repair_commitment_sha256"
+            ],
+            "public_fixture_protocol_commitment_sha256": protocol[
+                "protocol_commitment_sha256"
+            ],
+            "blocking_family": "VISOR_hand_contact",
+            "blocking_partition": partition,
+            "blocking_stratum": stratum,
+            "required_count": required,
+            "available_count": available,
+            "deficit_count": required - available,
+            "coco_source_counts": {
+                name: len(coco[name]) for name in preparation["partitions"]
+            },
+            "visor_stratum_counts": visor_counts,
+            "audits": audits,
+            "selections": {"coco": coco, "visor": visor},
+            "visor_annotation_provenance": visor_provenance,
+            "action_selection_status": "NOT_RUN_AFTER_BLOCKING_VISOR_SOURCE_NO_GO",
+            "model_inference_executed": False,
+            "media_rendering_executed": False,
+            "large_Charades_video_archive_downloaded": False,
+            "restricted_mount_present": False,
+        }
+        record["fixture_feasibility_commitment_sha256"] = digest(record)
+        write_private(fixture_root / "fixture-feasibility.json", record)
+        return {
+            "status": "NO_GO_ANNOTATION_ONLY_FIXTURE_SOURCE_YIELD",
+            "coco_source_count": sum(
+                len(coco[name]) for name in preparation["partitions"]
+            ),
+            "visor_item_count": sum(
+                sum(values.values()) for values in visor_counts.values()
+            ),
+            "action_item_count": 0,
+            "partition_count": len(preparation["partitions"]),
+            "failing_family_count": 1,
+            "blocking_family": "VISOR_hand_contact",
+            "blocking_partition": partition,
+            "blocking_stratum": stratum,
+            "required_count": required,
+            "available_count": available,
+            **audits,
+            "model_inference_executed": False,
+            "media_rendering_executed": False,
+            "restricted_mount_present": False,
+            "fixture_feasibility_commitment_sha256": record[
+                "fixture_feasibility_commitment_sha256"
+            ],
+        }
     old_manifest = json.loads(
         (
             args.public_root
