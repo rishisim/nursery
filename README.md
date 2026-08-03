@@ -208,7 +208,8 @@ retry froze exact Grounding DINO padding-sentinel validation at
 `afc936f7…a2d5`, then passed through DINOv2 before the pinned EgoBabyVLM package
 initializer required missing Submitit. Active runtime commitment
 `eb878d8c…fbea` adds only hash-pinned `submitit==1.5.3` and its absent
-`cloudpickle==3.1.1` dependency; the 55-package overlay is pending reseal. No
+`cloudpickle==3.1.1` dependency. The 55-package overlay passed reseal at
+`df15ff20…c0c4`, without model inference or a restricted mount. No
 fixture outcome, model substitution, or gate change is involved. C measurement,
 LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
 and descriptive-only claim boundary are unchanged.

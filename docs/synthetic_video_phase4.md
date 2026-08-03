@@ -193,8 +193,9 @@ also lacks `cloudpickle`, the sole required runtime dependency of the selected
 Submitit wheel. No fixture outcome was opened. Active runtime commitment
 `eb878d8c…fbea` therefore adds only hash-pinned public `submitit==1.5.3` (MIT)
 and `cloudpickle==3.1.1` (BSD-3-Clause). The prior 53-dependency runtime and its
-commitment remain preserved; the 55-dependency overlay must be resealed before
-blind sizing resumes.
+commitment remain preserved. The 55-dependency overlay then passed preparation
+in 9 minutes 16 seconds at commitment `df15ff20…c0c4`, with no model inference
+or restricted mount. Blind sizing may resume.
 Governed C measurement requires that pass, and LTX generation remains further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is
 authorized.

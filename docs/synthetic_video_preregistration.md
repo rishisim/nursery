@@ -1254,6 +1254,12 @@ attempt, active runtime commitment `eb878d8c…fbea` freezes exactly
 `submitit==1.5.3` (MIT wheel `ccc35100…1795`) and `cloudpickle==3.1.1`
 (BSD-3-Clause wheel `c8c5a442…50e`) and verifies both hashes before install.
 All earlier runtime commitments and the 53-dependency manifest
-`03c15506…2c15` remain preserved. The new 55-dependency overlay must be prepared
-and sealed before label-blind sizing resumes; no model, prompt, fixture,
-threshold, or scientific gate changes.
+`03c15506…2c15` remain preserved. The new 55-dependency overlay was required to
+pass preparation and sealing before label-blind sizing could resume; no model,
+prompt, fixture, threshold, or scientific gate changes.
+
+That overlay passed preparation in 9 minutes 16 seconds: all 55 dependency
+artifacts and installed distributions were sealed under runtime-manifest
+commitment `df15ff20…c0c4`. No model inference or restricted mount was present.
+This resource-only result authorizes the same label-blind sizing retry; it is
+not a public extractor qualification result.

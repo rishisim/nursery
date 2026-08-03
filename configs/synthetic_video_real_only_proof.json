@@ -1,6 +1,6 @@
 {
   "schema_version": 11,
-  "status": "MECHANISTIC_TRAINING_TUPLE_RUNTIME_DEPENDENCY_REPAIR_FROZEN_PENDING_REPREPARATION_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
+  "status": "MECHANISTIC_TRAINING_TUPLE_55_DEPENDENCY_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -70,7 +70,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_RUNTIME_DEPENDENCY_REPAIR_FROZEN_PENDING_REPREPARATION_AND_PUBLIC_QUALIFICATION",
+    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_55_DEPENDENCY_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -1255,11 +1255,10 @@
         "runtime_amendment_commitment_sha256": "eb878d8c68aa6f79b5115502beb4c8b64d84e9f495b7cec4513abc3e94effbea"
       },
       "mechanistic_training_tuple_runtime_preparation_result": {
-        "status": "PENDING_55_DEPENDENCY_RUNTIME_REPREPARATION",
-        "trigger_job_id": 313903,
-        "trigger_elapsed": "00:00:33",
-        "trigger_stage": "pinned_EgoBabyVLM_alignment_package_import_before_PE_Core_construction",
-        "trigger_error": "ModuleNotFoundError_submitit",
+        "status": "PASS_55_DEPENDENCY_RUNTIME_READY_LOCAL_RELOAD_BLIND_SIZING_PENDING",
+        "job_id": 313924,
+        "elapsed": "00:09:16",
+        "prior_engineering_attempt": {"job_id": 313903, "elapsed": "00:00:33", "stage": "pinned_EgoBabyVLM_alignment_package_import_before_PE_Core_construction", "error": "ModuleNotFoundError_submitit", "public_fixture_outcome_opened": false},
         "dependency_count": 55,
         "dependency_artifact_count": 55,
         "installed_distribution_count": 55,
@@ -1268,12 +1267,12 @@
         "mechanistic_amendment_commitment_sha256": "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf",
         "runtime_amendment_commitment_sha256": "eb878d8c68aa6f79b5115502beb4c8b64d84e9f495b7cec4513abc3e94effbea",
         "base_dependency_manifest_commitment_sha256": "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527",
-        "runtime_dependency_commitment_sha256": "PENDING_REPREPARATION",
+        "runtime_dependency_commitment_sha256": "df15ff20c2f1e137530ec6f8a6f848ed676f2bcde0ec48148736c23ddd6fc0c4",
         "prior_runtime_dependency_commitments_sha256": ["968f2570ffd8d325a12e2bd6058cc8ab31fb99f1d50b30607419f6da20c81f10", "9810a61868da9a2bede49679820963409c76a3524529a9396c3d5348010748f9", "03c15506b0ce9fcfe403ebd735e0025dd7685d34867425b385db5463b4542c15"],
         "restricted_mount_present": false,
         "model_inference_executed": false,
         "external_model_call_count": 0,
-        "validity": "the 53-dependency runtime remains preserved but is not active after the import-only dependency repair; model sizing cannot resume until the 55-dependency runtime is resealed"
+        "validity": "resource and immutable-runtime preparation only; it authorizes the committed label-blind local reload sizing but is not a public extractor pass"
       },
       "mechanistic_training_tuple_sizing_validation_amendment": {
         "status": "FROZEN_BEFORE_SIZING_RERUN_OR_PUBLIC_FIXTURE_OUTCOMES",
