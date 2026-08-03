@@ -88,3 +88,15 @@ physics `240 Hz`; render `30 Hz`; exactly 5280 steps and 660 frames. Public/CC0
 or synthetic assets only. No restricted ChildLens media was accessed, and no
 claim of infant training, age matching, ChildLens calibration, or human
 validation is made.
+
+The only simulation entry point is manifest-derived and requires an explicit
+mode:
+
+```text
+.venv-integrated/bin/python -m babyworld_lite.childlens_engine_bakeoff.unity_mujoco_gate \
+  --output <ignored-output> --rest-manifest <mpfb_rest_manifest.json> --registration
+.venv-integrated/bin/python -m babyworld_lite.childlens_engine_bakeoff.unity_mujoco_gate \
+  --output <ignored-output> --rest-manifest <mpfb_rest_manifest.json> --manipulation
+```
+
+There is no default or hard-coded alternate embodiment protocol.

@@ -1,8 +1,10 @@
 import json
+import ast
 from pathlib import Path
 
 
 CONFIG = json.loads(Path("configs/embodied_simulation_unity_mujoco_gate.json").read_text())
+SOURCE = Path("babyworld_lite/childlens_engine_bakeoff/unity_mujoco_gate.py")
 
 
 def test_gate_clock_and_schedule_are_exact():
@@ -55,3 +57,15 @@ def test_tactile_controller_requires_dwell_and_actuator_only_recovery():
     assert controller["force_target_n_per_digit"] > 0
     assert controller["shoulder_recenter_limit_deg"] <= 3
     assert controller["retry_open_deg_s"] > 0
+
+
+def test_manifest_gate_is_the_only_runnable_protocol():
+    source = SOURCE.read_text()
+    functions = {
+        node.name for node in ast.walk(ast.parse(source))
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
+    assert "manifest_registration" in functions
+    assert not {"model_xml", "controls", "execute", "run_gate"} & functions
+    assert 'parser.add_argument("--rest-manifest", type=Path, required=True)' in source
+    assert "add_mutually_exclusive_group(required=True)" in source

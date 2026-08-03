@@ -10,17 +10,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import platform
-import subprocess
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import mujoco
 import numpy as np
-
-
-DIGITS = ("thumb", "index", "middle", "ring", "little")
 
 
 def sha256(path: Path) -> str:
@@ -208,351 +202,32 @@ def smooth(a: float, b: float, t: float) -> float:
     return x * x * (3.0 - 2.0 * x)
 
 
-def phase_at(t: float, phases: list[dict[str, Any]]) -> str:
-    for phase in phases:
-        if phase["start_s"] <= t < phase["end_s"]:
-            return str(phase["id"])
-    return str(phases[-1]["id"])
-
-
-def model_xml(config: dict[str, Any], cell: dict[str, Any]) -> str:
-    target = config["target"]
-    half = np.asarray(target["dimensions_m"], dtype=float) / 2
-    x = 0.04 + float(cell["target_lateral_offset_m"])
-    if cell.get("no_object", False):
-        x = 5.0
-    mass = float(target["mass_kg"]) * float(cell["mass_scale"])
-    friction = np.asarray(target["friction"], dtype=float) * float(cell["friction_scale"])
-    finger_base = {
-        "thumb": (-0.0335, 0.0115, -0.0064, 56, 0.0243, 0.0258),
-        "index": (-0.0667, 0.0537, -0.0107, 79, 0.0208, 0.0185),
-        "middle": (-0.0502, 0.0657, -0.0044, 88, 0.0272, 0.0224),
-        "ring": (-0.0364, 0.0707, 0.0028, 75, 0.0240, 0.0201),
-        "little": (-0.0230, 0.0722, 0.0134, 94, 0.0172, 0.0201),
+def validate_rest_manifest(path: Path) -> None:
+    if not path.is_file():
+        raise ValueError(f"rest manifest does not exist: {path}")
+    manifest = json.loads(path.read_text())
+    if manifest.get("schema") != "embodied.mpfb_rest_manifest.v1":
+        raise ValueError("rest manifest must use schema embodied.mpfb_rest_manifest.v1")
+    names = {row.get("name") for row in manifest.get("bones", [])}
+    required = {"root", "head", "wrist.R"} | {
+        f"finger{digit}-{part}.R" for digit in range(1, 6) for part in range(1, 4)
     }
-    fingers = []
-    actuators = []
-    sensors = []
-    for digit in DIGITS:
-        x_pos, y, z, yaw, segment, middle_length = finger_base[digit]
-        fingers.append(
-            f'''<body name="{digit}_proximal" pos="{x_pos} {y} {z}" euler="0 0 {yaw}">
-              <joint name="{digit}_proximal_flex" type="hinge" axis="1 0 0" range="-70 75" damping="0.12" armature="0.0003"/>
-              <geom name="{digit}_proximal_collider" type="capsule" fromto="0 0 0 0 {segment} 0" size="0.0085" mass="0.010" friction="1.8 0.02 0.002" contype="2" conaffinity="1" solref="0.008 1" solimp="0.95 0.99 0.001" rgba="0.8 0.55 0.42 0"/>
-              <body name="{digit}_middle" pos="0 {segment} 0">
-                <joint name="{digit}_middle_flex" type="hinge" axis="1 0 0" range="-70 80" damping="0.10" armature="0.0002"/>
-                <geom name="{digit}_middle_collider" type="capsule" fromto="0 0 0 0 {middle_length} 0" size="0.0075" mass="0.008" friction="1.8 0.02 0.002" contype="2" conaffinity="1" solref="0.008 1" solimp="0.95 0.99 0.001" rgba="0.8 0.55 0.42 0"/>
-                <body name="{digit}_distal" pos="0 {middle_length} 0">
-                  <joint name="{digit}_distal_flex" type="hinge" axis="1 0 0" range="-70 85" damping="0.08" armature="0.00015"/>
-                  <geom name="{digit}_distal_collider" type="capsule" fromto="0 0 0 0 0.017 0" size="0.0065" mass="0.006" friction="1.8 0.02 0.002" contype="2" conaffinity="1" solref="0.008 1" solimp="0.95 0.99 0.001" rgba="0.8 0.55 0.42 0"/>
-                  <site name="{digit}_touch" pos="0 0.015 0" size="0.005"/>
-                </body>
-              </body>
-            </body>'''
-        )
-        for part, ratio in (("proximal", 1.0), ("middle", 0.82), ("distal", 0.68)):
-            actuators.append(f'<position name="{digit}_{part}_motor" joint="{digit}_{part}_flex" kp="8" kv="0.35" ctrlrange="-1.5 1.4" forcerange="-2.2 2.2"/>')
-        sensors.append(f'<touch name="{digit}_touch_sensor" site="{digit}_touch"/>')
-    return f'''<mujoco model="unity_mujoco_child_gate">
-      <compiler angle="degree" autolimits="true"/>
-      <option timestep="{1 / config['clock']['physics_hz']:.16f}" gravity="0 0 -9.81" integrator="implicitfast" iterations="100" ls_iterations="20" cone="elliptic"/>
-      <size nconmax="300" njmax="1200"/>
-      <default><joint limited="true" damping="1.0"/><geom condim="6" margin="0.0005"/></default>
-      <worldbody>
-        <geom name="floor" type="plane" size="3 3 0.1" rgba="0.35 0.24 0.16 1" friction="1.2 0.02 0.002"/>
-        <geom name="table" type="box" pos="0.10 0.43 0.31" size="0.65 0.38 0.31" rgba="0.42 0.24 0.12 1" friction="1.3 0.02 0.002"/>
-        <body name="torso" pos="0 0 0.73">
-          <joint name="torso_pitch" type="hinge" axis="1 0 0" range="-18 18" damping="4" armature="0.03"/>
-          <geom name="torso_proxy" type="capsule" fromto="0 0 0 0 0 0.30" size="0.11" mass="8" contype="0" conaffinity="0" rgba="0 0 0 0"/>
-          <body name="neck" pos="0 0 0.31"><joint name="neck_pitch" type="hinge" axis="1 0 0" range="-35 30" damping="1.5"/><inertial pos="0 0 0.03" mass="0.08" diaginertia="0.0002 0.0002 0.0002"/>
-            <body name="head" pos="0 0 0.07"><joint name="head_yaw" type="hinge" axis="0 0 1" range="-55 55" damping="1.5"/>
-              <geom name="head_proxy" type="sphere" size="0.09" mass="2" contype="0" conaffinity="0" rgba="0 0 0 0"/>
-              <site name="imu_site" pos="0 0.015 0.015" size="0.004"/>
-              <camera name="child_camera" pos="0 0.096 0.014" xyaxes="1 0 0 0 0 1" fovy="{config['camera']['vertical_fov_deg']}"/>
-            </body>
-          </body>
-        </body>
-        <body name="shoulder_chain" pos="0.16 0 0.98">
-          <joint name="shoulder_pitch" axis="1 0 0" range="-80 100" damping="2"/>
-          <joint name="shoulder_yaw" axis="0 0 1" range="-70 70" damping="2"/>
-          <geom name="upperarm_proxy" type="capsule" fromto="0 0 0 0 0.16 -0.11" size="0.035" mass="0.35" contype="0" conaffinity="0" rgba="0 0 0 0"/>
-          <body name="elbow_chain" pos="0 0.16 -0.11"><joint name="elbow_flex" axis="1 0 0" range="0 145" damping="1.5"/>
-            <geom name="forearm_proxy" type="capsule" fromto="0 0 0 0 0.15 -0.08" size="0.029" mass="0.25" contype="0" conaffinity="0" rgba="0 0 0 0"/>
-          </body>
-        </body>
-        <body name="wrist_guide" pos="0.16 0.10 0.72">
-          <joint name="wrist_x" type="slide" axis="1 0 0" range="-0.13 0.13" damping="18" armature="0.08"/>
-          <joint name="wrist_y" type="slide" axis="0 1 0" range="0 0.36" damping="18" armature="0.08"/>
-          <joint name="wrist_z" type="slide" axis="0 0 1" range="-0.10 0.18" damping="18" armature="0.08"/>
-          <joint name="wrist_roll" type="hinge" axis="0 1 0" range="-35 35" damping="1.5" armature="0.01"/>
-          <geom name="palm_collider" type="box" pos="0 0.025 0" size="0.045 0.035 0.025" mass="0.10" friction="1.5 0.02 0.002" contype="4" conaffinity="1" rgba="0 0 0 0"/>
-          <site name="palm_touch" pos="0 0.014 0" size="0.009"/>
-          {''.join(fingers)}
-        </body>
-        <body name="red_toy_001" pos="{x} 0.43 {0.62 + half[2] + 0.0002}">
-          <freejoint name="red_toy_free"/>
-          <geom name="red_toy_001_geom" type="box" size="{half[0]} {half[1]} {half[2]}" mass="{mass}" friction="{friction[0]} {friction[1]} {friction[2]}" solref="0.006 1" solimp="0.97 0.995 0.001" rgba="0.9 0.03 0.02 1"/>
-        </body>
-        <body name="blue_distractor" pos="-0.20 0.40 0.655"><geom type="sphere" size="0.035" mass="0" rgba="0.05 0.2 0.8 1"/></body>
-        <body name="yellow_distractor" pos="0.32 0.49 0.655"><geom type="box" size="0.03 0.03 0.035" mass="0" rgba="0.95 0.75 0.05 1"/></body>
-      </worldbody>
-      <actuator>
-        <position name="torso_motor" joint="torso_pitch" kp="180" kv="20" forcerange="-80 80"/>
-        <position name="neck_motor" joint="neck_pitch" kp="80" kv="10" forcerange="-25 25"/>
-        <position name="head_motor" joint="head_yaw" kp="65" kv="8" forcerange="-18 18"/>
-        <position name="shoulder_pitch_motor" joint="shoulder_pitch" kp="45" kv="5" forcerange="-20 20"/>
-        <position name="shoulder_yaw_motor" joint="shoulder_yaw" kp="45" kv="5" forcerange="-20 20"/>
-        <position name="elbow_motor" joint="elbow_flex" kp="35" kv="4" forcerange="-15 15"/>
-        <position name="wrist_x_motor" joint="wrist_x" kp="900" kv="55" forcerange="-120 120"/>
-        <position name="wrist_y_motor" joint="wrist_y" kp="900" kv="55" forcerange="-120 120"/>
-        <position name="wrist_z_motor" joint="wrist_z" kp="900" kv="55" forcerange="-120 120"/>
-        <position name="wrist_roll_motor" joint="wrist_roll" kp="35" kv="4" forcerange="-10 10"/>
-        {''.join(actuators)}
-      </actuator>
-      <sensor>
-        {''.join(sensors)}
-        <touch name="palm_touch_sensor" site="palm_touch"/>
-        <accelerometer name="head_accelerometer" site="imu_site"/>
-        <gyro name="head_gyroscope" site="imu_site"/>
-        <framepos name="camera_parent_position" objtype="body" objname="head"/>
-        <framequat name="camera_parent_quaternion" objtype="body" objname="head"/>
-      </sensor>
-    </mujoco>'''
-
-
-@dataclass
-class Run:
-    model: mujoco.MjModel
-    data: mujoco.MjData
-    joint_qpos: dict[str, int]
-    actuator: dict[str, int]
-    body: dict[str, int]
-    geom: dict[str, int]
-    sensor: dict[str, slice]
-
-
-def make_run(xml: str) -> Run:
-    model = mujoco.MjModel.from_xml_string(xml)
-    data = mujoco.MjData(model)
-    joints = {mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_JOINT, i): int(model.jnt_qposadr[i]) for i in range(model.njnt)}
-    actuators = {mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_ACTUATOR, i): i for i in range(model.nu)}
-    bodies = {mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_BODY, i): i for i in range(model.nbody)}
-    geoms = {mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_GEOM, i): i for i in range(model.ngeom)}
-    sensors = {}
-    for i in range(model.nsensor):
-        name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_SENSOR, i)
-        start = int(model.sensor_adr[i]); sensors[name] = slice(start, start + int(model.sensor_dim[i]))
-    return Run(model, data, joints, actuators, bodies, geoms, sensors)
-
-
-def controls(run: Run, t: float, offset: float) -> np.ndarray:
-    a = np.zeros(run.model.nu)
-    def setc(name: str, value: float) -> None: a[run.actuator[name]] = value
-    look = smooth(0.25, 2.4, t)
-    away = smooth(21.0, 21.8, t)
-    setc("torso_motor", np.deg2rad(-5 - 10 * smooth(2.0, 5.0, t) + 12 * away))
-    setc("neck_motor", np.deg2rad(-8 - 15 * look + 18 * away))
-    setc("head_motor", np.deg2rad(-18 + 24 * look - 38 * away))
-    setc("shoulder_pitch_motor", np.deg2rad(12 + 30 * smooth(3, 6.5, t) - 25 * smooth(19.5, 21, t)))
-    setc("shoulder_yaw_motor", np.deg2rad(-8 + 18 * smooth(3, 6.5, t)))
-    setc("elbow_motor", np.deg2rad(55 - 22 * smooth(3, 6.5, t) + 18 * smooth(19.5, 21, t)))
-    reach = smooth(3.0, 6.4, t)
-    withdraw = smooth(19.6, 21.0, t)
-    lift = smooth(10.0, 11.8, t) * (1 - smooth(17.0, 19.0, t))
-    setc("wrist_x_motor", (-0.060 + offset) * reach * (1 - withdraw))
-    setc("wrist_y_motor", 0.242 * reach * (1 - withdraw))
-    setc("wrist_z_motor", (-0.037 * reach + 0.100 * lift) * (1 - withdraw))
-    roll = np.deg2rad(25) * smooth(14.0, 15.2, t) * (1 - smooth(16.0, 17.0, t))
-    setc("wrist_roll_motor", roll)
-    close = smooth(6.4, 9.1, t) * (1 - smooth(18.85, 19.45, t))
-    for digit in DIGITS:
-        open_angle = np.deg2rad(58)
-        closed_angle = np.deg2rad(-28)
-        base = open_angle + (closed_angle - open_angle) * close
-        for part, ratio in (("proximal", 1.0), ("middle", 0.82), ("distal", 0.68)):
-            setc(f"{digit}_{part}_motor", base * ratio)
-    return a
-
-
-def contact_rows(run: Run) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, set[str], float]:
-    points = np.full((len(DIGITS) + 1, 3), np.nan)
-    normals = np.full_like(points, np.nan)
-    forces = np.zeros_like(points)
-    impulses = np.zeros(len(DIGITS) + 1)
-    target_geom = run.geom["red_toy_001_geom"]
-    hit: set[str] = set()
-    max_pen = 0.0
-    names = list(DIGITS) + ["palm"]
-    geom_to_slot = {
-        run.geom[f"{digit}_{part}_collider"]: slot
-        for slot, digit in enumerate(DIGITS)
-        for part in ("proximal", "middle", "distal")
-    }
-    geom_to_slot[run.geom["palm_collider"]] = len(DIGITS)
-    for ci in range(run.data.ncon):
-        con = run.data.contact[ci]
-        if target_geom not in (con.geom1, con.geom2): continue
-        other = con.geom2 if con.geom1 == target_geom else con.geom1
-        if other not in geom_to_slot: continue
-        slot = geom_to_slot[other]
-        wrench = np.zeros(6); mujoco.mj_contactForce(run.model, run.data, ci, wrench)
-        points[slot] = con.pos
-        normal = con.frame[:3].copy()
-        if con.geom2 == target_geom: normal *= -1
-        normals[slot] = normal
-        forces[slot] = normal * abs(wrench[0])
-        impulses[slot] += abs(wrench[0]) * run.model.opt.timestep
-        hit.add(names[slot]); max_pen = max(max_pen, max(0.0, -float(con.dist)))
-    return points, normals, forces, impulses, hit, max_pen
-
-
-def execute(config: dict[str, Any], cell: dict[str, Any]) -> tuple[dict[str, np.ndarray], dict[str, Any], str]:
-    xml = model_xml(config, cell)
-    run = make_run(xml)
-    for digit in DIGITS:
-        open_angle = np.deg2rad(58)
-        for part, ratio in (("proximal", 1.0), ("middle", 0.82), ("distal", 0.68)):
-            run.data.qpos[run.joint_qpos[f"{digit}_{part}_flex"]] = open_angle * ratio
-    dt = float(run.model.opt.timestep)
-    n = int(config["clock"]["physics_steps"]) + 1
-    target_body = run.body["red_toy_001"]
-    head_body = run.body["head"]
-    wrist_body = run.body["wrist_guide"]
-    cam_id = mujoco.mj_name2id(run.model, mujoco.mjtObj.mjOBJ_CAMERA, "child_camera")
-    streams: dict[str, list[Any]] = {k: [] for k in (
-        "time_s phase qpos qvel actuator_command actuator_force target_pose target_velocity wrist_pose head_pose camera_pose camera_parent_pose digit_segment_pose head_accel head_gyro contact_points contact_normals contact_forces contact_impulses contact_digits support_contact target_support_penetration finger_object_penetration recovery_state assist_active".split()
-    )}
-    target_start = None
-    all_hit: set[str] = set()
-    max_pen = 0.0
-    support_first_after_release = None
-    for step in range(n):
-        t = step * dt
-        run.data.ctrl[:] = controls(run, t, float(cell["target_lateral_offset_m"]))
-        if step > 0: mujoco.mj_step(run.model, run.data)
-        else: mujoco.mj_forward(run.model, run.data)
-        if target_start is None: target_start = run.data.xpos[target_body].copy()
-        points, normals, forces, impulses, hit, penetration = contact_rows(run)
-        all_hit |= hit; max_pen = max(max_pen, penetration)
-        support = False; support_pen = 0.0
-        for ci in range(run.data.ncon):
-            con = run.data.contact[ci]
-            if run.geom["red_toy_001_geom"] in (con.geom1, con.geom2) and run.geom["table"] in (con.geom1, con.geom2):
-                support = True; support_pen = max(support_pen, max(0.0, -float(con.dist)))
-        if t >= 18.8 and support and support_first_after_release is None: support_first_after_release = t
-        object_velocity = np.zeros(6); mujoco.mj_objectVelocity(run.model, run.data, mujoco.mjtObj.mjOBJ_BODY, target_body, object_velocity, 0)
-        camera_rotation = run.data.cam_xmat[cam_id].reshape(3, 3)
-        camera_pose = np.concatenate((run.data.cam_xpos[cam_id], camera_rotation.reshape(-1)))
-        parent_pose = np.concatenate((run.data.xpos[head_body], run.data.xquat[head_body]))
-        streams["time_s"].append(t); streams["phase"].append(phase_at(min(t, 21.999999), config["phases"]))
-        streams["qpos"].append(run.data.qpos.copy()); streams["qvel"].append(run.data.qvel.copy())
-        streams["actuator_command"].append(run.data.ctrl.copy()); streams["actuator_force"].append(run.data.actuator_force.copy())
-        streams["target_pose"].append(np.concatenate((run.data.xpos[target_body], run.data.xquat[target_body])))
-        streams["target_velocity"].append(object_velocity.copy())
-        streams["wrist_pose"].append(np.concatenate((run.data.xpos[wrist_body], run.data.xquat[wrist_body])))
-        streams["head_pose"].append(np.concatenate((run.data.xpos[head_body], run.data.xquat[head_body])))
-        streams["camera_pose"].append(camera_pose); streams["camera_parent_pose"].append(parent_pose)
-        streams["digit_segment_pose"].append(np.asarray([
-            np.concatenate((run.data.xpos[run.body[f"{digit}_{part}"]], run.data.xquat[run.body[f"{digit}_{part}"]]))
-            for digit in DIGITS for part in ("proximal", "middle", "distal")
-        ]))
-        streams["head_accel"].append(run.data.sensordata[run.sensor["head_accelerometer"]].copy())
-        streams["head_gyro"].append(run.data.sensordata[run.sensor["head_gyroscope"]].copy())
-        streams["contact_points"].append(points); streams["contact_normals"].append(normals); streams["contact_forces"].append(forces); streams["contact_impulses"].append(impulses)
-        streams["contact_digits"].append(len(hit)); streams["support_contact"].append(support)
-        streams["target_support_penetration"].append(support_pen); streams["finger_object_penetration"].append(penetration)
-        streams["recovery_state"].append(0); streams["assist_active"].append(False)
-    arrays = {k: np.asarray(v) for k, v in streams.items()}
-    z = arrays["target_pose"][:, 2]
-    lift = float(np.max(z) - target_start[2])
-    # Quaternion angular displacement relative to the grasp pose.
-    grasp_i = int(round(10.0 / dt)); q0 = arrays["target_pose"][grasp_i, 3:]
-    dots = np.clip(np.abs(arrays["target_pose"][:, 3:] @ q0), 0, 1)
-    rotation = float(np.degrees(2 * np.arccos(dots)).max())
-    release_slice = arrays["target_velocity"][int(20 / dt):, 3:]
-    settled_speed = float(np.linalg.norm(release_slice, axis=1).max())
-    required = set(config["frozen_tolerances"]["required_digits"])
-    qa = {
-        "cell": cell["id"], "physics_steps": n - 1, "truth_samples": n,
-        "first_contact_s": float(arrays["time_s"][np.flatnonzero(arrays["contact_digits"] > 0)[0]]) if np.any(arrays["contact_digits"] > 0) else None,
-        "contact_digits_seen": sorted(all_hit), "required_contact_graph_met": required <= all_hit,
-        "maximum_simultaneous_contact_digits": int(arrays["contact_digits"].max()),
-        "lift_m": lift, "manipulation_deg": rotation, "support_contact_after_release_s": support_first_after_release,
-        "settled_max_linear_speed_m_s_after_20s": settled_speed,
-        "finger_object_penetration_max_m": max_pen,
-        "target_support_penetration_max_m": float(arrays["target_support_penetration"].max()),
-        "assist_frames": int(arrays["assist_active"].sum()), "recovery_frames": int(np.count_nonzero(arrays["recovery_state"])),
-        "object_free_joint": True, "object_pose_writes_after_initialization": 0,
-        "attachments_equalities_external_forces": 0
-    }
-    tol = config["frozen_tolerances"]
-    qa["passed"] = bool(
-        qa["required_contact_graph_met"] and qa["maximum_simultaneous_contact_digits"] >= tol["minimum_distinct_support_digits"]
-        and tol["minimum_lift_m"] <= lift <= tol["maximum_lift_m"] + 0.015
-        and rotation >= tol["minimum_manipulation_deg"]
-        and support_first_after_release is not None and settled_speed < 0.08
-        and max_pen <= tol["finger_object_penetration_max_m"]
-        and qa["target_support_penetration_max_m"] <= tol["target_support_penetration_max_m"]
-        and qa["assist_frames"] == 0
-    )
-    return arrays, qa, xml
-
-
-def trace_projection(arrays: dict[str, np.ndarray], config: dict[str, Any], model: mujoco.MjModel) -> dict[str, Any]:
-    indices = np.arange(0, int(config["clock"]["physics_steps"]), config["clock"]["steps_per_frame"])
-    frames = []
-    for frame, i in enumerate(indices):
-        frames.append({
-            "frame": int(frame), "truth_index": int(i), "time_s": float(arrays["time_s"][i]), "phase": str(arrays["phase"][i]),
-            "qpos": arrays["qpos"][i].tolist(), "wrist_pose_mj": arrays["wrist_pose"][i].tolist(),
-            "head_pose_mj": arrays["head_pose"][i].tolist(), "camera_pose_mj": arrays["camera_pose"][i].tolist(),
-            "target_pose_mj": arrays["target_pose"][i].tolist(), "contact_points_mj": arrays["contact_points"][i].tolist(),
-            "digit_segment_pose_mj": arrays["digit_segment_pose"][i].reshape(-1).tolist(),
-            "contact_digits": int(arrays["contact_digits"][i]), "support_contact": bool(arrays["support_contact"][i])
-        })
-    joint_names = [mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_JOINT, i) for i in range(model.njnt)]
-    return {"schema": "embodied.unity_trace_projection.v1", "physics_hz": 240, "render_hz": 30, "steps_per_frame": 8, "joint_names": joint_names, "digit_segment_names": [f"{d}_{p}" for d in DIGITS for p in ("proximal", "middle", "distal")], "frames": frames}
-
-
-def run_gate(config_path: Path, output: Path, stage: str) -> None:
-    config = json.loads(config_path.read_text())
-    output.mkdir(parents=True, exist_ok=True)
-    cells = config["robustness_cells"] if stage == "all" else config["robustness_cells"][:1]
-    if stage == "no_object":
-        cells = [{"id": "dynamic_registration_no_object", "target_lateral_offset_m": 0.0, "mass_scale": 1.0, "friction_scale": 1.0, "no_object": True}]
-    results = []
-    for cell in cells:
-        cell_dir = output / cell["id"]; cell_dir.mkdir(exist_ok=True)
-        arrays, qa, xml = execute(config, cell)
-        np.savez_compressed(cell_dir / "authoritative_trace.npz", **arrays)
-        replay, replay_qa, _ = execute(config, cell)
-        max_error = max(float(np.max(np.abs(arrays[k] - replay[k]))) for k in arrays if arrays[k].dtype.kind in "fiu" and arrays[k].size)
-        qa["replay_numeric_max_abs"] = max_error; qa["replay_qa_equal"] = qa == replay_qa | {"replay_numeric_max_abs": max_error, "replay_qa_equal": True} if False else all(qa.get(k) == replay_qa.get(k) for k in replay_qa)
-        projection = trace_projection(arrays, config, make_run(xml).model)
-        (cell_dir / "render_trace.json").write_bytes(canonical_json(projection))
-        (cell_dir / "model.xml").write_text(xml)
-        (cell_dir / "physics_qa.json").write_bytes(canonical_json(qa))
-        results.append(qa)
-    summary = {"schema": "embodied.unity_mujoco_gate_results.v1", "cells": results, "passed_cells": sum(bool(x["passed"]) for x in results)}
-    (output / "gate_results.json").write_bytes(canonical_json(summary))
-    provenance = {
-        "mujoco": mujoco.__version__, "numpy": np.__version__, "python": platform.python_version(), "platform": platform.platform(),
-        "config_sha256": sha256(config_path), "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
-        "privacy": "public/synthetic only; restricted ChildLens media not accessed"
-    }
-    (output / "runtime_receipt.json").write_bytes(canonical_json(provenance))
+    missing = sorted(required - names)
+    if missing:
+        raise ValueError(f"rest manifest is missing required retained bones: {missing}")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=Path, default=Path("configs/embodied_simulation_unity_mujoco_gate.json"))
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--stage", choices=("nominal", "no_object", "all"), default="nominal")
-    parser.add_argument("--rest-manifest", type=Path)
-    parser.add_argument("--manipulation", action="store_true")
+    parser.add_argument("--rest-manifest", type=Path, required=True)
+    modes = parser.add_mutually_exclusive_group(required=True)
+    modes.add_argument("--registration", action="store_true", help="Run manifest-derived no-object registration")
+    modes.add_argument("--manipulation", action="store_true", help="Run manifest-derived tactile manipulation gate")
     args = parser.parse_args()
-    if args.rest_manifest: manifest_registration(args.rest_manifest, args.output, args.manipulation)
-    else: run_gate(args.config, args.output, args.stage)
+    validate_rest_manifest(args.rest_manifest)
+    manifest_registration(args.rest_manifest, args.output, manipulation=args.manipulation)
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()
