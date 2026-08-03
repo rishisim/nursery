@@ -1077,8 +1077,13 @@ localized, genuinely order-dependent public actions: open/close, take/put,
 sit-down/stand-up, and turn-on/turn-off.
 
 The learner-effective unit is one tuple whose German audio passes the frozen
-shared adapter and whose exact accepted English text and word timestamps are
-paired with an in-bounds utterance-centered video window. An adapter abstention
+shared adapter and whose exact accepted English text and accepted ASR segment
+bounds are paired with an in-bounds utterance-centered video window. OPUS-MT
+does not align individual English translation tokens back to German word
+timestamps, so all noun/adjective mentions in a translation share the accepted
+segment midpoint and before/during/after interval; no English-token timestamp
+is fabricated. This executable clarification was committed before any new
+fixture, C, generator, or synthetic learner outcome. An adapter abstention
 contributes no tuple, lexical exposure, recurrence, or credited duration. The
 seven frozen axes are adapter-qualified yield; noun/adjective exposure;
 utterance-centered referent visibility, dominance, and ambiguity;
@@ -1143,7 +1148,8 @@ bins using public words. Generated attempts and the accepted corpus are
 measured separately; all critical axes and at least six axes total must meet
 the frozen TV/Wasserstein tolerances, with no severe registered joint miss.
 
-The amendment commitment is `fed6a3dc…4222`. Its bounded qualification route
+The active amendment commitment is `c9a48206…adaf`; the pre-clarification
+commitment `fed6a3dc…4222` remains in Git history. Its bounded qualification route
 uses one H100 80GB process: at most 1 GPU-hour for blind sizing, 6 GPU-hours for
 public development plus holdout, and—only after public and human-transfer
 passes—8 GPU-hours for governed C, for a 15 GPU-hour aggregate ceiling, 200 GiB

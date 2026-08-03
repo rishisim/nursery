@@ -215,7 +215,7 @@ def test_tuple_amendment_commitment_and_axis_guards_reject_mutation() -> None:
     config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     amendment = MODULE._tuple_amendment(config)
     assert amendment["amendment_commitment_sha256"] == (
-        "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222"
+        "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf"
     )
     config["calibration_C"]["extractor"]["mechanistic_training_tuple_amendment"][
         "axes"

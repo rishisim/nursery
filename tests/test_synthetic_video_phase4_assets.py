@@ -115,7 +115,8 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert tuple_amendment["public_outcomes_opened_after_amendment"] is False
     assert tuple_amendment["governed_C_reopened_after_amendment"] is False
     assert tuple_amendment["generator_or_synthetic_learner_outcome_opened"] is False
-    assert tuple_amendment["amendment_commitment_sha256"] == "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222"
+    assert tuple_amendment["prior_pre_clarification_amendment_commitment_sha256"] == "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222"
+    assert tuple_amendment["amendment_commitment_sha256"] == "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf"
     assert result["governed_C_calibration"]["critical_axis_failure"] == "audiovisual_grounding_opportunity_high_missingness"
     assert result["governed_C_calibration"]["provisional_episode_plan_executable"] is False
     repair = result["governed_C_calibration_extractor_repair"]

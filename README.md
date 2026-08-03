@@ -188,7 +188,10 @@ egocentric sensor regime. Broad activity/context is descriptive only, and
 temporal sensitivity is tested only on localized inverse actions whose labels
 depend on order. Schema 11 freezes the modular public gates, one-applicant
 governed C transfer audit, missingness/matching rules, and one-H100 resource
-ceiling before any new outcome. Its commitment is `fed6a3dc…4222`. Public
+ceiling before any new outcome. An implementation clarification anchors English
+mentions to their accepted translation segment because OPUS-MT emits no
+English-token alignment; no timestamp is fabricated. The active commitment is
+`c9a48206…adaf`. Public
 qualification is the only currently authorized execution stage; C measurement,
 LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
 and descriptive-only claim boundary are unchanged.

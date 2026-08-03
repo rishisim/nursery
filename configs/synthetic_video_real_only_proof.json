@@ -897,13 +897,20 @@
           "broad_activity_checkpoint_public_development_no_go_e11727dd309a01ee820264ff18afee33cf56b83fa2449301ce1be6e12670c29d"
         ],
         "known_before_freeze": "the four no-gos above, the corrected common-asset seals, and the sealed Real-1h result; no new public tuple-fixture output, C tuple measurement, generator outcome, synthetic corpus, or synthetic learner score",
-        "unit": "one adapter-qualified learner tuple consisting of the exact accepted English learner text, word timestamps, and a fixed utterance-centered video window; abstained material contributes no tuple, lexical exposure, recurrence, or credited duration",
+        "unit": "one adapter-qualified learner tuple consisting of the exact accepted English learner text, its accepted German ASR segment bounds and word-timestamp envelope, and a fixed utterance-centered video window; abstained material contributes no tuple, lexical exposure, recurrence, or credited duration",
+        "pre_outcome_implementation_clarification": {
+          "timing": "after the first amendment commit and before any new public tuple-fixture output C measurement generator outcome synthetic corpus or synthetic learner score",
+          "reason": "the frozen OPUS-MT adapter emits one English translation per accepted German ASR segment and does not provide English-token-to-German-word alignment",
+          "correction": "anchor every noun and adjective found in the exact English learner text to the accepted segment midpoint and use the accepted segment start/end as the during interval; do not fabricate per-English-word timestamps",
+          "scientific_effect": "none on the learner input question axes gates or thresholds; this makes the registered utterance-centered semantics executable and explicit",
+          "resource_only_download_under_prior_commitment": "may finish atomically but cannot authorize inference; artifact bytes are reverified under this active commitment before use"
+        },
         "tuple_window": {
-          "anchor": "word_timestamp_midpoint_for_each_noun_or_adjective_mention",
-          "before_seconds": [-3.0, 0.0],
-          "during": "word_start_through_word_end",
-          "after_seconds": [0.0, 3.0],
-          "sample_offsets_from_word_midpoint_seconds": [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0],
+          "anchor": "accepted_ASR_translation_segment_midpoint_shared_by_every_noun_or_adjective_mention_in_that_exact_English_learner_text",
+          "before": "three_seconds_before_accepted_segment_start_through_segment_start",
+          "during": "accepted_segment_start_through_accepted_segment_end",
+          "after": "accepted_segment_end_through_three_seconds_after_segment_end",
+          "sample_offsets": "three equally spaced in-bounds samples in each of before during and after; boundary samples are not duplicated",
           "minimum_in_bounds_sample_fraction": 0.8,
           "edge_rule": "abstain rather than pad or repeat if fewer than 80 percent of requested samples are in bounds",
           "independent_episode_rule": "recording boundary or a gap of at least 30 seconds between accepted tuple windows",
@@ -1090,7 +1097,7 @@
           "LTX_generation_resources": "remain separately gated by the existing final-topology preflight and exact one-hour production ceiling"
         },
         "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
-        "amendment_commitment_sha256": "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222"
+        "amendment_commitment_sha256": "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf"
       },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},

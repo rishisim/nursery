@@ -155,7 +155,7 @@ commitment is `3cc29f32…e46e`; the original commitments above remain
 provisional/superseded. Later exploratory real-only runs and four preserved
 calibration no-gos are recorded in the canonical preregistration and compact
 Phase 4 result. Schema 11 now freezes a distinct mechanistic training-tuple
-calibration amendment at commitment `fed6a3dc…4222`. Only its public
+calibration amendment at commitment `c9a48206…adaf`. Only its public
 qualification is presently authorized. Governed C measurement requires that
 pass, and LTX generation remains further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is

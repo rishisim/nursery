@@ -332,7 +332,9 @@
     "public_outcomes_opened_after_amendment": false,
     "governed_C_reopened_after_amendment": false,
     "generator_or_synthetic_learner_outcome_opened": false,
-    "amendment_commitment_sha256": "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222",
+    "pre_outcome_implementation_clarification": "English noun and adjective mentions share their accepted ASR-translation segment timing because OPUS-MT supplies no English-token alignment; no per-English-word timestamp is fabricated",
+    "prior_pre_clarification_amendment_commitment_sha256": "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222",
+    "amendment_commitment_sha256": "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf",
     "next_gate": "implement and qualify the frozen modular extractors on task-matched public development and sealed holdout fixtures"
   },
   "governed_C_activity_checkpoint_safe_load_repair": {
