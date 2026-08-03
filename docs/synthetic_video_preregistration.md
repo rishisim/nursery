@@ -1166,9 +1166,16 @@ attempts were engineering-only failures caused by missing container transport
 dependencies and opened no scientific outcome. The official MIT-licensed
 EgoHOS project distributes its checkpoint bundle, but that archive contains no
 separate license file; the eligibility record is limited to academic local
-prototype processing and makes no broader commercial-use claim. Exact local
-dependency installation, network-disabled reload, and label-blind sizing are
-the next gate; public development and holdout remain unopened.
+prototype processing and makes no broader commercial-use claim. At that point,
+exact local dependency installation, network-disabled reload, and label-blind
+sizing remained; public development and holdout were unopened.
+
+The exact 53-package overlay was then prepared successfully in 8 minutes 45
+seconds under runtime-manifest commitment `968f2570…1f10`. The preparation
+mounted no restricted data and executed no model. This is a resource-only
+runtime PASS, not extractor qualification; the next gate remains the
+network-disabled one-H100 reload of all seven axes plus the separate action
+control, with no labels, retained scores, or scientific metrics.
 
 Before that reload, the exact runtime overlay and six narrowly scoped
 compatibility adapters were frozen, then clarified before inference at active

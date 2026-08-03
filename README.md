@@ -192,8 +192,10 @@ ceiling before any new outcome. An implementation clarification anchors English
 mentions to their accepted translation segment because OPUS-MT emits no
 English-token alignment; no timestamp is fabricated. The active commitment is
 `c9a48206…adaf`. The public artifact subgate passed at `8c787a01…b527`
-without model inference or a restricted mount; local-reload sizing and modular
-public qualification are next. The exact local overlay and compatibility
+without model inference or a restricted mount. The exact 53-package overlay
+then passed preparation at `968f2570…1f10`, also without inference or a
+restricted mount; label-blind local-reload sizing and modular public
+qualification are next. The exact local overlay and compatibility
 surface were frozen beforehand at active commitment `c59a81f4…0acc`; no model substitution or
 gate change is involved. C measurement,
 LTX generation, and Synthetic-1h training remain conditional. The one-hour cap

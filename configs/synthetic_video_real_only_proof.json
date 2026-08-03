@@ -1,6 +1,6 @@
 {
   "schema_version": 11,
-  "status": "MECHANISTIC_TRAINING_TUPLE_ARTIFACT_GATE_PASS_PENDING_LOCAL_RELOAD_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
+  "status": "MECHANISTIC_TRAINING_TUPLE_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -70,7 +70,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_ARTIFACT_GATE_PASS_PENDING_LOCAL_RELOAD_AND_PUBLIC_QUALIFICATION",
+    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -1242,6 +1242,24 @@
         "failure_rule": "ordinary dependency or documented minimal compatibility defects may be repaired in this canonical runtime before public outcomes; inability to run any frozen component locally within this runtime gate is a premodel no-go and no model may be substituted",
         "runtime_amendment_commitment_scope": "canonical JSON of this runtime amendment excluding runtime_amendment_commitment_sha256",
         "runtime_amendment_commitment_sha256": "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc"
+      },
+      "mechanistic_training_tuple_runtime_preparation_result": {
+        "status": "PASS_RUNTIME_READY_LOCAL_RELOAD_BLIND_SIZING_PENDING",
+        "job_id": 313843,
+        "elapsed": "00:08:45",
+        "dependency_count": 53,
+        "dependency_artifact_count": 53,
+        "installed_distribution_count": 53,
+        "additional_repository_count": 1,
+        "additional_model_file_count": 6,
+        "mechanistic_amendment_commitment_sha256": "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf",
+        "runtime_amendment_commitment_sha256": "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc",
+        "base_dependency_manifest_commitment_sha256": "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527",
+        "runtime_dependency_commitment_sha256": "968f2570ffd8d325a12e2bd6058cc8ab31fb99f1d50b30607419f6da20c81f10",
+        "restricted_mount_present": false,
+        "model_inference_executed": false,
+        "external_model_call_count": 0,
+        "validity": "resource and immutable-runtime preparation only; it authorizes the committed label-blind local reload sizing but is not a public extractor pass"
       },
       "mechanistic_training_tuple_public_fixture_protocol": {
         "status": "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES",

@@ -163,8 +163,10 @@ archives, and ten weight/resource files (14.62 GB), without model inference or
 a restricted mount. The EgoHOS bundle is distributed by the official
 MIT-licensed project but contains no separate archive license file; this record
 asserts academic local prototype use only and no broader license conclusion.
-Local-files-only reload and blind sizing remain pending. Governed C measurement requires that
-pass, and LTX generation remains further conditional and capped at exactly one
+The 53-package runtime overlay then passed resource-only preparation at
+commitment `968f2570…1f10`, with neither a restricted mount nor model
+inference. Local-files-only model reload and blind sizing remain pending.
+Governed C measurement requires that pass, and LTX generation remains further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is
 authorized.
 
