@@ -1172,9 +1172,11 @@ the next gate; public development and holdout remain unopened.
 
 Before that reload, the exact runtime overlay and six narrowly scoped
 compatibility adapters were frozen, then clarified before inference at active
-commitment `6c3c76e3…dec1` (the pre-clarification `adcac3fc…b285` remains in
-Git history). Seven calibration axes plus the separate blocking order-action
-control require eight sizing modules. They retain
+commitment `c59a81f4…0acc` (the earlier `adcac3fc…b285` and
+`6c3c76e3…dec1` commitments remain in Git history). One clarification records
+that seven calibration axes plus the separate blocking order-action control
+require eight sizing modules; the other pins the PE-Core loader's required
+`einops==0.8.0`. They retain
 the seven registered models. Grounding DINO uses its own commit's official
 pure-PyTorch deformable-attention fallback because the base container has no
 compiler; SAM 2 disables its officially optional CUDA extension; and the

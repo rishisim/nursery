@@ -1167,6 +1167,7 @@
           "certifi": "2024.2.2",
           "charset-normalizer": "3.3.2",
           "click": "8.1.7",
+          "einops": "0.8.0",
           "filelock": "3.14.0",
           "ftfy": "6.2.0",
           "fsspec": "2024.5.0",
@@ -1240,7 +1241,7 @@
         },
         "failure_rule": "ordinary dependency or documented minimal compatibility defects may be repaired in this canonical runtime before public outcomes; inability to run any frozen component locally within this runtime gate is a premodel no-go and no model may be substituted",
         "runtime_amendment_commitment_scope": "canonical JSON of this runtime amendment excluding runtime_amendment_commitment_sha256",
-        "runtime_amendment_commitment_sha256": "6c3c76e3c5661255dba0131f9b20c6d4daf3b994a8e8c9013bbddbc8213ddec1"
+        "runtime_amendment_commitment_sha256": "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc"
       },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},

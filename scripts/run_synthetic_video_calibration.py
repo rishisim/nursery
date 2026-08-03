@@ -287,7 +287,7 @@ def _tuple_runtime_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(expected, str) or digest(copy) != expected:
         raise RuntimeError("E_TUPLE_RUNTIME_COMMITMENT")
     dependencies = value.get("dependency_versions")
-    if not isinstance(dependencies, dict) or len(dependencies) != 52:
+    if not isinstance(dependencies, dict) or len(dependencies) != 53:
         raise RuntimeError("E_TUPLE_RUNTIME_DEPENDENCY_SET")
     if value["local_reload_gate"].get(
         "all_seven_axes_and_order_dependent_action_control_must_pass"

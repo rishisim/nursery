@@ -233,9 +233,10 @@ def test_tuple_runtime_amendment_is_exact_and_rejects_mutation() -> None:
     config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     runtime = MODULE._tuple_runtime_amendment(config)
     assert runtime["runtime_amendment_commitment_sha256"] == (
-        "6c3c76e3c5661255dba0131f9b20c6d4daf3b994a8e8c9013bbddbc8213ddec1"
+        "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc"
     )
-    assert len(runtime["dependency_versions"]) == 52
+    assert len(runtime["dependency_versions"]) == 53
+    assert runtime["dependency_versions"]["einops"] == "0.8.0"
     assert runtime["local_reload_gate"][
         "all_seven_axes_and_order_dependent_action_control_must_pass"
     ] is True
