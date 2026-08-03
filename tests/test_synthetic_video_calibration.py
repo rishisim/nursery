@@ -291,6 +291,27 @@ def test_tuple_download_resumes_only_on_partial_content(
     assert target.read_bytes() == b"prefix" + payload
 
 
+def test_tuple_public_prep_pins_language_and_vision_resources() -> None:
+    import inspect
+
+    source = inspect.getsource(MODULE.prepare_tuple_public)
+    assert MODULE.NLTK_DATA_COMMIT == "550b6625bcef1f2abff2ff770a5a0d272c9c6b2a"
+    assert MODULE.NLTK_RESOURCE_ARCHIVES == {
+        "wordnet.zip": {
+            "relative_url": "packages/corpora/wordnet.zip",
+            "sha256": "cbda5ea6eef7f36a97a43d4a75f85e07fccbb4f23657d27b4ccbc93e2646ab59",
+        },
+        "averaged_perceptron_tagger_eng.zip": {
+            "relative_url": "packages/taggers/averaged_perceptron_tagger_eng.zip",
+            "sha256": "6025f530624335c67d6547d44757b357b4e79bae030a0383e9887a92c1718f0b",
+        },
+    }
+    assert 'filename="PE-Core-L14-336.pt"' in source
+    assert 'local_files_only=False' in source
+    assert '"nltk": "3.9.1"' in source
+    assert '"wordfreq": "3.0.2"' in source
+
+
 def test_activity_threshold_and_abstention_are_conservative_and_explicit() -> None:
     threshold = MODULE._choose_label_threshold([0.1, 0.2, 0.8, 0.9], [False, False, True, True])
     assert 0.2 < threshold < 0.8

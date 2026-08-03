@@ -162,6 +162,17 @@ TUPLE_PREP_FIELDS = frozenset(
     }
 )
 TUPLE_PREP_HASH_FIELDS = frozenset({"tuple_dependency_commitment_sha256"})
+NLTK_DATA_COMMIT = "550b6625bcef1f2abff2ff770a5a0d272c9c6b2a"
+NLTK_RESOURCE_ARCHIVES = {
+    "wordnet.zip": {
+        "relative_url": "packages/corpora/wordnet.zip",
+        "sha256": "cbda5ea6eef7f36a97a43d4a75f85e07fccbb4f23657d27b4ccbc93e2646ab59",
+    },
+    "averaged_perceptron_tagger_eng.zip": {
+        "relative_url": "packages/taggers/averaged_perceptron_tagger_eng.zip",
+        "sha256": "6025f530624335c67d6547d44757b357b4e79bae030a0383e9887a92c1718f0b",
+    },
+}
 ACTIVITY_AXIS = "activity_context_mixture"
 VISUAL_AXIS = "egocentric_visual_regime"
 SCENE_AXIS = "scene_complexity"
@@ -343,6 +354,8 @@ def _license_digest(repository: Path, expected: str) -> str:
 
 
 def prepare_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
+    from huggingface_hub import hf_hub_download
+
     cfg = json.loads(args.config.read_text())
     amendment = _tuple_amendment(cfg)
     prior_stack = cfg["calibration_C"]["extractor"][
@@ -428,13 +441,19 @@ def prepare_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
     archive_license_names = _safe_extract_zip(
         egohos_archive, model_root / "egohos-checkpoints"
     )
-    pe_matches = [
-        path
-        for path in (public / "models/pe-hf-home").rglob("model.safetensors")
-        if file_digest(path)
-        == cfg["calibration_C"]["extractor"]["vision_model"]["weights_sha256"]
-    ]
-    if len(pe_matches) != 1:
+    pe_cfg = cfg["calibration_C"]["extractor"]["vision_model"]
+    pe_home = public / "models/pe-hf-home"
+    pe_home.mkdir(parents=True, exist_ok=True, mode=0o700)
+    pe_path = Path(
+        hf_hub_download(
+            repo_id=pe_cfg["repository"],
+            filename="PE-Core-L14-336.pt",
+            revision=pe_cfg["revision"],
+            cache_dir=pe_home / "hub",
+            local_files_only=False,
+        )
+    )
+    if file_digest(pe_path) != pe_cfg["weights_sha256"]:
         raise RuntimeError("E_TUPLE_PE_CORE_WEIGHT")
     egohod_cfg = amendment["fixed_stack"]["temporal_action_control"]
     egohod_hash = re.search(r"SHA-256 ([0-9a-f]{64})", egohod_cfg)
@@ -442,37 +461,60 @@ def prepare_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
     if not egohod_hash or not egohod_file.is_file() or file_digest(egohod_file) != egohod_hash.group(1):
         raise RuntimeError("E_TUPLE_EGOHOD_WEIGHT")
     nltk_root = public / "models/nltk_data"
+    nltk_archives = model_root / "nltk-archives"
+    nltk_records = []
+    for name, resource in NLTK_RESOURCE_ARCHIVES.items():
+        path = nltk_archives / name
+        url = (
+            "https://raw.githubusercontent.com/nltk/nltk_data/"
+            f"{NLTK_DATA_COMMIT}/{resource['relative_url']}"
+        )
+        _download_public_artifact(url, path)
+        if file_digest(path) != resource["sha256"]:
+            raise RuntimeError("E_TUPLE_NLTK_RESOURCE_HASH")
+        _safe_extract_zip(path, nltk_root)
+        nltk_records.append(
+            {
+                "name": name,
+                "source": url,
+                "sha256": file_digest(path),
+                "bytes": path.stat().st_size,
+            }
+        )
     nltk_files = sorted(path for path in nltk_root.rglob("*") if path.is_file())
     if not nltk_files:
         raise RuntimeError("E_TUPLE_NLTK_RESOURCES")
     wheel_root = model_root / "wheels"
     wheel_root.mkdir(parents=True, exist_ok=True, mode=0o700)
-    existing_wheels = list(wheel_root.glob("wordfreq-3.0.2-*.whl"))
-    if not existing_wheels:
-        subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "download",
-                "--disable-pip-version-check",
-                "--no-deps",
-                "--dest",
-                str(wheel_root),
-                "wordfreq==3.0.2",
-            ],
-            check=True,
-        )
-        existing_wheels = list(wheel_root.glob("wordfreq-3.0.2-*.whl"))
-    if len(existing_wheels) != 1:
-        raise RuntimeError("E_TUPLE_WORDFREQ_WHEEL")
-    wordfreq_wheel = existing_wheels[0]
-    artifact_records = weight_records + [
+    package_wheels = {}
+    for package, version in {"nltk": "3.9.1", "wordfreq": "3.0.2"}.items():
+        matches = list(wheel_root.glob(f"{package}-{version}-*.whl"))
+        if not matches:
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "download",
+                    "--disable-pip-version-check",
+                    "--no-deps",
+                    "--only-binary=:all:",
+                    "--dest",
+                    str(wheel_root),
+                    f"{package}=={version}",
+                ],
+                check=True,
+            )
+            matches = list(wheel_root.glob(f"{package}-{version}-*.whl"))
+        if len(matches) != 1:
+            raise RuntimeError("E_TUPLE_PACKAGE_WHEEL")
+        package_wheels[package] = matches[0]
+    artifact_records = weight_records + nltk_records + [
         {
-            "name": "pe_core_model.safetensors",
+            "name": "PE-Core-L14-336.pt",
             "source": "facebook/PE-Core-L14-336",
-            "sha256": file_digest(pe_matches[0]),
-            "bytes": pe_matches[0].stat().st_size,
+            "sha256": file_digest(pe_path),
+            "bytes": pe_path.stat().st_size,
         },
         {
             "name": "egohod_large_best.pt",
@@ -480,12 +522,16 @@ def prepare_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
             "sha256": file_digest(egohod_file),
             "bytes": egohod_file.stat().st_size,
         },
-        {
-            "name": wordfreq_wheel.name,
-            "source": "PyPI wordfreq 3.0.2",
-            "sha256": file_digest(wordfreq_wheel),
-            "bytes": wordfreq_wheel.stat().st_size,
-        },
+        *[
+            {
+                "name": wheel.name,
+                "source": f"PyPI {package} "
+                + ("3.9.1" if package == "nltk" else "3.0.2"),
+                "sha256": file_digest(wheel),
+                "bytes": wheel.stat().st_size,
+            }
+            for package, wheel in sorted(package_wheels.items())
+        ],
     ]
     manifest = {
         "schema_version": 1,
@@ -502,6 +548,7 @@ def prepare_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
             "PE-Core": "official Apache-2.0 model card and pinned checkpoint",
             "EgoHOD": "official Apache-2.0 model card and pinned checkpoint",
             "wordfreq": "Apache-2.0 code and CC-BY-SA-4.0 redistributable data",
+            "nltk": "Apache-2.0 code; pinned NLTK data packages are redistributed under their package records",
         },
         "nltk_resource_files": [
             {
