@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 5
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_VISOR_HOS_CORRECTION_AMENDMENT_FROZEN_PENDING_COMPLETE_PUBLIC_COMBINED_GATE_PRIOR_NO_GOS_PRESERVED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
@@ -100,6 +100,17 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert correction["five_critical_axes_must_pass"] is True
     assert correction["axes_required"] == 6
     assert correction["public_outcome_opened"] is False
+    complete_source = config[
+        "mechanistic_training_tuple_visor_hos_complete_source_result"
+    ]
+    assert complete_source["status"] == "NO_GO_COMPLETE_SOURCE_FEASIBILITY"
+    assert complete_source["external_complete_source_record_commitment_sha256"] == (
+        "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37"
+    )
+    assert complete_source["Charades_action_counts"] == [44, 44]
+    assert complete_source["model_inference_executed"] is False
+    assert complete_source["governed_C_reopened"] is False
+    assert complete_source["LTX_or_synthetic_learner_run"] is False
     runtime_preparation = config[
         "mechanistic_training_tuple_runtime_preparation_result"
     ]

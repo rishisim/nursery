@@ -1,12 +1,13 @@
 # Synthetic-video Phase 4 common evaluation assets
 
-**Status:** **CORRECTED COMMON ASSETS PASS; PROSPECTIVE VISOR-HOS FIXTURE
-CORRECTION FROZEN** — Stage A remains PASS; the first Stage B assets remain
+**Status:** **CORRECTED COMMON ASSETS PASS; LEARNER-EFFECTIVE COMPLETE PUBLIC
+SOURCE FEASIBILITY NO-GO** — Stage A remains PASS; the first Stage B assets remain
 provisional/superseded, and the corrected lexical and temporal assets are
 sealed. The prior mechanistic tuple-calibration fixture recipe fired its frozen
-public source no-go and remains final. A new user-authorized correction is
-frozen before new public or restricted outcomes; this is not confirmatory
-Phase 5 and no synthetic arm has run.
+public source no-go and remains final. The later user-authorized VISOR-HOS
+correction also reached a combined source no-go because the frozen first-person
+order-action family missed exact yield. This is not confirmatory Phase 5; no
+governed-C rerun, generator work, or synthetic arm ran.
 
 **Scope:** public-only language-pipeline qualification followed, only on a
 signed PASS, by governed construction and sealing of the two common evaluation
@@ -282,3 +283,33 @@ broad activity remains descriptive. Only a complete public PASS authorizes the
 governed C transfer audit. Only a later combined C PASS can authorize the
 already bounded local LTX path and exactly 3,600 accepted credited synthetic
 seconds for the same three-seed descriptive learner run.
+
+### Complete learner-effective source result — frozen no-go
+
+The corrected source run completed all thirteen independent public families on
+four CPU cores in `00:03:06`, with zero direct monetary cost. Its external
+aggregate record is sealed at `5f4aeff2…13b37`. The official VISOR-HOS source,
+semantic reference, contact and explicit-no-contact strata, no-hand nominee
+queue, integrity checks, COCO composites, language/lexical fixtures,
+referent/attribute composites, recurrence pairs, deterministic sensor clips,
+and cross-partition independence all passed their source checks. The no-hand
+items remained nominees only: applicant visual review and model inference were
+not opened. The active self-authored attributive German audio seed was also
+sealed beforehand with 112 files at `3379b1cc…21a3e`.
+
+The single failing family was the genuinely order-dependent first-person
+Charades-Ego control. After reconstructing the prior 96-item broad-context
+exclusion set from its exact frozen public rule (reproducing 48/48 items,
+24/19 subjects, and minimum label counts 9/8), the action sampler retained 44
+development and 44 holdout intervals rather than 48 each. Development had 5
+`turn_on` and 3 `turn_off` items against 6 required; holdout had 2 `turn_off`
+items against 6 required. Subject, video, and object overlap counts remained
+zero.
+
+This is `NO_GO_COMPLETE_SOURCE_FEASIBILITY`. It is a combined source decision,
+not an early stop on the first independent check, and it does not reinterpret
+any earlier no-go. The frozen recipe prohibits adding a source, changing a
+direction pair, relaxing six-per-direction yield, or replacing the action
+control after observing this result. Consequently public model development and
+holdout, governed C, LTX preflight or generation, and the Synthetic-1h learner
+were not run. No downstream operation is authorized under this frozen route.

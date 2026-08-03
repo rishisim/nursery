@@ -126,6 +126,13 @@ commitment, followed by public/dummy LTX topology sizing. Any later corpus
 remains capped at exactly one accepted credited hour and cannot support
 directional-competitiveness, equivalence, noninferiority, same-quality, or
 confirmatory claims.
+The corrected complete public source gate has now run and is a frozen no-go at
+commitment `5f4aeff2…13b37`: all other independent source families passed, but
+the first-person Charades-Ego order-action family yielded 44 rather than 48
+items in each partition, with frozen `turn_on`/`turn_off` deficits. No model
+qualification, governed C run, LTX generation, synthetic hour, or synthetic
+learner result was opened. The descriptive extension is therefore stopped
+under its current protocol.
 Restricted execution was paused after a schema-inspection command
 unintentionally printed 94 opaque asset-level SHA-256 keys to the Codex task
 output. No media, text, filenames, paths, child/session keys, direct identifiers,
@@ -250,7 +257,7 @@ was produced, the Charades archive was not downloaded, and public development,
 governed C, LTX, and Synthetic-1h training were not opened. That no-go remains
 final for its source semantics and sequential shared-cap allocation.
 
-The user has now prospectively authorized a new, narrowly scoped VISOR-HOS
+The user then prospectively authorized a new, narrowly scoped VISOR-HOS
 fixture correction at commitment `31c1c26f…1bf8d4`, before any new source
 inventory or extractor outcome. It freezes the official 158-file VISOR
 train-plus-validation annotation set, explicit contact versus explicit
@@ -265,3 +272,8 @@ order-dependent action control must pass. Broad activity remains descriptive.
 Only that combined public PASS can authorize the governed C transfer audit;
 only a subsequent combined C PASS can authorize the already bounded,
 exactly-one-accepted-hour descriptive LTX arm.
+The complete source stage under that correction is now sealed as
+`NO_GO_COMPLETE_SOURCE_FEASIBILITY` at `5f4aeff2…13b37`: the order-action
+family retained only 44/44 items and missed frozen `turn_on`/`turn_off`
+direction quotas. The conditional public-model, governed-C, and LTX stages
+therefore remain unrun and unauthorized.

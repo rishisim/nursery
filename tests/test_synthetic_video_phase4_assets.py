@@ -93,7 +93,7 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_VISOR_HOS_CORRECTION_AMENDMENT_FROZEN_PENDING_COMPLETE_PUBLIC_COMBINED_GATE_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -105,7 +105,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert result["coverage_redesign"]["gate_pass"] is False
     assert result["coverage_redesign"]["gate_components"]["mean_gain_at_least_0_02"] is False
     assert result["post_gate_descriptive_extension"]["preserves_coverage_redesign_stop"] is True
-    assert result["post_gate_descriptive_extension"]["status"] == "AUTHORIZED_PENDING_VISOR_HOS_CORRECTED_COMPLETE_PUBLIC_COMBINED_GATE"
+    assert result["post_gate_descriptive_extension"]["status"] == "STOPPED_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO"
     assert result["post_gate_descriptive_extension"]["prior_stop_preserved"] == "REAL_1H_FORMAL_GATE_AND_ALL_FOUR_CALIBRATION_NO_GOS_PRESERVED"
     tuple_amendment = result["governed_C_mechanistic_training_tuple_amendment"]
     assert tuple_amendment["status"] == "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
@@ -292,7 +292,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "VISOR_HOS_CORRECTION_AMENDMENT_FROZEN_PENDING_COMPLETE_PUBLIC_COMBINED_GATE_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN"
+    assert proof["status"] == "NO_GO_LEARNER_EFFECTIVE_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_CHARADES_ORDER_ACTION_YIELD_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,
@@ -317,7 +317,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert premodel["counts"]["artifact_bytes"] == 14621041722
     assert premodel["counts"]["egohos_archive_license_file_count"] == 0
     assert premodel["model_inference_executed"] is False
-    assert proof["generator_gate"]["status"] == "SELECTED_LOCAL_NOT_RUN_PENDING_VISOR_HOS_CORRECTED_COMPLETE_PUBLIC_AND_GOVERNED_C_COMBINED_GATES"
+    assert proof["generator_gate"]["status"] == "SELECTED_LOCAL_NOT_RUN_STOPPED_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO"
     assert proof["generator_gate"]["implementation"]["commit"] == "9377758131b1ffde4b7f766804590a6617bf2ab9"
     assert proof["generator_gate"]["weights"]["revision"] == "4229404625088d21c4f112eb640fb04a0900ee25"
     assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["accepted_credited_seconds_exact"] == 3600
@@ -326,7 +326,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert "LTX 19/28" in proof["generator_gate"]["bakeoff_interpretation"]
     assert proof["generator_gate"]["no_substitution"] is True
     assert proof["calibration_C"]["source"] == "development_set_C_only_never_training_validation_or_evaluation"
-    assert proof["calibration_C"]["local_generator_gate"] == "PENDING_VISOR_HOS_CORRECTED_COMPLETE_PUBLIC_AND_GOVERNED_C_COMBINED_GATES"
+    assert proof["calibration_C"]["local_generator_gate"] == "STOPPED_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO"
     fixture_source_no_go = proof["calibration_C"]["extractor"][
         "mechanistic_training_tuple_fixture_feasibility_result"
     ]

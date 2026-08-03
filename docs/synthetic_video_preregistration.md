@@ -1,6 +1,6 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — VISOR-HOS CORRECTION AMENDMENT FROZEN BEFORE NEW OUTCOMES**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — LEARNER-EFFECTIVE COMPLETE PUBLIC SOURCE FEASIBILITY NO-GO**
 
 **Evidence cut-off:** 2026-08-02
 
@@ -1412,3 +1412,34 @@ LTX-2.3 preflight, exactly 3,600 accepted credited synthetic seconds, and the
 same three 4,668-step learner seeds. The Real-1h formal failure and all earlier
 no-gos remain final; no equivalence, noninferiority, same-quality, or
 directionally-competitive claim is authorized.
+
+### Learner-effective complete source result — frozen no-go
+
+The prospective correction above was executed without opening model outcomes.
+All thirteen independent source families were collected before one decision.
+The external complete record is committed at `5f4aeff2…13b37`. VISOR-HOS
+contact and explicit-no-contact each supplied 48 items per partition, and each
+partition supplied a 192-item no-hand nominee review queue. COCO composites
+supplied 32 sources per partition; language/lexical, referent/attribute,
+recurrence, and sensor families supplied 48, 64, 64, and 48 items per partition,
+respectively. Artifact, semantic-reference, integrity, and cross-partition
+checks passed, with zero subject, video, and object overlap. Nominee status is
+not verified no-hand truth; the blinded applicant review was not opened.
+
+The action-control source failed its unchanged exact-yield requirement. Using
+only official Charades-Ego first-person `only1st` tables and excluding the
+prior broad-context fixture through its exact frozen seed/code-map/selection
+recipe yielded 44 development and 44 holdout clips. Against six required per
+direction, development supplied 5 `turn_on` and 3 `turn_off`, while holdout
+supplied 2 `turn_off`. The reconstructed prior exclusion aggregates exactly
+matched their sealed public record: 48/48 items, 24/19 subjects, and 9/8
+minimum label counts.
+
+Therefore the combined status is `NO_GO_COMPLETE_SOURCE_FEASIBILITY`. The
+run used four CPU cores for `00:03:06`, cost $0 directly, rendered no fixture
+media, and performed no model inference. Under the frozen no-substitution rule,
+the action source, direction pairs, and six-per-direction floor cannot be
+changed after this outcome. Public development/holdout, governed C, LTX, the
+one accepted synthetic hour, and Synthetic-1h learner training remain unrun and
+unauthorized. A future route would require a new explicit prospective user
+authorization; it cannot be represented as this recipe passing.

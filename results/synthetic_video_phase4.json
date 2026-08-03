@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_VISOR_HOS_CORRECTION_AMENDMENT_FROZEN_PENDING_COMPLETE_PUBLIC_COMBINED_GATE_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -63,7 +63,7 @@
     "interpretation": "the multi-pass Real-1h positive control missed only the frozen mean-gain component; this remains inconclusive about data quality and does not authorize generator or synthetic-arm work"
   },
   "post_gate_descriptive_extension": {
-    "status": "AUTHORIZED_PENDING_VISOR_HOS_CORRECTED_COMPLETE_PUBLIC_COMBINED_GATE",
+    "status": "STOPPED_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO",
     "effective_on": "2026-08-02",
     "preserves_coverage_redesign_stop": true,
     "authorization": "explicit user-authorized scientifically weaker one-accepted-hour descriptive Synthetic-1h LTX extension",
@@ -72,7 +72,7 @@
     "execution_order": ["corrected_public_source_feasibility_and_all_independent_public_module_metrics", "corrected_public_five_critical_plus_six_of_seven_plus_order_action_combined_gate", "governed_C_transfer_audit_and_combined_calibration_gate", "aggregate_conditioned_public_episode_plan_commitment", "public_dummy_LTX_final_topology_preflight", "freeze_and_approve_exact_resource_ceiling_if_required", "generate_and_seal_exactly_3600_credited_seconds", "three_matched_seed_synthetic_learner_runs"],
     "claim_limits": ["descriptive_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_more_than_one_accepted_synthetic_hour"],
     "prior_stop_preserved": "REAL_1H_FORMAL_GATE_AND_ALL_FOUR_CALIBRATION_NO_GOS_PRESERVED",
-    "synthetic_work_status": "NOT_RUN_NEW_PROSPECTIVE_PUBLIC_CORRECTION_AND_COMBINED_GATE_PENDING"
+    "synthetic_work_status": "NOT_RUN_STOPPED_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_NO_GO"
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -522,6 +522,67 @@
     "governed_C_reopened": false,
     "LTX_or_synthetic_learner_run": false
   },
+  "mechanistic_training_tuple_visor_hos_complete_source_result": {
+    "status": "NO_GO_COMPLETE_SOURCE_FEASIBILITY",
+    "job_id": 314197,
+    "elapsed": "00:03:06",
+    "allocated_CPU_count": 4,
+    "direct_monetary_cost": 0,
+    "visor_hos_correction_amendment_commitment_sha256": "31c1c26f76c5c7dc09e34aff9d5dde291d20631035b07a975d6b8ff5861bf8d4",
+    "external_complete_source_record_commitment_sha256": "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37",
+    "all_prior_no_gos_preserved": true,
+    "active_attributive_audio_seed": {"status": "PASS_AUDIO_SEED_SEALED_BEFORE_SOURCE_DECISION", "audio_file_count": 112, "audio_seed_commitment_sha256": "3379b1ccea1754fbced77a4c9d0e07b1b940e47003022f7bd5af3e5441421a3e"},
+    "family_statuses": {
+      "official_visor_hos_artifact": "PASS",
+      "visor_hos_semantic_reference": "PASS",
+      "visor_hos_contact": "PASS",
+      "visor_hos_explicit_no_contact": "PASS",
+      "visor_hos_no_hand_nominees": "PASS_NOMINEE_QUEUE_READY",
+      "visor_hos_integrity": "PASS",
+      "coco_composite_sources": "PASS",
+      "language_and_lexical": "PASS",
+      "referent_attribute_composite": "PASS",
+      "recurrence": "PASS",
+      "sensor": "PASS",
+      "cross_partition_source_independence": "PASS",
+      "charades_order_action": "NO_GO"
+    },
+    "public_source_counts": {
+      "COCO_composite_per_partition": 32,
+      "language_and_lexical_per_partition": 48,
+      "referent_attribute_per_partition": 64,
+      "recurrence_pairs_per_partition": 64,
+      "sensor_clips_per_partition": 48,
+      "VISOR_contact_per_partition": 48,
+      "VISOR_explicit_no_contact_per_partition": 48,
+      "VISOR_no_hand_nominee_queue_per_partition": 192,
+      "Charades_order_action_development": 44,
+      "Charades_order_action_holdout": 44
+    },
+    "Charades_order_action_deficits": [
+      {"partition": "development", "label": "turn_on", "required_count": 6, "available_count": 5},
+      {"partition": "development", "label": "turn_off", "required_count": 6, "available_count": 3},
+      {"partition": "holdout", "label": "turn_off", "required_count": 6, "available_count": 2}
+    ],
+    "prior_broad_context_exclusion_reconstruction": {
+      "status": "PASS_EXACT_FROZEN_RECIPE_AGGREGATES",
+      "development": {"item_count": 48, "subject_count": 24, "minimum_positive_count": 9},
+      "holdout": {"item_count": 48, "subject_count": 19, "minimum_positive_count": 8},
+      "prior_external_manifest_commitment_sha256": "7a44e6cd72043e3720c98111e9d6e92b5a043ac43d66cdad5355bc01782441f8"
+    },
+    "source_subject_overlap_count": 0,
+    "source_video_overlap_count": 0,
+    "source_object_overlap_count": 0,
+    "model_inference_executed": false,
+    "fixture_media_rendered": false,
+    "no_hand_visual_review_opened": false,
+    "public_development_opened": false,
+    "public_holdout_opened": false,
+    "governed_C_reopened": false,
+    "LTX_preflight_or_generation_run": false,
+    "synthetic_learner_run": false,
+    "stop_rule": "the complete source gate requires every frozen family including exactly six items for each of eight order-action directions in both partitions; this action-family deficit seals a no-go with no source substitution threshold relaxation or downstream work"
+  },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",
     "candidate_id": "egohod_egovideo_l_zero_shot",
@@ -588,5 +649,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "RUN_COMPLETE_PUBLIC_SOURCE_FEASIBILITY_THEN_ALL_INDEPENDENT_PUBLIC_DEVELOPMENT_AND_HOLDOUT_METRICS_UNDER_THE_FROZEN_VISOR_HOS_CORRECTION; ONLY_A_COMBINED_PASS_AUTHORIZES_GOVERNED_C_AND_THEN_THE_EXACTLY_ONE_ACCEPTED_HOUR_DESCRIPTIVE_LTX_ARM"
+  "next_authorized_scope": "NONE_UNDER_THE_FROZEN_LEARNER_EFFECTIVE_ROUTE_AFTER_COMPLETE_PUBLIC_SOURCE_NO_GO; GOVERNED_C_LTX_GENERATION_AND_SYNTHETIC_LEARNER_REMAIN_UNAUTHORIZED"
 }
