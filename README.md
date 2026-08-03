@@ -174,6 +174,14 @@ contact sheets, zero decode failures, no restricted mount, and no model
 inference. All four engineering attempts together used 6,924 wall seconds and
 13.246703 GiB, within the frozen two-hour and 200-GiB ceilings. The authorized
 applicant's blind visual labels and attestations are now the sole next gate.
+During that still-unsealed review, the applicant directed a binary-label
+semantics correction: of 195 codes already entered, 193 yes/no values were
+swapped and two abstentions were retained. Development changed from 6/184/2
+yes/no/abstain to 184/6/2, and holdout from 0/3/0 to 3/0/0. The queue remains
+fixed at `5ba8ae3e…f2b7`; the compact label record changed from
+`7dd640e1…e4fb5` to `2ffae4d1…eae8`. Review remains in progress. No review
+seal, model inference, public outcome, fixture, threshold, or scientific rule
+changed.
 
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema

@@ -409,6 +409,16 @@ qualification. The authorized applicant must now code a contiguous prefix to
 48 verified no-hand items in each partition, blind to EgoHOS output, and attest
 their role, blindness, and that inference has not started.
 
+While that review was still unsealed, the applicant prospectively corrected
+the binary label semantics. At correction time 195 items had been coded: 193
+yes/no values were swapped and two abstentions were unchanged. Development
+changed from 6 yes, 184 no, and 2 abstain to 184 yes, 6 no, and 2 abstain;
+holdout changed from 0/3/0 to 3/0/0. The label-record commitment changed from
+`7dd640e1…e4fb5` to `2ffae4d1…eae8`, while the fixed review queue remains
+`5ba8ae3e…f2b7`. This user-directed pre-seal correction changed no queue order,
+fixture lineage, threshold, model, or scientific rule. Review remains in
+progress; no seal, inference, or public scientific outcome exists.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

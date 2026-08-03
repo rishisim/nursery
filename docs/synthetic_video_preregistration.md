@@ -1585,6 +1585,17 @@ preparation or inference, the authorized applicant must code a contiguous
 prefix to 48 verified no-hand items per partition while blind to EgoHOS output
 and provide the three required attestations.
 
+During that still-unsealed review, the authorized applicant directed a
+pre-seal correction to the binary label semantics. Of 195 codes present at the
+correction, 193 yes/no values were swapped and two abstentions were retained.
+Development changed from 6 yes, 184 no, and 2 abstain to 184 yes, 6 no, and 2
+abstain; holdout changed from 0/3/0 to 3/0/0. The compact label-record SHA-256
+changed from `7dd640e1…e4fb5` to `2ffae4d1…eae8`; the fixed queue commitment
+remains `5ba8ae3e…f2b7`. The correction does not change queue order, fixture
+lineage, a threshold, a model, an amendment, or a scientific rule. Review is
+still in progress, with no review seal, inference, or public scientific
+outcome.
+
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
 descriptive. Only a combined public pass authorizes the single-applicant blind

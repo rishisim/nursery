@@ -94,7 +94,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
     assert result["schema_version"] == 5
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_AUTHORIZED_APPLICANT_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_AUTHORIZED_APPLICANT_REVIEW_IN_PROGRESS_PRIOR_NO_GOS_PRESERVED_NO_SEAL_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -127,6 +127,31 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert prepared["review_queue_count"] == 384
     assert prepared["model_inference_executed"] is False
     assert prepared["public_model_outcome_opened"] is False
+    correction = result["public_no_hand_review_label_semantics_correction"]
+    assert correction["coded_item_count_at_correction"] == 195
+    assert correction["binary_yes_no_swapped_count"] == 193
+    assert correction["abstention_unchanged_count"] == 2
+    assert correction["before_partition_counts"] == {
+        "development": {"yes": 6, "no": 184, "abstain": 2},
+        "holdout": {"yes": 0, "no": 3, "abstain": 0},
+    }
+    assert correction["after_partition_counts"] == {
+        "development": {"yes": 184, "no": 6, "abstain": 2},
+        "holdout": {"yes": 3, "no": 0, "abstain": 0},
+    }
+    assert correction["review_queue_commitment_sha256"] == (
+        "5ba8ae3eaa1d7189aac0a9435f1d10200dfbdfa4555125ed32867bb22c82f2b7"
+    )
+    assert correction["before_label_record_sha256"] == (
+        "7dd640e1bc8e02fe7ced62d1ad7cbe5ccb9e2503b1877840ccb9b093b54e4fb5"
+    )
+    assert correction["after_label_record_sha256"] == (
+        "2ffae4d120fdda4d995cb9d9056655d83082d05607d1860ef75199ea7109eae8"
+    )
+    assert correction["queue_or_scientific_contract_changed"] is False
+    assert correction["review_sealed"] is False
+    assert correction["model_inference_executed"] is False
+    assert correction["public_model_or_scientific_gate_outcome_opened"] is False
     tuple_amendment = result["governed_C_mechanistic_training_tuple_amendment"]
     assert tuple_amendment["status"] == "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     assert len(tuple_amendment["prior_no_go_commitments_preserved"]) == 4
@@ -312,7 +337,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_AUTHORIZED_APPLICANT_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
+    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_AUTHORIZED_APPLICANT_REVIEW_IN_PROGRESS_PRIOR_NO_GOS_PRESERVED_NO_SEAL_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,

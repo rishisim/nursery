@@ -1,6 +1,6 @@
 {
   "schema_version": 17,
-  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_AUTHORIZED_APPLICANT_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
+  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_AUTHORIZED_APPLICANT_REVIEW_IN_PROGRESS_PRIOR_NO_GOS_PRESERVED_NO_SEAL_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -298,6 +298,31 @@
     "review_queue_commitment_sha256": "5ba8ae3eaa1d7189aac0a9435f1d10200dfbdfa4555125ed32867bb22c82f2b7",
     "next_required_action": "AUTHORIZED_APPLICANT_BLINDLY_CODE_A_CONTIGUOUS_PREFIX_TO_48_VERIFIED_NO_HAND_ITEMS_PER_PARTITION_AND_ATTEST_ROLE_BLINDNESS_AND_NO_PRIOR_EGOHOS_INFERENCE"
   },
+  "public_no_hand_review_label_semantics_correction": {
+    "status": "USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_REVIEW_IN_PROGRESS_NO_SEAL_INFERENCE_OR_OUTCOME",
+    "applied_on": "2026-08-03",
+    "authorization_basis": "the authorized applicant clarified the binary review-label semantics before any review seal model inference or scientific outcome",
+    "correction_rule": "swap yes and no for every binary code already entered under the clarified label semantics; preserve abstentions and uncoded rows",
+    "review_queue_commitment_sha256": "5ba8ae3eaa1d7189aac0a9435f1d10200dfbdfa4555125ed32867bb22c82f2b7",
+    "coded_item_count_at_correction": 195,
+    "binary_yes_no_swapped_count": 193,
+    "abstention_unchanged_count": 2,
+    "before_partition_counts": {
+      "development": {"yes": 6, "no": 184, "abstain": 2},
+      "holdout": {"yes": 0, "no": 3, "abstain": 0}
+    },
+    "after_partition_counts": {
+      "development": {"yes": 184, "no": 6, "abstain": 2},
+      "holdout": {"yes": 3, "no": 0, "abstain": 0}
+    },
+    "before_label_record_sha256": "7dd640e1bc8e02fe7ced62d1ad7cbe5ccb9e2503b1877840ccb9b093b54e4fb5",
+    "after_label_record_sha256": "2ffae4d120fdda4d995cb9d9056655d83082d05607d1860ef75199ea7109eae8",
+    "queue_order_fixture_lineage_thresholds_and_scientific_contract_changed": false,
+    "review_sealed": false,
+    "model_inference_executed": false,
+    "public_model_or_scientific_gate_outcome_opened": false,
+    "next_required_action": "AUTHORIZED_APPLICANT_CONTINUE_AND_COMPLETE_THE_BLIND_REVIEW_UNDER_THE_CLARIFIED_LABEL_SEMANTICS_BEFORE_ATTESTATION_OR_SEAL"
+  },
   "governance_incident": {
     "observed_on": "2026-08-02",
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_GOVERNED_PROCESSING_RESUMED",
@@ -345,7 +370,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_CONSTRUCT_ALIGNED_PUBLIC_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_AUTHORIZED_APPLICANT_REVIEW_PENDING",
+    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_CONSTRUCT_ALIGNED_PUBLIC_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_AUTHORIZED_APPLICANT_REVIEW_IN_PROGRESS",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -364,7 +389,8 @@
       "axes": "/calibration_C/extractor/mechanistic_training_tuple_amendment/axes",
       "joint_distributions": "/calibration_C/extractor/mechanistic_training_tuple_amendment/joint_distributions",
       "public_combined_gate": "/construct_aligned_ltx_resume_amendment/combined_gate/pass_rule",
-      "public_qualification_current_state": "/construct_aligned_public_runner_implementation",
+      "public_runner_implementation": "/construct_aligned_public_runner_implementation",
+      "public_qualification_current_state": "/public_no_hand_review_label_semantics_correction",
       "preserved_complete_source_no_go": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_complete_source_result",
       "governed_C_and_episode_plan_order": "/construct_aligned_ltx_resume_amendment/execution_order",
       "generated_attempt_and_accepted_corpus_matching": "/calibration_C/extractor/mechanistic_training_tuple_amendment/generated_attempt_and_accepted_corpus_matching"

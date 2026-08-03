@@ -39,8 +39,21 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 8
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_AUTHORIZED_APPLICANT_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_AUTHORIZED_APPLICANT_REVIEW_IN_PROGRESS_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
+    label_correction = config["public_no_hand_review_label_semantics_correction"]
+    assert label_correction["coded_item_count_at_correction"] == 195
+    assert label_correction["binary_yes_no_swapped_count"] == 193
+    assert label_correction["abstention_unchanged_count"] == 2
+    assert label_correction["before_label_record_sha256"] == (
+        "7dd640e1bc8e02fe7ced62d1ad7cbe5ccb9e2503b1877840ccb9b093b54e4fb5"
+    )
+    assert label_correction["after_label_record_sha256"] == (
+        "2ffae4d120fdda4d995cb9d9056655d83082d05607d1860ef75199ea7109eae8"
+    )
+    assert label_correction["review_sealed"] is False
+    assert label_correction["model_inference_executed"] is False
+    assert label_correction["public_model_or_scientific_gate_outcome_opened"] is False
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
     assert premodel["dependency_manifest_commitment_sha256"] == (
@@ -224,6 +237,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     )
     assert config["gates"]["public_model_inference_requires_blind_no_hand_review_seal"] is True
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
+    assert config["gates"]["learner_effective_no_hand_review_sealed"] is False
     assert config["gates"]["learner_effective_public_model_inference_authorized"] is False
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
     assert config["gates"]["generator_work_authorized"] is False
@@ -306,6 +320,33 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert prepared["decode_failure_count"] == 0
     assert prepared["within_CPU_wall_ceiling"] is True
     assert prepared["model_inference_executed"] is False
+    correction = config["public_no_hand_review_label_semantics_correction"]
+    assert correction["status"].startswith(
+        "USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED"
+    )
+    assert correction["review_queue_commitment_sha256"] == (
+        "5ba8ae3eaa1d7189aac0a9435f1d10200dfbdfa4555125ed32867bb22c82f2b7"
+    )
+    assert correction["coded_item_count_at_correction"] == 195
+    assert correction["binary_yes_no_swapped_count"] == 193
+    assert correction["abstention_unchanged_count"] == 2
+    assert correction["before_partition_counts"] == {
+        "development": {"yes": 6, "no": 184, "abstain": 2},
+        "holdout": {"yes": 0, "no": 3, "abstain": 0},
+    }
+    assert correction["after_partition_counts"] == {
+        "development": {"yes": 184, "no": 6, "abstain": 2},
+        "holdout": {"yes": 3, "no": 0, "abstain": 0},
+    }
+    assert correction["before_label_record_sha256"] == (
+        "7dd640e1bc8e02fe7ced62d1ad7cbe5ccb9e2503b1877840ccb9b093b54e4fb5"
+    )
+    assert correction["after_label_record_sha256"] == (
+        "2ffae4d120fdda4d995cb9d9056655d83082d05607d1860ef75199ea7109eae8"
+    )
+    assert correction["review_sealed"] is False
+    assert correction["model_inference_executed"] is False
+    assert correction["public_model_or_scientific_gate_outcome_opened"] is False
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"
