@@ -555,6 +555,33 @@ def test_tuple_download_resumes_only_on_partial_content(
     assert target.read_bytes() == b"prefix" + payload
 
 
+def test_tuple_public_file_download_retries_transient_network_failure(
+    tmp_path: Path, monkeypatch
+) -> None:
+    attempts = []
+
+    class Response(BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            self.close()
+
+    def open_with_failure(_request, timeout):
+        assert timeout == 300
+        attempts.append(True)
+        if len(attempts) == 1:
+            raise OSError("temporary DNS failure")
+        return Response(b"public fixture")
+
+    monkeypatch.setattr(MODULE.urllib.request, "urlopen", open_with_failure)
+    monkeypatch.setattr(MODULE.time, "sleep", lambda _seconds: None)
+    target = tmp_path / "fixture.json"
+    MODULE._download_public_file("https://example.test/fixture.json", target)
+    assert len(attempts) == 2
+    assert target.read_bytes() == b"public fixture"
+
+
 def test_tuple_exact_download_accepts_small_hashed_public_files(
     tmp_path: Path, monkeypatch
 ) -> None:

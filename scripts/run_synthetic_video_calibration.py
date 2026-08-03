@@ -22,6 +22,7 @@ import tempfile
 import tarfile
 import time
 from typing import Any
+import urllib.error
 import urllib.request
 import zipfile
 
@@ -1932,12 +1933,20 @@ def _download_exact_public_artifact(
 def _download_public_file(url: str, target: Path) -> None:
     target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     partial = target.with_suffix(target.suffix + ".partial")
-    request = urllib.request.Request(
-        url, headers={"User-Agent": "synthetic-video-research/1"}
-    )
-    with urllib.request.urlopen(request, timeout=300) as response:
-        with partial.open("wb") as handle:
-            shutil.copyfileobj(response, handle, length=1024 * 1024)
+    for attempt in range(5):
+        request = urllib.request.Request(
+            url, headers={"User-Agent": "synthetic-video-research/1"}
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=300) as response:
+                with partial.open("wb") as handle:
+                    shutil.copyfileobj(response, handle, length=1024 * 1024)
+            break
+        except (OSError, urllib.error.URLError):
+            partial.unlink(missing_ok=True)
+            if attempt == 4:
+                raise
+            time.sleep(2**attempt)
     if not partial.is_file() or partial.stat().st_size == 0:
         raise RuntimeError("E_TUPLE_PUBLIC_FILE_EMPTY")
     os.chmod(partial, 0o600)
