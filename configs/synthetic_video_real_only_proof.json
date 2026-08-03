@@ -1,6 +1,6 @@
 {
   "schema_version": 11,
-  "status": "MECHANISTIC_TRAINING_TUPLE_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
+  "status": "MECHANISTIC_TRAINING_TUPLE_RUNTIME_DEPENDENCY_REPAIR_FROZEN_PENDING_REPREPARATION_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -70,7 +70,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION",
+    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_RUNTIME_DEPENDENCY_REPAIR_FROZEN_PENDING_REPREPARATION_AND_PUBLIC_QUALIFICATION",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -1144,9 +1144,10 @@
         "status": "FROZEN_BEFORE_LOCAL_RELOAD_SIZING_OR_PUBLIC_MODEL_OUTCOMES",
         "effective_on": "2026-08-02",
         "scientific_effect": "none; this resolves the execution environment for the already frozen model identities and gates without changing a model threshold fixture label or outcome",
-        "prior_runtime_amendment_commitments_sha256": ["adcac3fc45133ab8697923fd473fd692d9c79de48b5cc10b58e4d01cad92b285", "6c3c76e3c5661255dba0131f9b20c6d4daf3b994a8e8c9013bbddbc8213ddec1", "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc", "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b"],
+        "prior_runtime_amendment_commitments_sha256": ["adcac3fc45133ab8697923fd473fd692d9c79de48b5cc10b58e4d01cad92b285", "6c3c76e3c5661255dba0131f9b20c6d4daf3b994a8e8c9013bbddbc8213ddec1", "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc", "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b", "623225bf24f67743e1e8990e02cebe8364191bcd17f89859c27213488ea009e4"],
         "pre_outcome_engineering_clarification": "the official pinned NLTK archives extract their resource directories without NLTK's taggers/corpora namespace; after the label-blind sizing job failed before model inference, verify every previously sealed resource hash and expose scratch-only namespace symlinks without changing any bytes model threshold fixture or outcome",
         "pre_outcome_grounding_import_clarification": "after the next label-blind sizing job passed adapter lexical and sensor checks but stopped before Grounding DINO model construction because the pinned model source imports an unused COCOVisualizer that alone requires unpinned Matplotlib, remove exactly that single unreferenced import after verifying original and patched file hashes; model computation dependencies identity and gates are unchanged",
+        "pre_outcome_submitit_dependency_clarification": "label-blind sizing job 313903 passed adapter lexical sensor Grounding DINO SAM 2.1 and DINOv2 reloads before the pinned EgoBabyVLM alignment package initializer stopped on missing submitit before PE-Core construction; add exact public submitit and cloudpickle wheels only, with no model prompt fixture threshold or scientific gate change",
         "base_container": {"file": "pytorch-2.8.0-cu126.sif", "sha256": "f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792", "python": "3.11.13", "torch": "2.8.0+cu126", "compiler_present": false},
         "additional_public_artifacts": {
           "egobaby_loader": {"repository": "https://github.com/facebookresearch/egobabyvlm.git", "commit": "224621caf0628270b6115845ac75a65b984234a3", "license": "CC-BY-NC-4.0", "role": "pinned PE-Core loader compatibility only"},
@@ -1170,6 +1171,7 @@
           "certifi": "2024.2.2",
           "charset-normalizer": "3.3.2",
           "click": "8.1.7",
+          "cloudpickle": "3.1.1",
           "einops": "0.8.0",
           "filelock": "3.14.0",
           "ftfy": "6.2.0",
@@ -1204,6 +1206,7 @@
           "safetensors": "0.4.3",
           "scikit-image": "0.23.2",
           "scipy": "1.13.0",
+          "submitit": "1.5.3",
           "tabulate": "0.9.0",
           "termcolor": "2.4.0",
           "tifffile": "2024.5.22",
@@ -1218,6 +1221,10 @@
           "wordfreq": "3.0.2",
           "yacs": "0.1.8",
           "yapf": "0.40.2"
+        },
+        "added_dependency_wheels": {
+          "cloudpickle-3.1.1-py3-none-any.whl": {"sha256": "c8c5a44295039331ee9dad40ba100a9c7297b6f988e50e87ccdf3765a668350e", "license": "BSD-3-Clause", "role": "submitit runtime dependency absent from the pinned base container"},
+          "submitit-1.5.3-py3-none-any.whl": {"sha256": "ccc35100da12fe916541489deccccb6b9fa93dae8c01ade53e7f643552dc1795", "license": "MIT", "role": "import-only dependency of the pinned EgoBabyVLM alignment package initializer"}
         },
         "compatibility_adapters": {
           "GroundingDINO": "when the official custom CUDA extension is unavailable use the same commit's official multi_scale_deformable_attn_pytorch function on CUDA tensors and validate it against one CPU dummy within rtol 1e-4 atol 1e-5; remove exactly the unused COCOVisualizer import from groundingdino.py after verifying original SHA-256 cdfb48d5...a5b8 and patched SHA-256 0da7cea7...c671 because that symbol is never referenced by model computation",
@@ -1245,26 +1252,28 @@
         },
         "failure_rule": "ordinary dependency or documented minimal compatibility defects may be repaired in this canonical runtime before public outcomes; inability to run any frozen component locally within this runtime gate is a premodel no-go and no model may be substituted",
         "runtime_amendment_commitment_scope": "canonical JSON of this runtime amendment excluding runtime_amendment_commitment_sha256",
-        "runtime_amendment_commitment_sha256": "623225bf24f67743e1e8990e02cebe8364191bcd17f89859c27213488ea009e4"
+        "runtime_amendment_commitment_sha256": "eb878d8c68aa6f79b5115502beb4c8b64d84e9f495b7cec4513abc3e94effbea"
       },
       "mechanistic_training_tuple_runtime_preparation_result": {
-        "status": "PASS_RUNTIME_READY_LOCAL_RELOAD_BLIND_SIZING_PENDING",
-        "job_id": 313872,
-        "elapsed": "00:08:39",
-        "dependency_count": 53,
-        "dependency_artifact_count": 53,
-        "installed_distribution_count": 53,
+        "status": "PENDING_55_DEPENDENCY_RUNTIME_REPREPARATION",
+        "trigger_job_id": 313903,
+        "trigger_elapsed": "00:00:33",
+        "trigger_stage": "pinned_EgoBabyVLM_alignment_package_import_before_PE_Core_construction",
+        "trigger_error": "ModuleNotFoundError_submitit",
+        "dependency_count": 55,
+        "dependency_artifact_count": 55,
+        "installed_distribution_count": 55,
         "additional_repository_count": 1,
         "additional_model_file_count": 6,
         "mechanistic_amendment_commitment_sha256": "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf",
-        "runtime_amendment_commitment_sha256": "623225bf24f67743e1e8990e02cebe8364191bcd17f89859c27213488ea009e4",
+        "runtime_amendment_commitment_sha256": "eb878d8c68aa6f79b5115502beb4c8b64d84e9f495b7cec4513abc3e94effbea",
         "base_dependency_manifest_commitment_sha256": "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527",
-        "runtime_dependency_commitment_sha256": "03c15506b0ce9fcfe403ebd735e0025dd7685d34867425b385db5463b4542c15",
-        "prior_runtime_dependency_commitments_sha256": ["968f2570ffd8d325a12e2bd6058cc8ab31fb99f1d50b30607419f6da20c81f10", "9810a61868da9a2bede49679820963409c76a3524529a9396c3d5348010748f9"],
+        "runtime_dependency_commitment_sha256": "PENDING_REPREPARATION",
+        "prior_runtime_dependency_commitments_sha256": ["968f2570ffd8d325a12e2bd6058cc8ab31fb99f1d50b30607419f6da20c81f10", "9810a61868da9a2bede49679820963409c76a3524529a9396c3d5348010748f9", "03c15506b0ce9fcfe403ebd735e0025dd7685d34867425b385db5463b4542c15"],
         "restricted_mount_present": false,
         "model_inference_executed": false,
         "external_model_call_count": 0,
-        "validity": "resource and immutable-runtime preparation only; it authorizes the committed label-blind local reload sizing but is not a public extractor pass"
+        "validity": "the 53-dependency runtime remains preserved but is not active after the import-only dependency repair; model sizing cannot resume until the 55-dependency runtime is resealed"
       },
       "mechanistic_training_tuple_sizing_validation_amendment": {
         "status": "FROZEN_BEFORE_SIZING_RERUN_OR_PUBLIC_FIXTURE_OUTCOMES",

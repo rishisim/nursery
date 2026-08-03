@@ -233,17 +233,19 @@ def test_tuple_runtime_amendment_is_exact_and_rejects_mutation() -> None:
     config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     runtime = MODULE._tuple_runtime_amendment(config)
     assert runtime["runtime_amendment_commitment_sha256"] == (
-        "623225bf24f67743e1e8990e02cebe8364191bcd17f89859c27213488ea009e4"
+        "eb878d8c68aa6f79b5115502beb4c8b64d84e9f495b7cec4513abc3e94effbea"
     )
-    assert len(runtime["dependency_versions"]) == 53
+    assert len(runtime["dependency_versions"]) == 55
     assert runtime["dependency_versions"]["einops"] == "0.8.0"
+    assert runtime["dependency_versions"]["submitit"] == "1.5.3"
+    assert runtime["dependency_versions"]["cloudpickle"] == "3.1.1"
     assert runtime["local_reload_gate"][
         "all_seven_axes_and_order_dependent_action_control_must_pass"
     ] is True
     assert runtime["local_reload_gate"]["module_count"] == 8
     assert len(runtime["compatibility_adapters"]) == 7
     assert runtime["prior_runtime_amendment_commitments_sha256"][-1] == (
-        "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b"
+        "623225bf24f67743e1e8990e02cebe8364191bcd17f89859c27213488ea009e4"
     )
     config["calibration_C"]["extractor"][
         "mechanistic_training_tuple_runtime_amendment"
@@ -490,6 +492,8 @@ def test_tuple_runtime_prep_is_resource_only_and_hash_sealed() -> None:
     assert '"fvcore", "iopath", "mmcv"' in source
     assert '"model_inference_executed": False' in source
     assert "runtime_dependency_commitment_sha256" in source
+    assert "E_TUPLE_RUNTIME_ADDED_DEPENDENCY_HASH" in source
+    assert 'runtime["added_dependency_wheels"]' in source
     assert "_apply_grounding_dino_fallback_patch" in source
     assert "restricted_root" not in source
 

@@ -1243,3 +1243,17 @@ finite, every complementary padded position must be negative infinity, all
 post-sigmoid scores must be finite, and every normalized predicted-box
 coordinate must be finite within `[0,1]`. This clarification changes no model,
 weight, prompt, fixture, threshold, or scientific gate.
+
+The sizing retry under that rule passed the adapter, lexical, sensor, Grounding
+DINO, SAM 2.1, and DINOv2 reloads. It then stopped during import of the pinned
+EgoBabyVLM alignment package because its initializer imports `submitit`; this
+occurred before PE-Core construction. The approved base container also lacks
+`cloudpickle`, Submitit's required runtime dependency. No fixture label,
+prediction, score, or scientific metric was retained. Before another model
+attempt, active runtime commitment `eb878d8c…fbea` freezes exactly
+`submitit==1.5.3` (MIT wheel `ccc35100…1795`) and `cloudpickle==3.1.1`
+(BSD-3-Clause wheel `c8c5a442…50e`) and verifies both hashes before install.
+All earlier runtime commitments and the 53-dependency manifest
+`03c15506…2c15` remain preserved. The new 55-dependency overlay must be prepared
+and sealed before label-blind sizing resumes; no model, prompt, fixture,
+threshold, or scientific gate changes.

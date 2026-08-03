@@ -186,6 +186,15 @@ active tokenizer positions must be finite, only the exact tokenizer-padding
 complement may be negative infinity, post-sigmoid scores must be finite, and
 normalized boxes must be finite within `[0,1]`. This is an engineering sizing
 guard and changes no model, fixture, threshold, or scientific gate.
+That retry then passed the adapter, lexical, sensor, Grounding DINO, SAM 2.1,
+and DINOv2 reloads before the pinned EgoBabyVLM alignment package initializer
+required `submitit`; PE-Core had not yet been constructed. The base container
+also lacks `cloudpickle`, the sole required runtime dependency of the selected
+Submitit wheel. No fixture outcome was opened. Active runtime commitment
+`eb878d8c…fbea` therefore adds only hash-pinned public `submitit==1.5.3` (MIT)
+and `cloudpickle==3.1.1` (BSD-3-Clause). The prior 53-dependency runtime and its
+commitment remain preserved; the 55-dependency overlay must be resealed before
+blind sizing resumes.
 Governed C measurement requires that pass, and LTX generation remains further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is
 authorized.

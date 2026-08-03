@@ -203,8 +203,13 @@ hash and adds only scratch-local symlinks. The repaired overlay was resealed at
 an unused visualization import. Active commitment `623225bf…09e4` removes only
 that exact import after original/patched source-hash verification and was then
 resealed before label-blind sizing resumed. That reseal passed at
-`03c15506…2c15`, with no inference or restricted mount. No model substitution or
-gate change is involved. C measurement,
+`03c15506…2c15`, with no inference or restricted mount. A later label-blind
+retry froze exact Grounding DINO padding-sentinel validation at
+`afc936f7…a2d5`, then passed through DINOv2 before the pinned EgoBabyVLM package
+initializer required missing Submitit. Active runtime commitment
+`eb878d8c…fbea` adds only hash-pinned `submitit==1.5.3` and its absent
+`cloudpickle==3.1.1` dependency; the 55-package overlay is pending reseal. No
+fixture outcome, model substitution, or gate change is involved. C measurement,
 LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
 and descriptive-only claim boundary are unchanged.
 

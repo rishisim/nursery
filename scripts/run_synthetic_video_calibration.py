@@ -314,8 +314,21 @@ def _tuple_runtime_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(expected, str) or digest(copy) != expected:
         raise RuntimeError("E_TUPLE_RUNTIME_COMMITMENT")
     dependencies = value.get("dependency_versions")
-    if not isinstance(dependencies, dict) or len(dependencies) != 53:
+    if not isinstance(dependencies, dict) or len(dependencies) != 55:
         raise RuntimeError("E_TUPLE_RUNTIME_DEPENDENCY_SET")
+    if value.get("added_dependency_wheels") != {
+        "cloudpickle-3.1.1-py3-none-any.whl": {
+            "sha256": "c8c5a44295039331ee9dad40ba100a9c7297b6f988e50e87ccdf3765a668350e",
+            "license": "BSD-3-Clause",
+            "role": "submitit runtime dependency absent from the pinned base container",
+        },
+        "submitit-1.5.3-py3-none-any.whl": {
+            "sha256": "ccc35100da12fe916541489deccccb6b9fa93dae8c01ade53e7f643552dc1795",
+            "license": "MIT",
+            "role": "import-only dependency of the pinned EgoBabyVLM alignment package initializer",
+        },
+    }:
+        raise RuntimeError("E_TUPLE_RUNTIME_ADDED_DEPENDENCY_SET")
     if value["local_reload_gate"].get(
         "all_seven_axes_and_order_dependent_action_control_must_pass"
     ) is not True or value["local_reload_gate"].get("module_count") != 8:
@@ -1155,6 +1168,10 @@ def prepare_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
     dependency_artifacts = sorted(path for path in wheel_root.iterdir() if path.is_file())
     if len(dependency_artifacts) != len(requirements):
         raise RuntimeError("E_TUPLE_RUNTIME_ARTIFACT_COUNT")
+    for filename, record in runtime["added_dependency_wheels"].items():
+        path = wheel_root / filename
+        if not path.is_file() or file_digest(path) != record["sha256"]:
+            raise RuntimeError("E_TUPLE_RUNTIME_ADDED_DEPENDENCY_HASH")
 
     dependency_root = model_root / "runtime-pydeps"
     if dependency_root.exists():
@@ -1224,6 +1241,7 @@ def prepare_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
             }
             for path in dependency_artifacts
         ],
+        "added_dependency_wheels": runtime["added_dependency_wheels"],
         "installed_distributions": distributions,
         "compatibility_adapters": runtime["compatibility_adapters"],
         "grounding_dino_compatibility_patch": grounding_patch,
