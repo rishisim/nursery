@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem-per-cpu=4G
-#SBATCH --time=01:30:00
+#SBATCH --time=02:00:00
 #SBATCH --output=/dev/null
 #SBATCH --error=/dev/null
 
@@ -15,6 +15,8 @@ export HF_HUB_DISABLE_TELEMETRY=1 WANDB_DISABLED=true TOKENIZERS_PARALLELISM=fal
 prep_mode="${PHASE4_CALIBRATION_PREP_MODE:-legacy-repair}"
 if [[ "$prep_mode" == "activity-selection" ]]; then
   output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/extractor-redesign/activity-checkpoint-selection"
+elif [[ "$prep_mode" == "mechanistic-tuple" ]]; then
+  output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/mechanistic-tuples"
 else
   output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/extractor-repair"
 fi
@@ -38,6 +40,12 @@ if [[ "$prep_mode" == "activity-selection" ]]; then
     python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" activity-prepare \
     --public-root "${PHASE4_PUBLIC_ROOT}" \
     --manifest "${PHASE4_PUBLIC_ROOT}/public/manifests/charades-selection-manifest.json" \
+    --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json"
+elif [[ "$prep_mode" == "mechanistic-tuple" ]]; then
+  singularity exec --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${scratch}:${scratch}" \
+    "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" \
+    python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" tuple-prepare \
+    --public-root "${PHASE4_PUBLIC_ROOT}" \
     --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json"
 else
   singularity exec --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${scratch}:${scratch}" \

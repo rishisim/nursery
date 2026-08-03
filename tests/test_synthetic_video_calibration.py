@@ -209,6 +209,32 @@ def test_activity_temporal_permutation_is_deterministic_and_not_identity() -> No
     assert first != list(range(16))
 
 
+def test_tuple_amendment_commitment_and_axis_guards_reject_mutation() -> None:
+    import pytest
+
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    amendment = MODULE._tuple_amendment(config)
+    assert amendment["amendment_commitment_sha256"] == (
+        "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222"
+    )
+    config["calibration_C"]["extractor"]["mechanistic_training_tuple_amendment"][
+        "axes"
+    ][0]["priority"] = "important"
+    with pytest.raises(RuntimeError, match="E_TUPLE_AMENDMENT_COMMITMENT"):
+        MODULE._tuple_amendment(config)
+
+
+def test_tuple_zip_extraction_blocks_path_traversal(tmp_path: Path) -> None:
+    import pytest
+    import zipfile
+
+    archive = tmp_path / "fixture.zip"
+    with zipfile.ZipFile(archive, "w") as handle:
+        handle.writestr("../escape", "blocked")
+    with pytest.raises(RuntimeError, match="E_TUPLE_ARCHIVE_PATH"):
+        MODULE._safe_extract_zip(archive, tmp_path / "output")
+
+
 def test_activity_threshold_and_abstention_are_conservative_and_explicit() -> None:
     threshold = MODULE._choose_label_threshold([0.1, 0.2, 0.8, 0.9], [False, False, True, True])
     assert 0.2 < threshold < 0.8
@@ -505,6 +531,8 @@ def test_public_qualification_jobs_never_mount_restricted_data() -> None:
     assert "#SBATCH --partition=dev" in prepare
     assert "prepare-public" in prepare
     assert "activity-prepare" in prepare
+    assert "tuple-prepare" in prepare
+    assert "mechanistic-tuple" in prepare
     assert "PHASE4_ACTIVITY_CODE_CLEAN=1" in prepare
     assert "PHASE4_RESTRICTED_ROOT" not in prepare
     assert "#SBATCH --partition=h100" in qualify
@@ -529,5 +557,7 @@ def test_terminal_report_is_flat_and_guarded() -> None:
     assert "E_ORIGINAL_CALIBRATION_PROVENANCE" in source
     assert "ACTIVITY_CANDIDATE_FIELDS" in source
     assert "ACTIVITY_SELECTION_FIELDS" in source
+    assert "TUPLE_PREP_FIELDS" in source
+    assert "tuple-prepare" in source
     assert "E_ACTIVITY_HOLDOUT_BEFORE_WINNER_SEAL" in source
     assert 'print(json.dumps' not in source

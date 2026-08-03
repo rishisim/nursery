@@ -21,6 +21,7 @@ import tempfile
 import time
 from typing import Any
 import urllib.request
+import zipfile
 
 from nursery_egobaby_preflight.contract import compact_aggregate_json
 
@@ -146,6 +147,21 @@ ACTIVITY_SELECTION_FIELDS = frozenset(
 ACTIVITY_SELECTION_HASH_FIELDS = frozenset(
     {"activity_selection_commitment_sha256"}
 )
+TUPLE_PREP_FIELDS = frozenset(
+    {
+        "status",
+        "component_count",
+        "repository_count",
+        "weight_file_count",
+        "license_record_count",
+        "artifact_bytes",
+        "archive_license_file_count",
+        "restricted_mount_present",
+        "model_inference_executed",
+        "tuple_dependency_commitment_sha256",
+    }
+)
+TUPLE_PREP_HASH_FIELDS = frozenset({"tuple_dependency_commitment_sha256"})
 ACTIVITY_AXIS = "activity_context_mixture"
 VISUAL_AXIS = "egocentric_visual_regime"
 SCENE_AXIS = "scene_complexity"
@@ -187,6 +203,324 @@ def file_digest(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             result.update(chunk)
     return result.hexdigest()
+
+
+def _tuple_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
+    try:
+        value = cfg["calibration_C"]["extractor"][
+            "mechanistic_training_tuple_amendment"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_AMENDMENT_NOT_FROZEN") from error
+    if value.get("status") != (
+        "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
+    ):
+        raise RuntimeError("E_TUPLE_AMENDMENT_NOT_FROZEN")
+    copy = json.loads(json.dumps(value))
+    expected = copy.pop("amendment_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(copy) != expected:
+        raise RuntimeError("E_TUPLE_AMENDMENT_COMMITMENT")
+    axes = value.get("axes")
+    if not isinstance(axes, list) or len(axes) != 7:
+        raise RuntimeError("E_TUPLE_AXIS_SET")
+    ids = [axis.get("id") for axis in axes]
+    if len(ids) != len(set(ids)) or ids != [
+        "adapter_qualified_yield",
+        "noun_adjective_exposure",
+        "utterance_centered_referent_visibility_dominance_ambiguity",
+        "cross_episode_recurrence",
+        "adjective_attribute_contrast",
+        "hand_action_coupling",
+        "egocentric_sensor_regime",
+    ]:
+        raise RuntimeError("E_TUPLE_AXIS_SET")
+    if sum(axis.get("priority") == "critical" for axis in axes) != 5:
+        raise RuntimeError("E_TUPLE_CRITICAL_AXIS_SET")
+    if value["broad_activity_context"].get("status") != "DESCRIPTIVE_NONBLOCKING":
+        raise RuntimeError("E_TUPLE_ACTIVITY_ROLE")
+    return value
+
+
+def _tuple_run_root(public: Path) -> Path:
+    return public / "runs/synthetic-video-calibration/mechanistic-tuples"
+
+
+def _tuple_model_root(public: Path) -> Path:
+    return public / "models/mechanistic-tuples"
+
+
+def _clone_public_repository(url: str, commit: str, target: Path) -> None:
+    if not target.exists():
+        target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        subprocess.run(
+            ["git", "clone", "--filter=blob:none", "--no-checkout", url, str(target)],
+            check=True,
+        )
+    if not (target / ".git").is_dir():
+        raise RuntimeError("E_TUPLE_REPOSITORY_NOT_GIT")
+    subprocess.run(
+        ["git", "-C", str(target), "fetch", "--quiet", "origin", commit],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(target), "checkout", "--quiet", "--detach", commit],
+        check=True,
+    )
+    _verify_repository_commit(target, commit)
+
+
+def _download_public_artifact(url: str, target: Path) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if target.is_file() and target.stat().st_size > 1024 * 1024:
+        return
+    partial = target.with_suffix(target.suffix + ".partial")
+    subprocess.run(
+        [
+            "curl",
+            "--fail",
+            "--location",
+            "--retry",
+            "5",
+            "--retry-delay",
+            "5",
+            "--continue-at",
+            "-",
+            "--output",
+            str(partial),
+            url,
+        ],
+        check=True,
+    )
+    if partial.stat().st_size <= 1024 * 1024:
+        raise RuntimeError("E_TUPLE_ARTIFACT_TOO_SMALL")
+    os.chmod(partial, 0o600)
+    partial.replace(target)
+
+
+def _safe_extract_zip(source: Path, target: Path) -> list[str]:
+    with zipfile.ZipFile(source) as archive:
+        names = archive.namelist()
+        for name in names:
+            member = Path(name)
+            if member.is_absolute() or ".." in member.parts:
+                raise RuntimeError("E_TUPLE_ARCHIVE_PATH")
+        license_names = [
+            name
+            for name in names
+            if Path(name).name.casefold().startswith(("license", "copying", "notice"))
+        ]
+        marker = target / ".extracted-from-sha256"
+        expected = file_digest(source)
+        if not marker.is_file() or marker.read_text().strip() != expected:
+            target.mkdir(parents=True, exist_ok=True, mode=0o700)
+            archive.extractall(target)
+            marker.write_text(expected + "\n")
+            os.chmod(marker, 0o600)
+    return sorted(license_names)
+
+
+def _license_digest(repository: Path, expected: str) -> str:
+    candidates = [
+        path
+        for path in repository.iterdir()
+        if path.is_file() and path.name.casefold().startswith("license")
+    ]
+    matches = [path for path in candidates if file_digest(path) == expected]
+    if len(matches) != 1:
+        raise RuntimeError("E_TUPLE_CODE_LICENSE")
+    return expected
+
+
+def prepare_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    amendment = _tuple_amendment(cfg)
+    prior_stack = cfg["calibration_C"]["extractor"][
+        "domain_appropriate_redesign"
+    ]["single_stack"]
+    public = args.public_root
+    model_root = _tuple_model_root(public)
+    code_root = model_root / "code"
+    weight_root = model_root / "weights"
+    repositories = [
+        (
+            "EgoHOS",
+            prior_stack["hand_object_action"]["repository"],
+            prior_stack["hand_object_action"]["commit"],
+            prior_stack["hand_object_action"]["code_license_sha256"],
+        ),
+        (
+            "GroundingDINO",
+            prior_stack["scene_and_referent_detection"]["repository"],
+            prior_stack["scene_and_referent_detection"]["commit"],
+            prior_stack["scene_and_referent_detection"]["code_license_sha256"],
+        ),
+        (
+            "sam2",
+            prior_stack["mask_tracking"]["repository"],
+            prior_stack["mask_tracking"]["commit"],
+            prior_stack["mask_tracking"]["code_and_weight_license_sha256"],
+        ),
+        (
+            "dinov2",
+            prior_stack["diversity_embeddings"]["repository"],
+            prior_stack["diversity_embeddings"]["commit"],
+            prior_stack["diversity_embeddings"]["code_and_weight_license_sha256"],
+        ),
+    ]
+    repository_records = []
+    for name, url, commit, license_sha256 in repositories:
+        target = code_root / name
+        _clone_public_repository(url, commit, target)
+        repository_records.append(
+            {
+                "name": name,
+                "url": url,
+                "commit": commit,
+                "license_sha256": _license_digest(target, license_sha256),
+                "clean": True,
+            }
+        )
+    downloads = [
+        (
+            "groundingdino_swint_ogc.pth",
+            prior_stack["scene_and_referent_detection"]["checkpoint_url"],
+        ),
+        (
+            "sam2.1_hiera_base_plus.pt",
+            prior_stack["mask_tracking"]["checkpoint_url"],
+        ),
+        (
+            "dinov2_vitb14_pretrain.pth",
+            prior_stack["diversity_embeddings"]["checkpoint_url"],
+        ),
+        (
+            "egohos_work_dirs.zip",
+            "https://drive.usercontent.google.com/download?id=1DEJBeQ3cR1q7cjjzwDUIQVSoptT-y9U7&export=download&confirm=t",
+        ),
+    ]
+    weight_records = []
+    for name, url in downloads:
+        path = weight_root / name
+        _download_public_artifact(url, path)
+        weight_records.append(
+            {
+                "name": name,
+                "source": url,
+                "sha256": file_digest(path),
+                "bytes": path.stat().st_size,
+            }
+        )
+    egohos_archive = weight_root / "egohos_work_dirs.zip"
+    if not zipfile.is_zipfile(egohos_archive):
+        raise RuntimeError("E_TUPLE_EGOHOS_ARCHIVE")
+    archive_license_names = _safe_extract_zip(
+        egohos_archive, model_root / "egohos-checkpoints"
+    )
+    pe_matches = [
+        path
+        for path in (public / "models/pe-hf-home").rglob("model.safetensors")
+        if file_digest(path)
+        == cfg["calibration_C"]["extractor"]["vision_model"]["weights_sha256"]
+    ]
+    if len(pe_matches) != 1:
+        raise RuntimeError("E_TUPLE_PE_CORE_WEIGHT")
+    egohod_cfg = amendment["fixed_stack"]["temporal_action_control"]
+    egohod_hash = re.search(r"SHA-256 ([0-9a-f]{64})", egohod_cfg)
+    egohod_file = public / "models/activity-checkpoints/egovideo_large_best.pt"
+    if not egohod_hash or not egohod_file.is_file() or file_digest(egohod_file) != egohod_hash.group(1):
+        raise RuntimeError("E_TUPLE_EGOHOD_WEIGHT")
+    nltk_root = public / "models/nltk_data"
+    nltk_files = sorted(path for path in nltk_root.rglob("*") if path.is_file())
+    if not nltk_files:
+        raise RuntimeError("E_TUPLE_NLTK_RESOURCES")
+    wheel_root = model_root / "wheels"
+    wheel_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    existing_wheels = list(wheel_root.glob("wordfreq-3.0.2-*.whl"))
+    if not existing_wheels:
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "download",
+                "--disable-pip-version-check",
+                "--no-deps",
+                "--dest",
+                str(wheel_root),
+                "wordfreq==3.0.2",
+            ],
+            check=True,
+        )
+        existing_wheels = list(wheel_root.glob("wordfreq-3.0.2-*.whl"))
+    if len(existing_wheels) != 1:
+        raise RuntimeError("E_TUPLE_WORDFREQ_WHEEL")
+    wordfreq_wheel = existing_wheels[0]
+    artifact_records = weight_records + [
+        {
+            "name": "pe_core_model.safetensors",
+            "source": "facebook/PE-Core-L14-336",
+            "sha256": file_digest(pe_matches[0]),
+            "bytes": pe_matches[0].stat().st_size,
+        },
+        {
+            "name": "egohod_large_best.pt",
+            "source": "official cached activity checkpoint",
+            "sha256": file_digest(egohod_file),
+            "bytes": egohod_file.stat().st_size,
+        },
+        {
+            "name": wordfreq_wheel.name,
+            "source": "PyPI wordfreq 3.0.2",
+            "sha256": file_digest(wordfreq_wheel),
+            "bytes": wordfreq_wheel.stat().st_size,
+        },
+    ]
+    manifest = {
+        "schema_version": 1,
+        "status": "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING",
+        "amendment_commitment_sha256": amendment["amendment_commitment_sha256"],
+        "repositories": repository_records,
+        "artifacts": artifact_records,
+        "egohos_archive_license_files": archive_license_names,
+        "weight_terms": {
+            "EgoHOS": "official MIT-licensed repository explicitly distributes this checkpoint bundle for local inference; archive-specific license files recorded separately",
+            "GroundingDINO": "official Apache-2.0 repository release artifact distributed for local inference",
+            "sam2": "official Apache-2.0 code and checkpoints",
+            "dinov2": "official Apache-2.0 code and checkpoints",
+            "PE-Core": "official Apache-2.0 model card and pinned checkpoint",
+            "EgoHOD": "official Apache-2.0 model card and pinned checkpoint",
+            "wordfreq": "Apache-2.0 code and CC-BY-SA-4.0 redistributable data",
+        },
+        "nltk_resource_files": [
+            {
+                "relative_path": str(path.relative_to(nltk_root)),
+                "sha256": file_digest(path),
+            }
+            for path in nltk_files
+        ],
+        "local_files_only_required": True,
+        "telemetry_tracking_disabled": True,
+        "restricted_mount_present": False,
+        "model_inference_executed": False,
+    }
+    manifest["tuple_dependency_commitment_sha256"] = digest(manifest)
+    output = _tuple_run_root(public)
+    output.mkdir(parents=True, exist_ok=True, mode=0o700)
+    write_private(output / "dependency_manifest.json", manifest)
+    return {
+        "status": "PASS_ARTIFACTS_READY",
+        "component_count": 7,
+        "repository_count": len(repository_records),
+        "weight_file_count": len(artifact_records),
+        "license_record_count": len(manifest["weight_terms"]),
+        "artifact_bytes": sum(record["bytes"] for record in artifact_records),
+        "archive_license_file_count": len(archive_license_names),
+        "restricted_mount_present": False,
+        "model_inference_executed": False,
+        "tuple_dependency_commitment_sha256": manifest[
+            "tuple_dependency_commitment_sha256"
+        ],
+    }
 
 
 def _activity_config(cfg: dict[str, Any]) -> dict[str, Any]:
@@ -3241,6 +3575,9 @@ def main() -> None:
     activity_select_parser.add_argument("--public-root", type=Path, required=True)
     activity_select_parser.add_argument("--manifest", type=Path, required=True)
     activity_select_parser.add_argument("--config", type=Path, required=True)
+    tuple_prepare_parser = subparsers.add_parser("tuple-prepare")
+    tuple_prepare_parser.add_argument("--public-root", type=Path, required=True)
+    tuple_prepare_parser.add_argument("--config", type=Path, required=True)
     run_parser = subparsers.add_parser("run")
     run_parser.add_argument("--restricted-root", type=Path, required=True)
     run_parser.add_argument("--public-root", type=Path, required=True)
@@ -3304,6 +3641,15 @@ def main() -> None:
                 value,
                 allowed_fields=ACTIVITY_SELECTION_FIELDS,
                 sha256_fields=ACTIVITY_SELECTION_HASH_FIELDS,
+            )
+        )
+    elif args.command == "tuple-prepare":
+        value = prepare_tuple_public(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=TUPLE_PREP_FIELDS,
+                sha256_fields=TUPLE_PREP_HASH_FIELDS,
             )
         )
     elif args.command == "run":
