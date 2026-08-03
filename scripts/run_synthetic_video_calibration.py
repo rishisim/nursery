@@ -6724,8 +6724,16 @@ def _require_external_or_ignored_output(path: Path) -> None:
     """
 
     resolved = path.resolve()
+    git_executable = shutil.which("git")
+    if git_executable is None:
+        # Minimal inference containers need not carry Git.  Walking for either
+        # a `.git` directory or worktree pointer still lets us reject a path
+        # inside a repository; only a genuinely external path is accepted
+        # when `check-ignore` is unavailable.
+        _refuse_git_output(resolved)
+        return
     completed = subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"],
+        [git_executable, "rev-parse", "--show-toplevel"],
         cwd=Path.cwd(),
         text=True,
         capture_output=True,
@@ -6738,7 +6746,7 @@ def _require_external_or_ignored_output(path: Path) -> None:
     except ValueError:
         return
     ignored = subprocess.run(
-        ["git", "check-ignore", "--quiet", "--", str(resolved)],
+        [git_executable, "check-ignore", "--quiet", "--", str(resolved)],
         cwd=repository,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,

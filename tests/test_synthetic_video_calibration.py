@@ -1851,6 +1851,21 @@ def test_public_output_guard_allows_ignored_root_and_rejects_tracked_root() -> N
         MODULE._require_external_or_ignored_output(Path("scripts/source-artifacts"))
 
 
+def test_public_output_guard_without_git_allows_only_external_root(
+    monkeypatch, tmp_path: Path
+) -> None:
+    import pytest
+
+    external = tmp_path / "external-output"
+    monkeypatch.setattr(MODULE.shutil, "which", lambda _name: None)
+    MODULE._require_external_or_ignored_output(external)
+
+    repository = tmp_path / "repository"
+    (repository / ".git").mkdir(parents=True)
+    with pytest.raises(RuntimeError, match="E_TUPLE_FIXTURE_OUTPUT_IN_GIT"):
+        MODULE._require_external_or_ignored_output(repository / "ignored-output")
+
+
 def test_tuple_combined_public_gate_collects_all_failures() -> None:
     axes = {
         axis: {"status": "PASS"}
