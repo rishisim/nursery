@@ -178,3 +178,17 @@ and shuffled-order floors. No candidate was eligible (`0/3`), under selection
 commitment `e11727dd…c29d`. The holdout was not opened and governed C, LTX
 preflight, generation, and synthetic training remain stopped. No substitution
 or threshold relaxation is authorized.
+
+That fourth no-go also remains sealed. A new user-authorized amendment now
+targets the actual learner input instead of reopening broad context
+classification: adapter-qualified yield, noun/adjective exposure,
+utterance-centered referent visibility/dominance/ambiguity, cross-episode
+recurrence, adjective–attribute contrast, hand/action coupling, and the
+egocentric sensor regime. Broad activity/context is descriptive only, and
+temporal sensitivity is tested only on localized inverse actions whose labels
+depend on order. Schema 11 freezes the modular public gates, one-applicant
+governed C transfer audit, missingness/matching rules, and one-H100 resource
+ceiling before any new outcome. Its commitment is `fed6a3dc…4222`. Public
+qualification is the only currently authorized execution stage; C measurement,
+LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
+and descriptive-only claim boundary are unchanged.

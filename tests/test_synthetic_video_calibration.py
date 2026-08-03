@@ -154,6 +154,52 @@ def test_calibration_protocol_freezes_eight_axes_and_four_joints() -> None:
     assert sizing["aggregate_GPU_hours_max"] == 1.5
     assert selection["resource_ceiling"]["aggregate_GPU_hours_through_C_max"] == 20.0
 
+    tuple_amendment = calibration["extractor"]["mechanistic_training_tuple_amendment"]
+    assert tuple_amendment["status"] == (
+        "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
+    )
+    assert len(tuple_amendment["prior_no_go_sequence_preserved"]) == 4
+    assert [axis["id"] for axis in tuple_amendment["axes"]] == [
+        "adapter_qualified_yield",
+        "noun_adjective_exposure",
+        "utterance_centered_referent_visibility_dominance_ambiguity",
+        "cross_episode_recurrence",
+        "adjective_attribute_contrast",
+        "hand_action_coupling",
+        "egocentric_sensor_regime",
+    ]
+    assert [axis["priority"] for axis in tuple_amendment["axes"]].count("critical") == 5
+    assert tuple_amendment["broad_activity_context"]["status"] == "DESCRIPTIVE_NONBLOCKING"
+    assert tuple_amendment["genuinely_order_dependent_action_control"]["public_action_pairs"] == [
+        ["open", "close"],
+        ["take", "put"],
+        ["sit_down", "stand_up"],
+        ["turn_on", "turn_off"],
+    ]
+    assert tuple_amendment["governed_C_measurement_gate"] == {
+        "new_gate_not_retroactive_change": "the former eight-axis 0.20 missingness and six-of-eight no-go remains final for its broad estimator; this amendment prospectively evaluates seven different learner-effective axes",
+        "maximum_axis_missing_fraction": 0.2,
+        "public_ontology_eligible_fraction_of_all_noun_adjective_mentions_min": 0.6,
+        "critical_axes": [
+            "adapter_qualified_yield",
+            "noun_adjective_exposure",
+            "utterance_centered_referent_visibility_dominance_ambiguity",
+            "cross_episode_recurrence",
+            "adjective_attribute_contrast",
+        ],
+        "critical_axes_must_all_pass": True,
+        "measured_axes_min": 6,
+        "axis_count": 7,
+        "human_transfer_audit_must_pass": True,
+        "no_imputation": True,
+        "valid_negative_requires_public_specificity_pass": True,
+        "model_derived_proxies_not_human_ground_truth": True,
+    }
+    assert tuple_amendment["resource_ceiling"]["aggregate_GPU_hours_through_C_max"] == 15.0
+    assert tuple_amendment["resource_ceiling"]["multi_process_or_DDP"] is False
+    expected_commitment = tuple_amendment.pop("amendment_commitment_sha256")
+    assert MODULE.digest(tuple_amendment) == expected_commitment
+
 
 def test_activity_temporal_permutation_is_deterministic_and_not_identity() -> None:
     first = MODULE._deterministic_nonidentity_permutation(16, 20260802, "public-fixture")

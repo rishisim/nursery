@@ -38,8 +38,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 3
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO_PRIOR_FAILURES_PRESERVED"
+    assert config["schema_version"] == 4
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
     assert schedule_cycle(config["learner"]["schedule"]) == [
         "contrastive",
@@ -137,7 +137,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 10
+    assert config["schema_version"] == 11
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"

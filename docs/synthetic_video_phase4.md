@@ -1,7 +1,9 @@
 # Synthetic-video Phase 4 common evaluation assets
 
-**Status:** **REOPENED** — Stage A remains PASS; the first Stage B assets are
-provisional and scientifically superseded pending validity repair
+**Status:** **CORRECTED COMMON ASSETS PASS** — Stage A remains PASS; the first
+Stage B assets remain provisional/superseded, and the corrected lexical and
+temporal assets are sealed. The active exploratory mechanistic tuple-calibration
+amendment is pending public qualification and is not confirmatory Phase 5.
 
 **Scope:** public-only language-pipeline qualification followed, only on a
 signed PASS, by governed construction and sealing of the two common evaluation
@@ -143,3 +145,18 @@ because Phase 3 did not freeze the byte value/encoding of `study_id` in
 `HMAC(key, study_id || child_id)`; this must be resolved prospectively rather
 than inferred from provisional assets. Confirmatory Phase 5, generator/TTS execution,
 synthetic generation, score opening, and final evaluation remain unauthorized.
+
+### Corrected asset and active exploratory status
+
+The allocation ambiguity and the other audit findings were subsequently
+resolved without using learner outcomes. The corrected common assets passed:
+the lexical commitment is `3798fafc…17b4` and the held-out-real temporal
+commitment is `3cc29f32…e46e`; the original commitments above remain
+provisional/superseded. Later exploratory real-only runs and four preserved
+calibration no-gos are recorded in the canonical preregistration and compact
+Phase 4 result. Schema 11 now freezes a distinct mechanistic training-tuple
+calibration amendment at commitment `fed6a3dc…4222`. Only its public
+qualification is presently authorized. Governed C measurement requires that
+pass, and LTX generation remains further conditional and capped at exactly one
+accepted credited synthetic hour. No confirmatory/equivalence claim is
+authorized.

@@ -1,6 +1,6 @@
 {
-  "schema_version": 10,
-  "status": "ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO_NO_ELIGIBLE_CANDIDATE_PRIOR_FAILURES_PRESERVED",
+  "schema_version": 11,
+  "status": "MECHANISTIC_TRAINING_TUPLE_CALIBRATION_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -21,7 +21,7 @@
     "permitted_interpretation": "a positive synthetic training effect resembling the observed real effect may be described only as encouraging descriptive evidence",
     "prohibited_interpretation": ["directionally_competitive", "equivalent", "noninferior", "same_quality", "confirmatory_phase5", "proof_of_synthetic_data_quality"],
     "inconclusive_rule": "if both matched arms are flat or decline the comparison is inconclusive",
-    "outcome_independence": "the extension generator corpus cap learner seeds steps checkpoints evaluation assets calibration axes and resource-gate order are frozen before any synthetic learner outcome"
+    "outcome_independence": "the extension generator corpus cap learner seeds steps checkpoints evaluation assets and resource-gate order were frozen before any synthetic learner outcome; the later user-authorized mechanistic training-tuple calibration amendment is separately prospective and preserves every observed calibration no-go"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",
@@ -70,7 +70,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "ORIGINAL_AND_FIRST_REPAIR_NO_GOS_PRESERVED_DOMAIN_APPROPRIATE_REDESIGN_PREMODEL_FEASIBILITY_NO_GO",
+    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -882,7 +882,215 @@
           "institutional_GPU_time_accounted": true,
           "multi_process_topology": "PROHIBITED_WITHOUT_NEW_FINAL_TOPOLOGY_PREFLIGHT"
         },
-        "next_step": "implement and test the three adapters then run the frozen public development comparison once; no holdout or C access before the applicable seals"
+        "next_step": "STOPPED_WITH_ZERO_ELIGIBLE_CANDIDATES; this frozen broad-context study is complete and cannot be rerun or relaxed"
+      },
+      "mechanistic_training_tuple_amendment": {
+        "status": "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES",
+        "effective_on": "2026-08-02",
+        "authorization": "explicit user authorization to replace the failed broad activity-context temporal gate prospectively with learner-effective training-tuple calibration",
+        "scientific_question": "can a fixed modular extractor measure the learner-consumable lexical grounding opportunities in C well enough to prospectively match one accepted synthetic hour, without using evaluation concepts or outcomes",
+        "scientific_distinction": "this is a new mechanistic construct and gate; it does not alter, supersede as success, or rerun any prior no-go, and it does not reinterpret the failed Real-1h positive-control threshold",
+        "prior_no_go_sequence_preserved": [
+          "governed_C_missingness_no_go_28ef267cd0608a33b50037a50e44a622875dc5aad5d1b2a422aa6612347fe3d5",
+          "PE_Core_plus_OWLv2_public_specificity_no_go_042e9ba45fa64abda183eb7e575c5aa2e4990cebf1e54d25c0bffdd34b86fa7f",
+          "EgoVLPv2_premodel_feasibility_no_go_b5dd6c03d7b75e3be2f437c5247b66424f9f6aee28fbaaebbba6d0fa2f0a49d0",
+          "broad_activity_checkpoint_public_development_no_go_e11727dd309a01ee820264ff18afee33cf56b83fa2449301ce1be6e12670c29d"
+        ],
+        "known_before_freeze": "the four no-gos above, the corrected common-asset seals, and the sealed Real-1h result; no new public tuple-fixture output, C tuple measurement, generator outcome, synthetic corpus, or synthetic learner score",
+        "unit": "one adapter-qualified learner tuple consisting of the exact accepted English learner text, word timestamps, and a fixed utterance-centered video window; abstained material contributes no tuple, lexical exposure, recurrence, or credited duration",
+        "tuple_window": {
+          "anchor": "word_timestamp_midpoint_for_each_noun_or_adjective_mention",
+          "before_seconds": [-3.0, 0.0],
+          "during": "word_start_through_word_end",
+          "after_seconds": [0.0, 3.0],
+          "sample_offsets_from_word_midpoint_seconds": [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0],
+          "minimum_in_bounds_sample_fraction": 0.8,
+          "edge_rule": "abstain rather than pad or repeat if fewer than 80 percent of requested samples are in bounds",
+          "independent_episode_rule": "recording boundary or a gap of at least 30 seconds between accepted tuple windows",
+          "credited_duration_rule": "unchanged union of unique accepted source-timeline ASR windows with decodable eligible frames"
+        },
+        "axes": [
+          {
+            "id": "adapter_qualified_yield",
+            "priority": "critical",
+            "estimands": ["accepted_tuples_per_credited_minute", "accepted_utterances_per_credited_minute", "accepted_words_and_tokens_per_credited_minute", "credited_duration", "abstention_rate_and_reason"],
+            "extractor": "frozen shared Whisper-small plus OPUS-MT adapter and its exact normalization timestamp confidence and abstention contract",
+            "public_gate": {"inherited_language_gate_pass_required": true, "tuple_acceptance_and_abstention_case_accuracy_required": 1.0, "silent_truncation_count_max": 0, "invalid_timestamp_count_max": 0}
+          },
+          {
+            "id": "noun_adjective_exposure",
+            "priority": "critical",
+            "estimands": ["noun_and_adjective_token_counts", "type_counts", "wordfreq_Zipf_bands", "within_episode_repetitions", "independent_exposure_episode_counts", "long_tail_quantiles"],
+            "extractor": "NLTK 3.9.1 averaged_perceptron_tagger_eng plus WordNet lemmatization inherited from corrected Phase 4 and wordfreq 3.0.2 English Zipf frequencies; all resource bytes and licenses must be sealed before inference",
+            "frequency_bands": {"low": [0.0, 3.0], "mid": [3.0, 4.0], "high": [4.0, 8.0]},
+            "public_gate": {"noun_span_precision_min": 0.9, "noun_span_recall_min": 0.9, "adjective_span_precision_min": 0.9, "adjective_span_recall_min": 0.9, "lemma_and_frequency_band_exact_fraction_min": 0.95, "episode_repetition_count_exact_fraction_required": 1.0}
+          },
+          {
+            "id": "utterance_centered_referent_visibility_dominance_ambiguity",
+            "priority": "critical",
+            "estimands": ["visibility_before_during_after", "target_mask_fraction", "target_center_distance", "target_persistence", "target_to_largest_distractor_area_ratio", "candidate_count_0_1_2plus", "null_referent_rate"],
+            "extractor": "Grounding DINO boxes over the frozen public coarse ontology followed by SAM 2.1 masks and propagation; exact C words are mapped locally to public categories and never become model prompts or exports",
+            "definitions": {"visible_mask_fraction_min": 0.01, "dominant_target_mask_fraction_min": 0.05, "dominant_area_ratio_to_next_candidate_min": 2.0, "ambiguous_candidate_count_min": 2},
+            "public_gate": {"event_coverage_min": 0.8, "visibility_timing_macro_f1_min": 0.65, "no_referent_specificity_min": 0.8, "dominance_weighted_kappa_min": 0.6, "ambiguity_macro_f1_min": 0.65, "valid_geometry_and_monotonic_track_fraction_required": 1.0}
+          },
+          {
+            "id": "cross_episode_recurrence",
+            "priority": "critical",
+            "estimands": ["within_episode_track_recurrence", "cross_episode_category_recurrence", "inter_exposure_interval", "independent_episode_count", "visual_variation_across_repetitions", "near_duplicate_rate"],
+            "extractor": "DINOv2 ViT-B/14 embeddings on accepted SAM masks plus public-category identity exact SHA-256 and pHash diagnostics; embeddings stay governed",
+            "definitions": {"same_episode_gap_seconds_max": 30.0, "cross_episode_gap_seconds_min": 30.0, "adjacent_frames_do_not_count_as_independent_exposure": true, "exact_or_near_duplicate_does_not_count_as_visual_variation": true},
+            "public_gate": {"same_object_cross_episode_balanced_accuracy_min": 0.8, "recurrence_event_f1_min": 0.75, "near_duplicate_pair_balanced_accuracy_min": 0.9, "negative_pair_false_positive_rate_max": 0.1, "coverage_min": 0.8}
+          },
+          {
+            "id": "adjective_attribute_contrast",
+            "priority": "critical",
+            "estimands": ["adjective_noun_construction_rate", "visible_attribute_contrast_rate", "adjective_across_noun_category_count", "noun_across_attribute_value_count", "null_or_unmeasurable_attribute_rate"],
+            "extractor": "the fixed NLTK lexical events plus PE-Core-L14-336 scores and deterministic mask geometry/color measurements on accepted public-category SAM masks",
+            "public_attribute_families": {"color": ["red", "blue", "green", "yellow", "black", "white", "brown", "orange", "pink", "purple", "gray"], "relative_size": ["big", "small", "large", "tiny", "long", "short"], "shape": ["round", "square"], "state": ["open", "closed", "full", "empty", "clean", "dirty", "wet", "dry"], "surface_proxy": ["soft", "hard", "smooth", "rough"]},
+            "public_gate": {"adjective_noun_span_f1_min": 0.9, "eligible_visual_attribute_coverage_min": 0.8, "visible_contrast_macro_f1_min": 0.7, "null_contrast_specificity_min": 0.8, "valid_mask_measurement_fraction_required": 1.0}
+          },
+          {
+            "id": "hand_action_coupling",
+            "priority": "important",
+            "estimands": ["hand_visibility", "hand_target_contact", "naming_during_contact", "reach_grasp_hold_manipulate_completion", "target_occlusion_by_hand"],
+            "extractor": "official EgoHOS left/right hand dense-contact and first-order interacting-object masks; action phase uses mask trajectories and does not use generic hand text-prompt argmax",
+            "public_gate": {"hand_sensitivity_min": 0.8, "hand_specificity_min": 0.8, "contact_no_contact_macro_f1_min": 0.6, "mention_contact_alignment_f1_min": 0.65, "valid_negative_is_measured_only_after_specificity_pass": true, "coverage_min": 0.8}
+          },
+          {
+            "id": "egocentric_sensor_regime",
+            "priority": "important",
+            "estimands": ["head_camera_motion", "optical_flow", "blur", "brightness", "framing", "shot_discontinuity", "object_track_continuity"],
+            "extractor": "retained deterministic OpenCV and imageio-ffmpeg measurements with frozen bins; no activity label supplies a sensor value",
+            "public_gate": {"finite_in_bounds_fraction_required": 1.0, "controlled_perturbation_direction_fraction_required": 1.0, "frozen_bin_accuracy_min": 0.8, "silent_truncation_count_max": 0}
+          }
+        ],
+        "broad_activity_context": {
+          "status": "DESCRIPTIVE_NONBLOCKING",
+          "use": "report coarse public context mixture only from available metadata or explicitly coded labels; it cannot authorize plans or claim extractor transfer",
+          "known_public_development_results": "EgoHOD and VideoPrism passed broad classification floors while all three candidates failed the prior mixed temporal gate",
+          "temporal_sensitivity_required": false,
+          "learner_effective_gate_role": "NONE"
+        },
+        "genuinely_order_dependent_action_control": {
+          "status": "BLOCKING_PUBLIC_MODULE_CONTROL",
+          "model": "the already pinned EgoHOD EgoVideo-L checkpoint and adapter; no new candidate selection",
+          "public_action_pairs": [["open", "close"], ["take", "put"], ["sit_down", "stand_up"], ["turn_on", "turn_off"]],
+          "source": "subject-disjoint Charades-Ego first-person temporally localized action intervals selected only by frozen public action code and public-seed hash order",
+          "controls": ["ordered", "time_reversed", "repeated_center_frame"],
+          "gate": {"ordered_action_direction_macro_f1_min": 0.6, "opposite_pair_correct_margin_fraction_min": 0.7, "ordered_over_time_reversed_target_score_fraction_min": 0.7, "ordered_over_repeated_center_confidence_fraction_min": 0.7, "coverage_min": 0.8}
+        },
+        "fixed_stack": {
+          "shared_language_adapter": "results/synthetic_video_language_gate.json selected whisper-small-opus-de-en",
+          "lexical_tagger": "nltk==3.9.1 plus frozen WordNet and averaged_perceptron_tagger_eng resources",
+          "frequency_norms": "wordfreq==3.0.2 English best list; Apache-2.0 code and CC-BY-SA-4.0 redistributable data",
+          "grounding": "GroundingDINO@856dde20aee659246248e20734ef9ba5214f5e44 groundingdino_swint_ogc.pth",
+          "mask_tracking": "SAM2@2b90b9f5ceec907a1c18123530e92e794ad901a4 sam2.1_hiera_base_plus.pt",
+          "hand_contact": "EgoHOS@cd9bdf427ef1d94582334ebba4188d5aa18433e7 official released checkpoint bundle",
+          "recurrence": "DINOv2@7764ea0f912e53c92e82eb78a2a1631e92725fc8 dinov2_vitb14_pretrain.pth",
+          "attribute_alignment": "facebook/PE-Core-L14-336@bafb0f76541d399057e980a25947f67acec76575",
+          "temporal_action_control": "EgoHOD@3682c1906eb33d55431751111bb81dabe854f449 large_best.pt SHA-256 71faa0b6e5ebfb912238a099b16b1ff8b6b0a74cbb5b9eb43d5ad8bc92f880da",
+          "no_candidate_cycling_or_substitution": true,
+          "premodel_gate": "before public inference resolve and seal every repository commit checkpoint URL byte SHA-256 code license weight terms dependency manifest local-files-only reload and telemetry guard; any unresolved component is a no-go"
+        },
+        "public_qualification": {
+          "seed": 20260802,
+          "development_and_holdout_rule": "all fixtures split before inference by source subject video and authored scene; development may calibrate only the enumerated confidence grids; holdout is opened only after thresholds and manifest commitments are sealed",
+          "fixtures": {
+            "language_and_lexical": "inherited redistributable FLEURS plus self-authored German language-gate cases and a new fixed public text suite balanced across noun adjective repetition null and abstention cases",
+            "hands_and_contact": "public EPIC-KITCHENS VISOR validation sparse frames and clips with hand active-object contact occlusion and true hand-negative labels; CC-BY-NC-4.0",
+            "referent_timing_and_attribute": "fixed self-authored CC0 audiovisual composites from license-recorded public object crops with exact masks German word timing visibility dominance ambiguity adjective contrast and null cases",
+            "recurrence": "fixed positive negative transformed and near-duplicate object-track pairs derived from the same licensed public crops",
+            "sensor_regime": "programmatically controlled motion blur brightness framing cut and continuity perturbations over licensed public base clips",
+            "order_dependent_actions": "Charades-Ego first-person localized action intervals for the four frozen inverse pairs; development and holdout subjects are disjoint from each other and from the prior 96-item broad-context fixture"
+          },
+          "planned_counts_per_partition": {"language_and_lexical_items": 48, "hand_contact_clips": 40, "referent_attribute_microclips": 64, "recurrence_pairs": 64, "sensor_perturbation_clips": 48, "order_dependent_action_clips": 48},
+          "threshold_development": {
+            "Grounding_DINO_box_score_grid": [0.2, 0.25, 0.3, 0.35, 0.4],
+            "Grounding_DINO_text_score_grid": [0.15, 0.2, 0.25, 0.3],
+            "EgoHOS_min_mask_fraction_grid": [0.0025, 0.005, 0.01, 0.02],
+            "PE_Core_attribute_margin_grid": [0.0, 0.01, 0.02, 0.05, 0.1],
+            "DINOv2_recurrence_cosine_grid": [0.8, 0.85, 0.9, 0.95],
+            "selection_rule": "maximize the axis primary metric subject to every specificity coverage geometry and failure floor; ties choose the higher abstention or similarity threshold, then lexicographically smallest numeric tuple",
+            "holdout_reprompt_refit_or_threshold_change": "PROHIBITED"
+          },
+          "complete_gate": "every one of the seven axis public gates and the genuine order-dependent action control must pass with zero crashes silent truncations invalid records external calls or unaccounted failures; broad activity-context is descriptive and cannot fail this gate",
+          "fixture_manifest_and_threshold_commitments": "PENDING_MUST_BE_SEALED_AND_COMMITTED_BEFORE_ANY_PUBLIC_HOLDOUT_INFERENCE"
+        },
+        "governed_human_C_transfer_audit": {
+          "governance_decision": "PERMITTED_ONLY_FOR_THE_SINGLE_AUTHORIZED_APPLICANT_INSIDE_THE_EXISTING_CHILD_LENS_GOVERNED_BOUNDARY",
+          "scope": "visual and exact accepted-English learner-input tuple coding only; this is not German ASR translation validation and no third-party rater receives access",
+          "timing": "only after complete public qualification passes; human reference labels are sealed before extractor predictions are opened",
+          "sample": {"utterance_centered_events": 96, "cross_episode_recurrence_pairs": 24, "children": 18, "maximum_events_per_child": 6, "selection": "HMAC-SHA-256 with a new governed audit key over opaque child session and tuple keys, stratified 48 noun 24 adjective 12 speech_no_referent and 12 no_speech_visible_object events"},
+          "coder_blinding": "coding interface hides model predictions scores evaluation assets learner outcomes generator outcomes and synthetic data; row order and 20 percent concealed duplicate recodes are public-seed shuffled",
+          "reference_labels": ["noun_or_adjective_span", "referent_visibility_before_during_after", "dominance", "ambiguity_0_1_2plus", "hand_visibility", "target_contact", "visible_attribute_contrast", "same_referent_across_episode_pair"],
+          "transfer_gates": {"noun_adjective_span_macro_f1_min": 0.9, "referent_timing_macro_f1_min": 0.65, "no_referent_specificity_min": 0.8, "dominance_and_ambiguity_weighted_kappa_min": 0.6, "hand_sensitivity_min": 0.8, "hand_specificity_min": 0.8, "contact_macro_f1_min": 0.6, "attribute_contrast_macro_f1_min": 0.65, "attribute_null_specificity_min": 0.8, "recurrence_balanced_accuracy_min": 0.8, "concealed_duplicate_intrarater_kappa_min": 0.6},
+          "reliability_limitation": "one authorized applicant means no inter-rater reliability estimate; concealed duplicate agreement is only intra-rater consistency",
+          "retention_and_output": "media text sample keys row-level labels and predictions remain governed; terminal Git and chat receive only whitelisted compact counts metrics pass status and commitments"
+        },
+        "governed_C_measurement_gate": {
+          "new_gate_not_retroactive_change": "the former eight-axis 0.20 missingness and six-of-eight no-go remains final for its broad estimator; this amendment prospectively evaluates seven different learner-effective axes",
+          "maximum_axis_missing_fraction": 0.2,
+          "public_ontology_eligible_fraction_of_all_noun_adjective_mentions_min": 0.6,
+          "critical_axes": ["adapter_qualified_yield", "noun_adjective_exposure", "utterance_centered_referent_visibility_dominance_ambiguity", "cross_episode_recurrence", "adjective_attribute_contrast"],
+          "critical_axes_must_all_pass": true,
+          "measured_axes_min": 6,
+          "axis_count": 7,
+          "human_transfer_audit_must_pass": true,
+          "no_imputation": true,
+          "valid_negative_requires_public_specificity_pass": true,
+          "model_derived_proxies_not_human_ground_truth": true
+        },
+        "joint_distributions": ["mention_by_referent_visibility_and_dominance", "mention_by_hand_contact_and_action", "recurrence_by_visual_variation", "adjective_mention_by_visible_attribute_contrast", "motion_by_blur"],
+        "uncertainty": {"method": "whole_child_cluster_bootstrap", "replicates": 1000, "seed": 42, "interval": 0.95, "point_thresholds_are_gates_and_intervals_are_reported_descriptively": true},
+        "generated_attempt_and_accepted_corpus_matching": {
+          "report_separately": true,
+          "categorical_total_variation_max": 0.15,
+          "continuous_normalized_Wasserstein_max": 0.2,
+          "severe_axis_miss_min": 0.3,
+          "joint_total_variation_max": 0.2,
+          "severe_joint_miss_min": 0.35,
+          "all_critical_axes_within_tolerance": true,
+          "axes_within_tolerance_min": 6,
+          "severe_joint_miss_allowed": 0,
+          "omnibus_fidelity_score": "PROHIBITED"
+        },
+        "disclosure_and_steering": {
+          "exact_C_vocabulary_transcripts_embeddings_rows_ids_paths_or_reconstructive_combinations_exported": false,
+          "permitted_external_record": "approved compact counts rounded distributions missingness validation metrics failure classes provenance and commitments only",
+          "plans_use": "public lexical resources and nonrestricted prompt wording matched to governed aggregate bins only",
+          "evaluation_assets_concepts_scores_zero_exposure_or_learner_outcomes_may_steer": false,
+          "C_training_validation_or_evaluation_data_used": false
+        },
+        "execution": {
+          "canonical_entry_point": "scripts/run_synthetic_video_calibration.py",
+          "public_output_root": "runs/synthetic-video-calibration/mechanistic-tuples",
+          "governed_output_root": "synthetic_one_hour/mechanistic_tuple_calibration",
+          "public_work_has_no_restricted_mount": true,
+          "governed_work_network_disabled": true,
+          "local_files_only": true,
+          "telemetry_tracking_disabled": true,
+          "aggregate_output_guard_required": true,
+          "execution_order": ["amendment_commit_and_push", "implementation_and_behavioral_tests", "premodel_and_fixture_preparation", "blind_public_dummy_sizing", "public_development_threshold_freeze", "sealed_public_holdout", "governed_human_C_transfer_audit", "governed_C_measurement", "episode_plan_commitment", "LTX_final_topology_preflight", "exactly_one_accepted_synthetic_hour", "three_matched_seed_synthetic_learner_runs"]
+        },
+        "resource_ceiling": {
+          "authorization_basis": "the user's existing broad approval for the appropriate GPU covers this narrower single-process zero-monetary-cost Juno run",
+          "GPU_type": "NVIDIA_H100_80GB",
+          "GPU_count": 1,
+          "multi_process_or_DDP": false,
+          "CPU_preparation_wall_hours_max": 2.0,
+          "blind_public_dummy_sizing_GPU_hours_max": 1.0,
+          "public_development_and_holdout_GPU_hours_max": 6.0,
+          "governed_C_GPU_hours_max_if_public_and_human_gates_pass": 8.0,
+          "aggregate_GPU_hours_through_C_max": 15.0,
+          "public_storage_GiB_max": 200,
+          "governed_incremental_storage_GiB_max": 100,
+          "direct_monetary_cost_USD": 0,
+          "institutional_GPU_time_accounted": true,
+          "human_coding_person_hours_max": 4.0,
+          "LTX_generation_resources": "remain separately gated by the existing final-topology preflight and exact one-hour production ceiling"
+        },
+        "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
+        "amendment_commitment_sha256": "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222"
       },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},
@@ -933,8 +1141,8 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "STOP_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO",
-    "authorization_interpretation": "the original calibration no-go, first public-repair no-go and EgoVLPv2 pre-model no-go remain valid; the user-authorized bounded replacement study also stopped with zero eligible candidates at its frozen public-development gate",
+    "local_generator_gate": "PENDING_MECHANISTIC_TRAINING_TUPLE_PUBLIC_AND_GOVERNED_TRANSFER_QUALIFICATION",
+    "authorization_interpretation": "all four calibration no-gos remain final for their frozen questions; a new user-authorized mechanistic training-tuple calibration is prospective and currently authorizes public implementation and qualification only",
     "governed_result": {
       "status": "NO_GO",
       "job_topology": "1_H100",
@@ -1003,7 +1211,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_NOT_RUN_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO",
+    "status": "SELECTED_LOCAL_NOT_RUN_MECHANISTIC_TRAINING_TUPLE_CALIBRATION_PENDING",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
@@ -1020,7 +1228,7 @@
     "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "NOT_RUN; all three prior calibration failures remain preserved and the bounded replacement activity-checkpoint study stopped at its frozen public-development no-go with zero eligible candidates before holdout C reopening or LTX work",
+  "synthetic_arm": "NOT_RUN; four prior calibration no-gos remain preserved; the prospective mechanistic training-tuple amendment authorizes public qualification but no C-conditioned plan, LTX generation, or synthetic learner score until every intervening gate passes",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
   "former_directionally_competitive_rule_not_permitted_for_post_gate_extension": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",

@@ -1060,3 +1060,94 @@ eligible. Selection commitment `e11727dd…c29d` verifies. The frozen action is
 `NO_GO_NO_ELIGIBLE_CANDIDATE`: no winner, holdout opening, governed-C rerun,
 episode-plan rebuild, LTX work or synthetic learner work is permitted, and no
 candidate or threshold may be added or relaxed in this task.
+
+### Prospective mechanistic training-tuple calibration amendment
+
+The activity-checkpoint result above remains a valid fourth no-go, under
+commitment `e11727dd…c29d`. On 2026-08-02 the user authorized a new scientific
+construct before any further public result, C measurement, generator outcome,
+synthetic corpus, or synthetic learner score. The question is now whether the
+pipeline can measure and match the lexical-grounding opportunities that the
+pinned learner actually consumes. This does not call the old temporal test
+wrong after the fact: broad settings can often be recognized from static
+objects or backgrounds, so frame order is a poor validity test for labels such
+as meal or reading. Broad activity/context is therefore retained only as a
+descriptive nonblocking quantity. Temporal sensitivity is blocking only on
+localized, genuinely order-dependent public actions: open/close, take/put,
+sit-down/stand-up, and turn-on/turn-off.
+
+The learner-effective unit is one tuple whose German audio passes the frozen
+shared adapter and whose exact accepted English text and word timestamps are
+paired with an in-bounds utterance-centered video window. An adapter abstention
+contributes no tuple, lexical exposure, recurrence, or credited duration. The
+seven frozen axes are adapter-qualified yield; noun/adjective exposure;
+utterance-centered referent visibility, dominance, and ambiguity;
+cross-episode recurrence; adjective–attribute contrast; hand/action coupling;
+and egocentric sensor regime. The first five are validity-critical. Activity
+mixture is not an eighth gate, and no omnibus fidelity score is permitted.
+
+This construct follows task-relevant evidence rather than global visual
+similarity. Natural naming events are distinguished by target size,
+dominance, competitors, and temporal stability around naming
+([Yu and Smith, 2012](https://pmc.ncbi.nlm.nih.gov/articles/PMC3829203/));
+child-view object exposure is long-tailed and recurrent across different
+timescales
+([Clerkin et al., 2017](https://pmc.ncbi.nlm.nih.gov/articles/PMC5124080/),
+[Clerkin and Smith, 2022](https://pmc.ncbi.nlm.nih.gov/articles/PMC9170168/));
+and adjective generalization requires visible contrasts across noun categories
+([Leonard et al., 2020](https://pmc.ncbi.nlm.nih.gov/articles/PMC7201330/)).
+These sources motivate the frozen features but do not supply ChildLens labels
+or thresholds.
+
+One fixed modular stack is registered, with no post-outcome substitution:
+the repaired shared language adapter; NLTK/WordNet plus public `wordfreq`
+frequency norms; Grounding DINO plus SAM 2.1 for public-category grounding and
+tracking; EgoHOS for egocentric hands/contact/interacting objects; DINOv2 for
+governed recurrence embeddings; PE-Core plus deterministic mask measurements
+for visible attributes; deterministic sensor metrics; and the already pinned
+EgoHOD checkpoint for the localized inverse-action control. Exact repository
+commits, model identities, gates, threshold-development grids, and licenses are
+in schema 11 of the canonical proof config. Every unresolved checkpoint byte
+hash, weight term, offline reload, or dependency is a pre-model no-go; another
+model cannot be substituted.
+
+Public qualification is modular and task matched. It uses the already frozen
+language fixtures; VISOR hand/contact/active-object annotations; fixed
+self-authored audiovisual composites with exact referent timing, masks,
+attribute contrasts, ambiguity, and null cases; fixed recurrence pairs;
+programmatically controlled motion/blur/brightness/cut clips; and
+subject-disjoint Charades-Ego localized inverse-action clips. Public
+development may select only values from the frozen numeric grids. Fixture and
+threshold commitments must be committed before the sealed holdout opens. Every
+one of the seven module gates and the inverse-action control must pass; broad
+context cannot cause either pass or failure.
+
+If the complete public gate passes, governance permits a small C-domain audit
+only by the sole authorized applicant inside applicant-governed storage. It is
+limited to visual labels and the exact accepted English input the learner sees;
+it is not human German ASR or translation validation. The frozen sample has 96
+utterance-centered events and 24 recurrence pairs across all 18 C children,
+selected with a new governed HMAC key. The coding interface hides extractor
+predictions and all evaluation, learner, generator, and synthetic outcomes;
+reference labels are sealed before predictions open. No external rater receives
+access and only compact aggregate metrics and commitments may leave. Because
+there is one authorized applicant, no inter-rater reliability claim is
+possible; concealed duplicate coding measures only intra-rater consistency.
+
+The new governed gate is explicit rather than a retroactive relaxation of the
+old eight-axis gate. All five critical tuple axes must pass, at least six of
+seven axes must be measured, per-axis missingness must not exceed `0.20`, and
+the eligible public-ontology mapping must cover at least `0.60` of all accepted
+noun/adjective mentions. Synthetic plans may then match only approved aggregate
+bins using public words. Generated attempts and the accepted corpus are
+measured separately; all critical axes and at least six axes total must meet
+the frozen TV/Wasserstein tolerances, with no severe registered joint miss.
+
+The amendment commitment is `fed6a3dc…4222`. Its bounded qualification route
+uses one H100 80GB process: at most 1 GPU-hour for blind sizing, 6 GPU-hours for
+public development plus holdout, and—only after public and human-transfer
+passes—8 GPU-hours for governed C, for a 15 GPU-hour aggregate ceiling, 200 GiB
+public storage, 100 GiB governed incremental storage, and zero direct monetary
+cost. This is within the user's existing broad GPU authorization. DDP is not
+authorized. LTX retains its separate final-topology/resource gate and the
+synthetic corpus remains capped at exactly one accepted credited hour.

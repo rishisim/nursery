@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO_PRIOR_FAILURES_PRESERVED",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -63,7 +63,7 @@
     "interpretation": "the multi-pass Real-1h positive control missed only the frozen mean-gain component; this remains inconclusive about data quality and does not authorize generator or synthetic-arm work"
   },
   "post_gate_descriptive_extension": {
-    "status": "STOPPED_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO",
+    "status": "MECHANISTIC_TRAINING_TUPLE_CALIBRATION_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION",
     "effective_on": "2026-08-02",
     "preserves_coverage_redesign_stop": true,
     "authorization": "explicit user-authorized scientifically weaker one-accepted-hour descriptive Synthetic-1h LTX extension",
@@ -71,8 +71,8 @@
     "generator": "locally governed LTX-2.3; user-directed practical choice; LTX scored 19/28 and did not win the blinded bakeoff",
     "execution_order": ["governed_C_calibration_and_episode_plan_commitment", "public_dummy_LTX_final_topology_preflight", "freeze_and_approve_exact_resource_ceiling_if_required", "generate_and_seal_exactly_3600_credited_seconds", "three_matched_seed_synthetic_learner_runs"],
     "claim_limits": ["descriptive_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_more_than_one_accepted_synthetic_hour"],
-    "prior_stop_preserved": "STOPPED_CALIBRATION_EXTRACTOR_REDESIGN_PREMODEL_FEASIBILITY_NO_GO",
-    "synthetic_work_status": "NOT_RUN_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO"
+    "prior_stop_preserved": "REAL_1H_FORMAL_GATE_AND_ALL_FOUR_CALIBRATION_NO_GOS_PRESERVED",
+    "synthetic_work_status": "NOT_RUN_PENDING_NEW_MECHANISTIC_TUPLE_PUBLIC_AND_GOVERNED_GATES"
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -314,6 +314,27 @@
     "stop_rule_applied_without_relaxation_or_substitution": true,
     "interpretation": "EgoHOD and VideoPrism cleared classification floors but failed frozen temporal controls; V-JEPA 2 also missed classification and shuffled-order controls; winning development was never itself sufficient for public-gate pass"
   },
+  "governed_C_mechanistic_training_tuple_amendment": {
+    "status": "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES",
+    "effective_on": "2026-08-02",
+    "authorization": "explicit user authorization to prospectively replace the failed broad activity-context temporal construct with learner-effective training-tuple calibration",
+    "prior_no_go_commitments_preserved": [
+      "28ef267cd0608a33b50037a50e44a622875dc5aad5d1b2a422aa6612347fe3d5",
+      "042e9ba45fa64abda183eb7e575c5aa2e4990cebf1e54d25c0bffdd34b86fa7f",
+      "b5dd6c03d7b75e3be2f437c5247b66424f9f6aee28fbaaebbba6d0fa2f0a49d0",
+      "e11727dd309a01ee820264ff18afee33cf56b83fa2449301ce1be6e12670c29d"
+    ],
+    "axis_count": 7,
+    "critical_axis_count": 5,
+    "broad_activity_context_role": "DESCRIPTIVE_NONBLOCKING",
+    "temporal_control_role": "BLOCKING_ONLY_ON_GENUINELY_ORDER_DEPENDENT_ACTION_PAIRS",
+    "governed_human_transfer_audit": "single authorized applicant visual and accepted-English tuple coding only; not German validation; no third-party access or row-level export",
+    "public_outcomes_opened_after_amendment": false,
+    "governed_C_reopened_after_amendment": false,
+    "generator_or_synthetic_learner_outcome_opened": false,
+    "amendment_commitment_sha256": "fed6a3dc573c1453d4c46a07c786805dd65aad774fb6ae6e386d11fc0f444222",
+    "next_gate": "implement and qualify the frozen modular extractors on task-matched public development and sealed holdout fixtures"
+  },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",
     "candidate_id": "egohod_egovideo_l_zero_shot",
@@ -380,5 +401,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "STOPPED_AT_FROZEN_ACTIVITY_CHECKPOINT_PUBLIC_DEVELOPMENT_NO_GO; holdout governed C episode-plan rebuild LTX generation and synthetic learner remain unauthorized"
+  "next_authorized_scope": "IMPLEMENT_AND_RUN_FROZEN_MECHANISTIC_TRAINING_TUPLE_PUBLIC_QUALIFICATION_ONLY; governed C audit and measurement require public pass, and LTX generation plus synthetic training remain conditional"
 }
