@@ -1574,6 +1574,17 @@ preparation now uses four bounded download workers under the existing
 four-CPU, two-hour ceiling while preserving deterministic manifest order and
 the exact source, row, hash, and fixture contracts.
 
+Preparation completed on the fourth engineering attempt. The committed review
+bundle contains 384 public frames and 48 contact sheets with zero decode
+failures, no restricted mount, and no model inference. Aggregate wall time was
+6,924 seconds and retained storage was 13.246703 GiB, within the frozen
+two-hour and 200-GiB ceilings. The source-frame materialization commitment is
+`d34f3105…e1b33`; the blind review-queue commitment is
+`5ba8ae3e…f2b7`. This is not a public qualification result. Before any fixture
+preparation or inference, the authorized applicant must code a contiguous
+prefix to 48 verified no-hand items per partition while blind to EgoHOS output
+and provide the three required attestations.
+
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
 descriptive. Only a combined public pass authorizes the single-applicant blind

@@ -94,7 +94,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
     assert result["schema_version"] == 5
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_NEW_EMPIRICAL_OUTCOME"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_AUTHORIZED_APPLICANT_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -122,6 +122,11 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert repair["failure_class"] == "ENGINEERING_FAILURE_NOT_SCIENTIFIC_NO_GO"
     assert repair["model_inference_executed"] is False
     assert repair["scientific_contract_changed"] is False
+    prepared = result["public_no_hand_review_preparation_result"]
+    assert prepared["status"] == "READY_FOR_AUTHORIZED_APPLICANT_BLIND_REVIEW"
+    assert prepared["review_queue_count"] == 384
+    assert prepared["model_inference_executed"] is False
+    assert prepared["public_model_outcome_opened"] is False
     tuple_amendment = result["governed_C_mechanistic_training_tuple_amendment"]
     assert tuple_amendment["status"] == "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     assert len(tuple_amendment["prior_no_go_commitments_preserved"]) == 4
@@ -307,7 +312,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_NEW_EMPIRICAL_OUTCOME"
+    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_AUTHORIZED_APPLICANT_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,

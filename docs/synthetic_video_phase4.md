@@ -398,6 +398,17 @@ The canonical preparation now uses four bounded download workers under the
 already frozen four-CPU, two-hour topology; archive order in the sealed manifest
 remains deterministic.
 
+The cached preparation then completed on the fourth engineering attempt. The
+sealed review bundle contains 384 public frames in 48 contact sheets, with zero
+decode failures, no restricted mount, and no model inference. Aggregate wall
+time across all attempts was 6,924 seconds and retained public storage was
+13.246703 GiB, within the frozen two-hour and 200-GiB ceilings. The source-frame
+materialization is committed at `d34f3105…e1b33` and the blind review queue at
+`5ba8ae3e…f2b7`. This is readiness for applicant review, not public extractor
+qualification. The authorized applicant must now code a contiguous prefix to
+48 verified no-hand items in each partition, blind to EgoHOS output, and attest
+their role, blindness, and that inference has not started.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

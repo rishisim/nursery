@@ -1,6 +1,6 @@
 {
   "schema_version": 17,
-  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_NEW_EMPIRICAL_OUTCOME",
+  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_AUTHORIZED_APPLICANT_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -247,7 +247,7 @@
     "next_required_gate": "BLIND_APPLICANT_NO_HAND_REVIEW_AND_SEAL_BEFORE_FIXTURE_PREPARATION_OR_PUBLIC_MODEL_INFERENCE"
   },
   "public_no_hand_preparation_engineering_repair": {
-    "status": "RETRY_AUTHORIZED_AFTER_SILENT_PUBLIC_ARCHIVE_TRUNCATION_REPAIR",
+    "status": "PASS_AFTER_BOUNDED_ENGINEERING_RETRIES_READY_FOR_AUTHORIZED_APPLICANT_BLIND_REVIEW",
     "observed_on": "2026-08-03",
     "failure_class": "ENGINEERING_FAILURE_NOT_SCIENTIFIC_NO_GO",
     "public_cached_archive_count": 13,
@@ -267,6 +267,36 @@
     "governed_C_reopened": false,
     "scientific_threshold_or_fixture_changed": false,
     "completed_valid_downloads_and_unpromoted_partial_retained": true
+  },
+  "public_no_hand_review_preparation_result": {
+    "status": "READY_FOR_AUTHORIZED_APPLICANT_BLIND_REVIEW",
+    "completed_on": "2026-08-03",
+    "partition_count": 2,
+    "raw_nominee_count": 2112,
+    "review_queue_count": 384,
+    "source_frame_count": 384,
+    "source_archive_count": 124,
+    "contact_sheet_count": 48,
+    "decode_failure_count": 0,
+    "archive_download_worker_count": 4,
+    "attempt_count": 4,
+    "attempt_states": ["FAILED_TRUNCATED_PUBLIC_ARCHIVE", "CANCELLED_SAFE_ATOMIC_CHECKPOINT_FOR_BOUNDED_WORKER_REPAIR", "FAILED_TRANSIENT_REMOTE_DISCONNECT_AFTER_FROZEN_FILE_RETRIES", "COMPLETED"],
+    "attempt_elapsed_seconds": [2241, 1120, 3025, 538],
+    "aggregate_wall_seconds": 6924,
+    "CPU_wall_hours_max": 2.0,
+    "within_CPU_wall_ceiling": true,
+    "combined_storage_bytes": 14223538937,
+    "combined_storage_GiB": 13.246703,
+    "public_storage_GiB_max": 200,
+    "within_storage_ceiling": true,
+    "direct_monetary_cost_usd": 0,
+    "restricted_mount_present": false,
+    "model_inference_executed": false,
+    "public_development_or_holdout_model_outcome_opened": false,
+    "visor_hos_source_feasibility_commitment_sha256": "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37",
+    "source_frame_materialization_commitment_sha256": "d34f31057dc3d3b084c7e09dc7a049f89888ab691d087ea261e4a45f02ee1b33",
+    "review_queue_commitment_sha256": "5ba8ae3eaa1d7189aac0a9435f1d10200dfbdfa4555125ed32867bb22c82f2b7",
+    "next_required_action": "AUTHORIZED_APPLICANT_BLINDLY_CODE_A_CONTIGUOUS_PREFIX_TO_48_VERIFIED_NO_HAND_ITEMS_PER_PARTITION_AND_ATTEST_ROLE_BLINDNESS_AND_NO_PRIOR_EGOHOS_INFERENCE"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",
@@ -315,7 +345,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_CONSTRUCT_ALIGNED_PUBLIC_RUNNER_PASS_BLIND_NO_HAND_REVIEW_PENDING",
+    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_CONSTRUCT_ALIGNED_PUBLIC_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_AUTHORIZED_APPLICANT_REVIEW_PENDING",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",

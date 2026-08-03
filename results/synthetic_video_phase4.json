@@ -1,7 +1,7 @@
 {
   "schema_version": 5,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_NEW_EMPIRICAL_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_AUTHORIZED_APPLICANT_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -150,7 +150,7 @@
     "next_required_gate": "BLIND_APPLICANT_NO_HAND_REVIEW_AND_SEAL"
   },
   "public_no_hand_preparation_engineering_repair": {
-    "status": "RETRY_AUTHORIZED_AFTER_SILENT_PUBLIC_ARCHIVE_TRUNCATION_REPAIR",
+    "status": "PASS_AFTER_BOUNDED_ENGINEERING_RETRIES_READY_FOR_AUTHORIZED_APPLICANT_BLIND_REVIEW",
     "failure_class": "ENGINEERING_FAILURE_NOT_SCIENTIFIC_NO_GO",
     "public_cached_archive_count": 13,
     "public_valid_zip_count": 12,
@@ -166,6 +166,27 @@
     "completed_archives_retained_at_stop": 20,
     "unpromoted_partial_count_retained": 1,
     "archive_download_worker_count": 4
+  },
+  "public_no_hand_review_preparation_result": {
+    "status": "READY_FOR_AUTHORIZED_APPLICANT_BLIND_REVIEW",
+    "partition_count": 2,
+    "raw_nominee_count": 2112,
+    "review_queue_count": 384,
+    "source_frame_count": 384,
+    "source_archive_count": 124,
+    "contact_sheet_count": 48,
+    "decode_failure_count": 0,
+    "attempt_count": 4,
+    "aggregate_wall_seconds": 6924,
+    "within_CPU_wall_ceiling": true,
+    "combined_storage_GiB": 13.246703,
+    "within_storage_ceiling": true,
+    "direct_monetary_cost_usd": 0,
+    "restricted_mount_present": false,
+    "model_inference_executed": false,
+    "public_model_outcome_opened": false,
+    "source_frame_materialization_commitment_sha256": "d34f31057dc3d3b084c7e09dc7a049f89888ab691d087ea261e4a45f02ee1b33",
+    "review_queue_commitment_sha256": "5ba8ae3eaa1d7189aac0a9435f1d10200dfbdfa4555125ed32867bb22c82f2b7"
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -742,5 +763,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "COMPLETE_BLIND_NO_HAND_REVIEW_AND_SEAL_THEN_RUN_THE_COMBINED_PUBLIC_DEVELOPMENT_AND_ONCE_ONLY_HOLDOUT_QUALIFICATION; GOVERNED_C_COMPILER_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
+  "next_authorized_scope": "AUTHORIZED_APPLICANT_COMPLETE_THE_BLIND_NO_HAND_REVIEW_AND_ATTESTATIONS_THEN_SEAL_AND_RUN_THE_COMBINED_PUBLIC_DEVELOPMENT_AND_ONCE_ONLY_HOLDOUT_QUALIFICATION; GOVERNED_C_COMPILER_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
 }

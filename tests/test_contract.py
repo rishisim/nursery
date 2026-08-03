@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 8
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_AUTHORIZED_APPLICANT_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
@@ -299,6 +299,13 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert repair["model_inference_executed"] is False
     assert repair["scientific_threshold_or_fixture_changed"] is False
     assert repair["archive_download_worker_count"] == 4
+    prepared = config["public_no_hand_review_preparation_result"]
+    assert prepared["status"] == "READY_FOR_AUTHORIZED_APPLICANT_BLIND_REVIEW"
+    assert prepared["review_queue_count"] == 384
+    assert prepared["contact_sheet_count"] == 48
+    assert prepared["decode_failure_count"] == 0
+    assert prepared["within_CPU_wall_ceiling"] is True
+    assert prepared["model_inference_executed"] is False
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"

@@ -169,6 +169,11 @@ engineering retry, not a scientific no-go or protocol change.
 The retry uses four bounded archive workers within the already frozen four-CPU
 topology; exact source selection and deterministic manifest sealing are
 unchanged.
+Preparation is now complete and sealed for review: 384 public frames, 48
+contact sheets, zero decode failures, no restricted mount, and no model
+inference. All four engineering attempts together used 6,924 wall seconds and
+13.246703 GiB, within the frozen two-hour and 200-GiB ceilings. The authorized
+applicant's blind visual labels and attestations are now the sole next gate.
 
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
