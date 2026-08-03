@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 4
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_55_DEPENDENCY_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_BLIND_SIZING_PASS_PENDING_PUBLIC_FIXTURE_MANIFESTS_AND_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
@@ -76,6 +76,14 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     )
     assert sizing_validation["padding_mask_exact_required"] is True
     assert sizing_validation["public_fixture_outcome_opened"] is False
+    sizing_result = config["mechanistic_training_tuple_sizing_result"]
+    assert sizing_result["status"] == "PASS_LABEL_BLIND_LOCAL_RELOAD_SIZING"
+    assert sizing_result["module_count"] == 8
+    assert sizing_result["finite_output_count"] == 8
+    assert sizing_result["tuple_sizing_commitment_sha256"] == (
+        "b627590518b2e54daeace3d1c52e6918b41c2e203b42742538135c6a4c63e029"
+    )
+    assert sizing_result["public_fixture_outcome_opened"] is False
     runtime = config["mechanistic_training_tuple_runtime_amendment"]
     assert runtime["runtime_amendment_commitment_sha256"] == (
         "eb878d8c68aa6f79b5115502beb4c8b64d84e9f495b7cec4513abc3e94effbea"

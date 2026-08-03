@@ -1263,3 +1263,11 @@ artifacts and installed distributions were sealed under runtime-manifest
 commitment `df15ff20…c0c4`. No model inference or restricted mount was present.
 This resource-only result authorizes the same label-blind sizing retry; it is
 not a public extractor qualification result.
+
+That final-runtime sizing retry passed all eight registered modules on one H100
+in 55.37 seconds at 0.70 GiB peak VRAM. There were zero failures, external
+calls, retained predictions, or scientific metrics, and no restricted mount;
+record commitment `b6275905…e029` verifies the result. Public development and
+holdout remain unopened. The next gate is to prepare and seal every
+task-matched fixture byte, label, transformation, and disjoint partition before
+development inference.

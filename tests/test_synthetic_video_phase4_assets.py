@@ -93,7 +93,7 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_55_DEPENDENCY_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_BLIND_SIZING_PASS_PENDING_PUBLIC_FIXTURE_MANIFESTS_AND_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -149,6 +149,15 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     )
     assert sizing_validation["padding_mask_exact_required"] is True
     assert sizing_validation["score_or_prediction_retained"] is False
+    sizing_result = result["mechanistic_training_tuple_sizing_result"]
+    assert sizing_result["status"] == "PASS_LABEL_BLIND_LOCAL_RELOAD_SIZING"
+    assert sizing_result["module_count"] == 8
+    assert sizing_result["finite_output_count"] == 8
+    assert sizing_result["failure_count"] == 0
+    assert sizing_result["tuple_sizing_commitment_sha256"] == (
+        "b627590518b2e54daeace3d1c52e6918b41c2e203b42742538135c6a4c63e029"
+    )
+    assert sizing_result["public_fixture_outcome_opened"] is False
     premodel = result["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
     assert premodel["dependency_manifest_commitment_sha256"] == (
@@ -237,7 +246,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "MECHANISTIC_TRAINING_TUPLE_55_DEPENDENCY_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
+    assert proof["status"] == "MECHANISTIC_TRAINING_TUPLE_BLIND_SIZING_PASS_PENDING_PUBLIC_FIXTURE_MANIFESTS_AND_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,

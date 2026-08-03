@@ -195,7 +195,11 @@ Submitit wheel. No fixture outcome was opened. Active runtime commitment
 and `cloudpickle==3.1.1` (BSD-3-Clause). The prior 53-dependency runtime and its
 commitment remain preserved. The 55-dependency overlay then passed preparation
 in 9 minutes 16 seconds at commitment `df15ff20…c0c4`, with no model inference
-or restricted mount. Blind sizing may resume.
+or restricted mount. Final-runtime label-blind sizing then passed all eight
+modules in 55.37 seconds at 0.70 GiB peak VRAM, with zero failures, external
+calls, retained predictions, or scientific metrics; commitment
+`b6275905…e029` verifies the record. This opens only public task-matched fixture
+preparation and qualification.
 Governed C measurement requires that pass, and LTX generation remains further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is
 authorized.

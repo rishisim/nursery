@@ -209,7 +209,9 @@ retry froze exact Grounding DINO padding-sentinel validation at
 initializer required missing Submitit. Active runtime commitment
 `eb878d8c…fbea` adds only hash-pinned `submitit==1.5.3` and its absent
 `cloudpickle==3.1.1` dependency. The 55-package overlay passed reseal at
-`df15ff20…c0c4`, without model inference or a restricted mount. No
+`df15ff20…c0c4`, without model inference or a restricted mount. The subsequent
+eight-module label-blind sizing passed at `b6275905…e029`, with no fixture
+outcome or retained prediction. No
 fixture outcome, model substitution, or gate change is involved. C measurement,
 LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
 and descriptive-only claim boundary are unchanged.

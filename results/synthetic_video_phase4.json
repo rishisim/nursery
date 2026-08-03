@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_55_DEPENDENCY_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_BLIND_SIZING_PASS_PENDING_PUBLIC_FIXTURE_MANIFESTS_AND_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -383,7 +383,7 @@
     "restricted_mount_present": false,
     "model_inference_executed": false,
     "public_extractor_pass": false,
-    "next_gate": "one-H100 network-disabled eight-module label-blind local reload sizing"
+    "subsequent_status": "PASS_LABEL_BLIND_LOCAL_RELOAD_SIZING"
   },
   "mechanistic_training_tuple_sizing_validation_amendment": {
     "status": "FROZEN_BEFORE_SIZING_RERUN_OR_PUBLIC_FIXTURE_OUTCOMES",
@@ -400,7 +400,28 @@
     "public_fixture_outcome_opened": false,
     "governed_C_reopened": false,
     "validation_commitment_sha256": "afc936f742bd4313c35ff2e9a11a2389c589675c03309bbf09d8f8ab718ea2d5",
-    "next_gate": "repeat the unchanged one-H100 label-blind sizing under the exact sentinel-aware finite-in-bounds guard"
+    "subsequent_status": "PASS_LABEL_BLIND_LOCAL_RELOAD_SIZING"
+  },
+  "mechanistic_training_tuple_sizing_result": {
+    "status": "PASS_LABEL_BLIND_LOCAL_RELOAD_SIZING",
+    "job_id": 313940,
+    "elapsed": "00:01:04",
+    "module_count": 8,
+    "finite_output_count": 8,
+    "failure_count": 0,
+    "external_call_count": 0,
+    "scientific_metric_count": 0,
+    "retained_prediction_count": 0,
+    "peak_vram_gib": 0.701171875,
+    "total_runtime_seconds": 55.37020545359701,
+    "runtime_dependency_commitment_sha256": "df15ff20c2f1e137530ec6f8a6f848ed676f2bcde0ec48148736c23ddd6fc0c4",
+    "sizing_validation_commitment_sha256": "afc936f742bd4313c35ff2e9a11a2389c589675c03309bbf09d8f8ab718ea2d5",
+    "tuple_sizing_commitment_sha256": "b627590518b2e54daeace3d1c52e6918b41c2e203b42742538135c6a4c63e029",
+    "fixture_labels_used": false,
+    "prediction_or_score_retained": false,
+    "restricted_mount_present": false,
+    "public_fixture_outcome_opened": false,
+    "next_gate": "prepare and seal every task-matched public development and holdout fixture before development inference"
   },
   "mechanistic_training_tuple_public_fixture_protocol": {
     "status": "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES",
