@@ -313,6 +313,125 @@ def test_tuple_public_prep_pins_language_and_vision_resources() -> None:
     assert '"wordfreq": "3.0.2"' in source
 
 
+def test_tuple_window_uses_segment_midpoint_and_never_fabricates_word_time() -> None:
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    amendment = MODULE._tuple_amendment(config)
+    segment = {
+        "status": "ACCEPT",
+        "start": 4.0,
+        "end": 5.0,
+        "en": "The red ball",
+        "words": [{"word": "der", "start": 4.0, "end": 4.4}],
+    }
+    result = MODULE._tuple_segment_window(segment, 9.0, amendment)
+    assert result["status"] == "ACCEPT"
+    assert result["mention_anchor"] == 4.5
+    assert result["samples"] == {
+        "before": [1.5, 2.5, 3.5],
+        "during": [4.166667, 4.5, 4.833333],
+        "after": [5.5, 6.5, 7.5],
+    }
+    assert "words" not in result
+
+
+def test_tuple_window_abstains_at_boundary_and_on_adapter_rejection() -> None:
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    amendment = MODULE._tuple_amendment(config)
+    edge = {"status": "ACCEPT", "start": 0.0, "end": 1.0, "en": "ball"}
+    assert MODULE._tuple_segment_window(edge, 8.0, amendment)["reason"] == (
+        "INSUFFICIENT_IN_BOUNDS_FRAMES"
+    )
+    assert MODULE._tuple_segment_window(
+        {"status": "ABSTAIN", "reason": "LOW_CONFIDENCE"}, 8.0, amendment
+    ) == {"status": "ABSTAIN", "reason": "ADAPTER_ABSTAIN"}
+
+
+def test_lexical_mentions_preserve_roundtrip_lemma_pos_and_band() -> None:
+    tags = {"Red": "JJ", "balls": "NNS", "roll": "VBP"}
+    result = MODULE._lexical_mentions(
+        "Red balls roll",
+        lambda tokens: [(token, tags[token]) for token in tokens],
+        lambda token, pos: "ball" if (token, pos) == ("balls", "n") else token,
+        lambda lemma, language: {"red": 4.5, "ball": 3.5}[lemma],
+        {"low": [0.0, 3.0], "mid": [3.0, 4.0], "high": [4.0, 8.0]},
+    )
+    assert [(row["lemma"], row["part_of_speech"], row["frequency_band"]) for row in result] == [
+        ("red", "adjective", "high"),
+        ("ball", "noun", "mid"),
+    ]
+
+
+def test_public_ontology_abstains_on_unmatched_or_ambiguous_lemma() -> None:
+    mapping = {"toy": ["ball", "block"], "container": ["cup", "block"]}
+    assert MODULE._map_public_ontology("ball", mapping) == {
+        "status": "ACCEPT",
+        "reason": None,
+        "category": "toy",
+    }
+    assert MODULE._map_public_ontology("unknown", mapping)["reason"] == "ONTOLOGY_UNMATCHED"
+    assert MODULE._map_public_ontology("block", mapping)["reason"] == "ONTOLOGY_AMBIGUOUS"
+
+
+def test_referent_proxy_requires_qualified_specificity_for_valid_negative() -> None:
+    definitions = {
+        "visible_mask_fraction_min": 0.01,
+        "dominant_target_mask_fraction_min": 0.05,
+        "dominant_area_ratio_to_next_candidate_min": 2.0,
+    }
+    assert MODULE._referent_frame_proxy(
+        [], "toy", definitions, inference_succeeded=True, negative_specificity_passed=False
+    )["reason"] == "NEGATIVE_NOT_QUALIFIED"
+    assert MODULE._referent_frame_proxy(
+        [], "toy", definitions, inference_succeeded=True, negative_specificity_passed=True
+    )["status"] == "MEASURED_NEGATIVE"
+
+
+def test_referent_proxy_rejects_bad_geometry_and_measures_dominance() -> None:
+    definitions = {
+        "visible_mask_fraction_min": 0.01,
+        "dominant_target_mask_fraction_min": 0.05,
+        "dominant_area_ratio_to_next_candidate_min": 2.0,
+    }
+    invalid = [{"category": "toy", "mask_fraction": 0.2, "center_distance": 0.1, "box": [0, 0, 2, 1]}]
+    assert MODULE._referent_frame_proxy(
+        invalid, "toy", definitions, inference_succeeded=True, negative_specificity_passed=True
+    )["reason"] == "INVALID_GEOMETRY"
+    candidates = [
+        {"category": "toy", "mask_fraction": 0.2, "center_distance": 0.1, "box": [0.2, 0.2, 0.6, 0.7]},
+        {"category": "distractor", "mask_fraction": 0.05, "center_distance": 0.4, "box": [0.7, 0.2, 0.9, 0.5]},
+    ]
+    measured = MODULE._referent_frame_proxy(
+        candidates, "toy", definitions, inference_succeeded=True, negative_specificity_passed=True
+    )
+    assert measured["status"] == "MEASURED_POSITIVE"
+    assert measured["dominant"] is True
+    assert measured["candidate_count_bin"] == "2plus"
+
+
+def test_track_and_recurrence_guards_abstain_instead_of_imputing() -> None:
+    assert MODULE._validate_monotonic_track(
+        [
+            {"time": 0.1, "box": [0.1, 0.1, 0.2, 0.2]},
+            {"time": 0.2, "box": [0.2, 0.1, 0.3, 0.2]},
+        ]
+    )
+    assert not MODULE._validate_monotonic_track(
+        [
+            {"time": 0.2, "box": [0.1, 0.1, 0.2, 0.2]},
+            {"time": 0.1, "box": [0.2, 0.1, 0.3, 0.2]},
+        ]
+    )
+    invalid = MODULE._recurrence_decision(
+        float("nan"), 0.9, exact_duplicate=False, perceptual_duplicate=False
+    )
+    assert invalid == {"status": "ABSTAIN", "reason": "INVALID_SIMILARITY"}
+    same = MODULE._recurrence_decision(
+        0.95, 0.9, exact_duplicate=False, perceptual_duplicate=True
+    )
+    assert same["same_referent"] is True
+    assert same["visual_variation"] is False
+
+
 def test_activity_threshold_and_abstention_are_conservative_and_explicit() -> None:
     threshold = MODULE._choose_label_threshold([0.1, 0.2, 0.8, 0.9], [False, False, True, True])
     assert 0.2 < threshold < 0.8

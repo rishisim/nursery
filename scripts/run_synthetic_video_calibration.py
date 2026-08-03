@@ -252,6 +252,226 @@ def _tuple_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     return value
 
 
+def _tuple_segment_window(
+    segment: dict[str, Any], media_duration: float, amendment: dict[str, Any]
+) -> dict[str, Any]:
+    """Construct the frozen learner tuple window without inventing alignment."""
+    if segment.get("status") != "ACCEPT":
+        return {"status": "ABSTAIN", "reason": "ADAPTER_ABSTAIN"}
+    text = str(segment.get("en", "")).strip()
+    try:
+        start = float(segment["start"])
+        end = float(segment["end"])
+        duration = float(media_duration)
+    except (KeyError, TypeError, ValueError, OverflowError):
+        return {"status": "ABSTAIN", "reason": "INVALID_SEGMENT_BOUNDS"}
+    if (
+        not text
+        or not all(math.isfinite(value) for value in (start, end, duration))
+        or start < 0.0
+        or end <= start
+        or end > duration
+    ):
+        return {"status": "ABSTAIN", "reason": "INVALID_SEGMENT_BOUNDS"}
+    requested = {
+        "before": [start - 2.5, start - 1.5, start - 0.5],
+        "during": [
+            start + (index + 0.5) * (end - start) / 3.0 for index in range(3)
+        ],
+        "after": [end + 0.5, end + 1.5, end + 2.5],
+    }
+    samples = {
+        position: [round(value, 6) for value in values if 0.0 <= value <= duration]
+        for position, values in requested.items()
+    }
+    in_bounds = sum(len(values) for values in samples.values())
+    minimum = float(amendment["tuple_window"]["minimum_in_bounds_sample_fraction"])
+    if in_bounds / 9.0 < minimum:
+        return {"status": "ABSTAIN", "reason": "INSUFFICIENT_IN_BOUNDS_FRAMES"}
+    return {
+        "status": "ACCEPT",
+        "reason": None,
+        "text_en": text,
+        "segment_start": round(start, 6),
+        "segment_end": round(end, 6),
+        "mention_anchor": round((start + end) / 2.0, 6),
+        "samples": samples,
+    }
+
+
+def _lexical_mentions(
+    text: str,
+    tagger,
+    lemmatize,
+    zipf_frequency,
+    frequency_bands: dict[str, list[float]],
+) -> list[dict[str, Any]]:
+    tokens = re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?", text)
+    tagged = tagger(tokens)
+    if len(tagged) != len(tokens):
+        raise RuntimeError("E_TUPLE_LEXICAL_SILENT_TRUNCATION")
+    output = []
+    for index, (token, part_of_speech) in enumerate(tagged):
+        if token != tokens[index]:
+            raise RuntimeError("E_TUPLE_LEXICAL_ROUNDTRIP")
+        if part_of_speech.startswith("NN"):
+            kind, wordnet_pos = "noun", "n"
+        elif part_of_speech.startswith("JJ"):
+            kind, wordnet_pos = "adjective", "a"
+        else:
+            continue
+        lemma = str(lemmatize(token.casefold(), wordnet_pos)).casefold()
+        if not lemma or not re.fullmatch(r"[a-z]+(?:'[a-z]+)?", lemma):
+            raise RuntimeError("E_TUPLE_LEMMA_INVALID")
+        value = float(zipf_frequency(lemma, "en"))
+        if not math.isfinite(value) or value < 0.0:
+            raise RuntimeError("E_TUPLE_FREQUENCY_INVALID")
+        matching = [
+            label
+            for label, bounds in frequency_bands.items()
+            if float(bounds[0]) <= value < float(bounds[1])
+            or (value == float(bounds[1]) == 8.0)
+        ]
+        if len(matching) != 1:
+            raise RuntimeError("E_TUPLE_FREQUENCY_BAND")
+        output.append(
+            {
+                "token_index": index,
+                "token": token,
+                "lemma": lemma,
+                "part_of_speech": kind,
+                "zipf_frequency": round(value, 6),
+                "frequency_band": matching[0],
+            }
+        )
+    return output
+
+
+def _map_public_ontology(
+    lemma: str, mapping: dict[str, list[str]]
+) -> dict[str, Any]:
+    matches = sorted(
+        category
+        for category, words in mapping.items()
+        if lemma.casefold() in {str(word).casefold() for word in words}
+    )
+    if not matches:
+        return {"status": "ABSTAIN", "reason": "ONTOLOGY_UNMATCHED"}
+    if len(matches) != 1:
+        return {"status": "ABSTAIN", "reason": "ONTOLOGY_AMBIGUOUS"}
+    return {"status": "ACCEPT", "reason": None, "category": matches[0]}
+
+
+def _valid_normalized_box(box: Any) -> bool:
+    if not isinstance(box, list) or len(box) != 4:
+        return False
+    try:
+        left, top, right, bottom = (float(value) for value in box)
+    except (TypeError, ValueError, OverflowError):
+        return False
+    return (
+        all(math.isfinite(value) for value in (left, top, right, bottom))
+        and 0.0 <= left < right <= 1.0
+        and 0.0 <= top < bottom <= 1.0
+    )
+
+
+def _referent_frame_proxy(
+    candidates: list[dict[str, Any]],
+    target_category: str,
+    definitions: dict[str, Any],
+    *,
+    inference_succeeded: bool,
+    negative_specificity_passed: bool,
+) -> dict[str, Any]:
+    if not inference_succeeded:
+        return {"status": "ABSTAIN", "reason": "INFERENCE_FAILURE"}
+    clean = []
+    for candidate in candidates:
+        try:
+            area = float(candidate["mask_fraction"])
+            center = float(candidate["center_distance"])
+        except (KeyError, TypeError, ValueError, OverflowError):
+            return {"status": "ABSTAIN", "reason": "INVALID_GEOMETRY"}
+        if (
+            not _valid_normalized_box(candidate.get("box"))
+            or not all(math.isfinite(value) for value in (area, center))
+            or not 0.0 <= area <= 1.0
+            or not 0.0 <= center <= math.sqrt(0.5)
+        ):
+            return {"status": "ABSTAIN", "reason": "INVALID_GEOMETRY"}
+        clean.append({**candidate, "mask_fraction": area, "center_distance": center})
+    targets = [value for value in clean if value.get("category") == target_category]
+    visible_floor = float(definitions["visible_mask_fraction_min"])
+    visible_targets = [value for value in targets if value["mask_fraction"] >= visible_floor]
+    if not visible_targets:
+        if not negative_specificity_passed:
+            return {"status": "ABSTAIN", "reason": "NEGATIVE_NOT_QUALIFIED"}
+        return {
+            "status": "MEASURED_NEGATIVE",
+            "reason": None,
+            "visible": False,
+            "dominant": False,
+            "candidate_count_bin": "0",
+        }
+    target = max(visible_targets, key=lambda value: value["mask_fraction"])
+    others = sorted(
+        [value["mask_fraction"] for value in clean if value is not target],
+        reverse=True,
+    )
+    ratio = target["mask_fraction"] / max(others[0], 1e-12) if others else math.inf
+    candidate_count = len([value for value in clean if value["mask_fraction"] >= visible_floor])
+    return {
+        "status": "MEASURED_POSITIVE",
+        "reason": None,
+        "visible": True,
+        "dominant": (
+            target["mask_fraction"]
+            >= float(definitions["dominant_target_mask_fraction_min"])
+            and ratio >= float(definitions["dominant_area_ratio_to_next_candidate_min"])
+        ),
+        "candidate_count_bin": "2plus" if candidate_count >= 2 else "1",
+        "target_mask_fraction": round(target["mask_fraction"], 6),
+        "target_center_distance": round(target["center_distance"], 6),
+        "target_to_next_area_ratio": None if math.isinf(ratio) else round(ratio, 6),
+    }
+
+
+def _validate_monotonic_track(track: list[dict[str, Any]]) -> bool:
+    previous = -math.inf
+    for row in track:
+        try:
+            timestamp = float(row["time"])
+        except (KeyError, TypeError, ValueError, OverflowError):
+            return False
+        if not math.isfinite(timestamp) or timestamp <= previous:
+            return False
+        if not _valid_normalized_box(row.get("box")):
+            return False
+        previous = timestamp
+    return bool(track)
+
+
+def _recurrence_decision(
+    cosine_similarity: float,
+    threshold: float,
+    *,
+    exact_duplicate: bool,
+    perceptual_duplicate: bool,
+) -> dict[str, Any]:
+    values = (float(cosine_similarity), float(threshold))
+    if not all(math.isfinite(value) for value in values) or not all(
+        -1.0 <= value <= 1.0 for value in values
+    ):
+        return {"status": "ABSTAIN", "reason": "INVALID_SIMILARITY"}
+    return {
+        "status": "MEASURED",
+        "reason": None,
+        "same_referent": values[0] >= values[1],
+        "visual_variation": not (exact_duplicate or perceptual_duplicate),
+    }
+
+
 def _tuple_run_root(public: Path) -> Path:
     return public / "runs/synthetic-video-calibration/mechanistic-tuples"
 
