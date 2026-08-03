@@ -235,3 +235,15 @@ stop is preserved. Prospective repair `e5fd286e…7048` removes only that
 non-estimand floor while retaining the 48-pixel source-detail floor, then
 requires one complete annotation-only COCO/VISOR/Charades feasibility pass
 before any render or model inference.
+
+That complete annotation-only feasibility run then fired its frozen
+fixture-source no-go. Under the committed shared video cap and stratum order,
+the VISOR development partition contained 16 hand/contact items, zero
+hand/no-contact items, and 12 true-no-hand items; the hand/no-contact stratum
+required 12. Holdout had the same 16/0/12 aggregate counts, and all checked
+subject/video/object overlap counts were zero. Record commitment
+`dee0a375…13e7` verifies the compact result. No fixture media or model outcome
+was produced, the Charades archive was not downloaded, and public development,
+governed C, LTX, and Synthetic-1h training were not opened. The active protocol
+therefore stops here; another public source, stratum, threshold, or model may
+not be substituted after this result.

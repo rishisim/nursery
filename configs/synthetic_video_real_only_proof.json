@@ -1,6 +1,6 @@
 {
-  "schema_version": 12,
-  "status": "MECHANISTIC_TRAINING_TUPLE_BLIND_SIZING_PASS_PENDING_PUBLIC_FIXTURE_MANIFESTS_AND_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
+  "schema_version": 13,
+  "status": "MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -21,7 +21,8 @@
     "permitted_interpretation": "a positive synthetic training effect resembling the observed real effect may be described only as encouraging descriptive evidence",
     "prohibited_interpretation": ["directionally_competitive", "equivalent", "noninferior", "same_quality", "confirmatory_phase5", "proof_of_synthetic_data_quality"],
     "inconclusive_rule": "if both matched arms are flat or decline the comparison is inconclusive",
-    "outcome_independence": "the extension generator corpus cap learner seeds steps checkpoints evaluation assets and resource-gate order were frozen before any synthetic learner outcome; the later user-authorized mechanistic training-tuple calibration amendment is separately prospective and preserves every observed calibration no-go"
+    "outcome_independence": "the extension generator corpus cap learner seeds steps checkpoints evaluation assets and resource-gate order were frozen before any synthetic learner outcome; the later user-authorized mechanistic training-tuple calibration amendment is separately prospective and preserves every observed calibration no-go",
+    "execution_status": "STOPPED_BY_FROZEN_PUBLIC_FIXTURE_SOURCE_YIELD_NO_GO_BEFORE_RENDERING_C_OR_SYNTHETIC_WORK"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",
@@ -70,7 +71,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_BLIND_SIZING_PASS_PENDING_PUBLIC_FIXTURE_MANIFESTS_AND_QUALIFICATION",
+    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -1553,6 +1554,36 @@
         "repair_commitment_scope": "canonical JSON of this amendment excluding fixture_feasibility_repair_commitment_sha256",
         "fixture_feasibility_repair_commitment_sha256": "e5fd286e9b8140583a37b855fe7125d7c6a0a2e3b57589b53294f77d28e47048"
       },
+      "mechanistic_training_tuple_fixture_feasibility_result": {
+        "status": "NO_GO_ANNOTATION_ONLY_FIXTURE_SOURCE_YIELD",
+        "job_id": 313983,
+        "elapsed": "00:00:09",
+        "fixture_feasibility_repair_commitment_sha256": "e5fd286e9b8140583a37b855fe7125d7c6a0a2e3b57589b53294f77d28e47048",
+        "fixture_feasibility_commitment_sha256": "dee0a37548d75fc29f829159ce3ad648a63288339c7bc173f8201483e51213e7",
+        "blocking_family": "VISOR_hand_contact",
+        "blocking_partition": "development",
+        "blocking_stratum": "hand_no_contact",
+        "required_count": 12,
+        "available_count": 0,
+        "development_stratum_counts": {"hand_contact": 16, "hand_no_contact": 0, "true_no_hand": 12},
+        "holdout_stratum_counts": {"hand_contact": 16, "hand_no_contact": 0, "true_no_hand": 12},
+        "COCO_source_count": 64,
+        "VISOR_selected_item_count": 56,
+        "Charades_action_selection_status": "NOT_RUN_AFTER_BLOCKING_VISOR_SOURCE_NO_GO",
+        "source_subject_overlap_count": 0,
+        "source_video_overlap_count": 0,
+        "source_object_overlap_count": 0,
+        "model_inference_executed": false,
+        "media_rendering_executed": false,
+        "large_Charades_video_archive_downloaded": false,
+        "restricted_mount_present": false,
+        "public_development_opened": false,
+        "public_holdout_opened": false,
+        "governed_C_reopened": false,
+        "LTX_preflight_or_generation_run": false,
+        "synthetic_learner_run": false,
+        "stop_rule": "the frozen annotation-only feasibility repair requires a fixture-source no-go with no further source model threshold or stratum substitution when any exact family yield fails"
+      },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},
         "framing": {"centered": "one main object centered in a child-view frame", "distributed": "several objects distributed across a child-view frame", "peripheral": "the main content is near the edge of a child-view frame"},
@@ -1602,8 +1633,8 @@
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
     "omnibus_score": "PROHIBITED",
-    "local_generator_gate": "PENDING_MECHANISTIC_TRAINING_TUPLE_PUBLIC_AND_GOVERNED_TRANSFER_QUALIFICATION",
-    "authorization_interpretation": "all four calibration no-gos remain final for their frozen questions; a new user-authorized mechanistic training-tuple calibration is prospective and currently authorizes public implementation and qualification only",
+    "local_generator_gate": "STOPPED_BY_MECHANISTIC_TRAINING_TUPLE_PUBLIC_FIXTURE_SOURCE_NO_GO",
+    "authorization_interpretation": "all four earlier calibration no-gos remain final for their frozen questions; the new mechanistic training-tuple calibration also stopped at its frozen public fixture-source yield rule before model qualification governed C or generation",
     "governed_result": {
       "status": "NO_GO",
       "job_topology": "1_H100",
@@ -1672,7 +1703,7 @@
     "failure_interpretation": "inconclusive_about_data_quality_and_stop_before_C_calibration_or_generation"
   },
   "generator_gate": {
-    "status": "SELECTED_LOCAL_NOT_RUN_MECHANISTIC_TRAINING_TUPLE_CALIBRATION_PENDING",
+    "status": "SELECTED_LOCAL_NOT_RUN_BLOCKED_BY_MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO",
     "selected": "LTX-2.3-22B-Distilled-1.1",
     "selection_basis": "latest prospective user-directed practical local-execution choice made before any redesigned learner outcome, new generator outcome, synthetic corpus, or synthetic learner score",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
@@ -1689,7 +1720,7 @@
     "audio": "discard LTX native audio and retain the frozen modular German TTS path plus repaired common language adapter",
     "no_substitution": true
   },
-  "synthetic_arm": "NOT_RUN; four prior calibration no-gos remain preserved; the prospective mechanistic training-tuple amendment authorizes public qualification but no C-conditioned plan, LTX generation, or synthetic learner score until every intervening gate passes",
+  "synthetic_arm": "NOT_RUN; four prior calibration no-gos and the mechanistic training-tuple fixture-source no-go remain preserved; no public development model outcome governed C measurement C-conditioned plan LTX generation or synthetic learner score was opened",
   "positive_learning_signal": "per arm the mean seed-matched realistic macro gain is at least 0.02 and at least two of three seed gains are positive; all temporal safeguards satisfy the frozen non-catastrophic rule",
   "former_directionally_competitive_rule_not_permitted_for_post_gate_extension": "both arms meet the positive learning signal and the absolute difference between their mean realistic lexical macros is at most 0.05",
   "null_interpretation": "a similar null or decline is inconclusive about corpus data quality and cannot be called directional comparability",

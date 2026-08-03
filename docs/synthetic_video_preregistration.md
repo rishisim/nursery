@@ -1298,3 +1298,22 @@ record commitment `b6275905…e029` verifies the result. Public development and
 holdout remain unopened. The next gate is to prepare and seal every
 task-matched fixture byte, label, transformation, and disjoint partition before
 development inference.
+
+The first fixture-preparation attempt stopped before rendering on insufficient
+COCO development sports-ball source yield. That engineering stop remains
+preserved. Prospective commitment `e5fd286e…7048` removed only the source-area
+floor, retained the 48-by-48-pixel detail floor and every scientific gate, and
+required one complete annotation-only source-yield preflight with no further
+substitution on failure. The completed preflight then found a blocking VISOR
+development hand/no-contact yield of `0` against `12` required. Development
+and holdout each had compact hand/contact, hand/no-contact, and true-no-hand
+counts of `16/0/12`; checked subject, video, and object overlap counts were all
+zero. The compact no-go record is sealed at `dee0a375…13e7`.
+
+This is `NO_GO_ANNOTATION_ONLY_FIXTURE_SOURCE_YIELD`. It occurred before fixture
+media rendering, model inference, public-development or holdout opening,
+governed-C reopening, LTX preflight or generation, and synthetic learner work.
+The four earlier calibration no-gos remain unchanged. Under the frozen repair
+rule, no additional source, stratum, threshold, or model substitution is
+authorized in this protocol; the one-hour descriptive extension therefore
+stops without a synthetic result.

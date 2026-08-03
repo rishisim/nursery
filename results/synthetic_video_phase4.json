@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_BLIND_SIZING_PASS_PENDING_PUBLIC_FIXTURE_MANIFESTS_AND_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO_PRIOR_NO_GOS_PRESERVED_NO_SYNTHETIC_RUN",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -63,7 +63,7 @@
     "interpretation": "the multi-pass Real-1h positive control missed only the frozen mean-gain component; this remains inconclusive about data quality and does not authorize generator or synthetic-arm work"
   },
   "post_gate_descriptive_extension": {
-    "status": "MECHANISTIC_TRAINING_TUPLE_CALIBRATION_AMENDMENT_FROZEN_PENDING_PUBLIC_QUALIFICATION",
+    "status": "STOPPED_BY_MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO",
     "effective_on": "2026-08-02",
     "preserves_coverage_redesign_stop": true,
     "authorization": "explicit user-authorized scientifically weaker one-accepted-hour descriptive Synthetic-1h LTX extension",
@@ -72,7 +72,7 @@
     "execution_order": ["governed_C_calibration_and_episode_plan_commitment", "public_dummy_LTX_final_topology_preflight", "freeze_and_approve_exact_resource_ceiling_if_required", "generate_and_seal_exactly_3600_credited_seconds", "three_matched_seed_synthetic_learner_runs"],
     "claim_limits": ["descriptive_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_more_than_one_accepted_synthetic_hour"],
     "prior_stop_preserved": "REAL_1H_FORMAL_GATE_AND_ALL_FOUR_CALIBRATION_NO_GOS_PRESERVED",
-    "synthetic_work_status": "NOT_RUN_PENDING_NEW_MECHANISTIC_TUPLE_PUBLIC_AND_GOVERNED_GATES"
+    "synthetic_work_status": "NOT_RUN_FIXTURE_SOURCE_NO_GO_BEFORE_PUBLIC_MODEL_OUTCOMES_GOVERNED_C_OR_GENERATION"
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -468,6 +468,36 @@
     "annotation_only_complete_feasibility_preflight": "PENDING",
     "next_gate": "run one complete annotation-only source-yield and overlap preflight; stop on failure without another substitution"
   },
+  "mechanistic_training_tuple_fixture_feasibility_result": {
+    "status": "NO_GO_ANNOTATION_ONLY_FIXTURE_SOURCE_YIELD",
+    "job_id": 313983,
+    "elapsed": "00:00:09",
+    "fixture_feasibility_repair_commitment_sha256": "e5fd286e9b8140583a37b855fe7125d7c6a0a2e3b57589b53294f77d28e47048",
+    "fixture_feasibility_commitment_sha256": "dee0a37548d75fc29f829159ce3ad648a63288339c7bc173f8201483e51213e7",
+    "blocking_family": "VISOR_hand_contact",
+    "blocking_partition": "development",
+    "blocking_stratum": "hand_no_contact",
+    "required_count": 12,
+    "available_count": 0,
+    "development_stratum_counts": {"hand_contact": 16, "hand_no_contact": 0, "true_no_hand": 12},
+    "holdout_stratum_counts": {"hand_contact": 16, "hand_no_contact": 0, "true_no_hand": 12},
+    "COCO_source_count": 64,
+    "VISOR_selected_item_count": 56,
+    "Charades_action_selection_status": "NOT_RUN_AFTER_BLOCKING_VISOR_SOURCE_NO_GO",
+    "source_subject_overlap_count": 0,
+    "source_video_overlap_count": 0,
+    "source_object_overlap_count": 0,
+    "model_inference_executed": false,
+    "media_rendering_executed": false,
+    "large_Charades_video_archive_downloaded": false,
+    "restricted_mount_present": false,
+    "public_development_opened": false,
+    "public_holdout_opened": false,
+    "governed_C_reopened": false,
+    "LTX_preflight_or_generation_run": false,
+    "synthetic_learner_run": false,
+    "stop_rule": "the frozen annotation-only feasibility repair requires a fixture-source no-go with no further source model threshold or stratum substitution when any exact family yield fails"
+  },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",
     "candidate_id": "egohod_egovideo_l_zero_shot",
@@ -534,5 +564,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "IMPLEMENT_AND_RUN_FROZEN_MECHANISTIC_TRAINING_TUPLE_PUBLIC_QUALIFICATION_ONLY; governed C audit and measurement require public pass, and LTX generation plus synthetic training remain conditional"
+  "next_authorized_scope": "NONE_UNDER_ACTIVE_MECHANISTIC_TRAINING_TUPLE_PROTOCOL; fixture-source no-go stops public model qualification, governed C, LTX, and synthetic learner work"
 }

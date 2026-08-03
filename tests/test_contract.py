@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 4
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_BLIND_SIZING_PASS_PENDING_PUBLIC_FIXTURE_MANIFESTS_AND_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_FIXTURE_SOURCE_NO_GO_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
@@ -75,6 +75,17 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
         "e5fd286e9b8140583a37b855fe7125d7c6a0a2e3b57589b53294f77d28e47048"
     )
     assert fixture_feasibility["scientific_thresholds_changed"] is False
+    fixture_result = config["mechanistic_training_tuple_fixture_feasibility_result"]
+    assert fixture_result["status"] == "NO_GO_ANNOTATION_ONLY_FIXTURE_SOURCE_YIELD"
+    assert fixture_result["fixture_feasibility_commitment_sha256"] == (
+        "dee0a37548d75fc29f829159ce3ad648a63288339c7bc173f8201483e51213e7"
+    )
+    assert fixture_result["blocking_stratum"] == "hand_no_contact"
+    assert fixture_result["required_count"] == 12
+    assert fixture_result["available_count"] == 0
+    assert fixture_result["model_inference_executed"] is False
+    assert fixture_result["governed_C_reopened"] is False
+    assert fixture_result["LTX_or_synthetic_learner_run"] is False
     runtime_preparation = config[
         "mechanistic_training_tuple_runtime_preparation_result"
     ]
@@ -206,7 +217,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 12
+    assert config["schema_version"] == 13
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"

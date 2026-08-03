@@ -1,10 +1,11 @@
 # Synthetic-video Phase 4 common evaluation assets
 
-**Status:** **CORRECTED COMMON ASSETS PASS** — Stage A remains PASS; the first
-Stage B assets remain provisional/superseded, and the corrected lexical and
-temporal assets are sealed. The active exploratory mechanistic tuple-calibration
-artifact gate passed and local-reload sizing plus public qualification remain;
-this is not confirmatory Phase 5.
+**Status:** **CORRECTED COMMON ASSETS PASS; EXPLORATORY TUPLE CALIBRATION
+STOPPED** — Stage A remains PASS; the first Stage B assets remain
+provisional/superseded, and the corrected lexical and temporal assets are
+sealed. The active exploratory mechanistic tuple-calibration passed artifact
+and local-reload sizing gates but fired its frozen public fixture-source no-go;
+this is not confirmatory Phase 5 and no synthetic arm ran.
 
 **Scope:** public-only language-pipeline qualification followed, only on a
 signed PASS, by governed construction and sealing of the two common evaluation
@@ -156,8 +157,8 @@ commitment is `3cc29f32…e46e`; the original commitments above remain
 provisional/superseded. Later exploratory real-only runs and four preserved
 calibration no-gos are recorded in the canonical preregistration and compact
 Phase 4 result. Schema 11 now freezes a distinct mechanistic training-tuple
-calibration amendment at commitment `c9a48206…adaf`. Only its public
-qualification is presently authorized. Its public artifact manifest passed at
+calibration amendment at commitment `c9a48206…adaf`. At that amendment point,
+only public qualification was authorized. Its public artifact manifest passed at
 commitment `8c787a01…b527` with seven components, four immutable repository
 archives, and ten weight/resource files (14.62 GB), without model inference or
 a restricted mount. The EgoHOS bundle is distributed by the official
@@ -199,8 +200,8 @@ or restricted mount. Final-runtime label-blind sizing then passed all eight
 modules in 55.37 seconds at 0.70 GiB peak VRAM, with zero failures, external
 calls, retained predictions, or scientific metrics; commitment
 `b6275905…e029` verifies the record. This opens only public task-matched fixture
-preparation and qualification.
-Governed C measurement requires that pass, and LTX generation remains further conditional and capped at exactly one
+preparation and qualification at that stage.
+Governed C measurement required that pass, and LTX generation remained further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is
 authorized.
 
@@ -208,8 +209,8 @@ The task-matched fixture implementation is separately frozen before model
 outcomes at commitment `506a1f41…251d`. Its action control uses fixed
 open/close, take/put, sit-down/stand-up, and turn-on/turn-off prompts and
 localized Charades-Ego intervals disjoint from the failed broad-context study.
-Exact public fixture manifests are still pending and must be sealed before
-development inference. Preparation commitment `1cc8d0e3…ff1d` now fixes the
+Exact public fixture manifests were still pending and had to be sealed before
+development inference. Preparation commitment `1cc8d0e3…ff1d` fixed the
 source archives, partition selectors, self-authored German audio recipe,
 deterministic composite/recurrence/sensor renderers, VISOR strata, and exact
 48-per-direction-control sampling without opening a model outcome. Each of the
@@ -226,3 +227,15 @@ accepted alpha-mask crop is resized to fixed authored-composite geometry; the
 48-pixel bbox floor and all scientific gates remain unchanged. A new
 annotation-only feasibility preflight must verify all COCO, VISOR, and
 Charades yields and zero cross-partition source overlap before rendering.
+
+The complete annotation-only feasibility preflight subsequently stopped at
+the frozen source-yield rule. The VISOR development hand/no-contact stratum had
+zero eligible items against 12 required; development and holdout each had
+aggregate hand/contact, hand/no-contact, and true-no-hand counts of `16/0/12`.
+All checked subject/video/object overlap counts were zero. Compact record
+commitment `dee0a375…13e7` verifies the result. No fixture media was rendered,
+no model inference or public model outcome was opened, the large Charades video
+archive was not downloaded, and governed C, LTX, generation, and synthetic
+training were not run. This exact source no-go ends the active exploratory
+route without permitting another source, stratum, threshold, or model
+substitution.
