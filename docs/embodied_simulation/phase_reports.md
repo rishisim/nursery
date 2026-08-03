@@ -588,7 +588,7 @@ or causal study requires a separate governed protocol and authorization.
 
 ## Unity–MuJoCo feasibility preflight — 2026-08-02
 
-Gate decision: **PROMISING-BUT-REPAIR**.
+Gate decision: **UNITY NOT TESTED** (historical preflight only).
 
 This is a new, bounded architectural feasibility check for the requested
 Unity-rendered, MuJoCo-authoritative child-view replacement.  It deliberately
@@ -647,7 +647,7 @@ licensed/activated Unity run be attempted as the appearance comparison.
 
 ## Native MuJoCo + Filament truth-control episode — 2026-08-02
 
-Decision: **PROMISING-BUT-REPAIR**. The native fallback now executes the exact
+Decision: **VISUAL NO-GO; ENGINEERING HARNESS RETAINED**. The native fallback now executes the exact
 16.0-second episode contract once at a 250 Hz MuJoCo clock, sampled at 31.25
 Hz: look/reorient, reach, bilateral physical grasp, lift/inspect, and release.
 It is not a Unity result and it is not a claim of child-view visual credibility.

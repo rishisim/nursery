@@ -1,0 +1,63 @@
+{
+  "question": "Can an actual Unity-based furnished scene, skinned child-proportioned embodiment, articulated hand, and body-derived head camera produce a 5-8 second clip visibly more credible than the prior MIMo footage?",
+  "scope": "visual_feasibility_only",
+  "decision": "NO-GO",
+  "unity": {
+    "editor": "6000.0.80f1",
+    "revision": "2dfd32957da2",
+    "architecture": "arm64_native",
+    "graphics_api": "Metal",
+    "render_pipeline": "Built-in Render Pipeline",
+    "license": "Unity Personal assigned; proprietary Unity Editor dependency"
+  },
+  "assets": {
+    "avatar": {
+      "source": "MPFB/MakeHuman age-minimum rigged output retained from Phase 1",
+      "source_sha256": "38765a776be116b3ce1c3c49cf253be8d25946170041e7bcf54b77fec72b5c3b",
+      "exported_fbx_sha256": "b766981d9d3504cea220c0d72ad8aa56cbd80453e910fc76dc8c8814fbd980de",
+      "license": "CC0 core graphical assets",
+      "properties": "skinned child-proportioned mesh; full articulated five-finger chains"
+    },
+    "room": {
+      "source": "Kenney Furniture Kit from OpenGameArt",
+      "archive_sha256": "68afa4e6dc8a53942379fb47f1e84ec735d46b77bb1c1ceb968e245693dde067",
+      "license": "CC0"
+    }
+  },
+  "camera": {
+    "parents": ["avatar root", "spine", "neck", "head"],
+    "frozen_mount_local_position_fbx": [0.0, 0.0002, -0.0025],
+    "frozen_mount_local_euler_deg": [8.0, 180.0, 0.0],
+    "vertical_fov_deg": 58.0,
+    "near_clip_m": 0.025,
+    "documented_radial_head_surface_clearance_m": 0.3165,
+    "target_dependent_transform": false,
+    "independent_camera_animation": false
+  },
+  "motion_disclosure": "All animation, CCD IK, finger closure, and touch are kinematic/nonphysical. The target is static. No simulator-truth or side streams were generated.",
+  "comparison": {
+    "unity_clip": "runs/embodied_simulation/unity_visual_audition/unity_audition.mp4",
+    "unity_sha256": "099682dc4fc0a80ac0d236a2b63df5bef0bd6d71aca5eb7a42a793084a28e54b",
+    "mimo_reference_window_s": [6.0, 13.0],
+    "mimo_reference_sha256": "a9a1a1e39abcddfd7b8a4ef231684bc5d43badd23dbe27c89192eaf50ba66013",
+    "side_by_side_sha256": "3e9f16dfeb980238f4c22be1bf3493e2e9a2ec0f4480a0db6f6bb21e7f5ee3ae",
+    "dense_timeline_sha256": "7d4e716b5109ca25acfb2f132168e7a1d3327094271aef5e607df955ce72086a"
+  },
+  "judgment": {
+    "room_coherence": "fail: licensed furnishings are present but import-scale composition is not visually coherent from the head view",
+    "child_embodiment": "fail: skinned rig exists but self-geometry dominates and does not read as a plausible child view",
+    "head_camera": "fail visually despite valid ancestry and frozen mount; severe self-occlusion",
+    "horizon_roll_fov": "partial: 58-degree FOV and bounded roll, but composition is invalid",
+    "hand_anatomy": "not readable",
+    "reach_touch": "not readable",
+    "clipping": "fail: prolonged full-frame self-occlusion/near composition",
+    "temporal_naturalness": "fail: motion is visually negligible/unreadable",
+    "beats_mimo": false
+  },
+  "governance": {
+    "restricted_childlens_accessed": false,
+    "childlens_measurement_or_calibration": false,
+    "simulator_truth_or_training_example": false,
+    "causal_evidence": false
+  }
+}
