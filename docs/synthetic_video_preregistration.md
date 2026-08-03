@@ -1213,7 +1213,9 @@ single-line source repair: verify the original file at
 `cdfb48d5…a5b8`, remove exactly the unused import, and require patched hash
 `0da7cea7…c671`. Model computation, weights, fixtures, thresholds, and gates do
 not change. The `ee70ae31…b41b` runtime remains preserved in the prior list;
-the active overlay must be resealed before sizing resumes.
+the active overlay was resealed in 8 minutes 39 seconds at runtime-manifest
+commitment `03c15506…2c15`, again without model inference or a restricted
+mount. Label-blind sizing may now resume.
 
 Before that sizing run, the task-matched public-fixture implementation was
 made exact at commitment `506a1f41…251d`, without opening a model outcome. The

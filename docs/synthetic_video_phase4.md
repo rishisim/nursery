@@ -175,8 +175,9 @@ The retry passed language, lexical, and sensor checks but stopped before
 Grounding DINO construction because its model file imports an unused
 visualization class that pulls in unpinned Matplotlib. Active runtime commitment
 `623225bf…09e4` verifies the exact original source and removes only that
-unreferenced import; it must be resealed before local-files-only model reload
-and blind sizing resume.
+unreferenced import. The active runtime was resealed at `03c15506…2c15`, again
+without inference or a restricted mount; local-files-only model reload and
+blind sizing may resume.
 Governed C measurement requires that pass, and LTX generation remains further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is
 authorized.

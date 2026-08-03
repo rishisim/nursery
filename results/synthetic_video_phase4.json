@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_RUNTIME_REPAIR_FROZEN_REPREPARATION_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -366,23 +366,23 @@
     "public_model_outcome_opened": false
   },
   "mechanistic_training_tuple_runtime_preparation_result": {
-    "status": "PASS_RESOURCE_PREPARATION_SUPERSEDED_BY_PRE_OUTCOME_GROUNDING_UNUSED_IMPORT_REPAIR_REPREPARATION_PENDING",
-    "job_id": 313857,
-    "elapsed": "00:08:38",
+    "status": "PASS_RUNTIME_READY_LOCAL_RELOAD_BLIND_SIZING_PENDING",
+    "job_id": 313872,
+    "elapsed": "00:08:39",
     "dependency_count": 53,
     "dependency_artifact_count": 53,
     "installed_distribution_count": 53,
     "additional_repository_count": 1,
     "additional_model_file_count": 6,
     "mechanistic_amendment_commitment_sha256": "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf",
-    "runtime_amendment_commitment_sha256": "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b",
+    "runtime_amendment_commitment_sha256": "623225bf24f67743e1e8990e02cebe8364191bcd17f89859c27213488ea009e4",
     "base_dependency_manifest_commitment_sha256": "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527",
-    "runtime_dependency_commitment_sha256": "9810a61868da9a2bede49679820963409c76a3524529a9396c3d5348010748f9",
-    "prior_runtime_dependency_commitments_sha256": ["968f2570ffd8d325a12e2bd6058cc8ab31fb99f1d50b30607419f6da20c81f10"],
+    "runtime_dependency_commitment_sha256": "03c15506b0ce9fcfe403ebd735e0025dd7685d34867425b385db5463b4542c15",
+    "prior_runtime_dependency_commitments_sha256": ["968f2570ffd8d325a12e2bd6058cc8ab31fb99f1d50b30607419f6da20c81f10", "9810a61868da9a2bede49679820963409c76a3524529a9396c3d5348010748f9"],
     "restricted_mount_present": false,
     "model_inference_executed": false,
     "public_extractor_pass": false,
-    "next_gate": "reseal the active runtime after the Grounding DINO unused-import repair, then rerun one-H100 network-disabled eight-module label-blind local reload sizing"
+    "next_gate": "one-H100 network-disabled eight-module label-blind local reload sizing"
   },
   "mechanistic_training_tuple_public_fixture_protocol": {
     "status": "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES",

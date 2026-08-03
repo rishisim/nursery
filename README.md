@@ -201,8 +201,9 @@ standard `taggers/` and `corpora/` namespace; the repair verifies every sealed
 hash and adds only scratch-local symlinks. The repaired overlay was resealed at
 `9810a618…48f9`. The retry then stopped before Grounding DINO construction on
 an unused visualization import. Active commitment `623225bf…09e4` removes only
-that exact import after original/patched source-hash verification and must be
-resealed before label-blind sizing resumes. No model substitution or
+that exact import after original/patched source-hash verification and was then
+resealed before label-blind sizing resumed. That reseal passed at
+`03c15506…2c15`, with no inference or restricted mount. No model substitution or
 gate change is involved. C measurement,
 LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
 and descriptive-only claim boundary are unchanged.

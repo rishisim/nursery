@@ -93,7 +93,7 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_RUNTIME_REPAIR_FROZEN_REPREPARATION_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -131,11 +131,11 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
         "mechanistic_training_tuple_runtime_preparation_result"
     ]
     assert runtime_preparation["status"] == (
-        "PASS_RESOURCE_PREPARATION_SUPERSEDED_BY_PRE_OUTCOME_GROUNDING_UNUSED_IMPORT_REPAIR_REPREPARATION_PENDING"
+        "PASS_RUNTIME_READY_LOCAL_RELOAD_BLIND_SIZING_PENDING"
     )
     assert runtime_preparation["installed_distribution_count"] == 53
     assert runtime_preparation["runtime_dependency_commitment_sha256"] == (
-        "9810a61868da9a2bede49679820963409c76a3524529a9396c3d5348010748f9"
+        "03c15506b0ce9fcfe403ebd735e0025dd7685d34867425b385db5463b4542c15"
     )
     assert runtime_preparation["model_inference_executed"] is False
     premodel = result["mechanistic_training_tuple_premodel_result"]
@@ -226,7 +226,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "MECHANISTIC_TRAINING_TUPLE_RUNTIME_REPAIR_FROZEN_REPREPARATION_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
+    assert proof["status"] == "MECHANISTIC_TRAINING_TUPLE_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,
