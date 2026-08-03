@@ -249,24 +249,42 @@ def _tuple_model_root(public: Path) -> Path:
     return public / "models/mechanistic-tuples"
 
 
-def _clone_public_repository(url: str, commit: str, target: Path) -> None:
-    if not target.exists():
-        target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-        subprocess.run(
-            ["git", "clone", "--filter=blob:none", "--no-checkout", url, str(target)],
-            check=True,
-        )
-    if not (target / ".git").is_dir():
-        raise RuntimeError("E_TUPLE_REPOSITORY_NOT_GIT")
-    subprocess.run(
-        ["git", "-C", str(target), "fetch", "--quiet", "origin", commit],
-        check=True,
-    )
-    subprocess.run(
-        ["git", "-C", str(target), "checkout", "--quiet", "--detach", commit],
-        check=True,
-    )
-    _verify_repository_commit(target, commit)
+def _clone_public_repository(
+    url: str, commit: str, target: Path
+) -> dict[str, Any]:
+    target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    repository_url = url.removesuffix(".git")
+    archive = target.parent / f"{target.name}-{commit}.zip"
+    _download_public_artifact(f"{repository_url}/archive/{commit}.zip", archive)
+    archive_record = {
+        "archive_sha256": file_digest(archive),
+        "archive_bytes": archive.stat().st_size,
+    }
+    marker = target / ".source-commit"
+    if marker.is_file() and marker.read_text().strip() == commit:
+        return archive_record
+    with zipfile.ZipFile(archive) as source:
+        names = source.namelist()
+        roots = {Path(name).parts[0] for name in names if Path(name).parts}
+        if len(roots) != 1:
+            raise RuntimeError("E_TUPLE_REPOSITORY_ARCHIVE_ROOT")
+        for name in names:
+            member = Path(name)
+            if member.is_absolute() or ".." in member.parts:
+                raise RuntimeError("E_TUPLE_ARCHIVE_PATH")
+        temporary = target.parent / f".{target.name}-extracting"
+        if temporary.exists():
+            shutil.rmtree(temporary)
+        temporary.mkdir(mode=0o700)
+        source.extractall(temporary)
+        extracted = temporary / next(iter(roots))
+        if target.exists():
+            shutil.rmtree(target)
+        extracted.replace(target)
+        shutil.rmtree(temporary)
+    marker.write_text(commit + "\n")
+    os.chmod(marker, 0o600)
+    return archive_record
 
 
 def _download_public_artifact(url: str, target: Path) -> None:
@@ -274,23 +292,16 @@ def _download_public_artifact(url: str, target: Path) -> None:
     if target.is_file() and target.stat().st_size > 1024 * 1024:
         return
     partial = target.with_suffix(target.suffix + ".partial")
-    subprocess.run(
-        [
-            "curl",
-            "--fail",
-            "--location",
-            "--retry",
-            "5",
-            "--retry-delay",
-            "5",
-            "--continue-at",
-            "-",
-            "--output",
-            str(partial),
-            url,
-        ],
-        check=True,
-    )
+    offset = partial.stat().st_size if partial.is_file() else 0
+    headers = {"User-Agent": "synthetic-video-research/1"}
+    if offset:
+        headers["Range"] = f"bytes={offset}-"
+    request = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(request, timeout=300) as response:
+        status = int(getattr(response, "status", response.getcode()))
+        mode = "ab" if offset and status == 206 else "wb"
+        with partial.open(mode) as handle:
+            shutil.copyfileobj(response, handle, length=1024 * 1024)
     if partial.stat().st_size <= 1024 * 1024:
         raise RuntimeError("E_TUPLE_ARTIFACT_TOO_SMALL")
     os.chmod(partial, 0o600)
@@ -370,14 +381,15 @@ def prepare_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
     repository_records = []
     for name, url, commit, license_sha256 in repositories:
         target = code_root / name
-        _clone_public_repository(url, commit, target)
+        archive_record = _clone_public_repository(url, commit, target)
         repository_records.append(
             {
                 "name": name,
                 "url": url,
                 "commit": commit,
+                **archive_record,
                 "license_sha256": _license_digest(target, license_sha256),
-                "clean": True,
+                "immutable_commit_archive": True,
             }
         )
     downloads = [

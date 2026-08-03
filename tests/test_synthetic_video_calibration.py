@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+from io import BytesIO
 import json
 from pathlib import Path
+import shutil
+import zipfile
 
 
 SPEC = importlib.util.spec_from_file_location(
@@ -233,6 +236,59 @@ def test_tuple_zip_extraction_blocks_path_traversal(tmp_path: Path) -> None:
         handle.writestr("../escape", "blocked")
     with pytest.raises(RuntimeError, match="E_TUPLE_ARCHIVE_PATH"):
         MODULE._safe_extract_zip(archive, tmp_path / "output")
+
+
+def test_tuple_repository_archive_records_bytes_and_commit(
+    tmp_path: Path, monkeypatch
+) -> None:
+    source = tmp_path / "source.zip"
+    with zipfile.ZipFile(source, "w") as handle:
+        handle.writestr("repo-abc/LICENSE", "public license")
+        handle.writestr("repo-abc/module.py", "value = 1\n")
+
+    def copy_archive(_url: str, target: Path) -> None:
+        shutil.copyfile(source, target)
+
+    monkeypatch.setattr(MODULE, "_download_public_artifact", copy_archive)
+    target = tmp_path / "repo"
+    record = MODULE._clone_public_repository(
+        "https://github.com/example/repo.git", "abc", target
+    )
+    assert record == {
+        "archive_sha256": MODULE.file_digest(source),
+        "archive_bytes": source.stat().st_size,
+    }
+    assert (target / ".source-commit").read_text().strip() == "abc"
+    assert (target / "module.py").read_text() == "value = 1\n"
+
+
+def test_tuple_download_resumes_only_on_partial_content(
+    tmp_path: Path, monkeypatch
+) -> None:
+    payload = b"x" * (1024 * 1024 + 1)
+    target = tmp_path / "artifact.bin"
+    partial = tmp_path / "artifact.bin.partial"
+    partial.write_bytes(b"prefix")
+
+    class Response(BytesIO):
+        status = 206
+
+        def getcode(self):
+            return self.status
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            self.close()
+
+    monkeypatch.setattr(
+        MODULE.urllib.request,
+        "urlopen",
+        lambda _request, timeout: Response(payload),
+    )
+    MODULE._download_public_artifact("https://public.invalid/artifact", target)
+    assert target.read_bytes() == b"prefix" + payload
 
 
 def test_activity_threshold_and_abstention_are_conservative_and_explicit() -> None:
