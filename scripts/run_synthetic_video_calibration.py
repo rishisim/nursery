@@ -2547,6 +2547,9 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
     activity = cfg["calibration_C"]["extractor"][
         "activity_checkpoint_selection_amendment"
     ]
+    activity_dependency = _verify_activity_dependency_manifest(
+        args.public_root, activity
+    )
     candidate = next(
         value
         for value in activity["bounded_candidates"]
@@ -2590,6 +2593,9 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
         ],
         "runtime_dependency_commitment_sha256": dependency[
             "runtime_dependency_commitment_sha256"
+        ],
+        "activity_dependency_manifest_commitment_sha256": activity_dependency[
+            "dependency_manifest_commitment_sha256"
         ],
         "modules": modules,
         "fixture_labels_used": False,

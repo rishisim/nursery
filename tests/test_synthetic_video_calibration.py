@@ -384,6 +384,7 @@ def test_tuple_sizing_is_label_blind_and_retains_no_predictions() -> None:
     assert '"prediction_or_score_retained": False' in source
     assert '"external_call_count": 0' in source
     assert '"module_count"' in source
+    assert "_verify_activity_dependency_manifest" in source
     assert "activity['development_selection_result']" not in source
     assert "restricted_root" not in source
 
