@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_RUNTIME_REPAIR_FROZEN_REPREPARATION_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -354,9 +354,9 @@
   },
   "mechanistic_training_tuple_runtime_amendment": {
     "status": "FROZEN_BEFORE_LOCAL_RELOAD_SIZING_OR_PUBLIC_MODEL_OUTCOMES",
-    "runtime_amendment_commitment_sha256": "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b",
-    "prior_commitments_sha256": ["adcac3fc45133ab8697923fd473fd692d9c79de48b5cc10b58e4d01cad92b285", "6c3c76e3c5661255dba0131f9b20c6d4daf3b994a8e8c9013bbddbc8213ddec1", "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc"],
-    "clarifications": ["seven calibration axes plus the separate blocking order-action control require eight sizing modules", "pin einops 0.8.0 required by the selected PE-Core loader before inference", "verify all sealed NLTK resource hashes and create scratch-only taggers/corpora namespace symlinks; the triggering sizing attempt stopped before model inference"],
+    "runtime_amendment_commitment_sha256": "623225bf24f67743e1e8990e02cebe8364191bcd17f89859c27213488ea009e4",
+    "prior_commitments_sha256": ["adcac3fc45133ab8697923fd473fd692d9c79de48b5cc10b58e4d01cad92b285", "6c3c76e3c5661255dba0131f9b20c6d4daf3b994a8e8c9013bbddbc8213ddec1", "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc", "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b"],
+    "clarifications": ["seven calibration axes plus the separate blocking order-action control require eight sizing modules", "pin einops 0.8.0 required by the selected PE-Core loader before inference", "verify all sealed NLTK resource hashes and create scratch-only taggers/corpora namespace symlinks; the triggering sizing attempt stopped before model inference", "remove one exact unused COCOVisualizer import from pinned Grounding DINO after original and patched source hash verification; the triggering sizing attempt stopped before model construction"],
     "dependency_count": 53,
     "compatibility_adapter_count": 7,
     "label_blind_module_count": 8,
@@ -366,7 +366,7 @@
     "public_model_outcome_opened": false
   },
   "mechanistic_training_tuple_runtime_preparation_result": {
-    "status": "PASS_RUNTIME_READY_LOCAL_RELOAD_BLIND_SIZING_PENDING",
+    "status": "PASS_RESOURCE_PREPARATION_SUPERSEDED_BY_PRE_OUTCOME_GROUNDING_UNUSED_IMPORT_REPAIR_REPREPARATION_PENDING",
     "job_id": 313857,
     "elapsed": "00:08:38",
     "dependency_count": 53,
@@ -382,7 +382,7 @@
     "restricted_mount_present": false,
     "model_inference_executed": false,
     "public_extractor_pass": false,
-    "next_gate": "one-H100 network-disabled eight-module label-blind local reload sizing"
+    "next_gate": "reseal the active runtime after the Grounding DINO unused-import repair, then rerun one-H100 network-disabled eight-module label-blind local reload sizing"
   },
   "mechanistic_training_tuple_public_fixture_protocol": {
     "status": "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES",

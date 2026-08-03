@@ -233,7 +233,7 @@ def test_tuple_runtime_amendment_is_exact_and_rejects_mutation() -> None:
     config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     runtime = MODULE._tuple_runtime_amendment(config)
     assert runtime["runtime_amendment_commitment_sha256"] == (
-        "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b"
+        "623225bf24f67743e1e8990e02cebe8364191bcd17f89859c27213488ea009e4"
     )
     assert len(runtime["dependency_versions"]) == 53
     assert runtime["dependency_versions"]["einops"] == "0.8.0"
@@ -243,7 +243,7 @@ def test_tuple_runtime_amendment_is_exact_and_rejects_mutation() -> None:
     assert runtime["local_reload_gate"]["module_count"] == 8
     assert len(runtime["compatibility_adapters"]) == 7
     assert runtime["prior_runtime_amendment_commitments_sha256"][-1] == (
-        "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc"
+        "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b"
     )
     config["calibration_C"]["extractor"][
         "mechanistic_training_tuple_runtime_amendment"
@@ -485,9 +485,17 @@ def test_grounding_fallback_patch_is_narrow_and_extension_conditional() -> None:
     assert MODULE.GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256 == (
         "42aa71c7c47e6f930f48100924393adac95eb94aae0eef779bd7cad2d5bcc95d"
     )
+    assert MODULE.GROUNDING_DINO_MODEL_SOURCE_SHA256 == (
+        "cdfb48d5b15d6b98f3d2002f59ae4730740a1ecfbaeba324f6840c5e4666a5b8"
+    )
+    assert MODULE.GROUNDING_DINO_MODEL_NO_VISUALIZER_SHA256 == (
+        "0da7cea7ddbaddced76432d7a8bc13844dc69d3bee3ce5ae674c46fd0339c671"
+    )
     assert '"if torch.cuda.is_available() and value.is_cuda:"' in source
     assert "if '_C' in globals() and torch.cuda.is_available() and value.is_cuda:" in source
     assert "text.count(original) != 1" in source
+    assert 'model_text.count("COCOVisualizer") != 1' in source
+    assert "E_TUPLE_GROUNDING_VISUALIZER_PATCH_STATE" in source
 
 
 def test_tuple_window_uses_segment_midpoint_and_never_fabricates_word_time() -> None:

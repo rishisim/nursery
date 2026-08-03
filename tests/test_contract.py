@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 4
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_RUNTIME_PREP_PASS_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_MECHANISTIC_TRAINING_TUPLE_RUNTIME_REPAIR_FROZEN_REPREPARATION_PENDING_BLIND_SIZING_AND_PUBLIC_QUALIFICATION_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
@@ -58,7 +58,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
         "mechanistic_training_tuple_runtime_preparation_result"
     ]
     assert runtime_preparation["status"] == (
-        "PASS_RUNTIME_READY_LOCAL_RELOAD_BLIND_SIZING_PENDING"
+        "PASS_RESOURCE_PREPARATION_SUPERSEDED_BY_PRE_OUTCOME_GROUNDING_UNUSED_IMPORT_REPAIR_REPREPARATION_PENDING"
     )
     assert runtime_preparation["dependency_count"] == 53
     assert runtime_preparation["runtime_dependency_commitment_sha256"] == (
@@ -67,7 +67,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert runtime_preparation["model_inference_executed"] is False
     runtime = config["mechanistic_training_tuple_runtime_amendment"]
     assert runtime["runtime_amendment_commitment_sha256"] == (
-        "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b"
+        "623225bf24f67743e1e8990e02cebe8364191bcd17f89859c27213488ea009e4"
     )
     assert runtime["compatibility_adapter_count"] == 7
     assert schedule_cycle(config["learner"]["schedule"]) == [

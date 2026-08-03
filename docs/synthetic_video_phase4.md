@@ -171,7 +171,12 @@ model load because the official NLTK archives needed scratch-local
 `taggers/`/`corpora/` namespace symlinks. Every source resource hash is checked
 before those links are made. The active runtime was resealed at
 `9810a618…48f9`, again without model inference or a restricted mount.
-Local-files-only model reload and blind sizing remain pending.
+The retry passed language, lexical, and sensor checks but stopped before
+Grounding DINO construction because its model file imports an unused
+visualization class that pulls in unpinned Matplotlib. Active runtime commitment
+`623225bf…09e4` verifies the exact original source and removes only that
+unreferenced import; it must be resealed before local-files-only model reload
+and blind sizing resume.
 Governed C measurement requires that pass, and LTX generation remains further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is
 authorized.

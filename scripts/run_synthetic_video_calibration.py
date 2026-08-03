@@ -207,6 +207,12 @@ NLTK_RESOURCE_ARCHIVES = {
 GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256 = (
     "42aa71c7c47e6f930f48100924393adac95eb94aae0eef779bd7cad2d5bcc95d"
 )
+GROUNDING_DINO_MODEL_SOURCE_SHA256 = (
+    "cdfb48d5b15d6b98f3d2002f59ae4730740a1ecfbaeba324f6840c5e4666a5b8"
+)
+GROUNDING_DINO_MODEL_NO_VISUALIZER_SHA256 = (
+    "0da7cea7ddbaddced76432d7a8bc13844dc69d3bee3ce5ae674c46fd0339c671"
+)
 TUPLE_LANGUAGE_ADAPTER_SHA256 = (
     "005f368bef97dfc791f43e45da8bbfe01ea22e8790b2032e9580b14b1ea62ac8"
 )
@@ -703,7 +709,7 @@ def _download_exact_public_artifact(
 
 
 def _apply_grounding_dino_fallback_patch(code_root: Path) -> dict[str, str]:
-    path = (
+    deform_path = (
         code_root
         / "groundingdino/models/GroundingDINO/ms_deform_attn.py"
     )
@@ -711,20 +717,45 @@ def _apply_grounding_dino_fallback_patch(code_root: Path) -> dict[str, str]:
     replacement = (
         "if '_C' in globals() and torch.cuda.is_available() and value.is_cuda:"
     )
-    text = path.read_text()
+    text = deform_path.read_text()
     if original in text:
-        if file_digest(path) != GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256:
+        if file_digest(deform_path) != GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256:
             raise RuntimeError("E_TUPLE_GROUNDING_PATCH_SOURCE")
         if text.count(original) != 1:
             raise RuntimeError("E_TUPLE_GROUNDING_PATCH_COUNT")
-        path.write_text(text.replace(original, replacement))
-        os.chmod(path, 0o600)
+        deform_path.write_text(text.replace(original, replacement))
+        os.chmod(deform_path, 0o600)
     elif replacement not in text or text.count(replacement) != 1:
         raise RuntimeError("E_TUPLE_GROUNDING_PATCH_STATE")
+
+    model_path = (
+        code_root
+        / "groundingdino/models/GroundingDINO/groundingdino.py"
+    )
+    visualizer_import = (
+        "from groundingdino.util.visualizer import COCOVisualizer\n"
+    )
+    model_text = model_path.read_text()
+    if visualizer_import in model_text:
+        if (
+            file_digest(model_path) != GROUNDING_DINO_MODEL_SOURCE_SHA256
+            or model_text.count(visualizer_import) != 1
+            or model_text.count("COCOVisualizer") != 1
+        ):
+            raise RuntimeError("E_TUPLE_GROUNDING_VISUALIZER_PATCH_SOURCE")
+        model_path.write_text(model_text.replace(visualizer_import, ""))
+        os.chmod(model_path, 0o600)
+    elif (
+        "COCOVisualizer" in model_text
+        or file_digest(model_path) != GROUNDING_DINO_MODEL_NO_VISUALIZER_SHA256
+    ):
+        raise RuntimeError("E_TUPLE_GROUNDING_VISUALIZER_PATCH_STATE")
     return {
-        "original_sha256": GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256,
-        "patched_sha256": file_digest(path),
-        "semantic_scope": "use_official_pytorch_fallback_only_when_official_compiled_extension_is_absent",
+        "deform_attention_original_sha256": GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256,
+        "deform_attention_patched_sha256": file_digest(deform_path),
+        "model_original_sha256": GROUNDING_DINO_MODEL_SOURCE_SHA256,
+        "model_patched_sha256": file_digest(model_path),
+        "semantic_scope": "use the official PyTorch deformable-attention fallback only when the official compiled extension is absent and remove one unused visualization-only import; model computation is unchanged",
     }
 
 

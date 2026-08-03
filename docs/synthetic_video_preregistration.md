@@ -1204,6 +1204,17 @@ runtime-manifest commitment `9810a618…48f9`, again with no restricted mount or
 model inference. It authorizes the unchanged label-blind sizing gate only; it
 is not an extractor qualification result.
 
+That sizing retry cleared the adapter, lexical, and sensor checks, then stopped
+before Grounding DINO construction because the pinned model source imports an
+unused visualization class whose module alone requires unpinned Matplotlib.
+The class is not otherwise referenced in the selected model file. Before any
+model inference, active runtime commitment `623225bf…09e4` therefore froze a
+single-line source repair: verify the original file at
+`cdfb48d5…a5b8`, remove exactly the unused import, and require patched hash
+`0da7cea7…c671`. Model computation, weights, fixtures, thresholds, and gates do
+not change. The `ee70ae31…b41b` runtime remains preserved in the prior list;
+the active overlay must be resealed before sizing resumes.
+
 Before that sizing run, the task-matched public-fixture implementation was
 made exact at commitment `506a1f41…251d`, without opening a model outcome. The
 blocking action module uses the pinned EgoHOD checkpoint with three fixed
