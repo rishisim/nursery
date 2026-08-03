@@ -252,6 +252,29 @@ def _tuple_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     return value
 
 
+def _tuple_runtime_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
+    try:
+        value = cfg["calibration_C"]["extractor"][
+            "mechanistic_training_tuple_runtime_amendment"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_RUNTIME_NOT_FROZEN") from error
+    if value.get("status") != (
+        "FROZEN_BEFORE_LOCAL_RELOAD_SIZING_OR_PUBLIC_MODEL_OUTCOMES"
+    ):
+        raise RuntimeError("E_TUPLE_RUNTIME_NOT_FROZEN")
+    copy = json.loads(json.dumps(value))
+    expected = copy.pop("runtime_amendment_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(copy) != expected:
+        raise RuntimeError("E_TUPLE_RUNTIME_COMMITMENT")
+    dependencies = value.get("dependency_versions")
+    if not isinstance(dependencies, dict) or len(dependencies) != 52:
+        raise RuntimeError("E_TUPLE_RUNTIME_DEPENDENCY_SET")
+    if value["local_reload_gate"].get("all_seven_components_must_pass") is not True:
+        raise RuntimeError("E_TUPLE_RUNTIME_GATE")
+    return value
+
+
 def _tuple_segment_window(
     segment: dict[str, Any], media_duration: float, amendment: dict[str, Any]
 ) -> dict[str, Any]:

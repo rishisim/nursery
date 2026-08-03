@@ -1169,3 +1169,14 @@ separate license file; the eligibility record is limited to academic local
 prototype processing and makes no broader commercial-use claim. Exact local
 dependency installation, network-disabled reload, and label-blind sizing are
 the next gate; public development and holdout remain unopened.
+
+Before that reload, the exact runtime overlay and six narrowly scoped
+compatibility adapters were frozen at commitment `adcac3fc…b285`. They retain
+the seven registered models. Grounding DINO uses its own commit's official
+pure-PyTorch deformable-attention fallback because the base container has no
+compiler; SAM 2 disables its officially optional CUDA extension; and the
+EgoHOS shim supplies only unused `mmcv.ops` registry symbols and must fail if
+the selected Swin/UPerNet path calls one. The pinned public BERT snapshot and
+the EgoBabyVLM PE-Core loader are additional hashed dependencies. The sizing
+run remains label blind, retains no scores, uses one item per component, and is
+capped at one H100 GPU-hour.

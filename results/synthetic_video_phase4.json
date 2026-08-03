@@ -352,6 +352,16 @@
     "governed_C_reopened": false,
     "generator_or_synthetic_learner_outcome_opened": false
   },
+  "mechanistic_training_tuple_runtime_amendment": {
+    "status": "FROZEN_BEFORE_LOCAL_RELOAD_SIZING_OR_PUBLIC_MODEL_OUTCOMES",
+    "runtime_amendment_commitment_sha256": "adcac3fc45133ab8697923fd473fd692d9c79de48b5cc10b58e4d01cad92b285",
+    "dependency_count": 52,
+    "compatibility_adapter_count": 6,
+    "label_blind_item_count_per_component": 1,
+    "aggregate_GPU_hours_max": 1.0,
+    "model_substitution": false,
+    "public_model_outcome_opened": false
+  },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",
     "candidate_id": "egohod_egovideo_l_zero_shot",

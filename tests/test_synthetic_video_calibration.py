@@ -227,6 +227,23 @@ def test_tuple_amendment_commitment_and_axis_guards_reject_mutation() -> None:
         MODULE._tuple_amendment(config)
 
 
+def test_tuple_runtime_amendment_is_exact_and_rejects_mutation() -> None:
+    import pytest
+
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    runtime = MODULE._tuple_runtime_amendment(config)
+    assert runtime["runtime_amendment_commitment_sha256"] == (
+        "adcac3fc45133ab8697923fd473fd692d9c79de48b5cc10b58e4d01cad92b285"
+    )
+    assert len(runtime["dependency_versions"]) == 52
+    assert runtime["local_reload_gate"]["all_seven_components_must_pass"] is True
+    config["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_runtime_amendment"
+    ]["dependency_versions"]["numpy"] = "2.4.6"
+    with pytest.raises(RuntimeError, match="E_TUPLE_RUNTIME_COMMITMENT"):
+        MODULE._tuple_runtime_amendment(config)
+
+
 def test_tuple_zip_extraction_blocks_path_traversal(tmp_path: Path) -> None:
     import pytest
     import zipfile
