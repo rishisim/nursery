@@ -162,6 +162,22 @@ TUPLE_PREP_FIELDS = frozenset(
     }
 )
 TUPLE_PREP_HASH_FIELDS = frozenset({"tuple_dependency_commitment_sha256"})
+TUPLE_RUNTIME_PREP_FIELDS = frozenset(
+    {
+        "status",
+        "dependency_count",
+        "dependency_artifact_count",
+        "installed_distribution_count",
+        "additional_repository_count",
+        "additional_model_file_count",
+        "restricted_mount_present",
+        "model_inference_executed",
+        "runtime_dependency_commitment_sha256",
+    }
+)
+TUPLE_RUNTIME_PREP_HASH_FIELDS = frozenset(
+    {"runtime_dependency_commitment_sha256"}
+)
 NLTK_DATA_COMMIT = "550b6625bcef1f2abff2ff770a5a0d272c9c6b2a"
 NLTK_RESOURCE_ARCHIVES = {
     "wordnet.zip": {
@@ -562,6 +578,26 @@ def _download_public_artifact(url: str, target: Path) -> None:
     partial.replace(target)
 
 
+def _download_exact_public_artifact(
+    url: str, target: Path, expected_sha256: str
+) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if target.is_file() and file_digest(target) == expected_sha256:
+        return
+    partial = target.with_suffix(target.suffix + ".partial")
+    request = urllib.request.Request(
+        url, headers={"User-Agent": "synthetic-video-research/1"}
+    )
+    with urllib.request.urlopen(request, timeout=300) as response:
+        with partial.open("wb") as handle:
+            shutil.copyfileobj(response, handle, length=1024 * 1024)
+    os.chmod(partial, 0o600)
+    if file_digest(partial) != expected_sha256:
+        partial.unlink(missing_ok=True)
+        raise RuntimeError("E_TUPLE_EXACT_ARTIFACT_HASH")
+    partial.replace(target)
+
+
 def _safe_extract_zip(source: Path, target: Path) -> list[str]:
     with zipfile.ZipFile(source) as archive:
         names = archive.namelist()
@@ -815,6 +851,179 @@ def prepare_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
         "model_inference_executed": False,
         "tuple_dependency_commitment_sha256": manifest[
             "tuple_dependency_commitment_sha256"
+        ],
+    }
+
+
+def prepare_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    amendment = _tuple_amendment(cfg)
+    runtime = _tuple_runtime_amendment(cfg)
+    model_root = _tuple_model_root(args.public_root)
+    base_manifest_path = _tuple_run_root(args.public_root) / "dependency_manifest.json"
+    base_manifest = json.loads(base_manifest_path.read_text())
+    expected_base = cfg["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_premodel_result"
+    ]["dependency_manifest_commitment_sha256"]
+    if (
+        base_manifest.get("tuple_dependency_commitment_sha256") != expected_base
+        or digest(
+            {
+                key: value
+                for key, value in base_manifest.items()
+                if key != "tuple_dependency_commitment_sha256"
+            }
+        )
+        != expected_base
+        or base_manifest.get("amendment_commitment_sha256")
+        != amendment["amendment_commitment_sha256"]
+        or base_manifest.get("model_inference_executed") is not False
+        or base_manifest.get("restricted_mount_present") is not False
+    ):
+        raise RuntimeError("E_TUPLE_BASE_DEPENDENCY_MANIFEST")
+
+    egobaby = runtime["additional_public_artifacts"]["egobaby_loader"]
+    egobaby_root = model_root / "code/egobabyvlm"
+    egobaby_archive = _clone_public_repository(
+        egobaby["repository"], egobaby["commit"], egobaby_root
+    )
+    egobaby_license = _license_digest(
+        egobaby_root,
+        "e668cfe2504c4ffa4bbc7dbd63d3302d7561f4df107cfe0ac693c0fe3fa6f01d",
+    )
+
+    bert = runtime["additional_public_artifacts"]["bert_base_uncased"]
+    bert_root = model_root / "bert-base-uncased"
+    bert_records = []
+    for name, expected in sorted(bert["files_sha256"].items()):
+        path = bert_root / name
+        _download_exact_public_artifact(
+            "https://huggingface.co/"
+            f"{bert['repository']}/resolve/{bert['revision']}/{name}?download=true",
+            path,
+            expected,
+        )
+        bert_records.append(
+            {"name": name, "sha256": file_digest(path), "bytes": path.stat().st_size}
+        )
+
+    wheel_root = model_root / "runtime-distributions"
+    wheel_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    source_only = {"antlr4-python3-runtime", "mmcv"}
+    requirements = [
+        f"{package}=={version}"
+        for package, version in sorted(runtime["dependency_versions"].items())
+    ]
+    for package, version in sorted(runtime["dependency_versions"].items()):
+        command = [
+            sys.executable,
+            "-m",
+            "pip",
+            "download",
+            "--disable-pip-version-check",
+            "--no-deps",
+            "--dest",
+            str(wheel_root),
+        ]
+        if package in source_only:
+            command.append("--no-binary=:all:")
+        else:
+            command.append("--only-binary=:all:")
+        command.append(f"{package}=={version}")
+        subprocess.run(command, check=True)
+    dependency_artifacts = sorted(path for path in wheel_root.iterdir() if path.is_file())
+    if len(dependency_artifacts) != len(requirements):
+        raise RuntimeError("E_TUPLE_RUNTIME_ARTIFACT_COUNT")
+
+    dependency_root = model_root / "runtime-pydeps"
+    if dependency_root.exists():
+        shutil.rmtree(dependency_root)
+    dependency_root.mkdir(parents=True, mode=0o700)
+    install_environment = {
+        **os.environ,
+        "MMCV_WITH_OPS": "0",
+        "SAM2_BUILD_CUDA": "0",
+        "PIP_DISABLE_PIP_VERSION_CHECK": "1",
+    }
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--no-index",
+            "--find-links",
+            str(wheel_root),
+            "--no-deps",
+            "--no-build-isolation",
+            "--target",
+            str(dependency_root),
+            *requirements,
+        ],
+        env=install_environment,
+        check=True,
+    )
+    distributions = _installed_distributions(dependency_root)
+    installed = {row["name"].casefold(): row["version"] for row in distributions}
+    for package, version in runtime["dependency_versions"].items():
+        normalized = package.replace("_", "-").casefold()
+        matches = [
+            actual
+            for name, actual in installed.items()
+            if name.replace("_", "-") == normalized
+        ]
+        if matches != [version]:
+            raise RuntimeError("E_TUPLE_RUNTIME_DISTRIBUTION")
+
+    manifest = {
+        "schema_version": 1,
+        "status": "PASS_RUNTIME_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING",
+        "amendment_commitment_sha256": amendment["amendment_commitment_sha256"],
+        "runtime_amendment_commitment_sha256": runtime[
+            "runtime_amendment_commitment_sha256"
+        ],
+        "base_dependency_manifest_commitment_sha256": expected_base,
+        "base_container": runtime["base_container"],
+        "egobaby_loader": {
+            "repository": egobaby["repository"],
+            "commit": egobaby["commit"],
+            **egobaby_archive,
+            "license_sha256": egobaby_license,
+        },
+        "bert_base_uncased": {
+            "revision": bert["revision"],
+            "license": bert["license"],
+            "files": bert_records,
+        },
+        "dependency_artifacts": [
+            {
+                "name": path.name,
+                "sha256": file_digest(path),
+                "bytes": path.stat().st_size,
+            }
+            for path in dependency_artifacts
+        ],
+        "installed_distributions": distributions,
+        "compatibility_adapters": runtime["compatibility_adapters"],
+        "local_files_only_required": True,
+        "network_disabled_for_inference": True,
+        "telemetry_tracking_disabled": True,
+        "restricted_mount_present": False,
+        "model_inference_executed": False,
+    }
+    manifest["runtime_dependency_commitment_sha256"] = digest(manifest)
+    write_private(_tuple_run_root(args.public_root) / "runtime_manifest.json", manifest)
+    return {
+        "status": "PASS_RUNTIME_READY",
+        "dependency_count": len(runtime["dependency_versions"]),
+        "dependency_artifact_count": len(dependency_artifacts),
+        "installed_distribution_count": len(distributions),
+        "additional_repository_count": 1,
+        "additional_model_file_count": len(bert_records),
+        "restricted_mount_present": False,
+        "model_inference_executed": False,
+        "runtime_dependency_commitment_sha256": manifest[
+            "runtime_dependency_commitment_sha256"
         ],
     }
 
@@ -3874,6 +4083,9 @@ def main() -> None:
     tuple_prepare_parser = subparsers.add_parser("tuple-prepare")
     tuple_prepare_parser.add_argument("--public-root", type=Path, required=True)
     tuple_prepare_parser.add_argument("--config", type=Path, required=True)
+    tuple_runtime_parser = subparsers.add_parser("tuple-runtime-prepare")
+    tuple_runtime_parser.add_argument("--public-root", type=Path, required=True)
+    tuple_runtime_parser.add_argument("--config", type=Path, required=True)
     run_parser = subparsers.add_parser("run")
     run_parser.add_argument("--restricted-root", type=Path, required=True)
     run_parser.add_argument("--public-root", type=Path, required=True)
@@ -3946,6 +4158,15 @@ def main() -> None:
                 value,
                 allowed_fields=TUPLE_PREP_FIELDS,
                 sha256_fields=TUPLE_PREP_HASH_FIELDS,
+            )
+        )
+    elif args.command == "tuple-runtime-prepare":
+        value = prepare_tuple_runtime(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=TUPLE_RUNTIME_PREP_FIELDS,
+                sha256_fields=TUPLE_RUNTIME_PREP_HASH_FIELDS,
             )
         )
     elif args.command == "run":

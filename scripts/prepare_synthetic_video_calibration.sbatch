@@ -17,6 +17,8 @@ if [[ "$prep_mode" == "activity-selection" ]]; then
   output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/extractor-redesign/activity-checkpoint-selection"
 elif [[ "$prep_mode" == "mechanistic-tuple" ]]; then
   output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/mechanistic-tuples"
+elif [[ "$prep_mode" == "mechanistic-tuple-runtime" ]]; then
+  output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/mechanistic-tuples"
 else
   output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/extractor-repair"
 fi
@@ -45,6 +47,12 @@ elif [[ "$prep_mode" == "mechanistic-tuple" ]]; then
   singularity exec --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${scratch}:${scratch}" \
     "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" \
     python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" tuple-prepare \
+    --public-root "${PHASE4_PUBLIC_ROOT}" \
+    --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json"
+elif [[ "$prep_mode" == "mechanistic-tuple-runtime" ]]; then
+  singularity exec --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${scratch}:${scratch}" \
+    "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" \
+    python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" tuple-runtime-prepare \
     --public-root "${PHASE4_PUBLIC_ROOT}" \
     --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json"
 else

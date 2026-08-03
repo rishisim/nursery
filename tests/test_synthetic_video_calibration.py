@@ -308,6 +308,31 @@ def test_tuple_download_resumes_only_on_partial_content(
     assert target.read_bytes() == b"prefix" + payload
 
 
+def test_tuple_exact_download_accepts_small_hashed_public_files(
+    tmp_path: Path, monkeypatch
+) -> None:
+    payload = b"public tokenizer configuration"
+    expected = MODULE.hashlib.sha256(payload).hexdigest()
+
+    class Response(BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            self.close()
+
+    monkeypatch.setattr(
+        MODULE.urllib.request,
+        "urlopen",
+        lambda _request, timeout: Response(payload),
+    )
+    target = tmp_path / "config.json"
+    MODULE._download_exact_public_artifact(
+        "https://public.invalid/config", target, expected
+    )
+    assert target.read_bytes() == payload
+
+
 def test_tuple_public_prep_pins_language_and_vision_resources() -> None:
     import inspect
 
@@ -328,6 +353,20 @@ def test_tuple_public_prep_pins_language_and_vision_resources() -> None:
     assert "hf_hub_download" not in source
     assert '"nltk": "3.9.1"' in source
     assert '"wordfreq": "3.0.2"' in source
+
+
+def test_tuple_runtime_prep_is_resource_only_and_hash_sealed() -> None:
+    import inspect
+
+    source = inspect.getsource(MODULE.prepare_tuple_runtime)
+    assert "mechanistic_training_tuple_premodel_result" in source
+    assert '"--no-deps"' in source
+    assert '"--no-build-isolation"' in source
+    assert '"MMCV_WITH_OPS": "0"' in source
+    assert '"SAM2_BUILD_CUDA": "0"' in source
+    assert '"model_inference_executed": False' in source
+    assert "runtime_dependency_commitment_sha256" in source
+    assert "restricted_root" not in source
 
 
 def test_tuple_window_uses_segment_midpoint_and_never_fabricates_word_time() -> None:
@@ -747,6 +786,8 @@ def test_public_qualification_jobs_never_mount_restricted_data() -> None:
     assert "activity-prepare" in prepare
     assert "tuple-prepare" in prepare
     assert "mechanistic-tuple" in prepare
+    assert "tuple-runtime-prepare" in prepare
+    assert "mechanistic-tuple-runtime" in prepare
     assert "PHASE4_ACTIVITY_CODE_CLEAN=1" in prepare
     assert "PHASE4_RESTRICTED_ROOT" not in prepare
     assert "#SBATCH --partition=h100" in qualify
@@ -772,6 +813,8 @@ def test_terminal_report_is_flat_and_guarded() -> None:
     assert "ACTIVITY_CANDIDATE_FIELDS" in source
     assert "ACTIVITY_SELECTION_FIELDS" in source
     assert "TUPLE_PREP_FIELDS" in source
+    assert "TUPLE_RUNTIME_PREP_FIELDS" in source
     assert "tuple-prepare" in source
+    assert "tuple-runtime-prepare" in source
     assert "E_ACTIVITY_HOLDOUT_BEFORE_WINNER_SEAL" in source
     assert 'print(json.dumps' not in source
