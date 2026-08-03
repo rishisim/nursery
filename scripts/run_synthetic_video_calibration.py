@@ -354,8 +354,6 @@ def _license_digest(repository: Path, expected: str) -> str:
 
 
 def prepare_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
-    from huggingface_hub import hf_hub_download
-
     cfg = json.loads(args.config.read_text())
     amendment = _tuple_amendment(cfg)
     prior_stack = cfg["calibration_C"]["extractor"][
@@ -442,16 +440,12 @@ def prepare_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
         egohos_archive, model_root / "egohos-checkpoints"
     )
     pe_cfg = cfg["calibration_C"]["extractor"]["vision_model"]
-    pe_home = public / "models/pe-hf-home"
-    pe_home.mkdir(parents=True, exist_ok=True, mode=0o700)
-    pe_path = Path(
-        hf_hub_download(
-            repo_id=pe_cfg["repository"],
-            filename="PE-Core-L14-336.pt",
-            revision=pe_cfg["revision"],
-            cache_dir=pe_home / "hub",
-            local_files_only=False,
-        )
+    pe_path = weight_root / "PE-Core-L14-336.pt"
+    _download_public_artifact(
+        "https://huggingface.co/"
+        f"{pe_cfg['repository']}/resolve/{pe_cfg['revision']}/"
+        "PE-Core-L14-336.pt?download=true",
+        pe_path,
     )
     if file_digest(pe_path) != pe_cfg["weights_sha256"]:
         raise RuntimeError("E_TUPLE_PE_CORE_WEIGHT")

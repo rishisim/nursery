@@ -306,8 +306,9 @@ def test_tuple_public_prep_pins_language_and_vision_resources() -> None:
             "sha256": "6025f530624335c67d6547d44757b357b4e79bae030a0383e9887a92c1718f0b",
         },
     }
-    assert 'filename="PE-Core-L14-336.pt"' in source
-    assert 'local_files_only=False' in source
+    assert 'weight_root / "PE-Core-L14-336.pt"' in source
+    assert "huggingface.co/" in source
+    assert "hf_hub_download" not in source
     assert '"nltk": "3.9.1"' in source
     assert '"wordfreq": "3.0.2"' in source
 
