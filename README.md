@@ -108,21 +108,24 @@ Its deviation ledger is
 The latest prospective user choice selects locally governed LTX-2.3 for the
 redesigned pilot. This is a practical execution choice, not a quality claim:
 Gemini led the blinded screen at 27/28, followed by MiniMax at 25/28, Seedance
-at 24/28, and LTX at 19/28. No generation may begin unless the redesigned
-multi-pass Real-1h positive control passes, followed by governed C calibration
-and a bounded final-topology LTX preflight. Synthetic data remains capped at
-exactly one accepted credited hour.
+at 24/28, and LTX at 19/28. The original coverage-redesign rule required the
+multi-pass Real-1h positive control to pass before generation; that rule fired
+and remains sealed. It is not the active authorization path for the later
+descriptive extension. Synthetic data remains capped at exactly one accepted
+credited hour.
 The three redesigned Real-1h seeds completed. Mean realistic macro rose from
 `0.51836` at initialization to `0.53602`; two seeds improved and every temporal
 safeguard was non-catastrophic. The mean gain of `0.01766` nevertheless missed
 the frozen `0.02` positive-signal threshold, so that exploratory stop rule
 fired and remains sealed. After that result, the user prospectively authorized
 a scientifically weaker descriptive Synthetic-1h LTX extension. It does not
-reinterpret the failed gate. Its next conditional stage is bounded governed
-C calibration and a public episode-plan commitment, followed by public/dummy
-LTX topology sizing. Any later corpus remains capped at exactly one accepted
-credited hour and cannot support directional-competitiveness, equivalence,
-noninferiority, same-quality, or confirmatory claims.
+reinterpret the failed gate. Its next conditional stages are the corrected
+complete public source/module combined gate, the governed C transfer audit and
+combined calibration gate, and an aggregate-conditioned public episode-plan
+commitment, followed by public/dummy LTX topology sizing. Any later corpus
+remains capped at exactly one accepted credited hour and cannot support
+directional-competitiveness, equivalence, noninferiority, same-quality, or
+confirmatory claims.
 Restricted execution was paused after a schema-inspection command
 unintentionally printed 94 opaque asset-level SHA-256 keys to the Codex task
 output. No media, text, filenames, paths, child/session keys, direct identifiers,
@@ -248,7 +251,7 @@ governed C, LTX, and Synthetic-1h training were not opened. That no-go remains
 final for its source semantics and sequential shared-cap allocation.
 
 The user has now prospectively authorized a new, narrowly scoped VISOR-HOS
-fixture correction at commitment `34cb7b52…931b`, before any new source
+fixture correction at commitment `31c1c26f…1bf8d4`, before any new source
 inventory or extractor outcome. It freezes the official 158-file VISOR
 train-plus-validation annotation set, explicit contact versus explicit
 `hand-not-in-contact` truth, a separate visually verified no-hand task,

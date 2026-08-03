@@ -91,7 +91,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
         "FROZEN_BEFORE_NEW_PUBLIC_SOURCE_INVENTORY_MODEL_C_GENERATOR_OR_LEARNER_OUTCOMES"
     )
     assert correction["amendment_commitment_sha256"] == (
-        "34cb7b5299a7d88d71d7d350530b88cbac7616e61ace9f3d1372880272a9931b"
+        "31c1c26f76c5c7dc09e34aff9d5dde291d20631035b07a975d6b8ff5861bf8d4"
     )
     assert correction["prior_fixture_no_go_preserved"] == (
         "dee0a37548d75fc29f829159ce3ad648a63288339c7bc173f8201483e51213e7"
@@ -239,3 +239,25 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["governance_incident"]["containment_verification"]["restricted_asset_key_matches_in_all_git_tracked_content"] == 0
     assert "more_than_one_accepted_synthetic_hour" in config["prohibitions"]
     assert "confirmatory_phase5" in config["prohibitions"]
+
+
+def test_active_tuple_contract_is_not_confused_with_legacy_broad_calibration() -> None:
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    calibration = config["calibration_C"]
+    assert calibration["axes_status"].startswith("LEGACY_")
+    assert calibration["joint_distributions_status"].startswith("LEGACY_")
+    assert calibration["episode_plan_status"].startswith("LEGACY_PROVISIONAL_")
+    assert calibration["scale_up_evidence_status"].startswith("LEGACY_")
+
+    for pointer in calibration["active_calibration_contract_sources"].values():
+        value = config
+        for token in pointer.lstrip("/").split("/"):
+            value = value[token]
+        assert value is not None
+
+    results = json.loads(Path("results/synthetic_video_phase4.json").read_text())
+    assert results["post_gate_descriptive_extension"]["execution_order"][:3] == [
+        "corrected_public_source_feasibility_and_all_independent_public_module_metrics",
+        "corrected_public_five_critical_plus_six_of_seven_plus_order_action_combined_gate",
+        "governed_C_transfer_audit_and_combined_calibration_gate",
+    ]

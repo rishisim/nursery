@@ -83,7 +83,16 @@
       "audiovisual_grounding_opportunity_referent_timing_ambiguity_naming_with_action_and_null_cases",
       "diversity_heterogeneity_between_child_session_dispersion_long_tail_and_near_duplicate_rate"
     ],
+    "axes_status": "LEGACY_ORIGINAL_EIGHT_AXIS_CALIBRATION_INPUT_PRESERVED_FOR_THE_28EF267C_NO_GO_NOT_ACTIVE_FOR_THE_LEARNER_EFFECTIVE_RERUN",
     "joint_distributions": ["naming_by_referent_visibility", "naming_by_hand_object_action", "clutter_by_occlusion", "motion_by_blur"],
+    "joint_distributions_status": "LEGACY_ORIGINAL_EIGHT_AXIS_CALIBRATION_INPUT_PRESERVED_NOT_ACTIVE_FOR_THE_LEARNER_EFFECTIVE_RERUN",
+    "active_calibration_contract_sources": {
+      "axes": "/calibration_C/extractor/mechanistic_training_tuple_amendment/axes",
+      "joint_distributions": "/calibration_C/extractor/mechanistic_training_tuple_amendment/joint_distributions",
+      "public_combined_gate": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_correction_amendment/public_execution_and_combined_gate",
+      "governed_C_and_episode_plan_order": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_correction_amendment/governed_C_and_downstream_rule",
+      "generated_attempt_and_accepted_corpus_matching": "/calibration_C/extractor/mechanistic_training_tuple_amendment/generated_attempt_and_accepted_corpus_matching"
+    },
     "semantic_boundary": "public semantic categories and frequency bands only; never exact C vocabulary transcripts or sealed evaluation concepts",
     "estimation_contract": "freeze immutable public model revisions and hashes, fixed bins plus quartiles, explicit missingness and abstention, bootstrap uncertainty with public seed 42, and one governed commitment before generation",
     "extractor": {
@@ -1622,6 +1631,7 @@
           "commit": "8566507382add7dd037a83e7233950e0ad1ea78e",
           "archive_sha256": "6e588c80835976c41164e71b0dbfc5e3447fcabcdfd3221f5fd50b07eb57188e",
           "gen_coco_format_py_sha256": "686a052c8676c8378438efcf90e97e71cd6abca576381b0ca560e6cb07759cd7",
+          "gen_coco_format_handside_contact_py_sha256": "44feea718164ed171ee6cb24eb90cde402e429eb920c4ce728c00492b79084f6",
           "correct_json_sha256": "fecffd6d3eb5fb08d392e72f5ca35fd5476e89de2a0f088de24ab46fc34dba95",
           "README_sha256": "48ffb9e649bc49dacb90d362bef7a49d5cf767e04c9668ace9bc725989bd8de8",
           "code_terms": "NO_LICENSE_FILE_AND_GITHUB_LICENSE_NULL",
@@ -1692,15 +1702,156 @@
           "downstream": "only on C PASS freeze the nonrestricted public-word episode plan, run the already authorized local LTX-2.3 preflight, produce exactly 3600 accepted credited synthetic seconds within frozen ceilings, and train the same three seeds for exactly 4668 scheduler steps",
           "prohibited": ["reinterpret_prior_no_go", "reinterpret_real_gate", "more_than_one_accepted_synthetic_hour", "automatic_three_hour_arm", "extra_seed", "generator_substitution", "evaluation_driven_tuning", "equivalence_or_noninferiority_claim", "directionally_competitive_phrase"]
         },
+        "qualification_execution_clarification": {
+          "status": "FROZEN_BEFORE_PUBLIC_DEVELOPMENT_INFERENCE",
+          "scientific_thresholds_changed": false,
+          "phase_aggregation": {
+            "requested_samples": 9,
+            "minimum_valid_samples": 8,
+            "phase_sample_count": 3,
+            "phase_visible_if_valid_positive_samples_min": 2,
+            "event_abstains_if_any_retained_mask_or_box_invalid": true,
+            "track_order": "strictly_increasing_fixture_sample_time",
+            "SAM_semantics": "SAM2.1 image predictor segments every retained Grounding-DINO box on each of the nine frozen sampled frames; category-and-time-ordered masks are the registered sampled-track proxy; do not claim continuous full-frame video propagation"
+          },
+          "grounding_geometry": {
+            "caption": "one lowercase frozen public ontology category followed by a period",
+            "phrase_rule": "only tokenizer positions corresponding to that exact public category may supply the box score",
+            "box_conversion": "normalized cxcywh to pixel xyxy clipped to image bounds",
+          "same_category_NMS_IoU": 0.5,
+          "ambiguous_fixture_distractor": "persistent_ambiguous and persistent_dominant_with_small_distractor use a second distinct source annotation of the same frozen public ontology category so the exact-category caption can recover both candidates; cross-category distractors cannot satisfy this truth",
+          "candidate_count_truth": "derive and store candidate_count_by_phase separately for before during and after from exact authored target and distractor masks under the frozen visible-mask threshold; dominance_by_phase uses the frozen target fraction and target-to-largest-distractor ratio and is scored only in visible phase cells",
+            "fixture_mask_retention": "retain exact target and distractor masks per sampled frame with hashes outside Git; scalar scenario labels cannot substitute for phase truth",
+            "invalid_or_empty_mask": "ABSTAIN"
+          },
+          "grid_selection": {
+            "grounding": {"primary": "visibility_timing_macro_f1", "subject_to_all_axis_floors": true, "tie": "higher_box_score_then_higher_text_score"},
+            "recurrence": {"primary": "same_object_cross_episode_balanced_accuracy", "subject_to_all_axis_floors": true, "tie": "higher_DINOv2_cosine"},
+            "attribute": {"primary": "visible_contrast_macro_f1", "subject_to_all_axis_floors": true, "tie": "higher_PE_Core_margin"},
+            "hand": {"primary": "contact_no_contact_macro_f1", "subject_to_all_axis_floors": true, "tie": "higher_EgoHOS_min_mask_fraction"},
+            "action": {"primary": "ordered_action_direction_macro_f1", "subject_to_all_axis_floors": true, "abstention_margin_grid": [0.0, 0.005, 0.01, 0.02, 0.05], "tie": "higher_abstention_margin"}
+          },
+          "pHash": {
+            "algorithm": "32x32_grayscale_DCT_low_8x8_excluding_DC_median_bits",
+            "near_duplicate_hamming_distance_max": 4,
+            "role": "fixed diagnostic classifier for the registered near-duplicate balanced accuracy"
+          },
+          "recurrence_pixels": {
+            "input": "exact authored public-object alpha mask composited on neutral gray and retained with each recurrence fixture",
+            "preprocessing": "official DINOv2 ViT-B/14 resize crop and ImageNet normalization followed by L2-normalized 768-dimensional embedding",
+            "full_canvas_unmasked_proxy": "PROHIBITED",
+            "mask_files_and_embeddings": "external public run storage only"
+          },
+          "attribute_prompts": {
+            "template_order": ["a {value} object", "an object that is {value}", "the visible object is {value}"],
+            "prediction": "compare values only within the expected frozen public attribute family and abstain below the selected top-minus-second margin",
+            "public_qualified_values": {"color": ["red", "blue", "green", "yellow"], "relative_size": ["big", "small"]},
+            "deterministic_mask_cross_check": "color prediction uses pixels inside the predicted SAM mask and nearest frozen rendered palette; relative size uses predicted-mask bounding-box longest sides from a same-instance paired render and requires big divided by small to be at least 1.5; PE-Core and the deterministic prediction must agree or the item abstains",
+            "relative_size_fixture_pair": {"same_public_source_object": true, "same_background_and_episode": true, "big_authored_longest_side_pixels": 130, "small_authored_longest_side_pixels": 72, "minimum_predicted_mask_bbox_longest_side_ratio": 1.5, "scenario_specific_size_override": "PROHIBITED"},
+            "authored_alpha_mask_role": "reference truth and masked recurrence input only; it is prohibited as the predicted attribute measurement mask",
+            "other_registered_attribute_values": "unvalidated and contribute no C target until a future prospective public fixture"
+          },
+          "lexical_truth": {
+            "expected_lemma": "manual lowercase singular fixture token table",
+            "expected_frequency_band": "materialized from pinned wordfreq bytes before inference",
+            "wordfreq_version": "3.0.2",
+            "public_expected_Zipf_and_band": {
+              "ball": [5.04, "high"],
+              "cup": [5.11, "high"],
+              "bottle": [4.57, "high"],
+              "bowl": [4.63, "high"],
+              "book": [5.43, "high"],
+              "chair": [4.69, "high"],
+              "apple": [4.76, "high"],
+              "banana": [4.0, "high"],
+              "red": [5.32, "high"],
+              "blue": [5.13, "high"],
+              "cloud": [4.46, "high"]
+            },
+            "episode_repetition": "computed from manually frozen expected spans grouped by fixture episode_id and never from predictions"
+          },
+          "language_fixture_stage_semantics": {
+            "item_count_per_partition": 48,
+            "adapter_accept_count": 36,
+            "adapter_abstain_count": 12,
+            "learner_tuple_accept_count": 34,
+            "learner_tuple_abstain_count": 14,
+            "adapter_abstention_reasons": ["LANGUAGE_MISMATCH", "EMPTY_ASR", "INVALID_TIMESTAMP", "LOW_CONFIDENCE", "EMPTY_TRANSLATION", "SILENT_TRUNCATION"],
+            "tuple_only_abstention_reason": "INSUFFICIENT_IN_BOUNDS_FRAMES",
+            "grounding_only_abstention_reason": "ONTOLOGY_UNMATCHED",
+            "ontology_unmatched_rule": "the adapter and lexical learner tuple remain accepted and only the public-ontology grounding component abstains"
+          },
+          "referent_audio_fixture": {
+            "active_external_location": "public/mechanistic-training-tuple-fixtures/audio-seed",
+            "prior_predicative_seed_rule": "preserve the earlier public/mechanistic-tuple-audio-seed artifact but reject it as stale; it cannot supply the repaired adjective-to-noun span gate",
+            "language": "de",
+            "voice": "macOS Anna de_DE at 175 words per minute",
+            "development_template": "{definite_article_capitalized} {inflected_attribute} {noun}.",
+            "holdout_template": "Schau, {definite_article_lowercase} {inflected_attribute} {noun}.",
+            "definite_articles_by_public_category": {"sports ball": "der", "cup": "der", "bottle": "die", "bowl": "die", "book": "das", "chair": "der", "apple": "der", "banana": "die"},
+            "ordered_inflected_attributes_by_scenario_ordinal": ["rote", "blaue", "grüne", "gelbe", "große", "kleine", "rote", "blaue"],
+            "muxed_speech_delay_seconds": 2.5,
+            "maximum_spoken_audio_seconds": 2.0,
+            "prediction_rule": "the actual pinned shared adapter output, never this authored phrase truth, supplies referent and attribute event eligibility"
+          },
+          "sensor_direction_checks": [
+            "motion(high_translation)>motion(low_translation)",
+            "motion(low_translation)>motion(static)",
+            "blur_edge(strong_blur)<blur_edge(mild_blur)",
+            "brightness(dark)<brightness(static)",
+            "brightness(bright)>brightness(static)",
+            "max_interframe_luma(hard_cut)>max_interframe_luma(static)"
+          ],
+          "sensor_statistics": {
+            "per_item": ["median_motion_mean_absolute_luma", "maximum_motion_mean_absolute_luma", "median_blur_edge_strength", "median_brightness"],
+            "motion_measurement_scope": "interframe mean absolute luma change is a deterministic image-change proxy only; it is not optical flow and does not identify physical head-camera motion",
+            "hard_cut_uses": "maximum_motion_mean_absolute_luma",
+            "unvalidated_claims": ["head_camera_motion", "optical_flow", "framing", "object_track_continuity"],
+            "active_condition_rule": "the eight conditions are mutually exclusive single-factor transforms of the same base rather than a composed transform sequence",
+            "prior_transform_order_clarification": "the older committed transform-order prose is not used by this prospective qualifier; no prior outcome depended on it",
+            "truth_limitation": "bins are deterministic pre-encode rendered-pixel expectations and qualify post-H.264 serialization and measurement, not independent sensor ground truth"
+          },
+          "action_frame_sampling": {
+            "window": "max(0,start_minus_0.25_seconds) through min(source_duration,end_plus_0.25_seconds)",
+            "frame_count": 16,
+            "timestamps": "sixteen inclusive equally spaced timestamps in the clipped interval; duplicate decoded source-frame indices are prohibited",
+            "controls": ["ordered", "exact_time_reverse", "repeated_center_frame"],
+            "abstention": "fewer than sixteen distinct decoded frames or any invalid or nonfinite score"
+          },
+          "hand_alignment": {
+            "fixture_semantics": "fixed public self-authored German mention timing is paired with each explicit-contact or explicit-no-contact VISOR-HOS item; verified no-hand is excluded; no C word or governed content is used",
+            "metric": "binary F1 for mention-during-contact against explicit contact truth",
+            "limitation": "the metric is non-independent because it shares the underlying contact labels, is a supporting diagnostic only, cannot rescue contact failure, and contributes no extra axis or pass count"
+          },
+          "EgoHOS_prediction_mapping": {
+            "stage1_classes": {"0": "background", "1": "left_hand", "2": "right_hand"},
+            "stage2_classes": {"0": "background", "1": "dense_contact_boundary"},
+            "stage3_classes": {"0": "background", "1": "left_interacting_object", "2": "right_interacting_object", "3": "both_interacting_object"},
+            "preprocessing": "use each pinned official EgoHOS mmseg test pipeline exactly: MultiScaleFlipAug img_scale (360,480), keep-ratio Resize, official normalization and sibling pred_twohands or pred_cb additional-channel loading; manual aspect-distorting resize or hand-built normalized tensors are prohibited",
+            "output_geometry": "official inference rescaling must return each stage class map at the original fixture-frame dimensions before comparison with the retained target-hand truth mask",
+            "contact_positive": "the target-side stage3 interacting-object mask is nonempty above the selected mask-fraction threshold and intersects the stage2 dense-contact boundary after one-pixel dilation",
+            "no_contact_negative": "target-side stage1 hand mask is valid while both its side-specific stage3 object mask and adjacent stage2 contact boundary are absent",
+            "discordant_or_invalid": "ABSTAIN",
+            "target_side_and_ground_truth_mask_retention": "required in the external corrected fixture manifest"
+          },
+          "failure_collection": "map every independent module error to an opaque registered error code, finish all nondependent modules, and decide once with five-critical plus six-of-seven plus action",
+          "holdout_lock": "development raw results remain outside Git; exact thresholds and fixture commitment are sealed before holdout; holdout cannot refit reprompt or overwrite"
+        },
         "resource_and_governance": {
-          "public_source_feasibility": "local CPU or one Juno CPU process; zero paid monetary cost",
-          "public_model_and_governed_C_ceiling": "unchanged previously authorized one-H100 non-DDP topology and aggregate 15 GPU-hour ceiling through C; any overage or multiprocess topology requires a new exact approval and preflight",
+        "public_source_feasibility": "local CPU or one Juno CPU process; zero paid monetary cost",
+        "language_dependency_archive": {
+          "relative_location": "models/phase4-language-pydeps.tar under the public root",
+          "bytes": 542423040,
+          "sha256": "27df87f4ec1900b4a11f307d42a18483903d38ddb9ed77f418b88fa299497e37",
+          "verification": "require exact byte count and SHA-256 before scratch extraction"
+        },
+        "public_model_and_governed_C_ceiling": "unchanged previously authorized one-H100 non-DDP topology and aggregate 15 GPU-hour ceiling through C; any overage or multiprocess topology requires a new exact approval and preflight",
           "all_outputs": "datasets annotations media weights predictions embeddings caches logs manifests and run records outside Git under verified ignored or applicant-governed roots",
           "network": "public artifact ingress only before inference; public inference and every governed C run local-files-only with telemetry and tracking disabled; no hosted service receives ChildLens material or derivatives",
           "terminal_and_chat": "approved compact aggregate fields only"
         },
         "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
-        "amendment_commitment_sha256": "34cb7b5299a7d88d71d7d350530b88cbac7616e61ace9f3d1372880272a9931b"
+        "amendment_commitment_sha256": "31c1c26f76c5c7dc09e34aff9d5dde291d20631035b07a975d6b8ff5861bf8d4"
       },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},
@@ -1744,12 +1895,14 @@
       "prompt_boundary": "actual aggregate-conditioned plans prompts and German utterances remain solely in governed storage; Git contains only this public source pool and templates",
       "evaluation_steering": "PROHIBITED"
     },
+    "episode_plan_status": "LEGACY_PROVISIONAL_1428_PLAN_RECORD_NOT_EXECUTABLE_AFTER_THE_28EF267C_NO_GO; A_NEW_PLAN_MUST_BE_COMMITTED_ONLY_AFTER_THE_ACTIVE_COMBINED_PUBLIC_AND_GOVERNED_C_GATES_PASS",
     "limitations": "small feature set only; measured and unavailable features reported separately; no full distributional calibration claim",
     "disclosure": "Git and external reporting receive only compact non-identifying bins targets uncertainty missingness and a commitment after applicant disclosure review; suppress sparse or reconstructive cells and never export raw media text exact vocabulary embeddings row-level per-child or per-session statistics IDs or reconstructive combinations",
     "episode_plan_contract": "freeze a public nonrestricted episode-plan distribution matched axis-by-axis to approved targets using only public lexical resources and no sealed evaluation concepts or outcomes",
     "local_generator_input": "inside applicant-governed Juno storage LTX may consume the committed compact C aggregate target table and public self-authored episode-plan distribution; neither the table nor aggregate-conditioned prompts leave the governed boundary",
     "attempt_accounting": "measure every generated attempt and the accepted corpus separately",
     "scale_up_evidence": "real arm learns; synthetic improves over initialization; synthetic-real realistic macro gap at most 0.05; held-out-real temporal safeguard non-catastrophic; no critical calibration-axis failure; most axes within frozen tolerances; no severe preregistered joint-distribution miss; acceptable unique-hour yield and cost",
+    "scale_up_evidence_status": "LEGACY_PRE_REAL_GATE_SCALE_UP_RULE_PRESERVED_NOT_ACTIVE_FOR_THE_USER_AUTHORIZED_POST_GATE_DESCRIPTIVE_EXTENSION",
     "omnibus_score": "PROHIBITED",
     "local_generator_gate": "PENDING_VISOR_HOS_CORRECTED_COMPLETE_PUBLIC_AND_GOVERNED_C_COMBINED_GATES",
     "authorization_interpretation": "all four earlier calibration no-gos and the dee0a375 fixture-source no-go remain final for their frozen questions; a new user-authorized VISOR-HOS semantics and joint-allocation correction is prospective and can authorize generation only after complete combined public and governed C passes",

@@ -1339,6 +1339,10 @@ use. The official VISOR-HOS repository is fixed at
 `8566507382add7dd037a83e7233950e0ad1ea78e` solely as a semantic reference. It
 has no license file, so its code is not copied, imported, or executed; the
 canonical implementation independently applies the documented data fields.
+The two semantic-reference implementations are pinned separately:
+`gen_coco_format.py` at `686a052c…9cd7` and
+`gen_coco_format_handside_contact.py` at `44feea71…4f6`; the distinct hashes
+are intentional and prevent path/hash conflation.
 
 Contact evaluation is conditional on one valid visible left/right hand
 instance. A valid linked object identifier is contact; exact
@@ -1351,7 +1355,7 @@ outputs before inference. The first 48 verified negatives per partition are
 retained from at most the first 192 candidates in the frozen hash order.
 
 Participants are partitioned first by the seeded SHA-256 order, alternating
-development and holdout. One simultaneous deterministic min-cost allocation
+development and holdout. One simultaneous deterministic maximum-flow allocation
 then targets 48 contact, 48 explicit no-contact, and 48 verified no-hand items
 per partition, with four items maximum per video and stratum and one selected
 item maximum per frame. Participant, video, and frame overlap across partitions
@@ -1359,6 +1363,34 @@ must all be zero. Raw-eligible, post-partition, post-cap, and final counts are
 reported separately for every stratum. Input and mapping permutations must
 produce the same selection commitment. All independent source checks run
 before one combined source decision; no first-failure shortcut is permitted.
+
+The pre-inference execution clarification makes the task-matched metrics
+executable without changing a floor. Of 48 language fixtures per partition,
+36 test adapter acceptance and 12 adapter abstention; two accepted adapter
+cases then abstain only at tuple-window construction and two remain valid
+lexical tuples while grounding alone abstains for ontology mismatch. Referent
+visibility uses nine ordered samples and valid Grounding-DINO boxes plus SAM
+2.1 masks at those samples; it is a sampled-track proxy, not a claim of
+continuous full-frame propagation. Ambiguity fixtures use a distinct second
+instance of the same public category, and the actual adapter-mapped public
+category must match the authored category before an event receives grounding
+credit. Recurrence uses exact authored alpha masks,
+official DINOv2 preprocessing, cosine-grid selection, and a fixed pHash
+Hamming threshold of four. Attribute qualification is limited to the frozen
+red/blue/green/yellow and big/small public values with PE-Core plus deterministic
+mask checks. The active self-authored audio seed uses attributive German
+adjective–noun phrases and is bound to this amendment; the earlier predicative
+seed remains preserved but is ineligible. Sensor fixtures are single-factor transforms and qualify
+post-encode measurement, not independent sensor ground truth. Interframe mean
+absolute luma change is only an image-change proxy; physical head motion,
+optical flow, framing, and object-track continuity remain unvalidated and
+cannot become C targets or claims in this run. EgoHOS uses each pinned official
+mmseg keep-ratio test pipeline, normalization, and staged auxiliary masks at
+the original output geometry; an aspect-distorting manual resize is
+prohibited. EgoHOS contact
+requires a target-side interacting-object mask adjacent to the dense-contact
+boundary; discordant outputs abstain. Action clips use sixteen ordered frames,
+exact reversal, repeated-center controls, and the already frozen margin grid.
 
 Development may choose only the already frozen finite confidence grids. Those
 thresholds and fixture commitments are sealed before holdout. The holdout runs
@@ -1368,7 +1400,7 @@ order-dependent action control must pass. One supporting axis may be
 unmeasured and then contributes no C target or claim. Broad activity/context
 is descriptive and has no shuffle-degradation requirement. Gates, models,
 sources, and thresholds cannot be substituted or relaxed after outcomes. The
-complete amendment commitment is `34cb7b52…931b`.
+complete amendment commitment is `31c1c26f…1bf8d4`.
 
 Only a combined public PASS authorizes the previously frozen single-applicant
 governed C transfer audit and learner-effective C measurement. C still cannot

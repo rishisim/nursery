@@ -23,6 +23,7 @@ import tarfile
 import time
 from typing import Any
 import urllib.error
+import urllib.parse
 import urllib.request
 import zipfile
 
@@ -209,6 +210,7 @@ TUPLE_FIXTURE_PREP_FIELDS = frozenset(
         "order_action_item_count",
         "source_subject_overlap_count",
         "source_video_overlap_count",
+        "source_frame_overlap_count",
         "source_object_overlap_count",
         "restricted_mount_present",
         "model_inference_executed",
@@ -217,6 +219,64 @@ TUPLE_FIXTURE_PREP_FIELDS = frozenset(
 )
 TUPLE_FIXTURE_PREP_HASH_FIELDS = frozenset(
     {"public_fixture_manifest_commitment_sha256"}
+)
+TUPLE_NO_HAND_REVIEW_PREP_FIELDS = frozenset(
+    {
+        "status",
+        "partition_count",
+        "nominee_count",
+        "review_queue_count",
+        "source_frame_count",
+        "source_archive_count",
+        "decode_failure_count",
+        "contact_sheet_count",
+        "restricted_mount_present",
+        "model_inference_executed",
+        "visor_hos_source_feasibility_commitment_sha256",
+        "source_frame_materialization_commitment_sha256",
+        "review_queue_commitment_sha256",
+    }
+)
+TUPLE_NO_HAND_REVIEW_PREP_HASH_FIELDS = frozenset(
+    {
+        "visor_hos_source_feasibility_commitment_sha256",
+        "source_frame_materialization_commitment_sha256",
+        "review_queue_commitment_sha256",
+    }
+)
+TUPLE_NO_HAND_REVIEW_SEAL_FIELDS = frozenset(
+    {
+        "status",
+        "partition_count",
+        "coded_count",
+        "verified_no_hand_count",
+        "visible_hand_count",
+        "abstain_count",
+        "unreviewed_count",
+        "deficit_partition_count",
+        "restricted_mount_present",
+        "model_inference_executed",
+        "visor_hos_source_feasibility_commitment_sha256",
+        "review_queue_commitment_sha256",
+        "review_labels_commitment_sha256",
+        "verified_no_hand_seal_commitment_sha256",
+    }
+)
+TUPLE_NO_HAND_REVIEW_SEAL_HASH_FIELDS = frozenset(
+    {
+        "visor_hos_source_feasibility_commitment_sha256",
+        "review_queue_commitment_sha256",
+        "review_labels_commitment_sha256",
+        "verified_no_hand_seal_commitment_sha256",
+    }
+)
+TUPLE_NO_HAND_REVIEW_INCOMPLETE_SEAL_FIELDS = frozenset(
+    TUPLE_NO_HAND_REVIEW_SEAL_FIELDS
+    - {"verified_no_hand_seal_commitment_sha256"}
+)
+TUPLE_NO_HAND_REVIEW_INCOMPLETE_SEAL_HASH_FIELDS = frozenset(
+    TUPLE_NO_HAND_REVIEW_SEAL_HASH_FIELDS
+    - {"verified_no_hand_seal_commitment_sha256"}
 )
 TUPLE_AUDIO_SEED_FIELDS = frozenset(
     {"status", "audio_file_count", "audio_seed_commitment_sha256"}
@@ -247,6 +307,58 @@ TUPLE_FIXTURE_FEASIBILITY_FIELDS = frozenset(
 TUPLE_FIXTURE_FEASIBILITY_HASH_FIELDS = frozenset(
     {"fixture_feasibility_commitment_sha256"}
 )
+TUPLE_QUALIFICATION_FIELDS = frozenset(
+    {
+        "status",
+        "partition",
+        "module_count",
+        "completed_module_count",
+        "failed_module_count",
+        "critical_axis_pass_count",
+        "validated_axis_count",
+        "action_control_status",
+        "external_call_count",
+        "invalid_retained_record_count",
+        "silent_truncation_count",
+        "public_qualification_commitment_sha256",
+        "development_threshold_commitment_sha256",
+    }
+)
+TUPLE_QUALIFICATION_HASH_FIELDS = frozenset(
+    {
+        "public_qualification_commitment_sha256",
+        "development_threshold_commitment_sha256",
+    }
+)
+TUPLE_VISOR_HOS_SOURCE_FEASIBILITY_FIELDS = frozenset(
+    {
+        "status",
+        "official_annotation_file_count",
+        "official_annotation_bytes",
+        "coco_source_count",
+        "visor_contact_candidate_count",
+        "visor_no_contact_candidate_count",
+        "visor_no_hand_nominee_count",
+        "action_item_count",
+        "language_lexical_item_count",
+        "referent_attribute_item_count",
+        "recurrence_pair_count",
+        "sensor_item_count",
+        "partition_count",
+        "failing_family_count",
+        "pending_dependent_family_count",
+        "source_subject_overlap_count",
+        "source_video_overlap_count",
+        "source_object_overlap_count",
+        "model_inference_executed",
+        "media_rendering_executed",
+        "restricted_mount_present",
+        "visor_hos_source_feasibility_commitment_sha256",
+    }
+)
+TUPLE_VISOR_HOS_SOURCE_FEASIBILITY_HASH_FIELDS = frozenset(
+    {"visor_hos_source_feasibility_commitment_sha256"}
+)
 NLTK_DATA_COMMIT = "550b6625bcef1f2abff2ff770a5a0d272c9c6b2a"
 NLTK_RESOURCE_ARCHIVES = {
     "wordnet.zip": {
@@ -272,6 +384,16 @@ GROUNDING_DINO_MODEL_NO_VISUALIZER_SHA256 = (
 )
 TUPLE_LANGUAGE_ADAPTER_SHA256 = (
     "005f368bef97dfc791f43e45da8bbfe01ea22e8790b2032e9580b14b1ea62ac8"
+)
+TUPLE_WHISPER_SMALL_SHA256 = (
+    "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794"
+)
+TUPLE_OPUS_MT_DE_EN_REVISION = "1a922f3b32a8e809e17a47d4b32142d8105924e5"
+TUPLE_GROUNDING_DINO_SHA256 = (
+    "3b3ca2563c77c69f651d7bd133e97139c186df06231157a64c507099c52bc799"
+)
+TUPLE_SAM21_BASE_PLUS_SHA256 = (
+    "a2345aede8715ab1d5d31b4a509fb160c5a4af1970f199d9054ccfb746c004c5"
 )
 ACTIVITY_AXIS = "activity_context_mixture"
 VISUAL_AXIS = "egocentric_visual_regime"
@@ -516,13 +638,19 @@ def _tuple_visor_hos_correction_amendment(
     if not isinstance(expected, str) or digest(copy) != expected:
         raise RuntimeError("E_VISOR_HOS_CORRECTION_COMMITMENT")
     artifact = value.get("official_annotation_artifact", {})
+    semantic_reference = value.get("official_semantic_reference", {})
     sampler = value.get("partition_and_joint_sampler", {})
     counts = value.get("public_fixture_counts_per_partition", {})
     gate = value.get("public_execution_and_combined_gate", {})
+    execution = value.get("qualification_execution_clarification", {})
     truth = value.get("truth_contract", {})
     if (
         artifact.get("combined_JSON_file_count") != 158
         or artifact.get("combined_bytes") != 868821446
+        or semantic_reference.get("gen_coco_format_py_sha256")
+        != "686a052c8676c8378438efcf90e97e71cd6abca576381b0ca560e6cb07759cd7"
+        or semantic_reference.get("gen_coco_format_handside_contact_py_sha256")
+        != "44feea718164ed171ee6cb24eb90cde402e429eb920c4ce728c00492b79084f6"
         or sampler.get("seed") != 20260802
         or sampler.get("partitions") != ["development", "holdout"]
         or sampler.get("quota_per_partition_per_stratum") != 48
@@ -534,6 +662,20 @@ def _tuple_visor_hos_correction_amendment(
         or counts.get("total") != 416
         or truth.get("boolean_values_are_invalid") is not True
         or "visually verifies" not in str(truth.get("no_hand_verification", ""))
+        or execution.get("status") != "FROZEN_BEFORE_PUBLIC_DEVELOPMENT_INFERENCE"
+        or execution.get("scientific_thresholds_changed") is not False
+        or execution.get("phase_aggregation", {}).get("requested_samples") != 9
+        or execution.get("phase_aggregation", {}).get("minimum_valid_samples") != 8
+        or execution.get("grid_selection", {}).get("action", {}).get(
+            "abstention_margin_grid"
+        )
+        != [0.0, 0.005, 0.01, 0.02, 0.05]
+        or execution.get("grounding_geometry", {}).get("same_category_NMS_IoU")
+        != 0.5
+        or execution.get("pHash", {}).get("near_duplicate_hamming_distance_max")
+        != 4
+        or execution.get("recurrence_pixels", {}).get("full_canvas_unmasked_proxy")
+        != "PROHIBITED"
     ):
         raise RuntimeError("E_VISOR_HOS_CORRECTION_SCHEMA")
     if gate.get("critical_axes") != list(TUPLE_CRITICAL_AXIS_IDS) or gate.get(
@@ -1454,6 +1596,11 @@ def _visor_hos_frame_candidates(row: dict[str, Any]) -> dict[str, Any]:
         "frame_name": name,
         "image_path": path,
     }
+    source_split = image.get("_source_split")
+    if source_split is not None:
+        if source_split not in {"train", "val"}:
+            return {"status": "INVALID", "reason": "INVALID_SOURCE_SPLIT"}
+        base["source_split"] = source_split
     if not hands:
         if on_hand_glove_present:
             return {
@@ -1826,6 +1973,755 @@ def _visor_hos_joint_sampler(
     return selected, report
 
 
+VISOR_HOS_NO_HAND_REVIEW_MAX_PER_PARTITION = 192
+VISOR_HOS_NO_HAND_REVIEW_ITEMS_PER_SHEET = 8
+VISOR_HOS_NO_HAND_REVIEW_LABELS = frozenset(
+    {"yes", "no", "abstain", ""}
+)
+
+
+def _visor_hos_no_hand_review_order(
+    seed: int, partition: str, row: dict[str, Any]
+) -> tuple[str, str, str]:
+    return (
+        _fixture_order(
+            seed,
+            "visor_hos_no_hand_review",
+            partition,
+            row["video"],
+            row["frame_name"],
+        ),
+        row["video"],
+        row["frame_name"],
+    )
+
+
+def _visor_hos_no_hand_review_token(
+    seed: int, partition: str, row: dict[str, Any]
+) -> str:
+    return digest(
+        [
+            "visor_hos_no_hand_review_token",
+            seed,
+            partition,
+            row["video"],
+            row["frame_name"],
+        ]
+    )[:24]
+
+
+def _visor_hos_no_hand_review_nominees(
+    annotation_documents: list[dict[str, Any]],
+    *,
+    seed: int,
+    per_video_cap: int,
+    max_per_partition: int = VISOR_HOS_NO_HAND_REVIEW_MAX_PER_PARTITION,
+    correction_excluded_frame_keys: set[tuple[str, str]]
+    | frozenset[tuple[str, str]]
+    | None = None,
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
+    """Freeze a blinded no-hand nominee queue without accepting absence as truth."""
+
+    if per_video_cap <= 0 or max_per_partition <= 0:
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_LIMIT")
+    correction_excluded = _visor_hos_frame_key_set(
+        correction_excluded_frame_keys, "E_VISOR_HOS_CORRECTION_EXCLUSION_KEY"
+    )
+    participants: set[str] = set()
+    nominees: dict[tuple[str, str], dict[str, Any]] = {}
+    invalid_frame_count = 0
+    abstained_frame_count = 0
+    duplicate_nominee_count = 0
+    excluded_nominee_count = 0
+    for document in annotation_documents:
+        rows = document.get("video_annotations")
+        if not isinstance(rows, list):
+            invalid_frame_count += 1
+            continue
+        for row in rows:
+            image = row.get("image") if isinstance(row, dict) else None
+            video = str(image.get("video", "")) if isinstance(image, dict) else ""
+            participant = video.split("_", 1)[0]
+            if re.fullmatch(r"P\d{2}", participant):
+                participants.add(participant)
+            parsed = _visor_hos_frame_candidates(row) if isinstance(row, dict) else {
+                "status": "INVALID",
+                "candidates": [],
+            }
+            if parsed["status"] == "INVALID":
+                invalid_frame_count += 1
+                continue
+            if parsed["status"] == "ABSTAIN":
+                abstained_frame_count += 1
+                continue
+            if parsed["status"] != "NOMINEE":
+                continue
+            candidate = parsed["candidates"][0]
+            frame_key = (candidate["video"], candidate["frame_name"])
+            if frame_key in correction_excluded:
+                excluded_nominee_count += 1
+                continue
+            if frame_key in nominees:
+                if canonical(nominees[frame_key]) != canonical(candidate):
+                    raise RuntimeError(
+                        "E_VISOR_HOS_NO_HAND_REVIEW_CONFLICTING_DUPLICATE"
+                    )
+                duplicate_nominee_count += 1
+                continue
+            nominees[frame_key] = candidate
+    partitions = _visor_hos_participant_partitions(participants, seed)
+    queues: dict[str, list[dict[str, Any]]] = {
+        "development": [],
+        "holdout": [],
+    }
+    post_partition_counts: dict[str, int] = {}
+    post_cap_counts: dict[str, int] = {}
+    for partition in ("development", "holdout"):
+        partition_rows = sorted(
+            (
+                row
+                for row in nominees.values()
+                if partitions[row["participant"]] == partition
+            ),
+            key=lambda row: _visor_hos_no_hand_review_order(
+                seed, partition, row
+            ),
+        )
+        post_partition_counts[partition] = len(partition_rows)
+        video_counts: Counter[str] = Counter()
+        capped = []
+        for row in partition_rows:
+            if video_counts[row["video"]] >= per_video_cap:
+                continue
+            video_counts[row["video"]] += 1
+            capped.append(row)
+        post_cap_counts[partition] = len(capped)
+        for ordinal, row in enumerate(capped[:max_per_partition], start=1):
+            queues[partition].append(
+                {
+                    **row,
+                    "review_ordinal": ordinal,
+                    "review_token": _visor_hos_no_hand_review_token(
+                        seed, partition, row
+                    ),
+                }
+            )
+        if len({row["review_token"] for row in queues[partition]}) != len(
+            queues[partition]
+        ):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_TOKEN_COLLISION")
+    development_frames = {
+        (row["video"], row["frame_name"]) for row in queues["development"]
+    }
+    holdout_frames = {
+        (row["video"], row["frame_name"]) for row in queues["holdout"]
+    }
+    development_participants = {
+        row["participant"] for row in queues["development"]
+    }
+    holdout_participants = {row["participant"] for row in queues["holdout"]}
+    development_videos = {row["video"] for row in queues["development"]}
+    holdout_videos = {row["video"] for row in queues["holdout"]}
+    report = {
+        "raw_nominee_count": len(nominees),
+        "post_partition_counts": post_partition_counts,
+        "post_cap_counts": post_cap_counts,
+        "queue_counts": {
+            partition: len(rows) for partition, rows in queues.items()
+        },
+        "invalid_frame_count": invalid_frame_count,
+        "abstained_frame_count": abstained_frame_count,
+        "duplicate_nominee_count": duplicate_nominee_count,
+        "correction_excluded_nominee_count": excluded_nominee_count,
+        "participant_overlap_count": len(
+            development_participants & holdout_participants
+        ),
+        "video_overlap_count": len(development_videos & holdout_videos),
+        "frame_overlap_count": len(development_frames & holdout_frames),
+    }
+    return queues, report
+
+
+def _visor_hos_review_source_frame(frame_root: Path, relative_path: str) -> Path:
+    if not isinstance(relative_path, str) or not relative_path:
+        raise RuntimeError("E_VISOR_HOS_REVIEW_FRAME_PATH")
+    source = (frame_root / relative_path).resolve()
+    try:
+        source.relative_to(frame_root.resolve())
+    except ValueError as error:
+        raise RuntimeError("E_VISOR_HOS_REVIEW_FRAME_PATH") from error
+    return source
+
+
+def _write_private_bytes(path: Path, value: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    temporary = path.with_suffix(path.suffix + ".partial")
+    temporary.write_bytes(value)
+    os.chmod(temporary, 0o600)
+    temporary.replace(path)
+
+
+def _render_visor_hos_no_hand_review_sheet(
+    items: list[dict[str, Any]], sheet_ordinal: int
+) -> bytes:
+    from PIL import Image, ImageDraw, ImageOps
+
+    columns = 4
+    rows = 2
+    tile_width = 480
+    image_height = 360
+    label_height = 40
+    header_height = 40
+    canvas = Image.new(
+        "RGB",
+        (
+            columns * tile_width,
+            header_height + rows * (image_height + label_height),
+        ),
+        "white",
+    )
+    draw = ImageDraw.Draw(canvas)
+    for index, item in enumerate(items):
+        column = index % columns
+        row = index // columns
+        left = column * tile_width
+        top = header_height + row * (image_height + label_height)
+        source = Path(item["resolved_source_path"])
+        try:
+            with Image.open(source) as opened:
+                image = ImageOps.contain(opened.convert("RGB"), (tile_width, image_height))
+            x = left + (tile_width - image.width) // 2
+            y = top + (image_height - image.height) // 2
+            canvas.paste(image, (x, y))
+        except Exception:
+            draw.rectangle(
+                (left, top, left + tile_width - 1, top + image_height - 1),
+                fill="#eeeeee",
+                outline="#aa0000",
+            )
+            draw.text(
+                (left + 8, top + image_height // 2),
+                "DECODE FAILURE: code abstain",
+                fill="#880000",
+            )
+        draw.rectangle(
+            (
+                left,
+                top + image_height,
+                left + tile_width - 1,
+                top + image_height + label_height - 1,
+            ),
+            outline="black",
+        )
+        draw.text(
+            (left + 8, top + image_height + 6),
+            f"{item['review_ordinal']:03d}  {item['review_token']}",
+            fill="black",
+        )
+    draw.text(
+        (8, 10),
+        (
+            f"blind review sheet {sheet_ordinal:02d} — visible hand? "
+            "code yes=no hand, no=hand visible, abstain=ambiguous"
+        ),
+        fill="black",
+    )
+    output = BytesIO()
+    canvas.save(output, format="PNG", optimize=True)
+    return output.getvalue()
+
+
+def prepare_visor_hos_no_hand_review(
+    annotation_documents: list[dict[str, Any]] | None,
+    *,
+    cfg: dict[str, Any],
+    frame_root: Path,
+    review_root: Path,
+    correction_excluded_frame_keys: set[tuple[str, str]]
+    | frozenset[tuple[str, str]]
+    | None = None,
+    preselected_queues: dict[str, list[dict[str, Any]]] | None = None,
+    inventory_override: dict[str, Any] | None = None,
+    source_feasibility_commitment_sha256: str | None = None,
+    source_frame_materialization_commitment_sha256: str | None = None,
+) -> dict[str, Any]:
+    """Render a fixed, model-blind public no-hand review queue outside Git."""
+
+    amendment = _tuple_visor_hos_correction_amendment(cfg)
+    sampler = amendment["partition_and_joint_sampler"]
+    target = int(sampler["quota_per_partition_per_stratum"])
+    if target != 48 or VISOR_HOS_NO_HAND_REVIEW_MAX_PER_PARTITION != 192:
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_PROTOCOL")
+    _refuse_git_output(frame_root)
+    _refuse_git_output(review_root)
+    if preselected_queues is None:
+        if annotation_documents is None:
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE")
+        queues, inventory = _visor_hos_no_hand_review_nominees(
+            annotation_documents,
+            seed=int(sampler["seed"]),
+            per_video_cap=int(sampler["per_video_per_stratum_cap"]),
+            correction_excluded_frame_keys=correction_excluded_frame_keys,
+        )
+    else:
+        if annotation_documents not in (None, []):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE")
+        if (
+            set(preselected_queues) != {"development", "holdout"}
+            or not isinstance(inventory_override, dict)
+            or not isinstance(source_feasibility_commitment_sha256, str)
+            or not re.fullmatch(
+                r"[0-9a-f]{64}", source_feasibility_commitment_sha256
+            )
+            or not isinstance(
+                source_frame_materialization_commitment_sha256, str
+            )
+            or not re.fullmatch(
+                r"[0-9a-f]{64}",
+                source_frame_materialization_commitment_sha256,
+            )
+        ):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_LINEAGE")
+        queues = json.loads(json.dumps(preselected_queues))
+        inventory = json.loads(json.dumps(inventory_override))
+    items: dict[str, list[dict[str, Any]]] = {
+        "development": [],
+        "holdout": [],
+    }
+    contact_sheets: list[dict[str, Any]] = []
+    rendered_sheets: dict[str, bytes] = {}
+    decode_failure_count = 0
+    for partition in ("development", "holdout"):
+        for row in queues[partition]:
+            source = _visor_hos_review_source_frame(
+                frame_root, str(row["image_path"])
+            )
+            source_sha256 = file_digest(source) if source.is_file() else None
+            decode_status = "PASS"
+            try:
+                from PIL import Image
+
+                with Image.open(source) as image:
+                    image.verify()
+            except Exception:
+                decode_status = "DECODE_FAILURE"
+                decode_failure_count += 1
+            items[partition].append(
+                {
+                    **row,
+                    "resolved_source_path": str(source),
+                    "source_frame_sha256": source_sha256,
+                    "decode_status": decode_status,
+                }
+            )
+        for start in range(
+            0,
+            len(items[partition]),
+            VISOR_HOS_NO_HAND_REVIEW_ITEMS_PER_SHEET,
+        ):
+            chunk = items[partition][
+                start : start + VISOR_HOS_NO_HAND_REVIEW_ITEMS_PER_SHEET
+            ]
+            sheet_ordinal = start // VISOR_HOS_NO_HAND_REVIEW_ITEMS_PER_SHEET + 1
+            sheet_name = f"contact-sheet-{partition}-{sheet_ordinal:02d}.png"
+            sheet = _render_visor_hos_no_hand_review_sheet(chunk, sheet_ordinal)
+            rendered_sheets[sheet_name] = sheet
+            contact_sheets.append(
+                {
+                    "partition": partition,
+                    "sheet_ordinal": sheet_ordinal,
+                    "relative_path": sheet_name,
+                    "item_count": len(chunk),
+                    "sha256": hashlib.sha256(sheet).hexdigest(),
+                }
+            )
+    queue = {
+        "schema_version": 1,
+        "status": "READY_FOR_AUTHORIZED_APPLICANT_BLIND_REVIEW",
+        "visor_hos_correction_amendment_commitment_sha256": amendment[
+            "amendment_commitment_sha256"
+        ],
+        "seed": int(sampler["seed"]),
+        "target_verified_no_hand_per_partition": target,
+        "maximum_nominees_per_partition": (
+            VISOR_HOS_NO_HAND_REVIEW_MAX_PER_PARTITION
+        ),
+        "per_video_nominee_cap": int(sampler["per_video_per_stratum_cap"]),
+        "model_inference_executed_before_review": False,
+        "model_output_fields_present": False,
+        "label_semantics": {
+            "yes": "visually verified no visible hand",
+            "no": "a visible hand is present",
+            "abstain": "ambiguous visibility decode failure or incomplete annotation",
+        },
+        "inventory": inventory,
+        "partitions": items,
+        "contact_sheets": contact_sheets,
+    }
+    if source_feasibility_commitment_sha256 is not None:
+        queue["visor_hos_source_feasibility_commitment_sha256"] = (
+            source_feasibility_commitment_sha256
+        )
+    if source_frame_materialization_commitment_sha256 is not None:
+        queue["source_frame_materialization_commitment_sha256"] = (
+            source_frame_materialization_commitment_sha256
+        )
+    queue["review_queue_commitment_sha256"] = digest(queue)
+    manifest_path = review_root / "review-queue.json"
+    if manifest_path.exists():
+        prior = json.loads(manifest_path.read_text())
+        prior_commitment = prior.pop("review_queue_commitment_sha256", None)
+        if prior_commitment != digest(prior) or prior != {
+            key: value
+            for key, value in queue.items()
+            if key != "review_queue_commitment_sha256"
+        }:
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_ALREADY_FROZEN")
+        prior["review_queue_commitment_sha256"] = prior_commitment
+        for sheet_name, sheet in rendered_sheets.items():
+            path = review_root / sheet_name
+            if not path.is_file() or file_digest(path) != hashlib.sha256(
+                sheet
+            ).hexdigest():
+                raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SHEET_COMMITMENT")
+    else:
+        for sheet_name, sheet in rendered_sheets.items():
+            _write_private_bytes(review_root / sheet_name, sheet)
+        write_private(manifest_path, queue)
+        labels = {
+            "schema_version": 1,
+            "review_queue_commitment_sha256": queue[
+                "review_queue_commitment_sha256"
+            ],
+            "reviewer_role": "authorized_applicant",
+            "labels": [
+                {
+                    "partition": partition,
+                    "review_token": row["review_token"],
+                    "label": "",
+                }
+                for partition in ("development", "holdout")
+                for row in items[partition]
+            ],
+        }
+        write_private(review_root / "review-labels.json", labels)
+    return {
+        "status": queue["status"],
+        "partition_count": 2,
+        "nominee_count": int(inventory["raw_nominee_count"]),
+        "review_queue_count": sum(len(rows) for rows in items.values()),
+        "decode_failure_count": decode_failure_count,
+        "contact_sheet_count": len(contact_sheets),
+        "review_queue_commitment_sha256": queue[
+            "review_queue_commitment_sha256"
+        ],
+    }
+
+
+def _load_visor_hos_no_hand_review_queue(review_root: Path) -> dict[str, Any]:
+    path = review_root / "review-queue.json"
+    if not path.is_file():
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_QUEUE_MISSING")
+    queue = json.loads(path.read_text())
+    expected = queue.pop("review_queue_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(queue) != expected:
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_QUEUE_COMMITMENT")
+    queue["review_queue_commitment_sha256"] = expected
+    if (
+        queue.get("status") != "READY_FOR_AUTHORIZED_APPLICANT_BLIND_REVIEW"
+        or queue.get("model_inference_executed_before_review") is not False
+        or queue.get("model_output_fields_present") is not False
+        or queue.get("target_verified_no_hand_per_partition") != 48
+        or queue.get("maximum_nominees_per_partition") != 192
+    ):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_QUEUE_SCHEMA")
+    return queue
+
+
+def _validate_visor_hos_no_hand_review_artifacts(
+    queue: dict[str, Any], review_root: Path
+) -> None:
+    for sheet in queue.get("contact_sheets", []):
+        if not isinstance(sheet, dict):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SHEET_SCHEMA")
+        relative_path = sheet.get("relative_path")
+        if (
+            not isinstance(relative_path, str)
+            or Path(relative_path).name != relative_path
+        ):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SHEET_SCHEMA")
+        path = review_root / relative_path
+        if not path.is_file() or file_digest(path) != sheet.get("sha256"):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SHEET_COMMITMENT")
+    for partition in ("development", "holdout"):
+        rows = queue.get("partitions", {}).get(partition)
+        if not isinstance(rows, list):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_QUEUE_SCHEMA")
+        for row in rows:
+            if not isinstance(row, dict):
+                raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_QUEUE_SCHEMA")
+            path = Path(str(row.get("resolved_source_path", "")))
+            expected = row.get("source_frame_sha256")
+            if row.get("decode_status") == "PASS":
+                if (
+                    not isinstance(expected, str)
+                    or not path.is_file()
+                    or file_digest(path) != expected
+                ):
+                    raise RuntimeError(
+                        "E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_COMMITMENT"
+                    )
+
+
+def seal_visor_hos_no_hand_review(
+    *,
+    review_root: Path,
+    authorized_applicant_attested: bool,
+    blind_to_egohos_output_attested: bool,
+    egohos_inference_not_started_attested: bool,
+) -> dict[str, Any]:
+    """Seal applicant labels; only a 48-per-partition PASS can feed inference."""
+
+    _refuse_git_output(review_root)
+    if not all(
+        (
+            authorized_applicant_attested,
+            blind_to_egohos_output_attested,
+            egohos_inference_not_started_attested,
+        )
+    ):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_ATTESTATION")
+    queue = _load_visor_hos_no_hand_review_queue(review_root)
+    _validate_visor_hos_no_hand_review_artifacts(queue, review_root)
+    label_path = review_root / "review-labels.json"
+    if not label_path.is_file():
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_LABELS_MISSING")
+    labels = json.loads(label_path.read_text())
+    if (
+        set(labels)
+        != {
+            "schema_version",
+            "review_queue_commitment_sha256",
+            "reviewer_role",
+            "labels",
+        }
+        or any(
+            not isinstance(row, dict)
+            or set(row) != {"partition", "review_token", "label"}
+            for row in labels.get("labels", [])
+        )
+        or labels.get("schema_version") != 1
+        or labels.get("reviewer_role") != "authorized_applicant"
+        or labels.get("review_queue_commitment_sha256")
+        != queue["review_queue_commitment_sha256"]
+        or not isinstance(labels.get("labels"), list)
+    ):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_LABEL_SCHEMA")
+    queued = [
+        (partition, row)
+        for partition in ("development", "holdout")
+        for row in queue["partitions"][partition]
+    ]
+    expected_keys = [
+        (partition, row["review_token"]) for partition, row in queued
+    ]
+    observed_keys = [
+        (row.get("partition"), row.get("review_token"))
+        for row in labels["labels"]
+        if isinstance(row, dict)
+    ]
+    if observed_keys != expected_keys or len(observed_keys) != len(labels["labels"]):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_LABEL_ORDER")
+    normalized_labels: dict[tuple[str, str], str] = {}
+    for row in labels["labels"]:
+        label = row.get("label")
+        if label not in VISOR_HOS_NO_HAND_REVIEW_LABELS:
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_LABEL_VALUE")
+        normalized_labels[(row["partition"], row["review_token"])] = label
+    partition_records: dict[str, dict[str, Any]] = {}
+    total_coded = 0
+    total_no = 0
+    total_abstain = 0
+    total_unreviewed = 0
+    total_selected = 0
+    deficit_partition_count = 0
+    partition_statuses: list[str] = []
+    target = int(queue["target_verified_no_hand_per_partition"])
+    for partition in ("development", "holdout"):
+        partition_queue = queue["partitions"][partition]
+        values = [
+            normalized_labels[(partition, row["review_token"])]
+            for row in partition_queue
+        ]
+        coded_indices = [index for index, value in enumerate(values) if value]
+        if coded_indices != list(range(len(coded_indices))):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_NONCONTIGUOUS")
+        for row, label in zip(partition_queue, values, strict=True):
+            if row["decode_status"] != "PASS" and label not in {"", "abstain"}:
+                raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_DECODE_LABEL")
+        verified = [
+            row
+            for row, label in zip(partition_queue, values, strict=True)
+            if label == "yes"
+        ]
+        selected = verified[:target]
+        all_reviewed = len(coded_indices) == len(values)
+        if len(selected) != target:
+            deficit_partition_count += 1
+            partition_statuses.append(
+                "NO_GO" if all_reviewed else "INCOMPLETE_REVIEW"
+            )
+        else:
+            partition_statuses.append("PASS")
+        counts = Counter(values)
+        total_coded += len(coded_indices)
+        total_no += int(counts["no"])
+        total_abstain += int(counts["abstain"])
+        total_unreviewed += int(counts[""])
+        total_selected += len(selected)
+        partition_records[partition] = {
+            "queue_count": len(partition_queue),
+            "coded_count": len(coded_indices),
+            "yes_count": int(counts["yes"]),
+            "no_count": int(counts["no"]),
+            "abstain_count": int(counts["abstain"]),
+            "unreviewed_count": int(counts[""]),
+            "selected_verified_no_hand_count": len(selected),
+            "selected": [
+                {
+                    "review_token": row["review_token"],
+                    "video": row["video"],
+                    "frame_name": row["frame_name"],
+                    "source_frame_sha256": row["source_frame_sha256"],
+                }
+                for row in selected
+            ],
+        }
+    if "INCOMPLETE_REVIEW" in partition_statuses:
+        status = "INCOMPLETE_REVIEW"
+    elif "NO_GO" in partition_statuses:
+        status = "NO_GO"
+    else:
+        status = "PASS"
+    labels_payload = {
+        "schema_version": 1,
+        "review_queue_commitment_sha256": queue[
+            "review_queue_commitment_sha256"
+        ],
+        "reviewer_role": "authorized_applicant",
+        "blind_to_egohos_output_attested": True,
+        "egohos_inference_not_started_attested": True,
+        "labels": labels["labels"],
+    }
+    labels_commitment = digest(labels_payload)
+    if status != "INCOMPLETE_REVIEW":
+        seal = {
+            "schema_version": 1,
+            "status": status,
+            "review_queue_commitment_sha256": queue[
+                "review_queue_commitment_sha256"
+            ],
+            "review_labels_commitment_sha256": labels_commitment,
+            "reviewer_role": "authorized_applicant",
+            "blind_to_egohos_output_attested": True,
+            "egohos_inference_not_started_attested": True,
+            "partitions": partition_records,
+        }
+        seal["verified_no_hand_seal_commitment_sha256"] = digest(seal)
+        seal_path = review_root / "verified-no-hand-seal.json"
+        if seal_path.exists():
+            prior = json.loads(seal_path.read_text())
+            expected = prior.pop("verified_no_hand_seal_commitment_sha256", None)
+            if expected != digest(prior) or prior != {
+                key: value
+                for key, value in seal.items()
+                if key != "verified_no_hand_seal_commitment_sha256"
+            }:
+                raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_ALREADY_SEALED")
+        else:
+            write_private(seal_path, seal)
+        seal_commitment = seal["verified_no_hand_seal_commitment_sha256"]
+    else:
+        seal_commitment = None
+    return {
+        "status": status,
+        "partition_count": 2,
+        "coded_count": total_coded,
+        "verified_no_hand_count": total_selected,
+        "visible_hand_count": total_no,
+        "abstain_count": total_abstain,
+        "unreviewed_count": total_unreviewed,
+        "deficit_partition_count": deficit_partition_count,
+        "review_labels_commitment_sha256": labels_commitment,
+        "verified_no_hand_seal_commitment_sha256": seal_commitment,
+    }
+
+
+def load_visor_hos_verified_no_hand_frames(
+    review_root: Path,
+) -> set[tuple[str, str]]:
+    """Load the sole model-inference authorization artifact for no-hand truth."""
+
+    queue = _load_visor_hos_no_hand_review_queue(review_root)
+    _validate_visor_hos_no_hand_review_artifacts(queue, review_root)
+    path = review_root / "verified-no-hand-seal.json"
+    if not path.is_file():
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_NOT_SEALED")
+    seal = json.loads(path.read_text())
+    expected = seal.pop("verified_no_hand_seal_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(seal) != expected:
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SEAL_COMMITMENT")
+    if (
+        seal.get("status") != "PASS"
+        or seal.get("review_queue_commitment_sha256")
+        != queue["review_queue_commitment_sha256"]
+        or seal.get("reviewer_role") != "authorized_applicant"
+        or seal.get("blind_to_egohos_output_attested") is not True
+        or seal.get("egohos_inference_not_started_attested") is not True
+    ):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_NOT_AUTHORIZED")
+    output: set[tuple[str, str]] = set()
+    for partition in ("development", "holdout"):
+        record = seal.get("partitions", {}).get(partition, {})
+        selected = record.get("selected")
+        queue_rows = queue.get("partitions", {}).get(partition, [])
+        queue_by_token = {
+            row.get("review_token"): row
+            for row in queue_rows
+            if isinstance(row, dict)
+        }
+        if (
+            record.get("selected_verified_no_hand_count") != 48
+            or not isinstance(selected, list)
+            or len(selected) != 48
+            or len(queue_by_token) != len(queue_rows)
+        ):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SELECTION_COUNT")
+        selected_ordinals: list[int] = []
+        for row in selected:
+            queued = queue_by_token.get(row.get("review_token"))
+            if (
+                queued is None
+                or row.get("video") != queued.get("video")
+                or row.get("frame_name") != queued.get("frame_name")
+                or row.get("source_frame_sha256")
+                != queued.get("source_frame_sha256")
+            ):
+                raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SELECTION_KEY")
+            key = (row.get("video"), row.get("frame_name"))
+            if not all(isinstance(value, str) and value for value in key):
+                raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SELECTION_KEY")
+            selected_ordinals.append(int(queued["review_ordinal"]))
+            output.add(key)
+        if selected_ordinals != sorted(selected_ordinals) or len(
+            set(selected_ordinals)
+        ) != len(selected_ordinals):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SELECTION_ORDER")
+    if len(output) != 96:
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SELECTION_OVERLAP")
+    return output
+
+
 def _tuple_combined_public_gate(
     axis_results: dict[str, dict[str, Any]],
     action_control_result: dict[str, Any],
@@ -1873,6 +2769,3943 @@ def _tuple_combined_public_gate(
     }
 
 
+TUPLE_QUALIFICATION_MODULE_IDS = (
+    "adapter_and_lexical",
+    "referent",
+    "recurrence",
+    "attribute",
+    "hand_contact",
+    "sensor",
+    "order_action",
+)
+
+
+def _tuple_qualification_execution(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Return the pre-outcome execution clarification for tuple qualification."""
+
+    correction = _tuple_visor_hos_correction_amendment(cfg)
+    value = correction.get("qualification_execution_clarification")
+    if not isinstance(value, dict):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_EXECUTION_NOT_FROZEN")
+    if value.get("status") != "FROZEN_BEFORE_PUBLIC_DEVELOPMENT_INFERENCE":
+        raise RuntimeError("E_TUPLE_QUALIFICATION_EXECUTION_NOT_FROZEN")
+    phase = value.get("phase_aggregation", {})
+    if (
+        phase.get("requested_samples") != 9
+        or phase.get("minimum_valid_samples") != 8
+        or phase.get("phase_sample_count") != 3
+        or phase.get("phase_visible_if_valid_positive_samples_min") != 2
+    ):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_PHASE_RULE")
+    phash = value.get("pHash", {})
+    if (
+        phash.get("algorithm")
+        != "32x32_grayscale_DCT_low_8x8_excluding_DC_median_bits"
+        or phash.get("near_duplicate_hamming_distance_max") != 4
+    ):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_PHASH_RULE")
+    sensor = value.get("sensor_direction_checks")
+    if not isinstance(sensor, list) or len(sensor) != 6:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_SENSOR_RULE")
+    grids = value.get("grid_selection", {})
+    if set(grids) != {"grounding", "recurrence", "attribute", "hand", "action"}:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_GRID_RULE")
+    return value
+
+
+def _tuple_referent_audio_fixture(cfg: dict[str, Any]) -> dict[str, Any]:
+    correction = _tuple_visor_hos_correction_amendment(cfg)
+    value = correction["qualification_execution_clarification"].get(
+        "referent_audio_fixture"
+    )
+    expected_articles = {
+        "sports ball": "der",
+        "cup": "der",
+        "bottle": "die",
+        "bowl": "die",
+        "book": "das",
+        "chair": "der",
+        "apple": "der",
+        "banana": "die",
+    }
+    if (
+        not isinstance(value, dict)
+        or value.get("active_external_location")
+        != "public/mechanistic-training-tuple-fixtures/audio-seed"
+        or "public/mechanistic-tuple-audio-seed" not in str(
+            value.get("prior_predicative_seed_rule", "")
+        )
+        or value.get("language") != "de"
+        or value.get("voice") != "macOS Anna de_DE at 175 words per minute"
+        or value.get("development_template")
+        != "{definite_article_capitalized} {inflected_attribute} {noun}."
+        or value.get("holdout_template")
+        != "Schau, {definite_article_lowercase} {inflected_attribute} {noun}."
+        or value.get("definite_articles_by_public_category") != expected_articles
+        or value.get("ordered_inflected_attributes_by_scenario_ordinal")
+        != [
+            "rote",
+            "blaue",
+            "grüne",
+            "gelbe",
+            "große",
+            "kleine",
+            "rote",
+            "blaue",
+        ]
+        or value.get("muxed_speech_delay_seconds") != 2.5
+        or value.get("maximum_spoken_audio_seconds") != 2.0
+        or "actual pinned shared adapter output" not in str(
+            value.get("prediction_rule", "")
+        )
+    ):
+        raise RuntimeError("E_TUPLE_AUDIO_FIXTURE_RECIPE")
+    return value
+
+
+def _tuple_audio_phrase(
+    recipe: dict[str, Any], partition: str, category: str, ordinal: int, noun: str
+) -> str:
+    article = recipe["definite_articles_by_public_category"].get(category)
+    attributes = recipe["ordered_inflected_attributes_by_scenario_ordinal"]
+    if (
+        partition not in {"development", "holdout"}
+        or not isinstance(article, str)
+        or not 0 <= ordinal < len(attributes)
+        or not isinstance(noun, str)
+        or not noun
+    ):
+        raise RuntimeError("E_TUPLE_AUDIO_FIXTURE_PHRASE")
+    if partition == "development":
+        return recipe["development_template"].format(
+            definite_article_capitalized=article.capitalize(),
+            inflected_attribute=attributes[ordinal],
+            noun=noun,
+        )
+    return recipe["holdout_template"].format(
+        definite_article_lowercase=article,
+        inflected_attribute=attributes[ordinal],
+        noun=noun,
+    )
+
+
+def _tuple_fixture_file(
+    fixture_root: Path,
+    relative_value: Any,
+    expected_sha256: Any,
+    expected_bytes: Any | None = None,
+) -> Path:
+    relative = Path(str(relative_value))
+    if (
+        relative.is_absolute()
+        or not relative.parts
+        or ".." in relative.parts
+        or any(not part or part in {".", ".."} for part in relative.parts)
+    ):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_MEDIA_PATH")
+    target = fixture_root / relative
+    try:
+        target.resolve().relative_to(fixture_root.resolve())
+    except ValueError as error:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_MEDIA_PATH") from error
+    if not target.is_file() or not isinstance(expected_sha256, str):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_MEDIA_MISSING")
+    if file_digest(target) != expected_sha256:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_MEDIA_HASH")
+    if expected_bytes is not None and target.stat().st_size != int(expected_bytes):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_MEDIA_BYTES")
+    return target
+
+
+TUPLE_RECURRENCE_FIXTURE_FIELDS = frozenset(
+    {
+        "fixture_ordinal",
+        "stratum",
+        "same_referent",
+        "near_duplicate",
+        "source_image_ids",
+        "first_relative_path",
+        "first_sha256",
+        "first_bytes",
+        "second_relative_path",
+        "second_sha256",
+        "second_bytes",
+        "first_mask_relative_path",
+        "first_mask_sha256",
+        "first_mask_bytes",
+        "second_mask_relative_path",
+        "second_mask_sha256",
+        "second_mask_bytes",
+    }
+)
+TUPLE_RECURRENCE_STRATA = frozenset(
+    {
+        "same_instance_transformed",
+        "same_instance_near_duplicate",
+        "same_category_different_instance",
+        "different_category",
+    }
+)
+
+
+def _validate_tuple_recurrence_fixture_rows(
+    rows: Any, fixture_root: Path | None = None
+) -> None:
+    """Fail closed on recurrence lineage and full-canvas binary alpha masks."""
+
+    from PIL import Image
+
+    if not isinstance(rows, list):
+        raise RuntimeError("E_TUPLE_RECURRENCE_FIXTURE_SCHEMA")
+    ordinals: set[int] = set()
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != TUPLE_RECURRENCE_FIXTURE_FIELDS:
+            raise RuntimeError("E_TUPLE_RECURRENCE_FIXTURE_SCHEMA")
+        ordinal = row["fixture_ordinal"]
+        source_ids = row["source_image_ids"]
+        if (
+            isinstance(ordinal, bool)
+            or not isinstance(ordinal, int)
+            or ordinal < 0
+            or ordinal in ordinals
+            or row["stratum"] not in TUPLE_RECURRENCE_STRATA
+            or not isinstance(row["same_referent"], bool)
+            or not isinstance(row["near_duplicate"], bool)
+            or not isinstance(source_ids, list)
+            or len(source_ids) != 2
+            or any(isinstance(value, bool) or not isinstance(value, int) for value in source_ids)
+        ):
+            raise RuntimeError("E_TUPLE_RECURRENCE_FIXTURE_SCHEMA")
+        ordinals.add(ordinal)
+        resolved: dict[str, Path] = {}
+        for prefix in ("first", "second", "first_mask", "second_mask"):
+            relative = row[f"{prefix}_relative_path"]
+            sha256 = row[f"{prefix}_sha256"]
+            byte_count = row[f"{prefix}_bytes"]
+            if (
+                not isinstance(relative, str)
+                or not relative
+                or not isinstance(sha256, str)
+                or re.fullmatch(r"[0-9a-f]{64}", sha256) is None
+                or isinstance(byte_count, bool)
+                or not isinstance(byte_count, int)
+                or byte_count <= 0
+            ):
+                raise RuntimeError("E_TUPLE_RECURRENCE_FIXTURE_SCHEMA")
+            if fixture_root is not None:
+                resolved[prefix] = _tuple_fixture_file(
+                    fixture_root, relative, sha256, byte_count
+                )
+        if fixture_root is None:
+            continue
+        image_sizes = {}
+        for prefix in ("first", "second"):
+            with Image.open(resolved[prefix]) as source:
+                if source.format != "PNG":
+                    raise RuntimeError("E_TUPLE_RECURRENCE_IMAGE")
+                image_sizes[prefix] = source.size
+        for prefix, image_prefix in (
+            ("first_mask", "first"),
+            ("second_mask", "second"),
+        ):
+            with Image.open(resolved[prefix]) as source:
+                if source.format != "PNG" or source.mode != "L":
+                    raise RuntimeError("E_TUPLE_RECURRENCE_MASK")
+                mask = source.copy()
+            active_values = {
+                value for value, count in enumerate(mask.histogram()) if count
+            }
+            if (
+                mask.size != image_sizes[image_prefix]
+                or mask.size != (224, 224)
+                or not active_values <= {0, 255}
+                or 255 not in active_values
+            ):
+                raise RuntimeError("E_TUPLE_RECURRENCE_MASK")
+
+
+def _verify_tuple_fixture_files_recursive(value: Any, fixture_root: Path) -> int:
+    """Hash every manifest-referenced fixture file before model inference."""
+
+    if isinstance(value, list):
+        return sum(
+            _verify_tuple_fixture_files_recursive(item, fixture_root)
+            for item in value
+        )
+    if not isinstance(value, dict):
+        return 0
+    count = 0
+    for key, relative in value.items():
+        if not key.endswith("_relative_path"):
+            continue
+        prefix = key[: -len("_relative_path")]
+        hash_key = f"{prefix}_sha256"
+        if hash_key not in value:
+            raise RuntimeError("E_TUPLE_QUALIFICATION_MEDIA_HASH_FIELD")
+        if relative is None and value[hash_key] is None:
+            continue
+        _tuple_fixture_file(
+            fixture_root,
+            relative,
+            value[hash_key],
+            value.get(f"{prefix}_bytes"),
+        )
+        count += 1
+    for item in value.values():
+        if isinstance(item, (dict, list)):
+            count += _verify_tuple_fixture_files_recursive(item, fixture_root)
+    return count
+
+
+def _verify_tuple_fixture_commitments(
+    manifest: dict[str, Any], commitments: dict[str, str]
+) -> None:
+    for key, value in commitments.items():
+        if manifest.get(key) != value:
+            raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_PROVENANCE")
+
+
+def _verify_tuple_fixture_manifest(
+    public: Path, cfg: dict[str, Any]
+) -> tuple[dict[str, Any], Path]:
+    """Verify the complete external fixture seal before any model is loaded."""
+
+    amendment = _tuple_amendment(cfg)
+    runtime = _tuple_runtime_amendment(cfg)
+    protocol = _tuple_fixture_protocol(cfg)
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    correction = _tuple_visor_hos_correction_amendment(cfg)
+    _tuple_qualification_execution(cfg)
+    fixture_root = _tuple_fixture_root(public)
+    source_feasibility = _load_active_visor_hos_source_feasibility(
+        fixture_root, cfg
+    )
+    verified_no_hand = _load_visor_hos_verified_no_hand_lineage(
+        fixture_root / "no-hand-review",
+        expected_source_feasibility_commitment_sha256=source_feasibility[
+            "visor_hos_source_feasibility_commitment_sha256"
+        ],
+    )
+    path = fixture_root / "fixture-manifest.json"
+    if not path.is_file():
+        raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_MANIFEST_MISSING")
+    manifest = json.loads(path.read_text())
+    payload = json.loads(json.dumps(manifest))
+    expected = payload.pop("public_fixture_manifest_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(payload) != expected:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_COMMITMENT")
+    if (
+        manifest.get("schema_version") != 2
+        or manifest.get("status") != "SEALED_BEFORE_PUBLIC_DEVELOPMENT_INFERENCE"
+    ):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_STATUS")
+    commitments = {
+        "mechanistic_tuple_amendment_commitment_sha256": amendment[
+            "amendment_commitment_sha256"
+        ],
+        "public_fixture_protocol_commitment_sha256": protocol[
+            "protocol_commitment_sha256"
+        ],
+        "fixture_preparation_amendment_commitment_sha256": preparation[
+            "preparation_amendment_commitment_sha256"
+        ],
+        "visor_hos_correction_amendment_commitment_sha256": correction[
+            "amendment_commitment_sha256"
+        ],
+        "visor_hos_source_feasibility_commitment_sha256": source_feasibility[
+            "visor_hos_source_feasibility_commitment_sha256"
+        ],
+        "verified_no_hand_seal_commitment_sha256": verified_no_hand[
+            "commitment_sha256"
+        ],
+    }
+    _verify_tuple_fixture_commitments(manifest, commitments)
+    no_hand_commitment = verified_no_hand["commitment_sha256"]
+    if manifest.get("restricted_mount_present") is not False:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_RESTRICTED_MOUNT")
+    if manifest.get("model_inference_executed") is not False:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_OUTCOME_ORDER")
+    partitions = manifest.get("partitions")
+    if not isinstance(partitions, dict) or set(partitions) != {
+        "development",
+        "holdout",
+    }:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_PARTITIONS")
+    expected_counts = correction["public_fixture_counts_per_partition"]
+    family_count_keys = {
+        "language_lexical": "language_and_lexical_items",
+        "referent_attribute": "referent_attribute_microclips",
+        "recurrence": "recurrence_pairs",
+        "hand_contact": "hand_contact_items",
+        "sensor": "sensor_perturbation_clips",
+        "order_action": "order_dependent_action_clips",
+    }
+    for partition in ("development", "holdout"):
+        rows = partitions[partition]
+        if not isinstance(rows, dict) or set(rows) != set(family_count_keys):
+            raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_FAMILIES")
+        for family, count_key in family_count_keys.items():
+            if not isinstance(rows[family], list) or len(rows[family]) != int(
+                expected_counts[count_key]
+            ):
+                raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_COUNT")
+        for row in rows["hand_contact"]:
+            if not isinstance(row, dict):
+                raise RuntimeError("E_TUPLE_QUALIFICATION_HAND_FIXTURE")
+            if row.get("stratum") == "verified_no_hand" and row.get(
+                "verified_no_hand_seal_commitment_sha256"
+            ) != no_hand_commitment:
+                raise RuntimeError("E_TUPLE_QUALIFICATION_NO_HAND_ROW_SEAL")
+        hand_strata = Counter(row.get("stratum") for row in rows["hand_contact"])
+        if hand_strata != {
+            "contact": 48,
+            "explicit_no_contact": 48,
+            "verified_no_hand": 48,
+        }:
+            raise RuntimeError("E_TUPLE_QUALIFICATION_HAND_STRATA")
+        _validate_tuple_egohos_fixture_rows(
+            {
+                "verified_no_hand_seal": {
+                    "status": "PASS",
+                    "verified_no_hand_seal_commitment_sha256": no_hand_commitment,
+                }
+            },
+            rows["hand_contact"],
+        )
+        _validate_tuple_recurrence_fixture_rows(
+            rows["recurrence"], fixture_root
+        )
+    audits = manifest.get("audits", {})
+    for key in (
+        "source_subject_overlap_count",
+        "source_video_overlap_count",
+        "source_frame_overlap_count",
+        "source_object_overlap_count",
+    ):
+        if int(audits.get(key, -1)) != 0:
+            raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_OVERLAP")
+    if _verify_tuple_fixture_files_recursive(partitions, fixture_root) <= 0:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_FILES")
+    if runtime["local_reload_gate"].get("zero_external_calls_crashes_silent_truncations_or_invalid_records") is not True:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_RUNTIME_GATE")
+    return manifest, fixture_root
+
+
+def _safe_divide(numerator: int | float, denominator: int | float) -> float:
+    return float(numerator) / float(denominator) if denominator else 0.0
+
+
+def _binary_classification_metrics(
+    expected: list[bool], predicted: list[bool | None]
+) -> dict[str, float]:
+    if len(expected) != len(predicted) or not expected:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_BINARY_METRIC_INPUT")
+    tp = sum(want and got is True for want, got in zip(expected, predicted, strict=True))
+    tn = sum(not want and got is False for want, got in zip(expected, predicted, strict=True))
+    fp = sum(not want and got is True for want, got in zip(expected, predicted, strict=True))
+    fn = sum(want and got is not True for want, got in zip(expected, predicted, strict=True))
+    positive = sum(expected)
+    negative = len(expected) - positive
+    precision = _safe_divide(tp, tp + fp)
+    recall = _safe_divide(tp, positive)
+    specificity = _safe_divide(tn, negative)
+    f1 = _safe_divide(2 * precision * recall, precision + recall)
+    return {
+        "precision": precision,
+        "recall": recall,
+        "specificity": specificity,
+        "f1": f1,
+        "balanced_accuracy": (recall + specificity) / 2.0,
+        "coverage": _safe_divide(sum(value is not None for value in predicted), len(predicted)),
+    }
+
+
+def _multiclass_macro_f1(
+    expected: list[str], predicted: list[str | None], labels: list[str]
+) -> float:
+    if len(expected) != len(predicted) or not expected or len(labels) != len(set(labels)):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_MULTICLASS_METRIC_INPUT")
+    values = []
+    for label in labels:
+        truth = [value == label for value in expected]
+        guesses = [None if value is None else value == label for value in predicted]
+        values.append(_binary_classification_metrics(truth, guesses)["f1"])
+    return sum(values) / len(values)
+
+
+def _weighted_kappa(
+    expected: list[str], predicted: list[str | None], labels: list[str]
+) -> float:
+    """Linearly weighted Cohen kappa; abstentions are excluded and lower coverage is separate."""
+
+    paired = [
+        (want, got)
+        for want, got in zip(expected, predicted, strict=True)
+        if got is not None
+    ]
+    if not paired or len(labels) < 2:
+        return 0.0
+    index = {label: ordinal for ordinal, label in enumerate(labels)}
+    if any(want not in index or got not in index for want, got in paired):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_KAPPA_LABEL")
+    size = len(labels)
+    observed = [[0.0] * size for _ in range(size)]
+    truth_counts = [0.0] * size
+    guess_counts = [0.0] * size
+    for want, got in paired:
+        first, second = index[want], index[str(got)]
+        observed[first][second] += 1.0
+        truth_counts[first] += 1.0
+        guess_counts[second] += 1.0
+    count = float(len(paired))
+    disagreement = 0.0
+    expected_disagreement = 0.0
+    for first in range(size):
+        for second in range(size):
+            weight = abs(first - second) / (size - 1)
+            disagreement += weight * observed[first][second] / count
+            expected_disagreement += (
+                weight * truth_counts[first] * guess_counts[second] / (count * count)
+            )
+    if expected_disagreement == 0.0:
+        return 1.0 if disagreement == 0.0 else 0.0
+    return 1.0 - disagreement / expected_disagreement
+
+
+def _select_frozen_grid_result(
+    rows: list[dict[str, Any]],
+    *,
+    primary_metric: str,
+    threshold_fields: tuple[str, ...],
+) -> dict[str, Any] | None:
+    """Choose one eligible development row, conservatively resolving exact ties."""
+
+    eligible = [row for row in rows if row.get("eligible") is True]
+    if not eligible:
+        return None
+    for row in eligible:
+        values = [row.get(primary_metric), *(row.get(key) for key in threshold_fields)]
+        if not all(isinstance(value, (int, float)) and math.isfinite(float(value)) for value in values):
+            raise RuntimeError("E_TUPLE_QUALIFICATION_GRID_RESULT")
+    return max(
+        eligible,
+        key=lambda row: (
+            float(row[primary_metric]),
+            *(float(row[key]) for key in threshold_fields),
+        ),
+    )
+
+
+def _tuple_module_failure(error: BaseException) -> dict[str, Any]:
+    message = str(error)
+    match = re.fullmatch(r"(E_[A-Z0-9_]+)(?:\s.*)?", message)
+    return {
+        "status": "ERROR",
+        "error_code": match.group(1) if match else "E_UNACCOUNTED_MODULE_FAILURE",
+        "metrics": {},
+        "row_count": 0,
+        "failure_count": 1,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+    }
+
+
+def _collect_tuple_module_results(
+    runners: dict[str, Any], context: dict[str, Any]
+) -> dict[str, dict[str, Any]]:
+    """Run every independent public module before making one combined decision."""
+
+    if set(runners) != set(TUPLE_QUALIFICATION_MODULE_IDS):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_MODULE_SET")
+    output = {}
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        try:
+            result = runners[module_id](context)
+            if not isinstance(result, dict) or result.get("status") not in {
+                "PASS",
+                "NO_GO",
+                "UNMEASURED",
+            }:
+                raise RuntimeError("E_TUPLE_QUALIFICATION_MODULE_RESULT")
+            output[module_id] = result
+        except BaseException as error:
+            if isinstance(error, (KeyboardInterrupt, SystemExit)):
+                raise
+            output[module_id] = _tuple_module_failure(error)
+    return output
+
+
+def _tuple_axis(cfg: dict[str, Any], axis_id: str) -> dict[str, Any]:
+    matches = [axis for axis in _tuple_amendment(cfg)["axes"] if axis["id"] == axis_id]
+    if len(matches) != 1:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_AXIS_CONFIG")
+    return matches[0]
+
+
+def _tuple_public_ontology_mapping(preparation: dict[str, Any]) -> dict[str, list[str]]:
+    mapping = {
+        "sports ball": ["ball", "sports ball"],
+        "cup": ["cup"],
+        "bottle": ["bottle"],
+        "bowl": ["bowl"],
+        "book": ["book"],
+        "chair": ["chair"],
+        "apple": ["apple"],
+        "banana": ["banana"],
+    }
+    if list(mapping) != preparation["public_object_ontology"]:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_ONTOLOGY")
+    return mapping
+
+
+def _adjacent_adjective_noun_spans(
+    mentions: list[dict[str, Any]],
+) -> list[dict[str, str]]:
+    """Return only actual adjacent adjective-to-noun lexical events."""
+
+    by_index: dict[int, dict[str, Any]] = {}
+    for mention in mentions:
+        index = mention.get("token_index")
+        if not isinstance(index, int) or index < 0 or index in by_index:
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_SPAN_INDEX")
+        if mention.get("part_of_speech") not in {"noun", "adjective"}:
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_SPAN_PART")
+        lemma = mention.get("lemma")
+        if not isinstance(lemma, str) or not re.fullmatch(
+            r"[a-z]+(?:'[a-z]+)?", lemma
+        ):
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_SPAN_LEMMA")
+        by_index[index] = mention
+    output = []
+    for index in sorted(by_index):
+        adjective = by_index[index]
+        noun = by_index.get(index + 1)
+        if (
+            adjective["part_of_speech"] == "adjective"
+            and noun is not None
+            and noun["part_of_speech"] == "noun"
+        ):
+            output.append(
+                {"adjective": adjective["lemma"], "noun": noun["lemma"]}
+            )
+    return output
+
+
+def _span_f1(
+    expected: list[tuple[str, str, str]],
+    predicted: list[tuple[str, str, str]],
+) -> float:
+    truth, guesses = Counter(expected), Counter(predicted)
+    matched = sum((truth & guesses).values())
+    precision = _safe_divide(matched, sum(guesses.values()))
+    recall = _safe_divide(matched, sum(truth.values()))
+    return _safe_divide(2.0 * precision * recall, precision + recall)
+
+
+def _tuple_lexical_truth_checks(
+    expected_mentions: list[dict[str, Any]],
+    predicted_mentions: list[dict[str, Any]],
+) -> list[bool]:
+    output = []
+    for ordinal, expected in enumerate(expected_mentions):
+        if not isinstance(expected, dict) or not {
+            "token",
+            "part_of_speech",
+            "expected_lemma",
+            "expected_frequency_band",
+        } <= set(expected):
+            raise RuntimeError("E_TUPLE_LEXICAL_TRUTH_SCHEMA")
+        if ordinal >= len(predicted_mentions):
+            output.append(False)
+            continue
+        predicted = predicted_mentions[ordinal]
+        output.append(
+            str(predicted.get("token", "")).casefold()
+            == str(expected["token"]).casefold()
+            and predicted.get("part_of_speech") == expected["part_of_speech"]
+            and predicted.get("lemma") == str(expected["expected_lemma"]).casefold()
+            and predicted.get("frequency_band")
+            == expected["expected_frequency_band"]
+        )
+    if len(predicted_mentions) > len(expected_mentions):
+        output.extend([False] * (len(predicted_mentions) - len(expected_mentions)))
+    return output
+
+
+def _tuple_language_lexical_module(context: dict[str, Any]) -> dict[str, Any]:
+    cfg = context["cfg"]
+    rows = context["rows"]["language_lexical"]
+    scratch = context["scratch_root"]
+    amendment = _tuple_amendment(cfg)
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    adapter_gate = _tuple_axis(cfg, "adapter_qualified_yield")["public_gate"]
+    lexical_gate = _tuple_axis(cfg, "noun_adjective_exposure")["public_gate"]
+    if file_digest(Path(__file__).resolve().with_name("synthetic_video_language_adapter.py")) != TUPLE_LANGUAGE_ADAPTER_SHA256:
+        raise RuntimeError("E_TUPLE_LANGUAGE_ADAPTER_SOURCE")
+    from synthetic_video_language_adapter import validate_asr_prediction
+
+    import nltk
+    from nltk.stem import WordNetLemmatizer
+    from wordfreq import zipf_frequency
+
+    nltk.data.path[:] = [str(_stage_tuple_nltk_resources(context["public_root"], scratch, cfg))]
+    lemmatizer = WordNetLemmatizer()
+    mapping = _tuple_public_ontology_mapping(preparation)
+    frequency_bands = _tuple_axis(cfg, "noun_adjective_exposure")[
+        "frequency_bands"
+    ]
+    case_correct = 0
+    silently_accepted_truncations = 0
+    silently_accepted_invalid_timestamps = 0
+    expected_by_pos: dict[str, list[tuple[str, str]]] = {
+        "noun": [],
+        "adjective": [],
+    }
+    predicted_by_pos: dict[str, list[tuple[str, str]]] = {
+        "noun": [],
+        "adjective": [],
+    }
+    lemma_band_checks: list[bool] = []
+    expected_episode_counts: Counter[tuple[str, str, str]] = Counter()
+    predicted_episode_counts: Counter[tuple[str, str, str]] = Counter()
+    expected_adjective_noun_spans: list[tuple[str, str, str]] = []
+    predicted_adjective_noun_spans: list[tuple[str, str, str]] = []
+    output_rows = []
+    for row in rows:
+        adjudication = validate_asr_prediction(
+            row["prediction"], float(row["audio_duration"])
+        )
+        adapter_status = str(adjudication["status"])
+        adapter_reason = adjudication.get("reason")
+        tuple_status = adapter_status
+        tuple_reason = adapter_reason
+        grounding_status = "ABSTAIN" if adapter_status != "ACCEPT" else "ACCEPT"
+        grounding_reason = adapter_reason
+        window: dict[str, Any] | None = None
+        mentions: list[dict[str, Any]] = []
+        if adapter_status == "ACCEPT":
+            if row.get("translation_status") != "ACCEPT":
+                adapter_status = "ABSTAIN"
+                adapter_reason = (
+                    "EMPTY_TRANSLATION"
+                    if not str(row.get("text_en", "")).strip()
+                    else "SILENT_TRUNCATION"
+                )
+                tuple_status, tuple_reason = adapter_status, adapter_reason
+                grounding_status, grounding_reason = adapter_status, adapter_reason
+            else:
+                window = _tuple_segment_window(
+                    row["segment"], float(row["audio_duration"]), amendment
+                )
+                if window["status"] != "ACCEPT":
+                    tuple_status = "ABSTAIN"
+                    tuple_reason = window["reason"]
+                    grounding_status, grounding_reason = tuple_status, tuple_reason
+        if tuple_status == "ACCEPT":
+            mentions = _lexical_mentions(
+                window["text_en"],
+                nltk.pos_tag,
+                lemmatizer.lemmatize,
+                zipf_frequency,
+                frequency_bands,
+            )
+            noun_categories = [
+                _map_public_ontology(mention["lemma"], mapping)
+                for mention in mentions
+                if mention["part_of_speech"] == "noun"
+            ]
+            accepted_categories = [
+                item["category"] for item in noun_categories if item["status"] == "ACCEPT"
+            ]
+            if not accepted_categories:
+                grounding_status = "ABSTAIN"
+                grounding_reason = "ONTOLOGY_UNMATCHED"
+        old_reason = row.get("expected_reason")
+        expected_adapter_status = str(
+            row.get(
+                "expected_adapter_status",
+                "ABSTAIN"
+                if old_reason
+                in {
+                    "LANGUAGE_MISMATCH",
+                    "EMPTY_ASR",
+                    "INVALID_TIMESTAMP",
+                    "LOW_CONFIDENCE",
+                    "EMPTY_TRANSLATION",
+                    "SILENT_TRUNCATION",
+                }
+                else "ACCEPT",
+            )
+        )
+        expected_adapter_reason = row.get(
+            "expected_adapter_reason",
+            old_reason if expected_adapter_status == "ABSTAIN" else None,
+        )
+        expected_tuple_status = str(
+            row.get(
+                "expected_tuple_status",
+                "ABSTAIN"
+                if old_reason == "INSUFFICIENT_IN_BOUNDS_FRAMES"
+                or expected_adapter_status == "ABSTAIN"
+                else "ACCEPT",
+            )
+        )
+        expected_tuple_reason = row.get(
+            "expected_tuple_reason",
+            old_reason if expected_tuple_status == "ABSTAIN" else None,
+        )
+        expected_grounding_status = str(
+            row.get(
+                "expected_grounding_status",
+                "ABSTAIN"
+                if old_reason == "ONTOLOGY_UNMATCHED"
+                or expected_tuple_status == "ABSTAIN"
+                else "ACCEPT",
+            )
+        )
+        expected_grounding_reason = row.get(
+            "expected_grounding_reason",
+            old_reason if expected_grounding_status == "ABSTAIN" else None,
+        )
+        case_correct += (
+            adapter_status == expected_adapter_status
+            and adapter_reason == expected_adapter_reason
+            and tuple_status == expected_tuple_status
+            and tuple_reason == expected_tuple_reason
+            and grounding_status == expected_grounding_status
+            and grounding_reason == expected_grounding_reason
+        )
+        if expected_adapter_reason == "SILENT_TRUNCATION" and adapter_status == "ACCEPT":
+            silently_accepted_truncations += 1
+        if expected_adapter_reason == "INVALID_TIMESTAMP" and adapter_status == "ACCEPT":
+            silently_accepted_invalid_timestamps += 1
+        expected_mentions = row.get("expected_lexical_mentions", [])
+        episode = str(row["episode_id"])
+        for ordinal, expected in enumerate(expected_mentions):
+            part = str(expected["part_of_speech"])
+            token = str(expected["token"]).casefold()
+            expected_by_pos[part].append((str(row["case_id"]), f"{ordinal}:{token}"))
+            expected_episode_counts[(episode, part, token)] += 1
+        for ordinal, mention in enumerate(mentions):
+            part = str(mention["part_of_speech"])
+            token = str(mention["token"]).casefold()
+            predicted_by_pos[part].append((str(row["case_id"]), f"{ordinal}:{token}"))
+            predicted_episode_counts[(episode, part, mention["lemma"])] += 1
+        lemma_band_checks.extend(
+            _tuple_lexical_truth_checks(expected_mentions, mentions)
+        )
+        expected_constructions = row.get("expected_adjective_noun_spans")
+        if not isinstance(expected_constructions, list):
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_SPAN_TRUTH_MISSING")
+        case_id = str(row["case_id"])
+        for span in expected_constructions:
+            if (
+                not isinstance(span, dict)
+                or set(span) != {"adjective", "noun"}
+                or not all(
+                    isinstance(span[key], str)
+                    and re.fullmatch(r"[a-z]+(?:'[a-z]+)?", span[key])
+                    for key in ("adjective", "noun")
+                )
+            ):
+                raise RuntimeError("E_TUPLE_ATTRIBUTE_SPAN_TRUTH")
+            expected_adjective_noun_spans.append(
+                (case_id, span["adjective"], span["noun"])
+            )
+        observed_constructions = _adjacent_adjective_noun_spans(mentions)
+        predicted_adjective_noun_spans.extend(
+            (case_id, span["adjective"], span["noun"])
+            for span in observed_constructions
+        )
+        output_rows.append(
+            {
+                "case_id": row["case_id"],
+                "adapter_status": adapter_status,
+                "adapter_reason": adapter_reason,
+                "tuple_status": tuple_status,
+                "tuple_reason": tuple_reason,
+                "grounding_status": grounding_status,
+                "grounding_reason": grounding_reason,
+                "mention_count": len(mentions),
+                "adjective_noun_span_count": len(observed_constructions),
+            }
+        )
+
+    def span_metrics(part: str) -> dict[str, float]:
+        truth, predicted = Counter(expected_by_pos[part]), Counter(predicted_by_pos[part])
+        matched = sum((truth & predicted).values())
+        precision = _safe_divide(matched, sum(predicted.values()))
+        recall = _safe_divide(matched, sum(truth.values()))
+        return {"precision": precision, "recall": recall}
+
+    noun = span_metrics("noun")
+    adjective = span_metrics("adjective")
+    repetition_keys = set(expected_episode_counts) | set(predicted_episode_counts)
+    repetition_exact = _safe_divide(
+        sum(expected_episode_counts[key] == predicted_episode_counts[key] for key in repetition_keys),
+        len(repetition_keys),
+    )
+    case_accuracy = _safe_divide(case_correct, len(rows))
+    lemma_band_exact = _safe_divide(sum(lemma_band_checks), len(lemma_band_checks))
+    adjective_noun_span_f1 = _span_f1(
+        expected_adjective_noun_spans, predicted_adjective_noun_spans
+    )
+    context["_tuple_attribute_language_metrics"] = {
+        "adjective_noun_span_f1": adjective_noun_span_f1,
+        "dependency_status": "MEASURED",
+    }
+    adapter_pass = (
+        case_accuracy >= float(adapter_gate["tuple_acceptance_and_abstention_case_accuracy_required"])
+        and silently_accepted_truncations <= int(adapter_gate["silent_truncation_count_max"])
+        and silently_accepted_invalid_timestamps <= int(adapter_gate["invalid_timestamp_count_max"])
+    )
+    lexical_pass = (
+        noun["precision"] >= float(lexical_gate["noun_span_precision_min"])
+        and noun["recall"] >= float(lexical_gate["noun_span_recall_min"])
+        and adjective["precision"] >= float(lexical_gate["adjective_span_precision_min"])
+        and adjective["recall"] >= float(lexical_gate["adjective_span_recall_min"])
+        and lemma_band_exact >= float(lexical_gate["lemma_and_frequency_band_exact_fraction_min"])
+        and repetition_exact >= float(lexical_gate["episode_repetition_count_exact_fraction_required"])
+    )
+    return {
+        "status": "PASS" if adapter_pass and lexical_pass else "NO_GO",
+        "axis_results": {
+            "adapter_qualified_yield": {
+                "status": "PASS" if adapter_pass else "NO_GO",
+                "metrics": {
+                    "case_accuracy": case_accuracy,
+                    "silent_truncation_count": silently_accepted_truncations,
+                    "invalid_timestamp_count": silently_accepted_invalid_timestamps,
+                },
+            },
+            "noun_adjective_exposure": {
+                "status": "PASS" if lexical_pass else "NO_GO",
+                "metrics": {
+                    "noun_span_precision": noun["precision"],
+                    "noun_span_recall": noun["recall"],
+                    "adjective_span_precision": adjective["precision"],
+                    "adjective_span_recall": adjective["recall"],
+                    "adjective_noun_span_f1": adjective_noun_span_f1,
+                    "lemma_and_frequency_band_exact_fraction": lemma_band_exact,
+                    "episode_repetition_count_exact_fraction": repetition_exact,
+                },
+            },
+        },
+        "metrics": {"case_accuracy": case_accuracy},
+        "rows": output_rows,
+        "row_count": len(rows),
+        "failure_count": 0,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": silently_accepted_truncations,
+        "external_call_count": 0,
+    }
+
+
+def _tuple_language_artifact_record(public: Path) -> dict[str, Any]:
+    """Verify the selected adapter bytes and the immutable local HF revision."""
+
+    required_environment = {
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "HF_HUB_DISABLE_TELEMETRY": "1",
+    }
+    if any(os.environ.get(key) != value for key, value in required_environment.items()):
+        raise RuntimeError("E_TUPLE_REFERENT_ADAPTER_OFFLINE_ENVIRONMENT")
+    if os.environ.get("WANDB_DISABLED", "").casefold() != "true":
+        raise RuntimeError("E_TUPLE_REFERENT_ADAPTER_TELEMETRY")
+    adapter_path = Path(__file__).resolve().with_name(
+        "synthetic_video_language_adapter.py"
+    )
+    if (
+        not adapter_path.is_file()
+        or file_digest(adapter_path) != TUPLE_LANGUAGE_ADAPTER_SHA256
+    ):
+        raise RuntimeError("E_TUPLE_LANGUAGE_ADAPTER_SOURCE")
+    whisper_path = public / "models/whisper/small.pt"
+    if (
+        not whisper_path.is_file()
+        or file_digest(whisper_path) != TUPLE_WHISPER_SMALL_SHA256
+    ):
+        raise RuntimeError("E_TUPLE_REFERENT_WHISPER_WEIGHT")
+    translation_root = public / "models/opus-mt-de-en"
+    required_names = {
+        "config.json",
+        "source.spm",
+        "target.spm",
+        "tokenizer_config.json",
+    }
+    files = sorted(
+        path
+        for path in translation_root.rglob("*")
+        if path.is_file() and ".cache" not in path.relative_to(translation_root).parts
+    )
+    if not required_names <= {path.name for path in files} or not any(
+        path.name in {"model.safetensors", "pytorch_model.bin"} for path in files
+    ):
+        raise RuntimeError("E_TUPLE_REFERENT_TRANSLATION_ARTIFACT")
+    metadata_files = sorted(
+        (translation_root / ".cache/huggingface/download").rglob("*.metadata")
+    )
+    revisions = set()
+    for path in metadata_files:
+        lines = path.read_text(errors="strict").splitlines()
+        if not lines or not re.fullmatch(r"[0-9a-f]{40}", lines[0]):
+            raise RuntimeError("E_TUPLE_REFERENT_TRANSLATION_REVISION")
+        revisions.add(lines[0])
+    if revisions != {TUPLE_OPUS_MT_DE_EN_REVISION}:
+        raise RuntimeError("E_TUPLE_REFERENT_TRANSLATION_REVISION")
+    tree = [
+        {
+            "relative_path": str(path.relative_to(translation_root)),
+            "sha256": file_digest(path),
+            "bytes": path.stat().st_size,
+        }
+        for path in files
+    ]
+    return {
+        "adapter_sha256": TUPLE_LANGUAGE_ADAPTER_SHA256,
+        "whisper_small_sha256": TUPLE_WHISPER_SMALL_SHA256,
+        "opus_mt_de_en_revision": TUPLE_OPUS_MT_DE_EN_REVISION,
+        "opus_mt_de_en_file_count": len(tree),
+        "opus_mt_de_en_tree_commitment_sha256": digest(tree),
+    }
+
+
+def _tuple_build_referent_adapter_observation(
+    adjudication: dict[str, Any],
+    media_duration: float,
+    amendment: dict[str, Any],
+    ontology_mapping: dict[str, list[str]],
+    *,
+    tagger,
+    lemmatize,
+    zipf_frequency,
+    frequency_bands: dict[str, list[float]],
+) -> dict[str, Any]:
+    """Create one text-free grounding event from the actual shared adapter output."""
+
+    if adjudication.get("status") != "ACCEPT":
+        return {
+            "status": "ABSTAIN",
+            "reason": str(adjudication.get("reason") or "ADAPTER_ABSTAIN"),
+            "abstention_reason": str(
+                adjudication.get("reason") or "ADAPTER_ABSTAIN"
+            ),
+            "mentions": [],
+        }
+    words = adjudication.get("words")
+    if not isinstance(words, list) or not words:
+        return {
+            "status": "ABSTAIN",
+            "reason": "EMPTY_ASR",
+            "abstention_reason": "EMPTY_ASR",
+            "mentions": [],
+        }
+    segment = {
+        "status": "ACCEPT",
+        "start": words[0].get("start"),
+        "end": words[-1].get("end"),
+        "en": adjudication.get("text_en", ""),
+    }
+    window = _tuple_segment_window(segment, media_duration, amendment)
+    if window.get("status") != "ACCEPT":
+        return {
+            "status": "ABSTAIN",
+            "reason": window.get("reason"),
+            "abstention_reason": window.get("reason"),
+            "mentions": [],
+        }
+    mentions = _lexical_mentions(
+        window["text_en"],
+        tagger,
+        lemmatize,
+        zipf_frequency,
+        frequency_bands,
+    )
+    mappings = [
+        _map_public_ontology(mention["lemma"], ontology_mapping)
+        for mention in mentions
+        if mention["part_of_speech"] == "noun"
+    ]
+    categories = sorted(
+        {value["category"] for value in mappings if value["status"] == "ACCEPT"}
+    )
+    if not categories:
+        return {
+            "status": "ABSTAIN",
+            "reason": "ONTOLOGY_UNMATCHED",
+            "abstention_reason": "ONTOLOGY_UNMATCHED",
+            "mentions": mentions,
+        }
+    if len(categories) != 1:
+        return {
+            "status": "ABSTAIN",
+            "reason": "ONTOLOGY_AMBIGUOUS",
+            "abstention_reason": "ONTOLOGY_AMBIGUOUS",
+            "mentions": mentions,
+        }
+    return {
+        "status": "ACCEPT",
+        "reason": None,
+        "abstention_reason": None,
+        "category": categories[0],
+        "segment_start": window["segment_start"],
+        "segment_end": window["segment_end"],
+        "mention_anchor": window["mention_anchor"],
+        "samples": window["samples"],
+        "noun_mention_count": sum(
+            mention["part_of_speech"] == "noun" for mention in mentions
+        ),
+        "mentions": mentions,
+    }
+
+
+def _tuple_referent_adapter_observations(
+    context: dict[str, Any],
+) -> dict[int, dict[str, Any]]:
+    """Run the actual pinned adapter; authored truth never controls eligibility."""
+
+    module_cache = context.setdefault("module_cache", {})
+    cached = module_cache.get("referent_grounding_events")
+    if isinstance(cached, dict):
+        return cached
+    from synthetic_video_language_adapter import (
+        translate_accepted,
+        validate_asr_prediction,
+        whisper_prediction,
+    )
+
+    import nltk
+    from nltk.stem import WordNetLemmatizer
+    import torch
+    from transformers import MarianMTModel, MarianTokenizer
+    import whisper
+    from wordfreq import zipf_frequency
+
+    public = context["public_root"]
+    fixture_root = context["fixture_root"]
+    cfg = context["cfg"]
+    amendment = _tuple_amendment(cfg)
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    artifact = _tuple_language_artifact_record(public)
+    nltk_root = Path(context["scratch_root"]) / "referent-adapter-resources"
+    nltk.data.path[:] = [str(_stage_tuple_nltk_resources(public, nltk_root, cfg))]
+    lemmatizer = WordNetLemmatizer()
+    ontology_mapping = _tuple_public_ontology_mapping(preparation)
+    frequency_bands = _tuple_axis(cfg, "noun_adjective_exposure")[
+        "frequency_bands"
+    ]
+    device = str(context["device"])
+    asr = whisper.load_model(
+        str(public / "models/whisper/small.pt"), device=device
+    )
+    translation_root = public / "models/opus-mt-de-en"
+    tokenizer = MarianTokenizer.from_pretrained(
+        translation_root, local_files_only=True
+    )
+    translator = MarianMTModel.from_pretrained(
+        translation_root, local_files_only=True
+    ).to(device).eval()
+    decoding = {
+        "temperature": 0.0,
+        "beam_size": 5,
+        "fp16": device.startswith("cuda"),
+    }
+    observations: dict[int, dict[str, Any]] = {}
+    try:
+        for row in context["rows"]["referent_attribute"]:
+            ordinal = int(row["fixture_ordinal"])
+            if ordinal in observations:
+                raise RuntimeError("E_TUPLE_REFERENT_DUPLICATE_ORDINAL")
+            media = _tuple_fixture_file(
+                fixture_root,
+                row["media_relative_path"],
+                row["media_sha256"],
+                row.get("media_bytes"),
+            )
+            samples = whisper.load_audio(str(media))
+            media_duration = float(len(samples)) / float(whisper.audio.SAMPLE_RATE)
+            if not math.isfinite(media_duration) or media_duration <= 0.0:
+                raise RuntimeError("E_TUPLE_REFERENT_AUDIO_DURATION")
+            prediction = whisper_prediction(asr, media, decoding)
+            adjudication = validate_asr_prediction(
+                prediction, media_duration, confidence_min=0.35
+            )
+            with torch.inference_mode():
+                adjudication = translate_accepted(
+                    adjudication, tokenizer, translator, max_new_tokens=128
+                )
+            observation = _tuple_build_referent_adapter_observation(
+                adjudication,
+                media_duration,
+                amendment,
+                ontology_mapping,
+                tagger=nltk.pos_tag,
+                lemmatize=lemmatizer.lemmatize,
+                zipf_frequency=zipf_frequency,
+                frequency_bands=frequency_bands,
+            )
+            observations[ordinal] = {"fixture_ordinal": ordinal, **observation}
+    finally:
+        del asr, translator
+        _release_cuda()
+    result_root = Path(context["scratch_root"]) / "referent-adapter-observations"
+    _require_external_or_ignored_output(result_root)
+    result_root.mkdir(parents=True, exist_ok=False, mode=0o700)
+    serial = {
+        "schema_version": 1,
+        "partition": context["partition"],
+        "artifact_provenance": artifact,
+        "observations": [observations[key] for key in sorted(observations)],
+        "raw_or_translated_text_retained": False,
+        "external_call_count": 0,
+    }
+    serial["observation_commitment_sha256"] = digest(serial)
+    write_private(result_root / "observations.json", serial)
+    module_cache["referent_adapter_events"] = {
+        ordinal: {
+            "status": row["status"],
+            "abstention_reason": row["abstention_reason"],
+            "mentions": row["mentions"] if row["status"] == "ACCEPT" else [],
+        }
+        for ordinal, row in observations.items()
+    }
+    module_cache["referent_grounding_events"] = observations
+    return observations
+
+
+def _tuple_referent_truth_record(
+    row: dict[str, Any], fixture_root: Path
+) -> dict[str, Any]:
+    """Validate the corrected phase truth and every registered sampled mask."""
+
+    phases = ("before", "during", "after")
+    truth = row.get("truth")
+    if not isinstance(truth, dict):
+        raise RuntimeError("E_TUPLE_REFERENT_TRUTH_SCHEMA")
+    visibility = truth.get("visibility_by_phase")
+    dominance = truth.get("dominance_by_phase")
+    candidate_counts = truth.get("candidate_count_by_phase")
+    if (
+        not isinstance(visibility, dict)
+        or set(visibility) != set(phases)
+        or any(type(visibility[phase]) is not bool for phase in phases)
+        or not isinstance(dominance, dict)
+        or set(dominance) != set(phases)
+        or not isinstance(candidate_counts, dict)
+        or set(candidate_counts) != set(phases)
+        or any(candidate_counts[phase] not in {"0", "1", "2plus"} for phase in phases)
+    ):
+        raise RuntimeError("E_TUPLE_REFERENT_TRUTH_SCHEMA")
+    for phase in phases:
+        if visibility[phase]:
+            if type(dominance[phase]) is not bool or candidate_counts[phase] == "0":
+                raise RuntimeError("E_TUPLE_REFERENT_TRUTH_SCHEMA")
+        elif dominance[phase] is not None:
+            raise RuntimeError("E_TUPLE_REFERENT_TRUTH_SCHEMA")
+    sampled = truth.get("sampled_mask_truth")
+    if not isinstance(sampled, list) or not 8 <= len(sampled) <= 9:
+        raise RuntimeError("E_TUPLE_REFERENT_SAMPLED_TRUTH_SCHEMA")
+    phase_counts: Counter[str] = Counter()
+    prior_time = -math.inf
+    for sample in sampled:
+        if not isinstance(sample, dict) or sample.get("phase") not in phases:
+            raise RuntimeError("E_TUPLE_REFERENT_SAMPLED_TRUTH_SCHEMA")
+        phase = str(sample["phase"])
+        try:
+            sample_time = float(sample["sample_time"])
+        except (KeyError, TypeError, ValueError, OverflowError) as error:
+            raise RuntimeError("E_TUPLE_REFERENT_SAMPLED_TRUTH_SCHEMA") from error
+        if not math.isfinite(sample_time) or sample_time <= prior_time:
+            raise RuntimeError("E_TUPLE_REFERENT_SAMPLED_TRUTH_SCHEMA")
+        prior_time = sample_time
+        phase_counts[phase] += 1
+        target_path = _tuple_fixture_file(
+            fixture_root,
+            sample.get("target_mask_relative_path"),
+            sample.get("target_mask_sha256"),
+            sample.get("target_mask_bytes"),
+        )
+        from PIL import Image
+
+        with Image.open(target_path) as source:
+            target = source.convert("L")
+            if target.width < 1 or target.height < 1:
+                raise RuntimeError("E_TUPLE_REFERENT_TRUTH_MASK_GEOMETRY")
+            target_present = target.getbbox() is not None
+        distractor_relative = sample.get("distractor_mask_relative_path")
+        distractor_sha = sample.get("distractor_mask_sha256")
+        if distractor_relative is None or distractor_sha is None:
+            if distractor_relative is not None or distractor_sha is not None:
+                raise RuntimeError("E_TUPLE_REFERENT_TRUTH_MASK_SCHEMA")
+            distractor_present = False
+        else:
+            distractor_path = _tuple_fixture_file(
+                fixture_root,
+                distractor_relative,
+                distractor_sha,
+                sample.get("distractor_mask_bytes"),
+            )
+            with Image.open(distractor_path) as source:
+                distractor = source.convert("L")
+                if distractor.size != target.size:
+                    raise RuntimeError("E_TUPLE_REFERENT_TRUTH_MASK_GEOMETRY")
+                distractor_present = distractor.getbbox() is not None
+        expected_count = (
+            "2plus"
+            if target_present and distractor_present
+            else "1"
+            if target_present or distractor_present
+            else "0"
+        )
+        if (
+            target_present != visibility[phase]
+            or expected_count != candidate_counts[phase]
+        ):
+            raise RuntimeError("E_TUPLE_REFERENT_TRUTH_MASK_ROUNDTRIP")
+    if sum(phase_counts.values()) < 8 or any(
+        not 2 <= phase_counts[phase] <= 3 for phase in phases
+    ):
+        raise RuntimeError("E_TUPLE_REFERENT_SAMPLED_TRUTH_SCHEMA")
+    if "2plus" in candidate_counts.values():
+        target_image = str(row.get("source_image_id", ""))
+        target_annotation = str(row.get("source_annotation_id", ""))
+        target_sha = str(row.get("source_image_sha256", ""))
+        distractor_image = str(row.get("distractor_source_image_id", ""))
+        distractor_annotation = str(
+            row.get("distractor_source_annotation_id", "")
+        )
+        distractor_sha = str(row.get("distractor_source_image_sha256", ""))
+        if (
+            row.get("distractor_source_category") != row.get("category")
+            or row.get("distractor_source_distinct_from_target") is not True
+            or not all(
+                re.fullmatch(r"[0-9a-f]{64}", value)
+                for value in (target_sha, distractor_sha)
+            )
+            or not all(
+                value
+                for value in (
+                    target_image,
+                    target_annotation,
+                    distractor_image,
+                    distractor_annotation,
+                )
+            )
+            or target_image == distractor_image
+            or target_annotation == distractor_annotation
+            or target_sha == distractor_sha
+        ):
+            raise RuntimeError("E_TUPLE_REFERENT_DISTRACTOR_PROVENANCE")
+    return {
+        "visibility_by_phase": dict(visibility),
+        "dominance_by_phase": dict(dominance),
+        "candidate_count_by_phase": dict(candidate_counts),
+    }
+
+
+def _tuple_decode_frames_at_times(media: Path, sample_times: list[float]) -> list[Any]:
+    import decord
+
+    reader = decord.VideoReader(str(media), ctx=decord.cpu(0), num_threads=1)
+    if len(reader) < 1:
+        raise RuntimeError("E_TUPLE_REFERENT_DECODE_EMPTY")
+    fps = float(reader.get_avg_fps())
+    if not math.isfinite(fps) or fps <= 0.0:
+        raise RuntimeError("E_TUPLE_REFERENT_DECODE_FPS")
+    indices = [
+        min(len(reader) - 1, max(0, int(round(float(value) * fps))))
+        for value in sample_times
+    ]
+    if len(indices) != len(set(indices)):
+        raise RuntimeError("E_TUPLE_REFERENT_DECODE_DUPLICATE_FRAME")
+    frames = reader.get_batch(indices).asnumpy()
+    if (
+        frames.ndim != 4
+        or frames.shape[0] != len(sample_times)
+        or frames.shape[-1] != 3
+    ):
+        raise RuntimeError("E_TUPLE_REFERENT_DECODE_TRUNCATION")
+    return [frames[index] for index in range(len(frames))]
+
+
+def _tuple_grounding_phrase_positions(tokenizer, caption: str, category: str) -> list[int]:
+    if caption != f"{category}." or category != category.casefold().strip():
+        raise RuntimeError("E_TUPLE_GROUNDING_CAPTION")
+    caption_tokens = tokenizer(caption, add_special_tokens=True)["input_ids"]
+    category_tokens = tokenizer(category, add_special_tokens=False)["input_ids"]
+    if (
+        not isinstance(caption_tokens, list)
+        or not isinstance(category_tokens, list)
+        or not category_tokens
+    ):
+        raise RuntimeError("E_TUPLE_GROUNDING_PHRASE_TOKEN")
+    starts = [
+        index
+        for index in range(len(caption_tokens) - len(category_tokens) + 1)
+        if caption_tokens[index : index + len(category_tokens)] == category_tokens
+    ]
+    if len(starts) != 1:
+        raise RuntimeError("E_TUPLE_GROUNDING_PHRASE_TOKEN")
+    return list(range(starts[0], starts[0] + len(category_tokens)))
+
+
+def _tuple_cxcywh_to_normalized_xyxy(raw_box: Any) -> list[float] | None:
+    try:
+        center_x, center_y, width, height = (float(value) for value in raw_box)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if not all(
+        math.isfinite(value) for value in (center_x, center_y, width, height)
+    ):
+        return None
+    left = min(1.0, max(0.0, center_x - width / 2.0))
+    top = min(1.0, max(0.0, center_y - height / 2.0))
+    right = min(1.0, max(0.0, center_x + width / 2.0))
+    bottom = min(1.0, max(0.0, center_y + height / 2.0))
+    box = [left, top, right, bottom]
+    return box if _valid_normalized_box(box) else None
+
+
+def _tuple_box_iou(first: list[float], second: list[float]) -> float:
+    left = max(first[0], second[0])
+    top = max(first[1], second[1])
+    right = min(first[2], second[2])
+    bottom = min(first[3], second[3])
+    intersection = max(0.0, right - left) * max(0.0, bottom - top)
+    first_area = (first[2] - first[0]) * (first[3] - first[1])
+    second_area = (second[2] - second[0]) * (second[3] - second[1])
+    return _safe_divide(intersection, first_area + second_area - intersection)
+
+
+def _tuple_same_category_nms(
+    candidates: list[dict[str, Any]], iou_threshold: float
+) -> list[dict[str, Any]]:
+    if not 0.0 <= float(iou_threshold) <= 1.0:
+        raise RuntimeError("E_TUPLE_GROUNDING_NMS_THRESHOLD")
+    ordered = sorted(
+        candidates,
+        key=lambda row: (
+            -float(row["box_score"]),
+            -float(row["text_score"]),
+            tuple(float(value) for value in row["box"]),
+        ),
+    )
+    retained = []
+    for candidate in ordered:
+        if not _valid_normalized_box(candidate.get("box")):
+            raise RuntimeError("E_TUPLE_GROUNDING_NMS_BOX")
+        if all(
+            _tuple_box_iou(candidate["box"], prior["box"]) <= iou_threshold
+            for prior in retained
+        ):
+            retained.append(candidate)
+    return retained
+
+
+def _load_tuple_grounding_stack(public: Path, device: str):
+    import torch
+
+    model_root = _tuple_model_root(public)
+    grounding_root = model_root / "code/GroundingDINO"
+    sys.path.insert(0, str(grounding_root))
+    from groundingdino.datasets import transforms as grounding_transforms
+    from groundingdino.models import build_model
+    from groundingdino.util.misc import clean_state_dict
+    from groundingdino.util.slconfig import SLConfig
+
+    _grounding_fallback_consistency(device)
+    arguments = SLConfig.fromfile(
+        str(grounding_root / "groundingdino/config/GroundingDINO_SwinT_OGC.py")
+    )
+    arguments.device = device
+    arguments.text_encoder_type = str(model_root / "bert-base-uncased")
+    grounding = build_model(arguments)
+    checkpoint_path = model_root / "weights/groundingdino_swint_ogc.pth"
+    if file_digest(checkpoint_path) != TUPLE_GROUNDING_DINO_SHA256:
+        raise RuntimeError("E_TUPLE_GROUNDING_WEIGHT")
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    incompatible = grounding.load_state_dict(
+        clean_state_dict(checkpoint["model"]), strict=False
+    )
+    if incompatible.missing_keys or incompatible.unexpected_keys:
+        raise RuntimeError("E_TUPLE_GROUNDING_STATE")
+    grounding = grounding.to(device).eval()
+    transform = grounding_transforms.Compose(
+        [
+            grounding_transforms.RandomResize([800], max_size=1333),
+            grounding_transforms.ToTensor(),
+            grounding_transforms.Normalize(
+                [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
+            ),
+        ]
+    )
+    sam_root = model_root / "code/sam2"
+    sys.path.insert(0, str(sam_root))
+    from sam2.build_sam import build_sam2
+    from sam2.sam2_image_predictor import SAM2ImagePredictor
+
+    sam_path = model_root / "weights/sam2.1_hiera_base_plus.pt"
+    if file_digest(sam_path) != TUPLE_SAM21_BASE_PLUS_SHA256:
+        raise RuntimeError("E_TUPLE_SAM_WEIGHT")
+    sam = build_sam2(
+        "configs/sam2.1/sam2.1_hiera_b+.yaml",
+        str(sam_path),
+        device=device,
+        apply_postprocessing=False,
+    )
+    return grounding, transform, SAM2ImagePredictor(sam), sam
+
+
+def _tuple_grounding_frame_candidates(
+    grounding,
+    transform,
+    predictor,
+    frame: Any,
+    category: str,
+    *,
+    device: str,
+    minimum_box_score: float,
+    minimum_text_score: float,
+    nms_iou: float,
+) -> list[dict[str, Any]]:
+    import numpy as np
+    from PIL import Image
+    import torch
+
+    image = Image.fromarray(frame).convert("RGB")
+    caption = f"{category}."
+    phrase_positions = _tuple_grounding_phrase_positions(
+        grounding.tokenizer, caption, category
+    )
+    tensor, _ = transform(image, None)
+    with torch.inference_mode():
+        output = grounding(tensor[None].to(device), captions=[caption])
+    logits = output.get("pred_logits")
+    raw_boxes = output.get("pred_boxes")
+    if (
+        logits is None
+        or raw_boxes is None
+        or logits.ndim != 3
+        or raw_boxes.ndim != 3
+        or logits.shape[0] != 1
+        or raw_boxes.shape[0] != 1
+        or logits.shape[1] != raw_boxes.shape[1]
+        or raw_boxes.shape[2] != 4
+        or max(phrase_positions) >= logits.shape[2]
+    ):
+        raise RuntimeError("E_TUPLE_GROUNDING_OUTPUT_SHAPE")
+    phrase_scores = logits[0, :, phrase_positions].sigmoid()
+    if not torch.isfinite(phrase_scores).all() or not torch.isfinite(raw_boxes).all():
+        raise RuntimeError("E_TUPLE_GROUNDING_NONFINITE")
+    preliminary = []
+    for ordinal in range(raw_boxes.shape[1]):
+        values = phrase_scores[ordinal]
+        box_score = float(values.max())
+        text_score = float(values.min())
+        if box_score < minimum_box_score or text_score < minimum_text_score:
+            continue
+        box = _tuple_cxcywh_to_normalized_xyxy(
+            raw_boxes[0, ordinal].detach().cpu().tolist()
+        )
+        if box is None:
+            raise RuntimeError("E_TUPLE_GROUNDING_BOX_GEOMETRY")
+        preliminary.append(
+            {
+                "category": category,
+                "box": box,
+                "box_score": box_score,
+                "text_score": text_score,
+            }
+        )
+    retained = _tuple_same_category_nms(preliminary, nms_iou)
+    predictor.set_image(np.asarray(image, dtype=np.uint8))
+    height, width = frame.shape[:2]
+    output_candidates = []
+    for candidate in retained:
+        left, top, right, bottom = candidate["box"]
+        pixel_box = np.asarray(
+            [left * width, top * height, right * width, bottom * height],
+            dtype=np.float32,
+        )
+        try:
+            masks, scores, mask_logits = predictor.predict(
+                box=pixel_box, multimask_output=False
+            )
+            mask_values = np.asarray(masks)
+            while mask_values.ndim > 2 and mask_values.shape[0] == 1:
+                mask_values = mask_values[0]
+            valid = (
+                mask_values.shape == (height, width)
+                and np.isfinite(mask_values).all()
+                and np.isfinite(np.asarray(scores)).all()
+                and np.isfinite(np.asarray(mask_logits)).all()
+            )
+            mask = mask_values.astype(bool) if valid else None
+            valid = bool(valid and mask is not None and mask.any())
+        except Exception:
+            mask = None
+            valid = False
+        if not valid:
+            output_candidates.append(
+                {**candidate, "valid": False, "reason": "INVALID_OR_EMPTY_MASK"}
+            )
+            continue
+        locations = np.argwhere(mask)
+        center_y, center_x = locations.mean(axis=0)
+        normalized_x = center_x / max(1, width - 1)
+        normalized_y = center_y / max(1, height - 1)
+        output_candidates.append(
+            {
+                **candidate,
+                "valid": True,
+                "reason": None,
+                "mask": mask,
+                "mask_fraction": float(mask.mean()),
+                "center_distance": math.hypot(
+                    normalized_x - 0.5, normalized_y - 0.5
+                ),
+            }
+        )
+    return output_candidates
+
+
+def _tuple_grounding_sampled_tracks(
+    context: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Infer nine sampled frames once and retain masks only in the in-memory cache."""
+
+    module_cache = context.setdefault("module_cache", {})
+    cached = module_cache.get("grounding_sampled_tracks")
+    if isinstance(cached, list):
+        return cached
+    cfg = context["cfg"]
+    execution = _tuple_qualification_execution(cfg)
+    minimum_valid = int(execution["phase_aggregation"]["minimum_valid_samples"])
+    grids = _tuple_frozen_threshold_grids(cfg)
+    minimum_box = min(grids["Grounding_DINO_box_score"])
+    minimum_text = min(grids["Grounding_DINO_text_score"])
+    nms_iou = float(execution["grounding_geometry"]["same_category_NMS_IoU"])
+    observations = _tuple_referent_adapter_observations(context)
+    rows = context["rows"]["referent_attribute"]
+    fixture_root = context["fixture_root"]
+    accepted_count = sum(
+        observations.get(int(row["fixture_ordinal"]), {}).get("status") == "ACCEPT"
+        and observations[int(row["fixture_ordinal"])].get("category")
+        == row.get("category")
+        for row in rows
+    )
+    stack = None
+    if accepted_count:
+        stack = _load_tuple_grounding_stack(
+            context["public_root"], str(context["device"])
+        )
+    tracks = []
+    try:
+        for row in rows:
+            ordinal = int(row["fixture_ordinal"])
+            truth = _tuple_referent_truth_record(row, fixture_root)
+            observation = observations.get(ordinal)
+            if not isinstance(observation, dict):
+                raise RuntimeError("E_TUPLE_REFERENT_ADAPTER_OBSERVATION_MISSING")
+            track = {
+                "fixture_ordinal": ordinal,
+                "category": row["category"],
+                "scenario": row["scenario"],
+                "attribute_pair_id": row.get("attribute_pair_id"),
+                "attribute": truth.get("attribute", row.get("truth", {}).get("attribute")),
+                "truth": truth,
+                "adapter_observation": observation,
+                "samples": [],
+            }
+            if observation.get("status") != "ACCEPT":
+                tracks.append(track)
+                continue
+            if observation.get("category") != row.get("category"):
+                track["category_mismatch"] = True
+                tracks.append(track)
+                continue
+            sample_rows = [
+                (phase, float(value))
+                for phase in ("before", "during", "after")
+                for value in observation["samples"].get(phase, [])
+            ]
+            if len(sample_rows) < minimum_valid:
+                tracks.append(track)
+                continue
+            media = _tuple_fixture_file(
+                fixture_root,
+                row["media_relative_path"],
+                row["media_sha256"],
+                row.get("media_bytes"),
+            )
+            try:
+                frames = _tuple_decode_frames_at_times(
+                    media, [value for _phase, value in sample_rows]
+                )
+            except RuntimeError as error:
+                track["decode_error_code"] = str(error).split()[0]
+                tracks.append(track)
+                continue
+            assert stack is not None
+            grounding, transform, predictor, _sam = stack
+            for (phase, sample_time), frame in zip(
+                sample_rows, frames, strict=True
+            ):
+                try:
+                    candidates = _tuple_grounding_frame_candidates(
+                        grounding,
+                        transform,
+                        predictor,
+                        frame,
+                        str(observation["category"]),
+                        device=str(context["device"]),
+                        minimum_box_score=minimum_box,
+                        minimum_text_score=minimum_text,
+                        nms_iou=nms_iou,
+                    )
+                    track["samples"].append(
+                        {
+                            "sample_time": sample_time,
+                            "phase": phase,
+                            "image": frame,
+                            "inference_succeeded": True,
+                            "candidates": candidates,
+                        }
+                    )
+                except RuntimeError as error:
+                    track["samples"].append(
+                        {
+                            "sample_time": sample_time,
+                            "phase": phase,
+                            "image": frame,
+                            "inference_succeeded": False,
+                            "error_code": str(error).split()[0],
+                            "candidates": [],
+                        }
+                    )
+            tracks.append(track)
+    finally:
+        if stack is not None:
+            grounding, _transform, predictor, sam = stack
+            del grounding, predictor, sam
+            _release_cuda()
+    module_cache["grounding_sampled_tracks"] = tracks
+    return tracks
+
+
+def _tuple_phase_majority(values: list[Any]) -> Any | None:
+    if not values:
+        return None
+    counts = Counter(values)
+    highest = max(counts.values())
+    winners = [value for value, count in counts.items() if count == highest]
+    return winners[0] if len(winners) == 1 else None
+
+
+def _tuple_referent_track_prediction(
+    track: dict[str, Any],
+    box_threshold: float,
+    text_threshold: float,
+    definitions: dict[str, Any],
+    minimum_valid_samples: int,
+) -> dict[str, Any]:
+    observation = track["adapter_observation"]
+    if observation.get("status") != "ACCEPT":
+        return {
+            "status": "NO_ADAPTER_EVENT",
+            "reason": observation.get("abstention_reason"),
+            "invalid_retained_record_count": 0,
+            "inference_failure_count": 0,
+            "scientific_abstention_count": 0,
+            "category_error_count": 0,
+        }
+    if track.get("category_mismatch") is True or observation.get(
+        "category"
+    ) != track.get("category"):
+        return {
+            "status": "ABSTAIN",
+            "reason": "PUBLIC_CATEGORY_MISMATCH",
+            "invalid_retained_record_count": 0,
+            "inference_failure_count": 0,
+            "scientific_abstention_count": 1,
+            "category_error_count": 1,
+        }
+    inference_failures = sum(
+        sample.get("inference_succeeded") is not True for sample in track["samples"]
+    )
+    if len(track["samples"]) < minimum_valid_samples:
+        decode_failed = "decode_error_code" in track
+        return {
+            "status": "ABSTAIN",
+            "reason": track.get("decode_error_code", "INSUFFICIENT_VALID_SAMPLES"),
+            "invalid_retained_record_count": 0,
+            "inference_failure_count": 1 if decode_failed else inference_failures,
+            "scientific_abstention_count": 0 if decode_failed else 1,
+            "category_error_count": 0,
+        }
+    measured_samples = []
+    positive_track = []
+    for sample in track["samples"]:
+        if sample.get("inference_succeeded") is not True:
+            continue
+        retained = [
+            candidate
+            for candidate in sample["candidates"]
+            if float(candidate["box_score"]) >= box_threshold
+            and float(candidate["text_score"]) >= text_threshold
+        ]
+        if any(candidate.get("valid") is not True for candidate in retained):
+            return {
+                "status": "ABSTAIN",
+                "reason": "INVALID_OR_EMPTY_RETAINED_MASK",
+                "invalid_retained_record_count": 1,
+                "inference_failure_count": inference_failures,
+                "scientific_abstention_count": 0,
+                "category_error_count": 0,
+            }
+        proxy_candidates = [
+            {
+                "category": candidate["category"],
+                "box": candidate["box"],
+                "mask_fraction": candidate["mask_fraction"],
+                "center_distance": candidate["center_distance"],
+            }
+            for candidate in retained
+        ]
+        proxy = _referent_frame_proxy(
+            proxy_candidates,
+            str(observation["category"]),
+            definitions,
+            inference_succeeded=True,
+            # Public specificity is qualified by the same frozen metric below;
+            # a downstream valid negative remains unavailable if that gate fails.
+            negative_specificity_passed=True,
+        )
+        if not str(proxy.get("status", "")).startswith("MEASURED_"):
+            continue
+        measured_samples.append(
+            {
+                "sample_time": float(sample["sample_time"]),
+                "phase": sample["phase"],
+                "proxy": proxy,
+            }
+        )
+        if proxy["visible"]:
+            target = max(
+                retained, key=lambda candidate: float(candidate["mask_fraction"])
+            )
+            positive_track.append(
+                {"time": float(sample["sample_time"]), "box": target["box"]}
+            )
+    if len(measured_samples) < minimum_valid_samples:
+        true_failure_count = inference_failures
+        return {
+            "status": "ABSTAIN",
+            "reason": "INSUFFICIENT_VALID_SAMPLES",
+            "invalid_retained_record_count": 0,
+            "inference_failure_count": true_failure_count,
+            "scientific_abstention_count": 0 if true_failure_count else 1,
+            "category_error_count": 0,
+        }
+    geometry_valid = not positive_track or _validate_monotonic_track(positive_track)
+    if not geometry_valid:
+        return {
+            "status": "ABSTAIN",
+            "reason": "INVALID_MONOTONIC_TRACK",
+            "invalid_retained_record_count": 1,
+            "inference_failure_count": inference_failures,
+            "scientific_abstention_count": 0,
+            "category_error_count": 0,
+        }
+    phase_predictions = {}
+    for phase in ("before", "during", "after"):
+        phase_rows = [row["proxy"] for row in measured_samples if row["phase"] == phase]
+        if len(phase_rows) < 2:
+            return {
+                "status": "ABSTAIN",
+                "reason": "INSUFFICIENT_PHASE_SAMPLES",
+                "invalid_retained_record_count": 0,
+                "inference_failure_count": inference_failures,
+                "scientific_abstention_count": 0 if inference_failures else 1,
+                "category_error_count": 0,
+            }
+        visible = _tuple_phase_majority([bool(row["visible"]) for row in phase_rows])
+        count_bin = _tuple_phase_majority(
+            [str(row["candidate_count_bin"]) for row in phase_rows]
+        )
+        if visible is None or count_bin is None:
+            return {
+                "status": "ABSTAIN",
+                "reason": "AMBIGUOUS_PHASE_VOTE",
+                "invalid_retained_record_count": 0,
+                "inference_failure_count": inference_failures,
+                "scientific_abstention_count": 0 if inference_failures else 1,
+                "category_error_count": 0,
+            }
+        dominant = None
+        if visible:
+            dominant = _tuple_phase_majority(
+                [bool(row["dominant"]) for row in phase_rows if row["visible"]]
+            )
+            if dominant is None:
+                return {
+                    "status": "ABSTAIN",
+                    "reason": "AMBIGUOUS_DOMINANCE_VOTE",
+                    "invalid_retained_record_count": 0,
+                    "inference_failure_count": inference_failures,
+                    "scientific_abstention_count": 0 if inference_failures else 1,
+                    "category_error_count": 0,
+                }
+        phase_predictions[phase] = {
+            "visible": visible,
+            "dominant": dominant,
+            "candidate_count_bin": count_bin,
+        }
+    if any(track["truth"]["visibility_by_phase"].values()) and not positive_track:
+        return {
+            "status": "ABSTAIN",
+            "reason": "LOW_CONFIDENCE_OR_NO_DETECTION",
+            "invalid_retained_record_count": 0,
+            "inference_failure_count": inference_failures,
+            "scientific_abstention_count": 0 if inference_failures else 1,
+            "category_error_count": 0,
+        }
+    return {
+        "status": "MEASURED",
+        "reason": None,
+        "category": observation["category"],
+        "phase_predictions": phase_predictions,
+        "valid_geometry_and_monotonic_track": True,
+        "invalid_retained_record_count": 0,
+        "inference_failure_count": inference_failures,
+        "scientific_abstention_count": 0,
+        "category_error_count": 0,
+    }
+
+
+def _tuple_referent_metrics(
+    tracks: list[dict[str, Any]],
+    box_threshold: float,
+    text_threshold: float,
+    definitions: dict[str, Any],
+    minimum_valid_samples: int,
+) -> tuple[dict[str, float], list[dict[str, Any]], dict[str, int]]:
+    predictions = [
+        _tuple_referent_track_prediction(
+            track,
+            box_threshold,
+            text_threshold,
+            definitions,
+            minimum_valid_samples,
+        )
+        for track in tracks
+    ]
+    eligible = [
+        index
+        for index, track in enumerate(tracks)
+        if track["adapter_observation"].get("status") == "ACCEPT"
+    ]
+    visibility_truth: list[str] = []
+    visibility_predicted: list[str | None] = []
+    ambiguity_truth: list[str] = []
+    ambiguity_predicted: list[str | None] = []
+    dominance_truth: list[str] = []
+    dominance_predicted: list[str | None] = []
+    event_truth_present: list[bool] = []
+    event_predicted_present: list[bool | None] = []
+    compact_rows = []
+    for index in eligible:
+        truth = tracks[index]["truth"]
+        prediction = predictions[index]
+        measured = prediction["status"] == "MEASURED"
+        phase_predictions = prediction.get("phase_predictions", {})
+        for phase in ("before", "during", "after"):
+            visible_truth = bool(truth["visibility_by_phase"][phase])
+            visible_prediction = (
+                bool(phase_predictions[phase]["visible"]) if measured else None
+            )
+            visibility_truth.append("visible" if visible_truth else "not_visible")
+            visibility_predicted.append(
+                None
+                if visible_prediction is None
+                else "visible"
+                if visible_prediction
+                else "not_visible"
+            )
+            ambiguity_truth.append(truth["candidate_count_by_phase"][phase])
+            ambiguity_predicted.append(
+                phase_predictions[phase]["candidate_count_bin"]
+                if measured
+                else None
+            )
+            if visible_truth:
+                dominance_truth.append(
+                    "dominant"
+                    if truth["dominance_by_phase"][phase]
+                    else "not_dominant"
+                )
+                dominance_predicted.append(
+                    None
+                    if not measured or not phase_predictions[phase]["visible"]
+                    else "dominant"
+                    if phase_predictions[phase]["dominant"]
+                    else "not_dominant"
+                )
+        expected_present = any(truth["visibility_by_phase"].values())
+        event_truth_present.append(expected_present)
+        event_predicted_present.append(
+            any(
+                phase_predictions[phase]["visible"]
+                for phase in ("before", "during", "after")
+            )
+            if measured
+            else None
+        )
+        compact_rows.append(
+            {
+                "fixture_ordinal": tracks[index]["fixture_ordinal"],
+                "status": prediction["status"],
+                "reason": prediction.get("reason"),
+                "phase_predictions": phase_predictions,
+            }
+        )
+    visibility_macro_f1 = _multiclass_macro_f1(
+        visibility_truth,
+        visibility_predicted,
+        ["not_visible", "visible"],
+    ) if visibility_truth else 0.0
+    ambiguity_macro_f1 = _multiclass_macro_f1(
+        ambiguity_truth,
+        ambiguity_predicted,
+        ["0", "1", "2plus"],
+    ) if ambiguity_truth else 0.0
+    dominance_kappa = _weighted_kappa(
+        dominance_truth,
+        dominance_predicted,
+        ["not_dominant", "dominant"],
+    ) if dominance_truth else 0.0
+    no_referent = (
+        _binary_classification_metrics(event_truth_present, event_predicted_present)[
+            "specificity"
+        ]
+        if event_truth_present
+        else 0.0
+    )
+    measured_count = sum(predictions[index]["status"] == "MEASURED" for index in eligible)
+    geometry_count = sum(
+        not int(predictions[index].get("invalid_retained_record_count", 0))
+        and not int(predictions[index].get("inference_failure_count", 0))
+        for index in eligible
+    )
+    metrics = {
+        "event_coverage": _safe_divide(measured_count, len(eligible)),
+        "visibility_timing_macro_f1": visibility_macro_f1,
+        "no_referent_specificity": no_referent,
+        "dominance_weighted_kappa": dominance_kappa,
+        "ambiguity_macro_f1": ambiguity_macro_f1,
+        "valid_geometry_and_monotonic_track_fraction": _safe_divide(
+            geometry_count, len(eligible)
+        ),
+    }
+    integrity = {
+        "invalid_retained_record_count": sum(
+            int(predictions[index].get("invalid_retained_record_count", 0))
+            for index in eligible
+        ),
+        "inference_failure_count": sum(
+            int(predictions[index].get("inference_failure_count", 0))
+            for index in eligible
+        ),
+        "scientific_abstention_count": sum(
+            int(predictions[index].get("scientific_abstention_count", 0))
+            for index in eligible
+        ),
+        "category_error_count": sum(
+            int(predictions[index].get("category_error_count", 0))
+            for index in eligible
+        ),
+        "eligible_event_count": len(eligible),
+        "measured_event_count": measured_count,
+    }
+    return metrics, compact_rows, integrity
+
+
+def _tuple_referent_gate_pass(
+    metrics: dict[str, float], gate: dict[str, Any]
+) -> bool:
+    return (
+        metrics["event_coverage"] >= float(gate["event_coverage_min"])
+        and metrics["visibility_timing_macro_f1"]
+        >= float(gate["visibility_timing_macro_f1_min"])
+        and metrics["no_referent_specificity"]
+        >= float(gate["no_referent_specificity_min"])
+        and metrics["dominance_weighted_kappa"]
+        >= float(gate["dominance_weighted_kappa_min"])
+        and metrics["ambiguity_macro_f1"]
+        >= float(gate["ambiguity_macro_f1_min"])
+        and metrics["valid_geometry_and_monotonic_track_fraction"]
+        >= float(gate["valid_geometry_and_monotonic_track_fraction_required"])
+    )
+
+
+def _tuple_referent_module(context: dict[str, Any]) -> dict[str, Any]:
+    cfg = context["cfg"]
+    axis_id = "utterance_centered_referent_visibility_dominance_ambiguity"
+    axis = _tuple_axis(cfg, axis_id)
+    gate = axis["public_gate"]
+    definitions = axis["definitions"]
+    execution = _tuple_qualification_execution(cfg)
+    minimum_valid = int(execution["phase_aggregation"]["minimum_valid_samples"])
+    tracks = _tuple_grounding_sampled_tracks(context)
+    grids = _tuple_frozen_threshold_grids(cfg)
+    if context["partition"] == "development":
+        candidates = []
+        for box_threshold in grids["Grounding_DINO_box_score"]:
+            for text_threshold in grids["Grounding_DINO_text_score"]:
+                metrics, rows, integrity = _tuple_referent_metrics(
+                    tracks,
+                    box_threshold,
+                    text_threshold,
+                    definitions,
+                    minimum_valid,
+                )
+                candidates.append(
+                    {
+                        "Grounding_DINO_box_score": box_threshold,
+                        "Grounding_DINO_text_score": text_threshold,
+                        **metrics,
+                        "eligible": _tuple_referent_gate_pass(metrics, gate)
+                        and not integrity["invalid_retained_record_count"]
+                        and not integrity["inference_failure_count"],
+                        "_rows": rows,
+                        "_integrity": integrity,
+                    }
+                )
+        selected = _select_frozen_grid_result(
+            candidates,
+            primary_metric="visibility_timing_macro_f1",
+            threshold_fields=(
+                "Grounding_DINO_box_score",
+                "Grounding_DINO_text_score",
+            ),
+        )
+        reported = selected or max(
+            candidates,
+            key=lambda row: (
+                float(row["visibility_timing_macro_f1"]),
+                float(row["Grounding_DINO_box_score"]),
+                float(row["Grounding_DINO_text_score"]),
+            ),
+        )
+        selected_thresholds = (
+            {
+                "Grounding_DINO_box_score": float(
+                    selected["Grounding_DINO_box_score"]
+                ),
+                "Grounding_DINO_text_score": float(
+                    selected["Grounding_DINO_text_score"]
+                ),
+            }
+            if selected is not None
+            else {}
+        )
+    else:
+        thresholds = context["thresholds"]
+        box_threshold = float(thresholds["Grounding_DINO_box_score"])
+        text_threshold = float(thresholds["Grounding_DINO_text_score"])
+        metrics, rows, integrity = _tuple_referent_metrics(
+            tracks,
+            box_threshold,
+            text_threshold,
+            definitions,
+            minimum_valid,
+        )
+        reported = {
+            "Grounding_DINO_box_score": box_threshold,
+            "Grounding_DINO_text_score": text_threshold,
+            **metrics,
+            "eligible": _tuple_referent_gate_pass(metrics, gate)
+            and not integrity["invalid_retained_record_count"]
+            and not integrity["inference_failure_count"],
+            "_rows": rows,
+            "_integrity": integrity,
+        }
+        selected_thresholds = {
+            "Grounding_DINO_box_score": box_threshold,
+            "Grounding_DINO_text_score": text_threshold,
+        }
+    passed = bool(reported["eligible"] and selected_thresholds)
+    if selected_thresholds:
+        context.setdefault("module_cache", {})[
+            "selected_grounding_thresholds"
+        ] = dict(selected_thresholds)
+        context.setdefault("_selected_thresholds", {}).update(
+            selected_thresholds
+        )
+    metrics = {
+        key: value
+        for key, value in reported.items()
+        if key
+        not in {
+            "eligible",
+            "_rows",
+            "_integrity",
+            "Grounding_DINO_box_score",
+            "Grounding_DINO_text_score",
+        }
+    }
+    integrity = reported["_integrity"]
+    return {
+        "status": "PASS" if passed else "NO_GO",
+        "axis_results": {
+            axis_id: {
+                "status": "PASS" if passed else "NO_GO",
+                "metrics": metrics,
+            }
+        },
+        "metrics": metrics,
+        "selected_thresholds": selected_thresholds,
+        "rows": reported["_rows"],
+        "row_count": len(context["rows"]["referent_attribute"]),
+        "failure_count": int(integrity["inference_failure_count"]),
+        "abstention_count": int(integrity["scientific_abstention_count"]),
+        "category_error_count": int(integrity["category_error_count"]),
+        "invalid_retained_record_count": int(
+            integrity["invalid_retained_record_count"]
+        ),
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+    }
+
+
+def _decode_uniform_tuple_frames(media: Path, frame_count: int) -> Any:
+    frames, source_count = _decode_uniform_activity_frames(media, frame_count)
+    if source_count < frame_count:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_SOURCE_FRAME_COUNT")
+    return frames
+
+
+EGOHOS_STAGE_CLASSES = {
+    "stage1": frozenset({0, 1, 2}),
+    "stage2": frozenset({0, 1}),
+    "stage3": frozenset({0, 1, 2, 3}),
+}
+EGOHOS_TARGET_SIDE_CLASSES = {
+    "left hand": (1, 1),
+    "right hand": (2, 2),
+}
+
+
+def _tuple_egohos_stage_class_map(
+    stage: str, value: Any, expected_shape: tuple[int, int] | None = None
+) -> Any:
+    import numpy as np
+
+    if stage not in EGOHOS_STAGE_CLASSES:
+        raise RuntimeError("E_TUPLE_EGOHOS_STAGE_ID")
+    mask = np.asarray(value)
+    if (
+        mask.ndim != 2
+        or mask.size == 0
+        or (expected_shape is not None and mask.shape != expected_shape)
+        or not np.issubdtype(mask.dtype, np.number)
+        or not np.isfinite(mask).all()
+        or not np.equal(mask, np.floor(mask)).all()
+        or not set(int(item) for item in np.unique(mask)).issubset(
+            EGOHOS_STAGE_CLASSES[stage]
+        )
+    ):
+        raise RuntimeError(f"E_TUPLE_EGOHOS_{stage.upper()}_MASK")
+    return mask.astype(np.uint8, copy=False)
+
+
+def _tuple_egohos_binary_dilation(mask: Any) -> Any:
+    """Return the frozen one-pixel, eight-connected binary dilation."""
+
+    import numpy as np
+
+    value = np.asarray(mask)
+    if value.ndim != 2 or value.dtype != np.bool_:
+        raise RuntimeError("E_TUPLE_EGOHOS_DILATION_MASK")
+    padded = np.pad(value, 1, mode="constant", constant_values=False)
+    return np.logical_or.reduce(
+        [
+            padded[y : y + value.shape[0], x : x + value.shape[1]]
+            for y in range(3)
+            for x in range(3)
+        ]
+    )
+
+
+def _tuple_egohos_stage_masks(prediction: dict[str, Any]) -> dict[str, Any]:
+    """Validate finite, in-bounds official EgoHOS stage class maps."""
+
+    if not isinstance(prediction, dict) or set(prediction) != set(
+        EGOHOS_STAGE_CLASSES
+    ):
+        raise RuntimeError("E_TUPLE_EGOHOS_STAGE_SET")
+    output: dict[str, Any] = {}
+    shape = None
+    for stage in EGOHOS_STAGE_CLASSES:
+        value = _tuple_egohos_stage_class_map(stage, prediction[stage])
+        if shape is None:
+            shape = value.shape
+        elif value.shape != shape:
+            raise RuntimeError("E_TUPLE_EGOHOS_STAGE_SHAPE")
+        output[stage] = value
+    return output
+
+
+def _tuple_egohos_target_mask(value: Any, shape: tuple[int, int]) -> Any:
+    import numpy as np
+
+    mask = np.asarray(value)
+    if (
+        mask.ndim != 2
+        or mask.shape != shape
+        or mask.size == 0
+        or not np.issubdtype(mask.dtype, np.number)
+        or not np.isfinite(mask).all()
+        or not set(int(item) for item in np.unique(mask)).issubset({0, 1, 255})
+    ):
+        raise RuntimeError("E_TUPLE_EGOHOS_TARGET_MASK")
+    output = mask > 0
+    if not output.any():
+        raise RuntimeError("E_TUPLE_EGOHOS_TARGET_MASK_EMPTY")
+    return output
+
+
+def _tuple_egohos_mask_observation(
+    prediction: dict[str, Any],
+    *,
+    minimum_mask_fraction: float,
+    target_hand_side: str | None,
+    target_hand_mask: Any | None,
+) -> dict[str, Any]:
+    """Interpret the official three-stage outputs for one registered target.
+
+    Hand presence is scored independently.  Contact requires a target-side
+    first-order object and a one-pixel-dilated dense-contact boundary adjacent
+    to the target-side hand.  Residual/discordant evidence abstains; it is not
+    converted to a no-contact label.
+    """
+
+    import numpy as np
+
+    threshold = float(minimum_mask_fraction)
+    if not math.isfinite(threshold) or not 0.0 < threshold < 1.0:
+        raise RuntimeError("E_TUPLE_EGOHOS_MASK_THRESHOLD")
+    masks = _tuple_egohos_stage_masks(prediction)
+    shape = masks["stage1"].shape
+    pixels = int(masks["stage1"].size)
+    left_fraction = float((masks["stage1"] == 1).sum()) / pixels
+    right_fraction = float((masks["stage1"] == 2).sum()) / pixels
+    fractions = {
+        "left_hand_mask_fraction": left_fraction,
+        "right_hand_mask_fraction": right_fraction,
+    }
+    if target_hand_side is None:
+        if target_hand_mask is not None:
+            raise RuntimeError("E_TUPLE_EGOHOS_NO_HAND_TARGET_MASK")
+        return {
+            "status": "MEASURED",
+            "reason": None,
+            "hand_visible": max(left_fraction, right_fraction) >= threshold,
+            "contact": None,
+            **fractions,
+        }
+    if target_hand_side not in EGOHOS_TARGET_SIDE_CLASSES:
+        raise RuntimeError("E_TUPLE_EGOHOS_TARGET_SIDE")
+    if target_hand_mask is None:
+        raise RuntimeError("E_TUPLE_EGOHOS_TARGET_MASK_MISSING")
+    truth = _tuple_egohos_target_mask(target_hand_mask, shape)
+    hand_class, object_class = EGOHOS_TARGET_SIDE_CLASSES[target_hand_side]
+    hand = masks["stage1"] == hand_class
+    hand_fraction = float(hand.sum()) / pixels
+    if hand_fraction < threshold:
+        return {
+            "status": "MEASURED",
+            "reason": "TARGET_HAND_NOT_DETECTED",
+            "hand_visible": False,
+            "contact": None,
+            "target_hand_mask_fraction": hand_fraction,
+            **fractions,
+        }
+    if not np.logical_and(hand, truth).any():
+        return {
+            "status": "ABSTAIN",
+            "reason": "TARGET_SIDE_MASK_DISCORDANT_WITH_GROUND_TRUTH",
+            "hand_visible": None,
+            "contact": None,
+            "target_hand_mask_fraction": hand_fraction,
+            **fractions,
+        }
+    boundary = masks["stage2"] == 1
+    interacting_object = np.logical_or(
+        masks["stage3"] == object_class,
+        masks["stage3"] == 3,
+    )
+    object_fraction = float(interacting_object.sum()) / pixels
+    adjacent_boundary = np.logical_and(
+        boundary, _tuple_egohos_binary_dilation(hand)
+    )
+    object_boundary_overlap = np.logical_and(
+        interacting_object, _tuple_egohos_binary_dilation(boundary)
+    )
+    object_present = object_fraction >= threshold
+    if object_present and adjacent_boundary.any() and object_boundary_overlap.any():
+        contact: bool | None = True
+        reason = None
+        status = "MEASURED"
+    elif not interacting_object.any() and not adjacent_boundary.any():
+        contact = False
+        reason = None
+        status = "MEASURED"
+    else:
+        contact = None
+        reason = "CONTACT_EVIDENCE_DISCORDANT"
+        status = "ABSTAIN"
+    return {
+        "status": status,
+        "reason": reason,
+        "hand_visible": True,
+        "contact": contact,
+        "target_hand_mask_fraction": hand_fraction,
+        "target_object_mask_fraction": object_fraction,
+        "adjacent_contact_boundary_present": bool(adjacent_boundary.any()),
+        "object_boundary_overlap_present": bool(object_boundary_overlap.any()),
+        **fractions,
+    }
+
+
+def _tuple_egohos_verified_no_hand_commitment(
+    context: dict[str, Any], rows: list[dict[str, Any]]
+) -> str:
+    """Require a compact PASS seal and an exact row-to-seal provenance link."""
+
+    seal = context.get("verified_no_hand_seal")
+    if not isinstance(seal, dict) or seal.get("status") != "PASS":
+        raise RuntimeError("E_TUPLE_EGOHOS_NO_HAND_PASS_SEAL")
+    commitment = seal.get("verified_no_hand_seal_commitment_sha256")
+    if not isinstance(commitment, str) or not re.fullmatch(r"[0-9a-f]{64}", commitment):
+        raise RuntimeError("E_TUPLE_EGOHOS_NO_HAND_PASS_SEAL")
+    no_hand_rows = [row for row in rows if row.get("stratum") == "verified_no_hand"]
+    if not no_hand_rows or any(
+        row.get("verified_no_hand_seal_commitment_sha256") != commitment
+        for row in no_hand_rows
+    ):
+        raise RuntimeError("E_TUPLE_EGOHOS_NO_HAND_SEAL_LINK")
+    return commitment
+
+
+def _validate_tuple_egohos_fixture_rows(
+    context: dict[str, Any], rows: list[dict[str, Any]]
+) -> str:
+    """Fail before model loading when fixture truth or retained masks are absent."""
+
+    commitment = _tuple_egohos_verified_no_hand_commitment(context, rows)
+    allowed = set(VISOR_HOS_STRATA)
+    if not rows or any(not isinstance(row, dict) for row in rows):
+        raise RuntimeError("E_TUPLE_EGOHOS_FIXTURE_ROWS")
+    for row in rows:
+        stratum = row.get("stratum")
+        if stratum not in allowed:
+            raise RuntimeError("E_TUPLE_EGOHOS_FIXTURE_STRATUM")
+        if not all(
+            isinstance(row.get(key), str) and row[key]
+            for key in ("media_relative_path", "media_sha256")
+        ):
+            raise RuntimeError("E_TUPLE_EGOHOS_FIXTURE_MEDIA")
+        if stratum == "verified_no_hand":
+            if (
+                row.get("contact") is not None
+                or row.get("target_hand_side") is not None
+                or row.get("target_hand_mask_relative_path") is not None
+                or row.get("target_hand_mask_sha256") is not None
+                or row.get("verified_no_hand_seal_commitment_sha256")
+                != commitment
+            ):
+                raise RuntimeError("E_TUPLE_EGOHOS_NO_HAND_FIXTURE_TRUTH")
+            continue
+        expected_contact = stratum == "contact"
+        if (
+            row.get("contact") is not expected_contact
+            or row.get("target_hand_side") not in EGOHOS_TARGET_SIDE_CLASSES
+            or not all(
+                isinstance(row.get(key), str) and row[key]
+                for key in (
+                    "target_hand_mask_relative_path",
+                    "target_hand_mask_sha256",
+                )
+            )
+        ):
+            raise RuntimeError("E_TUPLE_EGOHOS_VISIBLE_HAND_FIXTURE_TRUTH")
+    return commitment
+
+
+def _tuple_egohos_predict_rows(
+    public: Path,
+    device: str,
+    rows: list[dict[str, Any]],
+    fixture_root: Path,
+    scratch: Path,
+) -> list[dict[str, Any]]:
+    """Stage exact source frames, then run the pinned official test pipeline."""
+
+    from PIL import Image
+
+    _require_external_or_ignored_output(scratch)
+    run_root = scratch / "egohos-public-qualification"
+    image_root = run_root / "images"
+    image_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    image_paths = []
+    original_shapes = []
+    for ordinal, row in enumerate(rows):
+        source = _tuple_fixture_file(
+            fixture_root,
+            row["media_relative_path"],
+            row["media_sha256"],
+            row.get("media_bytes"),
+        )
+        with Image.open(source) as opened:
+            width, height = opened.size
+            if opened.mode != "RGB" or width <= 0 or height <= 0:
+                raise RuntimeError("E_TUPLE_EGOHOS_SOURCE_IMAGE")
+            opened.verify()
+        suffix = source.suffix.casefold()
+        if suffix not in {".jpg", ".jpeg", ".png"}:
+            raise RuntimeError("E_TUPLE_EGOHOS_SOURCE_SUFFIX")
+        target = image_root / f"item-{ordinal:03d}{suffix}"
+        shutil.copy2(source, target)
+        os.chmod(target, 0o600)
+        if file_digest(target) != row["media_sha256"]:
+            raise RuntimeError("E_TUPLE_EGOHOS_STAGED_IMAGE_HASH")
+        image_paths.append(target)
+        original_shapes.append((height, width))
+    return _tuple_egohos_run_official_pipeline(
+        public,
+        device,
+        image_paths,
+        original_shapes,
+        run_root,
+    )
+
+
+def _tuple_egohos_threshold_metrics(
+    rows: list[dict[str, Any]],
+    predictions: list[dict[str, Any]],
+    fixture_root: Path,
+    threshold: float,
+) -> dict[str, Any]:
+    import numpy as np
+    from PIL import Image
+
+    if len(rows) != len(predictions) or not rows:
+        raise RuntimeError("E_TUPLE_EGOHOS_PREDICTION_COUNT")
+    observations = []
+    invalid = 0
+    for ordinal, (row, prediction) in enumerate(
+        zip(rows, predictions, strict=True)
+    ):
+        target_mask = None
+        target_mask_source = None
+        if row["stratum"] != "verified_no_hand":
+            mask_path = _tuple_fixture_file(
+                fixture_root,
+                row["target_hand_mask_relative_path"],
+                row["target_hand_mask_sha256"],
+                row.get("target_hand_mask_bytes"),
+            )
+            with Image.open(mask_path) as opened:
+                target_mask_source = opened.convert("L").copy()
+        try:
+            if target_mask_source is not None:
+                stage_shape = _tuple_egohos_stage_masks(prediction)["stage1"].shape
+                if target_mask_source.size != (stage_shape[1], stage_shape[0]):
+                    raise RuntimeError("E_TUPLE_EGOHOS_TARGET_MASK_ALIGNMENT")
+                target_mask = np.asarray(target_mask_source).copy()
+            observation = _tuple_egohos_mask_observation(
+                prediction,
+                minimum_mask_fraction=threshold,
+                target_hand_side=row.get("target_hand_side"),
+                target_hand_mask=target_mask,
+            )
+        except RuntimeError as error:
+            code = str(error).split(maxsplit=1)[0]
+            observation = {
+                "status": "ABSTAIN",
+                "reason": code if code.startswith("E_") else "E_TUPLE_EGOHOS_INVALID",
+                "hand_visible": None,
+                "contact": None,
+            }
+            invalid += 1
+        observations.append(
+            {
+                "fixture_ordinal": int(row.get("fixture_ordinal", ordinal)),
+                "stratum": row["stratum"],
+                "target_hand_side": row.get("target_hand_side"),
+                **observation,
+            }
+        )
+    expected_presence = [row["stratum"] != "verified_no_hand" for row in rows]
+    predicted_presence = [row["hand_visible"] for row in observations]
+    presence = _binary_classification_metrics(
+        expected_presence, predicted_presence
+    )
+    contact_indices = [
+        ordinal
+        for ordinal, row in enumerate(rows)
+        if row["stratum"] != "verified_no_hand"
+    ]
+    contact_truth = [bool(rows[ordinal]["contact"]) for ordinal in contact_indices]
+    contact_predicted = [observations[ordinal]["contact"] for ordinal in contact_indices]
+    contact_expected_labels = [
+        "contact" if value else "no_contact" for value in contact_truth
+    ]
+    contact_predicted_labels = [
+        None if value is None else "contact" if value else "no_contact"
+        for value in contact_predicted
+    ]
+    contact_binary = _binary_classification_metrics(
+        contact_truth, contact_predicted
+    )
+    contact_macro_f1 = _multiclass_macro_f1(
+        contact_expected_labels,
+        contact_predicted_labels,
+        ["contact", "no_contact"],
+    )
+    contact_coverage = _safe_divide(
+        sum(value is not None for value in contact_predicted),
+        len(contact_predicted),
+    )
+    coverage = min(presence["coverage"], contact_coverage)
+    return {
+        "hand_sensitivity": presence["recall"],
+        "hand_specificity": presence["specificity"],
+        "contact_no_contact_macro_f1": contact_macro_f1,
+        # The fixed German mention is centered on the registered frame.  This
+        # is therefore the declared non-independent contact-positive F1 only.
+        "mention_contact_alignment_f1": contact_binary["f1"],
+        "coverage": coverage,
+        "hand_presence_coverage": presence["coverage"],
+        "contact_state_coverage": contact_coverage,
+        "visible_hand_item_count": len(contact_indices),
+        "verified_no_hand_item_count": len(rows) - len(contact_indices),
+        "contact_metric_item_count": len(contact_indices),
+        "invalid_retained_record_count": invalid,
+        "rows": observations,
+    }
+
+
+def _tuple_egohos_metrics_pass(
+    metrics: dict[str, Any], gate: dict[str, Any]
+) -> bool:
+    return (
+        metrics["hand_sensitivity"] >= float(gate["hand_sensitivity_min"])
+        and metrics["hand_specificity"] >= float(gate["hand_specificity_min"])
+        and metrics["contact_no_contact_macro_f1"]
+        >= float(gate["contact_no_contact_macro_f1_min"])
+        and metrics["mention_contact_alignment_f1"]
+        >= float(gate["mention_contact_alignment_f1_min"])
+        and metrics["coverage"] >= float(gate["coverage_min"])
+        and metrics["invalid_retained_record_count"] == 0
+    )
+
+
+def _tuple_hand_contact_module(context: dict[str, Any]) -> dict[str, Any]:
+    """Qualify EgoHOS hand presence and visible-hand contact as separate tasks."""
+
+    cfg = context["cfg"]
+    rows = context["rows"]["hand_contact"]
+    fixture_root = context["fixture_root"]
+    _validate_tuple_egohos_fixture_rows(context, rows)
+    predictions = _tuple_egohos_predict_rows(
+        context["public_root"],
+        context["device"],
+        rows,
+        fixture_root,
+        context["scratch_root"],
+    )
+    gate = _tuple_axis(cfg, "hand_action_coupling")["public_gate"]
+    grid = _tuple_amendment(cfg)["public_qualification"][
+        "threshold_development"
+    ]["EgoHOS_min_mask_fraction_grid"]
+    if grid != [0.0025, 0.005, 0.01, 0.02]:
+        raise RuntimeError("E_TUPLE_EGOHOS_THRESHOLD_GRID")
+    if context["partition"] == "development":
+        candidates = []
+        for threshold in grid:
+            metrics = _tuple_egohos_threshold_metrics(
+                rows, predictions, fixture_root, float(threshold)
+            )
+            candidates.append(
+                {
+                    "EgoHOS_min_mask_fraction": float(threshold),
+                    **metrics,
+                    "eligible": _tuple_egohos_metrics_pass(metrics, gate),
+                }
+            )
+        selected = _select_frozen_grid_result(
+            candidates,
+            primary_metric="contact_no_contact_macro_f1",
+            threshold_fields=("EgoHOS_min_mask_fraction",),
+        )
+        chosen = selected or max(
+            candidates,
+            key=lambda row: (
+                row["contact_no_contact_macro_f1"],
+                row["EgoHOS_min_mask_fraction"],
+            ),
+        )
+        threshold = (
+            float(selected["EgoHOS_min_mask_fraction"])
+            if selected is not None
+            else None
+        )
+    else:
+        threshold = float(context["thresholds"]["EgoHOS_min_mask_fraction"])
+        if threshold not in [float(value) for value in grid]:
+            raise RuntimeError("E_TUPLE_EGOHOS_HOLDOUT_THRESHOLD")
+        chosen = {
+            "EgoHOS_min_mask_fraction": threshold,
+            **_tuple_egohos_threshold_metrics(
+                rows, predictions, fixture_root, threshold
+            ),
+        }
+        chosen["eligible"] = _tuple_egohos_metrics_pass(chosen, gate)
+        selected = chosen if chosen["eligible"] else None
+    passed = threshold is not None and selected is not None
+    rows_output = chosen.pop("rows")
+    metrics = {
+        key: value
+        for key, value in chosen.items()
+        if key not in {"eligible", "EgoHOS_min_mask_fraction"}
+    }
+    invalid = int(metrics["invalid_retained_record_count"])
+    return {
+        "status": "PASS" if passed else "NO_GO",
+        "axis_results": {
+            "hand_action_coupling": {
+                "status": "PASS" if passed else "NO_GO",
+                "metrics": metrics,
+            }
+        },
+        "metrics": metrics,
+        "selected_thresholds": (
+            {"EgoHOS_min_mask_fraction": threshold}
+            if threshold is not None
+            else {}
+        ),
+        "rows": rows_output,
+        "row_count": len(rows),
+        "failure_count": 0,
+        "invalid_retained_record_count": invalid,
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+    }
+
+
+def _tuple_sensor_observation(frames: Any) -> dict[str, Any]:
+    from PIL import Image
+
+    rows = []
+    previous = None
+    for raw in frames:
+        image = Image.fromarray(raw)
+        metrics = _image_metrics(image, previous)
+        rows.append(metrics)
+        previous = image
+    output = {}
+    for name in ("brightness", "blur_edge_strength", "motion_mean_absolute_luma"):
+        values = [float(row[name]) for row in rows if row[name] is not None]
+        if not values or not all(math.isfinite(value) for value in values):
+            raise RuntimeError("E_TUPLE_QUALIFICATION_SENSOR_NONFINITE")
+        output[name] = statistics.median(values)
+        output[f"{name}_max"] = max(values)
+    return output
+
+
+def _tuple_sensor_module(context: dict[str, Any]) -> dict[str, Any]:
+    cfg = context["cfg"]
+    rows = context["rows"]["sensor"]
+    fixture_root = context["fixture_root"]
+    gate = _tuple_axis(cfg, "egocentric_sensor_regime")["public_gate"]
+    bins = cfg["calibration_C"]["extractor"]["fixed_numeric_bins"]
+    observations = []
+    valid = 0
+    exact_bins = 0
+    bin_total = 0
+    for row in rows:
+        media = _tuple_fixture_file(
+            fixture_root,
+            row["media_relative_path"],
+            row["media_sha256"],
+            row.get("media_bytes"),
+        )
+        values = _tuple_sensor_observation(_decode_uniform_tuple_frames(media, 16))
+        predicted_bins = {}
+        for name in ("brightness", "blur_edge_strength", "motion_mean_absolute_luma"):
+            predicted_bins[name] = bucket(float(values[name]), bins[name])
+            exact_bins += predicted_bins[name] == row["truth"][name]["bin"]
+            bin_total += 1
+        valid += 1
+        observations.append(
+            {
+                "base_ordinal": int(row["base_ordinal"]),
+                "condition": row["condition"],
+                "values": values,
+                "predicted_bins": predicted_bins,
+            }
+        )
+    by_base = defaultdict(dict)
+    for row in observations:
+        by_base[row["base_ordinal"]][row["condition"]] = row["values"]
+    direction_checks: list[bool] = []
+    for values in by_base.values():
+        if set(values) != {
+            "static",
+            "low_translation",
+            "high_translation",
+            "mild_blur",
+            "strong_blur",
+            "dark",
+            "bright",
+            "hard_cut",
+        }:
+            raise RuntimeError("E_TUPLE_QUALIFICATION_SENSOR_CONDITIONS")
+        direction_checks.extend(
+            [
+                values["high_translation"]["motion_mean_absolute_luma"]
+                > values["low_translation"]["motion_mean_absolute_luma"],
+                values["low_translation"]["motion_mean_absolute_luma"]
+                > values["static"]["motion_mean_absolute_luma"],
+                values["strong_blur"]["blur_edge_strength"]
+                < values["mild_blur"]["blur_edge_strength"],
+                values["dark"]["brightness"] < values["static"]["brightness"],
+                values["bright"]["brightness"] > values["static"]["brightness"],
+                values["hard_cut"]["motion_mean_absolute_luma_max"]
+                > values["static"]["motion_mean_absolute_luma_max"],
+            ]
+        )
+    finite_fraction = _safe_divide(valid, len(rows))
+    bin_accuracy = _safe_divide(exact_bins, bin_total)
+    direction_fraction = _safe_divide(sum(direction_checks), len(direction_checks))
+    passed = (
+        finite_fraction >= float(gate["finite_in_bounds_fraction_required"])
+        and direction_fraction
+        >= float(gate["controlled_perturbation_direction_fraction_required"])
+        and bin_accuracy >= float(gate["frozen_bin_accuracy_min"])
+    )
+    return {
+        "status": "PASS" if passed else "NO_GO",
+        "axis_results": {
+            "egocentric_sensor_regime": {
+                "status": "PASS" if passed else "NO_GO",
+                "metrics": {
+                    "finite_in_bounds_fraction": finite_fraction,
+                    "controlled_perturbation_direction_fraction": direction_fraction,
+                    "frozen_bin_accuracy": bin_accuracy,
+                },
+            }
+        },
+        "metrics": {
+            "finite_in_bounds_fraction": finite_fraction,
+            "controlled_perturbation_direction_fraction": direction_fraction,
+            "frozen_bin_accuracy": bin_accuracy,
+        },
+        "rows": observations,
+        "row_count": len(rows),
+        "failure_count": 0,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+    }
+
+
+def _decode_tuple_action_interval(
+    media: Path, start: float, end: float, source_duration: float, frame_count: int
+) -> Any:
+    import decord
+    import numpy as np
+
+    if not all(math.isfinite(value) for value in (start, end, source_duration)):
+        raise RuntimeError("E_TUPLE_ACTION_INTERVAL")
+    clip_start = max(0.0, start - 0.25)
+    clip_end = min(source_duration, end + 0.25)
+    if clip_end <= clip_start:
+        raise RuntimeError("E_TUPLE_ACTION_INTERVAL")
+    reader = decord.VideoReader(str(media), ctx=decord.cpu(0), num_threads=1)
+    if len(reader) < 2:
+        raise RuntimeError("E_TUPLE_ACTION_DECODE_EMPTY")
+    fps = float(reader.get_avg_fps())
+    if not math.isfinite(fps) or fps <= 0.0:
+        raise RuntimeError("E_TUPLE_ACTION_FPS")
+    first = max(0, min(len(reader) - 1, int(math.ceil(clip_start * fps))))
+    last = max(first, min(len(reader) - 1, int(math.floor(clip_end * fps))))
+    indices = np.linspace(first, last, frame_count, dtype=np.int64)
+    if len(set(int(value) for value in indices)) != frame_count:
+        raise RuntimeError("E_TUPLE_ACTION_DISTINCT_FRAME_COUNT")
+    frames = reader.get_batch(indices.tolist()).asnumpy()
+    if frames.ndim != 4 or frames.shape[0] != frame_count or frames.shape[-1] != 3:
+        raise RuntimeError("E_TUPLE_ACTION_SILENT_TRUNCATION")
+    return frames
+
+
+def _tuple_action_predictions(
+    raw_rows: list[dict[str, Any]],
+    margin: float,
+    labels: list[str],
+    opposite: dict[str, str],
+) -> tuple[list[str | None], dict[str, float]]:
+    predicted: list[str | None] = []
+    covered_rows = []
+    for row in raw_rows:
+        pair = (row["label"], opposite[row["label"]])
+        first, second = (float(row["ordered_scores"][labels.index(label)]) for label in pair)
+        if abs(first - second) < margin:
+            predicted.append(None)
+            continue
+        predicted.append(pair[0] if first > second else pair[1])
+        covered_rows.append(row)
+    expected = [str(row["label"]) for row in raw_rows]
+    macro_f1 = _multiclass_macro_f1(expected, predicted, labels)
+    coverage = _safe_divide(len(covered_rows), len(raw_rows))
+    correct_margin = _safe_divide(
+        sum(
+            float(row["ordered_scores"][labels.index(row["label"])])
+            > float(row["ordered_scores"][labels.index(opposite[row["label"]])])
+            for row in covered_rows
+        ),
+        len(covered_rows),
+    )
+    ordered_over_reversed = _safe_divide(
+        sum(
+            float(row["ordered_scores"][labels.index(row["label"])])
+            > float(row["reversed_scores"][labels.index(row["label"])])
+            for row in covered_rows
+        ),
+        len(covered_rows),
+    )
+    ordered_over_repeated = _safe_divide(
+        sum(
+            (
+                float(row["ordered_scores"][labels.index(row["label"])])
+                - float(row["ordered_scores"][labels.index(opposite[row["label"]])])
+            )
+            > (
+                float(row["repeated_center_scores"][labels.index(row["label"])])
+                - float(
+                    row["repeated_center_scores"][
+                        labels.index(opposite[row["label"]])
+                    ]
+                )
+            )
+            for row in covered_rows
+        ),
+        len(covered_rows),
+    )
+    return predicted, {
+        "ordered_action_direction_macro_f1": macro_f1,
+        "opposite_pair_correct_margin_fraction": correct_margin,
+        "ordered_over_time_reversed_target_score_fraction": ordered_over_reversed,
+        "ordered_over_repeated_center_confidence_fraction": ordered_over_repeated,
+        "coverage": coverage,
+    }
+
+
+def _tuple_action_metrics_pass(
+    metrics: dict[str, Any], gate: dict[str, Any]
+) -> bool:
+    """Apply every frozen action and integrity floor to one grid point."""
+
+    required = {
+        "ordered_action_direction_macro_f1",
+        "opposite_pair_correct_margin_fraction",
+        "ordered_over_time_reversed_target_score_fraction",
+        "ordered_over_repeated_center_confidence_fraction",
+        "coverage",
+    }
+    if not required <= set(metrics) or not all(
+        isinstance(metrics[key], (int, float))
+        and math.isfinite(float(metrics[key]))
+        for key in required
+    ):
+        raise RuntimeError("E_TUPLE_ACTION_METRIC_RECORD")
+    return (
+        metrics["ordered_action_direction_macro_f1"]
+        >= float(gate["ordered_action_direction_macro_f1_min"])
+        and metrics["opposite_pair_correct_margin_fraction"]
+        >= float(gate["opposite_pair_correct_margin_fraction_min"])
+        and metrics["ordered_over_time_reversed_target_score_fraction"]
+        >= float(gate["ordered_over_time_reversed_target_score_fraction_min"])
+        and metrics["ordered_over_repeated_center_confidence_fraction"]
+        >= float(gate["ordered_over_repeated_center_confidence_fraction_min"])
+        and metrics["coverage"] >= float(gate["coverage_min"])
+        and int(metrics.get("failure_count", 0)) == 0
+        and int(metrics.get("invalid_retained_record_count", 0)) == 0
+        and int(metrics.get("silent_truncation_count", 0)) == 0
+        and int(metrics.get("external_call_count", 0)) == 0
+    )
+
+
+def _select_tuple_action_development(
+    candidates: list[dict[str, Any]], gate: dict[str, Any]
+) -> dict[str, Any] | None:
+    qualified = [
+        {**candidate, "eligible": _tuple_action_metrics_pass(candidate, gate)}
+        for candidate in candidates
+    ]
+    return _select_frozen_grid_result(
+        qualified,
+        primary_metric="ordered_action_direction_macro_f1",
+        threshold_fields=("abstention_margin",),
+    )
+
+
+def _tuple_order_action_module(context: dict[str, Any]) -> dict[str, Any]:
+    import numpy as np
+
+    cfg = context["cfg"]
+    rows = context["rows"]["order_action"]
+    fixture_root = context["fixture_root"]
+    device = context["device"]
+    protocol = _tuple_fixture_protocol(cfg)["order_dependent_action_control"]
+    amendment = _tuple_amendment(cfg)["genuinely_order_dependent_action_control"]
+    labels = list(protocol["labels"])
+    opposite = {
+        first: second
+        for pair in protocol["class_code_pairs"]
+        for first, second in (pair["pair"], tuple(reversed(pair["pair"])))
+    }
+    activity = _activity_config(cfg)
+    candidate = _activity_candidate(activity, "egohod_egovideo_l_zero_shot")
+    score, frame_count, _ = _load_egohod_activity_adapter(
+        context["public_root"],
+        candidate,
+        cfg,
+        labels,
+        device,
+        runtime_override=activity["runtime_environment"]["egohod"],
+        prompt_groups_override=protocol["prompt_ensembles"],
+    )
+    raw = []
+    try:
+        for row in rows:
+            media = _tuple_fixture_file(
+                fixture_root,
+                row["media_relative_path"],
+                row["media_sha256"],
+                row.get("media_bytes"),
+            )
+            frames = _decode_tuple_action_interval(
+                media,
+                float(row["start"]),
+                float(row["end"]),
+                float(row["source_duration"]),
+                frame_count,
+            )
+            controls = {
+                "ordered_scores": frames,
+                "reversed_scores": frames[::-1].copy(),
+                "repeated_center_scores": np.repeat(
+                    frames[len(frames) // 2 : len(frames) // 2 + 1],
+                    len(frames),
+                    axis=0,
+                ),
+            }
+            raw.append(
+                {
+                    "fixture_ordinal": int(row["fixture_ordinal"]),
+                    "label": row["label"],
+                    **{
+                        key: _finite_vector(
+                            score(frames_value),
+                            len(labels),
+                            "E_TUPLE_ACTION_NONFINITE_SCORE",
+                        )
+                        for key, frames_value in controls.items()
+                    },
+                }
+            )
+    finally:
+        del score
+        _release_cuda()
+    gate = amendment["gate"]
+    if context["partition"] == "development":
+        candidates = []
+        for margin in protocol["development_abstention_margin_grid"]:
+            _predicted, metrics = _tuple_action_predictions(
+                raw, float(margin), labels, opposite
+            )
+            candidates.append(
+                {
+                    "abstention_margin": float(margin),
+                    **metrics,
+                }
+            )
+        selected = _select_tuple_action_development(candidates, gate)
+        if selected is None:
+            threshold = None
+            metrics = candidates[0] if candidates else {}
+        else:
+            threshold = float(selected["abstention_margin"])
+            metrics = selected
+    else:
+        threshold = float(context["thresholds"]["action_abstention_margin"])
+        if threshold not in [
+            float(value) for value in protocol["development_abstention_margin_grid"]
+        ]:
+            raise RuntimeError("E_TUPLE_ACTION_HOLDOUT_THRESHOLD")
+        _predicted, metrics = _tuple_action_predictions(raw, threshold, labels, opposite)
+    passed = threshold is not None and _tuple_action_metrics_pass(metrics, gate)
+    return {
+        "status": "PASS" if passed else "NO_GO",
+        "metrics": metrics,
+        "selected_thresholds": (
+            {"action_abstention_margin": threshold} if threshold is not None else {}
+        ),
+        "rows": raw,
+        "row_count": len(rows),
+        "failure_count": 0,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+    }
+
+
+def _tuple_perceptual_hash(image: Any) -> int:
+    import numpy as np
+
+    pixels = np.asarray(image.convert("L").resize((32, 32)), dtype=np.float64)
+    indices = np.arange(32)
+    frequencies = np.arange(32)[:, None]
+    basis = np.cos(np.pi * (2 * indices + 1) * frequencies / 64)
+    basis[0] *= 1 / np.sqrt(2)
+    basis *= np.sqrt(2 / 32)
+    low = (basis @ pixels @ basis.T)[:8, :8].reshape(-1)[1:]
+    median = float(np.median(low))
+    return sum(
+        int(value > median) << index for index, value in enumerate(low)
+    )
+
+
+def _load_tuple_dinov2(public: Path, device: str):
+    import torch
+
+    model_root = _tuple_model_root(public)
+    sys.path.insert(0, str(model_root / "code/dinov2"))
+    from dinov2.hub.backbones import dinov2_vitb14
+
+    checkpoint_path = model_root / "weights/dinov2_vitb14_pretrain.pth"
+    if file_digest(checkpoint_path) != (
+        "0b8b82f85de91b424aded121c7e1dcc2b7bc6d0adeea651bf73a13307fad8c73"
+    ):
+        raise RuntimeError("E_TUPLE_DINOV2_WEIGHT")
+    model = dinov2_vitb14(pretrained=False).to(device).eval()
+    state = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    model.load_state_dict(state, strict=True)
+    return model
+
+
+def _tuple_dinov2_features(model: Any, images: list[Any], device: str) -> Any:
+    import torch
+    import torch.nn.functional as functional
+    from torchvision.transforms import InterpolationMode
+    from torchvision.transforms import functional as transform
+
+    tensors = []
+    mean = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
+    standard = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+    for image in images:
+        tensor = transform.pil_to_tensor(image.convert("RGB")).float() / 255.0
+        tensor = transform.resize(
+            tensor, 256, interpolation=InterpolationMode.BICUBIC, antialias=True
+        )
+        tensor = transform.center_crop(tensor, [224, 224])
+        tensors.append((tensor - mean) / standard)
+    with torch.inference_mode():
+        output = functional.normalize(model(torch.stack(tensors).to(device)), dim=-1)
+    if output.ndim != 2 or output.shape[0] != len(images) or not torch.isfinite(output).all():
+        raise RuntimeError("E_TUPLE_DINOV2_OUTPUT")
+    return output.cpu()
+
+
+def _tuple_recurrence_metrics(
+    raw: list[dict[str, Any]], threshold: float, phash_max: int
+) -> dict[str, float]:
+    expected = [bool(row["same_referent"]) for row in raw]
+    predicted = [float(row["cosine_similarity"]) >= threshold for row in raw]
+    classification = _binary_classification_metrics(expected, predicted)
+    near_truth = [bool(row["near_duplicate"]) for row in raw]
+    near_predicted = [
+        int(row["phash_hamming_distance"]) <= phash_max for row in raw
+    ]
+    near = _binary_classification_metrics(near_truth, near_predicted)
+    negative_indices = [index for index, value in enumerate(expected) if not value]
+    negative_fpr = _safe_divide(
+        sum(predicted[index] for index in negative_indices), len(negative_indices)
+    )
+    return {
+        "same_object_cross_episode_balanced_accuracy": classification[
+            "balanced_accuracy"
+        ],
+        "recurrence_event_f1": classification["f1"],
+        "near_duplicate_pair_balanced_accuracy": near["balanced_accuracy"],
+        "negative_pair_false_positive_rate": negative_fpr,
+        "coverage": 1.0,
+    }
+
+
+def _tuple_recurrence_module(context: dict[str, Any]) -> dict[str, Any]:
+    from PIL import Image
+
+    cfg = context["cfg"]
+    rows = context["rows"]["recurrence"]
+    fixture_root = context["fixture_root"]
+    gate = _tuple_axis(cfg, "cross_episode_recurrence")["public_gate"]
+    execution = _tuple_qualification_execution(cfg)
+    phash_max = int(execution["pHash"]["near_duplicate_hamming_distance_max"])
+    _validate_tuple_recurrence_fixture_rows(rows, fixture_root)
+    model = _load_tuple_dinov2(context["public_root"], context["device"])
+    raw = []
+    try:
+        for row in rows:
+            first_path = _tuple_fixture_file(
+                fixture_root, row["first_relative_path"], row["first_sha256"]
+            )
+            second_path = _tuple_fixture_file(
+                fixture_root, row["second_relative_path"], row["second_sha256"]
+            )
+            first_mask_path = _tuple_fixture_file(
+                fixture_root,
+                row["first_mask_relative_path"],
+                row["first_mask_sha256"],
+            )
+            second_mask_path = _tuple_fixture_file(
+                fixture_root,
+                row["second_mask_relative_path"],
+                row["second_mask_sha256"],
+            )
+            with Image.open(first_path) as source:
+                first = source.convert("RGB").copy()
+            with Image.open(second_path) as source:
+                second = source.convert("RGB").copy()
+            with Image.open(first_mask_path) as source:
+                first_mask = source.convert("L").copy()
+            with Image.open(second_mask_path) as source:
+                second_mask = source.convert("L").copy()
+            if (
+                first_mask.size != first.size
+                or second_mask.size != second.size
+                or first_mask.getbbox() is None
+                or second_mask.getbbox() is None
+            ):
+                raise RuntimeError("E_TUPLE_RECURRENCE_MASK")
+            neutral = Image.new("RGB", first.size, (112, 118, 125))
+            neutral.paste(first, mask=first_mask)
+            first = neutral
+            neutral = Image.new("RGB", second.size, (112, 118, 125))
+            neutral.paste(second, mask=second_mask)
+            second = neutral
+            features = _tuple_dinov2_features(
+                model, [first, second], context["device"]
+            )
+            similarity = float(features[0] @ features[1])
+            if not math.isfinite(similarity) or not -1.0 <= similarity <= 1.0:
+                raise RuntimeError("E_TUPLE_RECURRENCE_SIMILARITY")
+            raw.append(
+                {
+                    "fixture_ordinal": int(row["fixture_ordinal"]),
+                    "same_referent": bool(row["same_referent"]),
+                    "near_duplicate": bool(row["near_duplicate"]),
+                    "cosine_similarity": similarity,
+                    "exact_duplicate": row["first_sha256"] == row["second_sha256"],
+                    "phash_hamming_distance": (
+                        _tuple_perceptual_hash(first)
+                        ^ _tuple_perceptual_hash(second)
+                    ).bit_count(),
+                }
+            )
+    finally:
+        del model
+        _release_cuda()
+    grids = _tuple_amendment(cfg)["public_qualification"][
+        "threshold_development"
+    ]["DINOv2_recurrence_cosine_grid"]
+    if context["partition"] == "development":
+        candidates = []
+        for threshold in grids:
+            metrics = _tuple_recurrence_metrics(raw, float(threshold), phash_max)
+            eligible = (
+                metrics["same_object_cross_episode_balanced_accuracy"]
+                >= float(gate["same_object_cross_episode_balanced_accuracy_min"])
+                and metrics["recurrence_event_f1"]
+                >= float(gate["recurrence_event_f1_min"])
+                and metrics["near_duplicate_pair_balanced_accuracy"]
+                >= float(gate["near_duplicate_pair_balanced_accuracy_min"])
+                and metrics["negative_pair_false_positive_rate"]
+                <= float(gate["negative_pair_false_positive_rate_max"])
+                and metrics["coverage"] >= float(gate["coverage_min"])
+            )
+            candidates.append(
+                {
+                    "DINOv2_recurrence_cosine": float(threshold),
+                    **metrics,
+                    "eligible": eligible,
+                }
+            )
+        selected = _select_frozen_grid_result(
+            candidates,
+            primary_metric="same_object_cross_episode_balanced_accuracy",
+            threshold_fields=("DINOv2_recurrence_cosine",),
+        )
+        metrics = selected or max(
+            candidates,
+            key=lambda row: (
+                row["same_object_cross_episode_balanced_accuracy"],
+                row["DINOv2_recurrence_cosine"],
+            ),
+        )
+        threshold = (
+            float(selected["DINOv2_recurrence_cosine"])
+            if selected is not None
+            else None
+        )
+    else:
+        threshold = float(context["thresholds"]["DINOv2_recurrence_cosine"])
+        metrics = _tuple_recurrence_metrics(raw, threshold, phash_max)
+        selected = {"eligible": (
+            metrics["same_object_cross_episode_balanced_accuracy"]
+            >= float(gate["same_object_cross_episode_balanced_accuracy_min"])
+            and metrics["recurrence_event_f1"] >= float(gate["recurrence_event_f1_min"])
+            and metrics["near_duplicate_pair_balanced_accuracy"]
+            >= float(gate["near_duplicate_pair_balanced_accuracy_min"])
+            and metrics["negative_pair_false_positive_rate"]
+            <= float(gate["negative_pair_false_positive_rate_max"])
+            and metrics["coverage"] >= float(gate["coverage_min"])
+        )}
+    passed = threshold is not None and selected is not None and selected["eligible"] is True
+    return {
+        "status": "PASS" if passed else "NO_GO",
+        "axis_results": {
+            "cross_episode_recurrence": {
+                "status": "PASS" if passed else "NO_GO",
+                "metrics": {key: value for key, value in metrics.items() if key != "eligible"},
+            }
+        },
+        "metrics": {key: value for key, value in metrics.items() if key != "eligible"},
+        "selected_thresholds": (
+            {"DINOv2_recurrence_cosine": threshold}
+            if threshold is not None
+            else {}
+        ),
+        "rows": raw,
+        "row_count": len(rows),
+        "failure_count": 0,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+    }
+
+
+TUPLE_ATTRIBUTE_VALUES = {
+    "color": ("red", "blue", "green", "yellow"),
+    "relative_size": ("big", "small"),
+}
+TUPLE_ATTRIBUTE_PALETTE = {
+    "red": (220.0, 50.0, 45.0),
+    "blue": (45.0, 90.0, 220.0),
+    "green": (50.0, 170.0, 75.0),
+    "yellow": (230.0, 205.0, 45.0),
+}
+
+
+def _tuple_attribute_prompt_groups(cfg: dict[str, Any]) -> dict[str, dict[str, list[str]]]:
+    frozen = _tuple_qualification_execution(cfg)["attribute_prompts"]
+    templates = frozen.get("template_order")
+    values = frozen.get("public_qualified_values")
+    if templates != [
+        "a {value} object",
+        "an object that is {value}",
+        "the visible object is {value}",
+    ] or values != {
+        "color": ["red", "blue", "green", "yellow"],
+        "relative_size": ["big", "small"],
+    }:
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_PROMPT_CONTRACT")
+    return {
+        family: {
+            value: [template.format(value=value) for template in templates]
+            for value in family_values
+        }
+        for family, family_values in values.items()
+    }
+
+
+def _tuple_attribute_palette_label(median_rgb: Any) -> str:
+    import numpy as np
+
+    value = np.asarray(median_rgb, dtype=np.float64)
+    if value.shape != (3,) or not np.isfinite(value).all():
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_PALETTE_INPUT")
+    return min(
+        TUPLE_ATTRIBUTE_PALETTE,
+        key=lambda label: (
+            float(
+                np.square(
+                    value - np.asarray(TUPLE_ATTRIBUTE_PALETTE[label])
+                ).sum()
+            ),
+            label,
+        ),
+    )
+
+
+def _tuple_attribute_masked_image(image_array: Any, predicted_mask: Any):
+    import numpy as np
+    from PIL import Image
+
+    measurements = _predicted_mask_attribute_measurements(
+        image_array, predicted_mask, mask_role="predicted_SAM_mask"
+    )
+    image = np.asarray(image_array, dtype=np.uint8)
+    selected = np.asarray(predicted_mask) > 0
+    neutral = np.full(image.shape, (112, 118, 125), dtype=np.uint8)
+    neutral[selected] = image[selected]
+    return Image.fromarray(neutral, mode="RGB"), measurements
+
+
+def _tuple_attribute_noun_lemma(category: str) -> str:
+    mapping = {
+        "sports ball": "ball",
+        "cup": "cup",
+        "bottle": "bottle",
+        "bowl": "bowl",
+        "book": "book",
+        "chair": "chair",
+        "apple": "apple",
+        "banana": "banana",
+    }
+    if category not in mapping:
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_CATEGORY")
+    return mapping[category]
+
+
+def _tuple_attribute_truth(row: dict[str, Any]) -> dict[str, Any]:
+    required_row = {
+        "fixture_ordinal",
+        "category",
+        "scenario",
+        "source_image_id",
+        "source_annotation_id",
+        "attribute_pair_source_index",
+        "attribute_pair_id",
+        "episode_id",
+        "truth",
+    }
+    if not required_row <= set(row) or not isinstance(row["truth"], dict):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_FIXTURE_SCHEMA")
+    truth = row["truth"]
+    required_truth = {
+        "attribute",
+        "attribute_family",
+        "target_longest_side_pixels",
+        "background_identity_role",
+        "visibility_by_phase",
+        "dominance_by_phase",
+        "candidate_count_by_phase",
+        "sample_count_by_phase",
+        "sampled_mask_truth",
+        "attribute_contrast_expected",
+        "attribute_null_reason",
+        "reference_mask_role",
+        "deterministic_measurement_mask_role",
+    }
+    if not required_truth <= set(truth):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_FIXTURE_SCHEMA")
+    family = truth["attribute_family"]
+    attribute = truth["attribute"]
+    if (
+        family not in TUPLE_ATTRIBUTE_VALUES
+        or attribute not in TUPLE_ATTRIBUTE_VALUES[family]
+        or truth["reference_mask_role"] != "TRUTH_ONLY_NOT_A_MEASUREMENT_INPUT"
+        or truth["deterministic_measurement_mask_role"] != "predicted_SAM_mask"
+        or not isinstance(truth["attribute_contrast_expected"], bool)
+        or set(truth["visibility_by_phase"]) != {"before", "during", "after"}
+        or not all(
+            isinstance(value, bool)
+            for value in truth["visibility_by_phase"].values()
+        )
+    ):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_FIXTURE_SCHEMA")
+    expected_null_reason = None if truth["attribute_contrast_expected"] else str(
+        truth["attribute_null_reason"]
+    )
+    if (truth["attribute_null_reason"] is None) != (
+        truth["attribute_contrast_expected"] is True
+    ) or expected_null_reason not in {
+        None,
+        "NO_ACCEPTED_ADJECTIVE_NOUN_SPAN",
+        "NO_PREDICTED_REFERENT_MASK",
+    }:
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_FIXTURE_SCHEMA")
+    if family == "relative_size":
+        if (
+            truth["target_longest_side_pixels"]
+            != REFERENT_ATTRIBUTE_SIZE_LONGEST_PIXELS[attribute]
+            or truth["background_identity_role"] != "shared_relative_size_pair"
+            or not isinstance(row["attribute_pair_id"], str)
+            or not row["attribute_pair_id"]
+        ):
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_SIZE_PAIR_SCHEMA")
+    elif row["attribute_pair_id"] is not None:
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_COLOR_PAIR_SCHEMA")
+    return truth
+
+
+def _tuple_attribute_language_accepts(
+    row: dict[str, Any], adapter_event: Any
+) -> bool:
+    if not isinstance(adapter_event, dict) or set(adapter_event) != {
+        "status",
+        "abstention_reason",
+        "mentions",
+    }:
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_ADAPTER_EVENT_SCHEMA")
+    status = adapter_event["status"]
+    reason = adapter_event["abstention_reason"]
+    mentions = adapter_event["mentions"]
+    if status not in {"ACCEPT", "ABSTAIN"} or not isinstance(mentions, list):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_ADAPTER_EVENT_SCHEMA")
+    if status == "ABSTAIN":
+        if not isinstance(reason, str) or not reason or mentions:
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_ADAPTER_EVENT_SCHEMA")
+        return False
+    if reason is not None:
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_ADAPTER_EVENT_SCHEMA")
+    expected = {
+        "adjective": str(row["truth"]["attribute"]),
+        "noun": _tuple_attribute_noun_lemma(str(row["category"])),
+    }
+    return expected in _adjacent_adjective_noun_spans(mentions)
+
+
+def _tuple_attribute_target_candidate(
+    sample: dict[str, Any], category: str, thresholds: dict[str, float]
+) -> dict[str, Any] | None:
+    candidates = sample.get("candidates")
+    if not isinstance(candidates, list):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_GROUNDING_SCHEMA")
+    retained = []
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_GROUNDING_SCHEMA")
+        if candidate.get("category") != category:
+            continue
+        box_score = candidate.get("box_score")
+        text_score = candidate.get("text_score")
+        if not isinstance(box_score, (int, float)) or not isinstance(
+            text_score, (int, float)
+        ):
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_GROUNDING_SCHEMA")
+        if (
+            float(box_score) < thresholds["Grounding_DINO_box_score"]
+            or float(text_score) < thresholds["Grounding_DINO_text_score"]
+        ):
+            continue
+        if not _valid_normalized_box(candidate.get("box")):
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_PREDICTED_BOX_INVALID")
+        center_distance = candidate.get("center_distance", 0.0)
+        if not isinstance(center_distance, (int, float)) or not math.isfinite(
+            float(center_distance)
+        ):
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_GROUNDING_SCHEMA")
+        retained.append(candidate)
+    if not retained:
+        return None
+    return max(
+        retained,
+        key=lambda candidate: (
+            float(candidate["box_score"]),
+            float(candidate["text_score"]),
+            -float(candidate.get("center_distance", 0.0)),
+            tuple(float(value) for value in candidate["box"]),
+        ),
+    )
+
+
+def _tuple_attribute_apply_size_pairs(output: list[dict[str, Any]]) -> None:
+    size_pairs: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in output:
+        if row["attribute_family"] == "relative_size":
+            size_pairs[str(row["attribute_pair_id"])].append(row)
+    for rows in size_pairs.values():
+        if (
+            len(rows) != 2
+            or {row["attribute"] for row in rows} != {"big", "small"}
+            or len({row["episode_id"] for row in rows}) != 1
+            or len({row["source_image_id"] for row in rows}) != 1
+            or len({row["source_annotation_id"] for row in rows}) != 1
+            or {row["target_longest_side_pixels"] for row in rows} != {130, 72}
+            or {row["background_identity_role"] for row in rows}
+            != {"shared_relative_size_pair"}
+        ):
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_SIZE_PAIR_SCHEMA")
+        by_value = {row["attribute"]: row for row in rows}
+        big = by_value["big"]["predicted_mask_bbox_longest_side_median"]
+        small = by_value["small"]["predicted_mask_bbox_longest_side_median"]
+        ratio_pass = (
+            isinstance(big, (int, float))
+            and isinstance(small, (int, float))
+            and float(small) > 0.0
+            and float(big) / float(small) >= 1.5
+        )
+        for value, row in by_value.items():
+            row["deterministic_label"] = value if ratio_pass else None
+            row["predicted_size_ratio_pass"] = ratio_pass
+
+
+def _tuple_attribute_raw_rows(
+    context: dict[str, Any],
+    model: Any,
+    transform: Any,
+    text: Any,
+    slices: dict[str, tuple[int, int, list[str]]],
+) -> list[dict[str, Any]]:
+    import numpy as np
+
+    tracks = _tuple_grounding_sampled_tracks(context)
+    source_by_ordinal = {
+        int(row["fixture_ordinal"]): row
+        for row in context["rows"]["referent_attribute"]
+    }
+    if len(source_by_ordinal) != len(context["rows"]["referent_attribute"]):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_FIXTURE_ORDINAL")
+    thresholds = (
+        context.get("_selected_thresholds", {})
+        if context["partition"] == "development"
+        else context["thresholds"]
+    )
+    if not {
+        "Grounding_DINO_box_score",
+        "Grounding_DINO_text_score",
+    } <= set(thresholds):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_GROUNDING_THRESHOLD")
+    cache = context.get("module_cache")
+    if not isinstance(cache, dict) or not isinstance(
+        cache.get("referent_adapter_events"), dict
+    ):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_ADAPTER_EVENTS_MISSING")
+    adapter_events = cache["referent_adapter_events"]
+    output = []
+    seen: set[int] = set()
+    for track in tracks:
+        if not isinstance(track, dict) or not isinstance(
+            track.get("fixture_ordinal"), int
+        ):
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_GROUNDING_SCHEMA")
+        ordinal = int(track["fixture_ordinal"])
+        if ordinal in seen or ordinal not in source_by_ordinal:
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_FIXTURE_ORDINAL")
+        seen.add(ordinal)
+        row = source_by_ordinal[ordinal]
+        truth = _tuple_attribute_truth(row)
+        expected_grounding_truth = {
+            key: truth[key]
+            for key in (
+                "visibility_by_phase",
+                "dominance_by_phase",
+                "candidate_count_by_phase",
+            )
+        }
+        if (
+            track.get("category") != row["category"]
+            or track.get("scenario") != row["scenario"]
+            or track.get("truth") != expected_grounding_truth
+        ):
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_GROUNDING_ROUNDTRIP")
+        adapter_event = adapter_events.get(ordinal)
+        language_span_accepted = _tuple_attribute_language_accepts(
+            row, adapter_event
+        )
+        samples = track.get("samples")
+        if not isinstance(samples, list) or (
+            adapter_event["status"] == "ACCEPT" and len(samples) < 8
+        ) or (adapter_event["status"] == "ABSTAIN" and samples):
+            raise RuntimeError("E_TUPLE_ATTRIBUTE_GROUNDING_SCHEMA")
+        masked_images = []
+        measurements = []
+        invalid_mask = False
+        for sample in samples:
+            if (
+                not isinstance(sample, dict)
+                or sample.get("phase") not in {"before", "during", "after"}
+                or "image" not in sample
+            ):
+                raise RuntimeError("E_TUPLE_ATTRIBUTE_GROUNDING_SCHEMA")
+            candidate = _tuple_attribute_target_candidate(
+                sample, str(row["category"]), thresholds
+            )
+            if candidate is None:
+                continue
+            try:
+                masked, measured = _tuple_attribute_masked_image(
+                    sample["image"], candidate.get("mask")
+                )
+            except RuntimeError as error:
+                if str(error).startswith("E_TUPLE_ATTRIBUTE_PREDICTED_MASK_"):
+                    invalid_mask = True
+                    continue
+                raise
+            masked_images.append(masked)
+            measurements.append(measured)
+        mask_valid = bool(masked_images) and not invalid_mask
+        pe_label = None
+        pe_margin = None
+        if mask_valid:
+            features, _labels, _margins = _vision_batch(
+                model,
+                transform,
+                text,
+                slices,
+                masked_images,
+                None,
+                context["device"],
+            )
+            family = str(truth["attribute_family"])
+            start, stop, names = slices[family]
+            scores = np.median(
+                (features @ text[start:stop].T).numpy(), axis=0
+            )
+            if scores.shape != (len(names),) or not np.isfinite(scores).all():
+                raise RuntimeError("E_TUPLE_ATTRIBUTE_PE_OUTPUT")
+            order = np.argsort(scores)[::-1]
+            pe_label = names[int(order[0])]
+            pe_margin = float(scores[int(order[0])] - scores[int(order[1])])
+        deterministic_label = None
+        if mask_valid and truth["attribute_family"] == "color":
+            median_rgb = np.median(
+                np.asarray(
+                    [measurement["median_rgb"] for measurement in measurements],
+                    dtype=np.float64,
+                ),
+                axis=0,
+            )
+            deterministic_label = _tuple_attribute_palette_label(median_rgb)
+        output.append(
+            {
+                "fixture_ordinal": ordinal,
+                "category": row["category"],
+                "scenario": row["scenario"],
+                "attribute": truth["attribute"],
+                "attribute_family": truth["attribute_family"],
+                "contrast_expected": truth["attribute_contrast_expected"],
+                "mask_measurement_expected": any(
+                    truth["visibility_by_phase"].values()
+                ),
+                "language_span_accepted": language_span_accepted,
+                "mask_measurement_valid": mask_valid,
+                "invalid_predicted_mask": invalid_mask,
+                "selected_sample_count": len(masked_images),
+                "pe_label": pe_label,
+                "pe_margin": pe_margin,
+                "deterministic_label": deterministic_label,
+                "predicted_mask_bbox_longest_side_median": (
+                    float(
+                        statistics.median(
+                            measurement["bbox_longest_side_fraction"]
+                            for measurement in measurements
+                        )
+                    )
+                    if mask_valid
+                    else None
+                ),
+                "attribute_pair_id": row["attribute_pair_id"],
+                "episode_id": row["episode_id"],
+                "source_image_id": row["source_image_id"],
+                "source_annotation_id": row["source_annotation_id"],
+                "target_longest_side_pixels": truth[
+                    "target_longest_side_pixels"
+                ],
+                "background_identity_role": truth["background_identity_role"],
+            }
+        )
+    if seen != set(source_by_ordinal):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_GROUNDING_TRUNCATION")
+    _tuple_attribute_apply_size_pairs(output)
+    return output
+
+
+def _tuple_attribute_metrics(
+    raw: list[dict[str, Any]], margin: float, adjective_noun_span_f1: float
+) -> dict[str, float]:
+    labels = [
+        *TUPLE_ATTRIBUTE_VALUES["color"],
+        *TUPLE_ATTRIBUTE_VALUES["relative_size"],
+    ]
+    expected_labels = []
+    predicted_labels: list[str | None] = []
+    null_expected = []
+    null_predicted = []
+    measurement_expected = []
+    measurement_valid = []
+    for row in raw:
+        prediction = None
+        if (
+            row["language_span_accepted"] is True
+            and row["mask_measurement_valid"] is True
+            and isinstance(row["pe_margin"], (int, float))
+            and float(row["pe_margin"]) >= margin
+            and row["pe_label"] == row["deterministic_label"]
+        ):
+            prediction = str(row["pe_label"])
+        if row["mask_measurement_expected"]:
+            measurement_expected.append(True)
+            measurement_valid.append(row["mask_measurement_valid"] is True)
+        if row["contrast_expected"]:
+            expected_labels.append(str(row["attribute"]))
+            predicted_labels.append(prediction)
+        else:
+            null_expected.append(False)
+            null_predicted.append(prediction is not None)
+    if not expected_labels or not null_expected:
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_METRIC_STRATA")
+    visible_f1 = _multiclass_macro_f1(expected_labels, predicted_labels, labels)
+    coverage = _safe_divide(
+        sum(value is not None for value in predicted_labels), len(predicted_labels)
+    )
+    null_specificity = _binary_classification_metrics(
+        null_expected, null_predicted
+    )["specificity"]
+    mask_fraction = _safe_divide(sum(measurement_valid), len(measurement_expected))
+    return {
+        "adjective_noun_span_f1": float(adjective_noun_span_f1),
+        "eligible_visual_attribute_coverage": coverage,
+        "visible_contrast_macro_f1": visible_f1,
+        "null_contrast_specificity": null_specificity,
+        "valid_mask_measurement_fraction": mask_fraction,
+    }
+
+
+def _tuple_attribute_module(context: dict[str, Any]) -> dict[str, Any]:
+    cfg = context["cfg"]
+    gate = _tuple_axis(cfg, "adjective_attribute_contrast")["public_gate"]
+    prompts = _tuple_attribute_prompt_groups(cfg)
+    model, transform, text, slices = _load_vision(
+        context["public_root"],
+        cfg,
+        context["device"],
+        prompt_groups_override=prompts,
+    )
+    try:
+        raw = _tuple_attribute_raw_rows(context, model, transform, text, slices)
+    finally:
+        del model
+        _release_cuda()
+    language_metrics = context.get("_tuple_attribute_language_metrics")
+    span_f1 = (
+        float(language_metrics["adjective_noun_span_f1"])
+        if isinstance(language_metrics, dict)
+        and isinstance(language_metrics.get("adjective_noun_span_f1"), (int, float))
+        else 0.0
+    )
+
+    def evaluate(margin: float) -> dict[str, Any]:
+        metrics = _tuple_attribute_metrics(raw, margin, span_f1)
+        eligible = (
+            metrics["adjective_noun_span_f1"]
+            >= float(gate["adjective_noun_span_f1_min"])
+            and metrics["eligible_visual_attribute_coverage"]
+            >= float(gate["eligible_visual_attribute_coverage_min"])
+            and metrics["visible_contrast_macro_f1"]
+            >= float(gate["visible_contrast_macro_f1_min"])
+            and metrics["null_contrast_specificity"]
+            >= float(gate["null_contrast_specificity_min"])
+            and metrics["valid_mask_measurement_fraction"]
+            >= float(gate["valid_mask_measurement_fraction_required"])
+        )
+        return {
+            "PE_Core_attribute_margin": float(margin),
+            **metrics,
+            "eligible": eligible,
+        }
+
+    if context["partition"] == "development":
+        grid = _tuple_amendment(cfg)["public_qualification"][
+            "threshold_development"
+        ]["PE_Core_attribute_margin_grid"]
+        candidates = [evaluate(float(margin)) for margin in grid]
+        selected = _select_frozen_grid_result(
+            candidates,
+            primary_metric="visible_contrast_macro_f1",
+            threshold_fields=("PE_Core_attribute_margin",),
+        )
+        display = selected or max(
+            candidates,
+            key=lambda row: (
+                row["visible_contrast_macro_f1"],
+                row["PE_Core_attribute_margin"],
+            ),
+        )
+        threshold = (
+            float(selected["PE_Core_attribute_margin"])
+            if selected is not None
+            else None
+        )
+    else:
+        threshold = float(context["thresholds"]["PE_Core_attribute_margin"])
+        display = evaluate(threshold)
+        selected = display if display["eligible"] else None
+    passed = threshold is not None and selected is not None
+    metrics = {key: value for key, value in display.items() if key not in {
+        "eligible",
+        "PE_Core_attribute_margin",
+    }}
+    compact_rows = [
+        {
+            key: row[key]
+            for key in (
+                "fixture_ordinal",
+                "attribute",
+                "attribute_family",
+                "contrast_expected",
+                "mask_measurement_expected",
+                "language_span_accepted",
+                "mask_measurement_valid",
+                "invalid_predicted_mask",
+                "selected_sample_count",
+                "pe_label",
+                "pe_margin",
+                "deterministic_label",
+            )
+        }
+        for row in raw
+    ]
+    return {
+        "status": "PASS" if passed else "NO_GO",
+        "axis_results": {
+            "adjective_attribute_contrast": {
+                "status": "PASS" if passed else "NO_GO",
+                "metrics": metrics,
+            }
+        },
+        "metrics": metrics,
+        "selected_thresholds": (
+            {"PE_Core_attribute_margin": threshold}
+            if threshold is not None
+            else {}
+        ),
+        "rows": compact_rows,
+        "row_count": len(raw),
+        "failure_count": 0,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+    }
+
+
 def _refuse_git_output(path: Path) -> None:
     resolved = path.resolve()
     for candidate in (resolved, *resolved.parents):
@@ -1880,9 +6713,727 @@ def _refuse_git_output(path: Path) -> None:
             raise RuntimeError("E_TUPLE_FIXTURE_OUTPUT_IN_GIT")
 
 
+def _require_external_or_ignored_output(path: Path) -> None:
+    """Permit public outputs only outside Git or under an ignored root.
+
+    Public qualification normally runs in the external Juno public root.  The
+    ignored-root exception keeps local tests and explicitly ignored disposable
+    runs possible without allowing a source artifact to land in a tracked
+    worktree by accident.  Git worktrees use a `.git` file, so walking only for
+    `.git` directories is not sufficient here.
+    """
+
+    resolved = path.resolve()
+    completed = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        cwd=Path.cwd(),
+        text=True,
+        capture_output=True,
+    )
+    if completed.returncode:
+        return
+    repository = Path(completed.stdout.strip()).resolve()
+    try:
+        resolved.relative_to(repository)
+    except ValueError:
+        return
+    ignored = subprocess.run(
+        ["git", "check-ignore", "--quiet", "--", str(resolved)],
+        cwd=repository,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    if ignored.returncode != 0:
+        raise RuntimeError("E_TUPLE_FIXTURE_OUTPUT_NOT_EXTERNAL_OR_IGNORED")
+
+
+TUPLE_MODULE_AXIS_IDS = {
+    "adapter_and_lexical": (
+        "adapter_qualified_yield",
+        "noun_adjective_exposure",
+    ),
+    "referent": (
+        "utterance_centered_referent_visibility_dominance_ambiguity",
+    ),
+    "recurrence": ("cross_episode_recurrence",),
+    "attribute": ("adjective_attribute_contrast",),
+    "hand_contact": ("hand_action_coupling",),
+    "sensor": ("egocentric_sensor_regime",),
+    "order_action": (),
+}
+
+TUPLE_MODULE_RUNNER_NAMES = {
+    "adapter_and_lexical": "_tuple_language_lexical_module",
+    "referent": "_tuple_referent_module",
+    "recurrence": "_tuple_recurrence_module",
+    "attribute": "_tuple_attribute_module",
+    "hand_contact": "_tuple_hand_contact_module",
+    "sensor": "_tuple_sensor_module",
+    "order_action": "_tuple_order_action_module",
+}
+
+
+def _missing_tuple_module_runner(module_id: str):
+    def run(_context: dict[str, Any]) -> dict[str, Any]:
+        raise RuntimeError(f"E_TUPLE_QUALIFICATION_MODULE_UNIMPLEMENTED {module_id}")
+
+    return run
+
+
+def _development_unqualified_tuple_module_runner(module_id: str):
+    def run(_context: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "status": "UNMEASURED",
+            "axis_results": {
+                axis_id: {
+                    "status": "UNMEASURED",
+                    "metrics": {},
+                    "reason": "DEVELOPMENT_MODULE_DID_NOT_QUALIFY",
+                }
+                for axis_id in TUPLE_MODULE_AXIS_IDS[module_id]
+            },
+            "metrics": {},
+            "selected_thresholds": {},
+            "rows": [],
+            "row_count": 0,
+            "failure_count": 0,
+            "invalid_retained_record_count": 0,
+            "silent_truncation_count": 0,
+            "external_call_count": 0,
+        }
+
+    return run
+
+
+def _tuple_module_runners() -> dict[str, Any]:
+    """Resolve every preregistered module without manufacturing a result."""
+
+    if set(TUPLE_MODULE_RUNNER_NAMES) != set(TUPLE_QUALIFICATION_MODULE_IDS):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_MODULE_REGISTRY")
+    output = {}
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        value = globals().get(TUPLE_MODULE_RUNNER_NAMES[module_id])
+        output[module_id] = (
+            value if callable(value) else _missing_tuple_module_runner(module_id)
+        )
+    return output
+
+
+def _tuple_frozen_threshold_grids(cfg: dict[str, Any]) -> dict[str, tuple[float, ...]]:
+    development = _tuple_amendment(cfg)["public_qualification"][
+        "threshold_development"
+    ]
+    action = _tuple_fixture_protocol(cfg)["order_dependent_action_control"]
+    grids = {
+        "Grounding_DINO_box_score": development[
+            "Grounding_DINO_box_score_grid"
+        ],
+        "Grounding_DINO_text_score": development[
+            "Grounding_DINO_text_score_grid"
+        ],
+        "EgoHOS_min_mask_fraction": development[
+            "EgoHOS_min_mask_fraction_grid"
+        ],
+        "PE_Core_attribute_margin": development[
+            "PE_Core_attribute_margin_grid"
+        ],
+        "DINOv2_recurrence_cosine": development[
+            "DINOv2_recurrence_cosine_grid"
+        ],
+        "action_abstention_margin": action[
+            "development_abstention_margin_grid"
+        ],
+    }
+    output = {}
+    for key, values in grids.items():
+        if not isinstance(values, list) or not values:
+            raise RuntimeError("E_TUPLE_QUALIFICATION_THRESHOLD_GRID")
+        numeric = tuple(float(value) for value in values)
+        if len(set(numeric)) != len(numeric) or not all(
+            math.isfinite(value) for value in numeric
+        ):
+            raise RuntimeError("E_TUPLE_QUALIFICATION_THRESHOLD_GRID")
+        output[key] = numeric
+    return output
+
+
+def _tuple_selected_thresholds(
+    cfg: dict[str, Any],
+    module_results: dict[str, dict[str, Any]],
+    *,
+    expected: dict[str, float] | None = None,
+) -> dict[str, float]:
+    """Merge module thresholds and prove that no value escaped its frozen grid."""
+
+    grids = _tuple_frozen_threshold_grids(cfg)
+    output: dict[str, float] = {}
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        selected = module_results[module_id].get("selected_thresholds", {})
+        if not isinstance(selected, dict):
+            raise RuntimeError("E_TUPLE_QUALIFICATION_THRESHOLD_RECORD")
+        for key, raw_value in selected.items():
+            if key not in grids or not isinstance(raw_value, (int, float)):
+                raise RuntimeError("E_TUPLE_QUALIFICATION_THRESHOLD_NOT_FROZEN")
+            value = float(raw_value)
+            if not math.isfinite(value) or value not in grids[key]:
+                raise RuntimeError("E_TUPLE_QUALIFICATION_THRESHOLD_NOT_FROZEN")
+            if key in output and output[key] != value:
+                raise RuntimeError("E_TUPLE_QUALIFICATION_THRESHOLD_CONFLICT")
+            output[key] = value
+    if expected is not None:
+        normalized = {key: float(value) for key, value in expected.items()}
+        if any(key not in grids or value not in grids[key] for key, value in normalized.items()):
+            raise RuntimeError("E_TUPLE_QUALIFICATION_THRESHOLD_SEAL_GRID")
+        if any(key not in normalized or normalized[key] != value for key, value in output.items()):
+            raise RuntimeError("E_TUPLE_HOLDOUT_THRESHOLD_CHANGED")
+    return dict(sorted(output.items()))
+
+
+def _tuple_axis_results_from_modules(
+    module_results: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Register every axis even when its module errors or abstains."""
+
+    output: dict[str, dict[str, Any]] = {}
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        result = module_results[module_id]
+        expected_axes = TUPLE_MODULE_AXIS_IDS[module_id]
+        supplied = result.get("axis_results", {})
+        if supplied is None:
+            supplied = {}
+        if not isinstance(supplied, dict) or set(supplied) - set(expected_axes):
+            raise RuntimeError("E_TUPLE_QUALIFICATION_AXIS_RESULT_SET")
+        for axis_id in expected_axes:
+            axis = supplied.get(axis_id)
+            if axis is None:
+                status = (
+                    "ERROR" if result.get("status") == "ERROR" else "UNMEASURED"
+                )
+                axis = {"status": status, "metrics": {}}
+            if not isinstance(axis, dict) or axis.get("status") not in {
+                "PASS",
+                "NO_GO",
+                "UNMEASURED",
+                "ERROR",
+            }:
+                raise RuntimeError("E_TUPLE_QUALIFICATION_AXIS_RESULT")
+            output[axis_id] = axis
+    if set(output) != set((*TUPLE_CRITICAL_AXIS_IDS, *TUPLE_SUPPORTING_AXIS_IDS)):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_AXIS_RESULT_SET")
+    return output
+
+
+def _tuple_qualification_integrity(
+    module_results: dict[str, dict[str, Any]],
+) -> dict[str, int]:
+    fields = (
+        "failure_count",
+        "invalid_retained_record_count",
+        "silent_truncation_count",
+        "external_call_count",
+    )
+    output = {
+        key: sum(int(result.get(key, 0)) for result in module_results.values())
+        for key in fields
+    }
+    output["error_module_count"] = sum(
+        result.get("status") == "ERROR" for result in module_results.values()
+    )
+    output["unaccounted_failure_count"] = sum(
+        result.get("error_code") == "E_UNACCOUNTED_MODULE_FAILURE"
+        for result in module_results.values()
+    )
+    if any(value < 0 for value in output.values()):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_NEGATIVE_INTEGRITY_COUNT")
+    return output
+
+
+def _validate_tuple_qualification_record(value: Any) -> None:
+    """Reject non-finite or non-JSON module outputs before any result is sealed."""
+
+    if value is None or isinstance(value, (str, bool, int)):
+        return
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise RuntimeError("E_TUPLE_QUALIFICATION_NONFINITE_RESULT")
+        return
+    if isinstance(value, (list, tuple)):
+        for item in value:
+            _validate_tuple_qualification_record(item)
+        return
+    if isinstance(value, dict):
+        if not all(isinstance(key, str) for key in value):
+            raise RuntimeError("E_TUPLE_QUALIFICATION_NONJSON_RESULT")
+        for item in value.values():
+            _validate_tuple_qualification_record(item)
+        return
+    raise RuntimeError("E_TUPLE_QUALIFICATION_NONJSON_RESULT")
+
+
+def _apply_tuple_integrity_gate(
+    combined: dict[str, Any], integrity: dict[str, int]
+) -> dict[str, Any]:
+    output = json.loads(json.dumps(combined))
+    failures = list(output["combined_gate_failures"])
+    for key in (
+        "failure_count",
+        "invalid_retained_record_count",
+        "silent_truncation_count",
+        "external_call_count",
+        "error_module_count",
+        "unaccounted_failure_count",
+    ):
+        if integrity[key]:
+            failures.append(f"integrity:{key}")
+    output["integrity"] = integrity
+    output["combined_gate_failures"] = failures
+    output["status"] = "PASS" if not failures else "NO_GO"
+    return output
+
+
+def _tuple_qualification_root(public: Path) -> Path:
+    return _tuple_run_root(public) / "qualification"
+
+
+def _tuple_qualification_paths(public: Path) -> dict[str, Path]:
+    root = _tuple_qualification_root(public)
+    return {
+        "development_result": root / "development-result.json",
+        "development_threshold_seal": root / "development-threshold-seal.json",
+        "holdout_result": root / "holdout-result.json",
+    }
+
+
+def _refuse_tuple_qualification_overwrite(public: Path, partition: str) -> None:
+    paths = _tuple_qualification_paths(public)
+    if partition == "development":
+        targets = (
+            paths["development_result"],
+            paths["development_threshold_seal"],
+            paths["holdout_result"],
+        )
+        code = "E_TUPLE_DEVELOPMENT_RESULT_ALREADY_EXISTS"
+    elif partition == "holdout":
+        targets = (paths["holdout_result"],)
+        code = "E_TUPLE_HOLDOUT_RESULT_ALREADY_EXISTS"
+    else:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_PARTITION")
+    if any(path.exists() for path in targets):
+        raise RuntimeError(code)
+
+
+def _tuple_development_module_commitment(
+    fixture_commitment: str,
+    module_results: dict[str, dict[str, Any]],
+    axis_results: dict[str, dict[str, Any]],
+    combined_gate: dict[str, Any],
+) -> str:
+    return digest(
+        {
+            "fixture_manifest_commitment_sha256": fixture_commitment,
+            "module_results": module_results,
+            "axis_results": axis_results,
+            "combined_gate": combined_gate,
+        }
+    )
+
+
+def _tuple_development_threshold_seal(
+    cfg: dict[str, Any],
+    fixture_manifest: dict[str, Any],
+    module_results: dict[str, dict[str, Any]],
+    axis_results: dict[str, dict[str, Any]],
+    combined_gate: dict[str, Any],
+) -> dict[str, Any]:
+    thresholds = _tuple_selected_thresholds(cfg, module_results)
+    required_by_module = {
+        "referent": {
+            "Grounding_DINO_box_score",
+            "Grounding_DINO_text_score",
+        },
+        "recurrence": {"DINOv2_recurrence_cosine"},
+        "attribute": {"PE_Core_attribute_margin"},
+        "hand_contact": {"EgoHOS_min_mask_fraction"},
+        "order_action": {"action_abstention_margin"},
+    }
+    for module_id, required in required_by_module.items():
+        status = module_results[module_id].get("status")
+        selected = module_results[module_id].get("selected_thresholds", {})
+        if status == "PASS":
+            if not required <= set(thresholds):
+                raise RuntimeError("E_TUPLE_QUALIFICATION_PASS_WITHOUT_THRESHOLD")
+        elif selected:
+            raise RuntimeError("E_TUPLE_QUALIFICATION_FAILED_MODULE_THRESHOLD")
+    module_commitment = _tuple_development_module_commitment(
+        fixture_manifest["public_fixture_manifest_commitment_sha256"],
+        module_results,
+        axis_results,
+        combined_gate,
+    )
+    seal = {
+        "schema_version": 1,
+        "status": (
+            "PASS_DEVELOPMENT_THRESHOLDS_SEALED"
+            if combined_gate["status"] == "PASS"
+            else "NO_GO_DEVELOPMENT_COMBINED_GATE"
+        ),
+        "partition": "development",
+        "holdout_authorized": combined_gate["status"] == "PASS",
+        "public_fixture_manifest_commitment_sha256": fixture_manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "visor_hos_correction_amendment_commitment_sha256": fixture_manifest[
+            "visor_hos_correction_amendment_commitment_sha256"
+        ],
+        "verified_no_hand_seal_commitment_sha256": fixture_manifest[
+            "verified_no_hand_seal_commitment_sha256"
+        ],
+        "development_module_result_commitment_sha256": module_commitment,
+        "development_module_statuses": {
+            module_id: module_results[module_id]["status"]
+            for module_id in TUPLE_QUALIFICATION_MODULE_IDS
+        },
+        "selected_thresholds": thresholds,
+        "combined_gate_status": combined_gate["status"],
+        "holdout_reprompt_refit_or_threshold_change": "PROHIBITED",
+    }
+    seal["development_threshold_commitment_sha256"] = digest(seal)
+    return seal
+
+
+def _load_tuple_development_pair(
+    public: Path,
+    cfg: dict[str, Any],
+    fixture_manifest: dict[str, Any],
+    *,
+    missing_code: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    paths = _tuple_qualification_paths(public)
+    result_present = paths["development_result"].is_file()
+    seal_present = paths["development_threshold_seal"].is_file()
+    if result_present != seal_present:
+        raise RuntimeError("E_TUPLE_DEVELOPMENT_PAIR_PARTIAL")
+    if not result_present:
+        raise RuntimeError(missing_code)
+    seal = json.loads(paths["development_threshold_seal"].read_text())
+    payload = json.loads(json.dumps(seal))
+    expected = payload.pop("development_threshold_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(payload) != expected:
+        raise RuntimeError("E_TUPLE_DEVELOPMENT_THRESHOLD_COMMITMENT")
+    combined_status = seal.get("combined_gate_status")
+    expected_status = {
+        "PASS": "PASS_DEVELOPMENT_THRESHOLDS_SEALED",
+        "NO_GO": "NO_GO_DEVELOPMENT_COMBINED_GATE",
+    }.get(combined_status)
+    if (
+        expected_status is None
+        or seal.get("status") != expected_status
+        or seal.get("holdout_authorized") is not (combined_status == "PASS")
+        or seal.get("partition") != "development"
+        or seal.get("holdout_reprompt_refit_or_threshold_change") != "PROHIBITED"
+    ):
+        raise RuntimeError("E_TUPLE_DEVELOPMENT_PAIR_STATUS")
+    for key in (
+        "public_fixture_manifest_commitment_sha256",
+        "visor_hos_correction_amendment_commitment_sha256",
+        "verified_no_hand_seal_commitment_sha256",
+    ):
+        if seal.get(key) != fixture_manifest.get(key):
+            raise RuntimeError("E_TUPLE_DEVELOPMENT_THRESHOLD_PROVENANCE")
+    thresholds = seal.get("selected_thresholds")
+    if not isinstance(thresholds, dict):
+        raise RuntimeError("E_TUPLE_DEVELOPMENT_THRESHOLD_RECORD")
+    statuses = seal.get("development_module_statuses")
+    if (
+        not isinstance(statuses, dict)
+        or set(statuses) != set(TUPLE_QUALIFICATION_MODULE_IDS)
+        or any(
+            status not in {"PASS", "NO_GO", "UNMEASURED", "ERROR"}
+            for status in statuses.values()
+        )
+    ):
+        raise RuntimeError("E_TUPLE_DEVELOPMENT_MODULE_STATUS_SEAL")
+    development = json.loads(paths["development_result"].read_text())
+    result_payload = json.loads(json.dumps(development))
+    result_expected = result_payload.pop("public_qualification_commitment_sha256", None)
+    if not isinstance(result_expected, str) or digest(result_payload) != result_expected:
+        raise RuntimeError("E_TUPLE_DEVELOPMENT_RESULT_COMMITMENT")
+    development_module_results = development.get("module_results", {})
+    development_statuses = {
+        module_id: development_module_results.get(module_id, {}).get("status")
+        for module_id in TUPLE_QUALIFICATION_MODULE_IDS
+    }
+    if (
+        development.get("schema_version") != 1
+        or development.get("status") != expected_status
+        or development.get("partition") != "development"
+        or development.get("public_fixture_manifest_commitment_sha256")
+        != fixture_manifest.get("public_fixture_manifest_commitment_sha256")
+        or development.get("visor_hos_correction_amendment_commitment_sha256")
+        != fixture_manifest.get("visor_hos_correction_amendment_commitment_sha256")
+        or development.get("verified_no_hand_seal_commitment_sha256")
+        != fixture_manifest.get("verified_no_hand_seal_commitment_sha256")
+        or development.get("development_threshold_commitment_sha256") != expected
+        or development.get("development_module_result_commitment_sha256")
+        != seal.get("development_module_result_commitment_sha256")
+        or development.get("selected_thresholds") != thresholds
+        or development.get("combined_gate", {}).get("status") != combined_status
+        or development_statuses != statuses
+    ):
+        raise RuntimeError("E_TUPLE_DEVELOPMENT_RESULT_PROVENANCE")
+    if set(development_module_results) != set(TUPLE_QUALIFICATION_MODULE_IDS):
+        raise RuntimeError("E_TUPLE_DEVELOPMENT_MODULE_RESULT_SET")
+    if _tuple_selected_thresholds(cfg, development_module_results) != thresholds:
+        raise RuntimeError("E_TUPLE_DEVELOPMENT_THRESHOLD_PROVENANCE")
+    recomputed_module_commitment = _tuple_development_module_commitment(
+        fixture_manifest["public_fixture_manifest_commitment_sha256"],
+        development.get("module_results", {}),
+        development.get("axis_results", {}),
+        development.get("combined_gate", {}),
+    )
+    if recomputed_module_commitment != seal.get(
+        "development_module_result_commitment_sha256"
+    ):
+        raise RuntimeError("E_TUPLE_DEVELOPMENT_MODULE_COMMITMENT")
+    return seal, development
+
+
+def _load_tuple_development_threshold_seal(
+    public: Path,
+    cfg: dict[str, Any],
+    fixture_manifest: dict[str, Any],
+) -> dict[str, Any]:
+    seal, _ = _load_tuple_development_pair(
+        public,
+        cfg,
+        fixture_manifest,
+        missing_code="E_TUPLE_HOLDOUT_BEFORE_DEVELOPMENT_SEAL",
+    )
+    if seal["holdout_authorized"] is not True:
+        raise RuntimeError("E_TUPLE_HOLDOUT_NOT_AUTHORIZED")
+    return seal
+
+
+def _reuse_tuple_development_pair(
+    public: Path,
+    cfg: dict[str, Any],
+    fixture_manifest: dict[str, Any],
+) -> dict[str, Any] | None:
+    paths = _tuple_qualification_paths(public)
+    present = (
+        paths["development_result"].is_file(),
+        paths["development_threshold_seal"].is_file(),
+    )
+    if present == (False, False):
+        if paths["holdout_result"].exists():
+            raise RuntimeError("E_TUPLE_DEVELOPMENT_PAIR_MISSING_AFTER_HOLDOUT")
+        return None
+    seal, development = _load_tuple_development_pair(
+        public,
+        cfg,
+        fixture_manifest,
+        missing_code="E_TUPLE_DEVELOPMENT_PAIR_MISSING",
+    )
+    return _tuple_qualification_compact(
+        development, seal["development_threshold_commitment_sha256"]
+    )
+
+
+def _tuple_qualification_compact(
+    full: dict[str, Any], threshold_commitment: str
+) -> dict[str, Any]:
+    modules = full["module_results"]
+    combined = full["combined_gate"]
+    integrity = combined["integrity"]
+    return {
+        "status": full["status"],
+        "partition": str(full["partition"]).upper(),
+        "module_count": len(modules),
+        "completed_module_count": sum(
+            result.get("status") in {"PASS", "NO_GO", "UNMEASURED"}
+            for result in modules.values()
+        ),
+        "failed_module_count": int(integrity["error_module_count"]),
+        "critical_axis_pass_count": int(combined["critical_axis_pass_count"]),
+        "validated_axis_count": int(combined["validated_axis_count"]),
+        "action_control_status": str(combined["action_control_status"]),
+        "external_call_count": int(integrity["external_call_count"]),
+        "invalid_retained_record_count": int(
+            integrity["invalid_retained_record_count"]
+        ),
+        "silent_truncation_count": int(integrity["silent_truncation_count"]),
+        "public_qualification_commitment_sha256": full[
+            "public_qualification_commitment_sha256"
+        ],
+        "development_threshold_commitment_sha256": threshold_commitment,
+    }
+
+
+def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
+    """Run one public partition and make exactly one complete stage decision."""
+
+    partition = str(args.partition)
+    if partition not in {"development", "holdout"}:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_PARTITION")
+    cfg = json.loads(args.config.read_text())
+    _tuple_qualification_execution(cfg)
+    output_root = _tuple_qualification_root(args.public_root)
+    _require_external_or_ignored_output(output_root)
+    _require_external_or_ignored_output(args.scratch_root)
+    if (
+        os.environ.get("HF_HUB_OFFLINE") != "1"
+        or os.environ.get("TRANSFORMERS_OFFLINE") != "1"
+    ):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_OFFLINE_ENVIRONMENT")
+    if partition == "holdout":
+        _refuse_tuple_qualification_overwrite(args.public_root, partition)
+    _verify_tuple_runtime_manifest(args.public_root, cfg)
+    manifest, fixture_root = _verify_tuple_fixture_manifest(args.public_root, cfg)
+    correction = _tuple_visor_hos_correction_amendment(cfg)
+    if manifest.get("visor_hos_correction_amendment_commitment_sha256") != correction[
+        "amendment_commitment_sha256"
+    ]:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_CORRECTION_COMMITMENT")
+    no_hand_commitment = manifest.get("verified_no_hand_seal_commitment_sha256")
+    if not isinstance(no_hand_commitment, str) or not re.fullmatch(
+        r"[0-9a-f]{64}", no_hand_commitment
+    ):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_NO_HAND_SEAL")
+    if partition == "development":
+        reused = _reuse_tuple_development_pair(args.public_root, cfg, manifest)
+        if reused is not None:
+            return reused
+    threshold_seal = (
+        _load_tuple_development_threshold_seal(args.public_root, cfg, manifest)
+        if partition == "holdout"
+        else None
+    )
+    args.scratch_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    context = {
+        "cfg": cfg,
+        "public_root": args.public_root,
+        "scratch_root": args.scratch_root,
+        "fixture_root": fixture_root,
+        "fixture_manifest": manifest,
+        "fixture_manifest_commitment_sha256": manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "partition": partition,
+        "rows": manifest["partitions"][partition],
+        "device": args.device,
+        "thresholds": (
+            dict(threshold_seal["selected_thresholds"])
+            if threshold_seal is not None
+            else {}
+        ),
+        "verified_no_hand_seal": {
+            "status": "PASS",
+            "verified_no_hand_seal_commitment_sha256": no_hand_commitment,
+        },
+        "module_cache": {},
+    }
+    runners = _tuple_module_runners()
+    if threshold_seal is not None:
+        threshold_modules = {
+            "referent",
+            "recurrence",
+            "attribute",
+            "hand_contact",
+            "order_action",
+        }
+        for module_id in threshold_modules:
+            if threshold_seal["development_module_statuses"][module_id] != "PASS":
+                runners[module_id] = _development_unqualified_tuple_module_runner(
+                    module_id
+                )
+    module_results = _collect_tuple_module_results(runners, context)
+    _validate_tuple_qualification_record(module_results)
+    observed_thresholds = _tuple_selected_thresholds(
+        cfg,
+        module_results,
+        expected=(threshold_seal["selected_thresholds"] if threshold_seal else None),
+    )
+    selected_thresholds = (
+        dict(threshold_seal["selected_thresholds"])
+        if threshold_seal is not None
+        else observed_thresholds
+    )
+    axis_results = _tuple_axis_results_from_modules(module_results)
+    action_result = module_results["order_action"]
+    combined = _tuple_combined_public_gate(
+        axis_results,
+        action_result,
+        {"status": "DESCRIPTIVE_NOT_RERUN"},
+    )
+    combined = _apply_tuple_integrity_gate(
+        combined, _tuple_qualification_integrity(module_results)
+    )
+    partition_module_commitment = _tuple_development_module_commitment(
+        manifest["public_fixture_manifest_commitment_sha256"],
+        module_results,
+        axis_results,
+        combined,
+    )
+    if partition == "development":
+        seal = _tuple_development_threshold_seal(
+            cfg, manifest, module_results, axis_results, combined
+        )
+        if selected_thresholds != seal["selected_thresholds"]:
+            raise RuntimeError("E_TUPLE_QUALIFICATION_THRESHOLD_SEAL_MISMATCH")
+        threshold_commitment = seal["development_threshold_commitment_sha256"]
+        status = seal["status"]
+        development_module_commitment = partition_module_commitment
+    else:
+        seal = None
+        threshold_commitment = threshold_seal[
+            "development_threshold_commitment_sha256"
+        ]
+        development_module_commitment = threshold_seal[
+            "development_module_result_commitment_sha256"
+        ]
+        status = (
+            "PASS_PUBLIC_COMBINED_GATE"
+            if combined["status"] == "PASS"
+            else "NO_GO_PUBLIC_COMBINED_GATE"
+        )
+    full = {
+        "schema_version": 1,
+        "status": status,
+        "partition": partition,
+        "public_fixture_manifest_commitment_sha256": manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "visor_hos_correction_amendment_commitment_sha256": correction[
+            "amendment_commitment_sha256"
+        ],
+        "verified_no_hand_seal_commitment_sha256": no_hand_commitment,
+        "development_threshold_commitment_sha256": threshold_commitment,
+        "development_module_result_commitment_sha256": development_module_commitment,
+        "partition_module_result_commitment_sha256": partition_module_commitment,
+        "selected_thresholds": selected_thresholds,
+        "module_results": module_results,
+        "axis_results": axis_results,
+        "combined_gate": combined,
+        "broad_activity_context": {
+            "status": "DESCRIPTIVE_NOT_RERUN",
+            "used_in_gate": False,
+        },
+        "restricted_mount_present": False,
+        "network_disabled": True,
+    }
+    full["public_qualification_commitment_sha256"] = digest(full)
+    paths = _tuple_qualification_paths(args.public_root)
+    write_private_new(paths[f"{partition}_result"], full)
+    if seal is not None:
+        write_private_new(paths["development_threshold_seal"], seal)
+    return _tuple_qualification_compact(full, threshold_commitment)
+
+
 def prepare_tuple_audio_seed(args: argparse.Namespace) -> dict[str, Any]:
     cfg = json.loads(args.config.read_text())
     preparation = _tuple_fixture_preparation_amendment(cfg)
+    correction = _tuple_visor_hos_correction_amendment(cfg)
+    audio_recipe = _tuple_referent_audio_fixture(cfg)
     _refuse_git_output(args.output_root)
     if sys.platform != "darwin":
         raise RuntimeError("E_TUPLE_AUDIO_SEED_PLATFORM")
@@ -1897,33 +7448,34 @@ def prepare_tuple_audio_seed(args: argparse.Namespace) -> dict[str, Any]:
     ).stdout
     if not any(line.startswith("Anna ") and "de_DE" in line for line in voices.splitlines()):
         raise RuntimeError("E_TUPLE_AUDIO_SEED_VOICE")
-    grammar = {
-        "sports ball": ("der", "Ball"),
-        "cup": ("der", "Becher"),
-        "bottle": ("die", "Flasche"),
-        "bowl": ("die", "Schüssel"),
-        "book": ("das", "Buch"),
-        "chair": ("der", "Stuhl"),
-        "apple": ("der", "Apfel"),
-        "banana": ("die", "Banane"),
+    nouns = {
+        "sports ball": "Ball",
+        "cup": "Becher",
+        "bottle": "Flasche",
+        "bowl": "Schüssel",
+        "book": "Buch",
+        "chair": "Stuhl",
+        "apple": "Apfel",
+        "banana": "Banane",
     }
-    attributes = ["rot", "blau", "grün", "gelb", "groß", "klein", "rot", "blau"]
     scenarios = preparation["referent_attribute_rendering"][
         "scenarios_once_per_category"
     ]
     root = args.output_root.resolve()
+    active_parts = Path(audio_recipe["active_external_location"]).parts
+    if tuple(root.parts[-len(active_parts) :]) != active_parts:
+        raise RuntimeError("E_TUPLE_AUDIO_SEED_CANONICAL_ROOT")
     root.mkdir(parents=True, exist_ok=False, mode=0o700)
     records = []
     for partition in preparation["partitions"]:
         for category in preparation["public_object_ontology"]:
-            article, noun = grammar[category]
-            for ordinal, (scenario, attribute) in enumerate(
-                zip(scenarios, attributes, strict=True)
-            ):
+            noun = nouns[category]
+            for ordinal, scenario in enumerate(scenarios):
                 if scenario == "no_speech_visible_object":
                     continue
-                prefix = "" if partition == "development" else "Schau, "
-                phrase = f"{prefix}{article.capitalize()} {noun} ist {attribute}."
+                phrase = _tuple_audio_phrase(
+                    audio_recipe, partition, category, ordinal, noun
+                )
                 slug = category.replace(" ", "-")
                 target = root / partition / f"{slug}-{ordinal:02d}.aiff"
                 target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -1957,14 +7509,27 @@ def prepare_tuple_audio_seed(args: argparse.Namespace) -> dict[str, Any]:
         capture_output=True,
     ).stdout.strip()
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": "SEALED_SELF_AUTHORED_PUBLIC_AUDIO_SEED",
         "preparation_amendment_commitment_sha256": preparation[
             "preparation_amendment_commitment_sha256"
         ],
+        "visor_hos_correction_amendment_commitment_sha256": correction[
+            "amendment_commitment_sha256"
+        ],
+        "referent_audio_fixture_recipe": audio_recipe,
+        "referent_audio_fixture_recipe_commitment_sha256": digest(audio_recipe),
+        "active_external_location": audio_recipe["active_external_location"],
         "license": "CC0-1.0 self-authored text and rendered fixture audio",
+        "language": "de",
         "voice": "macOS Anna de_DE",
         "rate_words_per_minute": 175,
+        "muxed_speech_delay_seconds": audio_recipe[
+            "muxed_speech_delay_seconds"
+        ],
+        "maximum_spoken_audio_seconds": audio_recipe[
+            "maximum_spoken_audio_seconds"
+        ],
         "platform_version": os_version,
         "say_binary_sha256": file_digest(say),
         "audio_file_count": len(records),
@@ -2006,29 +7571,49 @@ def _language_lexical_fixture_rows(
         "This {noun} looks blue.",
         "The {noun} leaves and later the {noun} comes back.",
     ]
-    templates = (
-        development_templates if partition == "development" else holdout_templates
-    )
+    templates = development_templates if partition == "development" else holdout_templates
     output = []
     for category, (german, english) in nouns.items():
         for variant, template in enumerate(templates):
             text_en = template.format(noun=english)
-            expected = [{"token": english, "part_of_speech": "noun"}]
-            if variant in (1, 2):
-                expected.append(
-                    {
-                        "token": "red" if variant == 1 else "blue",
-                        "part_of_speech": "adjective",
-                    }
-                )
-            if variant == 3:
-                expected.append({"token": english, "part_of_speech": "noun"})
+            if variant == 0:
+                expected = [{"token": english, "part_of_speech": "noun"}]
+            elif variant == 1:
+                expected = [
+                    {"token": "red", "part_of_speech": "adjective"},
+                    {"token": english, "part_of_speech": "noun"},
+                ]
+            elif variant == 2:
+                expected = [
+                    {"token": english, "part_of_speech": "noun"},
+                    {"token": "blue", "part_of_speech": "adjective"},
+                ]
+            else:
+                expected = [
+                    {"token": english, "part_of_speech": "noun"},
+                    {"token": english, "part_of_speech": "noun"},
+                ]
+            expected_adjective_noun_spans = (
+                [{"adjective": "red", "noun": english}] if variant == 1 else []
+            )
+            expected = [
+                {
+                    **item,
+                    "expected_lemma": item["token"],
+                    "expected_frequency_band": "high",
+                }
+                for item in expected
+            ]
             output.append(
                 {
                     "case_id": f"{partition}-accept-{category.replace(' ', '-')}-{variant}",
                     "partition": partition,
-                    "expected_pipeline_status": "ACCEPT",
-                    "expected_reason": None,
+                    "expected_adapter_status": "ACCEPT",
+                    "expected_adapter_reason": None,
+                    "expected_tuple_status": "ACCEPT",
+                    "expected_tuple_reason": None,
+                    "expected_grounding_status": "ACCEPT",
+                    "expected_grounding_reason": None,
                     "prediction": {
                         "text": f"Der {german}",
                         "language": "de",
@@ -2057,6 +7642,7 @@ def _language_lexical_fixture_rows(
                         "en": text_en,
                     },
                     "expected_lexical_mentions": expected,
+                    "expected_adjective_noun_spans": expected_adjective_noun_spans,
                     "expected_public_category": category,
                     "episode_id": f"{partition}-episode-{variant % 2}",
                 }
@@ -2119,12 +7705,51 @@ def _language_lexical_fixture_rows(
             elif reason == "ONTOLOGY_UNMATCHED":
                 text_en = "The cloud."
                 segment["en"] = text_en
+            adapter_status = (
+                "ABSTAIN"
+                if reason
+                in {
+                    "LANGUAGE_MISMATCH",
+                    "EMPTY_ASR",
+                    "INVALID_TIMESTAMP",
+                    "LOW_CONFIDENCE",
+                    "EMPTY_TRANSLATION",
+                    "SILENT_TRUNCATION",
+                }
+                else "ACCEPT"
+            )
+            tuple_status = (
+                "ABSTAIN"
+                if adapter_status == "ABSTAIN"
+                or reason == "INSUFFICIENT_IN_BOUNDS_FRAMES"
+                else "ACCEPT"
+            )
+            expected_mentions = (
+                [
+                    {
+                        "token": "cloud",
+                        "part_of_speech": "noun",
+                        "expected_lemma": "cloud",
+                        "expected_frequency_band": "high",
+                    }
+                ]
+                if reason == "ONTOLOGY_UNMATCHED"
+                else []
+            )
             output.append(
                 {
                     "case_id": f"{partition}-abstain-{reason.casefold()}-{repeat}",
                     "partition": partition,
-                    "expected_pipeline_status": "ABSTAIN",
-                    "expected_reason": reason,
+                    "expected_adapter_status": adapter_status,
+                    "expected_adapter_reason": (
+                        reason if adapter_status == "ABSTAIN" else None
+                    ),
+                    "expected_tuple_status": tuple_status,
+                    "expected_tuple_reason": (
+                        reason if tuple_status == "ABSTAIN" else None
+                    ),
+                    "expected_grounding_status": "ABSTAIN",
+                    "expected_grounding_reason": reason,
                     "prediction": prediction,
                     "audio_duration": 7.0,
                     "translation_status": (
@@ -2132,7 +7757,8 @@ def _language_lexical_fixture_rows(
                     ),
                     "text_en": text_en,
                     "segment": segment,
-                    "expected_lexical_mentions": [],
+                    "expected_lexical_mentions": expected_mentions,
+                    "expected_adjective_noun_spans": [],
                     "expected_public_category": None,
                     "episode_id": f"{partition}-abstain-episode-{repeat}",
                 }
@@ -2243,6 +7869,270 @@ def _paste_masked_object(canvas, mask, crop, center: tuple[int, int], longest: i
     mask.paste(alpha, (left, top), alpha)
 
 
+REFERENT_ATTRIBUTE_VALUES = (
+    "red",
+    "blue",
+    "green",
+    "yellow",
+    "big",
+    "small",
+    "red",
+    "blue",
+)
+REFERENT_ATTRIBUTE_SIZE_LONGEST_PIXELS = {"big": 130, "small": 72}
+REFERENT_DISTRACTOR_SCENARIOS = frozenset(
+    {
+        "persistent_ambiguous",
+        "persistent_dominant_with_small_distractor",
+    }
+)
+
+
+def _referent_attribute_source_index(ordinal: int, source_count: int) -> int:
+    """Keep the public big/small contrast paired on one exact source crop."""
+
+    if source_count <= 0 or not 0 <= ordinal < len(REFERENT_ATTRIBUTE_VALUES):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_SOURCE_INDEX")
+    if REFERENT_ATTRIBUTE_VALUES[ordinal] in {"big", "small"}:
+        return 0
+    return ordinal % source_count
+
+
+def _referent_attribute_source_records(
+    records: list[dict[str, Any]], ordinal: int, scenario: str
+) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    """Select a same-category, independently sourced distractor only when used."""
+
+    target_index = _referent_attribute_source_index(ordinal, len(records))
+    target = records[target_index]
+    if scenario not in REFERENT_DISTRACTOR_SCENARIOS:
+        return target, None
+    if len(records) < 2:
+        raise RuntimeError("E_TUPLE_DISTRACTOR_SOURCE_YIELD")
+    distractor = records[(target_index + 1) % len(records)]
+    required = ("category", "image_id", "annotation_id", "source_image_sha256")
+    if any(key not in target or key not in distractor for key in required):
+        raise RuntimeError("E_TUPLE_DISTRACTOR_SOURCE_IDENTITY")
+    if target["category"] != distractor["category"]:
+        raise RuntimeError("E_TUPLE_DISTRACTOR_CATEGORY_MISMATCH")
+    if (
+        target["image_id"] == distractor["image_id"]
+        or target["annotation_id"] == distractor["annotation_id"]
+        or target["source_image_sha256"] == distractor["source_image_sha256"]
+    ):
+        raise RuntimeError("E_TUPLE_DISTRACTOR_SOURCE_IDENTITY")
+    return target, distractor
+
+
+def _referent_attribute_episode_id(
+    partition: str,
+    category: str,
+    scenario: str,
+    ordinal: int,
+    source_index: int,
+) -> str:
+    if not partition or not category or not scenario or not 0 <= ordinal < len(
+        REFERENT_ATTRIBUTE_VALUES
+    ):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_EPISODE_ID")
+    if REFERENT_ATTRIBUTE_VALUES[ordinal] in {"big", "small"}:
+        return f"{partition}|{category}|relative-size|{source_index}"
+    return f"{partition}|{category}|{scenario}"
+
+
+def _mask_fraction(mask: Any) -> float:
+    import numpy as np
+
+    array = np.asarray(mask)
+    if array.ndim != 2 or array.size == 0 or not np.isfinite(array).all():
+        raise RuntimeError("E_TUPLE_COMPOSITE_MASK_GEOMETRY")
+    return float((array > 0).mean())
+
+
+def _referent_attribute_phase_truth(
+    target_masks: Any,
+    distractor_masks: Any,
+    *,
+    fps: int,
+    duration_seconds: float,
+    utterance_start: float,
+    utterance_end: float,
+    definitions: dict[str, Any],
+) -> dict[str, Any]:
+    """Derive sampled phase truth from the retained authored masks.
+
+    The exact masks are reference labels only.  They are never a permissible
+    deterministic measurement input; model measurements must use a predicted
+    SAM mask through ``_predicted_mask_attribute_measurements`` below.
+    """
+
+    import numpy as np
+
+    targets = np.asarray(target_masks)
+    distractors = np.asarray(distractor_masks)
+    if (
+        targets.ndim != 3
+        or targets.shape != distractors.shape
+        or targets.shape[0] < 1
+        or fps <= 0
+    ):
+        raise RuntimeError("E_TUPLE_COMPOSITE_MASK_GEOMETRY")
+    values = (
+        float(duration_seconds),
+        float(utterance_start),
+        float(utterance_end),
+    )
+    if (
+        not all(math.isfinite(value) for value in values)
+        or values[0] <= 0.0
+        or not 0.0 <= values[1] < values[2] <= values[0]
+    ):
+        raise RuntimeError("E_TUPLE_COMPOSITE_PHASE_BOUNDS")
+    visible_floor = float(definitions["visible_mask_fraction_min"])
+    dominant_floor = float(definitions["dominant_target_mask_fraction_min"])
+    ratio_floor = float(definitions["dominant_area_ratio_to_next_candidate_min"])
+    if not (
+        0.0 <= visible_floor <= 1.0
+        and 0.0 <= dominant_floor <= 1.0
+        and math.isfinite(ratio_floor)
+        and ratio_floor >= 1.0
+    ):
+        raise RuntimeError("E_TUPLE_COMPOSITE_PHASE_DEFINITION")
+    requested = {
+        "before": [utterance_start - 2.5, utterance_start - 1.5, utterance_start - 0.5],
+        "during": [
+            utterance_start
+            + (index + 0.5) * (utterance_end - utterance_start) / 3.0
+            for index in range(3)
+        ],
+        "after": [utterance_end + 0.5, utterance_end + 1.5, utterance_end + 2.5],
+    }
+    sample_rows: dict[str, list[dict[str, Any]]] = {
+        phase: [] for phase in requested
+    }
+    maximum_frame_time = (targets.shape[0] - 1) / fps
+    for phase, timestamps in requested.items():
+        for timestamp in timestamps:
+            if not 0.0 <= timestamp <= duration_seconds or timestamp > maximum_frame_time:
+                continue
+            frame_index = int(round(timestamp * fps))
+            if not 0 <= frame_index < targets.shape[0]:
+                continue
+            target_fraction = _mask_fraction(targets[frame_index])
+            distractor_fraction = _mask_fraction(distractors[frame_index])
+            target_visible = target_fraction >= visible_floor
+            candidate_count = int(target_visible) + int(
+                distractor_fraction >= visible_floor
+            )
+            ratio = target_fraction / max(distractor_fraction, 1e-12)
+            sample_rows[phase].append(
+                {
+                    "phase": phase,
+                    "sample_time": round(float(timestamp), 6),
+                    "frame_index": frame_index,
+                    "target_visible": target_visible,
+                    "candidate_count_bin": (
+                        "2plus" if candidate_count >= 2 else str(candidate_count)
+                    ),
+                    "dominant": (
+                        target_visible
+                        and target_fraction >= dominant_floor
+                        and ratio >= ratio_floor
+                    ),
+                    "target_fraction": target_fraction,
+                    "distractor_fraction": distractor_fraction,
+                }
+            )
+    sample_counts = {phase: len(rows) for phase, rows in sample_rows.items()}
+    if sum(sample_counts.values()) < 8 or any(count < 2 for count in sample_counts.values()):
+        raise RuntimeError("E_TUPLE_COMPOSITE_PHASE_COVERAGE")
+
+    visibility: dict[str, bool] = {}
+    candidates: dict[str, str] = {}
+    dominance: dict[str, bool | None] = {}
+    target_fraction_medians: dict[str, float] = {}
+    distractor_fraction_medians: dict[str, float] = {}
+    candidate_order = {"0": 0, "1": 1, "2plus": 2}
+    for phase, rows in sample_rows.items():
+        visibility[phase] = sum(row["target_visible"] for row in rows) >= 2
+        counts = Counter(row["candidate_count_bin"] for row in rows)
+        candidates[phase] = max(
+            counts,
+            key=lambda label: (counts[label], candidate_order[label]),
+        )
+        visible_rows = [row for row in rows if row["target_visible"]]
+        dominance[phase] = (
+            sum(row["dominant"] for row in visible_rows) >= 2
+            if visibility[phase]
+            else None
+        )
+        target_fraction_medians[phase] = round(
+            float(statistics.median(row["target_fraction"] for row in rows)), 8
+        )
+        distractor_fraction_medians[phase] = round(
+            float(statistics.median(row["distractor_fraction"] for row in rows)),
+            8,
+        )
+    return {
+        "visibility_by_phase": visibility,
+        "candidate_count_by_phase": candidates,
+        "dominance_by_phase": dominance,
+        "sample_count_by_phase": sample_counts,
+        "sampled_mask_truth": [
+            row
+            for phase in ("before", "during", "after")
+            for row in sample_rows[phase]
+        ],
+        "target_mask_fraction_median_by_phase": target_fraction_medians,
+        "distractor_mask_fraction_median_by_phase": distractor_fraction_medians,
+    }
+
+
+def _predicted_mask_attribute_measurements(
+    image_array: Any,
+    predicted_mask: Any,
+    *,
+    mask_role: str,
+) -> dict[str, Any]:
+    """Measure pixels only through an explicitly identified predicted SAM mask."""
+
+    import numpy as np
+
+    if mask_role != "predicted_SAM_mask":
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_REFERENCE_MASK_PROHIBITED")
+    image = np.asarray(image_array)
+    mask = np.asarray(predicted_mask)
+    if (
+        image.ndim != 3
+        or image.shape[2] != 3
+        or mask.ndim != 2
+        or image.shape[:2] != mask.shape
+        or image.size == 0
+        or not np.isfinite(image).all()
+        or not np.isfinite(mask).all()
+    ):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_PREDICTED_MASK_GEOMETRY")
+    selected = mask > 0
+    if not selected.any():
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_PREDICTED_MASK_EMPTY")
+    y_indices, x_indices = np.nonzero(selected)
+    height, width = mask.shape
+    median_rgb = np.median(image[selected].astype(np.float64), axis=0)
+    if not np.isfinite(median_rgb).all():
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_PREDICTED_MASK_NONFINITE")
+    box_width = int(x_indices.max() - x_indices.min() + 1)
+    box_height = int(y_indices.max() - y_indices.min() + 1)
+    return {
+        "mask_fraction": round(float(selected.mean()), 8),
+        "median_rgb": [round(float(value), 6) for value in median_rgb],
+        "bbox_width_fraction": round(box_width / width, 8),
+        "bbox_height_fraction": round(box_height / height, 8),
+        "bbox_longest_side_fraction": round(
+            max(box_width / width, box_height / height), 8
+        ),
+    }
+
+
 def _render_referent_fixture(
     preparation: dict[str, Any],
     partition: str,
@@ -2251,7 +8141,8 @@ def _render_referent_fixture(
     ordinal: int,
     target_crop,
     distractor_crop,
-) -> tuple[list[Any], Any, dict[str, Any]]:
+    definitions: dict[str, Any],
+) -> tuple[list[Any], Any, Any, dict[str, Any]]:
     import numpy as np
     from PIL import Image
 
@@ -2259,12 +8150,22 @@ def _render_referent_fixture(
     width, height = int(geometry["width"]), int(geometry["height"])
     frame_count = int(geometry["frames"])
     fps = int(geometry["fps"])
-    attributes = ["red", "blue", "green", "yellow", "big", "small", "red", "blue"]
-    attribute = attributes[ordinal]
+    if not 0 <= ordinal < len(REFERENT_ATTRIBUTE_VALUES):
+        raise RuntimeError("E_TUPLE_ATTRIBUTE_ORDINAL")
+    attribute = REFERENT_ATTRIBUTE_VALUES[ordinal]
     target = _tint_object(target_crop, attribute)
-    distractor = _tint_object(distractor_crop, "green")
-    target_size = 72 if attribute == "small" else 130 if attribute == "big" else 104
-    target_size = 118 if scenario == "persistent_dominant_with_small_distractor" else target_size
+    if scenario in REFERENT_DISTRACTOR_SCENARIOS:
+        if distractor_crop is None:
+            raise RuntimeError("E_TUPLE_DISTRACTOR_SOURCE_MISSING")
+        distractor = _tint_object(distractor_crop, "green")
+    else:
+        distractor = None
+    target_size = REFERENT_ATTRIBUTE_SIZE_LONGEST_PIXELS.get(attribute, 104)
+    background_identity = (
+        f"{partition}|{category}|relative-size-pair"
+        if attribute in {"big", "small"}
+        else f"{partition}|{category}|{scenario}"
+    )
     visibility = {
         "persistent_clear": {"before", "during", "after"},
         "during_only": {"during"},
@@ -2276,7 +8177,8 @@ def _render_referent_fixture(
         "no_speech_visible_object": {"before", "during", "after"},
     }[scenario]
     frames = []
-    masks = np.zeros((frame_count, height, width), dtype=np.uint8)
+    target_masks = np.zeros((frame_count, height, width), dtype=np.uint8)
+    distractor_masks = np.zeros((frame_count, height, width), dtype=np.uint8)
     for frame_index in range(frame_count):
         timestamp = frame_index / fps
         phase = "before" if timestamp < 2.5 else "during" if timestamp <= 4.5 else "after"
@@ -2284,16 +8186,16 @@ def _render_referent_fixture(
             width,
             height,
             int(preparation["seed"]),
-            f"{partition}|{category}|{scenario}",
+            background_identity,
         ).convert("RGBA")
         target_mask = Image.new("L", (width, height), 0)
+        distractor_mask = Image.new("L", (width, height), 0)
         if phase in visibility:
             sway = int(round(8 * math.sin(frame_index / 7.0)))
             _paste_masked_object(
                 canvas, target_mask, target, (width // 2 + sway, height // 2), target_size
             )
-        if scenario in {"persistent_ambiguous", "persistent_dominant_with_small_distractor"}:
-            distractor_mask = Image.new("L", (width, height), 0)
+        if scenario in REFERENT_DISTRACTOR_SCENARIOS:
             distractor_size = target_size if scenario == "persistent_ambiguous" else 45
             _paste_masked_object(
                 canvas,
@@ -2303,26 +8205,57 @@ def _render_referent_fixture(
                 distractor_size,
             )
         frames.append(np.asarray(canvas.convert("RGB"), dtype=np.uint8))
-        masks[frame_index] = (np.asarray(target_mask, dtype=np.uint8) > 0).astype(np.uint8)
+        target_masks[frame_index] = (
+            np.asarray(target_mask, dtype=np.uint8) > 0
+        ).astype(np.uint8)
+        distractor_masks[frame_index] = (
+            np.asarray(distractor_mask, dtype=np.uint8) > 0
+        ).astype(np.uint8)
+    phase_truth = _referent_attribute_phase_truth(
+        target_masks,
+        distractor_masks,
+        fps=fps,
+        duration_seconds=float(geometry["duration_seconds"]),
+        utterance_start=float(
+            preparation["referent_attribute_rendering"][
+                "utterance_interval_seconds"
+            ][0]
+        ),
+        utterance_end=float(
+            preparation["referent_attribute_rendering"][
+                "utterance_interval_seconds"
+            ][1]
+        ),
+        definitions=definitions,
+    )
     truth = {
         "attribute": attribute,
-        "speech_present": scenario != "no_speech_visible_object",
-        "visibility": {
-            phase: phase in visibility for phase in ("before", "during", "after")
-        },
-        "dominant": scenario in {
-            "persistent_clear",
-            "during_only",
-            "before_only",
-            "after_only",
-            "persistent_dominant_with_small_distractor",
-            "no_speech_visible_object",
-        },
-        "candidate_count_bin": (
-            "0" if scenario == "speech_no_referent" else "2plus" if scenario == "persistent_ambiguous" else "1"
+        "attribute_family": (
+            "relative_size" if attribute in {"big", "small"} else "color"
         ),
+        "target_longest_side_pixels": target_size,
+        "background_identity_role": (
+            "shared_relative_size_pair"
+            if attribute in {"big", "small"}
+            else "scenario_specific"
+        ),
+        "speech_present": scenario != "no_speech_visible_object",
+        **phase_truth,
+        "attribute_contrast_expected": (
+            scenario != "no_speech_visible_object"
+            and any(phase_truth["visibility_by_phase"].values())
+        ),
+        "attribute_null_reason": (
+            "NO_ACCEPTED_ADJECTIVE_NOUN_SPAN"
+            if scenario == "no_speech_visible_object"
+            else "NO_PREDICTED_REFERENT_MASK"
+            if not any(phase_truth["visibility_by_phase"].values())
+            else None
+        ),
+        "reference_mask_role": "TRUTH_ONLY_NOT_A_MEASUREMENT_INPUT",
+        "deterministic_measurement_mask_role": "predicted_SAM_mask",
     }
-    return frames, masks, truth
+    return frames, target_masks, distractor_masks, truth
 
 
 def _write_fixture_video(
@@ -2410,27 +8343,40 @@ def _render_recurrence_pair(
     second_crop,
     stratum: str,
     ordinal: int,
-) -> tuple[Any, Any]:
+) -> tuple[Any, Any, Any, Any]:
     from PIL import Image, ImageEnhance
 
     def normalized(crop):
         canvas = Image.new("RGBA", (224, 224), (112, 118, 125, 255))
-        resized = crop.copy()
+        resized = crop.convert("RGBA").copy()
         resized.thumbnail((168, 168), Image.Resampling.LANCZOS)
-        canvas.alpha_composite(
-            resized,
-            ((224 - resized.width) // 2, (224 - resized.height) // 2),
-        )
-        return canvas.convert("RGB")
+        location = ((224 - resized.width) // 2, (224 - resized.height) // 2)
+        canvas.alpha_composite(resized, location)
+        mask = Image.new("L", canvas.size, 0)
+        mask.paste(resized.getchannel("A"), location)
+        mask = mask.point(lambda value: 255 if value >= 128 else 0, mode="L")
+        if mask.getbbox() is None:
+            raise RuntimeError("E_TUPLE_RECURRENCE_SOURCE_MASK_EMPTY")
+        return canvas.convert("RGB"), mask
 
-    first = normalized(first_crop)
-    second = normalized(second_crop)
+    first, first_mask = normalized(first_crop)
+    second, second_mask = normalized(second_crop)
     if stratum == "same_instance_transformed":
         second = ImageEnhance.Brightness(first).enhance(0.75 if ordinal % 2 else 1.25)
-        second = second.rotate(4 if ordinal % 2 else -4, resample=Image.Resampling.BILINEAR)
+        angle = 4 if ordinal % 2 else -4
+        second = second.rotate(angle, resample=Image.Resampling.BILINEAR)
+        second_mask = first_mask.rotate(
+            angle, resample=Image.Resampling.NEAREST, fillcolor=0
+        )
     elif stratum == "same_instance_near_duplicate":
         second = ImageEnhance.Brightness(first).enhance(0.98 if ordinal % 2 else 1.02)
-    return first, second
+        second_mask = first_mask.copy()
+    for mask in (first_mask, second_mask):
+        if mask.size != (224, 224) or mask.getbbox() is None or set(
+            value for value, count in enumerate(mask.histogram()) if count
+        ) - {0, 255}:
+            raise RuntimeError("E_TUPLE_RECURRENCE_MASK")
+    return first, second, first_mask, second_mask
 
 
 def _sensor_condition_frames(base_frames: list[Any], condition: str) -> list[Any]:
@@ -2948,24 +8894,94 @@ def _fixture_archive(
 
 
 def _read_audio_seed_manifest(
-    root: Path, preparation: dict[str, Any]
+    root: Path, cfg: dict[str, Any]
 ) -> tuple[dict[str, Any], dict[tuple[str, str, str], Path]]:
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    correction = _tuple_visor_hos_correction_amendment(cfg)
+    recipe = _tuple_referent_audio_fixture(cfg)
+    active_parts = Path(recipe["active_external_location"]).parts
+    if tuple(root.resolve().parts[-len(active_parts) :]) != active_parts:
+        raise RuntimeError("E_TUPLE_AUDIO_SEED_CANONICAL_ROOT")
     path = root / "audio-seed-manifest.json"
     manifest = json.loads(path.read_text())
     commitment = manifest.pop("audio_seed_commitment_sha256", None)
     if (
         not isinstance(commitment, str)
         or digest(manifest) != commitment
+        or manifest.get("schema_version") != 2
         or manifest.get("preparation_amendment_commitment_sha256")
         != preparation["preparation_amendment_commitment_sha256"]
+        or manifest.get("visor_hos_correction_amendment_commitment_sha256")
+        != correction["amendment_commitment_sha256"]
+        or manifest.get("referent_audio_fixture_recipe") != recipe
+        or manifest.get("referent_audio_fixture_recipe_commitment_sha256")
+        != digest(recipe)
+        or manifest.get("active_external_location")
+        != recipe["active_external_location"]
+        or manifest.get("language") != recipe["language"]
+        or manifest.get("voice") != "macOS Anna de_DE"
+        or manifest.get("rate_words_per_minute") != 175
+        or manifest.get("muxed_speech_delay_seconds")
+        != recipe["muxed_speech_delay_seconds"]
+        or manifest.get("maximum_spoken_audio_seconds")
+        != recipe["maximum_spoken_audio_seconds"]
+        or manifest.get("audio_file_count") != 112
         or manifest.get("status") != "SEALED_SELF_AUTHORED_PUBLIC_AUDIO_SEED"
     ):
         raise RuntimeError("E_TUPLE_AUDIO_SEED_MANIFEST")
     manifest["audio_seed_commitment_sha256"] = commitment
+    nouns = {
+        "sports ball": "Ball",
+        "cup": "Becher",
+        "bottle": "Flasche",
+        "bowl": "Schüssel",
+        "book": "Buch",
+        "chair": "Stuhl",
+        "apple": "Apfel",
+        "banana": "Banane",
+    }
+    scenarios = preparation["referent_attribute_rendering"][
+        "scenarios_once_per_category"
+    ]
+    expected: dict[tuple[str, str, str], tuple[int, str, str]] = {}
+    for partition in preparation["partitions"]:
+        for category in preparation["public_object_ontology"]:
+            for ordinal, scenario in enumerate(scenarios):
+                if scenario == "no_speech_visible_object":
+                    continue
+                slug = category.replace(" ", "-")
+                expected[(partition, category, scenario)] = (
+                    ordinal,
+                    _tuple_audio_phrase(
+                        recipe, partition, category, ordinal, nouns[category]
+                    ),
+                    f"{partition}/{slug}-{ordinal:02d}.aiff",
+                )
     records = {}
-    for row in manifest.get("records", []):
+    rows = manifest.get("records")
+    if not isinstance(rows, list):
+        raise RuntimeError("E_TUPLE_AUDIO_SEED_MANIFEST")
+    for row in rows:
+        if not isinstance(row, dict):
+            raise RuntimeError("E_TUPLE_AUDIO_SEED_MANIFEST")
+        key = (row.get("partition"), row.get("category"), row.get("scenario"))
+        expected_row = expected.get(key)
+        if expected_row is None:
+            raise RuntimeError("E_TUPLE_AUDIO_SEED_RECIPE")
+        ordinal, phrase, expected_relative = expected_row
+        if (
+            row.get("ordinal") != ordinal
+            or row.get("phrase_de") != phrase
+            or row.get("relative_path") != expected_relative
+        ):
+            raise RuntimeError("E_TUPLE_AUDIO_SEED_RECIPE")
         relative = Path(str(row.get("relative_path", "")))
-        if relative.is_absolute() or ".." in relative.parts:
+        if (
+            relative.is_absolute()
+            or not relative.parts
+            or ".." in relative.parts
+            or any(not part or part in {".", ".."} for part in relative.parts)
+        ):
             raise RuntimeError("E_TUPLE_AUDIO_SEED_PATH")
         source = root / relative
         if (
@@ -2974,11 +8990,10 @@ def _read_audio_seed_manifest(
             or source.stat().st_size != int(row.get("bytes", -1))
         ):
             raise RuntimeError("E_TUPLE_AUDIO_SEED_HASH")
-        key = (row["partition"], row["category"], row["scenario"])
         if key in records:
             raise RuntimeError("E_TUPLE_AUDIO_SEED_DUPLICATE")
         records[key] = source
-    if len(records) != 112:
+    if set(records) != set(expected):
         raise RuntimeError("E_TUPLE_AUDIO_SEED_COUNT")
     return manifest, records
 
@@ -3041,6 +9056,1271 @@ def _load_visor_annotation_documents(
             }
         )
     return base, source_root, documents, provenance
+
+
+def _download_sized_public_file(url: str, target: Path, expected_bytes: int) -> None:
+    """Download one official public file, retaining valid resumable state."""
+
+    if expected_bytes <= 0:
+        raise RuntimeError("E_VISOR_HOS_RESOURCE_SIZE")
+    if target.is_file() and target.stat().st_size == expected_bytes:
+        return
+    target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    partial = target.with_suffix(target.suffix + ".partial")
+    if partial.is_file() and partial.stat().st_size == expected_bytes:
+        os.chmod(partial, 0o600)
+        partial.replace(target)
+        return
+    if partial.is_file() and partial.stat().st_size > expected_bytes:
+        partial.unlink()
+    for attempt in range(5):
+        offset = partial.stat().st_size if partial.is_file() else 0
+        headers = {"User-Agent": "synthetic-video-research/1"}
+        if offset:
+            headers["Range"] = f"bytes={offset}-"
+        request = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(request, timeout=300) as response:
+                status = int(getattr(response, "status", response.getcode()))
+                mode = "ab" if offset and status == 206 else "wb"
+                with partial.open(mode) as handle:
+                    shutil.copyfileobj(response, handle, length=1024 * 1024)
+            if partial.stat().st_size == expected_bytes:
+                break
+            if partial.stat().st_size > expected_bytes:
+                partial.unlink()
+        except (OSError, urllib.error.URLError):
+            if attempt == 4:
+                raise
+        if attempt == 4:
+            raise RuntimeError("E_VISOR_HOS_RESOURCE_SIZE")
+        time.sleep(2**attempt)
+    if not partial.is_file() or partial.stat().st_size != expected_bytes:
+        raise RuntimeError("E_VISOR_HOS_RESOURCE_SIZE")
+    os.chmod(partial, 0o600)
+    partial.replace(target)
+
+
+def _visor_hos_resource_rows(
+    package: dict[str, Any], split: str, frozen: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """Validate one pinned official CKAN package without inferring names."""
+
+    result = package.get("result") if package.get("success") is True else None
+    resources = result.get("resources") if isinstance(result, dict) else None
+    if (
+        not isinstance(resources, list)
+        or result.get("name") != frozen.get("dataset_id")
+        or result.get("revision_id") != frozen.get("revision_id")
+        or len(resources) != int(frozen.get("JSON_file_count", -1))
+    ):
+        raise RuntimeError("E_VISOR_HOS_CATALOG_REVISION")
+    output = []
+    seen: set[str] = set()
+    for resource in resources:
+        if not isinstance(resource, dict):
+            raise RuntimeError("E_VISOR_HOS_CATALOG_RESOURCE")
+        name = str(resource.get("name", ""))
+        url = str(resource.get("url", ""))
+        try:
+            size = int(resource["size"])
+        except (KeyError, TypeError, ValueError, OverflowError) as error:
+            raise RuntimeError("E_VISOR_HOS_CATALOG_RESOURCE") from error
+        parsed = urllib.parse.urlsplit(url)
+        expected_path = (
+            "/datasets/2v6cgv1x04ol22qp9rm9x2j6a7/"
+            "GroundTruth-SparseAnnotations/annotations/"
+            f"{split}/{urllib.parse.quote(name)}"
+        )
+        if (
+            name in seen
+            or not re.fullmatch(r"P\d{2}_\d{2,3}\.json", name)
+            or Path(name).name != name
+            or parsed.scheme != "https"
+            or parsed.hostname != "data.bris.ac.uk"
+            or parsed.path != expected_path
+            or parsed.query
+            or parsed.fragment
+            or size <= 0
+            or resource.get("hash") not in (None, "")
+        ):
+            raise RuntimeError("E_VISOR_HOS_CATALOG_RESOURCE")
+        seen.add(name)
+        output.append(
+            {
+                "split": split,
+                "name": name,
+                "url": url,
+                "bytes": size,
+                "resource_id": str(resource.get("id", "")),
+            }
+        )
+    if sum(row["bytes"] for row in output) != int(frozen.get("bytes", -1)):
+        raise RuntimeError("E_VISOR_HOS_CATALOG_BYTES")
+    return sorted(output, key=lambda row: row["name"].encode("utf-8"))
+
+
+def _visor_hos_annotation_commitments(
+    artifact_root: Path, paths: list[Path]
+) -> tuple[str, str, bytes, list[dict[str, Any]]]:
+    """Compute the two frozen locally resolved 158-file commitments exactly."""
+
+    ordered = sorted(paths, key=lambda path: path.relative_to(artifact_root).as_posix().encode("utf-8"))
+    shasum_lines: list[bytes] = []
+    framed = hashlib.sha256()
+    records = []
+    for path in ordered:
+        relative = path.relative_to(artifact_root).as_posix()
+        relative_bytes = relative.encode("utf-8")
+        size = path.stat().st_size
+        sha256 = file_digest(path)
+        shasum_lines.append(f"{sha256}  {relative}\n".encode("ascii"))
+        framed.update(relative_bytes)
+        framed.update(b"\0")
+        framed.update(str(size).encode("ascii"))
+        framed.update(b"\0")
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                framed.update(chunk)
+        records.append(
+            {
+                "relative_path": relative,
+                "sha256": sha256,
+                "bytes": size,
+            }
+        )
+    manifest_bytes = b"".join(shasum_lines)
+    return (
+        hashlib.sha256(manifest_bytes).hexdigest(),
+        framed.hexdigest(),
+        manifest_bytes,
+        records,
+    )
+
+
+def _load_official_visor_hos_annotation_paths(
+    fixture_root: Path, amendment: dict[str, Any]
+) -> tuple[list[Path], dict[str, Any]]:
+    """Resolve and verify exactly the pinned official train+validation set."""
+
+    frozen = amendment["official_annotation_artifact"]
+    source_root = fixture_root / "sources/VISOR-HOS"
+    artifact_root = source_root / "annotations"
+    catalog_root = source_root / "catalog"
+    all_rows: list[dict[str, Any]] = []
+    catalog_records = []
+    for split, key in (("train", "train_resource"), ("val", "validation_resource")):
+        split_frozen = frozen[key]
+        package_url = (
+            "https://data.bris.ac.uk/data/api/3/action/package_show?id="
+            + split_frozen["dataset_id"]
+        )
+        catalog_path = catalog_root / f"{split}-package.json"
+        _download_public_file(package_url, catalog_path)
+        package = json.loads(catalog_path.read_text())
+        rows = _visor_hos_resource_rows(package, split, split_frozen)
+        all_rows.extend(rows)
+        catalog_records.append(
+            {
+                "split": split,
+                "dataset_id": split_frozen["dataset_id"],
+                "revision_id": split_frozen["revision_id"],
+                "catalog_sha256": file_digest(catalog_path),
+                "resource_count": len(rows),
+                "resource_bytes": sum(row["bytes"] for row in rows),
+            }
+        )
+    expected_paths = {
+        artifact_root / row["split"] / row["name"] for row in all_rows
+    }
+    if len(expected_paths) != int(frozen["combined_JSON_file_count"]):
+        raise RuntimeError("E_VISOR_HOS_RESOURCE_SET")
+    for row in all_rows:
+        target = artifact_root / row["split"] / row["name"]
+        _download_sized_public_file(row["url"], target, int(row["bytes"]))
+    discovered = set()
+    for split in ("train", "val"):
+        root = artifact_root / split
+        if root.is_dir():
+            discovered.update(root.glob("*.json"))
+    if discovered != expected_paths:
+        raise RuntimeError("E_VISOR_HOS_RESOURCE_SET")
+    paths = sorted(
+        expected_paths,
+        key=lambda path: path.relative_to(artifact_root).as_posix().encode("utf-8"),
+    )
+    if (
+        len(paths) != int(frozen["combined_JSON_file_count"])
+        or sum(path.stat().st_size for path in paths) != int(frozen["combined_bytes"])
+    ):
+        raise RuntimeError("E_VISOR_HOS_RESOURCE_SET")
+    manifest_commitment, framed_commitment, manifest_bytes, records = (
+        _visor_hos_annotation_commitments(artifact_root, paths)
+    )
+    if manifest_commitment != frozen[
+        "external_sorted_relative_path_and_SHA256_manifest_commitment_sha256"
+    ]:
+        raise RuntimeError("E_VISOR_HOS_SHASUM_MANIFEST_COMMITMENT")
+    if framed_commitment != frozen[
+        "external_path_size_and_bytes_framed_content_commitment_sha256"
+    ]:
+        raise RuntimeError("E_VISOR_HOS_BYTES_FRAMED_COMMITMENT")
+    manifest_path = source_root / "sha256_manifest.txt"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    manifest_path.write_bytes(manifest_bytes)
+    os.chmod(manifest_path, 0o600)
+    provenance = {
+        "schema_version": 1,
+        "status": "PASS_EXACT_OFFICIAL_ARTIFACT",
+        "doi": frozen["doi"],
+        "catalogs": catalog_records,
+        "files": records,
+        "file_count": len(paths),
+        "bytes": sum(path.stat().st_size for path in paths),
+        "shasum_manifest_commitment_sha256": manifest_commitment,
+        "bytes_framed_content_commitment_sha256": framed_commitment,
+        "locally_resolved_not_author_published_hashes": True,
+    }
+    provenance["artifact_provenance_commitment_sha256"] = digest(provenance)
+    write_private(source_root / "artifact-provenance.json", provenance)
+    return paths, provenance
+
+
+def _load_visor_hos_correction_exclusions(
+    fixture_root: Path, amendment: dict[str, Any]
+) -> tuple[set[tuple[str, str]], dict[str, Any]]:
+    """Pin the unlicensed reference bytes and use only its exclusion keys."""
+
+    reference = amendment["official_semantic_reference"]
+    required_file_hashes = {
+        "data_preparation/gen_coco_format.py": reference.get(
+            "gen_coco_format_py_sha256"
+        ),
+        "data_preparation/gen_coco_format_handside_contact.py": reference.get(
+            "gen_coco_format_handside_contact_py_sha256"
+        ),
+        "data_preparation/correct.json": reference.get("correct_json_sha256"),
+        "README.md": reference.get("README_sha256"),
+    }
+    if any(not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value) for value in required_file_hashes.values()):
+        raise RuntimeError("E_VISOR_HOS_SEMANTIC_HASH_SET")
+    source_root = fixture_root / "sources/VISOR-HOS/semantic-reference"
+    archive = source_root / f"VISOR-HOS-{reference['commit']}.tar.gz"
+    archive_url = (
+        "https://codeload.github.com/epic-kitchens/VISOR-HOS/tar.gz/"
+        + reference["commit"]
+    )
+    _download_exact_public_artifact(archive_url, archive, reference["archive_sha256"])
+    extracted_bytes: dict[str, bytes] = {}
+    with tarfile.open(archive, "r:gz") as handle:
+        for relative, expected in required_file_hashes.items():
+            matches = [
+                member
+                for member in handle.getmembers()
+                if member.isfile() and member.name.endswith("/" + relative)
+            ]
+            if len(matches) != 1:
+                raise RuntimeError("E_VISOR_HOS_SEMANTIC_MEMBER_SET")
+            stream = handle.extractfile(matches[0])
+            if stream is None:
+                raise RuntimeError("E_VISOR_HOS_SEMANTIC_MEMBER_SET")
+            payload = stream.read()
+            if hashlib.sha256(payload).hexdigest() != expected:
+                raise RuntimeError("E_VISOR_HOS_SEMANTIC_MEMBER_HASH")
+            extracted_bytes[relative] = payload
+    correction = json.loads(
+        extracted_bytes["data_preparation/correct.json"].decode("utf-8")
+    )
+    if not isinstance(correction, dict) or not correction:
+        raise RuntimeError("E_VISOR_HOS_CORRECTION_TABLE")
+    exclusions: set[tuple[str, str]] = set()
+    for frame_name, values in correction.items():
+        match = re.fullmatch(r"(P\d{2}_\d{2,3})_frame_\d+\.jpg", frame_name)
+        if match is None or not isinstance(values, dict) or not values:
+            raise RuntimeError("E_VISOR_HOS_CORRECTION_TABLE")
+        exclusions.add((match.group(1), frame_name))
+    record = {
+        "schema_version": 1,
+        "status": "PASS_REFERENCE_ONLY_EXCLUSION_KEYS",
+        "repository": reference["repository"],
+        "commit": reference["commit"],
+        "archive_sha256": reference["archive_sha256"],
+        "required_file_hashes": required_file_hashes,
+        "code_terms": reference["code_terms"],
+        "repository_code_imported_or_executed": False,
+        "correction_values_applied": False,
+        "correction_frame_count": len(exclusions),
+    }
+    record["semantic_reference_commitment_sha256"] = digest(record)
+    write_private(source_root / "semantic-reference.json", record)
+    return exclusions, record
+
+
+def _iter_visor_hos_documents(paths: list[Path]):
+    for path in paths:
+        document = json.loads(path.read_text())
+        if not isinstance(document, dict) or not isinstance(
+            document.get("video_annotations"), list
+        ):
+            raise RuntimeError("E_VISOR_HOS_ANNOTATION_SCHEMA")
+        source_split = path.parent.name
+        if source_split not in {"train", "val"}:
+            raise RuntimeError("E_VISOR_HOS_ANNOTATION_SPLIT")
+        for row in document["video_annotations"]:
+            image = row.get("image") if isinstance(row, dict) else None
+            if not isinstance(image, dict) or "_source_split" in image:
+                raise RuntimeError("E_VISOR_HOS_ANNOTATION_SCHEMA")
+            image["_source_split"] = source_split
+        yield document
+
+
+def _visor_hos_source_inventory(
+    annotation_documents,
+    *,
+    seed: int,
+    target_per_stratum: int,
+    no_hand_review_queue_ceiling: int,
+    per_video_stratum_cap: int,
+    correction_excluded_frame_keys: set[tuple[str, str]],
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
+    """Allocate source-qualified contact states and unverified negatives once.
+
+    The no-hand branch deliberately remains `no_hand_nominee`.  This source
+    check can establish that a bounded review queue exists, but only the later
+    blinded visual-review seal can convert any nominee into ground truth.
+    """
+
+    strata = ("contact", "explicit_no_contact", "no_hand_nominee")
+    quotas = {
+        "contact": target_per_stratum,
+        "explicit_no_contact": target_per_stratum,
+        "no_hand_nominee": no_hand_review_queue_ceiling,
+    }
+    minimums = {stratum: target_per_stratum for stratum in strata}
+    if (
+        target_per_stratum <= 0
+        or no_hand_review_queue_ceiling < target_per_stratum
+        or per_video_stratum_cap <= 0
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_LIMIT")
+    correction_excluded = _visor_hos_frame_key_set(
+        correction_excluded_frame_keys, "E_VISOR_HOS_CORRECTION_EXCLUSION_KEY"
+    )
+    participants: set[str] = set()
+    source_frame_keys: set[tuple[str, str]] = set()
+    parsed_all: list[dict[str, Any]] = []
+    invalid_frame_count = 0
+    abstained_frame_count = 0
+    abstained_hand_count = 0
+    for document in annotation_documents:
+        rows = document.get("video_annotations")
+        if not isinstance(rows, list):
+            invalid_frame_count += 1
+            continue
+        for row in rows:
+            image = row.get("image") if isinstance(row, dict) else None
+            video = str(image.get("video", "")) if isinstance(image, dict) else ""
+            frame_name = str(image.get("name", "")) if isinstance(image, dict) else ""
+            participant = video.split("_", 1)[0]
+            if re.fullmatch(r"P\d{2}", participant):
+                participants.add(participant)
+            if video and frame_name and Path(frame_name).name == frame_name:
+                source_frame_keys.add((video, frame_name))
+            result = _visor_hos_frame_candidates(row) if isinstance(row, dict) else {
+                "status": "INVALID",
+                "candidates": [],
+                "abstained_hand_count": 0,
+            }
+            if result["status"] == "INVALID":
+                invalid_frame_count += 1
+                continue
+            abstained_hand_count += int(result.get("abstained_hand_count", 0))
+            if result["status"] == "ABSTAIN":
+                abstained_frame_count += 1
+            for candidate in result.get("candidates", []):
+                frame_key = (candidate["video"], candidate["frame_name"])
+                if frame_key in correction_excluded:
+                    continue
+                parsed_all.append(candidate)
+    partitions = _visor_hos_participant_partitions(participants, seed)
+    raw_eligible = {
+        stratum: sum(row["stratum"] == stratum for row in parsed_all)
+        for stratum in strata
+    }
+    selected: dict[str, list[dict[str, Any]]] = {
+        "development": [],
+        "holdout": [],
+    }
+    post_partition: dict[str, dict[str, int]] = {}
+    post_cap: dict[str, dict[str, int]] = {}
+    final: dict[str, dict[str, int]] = {}
+    deficits: list[dict[str, Any]] = []
+    for partition in ("development", "holdout"):
+        candidates = [
+            row for row in parsed_all if partitions[row["participant"]] == partition
+        ]
+        post_partition[partition] = {
+            stratum: sum(row["stratum"] == stratum for row in candidates)
+            for stratum in strata
+        }
+        by_stratum_video: dict[tuple[str, str], set[tuple[str, str]]] = defaultdict(set)
+        representative: dict[tuple[str, tuple[str, str]], dict[str, Any]] = {}
+        for row in candidates:
+            frame = (row["video"], row["frame_name"])
+            stratum = row["stratum"]
+            by_stratum_video[(stratum, row["video"])].add(frame)
+            key = (stratum, frame)
+            prior = representative.get(key)
+            if prior is None or _visor_hos_candidate_order(
+                seed, partition, row
+            ) < _visor_hos_candidate_order(seed, partition, prior):
+                representative[key] = row
+        post_cap[partition] = {
+            stratum: sum(
+                min(len(frames), per_video_stratum_cap)
+                for (candidate_stratum, _video), frames in by_stratum_video.items()
+                if candidate_stratum == stratum
+            )
+            for stratum in strata
+        }
+        source = ("source", partition)
+        sink = ("sink", partition)
+        graph: dict[Any, list[list[Any]]] = defaultdict(list)
+        stratum_nodes = {stratum: ("stratum", stratum) for stratum in strata}
+        for stratum in sorted(strata):
+            _visor_hos_add_flow_edge(
+                graph, source, stratum_nodes[stratum], quotas[stratum]
+            )
+        all_frames = sorted(
+            {(row["video"], row["frame_name"]) for row in candidates},
+            key=lambda frame: min(
+                _visor_hos_candidate_order(seed, partition, row)
+                for row in candidates
+                if (row["video"], row["frame_name"]) == frame
+            ),
+        )
+        for frame in all_frames:
+            _visor_hos_add_flow_edge(graph, ("frame", *frame), sink, 1)
+        video_nodes: dict[tuple[str, str], Any] = {}
+        for key in sorted(by_stratum_video):
+            stratum, video = key
+            node = ("video_stratum", stratum, video)
+            video_nodes[key] = node
+            _visor_hos_add_flow_edge(
+                graph, stratum_nodes[stratum], node, per_video_stratum_cap
+            )
+            for frame in sorted(
+                by_stratum_video[key],
+                key=lambda item: _visor_hos_candidate_order(
+                    seed, partition, representative[(stratum, item)]
+                ),
+            ):
+                _visor_hos_add_flow_edge(graph, node, ("frame", *frame), 1)
+        _visor_hos_max_flow(graph, source, sink)
+        for (stratum, _video), node in video_nodes.items():
+            for target, _reverse, capacity in graph[node]:
+                if (
+                    isinstance(target, tuple)
+                    and target[:1] == ("frame",)
+                    and capacity == 0
+                ):
+                    frame = (target[1], target[2])
+                    selected[partition].append(representative[(stratum, frame)])
+        selected[partition].sort(
+            key=lambda row: _visor_hos_candidate_order(seed, partition, row)
+        )
+        final[partition] = {
+            stratum: sum(row["stratum"] == stratum for row in selected[partition])
+            for stratum in strata
+        }
+        for stratum in strata:
+            if final[partition][stratum] < minimums[stratum]:
+                deficits.append(
+                    {
+                        "partition": partition,
+                        "stratum": stratum,
+                        "required_count": minimums[stratum],
+                        "available_count": final[partition][stratum],
+                    }
+                )
+    development_participants = {
+        row["participant"] for row in selected["development"]
+    }
+    holdout_participants = {row["participant"] for row in selected["holdout"]}
+    development_videos = {row["video"] for row in selected["development"]}
+    holdout_videos = {row["video"] for row in selected["holdout"]}
+    development_frames = {
+        (row["video"], row["frame_name"]) for row in selected["development"]
+    }
+    holdout_frames = {
+        (row["video"], row["frame_name"]) for row in selected["holdout"]
+    }
+    correction_matches = source_frame_keys & correction_excluded
+    overlap = {
+        "participant_overlap_count": len(
+            development_participants & holdout_participants
+        ),
+        "video_overlap_count": len(development_videos & holdout_videos),
+        "frame_overlap_count": len(development_frames & holdout_frames),
+    }
+    integrity_failures = []
+    if len(correction_matches) != len(correction_excluded):
+        integrity_failures.append("CORRECTION_FRAME_NOT_FOUND")
+    if any(overlap.values()):
+        integrity_failures.append("CROSS_PARTITION_OVERLAP")
+    report = {
+        "status": "PASS_SOURCE_NOMINEES" if not deficits and not integrity_failures else "NO_GO",
+        "raw_eligible_counts": raw_eligible,
+        "post_partition_counts": post_partition,
+        "post_cap_counts": post_cap,
+        "final_counts": final,
+        "deficits": deficits,
+        "integrity_failures": integrity_failures,
+        "invalid_frame_count": invalid_frame_count,
+        "abstained_frame_count": abstained_frame_count,
+        "abstained_hand_count": abstained_hand_count,
+        "no_hand_items_are_unverified_nominees": True,
+        "no_hand_review_queue_ceiling": no_hand_review_queue_ceiling,
+        "correction_table_frame_count": len(correction_excluded),
+        "correction_excluded_source_frame_count": len(correction_matches),
+        "correction_values_applied": False,
+        **overlap,
+    }
+    return selected, report
+
+
+def _charades_action_source_inventory(
+    rows: list[dict[str, str]],
+    action: dict[str, Any],
+    seed: int,
+    excluded_subjects: set[str],
+    excluded_videos: set[str],
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
+    """Collect every frozen direction-label yield before one family decision."""
+
+    code_to_label = _charades_direction_map(action)
+    opposite = {
+        first: second
+        for pair in action["class_code_pairs"]
+        for first, second in (pair["pair"], tuple(reversed(pair["pair"])))
+    }
+    candidates = {
+        partition: {label: [] for label in action["labels"]}
+        for partition in ("development", "holdout")
+    }
+    invalid_row_count = 0
+    for row in rows:
+        video = str(row.get("id", ""))
+        subject = str(row.get("subject", ""))
+        if (
+            not video
+            or not subject
+            or video in excluded_videos
+            or subject in excluded_subjects
+            or str(row.get("verified", "")).strip().casefold() != "yes"
+            or not str(row.get("egocentric", "")).strip()
+        ):
+            continue
+        try:
+            duration = float(row["length"])
+            annotations = _parse_charades_actions(row.get("actions", ""))
+        except (KeyError, TypeError, ValueError, RuntimeError):
+            invalid_row_count += 1
+            continue
+        partition = _fixture_partition(
+            seed, "mechanistic_action_partition", subject
+        )
+        for item in annotations:
+            label = code_to_label.get(item["code"])
+            if label is None:
+                continue
+            start = max(0.0, item["start"])
+            end = min(duration, item["end"])
+            if not 1.0 <= end - start <= 12.0:
+                continue
+            if any(
+                code_to_label.get(other["code"]) == opposite[label]
+                and max(start, other["start"]) < min(end, other["end"])
+                for other in annotations
+            ):
+                continue
+            candidates[partition][label].append(
+                {
+                    "video": video,
+                    "subject": subject,
+                    "label": label,
+                    "code": item["code"],
+                    "start": round(start, 6),
+                    "end": round(end, 6),
+                    "source_duration": round(duration, 6),
+                }
+            )
+    selected = {"development": [], "holdout": []}
+    raw_counts: dict[str, dict[str, int]] = {}
+    final_counts: dict[str, dict[str, int]] = {}
+    deficits = []
+    for partition in ("development", "holdout"):
+        raw_counts[partition] = {
+            label: len(candidates[partition][label]) for label in action["labels"]
+        }
+        used: set[str] = set()
+        for label in action["labels"]:
+            ordered = sorted(
+                candidates[partition][label],
+                key=lambda row: _fixture_order(
+                    seed,
+                    "mechanistic_action",
+                    partition,
+                    label,
+                    row["video"],
+                    row["start"],
+                    row["end"],
+                ),
+            )
+            for row in ordered:
+                if row["video"] in used:
+                    continue
+                used.add(row["video"])
+                selected[partition].append(row)
+                if sum(
+                    item["label"] == label for item in selected[partition]
+                ) == 6:
+                    break
+        selected[partition].sort(
+            key=lambda row: (
+                action["labels"].index(row["label"]),
+                _fixture_order(
+                    seed,
+                    "mechanistic_action_final",
+                    partition,
+                    row["video"],
+                    row["start"],
+                ),
+            )
+        )
+        final_counts[partition] = {
+            label: sum(row["label"] == label for row in selected[partition])
+            for label in action["labels"]
+        }
+        for label in action["labels"]:
+            if final_counts[partition][label] != 6:
+                deficits.append(
+                    {
+                        "partition": partition,
+                        "label": label,
+                        "required_count": 6,
+                        "available_count": final_counts[partition][label],
+                    }
+                )
+    development_subjects = {row["subject"] for row in selected["development"]}
+    holdout_subjects = {row["subject"] for row in selected["holdout"]}
+    development_videos = {row["video"] for row in selected["development"]}
+    holdout_videos = {row["video"] for row in selected["holdout"]}
+    report = {
+        "status": "PASS" if not deficits else "NO_GO",
+        "raw_counts": raw_counts,
+        "final_counts": final_counts,
+        "deficits": deficits,
+        "invalid_row_count": invalid_row_count,
+        "subject_overlap_count": len(development_subjects & holdout_subjects),
+        "video_overlap_count": len(development_videos & holdout_videos),
+    }
+    if report["subject_overlap_count"] or report["video_overlap_count"]:
+        report["status"] = "NO_GO"
+    return selected, report
+
+
+def _load_active_visor_hos_source_feasibility(
+    fixture_root: Path, cfg: dict[str, Any]
+) -> dict[str, Any]:
+    amendment = _tuple_visor_hos_correction_amendment(cfg)
+    protocol = _tuple_fixture_protocol(cfg)
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    repair = _tuple_fixture_feasibility_repair(cfg)
+    path = fixture_root / "visor-hos-source-feasibility.json"
+    if not path.is_file():
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_MISSING")
+    record = json.loads(path.read_text())
+    payload = json.loads(json.dumps(record))
+    expected = payload.pop("visor_hos_source_feasibility_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(payload) != expected:
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_COMMITMENT")
+    commitments = {
+        "visor_hos_correction_amendment_commitment_sha256": amendment[
+            "amendment_commitment_sha256"
+        ],
+        "fixture_preparation_amendment_commitment_sha256": preparation[
+            "preparation_amendment_commitment_sha256"
+        ],
+        "fixture_feasibility_repair_commitment_sha256": repair[
+            "fixture_feasibility_repair_commitment_sha256"
+        ],
+        "public_fixture_protocol_commitment_sha256": protocol[
+            "protocol_commitment_sha256"
+        ],
+    }
+    if any(record.get(key) != value for key, value in commitments.items()):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_PROVENANCE")
+    if (
+        record.get("status")
+        != "PASS_SOURCE_FEASIBILITY_PENDING_NO_HAND_REVIEW"
+        or record.get("no_hand_truth_opened") is not False
+        or record.get("model_inference_executed") is not False
+        or record.get("media_rendering_executed") is not False
+        or record.get("restricted_mount_present") is not False
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_STATUS")
+    families = record.get("families", {})
+    if (
+        not isinstance(families, dict)
+        or record.get("failing_family_names") != []
+        or any(
+            not str(value.get("status", "")).startswith("PASS")
+            for value in families.values()
+            if isinstance(value, dict)
+        )
+        or any(not isinstance(value, dict) for value in families.values())
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_FAMILY")
+    required_statuses = {
+        "visor_hos_contact": "PASS",
+        "visor_hos_explicit_no_contact": "PASS",
+        "visor_hos_no_hand_nominees": "PASS_NOMINEE_QUEUE_READY",
+        "visor_hos_integrity": "PASS",
+        "cross_partition_source_independence": "PASS",
+    }
+    if any(
+        not isinstance(families.get(family), dict)
+        or families[family].get("status") != status
+        for family, status in required_statuses.items()
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_FAMILY")
+    selections = record.get("selections", {}).get("visor_hos_source_nominees")
+    if not isinstance(selections, dict) or set(selections) != {
+        "development",
+        "holdout",
+    }:
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_SELECTION")
+    partition_participants: dict[str, set[str]] = {}
+    partition_videos: dict[str, set[str]] = {}
+    partition_frames: dict[str, set[tuple[str, str]]] = {}
+    for partition in ("development", "holdout"):
+        rows = selections[partition]
+        if not isinstance(rows, list):
+            raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_SELECTION")
+        counts = Counter(
+            row.get("stratum") for row in rows if isinstance(row, dict)
+        )
+        if (
+            counts["contact"] != 48
+            or counts["explicit_no_contact"] != 48
+            or not 48 <= counts["no_hand_nominee"] <= 192
+            or sum(counts.values()) != len(rows)
+        ):
+            raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_SELECTION_COUNT")
+        video_stratum_counts: Counter[tuple[str, str]] = Counter()
+        frames: set[tuple[str, str]] = set()
+        for row in rows:
+            if (
+                not isinstance(row, dict)
+                or row.get("stratum")
+                not in {"contact", "explicit_no_contact", "no_hand_nominee"}
+                or row.get("source_split") not in {"train", "val"}
+                or not re.fullmatch(r"P\d{2}", str(row.get("participant", "")))
+                or not isinstance(row.get("video"), str)
+                or not isinstance(row.get("frame_name"), str)
+            ):
+                raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_SELECTION")
+            key = (row["video"], row["frame_name"])
+            if key in frames:
+                raise RuntimeError("E_VISOR_HOS_SOURCE_FRAME_DUPLICATE")
+            frames.add(key)
+            video_stratum_counts[(row["video"], row["stratum"])] += 1
+        if any(value > 4 for value in video_stratum_counts.values()):
+            raise RuntimeError("E_VISOR_HOS_SOURCE_VIDEO_CAP")
+        partition_participants[partition] = {
+            row["participant"] for row in rows
+        }
+        partition_videos[partition] = {row["video"] for row in rows}
+        partition_frames[partition] = frames
+    if (
+        partition_participants["development"]
+        & partition_participants["holdout"]
+        or partition_videos["development"] & partition_videos["holdout"]
+        or partition_frames["development"] & partition_frames["holdout"]
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_OVERLAP")
+    audits = record.get("audits", {})
+    if any(
+        int(audits.get(key, -1)) != 0
+        for key in (
+            "source_subject_overlap_count",
+            "source_video_overlap_count",
+            "source_object_overlap_count",
+        )
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_OVERLAP")
+    return record
+
+
+def _active_visor_hos_no_hand_review_queues(
+    source_record: dict[str, Any], cfg: dict[str, Any]
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
+    """Recover the exact frozen nominee queues without rerunning selection."""
+
+    amendment = _tuple_visor_hos_correction_amendment(cfg)
+    seed = int(amendment["partition_and_joint_sampler"]["seed"])
+    per_video_cap = int(
+        amendment["partition_and_joint_sampler"]["per_video_per_stratum_cap"]
+    )
+    source = source_record.get("selections", {}).get(
+        "visor_hos_source_nominees"
+    )
+    inventory = source_record.get("visor_hos_inventory", {}).get(
+        "no_hand_review_queue_inventory"
+    )
+    if (
+        not isinstance(source, dict)
+        or set(source) != {"development", "holdout"}
+        or not isinstance(inventory, dict)
+    ):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_RECORD")
+    output: dict[str, list[dict[str, Any]]] = {}
+    participant_sets: dict[str, set[str]] = {}
+    video_sets: dict[str, set[str]] = {}
+    frame_sets: dict[str, set[tuple[str, str]]] = {}
+    for partition in ("development", "holdout"):
+        rows = [
+            json.loads(json.dumps(row))
+            for row in source[partition]
+            if isinstance(row, dict) and row.get("stratum") == "no_hand_nominee"
+        ]
+        rows.sort(key=lambda row: int(row.get("review_ordinal", -1)))
+        if (
+            not 48 <= len(rows) <= VISOR_HOS_NO_HAND_REVIEW_MAX_PER_PARTITION
+            or inventory.get("queue_counts", {}).get(partition) != len(rows)
+            or [row.get("review_ordinal") for row in rows]
+            != list(range(1, len(rows) + 1))
+        ):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_COUNT")
+        video_counts: Counter[str] = Counter()
+        frames: set[tuple[str, str]] = set()
+        for row in rows:
+            image_path = Path(str(row.get("image_path", "")))
+            frame_key = (str(row.get("video", "")), str(row.get("frame_name", "")))
+            if (
+                row.get("hand_visible") is not False
+                or row.get("contact") is not None
+                or row.get("target_hand_side") is not None
+                or row.get("target_hand_segments") is not None
+                or row.get("source_split") not in {"train", "val"}
+                or not re.fullmatch(r"P\d{2}", str(row.get("participant", "")))
+                or not frame_key[0]
+                or frame_key[0].split("_", 1)[0] != row.get("participant")
+                or Path(frame_key[1]).name != frame_key[1]
+                or image_path.is_absolute()
+                or not image_path.parts
+                or ".." in image_path.parts
+                or image_path.name != frame_key[1]
+                or row.get("review_token")
+                != _visor_hos_no_hand_review_token(seed, partition, row)
+                or frame_key in frames
+            ):
+                raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_ROW")
+            frames.add(frame_key)
+            video_counts[frame_key[0]] += 1
+        if any(value > per_video_cap for value in video_counts.values()):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_VIDEO_CAP")
+        output[partition] = rows
+        participant_sets[partition] = {row["participant"] for row in rows}
+        video_sets[partition] = {row["video"] for row in rows}
+        frame_sets[partition] = frames
+    overlap = {
+        "participant_overlap_count": len(
+            participant_sets["development"] & participant_sets["holdout"]
+        ),
+        "video_overlap_count": len(
+            video_sets["development"] & video_sets["holdout"]
+        ),
+        "frame_overlap_count": len(
+            frame_sets["development"] & frame_sets["holdout"]
+        ),
+    }
+    if any(overlap.values()) or any(
+        int(inventory.get(key, -1)) != 0 for key in overlap
+    ):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_OVERLAP")
+    return output, json.loads(json.dumps(inventory))
+
+
+def _materialize_active_visor_hos_no_hand_review_frames(
+    fixture_root: Path,
+    review_root: Path,
+    preparation: dict[str, Any],
+    source_record: dict[str, Any],
+    queues: dict[str, list[dict[str, Any]]],
+) -> tuple[Path, dict[str, Any]]:
+    """Download only frozen nominee archives and extract only nominee frames."""
+
+    _require_external_or_ignored_output(review_root)
+    frame_root = review_root / "source-frames"
+    base = preparation["source_archives"]["EPIC_KITCHENS_VISOR_validation"]
+    archive_root = fixture_root / "sources/VISOR-HOS/frame-archives"
+    archive_records: dict[str, dict[str, Any]] = {}
+    frame_records: list[dict[str, Any]] = []
+    target_paths: set[Path] = set()
+    for partition in ("development", "holdout"):
+        for row in queues[partition]:
+            split = row["source_split"]
+            participant = row["participant"]
+            video = row["video"]
+            archive_url = (
+                f"{base['repository_root'].rstrip('/')}/rgb_frames/"
+                f"{split}/{participant}/{video}.zip"
+            )
+            archive_path = archive_root / split / participant / f"{video}.zip"
+            if not archive_path.is_file() or not zipfile.is_zipfile(archive_path):
+                _download_public_file(archive_url, archive_path)
+            archive_key = str(archive_path.relative_to(fixture_root))
+            archive_records.setdefault(
+                archive_key,
+                {
+                    "relative_path": archive_key,
+                    "url": archive_url,
+                    "sha256": file_digest(archive_path),
+                    "bytes": archive_path.stat().st_size,
+                    "license": base["license"],
+                },
+            )
+            with zipfile.ZipFile(archive_path) as archive:
+                matches = [
+                    name
+                    for name in archive.namelist()
+                    if Path(name).name == row["frame_name"]
+                ]
+                if len(matches) != 1:
+                    raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_FRAME_MEMBER")
+                member = Path(matches[0])
+                if member.is_absolute() or ".." in member.parts:
+                    raise RuntimeError("E_TUPLE_ARCHIVE_PATH")
+                target = _visor_hos_review_source_frame(
+                    frame_root, row["image_path"]
+                )
+                if target in target_paths:
+                    raise RuntimeError(
+                        "E_VISOR_HOS_NO_HAND_REVIEW_FRAME_PATH_COLLISION"
+                    )
+                target_paths.add(target)
+                target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                partial = target.with_suffix(target.suffix + ".partial")
+                with archive.open(matches[0]) as source, partial.open("wb") as handle:
+                    shutil.copyfileobj(source, handle, length=1024 * 1024)
+                os.chmod(partial, 0o600)
+                partial.replace(target)
+            try:
+                from PIL import Image
+
+                with Image.open(target) as image:
+                    width, height = image.size
+                    image.verify()
+            except Exception as error:
+                raise RuntimeError(
+                    "E_VISOR_HOS_NO_HAND_REVIEW_FRAME_DECODE"
+                ) from error
+            if width <= 0 or height <= 0:
+                raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_FRAME_DECODE")
+            frame_records.append(
+                {
+                    "partition": partition,
+                    "review_token": row["review_token"],
+                    "source_relative_path": str(target.relative_to(review_root)),
+                    "sha256": file_digest(target),
+                    "bytes": target.stat().st_size,
+                    "width": width,
+                    "height": height,
+                }
+            )
+    record = {
+        "schema_version": 1,
+        "status": "SEALED_PUBLIC_NOMINEE_FRAMES_BEFORE_APPLICANT_REVIEW",
+        "visor_hos_source_feasibility_commitment_sha256": source_record[
+            "visor_hos_source_feasibility_commitment_sha256"
+        ],
+        "archive_count": len(archive_records),
+        "source_frame_count": len(frame_records),
+        "archives": [archive_records[key] for key in sorted(archive_records)],
+        "frames": frame_records,
+        "model_inference_executed": False,
+        "restricted_mount_present": False,
+    }
+    record["source_frame_materialization_commitment_sha256"] = digest(record)
+    path = review_root / "source-frame-materialization.json"
+    if path.exists():
+        prior = json.loads(path.read_text())
+        expected = prior.pop(
+            "source_frame_materialization_commitment_sha256", None
+        )
+        if expected != digest(prior) or prior != {
+            key: value
+            for key, value in record.items()
+            if key != "source_frame_materialization_commitment_sha256"
+        }:
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_FRAMES_ALREADY_FROZEN")
+    else:
+        write_private(path, record)
+    return frame_root, record
+
+
+def _load_visor_hos_no_hand_frame_materialization(
+    review_root: Path, expected_source_feasibility_commitment_sha256: str
+) -> dict[str, Any]:
+    path = review_root / "source-frame-materialization.json"
+    if not path.is_file():
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_FRAMES_MISSING")
+    record = json.loads(path.read_text())
+    payload = json.loads(json.dumps(record))
+    expected = payload.pop("source_frame_materialization_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(payload) != expected:
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_FRAMES_COMMITMENT")
+    if (
+        record.get("status")
+        != "SEALED_PUBLIC_NOMINEE_FRAMES_BEFORE_APPLICANT_REVIEW"
+        or record.get("visor_hos_source_feasibility_commitment_sha256")
+        != expected_source_feasibility_commitment_sha256
+        or record.get("model_inference_executed") is not False
+        or record.get("restricted_mount_present") is not False
+        or record.get("archive_count") != len(record.get("archives", []))
+        or record.get("source_frame_count") != len(record.get("frames", []))
+    ):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_FRAMES_LINEAGE")
+    return record
+
+
+def prepare_active_visor_hos_no_hand_review(args: argparse.Namespace) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    fixture_root = _tuple_fixture_root(args.public_root)
+    review_root = fixture_root / "no-hand-review"
+    _require_external_or_ignored_output(args.public_root)
+    source_record = _load_active_visor_hos_source_feasibility(fixture_root, cfg)
+    queues, inventory = _active_visor_hos_no_hand_review_queues(
+        source_record, cfg
+    )
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    frame_root, materialization = (
+        _materialize_active_visor_hos_no_hand_review_frames(
+            fixture_root,
+            review_root,
+            preparation,
+            source_record,
+            queues,
+        )
+    )
+    compact = prepare_visor_hos_no_hand_review(
+        None,
+        cfg=cfg,
+        frame_root=frame_root,
+        review_root=review_root,
+        preselected_queues=queues,
+        inventory_override=inventory,
+        source_feasibility_commitment_sha256=source_record[
+            "visor_hos_source_feasibility_commitment_sha256"
+        ],
+        source_frame_materialization_commitment_sha256=materialization[
+            "source_frame_materialization_commitment_sha256"
+        ],
+    )
+    compact.update(
+        {
+            "source_frame_count": materialization["source_frame_count"],
+            "source_archive_count": materialization["archive_count"],
+            "restricted_mount_present": False,
+            "model_inference_executed": False,
+            "visor_hos_source_feasibility_commitment_sha256": source_record[
+                "visor_hos_source_feasibility_commitment_sha256"
+            ],
+            "source_frame_materialization_commitment_sha256": materialization[
+                "source_frame_materialization_commitment_sha256"
+            ],
+        }
+    )
+    return compact
+
+
+def seal_active_visor_hos_no_hand_review(args: argparse.Namespace) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    fixture_root = _tuple_fixture_root(args.public_root)
+    review_root = fixture_root / "no-hand-review"
+    _require_external_or_ignored_output(args.public_root)
+    source_record = _load_active_visor_hos_source_feasibility(fixture_root, cfg)
+    source_commitment = source_record[
+        "visor_hos_source_feasibility_commitment_sha256"
+    ]
+    queue = _load_visor_hos_no_hand_review_queue(review_root)
+    materialization = _load_visor_hos_no_hand_frame_materialization(
+        review_root, source_commitment
+    )
+    amendment = _tuple_visor_hos_correction_amendment(cfg)
+    if (
+        queue.get("visor_hos_source_feasibility_commitment_sha256")
+        != source_commitment
+        or queue.get("source_frame_materialization_commitment_sha256")
+        != materialization["source_frame_materialization_commitment_sha256"]
+        or queue.get("visor_hos_correction_amendment_commitment_sha256")
+        != amendment["amendment_commitment_sha256"]
+    ):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_LINEAGE")
+    compact = seal_visor_hos_no_hand_review(
+        review_root=review_root,
+        authorized_applicant_attested=args.authorized_applicant_attested,
+        blind_to_egohos_output_attested=args.blind_to_egohos_output_attested,
+        egohos_inference_not_started_attested=(
+            args.egohos_inference_not_started_attested
+        ),
+    )
+    seal_commitment = compact.get("verified_no_hand_seal_commitment_sha256")
+    if compact.get("status") == "INCOMPLETE_REVIEW" and seal_commitment is None:
+        compact.pop("verified_no_hand_seal_commitment_sha256", None)
+    elif compact.get("status") not in {"PASS", "NO_GO"} or not isinstance(
+        seal_commitment, str
+    ) or not re.fullmatch(r"[0-9a-f]{64}", seal_commitment):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SEAL_STATUS")
+    compact.update(
+        {
+            "restricted_mount_present": False,
+            "model_inference_executed": False,
+            "visor_hos_source_feasibility_commitment_sha256": source_commitment,
+            "review_queue_commitment_sha256": queue[
+                "review_queue_commitment_sha256"
+            ],
+        }
+    )
+    return compact
+
+
+def _load_visor_hos_verified_no_hand_lineage(
+    review_root: Path,
+    *,
+    expected_source_feasibility_commitment_sha256: str | None = None,
+) -> dict[str, Any]:
+    verified = load_visor_hos_verified_no_hand_frames(review_root)
+    queue = _load_visor_hos_no_hand_review_queue(review_root)
+    if expected_source_feasibility_commitment_sha256 is not None:
+        if (
+            not re.fullmatch(
+                r"[0-9a-f]{64}", expected_source_feasibility_commitment_sha256
+            )
+            or queue.get("visor_hos_source_feasibility_commitment_sha256")
+            != expected_source_feasibility_commitment_sha256
+        ):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_LINEAGE")
+        materialization = _load_visor_hos_no_hand_frame_materialization(
+            review_root, expected_source_feasibility_commitment_sha256
+        )
+        if queue.get("source_frame_materialization_commitment_sha256") != (
+            materialization["source_frame_materialization_commitment_sha256"]
+        ):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_LINEAGE")
+    seal_path = review_root / "verified-no-hand-seal.json"
+    seal = json.loads(seal_path.read_text())
+    commitment = seal.get("verified_no_hand_seal_commitment_sha256")
+    payload = json.loads(json.dumps(seal))
+    payload.pop("verified_no_hand_seal_commitment_sha256", None)
+    if not isinstance(commitment, str) or digest(payload) != commitment:
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SEAL_COMMITMENT")
+    by_partition: dict[str, list[dict[str, Any]]] = {}
+    for partition in ("development", "holdout"):
+        rows = seal.get("partitions", {}).get(partition, {}).get("selected")
+        if not isinstance(rows, list) or len(rows) != 48:
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SELECTION_COUNT")
+        by_partition[partition] = rows
+    if verified != {
+        (row["video"], row["frame_name"])
+        for rows in by_partition.values()
+        for row in rows
+    }:
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SELECTION_KEY")
+    return {
+        "commitment_sha256": commitment,
+        "queue_commitment_sha256": queue["review_queue_commitment_sha256"],
+        "source_feasibility_commitment_sha256": queue.get(
+            "visor_hos_source_feasibility_commitment_sha256"
+        ),
+        "source_frame_materialization_commitment_sha256": queue.get(
+            "source_frame_materialization_commitment_sha256"
+        ),
+        "partitions": by_partition,
+    }
+
+
+def _merge_active_visor_hos_selections(
+    source_record: dict[str, Any], verified: dict[str, Any]
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, int]]:
+    source = source_record["selections"]["visor_hos_source_nominees"]
+    output: dict[str, list[dict[str, Any]]] = {
+        "development": [],
+        "holdout": [],
+    }
+    all_partition_frames: dict[str, set[tuple[str, str]]] = {}
+    for partition in ("development", "holdout"):
+        rows = source.get(partition)
+        if not isinstance(rows, list):
+            raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_SELECTION")
+        contact = [row for row in rows if row.get("stratum") == "contact"]
+        no_contact = [
+            row for row in rows if row.get("stratum") == "explicit_no_contact"
+        ]
+        nominees = {
+            (row.get("video"), row.get("frame_name")): row
+            for row in rows
+            if row.get("stratum") == "no_hand_nominee"
+        }
+        if (
+            len(contact) != 48
+            or len(no_contact) != 48
+            or len(nominees)
+            != sum(row.get("stratum") == "no_hand_nominee" for row in rows)
+        ):
+            raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_SELECTION_COUNT")
+        verified_rows = []
+        for seal_row in verified["partitions"][partition]:
+            key = (seal_row.get("video"), seal_row.get("frame_name"))
+            nominee = nominees.get(key)
+            if (
+                nominee is None
+                or not isinstance(seal_row.get("source_frame_sha256"), str)
+                or not re.fullmatch(r"[0-9a-f]{64}", seal_row["source_frame_sha256"])
+            ):
+                raise RuntimeError("E_VISOR_HOS_VERIFIED_NO_HAND_NOT_NOMINATED")
+            verified_rows.append(
+                {
+                    **nominee,
+                    "stratum": "verified_no_hand",
+                    "verified_source_frame_sha256": seal_row[
+                        "source_frame_sha256"
+                    ],
+                    "review_token": seal_row["review_token"],
+                }
+            )
+        if len(verified_rows) != 48:
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SELECTION_COUNT")
+        output[partition] = contact + no_contact + verified_rows
+        frames = {(row["video"], row["frame_name"]) for row in output[partition]}
+        if len(frames) != 144:
+            raise RuntimeError("E_VISOR_HOS_SOURCE_FRAME_DUPLICATE")
+        for row in output[partition]:
+            if row.get("source_split") not in {"train", "val"}:
+                raise RuntimeError("E_VISOR_HOS_SOURCE_SPLIT")
+        all_partition_frames[partition] = frames
+    audits = {
+        "source_frame_overlap_count": len(
+            all_partition_frames["development"]
+            & all_partition_frames["holdout"]
+        ),
+        "source_frame_duplicate_count": 0,
+    }
+    if audits["source_frame_overlap_count"]:
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FRAME_OVERLAP")
+    return output, audits
 
 
 def _prepare_visor_fixtures(
@@ -3130,7 +10410,695 @@ def _prepare_visor_fixtures(
     return output, provenance
 
 
-def prepare_tuple_fixture_feasibility(
+def _write_visor_hos_target_hand_mask(
+    segments: Any, width: int, height: int, target: Path
+) -> dict[str, Any]:
+    from PIL import Image, ImageDraw
+
+    if width <= 0 or height <= 0 or not _valid_visor_segments(segments):
+        raise RuntimeError("E_TUPLE_VISOR_GEOMETRY")
+    mask = Image.new("L", (width, height), 0)
+    draw = ImageDraw.Draw(mask)
+    for polygon in segments:
+        points = [(float(x), float(y)) for x, y in polygon]
+        if any(not (0.0 <= x < width and 0.0 <= y < height) for x, y in points):
+            raise RuntimeError("E_TUPLE_VISOR_GEOMETRY")
+        draw.polygon(points, fill=255)
+    if mask.getbbox() is None:
+        raise RuntimeError("E_TUPLE_VISOR_EMPTY_HAND_MASK")
+    target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    partial = target.with_suffix(target.suffix + ".partial")
+    mask.save(partial, format="PNG")
+    os.chmod(partial, 0o600)
+    partial.replace(target)
+    with Image.open(target) as check:
+        if check.mode != "L" or check.size != (width, height):
+            raise RuntimeError("E_TUPLE_VISOR_HAND_MASK_ROUNDTRIP")
+        values = {index for index, count in enumerate(check.histogram()) if count}
+    if not values <= {0, 255} or 255 not in values:
+        raise RuntimeError("E_TUPLE_VISOR_HAND_MASK_ROUNDTRIP")
+    return {
+        "path": target,
+        "sha256": file_digest(target),
+        "bytes": target.stat().st_size,
+        "width": width,
+        "height": height,
+    }
+
+
+def _prepare_active_visor_hos_fixtures(
+    fixture_root: Path,
+    preparation: dict[str, Any],
+    cfg: dict[str, Any],
+    review_root: Path,
+) -> tuple[
+    dict[str, list[dict[str, Any]]],
+    list[dict[str, Any]],
+    dict[str, Any],
+]:
+    """Materialize only corrected, source-sealed VISOR-HOS fixtures."""
+
+    _require_external_or_ignored_output(review_root)
+    source_record = _load_active_visor_hos_source_feasibility(fixture_root, cfg)
+    verified = _load_visor_hos_verified_no_hand_lineage(
+        review_root,
+        expected_source_feasibility_commitment_sha256=source_record[
+            "visor_hos_source_feasibility_commitment_sha256"
+        ],
+    )
+    selected, frame_audits = _merge_active_visor_hos_selections(
+        source_record, verified
+    )
+    amendment = _tuple_visor_hos_correction_amendment(cfg)
+    base = preparation["source_archives"]["EPIC_KITCHENS_VISOR_validation"]
+    source_root = fixture_root / "sources/VISOR-HOS"
+    output: dict[str, list[dict[str, Any]]] = {
+        partition: [] for partition in preparation["partitions"]
+    }
+    zip_records: dict[str, dict[str, Any]] = {}
+    for partition in preparation["partitions"]:
+        for ordinal, row in enumerate(selected[partition]):
+            video = row["video"]
+            participant = row["participant"]
+            split = row["source_split"]
+            archive_url = (
+                f"{base['repository_root'].rstrip('/')}/rgb_frames/"
+                f"{split}/{participant}/{video}.zip"
+            )
+            archive_path = (
+                source_root
+                / "frame-archives"
+                / split
+                / participant
+                / f"{video}.zip"
+            )
+            if not archive_path.is_file() or not zipfile.is_zipfile(archive_path):
+                _download_public_file(archive_url, archive_path)
+            archive_key = str(archive_path.relative_to(fixture_root))
+            if archive_key not in zip_records:
+                zip_records[archive_key] = {
+                    "relative_path": archive_key,
+                    "sha256": file_digest(archive_path),
+                    "bytes": archive_path.stat().st_size,
+                    "license": base["license"],
+                }
+            with zipfile.ZipFile(archive_path) as archive:
+                matches = [
+                    name
+                    for name in archive.namelist()
+                    if Path(name).name == row["frame_name"]
+                ]
+                if len(matches) != 1:
+                    raise RuntimeError("E_TUPLE_VISOR_FRAME_MEMBER")
+                member = Path(matches[0])
+                if member.is_absolute() or ".." in member.parts:
+                    raise RuntimeError("E_TUPLE_ARCHIVE_PATH")
+                target = (
+                    fixture_root
+                    / "media/hand-contact"
+                    / partition
+                    / f"{ordinal:03d}.jpg"
+                )
+                target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                partial = target.with_suffix(".jpg.partial")
+                with archive.open(matches[0]) as source, partial.open("wb") as handle:
+                    shutil.copyfileobj(source, handle, length=1024 * 1024)
+                os.chmod(partial, 0o600)
+                partial.replace(target)
+            from PIL import Image
+
+            with Image.open(target) as image:
+                width, height = image.size
+                image.verify()
+            source_frame_sha256 = file_digest(target)
+            expected_verified_sha256 = row.get("verified_source_frame_sha256")
+            if (
+                expected_verified_sha256 is not None
+                and source_frame_sha256 != expected_verified_sha256
+            ):
+                raise RuntimeError("E_VISOR_HOS_VERIFIED_FRAME_HASH")
+            target_segments = row.get("target_hand_segments")
+            target_hand_mask: dict[str, Any] | None = None
+            if row["stratum"] in {"contact", "explicit_no_contact"}:
+                target_hand_mask = _write_visor_hos_target_hand_mask(
+                    target_segments,
+                    width,
+                    height,
+                    fixture_root
+                    / "truth/hand-contact"
+                    / partition
+                    / f"{ordinal:03d}-target-hand.png",
+                )
+            elif row["stratum"] != "verified_no_hand" or target_segments is not None:
+                raise RuntimeError("E_VISOR_HOS_ACTIVE_STRATUM")
+            output[partition].append(
+                {
+                    "fixture_ordinal": ordinal,
+                    "stratum": row["stratum"],
+                    "hand_visible": row["hand_visible"],
+                    "contact": row["contact"],
+                    "target_hand_side": row.get("target_hand_side"),
+                    "target_hand_mask_relative_path": (
+                        str(target_hand_mask["path"].relative_to(fixture_root))
+                        if target_hand_mask is not None
+                        else None
+                    ),
+                    "target_hand_mask_sha256": (
+                        target_hand_mask["sha256"]
+                        if target_hand_mask is not None
+                        else None
+                    ),
+                    "target_hand_mask_bytes": (
+                        target_hand_mask["bytes"]
+                        if target_hand_mask is not None
+                        else None
+                    ),
+                    "target_hand_mask_width": (
+                        target_hand_mask["width"]
+                        if target_hand_mask is not None
+                        else None
+                    ),
+                    "target_hand_mask_height": (
+                        target_hand_mask["height"]
+                        if target_hand_mask is not None
+                        else None
+                    ),
+                    "source_split": split,
+                    "source_participant": participant,
+                    "source_video": video,
+                    "source_frame_name": row["frame_name"],
+                    "source_frame_sha256": source_frame_sha256,
+                    "media_relative_path": str(target.relative_to(fixture_root)),
+                    "media_sha256": source_frame_sha256,
+                    "media_bytes": target.stat().st_size,
+                    "geometry_valid": True,
+                    "verified_no_hand_review_token": row.get("review_token"),
+                    "verified_no_hand_seal_commitment_sha256": (
+                        verified["commitment_sha256"]
+                        if row["stratum"] == "verified_no_hand"
+                        else None
+                    ),
+                }
+            )
+    source_commitment = source_record[
+        "visor_hos_source_feasibility_commitment_sha256"
+    ]
+    provenance = [
+        {
+            "source": "VISOR_HOS_OFFICIAL_TRAIN_VALIDATION_ANNOTATIONS",
+            "sha256": amendment["official_annotation_artifact"][
+                "external_sorted_relative_path_and_SHA256_manifest_commitment_sha256"
+            ],
+            "bytes": amendment["official_annotation_artifact"][
+                "combined_bytes"
+            ],
+            "license": "CC-BY-NC-4.0",
+        },
+        {
+            "source": "VISOR_HOS_SOURCE_FEASIBILITY_RECORD",
+            "sha256": source_commitment,
+            "bytes": (
+                fixture_root / "visor-hos-source-feasibility.json"
+            ).stat().st_size,
+            "license": "public aggregate and selection metadata",
+        },
+        {
+            "source": "VISOR_HOS_VERIFIED_NO_HAND_REVIEW_SEAL",
+            "sha256": verified["commitment_sha256"],
+            "bytes": (review_root / "verified-no-hand-seal.json").stat().st_size,
+            "license": "self-authored public review metadata",
+        },
+        *(zip_records[key] for key in sorted(zip_records)),
+    ]
+    lineage = {
+        "visor_hos_correction_amendment_commitment_sha256": amendment[
+            "amendment_commitment_sha256"
+        ],
+        "visor_hos_source_feasibility_commitment_sha256": source_commitment,
+        "verified_no_hand_seal_commitment_sha256": verified[
+            "commitment_sha256"
+        ],
+        **frame_audits,
+    }
+    return output, provenance, lineage
+
+
+def _source_feasibility_failure(error: Exception) -> dict[str, Any]:
+    message = str(error)
+    code = message if re.fullmatch(r"E_[A-Z0-9_]+", message) else type(error).__name__
+    return {
+        "status": (
+            "BLOCKED_ENGINEERING"
+            if isinstance(error, (OSError, urllib.error.URLError))
+            else "NO_GO"
+        ),
+        "error_code": code,
+    }
+
+
+def prepare_tuple_visor_hos_fixture_feasibility(
+    args: argparse.Namespace,
+) -> dict[str, Any]:
+    """Run every independent source check for the active VISOR-HOS recipe."""
+
+    cfg = json.loads(args.config.read_text())
+    protocol = _tuple_fixture_protocol(cfg)
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    repair = _tuple_fixture_feasibility_repair(cfg)
+    amendment = _tuple_visor_hos_correction_amendment(cfg)
+    fixture_root = _tuple_fixture_root(args.public_root)
+    _require_external_or_ignored_output(args.public_root)
+    fixture_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    families: dict[str, dict[str, Any]] = {}
+    selections: dict[str, Any] = {}
+    artifact_paths: list[Path] = []
+    correction_exclusions: set[tuple[str, str]] = set()
+    try:
+        artifact_paths, artifact_provenance = (
+            _load_official_visor_hos_annotation_paths(fixture_root, amendment)
+        )
+        families["official_visor_hos_artifact"] = {
+            "status": "PASS",
+            "file_count": artifact_provenance["file_count"],
+            "bytes": artifact_provenance["bytes"],
+            "artifact_provenance_commitment_sha256": artifact_provenance[
+                "artifact_provenance_commitment_sha256"
+            ],
+        }
+    except Exception as error:
+        families["official_visor_hos_artifact"] = _source_feasibility_failure(
+            error
+        )
+    try:
+        correction_exclusions, semantic_record = (
+            _load_visor_hos_correction_exclusions(fixture_root, amendment)
+        )
+        families["visor_hos_semantic_reference"] = {
+            "status": "PASS",
+            "correction_frame_count": len(correction_exclusions),
+            "semantic_reference_commitment_sha256": semantic_record[
+                "semantic_reference_commitment_sha256"
+            ],
+        }
+    except Exception as error:
+        families["visor_hos_semantic_reference"] = _source_feasibility_failure(
+            error
+        )
+
+    sources = preparation["source_archives"]
+    extracted = fixture_root / "sources/extracted"
+    coco: dict[str, list[dict[str, Any]]] = {
+        "development": [],
+        "holdout": [],
+    }
+    try:
+        coco_annotations = _fixture_archive(
+            args.public_root,
+            sources["COCO_2017_instances"],
+            "annotations_trainval2017.zip",
+        )
+        _safe_extract_zip(coco_annotations, extracted / "coco-annotations")
+        instances = json.loads(
+            (
+                extracted
+                / "coco-annotations/annotations/instances_val2017.json"
+            ).read_text()
+        )
+        coco = _select_coco_object_sources(instances, preparation, repair)
+        families["coco_composite_sources"] = {
+            "status": "PASS",
+            "counts": {
+                partition: len(coco[partition])
+                for partition in preparation["partitions"]
+            },
+        }
+        selections["coco"] = coco
+    except Exception as error:
+        families["coco_composite_sources"] = _source_feasibility_failure(error)
+
+    language_rows: dict[str, list[dict[str, Any]]] = {}
+    try:
+        language_rows = {
+            partition: _language_lexical_fixture_rows(preparation, partition)
+            for partition in preparation["partitions"]
+        }
+        expected_language = int(
+            amendment["public_fixture_counts_per_partition"][
+                "language_and_lexical_items"
+            ]
+        )
+        language_counts = {
+            partition: len(rows) for partition, rows in language_rows.items()
+        }
+        families["language_and_lexical"] = {
+            "status": (
+                "PASS"
+                if all(value == expected_language for value in language_counts.values())
+                else "NO_GO"
+            ),
+            "counts": language_counts,
+            "required_per_partition": expected_language,
+        }
+        selections["language_and_lexical"] = language_rows
+    except Exception as error:
+        families["language_and_lexical"] = _source_feasibility_failure(error)
+
+    coco_ready = families["coco_composite_sources"]["status"] == "PASS"
+    ontology_count = len(preparation["public_object_ontology"])
+    referent_count = ontology_count * len(
+        preparation["referent_attribute_rendering"]["scenarios_once_per_category"]
+    )
+    recurrence_count = sum(
+        int(value)
+        for value in preparation["recurrence_recipe"][
+            "strata_per_partition"
+        ].values()
+    )
+    sensor_count = int(
+        preparation["sensor_recipe"]["base_scenes_per_partition"]
+    ) * len(preparation["sensor_recipe"]["conditions"])
+    derived_source_checks = (
+        (
+            "referent_attribute_composite",
+            referent_count,
+            int(
+                amendment["public_fixture_counts_per_partition"][
+                    "referent_attribute_microclips"
+                ]
+            ),
+        ),
+        (
+            "recurrence",
+            recurrence_count,
+            int(
+                amendment["public_fixture_counts_per_partition"][
+                    "recurrence_pairs"
+                ]
+            ),
+        ),
+        (
+            "sensor",
+            sensor_count,
+            int(
+                amendment["public_fixture_counts_per_partition"][
+                    "sensor_perturbation_clips"
+                ]
+            ),
+        ),
+    )
+    for family, count, required in derived_source_checks:
+        if not coco_ready:
+            families[family] = {
+                "status": "DEPENDENCY_UNAVAILABLE",
+                "dependency": "coco_composite_sources",
+                "counts": {"development": 0, "holdout": 0},
+                "required_per_partition": required,
+            }
+        else:
+            families[family] = {
+                "status": "PASS" if count == required else "NO_GO",
+                "counts": {"development": count, "holdout": count},
+                "required_per_partition": required,
+            }
+
+    visor: dict[str, list[dict[str, Any]]] = {
+        "development": [],
+        "holdout": [],
+    }
+    visor_report: dict[str, Any] = {}
+    if (
+        families["official_visor_hos_artifact"]["status"] == "PASS"
+        and families["visor_hos_semantic_reference"]["status"] == "PASS"
+    ):
+        try:
+            sampler = amendment["partition_and_joint_sampler"]
+            visor, visor_report = _visor_hos_source_inventory(
+                _iter_visor_hos_documents(artifact_paths),
+                seed=int(sampler["seed"]),
+                target_per_stratum=int(sampler["quota_per_partition_per_stratum"]),
+                no_hand_review_queue_ceiling=192,
+                per_video_stratum_cap=int(sampler["per_video_per_stratum_cap"]),
+                correction_excluded_frame_keys=correction_exclusions,
+            )
+            no_hand_queues, no_hand_queue_report = (
+                _visor_hos_no_hand_review_nominees(
+                    _iter_visor_hos_documents(artifact_paths),
+                    seed=int(sampler["seed"]),
+                    per_video_cap=int(sampler["per_video_per_stratum_cap"]),
+                    correction_excluded_frame_keys=correction_exclusions,
+                )
+            )
+            for partition in preparation["partitions"]:
+                visor[partition] = [
+                    row
+                    for row in visor[partition]
+                    if row["stratum"] != "no_hand_nominee"
+                ] + no_hand_queues[partition]
+                visor[partition].sort(
+                    key=lambda row: (
+                        VISOR_HOS_STRATA.index(row["stratum"])
+                        if row["stratum"] in VISOR_HOS_STRATA
+                        else 2,
+                        _visor_hos_candidate_order(
+                            int(sampler["seed"]), partition, row
+                        ),
+                    )
+                )
+                visor_report["final_counts"][partition][
+                    "no_hand_nominee"
+                ] = len(no_hand_queues[partition])
+            visor_report["no_hand_review_queue_inventory"] = no_hand_queue_report
+            selections["visor_hos_source_nominees"] = visor
+            for stratum, family in (
+                ("contact", "visor_hos_contact"),
+                ("explicit_no_contact", "visor_hos_explicit_no_contact"),
+                ("no_hand_nominee", "visor_hos_no_hand_nominees"),
+            ):
+                counts = {
+                    partition: visor_report["final_counts"][partition][stratum]
+                    for partition in preparation["partitions"]
+                }
+                families[family] = {
+                    "status": (
+                        "PASS_NOMINEE_QUEUE_READY"
+                        if stratum == "no_hand_nominee"
+                        and all(value >= 48 for value in counts.values())
+                        else (
+                            "PASS"
+                            if stratum != "no_hand_nominee"
+                            and all(value == 48 for value in counts.values())
+                            else "NO_GO"
+                        )
+                    ),
+                    "counts": counts,
+                    "required_per_partition": 48,
+                }
+            families["visor_hos_integrity"] = {
+                "status": (
+                    "PASS"
+                    if visor_report["status"] == "PASS_SOURCE_NOMINEES"
+                    else "NO_GO"
+                ),
+                "participant_overlap_count": visor_report[
+                    "participant_overlap_count"
+                ],
+                "video_overlap_count": visor_report["video_overlap_count"],
+                "frame_overlap_count": visor_report["frame_overlap_count"],
+                "correction_values_applied": False,
+            }
+        except Exception as error:
+            failure = _source_feasibility_failure(error)
+            for family in (
+                "visor_hos_contact",
+                "visor_hos_explicit_no_contact",
+                "visor_hos_no_hand_nominees",
+                "visor_hos_integrity",
+            ):
+                families[family] = dict(failure)
+    else:
+        for family in (
+            "visor_hos_contact",
+            "visor_hos_explicit_no_contact",
+            "visor_hos_no_hand_nominees",
+            "visor_hos_integrity",
+        ):
+            families[family] = {
+                "status": "DEPENDENCY_UNAVAILABLE",
+                "dependency": "official_artifact_or_semantic_reference",
+            }
+
+    action: dict[str, list[dict[str, Any]]] = {
+        "development": [],
+        "holdout": [],
+    }
+    action_report: dict[str, Any] = {}
+    try:
+        charades_annotations = _fixture_archive(
+            args.public_root,
+            sources["Charades_Ego_annotations"],
+            "CharadesEgo.zip",
+        )
+        _safe_extract_zip(charades_annotations, extracted / "charades-annotations")
+        prior_manifest_path = (
+            args.public_root / "public/manifests/charades-selection-manifest.json"
+        )
+        prior_manifest = json.loads(prior_manifest_path.read_text())
+        excluded_subjects = {
+            row["subject"]
+            for rows in prior_manifest["partitions"].values()
+            for row in rows
+        }
+        excluded_videos = {
+            row["id"]
+            for rows in prior_manifest["partitions"].values()
+            for row in rows
+        }
+        action, action_report = _charades_action_source_inventory(
+            _load_charades_rows(extracted / "charades-annotations"),
+            protocol["order_dependent_action_control"],
+            int(preparation["seed"]),
+            excluded_subjects,
+            excluded_videos,
+        )
+        families["charades_order_action"] = {
+            "status": action_report["status"],
+            "counts": {
+                partition: len(action[partition])
+                for partition in preparation["partitions"]
+            },
+            "deficits": action_report["deficits"],
+        }
+        selections["charades_order_action"] = action
+    except Exception as error:
+        families["charades_order_action"] = _source_feasibility_failure(error)
+
+    subject_sets = {
+        partition: {
+            *(f"visor:{row['participant']}" for row in visor[partition]),
+            *(f"charades:{row['subject']}" for row in action[partition]),
+        }
+        for partition in preparation["partitions"]
+    }
+    video_sets = {
+        partition: {
+            *(f"visor:{row['video']}" for row in visor[partition]),
+            *(f"charades:{row['video']}" for row in action[partition]),
+        }
+        for partition in preparation["partitions"]
+    }
+    object_sets = {
+        partition: {row["image_id"] for row in coco[partition]}
+        for partition in preparation["partitions"]
+    }
+    audits = {
+        "source_subject_overlap_count": len(
+            subject_sets["development"] & subject_sets["holdout"]
+        ),
+        "source_video_overlap_count": len(
+            video_sets["development"] & video_sets["holdout"]
+        ),
+        "source_object_overlap_count": len(
+            object_sets["development"] & object_sets["holdout"]
+        ),
+    }
+    families["cross_partition_source_independence"] = {
+        "status": "PASS" if not any(audits.values()) else "NO_GO",
+        **audits,
+    }
+    nonpass = {
+        name: record
+        for name, record in families.items()
+        if not str(record.get("status", "")).startswith("PASS")
+    }
+    blocked = any(
+        record.get("status") == "BLOCKED_ENGINEERING"
+        for record in nonpass.values()
+    )
+    status = (
+        "BLOCKED_COMPLETE_SOURCE_FEASIBILITY_ENGINEERING"
+        if blocked
+        else (
+            "NO_GO_COMPLETE_SOURCE_FEASIBILITY"
+            if nonpass
+            else "PASS_SOURCE_FEASIBILITY_PENDING_NO_HAND_REVIEW"
+        )
+    )
+    record = {
+        "schema_version": 2,
+        "status": status,
+        "visor_hos_correction_amendment_commitment_sha256": amendment[
+            "amendment_commitment_sha256"
+        ],
+        "fixture_preparation_amendment_commitment_sha256": preparation[
+            "preparation_amendment_commitment_sha256"
+        ],
+        "fixture_feasibility_repair_commitment_sha256": repair[
+            "fixture_feasibility_repair_commitment_sha256"
+        ],
+        "public_fixture_protocol_commitment_sha256": protocol[
+            "protocol_commitment_sha256"
+        ],
+        "families": families,
+        "failing_family_names": sorted(nonpass),
+        "selections": selections,
+        "visor_hos_inventory": visor_report,
+        "action_inventory": action_report,
+        "audits": audits,
+        "no_hand_truth_opened": False,
+        "no_hand_review_required_before_public_model_inference": True,
+        "model_inference_executed": False,
+        "media_rendering_executed": False,
+        "large_Charades_video_archive_downloaded": False,
+        "restricted_mount_present": False,
+    }
+    record["visor_hos_source_feasibility_commitment_sha256"] = digest(record)
+    write_private(fixture_root / "visor-hos-source-feasibility.json", record)
+    raw_visor = visor_report.get("raw_eligible_counts", {})
+    artifact_family = families["official_visor_hos_artifact"]
+    return {
+        "status": status,
+        "official_annotation_file_count": int(
+            artifact_family.get("file_count", 0)
+        ),
+        "official_annotation_bytes": int(artifact_family.get("bytes", 0)),
+        "coco_source_count": sum(len(rows) for rows in coco.values()),
+        "visor_contact_candidate_count": int(raw_visor.get("contact", 0)),
+        "visor_no_contact_candidate_count": int(
+            raw_visor.get("explicit_no_contact", 0)
+        ),
+        "visor_no_hand_nominee_count": int(
+            raw_visor.get("no_hand_nominee", 0)
+        ),
+        "action_item_count": sum(len(rows) for rows in action.values()),
+        "language_lexical_item_count": sum(
+            len(rows) for rows in language_rows.values()
+        ),
+        "referent_attribute_item_count": (
+            2 * referent_count if families["referent_attribute_composite"]["status"] == "PASS" else 0
+        ),
+        "recurrence_pair_count": (
+            2 * recurrence_count if families["recurrence"]["status"] == "PASS" else 0
+        ),
+        "sensor_item_count": (
+            2 * sensor_count if families["sensor"]["status"] == "PASS" else 0
+        ),
+        "partition_count": 2,
+        "failing_family_count": len(nonpass),
+        "pending_dependent_family_count": int(
+            families["visor_hos_no_hand_nominees"]["status"]
+            == "PASS_NOMINEE_QUEUE_READY"
+        ),
+        **audits,
+        "model_inference_executed": False,
+        "media_rendering_executed": False,
+        "restricted_mount_present": False,
+        "visor_hos_source_feasibility_commitment_sha256": record[
+            "visor_hos_source_feasibility_commitment_sha256"
+        ],
+    }
+
+
+def _prepare_tuple_fixture_feasibility_legacy(
     args: argparse.Namespace,
 ) -> dict[str, Any]:
     cfg = json.loads(args.config.read_text())
@@ -3367,6 +11335,15 @@ def prepare_tuple_fixture_feasibility(
     }
 
 
+def prepare_tuple_fixture_feasibility(args: argparse.Namespace) -> dict[str, Any]:
+    recipe = str(getattr(args, "recipe", "active-visor-hos"))
+    if recipe == "active-visor-hos":
+        return prepare_tuple_visor_hos_fixture_feasibility(args)
+    if recipe == "legacy-sealed":
+        return _prepare_tuple_fixture_feasibility_legacy(args)
+    raise RuntimeError("E_TUPLE_FIXTURE_FEASIBILITY_RECIPE")
+
+
 def _prepare_coco_fixtures(
     fixture_root: Path,
     extracted: Path,
@@ -3417,6 +11394,12 @@ def _prepare_coco_fixtures(
     scenarios = preparation["referent_attribute_rendering"][
         "scenarios_once_per_category"
     ]
+    grounding_definitions = next(
+        axis["definitions"]
+        for axis in _tuple_amendment(cfg)["axes"]
+        if axis["id"]
+        == "utterance_centered_referent_visibility_dominance_ambiguity"
+    )
     outputs: dict[str, dict[str, list[dict[str, Any]]]] = {}
     for partition in preparation["partitions"]:
         outputs[partition] = {
@@ -3429,27 +11412,38 @@ def _prepare_coco_fixtures(
         }
         ontology = preparation["public_object_ontology"]
         base_frames: list[list[Any]] = []
-        for category_index, category in enumerate(ontology):
+        for category in ontology:
             targets = crop_records[partition][category]
-            distractor_category = ontology[(category_index + 1) % len(ontology)]
-            distractors = crop_records[partition][distractor_category]
             for scenario_ordinal, scenario in enumerate(scenarios):
-                target_record = targets[scenario_ordinal % len(targets)]
-                distractor_record = distractors[scenario_ordinal % len(distractors)]
+                source_index = _referent_attribute_source_index(
+                    scenario_ordinal, len(targets)
+                )
+                target_record, distractor_record = (
+                    _referent_attribute_source_records(
+                        targets, scenario_ordinal, scenario
+                    )
+                )
                 target_crop = Image.open(
                     fixture_root / target_record["crop_relative_path"]
                 ).convert("RGBA")
-                distractor_crop = Image.open(
-                    fixture_root / distractor_record["crop_relative_path"]
-                ).convert("RGBA")
-                frames, masks, truth = _render_referent_fixture(
-                    preparation,
-                    partition,
-                    category,
-                    scenario,
-                    scenario_ordinal,
-                    target_crop,
-                    distractor_crop,
+                distractor_crop = (
+                    Image.open(
+                        fixture_root / distractor_record["crop_relative_path"]
+                    ).convert("RGBA")
+                    if distractor_record is not None
+                    else None
+                )
+                frames, target_masks, distractor_masks, truth = (
+                    _render_referent_fixture(
+                        preparation,
+                        partition,
+                        category,
+                        scenario,
+                        scenario_ordinal,
+                        target_crop,
+                        distractor_crop,
+                        grounding_definitions,
+                    )
                 )
                 fixture_ordinal = len(outputs[partition]["referent_attribute"])
                 media = (
@@ -3465,8 +11459,42 @@ def _prepare_coco_fixtures(
                     / f"{fixture_ordinal:03d}.npz"
                 )
                 mask_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-                np.savez_compressed(mask_path, target_mask=masks)
+                np.savez_compressed(
+                    mask_path,
+                    target_mask=target_masks,
+                    distractor_mask=distractor_masks,
+                )
                 os.chmod(mask_path, 0o600)
+                sampled_mask_rows = []
+                for sample_ordinal, sample in enumerate(
+                    truth.pop("sampled_mask_truth")
+                ):
+                    frame_index = int(sample["frame_index"])
+                    mask_row = dict(sample)
+                    for role, masks in (
+                        ("target", target_masks),
+                        ("distractor", distractor_masks),
+                    ):
+                        sample_mask_path = (
+                            mask_path.parent
+                            / f"{fixture_ordinal:03d}-{sample_ordinal:02d}-{role}.png"
+                        )
+                        Image.fromarray(
+                            (masks[frame_index] > 0).astype(np.uint8) * 255,
+                            mode="L",
+                        ).save(sample_mask_path, format="PNG")
+                        os.chmod(sample_mask_path, 0o600)
+                        mask_row[f"{role}_mask_relative_path"] = str(
+                            sample_mask_path.relative_to(fixture_root)
+                        )
+                        mask_row[f"{role}_mask_sha256"] = file_digest(
+                            sample_mask_path
+                        )
+                        mask_row[f"{role}_mask_bytes"] = (
+                            sample_mask_path.stat().st_size
+                        )
+                    sampled_mask_rows.append(mask_row)
+                truth["sampled_mask_truth"] = sampled_mask_rows
                 audio = audio_files.get((partition, category, scenario))
                 if truth["speech_present"] and audio is None:
                     raise RuntimeError("E_TUPLE_AUDIO_SEED_MISSING")
@@ -3477,6 +11505,17 @@ def _prepare_coco_fixtures(
                     audio,
                     media,
                 )
+                attribute_pair_id = (
+                    _referent_attribute_episode_id(
+                        partition,
+                        category,
+                        scenario,
+                        scenario_ordinal,
+                        source_index,
+                    )
+                    if truth["attribute_family"] == "relative_size"
+                    else None
+                )
                 outputs[partition]["referent_attribute"].append(
                     {
                         "fixture_ordinal": fixture_ordinal,
@@ -3485,6 +11524,38 @@ def _prepare_coco_fixtures(
                         "source_image_id": target_record["image_id"],
                         "source_annotation_id": target_record["annotation_id"],
                         "source_image_sha256": target_record["source_image_sha256"],
+                        "distractor_source_category": (
+                            distractor_record["category"]
+                            if distractor_record is not None
+                            else None
+                        ),
+                        "distractor_source_image_id": (
+                            distractor_record["image_id"]
+                            if distractor_record is not None
+                            else None
+                        ),
+                        "distractor_source_annotation_id": (
+                            distractor_record["annotation_id"]
+                            if distractor_record is not None
+                            else None
+                        ),
+                        "distractor_source_image_sha256": (
+                            distractor_record["source_image_sha256"]
+                            if distractor_record is not None
+                            else None
+                        ),
+                        "distractor_source_distinct_from_target": (
+                            True if distractor_record is not None else None
+                        ),
+                        "attribute_pair_source_index": source_index,
+                        "attribute_pair_id": attribute_pair_id,
+                        "episode_id": _referent_attribute_episode_id(
+                            partition,
+                            category,
+                            scenario,
+                            scenario_ordinal,
+                            source_index,
+                        ),
                         "source_license_id": target_record["license_id"],
                         "source_license_name": target_record["license_name"],
                         "source_license_url": target_record["license_url"],
@@ -3527,18 +11598,26 @@ def _prepare_coco_fixtures(
                 second_crop = Image.open(
                     fixture_root / second_record["crop_relative_path"]
                 ).convert("RGBA")
-                first, second = _render_recurrence_pair(
+                first, second, first_mask, second_mask = _render_recurrence_pair(
                     first_crop, second_crop, stratum, ordinal
                 )
                 pair_ordinal = len(outputs[partition]["recurrence"])
                 pair_root = fixture_root / "media/recurrence" / partition
                 pair_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+                mask_root = fixture_root / "truth/recurrence" / partition
+                mask_root.mkdir(parents=True, exist_ok=True, mode=0o700)
                 first_path = pair_root / f"{pair_ordinal:03d}-a.png"
                 second_path = pair_root / f"{pair_ordinal:03d}-b.png"
+                first_mask_path = mask_root / f"{pair_ordinal:03d}-a-mask.png"
+                second_mask_path = mask_root / f"{pair_ordinal:03d}-b-mask.png"
                 first.save(first_path, format="PNG")
                 second.save(second_path, format="PNG")
+                first_mask.save(first_mask_path, format="PNG")
+                second_mask.save(second_mask_path, format="PNG")
                 os.chmod(first_path, 0o600)
                 os.chmod(second_path, 0o600)
+                os.chmod(first_mask_path, 0o600)
+                os.chmod(second_mask_path, 0o600)
                 outputs[partition]["recurrence"].append(
                     {
                         "fixture_ordinal": pair_ordinal,
@@ -3555,8 +11634,20 @@ def _prepare_coco_fixtures(
                         ],
                         "first_relative_path": str(first_path.relative_to(fixture_root)),
                         "first_sha256": file_digest(first_path),
+                        "first_bytes": first_path.stat().st_size,
                         "second_relative_path": str(second_path.relative_to(fixture_root)),
                         "second_sha256": file_digest(second_path),
+                        "second_bytes": second_path.stat().st_size,
+                        "first_mask_relative_path": str(
+                            first_mask_path.relative_to(fixture_root)
+                        ),
+                        "first_mask_sha256": file_digest(first_mask_path),
+                        "first_mask_bytes": first_mask_path.stat().st_size,
+                        "second_mask_relative_path": str(
+                            second_mask_path.relative_to(fixture_root)
+                        ),
+                        "second_mask_sha256": file_digest(second_mask_path),
+                        "second_mask_bytes": second_mask_path.stat().st_size,
                     }
                 )
         bins = cfg["calibration_C"]["extractor"]["fixed_numeric_bins"]
@@ -3599,6 +11690,10 @@ def _prepare_coco_fixtures(
         }
         for partition in preparation["partitions"]
     }
+    for partition in preparation["partitions"]:
+        _validate_tuple_recurrence_fixture_rows(
+            outputs[partition]["recurrence"], fixture_root
+        )
     return outputs, object_sets
 
 
@@ -3663,17 +11758,73 @@ def _prepare_action_fixtures(
     return output, sets
 
 
+def _tuple_fixture_preparation_compact(
+    fixture_manifest: dict[str, Any],
+) -> dict[str, Any]:
+    partitions = fixture_manifest["partitions"]
+    total = {
+        family: sum(len(partitions[partition][family]) for partition in partitions)
+        for family in (
+            "language_lexical",
+            "referent_attribute",
+            "recurrence",
+            "hand_contact",
+            "sensor",
+            "order_action",
+        )
+    }
+    audits = fixture_manifest["audits"]
+    return {
+        "status": "PASS_PUBLIC_FIXTURES_SEALED_NO_MODEL_INFERENCE",
+        "source_archive_count": len(fixture_manifest["source_provenance"]),
+        "partition_count": len(partitions),
+        "language_lexical_item_count": total["language_lexical"],
+        "referent_attribute_item_count": total["referent_attribute"],
+        "recurrence_pair_count": total["recurrence"],
+        "hand_contact_item_count": total["hand_contact"],
+        "sensor_item_count": total["sensor"],
+        "order_action_item_count": total["order_action"],
+        "source_subject_overlap_count": audits["source_subject_overlap_count"],
+        "source_video_overlap_count": audits["source_video_overlap_count"],
+        "source_frame_overlap_count": audits["source_frame_overlap_count"],
+        "source_object_overlap_count": audits["source_object_overlap_count"],
+        "restricted_mount_present": False,
+        "model_inference_executed": False,
+        "public_fixture_manifest_commitment_sha256": fixture_manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+    }
+
+
 def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
     cfg = json.loads(args.config.read_text())
+    fixture_root = _tuple_fixture_root(args.public_root)
+    _require_external_or_ignored_output(args.public_root)
+    qualification_paths = _tuple_qualification_paths(args.public_root)
+    if any(path.exists() for path in qualification_paths.values()):
+        raise RuntimeError("E_TUPLE_FIXTURE_REPLACEMENT_AFTER_QUALIFICATION")
     amendment = _tuple_amendment(cfg)
+    correction = _tuple_visor_hos_correction_amendment(cfg)
     protocol = _tuple_fixture_protocol(cfg)
     preparation = _tuple_fixture_preparation_amendment(cfg)
     feasibility_repair = _tuple_fixture_feasibility_repair(cfg)
     _verify_tuple_runtime_manifest(args.public_root, cfg)
-    fixture_root = _tuple_fixture_root(args.public_root)
+    fixture_manifest_path = fixture_root / "fixture-manifest.json"
+    if fixture_manifest_path.exists():
+        before = file_digest(fixture_manifest_path)
+        existing, _ = _verify_tuple_fixture_manifest(args.public_root, cfg)
+        if file_digest(fixture_manifest_path) != before:
+            raise RuntimeError("E_TUPLE_FIXTURE_MANIFEST_CHANGED_DURING_REUSE")
+        return _tuple_fixture_preparation_compact(existing)
     fixture_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    review_root = Path(
+        getattr(args, "no_hand_review_root", None)
+        or fixture_root / "no-hand-review"
+    )
+    if review_root.resolve() != (fixture_root / "no-hand-review").resolve():
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_CANONICAL_ROOT")
     audio_manifest, audio_files = _read_audio_seed_manifest(
-        args.audio_seed_root, preparation
+        args.audio_seed_root, cfg
     )
     sources = preparation["source_archives"]
     coco_annotations = _fixture_archive(
@@ -3703,8 +11854,8 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         cfg,
         audio_files,
     )
-    visor, visor_provenance = _prepare_visor_fixtures(
-        fixture_root, preparation
+    visor, visor_provenance, visor_lineage = _prepare_active_visor_hos_fixtures(
+        fixture_root, preparation, cfg, review_root
     )
     action, action_video_sets = _prepare_action_fixtures(
         args, fixture_root, extracted, preparation, protocol
@@ -3714,8 +11865,8 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         partitions[partition]["order_action"] = action[partition]
     subject_sets = {
         partition: {
-            *(row["source_participant"] for row in visor[partition]),
-            *(row["subject"] for row in action[partition]),
+            *(f"visor:{row['source_participant']}" for row in visor[partition]),
+            *(f"charades:{row['subject']}" for row in action[partition]),
         }
         for partition in preparation["partitions"]
     }
@@ -3724,15 +11875,33 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         for partition in preparation["partitions"]
     }
     video_sets = {
-        partition: visor_video_sets[partition] | action_video_sets[partition]
+        partition: {
+            *(f"visor:{value}" for value in visor_video_sets[partition]),
+            *(f"charades:{value}" for value in action_video_sets[partition]),
+        }
         for partition in preparation["partitions"]
     }
+    frame_sets = {
+        partition: {
+            (row["source_video"], row["source_frame_name"])
+            for row in visor[partition]
+        }
+        for partition in preparation["partitions"]
+    }
+    if any(
+        len(frame_sets[partition]) != len(visor[partition])
+        for partition in preparation["partitions"]
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FRAME_DUPLICATE")
     audits = {
         "source_subject_overlap_count": len(
             subject_sets["development"] & subject_sets["holdout"]
         ),
         "source_video_overlap_count": len(
             video_sets["development"] & video_sets["holdout"]
+        ),
+        "source_frame_overlap_count": len(
+            frame_sets["development"] & frame_sets["holdout"]
         ),
         "source_object_overlap_count": len(
             object_sets["development"] & object_sets["holdout"]
@@ -3752,11 +11921,25 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         for key in (
             "source_subject_overlap_count",
             "source_video_overlap_count",
+            "source_frame_overlap_count",
             "source_object_overlap_count",
         )
     ):
         raise RuntimeError("E_TUPLE_FIXTURE_PARTITION_OVERLAP")
-    expected_counts = preparation["counts_per_partition"]
+    if (
+        audits["source_frame_overlap_count"]
+        != visor_lineage["source_frame_overlap_count"]
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FRAME_AUDIT_MISMATCH")
+    active_counts = correction["public_fixture_counts_per_partition"]
+    expected_counts = {
+        "language_lexical": active_counts["language_and_lexical_items"],
+        "referent_attribute": active_counts["referent_attribute_microclips"],
+        "recurrence": active_counts["recurrence_pairs"],
+        "hand_contact": active_counts["hand_contact_items"],
+        "sensor": active_counts["sensor_perturbation_clips"],
+        "order_action": active_counts["order_dependent_action_clips"],
+    }
     if any(
         audits["fixture_counts"][partition] != expected_counts
         for partition in preparation["partitions"]
@@ -3773,7 +11956,7 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         if "sha256" in value
     ] + visor_provenance
     fixture_manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": "SEALED_BEFORE_PUBLIC_DEVELOPMENT_INFERENCE",
         "mechanistic_tuple_amendment_commitment_sha256": amendment[
             "amendment_commitment_sha256"
@@ -3783,6 +11966,15 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         ],
         "fixture_preparation_amendment_commitment_sha256": preparation[
             "preparation_amendment_commitment_sha256"
+        ],
+        "visor_hos_correction_amendment_commitment_sha256": visor_lineage[
+            "visor_hos_correction_amendment_commitment_sha256"
+        ],
+        "visor_hos_source_feasibility_commitment_sha256": visor_lineage[
+            "visor_hos_source_feasibility_commitment_sha256"
+        ],
+        "verified_no_hand_seal_commitment_sha256": visor_lineage[
+            "verified_no_hand_seal_commitment_sha256"
         ],
         "audio_seed_commitment_sha256": audio_manifest[
             "audio_seed_commitment_sha256"
@@ -3798,33 +11990,8 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
     fixture_manifest["public_fixture_manifest_commitment_sha256"] = digest(
         fixture_manifest
     )
-    write_private(fixture_root / "fixture-manifest.json", fixture_manifest)
-    total = {
-        family: sum(
-            len(partitions[partition][family])
-            for partition in preparation["partitions"]
-        )
-        for family in preparation["counts_per_partition"]
-    }
-    return {
-        "status": "PASS_PUBLIC_FIXTURES_SEALED_NO_MODEL_INFERENCE",
-        "source_archive_count": len(source_provenance),
-        "partition_count": len(preparation["partitions"]),
-        "language_lexical_item_count": total["language_lexical"],
-        "referent_attribute_item_count": total["referent_attribute"],
-        "recurrence_pair_count": total["recurrence"],
-        "hand_contact_item_count": total["hand_contact"],
-        "sensor_item_count": total["sensor"],
-        "order_action_item_count": total["order_action"],
-        "source_subject_overlap_count": audits["source_subject_overlap_count"],
-        "source_video_overlap_count": audits["source_video_overlap_count"],
-        "source_object_overlap_count": audits["source_object_overlap_count"],
-        "restricted_mount_present": False,
-        "model_inference_executed": False,
-        "public_fixture_manifest_commitment_sha256": fixture_manifest[
-            "public_fixture_manifest_commitment_sha256"
-        ],
-    }
+    write_private_new(fixture_manifest_path, fixture_manifest)
+    return _tuple_fixture_preparation_compact(fixture_manifest)
 
 
 def prepare_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
@@ -5383,65 +13550,183 @@ def _load_egohos_segmentor(config_path: Path, checkpoint_path: Path, device: str
     return model.to(device).eval(), config
 
 
-def _size_tuple_egohos(
-    public: Path, device: str, image_array, scratch: Path
-) -> dict[str, Any]:
-    import numpy as np
-    import torch
+def _tuple_egohos_config_item(value: Any, key: str) -> Any:
+    try:
+        return value[key]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_EGOHOS_TEST_PIPELINE") from error
+
+
+def _validate_tuple_egohos_test_pipeline(config: Any) -> None:
+    """Require the pinned official mmseg test preprocessing recipe exactly."""
+
+    data = _tuple_egohos_config_item(config, "data")
+    test = _tuple_egohos_config_item(data, "test")
+    pipeline = _tuple_egohos_config_item(test, "pipeline")
+    if not isinstance(pipeline, (list, tuple)) or len(pipeline) != 2:
+        raise RuntimeError("E_TUPLE_EGOHOS_TEST_PIPELINE")
+    load = pipeline[0]
+    augment = pipeline[1]
+    transforms = _tuple_egohos_config_item(augment, "transforms")
+    if (
+        _tuple_egohos_config_item(load, "type") != "LoadImageFromFile"
+        or _tuple_egohos_config_item(augment, "type") != "MultiScaleFlipAug"
+        or tuple(_tuple_egohos_config_item(augment, "img_scale")) != (360, 480)
+        or _tuple_egohos_config_item(augment, "flip") is not False
+        or not isinstance(transforms, (list, tuple))
+        or [
+            _tuple_egohos_config_item(item, "type") for item in transforms
+        ]
+        != ["Resize", "RandomFlip", "Normalize", "ImageToTensor", "Collect"]
+        or _tuple_egohos_config_item(transforms[0], "keep_ratio") is not True
+        or list(_tuple_egohos_config_item(transforms[2], "mean"))
+        != [123.675, 116.28, 103.53]
+        or list(_tuple_egohos_config_item(transforms[2], "std"))
+        != [58.395, 57.12, 57.375]
+        or _tuple_egohos_config_item(transforms[2], "to_rgb") is not True
+        or list(_tuple_egohos_config_item(transforms[3], "keys")) != ["img"]
+        or list(_tuple_egohos_config_item(transforms[4], "keys")) != ["img"]
+    ):
+        raise RuntimeError("E_TUPLE_EGOHOS_TEST_PIPELINE")
+
+
+def _tuple_egohos_official_stage(
+    model: Any,
+    config: Any,
+    image_paths: list[Path],
+    original_shapes: list[tuple[int, int]],
+    *,
+    stage: str,
+    run_root: Path,
+    output_folder: str | None,
+    inference_segmentor: Any,
+) -> list[Any]:
+    """Run one official mmseg stage and retain its original-size class maps."""
+
     from PIL import Image
+
+    if len(image_paths) != len(original_shapes) or not image_paths:
+        raise RuntimeError("E_TUPLE_EGOHOS_IMAGE_COUNT")
+    _validate_tuple_egohos_test_pipeline(config)
+    expected_channel = {
+        "stage1": "none",
+        "stage2": "twohands",
+        "stage3": "twohands_cb",
+    }.get(stage)
+    if expected_channel is None:
+        raise RuntimeError("E_TUPLE_EGOHOS_STAGE_ID")
+    existing_channel = config.get("additional_channel")
+    if existing_channel is not None and not isinstance(existing_channel, str):
+        raise RuntimeError("E_TUPLE_EGOHOS_ADDITIONAL_CHANNEL")
+    normalized_channel = (
+        existing_channel.casefold() if isinstance(existing_channel, str) else None
+    )
+    allowed_channels = (
+        {None, "", "none"}
+        if stage == "stage1"
+        else {None, "", expected_channel}
+    )
+    if normalized_channel not in allowed_channels:
+        raise RuntimeError("E_TUPLE_EGOHOS_ADDITIONAL_CHANNEL")
+    config["additional_channel"] = (
+        existing_channel or ""
+        if stage == "stage1"
+        else expected_channel
+    )
+    model.cfg = config
+    output = []
+    for image_path, original_shape in zip(
+        image_paths, original_shapes, strict=True
+    ):
+        result = inference_segmentor(model, str(image_path))
+        if not isinstance(result, (list, tuple)) or len(result) != 1:
+            raise RuntimeError("E_TUPLE_EGOHOS_OFFICIAL_RESULT")
+        prediction = _tuple_egohos_stage_class_map(
+            stage, result[0], expected_shape=original_shape
+        )
+        output.append(prediction)
+        if output_folder is not None:
+            target_root = run_root / output_folder
+            target_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+            target = target_root / f"{image_path.stem}.png"
+            Image.fromarray(prediction).save(target, format="PNG")
+            os.chmod(target, 0o600)
+    return output
+
+
+def _tuple_egohos_run_official_pipeline(
+    public: Path,
+    device: str,
+    image_paths: list[Path],
+    original_shapes: list[tuple[int, int]],
+    run_root: Path,
+) -> list[dict[str, Any]]:
+    """Run the official sequential mmseg inference pipeline for all three stages."""
 
     _install_egohos_segmentation_compatibility()
     model_root = _tuple_model_root(public)
     sys.path.insert(0, str(model_root / "code/EgoHOS/mmsegmentation"))
     sys.path.insert(0, str(model_root / "code/EgoHOS"))
+    from mmseg.apis import inference_segmentor
+
     work = model_root / "egohos-checkpoints/work_dirs"
-    media_root = scratch / "egohos"
-    image_root = media_root / "images"
-    image_root.mkdir(parents=True, exist_ok=True, mode=0o700)
-    image_path = image_root / "public-dummy.png"
-    Image.fromarray(image_array[:360, :480]).save(image_path)
-    os.chmod(image_path, 0o600)
-    tensor = torch.from_numpy(image_array[:360, :480].astype(np.float32))
-    mean = torch.tensor([123.675, 116.28, 103.53])
-    standard = torch.tensor([58.395, 57.12, 57.375])
-    tensor = ((tensor - mean) / standard).permute(2, 0, 1).unsqueeze(0).to(device)
-    stages = [
-        ("seg_twohands_ccda", "best_mIoU_iter_56000.pth", "pred_twohands"),
-        ("twohands_to_cb_ccda", "best_mIoU_iter_76000.pth", "pred_cb"),
-        ("twohands_cb_to_obj1_ccda", "best_mIoU_iter_34000.pth", None),
-    ]
-    width = 0
-    for folder, checkpoint_name, output_folder in stages:
+    predictions = [dict() for _path in image_paths]
+    stages = (
+        ("stage1", "seg_twohands_ccda", "best_mIoU_iter_56000.pth", "pred_twohands"),
+        ("stage2", "twohands_to_cb_ccda", "best_mIoU_iter_76000.pth", "pred_cb"),
+        ("stage3", "twohands_cb_to_obj1_ccda", "best_mIoU_iter_34000.pth", None),
+    )
+    for stage, folder, checkpoint_name, output_folder in stages:
         root = work / folder
         model, config = _load_egohos_segmentor(
             root / f"{folder}.py", root / checkpoint_name, device
         )
-        metadata = {
-            "filename": str(image_path),
-            "ori_shape": (360, 480, 3),
-            "img_shape": (360, 480, 3),
-            "pad_shape": (360, 480, 3),
-            "scale_factor": 1.0,
-            "flip": False,
-            "additional_channel": str(config.get("additional_channel", "")),
-        }
-        with torch.inference_mode():
-            logits = model.encode_decode(tensor, [metadata])
-        if logits.ndim != 4 or not torch.isfinite(logits).all():
-            raise RuntimeError("E_TUPLE_EGOHOS_OUTPUT")
-        prediction = logits.argmax(dim=1)[0].byte().cpu().numpy()
-        width += int(logits.numel())
-        if output_folder is not None:
-            target_root = media_root / output_folder
-            target_root.mkdir(parents=True, exist_ok=True, mode=0o700)
-            target = target_root / "public-dummy.png"
-            Image.fromarray(prediction).save(target)
-            os.chmod(target, 0o600)
-        del prediction, logits, model
-        _release_cuda()
-    del tensor
-    _release_cuda()
-    return {"finite": True, "output_width": width}
+        try:
+            stage_predictions = _tuple_egohos_official_stage(
+                model,
+                config,
+                image_paths,
+                original_shapes,
+                stage=stage,
+                run_root=run_root,
+                output_folder=output_folder,
+                inference_segmentor=inference_segmentor,
+            )
+            for record, prediction in zip(
+                predictions, stage_predictions, strict=True
+            ):
+                record[stage] = prediction
+        finally:
+            del model
+            _release_cuda()
+    for prediction in predictions:
+        _tuple_egohos_stage_masks(prediction)
+    return predictions
+
+
+def _size_tuple_egohos(
+    public: Path, device: str, image_array, scratch: Path
+) -> dict[str, Any]:
+    from PIL import Image
+
+    media_root = scratch / "egohos"
+    image_root = media_root / "images"
+    image_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    image_path = image_root / "public-dummy.png"
+    Image.fromarray(image_array).save(image_path)
+    os.chmod(image_path, 0o600)
+    height, width = image_array.shape[:2]
+    predictions = _tuple_egohos_run_official_pipeline(
+        public,
+        device,
+        [image_path],
+        [(height, width)],
+        media_root,
+    )
+    output_width = sum(
+        int(mask.size) for record in predictions for mask in record.values()
+    )
+    return {"finite": True, "output_width": output_width}
 
 
 def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
@@ -6170,6 +14455,29 @@ def write_private(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
+def write_private_new(path: Path, value: Any) -> None:
+    """Atomically create a private record without ever replacing a seal."""
+
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    temporary_name: str | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="wb", prefix=f".{path.name}.", dir=path.parent, delete=False
+        ) as temporary:
+            temporary_name = temporary.name
+            temporary.write(canonical(value) + b"\n")
+            temporary.flush()
+            os.fsync(temporary.fileno())
+        os.chmod(temporary_name, 0o600)
+        try:
+            os.link(temporary_name, path)
+        except FileExistsError as error:
+            raise RuntimeError("E_PRIVATE_OUTPUT_ALREADY_EXISTS") from error
+    finally:
+        if temporary_name is not None:
+            Path(temporary_name).unlink(missing_ok=True)
+
+
 def bucket(value: float, edges: list[float]) -> str:
     if not math.isfinite(value):
         raise ValueError("bucket value must be finite")
@@ -6313,7 +14621,12 @@ def _image_metrics(image, previous) -> dict[str, float | None]:
     }
 
 
-def _load_vision(public: Path, cfg: dict[str, Any], device: str):
+def _load_vision(
+    public: Path,
+    cfg: dict[str, Any],
+    device: str,
+    prompt_groups_override: dict[str, dict[str, list[str]]] | None = None,
+):
     import torch
     from apps.alignment_scoring.third_party.perception_models.core.vision_encoder import (
         pe,
@@ -6342,7 +14655,7 @@ def _load_vision(public: Path, cfg: dict[str, Any], device: str):
     tokenizer = transforms.get_text_tokenizer(model.context_length)
     extractor = cfg["calibration_C"]["extractor"]
     repair = extractor.get("coverage_repair")
-    prompt_groups = (
+    prompt_groups = prompt_groups_override or (
         repair["prompt_ensembles"]
         if repair and repair.get("status") == "FROZEN_ACTIVE"
         else extractor["regular_frame_prompt_groups"]
@@ -7116,11 +15429,20 @@ def _build_episode_plans(
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    extractor = cfg["calibration_C"]["extractor"]
+    active_tuple = extractor.get(
+        "mechanistic_training_tuple_visor_hos_correction_amendment"
+    )
+    if isinstance(active_tuple, dict) and active_tuple.get("status") == (
+        "FROZEN_BEFORE_NEW_PUBLIC_SOURCE_INVENTORY_MODEL_C_GENERATOR_OR_LEARNER_OUTCOMES"
+    ):
+        raise RuntimeError(
+            "E_LEGACY_BROAD_CALIBRATION_SUPERSEDED_BY_ACTIVE_TUPLE_PROTOCOL"
+        )
     import imageio_ffmpeg
     import numpy as np
 
-    cfg = json.loads(args.config.read_text())
-    extractor = cfg["calibration_C"]["extractor"]
     repair = _repair_config(cfg)
     repair_commitment = digest(repair)
     qualification_path = (
@@ -7636,16 +15958,49 @@ def main() -> None:
     tuple_size_parser.add_argument("--scratch-root", type=Path, required=True)
     tuple_size_parser.add_argument("--config", type=Path, required=True)
     tuple_size_parser.add_argument("--device", default="cuda")
+    tuple_qualify_parser = subparsers.add_parser("tuple-qualify")
+    tuple_qualify_parser.add_argument("--public-root", type=Path, required=True)
+    tuple_qualify_parser.add_argument("--scratch-root", type=Path, required=True)
+    tuple_qualify_parser.add_argument("--config", type=Path, required=True)
+    tuple_qualify_parser.add_argument(
+        "--partition", choices=("development", "holdout"), required=True
+    )
+    tuple_qualify_parser.add_argument("--device", default="cuda")
     tuple_audio_parser = subparsers.add_parser("tuple-audio-seed")
     tuple_audio_parser.add_argument("--output-root", type=Path, required=True)
     tuple_audio_parser.add_argument("--config", type=Path, required=True)
+    tuple_no_hand_prepare_parser = subparsers.add_parser(
+        "tuple-no-hand-review-prepare"
+    )
+    tuple_no_hand_prepare_parser.add_argument(
+        "--public-root", type=Path, required=True
+    )
+    tuple_no_hand_prepare_parser.add_argument("--config", type=Path, required=True)
+    tuple_no_hand_seal_parser = subparsers.add_parser("tuple-no-hand-review-seal")
+    tuple_no_hand_seal_parser.add_argument("--public-root", type=Path, required=True)
+    tuple_no_hand_seal_parser.add_argument("--config", type=Path, required=True)
+    tuple_no_hand_seal_parser.add_argument(
+        "--authorized-applicant-attested", action="store_true"
+    )
+    tuple_no_hand_seal_parser.add_argument(
+        "--blind-to-egohos-output-attested", action="store_true"
+    )
+    tuple_no_hand_seal_parser.add_argument(
+        "--egohos-inference-not-started-attested", action="store_true"
+    )
     tuple_fixtures_parser = subparsers.add_parser("tuple-fixtures-prepare")
     tuple_fixtures_parser.add_argument("--public-root", type=Path, required=True)
     tuple_fixtures_parser.add_argument("--audio-seed-root", type=Path, required=True)
+    tuple_fixtures_parser.add_argument("--no-hand-review-root", type=Path)
     tuple_fixtures_parser.add_argument("--config", type=Path, required=True)
     tuple_feasibility_parser = subparsers.add_parser("tuple-fixtures-feasibility")
     tuple_feasibility_parser.add_argument("--public-root", type=Path, required=True)
     tuple_feasibility_parser.add_argument("--config", type=Path, required=True)
+    tuple_feasibility_parser.add_argument(
+        "--recipe",
+        choices=("active-visor-hos", "legacy-sealed"),
+        default="active-visor-hos",
+    )
     run_parser = subparsers.add_parser("run")
     run_parser.add_argument("--restricted-root", type=Path, required=True)
     run_parser.add_argument("--public-root", type=Path, required=True)
@@ -7738,6 +16093,15 @@ def main() -> None:
                 sha256_fields=TUPLE_SIZING_HASH_FIELDS,
             )
         )
+    elif args.command == "tuple-qualify":
+        value = qualify_tuple_public(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=TUPLE_QUALIFICATION_FIELDS,
+                sha256_fields=TUPLE_QUALIFICATION_HASH_FIELDS,
+            )
+        )
     elif args.command == "tuple-audio-seed":
         value = prepare_tuple_audio_seed(args)
         print(
@@ -7745,6 +16109,33 @@ def main() -> None:
                 value,
                 allowed_fields=TUPLE_AUDIO_SEED_FIELDS,
                 sha256_fields=TUPLE_AUDIO_SEED_HASH_FIELDS,
+            )
+        )
+    elif args.command == "tuple-no-hand-review-prepare":
+        value = prepare_active_visor_hos_no_hand_review(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=TUPLE_NO_HAND_REVIEW_PREP_FIELDS,
+                sha256_fields=TUPLE_NO_HAND_REVIEW_PREP_HASH_FIELDS,
+            )
+        )
+    elif args.command == "tuple-no-hand-review-seal":
+        value = seal_active_visor_hos_no_hand_review(args)
+        sealed = "verified_no_hand_seal_commitment_sha256" in value
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=(
+                    TUPLE_NO_HAND_REVIEW_SEAL_FIELDS
+                    if sealed
+                    else TUPLE_NO_HAND_REVIEW_INCOMPLETE_SEAL_FIELDS
+                ),
+                sha256_fields=(
+                    TUPLE_NO_HAND_REVIEW_SEAL_HASH_FIELDS
+                    if sealed
+                    else TUPLE_NO_HAND_REVIEW_INCOMPLETE_SEAL_HASH_FIELDS
+                ),
             )
         )
     elif args.command == "tuple-fixtures-prepare":
@@ -7758,11 +16149,21 @@ def main() -> None:
         )
     elif args.command == "tuple-fixtures-feasibility":
         value = prepare_tuple_fixture_feasibility(args)
+        allowed_fields = (
+            TUPLE_VISOR_HOS_SOURCE_FEASIBILITY_FIELDS
+            if args.recipe == "active-visor-hos"
+            else TUPLE_FIXTURE_FEASIBILITY_FIELDS
+        )
+        hash_fields = (
+            TUPLE_VISOR_HOS_SOURCE_FEASIBILITY_HASH_FIELDS
+            if args.recipe == "active-visor-hos"
+            else TUPLE_FIXTURE_FEASIBILITY_HASH_FIELDS
+        )
         print(
             compact_aggregate_json(
                 value,
-                allowed_fields=TUPLE_FIXTURE_FEASIBILITY_FIELDS,
-                sha256_fields=TUPLE_FIXTURE_FEASIBILITY_HASH_FIELDS,
+                allowed_fields=allowed_fields,
+                sha256_fields=hash_fields,
             )
         )
     elif args.command == "run":

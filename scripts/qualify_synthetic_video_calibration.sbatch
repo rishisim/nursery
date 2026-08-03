@@ -17,7 +17,7 @@ candidate_id="${PHASE4_ACTIVITY_CANDIDATE:-legacy-repair}"
 activity_run_mode="${PHASE4_ACTIVITY_RUN_MODE:-development}"
 tuple_run_mode="${PHASE4_TUPLE_RUN_MODE:-none}"
 export HF_HOME="${PHASE4_PUBLIC_ROOT}/models/pe-hf-home"
-if [[ "$tuple_run_mode" == "sizing" ]]; then
+if [[ "$tuple_run_mode" == "sizing" || "$tuple_run_mode" == "development" || "$tuple_run_mode" == "holdout" ]]; then
   output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/mechanistic-tuples"
 elif [[ "$candidate_id" == "legacy-repair" ]]; then
   output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/extractor-repair"
@@ -42,6 +42,25 @@ if [[ "$tuple_run_mode" == "sizing" ]]; then
     --public-root "${PHASE4_PUBLIC_ROOT}" \
     --scratch-root "$scratch" \
     --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json" \
+    --device cuda
+elif [[ "$tuple_run_mode" == "development" || "$tuple_run_mode" == "holdout" ]]; then
+  language_archive="${PHASE4_PUBLIC_ROOT}/models/phase4-language-pydeps.tar"
+  language_archive_sha256="27df87f4ec1900b4a11f307d42a18483903d38ddb9ed77f418b88fa299497e37"
+  language_archive_bytes=542423040
+  if [[ ! -f "$language_archive" || "$(stat -c %s "$language_archive")" -ne "$language_archive_bytes" ]]; then
+    exit 65
+  fi
+  printf '%s  %s\n' "$language_archive_sha256" "$language_archive" | sha256sum --check --status
+  tar -C "$scratch/pydeps" -xf "$language_archive"
+  export PYTHONPATH="${PHASE4_PUBLIC_ROOT}/models/mechanistic-tuples/runtime-pydeps:${PHASE4_PUBLIC_ROOT}/source:${PHASE4_PUBLIC_ROOT}/models/mechanistic-tuples/code/egobabyvlm:${PHASE4_PUBLIC_ROOT}/models/activity-pydeps/egohod_egovideo_l_zero_shot:$scratch/pydeps"
+  singularity exec --nv --net --network none \
+    --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${scratch}:${scratch}" \
+    "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" \
+    python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" tuple-qualify \
+    --public-root "${PHASE4_PUBLIC_ROOT}" \
+    --scratch-root "$scratch" \
+    --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json" \
+    --partition "$tuple_run_mode" \
     --device cuda
 elif [[ "$candidate_id" == "legacy-repair" ]]; then
   tar -C "$scratch/pydeps" -xf "${PHASE4_PUBLIC_ROOT}/models/phase4-language-pydeps.tar"

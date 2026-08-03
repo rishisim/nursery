@@ -243,13 +243,15 @@ relationship-derived label and sequential shared-cap recipe.
 ### Prospective VISOR-HOS fixture correction
 
 Before any new source inventory or extractor outcome, the user authorized a
-narrow correction at commitment `34cb7b52…931b`. It does not reinterpret the
+narrow correction at commitment `31c1c26f…1bf8d4`. It does not reinterpret the
 `dee0a375…13e7` no-go. The correction pins the official VISOR DOI deposit's
 115 training and 43 validation annotation JSONs (868,821,446 bytes) under a
 locally resolved external-manifest commitment `771ce947…c095`. The deposit is
 handled as CC-BY-NC-4.0 noncommercial academic data. The official VISOR-HOS
 repository is pinned only as a semantic reference because it contains no
-license file; repository code is neither copied nor executed.
+license file; repository code is neither copied nor executed. Its two relevant
+conversion files are independently hash-pinned so their identities cannot be
+conflated.
 
 Contact truth is now per visible left/right hand instance: a resolved object
 identifier is contact, exact `hand-not-in-contact` is no-contact, and
@@ -261,6 +263,16 @@ the frozen public-seed hash deal. A simultaneous order-invariant sampler then
 targets 48 contact, 48 explicit no-contact, and 48 verified no-hand fixtures in
 each partition, with a cap of four per video and stratum, one selected item per
 frame, and zero participant/video/frame overlap.
+
+Before development inference, the execution clarification also fixes the
+nine-sample referent aggregation, exact lexical stage semantics, alpha-masked
+DINOv2 recurrence input, pHash threshold, PE-Core attribute prompts,
+single-factor sensor comparisons and maximum-motion cut statistic, target-side
+EgoHOS mapping with the official keep-ratio mmseg test pipelines, and
+sixteen-frame ordered/reversed/repeated action controls. The repaired public
+audio seed uses attributive adjective–noun phrasing and is commitment-bound;
+the earlier predicative seed is preserved but rejected as stale. These are
+executable metric definitions, not post-outcome threshold changes.
 
 The public stage must run every independent source and model check before one
 combined decision. All five critical learner-effective axes, at least six of
