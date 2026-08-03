@@ -1866,6 +1866,68 @@ def test_public_output_guard_without_git_allows_only_external_root(
         MODULE._require_external_or_ignored_output(repository / "ignored-output")
 
 
+def test_charades_loader_uses_official_first_person_only_tables(
+    tmp_path: Path,
+) -> None:
+    header = "id,subject,verified,length,actions,egocentric\n"
+    for split in ("train", "test"):
+        (tmp_path / f"CharadesEgo_v1_{split}.csv").write_text(
+            header + f"third-{split},subject-{split},Yes,10,c000 1 3,paired\n"
+        )
+        (tmp_path / f"CharadesEgo_v1_{split}_only1st.csv").write_text(
+            header + f"first-{split}EGO,subject-{split},Yes,10,c000 1 3,paired\n"
+        )
+    rows = MODULE._load_charades_rows(tmp_path)
+    assert [row["id"] for row in rows] == ["first-trainEGO", "first-testEGO"]
+
+
+def test_prior_activity_reconstruction_is_subject_partitioned_and_bounded() -> None:
+    fixture = {
+        "seed": 20260802,
+        "development_items": 3,
+        "holdout_items": 3,
+        "label_code_map": {
+            f"label_{index}": [f"c{index:03d}"] for index in range(8)
+        },
+    }
+    subjects = {"development": [], "holdout": []}
+    ordinal = 0
+    while any(len(values) < 4 for values in subjects.values()):
+        subject = f"public-subject-{ordinal}"
+        partition = MODULE._fixture_partition(
+            fixture["seed"], "partition", subject
+        )
+        # `_fixture_partition` hashes the same literal seed|partition|subject
+        # tuple used by the frozen broad-context recipe.
+        if len(subjects[partition]) < 4:
+            subjects[partition].append(subject)
+        ordinal += 1
+    rows = []
+    action_string = ";".join(
+        f"c{index:03d} 1 3" for index in range(8)
+    )
+    for partition, values in subjects.items():
+        for index, subject in enumerate(values):
+            rows.append(
+                {
+                    "id": f"{partition}-{index}EGO",
+                    "subject": subject,
+                    "verified": "Yes",
+                    "length": "10",
+                    "actions": action_string,
+                }
+            )
+    selected = MODULE._reconstruct_prior_activity_selection(rows, fixture)
+    assert {key: len(value) for key, value in selected.items()} == {
+        "development": 3,
+        "holdout": 3,
+    }
+    assert not (
+        {row["subject"] for row in selected["development"]}
+        & {row["subject"] for row in selected["holdout"]}
+    )
+
+
 def test_tuple_combined_public_gate_collects_all_failures() -> None:
     axes = {
         axis: {"status": "PASS"}

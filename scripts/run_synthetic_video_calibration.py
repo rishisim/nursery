@@ -9008,13 +9008,199 @@ def _read_audio_seed_manifest(
 
 def _load_charades_rows(annotation_root: Path) -> list[dict[str, str]]:
     output = []
-    for name in ("CharadesEgo_v1_train.csv", "CharadesEgo_v1_test.csv"):
+    # The paired CSVs contain both the third-person source and its first-person
+    # partner.  The action controls are explicitly first-person, so load the
+    # official first-person-only tables rather than accepting every row merely
+    # because its `egocentric` link field is populated.
+    for name in (
+        "CharadesEgo_v1_train_only1st.csv",
+        "CharadesEgo_v1_test_only1st.csv",
+    ):
         candidates = list(annotation_root.rglob(name))
         if len(candidates) != 1:
             raise RuntimeError("E_TUPLE_ACTION_ANNOTATION_FILE")
         with candidates[0].open(newline="", encoding="utf-8") as handle:
             output.extend(dict(row) for row in csv.DictReader(handle))
     return output
+
+
+def _reconstruct_prior_activity_selection(
+    rows: list[dict[str, str]], fixture: dict[str, Any]
+) -> dict[str, list[dict[str, Any]]]:
+    """Recreate the frozen broad-context fixture identities from public CSVs.
+
+    The original row/file manifest remains external.  Its exact public seed,
+    code map, partition rule and greedy selection rule are retained in the
+    canonical config, which is sufficient to reconstruct the exclusion set
+    without reopening any model outcome or depending on the missing copy.
+    """
+
+    seed = str(int(fixture["seed"]))
+    label_code_map = fixture["label_code_map"]
+    if not isinstance(label_code_map, dict) or len(label_code_map) != 8:
+        raise RuntimeError("E_TUPLE_PRIOR_ACTIVITY_LABEL_MAP")
+    code_sets = {
+        str(label): {str(code) for code in codes}
+        for label, codes in label_code_map.items()
+    }
+    candidates = []
+    for row in rows:
+        try:
+            duration = float(row["length"])
+        except (KeyError, TypeError, ValueError, OverflowError):
+            continue
+        if (
+            row.get("verified") != "Yes"
+            or not math.isfinite(duration)
+            or not 5.0 <= duration <= 60.0
+        ):
+            continue
+        codes = {
+            item.split()[0]
+            for item in str(row.get("actions", "")).split(";")
+            if item.strip()
+        }
+        labels = sorted(
+            label for label, values in code_sets.items() if codes & values
+        )
+        video = str(row.get("id", ""))
+        subject = str(row.get("subject", ""))
+        if not labels or not video or not subject:
+            continue
+        partition_hash = hashlib.sha256(
+            f"{seed}|partition|{subject}".encode()
+        ).hexdigest()
+        partition = (
+            "development" if int(partition_hash, 16) % 2 == 0 else "holdout"
+        )
+        candidates.append(
+            {
+                "id": video,
+                "subject": subject,
+                "labels": labels,
+                "partition": partition,
+            }
+        )
+    selected: dict[str, list[dict[str, Any]]] = {}
+    item_counts = {
+        "development": int(fixture["development_items"]),
+        "holdout": int(fixture["holdout_items"]),
+    }
+    for partition, item_count in item_counts.items():
+        pool = [row for row in candidates if row["partition"] == partition]
+        chosen: list[dict[str, Any]] = []
+        chosen_ids: set[str] = set()
+        label_counts: Counter[str] = Counter()
+        while len(chosen) < item_count:
+            deficits = {
+                label: max(0, 6 - label_counts[label]) for label in code_sets
+            }
+
+            def selection_key(row: dict[str, Any]) -> tuple[int, int, str]:
+                return (
+                    -sum(deficits[label] > 0 for label in row["labels"]),
+                    -sum(deficits[label] for label in row["labels"]),
+                    hashlib.sha256(
+                        f"{seed}|{partition}|{row['id']}".encode()
+                    ).hexdigest(),
+                )
+
+            remaining = [row for row in pool if row["id"] not in chosen_ids]
+            if not remaining:
+                raise RuntimeError("E_TUPLE_PRIOR_ACTIVITY_SELECTION_YIELD")
+            item = min(remaining, key=selection_key)
+            chosen.append(item)
+            chosen_ids.add(item["id"])
+            label_counts.update(item["labels"])
+        selected[partition] = chosen
+    return selected
+
+
+def _prior_activity_exclusions(
+    annotation_root: Path, cfg: dict[str, Any]
+) -> tuple[set[str], set[str], dict[str, Any]]:
+    try:
+        fixture = cfg["calibration_C"]["extractor"][
+            "activity_checkpoint_selection_amendment"
+        ]["public_activity_fixture"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_PRIOR_ACTIVITY_FIXTURE") from error
+    selected = _reconstruct_prior_activity_selection(
+        _load_charades_rows(annotation_root), fixture
+    )
+    expected_subjects = {
+        "development": int(fixture["development_subjects"]),
+        "holdout": int(fixture["holdout_subjects"]),
+    }
+    expected_minimum = {
+        "development": int(
+            fixture["development_minimum_positive_count_across_labels"]
+        ),
+        "holdout": int(
+            fixture["holdout_minimum_positive_count_across_labels"]
+        ),
+    }
+    labels = set(fixture["label_code_map"])
+    counts: dict[str, dict[str, int]] = {}
+    for partition, rows in selected.items():
+        label_counts = Counter(
+            label for row in rows for label in row["labels"]
+        )
+        counts[partition] = {
+            "item_count": len(rows),
+            "subject_count": len({row["subject"] for row in rows}),
+            "minimum_positive_count": min(
+                (label_counts[label] for label in labels), default=0
+            ),
+        }
+        if (
+            counts[partition]["item_count"]
+            != int(fixture[f"{partition}_items"])
+            or counts[partition]["subject_count"] != expected_subjects[partition]
+            or counts[partition]["minimum_positive_count"]
+            != expected_minimum[partition]
+        ):
+            raise RuntimeError("E_TUPLE_PRIOR_ACTIVITY_RECONSTRUCTION")
+    subjects = {
+        partition: {row["subject"] for row in rows}
+        for partition, rows in selected.items()
+    }
+    videos = {
+        partition: {row["id"] for row in rows}
+        for partition, rows in selected.items()
+    }
+    if (
+        subjects["development"] & subjects["holdout"]
+        or videos["development"] & videos["holdout"]
+    ):
+        raise RuntimeError("E_TUPLE_PRIOR_ACTIVITY_OVERLAP")
+    manifest_commitment = fixture.get("manifest_commitment_sha256")
+    if not isinstance(manifest_commitment, str) or not re.fullmatch(
+        r"[0-9a-f]{64}", manifest_commitment
+    ):
+        raise RuntimeError("E_TUPLE_PRIOR_ACTIVITY_COMMITMENT")
+    identity_commitment = digest(
+        {
+            partition: [
+                {"id": row["id"], "subject": row["subject"]}
+                for row in selected[partition]
+            ]
+            for partition in ("development", "holdout")
+        }
+    )
+    record = {
+        "status": "PASS_FROZEN_PRIOR_ACTIVITY_EXCLUSIONS_RECONSTRUCTED",
+        "frozen_manifest_commitment_sha256": manifest_commitment,
+        "selection_identity_commitment_sha256": identity_commitment,
+        "counts": counts,
+        "subject_overlap_count": 0,
+        "video_overlap_count": 0,
+    }
+    return (
+        subjects["development"] | subjects["holdout"],
+        videos["development"] | videos["holdout"],
+        record,
+    )
 
 
 def _load_visor_annotation_documents(
@@ -10947,20 +11133,11 @@ def prepare_tuple_visor_hos_fixture_feasibility(
             "CharadesEgo.zip",
         )
         _safe_extract_zip(charades_annotations, extracted / "charades-annotations")
-        prior_manifest_path = (
-            args.public_root / "public/manifests/charades-selection-manifest.json"
-        )
-        prior_manifest = json.loads(prior_manifest_path.read_text())
-        excluded_subjects = {
-            row["subject"]
-            for rows in prior_manifest["partitions"].values()
-            for row in rows
-        }
-        excluded_videos = {
-            row["id"]
-            for rows in prior_manifest["partitions"].values()
-            for row in rows
-        }
+        (
+            excluded_subjects,
+            excluded_videos,
+            prior_activity_exclusion,
+        ) = _prior_activity_exclusions(extracted / "charades-annotations", cfg)
         action, action_report = _charades_action_source_inventory(
             _load_charades_rows(extracted / "charades-annotations"),
             protocol["order_dependent_action_control"],
@@ -10975,6 +11152,7 @@ def prepare_tuple_visor_hos_fixture_feasibility(
                 for partition in preparation["partitions"]
             },
             "deficits": action_report["deficits"],
+            "prior_activity_exclusion": prior_activity_exclusion,
         }
         selections["charades_order_action"] = action
     except Exception as error:
@@ -11230,22 +11408,9 @@ def _prepare_tuple_fixture_feasibility_legacy(
                 "fixture_feasibility_commitment_sha256"
             ],
         }
-    old_manifest = json.loads(
-        (
-            args.public_root
-            / "public/manifests/charades-selection-manifest.json"
-        ).read_text()
+    excluded_subjects, excluded_videos, _ = _prior_activity_exclusions(
+        extracted / "charades-annotations", cfg
     )
-    excluded_subjects = {
-        row["subject"]
-        for rows in old_manifest["partitions"].values()
-        for row in rows
-    }
-    excluded_videos = {
-        row["id"]
-        for rows in old_manifest["partitions"].values()
-        for row in rows
-    }
     action = _select_charades_action_fixtures(
         _load_charades_rows(extracted / "charades-annotations"),
         protocol["order_dependent_action_control"],
@@ -11711,21 +11876,11 @@ def _prepare_action_fixtures(
     extracted: Path,
     preparation: dict[str, Any],
     protocol: dict[str, Any],
+    cfg: dict[str, Any],
 ) -> tuple[dict[str, list[dict[str, Any]]], dict[str, set[str]]]:
-    old_manifest_path = (
-        args.public_root / "public/manifests/charades-selection-manifest.json"
+    excluded_subjects, excluded_videos, _ = _prior_activity_exclusions(
+        extracted / "charades-annotations", cfg
     )
-    old_manifest = json.loads(old_manifest_path.read_text())
-    excluded_subjects = {
-        row["subject"]
-        for rows in old_manifest["partitions"].values()
-        for row in rows
-    }
-    excluded_videos = {
-        row["id"]
-        for rows in old_manifest["partitions"].values()
-        for row in rows
-    }
     selected = _select_charades_action_fixtures(
         _load_charades_rows(extracted / "charades-annotations"),
         protocol["order_dependent_action_control"],
@@ -11866,7 +12021,7 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         fixture_root, preparation, cfg, review_root
     )
     action, action_video_sets = _prepare_action_fixtures(
-        args, fixture_root, extracted, preparation, protocol
+        args, fixture_root, extracted, preparation, protocol, cfg
     )
     for partition in preparation["partitions"]:
         partitions[partition]["hand_contact"] = visor[partition]
