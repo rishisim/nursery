@@ -127,6 +127,17 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
         "PENDING_PREPARATION"
     )
     assert fixture_protocol["public_model_outcome_opened"] is False
+    fixture_preparation = result[
+        "mechanistic_training_tuple_fixture_preparation_amendment"
+    ]
+    assert fixture_preparation["status"] == (
+        "FROZEN_BEFORE_MANIFEST_CONSTRUCTION_OR_PUBLIC_MODEL_OUTCOMES"
+    )
+    assert fixture_preparation["preparation_amendment_commitment_sha256"] == (
+        "1cc8d0e3498da5785a2c2105307bf6d5ab20dd10f839ec0f2b92b9def372ff1d"
+    )
+    assert fixture_preparation["items_per_partition"] == 312
+    assert fixture_preparation["public_model_outcome_opened"] is False
     runtime_preparation = result[
         "mechanistic_training_tuple_runtime_preparation_result"
     ]
@@ -263,7 +274,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
-    assert proof["schema_version"] == 11
+    assert proof["schema_version"] == 12
     premodel = proof["calibration_C"]["extractor"]["mechanistic_training_tuple_premodel_result"]
     assert premodel["dependency_manifest_commitment_sha256"] == (
         "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"

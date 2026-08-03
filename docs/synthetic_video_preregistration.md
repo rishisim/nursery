@@ -1112,7 +1112,7 @@ governed recurrence embeddings; PE-Core plus deterministic mask measurements
 for visible attributes; deterministic sensor metrics; and the already pinned
 EgoHOD checkpoint for the localized inverse-action control. Exact repository
 commits, model identities, gates, threshold-development grids, and licenses are
-in schema 11 of the canonical proof config. Every unresolved checkpoint byte
+in schema 12 of the canonical proof config. Every unresolved checkpoint byte
 hash, weight term, offline reload, or dependency is a pre-model no-go; another
 model cannot be substituted.
 
@@ -1126,6 +1126,21 @@ development may select only values from the frozen numeric grids. Fixture and
 threshold commitments must be committed before the sealed holdout opens. Every
 one of the seven module gates and the inverse-action control must pass; broad
 context cannot cause either pass or failure.
+
+Before any task-matched development inference, preparation commitment
+`1cc8d0e…ff1d` freezes the exact source and construction recipe. It pins the
+official COCO 2017 validation annotations and images at SHA-256
+`113a836d…0268` and `4f7e2ccb…2f05`, respectively; preserves the already
+pinned Charades-Ego archive identities; and requires a per-file hash/license
+manifest for selectively downloaded VISOR validation material. Development
+and holdout each contain 48 adapter/lexical cases, 64 referent/attribute
+microclips, 64 recurrence pairs, 40 VISOR hand/contact items, 48 sensor clips,
+and 48 localized inverse-action clips. COCO images, VISOR participants/videos,
+Charades subjects/videos, authored backgrounds, audio files, and rendered
+media are partition-disjoint under the public seed. Self-authored German audio
+uses one sealed Anna `de_DE` render bundle; all media, row-level labels, and
+source records stay outside Git. This recipe performs no model inference and
+does not change an extractor, threshold, gate, or prior no-go.
 
 If the complete public gate passes, governance permits a small C-domain audit
 only by the sole authorized applicant inside applicant-governed storage. It is

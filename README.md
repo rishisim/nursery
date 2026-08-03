@@ -221,4 +221,10 @@ commitment `506a1f41…251d`: eight inverse direction labels use fixed three-pro
 ensembles and subject/video-disjoint localized Charades-Ego development and
 holdout clips. This is a genuinely order-dependent control, not a revival of
 the failed broad-context temporal gate. Exact task-matched fixture manifests
-remain pending and must be sealed before public development inference.
+remain pending and must be sealed before public development inference. The
+source-selection and rendering recipe is separately frozen at
+`1cc8d0e3…ff1d`: six task-matched families contain 312 items per partition,
+with official COCO archive bytes pinned, selective VISOR files hash-recorded,
+the existing Charades-Ego identities retained, and self-authored German audio
+sealed outside Git. This preparation stage has opened no model outcome and
+uses no restricted mount.

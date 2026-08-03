@@ -209,4 +209,11 @@ outcomes at commitment `506a1f41…251d`. Its action control uses fixed
 open/close, take/put, sit-down/stand-up, and turn-on/turn-off prompts and
 localized Charades-Ego intervals disjoint from the failed broad-context study.
 Exact public fixture manifests are still pending and must be sealed before
-development inference.
+development inference. Preparation commitment `1cc8d0e3…ff1d` now fixes the
+source archives, partition selectors, self-authored German audio recipe,
+deterministic composite/recurrence/sensor renderers, VISOR strata, and exact
+48-per-direction-control sampling without opening a model outcome. Each of the
+six fixture families has fixed development and holdout counts totaling 312
+items per partition. Media, public row manifests, annotations, and audio stay
+outside Git; only the eventual compact counts and complete-manifest commitment
+may be retained.

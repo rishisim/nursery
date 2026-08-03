@@ -323,6 +323,104 @@ def test_tuple_fixture_protocol_freezes_task_matched_action_semantics() -> None:
         MODULE._tuple_fixture_protocol(config)
 
 
+def test_tuple_fixture_preparation_amendment_is_exact_and_preoutcome() -> None:
+    import pytest
+
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    preparation = MODULE._tuple_fixture_preparation_amendment(config)
+    assert preparation["preparation_amendment_commitment_sha256"] == (
+        "1cc8d0e3498da5785a2c2105307bf6d5ab20dd10f839ec0f2b92b9def372ff1d"
+    )
+    assert preparation["counts_per_partition"] == {
+        "language_lexical": 48,
+        "referent_attribute": 64,
+        "recurrence": 64,
+        "hand_contact": 40,
+        "sensor": 48,
+        "order_action": 48,
+    }
+    assert preparation["source_archives"]["COCO_2017_instances"]["sha256"] == (
+        "113a836d90195ee1f884e704da6304dfaaecff1f023f49b6ca93c4aaae470268"
+    )
+    assert preparation["source_archives"]["COCO_2017_validation_images"]["sha256"] == (
+        "4f7e2ccb2866ec5041993c9cf2a952bbed69647b115d0f74da7ce8f4bef82f05"
+    )
+    assert preparation["execution"]["model_inference"] is False
+    config["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_fixture_preparation_amendment"
+    ]["counts_per_partition"]["sensor"] = 47
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_FIXTURE_PREPARATION_COMMITMENT"
+    ):
+        MODULE._tuple_fixture_preparation_amendment(config)
+
+
+def test_task_matched_language_fixture_has_frozen_accept_and_abstention_mix() -> None:
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    preparation = MODULE._tuple_fixture_preparation_amendment(config)
+    for partition in preparation["partitions"]:
+        rows = MODULE._language_lexical_fixture_rows(preparation, partition)
+        assert len(rows) == 48
+        assert sum(row["expected_pipeline_status"] == "ACCEPT" for row in rows) == 32
+        assert sum(row["expected_pipeline_status"] == "ABSTAIN" for row in rows) == 16
+        assert {
+            row["expected_reason"]
+            for row in rows
+            if row["expected_pipeline_status"] == "ABSTAIN"
+        } == {
+            "LANGUAGE_MISMATCH",
+            "EMPTY_ASR",
+            "INVALID_TIMESTAMP",
+            "LOW_CONFIDENCE",
+            "EMPTY_TRANSLATION",
+            "SILENT_TRUNCATION",
+            "INSUFFICIENT_IN_BOUNDS_FRAMES",
+            "ONTOLOGY_UNMATCHED",
+        }
+
+
+def test_public_fixture_partition_is_deterministic_and_namespace_scoped() -> None:
+    first = MODULE._fixture_partition(20260802, "visor_partition", "P01")
+    assert first == MODULE._fixture_partition(20260802, "visor_partition", "P01")
+    assert first in {"development", "holdout"}
+    assert MODULE._fixture_order(20260802, "a", "x") != MODULE._fixture_order(
+        20260802, "b", "x"
+    )
+
+
+def test_charades_action_parser_rejects_invalid_or_reversed_intervals() -> None:
+    import pytest
+
+    assert MODULE._parse_charades_actions("c008 1.00 2.50;c006 3.0 4.0") == [
+        {"code": "c008", "start": 1.0, "end": 2.5},
+        {"code": "c006", "start": 3.0, "end": 4.0},
+    ]
+    with pytest.raises(RuntimeError, match="E_TUPLE_ACTION_ANNOTATION"):
+        MODULE._parse_charades_actions("c008 2.0 1.0")
+
+
+def test_visor_valid_negative_requires_valid_annotation_geometry() -> None:
+    row = {
+        "image": {
+            "name": "frame.jpg",
+            "image_path": "P01_01/frame.jpg",
+            "video": "P01_01",
+        },
+        "annotations": [
+            {
+                "id": "object",
+                "name": "cup",
+                "segments": [[[1.0, 1.0], [4.0, 1.0], [4.0, 4.0]]],
+            }
+        ],
+    }
+    truth = MODULE._visor_frame_truth(row)
+    assert truth is not None
+    assert truth["stratum"] == "true_no_hand"
+    row["annotations"][0]["segments"] = [[[1.0, 1.0], [float("nan"), 1.0], [4.0, 4.0]]]
+    assert MODULE._visor_frame_truth(row) is None
+
+
 def test_tuple_zip_extraction_blocks_path_traversal(tmp_path: Path) -> None:
     import pytest
     import zipfile
@@ -964,6 +1062,8 @@ def test_public_qualification_jobs_never_mount_restricted_data() -> None:
     assert "mechanistic-tuple" in prepare
     assert "tuple-runtime-prepare" in prepare
     assert "mechanistic-tuple-runtime" in prepare
+    assert "tuple-fixtures-prepare" in prepare
+    assert "mechanistic-tuple-fixtures" in prepare
     assert "PHASE4_ACTIVITY_CODE_CLEAN=1" in prepare
     assert "PHASE4_RESTRICTED_ROOT" not in prepare
     assert "#SBATCH --partition=h100" in qualify
@@ -993,8 +1093,11 @@ def test_terminal_report_is_flat_and_guarded() -> None:
     assert "TUPLE_PREP_FIELDS" in source
     assert "TUPLE_RUNTIME_PREP_FIELDS" in source
     assert "TUPLE_SIZING_FIELDS" in source
+    assert "TUPLE_FIXTURE_PREP_FIELDS" in source
     assert "tuple-prepare" in source
     assert "tuple-runtime-prepare" in source
     assert "tuple-size" in source
+    assert "tuple-audio-seed" in source
+    assert "tuple-fixtures-prepare" in source
     assert "E_ACTIVITY_HOLDOUT_BEFORE_WINNER_SEAL" in source
     assert 'print(json.dumps' not in source

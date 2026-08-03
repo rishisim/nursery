@@ -54,6 +54,17 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     )
     assert fixture_protocol["action_direction_labels"] == 8
     assert fixture_protocol["public_outcome_opened"] is False
+    fixture_preparation = config[
+        "mechanistic_training_tuple_fixture_preparation_amendment"
+    ]
+    assert fixture_preparation["status"] == (
+        "FROZEN_BEFORE_MANIFEST_CONSTRUCTION_OR_PUBLIC_MODEL_OUTCOMES"
+    )
+    assert fixture_preparation["preparation_amendment_commitment_sha256"] == (
+        "1cc8d0e3498da5785a2c2105307bf6d5ab20dd10f839ec0f2b92b9def372ff1d"
+    )
+    assert fixture_preparation["items_per_partition"] == 312
+    assert fixture_preparation["public_outcome_opened"] is False
     runtime_preparation = config[
         "mechanistic_training_tuple_runtime_preparation_result"
     ]
@@ -185,7 +196,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 11
+    assert config["schema_version"] == 12
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"

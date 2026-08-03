@@ -1,5 +1,5 @@
 {
-  "schema_version": 11,
+  "schema_version": 12,
   "status": "MECHANISTIC_TRAINING_TUPLE_BLIND_SIZING_PASS_PENDING_PUBLIC_FIXTURE_MANIFESTS_AND_QUALIFICATION_PRIOR_NO_GOS_PRESERVED",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
@@ -1389,6 +1389,137 @@
         "manifest_commitments": "PENDING_PREPARATION; exact task-matched development and holdout source/media/label commitments must be added and committed before development inference",
         "protocol_commitment_scope": "canonical JSON of this fixture protocol excluding protocol_commitment_sha256",
         "protocol_commitment_sha256": "506a1f41a3685ca777f3c9d23f6f9b884523acec2a78080d5de2547b3324251d"
+      },
+      "mechanistic_training_tuple_fixture_preparation_amendment": {
+        "status": "FROZEN_BEFORE_MANIFEST_CONSTRUCTION_OR_PUBLIC_MODEL_OUTCOMES",
+        "effective_on": "2026-08-02",
+        "relationship": "prospective source-selection and rendering implementation for the already frozen mechanistic training-tuple fixture protocol; it changes no axis model threshold gate or prior result",
+        "known_before_freeze": "public-source availability and archive-byte hashes only; no task-matched fixture manifest model prediction public metric governed C tuple measurement generator outcome synthetic corpus or synthetic learner score",
+        "prior_no_go_sequence_preserved": [
+          "28ef267cd0608a33b50037a50e44a622875dc5aad5d1b2a422aa6612347fe3d5",
+          "042e9ba45fa64abda183eb7e575c5aa2e4990cebf1e54d25c0bffdd34b86fa7f",
+          "b5dd6c03d7b75e3be2f437c5247b66424f9f6aee28fbaaebbba6d0fa2f0a49d0",
+          "e11727dd309a01ee820264ff18afee33cf56b83fa2449301ce1be6e12670c29d"
+        ],
+        "seed": 20260802,
+        "partitions": ["development", "holdout"],
+        "counts_per_partition": {
+          "language_lexical": 48,
+          "referent_attribute": 64,
+          "recurrence": 64,
+          "hand_contact": 40,
+          "sensor": 48,
+          "order_action": 48
+        },
+        "public_object_ontology": ["sports ball", "cup", "bottle", "bowl", "book", "chair", "apple", "banana"],
+        "source_archives": {
+          "COCO_2017_instances": {
+            "official_page": "https://cocodataset.org/#download",
+            "url": "https://s3.amazonaws.com/images.cocodataset.org/annotations/annotations_trainval2017.zip",
+            "sha256": "113a836d90195ee1f884e704da6304dfaaecff1f023f49b6ca93c4aaae470268",
+            "bytes": 252907541,
+            "annotation_license": "CC-BY-4.0",
+            "image_license_rule": "retain the selected image's official COCO license id and URL in the external manifest"
+          },
+          "COCO_2017_validation_images": {
+            "official_page": "https://cocodataset.org/#download",
+            "url": "https://s3.amazonaws.com/images.cocodataset.org/zips/val2017.zip",
+            "sha256": "4f7e2ccb2866ec5041993c9cf2a952bbed69647b115d0f74da7ce8f4bef82f05",
+            "bytes": 815585330,
+            "license": "per-image Creative Commons terms recorded by COCO"
+          },
+          "Charades_Ego_annotations": {
+            "official_page": "https://prior.allenai.org/projects/charades-ego",
+            "url": "https://ai2-public-datasets.s3-us-west-2.amazonaws.com/charades/CharadesEgo.zip",
+            "sha256": "ee54787f666a0b2dddee4863b53388385544e2095653760ee82e7ae5b3e7e66e",
+            "license": "AllenAI non-commercial academic or nonprofit research license"
+          },
+          "Charades_Ego_480p_video": {
+            "official_page": "https://prior.allenai.org/projects/charades-ego",
+            "url": "https://ai2-public-datasets.s3-us-west-2.amazonaws.com/charades/CharadesEgo_v1_480.tar",
+            "sha256": "3df448ab1a004bb48fe8f188e0738f5cbb73f04e24217a655b6b0390784b1110",
+            "license": "AllenAI non-commercial academic or nonprofit research license",
+            "selective_extraction": "download once outside Git and retain only the registered 96 source videos after hash verification"
+          },
+          "EPIC_KITCHENS_VISOR_validation": {
+            "official_page": "https://epic-kitchens.github.io/VISOR/site",
+            "repository_root": "https://data.bris.ac.uk/datasets/2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations",
+            "annotation_index": "annotations/val/",
+            "frame_archive_template": "rgb_frames/val/{participant}/{video}.zip",
+            "license": "CC-BY-NC-4.0",
+            "hash_rule": "SHA-256 every downloaded annotation JSON frame archive and selected decoded frame in the external source manifest before inference"
+          }
+        },
+        "language_lexical_recipe": {
+          "inherited_actual_speech_evidence": "signed Stage-A FLEURS plus self-authored German language-gate PASS remains required and is referenced by immutable decision and artifact commitments",
+          "new_case_mix_per_partition": {"accepted": 32, "abstained": 16},
+          "accepted_case_design": "eight public nouns crossed with adjective and no-adjective English learner-text templates exact German ASR timestamps two independent episodes and manually frozen noun adjective lemma and null spans",
+          "abstention_reasons_balanced": ["LANGUAGE_MISMATCH", "EMPTY_ASR", "INVALID_TIMESTAMP", "LOW_CONFIDENCE", "EMPTY_TRANSLATION", "SILENT_TRUNCATION", "INSUFFICIENT_IN_BOUNDS_FRAMES", "ONTOLOGY_UNMATCHED"],
+          "truth_rule": "expected accept status abstention reason spans lemmas ontology mapping and episode repetition counts are fixture data fixed before model execution; frequency bands are checked against the immutable public wordfreq table",
+          "no_new_ASR_candidate_selection": true
+        },
+        "coco_source_selection": {
+          "partition": "SHA256(20260802|coco_object_partition|image_id) parity",
+          "eligibility": "polygon segmentation only; iscrowd zero; source image at least 480 by 360; target bbox at least 48 by 48 pixels; target annotation area fraction from 0.03 through 0.50; one selected target per source image",
+          "selection": "within each partition and public category select four unique source images by SHA256(20260802|coco_object|partition|category|image_id|annotation_id)",
+          "source_independence": "zero selected COCO source image or annotation overlap between development and holdout"
+        },
+        "referent_attribute_rendering": {
+          "license": "CC0 self-authored deterministic composites; embedded crops retain their recorded source-image license",
+          "geometry": {"width": 384, "height": 288, "fps": 9, "duration_seconds": 7.0, "frames": 63},
+          "utterance_interval_seconds": [2.5, 4.5],
+          "sample_semantics": "the frozen nine before during after sample offsets are exact frame times and the target mask is retained for every rendered frame",
+          "scenarios_once_per_category": ["persistent_clear", "during_only", "before_only", "after_only", "persistent_ambiguous", "persistent_dominant_with_small_distractor", "speech_no_referent", "no_speech_visible_object"],
+          "attribute_schedule": "public-seed rotation over red blue green yellow big and small; target color tint and size are deterministic and exact-mask-derived",
+          "audio": "self-authored German utterances synthesized once with macOS Anna de_DE at 175 words per minute; exact AIFF and muxed-media hashes plus OS and voice provenance are retained outside Git; no-speech cases contain generated digital silence",
+          "development_holdout_independence": "source crops authored backgrounds audio files and rendered media are disjoint by partition"
+        },
+        "recurrence_recipe": {
+          "strata_per_partition": {"same_instance_transformed": 16, "same_instance_near_duplicate": 16, "same_category_different_instance": 16, "different_category": 16},
+          "same_referent_truth": {"same_instance_transformed": true, "same_instance_near_duplicate": true, "same_category_different_instance": false, "different_category": false},
+          "near_duplicate_truth": {"same_instance_transformed": false, "same_instance_near_duplicate": true, "same_category_different_instance": false, "different_category": false},
+          "pairing": "public-seed hash order over the partition-specific COCO crops with no cross-partition source reuse"
+        },
+        "visor_selection": {
+          "partition": "SHA256(20260802|visor_partition|participant) parity",
+          "strata_per_partition": {"hand_contact": 16, "hand_no_contact": 12, "true_no_hand": 12},
+          "selection": "within each stratum select sparse validation frames by SHA256(20260802|visor|partition|stratum|video|frame_name), at most four items per source video",
+          "truth": "official left-hand and right-hand polygons define visibility; a nonempty in_contact_object link on an annotated hand defines contact; absence of either hand annotation defines a true negative",
+          "geometry": "all polygons and linked object ids must resolve and be in image bounds; invalid annotation rows are ineligible rather than relabeled"
+        },
+        "sensor_recipe": {
+          "base_scenes_per_partition": 6,
+          "conditions": ["static", "low_translation", "high_translation", "mild_blur", "strong_blur", "dark", "bright", "hard_cut"],
+          "transform_order": "fixed translation then Gaussian blur then multiplicative brightness then optional hard cut",
+          "truth": "known transform parameter and expected direction are fixed before measurement; bin labels use the already frozen numeric edges and exact rendered pixels",
+          "independence": "partition-specific COCO crops and authored backgrounds only"
+        },
+        "order_action_recipe": {
+          "source_and_selection": "exactly the already frozen Charades-Ego class pairs eligibility subject partition exclusion and six-per-direction selection",
+          "prior_broad_fixture_exclusion": "read the previously sealed public manifest outside Git and reject every prior subject and video",
+          "media": "retain exact selected source video bytes; decode only the annotated interval plus at most 0.25 seconds in-bounds context at inference",
+          "no_metadata_label_tuning": true
+        },
+        "manifest_contract": {
+          "external_root": "public/mechanistic-training-tuple-fixtures",
+          "row_level_public_manifests_in_Git": false,
+          "required_partition_manifests": ["development", "holdout"],
+          "required_audits": ["source_subject_overlap", "source_video_overlap", "source_object_overlap", "source_media_hash_roundtrip", "label_roundtrip", "finite_in_bounds_geometry", "fixture_count"],
+          "Git_record": "compact counts source archive provenance audit counts failure classes and one commitment over the complete external manifests only",
+          "development_inference_before_manifest_seal": "PROHIBITED",
+          "holdout_inference_before_development_threshold_seal": "PROHIBITED"
+        },
+        "execution": {
+          "canonical_entry_point": "scripts/run_synthetic_video_calibration.py tuple-fixtures-prepare",
+          "public_only": true,
+          "restricted_mount_present": false,
+          "model_inference": false,
+          "terminal_output": "approved compact counts and one commitment only",
+          "CPU_wall_hours_max": 2.0,
+          "public_storage_GiB_max": 200
+        },
+        "preparation_amendment_commitment_scope": "canonical JSON of this amendment excluding preparation_amendment_commitment_sha256",
+        "preparation_amendment_commitment_sha256": "1cc8d0e3498da5785a2c2105307bf6d5ab20dd10f839ec0f2b92b9def372ff1d"
       },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},

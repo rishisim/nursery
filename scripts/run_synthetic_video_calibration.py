@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
+import csv
 from io import BytesIO
 import hashlib
 import json
@@ -18,6 +19,7 @@ import statistics
 import subprocess
 import sys
 import tempfile
+import tarfile
 import time
 from typing import Any
 import urllib.request
@@ -193,6 +195,32 @@ TUPLE_SIZING_FIELDS = frozenset(
     }
 )
 TUPLE_SIZING_HASH_FIELDS = frozenset({"tuple_sizing_commitment_sha256"})
+TUPLE_FIXTURE_PREP_FIELDS = frozenset(
+    {
+        "status",
+        "source_archive_count",
+        "partition_count",
+        "language_lexical_item_count",
+        "referent_attribute_item_count",
+        "recurrence_pair_count",
+        "hand_contact_item_count",
+        "sensor_item_count",
+        "order_action_item_count",
+        "source_subject_overlap_count",
+        "source_video_overlap_count",
+        "source_object_overlap_count",
+        "restricted_mount_present",
+        "model_inference_executed",
+        "public_fixture_manifest_commitment_sha256",
+    }
+)
+TUPLE_FIXTURE_PREP_HASH_FIELDS = frozenset(
+    {"public_fixture_manifest_commitment_sha256"}
+)
+TUPLE_AUDIO_SEED_FIELDS = frozenset(
+    {"status", "audio_file_count", "audio_seed_commitment_sha256"}
+)
+TUPLE_AUDIO_SEED_HASH_FIELDS = frozenset({"audio_seed_commitment_sha256"})
 NLTK_DATA_COMMIT = "550b6625bcef1f2abff2ff770a5a0d272c9c6b2a"
 NLTK_RESOURCE_ARCHIVES = {
     "wordnet.zip": {
@@ -371,6 +399,50 @@ def _tuple_fixture_protocol(cfg: dict[str, Any]) -> dict[str, Any]:
         or len(code_pairs) != 4
     ):
         raise RuntimeError("E_TUPLE_ACTION_FIXTURE_SET")
+    return value
+
+
+def _tuple_fixture_preparation_amendment(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    try:
+        value = cfg["calibration_C"]["extractor"][
+            "mechanistic_training_tuple_fixture_preparation_amendment"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_FIXTURE_PREPARATION_NOT_FROZEN") from error
+    if value.get("status") != (
+        "FROZEN_BEFORE_MANIFEST_CONSTRUCTION_OR_PUBLIC_MODEL_OUTCOMES"
+    ):
+        raise RuntimeError("E_TUPLE_FIXTURE_PREPARATION_NOT_FROZEN")
+    copy = json.loads(json.dumps(value))
+    expected = copy.pop("preparation_amendment_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(copy) != expected:
+        raise RuntimeError("E_TUPLE_FIXTURE_PREPARATION_COMMITMENT")
+    counts = value.get("counts_per_partition")
+    if counts != {
+        "language_lexical": 48,
+        "referent_attribute": 64,
+        "recurrence": 64,
+        "hand_contact": 40,
+        "sensor": 48,
+        "order_action": 48,
+    }:
+        raise RuntimeError("E_TUPLE_FIXTURE_PREPARATION_COUNTS")
+    if value.get("partitions") != ["development", "holdout"]:
+        raise RuntimeError("E_TUPLE_FIXTURE_PREPARATION_PARTITIONS")
+    ontology = value.get("public_object_ontology")
+    if ontology != [
+        "sports ball",
+        "cup",
+        "bottle",
+        "bowl",
+        "book",
+        "chair",
+        "apple",
+        "banana",
+    ]:
+        raise RuntimeError("E_TUPLE_FIXTURE_PREPARATION_ONTOLOGY")
     return value
 
 
@@ -694,6 +766,1039 @@ def _tuple_model_root(public: Path) -> Path:
     return public / "models/mechanistic-tuples"
 
 
+def _tuple_fixture_root(public: Path) -> Path:
+    return public / "public/mechanistic-training-tuple-fixtures"
+
+
+def _fixture_order(seed: int, namespace: str, *parts: Any) -> str:
+    return hashlib.sha256(
+        "|".join([str(seed), namespace, *(str(part) for part in parts)]).encode()
+    ).hexdigest()
+
+
+def _fixture_partition(seed: int, namespace: str, identity: str) -> str:
+    value = int(_fixture_order(seed, namespace, identity), 16)
+    return "development" if value % 2 == 0 else "holdout"
+
+
+def _parse_charades_actions(value: str) -> list[dict[str, Any]]:
+    output = []
+    for raw in str(value or "").split(";"):
+        fields = raw.split()
+        if not fields:
+            continue
+        if len(fields) != 3 or not re.fullmatch(r"c\d{3}", fields[0]):
+            raise RuntimeError("E_TUPLE_ACTION_ANNOTATION")
+        try:
+            start, end = float(fields[1]), float(fields[2])
+        except ValueError as error:
+            raise RuntimeError("E_TUPLE_ACTION_ANNOTATION") from error
+        if not all(math.isfinite(item) for item in (start, end)) or not 0 <= start < end:
+            raise RuntimeError("E_TUPLE_ACTION_ANNOTATION")
+        output.append({"code": fields[0], "start": start, "end": end})
+    return output
+
+
+def _charades_direction_map(action: dict[str, Any]) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for pair in action["class_code_pairs"]:
+        first_label, second_label = pair["pair"]
+        for first_code, second_code in pair["matched_codes"]:
+            if first_code in result or second_code in result:
+                raise RuntimeError("E_TUPLE_ACTION_CODE_DUPLICATE")
+            result[first_code] = first_label
+            result[second_code] = second_label
+    return result
+
+
+def _select_charades_action_fixtures(
+    rows: list[dict[str, str]],
+    action: dict[str, Any],
+    seed: int,
+    excluded_subjects: set[str],
+    excluded_videos: set[str],
+) -> dict[str, list[dict[str, Any]]]:
+    code_to_label = _charades_direction_map(action)
+    opposite = {
+        first: second
+        for pair in action["class_code_pairs"]
+        for first, second in (pair["pair"], tuple(reversed(pair["pair"])))
+    }
+    candidates: dict[str, dict[str, list[dict[str, Any]]]] = {
+        partition: {label: [] for label in action["labels"]}
+        for partition in ("development", "holdout")
+    }
+    for row in rows:
+        video = str(row.get("id", ""))
+        subject = str(row.get("subject", ""))
+        if (
+            not video
+            or not subject
+            or video in excluded_videos
+            or subject in excluded_subjects
+            or str(row.get("verified", "")).strip().casefold() != "yes"
+            or not str(row.get("egocentric", "")).strip()
+        ):
+            continue
+        try:
+            duration = float(row["length"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        annotations = _parse_charades_actions(row.get("actions", ""))
+        partition = _fixture_partition(
+            seed, "mechanistic_action_partition", subject
+        )
+        for item in annotations:
+            label = code_to_label.get(item["code"])
+            if label is None:
+                continue
+            start = max(0.0, item["start"])
+            end = min(duration, item["end"])
+            interval = end - start
+            if not 1.0 <= interval <= 12.0:
+                continue
+            opposite_label = opposite[label]
+            overlaps_opposite = any(
+                code_to_label.get(other["code"]) == opposite_label
+                and max(start, other["start"]) < min(end, other["end"])
+                for other in annotations
+            )
+            if overlaps_opposite:
+                continue
+            candidates[partition][label].append(
+                {
+                    "video": video,
+                    "subject": subject,
+                    "label": label,
+                    "code": item["code"],
+                    "start": round(start, 6),
+                    "end": round(end, 6),
+                    "source_duration": round(duration, 6),
+                }
+            )
+    selected: dict[str, list[dict[str, Any]]] = {}
+    for partition in ("development", "holdout"):
+        used: set[str] = set()
+        selected[partition] = []
+        for label in action["labels"]:
+            ordered = sorted(
+                candidates[partition][label],
+                key=lambda row: _fixture_order(
+                    seed,
+                    "mechanistic_action",
+                    partition,
+                    label,
+                    row["video"],
+                    row["start"],
+                    row["end"],
+                ),
+            )
+            for row in ordered:
+                if row["video"] in used:
+                    continue
+                used.add(row["video"])
+                selected[partition].append(row)
+                if sum(
+                    item["label"] == label for item in selected[partition]
+                ) == 6:
+                    break
+            if sum(item["label"] == label for item in selected[partition]) != 6:
+                raise RuntimeError(
+                    f"E_TUPLE_ACTION_FIXTURE_YIELD_{partition}_{label}"
+                )
+        selected[partition].sort(
+            key=lambda row: (
+                action["labels"].index(row["label"]),
+                _fixture_order(
+                    seed,
+                    "mechanistic_action_final",
+                    partition,
+                    row["video"],
+                    row["start"],
+                ),
+            )
+        )
+    return selected
+
+
+def _valid_polygon_segmentation(value: Any) -> bool:
+    if not isinstance(value, list) or not value:
+        return False
+    for polygon in value:
+        if (
+            not isinstance(polygon, list)
+            or len(polygon) < 6
+            or len(polygon) % 2
+        ):
+            return False
+        try:
+            coordinates = [float(item) for item in polygon]
+        except (TypeError, ValueError, OverflowError):
+            return False
+        if not all(math.isfinite(item) for item in coordinates):
+            return False
+    return True
+
+
+def _valid_visor_segments(value: Any) -> bool:
+    if not isinstance(value, list) or not value:
+        return False
+    for polygon in value:
+        if not isinstance(polygon, list) or len(polygon) < 3:
+            return False
+        for point in polygon:
+            if not isinstance(point, list) or len(point) != 2:
+                return False
+            try:
+                coordinates = [float(item) for item in point]
+            except (TypeError, ValueError, OverflowError):
+                return False
+            if not all(math.isfinite(item) and item >= 0 for item in coordinates):
+                return False
+    return True
+
+
+def _select_coco_object_sources(
+    instances: dict[str, Any], preparation: dict[str, Any]
+) -> dict[str, list[dict[str, Any]]]:
+    seed = int(preparation["seed"])
+    ontology = preparation["public_object_ontology"]
+    categories = {
+        str(row["name"]): int(row["id"])
+        for row in instances.get("categories", [])
+        if str(row.get("name", "")) in ontology
+    }
+    if set(categories) != set(ontology):
+        raise RuntimeError("E_TUPLE_COCO_CATEGORY_SET")
+    images = {int(row["id"]): row for row in instances.get("images", [])}
+    licenses = {
+        int(row["id"]): row for row in instances.get("licenses", [])
+    }
+    candidates: dict[str, dict[str, list[dict[str, Any]]]] = {
+        partition: {category: [] for category in ontology}
+        for partition in preparation["partitions"]
+    }
+    category_by_id = {value: key for key, value in categories.items()}
+    for annotation in instances.get("annotations", []):
+        category = category_by_id.get(int(annotation.get("category_id", -1)))
+        image = images.get(int(annotation.get("image_id", -1)))
+        if category is None or image is None:
+            continue
+        try:
+            width, height = int(image["width"]), int(image["height"])
+            left, top, box_width, box_height = (
+                float(item) for item in annotation["bbox"]
+            )
+            area = float(annotation["area"])
+        except (KeyError, TypeError, ValueError, OverflowError):
+            continue
+        if (
+            int(annotation.get("iscrowd", 1)) != 0
+            or width < 480
+            or height < 360
+            or box_width < 48
+            or box_height < 48
+            or not 0.03 <= area / (width * height) <= 0.50
+            or not _valid_polygon_segmentation(annotation.get("segmentation"))
+            or left < 0
+            or top < 0
+            or left + box_width > width
+            or top + box_height > height
+        ):
+            continue
+        partition = _fixture_partition(
+            seed, "coco_object_partition", str(image["id"])
+        )
+        license_row = licenses.get(int(image.get("license", -1)), {})
+        candidates[partition][category].append(
+            {
+                "image_id": int(image["id"]),
+                "annotation_id": int(annotation["id"]),
+                "category": category,
+                "file_name": str(image["file_name"]),
+                "width": width,
+                "height": height,
+                "bbox": [left, top, box_width, box_height],
+                "segmentation": annotation["segmentation"],
+                "license_id": int(image.get("license", -1)),
+                "license_name": str(license_row.get("name", "")),
+                "license_url": str(license_row.get("url", "")),
+            }
+        )
+    selected: dict[str, list[dict[str, Any]]] = {}
+    for partition in preparation["partitions"]:
+        selected[partition] = []
+        used_images: set[int] = set()
+        for category in ontology:
+            ordered = sorted(
+                candidates[partition][category],
+                key=lambda row: _fixture_order(
+                    seed,
+                    "coco_object",
+                    partition,
+                    category,
+                    row["image_id"],
+                    row["annotation_id"],
+                ),
+            )
+            for row in ordered:
+                if row["image_id"] in used_images:
+                    continue
+                selected[partition].append(row)
+                used_images.add(row["image_id"])
+                if sum(
+                    item["category"] == category
+                    for item in selected[partition]
+                ) == 4:
+                    break
+            if sum(
+                item["category"] == category for item in selected[partition]
+            ) != 4:
+                raise RuntimeError(
+                    f"E_TUPLE_COCO_FIXTURE_YIELD_{partition}_{category}"
+                )
+        selected[partition].sort(
+            key=lambda row: (
+                ontology.index(row["category"]),
+                _fixture_order(
+                    seed,
+                    "coco_object_final",
+                    partition,
+                    row["image_id"],
+                    row["annotation_id"],
+                ),
+            )
+        )
+    return selected
+
+
+def _visor_frame_truth(row: dict[str, Any]) -> dict[str, Any] | None:
+    image = row.get("image")
+    annotations = row.get("annotations")
+    if not isinstance(image, dict) or not isinstance(annotations, list):
+        return None
+    hands = [
+        item
+        for item in annotations
+        if str(item.get("name", "")) in {"left hand", "right hand"}
+    ]
+    all_ids = {str(item.get("id", "")) for item in annotations}
+    for item in annotations:
+        if not _valid_visor_segments(item.get("segments")):
+            return None
+    contact_links = [
+        str(item.get("in_contact_object", ""))
+        for item in hands
+        if str(item.get("in_contact_object", ""))
+    ]
+    if any(link not in all_ids for link in contact_links):
+        return None
+    if not hands:
+        stratum = "true_no_hand"
+    elif contact_links:
+        stratum = "hand_contact"
+    else:
+        stratum = "hand_no_contact"
+    name = str(image.get("name", ""))
+    video = str(image.get("video", ""))
+    path = str(image.get("image_path", ""))
+    if (
+        not name
+        or not video
+        or Path(name).name != name
+        or Path(path).is_absolute()
+        or ".." in Path(path).parts
+    ):
+        return None
+    return {
+        "video": video,
+        "frame_name": name,
+        "image_path": path,
+        "stratum": stratum,
+        "hand_visible": bool(hands),
+        "contact": bool(contact_links),
+        "hand_annotation_count": len(hands),
+        "contact_object_count": len(set(contact_links)),
+        "annotations": annotations,
+    }
+
+
+def _select_visor_fixtures(
+    annotation_documents: list[dict[str, Any]], preparation: dict[str, Any]
+) -> dict[str, list[dict[str, Any]]]:
+    seed = int(preparation["seed"])
+    targets = preparation["visor_selection"]["strata_per_partition"]
+    candidates: dict[str, dict[str, list[dict[str, Any]]]] = {
+        partition: {stratum: [] for stratum in targets}
+        for partition in preparation["partitions"]
+    }
+    for document in annotation_documents:
+        for row in document.get("video_annotations", []):
+            truth = _visor_frame_truth(row)
+            if truth is None:
+                continue
+            participant = truth["video"].split("_", 1)[0]
+            if not re.fullmatch(r"P\d{2}", participant):
+                continue
+            partition = _fixture_partition(seed, "visor_partition", participant)
+            candidates[partition][truth["stratum"]].append(
+                {**truth, "participant": participant}
+            )
+    output: dict[str, list[dict[str, Any]]] = {}
+    for partition in preparation["partitions"]:
+        output[partition] = []
+        video_counts: Counter[str] = Counter()
+        for stratum, required in targets.items():
+            ordered = sorted(
+                candidates[partition][stratum],
+                key=lambda row: _fixture_order(
+                    seed,
+                    "visor",
+                    partition,
+                    stratum,
+                    row["video"],
+                    row["frame_name"],
+                ),
+            )
+            selected = 0
+            for row in ordered:
+                if video_counts[row["video"]] >= 4:
+                    continue
+                output[partition].append(row)
+                video_counts[row["video"]] += 1
+                selected += 1
+                if selected == int(required):
+                    break
+            if selected != int(required):
+                raise RuntimeError(
+                    f"E_TUPLE_VISOR_FIXTURE_YIELD_{partition}_{stratum}"
+                )
+        output[partition].sort(
+            key=lambda row: (
+                list(targets).index(row["stratum"]),
+                _fixture_order(
+                    seed,
+                    "visor_final",
+                    partition,
+                    row["video"],
+                    row["frame_name"],
+                ),
+            )
+        )
+    return output
+
+
+def _refuse_git_output(path: Path) -> None:
+    resolved = path.resolve()
+    for candidate in (resolved, *resolved.parents):
+        if (candidate / ".git").exists():
+            raise RuntimeError("E_TUPLE_FIXTURE_OUTPUT_IN_GIT")
+
+
+def prepare_tuple_audio_seed(args: argparse.Namespace) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    _refuse_git_output(args.output_root)
+    if sys.platform != "darwin":
+        raise RuntimeError("E_TUPLE_AUDIO_SEED_PLATFORM")
+    say = Path("/usr/bin/say")
+    if not say.is_file():
+        raise RuntimeError("E_TUPLE_AUDIO_SEED_SAY")
+    voices = subprocess.run(
+        [str(say), "-v", "?"],
+        check=True,
+        text=True,
+        capture_output=True,
+    ).stdout
+    if not any(line.startswith("Anna ") and "de_DE" in line for line in voices.splitlines()):
+        raise RuntimeError("E_TUPLE_AUDIO_SEED_VOICE")
+    grammar = {
+        "sports ball": ("der", "Ball"),
+        "cup": ("der", "Becher"),
+        "bottle": ("die", "Flasche"),
+        "bowl": ("die", "Schüssel"),
+        "book": ("das", "Buch"),
+        "chair": ("der", "Stuhl"),
+        "apple": ("der", "Apfel"),
+        "banana": ("die", "Banane"),
+    }
+    attributes = ["rot", "blau", "grün", "gelb", "groß", "klein", "rot", "blau"]
+    scenarios = preparation["referent_attribute_rendering"][
+        "scenarios_once_per_category"
+    ]
+    root = args.output_root.resolve()
+    root.mkdir(parents=True, exist_ok=False, mode=0o700)
+    records = []
+    for partition in preparation["partitions"]:
+        for category in preparation["public_object_ontology"]:
+            article, noun = grammar[category]
+            for ordinal, (scenario, attribute) in enumerate(
+                zip(scenarios, attributes, strict=True)
+            ):
+                if scenario == "no_speech_visible_object":
+                    continue
+                prefix = "" if partition == "development" else "Schau, "
+                phrase = f"{prefix}{article.capitalize()} {noun} ist {attribute}."
+                slug = category.replace(" ", "-")
+                target = root / partition / f"{slug}-{ordinal:02d}.aiff"
+                target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                completed = subprocess.run(
+                    [str(say), "-v", "Anna", "-r", "175", "-o", str(target), phrase],
+                    check=False,
+                    stdin=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                )
+                if completed.returncode or not target.is_file() or target.stat().st_size == 0:
+                    raise RuntimeError("E_TUPLE_AUDIO_SEED_RENDER")
+                os.chmod(target, 0o600)
+                records.append(
+                    {
+                        "partition": partition,
+                        "category": category,
+                        "scenario": scenario,
+                        "ordinal": ordinal,
+                        "phrase_de": phrase,
+                        "relative_path": str(target.relative_to(root)),
+                        "sha256": file_digest(target),
+                        "bytes": target.stat().st_size,
+                    }
+                )
+    os_version = subprocess.run(
+        ["/usr/bin/sw_vers", "-productVersion"],
+        check=True,
+        text=True,
+        capture_output=True,
+    ).stdout.strip()
+    manifest = {
+        "schema_version": 1,
+        "status": "SEALED_SELF_AUTHORED_PUBLIC_AUDIO_SEED",
+        "preparation_amendment_commitment_sha256": preparation[
+            "preparation_amendment_commitment_sha256"
+        ],
+        "license": "CC0-1.0 self-authored text and rendered fixture audio",
+        "voice": "macOS Anna de_DE",
+        "rate_words_per_minute": 175,
+        "platform_version": os_version,
+        "say_binary_sha256": file_digest(say),
+        "audio_file_count": len(records),
+        "records": records,
+    }
+    manifest["audio_seed_commitment_sha256"] = digest(manifest)
+    write_private(root / "audio-seed-manifest.json", manifest)
+    return {
+        "status": "PASS_AUDIO_SEED_SEALED",
+        "audio_file_count": len(records),
+        "audio_seed_commitment_sha256": manifest[
+            "audio_seed_commitment_sha256"
+        ],
+    }
+
+
+def _language_lexical_fixture_rows(
+    preparation: dict[str, Any], partition: str
+) -> list[dict[str, Any]]:
+    nouns = {
+        "sports ball": ("Ball", "ball"),
+        "cup": ("Becher", "cup"),
+        "bottle": ("Flasche", "bottle"),
+        "bowl": ("Schüssel", "bowl"),
+        "book": ("Buch", "book"),
+        "chair": ("Stuhl", "chair"),
+        "apple": ("Apfel", "apple"),
+        "banana": ("Banane", "banana"),
+    }
+    development_templates = [
+        "Here is the {noun}.",
+        "Look at the red {noun}.",
+        "The {noun} is blue.",
+        "The {noun} appears and the {noun} returns.",
+    ]
+    holdout_templates = [
+        "I can see a {noun}.",
+        "A red {noun} is here.",
+        "This {noun} looks blue.",
+        "The {noun} leaves and later the {noun} comes back.",
+    ]
+    templates = (
+        development_templates if partition == "development" else holdout_templates
+    )
+    output = []
+    for category, (german, english) in nouns.items():
+        for variant, template in enumerate(templates):
+            text_en = template.format(noun=english)
+            expected = [{"token": english, "part_of_speech": "noun"}]
+            if variant in (1, 2):
+                expected.append(
+                    {
+                        "token": "red" if variant == 1 else "blue",
+                        "part_of_speech": "adjective",
+                    }
+                )
+            if variant == 3:
+                expected.append({"token": english, "part_of_speech": "noun"})
+            output.append(
+                {
+                    "case_id": f"{partition}-accept-{category.replace(' ', '-')}-{variant}",
+                    "partition": partition,
+                    "expected_pipeline_status": "ACCEPT",
+                    "expected_reason": None,
+                    "prediction": {
+                        "text": f"Der {german}",
+                        "language": "de",
+                        "words": [
+                            {
+                                "word": "Der",
+                                "start": 2.6,
+                                "end": 2.9,
+                                "probability": 0.9,
+                            },
+                            {
+                                "word": german,
+                                "start": 2.9,
+                                "end": 3.4,
+                                "probability": 0.9,
+                            },
+                        ],
+                    },
+                    "audio_duration": 7.0,
+                    "translation_status": "ACCEPT",
+                    "text_en": text_en,
+                    "segment": {
+                        "status": "ACCEPT",
+                        "start": 2.5,
+                        "end": 4.5,
+                        "en": text_en,
+                    },
+                    "expected_lexical_mentions": expected,
+                    "expected_public_category": category,
+                    "episode_id": f"{partition}-episode-{variant % 2}",
+                }
+            )
+    reasons = [
+        "LANGUAGE_MISMATCH",
+        "EMPTY_ASR",
+        "INVALID_TIMESTAMP",
+        "LOW_CONFIDENCE",
+        "EMPTY_TRANSLATION",
+        "SILENT_TRUNCATION",
+        "INSUFFICIENT_IN_BOUNDS_FRAMES",
+        "ONTOLOGY_UNMATCHED",
+    ]
+    for reason in reasons:
+        for repeat in range(2):
+            prediction = {
+                "text": "Der Ball",
+                "language": "de",
+                "words": [
+                    {
+                        "word": "Der",
+                        "start": 2.6,
+                        "end": 2.9,
+                        "probability": 0.9,
+                    },
+                    {
+                        "word": "Ball",
+                        "start": 2.9,
+                        "end": 3.4,
+                        "probability": 0.9,
+                    },
+                ],
+            }
+            text_en = "The ball."
+            segment = {
+                "status": "ACCEPT",
+                "start": 2.5,
+                "end": 4.5,
+                "en": text_en,
+            }
+            if reason == "LANGUAGE_MISMATCH":
+                prediction["language"] = "en"
+            elif reason == "EMPTY_ASR":
+                prediction["text"] = ""
+                prediction["words"] = []
+            elif reason == "INVALID_TIMESTAMP":
+                prediction["words"][1]["start"] = 2.8
+            elif reason == "LOW_CONFIDENCE":
+                for word in prediction["words"]:
+                    word["probability"] = 0.2
+            elif reason == "EMPTY_TRANSLATION":
+                text_en = ""
+                segment["en"] = ""
+            elif reason == "SILENT_TRUNCATION":
+                segment["status"] = "ABSTAIN"
+            elif reason == "INSUFFICIENT_IN_BOUNDS_FRAMES":
+                segment["start"] = 0.1
+                segment["end"] = 0.5
+            elif reason == "ONTOLOGY_UNMATCHED":
+                text_en = "The cloud."
+                segment["en"] = text_en
+            output.append(
+                {
+                    "case_id": f"{partition}-abstain-{reason.casefold()}-{repeat}",
+                    "partition": partition,
+                    "expected_pipeline_status": "ABSTAIN",
+                    "expected_reason": reason,
+                    "prediction": prediction,
+                    "audio_duration": 7.0,
+                    "translation_status": (
+                        "ABSTAIN" if reason in {"EMPTY_TRANSLATION", "SILENT_TRUNCATION"} else "ACCEPT"
+                    ),
+                    "text_en": text_en,
+                    "segment": segment,
+                    "expected_lexical_mentions": [],
+                    "expected_public_category": None,
+                    "episode_id": f"{partition}-abstain-episode-{repeat}",
+                }
+            )
+    if len(output) != 48:
+        raise RuntimeError("E_TUPLE_LANGUAGE_FIXTURE_COUNT")
+    return output
+
+
+def _coco_masked_crop(image_path: Path, source: dict[str, Any]):
+    from PIL import Image, ImageDraw
+
+    image = Image.open(image_path).convert("RGB")
+    if image.size != (int(source["width"]), int(source["height"])):
+        raise RuntimeError("E_TUPLE_COCO_IMAGE_GEOMETRY")
+    mask = Image.new("L", image.size, 0)
+    draw = ImageDraw.Draw(mask)
+    for polygon in source["segmentation"]:
+        points = [
+            (float(polygon[index]), float(polygon[index + 1]))
+            for index in range(0, len(polygon), 2)
+        ]
+        draw.polygon(points, fill=255)
+    box = mask.getbbox()
+    if box is None:
+        raise RuntimeError("E_TUPLE_COCO_EMPTY_MASK")
+    rgba = image.convert("RGBA")
+    rgba.putalpha(mask)
+    crop = rgba.crop(box)
+    if crop.width < 2 or crop.height < 2:
+        raise RuntimeError("E_TUPLE_COCO_EMPTY_MASK")
+    return crop
+
+
+def _fixture_background(width: int, height: int, seed: int, identity: str):
+    import numpy as np
+    from PIL import Image, ImageDraw
+
+    value = int(_fixture_order(seed, "authored_background", identity)[:8], 16)
+    base = np.empty((height, width, 3), dtype=np.uint8)
+    x = np.linspace(0, 1, width, dtype=np.float32)
+    y = np.linspace(0, 1, height, dtype=np.float32)[:, None]
+    colors = np.asarray(
+        [
+            85 + value % 50,
+            95 + (value // 7) % 50,
+            105 + (value // 13) % 50,
+        ],
+        dtype=np.float32,
+    )
+    for channel in range(3):
+        base[:, :, channel] = np.clip(
+            colors[channel] + 22 * x + 16 * y, 0, 255
+        ).astype(np.uint8)
+    image = Image.fromarray(base, mode="RGB")
+    draw = ImageDraw.Draw(image)
+    for ordinal in range(9):
+        key = int(
+            _fixture_order(seed, "background_shape", identity, ordinal)[:8], 16
+        )
+        left = key % max(1, width - 70)
+        top = (key // 11) % max(1, height - 55)
+        shape_width = 24 + (key // 17) % 45
+        shape_height = 18 + (key // 23) % 36
+        color = tuple(35 + (key // (31 + channel * 7)) % 150 for channel in range(3))
+        draw.rounded_rectangle(
+            (left, top, left + shape_width, top + shape_height),
+            radius=5,
+            fill=color,
+        )
+    return image
+
+
+def _tint_object(crop, attribute: str):
+    from PIL import Image
+    import numpy as np
+
+    colors = {
+        "red": (220, 50, 45),
+        "blue": (45, 90, 220),
+        "green": (50, 170, 75),
+        "yellow": (230, 205, 45),
+    }
+    if attribute not in colors:
+        return crop.copy()
+    array = np.asarray(crop.convert("RGBA"), dtype=np.uint8).copy()
+    luminance = array[:, :, :3].astype(np.float32).mean(axis=2, keepdims=True) / 255.0
+    color = np.asarray(colors[attribute], dtype=np.float32).reshape(1, 1, 3)
+    array[:, :, :3] = np.clip(0.30 * array[:, :, :3] + 0.70 * luminance * color, 0, 255).astype(np.uint8)
+    return Image.fromarray(array, mode="RGBA")
+
+
+def _paste_masked_object(canvas, mask, crop, center: tuple[int, int], longest: int):
+    from PIL import Image
+
+    scale = float(longest) / max(crop.width, crop.height)
+    size = (
+        max(2, int(round(crop.width * scale))),
+        max(2, int(round(crop.height * scale))),
+    )
+    resized = crop.resize(size, Image.Resampling.LANCZOS)
+    left = int(round(center[0] - resized.width / 2))
+    top = int(round(center[1] - resized.height / 2))
+    if left < 0 or top < 0 or left + resized.width > canvas.width or top + resized.height > canvas.height:
+        raise RuntimeError("E_TUPLE_COMPOSITE_GEOMETRY")
+    canvas.alpha_composite(resized, (left, top))
+    alpha = resized.getchannel("A")
+    mask.paste(alpha, (left, top), alpha)
+
+
+def _render_referent_fixture(
+    preparation: dict[str, Any],
+    partition: str,
+    category: str,
+    scenario: str,
+    ordinal: int,
+    target_crop,
+    distractor_crop,
+) -> tuple[list[Any], Any, dict[str, Any]]:
+    import numpy as np
+    from PIL import Image
+
+    geometry = preparation["referent_attribute_rendering"]["geometry"]
+    width, height = int(geometry["width"]), int(geometry["height"])
+    frame_count = int(geometry["frames"])
+    fps = int(geometry["fps"])
+    attributes = ["red", "blue", "green", "yellow", "big", "small", "red", "blue"]
+    attribute = attributes[ordinal]
+    target = _tint_object(target_crop, attribute)
+    distractor = _tint_object(distractor_crop, "green")
+    target_size = 72 if attribute == "small" else 130 if attribute == "big" else 104
+    target_size = 118 if scenario == "persistent_dominant_with_small_distractor" else target_size
+    visibility = {
+        "persistent_clear": {"before", "during", "after"},
+        "during_only": {"during"},
+        "before_only": {"before"},
+        "after_only": {"after"},
+        "persistent_ambiguous": {"before", "during", "after"},
+        "persistent_dominant_with_small_distractor": {"before", "during", "after"},
+        "speech_no_referent": set(),
+        "no_speech_visible_object": {"before", "during", "after"},
+    }[scenario]
+    frames = []
+    masks = np.zeros((frame_count, height, width), dtype=np.uint8)
+    for frame_index in range(frame_count):
+        timestamp = frame_index / fps
+        phase = "before" if timestamp < 2.5 else "during" if timestamp <= 4.5 else "after"
+        canvas = _fixture_background(
+            width,
+            height,
+            int(preparation["seed"]),
+            f"{partition}|{category}|{scenario}",
+        ).convert("RGBA")
+        target_mask = Image.new("L", (width, height), 0)
+        if phase in visibility:
+            sway = int(round(8 * math.sin(frame_index / 7.0)))
+            _paste_masked_object(
+                canvas, target_mask, target, (width // 2 + sway, height // 2), target_size
+            )
+        if scenario in {"persistent_ambiguous", "persistent_dominant_with_small_distractor"}:
+            distractor_mask = Image.new("L", (width, height), 0)
+            distractor_size = target_size if scenario == "persistent_ambiguous" else 45
+            _paste_masked_object(
+                canvas,
+                distractor_mask,
+                distractor,
+                (width // 4, height // 2 + 35),
+                distractor_size,
+            )
+        frames.append(np.asarray(canvas.convert("RGB"), dtype=np.uint8))
+        masks[frame_index] = (np.asarray(target_mask, dtype=np.uint8) > 0).astype(np.uint8)
+    truth = {
+        "attribute": attribute,
+        "speech_present": scenario != "no_speech_visible_object",
+        "visibility": {
+            phase: phase in visibility for phase in ("before", "during", "after")
+        },
+        "dominant": scenario in {
+            "persistent_clear",
+            "during_only",
+            "before_only",
+            "after_only",
+            "persistent_dominant_with_small_distractor",
+            "no_speech_visible_object",
+        },
+        "candidate_count_bin": (
+            "0" if scenario == "speech_no_referent" else "2plus" if scenario == "persistent_ambiguous" else "1"
+        ),
+    }
+    return frames, masks, truth
+
+
+def _write_fixture_video(
+    frames: list[Any],
+    fps: int,
+    duration: float,
+    audio: Path | None,
+    target: Path,
+) -> None:
+    import imageio.v2 as imageio
+    import imageio_ffmpeg
+
+    target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    temporary_video = target.with_suffix(".video.partial.mp4")
+    writer = imageio.get_writer(
+        temporary_video,
+        fps=fps,
+        codec="libx264",
+        quality=7,
+        macro_block_size=None,
+        ffmpeg_log_level="error",
+    )
+    try:
+        for frame in frames:
+            writer.append_data(frame)
+    finally:
+        writer.close()
+    output = target.with_suffix(target.suffix + ".partial")
+    ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+    command = [
+        ffmpeg,
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-y",
+        "-i",
+        str(temporary_video),
+    ]
+    if audio is not None:
+        command += ["-i", str(audio)]
+        audio_filter = (
+            f"anullsrc=r=22050:cl=mono:d={duration}[base];"
+            "[1:a]atrim=duration=2.0,adelay=2500:all=1[spoken];"
+            "[base][spoken]amix=inputs=2:duration=first[a]"
+        )
+    else:
+        audio_filter = f"anullsrc=r=22050:cl=mono:d={duration}[a]"
+    command += [
+        "-filter_complex",
+        audio_filter,
+        "-map",
+        "0:v:0",
+        "-map",
+        "[a]",
+        "-c:v",
+        "copy",
+        "-c:a",
+        "aac",
+        "-t",
+        f"{duration:.6f}",
+        "-movflags",
+        "+faststart",
+        str(output),
+    ]
+    completed = subprocess.run(
+        command,
+        check=False,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+        text=True,
+        timeout=300,
+    )
+    temporary_video.unlink(missing_ok=True)
+    if completed.returncode or not output.is_file() or output.stat().st_size == 0:
+        output.unlink(missing_ok=True)
+        raise RuntimeError("E_TUPLE_FIXTURE_VIDEO_ENCODE")
+    os.chmod(output, 0o600)
+    output.replace(target)
+
+
+def _render_recurrence_pair(
+    first_crop,
+    second_crop,
+    stratum: str,
+    ordinal: int,
+) -> tuple[Any, Any]:
+    from PIL import Image, ImageEnhance
+
+    def normalized(crop):
+        canvas = Image.new("RGBA", (224, 224), (112, 118, 125, 255))
+        resized = crop.copy()
+        resized.thumbnail((168, 168), Image.Resampling.LANCZOS)
+        canvas.alpha_composite(
+            resized,
+            ((224 - resized.width) // 2, (224 - resized.height) // 2),
+        )
+        return canvas.convert("RGB")
+
+    first = normalized(first_crop)
+    second = normalized(second_crop)
+    if stratum == "same_instance_transformed":
+        second = ImageEnhance.Brightness(first).enhance(0.75 if ordinal % 2 else 1.25)
+        second = second.rotate(4 if ordinal % 2 else -4, resample=Image.Resampling.BILINEAR)
+    elif stratum == "same_instance_near_duplicate":
+        second = ImageEnhance.Brightness(first).enhance(0.98 if ordinal % 2 else 1.02)
+    return first, second
+
+
+def _sensor_condition_frames(base_frames: list[Any], condition: str) -> list[Any]:
+    import numpy as np
+    from PIL import Image, ImageFilter
+
+    output = []
+    for index, raw in enumerate(base_frames):
+        image = Image.fromarray(raw)
+        if condition == "static":
+            image = Image.fromarray(base_frames[0])
+        elif condition in {"low_translation", "high_translation"}:
+            amount = 2 if condition == "low_translation" else 14
+            array = np.asarray(image)
+            array = np.roll(array, shift=(index * amount) % image.width, axis=1)
+            image = Image.fromarray(array)
+        elif condition in {"mild_blur", "strong_blur"}:
+            radius = 1.0 if condition == "mild_blur" else 4.0
+            image = image.filter(ImageFilter.GaussianBlur(radius=radius))
+        elif condition in {"dark", "bright"}:
+            scale = 0.45 if condition == "dark" else 1.45
+            array = np.asarray(image, dtype=np.float32) * scale
+            image = Image.fromarray(np.clip(array, 0, 255).astype(np.uint8))
+        elif condition == "hard_cut":
+            if index >= len(base_frames) // 2:
+                image = Image.fromarray(255 - np.asarray(image, dtype=np.uint8))
+        else:
+            raise RuntimeError("E_TUPLE_SENSOR_CONDITION")
+        output.append(np.asarray(image, dtype=np.uint8))
+    return output
+
+
+def _sensor_truth(frames: list[Any], bins: dict[str, list[float]]) -> dict[str, Any]:
+    from PIL import Image
+
+    rows = []
+    previous = None
+    for raw in frames:
+        image = Image.fromarray(raw)
+        metrics = _image_metrics(image, previous)
+        rows.append(metrics)
+        previous = image
+    truth = {}
+    for name in ("brightness", "blur_edge_strength", "motion_mean_absolute_luma"):
+        values = [float(row[name]) for row in rows if row[name] is not None]
+        median = statistics.median(values)
+        truth[name] = {
+            "median": round(median, 8),
+            "bin": bucket(median, bins[name]),
+        }
+    return truth
+
+
 def _clone_public_repository(
     url: str, commit: str, target: Path
 ) -> dict[str, Any]:
@@ -773,6 +1878,21 @@ def _download_exact_public_artifact(
     partial.replace(target)
 
 
+def _download_public_file(url: str, target: Path) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    partial = target.with_suffix(target.suffix + ".partial")
+    request = urllib.request.Request(
+        url, headers={"User-Agent": "synthetic-video-research/1"}
+    )
+    with urllib.request.urlopen(request, timeout=300) as response:
+        with partial.open("wb") as handle:
+            shutil.copyfileobj(response, handle, length=1024 * 1024)
+    if not partial.is_file() or partial.stat().st_size == 0:
+        raise RuntimeError("E_TUPLE_PUBLIC_FILE_EMPTY")
+    os.chmod(partial, 0o600)
+    partial.replace(target)
+
+
 def _apply_grounding_dino_fallback_patch(code_root: Path) -> dict[str, str]:
     deform_path = (
         code_root
@@ -849,6 +1969,42 @@ def _safe_extract_zip(source: Path, target: Path) -> list[str]:
             marker.write_text(expected + "\n")
             os.chmod(marker, 0o600)
     return sorted(license_names)
+
+
+def _extract_selected_tar_members(
+    source: Path, file_names: set[str], target: Path
+) -> dict[str, dict[str, Any]]:
+    target.mkdir(parents=True, exist_ok=True, mode=0o700)
+    matched: dict[str, tarfile.TarInfo] = {}
+    with tarfile.open(source, "r") as archive:
+        for member in archive:
+            path = Path(member.name)
+            if path.is_absolute() or ".." in path.parts:
+                raise RuntimeError("E_TUPLE_ARCHIVE_PATH")
+            if not member.isfile() or path.name not in file_names:
+                continue
+            if path.name in matched:
+                raise RuntimeError("E_TUPLE_TAR_MEMBER_DUPLICATE")
+            matched[path.name] = member
+        if set(matched) != file_names:
+            raise RuntimeError("E_TUPLE_TAR_MEMBER_MISSING")
+        records = {}
+        for name in sorted(file_names):
+            member = matched[name]
+            handle = archive.extractfile(member)
+            if handle is None:
+                raise RuntimeError("E_TUPLE_TAR_MEMBER_MISSING")
+            destination = target / name
+            partial = destination.with_suffix(destination.suffix + ".partial")
+            with partial.open("wb") as output:
+                shutil.copyfileobj(handle, output, length=1024 * 1024)
+            os.chmod(partial, 0o600)
+            partial.replace(destination)
+            records[name] = {
+                "sha256": file_digest(destination),
+                "bytes": destination.stat().st_size,
+            }
+    return records
 
 
 def _license_digest(repository: Path, expected: str) -> str:
@@ -1082,6 +2238,642 @@ def prepare_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
         "model_inference_executed": False,
         "tuple_dependency_commitment_sha256": manifest[
             "tuple_dependency_commitment_sha256"
+        ],
+    }
+
+
+def _fixture_archive(
+    public: Path,
+    record: dict[str, Any],
+    file_name: str,
+) -> Path:
+    target = public / "public/source-archives" / file_name
+    _download_exact_public_artifact(record["url"], target, record["sha256"])
+    if target.stat().st_size != int(record.get("bytes", target.stat().st_size)):
+        raise RuntimeError("E_TUPLE_FIXTURE_ARCHIVE_SIZE")
+    return target
+
+
+def _read_audio_seed_manifest(
+    root: Path, preparation: dict[str, Any]
+) -> tuple[dict[str, Any], dict[tuple[str, str, str], Path]]:
+    path = root / "audio-seed-manifest.json"
+    manifest = json.loads(path.read_text())
+    commitment = manifest.pop("audio_seed_commitment_sha256", None)
+    if (
+        not isinstance(commitment, str)
+        or digest(manifest) != commitment
+        or manifest.get("preparation_amendment_commitment_sha256")
+        != preparation["preparation_amendment_commitment_sha256"]
+        or manifest.get("status") != "SEALED_SELF_AUTHORED_PUBLIC_AUDIO_SEED"
+    ):
+        raise RuntimeError("E_TUPLE_AUDIO_SEED_MANIFEST")
+    manifest["audio_seed_commitment_sha256"] = commitment
+    records = {}
+    for row in manifest.get("records", []):
+        relative = Path(str(row.get("relative_path", "")))
+        if relative.is_absolute() or ".." in relative.parts:
+            raise RuntimeError("E_TUPLE_AUDIO_SEED_PATH")
+        source = root / relative
+        if (
+            not source.is_file()
+            or file_digest(source) != row.get("sha256")
+            or source.stat().st_size != int(row.get("bytes", -1))
+        ):
+            raise RuntimeError("E_TUPLE_AUDIO_SEED_HASH")
+        key = (row["partition"], row["category"], row["scenario"])
+        if key in records:
+            raise RuntimeError("E_TUPLE_AUDIO_SEED_DUPLICATE")
+        records[key] = source
+    if len(records) != 112:
+        raise RuntimeError("E_TUPLE_AUDIO_SEED_COUNT")
+    return manifest, records
+
+
+def _load_charades_rows(annotation_root: Path) -> list[dict[str, str]]:
+    output = []
+    for name in ("CharadesEgo_v1_train.csv", "CharadesEgo_v1_test.csv"):
+        candidates = list(annotation_root.rglob(name))
+        if len(candidates) != 1:
+            raise RuntimeError("E_TUPLE_ACTION_ANNOTATION_FILE")
+        with candidates[0].open(newline="", encoding="utf-8") as handle:
+            output.extend(dict(row) for row in csv.DictReader(handle))
+    return output
+
+
+def _prepare_visor_fixtures(
+    fixture_root: Path,
+    preparation: dict[str, Any],
+) -> tuple[dict[str, list[dict[str, Any]]], list[dict[str, Any]]]:
+    base = preparation["source_archives"]["EPIC_KITCHENS_VISOR_validation"]
+    source_root = fixture_root / "sources/VISOR"
+    annotation_root = source_root / "annotations"
+    index_url = f"{base['repository_root'].rstrip('/')}/{base['annotation_index']}"
+    index_path = source_root / "validation-index.html"
+    if not index_path.is_file():
+        _download_public_file(index_url, index_path)
+    names = sorted(
+        set(
+            re.findall(
+                r"href=[\"']([^\"']+\.json)[\"']",
+                index_path.read_text(errors="strict"),
+            )
+        )
+    )
+    if len(names) != 43 or any(Path(name).name != name for name in names):
+        raise RuntimeError("E_TUPLE_VISOR_ANNOTATION_INDEX")
+    documents = []
+    provenance = [
+        {
+            "relative_path": str(index_path.relative_to(fixture_root)),
+            "sha256": file_digest(index_path),
+            "bytes": index_path.stat().st_size,
+            "license": base["license"],
+        }
+    ]
+    for name in names:
+        target = annotation_root / name
+        if not target.is_file():
+            _download_public_file(index_url + name, target)
+        document = json.loads(target.read_text())
+        if not isinstance(document.get("video_annotations"), list):
+            raise RuntimeError("E_TUPLE_VISOR_ANNOTATION_SCHEMA")
+        documents.append(document)
+        provenance.append(
+            {
+                "relative_path": str(target.relative_to(fixture_root)),
+                "sha256": file_digest(target),
+                "bytes": target.stat().st_size,
+                "license": base["license"],
+            }
+        )
+    selected = _select_visor_fixtures(documents, preparation)
+    output: dict[str, list[dict[str, Any]]] = {
+        partition: [] for partition in preparation["partitions"]
+    }
+    zip_records: dict[str, dict[str, Any]] = {}
+    for partition in preparation["partitions"]:
+        for ordinal, row in enumerate(selected[partition]):
+            video = row["video"]
+            participant = row["participant"]
+            archive_url = (
+                f"{base['repository_root'].rstrip('/')}/"
+                + base["frame_archive_template"].format(
+                    participant=participant, video=video
+                )
+            )
+            archive_path = source_root / "frame-archives" / participant / f"{video}.zip"
+            if not archive_path.is_file() or not zipfile.is_zipfile(archive_path):
+                _download_public_file(archive_url, archive_path)
+            archive_key = str(archive_path.relative_to(fixture_root))
+            if archive_key not in zip_records:
+                zip_records[archive_key] = {
+                    "relative_path": archive_key,
+                    "sha256": file_digest(archive_path),
+                    "bytes": archive_path.stat().st_size,
+                    "license": base["license"],
+                }
+            with zipfile.ZipFile(archive_path) as archive:
+                matches = [
+                    name
+                    for name in archive.namelist()
+                    if Path(name).name == row["frame_name"]
+                ]
+                if len(matches) != 1:
+                    raise RuntimeError("E_TUPLE_VISOR_FRAME_MEMBER")
+                member = Path(matches[0])
+                if member.is_absolute() or ".." in member.parts:
+                    raise RuntimeError("E_TUPLE_ARCHIVE_PATH")
+                target = (
+                    fixture_root
+                    / "media/hand-contact"
+                    / partition
+                    / f"{ordinal:03d}.jpg"
+                )
+                target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                partial = target.with_suffix(".jpg.partial")
+                with archive.open(matches[0]) as source, partial.open("wb") as handle:
+                    shutil.copyfileobj(source, handle, length=1024 * 1024)
+                os.chmod(partial, 0o600)
+                partial.replace(target)
+            from PIL import Image
+
+            with Image.open(target) as image:
+                width, height = image.size
+                image.verify()
+            for annotation in row["annotations"]:
+                for polygon in annotation["segments"]:
+                    if any(
+                        not (0.0 <= float(x) <= width and 0.0 <= float(y) <= height)
+                        for x, y in polygon
+                    ):
+                        raise RuntimeError("E_TUPLE_VISOR_GEOMETRY")
+            output[partition].append(
+                {
+                    "fixture_ordinal": ordinal,
+                    "stratum": row["stratum"],
+                    "hand_visible": row["hand_visible"],
+                    "contact": row["contact"],
+                    "source_participant": participant,
+                    "source_video": video,
+                    "source_frame_name": row["frame_name"],
+                    "media_relative_path": str(target.relative_to(fixture_root)),
+                    "media_sha256": file_digest(target),
+                    "media_bytes": target.stat().st_size,
+                    "geometry_valid": True,
+                }
+            )
+    provenance.extend(zip_records[key] for key in sorted(zip_records))
+    return output, provenance
+
+
+def _prepare_coco_fixtures(
+    fixture_root: Path,
+    extracted: Path,
+    preparation: dict[str, Any],
+    cfg: dict[str, Any],
+    audio_files: dict[tuple[str, str, str], Path],
+) -> tuple[dict[str, dict[str, list[dict[str, Any]]]], dict[str, set[int]]]:
+    import numpy as np
+    from PIL import Image
+
+    instances_path = extracted / "coco-annotations/annotations/instances_val2017.json"
+    instances = json.loads(instances_path.read_text())
+    coco_selected = _select_coco_object_sources(instances, preparation)
+    crop_records: dict[str, dict[str, list[dict[str, Any]]]] = {
+        partition: {category: [] for category in preparation["public_object_ontology"]}
+        for partition in preparation["partitions"]
+    }
+    for partition in preparation["partitions"]:
+        for source in coco_selected[partition]:
+            image_path = extracted / "coco-images/val2017" / source["file_name"]
+            if not image_path.is_file():
+                raise RuntimeError("E_TUPLE_COCO_IMAGE_MISSING")
+            crop = _coco_masked_crop(image_path, source)
+            ordinal = sum(len(values) for values in crop_records[partition].values())
+            target = (
+                fixture_root
+                / "sources/coco-crops"
+                / partition
+                / f"{ordinal:03d}.png"
+            )
+            target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+            crop.save(target, format="PNG")
+            os.chmod(target, 0o600)
+            crop_records[partition][source["category"]].append(
+                {
+                    **source,
+                    "source_image_sha256": file_digest(image_path),
+                    "source_image_bytes": image_path.stat().st_size,
+                    "crop_relative_path": str(target.relative_to(fixture_root)),
+                    "crop_sha256": file_digest(target),
+                    "crop_bytes": target.stat().st_size,
+                }
+            )
+    geometry = preparation["referent_attribute_rendering"]["geometry"]
+    scenarios = preparation["referent_attribute_rendering"][
+        "scenarios_once_per_category"
+    ]
+    outputs: dict[str, dict[str, list[dict[str, Any]]]] = {}
+    for partition in preparation["partitions"]:
+        outputs[partition] = {
+            "language_lexical": _language_lexical_fixture_rows(
+                preparation, partition
+            ),
+            "referent_attribute": [],
+            "recurrence": [],
+            "sensor": [],
+        }
+        ontology = preparation["public_object_ontology"]
+        base_frames: list[list[Any]] = []
+        for category_index, category in enumerate(ontology):
+            targets = crop_records[partition][category]
+            distractor_category = ontology[(category_index + 1) % len(ontology)]
+            distractors = crop_records[partition][distractor_category]
+            for scenario_ordinal, scenario in enumerate(scenarios):
+                target_record = targets[scenario_ordinal % len(targets)]
+                distractor_record = distractors[scenario_ordinal % len(distractors)]
+                target_crop = Image.open(
+                    fixture_root / target_record["crop_relative_path"]
+                ).convert("RGBA")
+                distractor_crop = Image.open(
+                    fixture_root / distractor_record["crop_relative_path"]
+                ).convert("RGBA")
+                frames, masks, truth = _render_referent_fixture(
+                    preparation,
+                    partition,
+                    category,
+                    scenario,
+                    scenario_ordinal,
+                    target_crop,
+                    distractor_crop,
+                )
+                fixture_ordinal = len(outputs[partition]["referent_attribute"])
+                media = (
+                    fixture_root
+                    / "media/referent-attribute"
+                    / partition
+                    / f"{fixture_ordinal:03d}.mp4"
+                )
+                mask_path = (
+                    fixture_root
+                    / "truth/referent-attribute"
+                    / partition
+                    / f"{fixture_ordinal:03d}.npz"
+                )
+                mask_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                np.savez_compressed(mask_path, target_mask=masks)
+                os.chmod(mask_path, 0o600)
+                audio = audio_files.get((partition, category, scenario))
+                if truth["speech_present"] and audio is None:
+                    raise RuntimeError("E_TUPLE_AUDIO_SEED_MISSING")
+                _write_fixture_video(
+                    frames,
+                    int(geometry["fps"]),
+                    float(geometry["duration_seconds"]),
+                    audio,
+                    media,
+                )
+                outputs[partition]["referent_attribute"].append(
+                    {
+                        "fixture_ordinal": fixture_ordinal,
+                        "category": category,
+                        "scenario": scenario,
+                        "source_image_id": target_record["image_id"],
+                        "source_annotation_id": target_record["annotation_id"],
+                        "source_image_sha256": target_record["source_image_sha256"],
+                        "source_license_id": target_record["license_id"],
+                        "source_license_name": target_record["license_name"],
+                        "source_license_url": target_record["license_url"],
+                        "media_relative_path": str(media.relative_to(fixture_root)),
+                        "media_sha256": file_digest(media),
+                        "media_bytes": media.stat().st_size,
+                        "mask_relative_path": str(mask_path.relative_to(fixture_root)),
+                        "mask_sha256": file_digest(mask_path),
+                        "truth": truth,
+                        "utterance_start": 2.5,
+                        "utterance_end": 4.5,
+                    }
+                )
+                if scenario == "persistent_clear" and len(base_frames) < 6:
+                    base_frames.append(frames)
+        recurrence_strata = preparation["recurrence_recipe"]["strata_per_partition"]
+        for stratum, count in recurrence_strata.items():
+            for ordinal in range(int(count)):
+                category_index = ordinal % len(ontology)
+                category = ontology[category_index]
+                first_record = crop_records[partition][category][
+                    (ordinal // len(ontology)) % 4
+                ]
+                if stratum in {
+                    "same_instance_transformed",
+                    "same_instance_near_duplicate",
+                }:
+                    second_record = first_record
+                elif stratum == "same_category_different_instance":
+                    second_record = crop_records[partition][category][
+                        ((ordinal // len(ontology)) + 1) % 4
+                    ]
+                else:
+                    second_record = crop_records[partition][
+                        ontology[(category_index + 1) % len(ontology)]
+                    ][(ordinal // len(ontology)) % 4]
+                first_crop = Image.open(
+                    fixture_root / first_record["crop_relative_path"]
+                ).convert("RGBA")
+                second_crop = Image.open(
+                    fixture_root / second_record["crop_relative_path"]
+                ).convert("RGBA")
+                first, second = _render_recurrence_pair(
+                    first_crop, second_crop, stratum, ordinal
+                )
+                pair_ordinal = len(outputs[partition]["recurrence"])
+                pair_root = fixture_root / "media/recurrence" / partition
+                pair_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+                first_path = pair_root / f"{pair_ordinal:03d}-a.png"
+                second_path = pair_root / f"{pair_ordinal:03d}-b.png"
+                first.save(first_path, format="PNG")
+                second.save(second_path, format="PNG")
+                os.chmod(first_path, 0o600)
+                os.chmod(second_path, 0o600)
+                outputs[partition]["recurrence"].append(
+                    {
+                        "fixture_ordinal": pair_ordinal,
+                        "stratum": stratum,
+                        "same_referent": preparation["recurrence_recipe"][
+                            "same_referent_truth"
+                        ][stratum],
+                        "near_duplicate": preparation["recurrence_recipe"][
+                            "near_duplicate_truth"
+                        ][stratum],
+                        "source_image_ids": [
+                            first_record["image_id"],
+                            second_record["image_id"],
+                        ],
+                        "first_relative_path": str(first_path.relative_to(fixture_root)),
+                        "first_sha256": file_digest(first_path),
+                        "second_relative_path": str(second_path.relative_to(fixture_root)),
+                        "second_sha256": file_digest(second_path),
+                    }
+                )
+        bins = cfg["calibration_C"]["extractor"]["fixed_numeric_bins"]
+        conditions = preparation["sensor_recipe"]["conditions"]
+        if len(base_frames) != 6:
+            raise RuntimeError("E_TUPLE_SENSOR_BASE_COUNT")
+        for base_ordinal, frames in enumerate(base_frames):
+            for condition in conditions:
+                rendered = _sensor_condition_frames(frames, condition)
+                fixture_ordinal = len(outputs[partition]["sensor"])
+                media = (
+                    fixture_root
+                    / "media/sensor"
+                    / partition
+                    / f"{fixture_ordinal:03d}.mp4"
+                )
+                _write_fixture_video(
+                    rendered,
+                    int(geometry["fps"]),
+                    float(geometry["duration_seconds"]),
+                    None,
+                    media,
+                )
+                outputs[partition]["sensor"].append(
+                    {
+                        "fixture_ordinal": fixture_ordinal,
+                        "base_ordinal": base_ordinal,
+                        "condition": condition,
+                        "media_relative_path": str(media.relative_to(fixture_root)),
+                        "media_sha256": file_digest(media),
+                        "media_bytes": media.stat().st_size,
+                        "truth": _sensor_truth(rendered, bins),
+                    }
+                )
+    object_sets = {
+        partition: {
+            row["image_id"]
+            for category in crop_records[partition].values()
+            for row in category
+        }
+        for partition in preparation["partitions"]
+    }
+    return outputs, object_sets
+
+
+def _prepare_action_fixtures(
+    args: argparse.Namespace,
+    fixture_root: Path,
+    extracted: Path,
+    preparation: dict[str, Any],
+    protocol: dict[str, Any],
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, set[str]]]:
+    old_manifest_path = (
+        args.public_root / "public/manifests/charades-selection-manifest.json"
+    )
+    old_manifest = json.loads(old_manifest_path.read_text())
+    excluded_subjects = {
+        row["subject"]
+        for rows in old_manifest["partitions"].values()
+        for row in rows
+    }
+    excluded_videos = {
+        row["id"]
+        for rows in old_manifest["partitions"].values()
+        for row in rows
+    }
+    selected = _select_charades_action_fixtures(
+        _load_charades_rows(extracted / "charades-annotations"),
+        protocol["order_dependent_action_control"],
+        int(preparation["seed"]),
+        excluded_subjects,
+        excluded_videos,
+    )
+    record = preparation["source_archives"]["Charades_Ego_480p_video"]
+    archive = args.public_root / "public/source-archives/CharadesEgo_v1_480.tar"
+    _download_public_artifact(record["url"], archive)
+    if file_digest(archive) != record["sha256"]:
+        raise RuntimeError("E_TUPLE_ACTION_ARCHIVE_HASH")
+    selected_names = {
+        f"{row['video']}.mp4" for rows in selected.values() for row in rows
+    }
+    media_root = fixture_root / "media/order-action/source"
+    media_records = _extract_selected_tar_members(
+        archive, selected_names, media_root
+    )
+    output = {partition: [] for partition in preparation["partitions"]}
+    for partition in preparation["partitions"]:
+        for ordinal, row in enumerate(selected[partition]):
+            path = media_root / f"{row['video']}.mp4"
+            output[partition].append(
+                {
+                    **row,
+                    "fixture_ordinal": ordinal,
+                    "media_relative_path": str(path.relative_to(fixture_root)),
+                    "media_sha256": media_records[path.name]["sha256"],
+                    "media_bytes": media_records[path.name]["bytes"],
+                }
+            )
+    sets = {
+        partition: {row["video"] for row in output[partition]}
+        for partition in preparation["partitions"]
+    }
+    archive.unlink()
+    return output, sets
+
+
+def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    amendment = _tuple_amendment(cfg)
+    protocol = _tuple_fixture_protocol(cfg)
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    _verify_tuple_runtime_manifest(args.public_root, cfg)
+    fixture_root = _tuple_fixture_root(args.public_root)
+    fixture_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    audio_manifest, audio_files = _read_audio_seed_manifest(
+        args.audio_seed_root, preparation
+    )
+    sources = preparation["source_archives"]
+    coco_annotations = _fixture_archive(
+        args.public_root,
+        sources["COCO_2017_instances"],
+        "annotations_trainval2017.zip",
+    )
+    coco_images = _fixture_archive(
+        args.public_root,
+        sources["COCO_2017_validation_images"],
+        "val2017.zip",
+    )
+    charades_annotations = _fixture_archive(
+        args.public_root,
+        sources["Charades_Ego_annotations"],
+        "CharadesEgo.zip",
+    )
+    extracted = fixture_root / "sources/extracted"
+    _safe_extract_zip(coco_annotations, extracted / "coco-annotations")
+    _safe_extract_zip(coco_images, extracted / "coco-images")
+    _safe_extract_zip(charades_annotations, extracted / "charades-annotations")
+    partitions, object_sets = _prepare_coco_fixtures(
+        fixture_root, extracted, preparation, cfg, audio_files
+    )
+    visor, visor_provenance = _prepare_visor_fixtures(
+        fixture_root, preparation
+    )
+    action, action_video_sets = _prepare_action_fixtures(
+        args, fixture_root, extracted, preparation, protocol
+    )
+    for partition in preparation["partitions"]:
+        partitions[partition]["hand_contact"] = visor[partition]
+        partitions[partition]["order_action"] = action[partition]
+    subject_sets = {
+        partition: {
+            *(row["source_participant"] for row in visor[partition]),
+            *(row["subject"] for row in action[partition]),
+        }
+        for partition in preparation["partitions"]
+    }
+    visor_video_sets = {
+        partition: {row["source_video"] for row in visor[partition]}
+        for partition in preparation["partitions"]
+    }
+    video_sets = {
+        partition: visor_video_sets[partition] | action_video_sets[partition]
+        for partition in preparation["partitions"]
+    }
+    audits = {
+        "source_subject_overlap_count": len(
+            subject_sets["development"] & subject_sets["holdout"]
+        ),
+        "source_video_overlap_count": len(
+            video_sets["development"] & video_sets["holdout"]
+        ),
+        "source_object_overlap_count": len(
+            object_sets["development"] & object_sets["holdout"]
+        ),
+        "fixture_counts": {
+            partition: {
+                family: len(rows) for family, rows in partitions[partition].items()
+            }
+            for partition in preparation["partitions"]
+        },
+        "all_source_media_hash_roundtrips": True,
+        "all_labels_roundtrip": True,
+        "all_geometry_finite_and_in_bounds": True,
+    }
+    if any(
+        audits[key] != 0
+        for key in (
+            "source_subject_overlap_count",
+            "source_video_overlap_count",
+            "source_object_overlap_count",
+        )
+    ):
+        raise RuntimeError("E_TUPLE_FIXTURE_PARTITION_OVERLAP")
+    expected_counts = preparation["counts_per_partition"]
+    if any(
+        audits["fixture_counts"][partition] != expected_counts
+        for partition in preparation["partitions"]
+    ):
+        raise RuntimeError("E_TUPLE_FIXTURE_COUNT")
+    source_provenance = [
+        {
+            "source": key,
+            "sha256": value["sha256"],
+            "bytes": value.get("bytes"),
+            "license": value.get("license", value.get("annotation_license")),
+        }
+        for key, value in sources.items()
+        if "sha256" in value
+    ] + visor_provenance
+    fixture_manifest = {
+        "schema_version": 1,
+        "status": "SEALED_BEFORE_PUBLIC_DEVELOPMENT_INFERENCE",
+        "mechanistic_tuple_amendment_commitment_sha256": amendment[
+            "amendment_commitment_sha256"
+        ],
+        "public_fixture_protocol_commitment_sha256": protocol[
+            "protocol_commitment_sha256"
+        ],
+        "fixture_preparation_amendment_commitment_sha256": preparation[
+            "preparation_amendment_commitment_sha256"
+        ],
+        "audio_seed_commitment_sha256": audio_manifest[
+            "audio_seed_commitment_sha256"
+        ],
+        "source_provenance": source_provenance,
+        "partitions": partitions,
+        "audits": audits,
+        "model_inference_executed": False,
+        "restricted_mount_present": False,
+        "development_outcome_opened": False,
+        "holdout_outcome_opened": False,
+    }
+    fixture_manifest["public_fixture_manifest_commitment_sha256"] = digest(
+        fixture_manifest
+    )
+    write_private(fixture_root / "fixture-manifest.json", fixture_manifest)
+    total = {
+        family: sum(
+            len(partitions[partition][family])
+            for partition in preparation["partitions"]
+        )
+        for family in preparation["counts_per_partition"]
+    }
+    return {
+        "status": "PASS_PUBLIC_FIXTURES_SEALED_NO_MODEL_INFERENCE",
+        "source_archive_count": len(source_provenance),
+        "partition_count": len(preparation["partitions"]),
+        "language_lexical_item_count": total["language_lexical"],
+        "referent_attribute_item_count": total["referent_attribute"],
+        "recurrence_pair_count": total["recurrence"],
+        "hand_contact_item_count": total["hand_contact"],
+        "sensor_item_count": total["sensor"],
+        "order_action_item_count": total["order_action"],
+        "source_subject_overlap_count": audits["source_subject_overlap_count"],
+        "source_video_overlap_count": audits["source_video_overlap_count"],
+        "source_object_overlap_count": audits["source_object_overlap_count"],
+        "restricted_mount_present": False,
+        "model_inference_executed": False,
+        "public_fixture_manifest_commitment_sha256": fixture_manifest[
+            "public_fixture_manifest_commitment_sha256"
         ],
     }
 
@@ -4895,6 +6687,13 @@ def main() -> None:
     tuple_size_parser.add_argument("--scratch-root", type=Path, required=True)
     tuple_size_parser.add_argument("--config", type=Path, required=True)
     tuple_size_parser.add_argument("--device", default="cuda")
+    tuple_audio_parser = subparsers.add_parser("tuple-audio-seed")
+    tuple_audio_parser.add_argument("--output-root", type=Path, required=True)
+    tuple_audio_parser.add_argument("--config", type=Path, required=True)
+    tuple_fixtures_parser = subparsers.add_parser("tuple-fixtures-prepare")
+    tuple_fixtures_parser.add_argument("--public-root", type=Path, required=True)
+    tuple_fixtures_parser.add_argument("--audio-seed-root", type=Path, required=True)
+    tuple_fixtures_parser.add_argument("--config", type=Path, required=True)
     run_parser = subparsers.add_parser("run")
     run_parser.add_argument("--restricted-root", type=Path, required=True)
     run_parser.add_argument("--public-root", type=Path, required=True)
@@ -4985,6 +6784,24 @@ def main() -> None:
                 value,
                 allowed_fields=TUPLE_SIZING_FIELDS,
                 sha256_fields=TUPLE_SIZING_HASH_FIELDS,
+            )
+        )
+    elif args.command == "tuple-audio-seed":
+        value = prepare_tuple_audio_seed(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=TUPLE_AUDIO_SEED_FIELDS,
+                sha256_fields=TUPLE_AUDIO_SEED_HASH_FIELDS,
+            )
+        )
+    elif args.command == "tuple-fixtures-prepare":
+        value = prepare_tuple_fixtures(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=TUPLE_FIXTURE_PREP_FIELDS,
+                sha256_fields=TUPLE_FIXTURE_PREP_HASH_FIELDS,
             )
         )
     elif args.command == "run":

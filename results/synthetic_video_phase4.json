@@ -436,6 +436,23 @@
     "public_model_outcome_opened": false,
     "governed_C_reopened": false
   },
+  "mechanistic_training_tuple_fixture_preparation_amendment": {
+    "status": "FROZEN_BEFORE_MANIFEST_CONSTRUCTION_OR_PUBLIC_MODEL_OUTCOMES",
+    "preparation_amendment_commitment_sha256": "1cc8d0e3498da5785a2c2105307bf6d5ab20dd10f839ec0f2b92b9def372ff1d",
+    "prior_no_go_count_preserved": 4,
+    "partition_count": 2,
+    "fixture_family_count": 6,
+    "items_per_partition": 312,
+    "source_archive_count_with_frozen_sha256": 4,
+    "source_archive_count_with_per_file_manifest_hashing": 1,
+    "COCO_annotation_sha256": "113a836d90195ee1f884e704da6304dfaaecff1f023f49b6ca93c4aaae470268",
+    "COCO_validation_image_sha256": "4f7e2ccb2866ec5041993c9cf2a952bbed69647b115d0f74da7ce8f4bef82f05",
+    "model_inference_executed": false,
+    "restricted_mount_present": false,
+    "public_model_outcome_opened": false,
+    "fixture_manifest_commitment": "PENDING_PREPARATION",
+    "next_gate": "render and seal the exact disjoint public fixtures, then commit their single external-manifest commitment before development inference"
+  },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",
     "candidate_id": "egohod_egovideo_l_zero_shot",
