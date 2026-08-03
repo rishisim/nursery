@@ -485,6 +485,9 @@ def test_grounding_fallback_patch_is_narrow_and_extension_conditional() -> None:
     assert MODULE.GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256 == (
         "42aa71c7c47e6f930f48100924393adac95eb94aae0eef779bd7cad2d5bcc95d"
     )
+    assert MODULE.GROUNDING_DINO_DEFORM_ATTN_PATCHED_SHA256 == (
+        "778efabd5d875a4aa457ede6948979a4196844fbd14bf7a76bc4d4b1440122c6"
+    )
     assert MODULE.GROUNDING_DINO_MODEL_SOURCE_SHA256 == (
         "cdfb48d5b15d6b98f3d2002f59ae4730740a1ecfbaeba324f6840c5e4666a5b8"
     )

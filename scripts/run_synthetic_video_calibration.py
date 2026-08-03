@@ -207,6 +207,9 @@ NLTK_RESOURCE_ARCHIVES = {
 GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256 = (
     "42aa71c7c47e6f930f48100924393adac95eb94aae0eef779bd7cad2d5bcc95d"
 )
+GROUNDING_DINO_DEFORM_ATTN_PATCHED_SHA256 = (
+    "778efabd5d875a4aa457ede6948979a4196844fbd14bf7a76bc4d4b1440122c6"
+)
 GROUNDING_DINO_MODEL_SOURCE_SHA256 = (
     "cdfb48d5b15d6b98f3d2002f59ae4730740a1ecfbaeba324f6840c5e4666a5b8"
 )
@@ -725,7 +728,12 @@ def _apply_grounding_dino_fallback_patch(code_root: Path) -> dict[str, str]:
             raise RuntimeError("E_TUPLE_GROUNDING_PATCH_COUNT")
         deform_path.write_text(text.replace(original, replacement))
         os.chmod(deform_path, 0o600)
-    elif replacement not in text or text.count(replacement) != 1:
+    elif (
+        replacement not in text
+        or text.count(replacement) != 1
+        or file_digest(deform_path)
+        != GROUNDING_DINO_DEFORM_ATTN_PATCHED_SHA256
+    ):
         raise RuntimeError("E_TUPLE_GROUNDING_PATCH_STATE")
 
     model_path = (
