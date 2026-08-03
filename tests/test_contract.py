@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 8
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
@@ -218,7 +218,13 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["phase4_authorized"] is True
     assert config["gates"]["childlens_audio_processing_authorized"] is True
     assert config["gates"]["learner_effective_implementation_authorized"] is True
-    assert config["gates"]["learner_effective_public_qualification_authorized"] is False
+    assert config["gates"]["learner_effective_public_qualification_authorized"] is True
+    assert config["gates"]["learner_effective_runner_implementation_status"].startswith(
+        "PASS_"
+    )
+    assert config["gates"]["public_model_inference_requires_blind_no_hand_review_seal"] is True
+    assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
+    assert config["gates"]["learner_effective_public_model_inference_authorized"] is False
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
     assert config["gates"]["generator_work_authorized"] is False
     assert config["gates"]["real_only_training_authorized"] is False
@@ -275,6 +281,19 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
         "SOLE_SELECTED_GENERATOR"
     )
     assert generator_amendment["compiler"]["fixed_frames"] == 121
+    runner = config["construct_aligned_public_runner_implementation"]
+    assert runner["status"].startswith("PASS_")
+    assert runner["exact_source_reuse_guard"] is True
+    assert runner["exact_action_fixture_counts"] == {
+        "development": 44,
+        "holdout": 44,
+    }
+    assert runner["action_performance_is_nonblocking_and_nonrescuing"] is True
+    assert runner["action_integrity_privacy_provenance_and_external_call_failures_remain_blocking"] is True
+    assert runner["public_model_or_extractor_outcome_opened"] is False
+    assert runner["implementation_source_sha256"] == (
+        "569ce81d38eec54455f1fefe03e8d3b272c2ea8799972ca6a4259036aa29d1a3"
+    )
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"

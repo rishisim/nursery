@@ -155,11 +155,13 @@ applicant-governed generator and puts H3 out of scope. The exact 44/44 action fi
 reported diagnostically on development and holdout but cannot gate or rescue
 the seven learner-effective axes; valid action-performance failure is
 nonblocking, while action integrity, privacy, provenance, and external-call
-failures remain blocking. Public extractor work may proceed only after the
-canonical runner implements and passes regression tests for this role without
-overwriting the prior no-go. LTX work remains conditional on combined public
-and governed-C passes, episode-plan sealing, and final-topology resource
-preflight.
+failures remain blocking. The canonical runner now implements that exact source
+reuse and diagnostic role and passes focused fail-closed regression tests,
+without opening a new public model outcome or overwriting the prior no-go. The
+next gate is the blind applicant review and lineage-bound seal of the public
+no-hand nominees; fixture preparation and model inference remain fail-closed
+until that seal exists. LTX work remains conditional on combined public and
+governed-C passes, episode-plan sealing, and final-topology resource preflight.
 
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
@@ -315,5 +317,6 @@ The complete source stage under that correction is now sealed as
 `NO_GO_COMPLETE_SOURCE_FEASIBILITY` at `5f4aeff2…13b37`: the order-action
 family retained only 44/44 items and missed frozen `turn_on`/`turn_off`
 direction quotas. The conditional public-model, governed-C, and LTX stages
-therefore remained unrun. The current prospective route and its separate H3
-license blocker are summarized above.
+therefore remained unrun. H3 and its license blocker are preserved as history
+but are out of scope for this pilot; the current conditional route uses LTX-2.3
+as the sole selected generator, subject to the public and governed-C gates.

@@ -29,6 +29,37 @@ def _current_audio_fixture_config() -> dict:
     return config
 
 
+def test_construct_aligned_resume_amendment_is_exact_and_schema17_compatible() -> None:
+    import pytest
+
+    config = json.loads(
+        Path("configs/synthetic_video_real_only_proof.json").read_text()
+    )
+    assert config["schema_version"] == 17
+    amendment = MODULE._construct_aligned_ltx_resume_amendment(config)
+    assert (
+        amendment["amendment_commitment_sha256"]
+        == MODULE.CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256
+    )
+    assert amendment["source_reuse"]["action_fixture_counts"] == {
+        "development": 44,
+        "holdout": 44,
+    }
+    historical = MODULE._tuple_visor_hos_correction_amendment(config)
+    assert historical["public_fixture_counts_per_partition"][
+        "order_dependent_action_clips"
+    ] == 48
+
+    mutated = json.loads(json.dumps(config))
+    active = mutated["construct_aligned_ltx_resume_amendment"]
+    active["source_reuse"]["action_fixture_counts"]["development"] = 45
+    payload = json.loads(json.dumps(active))
+    payload.pop("amendment_commitment_sha256")
+    active["amendment_commitment_sha256"] = MODULE.digest(payload)
+    with pytest.raises(RuntimeError, match="E_CONSTRUCT_ALIGNED_RESUME_COMMITMENT"):
+        MODULE._construct_aligned_ltx_resume_amendment(mutated)
+
+
 def _write_public_audio_seed(
     tmp_path: Path,
     config: dict,
@@ -1357,6 +1388,188 @@ def test_active_visor_source_record_and_verified_merge_are_fail_closed(
         MODULE._load_active_visor_hos_source_feasibility(tmp_path, config)
 
 
+def _construct_aligned_action_source_rows(config: dict) -> dict[str, list[dict]]:
+    protocol = MODULE._tuple_fixture_protocol(config)[
+        "order_dependent_action_control"
+    ]
+    preparation = MODULE._tuple_fixture_preparation_amendment(config)
+    code_by_label = {
+        label: pair["matched_codes"][0][index]
+        for pair in protocol["class_code_pairs"]
+        for index, label in enumerate(pair["pair"])
+    }
+    output: dict[str, list[dict]] = {}
+    for partition, counts in MODULE.CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS.items():
+        rows = []
+        for label in protocol["labels"]:
+            for ordinal in range(counts[label]):
+                rows.append(
+                    {
+                        "video": f"{partition}-{label}-{ordinal:02d}",
+                        "subject": f"{partition}-subject-{label}-{ordinal:02d}",
+                        "label": label,
+                        "code": code_by_label[label],
+                        "start": 1.0,
+                        "end": 3.0,
+                        "source_duration": 10.0,
+                    }
+                )
+        rows.sort(
+            key=lambda row: (
+                protocol["labels"].index(row["label"]),
+                MODULE._fixture_order(
+                    int(preparation["seed"]),
+                    "mechanistic_action_final",
+                    partition,
+                    row["video"],
+                    row["start"],
+                ),
+            )
+        )
+        output[partition] = rows
+    return output
+
+
+def _construct_aligned_source_record(config: dict) -> dict:
+    record = _active_visor_source_record()
+    statuses = {
+        "official_visor_hos_artifact": "PASS",
+        "visor_hos_semantic_reference": "PASS",
+        "visor_hos_contact": "PASS",
+        "visor_hos_explicit_no_contact": "PASS",
+        "visor_hos_no_hand_nominees": "PASS_NOMINEE_QUEUE_READY",
+        "visor_hos_integrity": "PASS",
+        "coco_composite_sources": "PASS",
+        "language_and_lexical": "PASS",
+        "referent_attribute_composite": "PASS",
+        "recurrence": "PASS",
+        "sensor": "PASS",
+        "charades_order_action": "NO_GO",
+        "cross_partition_source_independence": "PASS",
+    }
+    record.update(
+        {
+            "status": "NO_GO_COMPLETE_SOURCE_FEASIBILITY",
+            "families": {
+                name: {"status": status} for name, status in statuses.items()
+            },
+            "failing_family_names": ["charades_order_action"],
+            "action_inventory": {
+                "status": "NO_GO",
+                "final_counts": MODULE.CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS,
+                "deficits": MODULE.CONSTRUCT_ALIGNED_ACTION_DEFICITS,
+                "subject_overlap_count": 0,
+                "video_overlap_count": 0,
+            },
+            "no_hand_review_required_before_public_model_inference": True,
+            "large_Charades_video_archive_downloaded": False,
+        }
+    )
+    record["selections"]["charades_order_action"] = (
+        _construct_aligned_action_source_rows(config)
+    )
+    return record
+
+
+def test_construct_aligned_source_reuse_accepts_only_exact_action_no_go(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    import inspect
+    import pytest
+
+    config = json.loads(
+        Path("configs/synthetic_video_real_only_proof.json").read_text()
+    )
+    record = _construct_aligned_source_record(config)
+    commitment = MODULE.digest(record)
+    record["visor_hos_source_feasibility_commitment_sha256"] = commitment
+    path = tmp_path / "visor-hos-source-feasibility.json"
+    MODULE.write_private(path, record)
+    monkeypatch.setattr(
+        MODULE, "CONSTRUCT_ALIGNED_SOURCE_NO_GO_SHA256", commitment
+    )
+    monkeypatch.setattr(
+        MODULE,
+        "_construct_aligned_ltx_resume_amendment",
+        lambda _cfg: {
+            "amendment_commitment_sha256": (
+                MODULE.CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256
+            ),
+            "prior_results_and_amendments_preserved": {
+                "complete_source_no_go": commitment
+            },
+        },
+    )
+    before = path.read_bytes()
+    loaded = MODULE._load_construct_aligned_visor_hos_source_reuse(
+        tmp_path, config
+    )
+    assert path.read_bytes() == before
+    assert {
+        partition: len(rows)
+        for partition, rows in loaded["selections"][
+            "charades_order_action"
+        ].items()
+    } == MODULE.CONSTRUCT_ALIGNED_ACTION_COUNTS
+    assert "_select_charades_action_fixtures" not in inspect.getsource(
+        MODULE._prepare_action_fixtures
+    )
+
+    broken = json.loads(json.dumps(record))
+    same_label = broken["selections"]["charades_order_action"]["development"]
+    same_label[0], same_label[1] = same_label[1], same_label[0]
+    broken_payload = json.loads(json.dumps(broken))
+    broken_payload.pop("visor_hos_source_feasibility_commitment_sha256")
+    broken_commitment = MODULE.digest(broken_payload)
+    broken["visor_hos_source_feasibility_commitment_sha256"] = broken_commitment
+    MODULE.write_private(path, broken)
+    monkeypatch.setattr(
+        MODULE, "CONSTRUCT_ALIGNED_SOURCE_NO_GO_SHA256", broken_commitment
+    )
+    monkeypatch.setattr(
+        MODULE,
+        "_construct_aligned_ltx_resume_amendment",
+        lambda _cfg: {
+            "prior_results_and_amendments_preserved": {
+                "complete_source_no_go": broken_commitment
+            }
+        },
+    )
+    with pytest.raises(
+        RuntimeError, match="E_CONSTRUCT_ALIGNED_ACTION_SOURCE_ORDER"
+    ):
+        MODULE._load_construct_aligned_visor_hos_source_reuse(tmp_path, config)
+
+
+def test_construct_aligned_action_fixture_projection_is_exact() -> None:
+    import pytest
+
+    config = json.loads(
+        Path("configs/synthetic_video_real_only_proof.json").read_text()
+    )
+    source = _construct_aligned_action_source_rows(config)["development"]
+    fixtures = [
+        {
+            **row,
+            "fixture_ordinal": ordinal,
+            "media_relative_path": f"media/{ordinal:03d}.mp4",
+            "media_sha256": f"{ordinal + 1:064x}",
+            "media_bytes": ordinal + 1,
+        }
+        for ordinal, row in enumerate(source)
+    ]
+    MODULE._validate_construct_aligned_action_fixture_projection(
+        fixtures, source, "development"
+    )
+    fixtures[0]["video"] = "reselected-video"
+    with pytest.raises(
+        RuntimeError, match="E_CONSTRUCT_ALIGNED_ACTION_FIXTURE_PROJECTION"
+    ):
+        MODULE._validate_construct_aligned_action_fixture_projection(
+            fixtures, source, "development"
+        )
+
+
 def test_fixture_materialization_never_calls_legacy_sparse_visor_path() -> None:
     import inspect
 
@@ -1484,7 +1697,7 @@ def test_active_visor_materialization_seals_masks_and_no_hand_lineage(
     verified = {"commitment_sha256": seal_commitment}
     monkeypatch.setattr(
         MODULE,
-        "_load_active_visor_hos_source_feasibility",
+        "_load_construct_aligned_visor_hos_source_reuse",
         lambda fixture_root, cfg: source_record,
     )
     monkeypatch.setattr(
@@ -1523,7 +1736,9 @@ def test_active_visor_materialization_seals_masks_and_no_hand_lineage(
                 }
             },
         },
-        {},
+        json.loads(
+            Path("configs/synthetic_video_real_only_proof.json").read_text()
+        ),
         review_root,
     )
 
@@ -1532,6 +1747,9 @@ def test_active_visor_materialization_seals_masks_and_no_hand_lineage(
         "visor_hos_correction_amendment_commitment_sha256": amendment_commitment,
         "visor_hos_source_feasibility_commitment_sha256": source_commitment,
         "verified_no_hand_seal_commitment_sha256": seal_commitment,
+        "construct_aligned_ltx_resume_amendment_commitment_sha256": (
+            MODULE.CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256
+        ),
         "source_frame_overlap_count": 0,
         "source_frame_duplicate_count": 0,
     }
@@ -1690,6 +1908,7 @@ def test_no_hand_review_materializes_only_frozen_nominee_frames(
                 "visor_hos_source_feasibility_commitment_sha256": source_commitment
             },
             queues,
+            MODULE.CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256,
         )
     )
     assert record["archive_count"] == 2
@@ -1701,7 +1920,9 @@ def test_no_hand_review_materializes_only_frozen_nominee_frames(
         for row in rows:
             assert (frame_root / row["image_path"]).is_file()
     loaded = MODULE._load_visor_hos_no_hand_frame_materialization(
-        review_root, source_commitment
+        review_root,
+        source_commitment,
+        MODULE.CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256,
     )
     assert loaded["source_frame_materialization_commitment_sha256"] == record[
         "source_frame_materialization_commitment_sha256"
@@ -1714,7 +1935,9 @@ def test_active_no_hand_cli_wrappers_are_canonical_and_aggregate_only(
     from types import SimpleNamespace
 
     config_path = tmp_path / "config.json"
-    config_path.write_text("{}")
+    config_path.write_text(
+        Path("configs/synthetic_video_real_only_proof.json").read_text()
+    )
     public_root = tmp_path / "public-root"
     fixture_root = MODULE._tuple_fixture_root(public_root)
     source_commitment = "6" * 64
@@ -1728,7 +1951,7 @@ def test_active_no_hand_cli_wrappers_are_canonical_and_aggregate_only(
     inventory = {"raw_nominee_count": 0}
     monkeypatch.setattr(
         MODULE,
-        "_load_active_visor_hos_source_feasibility",
+        "_load_construct_aligned_visor_hos_source_reuse",
         lambda root, cfg: source_record,
     )
     monkeypatch.setattr(
@@ -1765,6 +1988,10 @@ def test_active_no_hand_cli_wrappers_are_canonical_and_aggregate_only(
             kwargs["source_frame_materialization_commitment_sha256"]
             == materialization_commitment
         )
+        assert (
+            kwargs["construct_aligned_amendment_commitment_sha256"]
+            == MODULE.CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256
+        )
         return {
             "status": "READY_FOR_AUTHORIZED_APPLICANT_BLIND_REVIEW",
             "partition_count": 2,
@@ -1791,6 +2018,9 @@ def test_active_no_hand_cli_wrappers_are_canonical_and_aggregate_only(
         "visor_hos_source_feasibility_commitment_sha256": source_commitment,
         "source_frame_materialization_commitment_sha256": materialization_commitment,
         "visor_hos_correction_amendment_commitment_sha256": "a" * 64,
+        "construct_aligned_ltx_resume_amendment_commitment_sha256": (
+            MODULE.CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256
+        ),
     }
     monkeypatch.setattr(
         MODULE, "_load_visor_hos_no_hand_review_queue", lambda root: queue
@@ -1798,7 +2028,7 @@ def test_active_no_hand_cli_wrappers_are_canonical_and_aggregate_only(
     monkeypatch.setattr(
         MODULE,
         "_load_visor_hos_no_hand_frame_materialization",
-        lambda root, expected: {
+        lambda root, expected, expected_active: {
             "source_frame_materialization_commitment_sha256": (
                 materialization_commitment
             )
@@ -1975,6 +2205,57 @@ def test_tuple_combined_public_gate_allows_one_supporting_axis_unmeasured() -> N
     )
     assert first["status"] == second["status"] == "PASS"
     assert first["validated_axis_count"] == 6
+
+
+def test_construct_aligned_combined_gate_ignores_only_action_performance() -> None:
+    axes = {
+        axis: {"status": "PASS"}
+        for axis in (
+            *MODULE.TUPLE_CRITICAL_AXIS_IDS,
+            *MODULE.TUPLE_SUPPORTING_AXIS_IDS,
+        )
+    }
+    axes[MODULE.TUPLE_SUPPORTING_AXIS_IDS[0]] = {"status": "UNMEASURED"}
+    passed = MODULE._tuple_combined_public_gate(
+        axes,
+        {"status": "PASS"},
+        action_control_blocks=False,
+    )
+    diagnostic_no_go = MODULE._tuple_combined_public_gate(
+        axes,
+        {"status": "NO_GO_DIAGNOSTIC"},
+        action_control_blocks=False,
+    )
+    assert passed["status"] == diagnostic_no_go["status"] == "PASS"
+    assert diagnostic_no_go["action_control_used_in_gate"] is False
+    assert diagnostic_no_go["validated_axis_count"] == 6
+
+    axes[MODULE.TUPLE_CRITICAL_AXIS_IDS[0]] = {"status": "NO_GO"}
+    cannot_rescue = MODULE._tuple_combined_public_gate(
+        axes,
+        {"status": "PASS"},
+        action_control_blocks=False,
+    )
+    assert cannot_rescue["status"] == "NO_GO"
+    assert cannot_rescue["critical_axis_failures"] == [
+        MODULE.TUPLE_CRITICAL_AXIS_IDS[0]
+    ]
+
+    integrity = {
+        "failure_count": 1,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+        "error_module_count": 1,
+        "unaccounted_failure_count": 0,
+    }
+    integrity_blocked = MODULE._apply_tuple_integrity_gate(
+        diagnostic_no_go, integrity
+    )
+    assert integrity_blocked["status"] == "NO_GO"
+    assert "integrity:failure_count" in integrity_blocked[
+        "combined_gate_failures"
+    ]
 
 
 def test_tuple_integrity_failure_blocks_otherwise_passing_combined_gate() -> None:
@@ -2735,6 +3016,37 @@ def test_tuple_missing_registered_module_is_an_error_not_a_pass(monkeypatch) -> 
     }
 
 
+def test_tuple_diagnostic_status_is_only_valid_for_order_action() -> None:
+    def runner(module_id):
+        def execute(_context):
+            return {
+                "status": "NO_GO_DIAGNOSTIC",
+                "metrics": {},
+                "row_count": 0,
+                "failure_count": 0,
+                "invalid_retained_record_count": 0,
+                "silent_truncation_count": 0,
+                "external_call_count": 0,
+            }
+
+        return execute
+
+    results = MODULE._collect_tuple_module_results(
+        {
+            module_id: runner(module_id)
+            for module_id in MODULE.TUPLE_QUALIFICATION_MODULE_IDS
+        },
+        {},
+    )
+    assert results["order_action"]["status"] == "NO_GO_DIAGNOSTIC"
+    for module_id in set(MODULE.TUPLE_QUALIFICATION_MODULE_IDS) - {"order_action"}:
+        assert results[module_id]["status"] == "ERROR"
+        assert (
+            results[module_id]["error_code"]
+            == "E_TUPLE_QUALIFICATION_MODULE_RESULT"
+        )
+
+
 def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
     tmp_path: Path, monkeypatch
 ) -> None:
@@ -2750,6 +3062,9 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
             "amendment_commitment_sha256"
         ],
         "verified_no_hand_seal_commitment_sha256": "a" * 64,
+        "construct_aligned_ltx_resume_amendment_commitment_sha256": (
+            MODULE.CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256
+        ),
         "partitions": {
             "development": {},
             "holdout": {},
@@ -2775,13 +3090,20 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
                 for axis in MODULE.TUPLE_MODULE_AXIS_IDS[module_id]
             }
             return {
-                "status": "PASS",
+                "status": (
+                    "NO_GO_DIAGNOSTIC"
+                    if module_id == "order_action"
+                    else "PASS"
+                ),
                 "axis_results": axis_results,
                 "metrics": {},
                 "selected_thresholds": (
                     thresholds.get(module_id, {})
                     if context["partition"] == "development"
-                    else {}
+                    else {
+                        key: context["thresholds"][key]
+                        for key in thresholds.get(module_id, {})
+                    }
                 ),
                 "rows": [],
                 "row_count": 0,
@@ -2821,6 +3143,7 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
         argparse.Namespace(**base, partition="development")
     )
     assert development["status"] == "PASS_DEVELOPMENT_THRESHOLDS_SEALED"
+    assert development["action_control_status"] == "NO_GO_DIAGNOSTIC"
     assert called == [
         ("development", module_id)
         for module_id in MODULE.TUPLE_QUALIFICATION_MODULE_IDS
@@ -2838,6 +3161,7 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
         argparse.Namespace(**base, partition="holdout")
     )
     assert holdout["status"] == "PASS_PUBLIC_COMBINED_GATE"
+    assert holdout["action_control_status"] == "NO_GO_DIAGNOSTIC"
     assert called[-7:] == [
         ("holdout", module_id)
         for module_id in MODULE.TUPLE_QUALIFICATION_MODULE_IDS
@@ -3136,6 +3460,46 @@ def test_tuple_action_grid_rejects_higher_f1_that_fails_temporal_floor() -> None
     invalid = dict(selected)
     invalid["invalid_retained_record_count"] = 1
     assert MODULE._tuple_action_metrics_pass(invalid, gate) is False
+
+
+def test_tuple_action_diagnostic_fallback_is_deterministic_and_nonpassing() -> None:
+    gate = {
+        "ordered_action_direction_macro_f1_min": 0.6,
+        "opposite_pair_correct_margin_fraction_min": 0.7,
+        "ordered_over_time_reversed_target_score_fraction_min": 0.7,
+        "ordered_over_repeated_center_confidence_fraction_min": 0.7,
+        "coverage_min": 0.8,
+    }
+    shared = {
+        "opposite_pair_correct_margin_fraction": 0.9,
+        "ordered_over_time_reversed_target_score_fraction": 0.6,
+        "ordered_over_repeated_center_confidence_fraction": 0.9,
+        "coverage": 1.0,
+    }
+    selected, passed = MODULE._select_tuple_action_diagnostic(
+        [
+            {
+                "abstention_margin": 0.0,
+                "ordered_action_direction_macro_f1": 0.55,
+                **shared,
+            },
+            {
+                "abstention_margin": 0.02,
+                "ordered_action_direction_macro_f1": 0.58,
+                **shared,
+            },
+            {
+                "abstention_margin": 0.05,
+                "ordered_action_direction_macro_f1": 0.58,
+                **shared,
+            },
+        ],
+        gate,
+    )
+    assert passed is False
+    assert selected["abstention_margin"] == 0.05
+    assert selected["ordered_action_direction_macro_f1"] == 0.58
+    assert selected["eligible"] is False
 
 
 def _egohos_test_masks(contact: bool | None):

@@ -1,7 +1,7 @@
 {
   "schema_version": 5,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_PENDING_PRIOR_NO_GOS_PRESERVED_NO_NEW_EMPIRICAL_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -128,6 +128,26 @@
     "public_extractor_or_C_outcome_opened": false,
     "LTX_preflight_or_generation_run": false,
     "synthetic_learner_run": false
+  },
+  "construct_aligned_public_runner_implementation_result": {
+    "status": "PASS_IMPLEMENTED_AND_REGRESSION_TESTED_NO_EMPIRICAL_OUTCOME",
+    "recorded_on": "2026-08-03",
+    "canonical_entry_point": "scripts/run_synthetic_video_calibration.py",
+    "implementation_source_sha256": "569ce81d38eec54455f1fefe03e8d3b272c2ea8799972ca6a4259036aa29d1a3",
+    "prospective_amendment_preserved": "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39",
+    "complete_source_no_go_preserved": "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37",
+    "source_reuse": "EXACT_PASS_FAMILIES_PLUS_EXACT_SEALED_44_DEVELOPMENT_AND_44_HOLDOUT_ACTION_ROWS_ONLY",
+    "action_performance_role": "NONBLOCKING_NONRESCUING_DIAGNOSTIC",
+    "action_integrity_role": "BLOCKING",
+    "failed_action_grid_fallback_retains_eligible_false": true,
+    "unexpected_non_action_diagnostic_status_fails_closed": true,
+    "no_hand_review_lineage_bound_to_active_amendment": true,
+    "no_hand_visual_review_opened": false,
+    "public_development_or_holdout_outcome_opened": false,
+    "governed_C_reopened": false,
+    "LTX_preflight_generation_or_synthetic_learner_run": false,
+    "focused_validation": {"passed": 149, "skipped": 1, "failed": 0},
+    "next_required_gate": "BLIND_APPLICANT_NO_HAND_REVIEW_AND_SEAL"
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -704,5 +724,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "IMPLEMENT_AND_TEST_THE_SCHEMA_17_RUNNER_WHILE_PRESERVING_THE_SCHEMA_16_EXACT_SOURCE_REUSE_AND_NONBLOCKING_ACTION_DIAGNOSTIC_GUARDS; THEN_COMPLETE_BLIND_NO_HAND_REVIEW_AND_PUBLIC_QUALIFICATION; GOVERNED_C_COMPILER_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
+  "next_authorized_scope": "COMPLETE_BLIND_NO_HAND_REVIEW_AND_SEAL_THEN_RUN_THE_COMBINED_PUBLIC_DEVELOPMENT_AND_ONCE_ONLY_HOLDOUT_QUALIFICATION; GOVERNED_C_COMPILER_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
 }

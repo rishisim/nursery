@@ -1552,6 +1552,15 @@ nonblocking. Any action decode, inference, serialization, nonfinite,
 silent-truncation, provenance, privacy, or external-call failure remains a
 blocking integrity failure.
 
+The canonical schema-17 runner now implements and regression-tests exact reuse
+of the passing source families and exact 44/44 action rows, preserves failed
+diagnostic points as ineligible, permits the diagnostic status only for the
+action module, and keeps integrity failures blocking. No public model, C,
+generator, or synthetic-learner outcome was opened during implementation. The
+next gate is the blind applicant review and lineage-bound seal of the public
+no-hand nominees; fixture preparation and public inference remain fail-closed
+until that seal exists.
+
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
 descriptive. Only a combined public pass authorizes the single-applicant blind

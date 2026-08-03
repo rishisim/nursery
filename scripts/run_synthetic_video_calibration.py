@@ -438,6 +438,117 @@ def file_digest(path: Path) -> str:
     return result.hexdigest()
 
 
+CONSTRUCT_ALIGNED_SOURCE_NO_GO_SHA256 = (
+    "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37"
+)
+CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256 = (
+    "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39"
+)
+CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
+CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
+    "development": {
+        "open": 6,
+        "close": 6,
+        "take": 6,
+        "put": 6,
+        "sit_down": 6,
+        "stand_up": 6,
+        "turn_on": 5,
+        "turn_off": 3,
+    },
+    "holdout": {
+        "open": 6,
+        "close": 6,
+        "take": 6,
+        "put": 6,
+        "sit_down": 6,
+        "stand_up": 6,
+        "turn_on": 6,
+        "turn_off": 2,
+    },
+}
+CONSTRUCT_ALIGNED_ACTION_DEFICITS = [
+    {
+        "partition": "development",
+        "label": "turn_on",
+        "required_count": 6,
+        "available_count": 5,
+    },
+    {
+        "partition": "development",
+        "label": "turn_off",
+        "required_count": 6,
+        "available_count": 3,
+    },
+    {
+        "partition": "holdout",
+        "label": "turn_off",
+        "required_count": 6,
+        "available_count": 2,
+    },
+]
+
+
+def _construct_aligned_ltx_resume_amendment(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the sole prospective bridge over the sealed action-only no-go."""
+
+    try:
+        value = cfg["construct_aligned_ltx_resume_amendment"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
+    if (
+        cfg.get("schema_version") not in {16, 17}
+        or value.get("status")
+        != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
+    ):
+        raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN")
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("amendment_commitment_sha256", None)
+    if (
+        expected != CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256
+        or digest(payload) != expected
+        or value.get("amendment_commitment_scope")
+        != "canonical JSON of this amendment excluding amendment_commitment_sha256"
+    ):
+        raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_COMMITMENT")
+    preserved = value.get("prior_results_and_amendments_preserved", {})
+    combined = value.get("combined_gate", {})
+    source = value.get("source_reuse", {})
+    diagnostic = value.get("action_diagnostic_execution", {})
+    if (
+        preserved.get("complete_source_no_go")
+        != CONSTRUCT_ALIGNED_SOURCE_NO_GO_SHA256
+        or preserved.get("prospective_H3_amendment")
+        != "d907d2479ba88c7e51d25e935e429cb5860e550a82620313e502482383e2855d"
+        or combined.get("critical_axes")
+        != [
+            "adapter_qualified_yield",
+            "noun_adjective_exposure",
+            "utterance_centered_referent_visibility_dominance_ambiguity",
+            "cross_episode_recurrence",
+            "adjective_attribute_contrast",
+        ]
+        or combined.get("supporting_axes")
+        != ["hand_action_coupling", "egocentric_sensor_regime"]
+        or combined.get("order_action")
+        != "SUPPORTING_DIAGNOSTIC_NONBLOCKING_ON_THE_EXISTING_SUBJECT_VIDEO_DISJOINT_44_DEVELOPMENT_AND_44_HOLDOUT_FIXTURES"
+        or source.get("prior_complete_source_no_go_remains_final") is not True
+        or source.get("no_new_source_or_candidate") is not True
+        or source.get("no_threshold_relaxation") is not True
+        or source.get("action_fixture_counts")
+        != CONSTRUCT_ALIGNED_ACTION_COUNTS
+        or diagnostic.get("development_threshold_grid")
+        != [0.0, 0.005, 0.01, 0.02, 0.05]
+        or "if none passes" not in str(diagnostic.get("selection_rule", ""))
+        or "always run" not in str(diagnostic.get("holdout_rule", ""))
+        or "remain blocking" not in str(diagnostic.get("integrity_rule", ""))
+    ):
+        raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_SCHEMA")
+    return value
+
+
 def _tuple_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     try:
         value = cfg["calibration_C"]["extractor"][
@@ -2244,6 +2355,7 @@ def prepare_visor_hos_no_hand_review(
     inventory_override: dict[str, Any] | None = None,
     source_feasibility_commitment_sha256: str | None = None,
     source_frame_materialization_commitment_sha256: str | None = None,
+    construct_aligned_amendment_commitment_sha256: str | None = None,
 ) -> dict[str, Any]:
     """Render a fixed, model-blind public no-hand review queue outside Git."""
 
@@ -2279,6 +2391,13 @@ def prepare_visor_hos_no_hand_review(
             or not re.fullmatch(
                 r"[0-9a-f]{64}",
                 source_frame_materialization_commitment_sha256,
+            )
+            or not isinstance(
+                construct_aligned_amendment_commitment_sha256, str
+            )
+            or not re.fullmatch(
+                r"[0-9a-f]{64}",
+                construct_aligned_amendment_commitment_sha256,
             )
         ):
             raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_LINEAGE")
@@ -2366,6 +2485,10 @@ def prepare_visor_hos_no_hand_review(
         queue["source_frame_materialization_commitment_sha256"] = (
             source_frame_materialization_commitment_sha256
         )
+    if construct_aligned_amendment_commitment_sha256 is not None:
+        queue["construct_aligned_ltx_resume_amendment_commitment_sha256"] = (
+            construct_aligned_amendment_commitment_sha256
+        )
     queue["review_queue_commitment_sha256"] = digest(queue)
     manifest_path = review_root / "review-queue.json"
     if manifest_path.exists():
@@ -2404,6 +2527,10 @@ def prepare_visor_hos_no_hand_review(
                 for row in items[partition]
             ],
         }
+        if construct_aligned_amendment_commitment_sha256 is not None:
+            labels[
+                "construct_aligned_ltx_resume_amendment_commitment_sha256"
+            ] = construct_aligned_amendment_commitment_sha256
         write_private(review_root / "review-labels.json", labels)
     return {
         "status": queue["status"],
@@ -2497,14 +2624,25 @@ def seal_visor_hos_no_hand_review(
     if not label_path.is_file():
         raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_LABELS_MISSING")
     labels = json.loads(label_path.read_text())
-    if (
-        set(labels)
-        != {
+    expected_label_keys = {
             "schema_version",
             "review_queue_commitment_sha256",
             "reviewer_role",
             "labels",
-        }
+    }
+    active_commitment = queue.get(
+        "construct_aligned_ltx_resume_amendment_commitment_sha256"
+    )
+    if active_commitment is not None:
+        expected_label_keys.add(
+            "construct_aligned_ltx_resume_amendment_commitment_sha256"
+        )
+    if (
+        set(labels) != expected_label_keys
+        or labels.get(
+            "construct_aligned_ltx_resume_amendment_commitment_sha256"
+        )
+        != active_commitment
         or any(
             not isinstance(row, dict)
             or set(row) != {"partition", "review_token", "label"}
@@ -2613,6 +2751,10 @@ def seal_visor_hos_no_hand_review(
         "egohos_inference_not_started_attested": True,
         "labels": labels["labels"],
     }
+    if active_commitment is not None:
+        labels_payload[
+            "construct_aligned_ltx_resume_amendment_commitment_sha256"
+        ] = active_commitment
     labels_commitment = digest(labels_payload)
     if status != "INCOMPLETE_REVIEW":
         seal = {
@@ -2627,6 +2769,10 @@ def seal_visor_hos_no_hand_review(
             "egohos_inference_not_started_attested": True,
             "partitions": partition_records,
         }
+        if active_commitment is not None:
+            seal[
+                "construct_aligned_ltx_resume_amendment_commitment_sha256"
+            ] = active_commitment
         seal["verified_no_hand_seal_commitment_sha256"] = digest(seal)
         seal_path = review_root / "verified-no-hand-seal.json"
         if seal_path.exists():
@@ -2678,6 +2824,12 @@ def load_visor_hos_verified_no_hand_frames(
         or seal.get("reviewer_role") != "authorized_applicant"
         or seal.get("blind_to_egohos_output_attested") is not True
         or seal.get("egohos_inference_not_started_attested") is not True
+        or seal.get(
+            "construct_aligned_ltx_resume_amendment_commitment_sha256"
+        )
+        != queue.get(
+            "construct_aligned_ltx_resume_amendment_commitment_sha256"
+        )
     ):
         raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_NOT_AUTHORIZED")
     output: set[tuple[str, str]] = set()
@@ -2726,6 +2878,8 @@ def _tuple_combined_public_gate(
     axis_results: dict[str, dict[str, Any]],
     action_control_result: dict[str, Any],
     broad_activity_result: dict[str, Any] | None = None,
+    *,
+    action_control_blocks: bool = True,
 ) -> dict[str, Any]:
     """Apply the frozen five-critical-plus-six-of-seven decision once."""
 
@@ -2747,7 +2901,7 @@ def _tuple_combined_public_gate(
     failures = [f"critical_axis:{axis_id}" for axis_id in critical_failures]
     if validated_axis_count < 6:
         failures.append("validated_axes_minimum:6_of_7")
-    if action_status != "PASS":
+    if action_control_blocks and action_status != "PASS":
         failures.append("order_dependent_action_control")
     return {
         "status": "PASS" if not failures else "NO_GO",
@@ -2761,6 +2915,7 @@ def _tuple_combined_public_gate(
             axis_id for axis_id in axis_ids if statuses[axis_id] != "PASS"
         ],
         "action_control_status": action_status,
+        "action_control_used_in_gate": action_control_blocks,
         "broad_activity_status": str(
             (broad_activity_result or {}).get("status", "UNMEASURED")
         ),
@@ -3070,6 +3225,7 @@ def _verify_tuple_fixture_manifest(
 ) -> tuple[dict[str, Any], Path]:
     """Verify the complete external fixture seal before any model is loaded."""
 
+    active = _construct_aligned_ltx_resume_amendment(cfg)
     amendment = _tuple_amendment(cfg)
     runtime = _tuple_runtime_amendment(cfg)
     protocol = _tuple_fixture_protocol(cfg)
@@ -3077,13 +3233,16 @@ def _verify_tuple_fixture_manifest(
     correction = _tuple_visor_hos_correction_amendment(cfg)
     _tuple_qualification_execution(cfg)
     fixture_root = _tuple_fixture_root(public)
-    source_feasibility = _load_active_visor_hos_source_feasibility(
+    source_feasibility = _load_construct_aligned_visor_hos_source_reuse(
         fixture_root, cfg
     )
     verified_no_hand = _load_visor_hos_verified_no_hand_lineage(
         fixture_root / "no-hand-review",
         expected_source_feasibility_commitment_sha256=source_feasibility[
             "visor_hos_source_feasibility_commitment_sha256"
+        ],
+        expected_construct_aligned_amendment_commitment_sha256=active[
+            "amendment_commitment_sha256"
         ],
     )
     path = fixture_root / "fixture-manifest.json"
@@ -3118,6 +3277,9 @@ def _verify_tuple_fixture_manifest(
         "verified_no_hand_seal_commitment_sha256": verified_no_hand[
             "commitment_sha256"
         ],
+        "construct_aligned_ltx_resume_amendment_commitment_sha256": active[
+            "amendment_commitment_sha256"
+        ],
     }
     _verify_tuple_fixture_commitments(manifest, commitments)
     no_hand_commitment = verified_no_hand["commitment_sha256"]
@@ -3145,10 +3307,20 @@ def _verify_tuple_fixture_manifest(
         if not isinstance(rows, dict) or set(rows) != set(family_count_keys):
             raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_FAMILIES")
         for family, count_key in family_count_keys.items():
+            expected_count = (
+                CONSTRUCT_ALIGNED_ACTION_COUNTS[partition]
+                if family == "order_action"
+                else int(expected_counts[count_key])
+            )
             if not isinstance(rows[family], list) or len(rows[family]) != int(
-                expected_counts[count_key]
+                expected_count
             ):
                 raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_COUNT")
+        _validate_construct_aligned_action_fixture_projection(
+            rows["order_action"],
+            source_feasibility["selections"]["charades_order_action"][partition],
+            partition,
+        )
         for row in rows["hand_contact"]:
             if not isinstance(row, dict):
                 raise RuntimeError("E_TUPLE_QUALIFICATION_HAND_FIXTURE")
@@ -3277,18 +3449,23 @@ def _select_frozen_grid_result(
     *,
     primary_metric: str,
     threshold_fields: tuple[str, ...],
+    require_eligible: bool = True,
 ) -> dict[str, Any] | None:
-    """Choose one eligible development row, conservatively resolving exact ties."""
+    """Choose one development row, conservatively resolving exact ties."""
 
-    eligible = [row for row in rows if row.get("eligible") is True]
-    if not eligible:
+    candidates = (
+        [row for row in rows if row.get("eligible") is True]
+        if require_eligible
+        else list(rows)
+    )
+    if not candidates:
         return None
-    for row in eligible:
+    for row in candidates:
         values = [row.get(primary_metric), *(row.get(key) for key in threshold_fields)]
         if not all(isinstance(value, (int, float)) and math.isfinite(float(value)) for value in values):
             raise RuntimeError("E_TUPLE_QUALIFICATION_GRID_RESULT")
     return max(
-        eligible,
+        candidates,
         key=lambda row: (
             float(row[primary_metric]),
             *(float(row[key]) for key in threshold_fields),
@@ -3322,11 +3499,13 @@ def _collect_tuple_module_results(
     for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
         try:
             result = runners[module_id](context)
-            if not isinstance(result, dict) or result.get("status") not in {
-                "PASS",
-                "NO_GO",
-                "UNMEASURED",
-            }:
+            allowed_statuses = {"PASS", "NO_GO", "UNMEASURED"}
+            if module_id == "order_action":
+                allowed_statuses.add("NO_GO_DIAGNOSTIC")
+            if (
+                not isinstance(result, dict)
+                or result.get("status") not in allowed_statuses
+            ):
                 raise RuntimeError("E_TUPLE_QUALIFICATION_MODULE_RESULT")
             output[module_id] = result
         except BaseException as error:
@@ -5764,6 +5943,33 @@ def _select_tuple_action_development(
     )
 
 
+def _select_tuple_action_diagnostic(
+    candidates: list[dict[str, Any]], gate: dict[str, Any]
+) -> tuple[dict[str, Any], bool]:
+    """Select a passing action point or the frozen diagnostic fallback once."""
+
+    qualified = [
+        {**candidate, "eligible": _tuple_action_metrics_pass(candidate, gate)}
+        for candidate in candidates
+    ]
+    selected = _select_frozen_grid_result(
+        qualified,
+        primary_metric="ordered_action_direction_macro_f1",
+        threshold_fields=("abstention_margin",),
+    )
+    if selected is not None:
+        return selected, True
+    fallback = _select_frozen_grid_result(
+        qualified,
+        primary_metric="ordered_action_direction_macro_f1",
+        threshold_fields=("abstention_margin",),
+        require_eligible=False,
+    )
+    if fallback is None:
+        raise RuntimeError("E_TUPLE_ACTION_DIAGNOSTIC_SELECTION")
+    return fallback, False
+
+
 def _tuple_order_action_module(context: dict[str, Any]) -> dict[str, Any]:
     import numpy as np
 
@@ -5845,13 +6051,9 @@ def _tuple_order_action_module(context: dict[str, Any]) -> dict[str, Any]:
                     **metrics,
                 }
             )
-        selected = _select_tuple_action_development(candidates, gate)
-        if selected is None:
-            threshold = None
-            metrics = candidates[0] if candidates else {}
-        else:
-            threshold = float(selected["abstention_margin"])
-            metrics = selected
+        selected, passed = _select_tuple_action_diagnostic(candidates, gate)
+        threshold = float(selected["abstention_margin"])
+        metrics = selected
     else:
         threshold = float(context["thresholds"]["action_abstention_margin"])
         if threshold not in [
@@ -5859,9 +6061,9 @@ def _tuple_order_action_module(context: dict[str, Any]) -> dict[str, Any]:
         ]:
             raise RuntimeError("E_TUPLE_ACTION_HOLDOUT_THRESHOLD")
         _predicted, metrics = _tuple_action_predictions(raw, threshold, labels, opposite)
-    passed = threshold is not None and _tuple_action_metrics_pass(metrics, gate)
+        passed = _tuple_action_metrics_pass(metrics, gate)
     return {
-        "status": "PASS" if passed else "NO_GO",
+        "status": "PASS" if passed else "NO_GO_DIAGNOSTIC",
         "metrics": metrics,
         "selected_thresholds": (
             {"action_abstention_margin": threshold} if threshold is not None else {}
@@ -7053,6 +7255,7 @@ def _tuple_development_threshold_seal(
     axis_results: dict[str, dict[str, Any]],
     combined_gate: dict[str, Any],
 ) -> dict[str, Any]:
+    active = _construct_aligned_ltx_resume_amendment(cfg)
     thresholds = _tuple_selected_thresholds(cfg, module_results)
     required_by_module = {
         "referent": {
@@ -7067,8 +7270,10 @@ def _tuple_development_threshold_seal(
     for module_id, required in required_by_module.items():
         status = module_results[module_id].get("status")
         selected = module_results[module_id].get("selected_thresholds", {})
-        if status == "PASS":
-            if not required <= set(thresholds):
+        if status == "PASS" or (
+            module_id == "order_action" and status == "NO_GO_DIAGNOSTIC"
+        ):
+            if not required <= set(selected):
                 raise RuntimeError("E_TUPLE_QUALIFICATION_PASS_WITHOUT_THRESHOLD")
         elif selected:
             raise RuntimeError("E_TUPLE_QUALIFICATION_FAILED_MODULE_THRESHOLD")
@@ -7095,6 +7300,9 @@ def _tuple_development_threshold_seal(
         ],
         "verified_no_hand_seal_commitment_sha256": fixture_manifest[
             "verified_no_hand_seal_commitment_sha256"
+        ],
+        "construct_aligned_ltx_resume_amendment_commitment_sha256": active[
+            "amendment_commitment_sha256"
         ],
         "development_module_result_commitment_sha256": module_commitment,
         "development_module_statuses": {
@@ -7145,6 +7353,7 @@ def _load_tuple_development_pair(
         "public_fixture_manifest_commitment_sha256",
         "visor_hos_correction_amendment_commitment_sha256",
         "verified_no_hand_seal_commitment_sha256",
+        "construct_aligned_ltx_resume_amendment_commitment_sha256",
     ):
         if seal.get(key) != fixture_manifest.get(key):
             raise RuntimeError("E_TUPLE_DEVELOPMENT_THRESHOLD_PROVENANCE")
@@ -7156,7 +7365,14 @@ def _load_tuple_development_pair(
         not isinstance(statuses, dict)
         or set(statuses) != set(TUPLE_QUALIFICATION_MODULE_IDS)
         or any(
-            status not in {"PASS", "NO_GO", "UNMEASURED", "ERROR"}
+            status
+            not in {
+                "PASS",
+                "NO_GO",
+                "NO_GO_DIAGNOSTIC",
+                "UNMEASURED",
+                "ERROR",
+            }
             for status in statuses.values()
         )
     ):
@@ -7181,6 +7397,12 @@ def _load_tuple_development_pair(
         != fixture_manifest.get("visor_hos_correction_amendment_commitment_sha256")
         or development.get("verified_no_hand_seal_commitment_sha256")
         != fixture_manifest.get("verified_no_hand_seal_commitment_sha256")
+        or development.get(
+            "construct_aligned_ltx_resume_amendment_commitment_sha256"
+        )
+        != fixture_manifest.get(
+            "construct_aligned_ltx_resume_amendment_commitment_sha256"
+        )
         or development.get("development_threshold_commitment_sha256") != expected
         or development.get("development_module_result_commitment_sha256")
         != seal.get("development_module_result_commitment_sha256")
@@ -7258,7 +7480,8 @@ def _tuple_qualification_compact(
         "partition": str(full["partition"]).upper(),
         "module_count": len(modules),
         "completed_module_count": sum(
-            result.get("status") in {"PASS", "NO_GO", "UNMEASURED"}
+            result.get("status")
+            in {"PASS", "NO_GO", "NO_GO_DIAGNOSTIC", "UNMEASURED"}
             for result in modules.values()
         ),
         "failed_module_count": int(integrity["error_module_count"]),
@@ -7284,6 +7507,7 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
     if partition not in {"development", "holdout"}:
         raise RuntimeError("E_TUPLE_QUALIFICATION_PARTITION")
     cfg = json.loads(args.config.read_text())
+    active = _construct_aligned_ltx_resume_amendment(cfg)
     _tuple_qualification_execution(cfg)
     output_root = _tuple_qualification_root(args.public_root)
     _require_external_or_ignored_output(output_root)
@@ -7350,7 +7574,13 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
             "order_action",
         }
         for module_id in threshold_modules:
-            if threshold_seal["development_module_statuses"][module_id] != "PASS":
+            development_status = threshold_seal["development_module_statuses"][
+                module_id
+            ]
+            if development_status != "PASS" and not (
+                module_id == "order_action"
+                and development_status == "NO_GO_DIAGNOSTIC"
+            ):
                 runners[module_id] = _development_unqualified_tuple_module_runner(
                     module_id
                 )
@@ -7372,6 +7602,7 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
         axis_results,
         action_result,
         {"status": "DESCRIPTIVE_NOT_RERUN"},
+        action_control_blocks=False,
     )
     combined = _apply_tuple_integrity_gate(
         combined, _tuple_qualification_integrity(module_results)
@@ -7415,6 +7646,9 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
             "amendment_commitment_sha256"
         ],
         "verified_no_hand_seal_commitment_sha256": no_hand_commitment,
+        "construct_aligned_ltx_resume_amendment_commitment_sha256": active[
+            "amendment_commitment_sha256"
+        ],
         "development_threshold_commitment_sha256": threshold_commitment,
         "development_module_result_commitment_sha256": development_module_commitment,
         "partition_module_result_commitment_sha256": partition_module_commitment,
@@ -9927,6 +10161,8 @@ def _charades_action_source_inventory(
 def _load_active_visor_hos_source_feasibility(
     fixture_root: Path, cfg: dict[str, Any]
 ) -> dict[str, Any]:
+    """Load the historical all-family PASS source seal without reinterpretation."""
+
     amendment = _tuple_visor_hos_correction_amendment(cfg)
     protocol = _tuple_fixture_protocol(cfg)
     preparation = _tuple_fixture_preparation_amendment(cfg)
@@ -9974,6 +10210,162 @@ def _load_active_visor_hos_source_feasibility(
             if isinstance(value, dict)
         )
         or any(not isinstance(value, dict) for value in families.values())
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_FAMILY")
+    required_statuses = {
+        "visor_hos_contact": "PASS",
+        "visor_hos_explicit_no_contact": "PASS",
+        "visor_hos_no_hand_nominees": "PASS_NOMINEE_QUEUE_READY",
+        "visor_hos_integrity": "PASS",
+        "cross_partition_source_independence": "PASS",
+    }
+    if any(
+        not isinstance(families.get(family), dict)
+        or families[family].get("status") != status
+        for family, status in required_statuses.items()
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_FAMILY")
+    selections = record.get("selections", {}).get("visor_hos_source_nominees")
+    if not isinstance(selections, dict) or set(selections) != {
+        "development",
+        "holdout",
+    }:
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_SELECTION")
+    partition_participants: dict[str, set[str]] = {}
+    partition_videos: dict[str, set[str]] = {}
+    partition_frames: dict[str, set[tuple[str, str]]] = {}
+    for partition in ("development", "holdout"):
+        rows = selections[partition]
+        if not isinstance(rows, list):
+            raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_SELECTION")
+        counts = Counter(row.get("stratum") for row in rows if isinstance(row, dict))
+        if (
+            counts["contact"] != 48
+            or counts["explicit_no_contact"] != 48
+            or not 48 <= counts["no_hand_nominee"] <= 192
+            or sum(counts.values()) != len(rows)
+        ):
+            raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_SELECTION_COUNT")
+        video_stratum_counts: Counter[tuple[str, str]] = Counter()
+        frames: set[tuple[str, str]] = set()
+        for row in rows:
+            if (
+                not isinstance(row, dict)
+                or row.get("stratum")
+                not in {"contact", "explicit_no_contact", "no_hand_nominee"}
+                or row.get("source_split") not in {"train", "val"}
+                or not re.fullmatch(r"P\d{2}", str(row.get("participant", "")))
+                or not isinstance(row.get("video"), str)
+                or not isinstance(row.get("frame_name"), str)
+            ):
+                raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_SELECTION")
+            key = (row["video"], row["frame_name"])
+            if key in frames:
+                raise RuntimeError("E_VISOR_HOS_SOURCE_FRAME_DUPLICATE")
+            frames.add(key)
+            video_stratum_counts[(row["video"], row["stratum"])] += 1
+        if any(value > 4 for value in video_stratum_counts.values()):
+            raise RuntimeError("E_VISOR_HOS_SOURCE_VIDEO_CAP")
+        partition_participants[partition] = {row["participant"] for row in rows}
+        partition_videos[partition] = {row["video"] for row in rows}
+        partition_frames[partition] = frames
+    if (
+        partition_participants["development"] & partition_participants["holdout"]
+        or partition_videos["development"] & partition_videos["holdout"]
+        or partition_frames["development"] & partition_frames["holdout"]
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_OVERLAP")
+    audits = record.get("audits", {})
+    if any(
+        int(audits.get(key, -1)) != 0
+        for key in (
+            "source_subject_overlap_count",
+            "source_video_overlap_count",
+            "source_object_overlap_count",
+        )
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_OVERLAP")
+    return record
+
+
+def _load_construct_aligned_visor_hos_source_reuse(
+    fixture_root: Path, cfg: dict[str, Any]
+) -> dict[str, Any]:
+    active = _construct_aligned_ltx_resume_amendment(cfg)
+    amendment = _tuple_visor_hos_correction_amendment(cfg)
+    protocol = _tuple_fixture_protocol(cfg)
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    repair = _tuple_fixture_feasibility_repair(cfg)
+    path = fixture_root / "visor-hos-source-feasibility.json"
+    if not path.is_file():
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_MISSING")
+    record = json.loads(path.read_text())
+    payload = json.loads(json.dumps(record))
+    expected = payload.pop("visor_hos_source_feasibility_commitment_sha256", None)
+    if (
+        not isinstance(expected, str)
+        or expected != CONSTRUCT_ALIGNED_SOURCE_NO_GO_SHA256
+        or expected
+        != active["prior_results_and_amendments_preserved"][
+            "complete_source_no_go"
+        ]
+        or digest(payload) != expected
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_COMMITMENT")
+    commitments = {
+        "visor_hos_correction_amendment_commitment_sha256": amendment[
+            "amendment_commitment_sha256"
+        ],
+        "fixture_preparation_amendment_commitment_sha256": preparation[
+            "preparation_amendment_commitment_sha256"
+        ],
+        "fixture_feasibility_repair_commitment_sha256": repair[
+            "fixture_feasibility_repair_commitment_sha256"
+        ],
+        "public_fixture_protocol_commitment_sha256": protocol[
+            "protocol_commitment_sha256"
+        ],
+    }
+    if any(record.get(key) != value for key, value in commitments.items()):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_PROVENANCE")
+    if (
+        record.get("schema_version") != 2
+        or record.get("status")
+        != "NO_GO_COMPLETE_SOURCE_FEASIBILITY"
+        or record.get("no_hand_truth_opened") is not False
+        or record.get("no_hand_review_required_before_public_model_inference")
+        is not True
+        or record.get("model_inference_executed") is not False
+        or record.get("media_rendering_executed") is not False
+        or record.get("large_Charades_video_archive_downloaded") is not False
+        or record.get("restricted_mount_present") is not False
+    ):
+        raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_STATUS")
+    families = record.get("families", {})
+    exact_family_statuses = {
+        "official_visor_hos_artifact": "PASS",
+        "visor_hos_semantic_reference": "PASS",
+        "visor_hos_contact": "PASS",
+        "visor_hos_explicit_no_contact": "PASS",
+        "visor_hos_no_hand_nominees": "PASS_NOMINEE_QUEUE_READY",
+        "visor_hos_integrity": "PASS",
+        "coco_composite_sources": "PASS",
+        "language_and_lexical": "PASS",
+        "referent_attribute_composite": "PASS",
+        "recurrence": "PASS",
+        "sensor": "PASS",
+        "charades_order_action": "NO_GO",
+        "cross_partition_source_independence": "PASS",
+    }
+    if (
+        not isinstance(families, dict)
+        or set(families) != set(exact_family_statuses)
+        or record.get("failing_family_names") != ["charades_order_action"]
+        or any(
+            not isinstance(families.get(family), dict)
+            or families[family].get("status") != status
+            for family, status in exact_family_statuses.items()
+        )
     ):
         raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_FAMILY")
     required_statuses = {
@@ -10054,7 +10446,147 @@ def _load_active_visor_hos_source_feasibility(
         )
     ):
         raise RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_OVERLAP")
+    action = record.get("selections", {}).get("charades_order_action")
+    inventory = record.get("action_inventory")
+    if (
+        not isinstance(action, dict)
+        or set(action) != {"development", "holdout"}
+        or not isinstance(inventory, dict)
+        or inventory.get("status") != "NO_GO"
+        or inventory.get("deficits") != CONSTRUCT_ALIGNED_ACTION_DEFICITS
+        or inventory.get("final_counts")
+        != CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS
+        or int(inventory.get("subject_overlap_count", -1)) != 0
+        or int(inventory.get("video_overlap_count", -1)) != 0
+    ):
+        raise RuntimeError("E_CONSTRUCT_ALIGNED_ACTION_SOURCE_LINEAGE")
+    action_protocol = protocol["order_dependent_action_control"]
+    labels = list(action_protocol["labels"])
+    code_to_label = {
+        code: label
+        for pair in action_protocol["class_code_pairs"]
+        for label, codes in zip(
+            pair["pair"], zip(*pair["matched_codes"], strict=True), strict=True
+        )
+        for code in codes
+    }
+    action_subjects: dict[str, set[str]] = {}
+    action_videos: dict[str, set[str]] = {}
+    for partition in ("development", "holdout"):
+        rows = action[partition]
+        if not isinstance(rows, list) or len(rows) != CONSTRUCT_ALIGNED_ACTION_COUNTS[
+            partition
+        ]:
+            raise RuntimeError("E_CONSTRUCT_ALIGNED_ACTION_SOURCE_COUNT")
+        counts = Counter()
+        subjects: set[str] = set()
+        videos: set[str] = set()
+        for row in rows:
+            if (
+                not isinstance(row, dict)
+                or set(row)
+                != {
+                    "video",
+                    "subject",
+                    "label",
+                    "code",
+                    "start",
+                    "end",
+                    "source_duration",
+                }
+                or row.get("label") not in CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS[
+                    partition
+                ]
+                or not isinstance(row.get("subject"), str)
+                or not row["subject"]
+                or not isinstance(row.get("video"), str)
+                or not row["video"]
+                or row["video"] in videos
+                or code_to_label.get(row.get("code")) != row.get("label")
+                or not all(
+                    isinstance(row.get(key), (int, float))
+                    and not isinstance(row.get(key), bool)
+                    and math.isfinite(float(row[key]))
+                    for key in ("start", "end", "source_duration")
+                )
+                or not 0.0 <= float(row["start"]) < float(row["end"])
+                <= float(row["source_duration"])
+                or not 1.0 <= float(row["end"]) - float(row["start"]) <= 12.0
+            ):
+                raise RuntimeError("E_CONSTRUCT_ALIGNED_ACTION_SOURCE_ROW")
+            counts[row["label"]] += 1
+            subjects.add(row["subject"])
+            videos.add(row["video"])
+        if dict(counts) != CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS[partition]:
+            raise RuntimeError("E_CONSTRUCT_ALIGNED_ACTION_SOURCE_COUNT")
+        expected_order = sorted(
+            rows,
+            key=lambda row: (
+                labels.index(row["label"]),
+                _fixture_order(
+                    int(preparation["seed"]),
+                    "mechanistic_action_final",
+                    partition,
+                    row["video"],
+                    row["start"],
+                ),
+            ),
+        )
+        if rows != expected_order:
+            raise RuntimeError("E_CONSTRUCT_ALIGNED_ACTION_SOURCE_ORDER")
+        action_subjects[partition] = subjects
+        action_videos[partition] = videos
+    if (
+        action_subjects["development"] & action_subjects["holdout"]
+        or action_videos["development"] & action_videos["holdout"]
+    ):
+        raise RuntimeError("E_CONSTRUCT_ALIGNED_ACTION_SOURCE_OVERLAP")
     return record
+
+
+def _validate_construct_aligned_action_fixture_projection(
+    rows: list[dict[str, Any]],
+    source_rows: list[dict[str, Any]],
+    partition: str,
+) -> None:
+    """Prove the active action fixtures are the sealed rows plus media fields."""
+
+    source_keys = {
+        "video",
+        "subject",
+        "label",
+        "code",
+        "start",
+        "end",
+        "source_duration",
+    }
+    added_keys = {
+        "fixture_ordinal",
+        "media_relative_path",
+        "media_sha256",
+        "media_bytes",
+    }
+    if (
+        partition not in CONSTRUCT_ALIGNED_ACTION_COUNTS
+        or len(rows) != CONSTRUCT_ALIGNED_ACTION_COUNTS[partition]
+        or len(source_rows) != CONSTRUCT_ALIGNED_ACTION_COUNTS[partition]
+    ):
+        raise RuntimeError("E_CONSTRUCT_ALIGNED_ACTION_FIXTURE_COUNT")
+    for ordinal, (row, source) in enumerate(zip(rows, source_rows, strict=True)):
+        if (
+            not isinstance(row, dict)
+            or not isinstance(source, dict)
+            or set(row) != source_keys | added_keys
+            or {key: row[key] for key in source_keys} != source
+            or row.get("fixture_ordinal") != ordinal
+            or not isinstance(row.get("media_relative_path"), str)
+            or not row["media_relative_path"]
+            or not re.fullmatch(r"[0-9a-f]{64}", str(row.get("media_sha256", "")))
+            or not isinstance(row.get("media_bytes"), int)
+            or isinstance(row.get("media_bytes"), bool)
+            or row["media_bytes"] <= 0
+        ):
+            raise RuntimeError("E_CONSTRUCT_ALIGNED_ACTION_FIXTURE_PROJECTION")
 
 
 def _active_visor_hos_no_hand_review_queues(
@@ -10153,9 +10685,15 @@ def _materialize_active_visor_hos_no_hand_review_frames(
     preparation: dict[str, Any],
     source_record: dict[str, Any],
     queues: dict[str, list[dict[str, Any]]],
+    construct_aligned_amendment_commitment_sha256: str,
 ) -> tuple[Path, dict[str, Any]]:
     """Download only frozen nominee archives and extract only nominee frames."""
 
+    if (
+        construct_aligned_amendment_commitment_sha256
+        != CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256
+    ):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_LINEAGE")
     _require_external_or_ignored_output(review_root)
     frame_root = review_root / "source-frames"
     base = preparation["source_archives"]["EPIC_KITCHENS_VISOR_validation"]
@@ -10240,6 +10778,9 @@ def _materialize_active_visor_hos_no_hand_review_frames(
         "visor_hos_source_feasibility_commitment_sha256": source_record[
             "visor_hos_source_feasibility_commitment_sha256"
         ],
+        "construct_aligned_ltx_resume_amendment_commitment_sha256": (
+            construct_aligned_amendment_commitment_sha256
+        ),
         "archive_count": len(archive_records),
         "source_frame_count": len(frame_records),
         "archives": [archive_records[key] for key in sorted(archive_records)],
@@ -10266,7 +10807,9 @@ def _materialize_active_visor_hos_no_hand_review_frames(
 
 
 def _load_visor_hos_no_hand_frame_materialization(
-    review_root: Path, expected_source_feasibility_commitment_sha256: str
+    review_root: Path,
+    expected_source_feasibility_commitment_sha256: str,
+    expected_construct_aligned_amendment_commitment_sha256: str | None = None,
 ) -> dict[str, Any]:
     path = review_root / "source-frame-materialization.json"
     if not path.is_file():
@@ -10281,6 +10824,13 @@ def _load_visor_hos_no_hand_frame_materialization(
         != "SEALED_PUBLIC_NOMINEE_FRAMES_BEFORE_APPLICANT_REVIEW"
         or record.get("visor_hos_source_feasibility_commitment_sha256")
         != expected_source_feasibility_commitment_sha256
+        or (
+            expected_construct_aligned_amendment_commitment_sha256 is not None
+            and record.get(
+                "construct_aligned_ltx_resume_amendment_commitment_sha256"
+            )
+            != expected_construct_aligned_amendment_commitment_sha256
+        )
         or record.get("model_inference_executed") is not False
         or record.get("restricted_mount_present") is not False
         or record.get("archive_count") != len(record.get("archives", []))
@@ -10292,10 +10842,13 @@ def _load_visor_hos_no_hand_frame_materialization(
 
 def prepare_active_visor_hos_no_hand_review(args: argparse.Namespace) -> dict[str, Any]:
     cfg = json.loads(args.config.read_text())
+    active = _construct_aligned_ltx_resume_amendment(cfg)
     fixture_root = _tuple_fixture_root(args.public_root)
     review_root = fixture_root / "no-hand-review"
     _require_external_or_ignored_output(args.public_root)
-    source_record = _load_active_visor_hos_source_feasibility(fixture_root, cfg)
+    source_record = _load_construct_aligned_visor_hos_source_reuse(
+        fixture_root, cfg
+    )
     queues, inventory = _active_visor_hos_no_hand_review_queues(
         source_record, cfg
     )
@@ -10307,6 +10860,7 @@ def prepare_active_visor_hos_no_hand_review(args: argparse.Namespace) -> dict[st
             preparation,
             source_record,
             queues,
+            active["amendment_commitment_sha256"],
         )
     )
     compact = prepare_visor_hos_no_hand_review(
@@ -10321,6 +10875,9 @@ def prepare_active_visor_hos_no_hand_review(args: argparse.Namespace) -> dict[st
         ],
         source_frame_materialization_commitment_sha256=materialization[
             "source_frame_materialization_commitment_sha256"
+        ],
+        construct_aligned_amendment_commitment_sha256=active[
+            "amendment_commitment_sha256"
         ],
     )
     compact.update(
@@ -10342,16 +10899,21 @@ def prepare_active_visor_hos_no_hand_review(args: argparse.Namespace) -> dict[st
 
 def seal_active_visor_hos_no_hand_review(args: argparse.Namespace) -> dict[str, Any]:
     cfg = json.loads(args.config.read_text())
+    active = _construct_aligned_ltx_resume_amendment(cfg)
     fixture_root = _tuple_fixture_root(args.public_root)
     review_root = fixture_root / "no-hand-review"
     _require_external_or_ignored_output(args.public_root)
-    source_record = _load_active_visor_hos_source_feasibility(fixture_root, cfg)
+    source_record = _load_construct_aligned_visor_hos_source_reuse(
+        fixture_root, cfg
+    )
     source_commitment = source_record[
         "visor_hos_source_feasibility_commitment_sha256"
     ]
     queue = _load_visor_hos_no_hand_review_queue(review_root)
     materialization = _load_visor_hos_no_hand_frame_materialization(
-        review_root, source_commitment
+        review_root,
+        source_commitment,
+        active["amendment_commitment_sha256"],
     )
     amendment = _tuple_visor_hos_correction_amendment(cfg)
     if (
@@ -10361,6 +10923,10 @@ def seal_active_visor_hos_no_hand_review(args: argparse.Namespace) -> dict[str, 
         != materialization["source_frame_materialization_commitment_sha256"]
         or queue.get("visor_hos_correction_amendment_commitment_sha256")
         != amendment["amendment_commitment_sha256"]
+        or queue.get(
+            "construct_aligned_ltx_resume_amendment_commitment_sha256"
+        )
+        != active["amendment_commitment_sha256"]
     ):
         raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_LINEAGE")
     compact = seal_visor_hos_no_hand_review(
@@ -10395,6 +10961,7 @@ def _load_visor_hos_verified_no_hand_lineage(
     review_root: Path,
     *,
     expected_source_feasibility_commitment_sha256: str | None = None,
+    expected_construct_aligned_amendment_commitment_sha256: str | None = None,
 ) -> dict[str, Any]:
     verified = load_visor_hos_verified_no_hand_frames(review_root)
     queue = _load_visor_hos_no_hand_review_queue(review_root)
@@ -10408,10 +10975,20 @@ def _load_visor_hos_verified_no_hand_lineage(
         ):
             raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_LINEAGE")
         materialization = _load_visor_hos_no_hand_frame_materialization(
-            review_root, expected_source_feasibility_commitment_sha256
+            review_root,
+            expected_source_feasibility_commitment_sha256,
+            expected_construct_aligned_amendment_commitment_sha256,
         )
         if queue.get("source_frame_materialization_commitment_sha256") != (
             materialization["source_frame_materialization_commitment_sha256"]
+        ):
+            raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_LINEAGE")
+    if expected_construct_aligned_amendment_commitment_sha256 is not None:
+        if (
+            queue.get(
+                "construct_aligned_ltx_resume_amendment_commitment_sha256"
+            )
+            != expected_construct_aligned_amendment_commitment_sha256
         ):
             raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_LINEAGE")
     seal_path = review_root / "verified-no-hand-seal.json"
@@ -10421,6 +10998,14 @@ def _load_visor_hos_verified_no_hand_lineage(
     payload.pop("verified_no_hand_seal_commitment_sha256", None)
     if not isinstance(commitment, str) or digest(payload) != commitment:
         raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SEAL_COMMITMENT")
+    if (
+        expected_construct_aligned_amendment_commitment_sha256 is not None
+        and seal.get(
+            "construct_aligned_ltx_resume_amendment_commitment_sha256"
+        )
+        != expected_construct_aligned_amendment_commitment_sha256
+    ):
+        raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_SOURCE_LINEAGE")
     by_partition: dict[str, list[dict[str, Any]]] = {}
     for partition in ("development", "holdout"):
         rows = seal.get("partitions", {}).get(partition, {}).get("selected")
@@ -10441,6 +11026,9 @@ def _load_visor_hos_verified_no_hand_lineage(
         ),
         "source_frame_materialization_commitment_sha256": queue.get(
             "source_frame_materialization_commitment_sha256"
+        ),
+        "construct_aligned_ltx_resume_amendment_commitment_sha256": queue.get(
+            "construct_aligned_ltx_resume_amendment_commitment_sha256"
         ),
         "partitions": by_partition,
     }
@@ -10645,6 +11233,7 @@ def _prepare_active_visor_hos_fixtures(
     preparation: dict[str, Any],
     cfg: dict[str, Any],
     review_root: Path,
+    source_record: dict[str, Any] | None = None,
 ) -> tuple[
     dict[str, list[dict[str, Any]]],
     list[dict[str, Any]],
@@ -10653,11 +11242,17 @@ def _prepare_active_visor_hos_fixtures(
     """Materialize only corrected, source-sealed VISOR-HOS fixtures."""
 
     _require_external_or_ignored_output(review_root)
-    source_record = _load_active_visor_hos_source_feasibility(fixture_root, cfg)
+    active = _construct_aligned_ltx_resume_amendment(cfg)
+    source_record = source_record or _load_construct_aligned_visor_hos_source_reuse(
+        fixture_root, cfg
+    )
     verified = _load_visor_hos_verified_no_hand_lineage(
         review_root,
         expected_source_feasibility_commitment_sha256=source_record[
             "visor_hos_source_feasibility_commitment_sha256"
+        ],
+        expected_construct_aligned_amendment_commitment_sha256=active[
+            "amendment_commitment_sha256"
         ],
     )
     selected, frame_audits = _merge_active_visor_hos_selections(
@@ -10831,6 +11426,9 @@ def _prepare_active_visor_hos_fixtures(
         "visor_hos_source_feasibility_commitment_sha256": source_commitment,
         "verified_no_hand_seal_commitment_sha256": verified[
             "commitment_sha256"
+        ],
+        "construct_aligned_ltx_resume_amendment_commitment_sha256": active[
+            "amendment_commitment_sha256"
         ],
         **frame_audits,
     }
@@ -11877,16 +12475,11 @@ def _prepare_action_fixtures(
     preparation: dict[str, Any],
     protocol: dict[str, Any],
     cfg: dict[str, Any],
+    source_record: dict[str, Any],
 ) -> tuple[dict[str, list[dict[str, Any]]], dict[str, set[str]]]:
-    excluded_subjects, excluded_videos, _ = _prior_activity_exclusions(
-        extracted / "charades-annotations", cfg
-    )
-    selected = _select_charades_action_fixtures(
-        _load_charades_rows(extracted / "charades-annotations"),
-        protocol["order_dependent_action_control"],
-        int(preparation["seed"]),
-        excluded_subjects,
-        excluded_videos,
+    del extracted, protocol, cfg
+    selected = json.loads(
+        json.dumps(source_record["selections"]["charades_order_action"])
     )
     record = preparation["source_archives"]["Charades_Ego_480p_video"]
     archive = args.public_root / "public/source-archives/CharadesEgo_v1_480.tar"
@@ -11913,6 +12506,9 @@ def _prepare_action_fixtures(
                     "media_bytes": media_records[path.name]["bytes"],
                 }
             )
+        _validate_construct_aligned_action_fixture_projection(
+            output[partition], selected[partition], partition
+        )
     sets = {
         partition: {row["video"] for row in output[partition]}
         for partition in preparation["partitions"]
@@ -11966,6 +12562,7 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
     qualification_paths = _tuple_qualification_paths(args.public_root)
     if any(path.exists() for path in qualification_paths.values()):
         raise RuntimeError("E_TUPLE_FIXTURE_REPLACEMENT_AFTER_QUALIFICATION")
+    active = _construct_aligned_ltx_resume_amendment(cfg)
     amendment = _tuple_amendment(cfg)
     correction = _tuple_visor_hos_correction_amendment(cfg)
     protocol = _tuple_fixture_protocol(cfg)
@@ -11986,6 +12583,9 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
     )
     if review_root.resolve() != (fixture_root / "no-hand-review").resolve():
         raise RuntimeError("E_VISOR_HOS_NO_HAND_REVIEW_CANONICAL_ROOT")
+    source_record = _load_construct_aligned_visor_hos_source_reuse(
+        fixture_root, cfg
+    )
     audio_manifest, audio_files = _read_audio_seed_manifest(
         args.audio_seed_root, cfg
     )
@@ -12018,10 +12618,16 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         audio_files,
     )
     visor, visor_provenance, visor_lineage = _prepare_active_visor_hos_fixtures(
-        fixture_root, preparation, cfg, review_root
+        fixture_root, preparation, cfg, review_root, source_record
     )
     action, action_video_sets = _prepare_action_fixtures(
-        args, fixture_root, extracted, preparation, protocol, cfg
+        args,
+        fixture_root,
+        extracted,
+        preparation,
+        protocol,
+        cfg,
+        source_record,
     )
     for partition in preparation["partitions"]:
         partitions[partition]["hand_contact"] = visor[partition]
@@ -12101,7 +12707,7 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         "recurrence": active_counts["recurrence_pairs"],
         "hand_contact": active_counts["hand_contact_items"],
         "sensor": active_counts["sensor_perturbation_clips"],
-        "order_action": active_counts["order_dependent_action_clips"],
+        "order_action": CONSTRUCT_ALIGNED_ACTION_COUNTS["development"],
     }
     if any(
         audits["fixture_counts"][partition] != expected_counts
@@ -12138,6 +12744,9 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         ],
         "verified_no_hand_seal_commitment_sha256": visor_lineage[
             "verified_no_hand_seal_commitment_sha256"
+        ],
+        "construct_aligned_ltx_resume_amendment_commitment_sha256": active[
+            "amendment_commitment_sha256"
         ],
         "audio_seed_commitment_sha256": audio_manifest[
             "audio_seed_commitment_sha256"

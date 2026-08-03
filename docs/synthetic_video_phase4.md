@@ -376,6 +376,14 @@ measured action performance cannot block or rescue the combined learner-effectiv
 decision. Decode, inference, serialization, provenance, privacy, nonfinite,
 silent-truncation, or external-call failures remain blocking integrity failures.
 
+The canonical schema-17 runner now implements exact reuse of the prior passing
+source families and exact 44/44 action rows, preserves failed diagnostic points
+as ineligible, accepts the diagnostic status only for the action module, and
+keeps integrity failures blocking. Focused runner and privacy/provenance guard
+tests passed before any new model outcome. The next gate is the blind applicant
+review and lineage-bound seal of the public no-hand nominees; fixture
+preparation and public inference remain fail-closed until it exists.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to
