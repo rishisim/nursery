@@ -1227,19 +1227,20 @@
           "network": "disabled with Singularity network namespace",
           "restricted_mount": false,
           "telemetry_tracking": false,
-          "item_count_per_component": 1,
+          "module_count": 8,
+          "item_count_per_module": 1,
           "fixture_labels_used": false,
           "prediction_or_score_retention": false,
           "scientific_metric_computed": false,
           "finite_in_bounds_output_required": true,
-          "all_seven_components_must_pass": true,
+          "all_seven_axes_and_order_dependent_action_control_must_pass": true,
           "zero_external_calls_crashes_silent_truncations_or_invalid_records": true,
           "peak_VRAM_GiB_max": 72.0,
           "aggregate_GPU_hours_max": 1.0
         },
         "failure_rule": "ordinary dependency or documented minimal compatibility defects may be repaired in this canonical runtime before public outcomes; inability to run any frozen component locally within this runtime gate is a premodel no-go and no model may be substituted",
         "runtime_amendment_commitment_scope": "canonical JSON of this runtime amendment excluding runtime_amendment_commitment_sha256",
-        "runtime_amendment_commitment_sha256": "adcac3fc45133ab8697923fd473fd692d9c79de48b5cc10b58e4d01cad92b285"
+        "runtime_amendment_commitment_sha256": "6c3c76e3c5661255dba0131f9b20c6d4daf3b994a8e8c9013bbddbc8213ddec1"
       },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},

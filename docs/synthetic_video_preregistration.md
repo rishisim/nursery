@@ -1171,7 +1171,10 @@ dependency installation, network-disabled reload, and label-blind sizing are
 the next gate; public development and holdout remain unopened.
 
 Before that reload, the exact runtime overlay and six narrowly scoped
-compatibility adapters were frozen at commitment `adcac3fc…b285`. They retain
+compatibility adapters were frozen, then clarified before inference at active
+commitment `6c3c76e3…dec1` (the pre-clarification `adcac3fc…b285` remains in
+Git history). Seven calibration axes plus the separate blocking order-action
+control require eight sizing modules. They retain
 the seven registered models. Grounding DINO uses its own commit's official
 pure-PyTorch deformable-attention fallback because the base container has no
 compiler; SAM 2 disables its officially optional CUDA extension; and the

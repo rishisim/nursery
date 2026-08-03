@@ -194,7 +194,7 @@ English-token alignment; no timestamp is fabricated. The active commitment is
 `c9a48206…adaf`. The public artifact subgate passed at `8c787a01…b527`
 without model inference or a restricted mount; local-reload sizing and modular
 public qualification are next. The exact local overlay and compatibility
-surface were frozen beforehand at `adcac3fc…b285`; no model substitution or
+surface were frozen beforehand at active commitment `6c3c76e3…dec1`; no model substitution or
 gate change is involved. C measurement,
 LTX generation, and Synthetic-1h training remain conditional. The one-hour cap
 and descriptive-only claim boundary are unchanged.
