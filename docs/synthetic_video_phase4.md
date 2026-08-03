@@ -386,3 +386,37 @@ The completed bakeoff remains Gemini 27/28, MiniMax 25/28, Seedance 24/28,
 and LTX 19/28; choosing LTX locally is not a quality-ranking revision. No more
 than 3,600 accepted credited synthetic seconds and the same three 4,668-step
 learner seeds are permitted, with descriptive exploratory reporting only.
+
+### LTX sole-generator and structured prompt-compiler amendment
+
+Before the no-hand review or any new public model, governed C, generator, or
+synthetic learner outcome, the user clarified that LTX-2.3 is the sole selected
+generator for this pilot—not a fallback or one candidate among several. The
+amendment is sealed at `cb4a7cd2…19c62`. MiniMax H3 remains preserved as
+history but is out of scope; no further H3 research, download, inference, or
+substitution is permitted. The completed bakeoff ranking remains unchanged.
+
+If and only if the combined public and governed-C gates pass, one deterministic
+episode-plan-to-prompt compiler must be implemented and validated on public or
+self-authored dummy material before material generation. Its fixed schema and
+template explicitly encode child-height first-person camera motion/framing;
+room, light, clutter, distractors, occlusion, and single-shot continuity;
+public noun and visible adjective contrasts; left/right hands, contact, action
+phases, completion, and object persistence; exact approach, naming,
+manipulation, recurrence, idle/transition, and exit beats; referent dominance,
+ambiguity, and null cases; cross-episode recurrence/burstiness; modular German
+TTS timing; and fixed negative constraints against third-person views, cuts,
+drift, impossible physics, floating objects, extra anatomy, text, captions,
+logos, and watermarks.
+
+The compiler uses canonical JSON, a fixed template, seed master `314159`,
+121 frames at 24 fps (`5.041666666666667` seconds), and no dynamic prompt
+enhancement. Prompt text may use only permitted public words and the sealed
+disclosure-safe C bins. Hand-authored or attempt-specific prompt improvement is
+prohibited. Public/dummy preflight must seal source/schema/template hashes,
+model and text-encoder provenance and licenses, decoding, camera/action
+controls, TTS timing slots, retry reasons, acceptance rules, resource ceilings,
+and prompt commitments before the one-hour run. Engineering corrections are
+allowed only prospectively on public/dummy failures; evaluation material, C
+text or vocabulary, learner scores, and generated-corpus learner outcomes may
+never tune prompts, retries, or acceptance.

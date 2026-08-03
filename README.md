@@ -73,10 +73,11 @@ learner; Machine-DevBench Lexical as the common standardized primary endpoint;
 an above-chance, positive real-only learning-curve readiness gate; and a
 separate held-out-real ChildLens temporal-transfer safeguard. It retains the
 modular video and German-TTS architecture. A completed four-family public-only
-bakeoff ranked Gemini first. The current prospective fallback generator is
+bakeoff ranked Gemini first. The sole selected generator for this pilot is
 locally governed LTX-2.3. A later MiniMax-H3 open-weight selection remains
 preserved in Git and in the canonical protocol but is shelved without any
-weight download or inference. LTX scored 19/28, MiniMax 25/28, and Gemini
+weight download or inference and is now explicitly out of scope. LTX scored
+19/28, MiniMax 25/28, and Gemini
 27/28; neither local choice may be reported as the bakeoff winner. See
 [`docs/synthetic_video_architecture_review.md`](docs/synthetic_video_architecture_review.md).
 A public generator pilot and bakeoff have been executed without ChildLens or
@@ -111,7 +112,7 @@ The generator-selection history remains explicit: Gemini led the blinded
 screen at 27/28, followed by MiniMax at 25/28, Seedance at 24/28, and LTX at
 19/28. LTX was selected as a practical local route, then MiniMax H3 was
 prospectively selected but remained blocked and unrun, and the latest user
-instruction restores LTX as the local fallback. None of these decisions
+instruction makes LTX the sole local generator. None of these decisions
 changes the bakeoff ranking, and no generator output has been produced. The
 original coverage-redesign rule required the
 multi-pass Real-1h positive control to pass before generation; that rule fired
@@ -147,9 +148,10 @@ of the five critical learner-effective axes and at least six of seven axes;
 broad activity and global visual similarity are descriptive. If public and
 governed C gates pass, the intended route is feature-matched episode planning,
 exactly 3,600 accepted synthetic seconds, and the same three 4,668-step learner
-seeds. The current schema-16 amendment at `842d5a16…81a39` retains that
-construct-aligned hierarchy, shelves H3, and restores pinned LTX-2.3 as the
-conditional applicant-governed generator. The exact 44/44 action fixtures are
+seeds. The schema-16 amendment at `842d5a16…81a39` retains that
+construct-aligned public-gate hierarchy. The current schema-17 amendment at
+`cb4a7cd2…19c62` makes pinned LTX-2.3 the sole conditional
+applicant-governed generator and puts H3 out of scope. The exact 44/44 action fixtures are
 reported diagnostically on development and holdout but cannot gate or rescue
 the seven learner-effective axes; valid action-performance failure is
 nonblocking, while action integrity, privacy, provenance, and external-call
@@ -158,6 +160,17 @@ canonical runner implements and passes regression tests for this role without
 overwriting the prior no-go. LTX work remains conditional on combined public
 and governed-C passes, episode-plan sealing, and final-topology resource
 preflight.
+
+Before any material generation, one deterministic structured compiler must
+map each sealed public-word episode plan into an LTX prompt. Its fixed schema
+encodes child-height first-person camera behavior, scene complexity and
+continuity, public noun/adjective contrasts, hand/contact/action phases,
+ordered temporal beats, referent dominance or null cases, recurrence
+assignments, modular German-TTS timing, and fixed negative constraints. Manual
+or attempt-specific prompt improvement is prohibited. Public/dummy validation
+must seal compiler/template/source hashes, LTX and text-encoder provenance,
+decoding and camera/action controls, retry vocabulary, acceptance rules, exact
+resource ceilings, and prompt commitments before the 3,600-second run.
 Restricted execution was paused after a schema-inspection command
 unintentionally printed 94 opaque asset-level SHA-256 keys to the Codex task
 output. No media, text, filenames, paths, child/session keys, direct identifiers,

@@ -1564,3 +1564,49 @@ credited seconds and 1,244 learner records reused across the same three public
 seeds and 4,668-step learner contract. The result remains descriptive and may
 not be called directionally competitive, equivalent, noninferior, same quality,
 or confirmatory.
+
+### LTX sole generator and deterministic prompt compiler — prospective amendment
+
+Before the no-hand review and before any new public model, C, generator, or
+synthetic learner outcome, the user clarified that locally governed LTX-2.3 is
+the sole selected generator for this pilot. It is neither a fallback nor a
+member of a generator candidate set. This amendment is committed at
+`cb4a7cd2…19c62` and preserves the construct-aligned public-gate amendment at
+`842d5a16…81a39`, every prior no-go and Real-1h result, and the historical H3
+record at `d907d247…e2855d`. H3 is out of scope and receives no further work.
+
+Material generation additionally requires a single deterministic structured
+episode-plan-to-prompt compiler. Each input is one sealed public-word episode
+plan plus disclosure-safe aggregate C target bins. The fixed schema requires:
+
+1. child-height first-person camera, head-motion, framing, blur, and lighting;
+2. public room, clutter, distractors, occlusion, and single-shot continuity;
+3. public noun targets and visible adjective/attribute contrasts;
+4. left/right hand visibility, contact, action phases, completion, and object
+   persistence;
+5. exact approach, naming-opportunity, manipulation, recurrence,
+   idle/transition, and exit intervals;
+6. referent visibility around the remuxed speech interval, dominance,
+   ambiguity, and null cases;
+7. cross-episode recurrence cluster and burst position; and
+8. fixed negative constraints against third-person views, cuts, identity or
+   object drift, impossible physics, floating objects, extra limbs/fingers,
+   unreadable text, captions, logos, and watermarks.
+
+The canonical prompt template, schema, and seed derivation are fixed in the
+config. Each clip is 121 frames at 24 fps, or `5.041666666666667` seconds.
+Modular German TTS is reserved first on the timeline, native generated audio is
+discarded, the exact TTS waveform is remuxed, and the repaired shared adapter
+determines credited acceptance. Canonical JSON uses UTF-8 NFC, sorted keys,
+six-decimal times, fixed template-field order, and no dynamic enhancement.
+
+Before the first material attempt, public/dummy validation must seal the
+compiler source, schema, template, dummy prompts, LTX weights/code,
+text-encoder hashes and license acceptance, decoding controls, camera/action
+controls, TTS slots, retry vocabulary, acceptance rules, prompt commitments,
+and final topology/resource ceiling. Public/dummy engineering failures may be
+repaired prospectively before that seal. Individual prompts may not be
+hand-improved, and evaluation concepts or outcomes, C vocabulary or text,
+learner scores, and generated-corpus learner outcomes may never tune prompts,
+retries, or acceptance. The corpus cap, three seeds, 4,668-step learner, and
+descriptive-only claim boundary remain unchanged.

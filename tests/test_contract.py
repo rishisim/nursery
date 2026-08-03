@@ -38,8 +38,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 7
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_RESUME_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED"
+    assert config["schema_version"] == 8
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
@@ -244,7 +244,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 16
+    assert config["schema_version"] == 17
     amendment = dict(config["ambitious_learner_effective_h3_amendment"])
     commitment = amendment.pop("amendment_commitment_sha256")
     assert commitment == canonical_json_sha256(amendment)
@@ -265,6 +265,16 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
         "SUPPORTING_DIAGNOSTIC_NONBLOCKING"
     )
     assert active["generator"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
+    generator_amendment = dict(config["ltx_sole_generator_prompt_compiler_amendment"])
+    generator_commitment = generator_amendment.pop("amendment_commitment_sha256")
+    assert generator_commitment == canonical_json_sha256(generator_amendment)
+    assert generator_commitment == (
+        "cb4a7cd2dd60fb14f3430aaf2544d79db95064d42a3f22ad6107206832319c62"
+    )
+    assert generator_amendment["generator_selection"]["role"].startswith(
+        "SOLE_SELECTED_GENERATOR"
+    )
+    assert generator_amendment["compiler"]["fixed_frames"] == 121
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"
@@ -303,3 +313,8 @@ def test_active_tuple_contract_is_not_confused_with_legacy_broad_calibration() -
         "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39"
     )
     assert active["selected_generator"] == "LTX-2.3-22B-Distilled-1.1"
+    generator = results["prospective_ltx_sole_generator_prompt_compiler_extension"]
+    assert generator["amendment_commitment_sha256"] == (
+        "cb4a7cd2dd60fb14f3430aaf2544d79db95064d42a3f22ad6107206832319c62"
+    )
+    assert generator["generator_role"].startswith("SOLE_SELECTED_GENERATOR")

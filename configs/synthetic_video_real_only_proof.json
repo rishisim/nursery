@@ -1,6 +1,6 @@
 {
-  "schema_version": 16,
-  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_RESUME_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME",
+  "schema_version": 17,
+  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -147,6 +147,77 @@
     "claim_limits": ["descriptive_exploratory_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5", "no_proof_of_synthetic_data_quality"],
     "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
     "amendment_commitment_sha256": "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39"
+  },
+  "ltx_sole_generator_prompt_compiler_amendment": {
+    "status": "FROZEN_BEFORE_NO_HAND_REVIEW_PUBLIC_MODEL_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES",
+    "effective_on": "2026-08-03",
+    "authorization": "latest explicit user clarification makes locally governed LTX-2.3 the sole selected generator for this pilot and requires a deterministic structured episode-plan-to-prompt compiler before material generation",
+    "preserved_history": {
+      "construct_aligned_public_gate_amendment": "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39",
+      "historical_H3_amendment": "d907d2479ba88c7e51d25e935e429cb5860e550a82620313e502482383e2855d",
+      "complete_source_no_go": "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37",
+      "H3_status": "HISTORY_ONLY_OUT_OF_SCOPE_NO_WEIGHT_DOWNLOAD_INFERENCE_OR_FURTHER_WORK"
+    },
+    "generator_selection": {
+      "selected": "LTX-2.3-22B-Distilled-1.1",
+      "role": "SOLE_SELECTED_GENERATOR_NOT_FALLBACK_NOT_CANDIDATE_SET_MEMBER",
+      "no_substitution": true,
+      "bakeoff_history": "Gemini 27/28, MiniMax H3 25/28, Seedance 24/28, LTX 19/28; the sole-generator decision is practical and local, not a reinterpretation of quality ranking"
+    },
+    "compiler": {
+      "schema_version": 1,
+      "canonical_entry_point": "scripts/run_synthetic_video_calibration.py ltx-compile-episode-plans",
+      "input_contract": "sealed disclosure-safe compact C target bins plus one sealed public-word episode-plan table; no C text vocabulary media identifiers embeddings row-level statistics or evaluation material",
+      "output_contract": "canonical JSON episode specifications and deterministic rendered prompt strings retained only in applicant-governed storage with compact family commitments exported",
+      "hand_authored_or_attempt_specific_prompt_edits": "PROHIBITED",
+      "episode_schema_required_fields": [
+        "episode_ordinal",
+        "public_seed",
+        "duration_seconds",
+        "camera",
+        "scene",
+        "lexical_targets",
+        "hands_and_action",
+        "temporal_beats",
+        "grounding",
+        "recurrence",
+        "modular_german_tts",
+        "negative_constraints"
+      ],
+      "camera_fields": ["child_height_first_person", "head_motion_bin", "framing_bin", "blur_bin", "lighting_bin"],
+      "scene_fields": ["public_room", "lighting", "clutter_bin", "distractor_bin", "occlusion_bin", "single_shot_continuity"],
+      "lexical_fields": ["public_noun_primary", "public_noun_distractors", "public_adjective_primary", "visible_attribute_contrast"],
+      "hand_action_fields": ["left_hand_visibility", "right_hand_visibility", "contact_state", "action_type", "approach_phase", "contact_phase", "manipulation_phase", "completion_phase", "object_persistence"],
+      "temporal_beat_fields": ["approach", "naming_opportunity", "manipulation", "recurrence", "idle_or_transition", "exit"],
+      "grounding_fields": ["referent_visibility_before_during_after_speech", "referent_dominance", "ambiguity_bin", "null_speech_or_no_referent_case"],
+      "recurrence_fields": ["public_recurrence_cluster", "episode_position_in_burst", "cross_episode_object_identity_token"],
+      "fixed_duration_seconds": 5.041666666666667,
+      "fixed_frames": 121,
+      "fixed_frames_per_second": 24,
+      "timeline_rule": "all six temporal beats are finite nonoverlapping ordered intervals within 0.0 through 5.041666666666667 seconds; modular German TTS speech intervals are reserved first and naming visibility constraints are expressed before during and after those exact intervals",
+      "prompt_template": "Child-height first-person egocentric camera; {camera_clause}. One continuous shot in {scene_clause}. Public target {lexical_clause}. {hands_action_clause}. Exact timeline: {temporal_clause}. Grounding: {grounding_clause}. Recurrence: {recurrence_clause}. Preserve object identity, room continuity, and physically possible contact throughout. Negative constraints: {negative_clause}.",
+      "negative_constraints": ["third-person view", "camera cuts", "identity drift", "object drift", "impossible physics", "floating objects", "extra limbs", "extra fingers", "unreadable text", "captions", "logos", "watermarks"],
+      "seed_master": 314159,
+      "per_attempt_seed": "first eight bytes of SHA256(UTF8('synthetic-video|ltx-2.3|314159|') || UTF8(episode_ordinal) || UTF8('|') || UTF8(attempt_ordinal)) interpreted as an unsigned 63-bit integer",
+      "canonicalization": "UTF-8 NFC strings; sorted-key compact JSON; fixed field order within the prompt template; decimal seconds serialized to six places; no dynamic prompt enhancement"
+    },
+    "public_dummy_validation_before_material_generation": {
+      "scope": "public or self-authored nonrestricted episode plans only; no C-conditioned prompt content is opened during runner engineering",
+      "must_freeze_before_first_material_attempt": ["compiler_source_hash", "schema_hash", "template_hash", "public_dummy_prompt_commitment", "LTX_implementation_and_weight_hashes", "text_encoder_hashes_and_license_acceptance", "decoding_parameters", "camera_and_action_controls", "modular_TTS_timing_slots", "retry_reason_vocabulary", "acceptance_rules", "final_topology_and_resource_ceiling"],
+      "engineering_revision_boundary": "prospective compiler or runner corrections may address public-dummy engineering failures before the production commitment; evaluation concepts C vocabulary or text learner scores and generated-corpus learner outcomes may never tune prompts retries or acceptance",
+      "native_generated_audio": "DISCARD_AND_REMUX_EXACT_MODULAR_GERMAN_TTS",
+      "shared_adapter": "REPAIRED_IDENTICAL_ASR_TRANSLATION_ABSTENTION_ADAPTER"
+    },
+    "retry_and_acceptance_contract": {
+      "allowed_retry_reasons": ["decode_failure", "duration_or_frame_count_mismatch", "adapter_abstention", "speech_referent_timing_violation", "critical_camera_regime_violation", "continuity_or_identity_drift", "hand_anatomy_or_physics_failure", "referent_visibility_or_dominance_failure", "caption_logo_watermark_or_text", "near_duplicate_attempt"],
+      "attempts_per_plan_max": 2,
+      "acceptance_rule": "decodable exact-duration output; remuxed modular German TTS passes the shared adapter; reserved speech/referent timing passes; no critical negative constraint; committed learner-effective attempt-level QA passes; accepted unique credited duration contributes until and only until exactly 3600 seconds",
+      "attempt_and_accepted_measurement": "measure every attempt and accepted corpus separately against the frozen feature tolerances; no evaluation outcome may enter QA",
+      "accepted_credited_seconds_exact": 3600
+    },
+    "claim_limits": ["descriptive_exploratory_only", "no_directionally_competitive_phrase", "no_equivalence", "no_noninferiority", "no_same_quality", "no_confirmatory_phase5"],
+    "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
+    "amendment_commitment_sha256": "cb4a7cd2dd60fb14f3430aaf2544d79db95064d42a3f22ad6107206832319c62"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",
@@ -2175,7 +2246,7 @@
   "generator_gate": {
     "status": "SELECTED_LOCAL_NOT_RUN_CONDITIONAL_ON_COMBINED_PUBLIC_AND_GOVERNED_C_PASS_PLUS_FINAL_TOPOLOGY_PREFLIGHT",
     "selected": "LTX-2.3-22B-Distilled-1.1",
-    "selection_basis": "latest prospective user-directed local fallback restored before any public extractor, governed C, generator, corpus, or synthetic learner outcome under this amendment",
+    "selection_basis": "latest prospective user-directed sole local generator selected before any public extractor, governed C, generator, corpus, or synthetic learner outcome under this amendment",
     "bakeoff_provenance": "synthetic-video-seedance-bakeoff@cd5d030",
     "bakeoff_interpretation": "Gemini led at 27/28 primary checks, MiniMax H3 scored 25/28, Seedance 24/28, and LTX 19/28; LTX is a practical local choice and must never be described as the bakeoff quality winner",
     "selection_history": [
@@ -2183,7 +2254,7 @@
       {"generator": "MiniMax H3 hosted", "role": "prior_user_selection_blocked_on_provider_and_institutional_training_use_clearance"},
       {"generator": "LTX-2.3", "role": "prior_user_directed_local_choice_stopped_before_generation"},
       {"generator": "MiniMax H3 open weights", "role": "prospective_schema_15_choice_shelved_without_weight_download_or_inference"},
-      {"generator": "LTX-2.3", "role": "active_user_directed_local_fallback_conditional_on_public_and_C_pass"}
+      {"generator": "LTX-2.3", "role": "active_user_directed_sole_generator_conditional_on_public_and_C_pass"}
     ],
     "implementation": {
       "repository": "https://github.com/Lightricks/LTX-2.git",

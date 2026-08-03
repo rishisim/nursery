@@ -93,8 +93,8 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["schema_version"] == 4
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_RESUME_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME"
+    assert result["schema_version"] == 5
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -112,6 +112,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert result["prospective_ambitious_h3_extension"]["H3_weight_download_or_inference_run"] is False
     assert result["prospective_construct_aligned_ltx_resume_extension"]["all_prior_calibration_no_gos_preserved"] is True
     assert result["prospective_construct_aligned_ltx_resume_extension"]["LTX_preflight_or_generation_run"] is False
+    assert result["prospective_ltx_sole_generator_prompt_compiler_extension"]["H3_role"].startswith("HISTORY_ONLY_OUT_OF_SCOPE")
     tuple_amendment = result["governed_C_mechanistic_training_tuple_amendment"]
     assert tuple_amendment["status"] == "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     assert len(tuple_amendment["prior_no_go_commitments_preserved"]) == 4
@@ -297,7 +298,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_RESUME_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME"
+    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,
@@ -314,7 +315,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
-    assert proof["schema_version"] == 16
+    assert proof["schema_version"] == 17
     premodel = proof["calibration_C"]["extractor"]["mechanistic_training_tuple_premodel_result"]
     assert premodel["dependency_manifest_commitment_sha256"] == (
         "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"

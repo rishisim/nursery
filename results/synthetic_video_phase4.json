@@ -1,7 +1,7 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_RESUME_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -110,6 +110,22 @@
     "bakeoff_scores": {"Gemini": 27, "MiniMax_H3": 25, "Seedance": 24, "LTX": 19},
     "public_extractor_or_C_outcome_opened": false,
     "no_hand_visual_review_opened": false,
+    "LTX_preflight_or_generation_run": false,
+    "synthetic_learner_run": false
+  },
+  "prospective_ltx_sole_generator_prompt_compiler_extension": {
+    "status": "FROZEN_NO_NEW_SCIENTIFIC_OUTCOME",
+    "effective_on": "2026-08-03",
+    "canonical_config": "configs/synthetic_video_real_only_proof.json schema 17",
+    "amendment_commitment_sha256": "cb4a7cd2dd60fb14f3430aaf2544d79db95064d42a3f22ad6107206832319c62",
+    "construct_aligned_public_gate_amendment_preserved": "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39",
+    "all_prior_no_gos_and_real_gate_preserved": true,
+    "selected_generator": "LTX-2.3-22B-Distilled-1.1",
+    "generator_role": "SOLE_SELECTED_GENERATOR_NOT_FALLBACK_NOT_CANDIDATE_SET_MEMBER",
+    "H3_role": "HISTORY_ONLY_OUT_OF_SCOPE_NO_FURTHER_WORK",
+    "compiler_schema_version": 1,
+    "compiler_or_public_dummy_validation_run": false,
+    "public_extractor_or_C_outcome_opened": false,
     "LTX_preflight_or_generation_run": false,
     "synthetic_learner_run": false
   },
@@ -688,5 +704,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "IMPLEMENT_AND_TEST_THE_SCHEMA_16_EXACT_SOURCE_REUSE_AND_NONBLOCKING_ACTION_DIAGNOSTIC_GUARDS_WITHOUT_OVERWRITING_PRIOR_NO_GOS; THEN_COMPLETE_BLIND_NO_HAND_REVIEW_AND_PUBLIC_QUALIFICATION; GOVERNED_C_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
+  "next_authorized_scope": "IMPLEMENT_AND_TEST_THE_SCHEMA_17_RUNNER_WHILE_PRESERVING_THE_SCHEMA_16_EXACT_SOURCE_REUSE_AND_NONBLOCKING_ACTION_DIAGNOSTIC_GUARDS; THEN_COMPLETE_BLIND_NO_HAND_REVIEW_AND_PUBLIC_QUALIFICATION; GOVERNED_C_COMPILER_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
 }
