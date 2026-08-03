@@ -65,6 +65,17 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
         "03c15506b0ce9fcfe403ebd735e0025dd7685d34867425b385db5463b4542c15"
     )
     assert runtime_preparation["model_inference_executed"] is False
+    sizing_validation = config[
+        "mechanistic_training_tuple_sizing_validation_amendment"
+    ]
+    assert sizing_validation["status"] == (
+        "FROZEN_BEFORE_SIZING_RERUN_OR_PUBLIC_FIXTURE_OUTCOMES"
+    )
+    assert sizing_validation["validation_commitment_sha256"] == (
+        "afc936f742bd4313c35ff2e9a11a2389c589675c03309bbf09d8f8ab718ea2d5"
+    )
+    assert sizing_validation["padding_mask_exact_required"] is True
+    assert sizing_validation["public_fixture_outcome_opened"] is False
     runtime = config["mechanistic_training_tuple_runtime_amendment"]
     assert runtime["runtime_amendment_commitment_sha256"] == (
         "623225bf24f67743e1e8990e02cebe8364191bcd17f89859c27213488ea009e4"

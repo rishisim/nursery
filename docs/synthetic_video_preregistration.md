@@ -1229,3 +1229,17 @@ six clips per direction under the frozen public-seed ordering. Exact action
 margin, reversal, and repeated-center semantics are registered in the
 canonical config. The remaining task-matched fixture manifests and byte hashes
 must still be prepared and committed before development inference.
+
+The ensuing label-blind sizing job reached the pinned Grounding DINO forward
+pass and stopped on `E_TUPLE_GROUNDING_NONFINITE`. Inspection of the immutable
+official implementation established that `ContrastiveEmbed` deliberately masks
+inactive text tokens and pads unused `max_text_len` positions with negative
+infinity; the official sigmoid maps those padding sentinels to finite zero. The
+run used no fixture labels and retained no prediction, score, scientific metric,
+governed C value, generator outcome, or synthetic learner outcome. Before any
+retry, sizing-validation commitment `afc936f7…a2d5` freezes a stronger exact
+check: active positions defined by the pinned tokenizer attention mask must be
+finite, every complementary padded position must be negative infinity, all
+post-sigmoid scores must be finite, and every normalized predicted-box
+coordinate must be finite within `[0,1]`. This clarification changes no model,
+weight, prompt, fixture, threshold, or scientific gate.

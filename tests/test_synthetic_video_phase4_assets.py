@@ -138,6 +138,17 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
         "03c15506b0ce9fcfe403ebd735e0025dd7685d34867425b385db5463b4542c15"
     )
     assert runtime_preparation["model_inference_executed"] is False
+    sizing_validation = result[
+        "mechanistic_training_tuple_sizing_validation_amendment"
+    ]
+    assert sizing_validation["status"] == (
+        "FROZEN_BEFORE_SIZING_RERUN_OR_PUBLIC_FIXTURE_OUTCOMES"
+    )
+    assert sizing_validation["validation_commitment_sha256"] == (
+        "afc936f742bd4313c35ff2e9a11a2389c589675c03309bbf09d8f8ab718ea2d5"
+    )
+    assert sizing_validation["padding_mask_exact_required"] is True
+    assert sizing_validation["score_or_prediction_retained"] is False
     premodel = result["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
     assert premodel["dependency_manifest_commitment_sha256"] == (

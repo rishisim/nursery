@@ -252,6 +252,44 @@ def test_tuple_runtime_amendment_is_exact_and_rejects_mutation() -> None:
         MODULE._tuple_runtime_amendment(config)
 
 
+def test_tuple_sizing_validation_freezes_exact_grounding_padding_semantics() -> None:
+    import pytest
+
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    amendment = MODULE._tuple_sizing_validation(config)
+    assert amendment["validation_commitment_sha256"] == (
+        "afc936f742bd4313c35ff2e9a11a2389c589675c03309bbf09d8f8ab718ea2d5"
+    )
+    rule = amendment["grounding_dino_output_rule"]
+    valid = {
+        "raw_nan_count": 0,
+        "raw_positive_infinity_count": 0,
+        "raw_active_position_nonfinite_count": 0,
+        "raw_padding_position_non_negative_infinity_count": 0,
+        "post_sigmoid_nonfinite_count": 0,
+        "pred_box_nonfinite_count": 0,
+        "pred_box_min": 0.1,
+        "pred_box_max": 0.9,
+    }
+    MODULE._validate_grounding_sizing_counts(valid, rule)
+    for key, value in {
+        "raw_active_position_nonfinite_count": 1,
+        "raw_padding_position_non_negative_infinity_count": 1,
+        "post_sigmoid_nonfinite_count": 1,
+        "pred_box_nonfinite_count": 1,
+        "pred_box_min": -0.01,
+        "pred_box_max": 1.01,
+    }.items():
+        invalid = {**valid, key: value}
+        with pytest.raises(RuntimeError, match="E_TUPLE_GROUNDING_NONFINITE"):
+            MODULE._validate_grounding_sizing_counts(invalid, rule)
+    config["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_sizing_validation_amendment"
+    ]["grounding_dino_output_rule"]["sizing_caption"] = "changed prompt."
+    with pytest.raises(RuntimeError, match="E_TUPLE_SIZING_VALIDATION_COMMITMENT"):
+        MODULE._tuple_sizing_validation(config)
+
+
 def test_tuple_fixture_protocol_freezes_task_matched_action_semantics() -> None:
     import pytest
 
@@ -472,6 +510,8 @@ def test_tuple_sizing_is_label_blind_and_retains_no_predictions() -> None:
     assert "E_TUPLE_LANGUAGE_ADAPTER_SOURCE" in source
     assert "_stage_tuple_nltk_resources" in source
     assert "_tuple_fixture_protocol" in source
+    assert "_tuple_sizing_validation" in source
+    assert "sizing_validation_commitment_sha256" in source
     assert "prompt_groups_override=action_protocol" in source
     assert "public_fixture_protocol_commitment_sha256" in source
     assert "activity['development_selection_result']" not in source

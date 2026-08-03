@@ -177,7 +177,15 @@ visualization class that pulls in unpinned Matplotlib. Active runtime commitment
 `623225bf…09e4` verifies the exact original source and removes only that
 unreferenced import. The active runtime was resealed at `03c15506…2c15`, again
 without inference or a restricted mount; local-files-only model reload and
-blind sizing may resume.
+blind sizing may resume. The next label-blind attempt reached the pinned
+Grounding DINO forward pass and stopped because the previous generic raw-output
+check treated the model's documented negative-infinity text-padding sentinels
+as numeric failure. No fixture label, prediction, score, or scientific metric
+was retained. Before retry, commitment `afc936f7…a2d5` froze the exact rule:
+active tokenizer positions must be finite, only the exact tokenizer-padding
+complement may be negative infinity, post-sigmoid scores must be finite, and
+normalized boxes must be finite within `[0,1]`. This is an engineering sizing
+guard and changes no model, fixture, threshold, or scientific gate.
 Governed C measurement requires that pass, and LTX generation remains further conditional and capped at exactly one
 accepted credited synthetic hour. No confirmatory/equivalence claim is
 authorized.

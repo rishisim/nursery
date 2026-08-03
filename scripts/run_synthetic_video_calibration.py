@@ -361,6 +361,55 @@ def _tuple_fixture_protocol(cfg: dict[str, Any]) -> dict[str, Any]:
     return value
 
 
+def _tuple_sizing_validation(cfg: dict[str, Any]) -> dict[str, Any]:
+    try:
+        value = cfg["calibration_C"]["extractor"][
+            "mechanistic_training_tuple_sizing_validation_amendment"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_SIZING_VALIDATION_NOT_FROZEN") from error
+    if value.get("status") != "FROZEN_BEFORE_SIZING_RERUN_OR_PUBLIC_FIXTURE_OUTCOMES":
+        raise RuntimeError("E_TUPLE_SIZING_VALIDATION_NOT_FROZEN")
+    copy = json.loads(json.dumps(value))
+    expected = copy.pop("validation_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(copy) != expected:
+        raise RuntimeError("E_TUPLE_SIZING_VALIDATION_COMMITMENT")
+    if value.get("grounding_dino_output_rule") != {
+        "sizing_caption": "public object.",
+        "raw_pred_logits_nan_count_max": 0,
+        "raw_pred_logits_positive_infinity_count_max": 0,
+        "raw_negative_infinity_role": "official_padding_sentinel_only",
+        "raw_negative_infinity_mask_required": "exact_complement_of_pinned_tokenizer_attention_mask_padded_to_model_max_text_len",
+        "raw_active_position_nonfinite_count_max": 0,
+        "raw_padding_position_non_negative_infinity_count_max": 0,
+        "post_sigmoid_score_finite_fraction_required": 1.0,
+        "pred_box_finite_fraction_required": 1.0,
+        "pred_box_coordinate_range_inclusive": [0.0, 1.0],
+    }:
+        raise RuntimeError("E_TUPLE_SIZING_VALIDATION_RULE")
+    return value
+
+
+def _validate_grounding_sizing_counts(
+    metrics: dict[str, int | float], rule: dict[str, Any]
+) -> None:
+    lower, upper = rule["pred_box_coordinate_range_inclusive"]
+    if (
+        metrics["raw_nan_count"] > rule["raw_pred_logits_nan_count_max"]
+        or metrics["raw_positive_infinity_count"]
+        > rule["raw_pred_logits_positive_infinity_count_max"]
+        or metrics["raw_active_position_nonfinite_count"]
+        > rule["raw_active_position_nonfinite_count_max"]
+        or metrics["raw_padding_position_non_negative_infinity_count"]
+        > rule["raw_padding_position_non_negative_infinity_count_max"]
+        or metrics["post_sigmoid_nonfinite_count"] != 0
+        or metrics["pred_box_nonfinite_count"] != 0
+        or metrics["pred_box_min"] < lower
+        or metrics["pred_box_max"] > upper
+    ):
+        raise RuntimeError("E_TUPLE_GROUNDING_NONFINITE")
+
+
 def _stage_tuple_nltk_resources(
     public: Path, scratch: Path, cfg: dict[str, Any]
 ) -> Path:
@@ -2363,7 +2412,10 @@ def _load_egohod_activity_adapter(
 
 
 def _size_tuple_grounding_and_sam(
-    public: Path, device: str, image_array
+    public: Path,
+    device: str,
+    image_array,
+    sizing_validation: dict[str, Any],
 ) -> dict[str, Any]:
     import torch
     from PIL import Image
@@ -2401,13 +2453,47 @@ def _size_tuple_grounding_and_sam(
         ]
     )
     tensor, _ = transform(Image.fromarray(image_array), None)
+    rule = sizing_validation["grounding_dino_output_rule"]
+    caption = rule["sizing_caption"]
     with torch.inference_mode():
-        outputs = grounding(tensor[None].to(device), captions=["public object."])
-    tensors = [outputs["pred_logits"], outputs["pred_boxes"]]
-    if any(not torch.isfinite(value).all() for value in tensors):
-        raise RuntimeError("E_TUPLE_GROUNDING_NONFINITE")
-    grounding_width = sum(int(value.numel()) for value in tensors)
-    del outputs, tensors, tensor, checkpoint, grounding
+        outputs = grounding(tensor[None].to(device), captions=[caption])
+    raw_logits = outputs["pred_logits"]
+    boxes = outputs["pred_boxes"]
+    scores = raw_logits.sigmoid()
+    tokenizer_attention_mask = grounding.tokenizer(
+        [caption], padding="longest", return_tensors="pt"
+    ).attention_mask.bool()
+    if (
+        tokenizer_attention_mask.ndim != 2
+        or tokenizer_attention_mask.shape[0] != 1
+        or tokenizer_attention_mask.shape[1] > raw_logits.shape[-1]
+    ):
+        raise RuntimeError("E_TUPLE_GROUNDING_PADDING_MASK")
+    expected_active = torch.zeros(
+        raw_logits.shape[-1], dtype=torch.bool, device=raw_logits.device
+    )
+    expected_active[: tokenizer_attention_mask.shape[1]] = (
+        tokenizer_attention_mask[0].to(raw_logits.device)
+    )
+    expected_active = expected_active.view(1, 1, -1).expand_as(raw_logits)
+    metrics = {
+        "raw_nan_count": int(torch.isnan(raw_logits).sum()),
+        "raw_positive_infinity_count": int(torch.isposinf(raw_logits).sum()),
+        "raw_active_position_nonfinite_count": int(
+            (~torch.isfinite(raw_logits[expected_active])).sum()
+        ),
+        "raw_padding_position_non_negative_infinity_count": int(
+            (~torch.isneginf(raw_logits[~expected_active])).sum()
+        ),
+        "post_sigmoid_nonfinite_count": int((~torch.isfinite(scores)).sum()),
+        "pred_box_nonfinite_count": int((~torch.isfinite(boxes)).sum()),
+        "pred_box_min": float(boxes.min()),
+        "pred_box_max": float(boxes.max()),
+    }
+    _validate_grounding_sizing_counts(metrics, rule)
+    grounding_width = int(scores.numel() + boxes.numel())
+    del outputs, raw_logits, scores, boxes, tensor, checkpoint, grounding
+    del tokenizer_attention_mask, expected_active, metrics
     _release_cuda()
 
     sam_root = model_root / "code/sam2"
@@ -2607,6 +2693,7 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
     amendment = _tuple_amendment(cfg)
     runtime = _tuple_runtime_amendment(cfg)
     fixture_protocol = _tuple_fixture_protocol(cfg)
+    sizing_validation = _tuple_sizing_validation(cfg)
     dependency = _verify_tuple_runtime_manifest(args.public_root, cfg)
     if torch.cuda.device_count() != 1 or args.device != "cuda":
         raise RuntimeError("E_TUPLE_SIZING_TOPOLOGY")
@@ -2674,7 +2761,12 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
         {"module": "sensor", "finite": True, "output_width": len(sensor)}
     )
 
-    grounding = _size_tuple_grounding_and_sam(args.public_root, args.device, image_array)
+    grounding = _size_tuple_grounding_and_sam(
+        args.public_root,
+        args.device,
+        image_array,
+        sizing_validation,
+    )
     modules.append({"module": "grounding_and_tracking", **grounding})
     modules.append(
         {"module": "recurrence", **_size_tuple_dinov2(args.public_root, args.device)}
@@ -2737,6 +2829,9 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
         ],
         "public_fixture_protocol_commitment_sha256": fixture_protocol[
             "protocol_commitment_sha256"
+        ],
+        "sizing_validation_commitment_sha256": sizing_validation[
+            "validation_commitment_sha256"
         ],
         "runtime_dependency_commitment_sha256": dependency[
             "runtime_dependency_commitment_sha256"

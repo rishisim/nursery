@@ -1266,6 +1266,40 @@
         "external_model_call_count": 0,
         "validity": "resource and immutable-runtime preparation only; it authorizes the committed label-blind local reload sizing but is not a public extractor pass"
       },
+      "mechanistic_training_tuple_sizing_validation_amendment": {
+        "status": "FROZEN_BEFORE_SIZING_RERUN_OR_PUBLIC_FIXTURE_OUTCOMES",
+        "effective_on": "2026-08-02",
+        "trigger": "label-blind public-dummy job 313878 reached the pinned Grounding DINO forward pass and the prior generic all-finite raw-logit check rejected official negative-infinity text-padding sentinels",
+        "known_before_freeze": "the pinned official ContrastiveEmbed implementation masks inactive text tokens and pads to max_text_len with negative infinity; no fixture label score scientific metric governed C measurement generator outcome or synthetic learner outcome was opened or retained",
+        "official_source": {
+          "repository": "https://github.com/IDEA-Research/GroundingDINO",
+          "commit": "856dde20aee659246248e20734ef9ba5214f5e44",
+          "file": "groundingdino/models/GroundingDINO/utils.py",
+          "lines_role": "ContrastiveEmbed masks inactive text_token_mask positions and pads unused max_text_len positions with float negative infinity"
+        },
+        "grounding_dino_output_rule": {
+          "sizing_caption": "public object.",
+          "raw_pred_logits_nan_count_max": 0,
+          "raw_pred_logits_positive_infinity_count_max": 0,
+          "raw_negative_infinity_role": "official_padding_sentinel_only",
+          "raw_negative_infinity_mask_required": "exact_complement_of_pinned_tokenizer_attention_mask_padded_to_model_max_text_len",
+          "raw_active_position_nonfinite_count_max": 0,
+          "raw_padding_position_non_negative_infinity_count_max": 0,
+          "post_sigmoid_score_finite_fraction_required": 1.0,
+          "pred_box_finite_fraction_required": 1.0,
+          "pred_box_coordinate_range_inclusive": [0.0, 1.0]
+        },
+        "scientific_effect": "none; this distinguishes the pinned model's documented padding representation from numeric instability and strengthens the existing finite-in-bounds sizing requirement without changing model weights prompts fixtures thresholds or scientific gates",
+        "public_dummy_model_inference_executed": true,
+        "fixture_labels_used": false,
+        "score_or_prediction_retained": false,
+        "scientific_metric_computed": false,
+        "public_fixture_outcome_opened": false,
+        "governed_C_reopened": false,
+        "generator_or_synthetic_learner_outcome_opened": false,
+        "validation_commitment_scope": "canonical JSON of this sizing validation amendment excluding validation_commitment_sha256",
+        "validation_commitment_sha256": "afc936f742bd4313c35ff2e9a11a2389c589675c03309bbf09d8f8ab718ea2d5"
+      },
       "mechanistic_training_tuple_public_fixture_protocol": {
         "status": "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES",
         "effective_on": "2026-08-02",

@@ -384,6 +384,23 @@
     "public_extractor_pass": false,
     "next_gate": "one-H100 network-disabled eight-module label-blind local reload sizing"
   },
+  "mechanistic_training_tuple_sizing_validation_amendment": {
+    "status": "FROZEN_BEFORE_SIZING_RERUN_OR_PUBLIC_FIXTURE_OUTCOMES",
+    "trigger_job_id": 313878,
+    "trigger_status": "ENGINEERING_STOP_AFTER_PINNED_GROUNDING_DINO_FORWARD",
+    "observed_representation": "official negative-infinity padding sentinels in raw text logits",
+    "active_token_positions_finite_required": true,
+    "padding_mask_exact_required": true,
+    "post_sigmoid_scores_finite_required": true,
+    "normalized_boxes_in_bounds_required": true,
+    "fixture_labels_used": false,
+    "score_or_prediction_retained": false,
+    "scientific_metric_computed": false,
+    "public_fixture_outcome_opened": false,
+    "governed_C_reopened": false,
+    "validation_commitment_sha256": "afc936f742bd4313c35ff2e9a11a2389c589675c03309bbf09d8f8ab718ea2d5",
+    "next_gate": "repeat the unchanged one-H100 label-blind sizing under the exact sentinel-aware finite-in-bounds guard"
+  },
   "mechanistic_training_tuple_public_fixture_protocol": {
     "status": "FROZEN_BEFORE_PUBLIC_MODEL_OUTCOMES",
     "protocol_commitment_sha256": "506a1f41a3685ca777f3c9d23f6f9b884523acec2a78080d5de2547b3324251d",
