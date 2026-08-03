@@ -70,7 +70,7 @@ public static class AuditionBuilder
             target_world_position = touchPoint, objects = ObjectMetrics.ToArray(), frames = FrameMetrics.ToArray(),
             skin_renderer_enabled = skinRenderer.enabled, skin_update_when_offscreen = skinRenderer.updateWhenOffscreen,
             bound_bones = boneAudits, deformation = deformationAudit,
-            disclosure = "All motion, CCD IK, finger closure, and touch are kinematic/nonphysical; target is static. The POV arm/hand is a smooth bone-driven first-person proxy because the imported one-piece skinned mesh did not visibly deform under batch bone writes. Visual feasibility only."
+            disclosure = "All motion, CCD IK, finger closure, and touch are kinematic/nonphysical; target is static. Final pixels use the actual weighted child mesh baked and rendered per frame with BakeMesh(useScale=true). Diagnostic proxy renderers are disabled and contribute no pixels. Visual feasibility only."
         };
         File.WriteAllText(Path.Combine(Output, "diagnostics.json"), JsonUtility.ToJson(diagnostics, true));
         AssetDatabase.SaveAssets(); EditorApplication.Exit(0);

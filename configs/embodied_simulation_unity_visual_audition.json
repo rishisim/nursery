@@ -25,7 +25,7 @@
   "motion_disclosure": "All animation, CCD IK, finger closure, and touch are kinematic/nonphysical. The target is static. No simulator-truth or side streams were generated.",
   "comparison": {
     "unity_clip": "runs/embodied_simulation/unity_visual_audition/unity_audition.mp4", "unity_sha256": "5039aeaf0abe2f261ce09feef37e960c4d4c71abd1ab4c3d1b2da0095d8fb76c",
-    "diagnostics_sha256": "7a163b30e9998f5eb0d47c29fe456ebdf2e7c2d9807a833f74b9351ad1ba927e", "mimo_reference_window_s": [6.0, 13.0],
+    "diagnostics_sha256": "48851e6bc7a670979448b88322e44051d59e1c1264164058a6a42377dc077cd0", "mimo_reference_window_s": [6.0, 13.0],
     "mimo_reference_sha256": "a9a1a1e39abcddfd7b8a4ef231684bc5d43badd23dbe27c89192eaf50ba66013", "side_by_side_sha256": "adb180dfeda3ec5fcf8fae9466b5490c398de1bea821a6d2962f2bc006e0bd13", "dense_timeline_sha256": "077ae6e31ec8b0a02829d7975fcd0376eed516ebc71c4768cd6b200b1d742926"
   },
   "judgment": {
