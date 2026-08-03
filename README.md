@@ -162,6 +162,10 @@ next gate is the blind applicant review and lineage-bound seal of the public
 no-hand nominees; fixture preparation and model inference remain fail-closed
 until that seal exists. LTX work remains conditional on combined public and
 governed-C passes, episode-plan sealing, and final-topology resource preflight.
+The first public-only review-preparation attempt stopped before inference when
+one frame archive was silently truncated; the canonical downloader now verifies
+declared response length and retries under the unchanged ceiling. This is an
+engineering retry, not a scientific no-go or protocol change.
 
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema

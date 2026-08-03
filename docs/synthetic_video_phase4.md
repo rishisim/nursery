@@ -384,6 +384,15 @@ tests passed before any new model outcome. The next gate is the blind applicant
 review and lineage-bound seal of the public no-hand nominees; fixture
 preparation and public inference remain fail-closed until it exists.
 
+The first public-only no-hand preparation attempt then stopped as an
+engineering failure before any model inference: one of 13 cached public frame
+archives contained 425,725 bytes against the server-declared 285,776,823 bytes
+and was not a complete ZIP. Twelve completed archives remain valid. The
+canonical downloader now checks declared response length, retries silent
+truncation, and fails closed at the existing retry ceiling. This repair changes
+no fixture, threshold, label, split, or scientific gate; the bounded
+preparation retry is authorized from the retained cache.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

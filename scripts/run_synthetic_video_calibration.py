@@ -8760,8 +8760,29 @@ def _download_public_file(url: str, target: Path) -> None:
         )
         try:
             with urllib.request.urlopen(request, timeout=300) as response:
+                headers = getattr(response, "headers", {})
+                expected_text = headers.get("Content-Length") if headers else None
+                expected_bytes = None
+                if expected_text is not None:
+                    try:
+                        expected_bytes = int(expected_text)
+                    except (TypeError, ValueError) as error:
+                        raise RuntimeError(
+                            "E_TUPLE_PUBLIC_FILE_CONTENT_LENGTH"
+                        ) from error
+                    if expected_bytes < 0:
+                        raise RuntimeError("E_TUPLE_PUBLIC_FILE_CONTENT_LENGTH")
                 with partial.open("wb") as handle:
                     shutil.copyfileobj(response, handle, length=1024 * 1024)
+            if (
+                expected_bytes is not None
+                and partial.stat().st_size != expected_bytes
+            ):
+                partial.unlink(missing_ok=True)
+                if attempt == 4:
+                    raise RuntimeError("E_TUPLE_PUBLIC_FILE_TRUNCATED")
+                time.sleep(2**attempt)
+                continue
             break
         except (OSError, urllib.error.URLError):
             partial.unlink(missing_ok=True)

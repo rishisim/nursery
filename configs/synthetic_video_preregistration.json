@@ -247,6 +247,7 @@
     "learner_effective_public_qualification_unlock": "the canonical schema-17 runner now implements and tests the preserved schema-16 exact source-reuse guard and nonblocking action diagnostic without overwriting the source no-go; blind applicant no-hand review and its lineage-bound seal remain mandatory before fixture preparation or public model inference",
     "public_model_inference_requires_blind_no_hand_review_seal": true,
     "learner_effective_no_hand_review_authorized": true,
+    "learner_effective_no_hand_review_preparation_status": "ENGINEERING_RETRY_AUTHORIZED_AFTER_SILENT_PUBLIC_ARCHIVE_TRUNCATION_NO_MODEL_OUTCOME",
     "learner_effective_public_model_inference_authorized": false,
     "learner_effective_public_model_inference_unlock": "only after a sealed authorized-applicant blind no-hand review whose source materialization queue labels and seal all bind to the active construct-aligned amendment",
     "governed_C_calibration_authorized_only_after_combined_public_pass": true,

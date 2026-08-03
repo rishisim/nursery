@@ -118,6 +118,10 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert runner["action_performance_role"] == "NONBLOCKING_NONRESCUING_DIAGNOSTIC"
     assert runner["action_integrity_role"] == "BLOCKING"
     assert runner["public_development_or_holdout_outcome_opened"] is False
+    repair = result["public_no_hand_preparation_engineering_repair"]
+    assert repair["failure_class"] == "ENGINEERING_FAILURE_NOT_SCIENTIFIC_NO_GO"
+    assert repair["model_inference_executed"] is False
+    assert repair["scientific_contract_changed"] is False
     tuple_amendment = result["governed_C_mechanistic_training_tuple_amendment"]
     assert tuple_amendment["status"] == "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     assert len(tuple_amendment["prior_no_go_commitments_preserved"]) == 4

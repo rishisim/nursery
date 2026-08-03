@@ -2431,6 +2431,63 @@ def test_tuple_public_file_download_retries_transient_network_failure(
     assert target.read_bytes() == b"public fixture"
 
 
+def test_tuple_public_file_download_retries_silent_content_truncation(
+    tmp_path: Path, monkeypatch
+) -> None:
+    payload = b"complete public fixture"
+    attempts = []
+
+    class Response(BytesIO):
+        def __init__(self, value):
+            super().__init__(value)
+            self.headers = {"Content-Length": str(len(payload))}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            self.close()
+
+    def open_with_truncation(_request, timeout):
+        assert timeout == 300
+        attempts.append(True)
+        return Response(payload[:5] if len(attempts) == 1 else payload)
+
+    monkeypatch.setattr(MODULE.urllib.request, "urlopen", open_with_truncation)
+    monkeypatch.setattr(MODULE.time, "sleep", lambda _seconds: None)
+    target = tmp_path / "fixture.zip"
+    MODULE._download_public_file("https://example.test/fixture.zip", target)
+    assert len(attempts) == 2
+    assert target.read_bytes() == payload
+
+
+def test_tuple_public_file_download_fails_closed_after_silent_truncation(
+    tmp_path: Path, monkeypatch
+) -> None:
+    import pytest
+
+    class Response(BytesIO):
+        headers = {"Content-Length": "100"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            self.close()
+
+    monkeypatch.setattr(
+        MODULE.urllib.request,
+        "urlopen",
+        lambda _request, timeout: Response(b"short"),
+    )
+    monkeypatch.setattr(MODULE.time, "sleep", lambda _seconds: None)
+    target = tmp_path / "fixture.zip"
+    with pytest.raises(RuntimeError, match="E_TUPLE_PUBLIC_FILE_TRUNCATED"):
+        MODULE._download_public_file("https://example.test/fixture.zip", target)
+    assert not target.exists()
+    assert not target.with_suffix(".zip.partial").exists()
+
+
 def test_tuple_exact_download_accepts_small_hashed_public_files(
     tmp_path: Path, monkeypatch
 ) -> None:

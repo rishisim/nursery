@@ -1561,6 +1561,14 @@ next gate is the blind applicant review and lineage-bound seal of the public
 no-hand nominees; fixture preparation and public inference remain fail-closed
 until that seal exists.
 
+The first public-only preparation attempt encountered an ordinary engineering
+failure before any model inference: one downloaded public frame archive was
+silently truncated relative to its declared response length. The canonical
+downloader was repaired to verify that length, retry incomplete responses, and
+fail closed after the unchanged retry limit. Completed valid archives are
+retained. No fixture, threshold, label, split, public outcome, or scientific
+gate changed, so the bounded preparation retry remains authorized.
+
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
 descriptive. Only a combined public pass authorizes the single-applicant blind

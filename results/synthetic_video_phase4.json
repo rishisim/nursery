@@ -133,7 +133,7 @@
     "status": "PASS_IMPLEMENTED_AND_REGRESSION_TESTED_NO_EMPIRICAL_OUTCOME",
     "recorded_on": "2026-08-03",
     "canonical_entry_point": "scripts/run_synthetic_video_calibration.py",
-    "implementation_source_sha256": "569ce81d38eec54455f1fefe03e8d3b272c2ea8799972ca6a4259036aa29d1a3",
+    "implementation_source_sha256": "bfef49ff7bf194a2c810a94d5638202317cf9778ffd9fca9865e3cfdfe890a3f",
     "prospective_amendment_preserved": "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39",
     "complete_source_no_go_preserved": "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37",
     "source_reuse": "EXACT_PASS_FAMILIES_PLUS_EXACT_SEALED_44_DEVELOPMENT_AND_44_HOLDOUT_ACTION_ROWS_ONLY",
@@ -146,8 +146,22 @@
     "public_development_or_holdout_outcome_opened": false,
     "governed_C_reopened": false,
     "LTX_preflight_generation_or_synthetic_learner_run": false,
-    "focused_validation": {"passed": 149, "skipped": 1, "failed": 0},
+    "focused_validation": {"passed": 151, "skipped": 1, "failed": 0},
     "next_required_gate": "BLIND_APPLICANT_NO_HAND_REVIEW_AND_SEAL"
+  },
+  "public_no_hand_preparation_engineering_repair": {
+    "status": "RETRY_AUTHORIZED_AFTER_SILENT_PUBLIC_ARCHIVE_TRUNCATION_REPAIR",
+    "failure_class": "ENGINEERING_FAILURE_NOT_SCIENTIFIC_NO_GO",
+    "public_cached_archive_count": 13,
+    "public_valid_zip_count": 12,
+    "public_invalid_zip_count": 1,
+    "invalid_cached_bytes": 425725,
+    "server_declared_bytes": 285776823,
+    "model_inference_executed": false,
+    "public_development_or_holdout_opened": false,
+    "governed_C_reopened": false,
+    "scientific_contract_changed": false,
+    "repair": "verify declared response length retry silent truncation and fail closed after the frozen retry limit"
   },
   "governed_C_calibration": {
     "status": "NO_GO",

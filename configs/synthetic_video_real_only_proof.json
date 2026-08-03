@@ -223,7 +223,7 @@
     "status": "PASS_IMPLEMENTED_AND_REGRESSION_TESTED_BEFORE_NO_HAND_REVIEW_OR_PUBLIC_MODEL_OUTCOME",
     "implemented_on": "2026-08-03",
     "canonical_entry_point": "scripts/run_synthetic_video_calibration.py",
-    "implementation_source_sha256": "569ce81d38eec54455f1fefe03e8d3b272c2ea8799972ca6a4259036aa29d1a3",
+    "implementation_source_sha256": "bfef49ff7bf194a2c810a94d5638202317cf9778ffd9fca9865e3cfdfe890a3f",
     "config_schema_version": 17,
     "prospective_amendment_preserved": "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39",
     "ltx_sole_generator_compiler_amendment_preserved": "cb4a7cd2dd60fb14f3430aaf2544d79db95064d42a3f22ad6107206832319c62",
@@ -240,11 +240,29 @@
     "generator_or_synthetic_learner_outcome_opened": false,
     "focused_validation": {
       "command": "python3 -m pytest -q tests/test_synthetic_video_calibration.py tests/test_contract.py tests/test_synthetic_video_phase4_assets.py",
-      "passed": 149,
+      "passed": 151,
       "skipped": 1,
       "failed": 0
     },
     "next_required_gate": "BLIND_APPLICANT_NO_HAND_REVIEW_AND_SEAL_BEFORE_FIXTURE_PREPARATION_OR_PUBLIC_MODEL_INFERENCE"
+  },
+  "public_no_hand_preparation_engineering_repair": {
+    "status": "RETRY_AUTHORIZED_AFTER_SILENT_PUBLIC_ARCHIVE_TRUNCATION_REPAIR",
+    "observed_on": "2026-08-03",
+    "failure_class": "ENGINEERING_FAILURE_NOT_SCIENTIFIC_NO_GO",
+    "public_cached_archive_count": 13,
+    "public_valid_zip_count": 12,
+    "public_invalid_zip_count": 1,
+    "invalid_cached_bytes": 425725,
+    "server_declared_bytes": 285776823,
+    "server_status": 200,
+    "server_content_type": "application/zip",
+    "repair": "the canonical public downloader now verifies declared response length retries silent truncation and fails closed after the frozen retry limit",
+    "model_inference_executed": false,
+    "public_development_or_holdout_opened": false,
+    "governed_C_reopened": false,
+    "scientific_threshold_or_fixture_changed": false,
+    "completed_valid_downloads_and_resumable_state_retained": true
   },
   "governance_incident": {
     "observed_on": "2026-08-02",
