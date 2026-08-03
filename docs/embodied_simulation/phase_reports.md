@@ -693,3 +693,40 @@ credibility over prior footage. The bounded remaining repair is one
 Unity/official-plugin appearance pass using this unchanged truth/registration
 contract once the user activates Unity; do not weaken or change the physics,
 camera, or grasp conditions.
+
+## Unity visual-shell audition — bounded repair
+
+Decision: **PASS** for visual feasibility only. The same canonical Unity
+audition was repaired after measuring the imported Kenney furniture and finding
+that its raw OBJ units had been treated as meters. Furniture is now normalized
+to documented metric target dimensions, the room is composed around the
+measured 1.133 m eye height, and the toy is placed at 85% of the measured
+articulated-arm reach.
+
+The 62-degree vertical-FOV camera has a 0.03 m near plane and one frozen mount
+under the head. Its optical origin is 0.032 m beyond the measured head-weighted
+surface; it has no target-facing lock or independent animation. The imported
+MPFB child mesh retains its bound upper-arm, forearm, wrist, hand, and finger
+bones. A decisive `BakeMesh` audit found 1,883 weighted right-arm vertices move
+between rest and contact (0.413 m mean, 0.695 m maximum). Because manual
+`Camera.Render` did not refresh the live skin, each final frame renders the
+actual baked full child skin. A smooth capsule arm was used only diagnostically
+and is disabled in every final frame.
+
+The repaired seven-second clip shows a stable child-height view, a coherent
+furnished room, an attached five-finger hand, readable reach/touch/withdraw,
+and no prolonged torso takeover or mesh clipping. Against the same prior MIMo
+window, it is materially stronger on camera stability, hand anatomy,
+self-occlusion, contact readability, clipping, and temporal naturalness; MIMo
+retains denser room detail. The combined evidence therefore passes this narrow
+Unity visual-shell gate.
+
+All motion and contact are kinematic and nonphysical; the stationary toy is not
+a demonstrated grasp. This media is not simulator truth, a physical episode, a
+training or side-stream example, calibration, human/infant validation, or
+causal evidence. Exact pins, licenses, commands, hashes, measurements, and the
+comparison rubric are recorded in
+`docs/embodied_simulation/unity_visual_audition.md` and
+`configs/embodied_simulation_unity_visual_audition.json`. The only recommended
+next step is a later, separately authorized registration of this exact visible
+rig and camera to the existing MuJoCo trace/physics contract.

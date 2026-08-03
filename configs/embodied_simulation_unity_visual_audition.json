@@ -1,63 +1,41 @@
 {
   "question": "Can an actual Unity-based furnished scene, skinned child-proportioned embodiment, articulated hand, and body-derived head camera produce a 5-8 second clip visibly more credible than the prior MIMo footage?",
   "scope": "visual_feasibility_only",
-  "decision": "NO-GO",
-  "unity": {
-    "editor": "6000.0.80f1",
-    "revision": "2dfd32957da2",
-    "architecture": "arm64_native",
-    "graphics_api": "Metal",
-    "render_pipeline": "Built-in Render Pipeline",
-    "license": "Unity Personal assigned; proprietary Unity Editor dependency"
-  },
+  "decision": "PASS",
+  "unity": {"editor": "6000.0.80f1", "revision": "2dfd32957da2", "architecture": "arm64_native", "graphics_api": "Metal", "render_pipeline": "Built-in Render Pipeline", "license": "Unity Personal assigned; proprietary Unity Editor dependency"},
   "assets": {
-    "avatar": {
-      "source": "MPFB/MakeHuman age-minimum rigged output retained from Phase 1",
-      "source_sha256": "38765a776be116b3ce1c3c49cf253be8d25946170041e7bcf54b77fec72b5c3b",
-      "exported_fbx_sha256": "b766981d9d3504cea220c0d72ad8aa56cbd80453e910fc76dc8c8814fbd980de",
-      "license": "CC0 core graphical assets",
-      "properties": "skinned child-proportioned mesh; full articulated five-finger chains"
-    },
-    "room": {
-      "source": "Kenney Furniture Kit from OpenGameArt",
-      "archive_sha256": "68afa4e6dc8a53942379fb47f1e84ec735d46b77bb1c1ceb968e245693dde067",
-      "license": "CC0"
-    }
+    "avatar": {"source": "MPFB/MakeHuman age-minimum rigged output retained from Phase 1", "source_sha256": "38765a776be116b3ce1c3c49cf253be8d25946170041e7bcf54b77fec72b5c3b", "exported_fbx_sha256": "b766981d9d3504cea220c0d72ad8aa56cbd80453e910fc76dc8c8814fbd980de", "license": "CC0 core graphical assets", "properties": "skinned child-proportioned mesh; full articulated five-finger chains"},
+    "room": {"source": "Kenney Furniture Kit from OpenGameArt", "archive_sha256": "68afa4e6dc8a53942379fb47f1e84ec735d46b77bb1c1ceb968e245693dde067", "license": "CC0", "unit_rule": "1 Unity unit = 1 meter; uniform scale derives from measured raw Renderer.bounds and explicit metric target size"}
   },
   "camera": {
     "parents": ["avatar root", "spine", "neck", "head"],
-    "frozen_mount_local_position_fbx": [0.0, 0.0002, -0.0025],
-    "frozen_mount_local_euler_deg": [8.0, 180.0, 0.0],
-    "vertical_fov_deg": 58.0,
-    "near_clip_m": 0.025,
-    "documented_radial_head_surface_clearance_m": 0.3165,
-    "target_dependent_transform": false,
-    "independent_camera_animation": false
+    "construction": "world-meter optical point 0.032 m beyond measured rest-pose head-weighted bounds, then frozen under head",
+    "eye_height_m": 1.1327022, "vertical_fov_deg": 62.0, "near_clip_m": 0.03,
+    "camera_inside_head_weighted_geometry": false, "target_dependent_transform": false, "independent_camera_animation": false
+  },
+  "repair": {
+    "kenney_scale_defect": "repaired from measured raw and world bounds", "target_reach_fraction": 0.85,
+    "target_visible_at_all_sampled_frames": true, "contact_fingertip_error_m": 0.020852,
+    "skin_binding": "all audited arm/wrist/finger transforms are exact SkinnedMeshRenderer.bones instances with nonzero weights",
+    "right_arm_weighted_vertices": 1883, "contact_mean_right_arm_vertex_displacement_m": 0.4129105,
+    "contact_baked_arm_bounds_distance_to_target_m": 0.0020773,
+    "manual_render_fix": "BakeMesh(useScale=true) rendered each frame with importer transform exactly once; duplicate source draw excluded",
+    "diagnostic_proxy_visible_in_final": false
   },
   "motion_disclosure": "All animation, CCD IK, finger closure, and touch are kinematic/nonphysical. The target is static. No simulator-truth or side streams were generated.",
   "comparison": {
-    "unity_clip": "runs/embodied_simulation/unity_visual_audition/unity_audition.mp4",
-    "unity_sha256": "099682dc4fc0a80ac0d236a2b63df5bef0bd6d71aca5eb7a42a793084a28e54b",
-    "mimo_reference_window_s": [6.0, 13.0],
-    "mimo_reference_sha256": "a9a1a1e39abcddfd7b8a4ef231684bc5d43badd23dbe27c89192eaf50ba66013",
-    "side_by_side_sha256": "3e9f16dfeb980238f4c22be1bf3493e2e9a2ec0f4480a0db6f6bb21e7f5ee3ae",
-    "dense_timeline_sha256": "7d4e716b5109ca25acfb2f132168e7a1d3327094271aef5e607df955ce72086a"
+    "unity_clip": "runs/embodied_simulation/unity_visual_audition/unity_audition.mp4", "unity_sha256": "5039aeaf0abe2f261ce09feef37e960c4d4c71abd1ab4c3d1b2da0095d8fb76c",
+    "diagnostics_sha256": "7a163b30e9998f5eb0d47c29fe456ebdf2e7c2d9807a833f74b9351ad1ba927e", "mimo_reference_window_s": [6.0, 13.0],
+    "mimo_reference_sha256": "a9a1a1e39abcddfd7b8a4ef231684bc5d43badd23dbe27c89192eaf50ba66013", "side_by_side_sha256": "adb180dfeda3ec5fcf8fae9466b5490c398de1bea821a6d2962f2bc006e0bd13", "dense_timeline_sha256": "077ae6e31ec8b0a02829d7975fcd0376eed516ebc71c4768cd6b200b1d742926"
   },
   "judgment": {
-    "room_coherence": "fail: licensed furnishings are present but import-scale composition is not visually coherent from the head view",
-    "child_embodiment": "fail: skinned rig exists but self-geometry dominates and does not read as a plausible child view",
-    "head_camera": "fail visually despite valid ancestry and frozen mount; severe self-occlusion",
-    "horizon_roll_fov": "partial: 58-degree FOV and bounded roll, but composition is invalid",
-    "hand_anatomy": "not readable",
-    "reach_touch": "not readable",
-    "clipping": "fail: prolonged full-frame self-occlusion/near composition",
-    "temporal_naturalness": "fail: motion is visually negligible/unreadable",
-    "beats_mimo": false
+    "room_coherence": "pass: metrically normalized furnished room and support read consistently, though sparser than MIMo",
+    "child_embodiment": "pass: actual weighted child forearm and hand remain attached and visible",
+    "head_camera": "pass: measured external optical origin, fixed body-derived mount, no target lock",
+    "horizon_roll_fov": "pass: stable zero-roll composition, 62-degree vertical FOV",
+    "hand_anatomy": "pass: smooth five-finger skinned hand, no duplicated or malformed digits",
+    "reach_touch": "pass: approach, visible touch, and withdraw are readable", "clipping": "pass: no head, near-plane, torso, or limb takeover",
+    "temporal_naturalness": "pass for visual feasibility; deterministic kinematic motion remains disclosed", "beats_mimo": true
   },
-  "governance": {
-    "restricted_childlens_accessed": false,
-    "childlens_measurement_or_calibration": false,
-    "simulator_truth_or_training_example": false,
-    "causal_evidence": false
-  }
+  "governance": {"restricted_childlens_accessed": false, "childlens_measurement_or_calibration": false, "simulator_truth_or_training_example": false, "causal_evidence": false, "only_recommended_next_gate": "register this exact visible rig and camera to the existing MuJoCo trace/physics contract under separate authorization"}
 }
