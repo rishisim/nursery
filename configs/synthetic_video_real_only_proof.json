@@ -1521,6 +1521,38 @@
         "preparation_amendment_commitment_scope": "canonical JSON of this amendment excluding preparation_amendment_commitment_sha256",
         "preparation_amendment_commitment_sha256": "1cc8d0e3498da5785a2c2105307bf6d5ab20dd10f839ec0f2b92b9def372ff1d"
       },
+      "mechanistic_training_tuple_fixture_feasibility_repair_amendment": {
+        "status": "FROZEN_AFTER_PREMODEL_FIXTURE_YIELD_STOP_BEFORE_ANY_PUBLIC_MODEL_OUTCOME",
+        "effective_on": "2026-08-02",
+        "trigger": {"job_id": 313969, "stage": "COCO_source_selection_before_fixture_rendering", "error_code": "E_TUPLE_COCO_FIXTURE_YIELD_development_sports_ball"},
+        "observed_scope": "one compact public source-availability failure only; no selected row manifest media render model prediction scientific metric governed C value generator outcome synthetic corpus or synthetic learner score",
+        "prior_fixture_preparation_commitment_preserved": "1cc8d0e3498da5785a2c2105307bf6d5ab20dd10f839ec0f2b92b9def372ff1d",
+        "scientific_thresholds_changed": false,
+        "models_prompts_axis_gates_and_counts_changed": false,
+        "source_selection_repair": {
+          "old_COCO_area_fraction_range": [0.03, 0.5],
+          "active_COCO_area_fraction_range": [0.0, 0.5],
+          "unchanged_source_image_minimum_pixels": [480, 360],
+          "unchanged_target_bbox_minimum_pixels": [48, 48],
+          "unchanged_polygon_only": true,
+          "unchanged_iscrowd": 0,
+          "rationale": "the alpha-masked crop is resized to an exact prospectively fixed authored-composite size, so source-frame area is not an extractor estimand or resolution safeguard; the unchanged 48-pixel bbox floor remains the source-detail safeguard",
+          "partition_and_hash_order_unchanged": true
+        },
+        "complete_annotation_only_feasibility_preflight": {
+          "canonical_entry_point": "scripts/run_synthetic_video_calibration.py tuple-fixtures-feasibility",
+          "scope": "resolve the exact deterministic COCO crop VISOR frame and Charades action selections and all development-holdout overlap/count audits before rendering or downloading large video archives",
+          "inputs": "the same official source annotations and prior broad-context exclusion manifest already frozen",
+          "model_inference": false,
+          "media_rendering": false,
+          "large_Charades_video_archive_download": false,
+          "pass_rule": "all six fixture-family counts are attainable in both partitions with zero source subject video and object overlap and the exact active eligibility rules",
+          "failure_rule": "seal a public fixture-source no-go and stop without another source-model-threshold substitution"
+        },
+        "preflight_result_commitment": "PENDING_ANNOTATION_ONLY_RUN",
+        "repair_commitment_scope": "canonical JSON of this amendment excluding fixture_feasibility_repair_commitment_sha256",
+        "fixture_feasibility_repair_commitment_sha256": "e5fd286e9b8140583a37b855fe7125d7c6a0a2e3b57589b53294f77d28e47048"
+      },
       "regular_frame_prompt_groups": {
         "activity": {"play": "a child playing with toys", "meal": "a child-view scene during a meal or snack", "book_learning": "a child-view scene with a book or learning activity", "household_routine": "a child-view household routine", "dressing_care": "a child-view dressing or personal-care routine", "mobility_outdoor": "a child moving around or outdoors", "quiet_observation": "a child quietly observing a scene", "other": "another ordinary child-view activity"},
         "framing": {"centered": "one main object centered in a child-view frame", "distributed": "several objects distributed across a child-view frame", "peripheral": "the main content is near the edge of a child-view frame"},

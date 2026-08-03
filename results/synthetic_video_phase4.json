@@ -453,6 +453,21 @@
     "fixture_manifest_commitment": "PENDING_PREPARATION",
     "next_gate": "render and seal the exact disjoint public fixtures, then commit their single external-manifest commitment before development inference"
   },
+  "mechanistic_training_tuple_fixture_feasibility_repair_amendment": {
+    "status": "FROZEN_AFTER_PREMODEL_FIXTURE_YIELD_STOP_BEFORE_ANY_PUBLIC_MODEL_OUTCOME",
+    "fixture_feasibility_repair_commitment_sha256": "e5fd286e9b8140583a37b855fe7125d7c6a0a2e3b57589b53294f77d28e47048",
+    "trigger_job_id": 313969,
+    "trigger_stage": "COCO_source_selection_before_fixture_rendering",
+    "trigger_error": "E_TUPLE_COCO_FIXTURE_YIELD_development_sports_ball",
+    "prior_fixture_preparation_commitment_preserved": "1cc8d0e3498da5785a2c2105307bf6d5ab20dd10f839ec0f2b92b9def372ff1d",
+    "public_model_outcome_opened": false,
+    "media_rendered": false,
+    "scientific_thresholds_changed": false,
+    "active_COCO_area_fraction_range": [0.0, 0.5],
+    "unchanged_target_bbox_minimum_pixels": [48, 48],
+    "annotation_only_complete_feasibility_preflight": "PENDING",
+    "next_gate": "run one complete annotation-only source-yield and overlap preflight; stop on failure without another substitution"
+  },
   "governed_C_activity_checkpoint_safe_load_repair": {
     "status": "PASS_SAFE_LOAD_AND_EGOHOD_BLIND_SIZING",
     "candidate_id": "egohod_egovideo_l_zero_shot",

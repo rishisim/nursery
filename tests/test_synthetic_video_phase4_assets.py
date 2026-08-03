@@ -138,6 +138,17 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     )
     assert fixture_preparation["items_per_partition"] == 312
     assert fixture_preparation["public_model_outcome_opened"] is False
+    fixture_feasibility = result[
+        "mechanistic_training_tuple_fixture_feasibility_repair_amendment"
+    ]
+    assert fixture_feasibility["status"] == (
+        "FROZEN_AFTER_PREMODEL_FIXTURE_YIELD_STOP_BEFORE_ANY_PUBLIC_MODEL_OUTCOME"
+    )
+    assert fixture_feasibility["fixture_feasibility_repair_commitment_sha256"] == (
+        "e5fd286e9b8140583a37b855fe7125d7c6a0a2e3b57589b53294f77d28e47048"
+    )
+    assert fixture_feasibility["public_model_outcome_opened"] is False
+    assert fixture_feasibility["scientific_thresholds_changed"] is False
     runtime_preparation = result[
         "mechanistic_training_tuple_runtime_preparation_result"
     ]

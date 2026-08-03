@@ -355,6 +355,30 @@ def test_tuple_fixture_preparation_amendment_is_exact_and_preoutcome() -> None:
         MODULE._tuple_fixture_preparation_amendment(config)
 
 
+def test_tuple_fixture_feasibility_repair_preserves_scientific_gates() -> None:
+    import pytest
+
+    config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    repair = MODULE._tuple_fixture_feasibility_repair(config)
+    assert repair["fixture_feasibility_repair_commitment_sha256"] == (
+        "e5fd286e9b8140583a37b855fe7125d7c6a0a2e3b57589b53294f77d28e47048"
+    )
+    assert repair["scientific_thresholds_changed"] is False
+    assert repair["source_selection_repair"][
+        "unchanged_target_bbox_minimum_pixels"
+    ] == [48, 48]
+    assert repair["source_selection_repair"][
+        "active_COCO_area_fraction_range"
+    ] == [0.0, 0.5]
+    config["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_fixture_feasibility_repair_amendment"
+    ]["scientific_thresholds_changed"] = True
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_FIXTURE_FEASIBILITY_REPAIR_COMMITMENT"
+    ):
+        MODULE._tuple_fixture_feasibility_repair(config)
+
+
 def test_task_matched_language_fixture_has_frozen_accept_and_abstention_mix() -> None:
     config = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     preparation = MODULE._tuple_fixture_preparation_amendment(config)
@@ -1064,6 +1088,8 @@ def test_public_qualification_jobs_never_mount_restricted_data() -> None:
     assert "mechanistic-tuple-runtime" in prepare
     assert "tuple-fixtures-prepare" in prepare
     assert "mechanistic-tuple-fixtures" in prepare
+    assert "tuple-fixtures-feasibility" in prepare
+    assert "mechanistic-tuple-fixture-feasibility" in prepare
     assert "PHASE4_ACTIVITY_CODE_CLEAN=1" in prepare
     assert "PHASE4_RESTRICTED_ROOT" not in prepare
     assert "#SBATCH --partition=h100" in qualify
@@ -1099,5 +1125,6 @@ def test_terminal_report_is_flat_and_guarded() -> None:
     assert "tuple-size" in source
     assert "tuple-audio-seed" in source
     assert "tuple-fixtures-prepare" in source
+    assert "tuple-fixtures-feasibility" in source
     assert "E_ACTIVITY_HOLDOUT_BEFORE_WINNER_SEAL" in source
     assert 'print(json.dumps' not in source

@@ -1142,6 +1142,18 @@ uses one sealed Anna `de_DE` render bundle; all media, row-level labels, and
 source records stay outside Git. This recipe performs no model inference and
 does not change an extractor, threshold, gate, or prior no-go.
 
+The first preparation job (`313969`) stopped before rendering on insufficient
+development sports-ball sources under the registered 3% source-frame-area
+floor. It opened no row manifest, model output, public metric, C value, or
+synthetic outcome. Repair commitment `e5fd286e…7048` preserves that stop and
+removes only this irrelevant source-area floor: alpha-masked crops are resized
+to the already fixed composite geometry, while the 48-by-48-pixel target-bbox,
+polygon, non-crowd, partition, and hash-order rules remain unchanged. No
+scientific threshold changes. Before another render, one annotation-only
+preflight must establish the exact COCO, VISOR, and Charades yields and all
+source-overlap counts. Failure is a fixture-source no-go; another post-result
+substitution is prohibited.
+
 If the complete public gate passes, governance permits a small C-domain audit
 only by the sole authorized applicant inside applicant-governed storage. It is
 limited to visual labels and the exact accepted English input the learner sees;

@@ -217,3 +217,12 @@ six fixture families has fixed development and holdout counts totaling 312
 items per partition. Media, public row manifests, annotations, and audio stay
 outside Git; only the eventual compact counts and complete-manifest commitment
 may be retained.
+
+Preparation job `313969` then stopped before any render or model inference:
+the 3% COCO source-frame-area floor could not provide four development
+sports-ball crops. That engineering stop remains recorded. Prospective repair
+commitment `e5fd286e…7048` removes only the source-area floor because every
+accepted alpha-mask crop is resized to fixed authored-composite geometry; the
+48-pixel bbox floor and all scientific gates remain unchanged. A new
+annotation-only feasibility preflight must verify all COCO, VISOR, and
+Charades yields and zero cross-partition source overlap before rendering.

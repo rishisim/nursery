@@ -221,6 +221,26 @@ TUPLE_AUDIO_SEED_FIELDS = frozenset(
     {"status", "audio_file_count", "audio_seed_commitment_sha256"}
 )
 TUPLE_AUDIO_SEED_HASH_FIELDS = frozenset({"audio_seed_commitment_sha256"})
+TUPLE_FIXTURE_FEASIBILITY_FIELDS = frozenset(
+    {
+        "status",
+        "coco_source_count",
+        "visor_item_count",
+        "action_item_count",
+        "partition_count",
+        "failing_family_count",
+        "source_subject_overlap_count",
+        "source_video_overlap_count",
+        "source_object_overlap_count",
+        "model_inference_executed",
+        "media_rendering_executed",
+        "restricted_mount_present",
+        "fixture_feasibility_commitment_sha256",
+    }
+)
+TUPLE_FIXTURE_FEASIBILITY_HASH_FIELDS = frozenset(
+    {"fixture_feasibility_commitment_sha256"}
+)
 NLTK_DATA_COMMIT = "550b6625bcef1f2abff2ff770a5a0d272c9c6b2a"
 NLTK_RESOURCE_ARCHIVES = {
     "wordnet.zip": {
@@ -443,6 +463,32 @@ def _tuple_fixture_preparation_amendment(
         "banana",
     ]:
         raise RuntimeError("E_TUPLE_FIXTURE_PREPARATION_ONTOLOGY")
+    return value
+
+
+def _tuple_fixture_feasibility_repair(cfg: dict[str, Any]) -> dict[str, Any]:
+    try:
+        value = cfg["calibration_C"]["extractor"][
+            "mechanistic_training_tuple_fixture_feasibility_repair_amendment"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_FIXTURE_FEASIBILITY_REPAIR_NOT_FROZEN") from error
+    if value.get("status") != (
+        "FROZEN_AFTER_PREMODEL_FIXTURE_YIELD_STOP_BEFORE_ANY_PUBLIC_MODEL_OUTCOME"
+    ):
+        raise RuntimeError("E_TUPLE_FIXTURE_FEASIBILITY_REPAIR_NOT_FROZEN")
+    copy = json.loads(json.dumps(value))
+    expected = copy.pop("fixture_feasibility_repair_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(copy) != expected:
+        raise RuntimeError("E_TUPLE_FIXTURE_FEASIBILITY_REPAIR_COMMITMENT")
+    selection = value.get("source_selection_repair")
+    if (
+        selection.get("old_COCO_area_fraction_range") != [0.03, 0.5]
+        or selection.get("active_COCO_area_fraction_range") != [0.0, 0.5]
+        or selection.get("unchanged_target_bbox_minimum_pixels") != [48, 48]
+        or value.get("scientific_thresholds_changed") is not False
+    ):
+        raise RuntimeError("E_TUPLE_FIXTURE_FEASIBILITY_REPAIR_SCOPE")
     return value
 
 
@@ -959,7 +1005,9 @@ def _valid_visor_segments(value: Any) -> bool:
 
 
 def _select_coco_object_sources(
-    instances: dict[str, Any], preparation: dict[str, Any]
+    instances: dict[str, Any],
+    preparation: dict[str, Any],
+    feasibility_repair: dict[str, Any],
 ) -> dict[str, list[dict[str, Any]]]:
     seed = int(preparation["seed"])
     ontology = preparation["public_object_ontology"]
@@ -979,6 +1027,9 @@ def _select_coco_object_sources(
         for partition in preparation["partitions"]
     }
     category_by_id = {value: key for key, value in categories.items()}
+    area_minimum, area_maximum = feasibility_repair["source_selection_repair"][
+        "active_COCO_area_fraction_range"
+    ]
     for annotation in instances.get("annotations", []):
         category = category_by_id.get(int(annotation.get("category_id", -1)))
         image = images.get(int(annotation.get("image_id", -1)))
@@ -998,7 +1049,7 @@ def _select_coco_object_sources(
             or height < 360
             or box_width < 48
             or box_height < 48
-            or not 0.03 <= area / (width * height) <= 0.50
+            or not float(area_minimum) <= area / (width * height) <= float(area_maximum)
             or not _valid_polygon_segmentation(annotation.get("segmentation"))
             or left < 0
             or top < 0
@@ -2301,10 +2352,10 @@ def _load_charades_rows(annotation_root: Path) -> list[dict[str, str]]:
     return output
 
 
-def _prepare_visor_fixtures(
+def _load_visor_annotation_documents(
     fixture_root: Path,
     preparation: dict[str, Any],
-) -> tuple[dict[str, list[dict[str, Any]]], list[dict[str, Any]]]:
+) -> tuple[dict[str, Any], Path, list[dict[str, Any]], list[dict[str, Any]]]:
     base = preparation["source_archives"]["EPIC_KITCHENS_VISOR_validation"]
     source_root = fixture_root / "sources/VISOR"
     annotation_root = source_root / "annotations"
@@ -2347,6 +2398,16 @@ def _prepare_visor_fixtures(
                 "license": base["license"],
             }
         )
+    return base, source_root, documents, provenance
+
+
+def _prepare_visor_fixtures(
+    fixture_root: Path,
+    preparation: dict[str, Any],
+) -> tuple[dict[str, list[dict[str, Any]]], list[dict[str, Any]]]:
+    base, source_root, documents, provenance = _load_visor_annotation_documents(
+        fixture_root, preparation
+    )
     selected = _select_visor_fixtures(documents, preparation)
     output: dict[str, list[dict[str, Any]]] = {
         partition: [] for partition in preparation["partitions"]
@@ -2427,10 +2488,152 @@ def _prepare_visor_fixtures(
     return output, provenance
 
 
+def prepare_tuple_fixture_feasibility(
+    args: argparse.Namespace,
+) -> dict[str, Any]:
+    cfg = json.loads(args.config.read_text())
+    protocol = _tuple_fixture_protocol(cfg)
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    repair = _tuple_fixture_feasibility_repair(cfg)
+    fixture_root = _tuple_fixture_root(args.public_root)
+    fixture_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    sources = preparation["source_archives"]
+    coco_annotations = _fixture_archive(
+        args.public_root,
+        sources["COCO_2017_instances"],
+        "annotations_trainval2017.zip",
+    )
+    charades_annotations = _fixture_archive(
+        args.public_root,
+        sources["Charades_Ego_annotations"],
+        "CharadesEgo.zip",
+    )
+    extracted = fixture_root / "sources/extracted"
+    _safe_extract_zip(coco_annotations, extracted / "coco-annotations")
+    _safe_extract_zip(charades_annotations, extracted / "charades-annotations")
+    instances = json.loads(
+        (
+            extracted / "coco-annotations/annotations/instances_val2017.json"
+        ).read_text()
+    )
+    coco = _select_coco_object_sources(instances, preparation, repair)
+    _, _, visor_documents, visor_provenance = _load_visor_annotation_documents(
+        fixture_root, preparation
+    )
+    visor = _select_visor_fixtures(visor_documents, preparation)
+    old_manifest = json.loads(
+        (
+            args.public_root
+            / "public/manifests/charades-selection-manifest.json"
+        ).read_text()
+    )
+    excluded_subjects = {
+        row["subject"]
+        for rows in old_manifest["partitions"].values()
+        for row in rows
+    }
+    excluded_videos = {
+        row["id"]
+        for rows in old_manifest["partitions"].values()
+        for row in rows
+    }
+    action = _select_charades_action_fixtures(
+        _load_charades_rows(extracted / "charades-annotations"),
+        protocol["order_dependent_action_control"],
+        int(preparation["seed"]),
+        excluded_subjects,
+        excluded_videos,
+    )
+    subject_sets = {
+        partition: {
+            *(row["participant"] for row in visor[partition]),
+            *(row["subject"] for row in action[partition]),
+        }
+        for partition in preparation["partitions"]
+    }
+    video_sets = {
+        partition: {
+            *(row["video"] for row in visor[partition]),
+            *(row["video"] for row in action[partition]),
+        }
+        for partition in preparation["partitions"]
+    }
+    object_sets = {
+        partition: {row["image_id"] for row in coco[partition]}
+        for partition in preparation["partitions"]
+    }
+    audits = {
+        "source_subject_overlap_count": len(
+            subject_sets["development"] & subject_sets["holdout"]
+        ),
+        "source_video_overlap_count": len(
+            video_sets["development"] & video_sets["holdout"]
+        ),
+        "source_object_overlap_count": len(
+            object_sets["development"] & object_sets["holdout"]
+        ),
+    }
+    counts = {
+        partition: {
+            "coco_source": len(coco[partition]),
+            "visor": len(visor[partition]),
+            "action": len(action[partition]),
+        }
+        for partition in preparation["partitions"]
+    }
+    expected = {"coco_source": 32, "visor": 40, "action": 48}
+    failing = sum(
+        counts[partition][family] != count
+        for partition in preparation["partitions"]
+        for family, count in expected.items()
+    ) + sum(value != 0 for value in audits.values())
+    if failing:
+        raise RuntimeError("E_TUPLE_FIXTURE_FEASIBILITY_GATE")
+    record = {
+        "schema_version": 1,
+        "status": "PASS_ANNOTATION_ONLY_FIXTURE_FEASIBILITY",
+        "fixture_preparation_amendment_commitment_sha256": preparation[
+            "preparation_amendment_commitment_sha256"
+        ],
+        "fixture_feasibility_repair_commitment_sha256": repair[
+            "fixture_feasibility_repair_commitment_sha256"
+        ],
+        "public_fixture_protocol_commitment_sha256": protocol[
+            "protocol_commitment_sha256"
+        ],
+        "counts": counts,
+        "audits": audits,
+        "selections": {"coco": coco, "visor": visor, "action": action},
+        "visor_annotation_provenance": visor_provenance,
+        "model_inference_executed": False,
+        "media_rendering_executed": False,
+        "large_Charades_video_archive_downloaded": False,
+        "restricted_mount_present": False,
+    }
+    record["fixture_feasibility_commitment_sha256"] = digest(record)
+    write_private(fixture_root / "fixture-feasibility.json", record)
+    return {
+        "status": "PASS_ANNOTATION_ONLY_FIXTURE_FEASIBILITY",
+        "coco_source_count": sum(row["coco_source"] for row in counts.values()),
+        "visor_item_count": sum(row["visor"] for row in counts.values()),
+        "action_item_count": sum(row["action"] for row in counts.values()),
+        "partition_count": len(counts),
+        "failing_family_count": 0,
+        **audits,
+        "model_inference_executed": False,
+        "media_rendering_executed": False,
+        "restricted_mount_present": False,
+        "fixture_feasibility_commitment_sha256": record[
+            "fixture_feasibility_commitment_sha256"
+        ],
+    }
+
+
 def _prepare_coco_fixtures(
     fixture_root: Path,
     extracted: Path,
     preparation: dict[str, Any],
+    feasibility_repair: dict[str, Any],
     cfg: dict[str, Any],
     audio_files: dict[tuple[str, str, str], Path],
 ) -> tuple[dict[str, dict[str, list[dict[str, Any]]]], dict[str, set[int]]]:
@@ -2439,7 +2642,9 @@ def _prepare_coco_fixtures(
 
     instances_path = extracted / "coco-annotations/annotations/instances_val2017.json"
     instances = json.loads(instances_path.read_text())
-    coco_selected = _select_coco_object_sources(instances, preparation)
+    coco_selected = _select_coco_object_sources(
+        instances, preparation, feasibility_repair
+    )
     crop_records: dict[str, dict[str, list[dict[str, Any]]]] = {
         partition: {category: [] for category in preparation["public_object_ontology"]}
         for partition in preparation["partitions"]
@@ -2725,6 +2930,7 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
     amendment = _tuple_amendment(cfg)
     protocol = _tuple_fixture_protocol(cfg)
     preparation = _tuple_fixture_preparation_amendment(cfg)
+    feasibility_repair = _tuple_fixture_feasibility_repair(cfg)
     _verify_tuple_runtime_manifest(args.public_root, cfg)
     fixture_root = _tuple_fixture_root(args.public_root)
     fixture_root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -2752,7 +2958,12 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
     _safe_extract_zip(coco_images, extracted / "coco-images")
     _safe_extract_zip(charades_annotations, extracted / "charades-annotations")
     partitions, object_sets = _prepare_coco_fixtures(
-        fixture_root, extracted, preparation, cfg, audio_files
+        fixture_root,
+        extracted,
+        preparation,
+        feasibility_repair,
+        cfg,
+        audio_files,
     )
     visor, visor_provenance = _prepare_visor_fixtures(
         fixture_root, preparation
@@ -6694,6 +6905,9 @@ def main() -> None:
     tuple_fixtures_parser.add_argument("--public-root", type=Path, required=True)
     tuple_fixtures_parser.add_argument("--audio-seed-root", type=Path, required=True)
     tuple_fixtures_parser.add_argument("--config", type=Path, required=True)
+    tuple_feasibility_parser = subparsers.add_parser("tuple-fixtures-feasibility")
+    tuple_feasibility_parser.add_argument("--public-root", type=Path, required=True)
+    tuple_feasibility_parser.add_argument("--config", type=Path, required=True)
     run_parser = subparsers.add_parser("run")
     run_parser.add_argument("--restricted-root", type=Path, required=True)
     run_parser.add_argument("--public-root", type=Path, required=True)
@@ -6802,6 +7016,15 @@ def main() -> None:
                 value,
                 allowed_fields=TUPLE_FIXTURE_PREP_FIELDS,
                 sha256_fields=TUPLE_FIXTURE_PREP_HASH_FIELDS,
+            )
+        )
+    elif args.command == "tuple-fixtures-feasibility":
+        value = prepare_tuple_fixture_feasibility(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=TUPLE_FIXTURE_FEASIBILITY_FIELDS,
+                sha256_fields=TUPLE_FIXTURE_FEASIBILITY_HASH_FIELDS,
             )
         )
     elif args.command == "run":

@@ -228,3 +228,10 @@ with official COCO archive bytes pinned, selective VISOR files hash-recorded,
 the existing Charades-Ego identities retained, and self-authored German audio
 sealed outside Git. This preparation stage has opened no model outcome and
 uses no restricted mount.
+
+The first render preparation stopped before media creation because the frozen
+3% COCO source-area floor under-yielded development sports-ball crops. The
+stop is preserved. Prospective repair `e5fd286e…7048` removes only that
+non-estimand floor while retaining the 48-pixel source-detail floor, then
+requires one complete annotation-only COCO/VISOR/Charades feasibility pass
+before any render or model inference.
