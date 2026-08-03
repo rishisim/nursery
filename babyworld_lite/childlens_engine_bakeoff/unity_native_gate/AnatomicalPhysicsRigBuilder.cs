@@ -122,6 +122,49 @@ public static class AnatomicalPhysicsRigBuilder
         EditorApplication.Exit(report.passed ? 0 : 2);
     }
 
+    [MenuItem("BabyWorld/Capture Anatomical Rig Failure Evidence")]
+    public static void CaptureFailureEvidence()
+    {
+        RequireEnvironment(); Directory.CreateDirectory(Output);
+        string cleanDir=Path.Combine(Output,"stage_a_clean_frames"),overlayDir=Path.Combine(Output,"stage_a_overlay_frames"),waypointDir=Path.Combine(Output,"stage_b_waypoint_frames");
+        Directory.CreateDirectory(cleanDir);Directory.CreateDirectory(overlayDir);Directory.CreateDirectory(waypointDir);
+        var evidence=new List<EvidenceFrame>(); int cleanFrame=0,waypointFrame=0;
+        Build(); var camera=EvidenceCamera(); var label=EvidenceLabel(camera); var overlay=BuildLiveOverlay();
+        int dofOrdinal=0,totalDofs=controlled.Sum(x=>x.dofCount);
+        for(int jointIndex=0;jointIndex<controlled.Count;jointIndex++){
+            var body=controlled[jointIndex];
+            for(int axis=0;axis<body.dofCount;axis++){
+                dofOrdinal++;
+                ZeroTargets();Simulate(96);var drive=Drive(body,axis);
+                for(int sample=0;sample<12;sample++){
+                    float phase=sample/11f;float target=phase<.5f?Mathf.Lerp(drive.lowerLimit*.65f,drive.upperLimit*.65f,phase*2):Mathf.Lerp(drive.upperLimit*.65f,0,(phase-.5f)*2);
+                    SetDrive(body,axis,drive,target);Simulate(8);FollowSkin();
+                    label.text=$"STAGE A PASS  |  DOF {dofOrdinal}/{totalDofs}  {body.name} axis {axis}\nlimits [{drive.lowerLimit:F0}, {drive.upperLimit:F0}] deg  target {target:F1} deg  q {body.jointPosition[axis]*Mathf.Rad2Deg:F1} deg";
+                    overlay.SetActive(false);CaptureEvidenceFrame(camera,Path.Combine(cleanDir,$"frame_{cleanFrame:D4}.png"));
+                    overlay.SetActive(true);CaptureEvidenceFrame(camera,Path.Combine(overlayDir,$"frame_{cleanFrame:D4}.png"));
+                    evidence.Add(new EvidenceFrame{chapter="stage_a_dof",frame=cleanFrame,trial=jointIndex,joint=body.name,axis=axis,target_deg=target,observed_deg=body.jointPosition[axis]*Mathf.Rad2Deg});cleanFrame++;
+                }
+            }
+        }
+        Build();Simulate(720);Vector3 origin=physicalSites["palm"].position;Quaternion originRotation=physicalSites["palm"].rotation;
+        Vector3[] offsets={new(.00f,.00f,.00f),new(.025f,.015f,.015f),new(-.02f,.02f,.025f),new(.015f,-.015f,.035f),new(-.015f,.005f,.05f)};
+        for(int trial=0;trial<offsets.Length;trial++){
+            Build();Simulate(720);camera=EvidenceCamera();label=EvidenceLabel(camera);overlay=BuildLiveOverlay();overlay.SetActive(true);
+            Vector3 target=origin+offsets[trial];var targetMarker=Marker("TARGET_RED",target,new Color(.95f,.03f,.03f),.012f);var observedMarker=Marker("OBSERVED_BLUE",physicalSites["palm"].position,new Color(.02f,.25f,1f),.010f);
+            var trailObject=new GameObject("OBSERVED_TRAIL_BLUE");var trail=trailObject.AddComponent<LineRenderer>();trail.material=new Material(Shader.Find("Sprites/Default"));trail.startColor=trail.endColor=new Color(.02f,.25f,1f);trail.startWidth=.0035f;trail.endWidth=.0035f;trail.positionCount=0;
+            for(int frame=0;frame<120;frame++){
+                for(int step=0;step<8;step++){DlsStep(target);Simulate(1);}Vector3 observed=physicalSites["palm"].position;observedMarker.transform.position=observed;trail.positionCount=frame+1;trail.SetPosition(frame,observed);
+                float positionError=Vector3.Distance(target,observed),orientationError=Quaternion.Angle(physicalSites["palm"].rotation,originRotation);
+                label.text=$"STAGE B NO-GO  |  fresh-state waypoint {trial+1}/5\nRED target  BLUE observed/trail  |  pos {positionError*1000:F1} mm  orient {orientationError:F1} deg";
+                CaptureEvidenceFrame(camera,Path.Combine(waypointDir,$"frame_{waypointFrame:D4}.png"));
+                evidence.Add(new EvidenceFrame{chapter="stage_b_waypoint",frame=waypointFrame,trial=trial,target_m=target,observed_m=observed,position_error_m=positionError,orientation_error_deg=orientationError});waypointFrame++;
+            }
+        }
+        File.WriteAllText(Path.Combine(Output,"evidence_frame_ledger.json"),JsonUtility.ToJson(new EvidenceTrace{rows=evidence.ToArray()},true));
+        File.WriteAllText(Path.Combine(Output,"evidence_capture_report.json"),JsonUtility.ToJson(new EvidenceReport{schema="embodied.anatomical_rig.failure_evidence.v1",unity_version=Application.unityVersion,stage_a_frames=cleanFrame,stage_b_frames=waypointFrame,stage_a_clean_and_overlay_same_state=true,physics_hz=240,render_hz=30,steps_per_frame=8,stage_b_decision="NO-GO"},true));
+        EditorApplication.Exit(0);
+    }
+
     static void RequireEnvironment() { if (string.IsNullOrWhiteSpace(Output) || string.IsNullOrWhiteSpace(ManifestPath)) throw new Exception("ANATOMICAL_RIG_OUTPUT and ANATOMICAL_RIG_MANIFEST are required"); }
     static void Build()
     {
@@ -200,6 +243,11 @@ public static class AnatomicalPhysicsRigBuilder
     static float Quantile(List<float> x,float q){var a=x.OrderBy(v=>v).ToArray();return a[Mathf.RoundToInt((a.Length-1)*q)];}
     static string Sha256(string path){using var h=SHA256.Create();return BitConverter.ToString(h.ComputeHash(File.ReadAllBytes(path))).Replace("-","").ToLowerInvariant();}
     static void RenderExternal(string name,bool overlay){foreach(var r in avatar.GetComponentsInChildren<Renderer>(true))r.enabled=true;var camera=new GameObject("qa_camera").AddComponent<Camera>();camera.transform.position=new Vector3(.9f,1.05f,.8f);camera.transform.LookAt(new Vector3(.25f,.72f,.15f));camera.fieldOfView=42;var light=new GameObject("light").AddComponent<Light>();light.type=LightType.Directional;light.intensity=1.2f;light.transform.rotation=Quaternion.Euler(45,-30,0);if(overlay)foreach(var c in colliderBindings){var v=GameObject.CreatePrimitive(PrimitiveType.Sphere);UnityEngine.Object.DestroyImmediate(v.GetComponent<Collider>());v.transform.position=c.collider.bounds.center;v.transform.localScale=c.collider.bounds.size;var m=new Material(Shader.Find("Standard"));m.color=new Color(0,.8f,.2f,.35f);v.GetComponent<Renderer>().sharedMaterial=m;}var rt=new RenderTexture(960,540,24);var tex=new Texture2D(960,540,TextureFormat.RGB24,false);camera.targetTexture=rt;camera.Render();RenderTexture.active=rt;tex.ReadPixels(new Rect(0,0,960,540),0,0);tex.Apply();File.WriteAllBytes(Path.Combine(Output,name),tex.EncodeToPNG());RenderTexture.active=null;UnityEngine.Object.DestroyImmediate(rt);UnityEngine.Object.DestroyImmediate(tex);}
+    static Camera EvidenceCamera(){var c=new GameObject("evidence_camera").AddComponent<Camera>();c.transform.position=new Vector3(.9f,1.05f,.8f);c.transform.LookAt(new Vector3(.25f,.72f,.15f));c.fieldOfView=42;c.nearClipPlane=.02f;var light=new GameObject("evidence_light").AddComponent<Light>();light.type=LightType.Directional;light.intensity=1.2f;light.transform.rotation=Quaternion.Euler(45,-30,0);return c;}
+    static TextMesh EvidenceLabel(Camera camera){var go=new GameObject("EVIDENCE_LABEL");go.transform.SetParent(camera.transform,false);go.transform.localPosition=new Vector3(-.70f,.39f,1.25f);go.transform.localRotation=Quaternion.identity;go.transform.localScale=Vector3.one*.040f;var t=go.AddComponent<TextMesh>();t.anchor=TextAnchor.UpperLeft;t.alignment=TextAlignment.Left;t.fontSize=64;t.characterSize=.09f;t.color=Color.white;return t;}
+    static GameObject BuildLiveOverlay(){var root=new GameObject("QA_ONLY_LIVE_COLLIDER_OVERLAY");foreach(var binding in colliderBindings){var sphere=(SphereCollider)binding.collider;var v=GameObject.CreatePrimitive(PrimitiveType.Sphere);v.name="QA_ONLY_"+binding.visualBone;UnityEngine.Object.DestroyImmediate(v.GetComponent<Collider>());v.transform.SetParent(sphere.transform,false);v.transform.localPosition=sphere.center;v.transform.localRotation=Quaternion.identity;v.transform.localScale=Vector3.one*sphere.radius*2;var m=new Material(Shader.Find("Standard"));m.color=new Color(.02f,.9f,.25f,.55f);v.GetComponent<Renderer>().sharedMaterial=m;v.transform.SetParent(root.transform,true);}return root;}
+    static GameObject Marker(string name,Vector3 position,Color color,float diameter){var v=GameObject.CreatePrimitive(PrimitiveType.Sphere);v.name=name;UnityEngine.Object.DestroyImmediate(v.GetComponent<Collider>());v.transform.position=position;v.transform.localScale=Vector3.one*diameter;var m=new Material(Shader.Find("Standard"));m.color=color;m.EnableKeyword("_EMISSION");m.SetColor("_EmissionColor",color);v.GetComponent<Renderer>().sharedMaterial=m;return v;}
+    static void CaptureEvidenceFrame(Camera camera,string path){var rt=new RenderTexture(960,540,24);var tex=new Texture2D(960,540,TextureFormat.RGB24,false);camera.targetTexture=rt;camera.Render();RenderTexture.active=rt;tex.ReadPixels(new Rect(0,0,960,540),0,0);tex.Apply();File.WriteAllBytes(path,tex.EncodeToPNG());camera.targetTexture=null;RenderTexture.active=null;UnityEngine.Object.DestroyImmediate(rt);UnityEngine.Object.DestroyImmediate(tex);}
 
     struct ColliderBinding { public Collider collider; public string visualBone; }
     struct AuditBody { public string name;public int index,dofs; }
@@ -213,4 +261,7 @@ public static class AnatomicalPhysicsRigBuilder
     [Serializable] class WaypointTrace { public WaypointRow[] rows; }
     [Serializable] class WaypointRow { public Vector3 target_m,observed_m;public float position_error_m,orientation_error_deg;public bool collision_free; }
     [Serializable] class StageBReport { public string schema,unity_version;public int jacobian_rows,waypoint_count;public float jacobian_max_direction_error_deg,jacobian_max_relative_magnitude_error,palm_position_max_error_m,palm_orientation_max_error_deg;public bool all_waypoints_collision_free,passed; }
+    [Serializable] class EvidenceTrace { public EvidenceFrame[] rows; }
+    [Serializable] class EvidenceFrame { public string chapter,joint;public int frame,trial,axis;public float target_deg,observed_deg,position_error_m,orientation_error_deg;public Vector3 target_m,observed_m; }
+    [Serializable] class EvidenceReport { public string schema,unity_version,stage_b_decision;public int stage_a_frames,stage_b_frames,physics_hz,render_hz,steps_per_frame;public bool stage_a_clean_and_overlay_same_state; }
 }

@@ -46,21 +46,47 @@ condition, not a scene-layout reinterpretation.
 
 Root: `runs/embodied_simulation/anatomical_physics_gate/`
 
-- `stage_a_final3/stage_a_report.json` — SHA-256
+- `stage_a/stage_a_report.json` — SHA-256
   `5dfcda2489ab3a5396c4913f9b860c0a2568d87ccc5ba3946f452f87ea86730d`
-- `stage_a_final3/stage_a_sweep.json` — SHA-256
+- `stage_a/stage_a_sweep.json` — SHA-256
   `43ef607432b3e577249263187951b80bae370949b36484268bc23bfeb632aa12`
-- `stage_b_repair3/stage_b_report.json` — SHA-256
+- `stage_b/stage_b_report.json` — SHA-256
   `c05ca65fba37eddde41ca83c631492c7fdb1039e0beafdc568bf13fd9f585b93`
-- `stage_b_repair3/stage_b_jacobian.json` — SHA-256
+- `stage_b/stage_b_jacobian.json` — SHA-256
   `de4ccad0002bf67c9a51b57f25ef40262b27970e3e651d3db4d1fb1f4e97a005`
-- `stage_b_repair3/stage_b_waypoints.json` — SHA-256
+- `stage_b/stage_b_waypoints.json` — SHA-256
   `756d984ea56fb5630519036ef6ebbea4e146bbc4749847270a357000312be1d4`
-- `failure_media/stage_b_no_go_diagnostic.mp4` — 6.0 s, 1920x1080,
-  30 fps, 180 frames; SHA-256
-  `e9a56bcf190447230845296672b1b4b15a40c4ddcf2ca11360a8a993f596f0b8`.
-  It is explicitly a three-state failure diagnostic (clean Stage A, Stage A
-  collider overlay, final Stage B waypoint state), not manipulation footage.
+- `stage_b/evidence/capture_report.json` — SHA-256
+  `7c4daabf493f2ea405b2b070944cedb6eb30513318507069d98c2b5bc342cda4`
+- `stage_b/evidence/frame_ledger.json` — SHA-256
+  `4816e9fdafc659d07bf1e5c82658d5366b58781f520319440db61a27895a775c`
+- `failure_media/stage_a_dof_sweeps.mp4` — 8.8 s, 1920x1080,
+  30 fps, 264 frames; SHA-256
+  `5115d0d044669ff0a2ed8c463aaecb1c1f01e22d9bd7311ad9d67d76118a415a`.
+- `failure_media/stage_b_waypoint_failures.mp4` — 20.0 s, 1920x1080,
+  30 fps, 600 frames; SHA-256
+  `b6d2e464ca0823bdb2c4d222cfcee3d98e060a44a2cf2230936a8aefcb6ee5aa`.
+- `failure_media/anatomical_rig_stage_b_no_go_diagnostic.mp4` — 28.8 s,
+  1920x1080, 30 fps, 864 frames; SHA-256
+  `ab7dabac71e5f63ab850c1cf8912e552b684fbaefd571e5ba2212f34b343d43a`.
+- `failure_media/combined_dense_timeline.png` — one-second dense timeline;
+  SHA-256
+  `20471d86f020b0ae1fe22eb5f143d7e9aba0e524f3b1e950aaf8be0cd65334c4`.
+
+These are explicitly labeled failure diagnostics, not manipulation footage.
+Stage A shows all 22 controlled DOFs with joint/axis/limit/target labels; its
+clean and collider-overlay halves are rendered from each identical frozen
+engine state without stepping between passes. Stage B shows five separately
+rebuilt and 720-step-settled waypoint trials, each for 120 frames with the red
+target, blue observed palm/trail, and live position/orientation error. The
+capture replay's final trial errors were 0.043, 31.817, 31.159, 54.267, and
+26.085 mm, with 0.575, 25.642, 35.063, 78.807, and 14.398 degrees orientation
+error. This independently visible replay also fails; the ordered gate table
+continues to report the authoritative qualification receipt above.
+
+The ignored run root is consolidated to `stage_a/`, `stage_b/`,
+`failure_media/`, and the runnable `project/`. Task-created superseded attempt
+directories and the earlier static-state MP4 were removed from the run root.
 
 ## Absent downstream deliverables
 
