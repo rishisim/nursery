@@ -1,7 +1,7 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_AMBITIOUS_LEARNER_EFFECTIVE_H3_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_GENERATION_LICENSE_BLOCKED_NO_NEW_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_RESUME_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -93,6 +93,24 @@
     "public_extractor_or_C_outcome_opened": false,
     "H3_weight_download_or_inference_run": false,
     "synthetic_generation_run": false,
+    "synthetic_learner_run": false
+  },
+  "prospective_construct_aligned_ltx_resume_extension": {
+    "status": "FROZEN_NO_NEW_SCIENTIFIC_OUTCOME",
+    "effective_on": "2026-08-03",
+    "canonical_config": "configs/synthetic_video_real_only_proof.json schema 16",
+    "amendment_commitment_sha256": "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39",
+    "prior_real_gate_preserved": true,
+    "all_prior_calibration_no_gos_preserved": true,
+    "prior_complete_source_no_go_preserved": "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37",
+    "prior_H3_amendment_preserved_and_shelved": "d907d2479ba88c7e51d25e935e429cb5860e550a82620313e502482383e2855d",
+    "scientific_change": "the exact existing 44-development and 44-holdout order-action fixtures remain a supporting nonblocking diagnostic; the combined learner-effective decision remains all five critical axes plus at least six of seven axes",
+    "selected_generator": "LTX-2.3-22B-Distilled-1.1",
+    "generator_selection_role": "latest_user_directed_local_fallback_not_bakeoff_winner",
+    "bakeoff_scores": {"Gemini": 27, "MiniMax_H3": 25, "Seedance": 24, "LTX": 19},
+    "public_extractor_or_C_outcome_opened": false,
+    "no_hand_visual_review_opened": false,
+    "LTX_preflight_or_generation_run": false,
     "synthetic_learner_run": false
   },
   "governed_C_calibration": {
@@ -670,5 +688,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "IMPLEMENT_AND_TEST_THE_SCHEMA_15_LEARNER_EFFECTIVE_RUNNER_WITHOUT_OVERWRITING_PRIOR_NO_GOS; PUBLIC QUALIFICATION_THEN_REQUIRES_ITS_OWN_VERIFIED_COMMIT; GOVERNED_C_IS_CONDITIONAL_ON_PUBLIC_PASS; MINIMAX_H3_WEIGHT_DOWNLOAD_INFERENCE_GENERATION_AND_SYNTHETIC_LEARNER_ARE_BLOCKED_PENDING_WRITTEN_LICENSE"
+  "next_authorized_scope": "IMPLEMENT_AND_TEST_THE_SCHEMA_16_EXACT_SOURCE_REUSE_AND_NONBLOCKING_ACTION_DIAGNOSTIC_GUARDS_WITHOUT_OVERWRITING_PRIOR_NO_GOS; THEN_COMPLETE_BLIND_NO_HAND_REVIEW_AND_PUBLIC_QUALIFICATION; GOVERNED_C_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
 }

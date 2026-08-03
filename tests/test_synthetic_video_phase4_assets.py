@@ -93,8 +93,8 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["schema_version"] == 3
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_AMBITIOUS_LEARNER_EFFECTIVE_H3_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_GENERATION_LICENSE_BLOCKED_NO_NEW_OUTCOME"
+    assert result["schema_version"] == 4
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_RESUME_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -110,6 +110,8 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert result["post_gate_descriptive_extension"]["prior_stop_preserved"] == "REAL_1H_FORMAL_GATE_AND_ALL_FOUR_CALIBRATION_NO_GOS_PRESERVED"
     assert result["prospective_ambitious_h3_extension"]["all_prior_calibration_no_gos_preserved"] is True
     assert result["prospective_ambitious_h3_extension"]["H3_weight_download_or_inference_run"] is False
+    assert result["prospective_construct_aligned_ltx_resume_extension"]["all_prior_calibration_no_gos_preserved"] is True
+    assert result["prospective_construct_aligned_ltx_resume_extension"]["LTX_preflight_or_generation_run"] is False
     tuple_amendment = result["governed_C_mechanistic_training_tuple_amendment"]
     assert tuple_amendment["status"] == "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     assert len(tuple_amendment["prior_no_go_commitments_preserved"]) == 4
@@ -295,7 +297,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "PROSPECTIVE_AMBITIOUS_LEARNER_EFFECTIVE_H3_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_H3_US_AND_OUTPUT_TRAINING_LICENSE_BLOCKED_NO_NEW_OUTCOME"
+    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_RESUME_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_NO_NEW_OUTCOME"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,
@@ -311,10 +313,8 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["learner"]["seeds"] == [436034264, 1285938051, 151347827]
     assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
-    assert proof["generator_gate"]["selected"] == (
-        "MiniMax-H3-Base-Ref2VA-open-weights-via-native-ComfyUI"
-    )
-    assert proof["schema_version"] == 15
+    assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
+    assert proof["schema_version"] == 16
     premodel = proof["calibration_C"]["extractor"]["mechanistic_training_tuple_premodel_result"]
     assert premodel["dependency_manifest_commitment_sha256"] == (
         "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"
@@ -322,36 +322,22 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert premodel["counts"]["artifact_bytes"] == 14621041722
     assert premodel["counts"]["egohos_archive_license_file_count"] == 0
     assert premodel["model_inference_executed"] is False
-    assert proof["generator_gate"]["status"] == (
-        "SELECTED_PROSPECTIVELY_BLOCKED_PENDING_WRITTEN_US_TERRITORY_AND_OUTPUT_TRAINING_LICENSE"
-    )
+    assert proof["generator_gate"]["status"].startswith("SELECTED_LOCAL_NOT_RUN")
     assert proof["generator_gate"]["implementation"]["commit"] == (
-        "14b05228cef127ce529bc0c08660770d4af3e9a8"
+        "9377758131b1ffde4b7f766804590a6617bf2ab9"
     )
     assert proof["generator_gate"]["weights"]["revision"] == (
-        "0543966fbdce5ba05709a8f2031c94bdba629b4a"
-    )
-    assert proof["generator_gate"]["weights"]["required_bytes"] == 42470585471
-    assert sum(
-        item["bytes"]
-        for item in proof["generator_gate"]["weights"]["required_files"].values()
-    ) == proof["generator_gate"]["weights"]["required_bytes"]
-    assert proof["generator_gate"]["official_release"]["license_sha256"] == (
-        "59b99642b95ea21630e311198ddbfffbfe05aadba0c2f5d884cbdf4efcc90f44"
-    )
-    assert proof["generator_gate"]["implementation"]["version"] == "0.30.0"
-    assert proof["generator_gate"]["implementation"]["manager_cloud_partner_nodes"] == (
-        "PROHIBITED"
+        "4229404625088d21c4f112eb640fb04a0900ee25"
     )
     assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["accepted_credited_seconds_exact"] == 3600
-    assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["raw_generated_seconds_max"].startswith("PENDING_")
-    assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["attempts_max"].startswith("PENDING_")
-    assert "MiniMax H3 scored 25/28" in proof["generator_gate"]["bakeoff_interpretation"]
-    assert proof["generator_gate"]["license_gate"]["weight_download_or_inference_before_resolution"] == "PROHIBITED"
+    assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["raw_generated_seconds_max"] == 5399.625
+    assert proof["generator_gate"]["production_ceiling_provisional_until_preflight"]["attempts_max"] == 1071
+    assert "LTX 19/28" in proof["generator_gate"]["bakeoff_interpretation"]
+    assert proof["ambitious_learner_effective_h3_amendment"]["amendment_commitment_sha256"] == "d907d2479ba88c7e51d25e935e429cb5860e550a82620313e502482383e2855d"
     assert proof["generator_gate"]["no_substitution"] is True
     assert proof["calibration_C"]["source"] == "development_set_C_only_never_training_validation_or_evaluation"
     assert proof["calibration_C"]["local_generator_gate"] == (
-        "BLOCKED_PENDING_AMBITIOUS_PUBLIC_AND_C_PASS_PLUS_WRITTEN_MINIMAX_US_TERRITORY_AND_OUTPUT_TRAINING_LICENSE"
+        "CONDITIONAL_ON_CONSTRUCT_ALIGNED_COMBINED_PUBLIC_AND_C_PASS_PLUS_LTX_FINAL_TOPOLOGY_PREFLIGHT"
     )
     fixture_source_no_go = proof["calibration_C"]["extractor"][
         "mechanistic_training_tuple_fixture_feasibility_result"

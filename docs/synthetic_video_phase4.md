@@ -314,18 +314,18 @@ control after observing this result. Consequently public model development and
 holdout, governed C, LTX preflight or generation, and the Synthetic-1h learner
 were not run. No downstream operation is authorized under this frozen route.
 
-### Prospective ambitious route and MiniMax H3 gate
+### Prospective ambitious route and MiniMax H3 gate — historical, unexecuted
 
 The complete source no-go above remains final. A 2026-08-03 prospective
 amendment (`d907d247…e2855d`) now preserves its 44/44 action inventory as a
 nonblocking supporting diagnostic rather than claiming that the prior
-48-per-partition requirement passed. The active combined gate is all five
+48-per-partition requirement passed. The then-prospective combined gate was all five
 critical learner-effective axes plus at least six of seven axes, with integrity
 and privacy checks blocking. Broad activity and global visual similarity are
 descriptive. The action-direction diagnostic cannot rescue any failed axis or
 contribute an extra axis.
 
-The active end-to-end goal is deliberately ambitious: finish public
+The then-prospective end-to-end goal was deliberately ambitious: finish public
 development and sealed holdout qualification, the blind governed C transfer
 audit, disclosure-safe C target measurement, feature-matched episode planning,
 exactly 3,600 accepted synthetic seconds, and the same three matched learner
@@ -354,3 +354,35 @@ preflight runs, or synthetic media is generated. Public learner-effective
 extractor qualification is independent of that license, but it unlocks only
 after the canonical runner implements and tests the new nonblocking diagnostic
 role without overwriting the prior source no-go.
+
+### Construct-aligned LTX resume amendment
+
+The MiniMax-H3 amendment above remains an immutable prospective history item;
+no H3 weight download, inference, or generator outcome occurred. Before any
+new public extractor, C, generator, or synthetic-learner outcome, the user
+prospectively restored locally governed LTX-2.3 as the fallback generator. The
+active amendment is sealed at `842d5a16…81a39` and preserves the H3 amendment
+at `d907d247…e2855d`, the complete-source no-go at `5f4aeff2…13b37`, every
+earlier calibration no-go, and the formal Real-1h failure.
+
+The scientific hierarchy is unchanged: all five critical learner-effective
+axes must pass and at least six of seven axes must validate. The exact existing
+44-development and 44-holdout action fixtures are retained without source or
+label substitution as a supporting diagnostic only. Development uses the
+already frozen action grid. If no grid point meets the unchanged action floors,
+the deterministic maximum-macro-F1 and then higher-margin fallback is sealed
+solely so the same failed diagnostic can be opened once on holdout. Validly
+measured action performance cannot block or rescue the combined learner-effective
+decision. Decode, inference, serialization, provenance, privacy, nonfinite,
+silent-truncation, or external-call failures remain blocking integrity failures.
+
+Only a combined public pass may authorize the governed C transfer audit and
+measurement. Only a combined C pass may authorize a public-word episode-plan
+commitment and LTX final-topology preflight. The generator remains pinned to
+`Lightricks/LTX-2@9377758131b1ffde4b7f766804590a6617bf2ab9`,
+`Lightricks/LTX-2.3@4229404625088d21c4f112eb640fb04a0900ee25`, and
+`google/gemma-3-12b-it-qat-q4_0-unquantized@68f7ee4fbd59087436ada77ed2d62f373fdd4482`.
+The completed bakeoff remains Gemini 27/28, MiniMax 25/28, Seedance 24/28,
+and LTX 19/28; choosing LTX locally is not a quality-ranking revision. No more
+than 3,600 accepted credited synthetic seconds and the same three 4,668-step
+learner seeds are permitted, with descriptive exploratory reporting only.

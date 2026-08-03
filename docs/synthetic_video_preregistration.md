@@ -1444,7 +1444,7 @@ one accepted synthetic hour, and Synthetic-1h learner training remain unrun and
 unauthorized. A future route would require a new explicit prospective user
 authorization; it cannot be represented as this recipe passing.
 
-### Ambitious learner-effective descriptive extension — prospective amendment
+### Ambitious learner-effective descriptive extension — historical H3 amendment
 
 On 2026-08-03, before any public extractor, governed C, newly selected
 generator, or synthetic learner outcome, the user authorized a new
@@ -1529,3 +1529,38 @@ contract. The final goal is a complete initialized/Real-1h/Synthetic-1h
 descriptive result—not a memo or preflight—but it cannot support equivalence,
 noninferiority, same-quality, directionally-competitive, or confirmatory
 language.
+
+### Construct-aligned learner-effective LTX resume — prospective amendment
+
+The MiniMax-H3 selection and license record above remains preserved exactly as
+a prospective, unexecuted history item. Before any new public extractor,
+governed C, generator, corpus, or synthetic learner outcome, the user restored
+locally governed LTX-2.3 as the conditional fallback. This schema-16 amendment
+is committed at `842d5a16…81a39`; it preserves the H3 amendment
+`d907d247…e2855d`, the complete-source no-go `5f4aeff2…13b37`, every earlier
+no-go, the corrected Phase-4 asset seals, and the formal Real-1h failure.
+
+The existing 44-development and 44-holdout action fixtures remain
+subject/video-disjoint and are not replaced or relabeled. Their ordered,
+reversed, and repeated-frame scores are a supporting nonblocking diagnostic:
+they do not enter the five-critical-plus-six-of-seven gate and cannot rescue
+any axis. Development uses only the frozen margin grid. If no point meets all
+unchanged action floors, the maximum action macro-F1 with the existing
+higher-margin tie-break is sealed solely as a diagnostic threshold so holdout
+is still evaluated once. Performance failure remains `NO_GO_DIAGNOSTIC` but is
+nonblocking. Any action decode, inference, serialization, nonfinite,
+silent-truncation, provenance, privacy, or external-call failure remains a
+blocking integrity failure.
+
+The combined public gate still requires all five critical axes and at least
+six of seven learner-effective axes. Broad activity/context remains
+descriptive. Only a combined public pass authorizes the single-applicant blind
+C transfer audit; only a passing transfer audit and combined C calibration
+authorize feature-matched episode planning. LTX then requires immutable local
+artifact and license verification plus a public/dummy final-topology preflight
+that freezes exact GPU topology, wall time, GPU hours, storage, attempt/retry
+ceilings, and cost. The corpus remains capped at exactly 3,600 accepted
+credited seconds and 1,244 learner records reused across the same three public
+seeds and 4,668-step learner contract. The result remains descriptive and may
+not be called directionally competitive, equivalent, noninferior, same quality,
+or confirmatory.

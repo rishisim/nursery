@@ -38,8 +38,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 6
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_AMBITIOUS_LEARNER_EFFECTIVE_H3_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED_GENERATION_LICENSE_BLOCKED"
+    assert config["schema_version"] == 7
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_RESUME_AMENDMENT_FROZEN_PRIOR_NO_GOS_PRESERVED"
     validate_phase_state(config)
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
@@ -244,8 +244,8 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 15
-    amendment = config["ambitious_learner_effective_h3_amendment"]
+    assert config["schema_version"] == 16
+    amendment = dict(config["ambitious_learner_effective_h3_amendment"])
     commitment = amendment.pop("amendment_commitment_sha256")
     assert commitment == canonical_json_sha256(amendment)
     assert commitment == "d907d2479ba88c7e51d25e935e429cb5860e550a82620313e502482383e2855d"
@@ -255,6 +255,16 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert amendment["hierarchy"]["public_and_governed_C_combined_pass_rule"].startswith(
         "all five critical axes pass"
     )
+    active = dict(config["construct_aligned_ltx_resume_amendment"])
+    active_commitment = active.pop("amendment_commitment_sha256")
+    assert active_commitment == canonical_json_sha256(active)
+    assert active_commitment == (
+        "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39"
+    )
+    assert active["combined_gate"]["order_action"].startswith(
+        "SUPPORTING_DIAGNOSTIC_NONBLOCKING"
+    )
+    assert active["generator"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"
@@ -279,12 +289,17 @@ def test_active_tuple_contract_is_not_confused_with_legacy_broad_calibration() -
         assert value is not None
 
     results = json.loads(Path("results/synthetic_video_phase4.json").read_text())
-    active = results["prospective_ambitious_h3_extension"]
-    assert active["amendment_commitment_sha256"] == (
+    historical = results["prospective_ambitious_h3_extension"]
+    assert historical["amendment_commitment_sha256"] == (
         "d907d2479ba88c7e51d25e935e429cb5860e550a82620313e502482383e2855d"
     )
-    assert active["order_action_counts_reused_without_substitution"] == {
+    assert historical["order_action_counts_reused_without_substitution"] == {
         "development": 44,
         "holdout": 44,
     }
-    assert active["H3_weight_download_or_inference_run"] is False
+    assert historical["H3_weight_download_or_inference_run"] is False
+    active = results["prospective_construct_aligned_ltx_resume_extension"]
+    assert active["amendment_commitment_sha256"] == (
+        "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39"
+    )
+    assert active["selected_generator"] == "LTX-2.3-22B-Distilled-1.1"
