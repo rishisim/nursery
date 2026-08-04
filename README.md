@@ -218,6 +218,26 @@ were +59/-26 samples, within one 1,024-sample AAC frame. The audit passed with
 no further diagnostic required. Runner SHA-256 is now `1897c40b…6768`; the full
 deterministic fixture retry is authorized, with all later outputs still absent.
 
+That retry, job 315462, stopped `1:0` after 159 seconds on
+`E_TUPLE_VISOR_GEOMETRY` while rasterizing official VISOR-HOS hand polygons,
+still before a fixture manifest, model inference, or any development,
+threshold, or holdout outcome. Aggregate-only job 315468 confirmed 288 selected
+fixtures, 192 visible-hand fixtures, and 169 cached visible-hand frames: 9 met
+the former strict half-open vertex check, 148 met the official continuous
+boundary-inclusive rule, 139 failed only because a vertex equaled the declared
+width or height, 21 had positive canvas overshoot, and none had negative
+coordinates. The prospective repair is pinned to
+`VISOR-HOS@8566507382add7dd037a83e7233950e0ad1ea78e` and `data_util.py`
+SHA-256 `76e6d1a1…3b40`: NumPy 1.26.4 truncating `int32` conversion followed by
+one OpenCV 4.10.0.84 `fillPoly` call over the complete unchanged contour list
+on an exact source-sized canvas, with no manual clipping, tolerance, scaling,
+or PIL fallback. Only the final union must be nonempty; outside-canvas component
+counts are diagnostic and cannot change source eligibility. Strict
+pre-model checks require exact PNG/source dimensions and binary nonempty
+array-equal serialization round trips. Fixture schema 3 binds repair commitment
+`84673942…42ddd9`; runner SHA-256 is `fc7f0156…e5396f4`. The deterministic fixture
+retry is authorized under that frozen repair only.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

@@ -1643,6 +1643,40 @@ diagnostic required. Runner SHA-256 is now `1897c40b…6768`; full deterministic
 fixture retry is authorized while every fixture, development, threshold,
 holdout, and model output remains absent.
 
+Job 315462 then reached the official VISOR-HOS polygon-to-truth-mask step and
+stopped `1:0` after 159 seconds with `E_TUPLE_VISOR_GEOMETRY`, before writing a
+fixture manifest, loading a public model, or opening any development,
+threshold, or holdout outcome. Aggregate-only diagnostic job 315468 reported
+288 selected fixtures, 192 visible-hand fixtures, and 169 cached visible-hand
+frames. Of those cached frames, 9 satisfied the former strict half-open
+all-vertices-in-bounds check, 148 satisfied the official continuous
+boundary-inclusive rule, 139 failed only on coordinates exactly equal to the
+declared width or height, 21 contained positive canvas overshoot, and 0
+contained negative coordinates. This is a pre-manifest engineering failure,
+not a scientific no-go; no source item, label, partition, threshold, learner,
+generator, C, or evaluation contract changed.
+
+The prospective retry freezes the semantic reference at
+`VISOR-HOS@8566507382add7dd037a83e7233950e0ad1ea78e`, archive SHA-256
+`6e588c80…88e`, and `data_util.py` SHA-256 `76e6d1a1…3b40`, used under the
+existing reference-only/no-upstream-code-copy boundary. Every unchanged,
+finite, nonnegative official source polygon whose truncated coordinates fit
+signed `int32` is converted with NumPy 1.26.4 truncating `int32` semantics;
+the complete unchanged contour list is rasterized in one OpenCV 4.10.0.84
+`fillPoly` call on an exact source-height-by-source-width `uint8` canvas. Manual
+clipping, coordinate tolerance, scaling, and a PIL rasterization fallback are
+prohibited. Only the final union must be nonempty; outside-canvas component
+counts remain diagnostic and cannot change source eligibility. Before public model
+loading, every visible-hand truth PNG must decode as mode `L`, match both the
+declared mask size and decoded source-frame dimensions, remain binary and
+nonempty, and pass exact array-equal/hash/byte/format/mode/size round-trip
+checks without `Image.convert` normalization. Fixture schema 3 binds these
+semantics and the compact boundary/overshoot diagnostics through repair
+commitment `84673942…42ddd9`; later development and holdout seals inherit the
+fixture commitment. Current runner SHA-256 is `fc7f0156…e5396f4`. The
+deterministic fixture-preparation retry is authorized, but model inference
+remains fail-closed until these pre-model checks and the fixture seal pass.
+
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
 descriptive. Only a combined public pass authorizes the single-applicant blind

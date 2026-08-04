@@ -60,6 +60,34 @@ def test_construct_aligned_resume_amendment_is_exact_and_schema17_compatible() -
         MODULE._construct_aligned_ltx_resume_amendment(mutated)
 
 
+def test_public_fixture_geometry_rasterization_repair_is_frozen() -> None:
+    import pytest
+
+    config = json.loads(
+        Path("configs/synthetic_video_real_only_proof.json").read_text()
+    )
+    repair = MODULE._public_fixture_geometry_rasterization_repair(config)
+    assert (
+        repair["repair_commitment_sha256"]
+        == "84673942ea5607f93c2b13cb697c823abe3118af58f93a167ca43962ef42ddd9"
+    )
+    assert repair["triggering_attempt"]["job_id"] == 315462
+    assert repair["triggering_attempt"]["public_model_inference_executed"] is False
+    assert repair["rasterization_semantics"]["manual_clip"] is False
+    assert repair["rasterization_semantics"]["pixel_tolerance"] is None
+    assert repair["scientific_thresholds_changed"] is False
+    assert repair["source_selection_changed"] is False
+
+    mutated = json.loads(json.dumps(config))
+    mutated["public_fixture_geometry_rasterization_repair"][
+        "scientific_thresholds_changed"
+    ] = True
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_VISOR_RASTERIZATION_REPAIR_COMMITMENT"
+    ):
+        MODULE._public_fixture_geometry_rasterization_repair(mutated)
+
+
 def _write_public_audio_seed(
     tmp_path: Path,
     config: dict,
@@ -1588,37 +1616,154 @@ def test_fixture_materialization_never_calls_legacy_sparse_visor_path() -> None:
     assert "_write_visor_hos_target_hand_mask(" in active_source
 
 
-def test_visor_hos_target_hand_mask_is_full_frame_binary_png(
+class _FakeFixedCanvasCV2:
+    __version__ = "4.10.0"
+    error = RuntimeError
+
+    def __init__(self) -> None:
+        self.contour_dtypes = []
+        self.fill_poly_contour_counts = []
+
+    def fillPoly(self, canvas, contours, color) -> None:
+        import numpy as np
+        from PIL import Image, ImageDraw
+
+        assert contours
+        self.fill_poly_contour_counts.append(len(contours))
+        self.contour_dtypes.extend(contour.dtype for contour in contours)
+        image = Image.fromarray(canvas)
+        draw = ImageDraw.Draw(image)
+        for contour in contours:
+            draw.polygon(
+                [tuple(int(value) for value in point) for point in contour],
+                fill=int(color[0]),
+            )
+        canvas[...] = np.asarray(image)
+
+
+def test_visor_hos_target_hand_mask_uses_fixed_canvas_boundary_semantics(
     tmp_path: Path,
 ) -> None:
     import pytest
+    import numpy as np
     from PIL import Image
 
+    cv2 = _FakeFixedCanvasCV2()
     target = tmp_path / "target-hand.png"
     record = MODULE._write_visor_hos_target_hand_mask(
-        [[[1.0, 1.0], [8.0, 1.0], [8.0, 7.0], [1.0, 7.0]]],
+        [[[1.0, 1.0], [12.0, 1.0], [17.0, 17.0], [1.0, 10.0]]],
         12,
         10,
         target,
+        cv2_module=cv2,
     )
     assert record["path"] == target
     assert record["sha256"] == MODULE.file_digest(target)
     assert record["bytes"] == target.stat().st_size
     assert record["width"] == 12
     assert record["height"] == 10
+    assert record["boundary_vertex_count"] == 2
+    assert record["outside_canvas_vertex_count"] == 1
+    assert record["outside_canvas_component_count"] == 1
+    assert cv2.contour_dtypes == [np.dtype(np.int32)]
     with Image.open(target) as mask:
+        observed = np.asarray(mask)
+        assert mask.format == "PNG"
         assert mask.mode == "L"
         assert mask.size == (12, 10)
         assert {
             index for index, count in enumerate(mask.histogram()) if count
         } == {0, 255}
-    with pytest.raises(RuntimeError, match="E_TUPLE_VISOR_GEOMETRY"):
+        assert observed[:, -1].any()
+        assert observed[-1, :].any()
+    with pytest.raises(RuntimeError, match="E_TUPLE_VISOR_EMPTY_HAND_MASK"):
         MODULE._write_visor_hos_target_hand_mask(
-            [[[1.0, 1.0], [12.0, 1.0], [8.0, 7.0]]],
+            [[[13.0, 1.0], [18.0, 1.0], [18.0, 7.0], [13.0, 7.0]]],
             12,
             10,
             tmp_path / "out-of-bounds.png",
+            cv2_module=cv2,
         )
+    union = MODULE._write_visor_hos_target_hand_mask(
+        [
+            [[1.0, 1.0], [5.0, 1.0], [5.0, 5.0], [1.0, 5.0]],
+            [[13.0, 1.0], [18.0, 1.0], [18.0, 7.0], [13.0, 7.0]],
+        ],
+        12,
+        10,
+        tmp_path / "mixed-in-and-outside-components.png",
+        cv2_module=cv2,
+    )
+    assert union["outside_canvas_component_count"] == 1
+    assert union["outside_canvas_vertex_count"] == 4
+    assert cv2.fill_poly_contour_counts[-1] == 2
+
+
+def test_visor_hos_target_hand_mask_rejects_invalid_geometry_before_rasterizer(
+    tmp_path: Path,
+) -> None:
+    import pytest
+
+    cv2 = _FakeFixedCanvasCV2()
+    invalid = (
+        [[[1.0, 1.0], [2.0, 2.0]]],
+        [[[-1.0, 1.0], [2.0, 1.0], [2.0, 2.0]]],
+        [[[float("nan"), 1.0], [2.0, 1.0], [2.0, 2.0]]],
+        [[[float("inf"), 1.0], [2.0, 1.0], [2.0, 2.0]]],
+        [[[2**31, 1.0], [2.0, 1.0], [2.0, 2.0]]],
+    )
+    for ordinal, segments in enumerate(invalid):
+        with pytest.raises(RuntimeError, match="E_TUPLE_VISOR_GEOMETRY"):
+            MODULE._write_visor_hos_target_hand_mask(
+                segments,
+                12,
+                10,
+                tmp_path / f"invalid-{ordinal}.png",
+                cv2_module=cv2,
+            )
+    assert cv2.contour_dtypes == []
+
+
+def test_visor_hos_rasterizer_version_and_target_mask_serialization_fail_closed(
+    tmp_path: Path, monkeypatch
+) -> None:
+    import importlib.metadata
+    import sys
+    import types
+
+    import pytest
+    from PIL import Image
+
+    fake = types.SimpleNamespace(__version__="4.10.0", fillPoly=lambda *_: None)
+    monkeypatch.setitem(sys.modules, "cv2", fake)
+    monkeypatch.setattr(
+        importlib.metadata,
+        "version",
+        lambda name: "4.10.0.83" if name == "opencv-python-headless" else "0",
+    )
+    with pytest.raises(RuntimeError, match="E_TUPLE_VISOR_RASTERIZER_VERSION"):
+        MODULE._load_visor_hos_opencv()
+
+    fixture_root = tmp_path / "fixtures"
+    source = fixture_root / "source.png"
+    mask = fixture_root / "mask.png"
+    source.parent.mkdir(parents=True)
+    Image.new("RGB", (12, 10), (10, 20, 30)).save(source)
+    Image.new("RGB", (12, 10), (255, 0, 0)).save(mask)
+    row = {
+        "media_relative_path": "source.png",
+        "media_sha256": MODULE.file_digest(source),
+        "media_bytes": source.stat().st_size,
+        "target_hand_mask_relative_path": "mask.png",
+        "target_hand_mask_sha256": MODULE.file_digest(mask),
+        "target_hand_mask_bytes": mask.stat().st_size,
+        "target_hand_mask_width": 12,
+        "target_hand_mask_height": 10,
+    }
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_EGOHOS_TARGET_MASK_SERIALIZATION"
+    ):
+        MODULE._read_tuple_egohos_target_mask(row, fixture_root)
 
 
 def test_active_visor_materialization_seals_masks_and_no_hand_lineage(
@@ -1695,6 +1840,9 @@ def test_active_visor_materialization_seals_masks_and_no_hand_lineage(
         "visor_hos_source_feasibility_commitment_sha256": source_commitment
     }
     verified = {"commitment_sha256": seal_commitment}
+    monkeypatch.setattr(
+        MODULE, "_load_visor_hos_opencv", lambda: _FakeFixedCanvasCV2()
+    )
     monkeypatch.setattr(
         MODULE,
         "_load_construct_aligned_visor_hos_source_reuse",
@@ -3306,6 +3454,10 @@ def test_prepare_tuple_fixtures_refuses_any_postqualification_replacement(
             "source_video_overlap_count": 0,
             "source_frame_overlap_count": 0,
             "source_object_overlap_count": 0,
+            "target_hand_boundary_vertex_count": 0,
+            "target_hand_outside_canvas_vertex_count": 0,
+            "target_hand_boundary_item_count": 0,
+            "target_hand_outside_canvas_item_count": 0,
         },
         "public_fixture_manifest_commitment_sha256": "d" * 64,
     }
@@ -3317,6 +3469,7 @@ def test_prepare_tuple_fixtures_refuses_any_postqualification_replacement(
         "_tuple_fixture_protocol",
         "_tuple_fixture_preparation_amendment",
         "_tuple_fixture_feasibility_repair",
+        "_public_fixture_geometry_rasterization_repair",
     ):
         monkeypatch.setattr(MODULE, name, lambda *_: {})
     monkeypatch.setattr(
@@ -3878,6 +4031,14 @@ def test_tuple_egohos_verified_no_hand_requires_pass_seal_and_row_link() -> None
             "target_hand_side": "left hand",
             "target_hand_mask_relative_path": "masks/left.png",
             "target_hand_mask_sha256": "b" * 64,
+            "target_hand_mask_width": 20,
+            "target_hand_mask_height": 20,
+            "target_hand_boundary_vertex_count": 0,
+            "target_hand_outside_canvas_vertex_count": 0,
+            "target_hand_outside_canvas_component_count": 0,
+            "source_polygon_finite_nonnegative": True,
+            "target_hand_mask_exact_frame_binary_nonempty": True,
+            "geometry_valid": True,
             "media_relative_path": "media/contact.png",
             "media_sha256": "c" * 64,
         },
@@ -3887,6 +4048,13 @@ def test_tuple_egohos_verified_no_hand_requires_pass_seal_and_row_link() -> None
             "target_hand_side": None,
             "target_hand_mask_relative_path": None,
             "target_hand_mask_sha256": None,
+            "target_hand_mask_bytes": None,
+            "target_hand_mask_width": None,
+            "target_hand_mask_height": None,
+            "target_hand_boundary_vertex_count": 0,
+            "target_hand_outside_canvas_vertex_count": 0,
+            "target_hand_outside_canvas_component_count": 0,
+            "target_hand_mask_exact_frame_binary_nonempty": False,
             "verified_no_hand_seal_commitment_sha256": commitment,
             "media_relative_path": "media/no-hand.png",
             "media_sha256": "d" * 64,
@@ -4025,6 +4193,14 @@ def test_tuple_hand_module_selects_only_frozen_grid_and_reports_one_axis(
             "target_hand_side": "left hand",
             "target_hand_mask_relative_path": "masks/left.png",
             "target_hand_mask_sha256": mask_hash,
+            "target_hand_mask_width": 20,
+            "target_hand_mask_height": 20,
+            "target_hand_boundary_vertex_count": 0,
+            "target_hand_outside_canvas_vertex_count": 0,
+            "target_hand_outside_canvas_component_count": 0,
+            "source_polygon_finite_nonnegative": True,
+            "target_hand_mask_exact_frame_binary_nonempty": True,
+            "geometry_valid": True,
             "media_relative_path": "media/contact.png",
             "media_sha256": "b" * 64,
         },
@@ -4035,6 +4211,14 @@ def test_tuple_hand_module_selects_only_frozen_grid_and_reports_one_axis(
             "target_hand_side": "left hand",
             "target_hand_mask_relative_path": "masks/left.png",
             "target_hand_mask_sha256": mask_hash,
+            "target_hand_mask_width": 20,
+            "target_hand_mask_height": 20,
+            "target_hand_boundary_vertex_count": 0,
+            "target_hand_outside_canvas_vertex_count": 0,
+            "target_hand_outside_canvas_component_count": 0,
+            "source_polygon_finite_nonnegative": True,
+            "target_hand_mask_exact_frame_binary_nonempty": True,
+            "geometry_valid": True,
             "media_relative_path": "media/no-contact.png",
             "media_sha256": "c" * 64,
         },
@@ -4045,6 +4229,13 @@ def test_tuple_hand_module_selects_only_frozen_grid_and_reports_one_axis(
             "target_hand_side": None,
             "target_hand_mask_relative_path": None,
             "target_hand_mask_sha256": None,
+            "target_hand_mask_bytes": None,
+            "target_hand_mask_width": None,
+            "target_hand_mask_height": None,
+            "target_hand_boundary_vertex_count": 0,
+            "target_hand_outside_canvas_vertex_count": 0,
+            "target_hand_outside_canvas_component_count": 0,
+            "target_hand_mask_exact_frame_binary_nonempty": False,
             "verified_no_hand_seal_commitment_sha256": commitment,
             "media_relative_path": "media/no-hand.png",
             "media_sha256": "d" * 64,
@@ -4060,6 +4251,11 @@ def test_tuple_hand_module_selects_only_frozen_grid_and_reports_one_axis(
             _egohos_test_masks(False),
             no_hand,
         ],
+    )
+    monkeypatch.setattr(
+        MODULE,
+        "_read_tuple_egohos_target_mask",
+        lambda *_args, **_kwargs: target.copy(),
     )
     result = MODULE._tuple_hand_contact_module(
         {

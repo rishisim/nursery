@@ -1,6 +1,6 @@
 {
   "schema_version": 17,
-  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PINNED_FFMPEG_PORTABILITY_DIAGNOSIS_PASS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
+  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_GEOMETRY_RASTERIZATION_REPAIR_FROZEN_RETRY_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -440,6 +440,71 @@
     "model_inference_executed": false,
     "fixture_retry_authorized": true,
     "public_model_inference_authorized_only_after_fixture_seal": true
+  },
+  "public_fixture_geometry_rasterization_repair": {
+    "status": "FROZEN_AFTER_PRESEAL_ENGINEERING_STOP_BEFORE_FIXTURE_OR_MODEL_OUTCOME",
+    "recorded_on": "2026-08-03",
+    "failure_class": "ENGINEERING_FAILURE_NOT_SCIENTIFIC_NO_GO",
+    "triggering_attempt": {
+      "job_id": 315462,
+      "exit_code": "1:0",
+      "elapsed_seconds": 159,
+      "failure": "E_TUPLE_VISOR_GEOMETRY",
+      "stage": "official_VISOR_HOS_polygon_to_target_hand_truth_mask_before_fixture_manifest",
+      "fixture_manifest_written": false,
+      "public_model_inference_executed": false,
+      "development_threshold_or_holdout_outcome_opened": false
+    },
+    "aggregate_geometry_diagnostic": {
+      "job_id": 315468,
+      "selected_fixture_count": 288,
+      "visible_hand_fixture_count": 192,
+      "cached_visible_hand_frame_count": 169,
+      "strict_half_open_all_vertices_in_bounds_count": 9,
+      "continuous_boundary_inclusive_all_vertices_in_bounds_count": 148,
+      "rows_failing_only_on_exact_width_or_height_boundary_count": 139,
+      "rows_with_positive_canvas_overshoot_count": 21,
+      "negative_coordinate_count": 0,
+      "interpretation": "compact public-only diagnosis of a rasterization-contract mismatch; no fixture/model/learner outcome and no source row was added removed or relabeled"
+    },
+    "prior_commitments_preserved": {
+      "construct_aligned_amendment": "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39",
+      "complete_source_no_go": "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37",
+      "VISOR_HOS_source_feasibility": "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37",
+      "verified_no_hand_seal": "a58ca3f10fd72ba2a7bfc2faf9c8c65b22a22913fcf2c92786859401b8d21c97",
+      "VISOR_HOS_correction_amendment": "31c1c26f76c5c7dc09e34aff9d5dde291d20631035b07a975d6b8ff5861bf8d4",
+      "LTX_prompt_compiler_amendment": "cb4a7cd2dd60fb14f3430aaf2544d79db95064d42a3f22ad6107206832319c62"
+    },
+    "official_semantic_basis": {
+      "VISOR_HOS_repository_commit": "8566507382add7dd037a83e7233950e0ad1ea78e",
+      "VISOR_HOS_archive_sha256": "6e588c80835976c41164e71b0dbfc5e3447fcabcdfd3221f5fd50b07eb57188e",
+      "data_util_py_sha256": "76e6d1a1dc67f26a6910ced65d351a698f610e66ba2a850fd64c0a21cee53b40",
+      "source_rule": "independently implement the pinned VISOR polygon int32 conversion and fixed-canvas cv2.fillPoly semantics; source coordinates are continuous and exact width or height is a valid boundary",
+      "code_terms_boundary": "reference-only under the existing no-license-file boundary; no upstream source code is copied imported executed or redistributed"
+    },
+    "rasterization_semantics": {
+      "numpy_distribution": "numpy==1.26.4",
+      "opencv_distribution": "opencv-python-headless==4.10.0.84",
+      "opencv_module_version": "4.10.0",
+      "input": "unchanged finite nonnegative official source polygons with every truncated coordinate representable as signed int32",
+      "conversion": "NumPy truncating cast to int32 per polygon",
+      "rasterization": "one cv2.fillPoly call over the complete unchanged int32 contour list on an exact source-height-by-source-width uint8 canvas",
+      "manual_clip": false,
+      "pixel_tolerance": null,
+      "coordinate_scaling": false,
+      "PIL_rasterization_fallback": false,
+      "component_rule": "rasterize the complete unchanged contour list in one official fixed-canvas call; only the final union must be nonempty, while outside-canvas component counts remain diagnostic and cannot change source eligibility",
+      "output_gate": "exact source HxW uint8 binary nonempty mask; atomic PNG mode L serialization; exact array-equal hash/byte/format/mode/size/binary/nonempty round trip"
+    },
+    "pre_model_verification": "decode every visible-hand truth PNG before model loading and require declared dimensions equal both mask and decoded source frame; threshold evaluation may not use Image.convert to normalize an invalid mask",
+    "manifest_binding": "fixture schema 3 directly binds this repair commitment and compact boundary/positive-overshoot diagnostics; later development and holdout seals inherit the fixture commitment",
+    "scientific_thresholds_changed": false,
+    "source_selection_changed": false,
+    "source_label_or_partition_changed": false,
+    "learner_generator_C_or_evaluation_contract_changed": false,
+    "current_runner_source_sha256": "fc7f01561cab8f2fa9278acd14afb40303217171897febb70984580c9e5396f4",
+    "repair_commitment_scope": "canonical JSON of this repair excluding repair_commitment_sha256",
+    "repair_commitment_sha256": "84673942ea5607f93c2b13cb697c823abe3118af58f93a167ca43962ef42ddd9"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",

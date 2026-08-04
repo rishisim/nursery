@@ -213,6 +213,10 @@ TUPLE_FIXTURE_PREP_FIELDS = frozenset(
         "source_video_overlap_count",
         "source_frame_overlap_count",
         "source_object_overlap_count",
+        "target_hand_boundary_vertex_count",
+        "target_hand_outside_canvas_vertex_count",
+        "target_hand_boundary_item_count",
+        "target_hand_outside_canvas_item_count",
         "restricted_mount_present",
         "model_inference_executed",
         "public_fixture_manifest_commitment_sha256",
@@ -801,6 +805,39 @@ def _tuple_visor_hos_correction_amendment(
         or "at least six of seven" not in str(gate.get("combined_pass_rule", ""))
     ):
         raise RuntimeError("E_VISOR_HOS_CORRECTION_COMBINED_GATE")
+    return value
+
+
+def _public_fixture_geometry_rasterization_repair(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the prospective VISOR polygon-to-mask engineering repair."""
+
+    try:
+        value = cfg["public_fixture_geometry_rasterization_repair"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_VISOR_RASTERIZATION_REPAIR_NOT_FROZEN") from error
+    if value.get("status") != (
+        "FROZEN_AFTER_PRESEAL_ENGINEERING_STOP_BEFORE_FIXTURE_OR_MODEL_OUTCOME"
+    ):
+        raise RuntimeError("E_TUPLE_VISOR_RASTERIZATION_REPAIR_NOT_FROZEN")
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("repair_commitment_sha256", None)
+    if not isinstance(expected, str) or digest(payload) != expected:
+        raise RuntimeError("E_TUPLE_VISOR_RASTERIZATION_REPAIR_COMMITMENT")
+    semantics = value.get("rasterization_semantics", {})
+    if (
+        semantics.get("numpy_distribution") != "numpy==1.26.4"
+        or semantics.get("opencv_distribution")
+        != "opencv-python-headless==4.10.0.84"
+        or semantics.get("opencv_module_version") != "4.10.0"
+        or semantics.get("manual_clip") is not False
+        or semantics.get("pixel_tolerance") is not None
+        or semantics.get("PIL_rasterization_fallback") is not False
+        or value.get("scientific_thresholds_changed") is not False
+        or value.get("source_selection_changed") is not False
+    ):
+        raise RuntimeError("E_TUPLE_VISOR_RASTERIZATION_REPAIR_SCOPE")
     return value
 
 
@@ -3232,6 +3269,7 @@ def _verify_tuple_fixture_manifest(
     protocol = _tuple_fixture_protocol(cfg)
     preparation = _tuple_fixture_preparation_amendment(cfg)
     correction = _tuple_visor_hos_correction_amendment(cfg)
+    rasterization_repair = _public_fixture_geometry_rasterization_repair(cfg)
     _tuple_qualification_execution(cfg)
     fixture_root = _tuple_fixture_root(public)
     source_feasibility = _load_construct_aligned_visor_hos_source_reuse(
@@ -3255,7 +3293,7 @@ def _verify_tuple_fixture_manifest(
     if not isinstance(expected, str) or digest(payload) != expected:
         raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_COMMITMENT")
     if (
-        manifest.get("schema_version") != 2
+        manifest.get("schema_version") != 3
         or manifest.get("status") != "SEALED_BEFORE_PUBLIC_DEVELOPMENT_INFERENCE"
     ):
         raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_STATUS")
@@ -3281,6 +3319,9 @@ def _verify_tuple_fixture_manifest(
         "construct_aligned_ltx_resume_amendment_commitment_sha256": active[
             "amendment_commitment_sha256"
         ],
+        "public_fixture_geometry_rasterization_repair_commitment_sha256": (
+            rasterization_repair["repair_commitment_sha256"]
+        ),
     }
     _verify_tuple_fixture_commitments(manifest, commitments)
     no_hand_commitment = verified_no_hand["commitment_sha256"]
@@ -3345,6 +3386,9 @@ def _verify_tuple_fixture_manifest(
             },
             rows["hand_contact"],
         )
+        for row in rows["hand_contact"]:
+            if row["stratum"] != "verified_no_hand":
+                _read_tuple_egohos_target_mask(row, fixture_root)
         _validate_tuple_recurrence_fixture_rows(
             rows["recurrence"], fixture_root
         )
@@ -3357,6 +3401,42 @@ def _verify_tuple_fixture_manifest(
     ):
         if int(audits.get(key, -1)) != 0:
             raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_OVERLAP")
+    visible_hand_rows = [
+        row
+        for partition in ("development", "holdout")
+        for row in partitions[partition]["hand_contact"]
+        if row["stratum"] != "verified_no_hand"
+    ]
+    expected_geometry_audits = {
+        "target_hand_boundary_vertex_count": sum(
+            int(row["target_hand_boundary_vertex_count"])
+            for row in visible_hand_rows
+        ),
+        "target_hand_outside_canvas_vertex_count": sum(
+            int(row["target_hand_outside_canvas_vertex_count"])
+            for row in visible_hand_rows
+        ),
+        "target_hand_boundary_item_count": sum(
+            int(int(row["target_hand_boundary_vertex_count"]) > 0)
+            for row in visible_hand_rows
+        ),
+        "target_hand_outside_canvas_item_count": sum(
+            int(int(row["target_hand_outside_canvas_vertex_count"]) > 0)
+            for row in visible_hand_rows
+        ),
+    }
+    if (
+        audits.get("all_source_polygons_finite_nonnegative") is not True
+        or audits.get(
+            "all_rasterized_target_masks_binary_nonempty_exact_frame_in_bounds"
+        )
+        is not True
+        or any(
+            audits.get(key) != value
+            for key, value in expected_geometry_audits.items()
+        )
+    ):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_GEOMETRY_AUDIT")
     if _verify_tuple_fixture_files_recursive(partitions, fixture_root) <= 0:
         raise RuntimeError("E_TUPLE_QUALIFICATION_FIXTURE_FILES")
     if runtime["local_reload_gate"].get("zero_external_calls_crashes_silent_truncations_or_invalid_records") is not True:
@@ -5404,6 +5484,14 @@ def _validate_tuple_egohos_fixture_rows(
                 or row.get("target_hand_side") is not None
                 or row.get("target_hand_mask_relative_path") is not None
                 or row.get("target_hand_mask_sha256") is not None
+                or row.get("target_hand_mask_bytes") is not None
+                or row.get("target_hand_mask_width") is not None
+                or row.get("target_hand_mask_height") is not None
+                or row.get("target_hand_boundary_vertex_count") != 0
+                or row.get("target_hand_outside_canvas_vertex_count") != 0
+                or row.get("target_hand_outside_canvas_component_count") != 0
+                or row.get("target_hand_mask_exact_frame_binary_nonempty")
+                is not False
                 or row.get("verified_no_hand_seal_commitment_sha256")
                 != commitment
             ):
@@ -5413,6 +5501,13 @@ def _validate_tuple_egohos_fixture_rows(
         if (
             row.get("contact") is not expected_contact
             or row.get("target_hand_side") not in EGOHOS_TARGET_SIDE_CLASSES
+            or not isinstance(row.get("target_hand_mask_width"), int)
+            or int(row["target_hand_mask_width"]) <= 0
+            or not isinstance(row.get("target_hand_mask_height"), int)
+            or int(row["target_hand_mask_height"]) <= 0
+            or row.get("source_polygon_finite_nonnegative") is not True
+            or row.get("target_hand_mask_exact_frame_binary_nonempty") is not True
+            or row.get("geometry_valid") is not True
             or not all(
                 isinstance(row.get(key), str) and row[key]
                 for key in (
@@ -5420,9 +5515,76 @@ def _validate_tuple_egohos_fixture_rows(
                     "target_hand_mask_sha256",
                 )
             )
+            or any(
+                not isinstance(row.get(key), int) or int(row[key]) < 0
+                for key in (
+                    "target_hand_boundary_vertex_count",
+                    "target_hand_outside_canvas_vertex_count",
+                    "target_hand_outside_canvas_component_count",
+                )
+            )
         ):
             raise RuntimeError("E_TUPLE_EGOHOS_VISIBLE_HAND_FIXTURE_TRUTH")
     return commitment
+
+
+def _read_tuple_egohos_target_mask(
+    row: dict[str, Any],
+    fixture_root: Path,
+    *,
+    require_source_alignment: bool = True,
+):
+    """Decode one sealed target mask without silently normalizing corruption."""
+
+    import numpy as np
+    from PIL import Image
+
+    mask_path = _tuple_fixture_file(
+        fixture_root,
+        row["target_hand_mask_relative_path"],
+        row["target_hand_mask_sha256"],
+        row.get("target_hand_mask_bytes"),
+    )
+    source_size = None
+    if require_source_alignment:
+        source_path = _tuple_fixture_file(
+            fixture_root,
+            row["media_relative_path"],
+            row["media_sha256"],
+            row.get("media_bytes"),
+        )
+        with Image.open(source_path) as source:
+            source_size = source.size
+            if source_size[0] <= 0 or source_size[1] <= 0:
+                raise RuntimeError("E_TUPLE_EGOHOS_SOURCE_IMAGE")
+            source.verify()
+    with Image.open(mask_path) as opened:
+        if all(
+            isinstance(row.get(key), int)
+            for key in ("target_hand_mask_width", "target_hand_mask_height")
+        ):
+            declared_size = (
+                int(row["target_hand_mask_width"]),
+                int(row["target_hand_mask_height"]),
+            )
+        else:
+            declared_size = opened.size
+        if (
+            opened.format != "PNG"
+            or opened.mode != "L"
+            or (source_size is not None and opened.size != source_size)
+            or opened.size != declared_size
+        ):
+            raise RuntimeError("E_TUPLE_EGOHOS_TARGET_MASK_SERIALIZATION")
+        target = np.asarray(opened).copy()
+    if (
+        target.shape != (declared_size[1], declared_size[0])
+        or target.dtype != np.uint8
+        or not np.isin(target, (0, 255)).all()
+        or not (target == 255).any()
+    ):
+        raise RuntimeError("E_TUPLE_EGOHOS_TARGET_MASK_SERIALIZATION")
+    return target
 
 
 def _tuple_egohos_predict_rows(
@@ -5479,9 +5641,6 @@ def _tuple_egohos_threshold_metrics(
     fixture_root: Path,
     threshold: float,
 ) -> dict[str, Any]:
-    import numpy as np
-    from PIL import Image
-
     if len(rows) != len(predictions) or not rows:
         raise RuntimeError("E_TUPLE_EGOHOS_PREDICTION_COUNT")
     observations = []
@@ -5490,22 +5649,15 @@ def _tuple_egohos_threshold_metrics(
         zip(rows, predictions, strict=True)
     ):
         target_mask = None
-        target_mask_source = None
         if row["stratum"] != "verified_no_hand":
-            mask_path = _tuple_fixture_file(
-                fixture_root,
-                row["target_hand_mask_relative_path"],
-                row["target_hand_mask_sha256"],
-                row.get("target_hand_mask_bytes"),
+            target_mask = _read_tuple_egohos_target_mask(
+                row, fixture_root, require_source_alignment=False
             )
-            with Image.open(mask_path) as opened:
-                target_mask_source = opened.convert("L").copy()
         try:
-            if target_mask_source is not None:
+            if target_mask is not None:
                 stage_shape = _tuple_egohos_stage_masks(prediction)["stage1"].shape
-                if target_mask_source.size != (stage_shape[1], stage_shape[0]):
+                if target_mask.shape != stage_shape:
                     raise RuntimeError("E_TUPLE_EGOHOS_TARGET_MASK_ALIGNMENT")
-                target_mask = np.asarray(target_mask_source).copy()
             observation = _tuple_egohos_mask_observation(
                 prediction,
                 minimum_mask_fraction=threshold,
@@ -5601,6 +5753,9 @@ def _tuple_hand_contact_module(context: dict[str, Any]) -> dict[str, Any]:
     rows = context["rows"]["hand_contact"]
     fixture_root = context["fixture_root"]
     _validate_tuple_egohos_fixture_rows(context, rows)
+    for row in rows:
+        if row["stratum"] != "verified_no_hand":
+            _read_tuple_egohos_target_mask(row, fixture_root)
     predictions = _tuple_egohos_predict_rows(
         context["public_root"],
         context["device"],
@@ -11246,39 +11401,129 @@ def _prepare_visor_fixtures(
     return output, provenance
 
 
-def _write_visor_hos_target_hand_mask(
-    segments: Any, width: int, height: int, target: Path
-) -> dict[str, Any]:
-    from PIL import Image, ImageDraw
+def _load_visor_hos_opencv():
+    """Load only the pinned runtime rasterizer; never fall back to Pillow."""
+
+    import importlib.metadata
+
+    try:
+        distribution_version = importlib.metadata.version("opencv-python-headless")
+        import cv2
+    except Exception as error:
+        raise RuntimeError("E_TUPLE_VISOR_RASTERIZER_IMPORT") from error
+    if distribution_version != "4.10.0.84" or cv2.__version__ != "4.10.0":
+        raise RuntimeError("E_TUPLE_VISOR_RASTERIZER_VERSION")
+    return cv2
+
+
+def _rasterize_visor_hos_target_hand_mask(
+    segments: Any,
+    width: int,
+    height: int,
+    *,
+    cv2_module: Any | None = None,
+):
+    """Apply the pinned VISOR-HOS int32/fixed-canvas mask semantics."""
+
+    import numpy as np
 
     if width <= 0 or height <= 0 or not _valid_visor_segments(segments):
         raise RuntimeError("E_TUPLE_VISOR_GEOMETRY")
-    mask = Image.new("L", (width, height), 0)
-    draw = ImageDraw.Draw(mask)
+    cv2_module = cv2_module or _load_visor_hos_opencv()
+    maximum = int(np.iinfo(np.int32).max)
+    contours = []
+    boundary_vertex_count = 0
+    outside_canvas_vertex_count = 0
+    outside_canvas_component_count = 0
     for polygon in segments:
-        points = [(float(x), float(y)) for x, y in polygon]
-        if any(not (0.0 <= x < width and 0.0 <= y < height) for x, y in points):
+        points = np.asarray(polygon, dtype=np.float64)
+        truncated = np.trunc(points)
+        if (
+            points.shape != (len(polygon), 2)
+            or not np.isfinite(points).all()
+            or (points < 0.0).any()
+            or (truncated > maximum).any()
+        ):
             raise RuntimeError("E_TUPLE_VISOR_GEOMETRY")
-        draw.polygon(points, fill=255)
-    if mask.getbbox() is None:
+        boundary = (points[:, 0] == width) | (points[:, 1] == height)
+        outside = (points[:, 0] > width) | (points[:, 1] > height)
+        boundary_vertex_count += int(boundary.sum())
+        outside_canvas_vertex_count += int(outside.sum())
+        outside_canvas_component_count += int(outside.any())
+        contours.append(truncated.astype(np.int32))
+    union = np.zeros((height, width), dtype=np.uint8)
+    try:
+        cv2_module.fillPoly(union, contours, color=(1, 1, 1))
+    except Exception as error:
+        raise RuntimeError("E_TUPLE_VISOR_RASTERIZER_FAILURE") from error
+    if (
+        union.shape != (height, width)
+        or union.dtype != np.uint8
+        or not np.isin(union, (0, 1)).all()
+    ):
+        raise RuntimeError("E_TUPLE_VISOR_RASTERIZER_OUTPUT")
+    if not union.any():
         raise RuntimeError("E_TUPLE_VISOR_EMPTY_HAND_MASK")
+    return {
+        "mask": union,
+        "boundary_vertex_count": boundary_vertex_count,
+        "outside_canvas_vertex_count": outside_canvas_vertex_count,
+        "outside_canvas_component_count": outside_canvas_component_count,
+    }
+
+
+def _write_visor_hos_target_hand_mask(
+    segments: Any,
+    width: int,
+    height: int,
+    target: Path,
+    *,
+    cv2_module: Any | None = None,
+) -> dict[str, Any]:
+    import numpy as np
+    from PIL import Image
+
+    rasterized = _rasterize_visor_hos_target_hand_mask(
+        segments, width, height, cv2_module=cv2_module
+    )
+    expected = rasterized["mask"] * np.uint8(255)
     target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     partial = target.with_suffix(target.suffix + ".partial")
-    mask.save(partial, format="PNG")
-    os.chmod(partial, 0o600)
-    partial.replace(target)
-    with Image.open(target) as check:
-        if check.mode != "L" or check.size != (width, height):
+    try:
+        Image.fromarray(expected).save(partial, format="PNG")
+        os.chmod(partial, 0o600)
+        with Image.open(partial) as check:
+            if (
+                check.format != "PNG"
+                or check.mode != "L"
+                or check.size != (width, height)
+            ):
+                raise RuntimeError("E_TUPLE_VISOR_HAND_MASK_ROUNDTRIP")
+            observed = np.asarray(check).copy()
+        if (
+            observed.shape != (height, width)
+            or observed.dtype != np.uint8
+            or not np.isin(observed, (0, 255)).all()
+            or not (observed == 255).any()
+            or not np.array_equal(observed, expected)
+        ):
             raise RuntimeError("E_TUPLE_VISOR_HAND_MASK_ROUNDTRIP")
-        values = {index for index, count in enumerate(check.histogram()) if count}
-    if not values <= {0, 255} or 255 not in values:
-        raise RuntimeError("E_TUPLE_VISOR_HAND_MASK_ROUNDTRIP")
+        partial.replace(target)
+    finally:
+        partial.unlink(missing_ok=True)
     return {
         "path": target,
         "sha256": file_digest(target),
         "bytes": target.stat().st_size,
         "width": width,
         "height": height,
+        "boundary_vertex_count": rasterized["boundary_vertex_count"],
+        "outside_canvas_vertex_count": rasterized[
+            "outside_canvas_vertex_count"
+        ],
+        "outside_canvas_component_count": rasterized[
+            "outside_canvas_component_count"
+        ],
     }
 
 
@@ -11426,6 +11671,21 @@ def _prepare_active_visor_hos_fixtures(
                         if target_hand_mask is not None
                         else None
                     ),
+                    "target_hand_boundary_vertex_count": (
+                        target_hand_mask["boundary_vertex_count"]
+                        if target_hand_mask is not None
+                        else 0
+                    ),
+                    "target_hand_outside_canvas_vertex_count": (
+                        target_hand_mask["outside_canvas_vertex_count"]
+                        if target_hand_mask is not None
+                        else 0
+                    ),
+                    "target_hand_outside_canvas_component_count": (
+                        target_hand_mask["outside_canvas_component_count"]
+                        if target_hand_mask is not None
+                        else 0
+                    ),
                     "source_split": split,
                     "source_participant": participant,
                     "source_video": video,
@@ -11434,6 +11694,10 @@ def _prepare_active_visor_hos_fixtures(
                     "media_relative_path": str(target.relative_to(fixture_root)),
                     "media_sha256": source_frame_sha256,
                     "media_bytes": target.stat().st_size,
+                    "source_polygon_finite_nonnegative": True,
+                    "target_hand_mask_exact_frame_binary_nonempty": (
+                        target_hand_mask is not None
+                    ),
                     "geometry_valid": True,
                     "verified_no_hand_review_token": row.get("review_token"),
                     "verified_no_hand_seal_commitment_sha256": (
@@ -12601,6 +12865,18 @@ def _tuple_fixture_preparation_compact(
         "source_video_overlap_count": audits["source_video_overlap_count"],
         "source_frame_overlap_count": audits["source_frame_overlap_count"],
         "source_object_overlap_count": audits["source_object_overlap_count"],
+        "target_hand_boundary_vertex_count": audits[
+            "target_hand_boundary_vertex_count"
+        ],
+        "target_hand_outside_canvas_vertex_count": audits[
+            "target_hand_outside_canvas_vertex_count"
+        ],
+        "target_hand_boundary_item_count": audits[
+            "target_hand_boundary_item_count"
+        ],
+        "target_hand_outside_canvas_item_count": audits[
+            "target_hand_outside_canvas_item_count"
+        ],
         "restricted_mount_present": False,
         "model_inference_executed": False,
         "public_fixture_manifest_commitment_sha256": fixture_manifest[
@@ -12619,6 +12895,7 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
     active = _construct_aligned_ltx_resume_amendment(cfg)
     amendment = _tuple_amendment(cfg)
     correction = _tuple_visor_hos_correction_amendment(cfg)
+    rasterization_repair = _public_fixture_geometry_rasterization_repair(cfg)
     protocol = _tuple_fixture_protocol(cfg)
     preparation = _tuple_fixture_preparation_amendment(cfg)
     feasibility_repair = _tuple_fixture_feasibility_repair(cfg)
@@ -12737,7 +13014,28 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         },
         "all_source_media_hash_roundtrips": True,
         "all_labels_roundtrip": True,
-        "all_geometry_finite_and_in_bounds": True,
+        "all_source_polygons_finite_nonnegative": True,
+        "all_rasterized_target_masks_binary_nonempty_exact_frame_in_bounds": True,
+        "target_hand_boundary_vertex_count": sum(
+            int(row["target_hand_boundary_vertex_count"])
+            for partition in preparation["partitions"]
+            for row in visor[partition]
+        ),
+        "target_hand_outside_canvas_vertex_count": sum(
+            int(row["target_hand_outside_canvas_vertex_count"])
+            for partition in preparation["partitions"]
+            for row in visor[partition]
+        ),
+        "target_hand_boundary_item_count": sum(
+            int(int(row["target_hand_boundary_vertex_count"]) > 0)
+            for partition in preparation["partitions"]
+            for row in visor[partition]
+        ),
+        "target_hand_outside_canvas_item_count": sum(
+            int(int(row["target_hand_outside_canvas_vertex_count"]) > 0)
+            for partition in preparation["partitions"]
+            for row in visor[partition]
+        ),
     }
     if any(
         audits[key] != 0
@@ -12779,7 +13077,7 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         if "sha256" in value
     ] + visor_provenance
     fixture_manifest = {
-        "schema_version": 2,
+        "schema_version": 3,
         "status": "SEALED_BEFORE_PUBLIC_DEVELOPMENT_INFERENCE",
         "mechanistic_tuple_amendment_commitment_sha256": amendment[
             "amendment_commitment_sha256"
@@ -12802,6 +13100,9 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
         "construct_aligned_ltx_resume_amendment_commitment_sha256": active[
             "amendment_commitment_sha256"
         ],
+        "public_fixture_geometry_rasterization_repair_commitment_sha256": (
+            rasterization_repair["repair_commitment_sha256"]
+        ),
         "audio_seed_commitment_sha256": audio_manifest[
             "audio_seed_commitment_sha256"
         ],
