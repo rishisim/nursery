@@ -111,8 +111,8 @@ def _scene_spec(scene: dict[str, Any], assets: dict[str, Any]) -> dict[str, Any]
                 "asset_dimensions_m": member["dimensions_m"],
                 "semantic_class": member["semantic_class"],
                 "collision_source": member["collision_source"],
-                "interactive": asset_id == "books",
-                "mass_kg": 0.22 if asset_id == "books" else None,
+                "interactive": False,
+                "mass_kg": None,
                 "static_friction": 0.75,
                 "dynamic_friction": 0.65,
             }
@@ -125,6 +125,7 @@ def _scene_spec(scene: dict[str, Any], assets: dict[str, Any]) -> dict[str, Any]
         "envelope_m": layout["envelope_m"],
         "zones": scene["zones"],
         "instances": instances,
+        "target": deepcopy(assets["interactive_target"]),
         "support_relations": [
             {"child_id": "target_001", "support_id": f"{scene['room_family']}_tableCoffee_00"}
         ],

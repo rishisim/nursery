@@ -5,6 +5,16 @@
   "scope": "public_synthetic_engineering_qualification_only",
   "canonical_entry_point": "python -m babyworld_lite.childlens_engine_bakeoff.procedural_scene_gate",
   "output_root": "runs/embodied_simulation/procedural_scene_gate",
+  "pre_run_contract_repairs": [
+    {
+      "id": "explicit_target_record",
+      "timing": "before any Unity module execution or outcome",
+      "reason": "Static interface audit found that SceneSpec support_relations named target_001 without carrying the target record.",
+      "repair": "Freeze the target identity, authored-geometry hash, dimensions, mass/friction, collision role, and support relation; add per-member furniture hashes.",
+      "outcome_dependent": false,
+      "rates_tolerances_activity_or_seed_changed": false
+    }
+  ],
   "authority": {
     "engine": "Unity 6000.0.80f1 ARM64/Metal",
     "physics": "Unity PhysX",
@@ -62,16 +72,32 @@
       "archive_sha256": "68afa4e6dc8a53942379fb47f1e84ec735d46b77bb1c1ceb968e245693dde067",
       "license": "CC0",
       "members": [
-        {"id": "tableCoffee", "dimensions_m": [1.15, 0.62, 0.86], "semantic_class": "support_table", "collision_source": "mesh_or_compound_box"},
-        {"id": "loungeSofaLong", "dimensions_m": [1.65, 0.92, 0.78], "semantic_class": "sofa", "collision_source": "compound_box"},
-        {"id": "bookcaseOpen", "dimensions_m": [0.72, 1.64, 0.35], "semantic_class": "storage", "collision_source": "compound_box"},
-        {"id": "chairCushion", "dimensions_m": [0.55, 1.24, 0.55], "semantic_class": "chair", "collision_source": "compound_box"},
-        {"id": "rugRectangle", "dimensions_m": [1.75, 0.015, 1.2], "semantic_class": "rug", "collision_source": "box"},
-        {"id": "lampSquareFloor", "dimensions_m": [0.42, 1.35, 0.42], "semantic_class": "lamp", "collision_source": "compound_box"},
-        {"id": "pottedPlant", "dimensions_m": [0.55, 1.0, 0.55], "semantic_class": "plant", "collision_source": "compound_box"},
-        {"id": "books", "dimensions_m": [0.32, 0.14, 0.24], "semantic_class": "books", "collision_source": "box"}
+        {"id": "tableCoffee", "sha256": "8c81c31a74aadc1e89e334eb1ac43380f41c14f47e5dd9a6b029ebf74850adda", "dimensions_m": [1.15, 0.62, 0.86], "semantic_class": "support_table", "collision_source": "mesh_or_compound_box"},
+        {"id": "loungeSofaLong", "sha256": "bbc91d1b01537dbc847685560265b6fcd72a21333c8aab7f8906a5addf8dbd20", "dimensions_m": [1.65, 0.92, 0.78], "semantic_class": "sofa", "collision_source": "compound_box"},
+        {"id": "bookcaseOpen", "sha256": "31beea66f34e64660c870e39c52ed2e81984939c88f4bd763c7dce56e9ef76a9", "dimensions_m": [0.72, 1.64, 0.35], "semantic_class": "storage", "collision_source": "compound_box"},
+        {"id": "chairCushion", "sha256": "afc684f28ab2e4ee3fe9cd59a92f03103e4f62c74ae785029fdd672fc6914cdd", "dimensions_m": [0.55, 1.24, 0.55], "semantic_class": "chair", "collision_source": "compound_box"},
+        {"id": "rugRectangle", "sha256": "0cdd8cea357bc267c9f121b4e7d32513c08f1b179522d95c6632bf2306d38f79", "dimensions_m": [1.75, 0.015, 1.2], "semantic_class": "rug", "collision_source": "box"},
+        {"id": "lampSquareFloor", "sha256": "c4b35656f587cacf2ccf57d1c0216541923890e878cec0d0f58ff71cd4a71bfc", "dimensions_m": [0.42, 1.35, 0.42], "semantic_class": "lamp", "collision_source": "compound_box"},
+        {"id": "pottedPlant", "sha256": "cf66928b943e30ef5c1f06145419ca2cda534249bb4d77831ae723532c4f8de3", "dimensions_m": [0.55, 1.0, 0.55], "semantic_class": "plant", "collision_source": "compound_box"},
+        {"id": "books", "sha256": "91fd64f5fd821b5046724ffa18974e8964b85bfbd4a0d89687d2283966394f5f", "dimensions_m": [0.32, 0.14, 0.24], "semantic_class": "books", "collision_source": "box"}
       ],
       "material_variants": ["warm_oak", "painted_sage", "natural_birch"]
+    },
+    "interactive_target": {
+      "persistent_id": "target_001",
+      "semantic_id": 41,
+      "instance_id": 41001,
+      "geometry": "repository_authored_rounded_grasp_toy",
+      "geometry_spec_sha256": "310e633c0200b2a4cce26881355c369ba7c4d8bd0913958fbca9b2567567170e",
+      "license": "repository-authored",
+      "dimensions_m": [0.055, 0.055, 0.055],
+      "mass_kg": 0.035,
+      "static_friction": 1.0,
+      "dynamic_friction": 0.9,
+      "collision_source": "authored_convex_mesh",
+      "collision_policy": "free_non_kinematic_physx_rigidbody",
+      "support_id": "primary_support",
+      "post_initialization_transform_writes": 0
     },
     "procedural_garments": {
       "license": "repository-authored",

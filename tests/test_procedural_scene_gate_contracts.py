@@ -67,6 +67,15 @@ def test_scene_catalog_has_licenses_dimensions_collision_and_physics():
     assert catalog["license"] == "CC0"
     assert all(row["dimensions_m"] and row["semantic_class"] and row["collision_source"] for row in catalog["members"])
     for contract in compile_contract_matrix(config):
+        target = contract["scene_spec"]["target"]
+        assert target["persistent_id"] == "target_001"
+        assert target["collision_policy"] == "free_non_kinematic_physx_rigidbody"
+        assert target["post_initialization_transform_writes"] == 0
+        assert len(target["geometry_spec_sha256"]) == 64
         for instance in contract["scene_spec"]["instances"]:
             assert "static_friction" in instance
             assert "dynamic_friction" in instance
+            catalog_row = next(
+                row for row in catalog["members"] if row["id"] == instance["asset_id"]
+            )
+            assert len(catalog_row["sha256"]) == 64
