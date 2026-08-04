@@ -75,6 +75,103 @@
       "enhanced_video_present": false
     }
   },
+  "stage_c_reconstruction": {
+    "protocol_state": "COMPLETE",
+    "decision": "PASS",
+    "question": "Can the retained free-object physical kernel be made perceptually inspectable through a correctly oriented, complete-state weighted-skin replay before any longer episode or appearance work?",
+    "duration_s": 8.0,
+    "render_resolution": [1920, 1080],
+    "render_hz": 30,
+    "physics_hz": 240,
+    "steps_per_frame": 8,
+    "coordinate_contract": {
+      "avatar_face_forward_unity": "+Z",
+      "workspace_must_be_in_front_dot_min": 0.5,
+      "physics_to_visual_transform": "fixed translation only; emitted in trace",
+      "no_mirror_or_implicit_axis_flip": true
+    },
+    "camera_contract": {
+      "optical_side_of_head": "head-weighted bounds max +Z plus measured clearance",
+      "neutral_mount_angle_deg_max": 15.0,
+      "minimum_skin_clearance_m": 0.02,
+      "maximum_roll_deg": 6.0,
+      "vertical_fov_deg": 68.0,
+      "near_clip_m": 0.03,
+      "gaze_source": "recorded torso, neck, and head local states"
+    },
+    "registration_contract": {
+      "maximum_palm_center_error_m": 0.012,
+      "contact_to_correct_visible_digit_p95_m": 0.012,
+      "contact_projection_pixel_error_max": 28.0,
+      "visible_vs_physical_first_touch_frames_max": 1,
+      "required_trace_fields": [
+        "palm position and rotation",
+        "per-digit closure",
+        "per-segment position, rotation, and velocity",
+        "contact point, normal, digit, and separation",
+        "object angular velocity",
+        "root, torso, neck, and head state"
+      ]
+    },
+    "visual_contract": {
+      "one_weighted_skin": true,
+      "hero_and_clean_external_proxy_pixels": 0,
+      "separate_labeled_physics_overlay_required": true,
+      "target_visible_at_touch_lift_turn_release_withdrawal": true,
+      "environment_scope": "bounded furnished registration cell; not a naturalistic or ChildLens appearance claim"
+    },
+    "decision_labels": ["PASS", "NO-GO"],
+    "appearance_deferred_until_pass": true,
+    "result": {
+      "physics": {
+        "duration_s": 8.0,
+        "lift_m": 0.0896450877,
+        "turn_deg": 24.9899635,
+        "maximum_finger_penetration_m": 0.002696842,
+        "maximum_palm_angular_speed_deg_s": 37.498623,
+        "qualified_opposition_render_frames": 91,
+        "required_opposition_render_frames": 91,
+        "right_thumb_contact_unique_steps": 812,
+        "right_non_thumb_contact_unique_steps": 1101,
+        "left_support_contact_unique_steps": 275,
+        "final_quarter_second_contact_unique_steps": 0,
+        "object_pose_writes_after_initialization": 0,
+        "object_external_forces": 0,
+        "attachment_or_joint_count": 0,
+        "assistance_ledger_entries": 0,
+        "same_machine_replay": "BIT_IDENTICAL_TRACE_CONTACT_AND_REPORT"
+      },
+      "render_registration": {
+        "frames": 241,
+        "resolution": [1920, 1080],
+        "palm_registration_max_m": 0.0099152364,
+        "contact_digit_surface_p95_m": 0.0079693189,
+        "contact_digit_surface_max_m": 0.008018435,
+        "first_touch_frame_difference": 0,
+        "camera_minimum_skin_clearance_m": 0.045320839,
+        "camera_maximum_roll_deg": 1.6083949,
+        "target_front_dot": 1.0,
+        "proxy_pixels_in_head_or_clean": 0
+      }
+    },
+    "ignored_artifact_receipts": {
+      "root": "runs/embodied_simulation/stage_c_reconstruction/",
+      "authority_trace_sha256": "73c55f713d7ed022cff36f88c7da36e37db0af5a7826f1ca948dccf76ba04232",
+      "contact_trace_sha256": "e856e892ad7bdebf2432315e4283153794c3a3d30d897e1a343993cb6a07fd83",
+      "authority_report_sha256": "69811853cfd92ad0e990ea131f817fce46d6305bdb74c13cc9009d1201ef65b1",
+      "registered_trace_sha256": "c634f01edafb8564776adec6b6652988aa49f2f54577f0cb8e0f8be4566d160d",
+      "head_video_sha256": "616b1fd810daeec0ed5dbfb7ace18feb20ad677e838f522293485295ca936c89",
+      "clean_external_video_sha256": "89f5555f129030d2ed11217a4352440d97148a2ff1015b19dbaf566f14b0a3ab",
+      "labeled_overlay_video_sha256": "452098e146bb77c61cad07f41b163eada35b36a3e2252823040c5759356c587b"
+    },
+    "scope_limits": [
+      "This PASS answers only the bounded registration question and does not overturn the original 56-second integrated NO-GO.",
+      "Palms and digits are kinematic contact-aware controllers; the free object alone is dynamic PhysX authority.",
+      "The render is a diagnostic simulator baseline, not a ChildLens-like appearance result.",
+      "No appearance model, depth/identity capture, audio, causal learner, or restricted child data was used."
+    ],
+    "appearance_run_performed": false
+  },
   "forbidden_assistance": [
     "parenting",
     "FixedJoint grasp",
