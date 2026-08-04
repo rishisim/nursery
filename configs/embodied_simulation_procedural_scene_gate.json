@@ -1,0 +1,214 @@
+{
+  "schema": "embodied.procedural_scene_gate.v1",
+  "frozen_at_origin_commit": "d0fc1b8dbae15ab29cb77913c749b038cff73bc0",
+  "decision_question": "Can one Unity-native framework generate coherent 12-20 second clothed child-head episodes across procedural furnished-room and clothing variants while preserving synchronized physics-registered truth?",
+  "scope": "public_synthetic_engineering_qualification_only",
+  "canonical_entry_point": "python -m babyworld_lite.childlens_engine_bakeoff.procedural_scene_gate",
+  "output_root": "runs/embodied_simulation/procedural_scene_gate",
+  "authority": {
+    "engine": "Unity 6000.0.80f1 ARM64/Metal",
+    "physics": "Unity PhysX",
+    "renderer": "Unity",
+    "physics_hz": 240,
+    "render_hz": 30,
+    "steps_per_render_frame": 8,
+    "single_state_rule": "The physics-step authority state drives collider skeleton, weighted body, garments, head camera, recorder, and every render modality.",
+    "kinematic_labels": ["commanded", "engine_observed"],
+    "measured_labels": ["physx_measured"],
+    "derived_labels": ["derived"],
+    "unavailable_label": "unavailable",
+    "biological_torque_claim_permitted": false
+  },
+  "schema_registry": {
+    "AvatarSpec": {
+      "schema": "embodied.avatar_spec.v1",
+      "required": ["avatar_id", "source_asset", "skeleton", "hand_topology", "garment_configuration_id"]
+    },
+    "EmbodimentManifest": {
+      "schema": "embodied.embodiment_manifest.v1",
+      "required": ["avatar_spec", "authority_root", "weighted_renderers", "collider_bindings", "camera_parent", "registration_receipts"]
+    },
+    "SceneSpec": {
+      "schema": "embodied.scene_spec.v1",
+      "required": ["seed", "room_family", "envelope_m", "zones", "instances", "support_relations", "reachability", "sightlines"]
+    },
+    "ActivityPlan": {
+      "schema": "embodied.activity_plan.v1",
+      "required": ["duration_s", "phases", "controller_profile_id", "no_seed_specific_retuning"]
+    },
+    "EpisodeTrace": {
+      "schema": "embodied.episode_trace.v1",
+      "required": ["clock", "body_state", "hand_state", "controller_state", "contacts", "objects", "camera_state", "assistance_ledger"]
+    },
+    "TruthProvenance": {
+      "schema": "embodied.truth_provenance.v1",
+      "required": ["field", "provenance", "formula_or_source", "units"]
+    },
+    "QATolerances": {
+      "schema": "embodied.qa_tolerances.v1",
+      "required": ["registration", "contact", "interaction", "camera", "clock", "capture", "replay"]
+    }
+  },
+  "assets": {
+    "avatar": {
+      "asset_id": "mpfb_child_cc0",
+      "sha256": "b766981d9d3504cea220c0d72ad8aa56cbd80453e910fc76dc8c8814fbd980de",
+      "license": "CC0",
+      "role": "one child-proportioned weighted body with two anatomical five-finger hands",
+      "public_synthetic": true
+    },
+    "furniture_catalog": {
+      "asset_id": "kenney_furniture_kit_cc0_curated",
+      "archive_sha256": "68afa4e6dc8a53942379fb47f1e84ec735d46b77bb1c1ceb968e245693dde067",
+      "license": "CC0",
+      "members": [
+        {"id": "tableCoffee", "dimensions_m": [1.15, 0.62, 0.86], "semantic_class": "support_table", "collision_source": "mesh_or_compound_box"},
+        {"id": "loungeSofaLong", "dimensions_m": [1.65, 0.92, 0.78], "semantic_class": "sofa", "collision_source": "compound_box"},
+        {"id": "bookcaseOpen", "dimensions_m": [0.72, 1.64, 0.35], "semantic_class": "storage", "collision_source": "compound_box"},
+        {"id": "chairCushion", "dimensions_m": [0.55, 1.24, 0.55], "semantic_class": "chair", "collision_source": "compound_box"},
+        {"id": "rugRectangle", "dimensions_m": [1.75, 0.015, 1.2], "semantic_class": "rug", "collision_source": "box"},
+        {"id": "lampSquareFloor", "dimensions_m": [0.42, 1.35, 0.42], "semantic_class": "lamp", "collision_source": "compound_box"},
+        {"id": "pottedPlant", "dimensions_m": [0.55, 1.0, 0.55], "semantic_class": "plant", "collision_source": "compound_box"},
+        {"id": "books", "dimensions_m": [0.32, 0.14, 0.24], "semantic_class": "books", "collision_source": "box"}
+      ],
+      "material_variants": ["warm_oak", "painted_sage", "natural_birch"]
+    },
+    "procedural_garments": {
+      "license": "repository-authored",
+      "construction": "skinned geometry derived once from the licensed avatar bind pose and bound to the same skeleton",
+      "real_time_cloth_required": false
+    }
+  },
+  "avatar_specs": [
+    {
+      "schema": "embodied.avatar_spec.v1",
+      "avatar_id": "mpfb_child_cc0",
+      "source_asset": "mpfb_child_cc0",
+      "skeleton": "single_weighted_mpfb_armature",
+      "hand_topology": {"hands": 2, "digits_per_hand": 5, "segments_per_digit": 3},
+      "garment_configuration_id": "sunset_play",
+      "garments": [
+        {"id": "long_sleeve_top", "layer": 10, "fit_offset_m": 0.004, "material": "cotton", "color_rgba": [0.83, 0.24, 0.16, 1.0]},
+        {"id": "soft_trousers", "layer": 10, "fit_offset_m": 0.004, "material": "cotton_twill", "color_rgba": [0.12, 0.26, 0.52, 1.0]},
+        {"id": "ankle_socks", "layer": 10, "fit_offset_m": 0.003, "material": "knit", "color_rgba": [0.93, 0.86, 0.65, 1.0]}
+      ]
+    },
+    {
+      "schema": "embodied.avatar_spec.v1",
+      "avatar_id": "mpfb_child_cc0",
+      "source_asset": "mpfb_child_cc0",
+      "skeleton": "single_weighted_mpfb_armature",
+      "hand_topology": {"hands": 2, "digits_per_hand": 5, "segments_per_digit": 3},
+      "garment_configuration_id": "forest_layer",
+      "garments": [
+        {"id": "short_sleeve_top", "layer": 10, "fit_offset_m": 0.004, "material": "jersey", "color_rgba": [0.16, 0.48, 0.30, 1.0]},
+        {"id": "contrast_vest", "layer": 20, "fit_offset_m": 0.008, "material": "fleece", "color_rgba": [0.86, 0.68, 0.18, 1.0]},
+        {"id": "soft_trousers", "layer": 10, "fit_offset_m": 0.004, "material": "cotton_twill", "color_rgba": [0.25, 0.20, 0.16, 1.0]}
+      ]
+    },
+    {
+      "schema": "embodied.avatar_spec.v1",
+      "avatar_id": "mpfb_child_cc0",
+      "source_asset": "mpfb_child_cc0",
+      "skeleton": "single_weighted_mpfb_armature",
+      "hand_topology": {"hands": 2, "digits_per_hand": 5, "segments_per_digit": 3},
+      "garment_configuration_id": "sky_overall",
+      "garments": [
+        {"id": "long_sleeve_top", "layer": 10, "fit_offset_m": 0.004, "material": "cotton", "color_rgba": [0.89, 0.87, 0.74, 1.0]},
+        {"id": "play_overall", "layer": 20, "fit_offset_m": 0.008, "material": "denim", "color_rgba": [0.15, 0.48, 0.68, 1.0]},
+        {"id": "ankle_socks", "layer": 10, "fit_offset_m": 0.003, "material": "knit", "color_rgba": [0.86, 0.31, 0.22, 1.0]}
+      ]
+    }
+  ],
+  "scene_matrix": [
+    {"seed": 202608041, "room_family": "warm_playroom", "material_variant": "warm_oak", "zones": ["window_scan", "low_table", "toy_shelf", "rug"]},
+    {"seed": 202608042, "room_family": "sage_living_corner", "material_variant": "painted_sage", "zones": ["sofa", "low_table", "bookcase", "window_scan"]},
+    {"seed": 202608043, "room_family": "birch_art_room", "material_variant": "natural_birch", "zones": ["art_shelf", "low_table", "reading_chair", "window_scan"]}
+  ],
+  "activity_plan": {
+    "schema": "embodied.activity_plan.v1",
+    "duration_s": 16.0,
+    "controller_profile_id": "physics_clocked_bimanual_child_v1",
+    "no_seed_specific_retuning": true,
+    "phases": [
+      {"id": "scan", "start_s": 0.0, "end_s": 1.8},
+      {"id": "body_reorientation", "start_s": 1.8, "end_s": 3.0},
+      {"id": "right_reach", "start_s": 3.0, "end_s": 5.0},
+      {"id": "visible_touch_and_capture", "start_s": 5.0, "end_s": 6.6},
+      {"id": "left_assistance", "start_s": 6.6, "end_s": 8.0},
+      {"id": "bimanual_inspect_turn", "start_s": 8.0, "end_s": 10.8},
+      {"id": "lower_place_release", "start_s": 10.8, "end_s": 13.0},
+      {"id": "both_hand_withdrawal", "start_s": 13.0, "end_s": 14.4},
+      {"id": "final_gaze_transition", "start_s": 14.4, "end_s": 16.0}
+    ]
+  },
+  "trace_contract": {
+    "schema": "embodied.episode_trace.v1",
+    "clock": ["physics_step", "render_frame", "time_s", "phase_id"],
+    "body_state": ["root", "torso", "neck", "head"],
+    "pose_fields": ["position_world_m", "rotation_world_xyzw", "linear_velocity_world_m_s", "angular_velocity_world_rad_s"],
+    "hand_state": ["left_palm", "right_palm", "left_thumb", "left_index", "left_middle", "left_ring", "left_little", "right_thumb", "right_index", "right_middle", "right_ring", "right_little"],
+    "per_digit_fields": ["segments", "pose", "velocity", "closure_commanded", "closure_observed"],
+    "controller_state": ["targets", "errors", "recovery_state", "speed_limits", "closure_limits"],
+    "contact_fields": ["collider_a", "collider_b", "point_world_m", "normal_world", "separation_m", "relative_velocity_world_m_s", "available_impulse_n_s", "provenance"],
+    "object_fields": ["persistent_id", "semantic_id", "instance_id", "pose", "linear_velocity_world_m_s", "angular_velocity_world_rad_s", "support_id", "sleeping"],
+    "camera_fields": ["parent_id", "position_world_m", "rotation_world_xyzw", "intrinsics", "clearance_m", "optical_vs_face_forward_deg"],
+    "derived_fields": ["joint_proprioception", "head_accelerometer_m_s2", "head_gyroscope_rad_s"],
+    "assistance_ledger": []
+  },
+  "truth_provenance": [
+    {"field": "kinematic_body_hand_and_garment_state", "provenance": "commanded_and_engine_observed", "formula_or_source": "Unity Transform state sampled after each Physics.Simulate", "units": "SI plus quaternion_xyzw"},
+    {"field": "free_object_pose_velocity_sleep_identity", "provenance": "physx_measured", "formula_or_source": "Unity Rigidbody after Physics.Simulate", "units": "m, m/s, rad/s"},
+    {"field": "contacts", "provenance": "physx_measured", "formula_or_source": "Unity contact callbacks plus Physics.ComputePenetration where separation is unavailable", "units": "m, m/s, N*s when exposed"},
+    {"field": "joint_proprioception", "provenance": "derived", "formula_or_source": "relative parent-child rotation and finite-difference angular velocity", "units": "rad, rad/s"},
+    {"field": "head_gyroscope", "provenance": "derived", "formula_or_source": "quaternion finite difference in head-local coordinates", "units": "rad/s"},
+    {"field": "head_accelerometer", "provenance": "derived", "formula_or_source": "second finite difference of head position transformed to head-local coordinates minus world gravity", "units": "m/s2"},
+    {"field": "biological_torque", "provenance": "unavailable", "formula_or_source": "not claimed", "units": "unavailable"}
+  ],
+  "qa_tolerances": {
+    "schema": "embodied.qa_tolerances.v1",
+    "registration": {"skin_collider_max_m": 0.0075, "garment_body_max_penetration_m": 0.004, "report_affected_vertex_distribution": true},
+    "contact": {"finger_object_max_penetration_m": 0.003, "target_support_max_penetration_m": 0.002, "visible_physical_max_frame_delta": 1, "correct_visible_surface_projection_required": true},
+    "interaction": {"right_required_digits": ["thumb"], "right_minimum_non_thumb_digits": 2, "right_opposition_min_s": 0.25, "meaningful_left_support_required": true, "lift_min_m": 0.08, "turn_min_deg": 20.0, "free_release_required": true},
+    "camera": {"optical_vs_face_forward_max_deg": 15.0, "minimum_head_or_clothing_clearance_m": 0.001, "roll_abs_max_deg": 12.0, "linear_speed_max_m_s": 1.5, "angular_speed_max_deg_s": 120.0, "required_events_visible": ["touch", "capture", "left_assistance", "turn", "placement", "free_release", "withdrawal"]},
+    "clock": {"physics_hz": 240, "render_hz": 30, "exact_steps_per_render_frame": 8},
+    "capture": {"resolution_px": [1920, 1080], "fps": 30, "streams": ["rgb", "metric_depth", "semantic", "persistent_instance"], "same_frozen_frame_required": true, "zero_proxy_hero_pixels": true},
+    "replay": {"fresh_process_required": true, "same_trace_rerender_required": true, "translation_max_m": 0.0005, "rotation_max_deg": 0.05, "object_velocity_max_m_s": 0.002, "rerender_min_psnr_db": 60.0}
+  },
+  "forbidden_assistance": [
+    "parenting free object",
+    "FixedJoint grasp",
+    "free-object transform writes after initialization",
+    "snapping",
+    "teleportation",
+    "hidden springs or forces",
+    "kinematic object lift",
+    "catch fixture",
+    "object trajectory",
+    "post-step repair"
+  ],
+  "promotion": {
+    "pass_minimum_room_seeds": 2,
+    "pass_total_room_seeds": 3,
+    "pass_minimum_clothing_variants": 2,
+    "pass_total_clothing_variants": 3,
+    "qa_may_veto": true,
+    "promising_bounded_repair_max_localized_defects": 1,
+    "hard_no_go": ["hardcoded clothing or rooms", "visible_physical_hand divergence", "failed unassisted coherent interaction", "camera trace visual divergence"]
+  },
+  "preserved_evidence": {
+    "visual_feasibility": {"decision": "PASS_VISUAL_SHELL_ONLY", "record": "docs/embodied_simulation/unity_visual_audition.md"},
+    "controller_registration": {"decision": "NO-GO_STAGE_C_AND_INTEGRATED", "record": "docs/embodied_simulation_bimanual_gate_decision.md"},
+    "bounded_physics_kernel": {"decision": "BOUNDED_PHYSICAL_KERNEL_PASS_ONLY", "lift_m": 0.1013, "turn_deg": 25.6, "left_support_limitation": "little digit only"}
+  },
+  "privacy_and_claims": {
+    "restricted_childlens_access_permitted": false,
+    "restricted_external_drive_access_permitted": false,
+    "public_synthetic_inputs_only": true,
+    "infant_trained": false,
+    "age_matched": false,
+    "childlens_calibrated": false,
+    "human_validated": false,
+    "biological_torque_valid": false
+  }
+}
