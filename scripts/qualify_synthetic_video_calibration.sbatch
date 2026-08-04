@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=synthetic-calibration-qualify
-#SBATCH --partition=h100
+#SBATCH --partition=a30
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=4G
-#SBATCH --time=01:30:00
+#SBATCH --time=03:00:00
 #SBATCH --output=/dev/null
 #SBATCH --error=/dev/null
 

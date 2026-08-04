@@ -7,6 +7,7 @@ import pytest
 
 from nursery_egobaby_preflight.contract import (
     canonical_json_sha256,
+    file_sha256,
     lexical_macro_wiring,
     schedule_cycle,
     validate_phase_state,
@@ -39,7 +40,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 8
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_DEVELOPMENT_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_DEVELOPMENT_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -58,6 +59,15 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert fixture_result["source_overlap_counts"] == [0, 0, 0, 0]
     assert fixture_result["model_inference_executed"] is False
     assert fixture_result["public_development_authorized"] is True
+    resource = config["learner_effective_public_qualification_resource_amendment"]
+    assert resource["triggering_H100_job_id"] == 315509
+    assert resource["triggering_H100_elapsed_seconds"] == 0
+    assert resource["qualification_output_count"] == 0
+    assert resource["active_GPU_type"] == "NVIDIA_A30_24GB"
+    assert resource["development_and_holdout_GPU_hours_max"] == 6.0
+    assert resource["amendment_commitment_sha256"] == (
+        "5330cf582e46d1bf075ca97af7c8bfceb47cfcd09499786f4e366b6f8e283beb"
+    )
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
     assert label_correction["binary_yes_no_swapped_count"] == 193
@@ -319,6 +329,13 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
     assert config["schema_version"] == 17
+    resource = dict(config["learner_effective_public_qualification_resource_amendment"])
+    commitment = resource.pop("amendment_commitment_sha256")
+    assert commitment == canonical_json_sha256(resource)
+    assert commitment == "5330cf582e46d1bf075ca97af7c8bfceb47cfcd09499786f4e366b6f8e283beb"
+    assert file_sha256(resource["canonical_wrapper"]) == resource[
+        "canonical_wrapper_sha256"
+    ]
     amendment = dict(config["ambitious_learner_effective_h3_amendment"])
     commitment = amendment.pop("amendment_commitment_sha256")
     assert commitment == canonical_json_sha256(amendment)

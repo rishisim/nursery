@@ -1,6 +1,6 @@
 {
   "schema_version": 17,
-  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_DEVELOPMENT_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
+  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_DEVELOPMENT_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -543,6 +543,60 @@
     "public_development_authorized": true,
     "holdout_authorized_only_after_development_threshold_seal": true
   },
+  "learner_effective_public_qualification_resource_amendment": {
+    "status": "FROZEN_AFTER_PENDING_H100_CANCELLED_BEFORE_PUBLIC_MODEL_OUTCOME",
+    "effective_on": "2026-08-03",
+    "decision_basis": "scheduler availability and prior label-blind sizing only; no public model, threshold, holdout, C, generator, or learner outcome was used",
+    "triggering_H100_job": {
+      "job_id": 315509,
+      "state": "CANCELLED_BEFORE_ALLOCATION",
+      "elapsed_seconds": 0,
+      "exit_code": "0:0",
+      "qualification_output_count": 0,
+      "stderr_empty": true,
+      "model_inference_executed": false
+    },
+    "scheduler_test_only_estimates": {
+      "H100": "2026-08-04T13:45:31-05:00",
+      "H200": "2026-08-04T06:20:48-05:00",
+      "A30": "2026-08-03T23:40:09-05:00",
+      "scientific_outcome_used": false
+    },
+    "label_blind_adequacy": {
+      "sizing_job_id": 313940,
+      "module_count": 8,
+      "failure_count": 0,
+      "peak_vram_GiB": 0.701171875,
+      "public_fixture_or_model_outcome_opened": false
+    },
+    "prior_resource_plan_preserved": {
+      "mechanistic_training_tuple_amendment_commitment_sha256": "c9a48206d09e0a3e8f771c5ec96f03c02d244a18f60b226227eca8ccddd9adaf",
+      "GPU_type": "NVIDIA_H100_80GB",
+      "public_development_and_holdout_GPU_hours_max": 6.0
+    },
+    "active_topology": {
+      "partition": "a30",
+      "GPU_type": "NVIDIA_A30_24GB",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "per_run_wall_hours_max": 3.0,
+      "public_development_and_holdout_GPU_hours_max": 6.0,
+      "multi_process_or_DDP": false,
+      "same_topology_for_development_and_holdout": true,
+      "public_storage_GiB_max": 200,
+      "direct_monetary_cost_USD": 0,
+      "institutional_GPU_time_accounted": true
+    },
+    "unchanged_contract": ["fixtures", "partitions", "models", "weights", "preprocessing", "threshold_grids", "seeds", "metrics", "combined_gate", "holdout_once_only", "governed_C_order", "LTX_and_learner_contracts"],
+    "canonical_wrapper": "scripts/qualify_synthetic_video_calibration.sbatch",
+    "canonical_wrapper_sha256": "2e4d6d7601aa35a85c6e9a12648bcf6319c54741b5cfc2c9808c797972988b03",
+    "authorization_basis": "the user's existing broad approval for whatever appropriate university GPU covers this single-process zero-monetary-cost A30 topology within the unchanged six-GPU-hour public ceiling",
+    "public_development_authorized": true,
+    "holdout_authorized_only_after_development_threshold_seal": true,
+    "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
+    "amendment_commitment_sha256": "5330cf582e46d1bf075ca97af7c8bfceb47cfcd09499786f4e366b6f8e283beb"
+  },
   "governance_incident": {
     "observed_on": "2026-08-02",
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_GOVERNED_PROCESSING_RESUMED",
@@ -590,7 +644,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_CONSTRUCT_ALIGNED_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_DEVELOPMENT_AUTHORIZED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
+    "status": "PRIOR_CALIBRATION_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_CONSTRUCT_ALIGNED_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_DEVELOPMENT_AUTHORIZED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -613,6 +667,7 @@
       "pre_seal_label_semantics_correction": "/public_no_hand_review_label_semantics_correction",
       "blind_no_hand_review_seal": "/public_no_hand_review_seal_result",
       "public_qualification_current_state": "/learner_effective_public_fixture_preparation_result",
+      "public_qualification_resource": "/learner_effective_public_qualification_resource_amendment",
       "preserved_complete_source_no_go": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_complete_source_result",
       "governed_C_and_episode_plan_order": "/construct_aligned_ltx_resume_amendment/execution_order",
       "generated_attempt_and_accepted_corpus_matching": "/calibration_C/extractor/mechanistic_training_tuple_amendment/generated_attempt_and_accepted_corpus_matching"

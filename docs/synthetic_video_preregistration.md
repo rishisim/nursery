@@ -1686,6 +1686,21 @@ threshold, or holdout outcome was opened. Exactly one public-development run is
 now authorized. Holdout remains sealed until the frozen development grid values
 and thresholds are selected and committed.
 
+Before any development inference, H100 job 315509 remained pending solely for
+scheduler resources and was canceled before allocation. It accumulated zero
+elapsed seconds, wrote zero qualification outputs, had empty stderr, and opened
+no model or scientific outcome. Read-only scheduler feasibility estimates and
+the prior label-blind sizing result (job 313940; eight modules, zero failures,
+0.701171875 GiB peak VRAM) prospectively select a single NVIDIA A30 24GB for
+both development and holdout. Each run is capped at one GPU, 8 CPUs, 32 GiB,
+and three hours; the unchanged combined public ceiling is six GPU-hours, 200
+GiB storage, and $0 direct monetary cost. Multi-process/DDP remains false. No
+fixture, model, weight, preprocessing, threshold grid, seed, metric, combined
+gate, or downstream contract changed. Resource amendment commitment is
+`5330cf58…283beb`; the canonical qualification-wrapper SHA-256 is
+`2e4d6d76…988b03`. The user's prior broad authorization covers this narrower
+zero-cost topology.
+
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
 descriptive. Only a combined public pass authorizes the single-applicant blind

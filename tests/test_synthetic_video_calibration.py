@@ -5372,9 +5372,9 @@ def test_public_qualification_jobs_never_mount_restricted_data() -> None:
     assert "PHASE4_EGOHOS_INFERENCE_NOT_STARTED_ATTESTED" in prepare
     assert "PHASE4_ACTIVITY_CODE_CLEAN=1" in prepare
     assert "PHASE4_RESTRICTED_ROOT" not in prepare
-    assert "#SBATCH --partition=h100" in qualify
+    assert "#SBATCH --partition=a30" in qualify
+    assert "#SBATCH --time=03:00:00" in qualify
     assert "#SBATCH --gpus-per-node=1" in qualify
-    assert "#SBATCH --time=01:30:00" in qualify
     assert "qualify-public" in qualify
     assert "activity-candidate" in qualify
     assert "--net --network none" in qualify

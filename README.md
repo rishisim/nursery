@@ -243,6 +243,15 @@ families with zero subject, video, frame, or object overlap, commitment
 holdout remains sealed until the frozen development grid selection and threshold
 record are committed.
 
+The first intended outcome-bearing H100 submission (job 315509) remained pending for
+resources and was canceled before allocation: elapsed time and qualification
+outputs were both zero, stderr was empty, and no inference ran. A prospective
+scheduler-only amendment, made without model outcomes, freezes one NVIDIA A30
+24GB, 8 CPUs, 32 GiB, and a three-hour per-run cap for both development and
+holdout. The combined public ceiling remains six GPU-hours and $0 direct cost.
+The prior H100 plan remains preserved; active resource commitment is
+`5330cf58…283beb`, and wrapper SHA-256 is `2e4d6d76…988b03`.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and
