@@ -1596,6 +1596,18 @@ lineage, a threshold, a model, an amendment, or a scientific rule. Review is
 still in progress, with no review seal, inference, or public scientific
 outcome.
 
+The corrected review subsequently sealed `PASS`. Job 315425 completed with
+exit `0:0`, empty stderr, and 13 seconds elapsed on four CPUs with 16 GiB at
+zero direct monetary cost. Across two partitions, 251 items were coded; the
+seal retained 96 verified no-hand items and compactly reports 15 visible-hand
+codes, 2 abstentions, 133 unreviewed items, and zero deficient partitions. The
+review-label commitment is `723f218b…1edd` and the verified no-hand seal is
+`a58ca3f1…1c97`. The authorized-applicant, blind-to-EgoHOS, and no-prior-
+EgoHOS-inference attestations all passed. Exact public fixture preparation is
+now authorized. Public model inference remains fail-closed until the fixture
+manifest and lineage are sealed; no fixture, model, development, holdout, or
+later scientific outcome has opened.
+
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
 descriptive. Only a combined public pass authorizes the single-applicant blind

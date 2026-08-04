@@ -94,7 +94,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
     assert result["schema_version"] == 5
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_AUTHORIZED_APPLICANT_REVIEW_IN_PROGRESS_PRIOR_NO_GOS_PRESERVED_NO_SEAL_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_PREPARATION_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -152,6 +152,35 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert correction["review_sealed"] is False
     assert correction["model_inference_executed"] is False
     assert correction["public_model_or_scientific_gate_outcome_opened"] is False
+    review_seal = result["public_no_hand_review_seal_result"]
+    assert review_seal["status"].startswith("PASS_BLIND_NO_HAND_REVIEW_SEALED")
+    assert review_seal["job_id"] == 315425
+    assert review_seal["exit_code"] == "0:0"
+    assert review_seal["elapsed_seconds"] == 13
+    assert review_seal["allocated_CPU_count"] == 4
+    assert review_seal["allocated_memory_GiB"] == 16
+    assert review_seal["direct_monetary_cost_usd"] == 0
+    assert review_seal["partition_count"] == 2
+    assert review_seal["coded_count"] == 251
+    assert review_seal["verified_no_hand_count"] == 96
+    assert review_seal["visible_hand_count"] == 15
+    assert review_seal["abstain_count"] == 2
+    assert review_seal["unreviewed_count"] == 133
+    assert review_seal["deficit_partition_count"] == 0
+    assert review_seal["review_labels_commitment_sha256"] == (
+        "723f218b3f3d06189949728d93bc04114bd54c9d405910bc31b0f1653f121edd"
+    )
+    assert review_seal["verified_no_hand_seal_commitment_sha256"] == (
+        "a58ca3f10fd72ba2a7bfc2faf9c8c65b22a22913fcf2c92786859401b8d21c97"
+    )
+    assert review_seal["stderr_empty"] is True
+    assert review_seal["authorized_applicant_attested"] is True
+    assert review_seal["blind_to_EgoHOS_output_attested"] is True
+    assert review_seal["EgoHOS_inference_not_started_attested"] is True
+    assert review_seal["fixture_preparation_authorized"] is True
+    assert review_seal["fixture_preparation_executed"] is False
+    assert review_seal["model_inference_executed"] is False
+    assert review_seal["public_development_or_holdout_outcome_opened"] is False
     tuple_amendment = result["governed_C_mechanistic_training_tuple_amendment"]
     assert tuple_amendment["status"] == "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     assert len(tuple_amendment["prior_no_go_commitments_preserved"]) == 4
@@ -337,7 +366,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_AUTHORIZED_APPLICANT_REVIEW_IN_PROGRESS_PRIOR_NO_GOS_PRESERVED_NO_SEAL_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
+    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_PREPARATION_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,

@@ -1,7 +1,7 @@
 {
   "schema_version": 5,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_AUTHORIZED_APPLICANT_REVIEW_IN_PROGRESS_PRIOR_NO_GOS_PRESERVED_NO_SEAL_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_PREPARATION_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -209,6 +209,34 @@
     "review_sealed": false,
     "model_inference_executed": false,
     "public_model_or_scientific_gate_outcome_opened": false
+  },
+  "public_no_hand_review_seal_result": {
+    "status": "PASS_BLIND_NO_HAND_REVIEW_SEALED_PUBLIC_FIXTURE_PREPARATION_AUTHORIZED_NO_FIXTURE_OR_MODEL_OUTCOME",
+    "completed_on": "2026-08-03",
+    "job_id": 315425,
+    "exit_code": "0:0",
+    "elapsed_seconds": 13,
+    "allocated_CPU_count": 4,
+    "allocated_memory_GiB": 16,
+    "direct_monetary_cost_usd": 0,
+    "partition_count": 2,
+    "coded_count": 251,
+    "verified_no_hand_count": 96,
+    "visible_hand_count": 15,
+    "abstain_count": 2,
+    "unreviewed_count": 133,
+    "deficit_partition_count": 0,
+    "review_labels_commitment_sha256": "723f218b3f3d06189949728d93bc04114bd54c9d405910bc31b0f1653f121edd",
+    "verified_no_hand_seal_commitment_sha256": "a58ca3f10fd72ba2a7bfc2faf9c8c65b22a22913fcf2c92786859401b8d21c97",
+    "stderr_empty": true,
+    "authorized_applicant_attested": true,
+    "blind_to_EgoHOS_output_attested": true,
+    "EgoHOS_inference_not_started_attested": true,
+    "fixture_preparation_authorized": true,
+    "fixture_preparation_executed": false,
+    "model_inference_executed": false,
+    "public_development_or_holdout_outcome_opened": false,
+    "governed_C_generator_or_learner_outcome_opened": false
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -785,5 +813,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "AUTHORIZED_APPLICANT_CONTINUE_AND_COMPLETE_THE_BLIND_NO_HAND_REVIEW_UNDER_THE_CLARIFIED_LABEL_SEMANTICS_THEN_ATTEST_AND_SEAL; ONLY_THEN_RUN_FIXTURE_PREPARATION_COMBINED_PUBLIC_DEVELOPMENT_AND_ONCE_ONLY_HOLDOUT_QUALIFICATION; GOVERNED_C_COMPILER_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
+  "next_authorized_scope": "PREPARE_AND_SEAL_THE_EXACT_PUBLIC_FIXTURE_MANIFEST_THEN_RUN_THE_COMBINED_PUBLIC_DEVELOPMENT_AND_ONCE_ONLY_HOLDOUT_QUALIFICATION; MODEL_INFERENCE_REMAINS_FAIL_CLOSED_UNTIL_FIXTURE_SEAL; GOVERNED_C_COMPILER_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
 }

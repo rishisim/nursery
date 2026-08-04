@@ -419,6 +419,18 @@ holdout changed from 0/3/0 to 3/0/0. The label-record commitment changed from
 fixture lineage, threshold, model, or scientific rule. Review remains in
 progress; no seal, inference, or public scientific outcome exists.
 
+The completed corrected review then sealed `PASS` in job 315425 with exit
+`0:0`, empty stderr, and 13 seconds elapsed on four CPUs and 16 GiB at zero
+direct monetary cost. Across two partitions, 251 items were coded; the seal
+retained 96 verified no-hand items and compactly reports 15 visible-hand codes,
+2 abstentions, 133 unreviewed items, and zero deficient partitions. Review
+labels are committed at `723f218b…1edd` and the verified no-hand seal at
+`a58ca3f1…1c97`. The authorized-applicant, blind-to-EgoHOS, and no-prior-EgoHOS-
+inference attestations are all true. This authorizes exact public fixture
+preparation. Model inference remains conditional on the fixture manifest and
+lineage seal; no fixture, model, development, holdout, or later scientific
+outcome has opened.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

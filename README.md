@@ -182,6 +182,15 @@ fixed at `5ba8ae3e…f2b7`; the compact label record changed from
 `7dd640e1…e4fb5` to `2ffae4d1…eae8`. Review remains in progress. No review
 seal, model inference, public outcome, fixture, threshold, or scientific rule
 changed.
+The corrected blind review then sealed PASS in job 315425 (`0:0`) in 13
+seconds on four CPUs and 16 GiB at $0 direct cost. Across two partitions, the
+compact seal reports 251 coded items, 96 retained verified no-hand items, 15
+visible-hand codes, 2 abstentions, 133 unreviewed items, and zero partition
+deficits. Review labels are committed at `723f218b…1edd` and the verified
+no-hand seal at `a58ca3f1…1c97`; all applicant, blindness, and no-prior-inference
+attestations passed and stderr was empty. Public fixture preparation is now
+authorized. No fixture has been prepared or sealed and no model, development,
+holdout, C, generator, or learner outcome has opened.
 
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema

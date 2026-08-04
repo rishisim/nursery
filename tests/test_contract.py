@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 8
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_AUTHORIZED_APPLICANT_REVIEW_IN_PROGRESS_PRIOR_NO_GOS_PRESERVED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_PREPARATION_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED"
     validate_phase_state(config)
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
@@ -54,6 +54,17 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert label_correction["review_sealed"] is False
     assert label_correction["model_inference_executed"] is False
     assert label_correction["public_model_or_scientific_gate_outcome_opened"] is False
+    review_seal = config["public_no_hand_review_seal_result"]
+    assert review_seal["status"].startswith("PASS_BLIND_NO_HAND_REVIEW_SEALED")
+    assert review_seal["job_id"] == 315425
+    assert review_seal["coded_count"] == 251
+    assert review_seal["verified_no_hand_count"] == 96
+    assert review_seal["deficit_partition_count"] == 0
+    assert review_seal["verified_no_hand_seal_commitment_sha256"] == (
+        "a58ca3f10fd72ba2a7bfc2faf9c8c65b22a22913fcf2c92786859401b8d21c97"
+    )
+    assert review_seal["fixture_preparation_authorized"] is True
+    assert review_seal["model_inference_executed"] is False
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
     assert premodel["dependency_manifest_commitment_sha256"] == (
@@ -237,8 +248,12 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     )
     assert config["gates"]["public_model_inference_requires_blind_no_hand_review_seal"] is True
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
-    assert config["gates"]["learner_effective_no_hand_review_sealed"] is False
+    assert config["gates"]["learner_effective_no_hand_review_sealed"] is True
+    assert config["gates"]["learner_effective_public_fixture_preparation_authorized"] is True
     assert config["gates"]["learner_effective_public_model_inference_authorized"] is False
+    assert config["gates"][
+        "learner_effective_public_model_inference_conditionally_authorized_after_fixture_seal"
+    ] is True
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
     assert config["gates"]["generator_work_authorized"] is False
     assert config["gates"]["real_only_training_authorized"] is False
@@ -347,6 +362,33 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert correction["review_sealed"] is False
     assert correction["model_inference_executed"] is False
     assert correction["public_model_or_scientific_gate_outcome_opened"] is False
+    review_seal = config["public_no_hand_review_seal_result"]
+    assert review_seal["status"].startswith("PASS_BLIND_NO_HAND_REVIEW_SEALED")
+    assert review_seal["job_id"] == 315425
+    assert review_seal["exit_code"] == "0:0"
+    assert review_seal["elapsed_seconds"] == 13
+    assert review_seal["allocated_CPU_count"] == 4
+    assert review_seal["allocated_memory_GiB"] == 16
+    assert review_seal["direct_monetary_cost_usd"] == 0
+    assert review_seal["partition_count"] == 2
+    assert review_seal["coded_count"] == 251
+    assert review_seal["verified_no_hand_count"] == 96
+    assert review_seal["visible_hand_count"] == 15
+    assert review_seal["abstain_count"] == 2
+    assert review_seal["unreviewed_count"] == 133
+    assert review_seal["deficit_partition_count"] == 0
+    assert review_seal["review_labels_commitment_sha256"] == (
+        "723f218b3f3d06189949728d93bc04114bd54c9d405910bc31b0f1653f121edd"
+    )
+    assert review_seal["verified_no_hand_seal_commitment_sha256"] == (
+        "a58ca3f10fd72ba2a7bfc2faf9c8c65b22a22913fcf2c92786859401b8d21c97"
+    )
+    assert review_seal["stderr_empty"] is True
+    assert all(review_seal["attestations"].values())
+    assert review_seal["fixture_preparation_authorized"] is True
+    assert review_seal["fixture_preparation_executed"] is False
+    assert review_seal["model_inference_executed"] is False
+    assert review_seal["public_development_or_holdout_outcome_opened"] is False
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"

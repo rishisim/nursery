@@ -1,6 +1,6 @@
 {
   "schema_version": 17,
-  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_AUTHORIZED_APPLICANT_REVIEW_IN_PROGRESS_PRIOR_NO_GOS_PRESERVED_NO_SEAL_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
+  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_PREPARATION_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -323,6 +323,38 @@
     "public_model_or_scientific_gate_outcome_opened": false,
     "next_required_action": "AUTHORIZED_APPLICANT_CONTINUE_AND_COMPLETE_THE_BLIND_REVIEW_UNDER_THE_CLARIFIED_LABEL_SEMANTICS_BEFORE_ATTESTATION_OR_SEAL"
   },
+  "public_no_hand_review_seal_result": {
+    "status": "PASS_BLIND_NO_HAND_REVIEW_SEALED_PUBLIC_FIXTURE_PREPARATION_AUTHORIZED_NO_FIXTURE_OR_MODEL_OUTCOME",
+    "completed_on": "2026-08-03",
+    "job_id": 315425,
+    "exit_code": "0:0",
+    "elapsed_seconds": 13,
+    "allocated_CPU_count": 4,
+    "allocated_memory_GiB": 16,
+    "direct_monetary_cost_usd": 0,
+    "partition_count": 2,
+    "coded_count": 251,
+    "verified_no_hand_count": 96,
+    "visible_hand_count": 15,
+    "abstain_count": 2,
+    "unreviewed_count": 133,
+    "deficit_partition_count": 0,
+    "review_labels_commitment_sha256": "723f218b3f3d06189949728d93bc04114bd54c9d405910bc31b0f1653f121edd",
+    "verified_no_hand_seal_commitment_sha256": "a58ca3f10fd72ba2a7bfc2faf9c8c65b22a22913fcf2c92786859401b8d21c97",
+    "stderr_empty": true,
+    "attestations": {
+      "authorized_applicant": true,
+      "blind_to_EgoHOS_output": true,
+      "EgoHOS_inference_not_started": true
+    },
+    "fixture_preparation_authorized": true,
+    "public_model_inference_authorized_only_after_fixture_seal": true,
+    "fixture_preparation_executed": false,
+    "model_inference_executed": false,
+    "public_development_or_holdout_outcome_opened": false,
+    "governed_C_generator_or_learner_outcome_opened": false,
+    "next_required_action": "PREPARE_AND_SEAL_THE_EXACT_PUBLIC_FIXTURE_MANIFEST_BEFORE_ANY_PUBLIC_MODEL_INFERENCE"
+  },
   "governance_incident": {
     "observed_on": "2026-08-02",
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_GOVERNED_PROCESSING_RESUMED",
@@ -370,7 +402,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_PRESERVED_CONSTRUCT_ALIGNED_PUBLIC_RUNNER_PASS_NO_HAND_REVIEW_BUNDLE_READY_USER_DIRECTED_PRE_SEAL_LABEL_SEMANTICS_CORRECTION_APPLIED_AUTHORIZED_APPLICANT_REVIEW_IN_PROGRESS",
+    "status": "PRIOR_CALIBRATION_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_CONSTRUCT_ALIGNED_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_PREPARATION_AUTHORIZED_NO_FIXTURE_OR_MODEL_OUTCOME",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -390,7 +422,8 @@
       "joint_distributions": "/calibration_C/extractor/mechanistic_training_tuple_amendment/joint_distributions",
       "public_combined_gate": "/construct_aligned_ltx_resume_amendment/combined_gate/pass_rule",
       "public_runner_implementation": "/construct_aligned_public_runner_implementation",
-      "public_qualification_current_state": "/public_no_hand_review_label_semantics_correction",
+      "pre_seal_label_semantics_correction": "/public_no_hand_review_label_semantics_correction",
+      "public_qualification_current_state": "/public_no_hand_review_seal_result",
       "preserved_complete_source_no_go": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_complete_source_result",
       "governed_C_and_episode_plan_order": "/construct_aligned_ltx_resume_amendment/execution_order",
       "generated_attempt_and_accepted_corpus_matching": "/calibration_C/extractor/mechanistic_training_tuple_amendment/generated_attempt_and_accepted_corpus_matching"
