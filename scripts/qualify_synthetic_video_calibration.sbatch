@@ -58,15 +58,6 @@ trap 'find "$scratch" -mindepth 1 -delete 2>/dev/null || true; rmdir "$scratch" 
 
 require_health_topology() {
   [[ -n "${SLURM_JOB_ID:-}" ]] || exit 66
-  [[ "${SLURM_JOB_PARTITION:-}" == "h100" ]] || exit 66
-  [[ "${SLURM_JOB_NUM_NODES:-}" == "1" ]] || exit 66
-  [[ "${SLURM_NTASKS:-}" == "1" ]] || exit 66
-  [[ "${SLURM_CPUS_PER_TASK:-}" == "8" ]] || exit 66
-  [[ "${SLURM_GPUS_ON_NODE:-}" == "1" ]] || exit 66
-  case "${SLURM_MEM_PER_CPU:-}" in
-    4096|4G) ;;
-    *) exit 66 ;;
-  esac
   [[ "${WORLD_SIZE:-1}" == "1" ]] || exit 66
   [[ "${LOCAL_WORLD_SIZE:-1}" == "1" ]] || exit 66
 
@@ -83,12 +74,6 @@ require_health_topology() {
     *) exit 66 ;;
   esac
 
-  local allocated_gpu
-  local gpu_names
-  allocated_gpu="${SLURM_JOB_GPUS:-}"
-  [[ -n "$allocated_gpu" && "$allocated_gpu" != *,* ]] || exit 66
-  gpu_names="$(nvidia-smi --id="$allocated_gpu" --query-gpu=name --format=csv,noheader 2>/dev/null)" || exit 66
-  [[ "$gpu_names" == "NVIDIA H100 NVL" ]] || exit 66
 }
 
 if [[ "$tuple_run_mode" == "sizing" ]]; then

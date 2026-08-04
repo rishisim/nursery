@@ -1,6 +1,6 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — PUBLIC DEPENDENCY RESTORE FROZEN AFTER H100 HEALTH ATTEMPT-1 PRE-INFERENCE FAILURE; ATTEMPT 2 PENDING; ALL PRIOR NO-GOS PRESERVED**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — TOPOLOGY-GUARD REPAIR FROZEN AFTER H100 HEALTH ATTEMPT-2 PRE-INFERENCE FAILURE; SOLE FINAL ATTEMPT 3 PENDING; ALL PRIOR NO-GOS PRESERVED**
 
 **Evidence cut-off:** 2026-08-04
 
@@ -1813,6 +1813,30 @@ is not rewritten. Repair commitment `3c54503b…46db4` freezes this exact active
 identity before attempt 2. No model, fixture, metric, threshold, seed, C value,
 generator result, or learner result informed the repair. Two full-suite
 submissions and 0.5 conservatively charged slice-GPU-hours remain.
+
+Attempt 2, job 316353, then reached the exact H100 allocation but stopped after
+five seconds with wrapper exit `66:0`, still before Singularity, model loading,
+module inference, private traces, or any scientific metric. Its wrapper-start
+count is one and full-result, compact-result, trace, stdout, and stderr counts
+are all zero. Read-only `scontrol` evidence passed all seven frozen scheduler
+predicates—partition, node count, CPU count, task count, wall limit, memory,
+and exact typed GRES—and requested and allocated TRES matched. The fail-closed
+wrapper did not disclose which redundant transient Slurm-environment or
+`SLURM_JOB_GPUS`/`nvidia-smi` probe rejected the otherwise correct allocation,
+so the diagnosis remains explicitly unlocalized within that redundant group.
+
+Prospective outcome-independent repair `8db2d8ae…b9a5b8` retains the same seven
+authoritative scheduler assertions in both wrapper and health runner, plus the
+runner's effective-CUDA check for exactly one visible device whose name begins
+`NVIDIA H100 NVL` (permitting the scheduler-selected MIG profile suffix) with
+45–50 GiB visible memory. It removes only redundant transient environment
+and GPU-identifier probes. The A30 scientific topology path, H100 resource
+request, models, fixtures, thresholds, metrics, seeds, gates, and downstream
+contract are unchanged. Attempt 2 receives the frozen conservative 0.25
+slice-GPU-hour charge (actual usage 5/3,600 hours), bringing the charged total
+to 0.5. Exactly one full-suite attempt and 0.25 charged slice-GPU-hours remain;
+any further engineering failure exhausts the route and must be sealed as an
+engineering blocker, never a scientific no-go.
 
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only

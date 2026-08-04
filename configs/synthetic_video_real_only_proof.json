@@ -1,6 +1,6 @@
 {
-  "schema_version": 20,
-  "status": "PROSPECTIVE_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_DEPENDENCY_RESTORE_FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_FAILURE_ATTEMPT_2_PENDING_NO_NEW_SCIENTIFIC_OUTCOME",
+  "schema_version": 21,
+  "status": "PROSPECTIVE_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_TOPOLOGY_GUARD_REPAIR_FROZEN_AFTER_H100_ATTEMPT_2_PREINFERENCE_FAILURE_FINAL_ATTEMPT_3_PENDING_NO_NEW_SCIENTIFIC_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -1017,6 +1017,78 @@
     "repair_commitment_scope": "canonical JSON of this repair excluding repair_commitment_sha256",
     "repair_commitment_sha256": "3c54503b4087fae1e993b0aa952823f988a088a5c6543760df1022e2dc046db4"
   },
+  "learner_effective_engineering_health_topology_guard_repair": {
+    "status": "FROZEN_AFTER_H100_ATTEMPT_2_REDUNDANT_TOPOLOGY_GUARD_FAILURE_BEFORE_ATTEMPT_3_OR_NEW_OUTCOME",
+    "effective_on": "2026-08-04",
+    "scope": "OUTCOME_INDEPENDENT_EXACT_SLURM_TOPOLOGY_VALIDATION_WIRING_REPAIR_ONLY",
+    "preserved_without_change": {
+      "engineering_health_amendment_sha256": "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205",
+      "H100_resource_redirect_sha256": "f7fc16f5c399c2a2d213b13a0d255a14b5b2f3ece41d62adaed17f61f186db6d",
+      "dependency_restore_sha256": "3c54503b4087fae1e993b0aa952823f988a088a5c6543760df1022e2dc046db4",
+      "prior_public_development_no_go_sha256": "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf",
+      "public_fixture_manifest_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "production_models_fixtures_thresholds_metrics_seeds_module_behavior_scientific_gates_and_downstream_contract": true
+    },
+    "triggering_attempt": {
+      "attempt": 2,
+      "job_id": 316353,
+      "partition": "h100",
+      "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+      "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "state": "FAILED",
+      "exit_code": "66:0",
+      "elapsed_seconds": 5,
+      "actual_GPU_hours": 0.001388888888888889,
+      "conservative_protocol_GPU_hours_charge": 0.25,
+      "wrapper_record_count": 1,
+      "full_result_count": 0,
+      "compact_result_count": 0,
+      "private_trace_count": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "model_module_inference_count": 0,
+      "scientific_metric_count": 0,
+      "classification": "ENGINEERING_WRAPPER_TOPOLOGY_GUARD_FAILURE_NOT_SCIENTIFIC_NO_GO",
+      "partial_scientific_or_engineering_metric_opened": false
+    },
+    "aggregate_read_only_diagnosis": {
+      "authoritative_scontrol_record_present": true,
+      "authoritative_scontrol_predicate_count": 7,
+      "authoritative_scontrol_predicate_pass_count": 7,
+      "authoritative_scontrol_predicates": ["partition_h100", "one_node", "eight_CPUs", "one_task", "15_minute_limit", "4_GiB_per_CPU", "exact_H100_NVL_3g_47gb_GRES"],
+      "scheduler_requested_and_allocated_TRES_match": true,
+      "unlocalized_failure_scope": "one or more redundant transient Slurm environment or SLURM_JOB_GPUS-to-nvidia-smi predicates before Singularity; the zero-output fail-closed wrapper did not disclose a narrower branch",
+      "scientific_or_model_information_used": false
+    },
+    "repair": {
+      "wrapper_scheduler_validation": "retain the same seven exact authoritative scontrol predicates plus single-process WORLD_SIZE and LOCAL_WORLD_SIZE; remove only redundant transient environment and GPU-identifier probes",
+      "runner_scheduler_validation": "use the same exact authoritative scontrol predicates for health mode rather than redundant transient Slurm environment fields",
+      "runner_effective_CUDA_validation": "retain exact torch checks for one visible CUDA device whose name begins NVIDIA H100 NVL, permitting the scheduler-selected MIG profile suffix, with 45-to-50 GiB visible memory",
+      "scientific_A30_topology_path_changed": false,
+      "health_resource_topology_changed": false,
+      "model_fixture_threshold_metric_seed_or_gate_changed": false,
+      "full_28_case_suite_restart_required": true
+    },
+    "remaining_health_budget": {
+      "submission_count_consumed": 2,
+      "submission_count_remaining": 1,
+      "aggregate_GPU_hours_ceiling": 0.75,
+      "actual_GPU_hours_consumed": 0.0016666666666666668,
+      "conservative_protocol_GPU_hours_charged": 0.5,
+      "conservative_protocol_GPU_hours_remaining": 0.25,
+      "new_storage_GiB_ceiling": 10,
+      "restored_storage_GiB_charged": 2.280886,
+      "new_storage_GiB_remaining": 7.719114,
+      "direct_monetary_cost_USD": 0
+    },
+    "attempt_3_rule": "commit and push this exact validation-wiring repair before the sole final full-suite attempt on the unchanged H100 MIG topology; any further engineering failure exhausts the route and seals ENGINEERING_BLOCKER",
+    "new_model_fixture_scientific_or_learner_outcome_opened": false,
+    "repair_commitment_scope": "canonical JSON of this repair excluding repair_commitment_sha256",
+    "repair_commitment_sha256": "8db2d8ae04ee702ab3c68ff7c243afed0d8e4710c01f3f7865faa4975fb9a5b8"
+  },
   "governance_incident": {
     "observed_on": "2026-08-02",
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_GOVERNED_PROCESSING_RESUMED",
@@ -1064,7 +1136,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_AND_PUBLIC_DEVELOPMENT_NO_GO_PRESERVED_H100_ATTEMPT_1_PREINFERENCE_DEPENDENCY_FAILURE_AND_PUBLIC_CACHE_RESTORE_FROZEN_ATTEMPT_2_PENDING_C_LTX_AND_SYNTHETIC_LEARNER_REMAIN_CONDITIONAL_AND_NOT_RUN",
+    "status": "PRIOR_CALIBRATION_NO_GOS_AND_PUBLIC_DEVELOPMENT_NO_GO_PRESERVED_H100_ATTEMPTS_1_AND_2_PREINFERENCE_ENGINEERING_FAILURES_AND_TOPOLOGY_GUARD_REPAIR_FROZEN_FINAL_ATTEMPT_3_PENDING_C_LTX_AND_SYNTHETIC_LEARNER_REMAIN_CONDITIONAL_AND_NOT_RUN",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",

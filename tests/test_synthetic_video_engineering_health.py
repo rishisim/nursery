@@ -694,6 +694,87 @@ def test_dependency_restore_is_hash_bound_preinference_and_scientifically_narrow
         MODULE._engineering_health_dependency_restore(mutated)
 
 
+def test_topology_guard_repair_is_hash_bound_preinference_and_scientifically_narrow() -> None:
+    config = _config()
+    repair = MODULE._engineering_health_topology_guard_repair(config)
+    assert repair["repair_commitment_sha256"] == (
+        "8db2d8ae04ee702ab3c68ff7c243afed0d8e4710c01f3f7865faa4975fb9a5b8"
+    )
+    assert repair["triggering_attempt"]["classification"] == (
+        "ENGINEERING_WRAPPER_TOPOLOGY_GUARD_FAILURE_NOT_SCIENTIFIC_NO_GO"
+    )
+    assert repair["triggering_attempt"]["model_module_inference_count"] == 0
+    assert repair["triggering_attempt"]["scientific_metric_count"] == 0
+    assert repair["aggregate_read_only_diagnosis"][
+        "authoritative_scontrol_predicate_pass_count"
+    ] == 7
+    assert repair["repair"]["health_resource_topology_changed"] is False
+    assert repair["repair"]["model_fixture_threshold_metric_seed_or_gate_changed"] is False
+    assert repair["remaining_health_budget"]["submission_count_remaining"] == 1
+    assert repair["remaining_health_budget"][
+        "conservative_protocol_GPU_hours_remaining"
+    ] == 0.25
+
+    mutated = json.loads(json.dumps(config))
+    value = mutated["learner_effective_engineering_health_topology_guard_repair"]
+    value["repair"]["health_resource_topology_changed"] = True
+    payload = json.loads(json.dumps(value))
+    payload.pop("repair_commitment_sha256")
+    value["repair_commitment_sha256"] = MODULE.digest(payload)
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_HEALTH_TOPOLOGY_GUARD_REPAIR_COMMITMENT"
+    ):
+        MODULE._engineering_health_topology_guard_repair(mutated)
+
+
+def test_h100_health_topology_uses_authoritative_scheduler_record_and_effective_cuda(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    h100_cuda = SimpleNamespace(
+        device_count=lambda: 1,
+        get_device_name=lambda _index: "NVIDIA H100 NVL MIG 3g.47gb",
+        get_device_properties=lambda _index: SimpleNamespace(
+            total_memory=47 * 1024**3
+        ),
+    )
+    monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=h100_cuda))
+    monkeypatch.setenv("SLURM_JOB_ID", "316353")
+    monkeypatch.setenv("SLURM_JOB_PARTITION", "transient-value-not-used")
+    monkeypatch.setenv("SLURM_JOB_GPUS", "transient-value-not-used")
+    monkeypatch.setenv("SLURM_GPUS_ON_NODE", "transient-value-not-used")
+    record = " ".join(
+        (
+            "JobId=316353",
+            "Partition=h100",
+            "NumNodes=1",
+            "NumCPUs=8",
+            "NumTasks=1",
+            "TimeLimit=00:15:00",
+            "MinMemoryCPU=4G",
+            "TresPerNode=gres/gpu:nvidia_h100_nvl_3g.47gb:1",
+        )
+    )
+    monkeypatch.setattr(
+        MODULE.subprocess,
+        "run",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            returncode=0, stdout=record, stderr=""
+        ),
+    )
+    MODULE._tuple_health_topology("cuda")
+
+    bad = record.replace("NumTasks=1", "NumTasks=2")
+    monkeypatch.setattr(
+        MODULE.subprocess,
+        "run",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            returncode=0, stdout=bad, stderr=""
+        ),
+    )
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_GPU_TOPOLOGY"):
+        MODULE._tuple_health_topology("cuda")
+
+
 def test_tuple_topology_separates_h100_health_from_a30_science(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

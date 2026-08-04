@@ -45,20 +45,20 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     assert 'health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"' in wrapper
     assert "1|2|3) ;;" in wrapper
     assert 'require_health_topology' in wrapper
-    assert '"${SLURM_JOB_PARTITION:-}" == "h100"' in wrapper
-    assert '"${SLURM_JOB_NUM_NODES:-}" == "1"' in wrapper
-    assert '"${SLURM_NTASKS:-}" == "1"' in wrapper
-    assert '"${SLURM_CPUS_PER_TASK:-}" == "8"' in wrapper
-    assert '"${SLURM_GPUS_ON_NODE:-}" == "1"' in wrapper
+    assert 'scontrol show job --oneliner "$SLURM_JOB_ID"' in wrapper
+    assert 'Partition=h100' in wrapper
+    assert 'NumNodes=1' in wrapper
+    assert 'NumCPUs=8' in wrapper
+    assert 'NumTasks=1' in wrapper
     assert 'TimeLimit=00:15:00' in wrapper
     assert 'MinMemoryCPU=4G' in wrapper
     assert 'TresPerNode=gres/gpu:nvidia_h100_nvl_3g.47gb:1' in wrapper
-    assert '--id="$allocated_gpu" --query-gpu=name' in wrapper
-    assert '[[ "$gpu_names" == "NVIDIA H100 NVL" ]]' in wrapper
+    assert 'SLURM_JOB_GPUS' not in topology_guard
+    assert 'nvidia-smi' not in topology_guard
     assert '"GPU_type":"NVIDIA_H100_NVL_3G_47GB_MIG"' in wrapper
     assert "echo " not in topology_guard
     assert "printf " not in topology_guard
-    assert topology_guard.count("2>/dev/null") == 2
+    assert topology_guard.count("2>/dev/null") == 1
     assert 'python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" tuple-health' in wrapper
     assert '--attempt "$health_attempt"' in wrapper
     assert '--partition "$tuple_run_mode"' in wrapper
@@ -82,8 +82,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 11
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_DEPENDENCY_RESTORE_FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_FAILURE_ATTEMPT_2_PENDING_NO_NEW_SCIENTIFIC_OUTCOME"
+    assert config["schema_version"] == 12
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_TOPOLOGY_GUARD_REPAIR_FROZEN_AFTER_H100_ATTEMPT_2_PREINFERENCE_FAILURE_FINAL_ATTEMPT_3_PENDING_NO_NEW_SCIENTIFIC_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -170,6 +170,21 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert restore["submission_count_remaining"] == 2
     assert restore["new_scientific_outcome_opened"] is False
     assert restore == result["learner_effective_engineering_health_dependency_restore"]
+    topology_repair = config[
+        "learner_effective_engineering_health_topology_guard_repair"
+    ]
+    assert topology_repair["repair_commitment_sha256"] == (
+        "8db2d8ae04ee702ab3c68ff7c243afed0d8e4710c01f3f7865faa4975fb9a5b8"
+    )
+    assert topology_repair["trigger_job_id"] == 316353
+    assert topology_repair["trigger_model_module_inference_count"] == 0
+    assert topology_repair["trigger_scientific_metric_count"] == 0
+    assert topology_repair["authoritative_scontrol_predicate_pass_count"] == 7
+    assert topology_repair["health_topology_changed"] is False
+    assert topology_repair["submission_count_remaining"] == 1
+    assert topology_repair == result[
+        "learner_effective_engineering_health_topology_guard_repair"
+    ]
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
     assert label_correction["binary_yes_no_swapped_count"] == 193
@@ -435,7 +450,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 20
+    assert config["schema_version"] == 21
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)

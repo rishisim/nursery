@@ -298,6 +298,19 @@ preserved and conservatively charged 0.25 slice-GPU-hours; two submissions and
 0.5 charged slice-GPU-hours remain. The unchanged full 28-case suite must rerun
 as attempt 2 before any scientific development metric can open.
 
+Attempt 2, job 316353, stopped after five seconds with wrapper exit `66:0`,
+again before module inference or metrics. The authoritative Slurm record passed
+all seven frozen scheduler predicates and showed identical requested and
+allocated resources; the zero-output wrapper did not identify which redundant
+transient environment or GPU-ID probe rejected the otherwise correct
+allocation. Outcome-independent repair `8db2d8ae…b9a5b8` retains those seven
+exact `scontrol` checks and the runner's one-device H100-NVL/47-GiB CUDA check,
+while removing only the redundant transient probes. Nothing scientific or
+resource-related changed. Attempts 1 and 2 are each conservatively charged
+0.25 slice-GPU-hours; the sole final full-suite attempt and 0.25 charged
+slice-GPU-hours remain. A further engineering failure seals an engineering
+blocker rather than a scientific result.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

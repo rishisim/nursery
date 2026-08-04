@@ -571,6 +571,9 @@ ENGINEERING_HEALTH_RESOURCE_REDIRECT_SHA256 = (
 ENGINEERING_HEALTH_DEPENDENCY_RESTORE_SHA256 = (
     "3c54503b4087fae1e993b0aa952823f988a088a5c6543760df1022e2dc046db4"
 )
+ENGINEERING_HEALTH_TOPOLOGY_GUARD_REPAIR_SHA256 = (
+    "8db2d8ae04ee702ab3c68ff7c243afed0d8e4710c01f3f7865faa4975fb9a5b8"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -626,7 +629,7 @@ def _construct_aligned_ltx_resume_amendment(
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {16, 17, 18, 19, 20}
+        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21}
         or value.get("status")
         != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     ):
@@ -684,7 +687,7 @@ def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") != 20
+        cfg.get("schema_version") != 21
         or value.get("status")
         != "FROZEN_BEFORE_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -753,7 +756,7 @@ def _engineering_health_resource_redirect(
     payload = json.loads(json.dumps(value))
     expected = payload.pop("amendment_commitment_sha256", None)
     if (
-        cfg.get("schema_version") != 20
+        cfg.get("schema_version") != 21
         or value.get("status")
         != "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "SCHEDULER_AND_RESOURCE_LATENCY_ONLY"
@@ -840,7 +843,10 @@ def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
     """Return the sole effective health policy after validating both amendments."""
 
     _engineering_health_amendment(cfg)
-    return _engineering_health_resource_redirect(cfg)["bounded_resource_policy"]
+    redirect = _engineering_health_resource_redirect(cfg)
+    _engineering_health_dependency_restore(cfg)
+    _engineering_health_topology_guard_repair(cfg)
+    return redirect["bounded_resource_policy"]
 
 
 def _engineering_health_dependency_restore(
@@ -879,7 +885,7 @@ def _engineering_health_dependency_restore(
         ["transformers", "4.57.6"],
     ]
     if (
-        cfg.get("schema_version") != 20
+        cfg.get("schema_version") != 21
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_DEPENDENCY_CACHE_MISS_BEFORE_ATTEMPT_2_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -964,6 +970,90 @@ def _engineering_health_dependency_restore(
         is not False
     ):
         raise RuntimeError("E_TUPLE_HEALTH_DEPENDENCY_RESTORE_COMMITMENT")
+    return value
+
+
+def _engineering_health_topology_guard_repair(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the final outcome-independent topology-guard wiring repair."""
+
+    try:
+        value = cfg["learner_effective_engineering_health_topology_guard_repair"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_GUARD_REPAIR_NOT_FROZEN") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("repair_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    trigger = value.get("triggering_attempt", {})
+    diagnosis = value.get("aggregate_read_only_diagnosis", {})
+    repair = value.get("repair", {})
+    budget = value.get("remaining_health_budget", {})
+    if (
+        cfg.get("schema_version") != 21
+        or value.get("status")
+        != "FROZEN_AFTER_H100_ATTEMPT_2_REDUNDANT_TOPOLOGY_GUARD_FAILURE_BEFORE_ATTEMPT_3_OR_NEW_OUTCOME"
+        or value.get("scope")
+        != "OUTCOME_INDEPENDENT_EXACT_SLURM_TOPOLOGY_VALIDATION_WIRING_REPAIR_ONLY"
+        or expected != ENGINEERING_HEALTH_TOPOLOGY_GUARD_REPAIR_SHA256
+        or digest(payload) != expected
+        or value.get("repair_commitment_scope")
+        != "canonical JSON of this repair excluding repair_commitment_sha256"
+        or preserved.get("engineering_health_amendment_sha256")
+        != ENGINEERING_HEALTH_AMENDMENT_SHA256
+        or preserved.get("H100_resource_redirect_sha256")
+        != ENGINEERING_HEALTH_RESOURCE_REDIRECT_SHA256
+        or preserved.get("dependency_restore_sha256")
+        != ENGINEERING_HEALTH_DEPENDENCY_RESTORE_SHA256
+        or preserved.get("prior_public_development_no_go_sha256")
+        != "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
+        or preserved.get("public_fixture_manifest_sha256")
+        != "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6"
+        or preserved.get(
+            "production_models_fixtures_thresholds_metrics_seeds_module_behavior_scientific_gates_and_downstream_contract"
+        )
+        is not True
+        or trigger.get("attempt") != 2
+        or trigger.get("job_id") != 316353
+        or trigger.get("state") != "FAILED"
+        or trigger.get("exit_code") != "66:0"
+        or trigger.get("elapsed_seconds") != 5
+        or trigger.get("conservative_protocol_GPU_hours_charge") != 0.25
+        or trigger.get("wrapper_record_count") != 1
+        or any(
+            trigger.get(key) != 0
+            for key in (
+                "full_result_count",
+                "compact_result_count",
+                "private_trace_count",
+                "stdout_bytes",
+                "stderr_bytes",
+                "model_module_inference_count",
+                "scientific_metric_count",
+            )
+        )
+        or trigger.get("classification")
+        != "ENGINEERING_WRAPPER_TOPOLOGY_GUARD_FAILURE_NOT_SCIENTIFIC_NO_GO"
+        or trigger.get("partial_scientific_or_engineering_metric_opened") is not False
+        or diagnosis.get("authoritative_scontrol_record_present") is not True
+        or diagnosis.get("authoritative_scontrol_predicate_count") != 7
+        or diagnosis.get("authoritative_scontrol_predicate_pass_count") != 7
+        or diagnosis.get("scheduler_requested_and_allocated_TRES_match") is not True
+        or diagnosis.get("scientific_or_model_information_used") is not False
+        or repair.get("scientific_A30_topology_path_changed") is not False
+        or repair.get("health_resource_topology_changed") is not False
+        or repair.get("model_fixture_threshold_metric_seed_or_gate_changed") is not False
+        or repair.get("full_28_case_suite_restart_required") is not True
+        or budget.get("submission_count_consumed") != 2
+        or budget.get("submission_count_remaining") != 1
+        or budget.get("conservative_protocol_GPU_hours_charged") != 0.5
+        or budget.get("conservative_protocol_GPU_hours_remaining") != 0.25
+        or budget.get("new_storage_GiB_ceiling") != 10
+        or budget.get("direct_monetary_cost_USD") != 0
+        or value.get("new_model_fixture_scientific_or_learner_outcome_opened")
+        is not False
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_GUARD_REPAIR_COMMITMENT")
     return value
 
 
@@ -9680,6 +9770,7 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
     active = _construct_aligned_ltx_resume_amendment(cfg)
     health = _engineering_health_amendment(cfg)
     dependency_restore = _engineering_health_dependency_restore(cfg)
+    topology_guard_repair = _engineering_health_topology_guard_repair(cfg)
     amendment = _tuple_amendment(cfg)
     runtime = _tuple_runtime_amendment(cfg)
     fixture_protocol = _tuple_fixture_protocol(cfg)
@@ -9731,6 +9822,7 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
             "active": active,
             "health": health,
             "dependency_restore": dependency_restore,
+            "topology_guard_repair": topology_guard_repair,
             "tuple_amendment": amendment,
             "runtime": runtime,
             "fixture_protocol": fixture_protocol,
@@ -9758,6 +9850,7 @@ def _tuple_health_dependency_preflight(
 
     health = _engineering_health_amendment(cfg)
     dependency_restore = _engineering_health_dependency_restore(cfg)
+    topology_guard_repair = _engineering_health_topology_guard_repair(cfg)
     configuration_commitment = _tuple_health_configuration_preflight(cfg)
     runtime_cfg = _tuple_runtime_amendment(cfg)
     runtime = _verify_tuple_runtime_manifest(public, cfg)
@@ -10048,6 +10141,9 @@ def _tuple_health_dependency_preflight(
             "engineering_health_dependency_restore_commitment_sha256": (
                 dependency_restore["repair_commitment_sha256"]
             ),
+            "engineering_health_topology_guard_repair_commitment_sha256": (
+                topology_guard_repair["repair_commitment_sha256"]
+            ),
         }
     )
     return record
@@ -10093,28 +10189,65 @@ def _tuple_health_topology(
 
     device_name = torch.cuda.get_device_name(0) if torch.cuda.device_count() == 1 else ""
     if engineering_health:
-        expected_partition = "h100"
-        expected_device = device_name == "NVIDIA H100 NVL"
+        expected_device = device_name.startswith("NVIDIA H100 NVL")
         total_memory = (
             int(torch.cuda.get_device_properties(0).total_memory)
             if torch.cuda.device_count() == 1
             else 0
         )
         expected_memory = 45 * 1024**3 <= total_memory <= 50 * 1024**3
+        job_id = os.environ.get("SLURM_JOB_ID")
+        if job_id:
+            completed = subprocess.run(
+                ["scontrol", "show", "job", "--oneliner", job_id],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            record = f" {completed.stdout.strip()} "
+            exact_gres = (
+                " TresPerNode=gres/gpu:nvidia_h100_nvl_3g.47gb:1 " in record
+                or " TresPerNode=gres:gpu:nvidia_h100_nvl_3g.47gb:1 " in record
+            )
+            scheduler_topology = completed.returncode == 0 and all(
+                token in record
+                for token in (
+                    " Partition=h100 ",
+                    " NumNodes=1 ",
+                    " NumCPUs=8 ",
+                    " NumTasks=1 ",
+                    " TimeLimit=00:15:00 ",
+                    " MinMemoryCPU=4G ",
+                )
+            ) and exact_gres
+        else:
+            scheduler_topology = all(
+                (
+                    os.environ.get("SLURM_JOB_PARTITION") == "h100",
+                    os.environ.get("SLURM_JOB_NUM_NODES") == "1",
+                    os.environ.get("SLURM_NTASKS") == "1",
+                    os.environ.get("SLURM_CPUS_PER_TASK") == "8",
+                    os.environ.get("SLURM_GPUS_ON_NODE") == "1",
+                )
+            )
     else:
-        expected_partition = "a30"
         expected_device = device_name == "NVIDIA A30"
         expected_memory = True
+        scheduler_topology = all(
+            (
+                os.environ.get("SLURM_JOB_PARTITION") == "a30",
+                os.environ.get("SLURM_JOB_NUM_NODES") == "1",
+                os.environ.get("SLURM_NTASKS") == "1",
+                os.environ.get("SLURM_CPUS_PER_TASK") == "8",
+                os.environ.get("SLURM_GPUS_ON_NODE") == "1",
+            )
+        )
     if (
         device != "cuda"
         or torch.cuda.device_count() != 1
         or not expected_device
         or not expected_memory
-        or os.environ.get("SLURM_JOB_PARTITION") != expected_partition
-        or os.environ.get("SLURM_JOB_NUM_NODES") != "1"
-        or os.environ.get("SLURM_NTASKS") != "1"
-        or os.environ.get("SLURM_CPUS_PER_TASK") != "8"
-        or os.environ.get("SLURM_GPUS_ON_NODE") != "1"
+        or not scheduler_topology
         or os.environ.get("WORLD_SIZE", "1") != "1"
         or os.environ.get("LOCAL_WORLD_SIZE", "1") != "1"
     ):
