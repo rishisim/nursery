@@ -1,15 +1,13 @@
 # Bimanual Child-Head Episode and Appearance Gate
 
-Decision: **NO-GO at the integrated truth/visual/appearance gate (2026-08-03).**
+Decision: **NO-GO at Stage C and at the integrated truth/visual/appearance gate (2026-08-03).**
 
-The hybrid Unity/PhysX manipulation kernel passes, a 56 s weighted-child
-head-view baseline and synchronized event audio were produced, and frozen
-robustness is 2/3. The integrated result is nevertheless a NO-GO: the visual
-baseline remains tabletop-dominant and visibly synthetic, the final run does
-not contain metric depth, semantic/instance renders, or derived head IMU, and
-no tightly conditioned temporal appearance method available on this Apple
-Silicon host could be run without weakening the identity/contact/temporal
-gates. It is not an integrated ChildLens-shaped artifact.
+Stage B provides bounded free-object physical-kernel evidence. It does not
+establish an anatomical or visibly registered bimanual episode. Stage C is a
+NO-GO/incomplete because the camera contract and visible-to-physical
+registration gates were not met. The 56 s output is therefore only a partial
+physical/render demonstration, not a Stage-D or engine/render-kernel PASS.
+No implementation rescue or media rerun was performed for this correction.
 
 ## Preserved evidence and lineage
 
@@ -29,13 +27,13 @@ gates. It is not an integrated ChildLens-shaped artifact.
 | Stage | Result | Key evidence |
 |---|---|---|
 | A — seven-DOF coordinate truth | NO-GO, automatic fallback | Set/Get round-trip 0; body/index audit PASS; angular max 0.158°/0.618%; translational max 27.469°/28.486% after the one row-index convention repair |
-| B — hybrid hard cell | PASS | 10.033 s; right/left measured contact; lift 0.1013 m; turn 25.60°; penetration 1.118 mm; speed 0.1796 m/s; free release; no assistance/object writes/joints/forces |
-| C — weighted bimanual baseline | PASS | 10.033 s; one weighted child; both `.R`/`.L` arms; fixed head-derived 68° camera; zero proxy renderers; 181 visible contact-event frames |
-| D — continuous curated baseline | ENGINE/RENDER KERNEL PASS, visual weakness | 56.033 s, 1,681 frames, 240/30 Hz exact mapping, free red and blue objects, one trace, 11 context objects; full dense review remains tabletop-dominant |
-| E — robustness/truth QA | 2/3 manipulation robustness; TRUTH INCOMPLETE | nominal PASS; +5 mm lateral FAIL; mass 0.045 kg/friction 0.75 PASS; depth/semantic/instance/head-IMU unavailable |
-| F — audio/appearance | AUDIO PASS / APPEARANCE NO-GO | six synthetic utterances, 48 kHz, zero clipping, exact 1,681-frame mux; no acceptable temporal multi-control appearance route installed |
+| B — hybrid hard cell | BOUNDED PHYSICAL-KERNEL PASS | 10.033 s; lift 0.1013 m; turn 25.60°; penetration 1.118 mm; speed 0.1796 m/s; free release; no assistance/object writes/joints/forces. Right contact includes thumb and multiple non-thumb digits. Left contact is only the little digit for 125 physics steps (249 geometric rows, about 0.52 s), so “bimanual support” is qualified and narrow. |
+| C — weighted bimanual baseline | NO-GO / INCOMPLETE REGISTRATION | Fixed approximately 50° downward optical pitch violates the near-neutral body-derived mount contract. Head pose is synthesized from time during render replay and camera extrinsics are absent from the physical trace. Palm rotations and per-digit pose/velocity are absent. Contact visibility is only an object-center viewport test; arm registration is only bone-name presence. |
+| D — continuous curated baseline | PARTIAL PHYSICAL/RENDER DEMONSTRATION; NOT PASS | 56.033 s and 1,681 frames exist at 240/30 Hz, but the videos are 960×540 rather than 1920×1080. Review shows a sparse primitive tabletop, unclothed skin, a mostly static target/table-facing view, furniture fragments at the top edge, and no meaningful final look toward the window. It is not a furnished naturalistic playroom and is visually worse than the preserved Unity visual audition. |
+| E — robustness/truth QA | 2/3 PHYSICAL-CELL ROBUSTNESS; TRUTH INCOMPLETE | nominal PASS; +5 mm lateral FAIL; mass 0.045 kg/friction 0.75 PASS. This does not promote C or D. Required camera/head, per-digit, palm-rotation, object-angular-velocity, contact-registration, depth, semantic, instance, and IMU evidence is absent. |
+| F — audio/appearance | AUDIO ARTIFACT PRESENT / APPEARANCE NO-GO | Six synthetic utterances, 48 kHz, zero clipping, and an exact 1,681-frame mux exist. No enhanced appearance video exists. |
 
-## Authority and semantics
+## Authority, semantics, and registration limits
 
 The physical target and blue cup are free, non-kinematic PhysX rigidbodies.
 Kinematic palms and contact-aware digit colliders are driven at 240 Hz. The
@@ -43,15 +41,29 @@ assistance ledger is empty: there are no attachments, joints, object pose
 writes after initialization, external forces, hidden supports, or post-step
 repairs. Kinematic authority is not biomechanics. Contact impulse is
 unavailable and omitted; geometric contact is measured with Unity collision
-geometry. The weighted-skin videos are explicit same-trace rendering replays,
-not a second physical authority.
+geometry.
+
+The physical trace records palm positions and aggregate closures, but not palm
+rotations or per-digit pose/velocity. It also omits object angular velocity and
+authoritative per-frame root/torso/neck/head/camera extrinsics. The rendering
+replay synthesizes head motion from `row.time_s` and replays palm position plus
+aggregate closure. Consequently it cannot register the physical palm turn or
+digit motion to the weighted skin.
+
+`contact_event_frames_visible` is not a contact-registration measurement: it
+projects the object center while a contact row exists. It does not project the
+measured contact point onto the correct visible digit/object surfaces or test
+visible-versus-physical touch timing. Likewise, `both_arms_registered` checks
+bone-name presence only. The implementation's `report.passed` predicates are
+existence/count receipts, not the frozen visual/truth gates, and cannot confer
+a scientific Stage-C or Stage-D PASS.
 
 ## Robustness
 
 | Frozen cell | Result | Lift | Turn | Max penetration | Notes |
 |---|---:|---:|---:|---:|---|
-| nominal | PASS | 0.1013 m | 25.60° | 1.118 mm | right and left contact |
-| target x +0.005 m | FAIL | 0.0183 m | 0° | 0.346 mm | capture and left assistance fail |
+| nominal | PASS | 0.1013 m | 25.60° | 1.118 mm | Physical-cell result; left contact only the little digit for 125 steps (~0.52 s) |
+| target x +0.005 m | FAIL | 0.0183 m | 0° | capture and left assistance fail |
 | mass 0.045 kg, friction 0.75 | PASS | 0.1013 m | 25.55° | 1.073 mm | no retuning |
 
 ## Immutable ignored-run receipts
@@ -71,11 +83,14 @@ bitwise-determinism claim.
 
 ## Absent products
 
-There is no accepted enhanced video, baseline/enhanced comparison, metric
-depth video, semantic or persistent-instance video, derived head IMU plot, or
-complete cross-modal drift receipt. Their absence is why this cannot receive
-`BASELINE-KERNEL PASS / APPEARANCE NO-GO`, which requires full baseline truth,
-and why the integrated decision is NO-GO.
+There is no accepted enhanced video; baseline/enhanced side-by-side; clean
+external plus separately labeled collider/contact overlay; metric depth;
+semantic or persistent-instance video; authoritative per-frame camera/head
+provenance; palm rotations; per-digit kinematic pose/velocity; object angular
+velocity; measured-contact-to-visible-skin projection/timing validation;
+derived head IMU; or complete cross-modal drift receipt. These absences, the
+Stage-C NO-GO, and the visual/camera failures preclude both
+`BASELINE-KERNEL PASS / APPEARANCE NO-GO` and `INTEGRATED PASS`.
 
 This is public/synthetic engineering evidence only. It is not infant-trained,
 age-matched, ChildLens-calibrated, human-validated, or biologically

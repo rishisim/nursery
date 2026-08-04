@@ -1,23 +1,127 @@
 {
   "schema": "embodied.bimanual_gate.v1",
   "seed": 20260803,
-  "authority": {"physics":"Unity 6000.0.80f1 PhysX","renderer":"Unity baseline","physics_hz":240,"render_hz":30,"steps_per_frame":8},
-  "control": {"path":"hybrid_after_seven_dof_no_go","palms":"kinematic","digits":"kinematic_contact_aware","objects":"free_non_kinematic_rigidbodies"},
-  "frozen_bounds": {"palm_speed_max_m_s":0.18,"palm_angular_speed_max_deg_s":45,"closure_rate_max_s":3.1,"finger_object_penetration_max_m":0.003,"minimum_lift_m":0.08,"minimum_turn_deg":20},
-  "forbidden_assistance": ["parenting","FixedJoint grasp","object transform writes after initialization","snapping","teleportation","hidden springs","external object force","catch tray","object trajectory","post-physics pose repair"],
+  "scientific_decision": "NO-GO",
+  "authority": {
+    "physics": "Unity 6000.0.80f1 PhysX",
+    "renderer": "Unity baseline",
+    "physics_hz": 240,
+    "render_hz": 30,
+    "steps_per_frame": 8
+  },
+  "control": {
+    "path": "hybrid_after_seven_dof_no_go",
+    "palms": "kinematic",
+    "digits": "kinematic_contact_aware",
+    "objects": "free_non_kinematic_rigidbodies"
+  },
+  "frozen_bounds": {
+    "palm_speed_max_m_s": 0.18,
+    "palm_angular_speed_max_deg_s": 45,
+    "closure_rate_max_s": 3.1,
+    "finger_object_penetration_max_m": 0.003,
+    "minimum_lift_m": 0.08,
+    "minimum_turn_deg": 20
+  },
+  "stage_decisions": {
+    "a": {
+      "decision": "NO-GO_AUTOMATIC_HYBRID_FALLBACK"
+    },
+    "b": {
+      "decision": "BOUNDED_PHYSICAL_KERNEL_PASS",
+      "anatomical_or_visible_bimanual_episode_pass": false,
+      "right_contact": "thumb and multiple non-thumb digits",
+      "left_contact": {
+        "digits": ["little"],
+        "unique_physics_steps": 125,
+        "geometric_contact_rows": 249,
+        "duration_s_at_240_hz": 0.5208333333
+      }
+    },
+    "c": {
+      "decision": "NO-GO",
+      "frozen_gate_validation": false,
+      "camera": {
+        "fixed_optical_pitch_deg": 50,
+        "near_neutral_mount_pass": false,
+        "head_pose_source": "synthesized from row.time_s during rendering replay",
+        "authoritative_camera_extrinsics_in_physics_trace": false
+      },
+      "registration": {
+        "palm_rotations_in_physics_trace": false,
+        "per_digit_pose_velocity_in_physics_trace": false,
+        "both_arms_check": "bone-name presence only",
+        "contact_visibility_check": "object-center viewport proxy only",
+        "measured_contact_to_visible_surface_status": "NOT_MEASURED",
+        "visible_vs_physical_touch_timing_status": "NOT_MEASURED"
+      }
+    },
+    "d": {
+      "decision": "PARTIAL_PHYSICAL_RENDER_DEMONSTRATION_NOT_PASS",
+      "frozen_gate_validation": false,
+      "render_resolution": [960, 540],
+      "required_render_resolution": [1920, 1080],
+      "naturalistic_playroom_visual_gate": false,
+      "meaningful_final_window_gaze": false
+    },
+    "e": {
+      "physical_cell_robustness_passes": 2,
+      "physical_cell_robustness_trials": 3,
+      "truth_qa_complete": false
+    },
+    "f": {
+      "audio_artifact_present": true,
+      "appearance_decision": "NO-GO",
+      "enhanced_video_present": false
+    }
+  },
+  "forbidden_assistance": [
+    "parenting",
+    "FixedJoint grasp",
+    "object transform writes after initialization",
+    "snapping",
+    "teleportation",
+    "hidden springs",
+    "external object force",
+    "catch tray",
+    "object trajectory",
+    "post-physics pose repair"
+  ],
   "field_provenance": {
-    "object_pose_velocity_sleep_identity":"measured Unity/PhysX",
-    "geometric_contact_point_normal_separation_penetration":"measured with Unity Physics.ComputePenetration/Collider.ClosestPoint",
-    "contact_impulse":"UNAVAILABLE; omitted",
-    "palm_and_digit_targets_closure":"commanded and engine-observed",
-    "weighted_bone_pose":"commanded/engine-observed in rendering replay; not physical authority",
-    "rgb":"measured Unity render state",
-    "metric_depth":"UNAVAILABLE in final 56 s run",
-    "semantic_and_instance":"UNAVAILABLE in final 56 s run",
-    "head_imu":"UNAVAILABLE in final 56 s run",
-    "biological_torque":"UNAVAILABLE and forbidden as a claim"
+    "object_pose_linear_velocity_sleep_identity": "measured Unity/PhysX",
+    "object_angular_velocity": "UNAVAILABLE in emitted physical trace",
+    "geometric_contact_point_normal_separation_penetration": "measured with Unity Physics.ComputePenetration/Collider.ClosestPoint",
+    "contact_impulse": "UNAVAILABLE; omitted",
+    "palm_position_and_aggregate_closure": "commanded and engine-observed",
+    "palm_rotation": "UNAVAILABLE in emitted physical trace",
+    "per_digit_pose_velocity": "UNAVAILABLE in emitted physical trace",
+    "weighted_bone_pose": "commanded/engine-observed in rendering replay; not physical authority",
+    "head_pose": "synthesized from time in rendering replay; absent from authoritative physical trace",
+    "camera_extrinsics": "UNAVAILABLE per frame in authoritative physical trace",
+    "rgb": "measured Unity render state at 960x540",
+    "contact_to_visible_skin_registration": "NOT_MEASURED; object-center viewport proxy is insufficient",
+    "metric_depth": "UNAVAILABLE in final 56 s run",
+    "semantic_and_instance": "UNAVAILABLE in final 56 s run",
+    "head_imu": "UNAVAILABLE in final 56 s run",
+    "biological_torque": "UNAVAILABLE and forbidden as a claim"
+  },
+  "pass_predicate_policy": {
+    "implementation_report_passed_is_scientific_stage_pass": false,
+    "bone_name_presence_can_satisfy_registration": false,
+    "object_center_viewport_visibility_can_satisfy_contact_registration": false,
+    "fixed_50deg_downward_optical_pitch_can_satisfy_near_neutral_mount": false,
+    "not_measured_or_unavailable_can_satisfy_pass": false
   },
   "assistance_ledger": [],
-  "appearance": {"decision":"NO-GO","reason":"no installed license-permitted Apple-Silicon temporal multi-control route; per-frame ControlNet is insufficient for frozen temporal/contact gates"},
-  "claims": {"infant_trained":false,"age_matched":false,"childlens_calibrated":false,"human_validated":false,"biologically_torque_valid":false}
+  "appearance": {
+    "decision": "NO-GO",
+    "reason": "no accepted enhanced appearance video exists"
+  },
+  "claims": {
+    "infant_trained": false,
+    "age_matched": false,
+    "childlens_calibrated": false,
+    "human_validated": false,
+    "biologically_torque_valid": false
+  }
 }
