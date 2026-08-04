@@ -3410,6 +3410,53 @@ def test_tuple_fixture_file_rejects_traversal_and_hash_mismatch(tmp_path: Path) 
         )
 
 
+def test_write_fixture_video_uses_mp4_safe_atomic_temporary(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    import sys
+    from types import ModuleType, SimpleNamespace
+
+    target = tmp_path / "fixture.mp4"
+
+    class Writer:
+        def __init__(self, path: Path) -> None:
+            self.path = Path(path)
+
+        def append_data(self, _frame: object) -> None:
+            return None
+
+        def close(self) -> None:
+            self.path.write_bytes(b"video-only")
+
+    imageio_package = ModuleType("imageio")
+    imageio_package.__path__ = []
+    imageio_v2 = ModuleType("imageio.v2")
+    imageio_v2.get_writer = lambda path, **_kwargs: Writer(path)
+    imageio_package.v2 = imageio_v2
+    imageio_ffmpeg = ModuleType("imageio_ffmpeg")
+    imageio_ffmpeg.get_ffmpeg_exe = lambda: "ffmpeg"
+    monkeypatch.setitem(sys.modules, "imageio", imageio_package)
+    monkeypatch.setitem(sys.modules, "imageio.v2", imageio_v2)
+    monkeypatch.setitem(sys.modules, "imageio_ffmpeg", imageio_ffmpeg)
+
+    def encode(command, **_kwargs):
+        output = Path(command[-1])
+        assert output == tmp_path / "fixture.partial.mp4"
+        assert output.suffix == ".mp4"
+        assert command[command.index("-c:v") + 1] == "copy"
+        assert command[command.index("-movflags") + 1] == "+faststart"
+        output.write_bytes(b"encoded-mp4")
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(MODULE.subprocess, "run", encode)
+    MODULE._write_fixture_video(
+        frames=[object()], fps=1, duration=1.0, audio=None, target=target
+    )
+
+    assert target.read_bytes() == b"encoded-mp4"
+    assert not list(tmp_path.glob("*partial*"))
+
+
 def test_tuple_fixture_manifest_hashes_all_nested_files_before_inference(
     tmp_path: Path,
 ) -> None:

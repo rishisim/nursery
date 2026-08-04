@@ -191,6 +191,19 @@ no-hand seal at `a58ca3f1…1c97`; all applicant, blindness, and no-prior-infere
 attestations passed and stderr was empty. Public fixture preparation is now
 authorized. No fixture has been prepared or sealed and no model, development,
 holdout, C, generator, or learner outcome has opened.
+The first fixture attempt, job 315430, stopped after 5 seconds (`1:0`) before
+inference because its public root did not contain the earlier sealed runtime
+manifest. The job-313924 and job-314974 roots were distinct. After exact
+commitment verification, only the three public runtime families were copied by
+checksum: 23,438,221,791 bytes (21.828545 GiB), leaving 535.877 GiB free and
+remaining within the 200-GiB ceiling, with no Git, network, restricted-data,
+model, or monetary use. Retry 315445 then stopped after 81 seconds (`1:0`) on
+`E_TUPLE_FIXTURE_VIDEO_ENCODE` before a manifest or model outcome: the final
+mux temporary name ended in `.mp4.partial`. The audited canonical repair changes
+only that suffix to `.partial.mp4`; every frame, audio, timing, codec, quality,
+duration, asset, selection, threshold, and final target is unchanged. Runner
+SHA-256 is now `33cd04d5…e272`; the deterministic fixture retry is authorized,
+while model inference remains blocked until the fixture seal.
 
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema

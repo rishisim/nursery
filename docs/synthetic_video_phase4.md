@@ -431,6 +431,23 @@ preparation. Model inference remains conditional on the fixture manifest and
 lineage seal; no fixture, model, development, holdout, or later scientific
 outcome has opened.
 
+Two subsequent fixture-preparation attempts stopped as engineering failures
+before inference. Job 315430 exited `1:0` after 5 seconds because the current
+public root lacked the earlier sealed runtime manifest; the job-313924 and
+job-314974 roots were distinct. The old runtime, base, and runtime-amendment
+commitments exactly matched the config, so only `mechanistic-tuples`,
+`activity-code`, and `activity-pydeps` were checksum-copied: 23,438,221,791
+bytes (21.828545 GiB), leaving 535.877 GiB free within the 200-GiB ceiling.
+The copy used no Git, network, restricted data, inference, or money. Job 315445
+then exited `1:0` after 81 seconds with `E_TUPLE_FIXTURE_VIDEO_ENCODE` before a
+fixture manifest, model, development, or holdout outcome. The final mux
+temporary path ended in `.mp4.partial`; the canonical fix uses `.partial.mp4`.
+The audit passed: frames, audio, timing, fps, codec, quality, duration, assets,
+selections, thresholds, and final target are unchanged, and all fixture,
+development, threshold, and holdout outputs remain absent. The current runner
+SHA-256 is `33cd04d5…e272`; deterministic fixture retry is safe and authorized,
+while model inference remains blocked until the fixture seal.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

@@ -1608,6 +1608,24 @@ now authorized. Public model inference remains fail-closed until the fixture
 manifest and lineage are sealed; no fixture, model, development, holdout, or
 later scientific outcome has opened.
 
+The first two fixture-preparation attempts stopped before inference as ordinary
+engineering failures. Job 315430 exited `1:0` after 5 seconds because its
+current public root lacked the earlier sealed runtime manifest; the job-313924
+and job-314974 roots were distinct. After the old runtime, base, and runtime-
+amendment commitments exactly matched the config, only `mechanistic-tuples`,
+`activity-code`, and `activity-pydeps` were checksum-copied: 23,438,221,791
+bytes (21.828545 GiB), leaving 535.877 GiB free within the 200-GiB ceiling.
+This used no Git, network, restricted data, model inference, or money. Retry
+315445 exited `1:0` after 81 seconds on `E_TUPLE_FIXTURE_VIDEO_ENCODE` before a
+fixture manifest or model/development/holdout result. Its final mux temporary
+path ended in `.mp4.partial`; the canonical implementation now uses
+`.partial.mp4`. The audit passed and the retry is deterministic: every frame,
+audio sample, timing, fps, codec, quality, duration, asset, selection,
+threshold, and final target is unchanged. Fixture, development, threshold, and
+holdout outputs remain absent, no inference occurred, and the current runner
+SHA-256 is `33cd04d5…e272`. Fixture retry is authorized; model inference remains
+blocked until fixture sealing.
+
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
 descriptive. Only a combined public pass authorizes the single-applicant blind

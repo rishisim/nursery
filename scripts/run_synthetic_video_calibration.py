@@ -8526,7 +8526,7 @@ def _write_fixture_video(
             writer.append_data(frame)
     finally:
         writer.close()
-    output = target.with_suffix(target.suffix + ".partial")
+    output = target.with_suffix(".partial.mp4")
     ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
     command = [
         ffmpeg,

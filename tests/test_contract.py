@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 8
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_PREPARATION_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PRE_INFERENCE_ENGINEERING_REPAIRS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED"
     validate_phase_state(config)
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
@@ -65,6 +65,19 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     )
     assert review_seal["fixture_preparation_authorized"] is True
     assert review_seal["model_inference_executed"] is False
+    fixture_repair = config["public_fixture_preparation_engineering_repair"]
+    assert fixture_repair["status"].startswith(
+        "PROSPECTIVE_DETERMINISTIC_FIXTURE_RETRY_AUTHORIZED"
+    )
+    assert fixture_repair["runtime_manifest_failure"]["job_id"] == 315430
+    assert fixture_repair["video_encode_failure"]["job_id"] == 315445
+    assert fixture_repair["current_runner_source_sha256"] == (
+        "33cd04d5d60c871cda2624f805e73791a802686e152c4bb24fab395365c2e272"
+    )
+    assert fixture_repair["audit_status"] == "PASS"
+    assert fixture_repair["fixture_development_threshold_holdout_outputs_present"] is False
+    assert fixture_repair["model_inference_executed"] is False
+    assert fixture_repair["fixture_retry_authorized"] is True
     premodel = config["mechanistic_training_tuple_premodel_result"]
     assert premodel["status"] == "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
     assert premodel["dependency_manifest_commitment_sha256"] == (
@@ -321,7 +334,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert runner["action_integrity_privacy_provenance_and_external_call_failures_remain_blocking"] is True
     assert runner["public_model_or_extractor_outcome_opened"] is False
     assert runner["implementation_source_sha256"] == (
-        "ddf2a59c6e6344688fe86b9dad9b95b0592115859afa281c88c951c33b905273"
+        "33cd04d5d60c871cda2624f805e73791a802686e152c4bb24fab395365c2e272"
     )
     repair = config["public_no_hand_preparation_engineering_repair"]
     assert repair["failure_class"] == "ENGINEERING_FAILURE_NOT_SCIENTIFIC_NO_GO"
@@ -389,6 +402,39 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert review_seal["fixture_preparation_executed"] is False
     assert review_seal["model_inference_executed"] is False
     assert review_seal["public_development_or_holdout_outcome_opened"] is False
+    fixture_repair = config["public_fixture_preparation_engineering_repair"]
+    assert fixture_repair["runtime_manifest_failure"] == {
+        "job_id": 315430,
+        "exit_code": "1:0",
+        "elapsed_seconds": 5,
+        "failure": "CURRENT_PUBLIC_ROOT_LACKED_THE_EARLIER_SEALED_RUNTIME_MANIFEST",
+        "old_runtime_job": 313924,
+        "current_root_job": 314974,
+        "roots_distinct": True,
+        "failed_before_fixture_manifest_or_model_inference": True,
+    }
+    assert fixture_repair["runtime_lineage_copy"]["copied_public_families"] == [
+        "mechanistic-tuples",
+        "activity-code",
+        "activity-pydeps",
+    ]
+    assert fixture_repair["runtime_lineage_copy"]["copied_bytes"] == 23438221791
+    assert fixture_repair["runtime_lineage_copy"]["copied_GiB"] == 21.828545
+    assert fixture_repair["runtime_lineage_copy"]["free_GiB_after_copy"] == 535.877
+    assert fixture_repair["runtime_lineage_copy"]["within_storage_ceiling"] is True
+    assert fixture_repair["video_encode_failure"]["job_id"] == 315445
+    assert fixture_repair["video_encode_failure"]["failure"] == (
+        "E_TUPLE_FIXTURE_VIDEO_ENCODE"
+    )
+    assert fixture_repair["video_encode_failure"]["canonical_fix"].endswith(
+        ".mp4.partial to .partial.mp4"
+    )
+    assert fixture_repair["current_fixture_output_present"] is False
+    assert fixture_repair["current_development_output_present"] is False
+    assert fixture_repair["current_threshold_output_present"] is False
+    assert fixture_repair["current_holdout_output_present"] is False
+    assert fixture_repair["model_inference_executed"] is False
+    assert fixture_repair["deterministic_retry_safe"] is True
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"
