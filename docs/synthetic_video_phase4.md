@@ -498,6 +498,22 @@ eight CPUs, 32 GiB, no DDP, and 15 minutes. The three-submission maximum,
 This is scheduler-only: the A30 provenance and all scientific contracts remain
 preserved, and no health or scientific outcome was used to make the redirect.
 
+The bounded H100 route is now terminal. Attempt 1 (job 316325) stopped before
+inference on the missing public language cache; the exact cache was restored
+and sealed without scientific outcomes. Attempt 2 (job 316353) stopped before
+container entry on a redundant wrapper topology probe; its prospective repair
+preserved the exact topology and science. Final attempt 3 (job 316370) completed
+after 20 seconds but returned `ENGINEERING_BLOCKER`, with 0/7 modules complete
+and zero scientific metrics. Aggregate-only trace diagnosis found that the
+runner tried to invoke `scontrol` inside the network-disabled Singularity
+runtime, where it was unavailable, despite the outer wrapper already passing
+the same authoritative scheduler predicates. Six other module traces were
+declared preflight-blocked. Terminal commitment `644028ba…9d0f81` classifies
+this as an exhausted engineering blocker—not a scientific no-go—and freezes
+the protocol-accounted 0.504019 H100-slice GPU-hours and $0 direct cost. No
+fourth health attempt, public development/holdout, governed C, LTX work,
+generation, or synthetic learner is authorized under this route.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

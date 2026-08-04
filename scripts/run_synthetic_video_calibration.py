@@ -574,6 +574,9 @@ ENGINEERING_HEALTH_DEPENDENCY_RESTORE_SHA256 = (
 ENGINEERING_HEALTH_TOPOLOGY_GUARD_REPAIR_SHA256 = (
     "8db2d8ae04ee702ab3c68ff7c243afed0d8e4710c01f3f7865faa4975fb9a5b8"
 )
+ENGINEERING_HEALTH_BLOCKER_SHA256 = (
+    "644028babc768e881276fa078b95349ba77f8418cb76d722e8baf2588f9d0f81"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -629,7 +632,7 @@ def _construct_aligned_ltx_resume_amendment(
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21}
+        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22}
         or value.get("status")
         != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     ):
@@ -687,7 +690,7 @@ def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") != 21
+        cfg.get("schema_version") not in {21, 22}
         or value.get("status")
         != "FROZEN_BEFORE_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -756,7 +759,7 @@ def _engineering_health_resource_redirect(
     payload = json.loads(json.dumps(value))
     expected = payload.pop("amendment_commitment_sha256", None)
     if (
-        cfg.get("schema_version") != 21
+        cfg.get("schema_version") not in {21, 22}
         or value.get("status")
         != "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "SCHEDULER_AND_RESOURCE_LATENCY_ONLY"
@@ -885,7 +888,7 @@ def _engineering_health_dependency_restore(
         ["transformers", "4.57.6"],
     ]
     if (
-        cfg.get("schema_version") != 21
+        cfg.get("schema_version") not in {21, 22}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_DEPENDENCY_CACHE_MISS_BEFORE_ATTEMPT_2_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -990,7 +993,7 @@ def _engineering_health_topology_guard_repair(
     repair = value.get("repair", {})
     budget = value.get("remaining_health_budget", {})
     if (
-        cfg.get("schema_version") != 21
+        cfg.get("schema_version") not in {21, 22}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_2_REDUNDANT_TOPOLOGY_GUARD_FAILURE_BEFORE_ATTEMPT_3_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1054,6 +1057,82 @@ def _engineering_health_topology_guard_repair(
         is not False
     ):
         raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_GUARD_REPAIR_COMMITMENT")
+    return value
+
+
+def _engineering_health_terminal_result(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Validate the sealed final blocker and prevent a fourth health route."""
+
+    try:
+        value = cfg["learner_effective_engineering_health_result"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_TERMINAL_RESULT_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("blocker_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    attempt = value.get("final_attempt", {})
+    compact = value.get("compact_aggregate", {})
+    diagnosis = value.get("stable_aggregate_diagnosis", {})
+    resource = value.get("resource_accounting", {})
+    gate = value.get("terminal_gate", {})
+    if (
+        cfg.get("schema_version") != 22
+        or value.get("status")
+        != "ENGINEERING_BLOCKER_ROUTE_EXHAUSTED_BEFORE_MODEL_INFERENCE_NO_SCIENTIFIC_METRICS_OPENED"
+        or expected != ENGINEERING_HEALTH_BLOCKER_SHA256
+        or digest(payload) != expected
+        or value.get("blocker_commitment_scope")
+        != "canonical JSON of this terminal result excluding blocker_commitment_sha256"
+        or preserved.get("engineering_health_amendment_sha256")
+        != ENGINEERING_HEALTH_AMENDMENT_SHA256
+        or preserved.get("H100_resource_redirect_sha256")
+        != ENGINEERING_HEALTH_RESOURCE_REDIRECT_SHA256
+        or preserved.get("dependency_restore_sha256")
+        != ENGINEERING_HEALTH_DEPENDENCY_RESTORE_SHA256
+        or preserved.get("topology_guard_repair_sha256")
+        != ENGINEERING_HEALTH_TOPOLOGY_GUARD_REPAIR_SHA256
+        or attempt.get("attempt") != 3
+        or attempt.get("job_id") != 316370
+        or attempt.get("scheduler_state") != "COMPLETED"
+        or attempt.get("scheduler_exit_code") != "0:0"
+        or attempt.get("compact_stdout_record_count") != 1
+        or attempt.get("compact_stdout_shape_valid") is not True
+        or attempt.get("compact_stdout_hash_fields_valid") is not True
+        or attempt.get("stderr_bytes") != 0
+        or attempt.get("private_trace_count") != 7
+        or attempt.get("model_module_inference_count") != 0
+        or attempt.get("scientific_metric_count") != 0
+        or compact.get("status") != "ENGINEERING_BLOCKER"
+        or compact.get("attempt") != 3
+        or compact.get("module_count") != 7
+        or compact.get("completed_module_count") != 0
+        or compact.get("failed_module_count") != 7
+        or compact.get("case_count") != 28
+        or compact.get("scientific_metric_count") != 0
+        or compact.get("unaccounted_failure_count") != 1
+        or compact.get("engineering_health_commitment_sha256")
+        != "107f5d0dd58adda31e9932a18a41319d5d6317fafd9b769e36ad0d13650c3696"
+        or diagnosis.get("declared_preflight_blocked_trace_count") != 6
+        or diagnosis.get("unaccounted_exception_trace_count") != 1
+        or diagnosis.get("unaccounted_exception_type") != "FileNotFoundError"
+        or diagnosis.get("partial_scientific_metric_opened") is not False
+        or resource.get("submission_count_used") != 3
+        or resource.get("submission_count_remaining") != 0
+        or resource.get("direct_monetary_cost_USD") != 0
+        or gate.get("engineering_health_pass") is not False
+        or gate.get("attempt_4_authorized") is not False
+        or any(
+            gate.get(key) is not False
+            for key in (
+                "public_development_authorized",
+                "public_holdout_authorized",
+                "governed_C_authorized",
+                "LTX_preflight_or_generation_authorized",
+                "synthetic_learner_authorized",
+            )
+        )
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_TERMINAL_RESULT_COMMITMENT")
     return value
 
 
@@ -10258,6 +10337,9 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
     """Run the bounded production-path microqualification with zero metrics."""
 
     cfg = json.loads(args.config.read_text())
+    if "learner_effective_engineering_health_result" in cfg:
+        _engineering_health_terminal_result(cfg)
+        raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
     health = _engineering_health_amendment(cfg)
     root = _tuple_health_root(args.public_root)
     _require_external_or_ignored_output(root)
@@ -10486,6 +10568,9 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
 def _load_tuple_health_pass(
     public: Path, cfg: dict[str, Any], fixture_commitment: str
 ) -> dict[str, Any]:
+    if "learner_effective_engineering_health_result" in cfg:
+        _engineering_health_terminal_result(cfg)
+        raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
     root = _tuple_health_root(public) / "health"
     passes = []
     observed = []

@@ -29,13 +29,13 @@ def _current_audio_fixture_config() -> dict:
     return config
 
 
-def test_construct_aligned_resume_amendment_is_exact_and_schema21_compatible() -> None:
+def test_construct_aligned_resume_amendment_is_exact_and_schema22_compatible() -> None:
     import pytest
 
     config = json.loads(
         Path("configs/synthetic_video_real_only_proof.json").read_text()
     )
-    assert config["schema_version"] == 21
+    assert config["schema_version"] == 22
     amendment = MODULE._construct_aligned_ltx_resume_amendment(config)
     assert (
         amendment["amendment_commitment_sha256"]

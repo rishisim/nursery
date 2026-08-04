@@ -311,6 +311,23 @@ resource-related changed. Attempts 1 and 2 are each conservatively charged
 slice-GPU-hours remain. A further engineering failure seals an engineering
 blocker rather than a scientific result.
 
+Final attempt 3, job 316370, completed its scheduler allocation in 20 seconds
+and emitted exactly one schema-valid compact health record, but the record was
+`ENGINEERING_BLOCKER`: 0/7 modules completed, seven failures were recorded,
+and all scientific metrics remained withheld. Aggregate-only reduction of the
+seven private traces found six declared preflight-blocked dependents and one
+`FileNotFoundError`. The failure occurred before dependency preflight, fixture
+projection, model loading, or module inference because the runner attempted to
+invoke Slurm's `scontrol` executable from inside the network-disabled
+Singularity runtime, where it was unavailable; the outer wrapper had already
+passed the same seven scheduler predicates. This is an engineering runtime
+validation-dependency failure, not a scientific no-go. Terminal commitment
+`644028ba…9d0f81` preserves health commitment `107f5d0d…0c3696`, zero
+scientific metrics, $0 direct cost, and the frozen protocol-accounted total of
+0.504019 H100-slice GPU-hours. All three submissions are consumed, no fourth
+attempt is authorized, and new-route development, holdout, governed C, LTX,
+and Synthetic-1h were not run.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

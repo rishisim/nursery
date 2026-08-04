@@ -93,8 +93,8 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["schema_version"] == 9
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_TOPOLOGY_GUARD_REPAIR_FROZEN_AFTER_H100_ATTEMPT_2_PREINFERENCE_FAILURE_FINAL_ATTEMPT_3_PENDING_NO_NEW_SCIENTIFIC_OUTCOME"
+    assert result["schema_version"] == 10
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_BLOCKER_SEALED_AFTER_FINAL_H100_ATTEMPT_3_NO_NEW_SCIENTIFIC_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -123,6 +123,14 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert health["new_engineering_outcome_opened"] is False
     assert health["new_scientific_outcome_opened"] is False
     assert health["LTX_or_synthetic_learner_run"] is False
+    blocker = result["learner_effective_engineering_health_result"]
+    assert blocker["job_id"] == 316370
+    assert blocker["module_counts"] == [7, 0, 7]
+    assert blocker["scientific_metric_count"] == 0
+    assert blocker["attempt_4_authorized"] is False
+    assert blocker["public_development_authorized"] is False
+    assert blocker["governed_C_authorized"] is False
+    assert blocker["LTX_or_synthetic_learner_run"] is False
     runner = result["construct_aligned_public_runner_implementation_result"]
     assert runner["status"].startswith("PASS_")
     assert runner["implementation_source_sha256"] == (
@@ -424,7 +432,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "PROSPECTIVE_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_TOPOLOGY_GUARD_REPAIR_FROZEN_AFTER_H100_ATTEMPT_2_PREINFERENCE_FAILURE_FINAL_ATTEMPT_3_PENDING_NO_NEW_SCIENTIFIC_OUTCOME"
+    assert proof["status"] == "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_BLOCKER_SEALED_AFTER_FINAL_H100_ATTEMPT_3_PREINFERENCE_RUNTIME_VALIDATION_DEPENDENCY_FAILURE_PUBLIC_SCIENCE_C_LTX_AND_SYNTHETIC_LEARNER_NOT_RUN"
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["repair_commitment_sha256"] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
     assert geometry_repair["triggering_attempt"]["public_model_inference_executed"] is False
@@ -503,6 +511,20 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
         "authoritative_scontrol_predicate_pass_count"
     ] == 7
     assert topology_repair["remaining_health_budget"]["submission_count_remaining"] == 1
+    blocker = dict(proof["learner_effective_engineering_health_result"])
+    blocker_commitment = blocker.pop("blocker_commitment_sha256")
+    assert blocker_commitment == digest(blocker)
+    assert blocker_commitment == (
+        "644028babc768e881276fa078b95349ba77f8418cb76d722e8baf2588f9d0f81"
+    )
+    assert blocker["final_attempt"]["job_id"] == 316370
+    assert blocker["compact_aggregate"]["status"] == "ENGINEERING_BLOCKER"
+    assert blocker["compact_aggregate"]["scientific_metric_count"] == 0
+    assert blocker["stable_aggregate_diagnosis"]["unaccounted_exception_type"] == (
+        "FileNotFoundError"
+    )
+    assert blocker["resource_accounting"]["submission_count_remaining"] == 0
+    assert blocker["terminal_gate"]["attempt_4_authorized"] is False
     assert health["unchanged_downstream_contract"]["accepted_synthetic_seconds_exact"] == 3600
     assert proof["budgets_credited_hours"] == {
         "real": 1,
@@ -520,7 +542,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
-    assert proof["schema_version"] == 21
+    assert proof["schema_version"] == 22
     premodel = proof["calibration_C"]["extractor"]["mechanistic_training_tuple_premodel_result"]
     assert premodel["dependency_manifest_commitment_sha256"] == (
         "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"

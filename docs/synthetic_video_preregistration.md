@@ -1838,6 +1838,31 @@ to 0.5. Exactly one full-suite attempt and 0.25 charged slice-GPU-hours remain;
 any further engineering failure exhausts the route and must be sealed as an
 engineering blocker, never a scientific no-go.
 
+Final attempt 3, job 316370, then completed the exact H100 scheduler request in
+20 seconds and wrote one schema-valid compact aggregate with empty stderr. The
+aggregate status was `ENGINEERING_BLOCKER`: 0/7 modules completed, seven failed,
+one failure was unaccounted by the predeclared error-code mapper, and the
+scientific-metric count remained zero. No holdout input was opened and there
+were zero invalid retained records, silent truncations, or external calls.
+Aggregate-only trace reduction found six declared
+`E_TUPLE_HEALTH_PREFLIGHT_BLOCKED` dependents and one `FileNotFoundError` in the
+runner's H100 topology validation. The runner attempted to invoke Slurm
+`scontrol` inside the network-disabled Singularity runtime, where that
+executable was absent, before dependency preflight, fixture projection, model
+loading, or module inference. The wrapper had already passed the same seven
+authoritative scheduler checks outside the container. This is sealed as an
+engineering runtime-validation dependency failure, not a below-threshold
+scientific result.
+
+Terminal commitment `644028ba…9d0f81` binds compact health commitment
+`107f5d0d…0c3696`, all three attempts, zero scientific metrics, no restricted
+input, and $0 direct cost. Protocol accounting totals 30.241150 minutes and
+0.504019 H100-slice GPU-hours because attempts 1 and 2 retain their frozen
+15-minute/0.25-hour conservative charges; scheduler-observed elapsed time over
+the three jobs was 26 seconds. The third failure exhausts the frozen
+submission route. Attempt 4, new-route public development and holdout, governed
+C, LTX preflight/generation, and the synthetic learner are not authorized.
+
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only
 holdout result is a scientific no-go. Governed C remains conditional on a full

@@ -727,6 +727,46 @@ def test_topology_guard_repair_is_hash_bound_preinference_and_scientifically_nar
         MODULE._engineering_health_topology_guard_repair(mutated)
 
 
+def test_terminal_health_blocker_is_hash_bound_and_prevents_any_new_route(
+    tmp_path: Path,
+) -> None:
+    config = _config()
+    result = MODULE._engineering_health_terminal_result(config)
+    assert result["blocker_commitment_sha256"] == (
+        "644028babc768e881276fa078b95349ba77f8418cb76d722e8baf2588f9d0f81"
+    )
+    assert result["final_attempt"]["job_id"] == 316370
+    assert result["compact_aggregate"]["status"] == "ENGINEERING_BLOCKER"
+    assert result["compact_aggregate"]["scientific_metric_count"] == 0
+    assert result["stable_aggregate_diagnosis"]["unaccounted_exception_type"] == (
+        "FileNotFoundError"
+    )
+    assert result["resource_accounting"]["submission_count_remaining"] == 0
+    assert result["terminal_gate"]["attempt_4_authorized"] is False
+
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ROUTE_EXHAUSTED"):
+        MODULE.run_tuple_health(
+            argparse.Namespace(
+                public_root=tmp_path / "public",
+                scratch_root=tmp_path / "scratch",
+                config=Path("configs/synthetic_video_real_only_proof.json"),
+                attempt=3,
+                device="cuda",
+            )
+        )
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ROUTE_EXHAUSTED"):
+        MODULE._load_tuple_health_pass(tmp_path, config, "a" * 64)
+
+    mutated = json.loads(json.dumps(config))
+    mutated["learner_effective_engineering_health_result"]["terminal_gate"][
+        "attempt_4_authorized"
+    ] = True
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_HEALTH_TERMINAL_RESULT_COMMITMENT"
+    ):
+        MODULE._engineering_health_terminal_result(mutated)
+
+
 def test_h100_health_topology_uses_authoritative_scheduler_record_and_effective_cuda(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -898,7 +938,13 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
 ) -> None:
     public = tmp_path / "public"
     scratch = tmp_path / "scratch"
-    config_path = Path("configs/synthetic_video_real_only_proof.json").resolve()
+    historical_config = json.loads(
+        Path("configs/synthetic_video_real_only_proof.json").read_text()
+    )
+    historical_config["schema_version"] = 21
+    historical_config.pop("learner_effective_engineering_health_result")
+    config_path = tmp_path / "preterminal-proof.json"
+    MODULE.write_private_new(config_path, historical_config)
     manifest = _fixture_manifest()
     attempt_root = MODULE._tuple_health_root(public) / "health/attempt-01"
     attempt_root.mkdir(parents=True, mode=0o700)

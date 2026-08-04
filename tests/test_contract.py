@@ -82,8 +82,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 12
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_TOPOLOGY_GUARD_REPAIR_FROZEN_AFTER_H100_ATTEMPT_2_PREINFERENCE_FAILURE_FINAL_ATTEMPT_3_PENDING_NO_NEW_SCIENTIFIC_OUTCOME"
+    assert config["schema_version"] == 13
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_BLOCKER_SEALED_AFTER_FINAL_H100_ATTEMPT_3_NO_NEW_SCIENTIFIC_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -185,6 +185,22 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert topology_repair == result[
         "learner_effective_engineering_health_topology_guard_repair"
     ]
+    blocker = config["learner_effective_engineering_health_result"]
+    assert blocker["status"].startswith("ENGINEERING_BLOCKER_ROUTE_EXHAUSTED")
+    assert blocker["job_id"] == 316370
+    assert blocker["module_counts"] == [7, 0, 7]
+    assert blocker["scientific_metric_count"] == 0
+    assert blocker["unaccounted_failure_count"] == 1
+    assert blocker["private_trace_count"] == 7
+    assert blocker["declared_preflight_blocked_trace_count"] == 6
+    assert blocker["attempt_4_authorized"] is False
+    assert blocker["public_development_authorized"] is False
+    assert blocker["governed_C_authorized"] is False
+    assert blocker["LTX_or_synthetic_learner_run"] is False
+    assert blocker["blocker_commitment_sha256"] == (
+        "644028babc768e881276fa078b95349ba77f8418cb76d722e8baf2588f9d0f81"
+    )
+    assert blocker == result["learner_effective_engineering_health_result"]
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
     assert label_correction["binary_yes_no_swapped_count"] == 193
@@ -408,7 +424,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["phase4_authorized"] is True
     assert config["gates"]["childlens_audio_processing_authorized"] is True
     assert config["gates"]["learner_effective_implementation_authorized"] is True
-    assert config["gates"]["learner_effective_public_qualification_authorized"] is True
+    assert config["gates"]["learner_effective_public_qualification_authorized"] is False
     assert config["gates"]["learner_effective_runner_implementation_status"].startswith(
         "PASS_"
     )
@@ -416,13 +432,13 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
     assert config["gates"]["learner_effective_no_hand_review_sealed"] is True
     assert config["gates"]["learner_effective_public_fixture_preparation_authorized"] is True
-    assert config["gates"]["learner_effective_public_model_inference_authorized"] is True
+    assert config["gates"]["learner_effective_public_model_inference_authorized"] is False
     assert config["gates"]["learner_effective_public_model_inference_scope"] == (
-        "ENGINEERING_MICROHEALTH_ONLY_NO_SCIENTIFIC_METRICS"
+        "NONE_ENGINEERING_HEALTH_ROUTE_EXHAUSTED"
     )
     assert config["gates"][
         "learner_effective_public_model_inference_conditionally_authorized_after_fixture_seal"
-    ] is True
+    ] is False
     assert config["gates"]["learner_effective_new_route_scientific_development_authorized"] is False
     assert config["gates"]["governed_C_calibration_authorized"] is False
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
@@ -450,7 +466,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 21
+    assert config["schema_version"] == 22
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)
