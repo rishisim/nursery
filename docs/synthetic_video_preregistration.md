@@ -1,6 +1,6 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — H100 ENGINEERING-HEALTH RESOURCE REDIRECT FROZEN; PRIOR PUBLIC-DEVELOPMENT NO-GO AND ZERO-RUNTIME CANCELED A30 SUBMISSION PRESERVED**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — PUBLIC DEPENDENCY RESTORE FROZEN AFTER H100 HEALTH ATTEMPT-1 PRE-INFERENCE FAILURE; ATTEMPT 2 PENDING; ALL PRIOR NO-GOS PRESERVED**
 
 **Evidence cut-off:** 2026-08-04
 
@@ -1789,6 +1789,30 @@ CPUs, 32 GiB, no DDP, and 15 minutes. The original initial-plus-two-resmoke,
 unchanged. This scheduler amendment changes no model, fixture, threshold,
 metric, seed, module behavior, repair allowance, scientific gate, governed-C
 rule, generator contract, or one-accepted-hour ceiling.
+
+H100 health attempt 1, job 316325, then stopped after one second with exit
+`65:0` before module loading because the required public language-dependency
+archive was absent. Exactly one wrapper-start record exists; full-result,
+compact-result, module-inference, and scientific-metric counts are all zero.
+The failure is therefore classified as an ordinary pre-inference dependency
+cache failure, not a scientific no-go. It is preserved externally and receives
+the frozen conservative 0.25 slice-GPU-hour charge despite 1/3,600 actual
+GPU-hours.
+
+Under the already frozen outcome-independent dependency-repair allowance, the
+canonical public preparation scripts restored the cache in CPU-only jobs
+316333 and 316335 (25 and 77 seconds, four CPUs and 64 GiB each, zero GPUs,
+$0). Their offline local-files-only validation reloaded Whisper-small, the
+pinned OPUS-MT de→en revision, and the required NLTK resources. The active
+language archive is 542,423,040 bytes at SHA-256 `97ef52ec…1a07`; its 11,512
+regular members contain 532,618,028 bytes and bind to metadata-independent tree
+commitment `34014b16…07af`. The complete restored public cache counted here is
+65 files and 2,449,082,735 bytes (2.280886 GiB), within the unchanged 10-GiB
+ceiling. The historical archive identity remains part of prior provenance and
+is not rewritten. Repair commitment `3c54503b…46db4` freezes this exact active
+identity before attempt 2. No model, fixture, metric, threshold, seed, C value,
+generator result, or learner result informed the repair. Two full-suite
+submissions and 0.5 conservatively charged slice-GPU-hours remain.
 
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only

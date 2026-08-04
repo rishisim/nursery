@@ -93,8 +93,8 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["schema_version"] == 7
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_H100_RESOURCE_REDIRECT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_AND_CANCELED_A30_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME"
+    assert result["schema_version"] == 8
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_DEPENDENCY_RESTORE_FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_FAILURE_ATTEMPT_2_PENDING_NO_NEW_SCIENTIFIC_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -424,7 +424,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "PROSPECTIVE_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_H100_RESOURCE_REDIRECT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_AND_CANCELED_A30_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME"
+    assert proof["status"] == "PROSPECTIVE_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_DEPENDENCY_RESTORE_FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_FAILURE_ATTEMPT_2_PENDING_NO_NEW_SCIENTIFIC_OUTCOME"
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["repair_commitment_sha256"] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
     assert geometry_repair["triggering_attempt"]["public_model_inference_executed"] is False
@@ -477,6 +477,18 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
         "gpu:nvidia_h100_nvl_3g.47gb:1"
     )
     assert redirect["bounded_resource_policy"]["aggregate_GPU_hours_max"] == 0.75
+    restore = dict(proof["learner_effective_engineering_health_dependency_restore"])
+    restore_commitment = restore.pop("repair_commitment_sha256")
+    assert restore_commitment == digest(restore)
+    assert restore_commitment == (
+        "3c54503b4087fae1e993b0aa952823f988a088a5c6543760df1022e2dc046db4"
+    )
+    assert restore["triggering_attempt"]["job_id"] == 316325
+    assert restore["triggering_attempt"]["scientific_metric_count"] == 0
+    assert restore["active_language_dependency_archive"]["sha256"] == (
+        "97ef52ecaa8c99db017e598d8a63d0d2170affef14ef46e7df7a656abd3a1a07"
+    )
+    assert restore["remaining_health_budget"]["submission_count_remaining"] == 2
     assert health["unchanged_downstream_contract"]["accepted_synthetic_seconds_exact"] == 3600
     assert proof["budgets_credited_hours"] == {
         "real": 1,
@@ -494,7 +506,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
-    assert proof["schema_version"] == 19
+    assert proof["schema_version"] == 20
     premodel = proof["calibration_C"]["extractor"]["mechanistic_training_tuple_premodel_result"]
     assert premodel["dependency_manifest_commitment_sha256"] == (
         "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"

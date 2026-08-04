@@ -646,6 +646,54 @@ def test_h100_resource_redirect_is_hash_bound_and_scientifically_narrow() -> Non
         MODULE._engineering_health_resource_redirect(mutated)
 
 
+def test_dependency_restore_is_hash_bound_preinference_and_scientifically_narrow() -> None:
+    config = _config()
+    restore = MODULE._engineering_health_dependency_restore(config)
+    assert restore["repair_commitment_sha256"] == (
+        "3c54503b4087fae1e993b0aa952823f988a088a5c6543760df1022e2dc046db4"
+    )
+    assert restore["triggering_attempt"]["classification"] == (
+        "ENGINEERING_DEPENDENCY_CACHE_MISS_NOT_SCIENTIFIC_NO_GO"
+    )
+    assert restore["triggering_attempt"]["model_module_inference_count"] == 0
+    assert restore["triggering_attempt"]["scientific_metric_count"] == 0
+    assert restore["public_restore_execution"][
+        "offline_local_files_only_reload_after_preparation"
+    ] == "PASS"
+    assert restore["active_language_dependency_archive"] == {
+        "relative_location": "models/phase4-language-pydeps.tar under the public root",
+        "sha256": "97ef52ecaa8c99db017e598d8a63d0d2170affef14ef46e7df7a656abd3a1a07",
+        "bytes": 542423040,
+        "normalized_regular_file_count": 11512,
+        "normalized_regular_file_bytes": 532618028,
+        "normalized_tree_commitment_sha256": "34014b16541c10bc3eccfbdfa18255e346be2c36cf70bb3defd0c9b04f2d07af",
+        "normalized_tree_commitment_method": "SHA256 of canonical JSON sorted list of relative_path SHA256 and bytes for every regular tar member after removing leading dot-slash; tar metadata excluded",
+        "identity_rule": "this rebuilt tar is the sole active byte identity for attempt 2 and later health/scientific runs; the historical tar identity remains preserved for prior provenance",
+        "verification": "require exact byte count and SHA-256 before scratch extraction",
+    }
+    historical = config["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_visor_hos_correction_amendment"
+    ]["resource_and_governance"]["language_dependency_archive"]
+    assert historical["sha256"] == (
+        "27df87f4ec1900b4a11f307d42a18483903d38ddb9ed77f418b88fa299497e37"
+    )
+    assert restore["remaining_health_budget"]["submission_count_remaining"] == 2
+    assert restore["remaining_health_budget"][
+        "conservative_protocol_GPU_hours_remaining"
+    ] == 0.5
+
+    mutated = json.loads(json.dumps(config))
+    repair = mutated["learner_effective_engineering_health_dependency_restore"]
+    repair["active_language_dependency_archive"]["sha256"] = "0" * 64
+    payload = json.loads(json.dumps(repair))
+    payload.pop("repair_commitment_sha256")
+    repair["repair_commitment_sha256"] = MODULE.digest(payload)
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_HEALTH_DEPENDENCY_RESTORE_COMMITMENT"
+    ):
+        MODULE._engineering_health_dependency_restore(mutated)
+
+
 def test_tuple_topology_separates_h100_health_from_a30_science(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

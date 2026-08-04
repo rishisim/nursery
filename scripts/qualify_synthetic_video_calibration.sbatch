@@ -103,7 +103,7 @@ if [[ "$tuple_run_mode" == "sizing" ]]; then
     --device cuda
 elif [[ "$tuple_run_mode" == "health" || "$tuple_run_mode" == "development" || "$tuple_run_mode" == "holdout" ]]; then
   language_archive="${PHASE4_PUBLIC_ROOT}/models/phase4-language-pydeps.tar"
-  language_archive_sha256="27df87f4ec1900b4a11f307d42a18483903d38ddb9ed77f418b88fa299497e37"
+  language_archive_sha256="97ef52ecaa8c99db017e598d8a63d0d2170affef14ef46e7df7a656abd3a1a07"
   language_archive_bytes=542423040
   if [[ ! -f "$language_archive" || "$(stat -c %s "$language_archive")" -ne "$language_archive_bytes" ]]; then
     exit 65

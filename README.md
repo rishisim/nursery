@@ -283,6 +283,21 @@ initial-plus-two-resmoke, 0.75 aggregate slice-GPU-hour, 10-GiB, and $0 ceilings
 are unchanged. No model, fixture, threshold, metric, seed, scientific gate,
 downstream contract, or prior result changed.
 
+The first H100 health submission, job 316325, stopped after one second with
+exit `65:0` because its required public language-dependency archive was absent.
+It wrote one wrapper-start record but no full or compact health result, loaded
+no module, and opened no scientific metric. This is a pre-inference engineering
+cache failure, not a scientific no-go. The exact canonical public preparation
+scripts rebuilt the base and language caches in CPU-only jobs 316333 and
+316335 (25 and 77 seconds; zero GPUs; $0), followed by a passing offline reload
+of Whisper-small, OPUS-MT de→en, and NLTK. Dependency-repair commitment
+`3c54503b…46db4` freezes the active 542,423,040-byte language archive at
+SHA-256 `97ef52ec…1a07`, its metadata-independent normalized tree commitment at
+`34014b16…07af`, and 2.280886 GiB total restored public storage. Attempt 1 is
+preserved and conservatively charged 0.25 slice-GPU-hours; two submissions and
+0.5 charged slice-GPU-hours remain. The unchanged full 28-case suite must rerun
+as attempt 2 before any scientific development metric can open.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

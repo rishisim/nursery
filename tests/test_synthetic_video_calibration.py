@@ -29,13 +29,13 @@ def _current_audio_fixture_config() -> dict:
     return config
 
 
-def test_construct_aligned_resume_amendment_is_exact_and_schema19_compatible() -> None:
+def test_construct_aligned_resume_amendment_is_exact_and_schema20_compatible() -> None:
     import pytest
 
     config = json.loads(
         Path("configs/synthetic_video_real_only_proof.json").read_text()
     )
-    assert config["schema_version"] == 19
+    assert config["schema_version"] == 20
     amendment = MODULE._construct_aligned_ltx_resume_amendment(config)
     assert (
         amendment["amendment_commitment_sha256"]
@@ -5547,7 +5547,7 @@ def test_public_qualification_jobs_never_mount_restricted_data() -> None:
     assert "tuple-qualify" in qualify
     assert '--partition "$tuple_run_mode"' in qualify
     assert "development" in qualify and "holdout" in qualify
-    assert "27df87f4ec1900b4a11f307d42a18483903d38ddb9ed77f418b88fa299497e37" in qualify
+    assert "97ef52ecaa8c99db017e598d8a63d0d2170affef14ef46e7df7a656abd3a1a07" in qualify
     assert "language_archive_bytes=542423040" in qualify
     assert "sha256sum --check --status" in qualify
 

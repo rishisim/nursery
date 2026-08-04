@@ -82,8 +82,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 10
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_H100_RESOURCE_REDIRECT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_AND_CANCELED_A30_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME"
+    assert config["schema_version"] == 11
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_DEPENDENCY_RESTORE_FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_FAILURE_ATTEMPT_2_PENDING_NO_NEW_SCIENTIFIC_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -153,6 +153,23 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert redirect["active_GPU_type"] == "NVIDIA_H100_NVL_3G_47GB_MIG"
     assert redirect["scientific_contract_changed"] is False
     assert redirect == result["learner_effective_engineering_health_resource_redirect"]
+    restore = config["learner_effective_engineering_health_dependency_restore"]
+    assert restore["repair_commitment_sha256"] == (
+        "3c54503b4087fae1e993b0aa952823f988a088a5c6543760df1022e2dc046db4"
+    )
+    assert restore["trigger_job_id"] == 316325
+    assert restore["trigger_model_module_inference_count"] == 0
+    assert restore["trigger_scientific_metric_count"] == 0
+    assert restore["classification"] == (
+        "ENGINEERING_DEPENDENCY_CACHE_MISS_NOT_SCIENTIFIC_NO_GO"
+    )
+    assert restore["active_language_archive_sha256"] == (
+        "97ef52ecaa8c99db017e598d8a63d0d2170affef14ef46e7df7a656abd3a1a07"
+    )
+    assert restore["offline_local_files_only_reload"] == "PASS"
+    assert restore["submission_count_remaining"] == 2
+    assert restore["new_scientific_outcome_opened"] is False
+    assert restore == result["learner_effective_engineering_health_dependency_restore"]
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
     assert label_correction["binary_yes_no_swapped_count"] == 193
@@ -418,7 +435,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 19
+    assert config["schema_version"] == 20
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)

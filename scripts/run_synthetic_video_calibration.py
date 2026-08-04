@@ -568,6 +568,9 @@ ENGINEERING_HEALTH_AMENDMENT_SHA256 = (
 ENGINEERING_HEALTH_RESOURCE_REDIRECT_SHA256 = (
     "f7fc16f5c399c2a2d213b13a0d255a14b5b2f3ece41d62adaed17f61f186db6d"
 )
+ENGINEERING_HEALTH_DEPENDENCY_RESTORE_SHA256 = (
+    "3c54503b4087fae1e993b0aa952823f988a088a5c6543760df1022e2dc046db4"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -623,7 +626,7 @@ def _construct_aligned_ltx_resume_amendment(
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {16, 17, 18, 19}
+        cfg.get("schema_version") not in {16, 17, 18, 19, 20}
         or value.get("status")
         != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     ):
@@ -681,7 +684,7 @@ def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") != 19
+        cfg.get("schema_version") != 20
         or value.get("status")
         != "FROZEN_BEFORE_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -750,7 +753,7 @@ def _engineering_health_resource_redirect(
     payload = json.loads(json.dumps(value))
     expected = payload.pop("amendment_commitment_sha256", None)
     if (
-        cfg.get("schema_version") != 19
+        cfg.get("schema_version") != 20
         or value.get("status")
         != "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "SCHEDULER_AND_RESOURCE_LATENCY_ONLY"
@@ -838,6 +841,130 @@ def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
 
     _engineering_health_amendment(cfg)
     return _engineering_health_resource_redirect(cfg)["bounded_resource_policy"]
+
+
+def _engineering_health_dependency_restore(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the outcome-independent public cache restoration after attempt 1."""
+
+    try:
+        value = cfg["learner_effective_engineering_health_dependency_restore"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_DEPENDENCY_RESTORE_NOT_FROZEN") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("repair_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    trigger = value.get("triggering_attempt", {})
+    execution = value.get("public_restore_execution", {})
+    archive = value.get("active_language_dependency_archive", {})
+    provenance = value.get("restored_public_dependency_provenance", {})
+    budget = value.get("remaining_health_budget", {})
+    expected_distributions = [
+        ["accelerate", "1.14.0"],
+        ["diffusers", "0.39.0"],
+        ["huggingface_hub", "0.36.2"],
+        ["imageio_ffmpeg", "0.6.0"],
+        ["llvmlite", "0.44.0"],
+        ["more_itertools", "10.7.0"],
+        ["nltk", "3.9.1"],
+        ["numba", "0.61.2"],
+        ["numpy", "2.2.6"],
+        ["openai_whisper", "20250625"],
+        ["protobuf", "7.35.1"],
+        ["safetensors", "0.8.0"],
+        ["sentencepiece", "0.2.2"],
+        ["tiktoken", "0.11.0"],
+        ["tokenizers", "0.22.2"],
+        ["transformers", "4.57.6"],
+    ]
+    if (
+        cfg.get("schema_version") != 20
+        or value.get("status")
+        != "FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_DEPENDENCY_CACHE_MISS_BEFORE_ATTEMPT_2_OR_NEW_OUTCOME"
+        or value.get("scope")
+        != "OUTCOME_INDEPENDENT_PUBLIC_DEPENDENCY_CACHE_RESTORATION_ONLY"
+        or expected != ENGINEERING_HEALTH_DEPENDENCY_RESTORE_SHA256
+        or digest(payload) != expected
+        or value.get("repair_commitment_scope")
+        != "canonical JSON of this repair excluding repair_commitment_sha256"
+        or preserved.get("engineering_health_amendment_sha256")
+        != ENGINEERING_HEALTH_AMENDMENT_SHA256
+        or preserved.get("H100_resource_redirect_sha256")
+        != ENGINEERING_HEALTH_RESOURCE_REDIRECT_SHA256
+        or preserved.get("historical_language_archive_sha256")
+        != "27df87f4ec1900b4a11f307d42a18483903d38ddb9ed77f418b88fa299497e37"
+        or preserved.get("historical_language_archive_bytes") != 542423040
+        or preserved.get("prior_public_development_no_go_sha256")
+        != "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
+        or preserved.get("public_fixture_manifest_sha256")
+        != "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6"
+        or preserved.get(
+            "production_models_fixtures_thresholds_metrics_seeds_module_behavior_scientific_gates_and_downstream_contract"
+        )
+        is not True
+        or trigger.get("attempt") != 1
+        or trigger.get("job_id") != 316325
+        or trigger.get("state") != "FAILED"
+        or trigger.get("exit_code") != "65:0"
+        or trigger.get("elapsed_seconds") != 1
+        or trigger.get("conservative_protocol_GPU_hours_charge") != 0.25
+        or trigger.get("wrapper_record_count") != 1
+        or any(
+            trigger.get(key) != 0
+            for key in (
+                "full_result_count",
+                "compact_result_count",
+                "model_module_inference_count",
+                "scientific_metric_count",
+            )
+        )
+        or trigger.get("classification")
+        != "ENGINEERING_DEPENDENCY_CACHE_MISS_NOT_SCIENTIFIC_NO_GO"
+        or trigger.get("partial_scientific_or_engineering_metric_opened") is not False
+        or execution.get("base_dependency_job", {}).get("job_id") != 316333
+        or execution.get("base_dependency_job", {}).get("state") != "COMPLETED"
+        or execution.get("base_dependency_job", {}).get("GPU_count") != 0
+        or execution.get("language_dependency_job", {}).get("job_id") != 316335
+        or execution.get("language_dependency_job", {}).get("state") != "COMPLETED"
+        or execution.get("language_dependency_job", {}).get("GPU_count") != 0
+        or execution.get("public_dependencies_only") is not True
+        or execution.get("restricted_mount_present") is not False
+        or execution.get("offline_local_files_only_reload_after_preparation")
+        != "PASS"
+        or execution.get("direct_monetary_cost_USD") != 0
+        or archive.get("sha256")
+        != "97ef52ecaa8c99db017e598d8a63d0d2170affef14ef46e7df7a656abd3a1a07"
+        or archive.get("bytes") != 542423040
+        or archive.get("normalized_regular_file_count") != 11512
+        or archive.get("normalized_regular_file_bytes") != 532618028
+        or archive.get("normalized_tree_commitment_sha256")
+        != "34014b16541c10bc3eccfbdfa18255e346be2c36cf70bb3defd0c9b04f2d07af"
+        or provenance.get("base_dependency_archive_sha256")
+        != "5da2b13ef7ad018e2c85ccdcddce9f2f1860ee631b8e425c9d87331599781506"
+        or provenance.get("base_dependency_archive_bytes") != 201246720
+        or provenance.get("Whisper_small_sha256")
+        != "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794"
+        or provenance.get("OPUS_MT_de_en_revision")
+        != "1a922f3b32a8e809e17a47d4b32142d8105924e5"
+        or provenance.get("OPUS_MT_file_count") != 34
+        or provenance.get("NLTK_package_families")
+        != ["averaged_perceptron_tagger_eng", "omw-1.4", "wordnet"]
+        or provenance.get("installed_distributions") != expected_distributions
+        or provenance.get("restored_storage_file_count") != 65
+        or provenance.get("restored_storage_bytes") != 2449082735
+        or provenance.get("restored_storage_within_10_GiB_ceiling") is not True
+        or budget.get("submission_count_consumed") != 1
+        or budget.get("submission_count_remaining") != 2
+        or budget.get("conservative_protocol_GPU_hours_charged") != 0.25
+        or budget.get("conservative_protocol_GPU_hours_remaining") != 0.5
+        or budget.get("new_storage_GiB_ceiling") != 10
+        or budget.get("direct_monetary_cost_USD") != 0
+        or value.get("new_model_fixture_scientific_or_learner_outcome_opened")
+        is not False
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_DEPENDENCY_RESTORE_COMMITMENT")
+    return value
 
 
 def _geometry_function_bundle_digests(
@@ -9552,6 +9679,7 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
 
     active = _construct_aligned_ltx_resume_amendment(cfg)
     health = _engineering_health_amendment(cfg)
+    dependency_restore = _engineering_health_dependency_restore(cfg)
     amendment = _tuple_amendment(cfg)
     runtime = _tuple_runtime_amendment(cfg)
     fixture_protocol = _tuple_fixture_protocol(cfg)
@@ -9602,6 +9730,7 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
         {
             "active": active,
             "health": health,
+            "dependency_restore": dependency_restore,
             "tuple_amendment": amendment,
             "runtime": runtime,
             "fixture_protocol": fixture_protocol,
@@ -9628,6 +9757,7 @@ def _tuple_health_dependency_preflight(
     """Rehash every production dependency family before GPU model loading."""
 
     health = _engineering_health_amendment(cfg)
+    dependency_restore = _engineering_health_dependency_restore(cfg)
     configuration_commitment = _tuple_health_configuration_preflight(cfg)
     runtime_cfg = _tuple_runtime_amendment(cfg)
     runtime = _verify_tuple_runtime_manifest(public, cfg)
@@ -9881,9 +10011,7 @@ def _tuple_health_dependency_preflight(
                 }
             )
 
-    language_archive = cfg["calibration_C"]["extractor"][
-        "mechanistic_training_tuple_visor_hos_correction_amendment"
-    ]["resource_and_governance"]["language_dependency_archive"]
+    language_archive = dependency_restore["active_language_dependency_archive"]
     records.append(
         {
             "family": "language_dependency_archive",
@@ -9917,6 +10045,9 @@ def _tuple_health_dependency_preflight(
             "engineering_health_amendment_commitment_sha256": health[
                 "amendment_commitment_sha256"
             ],
+            "engineering_health_dependency_restore_commitment_sha256": (
+                dependency_restore["repair_commitment_sha256"]
+            ),
         }
     )
     return record
