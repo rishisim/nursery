@@ -466,6 +466,29 @@ diagnostic is required. Current runner SHA-256 is `1897c40b…6768`; the full
 deterministic fixture retry is authorized while fixture, development,
 threshold, holdout, and model outputs remain absent.
 
+The subsequent geometry-compatible fixture retry passed in job 315501 and
+sealed 824 public items/pairs at commitment `2758557f…03dae6`, with the blind
+no-hand seal `a58ca3f1…1c97` preserved and no cross-partition source overlap.
+After a pending H100 submission was canceled before allocation or inference,
+the qualification topology was prospectively frozen to one A30. Development
+job 315542 then ran all seven modules but sealed
+`NO_GO_DEVELOPMENT_COMBINED_GATE`: only recurrence and the deterministic sensor
+module completed, while five modules errored. This is final for that route at
+commitment `4b7cd583…ec66bf`; its holdout, governed C, LTX, and learner stages
+were not run.
+
+A new user-authorized engineering-health amendment is frozen at
+`d447a7e1…2c6205` without reinterpreting job 315542. It requires one
+metric-withholding 28-case production-path microqualification before any new
+scientific metric. The same public stack, fixtures, runtime, schemas, and
+serializers must run on one A30 under a three-submission, 15-minute-each,
+0.75-GPU-hour, 10-GiB, $0 ceiling. Ordinary implementation failures may be
+repaired within that budget, but models, sources, labels, partitions,
+thresholds, and scientific rules cannot change. Only a committed all-module
+health PASS may open new-route development; any execution fault withholds all
+partial scientific metrics and is an engineering blocker rather than a
+scientific no-go.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

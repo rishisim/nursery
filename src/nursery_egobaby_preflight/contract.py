@@ -113,6 +113,7 @@ def validate_phase_state(config: Mapping[str, Any]) -> None:
         "AMBITIOUS_LEARNER_EFFECTIVE_H3_AMENDMENT_FROZEN",
         "CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_RESUME_AMENDMENT_FROZEN",
         "CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN",
+        "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_AMENDMENT_FROZEN",
     )
     marker_mismatch = any((marker in top) != (marker in nested) for marker in active_markers)
     if (

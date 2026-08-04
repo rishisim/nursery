@@ -39,8 +39,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 8
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_PUBLIC_DEVELOPMENT_COMBINED_NO_GO_HOLDOUT_C_LTX_AND_SYNTHETIC_LEARNER_NOT_RUN_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED"
+    assert config["schema_version"] == 9
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_AMENDMENT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -80,6 +80,24 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert development["public_qualification_commitment_sha256"] == (
         "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
     )
+    proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
+    result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
+    assert proof["learner_effective_public_development_result"] == result[
+        "learner_effective_public_development_result"
+    ]
+    assert canonical_json_sha256(
+        proof["learner_effective_public_development_result"]
+    ) == "c43c7a678e3a2eac10ed5a5ac75c8964520931ec180ab9306585c76d198fb8c8"
+    health = config["learner_effective_engineering_health_amendment"]
+    assert health["amendment_commitment_sha256"] == (
+        "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205"
+    )
+    assert health["microfixture_case_count"] == 28
+    assert health["scientific_metric_count"] == 0
+    assert health["submission_count_max"] == 3
+    assert health["aggregate_GPU_hours_max"] == 0.75
+    assert health["new_engineering_outcome_opened"] is False
+    assert health["new_scientific_outcome_opened"] is False
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
     assert label_correction["binary_yes_no_swapped_count"] == 193
@@ -311,10 +329,14 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
     assert config["gates"]["learner_effective_no_hand_review_sealed"] is True
     assert config["gates"]["learner_effective_public_fixture_preparation_authorized"] is True
-    assert config["gates"]["learner_effective_public_model_inference_authorized"] is False
+    assert config["gates"]["learner_effective_public_model_inference_authorized"] is True
+    assert config["gates"]["learner_effective_public_model_inference_scope"] == (
+        "ENGINEERING_MICROHEALTH_ONLY_NO_SCIENTIFIC_METRICS"
+    )
     assert config["gates"][
         "learner_effective_public_model_inference_conditionally_authorized_after_fixture_seal"
-    ] is False
+    ] is True
+    assert config["gates"]["learner_effective_new_route_scientific_development_authorized"] is False
     assert config["gates"]["governed_C_calibration_authorized"] is False
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
     assert config["gates"]["generator_work_authorized"] is False
@@ -341,7 +363,18 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 17
+    assert config["schema_version"] == 18
+    health = dict(config["learner_effective_engineering_health_amendment"])
+    health_commitment = health.pop("amendment_commitment_sha256")
+    assert health_commitment == canonical_json_sha256(health)
+    assert health_commitment == (
+        "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205"
+    )
+    assert health["engineering_microfixture_suite"]["total_case_count"] == 28
+    assert health["metric_withholding"]["microhealth_scientific_metric_count"] == 0
+    assert health["scientific_threshold_state"]["DINOv2_recurrence_cosine"] == 0.85
+    assert health["scientific_threshold_state"]["threshold_change_or_relaxation"] is False
+    assert health["bounded_resource_policy"]["per_submission_wall_minutes_max"] == 15
     resource = dict(config["learner_effective_public_qualification_resource_amendment"])
     commitment = resource.pop("amendment_commitment_sha256")
     assert commitment == canonical_json_sha256(resource)

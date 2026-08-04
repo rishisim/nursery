@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 import csv
@@ -449,6 +450,9 @@ CONSTRUCT_ALIGNED_SOURCE_NO_GO_SHA256 = (
 CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256 = (
     "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39"
 )
+ENGINEERING_HEALTH_AMENDMENT_SHA256 = (
+    "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -504,7 +508,7 @@ def _construct_aligned_ltx_resume_amendment(
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {16, 17}
+        cfg.get("schema_version") not in {16, 17, 18}
         or value.get("status")
         != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     ):
@@ -552,6 +556,96 @@ def _construct_aligned_ltx_resume_amendment(
     ):
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_SCHEMA")
     return value
+
+
+def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Validate the sole prospective engineering-health route."""
+
+    try:
+        value = cfg["learner_effective_engineering_health_amendment"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN") from error
+    if (
+        cfg.get("schema_version") != 18
+        or value.get("status")
+        != "FROZEN_BEFORE_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
+        or value.get("route_id") != "construct-aligned-engineering-health"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN")
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("amendment_commitment_sha256", None)
+    if (
+        expected != ENGINEERING_HEALTH_AMENDMENT_SHA256
+        or digest(payload) != expected
+        or value.get("amendment_commitment_scope")
+        != "canonical JSON of this amendment excluding amendment_commitment_sha256"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_COMMITMENT")
+    prior = value.get("prior_public_development_result", {})
+    micro = value.get("engineering_microfixture_suite", {})
+    resource = value.get("bounded_resource_policy", {})
+    withholding = value.get("metric_withholding", {})
+    threshold_state = value.get("scientific_threshold_state", {})
+    if (
+        prior.get("public_qualification_commitment_sha256")
+        != "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
+        or prior.get("canonical_subtree_sha256")
+        != "c43c7a678e3a2eac10ed5a5ac75c8964520931ec180ab9306585c76d198fb8c8"
+        or micro.get("cases_per_module") != 4
+        or micro.get("module_count") != 7
+        or micro.get("total_case_count") != 28
+        or set(micro.get("required_case_classes", {}))
+        != set(TUPLE_QUALIFICATION_MODULE_IDS)
+        or any(
+            len(classes) != 4
+            for classes in micro.get("required_case_classes", {}).values()
+        )
+        or resource.get("GPU_type") != "NVIDIA_A30_24GB"
+        or resource.get("GPU_count") != 1
+        or resource.get("CPU_count") != 8
+        or resource.get("memory_GiB") != 32
+        or resource.get("per_submission_wall_minutes_max") != 15
+        or resource.get("initial_plus_repair_resmoke_submission_count_max") != 3
+        or resource.get("aggregate_GPU_hours_max") != 0.75
+        or resource.get("new_storage_GiB_max") != 10
+        or resource.get("direct_monetary_cost_USD") != 0
+        or withholding.get("microhealth_scientific_metric_count") != 0
+        or withholding.get(
+            "all_module_engineering_PASS_required_before_aggregate_scientific_metrics_release"
+        )
+        is not True
+        or threshold_state.get("DINOv2_recurrence_cosine") != 0.85
+        or threshold_state.get("outcome_driven_tuning") is not False
+        or threshold_state.get("threshold_change_or_relaxation") is not False
+        or value.get("new_engineering_or_scientific_outcome_opened") is not False
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_SCHEMA")
+    return value
+
+
+def _geometry_function_bundle_digests(
+    path: Path, names: list[str]
+) -> tuple[str, str]:
+    """Hash the exact historical geometry implementation independently."""
+
+    text = path.read_text()
+    tree = ast.parse(text)
+    selected = [
+        node
+        for node in tree.body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name in set(names)
+    ]
+    if {node.name for node in selected} != set(names):
+        raise RuntimeError("E_TUPLE_VISOR_GEOMETRY_BUNDLE_FUNCTION_SET")
+    lines = text.splitlines(keepends=True)
+    source = "\n".join(
+        "".join(lines[node.lineno - 1 : node.end_lineno]) for node in selected
+    ).encode()
+    canonical_ast = "\n".join(
+        ast.dump(node, include_attributes=False) for node in selected
+    ).encode()
+    return hashlib.sha256(source).hexdigest(), hashlib.sha256(canonical_ast).hexdigest()
 
 
 def _tuple_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
@@ -825,8 +919,26 @@ def _public_fixture_geometry_rasterization_repair(
     expected = payload.pop("repair_commitment_sha256", None)
     if not isinstance(expected, str) or digest(payload) != expected:
         raise RuntimeError("E_TUPLE_VISOR_RASTERIZATION_REPAIR_COMMITMENT")
-    if file_digest(Path(__file__)) != value.get("current_runner_source_sha256"):
-        raise RuntimeError("E_TUPLE_VISOR_RASTERIZATION_REPAIR_RUNNER")
+    current_runner = file_digest(Path(__file__))
+    if current_runner != value.get("current_runner_source_sha256"):
+        health = _engineering_health_amendment(cfg)
+        compatibility = health.get("historical_geometry_compatibility", {})
+        if (
+            compatibility.get("historical_runner_sha256")
+            != value.get("current_runner_source_sha256")
+            or compatibility.get("historical_geometry_repair_commitment_sha256")
+            != expected
+        ):
+            raise RuntimeError("E_TUPLE_VISOR_RASTERIZATION_REPAIR_RUNNER")
+        source_sha256, ast_sha256 = _geometry_function_bundle_digests(
+            Path(__file__), compatibility.get("function_names", [])
+        )
+        if (
+            source_sha256
+            != compatibility.get("exact_function_source_bundle_sha256")
+            or ast_sha256 != compatibility.get("canonical_AST_bundle_sha256")
+        ):
+            raise RuntimeError("E_TUPLE_VISOR_RASTERIZATION_REPAIR_RUNNER")
     semantics = value.get("rasterization_semantics", {})
     if (
         semantics.get("numpy_distribution") != "numpy==1.26.4"

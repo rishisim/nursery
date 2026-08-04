@@ -265,6 +265,16 @@ violates the frozen integrity gate. Development result commitment is
 not authorized and was not opened. Governed C, episode planning, LTX generation,
 and the Synthetic-1h learner were not run under this stopped route.
 
+A new user-authorized prospective route is frozen at engineering-health
+amendment `d447a7e1…2c6205`; it does not reinterpret that no-go. Before any new
+scientific metric, the same production modules must pass a deterministic
+28-case public microqualification with no scientific scoring, stable private
+error traces, and aggregate-only reporting. The fixed budget is one A30, eight
+CPUs, 32 GiB, at most three 15-minute submissions, 0.75 aggregate GPU-hours,
+10 GiB new storage, and $0 direct cost. Only a committed all-module health PASS
+may open the new-route public development run. Holdout, governed C, LTX-2.3,
+exactly 3,600 accepted seconds, and Synthetic-1h remain conditional and unrun.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

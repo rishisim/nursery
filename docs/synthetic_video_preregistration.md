@@ -1,8 +1,8 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — LEARNER-EFFECTIVE COMPLETE PUBLIC SOURCE FEASIBILITY NO-GO**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ENGINEERING-HEALTH AMENDMENT FROZEN; PRIOR PUBLIC-DEVELOPMENT NO-GO PRESERVED**
 
-**Evidence cut-off:** 2026-08-02
+**Evidence cut-off:** 2026-08-04
 
 **Authority boundary:** this record preserves every frozen Phase 3 decision
 and records the public-language PASS plus the reopened common-asset gate. It
@@ -1728,6 +1728,61 @@ This complete combined no-go stops the frozen route before the governed C
 transfer audit, episode planning, LTX preflight/generation, or any Synthetic-1h
 learner run. It is a prototype gate failure, not evidence of equivalence,
 noninferiority, same quality, or a synthetic-data effect.
+
+### Prospective engineering-health route
+
+The user subsequently authorized a new outcome-independent engineering route,
+committed at `d447a7e1…2c6205`. Job 315542, its commitment
+`4b7cd583…ec66bf`, its partial recurrence/sensor measurements, and its stopped
+holdout remain final for the prior route. Nothing here changes that result or
+its thresholds. This new route asks whether the unchanged extractor stack can
+first demonstrate complete production-path execution health and only then
+produce scientifically valid, complete measurements.
+
+Before new scientific metrics, one external manifest must seal a deterministic
+four-case projection for each of the seven modules (28 cases total) from the
+already sealed nonrestricted public fixtures. It covers adapter accept and
+abstention, noun/adjective extraction, referent visible/absent/dominant/
+ambiguous paths, positive/negative recurrence, positive/negative attribute
+contrast, hand/no-hand/contact/no-contact, sensor regimes, and ordered-action
+controls. The projection is execution-health-only: it cannot score performance,
+select a threshold or model, affect the combined decision, relabel a fixture,
+or alter a development/holdout partition.
+
+Health and scientific modes use the same canonical entry point, module
+registry, model bytes, preprocessing, container, offline dependencies, output
+schemas, and serializers. All prerequisite artifacts and every referenced
+fixture file must validate before model loading. A later runner may reuse the
+sealed geometry repair only if its six geometry functions match exact source
+bundle `a7249fc9…189b4` and canonical-AST bundle `620acedb…be1d`, while the
+historical runner and repair commitments remain unchanged. Mocks and the prior
+load/shape-only sizing path do not qualify.
+
+The microhealth run computes zero scientific metrics. All seven modules must
+run end to end with finite, in-bounds, schema-valid and round-trip-safe outputs;
+valid negatives and abstentions must remain distinct from missing/error states.
+Any exception receives a stable module-specific engineering code, with detailed
+traceback only in private external logs. A full development or holdout run must
+also complete its engineering-integrity phase before aggregate metrics can be
+released. If any module errors, partial scientific metrics are withheld and the
+result is an engineering failure, not a scientific no-go.
+
+Only implementation, dependency, exact existing-model wiring, configuration,
+decoding, serialization, and error-classification repairs are permitted. Model
+or extractor substitution, new candidates, source or label changes, threshold
+changes, partition changes, and scientific-rule changes remain prohibited. The
+entire microfixture suite reruns after each repair. The fixed ceiling is one
+NVIDIA A30 24GB, eight CPUs, 32 GiB, no DDP, 15 minutes per submission, one
+initial run plus at most two repair/resmoke cycles, 0.75 aggregate GPU-hours,
+10 GiB new storage, two active engineering hours targeted, and $0 direct cost.
+H100/H200 use is prohibited for this stage.
+
+Only a committed all-module health PASS authorizes one new-route public
+development run. A complete valid below-threshold development or once-only
+holdout result is a scientific no-go. Governed C remains conditional on a full
+public pass; LTX-2.3 remains the sole generator and exactly 3,600 accepted
+seconds plus the matched three-seed descriptive learner remain conditional on
+a complete C pass.
 
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains

@@ -93,8 +93,8 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["schema_version"] == 5
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_PUBLIC_DEVELOPMENT_COMBINED_NO_GO_HOLDOUT_C_LTX_AND_SYNTHETIC_LEARNER_NOT_RUN_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED"
+    assert result["schema_version"] == 6
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_AMENDMENT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -113,6 +113,16 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert result["prospective_construct_aligned_ltx_resume_extension"]["all_prior_calibration_no_gos_preserved"] is True
     assert result["prospective_construct_aligned_ltx_resume_extension"]["LTX_preflight_or_generation_run"] is False
     assert result["prospective_ltx_sole_generator_prompt_compiler_extension"]["H3_role"].startswith("HISTORY_ONLY_OUT_OF_SCOPE")
+    health = result["learner_effective_engineering_health_amendment"]
+    assert health["amendment_commitment_sha256"] == (
+        "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205"
+    )
+    assert health["prior_public_development_no_go_commitment_sha256"] == (
+        "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
+    )
+    assert health["new_engineering_outcome_opened"] is False
+    assert health["new_scientific_outcome_opened"] is False
+    assert health["LTX_or_synthetic_learner_run"] is False
     runner = result["construct_aligned_public_runner_implementation_result"]
     assert runner["status"].startswith("PASS_")
     assert runner["implementation_source_sha256"] == (
@@ -414,7 +424,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_PUBLIC_DEVELOPMENT_COMBINED_NO_GO_HOLDOUT_C_LTX_AND_SYNTHETIC_LEARNER_NOT_RUN_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED"
+    assert proof["status"] == "PROSPECTIVE_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_AMENDMENT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME"
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["repair_commitment_sha256"] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
     assert geometry_repair["triggering_attempt"]["public_model_inference_executed"] is False
@@ -440,6 +450,18 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert development["holdout_authorized"] is False
     assert development["governed_C_reopened"] is False
     assert development["LTX_or_synthetic_learner_run"] is False
+    health = dict(proof["learner_effective_engineering_health_amendment"])
+    commitment = health.pop("amendment_commitment_sha256")
+    assert commitment == digest(health)
+    assert commitment == "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205"
+    assert health["prior_public_development_result"]["canonical_subtree_sha256"] == (
+        "c43c7a678e3a2eac10ed5a5ac75c8964520931ec180ab9306585c76d198fb8c8"
+    )
+    assert health["engineering_microfixture_suite"]["total_case_count"] == 28
+    assert health["bounded_resource_policy"][
+        "initial_plus_repair_resmoke_submission_count_max"
+    ] == 3
+    assert health["unchanged_downstream_contract"]["accepted_synthetic_seconds_exact"] == 3600
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,
@@ -456,7 +478,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
-    assert proof["schema_version"] == 17
+    assert proof["schema_version"] == 18
     premodel = proof["calibration_C"]["extractor"]["mechanistic_training_tuple_premodel_result"]
     assert premodel["dependency_manifest_commitment_sha256"] == (
         "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"

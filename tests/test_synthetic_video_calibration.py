@@ -29,13 +29,13 @@ def _current_audio_fixture_config() -> dict:
     return config
 
 
-def test_construct_aligned_resume_amendment_is_exact_and_schema17_compatible() -> None:
+def test_construct_aligned_resume_amendment_is_exact_and_schema18_compatible() -> None:
     import pytest
 
     config = json.loads(
         Path("configs/synthetic_video_real_only_proof.json").read_text()
     )
-    assert config["schema_version"] == 17
+    assert config["schema_version"] == 18
     amendment = MODULE._construct_aligned_ltx_resume_amendment(config)
     assert (
         amendment["amendment_commitment_sha256"]
@@ -58,6 +58,30 @@ def test_construct_aligned_resume_amendment_is_exact_and_schema17_compatible() -
     active["amendment_commitment_sha256"] = MODULE.digest(payload)
     with pytest.raises(RuntimeError, match="E_CONSTRUCT_ALIGNED_RESUME_COMMITMENT"):
         MODULE._construct_aligned_ltx_resume_amendment(mutated)
+
+
+def test_engineering_health_amendment_and_geometry_lineage_are_exact() -> None:
+    config = json.loads(
+        Path("configs/synthetic_video_real_only_proof.json").read_text()
+    )
+    amendment = MODULE._engineering_health_amendment(config)
+    assert amendment["amendment_commitment_sha256"] == (
+        "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205"
+    )
+    assert amendment["prior_public_development_result"][
+        "public_qualification_commitment_sha256"
+    ] == "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
+    assert amendment["engineering_microfixture_suite"]["total_case_count"] == 28
+    compatibility = amendment["historical_geometry_compatibility"]
+    source_sha256, ast_sha256 = MODULE._geometry_function_bundle_digests(
+        Path("scripts/run_synthetic_video_calibration.py"),
+        compatibility["function_names"],
+    )
+    assert source_sha256 == compatibility["exact_function_source_bundle_sha256"]
+    assert ast_sha256 == compatibility["canonical_AST_bundle_sha256"]
+    assert MODULE._public_fixture_geometry_rasterization_repair(config)[
+        "repair_commitment_sha256"
+    ] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
 
 
 def test_public_fixture_geometry_rasterization_repair_is_frozen() -> None:
