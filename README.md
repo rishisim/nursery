@@ -237,7 +237,11 @@ pre-model checks require declared positive non-boolean integer dimensions,
 exact PNG/source dimensions, and binary nonempty
 array-equal serialization round trips. Fixture schema 3 binds repair commitment
 `6084fd93…3e61ef`; runner SHA-256 is `b45a0547…612646`. The deterministic fixture
-retry is authorized under that frozen repair only.
+retry passed in job 315501: 824 fixture items/pairs were sealed across the six
+families with zero subject, video, frame, or object overlap, commitment
+`2758557f…03dae6`, and no model inference. Public development is now authorized;
+holdout remains sealed until the frozen development grid selection and threshold
+record are committed.
 
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema

@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 8
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_GEOMETRY_RASTERIZATION_REPAIR_FROZEN_RETRY_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_DEVELOPMENT_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -49,6 +49,15 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert geometry_repair["repair_commitment_sha256"] == (
         "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
     )
+    fixture_result = config["learner_effective_public_fixture_preparation_result"]
+    assert fixture_result["status"] == "PASS_PUBLIC_FIXTURES_SEALED_NO_MODEL_INFERENCE"
+    assert fixture_result["job_id"] == 315501
+    assert fixture_result["public_fixture_manifest_commitment_sha256"] == (
+        "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6"
+    )
+    assert fixture_result["source_overlap_counts"] == [0, 0, 0, 0]
+    assert fixture_result["model_inference_executed"] is False
+    assert fixture_result["public_development_authorized"] is True
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
     assert label_correction["binary_yes_no_swapped_count"] == 193
@@ -280,7 +289,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
     assert config["gates"]["learner_effective_no_hand_review_sealed"] is True
     assert config["gates"]["learner_effective_public_fixture_preparation_authorized"] is True
-    assert config["gates"]["learner_effective_public_model_inference_authorized"] is False
+    assert config["gates"]["learner_effective_public_model_inference_authorized"] is True
     assert config["gates"][
         "learner_effective_public_model_inference_conditionally_authorized_after_fixture_seal"
     ] is True

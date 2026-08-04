@@ -1675,8 +1675,16 @@ checks without `Image.convert` normalization. Fixture schema 3 binds these
 semantics and the compact boundary/overshoot diagnostics through repair
 commitment `6084fd93…3e61ef`; later development and holdout seals inherit the
 fixture commitment. Current runner SHA-256 is `b45a0547…612646`. The
-deterministic fixture-preparation retry is authorized, but model inference
-remains fail-closed until these pre-model checks and the fixture seal pass.
+deterministic fixture-preparation retry passed in CPU job 315501 (1,613 seconds,
+4 CPUs, 16 GiB, $0 direct cost). Across both partitions it sealed 96 language/
+lexical items, 128 referent/attribute items, 128 recurrence pairs, 288 hand/
+contact items, 96 sensor items, and the preserved 88 order-action diagnostic
+items. Subject, video, frame, and object cross-partition overlap counts were all
+zero. The schema-3 fixture commitment is `2758557f…03dae6`; strict target-mask
+verification passed, stderr was empty, and no model inference or development,
+threshold, or holdout outcome was opened. Exactly one public-development run is
+now authorized. Holdout remains sealed until the frozen development grid values
+and thresholds are selected and committed.
 
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
