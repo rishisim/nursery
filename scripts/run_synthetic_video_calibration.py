@@ -8541,12 +8541,14 @@ def _write_fixture_video(
     if audio is not None:
         command += ["-i", str(audio)]
         audio_filter = (
-            f"anullsrc=r=22050:cl=mono:d={duration}[base];"
-            "[1:a]atrim=duration=2.0,adelay=2500:all=1[spoken];"
+            f"anullsrc=r=22050:cl=mono,atrim=duration={duration}[base];"
+            "[1:a]atrim=duration=2.0,adelay=2500[spoken];"
             "[base][spoken]amix=inputs=2:duration=first[a]"
         )
     else:
-        audio_filter = f"anullsrc=r=22050:cl=mono:d={duration}[a]"
+        audio_filter = (
+            f"anullsrc=r=22050:cl=mono,atrim=duration={duration}[a]"
+        )
     command += [
         "-filter_complex",
         audio_filter,

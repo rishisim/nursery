@@ -1,7 +1,7 @@
 {
   "schema_version": 5,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PRE_INFERENCE_ENGINEERING_REPAIRS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PINNED_FFMPEG_PORTABILITY_DIAGNOSIS_PASS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -133,7 +133,7 @@
     "status": "PASS_IMPLEMENTED_AND_REGRESSION_TESTED_NO_EMPIRICAL_OUTCOME",
     "recorded_on": "2026-08-03",
     "canonical_entry_point": "scripts/run_synthetic_video_calibration.py",
-    "implementation_source_sha256": "33cd04d5d60c871cda2624f805e73791a802686e152c4bb24fab395365c2e272",
+    "implementation_source_sha256": "1897c40be4f19c54e18042bc97cedf4c895447963577c670d0f48947a7066768",
     "prospective_amendment_preserved": "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39",
     "complete_source_no_go_preserved": "5f4aeff25da36cde4c35699de7031b63ae427d1aee072370bb3844e3c4413b37",
     "source_reuse": "EXACT_PASS_FAMILIES_PLUS_EXACT_SEALED_44_DEVELOPMENT_AND_44_HOLDOUT_ACTION_ROWS_ONLY",
@@ -239,14 +239,20 @@
     "governed_C_generator_or_learner_outcome_opened": false
   },
   "public_fixture_preparation_engineering_repair": {
-    "status": "PROSPECTIVE_DETERMINISTIC_FIXTURE_RETRY_AUTHORIZED_AFTER_TWO_PRE_INFERENCE_ENGINEERING_FAILURES",
+    "status": "PASS_PINNED_FFMPEG_PORTABILITY_DIAGNOSIS_FULL_DETERMINISTIC_FIXTURE_RETRY_AUTHORIZED_NO_FIXTURE_OR_MODEL_OUTCOME",
     "recorded_on": "2026-08-03",
     "runtime_manifest_failure": {"job_id": 315430, "exit_code": "1:0", "elapsed_seconds": 5, "old_runtime_job": 313924, "current_root_job": 314974, "roots_distinct": true, "failed_before_fixture_manifest_or_model_inference": true},
     "runtime_lineage_copy": {"commitments_exactly_matched_config": true, "copied_public_families": ["mechanistic-tuples", "activity-code", "activity-pydeps"], "copied_bytes": 23438221791, "copied_GiB": 21.828545, "free_GiB_after_copy": 535.877, "within_200_GiB_ceiling": true, "Git_network_restricted_data_or_model_inference_used": false, "direct_monetary_cost_usd": 0},
     "video_encode_failure": {"job_id": 315445, "exit_code": "1:0", "elapsed_seconds": 81, "failure": "E_TUPLE_FIXTURE_VIDEO_ENCODE", "root_cause_suffix": ".mp4.partial", "fixed_suffix": ".partial.mp4", "failed_before_fixture_manifest_model_development_or_holdout": true},
+    "suffix_fix_retry_failure": {"job_id": 315452, "exit_code": "1:0", "elapsed_seconds": 11, "failure": "E_TUPLE_FIXTURE_VIDEO_ENCODE", "failed_before_fixture_manifest_or_model_inference": true},
+    "diagnostic_jobs": [{"job_id": 315453, "finding": "anullsrc_d_unsupported"}, {"job_id": 315455, "finding": "atrim_fixed_silent_but_adelay_all_unsupported"}, {"job_id": 315457, "finding": "aifc_compression_inventory_stop_before_encode"}, {"job_id": 315458, "status": "PASS_PINNED_BINARY_SMOKE"}],
+    "audio_seed_inventory": {"file_count": 112, "channel_layout": "mono", "sample_rate_hz": 22050},
+    "portable_filter_mapping": {"silent_source": "anullsrc=r=22050:cl=mono,atrim=duration=<d>", "speech_delay": "adelay=2500", "unsupported_options_prohibited": ["d=", "all="]},
+    "pinned_binary_smoke": {"silent_exit_code": 0, "speech_exit_code": 0, "output_channel_layout": "mono", "output_sample_rate_hz": 22050, "decoded_duration_seconds": 7.012426, "frame_count": 63, "frames_per_second": 9, "silent_active_sample_count": 0, "speech_source_active_sample_range": [14, 21035], "speech_output_active_sample_range": [55198, 76134], "speech_timing_error_samples": {"start": 59, "end": -26}, "AAC_frame_samples": 1024, "AAC_frame_milliseconds_at_22050_Hz": 46.4, "timing_errors_within_one_AAC_frame": true},
     "unchanged_contract": ["frames", "audio", "timing", "fps", "codec", "quality", "duration", "assets", "selections", "thresholds", "final_target"],
-    "current_runner_source_sha256": "33cd04d5d60c871cda2624f805e73791a802686e152c4bb24fab395365c2e272",
+    "current_runner_source_sha256": "1897c40be4f19c54e18042bc97cedf4c895447963577c670d0f48947a7066768",
     "audit_status": "PASS",
+    "no_further_engineering_diagnostic_required": true,
     "deterministic_retry_safe": true,
     "fixture_development_threshold_holdout_outputs_present": false,
     "model_inference_executed": false,
@@ -828,5 +834,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "RETRY_DETERMINISTIC_PUBLIC_FIXTURE_PREPARATION_AND_SEAL_AFTER_THE_AUDITED_RUNTIME_LINEAGE_COPY_AND_FINAL_MUX_SUFFIX_REPAIR; MODEL_INFERENCE_REMAINS_FAIL_CLOSED_UNTIL_FIXTURE_SEAL; THEN_RUN_COMBINED_PUBLIC_DEVELOPMENT_AND_ONCE_ONLY_HOLDOUT_QUALIFICATION; GOVERNED_C_COMPILER_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
+  "next_authorized_scope": "RUN_THE_FULL_DETERMINISTIC_PUBLIC_FIXTURE_PREPARATION_RETRY_WITH_THE_AUDITED_PINNED_FFMPEG_PORTABLE_FILTER_MAPPING_AND_SEAL; MODEL_INFERENCE_REMAINS_FAIL_CLOSED_UNTIL_FIXTURE_SEAL; THEN_RUN_COMBINED_PUBLIC_DEVELOPMENT_AND_ONCE_ONLY_HOLDOUT_QUALIFICATION; GOVERNED_C_COMPILER_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
 }

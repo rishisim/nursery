@@ -3438,6 +3438,7 @@ def test_write_fixture_video_uses_mp4_safe_atomic_temporary(
     monkeypatch.setitem(sys.modules, "imageio", imageio_package)
     monkeypatch.setitem(sys.modules, "imageio.v2", imageio_v2)
     monkeypatch.setitem(sys.modules, "imageio_ffmpeg", imageio_ffmpeg)
+    filters: list[str] = []
 
     def encode(command, **_kwargs):
         output = Path(command[-1])
@@ -3445,6 +3446,11 @@ def test_write_fixture_video_uses_mp4_safe_atomic_temporary(
         assert output.suffix == ".mp4"
         assert command[command.index("-c:v") + 1] == "copy"
         assert command[command.index("-movflags") + 1] == "+faststart"
+        audio_filter = command[command.index("-filter_complex") + 1]
+        assert ":d=" not in audio_filter
+        assert "all=" not in audio_filter
+        assert "anullsrc=r=22050:cl=mono,atrim=duration=1.0" in audio_filter
+        filters.append(audio_filter)
         output.write_bytes(b"encoded-mp4")
         return SimpleNamespace(returncode=0)
 
@@ -3452,9 +3458,22 @@ def test_write_fixture_video_uses_mp4_safe_atomic_temporary(
     MODULE._write_fixture_video(
         frames=[object()], fps=1, duration=1.0, audio=None, target=target
     )
+    audio = tmp_path / "speech.wav"
+    audio.write_bytes(b"public speech fixture")
+    MODULE._write_fixture_video(
+        frames=[object()], fps=1, duration=1.0, audio=audio, target=target
+    )
 
     assert target.read_bytes() == b"encoded-mp4"
     assert not list(tmp_path.glob("*partial*"))
+    assert filters == [
+        "anullsrc=r=22050:cl=mono,atrim=duration=1.0[a]",
+        (
+            "anullsrc=r=22050:cl=mono,atrim=duration=1.0[base];"
+            "[1:a]atrim=duration=2.0,adelay=2500[spoken];"
+            "[base][spoken]amix=inputs=2:duration=first[a]"
+        ),
+    ]
 
 
 def test_tuple_fixture_manifest_hashes_all_nested_files_before_inference(

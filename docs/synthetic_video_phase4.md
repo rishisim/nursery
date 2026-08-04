@@ -448,6 +448,24 @@ development, threshold, and holdout outputs remain absent. The current runner
 SHA-256 is `33cd04d5…e272`; deterministic fixture retry is safe and authorized,
 while model inference remains blocked until the fixture seal.
 
+Job 315452 nevertheless reproduced `E_TUPLE_FIXTURE_VIDEO_ENCODE` after 11
+seconds with exit 1, still before a fixture manifest or inference and despite
+the suffix fix. The bounded public/dummy pinned-binary diagnostic chain found
+that job 315453 rejected `anullsrc` option `d`, job 315455 accepted `atrim` for
+silence but rejected `adelay` option `all`, and job 315457 stopped only because
+Python `aifc` could not read one compression type during inventory before
+encode. All 112 AIFF seeds are mono at 22,050 Hz. Job 315458 then passed the
+pinned-binary smoke using
+`anullsrc=r=22050:cl=mono,atrim=duration=<d>` and mono `adelay=2500`, with no
+`d=` or `all=` options. Silent and speech muxes both exited 0, decoded as mono
+22,050-Hz audio for 7.012426 seconds with 63 frames at 9 fps, and silence had no
+active samples. Speech activity moved from source samples 14–21035 to output
+samples 55198–76134; start/end errors were +59/-26 samples, both within one
+1,024-sample AAC frame (about 46.4 ms). The audit passed and no further
+diagnostic is required. Current runner SHA-256 is `1897c40b…6768`; the full
+deterministic fixture retry is authorized while fixture, development,
+threshold, holdout, and model outputs remain absent.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

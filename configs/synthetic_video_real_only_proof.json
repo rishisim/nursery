@@ -1,6 +1,6 @@
 {
   "schema_version": 17,
-  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PRE_INFERENCE_ENGINEERING_REPAIRS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
+  "status": "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PINNED_FFMPEG_PORTABILITY_DIAGNOSIS_PASS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -223,7 +223,7 @@
     "status": "PASS_IMPLEMENTED_AND_REGRESSION_TESTED_BEFORE_NO_HAND_REVIEW_OR_PUBLIC_MODEL_OUTCOME",
     "implemented_on": "2026-08-03",
     "canonical_entry_point": "scripts/run_synthetic_video_calibration.py",
-    "implementation_source_sha256": "33cd04d5d60c871cda2624f805e73791a802686e152c4bb24fab395365c2e272",
+    "implementation_source_sha256": "1897c40be4f19c54e18042bc97cedf4c895447963577c670d0f48947a7066768",
     "config_schema_version": 17,
     "prospective_amendment_preserved": "842d5a16141d8b0a6bdc82d86fb405bcbb14bbbd4e6cfe645ffae328ad881a39",
     "ltx_sole_generator_compiler_amendment_preserved": "cb4a7cd2dd60fb14f3430aaf2544d79db95064d42a3f22ad6107206832319c62",
@@ -356,7 +356,7 @@
     "next_required_action": "PREPARE_AND_SEAL_THE_EXACT_PUBLIC_FIXTURE_MANIFEST_BEFORE_ANY_PUBLIC_MODEL_INFERENCE"
   },
   "public_fixture_preparation_engineering_repair": {
-    "status": "PROSPECTIVE_DETERMINISTIC_FIXTURE_RETRY_AUTHORIZED_AFTER_TWO_PRE_INFERENCE_ENGINEERING_FAILURES",
+    "status": "PASS_PINNED_FFMPEG_PORTABILITY_DIAGNOSIS_FULL_DETERMINISTIC_FIXTURE_RETRY_AUTHORIZED_NO_FIXTURE_OR_MODEL_OUTCOME",
     "recorded_on": "2026-08-03",
     "runtime_manifest_failure": {
       "job_id": 315430,
@@ -389,9 +389,49 @@
       "canonical_fix": "change only the final mux temporary suffix from .mp4.partial to .partial.mp4",
       "failed_before_fixture_manifest_model_development_or_holdout": true
     },
+    "suffix_fix_retry_failure": {
+      "job_id": 315452,
+      "exit_code": "1:0",
+      "elapsed_seconds": 11,
+      "failure": "E_TUPLE_FIXTURE_VIDEO_ENCODE",
+      "suffix_fix_present": true,
+      "failed_before_fixture_manifest_or_model_inference": true
+    },
+    "pinned_ffmpeg_diagnostics": [
+      {"job_id": 315453, "status": "ENGINEERING_DIAGNOSTIC", "finding": "anullsrc option d is unsupported by the pinned binary"},
+      {"job_id": 315455, "status": "ENGINEERING_DIAGNOSTIC", "finding": "atrim fixes the silent source but adelay option all is unsupported by the pinned binary"},
+      {"job_id": 315457, "status": "ENGINEERING_DIAGNOSTIC_PRE_ENCODE_STOP", "finding": "Python aifc rejected unsupported compression during inventory only"},
+      {"job_id": 315458, "status": "PASS_PINNED_BINARY_SMOKE"}
+    ],
+    "audio_seed_inventory": {"file_count": 112, "channels": 1, "channel_layout": "mono", "sample_rate_hz": 22050},
+    "portable_filter_mapping": {
+      "silent_source": "anullsrc=r=22050:cl=mono,atrim=duration=<d>",
+      "speech_delay": "adelay=2500",
+      "unsupported_options_prohibited": ["anullsrc d=", "adelay all="]
+    },
+    "pinned_binary_smoke": {
+      "job_id": 315458,
+      "status": "PASS",
+      "silent_exit_code": 0,
+      "speech_exit_code": 0,
+      "output_channels": 1,
+      "output_channel_layout": "mono",
+      "output_sample_rate_hz": 22050,
+      "decoded_duration_seconds": 7.012426,
+      "frame_count": 63,
+      "frames_per_second": 9,
+      "silent_active_sample_count": 0,
+      "speech_source_active_sample_range": [14, 21035],
+      "speech_output_active_sample_range": [55198, 76134],
+      "speech_timing_error_samples": {"start": 59, "end": -26},
+      "AAC_frame_samples": 1024,
+      "AAC_frame_milliseconds_at_22050_Hz": 46.4,
+      "timing_errors_within_one_AAC_frame": true
+    },
     "unchanged_contract": ["frames", "audio", "timing", "fps", "codec", "quality", "duration", "assets", "selections", "thresholds", "final_target"],
-    "current_runner_source_sha256": "33cd04d5d60c871cda2624f805e73791a802686e152c4bb24fab395365c2e272",
+    "current_runner_source_sha256": "1897c40be4f19c54e18042bc97cedf4c895447963577c670d0f48947a7066768",
     "audit_status": "PASS",
+    "no_further_engineering_diagnostic_required": true,
     "deterministic_retry_safe": true,
     "current_fixture_output_present": false,
     "current_development_output_present": false,
@@ -448,7 +488,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_CONSTRUCT_ALIGNED_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PRE_INFERENCE_ENGINEERING_REPAIRS_NO_FIXTURE_OR_MODEL_OUTCOME",
+    "status": "PRIOR_CALIBRATION_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_CONSTRUCT_ALIGNED_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PINNED_FFMPEG_PORTABILITY_DIAGNOSIS_PASS_NO_FIXTURE_OR_MODEL_OUTCOME",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",

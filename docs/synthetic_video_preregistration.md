@@ -1626,6 +1626,23 @@ holdout outputs remain absent, no inference occurred, and the current runner
 SHA-256 is `33cd04d5…e272`. Fixture retry is authorized; model inference remains
 blocked until fixture sealing.
 
+Job 315452 still reproduced `E_TUPLE_FIXTURE_VIDEO_ENCODE` after 11 seconds
+with exit 1, before a fixture manifest or inference despite the suffix repair.
+The bounded public/dummy pinned-FFmpeg diagnosis then found `anullsrc` option
+`d` unsupported in job 315453; job 315455 showed that `atrim` fixed the silent
+source but `adelay` option `all` was unsupported; and job 315457 stopped only on
+Python `aifc` compression support during inventory, before encode. All 112 AIFF
+seeds are mono at 22,050 Hz. Job 315458 passed the pinned-binary smoke with the
+portable mapping `anullsrc=r=22050:cl=mono,atrim=duration=<d>` and mono
+`adelay=2500`, prohibiting `d=` and `all=`. Both silent and speech outputs
+exited 0 and decoded as mono 22,050-Hz audio for 7.012426 seconds with 63 frames
+at 9 fps. Silence had zero active samples. Speech activity shifted from samples
+14–21035 to 55198–76134; timing errors were +59/-26 samples, within one
+1,024-sample AAC frame (about 46.4 ms). The audit passed with no further
+diagnostic required. Runner SHA-256 is now `1897c40b…6768`; full deterministic
+fixture retry is authorized while every fixture, development, threshold,
+holdout, and model output remains absent.
+
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
 descriptive. Only a combined public pass authorizes the single-applicant blind

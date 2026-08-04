@@ -204,6 +204,19 @@ only that suffix to `.partial.mp4`; every frame, audio, timing, codec, quality,
 duration, asset, selection, threshold, and final target is unchanged. Runner
 SHA-256 is now `33cd04d5…e272`; the deterministic fixture retry is authorized,
 while model inference remains blocked until the fixture seal.
+That retry, job 315452, still exited `1:0` after 11 seconds with the same pre-
+manifest `E_TUPLE_FIXTURE_VIDEO_ENCODE`, despite the corrected suffix. Bounded
+public/dummy diagnostics then isolated pinned-FFmpeg option portability: job
+315453 found `anullsrc d=` unsupported, job 315455 showed `atrim` fixed silence
+but `adelay all=` was unsupported, and job 315457 stopped only in Python's
+diagnostic AIFF reader before encode. All 112 seeds are mono/22,050 Hz. Job
+315458 passed the pinned-binary smoke with portable filters
+`anullsrc=r=22050:cl=mono,atrim=duration=<d>` and mono `adelay=2500`. Silent and
+speech outputs both exited 0, decoded mono/22,050 Hz for 7.012426 seconds and
+63 frames at 9 fps; silence had zero active samples and speech timing errors
+were +59/-26 samples, within one 1,024-sample AAC frame. The audit passed with
+no further diagnostic required. Runner SHA-256 is now `1897c40b…6768`; the full
+deterministic fixture retry is authorized, with all later outputs still absent.
 
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema

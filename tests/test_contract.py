@@ -39,7 +39,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 8
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PRE_INFERENCE_ENGINEERING_REPAIRS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PINNED_FFMPEG_PORTABILITY_DIAGNOSIS_PASS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED"
     validate_phase_state(config)
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
@@ -66,14 +66,23 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert review_seal["fixture_preparation_authorized"] is True
     assert review_seal["model_inference_executed"] is False
     fixture_repair = config["public_fixture_preparation_engineering_repair"]
-    assert fixture_repair["status"].startswith(
-        "PROSPECTIVE_DETERMINISTIC_FIXTURE_RETRY_AUTHORIZED"
-    )
+    assert fixture_repair["status"].startswith("PASS_PINNED_FFMPEG_PORTABILITY_DIAGNOSIS")
     assert fixture_repair["runtime_manifest_failure"]["job_id"] == 315430
     assert fixture_repair["video_encode_failure"]["job_id"] == 315445
     assert fixture_repair["current_runner_source_sha256"] == (
-        "33cd04d5d60c871cda2624f805e73791a802686e152c4bb24fab395365c2e272"
+        "1897c40be4f19c54e18042bc97cedf4c895447963577c670d0f48947a7066768"
     )
+    assert fixture_repair["suffix_fix_retry_failure"]["job_id"] == 315452
+    assert fixture_repair["diagnostic_jobs"][-1] == {
+        "job_id": 315458,
+        "status": "PASS_PINNED_BINARY_SMOKE",
+    }
+    assert fixture_repair["portable_filter_mapping"] == {
+        "silent_source": "anullsrc=r=22050:cl=mono,atrim=duration=<d>",
+        "speech_delay": "adelay=2500",
+        "unsupported_options_prohibited": ["d=", "all="],
+    }
+    assert fixture_repair["smoke"]["timing_within_one_AAC_frame"] is True
     assert fixture_repair["audit_status"] == "PASS"
     assert fixture_repair["fixture_development_threshold_holdout_outputs_present"] is False
     assert fixture_repair["model_inference_executed"] is False
@@ -334,7 +343,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert runner["action_integrity_privacy_provenance_and_external_call_failures_remain_blocking"] is True
     assert runner["public_model_or_extractor_outcome_opened"] is False
     assert runner["implementation_source_sha256"] == (
-        "33cd04d5d60c871cda2624f805e73791a802686e152c4bb24fab395365c2e272"
+        "1897c40be4f19c54e18042bc97cedf4c895447963577c670d0f48947a7066768"
     )
     repair = config["public_no_hand_preparation_engineering_repair"]
     assert repair["failure_class"] == "ENGINEERING_FAILURE_NOT_SCIENTIFIC_NO_GO"
@@ -429,12 +438,39 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert fixture_repair["video_encode_failure"]["canonical_fix"].endswith(
         ".mp4.partial to .partial.mp4"
     )
+    assert fixture_repair["suffix_fix_retry_failure"] == {
+        "job_id": 315452,
+        "exit_code": "1:0",
+        "elapsed_seconds": 11,
+        "failure": "E_TUPLE_FIXTURE_VIDEO_ENCODE",
+        "suffix_fix_present": True,
+        "failed_before_fixture_manifest_or_model_inference": True,
+    }
+    assert fixture_repair["audio_seed_inventory"] == {
+        "file_count": 112,
+        "channels": 1,
+        "channel_layout": "mono",
+        "sample_rate_hz": 22050,
+    }
+    smoke = fixture_repair["pinned_binary_smoke"]
+    assert smoke["job_id"] == 315458
+    assert smoke["silent_exit_code"] == smoke["speech_exit_code"] == 0
+    assert smoke["decoded_duration_seconds"] == 7.012426
+    assert smoke["frame_count"] == 63
+    assert smoke["frames_per_second"] == 9
+    assert smoke["silent_active_sample_count"] == 0
+    assert smoke["speech_source_active_sample_range"] == [14, 21035]
+    assert smoke["speech_output_active_sample_range"] == [55198, 76134]
+    assert smoke["speech_timing_error_samples"] == {"start": 59, "end": -26}
+    assert smoke["AAC_frame_samples"] == 1024
+    assert smoke["timing_errors_within_one_AAC_frame"] is True
     assert fixture_repair["current_fixture_output_present"] is False
     assert fixture_repair["current_development_output_present"] is False
     assert fixture_repair["current_threshold_output_present"] is False
     assert fixture_repair["current_holdout_output_present"] is False
     assert fixture_repair["model_inference_executed"] is False
     assert fixture_repair["deterministic_retry_safe"] is True
+    assert fixture_repair["no_further_engineering_diagnostic_required"] is True
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["mean_gain"] == 0.017661900756938558
     assert config["post_gate_descriptive_extension"]["preserved_gate_result"]["required_mean_gain"] == 0.02
     assert config["post_gate_descriptive_extension"]["binary_success_gate"] == "NONE"

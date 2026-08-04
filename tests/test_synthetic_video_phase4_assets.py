@@ -94,7 +94,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
     assert result["schema_version"] == 5
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PRE_INFERENCE_ENGINEERING_REPAIRS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PINNED_FFMPEG_PORTABILITY_DIAGNOSIS_PASS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -115,6 +115,9 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert result["prospective_ltx_sole_generator_prompt_compiler_extension"]["H3_role"].startswith("HISTORY_ONLY_OUT_OF_SCOPE")
     runner = result["construct_aligned_public_runner_implementation_result"]
     assert runner["status"].startswith("PASS_")
+    assert runner["implementation_source_sha256"] == (
+        "1897c40be4f19c54e18042bc97cedf4c895447963577c670d0f48947a7066768"
+    )
     assert runner["action_performance_role"] == "NONBLOCKING_NONRESCUING_DIAGNOSTIC"
     assert runner["action_integrity_role"] == "BLOCKING"
     assert runner["public_development_or_holdout_outcome_opened"] is False
@@ -192,12 +195,40 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert fixture_repair["video_encode_failure"]["root_cause_suffix"] == ".mp4.partial"
     assert fixture_repair["video_encode_failure"]["fixed_suffix"] == ".partial.mp4"
     assert fixture_repair["current_runner_source_sha256"] == (
-        "33cd04d5d60c871cda2624f805e73791a802686e152c4bb24fab395365c2e272"
+        "1897c40be4f19c54e18042bc97cedf4c895447963577c670d0f48947a7066768"
     )
+    assert fixture_repair["suffix_fix_retry_failure"] == {
+        "job_id": 315452,
+        "exit_code": "1:0",
+        "elapsed_seconds": 11,
+        "failure": "E_TUPLE_FIXTURE_VIDEO_ENCODE",
+        "failed_before_fixture_manifest_or_model_inference": True,
+    }
+    assert [row["job_id"] for row in fixture_repair["diagnostic_jobs"]] == [
+        315453,
+        315455,
+        315457,
+        315458,
+    ]
+    assert fixture_repair["audio_seed_inventory"] == {
+        "file_count": 112,
+        "channel_layout": "mono",
+        "sample_rate_hz": 22050,
+    }
+    assert fixture_repair["portable_filter_mapping"]["silent_source"] == (
+        "anullsrc=r=22050:cl=mono,atrim=duration=<d>"
+    )
+    assert fixture_repair["portable_filter_mapping"]["speech_delay"] == "adelay=2500"
+    smoke = fixture_repair["pinned_binary_smoke"]
+    assert smoke["silent_exit_code"] == smoke["speech_exit_code"] == 0
+    assert smoke["silent_active_sample_count"] == 0
+    assert smoke["speech_timing_error_samples"] == {"start": 59, "end": -26}
+    assert smoke["timing_errors_within_one_AAC_frame"] is True
     assert fixture_repair["audit_status"] == "PASS"
     assert fixture_repair["fixture_development_threshold_holdout_outputs_present"] is False
     assert fixture_repair["model_inference_executed"] is False
     assert fixture_repair["fixture_retry_authorized"] is True
+    assert fixture_repair["no_further_engineering_diagnostic_required"] is True
     tuple_amendment = result["governed_C_mechanistic_training_tuple_amendment"]
     assert tuple_amendment["status"] == "FROZEN_BEFORE_NEW_PUBLIC_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     assert len(tuple_amendment["prior_no_go_commitments_preserved"]) == 4
@@ -383,7 +414,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PRE_INFERENCE_ENGINEERING_REPAIRS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
+    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_RETRY_AUTHORIZED_AFTER_PINNED_FFMPEG_PORTABILITY_DIAGNOSIS_PASS_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,
