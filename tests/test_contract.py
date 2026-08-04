@@ -40,7 +40,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 8
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_DEVELOPMENT_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_PUBLIC_DEVELOPMENT_COMBINED_NO_GO_HOLDOUT_C_LTX_AND_SYNTHETIC_LEARNER_NOT_RUN_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -67,6 +67,18 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert resource["development_and_holdout_GPU_hours_max"] == 6.0
     assert resource["amendment_commitment_sha256"] == (
         "5330cf582e46d1bf075ca97af7c8bfceb47cfcd09499786f4e366b6f8e283beb"
+    )
+    development = config["learner_effective_public_development_result"]
+    assert development["status"] == "NO_GO_DEVELOPMENT_COMBINED_GATE"
+    assert development["job_id"] == 315542
+    assert development["module_counts"] == [7, 2, 5]
+    assert development["critical_axis_pass_count"] == 1
+    assert development["validated_axis_count"] == 2
+    assert development["unaccounted_failure_count"] == 3
+    assert development["holdout_authorized"] is False
+    assert development["holdout_result_present"] is False
+    assert development["public_qualification_commitment_sha256"] == (
+        "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
     )
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
@@ -299,10 +311,11 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
     assert config["gates"]["learner_effective_no_hand_review_sealed"] is True
     assert config["gates"]["learner_effective_public_fixture_preparation_authorized"] is True
-    assert config["gates"]["learner_effective_public_model_inference_authorized"] is True
+    assert config["gates"]["learner_effective_public_model_inference_authorized"] is False
     assert config["gates"][
         "learner_effective_public_model_inference_conditionally_authorized_after_fixture_seal"
-    ] is True
+    ] is False
+    assert config["gates"]["governed_C_calibration_authorized"] is False
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
     assert config["gates"]["generator_work_authorized"] is False
     assert config["gates"]["real_only_training_authorized"] is False

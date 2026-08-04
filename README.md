@@ -252,6 +252,19 @@ holdout. The combined public ceiling remains six GPU-hours and $0 direct cost.
 The prior H100 plan remains preserved; active resource commitment is
 `5330cf58…283beb`, and wrapper SHA-256 is `2e4d6d76…988b03`.
 
+The complete development run is a frozen combined NO-GO. A30 job 315542
+completed in 111 seconds (0.03083 GPU-hours, $0 direct cost) with every one of
+the seven modules attempted: recurrence and the deterministic sensor module
+passed, while adapter/lexical, referent, attribute, hand/contact, and the
+nonblocking action diagnostic errored. Consequently only 1/5 critical axes and
+2/7 total axes validated, below the unchanged 5/5 and 6/7 requirements. There
+were zero invalid retained records, silent truncations, or external calls, but
+five error modules included three unaccounted failures, which independently
+violates the frozen integrity gate. Development result commitment is
+`4b7cd583…ec66bf`; threshold-seal commitment is `4bff4bf8…0c742`. Holdout is
+not authorized and was not opened. Governed C, episode planning, LTX generation,
+and the Synthetic-1h learner were not run under this stopped route.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

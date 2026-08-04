@@ -1701,6 +1701,34 @@ gate, or downstream contract changed. Resource amendment commitment is
 `2e4d6d76…988b03`. The user's prior broad authorization covers this narrower
 zero-cost topology.
 
+The single development run then completed on the frozen A30 topology in job
+315542 (111 seconds; 0.0308333 GPU-hours; $0 direct cost). All seven independent
+modules were attempted before the combined decision. Cross-episode recurrence
+passed at the selected public-development DINOv2 cosine threshold 0.85, with
+coverage 1.0, near-duplicate balanced accuracy 0.9270833, false-positive rate
+0.0, recurrence F1 1.0, and same-object balanced accuracy 1.0. The deterministic
+sensor module also passed: finite/in-bounds fraction 1.0, controlled-direction
+fraction 1.0, and frozen-bin accuracy 0.9583333. Adapter/lexical and referent
+ended in `E_UNACCOUNTED_MODULE_FAILURE`; attribute ended in
+`E_FROZEN_VISION_MODEL`; hand/contact ended in
+`E_UNACCOUNTED_MODULE_FAILURE`; and the supporting nonblocking order-action
+diagnostic ended in `E_ACTIVITY_SELECTION_NOT_FROZEN`. Thus only one of five
+critical axes and two of seven total axes validated. The action diagnostic was
+not used in the gate, but five error modules, five failures, and three
+unaccounted failures independently violated the frozen zero-error integrity
+rule. Invalid-retained-record, silent-truncation, and external-call counts were
+all zero; execution was offline with no restricted mount.
+
+The sealed status is `NO_GO_DEVELOPMENT_COMBINED_GATE`. Public qualification
+commitment is `4b7cd583…ec66bf`, module-result commitment is
+`d6b22027…dd2b42`, and development-threshold commitment is
+`4bff4bf8…0c742`. The threshold seal sets `holdout_authorized=false`; no holdout
+result exists and reprompting, refitting, or threshold changes are prohibited.
+This complete combined no-go stops the frozen route before the governed C
+transfer audit, episode planning, LTX preflight/generation, or any Synthetic-1h
+learner run. It is a prototype gate failure, not evidence of equivalence,
+noninferiority, same quality, or a synthetic-data effect.
+
 The combined public gate still requires all five critical axes and at least
 six of seven learner-effective axes. Broad activity/context remains
 descriptive. Only a combined public pass authorizes the single-applicant blind

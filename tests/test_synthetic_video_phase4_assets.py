@@ -94,7 +94,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
     assert result["schema_version"] == 5
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_DEVELOPMENT_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_PUBLIC_DEVELOPMENT_COMBINED_NO_GO_HOLDOUT_C_LTX_AND_SYNTHETIC_LEARNER_NOT_RUN_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -414,7 +414,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_DEVELOPMENT_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
+    assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_PUBLIC_DEVELOPMENT_COMBINED_NO_GO_HOLDOUT_C_LTX_AND_SYNTHETIC_LEARNER_NOT_RUN_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED"
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["repair_commitment_sha256"] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
     assert geometry_repair["triggering_attempt"]["public_model_inference_executed"] is False
@@ -432,6 +432,14 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert resource["amendment_commitment_sha256"] == (
         "5330cf582e46d1bf075ca97af7c8bfceb47cfcd09499786f4e366b6f8e283beb"
     )
+    development = proof["learner_effective_public_development_result"]
+    assert development["status"] == "NO_GO_DEVELOPMENT_COMBINED_GATE"
+    assert development["combined_gate"]["critical_axis_pass_count"] == 1
+    assert development["combined_gate"]["validated_axis_count"] == 2
+    assert development["integrity"]["unaccounted_failure_count"] == 3
+    assert development["holdout_authorized"] is False
+    assert development["governed_C_reopened"] is False
+    assert development["LTX_or_synthetic_learner_run"] is False
     assert proof["budgets_credited_hours"] == {
         "real": 1,
         "synthetic_accepted": 1,

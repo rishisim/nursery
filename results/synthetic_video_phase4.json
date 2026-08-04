@@ -1,7 +1,7 @@
 {
   "schema_version": 5,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_DEVELOPMENT_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_MODEL_OR_SCIENTIFIC_GATE_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURES_SEALED_A30_RESOURCE_AMENDMENT_FROZEN_PUBLIC_DEVELOPMENT_COMBINED_NO_GO_HOLDOUT_C_LTX_AND_SYNTHETIC_LEARNER_NOT_RUN_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -414,6 +414,99 @@
     "holdout_authorized_only_after_development_threshold_seal": true,
     "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
     "amendment_commitment_sha256": "5330cf582e46d1bf075ca97af7c8bfceb47cfcd09499786f4e366b6f8e283beb"
+  },
+  "learner_effective_public_development_result": {
+    "status": "NO_GO_DEVELOPMENT_COMBINED_GATE",
+    "completed_on": "2026-08-03",
+    "job_id": 315542,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed_seconds": 111,
+    "resource": {
+      "partition": "a30",
+      "GPU_type": "NVIDIA_A30_24GB",
+      "GPU_count": 1,
+      "GPU_hours": 0.030833333333333334,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "direct_monetary_cost_USD": 0,
+      "resource_amendment_commitment_sha256": "5330cf582e46d1bf075ca97af7c8bfceb47cfcd09499786f4e366b6f8e283beb"
+    },
+    "public_fixture_manifest_commitment_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+    "development_module_result_commitment_sha256": "d6b22027c87860eb4345e7dd271bc3b13cb117e5de5ee2efa7ded4dc86dd2b42",
+    "development_threshold_commitment_sha256": "4bff4bf8c6015eaef077bfed1e82ff75c8c62f0ecd21334bd82aa2c534a0c742",
+    "public_qualification_commitment_sha256": "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf",
+    "module_count": 7,
+    "completed_module_count": 2,
+    "failed_module_count": 5,
+    "module_statuses": {
+      "adapter_and_lexical": "ERROR",
+      "referent": "ERROR",
+      "recurrence": "PASS",
+      "attribute": "ERROR",
+      "hand_contact": "ERROR",
+      "sensor": "PASS",
+      "order_action": "ERROR"
+    },
+    "module_error_codes": {
+      "adapter_and_lexical": "E_UNACCOUNTED_MODULE_FAILURE",
+      "referent": "E_UNACCOUNTED_MODULE_FAILURE",
+      "attribute": "E_FROZEN_VISION_MODEL",
+      "hand_contact": "E_UNACCOUNTED_MODULE_FAILURE",
+      "order_action": "E_ACTIVITY_SELECTION_NOT_FROZEN"
+    },
+    "axis_statuses": {
+      "adapter_qualified_yield": "ERROR",
+      "noun_adjective_exposure": "ERROR",
+      "utterance_centered_referent_visibility_dominance_ambiguity": "ERROR",
+      "cross_episode_recurrence": "PASS",
+      "adjective_attribute_contrast": "ERROR",
+      "hand_action_coupling": "ERROR",
+      "egocentric_sensor_regime": "PASS"
+    },
+    "passing_metrics": {
+      "cross_episode_recurrence": {
+        "DINOv2_recurrence_cosine": 0.85,
+        "coverage": 1.0,
+        "near_duplicate_pair_balanced_accuracy": 0.9270833333333333,
+        "negative_pair_false_positive_rate": 0.0,
+        "recurrence_event_f1": 1.0,
+        "same_object_cross_episode_balanced_accuracy": 1.0
+      },
+      "egocentric_sensor_regime": {
+        "controlled_perturbation_direction_fraction": 1.0,
+        "finite_in_bounds_fraction": 1.0,
+        "frozen_bin_accuracy": 0.9583333333333334
+      }
+    },
+    "selected_thresholds": {"DINOv2_recurrence_cosine": 0.85},
+    "combined_gate": {
+      "status": "NO_GO",
+      "critical_axis_pass_count": 1,
+      "critical_axis_required_count": 5,
+      "validated_axis_count": 2,
+      "validated_axis_required_count": 6,
+      "action_control_status": "ERROR",
+      "action_control_used_in_gate": false,
+      "failures": ["critical_axis:adapter_qualified_yield", "critical_axis:noun_adjective_exposure", "critical_axis:utterance_centered_referent_visibility_dominance_ambiguity", "critical_axis:adjective_attribute_contrast", "validated_axes_minimum:6_of_7", "integrity:failure_count", "integrity:error_module_count", "integrity:unaccounted_failure_count"]
+    },
+    "integrity": {
+      "failure_count": 5,
+      "error_module_count": 5,
+      "unaccounted_failure_count": 3,
+      "invalid_retained_record_count": 0,
+      "silent_truncation_count": 0,
+      "external_call_count": 0
+    },
+    "stderr_empty": false,
+    "network_disabled": true,
+    "restricted_mount_present": false,
+    "holdout_authorized": false,
+    "holdout_result_present": false,
+    "holdout_reprompt_refit_or_threshold_change": "PROHIBITED",
+    "governed_C_reopened": false,
+    "LTX_or_synthetic_learner_run": false,
+    "decision": "STOP_THIS_FROZEN_ROUTE_AFTER_COMPLETE_COMBINED_PUBLIC_DEVELOPMENT_NO_GO"
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -990,5 +1083,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "RUN_EXACTLY_ONE_COMBINED_PUBLIC_DEVELOPMENT_QUALIFICATION_ON_THE_FROZEN_SINGLE_A30_TOPOLOGY_AGAINST_THE_SEALED_2758557F_FIXTURES; SELECT_ONLY_FROZEN_GRID_VALUES_AND_SEAL_THRESHOLDS_BEFORE_ONCE_ONLY_A30_HOLDOUT; GOVERNED_C_COMPILER_LTX_PREFLIGHT_EXACTLY_3600_ACCEPTED_SECONDS_AND_SYNTHETIC_LEARNER_REMAIN_STRICTLY_CONDITIONAL"
+  "next_authorized_scope": "NONE_UNDER_THIS_FROZEN_ROUTE; THE_COMPLETE_PUBLIC_DEVELOPMENT_COMBINED_GATE_IS_NO_GO; HOLDOUT_GOVERNED_C_EPISODE_PLANS_LTX_GENERATION_AND_SYNTHETIC_LEARNER_REMAIN_NOT_RUN"
 }
