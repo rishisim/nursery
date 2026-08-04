@@ -496,15 +496,15 @@
       "component_rule": "rasterize the complete unchanged contour list in one official fixed-canvas call; only the final union must be nonempty, while outside-canvas component counts remain diagnostic and cannot change source eligibility",
       "output_gate": "exact source HxW uint8 binary nonempty mask; atomic PNG mode L serialization; exact array-equal hash/byte/format/mode/size/binary/nonempty round trip"
     },
-    "pre_model_verification": "decode every visible-hand truth PNG before model loading and require declared dimensions equal both mask and decoded source frame; threshold evaluation may not use Image.convert to normalize an invalid mask",
+    "pre_model_verification": "decode every visible-hand truth PNG before model loading and require declared exact positive non-boolean integer dimensions equal both mask and decoded source frame; threshold evaluation may not use Image.convert to normalize an invalid mask",
     "manifest_binding": "fixture schema 3 directly binds this repair commitment and compact boundary/positive-overshoot diagnostics; later development and holdout seals inherit the fixture commitment",
     "scientific_thresholds_changed": false,
     "source_selection_changed": false,
     "source_label_or_partition_changed": false,
     "learner_generator_C_or_evaluation_contract_changed": false,
-    "current_runner_source_sha256": "fc7f01561cab8f2fa9278acd14afb40303217171897febb70984580c9e5396f4",
+    "current_runner_source_sha256": "b45a05473f9901fb49f0b8b3eaa9d1e19436ed5c7b4c910e22a81a8700612646",
     "repair_commitment_scope": "canonical JSON of this repair excluding repair_commitment_sha256",
-    "repair_commitment_sha256": "84673942ea5607f93c2b13cb697c823abe3118af58f93a167ca43962ef42ddd9"
+    "repair_commitment_sha256": "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",

@@ -1667,13 +1667,14 @@ the complete unchanged contour list is rasterized in one OpenCV 4.10.0.84
 clipping, coordinate tolerance, scaling, and a PIL rasterization fallback are
 prohibited. Only the final union must be nonempty; outside-canvas component
 counts remain diagnostic and cannot change source eligibility. Before public model
-loading, every visible-hand truth PNG must decode as mode `L`, match both the
-declared mask size and decoded source-frame dimensions, remain binary and
+loading, every visible-hand truth PNG must decode as mode `L`, carry declared
+positive non-boolean integer dimensions that match both the mask and decoded
+source frame, remain binary and
 nonempty, and pass exact array-equal/hash/byte/format/mode/size round-trip
 checks without `Image.convert` normalization. Fixture schema 3 binds these
 semantics and the compact boundary/overshoot diagnostics through repair
-commitment `84673942…42ddd9`; later development and holdout seals inherit the
-fixture commitment. Current runner SHA-256 is `fc7f0156…e5396f4`. The
+commitment `6084fd93…3e61ef`; later development and holdout seals inherit the
+fixture commitment. Current runner SHA-256 is `b45a0547…612646`. The
 deterministic fixture-preparation retry is authorized, but model inference
 remains fail-closed until these pre-model checks and the fixture seal pass.
 

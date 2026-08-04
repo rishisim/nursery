@@ -233,9 +233,10 @@ one OpenCV 4.10.0.84 `fillPoly` call over the complete unchanged contour list
 on an exact source-sized canvas, with no manual clipping, tolerance, scaling,
 or PIL fallback. Only the final union must be nonempty; outside-canvas component
 counts are diagnostic and cannot change source eligibility. Strict
-pre-model checks require exact PNG/source dimensions and binary nonempty
+pre-model checks require declared positive non-boolean integer dimensions,
+exact PNG/source dimensions, and binary nonempty
 array-equal serialization round trips. Fixture schema 3 binds repair commitment
-`84673942…42ddd9`; runner SHA-256 is `fc7f0156…e5396f4`. The deterministic fixture
+`6084fd93…3e61ef`; runner SHA-256 is `b45a0547…612646`. The deterministic fixture
 retry is authorized under that frozen repair only.
 
 Before any material generation, one deterministic structured compiler must

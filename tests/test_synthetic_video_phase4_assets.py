@@ -416,7 +416,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     assert proof["status"] == "PROSPECTIVE_CONSTRUCT_ALIGNED_LEARNER_EFFECTIVE_LTX_SOLE_GENERATOR_COMPILER_AMENDMENT_FROZEN_RUNNER_PASS_BLIND_NO_HAND_REVIEW_SEAL_PASS_PUBLIC_FIXTURE_GEOMETRY_RASTERIZATION_REPAIR_FROZEN_RETRY_AUTHORIZED_PRIOR_NO_GOS_AND_PRE_SEAL_CORRECTION_PRESERVED_NO_FIXTURE_MODEL_OR_SCIENTIFIC_GATE_OUTCOME"
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]
-    assert geometry_repair["repair_commitment_sha256"] == "84673942ea5607f93c2b13cb697c823abe3118af58f93a167ca43962ef42ddd9"
+    assert geometry_repair["repair_commitment_sha256"] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
     assert geometry_repair["triggering_attempt"]["public_model_inference_executed"] is False
     assert geometry_repair["scientific_thresholds_changed"] is False
     assert proof["budgets_credited_hours"] == {

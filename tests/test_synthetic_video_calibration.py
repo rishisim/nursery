@@ -69,7 +69,7 @@ def test_public_fixture_geometry_rasterization_repair_is_frozen() -> None:
     repair = MODULE._public_fixture_geometry_rasterization_repair(config)
     assert (
         repair["repair_commitment_sha256"]
-        == "84673942ea5607f93c2b13cb697c823abe3118af58f93a167ca43962ef42ddd9"
+        == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
     )
     assert repair["triggering_attempt"]["job_id"] == 315462
     assert repair["triggering_attempt"]["public_model_inference_executed"] is False
@@ -1760,6 +1760,21 @@ def test_visor_hos_rasterizer_version_and_target_mask_serialization_fail_closed(
         "target_hand_mask_width": 12,
         "target_hand_mask_height": 10,
     }
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_EGOHOS_TARGET_MASK_SERIALIZATION"
+    ):
+        MODULE._read_tuple_egohos_target_mask(row, fixture_root)
+
+    Image.new("L", (12, 10), 255).save(mask)
+    row["target_hand_mask_sha256"] = MODULE.file_digest(mask)
+    row["target_hand_mask_bytes"] = mask.stat().st_size
+    row["target_hand_mask_width"] = True
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_EGOHOS_TARGET_MASK_SERIALIZATION"
+    ):
+        MODULE._read_tuple_egohos_target_mask(row, fixture_root)
+
+    row.pop("target_hand_mask_width")
     with pytest.raises(
         RuntimeError, match="E_TUPLE_EGOHOS_TARGET_MASK_SERIALIZATION"
     ):
@@ -4077,6 +4092,12 @@ def test_tuple_egohos_verified_no_hand_requires_pass_seal_and_row_link() -> None
         RuntimeError, match="E_TUPLE_EGOHOS_VISIBLE_HAND_FIXTURE_TRUTH"
     ):
         MODULE._validate_tuple_egohos_fixture_rows(context, broken)
+    broken = json.loads(json.dumps(rows))
+    broken[0]["target_hand_mask_width"] = True
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_EGOHOS_VISIBLE_HAND_FIXTURE_TRUTH"
+    ):
+        MODULE._validate_tuple_egohos_fixture_rows(context, broken)
 
 
 def test_tuple_egohos_metrics_separate_no_hand_from_contact_state(
@@ -4100,6 +4121,8 @@ def test_tuple_egohos_metrics_separate_no_hand_from_contact_state(
             "target_hand_side": "left hand",
             "target_hand_mask_relative_path": "masks/left.png",
             "target_hand_mask_sha256": mask_hash,
+            "target_hand_mask_width": 20,
+            "target_hand_mask_height": 20,
         },
         {
             "fixture_ordinal": 1,
@@ -4108,6 +4131,8 @@ def test_tuple_egohos_metrics_separate_no_hand_from_contact_state(
             "target_hand_side": "left hand",
             "target_hand_mask_relative_path": "masks/left.png",
             "target_hand_mask_sha256": mask_hash,
+            "target_hand_mask_width": 20,
+            "target_hand_mask_height": 20,
         },
         {
             "fixture_ordinal": 2,
@@ -4153,6 +4178,8 @@ def test_tuple_egohos_invalid_stage_record_abstains_and_blocks_gate(
         "target_hand_side": "left hand",
         "target_hand_mask_relative_path": "masks/left.png",
         "target_hand_mask_sha256": MODULE.file_digest(mask_path),
+        "target_hand_mask_width": 20,
+        "target_hand_mask_height": 20,
     }
     invalid = _egohos_test_masks(True)
     invalid["stage2"][0, 0] = 2

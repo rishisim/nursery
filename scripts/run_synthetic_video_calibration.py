@@ -825,6 +825,8 @@ def _public_fixture_geometry_rasterization_repair(
     expected = payload.pop("repair_commitment_sha256", None)
     if not isinstance(expected, str) or digest(payload) != expected:
         raise RuntimeError("E_TUPLE_VISOR_RASTERIZATION_REPAIR_COMMITMENT")
+    if file_digest(Path(__file__)) != value.get("current_runner_source_sha256"):
+        raise RuntimeError("E_TUPLE_VISOR_RASTERIZATION_REPAIR_RUNNER")
     semantics = value.get("rasterization_semantics", {})
     if (
         semantics.get("numpy_distribution") != "numpy==1.26.4"
@@ -5501,9 +5503,9 @@ def _validate_tuple_egohos_fixture_rows(
         if (
             row.get("contact") is not expected_contact
             or row.get("target_hand_side") not in EGOHOS_TARGET_SIDE_CLASSES
-            or not isinstance(row.get("target_hand_mask_width"), int)
+            or type(row.get("target_hand_mask_width")) is not int
             or int(row["target_hand_mask_width"]) <= 0
-            or not isinstance(row.get("target_hand_mask_height"), int)
+            or type(row.get("target_hand_mask_height")) is not int
             or int(row["target_hand_mask_height"]) <= 0
             or row.get("source_polygon_finite_nonnegative") is not True
             or row.get("target_hand_mask_exact_frame_binary_nonempty") is not True
@@ -5516,7 +5518,7 @@ def _validate_tuple_egohos_fixture_rows(
                 )
             )
             or any(
-                not isinstance(row.get(key), int) or int(row[key]) < 0
+                type(row.get(key)) is not int or int(row[key]) < 0
                 for key in (
                     "target_hand_boundary_vertex_count",
                     "target_hand_outside_canvas_vertex_count",
@@ -5558,17 +5560,16 @@ def _read_tuple_egohos_target_mask(
             if source_size[0] <= 0 or source_size[1] <= 0:
                 raise RuntimeError("E_TUPLE_EGOHOS_SOURCE_IMAGE")
             source.verify()
+    if any(
+        type(row.get(key)) is not int or int(row[key]) <= 0
+        for key in ("target_hand_mask_width", "target_hand_mask_height")
+    ):
+        raise RuntimeError("E_TUPLE_EGOHOS_TARGET_MASK_SERIALIZATION")
+    declared_size = (
+        int(row["target_hand_mask_width"]),
+        int(row["target_hand_mask_height"]),
+    )
     with Image.open(mask_path) as opened:
-        if all(
-            isinstance(row.get(key), int)
-            for key in ("target_hand_mask_width", "target_hand_mask_height")
-        ):
-            declared_size = (
-                int(row["target_hand_mask_width"]),
-                int(row["target_hand_mask_height"]),
-            )
-        else:
-            declared_size = opened.size
         if (
             opened.format != "PNG"
             or opened.mode != "L"
