@@ -1,72 +1,42 @@
 {
-  "schema": "EmbodiedSimulationContinuousEpisodeContract.v1",
-  "frozen_before_phase_4_outcomes_at_utc": "2026-08-01T01:03:19Z",
-  "scientific_scope": "public_synthetic_engineering_qualification_only",
-  "vertical_slice_contract": "configs/embodied_simulation_vertical_slice.json",
-  "scene_variant": "household",
-  "prompt": "Find the yellow cup, pick it up, inspect it, shake and tap it, put it down, then retrieve it and look again.",
-  "planner": {
-    "type": "deterministic_bounded_template",
-    "may_emit_joint_trajectories": false,
-    "allowed_actions": [
-      "look",
-      "reorient",
-      "approach",
-      "reach",
-      "touch",
-      "grasp",
-      "inspect",
-      "rotate",
-      "shake",
-      "bang",
-      "transfer",
-      "drop",
-      "retrieve"
-    ],
-    "target_reference": {
-      "requested_label": "yellow cup",
-      "required_persistent_id": "yellow_cup_authored"
-    },
-    "impossible_plan_policy": "reject_or_repair_before_physics_without_emitting_joint_targets"
-  },
+  "schema": "embodied.bimanual_child_episode.v1",
+  "scientific_scope": "public_synthetic_engineering_and_visual_feasibility_only",
+  "prompt": "You are playing at a low table in a warm family playroom. Look around for the red toy near the picture book. Reach for it with your right hand and touch it. Pick it up, bring your left hand over to help, turn it slowly while looking closely, stabilize it with both hands, and place it into the shallow bin. Then reach toward the blue cup, touch and move it gently, withdraw both hands, and look toward the window while an adult comments on what happened.",
+  "seed": 20260803,
   "activity": {
-    "duration_s": 60.0,
+    "duration_s": 56.0,
     "continuous_trace_required": true,
     "hidden_world_resets_permitted": false,
-    "vertical_slice": [
-      {"phase": "look", "action": "look", "start_s": 0.0, "end_s": 2.0},
-      {"phase": "reorient", "action": "reorient", "start_s": 2.0, "end_s": 4.0},
-      {"phase": "approach", "action": "approach", "start_s": 4.0, "end_s": 7.0},
-      {"phase": "reach_past_distractor", "action": "reach", "start_s": 7.0, "end_s": 10.0},
-      {"phase": "fingertip_contact", "action": "touch", "start_s": 10.0, "end_s": 11.0},
-      {"phase": "grasp", "action": "grasp", "start_s": 11.0, "end_s": 14.0},
-      {"phase": "lift", "action": "grasp", "start_s": 14.0, "end_s": 18.0},
-      {"phase": "inspect", "action": "inspect", "start_s": 18.0, "end_s": 20.0},
-      {"phase": "rotate", "action": "rotate", "start_s": 20.0, "end_s": 23.0},
-      {"phase": "head_turn_maintain_contact", "action": "inspect", "start_s": 23.0, "end_s": 28.0},
-      {"phase": "shake", "action": "shake", "start_s": 28.0, "end_s": 32.0},
-      {"phase": "bang", "action": "bang", "start_s": 32.0, "end_s": 36.0},
-      {"phase": "transfer", "action": "transfer", "start_s": 36.0, "end_s": 38.0},
-      {"phase": "release", "action": "drop", "start_s": 38.0, "end_s": 40.0},
-      {"phase": "settle", "action": "drop", "start_s": 40.0, "end_s": 46.0},
-      {"phase": "retrieve_reorient", "action": "reorient", "start_s": 46.0, "end_s": 48.0},
-      {"phase": "retrieve", "action": "retrieve", "start_s": 48.0, "end_s": 51.0},
-      {"phase": "retrieve_grasp", "action": "grasp", "start_s": 51.0, "end_s": 54.0},
-      {"phase": "retrieve_lift", "action": "retrieve", "start_s": 54.0, "end_s": 57.0},
-      {"phase": "retrieve_inspect", "action": "inspect", "start_s": 57.0, "end_s": 59.0},
-      {"phase": "final_dwell", "action": "look", "start_s": 59.0, "end_s": 60.0}
+    "phases": [
+      {"id":"scan_reorient","start_s":0,"end_s":6},
+      {"id":"right_reach_capture","start_s":6,"end_s":14},
+      {"id":"lift_left_assist","start_s":14,"end_s":23},
+      {"id":"bimanual_inspect_turn","start_s":23,"end_s":31},
+      {"id":"lower_open_free_release","start_s":31,"end_s":39},
+      {"id":"blue_cup_touch_push","start_s":39,"end_s":48},
+      {"id":"final_withdrawal_window_gaze","start_s":48,"end_s":56}
     ]
   },
+  "authority": {
+    "physics": "Unity 6000.0.80f1 PhysX",
+    "renderer": "Unity built-in baseline",
+    "physics_hz": 240,
+    "render_hz": 30,
+    "steps_per_frame": 8,
+    "controller": "kinematic body/palms/contact-aware digits with free non-kinematic objects",
+    "object_pose_writes_after_initialization": false,
+    "attachments_joints_external_forces": false
+  },
   "language": {
-    "source": "repository_authored_synthetic_english_not_empirical_calibration",
-    "developmental_status": "short conservative phrases; not age-matched, human-validated, or infant-calibrated",
+    "source": "repository-authored synthetic English from actual event times",
+    "developmental_status": "synthetic; not age-matched, human-validated, ChildLens-calibrated, or voice-cloned",
     "utterances": [
-      {"id": "u01", "text": "Look, a yellow cup.", "start_s": 0.7, "event": "look", "must_end_by_s": 3.0},
-      {"id": "u02", "text": "Touch the cup.", "start_s": 10.1, "event": "fingertip_contact", "must_end_by_s": 12.0},
-      {"id": "u03", "text": "Up goes the cup.", "start_s": 14.3, "event": "lift", "must_end_by_s": 17.0},
-      {"id": "u04", "text": "Shake, tap, and move it.", "start_s": 28.2, "event": "shake_bang_transfer", "must_end_by_s": 32.0},
-      {"id": "u05", "text": "Cup again.", "start_s": 46.4, "event": "retrieve_reorient", "must_end_by_s": 48.0},
-      {"id": "u06", "text": "Yellow cup.", "start_s": 59.0, "event": "final_dwell", "must_end_by_s": 60.0}
+      {"id":"u01","text":"There is the red toy.","start_s":4.2,"event":"red_fixation","must_end_by_s":6.0},
+      {"id":"u02","text":"You picked it up.","start_s":15.0,"event":"physical_lift","must_end_by_s":18.0},
+      {"id":"u03","text":"Both hands are turning it.","start_s":24.0,"event":"bimanual_turn","must_end_by_s":27.5},
+      {"id":"u04","text":"It is in the bin.","start_s":33.0,"event":"free_release","must_end_by_s":36.0},
+      {"id":"u05","text":"The blue cup moved.","start_s":45.3,"event":"blue_cup_motion","must_end_by_s":48.0},
+      {"id":"u06","text":"Now look toward the window.","start_s":49.0,"event":"final_attention_shift","must_end_by_s":53.0}
     ],
     "speech": {
       "engine": "macOS say",
@@ -81,54 +51,6 @@
       "neural_render_audio_permitted": false
     }
   },
-  "controller": {
-    "seed": 20260731,
-    "second_grasp_uses_same_frozen_contact_gate": true,
-    "shake_frequency_hz": 1.5,
-    "shake_vertical_amplitude_m": 0.018,
-    "shake_tracking": "bounded IK endpoints plus compliant object-state feedback through the articulated hand",
-    "bang_cycles": 2,
-    "bang_clearance_amplitude_m": 0.025,
-    "transfer_lateral_distance_m": 0.055,
-    "transfer_scope": "right-hand lateral transport; not an inter-hand transfer",
-    "retrieve_contact_offset_from_object_m": [-0.065, 0.040, 0.050],
-    "direct_object_pose_control_permitted": false
-  },
-  "bounded_repairs": [
-    {
-      "recorded_at_utc": "2026-08-01T01:48:46Z",
-      "evidence_runs": ["preflight_01", "preflight_02", "preflight_03", "preflight_04", "preflight_05", "preflight_06"],
-      "changes": "added phase-relative IK tracking, a collision-enabled support catch tray, support-aware put-down feedback, and a higher side/above retrieve contact approach",
-      "reason": "the initial long-horizon controller under-tracked shake/bang/transfer and allowed the released cup to leave the reachable support; later bounded attempts exposed transition and support-contact penetration",
-      "frozen_plan_timeline_seeds_and_thresholds_changed": false,
-      "final_preflight_gate": "PASS"
-    }
-  ],
-  "qualification": {
-    "duration_absolute_error_s_max": 1e-9,
-    "truth_samples": 3601,
-    "render_frames": 1801,
-    "utterance_count_min": 4,
-    "utterance_count_max": 6,
-    "hidden_world_reset_count_max": 0,
-    "action_plan_must_use_only_bounded_vocabulary": true,
-    "scene_target_must_resolve_before_execution": true,
-    "minimum_shake_vertical_range_m": 0.015,
-    "minimum_bang_support_contact_samples": 1,
-    "minimum_transfer_lateral_range_m": 0.035,
-    "minimum_retrieve_lift_m": 0.04,
-    "maximum_truth_discontinuity_m": 0.05,
-    "reuse_vertical_slice_hard_gates_without_change": true
-  },
-  "selection_policy": {
-    "candidate_count": 1,
-    "neural_appearance": "disabled_after_phase_3_no_accepted_method",
-    "authoritative_rgb": "deterministic_native_mimo_baseline",
-    "selection_after_gate_only": true
-  },
-  "privacy": {
-    "public_synthetic_inputs_only": true,
-    "restricted_childlens_access_permitted": false,
-    "remote_execution_required": false
-  }
+  "privacy": {"public_synthetic_inputs_only":true,"restricted_childlens_access_permitted":false},
+  "claims_forbidden": ["infant-trained","age-matched","ChildLens-calibrated","human-validated","biologically torque-valid"]
 }
