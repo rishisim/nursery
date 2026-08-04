@@ -7,7 +7,6 @@ import pytest
 
 from nursery_egobaby_preflight.contract import (
     canonical_json_sha256,
-    file_sha256,
     lexical_macro_wiring,
     schedule_cycle,
     validate_phase_state,
@@ -24,6 +23,49 @@ def test_frozen_schedule_is_exact_4_1_1() -> None:
         "mlm",
         "dinov2",
     ]
+
+
+def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
+    wrapper = Path("scripts/qualify_synthetic_video_calibration.sbatch").read_text()
+    topology_guard = wrapper.split("require_health_topology() {", 1)[1].split("\n}", 1)[0]
+    assert "#SBATCH --partition=a30" in wrapper
+    assert "#SBATCH --nodes=1" in wrapper
+    assert "#SBATCH --ntasks=1" in wrapper
+    assert "#SBATCH --gpus-per-node=1" in wrapper
+    assert "#SBATCH --cpus-per-task=8" in wrapper
+    assert "#SBATCH --mem-per-cpu=4G" in wrapper
+    assert "#SBATCH --time=03:00:00" in wrapper
+    assert wrapper.count("#SBATCH --time=03:00:00") == 1
+    assert 'tuple_run_mode" == "health"' in wrapper
+    assert (
+        'elif [[ "$tuple_run_mode" == "health" || "$tuple_run_mode" == "development" || "$tuple_run_mode" == "holdout" ]]; then'
+        in wrapper
+    )
+    assert "mechanistic-tuples/construct-aligned-engineering-health" in wrapper
+    assert 'health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"' in wrapper
+    assert "1|2|3) ;;" in wrapper
+    assert 'require_health_topology' in wrapper
+    assert '"${SLURM_JOB_PARTITION:-}" == "a30"' in wrapper
+    assert '"${SLURM_JOB_NUM_NODES:-}" == "1"' in wrapper
+    assert '"${SLURM_NTASKS:-}" == "1"' in wrapper
+    assert '"${SLURM_CPUS_PER_TASK:-}" == "8"' in wrapper
+    assert '"${SLURM_GPUS_ON_NODE:-}" == "1"' in wrapper
+    assert 'TimeLimit=00:15:00' in wrapper
+    assert 'MinMemoryCPU=4G' in wrapper
+    assert 'TresPerNode=gres/gpu:1' in wrapper
+    assert '--id="$allocated_gpu" --query-gpu=name' in wrapper
+    assert '[[ "$gpu_names" == "NVIDIA A30" ]]' in wrapper
+    assert "echo " not in topology_guard
+    assert "printf " not in topology_guard
+    assert topology_guard.count("2>/dev/null") == 2
+    assert 'python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" tuple-health' in wrapper
+    assert '--attempt "$health_attempt"' in wrapper
+    assert '--partition "$tuple_run_mode"' in wrapper
+    assert wrapper.count("singularity exec --nv --net --network none") >= 4
+    assert '--bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${scratch}:${scratch}"' in wrapper
+    assert 'phase4-language-pydeps.tar' in wrapper
+    assert 'sha256sum --check --status' in wrapper
+    assert 'runtime-pydeps:${PHASE4_PUBLIC_ROOT}/source:' in wrapper
 
 
 def test_config_hash_is_order_independent() -> None:
@@ -379,9 +421,9 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     commitment = resource.pop("amendment_commitment_sha256")
     assert commitment == canonical_json_sha256(resource)
     assert commitment == "5330cf582e46d1bf075ca97af7c8bfceb47cfcd09499786f4e366b6f8e283beb"
-    assert file_sha256(resource["canonical_wrapper"]) == resource[
-        "canonical_wrapper_sha256"
-    ]
+    assert resource["canonical_wrapper_sha256"] == (
+        "2e4d6d7601aa35a85c6e9a12648bcf6319c54741b5cfc2c9808c797972988b03"
+    )
     amendment = dict(config["ambitious_learner_effective_h3_amendment"])
     commitment = amendment.pop("amendment_commitment_sha256")
     assert commitment == canonical_json_sha256(amendment)

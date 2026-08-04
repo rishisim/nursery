@@ -23,6 +23,7 @@ import sys
 import tempfile
 import tarfile
 import time
+import traceback
 from typing import Any
 import urllib.error
 import urllib.parse
@@ -336,6 +337,108 @@ TUPLE_QUALIFICATION_HASH_FIELDS = frozenset(
         "development_threshold_commitment_sha256",
     }
 )
+TUPLE_HEALTH_FIELDS = frozenset(
+    {
+        "status",
+        "attempt",
+        "module_count",
+        "completed_module_count",
+        "failed_module_count",
+        "case_count",
+        "holdout_input_count",
+        "scientific_metric_count",
+        "failure_count",
+        "invalid_retained_record_count",
+        "silent_truncation_count",
+        "external_call_count",
+        "unaccounted_failure_count",
+        "public_fixture_manifest_commitment_sha256",
+        "runner_commitment_sha256",
+        "config_commitment_sha256",
+        "dependency_config_commitment_sha256",
+        "microfixture_manifest_commitment_sha256",
+        "engineering_health_commitment_sha256",
+        "GPU_type",
+        "GPU_count",
+        "CPU_count",
+        "memory_GiB",
+        "wall_minutes",
+        "GPU_hours",
+        "new_storage_GiB",
+        "direct_monetary_cost_USD",
+        "cumulative_submission_count",
+        "cumulative_wall_minutes",
+        "cumulative_GPU_hours",
+        "cumulative_new_storage_GiB",
+        "cumulative_direct_monetary_cost_USD",
+    }
+)
+TUPLE_HEALTH_HASH_FIELDS = frozenset(
+    {
+        "public_fixture_manifest_commitment_sha256",
+        "runner_commitment_sha256",
+        "config_commitment_sha256",
+        "dependency_config_commitment_sha256",
+        "microfixture_manifest_commitment_sha256",
+        "engineering_health_commitment_sha256",
+    }
+)
+TUPLE_HEALTH_FULL_FIELDS = frozenset(
+    {
+        "schema_version",
+        "status",
+        "route_id",
+        "attempt",
+        "public_fixture_manifest_commitment_sha256",
+        "runner_commitment_sha256",
+        "config_commitment_sha256",
+        "dependency_config_commitment_sha256",
+        "microfixture_manifest_commitment_sha256",
+        "module_results",
+        "module_count",
+        "completed_module_count",
+        "failed_module_count",
+        "case_count",
+        "holdout_input_count",
+        "scientific_metric_count",
+        "failure_count",
+        "invalid_retained_record_count",
+        "silent_truncation_count",
+        "external_call_count",
+        "unaccounted_failure_count",
+        "network_disabled",
+        "telemetry_disabled",
+        "restricted_mount_present",
+        "resource",
+        "cumulative_resource",
+        "engineering_health_commitment_sha256",
+    }
+)
+TUPLE_PARTITION_INTEGRITY_FIELDS = frozenset(
+    {
+        "status",
+        "partition",
+        "module_count",
+        "completed_module_count",
+        "failed_module_count",
+        "scientific_metric_count",
+        "failure_count",
+        "invalid_retained_record_count",
+        "silent_truncation_count",
+        "external_call_count",
+        "unaccounted_failure_count",
+        "public_fixture_manifest_commitment_sha256",
+        "engineering_health_commitment_sha256",
+        "partition_engineering_integrity_commitment_sha256",
+    }
+)
+TUPLE_PARTITION_INTEGRITY_HASH_FIELDS = frozenset(
+    {
+        "public_fixture_manifest_commitment_sha256",
+        "engineering_health_commitment_sha256",
+        "partition_engineering_integrity_commitment_sha256",
+    }
+)
 TUPLE_VISOR_HOS_SOURCE_FEASIBILITY_FIELDS = frozenset(
     {
         "status",
@@ -400,6 +503,15 @@ TUPLE_GROUNDING_DINO_SHA256 = (
 )
 TUPLE_SAM21_BASE_PLUS_SHA256 = (
     "a2345aede8715ab1d5d31b4a509fb160c5a4af1970f199d9054ccfb746c004c5"
+)
+TUPLE_PE_CORE_IDENTITY_SHA256 = (
+    "1a7fd6c54dfa10efacc65bb966fd20b02f8db65b8875ada05bd3fecb223f010e"
+)
+TUPLE_ORDER_ACTION_EGOHOD_CANDIDATE_SHA256 = (
+    "992a5ab7a812b511c6df92cf4892e998e1872982677093a61931c02faa51be93"
+)
+TUPLE_ORDER_ACTION_EGOHOD_RUNTIME_SHA256 = (
+    "033c48fa4172701af5b234de2b9786b079e37c9c8a99af5bb3d056094e867553"
 )
 ACTIVITY_AXIS = "activity_context_mixture"
 VISUAL_AXIS = "egocentric_visual_regime"
@@ -1007,43 +1119,72 @@ def _validate_grounding_sizing_counts(
 def _stage_tuple_nltk_resources(
     public: Path, scratch: Path, cfg: dict[str, Any]
 ) -> Path:
+    """Stage the exact pinned archives; do not depend on a moved run manifest."""
+
     manifest_path = _tuple_run_root(public) / "dependency_manifest.json"
-    manifest = json.loads(manifest_path.read_text())
-    commitment = manifest.pop("tuple_dependency_commitment_sha256", None)
     expected = cfg["calibration_C"]["extractor"][
         "mechanistic_training_tuple_premodel_result"
     ]["dependency_manifest_commitment_sha256"]
-    if not isinstance(commitment, str) or commitment != expected or digest(manifest) != expected:
+    if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{64}", expected):
         raise RuntimeError("E_TUPLE_NLTK_MANIFEST")
-    records = manifest.get("nltk_resource_files")
-    if not isinstance(records, list) or not records:
-        raise RuntimeError("E_TUPLE_NLTK_MANIFEST")
-    source = public / "models/nltk_data"
-    top_levels = set()
-    for record in records:
-        relative = Path(str(record.get("relative_path", "")))
-        if relative.is_absolute() or ".." in relative.parts or not relative.parts:
-            raise RuntimeError("E_TUPLE_NLTK_RESOURCE_PATH")
-        path = source / relative
-        if not path.is_file() or file_digest(path) != record.get("sha256"):
-            raise RuntimeError("E_TUPLE_NLTK_RESOURCE_HASH")
-        if len(relative.parts) > 1:
+    if manifest_path.is_file():
+        manifest = json.loads(manifest_path.read_text())
+        commitment = manifest.pop("tuple_dependency_commitment_sha256", None)
+        if commitment != expected or digest(manifest) != expected:
+            raise RuntimeError("E_TUPLE_NLTK_MANIFEST")
+        records = manifest.get("nltk_resource_files")
+        if not isinstance(records, list) or not records:
+            raise RuntimeError("E_TUPLE_NLTK_MANIFEST")
+        source = public / "models/nltk_data"
+        top_levels = set()
+        for record in records:
+            relative = Path(str(record.get("relative_path", "")))
+            if relative.is_absolute() or ".." in relative.parts or not relative.parts:
+                raise RuntimeError("E_TUPLE_NLTK_RESOURCE_PATH")
+            path = source / relative
+            if not path.is_file() or file_digest(path) != record.get("sha256"):
+                raise RuntimeError("E_TUPLE_NLTK_RESOURCE_HASH")
             top_levels.add(relative.parts[0])
-    if top_levels != {"averaged_perceptron_tagger_eng", "wordnet"}:
-        raise RuntimeError("E_TUPLE_NLTK_RESOURCE_SET")
+        if top_levels != {"averaged_perceptron_tagger_eng", "wordnet"}:
+            raise RuntimeError("E_TUPLE_NLTK_RESOURCE_SET")
+        target = scratch / "nltk_data"
+        (target / "taggers").mkdir(parents=True, exist_ok=False, mode=0o700)
+        (target / "corpora").mkdir(parents=True, exist_ok=False, mode=0o700)
+        os.symlink(
+            source / "averaged_perceptron_tagger_eng",
+            target / "taggers/averaged_perceptron_tagger_eng",
+            target_is_directory=True,
+        )
+        os.symlink(
+            source / "wordnet",
+            target / "corpora/wordnet",
+            target_is_directory=True,
+        )
+        return target
+    _tuple_amendment(cfg)
     target = scratch / "nltk_data"
-    (target / "taggers").mkdir(parents=True, exist_ok=False, mode=0o700)
-    (target / "corpora").mkdir(parents=True, exist_ok=False, mode=0o700)
-    os.symlink(
-        source / "averaged_perceptron_tagger_eng",
-        target / "taggers/averaged_perceptron_tagger_eng",
-        target_is_directory=True,
-    )
-    os.symlink(
-        source / "wordnet",
+    if target.exists():
+        raise RuntimeError("E_TUPLE_NLTK_STAGE_ALREADY_EXISTS")
+    archives = _tuple_model_root(public) / "nltk-archives"
+    destinations = {
+        "wordnet.zip": target / "corpora",
+        "averaged_perceptron_tagger_eng.zip": target / "taggers",
+    }
+    for name, destination in destinations.items():
+        archive = archives / name
+        record = NLTK_RESOURCE_ARCHIVES[name]
+        if not archive.is_file() or file_digest(archive) != record["sha256"]:
+            raise RuntimeError("E_TUPLE_NLTK_RESOURCE_HASH")
+        _safe_extract_zip(archive, destination)
+    required = {
         target / "corpora/wordnet",
-        target_is_directory=True,
-    )
+        target / "taggers/averaged_perceptron_tagger_eng",
+    }
+    if any(
+        not path.is_dir() or not any(item.is_file() for item in path.rglob("*"))
+        for path in required
+    ):
+        raise RuntimeError("E_TUPLE_NLTK_RESOURCE_SET")
     return target
 
 
@@ -3086,6 +3227,743 @@ TUPLE_QUALIFICATION_MODULE_IDS = (
     "order_action",
 )
 
+TUPLE_HEALTH_ERROR_FAMILIES = (
+    "E_ACTIVITY_",
+    "E_CONSTRUCT_",
+    "E_EGOHOS_",
+    "E_FROZEN_",
+    "E_PRIVATE_",
+    "E_SENSOR_",
+    "E_TUPLE_",
+)
+
+
+def _declared_health_error_codes() -> frozenset[str]:
+    """Return only error identifiers literally committed in this runner.
+
+    Dependency messages and input-derived strings must never be able to mint a
+    new compact terminal error identifier.  The runner hash therefore also
+    commits the complete set of codes that the health record may release.
+    """
+
+    source = Path(__file__).resolve().read_text(encoding="utf-8")
+    return frozenset(re.findall(r"\bE_[A-Z0-9_]+\b", source))
+
+
+def _tuple_health_fixture_rows(
+    rows: list[dict[str, Any]], family: str
+) -> dict[int, dict[str, Any]]:
+    """Give sealed rows a deterministic public-only ordinal."""
+
+    if not isinstance(rows, list) or not rows or any(
+        not isinstance(row, dict) for row in rows
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_DEVELOPMENT_FIXTURES")
+    fixture_ordinals = [row.get("fixture_ordinal") for row in rows]
+    if all(type(value) is int and int(value) >= 0 for value in fixture_ordinals):
+        if len(fixture_ordinals) != len(set(fixture_ordinals)):
+            raise RuntimeError("E_TUPLE_HEALTH_FIXTURE_ORDINAL")
+        return {
+            int(row["fixture_ordinal"]): row
+            for row in rows
+        }
+    if family != "language_lexical" or any(
+        not isinstance(row.get("case_id"), str) or not row["case_id"]
+        for row in rows
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_FIXTURE_ORDINAL")
+    ordered = sorted(rows, key=lambda row: str(row["case_id"]))
+    if len({row["case_id"] for row in ordered}) != len(ordered):
+        raise RuntimeError("E_TUPLE_HEALTH_FIXTURE_ORDINAL")
+    return dict(enumerate(ordered))
+
+
+def _tuple_health_case_candidates(
+    module_id: str,
+    case_class: str,
+    indexed: dict[int, dict[str, Any]],
+) -> list[int]:
+    """Map the frozen health classes to public fixture semantics only."""
+
+    output: list[int] = []
+    for ordinal, row in indexed.items():
+        reason = row.get("expected_adapter_reason")
+        scenario = row.get("scenario")
+        truth = row.get("truth") if isinstance(row.get("truth"), dict) else {}
+        stratum = row.get("stratum")
+        condition = row.get("condition")
+        control_role = row.get("control_role")
+        matches = False
+        if module_id == "adapter_and_lexical":
+            parts = {
+                mention.get("part_of_speech")
+                for mention in row.get("expected_lexical_mentions", [])
+                if isinstance(mention, dict)
+            }
+            matches = {
+                "accepted_noun_and_adjective": (
+                    row.get("expected_adapter_status") == "ACCEPT"
+                    and {"noun", "adjective"} <= parts
+                ),
+                "language_abstention": reason in {
+                    "LANGUAGE_MISMATCH",
+                    "EMPTY_ASR",
+                },
+                "confidence_or_timestamp_abstention": reason in {
+                    "LOW_CONFIDENCE",
+                    "INVALID_TIMESTAMP",
+                },
+                "translation_or_truncation_abstention": reason in {
+                    "EMPTY_TRANSLATION",
+                    "SILENT_TRUNCATION",
+                },
+            }.get(case_class, False)
+        elif module_id == "referent":
+            matches = {
+                "visible": scenario == "during_only",
+                "absent": scenario == "speech_no_referent",
+                "dominant": scenario
+                == "persistent_dominant_with_small_distractor",
+                "ambiguous": scenario == "persistent_ambiguous",
+            }.get(case_class, False)
+        elif module_id == "recurrence":
+            matches = {
+                "positive_same_referent_1": stratum
+                == "same_instance_transformed",
+                "positive_same_referent_2": stratum
+                == "same_instance_near_duplicate",
+                "negative_different_referent_1": stratum
+                == "same_category_different_instance",
+                "negative_different_referent_2": stratum
+                == "different_category",
+            }.get(case_class, False)
+        elif module_id == "attribute":
+            matches = {
+                "positive_visible_contrast_1": scenario
+                == "persistent_ambiguous",
+                "positive_visible_contrast_2": scenario
+                == "persistent_dominant_with_small_distractor",
+                "negative_or_absent_contrast_1": scenario
+                == "speech_no_referent",
+                "negative_or_absent_contrast_2": scenario
+                == "no_speech_visible_object",
+            }.get(case_class, False)
+            if matches and case_class.startswith("positive_"):
+                matches = truth.get("attribute_contrast_expected", True) is True
+        elif module_id == "hand_contact":
+            matches = {
+                "visible_hand": stratum != "verified_no_hand",
+                "verified_no_hand": stratum == "verified_no_hand",
+                "contact": stratum == "contact",
+                "explicit_no_contact": stratum == "explicit_no_contact",
+            }.get(case_class, False)
+        elif module_id == "sensor":
+            matches = {
+                "static_or_baseline": condition == "static",
+                "motion": condition in {"low_translation", "high_translation"},
+                "blur_or_lighting": condition
+                in {"mild_blur", "strong_blur", "dark", "bright"},
+                "hard_cut_or_transition": condition == "hard_cut",
+            }.get(case_class, False)
+        elif module_id == "order_action":
+            matches = control_role in {None, case_class}
+        if matches:
+            output.append(ordinal)
+    return output
+
+
+def _tuple_health_projection(
+    manifest: dict[str, Any], cfg: dict[str, Any]
+) -> dict[str, Any]:
+    """Freeze one metric-free, development-only microfixture projection."""
+
+    health = _engineering_health_amendment(cfg)
+    micro = health["engineering_microfixture_suite"]
+    partitions = manifest.get("partitions")
+    if (
+        manifest.get("status") != "SEALED_BEFORE_PUBLIC_DEVELOPMENT_INFERENCE"
+        or not isinstance(partitions, dict)
+        or not isinstance(partitions.get("development"), dict)
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_DEVELOPMENT_FIXTURES")
+    development = partitions["development"]
+    family_by_module = {
+        "adapter_and_lexical": "language_lexical",
+        "referent": "referent_attribute",
+        "recurrence": "recurrence",
+        "attribute": "referent_attribute",
+        "hand_contact": "hand_contact",
+        "sensor": "sensor",
+        "order_action": "order_action",
+    }
+    cases = []
+    seed = int(micro["selection_seed"])
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        family = family_by_module[module_id]
+        indexed = _tuple_health_fixture_rows(development.get(family, []), family)
+        used: set[int] = set()
+        selected_by_class: dict[str, int] = {}
+        for case_class in micro["required_case_classes"][module_id]:
+            candidates = [
+                ordinal
+                for ordinal in _tuple_health_case_candidates(
+                    module_id, case_class, indexed
+                )
+                if ordinal not in used
+            ]
+            if (
+                module_id == "attribute"
+                and case_class == "positive_visible_contrast_2"
+                and "positive_visible_contrast_1" in selected_by_class
+            ):
+                first = indexed[
+                    selected_by_class["positive_visible_contrast_1"]
+                ].get("attribute_pair_id")
+                if isinstance(first, str):
+                    candidates = [
+                        ordinal
+                        for ordinal in candidates
+                        if indexed[ordinal].get("attribute_pair_id") == first
+                    ]
+            candidates.sort(
+                key=lambda ordinal: _fixture_order(
+                    seed, module_id, case_class, ordinal
+                )
+            )
+            if not candidates:
+                raise RuntimeError("E_TUPLE_HEALTH_CASE_CLASS_DEFICIT")
+            selected = candidates[0]
+            used.add(selected)
+            selected_by_class[case_class] = selected
+            cases.append(
+                {
+                    "module_id": module_id,
+                    "case_class": case_class,
+                    "source_family": family,
+                    "source_fixture_ordinal": selected,
+                }
+            )
+    if len(cases) != int(micro["total_case_count"]):
+        raise RuntimeError("E_TUPLE_HEALTH_CASE_CLASS_DEFICIT")
+    record = {
+        "schema_version": 1,
+        "status": "SEALED_ENGINEERING_HEALTH_MICROFIXTURES",
+        "role": "EXECUTION_HEALTH_ONLY",
+        "route_id": health["route_id"],
+        "source_partition": "development",
+        "selection_seed": seed,
+        "public_fixture_manifest_commitment_sha256": manifest.get(
+            "public_fixture_manifest_commitment_sha256"
+        ),
+        "engineering_health_amendment_commitment_sha256": health[
+            "amendment_commitment_sha256"
+        ],
+        "module_count": len(TUPLE_QUALIFICATION_MODULE_IDS),
+        "case_count": len(cases),
+        "holdout_input_count": 0,
+        "scientific_metric_count": 0,
+        "cases": cases,
+    }
+    record["microfixture_manifest_commitment_sha256"] = digest(record)
+    return record
+
+
+def _tuple_health_error(
+    module_id: str, error: BaseException, trace_root: Path
+) -> dict[str, Any]:
+    """Write private diagnostics and return only a stable compact code."""
+
+    if module_id not in TUPLE_QUALIFICATION_MODULE_IDS:
+        raise RuntimeError("E_TUPLE_HEALTH_MODULE_ID")
+    trace_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    os.chmod(trace_root, 0o700)
+    ordinal = 1
+    while (trace_root / f"{module_id}-{ordinal:02d}.trace").exists():
+        ordinal += 1
+    trace_path = trace_root / f"{module_id}-{ordinal:02d}.trace"
+    trace_text = "".join(
+        traceback.format_exception(type(error), error, error.__traceback__)
+    )
+    trace_path.write_text(trace_text, encoding="utf-8")
+    os.chmod(trace_path, 0o600)
+    message = str(error)
+    match = re.match(r"^(E_[A-Z0-9_]+)(?:\s|$)", message)
+    raw_code = match.group(1) if match else None
+    if (
+        raw_code is not None
+        and raw_code in _declared_health_error_codes()
+        and raw_code.startswith(TUPLE_HEALTH_ERROR_FAMILIES)
+    ):
+        suffix = raw_code[2:]
+    else:
+        suffix = "UNACCOUNTED_FAILURE"
+    return {
+        "module_id": module_id,
+        "status": "ERROR",
+        "error_code": f"E_TUPLE_HEALTH_{module_id.upper()}_{suffix}",
+        "trace_written": True,
+    }
+
+
+def _tuple_health_budget(
+    attempt: int, prior_attempts: list[dict[str, Any]], cfg: dict[str, Any]
+) -> dict[str, Any]:
+    """Validate the fixed A30 repair budget before another submission."""
+
+    resource = _engineering_health_amendment(cfg)["bounded_resource_policy"]
+    maximum_attempts = int(
+        resource["initial_plus_repair_resmoke_submission_count_max"]
+    )
+    if type(attempt) is not int or not 1 <= attempt <= maximum_attempts:
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+    if not isinstance(prior_attempts, list):
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+    observed_attempts = []
+    total_gpu_hours = 0.0
+    total_storage = 0.0
+    for record in prior_attempts:
+        if not isinstance(record, dict):
+            raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+        values = record.get("resource", record)
+        observed_attempts.append(record.get("attempt"))
+        if (
+            values.get("GPU_type") != resource["GPU_type"]
+            or values.get("GPU_count") != resource["GPU_count"]
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_GPU_TOPOLOGY")
+        wall = float(values.get("wall_minutes", math.inf))
+        gpu_hours = float(values.get("GPU_hours", math.inf))
+        storage = float(values.get("new_storage_GiB", math.inf))
+        cost = float(values.get("direct_monetary_cost_USD", math.inf))
+        if not all(math.isfinite(value) and value >= 0 for value in (
+            wall, gpu_hours, storage, cost
+        )):
+            raise RuntimeError("E_TUPLE_HEALTH_RESOURCE_NONFINITE")
+        if wall > float(resource["per_submission_wall_minutes_max"]):
+            raise RuntimeError("E_TUPLE_HEALTH_WALL_BUDGET")
+        if cost != float(resource["direct_monetary_cost_USD"]):
+            raise RuntimeError("E_TUPLE_HEALTH_COST_BUDGET")
+        total_gpu_hours += gpu_hours
+        total_storage += storage
+    if observed_attempts != list(range(1, attempt)):
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+    if total_gpu_hours > float(resource["aggregate_GPU_hours_max"]):
+        raise RuntimeError("E_TUPLE_HEALTH_GPU_HOUR_BUDGET")
+    if total_storage > float(resource["new_storage_GiB_max"]):
+        raise RuntimeError("E_TUPLE_HEALTH_STORAGE_BUDGET")
+    return {
+        "attempt": attempt,
+        "GPU_type": resource["GPU_type"],
+        "GPU_count": int(resource["GPU_count"]),
+        "CPU_count": int(resource["CPU_count"]),
+        "memory_GiB": int(resource["memory_GiB"]),
+        "per_submission_wall_minutes_max": int(
+            resource["per_submission_wall_minutes_max"]
+        ),
+        "remaining_GPU_hours": float(resource["aggregate_GPU_hours_max"])
+        - total_gpu_hours,
+        "remaining_storage_GiB": float(resource["new_storage_GiB_max"])
+        - total_storage,
+        "direct_monetary_cost_USD": float(
+            resource["direct_monetary_cost_USD"]
+        ),
+    }
+
+
+def _tuple_health_cumulative_resource(
+    prior_attempts: list[dict[str, Any]], current: dict[str, Any]
+) -> dict[str, Any]:
+    resources = [record.get("resource", record) for record in prior_attempts]
+    resources.append(current)
+    return {
+        "cumulative_submission_count": len(resources),
+        "cumulative_wall_minutes": sum(
+            float(value["wall_minutes"]) for value in resources
+        ),
+        "cumulative_GPU_hours": sum(
+            float(value["GPU_hours"]) for value in resources
+        ),
+        "cumulative_new_storage_GiB": sum(
+            float(value["new_storage_GiB"]) for value in resources
+        ),
+        "cumulative_direct_monetary_cost_USD": sum(
+            float(value["direct_monetary_cost_USD"]) for value in resources
+        ),
+    }
+
+
+def _tuple_health_wrapper_marker(
+    attempt_root: Path, attempt: int, cfg: dict[str, Any]
+) -> dict[str, Any]:
+    path = attempt_root / "wrapper-started.json"
+    if not path.is_file():
+        raise RuntimeError("E_TUPLE_HEALTH_WRAPPER_MARKER")
+    value = json.loads(path.read_text())
+    policy = _engineering_health_amendment(cfg)["bounded_resource_policy"]
+    if (
+        set(value)
+        != {
+            "schema_version",
+            "attempt",
+            "submission_started_epoch",
+            "GPU_type",
+            "GPU_count",
+            "CPU_count",
+            "memory_GiB",
+        }
+        or value.get("schema_version") != 1
+        or value.get("attempt") != attempt
+        or value.get("GPU_type") != policy["GPU_type"]
+        or value.get("GPU_count") != policy["GPU_count"]
+        or value.get("CPU_count") != policy["CPU_count"]
+        or value.get("memory_GiB") != policy["memory_GiB"]
+        or not isinstance(value.get("submission_started_epoch"), (int, float))
+        or not math.isfinite(float(value["submission_started_epoch"]))
+        or float(value["submission_started_epoch"]) <= 0
+        or float(value["submission_started_epoch"]) > time.time() + 5.0
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_WRAPPER_MARKER")
+    return value
+
+
+def _tuple_health_incomplete_attempt_resource(
+    root: Path, attempt: int, cfg: dict[str, Any]
+) -> dict[str, Any]:
+    attempt_root = root / "health" / f"attempt-{attempt:02d}"
+    marker = _tuple_health_wrapper_marker(attempt_root, attempt, cfg)
+    policy = _engineering_health_amendment(cfg)["bounded_resource_policy"]
+    return {
+        "GPU_type": policy["GPU_type"],
+        "GPU_count": int(policy["GPU_count"]),
+        "CPU_count": int(policy["CPU_count"]),
+        "memory_GiB": int(policy["memory_GiB"]),
+        "wall_minutes": float(policy["per_submission_wall_minutes_max"]),
+        "GPU_hours": float(policy["per_submission_wall_minutes_max"]) / 60.0,
+        "new_storage_GiB": _tuple_health_tree_bytes(attempt_root) / (1024**3),
+        "direct_monetary_cost_USD": float(
+            policy["direct_monetary_cost_USD"]
+        ),
+        "submission_started_epoch": float(marker["submission_started_epoch"]),
+    }
+
+
+def _tuple_health_metric_release(
+    module_results: list[dict[str, Any]], scientific_metrics: Any
+) -> Any:
+    """Release scientific aggregates only after seven unique health passes."""
+
+    if (
+        not isinstance(module_results, list)
+        or len(module_results) != len(TUPLE_QUALIFICATION_MODULE_IDS)
+        or {row.get("module_id") for row in module_results}
+        != set(TUPLE_QUALIFICATION_MODULE_IDS)
+        or any(row.get("status") != "PASS_ENGINEERING" for row in module_results)
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_METRICS_WITHHELD")
+    return scientific_metrics
+
+
+def _tuple_health_finite(value: Any) -> None:
+    if isinstance(value, float) and not math.isfinite(value):
+        raise RuntimeError("E_TUPLE_HEALTH_NONFINITE")
+    if isinstance(value, dict):
+        for item in value.values():
+            _tuple_health_finite(item)
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            _tuple_health_finite(item)
+
+
+def _validate_tuple_health_module_result(
+    row: Any, *, expected_case_count: int | None = None
+) -> None:
+    if not isinstance(row, dict):
+        raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    if row.get("status") == "PASS_ENGINEERING":
+        required = {
+            "module_id",
+            "status",
+            "case_count",
+            "failure_count",
+            "invalid_retained_record_count",
+            "silent_truncation_count",
+            "external_call_count",
+            "unaccounted_failure_count",
+            "finite_in_bounds",
+            "schema_valid",
+            "deterministic_outputs",
+            "round_trip_valid",
+            "valid_negative_state_distinct",
+            "abstention_state_distinct",
+            "missing_error_state_distinct",
+            "production_output_commitment_sha256",
+        }
+        if (
+            set(row) != required
+            or type(row.get("case_count")) is not int
+            or int(row["case_count"]) <= 0
+            or (
+                expected_case_count is not None
+                and row["case_count"] != expected_case_count
+            )
+            or not isinstance(
+                row.get("production_output_commitment_sha256"), str
+            )
+            or not re.fullmatch(
+                r"[0-9a-f]{64}", row["production_output_commitment_sha256"]
+            )
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+        if not all(
+            row[key] is True
+            for key in (
+                "finite_in_bounds",
+                "schema_valid",
+                "deterministic_outputs",
+                "round_trip_valid",
+            )
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_OUTPUT_INTEGRITY")
+        if not all(
+            row[key] is True
+            for key in (
+                "valid_negative_state_distinct",
+                "abstention_state_distinct",
+                "missing_error_state_distinct",
+            )
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_STATE_DISTINCTION")
+        if any(
+            row[key] != 0
+            for key in (
+                "failure_count",
+                "invalid_retained_record_count",
+                "silent_truncation_count",
+                "external_call_count",
+                "unaccounted_failure_count",
+            )
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_OUTPUT_INTEGRITY")
+    elif (
+        set(row)
+        != {
+            "module_id",
+            "status",
+            "error_code",
+            "trace_written",
+        }
+        or row.get("status") != "ERROR"
+        or row.get("trace_written") is not True
+        or not isinstance(row.get("error_code"), str)
+        or not re.fullmatch(r"E_TUPLE_HEALTH_[A-Z0-9_]+", row["error_code"])
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    _tuple_health_finite(row)
+    if json.loads(canonical(row)) != row:
+        raise RuntimeError("E_TUPLE_HEALTH_MODULE_ROUND_TRIP")
+
+
+def _validate_tuple_health_full(value: Any, cfg: dict[str, Any]) -> None:
+    """Validate an external full health record without scientific fields."""
+
+    _engineering_health_amendment(cfg)
+    if not isinstance(value, dict):
+        raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    if any(
+        "metrics" in str(key).casefold()
+        or key in {"scientific_metrics", "scores", "predictions", "labels"}
+        for key in value
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_SCIENTIFIC_METRIC")
+    _tuple_health_finite(value)
+    if value.get("holdout_input_count") != 0:
+        raise RuntimeError("E_TUPLE_HEALTH_HOLDOUT_PROHIBITED")
+    modules = value.get("module_results")
+    if (
+        set(value) != set(TUPLE_HEALTH_FULL_FIELDS)
+        or value.get("schema_version") != 1
+        or value.get("route_id") != "construct-aligned-engineering-health"
+        or value.get("module_count") != len(TUPLE_QUALIFICATION_MODULE_IDS)
+        or value.get("case_count") != 28
+        or value.get("scientific_metric_count") != 0
+        or value.get("config_commitment_sha256") != digest(cfg)
+        or not isinstance(modules, list)
+        or len(modules) != len(TUPLE_QUALIFICATION_MODULE_IDS)
+        or {row.get("module_id") for row in modules}
+        != set(TUPLE_QUALIFICATION_MODULE_IDS)
+        or value.get("network_disabled") is not True
+        or value.get("telemetry_disabled") is not True
+        or value.get("restricted_mount_present") is not False
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    pass_count = sum(row.get("status") == "PASS_ENGINEERING" for row in modules)
+    error_count = sum(row.get("status") == "ERROR" for row in modules)
+    if pass_count + error_count != len(modules):
+        raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    if value.get("completed_module_count") != pass_count or value.get(
+        "failed_module_count"
+    ) != error_count:
+        raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    if (
+        value.get("failure_count") != error_count
+        or value.get("invalid_retained_record_count") != 0
+        or value.get("silent_truncation_count") != 0
+        or value.get("external_call_count") != 0
+        or value.get("unaccounted_failure_count")
+        != sum(
+            str(row.get("error_code", "")).endswith("UNACCOUNTED_FAILURE")
+            for row in modules
+        )
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    if value.get("status") == "PASS_ENGINEERING_HEALTH":
+        if error_count or pass_count != len(modules):
+            raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    elif value.get("status") != "ENGINEERING_BLOCKER":
+        raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    for row in modules:
+        _validate_tuple_health_module_result(row, expected_case_count=4)
+    for key in (
+        "public_fixture_manifest_commitment_sha256",
+        "runner_commitment_sha256",
+        "config_commitment_sha256",
+        "dependency_config_commitment_sha256",
+        "microfixture_manifest_commitment_sha256",
+        "engineering_health_commitment_sha256",
+    ):
+        if not isinstance(value.get(key), str) or not re.fullmatch(
+            r"[0-9a-f]{64}", value[key]
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    resource = value.get("resource")
+    cumulative = value.get("cumulative_resource")
+    if (
+        not isinstance(resource, dict)
+        or set(resource)
+        != {
+            "GPU_type",
+            "GPU_count",
+            "CPU_count",
+            "memory_GiB",
+            "wall_minutes",
+            "GPU_hours",
+            "new_storage_GiB",
+            "direct_monetary_cost_USD",
+        }
+        or not isinstance(cumulative, dict)
+        or set(cumulative)
+        != {
+            "cumulative_submission_count",
+            "cumulative_wall_minutes",
+            "cumulative_GPU_hours",
+            "cumulative_new_storage_GiB",
+            "cumulative_direct_monetary_cost_USD",
+        }
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    _tuple_health_budget(
+        int(value.get("attempt", 0)),
+        [
+            {
+                "attempt": ordinal,
+                "GPU_type": "NVIDIA_A30_24GB",
+                "GPU_count": 1,
+                "wall_minutes": 0.0,
+                "GPU_hours": 0.0,
+                "new_storage_GiB": 0.0,
+                "direct_monetary_cost_USD": 0,
+            }
+            for ordinal in range(1, int(value.get("attempt", 0)))
+        ],
+        cfg,
+    )
+    policy = _engineering_health_amendment(cfg)["bounded_resource_policy"]
+    if (
+        resource.get("GPU_type") != policy["GPU_type"]
+        or resource.get("GPU_count") != policy["GPU_count"]
+        or resource.get("CPU_count") != policy["CPU_count"]
+        or resource.get("memory_GiB") != policy["memory_GiB"]
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_GPU_TOPOLOGY")
+    wall = float(resource.get("wall_minutes", math.inf))
+    gpu_hours = float(resource.get("GPU_hours", math.inf))
+    storage = float(resource.get("new_storage_GiB", math.inf))
+    cost = float(resource.get("direct_monetary_cost_USD", math.inf))
+    if any(value < 0 for value in (wall, gpu_hours, storage, cost)):
+        raise RuntimeError("E_TUPLE_HEALTH_RESOURCE_NONFINITE")
+    if wall > float(policy["per_submission_wall_minutes_max"]):
+        raise RuntimeError("E_TUPLE_HEALTH_WALL_BUDGET")
+    if gpu_hours > float(policy["aggregate_GPU_hours_max"]):
+        raise RuntimeError("E_TUPLE_HEALTH_GPU_HOUR_BUDGET")
+    if storage > float(policy["new_storage_GiB_max"]):
+        raise RuntimeError("E_TUPLE_HEALTH_STORAGE_BUDGET")
+    if cost != float(policy["direct_monetary_cost_USD"]):
+        raise RuntimeError("E_TUPLE_HEALTH_COST_BUDGET")
+    if (
+        cumulative.get("cumulative_submission_count") != value.get("attempt")
+        or float(cumulative.get("cumulative_wall_minutes", math.inf)) < wall
+        or float(cumulative.get("cumulative_GPU_hours", math.inf)) < gpu_hours
+        or float(cumulative.get("cumulative_new_storage_GiB", math.inf)) < storage
+        or float(
+            cumulative.get("cumulative_direct_monetary_cost_USD", math.inf)
+        )
+        != cost
+        or float(cumulative["cumulative_GPU_hours"])
+        > float(policy["aggregate_GPU_hours_max"])
+        or float(cumulative["cumulative_new_storage_GiB"])
+        > float(policy["new_storage_GiB_max"])
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_CUMULATIVE_RESOURCE")
+
+
+def _tuple_health_compact(full: dict[str, Any]) -> dict[str, Any]:
+    keys = (
+        "status",
+        "attempt",
+        "module_count",
+        "completed_module_count",
+        "failed_module_count",
+        "case_count",
+        "holdout_input_count",
+        "scientific_metric_count",
+        "failure_count",
+        "invalid_retained_record_count",
+        "silent_truncation_count",
+        "external_call_count",
+        "unaccounted_failure_count",
+        "public_fixture_manifest_commitment_sha256",
+        "runner_commitment_sha256",
+        "config_commitment_sha256",
+        "dependency_config_commitment_sha256",
+        "microfixture_manifest_commitment_sha256",
+        "engineering_health_commitment_sha256",
+    )
+    compact = {key: full[key] for key in keys if key in full}
+    compact.update(full["resource"])
+    compact.update(full["cumulative_resource"])
+    _validate_tuple_health_compact(compact)
+    return compact
+
+
+def _validate_tuple_health_compact(value: Any) -> None:
+    if (
+        not isinstance(value, dict)
+        or set(value) != set(TUPLE_HEALTH_FIELDS)
+        or value.get("status")
+        not in {"PASS_ENGINEERING_HEALTH", "ENGINEERING_BLOCKER"}
+        or value.get("scientific_metric_count") != 0
+        or value.get("holdout_input_count") != 0
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_COMPACT_SCHEMA")
+    for key, item in value.items():
+        if isinstance(item, (dict, list, tuple)):
+            raise RuntimeError("E_TUPLE_HEALTH_COMPACT_SCHEMA")
+        if key.endswith("_sha256") and (
+            not isinstance(item, str) or not re.fullmatch(r"[0-9a-f]{64}", item)
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_COMPACT_SCHEMA")
+    _tuple_health_finite(value)
+
 
 def _tuple_qualification_execution(cfg: dict[str, Any]) -> dict[str, Any]:
     """Return the pre-outcome execution clarification for tuple qualification."""
@@ -3807,6 +4685,160 @@ def _tuple_lexical_truth_checks(
     return output
 
 
+def _tuple_health_normalize_output(value: Any) -> Any:
+    """Normalize an in-memory public output for private round-trip hashing."""
+
+    if value is None or isinstance(value, (str, bool, int)):
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise RuntimeError("E_TUPLE_HEALTH_NONFINITE")
+        return value
+    if isinstance(value, dict):
+        if any(not isinstance(key, str) for key in value):
+            raise RuntimeError("E_TUPLE_HEALTH_MODULE_ROUND_TRIP")
+        return {
+            key: _tuple_health_normalize_output(item)
+            for key, item in sorted(value.items())
+        }
+    if isinstance(value, (list, tuple)):
+        return [_tuple_health_normalize_output(item) for item in value]
+    item = getattr(value, "item", None)
+    if callable(item):
+        return _tuple_health_normalize_output(item())
+    raise RuntimeError("E_TUPLE_HEALTH_MODULE_ROUND_TRIP")
+
+
+def _tuple_health_pass_result(
+    module_id: str, case_count: int, production_output: Any
+) -> dict[str, Any]:
+    if module_id not in TUPLE_QUALIFICATION_MODULE_IDS or case_count <= 0:
+        raise RuntimeError("E_TUPLE_HEALTH_MODULE_RESULT")
+    normalized = _tuple_health_normalize_output(production_output)
+    serialized = canonical(normalized)
+    if json.loads(serialized) != normalized:
+        raise RuntimeError("E_TUPLE_HEALTH_MODULE_ROUND_TRIP")
+    value = {
+        "module_id": module_id,
+        "status": "PASS_ENGINEERING",
+        "case_count": int(case_count),
+        "failure_count": 0,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+        "unaccounted_failure_count": 0,
+        "finite_in_bounds": True,
+        "schema_valid": True,
+        "deterministic_outputs": True,
+        "round_trip_valid": True,
+        "valid_negative_state_distinct": True,
+        "abstention_state_distinct": True,
+        "missing_error_state_distinct": True,
+        "production_output_commitment_sha256": digest(normalized),
+    }
+    if json.loads(canonical(value)) != value:
+        raise RuntimeError("E_TUPLE_HEALTH_MODULE_ROUND_TRIP")
+    return value
+
+
+def _tuple_language_lexical_health(
+    context: dict[str, Any],
+    validate_asr_prediction: Any,
+    tagger: Any,
+    lemmatize: Any,
+    zipf_frequency: Any,
+    mapping: dict[str, list[str]],
+    frequency_bands: dict[str, list[float]],
+) -> dict[str, Any]:
+    """Exercise the exact adapter/lexical path without reading truth metrics."""
+
+    amendment = _tuple_amendment(context["cfg"])
+    states: set[str] = set()
+    grounding_states: set[str] = set()
+    production_output = []
+    for row in context["rows"]["language_lexical"]:
+        adjudication = validate_asr_prediction(
+            row["prediction"], float(row["audio_duration"])
+        )
+        status = str(adjudication.get("status"))
+        reason = adjudication.get("reason")
+        if status not in {"ACCEPT", "ABSTAIN"} or (
+            status == "ABSTAIN" and not isinstance(reason, str)
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_ADAPTER_STATE")
+        states.add(status)
+        output = {"adapter_status": status, "adapter_reason": reason}
+        if status != "ACCEPT":
+            grounding_states.add("ABSTAIN")
+            output["grounding_status"] = "ABSTAIN"
+            production_output.append(output)
+            continue
+        if row.get("translation_status") != "ACCEPT":
+            grounding_states.add("ABSTAIN")
+            output["grounding_status"] = "ABSTAIN"
+            production_output.append(output)
+            continue
+        window = _tuple_segment_window(
+            row["segment"], float(row["audio_duration"]), amendment
+        )
+        if window.get("status") != "ACCEPT":
+            grounding_states.add("ABSTAIN")
+            output["grounding_status"] = "ABSTAIN"
+            production_output.append(output)
+            continue
+        mentions = _lexical_mentions(
+            window["text_en"],
+            tagger,
+            lemmatize,
+            zipf_frequency,
+            frequency_bands,
+        )
+        for mention in mentions:
+            if (
+                mention.get("part_of_speech") not in {"noun", "adjective"}
+                or not isinstance(mention.get("lemma"), str)
+                or not isinstance(mention.get("frequency_band"), str)
+            ):
+                raise RuntimeError("E_TUPLE_HEALTH_LEXICAL_SCHEMA")
+        noun_mappings = [
+            _map_public_ontology(mention["lemma"], mapping)
+            for mention in mentions
+            if mention["part_of_speech"] == "noun"
+        ]
+        grounding_status = (
+            "ACCEPT"
+            if any(value.get("status") == "ACCEPT" for value in noun_mappings)
+            else "ABSTAIN"
+        )
+        grounding_states.add(grounding_status)
+        output.update(
+            {
+                "grounding_status": grounding_status,
+                "mentions": [
+                    {
+                        key: mention.get(key)
+                        for key in ("lemma", "part_of_speech", "frequency_band")
+                    }
+                    for mention in mentions
+                ],
+                "noun_mapping_statuses": [
+                    value.get("status") for value in noun_mappings
+                ],
+                "adjective_noun_span_count": len(
+                    _adjacent_adjective_noun_spans(mentions)
+                ),
+            }
+        )
+        production_output.append(output)
+    if states != {"ACCEPT", "ABSTAIN"} or not grounding_states:
+        raise RuntimeError("E_TUPLE_HEALTH_ADAPTER_STATE_DISTINCTION")
+    return _tuple_health_pass_result(
+        "adapter_and_lexical",
+        len(context["rows"]["language_lexical"]),
+        production_output,
+    )
+
+
 def _tuple_language_lexical_module(context: dict[str, Any]) -> dict[str, Any]:
     cfg = context["cfg"]
     rows = context["rows"]["language_lexical"]
@@ -3829,6 +4861,16 @@ def _tuple_language_lexical_module(context: dict[str, Any]) -> dict[str, Any]:
     frequency_bands = _tuple_axis(cfg, "noun_adjective_exposure")[
         "frequency_bands"
     ]
+    if context.get("engineering_health") is True:
+        return _tuple_language_lexical_health(
+            context,
+            validate_asr_prediction,
+            nltk.pos_tag,
+            lemmatizer.lemmatize,
+            zipf_frequency,
+            mapping,
+            frequency_bands,
+        )
     case_correct = 0
     silently_accepted_truncations = 0
     silently_accepted_invalid_timestamps = 0
@@ -4643,6 +5685,7 @@ def _tuple_grounding_frame_candidates(
     minimum_box_score: float,
     minimum_text_score: float,
     nms_iou: float,
+    strict_engineering: bool = False,
 ) -> list[dict[str, Any]]:
     import numpy as np
     from PIL import Image
@@ -4718,7 +5761,9 @@ def _tuple_grounding_frame_candidates(
             )
             mask = mask_values.astype(bool) if valid else None
             valid = bool(valid and mask is not None and mask.any())
-        except Exception:
+        except Exception as error:
+            if strict_engineering:
+                raise RuntimeError("E_TUPLE_GROUNDING_SAM_INFERENCE") from error
             mask = None
             valid = False
         if not valid:
@@ -4757,9 +5802,14 @@ def _tuple_grounding_sampled_tracks(
     cfg = context["cfg"]
     execution = _tuple_qualification_execution(cfg)
     minimum_valid = int(execution["phase_aggregation"]["minimum_valid_samples"])
-    grids = _tuple_frozen_threshold_grids(cfg)
-    minimum_box = min(grids["Grounding_DINO_box_score"])
-    minimum_text = min(grids["Grounding_DINO_text_score"])
+    if context.get("engineering_health") is True:
+        execution_thresholds = _tuple_health_inference_thresholds(cfg)
+        minimum_box = execution_thresholds["Grounding_DINO_box_score"]
+        minimum_text = execution_thresholds["Grounding_DINO_text_score"]
+    else:
+        grids = _tuple_frozen_threshold_grids(cfg)
+        minimum_box = min(grids["Grounding_DINO_box_score"])
+        minimum_text = min(grids["Grounding_DINO_text_score"])
     nms_iou = float(execution["grounding_geometry"]["same_category_NMS_IoU"])
     observations = _tuple_referent_adapter_observations(context)
     rows = context["rows"]["referent_attribute"]
@@ -4819,6 +5869,8 @@ def _tuple_grounding_sampled_tracks(
                     media, [value for _phase, value in sample_rows]
                 )
             except RuntimeError as error:
+                if context.get("engineering_health") is True:
+                    raise RuntimeError("E_TUPLE_REFERENT_DECODE") from error
                 track["decode_error_code"] = str(error).split()[0]
                 tracks.append(track)
                 continue
@@ -4838,6 +5890,8 @@ def _tuple_grounding_sampled_tracks(
                         minimum_box_score=minimum_box,
                         minimum_text_score=minimum_text,
                         nms_iou=nms_iou,
+                        strict_engineering=context.get("engineering_health")
+                        is True,
                     )
                     track["samples"].append(
                         {
@@ -4849,6 +5903,10 @@ def _tuple_grounding_sampled_tracks(
                         }
                     )
                 except RuntimeError as error:
+                    if context.get("engineering_health") is True:
+                        raise RuntimeError(
+                            "E_TUPLE_REFERENT_MODEL_INFERENCE"
+                        ) from error
                     track["samples"].append(
                         {
                             "sample_time": sample_time,
@@ -5233,6 +6291,99 @@ def _tuple_referent_module(context: dict[str, Any]) -> dict[str, Any]:
     execution = _tuple_qualification_execution(cfg)
     minimum_valid = int(execution["phase_aggregation"]["minimum_valid_samples"])
     tracks = _tuple_grounding_sampled_tracks(context)
+    if context.get("engineering_health") is True:
+        accepted = 0
+        for track in tracks:
+            observation = track.get("adapter_observation", {})
+            if observation.get("status") == "ABSTAIN":
+                if track.get("samples"):
+                    raise RuntimeError("E_TUPLE_HEALTH_REFERENT_ABSTAIN_STATE")
+                continue
+            if observation.get("status") != "ACCEPT":
+                raise RuntimeError("E_TUPLE_HEALTH_REFERENT_ADAPTER_STATE")
+            accepted += 1
+            if track.get("category_mismatch") or "decode_error_code" in track:
+                raise RuntimeError("E_TUPLE_HEALTH_REFERENT_CATEGORY_OR_DECODE")
+            samples = track.get("samples")
+            if not isinstance(samples, list) or len(samples) < minimum_valid:
+                raise RuntimeError("E_TUPLE_HEALTH_REFERENT_SAMPLE_COUNT")
+            prior_time = -math.inf
+            for sample in samples:
+                sample_time = float(sample.get("sample_time", math.nan))
+                if (
+                    not math.isfinite(sample_time)
+                    or sample_time <= prior_time
+                    or sample.get("phase") not in {"before", "during", "after"}
+                    or sample.get("inference_succeeded") is not True
+                    or not isinstance(sample.get("candidates"), list)
+                ):
+                    raise RuntimeError("E_TUPLE_HEALTH_REFERENT_SAMPLE_SCHEMA")
+                prior_time = sample_time
+                image = sample.get("image")
+                shape = getattr(image, "shape", ())
+                if len(shape) != 3 or shape[-1] != 3:
+                    raise RuntimeError("E_TUPLE_HEALTH_REFERENT_IMAGE_SCHEMA")
+                for candidate in sample["candidates"]:
+                    if (
+                        candidate.get("valid") is not True
+                        or not _valid_normalized_box(candidate.get("box"))
+                        or not all(
+                            isinstance(candidate.get(key), (int, float))
+                            and math.isfinite(float(candidate[key]))
+                            for key in (
+                                "box_score",
+                                "text_score",
+                                "mask_fraction",
+                                "center_distance",
+                            )
+                        )
+                        or not 0.0 <= float(candidate["box_score"]) <= 1.0
+                        or not 0.0 <= float(candidate["text_score"]) <= 1.0
+                        or not 0.0 < float(candidate["mask_fraction"]) <= 1.0
+                    ):
+                        raise RuntimeError(
+                            "E_TUPLE_HEALTH_REFERENT_CANDIDATE_SCHEMA"
+                        )
+                    mask = candidate.get("mask")
+                    if getattr(mask, "shape", None) != tuple(shape[:2]):
+                        raise RuntimeError(
+                            "E_TUPLE_HEALTH_REFERENT_MASK_GEOMETRY"
+                        )
+        if accepted < 1:
+            raise RuntimeError("E_TUPLE_HEALTH_REFERENT_MODEL_NOT_EXERCISED")
+        production_output = [
+            {
+                "adapter_status": track.get("adapter_observation", {}).get(
+                    "status"
+                ),
+                "category_mismatch": bool(track.get("category_mismatch")),
+                "decode_error": "decode_error_code" in track,
+                "samples": [
+                    {
+                        "phase": sample["phase"],
+                        "sample_time": float(sample["sample_time"]),
+                        "image_shape": list(sample["image"].shape),
+                        "candidates": [
+                            {
+                                "valid": candidate["valid"],
+                                "box": candidate["box"],
+                                "box_score": candidate["box_score"],
+                                "text_score": candidate["text_score"],
+                                "mask_fraction": candidate["mask_fraction"],
+                                "center_distance": candidate["center_distance"],
+                                "mask_shape": list(candidate["mask"].shape),
+                            }
+                            for candidate in sample["candidates"]
+                        ],
+                    }
+                    for sample in track.get("samples", [])
+                ],
+            }
+            for track in tracks
+        ]
+        return _tuple_health_pass_result(
+            "referent", len(tracks), production_output
+        )
     grids = _tuple_frozen_threshold_grids(cfg)
     if context["partition"] == "development":
         candidates = []
@@ -5748,12 +6899,14 @@ def _tuple_egohos_predict_rows(
     )
 
 
-def _tuple_egohos_threshold_metrics(
+def _tuple_egohos_observations(
     rows: list[dict[str, Any]],
     predictions: list[dict[str, Any]],
     fixture_root: Path,
     threshold: float,
-) -> dict[str, Any]:
+    *,
+    strict_engineering: bool = False,
+) -> tuple[list[dict[str, Any]], int]:
     if len(rows) != len(predictions) or not rows:
         raise RuntimeError("E_TUPLE_EGOHOS_PREDICTION_COUNT")
     observations = []
@@ -5778,6 +6931,8 @@ def _tuple_egohos_threshold_metrics(
                 target_hand_mask=target_mask,
             )
         except RuntimeError as error:
+            if strict_engineering:
+                raise RuntimeError("E_TUPLE_EGOHOS_OBSERVATION_SCHEMA") from error
             code = str(error).split(maxsplit=1)[0]
             observation = {
                 "status": "ABSTAIN",
@@ -5794,6 +6949,18 @@ def _tuple_egohos_threshold_metrics(
                 **observation,
             }
         )
+    return observations, invalid
+
+
+def _tuple_egohos_threshold_metrics(
+    rows: list[dict[str, Any]],
+    predictions: list[dict[str, Any]],
+    fixture_root: Path,
+    threshold: float,
+) -> dict[str, Any]:
+    observations, invalid = _tuple_egohos_observations(
+        rows, predictions, fixture_root, threshold
+    )
     expected_presence = [row["stratum"] != "verified_no_hand" for row in rows]
     predicted_presence = [row["hand_visible"] for row in observations]
     presence = _binary_classification_metrics(
@@ -5882,6 +7049,38 @@ def _tuple_hand_contact_module(context: dict[str, Any]) -> dict[str, Any]:
     ]["EgoHOS_min_mask_fraction_grid"]
     if grid != [0.0025, 0.005, 0.01, 0.02]:
         raise RuntimeError("E_TUPLE_EGOHOS_THRESHOLD_GRID")
+    if context.get("engineering_health") is True:
+        health_threshold = _tuple_health_inference_thresholds(cfg)[
+            "EgoHOS_min_mask_fraction"
+        ]
+        observations, invalid = _tuple_egohos_observations(
+            rows,
+            predictions,
+            fixture_root,
+            health_threshold,
+            strict_engineering=True,
+        )
+        if invalid or len(observations) != len(rows):
+            raise RuntimeError("E_TUPLE_HEALTH_HAND_CONTACT_TRUNCATION")
+        for observation in observations:
+            if (
+                observation.get("status") not in {"MEASURED", "ABSTAIN"}
+                or not isinstance(observation.get("hand_visible"), (bool, type(None)))
+                or not isinstance(observation.get("contact"), (bool, type(None)))
+                or any(
+                    not isinstance(observation.get(key), (int, float))
+                    or not math.isfinite(float(observation[key]))
+                    or not 0.0 <= float(observation[key]) <= 1.0
+                    for key in (
+                        "left_hand_mask_fraction",
+                        "right_hand_mask_fraction",
+                    )
+                )
+            ):
+                raise RuntimeError("E_TUPLE_HEALTH_HAND_CONTACT_OUTPUT_SCHEMA")
+        return _tuple_health_pass_result(
+            "hand_contact", len(observations), observations
+        )
     if context["partition"] == "development":
         candidates = []
         for threshold in grid:
@@ -5996,8 +7195,9 @@ def _tuple_sensor_module(context: dict[str, Any]) -> dict[str, Any]:
         predicted_bins = {}
         for name in ("brightness", "blur_edge_strength", "motion_mean_absolute_luma"):
             predicted_bins[name] = bucket(float(values[name]), bins[name])
-            exact_bins += predicted_bins[name] == row["truth"][name]["bin"]
-            bin_total += 1
+            if context.get("engineering_health") is not True:
+                exact_bins += predicted_bins[name] == row["truth"][name]["bin"]
+                bin_total += 1
         valid += 1
         observations.append(
             {
@@ -6007,6 +7207,35 @@ def _tuple_sensor_module(context: dict[str, Any]) -> dict[str, Any]:
                 "predicted_bins": predicted_bins,
             }
         )
+    if context.get("engineering_health") is True:
+        required_conditions = {
+            "static",
+            "low_translation",
+            "high_translation",
+            "mild_blur",
+            "strong_blur",
+            "dark",
+            "bright",
+            "hard_cut",
+        }
+        if len(observations) != len(rows) or any(
+            row.get("condition") not in required_conditions
+            or set(row.get("predicted_bins", {}))
+            != {
+                "brightness",
+                "blur_edge_strength",
+                "motion_mean_absolute_luma",
+            }
+            or any(
+                not isinstance(value, (int, float))
+                or not math.isfinite(float(value))
+                or float(value) < 0.0
+                for value in row.get("values", {}).values()
+            )
+            for row in observations
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_SENSOR_OUTPUT_SCHEMA")
+        return _tuple_health_pass_result("sensor", len(observations), observations)
     by_base = defaultdict(dict)
     for row in observations:
         by_base[row["base_ordinal"]][row["condition"]] = row["values"]
@@ -6239,6 +7468,45 @@ def _select_tuple_action_diagnostic(
     return fallback, False
 
 
+def _tuple_order_action_egohod_wiring(
+    cfg: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Resolve the exact action diagnostic without reopening activity selection."""
+
+    _engineering_health_amendment(cfg)
+    active = _construct_aligned_ltx_resume_amendment(cfg)
+    tuple_amendment = _tuple_amendment(cfg)
+    if (
+        active["combined_gate"].get("order_action")
+        != "SUPPORTING_DIAGNOSTIC_NONBLOCKING_ON_THE_EXISTING_SUBJECT_VIDEO_DISJOINT_44_DEVELOPMENT_AND_44_HOLDOUT_FIXTURES"
+        or "already pinned EgoHOD EgoVideo-L checkpoint"
+        not in tuple_amendment["genuinely_order_dependent_action_control"].get(
+            "model", ""
+        )
+    ):
+        raise RuntimeError("E_TUPLE_ACTION_EGOHOD_IDENTITY")
+    try:
+        historical = cfg["calibration_C"]["extractor"][
+            "activity_checkpoint_selection_amendment"
+        ]
+        candidates = historical["bounded_candidates"]
+        runtime = historical["runtime_environment"]["egohod"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_ACTION_EGOHOD_IDENTITY") from error
+    matches = [
+        candidate
+        for candidate in candidates
+        if candidate.get("candidate_id") == "egohod_egovideo_l_zero_shot"
+    ]
+    if (
+        len(matches) != 1
+        or digest(matches[0]) != TUPLE_ORDER_ACTION_EGOHOD_CANDIDATE_SHA256
+        or digest(runtime) != TUPLE_ORDER_ACTION_EGOHOD_RUNTIME_SHA256
+    ):
+        raise RuntimeError("E_TUPLE_ACTION_EGOHOD_IDENTITY")
+    return matches[0], runtime
+
+
 def _tuple_order_action_module(context: dict[str, Any]) -> dict[str, Any]:
     import numpy as np
 
@@ -6254,15 +7522,14 @@ def _tuple_order_action_module(context: dict[str, Any]) -> dict[str, Any]:
         for pair in protocol["class_code_pairs"]
         for first, second in (pair["pair"], tuple(reversed(pair["pair"])))
     }
-    activity = _activity_config(cfg)
-    candidate = _activity_candidate(activity, "egohod_egovideo_l_zero_shot")
+    candidate, runtime = _tuple_order_action_egohod_wiring(cfg)
     score, frame_count, _ = _load_egohod_activity_adapter(
         context["public_root"],
         candidate,
         cfg,
         labels,
         device,
-        runtime_override=activity["runtime_environment"]["egohod"],
+        runtime_override=runtime,
         prompt_groups_override=protocol["prompt_ensembles"],
     )
     raw = []
@@ -6307,6 +7574,29 @@ def _tuple_order_action_module(context: dict[str, Any]) -> dict[str, Any]:
     finally:
         del score
         _release_cuda()
+    if context.get("engineering_health") is True:
+        if len(raw) != len(rows):
+            raise RuntimeError("E_TUPLE_HEALTH_ORDER_ACTION_TRUNCATION")
+        for value in raw:
+            for key in (
+                "ordered_scores",
+                "reversed_scores",
+                "repeated_center_scores",
+            ):
+                scores = value.get(key)
+                if (
+                    not isinstance(scores, list)
+                    or len(scores) != len(labels)
+                    or not all(
+                        isinstance(score_value, (int, float))
+                        and math.isfinite(float(score_value))
+                        for score_value in scores
+                    )
+                ):
+                    raise RuntimeError(
+                        "E_TUPLE_HEALTH_ORDER_ACTION_OUTPUT_SCHEMA"
+                    )
+        return _tuple_health_pass_result("order_action", len(raw), raw)
     gate = amendment["gate"]
     if context["partition"] == "development":
         candidates = []
@@ -6502,14 +7792,34 @@ def _tuple_recurrence_module(context: dict[str, Any]) -> dict[str, Any]:
     finally:
         del model
         _release_cuda()
+    if context.get("engineering_health") is True:
+        if len(raw) != len(rows):
+            raise RuntimeError("E_TUPLE_HEALTH_RECURRENCE_TRUNCATION")
+        for value in raw:
+            if (
+                not isinstance(value.get("same_referent"), bool)
+                or not isinstance(value.get("near_duplicate"), bool)
+                or not isinstance(value.get("cosine_similarity"), (int, float))
+                or not math.isfinite(float(value["cosine_similarity"]))
+                or not -1.0 <= float(value["cosine_similarity"]) <= 1.0
+                or type(value.get("phash_hamming_distance")) is not int
+                or not 0 <= int(value["phash_hamming_distance"]) <= 63
+            ):
+                raise RuntimeError("E_TUPLE_HEALTH_RECURRENCE_OUTPUT_SCHEMA")
+        return _tuple_health_pass_result("recurrence", len(raw), raw)
     grids = _tuple_amendment(cfg)["public_qualification"][
         "threshold_development"
     ]["DINOv2_recurrence_cosine_grid"]
     if context["partition"] == "development":
-        candidates = []
-        for threshold in grids:
-            metrics = _tuple_recurrence_metrics(raw, float(threshold), phash_max)
-            eligible = (
+        threshold = float(
+            _engineering_health_amendment(cfg)["scientific_threshold_state"]
+            ["DINOv2_recurrence_cosine"]
+        )
+        if threshold != 0.85 or threshold not in [float(value) for value in grids]:
+            raise RuntimeError("E_TUPLE_RECURRENCE_FIXED_THRESHOLD")
+        metrics = _tuple_recurrence_metrics(raw, threshold, phash_max)
+        selected = {
+            "eligible": (
                 metrics["same_object_cross_episode_balanced_accuracy"]
                 >= float(gate["same_object_cross_episode_balanced_accuracy_min"])
                 and metrics["recurrence_event_f1"]
@@ -6520,30 +7830,7 @@ def _tuple_recurrence_module(context: dict[str, Any]) -> dict[str, Any]:
                 <= float(gate["negative_pair_false_positive_rate_max"])
                 and metrics["coverage"] >= float(gate["coverage_min"])
             )
-            candidates.append(
-                {
-                    "DINOv2_recurrence_cosine": float(threshold),
-                    **metrics,
-                    "eligible": eligible,
-                }
-            )
-        selected = _select_frozen_grid_result(
-            candidates,
-            primary_metric="same_object_cross_episode_balanced_accuracy",
-            threshold_fields=("DINOv2_recurrence_cosine",),
-        )
-        metrics = selected or max(
-            candidates,
-            key=lambda row: (
-                row["same_object_cross_episode_balanced_accuracy"],
-                row["DINOv2_recurrence_cosine"],
-            ),
-        )
-        threshold = (
-            float(selected["DINOv2_recurrence_cosine"])
-            if selected is not None
-            else None
-        )
+        }
     else:
         threshold = float(context["thresholds"]["DINOv2_recurrence_cosine"])
         metrics = _tuple_recurrence_metrics(raw, threshold, phash_max)
@@ -7063,6 +8350,18 @@ def _tuple_attribute_metrics(
 def _tuple_attribute_module(context: dict[str, Any]) -> dict[str, Any]:
     cfg = context["cfg"]
     gate = _tuple_axis(cfg, "adjective_attribute_contrast")["public_gate"]
+    if context.get("engineering_health") is True:
+        thresholds = _tuple_health_inference_thresholds(cfg)
+        context.setdefault("_selected_thresholds", {}).update(
+            {
+                "Grounding_DINO_box_score": thresholds[
+                    "Grounding_DINO_box_score"
+                ],
+                "Grounding_DINO_text_score": thresholds[
+                    "Grounding_DINO_text_score"
+                ],
+            }
+        )
     prompts = _tuple_attribute_prompt_groups(cfg)
     model, transform, text, slices = _load_vision(
         context["public_root"],
@@ -7075,6 +8374,46 @@ def _tuple_attribute_module(context: dict[str, Any]) -> dict[str, Any]:
     finally:
         del model
         _release_cuda()
+    if context.get("engineering_health") is True:
+        if len(raw) != len(context["rows"]["referent_attribute"]):
+            raise RuntimeError("E_TUPLE_HEALTH_ATTRIBUTE_TRUNCATION")
+        pe_exercised = 0
+        for value in raw:
+            if (
+                not isinstance(value.get("language_span_accepted"), bool)
+                or not isinstance(value.get("mask_measurement_valid"), bool)
+                or not isinstance(value.get("invalid_predicted_mask"), bool)
+                or value.get("invalid_predicted_mask") is True
+                or type(value.get("selected_sample_count")) is not int
+                or int(value["selected_sample_count"]) < 0
+            ):
+                raise RuntimeError("E_TUPLE_HEALTH_ATTRIBUTE_OUTPUT_SCHEMA")
+            if value["mask_measurement_valid"]:
+                pe_exercised += 1
+                if (
+                    not isinstance(value.get("pe_label"), str)
+                    or not isinstance(value.get("pe_margin"), (int, float))
+                    or not math.isfinite(float(value["pe_margin"]))
+                ):
+                    raise RuntimeError("E_TUPLE_HEALTH_ATTRIBUTE_PE_OUTPUT")
+        if pe_exercised < 1:
+            raise RuntimeError("E_TUPLE_HEALTH_ATTRIBUTE_PE_NOT_EXERCISED")
+        production_output = [
+            {
+                key: value
+                for key, value in row.items()
+                if key
+                not in {
+                    "episode_id",
+                    "source_image_id",
+                    "source_annotation_id",
+                }
+            }
+            for row in raw
+        ]
+        return _tuple_health_pass_result(
+            "attribute", len(raw), production_output
+        )
     language_metrics = context.get("_tuple_attribute_language_metrics")
     span_f1 = (
         float(language_metrics["adjective_noun_span_f1"])
@@ -7203,9 +8542,11 @@ def _require_external_or_ignored_output(path: Path) -> None:
         # when `check-ignore` is unavailable.
         _refuse_git_output(resolved)
         return
+    probe = resolved
+    while not probe.exists() and probe != probe.parent:
+        probe = probe.parent
     completed = subprocess.run(
-        [git_executable, "rev-parse", "--show-toplevel"],
-        cwd=Path.cwd(),
+        [git_executable, "-C", str(probe), "rev-parse", "--show-toplevel"],
         text=True,
         capture_output=True,
     )
@@ -7217,7 +8558,15 @@ def _require_external_or_ignored_output(path: Path) -> None:
     except ValueError:
         return
     ignored = subprocess.run(
-        [git_executable, "check-ignore", "--quiet", "--", str(resolved)],
+        [
+            git_executable,
+            "-C",
+            str(repository),
+            "check-ignore",
+            "--quiet",
+            "--",
+            str(resolved),
+        ],
         cwd=repository,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
@@ -7296,6 +8645,28 @@ def _tuple_module_runners() -> dict[str, Any]:
             value if callable(value) else _missing_tuple_module_runner(module_id)
         )
     return output
+
+
+def _tuple_health_inference_thresholds(cfg: dict[str, Any]) -> dict[str, float]:
+    """Validate fixed execution minima without opening scientific selection."""
+
+    observed = _tuple_amendment(cfg)["public_qualification"][
+        "threshold_development"
+    ]
+    expected = {
+        "Grounding_DINO_box_score_grid": [0.2, 0.25, 0.3, 0.35, 0.4],
+        "Grounding_DINO_text_score_grid": [0.15, 0.2, 0.25, 0.3],
+        "EgoHOS_min_mask_fraction_grid": [0.0025, 0.005, 0.01, 0.02],
+        "PE_Core_attribute_margin_grid": [0.0, 0.01, 0.02, 0.05, 0.1],
+        "DINOv2_recurrence_cosine_grid": [0.8, 0.85, 0.9, 0.95],
+    }
+    if any(observed.get(key) != values for key, values in expected.items()):
+        raise RuntimeError("E_TUPLE_HEALTH_EXECUTION_THRESHOLD_COMMITMENT")
+    return {
+        "Grounding_DINO_box_score": 0.2,
+        "Grounding_DINO_text_score": 0.15,
+        "EgoHOS_min_mask_fraction": 0.0025,
+    }
 
 
 def _tuple_frozen_threshold_grids(cfg: dict[str, Any]) -> dict[str, tuple[float, ...]]:
@@ -7471,7 +8842,22 @@ def _apply_tuple_integrity_gate(
 
 
 def _tuple_qualification_root(public: Path) -> Path:
-    return _tuple_run_root(public) / "qualification"
+    return (
+        _tuple_run_root(public)
+        / "construct-aligned-engineering-health"
+        / "qualification"
+    )
+
+
+def _tuple_legacy_qualification_paths(public: Path) -> dict[str, Path]:
+    """Historical job-315542 paths are read-only under the new route."""
+
+    root = _tuple_run_root(public) / "qualification"
+    return {
+        "development_result": root / "development-result.json",
+        "development_threshold_seal": root / "development-threshold-seal.json",
+        "holdout_result": root / "holdout-result.json",
+    }
 
 
 def _tuple_qualification_paths(public: Path) -> dict[str, Path]:
@@ -7481,6 +8867,141 @@ def _tuple_qualification_paths(public: Path) -> dict[str, Path]:
         "development_threshold_seal": root / "development-threshold-seal.json",
         "holdout_result": root / "holdout-result.json",
     }
+
+
+def _tuple_qualification_transaction_path(public: Path, partition: str) -> Path:
+    if partition not in {"development", "holdout"}:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_PARTITION")
+    return _tuple_qualification_root(public) / "transactions" / f"{partition}.json"
+
+
+def _tuple_qualification_transaction(
+    partition: str, full: dict[str, Any], seal: dict[str, Any] | None
+) -> dict[str, Any]:
+    if partition == "development" and not isinstance(seal, dict):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_TRANSACTION")
+    if partition == "holdout" and seal is not None:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_TRANSACTION")
+    value = {
+        "schema_version": 1,
+        "status": "SEALED_SCIENTIFIC_OUTCOME_TRANSACTION",
+        "partition": partition,
+        "scientific_result": full,
+        "development_threshold_seal": seal,
+    }
+    value["transaction_commitment_sha256"] = digest(value)
+    return value
+
+
+def _validate_tuple_qualification_transaction(
+    value: Any, partition: str
+) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    if (
+        not isinstance(value, dict)
+        or set(value)
+        != {
+            "schema_version",
+            "status",
+            "partition",
+            "scientific_result",
+            "development_threshold_seal",
+            "transaction_commitment_sha256",
+        }
+        or value.get("schema_version") != 1
+        or value.get("status") != "SEALED_SCIENTIFIC_OUTCOME_TRANSACTION"
+        or value.get("partition") != partition
+    ):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_TRANSACTION")
+    expected = value["transaction_commitment_sha256"]
+    if not isinstance(expected, str) or digest(
+        {
+            key: item
+            for key, item in value.items()
+            if key != "transaction_commitment_sha256"
+        }
+    ) != expected:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_TRANSACTION")
+    full = value.get("scientific_result")
+    seal = value.get("development_threshold_seal")
+    if not isinstance(full, dict) or full.get("partition") != partition:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_TRANSACTION")
+    result_expected = full.get("public_qualification_commitment_sha256")
+    if not isinstance(result_expected, str) or digest(
+        {
+            key: item
+            for key, item in full.items()
+            if key != "public_qualification_commitment_sha256"
+        }
+    ) != result_expected:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_TRANSACTION")
+    if partition == "development":
+        if not isinstance(seal, dict):
+            raise RuntimeError("E_TUPLE_QUALIFICATION_TRANSACTION")
+        seal_expected = seal.get("development_threshold_commitment_sha256")
+        if not isinstance(seal_expected, str) or digest(
+            {
+                key: item
+                for key, item in seal.items()
+                if key != "development_threshold_commitment_sha256"
+            }
+        ) != seal_expected:
+            raise RuntimeError("E_TUPLE_QUALIFICATION_TRANSACTION")
+    elif seal is not None:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_TRANSACTION")
+    return full, seal
+
+
+def _recover_tuple_qualification_transaction(
+    public: Path,
+    cfg: dict[str, Any],
+    manifest: dict[str, Any],
+    partition: str,
+) -> dict[str, Any] | None:
+    transaction_path = _tuple_qualification_transaction_path(public, partition)
+    if not transaction_path.is_file():
+        return None
+    full, seal = _validate_tuple_qualification_transaction(
+        json.loads(transaction_path.read_text()), partition
+    )
+    paths = _tuple_qualification_paths(public)
+    targets = (
+        [paths["development_result"], paths["development_threshold_seal"]]
+        if partition == "development"
+        else [paths["holdout_result"]]
+    )
+    if all(path.is_file() for path in targets):
+        return None
+    result_path = (
+        paths["development_result"]
+        if partition == "development"
+        else paths["holdout_result"]
+    )
+    if result_path.is_file():
+        if json.loads(result_path.read_text()) != full:
+            raise RuntimeError("E_TUPLE_QUALIFICATION_TRANSACTION_CONFLICT")
+    else:
+        write_private_new(result_path, full)
+    if partition == "development":
+        assert seal is not None
+        seal_path = paths["development_threshold_seal"]
+        if seal_path.is_file():
+            if json.loads(seal_path.read_text()) != seal:
+                raise RuntimeError("E_TUPLE_QUALIFICATION_TRANSACTION_CONFLICT")
+        else:
+            write_private_new(seal_path, seal)
+        loaded_seal, development = _load_tuple_development_pair(
+            public,
+            cfg,
+            manifest,
+            missing_code="E_TUPLE_DEVELOPMENT_PAIR_MISSING",
+        )
+        return _tuple_qualification_compact(
+            development,
+            loaded_seal["development_threshold_commitment_sha256"],
+        )
+    return _tuple_qualification_compact(
+        full, full["development_threshold_commitment_sha256"]
+    )
 
 
 def _refuse_tuple_qualification_overwrite(public: Path, partition: str) -> None:
@@ -7541,6 +9062,8 @@ def _tuple_development_threshold_seal(
         selected = module_results[module_id].get("selected_thresholds", {})
         if status == "PASS" or (
             module_id == "order_action" and status == "NO_GO_DIAGNOSTIC"
+        ) or (
+            module_id == "recurrence" and status == "NO_GO"
         ):
             if not required <= set(selected):
                 raise RuntimeError("E_TUPLE_QUALIFICATION_PASS_WITHOUT_THRESHOLD")
@@ -7769,96 +9292,1088 @@ def _tuple_qualification_compact(
     }
 
 
-def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
-    """Run one public partition and make exactly one complete stage decision."""
+def _tuple_health_root(public: Path) -> Path:
+    return _tuple_run_root(public) / "construct-aligned-engineering-health"
 
-    partition = str(args.partition)
-    if partition not in {"development", "holdout"}:
-        raise RuntimeError("E_TUPLE_QUALIFICATION_PARTITION")
-    cfg = json.loads(args.config.read_text())
-    active = _construct_aligned_ltx_resume_amendment(cfg)
-    _tuple_qualification_execution(cfg)
-    output_root = _tuple_qualification_root(args.public_root)
-    _require_external_or_ignored_output(output_root)
-    _require_external_or_ignored_output(args.scratch_root)
-    if (
-        os.environ.get("HF_HUB_OFFLINE") != "1"
-        or os.environ.get("TRANSFORMERS_OFFLINE") != "1"
-    ):
-        raise RuntimeError("E_TUPLE_QUALIFICATION_OFFLINE_ENVIRONMENT")
-    if partition == "holdout":
-        _refuse_tuple_qualification_overwrite(args.public_root, partition)
-    _verify_tuple_runtime_manifest(args.public_root, cfg)
-    manifest, fixture_root = _verify_tuple_fixture_manifest(args.public_root, cfg)
-    correction = _tuple_visor_hos_correction_amendment(cfg)
-    if manifest.get("visor_hos_correction_amendment_commitment_sha256") != correction[
-        "amendment_commitment_sha256"
-    ]:
-        raise RuntimeError("E_TUPLE_QUALIFICATION_CORRECTION_COMMITMENT")
-    no_hand_commitment = manifest.get("verified_no_hand_seal_commitment_sha256")
-    if not isinstance(no_hand_commitment, str) or not re.fullmatch(
-        r"[0-9a-f]{64}", no_hand_commitment
-    ):
-        raise RuntimeError("E_TUPLE_QUALIFICATION_NO_HAND_SEAL")
-    if partition == "development":
-        reused = _reuse_tuple_development_pair(args.public_root, cfg, manifest)
-        if reused is not None:
-            return reused
-    threshold_seal = (
-        _load_tuple_development_threshold_seal(args.public_root, cfg, manifest)
-        if partition == "holdout"
-        else None
+
+def _tuple_health_tree_bytes(root: Path) -> int:
+    if not root.exists():
+        return 0
+    return sum(
+        path.stat().st_size
+        for path in root.rglob("*")
+        if path.is_file() and not path.is_symlink()
     )
-    args.scratch_root.mkdir(parents=True, exist_ok=True, mode=0o700)
-    context = {
-        "cfg": cfg,
-        "public_root": args.public_root,
-        "scratch_root": args.scratch_root,
-        "fixture_root": fixture_root,
-        "fixture_manifest": manifest,
-        "fixture_manifest_commitment_sha256": manifest[
-            "public_fixture_manifest_commitment_sha256"
-        ],
-        "partition": partition,
-        "rows": manifest["partitions"][partition],
-        "device": args.device,
-        "thresholds": (
-            dict(threshold_seal["selected_thresholds"])
-            if threshold_seal is not None
-            else {}
-        ),
-        "verified_no_hand_seal": {
-            "status": "PASS",
-            "verified_no_hand_seal_commitment_sha256": no_hand_commitment,
-        },
-        "module_cache": {},
+
+
+def _tuple_health_verify_file(
+    path: Path, expected_sha256: str, expected_bytes: int | None = None
+) -> dict[str, Any]:
+    if (
+        not path.is_file()
+        or file_digest(path) != expected_sha256
+        or (
+            expected_bytes is not None
+            and path.stat().st_size != int(expected_bytes)
+        )
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_ARTIFACT_COMMITMENT")
+    return {
+        "sha256": expected_sha256,
+        "bytes": path.stat().st_size,
     }
-    runners = _tuple_module_runners()
-    if threshold_seal is not None:
-        threshold_modules = {
-            "referent",
-            "recurrence",
-            "attribute",
-            "hand_contact",
-            "order_action",
+
+
+def _tuple_health_tree_commitment(root: Path) -> dict[str, Any]:
+    if not root.is_dir():
+        raise RuntimeError("E_TUPLE_HEALTH_CODE_TREE")
+    records = []
+    for path in sorted(root.rglob("*")):
+        if not path.is_file() or path.is_symlink():
+            continue
+        relative = path.relative_to(root)
+        if (
+            ".git" in relative.parts
+            or "__pycache__" in relative.parts
+            or path.suffix == ".pyc"
+        ):
+            continue
+        records.append(
+            {
+                "relative_path": relative.as_posix(),
+                "sha256": file_digest(path),
+                "bytes": path.stat().st_size,
+            }
+        )
+    if not records:
+        raise RuntimeError("E_TUPLE_HEALTH_CODE_TREE")
+    return {
+        "file_count": len(records),
+        "bytes": sum(record["bytes"] for record in records),
+        "tree_commitment_sha256": digest(records),
+    }
+
+
+def _tuple_health_verify_archive_tree(
+    archive: Path,
+    root: Path,
+    *,
+    replacements: dict[str, tuple[str, str]] | None = None,
+) -> dict[str, Any]:
+    """Bind every importable extracted source byte to its frozen archive."""
+
+    replacements = replacements or {}
+    expected: dict[str, tuple[str, int]] = {}
+    with zipfile.ZipFile(archive) as source:
+        files = [member for member in source.infolist() if not member.is_dir()]
+        roots = {
+            Path(member.filename).parts[0]
+            for member in files
+            if Path(member.filename).parts
         }
-        for module_id in threshold_modules:
-            development_status = threshold_seal["development_module_statuses"][
-                module_id
-            ]
-            if development_status != "PASS" and not (
-                module_id == "order_action"
-                and development_status == "NO_GO_DIAGNOSTIC"
+        if len(roots) != 1:
+            raise RuntimeError("E_TUPLE_HEALTH_CODE_ARCHIVE_ROOT")
+        archive_root = next(iter(roots))
+        for member in files:
+            parts = Path(member.filename).parts
+            if not parts or parts[0] != archive_root or len(parts) < 2:
+                raise RuntimeError("E_TUPLE_HEALTH_CODE_ARCHIVE_ROOT")
+            relative = Path(*parts[1:]).as_posix()
+            hasher = hashlib.sha256()
+            with source.open(member) as handle:
+                for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                    hasher.update(chunk)
+            archive_sha = hasher.hexdigest()
+            replacement = replacements.get(relative)
+            if replacement is not None and archive_sha != replacement[0]:
+                raise RuntimeError("E_TUPLE_HEALTH_CODE_ARCHIVE_SOURCE")
+            expected[relative] = (
+                replacement[1] if replacement is not None else archive_sha,
+                int(member.file_size),
+            )
+    observed_paths = {
+        path.relative_to(root).as_posix(): path
+        for path in root.rglob("*")
+        if path.is_file()
+        and not path.is_symlink()
+        and path.name != ".source-commit"
+        and "__pycache__" not in path.relative_to(root).parts
+        and path.suffix != ".pyc"
+    }
+    if set(observed_paths) != set(expected):
+        raise RuntimeError("E_TUPLE_HEALTH_CODE_TREE_SET")
+    records = []
+    for relative in sorted(expected):
+        path = observed_paths[relative]
+        expected_sha, archive_bytes = expected[relative]
+        observed_sha = file_digest(path)
+        if observed_sha != expected_sha:
+            raise RuntimeError("E_TUPLE_HEALTH_CODE_TREE_COMMITMENT")
+        records.append(
+            {
+                "relative_path": relative,
+                "sha256": observed_sha,
+                "bytes": path.stat().st_size,
+                "archive_bytes": archive_bytes,
+            }
+        )
+    return {
+        "file_count": len(records),
+        "bytes": sum(record["bytes"] for record in records),
+        "tree_commitment_sha256": digest(records),
+    }
+
+
+def _tuple_health_verify_git_tree(root: Path, expected_commit: str) -> None:
+    _verify_repository_commit(root, expected_commit)
+    completed = subprocess.run(
+        ["git", "-C", str(root), "status", "--porcelain", "--untracked-files=all"],
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    unexpected = []
+    for line in completed.stdout.splitlines():
+        path = line[3:]
+        if "__pycache__/" in path or path.endswith(".pyc"):
+            continue
+        unexpected.append(line)
+    if unexpected:
+        raise RuntimeError("E_TUPLE_HEALTH_CODE_TREE_DIRTY")
+
+
+def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
+    """Validate every module-facing frozen field before any model is loaded."""
+
+    active = _construct_aligned_ltx_resume_amendment(cfg)
+    health = _engineering_health_amendment(cfg)
+    amendment = _tuple_amendment(cfg)
+    runtime = _tuple_runtime_amendment(cfg)
+    fixture_protocol = _tuple_fixture_protocol(cfg)
+    preparation = _tuple_fixture_preparation_amendment(cfg)
+    correction = _tuple_visor_hos_correction_amendment(cfg)
+    execution = _tuple_qualification_execution(cfg)
+    audio = _tuple_referent_audio_fixture(cfg)
+    thresholds = _tuple_health_inference_thresholds(cfg)
+    ontology = _tuple_public_ontology_mapping(preparation)
+    prompts = _tuple_attribute_prompt_groups(cfg)
+    action_candidate, action_runtime = _tuple_order_action_egohod_wiring(cfg)
+    axes = {
+        axis_id: _tuple_axis(cfg, axis_id)
+        for axis_id in (*TUPLE_CRITICAL_AXIS_IDS, *TUPLE_SUPPORTING_AXIS_IDS)
+    }
+    bins = cfg["calibration_C"]["extractor"].get("fixed_numeric_bins")
+    required_bins = {
+        "brightness",
+        "blur_edge_strength",
+        "motion_mean_absolute_luma",
+    }
+    if not isinstance(bins, dict) or not required_bins <= set(bins):
+        raise RuntimeError("E_TUPLE_HEALTH_SENSOR_BIN_CONFIG")
+    for key in required_bins:
+        values = bins[key]
+        if (
+            not isinstance(values, list)
+            or len(values) < 2
+            or not all(
+                isinstance(value, (int, float))
+                and math.isfinite(float(value))
+                for value in values
+            )
+            or any(
+                float(values[index]) >= float(values[index + 1])
+                for index in range(len(values) - 1)
+            )
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_SENSOR_BIN_CONFIG")
+    if set(_tuple_module_runners()) != set(TUPLE_QUALIFICATION_MODULE_IDS):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_MODULE_REGISTRY")
+    adapter = Path(__file__).resolve().with_name(
+        "synthetic_video_language_adapter.py"
+    )
+    if file_digest(adapter) != TUPLE_LANGUAGE_ADAPTER_SHA256:
+        raise RuntimeError("E_TUPLE_LANGUAGE_ADAPTER_SOURCE")
+    return digest(
+        {
+            "active": active,
+            "health": health,
+            "tuple_amendment": amendment,
+            "runtime": runtime,
+            "fixture_protocol": fixture_protocol,
+            "preparation": preparation,
+            "correction": correction,
+            "execution": execution,
+            "audio": audio,
+            "thresholds": thresholds,
+            "ontology": ontology,
+            "attribute_prompts": prompts,
+            "action_candidate": action_candidate,
+            "action_runtime": action_runtime,
+            "axes": axes,
+            "sensor_bins": {key: bins[key] for key in sorted(required_bins)},
+            "module_ids": list(TUPLE_QUALIFICATION_MODULE_IDS),
+            "language_adapter_sha256": TUPLE_LANGUAGE_ADAPTER_SHA256,
+        }
+    )
+
+
+def _tuple_health_dependency_preflight(
+    public: Path, cfg: dict[str, Any]
+) -> dict[str, Any]:
+    """Rehash every production dependency family before GPU model loading."""
+
+    health = _engineering_health_amendment(cfg)
+    configuration_commitment = _tuple_health_configuration_preflight(cfg)
+    runtime_cfg = _tuple_runtime_amendment(cfg)
+    runtime = _verify_tuple_runtime_manifest(public, cfg)
+    model_root = _tuple_model_root(public)
+    records: list[dict[str, Any]] = []
+    container = runtime_cfg["base_container"]
+    records.append(
+        {
+            "family": "container",
+            **_tuple_health_verify_file(
+                public / "models" / container["file"], container["sha256"]
+            ),
+        }
+    )
+    if container["sha256"] != health["pre_GPU_prerequisite_validation"][
+        "container_sha256"
+    ]:
+        raise RuntimeError("E_TUPLE_HEALTH_CONTAINER_COMMITMENT")
+
+    for artifact in runtime.get("dependency_artifacts", []):
+        records.append(
+            {
+                "family": "runtime_distribution",
+                **_tuple_health_verify_file(
+                    model_root / "runtime-distributions" / artifact["name"],
+                    artifact["sha256"],
+                    artifact["bytes"],
+                ),
+            }
+        )
+    for artifact in runtime.get("bert_base_uncased", {}).get("files", []):
+        records.append(
+            {
+                "family": "bert_base_uncased",
+                **_tuple_health_verify_file(
+                    model_root / "bert-base-uncased" / artifact["name"],
+                    artifact["sha256"],
+                    artifact["bytes"],
+                ),
+            }
+        )
+    if _installed_distributions(model_root / "runtime-pydeps") != runtime.get(
+        "installed_distributions"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_RUNTIME_DISTRIBUTIONS")
+    for family, root in (
+        ("runtime_pydeps_tree", model_root / "runtime-pydeps"),
+        (
+            "activity_pydeps_tree",
+            public / "models/activity-pydeps/egohod_egovideo_l_zero_shot",
+        ),
+    ):
+        records.append({"family": family, **_tuple_health_tree_commitment(root)})
+
+    premodel = cfg["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_premodel_result"
+    ]
+    if premodel.get("status") != (
+        "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_PREMODEL_STATUS")
+    artifact_paths = {
+        "groundingdino_swint_ogc.pth": model_root
+        / "weights/groundingdino_swint_ogc.pth",
+        "sam2.1_hiera_base_plus.pt": model_root
+        / "weights/sam2.1_hiera_base_plus.pt",
+        "dinov2_vitb14_pretrain.pth": model_root
+        / "weights/dinov2_vitb14_pretrain.pth",
+        "egohos_work_dirs.zip": model_root / "weights/egohos_work_dirs.zip",
+        "PE-Core-L14-336.pt": _resolve_tuple_pe_core_checkpoint(public, cfg),
+        "wordnet.zip": model_root / "nltk-archives/wordnet.zip",
+        "averaged_perceptron_tagger_eng.zip": model_root
+        / "nltk-archives/averaged_perceptron_tagger_eng.zip",
+        "nltk-3.9.1-py3-none-any.whl": model_root
+        / "wheels/nltk-3.9.1-py3-none-any.whl",
+        "wordfreq-3.0.2-py3-none-any.whl": model_root
+        / "wheels/wordfreq-3.0.2-py3-none-any.whl",
+    }
+    for name, path in artifact_paths.items():
+        records.append(
+            {
+                "family": "tuple_public_artifact",
+                **_tuple_health_verify_file(
+                    path, premodel["artifact_sha256"][name]
+                ),
+            }
+        )
+    action_candidate, _runtime = _tuple_order_action_egohod_wiring(cfg)
+    action_path = _resolve_tuple_egohod_checkpoint(public, action_candidate)
+    records.append(
+        {
+            "family": "egohod",
+            **_tuple_health_verify_file(
+                action_path,
+                premodel["artifact_sha256"]["egohod_large_best.pt"],
+                action_candidate["weight_bytes"],
+            ),
+        }
+    )
+
+    repository_names = {
+        "EgoHOS": "EgoHOS",
+        "GroundingDINO": "GroundingDINO",
+        "SAM2": "sam2",
+        "DINOv2": "dinov2",
+    }
+    for family, directory in repository_names.items():
+        source = premodel["repository_archives"][family]
+        archive = model_root / "code" / f"{directory}-{source['commit']}.zip"
+        records.append(
+            {
+                "family": "code_archive",
+                **_tuple_health_verify_file(archive, source["archive_sha256"]),
+            }
+        )
+        marker = model_root / "code" / directory / ".source-commit"
+        if not marker.is_file() or marker.read_text().strip() != source["commit"]:
+            raise RuntimeError("E_TUPLE_HEALTH_CODE_REVISION")
+        replacements = (
+            {
+                "groundingdino/models/GroundingDINO/ms_deform_attn.py": (
+                    GROUNDING_DINO_DEFORM_ATTN_SOURCE_SHA256,
+                    GROUNDING_DINO_DEFORM_ATTN_PATCHED_SHA256,
+                ),
+                "groundingdino/models/GroundingDINO/groundingdino.py": (
+                    GROUNDING_DINO_MODEL_SOURCE_SHA256,
+                    GROUNDING_DINO_MODEL_NO_VISUALIZER_SHA256,
+                ),
+            }
+            if family == "GroundingDINO"
+            else {}
+        )
+        records.append(
+            {
+                "family": f"{family}_extracted_tree",
+                **_tuple_health_verify_archive_tree(
+                    archive,
+                    model_root / "code" / directory,
+                    replacements=replacements,
+                ),
+            }
+        )
+    grounding_root = model_root / "code/GroundingDINO"
+    if (
+        file_digest(
+            grounding_root
+            / "groundingdino/models/GroundingDINO/ms_deform_attn.py"
+        )
+        != GROUNDING_DINO_DEFORM_ATTN_PATCHED_SHA256
+        or file_digest(
+            grounding_root
+            / "groundingdino/models/GroundingDINO/groundingdino.py"
+        )
+        != GROUNDING_DINO_MODEL_NO_VISUALIZER_SHA256
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_GROUNDING_PATCH")
+
+    archive_record = runtime.get("egobaby_loader", {})
+    egobaby_archive = (
+        model_root
+        / "code"
+        / f"egobabyvlm-{archive_record.get('commit')}.zip"
+    )
+    records.append(
+        {
+            "family": "egobaby_code_archive",
+            **_tuple_health_verify_file(
+                egobaby_archive,
+                archive_record.get("archive_sha256"),
+                archive_record.get("archive_bytes"),
+            ),
+        }
+    )
+    egobaby_marker = model_root / "code/egobabyvlm/.source-commit"
+    if (
+        not egobaby_marker.is_file()
+        or egobaby_marker.read_text().strip() != archive_record.get("commit")
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_CODE_REVISION")
+    records.append(
+        {
+            "family": "egobaby_extracted_tree",
+            **_tuple_health_verify_archive_tree(
+                egobaby_archive, model_root / "code/egobabyvlm"
+            ),
+        }
+    )
+
+    action_candidate, action_runtime = _tuple_order_action_egohod_wiring(cfg)
+    activity_code = _activity_code_root(public, action_candidate["candidate_id"])
+    clip_code = public / "models/activity-code/CLIP"
+    _tuple_health_verify_git_tree(activity_code, action_candidate["code_commit"])
+    _tuple_health_verify_git_tree(
+        clip_code, action_runtime["openai_CLIP_commit"]
+    )
+    records.extend(
+        [
+            {
+                "family": "egohod_activity_code_tree",
+                **_tuple_health_tree_commitment(activity_code),
+            },
+            {
+                "family": "openai_clip_code_tree",
+                **_tuple_health_tree_commitment(clip_code),
+            },
+        ]
+    )
+    for family, path in (
+        ("health_wrapper", Path(__file__).resolve().with_name("qualify_synthetic_video_calibration.sbatch")),
+        ("language_adapter", Path(__file__).resolve().with_name("synthetic_video_language_adapter.py")),
+    ):
+        records.append(
+            {
+                "family": family,
+                "sha256": file_digest(path),
+                "bytes": path.stat().st_size,
+            }
+        )
+
+    egohos_archive = model_root / "weights/egohos_work_dirs.zip"
+    expected_members = (
+        ("seg_twohands_ccda", "seg_twohands_ccda.py"),
+        ("seg_twohands_ccda", "best_mIoU_iter_56000.pth"),
+        ("twohands_to_cb_ccda", "twohands_to_cb_ccda.py"),
+        ("twohands_to_cb_ccda", "best_mIoU_iter_76000.pth"),
+        ("twohands_cb_to_obj1_ccda", "twohands_cb_to_obj1_ccda.py"),
+        ("twohands_cb_to_obj1_ccda", "best_mIoU_iter_34000.pth"),
+    )
+    with zipfile.ZipFile(egohos_archive) as source:
+        names = source.namelist()
+        for folder, filename in expected_members:
+            suffix = f"work_dirs/{folder}/{filename}"
+            matches = [name for name in names if name.endswith(suffix)]
+            if len(matches) != 1:
+                raise RuntimeError("E_TUPLE_HEALTH_EGOHOS_ARCHIVE_MEMBER")
+            member_hash = hashlib.sha256()
+            with source.open(matches[0]) as handle:
+                for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                    member_hash.update(chunk)
+            extracted = model_root / "egohos-checkpoints" / suffix
+            if (
+                not extracted.is_file()
+                or file_digest(extracted) != member_hash.hexdigest()
             ):
-                runners[module_id] = _development_unqualified_tuple_module_runner(
-                    module_id
+                raise RuntimeError("E_TUPLE_HEALTH_EGOHOS_EXTRACTED_MEMBER")
+            records.append(
+                {
+                    "family": "egohos_extracted_member",
+                    "sha256": member_hash.hexdigest(),
+                    "bytes": extracted.stat().st_size,
+                }
+            )
+
+    language_archive = cfg["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_visor_hos_correction_amendment"
+    ]["resource_and_governance"]["language_dependency_archive"]
+    records.append(
+        {
+            "family": "language_dependency_archive",
+            **_tuple_health_verify_file(
+                public / "models/phase4-language-pydeps.tar",
+                language_archive["sha256"],
+                language_archive["bytes"],
+            ),
+        }
+    )
+    language = _tuple_language_artifact_record(public)
+    record = {
+        "schema_version": 1,
+        "artifact_count": len(records),
+        "artifact_bytes": sum(int(value["bytes"]) for value in records),
+        "runtime_dependency_commitment_sha256": runtime[
+            "runtime_dependency_commitment_sha256"
+        ],
+        "language_tree_commitment_sha256": language[
+            "opus_mt_de_en_tree_commitment_sha256"
+        ],
+        "records_commitment_sha256": digest(records),
+        "configuration_validation_commitment_sha256": configuration_commitment,
+        "network_disabled": True,
+        "telemetry_disabled": True,
+    }
+    record["dependency_config_commitment_sha256"] = digest(
+        {
+            "preflight": record,
+            "config_canonical_sha256": digest(cfg),
+            "engineering_health_amendment_commitment_sha256": health[
+                "amendment_commitment_sha256"
+            ],
+        }
+    )
+    return record
+
+
+def _tuple_health_selected_rows(
+    manifest: dict[str, Any], projection: dict[str, Any], module_id: str
+) -> dict[str, list[dict[str, Any]]]:
+    families = {
+        "language_lexical",
+        "referent_attribute",
+        "recurrence",
+        "hand_contact",
+        "sensor",
+        "order_action",
+    }
+    output = {family: [] for family in families}
+    cases = [
+        value
+        for value in projection["cases"]
+        if value.get("module_id") == module_id
+    ]
+    if len(cases) != 4:
+        raise RuntimeError("E_TUPLE_HEALTH_CASE_CLASS_DEFICIT")
+    family = str(cases[0]["source_family"])
+    if family not in families or any(value["source_family"] != family for value in cases):
+        raise RuntimeError("E_TUPLE_HEALTH_SOURCE_FAMILY")
+    indexed = _tuple_health_fixture_rows(
+        manifest["partitions"]["development"][family], family
+    )
+    for case in cases:
+        ordinal = int(case["source_fixture_ordinal"])
+        if ordinal not in indexed:
+            raise RuntimeError("E_TUPLE_HEALTH_FIXTURE_ORDINAL")
+        output[family].append(indexed[ordinal])
+    return output
+
+
+def _tuple_health_topology(device: str) -> None:
+    import torch
+
+    if (
+        device != "cuda"
+        or torch.cuda.device_count() != 1
+        or torch.cuda.get_device_name(0) != "NVIDIA A30"
+        or os.environ.get("SLURM_JOB_PARTITION") != "a30"
+        or os.environ.get("SLURM_JOB_NUM_NODES") != "1"
+        or os.environ.get("SLURM_NTASKS") != "1"
+        or os.environ.get("SLURM_CPUS_PER_TASK") != "8"
+        or os.environ.get("SLURM_GPUS_ON_NODE") != "1"
+        or os.environ.get("WORLD_SIZE", "1") != "1"
+        or os.environ.get("LOCAL_WORLD_SIZE", "1") != "1"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_GPU_TOPOLOGY")
+
+
+def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
+    """Run the bounded production-path microqualification with zero metrics."""
+
+    cfg = json.loads(args.config.read_text())
+    health = _engineering_health_amendment(cfg)
+    root = _tuple_health_root(args.public_root)
+    _require_external_or_ignored_output(root)
+    _require_external_or_ignored_output(args.scratch_root)
+    root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    os.chmod(root, 0o700)
+    attempt_root = root / "health" / f"attempt-{int(args.attempt):02d}"
+    result_path = attempt_root / "full-result.json"
+    if result_path.is_file():
+        existing = json.loads(result_path.read_text())
+        expected = existing.pop("engineering_health_commitment_sha256", None)
+        existing["engineering_health_commitment_sha256"] = expected
+        if not isinstance(expected, str) or digest(
+            {key: value for key, value in existing.items() if key != "engineering_health_commitment_sha256"}
+        ) != expected:
+            raise RuntimeError("E_TUPLE_HEALTH_RESULT_COMMITMENT")
+        _validate_tuple_health_full(existing, cfg)
+        return _tuple_health_compact(existing)
+    attempt_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    marker = _tuple_health_wrapper_marker(attempt_root, int(args.attempt), cfg)
+    if set(path.name for path in attempt_root.iterdir()) != {
+        "wrapper-started.json"
+    }:
+        raise RuntimeError("E_TUPLE_HEALTH_PARTIAL_ATTEMPT")
+    submission_started_epoch = float(marker["submission_started_epoch"])
+    trace_root = attempt_root / "traces"
+    prior = []
+    for ordinal in range(1, int(args.attempt)):
+        prior_path = root / "health" / f"attempt-{ordinal:02d}" / "full-result.json"
+        if prior_path.is_file():
+            value = json.loads(prior_path.read_text())
+            _validate_tuple_health_full(value, cfg)
+            payload = {
+                key: item
+                for key, item in value.items()
+                if key != "engineering_health_commitment_sha256"
+            }
+            if digest(payload) != value.get(
+                "engineering_health_commitment_sha256"
+            ):
+                raise RuntimeError("E_TUPLE_HEALTH_RESULT_COMMITMENT")
+            resource = value["resource"]
+        else:
+            resource = _tuple_health_incomplete_attempt_resource(
+                root, ordinal, cfg
+            )
+        prior.append({"attempt": ordinal, "resource": resource})
+    available = _tuple_health_budget(int(args.attempt), prior, cfg)
+    before_bytes = _tuple_health_tree_bytes(root)
+    module_results: list[dict[str, Any]] = []
+    projection: dict[str, Any] | None = None
+    dependency: dict[str, Any] | None = None
+    manifest: dict[str, Any] | None = None
+    try:
+        _tuple_health_topology(str(args.device))
+        if (
+            os.environ.get("HF_HUB_OFFLINE") != "1"
+            or os.environ.get("TRANSFORMERS_OFFLINE") != "1"
+            or os.environ.get("HF_HUB_DISABLE_TELEMETRY") != "1"
+            or os.environ.get("WANDB_DISABLED", "").casefold() != "true"
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_OFFLINE_ENVIRONMENT")
+        dependency = _tuple_health_dependency_preflight(args.public_root, cfg)
+        manifest, fixture_root = _verify_tuple_fixture_manifest(
+            args.public_root, cfg
+        )
+        projection = _tuple_health_projection(manifest, cfg)
+        projection_path = root / "microfixture-manifest.json"
+        if projection_path.is_file():
+            if json.loads(projection_path.read_text()) != projection:
+                raise RuntimeError("E_TUPLE_HEALTH_PROJECTION_CHANGED")
+        else:
+            write_private_new(projection_path, projection)
+        no_hand = manifest["verified_no_hand_seal_commitment_sha256"]
+        runners = _tuple_module_runners()
+        for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+            module_scratch = args.scratch_root / module_id
+            module_scratch.mkdir(parents=True, exist_ok=False, mode=0o700)
+            try:
+                replicates = []
+                for replicate in (1, 2):
+                    replicate_scratch = module_scratch / f"replicate-{replicate}"
+                    replicate_scratch.mkdir(mode=0o700)
+                    context = {
+                        "cfg": cfg,
+                        "public_root": args.public_root,
+                        "scratch_root": replicate_scratch,
+                        "fixture_root": fixture_root,
+                        "fixture_manifest": manifest,
+                        "fixture_manifest_commitment_sha256": manifest[
+                            "public_fixture_manifest_commitment_sha256"
+                        ],
+                        "partition": "development",
+                        "rows": _tuple_health_selected_rows(
+                            manifest, projection, module_id
+                        ),
+                        "device": args.device,
+                        "thresholds": {},
+                        "verified_no_hand_seal": {
+                            "status": "PASS",
+                            "verified_no_hand_seal_commitment_sha256": no_hand,
+                        },
+                        "module_cache": {},
+                        "engineering_health": True,
+                    }
+                    result = runners[module_id](context)
+                    _validate_tuple_health_module_result(
+                        result, expected_case_count=4
+                    )
+                    if result.get("module_id") != module_id:
+                        raise RuntimeError("E_TUPLE_HEALTH_MODULE_RESULT")
+                    replicates.append(result)
+                if (
+                    replicates[0]["production_output_commitment_sha256"]
+                    != replicates[1]["production_output_commitment_sha256"]
+                ):
+                    raise RuntimeError("E_TUPLE_HEALTH_NONDETERMINISTIC_OUTPUT")
+                module_results.append(replicates[0])
+            except BaseException as error:
+                if isinstance(error, (KeyboardInterrupt, SystemExit)):
+                    raise
+                module_results.append(
+                    _tuple_health_error(module_id, error, trace_root)
                 )
-    module_results = _collect_tuple_module_results(runners, context)
+    except BaseException as error:
+        if isinstance(error, (KeyboardInterrupt, SystemExit)):
+            raise
+        if not module_results:
+            for ordinal, module_id in enumerate(TUPLE_QUALIFICATION_MODULE_IDS):
+                module_results.append(
+                    _tuple_health_error(
+                        module_id,
+                        error
+                        if ordinal == 0
+                        else RuntimeError("E_TUPLE_HEALTH_PREFLIGHT_BLOCKED"),
+                        trace_root,
+                    )
+                )
+    elapsed_seconds = max(0.0, time.time() - submission_started_epoch)
+    after_bytes = _tuple_health_tree_bytes(root)
+    new_storage_gib = max(0, after_bytes - before_bytes) / (1024**3)
+    resource = {
+        "GPU_type": available["GPU_type"],
+        "GPU_count": available["GPU_count"],
+        "CPU_count": available["CPU_count"],
+        "memory_GiB": available["memory_GiB"],
+        "wall_minutes": elapsed_seconds / 60.0,
+        "GPU_hours": elapsed_seconds / 3600.0,
+        "new_storage_GiB": new_storage_gib,
+        "direct_monetary_cost_USD": 0,
+    }
+    cumulative_resource = _tuple_health_cumulative_resource(prior, resource)
+    if resource["wall_minutes"] > available["per_submission_wall_minutes_max"]:
+        raise RuntimeError("E_TUPLE_HEALTH_WALL_BUDGET")
+    if resource["GPU_hours"] > available["remaining_GPU_hours"]:
+        raise RuntimeError("E_TUPLE_HEALTH_GPU_HOUR_BUDGET")
+    if resource["new_storage_GiB"] > available["remaining_storage_GiB"]:
+        raise RuntimeError("E_TUPLE_HEALTH_STORAGE_BUDGET")
+    passed = sum(
+        value.get("status") == "PASS_ENGINEERING" for value in module_results
+    )
+    failures = len(module_results) - passed
+    full = {
+        "schema_version": 1,
+        "status": (
+            "PASS_ENGINEERING_HEALTH" if failures == 0 else "ENGINEERING_BLOCKER"
+        ),
+        "route_id": health["route_id"],
+        "attempt": int(args.attempt),
+        "public_fixture_manifest_commitment_sha256": (
+            manifest.get("public_fixture_manifest_commitment_sha256")
+            if manifest is not None
+            else health["preserved_commitments"]["public_fixture_manifest_sha256"]
+        ),
+        "runner_commitment_sha256": file_digest(Path(__file__).resolve()),
+        "config_commitment_sha256": digest(cfg),
+        "dependency_config_commitment_sha256": (
+            dependency["dependency_config_commitment_sha256"]
+            if dependency is not None
+            else digest(
+                {
+                    "config_sha256": file_digest(args.config),
+                    "health_amendment": health["amendment_commitment_sha256"],
+                }
+            )
+        ),
+        "microfixture_manifest_commitment_sha256": (
+            projection["microfixture_manifest_commitment_sha256"]
+            if projection is not None
+            else digest(
+                {
+                    "status": "PREFLIGHT_BLOCKED_BEFORE_PROJECTION",
+                    "fixture": health["preserved_commitments"][
+                        "public_fixture_manifest_sha256"
+                    ],
+                }
+            )
+        ),
+        "module_results": module_results,
+        "module_count": len(TUPLE_QUALIFICATION_MODULE_IDS),
+        "completed_module_count": passed,
+        "failed_module_count": failures,
+        "case_count": 28,
+        "holdout_input_count": 0,
+        "scientific_metric_count": 0,
+        "failure_count": failures,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+        "unaccounted_failure_count": sum(
+            str(value.get("error_code", "")).endswith("UNACCOUNTED_FAILURE")
+            for value in module_results
+        ),
+        "network_disabled": True,
+        "telemetry_disabled": True,
+        "restricted_mount_present": False,
+        "resource": resource,
+        "cumulative_resource": cumulative_resource,
+    }
+    full["engineering_health_commitment_sha256"] = digest(full)
+    _validate_tuple_health_full(full, cfg)
+    write_private_new(result_path, full)
+    return _tuple_health_compact(full)
+
+
+def _load_tuple_health_pass(
+    public: Path, cfg: dict[str, Any], fixture_commitment: str
+) -> dict[str, Any]:
+    root = _tuple_health_root(public) / "health"
+    passes = []
+    observed = []
+    for attempt in range(1, 4):
+        path = root / f"attempt-{attempt:02d}" / "full-result.json"
+        if not path.is_file():
+            marker = root / f"attempt-{attempt:02d}" / "wrapper-started.json"
+            if marker.is_file():
+                if attempt != len(observed) + 1:
+                    raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+                observed.append(
+                    {
+                        "resource": _tuple_health_incomplete_attempt_resource(
+                            _tuple_health_root(public), attempt, cfg
+                        )
+                    }
+                )
+            continue
+        if attempt != len(observed) + 1:
+            raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+        value = json.loads(path.read_text())
+        _validate_tuple_health_full(value, cfg)
+        payload = {
+            key: item
+            for key, item in value.items()
+            if key != "engineering_health_commitment_sha256"
+        }
+        if digest(payload) != value.get("engineering_health_commitment_sha256"):
+            raise RuntimeError("E_TUPLE_HEALTH_RESULT_COMMITMENT")
+        expected_cumulative = _tuple_health_cumulative_resource(
+            [{"resource": prior["resource"]} for prior in observed],
+            value["resource"],
+        )
+        if value["cumulative_resource"] != expected_cumulative:
+            raise RuntimeError("E_TUPLE_HEALTH_CUMULATIVE_RESOURCE")
+        observed.append(value)
+        if value["status"] == "PASS_ENGINEERING_HEALTH":
+            passes.append(value)
+    if len(passes) != 1:
+        raise RuntimeError("E_TUPLE_SCIENCE_BEFORE_ENGINEERING_HEALTH_PASS")
+    value = passes[0]
+    if (
+        value["public_fixture_manifest_commitment_sha256"]
+        != fixture_commitment
+        or value["runner_commitment_sha256"]
+        != file_digest(Path(__file__).resolve())
+        or value["config_commitment_sha256"] != digest(cfg)
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_PASS_PROVENANCE")
+    return value
+
+
+def _tuple_partition_integrity_compact(full: dict[str, Any]) -> dict[str, Any]:
+    compact = {
+        key: full[key]
+        for key in TUPLE_PARTITION_INTEGRITY_FIELDS
+        if key in full
+    }
+    if (
+        set(compact) != set(TUPLE_PARTITION_INTEGRITY_FIELDS)
+        or compact["status"]
+        not in {"PASS_ENGINEERING_INTEGRITY", "ENGINEERING_BLOCKER"}
+        or compact["scientific_metric_count"] != 0
+    ):
+        raise RuntimeError("E_TUPLE_PARTITION_INTEGRITY_COMPACT_SCHEMA")
+    return compact
+
+
+def _validate_tuple_partition_integrity_full(value: Any) -> None:
+    required = {
+        "schema_version",
+        "status",
+        "partition",
+        "attempt",
+        "module_results",
+        "module_count",
+        "completed_module_count",
+        "failed_module_count",
+        "scientific_metric_count",
+        "failure_count",
+        "invalid_retained_record_count",
+        "silent_truncation_count",
+        "external_call_count",
+        "unaccounted_failure_count",
+        "public_fixture_manifest_commitment_sha256",
+        "engineering_health_commitment_sha256",
+        "runner_commitment_sha256",
+        "network_disabled",
+        "telemetry_disabled",
+        "restricted_mount_present",
+        "partition_engineering_integrity_commitment_sha256",
+    }
+    if (
+        not isinstance(value, dict)
+        or set(value) != required
+        or value.get("schema_version") != 1
+        or value.get("partition") not in {"DEVELOPMENT", "HOLDOUT"}
+        or type(value.get("attempt")) is not int
+        or not 1 <= value["attempt"] <= 3
+        or value.get("module_count") != len(TUPLE_QUALIFICATION_MODULE_IDS)
+        or value.get("scientific_metric_count") != 0
+        or any(
+            value.get(key) is not expected
+            for key, expected in (
+                ("network_disabled", True),
+                ("telemetry_disabled", True),
+                ("restricted_mount_present", False),
+            )
+        )
+    ):
+        raise RuntimeError("E_TUPLE_PARTITION_INTEGRITY_FULL_SCHEMA")
+    modules = value.get("module_results")
+    if (
+        not isinstance(modules, list)
+        or len(modules) != len(TUPLE_QUALIFICATION_MODULE_IDS)
+        or {row.get("module_id") for row in modules}
+        != set(TUPLE_QUALIFICATION_MODULE_IDS)
+    ):
+        raise RuntimeError("E_TUPLE_PARTITION_INTEGRITY_FULL_SCHEMA")
+    for row in modules:
+        _validate_tuple_health_module_result(row)
+    passed = sum(row["status"] == "PASS_ENGINEERING" for row in modules)
+    failed = len(modules) - passed
+    expected_status = (
+        "PASS_ENGINEERING_INTEGRITY" if failed == 0 else "ENGINEERING_BLOCKER"
+    )
+    if (
+        value.get("status") != expected_status
+        or value.get("completed_module_count") != passed
+        or value.get("failed_module_count") != failed
+        or value.get("failure_count") != failed
+        or value.get("invalid_retained_record_count") != 0
+        or value.get("silent_truncation_count") != 0
+        or value.get("external_call_count") != 0
+        or value.get("unaccounted_failure_count")
+        != sum(
+            str(row.get("error_code", "")).endswith("UNACCOUNTED_FAILURE")
+            for row in modules
+        )
+    ):
+        raise RuntimeError("E_TUPLE_PARTITION_INTEGRITY_FULL_SCHEMA")
+    for key in (
+        "public_fixture_manifest_commitment_sha256",
+        "engineering_health_commitment_sha256",
+        "runner_commitment_sha256",
+        "partition_engineering_integrity_commitment_sha256",
+    ):
+        if not isinstance(value.get(key), str) or not re.fullmatch(
+            r"[0-9a-f]{64}", value[key]
+        ):
+            raise RuntimeError("E_TUPLE_PARTITION_INTEGRITY_FULL_SCHEMA")
+    commitment = value["partition_engineering_integrity_commitment_sha256"]
+    if digest(
+        {
+            key: item
+            for key, item in value.items()
+            if key != "partition_engineering_integrity_commitment_sha256"
+        }
+    ) != commitment:
+        raise RuntimeError("E_TUPLE_PARTITION_INTEGRITY_COMMITMENT")
+
+
+def _tuple_partition_engineering_integrity(
+    context: dict[str, Any],
+    partition: str,
+    trace_root: Path,
+) -> list[dict[str, Any]]:
+    """Execute every complete-partition raw path before any metric helper."""
+
+    results = []
+    try:
+        runners = _tuple_module_runners()
+    except BaseException as error:
+        if isinstance(error, (KeyboardInterrupt, SystemExit)):
+            raise
+        return [
+            _tuple_health_error(
+                module_id,
+                error
+                if ordinal == 0
+                else RuntimeError("E_TUPLE_HEALTH_PREFLIGHT_BLOCKED"),
+                trace_root,
+            )
+            for ordinal, module_id in enumerate(TUPLE_QUALIFICATION_MODULE_IDS)
+        ]
+    base_scratch = Path(context["scratch_root"])
+    family_by_module = {
+        "adapter_and_lexical": "language_lexical",
+        "referent": "referent_attribute",
+        "recurrence": "recurrence",
+        "attribute": "referent_attribute",
+        "hand_contact": "hand_contact",
+        "sensor": "sensor",
+        "order_action": "order_action",
+    }
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        module_context = dict(context)
+        module_context["engineering_health"] = True
+        module_context["module_cache"] = {}
+        module_context["scratch_root"] = base_scratch / module_id
+        module_context["scratch_root"].mkdir(
+            parents=True, exist_ok=False, mode=0o700
+        )
+        try:
+            result = runners[module_id](module_context)
+            expected_case_count = len(
+                module_context["rows"][family_by_module[module_id]]
+            )
+            _validate_tuple_health_module_result(
+                result, expected_case_count=expected_case_count
+            )
+            if result.get("module_id") != module_id:
+                raise RuntimeError("E_TUPLE_PARTITION_INTEGRITY_MODULE_RESULT")
+            results.append(result)
+        except BaseException as error:
+            if isinstance(error, (KeyboardInterrupt, SystemExit)):
+                raise
+            results.append(_tuple_health_error(module_id, error, trace_root))
+    return results
+
+
+def _tuple_scientific_module_results(
+    runners: dict[str, Any],
+    context: dict[str, Any],
+    trace_root: Path,
+) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
+    """Discard all scientific outputs if any module raises."""
+
+    output: dict[str, dict[str, Any]] = {}
+    errors = []
+    if set(runners) != set(TUPLE_QUALIFICATION_MODULE_IDS):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_MODULE_SET")
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        try:
+            result = runners[module_id](context)
+            allowed = {"PASS", "NO_GO", "UNMEASURED"}
+            if module_id == "order_action":
+                allowed.add("NO_GO_DIAGNOSTIC")
+            if not isinstance(result, dict) or result.get("status") not in allowed:
+                raise RuntimeError("E_TUPLE_QUALIFICATION_MODULE_RESULT")
+            output[module_id] = result
+        except BaseException as error:
+            if isinstance(error, (KeyboardInterrupt, SystemExit)):
+                raise
+            errors.append(_tuple_health_error(module_id, error, trace_root))
+    return ({}, errors) if errors else (output, [])
+
+
+def _tuple_finalize_scientific_partition(
+    *,
+    cfg: dict[str, Any],
+    active: dict[str, Any],
+    correction: dict[str, Any],
+    manifest: dict[str, Any],
+    partition: str,
+    no_hand_commitment: str,
+    threshold_seal: dict[str, Any] | None,
+    integrity_results: list[dict[str, Any]],
+    module_results: dict[str, dict[str, Any]],
+) -> tuple[dict[str, Any], dict[str, Any] | None, dict[str, Any]]:
+    """Build one all-or-nothing scientific decision after engineering PASS."""
+
+    module_results = _tuple_health_metric_release(
+        integrity_results, module_results
+    )
     _validate_tuple_qualification_record(module_results)
     observed_thresholds = _tuple_selected_thresholds(
         cfg,
         module_results,
-        expected=(threshold_seal["selected_thresholds"] if threshold_seal else None),
+        expected=(
+            threshold_seal["selected_thresholds"]
+            if threshold_seal is not None
+            else None
+        ),
     )
     selected_thresholds = (
         dict(threshold_seal["selected_thresholds"])
@@ -7888,10 +10403,14 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
         )
         if selected_thresholds != seal["selected_thresholds"]:
             raise RuntimeError("E_TUPLE_QUALIFICATION_THRESHOLD_SEAL_MISMATCH")
-        threshold_commitment = seal["development_threshold_commitment_sha256"]
+        threshold_commitment = seal[
+            "development_threshold_commitment_sha256"
+        ]
         status = seal["status"]
         development_module_commitment = partition_module_commitment
     else:
+        if threshold_seal is None:
+            raise RuntimeError("E_TUPLE_HOLDOUT_BEFORE_DEVELOPMENT_SEAL")
         seal = None
         threshold_commitment = threshold_seal[
             "development_threshold_commitment_sha256"
@@ -7933,11 +10452,300 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
         "network_disabled": True,
     }
     full["public_qualification_commitment_sha256"] = digest(full)
-    paths = _tuple_qualification_paths(args.public_root)
-    write_private_new(paths[f"{partition}_result"], full)
-    if seal is not None:
-        write_private_new(paths["development_threshold_seal"], seal)
-    return _tuple_qualification_compact(full, threshold_commitment)
+    compact = _tuple_qualification_compact(full, threshold_commitment)
+    return full, seal, compact
+
+
+def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
+    """Run one public partition and make exactly one complete stage decision."""
+
+    partition = str(args.partition)
+    if partition not in {"development", "holdout"}:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_PARTITION")
+    cfg = json.loads(args.config.read_text())
+    active = _construct_aligned_ltx_resume_amendment(cfg)
+    _tuple_qualification_execution(cfg)
+    output_root = _tuple_qualification_root(args.public_root)
+    _require_external_or_ignored_output(output_root)
+    _require_external_or_ignored_output(args.scratch_root)
+    _tuple_health_topology(str(args.device))
+    if (
+        os.environ.get("HF_HUB_OFFLINE") != "1"
+        or os.environ.get("TRANSFORMERS_OFFLINE") != "1"
+        or os.environ.get("HF_HUB_DISABLE_TELEMETRY") != "1"
+        or os.environ.get("WANDB_DISABLED", "").casefold() != "true"
+    ):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_OFFLINE_ENVIRONMENT")
+    _verify_tuple_runtime_manifest(args.public_root, cfg)
+    manifest, fixture_root = _verify_tuple_fixture_manifest(args.public_root, cfg)
+    correction = _tuple_visor_hos_correction_amendment(cfg)
+    if manifest.get("visor_hos_correction_amendment_commitment_sha256") != correction[
+        "amendment_commitment_sha256"
+    ]:
+        raise RuntimeError("E_TUPLE_QUALIFICATION_CORRECTION_COMMITMENT")
+    no_hand_commitment = manifest.get("verified_no_hand_seal_commitment_sha256")
+    if not isinstance(no_hand_commitment, str) or not re.fullmatch(
+        r"[0-9a-f]{64}", no_hand_commitment
+    ):
+        raise RuntimeError("E_TUPLE_QUALIFICATION_NO_HAND_SEAL")
+    health_pass = _load_tuple_health_pass(
+        args.public_root,
+        cfg,
+        manifest["public_fixture_manifest_commitment_sha256"],
+    )
+    dependency = _tuple_health_dependency_preflight(args.public_root, cfg)
+    if (
+        dependency["dependency_config_commitment_sha256"]
+        != health_pass["dependency_config_commitment_sha256"]
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_PASS_DEPENDENCY_PROVENANCE")
+    recovered = _recover_tuple_qualification_transaction(
+        args.public_root, cfg, manifest, partition
+    )
+    if recovered is not None:
+        return recovered
+    if partition == "holdout":
+        _refuse_tuple_qualification_overwrite(args.public_root, partition)
+    if partition == "development":
+        reused = _reuse_tuple_development_pair(args.public_root, cfg, manifest)
+        if reused is not None:
+            return reused
+    threshold_seal = (
+        _load_tuple_development_threshold_seal(args.public_root, cfg, manifest)
+        if partition == "holdout"
+        else None
+    )
+    args.scratch_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    base_context = {
+        "cfg": cfg,
+        "public_root": args.public_root,
+        "fixture_root": fixture_root,
+        "fixture_manifest": manifest,
+        "fixture_manifest_commitment_sha256": manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "partition": partition,
+        "rows": manifest["partitions"][partition],
+        "device": args.device,
+        "thresholds": (
+            dict(threshold_seal["selected_thresholds"])
+            if threshold_seal is not None
+            else {}
+        ),
+        "verified_no_hand_seal": {
+            "status": "PASS",
+            "verified_no_hand_seal_commitment_sha256": no_hand_commitment,
+        },
+    }
+    integrity_root = output_root / "engineering-integrity"
+    integrity_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    prior_integrity = sorted(
+        path
+        for path in integrity_root.iterdir()
+        if re.fullmatch(
+            rf"{re.escape(partition)}-attempt-[0-9]{{2}}\.json", path.name
+        )
+    )
+    observed_attempts = [
+        int(path.stem.rsplit("-", maxsplit=1)[1]) for path in prior_integrity
+    ]
+    if observed_attempts != list(range(1, len(prior_integrity) + 1)):
+        raise RuntimeError("E_TUPLE_PARTITION_ENGINEERING_ATTEMPT_BUDGET")
+    if len(prior_integrity) >= 3:
+        raise RuntimeError("E_TUPLE_PARTITION_ENGINEERING_ATTEMPT_BUDGET")
+    integrity_attempt = len(prior_integrity) + 1
+    integrity_context = {
+        **base_context,
+        "scratch_root": args.scratch_root / f"{partition}-engineering-integrity",
+        "module_cache": {},
+    }
+    integrity_results = _tuple_partition_engineering_integrity(
+        integrity_context,
+        partition,
+        integrity_root / f"{partition}-attempt-{integrity_attempt:02d}-traces",
+    )
+    integrity_passed = sum(
+        value.get("status") == "PASS_ENGINEERING"
+        for value in integrity_results
+    )
+    integrity_failed = len(TUPLE_QUALIFICATION_MODULE_IDS) - integrity_passed
+    integrity_full = {
+        "schema_version": 1,
+        "status": (
+            "PASS_ENGINEERING_INTEGRITY"
+            if integrity_failed == 0
+            else "ENGINEERING_BLOCKER"
+        ),
+        "partition": partition.upper(),
+        "attempt": integrity_attempt,
+        "module_results": integrity_results,
+        "module_count": len(TUPLE_QUALIFICATION_MODULE_IDS),
+        "completed_module_count": integrity_passed,
+        "failed_module_count": integrity_failed,
+        "scientific_metric_count": 0,
+        "failure_count": integrity_failed,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+        "unaccounted_failure_count": sum(
+            str(value.get("error_code", "")).endswith("UNACCOUNTED_FAILURE")
+            for value in integrity_results
+        ),
+        "public_fixture_manifest_commitment_sha256": manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "engineering_health_commitment_sha256": health_pass[
+            "engineering_health_commitment_sha256"
+        ],
+        "runner_commitment_sha256": file_digest(Path(__file__).resolve()),
+        "network_disabled": True,
+        "telemetry_disabled": True,
+        "restricted_mount_present": False,
+    }
+    integrity_full["partition_engineering_integrity_commitment_sha256"] = digest(
+        integrity_full
+    )
+    _validate_tuple_partition_integrity_full(integrity_full)
+    write_private_new(
+        integrity_root / f"{partition}-attempt-{integrity_attempt:02d}.json",
+        integrity_full,
+    )
+    if integrity_failed:
+        return _tuple_partition_integrity_compact(integrity_full)
+
+    scientific_root = args.scratch_root / f"{partition}-scientific"
+    scientific_root.mkdir(parents=True, exist_ok=False, mode=0o700)
+    context = {
+        **base_context,
+        "scratch_root": scientific_root,
+        "module_cache": {},
+    }
+    runners = _tuple_module_runners()
+    if threshold_seal is not None:
+        threshold_modules = {
+            "referent",
+            "recurrence",
+            "attribute",
+            "hand_contact",
+            "order_action",
+        }
+        for module_id in threshold_modules:
+            development_status = threshold_seal["development_module_statuses"][
+                module_id
+            ]
+            if development_status != "PASS" and not (
+                module_id == "order_action"
+                and development_status == "NO_GO_DIAGNOSTIC"
+            ):
+                runners[module_id] = _development_unqualified_tuple_module_runner(
+                    module_id
+                )
+    module_results, scientific_errors = _tuple_scientific_module_results(
+        runners,
+        context,
+        integrity_root
+        / f"{partition}-attempt-{integrity_attempt:02d}-scientific-traces",
+    )
+    if scientific_errors:
+        errors_by_module = {
+            row["module_id"]: row for row in scientific_errors
+        }
+        blocker_modules = [
+            errors_by_module.get(row["module_id"], row)
+            for row in integrity_results
+        ]
+        scientific_blocker = {
+            **integrity_full,
+            "status": "ENGINEERING_BLOCKER",
+            "module_results": blocker_modules,
+            "completed_module_count": len(TUPLE_QUALIFICATION_MODULE_IDS)
+            - len(scientific_errors),
+            "failed_module_count": len(scientific_errors),
+            "failure_count": len(scientific_errors),
+            "unaccounted_failure_count": sum(
+                str(value.get("error_code", "")).endswith(
+                    "UNACCOUNTED_FAILURE"
+                )
+                for value in scientific_errors
+            ),
+        }
+        scientific_blocker.pop(
+            "partition_engineering_integrity_commitment_sha256", None
+        )
+        scientific_blocker[
+            "partition_engineering_integrity_commitment_sha256"
+        ] = digest(scientific_blocker)
+        _validate_tuple_partition_integrity_full(scientific_blocker)
+        write_private_new(
+            integrity_root
+            / f"{partition}-attempt-{integrity_attempt:02d}-scientific-blocker.json",
+            scientific_blocker,
+        )
+        return _tuple_partition_integrity_compact(scientific_blocker)
+    try:
+        full, seal, compact = _tuple_finalize_scientific_partition(
+            cfg=cfg,
+            active=active,
+            correction=correction,
+            manifest=manifest,
+            partition=partition,
+            no_hand_commitment=no_hand_commitment,
+            threshold_seal=threshold_seal,
+            integrity_results=integrity_results,
+            module_results=module_results,
+        )
+        paths = _tuple_qualification_paths(args.public_root)
+        transaction = _tuple_qualification_transaction(partition, full, seal)
+        write_private_new(
+            _tuple_qualification_transaction_path(args.public_root, partition),
+            transaction,
+        )
+        write_private_new(paths[f"{partition}_result"], full)
+        if seal is not None:
+            write_private_new(paths["development_threshold_seal"], seal)
+        return compact
+    except BaseException as error:
+        if isinstance(error, (KeyboardInterrupt, SystemExit)):
+            raise
+        finalize_trace_root = (
+            integrity_root
+            / f"{partition}-attempt-{integrity_attempt:02d}-finalize-traces"
+        )
+        blocker_modules = [
+            _tuple_health_error(
+                module_id,
+                error
+                if ordinal == 0
+                else RuntimeError("E_TUPLE_HEALTH_PREFLIGHT_BLOCKED"),
+                finalize_trace_root,
+            )
+            for ordinal, module_id in enumerate(TUPLE_QUALIFICATION_MODULE_IDS)
+        ]
+        finalize_blocker = {
+            **integrity_full,
+            "status": "ENGINEERING_BLOCKER",
+            "module_results": blocker_modules,
+            "completed_module_count": 0,
+            "failed_module_count": len(blocker_modules),
+            "failure_count": len(blocker_modules),
+            "unaccounted_failure_count": sum(
+                str(value["error_code"]).endswith("UNACCOUNTED_FAILURE")
+                for value in blocker_modules
+            ),
+        }
+        finalize_blocker.pop(
+            "partition_engineering_integrity_commitment_sha256", None
+        )
+        finalize_blocker[
+            "partition_engineering_integrity_commitment_sha256"
+        ] = digest(finalize_blocker)
+        _validate_tuple_partition_integrity_full(finalize_blocker)
+        write_private_new(
+            integrity_root
+            / f"{partition}-attempt-{integrity_attempt:02d}-finalize-blocker.json",
+            finalize_blocker,
+        )
+        return _tuple_partition_integrity_compact(finalize_blocker)
 
 
 def prepare_tuple_audio_seed(args: argparse.Namespace) -> dict[str, Any]:
@@ -13002,7 +15810,20 @@ def prepare_tuple_fixtures(args: argparse.Namespace) -> dict[str, Any]:
     cfg = json.loads(args.config.read_text())
     fixture_root = _tuple_fixture_root(args.public_root)
     _require_external_or_ignored_output(args.public_root)
-    qualification_paths = _tuple_qualification_paths(args.public_root)
+    qualification_paths = {
+        **{
+            f"new_{key}": value
+            for key, value in _tuple_qualification_paths(
+                args.public_root
+            ).items()
+        },
+        **{
+            f"legacy_{key}": value
+            for key, value in _tuple_legacy_qualification_paths(
+                args.public_root
+            ).items()
+        },
+    }
     if any(path.exists() for path in qualification_paths.values()):
         raise RuntimeError("E_TUPLE_FIXTURE_REPLACEMENT_AFTER_QUALIFICATION")
     active = _construct_aligned_ltx_resume_amendment(cfg)
@@ -14044,6 +16865,33 @@ def _activity_checkpoint_root(public: Path, candidate_id: str) -> Path:
     return public / "models/activity-checkpoints" / candidate_id
 
 
+def _resolve_tuple_egohod_checkpoint(
+    public: Path, candidate: dict[str, Any]
+) -> Path:
+    """Resolve only the frozen official EgoHOD bytes from known cache layouts."""
+
+    expected = candidate.get("weight_sha256")
+    if (
+        candidate.get("candidate_id") != "egohod_egovideo_l_zero_shot"
+        or expected
+        != "71faa0b6e5ebfb912238a099b16b1ff8b6b0a74cbb5b9eb43d5ad8bc92f880da"
+    ):
+        raise RuntimeError("E_ACTIVITY_WEIGHT_COMMITMENT")
+    candidates = (
+        _activity_checkpoint_root(public, candidate["candidate_id"])
+        / candidate["weight_file"],
+        public / "models/activity-checkpoints/egovideo_large_best.pt",
+        _tuple_model_root(public) / "weights/egohod_large_best.pt",
+    )
+    existing = [path for path in candidates if path.is_file()]
+    if not existing:
+        raise RuntimeError("E_ACTIVITY_WEIGHT_COMMITMENT")
+    observed = {path: file_digest(path) for path in existing}
+    if any(value != expected for value in observed.values()):
+        raise RuntimeError("E_ACTIVITY_WEIGHT_COMMITMENT")
+    return next(path for path in candidates if path in observed)
+
+
 def _link_public_artifact(source: Path, target: Path, expected_sha256: str) -> None:
     if target.is_file():
         if file_digest(target) != expected_sha256:
@@ -14486,9 +17334,7 @@ def _load_egohod_activity_adapter(
     from model.clip import CLIP
     from model.transformer import TextTransformer, VisionTransformer
 
-    checkpoint = _activity_checkpoint_root(public, candidate["candidate_id"]) / candidate["weight_file"]
-    if not checkpoint.is_file() or file_digest(checkpoint) != candidate["weight_sha256"]:
-        raise RuntimeError("E_ACTIVITY_WEIGHT_COMMITMENT")
+    checkpoint = _resolve_tuple_egohod_checkpoint(public, candidate)
     checkpoint_loading = runtime["checkpoint_safe_load"]
     unsafe_globals = set(
         torch.serialization.get_unsafe_globals_in_checkpoint(checkpoint)
@@ -15861,6 +18707,44 @@ def _image_metrics(image, previous) -> dict[str, float | None]:
     }
 
 
+def _resolve_tuple_pe_core_checkpoint(
+    public: Path, cfg: dict[str, Any]
+) -> Path:
+    """Resolve byte-identical frozen PE-Core copies with a canonical preference."""
+
+    try:
+        frozen = cfg["calibration_C"]["extractor"]["vision_model"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_FROZEN_VISION_MODEL") from error
+    if digest(frozen) != TUPLE_PE_CORE_IDENTITY_SHA256:
+        raise RuntimeError("E_FROZEN_VISION_MODEL")
+    canonical_path = (
+        public / "models/mechanistic-tuples/weights/PE-Core-L14-336.pt"
+    )
+    cached_path = (
+        public
+        / "models/pe-hf-home/hub"
+        / "models--facebook--PE-Core-L14-336"
+        / "snapshots"
+        / frozen["revision"]
+        / "PE-Core-L14-336.pt"
+    )
+    existing = [
+        path
+        for path in (canonical_path, cached_path)
+        if path.is_file()
+    ]
+    if not existing:
+        raise RuntimeError("E_FROZEN_VISION_MODEL")
+    try:
+        observed = {path: file_digest(path) for path in existing}
+    except OSError as error:
+        raise RuntimeError("E_FROZEN_VISION_MODEL") from error
+    if any(value != frozen["weights_sha256"] for value in observed.values()):
+        raise RuntimeError("E_FROZEN_VISION_MODEL")
+    return canonical_path if canonical_path in observed else sorted(observed)[0]
+
+
 def _load_vision(
     public: Path,
     cfg: dict[str, Any],
@@ -15873,23 +18757,9 @@ def _load_vision(
         transforms,
     )
 
-    frozen = cfg["calibration_C"]["extractor"]["vision_model"]
-    candidates = [
-        public / "models/mechanistic-tuples/weights/PE-Core-L14-336.pt"
-    ] + list(
-        (public / "models/pe-hf-home/hub").glob(
-            f"models--facebook--PE-Core-L14-336/snapshots/{frozen['revision']}/PE-Core-L14-336.pt"
-        )
-    )
-    candidates = [
-        path
-        for path in candidates
-        if path.is_file() and file_digest(path) == frozen["weights_sha256"]
-    ]
-    if len(candidates) != 1:
-        raise RuntimeError("E_FROZEN_VISION_MODEL")
+    checkpoint = _resolve_tuple_pe_core_checkpoint(public, cfg)
     model = pe.CLIP.from_config("PE-Core-L14-336", pretrained=False)
-    model.load_ckpt(str(candidates[0]))
+    model.load_ckpt(str(checkpoint))
     model = model.to(device).eval()
     transform = transforms.get_image_transform(model.image_size)
     tokenizer = transforms.get_text_tokenizer(model.context_length)
@@ -17198,6 +20068,14 @@ def main() -> None:
     tuple_size_parser.add_argument("--scratch-root", type=Path, required=True)
     tuple_size_parser.add_argument("--config", type=Path, required=True)
     tuple_size_parser.add_argument("--device", default="cuda")
+    tuple_health_parser = subparsers.add_parser("tuple-health")
+    tuple_health_parser.add_argument("--public-root", type=Path, required=True)
+    tuple_health_parser.add_argument("--scratch-root", type=Path, required=True)
+    tuple_health_parser.add_argument("--config", type=Path, required=True)
+    tuple_health_parser.add_argument(
+        "--attempt", type=int, choices=(1, 2, 3), required=True
+    )
+    tuple_health_parser.add_argument("--device", default="cuda")
     tuple_qualify_parser = subparsers.add_parser("tuple-qualify")
     tuple_qualify_parser.add_argument("--public-root", type=Path, required=True)
     tuple_qualify_parser.add_argument("--scratch-root", type=Path, required=True)
@@ -17333,13 +20211,31 @@ def main() -> None:
                 sha256_fields=TUPLE_SIZING_HASH_FIELDS,
             )
         )
-    elif args.command == "tuple-qualify":
-        value = qualify_tuple_public(args)
+    elif args.command == "tuple-health":
+        value = run_tuple_health(args)
         print(
             compact_aggregate_json(
                 value,
-                allowed_fields=TUPLE_QUALIFICATION_FIELDS,
-                sha256_fields=TUPLE_QUALIFICATION_HASH_FIELDS,
+                allowed_fields=TUPLE_HEALTH_FIELDS,
+                sha256_fields=TUPLE_HEALTH_HASH_FIELDS,
+            )
+        )
+    elif args.command == "tuple-qualify":
+        value = qualify_tuple_public(args)
+        engineering_only = "scientific_metric_count" in value
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=(
+                    TUPLE_PARTITION_INTEGRITY_FIELDS
+                    if engineering_only
+                    else TUPLE_QUALIFICATION_FIELDS
+                ),
+                sha256_fields=(
+                    TUPLE_PARTITION_INTEGRITY_HASH_FIELDS
+                    if engineering_only
+                    else TUPLE_QUALIFICATION_HASH_FIELDS
+                ),
             )
         )
     elif args.command == "tuple-audio-seed":

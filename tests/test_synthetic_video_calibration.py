@@ -84,6 +84,87 @@ def test_engineering_health_amendment_and_geometry_lineage_are_exact() -> None:
     ] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
 
 
+def test_pe_core_resolver_accepts_identical_copies_and_prefers_canonical(
+    tmp_path, monkeypatch
+) -> None:
+    import pytest
+
+    config = json.loads(
+        Path("configs/synthetic_video_real_only_proof.json").read_text()
+    )
+    frozen = config["calibration_C"]["extractor"]["vision_model"]
+    canonical = (
+        tmp_path / "models/mechanistic-tuples/weights/PE-Core-L14-336.pt"
+    )
+    cached = (
+        tmp_path
+        / "models/pe-hf-home/hub/models--facebook--PE-Core-L14-336/snapshots"
+        / frozen["revision"]
+        / "PE-Core-L14-336.pt"
+    )
+    canonical.parent.mkdir(parents=True)
+    cached.parent.mkdir(parents=True)
+    canonical.write_bytes(b"byte-identical frozen copy")
+    cached.write_bytes(b"byte-identical frozen copy")
+    observed = {
+        canonical: frozen["weights_sha256"],
+        cached: frozen["weights_sha256"],
+    }
+    monkeypatch.setattr(MODULE, "file_digest", lambda path: observed[path])
+
+    assert MODULE._resolve_tuple_pe_core_checkpoint(tmp_path, config) == canonical
+
+    observed[canonical] = "0" * 64
+    with pytest.raises(RuntimeError, match="E_FROZEN_VISION_MODEL"):
+        MODULE._resolve_tuple_pe_core_checkpoint(tmp_path, config)
+
+    canonical.unlink()
+    assert MODULE._resolve_tuple_pe_core_checkpoint(tmp_path, config) == cached
+
+    altered = json.loads(json.dumps(config))
+    altered["calibration_C"]["extractor"]["vision_model"]["revision"] = "0" * 40
+    with pytest.raises(RuntimeError, match="E_FROZEN_VISION_MODEL"):
+        MODULE._resolve_tuple_pe_core_checkpoint(tmp_path, altered)
+
+    cached.unlink()
+    with pytest.raises(RuntimeError, match="E_FROZEN_VISION_MODEL"):
+        MODULE._resolve_tuple_pe_core_checkpoint(tmp_path, config)
+
+
+def test_order_action_uses_exact_frozen_egohod_without_activity_selection() -> None:
+    import inspect
+    import pytest
+
+    config = json.loads(
+        Path("configs/synthetic_video_real_only_proof.json").read_text()
+    )
+    activity = config["calibration_C"]["extractor"][
+        "activity_checkpoint_selection_amendment"
+    ]
+    assert activity["status"] == "PUBLIC_DEVELOPMENT_NO_GO_NO_ELIGIBLE_CANDIDATE"
+    candidate, runtime = MODULE._tuple_order_action_egohod_wiring(config)
+    assert candidate["candidate_id"] == "egohod_egovideo_l_zero_shot"
+    assert candidate["weight_sha256"] == (
+        "71faa0b6e5ebfb912238a099b16b1ff8b6b0a74cbb5b9eb43d5ad8bc92f880da"
+    )
+    assert runtime["input_frames"] == 16
+    source = inspect.getsource(MODULE._tuple_order_action_module)
+    assert "_tuple_order_action_egohod_wiring" in source
+    assert "_activity_config" not in source
+
+    altered = json.loads(json.dumps(config))
+    candidates = altered["calibration_C"]["extractor"][
+        "activity_checkpoint_selection_amendment"
+    ]["bounded_candidates"]
+    next(
+        value
+        for value in candidates
+        if value["candidate_id"] == "egohod_egovideo_l_zero_shot"
+    )["weight_sha256"] = "0" * 64
+    with pytest.raises(RuntimeError, match="E_TUPLE_ACTION_EGOHOD_IDENTITY"):
+        MODULE._tuple_order_action_egohod_wiring(altered)
+
+
 def test_public_fixture_geometry_rasterization_repair_is_frozen() -> None:
     import pytest
 
@@ -3362,6 +3443,9 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
 
     monkeypatch.setenv("HF_HUB_OFFLINE", "1")
     monkeypatch.setenv("TRANSFORMERS_OFFLINE", "1")
+    monkeypatch.setenv("HF_HUB_DISABLE_TELEMETRY", "1")
+    monkeypatch.setenv("WANDB_DISABLED", "true")
+    monkeypatch.setattr(MODULE, "_tuple_health_topology", lambda *_: None)
     monkeypatch.setattr(MODULE, "_verify_tuple_runtime_manifest", lambda *_: {})
     monkeypatch.setattr(
         MODULE,
@@ -3375,6 +3459,35 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
             module_id: runner(module_id)
             for module_id in MODULE.TUPLE_QUALIFICATION_MODULE_IDS
         },
+    )
+    health_commitment = "c" * 64
+    dependency_commitment = "d" * 64
+    monkeypatch.setattr(
+        MODULE,
+        "_load_tuple_health_pass",
+        lambda *_: {
+            "engineering_health_commitment_sha256": health_commitment,
+            "dependency_config_commitment_sha256": dependency_commitment,
+        },
+    )
+    monkeypatch.setattr(
+        MODULE,
+        "_tuple_health_dependency_preflight",
+        lambda *_: {
+            "dependency_config_commitment_sha256": dependency_commitment
+        },
+    )
+    monkeypatch.setattr(
+        MODULE,
+        "_tuple_partition_engineering_integrity",
+        lambda *_: [
+            MODULE._tuple_health_pass_result(
+                module_id,
+                1,
+                {"module_id": module_id, "partition_integrity": True},
+            )
+            for module_id in MODULE.TUPLE_QUALIFICATION_MODULE_IDS
+        ],
     )
     public = tmp_path / "public"
     scratch = tmp_path / "scratch"
@@ -3396,6 +3509,18 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
     paths = MODULE._tuple_qualification_paths(public)
     assert paths["development_result"].is_file()
     assert paths["development_threshold_seal"].is_file()
+    transaction_path = MODULE._tuple_qualification_transaction_path(
+        public, "development"
+    )
+    assert transaction_path.is_file()
+    sealed_threshold_bytes = paths["development_threshold_seal"].read_bytes()
+    paths["development_threshold_seal"].unlink()
+    recovered = MODULE.qualify_tuple_public(
+        argparse.Namespace(**base, partition="development")
+    )
+    assert recovered == development
+    assert paths["development_threshold_seal"].read_bytes() == sealed_threshold_bytes
+    assert len(called) == len(MODULE.TUPLE_QUALIFICATION_MODULE_IDS)
     reused = MODULE.qualify_tuple_public(
         argparse.Namespace(**base, partition="development")
     )
