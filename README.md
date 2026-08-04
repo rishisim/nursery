@@ -275,6 +275,14 @@ CPUs, 32 GiB, at most three 15-minute submissions, 0.75 aggregate GPU-hours,
 may open the new-route public development run. Holdout, governed C, LTX-2.3,
 exactly 3,600 accepted seconds, and Synthetic-1h remain conditional and unrun.
 
+Before any health output, A30 job 316158 remained pending with zero runtime and
+was canceled before allocation. Prospective resource-only amendment
+`f7fc16f5…86db6d` redirects the unchanged microhealth to one H100 NVL
+`3g.47gb` MIG slice, one process, eight CPUs, 32 GiB, and 15 minutes. The
+initial-plus-two-resmoke, 0.75 aggregate slice-GPU-hour, 10-GiB, and $0 ceilings
+are unchanged. No model, fixture, threshold, metric, seed, scientific gate,
+downstream contract, or prior result changed.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

@@ -565,6 +565,9 @@ CONSTRUCT_ALIGNED_RESUME_AMENDMENT_SHA256 = (
 ENGINEERING_HEALTH_AMENDMENT_SHA256 = (
     "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205"
 )
+ENGINEERING_HEALTH_RESOURCE_REDIRECT_SHA256 = (
+    "f7fc16f5c399c2a2d213b13a0d255a14b5b2f3ece41d62adaed17f61f186db6d"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -620,7 +623,7 @@ def _construct_aligned_ltx_resume_amendment(
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {16, 17, 18}
+        cfg.get("schema_version") not in {16, 17, 18, 19}
         or value.get("status")
         != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     ):
@@ -678,7 +681,7 @@ def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") != 18
+        cfg.get("schema_version") != 19
         or value.get("status")
         != "FROZEN_BEFORE_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -733,6 +736,108 @@ def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     ):
         raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_SCHEMA")
     return value
+
+
+def _engineering_health_resource_redirect(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the outcome-free H100 MIG scheduler-only redirect."""
+
+    try:
+        value = cfg["learner_effective_engineering_health_resource_redirect"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_RESOURCE_REDIRECT_NOT_FROZEN") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("amendment_commitment_sha256", None)
+    if (
+        cfg.get("schema_version") != 19
+        or value.get("status")
+        != "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
+        or value.get("scope") != "SCHEDULER_AND_RESOURCE_LATENCY_ONLY"
+        or expected != ENGINEERING_HEALTH_RESOURCE_REDIRECT_SHA256
+        or digest(payload) != expected
+        or value.get("amendment_commitment_scope")
+        != "canonical JSON of this amendment excluding amendment_commitment_sha256"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_RESOURCE_REDIRECT_COMMITMENT")
+    preserved = value.get("preserved_without_change", {})
+    canceled = value.get("canceled_A30_submission", {})
+    eligibility = value.get("scheduler_only_eligibility_check", {})
+    topology = value.get("active_health_topology", {})
+    resource = value.get("bounded_resource_policy", {})
+    if (
+        preserved.get("engineering_health_amendment_sha256")
+        != ENGINEERING_HEALTH_AMENDMENT_SHA256
+        or preserved.get("prior_public_development_no_go_sha256")
+        != "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
+        or preserved.get("public_fixture_manifest_sha256")
+        != "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6"
+        or preserved.get("verified_no_hand_seal_sha256")
+        != "a58ca3f10fd72ba2a7bfc2faf9c8c65b22a22913fcf2c92786859401b8d21c97"
+        or preserved.get(
+            "production_models_fixtures_thresholds_metrics_seeds_runner_behavior_repair_allowances_and_downstream_gates"
+        )
+        is not True
+        or canceled.get("job_id") != 316158
+        or canceled.get("partition") != "a30"
+        or canceled.get("state") != "CANCELLED_BEFORE_ALLOCATION"
+        or canceled.get("elapsed_seconds") != 0
+        or canceled.get("GPU_hours") != 0
+        or any(
+            canceled.get(key) != 0
+            for key in (
+                "qualification_attempt_directory_count",
+                "wrapper_record_count",
+                "full_result_count",
+                "compact_result_count",
+                "scientific_metric_count",
+            )
+        )
+        or canceled.get("engineering_outcome_opened") is not False
+        or eligibility.get("partition") != "h100"
+        or eligibility.get("eligible_node_count") != 1
+        or eligibility.get("GRES") != "gpu:nvidia_h100_nvl_3g.47gb:1"
+        or eligibility.get("real_job_submitted_by_check") is not False
+        or eligibility.get("model_or_fixture_inference_executed") is not False
+        or eligibility.get("scientific_or_engineering_outcome_opened") is not False
+        or topology
+        != {
+            "partition": "h100",
+            "nodes": 1,
+            "tasks": 1,
+            "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+            "GPU_count": 1,
+            "process_count": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "DDP": False,
+            "per_submission_wall_minutes_max": 15,
+        }
+        or resource
+        != {
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+            "GPU_count": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "DDP": False,
+            "per_submission_wall_minutes_max": 15,
+            "initial_plus_repair_resmoke_submission_count_max": 3,
+            "aggregate_GPU_hours_max": 0.75,
+            "new_storage_GiB_max": 10,
+            "direct_monetary_cost_USD": 0,
+        }
+        or value.get("new_engineering_or_scientific_outcome_opened") is not False
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_RESOURCE_REDIRECT_SCHEMA")
+    return value
+
+
+def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Return the sole effective health policy after validating both amendments."""
+
+    _engineering_health_amendment(cfg)
+    return _engineering_health_resource_redirect(cfg)["bounded_resource_policy"]
 
 
 def _geometry_function_bundle_digests(
@@ -3508,9 +3613,9 @@ def _tuple_health_error(
 def _tuple_health_budget(
     attempt: int, prior_attempts: list[dict[str, Any]], cfg: dict[str, Any]
 ) -> dict[str, Any]:
-    """Validate the fixed A30 repair budget before another submission."""
+    """Validate the fixed resource-redirect repair budget before submission."""
 
-    resource = _engineering_health_amendment(cfg)["bounded_resource_policy"]
+    resource = _engineering_health_resource_policy(cfg)
     maximum_attempts = int(
         resource["initial_plus_repair_resmoke_submission_count_max"]
     )
@@ -3599,7 +3704,7 @@ def _tuple_health_wrapper_marker(
     if not path.is_file():
         raise RuntimeError("E_TUPLE_HEALTH_WRAPPER_MARKER")
     value = json.loads(path.read_text())
-    policy = _engineering_health_amendment(cfg)["bounded_resource_policy"]
+    policy = _engineering_health_resource_policy(cfg)
     if (
         set(value)
         != {
@@ -3631,7 +3736,7 @@ def _tuple_health_incomplete_attempt_resource(
 ) -> dict[str, Any]:
     attempt_root = root / "health" / f"attempt-{attempt:02d}"
     marker = _tuple_health_wrapper_marker(attempt_root, attempt, cfg)
-    policy = _engineering_health_amendment(cfg)["bounded_resource_policy"]
+    policy = _engineering_health_resource_policy(cfg)
     return {
         "GPU_type": policy["GPU_type"],
         "GPU_count": int(policy["GPU_count"]),
@@ -3861,13 +3966,14 @@ def _validate_tuple_health_full(value: Any, cfg: dict[str, Any]) -> None:
         }
     ):
         raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    policy = _engineering_health_resource_policy(cfg)
     _tuple_health_budget(
         int(value.get("attempt", 0)),
         [
             {
                 "attempt": ordinal,
-                "GPU_type": "NVIDIA_A30_24GB",
-                "GPU_count": 1,
+                "GPU_type": policy["GPU_type"],
+                "GPU_count": policy["GPU_count"],
                 "wall_minutes": 0.0,
                 "GPU_hours": 0.0,
                 "new_storage_GiB": 0.0,
@@ -3877,7 +3983,6 @@ def _validate_tuple_health_full(value: Any, cfg: dict[str, Any]) -> None:
         ],
         cfg,
     )
-    policy = _engineering_health_amendment(cfg)["bounded_resource_policy"]
     if (
         resource.get("GPU_type") != policy["GPU_type"]
         or resource.get("GPU_count") != policy["GPU_count"]
@@ -9850,14 +9955,31 @@ def _tuple_health_selected_rows(
     return output
 
 
-def _tuple_health_topology(device: str) -> None:
+def _tuple_health_topology(
+    device: str, engineering_health: bool = True
+) -> None:
     import torch
 
+    device_name = torch.cuda.get_device_name(0) if torch.cuda.device_count() == 1 else ""
+    if engineering_health:
+        expected_partition = "h100"
+        expected_device = device_name == "NVIDIA H100 NVL"
+        total_memory = (
+            int(torch.cuda.get_device_properties(0).total_memory)
+            if torch.cuda.device_count() == 1
+            else 0
+        )
+        expected_memory = 45 * 1024**3 <= total_memory <= 50 * 1024**3
+    else:
+        expected_partition = "a30"
+        expected_device = device_name == "NVIDIA A30"
+        expected_memory = True
     if (
         device != "cuda"
         or torch.cuda.device_count() != 1
-        or torch.cuda.get_device_name(0) != "NVIDIA A30"
-        or os.environ.get("SLURM_JOB_PARTITION") != "a30"
+        or not expected_device
+        or not expected_memory
+        or os.environ.get("SLURM_JOB_PARTITION") != expected_partition
         or os.environ.get("SLURM_JOB_NUM_NODES") != "1"
         or os.environ.get("SLURM_NTASKS") != "1"
         or os.environ.get("SLURM_CPUS_PER_TASK") != "8"
@@ -10468,7 +10590,7 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
     output_root = _tuple_qualification_root(args.public_root)
     _require_external_or_ignored_output(output_root)
     _require_external_or_ignored_output(args.scratch_root)
-    _tuple_health_topology(str(args.device))
+    _tuple_health_topology(str(args.device), False)
     if (
         os.environ.get("HF_HUB_OFFLINE") != "1"
         or os.environ.get("TRANSFORMERS_OFFLINE") != "1"

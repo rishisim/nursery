@@ -45,16 +45,17 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     assert 'health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"' in wrapper
     assert "1|2|3) ;;" in wrapper
     assert 'require_health_topology' in wrapper
-    assert '"${SLURM_JOB_PARTITION:-}" == "a30"' in wrapper
+    assert '"${SLURM_JOB_PARTITION:-}" == "h100"' in wrapper
     assert '"${SLURM_JOB_NUM_NODES:-}" == "1"' in wrapper
     assert '"${SLURM_NTASKS:-}" == "1"' in wrapper
     assert '"${SLURM_CPUS_PER_TASK:-}" == "8"' in wrapper
     assert '"${SLURM_GPUS_ON_NODE:-}" == "1"' in wrapper
     assert 'TimeLimit=00:15:00' in wrapper
     assert 'MinMemoryCPU=4G' in wrapper
-    assert 'TresPerNode=gres/gpu:1' in wrapper
+    assert 'TresPerNode=gres/gpu:nvidia_h100_nvl_3g.47gb:1' in wrapper
     assert '--id="$allocated_gpu" --query-gpu=name' in wrapper
-    assert '[[ "$gpu_names" == "NVIDIA A30" ]]' in wrapper
+    assert '[[ "$gpu_names" == "NVIDIA H100 NVL" ]]' in wrapper
+    assert '"GPU_type":"NVIDIA_H100_NVL_3G_47GB_MIG"' in wrapper
     assert "echo " not in topology_guard
     assert "printf " not in topology_guard
     assert topology_guard.count("2>/dev/null") == 2
@@ -81,8 +82,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 9
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_AMENDMENT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME"
+    assert config["schema_version"] == 10
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_H100_RESOURCE_REDIRECT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_AND_CANCELED_A30_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -140,6 +141,18 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert health["aggregate_GPU_hours_max"] == 0.75
     assert health["new_engineering_outcome_opened"] is False
     assert health["new_scientific_outcome_opened"] is False
+    redirect = config["learner_effective_engineering_health_resource_redirect"]
+    assert redirect["amendment_commitment_sha256"] == (
+        "f7fc16f5c399c2a2d213b13a0d255a14b5b2f3ece41d62adaed17f61f186db6d"
+    )
+    assert redirect["canceled_A30_job_id"] == 316158
+    assert redirect["canceled_A30_elapsed_seconds"] == 0
+    assert redirect["canceled_A30_qualification_output_count"] == 0
+    assert redirect["active_partition"] == "h100"
+    assert redirect["active_GRES"] == "gpu:nvidia_h100_nvl_3g.47gb:1"
+    assert redirect["active_GPU_type"] == "NVIDIA_H100_NVL_3G_47GB_MIG"
+    assert redirect["scientific_contract_changed"] is False
+    assert redirect == result["learner_effective_engineering_health_resource_redirect"]
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
     assert label_correction["binary_yes_no_swapped_count"] == 193
@@ -405,7 +418,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 18
+    assert config["schema_version"] == 19
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)
@@ -417,6 +430,26 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert health["scientific_threshold_state"]["DINOv2_recurrence_cosine"] == 0.85
     assert health["scientific_threshold_state"]["threshold_change_or_relaxation"] is False
     assert health["bounded_resource_policy"]["per_submission_wall_minutes_max"] == 15
+    redirect = dict(config["learner_effective_engineering_health_resource_redirect"])
+    redirect_commitment = redirect.pop("amendment_commitment_sha256")
+    assert redirect_commitment == canonical_json_sha256(redirect)
+    assert redirect_commitment == (
+        "f7fc16f5c399c2a2d213b13a0d255a14b5b2f3ece41d62adaed17f61f186db6d"
+    )
+    assert redirect["canceled_A30_submission"]["elapsed_seconds"] == 0
+    assert redirect["active_health_topology"] == {
+        "partition": "h100",
+        "nodes": 1,
+        "tasks": 1,
+        "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+        "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "GPU_count": 1,
+        "process_count": 1,
+        "CPU_count": 8,
+        "memory_GiB": 32,
+        "DDP": False,
+        "per_submission_wall_minutes_max": 15,
+    }
     resource = dict(config["learner_effective_public_qualification_resource_amendment"])
     commitment = resource.pop("amendment_commitment_sha256")
     assert commitment == canonical_json_sha256(resource)

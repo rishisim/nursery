@@ -1,6 +1,6 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ENGINEERING-HEALTH AMENDMENT FROZEN; PRIOR PUBLIC-DEVELOPMENT NO-GO PRESERVED**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — H100 ENGINEERING-HEALTH RESOURCE REDIRECT FROZEN; PRIOR PUBLIC-DEVELOPMENT NO-GO AND ZERO-RUNTIME CANCELED A30 SUBMISSION PRESERVED**
 
 **Evidence cut-off:** 2026-08-04
 
@@ -1776,6 +1776,19 @@ NVIDIA A30 24GB, eight CPUs, 32 GiB, no DDP, 15 minutes per submission, one
 initial run plus at most two repair/resmoke cycles, 0.75 aggregate GPU-hours,
 10 GiB new storage, two active engineering hours targeted, and $0 direct cost.
 H100/H200 use is prohibited for this stage.
+
+That original A30 resource clause remains part of amendment
+`d447a7e1…2c6205` and is not rewritten. Before any health or scientific
+outcome, the user prospectively authorized resource-only redirect
+`f7fc16f5…86db6d`. A30 job 316158 was still pending with zero elapsed time and
+no attempt directory, wrapper record, full result, or compact result; it was
+then canceled before allocation. The active health request is exactly one
+`nvidia_h100_nvl_3g.47gb` MIG slice on partition `h100`, one process, eight
+CPUs, 32 GiB, no DDP, and 15 minutes. The original initial-plus-two-resmoke,
+0.75 aggregate slice-GPU-hour, 10-GiB, and $0 ceilings remain numerically
+unchanged. This scheduler amendment changes no model, fixture, threshold,
+metric, seed, module behavior, repair allowance, scientific gate, governed-C
+rule, generator contract, or one-accepted-hour ceiling.
 
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only

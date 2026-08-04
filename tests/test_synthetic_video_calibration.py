@@ -29,13 +29,13 @@ def _current_audio_fixture_config() -> dict:
     return config
 
 
-def test_construct_aligned_resume_amendment_is_exact_and_schema18_compatible() -> None:
+def test_construct_aligned_resume_amendment_is_exact_and_schema19_compatible() -> None:
     import pytest
 
     config = json.loads(
         Path("configs/synthetic_video_real_only_proof.json").read_text()
     )
-    assert config["schema_version"] == 18
+    assert config["schema_version"] == 19
     amendment = MODULE._construct_aligned_ltx_resume_amendment(config)
     assert (
         amendment["amendment_commitment_sha256"]
@@ -72,6 +72,18 @@ def test_engineering_health_amendment_and_geometry_lineage_are_exact() -> None:
         "public_qualification_commitment_sha256"
     ] == "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
     assert amendment["engineering_microfixture_suite"]["total_case_count"] == 28
+    redirect = MODULE._engineering_health_resource_redirect(config)
+    assert redirect["amendment_commitment_sha256"] == (
+        "f7fc16f5c399c2a2d213b13a0d255a14b5b2f3ece41d62adaed17f61f186db6d"
+    )
+    assert redirect["canceled_A30_submission"]["job_id"] == 316158
+    assert redirect["canceled_A30_submission"]["elapsed_seconds"] == 0
+    assert redirect["active_health_topology"]["GRES"] == (
+        "gpu:nvidia_h100_nvl_3g.47gb:1"
+    )
+    assert MODULE._engineering_health_resource_policy(config)["GPU_type"] == (
+        "NVIDIA_H100_NVL_3G_47GB_MIG"
+    )
     compatibility = amendment["historical_geometry_compatibility"]
     source_sha256, ast_sha256 = MODULE._geometry_function_bundle_digests(
         Path("scripts/run_synthetic_video_calibration.py"),

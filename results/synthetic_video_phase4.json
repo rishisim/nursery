@@ -1,7 +1,7 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_AMENDMENT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_H100_RESOURCE_REDIRECT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_AND_CANCELED_A30_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -532,6 +532,33 @@
     "new_route_holdout_result_present": false,
     "governed_C_reopened": false,
     "LTX_or_synthetic_learner_run": false
+  },
+  "learner_effective_engineering_health_resource_redirect": {
+    "status": "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME",
+    "effective_on": "2026-08-04",
+    "canonical_source": "configs/synthetic_video_real_only_proof.json#learner_effective_engineering_health_resource_redirect",
+    "amendment_commitment_sha256": "f7fc16f5c399c2a2d213b13a0d255a14b5b2f3ece41d62adaed17f61f186db6d",
+    "scope": "SCHEDULER_AND_RESOURCE_LATENCY_ONLY",
+    "canceled_A30_job_id": 316158,
+    "canceled_A30_state": "CANCELLED_BEFORE_ALLOCATION",
+    "canceled_A30_elapsed_seconds": 0,
+    "canceled_A30_GPU_hours": 0,
+    "canceled_A30_qualification_output_count": 0,
+    "active_partition": "h100",
+    "active_GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+    "active_GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+    "active_GPU_count": 1,
+    "active_process_count": 1,
+    "CPU_count": 8,
+    "memory_GiB": 32,
+    "per_submission_wall_minutes_max": 15,
+    "submission_count_max": 3,
+    "aggregate_GPU_hours_max": 0.75,
+    "new_storage_GiB_max": 10,
+    "direct_monetary_cost_USD": 0,
+    "scientific_contract_changed": false,
+    "new_engineering_outcome_opened": false,
+    "new_scientific_outcome_opened": false
   },
   "governed_C_calibration": {
     "status": "NO_GO",
@@ -1108,5 +1135,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "IMPLEMENT_AND_TEST_THE_CANONICAL_METRIC_WITHHOLDING_HEALTH_MODE_SEAL_THE_28_CASE_EXTERNAL_MICROFIXTURE_MANIFEST_AND_RUN_UP_TO_THREE_15_MINUTE_SINGLE_A30_MICROHEALTH_SUBMISSIONS; NEW_SCIENTIFIC_DEVELOPMENT_REMAINS_CONDITIONAL_ON_A_COMMITTED_ALL_MODULE_HEALTH_PASS"
+  "next_authorized_scope": "COMMIT_AND_PUSH_THE_SCHEDULER_ONLY_H100_MIG_REDIRECT_THEN_RUN_ONE_UNCHANGED_15_MINUTE_METRIC_WITHHOLDING_MICROHEALTH_SUBMISSION_WITH_AT_MOST_TWO_FROZEN_REPAIR_RESMOKES; NEW_SCIENTIFIC_DEVELOPMENT_REMAINS_CONDITIONAL_ON_A_COMMITTED_ALL_MODULE_HEALTH_PASS"
 }

@@ -10,6 +10,10 @@
 #SBATCH --output=/dev/null
 #SBATCH --error=/dev/null
 
+# The static A30 directives remain the default for later scientific
+# development/holdout. Engineering health is submitted with the prospectively
+# frozen H100 NVL 3g.47gb command-line overrides validated below.
+
 set -euo pipefail
 umask 077
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 WANDB_DISABLED=true TOKENIZERS_PARALLELISM=false PYTHONNOUSERSITE=1
@@ -43,7 +47,7 @@ if [[ "$tuple_run_mode" == "health" ]]; then
   install -d -m 700 "$health_attempt_root"
   wrapper_marker="$health_attempt_root/wrapper-started.json"
   [[ ! -e "$wrapper_marker" ]] || exit 65
-  printf '{"schema_version":1,"attempt":%d,"submission_started_epoch":%s,"GPU_type":"NVIDIA_A30_24GB","GPU_count":1,"CPU_count":8,"memory_GiB":32}\n' \
+  printf '{"schema_version":1,"attempt":%d,"submission_started_epoch":%s,"GPU_type":"NVIDIA_H100_NVL_3G_47GB_MIG","GPU_count":1,"CPU_count":8,"memory_GiB":32}\n' \
     "$health_attempt" "$PHASE4_HEALTH_SUBMISSION_STARTED_EPOCH" >"$wrapper_marker"
   chmod 600 "$wrapper_marker"
 fi
@@ -54,7 +58,7 @@ trap 'find "$scratch" -mindepth 1 -delete 2>/dev/null || true; rmdir "$scratch" 
 
 require_health_topology() {
   [[ -n "${SLURM_JOB_ID:-}" ]] || exit 66
-  [[ "${SLURM_JOB_PARTITION:-}" == "a30" ]] || exit 66
+  [[ "${SLURM_JOB_PARTITION:-}" == "h100" ]] || exit 66
   [[ "${SLURM_JOB_NUM_NODES:-}" == "1" ]] || exit 66
   [[ "${SLURM_NTASKS:-}" == "1" ]] || exit 66
   [[ "${SLURM_CPUS_PER_TASK:-}" == "8" ]] || exit 66
@@ -68,14 +72,14 @@ require_health_topology() {
 
   local job_record
   job_record="$(scontrol show job --oneliner "$SLURM_JOB_ID" 2>/dev/null)" || exit 66
-  case " $job_record " in *" Partition=a30 "*) ;; *) exit 66 ;; esac
+  case " $job_record " in *" Partition=h100 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" NumNodes=1 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" NumCPUs=8 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" NumTasks=1 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" TimeLimit=00:15:00 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" MinMemoryCPU=4G "*) ;; *) exit 66 ;; esac
   case " $job_record " in
-    *" TresPerNode=gres/gpu:1 "*|*" TresPerNode=gres:gpu:1 "*|*" TresPerNode=gres/gpu:a30:1 "*|*" TresPerNode=gres:gpu:a30:1 "*) ;;
+    *" TresPerNode=gres/gpu:nvidia_h100_nvl_3g.47gb:1 "*|*" TresPerNode=gres:gpu:nvidia_h100_nvl_3g.47gb:1 "*) ;;
     *) exit 66 ;;
   esac
 
@@ -84,7 +88,7 @@ require_health_topology() {
   allocated_gpu="${SLURM_JOB_GPUS:-}"
   [[ -n "$allocated_gpu" && "$allocated_gpu" != *,* ]] || exit 66
   gpu_names="$(nvidia-smi --id="$allocated_gpu" --query-gpu=name --format=csv,noheader 2>/dev/null)" || exit 66
-  [[ "$gpu_names" == "NVIDIA A30" ]] || exit 66
+  [[ "$gpu_names" == "NVIDIA H100 NVL" ]] || exit 66
 }
 
 if [[ "$tuple_run_mode" == "sizing" ]]; then

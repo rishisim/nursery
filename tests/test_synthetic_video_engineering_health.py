@@ -7,6 +7,7 @@ import os
 import re
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -306,7 +307,7 @@ def _healthy_full() -> dict:
         "telemetry_disabled": True,
         "restricted_mount_present": False,
         "resource": {
-            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
             "GPU_count": 1,
             "CPU_count": 8,
             "memory_GiB": 32,
@@ -554,12 +555,12 @@ def test_tuple_health_metric_release_requires_seven_unique_passed_modules() -> N
         MODULE._tuple_health_metric_release(wrong_status, scientific)
 
 
-def test_tuple_health_budget_enforces_three_a30_attempts_and_aggregate_limits() -> None:
+def test_tuple_health_budget_enforces_three_h100_mig_attempts_and_aggregate_limits() -> None:
     config = _config()
     prior = [
         {
             "attempt": 1,
-            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
             "GPU_count": 1,
             "wall_minutes": 12.0,
             "GPU_hours": 0.20,
@@ -568,7 +569,7 @@ def test_tuple_health_budget_enforces_three_a30_attempts_and_aggregate_limits() 
         },
         {
             "attempt": 2,
-            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
             "GPU_count": 1,
             "wall_minutes": 14.0,
             "GPU_hours": 0.20,
@@ -578,7 +579,7 @@ def test_tuple_health_budget_enforces_three_a30_attempts_and_aggregate_limits() 
     ]
     budget = MODULE._tuple_health_budget(3, prior, config)
     assert budget["attempt"] == 3
-    assert budget["GPU_type"] == "NVIDIA_A30_24GB"
+    assert budget["GPU_type"] == "NVIDIA_H100_NVL_3G_47GB_MIG"
     assert budget["GPU_count"] == 1
     assert budget["per_submission_wall_minutes_max"] == 15
     assert budget["remaining_GPU_hours"] == pytest.approx(0.35)
@@ -592,7 +593,7 @@ def test_tuple_health_budget_enforces_three_a30_attempts_and_aggregate_limits() 
 @pytest.mark.parametrize(
     "field,value,error_code",
     [
-        ("GPU_type", "NVIDIA_H100_80GB", "E_TUPLE_HEALTH_GPU_TOPOLOGY"),
+        ("GPU_type", "NVIDIA_A30_24GB", "E_TUPLE_HEALTH_GPU_TOPOLOGY"),
         ("GPU_count", 2, "E_TUPLE_HEALTH_GPU_TOPOLOGY"),
         ("wall_minutes", 15.1, "E_TUPLE_HEALTH_WALL_BUDGET"),
         ("GPU_hours", 0.76, "E_TUPLE_HEALTH_GPU_HOUR_BUDGET"),
@@ -606,7 +607,7 @@ def test_tuple_health_budget_rejects_topology_or_resource_overrun(
     prior = [
         {
             "attempt": 1,
-            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
             "GPU_count": 1,
             "wall_minutes": 10.0,
             "GPU_hours": 0.0,
@@ -617,6 +618,72 @@ def test_tuple_health_budget_rejects_topology_or_resource_overrun(
     ]
     with pytest.raises(RuntimeError, match=error_code):
         MODULE._tuple_health_budget(2, prior, _config())
+
+
+def test_h100_resource_redirect_is_hash_bound_and_scientifically_narrow() -> None:
+    config = _config()
+    original = MODULE._engineering_health_amendment(config)
+    redirect = MODULE._engineering_health_resource_redirect(config)
+    assert original["amendment_commitment_sha256"] == (
+        "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205"
+    )
+    assert redirect["scope"] == "SCHEDULER_AND_RESOURCE_LATENCY_ONLY"
+    assert redirect["preserved_without_change"][
+        "production_models_fixtures_thresholds_metrics_seeds_runner_behavior_repair_allowances_and_downstream_gates"
+    ] is True
+    assert redirect["canceled_A30_submission"]["engineering_outcome_opened"] is False
+    assert redirect["canceled_A30_submission"]["scientific_metric_count"] == 0
+
+    mutated = json.loads(json.dumps(config))
+    amendment = mutated["learner_effective_engineering_health_resource_redirect"]
+    amendment["active_health_topology"]["GPU_count"] = 2
+    payload = json.loads(json.dumps(amendment))
+    payload.pop("amendment_commitment_sha256")
+    amendment["amendment_commitment_sha256"] = MODULE.digest(payload)
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_HEALTH_RESOURCE_REDIRECT_COMMITMENT"
+    ):
+        MODULE._engineering_health_resource_redirect(mutated)
+
+
+def test_tuple_topology_separates_h100_health_from_a30_science(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    for key, value in {
+        "SLURM_JOB_NUM_NODES": "1",
+        "SLURM_NTASKS": "1",
+        "SLURM_CPUS_PER_TASK": "8",
+        "SLURM_GPUS_ON_NODE": "1",
+        "WORLD_SIZE": "1",
+        "LOCAL_WORLD_SIZE": "1",
+    }.items():
+        monkeypatch.setenv(key, value)
+
+    h100_cuda = SimpleNamespace(
+        device_count=lambda: 1,
+        get_device_name=lambda _index: "NVIDIA H100 NVL",
+        get_device_properties=lambda _index: SimpleNamespace(
+            total_memory=47 * 1024**3
+        ),
+    )
+    monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=h100_cuda))
+    monkeypatch.setenv("SLURM_JOB_PARTITION", "h100")
+    MODULE._tuple_health_topology("cuda")
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_GPU_TOPOLOGY"):
+        MODULE._tuple_health_topology("cuda", False)
+
+    a30_cuda = SimpleNamespace(
+        device_count=lambda: 1,
+        get_device_name=lambda _index: "NVIDIA A30",
+        get_device_properties=lambda _index: SimpleNamespace(
+            total_memory=24 * 1024**3
+        ),
+    )
+    monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=a30_cuda))
+    monkeypatch.setenv("SLURM_JOB_PARTITION", "a30")
+    MODULE._tuple_health_topology("cuda", False)
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_GPU_TOPOLOGY"):
+        MODULE._tuple_health_topology("cuda")
 
 
 def test_tuple_health_trace_root_is_private_even_with_permissive_umask(
@@ -712,7 +779,7 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
             "schema_version": 1,
             "attempt": 1,
             "submission_started_epoch": __import__("time").time(),
-            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
             "GPU_count": 1,
             "CPU_count": 8,
             "memory_GiB": 32,

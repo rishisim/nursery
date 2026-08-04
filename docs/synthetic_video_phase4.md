@@ -1,7 +1,7 @@
 # Synthetic-video Phase 4 common evaluation assets
 
-**Status:** **CORRECTED COMMON ASSETS PASS; LEARNER-EFFECTIVE COMPLETE PUBLIC
-SOURCE FEASIBILITY NO-GO** — Stage A remains PASS; the first Stage B assets remain
+**Status:** **CORRECTED COMMON ASSETS PASS; H100 ENGINEERING-HEALTH RESOURCE
+REDIRECT FROZEN; PRIOR LEARNER-EFFECTIVE NO-GOS PRESERVED** — Stage A remains PASS; the first Stage B assets remain
 provisional/superseded, and the corrected lexical and temporal assets are
 sealed. The prior mechanistic tuple-calibration fixture recipe fired its frozen
 public source no-go and remains final. The later user-authorized VISOR-HOS
@@ -488,6 +488,15 @@ thresholds, and scientific rules cannot change. Only a committed all-module
 health PASS may open new-route development; any execution fault withholds all
 partial scientific metrics and is an engineering blocker rather than a
 scientific no-go.
+
+Before that health run produced any output, A30 job 316158 remained pending
+with zero elapsed time and was canceled before allocation. User-authorized
+resource redirect `f7fc16f5…86db6d` now freezes the unchanged health run to
+one `nvidia_h100_nvl_3g.47gb` MIG slice on partition `h100`, one process,
+eight CPUs, 32 GiB, no DDP, and 15 minutes. The three-submission maximum,
+0.75 aggregate slice-GPU-hours, 10-GiB storage, and $0 limits are unchanged.
+This is scheduler-only: the A30 provenance and all scientific contracts remain
+preserved, and no health or scientific outcome was used to make the redirect.
 
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan

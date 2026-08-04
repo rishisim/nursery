@@ -1,6 +1,6 @@
 {
-  "schema_version": 18,
-  "status": "PROSPECTIVE_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_AMENDMENT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME",
+  "schema_version": 19,
+  "status": "PROSPECTIVE_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_H100_RESOURCE_REDIRECT_FROZEN_PRIOR_PUBLIC_DEVELOPMENT_NO_GO_AND_CANCELED_A30_PRESERVED_NO_NEW_ENGINEERING_OR_SCIENTIFIC_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -843,6 +843,74 @@
     "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
     "amendment_commitment_sha256": "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205"
   },
+  "learner_effective_engineering_health_resource_redirect": {
+    "status": "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME",
+    "effective_on": "2026-08-04",
+    "authorization": "explicit user approval to replace only the zero-runtime queued A30 engineering-health microqualification with one immediately eligible H100 NVL 3g.47gb MIG-slice request",
+    "scope": "SCHEDULER_AND_RESOURCE_LATENCY_ONLY",
+    "supersedes_only": "learner_effective_engineering_health_amendment.bounded_resource_policy and its A30 execution-order token for new engineering-health submissions",
+    "preserved_without_change": {
+      "engineering_health_amendment_sha256": "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205",
+      "prior_public_development_no_go_sha256": "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf",
+      "public_fixture_manifest_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "verified_no_hand_seal_sha256": "a58ca3f10fd72ba2a7bfc2faf9c8c65b22a22913fcf2c92786859401b8d21c97",
+      "production_models_fixtures_thresholds_metrics_seeds_runner_behavior_repair_allowances_and_downstream_gates": true
+    },
+    "canceled_A30_submission": {
+      "job_id": 316158,
+      "partition": "a30",
+      "state": "CANCELLED_BEFORE_ALLOCATION",
+      "cancelled_on": "2026-08-04",
+      "scheduler_estimated_start_before_cancellation": "2026-08-05T08:54:00-05:00",
+      "elapsed_seconds": 0,
+      "GPU_hours": 0,
+      "qualification_attempt_directory_count": 0,
+      "wrapper_record_count": 0,
+      "full_result_count": 0,
+      "compact_result_count": 0,
+      "engineering_outcome_opened": false,
+      "scientific_metric_count": 0
+    },
+    "scheduler_only_eligibility_check": {
+      "partition": "h100",
+      "eligible_node_count": 1,
+      "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+      "real_job_submitted_by_check": false,
+      "model_or_fixture_inference_executed": false,
+      "scientific_or_engineering_outcome_opened": false
+    },
+    "active_health_topology": {
+      "partition": "h100",
+      "nodes": 1,
+      "tasks": 1,
+      "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+      "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+      "GPU_count": 1,
+      "process_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "DDP": false,
+      "per_submission_wall_minutes_max": 15
+    },
+    "bounded_resource_policy": {
+      "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "DDP": false,
+      "per_submission_wall_minutes_max": 15,
+      "initial_plus_repair_resmoke_submission_count_max": 3,
+      "aggregate_GPU_hours_max": 0.75,
+      "new_storage_GiB_max": 10,
+      "direct_monetary_cost_USD": 0
+    },
+    "submission_rule": "submit exactly one unchanged initial health attempt on the frozen H100 MIG topology; only the already frozen two repair-and-full-resmoke cycles remain available after an ordinary engineering failure",
+    "queue_change_rule": "if immediate eligibility changes, keep the one frozen H100 request and do not cycle queues or submit duplicates",
+    "downstream_rule": "public development holdout governed C LTX and learner gates remain byte-for-byte scientifically unchanged and conditional on their existing predecessors",
+    "new_engineering_or_scientific_outcome_opened": false,
+    "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
+    "amendment_commitment_sha256": "f7fc16f5c399c2a2d213b13a0d255a14b5b2f3ece41d62adaed17f61f186db6d"
+  },
   "governance_incident": {
     "observed_on": "2026-08-02",
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_GOVERNED_PROCESSING_RESUMED",
@@ -913,7 +981,7 @@
       "pre_seal_label_semantics_correction": "/public_no_hand_review_label_semantics_correction",
       "blind_no_hand_review_seal": "/public_no_hand_review_seal_result",
       "prior_public_qualification_terminal_result": "/learner_effective_public_development_result",
-      "public_qualification_current_state": "/learner_effective_engineering_health_amendment",
+      "public_qualification_current_state": "/learner_effective_engineering_health_resource_redirect",
       "public_qualification_resource": "/learner_effective_public_qualification_resource_amendment",
       "preserved_complete_source_no_go": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_complete_source_result",
       "governed_C_and_episode_plan_order": "/construct_aligned_ltx_resume_amendment/execution_order",
