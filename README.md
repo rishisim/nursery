@@ -779,3 +779,13 @@ and holdout are capped at 5, 15, and 15 GPU minutes respectively, with one
 five-minute repair/resmoke permitted, one process/no DDP, at most 0.666667
 zero-cost GPU-hours, 10 GiB, and $0. Slurm is waited on once per submission;
 periodic polling and unchanged pending updates are prohibited.
+
+The public-only route's deterministic attribute overlay is now sealed before
+model inference: 64 CC0 programmatic items, zero new annotations, clean-reload
+commitment `2b30f892…e1b1b`. A single scheduler-only comparison selected one
+zero-cost H100 NVL 3g.47gb MIG slice; topology commitment `90d8842b…2bfe`
+freezes one process, eight CPUs, 32 GiB RAM, five-minute microhealth, and
+15-minute development/holdout caps. This authorizes only the metric-withheld
+public microhealth run. Scientific development remains conditional on a
+committed all-module health pass, and governed/downstream work remains out of
+scope.

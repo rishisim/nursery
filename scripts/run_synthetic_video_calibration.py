@@ -6145,7 +6145,15 @@ def _public_only_readiness_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     if (
         cfg.get("schema_version") != 37
         or cfg.get("status")
-        != "PUBLIC_ONLY_CALIBRATION_READINESS_AMENDMENT_FROZEN_BEFORE_NEW_OUTCOMES"
+        not in {
+            "PUBLIC_ONLY_CALIBRATION_READINESS_AMENDMENT_FROZEN_BEFORE_NEW_OUTCOMES",
+            "PUBLIC_ONLY_CALIBRATION_READINESS_TOPOLOGY_FROZEN_BEFORE_MODEL_OUTCOMES",
+            "PUBLIC_ONLY_CALIBRATION_READINESS_ENGINEERING_HEALTH_PASS",
+            "PUBLIC_ONLY_CALIBRATION_READINESS_DEVELOPMENT_PASS_THRESHOLDS_SEALED",
+            "NO_GO_PUBLIC_ONLY_COMPLETE_VALID_SCIENTIFIC_METRICS",
+            "CALIBRATION_READY_PUBLIC_ONLY",
+            "ENGINEERING_BLOCKER_PUBLIC_ONLY_CALIBRATION_READINESS",
+        }
         or value.get("status")
         != "FROZEN_BEFORE_NEW_PUBLIC_MODEL_FIXTURE_OR_SCIENTIFIC_OUTCOMES"
         or expected != PUBLIC_ONLY_READINESS_AMENDMENT_SHA256
@@ -19258,6 +19266,40 @@ def _public_readiness_topology(cfg: dict[str, Any]) -> dict[str, Any]:
     return value
 
 
+def _public_readiness_fixture_result(cfg: dict[str, Any]) -> dict[str, Any]:
+    amendment = _public_only_readiness_amendment(cfg)
+    try:
+        value = cfg["public_only_calibration_readiness_fixture_result"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_RESULT_MISSING") from error
+    if not isinstance(value, dict):
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_RESULT_SCHEMA")
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("fixture_result_commitment_sha256", None)
+    if (
+        value.get("status")
+        != "PASS_PUBLIC_READINESS_FIXTURES_SEALED_BEFORE_MODEL_OUTCOMES"
+        or value.get("amendment_commitment_sha256")
+        != amendment["amendment_commitment_sha256"]
+        or value.get("base_fixture_manifest_commitment_sha256")
+        != amendment["public_fixtures"]["base_fixture_commitment_sha256"]
+        or value.get("partition_count") != 2
+        or value.get("attribute_item_count") != 64
+        or value.get("manual_annotation_count") != 0
+        or value.get("model_inference_executed") is not False
+        or value.get("scientific_metric_count") != 0
+        or value.get("clean_reload_commitment_match") is not True
+        or value.get("label_round_trip_failure_count") != 0
+        or value.get("class_balance_failure_count") != 0
+        or value.get("development_holdout_overlap_count") != 0
+        or not isinstance(value.get("readiness_fixture_commitment_sha256"), str)
+        or expected is None
+        or digest(payload) != expected
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_RESULT_COMMITMENT")
+    return value
+
+
 def _public_readiness_execution_commitment(cfg: dict[str, Any]) -> str:
     amendment = _public_only_readiness_amendment(cfg)
     topology = _public_readiness_topology(cfg)
@@ -19615,6 +19657,7 @@ def run_public_readiness_health(args: argparse.Namespace) -> dict[str, Any]:
     cfg = json.loads(args.config.read_text())
     amendment = _public_only_readiness_amendment(cfg)
     topology = _public_readiness_topology(cfg)
+    fixture_result = _public_readiness_fixture_result(cfg)
     if args.attempt not in {1, 2}:
         raise RuntimeError("E_PUBLIC_READINESS_HEALTH_ATTEMPT")
     root = _public_readiness_root(args.public_root) / "engineering-health"
@@ -19650,6 +19693,10 @@ def run_public_readiness_health(args: argparse.Namespace) -> dict[str, Any]:
     overlay, overlay_root = _load_public_readiness_fixture_manifest(
         args.public_root, cfg
     )
+    if overlay["readiness_fixture_commitment_sha256"] != fixture_result[
+        "readiness_fixture_commitment_sha256"
+    ]:
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_RESULT_PROVENANCE")
     dependency = _tuple_health_dependency_preflight(
         args.public_root, cfg, container
     )
@@ -19997,6 +20044,7 @@ def qualify_public_readiness(args: argparse.Namespace) -> dict[str, Any]:
     cfg = json.loads(args.config.read_text())
     amendment = _public_only_readiness_amendment(cfg)
     topology = _public_readiness_topology(cfg)
+    fixture_result = _public_readiness_fixture_result(cfg)
     _require_external_or_ignored_output(_public_readiness_root(args.public_root))
     _require_external_or_ignored_output(args.scratch_root)
     if (
@@ -20020,6 +20068,10 @@ def qualify_public_readiness(args: argparse.Namespace) -> dict[str, Any]:
     overlay, overlay_root = _load_public_readiness_fixture_manifest(
         args.public_root, cfg
     )
+    if overlay["readiness_fixture_commitment_sha256"] != fixture_result[
+        "readiness_fixture_commitment_sha256"
+    ]:
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_RESULT_PROVENANCE")
     health = _load_public_readiness_health_pass(
         args.public_root,
         cfg,

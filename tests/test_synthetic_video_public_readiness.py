@@ -102,6 +102,16 @@ def test_public_readiness_topology_is_separately_committed() -> None:
         MODULE._public_readiness_topology(mutated)
 
 
+def test_public_readiness_fixture_result_is_sealed_before_inference() -> None:
+    result = MODULE._public_readiness_fixture_result(_config())
+    assert result["readiness_fixture_commitment_sha256"] == (
+        "2b30f892ee327e2a1e39e35e41fec7a1e60adeef9b3df4c4c594e8eab45e1b1b"
+    )
+    assert result["attribute_item_count"] == 64
+    assert result["manual_annotation_count"] == 0
+    assert result["model_inference_executed"] is False
+
+
 def test_readiness_lexical_metrics_measure_aggregate_estimands() -> None:
     expected = [
         _event("c1", "e1", "adjective", "red"),

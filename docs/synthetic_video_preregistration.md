@@ -2389,3 +2389,14 @@ no-go. Execution failure within the one-repair budget is an engineering blocker.
 gate, every included coverage/missingness/negative-specificity rule, offline
 clean-cache reload, deterministic compact serialization, the resource ceiling,
 and zero new annotation or ongoing per-corpus human QA.
+
+Before any new model outcome, the deterministic CC0 attribute overlay was
+rendered and clean-reloaded under the canonical implementation. It contains 64
+items (32 per partition), required no manual annotation, passed its frozen
+schema/balance/negative-semantics and split-overlap checks, and is sealed at
+`2b30f892…e1b1b` (compact result `023accc1…a375`). One scheduler-only comparison
+found all four authorized zero-cost GPU requests eligible; the earliest estimate
+was the single H100 NVL 3g.47gb MIG request. The exact one-process topology—one
+47-GB slice, eight CPUs, 32 GiB RAM, no DDP, five minutes for microhealth and 15
+minutes per scientific partition—is frozen at `90d8842b…2bfe`. No model
+inference or scientific metric was opened while selecting this topology.

@@ -122,7 +122,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["schema_version"] == 28
     assert config["status"] == (
         "PHASE4_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_"
-        "AMENDMENT_FROZEN"
+        "TOPOLOGY_FROZEN"
     )
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
