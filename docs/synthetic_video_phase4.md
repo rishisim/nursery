@@ -688,3 +688,18 @@ with exit 64 and opened no module or scientific output. Engineering blocker
 `54711563…e948bc` preserves that result. Prospective schema-35 repair
 `e7005767…516ba` adds only the missing export and freezes one complete attempt
 13 on the earliest scheduler-eligible compatible zero-cost A30 topology.
+
+Attempt 13, Juno job 316887, completed after 362 scheduler seconds with three
+of seven engineering modules complete and zero scientific metrics. Three
+module failures came from treating the exact NLTK extraction-provenance marker
+as a resource directory; the hand/contact path also lacked the pinned public
+`matplotlib` runtime family. Blocker `a50e361b…903bb1` preserves that outcome
+as engineering-only. Before another outcome, schema 36 freezes repair
+`37e9c960…1036`: all 22 manifest record hashes remain mandatory, only the
+exact 65-byte marker is excluded from resource-top-level membership, and eight
+exact public wheels totaling 18,625,335 bytes are hash/license pinned for
+offline installation and reload. Attempt 14 keeps the unchanged 28-case,
+two-replicate, metric-withheld suite on one A30, one process, eight CPUs,
+32 GiB, 60 minutes/1 GPU-hour, 1 GiB new storage, and $0. Scientific
+development remains locked pending a committed 7/7 health pass; there is no
+repeated scheduler polling or unchanged-status reporting.

@@ -631,3 +631,18 @@ failed closed with exit 64. Blocker `54711563…e948bc` preserves the zero-outpu
 engineering result. Schema 35 freezes only the missing `60`-minute export and
 one complete attempt 13 at repair `e7005767…516ba`; the sealed fixtures,
 models, metrics, thresholds, and downstream rules remain unchanged.
+
+Attempt 13, Juno job 316887, completed after 362 scheduler seconds with
+scientific metrics still withheld. Three of seven modules completed; three
+modules rejected the exact 22-record NLTK manifest because its one hashed
+extraction-provenance marker was incorrectly treated as a resource top level,
+and the hand/contact path lacked the public `matplotlib` runtime family. This
+is preserved as engineering blocker `a50e361b…903bb1`, not a scientific
+no-go. Schema 36 prospectively freezes repair `37e9c960…1036`: every NLTK
+record hash remains blocking, only the exact 65-byte marker is excluded from
+top-level membership, and eight exact licensed public wheels (18,625,335
+bytes) must be installed and reloaded offline. One complete attempt 14 is
+authorized on the scheduler-selected A30 with one process, eight CPUs,
+32 GiB, 60 minutes/1 GPU-hour, 1 GiB new storage, and $0. There is one live
+job at most and unchanged scheduler states are neither repeatedly polled nor
+reported.

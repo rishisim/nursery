@@ -43,7 +43,8 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     )
     assert "mechanistic-tuples/construct-aligned-engineering-health" in wrapper
     assert 'health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"' in wrapper
-    assert "13) ;;" in wrapper
+    assert "14) ;;" in wrapper
+    assert "13) ;;" not in wrapper
     assert 'health_wall_minutes="${PHASE4_HEALTH_WALL_MINUTES:-}"' in wrapper
     assert "10) ;;" not in wrapper
     assert "9) ;;" not in wrapper
@@ -51,7 +52,7 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     assert "7) ;;" not in wrapper
     assert "6) ;;" not in wrapper
     assert "5) ;;" not in wrapper
-    assert "4) ;;" not in wrapper
+    assert "\n    4) ;;" not in wrapper
     assert "1|2|3) ;;" not in wrapper
     assert 'require_health_topology' in wrapper
     assert 'scontrol show job --oneliner "$SLURM_JOB_ID"' in wrapper
@@ -103,8 +104,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 26
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_12_SUBMISSION_EXPORT_BLOCKER_PRESERVED_EXPORT_CONTRACT_REPAIR_ATTEMPT_13_FROZEN_NO_NEW_OUTCOME"
+    assert config["schema_version"] == 27
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_13_RUNTIME_BLOCKERS_PRESERVED_NLTK_MATPLOTLIB_REPAIR_ATTEMPT_14_FROZEN_NO_NEW_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -549,7 +550,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_implementation_authorized"] is True
     assert config["gates"]["learner_effective_public_qualification_authorized"] is True
     assert config["gates"]["learner_effective_runner_implementation_status"] == (
-        "ATTEMPT_12_SUBMISSION_EXPORT_BLOCKER_PRESERVED_EXPORT_CONTRACT_REPAIR_ATTEMPT_13_FROZEN_BEFORE_NEW_OUTCOME"
+        "ATTEMPT_13_RUNTIME_BLOCKERS_PRESERVED_NLTK_MATPLOTLIB_REPAIR_ATTEMPT_14_FROZEN_BEFORE_NEW_OUTCOME"
     )
     assert config["gates"]["public_model_inference_requires_blind_no_hand_review_seal"] is True
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
@@ -557,7 +558,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_public_fixture_preparation_authorized"] is True
     assert config["gates"]["learner_effective_public_model_inference_authorized"] is True
     assert config["gates"]["learner_effective_public_model_inference_scope"] == (
-        "ATTEMPT_13_EXPORT_CONTRACT_REPAIRED_ENGINEERING_MICROHEALTH_ONLY_NO_SCIENTIFIC_METRICS"
+        "ATTEMPT_14_NLTK_MATPLOTLIB_REPAIRED_ENGINEERING_MICROHEALTH_ONLY_NO_SCIENTIFIC_METRICS"
     )
     assert config["gates"][
         "learner_effective_public_model_inference_conditionally_authorized_after_fixture_seal"
@@ -589,7 +590,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 35
+    assert config["schema_version"] == 36
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)

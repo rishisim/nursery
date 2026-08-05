@@ -1,6 +1,6 @@
 {
-  "schema_version": 35,
-  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_12_SUBMISSION_EXPORT_BLOCKER_PRESERVED_EXPORT_CONTRACT_REPAIR_ATTEMPT_13_FROZEN_NO_NEW_OUTCOME",
+  "schema_version": 36,
+  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_13_RUNTIME_BLOCKERS_PRESERVED_NLTK_MATPLOTLIB_REPAIR_ATTEMPT_14_FROZEN_NO_NEW_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -2772,6 +2772,173 @@
     "new_health_or_scientific_outcome_opened": false,
     "repair_commitment_scope": "canonical JSON of this amendment excluding repair_commitment_sha256",
     "repair_commitment_sha256": "e700576735251403138e34fa9918fa2ab0e3d723e2252871302fcd4da77516ba"
+  },
+  "learner_effective_engineering_health_attempt_13_result": {
+    "status": "ENGINEERING_BLOCKER_ATTEMPT_13_DURING_MODULE_EXECUTION_NO_SCIENTIFIC_METRICS_OPENED",
+    "observed_on": "2026-08-05",
+    "route_id": "construct-aligned-engineering-health",
+    "classification": "ENGINEERING_NLTK_PROVENANCE_MARKER_AND_PUBLIC_MATPLOTLIB_DEPENDENCY_FAILURES_NOT_SCIENTIFIC_NO_GO",
+    "preserved_submission_export_repair_sha256": "e700576735251403138e34fa9918fa2ab0e3d723e2252871302fcd4da77516ba",
+    "submission_provenance": {
+      "job_id": 316887,
+      "attempt": 13,
+      "scheduler_state": "COMPLETED",
+      "scheduler_exit_code": "0:0",
+      "scheduler_elapsed_seconds": 362,
+      "GPU_type": "NVIDIA_A30_24GB",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "wall_minutes_requested": 60,
+      "DDP": false,
+      "direct_monetary_cost_USD": 0
+    },
+    "compact_aggregate": {
+      "module_count": 7,
+      "completed_module_count": 3,
+      "failed_module_count": 4,
+      "case_count": 28,
+      "holdout_input_count": 0,
+      "scientific_metric_count": 0,
+      "failure_count": 4,
+      "invalid_retained_record_count": 0,
+      "silent_truncation_count": 0,
+      "external_call_count": 0,
+      "unaccounted_failure_count": 1,
+      "public_fixture_manifest_commitment_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "runner_commitment_sha256": "b82c16cf570c623ec77bbfb216ff1a7ebff3906bc9774cd77564afdf7ff78348",
+      "config_commitment_sha256": "faaedf74ec8ca6d3f4887174e6def45030be25e96c0eca8336e4c24b70055c6c",
+      "dependency_config_commitment_sha256": "f3d5e8bf608a3d41c317302b691a76e520dc8b6e8fd229d241cb48a004d91f66",
+      "microfixture_manifest_commitment_sha256": "67ad82064f47bd5e9d9c71fcd21b301fa3fc54987351bc91f2cf3af3881ef6aa",
+      "engineering_health_commitment_sha256": "abc903036dceb88376f6bd9ae50d8bfa263b3fc9791d5dd3d5eb6cad5f9cbe70"
+    },
+    "stable_aggregate_diagnosis": {
+      "passed_module_count": 3,
+      "NLTK_resource_set_failure_module_count": 3,
+      "public_dependency_missing_module_count": 1,
+      "missing_public_dependency": "matplotlib",
+      "NLTK_manifest_resource_record_count": 22,
+      "NLTK_expected_resource_top_level_count": 2,
+      "NLTK_extra_provenance_marker_count": 1,
+      "model_module_inference_count": 3,
+      "scientific_metric_count": 0,
+      "holdout_input_count": 0,
+      "sensitive_detail_field_count": 0,
+      "model_or_scientific_outcome_used_for_repair": false
+    },
+    "resource_accounting": {
+      "attempt_GPU_hours_actual": 0.09896552986568875,
+      "protocol_accounted_cumulative_GPU_hours_actual": 1.5457208277781804,
+      "attempt_retained_storage_GiB": 0.000009451061487197876,
+      "protocol_accounted_cumulative_retained_storage_GiB": 0.000018970109522342682,
+      "attempt_wall_minutes_actual": 5.937931791941325,
+      "protocol_accounted_cumulative_wall_minutes_actual": 92.74324966669084,
+      "direct_monetary_cost_USD": 0
+    },
+    "terminal_gate": {
+      "scientific_decision_opened": false,
+      "public_development_authorized": false,
+      "governed_C_authorized": false,
+      "LTX_or_synthetic_learner_run": false,
+      "attempt_14_authorized_only_after_prospective_NLTK_and_matplotlib_repair_commit_and_push": true
+    },
+    "blocker_commitment_scope": "canonical JSON of this result excluding blocker_commitment_sha256",
+    "blocker_commitment_sha256": "a50e361b9f6ca9f6367b2b26190a726e4d005d08b6c9563dbd1dc976e1903bb1"
+  },
+  "learner_effective_engineering_health_NLTK_matplotlib_repair": {
+    "status": "FROZEN_AFTER_ATTEMPT_13_RUNTIME_BLOCKERS_BEFORE_ATTEMPT_14_OR_NEW_OUTCOME",
+    "effective_on": "2026-08-05",
+    "scope": "OUTCOME_INDEPENDENT_EXACT_NLTK_PROVENANCE_MARKER_AND_PUBLIC_MATPLOTLIB_RUNTIME_REPAIR_AND_ATTEMPT_14_TOPOLOGY_SELECTION",
+    "authorization_basis": "user standing authorization for ordinary engineering repairs until a complete valid scientific result and earliest-compatible-zero-cost GPU selection",
+    "preserved_without_change": {
+      "attempt_13_blocker_sha256": "a50e361b9f6ca9f6367b2b26190a726e4d005d08b6c9563dbd1dc976e1903bb1",
+      "submission_export_repair_sha256": "e700576735251403138e34fa9918fa2ab0e3d723e2252871302fcd4da77516ba",
+      "fixture_bind_repair_sha256": "cca49a50a895ab4ac94997fbfe7bc256efc4b9ae790b1925a5671dc3b1a1e3f7",
+      "public_fixture_manifest_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "models_weights_fixtures_inputs_seeds_thresholds_metrics_scientific_gates_privacy_rules_and_downstream_contract": true
+    },
+    "NLTK_staging_repair": {
+      "manifest_resource_record_count": 22,
+      "resource_top_levels_required_exact": ["averaged_perceptron_tagger_eng", "wordnet"],
+      "allowed_provenance_marker_relative_path": ".extracted-from-sha256",
+      "allowed_provenance_marker_count": 1,
+      "allowed_provenance_marker_sha256": "f5fac8169578d94a1f568e047af30ecf001d964f99248d822a841436a35d4407",
+      "allowed_provenance_marker_bytes": 65,
+      "all_manifest_record_hashes_remain_blocking": true,
+      "provenance_marker_excluded_only_from_resource_top_level_membership": true,
+      "source_or_resource_bytes_changed": false
+    },
+    "public_runtime_dependency_repair": {
+      "source_index": "https://pypi.org/simple",
+      "artifact_host": "https://files.pythonhosted.org",
+      "platform": "manylinux2014_x86_64",
+      "python": "CPython_3.11",
+      "wheel_count": 8,
+      "total_wheel_bytes": 18625335,
+      "local_files_only_inference_required": true,
+      "network_disabled_after_cache_preparation": true,
+      "telemetry_or_tracking_added": false,
+      "installed_distributions": [
+        {"name": "contourpy", "version": "1.3.0"},
+        {"name": "cycler", "version": "0.12.1"},
+        {"name": "fonttools", "version": "4.55.3"},
+        {"name": "kiwisolver", "version": "1.4.7"},
+        {"name": "matplotlib", "version": "3.8.4"},
+        {"name": "pyparsing", "version": "3.2.0"},
+        {"name": "python-dateutil", "version": "2.9.0.post0"},
+        {"name": "six", "version": "1.17.0"}
+      ],
+      "artifacts": [
+        {"name": "contourpy-1.3.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", "distribution": "contourpy", "version": "1.3.0", "sha256": "637f674226be46f6ba372fd29d9523dd977a291f66ab2a74fbeb5530bb3f445d", "bytes": 323162, "OSI_license": "BSD License", "license_file_count": 1},
+        {"name": "cycler-0.12.1-py3-none-any.whl", "distribution": "cycler", "version": "0.12.1", "sha256": "85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30", "bytes": 8321, "OSI_license": "BSD License", "license_file_count": 1},
+        {"name": "fonttools-4.55.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", "distribution": "fonttools", "version": "4.55.3", "sha256": "da9da6d65cd7aa6b0f806556f4985bcbf603bf0c5c590e61b43aa3e5a0f822d0", "bytes": 4906304, "OSI_license": "MIT License", "license_file_count": 1},
+        {"name": "kiwisolver-1.4.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", "distribution": "kiwisolver", "version": "1.4.7", "sha256": "18077b53dc3bb490e330669a99920c5e6a496889ae8c63b58fbc57c3d7f33a18", "bytes": 1426376, "OSI_license": "BSD License", "license_file_count": 1},
+        {"name": "matplotlib-3.8.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", "distribution": "matplotlib", "version": "3.8.4", "sha256": "cc4ccdc64e3039fc303defd119658148f2349239871db72cd74e2eeaa9b80b71", "bytes": 11613309, "OSI_license": "Python Software Foundation License", "license_file_count": 14},
+        {"name": "pyparsing-3.2.0-py3-none-any.whl", "distribution": "pyparsing", "version": "3.2.0", "sha256": "93d9577b88da0bbea8cc8334ee8b918ed014968fd2ec383e868fb8afb1ccef84", "bytes": 106921, "OSI_license": "MIT License", "license_file_count": 1},
+        {"name": "python_dateutil-2.9.0.post0-py2.py3-none-any.whl", "distribution": "python-dateutil", "version": "2.9.0.post0", "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427", "bytes": 229892, "OSI_license": "Apache Software License OR BSD License", "license_file_count": 1},
+        {"name": "six-1.17.0-py2.py3-none-any.whl", "distribution": "six", "version": "1.17.0", "sha256": "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", "bytes": 11050, "OSI_license": "MIT License", "license_file_count": 1}
+      ],
+      "all_code_and_weight_or_fixture_components_unchanged": true
+    },
+    "scheduler_only_comparison": {
+      "checked_on": "2026-08-05",
+      "real_job_submitted_by_checks": false,
+      "request": {"nodes": 1, "tasks": 1, "CPU_count": 8, "memory_GiB": 32, "wall_minutes": 60, "DDP": false, "direct_monetary_cost_USD": 0},
+      "candidates": [
+        {"GPU_type": "NVIDIA_A30_24GB", "partition": "a30", "GRES": "gpu:nvidia_a30:1", "eligible": true, "estimated_start": "2026-08-05T02:18:08-05:00"},
+        {"GPU_type": "NVIDIA_H100_NVL", "partition": "h100", "GRES": "gpu:nvidia_h100_nvl:1", "eligible": true, "estimated_start": "2026-08-07T18:07:03-05:00"},
+        {"GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG", "partition": "h100", "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1", "eligible": true, "estimated_start": "2026-08-05T18:18:08-05:00"},
+        {"GPU_type": "NVIDIA_H200_NVL", "partition": "h200", "GRES": "gpu:nvidia_h200_nvl:1", "eligible": true, "estimated_start": "2026-08-05T06:54:08-05:00"}
+      ],
+      "selection_rule": "minimum scheduler-estimated start among compatible eligible zero-cost one-process requests; fixed GPU-type order only breaks exact timestamp ties",
+      "selected_GPU_type": "NVIDIA_A30_24GB"
+    },
+    "active_attempt_resource_policy": {
+      "attempt": 14,
+      "submission_count": 1,
+      "partition": "a30",
+      "GRES": "gpu:nvidia_a30:1",
+      "GPU_type": "NVIDIA_A30_24GB",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "DDP": false,
+      "wall_minutes_max": 60,
+      "GPU_hours_max": 1.0,
+      "new_storage_GiB_max": 1.0,
+      "prior_protocol_accounted_GPU_hours_actual": 1.5457208277781804,
+      "active_aggregate_GPU_hours_max": 2.54572082777818,
+      "prior_health_run_storage_GiB_actual": 0.000018970109522342682,
+      "active_aggregate_new_storage_GiB_max": 1.0000189701095223,
+      "direct_monetary_cost_USD": 0,
+      "historical_incomplete_attempt_wall_minutes": {"1": 15, "2": 15, "4": 15, "6": 15, "7": 15, "9": 0.16666666666666666, "12": 0.05},
+      "historical_attempt_GPU_types": {"1": "NVIDIA_H100_NVL_3G_47GB_MIG", "2": "NVIDIA_H100_NVL_3G_47GB_MIG", "3": "NVIDIA_H100_NVL_3G_47GB_MIG", "4": "NVIDIA_H100_NVL_3G_47GB_MIG", "5": "NVIDIA_H100_NVL_3G_47GB_MIG", "6": "NVIDIA_H100_NVL_3G_47GB_MIG", "7": "NVIDIA_H100_NVL_3G_47GB_MIG", "8": "NVIDIA_H100_NVL", "9": "NVIDIA_A30_24GB", "10": "NVIDIA_A30_24GB", "11": "NVIDIA_A30_24GB", "12": "NVIDIA_A30_24GB", "13": "NVIDIA_A30_24GB"}
+    },
+    "topology_attestation_contract": {"partition": "a30", "node_count": 1, "task_count": 1, "CPU_count": 8, "time_limit_minutes": 60, "memory_per_CPU_GiB": 4, "GRES": "gpu:nvidia_a30:1", "expected_device_name": "NVIDIA A30", "visible_memory_GiB_min": 23, "visible_memory_GiB_max": 25, "world_size": 1, "local_world_size": 1},
+    "execution_and_stop_rule": {"attempt_14_is_complete_health_suite_not_shallow_diagnostic": true, "same_complete_28_case_two_replicate_suite": true, "metric_withholding_on_timeout_or_error": true, "commit_and_push_before_dependency_install_or_submission": true, "one_live_job_max": 1, "no_repeated_scheduler_polling_or_unchanged_status_updates": true, "valid_complete_scientific_result_remains_terminal_under_frozen_gate": true},
+    "new_health_or_scientific_outcome_opened": false,
+    "repair_commitment_scope": "canonical JSON of this amendment excluding repair_commitment_sha256",
+    "repair_commitment_sha256": "37e9c960ea2e60b664933fd82734722a458b13adfdd32163cb2b4a71f0181036"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",

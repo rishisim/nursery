@@ -2136,3 +2136,21 @@ engineering submission failure. Blocker `54711563…e948bc` preserves the
 zero-output result. Before another outcome, schema 35 freezes repair
 `e7005767…516ba`: add exactly that missing export and run one complete attempt
 13 on one A30 under the unchanged 60-minute/1-GPU-hour, one-process, $0 limits.
+
+Attempt 13 (Juno job 316887) completed after 362 scheduler seconds with zero
+scientific metrics. Three modules completed; three failed on the exact NLTK
+resource-set classifier because the 22-record manifest contains one hashed
+extraction-provenance marker, and the independent hand/contact path lacked the
+public `matplotlib` runtime family. The sealed engineering blocker is
+`a50e361b…903bb1`; it is not a scientific no-go.
+
+Prospective schema 36 repair `37e9c960…1036` changes only those two runtime
+contracts. Every NLTK manifest record hash remains blocking, while exactly one
+65-byte `.extracted-from-sha256` provenance record with its frozen hash is
+excluded only from resource-top-level membership. Eight exact licensed public
+wheels totaling 18,625,335 bytes are pinned for local-files-only installation
+and reload. Attempt 14 is one unchanged complete health suite on one A30, one
+process, eight CPUs, 32 GiB, 60 minutes/1 GPU-hour, 1 GiB new storage, and $0.
+Public scientific development remains unauthorized until a committed 7/7
+health pass. Only one job may be live, and unchanged scheduler state must not
+be repeatedly polled or reported.

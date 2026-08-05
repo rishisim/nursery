@@ -11,7 +11,7 @@
 #SBATCH --error=/dev/null
 
 # The static A30 directives remain the default for later scientific
-# development/holdout. Health attempt 13 uses one prospectively frozen
+# development/holdout. Health attempt 14 uses one prospectively frozen
 # command-line topology selected immediately before submission.
 
 set -euo pipefail
@@ -39,7 +39,7 @@ exec >"$output_root/logs/qualify-${SLURM_JOB_ID}.out" 2>"$output_root/logs/quali
 if [[ "$tuple_run_mode" == "health" ]]; then
   health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"
   case "$health_attempt" in
-    13) ;;
+    14) ;;
     *) exit 64 ;;
   esac
   health_gpu_type="${PHASE4_HEALTH_GPU_TYPE:-}"
