@@ -1,6 +1,6 @@
 {
   "schema_version": 36,
-  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_19_GROUNDING_STATE_BLOCKER_PRESERVED_ATTEMPT_20_REPAIR_FROZEN_NO_NEW_OUTCOME",
+  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_PASS_SEALED_PUBLIC_DEVELOPMENT_AUTHORIZED_NO_SCIENTIFIC_METRICS_OPENED",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -3426,6 +3426,21 @@
     "new_health_or_scientific_outcome_opened": false,
     "repair_commitment_scope": "canonical JSON of this amendment excluding repair_commitment_sha256",
     "repair_commitment_sha256": "3ecdaa380536c23c0a6b4d695c22a3d9be5209dab1090b001c4e667cc6e5cbeb"
+  },
+  "learner_effective_engineering_health_pass_result": {
+    "status": "PASS_ENGINEERING_HEALTH_SEALED_BEFORE_PUBLIC_DEVELOPMENT",
+    "observed_on": "2026-08-05",
+    "route_id": "construct-aligned-engineering-health",
+    "preserved_attempt_19_blocker_sha256": "af86c7a955acac78a905adcbd2d4f85c3d4cb9da362fc1db718b29f3ed053bad",
+    "preserved_grounding_state_compatibility_repair_sha256": "3ecdaa380536c23c0a6b4d695c22a3d9be5209dab1090b001c4e667cc6e5cbeb",
+    "submission_provenance": {"job_id": 316963, "attempt": 20, "scheduler_state": "COMPLETED", "scheduler_exit_code": "0:0", "scheduler_elapsed_seconds": 457, "GPU_type": "NVIDIA_A30_24GB", "GPU_count": 1, "CPU_count": 8, "memory_GiB": 32, "wall_minutes_requested": 60, "DDP": false, "direct_monetary_cost_USD": 0},
+    "compact_aggregate": {"status": "PASS_ENGINEERING_HEALTH", "module_count": 7, "completed_module_count": 7, "failed_module_count": 0, "case_count": 28, "holdout_input_count": 0, "scientific_metric_count": 0, "failure_count": 0, "invalid_retained_record_count": 0, "silent_truncation_count": 0, "external_call_count": 0, "unaccounted_failure_count": 0, "public_fixture_manifest_commitment_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6", "runner_commitment_sha256": "a9c6287c33e122b4f1b27b8f12b5e228474819bfd28a4856c18537643678a9fa", "config_commitment_sha256": "3b12a597a7ab08f4b2c018c53e9e5fff87e9a6e6abe92ef61a9e1d605ac67f8f", "dependency_config_commitment_sha256": "02df575648b3880d7024bccf6a2a8cb82c1d64bc8357340ab6f585b68fd37904", "microfixture_manifest_commitment_sha256": "67ad82064f47bd5e9d9c71fcd21b301fa3fc54987351bc91f2cf3af3881ef6aa", "engineering_health_commitment_sha256": "4d26d002d9189942a9ba1876e47ed92d1edde8a81da81d31bc22f39d26cb656e"},
+    "module_health": {"adapter_and_lexical": "PASS_ENGINEERING", "referent": "PASS_ENGINEERING", "recurrence": "PASS_ENGINEERING", "attribute": "PASS_ENGINEERING", "hand_contact": "PASS_ENGINEERING", "sensor": "PASS_ENGINEERING", "order_action": "PASS_ENGINEERING"},
+    "resource_accounting": {"attempt_GPU_hours_actual": 0.1250727156135771, "protocol_accounted_cumulative_GPU_hours_actual": 1.8989556597338781, "attempt_retained_storage_GiB": 1.703854650259018e-5, "protocol_accounted_cumulative_retained_storage_GiB": 5.7155266404151917e-5, "attempt_wall_minutes_actual": 7.504362936814626, "protocol_accounted_cumulative_wall_minutes_actual": 113.93733958403274, "direct_monetary_cost_USD": 0},
+    "pass_to_science_transition": {"health_runner_sha256_remains_exact": "a9c6287c33e122b4f1b27b8f12b5e228474819bfd28a4856c18537643678a9fa", "health_config_sha256_remains_exact": "3b12a597a7ab08f4b2c018c53e9e5fff87e9a6e6abe92ef61a9e1d605ac67f8f", "dependency_config_sha256_must_remain_exact": "02df575648b3880d7024bccf6a2a8cb82c1d64bc8357340ab6f585b68fd37904", "current_runner_change_scope": "PASS_SEAL_VALIDATION_AND_EXACT_HISTORICAL_PROVENANCE_UNLOCK_ONLY", "model_fixture_source_preprocessing_seed_threshold_metric_privacy_or_gate_changed": false},
+    "terminal_gate": {"engineering_health_pass": true, "public_development_authorized": true, "public_holdout_authorized": false, "governed_C_authorized": false, "LTX_or_synthetic_learner_run": false},
+    "pass_commitment_scope": "canonical JSON of this result excluding pass_commitment_sha256",
+    "pass_commitment_sha256": "25486c1a4217ecd4f1a4eecfbdf90f5802d79c9300ea038155030448b2089839"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",

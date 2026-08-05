@@ -182,6 +182,7 @@ def _historical_health_config() -> dict:
     config.pop(
         "learner_effective_engineering_health_grounding_state_compatibility_repair"
     )
+    config.pop("learner_effective_engineering_health_pass_result")
     return config
 
 
@@ -945,6 +946,51 @@ def test_historical_attempt_19_full_record_requires_both_sealed_commitments() ->
         MODULE._validate_tuple_health_full(wrong_health, _config())
 
 
+def test_attempt_20_full_pass_requires_the_sealed_health_provenance() -> None:
+    config = _config()
+    sealed = config["learner_effective_engineering_health_pass_result"]
+    compact = sealed["compact_aggregate"]
+    full = _healthy_full()
+    full["attempt"] = 20
+    for key in (
+        "public_fixture_manifest_commitment_sha256",
+        "runner_commitment_sha256",
+        "config_commitment_sha256",
+        "dependency_config_commitment_sha256",
+        "microfixture_manifest_commitment_sha256",
+        "engineering_health_commitment_sha256",
+    ):
+        full[key] = compact[key]
+    full["resource"] = {
+        "GPU_type": "NVIDIA_A30_24GB",
+        "GPU_count": 1,
+        "CPU_count": 8,
+        "memory_GiB": 32,
+        "wall_minutes": 7.504362936814626,
+        "GPU_hours": 0.1250727156135771,
+        "new_storage_GiB": 1.703854650259018e-5,
+        "direct_monetary_cost_USD": 0,
+    }
+    full["cumulative_resource"] = {
+        "cumulative_submission_count": 20,
+        "cumulative_wall_minutes": 113.93733958403274,
+        "cumulative_GPU_hours": 1.8989556597338781,
+        "cumulative_new_storage_GiB": 5.7155266404151917e-5,
+        "cumulative_direct_monetary_cost_USD": 0.0,
+    }
+    MODULE._validate_tuple_health_full(full, config)
+
+    wrong_config = json.loads(json.dumps(full))
+    wrong_config["config_commitment_sha256"] = "e" * 64
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_FULL_SCHEMA"):
+        MODULE._validate_tuple_health_full(wrong_config, config)
+
+    wrong_health = json.loads(json.dumps(full))
+    wrong_health["engineering_health_commitment_sha256"] = "e" * 64
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_FULL_SCHEMA"):
+        MODULE._validate_tuple_health_full(wrong_health, config)
+
+
 def test_nltk_manifest_allows_only_the_exact_hashed_provenance_marker(
     tmp_path: Path,
 ) -> None:
@@ -1228,6 +1274,33 @@ def test_grounding_state_compatibility_is_shared_by_sizing_and_production() -> N
     assert source.count(
         "_tuple_grounding_state_compatibility(incompatible, cfg)"
     ) == 2
+
+
+def test_attempt_20_engineering_pass_is_exact_and_unlocks_development_only() -> None:
+    config = _config()
+    result = MODULE._engineering_health_attempt_20_pass_result(config)
+    assert result["pass_commitment_sha256"] == (
+        "25486c1a4217ecd4f1a4eecfbdf90f5802d79c9300ea038155030448b2089839"
+    )
+    assert result["compact_aggregate"]["status"] == "PASS_ENGINEERING_HEALTH"
+    assert result["compact_aggregate"]["scientific_metric_count"] == 0
+    assert set(result["module_health"].values()) == {"PASS_ENGINEERING"}
+    assert result["terminal_gate"] == {
+        "engineering_health_pass": True,
+        "public_development_authorized": True,
+        "public_holdout_authorized": False,
+        "governed_C_authorized": False,
+        "LTX_or_synthetic_learner_run": False,
+    }
+
+    mutated = json.loads(json.dumps(config))
+    mutated["learner_effective_engineering_health_pass_result"][
+        "terminal_gate"
+    ]["public_holdout_authorized"] = True
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_HEALTH_ATTEMPT_20_PASS_COMMITMENT"
+    ):
+        MODULE._engineering_health_attempt_20_pass_result(mutated)
 
 
 @pytest.mark.parametrize(
@@ -2004,7 +2077,7 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
 
     with pytest.raises(
         RuntimeError,
-        match="E_TUPLE_HEALTH_GROUNDING_STATE_COMPATIBILITY_REPAIR_ATTEMPT",
+        match="E_TUPLE_HEALTH_ROUTE_EXHAUSTED_PASS",
     ):
         MODULE.run_tuple_health(
             argparse.Namespace(
@@ -2933,6 +3006,7 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop(
         "learner_effective_engineering_health_grounding_state_compatibility_repair"
     )
+    historical_config.pop("learner_effective_engineering_health_pass_result")
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)
     manifest = _fixture_manifest()

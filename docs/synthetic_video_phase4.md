@@ -778,3 +778,15 @@ suite on one scheduler-selected A30, eight CPUs, 32 GiB, with a
 60-minute/1-GPU-hour, 1-GiB, $0 ceiling. One blocking Slurm wait replaces
 periodic polling; unchanged pending-state updates are prohibited. Public
 science remains locked pending a committed 7/7 engineering-health pass.
+
+Attempt 20 (Juno job 316963) supplied that committed engineering-health pass.
+All seven modules and 28 cases completed; failure, invalid-record,
+silent-truncation, external-call, unaccounted-failure, and scientific-metric
+counts were all zero. Commitment `25486c1a…09839` binds the exact historical
+runner, configuration, dependencies, fixtures, and health output. One
+engineering-first public-development qualification is now authorized under
+the unchanged combined gate. Holdout remains locked pending a valid
+development pass and threshold seal; governed C and LTX remain further
+downstream. The pass consumed 457 scheduler seconds, 0.125073 A30 GPU-hours,
+0.000017 GiB retained storage, and $0 direct cost. No prior blocker or no-go
+was reinterpreted.

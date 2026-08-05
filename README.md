@@ -713,3 +713,13 @@ the same validator in sizing and production loaders. The complete unchanged
 attempt 20 is frozen on one A30, eight CPUs, 32 GiB, 60 minutes/1 GPU-hour,
 1 GiB new storage, and $0. Slurm execution uses one blocking wait; periodic
 polling and unchanged-status updates are prohibited.
+
+Attempt 20, Juno job 316963, passed all seven engineering-health modules in
+457 scheduler seconds. All 28 cases completed with zero failures, invalid
+retained records, silent truncations, external calls, unaccounted failures, or
+scientific metrics. Pass commitment `25486c1a…09839` preserves the exact
+runner, configuration, dependency, fixture, and health commitments and opens
+one engineering-first public-development qualification only. Holdout,
+governed C, LTX generation, and learner work remain locked behind their
+unchanged gates. The attempt used 0.125073 A30 GPU-hours, 0.000017 GiB retained
+storage, and $0 direct cost.

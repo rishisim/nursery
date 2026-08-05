@@ -2251,3 +2251,15 @@ CPUs, 32 GiB, with a 60-minute/1-GPU-hour, 1-GiB, $0 ceiling. It uses one
 blocking Slurm wait. Periodic polling and unchanged-status reporting are
 prohibited. No model, fixture, source, seed, threshold, metric, privacy rule,
 or scientific gate changed.
+
+Attempt 20, Juno job 316963, then completed all 28 cases and both replicates
+with all seven modules at `PASS_ENGINEERING`. The metric-withheld record has
+zero failed modules, scientific metrics, invalid retained records, silent
+truncations, external calls, and unaccounted failures. Exact pass commitment
+`25486c1a…09839` seals the previously committed runner/configuration,
+dependency, fixture, microfixture, and health commitments. This authorizes one
+complete engineering-first public-development qualification under the frozen
+five-critical-plus-six-of-seven gate; it does not authorize holdout, governed
+C, LTX generation, or learner execution. Resource use was 457 scheduler
+seconds, 0.125073 A30 GPU-hours, 0.000017 GiB retained storage, and $0 direct
+cost. All prior failures and no-gos remain unchanged.

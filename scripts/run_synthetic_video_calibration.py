@@ -680,6 +680,9 @@ ENGINEERING_HEALTH_ATTEMPT_19_BLOCKER_SHA256 = (
 ENGINEERING_HEALTH_GROUNDING_STATE_COMPATIBILITY_REPAIR_SHA256 = (
     "3ecdaa380536c23c0a6b4d695c22a3d9be5209dab1090b001c4e667cc6e5cbeb"
 )
+ENGINEERING_HEALTH_ATTEMPT_20_PASS_SHA256 = (
+    "25486c1a4217ecd4f1a4eecfbdf90f5802d79c9300ea038155030448b2089839"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -5576,6 +5579,130 @@ def _engineering_health_grounding_state_compatibility_repair(
     return value
 
 
+def _engineering_health_attempt_20_pass_result(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the exact metric-withheld health PASS before public science."""
+
+    repair = _engineering_health_grounding_state_compatibility_repair(cfg)
+    try:
+        value = cfg["learner_effective_engineering_health_pass_result"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_20_PASS_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("pass_commitment_sha256", None)
+    submission = value.get("submission_provenance", {})
+    compact = value.get("compact_aggregate", {})
+    resource = value.get("resource_accounting", {})
+    transition = value.get("pass_to_science_transition", {})
+    terminal = value.get("terminal_gate", {})
+    expected_modules = {
+        module_id: "PASS_ENGINEERING"
+        for module_id in TUPLE_QUALIFICATION_MODULE_IDS
+    }
+    expected_compact = {
+        "status": "PASS_ENGINEERING_HEALTH",
+        "module_count": 7,
+        "completed_module_count": 7,
+        "failed_module_count": 0,
+        "case_count": 28,
+        "holdout_input_count": 0,
+        "scientific_metric_count": 0,
+        "failure_count": 0,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+        "unaccounted_failure_count": 0,
+        "public_fixture_manifest_commitment_sha256": (
+            "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6"
+        ),
+        "runner_commitment_sha256": (
+            "a9c6287c33e122b4f1b27b8f12b5e228474819bfd28a4856c18537643678a9fa"
+        ),
+        "config_commitment_sha256": (
+            "3b12a597a7ab08f4b2c018c53e9e5fff87e9a6e6abe92ef61a9e1d605ac67f8f"
+        ),
+        "dependency_config_commitment_sha256": (
+            "02df575648b3880d7024bccf6a2a8cb82c1d64bc8357340ab6f585b68fd37904"
+        ),
+        "microfixture_manifest_commitment_sha256": (
+            "67ad82064f47bd5e9d9c71fcd21b301fa3fc54987351bc91f2cf3af3881ef6aa"
+        ),
+        "engineering_health_commitment_sha256": (
+            "4d26d002d9189942a9ba1876e47ed92d1edde8a81da81d31bc22f39d26cb656e"
+        ),
+    }
+    if (
+        cfg.get("schema_version") != 36
+        or value.get("status")
+        != "PASS_ENGINEERING_HEALTH_SEALED_BEFORE_PUBLIC_DEVELOPMENT"
+        or value.get("route_id") != "construct-aligned-engineering-health"
+        or value.get("preserved_attempt_19_blocker_sha256")
+        != ENGINEERING_HEALTH_ATTEMPT_19_BLOCKER_SHA256
+        or value.get(
+            "preserved_grounding_state_compatibility_repair_sha256"
+        )
+        != repair["repair_commitment_sha256"]
+        or expected != ENGINEERING_HEALTH_ATTEMPT_20_PASS_SHA256
+        or digest(payload) != expected
+        or submission
+        != {
+            "job_id": 316963,
+            "attempt": 20,
+            "scheduler_state": "COMPLETED",
+            "scheduler_exit_code": "0:0",
+            "scheduler_elapsed_seconds": 457,
+            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_count": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "wall_minutes_requested": 60,
+            "DDP": False,
+            "direct_monetary_cost_USD": 0,
+        }
+        or compact != expected_compact
+        or value.get("module_health") != expected_modules
+        or resource
+        != {
+            "attempt_GPU_hours_actual": 0.1250727156135771,
+            "protocol_accounted_cumulative_GPU_hours_actual": 1.8989556597338781,
+            "attempt_retained_storage_GiB": 1.703854650259018e-5,
+            "protocol_accounted_cumulative_retained_storage_GiB": 5.7155266404151917e-5,
+            "attempt_wall_minutes_actual": 7.504362936814626,
+            "protocol_accounted_cumulative_wall_minutes_actual": 113.93733958403274,
+            "direct_monetary_cost_USD": 0,
+        }
+        or transition
+        != {
+            "health_runner_sha256_remains_exact": expected_compact[
+                "runner_commitment_sha256"
+            ],
+            "health_config_sha256_remains_exact": expected_compact[
+                "config_commitment_sha256"
+            ],
+            "dependency_config_sha256_must_remain_exact": expected_compact[
+                "dependency_config_commitment_sha256"
+            ],
+            "current_runner_change_scope": (
+                "PASS_SEAL_VALIDATION_AND_EXACT_HISTORICAL_PROVENANCE_UNLOCK_ONLY"
+            ),
+            "model_fixture_source_preprocessing_seed_threshold_metric_privacy_or_gate_changed": False,
+        }
+        or terminal
+        != {
+            "engineering_health_pass": True,
+            "public_development_authorized": True,
+            "public_holdout_authorized": False,
+            "governed_C_authorized": False,
+            "LTX_or_synthetic_learner_run": False,
+        }
+        or value.get("pass_commitment_scope")
+        != "canonical JSON of this result excluding pass_commitment_sha256"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_20_PASS_COMMITMENT")
+    return value
+
+
 def _geometry_function_bundle_digests(
     path: Path, names: list[str]
 ) -> tuple[str, str]:
@@ -8902,6 +9029,21 @@ def _validate_tuple_health_full(value: Any, cfg: dict[str, Any]) -> None:
         if (
             value.get("engineering_health_commitment_sha256")
             != attempt_19["external_engineering_health_commitment_sha256"]
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    if (
+        "learner_effective_engineering_health_pass_result" in cfg
+        and value.get("attempt") == 20
+    ):
+        pass_result = _engineering_health_attempt_20_pass_result(cfg)[
+            "compact_aggregate"
+        ]
+        expected_config_commitments.add(
+            pass_result["config_commitment_sha256"]
+        )
+        if (
+            value.get("engineering_health_commitment_sha256")
+            != pass_result["engineering_health_commitment_sha256"]
         ):
             raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
     if (
@@ -16023,6 +16165,9 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
     """Run the bounded production-path microqualification with zero metrics."""
 
     cfg = json.loads(args.config.read_text())
+    if "learner_effective_engineering_health_pass_result" in cfg:
+        _engineering_health_attempt_20_pass_result(cfg)
+        raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED_PASS")
     if (
         "learner_effective_engineering_health_grounding_state_compatibility_repair"
         in cfg
@@ -16415,6 +16560,11 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
 def _load_tuple_health_pass(
     public: Path, cfg: dict[str, Any], fixture_commitment: str
 ) -> dict[str, Any]:
+    sealed_pass = (
+        _engineering_health_attempt_20_pass_result(cfg)
+        if "learner_effective_engineering_health_pass_result" in cfg
+        else None
+    )
     if "learner_effective_engineering_health_NLTK_matplotlib_repair" in cfg:
         _engineering_health_nltk_matplotlib_repair(cfg)
     elif "learner_effective_engineering_health_submission_export_repair" in cfg:
@@ -16505,12 +16655,33 @@ def _load_tuple_health_pass(
     if len(passes) != 1:
         raise RuntimeError("E_TUPLE_SCIENCE_BEFORE_ENGINEERING_HEALTH_PASS")
     value = passes[0]
+    sealed_compact = (
+        sealed_pass["compact_aggregate"]
+        if sealed_pass is not None
+        else None
+    )
+    expected_runner_commitment = (
+        sealed_compact["runner_commitment_sha256"]
+        if sealed_compact is not None
+        else file_digest(Path(__file__).resolve())
+    )
+    expected_config_commitment = (
+        sealed_compact["config_commitment_sha256"]
+        if sealed_compact is not None
+        else digest(cfg)
+    )
     if (
         value["public_fixture_manifest_commitment_sha256"]
         != fixture_commitment
         or value["runner_commitment_sha256"]
-        != file_digest(Path(__file__).resolve())
-        or value["config_commitment_sha256"] != digest(cfg)
+        != expected_runner_commitment
+        or value["config_commitment_sha256"]
+        != expected_config_commitment
+        or (
+            sealed_compact is not None
+            and value["engineering_health_commitment_sha256"]
+            != sealed_compact["engineering_health_commitment_sha256"]
+        )
     ):
         raise RuntimeError("E_TUPLE_HEALTH_PASS_PROVENANCE")
     return value
