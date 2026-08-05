@@ -11,7 +11,7 @@
 #SBATCH --error=/dev/null
 
 # The static A30 directives remain the default for later scientific
-# development/holdout. Health attempt 14 uses one prospectively frozen
+# development/holdout. Health attempt 15 uses one prospectively frozen
 # command-line topology selected immediately before submission.
 
 set -euo pipefail
@@ -39,7 +39,7 @@ exec >"$output_root/logs/qualify-${SLURM_JOB_ID}.out" 2>"$output_root/logs/quali
 if [[ "$tuple_run_mode" == "health" ]]; then
   health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"
   case "$health_attempt" in
-    14) ;;
+    15) ;;
     *) exit 64 ;;
   esac
   health_gpu_type="${PHASE4_HEALTH_GPU_TYPE:-}"
@@ -134,8 +134,18 @@ require_health_topology() {
   case " $job_record " in *" TimeLimit=01:00:00 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" MinMemoryCPU=4G "*) ;; *) exit 66 ;; esac
   local gres_suffix="${health_gres#gpu:}"
-  [[ " $job_record " == *" TresPerNode=gres/gpu:${gres_suffix} "* || \
-     " $job_record " == *" TresPerNode=gres:gpu:${gres_suffix} "* ]] || exit 66
+  local scheduler_gres_ok=false
+  if [[ " $job_record " == *" TresPerNode=gres/gpu:${gres_suffix} "* || \
+        " $job_record " == *" TresPerNode=gres:gpu:${gres_suffix} "* ]]; then
+    scheduler_gres_ok=true
+  elif [[ "$health_attempt" == "15" && "$health_gpu_type" == "NVIDIA_A30_24GB" && \
+          "$health_partition" == "a30" && "$health_gres" == "gpu:nvidia_a30:1" && \
+          " $job_record " == *" TresPerNode=gres/gpu:1 "* ]]; then
+    # Slurm may serialize an A30-only partition's one-GPU request generically.
+    # The in-container runner still blocks on the exact A30 name and 23--25 GiB.
+    scheduler_gres_ok=true
+  fi
+  [[ "$scheduler_gres_ok" == "true" ]] || exit 66
 
   case "${SLURM_JOB_ID:-}" in
     ''|*[!0-9]*) exit 66 ;;

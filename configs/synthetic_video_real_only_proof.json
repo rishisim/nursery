@@ -1,6 +1,6 @@
 {
   "schema_version": 36,
-  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_13_RUNTIME_BLOCKERS_PRESERVED_NLTK_MATPLOTLIB_REPAIR_ATTEMPT_14_FROZEN_NO_NEW_OUTCOME",
+  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_14_SLURM_GRES_SERIALIZATION_BLOCKER_PRESERVED_ATTEMPT_15_REPAIR_FROZEN_NO_NEW_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -2939,6 +2939,148 @@
     "new_health_or_scientific_outcome_opened": false,
     "repair_commitment_scope": "canonical JSON of this amendment excluding repair_commitment_sha256",
     "repair_commitment_sha256": "37e9c960ea2e60b664933fd82734722a458b13adfdd32163cb2b4a71f0181036"
+  },
+  "learner_effective_engineering_health_attempt_14_result": {
+    "status": "ENGINEERING_BLOCKER_ATTEMPT_14_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED",
+    "observed_on": "2026-08-05",
+    "route_id": "construct-aligned-engineering-health",
+    "classification": "ENGINEERING_SLURM_GENERIC_GRES_SERIALIZATION_MISMATCH_NOT_SCIENTIFIC_NO_GO",
+    "preserved_NLTK_matplotlib_repair_sha256": "37e9c960ea2e60b664933fd82734722a458b13adfdd32163cb2b4a71f0181036",
+    "submission_provenance": {
+      "job_id": 316905,
+      "attempt": 14,
+      "scheduler_state": "FAILED",
+      "scheduler_exit_code": "66:0",
+      "scheduler_elapsed_seconds": 9,
+      "GPU_type": "NVIDIA_A30_24GB",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "wall_minutes_requested": 60,
+      "DDP": false,
+      "direct_monetary_cost_USD": 0
+    },
+    "compact_aggregate": {
+      "planned_module_count": 7,
+      "planned_case_count": 28,
+      "wrapper_record_count": 1,
+      "container_attestation_count": 1,
+      "fixture_bind_attestation_count": 1,
+      "topology_attestation_count": 0,
+      "runner_entry_count": 0,
+      "module_execution_count": 0,
+      "holdout_input_count": 0,
+      "scientific_metric_count": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "retained_file_count": 3,
+      "retained_bytes": 1225
+    },
+    "stable_aggregate_diagnosis": {
+      "wrapper_topology_predicate_count": 7,
+      "wrapper_topology_predicate_pass_count": 6,
+      "partition_nodes_tasks_CPUs_memory_and_wall_predicates_passed": true,
+      "requested_or_allocated_A30_TRES_present": true,
+      "observed_TresPerNode_class": "GENERIC_GRES_SLASH",
+      "observed_TresPerNode_value_length": 10,
+      "frozen_wrapper_expected_only_typed_GRES_serializations": true,
+      "GPU_device_name_or_memory_probe_executed": false,
+      "model_module_inference_count": 0,
+      "scientific_metric_count": 0,
+      "sensitive_detail_field_count": 0,
+      "model_or_scientific_outcome_used_for_repair": false
+    },
+    "resource_accounting": {
+      "attempt_GPU_hours_actual": 0.0025,
+      "protocol_accounted_cumulative_GPU_hours_actual": 1.5482208277781804,
+      "attempt_retained_storage_GiB": 1.1408701539039612e-6,
+      "protocol_accounted_cumulative_retained_storage_GiB": 0.000020110979676246643,
+      "attempt_wall_minutes_actual": 0.15,
+      "protocol_accounted_cumulative_wall_minutes_actual": 92.89324966669084,
+      "direct_monetary_cost_USD": 0
+    },
+    "terminal_gate": {
+      "scientific_decision_opened": false,
+      "public_development_authorized": false,
+      "governed_C_authorized": false,
+      "LTX_or_synthetic_learner_run": false,
+      "attempt_15_authorized_only_after_prospective_generic_GRES_serialization_repair_commit_and_push": true
+    },
+    "blocker_commitment_scope": "canonical JSON of this result excluding blocker_commitment_sha256",
+    "blocker_commitment_sha256": "584392429481f2a6d5dfc16d1fed8bfe2b49902c08f5767ad143e0feaabe0824"
+  },
+  "learner_effective_engineering_health_generic_GRES_serialization_repair": {
+    "status": "FROZEN_AFTER_ATTEMPT_14_GENERIC_SLURM_GRES_SERIALIZATION_BEFORE_ATTEMPT_15_OR_NEW_OUTCOME",
+    "effective_on": "2026-08-05",
+    "scope": "OUTCOME_INDEPENDENT_EXACT_SLURM_GENERIC_GRES_SERIALIZATION_COMPATIBILITY_REPAIR_AND_ATTEMPT_15_TOPOLOGY_SELECTION",
+    "authorization_basis": "user standing authorization for ordinary engineering repairs until a complete valid scientific result and earliest-compatible-zero-cost GPU selection",
+    "preserved_without_change": {
+      "attempt_14_blocker_sha256": "584392429481f2a6d5dfc16d1fed8bfe2b49902c08f5767ad143e0feaabe0824",
+      "NLTK_matplotlib_repair_sha256": "37e9c960ea2e60b664933fd82734722a458b13adfdd32163cb2b4a71f0181036",
+      "public_fixture_manifest_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "models_weights_fixtures_inputs_seeds_thresholds_metrics_scientific_gates_privacy_rules_and_downstream_contract": true
+    },
+    "failure_specific_repair": {
+      "typed_scheduler_TresPerNode_forms_retained": ["gres/gpu:nvidia_a30:1", "gres:gpu:nvidia_a30:1"],
+      "additional_exact_scheduler_TresPerNode_form": "gres/gpu:1",
+      "additional_form_allowed_only_for_attempt": 15,
+      "additional_form_allowed_only_with_partition": "a30",
+      "additional_form_allowed_only_with_requested_GRES": "gpu:nvidia_a30:1",
+      "additional_form_allowed_only_with_one_process_and_one_GPU": true,
+      "in_container_exact_device_name_and_23_to_25_GiB_memory_attestation_remains_blocking": true,
+      "generic_scheduler_token_alone_never_attests_hardware": true,
+      "runner_topology_attestation_records_the_prospectively_requested_typed_GRES": true,
+      "model_fixture_source_threshold_partition_seed_metric_or_gate_changed": false
+    },
+    "scheduler_only_comparison": {
+      "checked_on": "2026-08-05",
+      "real_job_submitted_by_checks": false,
+      "request": {"nodes": 1, "tasks": 1, "CPU_count": 8, "memory_GiB": 32, "wall_minutes": 60, "DDP": false, "direct_monetary_cost_USD": 0},
+      "candidates": [
+        {"GPU_type": "NVIDIA_A30_24GB", "partition": "a30", "GRES": "gpu:nvidia_a30:1", "eligible": true, "estimated_start": "2026-08-05T02:54:18-05:00"},
+        {"GPU_type": "NVIDIA_H100_NVL", "partition": "h100", "GRES": "gpu:nvidia_h100_nvl:1", "eligible": true, "estimated_start": "2026-08-07T18:37:27-05:00"},
+        {"GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG", "partition": "h100", "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1", "eligible": true, "estimated_start": "2026-08-05T18:54:18-05:00"},
+        {"GPU_type": "NVIDIA_H200_NVL", "partition": "h200", "GRES": "gpu:nvidia_h200_nvl:1", "eligible": true, "estimated_start": "2026-08-05T04:44:18-05:00"}
+      ],
+      "selection_rule": "minimum scheduler-estimated start among compatible eligible zero-cost one-process requests; fixed GPU-type order only breaks exact timestamp ties",
+      "selected_GPU_type": "NVIDIA_A30_24GB"
+    },
+    "scheduler_submission_representation": {
+      "SBATCH_GPU_request": "--gpus-per-node=1 on the A30-only partition",
+      "requested_typed_GRES": "gpu:nvidia_a30:1",
+      "expected_scontrol_TresPerNode_classes": ["TYPED_GRES_SLASH", "TYPED_GRES_COLON", "GENERIC_GRES_SLASH"],
+      "scheduler_test_static_directives_exit": 0,
+      "scheduler_test_typed_gpus_per_node_exit": 0,
+      "scheduler_test_generic_gpus_per_node_exit": 0,
+      "scheduler_test_explicit_gres_exit": 1,
+      "real_job_submitted_by_tests": false
+    },
+    "active_attempt_resource_policy": {
+      "attempt": 15,
+      "submission_count": 1,
+      "partition": "a30",
+      "GRES": "gpu:nvidia_a30:1",
+      "GPU_type": "NVIDIA_A30_24GB",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "DDP": false,
+      "wall_minutes_max": 60,
+      "GPU_hours_max": 1.0,
+      "new_storage_GiB_max": 1.0,
+      "prior_protocol_accounted_GPU_hours_actual": 1.5482208277781804,
+      "active_aggregate_GPU_hours_max": 2.5482208277781804,
+      "prior_health_run_storage_GiB_actual": 0.000020110979676246643,
+      "active_aggregate_new_storage_GiB_max": 1.0000201109796762,
+      "direct_monetary_cost_USD": 0,
+      "historical_incomplete_attempt_wall_minutes": {"1": 15, "2": 15, "4": 15, "6": 15, "7": 15, "9": 0.16666666666666666, "12": 0.05, "14": 0.15},
+      "historical_attempt_GPU_types": {"1": "NVIDIA_H100_NVL_3G_47GB_MIG", "2": "NVIDIA_H100_NVL_3G_47GB_MIG", "3": "NVIDIA_H100_NVL_3G_47GB_MIG", "4": "NVIDIA_H100_NVL_3G_47GB_MIG", "5": "NVIDIA_H100_NVL_3G_47GB_MIG", "6": "NVIDIA_H100_NVL_3G_47GB_MIG", "7": "NVIDIA_H100_NVL_3G_47GB_MIG", "8": "NVIDIA_H100_NVL", "9": "NVIDIA_A30_24GB", "10": "NVIDIA_A30_24GB", "11": "NVIDIA_A30_24GB", "12": "NVIDIA_A30_24GB", "13": "NVIDIA_A30_24GB", "14": "NVIDIA_A30_24GB"}
+    },
+    "topology_attestation_contract": {"partition": "a30", "node_count": 1, "task_count": 1, "CPU_count": 8, "time_limit_minutes": 60, "memory_per_CPU_GiB": 4, "GRES": "gpu:nvidia_a30:1", "expected_device_name": "NVIDIA A30", "visible_memory_GiB_min": 23, "visible_memory_GiB_max": 25, "world_size": 1, "local_world_size": 1},
+    "execution_and_stop_rule": {"attempt_15_is_complete_health_suite_not_shallow_diagnostic": true, "same_complete_28_case_two_replicate_suite": true, "metric_withholding_on_timeout_or_error": true, "commit_and_push_before_submission": true, "one_live_job_max": 1, "no_repeated_scheduler_polling_or_unchanged_status_updates": true, "valid_complete_scientific_result_remains_terminal_under_frozen_gate": true},
+    "new_health_or_scientific_outcome_opened": false,
+    "repair_commitment_scope": "canonical JSON of this amendment excluding repair_commitment_sha256",
+    "repair_commitment_sha256": "ce9040c8bd1ab65d9dc0cf943bc18774f9486a0df6030b60696e81a27b81ce0a"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",

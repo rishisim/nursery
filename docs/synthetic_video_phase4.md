@@ -703,3 +703,16 @@ two-replicate, metric-withheld suite on one A30, one process, eight CPUs,
 32 GiB, 60 minutes/1 GPU-hour, 1 GiB new storage, and $0. Scientific
 development remains locked pending a committed 7/7 health pass; there is no
 repeated scheduler polling or unchanged-status reporting.
+
+Attempt 14 (Juno job 316905) failed after 9 scheduler seconds before runner
+entry, module execution, or scientific metric release. Slurm serialized the
+A30-only one-GPU request as generic `gres/gpu:1`; six of seven wrapper
+topology predicates passed, while the typed-GRES-only predicate failed closed.
+Blocker `58439242…e0824` is engineering-only. Prospective repair
+`ce9040c8…1ce0a` adds that single scheduler representation only for attempt 15
+on the A30 partition. The wrapper still binds the prospectively requested
+typed GRES, and the in-container runner must independently observe exactly one
+`NVIDIA A30` with 23–25 GiB before model loading. Models, fixtures, inputs,
+seeds, thresholds, metrics, privacy controls, and all scientific gates are
+unchanged. Attempt 15 remains one complete metric-withheld health suite under
+the existing 60-minute/1-GPU-hour, 1-GiB, one-process, $0 ceiling.

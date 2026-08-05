@@ -160,6 +160,10 @@ def _historical_health_config() -> dict:
     config.pop("learner_effective_engineering_health_submission_export_repair")
     config.pop("learner_effective_engineering_health_attempt_13_result")
     config.pop("learner_effective_engineering_health_NLTK_matplotlib_repair")
+    config.pop("learner_effective_engineering_health_attempt_14_result")
+    config.pop(
+        "learner_effective_engineering_health_generic_GRES_serialization_repair"
+    )
     return config
 
 
@@ -194,7 +198,7 @@ def _write_topology_attestation(
         "node_count": 1,
         "CPU_count": 8,
         "task_count": 1,
-        "time_limit_minutes": 60 if attempt in {8, 9, 10, 11, 12, 13, 14} else 15,
+        "time_limit_minutes": 60 if attempt in {8, 9, 10, 11, 12, 13, 14, 15} else 15,
         "memory_per_CPU_GiB": 4,
         "GRES": gres,
         "predicate_count": 7,
@@ -930,6 +934,33 @@ def test_nltk_matplotlib_repair_rejects_changed_public_wheel_identity() -> None:
         MODULE._engineering_health_nltk_matplotlib_repair(mutated)
 
 
+def test_generic_gres_repair_preserves_attempt_14_and_rejects_mutation() -> None:
+    config = _config()
+    attempt = MODULE._engineering_health_attempt_14_result(config)
+    assert attempt["blocker_commitment_sha256"] == (
+        "584392429481f2a6d5dfc16d1fed8bfe2b49902c08f5767ad143e0feaabe0824"
+    )
+    assert attempt["compact_aggregate"]["scientific_metric_count"] == 0
+    repair = MODULE._engineering_health_generic_gres_repair(config)
+    assert repair["repair_commitment_sha256"] == (
+        "ce9040c8bd1ab65d9dc0cf943bc18774f9486a0df6030b60696e81a27b81ce0a"
+    )
+    assert repair["active_attempt_resource_policy"]["attempt"] == 15
+    assert repair["failure_specific_repair"][
+        "in_container_exact_device_name_and_23_to_25_GiB_memory_attestation_remains_blocking"
+    ] is True
+    mutated = json.loads(json.dumps(config))
+    mutated[
+        "learner_effective_engineering_health_generic_GRES_serialization_repair"
+    ]["failure_specific_repair"]["additional_exact_scheduler_TresPerNode_form"] = (
+        "gres/gpu:2"
+    )
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_HEALTH_GENERIC_GRES_REPAIR_COMMITMENT"
+    ):
+        MODULE._engineering_health_generic_gres_repair(mutated)
+
+
 @pytest.mark.parametrize(
     "forbidden_key,forbidden_value",
     [
@@ -1134,8 +1165,19 @@ def test_tuple_health_budget_enforces_active_lineage_repair_attempt_and_limits()
             "direct_monetary_cost_USD": 0,
         }
     )
-    budget = MODULE._tuple_health_budget(14, prior, config)
-    assert budget["attempt"] == 14
+    prior.append(
+        {
+            "attempt": 14,
+            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_count": 1,
+            "wall_minutes": 0.15,
+            "GPU_hours": 0.0025,
+            "new_storage_GiB": 1.1408701539039612e-6,
+            "direct_monetary_cost_USD": 0,
+        }
+    )
+    budget = MODULE._tuple_health_budget(15, prior, config)
+    assert budget["attempt"] == 15
     assert budget["GPU_type"] == MODULE._engineering_health_resource_policy(config)[
         "GPU_type"
     ]
@@ -1146,7 +1188,7 @@ def test_tuple_health_budget_enforces_active_lineage_repair_attempt_and_limits()
     assert budget["direct_monetary_cost_USD"] == 0
 
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ATTEMPT_BUDGET"):
-        MODULE._tuple_health_budget(15, prior, config)
+        MODULE._tuple_health_budget(16, prior, config)
 
 
 def test_attempt_12_pre_runner_failure_has_sealed_marker_free_resource() -> None:
@@ -1512,9 +1554,20 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
     )
     assert dependency_repair["active_attempt_resource_policy"]["attempt"] == 14
     assert dependency_repair["public_runtime_dependency_repair"]["wheel_count"] == 8
+    attempt_14 = MODULE._engineering_health_attempt_14_result(config)
+    assert attempt_14["blocker_commitment_sha256"] == (
+        "584392429481f2a6d5dfc16d1fed8bfe2b49902c08f5767ad143e0feaabe0824"
+    )
+    assert attempt_14["submission_provenance"]["job_id"] == 316905
+    assert attempt_14["compact_aggregate"]["scientific_metric_count"] == 0
+    gres_repair = MODULE._engineering_health_generic_gres_repair(config)
+    assert gres_repair["repair_commitment_sha256"] == (
+        "ce9040c8bd1ab65d9dc0cf943bc18774f9486a0df6030b60696e81a27b81ce0a"
+    )
+    assert gres_repair["active_attempt_resource_policy"]["attempt"] == 15
     effective = MODULE._engineering_health_resource_policy(config)
     assert effective["per_submission_wall_minutes_max"] == 60
-    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 14
+    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 15
 
     with pytest.raises(
         RuntimeError,
@@ -1877,6 +1930,35 @@ def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
         cfg=_config(),
     )
     assert commitment == MODULE.file_digest(attempt_14_attestation)
+
+    attempt_15_gpu_type = MODULE._engineering_health_generic_gres_repair(
+        _config()
+    )["active_attempt_resource_policy"]["GPU_type"]
+    attempt_15_name, attempt_15_memory = device_by_type[attempt_15_gpu_type]
+    attempt_15_cuda = SimpleNamespace(
+        device_count=lambda: 1,
+        get_device_name=lambda _index: attempt_15_name,
+        get_device_properties=lambda _index: SimpleNamespace(
+            total_memory=attempt_15_memory * 1024**3
+        ),
+    )
+    monkeypatch.setitem(
+        sys.modules, "torch", SimpleNamespace(cuda=attempt_15_cuda)
+    )
+    attempt_15_attestation = _write_topology_attestation(
+        tmp_path / "attempt-15",
+        monkeypatch,
+        attempt=15,
+        job_id=316906,
+        gpu_type=attempt_15_gpu_type,
+    )
+    commitment = MODULE._tuple_health_topology(
+        "cuda",
+        topology_attestation=attempt_15_attestation,
+        attempt=15,
+        cfg=_config(),
+    )
+    assert commitment == MODULE.file_digest(attempt_15_attestation)
 
     bad = json.loads(attestation.read_text())
     bad["task_count"] = 2
@@ -2242,6 +2324,10 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop("learner_effective_engineering_health_attempt_13_result")
     historical_config.pop(
         "learner_effective_engineering_health_NLTK_matplotlib_repair"
+    )
+    historical_config.pop("learner_effective_engineering_health_attempt_14_result")
+    historical_config.pop(
+        "learner_effective_engineering_health_generic_GRES_serialization_repair"
     )
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)

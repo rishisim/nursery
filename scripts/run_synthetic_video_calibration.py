@@ -644,6 +644,12 @@ ENGINEERING_HEALTH_ATTEMPT_13_BLOCKER_SHA256 = (
 ENGINEERING_HEALTH_NLTK_MATPLOTLIB_REPAIR_SHA256 = (
     "37e9c960ea2e60b664933fd82734722a458b13adfdd32163cb2b4a71f0181036"
 )
+ENGINEERING_HEALTH_ATTEMPT_14_BLOCKER_SHA256 = (
+    "584392429481f2a6d5dfc16d1fed8bfe2b49902c08f5767ad143e0feaabe0824"
+)
+ENGINEERING_HEALTH_GENERIC_GRES_REPAIR_SHA256 = (
+    "ce9040c8bd1ab65d9dc0cf943bc18774f9486a0df6030b60696e81a27b81ce0a"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -916,6 +922,24 @@ def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
     redirect = _engineering_health_resource_redirect(cfg)
     _engineering_health_dependency_restore(cfg)
     _engineering_health_topology_guard_repair(cfg)
+    if "learner_effective_engineering_health_generic_GRES_serialization_repair" in cfg:
+        active = _engineering_health_generic_gres_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]
+        return {
+            "partition": active["partition"],
+            "GRES": active["GRES"],
+            "GPU_type": active["GPU_type"],
+            "GPU_count": active["GPU_count"],
+            "CPU_count": active["CPU_count"],
+            "memory_GiB": active["memory_GiB"],
+            "DDP": active["DDP"],
+            "per_submission_wall_minutes_max": active["wall_minutes_max"],
+            "initial_plus_repair_resmoke_submission_count_max": active["attempt"],
+            "aggregate_GPU_hours_max": active["active_aggregate_GPU_hours_max"],
+            "new_storage_GiB_max": active["active_aggregate_new_storage_GiB_max"],
+            "direct_monetary_cost_USD": active["direct_monetary_cost_USD"],
+        }
     if "learner_effective_engineering_health_NLTK_matplotlib_repair" in cfg:
         active = _engineering_health_nltk_matplotlib_repair(cfg)[
             "active_attempt_resource_policy"
@@ -1128,6 +1152,16 @@ def _engineering_health_attempt_gpu_type(
     """Return the prospectively bound GPU type for one historical/current attempt."""
 
     if type(attempt) is not int or attempt < 1:
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+    if "learner_effective_engineering_health_generic_GRES_serialization_repair" in cfg:
+        policy = _engineering_health_generic_gres_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]
+        if attempt == int(policy["attempt"]):
+            return str(policy["GPU_type"])
+        historical = policy["historical_attempt_GPU_types"]
+        if str(attempt) in historical:
+            return str(historical[str(attempt)])
         raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
     if "learner_effective_engineering_health_NLTK_matplotlib_repair" in cfg:
         policy = _engineering_health_nltk_matplotlib_repair(cfg)[
@@ -4147,6 +4181,239 @@ def _engineering_health_nltk_matplotlib_repair(
         != "canonical JSON of this amendment excluding repair_commitment_sha256"
     ):
         raise RuntimeError("E_TUPLE_HEALTH_NLTK_MATPLOTLIB_REPAIR_COMMITMENT")
+    return value
+
+
+def _engineering_health_attempt_14_result(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the sealed pre-runner generic-GRES serialization failure."""
+
+    repair = _engineering_health_nltk_matplotlib_repair(cfg)
+    try:
+        value = cfg["learner_effective_engineering_health_attempt_14_result"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_14_RESULT_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("blocker_commitment_sha256", None)
+    submission = value.get("submission_provenance", {})
+    compact = value.get("compact_aggregate", {})
+    diagnosis = value.get("stable_aggregate_diagnosis", {})
+    resource = value.get("resource_accounting", {})
+    if (
+        cfg.get("schema_version") != 36
+        or value.get("status")
+        != "ENGINEERING_BLOCKER_ATTEMPT_14_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED"
+        or value.get("classification")
+        != "ENGINEERING_SLURM_GENERIC_GRES_SERIALIZATION_MISMATCH_NOT_SCIENTIFIC_NO_GO"
+        or value.get("preserved_NLTK_matplotlib_repair_sha256")
+        != repair["repair_commitment_sha256"]
+        or expected != ENGINEERING_HEALTH_ATTEMPT_14_BLOCKER_SHA256
+        or digest(payload) != expected
+        or submission
+        != {
+            "job_id": 316905,
+            "attempt": 14,
+            "scheduler_state": "FAILED",
+            "scheduler_exit_code": "66:0",
+            "scheduler_elapsed_seconds": 9,
+            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_count": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "wall_minutes_requested": 60,
+            "DDP": False,
+            "direct_monetary_cost_USD": 0,
+        }
+        or compact.get("planned_module_count") != 7
+        or compact.get("planned_case_count") != 28
+        or compact.get("wrapper_record_count") != 1
+        or compact.get("container_attestation_count") != 1
+        or compact.get("fixture_bind_attestation_count") != 1
+        or compact.get("topology_attestation_count") != 0
+        or compact.get("runner_entry_count") != 0
+        or compact.get("module_execution_count") != 0
+        or compact.get("holdout_input_count") != 0
+        or compact.get("scientific_metric_count") != 0
+        or compact.get("stdout_bytes") != 0
+        or compact.get("stderr_bytes") != 0
+        or compact.get("retained_file_count") != 3
+        or compact.get("retained_bytes") != 1225
+        or diagnosis.get("wrapper_topology_predicate_count") != 7
+        or diagnosis.get("wrapper_topology_predicate_pass_count") != 6
+        or diagnosis.get(
+            "partition_nodes_tasks_CPUs_memory_and_wall_predicates_passed"
+        )
+        is not True
+        or diagnosis.get("requested_or_allocated_A30_TRES_present") is not True
+        or diagnosis.get("observed_TresPerNode_class") != "GENERIC_GRES_SLASH"
+        or diagnosis.get("observed_TresPerNode_value_length") != 10
+        or diagnosis.get("GPU_device_name_or_memory_probe_executed") is not False
+        or diagnosis.get("model_module_inference_count") != 0
+        or diagnosis.get("scientific_metric_count") != 0
+        or diagnosis.get("model_or_scientific_outcome_used_for_repair")
+        is not False
+        or resource.get("attempt_GPU_hours_actual") != 0.0025
+        or resource.get("protocol_accounted_cumulative_GPU_hours_actual")
+        != 1.5482208277781804
+        or resource.get("attempt_retained_storage_GiB")
+        != 1.1408701539039612e-6
+        or value.get("terminal_gate", {}).get("scientific_decision_opened")
+        is not False
+        or value.get("terminal_gate", {}).get(
+            "attempt_15_authorized_only_after_prospective_generic_GRES_serialization_repair_commit_and_push"
+        )
+        is not True
+        or value.get("blocker_commitment_scope")
+        != "canonical JSON of this result excluding blocker_commitment_sha256"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_14_RESULT_COMMITMENT")
+    return value
+
+
+def _engineering_health_generic_gres_repair(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the exact generic Slurm GRES serialization repair."""
+
+    attempt_14 = _engineering_health_attempt_14_result(cfg)
+    try:
+        value = cfg[
+            "learner_effective_engineering_health_generic_GRES_serialization_repair"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_GENERIC_GRES_REPAIR_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("repair_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    repair = value.get("failure_specific_repair", {})
+    comparison = value.get("scheduler_only_comparison", {})
+    representation = value.get("scheduler_submission_representation", {})
+    active = value.get("active_attempt_resource_policy", {})
+    topology = value.get("topology_attestation_contract", {})
+    catalog = {
+        "NVIDIA_A30_24GB": ("a30", "gpu:nvidia_a30:1", "NVIDIA A30", 23, 25),
+        "NVIDIA_H100_NVL": ("h100", "gpu:nvidia_h100_nvl:1", "NVIDIA H100 NVL", 85, 100),
+        "NVIDIA_H100_NVL_3G_47GB_MIG": ("h100", "gpu:nvidia_h100_nvl_3g.47gb:1", "NVIDIA H100 NVL MIG 3g.47gb", 45, 50),
+        "NVIDIA_H200_NVL": ("h200", "gpu:nvidia_h200_nvl:1", "NVIDIA H200 NVL", 135, 145),
+    }
+    candidates = comparison.get("candidates")
+    candidate_shape_ok = (
+        isinstance(candidates, list)
+        and len(candidates) == len(catalog)
+        and {item.get("GPU_type") for item in candidates if isinstance(item, dict)}
+        == set(catalog)
+        and all(
+            isinstance(item, dict)
+            and set(item)
+            == {"GPU_type", "partition", "GRES", "eligible", "estimated_start"}
+            and item["partition"] == catalog[item["GPU_type"]][0]
+            and item["GRES"] == catalog[item["GPU_type"]][1]
+            and item["eligible"] is True
+            and re.fullmatch(
+                r"2026-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}-0[5-7]:00",
+                str(item["estimated_start"]),
+            )
+            is not None
+            for item in candidates
+        )
+    )
+    winner = (
+        min(
+            candidates,
+            key=lambda item: (
+                item["estimated_start"],
+                list(catalog).index(item["GPU_type"]),
+            ),
+        )
+        if candidate_shape_ok
+        else {}
+    )
+    selected_type = comparison.get("selected_GPU_type")
+    selected = catalog.get(selected_type, (None, None, None, None, None))
+    if (
+        cfg.get("schema_version") != 36
+        or value.get("status")
+        != "FROZEN_AFTER_ATTEMPT_14_GENERIC_SLURM_GRES_SERIALIZATION_BEFORE_ATTEMPT_15_OR_NEW_OUTCOME"
+        or value.get("scope")
+        != "OUTCOME_INDEPENDENT_EXACT_SLURM_GENERIC_GRES_SERIALIZATION_COMPATIBILITY_REPAIR_AND_ATTEMPT_15_TOPOLOGY_SELECTION"
+        or expected != ENGINEERING_HEALTH_GENERIC_GRES_REPAIR_SHA256
+        or digest(payload) != expected
+        or preserved.get("attempt_14_blocker_sha256")
+        != attempt_14["blocker_commitment_sha256"]
+        or preserved.get("NLTK_matplotlib_repair_sha256")
+        != ENGINEERING_HEALTH_NLTK_MATPLOTLIB_REPAIR_SHA256
+        or repair
+        != {
+            "typed_scheduler_TresPerNode_forms_retained": [
+                "gres/gpu:nvidia_a30:1",
+                "gres:gpu:nvidia_a30:1",
+            ],
+            "additional_exact_scheduler_TresPerNode_form": "gres/gpu:1",
+            "additional_form_allowed_only_for_attempt": 15,
+            "additional_form_allowed_only_with_partition": "a30",
+            "additional_form_allowed_only_with_requested_GRES": "gpu:nvidia_a30:1",
+            "additional_form_allowed_only_with_one_process_and_one_GPU": True,
+            "in_container_exact_device_name_and_23_to_25_GiB_memory_attestation_remains_blocking": True,
+            "generic_scheduler_token_alone_never_attests_hardware": True,
+            "runner_topology_attestation_records_the_prospectively_requested_typed_GRES": True,
+            "model_fixture_source_threshold_partition_seed_metric_or_gate_changed": False,
+        }
+        or comparison.get("checked_on") != "2026-08-05"
+        or comparison.get("real_job_submitted_by_checks") is not False
+        or not candidate_shape_ok
+        or selected_type != winner.get("GPU_type")
+        or representation
+        != {
+            "SBATCH_GPU_request": "--gpus-per-node=1 on the A30-only partition",
+            "requested_typed_GRES": "gpu:nvidia_a30:1",
+            "expected_scontrol_TresPerNode_classes": [
+                "TYPED_GRES_SLASH",
+                "TYPED_GRES_COLON",
+                "GENERIC_GRES_SLASH",
+            ],
+            "scheduler_test_static_directives_exit": 0,
+            "scheduler_test_typed_gpus_per_node_exit": 0,
+            "scheduler_test_generic_gpus_per_node_exit": 0,
+            "scheduler_test_explicit_gres_exit": 1,
+            "real_job_submitted_by_tests": False,
+        }
+        or active.get("attempt") != 15
+        or active.get("partition") != selected[0]
+        or active.get("GRES") != selected[1]
+        or active.get("GPU_type") != selected_type
+        or active.get("GPU_count") != 1
+        or active.get("CPU_count") != 8
+        or active.get("memory_GiB") != 32
+        or active.get("DDP") is not False
+        or active.get("wall_minutes_max") != 60
+        or active.get("prior_protocol_accounted_GPU_hours_actual")
+        != 1.5482208277781804
+        or active.get("active_aggregate_GPU_hours_max") != 2.5482208277781804
+        or active.get("prior_health_run_storage_GiB_actual")
+        != 0.000020110979676246643
+        or active.get("active_aggregate_new_storage_GiB_max")
+        != 1.0000201109796762
+        or topology
+        != {
+            "partition": selected[0],
+            "node_count": 1,
+            "task_count": 1,
+            "CPU_count": 8,
+            "time_limit_minutes": 60,
+            "memory_per_CPU_GiB": 4,
+            "GRES": selected[1],
+            "expected_device_name": selected[2],
+            "visible_memory_GiB_min": selected[3],
+            "visible_memory_GiB_max": selected[4],
+            "world_size": 1,
+            "local_world_size": 1,
+        }
+        or value.get("new_health_or_scientific_outcome_opened") is not False
+        or value.get("repair_commitment_scope")
+        != "canonical JSON of this amendment excluding repair_commitment_sha256"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_GENERIC_GRES_REPAIR_COMMITMENT")
     return value
 
 
@@ -13191,6 +13458,17 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
         if "learner_effective_engineering_health_NLTK_matplotlib_repair" in cfg
         else None
     )
+    attempt_14_result = (
+        _engineering_health_attempt_14_result(cfg)
+        if "learner_effective_engineering_health_attempt_14_result" in cfg
+        else None
+    )
+    generic_gres_repair = (
+        _engineering_health_generic_gres_repair(cfg)
+        if "learner_effective_engineering_health_generic_GRES_serialization_repair"
+        in cfg
+        else None
+    )
     amendment = _tuple_amendment(cfg)
     runtime = _tuple_runtime_amendment(cfg)
     fixture_protocol = _tuple_fixture_protocol(cfg)
@@ -13248,6 +13526,8 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
             "submission_export_repair": submission_export_repair,
             "attempt_13_result": attempt_13_result,
             "nltk_matplotlib_repair": nltk_matplotlib_repair,
+            "attempt_14_result": attempt_14_result,
+            "generic_gres_repair": generic_gres_repair,
             "tuple_amendment": amendment,
             "runtime": runtime,
             "fixture_protocol": fixture_protocol,
@@ -13752,6 +14032,17 @@ def _tuple_health_topology_attestation(
     if not job_id.isdecimal() or int(job_id) <= 0:
         raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION")
     if (
+        "learner_effective_engineering_health_generic_GRES_serialization_repair"
+        in cfg
+        and attempt == 15
+    ):
+        topology = _engineering_health_generic_gres_repair(cfg)[
+            "topology_attestation_contract"
+        ]
+        expected_partition = topology["partition"]
+        expected_wall_minutes = topology["time_limit_minutes"]
+        expected_gres = topology["GRES"]
+    elif (
         "learner_effective_engineering_health_NLTK_matplotlib_repair" in cfg
         and attempt == 14
     ):
@@ -14074,6 +14365,25 @@ def _tuple_health_topology(
             else 0
         )
         if (
+            "learner_effective_engineering_health_generic_GRES_serialization_repair"
+            in cfg
+            and int(attempt) == 15
+        ):
+            topology = _engineering_health_generic_gres_repair(cfg)[
+                "topology_attestation_contract"
+            ]
+            configured_name = str(topology["expected_device_name"])
+            expected_device = (
+                device_name.startswith("NVIDIA H100 NVL")
+                if expected_gpu_type == "NVIDIA_H100_NVL_3G_47GB_MIG"
+                else device_name == configured_name
+            )
+            expected_memory = (
+                int(topology["visible_memory_GiB_min"]) * 1024**3
+                <= total_memory
+                <= int(topology["visible_memory_GiB_max"]) * 1024**3
+            )
+        elif (
             "learner_effective_engineering_health_NLTK_matplotlib_repair"
             in cfg
             and int(attempt) == 14
@@ -24630,7 +24940,7 @@ def main() -> None:
         "--container-attestation", type=Path, required=True
     )
     tuple_health_parser.add_argument(
-        "--attempt", type=int, choices=(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14), required=True
+        "--attempt", type=int, choices=(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), required=True
     )
     tuple_health_parser.add_argument("--device", default="cuda")
     tuple_qualify_parser = subparsers.add_parser("tuple-qualify")

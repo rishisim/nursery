@@ -646,3 +646,15 @@ authorized on the scheduler-selected A30 with one process, eight CPUs,
 32 GiB, 60 minutes/1 GPU-hour, 1 GiB new storage, and $0. There is one live
 job at most and unchanged scheduler states are neither repeatedly polled nor
 reported.
+
+Attempt 14, Juno job 316905, failed after 9 scheduler seconds before the
+runner, module execution, or any scientific metric. Slurm represented the
+A30-only one-GPU request as generic `gres/gpu:1`; the wrapper's six other
+topology predicates passed, but its typed-GRES-only check failed closed.
+Engineering blocker `58439242…e0824` preserves that result. The prospective
+repair `ce9040c8…1ce0a` admits that one exact generic scheduler serialization
+only for attempt 15 on the A30 partition while retaining the requested typed
+GRES and the runner's blocking exact `NVIDIA A30` plus 23–25 GiB CUDA check.
+The unchanged complete health suite remains metric-withheld, one-process,
+60-minute/1-GPU-hour, 1 GiB new storage, and $0. There is no repeated polling
+or unchanged-status reporting.

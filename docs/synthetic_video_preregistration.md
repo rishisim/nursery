@@ -2154,3 +2154,21 @@ process, eight CPUs, 32 GiB, 60 minutes/1 GPU-hour, 1 GiB new storage, and $0.
 Public scientific development remains unauthorized until a committed 7/7
 health pass. Only one job may be live, and unchanged scheduler state must not
 be repeatedly polled or reported.
+
+Attempt 14 (Juno job 316905) stopped after 9 scheduler seconds before runner
+entry and opened zero scientific metrics. The A30-only one-GPU allocation was
+serialized by Slurm as generic `gres/gpu:1`; all other wrapper topology
+predicates passed, but the frozen typed-GRES-only representation check failed
+closed. This is sealed as engineering blocker `58439242…e0824`, not a
+scientific no-go.
+
+Before another outcome, prospective repair `ce9040c8…1ce0a` permits exactly
+that generic Slurm representation only for attempt 15 with partition `a30`,
+requested GRES `gpu:nvidia_a30:1`, one GPU, and one process. It does not use
+the generic token as hardware evidence: the in-container runner's exact
+`NVIDIA A30` name and 23–25 GiB visible-memory check remains blocking before
+model loading. The sealed fixtures, models, thresholds, metrics, seeds,
+scientific gate, privacy rules, and downstream contract remain unchanged.
+Attempt 15 retains the complete 28-case/two-replicate metric-withheld suite,
+60-minute/1-GPU-hour, 1-GiB, and $0 ceilings, with one live job and no repeated
+scheduler polling or unchanged-status reporting.
