@@ -45,6 +45,7 @@ def _historical_health_config() -> dict:
     config["schema_version"] = 21
     config.pop("learner_effective_engineering_health_result")
     config.pop("learner_effective_engineering_health_reauthorization")
+    config.pop("learner_effective_engineering_health_reauthorization_result")
     return config
 
 
@@ -807,7 +808,22 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
         "runner_scontrol_subprocess_inside_container"
     ] is False
 
-    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_REAUTHORIZED_ATTEMPT"):
+    terminal_reauthorization = (
+        MODULE._engineering_health_reauthorization_result(config)
+    )
+    assert terminal_reauthorization["blocker_commitment_sha256"] == (
+        "59b1778b35cedd1cb020177e41fe6887371a5480f7ee6bf6e57f55d4c90edde3"
+    )
+    assert terminal_reauthorization["submission_provenance"]["job_id"] == 316478
+    assert terminal_reauthorization["submission_provenance"][
+        "model_module_inference_count"
+    ] == 0
+    assert terminal_reauthorization["stable_aggregate_diagnosis"][
+        "argparse_invalid_choice"
+    ] is True
+    assert terminal_reauthorization["terminal_gate"]["attempt_5_authorized"] is False
+
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ROUTE_EXHAUSTED"):
         MODULE.run_tuple_health(
             argparse.Namespace(
                 public_root=tmp_path / "public",
@@ -837,6 +853,20 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
         RuntimeError, match="E_TUPLE_HEALTH_REAUTHORIZATION_COMMITMENT"
     ):
         MODULE._engineering_health_reauthorization(mutated)
+
+    mutated = json.loads(json.dumps(config))
+    result = mutated[
+        "learner_effective_engineering_health_reauthorization_result"
+    ]
+    result["terminal_gate"]["attempt_5_authorized"] = True
+    payload = json.loads(json.dumps(result))
+    payload.pop("blocker_commitment_sha256")
+    result["blocker_commitment_sha256"] = MODULE.digest(payload)
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_HEALTH_REAUTHORIZATION_RESULT_COMMITMENT",
+    ):
+        MODULE._engineering_health_reauthorization_result(mutated)
 
 
 def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
@@ -958,6 +988,36 @@ def test_tuple_health_cli_emits_one_exact_allowlisted_line(
     assert set(json.loads(lines[0])) == set(MODULE.TUPLE_HEALTH_FIELDS)
 
 
+def test_attempt4_terminal_diagnosis_matches_frozen_cli_choice(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_synthetic_video_calibration.py",
+            "tuple-health",
+            "--public-root",
+            str(tmp_path / "public"),
+            "--scratch-root",
+            str(tmp_path / "scratch"),
+            "--config",
+            "configs/synthetic_video_real_only_proof.json",
+            "--attempt",
+            "4",
+            "--device",
+            "cuda",
+        ],
+    )
+    with pytest.raises(SystemExit, match="2"):
+        MODULE.main()
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert "invalid choice: '4'" in captured.err
+
+
 def test_output_guard_rejects_unignored_path_in_another_git_repository(
     tmp_path: Path,
 ) -> None:
@@ -1004,6 +1064,7 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config["schema_version"] = 21
     historical_config.pop("learner_effective_engineering_health_result")
     historical_config.pop("learner_effective_engineering_health_reauthorization")
+    historical_config.pop("learner_effective_engineering_health_reauthorization_result")
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)
     manifest = _fixture_manifest()

@@ -1887,6 +1887,24 @@ restart the complete 28-case, two-replicate suite. No post-attempt repair,
 resmoke, or attempt 5 is authorized. A failure seals a new engineering blocker;
 only a committed 7/7 engineering pass authorizes public development.
 
+The one authorized submission was H100 job 316478. The wrapper passed all
+seven exact scheduler predicates and wrote one compact topology attestation,
+then the committed runner CLI rejected `--attempt 4` because its parser still
+listed only choices 1, 2, and 3. This occurred before runner entry, dependency
+preflight, fixture projection, model loading, module inference, or any
+scientific metric. The scheduler state was `FAILED` with exit `2:0` after 15
+seconds; the attempt root contains only the wrapper marker and attestation, with
+no full health record or private trace. Commitment `59b1778b…0edde3` seals this
+as `ENGINEERING_CLI_CONFIGURATION_MISMATCH_ROUTE_EXHAUSTED_NOT_SCIENTIFIC_NO_GO`.
+
+One malformed typed-GRES command was rejected by `sbatch` before creating a
+job or consuming resources; the accepted submission reused the exact typed
+`--gpus-per-node` form from the prior H100 jobs. The terminal route charges the
+full prospectively bounded 0.25 slice-GPU-hour conservatively, for 0.754019
+cumulative protocol slice-GPU-hours, 1,092 new bytes, and $0. Attempt 5 and all
+public development/holdout, governed C, LTX, generation, and synthetic-learner
+work are unauthorized under this route.
+
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only
 holdout result is a scientific no-go. Governed C remains conditional on a full

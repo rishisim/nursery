@@ -341,6 +341,17 @@ commitment. Models, fixtures, preprocessing, metrics, thresholds, seeds,
 scientific gates, and downstream contracts are unchanged. There is no repair
 cycle or attempt 5: only a committed 7/7 health pass can open public development.
 
+The sole reauthorized submission, H100 job 316478, is terminal
+`ENGINEERING_BLOCKER`. The wrapper passed all seven exact topology predicates
+and wrote its compact attestation, but the committed CLI parser still admitted
+only attempt values 1–3 and rejected `--attempt 4` before runner entry. The job
+failed after 15 scheduler seconds with no full health record, private trace,
+model-module inference, or scientific metric. Commitment
+`59b1778b…0edde3` seals this distinct route. Its conservative protocol charge
+uses the full 0.25 slice-GPU-hour allowance; cumulative protocol accounting is
+0.754019 slice-GPU-hours at $0. No attempt 5, public development/holdout,
+governed C, LTX work, generation, or Synthetic-1h is authorized.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

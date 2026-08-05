@@ -526,6 +526,17 @@ metric, threshold, seed, scientific gate, or downstream rule changes, and no
 attempt 5 is permitted. Public development remains conditional on a committed
 all-module attempt-4 pass.
 
+That sole submission was H100 job 316478 and it sealed blocker
+`59b1778b…0edde3`. All seven outer-wrapper scheduler predicates passed and the
+compact topology attestation was written, but the prospectively committed CLI
+parser still bounded `--attempt` to 1, 2, or 3. It rejected attempt 4 before
+runner entry, dependency or fixture preflight, model loading, or module
+inference. The 15-second job produced no full health result, private trace, or
+scientific metric. Conservative accounting charges the full 0.25 authorized
+slice-GPU-hour, bringing the protocol total to 0.754019 slice-GPU-hours and $0.
+This is an engineering blocker, not a scientific no-go; the route is exhausted
+with no attempt 5 and all downstream stages remain unauthorized.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

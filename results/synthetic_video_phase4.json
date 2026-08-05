@@ -1,7 +1,7 @@
 {
-  "schema_version": 11,
+  "schema_version": 12,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_BLOCKER_PRESERVED_SINGLE_ATTEMPT_REAUTHORIZATION_FROZEN_PENDING_ATTEMPT_4_NO_NEW_SCIENTIFIC_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_REAUTHORIZED_ATTEMPT_4_BLOCKER_SEALED_NO_SCIENTIFIC_OUTCOME_NO_ATTEMPT_5",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -674,6 +674,34 @@
     "model_fixture_threshold_metric_seed_or_gate_changed": false,
     "new_health_or_scientific_outcome_opened": false
   },
+  "learner_effective_engineering_health_reauthorization_result": {
+    "status": "ENGINEERING_BLOCKER_REAUTHORIZED_ATTEMPT_4_EXHAUSTED_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED",
+    "observed_on": "2026-08-04",
+    "canonical_source": "configs/synthetic_video_real_only_proof.json#learner_effective_engineering_health_reauthorization_result",
+    "job_id": 316478,
+    "scheduler_state": "FAILED",
+    "scheduler_exit_code": "2:0",
+    "scheduler_elapsed_seconds": 15,
+    "attempt": 4,
+    "topology_predicate_counts": [7, 7],
+    "wrapper_marker_count": 1,
+    "topology_attestation_count": 1,
+    "full_result_count": 0,
+    "private_trace_count": 0,
+    "model_module_inference_count": 0,
+    "scientific_metric_count": 0,
+    "failure_stage": "CLI_ARGUMENT_VALIDATION_BEFORE_RUNNER_ENTRY",
+    "classification": "ENGINEERING_CLI_CONFIGURATION_MISMATCH_ROUTE_EXHAUSTED_NOT_SCIENTIFIC_NO_GO",
+    "blocker_commitment_sha256": "59b1778b35cedd1cb020177e41fe6887371a5480f7ee6bf6e57f55d4c90edde3",
+    "protocol_accounted_cumulative_GPU_hours": 0.754019171529346,
+    "aggregate_GPU_hours_ceiling": 0.754019171529346,
+    "direct_monetary_cost_USD": 0,
+    "attempt_5_authorized": false,
+    "public_development_authorized": false,
+    "governed_C_authorized": false,
+    "LTX_or_synthetic_learner_run": false,
+    "new_scientific_outcome_opened": false
+  },
   "governed_C_calibration": {
     "status": "NO_GO",
     "topology": "1_H100",
@@ -1249,5 +1277,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "COMMIT_AND_PUSH_THE_SCHEDULER_ONLY_H100_MIG_REDIRECT_THEN_RUN_ONE_UNCHANGED_15_MINUTE_METRIC_WITHHOLDING_MICROHEALTH_SUBMISSION_WITH_AT_MOST_TWO_FROZEN_REPAIR_RESMOKES; NEW_SCIENTIFIC_DEVELOPMENT_REMAINS_CONDITIONAL_ON_A_COMMITTED_ALL_MODULE_HEALTH_PASS"
+  "next_authorized_scope": "NONE_UNDER_THIS_FROZEN_ROUTE; ATTEMPT_4_EXHAUSTED_ENGINEERING_HEALTH_AND_PUBLIC_DEVELOPMENT_HOLDOUT_GOVERNED_C_LTX_GENERATION_AND_SYNTHETIC_LEARNER_REMAIN_UNAUTHORIZED"
 }

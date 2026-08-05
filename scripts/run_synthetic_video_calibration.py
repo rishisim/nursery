@@ -581,6 +581,9 @@ ENGINEERING_HEALTH_BLOCKER_SHA256 = (
 ENGINEERING_HEALTH_REAUTHORIZATION_SHA256 = (
     "3271499c19a77ffab8c53e2cd2052ea14514682a3d4b73fd7c5179ceec4a7ff4"
 )
+ENGINEERING_HEALTH_REAUTHORIZATION_BLOCKER_SHA256 = (
+    "59b1778b35cedd1cb020177e41fe6887371a5480f7ee6bf6e57f55d4c90edde3"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -636,7 +639,7 @@ def _construct_aligned_ltx_resume_amendment(
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22, 23}
+        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22, 23, 24}
         or value.get("status")
         != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     ):
@@ -694,7 +697,7 @@ def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {21, 22, 23}
+        cfg.get("schema_version") not in {21, 22, 23, 24}
         or value.get("status")
         != "FROZEN_BEFORE_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -763,7 +766,7 @@ def _engineering_health_resource_redirect(
     payload = json.loads(json.dumps(value))
     expected = payload.pop("amendment_commitment_sha256", None)
     if (
-        cfg.get("schema_version") not in {21, 22, 23}
+        cfg.get("schema_version") not in {21, 22, 23, 24}
         or value.get("status")
         != "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "SCHEDULER_AND_RESOURCE_LATENCY_ONLY"
@@ -896,7 +899,7 @@ def _engineering_health_dependency_restore(
         ["transformers", "4.57.6"],
     ]
     if (
-        cfg.get("schema_version") not in {21, 22, 23}
+        cfg.get("schema_version") not in {21, 22, 23, 24}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_DEPENDENCY_CACHE_MISS_BEFORE_ATTEMPT_2_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1001,7 +1004,7 @@ def _engineering_health_topology_guard_repair(
     repair = value.get("repair", {})
     budget = value.get("remaining_health_budget", {})
     if (
-        cfg.get("schema_version") not in {21, 22, 23}
+        cfg.get("schema_version") not in {21, 22, 23, 24}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_2_REDUNDANT_TOPOLOGY_GUARD_FAILURE_BEFORE_ATTEMPT_3_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1084,7 +1087,7 @@ def _engineering_health_terminal_result(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {22, 23}
+        cfg.get("schema_version") not in {22, 23, 24}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ROUTE_EXHAUSTED_BEFORE_MODEL_INFERENCE_NO_SCIENTIFIC_METRICS_OPENED"
         or expected != ENGINEERING_HEALTH_BLOCKER_SHA256
@@ -1160,7 +1163,7 @@ def _engineering_health_reauthorization(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("effective_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") != 23
+        cfg.get("schema_version") not in {23, 24}
         or value.get("status")
         != "FROZEN_AFTER_SEALED_BLOCKER_BEFORE_REAUTHORIZED_ATTEMPT_4_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope")
@@ -1254,6 +1257,118 @@ def _engineering_health_reauthorization(cfg: dict[str, Any]) -> dict[str, Any]:
         or value.get("new_health_or_scientific_outcome_opened") is not False
     ):
         raise RuntimeError("E_TUPLE_HEALTH_REAUTHORIZATION_COMMITMENT")
+    return value
+
+
+def _engineering_health_reauthorization_result(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the terminal result of the sole post-blocker submission."""
+
+    reauthorization = _engineering_health_reauthorization(cfg)
+    try:
+        value = cfg["learner_effective_engineering_health_reauthorization_result"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_REAUTHORIZATION_RESULT_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("blocker_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    submission = value.get("submission_provenance", {})
+    diagnosis = value.get("stable_aggregate_diagnosis", {})
+    resource = value.get("resource_accounting", {})
+    gate = value.get("terminal_gate", {})
+    if (
+        cfg.get("schema_version") != 24
+        or value.get("status")
+        != "ENGINEERING_BLOCKER_REAUTHORIZED_ATTEMPT_4_EXHAUSTED_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED"
+        or value.get("route_id") != "construct-aligned-engineering-health"
+        or expected != ENGINEERING_HEALTH_REAUTHORIZATION_BLOCKER_SHA256
+        or digest(payload) != expected
+        or value.get("blocker_commitment_scope")
+        != "canonical JSON of this terminal result excluding blocker_commitment_sha256"
+        or preserved.get("reauthorization_commitment_sha256")
+        != reauthorization["reauthorization_commitment_sha256"]
+        or preserved.get("sealed_attempt_3_blocker_sha256")
+        != ENGINEERING_HEALTH_BLOCKER_SHA256
+        or preserved.get("prior_public_development_no_go_sha256")
+        != "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
+        or preserved.get("public_fixture_manifest_sha256")
+        != "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6"
+        or preserved.get(
+            "models_weights_fixtures_preprocessing_thresholds_metrics_seeds_scientific_gates_and_downstream_contract"
+        )
+        is not True
+        or submission.get("rejected_pre_submission_command_count") != 1
+        or submission.get("rejected_pre_submission_job_count") != 0
+        or submission.get("rejected_pre_submission_GPU_hours") != 0
+        or submission.get("accepted_submission_count") != 1
+        or submission.get("attempt") != 4
+        or submission.get("job_id") != 316478
+        or submission.get("scheduler_state") != "FAILED"
+        or submission.get("scheduler_exit_code") != "2:0"
+        or submission.get("scheduler_elapsed_seconds") != 15
+        or submission.get("partition") != "h100"
+        or submission.get("GRES") != "gpu:nvidia_h100_nvl_3g.47gb:1"
+        or submission.get("GPU_type") != "NVIDIA_H100_NVL_3G_47GB_MIG"
+        or submission.get("GPU_count") != 1
+        or submission.get("CPU_count") != 8
+        or submission.get("memory_GiB") != 32
+        or submission.get("authoritative_topology_predicate_count") != 7
+        or submission.get("authoritative_topology_predicate_pass_count") != 7
+        or submission.get("wrapper_marker_count") != 1
+        or submission.get("topology_attestation_count") != 1
+        or submission.get("full_result_count") != 0
+        or submission.get("private_trace_count") != 0
+        or submission.get("stderr_line_count") != 8
+        or submission.get("stderr_bytes") != 612
+        or submission.get("stderr_sha256")
+        != "c87246b4200baf4510c455b143910bbcf20089600e8bfa44d2f97ed7a86e884e"
+        or submission.get("runner_source_sha256")
+        != "24f2c5bba4015febe036b9ec1d5e614d413643d62483047dbce3f2af6b7f8146"
+        or submission.get("prospective_config_file_sha256")
+        != "9d5a1437cae7079225cd78d1073d0a5cc3f68cfa5e5bdb62034ce0713d354361"
+        or submission.get("prospective_config_commitment_sha256")
+        != "ff2275e3f68ad2d5ad69f790e141a5d6a2f50fc077fe7fc4ca42374bd132ce7f"
+        or submission.get("wrapper_source_sha256")
+        != "cc3794352ab95b22d647df1401e5116815b283a500ed5254afa548dc713ad54a"
+        or submission.get("attempt_root_file_count") != 2
+        or submission.get("model_module_inference_count") != 0
+        or submission.get("scientific_metric_count") != 0
+        or diagnosis.get("traceback_present") is not False
+        or diagnosis.get("argparse_error_present") is not True
+        or diagnosis.get("argparse_invalid_choice") is not True
+        or diagnosis.get("rejected_argument") != "attempt_4"
+        or diagnosis.get("committed_parser_choices") != [1, 2, 3]
+        or diagnosis.get("failure_stage")
+        != "CLI_ARGUMENT_VALIDATION_BEFORE_RUNNER_ENTRY_DEPENDENCY_PREFLIGHT_FIXTURE_PROJECTION_MODEL_LOADING_OR_MODULE_INFERENCE"
+        or diagnosis.get("classification")
+        != "ENGINEERING_CLI_CONFIGURATION_MISMATCH_ROUTE_EXHAUSTED_NOT_SCIENTIFIC_NO_GO"
+        or diagnosis.get("partial_health_or_scientific_metric_opened") is not False
+        or resource.get("accepted_submission_count") != 1
+        or resource.get("submission_count_remaining") != 0
+        or resource.get("attempt_4_conservative_protocol_GPU_hours_charged")
+        != 0.25
+        or resource.get("protocol_accounted_cumulative_GPU_hours")
+        != 0.754019171529346
+        or resource.get("aggregate_GPU_hours_ceiling") != 0.754019171529346
+        or resource.get("attempt_4_new_storage_bytes") != 1092
+        or resource.get("direct_monetary_cost_USD") != 0
+        or gate.get("engineering_health_pass") is not False
+        or gate.get("attempt_5_authorized") is not False
+        or gate.get("decision")
+        != "STOP_AT_EXACT_ENGINEERING_BLOCKER_WITH_ALL_SCIENTIFIC_METRICS_WITHHELD"
+        or any(
+            gate.get(key) is not False
+            for key in (
+                "public_development_authorized",
+                "public_holdout_authorized",
+                "governed_C_authorized",
+                "LTX_preflight_or_generation_authorized",
+                "synthetic_learner_authorized",
+            )
+        )
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_REAUTHORIZATION_RESULT_COMMITMENT")
     return value
 
 
@@ -10491,6 +10606,9 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
     """Run the bounded production-path microqualification with zero metrics."""
 
     cfg = json.loads(args.config.read_text())
+    if "learner_effective_engineering_health_reauthorization_result" in cfg:
+        _engineering_health_reauthorization_result(cfg)
+        raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
     if "learner_effective_engineering_health_result" in cfg:
         if "learner_effective_engineering_health_reauthorization" not in cfg:
             _engineering_health_terminal_result(cfg)
@@ -10746,6 +10864,9 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
 def _load_tuple_health_pass(
     public: Path, cfg: dict[str, Any], fixture_commitment: str
 ) -> dict[str, Any]:
+    if "learner_effective_engineering_health_reauthorization_result" in cfg:
+        _engineering_health_reauthorization_result(cfg)
+        raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
     if "learner_effective_engineering_health_result" in cfg:
         if "learner_effective_engineering_health_reauthorization" not in cfg:
             _engineering_health_terminal_result(cfg)
