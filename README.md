@@ -658,3 +658,13 @@ GRES and the runner's blocking exact `NVIDIA A30` plus 23–25 GiB CUDA check.
 The unchanged complete health suite remains metric-withheld, one-process,
 60-minute/1-GPU-hour, 1 GiB new storage, and $0. There is no repeated polling
 or unchanged-status reporting.
+
+Attempt 15, Juno job 316918, passed the wrapper topology attestation but failed
+after 10 scheduler seconds before its first progress record. The health entry
+point checked the older attempt-14 repair before the active attempt-15 repair
+and raised the stable engineering code
+`E_TUPLE_HEALTH_NLTK_MATPLOTLIB_REPAIR_ATTEMPT`; zero model modules or
+scientific metrics ran. Blocker `7a571023…427bb` preserves the failure.
+Prospective repair `0c617e63…37398f` makes the active attempt-16 dispatch
+precede historical branches and otherwise retains the exact A30, resource,
+privacy, metric-withholding, and scientific contracts.

@@ -716,3 +716,14 @@ typed GRES, and the in-container runner must independently observe exactly one
 seeds, thresholds, metrics, privacy controls, and all scientific gates are
 unchanged. Attempt 15 remains one complete metric-withheld health suite under
 the existing 60-minute/1-GPU-hour, 1-GiB, one-process, $0 ceiling.
+
+Attempt 15 (Juno job 316918) passed the compact wrapper topology attestation
+but failed after 10 scheduler seconds before its first runner progress record.
+The canonical health dispatcher evaluated the historical attempt-14 repair
+before the active attempt-15 repair and raised
+`E_TUPLE_HEALTH_NLTK_MATPLOTLIB_REPAIR_ATTEMPT`. No module inference or
+scientific metric ran. Engineering blocker `7a571023…427bb` preserves this
+outcome. Prospective repair `0c617e63…37398f` changes only dispatch precedence:
+attempt 16 validates the active repair first. The complete suite, A30 hardware
+attestation, one-process topology, budgets, privacy guards, metric withholding,
+and all scientific rules remain unchanged.

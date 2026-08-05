@@ -2172,3 +2172,18 @@ scientific gate, privacy rules, and downstream contract remain unchanged.
 Attempt 15 retains the complete 28-case/two-replicate metric-withheld suite,
 60-minute/1-GPU-hour, 1-GiB, and $0 ceilings, with one live job and no repeated
 scheduler polling or unchanged-status reporting.
+
+Attempt 15 (Juno job 316918) passed the wrapper's topology attestation and then
+failed after 10 scheduler seconds before its first progress record. The health
+entry point checked the historical attempt-14 repair before the active
+attempt-15 repair and raised
+`E_TUPLE_HEALTH_NLTK_MATPLOTLIB_REPAIR_ATTEMPT`. No model module or scientific
+metric ran. This is engineering blocker `7a571023…427bb`, not a scientific
+result.
+
+Prospective repair `0c617e63…37398f` changes only active-repair dispatch
+precedence: attempt 16 validates its active amendment before historical
+branches. It preserves the exact generic-GRES compatibility bound, in-container
+A30 name/memory check, models, fixtures, seeds, thresholds, metrics, scientific
+gate, privacy controls, one-process topology, and resource ceilings. The suite
+remains metric-withheld until all seven modules execute successfully.
