@@ -563,7 +563,9 @@ seeds, metrics, gates, and downstream limits are unchanged.
 Schema 30 adds the user's standing zero-cost earliest-eligible-GPU policy
 without changing that suite or any scientific rule. Pending H100-MIG job
 316697 had zero runtime and no attempt files and was canceled before allocation.
-One scheduler-only comparison selected a full A30 24GB for attempt 8 ahead of
-the compatible H100/H200 requests. Commitment `2cd0b824…ab3fba` freezes one
+The first scheduler-only comparison selected A30 and was committed without a
+model outcome. At the required immediate pre-submission recheck, A30 moved to
+August 10 and a full H100 NVL became immediately eligible. The canonical
+resource amendment now freezes that full H100 at `8ef8e53c…d327d6`: one
 process, eight CPUs, 32 GiB, 60 minutes/1.0 GPU-hour, 1 GiB retained storage,
-and $0; no repeated queue polling or duplicate live job is permitted.
+and $0. No repeated queue polling or duplicate live job is permitted.

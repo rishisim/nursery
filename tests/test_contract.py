@@ -51,17 +51,17 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     assert "1|2|3) ;;" not in wrapper
     assert 'require_health_topology' in wrapper
     assert 'scontrol show job --oneliner "$SLURM_JOB_ID"' in wrapper
-    assert 'Partition=a30' in wrapper
+    assert 'Partition=h100' in wrapper
     assert 'NumNodes=1' in wrapper
     assert 'NumCPUs=8' in wrapper
     assert 'NumTasks=1' in wrapper
     assert 'TimeLimit=01:00:00' in wrapper
     assert 'time_limit_minutes":60' in wrapper
     assert 'MinMemoryCPU=4G' in wrapper
-    assert 'TresPerNode=gres/gpu:nvidia_a30:1' in wrapper
+    assert 'TresPerNode=gres/gpu:nvidia_h100_nvl:1' in wrapper
     assert 'SLURM_JOB_GPUS' not in topology_guard
     assert 'nvidia-smi' not in topology_guard
-    assert '"GPU_type":"NVIDIA_A30_24GB"' in wrapper
+    assert '"GPU_type":"NVIDIA_H100_NVL"' in wrapper
     assert "echo " not in topology_guard
     assert topology_guard.count("printf ") == 1
     assert 'topology-attestation.json' in topology_guard
@@ -97,7 +97,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 21
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_ZERO_RUNTIME_H100_ATTEMPT_8_CANCELED_A30_TOPOLOGY_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_ZERO_RUNTIME_H100_MIG_ATTEMPT_8_CANCELED_FULL_H100_TOPOLOGY_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -169,11 +169,11 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert redirect == result["learner_effective_engineering_health_resource_redirect"]
     scheduler = config["learner_effective_engineering_health_scheduler_policy"]
     assert scheduler["amendment_commitment_sha256"] == (
-        "2cd0b824e91b8bf228d06aae240f16e70f8ffc03fb2f204518f8ce5eeeab3fba"
+        "8ef8e53c2754fe13b91518c02f419a1d3c4f3162aa18648f7044986854d327d6"
     )
     assert scheduler["canceled_job_id"] == 316697
-    assert scheduler["selected_partition"] == "a30"
-    assert scheduler["selected_GPU_type"] == "NVIDIA_A30_24GB"
+    assert scheduler["selected_partition"] == "h100"
+    assert scheduler["selected_GPU_type"] == "NVIDIA_H100_NVL"
     assert scheduler == result[
         "learner_effective_engineering_health_scheduler_policy"
     ]
@@ -542,7 +542,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_implementation_authorized"] is True
     assert config["gates"]["learner_effective_public_qualification_authorized"] is True
     assert config["gates"]["learner_effective_runner_implementation_status"] == (
-        "ATTEMPT_7_TIMEOUT_PRESERVED_ZERO_RUNTIME_H100_ATTEMPT_8_CANCELED_A30_TOPOLOGY_FROZEN_BEFORE_ATTEMPT_8_OR_NEW_OUTCOME"
+        "ATTEMPT_7_TIMEOUT_PRESERVED_ZERO_RUNTIME_H100_MIG_ATTEMPT_8_CANCELED_FULL_H100_TOPOLOGY_FROZEN_BEFORE_ATTEMPT_8_OR_NEW_OUTCOME"
     )
     assert config["gates"]["public_model_inference_requires_blind_no_hand_review_seal"] is True
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
@@ -610,12 +610,12 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     scheduler_commitment = scheduler.pop("amendment_commitment_sha256")
     assert scheduler_commitment == canonical_json_sha256(scheduler)
     assert scheduler_commitment == (
-        "2cd0b824e91b8bf228d06aae240f16e70f8ffc03fb2f204518f8ce5eeeab3fba"
+        "8ef8e53c2754fe13b91518c02f419a1d3c4f3162aa18648f7044986854d327d6"
     )
     assert scheduler["canceled_submission"]["job_id"] == 316697
     assert scheduler["canceled_submission"]["elapsed_seconds"] == 0
     assert scheduler["active_attempt_resource_policy"]["GPU_type"] == (
-        "NVIDIA_A30_24GB"
+        "NVIDIA_H100_NVL"
     )
     redirect = dict(config["learner_effective_engineering_health_resource_redirect"])
     redirect_commitment = redirect.pop("amendment_commitment_sha256")

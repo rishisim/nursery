@@ -71,6 +71,9 @@ def _write_topology_attestation(
     if gpu_type == "NVIDIA_A30_24GB":
         partition = "a30"
         gres = "gpu:nvidia_a30:1"
+    elif gpu_type == "NVIDIA_H100_NVL":
+        partition = "h100"
+        gres = "gpu:nvidia_h100_nvl:1"
     else:
         partition = "h100"
         gres = "gpu:nvidia_h100_nvl_3g.47gb:1"
@@ -712,7 +715,7 @@ def test_tuple_health_budget_enforces_active_extended_wall_attempt_and_limits() 
     ]
     budget = MODULE._tuple_health_budget(8, prior, config)
     assert budget["attempt"] == 8
-    assert budget["GPU_type"] == "NVIDIA_A30_24GB"
+    assert budget["GPU_type"] == "NVIDIA_H100_NVL"
     assert budget["GPU_count"] == 1
     assert budget["per_submission_wall_minutes_max"] == 60
     assert budget["remaining_GPU_hours"] == pytest.approx(1.0)
@@ -1159,20 +1162,22 @@ def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
         "cuda", topology_attestation=attestation, attempt=4, cfg=_config()
     )
     assert commitment == MODULE.file_digest(attestation)
-    a30_cuda = SimpleNamespace(
+    full_h100_cuda = SimpleNamespace(
         device_count=lambda: 1,
-        get_device_name=lambda _index: "NVIDIA A30",
+        get_device_name=lambda _index: "NVIDIA H100 NVL",
         get_device_properties=lambda _index: SimpleNamespace(
-            total_memory=24 * 1024**3
+            total_memory=90 * 1024**3
         ),
     )
-    monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=a30_cuda))
+    monkeypatch.setitem(
+        sys.modules, "torch", SimpleNamespace(cuda=full_h100_cuda)
+    )
     attempt_8_attestation = _write_topology_attestation(
         tmp_path / "attempt-08",
         monkeypatch,
         attempt=8,
         job_id=316700,
-        gpu_type="NVIDIA_A30_24GB",
+        gpu_type="NVIDIA_H100_NVL",
     )
     commitment = MODULE._tuple_health_topology(
         "cuda",

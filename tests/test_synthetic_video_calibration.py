@@ -83,12 +83,12 @@ def test_engineering_health_amendment_and_geometry_lineage_are_exact() -> None:
     )
     scheduler = MODULE._engineering_health_scheduler_policy(config)
     assert scheduler["amendment_commitment_sha256"] == (
-        "2cd0b824e91b8bf228d06aae240f16e70f8ffc03fb2f204518f8ce5eeeab3fba"
+        "8ef8e53c2754fe13b91518c02f419a1d3c4f3162aa18648f7044986854d327d6"
     )
     assert scheduler["canceled_submission"]["job_id"] == 316697
     assert scheduler["canceled_submission"]["elapsed_seconds"] == 0
     assert MODULE._engineering_health_resource_policy(config)["GPU_type"] == (
-        "NVIDIA_A30_24GB"
+        "NVIDIA_H100_NVL"
     )
     assert MODULE._engineering_health_resource_policy(config)[
         "per_submission_wall_minutes_max"

@@ -606,7 +606,7 @@ ENGINEERING_HEALTH_EXTENDED_WALL_REPAIR_SHA256 = (
     "d2db51229719a0e64f84da9541a284d88c75a2fd32e2e186ba34e17ab5eed6e7"
 )
 ENGINEERING_HEALTH_SCHEDULER_POLICY_SHA256 = (
-    "2cd0b824e91b8bf228d06aae240f16e70f8ffc03fb2f204518f8ce5eeeab3fba"
+    "8ef8e53c2754fe13b91518c02f419a1d3c4f3162aa18648f7044986854d327d6"
 )
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
@@ -2223,7 +2223,7 @@ def _engineering_health_scheduler_policy(
     if (
         cfg.get("schema_version") != 30
         or value.get("status")
-        != "FROZEN_AFTER_ZERO_RUNTIME_H100_MIG_CANCELLATION_BEFORE_A30_ATTEMPT_8_OR_NEW_MODEL_OUTCOME"
+        != "FROZEN_AFTER_ZERO_RUNTIME_H100_MIG_CANCELLATION_AND_SUBMISSION_RECHECK_BEFORE_FULL_H100_ATTEMPT_8_OR_NEW_MODEL_OUTCOME"
         or value.get("scope")
         != "STANDING_ZERO_COST_EARLIEST_SCHEDULER_ELIGIBLE_GPU_POLICY_AND_ATTEMPT_8_SELECTION_ONLY"
         or expected != ENGINEERING_HEALTH_SCHEDULER_POLICY_SHA256
@@ -2288,40 +2288,40 @@ def _engineering_health_scheduler_policy(
                 "partition": "a30",
                 "GRES": "gpu:nvidia_a30:1",
                 "eligible": True,
-                "estimated_start": "2026-08-04T23:21:36-05:00",
+                "estimated_start": "2026-08-10T11:35:00-05:00",
             },
             {
                 "GPU_type": "NVIDIA_H100_NVL",
                 "partition": "h100",
                 "GRES": "gpu:nvidia_h100_nvl:1",
                 "eligible": True,
-                "estimated_start": "2026-08-04T23:41:36-05:00",
+                "estimated_start": "2026-08-04T23:36:18-05:00",
             },
             {
                 "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
                 "partition": "h100",
                 "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
                 "eligible": True,
-                "estimated_start": "2026-08-05T03:12:48-05:00",
+                "estimated_start": "2026-08-05T02:52:48-05:00",
             },
             {
                 "GPU_type": "NVIDIA_H200_NVL",
                 "partition": "h200",
                 "GRES": "gpu:nvidia_h200_nvl:1",
                 "eligible": True,
-                "estimated_start": "2026-08-05T03:02:36-05:00",
+                "estimated_start": "2026-08-05T03:17:18-05:00",
             },
         ]
         or comparison.get("selection_rule")
         != "minimum scheduler-estimated start among compatible eligible zero-cost one-process requests; fixed GPU-type order only breaks exact timestamp ties"
-        or comparison.get("selected_GPU_type") != "NVIDIA_A30_24GB"
+        or comparison.get("selected_GPU_type") != "NVIDIA_H100_NVL"
         or active
         != {
             "attempt": 8,
             "submission_count": 1,
-            "partition": "a30",
-            "GRES": "gpu:nvidia_a30:1",
-            "GPU_type": "NVIDIA_A30_24GB",
+            "partition": "h100",
+            "GRES": "gpu:nvidia_h100_nvl:1",
+            "GPU_type": "NVIDIA_H100_NVL",
             "GPU_count": 1,
             "CPU_count": 8,
             "memory_GiB": 32,
@@ -2346,16 +2346,16 @@ def _engineering_health_scheduler_policy(
         }
         or attestation
         != {
-            "partition": "a30",
+            "partition": "h100",
             "node_count": 1,
             "task_count": 1,
             "CPU_count": 8,
             "time_limit_minutes": 60,
             "memory_per_CPU_GiB": 4,
-            "GRES": "gpu:nvidia_a30:1",
-            "expected_device_name": "NVIDIA A30",
-            "visible_memory_GiB_min": 23,
-            "visible_memory_GiB_max": 25,
+            "GRES": "gpu:nvidia_h100_nvl:1",
+            "expected_device_name": "NVIDIA H100 NVL",
+            "visible_memory_GiB_min": 85,
+            "visible_memory_GiB_max": 100,
             "world_size": 1,
             "local_world_size": 1,
         }
@@ -11775,6 +11775,9 @@ def _tuple_health_topology(
         if expected_gpu_type == "NVIDIA_A30_24GB":
             expected_device = device_name == "NVIDIA A30"
             expected_memory = 23 * 1024**3 <= total_memory <= 25 * 1024**3
+        elif expected_gpu_type == "NVIDIA_H100_NVL":
+            expected_device = device_name == "NVIDIA H100 NVL"
+            expected_memory = 85 * 1024**3 <= total_memory <= 100 * 1024**3
         elif expected_gpu_type == "NVIDIA_H100_NVL_3G_47GB_MIG":
             expected_device = device_name.startswith("NVIDIA H100 NVL")
             expected_memory = 45 * 1024**3 <= total_memory <= 50 * 1024**3

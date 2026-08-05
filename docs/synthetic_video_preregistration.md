@@ -1,6 +1,6 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ATTEMPT-7 ENGINEERING TIMEOUT PRESERVED; ZERO-RUNTIME H100 ATTEMPT-8 CANCELED; FULL-A30 ATTEMPT-8 TOPOLOGY FROZEN BEFORE MODEL OUTCOME; ALL PRIOR NO-GOS PRESERVED**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ATTEMPT-7 ENGINEERING TIMEOUT PRESERVED; ZERO-RUNTIME H100-MIG ATTEMPT-8 CANCELED; FULL-H100 ATTEMPT-8 TOPOLOGY FROZEN BEFORE MODEL OUTCOME; ALL PRIOR NO-GOS PRESERVED**
 
 **Evidence cut-off:** 2026-08-04
 
@@ -1976,9 +1976,12 @@ submission, compare compatible zero-cost Juno A30, H100 NVL, H100 47-GB MIG,
 and H200 one-process requests using scheduler-only tests and freeze the earliest
 eligible topology. The already queued H100-MIG job 316697 was still pending at
 zero runtime with no attempt files or outcomes, so it was canceled before
-allocation. The fixed comparison selected one full NVIDIA A30 24GB, eight CPUs,
+allocation. The first fixed comparison selected A30 and was committed without
+a model outcome. The required immediate pre-submission recheck then showed A30
+delayed to August 10 while one full NVIDIA H100 NVL was immediately eligible.
+The canonical in-place amendment therefore freezes that full H100, eight CPUs,
 32 GiB, 60 minutes/1.0 GPU-hour, no DDP, 1 GiB retained storage, and $0. This
-resource-only amendment is sealed at `2cd0b824…ab3fba`; every model, fixture,
+resource-only amendment is sealed at `8ef8e53c…d327d6`; every model, fixture,
 input, seed, threshold, metric, repair allowance, privacy rule, scientific gate,
 and downstream limit remains unchanged. Once a run is authorized to open
 scientific metrics, its exact topology is frozen before execution and cannot be
