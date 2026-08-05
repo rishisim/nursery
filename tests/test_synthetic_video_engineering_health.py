@@ -154,6 +154,8 @@ def _historical_health_config() -> dict:
     config.pop("learner_effective_engineering_health_historical_lineage_repair")
     config.pop("learner_effective_engineering_health_attempt_10_result")
     config.pop("learner_effective_engineering_health_portable_AST_repair")
+    config.pop("learner_effective_engineering_health_attempt_11_result")
+    config.pop("learner_effective_engineering_health_fixture_bind_repair")
     return config
 
 
@@ -188,7 +190,7 @@ def _write_topology_attestation(
         "node_count": 1,
         "CPU_count": 8,
         "task_count": 1,
-        "time_limit_minutes": 60 if attempt in {8, 9, 10, 11} else 15,
+        "time_limit_minutes": 60 if attempt in {8, 9, 10, 11, 12} else 15,
         "memory_per_CPU_GiB": 4,
         "GRES": gres,
         "predicate_count": 7,
@@ -231,6 +233,49 @@ def _write_container_attestation(
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(MODULE.canonical(value) + b"\n")
     path.chmod(0o600)
+    return path
+
+
+def _write_fixture_bind_attestation(
+    root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    run_mode: str,
+    attempt: int | None,
+    job_id: int,
+) -> Path:
+    repair = MODULE._engineering_health_fixture_bind_repair(_config())[
+        "failure_specific_repair"
+    ]
+    source = repair["source_record_file"]
+    no_hand = repair["verified_no_hand_seal_file"]
+    manifest = repair["fixture_manifest_file"]
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / "fixture-bind-attestation.json"
+    MODULE.write_private_new(
+        path,
+        {
+            "artifact_family": "SEALED_PUBLIC_FIXTURE_BIND",
+            "attempt": attempt,
+            "fixture_manifest_bytes": manifest["bytes"],
+            "fixture_manifest_file_sha256": manifest["sha256"],
+            "job_id": job_id,
+            "path_field_count": 0,
+            "predicate_count": 9,
+            "predicate_pass_count": 9,
+            "read_only": True,
+            "run_mode": run_mode,
+            "schema_version": 1,
+            "source": "WRAPPER_HOST_BEFORE_CONTAINER",
+            "source_bound_at_original_absolute_alias": True,
+            "source_bound_over_active_fixture_target": True,
+            "source_record_bytes": source["bytes"],
+            "source_record_file_sha256": source["sha256"],
+            "verified_no_hand_seal_bytes": no_hand["bytes"],
+            "verified_no_hand_seal_file_sha256": no_hand["sha256"],
+        },
+    )
+    monkeypatch.setenv("SLURM_JOB_ID", str(job_id))
     return path
 
 
@@ -618,6 +663,15 @@ def test_tuple_health_error_preserves_stable_code_without_raw_message(
         "E_TUPLE_HEALTH_HAND_CONTACT_TUPLE_EGOHOS_OBSERVATION_SCHEMA"
     )
     assert "private-detail" not in json.dumps([first, second])
+    visor = MODULE._tuple_health_error(
+        "adapter_and_lexical",
+        RuntimeError("E_VISOR_HOS_SOURCE_FEASIBILITY_MISSING private-detail"),
+        tmp_path,
+    )
+    assert visor["error_code"] == (
+        "E_TUPLE_HEALTH_ADAPTER_AND_LEXICAL_VISOR_HOS_SOURCE_FEASIBILITY_MISSING"
+    )
+    assert "private-detail" not in json.dumps(visor)
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_MODULE_ID"):
         MODULE._tuple_health_error("unknown", RuntimeError("boom"), tmp_path)
 
@@ -713,6 +767,30 @@ def test_historical_attempt_10_full_record_requires_both_sealed_commitments() ->
     )
     full["resource"]["GPU_type"] = "NVIDIA_A30_24GB"
     full["cumulative_resource"]["cumulative_submission_count"] = 10
+    MODULE._validate_tuple_health_full(full, _config())
+
+    wrong_config = json.loads(json.dumps(full))
+    wrong_config["config_commitment_sha256"] = "e" * 64
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_FULL_SCHEMA"):
+        MODULE._validate_tuple_health_full(wrong_config, _config())
+
+    wrong_health = json.loads(json.dumps(full))
+    wrong_health["engineering_health_commitment_sha256"] = "e" * 64
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_FULL_SCHEMA"):
+        MODULE._validate_tuple_health_full(wrong_health, _config())
+
+
+def test_historical_attempt_11_full_record_requires_both_sealed_commitments() -> None:
+    full = _healthy_full()
+    full["attempt"] = 11
+    full["config_commitment_sha256"] = (
+        "ecb1647874791878a584e143e657b66f250d4a1df842538e0223b3d7b833aa55"
+    )
+    full["engineering_health_commitment_sha256"] = (
+        "2e409529a3de9a1536915e776f14d8ffa8e9f35aec88929d54c0a46d8b5debc4"
+    )
+    full["resource"]["GPU_type"] = "NVIDIA_A30_24GB"
+    full["cumulative_resource"]["cumulative_submission_count"] = 11
     MODULE._validate_tuple_health_full(full, _config())
 
     wrong_config = json.loads(json.dumps(full))
@@ -897,8 +975,19 @@ def test_tuple_health_budget_enforces_active_lineage_repair_attempt_and_limits()
             "direct_monetary_cost_USD": 0,
         }
     )
-    budget = MODULE._tuple_health_budget(11, prior, config)
-    assert budget["attempt"] == 11
+    prior.append(
+        {
+            "attempt": 11,
+            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_count": 1,
+            "wall_minutes": 3.6992401123046874,
+            "GPU_hours": 0.061654001871744794,
+            "new_storage_GiB": 1.2740492820739746e-6,
+            "direct_monetary_cost_USD": 0,
+        }
+    )
+    budget = MODULE._tuple_health_budget(12, prior, config)
+    assert budget["attempt"] == 12
     assert budget["GPU_type"] == MODULE._engineering_health_resource_policy(config)[
         "GPU_type"
     ]
@@ -909,7 +998,7 @@ def test_tuple_health_budget_enforces_active_lineage_repair_attempt_and_limits()
     assert budget["direct_monetary_cost_USD"] == 0
 
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ATTEMPT_BUDGET"):
-        MODULE._tuple_health_budget(12, prior, config)
+        MODULE._tuple_health_budget(13, prior, config)
 
 
 @pytest.mark.parametrize(
@@ -1222,13 +1311,25 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
     assert portable["failure_specific_repair"][
         "portable_AST_bundle_sha256"
     ] == "74d7707cd8d485aa00514f7f216759f848893923e990f94e3a1d19b935958b8d"
+    attempt_11 = MODULE._engineering_health_attempt_11_result(config)
+    assert attempt_11["blocker_commitment_sha256"] == (
+        "e86739340a2d969b04b823932f9583d3defe7ed92a6d849042a681d03b7fb2f5"
+    )
+    assert attempt_11["submission_provenance"]["job_id"] == 316845
+    assert attempt_11["compact_aggregate"]["scientific_metric_count"] == 0
+    fixture_bind = MODULE._engineering_health_fixture_bind_repair(config)
+    assert fixture_bind["repair_commitment_sha256"] == (
+        "cca49a50a895ab4ac94997fbfe7bc256efc4b9ae790b1925a5671dc3b1a1e3f7"
+    )
+    assert fixture_bind["active_attempt_resource_policy"]["attempt"] == 12
+    assert fixture_bind["failure_specific_repair"]["bind_mode"] == "READ_ONLY"
     effective = MODULE._engineering_health_resource_policy(config)
     assert effective["per_submission_wall_minutes_max"] == 60
-    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 11
+    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 12
 
     with pytest.raises(
         RuntimeError,
-        match="E_TUPLE_HEALTH_PORTABLE_AST_REPAIR_ATTEMPT",
+        match="E_TUPLE_HEALTH_FIXTURE_BIND_REPAIR_ATTEMPT",
     ):
         MODULE.run_tuple_health(
             argparse.Namespace(
@@ -1501,6 +1602,35 @@ def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
     )
     assert commitment == MODULE.file_digest(attempt_11_attestation)
 
+    attempt_12_gpu_type = MODULE._engineering_health_fixture_bind_repair(
+        _config()
+    )["active_attempt_resource_policy"]["GPU_type"]
+    attempt_12_name, attempt_12_memory = device_by_type[attempt_12_gpu_type]
+    attempt_12_cuda = SimpleNamespace(
+        device_count=lambda: 1,
+        get_device_name=lambda _index: attempt_12_name,
+        get_device_properties=lambda _index: SimpleNamespace(
+            total_memory=attempt_12_memory * 1024**3
+        ),
+    )
+    monkeypatch.setitem(
+        sys.modules, "torch", SimpleNamespace(cuda=attempt_12_cuda)
+    )
+    attempt_12_attestation = _write_topology_attestation(
+        tmp_path / "attempt-12",
+        monkeypatch,
+        attempt=12,
+        job_id=316846,
+        gpu_type=attempt_12_gpu_type,
+    )
+    commitment = MODULE._tuple_health_topology(
+        "cuda",
+        topology_attestation=attempt_12_attestation,
+        attempt=12,
+        cfg=_config(),
+    )
+    assert commitment == MODULE.file_digest(attempt_12_attestation)
+
     bad = json.loads(attestation.read_text())
     bad["task_count"] = 2
     attestation.write_bytes(MODULE.canonical(bad) + b"\n")
@@ -1563,6 +1693,49 @@ def test_container_attestation_replaces_unavailable_in_container_sif_target(
                 run_mode="health",
                 attempt=6,
             )
+
+
+def test_fixture_bind_attestation_is_path_free_read_only_and_hash_bound(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = _write_fixture_bind_attestation(
+        tmp_path,
+        monkeypatch,
+        run_mode="health",
+        attempt=12,
+        job_id=316846,
+    )
+    commitment = MODULE._tuple_fixture_bind_attestation(
+        path,
+        _config(),
+        run_mode="health",
+        attempt=12,
+    )
+    assert commitment == MODULE.file_digest(path)
+    value = json.loads(path.read_text())
+    assert value["path_field_count"] == 0
+    assert value["read_only"] is True
+    assert not any(
+        "root" in key or "path" in key
+        for key in value
+        if key != "path_field_count"
+    )
+
+    for key, changed in (("read_only", False), ("path_field_count", 1)):
+        tampered = dict(value)
+        tampered[key] = changed
+        path.write_bytes(MODULE.canonical(tampered) + b"\n")
+        with pytest.raises(
+            RuntimeError,
+            match="E_TUPLE_HEALTH_FIXTURE_BIND_ATTESTATION",
+        ):
+            MODULE._tuple_fixture_bind_attestation(
+                path,
+                _config(),
+                run_mode="health",
+                attempt=12,
+            )
+    path.write_bytes(MODULE.canonical(value) + b"\n")
 
 
 def test_health_and_science_configuration_commitments_ignore_outcome_state() -> None:
@@ -1811,6 +1984,10 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop(
         "learner_effective_engineering_health_portable_AST_repair"
     )
+    historical_config.pop("learner_effective_engineering_health_attempt_11_result")
+    historical_config.pop(
+        "learner_effective_engineering_health_fixture_bind_repair"
+    )
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)
     manifest = _fixture_manifest()
@@ -1974,6 +2151,13 @@ def test_partition_crash_withholds_metrics_and_preserves_legacy_record(
         attempt=None,
         job_id=316539,
     )
+    fixture_bind_attestation = _write_fixture_bind_attestation(
+        tmp_path / "development-fixture-bind-attestation",
+        monkeypatch,
+        run_mode="development",
+        attempt=None,
+        job_id=316539,
+    )
 
     compact = MODULE.qualify_tuple_public(
         argparse.Namespace(
@@ -1981,6 +2165,7 @@ def test_partition_crash_withholds_metrics_and_preserves_legacy_record(
             scratch_root=scratch,
             config=config_path,
             container_attestation=container_attestation,
+            fixture_bind_attestation=fixture_bind_attestation,
             partition="development",
             device="cuda",
         )

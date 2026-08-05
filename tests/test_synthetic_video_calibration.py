@@ -35,7 +35,7 @@ def test_construct_aligned_resume_amendment_is_exact_and_schema23_compatible() -
     config = json.loads(
         Path("configs/synthetic_video_real_only_proof.json").read_text()
     )
-    assert config["schema_version"] == 33
+    assert config["schema_version"] == 34
     amendment = MODULE._construct_aligned_ltx_resume_amendment(config)
     assert (
         amendment["amendment_commitment_sha256"]
@@ -3520,11 +3520,49 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
     )
     public = tmp_path / "public"
     scratch = tmp_path / "scratch"
+    bind_repair = MODULE._engineering_health_fixture_bind_repair(config)[
+        "failure_specific_repair"
+    ]
+    source_record = bind_repair["source_record_file"]
+    no_hand_record = bind_repair["verified_no_hand_seal_file"]
+    fixture_manifest = bind_repair["fixture_manifest_file"]
+    fixture_bind_attestation = tmp_path / "fixture-bind-attestation.json"
+
+    def write_fixture_bind_attestation(run_mode: str) -> None:
+        if fixture_bind_attestation.exists():
+            fixture_bind_attestation.unlink()
+        MODULE.write_private_new(
+            fixture_bind_attestation,
+            {
+                "artifact_family": "SEALED_PUBLIC_FIXTURE_BIND",
+                "attempt": None,
+                "fixture_manifest_bytes": fixture_manifest["bytes"],
+                "fixture_manifest_file_sha256": fixture_manifest["sha256"],
+                "job_id": 123456,
+                "path_field_count": 0,
+                "predicate_count": 9,
+                "predicate_pass_count": 9,
+                "read_only": True,
+                "run_mode": run_mode,
+                "schema_version": 1,
+                "source": "WRAPPER_HOST_BEFORE_CONTAINER",
+                "source_bound_at_original_absolute_alias": True,
+                "source_bound_over_active_fixture_target": True,
+                "source_record_bytes": source_record["bytes"],
+                "source_record_file_sha256": source_record["sha256"],
+                "verified_no_hand_seal_bytes": no_hand_record["bytes"],
+                "verified_no_hand_seal_file_sha256": no_hand_record["sha256"],
+            },
+        )
+
+    monkeypatch.setenv("SLURM_JOB_ID", "123456")
+    write_fixture_bind_attestation("development")
     base = {
         "public_root": public,
         "scratch_root": scratch,
         "config": config_path,
         "container_attestation": tmp_path / "container-attestation.json",
+        "fixture_bind_attestation": fixture_bind_attestation,
         "device": "cpu",
     }
     development = MODULE.qualify_tuple_public(
@@ -3557,6 +3595,7 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
     assert reused == development
     assert len(called) == len(MODULE.TUPLE_QUALIFICATION_MODULE_IDS)
 
+    write_fixture_bind_attestation("holdout")
     holdout = MODULE.qualify_tuple_public(
         argparse.Namespace(**base, partition="holdout")
     )

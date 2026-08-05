@@ -11,7 +11,7 @@
 #SBATCH --error=/dev/null
 
 # The static A30 directives remain the default for later scientific
-# development/holdout. Health attempt 11 uses one prospectively frozen
+# development/holdout. Health attempt 12 uses one prospectively frozen
 # command-line topology selected immediately before submission.
 
 set -euo pipefail
@@ -39,7 +39,7 @@ exec >"$output_root/logs/qualify-${SLURM_JOB_ID}.out" 2>"$output_root/logs/quali
 if [[ "$tuple_run_mode" == "health" ]]; then
   health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"
   case "$health_attempt" in
-    11) ;;
+    12) ;;
     *) exit 64 ;;
   esac
   health_gpu_type="${PHASE4_HEALTH_GPU_TYPE:-}"
@@ -61,6 +61,27 @@ if [[ "$tuple_run_mode" == "health" ]]; then
   printf '{"schema_version":1,"attempt":%d,"submission_started_epoch":%s,"GPU_type":"%s","GPU_count":1,"CPU_count":8,"memory_GiB":32}\n' \
     "$health_attempt" "$PHASE4_HEALTH_SUBMISSION_STARTED_EPOCH" "$health_gpu_type" >"$wrapper_marker"
   chmod 600 "$wrapper_marker"
+fi
+fixture_source_root=""
+fixture_target=""
+fixture_binds=""
+if [[ "$tuple_run_mode" == "health" || "$tuple_run_mode" == "development" || "$tuple_run_mode" == "holdout" ]]; then
+  fixture_source_root="${PHASE4_FIXTURE_SOURCE_ROOT:-}"
+  fixture_target="${PHASE4_PUBLIC_ROOT}/public/mechanistic-training-tuple-fixtures"
+  [[ "$fixture_source_root" == /* ]] || exit 65
+  [[ -d "$fixture_source_root" ]] || exit 65
+  [[ -d "$fixture_target" ]] || exit 65
+  [[ "$(readlink -f "$fixture_source_root")" != "$(readlink -f "$fixture_target")" ]] || exit 65
+  source_record="$fixture_source_root/visor-hos-source-feasibility.json"
+  no_hand_seal="$fixture_source_root/no-hand-review/verified-no-hand-seal.json"
+  fixture_manifest="$fixture_source_root/fixture-manifest.json"
+  [[ -f "$source_record" && "$(stat -c %s "$source_record")" -eq 838802 ]] || exit 65
+  [[ -f "$no_hand_seal" && "$(stat -c %s "$no_hand_seal")" -eq 19579 ]] || exit 65
+  [[ -f "$fixture_manifest" && "$(stat -c %s "$fixture_manifest")" -eq 1426457 ]] || exit 65
+  printf '%s  %s\n' 64176cf282f1038174b12277560cb5f7aa8d61aa027599ad5c44b53e066f9f9e "$source_record" | sha256sum --check --status
+  printf '%s  %s\n' 362ab55a026110e7035fb1b1e24bc959023a353849e8f4c246f66b59e041743e "$no_hand_seal" | sha256sum --check --status
+  printf '%s  %s\n' 740eebfce87cc8cf543fefcb8015a3ec75b934acc9a39c8d81adb5a7dd331371 "$fixture_manifest" | sha256sum --check --status
+  fixture_binds="${fixture_source_root}:${fixture_source_root}:ro,${fixture_source_root}:${fixture_target}:ro"
 fi
 if [[ "$tuple_run_mode" == "health" || "$tuple_run_mode" == "development" || "$tuple_run_mode" == "holdout" ]]; then
   container_image="${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif"
@@ -84,6 +105,15 @@ if [[ "$tuple_run_mode" == "health" || "$tuple_run_mode" == "development" || "$t
   printf '{"artifact_family":"BASE_CONTAINER","attempt":%s,"bytes":3731320832,"host_entry_is_symlink":true,"job_id":%s,"predicate_count":4,"predicate_pass_count":4,"resolved_target_regular_file":true,"run_mode":"%s","schema_version":1,"sha256":"%s","source":"WRAPPER_HOST_BEFORE_CONTAINER"}\n' \
     "$attestation_attempt" "$SLURM_JOB_ID" "$tuple_run_mode" "$container_sha256" >"$container_attestation"
   chmod 600 "$container_attestation"
+  if [[ "$tuple_run_mode" == "health" ]]; then
+    fixture_bind_attestation="$health_attempt_root/fixture-bind-attestation.json"
+  else
+    fixture_bind_attestation="$container_attestation_root/${tuple_run_mode}-${SLURM_JOB_ID}-fixture-bind.json"
+  fi
+  [[ ! -e "$fixture_bind_attestation" ]] || exit 65
+  printf '{"artifact_family":"SEALED_PUBLIC_FIXTURE_BIND","attempt":%s,"fixture_manifest_bytes":1426457,"fixture_manifest_file_sha256":"740eebfce87cc8cf543fefcb8015a3ec75b934acc9a39c8d81adb5a7dd331371","job_id":%s,"path_field_count":0,"predicate_count":9,"predicate_pass_count":9,"read_only":true,"run_mode":"%s","schema_version":1,"source":"WRAPPER_HOST_BEFORE_CONTAINER","source_bound_at_original_absolute_alias":true,"source_bound_over_active_fixture_target":true,"source_record_bytes":838802,"source_record_file_sha256":"64176cf282f1038174b12277560cb5f7aa8d61aa027599ad5c44b53e066f9f9e","verified_no_hand_seal_bytes":19579,"verified_no_hand_seal_file_sha256":"362ab55a026110e7035fb1b1e24bc959023a353849e8f4c246f66b59e041743e"}\n' \
+    "$attestation_attempt" "$SLURM_JOB_ID" "$tuple_run_mode" >"$fixture_bind_attestation"
+  chmod 600 "$fixture_bind_attestation"
 fi
 scratch="${TMPDIR:-/tmp}/synthetic-calibration-qualify-${SLURM_JOB_ID}"
 install -d -m 700 "$scratch" "$scratch/pydeps"
@@ -141,7 +171,7 @@ elif [[ "$tuple_run_mode" == "health" || "$tuple_run_mode" == "development" || "
   if [[ "$tuple_run_mode" == "health" ]]; then
     require_health_topology
     singularity exec --nv --net --network none \
-      --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${scratch}:${scratch}" \
+      --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${fixture_binds},${scratch}:${scratch}" \
       "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" \
       python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" tuple-health \
       --public-root "${PHASE4_PUBLIC_ROOT}" \
@@ -152,13 +182,14 @@ elif [[ "$tuple_run_mode" == "health" || "$tuple_run_mode" == "development" || "
       --device cuda
   else
     singularity exec --nv --net --network none \
-      --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${scratch}:${scratch}" \
+      --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${fixture_binds},${scratch}:${scratch}" \
       "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" \
       python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" tuple-qualify \
       --public-root "${PHASE4_PUBLIC_ROOT}" \
       --scratch-root "$scratch" \
       --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json" \
       --container-attestation "$container_attestation" \
+      --fixture-bind-attestation "$fixture_bind_attestation" \
       --partition "$tuple_run_mode" \
       --device cuda
   fi

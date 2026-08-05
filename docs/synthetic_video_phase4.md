@@ -665,3 +665,18 @@ binding historical attempts 8 and 10 to their sealed config/health pairs.
 Attempt 11 is the same complete suite under the same one-process,
 earliest-compatible-zero-cost, one-live-job, no-polling contract. Public
 science remains unauthorized until 7/7 engineering health is committed.
+
+Attempt 11, Juno job 316845, completed after 226 seconds with zero completed
+modules and zero scientific metrics. It stopped during fixture verification
+because the active public root was incomplete, while the exact historical
+824-item public fixture tree still passed offline verification in the frozen
+container. Engineering blocker `e8673934…7fb2f5` preserves the failed attempt
+without treating it as scientific evidence.
+
+Prospective schema-34 repair `cca49a50…a1e3f7` keeps the active model and
+dependency root but binds the verified historical fixture root read-only at
+its original alias and at the active fixture target. The wrapper verifies the
+three sealed records before the bind and exposes only a path-free attestation;
+it neither copies nor modifies either tree. One complete attempt 12 is frozen
+on one A30, one process, eight CPUs, 32 GiB, 60 minutes/1 GPU-hour, 1 GiB new
+storage, and $0. Public science stays locked pending a committed 7/7 pass.

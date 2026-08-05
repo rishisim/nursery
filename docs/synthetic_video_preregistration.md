@@ -2110,3 +2110,20 @@ are accepted only with their sealed config/health commitment pairs; other
 unbound commitments fail closed. Attempt 11 retains the complete 28-case,
 two-replicate suite, metric withholding, one process, $0 direct cost, and the
 standing one-live-job/no-polling rule. No scientific contract changes.
+
+Attempt 11, Juno job 316845, completed after 226 seconds but stopped during
+fixture verification: zero modules completed and no scientific metric opened.
+The active public root lacked the sealed VISOR-HOS source record and complete
+824-item fixture tree; the exact historical public-only tree remained valid
+under the frozen offline verifier. Blocker `e8673934…7fb2f5` seals this as an
+engineering fixture-root failure, not a scientific no-go.
+
+Before a new outcome, schema 34 freezes read-only fixture-bind repair
+`cca49a50…a1e3f7`. The active model/dependency root remains authoritative,
+while the exact verified historical fixture tree is mounted read-only at its
+original alias and the active fixture target so both sealed absolute and
+manifest-relative references resolve without copies or mutation. The wrapper
+checks the three sealed record sizes and hashes before mounting and emits only
+a path-free attestation. Attempt 12 is frozen on one A30, one process, eight
+CPUs, 32 GiB, a 60-minute/1-GPU-hour ceiling, 1 GiB new storage, and $0. All
+scientific metrics remain withheld unless the complete 7/7 health suite passes.

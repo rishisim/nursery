@@ -607,3 +607,19 @@ attempts 8 and 10 to their exact historical config and health commitments.
 One unchanged complete attempt 11 is authorized after commit/push under the
 same earliest-compatible-zero-cost, one-process, one-live-job, no-polling
 policy. Scientific development remains locked until a committed 7/7 pass.
+
+Attempt 11, Juno job 316845, completed after 226 seconds but stopped during
+fixture verification with all seven modules blocked and all scientific metrics
+withheld. The active public root did not contain the sealed VISOR-HOS source
+record or complete 824-item fixture tree; the historical public-only fixture
+root still verifies exactly in the frozen container. Blocker
+`e8673934…7fb2f5` preserves that engineering-only outcome.
+
+Schema 34 prospectively freezes repair `cca49a50…a1e3f7`: attempt 12 keeps the
+active model/dependency root and mounts the exact historical sealed fixture
+tree read-only at both its original alias and the active fixture target. The
+wrapper verifies the three sealed records by size and SHA-256 before mounting,
+emits only a path-free attestation, and leaves both roots untouched. Attempt 12
+uses one A30, one process, eight CPUs, 32 GiB, a 60-minute/1-GPU-hour ceiling,
+1 GiB new storage, and $0. Scientific development remains locked until a
+committed 7/7 engineering-health pass.
