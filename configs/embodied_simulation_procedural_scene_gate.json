@@ -1,76 +1,21 @@
 {
-  "schema": "embodied.procedural_scene_gate.v1",
-  "frozen_at_origin_commit": "d0fc1b8dbae15ab29cb77913c749b038cff73bc0",
-  "decision_question": "Can one Unity-native framework generate coherent 12-20 second clothed child-head episodes across procedural furnished-room and clothing variants while preserving synchronized physics-registered truth?",
+  "schema": "embodied.integrated_dexterous_scene_gate.v2",
+  "frozen_at_origin_commit": "cfb64eaa14ccf58202486d3c5c11966288b0ef45",
+  "decision_question": "Can one Unity-native single-authority system produce at least two of three materially distinct, visually coherent 20-30 second clothed child-head episodes with load-bearing bimanual manipulation, clean embodiment, readable body-derived POV, rich deterministic rooms, and synchronized truthful streams without object assistance or visible/physical/recorded divergence?",
   "scope": "public_synthetic_engineering_qualification_only",
   "canonical_entry_point": "python -m babyworld_lite.childlens_engine_bakeoff.procedural_scene_gate",
   "output_root": "runs/embodied_simulation/procedural_scene_gate",
+  "ordered_gate": ["A", "B", "C", "D", "E", "F"],
   "implementation_freeze": {
-    "classification": "executed NO-GO implementation with a post-outcome QA-only record correction; no new experiment",
-    "source_sha256": {
-      "GateContracts.cs": "435f533d6f40c162fb9a360fe6942b9ab1421188f9dd2dc1bbf5b6a29a29ecd6",
-      "ProceduralSceneGateBuilder.cs": "887c704a57f1ba6739b9a58ebc56f13a8d3b01139522ce5879a889b1d49599bd",
-      "EmbodimentGarments.cs": "efd8a61a67eb45094939d42466c9f4eaf2bad2f8862a0ac28a4274e3374aeb7c",
-      "FullBodyBimanualMotion.cs": "b64166b1d7bc3172746d400c1c41244ebef977a1b51fdc38f18ddf3ca0a8a4df",
-      "ProceduralSceneCompiler.cs": "b51375d5cd653a6f810992667f9871aa184d7a5ccd91d84feed54582d341f823",
-      "PhysicsTruthRecorder.cs": "f96b27c2f3eb14990d301a0e7fbb65714ab06ff3e2d59776c1b28e4d184bf3d6",
-      "RegisteredCapture.cs": "e4e35c6af8dcf9a931c6bdc42af70c893286fbce428254ae4e8b6e51df574427",
-      "MetricDepth.shader": "38b9755073963924b6a487ab9fa1915c72399ff159d4e81824223c0dc89d6da5",
-      "SemanticInstance.shader": "55379eb852190d816b733a33a591910713c6f5a9e8b887975730c00246c7ea6c",
-      "contracts.py": "d50941bb2a79d61b15645cc751ecf7009d71fd7223a5d00175dde9af29417ca2",
-      "cli.py": "01d6de5ad8a60f429776b8b12d82da8cda1bbd71db398cb3795997416e7bf2e9",
-      "runner.py": "9cd23c52acc5b6b0d8665b11b8c3069508897d282e44908bce4879e2b5acf66d",
-      "independent_qa.py": "6e18c17354c84c2feb579aa7d89cb3b933ed6e5dc91195e177b6167847f2e197"
-    },
+    "status": "interfaces_frozen_pre_audition",
+    "classification": "prospective integrated qualification; source hashes must be sealed before any eligible Unity execution",
+    "sealed_source_sha256": {},
     "same_controller_all_seeds_and_garments": true,
-    "seed_specific_retuning": false
+    "seed_specific_retuning": false,
+    "audition_limit": 2,
+    "audition_scope": "minimal wrist-centered compliant-hand microcell only",
+    "superseded_attempts_must_be_removed": true
   },
-  "post_outcome_record_correction": {
-    "new_experiment": false,
-    "no_go_outcome_changed": false,
-    "executed_eligible_config_sha256": "3e24522b0cda7bce99f50d07fe94004a1ce1ea53ecd876bfb0600881fa085519",
-    "executed_primary_episode_contract_sha256": "507677658a2df717d222856221abe7c66277bc4cc1ac0f6badf52c6be2ff4570",
-    "scope": "independent QA separation eligibility, dwell/turn derivation, integer-clock interpretation, camera-roll source, and evidence-semantics correction only",
-    "episode_spec_fields_changed": false,
-    "unity_execution_source_changed": false
-  },
-  "controller_target_tracking_disclosure": {
-    "classification": "scene_conditioned_kinematic_hand_target_tracking_not_object_assistance",
-    "behavior": "Before bimanual qualification, interactionAnchorWorld follows the free target Rigidbody center of mass and drives only bounded commanded hand waypoints. At qualification the anchor is latched for the commanded hand sequence.",
-    "object_pose_velocity_force_or_parent_modified": false,
-    "runtime_logging_status": "not separately instrumented in the executed trace; disclosed by canonical source audit",
-    "biological_control_claim": false
-  },
-  "pre_run_contract_repairs": [
-    {
-      "id": "explicit_target_record",
-      "timing": "before any Unity module execution or outcome",
-      "reason": "Static interface audit found that SceneSpec support_relations named target_001 without carrying the target record.",
-      "repair": "Freeze the target identity, authored-geometry hash, dimensions, mass/friction, collision role, and support relation; add per-member furniture hashes.",
-      "outcome_dependent": false,
-      "rates_tolerances_activity_or_seed_changed": false
-    },
-    {
-      "id": "measured_contact_evidence_definition",
-      "timing": "after development trace audit and before any acceptance-eligible Stage-D or integrated outcome",
-      "reason": "Unity Physics.ContactEvent preserves speculative contact candidates with positive separation. Earlier development counters incorrectly admitted those candidates as physical grasp evidence.",
-      "repair": "A qualification-shell hand/object row requires measured separation <= 0.0005 m. Rows above that threshold remain auditable raw PhysX truth and cannot increment dwell. Eligible positive-separation rows remain explicitly labeled as non-force proximity unless nonzero impulse is separately observed.",
-      "outcome_dependent": false,
-      "prior_stage_d_dwell_and_qualification_invalidated": true,
-      "prior_stage_d_results_eligible_for_final_pass_or_robustness": false,
-      "rates_activity_mass_geometry_friction_or_seed_changed": false
-    },
-    {
-      "id": "aperture_aware_reachability_band",
-      "timing": "after development IK saturation evidence and before any acceptance-eligible Stage-D or Stage-E outcome",
-      "classification": "outcome_informed_development_scene_compiler_repair",
-      "reason": "The prior shoulder-only corridor placed the open child-hand aperture beyond the bounded IK solution even when nominal shoulder distance passed. The correction is shared across all seeds and is not a seed exception.",
-      "repair": "Freeze one deterministic 0.34-0.38 m shoulder-midpoint band plus a 0.025 m lateral bias toward the right shoulder so the right aperture can center while the left hand remains reachable.",
-      "prior_scene_spec_matrix_invalidated_for_acceptance": true,
-      "current_and_prior_reach_repair_runs_eligible_for_final_pass_or_robustness": false,
-      "seed_specific_code_or_retuning": false
-    }
-  ],
   "authority": {
     "engine": "Unity 6000.0.80f1 ARM64/Metal",
     "physics": "Unity PhysX",
@@ -78,63 +23,40 @@
     "physics_hz": 240,
     "render_hz": 30,
     "steps_per_render_frame": 8,
-    "single_state_rule": "The physics-step authority state drives collider skeleton, weighted body, garments, head camera, recorder, and every render modality.",
-    "kinematic_labels": ["commanded", "engine_observed"],
-    "measured_labels": ["physx_measured"],
-    "derived_labels": ["derived"],
-    "unavailable_label": "unavailable",
+    "single_state_rule": "The completed physics state drives colliders, weighted skin, garments, head camera, objects, recorder, and every render modality.",
+    "wrist_palm_authority": "bounded kinematic IK/servo targets",
+    "finger_authority": "genuinely dynamic articulated rigidbodies with compliant joint drives",
+    "target_authority": "free non-kinematic PhysX Rigidbody",
+    "target_tracking": "bounded and logged prequalification hand targets may follow measured target state; tracking latches at qualification and never modifies the object",
     "biological_torque_claim_permitted": false
   },
   "schema_registry": {
-    "AvatarSpec": {
-      "schema": "embodied.avatar_spec.v1",
-      "required": ["avatar_id", "source_asset", "skeleton", "hand_topology", "garment_configuration_id"]
-    },
-    "EmbodimentManifest": {
-      "schema": "embodied.embodiment_manifest.v1",
-      "required": ["avatar_spec", "authority_root", "weighted_renderers", "collider_bindings", "camera_parent", "registration_receipts"]
-    },
-    "SceneSpec": {
-      "schema": "embodied.scene_spec.v1",
-      "required": ["seed", "room_family", "envelope_m", "zones", "instances", "support_relations", "reachability", "sightlines"]
-    },
-    "ActivityPlan": {
-      "schema": "embodied.activity_plan.v1",
-      "required": ["duration_s", "phases", "controller_profile_id", "no_seed_specific_retuning"]
-    },
-    "EpisodeTrace": {
-      "schema": "embodied.episode_trace.v1",
-      "required": ["clock", "body_state", "hand_state", "controller_state", "contacts", "objects", "camera_state", "assistance_ledger"]
-    },
-    "TruthProvenance": {
-      "schema": "embodied.truth_provenance.v1",
-      "required": ["field", "provenance", "formula_or_source", "units"]
-    },
-    "QATolerances": {
-      "schema": "embodied.qa_tolerances.v1",
-      "required": ["registration", "contact", "interaction", "camera", "clock", "capture", "replay"]
-    }
+    "EpisodeSpec": {"schema": "embodied.episode_spec.v2", "required": ["episode_id", "cell_id", "target_id", "destination_id", "garment_configuration_id", "final_gaze_zone"]},
+    "AvatarSpec": {"schema": "embodied.avatar_spec.v1", "required": ["avatar_id", "source_asset", "skeleton", "hand_topology", "garment_configuration_id"]},
+    "EmbodimentManifest": {"schema": "embodied.embodiment_manifest.v1", "required": ["avatar_spec", "authority_root", "weighted_renderers", "collider_bindings", "camera_parent", "registration_receipts"]},
+    "SceneSpec": {"schema": "embodied.scene_spec.v1", "required": ["seed", "room_family", "envelope_m", "zones", "instances", "support_relations", "reachability", "sightlines"]},
+    "ActivityPlan": {"schema": "embodied.activity_plan.v1", "required": ["duration_s", "phases", "controller_profile_id", "no_seed_specific_retuning"]},
+    "EpisodeTrace": {"schema": "embodied.episode_trace.v2", "required": ["clock", "body_state", "hand_state", "controller_state", "contacts", "objects", "camera_state", "authority_audit", "recovery_ledger", "assistance_ledger"]},
+    "TruthProvenance": {"schema": "embodied.truth_provenance.v1", "required": ["field", "provenance", "formula_or_source", "units"]},
+    "QATolerances": {"schema": "embodied.qa_tolerances.v1", "required": ["registration", "contact", "interaction", "camera", "clock", "capture", "replay"]}
   },
   "scene_compiler": {
-    "schema": "embodied.scene_compiler_contract.v1",
-    "aperture_aware": true,
-    "target_midpoint_reach_band_m": [0.34, 0.38],
-    "target_midpoint_reach_center_m": 0.36,
-    "seed_modulo_offset_m": 0.02,
-    "target_lateral_bias_toward_right_shoulder_m": 0.025,
-    "measured_bilateral_shoulder_reach_limit_m": [0.34, 0.48],
-    "deterministic_mapping": "center + seed_modulo_offset_m * ((seed % 3) - 1)",
+    "schema": "embodied.scene_compiler_contract.v2",
+    "canonical_compiler_count": 1,
+    "target_midpoint_reach_band_m": [0.33, 0.38],
+    "target_midpoint_reach_center_m": 0.355,
+    "seed_modulo_offset_m": 0.015,
+    "target_lateral_bias_toward_right_shoulder_m": 0.02,
+    "measured_bilateral_shoulder_reach_limit_m": [0.33, 0.48],
+    "deterministic_mapping": "0.355 m + 0.015 m * ((seed % 3) - 1)",
     "same_band_all_room_seeds": true,
-    "seed_specific_retuning": false
+    "seed_specific_retuning": false,
+    "minimum_contextual_objects": 10,
+    "reachable_objects_physics_backed": true,
+    "deterministic_prospective_rejection_only": true
   },
   "assets": {
-    "avatar": {
-      "asset_id": "mpfb_child_cc0",
-      "sha256": "b766981d9d3504cea220c0d72ad8aa56cbd80453e910fc76dc8c8814fbd980de",
-      "license": "CC0",
-      "role": "one child-proportioned weighted body with two anatomical five-finger hands",
-      "public_synthetic": true
-    },
+    "avatar": {"asset_id": "mpfb_child_cc0", "sha256": "b766981d9d3504cea220c0d72ad8aa56cbd80453e910fc76dc8c8814fbd980de", "license": "CC0", "public_synthetic": true},
     "furniture_catalog": {
       "asset_id": "kenney_furniture_kit_cc0_curated",
       "archive_sha256": "68afa4e6dc8a53942379fb47f1e84ec735d46b77bb1c1ceb968e245693dde067",
@@ -151,158 +73,68 @@
       ],
       "material_variants": ["warm_oak", "painted_sage", "natural_birch"]
     },
-    "interactive_target": {
-      "persistent_id": "target_001",
-      "semantic_id": 41,
-      "instance_id": 41001,
-      "geometry": "repository_authored_rounded_grasp_toy",
-      "geometry_spec_sha256": "9d9963e46446fb05187c285062e7562af142a82906b5adf3f491f1d70060e5c5",
-      "license": "repository-authored",
-      "dimensions_m": [0.055, 0.055, 0.055],
-      "mass_kg": 0.12,
-      "static_friction": 1.0,
-      "dynamic_friction": 0.9,
-      "collision_source": "analytic_sphere_matching_render_envelope",
-      "collision_policy": "free_non_kinematic_physx_rigidbody",
-      "support_id": "primary_support",
-      "post_initialization_transform_writes": 0
-    },
-    "procedural_garments": {
-      "license": "repository-authored",
-      "construction": "skinned geometry derived once from the licensed avatar bind pose and bound to the same skeleton",
-      "real_time_cloth_required": false
-    }
+    "interactive_targets": [
+      {"persistent_id": "red_toy_001", "semantic_id": 41, "instance_id": 41001, "geometry": "rounded_toy", "geometry_spec_sha256": "9d9963e46446fb05187c285062e7562af142a82906b5adf3f491f1d70060e5c5", "license": "repository-authored", "dimensions_m": [0.055, 0.055, 0.055], "mass_kg": 0.09, "static_friction": 1.0, "dynamic_friction": 0.9, "collision_source": "analytic_sphere", "collision_policy": "free_non_kinematic_physx_rigidbody", "support_id": "primary_support", "post_initialization_transform_writes": 0},
+      {"persistent_id": "blue_cup_001", "semantic_id": 42, "instance_id": 42001, "geometry": "handled_cup", "geometry_spec_sha256": "f79ab83b8850ec62bfe84c07b81793e42bfed6ae8158b06736e4467f05f96885", "license": "repository-authored", "dimensions_m": [0.065, 0.075, 0.065], "mass_kg": 0.08, "static_friction": 0.9, "dynamic_friction": 0.8, "collision_source": "compound_analytic", "collision_policy": "free_non_kinematic_physx_rigidbody", "support_id": "primary_support", "post_initialization_transform_writes": 0},
+      {"persistent_id": "yellow_block_001", "semantic_id": 43, "instance_id": 43001, "geometry": "beveled_block", "geometry_spec_sha256": "c60dba9e25789265ef8aecc27f670fe0ca8988feefc9c7c9ea4a9bf74de14e06", "license": "repository-authored", "dimensions_m": [0.06, 0.05, 0.06], "mass_kg": 0.10, "static_friction": 0.95, "dynamic_friction": 0.85, "collision_source": "analytic_box", "collision_policy": "free_non_kinematic_physx_rigidbody", "support_id": "primary_support", "post_initialization_transform_writes": 0}
+    ],
+    "procedural_garments": {"license": "repository-authored", "construction": "skinned geometry derived once from the licensed avatar bind pose and bound to the same authoritative skeleton", "real_time_cloth_required": false}
   },
   "avatar_specs": [
-    {
-      "schema": "embodied.avatar_spec.v1",
-      "avatar_id": "mpfb_child_cc0",
-      "source_asset": "mpfb_child_cc0",
-      "skeleton": "single_weighted_mpfb_armature",
-      "hand_topology": {"hands": 2, "digits_per_hand": 5, "segments_per_digit": 3},
-      "garment_configuration_id": "sunset_play",
-      "garments": [
-        {"id": "long_sleeve_top", "layer": 10, "fit_offset_m": 0.004, "material": "cotton", "color_rgba": [0.83, 0.24, 0.16, 1.0]},
-        {"id": "soft_trousers", "layer": 10, "fit_offset_m": 0.004, "material": "cotton_twill", "color_rgba": [0.12, 0.26, 0.52, 1.0]},
-        {"id": "ankle_socks", "layer": 10, "fit_offset_m": 0.003, "material": "knit", "color_rgba": [0.93, 0.86, 0.65, 1.0]}
-      ]
-    },
-    {
-      "schema": "embodied.avatar_spec.v1",
-      "avatar_id": "mpfb_child_cc0",
-      "source_asset": "mpfb_child_cc0",
-      "skeleton": "single_weighted_mpfb_armature",
-      "hand_topology": {"hands": 2, "digits_per_hand": 5, "segments_per_digit": 3},
-      "garment_configuration_id": "forest_layer",
-      "garments": [
-        {"id": "short_sleeve_top", "layer": 10, "fit_offset_m": 0.004, "material": "jersey", "color_rgba": [0.16, 0.48, 0.30, 1.0]},
-        {"id": "contrast_vest", "layer": 20, "fit_offset_m": 0.008, "material": "fleece", "color_rgba": [0.86, 0.68, 0.18, 1.0]},
-        {"id": "soft_trousers", "layer": 10, "fit_offset_m": 0.004, "material": "cotton_twill", "color_rgba": [0.25, 0.20, 0.16, 1.0]}
-      ]
-    },
-    {
-      "schema": "embodied.avatar_spec.v1",
-      "avatar_id": "mpfb_child_cc0",
-      "source_asset": "mpfb_child_cc0",
-      "skeleton": "single_weighted_mpfb_armature",
-      "hand_topology": {"hands": 2, "digits_per_hand": 5, "segments_per_digit": 3},
-      "garment_configuration_id": "sky_overall",
-      "garments": [
-        {"id": "long_sleeve_top", "layer": 10, "fit_offset_m": 0.004, "material": "cotton", "color_rgba": [0.89, 0.87, 0.74, 1.0]},
-        {"id": "play_overall", "layer": 20, "fit_offset_m": 0.008, "material": "denim", "color_rgba": [0.15, 0.48, 0.68, 1.0]},
-        {"id": "ankle_socks", "layer": 10, "fit_offset_m": 0.003, "material": "knit", "color_rgba": [0.86, 0.31, 0.22, 1.0]}
-      ]
-    }
+    {"schema": "embodied.avatar_spec.v1", "avatar_id": "mpfb_child_cc0", "source_asset": "mpfb_child_cc0", "skeleton": "single_weighted_mpfb_armature", "hand_topology": {"hands": 2, "digits_per_hand": 5, "segments_per_digit": 3}, "garment_configuration_id": "sunset_play", "garments": [{"id": "long_sleeve_top", "layer": 10, "fit_offset_m": 0.004, "material": "cotton", "color_rgba": [0.83, 0.24, 0.16, 1.0]}, {"id": "soft_trousers", "layer": 10, "fit_offset_m": 0.004, "material": "cotton_twill", "color_rgba": [0.12, 0.26, 0.52, 1.0]}, {"id": "ankle_socks", "layer": 10, "fit_offset_m": 0.003, "material": "knit", "color_rgba": [0.93, 0.86, 0.65, 1.0]}]},
+    {"schema": "embodied.avatar_spec.v1", "avatar_id": "mpfb_child_cc0", "source_asset": "mpfb_child_cc0", "skeleton": "single_weighted_mpfb_armature", "hand_topology": {"hands": 2, "digits_per_hand": 5, "segments_per_digit": 3}, "garment_configuration_id": "forest_layer", "garments": [{"id": "short_sleeve_top", "layer": 10, "fit_offset_m": 0.004, "material": "jersey", "color_rgba": [0.16, 0.48, 0.30, 1.0]}, {"id": "contrast_vest", "layer": 20, "fit_offset_m": 0.008, "material": "fleece", "color_rgba": [0.86, 0.68, 0.18, 1.0]}, {"id": "soft_trousers", "layer": 10, "fit_offset_m": 0.004, "material": "cotton_twill", "color_rgba": [0.25, 0.20, 0.16, 1.0]}]},
+    {"schema": "embodied.avatar_spec.v1", "avatar_id": "mpfb_child_cc0", "source_asset": "mpfb_child_cc0", "skeleton": "single_weighted_mpfb_armature", "hand_topology": {"hands": 2, "digits_per_hand": 5, "segments_per_digit": 3}, "garment_configuration_id": "sky_overall", "garments": [{"id": "long_sleeve_top", "layer": 10, "fit_offset_m": 0.004, "material": "cotton", "color_rgba": [0.89, 0.87, 0.74, 1.0]}, {"id": "play_overall", "layer": 20, "fit_offset_m": 0.008, "material": "denim", "color_rgba": [0.15, 0.48, 0.68, 1.0]}, {"id": "ankle_socks", "layer": 10, "fit_offset_m": 0.003, "material": "knit", "color_rgba": [0.86, 0.31, 0.22, 1.0]}]}
   ],
-  "scene_matrix": [
-    {"seed": 202608041, "room_family": "warm_playroom", "material_variant": "warm_oak", "zones": ["window_scan", "low_table", "toy_shelf", "rug"]},
-    {"seed": 202608042, "room_family": "sage_living_corner", "material_variant": "painted_sage", "zones": ["sofa", "low_table", "bookcase", "window_scan"]},
-    {"seed": 202608043, "room_family": "birch_art_room", "material_variant": "natural_birch", "zones": ["art_shelf", "low_table", "reading_chair", "window_scan"]}
+  "episode_cells": [
+    {"episode_id": "A_playroom_red_toy", "cell_id": "A", "seed": 202608051, "room_family": "warm_playroom", "material_variant": "warm_oak", "garment_configuration_id": "sunset_play", "target_id": "red_toy_001", "target_relation": "beside_picture_book", "destination_id": "shallow_bin", "final_gaze_zone": "look_away", "contact_strategy": "radial_thumb_index_middle", "zones": ["window_scan", "low_table", "toy_shelf", "rug"]},
+    {"episode_id": "B_living_blue_cup", "cell_id": "B", "seed": 202608052, "room_family": "sage_living_corner", "material_variant": "painted_sage", "garment_configuration_id": "forest_layer", "target_id": "blue_cup_001", "target_relation": "beside_book", "destination_id": "tray", "final_gaze_zone": "window_scan", "contact_strategy": "cup_body_thumb_middle_ring", "zones": ["sofa", "low_table", "bookcase", "window_scan"]},
+    {"episode_id": "C_art_yellow_block", "cell_id": "C", "seed": 202608053, "room_family": "birch_art_room", "material_variant": "natural_birch", "garment_configuration_id": "sky_overall", "target_id": "yellow_block_001", "target_relation": "among_craft_objects", "destination_id": "marked_support", "final_gaze_zone": "art_shelf", "contact_strategy": "face_opposition_thumb_index_middle", "zones": ["art_shelf", "low_table", "reading_chair", "window_scan"]}
   ],
   "activity_plan": {
-    "schema": "embodied.activity_plan.v1",
-    "duration_s": 16.0,
-    "controller_profile_id": "physics_clocked_bimanual_child_v1",
-    "no_seed_specific_retuning": true,
+    "schema": "embodied.activity_plan.v1", "duration_s": 24.0, "controller_profile_id": "wrist_servo_compliant_fingers_v1", "no_seed_specific_retuning": true,
     "phases": [
-      {"id": "scan", "start_s": 0.0, "end_s": 1.8},
-      {"id": "body_reorientation", "start_s": 1.8, "end_s": 3.0},
-      {"id": "right_reach", "start_s": 3.0, "end_s": 5.0},
-      {"id": "visible_touch_and_capture", "start_s": 5.0, "end_s": 6.6},
-      {"id": "left_assistance", "start_s": 6.6, "end_s": 8.0},
-      {"id": "bimanual_condition_lift_inspect_turn", "start_s": 8.0, "end_s": 11.3},
-      {"id": "lower_place_release", "start_s": 11.3, "end_s": 13.0},
-      {"id": "both_hand_withdrawal", "start_s": 13.0, "end_s": 14.4},
-      {"id": "final_gaze_transition", "start_s": 14.4, "end_s": 16.0}
+      {"id": "scan", "start_s": 0.0, "end_s": 2.5}, {"id": "body_reorientation", "start_s": 2.5, "end_s": 4.0}, {"id": "anticipatory_right_reach", "start_s": 4.0, "end_s": 7.0}, {"id": "visible_touch_and_force_capture", "start_s": 7.0, "end_s": 10.0}, {"id": "left_assistance", "start_s": 10.0, "end_s": 12.5}, {"id": "unsupported_lift_inspect_turn", "start_s": 12.5, "end_s": 17.5}, {"id": "lower_place_commanded_open", "start_s": 17.5, "end_s": 20.5}, {"id": "free_release_settle", "start_s": 20.5, "end_s": 21.5}, {"id": "both_hand_withdrawal", "start_s": 21.5, "end_s": 23.0}, {"id": "final_gaze_transition", "start_s": 23.0, "end_s": 24.0}
     ]
   },
   "trace_contract": {
-    "schema": "embodied.episode_trace.v1",
+    "schema": "embodied.episode_trace.v2",
     "clock": ["physics_step", "render_frame", "time_s", "phase_id"],
     "body_state": ["root", "torso", "neck", "head"],
     "pose_fields": ["position_world_m", "rotation_world_xyzw", "linear_velocity_world_m_s", "angular_velocity_world_rad_s"],
     "hand_state": ["left_palm", "right_palm", "left_thumb", "left_index", "left_middle", "left_ring", "left_little", "right_thumb", "right_index", "right_middle", "right_ring", "right_little"],
-    "per_digit_fields": ["segments", "pose", "velocity", "closure_commanded", "closure_observed"],
-    "controller_state": ["targets", "errors", "recovery_state", "speed_limits", "closure_limits", "right_opposition_qualified", "meaningful_left_support_qualified", "carry_contacts_maintained", "right_opposition_dwell_steps", "left_support_dwell_steps", "bimanual_qualification_step"],
-    "contact_fields": ["collider_a", "collider_b", "point_world_m", "normal_world", "separation_m", "relative_velocity_world_m_s", "available_impulse_n_s", "available_impulse_magnitude_n_s", "nonzero_impulse_observed", "mean_force_equivalent_n", "force_evidence_semantics", "qualification_separation_eligible", "provenance"],
-    "object_fields": ["persistent_id", "semantic_id", "instance_id", "pose", "linear_velocity_world_m_s", "angular_velocity_world_rad_s", "support_id", "sleeping"],
-    "camera_fields": ["parent_id", "position_world_m", "rotation_world_xyzw", "intrinsics", "clearance_m", "optical_vs_face_forward_deg"],
+    "per_digit_fields": ["segments", "dynamic_body_pose", "joint_drive", "velocity", "closure_commanded", "closure_observed", "drive_provenance"],
+    "controller_state": ["targets", "tracking_source", "errors", "recovery_state", "speed_limits", "right_force_opposition_qualified", "meaningful_left_force_support_qualified", "support_continuous", "qualification_steps"],
+    "contact_fields": ["collider_a", "collider_b", "point_world_m", "normal_world", "separation_m", "relative_velocity_world_m_s", "available_impulse_n_s", "nonzero_impulse_observed", "mean_force_equivalent_n", "qualification_eligible", "visible_projection", "provenance"],
+    "object_fields": ["persistent_id", "semantic_id", "instance_id", "pose", "linear_velocity_world_m_s", "angular_velocity_world_rad_s", "support_id", "sleeping", "free_dynamic"],
+    "camera_fields": ["parent_id", "mount_id", "position_world_m", "rotation_world_xyzw", "intrinsics", "clearance_m", "optical_vs_face_forward_deg", "roll_deg", "velocity"],
     "derived_fields": ["joint_proprioception", "head_accelerometer_m_s2", "head_gyroscope_rad_s"],
-    "assistance_ledger": []
+    "authority_audit": ["target_pose_write_counter", "target_velocity_write_counter", "target_force_counter", "target_torque_counter", "target_joint_counter", "target_parenting_counter", "target_kinematic_change_counter", "recovery_counter", "source_audit_sha256"],
+    "recovery_ledger": [], "assistance_ledger": []
   },
   "truth_provenance": [
-    {"field": "kinematic_body_hand_and_garment_state", "provenance": "commanded_and_engine_observed", "formula_or_source": "Unity Transform state sampled after each Physics.Simulate", "units": "SI plus quaternion_xyzw"},
-    {"field": "free_object_pose_velocity_sleep_identity", "provenance": "physx_measured", "formula_or_source": "Unity Rigidbody after Physics.Simulate", "units": "m, m/s, rad/s"},
-    {"field": "contacts", "provenance": "physx_measured", "formula_or_source": "Unity contact callbacks plus Physics.ComputePenetration where separation is unavailable", "units": "m, m/s, N*s when exposed"},
-    {"field": "joint_proprioception", "provenance": "derived", "formula_or_source": "relative parent-child rotation and finite-difference angular velocity", "units": "rad, rad/s"},
-    {"field": "head_gyroscope", "provenance": "derived", "formula_or_source": "quaternion finite difference in head-local coordinates", "units": "rad/s"},
-    {"field": "head_accelerometer", "provenance": "derived", "formula_or_source": "second finite difference of head position transformed to head-local coordinates minus world gravity", "units": "m/s2"},
+    {"field": "body_wrist_palm", "provenance": "commanded_and_engine_observed", "formula_or_source": "bounded Unity Transform/kinematic Rigidbody targets sampled around Physics.Simulate", "units": "SI"},
+    {"field": "dynamic_fingers", "provenance": "physx_measured", "formula_or_source": "dynamic Rigidbody and compliant joint state after Physics.Simulate; weighted bones follow this completed state", "units": "SI"},
+    {"field": "free_object", "provenance": "physx_measured", "formula_or_source": "free Unity Rigidbody after Physics.Simulate", "units": "SI"},
+    {"field": "contacts", "provenance": "physx_measured", "formula_or_source": "Unity contact callbacks with point impulse; separation eligibility never substitutes for force", "units": "m,m/s,N*s,N"},
+    {"field": "head_imu", "provenance": "derived", "formula_or_source": "finite differences of authoritative head pose in head-local coordinates with stated gravity convention", "units": "m/s2,rad/s"},
     {"field": "biological_torque", "provenance": "unavailable", "formula_or_source": "not claimed", "units": "unavailable"}
   ],
   "qa_tolerances": {
     "schema": "embodied.qa_tolerances.v1",
-    "registration": {"skin_collider_max_m": 0.0075, "garment_body_max_penetration_m": 0.004, "report_affected_vertex_distribution": true},
-    "contact": {"finger_object_max_penetration_m": 0.003, "target_support_max_penetration_m": 0.002, "qualification_max_measured_separation_m": 0.0005, "eligible_positive_separation_is_proximity_not_force": true, "rows_over_qualification_shell_preserved_as_raw_truth_only": true, "impulse_and_nonzero_force_semantics_reported_separately": true, "visible_physical_max_frame_delta": 1, "correct_visible_surface_projection_required": true},
-    "interaction": {"right_required_digits": ["thumb"], "right_minimum_non_thumb_digits": 2, "right_opposition_min_s": 0.25, "dwell_evidence": "per-step target/hand PhysX contact with measured separation <= 0.0005 m; impulse and nonzero-force status are separate fields", "meaningful_left_support_required": true, "lift_min_m": 0.08, "turn_min_deg": 20.0, "free_release_required": true},
-    "camera": {"optical_vs_face_forward_max_deg": 15.0, "minimum_head_or_clothing_clearance_m": 0.001, "roll_abs_max_deg": 12.0, "linear_speed_max_m_s": 1.5, "angular_speed_max_deg_s": 120.0, "required_events_visible": ["touch", "capture", "left_assistance", "turn", "placement", "free_release", "withdrawal"]},
+    "registration": {"skin_collider_max_m": 0.005, "garment_body_max_penetration_m": 0.002, "garment_affected_vertex_fraction_max": 0.001, "finger_object_max_penetration_m": 0.002, "support_max_penetration_m": 0.0015, "positive_camera_head_hair_garment_clearance_every_frame": true},
+    "contact": {"qualification_max_measured_separation_m": 0.0005, "simultaneous_nonzero_physx_impulse_required": true, "eligible_positive_separation_is_proximity_not_force": true, "rows_over_qualification_shell_preserved_as_raw_truth_only": true, "visible_physical_max_frame_delta": 1, "correct_visible_surface_projection_required": true},
+    "interaction": {"right_required_digits": ["thumb"], "right_minimum_non_thumb_digits": 2, "right_opposition_min_s": 0.30, "left_excluded_only_digit": "little", "left_support_min_s": 0.25, "support_continuous_until_commanded_open": true, "unsupported_required": true, "lift_min_m": 0.10, "turn_min_deg": 30.0, "free_release_required": true, "settling_required": true},
+    "camera": {"fov_candidates_deg": [60, 68, 75], "freeze_rule": "narrowest_candidate_with_all_required_events_directly_inspectable", "optical_vs_face_forward_max_deg": 15.0, "minimum_clearance_m": 0.001, "roll_abs_max_deg": 12.0, "required_events_visible": ["touch", "capture", "left_assistance", "lift", "turn", "placement", "free_release", "withdrawal"]},
     "clock": {"physics_hz": 240, "render_hz": 30, "exact_steps_per_render_frame": 8},
-    "capture": {"resolution_px": [1920, 1080], "fps": 30, "streams": ["rgb", "metric_depth", "semantic", "persistent_instance"], "same_frozen_frame_required": true, "zero_proxy_hero_pixels": true},
+    "capture": {"resolution_px": [1920, 1080], "fps": 30, "streams": ["rgb", "metric_depth", "semantic", "persistent_instance"], "same_frozen_frame_required": true, "contact_projection_required": true, "zero_proxy_hero_pixels": true},
     "replay": {"fresh_process_required": true, "same_trace_rerender_required": true, "translation_max_m": 0.0005, "rotation_max_deg": 0.05, "object_velocity_max_m_s": 0.002, "rerender_min_psnr_db": 60.0}
   },
-  "forbidden_assistance": [
-    "parenting free object",
-    "FixedJoint grasp",
-    "free-object transform writes after initialization",
-    "snapping",
-    "teleportation",
-    "hidden springs or forces",
-    "kinematic object lift",
-    "catch fixture",
-    "object trajectory",
-    "post-step repair"
-  ],
-  "promotion": {
-    "pass_minimum_room_seeds": 2,
-    "pass_total_room_seeds": 3,
-    "pass_minimum_clothing_variants": 2,
-    "pass_total_clothing_variants": 3,
-    "qa_may_veto": true,
-    "promising_bounded_repair_max_localized_defects": 1,
-    "hard_no_go": ["hardcoded clothing or rooms", "visible_physical_hand divergence", "failed unassisted coherent interaction", "camera trace visual divergence"]
-  },
+  "forbidden_assistance": ["parenting free object", "FixedJoint grasp", "free-object transform writes after initialization", "free-object velocity writes after initialization", "snapping", "teleportation", "hidden force torque spring fixture or catch tray", "kinematic object lift", "object trajectory", "post-step repair"],
+  "source_audit": {"mandatory_before_execution": true, "scan_extensions": [".cs", ".py", ".shader"], "forbidden_target_operations": ["SetParent", "FixedJoint", "AddForce", "AddTorque", "MovePosition", "MoveRotation", "isKinematic", "velocity", "angularVelocity", "SetPositionAndRotation"], "manual_allowlist_required_for_initialization_and_non_target_bodies": true},
+  "promotion": {"pass_minimum_episode_cells": 2, "pass_total_episode_cells": 3, "pass_minimum_clothing_variants": 2, "primary_robustness_minimum_passes": 2, "primary_robustness_total": 3, "qa_may_veto": true, "promising_bounded_repair_max_localized_defects": 1, "hard_no_go": ["failed compliant manipulation", "clipping", "event visibility", "procedural generality", "assistance", "registration"]},
   "preserved_evidence": {
     "visual_feasibility": {"decision": "PASS_VISUAL_SHELL_ONLY", "record": "docs/embodied_simulation/unity_visual_audition.md"},
-    "controller_registration": {"decision": "NO-GO_STAGE_C_AND_INTEGRATED", "record": "docs/embodied_simulation_bimanual_gate_decision.md"},
-    "bounded_physics_kernel": {"decision": "BOUNDED_PHYSICAL_KERNEL_PASS_ONLY", "lift_m": 0.1013, "turn_deg": 25.6, "left_support_limitation": "little digit only"}
+    "corrected_prior_gate": {"decision": "NO-GO", "record": "docs/embodied_simulation/procedural_scene_gate_decision.md", "right_geometric_dwell_s": 1.6875, "right_nonzero_impulse_dwell_s": 0.0, "left_geometric_dwell_s": 0.3125, "left_nonzero_impulse_dwell_s": 0.0, "postqualification_opposition_s": 0.0625, "lift_m": 0.0, "turn_deg_support_bound": 57.0641, "clean_release": false, "head_view_readable": false}
   },
-  "privacy_and_claims": {
-    "restricted_childlens_access_permitted": false,
-    "restricted_external_drive_access_permitted": false,
-    "public_synthetic_inputs_only": true,
-    "infant_trained": false,
-    "age_matched": false,
-    "childlens_calibrated": false,
-    "human_validated": false,
-    "biological_torque_valid": false
-  }
+  "privacy_and_claims": {"restricted_childlens_access_permitted": false, "restricted_external_drive_access_permitted": false, "public_synthetic_inputs_only": true, "infant_trained": false, "age_matched": false, "childlens_calibrated": false, "human_validated": false, "biological_torque_valid": false}
 }

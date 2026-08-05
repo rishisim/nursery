@@ -11,13 +11,14 @@ from typing import Any
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 CONFIG_PATH = REPOSITORY_ROOT / "configs" / "embodied_simulation_procedural_scene_gate.json"
 OUTPUT_ROOT = REPOSITORY_ROOT / "runs" / "embodied_simulation" / "procedural_scene_gate"
-SCHEMA = "embodied.procedural_scene_gate.v1"
+SCHEMA = "embodied.integrated_dexterous_scene_gate.v2"
 REQUIRED_SCHEMAS = {
+    "EpisodeSpec": "embodied.episode_spec.v2",
     "AvatarSpec": "embodied.avatar_spec.v1",
     "EmbodimentManifest": "embodied.embodiment_manifest.v1",
     "SceneSpec": "embodied.scene_spec.v1",
     "ActivityPlan": "embodied.activity_plan.v1",
-    "EpisodeTrace": "embodied.episode_trace.v1",
+    "EpisodeTrace": "embodied.episode_trace.v2",
     "TruthProvenance": "embodied.truth_provenance.v1",
     "QATolerances": "embodied.qa_tolerances.v1",
 }
@@ -44,10 +45,14 @@ def validate_frozen_config(config: dict[str, Any]) -> None:
     if not implementation["same_controller_all_seeds_and_garments"] or implementation["seed_specific_retuning"]:
         raise ValueError("the frozen implementation must be shared without seed-specific retuning")
     module_root = Path(__file__).resolve().parent
-    for name, expected_sha256 in implementation["source_sha256"].items():
-        source = module_root / name
-        if not source.is_file() or hashlib.sha256(source.read_bytes()).hexdigest() != expected_sha256:
-            raise ValueError(f"canonical implementation source hash changed: {name}")
+    sealed_hashes = implementation.get("sealed_source_sha256", {})
+    if implementation.get("status") == "sealed_for_execution":
+        if not sealed_hashes:
+            raise ValueError("execution freeze requires sealed canonical source hashes")
+        for name, expected_sha256 in sealed_hashes.items():
+            source = module_root / name
+            if not source.is_file() or hashlib.sha256(source.read_bytes()).hexdigest() != expected_sha256:
+                raise ValueError(f"canonical implementation source hash changed: {name}")
     registry = config["schema_registry"]
     for name, schema in REQUIRED_SCHEMAS.items():
         if registry.get(name, {}).get("schema") != schema:
@@ -57,20 +62,16 @@ def validate_frozen_config(config: dict[str, Any]) -> None:
         raise ValueError("at least three distinct clothing configurations are frozen")
     if any(row["hand_topology"] != {"hands": 2, "digits_per_hand": 5, "segments_per_digit": 3} for row in avatar_specs):
         raise ValueError("every AvatarSpec must bind two five-finger three-segment hands")
-    scenes = config["scene_matrix"]
+    scenes = config["episode_cells"]
     if len(scenes) < 3 or len({row["room_family"] for row in scenes}) < 3:
         raise ValueError("at least three materially distinct room families are frozen")
     compiler = config["scene_compiler"]
-    if compiler["target_midpoint_reach_band_m"] != [0.34, 0.38]:
-        raise ValueError("the aperture-aware target reach band changed")
-    if compiler["target_midpoint_reach_center_m"] != 0.36 or compiler["seed_modulo_offset_m"] != 0.02:
-        raise ValueError("the deterministic aperture-aware reach mapping changed")
-    if compiler["target_lateral_bias_toward_right_shoulder_m"] != 0.025:
-        raise ValueError("the shared bimanual lateral reach bias changed")
+    if compiler["target_midpoint_reach_band_m"] != [0.33, 0.38]:
+        raise ValueError("the prospective aperture-aware target reach band changed")
     if not compiler["same_band_all_room_seeds"] or compiler["seed_specific_retuning"]:
         raise ValueError("all scenes must use one reach band without retuning")
     plan = config["activity_plan"]
-    if not 12.0 <= plan["duration_s"] <= 20.0 or not plan["no_seed_specific_retuning"]:
+    if not 20.0 <= plan["duration_s"] <= 30.0 or not plan["no_seed_specific_retuning"]:
         raise ValueError("ActivityPlan duration or retuning rule changed")
     phases = plan["phases"]
     if phases[0]["start_s"] != 0.0 or phases[-1]["end_s"] != plan["duration_s"]:
@@ -86,6 +87,14 @@ def validate_frozen_config(config: dict[str, Any]) -> None:
         raise ValueError("registered capture streams changed")
     if config["privacy_and_claims"]["restricted_childlens_access_permitted"]:
         raise ValueError("restricted ChildLens access must remain prohibited")
+    interaction = config["qa_tolerances"]["interaction"]
+    if interaction["right_opposition_min_s"] != 0.30 or interaction["left_support_min_s"] != 0.25:
+        raise ValueError("force-bearing dwell thresholds changed")
+    if interaction["lift_min_m"] != 0.10 or interaction["turn_min_deg"] != 30.0:
+        raise ValueError("integrated manipulation thresholds changed")
+    registration = config["qa_tolerances"]["registration"]
+    if registration["skin_collider_max_m"] != 0.005 or registration["garment_body_max_penetration_m"] != 0.002:
+        raise ValueError("anti-clipping registration thresholds changed")
 
 
 def assert_output_root_ignored(output_root: Path, repository_root: Path = REPOSITORY_ROOT) -> None:
@@ -112,15 +121,15 @@ def _scene_spec(
     layouts = {
         "warm_playroom": {
             "envelope_m": [4.4, 2.55, 4.8],
-            "instances": ["tableCoffee", "bookcaseOpen", "rugRectangle", "chairCushion", "books"],
+            "instances": ["tableCoffee", "bookcaseOpen", "rugRectangle", "chairCushion", "books", "books", "pottedPlant", "lampSquareFloor", "chairCushion", "books", "rugRectangle"],
         },
         "sage_living_corner": {
             "envelope_m": [4.8, 2.55, 5.2],
-            "instances": ["tableCoffee", "loungeSofaLong", "rugRectangle", "lampSquareFloor", "pottedPlant"],
+            "instances": ["tableCoffee", "loungeSofaLong", "rugRectangle", "lampSquareFloor", "pottedPlant", "books", "chairCushion", "books", "pottedPlant", "rugRectangle", "books"],
         },
         "birch_art_room": {
             "envelope_m": [4.2, 2.55, 4.6],
-            "instances": ["tableCoffee", "bookcaseOpen", "chairCushion", "rugRectangle", "pottedPlant"],
+            "instances": ["tableCoffee", "bookcaseOpen", "chairCushion", "rugRectangle", "pottedPlant", "books", "lampSquareFloor", "books", "chairCushion", "rugRectangle", "books"],
         },
     }
     layout = layouts[scene["room_family"]]
@@ -148,9 +157,10 @@ def _scene_spec(
         "envelope_m": layout["envelope_m"],
         "zones": scene["zones"],
         "instances": instances,
-        "target": deepcopy(assets["interactive_target"]),
+        "target": deepcopy(next(row for row in assets["interactive_targets"] if row["persistent_id"] == scene["target_id"])),
         "support_relations": [
-            {"child_id": "target_001", "support_id": f"{scene['room_family']}_tableCoffee_00"}
+            {"child_id": scene["target_id"], "support_id": f"{scene['room_family']}_tableCoffee_00"},
+            {"child_id": scene["target_id"], "destination_id": scene["destination_id"]},
         ],
         "reachability": {
             "aperture_aware": True,
@@ -165,7 +175,9 @@ def _scene_spec(
             "deterministic_mapping": compiler["deterministic_mapping"],
             "seed_specific_retuning": False,
         },
-        "sightlines": {"target_visible_at_required_events": True, "final_gaze_zone": "window_scan"},
+        "sightlines": {"target_visible_at_required_events": True, "final_gaze_zone": scene["final_gaze_zone"]},
+        "episode_cell": scene["cell_id"],
+        "destination_id": scene["destination_id"],
         "stabilization_s": 1.0,
         "no_visible_primitive_furniture": True,
     }
@@ -174,15 +186,19 @@ def _scene_spec(
 def compile_contract_matrix(config: dict[str, Any]) -> list[dict[str, Any]]:
     validate_frozen_config(config)
     result = []
-    for scene_index, scene in enumerate(config["scene_matrix"]):
-        for garment_index, avatar in enumerate(config["avatar_specs"]):
+    avatars = {row["garment_configuration_id"]: row for row in config["avatar_specs"]}
+    for scene_index, scene in enumerate(config["episode_cells"]):
+            avatar = avatars[scene["garment_configuration_id"]]
             scene_spec = _scene_spec(scene, config["assets"], config["scene_compiler"])
             activity = deepcopy(config["activity_plan"])
             avatar_spec = deepcopy(avatar)
+            episode_spec = deepcopy(scene)
+            episode_spec["schema"] = REQUIRED_SCHEMAS["EpisodeSpec"]
             contract = {
-                "schema": "embodied.compiled_episode_contract.v1",
-                "episode_id": f"{scene['room_family']}__{avatar['garment_configuration_id']}",
-                "matrix_indices": {"scene": scene_index, "garment": garment_index},
+                "schema": "embodied.compiled_episode_contract.v2",
+                "episode_id": scene["episode_id"],
+                "matrix_indices": {"scene": scene_index, "garment": scene_index},
+                "episode_spec": episode_spec,
                 "avatar_spec": avatar_spec,
                 "scene_spec": scene_spec,
                 "activity_plan": activity,

@@ -9,25 +9,26 @@ from babyworld_lite.childlens_engine_bakeoff.procedural_scene_gate.contracts imp
 )
 
 
-def test_frozen_contract_matrix_is_three_rooms_by_three_garments():
+def test_frozen_contract_matrix_is_three_required_cells_with_three_garments():
     config = load_frozen_config()
     validate_frozen_config(config)
     matrix = compile_contract_matrix(config)
-    assert len(matrix) == 9
+    assert len(matrix) == 3
     assert len({row["scene_spec"]["room_family"] for row in matrix}) == 3
     assert len({row["avatar_spec"]["garment_configuration_id"] for row in matrix}) == 3
+    assert {row["episode_spec"]["cell_id"] for row in matrix} == {"A", "B", "C"}
     assert all(row["activity_plan"]["no_seed_specific_retuning"] for row in matrix)
     compiler = config["scene_compiler"]
-    assert compiler["target_midpoint_reach_band_m"] == [0.34, 0.38]
-    assert compiler["target_lateral_bias_toward_right_shoulder_m"] == 0.025
+    assert compiler["target_midpoint_reach_band_m"] == [0.33, 0.38]
+    assert compiler["target_lateral_bias_toward_right_shoulder_m"] == 0.02
     assert compiler["same_band_all_room_seeds"]
     assert not compiler["seed_specific_retuning"]
     assert {
         row["scene_spec"]["reachability"]["compiled_requested_midpoint_m"]
         for row in matrix
-    } == {0.34, 0.36, 0.38}
+    } == {0.34, 0.355, 0.37}
     assert all(
-        row["scene_spec"]["reachability"]["compiled_midpoint_band_m"] == [0.34, 0.38]
+        row["scene_spec"]["reachability"]["compiled_midpoint_band_m"] == [0.33, 0.38]
         and not row["scene_spec"]["reachability"]["seed_specific_retuning"]
         for row in matrix
     )
@@ -51,15 +52,11 @@ def test_contact_qualification_shell_and_force_semantics_are_distinct():
     assert contact["qualification_max_measured_separation_m"] == 0.0005
     assert contact["eligible_positive_separation_is_proximity_not_force"]
     assert contact["rows_over_qualification_shell_preserved_as_raw_truth_only"]
-    assert contact["impulse_and_nonzero_force_semantics_reported_separately"]
-    assert "separation <= 0.0005 m" in interaction["dwell_evidence"]
-    repair = next(
-        row
-        for row in config["pre_run_contract_repairs"]
-        if row["id"] == "measured_contact_evidence_definition"
-    )
-    assert repair["prior_stage_d_dwell_and_qualification_invalidated"]
-    assert not repair["prior_stage_d_results_eligible_for_final_pass_or_robustness"]
+    assert contact["simultaneous_nonzero_physx_impulse_required"]
+    assert interaction["right_opposition_min_s"] == 0.30
+    assert interaction["left_support_min_s"] == 0.25
+    assert interaction["lift_min_m"] == 0.10
+    assert interaction["turn_min_deg"] == 30.0
 
 
 def test_trace_closes_corrected_bimanual_truth_gaps():
@@ -71,15 +68,17 @@ def test_trace_closes_corrected_bimanual_truth_gaps():
     assert "angular_velocity_world_rad_s" in trace["object_fields"]
     assert "clearance_m" in trace["camera_fields"]
     assert trace["assistance_ledger"] == []
+    assert trace["recovery_ledger"] == []
+    assert "target_force_counter" in trace["authority_audit"]
 
 
 def test_preserved_visual_pass_and_integrated_no_go_are_distinct():
     config = load_frozen_config()
     evidence = config["preserved_evidence"]
     assert evidence["visual_feasibility"]["decision"] == "PASS_VISUAL_SHELL_ONLY"
-    assert evidence["controller_registration"]["decision"] == "NO-GO_STAGE_C_AND_INTEGRATED"
+    assert evidence["corrected_prior_gate"]["decision"] == "NO-GO"
     assert Path(evidence["visual_feasibility"]["record"]).is_file()
-    assert Path(evidence["controller_registration"]["record"]).is_file()
+    assert Path(evidence["corrected_prior_gate"]["record"]).is_file()
 
 
 def test_no_assistance_and_claim_boundaries_are_frozen():
@@ -100,7 +99,7 @@ def test_scene_catalog_has_licenses_dimensions_collision_and_physics():
     assert all(row["dimensions_m"] and row["semantic_class"] and row["collision_source"] for row in catalog["members"])
     for contract in compile_contract_matrix(config):
         target = contract["scene_spec"]["target"]
-        assert target["persistent_id"] == "target_001"
+        assert target["persistent_id"] in {"red_toy_001", "blue_cup_001", "yellow_block_001"}
         assert target["collision_policy"] == "free_non_kinematic_physx_rigidbody"
         assert target["post_initialization_transform_writes"] == 0
         assert len(target["geometry_spec_sha256"]) == 64
@@ -111,3 +110,15 @@ def test_scene_catalog_has_licenses_dimensions_collision_and_physics():
                 row for row in catalog["members"] if row["id"] == instance["asset_id"]
             )
             assert len(catalog_row["sha256"]) == 64
+
+
+def test_integrated_anti_clipping_and_rich_scene_contract_is_frozen():
+    config = load_frozen_config()
+    registration = config["qa_tolerances"]["registration"]
+    assert registration["skin_collider_max_m"] == 0.005
+    assert registration["garment_body_max_penetration_m"] == 0.002
+    assert registration["garment_affected_vertex_fraction_max"] == 0.001
+    assert registration["finger_object_max_penetration_m"] == 0.002
+    assert registration["support_max_penetration_m"] == 0.0015
+    assert config["scene_compiler"]["minimum_contextual_objects"] == 10
+    assert all(len(row["scene_spec"]["instances"]) > 10 for row in compile_contract_matrix(config))

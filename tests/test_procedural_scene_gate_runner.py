@@ -32,7 +32,7 @@ def test_runner_uses_one_canonical_unity_orchestrator():
 
 
 def test_contract_lookup_rejects_nonfrozen_episode():
-    contract = contract_by_episode_id("warm_playroom__sunset_play")
+    contract = contract_by_episode_id("A_playroom_red_toy")
     assert contract["scene_spec"]["room_family"] == "warm_playroom"
     with pytest.raises(ValueError):
         contract_by_episode_id("ad_hoc_seed_specific_episode")
