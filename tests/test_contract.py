@@ -120,7 +120,10 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 27
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_2_BLOCKER_PRESERVED_ATTRIBUTE_DEPENDENCY_REPAIR_FROZEN_NO_SCIENTIFIC_METRICS_OPENED"
+    assert config["status"] == (
+        "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_"
+        "COMPLETE_SCIENTIFIC_NO_GO_DOWNSTREAM_STOPPED"
+    )
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -563,22 +566,22 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["phase4_authorized"] is True
     assert config["gates"]["childlens_audio_processing_authorized"] is True
     assert config["gates"]["learner_effective_implementation_authorized"] is True
-    assert config["gates"]["learner_effective_public_qualification_authorized"] is True
+    assert config["gates"]["learner_effective_public_qualification_authorized"] is False
     assert config["gates"]["learner_effective_runner_implementation_status"] == (
-        "PASS_ENGINEERING_HEALTH_PUBLIC_DEVELOPMENT_ATTEMPT_2_BLOCKER_PRESERVED_ATTRIBUTE_DEPENDENCY_REPAIR_FROZEN"
+        "PUBLIC_DEVELOPMENT_COMPLETE_SCIENTIFIC_NO_GO_SEALED_DOWNSTREAM_STOPPED"
     )
     assert config["gates"]["public_model_inference_requires_blind_no_hand_review_seal"] is True
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
     assert config["gates"]["learner_effective_no_hand_review_sealed"] is True
     assert config["gates"]["learner_effective_public_fixture_preparation_authorized"] is True
-    assert config["gates"]["learner_effective_public_model_inference_authorized"] is True
+    assert config["gates"]["learner_effective_public_model_inference_authorized"] is False
     assert config["gates"]["learner_effective_public_model_inference_scope"] == (
-        "PUBLIC_DEVELOPMENT_FINAL_ENGINEERING_INTEGRITY_ATTEMPT_3_AFTER_EXACT_ATTRIBUTE_DEPENDENCY_REPAIR_NO_METRICS_UNTIL_VALID_FINALIZE"
+        "NONE_TERMINAL_PUBLIC_DEVELOPMENT_SCIENTIFIC_NO_GO"
     )
     assert config["gates"][
         "learner_effective_public_model_inference_conditionally_authorized_after_fixture_seal"
-    ] is True
-    assert config["gates"]["learner_effective_new_route_scientific_development_authorized"] is True
+    ] is False
+    assert config["gates"]["learner_effective_new_route_scientific_development_authorized"] is False
     assert config["gates"]["governed_C_calibration_authorized"] is False
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
     assert config["gates"]["generator_work_authorized"] is False

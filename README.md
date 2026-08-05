@@ -746,3 +746,16 @@ scientific-phase blocker. Final-attempt repair `602c273d…b5073b` propagates a
 qualifying returned referent threshold pair; if none qualifies, it emits the
 dependent attribute axis as `UNMEASURED` without inventing a threshold. Both
 states remain critical gate failures. No scientific rule or input changes.
+
+Final public-development attempt 3 (Juno job 316982) then passed all seven
+engineering-integrity modules and released the complete aggregate scientific
+record exactly once. The frozen combined gate returned a scientific no-go:
+adapter-qualified yield, recurrence, and sensor regime passed, while lexical
+exposure and utterance-centered referent qualification failed; adjective–
+attribute contrast was unmeasured because its required referent threshold did
+not qualify, and supporting hand/action coverage failed. Thus 2/5 critical
+axes and 3/7 total axes passed, below the unchanged 5/5 and 6/7 requirements.
+Commitment `42338302…50e9d` seals the terminal result. The holdout, governed C,
+LTX-2.3 generation, and synthetic learner were not run. The three development
+attempts used 0.905556 A30 GPU-hours, retained 279,902 bytes of compact
+qualification state outside Git, and incurred $0 direct monetary cost.

@@ -3544,6 +3544,11 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
         "_public_development_attribute_dependency_repair",
         lambda _cfg: None,
     )
+    monkeypatch.setattr(
+        MODULE,
+        "_public_development_terminal_result",
+        lambda _cfg: None,
+    )
     monkeypatch.setattr(MODULE, "_verify_tuple_runtime_manifest", lambda *_: {})
     monkeypatch.setattr(
         MODULE,

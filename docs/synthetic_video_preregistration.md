@@ -2295,3 +2295,17 @@ attribute is emitted as `UNMEASURED` with reason
 unqualified threshold is introduced. Referent failure and attribute
 unmeasured status each remain critical combined-gate failures. Fixtures,
 models, partitions, grids, metrics, seeds, and gates remain unchanged.
+
+Final public-development attempt 3 (Juno job 316982) completed with 7/7
+engineering-integrity and 7/7 scientific modules, so aggregate metrics were
+released exactly once. The valid combined decision is a scientific no-go:
+adapter-qualified yield, recurrence, and sensor regime passed; lexical
+exposure, utterance-centered referent qualification, and supporting
+hand/action coverage failed; adjective–attribute contrast remained unmeasured
+because the required referent threshold did not qualify. The unchanged gate
+therefore passed only 2/5 critical axes and 3/7 total axes, rather than 5/5 and
+at least 6/7. Commitment `42338302…50e9d` is terminal for this route. Holdout,
+governed C, LTX-2.3 generation, and the synthetic learner remain unexecuted and
+unauthorized. The three public-development attempts used 0.905556 A30
+GPU-hours, retained 279,902 bytes of compact qualification state outside Git,
+and cost $0 directly.

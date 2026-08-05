@@ -1358,6 +1358,45 @@ def test_public_development_attempt_2_and_attribute_dependency_repair_are_exact(
         MODULE._public_development_attribute_dependency_repair(mutated)
 
 
+def test_complete_public_development_no_go_is_hash_bound_and_terminal() -> None:
+    config = _config()
+    result = MODULE._public_development_terminal_result(config)
+    assert result["result_commitment_sha256"] == (
+        "42338302949e27e0ed7c3f6e8a5f70e10bb380a5e8158378e89f5ff87c350e9d"
+    )
+    assert result["critical_axis_pass_count"] == 2
+    assert result["critical_axis_required_count"] == 5
+    assert result["validated_axis_count"] == 3
+    assert result["validated_axis_required_count"] == 6
+    assert result["terminal_gate"] == {
+        "public_development_pass": False,
+        "public_holdout_authorized": False,
+        "governed_C_authorized": False,
+        "LTX_or_synthetic_learner_run": False,
+    }
+
+    mutated = json.loads(json.dumps(config))
+    mutated["learner_effective_public_development_terminal_result"][
+        "critical_axis_pass_count"
+    ] = 3
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_PUBLIC_DEVELOPMENT_TERMINAL_RESULT_COMMITMENT",
+    ):
+        MODULE._public_development_terminal_result(mutated)
+
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_PUBLIC_DEVELOPMENT_SCIENTIFIC_NO_GO_TERMINAL",
+    ):
+        MODULE.qualify_tuple_public(
+            argparse.Namespace(
+                partition="holdout",
+                config=Path("configs/synthetic_video_real_only_proof.json"),
+            )
+        )
+
+
 @pytest.mark.parametrize(
     "forbidden_key,forbidden_value",
     [
@@ -3202,6 +3241,11 @@ def test_partition_crash_withholds_metrics_and_preserves_legacy_record(
     monkeypatch.setattr(
         MODULE,
         "_public_development_attribute_dependency_repair",
+        lambda _cfg: None,
+    )
+    monkeypatch.setattr(
+        MODULE,
+        "_public_development_terminal_result",
         lambda _cfg: None,
     )
     monkeypatch.setattr(MODULE, "_verify_tuple_runtime_manifest", lambda *_: {})

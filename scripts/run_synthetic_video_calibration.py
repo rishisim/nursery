@@ -695,6 +695,9 @@ PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_2_RESULT_SHA256 = (
 PUBLIC_DEVELOPMENT_ATTRIBUTE_DEPENDENCY_REPAIR_SHA256 = (
     "602c273dbfc60ef91af083c2baad77d2831981765c4a79f7a8ccf4b8b4b5073b"
 )
+PUBLIC_DEVELOPMENT_TERMINAL_RESULT_SHA256 = (
+    "42338302949e27e0ed7c3f6e8a5f70e10bb380a5e8158378e89f5ff87c350e9d"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -5980,6 +5983,65 @@ def _public_development_attribute_dependency_repair(
     ):
         raise RuntimeError(
             "E_TUPLE_DEVELOPMENT_ATTRIBUTE_DEPENDENCY_REPAIR_COMMITMENT"
+        )
+    return value
+
+
+def _public_development_terminal_result(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate and preserve the terminal complete public-development no-go."""
+
+    _public_development_attribute_dependency_repair(cfg)
+    try:
+        value = cfg["learner_effective_public_development_terminal_result"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError(
+            "E_TUPLE_PUBLIC_DEVELOPMENT_TERMINAL_RESULT_MISSING"
+        ) from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("result_commitment_sha256", None)
+    exact_axes = {
+        "adapter_qualified_yield": "PASS",
+        "noun_adjective_exposure": "NO_GO",
+        "utterance_centered_referent_visibility_dominance_ambiguity": "NO_GO",
+        "cross_episode_recurrence": "PASS",
+        "adjective_attribute_contrast": "UNMEASURED",
+        "hand_action_coupling": "NO_GO",
+        "egocentric_sensor_regime": "PASS",
+    }
+    exact_terminal_gate = {
+        "public_development_pass": False,
+        "public_holdout_authorized": False,
+        "governed_C_authorized": False,
+        "LTX_or_synthetic_learner_run": False,
+    }
+    if (
+        expected != PUBLIC_DEVELOPMENT_TERMINAL_RESULT_SHA256
+        or digest(payload) != expected
+        or value.get("status")
+        != "NO_GO_COMPLETE_VALID_PUBLIC_DEVELOPMENT_COMBINED_GATE_DOWNSTREAM_STOPPED"
+        or value.get("job_id") != 316982
+        or value.get("engineering_integrity_attempt") != 3
+        or value.get("integrity_completed_module_count") != 7
+        or value.get("integrity_failed_module_count") != 0
+        or value.get("scientific_completed_module_count") != 7
+        or value.get("scientific_failed_module_count") != 0
+        or value.get("critical_axis_pass_count") != 2
+        or value.get("critical_axis_required_count") != 5
+        or value.get("validated_axis_count") != 3
+        or value.get("validated_axis_required_count") != 6
+        or value.get("axis_statuses") != exact_axes
+        or value.get("public_qualification_commitment_sha256")
+        != "249e58198c12b01585177b66185a3d69045a9d8c48afd15b2dd1e04dd8fa1ddb"
+        or value.get("development_threshold_commitment_sha256")
+        != "d103b5e0597c771ce9238be61eab581d6134d5fca84b6b43065a0005ec020b33"
+        or value.get("transaction_commitment_sha256")
+        != "34d609084d4a22c36c9cbb5c1b8614184dae43262050ca5322ce1fa88dfb9620"
+        or value.get("terminal_gate") != exact_terminal_gate
+    ):
+        raise RuntimeError(
+            "E_TUPLE_PUBLIC_DEVELOPMENT_TERMINAL_RESULT_COMMITMENT"
         )
     return value
 
@@ -17433,6 +17495,12 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
     if partition not in {"development", "holdout"}:
         raise RuntimeError("E_TUPLE_QUALIFICATION_PARTITION")
     cfg = json.loads(args.config.read_text())
+    if "learner_effective_public_development_terminal_result" in cfg:
+        terminal_result = _public_development_terminal_result(cfg)
+        if terminal_result is not None:
+            raise RuntimeError(
+                "E_TUPLE_PUBLIC_DEVELOPMENT_SCIENTIFIC_NO_GO_TERMINAL"
+            )
     if "learner_effective_public_development_attribute_dependency_repair" in cfg:
         development_active_repair = (
             _public_development_attribute_dependency_repair(cfg)
