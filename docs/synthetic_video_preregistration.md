@@ -2093,3 +2093,20 @@ and every unbound historical commitment is rejected. Attempt 9's measured
 complete attempt 10 may run on the prospectively frozen earliest compatible
 zero-cost one-process topology. No scientific input or decision rule changes,
 and the no-polling/one-live-job rule remains binding.
+
+Attempt 10, Juno job 316832, completed after 244 seconds and wrote a valid
+metric-withheld engineering blocker. The exact six-function geometry source
+bundle matched its frozen digest; the Python-specific `ast.dump` commitment did
+not match across host Python 3.14.6 and container Python 3.11.13. No model
+module completed, the six dependent modules were preflight-blocked, and no
+scientific metric, holdout input, external call, invalid record, or unaccounted
+failure opened. Blocker `1575ef02…ad0257` is not a scientific no-go.
+
+Schema 33 prospectively freezes portable-AST repair `7896a533…4b67c1`. Its
+projection includes AST node types and semantic fields, excludes location
+attributes and only the newer `type_params` field, and is jointly required with
+the unchanged byte-exact source-bundle digest. Historical attempts 8 and 10
+are accepted only with their sealed config/health commitment pairs; other
+unbound commitments fail closed. Attempt 11 retains the complete 28-case,
+two-replicate suite, metric withholding, one process, $0 direct cost, and the
+standing one-live-job/no-polling rule. No scientific contract changes.

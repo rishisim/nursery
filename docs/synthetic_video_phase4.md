@@ -652,3 +652,16 @@ attempt number, and result record. It rejects all other unbound commitments
 and changes no science. One complete attempt 10 is authorized under the
 standing earliest-compatible-zero-cost, one-process, one-live-job, no-polling
 policy; public development remains locked until a committed 7/7 health pass.
+
+Attempt 10, Juno job 316832, completed in 244 seconds with zero scientific
+metrics and zero model-module completions. Byte-exact geometry source matched,
+while the legacy AST serialization differed between host Python 3.14.6 and the
+frozen container's Python 3.11.13; six modules were preflight-blocked. This is
+sealed at `1575ef02…ad0257` as engineering-only. Prospective schema-33 repair
+`7896a533…4b67c1` replaces only that runtime-dependent AST serialization check
+with a location-free semantic projection that excludes the version-specific
+`type_params` field, while retaining the exact source digest as blocking and
+binding historical attempts 8 and 10 to their sealed config/health pairs.
+Attempt 11 is the same complete suite under the same one-process,
+earliest-compatible-zero-cost, one-live-job, no-polling contract. Public
+science remains unauthorized until 7/7 engineering health is committed.

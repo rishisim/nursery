@@ -594,3 +594,16 @@ metric, seed, gate, privacy rule, or downstream limit. One complete attempt 10
 is authorized on the single earliest scheduler-eligible compatible zero-cost
 GPU frozen before submission. There is one live job at most, no DDP, and no
 repeated scheduler polling or unchanged status message.
+
+Attempt 10, Juno job 316832, completed after 244 seconds with all scientific
+metrics still withheld. Exact geometry-function source bytes matched, but the
+legacy `ast.dump` commitment differed between host Python 3.14 and container
+Python 3.11; the other six modules were preflight-blocked. Blocker
+`1575ef02…ad0257` preserves this engineering-only result. Schema 33 freezes a
+portable AST projection that includes node types and semantic fields, excludes
+locations and only the version-specific `type_params` field, and keeps the
+exact source-bundle hash blocking. Repair `7896a533…4b67c1` also binds sealed
+attempts 8 and 10 to their exact historical config and health commitments.
+One unchanged complete attempt 11 is authorized after commit/push under the
+same earliest-compatible-zero-cost, one-process, one-live-job, no-polling
+policy. Scientific development remains locked until a committed 7/7 pass.
