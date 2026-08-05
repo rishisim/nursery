@@ -381,6 +381,14 @@ hash/size record; models, fixtures, metrics, thresholds, seeds, and gates remain
 unchanged. Each attempt retains one H100 NVL `3g.47gb` slice, eight CPUs,
 32 GiB, 15 minutes, at most 0.25 slice-GPU-hours and 1 GiB, at $0.
 
+Attempt 6 (job 316604) reached both private host/container and topology
+attestations, then timed out at 15:24 before a microfixture projection, module
+inference, full health record, or scientific metric was written. Commitment
+`e559cd53…6d114` preserves that engineering timeout. The prospective attempt-7
+repair adds only a private atomic stable-stage progress record to the unchanged
+complete health suite, allowing another timeout to be diagnosed without paths,
+filenames, hashes, rows, predictions, labels, prompts, or metrics.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

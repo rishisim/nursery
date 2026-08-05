@@ -93,8 +93,8 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["schema_version"] == 15
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_5_BLOCKER_PRESERVED_HOST_CONTAINER_ATTESTATION_REPAIR_FROZEN_PENDING_ATTEMPT_6_NO_NEW_OUTCOME"
+    assert result["schema_version"] == 16
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_6_TIMEOUT_PRESERVED_PROGRESS_INSTRUMENTATION_REPAIR_FROZEN_PENDING_ATTEMPT_7_NO_NEW_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -166,6 +166,20 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
         "b05dc8da3155561b182b3bcfa50c851f83828b34e063918306bdfb57fdedeb9c"
     )
     assert parser_result["attempt_6_authorized"] is False
+    attempt_6 = result[
+        "learner_effective_engineering_health_iterative_attempt_6_result"
+    ]
+    assert attempt_6["job_id"] == 316604
+    assert attempt_6["scheduler_state"] == "TIMEOUT"
+    assert attempt_6["scientific_metric_count"] == 0
+    assert attempt_6["blocker_commitment_sha256"] == (
+        "e559cd535d2a6dd833d2588c75b180754260dd3ff68ea9f6731a0e4478a6d114"
+    )
+    progress = result["learner_effective_engineering_health_progress_repair"]
+    assert progress["active_attempt"] == 7
+    assert progress["reauthorization_commitment_sha256"] == (
+        "a2d1347bef14848a5238f9a10c6e94da8eaa68593aa3d97e8a460dfbf8694d07"
+    )
     runner = result["construct_aligned_public_runner_implementation_result"]
     assert runner["status"].startswith("PASS_")
     assert runner["implementation_source_sha256"] == (
@@ -467,7 +481,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_5_BLOCKER_PRESERVED_HOST_CONTAINER_ATTESTATION_REPAIR_FROZEN_PENDING_ATTEMPT_6_NO_NEW_OUTCOME"
+    assert proof["status"] == "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_6_TIMEOUT_PRESERVED_PROGRESS_INSTRUMENTATION_REPAIR_FROZEN_PENDING_ATTEMPT_7_NO_NEW_OUTCOME"
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["repair_commitment_sha256"] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
     assert geometry_repair["triggering_attempt"]["public_model_inference_executed"] is False
@@ -652,6 +666,25 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert iterative["rolling_execution_policy"][
         "blanket_user_authorization_for_additional_ordinary_engineering_attempts"
     ] is True
+    attempt_6 = dict(
+        proof["learner_effective_engineering_health_iterative_attempt_6_result"]
+    )
+    attempt_6_commitment = attempt_6.pop("blocker_commitment_sha256")
+    assert attempt_6_commitment == digest(attempt_6)
+    assert attempt_6_commitment == (
+        "e559cd535d2a6dd833d2588c75b180754260dd3ff68ea9f6731a0e4478a6d114"
+    )
+    assert attempt_6["compact_aggregate"]["model_module_inference_count"] == 0
+    progress = dict(proof["learner_effective_engineering_health_progress_repair"])
+    progress_commitment = progress.pop("reauthorization_commitment_sha256")
+    assert progress_commitment == digest(progress)
+    assert progress_commitment == (
+        "a2d1347bef14848a5238f9a10c6e94da8eaa68593aa3d97e8a460dfbf8694d07"
+    )
+    assert progress["preserved_without_change"]["attempt_6_blocker_sha256"] == (
+        attempt_6_commitment
+    )
+    assert progress["active_attempt_resource_policy"]["attempt"] == 7
     assert health["unchanged_downstream_contract"]["accepted_synthetic_seconds_exact"] == 3600
     assert proof["budgets_credited_hours"] == {
         "real": 1,
@@ -669,7 +702,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
-    assert proof["schema_version"] == 27
+    assert proof["schema_version"] == 28
     premodel = proof["calibration_C"]["extractor"]["mechanistic_training_tuple_premodel_result"]
     assert premodel["dependency_manifest_commitment_sha256"] == (
         "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"

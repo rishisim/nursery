@@ -49,6 +49,8 @@ def _historical_health_config() -> dict:
     config.pop("learner_effective_engineering_health_parser_repair_reauthorization")
     config.pop("learner_effective_engineering_health_parser_repair_result")
     config.pop("learner_effective_engineering_health_iterative_reauthorization")
+    config.pop("learner_effective_engineering_health_iterative_attempt_6_result")
+    config.pop("learner_effective_engineering_health_progress_repair")
     return config
 
 
@@ -631,7 +633,7 @@ def test_tuple_health_metric_release_requires_seven_unique_passed_modules() -> N
         MODULE._tuple_health_metric_release(wrong_status, scientific)
 
 
-def test_tuple_health_budget_enforces_active_iterative_attempt_and_limits() -> None:
+def test_tuple_health_budget_enforces_active_progress_attempt_and_limits() -> None:
     config = _config()
     prior = [
         {
@@ -679,18 +681,27 @@ def test_tuple_health_budget_enforces_active_iterative_attempt_and_limits() -> N
             "new_storage_GiB": 9.872019290924072e-7,
             "direct_monetary_cost_USD": 0,
         },
+        {
+            "attempt": 6,
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+            "GPU_count": 1,
+            "wall_minutes": 15.0,
+            "GPU_hours": 0.25,
+            "new_storage_GiB": 7.729977369308472e-7,
+            "direct_monetary_cost_USD": 0,
+        },
     ]
-    budget = MODULE._tuple_health_budget(6, prior, config)
-    assert budget["attempt"] == 6
+    budget = MODULE._tuple_health_budget(7, prior, config)
+    assert budget["attempt"] == 7
     assert budget["GPU_type"] == "NVIDIA_H100_NVL_3G_47GB_MIG"
     assert budget["GPU_count"] == 1
     assert budget["per_submission_wall_minutes_max"] == 15
-    assert budget["remaining_GPU_hours"] == pytest.approx(0.25)
+    assert budget["remaining_GPU_hours"] == pytest.approx(0.2566666666666666)
     assert budget["remaining_storage_GiB"] == pytest.approx(1.0)
     assert budget["direct_monetary_cost_USD"] == 0
 
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ATTEMPT_BUDGET"):
-        MODULE._tuple_health_budget(7, prior, config)
+        MODULE._tuple_health_budget(8, prior, config)
 
 
 @pytest.mark.parametrize(
@@ -924,9 +935,28 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
         "blanket_user_authorization_for_additional_ordinary_engineering_attempts"
     ] is True
 
+    attempt_6 = MODULE._engineering_health_iterative_attempt_6_result(config)
+    assert attempt_6["blocker_commitment_sha256"] == (
+        "e559cd535d2a6dd833d2588c75b180754260dd3ff68ea9f6731a0e4478a6d114"
+    )
+    assert attempt_6["submission_provenance"]["job_id"] == 316604
+    assert attempt_6["compact_aggregate"]["scientific_metric_count"] == 0
+    assert attempt_6["stable_aggregate_diagnosis"][
+        "exact_in_container_stage_identified"
+    ] is False
+
+    progress = MODULE._engineering_health_progress_repair(config)
+    assert progress["reauthorization_commitment_sha256"] == (
+        "a2d1347bef14848a5238f9a10c6e94da8eaa68593aa3d97e8a460dfbf8694d07"
+    )
+    assert progress["active_attempt_resource_policy"]["attempt"] == 7
+    assert progress["failure_specific_repair"][
+        "progress_record_used_for_scientific_metrics_or_selection"
+    ] is False
+
     with pytest.raises(
         RuntimeError,
-        match="E_TUPLE_HEALTH_ITERATIVE_REAUTHORIZED_ATTEMPT",
+        match="E_TUPLE_HEALTH_PROGRESS_REPAIR_ATTEMPT",
     ):
         MODULE.run_tuple_health(
             argparse.Namespace(
@@ -1014,6 +1044,30 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
         match="E_TUPLE_HEALTH_ITERATIVE_REAUTHORIZATION_COMMITMENT",
     ):
         MODULE._engineering_health_iterative_reauthorization(mutated)
+
+    mutated = json.loads(json.dumps(config))
+    result = mutated["learner_effective_engineering_health_iterative_attempt_6_result"]
+    result["compact_aggregate"]["scientific_metric_count"] = 1
+    payload = json.loads(json.dumps(result))
+    payload.pop("blocker_commitment_sha256")
+    result["blocker_commitment_sha256"] = MODULE.digest(payload)
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_HEALTH_ITERATIVE_ATTEMPT_6_RESULT_COMMITMENT",
+    ):
+        MODULE._engineering_health_iterative_attempt_6_result(mutated)
+
+    mutated = json.loads(json.dumps(config))
+    progress = mutated["learner_effective_engineering_health_progress_repair"]
+    progress["failure_specific_repair"]["stable_stage_codes_only"] = False
+    payload = json.loads(json.dumps(progress))
+    payload.pop("reauthorization_commitment_sha256")
+    progress["reauthorization_commitment_sha256"] = MODULE.digest(payload)
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_HEALTH_PROGRESS_REPAIR_COMMITMENT",
+    ):
+        MODULE._engineering_health_progress_repair(mutated)
 
 
 def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
@@ -1120,6 +1174,44 @@ def test_health_and_science_configuration_commitments_ignore_outcome_state() -> 
     )
 
 
+def test_progress_record_is_private_aggregate_only_and_fail_closed(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "engineering-progress.json"
+    MODULE._write_tuple_health_progress(
+        path,
+        attempt=7,
+        stage="DEPENDENCY_CODE_TREE",
+        stage_ordinal=5,
+        module_ordinal=0,
+        replicate=0,
+        update_count=4,
+        submission_started_epoch=__import__("time").time() - 1.0,
+    )
+    value = json.loads(path.read_text())
+    assert path.stat().st_mode & 0o777 == 0o600
+    assert value["attempt"] == 7
+    assert value["stage"] == "DEPENDENCY_CODE_TREE"
+    assert value["scientific_metric_count"] == 0
+    assert value["sensitive_detail_field_count"] == 0
+    assert not any(
+        token in key.casefold()
+        for key in value
+        for token in ("path", "filename", "hash", "prompt", "prediction", "label")
+    )
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_PROGRESS_RECORD"):
+        MODULE._write_tuple_health_progress(
+            path,
+            attempt=7,
+            stage="UNDECLARED_STAGE",
+            stage_ordinal=5,
+            module_ordinal=0,
+            replicate=0,
+            update_count=5,
+            submission_started_epoch=__import__("time").time(),
+        )
+
+
 def test_tuple_topology_separates_h100_health_from_a30_science(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1203,14 +1295,14 @@ def test_tuple_health_cli_emits_one_exact_allowlisted_line(
             "--container-attestation",
             str(tmp_path / "container-attestation.json"),
             "--attempt",
-            "6",
+            "7",
             "--device",
             "cuda",
         ],
     )
     MODULE.main()
     lines = capsys.readouterr().out.splitlines()
-    assert observed_attempts == [6]
+    assert observed_attempts == [7]
     assert len(lines) == 1
     assert set(json.loads(lines[0])) == set(MODULE.TUPLE_HEALTH_FIELDS)
 
@@ -1297,6 +1389,8 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop("learner_effective_engineering_health_parser_repair_reauthorization")
     historical_config.pop("learner_effective_engineering_health_parser_repair_result")
     historical_config.pop("learner_effective_engineering_health_iterative_reauthorization")
+    historical_config.pop("learner_effective_engineering_health_iterative_attempt_6_result")
+    historical_config.pop("learner_effective_engineering_health_progress_repair")
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)
     manifest = _fixture_manifest()

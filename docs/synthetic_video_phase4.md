@@ -570,6 +570,15 @@ to dereference the host-only target. The same attestation path is used for later
 scientific development/holdout so stable dependency commitments remain equal.
 No scientific input or rule changes.
 
+Attempt 6, Juno job 316604, then timed out at 15:24. Both private attestations
+were present within eight seconds, but no root-level microfixture projection,
+module inference, full result, trace, terminal output, or scientific metric was
+written. This is sealed as engineering timeout `e559cd53…6d114`, not a
+scientific no-go. Before attempt 7, schema 28 adds a private mode-0600 atomic
+progress record containing only stable stage and module-ordinal fields. The
+full 28-case, two-replicate production-path suite and every scientific input,
+threshold, and decision rule remain unchanged.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

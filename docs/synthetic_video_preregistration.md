@@ -1948,6 +1948,16 @@ same frozen container hash/bytes for health and later scientific jobs. Attempt
 6 retains one H100 NVL `3g.47gb` slice, eight CPUs, 32 GiB, 15 minutes, at most
 0.25 slice-GPU-hours and 1 GiB, and $0. All scientific rules remain unchanged.
 
+Attempt 6 (job 316604) timed out after 15:24 with the wrapper, container, and
+topology records present but before any microfixture projection, module
+inference, full health record, private trace, terminal output, or scientific
+metric. Result commitment `e559cd53…6d114` preserves that engineering outcome.
+The prospective attempt-7 repair, commitment `a2d1347b…94d07`, adds only one
+private atomic progress record with stable stage, module ordinal, replicate,
+update count, and elapsed time. It records no paths, filenames, artifact hashes,
+prompts, rows, labels, predictions, or metrics and cannot enter scientific
+selection. Attempt 7 retains the same H100 topology and per-attempt ceiling.
+
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only
 holdout result is a scientific no-go. Governed C remains conditional on a full

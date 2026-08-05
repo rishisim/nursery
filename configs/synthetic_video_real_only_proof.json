@@ -1,6 +1,6 @@
 {
-  "schema_version": 27,
-  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_5_BLOCKER_PRESERVED_HOST_CONTAINER_ATTESTATION_REPAIR_FROZEN_PENDING_ATTEMPT_6_NO_NEW_OUTCOME",
+  "schema_version": 28,
+  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_6_TIMEOUT_PRESERVED_PROGRESS_INSTRUMENTATION_REPAIR_FROZEN_PENDING_ATTEMPT_7_NO_NEW_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -1603,6 +1603,121 @@
     "reauthorization_commitment_scope": "canonical JSON of this amendment excluding reauthorization_commitment_sha256",
     "reauthorization_commitment_sha256": "3114e1763f65dbeb8b2f89bb2a0480c86f4266f888c1ac2ff740bee85d357ab9"
   },
+  "learner_effective_engineering_health_iterative_attempt_6_result": {
+    "status": "ENGINEERING_TIMEOUT_ATTEMPT_6_BEFORE_MICROFIXTURE_PROJECTION_OR_FULL_RESULT_NO_SCIENTIFIC_METRICS_OPENED",
+    "observed_on": "2026-08-04",
+    "route_id": "construct-aligned-engineering-health",
+    "classification": "ENGINEERING_RUNTIME_TIMEOUT_NOT_SCIENTIFIC_NO_GO",
+    "preserved_attempt_5_blocker_sha256": "b05dc8da3155561b182b3bcfa50c851f83828b34e063918306bdfb57fdedeb9c",
+    "submission_provenance": {
+      "job_id": 316604,
+      "attempt": 6,
+      "scheduler_state": "TIMEOUT",
+      "scheduler_exit_code": "0:0",
+      "scheduler_elapsed_seconds": 924,
+      "batch_CPU_seconds": 12.456,
+      "batch_max_RSS_KiB": 6618920,
+      "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "wall_minutes_requested": 15,
+      "DDP": false,
+      "direct_monetary_cost_USD": 0
+    },
+    "compact_aggregate": {
+      "wrapper_marker_count": 1,
+      "container_attestation_count": 1,
+      "topology_attestation_count": 1,
+      "microfixture_manifest_count": 0,
+      "full_result_count": 0,
+      "private_trace_count": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "stable_error_code_count": 0,
+      "model_module_inference_count": 0,
+      "scientific_metric_count": 0,
+      "retained_file_count": 3,
+      "retained_bytes": 830
+    },
+    "stable_aggregate_diagnosis": {
+      "wrapper_to_container_attestation_seconds": 6.0,
+      "wrapper_to_topology_attestation_seconds": 8.0,
+      "last_persisted_stage": "TOPOLOGY_ATTESTED_BEFORE_CONTAINER_RUNNER_PROGRESS_RECORD",
+      "exact_in_container_stage_identified": false,
+      "progress_instrumentation_required": true,
+      "model_or_scientific_outcome_used": false
+    },
+    "resource_accounting": {
+      "attempt_GPU_hours_actual": 0.25666666666666665,
+      "protocol_accounted_cumulative_GPU_hours_actual": 1.0167105815145705,
+      "attempt_retained_storage_GiB": 7.729977369308472e-7,
+      "protocol_accounted_cumulative_retained_storage_GiB": 3.6098062992095947e-6,
+      "direct_monetary_cost_USD": 0
+    },
+    "terminal_gate": {
+      "scientific_decision_opened": false,
+      "public_development_authorized": false,
+      "governed_C_authorized": false,
+      "LTX_or_synthetic_learner_run": false,
+      "attempt_7_authorized_only_after_prospective_progress_repair_commit_and_push": true
+    },
+    "blocker_commitment_scope": "canonical JSON of this result excluding blocker_commitment_sha256",
+    "blocker_commitment_sha256": "e559cd535d2a6dd833d2588c75b180754260dd3ff68ea9f6731a0e4478a6d114"
+  },
+  "learner_effective_engineering_health_progress_repair": {
+    "status": "FROZEN_AFTER_ATTEMPT_6_TIMEOUT_BEFORE_PROGRESS_INSTRUMENTED_ATTEMPT_7_OR_NEW_OUTCOME",
+    "effective_on": "2026-08-04",
+    "scope": "ENGINEERING_PROGRESS_INSTRUMENTATION_ONLY",
+    "preserved_without_change": {
+      "attempt_6_blocker_sha256": "e559cd535d2a6dd833d2588c75b180754260dd3ff68ea9f6731a0e4478a6d114",
+      "attempt_5_blocker_sha256": "b05dc8da3155561b182b3bcfa50c851f83828b34e063918306bdfb57fdedeb9c",
+      "public_fixture_manifest_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "models_weights_fixtures_preprocessing_thresholds_metrics_seeds_module_behavior_scientific_gates_and_downstream_contract": true
+    },
+    "failure_specific_repair": {
+      "canonical_progress_record": "engineering-progress.json",
+      "progress_record_schema_version": 1,
+      "progress_record_mode_octal": "0600",
+      "atomic_replace": true,
+      "stable_stage_codes_only": true,
+      "paths_filenames_hashes_prompts_rows_predictions_labels_or_metrics_recorded": false,
+      "dependency_preflight_stage_boundaries_recorded": true,
+      "fixture_projection_stage_boundaries_recorded": true,
+      "module_ordinal_and_replicate_stage_boundaries_recorded": true,
+      "full_28_case_two_replicate_suite_unchanged": true,
+      "progress_record_used_for_scientific_metrics_or_selection": false,
+      "scientific_metric_count": 0,
+      "model_fixture_threshold_metric_seed_or_gate_changed": false
+    },
+    "active_attempt_resource_policy": {
+      "attempt": 7,
+      "submission_count": 1,
+      "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "DDP": false,
+      "wall_minutes_max": 15,
+      "GPU_hours_max": 0.25,
+      "new_storage_GiB_max": 1.0,
+      "prior_protocol_accounted_GPU_hours_actual": 1.0167105815145705,
+      "active_aggregate_GPU_hours_max": 1.2667105815145705,
+      "prior_health_run_storage_GiB_actual": 3.6098062992095947e-6,
+      "active_aggregate_new_storage_GiB_max": 1.0000036098062992,
+      "direct_monetary_cost_USD": 0
+    },
+    "execution_and_stop_rule": {
+      "attempt_7_is_complete_health_suite_not_shallow_diagnostic": true,
+      "same_single_process_H100_slice_topology": true,
+      "metric_withholding_on_timeout_or_error": true,
+      "on_timeout_use_only_last_stable_progress_stage_for_next_outcome_independent_repair": true,
+      "valid_complete_scientific_result_remains_terminal_under_frozen_gate": true
+    },
+    "new_health_or_scientific_outcome_opened": false,
+    "reauthorization_commitment_scope": "canonical JSON of this amendment excluding reauthorization_commitment_sha256",
+    "reauthorization_commitment_sha256": "a2d1347bef14848a5238f9a10c6e94da8eaa68593aa3d97e8a460dfbf8694d07"
+  },
   "governance_incident": {
     "observed_on": "2026-08-02",
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_GOVERNED_PROCESSING_RESUMED",
@@ -1650,7 +1765,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_AND_ATTEMPT_3_4_AND_5_ENGINEERING_BLOCKERS_PRESERVED_HOST_CONTAINER_ATTESTATION_REPAIR_ATTEMPT_6_PENDING_C_LTX_AND_SYNTHETIC_LEARNER_CONDITIONAL_NOT_RUN",
+    "status": "PRIOR_CALIBRATION_NO_GOS_AND_ATTEMPT_3_4_5_BLOCKERS_AND_ATTEMPT_6_TIMEOUT_PRESERVED_PROGRESS_INSTRUMENTED_ATTEMPT_7_PENDING_C_LTX_AND_SYNTHETIC_LEARNER_CONDITIONAL_NOT_RUN",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -1673,7 +1788,7 @@
       "pre_seal_label_semantics_correction": "/public_no_hand_review_label_semantics_correction",
       "blind_no_hand_review_seal": "/public_no_hand_review_seal_result",
       "prior_public_qualification_terminal_result": "/learner_effective_public_development_result",
-      "public_qualification_current_state": "/learner_effective_engineering_health_iterative_reauthorization",
+      "public_qualification_current_state": "/learner_effective_engineering_health_progress_repair",
       "public_qualification_resource": "/learner_effective_public_qualification_resource_amendment",
       "preserved_complete_source_no_go": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_complete_source_result",
       "governed_C_and_episode_plan_order": "/construct_aligned_ltx_resume_amendment/execution_order",

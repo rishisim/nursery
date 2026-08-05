@@ -593,6 +593,12 @@ ENGINEERING_HEALTH_PARSER_REPAIR_BLOCKER_SHA256 = (
 ENGINEERING_HEALTH_ITERATIVE_REAUTHORIZATION_SHA256 = (
     "3114e1763f65dbeb8b2f89bb2a0480c86f4266f888c1ac2ff740bee85d357ab9"
 )
+ENGINEERING_HEALTH_ITERATIVE_ATTEMPT_6_BLOCKER_SHA256 = (
+    "e559cd535d2a6dd833d2588c75b180754260dd3ff68ea9f6731a0e4478a6d114"
+)
+ENGINEERING_HEALTH_PROGRESS_REPAIR_SHA256 = (
+    "a2d1347bef14848a5238f9a10c6e94da8eaa68593aa3d97e8a460dfbf8694d07"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -648,7 +654,7 @@ def _construct_aligned_ltx_resume_amendment(
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
+        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28}
         or value.get("status")
         != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     ):
@@ -706,7 +712,7 @@ def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28}
         or value.get("status")
         != "FROZEN_BEFORE_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -775,7 +781,7 @@ def _engineering_health_resource_redirect(
     payload = json.loads(json.dumps(value))
     expected = payload.pop("amendment_commitment_sha256", None)
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28}
         or value.get("status")
         != "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "SCHEDULER_AND_RESOURCE_LATENCY_ONLY"
@@ -865,6 +871,26 @@ def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
     redirect = _engineering_health_resource_redirect(cfg)
     _engineering_health_dependency_restore(cfg)
     _engineering_health_topology_guard_repair(cfg)
+    if "learner_effective_engineering_health_progress_repair" in cfg:
+        active = _engineering_health_progress_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]
+        return {
+            "GPU_type": active["GPU_type"],
+            "GPU_count": active["GPU_count"],
+            "CPU_count": active["CPU_count"],
+            "memory_GiB": active["memory_GiB"],
+            "DDP": active["DDP"],
+            "per_submission_wall_minutes_max": active["wall_minutes_max"],
+            "initial_plus_repair_resmoke_submission_count_max": active["attempt"],
+            "aggregate_GPU_hours_max": active[
+                "active_aggregate_GPU_hours_max"
+            ],
+            "new_storage_GiB_max": active[
+                "active_aggregate_new_storage_GiB_max"
+            ],
+            "direct_monetary_cost_USD": active["direct_monetary_cost_USD"],
+        }
     if "learner_effective_engineering_health_iterative_reauthorization" in cfg:
         active = _engineering_health_iterative_reauthorization(cfg)[
             "active_attempt_resource_policy"
@@ -932,7 +958,7 @@ def _engineering_health_dependency_restore(
         ["transformers", "4.57.6"],
     ]
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_DEPENDENCY_CACHE_MISS_BEFORE_ATTEMPT_2_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1037,7 +1063,7 @@ def _engineering_health_topology_guard_repair(
     repair = value.get("repair", {})
     budget = value.get("remaining_health_budget", {})
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_2_REDUNDANT_TOPOLOGY_GUARD_FAILURE_BEFORE_ATTEMPT_3_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1120,7 +1146,7 @@ def _engineering_health_terminal_result(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {22, 23, 24, 25, 26, 27}
+        cfg.get("schema_version") not in {22, 23, 24, 25, 26, 27, 28}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ROUTE_EXHAUSTED_BEFORE_MODEL_INFERENCE_NO_SCIENTIFIC_METRICS_OPENED"
         or expected != ENGINEERING_HEALTH_BLOCKER_SHA256
@@ -1196,7 +1222,7 @@ def _engineering_health_reauthorization(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("effective_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") not in {23, 24, 25, 26, 27}
+        cfg.get("schema_version") not in {23, 24, 25, 26, 27, 28}
         or value.get("status")
         != "FROZEN_AFTER_SEALED_BLOCKER_BEFORE_REAUTHORIZED_ATTEMPT_4_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope")
@@ -1311,7 +1337,7 @@ def _engineering_health_reauthorization_result(
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {24, 25, 26, 27}
+        cfg.get("schema_version") not in {24, 25, 26, 27, 28}
         or value.get("status")
         != "ENGINEERING_BLOCKER_REAUTHORIZED_ATTEMPT_4_EXHAUSTED_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -1426,7 +1452,7 @@ def _engineering_health_parser_repair_reauthorization(
     resource = value.get("effective_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") not in {25, 26, 27}
+        cfg.get("schema_version") not in {25, 26, 27, 28}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_4_BLOCKER_BEFORE_SINGLE_POST_BLOCKER_ATTEMPT_5_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "ONE_SUBMISSION_CLI_ATTEMPT_BOUND_REPAIR_ONLY"
@@ -1514,7 +1540,7 @@ def _engineering_health_parser_repair_result(
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {26, 27}
+        cfg.get("schema_version") not in {26, 27, 28}
         or value.get("status")
         != "ENGINEERING_BLOCKER_POST_BLOCKER_ATTEMPT_5_EXHAUSTED_BEFORE_MODEL_LOADING_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -1653,7 +1679,7 @@ def _engineering_health_iterative_reauthorization(
     resource = value.get("active_attempt_resource_policy", {})
     rolling = value.get("rolling_execution_policy", {})
     if (
-        cfg.get("schema_version") != 27
+        cfg.get("schema_version") not in {27, 28}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_5_BLOCKER_BEFORE_HOST_CONTAINER_ATTESTATION_REPAIR_ATTEMPT_6_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1750,6 +1776,181 @@ def _engineering_health_iterative_reauthorization(
         or value.get("new_health_or_scientific_outcome_opened") is not False
     ):
         raise RuntimeError("E_TUPLE_HEALTH_ITERATIVE_REAUTHORIZATION_COMMITMENT")
+    return value
+
+
+def _engineering_health_iterative_attempt_6_result(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the timeout record from the first rolling-authorized attempt."""
+
+    iterative = _engineering_health_iterative_reauthorization(cfg)
+    try:
+        value = cfg[
+            "learner_effective_engineering_health_iterative_attempt_6_result"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError(
+            "E_TUPLE_HEALTH_ITERATIVE_ATTEMPT_6_RESULT_MISSING"
+        ) from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("blocker_commitment_sha256", None)
+    submission = value.get("submission_provenance", {})
+    compact = value.get("compact_aggregate", {})
+    diagnosis = value.get("stable_aggregate_diagnosis", {})
+    resource = value.get("resource_accounting", {})
+    gate = value.get("terminal_gate", {})
+    if (
+        cfg.get("schema_version") != 28
+        or value.get("status")
+        != "ENGINEERING_TIMEOUT_ATTEMPT_6_BEFORE_MICROFIXTURE_PROJECTION_OR_FULL_RESULT_NO_SCIENTIFIC_METRICS_OPENED"
+        or value.get("route_id") != "construct-aligned-engineering-health"
+        or value.get("classification")
+        != "ENGINEERING_RUNTIME_TIMEOUT_NOT_SCIENTIFIC_NO_GO"
+        or value.get("preserved_attempt_5_blocker_sha256")
+        != iterative["preserved_without_change"]["attempt_5_blocker_sha256"]
+        or expected != ENGINEERING_HEALTH_ITERATIVE_ATTEMPT_6_BLOCKER_SHA256
+        or digest(payload) != expected
+        or submission
+        != {
+            "job_id": 316604,
+            "attempt": 6,
+            "scheduler_state": "TIMEOUT",
+            "scheduler_exit_code": "0:0",
+            "scheduler_elapsed_seconds": 924,
+            "batch_CPU_seconds": 12.456,
+            "batch_max_RSS_KiB": 6618920,
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+            "GPU_count": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "wall_minutes_requested": 15,
+            "DDP": False,
+            "direct_monetary_cost_USD": 0,
+        }
+        or compact
+        != {
+            "wrapper_marker_count": 1,
+            "container_attestation_count": 1,
+            "topology_attestation_count": 1,
+            "microfixture_manifest_count": 0,
+            "full_result_count": 0,
+            "private_trace_count": 0,
+            "stdout_bytes": 0,
+            "stderr_bytes": 0,
+            "stable_error_code_count": 0,
+            "model_module_inference_count": 0,
+            "scientific_metric_count": 0,
+            "retained_file_count": 3,
+            "retained_bytes": 830,
+        }
+        or diagnosis
+        != {
+            "wrapper_to_container_attestation_seconds": 6.0,
+            "wrapper_to_topology_attestation_seconds": 8.0,
+            "last_persisted_stage": "TOPOLOGY_ATTESTED_BEFORE_CONTAINER_RUNNER_PROGRESS_RECORD",
+            "exact_in_container_stage_identified": False,
+            "progress_instrumentation_required": True,
+            "model_or_scientific_outcome_used": False,
+        }
+        or resource
+        != {
+            "attempt_GPU_hours_actual": 0.25666666666666665,
+            "protocol_accounted_cumulative_GPU_hours_actual": 1.0167105815145705,
+            "attempt_retained_storage_GiB": 7.729977369308472e-7,
+            "protocol_accounted_cumulative_retained_storage_GiB": 3.6098062992095947e-6,
+            "direct_monetary_cost_USD": 0,
+        }
+        or gate
+        != {
+            "scientific_decision_opened": False,
+            "public_development_authorized": False,
+            "governed_C_authorized": False,
+            "LTX_or_synthetic_learner_run": False,
+            "attempt_7_authorized_only_after_prospective_progress_repair_commit_and_push": True,
+        }
+        or value.get("blocker_commitment_scope")
+        != "canonical JSON of this result excluding blocker_commitment_sha256"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_ITERATIVE_ATTEMPT_6_RESULT_COMMITMENT")
+    return value
+
+
+def _engineering_health_progress_repair(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Validate the outcome-independent attempt-7 progress instrumentation."""
+
+    attempt_6 = _engineering_health_iterative_attempt_6_result(cfg)
+    try:
+        value = cfg["learner_effective_engineering_health_progress_repair"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_PROGRESS_REPAIR_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("reauthorization_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    repair = value.get("failure_specific_repair", {})
+    resource = value.get("active_attempt_resource_policy", {})
+    execution = value.get("execution_and_stop_rule", {})
+    if (
+        cfg.get("schema_version") != 28
+        or value.get("status")
+        != "FROZEN_AFTER_ATTEMPT_6_TIMEOUT_BEFORE_PROGRESS_INSTRUMENTED_ATTEMPT_7_OR_NEW_OUTCOME"
+        or value.get("scope") != "ENGINEERING_PROGRESS_INSTRUMENTATION_ONLY"
+        or expected != ENGINEERING_HEALTH_PROGRESS_REPAIR_SHA256
+        or digest(payload) != expected
+        or preserved
+        != {
+            "attempt_6_blocker_sha256": attempt_6["blocker_commitment_sha256"],
+            "attempt_5_blocker_sha256": ENGINEERING_HEALTH_PARSER_REPAIR_BLOCKER_SHA256,
+            "public_fixture_manifest_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+            "models_weights_fixtures_preprocessing_thresholds_metrics_seeds_module_behavior_scientific_gates_and_downstream_contract": True,
+        }
+        or repair
+        != {
+            "canonical_progress_record": "engineering-progress.json",
+            "progress_record_schema_version": 1,
+            "progress_record_mode_octal": "0600",
+            "atomic_replace": True,
+            "stable_stage_codes_only": True,
+            "paths_filenames_hashes_prompts_rows_predictions_labels_or_metrics_recorded": False,
+            "dependency_preflight_stage_boundaries_recorded": True,
+            "fixture_projection_stage_boundaries_recorded": True,
+            "module_ordinal_and_replicate_stage_boundaries_recorded": True,
+            "full_28_case_two_replicate_suite_unchanged": True,
+            "progress_record_used_for_scientific_metrics_or_selection": False,
+            "scientific_metric_count": 0,
+            "model_fixture_threshold_metric_seed_or_gate_changed": False,
+        }
+        or resource
+        != {
+            "attempt": 7,
+            "submission_count": 1,
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+            "GPU_count": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "DDP": False,
+            "wall_minutes_max": 15,
+            "GPU_hours_max": 0.25,
+            "new_storage_GiB_max": 1.0,
+            "prior_protocol_accounted_GPU_hours_actual": 1.0167105815145705,
+            "active_aggregate_GPU_hours_max": 1.2667105815145705,
+            "prior_health_run_storage_GiB_actual": 3.6098062992095947e-6,
+            "active_aggregate_new_storage_GiB_max": 1.0000036098062992,
+            "direct_monetary_cost_USD": 0,
+        }
+        or execution
+        != {
+            "attempt_7_is_complete_health_suite_not_shallow_diagnostic": True,
+            "same_single_process_H100_slice_topology": True,
+            "metric_withholding_on_timeout_or_error": True,
+            "on_timeout_use_only_last_stable_progress_stage_for_next_outcome_independent_repair": True,
+            "valid_complete_scientific_result_remains_terminal_under_frozen_gate": True,
+        }
+        or value.get("new_health_or_scientific_outcome_opened") is not False
+        or value.get("reauthorization_commitment_scope")
+        != "canonical JSON of this amendment excluding reauthorization_commitment_sha256"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_PROGRESS_REPAIR_COMMITMENT")
     return value
 
 
@@ -4559,6 +4760,8 @@ def _tuple_health_budget(
             raise RuntimeError("E_TUPLE_HEALTH_RESOURCE_NONFINITE")
         if wall > float(resource["per_submission_wall_minutes_max"]):
             raise RuntimeError("E_TUPLE_HEALTH_WALL_BUDGET")
+        if gpu_hours > float(resource["per_submission_wall_minutes_max"]) / 60.0:
+            raise RuntimeError("E_TUPLE_HEALTH_GPU_HOUR_BUDGET")
         if cost != float(resource["direct_monetary_cost_USD"]):
             raise RuntimeError("E_TUPLE_HEALTH_COST_BUDGET")
         total_gpu_hours += gpu_hours
@@ -10565,13 +10768,20 @@ def _tuple_health_dependency_preflight(
     public: Path,
     cfg: dict[str, Any],
     container_record: dict[str, Any],
+    progress: Any | None = None,
 ) -> dict[str, Any]:
     """Rehash every production dependency family before GPU model loading."""
 
+    def mark(stage: str, ordinal: int) -> None:
+        if progress is not None:
+            progress(stage, ordinal, 0, 0)
+
+    mark("DEPENDENCY_CONFIGURATION", 1)
     health = _engineering_health_amendment(cfg)
     dependency_restore = _engineering_health_dependency_restore(cfg)
     topology_guard_repair = _engineering_health_topology_guard_repair(cfg)
     configuration_commitment = _tuple_health_configuration_preflight(cfg)
+    mark("DEPENDENCY_RUNTIME_MANIFEST", 2)
     runtime_cfg = _tuple_runtime_amendment(cfg)
     runtime = _verify_tuple_runtime_manifest(public, cfg)
     model_root = _tuple_model_root(public)
@@ -10593,6 +10803,7 @@ def _tuple_health_dependency_preflight(
     ]:
         raise RuntimeError("E_TUPLE_HEALTH_CONTAINER_COMMITMENT")
 
+    mark("DEPENDENCY_RUNTIME_DISTRIBUTIONS", 3)
     for artifact in runtime.get("dependency_artifacts", []):
         records.append(
             {
@@ -10604,6 +10815,7 @@ def _tuple_health_dependency_preflight(
                 ),
             }
         )
+    mark("DEPENDENCY_TEXT_ENCODER", 4)
     for artifact in runtime.get("bert_base_uncased", {}).get("files", []):
         records.append(
             {
@@ -10619,13 +10831,14 @@ def _tuple_health_dependency_preflight(
         "installed_distributions"
     ):
         raise RuntimeError("E_TUPLE_HEALTH_RUNTIME_DISTRIBUTIONS")
-    for family, root in (
+    for ordinal, (family, root) in enumerate((
         ("runtime_pydeps_tree", model_root / "runtime-pydeps"),
         (
             "activity_pydeps_tree",
             public / "models/activity-pydeps/egohod_egovideo_l_zero_shot",
         ),
-    ):
+    ), start=5):
+        mark("DEPENDENCY_CODE_TREE", ordinal)
         records.append({"family": family, **_tuple_health_tree_commitment(root)})
 
     premodel = cfg["calibration_C"]["extractor"][
@@ -10652,6 +10865,7 @@ def _tuple_health_dependency_preflight(
         "wordfreq-3.0.2-py3-none-any.whl": model_root
         / "wheels/wordfreq-3.0.2-py3-none-any.whl",
     }
+    mark("DEPENDENCY_PUBLIC_ARTIFACTS", 7)
     for name, path in artifact_paths.items():
         records.append(
             {
@@ -10661,6 +10875,7 @@ def _tuple_health_dependency_preflight(
                 ),
             }
         )
+    mark("DEPENDENCY_ACTION_WEIGHT", 8)
     action_candidate, _runtime = _tuple_order_action_egohod_wiring(cfg)
     action_path = _resolve_tuple_egohod_checkpoint(public, action_candidate)
     records.append(
@@ -10680,7 +10895,10 @@ def _tuple_health_dependency_preflight(
         "SAM2": "sam2",
         "DINOv2": "dinov2",
     }
-    for family, directory in repository_names.items():
+    for ordinal, (family, directory) in enumerate(
+        repository_names.items(), start=9
+    ):
+        mark("DEPENDENCY_REPOSITORY_ARCHIVE", ordinal)
         source = premodel["repository_archives"][family]
         archive = model_root / "code" / f"{directory}-{source['commit']}.zip"
         records.append(
@@ -10731,6 +10949,7 @@ def _tuple_health_dependency_preflight(
     ):
         raise RuntimeError("E_TUPLE_HEALTH_GROUNDING_PATCH")
 
+    mark("DEPENDENCY_LEARNER_CODE", 13)
     archive_record = runtime.get("egobaby_loader", {})
     egobaby_archive = (
         model_root
@@ -10762,6 +10981,7 @@ def _tuple_health_dependency_preflight(
         }
     )
 
+    mark("DEPENDENCY_ACTIVITY_CODE", 14)
     action_candidate, action_runtime = _tuple_order_action_egohod_wiring(cfg)
     activity_code = _activity_code_root(public, action_candidate["candidate_id"])
     clip_code = public / "models/activity-code/CLIP"
@@ -10793,6 +11013,7 @@ def _tuple_health_dependency_preflight(
             }
         )
 
+    mark("DEPENDENCY_HAND_ARCHIVE_MEMBERS", 15)
     egohos_archive = model_root / "weights/egohos_work_dirs.zip"
     expected_members = (
         ("seg_twohands_ccda", "seg_twohands_ccda.py"),
@@ -10827,6 +11048,7 @@ def _tuple_health_dependency_preflight(
                 }
             )
 
+    mark("DEPENDENCY_LANGUAGE_ARCHIVE", 16)
     language_archive = dependency_restore["active_language_dependency_archive"]
     records.append(
         {
@@ -10838,6 +11060,7 @@ def _tuple_health_dependency_preflight(
             ),
         }
     )
+    mark("DEPENDENCY_LANGUAGE_MODELS", 17)
     language = _tuple_language_artifact_record(public)
     record = {
         "schema_version": 1,
@@ -10869,6 +11092,7 @@ def _tuple_health_dependency_preflight(
             ),
         }
     )
+    mark("DEPENDENCY_COMPLETE", 18)
     return record
 
 
@@ -10993,6 +11217,83 @@ def _tuple_container_attestation(
     return {"sha256": value["sha256"], "bytes": value["bytes"]}
 
 
+TUPLE_HEALTH_PROGRESS_STAGES = frozenset(
+    {
+        "RUNNER_ENTRY",
+        "ATTESTATIONS_VALIDATED",
+        "DEPENDENCY_CONFIGURATION",
+        "DEPENDENCY_RUNTIME_MANIFEST",
+        "DEPENDENCY_RUNTIME_DISTRIBUTIONS",
+        "DEPENDENCY_TEXT_ENCODER",
+        "DEPENDENCY_CODE_TREE",
+        "DEPENDENCY_PUBLIC_ARTIFACTS",
+        "DEPENDENCY_ACTION_WEIGHT",
+        "DEPENDENCY_REPOSITORY_ARCHIVE",
+        "DEPENDENCY_LEARNER_CODE",
+        "DEPENDENCY_ACTIVITY_CODE",
+        "DEPENDENCY_HAND_ARCHIVE_MEMBERS",
+        "DEPENDENCY_LANGUAGE_ARCHIVE",
+        "DEPENDENCY_LANGUAGE_MODELS",
+        "DEPENDENCY_COMPLETE",
+        "FIXTURE_VERIFICATION",
+        "MICROFIXTURE_PROJECTION",
+        "MODULE_EXECUTION",
+        "HEALTH_COMPLETE",
+    }
+)
+
+
+def _write_tuple_health_progress(
+    path: Path,
+    *,
+    attempt: int,
+    stage: str,
+    stage_ordinal: int,
+    module_ordinal: int,
+    replicate: int,
+    update_count: int,
+    submission_started_epoch: float,
+) -> None:
+    """Persist only a stable aggregate engineering stage for timeout diagnosis."""
+
+    elapsed = max(0.0, time.time() - submission_started_epoch)
+    if (
+        type(attempt) is not int
+        or attempt < 1
+        or stage not in TUPLE_HEALTH_PROGRESS_STAGES
+        or type(stage_ordinal) is not int
+        or not 0 <= stage_ordinal <= 18
+        or type(module_ordinal) is not int
+        or not 0 <= module_ordinal <= len(TUPLE_QUALIFICATION_MODULE_IDS)
+        or type(replicate) is not int
+        or replicate not in {0, 1, 2}
+        or type(update_count) is not int
+        or update_count < 1
+        or not math.isfinite(elapsed)
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_PROGRESS_RECORD")
+    value = {
+        "schema_version": 1,
+        "attempt": attempt,
+        "stage": stage,
+        "stage_ordinal": stage_ordinal,
+        "module_ordinal": module_ordinal,
+        "replicate": replicate,
+        "update_count": update_count,
+        "elapsed_seconds": elapsed,
+        "scientific_metric_count": 0,
+        "sensitive_detail_field_count": 0,
+    }
+    write_private(path, value)
+    if (
+        not path.is_file()
+        or path.is_symlink()
+        or stat.S_IMODE(path.stat().st_mode) != 0o600
+        or json.loads(path.read_bytes()) != value
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_PROGRESS_RECORD")
+
+
 def _tuple_health_topology(
     device: str,
     engineering_health: bool = True,
@@ -11049,7 +11350,11 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
     """Run the bounded production-path microqualification with zero metrics."""
 
     cfg = json.loads(args.config.read_text())
-    if "learner_effective_engineering_health_iterative_reauthorization" in cfg:
+    if "learner_effective_engineering_health_progress_repair" in cfg:
+        _engineering_health_progress_repair(cfg)
+        if int(args.attempt) != 7:
+            raise RuntimeError("E_TUPLE_HEALTH_PROGRESS_REPAIR_ATTEMPT")
+    elif "learner_effective_engineering_health_iterative_reauthorization" in cfg:
         _engineering_health_iterative_reauthorization(cfg)
         if int(args.attempt) != 6:
             raise RuntimeError("E_TUPLE_HEALTH_ITERATIVE_REAUTHORIZED_ATTEMPT")
@@ -11123,6 +11428,29 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
         prior.append({"attempt": ordinal, "resource": resource})
     available = _tuple_health_budget(int(args.attempt), prior, cfg)
     before_bytes = _tuple_health_tree_bytes(root)
+    progress_path = attempt_root / "engineering-progress.json"
+    progress_update_count = 0
+
+    def record_progress(
+        stage: str,
+        stage_ordinal: int,
+        module_ordinal: int = 0,
+        replicate: int = 0,
+    ) -> None:
+        nonlocal progress_update_count
+        progress_update_count += 1
+        _write_tuple_health_progress(
+            progress_path,
+            attempt=int(args.attempt),
+            stage=stage,
+            stage_ordinal=stage_ordinal,
+            module_ordinal=module_ordinal,
+            replicate=replicate,
+            update_count=progress_update_count,
+            submission_started_epoch=submission_started_epoch,
+        )
+
+    record_progress("RUNNER_ENTRY", 0)
     module_results: list[dict[str, Any]] = []
     projection: dict[str, Any] | None = None
     dependency: dict[str, Any] | None = None
@@ -11140,6 +11468,7 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
             run_mode="health",
             attempt=int(args.attempt),
         )
+        record_progress("ATTESTATIONS_VALIDATED", 0)
         if (
             os.environ.get("HF_HUB_OFFLINE") != "1"
             or os.environ.get("TRANSFORMERS_OFFLINE") != "1"
@@ -11151,10 +11480,13 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
             args.public_root,
             cfg,
             container_record,
+            record_progress,
         )
+        record_progress("FIXTURE_VERIFICATION", 0)
         manifest, fixture_root = _verify_tuple_fixture_manifest(
             args.public_root, cfg
         )
+        record_progress("MICROFIXTURE_PROJECTION", 0)
         projection = _tuple_health_projection(manifest, cfg)
         projection_path = root / "microfixture-manifest.json"
         if projection_path.is_file():
@@ -11164,12 +11496,20 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
             write_private_new(projection_path, projection)
         no_hand = manifest["verified_no_hand_seal_commitment_sha256"]
         runners = _tuple_module_runners()
-        for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        for module_ordinal, module_id in enumerate(
+            TUPLE_QUALIFICATION_MODULE_IDS, start=1
+        ):
             module_scratch = args.scratch_root / module_id
             module_scratch.mkdir(parents=True, exist_ok=False, mode=0o700)
             try:
                 replicates = []
                 for replicate in (1, 2):
+                    record_progress(
+                        "MODULE_EXECUTION",
+                        0,
+                        module_ordinal,
+                        replicate,
+                    )
                     replicate_scratch = module_scratch / f"replicate-{replicate}"
                     replicate_scratch.mkdir(mode=0o700)
                     context = {
@@ -11213,6 +11553,7 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
                 module_results.append(
                     _tuple_health_error(module_id, error, trace_root)
                 )
+        record_progress("HEALTH_COMPLETE", 0)
     except BaseException as error:
         if isinstance(error, (KeyboardInterrupt, SystemExit)):
             raise
@@ -11321,7 +11662,9 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
 def _load_tuple_health_pass(
     public: Path, cfg: dict[str, Any], fixture_commitment: str
 ) -> dict[str, Any]:
-    if "learner_effective_engineering_health_iterative_reauthorization" in cfg:
+    if "learner_effective_engineering_health_progress_repair" in cfg:
+        _engineering_health_progress_repair(cfg)
+    elif "learner_effective_engineering_health_iterative_reauthorization" in cfg:
         _engineering_health_iterative_reauthorization(cfg)
     elif "learner_effective_engineering_health_parser_repair_result" in cfg:
         _engineering_health_parser_repair_result(cfg)
@@ -21327,7 +21670,7 @@ def main() -> None:
         "--container-attestation", type=Path, required=True
     )
     tuple_health_parser.add_argument(
-        "--attempt", type=int, choices=(1, 2, 3, 5, 6), required=True
+        "--attempt", type=int, choices=(1, 2, 3, 5, 6, 7), required=True
     )
     tuple_health_parser.add_argument("--device", default="cuda")
     tuple_qualify_parser = subparsers.add_parser("tuple-qualify")
