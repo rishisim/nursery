@@ -61,7 +61,7 @@
     },
     "controller_repairs": {
       "reason": "Development cells exposed wrist solver stutter and loss of the bilateral aperture immediately after historical qualification.",
-      "repair": "Bounded small-angle CCD, fixed pre-lift contact conditioning, and a fail-closed current-step opposing-contact carry gate.",
+      "repair": "Bounded small-angle CCD, fixed pre-lift contact conditioning, and fail-closed carry telemetry derived from the prior-step measured contact set.",
       "forbidden_rejected_trials": [
         "object or hand follower",
         "object recentering",
@@ -179,16 +179,43 @@
     "right_thumb_two_non_thumb_nonzero_impulse_dwell_s": 0.0,
     "meaningful_opposing_left_geometric_dwell_s": 0.3125,
     "meaningful_opposing_left_nonzero_impulse_dwell_s": 0.0,
-    "maintained_current_step_carry_contacts_s": 0.06666666666666667,
+    "controller_carry_telemetry_steps": 16,
+    "controller_carry_telemetry_dwell_s": 0.06666666666666667,
+    "literal_same_row_postqualification_opposing_geometry_steps": 15,
+    "literal_same_row_postqualification_opposing_geometry_dwell_s": 0.0625,
     "qualification_contact_latency_steps": 1,
-    "carry_telemetry_vs_same_row_geometry_mismatch_steps": 61,
     "lift_after_bimanual_qualification_m": 0.0,
     "supported_turn_during_bimanual_turn_deg": 57.0641,
     "maximum_hand_target_impulse_n_s": 0.07174254208803177,
     "minimum_hand_target_separation_m": -0.0008076466619968414,
     "assistance_ledger_entries": 0,
+    "assistance_evidence_scope": "The zero receipt counters and empty ledger are passive/hard-coded fields, not runtime detectors. Canonical source audit found no direct post-initialization free-object pose/velocity write, force, torque, parenting, or joint-construction API.",
+    "controller_target_tracking_disclosure": "Before qualification, interactionAnchorWorld follows the free target Rigidbody center of mass and drives only bounded kinematic hand waypoints; it is latched at qualification. This is scene-conditioned hand target tracking, not object assistance, and was not separately instrumented in the executed trace.",
     "video_decode": "three 1920x1080 30 fps 16 s streams fully decoded",
     "qa_label": "STAGE_D_NO_GO_PROMOTION_VETO",
     "promotion_consequence": "Ordered Gate E and final replay/rerender promotion were not attempted because unassisted free-object capture/lift failed. No earlier development run contributes to PASS or robustness."
+  },
+  "post_outcome_qa_record_correction": {
+    "schema": "embodied.corrected_qa_receipt.v1",
+    "classification": "post-outcome QA and decision-record correction; no new experiment",
+    "new_experiment": false,
+    "no_go_outcome_unchanged": true,
+    "executed_eligible_config_sha256": "3e24522b0cda7bce99f50d07fe94004a1ce1ea53ecd876bfb0600881fa085519",
+    "executed_primary_contract_sha256": "507677658a2df717d222856221abe7c66277bc4cc1ac0f6badf52c6be2ff4570",
+    "executed_trace_sha256": "9bf8f001acae001d32aa69b4e085460ea8429421940e5c299fe8c8065845abec",
+    "post_outcome_config_record_sha256": "7183b79cbe88ea70f2c66eb4bd1ddbba82c92f0c98c093118b053d06b1b06336",
+    "corrected_qa_source_sha256": "6e18c17354c84c2feb579aa7d89cb3b933ed6e5dc91195e177b6167847f2e197",
+    "invalid_stale_qa_report_sha256": "443d5d4bc2adf9acdf4b4f970c79b45d2a4043ba53574a24e81fb41c695a0226",
+    "corrected_ignored_qa_report_sha256": "1d1e23bfe93a8bbbaa2a937b83f79bc2ecea8e283a7cadad6efd634afabf64c7",
+    "corrected_ignored_qa_report_path": "runs/embodied_simulation/procedural_scene_gate/episodes/sage_living_corner__sunset_play/bimanual_cell/independent_qa_report.json",
+    "corrections": {
+      "contact_eligibility": "All qualification and dwell evidence is recomputed from separation <= 0.0005 m; 23,851 speculative positive-separation rows are retained only in raw truth and excluded from evidence.",
+      "carry_semantics": "Controller carry telemetry spans 16 steps (0.0666666667 s), while literal same-row post-qualification opposing geometry spans 15 steps (0.0625 s). The telemetry is a prior-step controller latch and is not current-step contact evidence.",
+      "clock": "Exact 8:1 mapping passes from integer step/frame continuity; maximum serialized floating timestamp drift is 1.271348446962861e-06 s and is diagnostic only.",
+      "camera_roll": "Maximum absolute optical roll is 7.9146270751953125 degrees from the registered capture ledger; the prior approximately 180-degree result incorrectly interpreted the world quaternion.",
+      "authority": "Zero object-write/force/joint counters and the empty assistance ledger are passive producer literals, not independent runtime detectors. Source audit found no direct object-assistance operation.",
+      "controller_tracking": "Before qualification, interactionAnchorWorld follows the free target center of mass and drives bounded hand waypoints only; this is disclosed scene-conditioned controller target tracking, not object assistance."
+    },
+    "promotion_label": "STAGE_D_NO_GO_PROMOTION_VETO"
   }
 }

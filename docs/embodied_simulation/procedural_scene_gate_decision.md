@@ -25,7 +25,7 @@ The final compiler freezes one generic aperture-aware target band for every room
 
 | Gate | Scientific status | Evidence |
 |---|---|---|
-| A | Implemented and qualified at the interface level | Frozen schemas/config/spec/source hashes; one authority receipt reports zero object writes, forces, attachments, joints, or assistance and no independent render timeline. |
+| A | Implemented and qualified at the interface level | Frozen schemas/config/spec/source hashes and one-state bindings. The authority receipt's zero object-write/force/joint counters are passive hard-coded fields, not runtime detectors; they are not used as independent proof. |
 | B | Development qualification only | Three garment sweeps reported approximately 2.843 mm maximum skin/collider error and zero measured garment/body penetration, but these pre-final runs are not reused as final acceptance evidence. The final primary trace sampled 2.103 mm skin/collider error and zero penetration for its three sunset garments. |
 | C | Development qualification only; final integrated visual check fails | The neutral mount is 0 degrees from face forward with positive measured clearance (minimum 40.695 mm in the per-step trace and 42.455 mm in captured-frame qualification), but the support table occludes most of the final head interaction view. |
 | D | **FAIL / independent promotion veto** | The 120 g free target never lifts after qualification; current opposing contacts are not maintained; a clean commanded free release is absent. |
@@ -42,15 +42,18 @@ The pre-outcome evidence definition is measured separation at the completed phys
 | Same right-hand condition with simultaneous nonzero impulse | 0 s | separately reported | no force-supported dwell |
 | Meaningful opposing left geometric dwell, simultaneous with right geometry | 0.3125 s | meaningful stable support | geometric condition only |
 | Meaningful opposing left nonzero-impulse dwell | 0 s | separately reported | no force-supported dwell |
-| Controller current-step carry contacts | 0.0667 s | maintained through carry | **FAIL** |
+| Controller `carry_contacts_maintained` telemetry | 16 steps / 0.06667 s | maintained through carry | **FAIL**; consumes the prior-step contact set |
+| Literal same-row post-qualification opposing geometry | 15 steps / 0.0625 s | maintained through carry | **FAIL** |
 | Lift after bimanual qualification | 0 m | >0.08 m | **FAIL** |
 | Object turn during `BimanualTurn`, support-bound for all 792 steps | 57.0641 degrees | >20 degrees after lift | ineligible because lift failed |
 | Commanded free release | hand contact persists after opening command | free release and settle | **FAIL** |
 | Minimum hand/object separation | -0.808 mm | penetration <=3 mm | within penetration bound |
 | Maximum hand/object impulse | 0.07174 N s | reported separately | measured, not a dwell substitute |
-| Assistance ledger | 0 entries | 0 | **PASS** |
+| Passive assistance ledger | 0 entries | 0 | empty as recorded; not independent runtime proof |
 
-The right historical counter and left historical counter become true, but qualification at step `s` consumes the prior step's contact set. Independent replay found 61 rows where `carry_contacts_maintained` differs from same-row geometry; the carry flag is true for only steps 1922-1937, or 16 physics steps. The hands then hold rather than synthesizing an object trajectory. This behavior preserves the no-assistance contract but proves that the configured hand/controller/target system does not achieve the required physical episode or exact current-step contact registration.
+The right historical counter and left historical counter become true, but qualification at step `s` consumes the prior step's contact set. `carry_contacts_maintained` is true for steps 1922-1937 (16 steps), while literal same-row opposing geometry strictly after qualification exists only for steps 1923-1937 (15 steps). The telemetry value is therefore not described as current-step carry evidence. The hands then hold rather than synthesizing an object trajectory, proving that the configured hand/controller/target system does not achieve the required physical episode.
+
+Before qualification, the live `interactionAnchorWorld` follows the free target Rigidbody center of mass and drives only bounded kinematic hand waypoints; the anchor is then latched. This is disclosed scene-conditioned controller target tracking, not object assistance: source audit found no direct post-initialization object pose/velocity write, force, torque, parenting, or joint-construction API in the canonical controller/compiler/recorder path. The executed zero counters and empty assistance ledger are passive receipts and cannot independently detect uninstrumented assistance.
 
 ## Dense visual audit and direct comparison
 
@@ -60,7 +63,7 @@ All three final videos were inspected as dense phase contact sheets in addition 
 - Clean head: initial scan and final gaze expose the room, but from reach through release the table fills most of the image. Touch, capture, left assistance, turn, placement, and release are not reliably visible. This is a hard event-visibility failure even though the optical mount itself is neutral and clear of the head/clothing.
 - Overlay: colliders and contacts are confined to the labeled diagnostic stream. It corroborates hand proximity but cannot substitute for visible hero contact, and no completed contact-to-visible-skin projection product was promoted.
 
-Compared directly with the preserved Unity visual audition, this implementation adds a weighted clothed full body, room context, complete truth, and a neutral head mount, but loses the audition's clean target-centric view and does not complete the interaction. Compared with the corrected failed bimanual clip, it fixes clothing, full-body/head trace coverage, palm/per-digit rotation/state, object identity, and the fixed approximately 50-degree optical pitch; however, its head view is more occluded and its free-object sequence still fails. The integrated result therefore does not plainly improve over both references as required for PASS.
+Compared directly with the preserved Unity visual audition, this implementation adds a weighted clothed full body, room context, expanded synchronized body/hand/contact/object trace coverage, and a neutral head mount, but loses the audition's clean target-centric view and does not complete the interaction. Registered depth/semantic/instance hero capture, fresh-process replay/rerender, and robustness remain absent. Compared with the corrected failed bimanual clip, it fixes clothing, full-body/head trace coverage, palm/per-digit rotation/state, object identity, and the fixed approximately 50-degree optical pitch; however, its head view is more occluded and its free-object sequence still fails. The integrated result therefore does not plainly improve over both references as required for PASS.
 
 ## Why promotion stops here
 

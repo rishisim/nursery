@@ -6,7 +6,7 @@
   "canonical_entry_point": "python -m babyworld_lite.childlens_engine_bakeoff.procedural_scene_gate",
   "output_root": "runs/embodied_simulation/procedural_scene_gate",
   "implementation_freeze": {
-    "classification": "post-development canonical NO-GO acceptance configuration",
+    "classification": "executed NO-GO implementation with a post-outcome QA-only record correction; no new experiment",
     "source_sha256": {
       "GateContracts.cs": "435f533d6f40c162fb9a360fe6942b9ab1421188f9dd2dc1bbf5b6a29a29ecd6",
       "ProceduralSceneGateBuilder.cs": "887c704a57f1ba6739b9a58ebc56f13a8d3b01139522ce5879a889b1d49599bd",
@@ -20,10 +20,26 @@
       "contracts.py": "d50941bb2a79d61b15645cc751ecf7009d71fd7223a5d00175dde9af29417ca2",
       "cli.py": "01d6de5ad8a60f429776b8b12d82da8cda1bbd71db398cb3795997416e7bf2e9",
       "runner.py": "9cd23c52acc5b6b0d8665b11b8c3069508897d282e44908bce4879e2b5acf66d",
-      "independent_qa.py": "5d9d6ca7797f7da35d6224a1c5a2b01ae866e75e82211aed8dc697dbb592d3f6"
+      "independent_qa.py": "6e18c17354c84c2feb579aa7d89cb3b933ed6e5dc91195e177b6167847f2e197"
     },
     "same_controller_all_seeds_and_garments": true,
     "seed_specific_retuning": false
+  },
+  "post_outcome_record_correction": {
+    "new_experiment": false,
+    "no_go_outcome_changed": false,
+    "executed_eligible_config_sha256": "3e24522b0cda7bce99f50d07fe94004a1ce1ea53ecd876bfb0600881fa085519",
+    "executed_primary_episode_contract_sha256": "507677658a2df717d222856221abe7c66277bc4cc1ac0f6badf52c6be2ff4570",
+    "scope": "independent QA separation eligibility, dwell/turn derivation, integer-clock interpretation, camera-roll source, and evidence-semantics correction only",
+    "episode_spec_fields_changed": false,
+    "unity_execution_source_changed": false
+  },
+  "controller_target_tracking_disclosure": {
+    "classification": "scene_conditioned_kinematic_hand_target_tracking_not_object_assistance",
+    "behavior": "Before bimanual qualification, interactionAnchorWorld follows the free target Rigidbody center of mass and drives only bounded commanded hand waypoints. At qualification the anchor is latched for the commanded hand sequence.",
+    "object_pose_velocity_force_or_parent_modified": false,
+    "runtime_logging_status": "not separately instrumented in the executed trace; disclosed by canonical source audit",
+    "biological_control_claim": false
   },
   "pre_run_contract_repairs": [
     {

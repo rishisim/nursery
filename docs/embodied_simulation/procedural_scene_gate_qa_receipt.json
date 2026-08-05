@@ -1,0 +1,72 @@
+{
+  "schema": "embodied.corrected_qa_receipt.v1",
+  "classification": "post-outcome QA and decision-record correction; no new experiment",
+  "new_experiment": false,
+  "scientific_outcome": "NO-GO",
+  "promotion_label": "STAGE_D_NO_GO_PROMOTION_VETO",
+  "outcome_unchanged": true,
+  "executed_evidence": {
+    "eligible_config_sha256": "3e24522b0cda7bce99f50d07fe94004a1ce1ea53ecd876bfb0600881fa085519",
+    "primary_episode_contract_sha256": "507677658a2df717d222856221abe7c66277bc4cc1ac0f6badf52c6be2ff4570",
+    "trace_sha256": "9bf8f001acae001d32aa69b4e085460ea8429421940e5c299fe8c8065845abec",
+    "episode_id": "sage_living_corner__sunset_play",
+    "stage": "bimanual_cell",
+    "capture_mode": "qualification"
+  },
+  "post_outcome_record": {
+    "config_sha256": "7183b79cbe88ea70f2c66eb4bd1ddbba82c92f0c98c093118b053d06b1b06336",
+    "qa_source_sha256": "6e18c17354c84c2feb579aa7d89cb3b933ed6e5dc91195e177b6167847f2e197",
+    "corrected_full_report_sha256": "1d1e23bfe93a8bbbaa2a937b83f79bc2ecea8e283a7cadad6efd634afabf64c7",
+    "corrected_full_report_path": "runs/embodied_simulation/procedural_scene_gate/episodes/sage_living_corner__sunset_play/bimanual_cell/independent_qa_report.json",
+    "full_report_is_generated_and_ignored": true,
+    "invalid_stale_report_sha256": "443d5d4bc2adf9acdf4b4f970c79b45d2a4043ba53574a24e81fb41c695a0226",
+    "invalid_stale_report_reasons": [
+      "admitted speculative contacts above the frozen 0.0005 m separation maximum",
+      "misreported dwell and turn metrics",
+      "false-failed integer 8:1 mapping on serialized floating timestamp drift",
+      "computed camera roll from a world quaternion instead of the registered capture ledger"
+    ]
+  },
+  "corrected_metrics": {
+    "eligible_contact_rows": 3613,
+    "speculative_contact_rows_excluded": 23851,
+    "eligible_nonzero_impulse_rows": 419,
+    "right_thumb_two_non_thumb_geometric_dwell_s": 1.6875,
+    "right_thumb_two_non_thumb_nonzero_impulse_dwell_s": 0.0,
+    "meaningful_opposing_left_geometric_dwell_s": 0.3125,
+    "meaningful_opposing_left_nonzero_impulse_dwell_s": 0.0,
+    "qualification_step": 1922,
+    "controller_carry_telemetry_steps": 16,
+    "controller_carry_telemetry_dwell_s": 0.06666666666666667,
+    "literal_same_row_postqualification_opposing_geometry_steps": 15,
+    "literal_same_row_postqualification_opposing_geometry_dwell_s": 0.0625,
+    "lift_after_bimanual_qualification_m": 0.0,
+    "supported_turn_during_bimanual_turn_deg": 57.06412496399321,
+    "supported_turn_steps": 792,
+    "bimanual_turn_steps": 792,
+    "maximum_hand_target_impulse_n_s": 0.07174254208803177,
+    "maximum_float_timestamp_drift_s": 1.271348446962861e-06,
+    "exact_integer_clock_mapping_pass": true,
+    "maximum_absolute_optical_roll_deg": 7.9146270751953125,
+    "optical_roll_source": "registered_capture_ledger.roll_deg"
+  },
+  "authority_evidence_scope": {
+    "passive_fields": [
+      "object_pose_write_count",
+      "object_velocity_write_count",
+      "hidden_force_count",
+      "parenting_count",
+      "joint_count",
+      "assistance_ledger"
+    ],
+    "runtime_detector_claim": false,
+    "source_audit": "Canonical source contains no direct free-object pose or velocity write, force or torque application, parenting, or joint construction after initialization.",
+    "controller_target_tracking": "Before qualification, live interactionAnchorWorld follows the free target Rigidbody center of mass and drives only bounded kinematic hand waypoints; it is latched at qualification. This is scene-conditioned hand target tracking, not object assistance, and was not separately instrumented in the executed trace."
+  },
+  "video_receipts": {
+    "head_rgb_sha256": "ab0a92164a5bca53d1283a5456638de014d2df6d6e7335fff3df00d214652940",
+    "external_rgb_sha256": "ae867e3bb4470067d7245b2fbfd4469e90c3d9aff818764321dafc661884fdba",
+    "contact_overlay_sha256": "3dc4b7b07e6edd0349a50c94450a0bb835e13cb090fbfbf006c230902c7d01d8"
+  },
+  "scope_limit": "The trace provides expanded synchronized body, hand, contact, object, camera-parent, and controller state. Registered depth/semantic/instance capture, fresh-process replay, same-trace rerender, and multi-seed robustness evidence are absent and are not claimed."
+}

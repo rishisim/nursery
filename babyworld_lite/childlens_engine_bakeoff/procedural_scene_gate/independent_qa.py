@@ -21,7 +21,7 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
-from .contracts import load_frozen_config, validate_frozen_config
+from .contracts import CONFIG_PATH, load_frozen_config, validate_frozen_config
 
 
 PASS = "PASS"
@@ -338,6 +338,26 @@ def _measured_contact(contact: Mapping[str, Any]) -> bool:
     return provenance in {"physx_measured", "measured_physx", "measured"}
 
 
+def _separation_eligible(contact: Mapping[str, Any], maximum_separation_m: float) -> bool:
+    separation = contact.get("separation_m")
+    return (
+        isinstance(separation, (int, float))
+        and math.isfinite(float(separation))
+        and float(separation) <= maximum_separation_m
+    )
+
+
+def _impulse_magnitude(contact: Mapping[str, Any]) -> float:
+    explicit = contact.get("available_impulse_magnitude_n_s")
+    if isinstance(explicit, (int, float)) and math.isfinite(float(explicit)):
+        return abs(float(explicit))
+    impulse = contact.get("available_impulse_n_s")
+    if isinstance(impulse, (int, float)) and math.isfinite(float(impulse)):
+        return abs(float(impulse))
+    vector = _vector(impulse)
+    return _magnitude(vector) if vector is not None else 0.0
+
+
 def _max_contiguous_duration(steps: Iterable[int], physics_hz: float) -> float:
     ordered = sorted(set(steps))
     if not ordered or physics_hz <= 0:
@@ -427,9 +447,16 @@ def _trace_checks(
             frame_counts[frame] += 1
         interior = [count for frame, count in frame_counts.items() if frame not in {min(frames), max(frames)}]
         dense = all(count == ratio for count in interior)
-        clock_ok = contiguous and mapped and dense and time_error <= 1e-6 and physics_hz / render_hz == ratio
+        monotonic_time = all(float(current) > float(previous) for previous, current in zip(times, times[1:]))
+        # Exact synchronization is established by contiguous integer physics steps
+        # and the frozen step//ratio render mapping. Unity serializes time_s from
+        # float32; its microsecond-scale drift is retained as a diagnostic and is
+        # not allowed to false-fail the exact integer clock.
+        clock_ok = contiguous and mapped and dense and monotonic_time and physics_hz / render_hz == ratio
         clock_details.update(contiguous=contiguous, integer_mapping=mapped, dense_interior_frames=dense,
-                             maximum_time_error_s=time_error)
+                             monotonic_timestamps=monotonic_time,
+                             maximum_float_timestamp_drift_s=time_error,
+                             timestamp_drift_is_diagnostic_not_integer_mapping_evidence=True)
 
     missing_counts: dict[str, int] = defaultdict(int)
     required_body = ("root", "torso", "neck", "head")
@@ -532,6 +559,7 @@ def _interaction_checks(
     rows: Sequence[Mapping[str, Any]], target_id: str | None, tolerances: Mapping[str, Any]
 ) -> tuple[list[Check], dict[str, Any]]:
     required = tolerances["interaction"]
+    maximum_separation_m = float(tolerances["contact"]["qualification_max_measured_separation_m"])
     physics_hz = float(tolerances["clock"]["physics_hz"])
     if not rows or target_id is None:
         return [
@@ -547,66 +575,127 @@ def _interaction_checks(
         obj = _object_for(row, target_id)
         if obj is not None:
             states.append((row, obj))
-    positions = [_pose_position(obj) for _, obj in states]
-    rotations = [_pose_rotation(obj) for _, obj in states]
-    if not states or any(position is None for position in positions):
+    state_by_step = {int(_field(row, "physics_step", -1)): (row, obj) for row, obj in states}
+    qualification_steps = [
+        int(controller["bimanual_qualification_step"])
+        for row in rows
+        for controller in [row.get("controller_state")]
+        if isinstance(controller, Mapping)
+        and isinstance(controller.get("bimanual_qualification_step"), int)
+        and int(controller["bimanual_qualification_step"]) >= 0
+    ]
+    qualification_step = min(qualification_steps) if qualification_steps else None
+    baseline_state = state_by_step.get(qualification_step) if qualification_step is not None else (states[0] if states else None)
+    baseline_position = _pose_position(baseline_state[1]) if baseline_state is not None else None
+    post_qualification_states = [
+        (row, obj) for row, obj in states
+        if qualification_step is None or int(_field(row, "physics_step", -1)) >= qualification_step
+    ]
+    post_qualification_positions = [_pose_position(obj) for _, obj in post_qualification_states]
+    if baseline_position is None or not post_qualification_states or any(position is None for position in post_qualification_positions):
         lift_m = math.nan
         lift_start_step = math.inf
         lifted_steps: set[int] = set()
     else:
-        baseline_y = float(positions[0][1])  # initial support height, not a viewport proxy
-        lift_m = max(float(position[1]) for position in positions) - baseline_y
-        lift_start_step = next((_field(row, "physics_step") for (row, _), position in zip(states, positions)
+        baseline_y = float(baseline_position[1])
+        lift_m = max(float(position[1]) for position in post_qualification_positions) - baseline_y
+        lift_start_step = next((_field(row, "physics_step") for (row, _), position in zip(post_qualification_states, post_qualification_positions)
                                 if float(position[1]) - baseline_y > 0.005), math.inf)
-        lifted_steps = {_field(row, "physics_step") for (row, _), position in zip(states, positions)
+        lifted_steps = {_field(row, "physics_step") for (row, _), position in zip(post_qualification_states, post_qualification_positions)
                         if float(position[1]) - baseline_y > 0.01}
+
+    def is_turn_phase(row: Mapping[str, Any]) -> bool:
+        phase = str(_field(row, "phase_id", "")).lower().replace("_", "").replace("-", "")
+        return phase in {"turn", "bimanualturn", "bimanualconditionliftinspectturn"}
+
+    turn_states = [(row, obj) for row, obj in states if is_turn_phase(row)]
+    turn_rotations = [_pose_rotation(obj) for _, obj in turn_states]
     turn_deg = math.nan
-    if rotations and rotations[0] is not None:
-        values = [_quat_angle_deg(rotations[0], rotation) for rotation in rotations if rotation is not None]
+    if turn_rotations and turn_rotations[0] is not None:
+        values = [_quat_angle_deg(turn_rotations[0], rotation) for rotation in turn_rotations if rotation is not None]
         turn_deg = max(values) if values else math.nan
+    supported_turn_steps = sum(
+        obj.get("support_id") not in {None, "", "none", "unavailable"} for _, obj in turn_states
+    )
 
     right_steps: list[int] = []
     left_steps: list[int] = []
     opposing_steps: list[int] = []
+    right_impulse_steps: list[int] = []
+    left_impulse_support_steps: list[int] = []
+    literal_postqualification_steps: list[int] = []
+    controller_carry_steps: list[int] = []
     available_impulses: list[float] = []
+    eligible_hand_rows = 0
+    speculative_hand_rows = 0
+    eligible_nonzero_impulse_rows = 0
     for row in rows:
         step = _field(row, "physics_step", -1)
-        measured = [contact for contact in _contacts(row)
-                    if _contact_targets(contact, target_id) and _measured_contact(contact)]
-        for contact in measured:
-            impulse = contact.get("available_impulse_n_s")
-            if isinstance(impulse, (int, float)):
-                available_impulses.append(abs(float(impulse)))
-            else:
-                vector_impulse = _vector(impulse)
-                if vector_impulse is not None:
-                    available_impulses.append(_magnitude(vector_impulse))
+        measured_target = [contact for contact in _contacts(row)
+                           if _contact_targets(contact, target_id) and _measured_contact(contact)]
+        measured_hand = [contact for contact in measured_target if _contact_hand_digit(contact)[0] in {"left", "right"}]
+        eligible = [contact for contact in measured_hand
+                    if _separation_eligible(contact, maximum_separation_m)]
+        eligible_hand_rows += len(eligible)
+        speculative_hand_rows += len(measured_hand) - len(eligible)
+        for contact in eligible:
+            magnitude = _impulse_magnitude(contact)
+            available_impulses.append(magnitude)
+            eligible_nonzero_impulse_rows += magnitude > 0.0
         by_hand: dict[str, dict[str, list[Mapping[str, Any]]]] = defaultdict(lambda: defaultdict(list))
-        for contact in measured:
+        for contact in eligible:
             hand, digit = _contact_hand_digit(contact)
             if hand and digit:
                 by_hand[hand][digit].append(contact)
         right_digits = set(by_hand["right"])
-        if step < lift_start_step and "thumb" in right_digits and len(right_digits - {"thumb"}) >= int(required["right_minimum_non_thumb_digits"]):
+        right_geometry = "thumb" in right_digits and len(right_digits - {"thumb"}) >= int(required["right_minimum_non_thumb_digits"])
+        if step < lift_start_step and right_geometry:
             right_steps.append(step)
+        right_impulse_digits = {
+            digit for digit, contacts in by_hand["right"].items()
+            if any(_impulse_magnitude(contact) > 0.0 for contact in contacts)
+        }
+        if ("thumb" in right_impulse_digits
+                and len(right_impulse_digits - {"thumb"}) >= int(required["right_minimum_non_thumb_digits"])):
+            right_impulse_steps.append(step)
         left_digits = set(by_hand["left"])
-        if step in lifted_steps and left_digits - {"little"}:
+        non_little_left_digits = left_digits - {"little"}
+        has_non_little_left = bool(non_little_left_digits)
+        has_stable_left_digits = len(non_little_left_digits) >= 2
+        right_normals = [_normal_on_target(contact, target_id) for contacts in by_hand["right"].values() for contact in contacts]
+        left_normals = [_normal_on_target(contact, target_id) for contacts in by_hand["left"].values() for contact in contacts]
+        opposing_geometry = any(math.isfinite(_dot(left, right)) and _dot(left, right) <= -0.25
+                                 for left in left_normals for right in right_normals)
+        meaningful_left_geometry = right_geometry and has_stable_left_digits and opposing_geometry
+        literal_opposing_geometry = right_geometry and has_non_little_left and opposing_geometry
+        if meaningful_left_geometry:
             left_steps.append(step)
-            right_normals = [_normal_on_target(contact, target_id) for contacts in by_hand["right"].values() for contact in contacts]
-            left_normals = [_normal_on_target(contact, target_id) for contacts in by_hand["left"].values() for contact in contacts]
-            if any(math.isfinite(_dot(left, right)) and _dot(left, right) <= -0.25
-                   for left in left_normals for right in right_normals):
-                opposing_steps.append(step)
+            opposing_steps.append(step)
+        left_impulse_contacts = [
+            contact for digit, contacts in by_hand["left"].items() if digit != "little"
+            for contact in contacts if _impulse_magnitude(contact) > 0.0
+        ]
+        if meaningful_left_geometry and left_impulse_contacts:
+            left_impulse_support_steps.append(step)
+        if qualification_step is not None and step > qualification_step and literal_opposing_geometry:
+            literal_postqualification_steps.append(step)
+        controller = row.get("controller_state")
+        if isinstance(controller, Mapping) and controller.get("carry_contacts_maintained") is True:
+            controller_carry_steps.append(step)
 
     right_dwell = _max_contiguous_duration(right_steps, physics_hz)
     left_dwell = _max_contiguous_duration(left_steps, physics_hz)
     opposing_dwell = _max_contiguous_duration(opposing_steps, physics_hz)
+    right_impulse_dwell = _max_contiguous_duration(right_impulse_steps, physics_hz)
+    left_impulse_dwell = _max_contiguous_duration(left_impulse_support_steps, physics_hz)
+    controller_carry_dwell = _max_contiguous_duration(controller_carry_steps, physics_hz)
+    literal_postqualification_dwell = _max_contiguous_duration(literal_postqualification_steps, physics_hz)
     right_ok = right_dwell >= float(required["right_opposition_min_s"])
     left_ok = left_dwell >= 0.25 and opposing_dwell >= 0.25
 
     all_ledgers = [entry for row in rows for entry in row.get("assistance_ledger", [])
                    if isinstance(row.get("assistance_ledger", []), list)]
-    no_assistance = not all_ledgers
+    no_recorded_assistance = not all_ledgers
     release_rows = []
     prior_commanded_closure = 0.0
     for index, row in enumerate(rows):
@@ -636,7 +725,10 @@ def _interaction_checks(
         start = release_rows[0]
         post = rows[start + 1:]
         hand_contact_after = any(
-            _contact_targets(contact, target_id) and _contact_hand_digit(contact)[0] in {"left", "right"}
+            _contact_targets(contact, target_id)
+            and _measured_contact(contact)
+            and _separation_eligible(contact, maximum_separation_m)
+            and _contact_hand_digit(contact)[0] in {"left", "right"}
             for row in post for contact in _contacts(row)
         )
         post_objects = [obj for row in post for obj in [_object_for(row, target_id)] if obj is not None]
@@ -647,17 +739,31 @@ def _interaction_checks(
             or (obj.get("is_kinematic") is False and obj.get("parent_id") in {None, ""})
             for obj in post_objects
         )
-        free_release_ok = bool(post_objects) and not hand_contact_after and settled and dynamic and no_assistance
+        free_release_ok = bool(post_objects) and not hand_contact_after and settled and dynamic and no_recorded_assistance
         release_details.update(hand_contact_after=hand_contact_after, settled=settled, dynamic=dynamic)
 
     metrics = {
         "right_measured_opposition_dwell_s": right_dwell,
-        "left_non_little_dwell_s": left_dwell,
+        "right_required_digits_nonzero_impulse_dwell_s": right_impulse_dwell,
+        "meaningful_opposing_left_geometric_dwell_s": left_dwell,
+        "meaningful_opposing_left_nonzero_impulse_dwell_s": left_impulse_dwell,
         "left_opposing_normal_dwell_s": opposing_dwell,
+        "controller_carry_telemetry_dwell_s": controller_carry_dwell,
+        "literal_same_row_postqualification_opposing_geometry_dwell_s": literal_postqualification_dwell,
+        "controller_carry_telemetry_steps": controller_carry_steps,
+        "literal_same_row_postqualification_opposing_geometry_steps": literal_postqualification_steps,
+        "bimanual_qualification_step": qualification_step,
         "lift_m": lift_m if math.isfinite(lift_m) else None,
-        "turn_deg": turn_deg if math.isfinite(turn_deg) else None,
+        "turn_during_bimanual_turn_deg": turn_deg if math.isfinite(turn_deg) else None,
+        "turn_phase_steps": len(turn_states),
+        "turn_phase_supported_steps": supported_turn_steps,
         "maximum_available_impulse_n_s": max(available_impulses) if available_impulses else None,
+        "qualification_maximum_separation_m": maximum_separation_m,
+        "eligible_hand_target_rows": eligible_hand_rows,
+        "speculative_hand_target_rows_excluded": speculative_hand_rows,
+        "eligible_nonzero_impulse_hand_target_rows": eligible_nonzero_impulse_rows,
         "assistance_entries": len(all_ledgers),
+        "assistance_evidence_scope": "passive per-step ledger only; not an independent runtime API detector",
         **release_details,
     }
     return [
@@ -667,15 +773,20 @@ def _interaction_checks(
                "left support is sustained, includes a non-little digit, and physically opposes the right hand", metrics),
         _check("interaction.lift_turn", math.isfinite(lift_m) and math.isfinite(turn_deg)
                and lift_m > float(required["lift_min_m"]) and turn_deg > float(required["turn_min_deg"]),
-               "free target exceeds frozen lift and turn thresholds", metrics),
+               "free target exceeds frozen post-qualification lift and in-phase turn thresholds", metrics),
         _check("interaction.free_release", free_release_ok,
                "commanded opening produces contact-free dynamic release and support/sleep settle", release_details),
-        _check("interaction.no_assistance", no_assistance,
-               "every per-step assistance ledger is empty", {"entries": all_ledgers[:20]}),
+        _check("interaction.no_assistance", no_recorded_assistance,
+               "the passive per-step assistance ledger is empty; source audit is required to exclude uninstrumented assistance APIs",
+               {"entries": all_ledgers[:20], "runtime_detector": False}),
     ], metrics
 
 
-def _camera_checks(rows: Sequence[Mapping[str, Any]], tolerances: Mapping[str, Any]) -> tuple[list[Check], dict[str, Any]]:
+def _camera_checks(
+    rows: Sequence[Mapping[str, Any]],
+    tolerances: Mapping[str, Any],
+    capture_ledger: Sequence[Mapping[str, Any]] = (),
+) -> tuple[list[Check], dict[str, Any]]:
     required = tolerances["camera"]
     samples: list[tuple[float, Mapping[str, Any]]] = []
     for row in rows:
@@ -694,7 +805,16 @@ def _camera_checks(rows: Sequence[Mapping[str, Any]], tolerances: Mapping[str, A
     parents = {camera.get("parent_id") for _, camera in samples}
     positions = [_pose_position(camera) for _, camera in samples]
     rotations = [_pose_rotation(camera) for _, camera in samples]
-    rolls = [abs(_quat_roll_deg(rotation)) for rotation in rotations if rotation is not None]
+    ledger_rolls = [
+        abs(float(frame["roll_deg"])) for frame in capture_ledger
+        if isinstance(frame.get("roll_deg"), (int, float)) and math.isfinite(float(frame["roll_deg"]))
+    ]
+    # World-quaternion Euler roll is coordinate-convention dependent and yielded
+    # a false ~180 degree value for the valid Unity head mount. Prefer the
+    # registered capture ledger's camera-relative roll; retain the quaternion
+    # fallback only when no capture ledger exists.
+    rolls = ledger_rolls or [abs(_quat_roll_deg(rotation)) for rotation in rotations if rotation is not None]
+    roll_source = "registered_capture_ledger.roll_deg" if ledger_rolls else "world_quaternion_fallback"
     linear_speeds, angular_speeds = [], []
     for ((t0, _), (t1, _)), p0, p1, q0, q1 in zip(zip(samples, samples[1:]), positions, positions[1:], rotations, rotations[1:]):
         dt = t1 - t0
@@ -714,6 +834,7 @@ def _camera_checks(rows: Sequence[Mapping[str, Any]], tolerances: Mapping[str, A
         "minimum_clearance_m": min(clearance) if clearance else None,
         "maximum_optical_vs_face_forward_deg": max(optical) if optical else None,
         "maximum_abs_roll_deg": max(rolls) if rolls else None,
+        "roll_source": roll_source,
         "maximum_linear_speed_m_s": max(linear_speeds) if linear_speeds else 0.0,
         "maximum_angular_speed_deg_s": max(angular_speeds) if angular_speeds else 0.0,
     }
@@ -1087,10 +1208,6 @@ def _authority_checks(report: Any, run_root: Path) -> list[Check]:
     canonical_receipt_pass &= report.get("single_state_drives_body_clothing_camera_truth") is True
     canonical_receipt_pass &= all(report.get(name) not in {None, "", "UNAVAILABLE"}
                                   for name in ("authority_root", "avatar_root", "head", "camera_parent", "target_rigidbody"))
-    canonical_receipt_pass &= all(report.get(name) == 0 for name in (
-        "object_pose_writes_after_initialization", "object_external_forces",
-        "attachment_or_joint_count", "assistance_ledger_entries",
-    ))
     passed = explicit_ids_pass or canonical_receipt_pass
     if "engine" in report:
         passed &= report.get("engine") == "Unity"
@@ -1108,9 +1225,20 @@ def _authority_checks(report: Any, run_root: Path) -> list[Check]:
         result = subprocess.run(["git", "check-ignore", "--quiet", str(relative)], cwd=repository, check=False)
         ignored = result.returncode == 0
         passed &= ignored
+    passive_counters = {
+        name: report.get(name) for name in (
+            "object_pose_writes_after_initialization", "object_external_forces",
+            "attachment_or_joint_count", "assistance_ledger_entries",
+        )
+    }
     return [_check("authority.single_state", passed,
                    "one Unity/PhysX physics-clocked state drives collider, body, garments, camera, and recorder",
-                   {"consumer_state_ids": state_ids, "run_root_git_ignored": ignored})]
+                   {
+                       "consumer_state_ids": state_ids,
+                       "run_root_git_ignored": ignored,
+                       "producer_counter_values": passive_counters,
+                       "producer_counter_semantics": "passive/hard-coded receipt fields; not independent runtime detectors and not used to pass this check",
+                   })]
 
 
 def _rate(value: str | None) -> float | None:
@@ -1328,15 +1456,23 @@ def audit_run(
     trace_checks, trace_details = _trace_checks(rows, evidence, tolerances, duration_s, phases)
     if trace_error:
         trace_checks[0] = _check("trace.present", False, "episode trace is malformed", {"error": trace_error})
+    capture_ledger_path = _mapped_path(root, evidence, "capture_frame_ledger", "capture_frame_ledger.jsonl")
+    try:
+        capture_ledger = _load_trace(capture_ledger_path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        capture_ledger = []
     interaction_checks, interaction_metrics = _interaction_checks(
         trace_details.get("ordered_rows", []), trace_details.get("target_object_id"), tolerances
     )
-    camera_checks, camera_metrics = _camera_checks(trace_details.get("ordered_rows", []), tolerances)
+    camera_checks, camera_metrics = _camera_checks(
+        trace_details.get("ordered_rows", []), tolerances, capture_ledger
+    )
     motion_limit_checks, motion_limit_metrics = _motion_limit_checks(
         trace_details.get("ordered_rows", []), float(tolerances["clock"]["physics_hz"])
     )
 
     authority = _optional_report(root, evidence, "authority_receipt", "authority_receipt.json")
+    execution = _optional_report(root, evidence, "execution_receipt", "execution_receipt.json")
     registration = _optional_report(root, evidence, "registration_report", "registration_report.json")
     projection = _optional_report(root, evidence, "contact_projection", "contact_projection.json")
     capture = _optional_report(root, evidence, "capture_manifest", "capture_manifest.json")
@@ -1387,6 +1523,11 @@ def audit_run(
     return {
         "schema": REPORT_SCHEMA,
         "run_root": str(root),
+        "contract_provenance": {
+            "executed_episode_contract_sha256": execution.get("contract_sha256") if isinstance(execution, Mapping) else None,
+            "post_outcome_qa_record_config_sha256": _sha256(CONFIG_PATH),
+            "new_experiment_run": False,
+        },
         "frozen_tolerance_schema": tolerances["schema"],
         "qa_decision": decision,
         "promotion_veto": bool(non_pass),
@@ -1403,6 +1544,8 @@ def audit_run(
             "missing_required_evidence_promotable": False,
             "restricted_childlens_accessed": False,
             "biological_torque_claimed": False,
+            "authority_receipt_zero_counters_accepted_as_runtime_detectors": False,
+            "scene_conditioned_hand_target_tracking": "prequalification interactionAnchorWorld follows the free target center and drives only bounded kinematic hand waypoints",
         },
     }
 

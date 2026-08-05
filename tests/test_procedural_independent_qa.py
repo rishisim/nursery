@@ -17,6 +17,10 @@ def _write_json(path: Path, value):
     path.write_text(json.dumps(value), encoding="utf-8")
 
 
+def _write_jsonl(path: Path, values):
+    path.write_text("".join(json.dumps(value) + "\n" for value in values), encoding="utf-8")
+
+
 def _pose(position=(0.0, 1.0, 0.0), rotation=(0.0, 0.0, 0.0, 1.0)):
     return {
         "position_world_m": list(position),
@@ -70,7 +74,12 @@ def _trace_row(step):
             ]
         )
     if 70 <= step <= 135:
-        contacts.append(_contact("left", "index", [-1.0, 0.0, 0.0]))
+        contacts.extend(
+            [
+                _contact("left", "index", [-1.0, 0.0, 0.0]),
+                _contact("left", "middle", [-1.0, 0.0, 0.0]),
+            ]
+        )
     return {
         "clock": {
             "physics_step": step,
@@ -162,6 +171,93 @@ def test_physx_contact_lift_turn_and_free_release_are_recomputed_from_trace(tmp_
     assert _find_check(report, "interaction.free_release")["status"] == PASS
     assert _find_check(report, "interaction.no_assistance")["status"] == PASS
     assert len(report["dense_timeline"]) == 20
+
+
+def test_speculative_contacts_above_frozen_half_millimeter_never_increment_dwell(tmp_path):
+    rows = [_trace_row(step) for step in range(160)]
+    for row in rows:
+        for contact in row["contacts"]:
+            contact["separation_m"] = 0.0005001
+    _write_json(tmp_path / "episode_trace.json", rows)
+    _write_json(
+        tmp_path / "qa_evidence.json",
+        {"schema": "embodied.independent_qa_evidence.v1", "trace": "episode_trace.json", "target_object_id": "target_001"},
+    )
+    report = audit_run(tmp_path)
+    assert _find_check(report, "interaction.right_capture")["status"] == FAIL
+    metrics = report["derived_metrics"]["interaction"]
+    assert metrics["eligible_hand_target_rows"] == 0
+    assert metrics["speculative_hand_target_rows_excluded"] > 0
+
+
+def test_exact_integer_clock_does_not_false_fail_float32_microsecond_drift(tmp_path):
+    rows = [_trace_row(step) for step in range(160)]
+    for step, row in enumerate(rows):
+        row["clock"]["time_s"] = step / 240.0 + 1.27e-6 * step / (len(rows) - 1)
+    _write_json(tmp_path / "episode_trace.json", rows)
+    _write_json(
+        tmp_path / "qa_evidence.json",
+        {"schema": "embodied.independent_qa_evidence.v1", "trace": "episode_trace.json", "target_object_id": "target_001"},
+    )
+    report = audit_run(tmp_path)
+    clock = _find_check(report, "trace.clock")
+    assert clock["status"] == PASS
+    assert clock["evidence"]["maximum_float_timestamp_drift_s"] > 1e-6
+    assert clock["evidence"]["timestamp_drift_is_diagnostic_not_integer_mapping_evidence"]
+
+
+def test_turn_is_measured_only_during_bimanual_turn_phase(tmp_path):
+    rows = [_trace_row(step) for step in range(160)]
+    rows[-1]["objects"][0]["rotation_world_xyzw"] = [0.0, 1.0, 0.0, 0.0]
+    _write_json(tmp_path / "episode_trace.json", rows)
+    _write_json(
+        tmp_path / "qa_evidence.json",
+        {"schema": "embodied.independent_qa_evidence.v1", "trace": "episode_trace.json", "target_object_id": "target_001"},
+    )
+    report = audit_run(tmp_path)
+    turn = report["derived_metrics"]["interaction"]["turn_during_bimanual_turn_deg"]
+    assert turn == pytest.approx(25.0, abs=0.7)
+
+
+def test_carry_telemetry_and_literal_same_row_postqualification_geometry_are_distinct(tmp_path):
+    rows = [_trace_row(step) for step in range(40)]
+    for step, row in enumerate(rows):
+        row["contacts"] = []
+        row["controller_state"]["bimanual_qualification_step"] = 10 if step >= 10 else -1
+        row["controller_state"]["carry_contacts_maintained"] = 10 <= step <= 25
+        if 10 <= step <= 25:
+            row["contacts"] = [
+                _contact("right", "thumb", [1.0, 0.0, 0.0]),
+                _contact("right", "index", [1.0, 0.0, 0.0]),
+                _contact("right", "middle", [1.0, 0.0, 0.0]),
+                _contact("left", "index", [-1.0, 0.0, 0.0]),
+            ]
+    _write_json(tmp_path / "episode_trace.json", rows)
+    _write_json(
+        tmp_path / "qa_evidence.json",
+        {"schema": "embodied.independent_qa_evidence.v1", "trace": "episode_trace.json", "target_object_id": "target_001"},
+    )
+    metrics = audit_run(tmp_path)["derived_metrics"]["interaction"]
+    assert metrics["controller_carry_telemetry_dwell_s"] == pytest.approx(16 / 240)
+    assert metrics["literal_same_row_postqualification_opposing_geometry_dwell_s"] == pytest.approx(15 / 240)
+
+
+def test_registered_capture_roll_overrides_coordinate_dependent_world_euler_roll(tmp_path):
+    rows = [_trace_row(step) for step in range(16)]
+    for row in rows:
+        row["camera_state"]["rotation_world_xyzw"] = [0.0, 1.0, 0.0, 0.0]
+    _write_json(tmp_path / "episode_trace.json", rows)
+    _write_jsonl(
+        tmp_path / "capture_frame_ledger.jsonl",
+        [{"render_frame": frame, "roll_deg": 7.91463} for frame in range(2)],
+    )
+    _write_json(
+        tmp_path / "qa_evidence.json",
+        {"schema": "embodied.independent_qa_evidence.v1", "trace": "episode_trace.json", "target_object_id": "target_001"},
+    )
+    camera = audit_run(tmp_path)["derived_metrics"]["camera"]
+    assert camera["maximum_abs_roll_deg"] == pytest.approx(7.91463)
+    assert camera["roll_source"] == "registered_capture_ledger.roll_deg"
 
 
 def test_viewport_object_center_proxy_cannot_satisfy_visible_contact_gate(tmp_path):
@@ -315,10 +411,10 @@ def test_canonical_unity_authority_and_expanded_provenance_receipts_are_accepted
         "head": "Head",
         "camera_parent": "HeadMount",
         "target_rigidbody": "Target",
-        "object_pose_writes_after_initialization": 0,
-        "object_external_forces": 0,
-        "attachment_or_joint_count": 0,
-        "assistance_ledger_entries": 0,
+        "object_pose_writes_after_initialization": 999,
+        "object_external_forces": 999,
+        "attachment_or_joint_count": 999,
+        "assistance_ledger_entries": 999,
         "independent_render_timeline": False,
         "single_state_drives_body_clothing_camera_truth": True,
     }
@@ -344,5 +440,7 @@ def test_canonical_unity_authority_and_expanded_provenance_receipts_are_accepted
         },
     )
     report = audit_run(tmp_path)
-    assert _find_check(report, "authority.single_state")["status"] == PASS
+    authority_check = _find_check(report, "authority.single_state")
+    assert authority_check["status"] == PASS
+    assert "not independent runtime detectors" in authority_check["evidence"]["producer_counter_semantics"]
     assert _find_check(report, "truth.provenance")["status"] == PASS
