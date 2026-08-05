@@ -328,6 +328,19 @@ scientific metrics, $0 direct cost, and the frozen protocol-accounted total of
 attempt is authorized, and new-route development, holdout, governed C, LTX,
 and Synthetic-1h were not run.
 
+That terminal result remains immutable. After reviewing it, the user explicitly
+authorized a separate one-submission repair amendment at commitment
+`3271499c…a7ff4`. It permits attempt 4 only on the same one-process H100 NVL
+`3g.47gb` slice, eight CPUs, 32 GiB, 15 minutes, at most 0.25 additional
+slice-GPU-hours, 1 GiB new run storage, and $0. The outer wrapper still validates
+all seven exact Slurm predicates, then writes a canonical compact topology
+attestation containing no raw scheduler record. The runner verifies that
+attestation and the effective CUDA device without invoking `scontrol` inside
+Singularity; the attestation hash is bound into the health result's dependency
+commitment. Models, fixtures, preprocessing, metrics, thresholds, seeds,
+scientific gates, and downstream contracts are unchanged. There is no repair
+cycle or attempt 5: only a committed 7/7 health pass can open public development.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

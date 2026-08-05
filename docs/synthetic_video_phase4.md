@@ -514,6 +514,18 @@ the protocol-accounted 0.504019 H100-slice GPU-hours and $0 direct cost. No
 fourth health attempt, public development/holdout, governed C, LTX work,
 generation, or synthetic learner is authorized under this route.
 
+The user then explicitly authorized one distinct prospective repair route while
+preserving that blocker unchanged. Amendment `3271499c…a7ff4` permits only
+attempt 4 on the same H100 NVL `3g.47gb` slice, one process, eight CPUs, 32 GiB,
+15 minutes, 0.25 additional slice-GPU-hours, 1 GiB new run storage, and $0.
+The wrapper retains all seven exact Slurm assertions and writes a compact
+mode-0600 topology attestation after they pass; the container validates its
+exact job/topology binding and CUDA properties without calling `scontrol`.
+Its hash is folded into the health dependency commitment. No model, fixture,
+metric, threshold, seed, scientific gate, or downstream rule changes, and no
+attempt 5 is permitted. Public development remains conditional on a committed
+all-module attempt-4 pass.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

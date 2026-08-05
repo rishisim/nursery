@@ -39,7 +39,7 @@ exec >"$output_root/logs/qualify-${SLURM_JOB_ID}.out" 2>"$output_root/logs/quali
 if [[ "$tuple_run_mode" == "health" ]]; then
   health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"
   case "$health_attempt" in
-    1|2|3) ;;
+    4) ;;
     *) exit 64 ;;
   esac
   export PHASE4_HEALTH_SUBMISSION_STARTED_EPOCH="$(date +%s)"
@@ -73,6 +73,15 @@ require_health_topology() {
     *" TresPerNode=gres/gpu:nvidia_h100_nvl_3g.47gb:1 "*|*" TresPerNode=gres:gpu:nvidia_h100_nvl_3g.47gb:1 "*) ;;
     *) exit 66 ;;
   esac
+
+  case "${SLURM_JOB_ID:-}" in
+    ''|*[!0-9]*) exit 66 ;;
+  esac
+  local topology_attestation="$health_attempt_root/topology-attestation.json"
+  [[ ! -e "$topology_attestation" ]] || exit 65
+  printf '{"CPU_count":8,"GRES":"gpu:nvidia_h100_nvl_3g.47gb:1","attempt":4,"job_id":%s,"local_world_size":1,"memory_per_CPU_GiB":4,"node_count":1,"partition":"h100","predicate_count":7,"predicate_pass_count":7,"schema_version":1,"source":"WRAPPER_SCONTROL_BEFORE_CONTAINER","task_count":1,"time_limit_minutes":15,"world_size":1}\n' \
+    "$SLURM_JOB_ID" >"$topology_attestation"
+  chmod 600 "$topology_attestation"
 
 }
 

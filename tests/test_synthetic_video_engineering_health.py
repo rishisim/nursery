@@ -40,6 +40,48 @@ def _config() -> dict:
     )
 
 
+def _historical_health_config() -> dict:
+    config = _config()
+    config["schema_version"] = 21
+    config.pop("learner_effective_engineering_health_result")
+    config.pop("learner_effective_engineering_health_reauthorization")
+    return config
+
+
+def _write_topology_attestation(
+    root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    attempt: int = 4,
+    job_id: int = 316371,
+) -> Path:
+    monkeypatch.setenv("SLURM_JOB_ID", str(job_id))
+    monkeypatch.setenv("WORLD_SIZE", "1")
+    monkeypatch.setenv("LOCAL_WORLD_SIZE", "1")
+    value = {
+        "schema_version": 1,
+        "attempt": attempt,
+        "job_id": job_id,
+        "partition": "h100",
+        "node_count": 1,
+        "CPU_count": 8,
+        "task_count": 1,
+        "time_limit_minutes": 15,
+        "memory_per_CPU_GiB": 4,
+        "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+        "predicate_count": 7,
+        "predicate_pass_count": 7,
+        "world_size": 1,
+        "local_world_size": 1,
+        "source": "WRAPPER_SCONTROL_BEFORE_CONTAINER",
+    }
+    path = root / "topology-attestation.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(MODULE.canonical(value) + b"\n")
+    path.chmod(0o600)
+    return path
+
+
 def _development_rows() -> dict[str, list[dict]]:
     language = [
         {
@@ -555,39 +597,48 @@ def test_tuple_health_metric_release_requires_seven_unique_passed_modules() -> N
         MODULE._tuple_health_metric_release(wrong_status, scientific)
 
 
-def test_tuple_health_budget_enforces_three_h100_mig_attempts_and_aggregate_limits() -> None:
+def test_tuple_health_budget_enforces_single_reauthorized_attempt_and_limits() -> None:
     config = _config()
     prior = [
         {
             "attempt": 1,
             "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
             "GPU_count": 1,
-            "wall_minutes": 12.0,
-            "GPU_hours": 0.20,
-            "new_storage_GiB": 2.0,
+            "wall_minutes": 15.0,
+            "GPU_hours": 0.25,
+            "new_storage_GiB": 0.0,
             "direct_monetary_cost_USD": 0,
         },
         {
             "attempt": 2,
             "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
             "GPU_count": 1,
-            "wall_minutes": 14.0,
-            "GPU_hours": 0.20,
-            "new_storage_GiB": 2.0,
+            "wall_minutes": 15.0,
+            "GPU_hours": 0.25,
+            "new_storage_GiB": 2.905726432800293e-07,
+            "direct_monetary_cost_USD": 0,
+        },
+        {
+            "attempt": 3,
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+            "GPU_count": 1,
+            "wall_minutes": 0.24115029176076253,
+            "GPU_hours": 0.004019171529346042,
+            "new_storage_GiB": 1.1119991540908813e-06,
             "direct_monetary_cost_USD": 0,
         },
     ]
-    budget = MODULE._tuple_health_budget(3, prior, config)
-    assert budget["attempt"] == 3
+    budget = MODULE._tuple_health_budget(4, prior, config)
+    assert budget["attempt"] == 4
     assert budget["GPU_type"] == "NVIDIA_H100_NVL_3G_47GB_MIG"
     assert budget["GPU_count"] == 1
     assert budget["per_submission_wall_minutes_max"] == 15
-    assert budget["remaining_GPU_hours"] == pytest.approx(0.35)
-    assert budget["remaining_storage_GiB"] == pytest.approx(6.0)
+    assert budget["remaining_GPU_hours"] == pytest.approx(0.25)
+    assert budget["remaining_storage_GiB"] == pytest.approx(1.0)
     assert budget["direct_monetary_cost_USD"] == 0
 
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ATTEMPT_BUDGET"):
-        MODULE._tuple_health_budget(4, prior, config)
+        MODULE._tuple_health_budget(5, prior, config)
 
 
 @pytest.mark.parametrize(
@@ -596,8 +647,8 @@ def test_tuple_health_budget_enforces_three_h100_mig_attempts_and_aggregate_limi
         ("GPU_type", "NVIDIA_A30_24GB", "E_TUPLE_HEALTH_GPU_TOPOLOGY"),
         ("GPU_count", 2, "E_TUPLE_HEALTH_GPU_TOPOLOGY"),
         ("wall_minutes", 15.1, "E_TUPLE_HEALTH_WALL_BUDGET"),
-        ("GPU_hours", 0.76, "E_TUPLE_HEALTH_GPU_HOUR_BUDGET"),
-        ("new_storage_GiB", 10.1, "E_TUPLE_HEALTH_STORAGE_BUDGET"),
+        ("GPU_hours", 0.8, "E_TUPLE_HEALTH_GPU_HOUR_BUDGET"),
+        ("new_storage_GiB", 1.1, "E_TUPLE_HEALTH_STORAGE_BUDGET"),
         ("direct_monetary_cost_USD", 0.01, "E_TUPLE_HEALTH_COST_BUDGET"),
     ],
 )
@@ -727,7 +778,7 @@ def test_topology_guard_repair_is_hash_bound_preinference_and_scientifically_nar
         MODULE._engineering_health_topology_guard_repair(mutated)
 
 
-def test_terminal_health_blocker_is_hash_bound_and_prevents_any_new_route(
+def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
     tmp_path: Path,
 ) -> None:
     config = _config()
@@ -744,7 +795,19 @@ def test_terminal_health_blocker_is_hash_bound_and_prevents_any_new_route(
     assert result["resource_accounting"]["submission_count_remaining"] == 0
     assert result["terminal_gate"]["attempt_4_authorized"] is False
 
-    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ROUTE_EXHAUSTED"):
+    reauthorization = MODULE._engineering_health_reauthorization(config)
+    assert reauthorization["reauthorization_commitment_sha256"] == (
+        "3271499c19a77ffab8c53e2cd2052ea14514682a3d4b73fd7c5179ceec4a7ff4"
+    )
+    assert reauthorization["effective_resource_policy"]["reauthorized_attempt"] == 4
+    assert reauthorization["effective_resource_policy"][
+        "reauthorized_submission_count"
+    ] == 1
+    assert reauthorization["failure_specific_repair"][
+        "runner_scontrol_subprocess_inside_container"
+    ] is False
+
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_REAUTHORIZED_ATTEMPT"):
         MODULE.run_tuple_health(
             argparse.Namespace(
                 public_root=tmp_path / "public",
@@ -754,8 +817,6 @@ def test_terminal_health_blocker_is_hash_bound_and_prevents_any_new_route(
                 device="cuda",
             )
         )
-    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ROUTE_EXHAUSTED"):
-        MODULE._load_tuple_health_pass(tmp_path, config, "a" * 64)
 
     mutated = json.loads(json.dumps(config))
     mutated["learner_effective_engineering_health_result"]["terminal_gate"][
@@ -766,9 +827,20 @@ def test_terminal_health_blocker_is_hash_bound_and_prevents_any_new_route(
     ):
         MODULE._engineering_health_terminal_result(mutated)
 
+    mutated = json.loads(json.dumps(config))
+    amended = mutated["learner_effective_engineering_health_reauthorization"]
+    amended["effective_resource_policy"]["reauthorized_submission_count"] = 2
+    payload = json.loads(json.dumps(amended))
+    payload.pop("reauthorization_commitment_sha256")
+    amended["reauthorization_commitment_sha256"] = MODULE.digest(payload)
+    with pytest.raises(
+        RuntimeError, match="E_TUPLE_HEALTH_REAUTHORIZATION_COMMITMENT"
+    ):
+        MODULE._engineering_health_reauthorization(mutated)
 
-def test_h100_health_topology_uses_authoritative_scheduler_record_and_effective_cuda(
-    monkeypatch: pytest.MonkeyPatch,
+
+def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     h100_cuda = SimpleNamespace(
         device_count=lambda: 1,
@@ -778,45 +850,30 @@ def test_h100_health_topology_uses_authoritative_scheduler_record_and_effective_
         ),
     )
     monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=h100_cuda))
-    monkeypatch.setenv("SLURM_JOB_ID", "316353")
-    monkeypatch.setenv("SLURM_JOB_PARTITION", "transient-value-not-used")
-    monkeypatch.setenv("SLURM_JOB_GPUS", "transient-value-not-used")
-    monkeypatch.setenv("SLURM_GPUS_ON_NODE", "transient-value-not-used")
-    record = " ".join(
-        (
-            "JobId=316353",
-            "Partition=h100",
-            "NumNodes=1",
-            "NumCPUs=8",
-            "NumTasks=1",
-            "TimeLimit=00:15:00",
-            "MinMemoryCPU=4G",
-            "TresPerNode=gres/gpu:nvidia_h100_nvl_3g.47gb:1",
-        )
-    )
+    attestation = _write_topology_attestation(tmp_path, monkeypatch)
     monkeypatch.setattr(
         MODULE.subprocess,
         "run",
-        lambda *_args, **_kwargs: SimpleNamespace(
-            returncode=0, stdout=record, stderr=""
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            AssertionError("scontrol subprocess must not run inside the container")
         ),
     )
-    MODULE._tuple_health_topology("cuda")
+    commitment = MODULE._tuple_health_topology(
+        "cuda", topology_attestation=attestation, attempt=4
+    )
+    assert commitment == MODULE.file_digest(attestation)
 
-    bad = record.replace("NumTasks=1", "NumTasks=2")
-    monkeypatch.setattr(
-        MODULE.subprocess,
-        "run",
-        lambda *_args, **_kwargs: SimpleNamespace(
-            returncode=0, stdout=bad, stderr=""
-        ),
-    )
-    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_GPU_TOPOLOGY"):
-        MODULE._tuple_health_topology("cuda")
+    bad = json.loads(attestation.read_text())
+    bad["task_count"] = 2
+    attestation.write_bytes(MODULE.canonical(bad) + b"\n")
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION"):
+        MODULE._tuple_health_topology(
+            "cuda", topology_attestation=attestation, attempt=4
+        )
 
 
 def test_tuple_topology_separates_h100_health_from_a30_science(
-    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     for key, value in {
         "SLURM_JOB_NUM_NODES": "1",
@@ -837,7 +894,10 @@ def test_tuple_topology_separates_h100_health_from_a30_science(
     )
     monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=h100_cuda))
     monkeypatch.setenv("SLURM_JOB_PARTITION", "h100")
-    MODULE._tuple_health_topology("cuda")
+    attestation = _write_topology_attestation(tmp_path, monkeypatch)
+    MODULE._tuple_health_topology(
+        "cuda", topology_attestation=attestation, attempt=4
+    )
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_GPU_TOPOLOGY"):
         MODULE._tuple_health_topology("cuda", False)
 
@@ -851,7 +911,7 @@ def test_tuple_topology_separates_h100_health_from_a30_science(
     monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=a30_cuda))
     monkeypatch.setenv("SLURM_JOB_PARTITION", "a30")
     MODULE._tuple_health_topology("cuda", False)
-    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_GPU_TOPOLOGY"):
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION"):
         MODULE._tuple_health_topology("cuda")
 
 
@@ -943,6 +1003,7 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     )
     historical_config["schema_version"] = 21
     historical_config.pop("learner_effective_engineering_health_result")
+    historical_config.pop("learner_effective_engineering_health_reauthorization")
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)
     manifest = _fixture_manifest()
@@ -959,6 +1020,9 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
             "CPU_count": 8,
             "memory_GiB": 32,
         },
+    )
+    _write_topology_attestation(
+        attempt_root, monkeypatch, attempt=1, job_id=316325
     )
     calls: list[str] = []
 
@@ -982,7 +1046,9 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
         "_tuple_qualification_integrity",
     ):
         monkeypatch.setattr(MODULE, name, forbidden)
-    monkeypatch.setattr(MODULE, "_tuple_health_topology", lambda *_: None)
+    monkeypatch.setattr(
+        MODULE, "_tuple_health_topology", lambda *_args, **_kwargs: "a" * 64
+    )
     monkeypatch.setattr(
         MODULE,
         "_tuple_health_dependency_preflight",

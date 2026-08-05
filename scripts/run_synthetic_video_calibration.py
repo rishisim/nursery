@@ -17,6 +17,7 @@ from pathlib import Path
 import random
 import re
 import shutil
+import stat
 import statistics
 import subprocess
 import sys
@@ -577,6 +578,9 @@ ENGINEERING_HEALTH_TOPOLOGY_GUARD_REPAIR_SHA256 = (
 ENGINEERING_HEALTH_BLOCKER_SHA256 = (
     "644028babc768e881276fa078b95349ba77f8418cb76d722e8baf2588f9d0f81"
 )
+ENGINEERING_HEALTH_REAUTHORIZATION_SHA256 = (
+    "3271499c19a77ffab8c53e2cd2052ea14514682a3d4b73fd7c5179ceec4a7ff4"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -632,7 +636,7 @@ def _construct_aligned_ltx_resume_amendment(
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22}
+        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22, 23}
         or value.get("status")
         != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     ):
@@ -690,7 +694,7 @@ def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {21, 22}
+        cfg.get("schema_version") not in {21, 22, 23}
         or value.get("status")
         != "FROZEN_BEFORE_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -759,7 +763,7 @@ def _engineering_health_resource_redirect(
     payload = json.loads(json.dumps(value))
     expected = payload.pop("amendment_commitment_sha256", None)
     if (
-        cfg.get("schema_version") not in {21, 22}
+        cfg.get("schema_version") not in {21, 22, 23}
         or value.get("status")
         != "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "SCHEDULER_AND_RESOURCE_LATENCY_ONLY"
@@ -843,12 +847,16 @@ def _engineering_health_resource_redirect(
 
 
 def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
-    """Return the sole effective health policy after validating both amendments."""
+    """Return the effective health policy after validating its full lineage."""
 
     _engineering_health_amendment(cfg)
     redirect = _engineering_health_resource_redirect(cfg)
     _engineering_health_dependency_restore(cfg)
     _engineering_health_topology_guard_repair(cfg)
+    if "learner_effective_engineering_health_reauthorization" in cfg:
+        return _engineering_health_reauthorization(cfg)[
+            "effective_resource_policy"
+        ]
     return redirect["bounded_resource_policy"]
 
 
@@ -888,7 +896,7 @@ def _engineering_health_dependency_restore(
         ["transformers", "4.57.6"],
     ]
     if (
-        cfg.get("schema_version") not in {21, 22}
+        cfg.get("schema_version") not in {21, 22, 23}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_DEPENDENCY_CACHE_MISS_BEFORE_ATTEMPT_2_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -993,7 +1001,7 @@ def _engineering_health_topology_guard_repair(
     repair = value.get("repair", {})
     budget = value.get("remaining_health_budget", {})
     if (
-        cfg.get("schema_version") not in {21, 22}
+        cfg.get("schema_version") not in {21, 22, 23}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_2_REDUNDANT_TOPOLOGY_GUARD_FAILURE_BEFORE_ATTEMPT_3_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1076,7 +1084,7 @@ def _engineering_health_terminal_result(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") != 22
+        cfg.get("schema_version") not in {22, 23}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ROUTE_EXHAUSTED_BEFORE_MODEL_INFERENCE_NO_SCIENTIFIC_METRICS_OPENED"
         or expected != ENGINEERING_HEALTH_BLOCKER_SHA256
@@ -1133,6 +1141,119 @@ def _engineering_health_terminal_result(cfg: dict[str, Any]) -> dict[str, Any]:
         )
     ):
         raise RuntimeError("E_TUPLE_HEALTH_TERMINAL_RESULT_COMMITMENT")
+    return value
+
+
+def _engineering_health_reauthorization(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Validate the one-submission post-blocker topology-attestation route."""
+
+    _engineering_health_terminal_result(cfg)
+    try:
+        value = cfg["learner_effective_engineering_health_reauthorization"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_REAUTHORIZATION_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("reauthorization_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    repair = value.get("failure_specific_repair", {})
+    attestation = repair.get("topology_attestation", {})
+    resource = value.get("effective_resource_policy", {})
+    execution = value.get("execution_and_stop_rule", {})
+    if (
+        cfg.get("schema_version") != 23
+        or value.get("status")
+        != "FROZEN_AFTER_SEALED_BLOCKER_BEFORE_REAUTHORIZED_ATTEMPT_4_OR_NEW_SCIENTIFIC_OUTCOME"
+        or value.get("scope")
+        != "ONE_SUBMISSION_WRAPPER_TO_CONTAINER_TOPOLOGY_ATTESTATION_REPAIR_ONLY"
+        or expected != ENGINEERING_HEALTH_REAUTHORIZATION_SHA256
+        or digest(payload) != expected
+        or value.get("reauthorization_commitment_scope")
+        != "canonical JSON of this amendment excluding reauthorization_commitment_sha256"
+        or preserved.get("sealed_engineering_blocker_sha256")
+        != ENGINEERING_HEALTH_BLOCKER_SHA256
+        or preserved.get("attempt_3_engineering_health_commitment_sha256")
+        != "107f5d0dd58adda31e9932a18a41319d5d6317fafd9b769e36ad0d13650c3696"
+        or preserved.get("prior_public_development_no_go_sha256")
+        != "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
+        or preserved.get("public_fixture_manifest_sha256")
+        != "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6"
+        or preserved.get(
+            "models_weights_fixtures_preprocessing_thresholds_metrics_seeds_module_behavior_scientific_gates_and_downstream_contract"
+        )
+        is not True
+        or repair.get("runner_scontrol_subprocess_inside_container") is not False
+        or repair.get("same_complete_28_case_two_replicate_production_paths")
+        is not True
+        or repair.get("mocks_or_shallow_load_path") is not False
+        or repair.get("scientific_metric_count") != 0
+        or repair.get("holdout_input_count") != 0
+        or repair.get("model_fixture_threshold_metric_seed_or_gate_changed")
+        is not False
+        or attestation.get("schema_version") != 1
+        or attestation.get("raw_scontrol_record_retained_or_exposed") is not False
+        or attestation.get("exact_fields")
+        != [
+            "schema_version",
+            "attempt",
+            "job_id",
+            "partition",
+            "node_count",
+            "CPU_count",
+            "task_count",
+            "time_limit_minutes",
+            "memory_per_CPU_GiB",
+            "GRES",
+            "predicate_count",
+            "predicate_pass_count",
+            "world_size",
+            "local_world_size",
+            "source",
+        ]
+        or attestation.get("expected_values")
+        != {
+            "attempt": 4,
+            "partition": "h100",
+            "node_count": 1,
+            "CPU_count": 8,
+            "task_count": 1,
+            "time_limit_minutes": 15,
+            "memory_per_CPU_GiB": 4,
+            "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+            "predicate_count": 7,
+            "predicate_pass_count": 7,
+            "world_size": 1,
+            "local_world_size": 1,
+            "source": "WRAPPER_SCONTROL_BEFORE_CONTAINER",
+        }
+        or resource
+        != {
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+            "GPU_count": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "DDP": False,
+            "per_submission_wall_minutes_max": 15,
+            "initial_plus_repair_resmoke_submission_count_max": 4,
+            "reauthorized_attempt": 4,
+            "reauthorized_submission_count": 1,
+            "prior_protocol_accounted_GPU_hours": 0.504019171529346,
+            "reauthorized_GPU_hours_max": 0.25,
+            "aggregate_GPU_hours_max": 0.754019171529346,
+            "prior_health_run_storage_GiB": 1.4025717973709106e-06,
+            "reauthorized_new_storage_GiB_max": 1.0,
+            "new_storage_GiB_max": 1.0000014025717974,
+            "direct_monetary_cost_USD": 0,
+        }
+        or execution.get("prospective_commit_and_push_required_before_submission")
+        is not True
+        or execution.get("attempt_ordinal") != 4
+        or execution.get("submission_count") != 1
+        or execution.get("repair_or_resmoke_cycles_after_attempt_4") != 0
+        or execution.get("complete_suite_restart_required") is not True
+        or execution.get("metric_withholding_unchanged") is not True
+        or value.get("new_health_or_scientific_outcome_opened") is not False
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_REAUTHORIZATION_COMMITMENT")
     return value
 
 
@@ -4180,6 +4301,18 @@ def _validate_tuple_health_full(value: Any, cfg: dict[str, Any]) -> None:
     if value.get("holdout_input_count") != 0:
         raise RuntimeError("E_TUPLE_HEALTH_HOLDOUT_PROHIBITED")
     modules = value.get("module_results")
+    expected_config_commitments = {digest(cfg)}
+    if (
+        "learner_effective_engineering_health_reauthorization" in cfg
+        and type(value.get("attempt")) is int
+        and int(value["attempt"]) <= 3
+    ):
+        _engineering_health_reauthorization(cfg)
+        expected_config_commitments.add(
+            cfg["learner_effective_engineering_health_result"][
+                "compact_aggregate"
+            ]["config_commitment_sha256"]
+        )
     if (
         set(value) != set(TUPLE_HEALTH_FULL_FIELDS)
         or value.get("schema_version") != 1
@@ -4187,7 +4320,8 @@ def _validate_tuple_health_full(value: Any, cfg: dict[str, Any]) -> None:
         or value.get("module_count") != len(TUPLE_QUALIFICATION_MODULE_IDS)
         or value.get("case_count") != 28
         or value.get("scientific_metric_count") != 0
-        or value.get("config_commitment_sha256") != digest(cfg)
+        or value.get("config_commitment_sha256")
+        not in expected_config_commitments
         or not isinstance(modules, list)
         or len(modules) != len(TUPLE_QUALIFICATION_MODULE_IDS)
         or {row.get("module_id") for row in modules}
@@ -10261,9 +10395,61 @@ def _tuple_health_selected_rows(
     return output
 
 
+def _tuple_health_topology_attestation(path: Path, attempt: int) -> str:
+    """Validate the wrapper's compact scheduler attestation without Slurm tools."""
+
+    job_id = os.environ.get("SLURM_JOB_ID", "")
+    if not job_id.isdecimal() or int(job_id) <= 0:
+        raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION")
+    expected = {
+        "schema_version": 1,
+        "attempt": attempt,
+        "job_id": int(job_id),
+        "partition": "h100",
+        "node_count": 1,
+        "CPU_count": 8,
+        "task_count": 1,
+        "time_limit_minutes": 15,
+        "memory_per_CPU_GiB": 4,
+        "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+        "predicate_count": 7,
+        "predicate_pass_count": 7,
+        "world_size": 1,
+        "local_world_size": 1,
+        "source": "WRAPPER_SCONTROL_BEFORE_CONTAINER",
+    }
+    try:
+        mode = stat.S_IMODE(path.lstat().st_mode)
+        raw = path.read_bytes()
+        value = json.loads(raw)
+    except (OSError, ValueError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION") from error
+    if (
+        not path.is_file()
+        or path.is_symlink()
+        or mode != 0o600
+        or value != expected
+        or raw != canonical(value) + b"\n"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION")
+    return file_digest(path)
+
+
 def _tuple_health_topology(
-    device: str, engineering_health: bool = True
-) -> None:
+    device: str,
+    engineering_health: bool = True,
+    *,
+    topology_attestation: Path | None = None,
+    attempt: int | None = None,
+) -> str | None:
+    attestation_commitment = None
+    if engineering_health:
+        if topology_attestation is None or type(attempt) is not int:
+            raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION")
+        attestation_commitment = _tuple_health_topology_attestation(
+            topology_attestation, int(attempt)
+        )
+
     import torch
 
     device_name = torch.cuda.get_device_name(0) if torch.cuda.device_count() == 1 else ""
@@ -10275,40 +10461,7 @@ def _tuple_health_topology(
             else 0
         )
         expected_memory = 45 * 1024**3 <= total_memory <= 50 * 1024**3
-        job_id = os.environ.get("SLURM_JOB_ID")
-        if job_id:
-            completed = subprocess.run(
-                ["scontrol", "show", "job", "--oneliner", job_id],
-                text=True,
-                capture_output=True,
-                check=False,
-            )
-            record = f" {completed.stdout.strip()} "
-            exact_gres = (
-                " TresPerNode=gres/gpu:nvidia_h100_nvl_3g.47gb:1 " in record
-                or " TresPerNode=gres:gpu:nvidia_h100_nvl_3g.47gb:1 " in record
-            )
-            scheduler_topology = completed.returncode == 0 and all(
-                token in record
-                for token in (
-                    " Partition=h100 ",
-                    " NumNodes=1 ",
-                    " NumCPUs=8 ",
-                    " NumTasks=1 ",
-                    " TimeLimit=00:15:00 ",
-                    " MinMemoryCPU=4G ",
-                )
-            ) and exact_gres
-        else:
-            scheduler_topology = all(
-                (
-                    os.environ.get("SLURM_JOB_PARTITION") == "h100",
-                    os.environ.get("SLURM_JOB_NUM_NODES") == "1",
-                    os.environ.get("SLURM_NTASKS") == "1",
-                    os.environ.get("SLURM_CPUS_PER_TASK") == "8",
-                    os.environ.get("SLURM_GPUS_ON_NODE") == "1",
-                )
-            )
+        scheduler_topology = attestation_commitment is not None
     else:
         expected_device = device_name == "NVIDIA A30"
         expected_memory = True
@@ -10331,6 +10484,7 @@ def _tuple_health_topology(
         or os.environ.get("LOCAL_WORLD_SIZE", "1") != "1"
     ):
         raise RuntimeError("E_TUPLE_HEALTH_GPU_TOPOLOGY")
+    return attestation_commitment
 
 
 def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
@@ -10338,8 +10492,12 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
 
     cfg = json.loads(args.config.read_text())
     if "learner_effective_engineering_health_result" in cfg:
-        _engineering_health_terminal_result(cfg)
-        raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
+        if "learner_effective_engineering_health_reauthorization" not in cfg:
+            _engineering_health_terminal_result(cfg)
+            raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
+        _engineering_health_reauthorization(cfg)
+        if int(args.attempt) != 4:
+            raise RuntimeError("E_TUPLE_HEALTH_REAUTHORIZED_ATTEMPT")
     health = _engineering_health_amendment(cfg)
     root = _tuple_health_root(args.public_root)
     _require_external_or_ignored_output(root)
@@ -10361,7 +10519,8 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
     attempt_root.mkdir(parents=True, exist_ok=True, mode=0o700)
     marker = _tuple_health_wrapper_marker(attempt_root, int(args.attempt), cfg)
     if set(path.name for path in attempt_root.iterdir()) != {
-        "wrapper-started.json"
+        "topology-attestation.json",
+        "wrapper-started.json",
     }:
         raise RuntimeError("E_TUPLE_HEALTH_PARTIAL_ATTEMPT")
     submission_started_epoch = float(marker["submission_started_epoch"])
@@ -10393,8 +10552,13 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
     projection: dict[str, Any] | None = None
     dependency: dict[str, Any] | None = None
     manifest: dict[str, Any] | None = None
+    topology_attestation_commitment: str | None = None
     try:
-        _tuple_health_topology(str(args.device))
+        topology_attestation_commitment = _tuple_health_topology(
+            str(args.device),
+            topology_attestation=attempt_root / "topology-attestation.json",
+            attempt=int(args.attempt),
+        )
         if (
             os.environ.get("HF_HUB_OFFLINE") != "1"
             or os.environ.get("TRANSFORMERS_OFFLINE") != "1"
@@ -10403,6 +10567,16 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
         ):
             raise RuntimeError("E_TUPLE_HEALTH_OFFLINE_ENVIRONMENT")
         dependency = _tuple_health_dependency_preflight(args.public_root, cfg)
+        dependency["dependency_config_commitment_sha256"] = digest(
+            {
+                "dependency_config_commitment_sha256": dependency[
+                    "dependency_config_commitment_sha256"
+                ],
+                "topology_attestation_commitment_sha256": (
+                    topology_attestation_commitment
+                ),
+            }
+        )
         manifest, fixture_root = _verify_tuple_fixture_manifest(
             args.public_root, cfg
         )
@@ -10523,6 +10697,10 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
                 {
                     "config_sha256": file_digest(args.config),
                     "health_amendment": health["amendment_commitment_sha256"],
+                    "topology_attestation_commitment_sha256": (
+                        topology_attestation_commitment
+                        or "PREFLIGHT_BLOCKED_BEFORE_ATTESTATION"
+                    ),
                 }
             )
         ),
@@ -10569,12 +10747,19 @@ def _load_tuple_health_pass(
     public: Path, cfg: dict[str, Any], fixture_commitment: str
 ) -> dict[str, Any]:
     if "learner_effective_engineering_health_result" in cfg:
-        _engineering_health_terminal_result(cfg)
-        raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
+        if "learner_effective_engineering_health_reauthorization" not in cfg:
+            _engineering_health_terminal_result(cfg)
+            raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
+        _engineering_health_reauthorization(cfg)
     root = _tuple_health_root(public) / "health"
     passes = []
     observed = []
-    for attempt in range(1, 4):
+    maximum_attempts = int(
+        _engineering_health_resource_policy(cfg)[
+            "initial_plus_repair_resmoke_submission_count_max"
+        ]
+    )
+    for attempt in range(1, maximum_attempts + 1):
         path = root / f"attempt-{attempt:02d}" / "full-result.json"
         if not path.is_file():
             marker = root / f"attempt-{attempt:02d}" / "wrapper-started.json"

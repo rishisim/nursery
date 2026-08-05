@@ -1860,8 +1860,32 @@ input, and $0 direct cost. Protocol accounting totals 30.241150 minutes and
 0.504019 H100-slice GPU-hours because attempts 1 and 2 retain their frozen
 15-minute/0.25-hour conservative charges; scheduler-observed elapsed time over
 the three jobs was 26 seconds. The third failure exhausts the frozen
-submission route. Attempt 4, new-route public development and holdout, governed
-C, LTX preflight/generation, and the synthetic learner are not authorized.
+submission route. Under that sealed route, attempt 4, new-route public
+development and holdout, governed C, LTX preflight/generation, and the synthetic
+learner were not authorized.
+
+The blocker above remains final for its three-attempt route and is not
+reinterpreted. The user subsequently made a new prospective decision,
+commitment `3271499c…a7ff4`, authorizing exactly one attempt 4 to repair only the
+identified wrapper-to-container validation boundary. The exact H100 NVL
+`3g.47gb` one-process topology, eight CPUs, 32 GiB, 15-minute wall cap, public
+fixtures, models, preprocessing, module code paths, zero-metric withholding,
+and downstream scientific gates remain unchanged. The new ceiling is 0.25
+additional slice-GPU-hours and 1 GiB additional health-run storage, producing
+lifetime protocol ceilings of 0.754019 slice-GPU-hours and 1.000001403 GiB for
+the health run tree; direct monetary cost remains $0.
+
+Before container entry, the wrapper must pass the same seven authoritative
+`scontrol` predicates and write one mode-0600 canonical JSON attestation with
+only the frozen attempt, job, topology, predicate-count, and provenance fields;
+the raw scheduler record is neither retained nor exported. Inside the
+network-disabled container, the runner must validate the exact attestation,
+job binding, canonical round trip, and one-device H100-NVL/45–50-GiB CUDA
+properties without invoking Slurm tooling. The attestation SHA-256 is folded
+into the dependency-config commitment and hence the health seal. Attempt 4 must
+restart the complete 28-case, two-replicate suite. No post-attempt repair,
+resmoke, or attempt 5 is authorized. A failure seals a new engineering blocker;
+only a committed 7/7 engineering pass authorizes public development.
 
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only

@@ -43,7 +43,8 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     )
     assert "mechanistic-tuples/construct-aligned-engineering-health" in wrapper
     assert 'health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"' in wrapper
-    assert "1|2|3) ;;" in wrapper
+    assert "4) ;;" in wrapper
+    assert "1|2|3) ;;" not in wrapper
     assert 'require_health_topology' in wrapper
     assert 'scontrol show job --oneliner "$SLURM_JOB_ID"' in wrapper
     assert 'Partition=h100' in wrapper
@@ -57,7 +58,10 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     assert 'nvidia-smi' not in topology_guard
     assert '"GPU_type":"NVIDIA_H100_NVL_3G_47GB_MIG"' in wrapper
     assert "echo " not in topology_guard
-    assert "printf " not in topology_guard
+    assert topology_guard.count("printf ") == 1
+    assert 'topology-attestation.json' in topology_guard
+    assert '"source":"WRAPPER_SCONTROL_BEFORE_CONTAINER"' in topology_guard
+    assert '"predicate_count":7,"predicate_pass_count":7' in topology_guard
     assert topology_guard.count("2>/dev/null") == 1
     assert 'python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" tuple-health' in wrapper
     assert '--attempt "$health_attempt"' in wrapper
@@ -82,8 +86,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 13
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_BLOCKER_SEALED_AFTER_FINAL_H100_ATTEMPT_3_NO_NEW_SCIENTIFIC_OUTCOME"
+    assert config["schema_version"] == 14
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_BLOCKER_PRESERVED_SINGLE_ATTEMPT_REAUTHORIZATION_FROZEN_PENDING_ATTEMPT_4_NO_NEW_SCIENTIFIC_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -201,6 +205,23 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
         "644028babc768e881276fa078b95349ba77f8418cb76d722e8baf2588f9d0f81"
     )
     assert blocker == result["learner_effective_engineering_health_result"]
+    reauthorization = config[
+        "learner_effective_engineering_health_reauthorization"
+    ]
+    assert reauthorization["reauthorization_commitment_sha256"] == (
+        "3271499c19a77ffab8c53e2cd2052ea14514682a3d4b73fd7c5179ceec4a7ff4"
+    )
+    assert reauthorization["sealed_engineering_blocker_sha256"] == (
+        "644028babc768e881276fa078b95349ba77f8418cb76d722e8baf2588f9d0f81"
+    )
+    assert reauthorization["attempt"] == 4
+    assert reauthorization["submission_count"] == 1
+    assert reauthorization["reauthorized_GPU_hours_max"] == 0.25
+    assert reauthorization["runner_scontrol_inside_container"] is False
+    assert reauthorization["model_fixture_threshold_metric_seed_or_gate_changed"] is False
+    assert reauthorization == result[
+        "learner_effective_engineering_health_reauthorization"
+    ]
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
     assert label_correction["binary_yes_no_swapped_count"] == 193
@@ -424,7 +445,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["phase4_authorized"] is True
     assert config["gates"]["childlens_audio_processing_authorized"] is True
     assert config["gates"]["learner_effective_implementation_authorized"] is True
-    assert config["gates"]["learner_effective_public_qualification_authorized"] is False
+    assert config["gates"]["learner_effective_public_qualification_authorized"] is True
     assert config["gates"]["learner_effective_runner_implementation_status"].startswith(
         "PASS_"
     )
@@ -432,13 +453,13 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
     assert config["gates"]["learner_effective_no_hand_review_sealed"] is True
     assert config["gates"]["learner_effective_public_fixture_preparation_authorized"] is True
-    assert config["gates"]["learner_effective_public_model_inference_authorized"] is False
+    assert config["gates"]["learner_effective_public_model_inference_authorized"] is True
     assert config["gates"]["learner_effective_public_model_inference_scope"] == (
-        "NONE_ENGINEERING_HEALTH_ROUTE_EXHAUSTED"
+        "REAUTHORIZED_ATTEMPT_4_ENGINEERING_MICROHEALTH_ONLY_NO_SCIENTIFIC_METRICS"
     )
     assert config["gates"][
         "learner_effective_public_model_inference_conditionally_authorized_after_fixture_seal"
-    ] is False
+    ] is True
     assert config["gates"]["learner_effective_new_route_scientific_development_authorized"] is False
     assert config["gates"]["governed_C_calibration_authorized"] is False
     assert config["language"]["identical_real_synthetic_pipeline_frozen"] is True
@@ -466,7 +487,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 22
+    assert config["schema_version"] == 23
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)
