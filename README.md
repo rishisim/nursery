@@ -701,3 +701,15 @@ those two exact commitments, rejects every other unbound historical value,
 and freezes the otherwise unchanged complete attempt 19 on the
 scheduler-selected A30. Periodic polling and unchanged-status reporting remain
 prohibited.
+
+Attempt 19, Juno job 316954, completed all seven metric-withheld modules in 404
+scheduler seconds. Five modules passed engineering health; referent and
+attribute stopped on the same exact Grounding DINO checkpoint/model state-key
+delta (zero missing keys and two unexpected checkpoint keys). No scientific
+metric opened. Engineering blocker `af86c7a9…053bad` preserves that result.
+Prospective repair `3ecdaa38…e5cbeb` permits only those two exact unused
+checkpoint keys under `strict=False`, blocks any other key delta, and applies
+the same validator in sizing and production loaders. The complete unchanged
+attempt 20 is frozen on one A30, eight CPUs, 32 GiB, 60 minutes/1 GPU-hour,
+1 GiB new storage, and $0. Slurm execution uses one blocking wait; periodic
+polling and unchanged-status updates are prohibited.

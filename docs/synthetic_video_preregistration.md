@@ -2234,3 +2234,20 @@ historical or unbound value. Attempt 19 reruns the whole suite on the
 scheduler-selected A30 with one process, eight CPUs, 32 GiB, a
 60-minute/1-GPU-hour cap, 1 GiB new storage, and $0. No model, fixture, seed,
 threshold, metric, privacy rule, or scientific gate changed.
+
+Attempt 19 (Juno job 316954) completed all seven metric-withheld modules after
+404 scheduler seconds. Five passed engineering health. Referent and attribute
+both returned the same exact `E_TUPLE_GROUNDING_STATE` compatibility failure:
+the checkpoint had zero missing state keys and exactly two unused unexpected
+keys relative to the pinned implementation. No scientific metric opened.
+Blocker `af86c7a9…053bad` preserves the full result.
+
+Before another outcome, repair `3ecdaa38…e5cbeb` permits only those two exact
+unexpected checkpoint keys under `strict=False`; zero missing keys remain
+required and any additional key delta is blocking. The same validator is used
+by label-blind sizing and production grounding loads. Attempt 20 reruns all 28
+cases and both replicates on one scheduler-selected A30, one process, eight
+CPUs, 32 GiB, with a 60-minute/1-GPU-hour, 1-GiB, $0 ceiling. It uses one
+blocking Slurm wait. Periodic polling and unchanged-status reporting are
+prohibited. No model, fixture, source, seed, threshold, metric, privacy rule,
+or scientific gate changed.

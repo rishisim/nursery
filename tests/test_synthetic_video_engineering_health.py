@@ -178,6 +178,10 @@ def _historical_health_config() -> dict:
     config.pop(
         "learner_effective_engineering_health_historical_full_result_lineage_repair"
     )
+    config.pop("learner_effective_engineering_health_attempt_19_result")
+    config.pop(
+        "learner_effective_engineering_health_grounding_state_compatibility_repair"
+    )
     return config
 
 
@@ -212,7 +216,7 @@ def _write_topology_attestation(
         "node_count": 1,
         "CPU_count": 8,
         "task_count": 1,
-        "time_limit_minutes": 60 if attempt in {8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19} else 15,
+        "time_limit_minutes": 60 if attempt in {8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20} else 15,
         "memory_per_CPU_GiB": 4,
         "GRES": gres,
         "predicate_count": 7,
@@ -905,6 +909,42 @@ def test_historical_attempt_17_full_record_requires_both_sealed_commitments() ->
         MODULE._validate_tuple_health_full(wrong_health, _config())
 
 
+def test_historical_attempt_19_full_record_requires_both_sealed_commitments() -> None:
+    full = _healthy_full()
+    full["status"] = "ENGINEERING_BLOCKER"
+    full["attempt"] = 19
+    full["config_commitment_sha256"] = (
+        "c9cd75f0d813bc0bbf506aa97691e883af88647f09af1ecb758bacb3ef171916"
+    )
+    full["engineering_health_commitment_sha256"] = (
+        "b0a0a56b79a927355c3123f352057d038cea41e3e7dab202802f6ebf3bb64b17"
+    )
+    for module_id in ("referent", "attribute"):
+        index = MODULE_IDS.index(module_id)
+        full["module_results"][index] = {
+            "module_id": module_id,
+            "status": "ERROR",
+            "error_code": f"E_TUPLE_HEALTH_{module_id.upper()}_TUPLE_GROUNDING_STATE",
+            "trace_written": True,
+        }
+    full["completed_module_count"] = 5
+    full["failed_module_count"] = 2
+    full["failure_count"] = 2
+    full["resource"]["GPU_type"] = "NVIDIA_A30_24GB"
+    full["cumulative_resource"]["cumulative_submission_count"] = 19
+    MODULE._validate_tuple_health_full(full, _config())
+
+    wrong_config = json.loads(json.dumps(full))
+    wrong_config["config_commitment_sha256"] = "e" * 64
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_FULL_SCHEMA"):
+        MODULE._validate_tuple_health_full(wrong_config, _config())
+
+    wrong_health = json.loads(json.dumps(full))
+    wrong_health["engineering_health_commitment_sha256"] = "e" * 64
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_FULL_SCHEMA"):
+        MODULE._validate_tuple_health_full(wrong_health, _config())
+
+
 def test_nltk_manifest_allows_only_the_exact_hashed_provenance_marker(
     tmp_path: Path,
 ) -> None:
@@ -1113,6 +1153,81 @@ def test_historical_full_result_lineage_repair_preserves_attempt_18() -> None:
         match="E_TUPLE_HEALTH_HISTORICAL_FULL_RESULT_LINEAGE_REPAIR_COMMITMENT",
     ):
         MODULE._engineering_health_historical_full_result_lineage_repair(mutated)
+
+
+def test_grounding_state_repair_preserves_attempt_19_and_rejects_mutation() -> None:
+    config = _config()
+    attempt = MODULE._engineering_health_attempt_19_result(config)
+    assert attempt["blocker_commitment_sha256"] == (
+        "af86c7a955acac78a905adcbd2d4f85c3d4cb9da362fc1db718b29f3ed053bad"
+    )
+    assert attempt["compact_aggregate"]["scientific_metric_count"] == 0
+    assert attempt["stable_aggregate_diagnosis"]["missing_key_count"] == 0
+    assert attempt["stable_aggregate_diagnosis"]["unexpected_keys"] == [
+        "bert.embeddings.position_ids",
+        "label_enc.weight",
+    ]
+    repair = MODULE._engineering_health_grounding_state_compatibility_repair(
+        config
+    )
+    assert repair["repair_commitment_sha256"] == (
+        "3ecdaa380536c23c0a6b4d695c22a3d9be5209dab1090b001c4e667cc6e5cbeb"
+    )
+    assert repair["active_attempt_resource_policy"]["attempt"] == 20
+
+    mutated = json.loads(json.dumps(config))
+    mutated[
+        "learner_effective_engineering_health_grounding_state_compatibility_repair"
+    ]["failure_specific_repair"]["required_unexpected_keys_exact"].append(
+        "unapproved.weight"
+    )
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_HEALTH_GROUNDING_STATE_COMPATIBILITY_REPAIR_COMMITMENT",
+    ):
+        MODULE._engineering_health_grounding_state_compatibility_repair(mutated)
+
+
+def test_grounding_state_compatibility_is_exact_and_order_independent() -> None:
+    compatible = SimpleNamespace(
+        missing_keys=[],
+        unexpected_keys=["label_enc.weight", "bert.embeddings.position_ids"],
+    )
+    record = MODULE._tuple_grounding_state_compatibility(compatible, _config())
+    assert record == {
+        "missing_key_count": 0,
+        "unexpected_key_count": 2,
+        "compatibility_repair_commitment_sha256": (
+            "3ecdaa380536c23c0a6b4d695c22a3d9be5209dab1090b001c4e667cc6e5cbeb"
+        ),
+    }
+
+    for incompatible in (
+        SimpleNamespace(
+            missing_keys=["missing.weight"],
+            unexpected_keys=[
+                "bert.embeddings.position_ids",
+                "label_enc.weight",
+            ],
+        ),
+        SimpleNamespace(
+            missing_keys=[],
+            unexpected_keys=[
+                "bert.embeddings.position_ids",
+                "label_enc.weight",
+                "unapproved.weight",
+            ],
+        ),
+    ):
+        with pytest.raises(RuntimeError, match="E_TUPLE_GROUNDING_STATE"):
+            MODULE._tuple_grounding_state_compatibility(incompatible, _config())
+
+
+def test_grounding_state_compatibility_is_shared_by_sizing_and_production() -> None:
+    source = Path("scripts/run_synthetic_video_calibration.py").read_text()
+    assert source.count(
+        "_tuple_grounding_state_compatibility(incompatible, cfg)"
+    ) == 2
 
 
 @pytest.mark.parametrize(
@@ -1374,8 +1489,19 @@ def test_tuple_health_budget_enforces_active_lineage_repair_attempt_and_limits()
             "direct_monetary_cost_USD": 0,
         }
     )
-    budget = MODULE._tuple_health_budget(19, prior, config)
-    assert budget["attempt"] == 19
+    prior.append(
+        {
+            "attempt": 19,
+            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_count": 1,
+            "wall_minutes": 6.615966049830119,
+            "GPU_hours": 0.11026610083050198,
+            "new_storage_GiB": 9.074807167053223e-06,
+            "direct_monetary_cost_USD": 0,
+        }
+    )
+    budget = MODULE._tuple_health_budget(20, prior, config)
+    assert budget["attempt"] == 20
     assert budget["GPU_type"] == MODULE._engineering_health_resource_policy(config)[
         "GPU_type"
     ]
@@ -1386,7 +1512,7 @@ def test_tuple_health_budget_enforces_active_lineage_repair_attempt_and_limits()
     assert budget["direct_monetary_cost_USD"] == 0
 
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ATTEMPT_BUDGET"):
-        MODULE._tuple_health_budget(20, prior, config)
+        MODULE._tuple_health_budget(21, prior, config)
 
 
 def test_attempt_12_pre_runner_failure_has_sealed_marker_free_resource() -> None:
@@ -1859,13 +1985,26 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
         "343c98dcbd4f78f838a8f854a7b6d3393349058d64e22efac663d738fe485ca9"
     )
     assert lineage_repair["active_attempt_resource_policy"]["attempt"] == 19
+    attempt_19 = MODULE._engineering_health_attempt_19_result(config)
+    assert attempt_19["blocker_commitment_sha256"] == (
+        "af86c7a955acac78a905adcbd2d4f85c3d4cb9da362fc1db718b29f3ed053bad"
+    )
+    assert attempt_19["submission_provenance"]["job_id"] == 316954
+    assert attempt_19["compact_aggregate"]["scientific_metric_count"] == 0
+    grounding_repair = (
+        MODULE._engineering_health_grounding_state_compatibility_repair(config)
+    )
+    assert grounding_repair["repair_commitment_sha256"] == (
+        "3ecdaa380536c23c0a6b4d695c22a3d9be5209dab1090b001c4e667cc6e5cbeb"
+    )
+    assert grounding_repair["active_attempt_resource_policy"]["attempt"] == 20
     effective = MODULE._engineering_health_resource_policy(config)
     assert effective["per_submission_wall_minutes_max"] == 60
-    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 19
+    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 20
 
     with pytest.raises(
         RuntimeError,
-        match="E_TUPLE_HEALTH_HISTORICAL_FULL_RESULT_LINEAGE_REPAIR_ATTEMPT",
+        match="E_TUPLE_HEALTH_GROUNDING_STATE_COMPATIBILITY_REPAIR_ATTEMPT",
     ):
         MODULE.run_tuple_health(
             argparse.Namespace(
@@ -2374,6 +2513,37 @@ def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
     )
     assert commitment == MODULE.file_digest(attempt_19_attestation)
 
+    attempt_20_gpu_type = (
+        MODULE._engineering_health_grounding_state_compatibility_repair(
+            _config()
+        )["active_attempt_resource_policy"]["GPU_type"]
+    )
+    attempt_20_name, attempt_20_memory = device_by_type[attempt_20_gpu_type]
+    attempt_20_cuda = SimpleNamespace(
+        device_count=lambda: 1,
+        get_device_name=lambda _index: attempt_20_name,
+        get_device_properties=lambda _index: SimpleNamespace(
+            total_memory=attempt_20_memory * 1024**3
+        ),
+    )
+    monkeypatch.setitem(
+        sys.modules, "torch", SimpleNamespace(cuda=attempt_20_cuda)
+    )
+    attempt_20_attestation = _write_topology_attestation(
+        tmp_path / "attempt-20",
+        monkeypatch,
+        attempt=20,
+        job_id=316955,
+        gpu_type=attempt_20_gpu_type,
+    )
+    commitment = MODULE._tuple_health_topology(
+        "cuda",
+        topology_attestation=attempt_20_attestation,
+        attempt=20,
+        cfg=_config(),
+    )
+    assert commitment == MODULE.file_digest(attempt_20_attestation)
+
     bad = json.loads(attestation.read_text())
     bad["task_count"] = 2
     attestation.write_bytes(MODULE.canonical(bad) + b"\n")
@@ -2758,6 +2928,10 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop("learner_effective_engineering_health_attempt_18_result")
     historical_config.pop(
         "learner_effective_engineering_health_historical_full_result_lineage_repair"
+    )
+    historical_config.pop("learner_effective_engineering_health_attempt_19_result")
+    historical_config.pop(
+        "learner_effective_engineering_health_grounding_state_compatibility_repair"
     )
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)

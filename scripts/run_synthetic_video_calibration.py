@@ -674,6 +674,12 @@ ENGINEERING_HEALTH_ATTEMPT_18_BLOCKER_SHA256 = (
 ENGINEERING_HEALTH_HISTORICAL_FULL_RESULT_LINEAGE_REPAIR_SHA256 = (
     "343c98dcbd4f78f838a8f854a7b6d3393349058d64e22efac663d738fe485ca9"
 )
+ENGINEERING_HEALTH_ATTEMPT_19_BLOCKER_SHA256 = (
+    "af86c7a955acac78a905adcbd2d4f85c3d4cb9da362fc1db718b29f3ed053bad"
+)
+ENGINEERING_HEALTH_GROUNDING_STATE_COMPATIBILITY_REPAIR_SHA256 = (
+    "3ecdaa380536c23c0a6b4d695c22a3d9be5209dab1090b001c4e667cc6e5cbeb"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -946,6 +952,21 @@ def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
     redirect = _engineering_health_resource_redirect(cfg)
     _engineering_health_dependency_restore(cfg)
     _engineering_health_topology_guard_repair(cfg)
+    if "learner_effective_engineering_health_grounding_state_compatibility_repair" in cfg:
+        active = _engineering_health_grounding_state_compatibility_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]
+        return {
+            "partition": active["partition"], "GRES": active["GRES"],
+            "GPU_type": active["GPU_type"], "GPU_count": active["GPU_count"],
+            "CPU_count": active["CPU_count"], "memory_GiB": active["memory_GiB"],
+            "DDP": active["DDP"],
+            "per_submission_wall_minutes_max": active["wall_minutes_max"],
+            "initial_plus_repair_resmoke_submission_count_max": active["attempt"],
+            "aggregate_GPU_hours_max": active["active_aggregate_GPU_hours_max"],
+            "new_storage_GiB_max": active["active_aggregate_new_storage_GiB_max"],
+            "direct_monetary_cost_USD": active["direct_monetary_cost_USD"],
+        }
     if "learner_effective_engineering_health_historical_full_result_lineage_repair" in cfg:
         active = _engineering_health_historical_full_result_lineage_repair(cfg)[
             "active_attempt_resource_policy"
@@ -1239,6 +1260,16 @@ def _engineering_health_attempt_gpu_type(
     """Return the prospectively bound GPU type for one historical/current attempt."""
 
     if type(attempt) is not int or attempt < 1:
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+    if "learner_effective_engineering_health_grounding_state_compatibility_repair" in cfg:
+        policy = _engineering_health_grounding_state_compatibility_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]
+        if attempt == int(policy["attempt"]):
+            return str(policy["GPU_type"])
+        historical = policy["historical_attempt_GPU_types"]
+        if str(attempt) in historical:
+            return str(historical[str(attempt)])
         raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
     if "learner_effective_engineering_health_historical_full_result_lineage_repair" in cfg:
         policy = _engineering_health_historical_full_result_lineage_repair(cfg)[
@@ -5329,6 +5360,222 @@ def _engineering_health_historical_full_result_lineage_repair(
     return value
 
 
+def _engineering_health_attempt_19_result(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the complete metric-withheld exact grounding-state blocker."""
+
+    repair = _engineering_health_historical_full_result_lineage_repair(cfg)
+    try:
+        value = cfg["learner_effective_engineering_health_attempt_19_result"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_19_RESULT_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("blocker_commitment_sha256", None)
+    submission = value.get("submission_provenance", {})
+    compact = value.get("compact_aggregate", {})
+    diagnosis = value.get("stable_aggregate_diagnosis", {})
+    resource = value.get("resource_accounting", {})
+    terminal = value.get("terminal_gate", {})
+    expected_modules = {
+        "adapter_and_lexical": "PASS_ENGINEERING",
+        "referent": "ERROR",
+        "recurrence": "PASS_ENGINEERING",
+        "attribute": "ERROR",
+        "hand_contact": "PASS_ENGINEERING",
+        "sensor": "PASS_ENGINEERING",
+        "order_action": "PASS_ENGINEERING",
+    }
+    if (
+        cfg.get("schema_version") != 36
+        or value.get("status")
+        != "ENGINEERING_BLOCKER_ATTEMPT_19_COMPLETE_METRIC_WITHHELD_HEALTH_NO_SCIENTIFIC_METRICS_OPENED"
+        or value.get("classification")
+        != "ENGINEERING_GROUNDING_DINO_EXACT_STATE_COMPATIBILITY_FAILURE_NOT_SCIENTIFIC_NO_GO"
+        or value.get("preserved_historical_full_result_lineage_repair_sha256")
+        != repair["repair_commitment_sha256"]
+        or expected != ENGINEERING_HEALTH_ATTEMPT_19_BLOCKER_SHA256
+        or digest(payload) != expected
+        or submission
+        != {
+            "job_id": 316954,
+            "attempt": 19,
+            "scheduler_state": "COMPLETED",
+            "scheduler_exit_code": "0:0",
+            "scheduler_elapsed_seconds": 404,
+            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_count": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "wall_minutes_requested": 60,
+            "DDP": False,
+            "direct_monetary_cost_USD": 0,
+        }
+        or compact.get("status") != "ENGINEERING_BLOCKER"
+        or compact.get("completed_module_count") != 5
+        or compact.get("failed_module_count") != 2
+        or compact.get("scientific_metric_count") != 0
+        or compact.get("unaccounted_failure_count") != 0
+        or compact.get("external_engineering_health_commitment_sha256")
+        != "b0a0a56b79a927355c3123f352057d038cea41e3e7dab202802f6ebf3bb64b17"
+        or value.get("module_health") != expected_modules
+        or diagnosis.get("referent_error_code")
+        != "E_TUPLE_HEALTH_REFERENT_TUPLE_GROUNDING_STATE"
+        or diagnosis.get("attribute_error_code")
+        != "E_TUPLE_HEALTH_ATTRIBUTE_TUPLE_GROUNDING_STATE"
+        or diagnosis.get("GroundingDINO_checkpoint_key_count") != 940
+        or diagnosis.get("GroundingDINO_model_state_key_count") != 938
+        or diagnosis.get("missing_key_count") != 0
+        or diagnosis.get("unexpected_key_count") != 2
+        or diagnosis.get("unexpected_keys")
+        != ["bert.embeddings.position_ids", "label_enc.weight"]
+        or diagnosis.get("all_other_modules_passed") is not True
+        or diagnosis.get("model_substitution_required") is not False
+        or diagnosis.get("model_or_scientific_outcome_used_for_repair") is not False
+        or resource.get("attempt_GPU_hours_actual") != 0.11026610083050198
+        or resource.get("protocol_accounted_cumulative_GPU_hours_actual")
+        != 1.773882944120301
+        or resource.get("attempt_retained_storage_GiB")
+        != 9.074807167053223e-6
+        or terminal.get("scientific_decision_opened") is not False
+        or terminal.get(
+            "attempt_20_authorized_only_after_prospective_grounding_state_compatibility_repair_commit_and_push"
+        )
+        is not True
+        or value.get("blocker_commitment_scope")
+        != "canonical JSON of this result excluding blocker_commitment_sha256"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_19_RESULT_COMMITMENT")
+    return value
+
+
+def _engineering_health_grounding_state_compatibility_repair(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate exact Grounding DINO state compatibility and attempt-20 policy."""
+
+    attempt_19 = _engineering_health_attempt_19_result(cfg)
+    try:
+        value = cfg[
+            "learner_effective_engineering_health_grounding_state_compatibility_repair"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError(
+            "E_TUPLE_HEALTH_GROUNDING_STATE_COMPATIBILITY_REPAIR_MISSING"
+        ) from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("repair_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    repair = value.get("failure_specific_repair", {})
+    comparison = value.get("scheduler_only_comparison", {})
+    active = value.get("active_attempt_resource_policy", {})
+    topology = value.get("topology_attestation_contract", {})
+    catalog = {
+        "NVIDIA_A30_24GB": ("a30", "gpu:nvidia_a30:1", "NVIDIA A30", 23, 25),
+        "NVIDIA_H100_NVL": ("h100", "gpu:nvidia_h100_nvl:1", "NVIDIA H100 NVL", 85, 100),
+        "NVIDIA_H100_NVL_3G_47GB_MIG": ("h100", "gpu:nvidia_h100_nvl_3g.47gb:1", "NVIDIA H100 NVL MIG 3g.47gb", 45, 50),
+        "NVIDIA_H200_NVL": ("h200", "gpu:nvidia_h200_nvl:1", "NVIDIA H200 NVL", 135, 145),
+    }
+    candidates = comparison.get("candidates")
+    candidate_shape_ok = (
+        isinstance(candidates, list)
+        and len(candidates) == len(catalog)
+        and {item.get("GPU_type") for item in candidates if isinstance(item, dict)}
+        == set(catalog)
+        and all(
+            isinstance(item, dict)
+            and item.get("partition") == catalog[item["GPU_type"]][0]
+            and item.get("GRES") == catalog[item["GPU_type"]][1]
+            and item.get("eligible") is True
+            and re.fullmatch(
+                r"2026-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}-0[5-7]:00",
+                str(item.get("estimated_start")),
+            )
+            is not None
+            for item in candidates
+        )
+    )
+    order = list(catalog)
+    winner = (
+        min(candidates, key=lambda item: (item["estimated_start"], order.index(item["GPU_type"])))
+        if candidate_shape_ok
+        else {}
+    )
+    selected_type = comparison.get("selected_GPU_type")
+    selected = catalog.get(selected_type, (None, None, None, None, None))
+    if (
+        cfg.get("schema_version") != 36
+        or value.get("status")
+        != "FROZEN_AFTER_ATTEMPT_19_EXACT_GROUNDING_STATE_COMPATIBILITY_FAILURE_BEFORE_ATTEMPT_20_OR_NEW_OUTCOME"
+        or value.get("scope")
+        != "OUTCOME_INDEPENDENT_EXACT_GROUNDING_DINO_STRICT_FALSE_UNEXPECTED_KEY_ALLOWLIST_PLUS_ATTEMPT_20_TOPOLOGY_SELECTION"
+        or expected != ENGINEERING_HEALTH_GROUNDING_STATE_COMPATIBILITY_REPAIR_SHA256
+        or digest(payload) != expected
+        or preserved.get("attempt_19_blocker_sha256")
+        != attempt_19["blocker_commitment_sha256"]
+        or preserved.get("historical_full_result_lineage_repair_sha256")
+        != ENGINEERING_HEALTH_HISTORICAL_FULL_RESULT_LINEAGE_REPAIR_SHA256
+        or preserved.get("GroundingDINO_repository_commit")
+        != "856dde20aee659246248e20734ef9ba5214f5e44"
+        or preserved.get("GroundingDINO_repository_archive_sha256")
+        != "d1045d1113de0acff91b6328672d4c3f168c4a8e4115b52cb4bbf19fcbe4e4c0"
+        or preserved.get("GroundingDINO_checkpoint_sha256")
+        != TUPLE_GROUNDING_DINO_SHA256
+        or repair.get("load_state_dict_strict") is not False
+        or repair.get("required_missing_keys") != []
+        or repair.get("required_unexpected_keys_exact")
+        != ["bert.embeddings.position_ids", "label_enc.weight"]
+        or repair.get("checkpoint_key_count") != 940
+        or repair.get("model_state_key_count") != 938
+        or repair.get("any_additional_missing_or_unexpected_key_is_blocking")
+        is not True
+        or repair.get("unexpected_checkpoint_tensors_are_not_loaded_or_used")
+        is not True
+        or repair.get("same_exact_compatibility_validator_required_in_sizing_and_production_loaders")
+        is not True
+        or repair.get("attempt_19_exact_failure_regression_tests_required")
+        is not True
+        or repair.get("whole_microfixture_suite_rerun_required") is not True
+        or repair.get("generic_scheduler_TresPerNode_form_for_attempt_20")
+        != "gres/gpu:1"
+        or repair.get("model_fixture_source_threshold_partition_seed_metric_or_gate_changed")
+        is not False
+        or comparison.get("checked_on") != "2026-08-05"
+        or comparison.get("real_job_submitted_by_checks") is not False
+        or not candidate_shape_ok
+        or selected_type != winner.get("GPU_type")
+        or active.get("attempt") != 20
+        or active.get("partition") != selected[0]
+        or active.get("GRES") != selected[1]
+        or active.get("GPU_type") != selected_type
+        or active.get("prior_protocol_accounted_GPU_hours_actual")
+        != 1.773882944120301
+        or active.get("active_aggregate_GPU_hours_max") != 2.773882944120301
+        or topology
+        != {
+            "partition": selected[0],
+            "node_count": 1,
+            "task_count": 1,
+            "CPU_count": 8,
+            "time_limit_minutes": 60,
+            "memory_per_CPU_GiB": 4,
+            "GRES": selected[1],
+            "expected_device_name": selected[2],
+            "visible_memory_GiB_min": selected[3],
+            "visible_memory_GiB_max": selected[4],
+            "world_size": 1,
+            "local_world_size": 1,
+        }
+        or value.get("new_health_or_scientific_outcome_opened") is not False
+        or value.get("repair_commitment_scope")
+        != "canonical JSON of this amendment excluding repair_commitment_sha256"
+    ):
+        raise RuntimeError(
+            "E_TUPLE_HEALTH_GROUNDING_STATE_COMPATIBILITY_REPAIR_COMMITMENT"
+        )
+    return value
+
+
 def _geometry_function_bundle_digests(
     path: Path, names: list[str]
 ) -> tuple[str, str]:
@@ -8343,7 +8590,14 @@ def _tuple_health_incomplete_attempt_resource(
     marker = _tuple_health_wrapper_marker(attempt_root, attempt, cfg)
     policy = _engineering_health_resource_policy(cfg)
     historical = {}
-    if "learner_effective_engineering_health_historical_full_result_lineage_repair" in cfg:
+    if (
+        "learner_effective_engineering_health_grounding_state_compatibility_repair"
+        in cfg
+    ):
+        historical = _engineering_health_grounding_state_compatibility_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]["historical_incomplete_attempt_wall_minutes"]
+    elif "learner_effective_engineering_health_historical_full_result_lineage_repair" in cfg:
         historical = _engineering_health_historical_full_result_lineage_repair(cfg)[
             "active_attempt_resource_policy"
         ]["historical_incomplete_attempt_wall_minutes"]
@@ -8631,6 +8885,23 @@ def _validate_tuple_health_full(value: Any, cfg: dict[str, Any]) -> None:
         if (
             value.get("engineering_health_commitment_sha256")
             != attempt_17["external_engineering_health_commitment_sha256"]
+        ):
+            raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
+    if (
+        "learner_effective_engineering_health_grounding_state_compatibility_repair"
+        in cfg
+        and value.get("attempt") == 19
+    ):
+        _engineering_health_grounding_state_compatibility_repair(cfg)
+        attempt_19 = _engineering_health_attempt_19_result(cfg)[
+            "compact_aggregate"
+        ]
+        expected_config_commitments.add(
+            attempt_19["config_commitment_sha256"]
+        )
+        if (
+            value.get("engineering_health_commitment_sha256")
+            != attempt_19["external_engineering_health_commitment_sha256"]
         ):
             raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
     if (
@@ -10477,7 +10748,43 @@ def _tuple_same_category_nms(
     return retained
 
 
-def _load_tuple_grounding_stack(public: Path, device: str):
+def _tuple_grounding_state_compatibility(
+    incompatible: Any, cfg: dict[str, Any]
+) -> dict[str, Any]:
+    """Accept only the prospectively frozen exact Grounding DINO key delta."""
+
+    if (
+        "learner_effective_engineering_health_grounding_state_compatibility_repair"
+        in cfg
+    ):
+        repair = _engineering_health_grounding_state_compatibility_repair(cfg)[
+            "failure_specific_repair"
+        ]
+        expected_missing = sorted(str(key) for key in repair["required_missing_keys"])
+        expected_unexpected = sorted(
+            str(key) for key in repair["required_unexpected_keys_exact"]
+        )
+        repair_commitment = (
+            ENGINEERING_HEALTH_GROUNDING_STATE_COMPATIBILITY_REPAIR_SHA256
+        )
+    else:
+        expected_missing = []
+        expected_unexpected = []
+        repair_commitment = None
+    missing = sorted(str(key) for key in incompatible.missing_keys)
+    unexpected = sorted(str(key) for key in incompatible.unexpected_keys)
+    if missing != expected_missing or unexpected != expected_unexpected:
+        raise RuntimeError("E_TUPLE_GROUNDING_STATE")
+    return {
+        "missing_key_count": len(missing),
+        "unexpected_key_count": len(unexpected),
+        "compatibility_repair_commitment_sha256": repair_commitment,
+    }
+
+
+def _load_tuple_grounding_stack(
+    public: Path, device: str, cfg: dict[str, Any]
+):
     import torch
 
     model_root = _tuple_model_root(public)
@@ -10502,8 +10809,7 @@ def _load_tuple_grounding_stack(public: Path, device: str):
     incompatible = grounding.load_state_dict(
         clean_state_dict(checkpoint["model"]), strict=False
     )
-    if incompatible.missing_keys or incompatible.unexpected_keys:
-        raise RuntimeError("E_TUPLE_GROUNDING_STATE")
+    _tuple_grounding_state_compatibility(incompatible, cfg)
     grounding = grounding.to(device).eval()
     transform = grounding_transforms.Compose(
         [
@@ -10680,7 +10986,7 @@ def _tuple_grounding_sampled_tracks(
     stack = None
     if accepted_count:
         stack = _load_tuple_grounding_stack(
-            context["public_root"], str(context["device"])
+            context["public_root"], str(context["device"]), cfg
         )
     tracks = []
     try:
@@ -14465,6 +14771,17 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
         in cfg
         else None
     )
+    attempt_19_result = (
+        _engineering_health_attempt_19_result(cfg)
+        if "learner_effective_engineering_health_attempt_19_result" in cfg
+        else None
+    )
+    grounding_state_compatibility_repair = (
+        _engineering_health_grounding_state_compatibility_repair(cfg)
+        if "learner_effective_engineering_health_grounding_state_compatibility_repair"
+        in cfg
+        else None
+    )
     amendment = _tuple_amendment(cfg)
     runtime = _tuple_runtime_amendment(cfg)
     fixture_protocol = _tuple_fixture_protocol(cfg)
@@ -14532,6 +14849,8 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
             "ffmpeg_prettytable_repair": ffmpeg_prettytable_repair,
             "attempt_18_result": attempt_18_result,
             "historical_full_result_lineage_repair": historical_full_result_lineage_repair,
+            "attempt_19_result": attempt_19_result,
+            "grounding_state_compatibility_repair": grounding_state_compatibility_repair,
             "tuple_amendment": amendment,
             "runtime": runtime,
             "fixture_protocol": fixture_protocol,
@@ -15065,6 +15384,17 @@ def _tuple_health_topology_attestation(
     if not job_id.isdecimal() or int(job_id) <= 0:
         raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION")
     if (
+        "learner_effective_engineering_health_grounding_state_compatibility_repair"
+        in cfg
+        and attempt == 20
+    ):
+        topology = _engineering_health_grounding_state_compatibility_repair(cfg)[
+            "topology_attestation_contract"
+        ]
+        expected_partition = topology["partition"]
+        expected_wall_minutes = topology["time_limit_minutes"]
+        expected_gres = topology["GRES"]
+    elif (
         "learner_effective_engineering_health_historical_full_result_lineage_repair"
         in cfg
         and attempt == 19
@@ -15441,6 +15771,25 @@ def _tuple_health_topology(
             else 0
         )
         if (
+            "learner_effective_engineering_health_grounding_state_compatibility_repair"
+            in cfg
+            and int(attempt) == 20
+        ):
+            topology = _engineering_health_grounding_state_compatibility_repair(cfg)[
+                "topology_attestation_contract"
+            ]
+            configured_name = str(topology["expected_device_name"])
+            expected_device = (
+                device_name.startswith("NVIDIA H100 NVL")
+                if expected_gpu_type == "NVIDIA_H100_NVL_3G_47GB_MIG"
+                else device_name == configured_name
+            )
+            expected_memory = (
+                int(topology["visible_memory_GiB_min"]) * 1024**3
+                <= total_memory
+                <= int(topology["visible_memory_GiB_max"]) * 1024**3
+            )
+        elif (
             "learner_effective_engineering_health_historical_full_result_lineage_repair"
             in cfg
             and int(attempt) == 19
@@ -15674,7 +16023,16 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
     """Run the bounded production-path microqualification with zero metrics."""
 
     cfg = json.loads(args.config.read_text())
-    if "learner_effective_engineering_health_historical_full_result_lineage_repair" in cfg:
+    if (
+        "learner_effective_engineering_health_grounding_state_compatibility_repair"
+        in cfg
+    ):
+        _engineering_health_grounding_state_compatibility_repair(cfg)
+        if int(args.attempt) != 20:
+            raise RuntimeError(
+                "E_TUPLE_HEALTH_GROUNDING_STATE_COMPATIBILITY_REPAIR_ATTEMPT"
+            )
+    elif "learner_effective_engineering_health_historical_full_result_lineage_repair" in cfg:
         _engineering_health_historical_full_result_lineage_repair(cfg)
         if int(args.attempt) != 19:
             raise RuntimeError(
@@ -23457,6 +23815,7 @@ def _size_tuple_grounding_and_sam(
     device: str,
     image_array,
     sizing_validation: dict[str, Any],
+    cfg: dict[str, Any],
 ) -> dict[str, Any]:
     import torch
     from PIL import Image
@@ -23482,7 +23841,10 @@ def _size_tuple_grounding_and_sam(
     ):
         raise RuntimeError("E_TUPLE_GROUNDING_WEIGHT")
     checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
-    grounding.load_state_dict(clean_state_dict(checkpoint["model"]), strict=False)
+    incompatible = grounding.load_state_dict(
+        clean_state_dict(checkpoint["model"]), strict=False
+    )
+    _tuple_grounding_state_compatibility(incompatible, cfg)
     grounding = grounding.to(device).eval()
     transform = grounding_transforms.Compose(
         [
@@ -23925,6 +24287,7 @@ def size_tuple_runtime(args: argparse.Namespace) -> dict[str, Any]:
         args.device,
         image_array,
         sizing_validation,
+        cfg,
     )
     modules.append({"module": "grounding_and_tracking", **grounding})
     modules.append(
@@ -26105,7 +26468,7 @@ def main() -> None:
         "--container-attestation", type=Path, required=True
     )
     tuple_health_parser.add_argument(
-        "--attempt", type=int, choices=(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19), required=True
+        "--attempt", type=int, choices=(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20), required=True
     )
     tuple_health_parser.add_argument("--device", default="cuda")
     tuple_qualify_parser = subparsers.add_parser("tuple-qualify")
