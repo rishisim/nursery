@@ -691,3 +691,13 @@ seed, metric, or scientific rule failed. Engineering blocker
 adds the exact BSD-3-Clause PrettyTable 3.18.0 public wheel for offline reload.
 Attempt 18 reruns the entire metric-withheld suite on the scheduler-selected
 A30 under the unchanged one-process, 60-minute/1-GPU-hour, 1-GiB, $0 ceiling.
+
+Attempt 18, Juno job 316944, stopped after 10 scheduler seconds before runner
+progress or any scientific metric. The canonical validator did not yet admit
+the exact sealed attempt-17 full-result config and engineering commitments
+when traversing historical runs. Engineering blocker `68ad48be…a8227c9e`
+preserves that failure. Prospective repair `343c98dc…e485ca9` admits only
+those two exact commitments, rejects every other unbound historical value,
+and freezes the otherwise unchanged complete attempt 19 on the
+scheduler-selected A30. Periodic polling and unchanged-status reporting remain
+prohibited.

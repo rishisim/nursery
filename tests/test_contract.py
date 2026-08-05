@@ -43,8 +43,8 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     )
     assert "mechanistic-tuples/construct-aligned-engineering-health" in wrapper
     assert 'health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"' in wrapper
-    assert "18) ;;" in wrapper
-    assert "17) ;;" not in wrapper
+    assert "19) ;;" in wrapper
+    assert "18) ;;" not in wrapper
     assert "15) ;;" not in wrapper
     assert "14) ;;" not in wrapper
     assert "13) ;;" not in wrapper
@@ -68,7 +68,7 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     assert 'MinMemoryCPU=4G' in wrapper
     assert 'TresPerNode=gres/gpu:${gres_suffix}' in wrapper
     assert 'TresPerNode=gres/gpu:1' in wrapper
-    assert '"$health_attempt" == "18"' in wrapper
+    assert '"$health_attempt" == "19"' in wrapper
     assert '"$health_gpu_type" == "NVIDIA_A30_24GB"' in wrapper
     assert '"$health_partition" == "a30"' in wrapper
     assert '"$health_gres" == "gpu:nvidia_a30:1"' in wrapper
@@ -119,7 +119,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 27
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_17_RUNTIME_EXECUTION_BLOCKER_PRESERVED_ATTEMPT_18_REPAIR_FROZEN_NO_NEW_OUTCOME"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_18_HISTORICAL_FULL_RESULT_LINEAGE_BLOCKER_PRESERVED_ATTEMPT_19_REPAIR_FROZEN_NO_NEW_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -564,7 +564,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_implementation_authorized"] is True
     assert config["gates"]["learner_effective_public_qualification_authorized"] is True
     assert config["gates"]["learner_effective_runner_implementation_status"] == (
-        "ATTEMPT_17_RUNTIME_EXECUTION_BLOCKER_PRESERVED_ATTEMPT_18_REPAIR_FROZEN_BEFORE_NEW_OUTCOME"
+        "ATTEMPT_18_HISTORICAL_FULL_RESULT_LINEAGE_BLOCKER_PRESERVED_ATTEMPT_19_REPAIR_FROZEN_BEFORE_NEW_OUTCOME"
     )
     assert config["gates"]["public_model_inference_requires_blind_no_hand_review_seal"] is True
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
@@ -572,7 +572,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_public_fixture_preparation_authorized"] is True
     assert config["gates"]["learner_effective_public_model_inference_authorized"] is True
     assert config["gates"]["learner_effective_public_model_inference_scope"] == (
-        "ATTEMPT_18_FFMPEG_PRETTYTABLE_REPAIRED_ENGINEERING_MICROHEALTH_ONLY_NO_SCIENTIFIC_METRICS"
+        "ATTEMPT_19_HISTORICAL_FULL_RESULT_LINEAGE_REPAIRED_ENGINEERING_MICROHEALTH_ONLY_NO_SCIENTIFIC_METRICS"
     )
     assert config["gates"][
         "learner_effective_public_model_inference_conditionally_authorized_after_fixture_seal"

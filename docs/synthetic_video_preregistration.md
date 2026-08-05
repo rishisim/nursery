@@ -2221,3 +2221,16 @@ installation and reload. Attempt 18 reruns all 28 cases and both replicates on
 one scheduler-selected A30, one process, eight CPUs, 32 GiB, with a
 60-minute/1-GPU-hour, 1-GiB, $0 ceiling. Scientific metric withholding,
 privacy guards, and the five-critical-plus-six-of-seven gate are unchanged.
+
+Attempt 18 (Juno job 316944) stopped after 10 scheduler seconds before runner
+progress or model inference. Its stable `E_TUPLE_HEALTH_FULL_SCHEMA` diagnosis
+was a missing historical-validation branch for the exact sealed attempt-17
+full-result config and engineering commitments, not a content mutation or
+scientific result. Blocker `68ad48be…a8227c9e` preserves the outcome.
+
+Before another outcome, repair `343c98dc…e485ca9` freezes an exact allowlist of
+those two attempt-17 commitments while continuing to reject every other
+historical or unbound value. Attempt 19 reruns the whole suite on the
+scheduler-selected A30 with one process, eight CPUs, 32 GiB, a
+60-minute/1-GPU-hour cap, 1 GiB new storage, and $0. No model, fixture, seed,
+threshold, metric, privacy rule, or scientific gate changed.

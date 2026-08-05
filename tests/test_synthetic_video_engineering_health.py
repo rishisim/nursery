@@ -174,6 +174,10 @@ def _historical_health_config() -> dict:
     config.pop(
         "learner_effective_engineering_health_ffmpeg_prettytable_repair"
     )
+    config.pop("learner_effective_engineering_health_attempt_18_result")
+    config.pop(
+        "learner_effective_engineering_health_historical_full_result_lineage_repair"
+    )
     return config
 
 
@@ -208,7 +212,7 @@ def _write_topology_attestation(
         "node_count": 1,
         "CPU_count": 8,
         "task_count": 1,
-        "time_limit_minutes": 60 if attempt in {8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18} else 15,
+        "time_limit_minutes": 60 if attempt in {8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19} else 15,
         "memory_per_CPU_GiB": 4,
         "GRES": gres,
         "predicate_count": 7,
@@ -864,6 +868,43 @@ def test_historical_attempt_13_full_record_requires_both_sealed_commitments() ->
         MODULE._validate_tuple_health_full(wrong_health, _config())
 
 
+def test_historical_attempt_17_full_record_requires_both_sealed_commitments() -> None:
+    full = _healthy_full()
+    full["status"] = "ENGINEERING_BLOCKER"
+    full["attempt"] = 17
+    full["config_commitment_sha256"] = (
+        "86ddc49f67fe741dad5d4e3a86d93994412a64b7d48d8fdc37e67f509769a2e7"
+    )
+    full["engineering_health_commitment_sha256"] = (
+        "55aed5b0d368fcf3ad96a8b2f91e535eee1e9030180f20d097dc0e64fc4b7f1f"
+    )
+    for module_id in ("referent", "attribute", "hand_contact"):
+        index = MODULE_IDS.index(module_id)
+        full["module_results"][index] = {
+            "module_id": module_id,
+            "status": "ERROR",
+            "error_code": f"E_TUPLE_HEALTH_{module_id.upper()}_UNACCOUNTED_FAILURE",
+            "trace_written": True,
+        }
+    full["completed_module_count"] = 4
+    full["failed_module_count"] = 3
+    full["failure_count"] = 3
+    full["unaccounted_failure_count"] = 3
+    full["resource"]["GPU_type"] = "NVIDIA_A30_24GB"
+    full["cumulative_resource"]["cumulative_submission_count"] = 17
+    MODULE._validate_tuple_health_full(full, _config())
+
+    wrong_config = json.loads(json.dumps(full))
+    wrong_config["config_commitment_sha256"] = "e" * 64
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_FULL_SCHEMA"):
+        MODULE._validate_tuple_health_full(wrong_config, _config())
+
+    wrong_health = json.loads(json.dumps(full))
+    wrong_health["engineering_health_commitment_sha256"] = "e" * 64
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_FULL_SCHEMA"):
+        MODULE._validate_tuple_health_full(wrong_health, _config())
+
+
 def test_nltk_manifest_allows_only_the_exact_hashed_provenance_marker(
     tmp_path: Path,
 ) -> None:
@@ -1041,6 +1082,37 @@ def test_ffmpeg_prettytable_repair_preserves_attempt_17_and_rejects_mutation() -
         match="E_TUPLE_HEALTH_FFMPEG_PRETTYTABLE_REPAIR_COMMITMENT",
     ):
         MODULE._engineering_health_ffmpeg_prettytable_repair(mutated)
+
+
+def test_historical_full_result_lineage_repair_preserves_attempt_18() -> None:
+    config = _config()
+    attempt = MODULE._engineering_health_attempt_18_result(config)
+    assert attempt["blocker_commitment_sha256"] == (
+        "68ad48be2c03db7d06f3939a8e9a7ac92a2dd1d6e37d9b80370a5207a8227c9e"
+    )
+    assert attempt["stable_aggregate_diagnosis"]["stable_error_code"] == (
+        "E_TUPLE_HEALTH_FULL_SCHEMA"
+    )
+    assert attempt["compact_aggregate"]["scientific_metric_count"] == 0
+    repair = MODULE._engineering_health_historical_full_result_lineage_repair(
+        config
+    )
+    assert repair["repair_commitment_sha256"] == (
+        "343c98dcbd4f78f838a8f854a7b6d3393349058d64e22efac663d738fe485ca9"
+    )
+    assert repair["active_attempt_resource_policy"]["attempt"] == 19
+
+    mutated = json.loads(json.dumps(config))
+    mutated[
+        "learner_effective_engineering_health_historical_full_result_lineage_repair"
+    ]["preserved_without_change"]["attempt_17_config_commitment_sha256"] = (
+        "e" * 64
+    )
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_HEALTH_HISTORICAL_FULL_RESULT_LINEAGE_REPAIR_COMMITMENT",
+    ):
+        MODULE._engineering_health_historical_full_result_lineage_repair(mutated)
 
 
 @pytest.mark.parametrize(
@@ -1291,8 +1363,19 @@ def test_tuple_health_budget_enforces_active_lineage_repair_attempt_and_limits()
             "direct_monetary_cost_USD": 0,
         }
     )
-    budget = MODULE._tuple_health_budget(18, prior, config)
-    assert budget["attempt"] == 18
+    prior.append(
+        {
+            "attempt": 18,
+            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_count": 1,
+            "wall_minutes": 0.16666666666666666,
+            "GPU_hours": 0.002777777777777778,
+            "new_storage_GiB": 1.430511474609375e-06,
+            "direct_monetary_cost_USD": 0,
+        }
+    )
+    budget = MODULE._tuple_health_budget(19, prior, config)
+    assert budget["attempt"] == 19
     assert budget["GPU_type"] == MODULE._engineering_health_resource_policy(config)[
         "GPU_type"
     ]
@@ -1303,7 +1386,7 @@ def test_tuple_health_budget_enforces_active_lineage_repair_attempt_and_limits()
     assert budget["direct_monetary_cost_USD"] == 0
 
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ATTEMPT_BUDGET"):
-        MODULE._tuple_health_budget(19, prior, config)
+        MODULE._tuple_health_budget(20, prior, config)
 
 
 def test_attempt_12_pre_runner_failure_has_sealed_marker_free_resource() -> None:
@@ -1325,7 +1408,12 @@ def test_attempt_12_pre_runner_failure_has_sealed_marker_free_resource() -> None
 
 @pytest.mark.parametrize(
     "attempt,wall_minutes",
-    [(14, 0.15), (15, 0.16666666666666666), (16, 0.18333333333333332)],
+    [
+        (14, 0.15),
+        (15, 0.16666666666666666),
+        (16, 0.18333333333333332),
+        (18, 0.16666666666666666),
+    ],
 )
 def test_active_resource_dispatch_uses_exact_incomplete_attempt_wall(
     tmp_path: Path, attempt: int, wall_minutes: float
@@ -1758,13 +1846,26 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
     assert runtime_repair["failure_specific_repair"]["prettytable_runtime"][
         "wheel_sha256"
     ] == "b3346e0e6f79180833aebaac088ae926340586cf6d7d991b9eb125b65f72313a"
+    attempt_18 = MODULE._engineering_health_attempt_18_result(config)
+    assert attempt_18["blocker_commitment_sha256"] == (
+        "68ad48be2c03db7d06f3939a8e9a7ac92a2dd1d6e37d9b80370a5207a8227c9e"
+    )
+    assert attempt_18["submission_provenance"]["job_id"] == 316944
+    assert attempt_18["compact_aggregate"]["scientific_metric_count"] == 0
+    lineage_repair = (
+        MODULE._engineering_health_historical_full_result_lineage_repair(config)
+    )
+    assert lineage_repair["repair_commitment_sha256"] == (
+        "343c98dcbd4f78f838a8f854a7b6d3393349058d64e22efac663d738fe485ca9"
+    )
+    assert lineage_repair["active_attempt_resource_policy"]["attempt"] == 19
     effective = MODULE._engineering_health_resource_policy(config)
     assert effective["per_submission_wall_minutes_max"] == 60
-    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 18
+    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 19
 
     with pytest.raises(
         RuntimeError,
-        match="E_TUPLE_HEALTH_FFMPEG_PRETTYTABLE_REPAIR_ATTEMPT",
+        match="E_TUPLE_HEALTH_HISTORICAL_FULL_RESULT_LINEAGE_REPAIR_ATTEMPT",
     ):
         MODULE.run_tuple_health(
             argparse.Namespace(
@@ -2242,6 +2343,37 @@ def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
     )
     assert commitment == MODULE.file_digest(attempt_18_attestation)
 
+    attempt_19_gpu_type = (
+        MODULE._engineering_health_historical_full_result_lineage_repair(
+            _config()
+        )["active_attempt_resource_policy"]["GPU_type"]
+    )
+    attempt_19_name, attempt_19_memory = device_by_type[attempt_19_gpu_type]
+    attempt_19_cuda = SimpleNamespace(
+        device_count=lambda: 1,
+        get_device_name=lambda _index: attempt_19_name,
+        get_device_properties=lambda _index: SimpleNamespace(
+            total_memory=attempt_19_memory * 1024**3
+        ),
+    )
+    monkeypatch.setitem(
+        sys.modules, "torch", SimpleNamespace(cuda=attempt_19_cuda)
+    )
+    attempt_19_attestation = _write_topology_attestation(
+        tmp_path / "attempt-19",
+        monkeypatch,
+        attempt=19,
+        job_id=316945,
+        gpu_type=attempt_19_gpu_type,
+    )
+    commitment = MODULE._tuple_health_topology(
+        "cuda",
+        topology_attestation=attempt_19_attestation,
+        attempt=19,
+        cfg=_config(),
+    )
+    assert commitment == MODULE.file_digest(attempt_19_attestation)
+
     bad = json.loads(attestation.read_text())
     bad["task_count"] = 2
     attestation.write_bytes(MODULE.canonical(bad) + b"\n")
@@ -2622,6 +2754,10 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop("learner_effective_engineering_health_attempt_17_result")
     historical_config.pop(
         "learner_effective_engineering_health_ffmpeg_prettytable_repair"
+    )
+    historical_config.pop("learner_effective_engineering_health_attempt_18_result")
+    historical_config.pop(
+        "learner_effective_engineering_health_historical_full_result_lineage_repair"
     )
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)

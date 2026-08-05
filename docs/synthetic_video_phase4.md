@@ -753,3 +753,13 @@ binary and pins the 37,357-byte BSD-3-Clause PrettyTable 3.18.0 wheel for
 offline installation and reload. Attempt 18 is the unchanged complete suite
 on the scheduler-selected A30; public science remains locked pending a
 committed 7/7 health pass.
+
+Attempt 18 (Juno job 316944) stopped after 10 scheduler seconds before runner
+progress. The stable error `E_TUPLE_HEALTH_FULL_SCHEMA` occurred while
+validating the preserved attempt-17 full result: its exact sealed config and
+engineering-health commitments were not in the current historical validation
+branch. No module or scientific metric ran. Blocker `68ad48be…a8227c9e`
+preserves the failure. Prospective repair `343c98dc…e485ca9` admits only those
+two exact attempt-17 commitments and leaves every other unbound value rejected.
+Attempt 19 remains the complete metric-withheld suite on the scheduler-selected
+A30 under the same 60-minute/1-GPU-hour, 1-GiB, $0 ceiling.
