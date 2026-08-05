@@ -763,3 +763,18 @@ preserves the failure. Prospective repair `343c98dc…e485ca9` admits only those
 two exact attempt-17 commitments and leaves every other unbound value rejected.
 Attempt 19 remains the complete metric-withheld suite on the scheduler-selected
 A30 under the same 60-minute/1-GPU-hour, 1-GiB, $0 ceiling.
+
+Attempt 19 (Juno job 316954) completed all seven metric-withheld modules after
+404 scheduler seconds. Five passed engineering health. Referent and attribute
+both stopped on the same exact Grounding DINO checkpoint/model state-key delta:
+zero missing keys and two unexpected checkpoint keys. No scientific metric
+opened. Blocker `af86c7a9…053bad` preserves this engineering result.
+
+Prospective repair `3ecdaa38…e5cbeb` permits only those two exact unused
+checkpoint keys under `strict=False`, requires zero missing keys, and blocks
+any other state-key delta. The same validator is applied in the sizing and
+production grounding loaders. Attempt 20 is the otherwise unchanged complete
+suite on one scheduler-selected A30, eight CPUs, 32 GiB, with a
+60-minute/1-GPU-hour, 1-GiB, $0 ceiling. One blocking Slurm wait replaces
+periodic polling; unchanged pending-state updates are prohibited. Public
+science remains locked pending a committed 7/7 engineering-health pass.
