@@ -723,3 +723,15 @@ one engineering-first public-development qualification only. Holdout,
 governed C, LTX generation, and learner work remain locked behind their
 unchanged gates. The attempt used 0.125073 A30 GPU-hours, 0.000017 GiB retained
 storage, and $0 direct cost.
+
+The first engineering-first public-development run (Juno job 316965) completed
+in 700 scheduler seconds but opened no scientific metrics. Five of seven
+modules passed integrity; referent and attribute shared one deterministic
+`TRUTH_MASK_ROUNDTRIP` error. The validator had compared every sampled mask to
+its phase-level aggregate, although the frozen fixture truth records
+sample-level visibility/count/dominance first and aggregates those samples
+only afterward. Blocker `f8c31553…56221` preserves the failed attempt.
+Prospective repair `638d5c3c…f82e2` validates each mask against its own frozen
+sample record, then recomputes the unchanged phase rules. No fixture, model,
+partition, threshold, metric, seed, or gate changes. The full development
+sequence must restart as integrity attempt 2 before any metric can open.

@@ -120,7 +120,7 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
     assert config["schema_version"] == 27
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_PASS_SEALED_PUBLIC_DEVELOPMENT_AUTHORIZED_NO_SCIENTIFIC_METRICS_OPENED"
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_1_BLOCKER_PRESERVED_MASK_ROUNDTRIP_REPAIR_FROZEN_NO_SCIENTIFIC_METRICS_OPENED"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -565,7 +565,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_implementation_authorized"] is True
     assert config["gates"]["learner_effective_public_qualification_authorized"] is True
     assert config["gates"]["learner_effective_runner_implementation_status"] == (
-        "PASS_ENGINEERING_HEALTH_SEALED_PUBLIC_DEVELOPMENT_AUTHORIZED"
+        "PASS_ENGINEERING_HEALTH_PUBLIC_DEVELOPMENT_ATTEMPT_1_BLOCKER_PRESERVED_MASK_ROUNDTRIP_REPAIR_FROZEN"
     )
     assert config["gates"]["public_model_inference_requires_blind_no_hand_review_seal"] is True
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
@@ -573,7 +573,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_public_fixture_preparation_authorized"] is True
     assert config["gates"]["learner_effective_public_model_inference_authorized"] is True
     assert config["gates"]["learner_effective_public_model_inference_scope"] == (
-        "PUBLIC_DEVELOPMENT_ENGINEERING_INTEGRITY_THEN_COMPLETE_SCIENTIFIC_METRICS"
+        "PUBLIC_DEVELOPMENT_ENGINEERING_INTEGRITY_ATTEMPT_2_AFTER_EXACT_MASK_ROUNDTRIP_REPAIR_NO_METRICS_UNTIL_ALL_MODULES_PASS"
     )
     assert config["gates"][
         "learner_effective_public_model_inference_conditionally_authorized_after_fixture_seal"

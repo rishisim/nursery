@@ -2961,6 +2961,8 @@ def _referent_truth_fixture(tmp_path: Path) -> tuple[dict[str, object], Path]:
     distractor_path = mask_root / "distractor.png"
     target.save(target_path)
     distractor.save(distractor_path)
+    target_fraction = MODULE._mask_fraction(target)
+    distractor_fraction = MODULE._mask_fraction(distractor)
     sampled = []
     for ordinal, phase in enumerate(
         ["before"] * 3 + ["during"] * 3 + ["after"] * 3
@@ -2971,8 +2973,16 @@ def _referent_truth_fixture(tmp_path: Path) -> tuple[dict[str, object], Path]:
                 "phase": phase,
                 "target_mask_relative_path": "truth/target.png",
                 "target_mask_sha256": MODULE.file_digest(target_path),
+                "target_mask_bytes": target_path.stat().st_size,
                 "distractor_mask_relative_path": "truth/distractor.png",
                 "distractor_mask_sha256": MODULE.file_digest(distractor_path),
+                "distractor_mask_bytes": distractor_path.stat().st_size,
+                "frame_index": ordinal,
+                "target_visible": True,
+                "candidate_count_bin": "2plus",
+                "dominant": False,
+                "target_fraction": target_fraction,
+                "distractor_fraction": distractor_fraction,
             }
         )
     row: dict[str, object] = {
@@ -2991,7 +3001,16 @@ def _referent_truth_fixture(tmp_path: Path) -> tuple[dict[str, object], Path]:
             "visibility_by_phase": {phase: True for phase in ("before", "during", "after")},
             "dominance_by_phase": {phase: False for phase in ("before", "during", "after")},
             "candidate_count_by_phase": {phase: "2plus" for phase in ("before", "during", "after")},
+            "sample_count_by_phase": {phase: 3 for phase in ("before", "during", "after")},
             "sampled_mask_truth": sampled,
+            "target_mask_fraction_median_by_phase": {
+                phase: round(target_fraction, 8)
+                for phase in ("before", "during", "after")
+            },
+            "distractor_mask_fraction_median_by_phase": {
+                phase: round(distractor_fraction, 8)
+                for phase in ("before", "during", "after")
+            },
         },
     }
     return row, fixture_root
@@ -3001,7 +3020,16 @@ def test_referent_truth_requires_phase_counts_masks_and_distinct_same_category(
     tmp_path: Path,
 ) -> None:
     row, fixture_root = _referent_truth_fixture(tmp_path)
-    truth = MODULE._tuple_referent_truth_record(row, fixture_root)
+    config = json.loads(
+        Path("configs/synthetic_video_real_only_proof.json").read_text()
+    )
+    definitions = MODULE._tuple_axis(
+        config,
+        "utterance_centered_referent_visibility_dominance_ambiguity",
+    )["definitions"]
+    truth = MODULE._tuple_referent_truth_record(
+        row, fixture_root, definitions
+    )
     assert truth["candidate_count_by_phase"] == {
         "before": "2plus",
         "during": "2plus",
@@ -3012,11 +3040,50 @@ def test_referent_truth_requires_phase_counts_masks_and_distinct_same_category(
     import pytest
 
     with pytest.raises(RuntimeError, match="E_TUPLE_REFERENT_DISTRACTOR_PROVENANCE"):
-        MODULE._tuple_referent_truth_record(changed, fixture_root)
+        MODULE._tuple_referent_truth_record(
+            changed, fixture_root, definitions
+        )
     scalar = json.loads(json.dumps(row))
     scalar["truth"] = {"visibility": {"before": True}}
     with pytest.raises(RuntimeError, match="E_TUPLE_REFERENT_TRUTH_SCHEMA"):
-        MODULE._tuple_referent_truth_record(scalar, fixture_root)
+        MODULE._tuple_referent_truth_record(scalar, fixture_root, definitions)
+
+
+def test_referent_truth_roundtrip_allows_sample_variation_within_phase(
+    tmp_path: Path,
+) -> None:
+    from PIL import Image
+    import pytest
+
+    row, fixture_root = _referent_truth_fixture(tmp_path)
+    empty = fixture_root / "truth/empty.png"
+    Image.new("L", (32, 24), 0).save(empty)
+    sample = row["truth"]["sampled_mask_truth"][2]
+    for role in ("target", "distractor"):
+        sample[f"{role}_mask_relative_path"] = "truth/empty.png"
+        sample[f"{role}_mask_sha256"] = MODULE.file_digest(empty)
+        sample[f"{role}_mask_bytes"] = empty.stat().st_size
+    sample.update(
+        {
+            "target_visible": False,
+            "candidate_count_bin": "0",
+            "dominant": False,
+            "target_fraction": 0.0,
+            "distractor_fraction": 0.0,
+        }
+    )
+    config = json.loads(
+        Path("configs/synthetic_video_real_only_proof.json").read_text()
+    )
+    definitions = MODULE._tuple_axis(
+        config,
+        "utterance_centered_referent_visibility_dominance_ambiguity",
+    )["definitions"]
+    MODULE._tuple_referent_truth_record(row, fixture_root, definitions)
+
+    sample["target_visible"] = True
+    with pytest.raises(RuntimeError, match="E_TUPLE_REFERENT_TRUTH_MASK_ROUNDTRIP"):
+        MODULE._tuple_referent_truth_record(row, fixture_root, definitions)
 
 
 def test_grounding_phrase_box_and_nms_rules_are_exact() -> None:
@@ -3262,7 +3329,7 @@ def test_referent_category_mismatch_abstains_before_model_prompt(monkeypatch) ->
     monkeypatch.setattr(
         MODULE,
         "_tuple_referent_truth_record",
-        lambda _row, _root: {
+        lambda _row, _root, _definitions: {
             "visibility_by_phase": {phase: True for phase in ("before", "during", "after")},
             "dominance_by_phase": {phase: True for phase in ("before", "during", "after")},
             "candidate_count_by_phase": {phase: "1" for phase in ("before", "during", "after")},
@@ -3467,6 +3534,11 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
     monkeypatch.setenv("HF_HUB_DISABLE_TELEMETRY", "1")
     monkeypatch.setenv("WANDB_DISABLED", "true")
     monkeypatch.setattr(MODULE, "_tuple_health_topology", lambda *_: None)
+    monkeypatch.setattr(
+        MODULE,
+        "_public_development_truth_mask_roundtrip_repair",
+        lambda _cfg: None,
+    )
     monkeypatch.setattr(MODULE, "_verify_tuple_runtime_manifest", lambda *_: {})
     monkeypatch.setattr(
         MODULE,

@@ -790,3 +790,18 @@ development pass and threshold seal; governed C and LTX remain further
 downstream. The pass consumed 457 scheduler seconds, 0.125073 A30 GPU-hours,
 0.000017 GiB retained storage, and $0 direct cost. No prior blocker or no-go
 was reinterpreted.
+
+The first engineering-first public-development run (Juno job 316965) then
+returned an engineering blocker after 700 scheduler seconds and released zero
+scientific metrics. Five modules passed. Referent and attribute both detected
+the same mask round-trip implementation error: per-sample masks were being
+compared directly with their phase aggregate. Commitment `f8c31553…56221`
+preserves that complete metric-withheld result.
+
+Repair `638d5c3c…f82e2`, frozen before integrity attempt 2, validates each mask
+against the existing per-sample truth and only then recomputes the unchanged
+phase aggregation. It neither relabels nor rebuilds the sealed 824-item
+fixture, and it changes no model, input, partition, seed, threshold, metric, or
+scientific gate. The complete public-development integrity suite must pass
+before scientific metrics are opened; holdout, governed C, LTX, and learner
+execution remain unauthorized.

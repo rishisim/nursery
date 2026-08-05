@@ -1303,6 +1303,34 @@ def test_attempt_20_engineering_pass_is_exact_and_unlocks_development_only() -> 
         MODULE._engineering_health_attempt_20_pass_result(mutated)
 
 
+def test_public_development_attempt_1_and_mask_roundtrip_repair_are_exact() -> None:
+    config = _config()
+    result = MODULE._public_development_engineering_attempt_1_result(config)
+    repair = MODULE._public_development_truth_mask_roundtrip_repair(config)
+    assert result["result_commitment_sha256"] == (
+        "f8c315531e80049a1c0c8860dfdb99587908c97793ed6f705a911c2492756221"
+    )
+    assert result["scientific_metric_count"] == 0
+    assert result["failed_module_count"] == 2
+    assert repair["repair_commitment_sha256"] == (
+        "638d5c3c43ccb81421e5667b00308aee68fbeed7cd2f80502c3395ba385f82e2"
+    )
+    assert repair[
+        "fixture_source_partition_model_seed_threshold_metric_or_gate_changed"
+    ] is False
+    assert repair["public_development_integrity_attempt"] == 2
+
+    mutated = json.loads(json.dumps(config))
+    mutated["learner_effective_public_development_truth_mask_roundtrip_repair"][
+        "per_sample_visible_mask_fraction_min"
+    ] = 0.0
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_DEVELOPMENT_TRUTH_MASK_ROUNDTRIP_REPAIR_COMMITMENT",
+    ):
+        MODULE._public_development_truth_mask_roundtrip_repair(mutated)
+
+
 @pytest.mark.parametrize(
     "forbidden_key,forbidden_value",
     [
@@ -3139,6 +3167,11 @@ def test_partition_crash_withholds_metrics_and_preserves_legacy_record(
     monkeypatch.setenv("HF_HUB_DISABLE_TELEMETRY", "1")
     monkeypatch.setenv("WANDB_DISABLED", "true")
     monkeypatch.setattr(MODULE, "_tuple_health_topology", lambda *_: None)
+    monkeypatch.setattr(
+        MODULE,
+        "_public_development_truth_mask_roundtrip_repair",
+        lambda _cfg: None,
+    )
     monkeypatch.setattr(MODULE, "_verify_tuple_runtime_manifest", lambda *_: {})
     monkeypatch.setattr(
         MODULE,

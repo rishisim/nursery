@@ -683,6 +683,12 @@ ENGINEERING_HEALTH_GROUNDING_STATE_COMPATIBILITY_REPAIR_SHA256 = (
 ENGINEERING_HEALTH_ATTEMPT_20_PASS_SHA256 = (
     "25486c1a4217ecd4f1a4eecfbdf90f5802d79c9300ea038155030448b2089839"
 )
+PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_1_RESULT_SHA256 = (
+    "f8c315531e80049a1c0c8860dfdb99587908c97793ed6f705a911c2492756221"
+)
+PUBLIC_DEVELOPMENT_TRUTH_MASK_ROUNDTRIP_REPAIR_SHA256 = (
+    "638d5c3c43ccb81421e5667b00308aee68fbeed7cd2f80502c3395ba385f82e2"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -5703,6 +5709,137 @@ def _engineering_health_attempt_20_pass_result(
     return value
 
 
+def _public_development_engineering_attempt_1_result(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the first metric-withheld development integrity blocker."""
+
+    try:
+        value = cfg[
+            "learner_effective_public_development_engineering_attempt_1_result"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError(
+            "E_TUPLE_DEVELOPMENT_ENGINEERING_ATTEMPT_1_RESULT_MISSING"
+        ) from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("result_commitment_sha256", None)
+    exact = {
+        "status": "ENGINEERING_BLOCKER_PUBLIC_DEVELOPMENT_ATTEMPT_1_METRICS_WITHHELD",
+        "observed_on": "2026-08-05",
+        "job_id": 316965,
+        "partition": "DEVELOPMENT",
+        "attempt": 1,
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0",
+        "scheduler_elapsed_seconds": 700,
+        "GPU_type": "NVIDIA_A30_24GB",
+        "module_count": 7,
+        "completed_module_count": 5,
+        "failed_module_count": 2,
+        "scientific_metric_count": 0,
+        "failing_modules": {
+            "referent": "E_TUPLE_HEALTH_REFERENT_TUPLE_REFERENT_TRUTH_MASK_ROUNDTRIP",
+            "attribute": "E_TUPLE_HEALTH_ATTRIBUTE_TUPLE_REFERENT_TRUTH_MASK_ROUNDTRIP",
+        },
+        "external_call_count": 0,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "unaccounted_failure_count": 0,
+        "public_fixture_manifest_commitment_sha256": (
+            "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6"
+        ),
+        "engineering_health_commitment_sha256": (
+            "4d26d002d9189942a9ba1876e47ed92d1edde8a81da81d31bc22f39d26cb656e"
+        ),
+        "runner_commitment_sha256": (
+            "c826faa9ac7fa55ede80368a30cda7f8728091d434ba21c48413af4dad2f3e01"
+        ),
+        "partition_engineering_integrity_commitment_sha256": (
+            "0836e0bfc45c15a004e801c92b336d959913329e719bfd001aea15e633c583d7"
+        ),
+        "attempt_GPU_hours_actual": 0.19444444444444445,
+        "direct_monetary_cost_USD": 0,
+        "classification": (
+            "ENGINEERING_PHASE_AGGREGATE_WAS_INCORRECTLY_APPLIED_TO_EACH_"
+            "SAMPLED_MASK_NOT_SCIENTIFIC_NO_GO"
+        ),
+        "scientific_outcome_opened": False,
+        "result_commitment_scope": (
+            "canonical JSON of this result excluding result_commitment_sha256"
+        ),
+    }
+    if (
+        expected != PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_1_RESULT_SHA256
+        or digest(payload) != expected
+        or payload != exact
+    ):
+        raise RuntimeError(
+            "E_TUPLE_DEVELOPMENT_ENGINEERING_ATTEMPT_1_RESULT_COMMITMENT"
+        )
+    return value
+
+
+def _public_development_truth_mask_roundtrip_repair(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the exact per-sample/phase-aggregate round-trip repair."""
+
+    prior = _public_development_engineering_attempt_1_result(cfg)
+    try:
+        value = cfg[
+            "learner_effective_public_development_truth_mask_roundtrip_repair"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError(
+            "E_TUPLE_DEVELOPMENT_TRUTH_MASK_ROUNDTRIP_REPAIR_MISSING"
+        ) from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("repair_commitment_sha256", None)
+    exact = {
+        "status": (
+            "FROZEN_AFTER_PUBLIC_DEVELOPMENT_ATTEMPT_1_MASK_ROUNDTRIP_"
+            "ENGINEERING_FAILURE_BEFORE_ATTEMPT_2_OR_SCIENTIFIC_METRICS"
+        ),
+        "effective_on": "2026-08-05",
+        "prior_engineering_blocker_commitment_sha256": prior[
+            "result_commitment_sha256"
+        ],
+        "repair_scope": (
+            "validate each sampled binary mask against its own frozen visible/"
+            "count/dominance/fraction record, then recompute the already frozen "
+            "phase aggregation exactly once"
+        ),
+        "per_sample_visible_mask_fraction_min": 0.01,
+        "per_sample_dominant_target_mask_fraction_min": 0.05,
+        "per_sample_dominant_area_ratio_to_next_candidate_min": 2.0,
+        "phase_visibility_rule": "at_least_2_target_visible_samples",
+        "phase_candidate_rule": (
+            "modal_bin_ties_resolve_0_then_1_then_2plus_by_highest_order"
+        ),
+        "phase_dominance_rule": (
+            "at_least_2_dominant_visible_samples_if_phase_visible_else_null"
+        ),
+        "fixture_source_partition_model_seed_threshold_metric_or_gate_changed": False,
+        "public_development_integrity_attempt": 2,
+        "public_development_integrity_attempt_count_max": 3,
+        "metric_withholding_until_all_seven_modules_pass": True,
+        "holdout_governed_C_LTX_or_learner_authorized": False,
+        "repair_commitment_scope": (
+            "canonical JSON of this amendment excluding repair_commitment_sha256"
+        ),
+    }
+    if (
+        expected != PUBLIC_DEVELOPMENT_TRUTH_MASK_ROUNDTRIP_REPAIR_SHA256
+        or digest(payload) != expected
+        or payload != exact
+    ):
+        raise RuntimeError(
+            "E_TUPLE_DEVELOPMENT_TRUTH_MASK_ROUNDTRIP_REPAIR_COMMITMENT"
+        )
+    return value
+
+
 def _geometry_function_bundle_digests(
     path: Path, names: list[str]
 ) -> tuple[str, str]:
@@ -10662,11 +10799,30 @@ def _tuple_referent_adapter_observations(
 
 
 def _tuple_referent_truth_record(
-    row: dict[str, Any], fixture_root: Path
+    row: dict[str, Any],
+    fixture_root: Path,
+    definitions: dict[str, Any],
 ) -> dict[str, Any]:
     """Validate the corrected phase truth and every registered sampled mask."""
 
     phases = ("before", "during", "after")
+    try:
+        visible_floor = float(definitions["visible_mask_fraction_min"])
+        dominant_floor = float(
+            definitions["dominant_target_mask_fraction_min"]
+        )
+        ratio_floor = float(
+            definitions["dominant_area_ratio_to_next_candidate_min"]
+        )
+    except (KeyError, TypeError, ValueError, OverflowError) as error:
+        raise RuntimeError("E_TUPLE_REFERENT_TRUTH_DEFINITION") from error
+    if not (
+        0.0 <= visible_floor <= 1.0
+        and 0.0 <= dominant_floor <= 1.0
+        and math.isfinite(ratio_floor)
+        and ratio_floor >= 1.0
+    ):
+        raise RuntimeError("E_TUPLE_REFERENT_TRUTH_DEFINITION")
     truth = row.get("truth")
     if not isinstance(truth, dict):
         raise RuntimeError("E_TUPLE_REFERENT_TRUTH_SCHEMA")
@@ -10694,6 +10850,9 @@ def _tuple_referent_truth_record(
     if not isinstance(sampled, list) or not 8 <= len(sampled) <= 9:
         raise RuntimeError("E_TUPLE_REFERENT_SAMPLED_TRUTH_SCHEMA")
     phase_counts: Counter[str] = Counter()
+    sampled_by_phase: dict[str, list[dict[str, Any]]] = {
+        phase: [] for phase in phases
+    }
     prior_time = -math.inf
     for sample in sampled:
         if not isinstance(sample, dict) or sample.get("phase") not in phases:
@@ -10719,13 +10878,13 @@ def _tuple_referent_truth_record(
             target = source.convert("L")
             if target.width < 1 or target.height < 1:
                 raise RuntimeError("E_TUPLE_REFERENT_TRUTH_MASK_GEOMETRY")
-            target_present = target.getbbox() is not None
+            target_fraction = _mask_fraction(target)
         distractor_relative = sample.get("distractor_mask_relative_path")
         distractor_sha = sample.get("distractor_mask_sha256")
         if distractor_relative is None or distractor_sha is None:
             if distractor_relative is not None or distractor_sha is not None:
                 raise RuntimeError("E_TUPLE_REFERENT_TRUTH_MASK_SCHEMA")
-            distractor_present = False
+            distractor_fraction = 0.0
         else:
             distractor_path = _tuple_fixture_file(
                 fixture_root,
@@ -10737,23 +10896,113 @@ def _tuple_referent_truth_record(
                 distractor = source.convert("L")
                 if distractor.size != target.size:
                     raise RuntimeError("E_TUPLE_REFERENT_TRUTH_MASK_GEOMETRY")
-                distractor_present = distractor.getbbox() is not None
-        expected_count = (
-            "2plus"
-            if target_present and distractor_present
-            else "1"
-            if target_present or distractor_present
-            else "0"
+                distractor_fraction = _mask_fraction(distractor)
+        target_visible = target_fraction >= visible_floor
+        distractor_visible = distractor_fraction >= visible_floor
+        candidate_count = int(target_visible) + int(distractor_visible)
+        expected_count = "2plus" if candidate_count >= 2 else str(candidate_count)
+        ratio = target_fraction / max(distractor_fraction, 1e-12)
+        expected_dominant = (
+            target_visible
+            and target_fraction >= dominant_floor
+            and ratio >= ratio_floor
         )
+        sample_target_visible = sample.get("target_visible")
+        sample_count = sample.get("candidate_count_bin")
+        sample_dominant = sample.get("dominant")
+        try:
+            recorded_target_fraction = float(sample["target_fraction"])
+            recorded_distractor_fraction = float(
+                sample["distractor_fraction"]
+            )
+        except (KeyError, TypeError, ValueError, OverflowError) as error:
+            raise RuntimeError("E_TUPLE_REFERENT_SAMPLED_TRUTH_SCHEMA") from error
         if (
-            target_present != visibility[phase]
-            or expected_count != candidate_counts[phase]
+            type(sample_target_visible) is not bool
+            or sample_count not in {"0", "1", "2plus"}
+            or type(sample_dominant) is not bool
+            or not all(
+                math.isfinite(value) and 0.0 <= value <= 1.0
+                for value in (
+                    recorded_target_fraction,
+                    recorded_distractor_fraction,
+                )
+            )
+            or not math.isclose(
+                recorded_target_fraction,
+                target_fraction,
+                rel_tol=0.0,
+                abs_tol=1e-12,
+            )
+            or not math.isclose(
+                recorded_distractor_fraction,
+                distractor_fraction,
+                rel_tol=0.0,
+                abs_tol=1e-12,
+            )
+            or sample_target_visible is not target_visible
+            or sample_count != expected_count
+            or sample_dominant is not expected_dominant
         ):
             raise RuntimeError("E_TUPLE_REFERENT_TRUTH_MASK_ROUNDTRIP")
+        sampled_by_phase[phase].append(
+            {
+                "target_visible": target_visible,
+                "candidate_count_bin": expected_count,
+                "dominant": expected_dominant,
+                "target_fraction": target_fraction,
+                "distractor_fraction": distractor_fraction,
+            }
+        )
     if sum(phase_counts.values()) < 8 or any(
         not 2 <= phase_counts[phase] <= 3 for phase in phases
     ):
         raise RuntimeError("E_TUPLE_REFERENT_SAMPLED_TRUTH_SCHEMA")
+    candidate_order = {"0": 0, "1": 1, "2plus": 2}
+    recomputed_visibility: dict[str, bool] = {}
+    recomputed_candidates: dict[str, str] = {}
+    recomputed_dominance: dict[str, bool | None] = {}
+    target_medians: dict[str, float] = {}
+    distractor_medians: dict[str, float] = {}
+    for phase in phases:
+        rows = sampled_by_phase[phase]
+        recomputed_visibility[phase] = (
+            sum(value["target_visible"] for value in rows) >= 2
+        )
+        counts = Counter(value["candidate_count_bin"] for value in rows)
+        recomputed_candidates[phase] = max(
+            counts,
+            key=lambda label: (counts[label], candidate_order[label]),
+        )
+        visible_rows = [value for value in rows if value["target_visible"]]
+        recomputed_dominance[phase] = (
+            sum(value["dominant"] for value in visible_rows) >= 2
+            if recomputed_visibility[phase]
+            else None
+        )
+        target_medians[phase] = round(
+            float(statistics.median(value["target_fraction"] for value in rows)),
+            8,
+        )
+        distractor_medians[phase] = round(
+            float(
+                statistics.median(
+                    value["distractor_fraction"] for value in rows
+                )
+            ),
+            8,
+        )
+    if (
+        recomputed_visibility != visibility
+        or recomputed_candidates != candidate_counts
+        or recomputed_dominance != dominance
+        or truth.get("sample_count_by_phase") != dict(phase_counts)
+        or truth.get("target_mask_fraction_median_by_phase")
+        != target_medians
+        or truth.get("distractor_mask_fraction_median_by_phase")
+        != distractor_medians
+    ):
+        raise RuntimeError("E_TUPLE_REFERENT_TRUTH_MASK_ROUNDTRIP")
     if "2plus" in candidate_counts.values():
         target_image = str(row.get("source_image_id", ""))
         target_annotation = str(row.get("source_annotation_id", ""))
@@ -11105,6 +11354,10 @@ def _tuple_grounding_sampled_tracks(
     if isinstance(cached, list):
         return cached
     cfg = context["cfg"]
+    grounding_definitions = _tuple_axis(
+        cfg,
+        "utterance_centered_referent_visibility_dominance_ambiguity",
+    )["definitions"]
     execution = _tuple_qualification_execution(cfg)
     minimum_valid = int(execution["phase_aggregation"]["minimum_valid_samples"])
     if context.get("engineering_health") is True:
@@ -11134,7 +11387,11 @@ def _tuple_grounding_sampled_tracks(
     try:
         for row in rows:
             ordinal = int(row["fixture_ordinal"])
-            truth = _tuple_referent_truth_record(row, fixture_root)
+            truth = _tuple_referent_truth_record(
+                row,
+                fixture_root,
+                grounding_definitions,
+            )
             observation = observations.get(ordinal)
             if not isinstance(observation, dict):
                 raise RuntimeError("E_TUPLE_REFERENT_ADAPTER_OBSERVATION_MISSING")
@@ -16998,6 +17255,12 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
     if partition not in {"development", "holdout"}:
         raise RuntimeError("E_TUPLE_QUALIFICATION_PARTITION")
     cfg = json.loads(args.config.read_text())
+    development_mask_repair = (
+        _public_development_truth_mask_roundtrip_repair(cfg)
+        if "learner_effective_public_development_truth_mask_roundtrip_repair"
+        in cfg
+        else None
+    )
     if "learner_effective_engineering_health_NLTK_matplotlib_repair" in cfg:
         _engineering_health_nltk_matplotlib_repair(cfg)
     elif "learner_effective_engineering_health_submission_export_repair" in cfg:
@@ -17097,6 +17360,46 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
     }
     integrity_root = output_root / "engineering-integrity"
     integrity_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if partition == "development" and development_mask_repair is not None:
+        prior_config = _public_development_engineering_attempt_1_result(cfg)
+        prior_path = integrity_root / "development-attempt-01.json"
+        if not prior_path.is_file():
+            raise RuntimeError(
+                "E_TUPLE_DEVELOPMENT_ENGINEERING_ATTEMPT_1_EXTERNAL_MISSING"
+            )
+        prior_full = json.loads(prior_path.read_text())
+        _validate_tuple_partition_integrity_full(prior_full)
+        prior_errors = {
+            str(row["module_id"]): str(row.get("error_code"))
+            for row in prior_full["module_results"]
+            if row["status"] == "ERROR"
+        }
+        if (
+            prior_full["partition_engineering_integrity_commitment_sha256"]
+            != prior_config[
+                "partition_engineering_integrity_commitment_sha256"
+            ]
+            or prior_full["public_fixture_manifest_commitment_sha256"]
+            != prior_config["public_fixture_manifest_commitment_sha256"]
+            or prior_full["engineering_health_commitment_sha256"]
+            != prior_config["engineering_health_commitment_sha256"]
+            or prior_full["runner_commitment_sha256"]
+            != prior_config["runner_commitment_sha256"]
+            or prior_full["attempt"] != prior_config["attempt"]
+            or prior_full["completed_module_count"]
+            != prior_config["completed_module_count"]
+            or prior_full["failed_module_count"]
+            != prior_config["failed_module_count"]
+            or prior_full["scientific_metric_count"] != 0
+            or prior_full["external_call_count"] != 0
+            or prior_full["invalid_retained_record_count"] != 0
+            or prior_full["silent_truncation_count"] != 0
+            or prior_full["unaccounted_failure_count"] != 0
+            or prior_errors != prior_config["failing_modules"]
+        ):
+            raise RuntimeError(
+                "E_TUPLE_DEVELOPMENT_ENGINEERING_ATTEMPT_1_EXTERNAL_PROVENANCE"
+            )
     prior_integrity = sorted(
         path
         for path in integrity_root.iterdir()

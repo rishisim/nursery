@@ -2263,3 +2263,19 @@ five-critical-plus-six-of-seven gate; it does not authorize holdout, governed
 C, LTX generation, or learner execution. Resource use was 457 scheduler
 seconds, 0.125073 A30 GPU-hours, 0.000017 GiB retained storage, and $0 direct
 cost. All prior failures and no-gos remain unchanged.
+
+Public-development integrity attempt 1 (Juno job 316965) completed in 700
+scheduler seconds with five healthy modules and two shared
+`TRUTH_MASK_ROUNDTRIP` errors in referent and attribute. Scientific metrics
+remained fully withheld. Blocker `f8c31553…56221` records that the validator
+incorrectly compared each sampled binary mask with the already aggregated
+phase label. This was an execution-validity defect, not a below-threshold
+measurement.
+
+Before attempt 2, repair `638d5c3c…f82e2` freezes the exact intended order:
+validate each retained mask against its own immutable per-sample visible,
+candidate-count, dominance, and fraction record; then recompute the existing
+phase rules (at least two visible samples, modal candidate bin with the frozen
+tie order, and at least two dominant visible samples). Models, fixtures,
+partitions, seeds, thresholds, metrics, privacy rules, and the combined gate
+remain unchanged. Holdout and every downstream stage remain locked.

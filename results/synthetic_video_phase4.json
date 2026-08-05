@@ -1,7 +1,7 @@
 {
   "schema_version": 24,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_PASS_SEALED_PUBLIC_DEVELOPMENT_AUTHORIZED_NO_SCIENTIFIC_METRICS_OPENED",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_1_BLOCKER_PRESERVED_MASK_ROUNDTRIP_REPAIR_FROZEN_NO_SCIENTIFIC_METRICS_OPENED",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -1514,6 +1514,29 @@
     "governed_C_authorized": false,
     "LTX_or_synthetic_learner_run": false
   },
+  "learner_effective_public_development_engineering_attempt_1_result": {
+    "status": "ENGINEERING_BLOCKER_PUBLIC_DEVELOPMENT_ATTEMPT_1_METRICS_WITHHELD",
+    "observed_on": "2026-08-05",
+    "job_id": 316965,
+    "attempt": 1,
+    "scheduler_elapsed_seconds": 700,
+    "GPU_type": "NVIDIA_A30_24GB",
+    "completed_module_count": 5,
+    "failed_module_count": 2,
+    "scientific_metric_count": 0,
+    "unaccounted_failure_count": 0,
+    "partition_engineering_integrity_commitment_sha256": "0836e0bfc45c15a004e801c92b336d959913329e719bfd001aea15e633c583d7",
+    "result_commitment_sha256": "f8c315531e80049a1c0c8860dfdb99587908c97793ed6f705a911c2492756221",
+    "classification": "ENGINEERING_PHASE_AGGREGATE_WAS_INCORRECTLY_APPLIED_TO_EACH_SAMPLED_MASK_NOT_SCIENTIFIC_NO_GO"
+  },
+  "learner_effective_public_development_truth_mask_roundtrip_repair": {
+    "status": "FROZEN_AFTER_PUBLIC_DEVELOPMENT_ATTEMPT_1_MASK_ROUNDTRIP_ENGINEERING_FAILURE_BEFORE_ATTEMPT_2_OR_SCIENTIFIC_METRICS",
+    "prior_engineering_blocker_commitment_sha256": "f8c315531e80049a1c0c8860dfdb99587908c97793ed6f705a911c2492756221",
+    "repair_commitment_sha256": "638d5c3c43ccb81421e5667b00308aee68fbeed7cd2f80502c3395ba385f82e2",
+    "public_development_integrity_attempt": 2,
+    "scientific_metric_count": 0,
+    "scientific_threshold_or_gate_changed": false
+  },
   "governed_C_calibration": {
     "status": "NO_GO",
     "topology": "1_H100",
@@ -2089,5 +2112,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "RUN_ONE_COMPLETE_PUBLIC_DEVELOPMENT_QUALIFICATION_ENGINEERING_FIRST_THEN_APPLY_THE_FROZEN_FIVE_CRITICAL_PLUS_SIX_OF_SEVEN_GATE; HOLDOUT_REMAINS_LOCKED_UNTIL_A_DEVELOPMENT_PASS_AND_THRESHOLD_SEAL"
+  "next_authorized_scope": "COMMIT_AND_PUSH_THE_EXACT_MASK_ROUNDTRIP_REPAIR_THEN_RERUN_THE_COMPLETE_PUBLIC_DEVELOPMENT_INTEGRITY_AND_SCIENTIFIC_SEQUENCE_AS_ATTEMPT_2; HOLDOUT_REMAINS_LOCKED"
 }
