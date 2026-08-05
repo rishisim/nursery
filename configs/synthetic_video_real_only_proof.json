@@ -1,6 +1,6 @@
 {
-  "schema_version": 30,
-  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_ZERO_RUNTIME_H100_MIG_ATTEMPT_8_CANCELED_FULL_H100_TOPOLOGY_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME",
+  "schema_version": 31,
+  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_8_GIT_ABSENCE_BLOCKER_PRESERVED_CLEAN_TREE_FALLBACK_ATTEMPT_9_FROZEN_NO_NEW_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -1948,6 +1948,219 @@
     "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
     "amendment_commitment_sha256": "8ef8e53c2754fe13b91518c02f419a1d3c4f3162aa18648f7044986854d327d6"
   },
+  "learner_effective_engineering_health_attempt_8_result": {
+    "status": "ENGINEERING_BLOCKER_ATTEMPT_8_DURING_DEPENDENCY_ACTIVITY_CODE_NO_SCIENTIFIC_METRICS_OPENED",
+    "observed_on": "2026-08-04",
+    "route_id": "construct-aligned-engineering-health",
+    "classification": "ENGINEERING_CONTAINER_GIT_EXECUTABLE_MISSING_NOT_SCIENTIFIC_NO_GO",
+    "preserved_scheduler_policy_sha256": "8ef8e53c2754fe13b91518c02f419a1d3c4f3162aa18648f7044986854d327d6",
+    "submission_provenance": {
+      "job_id": 316777,
+      "attempt": 8,
+      "scheduler_state": "COMPLETED",
+      "scheduler_exit_code": "0:0",
+      "scheduler_elapsed_seconds": 199,
+      "GPU_type": "NVIDIA_H100_NVL",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "wall_minutes_requested": 60,
+      "DDP": false,
+      "direct_monetary_cost_USD": 0
+    },
+    "compact_aggregate": {
+      "module_count": 7,
+      "completed_module_count": 0,
+      "failed_module_count": 7,
+      "case_count": 28,
+      "holdout_input_count": 0,
+      "scientific_metric_count": 0,
+      "failure_count": 7,
+      "invalid_retained_record_count": 0,
+      "silent_truncation_count": 0,
+      "external_call_count": 0,
+      "unaccounted_failure_count": 1,
+      "private_trace_count": 7,
+      "preflight_blocked_trace_count": 6,
+      "retained_file_count": 12,
+      "retained_bytes": 5055,
+      "stdout_bytes": 1354,
+      "stderr_bytes": 0,
+      "public_fixture_manifest_commitment_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "runner_commitment_sha256": "75734064731b62400702299297f8c0a6ec9b8cbd54dd4896e53d9c265dbfbdf9",
+      "config_commitment_sha256": "490f63e294d4751a962d41c1956b02e1ac51bafc8a42aed2f76aa8c8704b0c89",
+      "dependency_config_commitment_sha256": "6c7816d4fdedf885a684c0e4ddc9c829aaca7ceaef068fccf01da1a405903e8c",
+      "microfixture_manifest_commitment_sha256": "981e1cf51ba9f538976aaf6cb2a806113f54656fe3a2dc4cc0095841bb6580ee",
+      "engineering_health_commitment_sha256": "5df1d3e169f17ecbd269e7dd8c29fc0b033a301fb6cd15e69eebecccdceb92c8"
+    },
+    "stable_aggregate_diagnosis": {
+      "last_persisted_stage": "DEPENDENCY_ACTIVITY_CODE",
+      "last_persisted_stage_ordinal": 14,
+      "progress_update_count": 16,
+      "progress_elapsed_seconds_rounded": 196.865,
+      "file_not_found_trace_count": 1,
+      "missing_git_executable_classification_count": 1,
+      "container_git_executable_available": false,
+      "host_clean_tree_attestation_required": true,
+      "model_module_inference_count": 0,
+      "scientific_metric_count": 0,
+      "sensitive_detail_field_count": 0,
+      "model_or_scientific_outcome_used": false
+    },
+    "resource_accounting": {
+      "attempt_GPU_hours_actual": 0.054775266514884104,
+      "protocol_accounted_cumulative_GPU_hours_actual": 1.3148191813627879,
+      "attempt_retained_storage_GiB": 1.6046687960624695e-6,
+      "protocol_accounted_cumulative_retained_storage_GiB": 6.210058927536011e-6,
+      "attempt_wall_minutes_actual": 3.286515990893046,
+      "protocol_accounted_cumulative_wall_minutes_actual": 78.88915088176728,
+      "direct_monetary_cost_USD": 0
+    },
+    "terminal_gate": {
+      "scientific_decision_opened": false,
+      "public_development_authorized": false,
+      "governed_C_authorized": false,
+      "LTX_or_synthetic_learner_run": false,
+      "attempt_9_authorized_only_after_prospective_git_fallback_repair_commit_and_push": true
+    },
+    "blocker_commitment_scope": "canonical JSON of this result excluding blocker_commitment_sha256",
+    "blocker_commitment_sha256": "409c36d2c3ba4aefdd2f510c661ba363c000fc232dce2fcfba0151ba25f9aad7"
+  },
+  "learner_effective_engineering_health_git_fallback_repair": {
+    "status": "FROZEN_AFTER_ATTEMPT_8_BLOCKER_BEFORE_GIT_FREE_TREE_ATTESTED_ATTEMPT_9_OR_NEW_OUTCOME",
+    "effective_on": "2026-08-04",
+    "scope": "OUTCOME_INDEPENDENT_CONTAINER_GIT_ABSENCE_REPAIR_AND_ATTEMPT_9_TOPOLOGY_SELECTION",
+    "authorization_basis": "user standing authorization for ordinary engineering repairs until a complete valid scientific result and earliest-compatible-zero-cost GPU selection",
+    "preserved_without_change": {
+      "attempt_8_blocker_sha256": "409c36d2c3ba4aefdd2f510c661ba363c000fc232dce2fcfba0151ba25f9aad7",
+      "attempt_8_engineering_health_commitment_sha256": "5df1d3e169f17ecbd269e7dd8c29fc0b033a301fb6cd15e69eebecccdceb92c8",
+      "scheduler_policy_sha256": "8ef8e53c2754fe13b91518c02f419a1d3c4f3162aa18648f7044986854d327d6",
+      "public_fixture_manifest_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "models_weights_fixtures_inputs_seeds_thresholds_metrics_scientific_gates_privacy_rules_and_downstream_contract": true
+    },
+    "failure_specific_diagnosis": {
+      "failure_stage": "DEPENDENCY_ACTIVITY_CODE",
+      "exception_type": "FileNotFoundError",
+      "missing_executable": "git",
+      "container_git_available": false,
+      "host_git_available": true,
+      "model_module_inference_count": 0,
+      "scientific_metric_count": 0,
+      "outcome_information_used_for_repair": false
+    },
+    "clean_tree_attestations": {
+      "host_git_clean_verification_before_freeze": true,
+      "official_commit_match_count": 2,
+      "unexpected_status_count": 0,
+      "repositories": [
+        {
+          "family": "egohod_activity_code_tree",
+          "expected_commit": "3682c1906eb33d55431751111bb81dabe854f449",
+          "git_index_sha256": "a6caae2499485ff6195e4fbd565bd9bfe1a7c4f828cd69cac430b701a961416d",
+          "git_index_bytes": 6399,
+          "file_count": 49,
+          "bytes": 2019900,
+          "tree_commitment_sha256": "1d0ebcc69290dae8e7b33c0e759ee25b050e1d6b110aa6a5f681b7ef867174eb",
+          "host_unexpected_status_count": 0
+        },
+        {
+          "family": "openai_clip_code_tree",
+          "expected_commit": "d05afc436d78f1c48dc0dbf8e5980a9d471f35f6",
+          "git_index_sha256": "7754654607dedf1df4fdb6ec4e1f04c595fa7084dffd7381730b131bb6933c59",
+          "git_index_bytes": 2102,
+          "file_count": 22,
+          "bytes": 5394303,
+          "tree_commitment_sha256": "3de34b6347e7e8303b2bb137c2afa3d6a4806a9362adee8e8c57451e8d1a2cbd",
+          "host_unexpected_status_count": 0
+        }
+      ]
+    },
+    "failure_specific_repair": {
+      "runner_uses_git_status_when_git_is_available": true,
+      "runner_uses_pinned_HEAD_index_and_complete_worktree_tree_attestation_when_git_is_unavailable": true,
+      "complete_tree_includes_relative_paths_file_sha256_and_bytes": true,
+      "complete_tree_excludes_only_git_metadata_pycache_and_pyc": true,
+      "untracked_or_modified_importable_source_detected": true,
+      "container_package_or_dependency_change": false,
+      "model_fixture_source_threshold_partition_seed_metric_or_gate_changed": false
+    },
+    "scheduler_only_comparison": {
+      "checked_on": "2026-08-04",
+      "real_job_submitted_by_checks": false,
+      "request": {
+        "nodes": 1,
+        "tasks": 1,
+        "CPU_count": 8,
+        "memory_GiB": 32,
+        "wall_minutes": 60,
+        "DDP": false,
+        "direct_monetary_cost_USD": 0
+      },
+      "candidates": [
+        {"GPU_type": "NVIDIA_A30_24GB", "partition": "a30", "GRES": "gpu:nvidia_a30:1", "eligible": true, "estimated_start": "2026-08-05T00:07:53-05:00"},
+        {"GPU_type": "NVIDIA_H100_NVL", "partition": "h100", "GRES": "gpu:nvidia_h100_nvl:1", "eligible": true, "estimated_start": "2026-08-05T00:07:53-05:00"},
+        {"GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG", "partition": "h100", "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1", "eligible": true, "estimated_start": "2026-08-05T04:51:08-05:00"},
+        {"GPU_type": "NVIDIA_H200_NVL", "partition": "h200", "GRES": "gpu:nvidia_h200_nvl:1", "eligible": true, "estimated_start": "2026-08-05T19:30:53-05:00"}
+      ],
+      "selection_rule": "minimum scheduler-estimated start among compatible eligible zero-cost one-process requests; fixed GPU-type order only breaks exact timestamp ties",
+      "selected_GPU_type": "NVIDIA_A30_24GB"
+    },
+    "active_attempt_resource_policy": {
+      "attempt": 9,
+      "submission_count": 1,
+      "partition": "a30",
+      "GRES": "gpu:nvidia_a30:1",
+      "GPU_type": "NVIDIA_A30_24GB",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "DDP": false,
+      "wall_minutes_max": 60,
+      "GPU_hours_max": 1.0,
+      "new_storage_GiB_max": 1.0,
+      "prior_protocol_accounted_GPU_hours_actual": 1.3148191813627879,
+      "active_aggregate_GPU_hours_max": 2.314819181362788,
+      "prior_health_run_storage_GiB_actual": 6.210058927536011e-6,
+      "active_aggregate_new_storage_GiB_max": 1.0000062100589275,
+      "direct_monetary_cost_USD": 0,
+      "historical_attempt_GPU_types": {
+        "1": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "2": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "3": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "4": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "5": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "6": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "7": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "8": "NVIDIA_H100_NVL"
+      }
+    },
+    "topology_attestation_contract": {
+      "partition": "a30",
+      "node_count": 1,
+      "task_count": 1,
+      "CPU_count": 8,
+      "time_limit_minutes": 60,
+      "memory_per_CPU_GiB": 4,
+      "GRES": "gpu:nvidia_a30:1",
+      "expected_device_name": "NVIDIA A30",
+      "visible_memory_GiB_min": 23,
+      "visible_memory_GiB_max": 25,
+      "world_size": 1,
+      "local_world_size": 1
+    },
+    "execution_and_stop_rule": {
+      "attempt_9_is_complete_health_suite_not_shallow_diagnostic": true,
+      "same_complete_28_case_two_replicate_suite": true,
+      "metric_withholding_on_timeout_or_error": true,
+      "commit_and_push_before_submission": true,
+      "one_live_job_max": 1,
+      "no_repeated_scheduler_polling_or_unchanged_status_updates": true,
+      "valid_complete_scientific_result_remains_terminal_under_frozen_gate": true
+    },
+    "new_health_or_scientific_outcome_opened": false,
+    "repair_commitment_scope": "canonical JSON of this amendment excluding repair_commitment_sha256",
+    "repair_commitment_sha256": "b6a93e3a0b0b716d8bdd8fdd47656e69f8ff5b66c0a3ec8f96973e565a9066f9"
+  },
   "governance_incident": {
     "observed_on": "2026-08-02",
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_GOVERNED_PROCESSING_RESUMED",
@@ -1995,7 +2208,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_AND_ATTEMPT_3_4_5_BLOCKERS_PLUS_ATTEMPT_6_AND_7_TIMEOUTS_PRESERVED_EXTENDED_WALL_ATTEMPT_8_PENDING_C_LTX_AND_SYNTHETIC_LEARNER_CONDITIONAL_NOT_RUN",
+    "status": "PRIOR_CALIBRATION_NO_GOS_AND_ATTEMPT_3_4_5_8_BLOCKERS_PLUS_ATTEMPT_6_AND_7_TIMEOUTS_PRESERVED_GIT_FALLBACK_ATTEMPT_9_FROZEN_C_LTX_AND_SYNTHETIC_LEARNER_CONDITIONAL_NOT_RUN",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -2018,7 +2231,7 @@
       "pre_seal_label_semantics_correction": "/public_no_hand_review_label_semantics_correction",
       "blind_no_hand_review_seal": "/public_no_hand_review_seal_result",
       "prior_public_qualification_terminal_result": "/learner_effective_public_development_result",
-      "public_qualification_current_state": "/learner_effective_engineering_health_progress_repair",
+      "public_qualification_current_state": "/learner_effective_engineering_health_git_fallback_repair",
       "public_qualification_resource": "/learner_effective_public_qualification_resource_amendment",
       "preserved_complete_source_no_go": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_complete_source_result",
       "governed_C_and_episode_plan_order": "/construct_aligned_ltx_resume_amendment/execution_order",

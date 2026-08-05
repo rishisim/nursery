@@ -35,7 +35,7 @@ def test_construct_aligned_resume_amendment_is_exact_and_schema23_compatible() -
     config = json.loads(
         Path("configs/synthetic_video_real_only_proof.json").read_text()
     )
-    assert config["schema_version"] == 30
+    assert config["schema_version"] == 31
     amendment = MODULE._construct_aligned_ltx_resume_amendment(config)
     assert (
         amendment["amendment_commitment_sha256"]
@@ -88,7 +88,7 @@ def test_engineering_health_amendment_and_geometry_lineage_are_exact() -> None:
     assert scheduler["canceled_submission"]["job_id"] == 316697
     assert scheduler["canceled_submission"]["elapsed_seconds"] == 0
     assert MODULE._engineering_health_resource_policy(config)["GPU_type"] == (
-        "NVIDIA_H100_NVL"
+        "NVIDIA_A30_24GB"
     )
     assert MODULE._engineering_health_resource_policy(config)[
         "per_submission_wall_minutes_max"

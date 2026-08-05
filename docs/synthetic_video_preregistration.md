@@ -1,6 +1,6 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ATTEMPT-7 ENGINEERING TIMEOUT PRESERVED; ZERO-RUNTIME H100-MIG ATTEMPT-8 CANCELED; FULL-H100 ATTEMPT-8 TOPOLOGY FROZEN BEFORE MODEL OUTCOME; ALL PRIOR NO-GOS PRESERVED**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ATTEMPT-8 CONTAINER-GIT ENGINEERING BLOCKER PRESERVED; CLEAN-TREE-ATTESTED ATTEMPT 9 FROZEN BEFORE NEW OUTCOME; ALL PRIOR NO-GOS PRESERVED**
 
 **Evidence cut-off:** 2026-08-04
 
@@ -1986,6 +1986,27 @@ input, seed, threshold, metric, repair allowance, privacy rule, scientific gate,
 and downstream limit remains unchanged. Once a run is authorized to open
 scientific metrics, its exact topology is frozen before execution and cannot be
 changed in response to outcomes.
+
+Attempt 8, Juno job 316777, completed after 199 seconds on the frozen full H100
+and is preserved as engineering blocker `409c36d2…f9aad7`. Exact dependency
+preflight reached `DEPENDENCY_ACTIVITY_CODE`; the container then raised one
+`FileNotFoundError` because it contains no `git` executable. The other six
+modules were explicitly preflight-blocked. Zero of seven modules ran, all
+scientific metrics and holdout inputs remained withheld, network and telemetry
+were disabled, and no invalid retained record, silent truncation, external call,
+or restricted mount was observed. This is not a scientific no-go.
+
+Before attempt 9, host Git verified both pinned activity-code repositories at
+their official commits with no unexpected status entry. Schema 31 freezes the
+complete relative-path/file-hash/byte tree and Git-index commitments for those
+clean repositories at `b6a93e3a…a9066f9`. When Git exists the runner still uses
+`git status`; when it is absent, the runner requires the same pinned HEAD,
+exact index bytes, and exact complete worktree commitment. Modified or
+untracked importable source fails closed. No package, model, fixture, source,
+threshold, partition, seed, metric, gate, privacy rule, or downstream limit is
+changed. Attempt 9 restarts the complete 28-case two-replicate suite with
+metric withholding, one live job, and no repeated scheduler polling or
+unchanged queue-status reporting.
 
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only

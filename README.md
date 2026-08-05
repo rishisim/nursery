@@ -569,3 +569,13 @@ August 10 and a full H100 NVL became immediately eligible. The canonical
 resource amendment now freezes that full H100 at `8ef8e53c…d327d6`: one
 process, eight CPUs, 32 GiB, 60 minutes/1.0 GPU-hour, 1 GiB retained storage,
 and $0. No repeated queue polling or duplicate live job is permitted.
+
+Attempt 8 subsequently completed on that full H100 but stopped during exact
+activity-code dependency validation because the network-disabled container has
+no `git` executable. Blocker `409c36d2…f9aad7` preserves zero completed
+modules and zero scientific metrics. Schema 31 prospectively freezes the two
+official host-clean repository trees and Git indexes at repair commitment
+`b6a93e3a…a9066f9`; the runner can now verify those exact trees without adding
+Git to the container, while still failing on any modified or untracked source.
+One unchanged attempt 9 is authorized under the standing earliest-compatible
+zero-cost GPU policy. Scheduler state is not repeatedly polled or reported.
