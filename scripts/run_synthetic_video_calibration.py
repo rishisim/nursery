@@ -753,7 +753,7 @@ def _construct_aligned_ltx_resume_amendment(
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     ):
@@ -811,7 +811,7 @@ def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_BEFORE_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -880,7 +880,7 @@ def _engineering_health_resource_redirect(
     payload = json.loads(json.dumps(value))
     expected = payload.pop("amendment_commitment_sha256", None)
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "SCHEDULER_AND_RESOURCE_LATENCY_ONLY"
@@ -1448,7 +1448,7 @@ def _engineering_health_dependency_restore(
         ["transformers", "4.57.6"],
     ]
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_DEPENDENCY_CACHE_MISS_BEFORE_ATTEMPT_2_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1553,7 +1553,7 @@ def _engineering_health_topology_guard_repair(
     repair = value.get("repair", {})
     budget = value.get("remaining_health_budget", {})
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_2_REDUNDANT_TOPOLOGY_GUARD_FAILURE_BEFORE_ATTEMPT_3_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1636,7 +1636,7 @@ def _engineering_health_terminal_result(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ROUTE_EXHAUSTED_BEFORE_MODEL_INFERENCE_NO_SCIENTIFIC_METRICS_OPENED"
         or expected != ENGINEERING_HEALTH_BLOCKER_SHA256
@@ -1712,7 +1712,7 @@ def _engineering_health_reauthorization(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("effective_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") not in {23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_SEALED_BLOCKER_BEFORE_REAUTHORIZED_ATTEMPT_4_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope")
@@ -1827,7 +1827,7 @@ def _engineering_health_reauthorization_result(
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_REAUTHORIZED_ATTEMPT_4_EXHAUSTED_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -1942,7 +1942,7 @@ def _engineering_health_parser_repair_reauthorization(
     resource = value.get("effective_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") not in {25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_4_BLOCKER_BEFORE_SINGLE_POST_BLOCKER_ATTEMPT_5_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "ONE_SUBMISSION_CLI_ATTEMPT_BOUND_REPAIR_ONLY"
@@ -2030,7 +2030,7 @@ def _engineering_health_parser_repair_result(
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_POST_BLOCKER_ATTEMPT_5_EXHAUSTED_BEFORE_MODEL_LOADING_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -2169,7 +2169,7 @@ def _engineering_health_iterative_reauthorization(
     resource = value.get("active_attempt_resource_policy", {})
     rolling = value.get("rolling_execution_policy", {})
     if (
-        cfg.get("schema_version") not in {27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_5_BLOCKER_BEFORE_HOST_CONTAINER_ATTESTATION_REPAIR_ATTEMPT_6_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -2291,7 +2291,7 @@ def _engineering_health_iterative_attempt_6_result(
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "ENGINEERING_TIMEOUT_ATTEMPT_6_BEFORE_MICROFIXTURE_PROJECTION_OR_FULL_RESULT_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -2381,7 +2381,7 @@ def _engineering_health_progress_repair(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("active_attempt_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") not in {28, 29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {28, 29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_6_TIMEOUT_BEFORE_PROGRESS_INSTRUMENTED_ATTEMPT_7_OR_NEW_OUTCOME"
         or value.get("scope") != "ENGINEERING_PROGRESS_INSTRUMENTATION_ONLY"
@@ -2460,7 +2460,7 @@ def _engineering_health_attempt_7_result(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "ENGINEERING_TIMEOUT_ATTEMPT_7_DURING_DEPENDENCY_PREFLIGHT_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -2557,7 +2557,7 @@ def _engineering_health_extended_wall_repair(
     resource = value.get("active_attempt_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") not in {29, 30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {29, 30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_7_TIMEOUT_BEFORE_EXTENDED_WALL_ATTEMPT_8_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -2638,7 +2638,7 @@ def _engineering_health_scheduler_policy(
     execution = value.get("execution_and_stop_rule", {})
     candidates = comparison.get("candidates")
     if (
-        cfg.get("schema_version") not in {30, 31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {30, 31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ZERO_RUNTIME_H100_MIG_CANCELLATION_AND_SUBMISSION_RECHECK_BEFORE_FULL_H100_ATTEMPT_8_OR_NEW_MODEL_OUTCOME"
         or value.get("scope")
@@ -2808,7 +2808,7 @@ def _engineering_health_attempt_8_result(
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_8_DURING_DEPENDENCY_ACTIVITY_CODE_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -3051,7 +3051,7 @@ def _engineering_health_git_fallback_repair(
         "local_world_size": 1,
     }
     if (
-        cfg.get("schema_version") not in {31, 32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {31, 32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_8_BLOCKER_BEFORE_GIT_FREE_TREE_ATTESTED_ATTEMPT_9_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -3145,7 +3145,7 @@ def _engineering_health_attempt_9_result(
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_9_BEFORE_RUNNER_PROGRESS_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -3364,7 +3364,7 @@ def _engineering_health_historical_lineage_repair(
         "local_world_size": 1,
     }
     if (
-        cfg.get("schema_version") not in {32, 33, 34, 35, 36}
+        cfg.get("schema_version") not in {32, 33, 34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_9_BLOCKER_BEFORE_HISTORICAL_LINEAGE_REPAIRED_ATTEMPT_10_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -3450,7 +3450,7 @@ def _engineering_health_attempt_10_result(
     payload = json.loads(json.dumps(value))
     expected = payload.pop("blocker_commitment_sha256", None)
     if (
-        cfg.get("schema_version") not in {33, 34, 35, 36}
+        cfg.get("schema_version") not in {33, 34, 35, 36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_10_DURING_FIXTURE_VERIFICATION_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -3621,7 +3621,7 @@ def _engineering_health_portable_ast_repair(
         "world_size": 1, "local_world_size": 1,
     }
     if (
-        cfg.get("schema_version") not in {33, 34, 35, 36}
+        cfg.get("schema_version") not in {33, 34, 35, 36, 37}
         or value.get("status") != "FROZEN_AFTER_ATTEMPT_10_BLOCKER_BEFORE_PORTABLE_AST_REPAIRED_ATTEMPT_11_OR_NEW_OUTCOME"
         or value.get("scope") != "OUTCOME_INDEPENDENT_CROSS_PYTHON_GEOMETRY_AST_COMPATIBILITY_REPAIR_AND_ATTEMPT_11_TOPOLOGY_SELECTION"
         or expected != ENGINEERING_HEALTH_PORTABLE_AST_REPAIR_SHA256
@@ -3695,7 +3695,7 @@ def _engineering_health_attempt_11_result(
     diagnosis = value.get("stable_aggregate_diagnosis", {})
     resource = value.get("resource_accounting", {})
     if (
-        cfg.get("schema_version") not in {34, 35, 36}
+        cfg.get("schema_version") not in {34, 35, 36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_11_DURING_FIXTURE_VERIFICATION_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("classification")
@@ -3846,7 +3846,7 @@ def _engineering_health_fixture_bind_repair(
         "local_world_size": 1,
     }
     if (
-        cfg.get("schema_version") not in {34, 35, 36}
+        cfg.get("schema_version") not in {34, 35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_11_BLOCKER_BEFORE_READ_ONLY_SEALED_FIXTURE_BIND_ATTEMPT_12_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -3896,7 +3896,7 @@ def _engineering_health_attempt_12_result(
     diagnosis = value.get("stable_aggregate_diagnosis", {})
     resource = value.get("resource_accounting", {})
     if (
-        cfg.get("schema_version") not in {35, 36}
+        cfg.get("schema_version") not in {35, 36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_12_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("classification")
@@ -4053,7 +4053,7 @@ def _engineering_health_submission_export_repair(
         "local_world_size": 1,
     }
     if (
-        cfg.get("schema_version") not in {35, 36}
+        cfg.get("schema_version") not in {35, 36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_12_EXPORT_CONTRACT_FAILURE_BEFORE_ATTEMPT_13_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -4099,7 +4099,7 @@ def _engineering_health_attempt_13_result(
     resource = value.get("resource_accounting", {})
     submission = value.get("submission_provenance", {})
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_13_DURING_MODULE_EXECUTION_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("classification")
@@ -4300,7 +4300,7 @@ def _engineering_health_nltk_matplotlib_repair(
         "local_world_size": 1,
     }
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_13_RUNTIME_BLOCKERS_BEFORE_ATTEMPT_14_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -4377,7 +4377,7 @@ def _engineering_health_attempt_14_result(
     diagnosis = value.get("stable_aggregate_diagnosis", {})
     resource = value.get("resource_accounting", {})
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_14_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("classification")
@@ -4508,7 +4508,7 @@ def _engineering_health_generic_gres_repair(
     selected_type = comparison.get("selected_GPU_type")
     selected = catalog.get(selected_type, (None, None, None, None, None))
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_14_GENERIC_SLURM_GRES_SERIALIZATION_BEFORE_ATTEMPT_15_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -4610,7 +4610,7 @@ def _engineering_health_attempt_15_result(
     diagnosis = value.get("stable_aggregate_diagnosis", {})
     resource = value.get("resource_accounting", {})
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_15_BEFORE_RUNNER_PROGRESS_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("classification")
@@ -4713,7 +4713,7 @@ def _engineering_health_active_dispatch_repair(
     selected_type = comparison.get("selected_GPU_type")
     selected = catalog.get(selected_type, (None, None, None, None, None))
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_15_ACTIVE_REPAIR_DISPATCH_FAILURE_BEFORE_ATTEMPT_16_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -4797,7 +4797,7 @@ def _engineering_health_attempt_16_result(
     diagnosis = value.get("stable_aggregate_diagnosis", {})
     resource = value.get("resource_accounting", {})
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_16_BEFORE_RUNNER_PROGRESS_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("classification")
@@ -4898,7 +4898,7 @@ def _engineering_health_historical_resource_dispatch_repair(
     selected_type = comparison.get("selected_GPU_type")
     selected = catalog.get(selected_type, (None, None, None, None, None))
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_16_HISTORICAL_RESOURCE_DISPATCH_FAILURE_BEFORE_ATTEMPT_17_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -4976,7 +4976,7 @@ def _engineering_health_attempt_17_result(
         "order_action": "PASS_ENGINEERING",
     }
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_17_COMPLETE_METRIC_WITHHELD_HEALTH_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("classification")
@@ -5096,7 +5096,7 @@ def _engineering_health_ffmpeg_prettytable_repair(
         "source": "official PyPI wheel",
     }
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_17_RUNTIME_EXECUTION_FAILURES_BEFORE_ATTEMPT_18_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -5187,7 +5187,7 @@ def _engineering_health_attempt_18_result(
     resource = value.get("resource_accounting", {})
     terminal = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_18_BEFORE_RUNNER_PROGRESS_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("classification")
@@ -5313,7 +5313,7 @@ def _engineering_health_historical_full_result_lineage_repair(
     selected_type = comparison.get("selected_GPU_type")
     selected = catalog.get(selected_type, (None, None, None, None, None))
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_18_HISTORICAL_FULL_RESULT_VALIDATION_FAILURE_BEFORE_ATTEMPT_19_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -5405,7 +5405,7 @@ def _engineering_health_attempt_19_result(
         "order_action": "PASS_ENGINEERING",
     }
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ATTEMPT_19_COMPLETE_METRIC_WITHHELD_HEALTH_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("classification")
@@ -5522,7 +5522,7 @@ def _engineering_health_grounding_state_compatibility_repair(
     selected_type = comparison.get("selected_GPU_type")
     selected = catalog.get(selected_type, (None, None, None, None, None))
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_19_EXACT_GROUNDING_STATE_COMPATIBILITY_FAILURE_BEFORE_ATTEMPT_20_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -5648,7 +5648,7 @@ def _engineering_health_attempt_20_pass_result(
         ),
     }
     if (
-        cfg.get("schema_version") != 36
+        cfg.get("schema_version") not in {36, 37}
         or value.get("status")
         != "PASS_ENGINEERING_HEALTH_SEALED_BEFORE_PUBLIC_DEVELOPMENT"
         or value.get("route_id") != "construct-aligned-engineering-health"

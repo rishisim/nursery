@@ -119,10 +119,10 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 27
+    assert config["schema_version"] == 28
     assert config["status"] == (
-        "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_"
-        "COMPLETE_SCIENTIFIC_NO_GO_DOWNSTREAM_STOPPED"
+        "PHASE4_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_"
+        "AMENDMENT_FROZEN"
     )
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
@@ -608,7 +608,20 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 36
+    assert config["schema_version"] == 37
+    readiness = dict(config["public_only_calibration_readiness_amendment"])
+    readiness_commitment = readiness.pop("amendment_commitment_sha256")
+    assert readiness_commitment == canonical_json_sha256(readiness)
+    assert readiness_commitment == (
+        "03bbf64749b0302a16e97f9b999674e287b7f4fa801df905d09b72ea9c39eeae"
+    )
+    assert readiness["prior_terminal_result_preserved"][
+        "result_commitment_sha256"
+    ] == "42338302949e27e0ed7c3f6e8a5f70e10bb380a5e8158378e89f5ff87c350e9d"
+    assert readiness["absolute_scope"]["public_only"] is True
+    assert readiness["absolute_scope"]["governed_C"] is False
+    assert readiness["combined_gate"]["critical_axes_must_all_pass"] is True
+    assert readiness["combined_gate"]["validated_axes_min"] == 6
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)

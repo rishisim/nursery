@@ -759,3 +759,23 @@ Commitment `42338302…50e9d` seals the terminal result. The holdout, governed C
 LTX-2.3 generation, and synthetic learner were not run. The three development
 attempts used 0.905556 A30 GPU-hours, retained 279,902 bytes of compact
 qualification state outside Git, and incurred $0 direct monetary cost.
+
+The accepted no-go remains final. A new user-authorized route, frozen at
+commitment `03bbf647…9eeae` before any new outcome, now asks only whether a
+fast, automated, independently validated public-only calibration package is
+ready for a later separately authorized governed run. It replaces no prior
+result and cannot access ChildLens/BabyView, run governed C, invoke LTX/TTS,
+generate a synthetic corpus, or train/evaluate the learner.
+
+This public-only route aligns lexical tests to aggregate noun/adjective counts,
+types, public frequency bands, repetition/burstiness, and long-tail share while
+retaining event precision/recall diagnostics. Attribute contrast runs
+independently of referent qualification and tests color, relative size, shape,
+and visible state on deterministic positive, opposite, null, and ambiguous
+fixtures. The unchanged combined rule remains all five critical axes and at
+least six of seven total axes on both development and the unopened holdout.
+Broad context and order-action remain descriptive. Microhealth, development,
+and holdout are capped at 5, 15, and 15 GPU minutes respectively, with one
+five-minute repair/resmoke permitted, one process/no DDP, at most 0.666667
+zero-cost GPU-hours, 10 GiB, and $0. Slurm is waited on once per submission;
+periodic polling and unchanged pending updates are prohibited.

@@ -1,7 +1,322 @@
 {
-  "schema_version": 36,
-  "status": "LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_COMPLETE_SCIENTIFIC_NO_GO_DOWNSTREAM_STOPPED",
+  "schema_version": 37,
+  "status": "PUBLIC_ONLY_CALIBRATION_READINESS_AMENDMENT_FROZEN_BEFORE_NEW_OUTCOMES",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
+  "public_only_calibration_readiness_amendment": {
+    "status": "FROZEN_BEFORE_NEW_PUBLIC_MODEL_FIXTURE_OR_SCIENTIFIC_OUTCOMES",
+    "effective_on": "2026-08-05",
+    "authorization": "explicit user authorization for a new prospective public-only construct-aligned calibration-readiness package",
+    "route_id": "learner_effective_public_only_readiness",
+    "scientific_question": "can a fast fully automated public-only package measure and independently validate the seven learner-effective calibration axes well enough to be ready for a later separately authorized governed run",
+    "scientific_distinction": "this route tests aggregate calibration estimands and independent axis executability; it is not a repair, reinterpretation, threshold relaxation, or success superseding the terminal prior public-development route",
+    "prior_terminal_result_preserved": {
+      "status": "NO_GO_PUBLIC_DEVELOPMENT_COMPLETE_TERMINAL_FOR_PRIOR_ROUTE",
+      "result_commitment_sha256": "42338302949e27e0ed7c3f6e8a5f70e10bb380a5e8158378e89f5ff87c350e9d",
+      "critical_axis_pass_count": 2,
+      "critical_axis_count": 5,
+      "total_axis_pass_count": 3,
+      "total_axis_count": 7,
+      "holdout_opened": false,
+      "governed_C_or_downstream_work_authorized_by_that_result": false
+    },
+    "absolute_scope": {
+      "public_only": true,
+      "ChildLens_or_BabyView_mount_inspection_processing_or_use": false,
+      "governed_C": false,
+      "LTX_generator_TTS_or_synthetic_corpus": false,
+      "learner_training_or_evaluation": false,
+      "prior_failed_fixture_predictions_used_for_method_threshold_label_or_metric_selection": false,
+      "permitted_terminal_states": [
+        "CALIBRATION_READY_PUBLIC_ONLY",
+        "NO_GO_PUBLIC_ONLY_COMPLETE_VALID_SCIENTIFIC_METRICS",
+        "ENGINEERING_BLOCKER",
+        "LICENSE_PROVENANCE_OR_RESOURCE_BLOCKER"
+      ],
+      "next_state_after_pass": "READY_FOR_SEPARATELY_AUTHORIZED_GOVERNED_CALIBRATION_RUN_NOT_AUTHORIZATION_TO_EXECUTE_IT"
+    },
+    "preserved_commitments": {
+      "corrected_lexical_asset_sha256": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4",
+      "corrected_temporal_asset_sha256": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e",
+      "public_fixture_manifest_commitment_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "verified_no_hand_seal_sha256": "a58ca3f10fd72ba2a7bfc2faf9c8c65b22a22913fcf2c92786859401b8d21c97",
+      "formal_Real_1h_result": "FAILED_NOT_REINTERPRETED_MEAN_REALISTIC_MACRO_0_5360_MEAN_GAIN_0_01766_BELOW_0_02",
+      "all_prior_calibration_no_gos_and_engineering_records": "PRESERVED_UNCHANGED_IN_THIS_CONFIG_GIT_HISTORY_PROTOCOL_AND_DECISION_RECORD"
+    },
+    "combined_gate": {
+      "critical_axes": [
+        "adapter_qualified_yield",
+        "noun_adjective_exposure",
+        "utterance_centered_referent_visibility_dominance_ambiguity",
+        "cross_episode_recurrence",
+        "adjective_attribute_contrast"
+      ],
+      "supporting_axes": [
+        "hand_action_coupling",
+        "egocentric_sensor_regime"
+      ],
+      "critical_axes_must_all_pass": true,
+      "validated_axes_min": 6,
+      "axis_count": 7,
+      "axis_statuses": ["PASS", "NO_GO", "UNMEASURED"],
+      "each_axis_executes_independently": true,
+      "shared_output_requires_axis_specific_validity_test": true,
+      "failed_axis_cannot_prevent_independent_axis_execution": true,
+      "broad_activity_context": "DESCRIPTIVE_NONBLOCKING",
+      "order_action_sensitivity": "DESCRIPTIVE_NONBLOCKING_GENUINELY_ORDER_DEPENDENT_ACTIONS_ONLY",
+      "omnibus_fidelity_score": "PROHIBITED"
+    },
+    "axis_methods": {
+      "adapter_qualified_yield": {
+        "recipe": "the repaired canonical Whisper-small plus OPUS-MT-de-en offline adapter",
+        "selection": "FIXED_ONE_RECIPE_NO_CANDIDATE_SELECTION",
+        "gate": {
+          "acceptance_and_abstention_case_accuracy_required": 1.0,
+          "scored_case_coverage_required": 1.0,
+          "silent_truncation_count_max": 0,
+          "invalid_timestamp_count_max": 0,
+          "external_call_count_max": 0
+        }
+      },
+      "noun_adjective_exposure": {
+        "recipe": "NLTK-3.9.1 averaged_perceptron_tagger_eng plus WordNet lemmatization and wordfreq-3.0.2 English Zipf bands",
+        "selection": "FIXED_ONE_TASK_SPECIFIC_RECIPE_NO_CANDIDATE_SELECTION",
+        "rejected_unfrozen_alternative": "Stanza was primary-source reviewed but is not shortlisted because its additional language-model package bytes and separate package terms were not already immutably resolved for this bounded route",
+        "primary_aggregate_estimands": [
+          "noun_and_adjective_total_counts",
+          "noun_and_adjective_type_counts",
+          "public_frequency_band_distributions",
+          "within_episode_repetition_and_burstiness_distributions",
+          "long_tail_share"
+        ],
+        "diagnostic_estimands": [
+          "noun_event_precision_and_recall",
+          "adjective_event_precision_and_recall",
+          "lemma_and_frequency_band_accuracy"
+        ],
+        "gate": {
+          "eligible_case_coverage_min": 0.8,
+          "noun_total_count_relative_error_max": 0.15,
+          "adjective_total_count_relative_error_max": 0.15,
+          "noun_type_count_relative_error_max": 0.2,
+          "adjective_type_count_relative_error_max": 0.2,
+          "frequency_band_total_variation_max": 0.15,
+          "episode_repetition_distribution_total_variation_max": 0.2,
+          "long_tail_share_absolute_error_max": 0.1,
+          "noun_event_precision_min": 0.75,
+          "noun_event_recall_min": 0.75,
+          "adjective_event_precision_min": 0.75,
+          "adjective_event_recall_min": 0.75,
+          "lemma_and_frequency_band_accuracy_min": 0.8
+        },
+        "replaced_prior_representation": "exact token ordinals and 100-percent per-episode repetition equality remain diagnostics but no longer alone stand in for aggregate exposure calibration"
+      },
+      "utterance_centered_referent_visibility_dominance_ambiguity": {
+        "recipe": "GroundingDINO-SwinT-OGC plus SAM-2.1-Hiera-base-plus over the frozen public coarse ontology",
+        "selection": "FIXED_ONE_RECIPE_WITH_ONLY_THE_FROZEN_DEVELOPMENT_THRESHOLD_GRID",
+        "gate": {
+          "event_coverage_min": 0.8,
+          "visibility_timing_macro_f1_min": 0.65,
+          "no_referent_specificity_min": 0.8,
+          "dominance_weighted_kappa_min": 0.6,
+          "ambiguity_macro_f1_min": 0.65,
+          "valid_geometry_and_monotonic_track_fraction_required": 1.0
+        }
+      },
+      "cross_episode_recurrence": {
+        "recipe": "DINOv2-ViT-B-14 plus exact-hash and pHash diagnostics under the previously passing semantics",
+        "selection": "HASH_AND_INTERFACE_VERIFIED_REUSE_WITH_FROZEN_DEVELOPMENT_COSINE_GRID",
+        "gate": {
+          "same_object_cross_episode_balanced_accuracy_min": 0.8,
+          "recurrence_event_f1_min": 0.75,
+          "near_duplicate_pair_balanced_accuracy_min": 0.9,
+          "negative_pair_false_positive_rate_max": 0.1,
+          "coverage_min": 0.8
+        }
+      },
+      "adjective_attribute_contrast": {
+        "recipe": "independent GroundingDINO plus SAM-2.1 mask qualification followed by PE-Core-L14-336 masked-image scores and deterministic color geometry checks",
+        "selection": "FIXED_ONE_RECIPE_WITH_OWN_FROZEN_DEVELOPMENT_GROUNDING_AND_MARGIN_GRIDS",
+        "independent_from_referent_gate": true,
+        "families": ["color", "relative_size", "shape", "state"],
+        "case_semantics_per_family": ["positive", "opposite", "null", "ambiguous"],
+        "gate": {
+          "family_count_required": 4,
+          "per_family_macro_f1_min": 0.7,
+          "per_family_coverage_min": 0.8,
+          "combined_macro_f1_min": 0.7,
+          "null_specificity_min": 0.8,
+          "ambiguous_specificity_min": 0.8,
+          "predicted_mask_coverage_min": 0.8,
+          "median_predicted_mask_IoU_min": 0.5,
+          "adjective_noun_event_f1_min": 0.75,
+          "invalid_mask_count_max": 0
+        },
+        "replaced_prior_representation": "the axis no longer becomes unmeasured merely because the separate referent axis did not select a threshold; its shared detector output receives an attribute-specific mask and negative-semantics qualification"
+      },
+      "hand_action_coupling": {
+        "recipe": "official EgoHOS released hand contact and first-order interacting-object pipeline",
+        "selection": "FIXED_ONE_RECIPE_WITH_FROZEN_DEVELOPMENT_MASK_GRID",
+        "gate": {
+          "hand_sensitivity_min": 0.8,
+          "hand_specificity_min": 0.8,
+          "contact_no_contact_macro_f1_min": 0.6,
+          "mention_contact_alignment_f1_min": 0.65,
+          "coverage_min": 0.8,
+          "valid_negative_requires_qualified_specificity": true
+        }
+      },
+      "egocentric_sensor_regime": {
+        "recipe": "deterministic OpenCV and imageio-ffmpeg measurements under the previously passing semantics",
+        "selection": "HASH_AND_INTERFACE_VERIFIED_REUSE_NO_MODEL_SELECTION",
+        "gate": {
+          "finite_in_bounds_fraction_required": 1.0,
+          "controlled_perturbation_direction_fraction_required": 1.0,
+          "frozen_bin_accuracy_min": 0.8,
+          "silent_truncation_count_max": 0
+        }
+      }
+    },
+    "bounded_method_research": {
+      "primary_sources": [
+        {"component": "Whisper", "url": "https://github.com/openai/whisper"},
+        {"component": "OPUS_MT_de_en", "url": "https://huggingface.co/Helsinki-NLP/opus-mt-de-en/tree/main"},
+        {"component": "NLTK_and_data", "url": "https://github.com/nltk/nltk"},
+        {"component": "GroundingDINO", "url": "https://github.com/IDEA-Research/GroundingDINO"},
+        {"component": "SAM_2_1", "url": "https://github.com/facebookresearch/sam2"},
+        {"component": "PE_Core", "url": "https://github.com/facebookresearch/perception_models/blob/main/apps/pe/README.md"},
+        {"component": "EgoHOS", "url": "https://github.com/owenzlz/EgoHOS"},
+        {"component": "DINOv2", "url": "https://github.com/facebookresearch/dinov2"},
+        {"component": "VISOR", "url": "https://epic-kitchens.github.io/VISOR/site"}
+      ],
+      "eligible_candidate_count_by_unresolved_axis": {
+        "noun_adjective_exposure": 1,
+        "utterance_centered_referent_visibility_dominance_ambiguity": 1,
+        "adjective_attribute_contrast": 1,
+        "hand_action_coupling": 1
+      },
+      "candidate_ceiling_per_axis": 2,
+      "no_candidate_or_source_cycling_after_outcomes": true,
+      "development_only_selection": true,
+      "holdout_refit_reprompt_relabel_or_threshold_change": "PROHIBITED"
+    },
+    "immutable_stack": {
+      "language_adapter_sha256": "005f368bef97dfc791f43e45da8bbfe01ea22e8790b2032e9580b14b1ea62ac8",
+      "Whisper_small_sha256": "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794",
+      "OPUS_MT_de_en_revision": "1a922f3b32a8e809e17a47d4b32142d8105924e5",
+      "NLTK_wheel_sha256": "4fa26829c5b00715afe3061398a8989dc643b92ce7dd93fb4585a70930d168a1",
+      "WordNet_sha256": "cbda5ea6eef7f36a97a43d4a75f85e07fccbb4f23657d27b4ccbc93e2646ab59",
+      "averaged_perceptron_tagger_eng_sha256": "6025f530624335c67d6547d44757b357b4e79bae030a0383e9887a92c1718f0b",
+      "wordfreq_wheel_sha256": "c5bfdf26cc26437d670ef145326e4e395cf0a4f4de2da85a331ddf3d2a334588",
+      "GroundingDINO_commit": "856dde20aee659246248e20734ef9ba5214f5e44",
+      "GroundingDINO_weight_sha256": "3b3ca2563c77c69f651d7bd133e97139c186df06231157a64c507099c52bc799",
+      "SAM2_commit": "2b90b9f5ceec907a1c18123530e92e794ad901a4",
+      "SAM2_1_base_plus_weight_sha256": "a2345aede8715ab1d5d31b4a509fb160c5a4af1970f199d9054ccfb746c004c5",
+      "PE_Core_revision": "facebook/PE-Core-L14-336@bafb0f76541d399057e980a25947f67acec76575",
+      "PE_Core_weight_sha256": "0cdab5b338cbaa1e7a5dcd1b2fb4c9f4d5df1abd289564658edbab64a650e7e8",
+      "EgoHOS_commit": "cd9bdf427ef1d94582334ebba4188d5aa18433e7",
+      "EgoHOS_checkpoint_archive_sha256": "2a26ef11ae0afbd4716b0db355e4d5d13698a0e92ab4361214d9a611627836e4",
+      "DINOv2_commit": "7764ea0f912e53c92e82eb78a2a1631e92725fc8",
+      "DINOv2_ViTB14_weight_sha256": "0b8b82f85de91b424aded121c7e1dcc2b7bc6d0adeea651bf73a13307fad8c73",
+      "base_container_sha256": "f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792",
+      "license_interpretation": "official local academic processing under the already sealed code and weight records; EgoHOS remains limited to this academic local prototype because its official checkpoint archive has no separate license file",
+      "local_files_only": true,
+      "telemetry_and_external_tracking_disabled": true,
+      "hosted_inference": false
+    },
+    "public_fixtures": {
+      "base_fixture_file_sha256": "740eebfce87cc8cf543fefcb8015a3ec75b934acc9a39c8d81adb5a7dd331371",
+      "base_fixture_commitment_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "base_fixture_item_count": 824,
+      "reuse_after_hash_schema_label_and_lineage_validation": true,
+      "new_programmatic_attribute_overlay": {
+        "status": "FROZEN_RECIPE_NOT_YET_RENDERED",
+        "license": "CC0_self_authored_programmatic",
+        "seed": 20260805,
+        "families": ["color", "relative_size", "shape", "state"],
+        "semantic_cases_per_family": ["positive", "opposite", "null", "ambiguous"],
+        "replicates_per_case_per_partition": 2,
+        "items_per_partition": 32,
+        "partition_count": 2,
+        "source_scene_palette_and_object_identity_disjoint_across_partitions": true,
+        "exact_masks_and_labels_programmatically_derived": true,
+        "manual_annotation_count": 0,
+        "output_manifest_commitment": "PENDING_DETERMINISTIC_PREPARATION_BEFORE_INFERENCE"
+      },
+      "label_metric_sanity": {
+        "deterministic_round_trip_required": true,
+        "class_balance_required": true,
+        "exact_negative_null_and_ambiguity_semantics_required": true,
+        "schema_and_annotation_semantic_checks_required": true,
+        "model_predictions_may_relabel_fixtures": false,
+        "development_holdout_source_subject_video_and_authored_scene_overlap_count_required": 0
+      }
+    },
+    "threshold_development": {
+      "Grounding_DINO_box_score_grid": [0.2, 0.25, 0.3, 0.35, 0.4],
+      "Grounding_DINO_text_score_grid": [0.15, 0.2, 0.25, 0.3],
+      "attribute_Grounding_DINO_box_score_grid": [0.2, 0.25, 0.3, 0.35, 0.4],
+      "attribute_Grounding_DINO_text_score_grid": [0.15, 0.2, 0.25, 0.3],
+      "PE_Core_attribute_margin_grid": [0.0, 0.01, 0.02, 0.05, 0.1],
+      "EgoHOS_min_mask_fraction_grid": [0.0025, 0.005, 0.01, 0.02],
+      "DINOv2_recurrence_cosine_grid": [0.8, 0.85, 0.9, 0.95],
+      "selection_rule": "for each independent axis maximize its primary aggregate or task-matched metric subject to every frozen coverage specificity geometry diagnostic and failure floor; ties choose the higher abstention similarity or margin threshold then the lexicographically smallest numeric tuple",
+      "development_selected_thresholds_sealed_before_holdout": true,
+      "holdout_opened_once": true
+    },
+    "engineering_contract": {
+      "canonical_entry_point": "scripts/run_synthetic_video_calibration.py",
+      "canonical_wrapper": "scripts/qualify_synthetic_video_calibration.sbatch",
+      "new_external_run_namespace": "runs/synthetic-video-calibration/public-only-readiness",
+      "old_external_route_read_only": true,
+      "CPU_static_check_wall_seconds_target_max": 60,
+      "microfixture_cases_per_path_min": 3,
+      "microfixture_cases_per_path_max": 5,
+      "microfixture_scientific_metric_count": 0,
+      "microfixture_wall_minutes_max": 5,
+      "public_development_wall_minutes_max": 15,
+      "public_holdout_wall_minutes_max": 15,
+      "initial_plus_repair_micro_attempt_count_max": 2,
+      "repair_policy": {
+        "allowed": ["existing_model_wiring", "dependency", "configuration_validation", "decoding", "serialization"],
+        "prohibited": ["model_substitution", "candidate_addition", "fixture_relabeling", "partition_change", "threshold_change", "scientific_rule_change"],
+        "full_micro_suite_rerun_after_repair": true
+      },
+      "metric_withholding": "no scientific metric is emitted or retained unless all production paths pass engineering integrity",
+      "predecode_once_batch_inference_and_shared_feature_cache": true,
+      "single_live_scheduler_job": true,
+      "scheduler_wait": "ONE_BLOCKING_WAIT_NO_PERIODIC_POLLING_OR_UNCHANGED_STATUS_UPDATES",
+      "single_process": true,
+      "DDP": false,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "GPU_selection": "earliest scheduler-eligible compatible zero-cost Juno A30 H100 H100-47GB-MIG or H200 chosen by scheduler-only test and committed before microqualification",
+      "scientific_topology_freeze": "the exact selected GPU topology is frozen before development and cannot change in response to outcomes",
+      "aggregate_GPU_hours_max": 0.6666666666666666,
+      "new_retained_storage_GiB_max": 10,
+      "direct_monetary_cost_USD": 0
+    },
+    "execution_order": [
+      "prospective_amendment_commit_and_push",
+      "canonical_implementation_and_focused_tests",
+      "static_artifact_schema_label_and_privacy_checks",
+      "deterministic_programmatic_attribute_fixture_preparation_and_commitment",
+      "scheduler_only_GPU_selection_and_prospective_topology_commit",
+      "metric_withheld_production_path_microqualification",
+      "microhealth_pass_commit_and_push",
+      "complete_public_development_and_threshold_seal",
+      "single_sealed_public_holdout_if_development_passes",
+      "terminal_public_only_decision_commit_and_push"
+    ],
+    "completion_rule": {
+      "CALIBRATION_READY_PUBLIC_ONLY": "development and holdout each pass all five critical axes and at least six of seven total axes with every included coverage missingness negative-specificity integrity clean-cache deterministic-serialization and resource rule passing",
+      "zero_new_manual_annotation": true,
+      "zero_marginal_per_corpus_human_QA": true,
+      "compact_Git_records_only": true,
+      "all_media_weights_predictions_embeddings_caches_rows_logs_and_traces_external": true
+    },
+    "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
+    "amendment_commitment_sha256": "03bbf64749b0302a16e97f9b999674e287b7f4fa801df905d09b72ea9c39eeae"
+  },
   "prospective_amendment": {
     "effective_on": "2026-08-02",
     "timing": "after sealing the under-covered 570-step Real-1h and Real-3h stop, before any redesigned learner outcome, generator outcome, synthetic corpus, or synthetic learner score",

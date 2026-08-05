@@ -1,11 +1,28 @@
 {
-  "schema_version": 24,
+  "schema_version": 25,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_COMPLETE_SCIENTIFIC_NO_GO_DOWNSTREAM_STOPPED",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_PRIOR_PUBLIC_NO_GO_PRESERVED_NEW_PUBLIC_ONLY_READINESS_ROUTE_FROZEN",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
   "signed_on": "2026-08-01",
+  "public_only_calibration_readiness": {
+    "status": "PROSPECTIVE_AMENDMENT_FROZEN_NO_NEW_MODEL_OR_SCIENTIFIC_OUTCOME",
+    "effective_on": "2026-08-05",
+    "amendment_commitment_sha256": "03bbf64749b0302a16e97f9b999674e287b7f4fa801df905d09b72ea9c39eeae",
+    "prior_terminal_result_commitment_sha256": "42338302949e27e0ed7c3f6e8a5f70e10bb380a5e8158378e89f5ff87c350e9d",
+    "prior_result_reinterpreted_or_overwritten": false,
+    "question": "can an aggregate-estimand aligned independently validated fully automated public-only package be ready for a later separately authorized governed calibration run",
+    "critical_axis_count": 5,
+    "total_axis_count": 7,
+    "critical_axes_required": 5,
+    "total_axes_required": 6,
+    "development_opened": false,
+    "holdout_opened": false,
+    "new_manual_annotation_count": 0,
+    "ChildLens_or_BabyView_used": false,
+    "governed_C_LTX_synthetic_or_learner_work_authorized": false
+  },
   "prior_commitments": {
     "status": "PROVISIONAL_SUPERSEDED",
     "lexical": "68f9490a12d01574780bcefdd032beee70934258cdd5fe5c34d4c0661c72d5c1",
@@ -2173,5 +2190,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "NONE_FOR_THIS_ROUTE; HOLDOUT_GOVERNED_C_LTX_GENERATION_AND_SYNTHETIC_LEARNER_EXECUTION_ARE_STOPPED_BY_THE_COMPLETE_PUBLIC_DEVELOPMENT_NO_GO"
+  "next_authorized_scope": "PUBLIC_ONLY_CALIBRATION_READINESS_IMPLEMENTATION_MICROHEALTH_DEVELOPMENT_AND_CONDITIONAL_HOLDOUT_ONLY; GOVERNED_C_LTX_GENERATION_SYNTHETIC_CORPUS_AND_LEARNER_EXECUTION_REMAIN_UNAUTHORIZED"
 }

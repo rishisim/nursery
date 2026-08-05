@@ -2309,3 +2309,83 @@ governed C, LTX-2.3 generation, and the synthetic learner remain unexecuted and
 unauthorized. The three public-development attempts used 0.905556 A30
 GPU-hours, retained 279,902 bytes of compact qualification state outside Git,
 and cost $0 directly.
+
+## Prospective public-only calibration-readiness route
+
+On 2026-08-05, after accepting the complete prior-route no-go at commitment
+`42338302…50e9d`, the user authorized a scientifically distinct public-only
+readiness question. The prior result, every earlier no-go, the corrected common
+asset seals, and the formal Real-1h failure remain final for their own frozen
+protocols. This amendment neither repairs nor reinterprets them.
+
+The new question is whether one fully automated, locally executable package can
+independently validate the seven learner-effective calibration axes using only
+public or self-authored material. It cannot mount or use ChildLens/BabyView,
+run governed C, invoke LTX or TTS, produce synthetic media, or train/evaluate a
+learner. A pass authorizes only a later separately approved governed calibration
+run. Canonical amendment `03bbf647…9eeae` freezes the methods, fixtures, metrics,
+threshold grids, resource limits, privacy boundary, and execution order before
+any new outcome.
+
+The five critical axes remain adapter-qualified yield, noun/adjective exposure,
+utterance-centered grounding opportunity, cross-episode recurrence, and
+adjective–attribute contrast. Hand/contact coupling and egocentric sensor regime
+remain supporting. All five critical axes and at least six of seven total axes
+must pass on both public development and an untouched source-disjoint holdout.
+Broad activity/context and genuinely order-dependent action controls are
+descriptive and cannot gate or rescue the decision. Every axis returns `PASS`,
+`NO_GO`, or `UNMEASURED` independently; failure of referent qualification may
+not suppress the attribute test.
+
+Lexical qualification now targets the aggregate calibration estimands:
+noun/adjective token and type counts, public frequency-band distributions,
+within-episode repetition/burstiness, and long-tail share. Event precision,
+recall, and lemma/band correctness remain required diagnostics, but exact token
+ordinals and 100% episode-count equality no longer alone proxy aggregate
+calibration. The frozen limits are 0.15 total-count relative error per POS, 0.20
+type-count relative error, 0.15 frequency-band total variation, 0.20 repetition
+distribution total variation, 0.10 long-tail-share absolute error, at least 0.75
+event precision/recall per POS, at least 0.80 lemma/band accuracy, and at least
+0.80 eligible-case coverage.
+
+Attribute qualification has its own Grounding DINO/SAM 2.1 threshold selection
+and mask-validity check before PE-Core/deterministic attribute inference. Color,
+relative size, shape, and visible state are scored separately on exact positive,
+opposite, null, and ambiguous public/programmatic cases. Each family requires
+at least 0.70 macro-F1 and 0.80 coverage; combined macro-F1 requires 0.70, null
+and ambiguous specificity require 0.80, predicted-mask coverage requires 0.80,
+median mask IoU requires 0.50, adjective–noun event F1 requires 0.75, and invalid
+masks are prohibited. A deterministic CC0 overlay contributes 32 items per
+partition (four families × four semantics × two replicates), with split-specific
+scenes, palettes, and object identities and no new manual annotation.
+
+The fixed local stack remains the sealed Whisper-small/OPUS-MT adapter,
+NLTK/WordNet/wordfreq, Grounding DINO plus SAM 2.1, PE-Core-L14-336, EgoHOS,
+DINOv2, and deterministic OpenCV/imageio-ffmpeg sensor measurements. Primary
+official repositories/model records were checked prospectively. No unresolved
+axis has more than one eligible recipe in this bounded route, so development
+selects only frozen numeric grids, never a post-outcome substitute. Existing
+artifact identities, license records, hashes, and local-files-only rules remain
+binding; the EgoHOS archive remains limited to academic local prototype use
+because it contains no separate checkpoint license file.
+
+Static artifact/schema/label checks target 60 seconds. The production-path
+metric-withheld micro suite uses three to five cases per path and at most five
+GPU minutes. One outcome-independent repair and complete resmoke is allowed.
+Development and holdout each have 15-minute caps. The aggregate ceiling is
+0.666667 zero-cost single-GPU hours, 10 GiB new retained storage, one process,
+eight CPUs, 32 GiB, no DDP, and $0 direct cost. A scheduler-only check selects
+the earliest compatible zero-cost A30, H100, 47-GB H100 MIG, or H200 topology;
+that exact topology is committed before microqualification and frozen before
+scientific development. Exactly one job may be live, and every submission uses
+one blocking wait—periodic polling and repeated unchanged-status updates are
+prohibited.
+
+Only after a committed microhealth pass may development metrics open. All axes
+execute before the combined decision, selected thresholds are sealed before the
+holdout opens once, and any complete below-threshold result is a scientific
+no-go. Execution failure within the one-repair budget is an engineering blocker.
+`CALIBRATION_READY_PUBLIC_ONLY` requires both partitions to pass the combined
+gate, every included coverage/missingness/negative-specificity rule, offline
+clean-cache reload, deterministic compact serialization, the resource ceiling,
+and zero new annotation or ongoing per-corpus human QA.
