@@ -794,3 +794,11 @@ The first MIG submission was rejected before job creation because a legacy
 untyped GPU directive conflicted with the typed GRES. Zero GPU-hours and zero
 outcomes were produced; canonical wiring-only repair `4483dae5…4139` preserves
 the topology and all scientific inputs/rules before resubmission.
+
+Microhealth job 317631 then stopped in the wrapper after 13 seconds because its
+equivalent 32-GiB node-memory request did not match the validator's four-GiB
+per-CPU serialization. It reached neither the runner nor model inference and
+opened no metric; compact failure `067656db…e1f8` records 0.003611 GPU-hours.
+The one allowed complete resmoke is frozen at `247971e1…f067` with the same
+scientific contract and wrapper-native memory request. Public development
+remains locked until that final micro attempt passes and is committed.

@@ -2408,3 +2408,21 @@ outcome. Repair `4483dae5…4139` changes only the wrapper's default to a typed
 A30 GRES, allowing the prospectively selected typed command-line request to
 override the same Slurm option. No fixture, model, threshold, partition,
 metric, or scientific gate changed, and no microhealth attempt was consumed.
+
+The repaired first microhealth submission, Juno job 317631, was allocated on
+the frozen H100 47-GB MIG topology but stopped after 13 seconds in the wrapper,
+before runner entry, model inference, a microfixture manifest, or any scientific
+metric. Slurm granted the requested single slice, eight CPUs, 32 GiB, and
+five-minute limit; the submission had expressed memory as 32 GiB per node while
+the wrapper's topology validator required the equivalent four GiB per CPU
+serialization. Compact failure `067656db…e1f8` classifies this as an engineering
+configuration-representation failure, not a scientific no-go, and charges its
+actual 0.003611 GPU-hours.
+
+The route's sole allowed repair/resmoke is frozen prospectively at
+`247971e1…f067`: attempt 2 uses the same wrapper, topology, models, fixtures,
+partitions, thresholds, metrics, and gates, with the wrapper-native four-GiB
+per-CPU request yielding the same 32-GiB allocation. Attempt 2 reruns the entire
+metric-withheld micro suite and is the final permitted micro attempt. Scientific
+development remains locked until that complete resmoke is committed as an
+all-module engineering-health pass.

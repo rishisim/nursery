@@ -6148,6 +6148,7 @@ def _public_only_readiness_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
         not in {
             "PUBLIC_ONLY_CALIBRATION_READINESS_AMENDMENT_FROZEN_BEFORE_NEW_OUTCOMES",
             "PUBLIC_ONLY_CALIBRATION_READINESS_TOPOLOGY_FROZEN_BEFORE_MODEL_OUTCOMES",
+            "PUBLIC_ONLY_CALIBRATION_READINESS_ENGINEERING_REPAIR_FROZEN_BEFORE_FINAL_MICRO_ATTEMPT",
             "PUBLIC_ONLY_CALIBRATION_READINESS_ENGINEERING_HEALTH_PASS",
             "PUBLIC_ONLY_CALIBRATION_READINESS_DEVELOPMENT_PASS_THRESHOLDS_SEALED",
             "NO_GO_PUBLIC_ONLY_COMPLETE_VALID_SCIENTIFIC_METRICS",
@@ -19334,6 +19335,101 @@ def _public_readiness_preallocation_repair(cfg: dict[str, Any]) -> dict[str, Any
     return value
 
 
+def _public_readiness_attempt_1_repair(
+    cfg: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Validate the one metric-withheld wrapper failure and bounded resmoke.
+
+    Attempt 1 stopped before runner entry, so it intentionally has no
+    ``full-result.json``.  The compact committed record is the only admissible
+    substitute for that missing runner record, and its actual allocation is
+    still charged against the route-wide GPU-hour ceiling.
+    """
+
+    topology = _public_readiness_topology(cfg)
+    try:
+        result = cfg[
+            "public_only_calibration_readiness_engineering_attempt_1_result"
+        ]
+        repair = cfg[
+            "public_only_calibration_readiness_engineering_attempt_1_repair"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_PUBLIC_READINESS_ATTEMPT_1_REPAIR_MISSING") from error
+    if not isinstance(result, dict) or not isinstance(repair, dict):
+        raise RuntimeError("E_PUBLIC_READINESS_ATTEMPT_1_REPAIR_SCHEMA")
+    result_payload = json.loads(json.dumps(result))
+    result_expected = result_payload.pop("result_commitment_sha256", None)
+    if (
+        result.get("status")
+        != "ENGINEERING_PREFLIGHT_FAILURE_ATTEMPT_1_BEFORE_RUNNER_OR_MODEL_INFERENCE_NO_SCIENTIFIC_METRICS_OPENED"
+        or result.get("job_id") != 317631
+        or result.get("scheduler_state") != "FAILED"
+        or result.get("scheduler_exit_code") != "66:0"
+        or result.get("scheduler_elapsed_seconds") != 13
+        or result.get("GPU_type") != topology["GPU_type"]
+        or result.get("GPU_count") != 1
+        or result.get("CPU_count") != 8
+        or result.get("memory_GiB") != 32
+        or result.get("requested_and_allocated_TRES_match") is not True
+        or result.get("container_attestation_count") != 1
+        or result.get("fixture_bind_attestation_count") != 1
+        or result.get("topology_attestation_count") != 0
+        or result.get("microfixture_manifest_count") != 0
+        or result.get("full_result_count") != 0
+        or result.get("module_execution_count") != 0
+        or result.get("scientific_metric_count") != 0
+        or result.get("stable_error_code")
+        != "E_PUBLIC_READINESS_WRAPPER_MEMORY_REPRESENTATION"
+        or result.get("classification")
+        != "ENGINEERING_CONFIGURATION_REPRESENTATION_FAILURE_NOT_SCIENTIFIC_NO_GO"
+        or float(result.get("attempt_GPU_hours_actual", math.inf))
+        != 13.0 / 3600.0
+        or result.get("direct_monetary_cost_USD") != 0
+        or result.get("model_fixture_threshold_partition_metric_or_gate_changed")
+        is not False
+        or result_expected is None
+        or digest(result_payload) != result_expected
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_ATTEMPT_1_RESULT_COMMITMENT")
+    repair_payload = json.loads(json.dumps(repair))
+    repair_expected = repair_payload.pop("repair_commitment_sha256", None)
+    if (
+        repair.get("status")
+        != "FROZEN_BEFORE_COMPLETE_ATTEMPT_2_OR_ANY_NEW_MODEL_OUTCOME"
+        or repair.get("trigger_job_id") != result["job_id"]
+        or repair.get("trigger_result_commitment_sha256") != result_expected
+        or repair.get("topology_commitment_sha256")
+        != topology["topology_commitment_sha256"]
+        or repair.get("resulting_memory_GiB") != 32
+        or repair.get("GPU_type") != topology["GPU_type"]
+        or repair.get("GPU_count") != 1
+        or repair.get("CPU_count") != 8
+        or repair.get("micro_wall_minutes") != 5
+        or repair.get("attempt_2_is_complete_suite_resmoke") is not True
+        or repair.get("attempt_2_is_final_allowed_micro_attempt") is not True
+        or float(repair.get("prior_attempt_GPU_hours_actual", math.inf))
+        != float(result["attempt_GPU_hours_actual"])
+        or float(repair.get("aggregate_GPU_hours_max", math.inf))
+        != float(topology["aggregate_GPU_hours_max"])
+        or float(
+            repair.get("aggregate_GPU_hours_remaining_before_attempt_2", math.inf)
+        )
+        != float(topology["aggregate_GPU_hours_max"])
+        - float(result["attempt_GPU_hours_actual"])
+        or repair.get("direct_monetary_cost_USD") != 0
+        or repair.get(
+            "model_fixture_threshold_partition_metric_seed_or_gate_changed"
+        )
+        is not False
+        or repair.get("scientific_metric_count_before_resmoke") != 0
+        or repair_expected is None
+        or digest(repair_payload) != repair_expected
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_ATTEMPT_1_REPAIR_COMMITMENT")
+    return result, repair
+
+
 def _public_readiness_execution_commitment(cfg: dict[str, Any]) -> str:
     amendment = _public_only_readiness_amendment(cfg)
     topology = _public_readiness_topology(cfg)
@@ -19700,8 +19796,19 @@ def run_public_readiness_health(args: argparse.Namespace) -> dict[str, Any]:
     _require_external_or_ignored_output(args.scratch_root)
     root.mkdir(parents=True, exist_ok=True, mode=0o700)
     prior_paths = sorted(root.glob("attempt-*/full-result.json"))
-    if len(prior_paths) != args.attempt - 1:
-        raise RuntimeError("E_PUBLIC_READINESS_HEALTH_ATTEMPT")
+    wrapper_preflight_GPU_hours = 0.0
+    if args.attempt == 1:
+        if prior_paths:
+            raise RuntimeError("E_PUBLIC_READINESS_HEALTH_ATTEMPT")
+    else:
+        # Attempt 1 was allocated but stopped in the wrapper before runner
+        # entry.  It therefore has no runner full-result to count here.
+        attempt_1, _repair = _public_readiness_attempt_1_repair(cfg)
+        if prior_paths:
+            raise RuntimeError("E_PUBLIC_READINESS_HEALTH_ATTEMPT")
+        wrapper_preflight_GPU_hours = float(
+            attempt_1["attempt_GPU_hours_actual"]
+        )
     prior_records = []
     for path in prior_paths:
         prior = json.loads(path.read_text())
@@ -19842,7 +19949,8 @@ def run_public_readiness_health(args: argparse.Namespace) -> dict[str, Any]:
         (
             wall_minutes > float(topology["micro_wall_minutes"]),
             resource["new_storage_GiB"] > float(topology["new_storage_GiB_max"]),
-            sum(float(record["resource"]["GPU_hours"]) for record in prior_records)
+            wrapper_preflight_GPU_hours
+            + sum(float(record["resource"]["GPU_hours"]) for record in prior_records)
             + resource["GPU_hours"]
             > float(topology["aggregate_GPU_hours_max"]),
         )

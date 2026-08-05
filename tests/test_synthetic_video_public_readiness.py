@@ -121,6 +121,28 @@ def test_zero_job_preallocation_repair_changes_no_scientific_rule() -> None:
     assert result["model_fixture_threshold_partition_metric_or_gate_changed"] is False
 
 
+def test_attempt_1_wrapper_failure_is_charged_and_only_attempt_2_is_allowed() -> None:
+    result, repair = MODULE._public_readiness_attempt_1_repair(_config())
+    assert result["job_id"] == 317631
+    assert result["module_execution_count"] == 0
+    assert result["scientific_metric_count"] == 0
+    assert result["attempt_GPU_hours_actual"] == pytest.approx(13 / 3600)
+    assert repair["attempt_2_is_complete_suite_resmoke"] is True
+    assert repair["attempt_2_is_final_allowed_micro_attempt"] is True
+    assert repair["aggregate_GPU_hours_remaining_before_attempt_2"] == pytest.approx(
+        2 / 3 - 13 / 3600
+    )
+
+    changed = _config()
+    changed["public_only_calibration_readiness_engineering_attempt_1_result"][
+        "scientific_metric_count"
+    ] = 1
+    with pytest.raises(
+        RuntimeError, match="E_PUBLIC_READINESS_ATTEMPT_1_RESULT_COMMITMENT"
+    ):
+        MODULE._public_readiness_attempt_1_repair(changed)
+
+
 def test_readiness_lexical_metrics_measure_aggregate_estimands() -> None:
     expected = [
         _event("c1", "e1", "adjective", "red"),

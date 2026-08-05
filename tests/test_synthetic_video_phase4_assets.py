@@ -520,7 +520,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     assert proof["status"] == (
-        "PUBLIC_ONLY_CALIBRATION_READINESS_TOPOLOGY_FROZEN_BEFORE_MODEL_OUTCOMES"
+        "PUBLIC_ONLY_CALIBRATION_READINESS_ENGINEERING_REPAIR_FROZEN_BEFORE_FINAL_MICRO_ATTEMPT"
     )
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["repair_commitment_sha256"] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
