@@ -35,7 +35,7 @@ def test_construct_aligned_resume_amendment_is_exact_and_schema23_compatible() -
     config = json.loads(
         Path("configs/synthetic_video_real_only_proof.json").read_text()
     )
-    assert config["schema_version"] == 28
+    assert config["schema_version"] == 29
     amendment = MODULE._construct_aligned_ltx_resume_amendment(config)
     assert (
         amendment["amendment_commitment_sha256"]
@@ -84,6 +84,9 @@ def test_engineering_health_amendment_and_geometry_lineage_are_exact() -> None:
     assert MODULE._engineering_health_resource_policy(config)["GPU_type"] == (
         "NVIDIA_H100_NVL_3G_47GB_MIG"
     )
+    assert MODULE._engineering_health_resource_policy(config)[
+        "per_submission_wall_minutes_max"
+    ] == 60
     compatibility = amendment["historical_geometry_compatibility"]
     source_sha256, ast_sha256 = MODULE._geometry_function_bundle_digests(
         Path("scripts/run_synthetic_video_calibration.py"),

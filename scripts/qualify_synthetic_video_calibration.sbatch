@@ -39,7 +39,7 @@ exec >"$output_root/logs/qualify-${SLURM_JOB_ID}.out" 2>"$output_root/logs/quali
 if [[ "$tuple_run_mode" == "health" ]]; then
   health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"
   case "$health_attempt" in
-    7) ;;
+    8) ;;
     *) exit 64 ;;
   esac
   export PHASE4_HEALTH_SUBMISSION_STARTED_EPOCH="$(date +%s)"
@@ -90,7 +90,7 @@ require_health_topology() {
   case " $job_record " in *" NumNodes=1 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" NumCPUs=8 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" NumTasks=1 "*) ;; *) exit 66 ;; esac
-  case " $job_record " in *" TimeLimit=00:15:00 "*) ;; *) exit 66 ;; esac
+  case " $job_record " in *" TimeLimit=01:00:00 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" MinMemoryCPU=4G "*) ;; *) exit 66 ;; esac
   case " $job_record " in
     *" TresPerNode=gres/gpu:nvidia_h100_nvl_3g.47gb:1 "*|*" TresPerNode=gres:gpu:nvidia_h100_nvl_3g.47gb:1 "*) ;;
@@ -102,7 +102,7 @@ require_health_topology() {
   esac
   local topology_attestation="$health_attempt_root/topology-attestation.json"
   [[ ! -e "$topology_attestation" ]] || exit 65
-  printf '{"CPU_count":8,"GRES":"gpu:nvidia_h100_nvl_3g.47gb:1","attempt":%s,"job_id":%s,"local_world_size":1,"memory_per_CPU_GiB":4,"node_count":1,"partition":"h100","predicate_count":7,"predicate_pass_count":7,"schema_version":1,"source":"WRAPPER_SCONTROL_BEFORE_CONTAINER","task_count":1,"time_limit_minutes":15,"world_size":1}\n' \
+  printf '{"CPU_count":8,"GRES":"gpu:nvidia_h100_nvl_3g.47gb:1","attempt":%s,"job_id":%s,"local_world_size":1,"memory_per_CPU_GiB":4,"node_count":1,"partition":"h100","predicate_count":7,"predicate_pass_count":7,"schema_version":1,"source":"WRAPPER_SCONTROL_BEFORE_CONTAINER","task_count":1,"time_limit_minutes":60,"world_size":1}\n' \
     "$health_attempt" "$SLURM_JOB_ID" >"$topology_attestation"
   chmod 600 "$topology_attestation"
 

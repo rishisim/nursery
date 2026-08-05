@@ -43,7 +43,8 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     )
     assert "mechanistic-tuples/construct-aligned-engineering-health" in wrapper
     assert 'health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"' in wrapper
-    assert "7) ;;" in wrapper
+    assert "8) ;;" in wrapper
+    assert "7) ;;" not in wrapper
     assert "6) ;;" not in wrapper
     assert "5) ;;" not in wrapper
     assert "4) ;;" not in wrapper
@@ -54,7 +55,8 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     assert 'NumNodes=1' in wrapper
     assert 'NumCPUs=8' in wrapper
     assert 'NumTasks=1' in wrapper
-    assert 'TimeLimit=00:15:00' in wrapper
+    assert 'TimeLimit=01:00:00' in wrapper
+    assert 'time_limit_minutes":60' in wrapper
     assert 'MinMemoryCPU=4G' in wrapper
     assert 'TresPerNode=gres/gpu:nvidia_h100_nvl_3g.47gb:1' in wrapper
     assert 'SLURM_JOB_GPUS' not in topology_guard
@@ -94,8 +96,8 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 19
-    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_6_TIMEOUT_PRESERVED_PROGRESS_INSTRUMENTATION_REPAIR_FROZEN_PENDING_ATTEMPT_7_NO_NEW_OUTCOME"
+    assert config["schema_version"] == 20
+    assert config["status"] == "PHASE4_CORRECTED_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_EXTENDED_WALL_REPAIR_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME"
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["fixture_schema_version"] == 3
@@ -285,6 +287,25 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
         "a2d1347bef14848a5238f9a10c6e94da8eaa68593aa3d97e8a460dfbf8694d07"
     )
     assert progress["active_attempt"] == 7
+    attempt_7 = config["learner_effective_engineering_health_attempt_7_result"]
+    assert attempt_7 == result[
+        "learner_effective_engineering_health_attempt_7_result"
+    ]
+    assert attempt_7["blocker_commitment_sha256"] == (
+        "03c09a61cedb29e04cf465287db693cd1248c53d45d9a7a47a777e6cdf1d594d"
+    )
+    assert attempt_7["scientific_metric_count"] == 0
+    extended = config[
+        "learner_effective_engineering_health_extended_wall_repair"
+    ]
+    assert extended == result[
+        "learner_effective_engineering_health_extended_wall_repair"
+    ]
+    assert extended["reauthorization_commitment_sha256"] == (
+        "d2db51229719a0e64f84da9541a284d88c75a2fd32e2e186ba34e17ab5eed6e7"
+    )
+    assert extended["active_attempt"] == 8
+    assert extended["wall_minutes_max"] == 60
     assert progress["model_fixture_threshold_metric_seed_or_gate_changed"] is False
     label_correction = config["public_no_hand_review_label_semantics_correction"]
     assert label_correction["coded_item_count_at_correction"] == 195
@@ -511,7 +532,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_implementation_authorized"] is True
     assert config["gates"]["learner_effective_public_qualification_authorized"] is True
     assert config["gates"]["learner_effective_runner_implementation_status"] == (
-        "ATTEMPT_6_TIMEOUT_PRESERVED_PROGRESS_INSTRUMENTATION_FROZEN_BEFORE_ATTEMPT_7_OR_NEW_OUTCOME"
+        "ATTEMPT_7_TIMEOUT_PRESERVED_EXTENDED_WALL_REPAIR_FROZEN_BEFORE_ATTEMPT_8_OR_NEW_OUTCOME"
     )
     assert config["gates"]["public_model_inference_requires_blind_no_hand_review_seal"] is True
     assert config["gates"]["learner_effective_no_hand_review_authorized"] is True
@@ -519,7 +540,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["gates"]["learner_effective_public_fixture_preparation_authorized"] is True
     assert config["gates"]["learner_effective_public_model_inference_authorized"] is True
     assert config["gates"]["learner_effective_public_model_inference_scope"] == (
-        "ATTEMPT_7_PROGRESS_INSTRUMENTED_ENGINEERING_MICROHEALTH_ONLY_NO_SCIENTIFIC_METRICS"
+        "ATTEMPT_8_EXTENDED_WALL_ENGINEERING_MICROHEALTH_ONLY_NO_SCIENTIFIC_METRICS"
     )
     assert config["gates"][
         "learner_effective_public_model_inference_conditionally_authorized_after_fixture_seal"
@@ -551,7 +572,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 28
+    assert config["schema_version"] == 29
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)
@@ -563,6 +584,16 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert health["scientific_threshold_state"]["DINOv2_recurrence_cosine"] == 0.85
     assert health["scientific_threshold_state"]["threshold_change_or_relaxation"] is False
     assert health["bounded_resource_policy"]["per_submission_wall_minutes_max"] == 15
+    extended = dict(
+        config["learner_effective_engineering_health_extended_wall_repair"]
+    )
+    extended_commitment = extended.pop("reauthorization_commitment_sha256")
+    assert extended_commitment == canonical_json_sha256(extended)
+    assert extended_commitment == (
+        "d2db51229719a0e64f84da9541a284d88c75a2fd32e2e186ba34e17ab5eed6e7"
+    )
+    assert extended["active_attempt_resource_policy"]["attempt"] == 8
+    assert extended["active_attempt_resource_policy"]["wall_minutes_max"] == 60
     redirect = dict(config["learner_effective_engineering_health_resource_redirect"])
     redirect_commitment = redirect.pop("amendment_commitment_sha256")
     assert redirect_commitment == canonical_json_sha256(redirect)

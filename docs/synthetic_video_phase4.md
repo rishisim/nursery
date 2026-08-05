@@ -579,6 +579,20 @@ progress record containing only stable stage and module-ordinal fields. The
 full 28-case, two-replicate production-path suite and every scientific input,
 threshold, and decision rule remain unchanged.
 
+Attempt 7, Juno job 316641, then reached its 15-minute wall cap during
+dependency preflight. The private stable-stage record was last updated on
+entry to repository-archive verification after the exact action-weight check
+completed. It contained zero sensitive-detail fields and zero scientific
+metrics; there was no microfixture projection, model-module inference, full
+result, trace, stdout, or stderr. Commitment `03c09a61…d594d` therefore seals
+an engineering timeout, not a scientific no-go. Before attempt 8, schema 29
+freezes the failure-specific resource repair at `d2db5122…ed6e7`: the same
+single-process H100 NVL 3g.47gb slice, eight CPUs, 32 GiB, models, fixtures,
+preprocessing, exact dependency checks, two-replicate microfixtures, and
+scientific rules now receive a 60-minute/1.0-slice-GPU-hour cap, 1 GiB retained
+storage, and $0 direct cost. Scientific development remains locked until a
+committed seven-module engineering PASS.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

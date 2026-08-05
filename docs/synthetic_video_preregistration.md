@@ -1958,6 +1958,18 @@ update count, and elapsed time. It records no paths, filenames, artifact hashes,
 prompts, rows, labels, predictions, or metrics and cannot enter scientific
 selection. Attempt 7 retains the same H100 topology and per-attempt ceiling.
 
+Attempt 7, Juno job 316641, is sealed as engineering timeout
+`03c09a61…d594d`. The 15-minute cap expired during dependency preflight after
+the exact action-weight validation completed and repository-archive
+verification began. The stable record contained zero sensitive-detail fields
+and zero scientific metrics; no microfixture or model-module inference began.
+The prospectively committed attempt-8 repair `d2db5122…ed6e7` changes only the
+wall/resource ceiling: one H100 NVL 3g.47gb slice, one process, eight CPUs,
+32 GiB, 60 minutes/1.0 slice-GPU-hour, 1 GiB retained storage, and $0. The full
+28-case two-replicate health suite, exact artifact validation, models,
+fixtures, thresholds, metrics, seeds, combined gate, governed-C rules, LTX-2.3
+selection, and one-hour ceiling are unchanged.
+
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only
 holdout result is a scientific no-go. Governed C remains conditional on a full

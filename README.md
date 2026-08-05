@@ -546,3 +546,16 @@ direction quotas. The conditional public-model, governed-C, and LTX stages
 therefore remained unrun. H3 and its license blocker are preserved as history
 but are out of scope for this pilot; the current conditional route uses LTX-2.3
 as the sole selected generator, subject to the public and governed-C gates.
+
+Engineering-health attempt 7, Juno job 316641, is preserved as a pre-inference
+timeout rather than a scientific no-go. Its private aggregate-only progress
+record reached repository-archive verification after completing the frozen
+action-weight check; no microfixture projection, module inference, trace,
+terminal output, sensitive detail, or scientific metric was produced. The
+result is sealed at `03c09a61…d594d`. Under the user's rolling ordinary-
+engineering authorization, schema 29 freezes only a 15-to-60-minute wall-cap
+correction for attempt 8 (`d2db5122…ed6e7`). It keeps one H100 NVL 3g.47gb
+slice, one process, eight CPUs, 32 GiB, the complete 28-case two-replicate
+suite, exact dependency revalidation, a 1.0 slice-GPU-hour ceiling, 1 GiB
+retained-storage ceiling, and $0 direct cost. Models, fixtures, thresholds,
+seeds, metrics, gates, and downstream limits are unchanged.
