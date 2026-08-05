@@ -440,6 +440,83 @@ TUPLE_PARTITION_INTEGRITY_HASH_FIELDS = frozenset(
         "partition_engineering_integrity_commitment_sha256",
     }
 )
+PUBLIC_READINESS_FIXTURE_FIELDS = frozenset(
+    {
+        "status",
+        "partition_count",
+        "attribute_item_count",
+        "manual_annotation_count",
+        "readiness_fixture_commitment_sha256",
+    }
+)
+PUBLIC_READINESS_FIXTURE_HASH_FIELDS = frozenset(
+    {"readiness_fixture_commitment_sha256"}
+)
+PUBLIC_READINESS_HEALTH_FIELDS = frozenset(
+    {
+        "status",
+        "attempt",
+        "module_count",
+        "completed_module_count",
+        "failed_module_count",
+        "case_count",
+        "scientific_metric_count",
+        "failure_count",
+        "external_call_count",
+        "unaccounted_failure_count",
+        "wall_minutes",
+        "GPU_hours",
+        "new_storage_GiB",
+        "direct_monetary_cost_USD",
+        "public_fixture_manifest_commitment_sha256",
+        "readiness_fixture_commitment_sha256",
+        "topology_commitment_sha256",
+        "runner_commitment_sha256",
+        "dependency_config_commitment_sha256",
+        "microfixture_manifest_commitment_sha256",
+        "engineering_health_commitment_sha256",
+    }
+)
+PUBLIC_READINESS_HEALTH_HASH_FIELDS = frozenset(
+    {
+        "public_fixture_manifest_commitment_sha256",
+        "readiness_fixture_commitment_sha256",
+        "topology_commitment_sha256",
+        "runner_commitment_sha256",
+        "dependency_config_commitment_sha256",
+        "microfixture_manifest_commitment_sha256",
+        "engineering_health_commitment_sha256",
+    }
+)
+PUBLIC_READINESS_QUALIFICATION_FIELDS = frozenset(
+    {
+        "status",
+        "partition",
+        "module_count",
+        "completed_module_count",
+        "failed_module_count",
+        "critical_axis_pass_count",
+        "validated_axis_count",
+        "action_control_status",
+        "scientific_metric_count",
+        "failure_count",
+        "external_call_count",
+        "invalid_retained_record_count",
+        "silent_truncation_count",
+        "public_fixture_manifest_commitment_sha256",
+        "readiness_fixture_commitment_sha256",
+        "development_threshold_commitment_sha256",
+        "public_qualification_commitment_sha256",
+    }
+)
+PUBLIC_READINESS_QUALIFICATION_HASH_FIELDS = frozenset(
+    {
+        "public_fixture_manifest_commitment_sha256",
+        "readiness_fixture_commitment_sha256",
+        "development_threshold_commitment_sha256",
+        "public_qualification_commitment_sha256",
+    }
+)
 TUPLE_VISOR_HOS_SOURCE_FEASIBILITY_FIELDS = frozenset(
     {
         "status",
@@ -697,6 +774,9 @@ PUBLIC_DEVELOPMENT_ATTRIBUTE_DEPENDENCY_REPAIR_SHA256 = (
 )
 PUBLIC_DEVELOPMENT_TERMINAL_RESULT_SHA256 = (
     "42338302949e27e0ed7c3f6e8a5f70e10bb380a5e8158378e89f5ff87c350e9d"
+)
+PUBLIC_ONLY_READINESS_AMENDMENT_SHA256 = (
+    "03bbf64749b0302a16e97f9b999674e287b7f4fa801df905d09b72ea9c39eeae"
 )
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
@@ -6046,6 +6126,57 @@ def _public_development_terminal_result(
     return value
 
 
+def _public_only_readiness_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Validate the new public-only route without weakening the prior no-go."""
+
+    terminal = _public_development_terminal_result(cfg)
+    try:
+        value = cfg["public_only_calibration_readiness_amendment"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_PUBLIC_READINESS_AMENDMENT_MISSING") from error
+    if not isinstance(value, dict):
+        raise RuntimeError("E_PUBLIC_READINESS_AMENDMENT_SCHEMA")
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("amendment_commitment_sha256", None)
+    scope = value.get("absolute_scope", {})
+    combined = value.get("combined_gate", {})
+    prior = value.get("prior_terminal_result_preserved", {})
+    resource = value.get("engineering_contract", {})
+    if (
+        cfg.get("schema_version") != 37
+        or cfg.get("status")
+        != "PUBLIC_ONLY_CALIBRATION_READINESS_AMENDMENT_FROZEN_BEFORE_NEW_OUTCOMES"
+        or value.get("status")
+        != "FROZEN_BEFORE_NEW_PUBLIC_MODEL_FIXTURE_OR_SCIENTIFIC_OUTCOMES"
+        or expected != PUBLIC_ONLY_READINESS_AMENDMENT_SHA256
+        or digest(payload) != expected
+        or prior.get("result_commitment_sha256")
+        != terminal["result_commitment_sha256"]
+        or scope.get("public_only") is not True
+        or any(
+            scope.get(key) is not False
+            for key in (
+                "ChildLens_or_BabyView_mount_inspection_processing_or_use",
+                "governed_C",
+                "LTX_generator_TTS_or_synthetic_corpus",
+                "learner_training_or_evaluation",
+                "prior_failed_fixture_predictions_used_for_method_threshold_label_or_metric_selection",
+            )
+        )
+        or combined.get("critical_axes_must_all_pass") is not True
+        or combined.get("validated_axes_min") != 6
+        or combined.get("axis_count") != 7
+        or combined.get("each_axis_executes_independently") is not True
+        or resource.get("single_process") is not True
+        or resource.get("DDP") is not False
+        or float(resource.get("aggregate_GPU_hours_max", math.inf))
+        > 2.0 / 3.0
+        or resource.get("direct_monetary_cost_USD") != 0
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_AMENDMENT_COMMITMENT")
+    return value
+
+
 def _geometry_function_bundle_digests(
     path: Path, names: list[str]
 ) -> tuple[str, str]:
@@ -8632,6 +8763,7 @@ TUPLE_HEALTH_ERROR_FAMILIES = (
     "E_EGOHOS_",
     "E_FROZEN_",
     "E_PRIVATE_",
+    "E_PUBLIC_READINESS_",
     "E_SENSOR_",
     "E_TUPLE_",
     "E_VISOR_",
@@ -10298,6 +10430,155 @@ def _tuple_lexical_truth_checks(
     return output
 
 
+def _readiness_relative_count_error(expected: int, predicted: int) -> float:
+    if type(expected) is not int or type(predicted) is not int or min(expected, predicted) < 0:
+        raise RuntimeError("E_PUBLIC_READINESS_LEXICAL_COUNT")
+    if expected == 0:
+        return 0.0 if predicted == 0 else 1.0
+    return abs(predicted - expected) / expected
+
+
+def _readiness_total_variation(
+    expected: Counter[Any], predicted: Counter[Any]
+) -> float:
+    if any(type(value) is not int or value < 0 for value in (*expected.values(), *predicted.values())):
+        raise RuntimeError("E_PUBLIC_READINESS_DISTRIBUTION")
+    expected_total = sum(expected.values())
+    predicted_total = sum(predicted.values())
+    if expected_total == 0 or predicted_total == 0:
+        return 0.0 if expected_total == predicted_total else 1.0
+    keys = set(expected) | set(predicted)
+    return 0.5 * sum(
+        abs(expected[key] / expected_total - predicted[key] / predicted_total)
+        for key in keys
+    )
+
+
+def _readiness_lexical_aggregate_metrics(
+    expected_mentions: list[dict[str, Any]],
+    predicted_mentions: list[dict[str, Any]],
+    expected_eligible_case_ids: set[str],
+    predicted_eligible_case_ids: set[str],
+) -> dict[str, float]:
+    """Measure aggregate exposure estimands without exact token-boundary gating."""
+
+    required = {"case_id", "episode_id", "part_of_speech", "lemma", "frequency_band"}
+    allowed_pos = {"noun", "adjective"}
+    allowed_bands = {"low", "mid", "high"}
+    for event in (*expected_mentions, *predicted_mentions):
+        if (
+            not isinstance(event, dict)
+            or not required <= set(event)
+            or event["part_of_speech"] not in allowed_pos
+            or event["frequency_band"] not in allowed_bands
+            or not isinstance(event["case_id"], str)
+            or not isinstance(event["episode_id"], str)
+            or not isinstance(event["lemma"], str)
+            or not re.fullmatch(r"[a-z]+(?:'[a-z]+)?", event["lemma"])
+        ):
+            raise RuntimeError("E_PUBLIC_READINESS_LEXICAL_EVENT_SCHEMA")
+    if not expected_eligible_case_ids or not predicted_eligible_case_ids <= expected_eligible_case_ids:
+        raise RuntimeError("E_PUBLIC_READINESS_LEXICAL_ELIGIBILITY")
+
+    metrics: dict[str, float] = {
+        "eligible_case_coverage": _safe_divide(
+            len(predicted_eligible_case_ids), len(expected_eligible_case_ids)
+        )
+    }
+    for part in ("noun", "adjective"):
+        expected_rows = [row for row in expected_mentions if row["part_of_speech"] == part]
+        predicted_rows = [row for row in predicted_mentions if row["part_of_speech"] == part]
+        expected_events = Counter((row["case_id"], row["lemma"]) for row in expected_rows)
+        predicted_events = Counter((row["case_id"], row["lemma"]) for row in predicted_rows)
+        matched = sum((expected_events & predicted_events).values())
+        metrics[f"{part}_event_precision"] = _safe_divide(
+            matched, sum(predicted_events.values())
+        )
+        metrics[f"{part}_event_recall"] = _safe_divide(
+            matched, sum(expected_events.values())
+        )
+        metrics[f"{part}_total_count_relative_error"] = _readiness_relative_count_error(
+            len(expected_rows), len(predicted_rows)
+        )
+        metrics[f"{part}_type_count_relative_error"] = _readiness_relative_count_error(
+            len({row["lemma"] for row in expected_rows}),
+            len({row["lemma"] for row in predicted_rows}),
+        )
+
+    expected_bands = Counter(
+        (row["part_of_speech"], row["frequency_band"])
+        for row in expected_mentions
+    )
+    predicted_bands = Counter(
+        (row["part_of_speech"], row["frequency_band"])
+        for row in predicted_mentions
+    )
+    metrics["frequency_band_total_variation"] = _readiness_total_variation(
+        expected_bands, predicted_bands
+    )
+
+    def repetition_distribution(rows: list[dict[str, Any]]) -> Counter[str]:
+        events = Counter(
+            (row["episode_id"], row["part_of_speech"], row["lemma"])
+            for row in rows
+        )
+        return Counter(
+            "1" if count == 1 else "2" if count == 2 else "3plus"
+            for count in events.values()
+        )
+
+    metrics["episode_repetition_distribution_total_variation"] = (
+        _readiness_total_variation(
+            repetition_distribution(expected_mentions),
+            repetition_distribution(predicted_mentions),
+        )
+    )
+    expected_low = _safe_divide(
+        sum(row["frequency_band"] == "low" for row in expected_mentions),
+        len(expected_mentions),
+    )
+    predicted_low = _safe_divide(
+        sum(row["frequency_band"] == "low" for row in predicted_mentions),
+        len(predicted_mentions),
+    )
+    metrics["long_tail_share_absolute_error"] = abs(expected_low - predicted_low)
+    expected_lemma_bands = Counter(
+        (row["case_id"], row["part_of_speech"], row["lemma"], row["frequency_band"])
+        for row in expected_mentions
+    )
+    predicted_lemma_bands = Counter(
+        (row["case_id"], row["part_of_speech"], row["lemma"], row["frequency_band"])
+        for row in predicted_mentions
+    )
+    metrics["lemma_and_frequency_band_accuracy"] = _safe_divide(
+        sum((expected_lemma_bands & predicted_lemma_bands).values()),
+        sum(expected_lemma_bands.values()),
+    )
+    if not all(math.isfinite(value) and 0.0 <= value <= 1.0 for value in metrics.values()):
+        raise RuntimeError("E_PUBLIC_READINESS_LEXICAL_METRIC")
+    return metrics
+
+
+def _readiness_lexical_gate_pass(
+    metrics: dict[str, float], gate: dict[str, Any]
+) -> bool:
+    return (
+        metrics["eligible_case_coverage"] >= float(gate["eligible_case_coverage_min"])
+        and metrics["noun_total_count_relative_error"] <= float(gate["noun_total_count_relative_error_max"])
+        and metrics["adjective_total_count_relative_error"] <= float(gate["adjective_total_count_relative_error_max"])
+        and metrics["noun_type_count_relative_error"] <= float(gate["noun_type_count_relative_error_max"])
+        and metrics["adjective_type_count_relative_error"] <= float(gate["adjective_type_count_relative_error_max"])
+        and metrics["frequency_band_total_variation"] <= float(gate["frequency_band_total_variation_max"])
+        and metrics["episode_repetition_distribution_total_variation"] <= float(gate["episode_repetition_distribution_total_variation_max"])
+        and metrics["long_tail_share_absolute_error"] <= float(gate["long_tail_share_absolute_error_max"])
+        and metrics["noun_event_precision"] >= float(gate["noun_event_precision_min"])
+        and metrics["noun_event_recall"] >= float(gate["noun_event_recall_min"])
+        and metrics["adjective_event_precision"] >= float(gate["adjective_event_precision_min"])
+        and metrics["adjective_event_recall"] >= float(gate["adjective_event_recall_min"])
+        and metrics["lemma_and_frequency_band_accuracy"] >= float(gate["lemma_and_frequency_band_accuracy_min"])
+    )
+
+
 def _tuple_health_normalize_output(value: Any) -> Any:
     """Normalize an in-memory public output for private round-trip hashing."""
 
@@ -10459,7 +10740,14 @@ def _tuple_language_lexical_module(context: dict[str, Any]) -> dict[str, Any]:
     amendment = _tuple_amendment(cfg)
     preparation = _tuple_fixture_preparation_amendment(cfg)
     adapter_gate = _tuple_axis(cfg, "adapter_qualified_yield")["public_gate"]
-    lexical_gate = _tuple_axis(cfg, "noun_adjective_exposure")["public_gate"]
+    public_readiness = context.get("public_readiness") is True
+    lexical_gate = (
+        _public_only_readiness_amendment(cfg)["axis_methods"][
+            "noun_adjective_exposure"
+        ]["gate"]
+        if public_readiness
+        else _tuple_axis(cfg, "noun_adjective_exposure")["public_gate"]
+    )
     if file_digest(Path(__file__).resolve().with_name("synthetic_video_language_adapter.py")) != TUPLE_LANGUAGE_ADAPTER_SHA256:
         raise RuntimeError("E_TUPLE_LANGUAGE_ADAPTER_SOURCE")
     from synthetic_video_language_adapter import validate_asr_prediction
@@ -10500,6 +10788,10 @@ def _tuple_language_lexical_module(context: dict[str, Any]) -> dict[str, Any]:
     predicted_episode_counts: Counter[tuple[str, str, str]] = Counter()
     expected_adjective_noun_spans: list[tuple[str, str, str]] = []
     predicted_adjective_noun_spans: list[tuple[str, str, str]] = []
+    readiness_expected_mentions: list[dict[str, Any]] = []
+    readiness_predicted_mentions: list[dict[str, Any]] = []
+    readiness_expected_eligible_cases: set[str] = set()
+    readiness_predicted_eligible_cases: set[str] = set()
     output_rows = []
     for row in rows:
         adjudication = validate_asr_prediction(
@@ -10611,23 +10903,45 @@ def _tuple_language_lexical_module(context: dict[str, Any]) -> dict[str, Any]:
             silently_accepted_invalid_timestamps += 1
         expected_mentions = row.get("expected_lexical_mentions", [])
         episode = str(row["episode_id"])
+        case_id = str(row["case_id"])
+        if expected_tuple_status == "ACCEPT":
+            readiness_expected_eligible_cases.add(case_id)
+            if tuple_status == "ACCEPT":
+                readiness_predicted_eligible_cases.add(case_id)
         for ordinal, expected in enumerate(expected_mentions):
             part = str(expected["part_of_speech"])
             token = str(expected["token"]).casefold()
-            expected_by_pos[part].append((str(row["case_id"]), f"{ordinal}:{token}"))
+            expected_by_pos[part].append((case_id, f"{ordinal}:{token}"))
             expected_episode_counts[(episode, part, token)] += 1
+            readiness_expected_mentions.append(
+                {
+                    "case_id": case_id,
+                    "episode_id": episode,
+                    "part_of_speech": part,
+                    "lemma": str(expected["expected_lemma"]).casefold(),
+                    "frequency_band": str(expected["expected_frequency_band"]),
+                }
+            )
         for ordinal, mention in enumerate(mentions):
             part = str(mention["part_of_speech"])
             token = str(mention["token"]).casefold()
-            predicted_by_pos[part].append((str(row["case_id"]), f"{ordinal}:{token}"))
+            predicted_by_pos[part].append((case_id, f"{ordinal}:{token}"))
             predicted_episode_counts[(episode, part, mention["lemma"])] += 1
+            readiness_predicted_mentions.append(
+                {
+                    "case_id": case_id,
+                    "episode_id": episode,
+                    "part_of_speech": part,
+                    "lemma": str(mention["lemma"]),
+                    "frequency_band": str(mention["frequency_band"]),
+                }
+            )
         lemma_band_checks.extend(
             _tuple_lexical_truth_checks(expected_mentions, mentions)
         )
         expected_constructions = row.get("expected_adjective_noun_spans")
         if not isinstance(expected_constructions, list):
             raise RuntimeError("E_TUPLE_ATTRIBUTE_SPAN_TRUTH_MISSING")
-        case_id = str(row["case_id"])
         for span in expected_constructions:
             if (
                 not isinstance(span, dict)
@@ -10689,14 +11003,47 @@ def _tuple_language_lexical_module(context: dict[str, Any]) -> dict[str, Any]:
         and silently_accepted_truncations <= int(adapter_gate["silent_truncation_count_max"])
         and silently_accepted_invalid_timestamps <= int(adapter_gate["invalid_timestamp_count_max"])
     )
-    lexical_pass = (
-        noun["precision"] >= float(lexical_gate["noun_span_precision_min"])
-        and noun["recall"] >= float(lexical_gate["noun_span_recall_min"])
-        and adjective["precision"] >= float(lexical_gate["adjective_span_precision_min"])
-        and adjective["recall"] >= float(lexical_gate["adjective_span_recall_min"])
-        and lemma_band_exact >= float(lexical_gate["lemma_and_frequency_band_exact_fraction_min"])
-        and repetition_exact >= float(lexical_gate["episode_repetition_count_exact_fraction_required"])
-    )
+    if public_readiness:
+        readiness_metrics = _readiness_lexical_aggregate_metrics(
+            readiness_expected_mentions,
+            readiness_predicted_mentions,
+            readiness_expected_eligible_cases,
+            readiness_predicted_eligible_cases,
+        )
+        lexical_pass = _readiness_lexical_gate_pass(
+            readiness_metrics, lexical_gate
+        )
+        lexical_metrics = {
+            **readiness_metrics,
+            "adjective_noun_span_f1": adjective_noun_span_f1,
+            "exact_token_ordinal_precision_noun_diagnostic": noun["precision"],
+            "exact_token_ordinal_recall_noun_diagnostic": noun["recall"],
+            "exact_token_ordinal_precision_adjective_diagnostic": adjective[
+                "precision"
+            ],
+            "exact_token_ordinal_recall_adjective_diagnostic": adjective[
+                "recall"
+            ],
+            "exact_episode_repetition_fraction_diagnostic": repetition_exact,
+        }
+    else:
+        lexical_pass = (
+            noun["precision"] >= float(lexical_gate["noun_span_precision_min"])
+            and noun["recall"] >= float(lexical_gate["noun_span_recall_min"])
+            and adjective["precision"] >= float(lexical_gate["adjective_span_precision_min"])
+            and adjective["recall"] >= float(lexical_gate["adjective_span_recall_min"])
+            and lemma_band_exact >= float(lexical_gate["lemma_and_frequency_band_exact_fraction_min"])
+            and repetition_exact >= float(lexical_gate["episode_repetition_count_exact_fraction_required"])
+        )
+        lexical_metrics = {
+            "noun_span_precision": noun["precision"],
+            "noun_span_recall": noun["recall"],
+            "adjective_span_precision": adjective["precision"],
+            "adjective_span_recall": adjective["recall"],
+            "adjective_noun_span_f1": adjective_noun_span_f1,
+            "lemma_and_frequency_band_exact_fraction": lemma_band_exact,
+            "episode_repetition_count_exact_fraction": repetition_exact,
+        }
     return {
         "status": "PASS" if adapter_pass and lexical_pass else "NO_GO",
         "axis_results": {
@@ -10710,15 +11057,7 @@ def _tuple_language_lexical_module(context: dict[str, Any]) -> dict[str, Any]:
             },
             "noun_adjective_exposure": {
                 "status": "PASS" if lexical_pass else "NO_GO",
-                "metrics": {
-                    "noun_span_precision": noun["precision"],
-                    "noun_span_recall": noun["recall"],
-                    "adjective_span_precision": adjective["precision"],
-                    "adjective_span_recall": adjective["recall"],
-                    "adjective_noun_span_f1": adjective_noun_span_f1,
-                    "lemma_and_frequency_band_exact_fraction": lemma_band_exact,
-                    "episode_repetition_count_exact_fraction": repetition_exact,
-                },
+                "metrics": lexical_metrics,
             },
         },
         "metrics": {"case_accuracy": case_accuracy},
@@ -12204,6 +12543,15 @@ def _tuple_referent_module(context: dict[str, Any]) -> dict[str, Any]:
             if selected is not None
             else {}
         )
+        if context.get("public_readiness") is True and not selected_thresholds:
+            selected_thresholds = {
+                "Grounding_DINO_box_score": float(
+                    reported["Grounding_DINO_box_score"]
+                ),
+                "Grounding_DINO_text_score": float(
+                    reported["Grounding_DINO_text_score"]
+                ),
+            }
     else:
         thresholds = context["thresholds"]
         box_threshold = float(thresholds["Grounding_DINO_box_score"])
@@ -12879,6 +13227,8 @@ def _tuple_hand_contact_module(context: dict[str, Any]) -> dict[str, Any]:
             if selected is not None
             else None
         )
+        if context.get("public_readiness") is True and threshold is None:
+            threshold = float(chosen["EgoHOS_min_mask_fraction"])
     else:
         threshold = float(context["thresholds"]["EgoHOS_min_mask_fraction"])
         if threshold not in [float(value) for value in grid]:
@@ -14284,6 +14634,496 @@ def _tuple_attribute_module(context: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _readiness_attribute_prompt_groups() -> dict[str, dict[str, list[str]]]:
+    templates = (
+        "a {value} object",
+        "an object that is {value}",
+        "the visible object is {value}",
+    )
+    return {
+        family: {
+            value: [template.format(value=value) for template in templates]
+            for value in values
+        }
+        for family, values in READINESS_ATTRIBUTE_PAIRS.items()
+    }
+
+
+def _readiness_exact_masked_image(image: Any, mask: Any):
+    import numpy as np
+    from PIL import Image
+
+    source = np.asarray(image.convert("RGB"), dtype=np.uint8)
+    selected = np.asarray(mask.convert("L")) > 0
+    if source.shape[:2] != selected.shape or not selected.any():
+        raise RuntimeError("E_PUBLIC_READINESS_ATTRIBUTE_MASK_GEOMETRY")
+    neutral = np.full(source.shape, (112, 118, 125), dtype=np.uint8)
+    neutral[selected] = source[selected]
+    return Image.fromarray(neutral, mode="RGB"), selected
+
+
+def _readiness_attribute_deterministic_label(
+    family: str, image: Any, selected: Any
+) -> str | None:
+    import numpy as np
+
+    pixels = np.asarray(image.convert("RGB"), dtype=np.uint8)
+    mask = np.asarray(selected, dtype=bool)
+    y, x = np.nonzero(mask)
+    if not mask.any() or not len(x):
+        raise RuntimeError("E_PUBLIC_READINESS_ATTRIBUTE_MASK_EMPTY")
+    if family == "color":
+        median = np.median(pixels[mask].astype(np.float64), axis=0)
+        palette = {"red": np.asarray((220.0, 50.0, 45.0)), "blue": np.asarray((45.0, 90.0, 220.0))}
+        distances = sorted(
+            (float(np.square(median - value).sum()), label)
+            for label, value in palette.items()
+        )
+        if math.isclose(distances[0][0], distances[1][0], rel_tol=0.0, abs_tol=1e-9):
+            return None
+        return distances[0][1]
+    width = int(x.max() - x.min() + 1)
+    height = int(y.max() - y.min() + 1)
+    if family == "relative_size":
+        return "big" if max(width, height) / max(pixels.shape[:2]) >= 0.4 else "small"
+    if family == "shape":
+        fill = float(mask.sum()) / float(width * height)
+        if 0.70 <= fill <= 0.87:
+            return "round"
+        if fill >= 0.94:
+            return "square"
+        return None
+    return None
+
+
+def _readiness_programmatic_attribute_raw(
+    context: dict[str, Any], model: Any, transform: Any, text: Any, slices: Any
+) -> tuple[list[dict[str, Any]], float]:
+    from PIL import Image
+    import nltk
+    from nltk.stem import WordNetLemmatizer
+    from wordfreq import zipf_frequency
+
+    rows = context["readiness_attribute_rows"]
+    root = context["readiness_fixture_root"]
+    scratch = Path(context["scratch_root"]) / "readiness-attribute-nltk"
+    nltk.data.path[:] = [
+        str(_stage_tuple_nltk_resources(context["public_root"], scratch, context["cfg"]))
+    ]
+    lemmatizer = WordNetLemmatizer()
+    frequency_bands = _tuple_axis(context["cfg"], "noun_adjective_exposure")[
+        "frequency_bands"
+    ]
+    masked_images = []
+    prepared = []
+    expected_spans: list[tuple[str, str, str]] = []
+    predicted_spans: list[tuple[str, str, str]] = []
+    for row in rows:
+        media = _tuple_fixture_file(
+            root,
+            row["media_relative_path"],
+            row["media_sha256"],
+            row["media_bytes"],
+        )
+        mask_path = _tuple_fixture_file(
+            root,
+            row["mask_relative_path"],
+            row["mask_sha256"],
+            row["mask_bytes"],
+        )
+        with Image.open(media) as source, Image.open(mask_path) as mask_source:
+            image = source.convert("RGB")
+            masked, selected = _readiness_exact_masked_image(
+                image, mask_source.convert("L")
+            )
+            deterministic = _readiness_attribute_deterministic_label(
+                str(row["family"]), image, selected
+            )
+        mentions = _lexical_mentions(
+            str(row["text_en"]),
+            nltk.pos_tag,
+            lemmatizer.lemmatize,
+            zipf_frequency,
+            frequency_bands,
+        )
+        spans = _adjacent_adjective_noun_spans(mentions)
+        case_id = str(row["case_id"])
+        expected_spans.extend(
+            (case_id, span["adjective"], span["noun"])
+            for span in row["expected_adjective_noun_spans"]
+        )
+        predicted_spans.extend(
+            (case_id, span["adjective"], span["noun"]) for span in spans
+        )
+        masked_images.append(masked)
+        prepared.append(
+            {
+                "case_id": case_id,
+                "family": row["family"],
+                "expected_relation": row["expected_relation"],
+                "mentioned_label": spans[0]["adjective"] if len(spans) == 1 else None,
+                "deterministic_label": deterministic,
+            }
+        )
+    _features, labels, margins = _vision_batch(
+        model,
+        transform,
+        text,
+        slices,
+        masked_images,
+        None,
+        str(context["device"]),
+    )
+    output = []
+    for row, label, margin in zip(prepared, labels, margins, strict=True):
+        family = str(row["family"])
+        pe_label = label.get(family)
+        pe_margin = margin.get(family)
+        if (
+            pe_label not in READINESS_ATTRIBUTE_PAIRS[family]
+            or not isinstance(pe_margin, (int, float))
+            or not math.isfinite(float(pe_margin))
+        ):
+            raise RuntimeError("E_PUBLIC_READINESS_ATTRIBUTE_PE_SCHEMA")
+        output.append(
+            {
+                **row,
+                "pe_label": pe_label,
+                "pe_margin": float(pe_margin),
+            }
+        )
+    return output, _span_f1(expected_spans, predicted_spans)
+
+
+def _readiness_attribute_mask_metrics(
+    context: dict[str, Any], tracks: list[dict[str, Any]], box: float, text: float
+) -> dict[str, Any]:
+    import numpy as np
+    from PIL import Image
+
+    rows = {
+        int(row["fixture_ordinal"]): row
+        for row in context["rows"]["referent_attribute"]
+    }
+    positive_count = measured_count = negative_count = negative_correct = 0
+    invalid_mask_count = 0
+    ious: list[float] = []
+    thresholds = {
+        "Grounding_DINO_box_score": float(box),
+        "Grounding_DINO_text_score": float(text),
+    }
+    for track in tracks:
+        row = rows[int(track["fixture_ordinal"])]
+        if track["adapter_observation"].get("status") != "ACCEPT":
+            continue
+        truth_by_key = {
+            (str(sample["phase"]), round(float(sample["sample_time"]), 6)): sample
+            for sample in row["truth"]["sampled_mask_truth"]
+        }
+        for sample in track["samples"]:
+            key = (str(sample["phase"]), round(float(sample["sample_time"]), 6))
+            truth = truth_by_key.get(key)
+            if truth is None:
+                raise RuntimeError("E_PUBLIC_READINESS_ATTRIBUTE_TRUTH_ALIGNMENT")
+            candidate = _tuple_attribute_target_candidate(
+                sample, str(row["category"]), thresholds
+            )
+            expected_positive = bool(truth["target_visible"])
+            if expected_positive:
+                positive_count += 1
+                if candidate is None:
+                    continue
+                if candidate.get("valid") is not True or candidate.get("mask") is None:
+                    invalid_mask_count += 1
+                    continue
+                truth_path = _tuple_fixture_file(
+                    context["fixture_root"],
+                    truth["target_mask_relative_path"],
+                    truth["target_mask_sha256"],
+                    truth["target_mask_bytes"],
+                )
+                with Image.open(truth_path) as source:
+                    expected_mask = np.asarray(source.convert("L")) > 0
+                predicted_mask = np.asarray(candidate["mask"], dtype=bool)
+                if predicted_mask.shape != expected_mask.shape or not predicted_mask.any():
+                    invalid_mask_count += 1
+                    continue
+                intersection = int(np.logical_and(predicted_mask, expected_mask).sum())
+                union = int(np.logical_or(predicted_mask, expected_mask).sum())
+                if union <= 0:
+                    invalid_mask_count += 1
+                    continue
+                measured_count += 1
+                ious.append(intersection / union)
+            else:
+                negative_count += 1
+                if candidate is None:
+                    negative_correct += 1
+                elif candidate.get("valid") is not True:
+                    invalid_mask_count += 1
+    return {
+        "predicted_mask_coverage": _safe_divide(measured_count, positive_count),
+        "median_predicted_mask_IoU": float(statistics.median(ious)) if ious else 0.0,
+        "predicted_mask_negative_specificity": _safe_divide(
+            negative_correct, negative_count
+        ),
+        "invalid_mask_count": invalid_mask_count,
+        "positive_sample_count": positive_count,
+        "negative_sample_count": negative_count,
+    }
+
+
+def _readiness_attribute_prediction(row: dict[str, Any], margin: float) -> str | None:
+    mentioned = row["mentioned_label"]
+    if mentioned is None:
+        return "null"
+    family = str(row["family"])
+    first, second = READINESS_ATTRIBUTE_PAIRS[family]
+    opposite = second if mentioned == first else first
+    if float(row["pe_margin"]) < float(margin):
+        return "ambiguous"
+    pe_label = row["pe_label"]
+    deterministic = row["deterministic_label"]
+    if deterministic is not None and deterministic != pe_label:
+        return "ambiguous"
+    if pe_label == mentioned:
+        return "positive"
+    if pe_label == opposite:
+        return "opposite"
+    return None
+
+
+def _readiness_attribute_metrics(
+    raw: list[dict[str, Any]],
+    margin: float,
+    span_f1: float,
+    mask_metrics: dict[str, Any],
+) -> dict[str, Any]:
+    labels = list(READINESS_ATTRIBUTE_SEMANTICS)
+    family_metrics = {}
+    all_expected = []
+    all_predicted = []
+    for family in READINESS_ATTRIBUTE_PAIRS:
+        rows = [row for row in raw if row["family"] == family]
+        expected = [str(row["expected_relation"]) for row in rows]
+        predicted = [_readiness_attribute_prediction(row, margin) for row in rows]
+        eligible = [index for index, value in enumerate(expected) if value in {"positive", "opposite"}]
+        family_metrics[family] = {
+            "macro_f1": _multiclass_macro_f1(expected, predicted, labels),
+            "coverage": _safe_divide(
+                sum(predicted[index] in {"positive", "opposite"} for index in eligible),
+                len(eligible),
+            ),
+        }
+        all_expected.extend(expected)
+        all_predicted.extend(predicted)
+    null_indices = [index for index, value in enumerate(all_expected) if value == "null"]
+    ambiguous_indices = [
+        index for index, value in enumerate(all_expected) if value == "ambiguous"
+    ]
+    return {
+        "family_metrics": family_metrics,
+        "combined_macro_f1": _multiclass_macro_f1(
+            all_expected, all_predicted, labels
+        ),
+        "null_specificity": _safe_divide(
+            sum(all_predicted[index] == "null" for index in null_indices),
+            len(null_indices),
+        ),
+        "ambiguous_specificity": _safe_divide(
+            sum(all_predicted[index] == "ambiguous" for index in ambiguous_indices),
+            len(ambiguous_indices),
+        ),
+        "adjective_noun_event_f1": float(span_f1),
+        **mask_metrics,
+    }
+
+
+def _readiness_attribute_gate_pass(
+    metrics: dict[str, Any], gate: dict[str, Any]
+) -> bool:
+    families = metrics["family_metrics"]
+    return (
+        set(families) == set(READINESS_ATTRIBUTE_PAIRS)
+        and len(families) == int(gate["family_count_required"])
+        and all(
+            value["macro_f1"] >= float(gate["per_family_macro_f1_min"])
+            and value["coverage"] >= float(gate["per_family_coverage_min"])
+            for value in families.values()
+        )
+        and metrics["combined_macro_f1"] >= float(gate["combined_macro_f1_min"])
+        and metrics["null_specificity"] >= float(gate["null_specificity_min"])
+        and metrics["ambiguous_specificity"] >= float(gate["ambiguous_specificity_min"])
+        and metrics["predicted_mask_coverage"] >= float(gate["predicted_mask_coverage_min"])
+        and metrics["median_predicted_mask_IoU"] >= float(gate["median_predicted_mask_IoU_min"])
+        and metrics["adjective_noun_event_f1"] >= float(gate["adjective_noun_event_f1_min"])
+        and metrics["invalid_mask_count"] <= int(gate["invalid_mask_count_max"])
+    )
+
+
+def _readiness_attribute_module(context: dict[str, Any]) -> dict[str, Any]:
+    cfg = context["cfg"]
+    amendment = _public_only_readiness_amendment(cfg)
+    gate = amendment["axis_methods"]["adjective_attribute_contrast"]["gate"]
+    grids = amendment["threshold_development"]
+    tracks = _tuple_grounding_sampled_tracks(context)
+    prompts = _readiness_attribute_prompt_groups()
+    model, transform, text_features, slices = _load_vision(
+        context["public_root"], cfg, context["device"], prompt_groups_override=prompts
+    )
+    try:
+        raw, span_f1 = _readiness_programmatic_attribute_raw(
+            context, model, transform, text_features, slices
+        )
+    finally:
+        del model
+        _release_cuda()
+    if context.get("engineering_health") is True:
+        if len(raw) != len(context["readiness_attribute_rows"]):
+            raise RuntimeError("E_PUBLIC_READINESS_HEALTH_ATTRIBUTE_TRUNCATION")
+        for row in raw:
+            if (
+                row.get("family") not in READINESS_ATTRIBUTE_PAIRS
+                or row.get("pe_label") not in READINESS_ATTRIBUTE_PAIRS[row["family"]]
+                or not math.isfinite(float(row.get("pe_margin", math.nan)))
+            ):
+                raise RuntimeError("E_PUBLIC_READINESS_HEALTH_ATTRIBUTE_SCHEMA")
+        return _tuple_health_pass_result("attribute", len(raw), raw)
+
+    if context["partition"] == "development":
+        mask_candidates = []
+        for box in grids["attribute_Grounding_DINO_box_score_grid"]:
+            for text_threshold in grids["attribute_Grounding_DINO_text_score_grid"]:
+                metrics = _readiness_attribute_mask_metrics(
+                    context, tracks, float(box), float(text_threshold)
+                )
+                eligible = (
+                    metrics["predicted_mask_coverage"]
+                    >= float(gate["predicted_mask_coverage_min"])
+                    and metrics["median_predicted_mask_IoU"]
+                    >= float(gate["median_predicted_mask_IoU_min"])
+                    and metrics["predicted_mask_negative_specificity"]
+                    >= float(gate["null_specificity_min"])
+                    and metrics["invalid_mask_count"]
+                    <= int(gate["invalid_mask_count_max"])
+                )
+                mask_candidates.append(
+                    {
+                        "Attribute_Grounding_DINO_box_score": float(box),
+                        "Attribute_Grounding_DINO_text_score": float(text_threshold),
+                        **metrics,
+                        "eligible": eligible,
+                    }
+                )
+        selected_mask = _select_frozen_grid_result(
+            mask_candidates,
+            primary_metric="median_predicted_mask_IoU",
+            threshold_fields=(
+                "Attribute_Grounding_DINO_box_score",
+                "Attribute_Grounding_DINO_text_score",
+            ),
+        )
+        display_mask = selected_mask or max(
+            mask_candidates,
+            key=lambda row: (
+                row["median_predicted_mask_IoU"],
+                row["Attribute_Grounding_DINO_box_score"],
+                row["Attribute_Grounding_DINO_text_score"],
+            ),
+        )
+        margin_candidates = [
+            {
+                "PE_Core_attribute_margin": float(margin),
+                **_readiness_attribute_metrics(raw, float(margin), span_f1, display_mask),
+            }
+            for margin in grids["PE_Core_attribute_margin_grid"]
+        ]
+        for candidate in margin_candidates:
+            candidate["eligible"] = selected_mask is not None and _readiness_attribute_gate_pass(
+                candidate, gate
+            )
+        selected_margin = _select_frozen_grid_result(
+            margin_candidates,
+            primary_metric="combined_macro_f1",
+            threshold_fields=("PE_Core_attribute_margin",),
+        )
+        display = selected_margin or max(
+            margin_candidates,
+            key=lambda row: (row["combined_macro_f1"], row["PE_Core_attribute_margin"]),
+        )
+        passed = selected_mask is not None and selected_margin is not None
+        selected_thresholds = {
+            "Attribute_Grounding_DINO_box_score": float(
+                display_mask["Attribute_Grounding_DINO_box_score"]
+            ),
+            "Attribute_Grounding_DINO_text_score": float(
+                display_mask["Attribute_Grounding_DINO_text_score"]
+            ),
+            "PE_Core_attribute_margin": float(display["PE_Core_attribute_margin"]),
+        }
+    else:
+        thresholds = context["thresholds"]
+        mask_metrics = _readiness_attribute_mask_metrics(
+            context,
+            tracks,
+            float(thresholds["Attribute_Grounding_DINO_box_score"]),
+            float(thresholds["Attribute_Grounding_DINO_text_score"]),
+        )
+        display = {
+            "PE_Core_attribute_margin": float(
+                thresholds["PE_Core_attribute_margin"]
+            ),
+            **_readiness_attribute_metrics(
+                raw,
+                float(thresholds["PE_Core_attribute_margin"]),
+                span_f1,
+                mask_metrics,
+            ),
+        }
+        passed = _readiness_attribute_gate_pass(display, gate)
+        selected_thresholds = {
+            key: float(thresholds[key])
+            for key in (
+                "Attribute_Grounding_DINO_box_score",
+                "Attribute_Grounding_DINO_text_score",
+                "PE_Core_attribute_margin",
+            )
+        }
+    metrics = {
+        key: value
+        for key, value in display.items()
+        if key not in {"eligible", "PE_Core_attribute_margin"}
+    }
+    compact_rows = [
+        {
+            "case_id": row["case_id"],
+            "family": row["family"],
+            "expected_relation": row["expected_relation"],
+            "predicted_relation": _readiness_attribute_prediction(
+                row, selected_thresholds["PE_Core_attribute_margin"]
+            ),
+        }
+        for row in raw
+    ]
+    return {
+        "status": "PASS" if passed else "NO_GO",
+        "axis_results": {
+            "adjective_attribute_contrast": {
+                "status": "PASS" if passed else "NO_GO",
+                "metrics": metrics,
+            }
+        },
+        "metrics": metrics,
+        "selected_thresholds": selected_thresholds,
+        "rows": compact_rows,
+        "row_count": len(raw),
+        "failure_count": 0,
+        "invalid_retained_record_count": int(metrics["invalid_mask_count"]),
+        "silent_truncation_count": 0,
+        "external_call_count": 0,
+    }
+
+
 def _refuse_git_output(path: Path) -> None:
     resolved = path.resolve()
     for candidate in (resolved, *resolved.parents):
@@ -14341,6 +15181,336 @@ def _require_external_or_ignored_output(path: Path) -> None:
     )
     if ignored.returncode != 0:
         raise RuntimeError("E_TUPLE_FIXTURE_OUTPUT_NOT_EXTERNAL_OR_IGNORED")
+
+
+def _public_readiness_root(public: Path) -> Path:
+    return public / "runs/synthetic-video-calibration/public-only-readiness"
+
+
+def _public_readiness_fixture_root(public: Path) -> Path:
+    return _public_readiness_root(public) / "fixtures"
+
+
+READINESS_ATTRIBUTE_PAIRS = {
+    "color": ("red", "blue"),
+    "relative_size": ("big", "small"),
+    "shape": ("round", "square"),
+    "state": ("open", "closed"),
+}
+READINESS_ATTRIBUTE_SEMANTICS = ("positive", "opposite", "null", "ambiguous")
+
+
+def _render_public_readiness_attribute_fixture(
+    partition: str,
+    family: str,
+    semantic_case: str,
+    replicate: int,
+):
+    """Render one deterministic CC0 attribute case with an exact target mask."""
+
+    import numpy as np
+    from PIL import Image, ImageDraw
+
+    if (
+        partition not in {"development", "holdout"}
+        or family not in READINESS_ATTRIBUTE_PAIRS
+        or semantic_case not in READINESS_ATTRIBUTE_SEMANTICS
+        or replicate not in {0, 1}
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_ATTRIBUTE_RENDER_INPUT")
+    first, second = READINESS_ATTRIBUTE_PAIRS[family]
+    mentioned = (first, second)[replicate]
+    opposite = second if mentioned == first else first
+    visual_label = (
+        mentioned
+        if semantic_case == "positive"
+        else opposite
+        if semantic_case == "opposite"
+        else None
+    )
+    width = height = 224
+    split_index = 0 if partition == "development" else 1
+    background = (
+        207 + 7 * split_index,
+        214 - 5 * split_index,
+        220 - 9 * split_index,
+    )
+    image = Image.new("RGB", (width, height), background)
+    mask = Image.new("L", (width, height), 0)
+    draw = ImageDraw.Draw(image)
+    mask_draw = ImageDraw.Draw(mask)
+    shift_x = (-11, 13)[replicate] + 5 * split_index
+    shift_y = (8, -7)[replicate] - 4 * split_index
+    center_x, center_y = 112 + shift_x, 112 + shift_y
+    for offset in (26, 54, 82):
+        x = (offset + 19 * split_index + 11 * replicate) % width
+        draw.line((x, 12, min(width - 1, x + 16), 30), fill=(150, 157, 164), width=3)
+
+    if family == "relative_size":
+        radius = (
+            56
+            if visual_label == "big"
+            else 29
+            if visual_label == "small"
+            else 42
+        )
+        box = (center_x - radius, center_y - radius, center_x + radius, center_y + radius)
+        mask_draw.ellipse(box, fill=255)
+        draw.ellipse(box, fill=(224, 156, 58), outline=(74, 55, 34), width=4)
+    elif family == "shape":
+        radius = 48
+        box = (center_x - radius, center_y - radius, center_x + radius, center_y + radius)
+        if visual_label == "round":
+            mask_draw.ellipse(box, fill=255)
+            draw.ellipse(box, fill=(78, 152, 210), outline=(34, 61, 85), width=4)
+        elif visual_label == "square":
+            mask_draw.rectangle(box, fill=255)
+            draw.rectangle(box, fill=(78, 152, 210), outline=(34, 61, 85), width=4)
+        else:
+            mask_draw.rounded_rectangle(box, radius=22, fill=255)
+            draw.rounded_rectangle(box, radius=22, fill=(78, 152, 210), outline=(34, 61, 85), width=4)
+    elif family == "state":
+        left, top, right, bottom = center_x - 53, center_y - 36, center_x + 53, center_y + 49
+        if visual_label == "open":
+            mask_draw.rectangle((left, top + 17, right, bottom), fill=255)
+            mask_draw.polygon(((left, top + 17), (center_x, top - 25), (right, top + 17)), fill=255)
+            draw.rectangle((left, top + 17, right, bottom), fill=(175, 118, 70), outline=(72, 43, 26), width=4)
+            draw.polygon(((left, top + 17), (center_x, top - 25), (right, top + 17)), fill=(210, 159, 102), outline=(72, 43, 26))
+            draw.rectangle((left + 12, top + 25, right - 12, top + 43), fill=(50, 39, 32))
+        elif visual_label == "closed":
+            mask_draw.rectangle((left, top, right, bottom), fill=255)
+            draw.rectangle((left, top, right, bottom), fill=(175, 118, 70), outline=(72, 43, 26), width=4)
+            draw.line((left, top + 18, right, top + 18), fill=(72, 43, 26), width=4)
+        else:
+            mask_draw.rectangle((left, top + 8, right, bottom), fill=255)
+            mask_draw.polygon(((left, top + 8), (center_x + 18, top - 10), (right, top + 8)), fill=255)
+            draw.rectangle((left, top + 8, right, bottom), fill=(175, 118, 70), outline=(72, 43, 26), width=4)
+            draw.polygon(((left, top + 8), (center_x + 18, top - 10), (right, top + 8)), fill=(210, 159, 102), outline=(72, 43, 26))
+    else:
+        radius = 49
+        box = (center_x - radius, center_y - radius, center_x + radius, center_y + radius)
+        mask_draw.ellipse(box, fill=255)
+        colors = {"red": (220, 50, 45), "blue": (45, 90, 220)}
+        if visual_label in colors:
+            draw.ellipse(box, fill=colors[visual_label], outline=(55, 55, 55), width=4)
+        else:
+            array = np.asarray(image, dtype=np.uint8).copy()
+            selected = np.asarray(mask) > 0
+            yy, xx = np.indices(selected.shape)
+            array[selected & (xx < center_x)] = colors["red"]
+            array[selected & (xx >= center_x)] = colors["blue"]
+            image = Image.fromarray(array, mode="RGB")
+            draw = ImageDraw.Draw(image)
+            draw.ellipse(box, outline=(55, 55, 55), width=4)
+
+    if semantic_case == "null":
+        text_en = "the object is here"
+        spans: list[dict[str, str]] = []
+    else:
+        text_en = f"the {mentioned} object is here"
+        spans = [{"adjective": mentioned, "noun": "object"}]
+    if not np.asarray(mask).any():
+        raise RuntimeError("E_PUBLIC_READINESS_ATTRIBUTE_RENDER_MASK")
+    return image, mask, {
+        "mentioned_label": None if semantic_case == "null" else mentioned,
+        "opposite_label": opposite,
+        "visual_label": visual_label,
+        "expected_relation": semantic_case,
+        "text_en": text_en,
+        "expected_adjective_noun_spans": spans,
+    }
+
+
+def _validate_public_readiness_fixture_manifest(
+    value: Any, root: Path, cfg: dict[str, Any]
+) -> dict[str, Any]:
+    amendment = _public_only_readiness_amendment(cfg)
+    if not isinstance(value, dict):
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_SCHEMA")
+    expected = value.get("readiness_fixture_commitment_sha256")
+    payload = {key: item for key, item in value.items() if key != "readiness_fixture_commitment_sha256"}
+    if (
+        value.get("schema_version") != 1
+        or value.get("status") != "PASS_PUBLIC_READINESS_FIXTURES_SEALED"
+        or value.get("amendment_commitment_sha256")
+        != amendment["amendment_commitment_sha256"]
+        or value.get("base_fixture_commitment_sha256")
+        != amendment["public_fixtures"]["base_fixture_commitment_sha256"]
+        or not isinstance(expected, str)
+        or digest(payload) != expected
+        or value.get("manual_annotation_count") != 0
+        or value.get("model_inference_executed") is not False
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_COMMITMENT")
+    partitions = value.get("partitions")
+    if not isinstance(partitions, dict) or set(partitions) != {"development", "holdout"}:
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_SCHEMA")
+    media_hashes: dict[str, set[str]] = {}
+    for partition, rows in partitions.items():
+        if not isinstance(rows, list) or len(rows) != 32:
+            raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_COUNT")
+        counts = Counter((row.get("family"), row.get("semantic_case")) for row in rows)
+        if counts != Counter(
+            {(family, semantic): 2 for family in READINESS_ATTRIBUTE_PAIRS for semantic in READINESS_ATTRIBUTE_SEMANTICS}
+        ):
+            raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_BALANCE")
+        hashes = set()
+        seen_ids = set()
+        for row in rows:
+            case_id = row.get("case_id")
+            if not isinstance(case_id, str) or case_id in seen_ids:
+                raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_ID")
+            seen_ids.add(case_id)
+            if row.get("partition") != partition:
+                raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_PARTITION")
+            media = _tuple_fixture_file(
+                root,
+                row.get("media_relative_path"),
+                row.get("media_sha256"),
+                row.get("media_bytes"),
+            )
+            mask = _tuple_fixture_file(
+                root,
+                row.get("mask_relative_path"),
+                row.get("mask_sha256"),
+                row.get("mask_bytes"),
+            )
+            if media.suffix != ".png" or mask.suffix != ".png":
+                raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_MEDIA")
+            hashes.add(str(row["media_sha256"]))
+        media_hashes[partition] = hashes
+    if media_hashes["development"] & media_hashes["holdout"]:
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_SPLIT_OVERLAP")
+    audits = value.get("audits", {})
+    if audits != {
+        "development_holdout_media_hash_overlap_count": 0,
+        "development_holdout_authored_scene_overlap_count": 0,
+        "development_holdout_case_id_overlap_count": 0,
+        "label_round_trip_failure_count": 0,
+        "class_balance_failure_count": 0,
+    }:
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_AUDIT")
+    return value
+
+
+def _load_public_readiness_fixture_manifest(
+    public: Path, cfg: dict[str, Any]
+) -> tuple[dict[str, Any], Path]:
+    root = _public_readiness_fixture_root(public)
+    path = root / "readiness-fixture-manifest.json"
+    if not path.is_file():
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_MISSING")
+    return _validate_public_readiness_fixture_manifest(
+        json.loads(path.read_text()), root, cfg
+    ), root
+
+
+def prepare_public_readiness_fixtures(args: argparse.Namespace) -> dict[str, Any]:
+    """Create the deterministic public attribute overlay before inference."""
+
+    cfg = json.loads(args.config.read_text())
+    amendment = _public_only_readiness_amendment(cfg)
+    root = _public_readiness_fixture_root(args.public_root)
+    _require_external_or_ignored_output(root)
+    manifest_path = root / "readiness-fixture-manifest.json"
+    if manifest_path.is_file():
+        manifest = _validate_public_readiness_fixture_manifest(
+            json.loads(manifest_path.read_text()), root, cfg
+        )
+    else:
+        if root.exists():
+            raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_PARTIAL_ROOT")
+        root.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        temporary = Path(tempfile.mkdtemp(prefix="fixtures-preparing-", dir=root.parent))
+        temporary.chmod(0o700)
+        partitions: dict[str, list[dict[str, Any]]] = {
+            "development": [],
+            "holdout": [],
+        }
+        try:
+            for partition in partitions:
+                ordinal = 0
+                for family in READINESS_ATTRIBUTE_PAIRS:
+                    for semantic_case in READINESS_ATTRIBUTE_SEMANTICS:
+                        for replicate in range(2):
+                            image, mask, truth = _render_public_readiness_attribute_fixture(
+                                partition, family, semantic_case, replicate
+                            )
+                            relative = Path(partition) / "attribute" / f"case-{ordinal:03d}"
+                            media_relative = relative.with_suffix(".png")
+                            mask_relative = Path(partition) / "attribute" / f"case-{ordinal:03d}-mask.png"
+                            media_path = temporary / media_relative
+                            mask_path = temporary / mask_relative
+                            media_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                            image.save(media_path, format="PNG", optimize=False)
+                            mask.save(mask_path, format="PNG", optimize=False)
+                            case_id = digest(
+                                {
+                                    "seed": amendment["public_fixtures"]["new_programmatic_attribute_overlay"]["seed"],
+                                    "partition": partition,
+                                    "family": family,
+                                    "semantic_case": semantic_case,
+                                    "replicate": replicate,
+                                }
+                            )
+                            partitions[partition].append(
+                                {
+                                    "fixture_ordinal": ordinal,
+                                    "case_id": case_id,
+                                    "partition": partition,
+                                    "authored_scene_id": f"{partition}-{family}-{semantic_case}-{replicate}",
+                                    "family": family,
+                                    "semantic_case": semantic_case,
+                                    **truth,
+                                    "media_relative_path": media_relative.as_posix(),
+                                    "media_sha256": file_digest(media_path),
+                                    "media_bytes": media_path.stat().st_size,
+                                    "mask_relative_path": mask_relative.as_posix(),
+                                    "mask_sha256": file_digest(mask_path),
+                                    "mask_bytes": mask_path.stat().st_size,
+                                }
+                            )
+                            ordinal += 1
+            manifest = {
+                "schema_version": 1,
+                "status": "PASS_PUBLIC_READINESS_FIXTURES_SEALED",
+                "amendment_commitment_sha256": amendment[
+                    "amendment_commitment_sha256"
+                ],
+                "base_fixture_commitment_sha256": amendment["public_fixtures"][
+                    "base_fixture_commitment_sha256"
+                ],
+                "generator_seed": amendment["public_fixtures"][
+                    "new_programmatic_attribute_overlay"
+                ]["seed"],
+                "license": "CC0_self_authored_programmatic",
+                "partitions": partitions,
+                "audits": {
+                    "development_holdout_media_hash_overlap_count": 0,
+                    "development_holdout_authored_scene_overlap_count": 0,
+                    "development_holdout_case_id_overlap_count": 0,
+                    "label_round_trip_failure_count": 0,
+                    "class_balance_failure_count": 0,
+                },
+                "manual_annotation_count": 0,
+                "model_inference_executed": False,
+                "restricted_mount_present": False,
+            }
+            manifest["readiness_fixture_commitment_sha256"] = digest(manifest)
+            write_private(temporary / "readiness-fixture-manifest.json", manifest)
+            _validate_public_readiness_fixture_manifest(manifest, temporary, cfg)
+            temporary.replace(root)
+        except BaseException:
+            raise
+    return {
+        "status": "PASS_PUBLIC_READINESS_FIXTURES_SEALED",
+        "partition_count": 2,
+        "attribute_item_count": 64,
+        "manual_annotation_count": 0,
+        "readiness_fixture_commitment_sha256": manifest[
+            "readiness_fixture_commitment_sha256"
+        ],
+    }
 
 
 TUPLE_MODULE_AXIS_IDS = {
@@ -14419,6 +15589,24 @@ def _tuple_module_runners() -> dict[str, Any]:
     return output
 
 
+READINESS_MODULE_RUNNER_NAMES = {
+    **TUPLE_MODULE_RUNNER_NAMES,
+    "attribute": "_readiness_attribute_module",
+}
+
+
+def _public_readiness_module_runners() -> dict[str, Any]:
+    if set(READINESS_MODULE_RUNNER_NAMES) != set(TUPLE_QUALIFICATION_MODULE_IDS):
+        raise RuntimeError("E_PUBLIC_READINESS_MODULE_REGISTRY")
+    output = {}
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        value = globals().get(READINESS_MODULE_RUNNER_NAMES[module_id])
+        output[module_id] = (
+            value if callable(value) else _missing_tuple_module_runner(module_id)
+        )
+    return output
+
+
 def _tuple_health_inference_thresholds(cfg: dict[str, Any]) -> dict[str, float]:
     """Validate fixed execution minima without opening scientific selection."""
 
@@ -14477,6 +15665,90 @@ def _tuple_frozen_threshold_grids(cfg: dict[str, Any]) -> dict[str, tuple[float,
             raise RuntimeError("E_TUPLE_QUALIFICATION_THRESHOLD_GRID")
         output[key] = numeric
     return output
+
+
+def _public_readiness_threshold_grids(
+    cfg: dict[str, Any],
+) -> dict[str, tuple[float, ...]]:
+    amendment = _public_only_readiness_amendment(cfg)
+    values = amendment["threshold_development"]
+    action = _tuple_fixture_protocol(cfg)["order_dependent_action_control"]
+    raw = {
+        "Grounding_DINO_box_score": values["Grounding_DINO_box_score_grid"],
+        "Grounding_DINO_text_score": values["Grounding_DINO_text_score_grid"],
+        "Attribute_Grounding_DINO_box_score": values[
+            "attribute_Grounding_DINO_box_score_grid"
+        ],
+        "Attribute_Grounding_DINO_text_score": values[
+            "attribute_Grounding_DINO_text_score_grid"
+        ],
+        "PE_Core_attribute_margin": values["PE_Core_attribute_margin_grid"],
+        "EgoHOS_min_mask_fraction": values["EgoHOS_min_mask_fraction_grid"],
+        "DINOv2_recurrence_cosine": values["DINOv2_recurrence_cosine_grid"],
+        "action_abstention_margin": action["development_abstention_margin_grid"],
+    }
+    output = {}
+    for key, grid in raw.items():
+        numeric = tuple(float(value) for value in grid)
+        if not numeric or len(numeric) != len(set(numeric)) or not all(
+            math.isfinite(value) for value in numeric
+        ):
+            raise RuntimeError("E_PUBLIC_READINESS_THRESHOLD_GRID")
+        output[key] = numeric
+    return output
+
+
+def _public_readiness_selected_thresholds(
+    cfg: dict[str, Any],
+    module_results: dict[str, dict[str, Any]],
+    *,
+    expected: dict[str, float] | None = None,
+) -> dict[str, float]:
+    grids = _public_readiness_threshold_grids(cfg)
+    output: dict[str, float] = {}
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        selected = module_results[module_id].get("selected_thresholds", {})
+        if not isinstance(selected, dict):
+            raise RuntimeError("E_PUBLIC_READINESS_THRESHOLD_RECORD")
+        for key, raw in selected.items():
+            if key not in grids or not isinstance(raw, (int, float)):
+                raise RuntimeError("E_PUBLIC_READINESS_THRESHOLD_NOT_FROZEN")
+            value = float(raw)
+            if value not in grids[key] or key in output:
+                raise RuntimeError("E_PUBLIC_READINESS_THRESHOLD_NOT_FROZEN")
+            output[key] = value
+    if expected is not None:
+        normalized = {key: float(value) for key, value in expected.items()}
+        if normalized != output:
+            raise RuntimeError("E_PUBLIC_READINESS_HOLDOUT_THRESHOLD_CHANGED")
+    return dict(sorted(output.items()))
+
+
+def _public_readiness_scientific_module_results(
+    runners: dict[str, Any],
+    context: dict[str, Any],
+    trace_root: Path,
+) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
+    """Execute every axis independently; no referent-to-attribute cascade."""
+
+    output = {}
+    errors = []
+    if set(runners) != set(TUPLE_QUALIFICATION_MODULE_IDS):
+        raise RuntimeError("E_PUBLIC_READINESS_MODULE_SET")
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        try:
+            result = runners[module_id](context)
+            allowed = {"PASS", "NO_GO", "UNMEASURED"}
+            if module_id == "order_action":
+                allowed.add("NO_GO_DIAGNOSTIC")
+            if not isinstance(result, dict) or result.get("status") not in allowed:
+                raise RuntimeError("E_PUBLIC_READINESS_MODULE_RESULT")
+            output[module_id] = result
+        except BaseException as error:
+            if isinstance(error, (KeyboardInterrupt, SystemExit)):
+                raise
+            errors.append(_tuple_health_error(module_id, error, trace_root))
+    return ({}, errors) if errors else (output, [])
 
 
 def _tuple_selected_thresholds(
@@ -17924,6 +19196,1042 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
             finalize_blocker,
         )
         return _tuple_partition_integrity_compact(finalize_blocker)
+
+
+def _public_readiness_topology(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Validate the scheduler-only topology frozen before readiness outcomes."""
+
+    amendment = _public_only_readiness_amendment(cfg)
+    try:
+        value = cfg["public_only_calibration_readiness_topology"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_PUBLIC_READINESS_TOPOLOGY_MISSING") from error
+    if not isinstance(value, dict):
+        raise RuntimeError("E_PUBLIC_READINESS_TOPOLOGY_SCHEMA")
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("topology_commitment_sha256", None)
+    allowed = {
+        ("NVIDIA_A30_24GB", "a30", "gpu:nvidia_a30:1"),
+        ("NVIDIA_H100_NVL", "h100", "gpu:nvidia_h100_nvl:1"),
+        (
+            "NVIDIA_H100_NVL_3G_47GB_MIG",
+            "h100",
+            "gpu:nvidia_h100_nvl_3g.47gb:1",
+        ),
+        ("NVIDIA_H200_NVL", "h200", "gpu:nvidia_h200_nvl:1"),
+    }
+    identity = (
+        value.get("GPU_type"),
+        value.get("partition"),
+        value.get("GRES"),
+    )
+    if (
+        value.get("status") != "FROZEN_SCHEDULER_ONLY_BEFORE_MODEL_OUTCOMES"
+        or value.get("route_id") != amendment["route_id"]
+        or value.get("amendment_commitment_sha256")
+        != amendment["amendment_commitment_sha256"]
+        or identity not in allowed
+        or value.get("node_count") != 1
+        or value.get("task_count") != 1
+        or value.get("GPU_count") != 1
+        or value.get("CPU_count") != 8
+        or value.get("memory_GiB") != 32
+        or value.get("single_process") is not True
+        or value.get("DDP") is not False
+        or value.get("micro_wall_minutes") != 5
+        or value.get("scientific_partition_wall_minutes") != 15
+        or value.get("micro_attempt_count_max") != 2
+        or float(value.get("aggregate_GPU_hours_max", math.inf))
+        > float(amendment["engineering_contract"]["aggregate_GPU_hours_max"])
+        or float(value.get("new_storage_GiB_max", math.inf))
+        > float(amendment["engineering_contract"]["new_retained_storage_GiB_max"])
+        or value.get("direct_monetary_cost_USD") != 0
+        or not isinstance(value.get("expected_device_name_prefix"), str)
+        or not value["expected_device_name_prefix"]
+        or not isinstance(value.get("visible_memory_GiB_min"), int)
+        or not isinstance(value.get("visible_memory_GiB_max"), int)
+        or not 1 <= value["visible_memory_GiB_min"] <= value["visible_memory_GiB_max"]
+        or expected is None
+        or digest(payload) != expected
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_TOPOLOGY_COMMITMENT")
+    return value
+
+
+def _public_readiness_execution_commitment(cfg: dict[str, Any]) -> str:
+    amendment = _public_only_readiness_amendment(cfg)
+    topology = _public_readiness_topology(cfg)
+    return digest(
+        {
+            "amendment_commitment_sha256": amendment[
+                "amendment_commitment_sha256"
+            ],
+            "topology_commitment_sha256": topology[
+                "topology_commitment_sha256"
+            ],
+            "runner_commitment_sha256": file_digest(Path(__file__).resolve()),
+        }
+    )
+
+
+def _public_readiness_attestation(
+    path: Path, cfg: dict[str, Any], run_mode: str
+) -> str:
+    """Validate the wrapper's exact one-process scheduler attestation."""
+
+    if run_mode not in {"health", "development", "holdout"}:
+        raise RuntimeError("E_PUBLIC_READINESS_TOPOLOGY_ATTESTATION")
+    topology = _public_readiness_topology(cfg)
+    job_id = os.environ.get("SLURM_JOB_ID", "")
+    if not job_id.isdecimal() or int(job_id) <= 0:
+        raise RuntimeError("E_PUBLIC_READINESS_TOPOLOGY_ATTESTATION")
+    expected = {
+        "schema_version": 1,
+        "route_id": "learner_effective_public_only_readiness",
+        "run_mode": run_mode,
+        "job_id": int(job_id),
+        "partition": topology["partition"],
+        "GRES": topology["GRES"],
+        "node_count": 1,
+        "task_count": 1,
+        "GPU_count": 1,
+        "CPU_count": 8,
+        "memory_GiB": 32,
+        "time_limit_minutes": (
+            topology["micro_wall_minutes"]
+            if run_mode == "health"
+            else topology["scientific_partition_wall_minutes"]
+        ),
+        "world_size": 1,
+        "local_world_size": 1,
+        "source": "WRAPPER_SCONTROL_BEFORE_CONTAINER",
+    }
+    try:
+        value = json.loads(path.read_text())
+        mode = stat.S_IMODE(path.lstat().st_mode)
+    except (OSError, ValueError, TypeError) as error:
+        raise RuntimeError("E_PUBLIC_READINESS_TOPOLOGY_ATTESTATION") from error
+    if path.is_symlink() or not path.is_file() or mode != 0o600 or value != expected:
+        raise RuntimeError("E_PUBLIC_READINESS_TOPOLOGY_ATTESTATION")
+    return file_digest(path)
+
+
+def _public_readiness_cuda_topology(
+    device: str, cfg: dict[str, Any], attestation: Path, run_mode: str
+) -> str:
+    commitment = _public_readiness_attestation(attestation, cfg, run_mode)
+    import torch
+
+    topology = _public_readiness_topology(cfg)
+    count = torch.cuda.device_count()
+    name = torch.cuda.get_device_name(0) if count == 1 else ""
+    total = int(torch.cuda.get_device_properties(0).total_memory) if count == 1 else 0
+    if (
+        device != "cuda"
+        or count != 1
+        or not name.startswith(topology["expected_device_name_prefix"])
+        or not topology["visible_memory_GiB_min"] * 1024**3
+        <= total
+        <= topology["visible_memory_GiB_max"] * 1024**3
+        or os.environ.get("WORLD_SIZE", "1") != "1"
+        or os.environ.get("LOCAL_WORLD_SIZE", "1") != "1"
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_GPU_TOPOLOGY")
+    return commitment
+
+
+def _public_readiness_container_attestation(
+    path: Path, cfg: dict[str, Any], run_mode: str
+) -> dict[str, Any]:
+    job_id = os.environ.get("SLURM_JOB_ID", "")
+    if not job_id.isdecimal() or int(job_id) <= 0:
+        raise RuntimeError("E_PUBLIC_READINESS_CONTAINER_ATTESTATION")
+    container = _tuple_runtime_amendment(cfg)["base_container"]
+    expected = {
+        "artifact_family": "BASE_CONTAINER",
+        "bytes": 3731320832,
+        "host_entry_is_symlink": True,
+        "job_id": int(job_id),
+        "predicate_count": 4,
+        "predicate_pass_count": 4,
+        "resolved_target_regular_file": True,
+        "run_mode": f"readiness-{run_mode}",
+        "schema_version": 1,
+        "sha256": container["sha256"],
+        "source": "WRAPPER_HOST_BEFORE_CONTAINER",
+    }
+    try:
+        value = json.loads(path.read_text())
+        mode = stat.S_IMODE(path.lstat().st_mode)
+    except (OSError, ValueError, TypeError) as error:
+        raise RuntimeError("E_PUBLIC_READINESS_CONTAINER_ATTESTATION") from error
+    if path.is_symlink() or not path.is_file() or mode != 0o600 or value != expected:
+        raise RuntimeError("E_PUBLIC_READINESS_CONTAINER_ATTESTATION")
+    return {"sha256": value["sha256"], "bytes": value["bytes"]}
+
+
+def _public_readiness_fixture_bind_attestation(
+    path: Path, cfg: dict[str, Any], run_mode: str
+) -> str:
+    job_id = os.environ.get("SLURM_JOB_ID", "")
+    if not job_id.isdecimal() or int(job_id) <= 0:
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_BIND_ATTESTATION")
+    repair = _engineering_health_fixture_bind_repair(cfg)[
+        "failure_specific_repair"
+    ]
+    source = repair["source_record_file"]
+    no_hand = repair["verified_no_hand_seal_file"]
+    manifest = repair["fixture_manifest_file"]
+    expected = {
+        "artifact_family": "SEALED_PUBLIC_FIXTURE_BIND",
+        "fixture_manifest_bytes": manifest["bytes"],
+        "fixture_manifest_file_sha256": manifest["sha256"],
+        "job_id": int(job_id),
+        "path_field_count": 0,
+        "predicate_count": 9,
+        "predicate_pass_count": 9,
+        "read_only": True,
+        "run_mode": f"readiness-{run_mode}",
+        "schema_version": 1,
+        "source": "WRAPPER_HOST_BEFORE_CONTAINER",
+        "source_bound_at_original_absolute_alias": True,
+        "source_bound_over_active_fixture_target": True,
+        "source_record_bytes": source["bytes"],
+        "source_record_file_sha256": source["sha256"],
+        "verified_no_hand_seal_bytes": no_hand["bytes"],
+        "verified_no_hand_seal_file_sha256": no_hand["sha256"],
+    }
+    try:
+        value = json.loads(path.read_text())
+        mode = stat.S_IMODE(path.lstat().st_mode)
+    except (OSError, ValueError, TypeError) as error:
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_BIND_ATTESTATION") from error
+    if path.is_symlink() or not path.is_file() or mode != 0o600 or value != expected:
+        raise RuntimeError("E_PUBLIC_READINESS_FIXTURE_BIND_ATTESTATION")
+    return file_digest(path)
+
+
+def _public_readiness_health_projection(
+    manifest: dict[str, Any], overlay: dict[str, Any], cfg: dict[str, Any]
+) -> dict[str, Any]:
+    base = _tuple_health_projection(manifest, cfg)
+    development = overlay["partitions"]["development"]
+    requested = (
+        ("color", "positive"),
+        ("relative_size", "opposite"),
+        ("shape", "null"),
+        ("state", "ambiguous"),
+        ("color", "ambiguous"),
+    )
+    overlay_cases = []
+    for family, semantic in requested:
+        candidates = [
+            row
+            for row in development
+            if row["family"] == family and row["semantic_case"] == semantic
+        ]
+        candidates.sort(key=lambda row: int(row["fixture_ordinal"]))
+        if not candidates:
+            raise RuntimeError("E_PUBLIC_READINESS_HEALTH_CASE_DEFICIT")
+        overlay_cases.append(int(candidates[0]["fixture_ordinal"]))
+    value = {
+        "schema_version": 1,
+        "status": "SEALED_PUBLIC_READINESS_ENGINEERING_MICROFIXTURES",
+        "role": "EXECUTION_HEALTH_ONLY_NO_SCIENTIFIC_METRICS",
+        "amendment_commitment_sha256": _public_only_readiness_amendment(cfg)[
+            "amendment_commitment_sha256"
+        ],
+        "public_fixture_manifest_commitment_sha256": manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "readiness_fixture_commitment_sha256": overlay[
+            "readiness_fixture_commitment_sha256"
+        ],
+        "base_projection_commitment_sha256": base[
+            "microfixture_manifest_commitment_sha256"
+        ],
+        "attribute_overlay_fixture_ordinals": overlay_cases,
+        "module_case_counts": {
+            module_id: 5 if module_id == "attribute" else 4
+            for module_id in TUPLE_QUALIFICATION_MODULE_IDS
+        },
+        "case_count": 29,
+        "shared_dependency_case_count": 4,
+        "scientific_metric_count": 0,
+    }
+    value["microfixture_manifest_commitment_sha256"] = digest(value)
+    value["_base_projection"] = base
+    return value
+
+
+def _public_readiness_module_context(
+    *,
+    base_context: dict[str, Any],
+    module_id: str,
+    projection: dict[str, Any] | None,
+    overlay: dict[str, Any],
+    overlay_root: Path,
+) -> dict[str, Any]:
+    context = dict(base_context)
+    if projection is None:
+        context["rows"] = base_context["fixture_manifest"]["partitions"][
+            base_context["partition"]
+        ]
+        readiness_rows = overlay["partitions"][base_context["partition"]]
+    else:
+        context["rows"] = _tuple_health_selected_rows(
+            base_context["fixture_manifest"],
+            projection["_base_projection"],
+            module_id,
+        )
+        readiness_rows_by_ordinal = {
+            int(row["fixture_ordinal"]): row
+            for row in overlay["partitions"]["development"]
+        }
+        readiness_rows = [
+            readiness_rows_by_ordinal[ordinal]
+            for ordinal in projection["attribute_overlay_fixture_ordinals"]
+        ]
+    context.update(
+        {
+            "public_readiness": True,
+            "engineering_health": True,
+            "module_cache": {},
+            "readiness_attribute_rows": readiness_rows,
+            "readiness_fixture_root": overlay_root,
+        }
+    )
+    return context
+
+
+def _public_readiness_health_compact(full: dict[str, Any]) -> dict[str, Any]:
+    resource = full["resource"]
+    return {
+        "status": full["status"],
+        "attempt": int(full["attempt"]),
+        "module_count": int(full["module_count"]),
+        "completed_module_count": int(full["completed_module_count"]),
+        "failed_module_count": int(full["failed_module_count"]),
+        "case_count": int(full["case_count"]),
+        "scientific_metric_count": 0,
+        "failure_count": int(full["failure_count"]),
+        "external_call_count": int(full["external_call_count"]),
+        "unaccounted_failure_count": int(full["unaccounted_failure_count"]),
+        "wall_minutes": float(resource["wall_minutes"]),
+        "GPU_hours": float(resource["GPU_hours"]),
+        "new_storage_GiB": float(resource["new_storage_GiB"]),
+        "direct_monetary_cost_USD": 0.0,
+        "public_fixture_manifest_commitment_sha256": full[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "readiness_fixture_commitment_sha256": full[
+            "readiness_fixture_commitment_sha256"
+        ],
+        "topology_commitment_sha256": full[
+            "topology_commitment_sha256"
+        ],
+        "runner_commitment_sha256": full["runner_commitment_sha256"],
+        "dependency_config_commitment_sha256": full[
+            "dependency_config_commitment_sha256"
+        ],
+        "microfixture_manifest_commitment_sha256": full[
+            "microfixture_manifest_commitment_sha256"
+        ],
+        "engineering_health_commitment_sha256": full[
+            "engineering_health_commitment_sha256"
+        ],
+    }
+
+
+def _validate_public_readiness_health_full(
+    full: dict[str, Any], cfg: dict[str, Any]
+) -> None:
+    if not isinstance(full, dict):
+        raise RuntimeError("E_PUBLIC_READINESS_HEALTH_SCHEMA")
+    expected = full.get("engineering_health_commitment_sha256")
+    if not isinstance(expected, str) or digest(
+        {
+            key: value
+            for key, value in full.items()
+            if key != "engineering_health_commitment_sha256"
+        }
+    ) != expected:
+        raise RuntimeError("E_PUBLIC_READINESS_HEALTH_COMMITMENT")
+    modules = full.get("module_results")
+    if (
+        full.get("schema_version") != 1
+        or full.get("status") not in {
+            "PASS_ENGINEERING_HEALTH",
+            "ENGINEERING_BLOCKER",
+        }
+        or full.get("route_id")
+        != _public_only_readiness_amendment(cfg)["route_id"]
+        or full.get("topology_commitment_sha256")
+        != _public_readiness_topology(cfg)["topology_commitment_sha256"]
+        or not isinstance(modules, list)
+        or len(modules) != len(TUPLE_QUALIFICATION_MODULE_IDS)
+        or {row.get("module_id") for row in modules}
+        != set(TUPLE_QUALIFICATION_MODULE_IDS)
+        or full.get("scientific_metric_count") != 0
+        or full.get("network_disabled") is not True
+        or full.get("telemetry_disabled") is not True
+        or full.get("restricted_mount_present") is not False
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_HEALTH_SCHEMA")
+    for row in modules:
+        _validate_tuple_health_module_result(row)
+    passed = sum(row["status"] == "PASS_ENGINEERING" for row in modules)
+    if (
+        full["completed_module_count"] != passed
+        or full["failed_module_count"] != len(modules) - passed
+        or full["failure_count"] != len(modules) - passed
+        or full["status"]
+        != (
+            "PASS_ENGINEERING_HEALTH"
+            if passed == len(modules)
+            else "ENGINEERING_BLOCKER"
+        )
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_HEALTH_SCHEMA")
+    resource = full.get("resource", {})
+    topology = _public_readiness_topology(cfg)
+    if (
+        not isinstance(resource, dict)
+        or float(resource.get("wall_minutes", math.inf))
+        > float(topology["micro_wall_minutes"])
+        or float(resource.get("GPU_hours", math.inf))
+        > float(topology["micro_wall_minutes"]) / 60.0
+        or float(resource.get("new_storage_GiB", math.inf))
+        > float(topology["new_storage_GiB_max"])
+        or resource.get("direct_monetary_cost_USD") != 0
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_HEALTH_RESOURCE")
+
+
+def run_public_readiness_health(args: argparse.Namespace) -> dict[str, Any]:
+    """Run the new route's production-path microqualification without metrics."""
+
+    started = time.monotonic()
+    cfg = json.loads(args.config.read_text())
+    amendment = _public_only_readiness_amendment(cfg)
+    topology = _public_readiness_topology(cfg)
+    if args.attempt not in {1, 2}:
+        raise RuntimeError("E_PUBLIC_READINESS_HEALTH_ATTEMPT")
+    root = _public_readiness_root(args.public_root) / "engineering-health"
+    _require_external_or_ignored_output(root)
+    _require_external_or_ignored_output(args.scratch_root)
+    root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    prior_paths = sorted(root.glob("attempt-*/full-result.json"))
+    if len(prior_paths) != args.attempt - 1:
+        raise RuntimeError("E_PUBLIC_READINESS_HEALTH_ATTEMPT")
+    prior_records = []
+    for path in prior_paths:
+        prior = json.loads(path.read_text())
+        _validate_public_readiness_health_full(prior, cfg)
+        prior_records.append(prior)
+    if any(record["status"] == "PASS_ENGINEERING_HEALTH" for record in prior_records):
+        raise RuntimeError("E_PUBLIC_READINESS_HEALTH_ALREADY_PASSED")
+    attempt_root = root / f"attempt-{args.attempt:02d}"
+    if attempt_root.exists():
+        raise RuntimeError("E_PUBLIC_READINESS_HEALTH_ATTEMPT_EXISTS")
+    attempt_root.mkdir(parents=True, mode=0o700)
+    trace_root = attempt_root / "traces"
+    topology_attestation = _public_readiness_cuda_topology(
+        str(args.device), cfg, args.topology_attestation, "health"
+    )
+    container = _public_readiness_container_attestation(
+        args.container_attestation, cfg, "health"
+    )
+    _public_readiness_fixture_bind_attestation(
+        args.fixture_bind_attestation, cfg, "health"
+    )
+    _verify_tuple_runtime_manifest(args.public_root, cfg)
+    manifest, fixture_root = _verify_tuple_fixture_manifest(args.public_root, cfg)
+    overlay, overlay_root = _load_public_readiness_fixture_manifest(
+        args.public_root, cfg
+    )
+    dependency = _tuple_health_dependency_preflight(
+        args.public_root, cfg, container
+    )
+    projection = _public_readiness_health_projection(manifest, overlay, cfg)
+    projection_public = {
+        key: value for key, value in projection.items() if not key.startswith("_")
+    }
+    write_private_new(attempt_root / "microfixture-manifest.json", projection_public)
+    base_context = {
+        "cfg": cfg,
+        "public_root": args.public_root,
+        "fixture_root": fixture_root,
+        "fixture_manifest": manifest,
+        "fixture_manifest_commitment_sha256": manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "partition": "development",
+        "device": args.device,
+        "thresholds": _tuple_health_inference_thresholds(cfg),
+    }
+    module_results = []
+    runners = _public_readiness_module_runners()
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        module_scratch = args.scratch_root / f"health-{module_id}"
+        module_scratch.mkdir(parents=True, exist_ok=False, mode=0o700)
+        context = _public_readiness_module_context(
+            base_context={**base_context, "scratch_root": module_scratch},
+            module_id=module_id,
+            projection=projection,
+            overlay=overlay,
+            overlay_root=overlay_root,
+        )
+        try:
+            result = runners[module_id](context)
+            _validate_tuple_health_module_result(
+                result,
+                expected_case_count=projection["module_case_counts"][module_id],
+            )
+            if result["module_id"] != module_id:
+                raise RuntimeError("E_PUBLIC_READINESS_HEALTH_MODULE_RESULT")
+            module_results.append(result)
+        except BaseException as error:
+            if isinstance(error, (KeyboardInterrupt, SystemExit)):
+                raise
+            module_results.append(_tuple_health_error(module_id, error, trace_root))
+    passed = sum(row["status"] == "PASS_ENGINEERING" for row in module_results)
+    failed = len(module_results) - passed
+    wall_minutes = (time.monotonic() - started) / 60.0
+    resource = {
+        "GPU_type": topology["GPU_type"],
+        "GPU_count": 1,
+        "CPU_count": 8,
+        "memory_GiB": 32,
+        "wall_minutes": wall_minutes,
+        "GPU_hours": wall_minutes / 60.0,
+        "new_storage_GiB": _tuple_health_tree_bytes(
+            _public_readiness_root(args.public_root)
+        )
+        / (1024**3),
+        "direct_monetary_cost_USD": 0,
+    }
+    full = {
+        "schema_version": 1,
+        "status": (
+            "PASS_ENGINEERING_HEALTH"
+            if failed == 0
+            else "ENGINEERING_BLOCKER"
+        ),
+        "route_id": amendment["route_id"],
+        "attempt": args.attempt,
+        "amendment_commitment_sha256": amendment[
+            "amendment_commitment_sha256"
+        ],
+        "execution_commitment_sha256": _public_readiness_execution_commitment(cfg),
+        "topology_commitment_sha256": topology["topology_commitment_sha256"],
+        "topology_attestation_sha256": topology_attestation,
+        "public_fixture_manifest_commitment_sha256": manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "readiness_fixture_commitment_sha256": overlay[
+            "readiness_fixture_commitment_sha256"
+        ],
+        "runner_commitment_sha256": file_digest(Path(__file__).resolve()),
+        "dependency_config_commitment_sha256": dependency[
+            "dependency_config_commitment_sha256"
+        ],
+        "microfixture_manifest_commitment_sha256": projection[
+            "microfixture_manifest_commitment_sha256"
+        ],
+        "module_results": module_results,
+        "module_count": len(module_results),
+        "completed_module_count": passed,
+        "failed_module_count": failed,
+        "case_count": int(projection["case_count"]),
+        "scientific_metric_count": 0,
+        "failure_count": failed,
+        "external_call_count": 0,
+        "unaccounted_failure_count": sum(
+            str(row.get("error_code", "")).endswith("UNACCOUNTED_FAILURE")
+            for row in module_results
+        ),
+        "network_disabled": True,
+        "telemetry_disabled": True,
+        "restricted_mount_present": False,
+        "resource": resource,
+    }
+    if any(
+        (
+            wall_minutes > float(topology["micro_wall_minutes"]),
+            resource["new_storage_GiB"] > float(topology["new_storage_GiB_max"]),
+            sum(float(record["resource"]["GPU_hours"]) for record in prior_records)
+            + resource["GPU_hours"]
+            > float(topology["aggregate_GPU_hours_max"]),
+        )
+    ):
+        full["status"] = "ENGINEERING_BLOCKER"
+        full["failure_count"] = max(1, int(full["failure_count"]))
+    full["engineering_health_commitment_sha256"] = digest(full)
+    _validate_public_readiness_health_full(full, cfg)
+    write_private_new(attempt_root / "full-result.json", full)
+    return _public_readiness_health_compact(full)
+
+
+def _load_public_readiness_health_pass(
+    public: Path,
+    cfg: dict[str, Any],
+    base_fixture_commitment: str,
+    readiness_fixture_commitment: str,
+) -> dict[str, Any]:
+    root = _public_readiness_root(public) / "engineering-health"
+    records = []
+    for path in sorted(root.glob("attempt-*/full-result.json")):
+        value = json.loads(path.read_text())
+        _validate_public_readiness_health_full(value, cfg)
+        records.append(value)
+    passes = [value for value in records if value["status"] == "PASS_ENGINEERING_HEALTH"]
+    if len(passes) != 1:
+        raise RuntimeError("E_PUBLIC_READINESS_SCIENCE_BEFORE_HEALTH_PASS")
+    value = passes[0]
+    sealed = cfg.get("public_only_calibration_readiness_engineering_health_result")
+    compact = _public_readiness_health_compact(value)
+    if (
+        value["public_fixture_manifest_commitment_sha256"]
+        != base_fixture_commitment
+        or value["readiness_fixture_commitment_sha256"]
+        != readiness_fixture_commitment
+        or value["runner_commitment_sha256"] != file_digest(Path(__file__).resolve())
+        or not isinstance(sealed, dict)
+        or sealed != compact
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_HEALTH_PASS_PROVENANCE")
+    return value
+
+
+def _public_readiness_integrity_results(
+    context: dict[str, Any], overlay: dict[str, Any], overlay_root: Path, trace_root: Path
+) -> list[dict[str, Any]]:
+    output = []
+    runners = _public_readiness_module_runners()
+    base_scratch = Path(context["scratch_root"])
+    family_by_module = {
+        "adapter_and_lexical": "language_lexical",
+        "referent": "referent_attribute",
+        "recurrence": "recurrence",
+        "attribute": "readiness_attribute",
+        "hand_contact": "hand_contact",
+        "sensor": "sensor",
+        "order_action": "order_action",
+    }
+    for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
+        module_scratch = base_scratch / module_id
+        module_scratch.mkdir(parents=True, exist_ok=False, mode=0o700)
+        module_context = _public_readiness_module_context(
+            base_context={**context, "scratch_root": module_scratch},
+            module_id=module_id,
+            projection=None,
+            overlay=overlay,
+            overlay_root=overlay_root,
+        )
+        try:
+            result = runners[module_id](module_context)
+            expected_count = (
+                len(overlay["partitions"][context["partition"]])
+                if module_id == "attribute"
+                else len(context["fixture_manifest"]["partitions"][context["partition"]][family_by_module[module_id]])
+            )
+            _validate_tuple_health_module_result(result, expected_case_count=expected_count)
+            if result["module_id"] != module_id:
+                raise RuntimeError("E_PUBLIC_READINESS_INTEGRITY_MODULE_RESULT")
+            output.append(result)
+        except BaseException as error:
+            if isinstance(error, (KeyboardInterrupt, SystemExit)):
+                raise
+            output.append(_tuple_health_error(module_id, error, trace_root))
+    return output
+
+
+def _public_readiness_qualification_paths(public: Path) -> dict[str, Path]:
+    root = _public_readiness_root(public) / "qualification"
+    return {
+        "development_result": root / "development-result.json",
+        "development_threshold_seal": root / "development-threshold-seal.json",
+        "holdout_result": root / "holdout-result.json",
+        "integrity_root": root / "engineering-integrity",
+    }
+
+
+def _public_readiness_threshold_seal(
+    cfg: dict[str, Any],
+    manifest: dict[str, Any],
+    overlay: dict[str, Any],
+    module_results: dict[str, dict[str, Any]],
+    axis_results: dict[str, dict[str, Any]],
+    combined: dict[str, Any],
+) -> dict[str, Any]:
+    thresholds = _public_readiness_selected_thresholds(cfg, module_results)
+    required = {
+        "referent": {"Grounding_DINO_box_score", "Grounding_DINO_text_score"},
+        "recurrence": {"DINOv2_recurrence_cosine"},
+        "attribute": {
+            "Attribute_Grounding_DINO_box_score",
+            "Attribute_Grounding_DINO_text_score",
+            "PE_Core_attribute_margin",
+        },
+        "hand_contact": {"EgoHOS_min_mask_fraction"},
+        "order_action": {"action_abstention_margin"},
+    }
+    for module_id, keys in required.items():
+        if not keys <= set(module_results[module_id].get("selected_thresholds", {})):
+            raise RuntimeError("E_PUBLIC_READINESS_THRESHOLD_INCOMPLETE")
+    module_commitment = _tuple_development_module_commitment(
+        digest(
+            {
+                "base": manifest["public_fixture_manifest_commitment_sha256"],
+                "overlay": overlay["readiness_fixture_commitment_sha256"],
+            }
+        ),
+        module_results,
+        axis_results,
+        combined,
+    )
+    seal = {
+        "schema_version": 1,
+        "status": (
+            "PASS_DEVELOPMENT_THRESHOLDS_SEALED"
+            if combined["status"] == "PASS"
+            else "NO_GO_DEVELOPMENT_COMBINED_GATE"
+        ),
+        "partition": "development",
+        "holdout_authorized": combined["status"] == "PASS",
+        "amendment_commitment_sha256": _public_only_readiness_amendment(cfg)[
+            "amendment_commitment_sha256"
+        ],
+        "topology_commitment_sha256": _public_readiness_topology(cfg)[
+            "topology_commitment_sha256"
+        ],
+        "public_fixture_manifest_commitment_sha256": manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "readiness_fixture_commitment_sha256": overlay[
+            "readiness_fixture_commitment_sha256"
+        ],
+        "development_module_result_commitment_sha256": module_commitment,
+        "development_module_statuses": {
+            module_id: module_results[module_id]["status"]
+            for module_id in TUPLE_QUALIFICATION_MODULE_IDS
+        },
+        "selected_thresholds": thresholds,
+        "combined_gate_status": combined["status"],
+        "holdout_open_once_no_refit_reprompt_relabel_or_threshold_change": True,
+    }
+    seal["development_threshold_commitment_sha256"] = digest(seal)
+    return seal
+
+
+def _load_public_readiness_threshold_seal(
+    public: Path, cfg: dict[str, Any], manifest: dict[str, Any], overlay: dict[str, Any]
+) -> dict[str, Any]:
+    path = _public_readiness_qualification_paths(public)["development_threshold_seal"]
+    if not path.is_file():
+        raise RuntimeError("E_PUBLIC_READINESS_HOLDOUT_BEFORE_DEVELOPMENT")
+    value = json.loads(path.read_text())
+    expected = value.get("development_threshold_commitment_sha256")
+    if not isinstance(expected, str) or digest(
+        {key: item for key, item in value.items() if key != "development_threshold_commitment_sha256"}
+    ) != expected:
+        raise RuntimeError("E_PUBLIC_READINESS_THRESHOLD_SEAL")
+    committed = cfg.get("public_only_calibration_readiness_development_result")
+    if (
+        value.get("status") != "PASS_DEVELOPMENT_THRESHOLDS_SEALED"
+        or value.get("holdout_authorized") is not True
+        or value.get("public_fixture_manifest_commitment_sha256")
+        != manifest["public_fixture_manifest_commitment_sha256"]
+        or value.get("readiness_fixture_commitment_sha256")
+        != overlay["readiness_fixture_commitment_sha256"]
+        or not isinstance(committed, dict)
+        or committed.get("development_threshold_commitment_sha256") != expected
+        or committed.get("status") != "PASS_DEVELOPMENT_THRESHOLDS_SEALED"
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_THRESHOLD_SEAL_PROVENANCE")
+    return value
+
+
+def _public_readiness_qualification_compact(full: dict[str, Any]) -> dict[str, Any]:
+    combined = full["combined_gate"]
+    integrity = combined["integrity"]
+    return {
+        "status": full["status"],
+        "partition": full["partition"].upper(),
+        "module_count": len(full["module_results"]),
+        "completed_module_count": len(full["module_results"]),
+        "failed_module_count": int(integrity["error_module_count"]),
+        "critical_axis_pass_count": int(combined["critical_axis_pass_count"]),
+        "validated_axis_count": int(combined["validated_axis_count"]),
+        "action_control_status": str(combined["action_control_status"]),
+        "scientific_metric_count": sum(
+            len(result.get("metrics", {}))
+            for result in full["module_results"].values()
+        ),
+        "failure_count": int(integrity["failure_count"]),
+        "external_call_count": int(integrity["external_call_count"]),
+        "invalid_retained_record_count": int(integrity["invalid_retained_record_count"]),
+        "silent_truncation_count": int(integrity["silent_truncation_count"]),
+        "public_fixture_manifest_commitment_sha256": full[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "readiness_fixture_commitment_sha256": full[
+            "readiness_fixture_commitment_sha256"
+        ],
+        "development_threshold_commitment_sha256": full[
+            "development_threshold_commitment_sha256"
+        ],
+        "public_qualification_commitment_sha256": full[
+            "public_qualification_commitment_sha256"
+        ],
+    }
+
+
+def qualify_public_readiness(args: argparse.Namespace) -> dict[str, Any]:
+    """Run one independent-axis public readiness partition exactly once."""
+
+    partition = str(args.partition)
+    if partition not in {"development", "holdout"}:
+        raise RuntimeError("E_PUBLIC_READINESS_PARTITION")
+    cfg = json.loads(args.config.read_text())
+    amendment = _public_only_readiness_amendment(cfg)
+    topology = _public_readiness_topology(cfg)
+    _require_external_or_ignored_output(_public_readiness_root(args.public_root))
+    _require_external_or_ignored_output(args.scratch_root)
+    if (
+        os.environ.get("HF_HUB_OFFLINE") != "1"
+        or os.environ.get("TRANSFORMERS_OFFLINE") != "1"
+        or os.environ.get("HF_HUB_DISABLE_TELEMETRY") != "1"
+        or os.environ.get("WANDB_DISABLED", "").casefold() != "true"
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_OFFLINE_ENVIRONMENT")
+    _public_readiness_cuda_topology(
+        str(args.device), cfg, args.topology_attestation, partition
+    )
+    container = _public_readiness_container_attestation(
+        args.container_attestation, cfg, partition
+    )
+    _public_readiness_fixture_bind_attestation(
+        args.fixture_bind_attestation, cfg, partition
+    )
+    _verify_tuple_runtime_manifest(args.public_root, cfg)
+    manifest, fixture_root = _verify_tuple_fixture_manifest(args.public_root, cfg)
+    overlay, overlay_root = _load_public_readiness_fixture_manifest(
+        args.public_root, cfg
+    )
+    health = _load_public_readiness_health_pass(
+        args.public_root,
+        cfg,
+        manifest["public_fixture_manifest_commitment_sha256"],
+        overlay["readiness_fixture_commitment_sha256"],
+    )
+    dependency = _tuple_health_dependency_preflight(args.public_root, cfg, container)
+    if dependency["dependency_config_commitment_sha256"] != health[
+        "dependency_config_commitment_sha256"
+    ]:
+        raise RuntimeError("E_PUBLIC_READINESS_DEPENDENCY_CHANGED_AFTER_HEALTH")
+    paths = _public_readiness_qualification_paths(args.public_root)
+    paths["integrity_root"].mkdir(parents=True, exist_ok=True, mode=0o700)
+    result_path = paths[f"{partition}_result"]
+    if result_path.exists():
+        full = json.loads(result_path.read_text())
+        expected = full.get("public_qualification_commitment_sha256")
+        if not isinstance(expected, str) or digest(
+            {key: item for key, item in full.items() if key != "public_qualification_commitment_sha256"}
+        ) != expected:
+            raise RuntimeError("E_PUBLIC_READINESS_RESULT_COMMITMENT")
+        return _public_readiness_qualification_compact(full)
+    threshold_seal = (
+        _load_public_readiness_threshold_seal(args.public_root, cfg, manifest, overlay)
+        if partition == "holdout"
+        else None
+    )
+    args.scratch_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    base_context = {
+        "cfg": cfg,
+        "public_root": args.public_root,
+        "fixture_root": fixture_root,
+        "fixture_manifest": manifest,
+        "partition": partition,
+        "device": args.device,
+        "thresholds": (
+            dict(threshold_seal["selected_thresholds"])
+            if threshold_seal is not None
+            else {}
+        ),
+        "verified_no_hand_seal": {
+            "status": "PASS",
+            "verified_no_hand_seal_commitment_sha256": manifest[
+                "verified_no_hand_seal_commitment_sha256"
+            ],
+        },
+        "scratch_root": args.scratch_root / f"{partition}-integrity",
+    }
+    base_context["scratch_root"].mkdir(parents=True, exist_ok=False, mode=0o700)
+    integrity_results = _public_readiness_integrity_results(
+        base_context,
+        overlay,
+        overlay_root,
+        paths["integrity_root"] / f"{partition}-traces",
+    )
+    integrity_passed = sum(
+        row["status"] == "PASS_ENGINEERING" for row in integrity_results
+    )
+    integrity_full = {
+        "schema_version": 1,
+        "status": (
+            "PASS_ENGINEERING_INTEGRITY"
+            if integrity_passed == len(integrity_results)
+            else "ENGINEERING_BLOCKER"
+        ),
+        "partition": partition.upper(),
+        "module_results": integrity_results,
+        "module_count": len(integrity_results),
+        "completed_module_count": integrity_passed,
+        "failed_module_count": len(integrity_results) - integrity_passed,
+        "scientific_metric_count": 0,
+        "failure_count": len(integrity_results) - integrity_passed,
+        "external_call_count": 0,
+        "public_fixture_manifest_commitment_sha256": manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "readiness_fixture_commitment_sha256": overlay[
+            "readiness_fixture_commitment_sha256"
+        ],
+        "engineering_health_commitment_sha256": health[
+            "engineering_health_commitment_sha256"
+        ],
+        "runner_commitment_sha256": file_digest(Path(__file__).resolve()),
+        "network_disabled": True,
+        "telemetry_disabled": True,
+        "restricted_mount_present": False,
+    }
+    integrity_full["partition_engineering_integrity_commitment_sha256"] = digest(
+        integrity_full
+    )
+    write_private_new(paths["integrity_root"] / f"{partition}.json", integrity_full)
+    if integrity_passed != len(integrity_results):
+        return {
+            "status": "ENGINEERING_BLOCKER",
+            "partition": partition.upper(),
+            "module_count": len(integrity_results),
+            "completed_module_count": integrity_passed,
+            "failed_module_count": len(integrity_results) - integrity_passed,
+            "critical_axis_pass_count": 0,
+            "validated_axis_count": 0,
+            "action_control_status": "WITHHELD",
+            "scientific_metric_count": 0,
+            "failure_count": len(integrity_results) - integrity_passed,
+            "external_call_count": 0,
+            "invalid_retained_record_count": 0,
+            "silent_truncation_count": 0,
+            "public_fixture_manifest_commitment_sha256": manifest[
+                "public_fixture_manifest_commitment_sha256"
+            ],
+            "readiness_fixture_commitment_sha256": overlay[
+                "readiness_fixture_commitment_sha256"
+            ],
+            "development_threshold_commitment_sha256": "0" * 64,
+            "public_qualification_commitment_sha256": integrity_full[
+                "partition_engineering_integrity_commitment_sha256"
+            ],
+        }
+    science_context = {
+        **base_context,
+        "engineering_health": False,
+        "public_readiness": True,
+        "rows": manifest["partitions"][partition],
+        "readiness_attribute_rows": overlay["partitions"][partition],
+        "readiness_fixture_root": overlay_root,
+        "scratch_root": args.scratch_root / f"{partition}-scientific",
+        "module_cache": {},
+    }
+    science_context["scratch_root"].mkdir(parents=True, exist_ok=False, mode=0o700)
+    module_results, errors = _public_readiness_scientific_module_results(
+        _public_readiness_module_runners(),
+        science_context,
+        paths["integrity_root"] / f"{partition}-scientific-traces",
+    )
+    if errors:
+        raise RuntimeError("E_PUBLIC_READINESS_SCIENTIFIC_EXECUTION_BLOCKER")
+    _tuple_health_metric_release(integrity_results, module_results)
+    _validate_tuple_qualification_record(module_results)
+    observed_thresholds = _public_readiness_selected_thresholds(
+        cfg,
+        module_results,
+        expected=(
+            threshold_seal["selected_thresholds"]
+            if threshold_seal is not None
+            else None
+        ),
+    )
+    axis_results = _tuple_axis_results_from_modules(module_results)
+    combined = _tuple_combined_public_gate(
+        axis_results,
+        module_results["order_action"],
+        {"status": "DESCRIPTIVE_NOT_RERUN"},
+        action_control_blocks=False,
+    )
+    combined = _apply_tuple_integrity_gate(
+        combined, _tuple_qualification_integrity(module_results)
+    )
+    if partition == "development":
+        seal = _public_readiness_threshold_seal(
+            cfg, manifest, overlay, module_results, axis_results, combined
+        )
+        if observed_thresholds != seal["selected_thresholds"]:
+            raise RuntimeError("E_PUBLIC_READINESS_THRESHOLD_SEAL_MISMATCH")
+        threshold_commitment = seal["development_threshold_commitment_sha256"]
+        status = seal["status"]
+    else:
+        seal = None
+        threshold_commitment = threshold_seal[
+            "development_threshold_commitment_sha256"
+        ]
+        status = (
+            "CALIBRATION_READY_PUBLIC_ONLY"
+            if combined["status"] == "PASS"
+            else "NO_GO_PUBLIC_ONLY_COMPLETE_VALID_SCIENTIFIC_METRICS"
+        )
+    full = {
+        "schema_version": 1,
+        "status": status,
+        "partition": partition,
+        "amendment_commitment_sha256": amendment["amendment_commitment_sha256"],
+        "topology_commitment_sha256": topology["topology_commitment_sha256"],
+        "public_fixture_manifest_commitment_sha256": manifest[
+            "public_fixture_manifest_commitment_sha256"
+        ],
+        "readiness_fixture_commitment_sha256": overlay[
+            "readiness_fixture_commitment_sha256"
+        ],
+        "engineering_health_commitment_sha256": health[
+            "engineering_health_commitment_sha256"
+        ],
+        "development_threshold_commitment_sha256": threshold_commitment,
+        "selected_thresholds": (
+            seal["selected_thresholds"] if seal is not None else threshold_seal["selected_thresholds"]
+        ),
+        "module_results": module_results,
+        "axis_results": axis_results,
+        "combined_gate": combined,
+        "broad_activity_context": {
+            "status": "DESCRIPTIVE_NOT_RERUN",
+            "used_in_gate": False,
+        },
+        "order_action_used_in_gate": False,
+        "restricted_mount_present": False,
+        "network_disabled": True,
+        "telemetry_disabled": True,
+        "manual_annotation_count": 0,
+        "ongoing_human_QA_required": False,
+    }
+    full["public_qualification_commitment_sha256"] = digest(full)
+    write_private_new(result_path, full)
+    if seal is not None:
+        write_private_new(paths["development_threshold_seal"], seal)
+    return _public_readiness_qualification_compact(full)
 
 
 def prepare_tuple_audio_seed(args: argparse.Namespace) -> dict[str, Any]:
@@ -27276,6 +29584,41 @@ def main() -> None:
         "--partition", choices=("development", "holdout"), required=True
     )
     tuple_qualify_parser.add_argument("--device", default="cuda")
+    readiness_prepare_parser = subparsers.add_parser("readiness-prepare")
+    readiness_prepare_parser.add_argument("--public-root", type=Path, required=True)
+    readiness_prepare_parser.add_argument("--config", type=Path, required=True)
+    readiness_health_parser = subparsers.add_parser("readiness-health")
+    readiness_health_parser.add_argument("--public-root", type=Path, required=True)
+    readiness_health_parser.add_argument("--scratch-root", type=Path, required=True)
+    readiness_health_parser.add_argument("--config", type=Path, required=True)
+    readiness_health_parser.add_argument(
+        "--container-attestation", type=Path, required=True
+    )
+    readiness_health_parser.add_argument(
+        "--fixture-bind-attestation", type=Path, required=True
+    )
+    readiness_health_parser.add_argument(
+        "--topology-attestation", type=Path, required=True
+    )
+    readiness_health_parser.add_argument("--attempt", type=int, choices=(1, 2), required=True)
+    readiness_health_parser.add_argument("--device", default="cuda")
+    readiness_qualify_parser = subparsers.add_parser("readiness-qualify")
+    readiness_qualify_parser.add_argument("--public-root", type=Path, required=True)
+    readiness_qualify_parser.add_argument("--scratch-root", type=Path, required=True)
+    readiness_qualify_parser.add_argument("--config", type=Path, required=True)
+    readiness_qualify_parser.add_argument(
+        "--container-attestation", type=Path, required=True
+    )
+    readiness_qualify_parser.add_argument(
+        "--fixture-bind-attestation", type=Path, required=True
+    )
+    readiness_qualify_parser.add_argument(
+        "--topology-attestation", type=Path, required=True
+    )
+    readiness_qualify_parser.add_argument(
+        "--partition", choices=("development", "holdout"), required=True
+    )
+    readiness_qualify_parser.add_argument("--device", default="cuda")
     tuple_audio_parser = subparsers.add_parser("tuple-audio-seed")
     tuple_audio_parser.add_argument("--output-root", type=Path, required=True)
     tuple_audio_parser.add_argument("--config", type=Path, required=True)
@@ -27428,6 +29771,33 @@ def main() -> None:
                     if engineering_only
                     else TUPLE_QUALIFICATION_HASH_FIELDS
                 ),
+            )
+        )
+    elif args.command == "readiness-prepare":
+        value = prepare_public_readiness_fixtures(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=PUBLIC_READINESS_FIXTURE_FIELDS,
+                sha256_fields=PUBLIC_READINESS_FIXTURE_HASH_FIELDS,
+            )
+        )
+    elif args.command == "readiness-health":
+        value = run_public_readiness_health(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=PUBLIC_READINESS_HEALTH_FIELDS,
+                sha256_fields=PUBLIC_READINESS_HEALTH_HASH_FIELDS,
+            )
+        )
+    elif args.command == "readiness-qualify":
+        value = qualify_public_readiness(args)
+        print(
+            compact_aggregate_json(
+                value,
+                allowed_fields=PUBLIC_READINESS_QUALIFICATION_FIELDS,
+                sha256_fields=PUBLIC_READINESS_QUALIFICATION_HASH_FIELDS,
             )
         )
     elif args.command == "tuple-audio-seed":
