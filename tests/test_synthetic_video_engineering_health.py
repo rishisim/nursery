@@ -156,6 +156,8 @@ def _historical_health_config() -> dict:
     config.pop("learner_effective_engineering_health_portable_AST_repair")
     config.pop("learner_effective_engineering_health_attempt_11_result")
     config.pop("learner_effective_engineering_health_fixture_bind_repair")
+    config.pop("learner_effective_engineering_health_attempt_12_result")
+    config.pop("learner_effective_engineering_health_submission_export_repair")
     return config
 
 
@@ -190,7 +192,7 @@ def _write_topology_attestation(
         "node_count": 1,
         "CPU_count": 8,
         "task_count": 1,
-        "time_limit_minutes": 60 if attempt in {8, 9, 10, 11, 12} else 15,
+        "time_limit_minutes": 60 if attempt in {8, 9, 10, 11, 12, 13} else 15,
         "memory_per_CPU_GiB": 4,
         "GRES": gres,
         "predicate_count": 7,
@@ -986,8 +988,19 @@ def test_tuple_health_budget_enforces_active_lineage_repair_attempt_and_limits()
             "direct_monetary_cost_USD": 0,
         }
     )
-    budget = MODULE._tuple_health_budget(12, prior, config)
-    assert budget["attempt"] == 12
+    prior.append(
+        {
+            "attempt": 12,
+            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_count": 1,
+            "wall_minutes": 0.05,
+            "GPU_hours": 0.0008333333333333334,
+            "new_storage_GiB": 0.0,
+            "direct_monetary_cost_USD": 0,
+        }
+    )
+    budget = MODULE._tuple_health_budget(13, prior, config)
+    assert budget["attempt"] == 13
     assert budget["GPU_type"] == MODULE._engineering_health_resource_policy(config)[
         "GPU_type"
     ]
@@ -998,7 +1011,24 @@ def test_tuple_health_budget_enforces_active_lineage_repair_attempt_and_limits()
     assert budget["direct_monetary_cost_USD"] == 0
 
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ATTEMPT_BUDGET"):
-        MODULE._tuple_health_budget(13, prior, config)
+        MODULE._tuple_health_budget(14, prior, config)
+
+
+def test_attempt_12_pre_runner_failure_has_sealed_marker_free_resource() -> None:
+    resource = MODULE._tuple_health_incomplete_attempt_resource(
+        Path("/does-not-exist"), 12, _config()
+    )
+    assert resource == {
+        "GPU_type": "NVIDIA_A30_24GB",
+        "GPU_count": 1,
+        "CPU_count": 8,
+        "memory_GiB": 32,
+        "wall_minutes": 0.05,
+        "GPU_hours": 0.0008333333333333334,
+        "new_storage_GiB": 0.0,
+        "direct_monetary_cost_USD": 0,
+        "submission_started_epoch": 1785912624.0,
+    }
 
 
 @pytest.mark.parametrize(
@@ -1323,13 +1353,25 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
     )
     assert fixture_bind["active_attempt_resource_policy"]["attempt"] == 12
     assert fixture_bind["failure_specific_repair"]["bind_mode"] == "READ_ONLY"
+    attempt_12 = MODULE._engineering_health_attempt_12_result(config)
+    assert attempt_12["blocker_commitment_sha256"] == (
+        "5471156337683b5b3695ee26ea9acfa1c658acfb8400a6c681538eecf6e948bc"
+    )
+    assert attempt_12["submission_provenance"]["job_id"] == 316878
+    assert attempt_12["stable_aggregate_diagnosis"]["runner_entry_count"] == 0
+    export_repair = MODULE._engineering_health_submission_export_repair(config)
+    assert export_repair["repair_commitment_sha256"] == (
+        "e700576735251403138e34fa9918fa2ab0e3d723e2252871302fcd4da77516ba"
+    )
+    assert export_repair["active_attempt_resource_policy"]["attempt"] == 13
+    assert export_repair["failure_specific_repair"]["required_export_value"] == "60"
     effective = MODULE._engineering_health_resource_policy(config)
     assert effective["per_submission_wall_minutes_max"] == 60
-    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 12
+    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 13
 
     with pytest.raises(
         RuntimeError,
-        match="E_TUPLE_HEALTH_FIXTURE_BIND_REPAIR_ATTEMPT",
+        match="E_TUPLE_HEALTH_SUBMISSION_EXPORT_REPAIR_ATTEMPT",
     ):
         MODULE.run_tuple_health(
             argparse.Namespace(
@@ -1630,6 +1672,35 @@ def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
         cfg=_config(),
     )
     assert commitment == MODULE.file_digest(attempt_12_attestation)
+
+    attempt_13_gpu_type = MODULE._engineering_health_submission_export_repair(
+        _config()
+    )["active_attempt_resource_policy"]["GPU_type"]
+    attempt_13_name, attempt_13_memory = device_by_type[attempt_13_gpu_type]
+    attempt_13_cuda = SimpleNamespace(
+        device_count=lambda: 1,
+        get_device_name=lambda _index: attempt_13_name,
+        get_device_properties=lambda _index: SimpleNamespace(
+            total_memory=attempt_13_memory * 1024**3
+        ),
+    )
+    monkeypatch.setitem(
+        sys.modules, "torch", SimpleNamespace(cuda=attempt_13_cuda)
+    )
+    attempt_13_attestation = _write_topology_attestation(
+        tmp_path / "attempt-13",
+        monkeypatch,
+        attempt=13,
+        job_id=316879,
+        gpu_type=attempt_13_gpu_type,
+    )
+    commitment = MODULE._tuple_health_topology(
+        "cuda",
+        topology_attestation=attempt_13_attestation,
+        attempt=13,
+        cfg=_config(),
+    )
+    assert commitment == MODULE.file_digest(attempt_13_attestation)
 
     bad = json.loads(attestation.read_text())
     bad["task_count"] = 2
@@ -1987,6 +2058,10 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop("learner_effective_engineering_health_attempt_11_result")
     historical_config.pop(
         "learner_effective_engineering_health_fixture_bind_repair"
+    )
+    historical_config.pop("learner_effective_engineering_health_attempt_12_result")
+    historical_config.pop(
+        "learner_effective_engineering_health_submission_export_repair"
     )
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)

@@ -680,3 +680,11 @@ three sealed records before the bind and exposes only a path-free attestation;
 it neither copies nor modifies either tree. One complete attempt 12 is frozen
 on one A30, one process, eight CPUs, 32 GiB, 60 minutes/1 GPU-hour, 1 GiB new
 storage, and $0. Public science stays locked pending a committed 7/7 pass.
+
+Attempt 12, Juno job 316878, then failed after 3 seconds before runner entry.
+Eight of nine required health exports were present; the submission omitted the
+already-required `PHASE4_HEALTH_WALL_MINUTES=60`, so the wrapper failed closed
+with exit 64 and opened no module or scientific output. Engineering blocker
+`54711563…e948bc` preserves that result. Prospective schema-35 repair
+`e7005767…516ba` adds only the missing export and freezes one complete attempt
+13 on the earliest scheduler-eligible compatible zero-cost A30 topology.

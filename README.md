@@ -623,3 +623,11 @@ emits only a path-free attestation, and leaves both roots untouched. Attempt 12
 uses one A30, one process, eight CPUs, 32 GiB, a 60-minute/1-GPU-hour ceiling,
 1 GiB new storage, and $0. Scientific development remains locked until a
 committed 7/7 engineering-health pass.
+
+Attempt 12, Juno job 316878, failed after 3 seconds before its runner marker or
+any scientific metric. The submission supplied eight of nine wrapper-required
+health fields and omitted `PHASE4_HEALTH_WALL_MINUTES`; the wrapper correctly
+failed closed with exit 64. Blocker `54711563…e948bc` preserves the zero-output
+engineering result. Schema 35 freezes only the missing `60`-minute export and
+one complete attempt 13 at repair `e7005767…516ba`; the sealed fixtures,
+models, metrics, thresholds, and downstream rules remain unchanged.

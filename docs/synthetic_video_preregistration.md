@@ -2127,3 +2127,12 @@ checks the three sealed record sizes and hashes before mounting and emits only
 a path-free attestation. Attempt 12 is frozen on one A30, one process, eight
 CPUs, 32 GiB, a 60-minute/1-GPU-hour ceiling, 1 GiB new storage, and $0. All
 scientific metrics remain withheld unless the complete 7/7 health suite passes.
+
+Attempt 12, Juno job 316878, failed after 3 seconds before runner entry,
+module execution, or scientific metric release. Its submission carried eight
+of nine required health exports but omitted the wrapper's pre-existing
+`PHASE4_HEALTH_WALL_MINUTES=60` contract; exit 64 therefore records an
+engineering submission failure. Blocker `54711563…e948bc` preserves the
+zero-output result. Before another outcome, schema 35 freezes repair
+`e7005767…516ba`: add exactly that missing export and run one complete attempt
+13 on one A30 under the unchanged 60-minute/1-GPU-hour, one-process, $0 limits.
