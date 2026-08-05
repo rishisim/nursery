@@ -93,8 +93,8 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["schema_version"] == 12
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_REAUTHORIZED_ATTEMPT_4_BLOCKER_SEALED_NO_SCIENTIFIC_OUTCOME_NO_ATTEMPT_5"
+    assert result["schema_version"] == 13
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_4_BLOCKER_PRESERVED_PARSER_REPAIR_REAUTHORIZATION_FROZEN_PENDING_ATTEMPT_5_NO_NEW_SCIENTIFIC_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -148,6 +148,13 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert terminal_reauthorization["full_result_count"] == 0
     assert terminal_reauthorization["scientific_metric_count"] == 0
     assert terminal_reauthorization["attempt_5_authorized"] is False
+    parser_repair = result[
+        "learner_effective_engineering_health_parser_repair_reauthorization"
+    ]
+    assert parser_repair["attempt"] == 5
+    assert parser_repair["attempt_4_blocker_sha256"] == (
+        terminal_reauthorization["blocker_commitment_sha256"]
+    )
     runner = result["construct_aligned_public_runner_implementation_result"]
     assert runner["status"].startswith("PASS_")
     assert runner["implementation_source_sha256"] == (
@@ -449,7 +456,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_REAUTHORIZED_ATTEMPT_4_BLOCKER_SEALED_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED_NO_ATTEMPT_5"
+    assert proof["status"] == "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_4_BLOCKER_PRESERVED_PARSER_BOUND_REPAIR_FROZEN_BEFORE_SINGLE_POST_BLOCKER_ATTEMPT_5_OR_NEW_SCIENTIFIC_OUTCOME"
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["repair_commitment_sha256"] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
     assert geometry_repair["triggering_attempt"]["public_model_inference_executed"] is False
@@ -574,6 +581,36 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
         "scientific_metric_count"
     ] == 0
     assert terminal_reauthorization["terminal_gate"]["attempt_5_authorized"] is False
+    parser_repair = dict(
+        proof[
+            "learner_effective_engineering_health_parser_repair_reauthorization"
+        ]
+    )
+    parser_repair_commitment = parser_repair.pop(
+        "reauthorization_commitment_sha256"
+    )
+    assert parser_repair_commitment == digest(parser_repair)
+    assert parser_repair_commitment == (
+        "d9cf3feaa0f5c4d65978ca796b722f31e75ce1078b918d114ca35b298a148c8b"
+    )
+    assert parser_repair["preserved_without_change"][
+        "attempt_4_blocker_sha256"
+    ] == terminal_reauthorization_commitment
+    assert parser_repair["failure_specific_repair"]["new_parser_choices"] == [
+        1,
+        2,
+        3,
+        5,
+    ]
+    assert parser_repair["failure_specific_repair"][
+        "attempt_4_remains_rejected_and_sealed"
+    ] is True
+    assert parser_repair["effective_resource_policy"][
+        "reauthorized_attempt"
+    ] == 5
+    assert parser_repair["execution_and_stop_rule"][
+        "repair_or_resmoke_cycles_after_attempt_5"
+    ] == 0
     assert health["unchanged_downstream_contract"]["accepted_synthetic_seconds_exact"] == 3600
     assert proof["budgets_credited_hours"] == {
         "real": 1,
@@ -591,7 +628,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
-    assert proof["schema_version"] == 24
+    assert proof["schema_version"] == 25
     premodel = proof["calibration_C"]["extractor"]["mechanistic_training_tuple_premodel_result"]
     assert premodel["dependency_manifest_commitment_sha256"] == (
         "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"

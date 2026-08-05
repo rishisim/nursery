@@ -1905,6 +1905,21 @@ cumulative protocol slice-GPU-hours, 1,092 new bytes, and $0. Attempt 5 and all
 public development/holdout, governed C, LTX, generation, and synthetic-learner
 work are unauthorized under this route.
 
+After inspecting that seal, the user made a new prospective authorization at
+commitment `d9cf3fea…48c8b`. Exactly one post-blocker submission is permitted.
+The failure-specific repair changes the committed CLI choices from 1/2/3 to
+1/2/3/5 and makes the wrapper accept only attempt 5; attempt 4 remains rejected
+and its blocker is neither deleted nor reinterpreted. The exact public inputs,
+models, preprocessing, thresholds, metrics, seeds, production paths,
+attestation, zero-metric withholding, and downstream gates remain unchanged.
+
+Attempt 5 uses one H100 NVL `3g.47gb` slice, one process, eight CPUs, 32 GiB,
+and a 15-minute wall cap. Its additional ceilings are 0.25 slice-GPU-hours,
+1 GiB, and $0, giving a cumulative protocol ceiling of 1.004019
+slice-GPU-hours. It must restart the full 28-case two-replicate suite. Any
+engineering failure seals a new blocker with no attempt 6; only a committed
+7/7 pass authorizes public development.
+
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only
 holdout result is a scientific no-go. Governed C remains conditional on a full

@@ -537,6 +537,16 @@ slice-GPU-hour, bringing the protocol total to 0.754019 slice-GPU-hours and $0.
 This is an engineering blocker, not a scientific no-go; the route is exhausted
 with no attempt 5 and all downstream stages remain unauthorized.
 
+The user subsequently authorized a distinct one-submission parser-bound repair
+at commitment `d9cf3fea…48c8b`. It adds global attempt 5 to the CLI and moves
+the wrapper to attempt 5 while keeping attempt 4 invalid and its blocker final.
+No model, weight, fixture, preprocessing, threshold, metric, seed, module path,
+or scientific gate changes. The topology remains one H100 NVL `3g.47gb`
+slice, eight CPUs, 32 GiB, and 15 minutes, with at most 0.25 additional
+slice-GPU-hours, 1 GiB, and $0. The full 28-case suite must restart; only a
+committed 7/7 pass may open development, and no repair or attempt 6 follows a
+failure.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

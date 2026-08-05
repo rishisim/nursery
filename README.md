@@ -352,6 +352,15 @@ uses the full 0.25 slice-GPU-hour allowance; cumulative protocol accounting is
 0.754019 slice-GPU-hours at $0. No attempt 5, public development/holdout,
 governed C, LTX work, generation, or Synthetic-1h is authorized.
 
+After reviewing that terminal record, the user explicitly authorized one new
+prospective post-blocker submission at commitment `d9cf3fea…48c8b`. The only
+repair changes the `tuple-health --attempt` choices from 1/2/3 to 1/2/3/5 and
+the wrapper from attempt 4 to attempt 5; attempt 4 remains rejected and sealed.
+The same H100 NVL `3g.47gb` slice, eight CPUs, 32 GiB, 15-minute wall cap,
+28-case suite, public artifacts, offline controls, zero-metric withholding, and
+scientific gates remain fixed. The added ceiling is 0.25 slice-GPU-hours,
+1 GiB, and $0. There is no post-attempt repair or attempt 6.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

@@ -46,6 +46,7 @@ def _historical_health_config() -> dict:
     config.pop("learner_effective_engineering_health_result")
     config.pop("learner_effective_engineering_health_reauthorization")
     config.pop("learner_effective_engineering_health_reauthorization_result")
+    config.pop("learner_effective_engineering_health_parser_repair_reauthorization")
     return config
 
 
@@ -598,7 +599,7 @@ def test_tuple_health_metric_release_requires_seven_unique_passed_modules() -> N
         MODULE._tuple_health_metric_release(wrong_status, scientific)
 
 
-def test_tuple_health_budget_enforces_single_reauthorized_attempt_and_limits() -> None:
+def test_tuple_health_budget_enforces_single_parser_repair_attempt_and_limits() -> None:
     config = _config()
     prior = [
         {
@@ -628,9 +629,18 @@ def test_tuple_health_budget_enforces_single_reauthorized_attempt_and_limits() -
             "new_storage_GiB": 1.1119991540908813e-06,
             "direct_monetary_cost_USD": 0,
         },
+        {
+            "attempt": 4,
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+            "GPU_count": 1,
+            "wall_minutes": 15.0,
+            "GPU_hours": 0.25,
+            "new_storage_GiB": 1.0170042514801025e-06,
+            "direct_monetary_cost_USD": 0,
+        },
     ]
-    budget = MODULE._tuple_health_budget(4, prior, config)
-    assert budget["attempt"] == 4
+    budget = MODULE._tuple_health_budget(5, prior, config)
+    assert budget["attempt"] == 5
     assert budget["GPU_type"] == "NVIDIA_H100_NVL_3G_47GB_MIG"
     assert budget["GPU_count"] == 1
     assert budget["per_submission_wall_minutes_max"] == 15
@@ -639,7 +649,7 @@ def test_tuple_health_budget_enforces_single_reauthorized_attempt_and_limits() -
     assert budget["direct_monetary_cost_USD"] == 0
 
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ATTEMPT_BUDGET"):
-        MODULE._tuple_health_budget(5, prior, config)
+        MODULE._tuple_health_budget(6, prior, config)
 
 
 @pytest.mark.parametrize(
@@ -648,7 +658,7 @@ def test_tuple_health_budget_enforces_single_reauthorized_attempt_and_limits() -
         ("GPU_type", "NVIDIA_A30_24GB", "E_TUPLE_HEALTH_GPU_TOPOLOGY"),
         ("GPU_count", 2, "E_TUPLE_HEALTH_GPU_TOPOLOGY"),
         ("wall_minutes", 15.1, "E_TUPLE_HEALTH_WALL_BUDGET"),
-        ("GPU_hours", 0.8, "E_TUPLE_HEALTH_GPU_HOUR_BUDGET"),
+        ("GPU_hours", 1.1, "E_TUPLE_HEALTH_GPU_HOUR_BUDGET"),
         ("new_storage_GiB", 1.1, "E_TUPLE_HEALTH_STORAGE_BUDGET"),
         ("direct_monetary_cost_USD", 0.01, "E_TUPLE_HEALTH_COST_BUDGET"),
     ],
@@ -823,7 +833,27 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
     ] is True
     assert terminal_reauthorization["terminal_gate"]["attempt_5_authorized"] is False
 
-    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ROUTE_EXHAUSTED"):
+    parser_repair = MODULE._engineering_health_parser_repair_reauthorization(
+        config
+    )
+    assert parser_repair["reauthorization_commitment_sha256"] == (
+        "d9cf3feaa0f5c4d65978ca796b722f31e75ce1078b918d114ca35b298a148c8b"
+    )
+    assert parser_repair["failure_specific_repair"]["new_parser_choices"] == [
+        1,
+        2,
+        3,
+        5,
+    ]
+    assert parser_repair["effective_resource_policy"]["reauthorized_attempt"] == 5
+    assert parser_repair["execution_and_stop_rule"][
+        "repair_or_resmoke_cycles_after_attempt_5"
+    ] == 0
+
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_HEALTH_PARSER_REPAIR_REAUTHORIZED_ATTEMPT",
+    ):
         MODULE.run_tuple_health(
             argparse.Namespace(
                 public_root=tmp_path / "public",
@@ -867,6 +897,20 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
         match="E_TUPLE_HEALTH_REAUTHORIZATION_RESULT_COMMITMENT",
     ):
         MODULE._engineering_health_reauthorization_result(mutated)
+
+    mutated = json.loads(json.dumps(config))
+    parser_repair = mutated[
+        "learner_effective_engineering_health_parser_repair_reauthorization"
+    ]
+    parser_repair["failure_specific_repair"]["attempt_4_remains_rejected_and_sealed"] = False
+    payload = json.loads(json.dumps(parser_repair))
+    payload.pop("reauthorization_commitment_sha256")
+    parser_repair["reauthorization_commitment_sha256"] = MODULE.digest(payload)
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_HEALTH_PARSER_REPAIR_REAUTHORIZATION_COMMITMENT",
+    ):
+        MODULE._engineering_health_parser_repair_reauthorization(mutated)
 
 
 def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
@@ -963,7 +1007,13 @@ def test_tuple_health_cli_emits_one_exact_allowlisted_line(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     compact = MODULE._tuple_health_compact(_healthy_full())
-    monkeypatch.setattr(MODULE, "run_tuple_health", lambda _args: compact)
+    observed_attempts: list[int] = []
+
+    def run_health(args: argparse.Namespace) -> dict:
+        observed_attempts.append(args.attempt)
+        return compact
+
+    monkeypatch.setattr(MODULE, "run_tuple_health", run_health)
     monkeypatch.setattr(
         sys,
         "argv",
@@ -977,13 +1027,14 @@ def test_tuple_health_cli_emits_one_exact_allowlisted_line(
             "--config",
             str(tmp_path / "config.json"),
             "--attempt",
-            "1",
+            "5",
             "--device",
             "cuda",
         ],
     )
     MODULE.main()
     lines = capsys.readouterr().out.splitlines()
+    assert observed_attempts == [5]
     assert len(lines) == 1
     assert set(json.loads(lines[0])) == set(MODULE.TUPLE_HEALTH_FIELDS)
 
@@ -1065,6 +1116,7 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop("learner_effective_engineering_health_result")
     historical_config.pop("learner_effective_engineering_health_reauthorization")
     historical_config.pop("learner_effective_engineering_health_reauthorization_result")
+    historical_config.pop("learner_effective_engineering_health_parser_repair_reauthorization")
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)
     manifest = _fixture_manifest()

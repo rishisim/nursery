@@ -584,6 +584,9 @@ ENGINEERING_HEALTH_REAUTHORIZATION_SHA256 = (
 ENGINEERING_HEALTH_REAUTHORIZATION_BLOCKER_SHA256 = (
     "59b1778b35cedd1cb020177e41fe6887371a5480f7ee6bf6e57f55d4c90edde3"
 )
+ENGINEERING_HEALTH_PARSER_REPAIR_REAUTHORIZATION_SHA256 = (
+    "d9cf3feaa0f5c4d65978ca796b722f31e75ce1078b918d114ca35b298a148c8b"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -639,7 +642,7 @@ def _construct_aligned_ltx_resume_amendment(
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22, 23, 24}
+        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
         or value.get("status")
         != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     ):
@@ -697,7 +700,7 @@ def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25}
         or value.get("status")
         != "FROZEN_BEFORE_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -766,7 +769,7 @@ def _engineering_health_resource_redirect(
     payload = json.loads(json.dumps(value))
     expected = payload.pop("amendment_commitment_sha256", None)
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25}
         or value.get("status")
         != "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "SCHEDULER_AND_RESOURCE_LATENCY_ONLY"
@@ -856,6 +859,10 @@ def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
     redirect = _engineering_health_resource_redirect(cfg)
     _engineering_health_dependency_restore(cfg)
     _engineering_health_topology_guard_repair(cfg)
+    if "learner_effective_engineering_health_parser_repair_reauthorization" in cfg:
+        return _engineering_health_parser_repair_reauthorization(cfg)[
+            "effective_resource_policy"
+        ]
     if "learner_effective_engineering_health_reauthorization" in cfg:
         return _engineering_health_reauthorization(cfg)[
             "effective_resource_policy"
@@ -899,7 +906,7 @@ def _engineering_health_dependency_restore(
         ["transformers", "4.57.6"],
     ]
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_DEPENDENCY_CACHE_MISS_BEFORE_ATTEMPT_2_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1004,7 +1011,7 @@ def _engineering_health_topology_guard_repair(
     repair = value.get("repair", {})
     budget = value.get("remaining_health_budget", {})
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_2_REDUNDANT_TOPOLOGY_GUARD_FAILURE_BEFORE_ATTEMPT_3_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1087,7 +1094,7 @@ def _engineering_health_terminal_result(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {22, 23, 24}
+        cfg.get("schema_version") not in {22, 23, 24, 25}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ROUTE_EXHAUSTED_BEFORE_MODEL_INFERENCE_NO_SCIENTIFIC_METRICS_OPENED"
         or expected != ENGINEERING_HEALTH_BLOCKER_SHA256
@@ -1163,7 +1170,7 @@ def _engineering_health_reauthorization(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("effective_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") not in {23, 24}
+        cfg.get("schema_version") not in {23, 24, 25}
         or value.get("status")
         != "FROZEN_AFTER_SEALED_BLOCKER_BEFORE_REAUTHORIZED_ATTEMPT_4_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope")
@@ -1278,7 +1285,7 @@ def _engineering_health_reauthorization_result(
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") != 24
+        cfg.get("schema_version") not in {24, 25}
         or value.get("status")
         != "ENGINEERING_BLOCKER_REAUTHORIZED_ATTEMPT_4_EXHAUSTED_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -1369,6 +1376,95 @@ def _engineering_health_reauthorization_result(
         )
     ):
         raise RuntimeError("E_TUPLE_HEALTH_REAUTHORIZATION_RESULT_COMMITMENT")
+    return value
+
+
+def _engineering_health_parser_repair_reauthorization(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the sole post-attempt-4 parser-bound repair route."""
+
+    terminal = _engineering_health_reauthorization_result(cfg)
+    try:
+        value = cfg[
+            "learner_effective_engineering_health_parser_repair_reauthorization"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError(
+            "E_TUPLE_HEALTH_PARSER_REPAIR_REAUTHORIZATION_MISSING"
+        ) from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("reauthorization_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    repair = value.get("failure_specific_repair", {})
+    resource = value.get("effective_resource_policy", {})
+    execution = value.get("execution_and_stop_rule", {})
+    if (
+        cfg.get("schema_version") != 25
+        or value.get("status")
+        != "FROZEN_AFTER_ATTEMPT_4_BLOCKER_BEFORE_SINGLE_POST_BLOCKER_ATTEMPT_5_OR_NEW_SCIENTIFIC_OUTCOME"
+        or value.get("scope") != "ONE_SUBMISSION_CLI_ATTEMPT_BOUND_REPAIR_ONLY"
+        or expected != ENGINEERING_HEALTH_PARSER_REPAIR_REAUTHORIZATION_SHA256
+        or digest(payload) != expected
+        or value.get("reauthorization_commitment_scope")
+        != "canonical JSON of this amendment excluding reauthorization_commitment_sha256"
+        or preserved.get("attempt_3_blocker_sha256")
+        != ENGINEERING_HEALTH_BLOCKER_SHA256
+        or preserved.get("attempt_4_reauthorization_sha256")
+        != ENGINEERING_HEALTH_REAUTHORIZATION_SHA256
+        or preserved.get("attempt_4_blocker_sha256")
+        != terminal["blocker_commitment_sha256"]
+        or preserved.get("prior_public_development_no_go_sha256")
+        != "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
+        or preserved.get("public_fixture_manifest_sha256")
+        != "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6"
+        or preserved.get(
+            "models_weights_fixtures_preprocessing_thresholds_metrics_seeds_module_behavior_scientific_gates_and_downstream_contract"
+        )
+        is not True
+        or repair.get("old_parser_choices") != [1, 2, 3]
+        or repair.get("new_parser_choices") != [1, 2, 3, 5]
+        or repair.get("attempt_4_remains_rejected_and_sealed") is not True
+        or repair.get("wrapper_health_attempt") != 5
+        or repair.get("runner_authorized_attempt") != 5
+        or repair.get("same_complete_28_case_two_replicate_production_paths")
+        is not True
+        or repair.get("same_compact_wrapper_topology_attestation") is not True
+        or repair.get("runner_scontrol_subprocess_inside_container") is not False
+        or repair.get("mocks_or_shallow_load_path") is not False
+        or repair.get("scientific_metric_count") != 0
+        or repair.get("holdout_input_count") != 0
+        or repair.get("model_fixture_threshold_metric_seed_or_gate_changed")
+        is not False
+        or resource
+        != {
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+            "GPU_count": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "DDP": False,
+            "per_submission_wall_minutes_max": 15,
+            "initial_plus_repair_resmoke_submission_count_max": 5,
+            "reauthorized_attempt": 5,
+            "reauthorized_submission_count": 1,
+            "prior_protocol_accounted_GPU_hours": 0.754019171529346,
+            "reauthorized_GPU_hours_max": 0.25,
+            "aggregate_GPU_hours_max": 1.004019171529346,
+            "prior_health_run_storage_GiB": 2.419576048851013e-06,
+            "reauthorized_new_storage_GiB_max": 1.0,
+            "new_storage_GiB_max": 1.0000024195760489,
+            "direct_monetary_cost_USD": 0,
+        }
+        or execution.get("prospective_commit_and_push_required_before_submission")
+        is not True
+        or execution.get("attempt_ordinal") != 5
+        or execution.get("submission_count") != 1
+        or execution.get("repair_or_resmoke_cycles_after_attempt_5") != 0
+        or execution.get("complete_suite_restart_required") is not True
+        or execution.get("metric_withholding_unchanged") is not True
+        or value.get("new_health_or_scientific_outcome_opened") is not False
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_PARSER_REPAIR_REAUTHORIZATION_COMMITMENT")
     return value
 
 
@@ -10606,10 +10702,14 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
     """Run the bounded production-path microqualification with zero metrics."""
 
     cfg = json.loads(args.config.read_text())
-    if "learner_effective_engineering_health_reauthorization_result" in cfg:
+    if "learner_effective_engineering_health_parser_repair_reauthorization" in cfg:
+        _engineering_health_parser_repair_reauthorization(cfg)
+        if int(args.attempt) != 5:
+            raise RuntimeError("E_TUPLE_HEALTH_PARSER_REPAIR_REAUTHORIZED_ATTEMPT")
+    elif "learner_effective_engineering_health_reauthorization_result" in cfg:
         _engineering_health_reauthorization_result(cfg)
         raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
-    if "learner_effective_engineering_health_result" in cfg:
+    elif "learner_effective_engineering_health_result" in cfg:
         if "learner_effective_engineering_health_reauthorization" not in cfg:
             _engineering_health_terminal_result(cfg)
             raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
@@ -10864,10 +10964,12 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
 def _load_tuple_health_pass(
     public: Path, cfg: dict[str, Any], fixture_commitment: str
 ) -> dict[str, Any]:
-    if "learner_effective_engineering_health_reauthorization_result" in cfg:
+    if "learner_effective_engineering_health_parser_repair_reauthorization" in cfg:
+        _engineering_health_parser_repair_reauthorization(cfg)
+    elif "learner_effective_engineering_health_reauthorization_result" in cfg:
         _engineering_health_reauthorization_result(cfg)
         raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
-    if "learner_effective_engineering_health_result" in cfg:
+    elif "learner_effective_engineering_health_result" in cfg:
         if "learner_effective_engineering_health_reauthorization" not in cfg:
             _engineering_health_terminal_result(cfg)
             raise RuntimeError("E_TUPLE_HEALTH_ROUTE_EXHAUSTED")
@@ -20850,7 +20952,7 @@ def main() -> None:
     tuple_health_parser.add_argument("--scratch-root", type=Path, required=True)
     tuple_health_parser.add_argument("--config", type=Path, required=True)
     tuple_health_parser.add_argument(
-        "--attempt", type=int, choices=(1, 2, 3), required=True
+        "--attempt", type=int, choices=(1, 2, 3, 5), required=True
     )
     tuple_health_parser.add_argument("--device", default="cuda")
     tuple_qualify_parser = subparsers.add_parser("tuple-qualify")

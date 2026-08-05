@@ -1,7 +1,7 @@
 {
-  "schema_version": 12,
+  "schema_version": 13,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_REAUTHORIZED_ATTEMPT_4_BLOCKER_SEALED_NO_SCIENTIFIC_OUTCOME_NO_ATTEMPT_5",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_4_BLOCKER_PRESERVED_PARSER_REPAIR_REAUTHORIZATION_FROZEN_PENDING_ATTEMPT_5_NO_NEW_SCIENTIFIC_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -702,6 +702,28 @@
     "LTX_or_synthetic_learner_run": false,
     "new_scientific_outcome_opened": false
   },
+  "learner_effective_engineering_health_parser_repair_reauthorization": {
+    "status": "FROZEN_AFTER_ATTEMPT_4_BLOCKER_BEFORE_SINGLE_POST_BLOCKER_ATTEMPT_5_OR_NEW_SCIENTIFIC_OUTCOME",
+    "effective_on": "2026-08-04",
+    "canonical_source": "configs/synthetic_video_real_only_proof.json#learner_effective_engineering_health_parser_repair_reauthorization",
+    "reauthorization_commitment_sha256": "d9cf3feaa0f5c4d65978ca796b722f31e75ce1078b918d114ca35b298a148c8b",
+    "attempt_4_blocker_sha256": "59b1778b35cedd1cb020177e41fe6887371a5480f7ee6bf6e57f55d4c90edde3",
+    "scope": "ONE_SUBMISSION_CLI_ATTEMPT_BOUND_REPAIR_ONLY",
+    "attempt": 5,
+    "submission_count": 1,
+    "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+    "GPU_count": 1,
+    "CPU_count": 8,
+    "memory_GiB": 32,
+    "wall_minutes_max": 15,
+    "reauthorized_GPU_hours_max": 0.25,
+    "aggregate_protocol_GPU_hours_max": 1.004019171529346,
+    "reauthorized_new_storage_GiB_max": 1.0,
+    "direct_monetary_cost_USD": 0,
+    "attempt_4_remains_rejected_and_sealed": true,
+    "model_fixture_threshold_metric_seed_or_gate_changed": false,
+    "new_health_or_scientific_outcome_opened": false
+  },
   "governed_C_calibration": {
     "status": "NO_GO",
     "topology": "1_H100",
@@ -1277,5 +1299,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "NONE_UNDER_THIS_FROZEN_ROUTE; ATTEMPT_4_EXHAUSTED_ENGINEERING_HEALTH_AND_PUBLIC_DEVELOPMENT_HOLDOUT_GOVERNED_C_LTX_GENERATION_AND_SYNTHETIC_LEARNER_REMAIN_UNAUTHORIZED"
+  "next_authorized_scope": "COMMIT_AND_PUSH_THE_SINGLE_SUBMISSION_CLI_ATTEMPT_BOUND_REPAIR_THEN_RUN_EXACTLY_ONE_H100_ATTEMPT_5; ONLY_A_COMMITTED_ALL_MODULE_PASS_AUTHORIZES_PUBLIC_DEVELOPMENT_AND_ANY_FAILURE_SEALS_A_NEW_ENGINEERING_BLOCKER_WITH_NO_ATTEMPT_6"
 }

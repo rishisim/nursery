@@ -1,6 +1,6 @@
 {
-  "schema_version": 24,
-  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_REAUTHORIZED_ATTEMPT_4_BLOCKER_SEALED_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED_NO_ATTEMPT_5",
+  "schema_version": 25,
+  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_4_BLOCKER_PRESERVED_PARSER_BOUND_REPAIR_FROZEN_BEFORE_SINGLE_POST_BLOCKER_ATTEMPT_5_OR_NEW_SCIENTIFIC_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -1358,6 +1358,71 @@
     "blocker_commitment_scope": "canonical JSON of this terminal result excluding blocker_commitment_sha256",
     "blocker_commitment_sha256": "59b1778b35cedd1cb020177e41fe6887371a5480f7ee6bf6e57f55d4c90edde3"
   },
+  "learner_effective_engineering_health_parser_repair_reauthorization": {
+    "status": "FROZEN_AFTER_ATTEMPT_4_BLOCKER_BEFORE_SINGLE_POST_BLOCKER_ATTEMPT_5_OR_NEW_SCIENTIFIC_OUTCOME",
+    "effective_on": "2026-08-04",
+    "authorization": "explicit user selection of one new prospective post-blocker submission after reviewing sealed attempt-4 blocker 59b1778b…0edde3",
+    "scope": "ONE_SUBMISSION_CLI_ATTEMPT_BOUND_REPAIR_ONLY",
+    "preserved_without_change": {
+      "attempt_3_blocker_sha256": "644028babc768e881276fa078b95349ba77f8418cb76d722e8baf2588f9d0f81",
+      "attempt_4_reauthorization_sha256": "3271499c19a77ffab8c53e2cd2052ea14514682a3d4b73fd7c5179ceec4a7ff4",
+      "attempt_4_blocker_sha256": "59b1778b35cedd1cb020177e41fe6887371a5480f7ee6bf6e57f55d4c90edde3",
+      "prior_public_development_no_go_sha256": "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf",
+      "public_fixture_manifest_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "verified_no_hand_seal_sha256": "a58ca3f10fd72ba2a7bfc2faf9c8c65b22a22913fcf2c92786859401b8d21c97",
+      "corrected_lexical_asset_sha256": "3798fafcfc7cc57da80434bac622cd6540ff0e6eea70e10813b720616c8d17b4",
+      "corrected_temporal_asset_sha256": "3cc29f32628cc0c40defeb94de2056aa9ad3a7dd47dca6cf170801024e6ee46e",
+      "formal_real_1h_positive_control_status": "FAILED_NOT_REINTERPRETED",
+      "models_weights_fixtures_preprocessing_thresholds_metrics_seeds_module_behavior_scientific_gates_and_downstream_contract": true
+    },
+    "failure_specific_repair": {
+      "diagnosed_failure": "the committed tuple-health CLI accepted attempts 1 2 and 3 while the prospectively authorized wrapper invoked global attempt 4",
+      "old_parser_choices": [1, 2, 3],
+      "new_parser_choices": [1, 2, 3, 5],
+      "attempt_4_remains_rejected_and_sealed": true,
+      "wrapper_health_attempt": 5,
+      "runner_authorized_attempt": 5,
+      "same_complete_28_case_two_replicate_production_paths": true,
+      "same_compact_wrapper_topology_attestation": true,
+      "runner_scontrol_subprocess_inside_container": false,
+      "mocks_or_shallow_load_path": false,
+      "scientific_metric_count": 0,
+      "holdout_input_count": 0,
+      "model_fixture_threshold_metric_seed_or_gate_changed": false
+    },
+    "effective_resource_policy": {
+      "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "DDP": false,
+      "per_submission_wall_minutes_max": 15,
+      "initial_plus_repair_resmoke_submission_count_max": 5,
+      "reauthorized_attempt": 5,
+      "reauthorized_submission_count": 1,
+      "prior_protocol_accounted_GPU_hours": 0.754019171529346,
+      "reauthorized_GPU_hours_max": 0.25,
+      "aggregate_GPU_hours_max": 1.004019171529346,
+      "prior_health_run_storage_GiB": 2.419576048851013e-06,
+      "reauthorized_new_storage_GiB_max": 1.0,
+      "new_storage_GiB_max": 1.0000024195760489,
+      "direct_monetary_cost_USD": 0
+    },
+    "execution_and_stop_rule": {
+      "prospective_commit_and_push_required_before_submission": true,
+      "attempt_ordinal": 5,
+      "submission_count": 1,
+      "repair_or_resmoke_cycles_after_attempt_5": 0,
+      "complete_suite_restart_required": true,
+      "metric_withholding_unchanged": true,
+      "PASS_rule": "all seven modules complete with zero failures invalid retained records silent truncations external calls or unaccounted failures",
+      "failure_rule": "any engineering failure seals a new exact ENGINEERING_BLOCKER with no attempt 6; a valid complete below-threshold result can occur only in later scientific qualification",
+      "downstream_rule": "only a committed attempt-5 all-module engineering PASS authorizes public development; all later public governed C LTX and learner gates remain unchanged and conditional"
+    },
+    "new_health_or_scientific_outcome_opened": false,
+    "reauthorization_commitment_scope": "canonical JSON of this amendment excluding reauthorization_commitment_sha256",
+    "reauthorization_commitment_sha256": "d9cf3feaa0f5c4d65978ca796b722f31e75ce1078b918d114ca35b298a148c8b"
+  },
   "governance_incident": {
     "observed_on": "2026-08-02",
     "status": "REVIEWED_NO_FURTHER_ACTION_REQUIRED_GOVERNED_PROCESSING_RESUMED",
@@ -1405,7 +1470,7 @@
   },
   "language_adapter": "frozen_language_adapter_v1_identical_real_and_synthetic",
   "calibration_C": {
-    "status": "PRIOR_CALIBRATION_NO_GOS_AND_ATTEMPT_3_BLOCKER_PRESERVED_REAUTHORIZED_ATTEMPT_4_ENGINEERING_BLOCKER_SEALED_C_LTX_AND_SYNTHETIC_LEARNER_NOT_RUN",
+    "status": "PRIOR_CALIBRATION_NO_GOS_AND_ATTEMPT_3_AND_4_BLOCKERS_PRESERVED_SINGLE_POST_BLOCKER_ATTEMPT_5_PENDING_C_LTX_AND_SYNTHETIC_LEARNER_REMAIN_CONDITIONAL_AND_NOT_RUN",
     "source": "development_set_C_only_never_training_validation_or_evaluation",
     "axes": [
       "activity_context_mixture",
@@ -1428,7 +1493,7 @@
       "pre_seal_label_semantics_correction": "/public_no_hand_review_label_semantics_correction",
       "blind_no_hand_review_seal": "/public_no_hand_review_seal_result",
       "prior_public_qualification_terminal_result": "/learner_effective_public_development_result",
-      "public_qualification_current_state": "/learner_effective_engineering_health_reauthorization_result",
+      "public_qualification_current_state": "/learner_effective_engineering_health_parser_repair_reauthorization",
       "public_qualification_resource": "/learner_effective_public_qualification_resource_amendment",
       "preserved_complete_source_no_go": "/calibration_C/extractor/mechanistic_training_tuple_visor_hos_complete_source_result",
       "governed_C_and_episode_plan_order": "/construct_aligned_ltx_resume_amendment/execution_order",
