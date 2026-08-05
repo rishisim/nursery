@@ -17,6 +17,20 @@ def test_frozen_contract_matrix_is_three_rooms_by_three_garments():
     assert len({row["scene_spec"]["room_family"] for row in matrix}) == 3
     assert len({row["avatar_spec"]["garment_configuration_id"] for row in matrix}) == 3
     assert all(row["activity_plan"]["no_seed_specific_retuning"] for row in matrix)
+    compiler = config["scene_compiler"]
+    assert compiler["target_midpoint_reach_band_m"] == [0.34, 0.38]
+    assert compiler["target_lateral_bias_toward_right_shoulder_m"] == 0.025
+    assert compiler["same_band_all_room_seeds"]
+    assert not compiler["seed_specific_retuning"]
+    assert {
+        row["scene_spec"]["reachability"]["compiled_requested_midpoint_m"]
+        for row in matrix
+    } == {0.34, 0.36, 0.38}
+    assert all(
+        row["scene_spec"]["reachability"]["compiled_midpoint_band_m"] == [0.34, 0.38]
+        and not row["scene_spec"]["reachability"]["seed_specific_retuning"]
+        for row in matrix
+    )
 
 
 def test_one_exact_clock_and_registered_capture_contract():
@@ -28,6 +42,24 @@ def test_one_exact_clock_and_registered_capture_contract():
     assert capture["resolution_px"] == [1920, 1080]
     assert capture["streams"] == ["rgb", "metric_depth", "semantic", "persistent_instance"]
     assert capture["same_frozen_frame_required"]
+
+
+def test_contact_qualification_shell_and_force_semantics_are_distinct():
+    config = load_frozen_config()
+    contact = config["qa_tolerances"]["contact"]
+    interaction = config["qa_tolerances"]["interaction"]
+    assert contact["qualification_max_measured_separation_m"] == 0.0005
+    assert contact["eligible_positive_separation_is_proximity_not_force"]
+    assert contact["rows_over_qualification_shell_preserved_as_raw_truth_only"]
+    assert contact["impulse_and_nonzero_force_semantics_reported_separately"]
+    assert "separation <= 0.0005 m" in interaction["dwell_evidence"]
+    repair = next(
+        row
+        for row in config["pre_run_contract_repairs"]
+        if row["id"] == "measured_contact_evidence_definition"
+    )
+    assert repair["prior_stage_d_dwell_and_qualification_invalidated"]
+    assert not repair["prior_stage_d_results_eligible_for_final_pass_or_robustness"]
 
 
 def test_trace_closes_corrected_bimanual_truth_gaps():

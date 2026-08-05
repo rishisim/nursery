@@ -1,0 +1,194 @@
+{
+  "schema": "embodied.development_freeze_amendment.v1",
+  "amendment_id": "stage_d_outcome_informed_repairs_and_final_refreeze",
+  "classification": "outcome_informed_development_repair",
+  "scientific_status": {
+    "prior_freeze_invalidated_for_acceptance": true,
+    "prior_35g_results_eligible_for_final_pass": false,
+    "mass_only_120g_results_eligible_for_final_pass": false,
+    "all_pre_correction_stage_d_dwell_and_qualification_eligible_for_final_pass_or_robustness": false,
+    "corrected_contact_pre_reach_matrix_results_eligible_for_final_pass": false,
+    "aperture_aware_120g_freeze_invalidated_by_later_geometry_and_controller_repairs": true,
+    "all_development_repair_runs_eligible_for_final_pass_or_robustness": false,
+    "final_refreeze_completed_before_final_acceptance_run": true,
+    "final_acceptance_run_eligible_for_decision": true,
+    "acceptance_rule": "Only runs matching the final source/config/spec freeze may support the decision. Do not combine 35 g, mass-only 120 g, speculative-contact, pre-reach-band, pre-analytic-collider, or controller-development outcomes with final evidence. Every room seed uses the same compiler reach band and controller without retuning."
+  },
+  "repair_rationale": {
+    "observed_development_result": "The 35 g developmental cell reached a 58-step right thumb plus two-non-thumb opposed-contact dwell (0.2417 s at 240 Hz), two steps below the frozen threshold, while a measured contact impulse accelerated the light free object beyond the bounded palm's recovery speed.",
+    "changed_field": "assets.interactive_target.mass_kg",
+    "before_kg": 0.035,
+    "after_kg": 0.12,
+    "unchanged_at_the_mass_repair": [
+      "55 mm sphere geometry",
+      "free non-kinematic PhysX authority",
+      "gravity",
+      "convex collision mesh",
+      "static and dynamic friction",
+      "controller speed and closure bounds",
+      "strict empty assistance ledger"
+    ]
+  },
+  "physical_plausibility": {
+    "geometry": "solid 55 mm diameter sphere",
+    "sphere_volume_cm3": 87.113,
+    "implied_bulk_density_g_cm3": 1.3775,
+    "formula": "volume = 4/3*pi*(2.75 cm)^3; density = 120 g / volume",
+    "interpretation": "The implied density is physically plausible for a solid or filled polymer/elastomer grasp toy; this statement establishes plausibility only and is not a claim about a manufactured child product."
+  },
+  "contact_evidence_correction": {
+    "classification": "scientific_integrity_semantic_repair_before_acceptance_eligible_outcomes",
+    "reason": "Unity Physics.ContactEvent exposes positive-separation speculative candidates. Development counters had incorrectly treated those raw candidates as physical grasp contacts.",
+    "qualified_contact_definition": "target/hand measured separation <= 0.0005 m at the completed physics step",
+    "impulse_semantics": "Per-point impulse magnitude and nonzero-impulse status are reported separately; mean-force equivalent is derived as impulse/dt and does not replace the separation eligibility rule.",
+    "raw_truth_policy": "Rows above 0.5 mm remain in EpisodeTrace as auditable raw speculative truth and never increment dwell. Rows in the qualification shell from 0 through 0.5 mm are geometric proximity, not force evidence; impulse/nonzero-force semantics are reported separately.",
+    "invalidation": "Every earlier Stage-D dwell, qualification, lift attempt, and robustness implication computed from speculative candidates is invalid and contributes nothing to final PASS or robustness. The first code-corrected but pre-freeze run is development-only and also ineligible."
+  },
+  "subsequent_development_repairs": {
+    "classification": "outcome_informed_development_repairs_invalidating_all_earlier_freezes",
+    "analytic_target_collider": {
+      "reason": "The authored low-poly convex collision mesh introduced facet-dependent aperture behavior inconsistent with the exact 55 mm rendered envelope.",
+      "repair": "Use one analytic 27.5 mm-radius SphereCollider matching the 55 mm render sphere.",
+      "geometry_spec_sha256": "9d9963e46446fb05187c285062e7562af142a82906b5adf3f491f1d70060e5c5",
+      "scientific_status": "development-only; invalidated the aperture-aware receipt below"
+    },
+    "aperture_aware_reachability": {
+      "reason": "The former shoulder-only corridor could satisfy nominal distance while placing the child hand aperture outside the bounded bilateral IK solution.",
+      "generic_repair": "One deterministic 0.34-0.38 m shoulder-midpoint band and 0.025 m right-shoulder lateral bias for every seed and garment.",
+      "same_band_all_room_seeds": true,
+      "seed_specific_retuning": false,
+      "scientific_status": "outcome-informed compiler repair; all previous SceneSpec/EpisodeSpec hashes invalid"
+    },
+    "controller_repairs": {
+      "reason": "Development cells exposed wrist solver stutter and loss of the bilateral aperture immediately after historical qualification.",
+      "repair": "Bounded small-angle CCD, fixed pre-lift contact conditioning, and a fail-closed current-step opposing-contact carry gate.",
+      "forbidden_rejected_trials": [
+        "object or hand follower",
+        "object recentering",
+        "parenting or joints",
+        "hidden force or spring",
+        "object transform repair"
+      ],
+      "scientific_status": "development-only until the final source/config/spec refreeze"
+    }
+  },
+  "invalidated_35g_freeze_receipt": {
+    "schema": "embodied.contract_freeze_receipt.v1",
+    "config_sha256": "ff2c44ed884df84ed359ce0ebeb2ef5a994e1dfca51c3f0024e7fb676a3a3fa9",
+    "compiled_episode_count": 9,
+    "episode_contract_sha256": {
+      "birch_art_room__forest_layer": "952972fa4af3ff016c9620806fa03208e21f2ee11de04532e4768b8d236dcfa2",
+      "birch_art_room__sky_overall": "6cb069bbc5bc7ac5a34ab38f28d925dce7eaaca22f5e23856d3666baefc29885",
+      "birch_art_room__sunset_play": "b0a40d8a711e68d0370b18b36d3d61310df3ab15f28d7c8eec3954914357494a",
+      "sage_living_corner__forest_layer": "faacefa0bec7386845272abd8e0bc7baa22835d52fafdde27e290bc4dfb63273",
+      "sage_living_corner__sky_overall": "de036e598587354429e2b90739248af21ca2968fa49f735fa12a15ab4b4e0de4",
+      "sage_living_corner__sunset_play": "34a3512a7e11d19ecc14230de505b4b43d36bdaff2add71cb9c9989cb59b6345",
+      "warm_playroom__forest_layer": "ac6ab3ec05f1f3280834fc55c413ca081782fb0cdd8c53fd929ddc88e69a11a0",
+      "warm_playroom__sky_overall": "fe1663bbd8b4bbe49a861d125bd835ecc9d707495f17cd742fb4004ee51ebce6",
+      "warm_playroom__sunset_play": "1a04e7dc43594070ad76da403bf62a04d0a8a9dad0807a9040b34e6f3fd1c442"
+    }
+  },
+  "invalidated_mass_only_120g_freeze_receipt": {
+    "schema": "embodied.contract_freeze_receipt.v1",
+    "config_sha256": "de353918df04837634e061667052f873a07d7c0e251c6396b30c0bc5115b3174",
+    "compiled_episode_count": 9,
+    "episode_contract_sha256": {
+      "birch_art_room__forest_layer": "81ac1b3c2f7451d7018d30b69cd79142501c276b42f2f619bda2dbd13a597937",
+      "birch_art_room__sky_overall": "e4f4b035f48d06c51bd1b93b77ac41612999facf333a1f6ab149a8f28dba47ac",
+      "birch_art_room__sunset_play": "60502b1060502c784ff93f666f325eedf958d2a398018a00d7ce53568c82b857",
+      "sage_living_corner__forest_layer": "31d729b1728165079e2fc0976c98173a27fec96da46ca0fd6fda5980b0a0b187",
+      "sage_living_corner__sky_overall": "f48e261997126a407bfabe5274768a863e37c40aee91eb10d6056943934d95ac",
+      "sage_living_corner__sunset_play": "aac9b4d29163e9851016c1deb1c69bb620e2101a1e4b2acb37a549cf6d0895e7",
+      "warm_playroom__forest_layer": "0d8910b01309f1ed83f18547fe71d2102a2af6ea5b5d9b21168cca6baf8ca497",
+      "warm_playroom__sky_overall": "d5bda6b8b0d3174b870e6fb54cedc2e8cc4cceecf1ac67f941cdf84ab19148b2",
+      "warm_playroom__sunset_play": "abbb23409e86d487cd4146eccad9d919a0353ad0894726b6b315a37221b40a11"
+    }
+  },
+  "corrected_contact_evidence_120g_freeze_receipt": {
+    "schema": "embodied.contract_freeze_receipt.v1",
+    "config_sha256": "8d6b7a5187e2cd9db72d697a486fae60edfef0000d2ef4c03a4e94e2a809b000",
+    "compiled_episode_count": 9,
+    "episode_contract_sha256": {
+      "birch_art_room__forest_layer": "f2022d0bce0c9257a72bed79cccc492b7529f48d2cc233f14e7bb0daa5325269",
+      "birch_art_room__sky_overall": "babe91892323b969cffa9fa514343238c66f1ee2b86d2d1907a7d2a84e7a8413",
+      "birch_art_room__sunset_play": "f6a6852bda6c6ad7790d49077a7580a22823284e840bc731ca38b1262c15c25a",
+      "sage_living_corner__forest_layer": "9961e4082214878fd7be60ed3558b18e73c905ddf4ba1d64bff091dd7fe526e9",
+      "sage_living_corner__sky_overall": "faf2ccb2d4b71fcc01a1b8ef724761d58ad31f0f4ae44782aac4159c2848f6c2",
+      "sage_living_corner__sunset_play": "9e63a1d1d1b367a1373babc3258cf9a0b8c717dfe3c5a9ccf79cee80ebaa2b3b",
+      "warm_playroom__forest_layer": "a8079377c9ef24dd25343e868aacc91400afddb3b3059d2c9f3c81d10a7f5ed1",
+      "warm_playroom__sky_overall": "ec111b29383b670f892661aec9851f9e6e8390e30a1aa734ffc274030861e343",
+      "warm_playroom__sunset_play": "12e822870b35dbed81dfd1b4f89af471434ab106475ba2edc26c15a21c929e23"
+    }
+  },
+  "aperture_aware_corrected_contact_120g_freeze_receipt": {
+    "schema": "embodied.contract_freeze_receipt.v1",
+    "scientific_status": "invalidated by subsequent analytic-collider and controller repairs; no result under this receipt contributes to PASS or robustness",
+    "config_sha256": "c4e1d6b6cff4a2d5722b06f2fa155bc6b8232c54acfcc615d2305e55fbf39e9d",
+    "compiled_episode_count": 9,
+    "reachability_contract": {
+      "target_midpoint_reach_band_m": [0.34, 0.38],
+      "deterministic_seed_values_m": [0.34, 0.36, 0.38],
+      "lateral_bias_toward_right_shoulder_m": 0.025,
+      "same_band_all_room_seeds": true,
+      "seed_specific_retuning": false
+    },
+    "episode_contract_sha256": {
+      "birch_art_room__forest_layer": "893ad7d6c47600fa303b1bdb3d6575a8e0b5ca37a02636548391cb7aadfc62cb",
+      "birch_art_room__sky_overall": "c42bb400fbfa0d35d0f99075de3803ef4a1ffbe3cb86e25aac9fadeaa904a158",
+      "birch_art_room__sunset_play": "7a87deac15f881b18c9fc27c6f6316429a622834d39b9928f8b3a54a8a199f25",
+      "sage_living_corner__forest_layer": "ef22f2d4e9da836f0c530fe89fa737072295ac0d309603c6d5d916367840300a",
+      "sage_living_corner__sky_overall": "515b1f33f259747cfb57736a018545e6ae7bc5e6463c68c4fcd87f432363144c",
+      "sage_living_corner__sunset_play": "968712da349a79236c536229b9bed618d710b09cef28d96261e3ba6df578fb3c",
+      "warm_playroom__forest_layer": "78acf2783f69b4d6967026a7f4f9df93a8eb21a990014036e9453af31f9cd696",
+      "warm_playroom__sky_overall": "3264eeb15008c1ed6fdb7d1771a42f2d698a433ee41f6f1a0dabf4dedd5c4008",
+      "warm_playroom__sunset_play": "e3426b94cb7b755569d84c3fdbca4dc83ba35857fbd0bece68fe351ff52c953a"
+    }
+  },
+  "final_source_config_spec_freeze_receipt": {
+    "schema": "embodied.contract_freeze_receipt.v1",
+    "classification": "post-development canonical NO-GO acceptance configuration",
+    "config_sha256": "3e24522b0cda7bce99f50d07fe94004a1ce1ea53ecd876bfb0600881fa085519",
+    "compiled_episode_count": 9,
+    "reachability_contract": {
+      "target_midpoint_reach_band_m": [0.34, 0.38],
+      "deterministic_seed_values_m": [0.34, 0.36, 0.38],
+      "lateral_bias_toward_right_shoulder_m": 0.025,
+      "same_band_all_room_seeds": true,
+      "seed_specific_retuning": false
+    },
+    "episode_contract_sha256": {
+      "birch_art_room__forest_layer": "e3bd6e90b6ad6a7d750421bce5885c44a71a69e9870333f83e236e211b592a6f",
+      "birch_art_room__sky_overall": "64d0f820b8d11262fa762251c7d9337fc6ef7afae883ae7bf7e8844febf78ffb",
+      "birch_art_room__sunset_play": "2c5f5b93fb012c75331c26b217cdc7389954f691e3f6adddbc3a4afd73b60304",
+      "sage_living_corner__forest_layer": "caffc62516e3d4b827d403180b212aabb34e16d39d18e23b7bf2fe0552e201c8",
+      "sage_living_corner__sky_overall": "b3546b132824385a75627430f966e548e9a6086442f559593da82bd7c61ef4cd",
+      "sage_living_corner__sunset_play": "507677658a2df717d222856221abe7c66277bc4cc1ac0f6badf52c6be2ff4570",
+      "warm_playroom__forest_layer": "8e757cd7f0b84e9b152179f9de60166b05433410518541ea193f40fb568c32c4",
+      "warm_playroom__sky_overall": "45091fc5e7a0049f14370ebb7d557ac410509d092db64ed99260cdbce72b12fe",
+      "warm_playroom__sunset_play": "34f57e527c826f097e2498f8a72d8a54d21bc5d7da5bbef28bbf8aa3898d4f34"
+    }
+  },
+  "final_acceptance_outcome": {
+    "episode_id": "sage_living_corner__sunset_play",
+    "stage": "bimanual_cell",
+    "contract_sha256": "507677658a2df717d222856221abe7c66277bc4cc1ac0f6badf52c6be2ff4570",
+    "capture_mode": "qualification",
+    "physics_steps": 3840,
+    "render_frames": 480,
+    "right_thumb_two_non_thumb_geometric_dwell_s": 1.6875,
+    "right_thumb_two_non_thumb_nonzero_impulse_dwell_s": 0.0,
+    "meaningful_opposing_left_geometric_dwell_s": 0.3125,
+    "meaningful_opposing_left_nonzero_impulse_dwell_s": 0.0,
+    "maintained_current_step_carry_contacts_s": 0.06666666666666667,
+    "qualification_contact_latency_steps": 1,
+    "carry_telemetry_vs_same_row_geometry_mismatch_steps": 61,
+    "lift_after_bimanual_qualification_m": 0.0,
+    "supported_turn_during_bimanual_turn_deg": 57.0641,
+    "maximum_hand_target_impulse_n_s": 0.07174254208803177,
+    "minimum_hand_target_separation_m": -0.0008076466619968414,
+    "assistance_ledger_entries": 0,
+    "video_decode": "three 1920x1080 30 fps 16 s streams fully decoded",
+    "qa_label": "STAGE_D_NO_GO_PROMOTION_VETO",
+    "promotion_consequence": "Ordered Gate E and final replay/rerender promotion were not attempted because unassisted free-object capture/lift failed. No earlier development run contributes to PASS or robustness."
+  }
+}

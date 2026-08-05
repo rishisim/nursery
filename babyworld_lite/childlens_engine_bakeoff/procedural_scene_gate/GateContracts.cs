@@ -72,6 +72,7 @@ namespace ProceduralSceneGate
         public int PhysicsStep;
         public int RenderFrame;
         public float TimeSeconds;
+        public bool AnatomicalColliderVelocityDriveCommanded;
         public readonly List<ContactTruth> Contacts = new List<ContactTruth>();
         public readonly List<string> AssistanceLedger = new List<string>();
     }

@@ -40,6 +40,14 @@ def validate_frozen_config(config: dict[str, Any]) -> None:
         raise ValueError("the frozen gate requires 240 Hz physics and 30 Hz rendering")
     if authority["physics_hz"] // authority["render_hz"] != authority["steps_per_render_frame"]:
         raise ValueError("physics/render clocks must have the frozen exact integer mapping")
+    implementation = config["implementation_freeze"]
+    if not implementation["same_controller_all_seeds_and_garments"] or implementation["seed_specific_retuning"]:
+        raise ValueError("the frozen implementation must be shared without seed-specific retuning")
+    module_root = Path(__file__).resolve().parent
+    for name, expected_sha256 in implementation["source_sha256"].items():
+        source = module_root / name
+        if not source.is_file() or hashlib.sha256(source.read_bytes()).hexdigest() != expected_sha256:
+            raise ValueError(f"canonical implementation source hash changed: {name}")
     registry = config["schema_registry"]
     for name, schema in REQUIRED_SCHEMAS.items():
         if registry.get(name, {}).get("schema") != schema:
@@ -52,6 +60,15 @@ def validate_frozen_config(config: dict[str, Any]) -> None:
     scenes = config["scene_matrix"]
     if len(scenes) < 3 or len({row["room_family"] for row in scenes}) < 3:
         raise ValueError("at least three materially distinct room families are frozen")
+    compiler = config["scene_compiler"]
+    if compiler["target_midpoint_reach_band_m"] != [0.34, 0.38]:
+        raise ValueError("the aperture-aware target reach band changed")
+    if compiler["target_midpoint_reach_center_m"] != 0.36 or compiler["seed_modulo_offset_m"] != 0.02:
+        raise ValueError("the deterministic aperture-aware reach mapping changed")
+    if compiler["target_lateral_bias_toward_right_shoulder_m"] != 0.025:
+        raise ValueError("the shared bimanual lateral reach bias changed")
+    if not compiler["same_band_all_room_seeds"] or compiler["seed_specific_retuning"]:
+        raise ValueError("all scenes must use one reach band without retuning")
     plan = config["activity_plan"]
     if not 12.0 <= plan["duration_s"] <= 20.0 or not plan["no_seed_specific_retuning"]:
         raise ValueError("ActivityPlan duration or retuning rule changed")
@@ -82,10 +99,16 @@ def assert_output_root_ignored(output_root: Path, repository_root: Path = REPOSI
         raise ValueError(f"generated output root is not ignored: {relative}")
 
 
-def _scene_spec(scene: dict[str, Any], assets: dict[str, Any]) -> dict[str, Any]:
+def _scene_spec(
+    scene: dict[str, Any], assets: dict[str, Any], compiler: dict[str, Any]
+) -> dict[str, Any]:
     seed = scene["seed"]
     offset_index = seed % 3 - 1
-    lateral = 0.035 * offset_index
+    requested_midpoint_reach = round(
+        compiler["target_midpoint_reach_center_m"]
+        + compiler["seed_modulo_offset_m"] * offset_index,
+        6,
+    )
     layouts = {
         "warm_playroom": {
             "envelope_m": [4.4, 2.55, 4.8],
@@ -129,7 +152,19 @@ def _scene_spec(scene: dict[str, Any], assets: dict[str, Any]) -> dict[str, Any]
         "support_relations": [
             {"child_id": "target_001", "support_id": f"{scene['room_family']}_tableCoffee_00"}
         ],
-        "reachability": {"target_from_right_shoulder_m": 0.39 + lateral, "compiled_limit_m": [0.34, 0.48]},
+        "reachability": {
+            "aperture_aware": True,
+            "compiled_requested_midpoint_m": requested_midpoint_reach,
+            "compiled_midpoint_band_m": compiler["target_midpoint_reach_band_m"],
+            "lateral_bias_toward_right_shoulder_m": compiler[
+                "target_lateral_bias_toward_right_shoulder_m"
+            ],
+            "measured_bilateral_shoulder_limit_m": compiler[
+                "measured_bilateral_shoulder_reach_limit_m"
+            ],
+            "deterministic_mapping": compiler["deterministic_mapping"],
+            "seed_specific_retuning": False,
+        },
         "sightlines": {"target_visible_at_required_events": True, "final_gaze_zone": "window_scan"},
         "stabilization_s": 1.0,
         "no_visible_primitive_furniture": True,
@@ -141,7 +176,7 @@ def compile_contract_matrix(config: dict[str, Any]) -> list[dict[str, Any]]:
     result = []
     for scene_index, scene in enumerate(config["scene_matrix"]):
         for garment_index, avatar in enumerate(config["avatar_specs"]):
-            scene_spec = _scene_spec(scene, config["assets"])
+            scene_spec = _scene_spec(scene, config["assets"], config["scene_compiler"])
             activity = deepcopy(config["activity_plan"])
             avatar_spec = deepcopy(avatar)
             contract = {
