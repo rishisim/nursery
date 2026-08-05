@@ -1,6 +1,6 @@
 {
-  "schema_version": 29,
-  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_EXTENDED_WALL_REPAIR_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME",
+  "schema_version": 30,
+  "status": "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_ZERO_RUNTIME_H100_ATTEMPT_8_CANCELED_A30_TOPOLOGY_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "prospective_amendment": {
     "effective_on": "2026-08-02",
@@ -1839,6 +1839,114 @@
     "new_health_or_scientific_outcome_opened": false,
     "reauthorization_commitment_scope": "canonical JSON of this amendment excluding reauthorization_commitment_sha256",
     "reauthorization_commitment_sha256": "d2db51229719a0e64f84da9541a284d88c75a2fd32e2e186ba34e17ab5eed6e7"
+  },
+  "learner_effective_engineering_health_scheduler_policy": {
+    "status": "FROZEN_AFTER_ZERO_RUNTIME_H100_MIG_CANCELLATION_BEFORE_A30_ATTEMPT_8_OR_NEW_MODEL_OUTCOME",
+    "effective_on": "2026-08-04",
+    "scope": "STANDING_ZERO_COST_EARLIEST_SCHEDULER_ELIGIBLE_GPU_POLICY_AND_ATTEMPT_8_SELECTION_ONLY",
+    "authorization_basis": "user standing prospective authorization to use whichever compatible zero-cost Juno GPU is earliest scheduler-eligible until a complete valid scientific result can be released",
+    "preserved_without_change": {
+      "extended_wall_repair_sha256": "d2db51229719a0e64f84da9541a284d88c75a2fd32e2e186ba34e17ab5eed6e7",
+      "attempt_7_blocker_sha256": "03c09a61cedb29e04cf465287db693cd1248c53d45d9a7a47a777e6cdf1d594d",
+      "public_fixture_manifest_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+      "models_weights_fixtures_inputs_seeds_thresholds_metrics_repair_allowances_scientific_gates_privacy_rules_and_downstream_contract": true
+    },
+    "standing_selection_policy": {
+      "eligible_GPU_types": ["NVIDIA_A30_24GB", "NVIDIA_H100_NVL", "NVIDIA_H100_NVL_3G_47GB_MIG", "NVIDIA_H200_NVL"],
+      "scheduler_test_only_immediately_before_engineering_submission": true,
+      "earliest_estimated_start_wins": true,
+      "one_live_job_max": 1,
+      "cancel_only_pending_zero_runtime_no_output": true,
+      "one_process_no_DDP": true,
+      "zero_direct_monetary_cost_required": true,
+      "freeze_exact_topology_before_scientific_metrics_can_open": true,
+      "no_hardware_switch_in_response_to_engineering_or_scientific_outcomes": true
+    },
+    "canceled_submission": {
+      "job_id": 316697,
+      "partition": "h100",
+      "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+      "state": "CANCELLED_BEFORE_ALLOCATION",
+      "elapsed_seconds": 0,
+      "GPU_hours": 0,
+      "attempt_file_count": 0,
+      "attempt_bytes": 0,
+      "engineering_outcome_opened": false,
+      "scientific_metric_count": 0
+    },
+    "scheduler_only_comparison": {
+      "checked_on": "2026-08-04",
+      "real_job_submitted_by_checks": false,
+      "request": {
+        "nodes": 1,
+        "tasks": 1,
+        "CPU_count": 8,
+        "memory_GiB": 32,
+        "wall_minutes": 60,
+        "DDP": false,
+        "direct_monetary_cost_USD": 0
+      },
+      "candidates": [
+        {"GPU_type": "NVIDIA_A30_24GB", "partition": "a30", "GRES": "gpu:nvidia_a30:1", "eligible": true, "estimated_start": "2026-08-04T23:21:36-05:00"},
+        {"GPU_type": "NVIDIA_H100_NVL", "partition": "h100", "GRES": "gpu:nvidia_h100_nvl:1", "eligible": true, "estimated_start": "2026-08-04T23:41:36-05:00"},
+        {"GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG", "partition": "h100", "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1", "eligible": true, "estimated_start": "2026-08-05T03:12:48-05:00"},
+        {"GPU_type": "NVIDIA_H200_NVL", "partition": "h200", "GRES": "gpu:nvidia_h200_nvl:1", "eligible": true, "estimated_start": "2026-08-05T03:02:36-05:00"}
+      ],
+      "selection_rule": "minimum scheduler-estimated start among compatible eligible zero-cost one-process requests; fixed GPU-type order only breaks exact timestamp ties",
+      "selected_GPU_type": "NVIDIA_A30_24GB"
+    },
+    "active_attempt_resource_policy": {
+      "attempt": 8,
+      "submission_count": 1,
+      "partition": "a30",
+      "GRES": "gpu:nvidia_a30:1",
+      "GPU_type": "NVIDIA_A30_24GB",
+      "GPU_count": 1,
+      "CPU_count": 8,
+      "memory_GiB": 32,
+      "DDP": false,
+      "wall_minutes_max": 60,
+      "GPU_hours_max": 1.0,
+      "new_storage_GiB_max": 1.0,
+      "prior_protocol_accounted_GPU_hours_actual": 1.2717105815145704,
+      "active_aggregate_GPU_hours_max": 2.2600439148479035,
+      "prior_health_run_storage_GiB_actual": 4.605390131473541e-6,
+      "active_aggregate_new_storage_GiB_max": 1.0000046053901315,
+      "direct_monetary_cost_USD": 0,
+      "historical_attempt_GPU_types": {
+        "1": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "2": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "3": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "4": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "5": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "6": "NVIDIA_H100_NVL_3G_47GB_MIG",
+        "7": "NVIDIA_H100_NVL_3G_47GB_MIG"
+      }
+    },
+    "topology_attestation_contract": {
+      "partition": "a30",
+      "node_count": 1,
+      "task_count": 1,
+      "CPU_count": 8,
+      "time_limit_minutes": 60,
+      "memory_per_CPU_GiB": 4,
+      "GRES": "gpu:nvidia_a30:1",
+      "expected_device_name": "NVIDIA A30",
+      "visible_memory_GiB_min": 23,
+      "visible_memory_GiB_max": 25,
+      "world_size": 1,
+      "local_world_size": 1
+    },
+    "execution_and_stop_rule": {
+      "attempt_8_is_complete_health_suite_not_shallow_diagnostic": true,
+      "same_complete_28_case_two_replicate_suite": true,
+      "metric_withholding_on_timeout_or_error": true,
+      "commit_and_push_before_submission": true,
+      "valid_complete_scientific_result_remains_terminal_under_frozen_gate": true
+    },
+    "new_health_or_scientific_outcome_opened": false,
+    "amendment_commitment_scope": "canonical JSON of this amendment excluding amendment_commitment_sha256",
+    "amendment_commitment_sha256": "2cd0b824e91b8bf228d06aae240f16e70f8ffc03fb2f204518f8ce5eeeab3fba"
   },
   "governance_incident": {
     "observed_on": "2026-08-02",

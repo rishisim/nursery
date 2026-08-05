@@ -605,6 +605,9 @@ ENGINEERING_HEALTH_ATTEMPT_7_BLOCKER_SHA256 = (
 ENGINEERING_HEALTH_EXTENDED_WALL_REPAIR_SHA256 = (
     "d2db51229719a0e64f84da9541a284d88c75a2fd32e2e186ba34e17ab5eed6e7"
 )
+ENGINEERING_HEALTH_SCHEDULER_POLICY_SHA256 = (
+    "2cd0b824e91b8bf228d06aae240f16e70f8ffc03fb2f204518f8ce5eeeab3fba"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -660,7 +663,7 @@ def _construct_aligned_ltx_resume_amendment(
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_CONSTRUCT_ALIGNED_RESUME_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29}
+        cfg.get("schema_version") not in {16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30}
         or value.get("status")
         != "FROZEN_BEFORE_RUNNER_CHANGE_NO_HAND_REVIEW_PUBLIC_DEVELOPMENT_HOLDOUT_C_GENERATOR_OR_SYNTHETIC_LEARNER_OUTCOMES"
     ):
@@ -718,7 +721,7 @@ def _engineering_health_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
     except (KeyError, TypeError) as error:
         raise RuntimeError("E_TUPLE_HEALTH_AMENDMENT_NOT_FROZEN") from error
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30}
         or value.get("status")
         != "FROZEN_BEFORE_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -787,7 +790,7 @@ def _engineering_health_resource_redirect(
     payload = json.loads(json.dumps(value))
     expected = payload.pop("amendment_commitment_sha256", None)
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30}
         or value.get("status")
         != "FROZEN_BEFORE_H100_ENGINEERING_HEALTH_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "SCHEDULER_AND_RESOURCE_LATENCY_ONLY"
@@ -877,6 +880,30 @@ def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
     redirect = _engineering_health_resource_redirect(cfg)
     _engineering_health_dependency_restore(cfg)
     _engineering_health_topology_guard_repair(cfg)
+    if "learner_effective_engineering_health_scheduler_policy" in cfg:
+        active = _engineering_health_scheduler_policy(cfg)[
+            "active_attempt_resource_policy"
+        ]
+        return {
+            "partition": active["partition"],
+            "GRES": active["GRES"],
+            "GPU_type": active["GPU_type"],
+            "GPU_count": active["GPU_count"],
+            "CPU_count": active["CPU_count"],
+            "memory_GiB": active["memory_GiB"],
+            "DDP": active["DDP"],
+            "per_submission_wall_minutes_max": active["wall_minutes_max"],
+            "initial_plus_repair_resmoke_submission_count_max": active[
+                "attempt"
+            ],
+            "aggregate_GPU_hours_max": active[
+                "active_aggregate_GPU_hours_max"
+            ],
+            "new_storage_GiB_max": active[
+                "active_aggregate_new_storage_GiB_max"
+            ],
+            "direct_monetary_cost_USD": active["direct_monetary_cost_USD"],
+        }
     if "learner_effective_engineering_health_extended_wall_repair" in cfg:
         active = _engineering_health_extended_wall_repair(cfg)[
             "active_attempt_resource_policy"
@@ -948,6 +975,26 @@ def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
     return redirect["bounded_resource_policy"]
 
 
+def _engineering_health_attempt_gpu_type(
+    cfg: dict[str, Any], attempt: int
+) -> str:
+    """Return the prospectively bound GPU type for one historical/current attempt."""
+
+    if type(attempt) is not int or attempt < 1:
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+    if "learner_effective_engineering_health_scheduler_policy" in cfg:
+        policy = _engineering_health_scheduler_policy(cfg)[
+            "active_attempt_resource_policy"
+        ]
+        if attempt == int(policy["attempt"]):
+            return str(policy["GPU_type"])
+        historical = policy["historical_attempt_GPU_types"]
+        if str(attempt) in historical:
+            return str(historical[str(attempt)])
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+    return str(_engineering_health_resource_policy(cfg)["GPU_type"])
+
+
 def _engineering_health_dependency_restore(
     cfg: dict[str, Any],
 ) -> dict[str, Any]:
@@ -984,7 +1031,7 @@ def _engineering_health_dependency_restore(
         ["transformers", "4.57.6"],
     ]
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_1_PREINFERENCE_DEPENDENCY_CACHE_MISS_BEFORE_ATTEMPT_2_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1089,7 +1136,7 @@ def _engineering_health_topology_guard_repair(
     repair = value.get("repair", {})
     budget = value.get("remaining_health_budget", {})
     if (
-        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29}
+        cfg.get("schema_version") not in {21, 22, 23, 24, 25, 26, 27, 28, 29, 30}
         or value.get("status")
         != "FROZEN_AFTER_H100_ATTEMPT_2_REDUNDANT_TOPOLOGY_GUARD_FAILURE_BEFORE_ATTEMPT_3_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1172,7 +1219,7 @@ def _engineering_health_terminal_result(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {22, 23, 24, 25, 26, 27, 28, 29}
+        cfg.get("schema_version") not in {22, 23, 24, 25, 26, 27, 28, 29, 30}
         or value.get("status")
         != "ENGINEERING_BLOCKER_ROUTE_EXHAUSTED_BEFORE_MODEL_INFERENCE_NO_SCIENTIFIC_METRICS_OPENED"
         or expected != ENGINEERING_HEALTH_BLOCKER_SHA256
@@ -1248,7 +1295,7 @@ def _engineering_health_reauthorization(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("effective_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") not in {23, 24, 25, 26, 27, 28, 29}
+        cfg.get("schema_version") not in {23, 24, 25, 26, 27, 28, 29, 30}
         or value.get("status")
         != "FROZEN_AFTER_SEALED_BLOCKER_BEFORE_REAUTHORIZED_ATTEMPT_4_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope")
@@ -1363,7 +1410,7 @@ def _engineering_health_reauthorization_result(
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {24, 25, 26, 27, 28, 29}
+        cfg.get("schema_version") not in {24, 25, 26, 27, 28, 29, 30}
         or value.get("status")
         != "ENGINEERING_BLOCKER_REAUTHORIZED_ATTEMPT_4_EXHAUSTED_BEFORE_RUNNER_ENTRY_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -1478,7 +1525,7 @@ def _engineering_health_parser_repair_reauthorization(
     resource = value.get("effective_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") not in {25, 26, 27, 28, 29}
+        cfg.get("schema_version") not in {25, 26, 27, 28, 29, 30}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_4_BLOCKER_BEFORE_SINGLE_POST_BLOCKER_ATTEMPT_5_OR_NEW_SCIENTIFIC_OUTCOME"
         or value.get("scope") != "ONE_SUBMISSION_CLI_ATTEMPT_BOUND_REPAIR_ONLY"
@@ -1566,7 +1613,7 @@ def _engineering_health_parser_repair_result(
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {26, 27, 28, 29}
+        cfg.get("schema_version") not in {26, 27, 28, 29, 30}
         or value.get("status")
         != "ENGINEERING_BLOCKER_POST_BLOCKER_ATTEMPT_5_EXHAUSTED_BEFORE_MODEL_LOADING_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -1705,7 +1752,7 @@ def _engineering_health_iterative_reauthorization(
     resource = value.get("active_attempt_resource_policy", {})
     rolling = value.get("rolling_execution_policy", {})
     if (
-        cfg.get("schema_version") not in {27, 28, 29}
+        cfg.get("schema_version") not in {27, 28, 29, 30}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_5_BLOCKER_BEFORE_HOST_CONTAINER_ATTESTATION_REPAIR_ATTEMPT_6_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -1827,7 +1874,7 @@ def _engineering_health_iterative_attempt_6_result(
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") not in {28, 29}
+        cfg.get("schema_version") not in {28, 29, 30}
         or value.get("status")
         != "ENGINEERING_TIMEOUT_ATTEMPT_6_BEFORE_MICROFIXTURE_PROJECTION_OR_FULL_RESULT_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -1917,7 +1964,7 @@ def _engineering_health_progress_repair(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("active_attempt_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") not in {28, 29}
+        cfg.get("schema_version") not in {28, 29, 30}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_6_TIMEOUT_BEFORE_PROGRESS_INSTRUMENTED_ATTEMPT_7_OR_NEW_OUTCOME"
         or value.get("scope") != "ENGINEERING_PROGRESS_INSTRUMENTATION_ONLY"
@@ -1996,7 +2043,7 @@ def _engineering_health_attempt_7_result(cfg: dict[str, Any]) -> dict[str, Any]:
     resource = value.get("resource_accounting", {})
     gate = value.get("terminal_gate", {})
     if (
-        cfg.get("schema_version") != 29
+        cfg.get("schema_version") not in {29, 30}
         or value.get("status")
         != "ENGINEERING_TIMEOUT_ATTEMPT_7_DURING_DEPENDENCY_PREFLIGHT_NO_SCIENTIFIC_METRICS_OPENED"
         or value.get("route_id") != "construct-aligned-engineering-health"
@@ -2093,7 +2140,7 @@ def _engineering_health_extended_wall_repair(
     resource = value.get("active_attempt_resource_policy", {})
     execution = value.get("execution_and_stop_rule", {})
     if (
-        cfg.get("schema_version") != 29
+        cfg.get("schema_version") not in {29, 30}
         or value.get("status")
         != "FROZEN_AFTER_ATTEMPT_7_TIMEOUT_BEFORE_EXTENDED_WALL_ATTEMPT_8_OR_NEW_OUTCOME"
         or value.get("scope")
@@ -2150,6 +2197,179 @@ def _engineering_health_extended_wall_repair(
         != "canonical JSON of this amendment excluding reauthorization_commitment_sha256"
     ):
         raise RuntimeError("E_TUPLE_HEALTH_EXTENDED_WALL_REPAIR_COMMITMENT")
+    return value
+
+
+def _engineering_health_scheduler_policy(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the outcome-free earliest-eligible GPU selection for attempt 8."""
+
+    extended = _engineering_health_extended_wall_repair(cfg)
+    try:
+        value = cfg["learner_effective_engineering_health_scheduler_policy"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_SCHEDULER_POLICY_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("amendment_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    standing = value.get("standing_selection_policy", {})
+    canceled = value.get("canceled_submission", {})
+    comparison = value.get("scheduler_only_comparison", {})
+    active = value.get("active_attempt_resource_policy", {})
+    attestation = value.get("topology_attestation_contract", {})
+    execution = value.get("execution_and_stop_rule", {})
+    candidates = comparison.get("candidates")
+    if (
+        cfg.get("schema_version") != 30
+        or value.get("status")
+        != "FROZEN_AFTER_ZERO_RUNTIME_H100_MIG_CANCELLATION_BEFORE_A30_ATTEMPT_8_OR_NEW_MODEL_OUTCOME"
+        or value.get("scope")
+        != "STANDING_ZERO_COST_EARLIEST_SCHEDULER_ELIGIBLE_GPU_POLICY_AND_ATTEMPT_8_SELECTION_ONLY"
+        or expected != ENGINEERING_HEALTH_SCHEDULER_POLICY_SHA256
+        or digest(payload) != expected
+        or value.get("amendment_commitment_scope")
+        != "canonical JSON of this amendment excluding amendment_commitment_sha256"
+        or preserved
+        != {
+            "extended_wall_repair_sha256": extended[
+                "reauthorization_commitment_sha256"
+            ],
+            "attempt_7_blocker_sha256": ENGINEERING_HEALTH_ATTEMPT_7_BLOCKER_SHA256,
+            "public_fixture_manifest_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+            "models_weights_fixtures_inputs_seeds_thresholds_metrics_repair_allowances_scientific_gates_privacy_rules_and_downstream_contract": True,
+        }
+        or standing
+        != {
+            "eligible_GPU_types": [
+                "NVIDIA_A30_24GB",
+                "NVIDIA_H100_NVL",
+                "NVIDIA_H100_NVL_3G_47GB_MIG",
+                "NVIDIA_H200_NVL",
+            ],
+            "scheduler_test_only_immediately_before_engineering_submission": True,
+            "earliest_estimated_start_wins": True,
+            "one_live_job_max": 1,
+            "cancel_only_pending_zero_runtime_no_output": True,
+            "one_process_no_DDP": True,
+            "zero_direct_monetary_cost_required": True,
+            "freeze_exact_topology_before_scientific_metrics_can_open": True,
+            "no_hardware_switch_in_response_to_engineering_or_scientific_outcomes": True,
+        }
+        or canceled
+        != {
+            "job_id": 316697,
+            "partition": "h100",
+            "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+            "state": "CANCELLED_BEFORE_ALLOCATION",
+            "elapsed_seconds": 0,
+            "GPU_hours": 0,
+            "attempt_file_count": 0,
+            "attempt_bytes": 0,
+            "engineering_outcome_opened": False,
+            "scientific_metric_count": 0,
+        }
+        or comparison.get("checked_on") != "2026-08-04"
+        or comparison.get("real_job_submitted_by_checks") is not False
+        or comparison.get("request")
+        != {
+            "nodes": 1,
+            "tasks": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "wall_minutes": 60,
+            "DDP": False,
+            "direct_monetary_cost_USD": 0,
+        }
+        or candidates
+        != [
+            {
+                "GPU_type": "NVIDIA_A30_24GB",
+                "partition": "a30",
+                "GRES": "gpu:nvidia_a30:1",
+                "eligible": True,
+                "estimated_start": "2026-08-04T23:21:36-05:00",
+            },
+            {
+                "GPU_type": "NVIDIA_H100_NVL",
+                "partition": "h100",
+                "GRES": "gpu:nvidia_h100_nvl:1",
+                "eligible": True,
+                "estimated_start": "2026-08-04T23:41:36-05:00",
+            },
+            {
+                "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+                "partition": "h100",
+                "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+                "eligible": True,
+                "estimated_start": "2026-08-05T03:12:48-05:00",
+            },
+            {
+                "GPU_type": "NVIDIA_H200_NVL",
+                "partition": "h200",
+                "GRES": "gpu:nvidia_h200_nvl:1",
+                "eligible": True,
+                "estimated_start": "2026-08-05T03:02:36-05:00",
+            },
+        ]
+        or comparison.get("selection_rule")
+        != "minimum scheduler-estimated start among compatible eligible zero-cost one-process requests; fixed GPU-type order only breaks exact timestamp ties"
+        or comparison.get("selected_GPU_type") != "NVIDIA_A30_24GB"
+        or active
+        != {
+            "attempt": 8,
+            "submission_count": 1,
+            "partition": "a30",
+            "GRES": "gpu:nvidia_a30:1",
+            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_count": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "DDP": False,
+            "wall_minutes_max": 60,
+            "GPU_hours_max": 1.0,
+            "new_storage_GiB_max": 1.0,
+            "prior_protocol_accounted_GPU_hours_actual": 1.2717105815145704,
+            "active_aggregate_GPU_hours_max": 2.2600439148479035,
+            "prior_health_run_storage_GiB_actual": 4.605390131473541e-6,
+            "active_aggregate_new_storage_GiB_max": 1.0000046053901315,
+            "direct_monetary_cost_USD": 0,
+            "historical_attempt_GPU_types": {
+                "1": "NVIDIA_H100_NVL_3G_47GB_MIG",
+                "2": "NVIDIA_H100_NVL_3G_47GB_MIG",
+                "3": "NVIDIA_H100_NVL_3G_47GB_MIG",
+                "4": "NVIDIA_H100_NVL_3G_47GB_MIG",
+                "5": "NVIDIA_H100_NVL_3G_47GB_MIG",
+                "6": "NVIDIA_H100_NVL_3G_47GB_MIG",
+                "7": "NVIDIA_H100_NVL_3G_47GB_MIG",
+            },
+        }
+        or attestation
+        != {
+            "partition": "a30",
+            "node_count": 1,
+            "task_count": 1,
+            "CPU_count": 8,
+            "time_limit_minutes": 60,
+            "memory_per_CPU_GiB": 4,
+            "GRES": "gpu:nvidia_a30:1",
+            "expected_device_name": "NVIDIA A30",
+            "visible_memory_GiB_min": 23,
+            "visible_memory_GiB_max": 25,
+            "world_size": 1,
+            "local_world_size": 1,
+        }
+        or execution
+        != {
+            "attempt_8_is_complete_health_suite_not_shallow_diagnostic": True,
+            "same_complete_28_case_two_replicate_suite": True,
+            "metric_withholding_on_timeout_or_error": True,
+            "commit_and_push_before_submission": True,
+            "valid_complete_scientific_result_remains_terminal_under_frozen_gate": True,
+        }
+        or value.get("new_health_or_scientific_outcome_opened") is not False
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_SCHEDULER_POLICY_COMMITMENT")
     return value
 
 
@@ -4943,9 +5163,11 @@ def _tuple_health_budget(
         if not isinstance(record, dict):
             raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
         values = record.get("resource", record)
-        observed_attempts.append(record.get("attempt"))
+        record_attempt = record.get("attempt")
+        observed_attempts.append(record_attempt)
         if (
-            values.get("GPU_type") != resource["GPU_type"]
+            values.get("GPU_type")
+            != _engineering_health_attempt_gpu_type(cfg, record_attempt)
             or values.get("GPU_count") != resource["GPU_count"]
         ):
             raise RuntimeError("E_TUPLE_HEALTH_GPU_TOPOLOGY")
@@ -5020,6 +5242,7 @@ def _tuple_health_wrapper_marker(
         raise RuntimeError("E_TUPLE_HEALTH_WRAPPER_MARKER")
     value = json.loads(path.read_text())
     policy = _engineering_health_resource_policy(cfg)
+    expected_gpu_type = _engineering_health_attempt_gpu_type(cfg, attempt)
     if (
         set(value)
         != {
@@ -5033,7 +5256,7 @@ def _tuple_health_wrapper_marker(
         }
         or value.get("schema_version") != 1
         or value.get("attempt") != attempt
-        or value.get("GPU_type") != policy["GPU_type"]
+        or value.get("GPU_type") != expected_gpu_type
         or value.get("GPU_count") != policy["GPU_count"]
         or value.get("CPU_count") != policy["CPU_count"]
         or value.get("memory_GiB") != policy["memory_GiB"]
@@ -5061,7 +5284,7 @@ def _tuple_health_incomplete_attempt_resource(
         historical.get(str(attempt), policy["per_submission_wall_minutes_max"])
     )
     return {
-        "GPU_type": policy["GPU_type"],
+        "GPU_type": _engineering_health_attempt_gpu_type(cfg, attempt),
         "GPU_count": int(policy["GPU_count"]),
         "CPU_count": int(policy["CPU_count"]),
         "memory_GiB": int(policy["memory_GiB"]),
@@ -5312,24 +5535,26 @@ def _validate_tuple_health_full(value: Any, cfg: dict[str, Any]) -> None:
     ):
         raise RuntimeError("E_TUPLE_HEALTH_FULL_SCHEMA")
     policy = _engineering_health_resource_policy(cfg)
+    attempt = int(value.get("attempt", 0))
+    expected_gpu_type = _engineering_health_attempt_gpu_type(cfg, attempt)
     _tuple_health_budget(
-        int(value.get("attempt", 0)),
+        attempt,
         [
             {
                 "attempt": ordinal,
-                "GPU_type": policy["GPU_type"],
+                "GPU_type": _engineering_health_attempt_gpu_type(cfg, ordinal),
                 "GPU_count": policy["GPU_count"],
                 "wall_minutes": 0.0,
                 "GPU_hours": 0.0,
                 "new_storage_GiB": 0.0,
                 "direct_monetary_cost_USD": 0,
             }
-            for ordinal in range(1, int(value.get("attempt", 0)))
+            for ordinal in range(1, attempt)
         ],
         cfg,
     )
     if (
-        resource.get("GPU_type") != policy["GPU_type"]
+        resource.get("GPU_type") != expected_gpu_type
         or resource.get("GPU_count") != policy["GPU_count"]
         or resource.get("CPU_count") != policy["CPU_count"]
         or resource.get("memory_GiB") != policy["memory_GiB"]
@@ -11336,24 +11561,39 @@ def _tuple_health_selected_rows(
     return output
 
 
-def _tuple_health_topology_attestation(path: Path, attempt: int) -> str:
+def _tuple_health_topology_attestation(
+    path: Path, attempt: int, cfg: dict[str, Any]
+) -> str:
     """Validate the wrapper's compact scheduler attestation without Slurm tools."""
 
     job_id = os.environ.get("SLURM_JOB_ID", "")
     if not job_id.isdecimal() or int(job_id) <= 0:
         raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION")
-    expected_wall_minutes = 60 if attempt == 8 else 15
+    if (
+        "learner_effective_engineering_health_scheduler_policy" in cfg
+        and attempt == 8
+    ):
+        topology = _engineering_health_scheduler_policy(cfg)[
+            "topology_attestation_contract"
+        ]
+        expected_partition = topology["partition"]
+        expected_wall_minutes = topology["time_limit_minutes"]
+        expected_gres = topology["GRES"]
+    else:
+        expected_partition = "h100"
+        expected_wall_minutes = 60 if attempt == 8 else 15
+        expected_gres = "gpu:nvidia_h100_nvl_3g.47gb:1"
     expected = {
         "schema_version": 1,
         "attempt": attempt,
         "job_id": int(job_id),
-        "partition": "h100",
+        "partition": expected_partition,
         "node_count": 1,
         "CPU_count": 8,
         "task_count": 1,
         "time_limit_minutes": expected_wall_minutes,
         "memory_per_CPU_GiB": 4,
-        "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+        "GRES": expected_gres,
         "predicate_count": 7,
         "predicate_pass_count": 7,
         "world_size": 1,
@@ -11508,26 +11748,38 @@ def _tuple_health_topology(
     *,
     topology_attestation: Path | None = None,
     attempt: int | None = None,
+    cfg: dict[str, Any] | None = None,
 ) -> str | None:
     attestation_commitment = None
     if engineering_health:
-        if topology_attestation is None or type(attempt) is not int:
+        if (
+            topology_attestation is None
+            or type(attempt) is not int
+            or not isinstance(cfg, dict)
+        ):
             raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION")
         attestation_commitment = _tuple_health_topology_attestation(
-            topology_attestation, int(attempt)
+            topology_attestation, int(attempt), cfg
         )
 
     import torch
 
     device_name = torch.cuda.get_device_name(0) if torch.cuda.device_count() == 1 else ""
     if engineering_health:
-        expected_device = device_name.startswith("NVIDIA H100 NVL")
+        expected_gpu_type = _engineering_health_attempt_gpu_type(cfg, int(attempt))
         total_memory = (
             int(torch.cuda.get_device_properties(0).total_memory)
             if torch.cuda.device_count() == 1
             else 0
         )
-        expected_memory = 45 * 1024**3 <= total_memory <= 50 * 1024**3
+        if expected_gpu_type == "NVIDIA_A30_24GB":
+            expected_device = device_name == "NVIDIA A30"
+            expected_memory = 23 * 1024**3 <= total_memory <= 25 * 1024**3
+        elif expected_gpu_type == "NVIDIA_H100_NVL_3G_47GB_MIG":
+            expected_device = device_name.startswith("NVIDIA H100 NVL")
+            expected_memory = 45 * 1024**3 <= total_memory <= 50 * 1024**3
+        else:
+            raise RuntimeError("E_TUPLE_HEALTH_GPU_TOPOLOGY")
         scheduler_topology = attestation_commitment is not None
     else:
         expected_device = device_name == "NVIDIA A30"
@@ -11673,6 +11925,7 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
             str(args.device),
             topology_attestation=attempt_root / "topology-attestation.json",
             attempt=int(args.attempt),
+            cfg=cfg,
         )
         container_record = _tuple_container_attestation(
             args.container_attestation,

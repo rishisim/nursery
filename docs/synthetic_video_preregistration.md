@@ -1,6 +1,6 @@
 # Synthetic-video governance and preregistration
 
-**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — TOPOLOGY-GUARD REPAIR FROZEN AFTER H100 HEALTH ATTEMPT-2 PRE-INFERENCE FAILURE; SOLE FINAL ATTEMPT 3 PENDING; ALL PRIOR NO-GOS PRESERVED**
+**Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ATTEMPT-7 ENGINEERING TIMEOUT PRESERVED; ZERO-RUNTIME H100 ATTEMPT-8 CANCELED; FULL-A30 ATTEMPT-8 TOPOLOGY FROZEN BEFORE MODEL OUTCOME; ALL PRIOR NO-GOS PRESERVED**
 
 **Evidence cut-off:** 2026-08-04
 
@@ -1969,6 +1969,20 @@ wall/resource ceiling: one H100 NVL 3g.47gb slice, one process, eight CPUs,
 28-case two-replicate health suite, exact artifact validation, models,
 fixtures, thresholds, metrics, seeds, combined gate, governed-C rules, LTX-2.3
 selection, and one-hour ceiling are unchanged.
+
+Before any attempt-8 allocation or model outcome, the user prospectively
+authorized a standing latency-only policy: immediately before an engineering
+submission, compare compatible zero-cost Juno A30, H100 NVL, H100 47-GB MIG,
+and H200 one-process requests using scheduler-only tests and freeze the earliest
+eligible topology. The already queued H100-MIG job 316697 was still pending at
+zero runtime with no attempt files or outcomes, so it was canceled before
+allocation. The fixed comparison selected one full NVIDIA A30 24GB, eight CPUs,
+32 GiB, 60 minutes/1.0 GPU-hour, no DDP, 1 GiB retained storage, and $0. This
+resource-only amendment is sealed at `2cd0b824…ab3fba`; every model, fixture,
+input, seed, threshold, metric, repair allowance, privacy rule, scientific gate,
+and downstream limit remains unchanged. Once a run is authorized to open
+scientific metrics, its exact topology is frozen before execution and cannot be
+changed in response to outcomes.
 
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only

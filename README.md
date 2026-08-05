@@ -553,9 +553,17 @@ record reached repository-archive verification after completing the frozen
 action-weight check; no microfixture projection, module inference, trace,
 terminal output, sensitive detail, or scientific metric was produced. The
 result is sealed at `03c09a61…d594d`. Under the user's rolling ordinary-
-engineering authorization, schema 29 freezes only a 15-to-60-minute wall-cap
+engineering authorization, schema 29 froze only a 15-to-60-minute wall-cap
 correction for attempt 8 (`d2db5122…ed6e7`). It keeps one H100 NVL 3g.47gb
 slice, one process, eight CPUs, 32 GiB, the complete 28-case two-replicate
 suite, exact dependency revalidation, a 1.0 slice-GPU-hour ceiling, 1 GiB
 retained-storage ceiling, and $0 direct cost. Models, fixtures, thresholds,
 seeds, metrics, gates, and downstream limits are unchanged.
+
+Schema 30 adds the user's standing zero-cost earliest-eligible-GPU policy
+without changing that suite or any scientific rule. Pending H100-MIG job
+316697 had zero runtime and no attempt files and was canceled before allocation.
+One scheduler-only comparison selected a full A30 24GB for attempt 8 ahead of
+the compatible H100/H200 requests. Commitment `2cd0b824…ab3fba` freezes one
+process, eight CPUs, 32 GiB, 60 minutes/1.0 GPU-hour, 1 GiB retained storage,
+and $0; no repeated queue polling or duplicate live job is permitted.

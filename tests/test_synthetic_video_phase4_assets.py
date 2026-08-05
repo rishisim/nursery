@@ -93,8 +93,8 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["schema_version"] == 17
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_EXTENDED_WALL_REPAIR_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME"
+    assert result["schema_version"] == 18
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_ZERO_RUNTIME_H100_ATTEMPT_8_CANCELED_A30_TOPOLOGY_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -120,6 +120,14 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert health["prior_public_development_no_go_commitment_sha256"] == (
         "4b7cd58345757ed0a51dfcdddf6641954e5e55269bf9ed64ca2385ccd2ec66bf"
     )
+    scheduler = result["learner_effective_engineering_health_scheduler_policy"]
+    assert scheduler["amendment_commitment_sha256"] == (
+        "2cd0b824e91b8bf228d06aae240f16e70f8ffc03fb2f204518f8ce5eeeab3fba"
+    )
+    assert scheduler["canceled_job_id"] == 316697
+    assert scheduler["canceled_elapsed_seconds"] == 0
+    assert scheduler["selected_GPU_type"] == "NVIDIA_A30_24GB"
+    assert scheduler["new_health_or_scientific_outcome_opened"] is False
     assert health["new_engineering_outcome_opened"] is False
     assert health["new_scientific_outcome_opened"] is False
     assert health["LTX_or_synthetic_learner_run"] is False
@@ -495,7 +503,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_EXTENDED_WALL_REPAIR_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME"
+    assert proof["status"] == "LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_ZERO_RUNTIME_H100_ATTEMPT_8_CANCELED_A30_TOPOLOGY_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME"
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["repair_commitment_sha256"] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
     assert geometry_repair["triggering_attempt"]["public_model_inference_executed"] is False
@@ -527,6 +535,18 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert commitment == "d447a7e165136032a1fba43605d3f81881b41ec030c82e9028e1a8f5cb2c6205"
     assert health["prior_public_development_result"]["canonical_subtree_sha256"] == (
         "c43c7a678e3a2eac10ed5a5ac75c8964520931ec180ab9306585c76d198fb8c8"
+    )
+    scheduler = dict(
+        proof["learner_effective_engineering_health_scheduler_policy"]
+    )
+    scheduler_commitment = scheduler.pop("amendment_commitment_sha256")
+    assert scheduler_commitment == digest(scheduler)
+    assert scheduler_commitment == (
+        "2cd0b824e91b8bf228d06aae240f16e70f8ffc03fb2f204518f8ce5eeeab3fba"
+    )
+    assert scheduler["canceled_submission"]["attempt_file_count"] == 0
+    assert scheduler["active_attempt_resource_policy"]["GPU_type"] == (
+        "NVIDIA_A30_24GB"
     )
     assert health["engineering_microfixture_suite"]["total_case_count"] == 28
     assert health["bounded_resource_policy"][
@@ -733,7 +753,7 @@ def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     assert proof["real_1h_positive_control_gate"]["realistic_lexical_macro_seed_mean_min"] == 0.52
     assert proof["real_1h_positive_control_gate"]["mean_improvement_over_seed_matched_initialization_min"] == 0.02
     assert proof["generator_gate"]["selected"] == "LTX-2.3-22B-Distilled-1.1"
-    assert proof["schema_version"] == 29
+    assert proof["schema_version"] == 30
     premodel = proof["calibration_C"]["extractor"]["mechanistic_training_tuple_premodel_result"]
     assert premodel["dependency_manifest_commitment_sha256"] == (
         "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527"

@@ -53,6 +53,7 @@ def _historical_health_config() -> dict:
     config.pop("learner_effective_engineering_health_progress_repair")
     config.pop("learner_effective_engineering_health_attempt_7_result")
     config.pop("learner_effective_engineering_health_extended_wall_repair")
+    config.pop("learner_effective_engineering_health_scheduler_policy")
     return config
 
 
@@ -62,21 +63,28 @@ def _write_topology_attestation(
     *,
     attempt: int = 4,
     job_id: int = 316371,
+    gpu_type: str = "NVIDIA_H100_NVL_3G_47GB_MIG",
 ) -> Path:
     monkeypatch.setenv("SLURM_JOB_ID", str(job_id))
     monkeypatch.setenv("WORLD_SIZE", "1")
     monkeypatch.setenv("LOCAL_WORLD_SIZE", "1")
+    if gpu_type == "NVIDIA_A30_24GB":
+        partition = "a30"
+        gres = "gpu:nvidia_a30:1"
+    else:
+        partition = "h100"
+        gres = "gpu:nvidia_h100_nvl_3g.47gb:1"
     value = {
         "schema_version": 1,
         "attempt": attempt,
         "job_id": job_id,
-        "partition": "h100",
+        "partition": partition,
         "node_count": 1,
         "CPU_count": 8,
         "task_count": 1,
         "time_limit_minutes": 60 if attempt == 8 else 15,
         "memory_per_CPU_GiB": 4,
-        "GRES": "gpu:nvidia_h100_nvl_3g.47gb:1",
+        "GRES": gres,
         "predicate_count": 7,
         "predicate_pass_count": 7,
         "world_size": 1,
@@ -704,7 +712,7 @@ def test_tuple_health_budget_enforces_active_extended_wall_attempt_and_limits() 
     ]
     budget = MODULE._tuple_health_budget(8, prior, config)
     assert budget["attempt"] == 8
-    assert budget["GPU_type"] == "NVIDIA_H100_NVL_3G_47GB_MIG"
+    assert budget["GPU_type"] == "NVIDIA_A30_24GB"
     assert budget["GPU_count"] == 1
     assert budget["per_submission_wall_minutes_max"] == 60
     assert budget["remaining_GPU_hours"] == pytest.approx(1.0)
@@ -1148,14 +1156,29 @@ def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
         ),
     )
     commitment = MODULE._tuple_health_topology(
-        "cuda", topology_attestation=attestation, attempt=4
+        "cuda", topology_attestation=attestation, attempt=4, cfg=_config()
     )
     assert commitment == MODULE.file_digest(attestation)
+    a30_cuda = SimpleNamespace(
+        device_count=lambda: 1,
+        get_device_name=lambda _index: "NVIDIA A30",
+        get_device_properties=lambda _index: SimpleNamespace(
+            total_memory=24 * 1024**3
+        ),
+    )
+    monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=a30_cuda))
     attempt_8_attestation = _write_topology_attestation(
-        tmp_path / "attempt-08", monkeypatch, attempt=8, job_id=316700
+        tmp_path / "attempt-08",
+        monkeypatch,
+        attempt=8,
+        job_id=316700,
+        gpu_type="NVIDIA_A30_24GB",
     )
     commitment = MODULE._tuple_health_topology(
-        "cuda", topology_attestation=attempt_8_attestation, attempt=8
+        "cuda",
+        topology_attestation=attempt_8_attestation,
+        attempt=8,
+        cfg=_config(),
     )
     assert commitment == MODULE.file_digest(attempt_8_attestation)
 
@@ -1164,7 +1187,7 @@ def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
     attestation.write_bytes(MODULE.canonical(bad) + b"\n")
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION"):
         MODULE._tuple_health_topology(
-            "cuda", topology_attestation=attestation, attempt=4
+            "cuda", topology_attestation=attestation, attempt=4, cfg=_config()
         )
 
 
@@ -1301,7 +1324,7 @@ def test_tuple_topology_separates_h100_health_from_a30_science(
     monkeypatch.setenv("SLURM_JOB_PARTITION", "h100")
     attestation = _write_topology_attestation(tmp_path, monkeypatch)
     MODULE._tuple_health_topology(
-        "cuda", topology_attestation=attestation, attempt=4
+        "cuda", topology_attestation=attestation, attempt=4, cfg=_config()
     )
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_GPU_TOPOLOGY"):
         MODULE._tuple_health_topology("cuda", False)
@@ -1458,6 +1481,7 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop("learner_effective_engineering_health_progress_repair")
     historical_config.pop("learner_effective_engineering_health_attempt_7_result")
     historical_config.pop("learner_effective_engineering_health_extended_wall_repair")
+    historical_config.pop("learner_effective_engineering_health_scheduler_policy")
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)
     manifest = _fixture_manifest()

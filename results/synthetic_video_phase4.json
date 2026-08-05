@@ -1,7 +1,7 @@
 {
-  "schema_version": 17,
+  "schema_version": 18,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_EXTENDED_WALL_REPAIR_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_7_TIMEOUT_PRESERVED_ZERO_RUNTIME_H100_ATTEMPT_8_CANCELED_A30_TOPOLOGY_FROZEN_PENDING_ATTEMPT_8_NO_NEW_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -868,6 +868,31 @@
     "model_fixture_threshold_metric_seed_or_gate_changed": false,
     "new_health_or_scientific_outcome_opened": false
   },
+  "learner_effective_engineering_health_scheduler_policy": {
+    "status": "FROZEN_AFTER_ZERO_RUNTIME_H100_MIG_CANCELLATION_BEFORE_A30_ATTEMPT_8_OR_NEW_MODEL_OUTCOME",
+    "effective_on": "2026-08-04",
+    "canonical_source": "configs/synthetic_video_real_only_proof.json#learner_effective_engineering_health_scheduler_policy",
+    "amendment_commitment_sha256": "2cd0b824e91b8bf228d06aae240f16e70f8ffc03fb2f204518f8ce5eeeab3fba",
+    "scope": "STANDING_ZERO_COST_EARLIEST_SCHEDULER_ELIGIBLE_GPU_POLICY_AND_ATTEMPT_8_SELECTION_ONLY",
+    "canceled_job_id": 316697,
+    "canceled_state": "CANCELLED_BEFORE_ALLOCATION",
+    "canceled_elapsed_seconds": 0,
+    "canceled_attempt_file_count": 0,
+    "scheduler_only_candidate_count": 4,
+    "selected_partition": "a30",
+    "selected_GRES": "gpu:nvidia_a30:1",
+    "selected_GPU_type": "NVIDIA_A30_24GB",
+    "GPU_count": 1,
+    "process_count": 1,
+    "CPU_count": 8,
+    "memory_GiB": 32,
+    "wall_minutes_max": 60,
+    "GPU_hours_max": 1.0,
+    "new_storage_GiB_max": 1.0,
+    "direct_monetary_cost_USD": 0,
+    "model_fixture_threshold_metric_seed_repair_or_scientific_gate_changed": false,
+    "new_health_or_scientific_outcome_opened": false
+  },
   "governed_C_calibration": {
     "status": "NO_GO",
     "topology": "1_H100",
@@ -1443,5 +1468,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "COMMIT_AND_PUSH_HOST_CONTAINER_ATTESTATION_REPAIR_THEN_RUN_COMPLETE_H100_ATTEMPT_6; CONTINUE_OUTCOME_INDEPENDENT_ENGINEERING_REPAIRS_UNTIL_HEALTH_PASS_THEN_OPEN_COMPLETE_PUBLIC_SCIENTIFIC_DEVELOPMENT"
+  "next_authorized_scope": "COMMIT_AND_PUSH_EARLIEST_ELIGIBLE_GPU_POLICY_THEN_RUN_COMPLETE_A30_ATTEMPT_8; CONTINUE_OUTCOME_INDEPENDENT_ENGINEERING_REPAIRS_UNTIL_HEALTH_PASS_THEN_OPEN_COMPLETE_PUBLIC_SCIENTIFIC_DEVELOPMENT"
 }

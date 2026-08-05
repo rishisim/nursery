@@ -11,8 +11,8 @@
 #SBATCH --error=/dev/null
 
 # The static A30 directives remain the default for later scientific
-# development/holdout. Engineering health is submitted with the prospectively
-# frozen H100 NVL 3g.47gb command-line overrides validated below.
+# development/holdout. Attempt 8 health uses the prospectively frozen full-A30
+# command-line request selected by the scheduler-only comparison below.
 
 set -euo pipefail
 umask 077
@@ -47,7 +47,7 @@ if [[ "$tuple_run_mode" == "health" ]]; then
   install -d -m 700 "$health_attempt_root"
   wrapper_marker="$health_attempt_root/wrapper-started.json"
   [[ ! -e "$wrapper_marker" ]] || exit 65
-  printf '{"schema_version":1,"attempt":%d,"submission_started_epoch":%s,"GPU_type":"NVIDIA_H100_NVL_3G_47GB_MIG","GPU_count":1,"CPU_count":8,"memory_GiB":32}\n' \
+  printf '{"schema_version":1,"attempt":%d,"submission_started_epoch":%s,"GPU_type":"NVIDIA_A30_24GB","GPU_count":1,"CPU_count":8,"memory_GiB":32}\n' \
     "$health_attempt" "$PHASE4_HEALTH_SUBMISSION_STARTED_EPOCH" >"$wrapper_marker"
   chmod 600 "$wrapper_marker"
 fi
@@ -86,14 +86,14 @@ require_health_topology() {
 
   local job_record
   job_record="$(scontrol show job --oneliner "$SLURM_JOB_ID" 2>/dev/null)" || exit 66
-  case " $job_record " in *" Partition=h100 "*) ;; *) exit 66 ;; esac
+  case " $job_record " in *" Partition=a30 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" NumNodes=1 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" NumCPUs=8 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" NumTasks=1 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" TimeLimit=01:00:00 "*) ;; *) exit 66 ;; esac
   case " $job_record " in *" MinMemoryCPU=4G "*) ;; *) exit 66 ;; esac
   case " $job_record " in
-    *" TresPerNode=gres/gpu:nvidia_h100_nvl_3g.47gb:1 "*|*" TresPerNode=gres:gpu:nvidia_h100_nvl_3g.47gb:1 "*) ;;
+    *" TresPerNode=gres/gpu:nvidia_a30:1 "*|*" TresPerNode=gres:gpu:nvidia_a30:1 "*) ;;
     *) exit 66 ;;
   esac
 
@@ -102,7 +102,7 @@ require_health_topology() {
   esac
   local topology_attestation="$health_attempt_root/topology-attestation.json"
   [[ ! -e "$topology_attestation" ]] || exit 65
-  printf '{"CPU_count":8,"GRES":"gpu:nvidia_h100_nvl_3g.47gb:1","attempt":%s,"job_id":%s,"local_world_size":1,"memory_per_CPU_GiB":4,"node_count":1,"partition":"h100","predicate_count":7,"predicate_pass_count":7,"schema_version":1,"source":"WRAPPER_SCONTROL_BEFORE_CONTAINER","task_count":1,"time_limit_minutes":60,"world_size":1}\n' \
+  printf '{"CPU_count":8,"GRES":"gpu:nvidia_a30:1","attempt":%s,"job_id":%s,"local_world_size":1,"memory_per_CPU_GiB":4,"node_count":1,"partition":"a30","predicate_count":7,"predicate_pass_count":7,"schema_version":1,"source":"WRAPPER_SCONTROL_BEFORE_CONTAINER","task_count":1,"time_limit_minutes":60,"world_size":1}\n' \
     "$health_attempt" "$SLURM_JOB_ID" >"$topology_attestation"
   chmod 600 "$topology_attestation"
 
