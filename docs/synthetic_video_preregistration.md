@@ -1920,6 +1920,19 @@ slice-GPU-hours. It must restart the full 28-case two-replicate suite. Any
 engineering failure seals a new blocker with no attempt 6; only a committed
 7/7 pass authorizes public development.
 
+The sole authorized post-blocker submission, job 316537, completed at the
+scheduler in 33 seconds and produced committed blocker `b05dc8da…deb9c`.
+Production-dependency preflight returned
+`E_TUPLE_HEALTH_ARTIFACT_COMMITMENT` while verifying the frozen base-container
+file, before model loading or module inference. Zero of seven modules completed;
+six dependent modules were explicitly preflight-blocked, all scientific metrics
+remained withheld, and no external call, invalid retained record, silent
+truncation, or unaccounted exception occurred. The post-run host check found the
+public container present and byte-matching the frozen hash, so the execution-time
+discrepancy remains unresolved. Per the predeclared stop rule, there is no
+attempt 6 and no public development/holdout, governed C, LTX, generation, or
+synthetic-learner authorization under this route.
+
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only
 holdout result is a scientific no-go. Governed C remains conditional on a full

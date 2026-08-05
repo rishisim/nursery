@@ -547,6 +547,16 @@ slice-GPU-hours, 1 GiB, and $0. The full 28-case suite must restart; only a
 committed 7/7 pass may open development, and no repair or attempt 6 follows a
 failure.
 
+Sole post-blocker job 316537 completed at the scheduler in 33 seconds and wrote
+a valid committed `ENGINEERING_BLOCKER` record, `b05dc8da…deb9c`. The complete
+suite stopped in production-dependency preflight: base-container immutable-file
+verification returned `E_TUPLE_HEALTH_ARTIFACT_COMMITMENT` before model loading.
+No module completed; six dependent modules were explicitly preflight-blocked;
+there were zero unaccounted failures, external calls, invalid retained records,
+or scientific metrics. The public container was present and matched the frozen
+hash in a post-run host check, leaving the execution-time discrepancy unresolved
+within this route. Attempt 6 and all downstream stages are unauthorized.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to

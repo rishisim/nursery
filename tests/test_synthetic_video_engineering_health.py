@@ -47,6 +47,7 @@ def _historical_health_config() -> dict:
     config.pop("learner_effective_engineering_health_reauthorization")
     config.pop("learner_effective_engineering_health_reauthorization_result")
     config.pop("learner_effective_engineering_health_parser_repair_reauthorization")
+    config.pop("learner_effective_engineering_health_parser_repair_result")
     return config
 
 
@@ -850,10 +851,25 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
         "repair_or_resmoke_cycles_after_attempt_5"
     ] == 0
 
-    with pytest.raises(
-        RuntimeError,
-        match="E_TUPLE_HEALTH_PARSER_REPAIR_REAUTHORIZED_ATTEMPT",
-    ):
+    terminal_parser_repair = MODULE._engineering_health_parser_repair_result(
+        config
+    )
+    assert terminal_parser_repair["blocker_commitment_sha256"] == (
+        "b05dc8da3155561b182b3bcfa50c851f83828b34e063918306bdfb57fdedeb9c"
+    )
+    assert terminal_parser_repair["submission_provenance"]["job_id"] == 316537
+    assert terminal_parser_repair["compact_aggregate"][
+        "completed_module_count"
+    ] == 0
+    assert terminal_parser_repair["compact_aggregate"][
+        "scientific_metric_count"
+    ] == 0
+    assert terminal_parser_repair["stable_aggregate_diagnosis"][
+        "first_stable_error_code"
+    ] == "E_TUPLE_HEALTH_ARTIFACT_COMMITMENT"
+    assert terminal_parser_repair["terminal_gate"]["attempt_6_authorized"] is False
+
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ROUTE_EXHAUSTED"):
         MODULE.run_tuple_health(
             argparse.Namespace(
                 public_root=tmp_path / "public",
@@ -911,6 +927,18 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
         match="E_TUPLE_HEALTH_PARSER_REPAIR_REAUTHORIZATION_COMMITMENT",
     ):
         MODULE._engineering_health_parser_repair_reauthorization(mutated)
+
+    mutated = json.loads(json.dumps(config))
+    result = mutated["learner_effective_engineering_health_parser_repair_result"]
+    result["terminal_gate"]["attempt_6_authorized"] = True
+    payload = json.loads(json.dumps(result))
+    payload.pop("blocker_commitment_sha256")
+    result["blocker_commitment_sha256"] = MODULE.digest(payload)
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_HEALTH_PARSER_REPAIR_RESULT_COMMITMENT",
+    ):
+        MODULE._engineering_health_parser_repair_result(mutated)
 
 
 def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
@@ -1117,6 +1145,7 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop("learner_effective_engineering_health_reauthorization")
     historical_config.pop("learner_effective_engineering_health_reauthorization_result")
     historical_config.pop("learner_effective_engineering_health_parser_repair_reauthorization")
+    historical_config.pop("learner_effective_engineering_health_parser_repair_result")
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)
     manifest = _fixture_manifest()

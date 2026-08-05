@@ -361,6 +361,16 @@ The same H100 NVL `3g.47gb` slice, eight CPUs, 32 GiB, 15-minute wall cap,
 scientific gates remain fixed. The added ceiling is 0.25 slice-GPU-hours,
 1 GiB, and $0. There is no post-attempt repair or attempt 6.
 
+Sole job 316537 then completed at the scheduler in 33 seconds but sealed
+`ENGINEERING_BLOCKER` commitment `b05dc8da…deb9c`: immutable base-container
+verification returned `E_TUPLE_HEALTH_ARTIFACT_COMMITMENT` before model
+loading. Zero of seven modules completed, all seven received stable engineering
+errors, and no scientific metric opened. A host-side post-run check found the
+public container present and matching the frozen hash, so the execution-time
+discrepancy is unresolved. The frozen route is exhausted: no attempt 6,
+development/holdout, governed C, LTX work, generation, or Synthetic-1h run is
+authorized.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and
