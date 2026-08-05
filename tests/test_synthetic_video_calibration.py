@@ -35,7 +35,7 @@ def test_construct_aligned_resume_amendment_is_exact_and_schema23_compatible() -
     config = json.loads(
         Path("configs/synthetic_video_real_only_proof.json").read_text()
     )
-    assert config["schema_version"] == 26
+    assert config["schema_version"] == 27
     amendment = MODULE._construct_aligned_ltx_resume_amendment(config)
     assert (
         amendment["amendment_commitment_sha256"]
@@ -3491,6 +3491,14 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
     )
     monkeypatch.setattr(
         MODULE,
+        "_tuple_container_attestation",
+        lambda *_args, **_kwargs: {
+            "sha256": "f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792",
+            "bytes": 3731320832,
+        },
+    )
+    monkeypatch.setattr(
+        MODULE,
         "_tuple_partition_engineering_integrity",
         lambda *_: [
             MODULE._tuple_health_pass_result(
@@ -3507,6 +3515,7 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
         "public_root": public,
         "scratch_root": scratch,
         "config": config_path,
+        "container_attestation": tmp_path / "container-attestation.json",
         "device": "cpu",
     }
     development = MODULE.qualify_tuple_public(

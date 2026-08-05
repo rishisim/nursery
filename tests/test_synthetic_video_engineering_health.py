@@ -48,6 +48,7 @@ def _historical_health_config() -> dict:
     config.pop("learner_effective_engineering_health_reauthorization_result")
     config.pop("learner_effective_engineering_health_parser_repair_reauthorization")
     config.pop("learner_effective_engineering_health_parser_repair_result")
+    config.pop("learner_effective_engineering_health_iterative_reauthorization")
     return config
 
 
@@ -79,6 +80,36 @@ def _write_topology_attestation(
         "source": "WRAPPER_SCONTROL_BEFORE_CONTAINER",
     }
     path = root / "topology-attestation.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(MODULE.canonical(value) + b"\n")
+    path.chmod(0o600)
+    return path
+
+
+def _write_container_attestation(
+    root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    run_mode: str = "health",
+    attempt: int | None = 6,
+    job_id: int = 316538,
+) -> Path:
+    monkeypatch.setenv("SLURM_JOB_ID", str(job_id))
+    value = {
+        "artifact_family": "BASE_CONTAINER",
+        "attempt": attempt,
+        "bytes": 3731320832,
+        "host_entry_is_symlink": True,
+        "job_id": job_id,
+        "predicate_count": 4,
+        "predicate_pass_count": 4,
+        "resolved_target_regular_file": True,
+        "run_mode": run_mode,
+        "schema_version": 1,
+        "sha256": "f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792",
+        "source": "WRAPPER_HOST_BEFORE_CONTAINER",
+    }
+    path = root / "container-attestation.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(MODULE.canonical(value) + b"\n")
     path.chmod(0o600)
@@ -600,7 +631,7 @@ def test_tuple_health_metric_release_requires_seven_unique_passed_modules() -> N
         MODULE._tuple_health_metric_release(wrong_status, scientific)
 
 
-def test_tuple_health_budget_enforces_single_parser_repair_attempt_and_limits() -> None:
+def test_tuple_health_budget_enforces_active_iterative_attempt_and_limits() -> None:
     config = _config()
     prior = [
         {
@@ -639,9 +670,18 @@ def test_tuple_health_budget_enforces_single_parser_repair_attempt_and_limits() 
             "new_storage_GiB": 1.0170042514801025e-06,
             "direct_monetary_cost_USD": 0,
         },
+        {
+            "attempt": 5,
+            "GPU_type": "NVIDIA_H100_NVL_3G_47GB_MIG",
+            "GPU_count": 1,
+            "wall_minutes": 0.36148459911346437,
+            "GPU_hours": 0.006024743318557739,
+            "new_storage_GiB": 9.872019290924072e-7,
+            "direct_monetary_cost_USD": 0,
+        },
     ]
-    budget = MODULE._tuple_health_budget(5, prior, config)
-    assert budget["attempt"] == 5
+    budget = MODULE._tuple_health_budget(6, prior, config)
+    assert budget["attempt"] == 6
     assert budget["GPU_type"] == "NVIDIA_H100_NVL_3G_47GB_MIG"
     assert budget["GPU_count"] == 1
     assert budget["per_submission_wall_minutes_max"] == 15
@@ -650,7 +690,7 @@ def test_tuple_health_budget_enforces_single_parser_repair_attempt_and_limits() 
     assert budget["direct_monetary_cost_USD"] == 0
 
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ATTEMPT_BUDGET"):
-        MODULE._tuple_health_budget(6, prior, config)
+        MODULE._tuple_health_budget(7, prior, config)
 
 
 @pytest.mark.parametrize(
@@ -869,12 +909,31 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
     ] == "E_TUPLE_HEALTH_ARTIFACT_COMMITMENT"
     assert terminal_parser_repair["terminal_gate"]["attempt_6_authorized"] is False
 
-    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ROUTE_EXHAUSTED"):
+    iterative = MODULE._engineering_health_iterative_reauthorization(config)
+    assert iterative["reauthorization_commitment_sha256"] == (
+        "3114e1763f65dbeb8b2f89bb2a0480c86f4266f888c1ac2ff740bee85d357ab9"
+    )
+    assert iterative["read_only_root_cause_diagnosis"][
+        "host_entry_is_symlink"
+    ] is True
+    assert iterative["read_only_root_cause_diagnosis"][
+        "running_container_namespace_symlink_target_present"
+    ] is False
+    assert iterative["active_attempt_resource_policy"]["attempt"] == 6
+    assert iterative["rolling_execution_policy"][
+        "blanket_user_authorization_for_additional_ordinary_engineering_attempts"
+    ] is True
+
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_HEALTH_ITERATIVE_REAUTHORIZED_ATTEMPT",
+    ):
         MODULE.run_tuple_health(
             argparse.Namespace(
                 public_root=tmp_path / "public",
                 scratch_root=tmp_path / "scratch",
                 config=Path("configs/synthetic_video_real_only_proof.json"),
+                container_attestation=tmp_path / "container-attestation.json",
                 attempt=3,
                 device="cuda",
             )
@@ -940,6 +999,22 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
     ):
         MODULE._engineering_health_parser_repair_result(mutated)
 
+    mutated = json.loads(json.dumps(config))
+    iterative = mutated[
+        "learner_effective_engineering_health_iterative_reauthorization"
+    ]
+    iterative["failure_specific_repair"][
+        "runner_no_longer_dereferences_host_only_SIF_target_inside_container"
+    ] = False
+    payload = json.loads(json.dumps(iterative))
+    payload.pop("reauthorization_commitment_sha256")
+    iterative["reauthorization_commitment_sha256"] = MODULE.digest(payload)
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_HEALTH_ITERATIVE_REAUTHORIZATION_COMMITMENT",
+    ):
+        MODULE._engineering_health_iterative_reauthorization(mutated)
+
 
 def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
@@ -972,6 +1047,77 @@ def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
         MODULE._tuple_health_topology(
             "cuda", topology_attestation=attestation, attempt=4
         )
+
+
+def test_container_attestation_replaces_unavailable_in_container_sif_target(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    health = _write_container_attestation(
+        tmp_path / "health", monkeypatch, attempt=6, job_id=316538
+    )
+    assert MODULE._tuple_container_attestation(
+        health,
+        _config(),
+        run_mode="health",
+        attempt=6,
+    ) == {
+        "sha256": "f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792",
+        "bytes": 3731320832,
+    }
+
+    development = _write_container_attestation(
+        tmp_path / "development",
+        monkeypatch,
+        run_mode="development",
+        attempt=None,
+        job_id=316539,
+    )
+    assert MODULE._tuple_container_attestation(
+        development,
+        _config(),
+        run_mode="development",
+        attempt=None,
+    )["bytes"] == 3731320832
+
+    original = json.loads(health.read_text())
+    monkeypatch.setenv("SLURM_JOB_ID", "316538")
+    for key, changed_value in (
+        ("job_id", 316537),
+        ("run_mode", "development"),
+        ("attempt", 5),
+        ("predicate_pass_count", 3),
+        ("sha256", "0" * 64),
+        ("bytes", 1),
+    ):
+        changed = dict(original)
+        changed[key] = changed_value
+        health.write_bytes(MODULE.canonical(changed) + b"\n")
+        with pytest.raises(
+            RuntimeError,
+            match="E_TUPLE_HEALTH_CONTAINER_ATTESTATION",
+        ):
+            MODULE._tuple_container_attestation(
+                health,
+                _config(),
+                run_mode="health",
+                attempt=6,
+            )
+
+
+def test_health_and_science_configuration_commitments_ignore_outcome_state() -> None:
+    health_config = _config()
+    health_commitment = MODULE._tuple_health_configuration_preflight(health_config)
+    science_config = json.loads(json.dumps(health_config))
+    science_config["status"] = (
+        "COMMITTED_ENGINEERING_HEALTH_PASS_PENDING_SCIENTIFIC_DEVELOPMENT"
+    )
+    science_config["learner_effective_engineering_health_pass_result"] = {
+        "outcome_only_test_record": True
+    }
+    assert (
+        MODULE._tuple_health_configuration_preflight(science_config)
+        == health_commitment
+    )
 
 
 def test_tuple_topology_separates_h100_health_from_a30_science(
@@ -1054,15 +1200,17 @@ def test_tuple_health_cli_emits_one_exact_allowlisted_line(
             str(tmp_path / "scratch"),
             "--config",
             str(tmp_path / "config.json"),
+            "--container-attestation",
+            str(tmp_path / "container-attestation.json"),
             "--attempt",
-            "5",
+            "6",
             "--device",
             "cuda",
         ],
     )
     MODULE.main()
     lines = capsys.readouterr().out.splitlines()
-    assert observed_attempts == [5]
+    assert observed_attempts == [6]
     assert len(lines) == 1
     assert set(json.loads(lines[0])) == set(MODULE.TUPLE_HEALTH_FIELDS)
 
@@ -1084,6 +1232,8 @@ def test_attempt4_terminal_diagnosis_matches_frozen_cli_choice(
             str(tmp_path / "scratch"),
             "--config",
             "configs/synthetic_video_real_only_proof.json",
+            "--container-attestation",
+            str(tmp_path / "container-attestation.json"),
             "--attempt",
             "4",
             "--device",
@@ -1146,6 +1296,7 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop("learner_effective_engineering_health_reauthorization_result")
     historical_config.pop("learner_effective_engineering_health_parser_repair_reauthorization")
     historical_config.pop("learner_effective_engineering_health_parser_repair_result")
+    historical_config.pop("learner_effective_engineering_health_iterative_reauthorization")
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)
     manifest = _fixture_manifest()
@@ -1164,6 +1315,9 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
         },
     )
     _write_topology_attestation(
+        attempt_root, monkeypatch, attempt=1, job_id=316325
+    )
+    container_attestation = _write_container_attestation(
         attempt_root, monkeypatch, attempt=1, job_id=316325
     )
     calls: list[str] = []
@@ -1216,6 +1370,7 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
             public_root=public,
             scratch_root=scratch,
             config=config_path,
+            container_attestation=container_attestation,
             attempt=1,
             device="cuda",
         )
@@ -1298,12 +1453,20 @@ def test_partition_crash_withholds_metrics_and_preserves_legacy_record(
         "_tuple_module_runners",
         lambda: {module_id: runner(module_id) for module_id in MODULE_IDS},
     )
+    container_attestation = _write_container_attestation(
+        tmp_path / "development-container-attestation",
+        monkeypatch,
+        run_mode="development",
+        attempt=None,
+        job_id=316539,
+    )
 
     compact = MODULE.qualify_tuple_public(
         argparse.Namespace(
             public_root=public,
             scratch_root=scratch,
             config=config_path,
+            container_attestation=container_attestation,
             partition="development",
             device="cuda",
         )

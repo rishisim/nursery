@@ -1933,6 +1933,21 @@ discrepancy remains unresolved. Per the predeclared stop rule, there is no
 attempt 6 and no public development/holdout, governed C, LTX, generation, or
 synthetic-learner authorization under this route.
 
+The user then made a new prospective rolling authorization for ordinary
+engineering attempts until the route produces a complete valid scientific
+decision. This does not reinterpret blocker `b05dc8da…deb9c`. Read-only
+diagnosis established that the SIF entry is a host symlink whose resolved
+3,731,320,832-byte target exists and matches the frozen SHA-256, while that
+target is intentionally absent inside the running SIF namespace. Attempt 6
+therefore replaces only the invalid in-container dereference with a canonical
+host-before-container attestation. The wrapper must verify symlink status,
+resolved regular-file status, exact bytes, and SHA-256 and write a private
+canonical record; the runner must bind it to the scheduler job, run mode,
+attempt, and four passed predicates. The stable dependency record contains the
+same frozen container hash/bytes for health and later scientific jobs. Attempt
+6 retains one H100 NVL `3g.47gb` slice, eight CPUs, 32 GiB, 15 minutes, at most
+0.25 slice-GPU-hours and 1 GiB, and $0. All scientific rules remain unchanged.
+
 Only a committed all-module health PASS authorizes one new-route public
 development run. A complete valid below-threshold development or once-only
 holdout result is a scientific no-go. Governed C remains conditional on a full

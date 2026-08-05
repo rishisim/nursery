@@ -39,7 +39,7 @@ exec >"$output_root/logs/qualify-${SLURM_JOB_ID}.out" 2>"$output_root/logs/quali
 if [[ "$tuple_run_mode" == "health" ]]; then
   health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"
   case "$health_attempt" in
-    5) ;;
+    6) ;;
     *) exit 64 ;;
   esac
   export PHASE4_HEALTH_SUBMISSION_STARTED_EPOCH="$(date +%s)"
@@ -50,6 +50,29 @@ if [[ "$tuple_run_mode" == "health" ]]; then
   printf '{"schema_version":1,"attempt":%d,"submission_started_epoch":%s,"GPU_type":"NVIDIA_H100_NVL_3G_47GB_MIG","GPU_count":1,"CPU_count":8,"memory_GiB":32}\n' \
     "$health_attempt" "$PHASE4_HEALTH_SUBMISSION_STARTED_EPOCH" >"$wrapper_marker"
   chmod 600 "$wrapper_marker"
+fi
+if [[ "$tuple_run_mode" == "health" || "$tuple_run_mode" == "development" || "$tuple_run_mode" == "holdout" ]]; then
+  container_image="${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif"
+  container_sha256="f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792"
+  container_bytes=3731320832
+  [[ -L "$container_image" ]] || exit 65
+  [[ -f "$container_image" ]] || exit 65
+  [[ "$(stat -Lc %s "$container_image")" -eq "$container_bytes" ]] || exit 65
+  printf '%s  %s\n' "$container_sha256" "$container_image" | sha256sum --check --status
+  case "$SLURM_JOB_ID" in ''|*[!0-9]*) exit 66 ;; esac
+  if [[ "$tuple_run_mode" == "health" ]]; then
+    container_attestation="$health_attempt_root/container-attestation.json"
+    attestation_attempt="$health_attempt"
+  else
+    container_attestation_root="$output_root/container-attestations"
+    install -d -m 700 "$container_attestation_root"
+    container_attestation="$container_attestation_root/${tuple_run_mode}-${SLURM_JOB_ID}.json"
+    attestation_attempt=null
+  fi
+  [[ ! -e "$container_attestation" ]] || exit 65
+  printf '{"artifact_family":"BASE_CONTAINER","attempt":%s,"bytes":3731320832,"host_entry_is_symlink":true,"job_id":%s,"predicate_count":4,"predicate_pass_count":4,"resolved_target_regular_file":true,"run_mode":"%s","schema_version":1,"sha256":"%s","source":"WRAPPER_HOST_BEFORE_CONTAINER"}\n' \
+    "$attestation_attempt" "$SLURM_JOB_ID" "$tuple_run_mode" "$container_sha256" >"$container_attestation"
+  chmod 600 "$container_attestation"
 fi
 scratch="${TMPDIR:-/tmp}/synthetic-calibration-qualify-${SLURM_JOB_ID}"
 install -d -m 700 "$scratch" "$scratch/pydeps"
@@ -79,7 +102,7 @@ require_health_topology() {
   esac
   local topology_attestation="$health_attempt_root/topology-attestation.json"
   [[ ! -e "$topology_attestation" ]] || exit 65
-  printf '{"CPU_count":8,"GRES":"gpu:nvidia_h100_nvl_3g.47gb:1","attempt":5,"job_id":%s,"local_world_size":1,"memory_per_CPU_GiB":4,"node_count":1,"partition":"h100","predicate_count":7,"predicate_pass_count":7,"schema_version":1,"source":"WRAPPER_SCONTROL_BEFORE_CONTAINER","task_count":1,"time_limit_minutes":15,"world_size":1}\n' \
+  printf '{"CPU_count":8,"GRES":"gpu:nvidia_h100_nvl_3g.47gb:1","attempt":6,"job_id":%s,"local_world_size":1,"memory_per_CPU_GiB":4,"node_count":1,"partition":"h100","predicate_count":7,"predicate_pass_count":7,"schema_version":1,"source":"WRAPPER_SCONTROL_BEFORE_CONTAINER","task_count":1,"time_limit_minutes":15,"world_size":1}\n' \
     "$SLURM_JOB_ID" >"$topology_attestation"
   chmod 600 "$topology_attestation"
 
@@ -114,6 +137,7 @@ elif [[ "$tuple_run_mode" == "health" || "$tuple_run_mode" == "development" || "
       --public-root "${PHASE4_PUBLIC_ROOT}" \
       --scratch-root "$scratch" \
       --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json" \
+      --container-attestation "$container_attestation" \
       --attempt "$health_attempt" \
       --device cuda
   else
@@ -124,6 +148,7 @@ elif [[ "$tuple_run_mode" == "health" || "$tuple_run_mode" == "development" || "
       --public-root "${PHASE4_PUBLIC_ROOT}" \
       --scratch-root "$scratch" \
       --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json" \
+      --container-attestation "$container_attestation" \
       --partition "$tuple_run_mode" \
       --device cuda
   fi

@@ -371,6 +371,16 @@ discrepancy is unresolved. The frozen route is exhausted: no attempt 6,
 development/holdout, governed C, LTX work, generation, or Synthetic-1h run is
 authorized.
 
+The user subsequently authorized rolling ordinary engineering attempts until a
+complete valid scientific result. Read-only diagnosis established that the SIF
+entry is a symlink: its 3,731,320,832-byte target exists and matches the frozen
+hash on the host but is not exposed inside the running SIF namespace. Schema 27
+therefore preserves the attempt-5 blocker while freezing a host-before-container
+immutable attestation for attempt 6. The runner consumes only its canonical
+hash/size record; models, fixtures, metrics, thresholds, seeds, and gates remain
+unchanged. Each attempt retains one H100 NVL `3g.47gb` slice, eight CPUs,
+32 GiB, 15 minutes, at most 0.25 slice-GPU-hours and 1 GiB, at $0.
+
 Before any material generation, one deterministic structured compiler must
 map each sealed public-word episode plan into an LTX prompt. Its fixed schema
 encodes child-height first-person camera behavior, scene complexity and

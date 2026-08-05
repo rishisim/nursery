@@ -557,6 +557,19 @@ or scientific metrics. The public container was present and matched the frozen
 hash in a post-run host check, leaving the execution-time discrepancy unresolved
 within this route. Attempt 6 and all downstream stages are unauthorized.
 
+After that seal, the user explicitly authorized all outcome-independent
+engineering attempts needed to reach a complete valid public scientific result.
+Read-only namespace diagnosis showed that the public SIF entry is a symlink:
+the resolved 3,731,320,832-byte target is present and byte-matches the frozen
+hash on the host, but the target is absent inside the running SIF namespace.
+Schema 27 freezes the minimal attempt-6 repair before any new outcome. The
+wrapper verifies the symlink, resolved regular target, exact bytes, and SHA-256
+before container launch and writes a mode-0600 canonical attestation; the runner
+validates its job, run mode, attempt, predicates, hash, and bytes without trying
+to dereference the host-only target. The same attestation path is used for later
+scientific development/holdout so stable dependency commitments remain equal.
+No scientific input or rule changes.
+
 Only a combined public pass may authorize the governed C transfer audit and
 measurement. Only a combined C pass may authorize a public-word episode-plan
 commitment and LTX final-topology preflight. The generator remains pinned to
