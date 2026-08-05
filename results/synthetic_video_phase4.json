@@ -1,7 +1,7 @@
 {
   "schema_version": 24,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_16_RESOURCE_DISPATCH_BLOCKER_PRESERVED_ATTEMPT_17_REPAIR_FROZEN_NO_NEW_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_17_RUNTIME_EXECUTION_BLOCKER_PRESERVED_ATTEMPT_18_REPAIR_FROZEN_NO_NEW_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -1338,6 +1338,55 @@
     "model_fixture_threshold_metric_seed_repair_or_scientific_gate_changed": false,
     "new_health_or_scientific_outcome_opened": false
   },
+  "learner_effective_engineering_health_attempt_17_result": {
+    "status": "ENGINEERING_BLOCKER_ATTEMPT_17_COMPLETE_METRIC_WITHHELD_HEALTH_NO_SCIENTIFIC_METRICS_OPENED",
+    "observed_on": "2026-08-05",
+    "canonical_source": "configs/synthetic_video_real_only_proof.json#learner_effective_engineering_health_attempt_17_result",
+    "job_id": 316933,
+    "attempt": 17,
+    "scheduler_state": "COMPLETED",
+    "scheduler_exit_code": "0:0",
+    "scheduler_elapsed_seconds": 390,
+    "GPU_type": "NVIDIA_A30_24GB",
+    "completed_module_count": 4,
+    "failed_module_count": 3,
+    "scientific_metric_count": 0,
+    "missing_bundled_ffmpeg_command": true,
+    "missing_prettytable_import": true,
+    "classification": "ENGINEERING_PUBLIC_RUNTIME_EXECUTION_DEPENDENCY_FAILURES_NOT_SCIENTIFIC_NO_GO",
+    "blocker_commitment_sha256": "bcb7e203dd20013ecd50e7a50d1f09a75aeb59f766f193843eb2ac4ba5fa762d",
+    "attempt_GPU_hours_actual": 0.10678490440050761,
+    "protocol_accounted_cumulative_GPU_hours_actual": 1.6608390655120213,
+    "direct_monetary_cost_USD": 0,
+    "new_scientific_outcome_opened": false
+  },
+  "learner_effective_engineering_health_ffmpeg_prettytable_repair": {
+    "status": "FROZEN_AFTER_ATTEMPT_17_RUNTIME_EXECUTION_FAILURES_BEFORE_ATTEMPT_18_OR_NEW_OUTCOME",
+    "effective_on": "2026-08-05",
+    "canonical_source": "configs/synthetic_video_real_only_proof.json#learner_effective_engineering_health_ffmpeg_prettytable_repair",
+    "repair_commitment_sha256": "f1d4153ae0835b90b0e0ba3749b7beef7c21e846a4d5f344d6dede4c1a092124",
+    "attempt_17_blocker_sha256": "bcb7e203dd20013ecd50e7a50d1f09a75aeb59f766f193843eb2ac4ba5fa762d",
+    "bundled_ffmpeg_exact_staging": true,
+    "prettytable_version": "3.18.0",
+    "prettytable_wheel_sha256": "b3346e0e6f79180833aebaac088ae926340586cf6d7d991b9eb125b65f72313a",
+    "prettytable_license": "BSD-3-Clause",
+    "active_attempt": 18,
+    "selected_partition": "a30",
+    "selected_GRES": "gpu:nvidia_a30:1",
+    "selected_GPU_type": "NVIDIA_A30_24GB",
+    "GPU_count": 1,
+    "CPU_count": 8,
+    "memory_GiB": 32,
+    "wall_minutes_max": 60,
+    "GPU_hours_max": 1.0,
+    "active_aggregate_GPU_hours_max": 2.6608390655120213,
+    "new_storage_GiB_max": 1.0,
+    "direct_monetary_cost_USD": 0,
+    "one_live_job_max": 1,
+    "no_repeated_scheduler_polling_or_unchanged_status_updates": true,
+    "model_fixture_threshold_metric_seed_repair_or_scientific_gate_changed": false,
+    "new_health_or_scientific_outcome_opened": false
+  },
   "governed_C_calibration": {
     "status": "NO_GO",
     "topology": "1_H100",
@@ -1913,5 +1962,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "COMMIT_AND_PUSH_NLTK_MATPLOTLIB_RUNTIME_REPAIR_THEN_INSTALL_THE_EXACT_PUBLIC_WHEELS_OFFLINE_AND_RUN_ONE_COMPLETE_ATTEMPT_14_ON_THE_FROZEN_A30_TOPOLOGY; OPEN_PUBLIC_SCIENTIFIC_DEVELOPMENT_ONLY_AFTER_A_COMMITTED_7_OF_7_HEALTH_PASS"
+  "next_authorized_scope": "COMMIT_AND_PUSH_THE_EXACT_FFMPEG_PRETTYTABLE_RUNTIME_REPAIR_THEN_INSTALL_AND_RELOAD_THE_PINNED_PUBLIC_WHEEL_OFFLINE_AND_RUN_ONE_COMPLETE_ATTEMPT_18_ON_THE_FROZEN_A30_TOPOLOGY; OPEN_PUBLIC_SCIENTIFIC_DEVELOPMENT_ONLY_AFTER_A_COMMITTED_7_OF_7_HEALTH_PASS"
 }

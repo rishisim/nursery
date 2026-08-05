@@ -680,3 +680,14 @@ historical defaults and freezes one otherwise unchanged attempt 17 on the
 scheduler-selected A30. It remains one process, eight CPUs, 32 GiB,
 60 minutes/1 GPU-hour, 1 GiB new storage, and $0, with no periodic polling or
 unchanged-status reporting.
+
+Attempt 17, Juno job 316933, completed in 390 scheduler seconds with scientific
+metrics withheld. Four of seven modules passed engineering health. Referent and
+attribute execution both lacked the already pinned bundled `ffmpeg` command,
+and EgoHOS lacked the public PrettyTable import; no model, fixture, threshold,
+seed, metric, or scientific rule failed. Engineering blocker
+`bcb7e203…a762d` preserves the complete result. Prospective repair
+`f1d4153a…92124` verifies and stages the exact imageio-ffmpeg 0.6.0 binary and
+adds the exact BSD-3-Clause PrettyTable 3.18.0 public wheel for offline reload.
+Attempt 18 reruns the entire metric-withheld suite on the scheduler-selected
+A30 under the unchanged one-process, 60-minute/1-GPU-hour, 1-GiB, $0 ceiling.

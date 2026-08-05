@@ -741,3 +741,15 @@ over historical defaults and freezes attempt 17 on the earliest eligible
 zero-cost A30 topology. Models, fixtures, thresholds, metrics, seeds, privacy
 guards, one-process execution, and scientific gates are unchanged; periodic
 scheduler polling and unchanged-status messages remain prohibited.
+
+Attempt 17 (Juno job 316933) completed after 390 scheduler seconds. Four of
+seven modules passed engineering health; referent and attribute both stopped
+because Whisper's already pinned imageio-ffmpeg binary was not exposed as the
+`ffmpeg` command, while EgoHOS stopped because its public PrettyTable runtime
+dependency was absent. Scientific metrics remained zero, so blocker
+`bcb7e203…a762d` is engineering-only. Prospective repair
+`f1d4153a…92124` stages and verifies the exact 79,826,272-byte bundled ffmpeg
+binary and pins the 37,357-byte BSD-3-Clause PrettyTable 3.18.0 wheel for
+offline installation and reload. Attempt 18 is the unchanged complete suite
+on the scheduler-selected A30; public science remains locked pending a
+committed 7/7 health pass.

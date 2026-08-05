@@ -11,7 +11,7 @@
 #SBATCH --error=/dev/null
 
 # The static A30 directives remain the default for later scientific
-# development/holdout. Health attempt 17 uses one prospectively frozen
+# development/holdout. Health attempt 18 uses one prospectively frozen
 # command-line topology selected immediately before submission.
 
 set -euo pipefail
@@ -39,7 +39,7 @@ exec >"$output_root/logs/qualify-${SLURM_JOB_ID}.out" 2>"$output_root/logs/quali
 if [[ "$tuple_run_mode" == "health" ]]; then
   health_attempt="${PHASE4_HEALTH_ATTEMPT:-}"
   case "$health_attempt" in
-    17) ;;
+    18) ;;
     *) exit 64 ;;
   esac
   health_gpu_type="${PHASE4_HEALTH_GPU_TYPE:-}"
@@ -138,7 +138,7 @@ require_health_topology() {
   if [[ " $job_record " == *" TresPerNode=gres/gpu:${gres_suffix} "* || \
         " $job_record " == *" TresPerNode=gres:gpu:${gres_suffix} "* ]]; then
     scheduler_gres_ok=true
-  elif [[ "$health_attempt" == "17" && "$health_gpu_type" == "NVIDIA_A30_24GB" && \
+  elif [[ "$health_attempt" == "18" && "$health_gpu_type" == "NVIDIA_A30_24GB" && \
           "$health_partition" == "a30" && "$health_gres" == "gpu:nvidia_a30:1" && \
           " $job_record " == *" TresPerNode=gres/gpu:1 "* ]]; then
     # Slurm may serialize an A30-only partition's one-GPU request generically.
@@ -178,6 +178,17 @@ elif [[ "$tuple_run_mode" == "health" || "$tuple_run_mode" == "development" || "
   printf '%s  %s\n' "$language_archive_sha256" "$language_archive" | sha256sum --check --status
   tar -C "$scratch/pydeps" -xf "$language_archive"
   export PYTHONPATH="${PHASE4_PUBLIC_ROOT}/models/mechanistic-tuples/runtime-pydeps:${PHASE4_PUBLIC_ROOT}/source:${PHASE4_PUBLIC_ROOT}/models/mechanistic-tuples/code/egobabyvlm:${PHASE4_PUBLIC_ROOT}/models/activity-pydeps/egohod_egovideo_l_zero_shot:$scratch/pydeps"
+  install -d -m 700 "$scratch/bin"
+  ffmpeg_exe=$(singularity exec --net --network none \
+    --bind "${PHASE4_PUBLIC_ROOT}:${PHASE4_PUBLIC_ROOT},${scratch}:${scratch}" \
+    "${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif" \
+    env PYTHONPATH="$scratch/pydeps" \
+    python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')
+  [[ -x "$ffmpeg_exe" && "$(stat -c %s "$ffmpeg_exe")" -eq 79826272 ]] || exit 65
+  printf '%s  %s\n' e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99 "$ffmpeg_exe" | sha256sum --check --status
+  ln -s "$ffmpeg_exe" "$scratch/bin/ffmpeg"
+  export PATH="$scratch/bin:$PATH"
+  export SINGULARITYENV_PREPEND_PATH="$scratch/bin"
   if [[ "$tuple_run_mode" == "health" ]]; then
     require_health_topology
     singularity exec --nv --net --network none \

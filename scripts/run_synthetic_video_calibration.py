@@ -662,6 +662,12 @@ ENGINEERING_HEALTH_ATTEMPT_16_BLOCKER_SHA256 = (
 ENGINEERING_HEALTH_HISTORICAL_RESOURCE_DISPATCH_REPAIR_SHA256 = (
     "857b5353858d936dcaef3ea2c8ab2f6a1f569ace3f464f2de80dd831c273f87d"
 )
+ENGINEERING_HEALTH_ATTEMPT_17_BLOCKER_SHA256 = (
+    "bcb7e203dd20013ecd50e7a50d1f09a75aeb59f766f193843eb2ac4ba5fa762d"
+)
+ENGINEERING_HEALTH_FFMPEG_PRETTYTABLE_REPAIR_SHA256 = (
+    "f1d4153ae0835b90b0e0ba3749b7beef7c21e846a4d5f344d6dede4c1a092124"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -934,6 +940,21 @@ def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
     redirect = _engineering_health_resource_redirect(cfg)
     _engineering_health_dependency_restore(cfg)
     _engineering_health_topology_guard_repair(cfg)
+    if "learner_effective_engineering_health_ffmpeg_prettytable_repair" in cfg:
+        active = _engineering_health_ffmpeg_prettytable_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]
+        return {
+            "partition": active["partition"], "GRES": active["GRES"],
+            "GPU_type": active["GPU_type"], "GPU_count": active["GPU_count"],
+            "CPU_count": active["CPU_count"], "memory_GiB": active["memory_GiB"],
+            "DDP": active["DDP"],
+            "per_submission_wall_minutes_max": active["wall_minutes_max"],
+            "initial_plus_repair_resmoke_submission_count_max": active["attempt"],
+            "aggregate_GPU_hours_max": active["active_aggregate_GPU_hours_max"],
+            "new_storage_GiB_max": active["active_aggregate_new_storage_GiB_max"],
+            "direct_monetary_cost_USD": active["direct_monetary_cost_USD"],
+        }
     if "learner_effective_engineering_health_historical_resource_dispatch_repair" in cfg:
         active = _engineering_health_historical_resource_dispatch_repair(cfg)[
             "active_attempt_resource_policy"
@@ -1197,6 +1218,16 @@ def _engineering_health_attempt_gpu_type(
     """Return the prospectively bound GPU type for one historical/current attempt."""
 
     if type(attempt) is not int or attempt < 1:
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+    if "learner_effective_engineering_health_ffmpeg_prettytable_repair" in cfg:
+        policy = _engineering_health_ffmpeg_prettytable_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]
+        if attempt == int(policy["attempt"]):
+            return str(policy["GPU_type"])
+        historical = policy["historical_attempt_GPU_types"]
+        if str(attempt) in historical:
+            return str(historical[str(attempt)])
         raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
     if "learner_effective_engineering_health_historical_resource_dispatch_repair" in cfg:
         policy = _engineering_health_historical_resource_dispatch_repair(cfg)[
@@ -4838,6 +4869,226 @@ def _engineering_health_historical_resource_dispatch_repair(
     return value
 
 
+def _engineering_health_attempt_17_result(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the complete metric-withheld public runtime blocker."""
+
+    repair = _engineering_health_historical_resource_dispatch_repair(cfg)
+    try:
+        value = cfg["learner_effective_engineering_health_attempt_17_result"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_17_RESULT_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("blocker_commitment_sha256", None)
+    submission = value.get("submission_provenance", {})
+    compact = value.get("compact_aggregate", {})
+    diagnosis = value.get("stable_aggregate_diagnosis", {})
+    resource = value.get("resource_accounting", {})
+    terminal = value.get("terminal_gate", {})
+    expected_modules = {
+        "adapter_and_lexical": "PASS_ENGINEERING",
+        "referent": "ERROR",
+        "recurrence": "PASS_ENGINEERING",
+        "attribute": "ERROR",
+        "hand_contact": "ERROR",
+        "sensor": "PASS_ENGINEERING",
+        "order_action": "PASS_ENGINEERING",
+    }
+    if (
+        cfg.get("schema_version") != 36
+        or value.get("status")
+        != "ENGINEERING_BLOCKER_ATTEMPT_17_COMPLETE_METRIC_WITHHELD_HEALTH_NO_SCIENTIFIC_METRICS_OPENED"
+        or value.get("classification")
+        != "ENGINEERING_PUBLIC_RUNTIME_EXECUTION_DEPENDENCY_FAILURES_NOT_SCIENTIFIC_NO_GO"
+        or value.get("preserved_historical_resource_dispatch_repair_sha256")
+        != repair["repair_commitment_sha256"]
+        or expected != ENGINEERING_HEALTH_ATTEMPT_17_BLOCKER_SHA256
+        or digest(payload) != expected
+        or submission
+        != {
+            "job_id": 316933,
+            "attempt": 17,
+            "scheduler_state": "COMPLETED",
+            "scheduler_exit_code": "0:0",
+            "scheduler_elapsed_seconds": 390,
+            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_count": 1,
+            "CPU_count": 8,
+            "memory_GiB": 32,
+            "wall_minutes_requested": 60,
+            "DDP": False,
+            "direct_monetary_cost_USD": 0,
+        }
+        or compact.get("status") != "ENGINEERING_BLOCKER"
+        or compact.get("completed_module_count") != 4
+        or compact.get("failed_module_count") != 3
+        or compact.get("scientific_metric_count") != 0
+        or compact.get("unaccounted_failure_count") != 3
+        or compact.get("external_engineering_health_commitment_sha256")
+        != "55aed5b0d368fcf3ad96a8b2f91e535eee1e9030180f20d097dc0e64fc4b7f1f"
+        or value.get("module_health") != expected_modules
+        or diagnosis.get("referent_and_attribute_missing_exact_bundled_ffmpeg_command")
+        is not True
+        or diagnosis.get("hand_contact_missing_exact_prettytable_import")
+        is not True
+        or diagnosis.get("missing_public_dependency_count") != 2
+        or diagnosis.get("model_substitution_required") is not False
+        or diagnosis.get("model_or_scientific_outcome_used_for_repair") is not False
+        or resource.get("attempt_GPU_hours_actual") != 0.10678490440050761
+        or resource.get("protocol_accounted_cumulative_GPU_hours_actual")
+        != 1.6608390655120213
+        or resource.get("attempt_retained_storage_GiB")
+        != 6.639398634433746e-6
+        or terminal.get("scientific_decision_opened") is not False
+        or terminal.get(
+            "attempt_18_authorized_only_after_prospective_ffmpeg_prettytable_repair_commit_and_push"
+        )
+        is not True
+        or value.get("blocker_commitment_scope")
+        != "canonical JSON of this result excluding blocker_commitment_sha256"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_17_RESULT_COMMITMENT")
+    return value
+
+
+def _engineering_health_ffmpeg_prettytable_repair(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the exact public runtime repair and attempt-18 policy."""
+
+    attempt_17 = _engineering_health_attempt_17_result(cfg)
+    try:
+        value = cfg[
+            "learner_effective_engineering_health_ffmpeg_prettytable_repair"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError(
+            "E_TUPLE_HEALTH_FFMPEG_PRETTYTABLE_REPAIR_MISSING"
+        ) from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("repair_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    repair = value.get("failure_specific_repair", {})
+    ffmpeg = repair.get("bundled_ffmpeg", {})
+    prettytable = repair.get("prettytable_runtime", {})
+    runtime = value.get("public_runtime_dependency_repair", {})
+    comparison = value.get("scheduler_only_comparison", {})
+    active = value.get("active_attempt_resource_policy", {})
+    topology = value.get("topology_attestation_contract", {})
+    catalog = {
+        "NVIDIA_A30_24GB": ("a30", "gpu:nvidia_a30:1", "NVIDIA A30", 23, 25),
+        "NVIDIA_H100_NVL": ("h100", "gpu:nvidia_h100_nvl:1", "NVIDIA H100 NVL", 85, 100),
+        "NVIDIA_H100_NVL_3G_47GB_MIG": ("h100", "gpu:nvidia_h100_nvl_3g.47gb:1", "NVIDIA H100 NVL MIG 3g.47gb", 45, 50),
+        "NVIDIA_H200_NVL": ("h200", "gpu:nvidia_h200_nvl:1", "NVIDIA H200 NVL", 135, 145),
+    }
+    candidates = comparison.get("candidates")
+    candidate_shape_ok = (
+        isinstance(candidates, list)
+        and len(candidates) == len(catalog)
+        and {item.get("GPU_type") for item in candidates if isinstance(item, dict)}
+        == set(catalog)
+        and all(
+            item.get("partition") == catalog[item["GPU_type"]][0]
+            and item.get("GRES") == catalog[item["GPU_type"]][1]
+            and item.get("eligible") is True
+            and re.fullmatch(
+                r"2026-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}-0[5-7]:00",
+                str(item.get("estimated_start")),
+            )
+            is not None
+            for item in candidates
+        )
+    )
+    order = list(catalog)
+    winner = (
+        min(candidates, key=lambda item: (item["estimated_start"], order.index(item["GPU_type"])))
+        if candidate_shape_ok
+        else {}
+    )
+    selected_type = comparison.get("selected_GPU_type")
+    selected = catalog.get(selected_type, (None, None, None, None, None))
+    expected_artifact = {
+        "name": "prettytable-3.18.0-py3-none-any.whl",
+        "sha256": "b3346e0e6f79180833aebaac088ae926340586cf6d7d991b9eb125b65f72313a",
+        "bytes": 37357,
+        "license": "BSD-3-Clause",
+        "source": "official PyPI wheel",
+    }
+    if (
+        cfg.get("schema_version") != 36
+        or value.get("status")
+        != "FROZEN_AFTER_ATTEMPT_17_RUNTIME_EXECUTION_FAILURES_BEFORE_ATTEMPT_18_OR_NEW_OUTCOME"
+        or value.get("scope")
+        != "OUTCOME_INDEPENDENT_BUNDLED_FFMPEG_PATH_AND_PRETTYTABLE_RUNTIME_REPAIR_PLUS_ATTEMPT_18_TOPOLOGY_SELECTION"
+        or expected != ENGINEERING_HEALTH_FFMPEG_PRETTYTABLE_REPAIR_SHA256
+        or digest(payload) != expected
+        or preserved.get("attempt_17_blocker_sha256")
+        != attempt_17["blocker_commitment_sha256"]
+        or preserved.get("historical_resource_dispatch_repair_sha256")
+        != ENGINEERING_HEALTH_HISTORICAL_RESOURCE_DISPATCH_REPAIR_SHA256
+        or ffmpeg
+        != {
+            "provider": "imageio-ffmpeg",
+            "version": "0.6.0",
+            "binary_sha256": "e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99",
+            "binary_bytes": 79826272,
+            "source_archive_sha256": "97ef52ecaa8c99db017e598d8a63d0d2170affef14ef46e7df7a656abd3a1a07",
+            "staging": "verify exact executable then scratch-only ffmpeg symlink and SINGULARITYENV_PREPEND_PATH before the unchanged offline container run",
+        }
+        or prettytable.get("version") != "3.18.0"
+        or prettytable.get("wheel_sha256") != expected_artifact["sha256"]
+        or prettytable.get("wheel_bytes") != 37357
+        or prettytable.get("license_expression") != "BSD-3-Clause"
+        or prettytable.get("existing_dependency") != {"wcwidth": "0.2.13"}
+        or repair.get("attempt_17_exact_failure_regression_tests_required")
+        is not True
+        or repair.get("whole_microfixture_suite_rerun_required") is not True
+        or repair.get("generic_scheduler_TresPerNode_form_for_attempt_18")
+        != "gres/gpu:1"
+        or repair.get("model_fixture_source_threshold_partition_seed_metric_or_gate_changed")
+        is not False
+        or runtime.get("artifacts") != [expected_artifact]
+        or runtime.get("installed_distributions")
+        != [{"name": "prettytable", "version": "3.18.0"}]
+        or runtime.get("network_during_inference") is not False
+        or runtime.get("telemetry_or_tracking") is not False
+        or comparison.get("checked_on") != "2026-08-05"
+        or comparison.get("real_job_submitted_by_checks") is not False
+        or not candidate_shape_ok
+        or selected_type != winner.get("GPU_type")
+        or active.get("attempt") != 18
+        or active.get("partition") != selected[0]
+        or active.get("GRES") != selected[1]
+        or active.get("GPU_type") != selected_type
+        or active.get("prior_protocol_accounted_GPU_hours_actual")
+        != 1.6608390655120213
+        or active.get("active_aggregate_GPU_hours_max") != 2.6608390655120213
+        or topology
+        != {
+            "partition": selected[0],
+            "node_count": 1,
+            "task_count": 1,
+            "CPU_count": 8,
+            "time_limit_minutes": 60,
+            "memory_per_CPU_GiB": 4,
+            "GRES": selected[1],
+            "expected_device_name": selected[2],
+            "visible_memory_GiB_min": selected[3],
+            "visible_memory_GiB_max": selected[4],
+            "world_size": 1,
+            "local_world_size": 1,
+        }
+        or value.get("new_health_or_scientific_outcome_opened") is not False
+        or value.get("repair_commitment_scope")
+        != "canonical JSON of this amendment excluding repair_commitment_sha256"
+    ):
+        raise RuntimeError(
+            "E_TUPLE_HEALTH_FFMPEG_PRETTYTABLE_REPAIR_COMMITMENT"
+        )
+    return value
+
+
 def _geometry_function_bundle_digests(
     path: Path, names: list[str]
 ) -> tuple[str, str]:
@@ -7852,7 +8103,11 @@ def _tuple_health_incomplete_attempt_resource(
     marker = _tuple_health_wrapper_marker(attempt_root, attempt, cfg)
     policy = _engineering_health_resource_policy(cfg)
     historical = {}
-    if "learner_effective_engineering_health_historical_resource_dispatch_repair" in cfg:
+    if "learner_effective_engineering_health_ffmpeg_prettytable_repair" in cfg:
+        historical = _engineering_health_ffmpeg_prettytable_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]["historical_incomplete_attempt_wall_minutes"]
+    elif "learner_effective_engineering_health_historical_resource_dispatch_repair" in cfg:
         historical = _engineering_health_historical_resource_dispatch_repair(cfg)[
             "active_attempt_resource_policy"
         ]["historical_incomplete_attempt_wall_minutes"]
@@ -13927,6 +14182,17 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
         in cfg
         else None
     )
+    attempt_17_result = (
+        _engineering_health_attempt_17_result(cfg)
+        if "learner_effective_engineering_health_attempt_17_result" in cfg
+        else None
+    )
+    ffmpeg_prettytable_repair = (
+        _engineering_health_ffmpeg_prettytable_repair(cfg)
+        if "learner_effective_engineering_health_ffmpeg_prettytable_repair"
+        in cfg
+        else None
+    )
     amendment = _tuple_amendment(cfg)
     runtime = _tuple_runtime_amendment(cfg)
     fixture_protocol = _tuple_fixture_protocol(cfg)
@@ -13990,6 +14256,8 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
             "active_dispatch_repair": active_dispatch_repair,
             "attempt_16_result": attempt_16_result,
             "historical_resource_dispatch_repair": historical_resource_dispatch_repair,
+            "attempt_17_result": attempt_17_result,
+            "ffmpeg_prettytable_repair": ffmpeg_prettytable_repair,
             "tuple_amendment": amendment,
             "runtime": runtime,
             "fixture_protocol": fixture_protocol,
@@ -14029,6 +14297,12 @@ def _tuple_health_dependency_preflight(
     nltk_matplotlib_repair = (
         _engineering_health_nltk_matplotlib_repair(cfg)
         if "learner_effective_engineering_health_NLTK_matplotlib_repair" in cfg
+        else None
+    )
+    ffmpeg_prettytable_repair = (
+        _engineering_health_ffmpeg_prettytable_repair(cfg)
+        if "learner_effective_engineering_health_ffmpeg_prettytable_repair"
+        in cfg
         else None
     )
     configuration_commitment = _tuple_health_configuration_preflight(cfg)
@@ -14080,6 +14354,20 @@ def _tuple_health_dependency_preflight(
                     ),
                 }
             )
+    if ffmpeg_prettytable_repair is not None:
+        for artifact in ffmpeg_prettytable_repair[
+            "public_runtime_dependency_repair"
+        ]["artifacts"]:
+            records.append(
+                {
+                    "family": "runtime_distribution_repair",
+                    **_tuple_health_verify_file(
+                        model_root / "runtime-distributions" / artifact["name"],
+                        artifact["sha256"],
+                        artifact["bytes"],
+                    ),
+                }
+            )
     mark("DEPENDENCY_TEXT_ENCODER", 4)
     for artifact in runtime.get("bert_base_uncased", {}).get("files", []):
         records.append(
@@ -14098,6 +14386,15 @@ def _tuple_health_dependency_preflight(
     }
     if nltk_matplotlib_repair is not None:
         for row in nltk_matplotlib_repair[
+            "public_runtime_dependency_repair"
+        ]["installed_distributions"]:
+            name = str(row["name"])
+            version = str(row["version"])
+            if name in expected_installed and expected_installed[name] != version:
+                raise RuntimeError("E_TUPLE_HEALTH_RUNTIME_DISTRIBUTION_CONFLICT")
+            expected_installed[name] = version
+    if ffmpeg_prettytable_repair is not None:
+        for row in ffmpeg_prettytable_repair[
             "public_runtime_dependency_repair"
         ]["installed_distributions"]:
             name = str(row["name"])
@@ -14494,6 +14791,17 @@ def _tuple_health_topology_attestation(
     if not job_id.isdecimal() or int(job_id) <= 0:
         raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION")
     if (
+        "learner_effective_engineering_health_ffmpeg_prettytable_repair"
+        in cfg
+        and attempt == 18
+    ):
+        topology = _engineering_health_ffmpeg_prettytable_repair(cfg)[
+            "topology_attestation_contract"
+        ]
+        expected_partition = topology["partition"]
+        expected_wall_minutes = topology["time_limit_minutes"]
+        expected_gres = topology["GRES"]
+    elif (
         "learner_effective_engineering_health_historical_resource_dispatch_repair"
         in cfg
         and attempt == 17
@@ -14848,6 +15156,21 @@ def _tuple_health_topology(
             else 0
         )
         if (
+            "learner_effective_engineering_health_ffmpeg_prettytable_repair"
+            in cfg
+            and int(attempt) == 18
+        ):
+            topology = _engineering_health_ffmpeg_prettytable_repair(cfg)[
+                "topology_attestation_contract"
+            ]
+            configured_name = str(topology["expected_device_name"])
+            expected_device = device_name == configured_name
+            expected_memory = (
+                int(topology["visible_memory_GiB_min"]) * 1024**3
+                <= total_memory
+                <= int(topology["visible_memory_GiB_max"]) * 1024**3
+            )
+        elif (
             "learner_effective_engineering_health_historical_resource_dispatch_repair"
             in cfg
             and int(attempt) == 17
@@ -15051,7 +15374,13 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
     """Run the bounded production-path microqualification with zero metrics."""
 
     cfg = json.loads(args.config.read_text())
-    if "learner_effective_engineering_health_historical_resource_dispatch_repair" in cfg:
+    if "learner_effective_engineering_health_ffmpeg_prettytable_repair" in cfg:
+        _engineering_health_ffmpeg_prettytable_repair(cfg)
+        if int(args.attempt) != 18:
+            raise RuntimeError(
+                "E_TUPLE_HEALTH_FFMPEG_PRETTYTABLE_REPAIR_ATTEMPT"
+            )
+    elif "learner_effective_engineering_health_historical_resource_dispatch_repair" in cfg:
         _engineering_health_historical_resource_dispatch_repair(cfg)
         if int(args.attempt) != 17:
             raise RuntimeError(
@@ -25470,7 +25799,7 @@ def main() -> None:
         "--container-attestation", type=Path, required=True
     )
     tuple_health_parser.add_argument(
-        "--attempt", type=int, choices=(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17), required=True
+        "--attempt", type=int, choices=(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18), required=True
     )
     tuple_health_parser.add_argument("--device", default="cuda")
     tuple_qualify_parser = subparsers.add_parser("tuple-qualify")

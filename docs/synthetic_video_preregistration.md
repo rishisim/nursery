@@ -2205,3 +2205,19 @@ storage, and $0. The in-container exact A30 name/memory attestation, models,
 fixtures, inputs, seeds, thresholds, metrics, privacy rules, and scientific
 gate remain frozen. Only one job may be live; periodic scheduler polling and
 unchanged-status reporting are prohibited.
+
+Attempt 17 (Juno job 316933) completed after 390 scheduler seconds with four of
+seven engineering modules healthy and zero scientific metrics. The referent
+and attribute paths both lacked the already pinned imageio-ffmpeg command;
+the independent EgoHOS path lacked PrettyTable. These are public runtime
+wiring/dependency failures, not below-threshold measurements. Blocker
+`bcb7e203…a762d` preserves the complete result without changing any model,
+fixture, seed, threshold, metric, or gate.
+
+Before another outcome, repair `f1d4153a…92124` freezes the exact
+imageio-ffmpeg 0.6.0 binary identity and scratch-only `ffmpeg` command staging,
+plus the official BSD-3-Clause PrettyTable 3.18.0 wheel identity for offline
+installation and reload. Attempt 18 reruns all 28 cases and both replicates on
+one scheduler-selected A30, one process, eight CPUs, 32 GiB, with a
+60-minute/1-GPU-hour, 1-GiB, $0 ceiling. Scientific metric withholding,
+privacy guards, and the five-critical-plus-six-of-seven gate are unchanged.
