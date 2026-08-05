@@ -579,3 +579,18 @@ official host-clean repository trees and Git indexes at repair commitment
 Git to the container, while still failing on any modified or untracked source.
 One unchanged attempt 9 is authorized under the standing earliest-compatible
 zero-cost GPU policy. Scheduler state is not repeatedly polled or reported.
+
+Attempt 9, Juno job 316813, then failed after 10 seconds before the runner
+wrote its first progress record. The wrapper, container, and topology
+attestations were present, but historical attempt-8 validation rejected that
+sealed run's older config commitment under the newer canonical schema. No
+model module ran and no scientific metric opened; blocker `2fed8750…ae7a43`
+therefore records an engineering lineage-validation defect, not a scientific
+no-go. Schema 32 prospectively binds the attempt-8 config and engineering-health
+commitments to its already sealed result, rejects every other unbound
+historical commitment, and keeps the current-config commitment mandatory for
+attempt 10. Repair `be09b2e0…f526b0` changes no model, fixture, threshold,
+metric, seed, gate, privacy rule, or downstream limit. One complete attempt 10
+is authorized on the single earliest scheduler-eligible compatible zero-cost
+GPU frozen before submission. There is one live job at most, no DDP, and no
+repeated scheduler polling or unchanged status message.

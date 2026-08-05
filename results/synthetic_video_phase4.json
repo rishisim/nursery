@@ -1,7 +1,7 @@
 {
-  "schema_version": 19,
+  "schema_version": 20,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_8_GIT_ABSENCE_BLOCKER_PRESERVED_CLEAN_TREE_FALLBACK_ATTEMPT_9_FROZEN_NO_NEW_OUTCOME",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_ENGINEERING_HEALTH_ATTEMPT_9_HISTORICAL_LINEAGE_BLOCKER_PRESERVED_LINEAGE_REPAIR_ATTEMPT_10_FROZEN_NO_NEW_OUTCOME",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -943,6 +943,56 @@
     "model_fixture_threshold_metric_seed_repair_or_scientific_gate_changed": false,
     "new_health_or_scientific_outcome_opened": false
   },
+  "learner_effective_engineering_health_attempt_9_result": {
+    "status": "ENGINEERING_BLOCKER_ATTEMPT_9_BEFORE_RUNNER_PROGRESS_NO_SCIENTIFIC_METRICS_OPENED",
+    "observed_on": "2026-08-05",
+    "canonical_source": "configs/synthetic_video_real_only_proof.json#learner_effective_engineering_health_attempt_9_result",
+    "job_id": 316813,
+    "attempt": 9,
+    "scheduler_state": "FAILED",
+    "scheduler_exit_code": "1:0",
+    "scheduler_elapsed_seconds": 10,
+    "GPU_type": "NVIDIA_A30_24GB",
+    "wrapper_marker_count": 1,
+    "container_attestation_count": 1,
+    "topology_attestation_count": 1,
+    "progress_record_count": 0,
+    "full_result_count": 0,
+    "model_module_inference_count": 0,
+    "scientific_metric_count": 0,
+    "failure_stage": "PRIOR_ATTEMPT_8_FULL_RESULT_VALIDATION_BEFORE_RUNNER_PROGRESS",
+    "classification": "ENGINEERING_HISTORICAL_CONFIG_COMMITMENT_LINEAGE_MISSING_NOT_SCIENTIFIC_NO_GO",
+    "blocker_commitment_sha256": "2fed8750a5f60929e144aecb89ef6f3bb1d1d048d9cd1d1080e8f21393ae7a43",
+    "attempt_GPU_hours_actual": 0.002777777777777778,
+    "protocol_accounted_cumulative_GPU_hours_actual": 1.3175969591405656,
+    "direct_monetary_cost_USD": 0,
+    "new_scientific_outcome_opened": false
+  },
+  "learner_effective_engineering_health_historical_lineage_repair": {
+    "status": "FROZEN_AFTER_ATTEMPT_9_BLOCKER_BEFORE_HISTORICAL_LINEAGE_REPAIRED_ATTEMPT_10_OR_NEW_OUTCOME",
+    "effective_on": "2026-08-05",
+    "canonical_source": "configs/synthetic_video_real_only_proof.json#learner_effective_engineering_health_historical_lineage_repair",
+    "repair_commitment_sha256": "be09b2e0c3a2026957dbd20b18129e65cd1b8ca03a8a62fdb49d568a76f526b0",
+    "attempt_9_blocker_sha256": "2fed8750a5f60929e144aecb89ef6f3bb1d1d048d9cd1d1080e8f21393ae7a43",
+    "scope": "OUTCOME_INDEPENDENT_HISTORICAL_CONFIG_COMMITMENT_VALIDATION_REPAIR_AND_ATTEMPT_10_TOPOLOGY_SELECTION",
+    "historical_attempt_8_config_and_health_commitments_bound": true,
+    "other_unbound_commitments_rejected": true,
+    "active_attempt": 10,
+    "selected_partition": "a30",
+    "selected_GRES": "gpu:nvidia_a30:1",
+    "selected_GPU_type": "NVIDIA_A30_24GB",
+    "GPU_count": 1,
+    "CPU_count": 8,
+    "memory_GiB": 32,
+    "wall_minutes_max": 60,
+    "GPU_hours_max": 1.0,
+    "active_aggregate_GPU_hours_max": 2.3175969591405656,
+    "new_storage_GiB_max": 1.0,
+    "direct_monetary_cost_USD": 0,
+    "no_repeated_scheduler_polling": true,
+    "model_fixture_threshold_metric_seed_repair_or_scientific_gate_changed": false,
+    "new_health_or_scientific_outcome_opened": false
+  },
   "governed_C_calibration": {
     "status": "NO_GO",
     "topology": "1_H100",
@@ -1518,5 +1568,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "COMMIT_AND_PUSH_FULL_H100_SUBMISSION_RECHECK_THEN_RUN_COMPLETE_FULL_H100_ATTEMPT_8; CONTINUE_OUTCOME_INDEPENDENT_ENGINEERING_REPAIRS_UNTIL_HEALTH_PASS_THEN_OPEN COMPLETE PUBLIC_SCIENTIFIC_DEVELOPMENT"
+  "next_authorized_scope": "COMMIT_AND_PUSH_EXACT_HISTORICAL_LINEAGE_REPAIR_THEN_RUN_ONE_COMPLETE_ATTEMPT_10_ON_THE_FROZEN_EARLIEST_ELIGIBLE_ZERO_COST_GPU; OPEN PUBLIC_SCIENTIFIC_DEVELOPMENT ONLY AFTER A COMMITTED 7_OF_7 HEALTH PASS"
 }

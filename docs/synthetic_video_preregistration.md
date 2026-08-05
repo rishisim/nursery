@@ -2073,3 +2073,23 @@ hand-improved, and evaluation concepts or outcomes, C vocabulary or text,
 learner scores, and generated-corpus learner outcomes may never tune prompts,
 retries, or acceptance. The corpus cap, three seeds, 4,668-step learner, and
 descriptive-only claim boundary remain unchanged.
+
+### Engineering-health historical-lineage repair
+
+Attempt 9, Juno job 316813, terminated after 10 seconds before runner progress,
+model inference, or scientific metrics. All three host-side attestations were
+present. Stable aggregate diagnosis identified `E_TUPLE_HEALTH_FULL_SCHEMA`
+while validating the sealed attempt-8 full record: schema 31 accepted the
+current config commitment but had not explicitly admitted attempt 8's sealed
+historical config commitment. Blocker `2fed8750…ae7a43` preserves this as an
+engineering lineage-validation failure.
+
+Before a new outcome, schema 32 freezes repair `be09b2e0…f526b0`. The validator
+may accept the historical config commitment only for attempt 8 and only when
+both its config and engineering-health commitments match the sealed attempt-8
+result; current attempt records still require the current config commitment,
+and every unbound historical commitment is rejected. Attempt 9's measured
+10-second/0.002778-GPU-hour use is included in cumulative accounting. One
+complete attempt 10 may run on the prospectively frozen earliest compatible
+zero-cost one-process topology. No scientific input or decision rule changes,
+and the no-polling/one-live-job rule remains binding.

@@ -35,7 +35,7 @@ def test_construct_aligned_resume_amendment_is_exact_and_schema23_compatible() -
     config = json.loads(
         Path("configs/synthetic_video_real_only_proof.json").read_text()
     )
-    assert config["schema_version"] == 31
+    assert config["schema_version"] == 32
     amendment = MODULE._construct_aligned_ltx_resume_amendment(config)
     assert (
         amendment["amendment_commitment_sha256"]

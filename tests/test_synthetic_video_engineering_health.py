@@ -125,6 +125,8 @@ def _historical_health_config() -> dict:
     config.pop("learner_effective_engineering_health_scheduler_policy")
     config.pop("learner_effective_engineering_health_attempt_8_result")
     config.pop("learner_effective_engineering_health_git_fallback_repair")
+    config.pop("learner_effective_engineering_health_attempt_9_result")
+    config.pop("learner_effective_engineering_health_historical_lineage_repair")
     return config
 
 
@@ -159,7 +161,7 @@ def _write_topology_attestation(
         "node_count": 1,
         "CPU_count": 8,
         "task_count": 1,
-        "time_limit_minutes": 60 if attempt in {8, 9} else 15,
+        "time_limit_minutes": 60 if attempt in {8, 9, 10} else 15,
         "memory_per_CPU_GiB": 4,
         "GRES": gres,
         "predicate_count": 7,
@@ -649,6 +651,30 @@ def test_tuple_health_full_and_compact_validators_withhold_case_details() -> Non
         assert prohibited not in serialized
 
 
+def test_historical_attempt_8_full_record_requires_both_sealed_commitments() -> None:
+    full = _healthy_full()
+    full["attempt"] = 8
+    full["config_commitment_sha256"] = (
+        "490f63e294d4751a962d41c1956b02e1ac51bafc8a42aed2f76aa8c8704b0c89"
+    )
+    full["engineering_health_commitment_sha256"] = (
+        "5df1d3e169f17ecbd269e7dd8c29fc0b033a301fb6cd15e69eebecccdceb92c8"
+    )
+    full["resource"]["GPU_type"] = "NVIDIA_H100_NVL"
+    full["cumulative_resource"]["cumulative_submission_count"] = 8
+    MODULE._validate_tuple_health_full(full, _config())
+
+    wrong_config = json.loads(json.dumps(full))
+    wrong_config["config_commitment_sha256"] = "e" * 64
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_FULL_SCHEMA"):
+        MODULE._validate_tuple_health_full(wrong_config, _config())
+
+    wrong_health = json.loads(json.dumps(full))
+    wrong_health["engineering_health_commitment_sha256"] = "e" * 64
+    with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_FULL_SCHEMA"):
+        MODULE._validate_tuple_health_full(wrong_health, _config())
+
+
 @pytest.mark.parametrize(
     "forbidden_key,forbidden_value",
     [
@@ -720,7 +746,7 @@ def test_tuple_health_metric_release_requires_seven_unique_passed_modules() -> N
         MODULE._tuple_health_metric_release(wrong_status, scientific)
 
 
-def test_tuple_health_budget_enforces_active_extended_wall_attempt_and_limits() -> None:
+def test_tuple_health_budget_enforces_active_lineage_repair_attempt_and_limits() -> None:
     config = _config()
     prior = [
         {
@@ -798,9 +824,22 @@ def test_tuple_health_budget_enforces_active_extended_wall_attempt_and_limits() 
             "direct_monetary_cost_USD": 0,
         }
     )
-    budget = MODULE._tuple_health_budget(9, prior, config)
-    assert budget["attempt"] == 9
-    assert budget["GPU_type"] == "NVIDIA_A30_24GB"
+    prior.append(
+        {
+            "attempt": 9,
+            "GPU_type": "NVIDIA_A30_24GB",
+            "GPU_count": 1,
+            "wall_minutes": 0.16666666666666666,
+            "GPU_hours": 0.002777777777777778,
+            "new_storage_GiB": 7.487833499908447e-7,
+            "direct_monetary_cost_USD": 0,
+        }
+    )
+    budget = MODULE._tuple_health_budget(10, prior, config)
+    assert budget["attempt"] == 10
+    assert budget["GPU_type"] == MODULE._engineering_health_resource_policy(config)[
+        "GPU_type"
+    ]
     assert budget["GPU_count"] == 1
     assert budget["per_submission_wall_minutes_max"] == 60
     assert budget["remaining_GPU_hours"] == pytest.approx(1.0)
@@ -808,7 +847,7 @@ def test_tuple_health_budget_enforces_active_extended_wall_attempt_and_limits() 
     assert budget["direct_monetary_cost_USD"] == 0
 
     with pytest.raises(RuntimeError, match="E_TUPLE_HEALTH_ATTEMPT_BUDGET"):
-        MODULE._tuple_health_budget(10, prior, config)
+        MODULE._tuple_health_budget(11, prior, config)
 
 
 @pytest.mark.parametrize(
@@ -1080,9 +1119,6 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
     assert extended["failure_specific_repair"][
         "model_fixture_source_threshold_partition_seed_metric_or_gate_changed"
     ] is False
-    effective = MODULE._engineering_health_resource_policy(config)
-    assert effective["per_submission_wall_minutes_max"] == 60
-    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 9
     attempt_8 = MODULE._engineering_health_attempt_8_result(config)
     assert attempt_8["blocker_commitment_sha256"] == (
         "409c36d2c3ba4aefdd2f510c661ba363c000fc232dce2fcfba0151ba25f9aad7"
@@ -1096,10 +1132,27 @@ def test_terminal_blocker_is_preserved_and_reauthorization_is_hash_bound(
     assert repair["failure_specific_repair"][
         "model_fixture_source_threshold_partition_seed_metric_or_gate_changed"
     ] is False
+    attempt_9 = MODULE._engineering_health_attempt_9_result(config)
+    assert attempt_9["blocker_commitment_sha256"] == (
+        "2fed8750a5f60929e144aecb89ef6f3bb1d1d048d9cd1d1080e8f21393ae7a43"
+    )
+    assert attempt_9["submission_provenance"]["job_id"] == 316813
+    assert attempt_9["compact_aggregate"]["scientific_metric_count"] == 0
+    lineage = MODULE._engineering_health_historical_lineage_repair(config)
+    assert lineage["repair_commitment_sha256"] == (
+        "be09b2e0c3a2026957dbd20b18129e65cd1b8ca03a8a62fdb49d568a76f526b0"
+    )
+    assert lineage["active_attempt_resource_policy"]["attempt"] == 10
+    assert lineage["failure_specific_repair"][
+        "other_historical_or_unbound_commitments_rejected"
+    ] is True
+    effective = MODULE._engineering_health_resource_policy(config)
+    assert effective["per_submission_wall_minutes_max"] == 60
+    assert effective["initial_plus_repair_resmoke_submission_count_max"] == 10
 
     with pytest.raises(
         RuntimeError,
-        match="E_TUPLE_HEALTH_GIT_FALLBACK_REPAIR_ATTEMPT",
+        match="E_TUPLE_HEALTH_HISTORICAL_LINEAGE_REPAIR_ATTEMPT",
     ):
         MODULE.run_tuple_health(
             argparse.Namespace(
@@ -1307,6 +1360,41 @@ def test_h100_health_topology_uses_wrapper_attestation_and_effective_cuda(
         cfg=_config(),
     )
     assert commitment == MODULE.file_digest(attempt_9_attestation)
+
+    attempt_10_gpu_type = MODULE._engineering_health_historical_lineage_repair(
+        _config()
+    )["active_attempt_resource_policy"]["GPU_type"]
+    device_by_type = {
+        "NVIDIA_A30_24GB": ("NVIDIA A30", 24),
+        "NVIDIA_H100_NVL": ("NVIDIA H100 NVL", 90),
+        "NVIDIA_H100_NVL_3G_47GB_MIG": ("NVIDIA H100 NVL", 47),
+        "NVIDIA_H200_NVL": ("NVIDIA H200 NVL", 140),
+    }
+    attempt_10_name, attempt_10_memory = device_by_type[attempt_10_gpu_type]
+    attempt_10_cuda = SimpleNamespace(
+        device_count=lambda: 1,
+        get_device_name=lambda _index: attempt_10_name,
+        get_device_properties=lambda _index: SimpleNamespace(
+            total_memory=attempt_10_memory * 1024**3
+        ),
+    )
+    monkeypatch.setitem(
+        sys.modules, "torch", SimpleNamespace(cuda=attempt_10_cuda)
+    )
+    attempt_10_attestation = _write_topology_attestation(
+        tmp_path / "attempt-10",
+        monkeypatch,
+        attempt=10,
+        job_id=316814,
+        gpu_type=attempt_10_gpu_type,
+    )
+    commitment = MODULE._tuple_health_topology(
+        "cuda",
+        topology_attestation=attempt_10_attestation,
+        attempt=10,
+        cfg=_config(),
+    )
+    assert commitment == MODULE.file_digest(attempt_10_attestation)
 
     bad = json.loads(attestation.read_text())
     bad["task_count"] = 2
@@ -1610,6 +1698,10 @@ def test_health_orchestration_never_calls_scientific_release_helpers(
     historical_config.pop("learner_effective_engineering_health_scheduler_policy")
     historical_config.pop("learner_effective_engineering_health_attempt_8_result")
     historical_config.pop("learner_effective_engineering_health_git_fallback_repair")
+    historical_config.pop("learner_effective_engineering_health_attempt_9_result")
+    historical_config.pop(
+        "learner_effective_engineering_health_historical_lineage_repair"
+    )
     config_path = tmp_path / "preterminal-proof.json"
     MODULE.write_private_new(config_path, historical_config)
     manifest = _fixture_manifest()

@@ -637,3 +637,18 @@ and prompt commitments before the one-hour run. Engineering corrections are
 allowed only prospectively on public/dummy failures; evaluation material, C
 text or vocabulary, learner scores, and generated-corpus learner outcomes may
 never tune prompts, retries, or acceptance.
+
+### Current engineering-health route
+
+Attempt 8's missing-container-Git blocker and schema-31 clean-tree fallback are
+preserved unchanged. Attempt 9, Juno job 316813, then failed after 10 seconds
+before runner progress because the canonical validator did not admit attempt
+8's sealed historical config commitment. Wrapper/container/topology
+attestations were complete; model inference and scientific metrics remained
+zero. Blocker `2fed8750…ae7a43` is therefore engineering-only. Prospective
+schema-32 repair `be09b2e0…f526b0` admits that one historical commitment only
+when it is jointly bound to the sealed attempt-8 config, engineering-health,
+attempt number, and result record. It rejects all other unbound commitments
+and changes no science. One complete attempt 10 is authorized under the
+standing earliest-compatible-zero-cost, one-process, one-live-job, no-polling
+policy; public development remains locked until a committed 7/7 health pass.
