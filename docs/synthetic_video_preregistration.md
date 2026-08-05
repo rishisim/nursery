@@ -2279,3 +2279,19 @@ phase rules (at least two visible samples, modal candidate bin with the frozen
 tie order, and at least two dominant visible samples). Models, fixtures,
 partitions, seeds, thresholds, metrics, privacy rules, and the combined gate
 remain unchanged. Holdout and every downstream stage remain locked.
+
+Attempt 2 (Juno job 316979) passed the complete seven-module development
+engineering-integrity phase. The scientific phase then completed six modules
+but stopped before metric release because attribute could not see referent's
+development threshold state. The all-or-nothing guard discarded every metric.
+Blocker `b35f6a08…e78e27` binds integrity commitment `4102dadf…df37` and
+scientific-blocker commitment `07a587ac…e5b1`; it is not a scientific no-go.
+
+Before the third and final integrity attempt, repair `602c273d…b5073b`
+requires explicit propagation only when the returned referent result contains
+the two already frozen threshold fields. If referent has no qualifying pair,
+attribute is emitted as `UNMEASURED` with reason
+`DEPENDENT_REFERENT_DEVELOPMENT_DID_NOT_QUALIFY`; neither a substitute nor an
+unqualified threshold is introduced. Referent failure and attribute
+unmeasured status each remain critical combined-gate failures. Fixtures,
+models, partitions, grids, metrics, seeds, and gates remain unchanged.

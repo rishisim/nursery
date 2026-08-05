@@ -689,6 +689,12 @@ PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_1_RESULT_SHA256 = (
 PUBLIC_DEVELOPMENT_TRUTH_MASK_ROUNDTRIP_REPAIR_SHA256 = (
     "638d5c3c43ccb81421e5667b00308aee68fbeed7cd2f80502c3395ba385f82e2"
 )
+PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_2_RESULT_SHA256 = (
+    "b35f6a083a432cd6f2ab00dc01e860b7086d9c6b160c4efe1c1f8e22a9e78e27"
+)
+PUBLIC_DEVELOPMENT_ATTRIBUTE_DEPENDENCY_REPAIR_SHA256 = (
+    "602c273dbfc60ef91af083c2baad77d2831981765c4a79f7a8ccf4b8b4b5073b"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -5836,6 +5842,144 @@ def _public_development_truth_mask_roundtrip_repair(
     ):
         raise RuntimeError(
             "E_TUPLE_DEVELOPMENT_TRUTH_MASK_ROUNDTRIP_REPAIR_COMMITMENT"
+        )
+    return value
+
+
+def _public_development_engineering_attempt_2_result(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the second metric-withheld development blocker."""
+
+    _public_development_truth_mask_roundtrip_repair(cfg)
+    try:
+        value = cfg[
+            "learner_effective_public_development_engineering_attempt_2_result"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError(
+            "E_TUPLE_DEVELOPMENT_ENGINEERING_ATTEMPT_2_RESULT_MISSING"
+        ) from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("result_commitment_sha256", None)
+    exact = {
+        "status": "ENGINEERING_BLOCKER_PUBLIC_DEVELOPMENT_ATTEMPT_2_SCIENTIFIC_METRICS_WITHHELD",
+        "observed_on": "2026-08-05",
+        "job_id": 316979,
+        "partition": "DEVELOPMENT",
+        "attempt": 2,
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0",
+        "scheduler_elapsed_seconds": 1287,
+        "GPU_type": "NVIDIA_A30_24GB",
+        "integrity_module_count": 7,
+        "integrity_completed_module_count": 7,
+        "integrity_failed_module_count": 0,
+        "integrity_commitment_sha256": (
+            "4102dadfdd35b981a1aa5bceeb4b29b64eef46b89dd6f54a503050be2730df37"
+        ),
+        "scientific_phase_completed_module_count": 6,
+        "scientific_phase_failed_module_count": 1,
+        "scientific_metric_count": 0,
+        "failing_modules": {
+            "attribute": (
+                "E_TUPLE_HEALTH_ATTRIBUTE_TUPLE_ATTRIBUTE_GROUNDING_THRESHOLD"
+            )
+        },
+        "external_call_count": 0,
+        "invalid_retained_record_count": 0,
+        "silent_truncation_count": 0,
+        "unaccounted_failure_count": 0,
+        "public_fixture_manifest_commitment_sha256": (
+            "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6"
+        ),
+        "engineering_health_commitment_sha256": (
+            "4d26d002d9189942a9ba1876e47ed92d1edde8a81da81d31bc22f39d26cb656e"
+        ),
+        "runner_commitment_sha256": (
+            "9c833d20c899445ab6047cf680dc458a6b9418e70ba2ea7795f5f8f4600f63d3"
+        ),
+        "partition_engineering_blocker_commitment_sha256": (
+            "07a587aca65e469228d585eca9623f08d2886fdfe50dd98ef3692973d93de5b1"
+        ),
+        "attempt_GPU_hours_actual": 0.3575,
+        "direct_monetary_cost_USD": 0,
+        "classification": (
+            "ENGINEERING_REFERENT_SELECTED_THRESHOLD_STATE_WAS_NOT_EXPLICITLY_"
+            "PROPAGATED_TO_DEPENDENT_ATTRIBUTE_MODULE_NOT_SCIENTIFIC_NO_GO"
+        ),
+        "scientific_outcome_opened": False,
+        "result_commitment_scope": (
+            "canonical JSON of this result excluding result_commitment_sha256"
+        ),
+    }
+    if (
+        expected != PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_2_RESULT_SHA256
+        or digest(payload) != expected
+        or payload != exact
+    ):
+        raise RuntimeError(
+            "E_TUPLE_DEVELOPMENT_ENGINEERING_ATTEMPT_2_RESULT_COMMITMENT"
+        )
+    return value
+
+
+def _public_development_attribute_dependency_repair(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate final-attempt propagation and dependent-unmeasured rules."""
+
+    prior = _public_development_engineering_attempt_2_result(cfg)
+    try:
+        value = cfg[
+            "learner_effective_public_development_attribute_dependency_repair"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError(
+            "E_TUPLE_DEVELOPMENT_ATTRIBUTE_DEPENDENCY_REPAIR_MISSING"
+        ) from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("repair_commitment_sha256", None)
+    exact = {
+        "status": (
+            "FROZEN_AFTER_PUBLIC_DEVELOPMENT_ATTEMPT_2_ATTRIBUTE_DEPENDENCY_"
+            "STATE_FAILURE_BEFORE_ATTEMPT_3_OR_SCIENTIFIC_METRICS"
+        ),
+        "effective_on": "2026-08-05",
+        "prior_engineering_blocker_commitment_sha256": prior[
+            "result_commitment_sha256"
+        ],
+        "repair_scope": (
+            "propagate a qualifying development referent threshold pair from "
+            "the returned referent module result into the shared scientific "
+            "context; when no pair qualifies, emit the dependent attribute "
+            "axis as UNMEASURED without running it or inventing a threshold"
+        ),
+        "required_grounding_threshold_fields": [
+            "Grounding_DINO_box_score",
+            "Grounding_DINO_text_score",
+        ],
+        "unmeasured_reason": (
+            "DEPENDENT_REFERENT_DEVELOPMENT_DID_NOT_QUALIFY"
+        ),
+        "referent_failure_remains_gate_failure": True,
+        "attribute_unmeasured_remains_critical_gate_failure": True,
+        "fixture_source_partition_model_seed_threshold_grid_metric_or_gate_changed": False,
+        "public_development_integrity_attempt": 3,
+        "public_development_integrity_attempt_count_max": 3,
+        "metric_withholding_until_complete_valid_finalize": True,
+        "holdout_governed_C_LTX_or_learner_authorized": False,
+        "repair_commitment_scope": (
+            "canonical JSON of this amendment excluding repair_commitment_sha256"
+        ),
+    }
+    if (
+        expected != PUBLIC_DEVELOPMENT_ATTRIBUTE_DEPENDENCY_REPAIR_SHA256
+        or digest(payload) != expected
+        or payload != exact
+    ):
+        raise RuntimeError(
+            "E_TUPLE_DEVELOPMENT_ATTRIBUTE_DEPENDENCY_REPAIR_COMMITMENT"
         )
     return value
 
@@ -14170,7 +14314,11 @@ def _missing_tuple_module_runner(module_id: str):
     return run
 
 
-def _development_unqualified_tuple_module_runner(module_id: str):
+def _development_unqualified_tuple_module_runner(
+    module_id: str,
+    *,
+    reason: str = "DEVELOPMENT_MODULE_DID_NOT_QUALIFY",
+):
     def run(_context: dict[str, Any]) -> dict[str, Any]:
         return {
             "status": "UNMEASURED",
@@ -14178,7 +14326,7 @@ def _development_unqualified_tuple_module_runner(module_id: str):
                 axis_id: {
                     "status": "UNMEASURED",
                     "metrics": {},
-                    "reason": "DEVELOPMENT_MODULE_DID_NOT_QUALIFY",
+                    "reason": reason,
                 }
                 for axis_id in TUPLE_MODULE_AXIS_IDS[module_id]
             },
@@ -17126,12 +17274,42 @@ def _tuple_scientific_module_results(
         raise RuntimeError("E_TUPLE_QUALIFICATION_MODULE_SET")
     for module_id in TUPLE_QUALIFICATION_MODULE_IDS:
         try:
-            result = runners[module_id](context)
+            selected = context.setdefault("_selected_thresholds", {})
+            grounding_fields = {
+                "Grounding_DINO_box_score",
+                "Grounding_DINO_text_score",
+            }
+            if (
+                module_id == "attribute"
+                and context.get("partition") == "development"
+                and not grounding_fields <= set(selected)
+            ):
+                result = _development_unqualified_tuple_module_runner(
+                    "attribute",
+                    reason=(
+                        "DEPENDENT_REFERENT_DEVELOPMENT_DID_NOT_QUALIFY"
+                    ),
+                )(context)
+            else:
+                result = runners[module_id](context)
             allowed = {"PASS", "NO_GO", "UNMEASURED"}
             if module_id == "order_action":
                 allowed.add("NO_GO_DIAGNOSTIC")
             if not isinstance(result, dict) or result.get("status") not in allowed:
                 raise RuntimeError("E_TUPLE_QUALIFICATION_MODULE_RESULT")
+            if (
+                module_id == "referent"
+                and context.get("partition") == "development"
+                and isinstance(result.get("selected_thresholds"), dict)
+                and grounding_fields
+                <= set(result["selected_thresholds"])
+            ):
+                selected.update(
+                    {
+                        key: result["selected_thresholds"][key]
+                        for key in grounding_fields
+                    }
+                )
             output[module_id] = result
         except BaseException as error:
             if isinstance(error, (KeyboardInterrupt, SystemExit)):
@@ -17255,12 +17433,19 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
     if partition not in {"development", "holdout"}:
         raise RuntimeError("E_TUPLE_QUALIFICATION_PARTITION")
     cfg = json.loads(args.config.read_text())
-    development_mask_repair = (
-        _public_development_truth_mask_roundtrip_repair(cfg)
-        if "learner_effective_public_development_truth_mask_roundtrip_repair"
+    if "learner_effective_public_development_attribute_dependency_repair" in cfg:
+        development_active_repair = (
+            _public_development_attribute_dependency_repair(cfg)
+        )
+    elif (
+        "learner_effective_public_development_truth_mask_roundtrip_repair"
         in cfg
-        else None
-    )
+    ):
+        development_active_repair = (
+            _public_development_truth_mask_roundtrip_repair(cfg)
+        )
+    else:
+        development_active_repair = None
     if "learner_effective_engineering_health_NLTK_matplotlib_repair" in cfg:
         _engineering_health_nltk_matplotlib_repair(cfg)
     elif "learner_effective_engineering_health_submission_export_repair" in cfg:
@@ -17360,7 +17545,7 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
     }
     integrity_root = output_root / "engineering-integrity"
     integrity_root.mkdir(parents=True, exist_ok=True, mode=0o700)
-    if partition == "development" and development_mask_repair is not None:
+    if partition == "development" and development_active_repair is not None:
         prior_config = _public_development_engineering_attempt_1_result(cfg)
         prior_path = integrity_root / "development-attempt-01.json"
         if not prior_path.is_file():
@@ -17399,6 +17584,70 @@ def qualify_tuple_public(args: argparse.Namespace) -> dict[str, Any]:
         ):
             raise RuntimeError(
                 "E_TUPLE_DEVELOPMENT_ENGINEERING_ATTEMPT_1_EXTERNAL_PROVENANCE"
+            )
+    if (
+        partition == "development"
+        and development_active_repair is not None
+        and "learner_effective_public_development_attribute_dependency_repair"
+        in cfg
+    ):
+        attempt_2 = _public_development_engineering_attempt_2_result(cfg)
+        integrity_path = integrity_root / "development-attempt-02.json"
+        blocker_path = (
+            integrity_root / "development-attempt-02-scientific-blocker.json"
+        )
+        if not integrity_path.is_file() or not blocker_path.is_file():
+            raise RuntimeError(
+                "E_TUPLE_DEVELOPMENT_ENGINEERING_ATTEMPT_2_EXTERNAL_MISSING"
+            )
+        integrity_full = json.loads(integrity_path.read_text())
+        blocker_full = json.loads(blocker_path.read_text())
+        _validate_tuple_partition_integrity_full(integrity_full)
+        _validate_tuple_partition_integrity_full(blocker_full)
+        blocker_errors = {
+            str(row["module_id"]): str(row.get("error_code"))
+            for row in blocker_full["module_results"]
+            if row["status"] == "ERROR"
+        }
+        shared_exact = all(
+            value["public_fixture_manifest_commitment_sha256"]
+            == attempt_2["public_fixture_manifest_commitment_sha256"]
+            and value["engineering_health_commitment_sha256"]
+            == attempt_2["engineering_health_commitment_sha256"]
+            and value["runner_commitment_sha256"]
+            == attempt_2["runner_commitment_sha256"]
+            and value["attempt"] == attempt_2["attempt"]
+            and value["scientific_metric_count"] == 0
+            and value["external_call_count"] == 0
+            and value["invalid_retained_record_count"] == 0
+            and value["silent_truncation_count"] == 0
+            and value["unaccounted_failure_count"] == 0
+            for value in (integrity_full, blocker_full)
+        )
+        if (
+            not shared_exact
+            or integrity_full["status"] != "PASS_ENGINEERING_INTEGRITY"
+            or integrity_full["completed_module_count"]
+            != attempt_2["integrity_completed_module_count"]
+            or integrity_full["failed_module_count"]
+            != attempt_2["integrity_failed_module_count"]
+            or integrity_full[
+                "partition_engineering_integrity_commitment_sha256"
+            ]
+            != attempt_2["integrity_commitment_sha256"]
+            or blocker_full["status"] != "ENGINEERING_BLOCKER"
+            or blocker_full["completed_module_count"]
+            != attempt_2["scientific_phase_completed_module_count"]
+            or blocker_full["failed_module_count"]
+            != attempt_2["scientific_phase_failed_module_count"]
+            or blocker_full[
+                "partition_engineering_integrity_commitment_sha256"
+            ]
+            != attempt_2["partition_engineering_blocker_commitment_sha256"]
+            or blocker_errors != attempt_2["failing_modules"]
+        ):
+            raise RuntimeError(
+                "E_TUPLE_DEVELOPMENT_ENGINEERING_ATTEMPT_2_EXTERNAL_PROVENANCE"
             )
     prior_integrity = sorted(
         path

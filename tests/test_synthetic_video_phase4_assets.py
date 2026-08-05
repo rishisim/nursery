@@ -94,7 +94,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
     assert result["schema_version"] == 24
-    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_1_BLOCKER_PRESERVED_MASK_ROUNDTRIP_REPAIR_FROZEN_NO_SCIENTIFIC_METRICS_OPENED"
+    assert result["status"] == "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_2_BLOCKER_PRESERVED_ATTRIBUTE_DEPENDENCY_REPAIR_FROZEN_NO_SCIENTIFIC_METRICS_OPENED"
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
     assert set(references) == {"Real-full", "Synthetic-full", "Real-small", "Mixed"}
@@ -516,7 +516,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
-    assert proof["status"] == "LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_1_BLOCKER_PRESERVED_MASK_ROUNDTRIP_REPAIR_FROZEN_NO_SCIENTIFIC_METRICS_OPENED"
+    assert proof["status"] == "LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_2_BLOCKER_PRESERVED_ATTRIBUTE_DEPENDENCY_REPAIR_FROZEN_NO_SCIENTIFIC_METRICS_OPENED"
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["repair_commitment_sha256"] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"
     assert geometry_repair["triggering_attempt"]["public_model_inference_executed"] is False

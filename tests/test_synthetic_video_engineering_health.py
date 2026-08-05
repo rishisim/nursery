@@ -1331,6 +1331,33 @@ def test_public_development_attempt_1_and_mask_roundtrip_repair_are_exact() -> N
         MODULE._public_development_truth_mask_roundtrip_repair(mutated)
 
 
+def test_public_development_attempt_2_and_attribute_dependency_repair_are_exact() -> None:
+    config = _config()
+    result = MODULE._public_development_engineering_attempt_2_result(config)
+    repair = MODULE._public_development_attribute_dependency_repair(config)
+    assert result["result_commitment_sha256"] == (
+        "b35f6a083a432cd6f2ab00dc01e860b7086d9c6b160c4efe1c1f8e22a9e78e27"
+    )
+    assert result["integrity_completed_module_count"] == 7
+    assert result["scientific_metric_count"] == 0
+    assert repair["repair_commitment_sha256"] == (
+        "602c273dbfc60ef91af083c2baad77d2831981765c4a79f7a8ccf4b8b4b5073b"
+    )
+    assert repair["referent_failure_remains_gate_failure"] is True
+    assert repair["attribute_unmeasured_remains_critical_gate_failure"] is True
+    assert repair["public_development_integrity_attempt"] == 3
+
+    mutated = json.loads(json.dumps(config))
+    mutated[
+        "learner_effective_public_development_attribute_dependency_repair"
+    ]["attribute_unmeasured_remains_critical_gate_failure"] = False
+    with pytest.raises(
+        RuntimeError,
+        match="E_TUPLE_DEVELOPMENT_ATTRIBUTE_DEPENDENCY_REPAIR_COMMITMENT",
+    ):
+        MODULE._public_development_attribute_dependency_repair(mutated)
+
+
 @pytest.mark.parametrize(
     "forbidden_key,forbidden_value",
     [
@@ -3170,6 +3197,11 @@ def test_partition_crash_withholds_metrics_and_preserves_legacy_record(
     monkeypatch.setattr(
         MODULE,
         "_public_development_truth_mask_roundtrip_repair",
+        lambda _cfg: None,
+    )
+    monkeypatch.setattr(
+        MODULE,
+        "_public_development_attribute_dependency_repair",
         lambda _cfg: None,
     )
     monkeypatch.setattr(MODULE, "_verify_tuple_runtime_manifest", lambda *_: {})

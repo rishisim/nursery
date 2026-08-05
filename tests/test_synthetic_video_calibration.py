@@ -3539,6 +3539,11 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
         "_public_development_truth_mask_roundtrip_repair",
         lambda _cfg: None,
     )
+    monkeypatch.setattr(
+        MODULE,
+        "_public_development_attribute_dependency_repair",
+        lambda _cfg: None,
+    )
     monkeypatch.setattr(MODULE, "_verify_tuple_runtime_manifest", lambda *_: {})
     monkeypatch.setattr(
         MODULE,
@@ -3681,6 +3686,51 @@ def test_tuple_qualification_development_seals_then_holdout_cannot_refit(
         MODULE.qualify_tuple_public(
             argparse.Namespace(**base, partition="holdout")
         )
+
+
+def test_development_attribute_is_unmeasured_when_referent_has_no_threshold() -> None:
+    called = []
+
+    def runner(module_id: str):
+        def execute(_context):
+            called.append(module_id)
+            if module_id == "attribute":
+                raise AssertionError(
+                    "dependent attribute runner must not execute without a "
+                    "qualified development grounding threshold"
+                )
+            return {
+                "status": (
+                    "NO_GO"
+                    if module_id == "referent"
+                    else "NO_GO_DIAGNOSTIC"
+                    if module_id == "order_action"
+                    else "PASS"
+                ),
+                "selected_thresholds": {},
+            }
+
+        return execute
+
+    module_results, errors = MODULE._tuple_scientific_module_results(
+        {
+            module_id: runner(module_id)
+            for module_id in MODULE.TUPLE_QUALIFICATION_MODULE_IDS
+        },
+        {"partition": "development"},
+        Path("unused"),
+    )
+    assert errors == []
+    assert set(module_results) == set(MODULE.TUPLE_QUALIFICATION_MODULE_IDS)
+    assert module_results["referent"]["status"] == "NO_GO"
+    assert module_results["attribute"]["status"] == "UNMEASURED"
+    assert module_results["attribute"]["axis_results"][
+        "adjective_attribute_contrast"
+    ]["reason"] == "DEPENDENT_REFERENT_DEVELOPMENT_DID_NOT_QUALIFY"
+    assert "attribute" not in called
+    assert set(called) == set(MODULE.TUPLE_QUALIFICATION_MODULE_IDS) - {
+        "attribute"
+    }
 
 
 def test_tuple_fixture_preparation_lineage_and_development_pair_fail_closed(

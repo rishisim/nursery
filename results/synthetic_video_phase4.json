@@ -1,7 +1,7 @@
 {
   "schema_version": 24,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_1_BLOCKER_PRESERVED_MASK_ROUNDTRIP_REPAIR_FROZEN_NO_SCIENTIFIC_METRICS_OPENED",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_LEARNER_EFFECTIVE_PUBLIC_DEVELOPMENT_ENGINEERING_ATTEMPT_2_BLOCKER_PRESERVED_ATTRIBUTE_DEPENDENCY_REPAIR_FROZEN_NO_SCIENTIFIC_METRICS_OPENED",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
@@ -1537,6 +1537,32 @@
     "scientific_metric_count": 0,
     "scientific_threshold_or_gate_changed": false
   },
+  "learner_effective_public_development_engineering_attempt_2_result": {
+    "status": "ENGINEERING_BLOCKER_PUBLIC_DEVELOPMENT_ATTEMPT_2_SCIENTIFIC_METRICS_WITHHELD",
+    "observed_on": "2026-08-05",
+    "job_id": 316979,
+    "attempt": 2,
+    "scheduler_elapsed_seconds": 1287,
+    "GPU_type": "NVIDIA_A30_24GB",
+    "integrity_completed_module_count": 7,
+    "integrity_failed_module_count": 0,
+    "scientific_phase_completed_module_count": 6,
+    "scientific_phase_failed_module_count": 1,
+    "scientific_metric_count": 0,
+    "unaccounted_failure_count": 0,
+    "integrity_commitment_sha256": "4102dadfdd35b981a1aa5bceeb4b29b64eef46b89dd6f54a503050be2730df37",
+    "partition_engineering_blocker_commitment_sha256": "07a587aca65e469228d585eca9623f08d2886fdfe50dd98ef3692973d93de5b1",
+    "result_commitment_sha256": "b35f6a083a432cd6f2ab00dc01e860b7086d9c6b160c4efe1c1f8e22a9e78e27",
+    "classification": "ENGINEERING_REFERENT_SELECTED_THRESHOLD_STATE_WAS_NOT_EXPLICITLY_PROPAGATED_TO_DEPENDENT_ATTRIBUTE_MODULE_NOT_SCIENTIFIC_NO_GO"
+  },
+  "learner_effective_public_development_attribute_dependency_repair": {
+    "status": "FROZEN_AFTER_PUBLIC_DEVELOPMENT_ATTEMPT_2_ATTRIBUTE_DEPENDENCY_STATE_FAILURE_BEFORE_ATTEMPT_3_OR_SCIENTIFIC_METRICS",
+    "prior_engineering_blocker_commitment_sha256": "b35f6a083a432cd6f2ab00dc01e860b7086d9c6b160c4efe1c1f8e22a9e78e27",
+    "repair_commitment_sha256": "602c273dbfc60ef91af083c2baad77d2831981765c4a79f7a8ccf4b8b4b5073b",
+    "public_development_integrity_attempt": 3,
+    "scientific_metric_count": 0,
+    "scientific_threshold_or_gate_changed": false
+  },
   "governed_C_calibration": {
     "status": "NO_GO",
     "topology": "1_H100",
@@ -2112,5 +2138,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "COMMIT_AND_PUSH_THE_EXACT_MASK_ROUNDTRIP_REPAIR_THEN_RERUN_THE_COMPLETE_PUBLIC_DEVELOPMENT_INTEGRITY_AND_SCIENTIFIC_SEQUENCE_AS_ATTEMPT_2; HOLDOUT_REMAINS_LOCKED"
+  "next_authorized_scope": "COMMIT_AND_PUSH_THE_EXACT_ATTRIBUTE_DEPENDENCY_STATE_REPAIR_THEN_RUN_FINAL_PUBLIC_DEVELOPMENT_ATTEMPT_3; A_VALID_COMPLETE_NO_GO_STOPS_AND_ONLY_A_PASS_SEAL_UNLOCKS_HOLDOUT"
 }

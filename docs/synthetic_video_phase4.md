@@ -805,3 +805,18 @@ fixture, and it changes no model, input, partition, seed, threshold, metric, or
 scientific gate. The complete public-development integrity suite must pass
 before scientific metrics are opened; holdout, governed C, LTX, and learner
 execution remain unauthorized.
+
+Public-development attempt 2 (Juno job 316979) passed all seven engineering
+integrity modules. Its scientific phase completed six modules before attribute
+raised a missing-grounding-threshold state error; the all-or-nothing release
+guard retained zero scientific metrics. Commitment `b35f6a08…e78e27`
+preserves both the 7/7 integrity record and the scientific-phase blocker.
+
+Final-attempt repair `602c273d…b5073b` makes the dependency explicit. A
+qualifying referent threshold pair is propagated from the returned module
+record; without one, attribute becomes `UNMEASURED` and is not run. This does
+not rescue the gate: both referent failure and unmeasured adjective contrast
+remain critical failures. No threshold grid, fixture, model, partition,
+metric, seed, or scientific decision rule changes. Attempt 3 is the remaining
+authorized development repair cycle; holdout stays locked unless it produces a
+valid combined PASS.

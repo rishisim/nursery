@@ -735,3 +735,14 @@ Prospective repair `638d5c3c…f82e2` validates each mask against its own frozen
 sample record, then recomputes the unchanged phase rules. No fixture, model,
 partition, threshold, metric, seed, or gate changes. The full development
 sequence must restart as integrity attempt 2 before any metric can open.
+
+Public-development attempt 2 (Juno job 316979) passed all seven integrity
+modules, including the repaired mask round trip. During the subsequent
+all-or-nothing scientific phase, six modules completed and attribute stopped
+because the referent module's development threshold result was not explicitly
+propagated into their shared context. All scientific metrics were discarded;
+blocker `b35f6a08…e78e27` preserves both the 7/7 integrity commitment and the
+scientific-phase blocker. Final-attempt repair `602c273d…b5073b` propagates a
+qualifying returned referent threshold pair; if none qualifies, it emits the
+dependent attribute axis as `UNMEASURED` without inventing a threshold. Both
+states remain critical gate failures. No scientific rule or input changes.
