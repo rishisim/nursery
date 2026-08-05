@@ -363,6 +363,23 @@
     "no_hardware_switch_after_scientific_metrics": "FROZEN",
     "topology_commitment_sha256": "90d8842b81b27c4046bd01b4ce8b4d24cefbf1f395b9d2e633bb1c41baf82bfe"
   },
+  "public_only_calibration_readiness_preallocation_repair": {
+    "status": "FROZEN_AFTER_ZERO_JOB_PREALLOCATION_GRES_WIRING_FAILURE_BEFORE_MODEL_OUTCOMES",
+    "observed_on": "2026-08-05",
+    "amendment_commitment_sha256": "03bbf64749b0302a16e97f9b999674e287b7f4fa801df905d09b72ea9c39eeae",
+    "topology_commitment_sha256": "90d8842b81b27c4046bd01b4ce8b4d24cefbf1f395b9d2e633bb1c41baf82bfe",
+    "failure": "SLURM_INVALID_GRES_MIXED_TYPED_AND_UNTYPED_REQUEST",
+    "job_created": false,
+    "GPU_allocated": false,
+    "GPU_hours": 0,
+    "model_inference_executed": false,
+    "scientific_metric_count": 0,
+    "root_cause": "legacy_untyped_SBATCH_gpus_per_node_conflicted_with_frozen_typed_command_line_MIG_GRES",
+    "canonical_repair": "replace_wrapper_default_with_typed_A30_GRES_so_command_line_typed_GRES_overrides_the_same_Slurm_option",
+    "micro_attempt_consumed": false,
+    "model_fixture_threshold_partition_metric_or_gate_changed": false,
+    "repair_commitment_sha256": "4483dae55fc2aeba17db88df4d48364b9aa7f74147324892c9af277247dd4139"
+  },
   "prospective_amendment": {
     "effective_on": "2026-08-02",
     "timing": "after sealing the under-covered 570-step Real-1h and Real-3h stop, before any redesigned learner outcome, generator outcome, synthetic corpus, or synthetic learner score",

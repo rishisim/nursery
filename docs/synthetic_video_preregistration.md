@@ -2400,3 +2400,11 @@ was the single H100 NVL 3g.47gb MIG request. The exact one-process topology—on
 47-GB slice, eight CPUs, 32 GiB RAM, no DDP, five minutes for microhealth and 15
 minutes per scientific partition—is frozen at `90d8842b…2bfe`. No model
 inference or scientific metric was opened while selecting this topology.
+
+The first submission command was rejected before Slurm created a job because
+the wrapper combined its legacy untyped `--gpus-per-node=1` directive with the
+new typed MIG GRES. It consumed zero GPU-hours and opened no model or metric
+outcome. Repair `4483dae5…4139` changes only the wrapper's default to a typed
+A30 GRES, allowing the prospectively selected typed command-line request to
+override the same Slurm option. No fixture, model, threshold, partition,
+metric, or scientific gate changed, and no microhealth attempt was consumed.

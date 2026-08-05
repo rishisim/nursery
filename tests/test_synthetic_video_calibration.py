@@ -5719,7 +5719,7 @@ def test_public_qualification_jobs_never_mount_restricted_data() -> None:
     assert "PHASE4_RESTRICTED_ROOT" not in prepare
     assert "#SBATCH --partition=a30" in qualify
     assert "#SBATCH --time=03:00:00" in qualify
-    assert "#SBATCH --gpus-per-node=1" in qualify
+    assert "#SBATCH --gres=gpu:nvidia_a30:1" in qualify
     assert "qualify-public" in qualify
     assert "activity-candidate" in qualify
     assert "--net --network none" in qualify

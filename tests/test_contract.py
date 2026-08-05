@@ -31,7 +31,7 @@ def test_phase4_qualification_wrapper_has_fail_closed_health_topology() -> None:
     assert "#SBATCH --partition=a30" in wrapper
     assert "#SBATCH --nodes=1" in wrapper
     assert "#SBATCH --ntasks=1" in wrapper
-    assert "#SBATCH --gpus-per-node=1" in wrapper
+    assert "#SBATCH --gres=gpu:nvidia_a30:1" in wrapper
     assert "#SBATCH --cpus-per-task=8" in wrapper
     assert "#SBATCH --mem-per-cpu=4G" in wrapper
     assert "#SBATCH --time=03:00:00" in wrapper

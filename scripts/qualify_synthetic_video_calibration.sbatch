@@ -3,7 +3,7 @@
 #SBATCH --partition=a30
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --gpus-per-node=1
+#SBATCH --gres=gpu:nvidia_a30:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=4G
 #SBATCH --time=03:00:00

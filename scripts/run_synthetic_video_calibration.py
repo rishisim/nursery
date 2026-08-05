@@ -19300,6 +19300,40 @@ def _public_readiness_fixture_result(cfg: dict[str, Any]) -> dict[str, Any]:
     return value
 
 
+def _public_readiness_preallocation_repair(cfg: dict[str, Any]) -> dict[str, Any]:
+    amendment = _public_only_readiness_amendment(cfg)
+    topology = _public_readiness_topology(cfg)
+    try:
+        value = cfg["public_only_calibration_readiness_preallocation_repair"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_PUBLIC_READINESS_PREALLOCATION_REPAIR_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("repair_commitment_sha256", None)
+    if (
+        not isinstance(value, dict)
+        or value.get("status")
+        != "FROZEN_AFTER_ZERO_JOB_PREALLOCATION_GRES_WIRING_FAILURE_BEFORE_MODEL_OUTCOMES"
+        or value.get("amendment_commitment_sha256")
+        != amendment["amendment_commitment_sha256"]
+        or value.get("topology_commitment_sha256")
+        != topology["topology_commitment_sha256"]
+        or value.get("failure")
+        != "SLURM_INVALID_GRES_MIXED_TYPED_AND_UNTYPED_REQUEST"
+        or value.get("job_created") is not False
+        or value.get("GPU_allocated") is not False
+        or value.get("GPU_hours") != 0
+        or value.get("model_inference_executed") is not False
+        or value.get("scientific_metric_count") != 0
+        or value.get("micro_attempt_consumed") is not False
+        or value.get("model_fixture_threshold_partition_metric_or_gate_changed")
+        is not False
+        or expected is None
+        or digest(payload) != expected
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_PREALLOCATION_REPAIR_COMMITMENT")
+    return value
+
+
 def _public_readiness_execution_commitment(cfg: dict[str, Any]) -> str:
     amendment = _public_only_readiness_amendment(cfg)
     topology = _public_readiness_topology(cfg)
@@ -19658,6 +19692,7 @@ def run_public_readiness_health(args: argparse.Namespace) -> dict[str, Any]:
     amendment = _public_only_readiness_amendment(cfg)
     topology = _public_readiness_topology(cfg)
     fixture_result = _public_readiness_fixture_result(cfg)
+    _public_readiness_preallocation_repair(cfg)
     if args.attempt not in {1, 2}:
         raise RuntimeError("E_PUBLIC_READINESS_HEALTH_ATTEMPT")
     root = _public_readiness_root(args.public_root) / "engineering-health"

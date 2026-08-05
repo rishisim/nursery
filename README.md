@@ -789,3 +789,8 @@ freezes one process, eight CPUs, 32 GiB RAM, five-minute microhealth, and
 public microhealth run. Scientific development remains conditional on a
 committed all-module health pass, and governed/downstream work remains out of
 scope.
+
+The first MIG submission was rejected before job creation because a legacy
+untyped GPU directive conflicted with the typed GRES. Zero GPU-hours and zero
+outcomes were produced; canonical wiring-only repair `4483dae5…4139` preserves
+the topology and all scientific inputs/rules before resubmission.

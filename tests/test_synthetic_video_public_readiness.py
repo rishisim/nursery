@@ -112,6 +112,15 @@ def test_public_readiness_fixture_result_is_sealed_before_inference() -> None:
     assert result["model_inference_executed"] is False
 
 
+def test_zero_job_preallocation_repair_changes_no_scientific_rule() -> None:
+    result = MODULE._public_readiness_preallocation_repair(_config())
+    assert result["job_created"] is False
+    assert result["GPU_allocated"] is False
+    assert result["GPU_hours"] == 0
+    assert result["micro_attempt_consumed"] is False
+    assert result["model_fixture_threshold_partition_metric_or_gate_changed"] is False
+
+
 def test_readiness_lexical_metrics_measure_aggregate_estimands() -> None:
     expected = [
         _event("c1", "e1", "adjective", "red"),
