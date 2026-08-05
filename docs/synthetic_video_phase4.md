@@ -727,3 +727,17 @@ outcome. Prospective repair `0c617e63…37398f` changes only dispatch precedence
 attempt 16 validates the active repair first. The complete suite, A30 hardware
 attestation, one-process topology, budgets, privacy guards, metric withholding,
 and all scientific rules remain unchanged.
+
+Attempt 16 (Juno job 316924) passed the wrapper topology attestation but
+failed after 11 scheduler seconds before any runner progress, model module, or
+scientific metric. The incomplete-attempt resource dispatcher had not been
+advanced with the active repair lineage, so it charged attempts 14 and 15 the
+60-minute fallback rather than their exact committed 0.15- and
+0.1666667-minute durations. The resulting
+`E_TUPLE_HEALTH_GPU_HOUR_BUDGET` is preserved as engineering blocker
+`6120cc49…49816`, not a scientific no-go. Prospective repair
+`857b5353…3f87d` gives the exact attempt-14/15/16 resource records precedence
+over historical defaults and freezes attempt 17 on the earliest eligible
+zero-cost A30 topology. Models, fixtures, thresholds, metrics, seeds, privacy
+guards, one-process execution, and scientific gates are unchanged; periodic
+scheduler polling and unchanged-status messages remain prohibited.

@@ -668,3 +668,15 @@ scientific metrics ran. Blocker `7a571023…427bb` preserves the failure.
 Prospective repair `0c617e63…37398f` makes the active attempt-16 dispatch
 precede historical branches and otherwise retains the exact A30, resource,
 privacy, metric-withholding, and scientific contracts.
+
+Attempt 16, Juno job 316924, passed the wrapper topology attestation but failed
+after 11 scheduler seconds before its first progress record. Historical
+resource accounting charged incomplete attempts 14 and 15 the one-hour
+default instead of their exact 9- and 10-second committed durations, causing
+`E_TUPLE_HEALTH_GPU_HOUR_BUDGET`; zero model modules or scientific metrics
+ran. Blocker `6120cc49…49816` preserves the failure. Prospective repair
+`857b5353…3f87d` makes the exact attempt-14/15/16 resource map active before
+historical defaults and freezes one otherwise unchanged attempt 17 on the
+scheduler-selected A30. It remains one process, eight CPUs, 32 GiB,
+60 minutes/1 GPU-hour, 1 GiB new storage, and $0, with no periodic polling or
+unchanged-status reporting.

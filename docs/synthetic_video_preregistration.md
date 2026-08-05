@@ -2187,3 +2187,21 @@ branches. It preserves the exact generic-GRES compatibility bound, in-container
 A30 name/memory check, models, fixtures, seeds, thresholds, metrics, scientific
 gate, privacy controls, one-process topology, and resource ceilings. The suite
 remains metric-withheld until all seven modules execute successfully.
+
+Attempt 16 (Juno job 316924) passed the wrapper topology attestation and then
+failed after 11 scheduler seconds before its first progress record. The
+historical incomplete-attempt resource dispatcher charged attempts 14 and 15
+the 60-minute fallback rather than their exact committed 9- and 10-second
+durations, triggering `E_TUPLE_HEALTH_GPU_HOUR_BUDGET`. No model module or
+scientific metric ran. Engineering blocker `6120cc49…49816` preserves this
+outcome without changing any scientific result.
+
+Prospective repair `857b5353…3f87d` changes only historical resource-dispatch
+precedence. Attempts 14, 15, and 16 now use their exact committed elapsed
+resources before any historical default is considered. Attempt 17 is one
+unchanged complete metric-withheld suite on the scheduler-selected A30 with
+one process, eight CPUs, 32 GiB, a 60-minute/1-GPU-hour ceiling, 1 GiB new
+storage, and $0. The in-container exact A30 name/memory attestation, models,
+fixtures, inputs, seeds, thresholds, metrics, privacy rules, and scientific
+gate remain frozen. Only one job may be live; periodic scheduler polling and
+unchanged-status reporting are prohibited.

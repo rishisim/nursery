@@ -656,6 +656,12 @@ ENGINEERING_HEALTH_ATTEMPT_15_BLOCKER_SHA256 = (
 ENGINEERING_HEALTH_ACTIVE_DISPATCH_REPAIR_SHA256 = (
     "0c617e6314a914b5ad30e167eceb4a3981c72bfa7661558c9887cfa19037398f"
 )
+ENGINEERING_HEALTH_ATTEMPT_16_BLOCKER_SHA256 = (
+    "6120cc49b0fe802ba292899bb9773ddf7549a4b886b184b67f282f8af9949816"
+)
+ENGINEERING_HEALTH_HISTORICAL_RESOURCE_DISPATCH_REPAIR_SHA256 = (
+    "857b5353858d936dcaef3ea2c8ab2f6a1f569ace3f464f2de80dd831c273f87d"
+)
 CONSTRUCT_ALIGNED_ACTION_COUNTS = {"development": 44, "holdout": 44}
 CONSTRUCT_ALIGNED_ACTION_CLASS_COUNTS = {
     "development": {
@@ -928,6 +934,21 @@ def _engineering_health_resource_policy(cfg: dict[str, Any]) -> dict[str, Any]:
     redirect = _engineering_health_resource_redirect(cfg)
     _engineering_health_dependency_restore(cfg)
     _engineering_health_topology_guard_repair(cfg)
+    if "learner_effective_engineering_health_historical_resource_dispatch_repair" in cfg:
+        active = _engineering_health_historical_resource_dispatch_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]
+        return {
+            "partition": active["partition"], "GRES": active["GRES"],
+            "GPU_type": active["GPU_type"], "GPU_count": active["GPU_count"],
+            "CPU_count": active["CPU_count"], "memory_GiB": active["memory_GiB"],
+            "DDP": active["DDP"],
+            "per_submission_wall_minutes_max": active["wall_minutes_max"],
+            "initial_plus_repair_resmoke_submission_count_max": active["attempt"],
+            "aggregate_GPU_hours_max": active["active_aggregate_GPU_hours_max"],
+            "new_storage_GiB_max": active["active_aggregate_new_storage_GiB_max"],
+            "direct_monetary_cost_USD": active["direct_monetary_cost_USD"],
+        }
     if "learner_effective_engineering_health_active_dispatch_repair" in cfg:
         active = _engineering_health_active_dispatch_repair(cfg)[
             "active_attempt_resource_policy"
@@ -1176,6 +1197,16 @@ def _engineering_health_attempt_gpu_type(
     """Return the prospectively bound GPU type for one historical/current attempt."""
 
     if type(attempt) is not int or attempt < 1:
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
+    if "learner_effective_engineering_health_historical_resource_dispatch_repair" in cfg:
+        policy = _engineering_health_historical_resource_dispatch_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]
+        if attempt == int(policy["attempt"]):
+            return str(policy["GPU_type"])
+        historical = policy["historical_attempt_GPU_types"]
+        if str(attempt) in historical:
+            return str(historical[str(attempt)])
         raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_BUDGET")
     if "learner_effective_engineering_health_active_dispatch_repair" in cfg:
         policy = _engineering_health_active_dispatch_repair(cfg)[
@@ -4638,6 +4669,175 @@ def _engineering_health_active_dispatch_repair(
     return value
 
 
+def _engineering_health_attempt_16_result(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the sealed pre-progress historical-resource dispatch failure."""
+
+    repair = _engineering_health_active_dispatch_repair(cfg)
+    try:
+        value = cfg["learner_effective_engineering_health_attempt_16_result"]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_16_RESULT_MISSING") from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("blocker_commitment_sha256", None)
+    submission = value.get("submission_provenance", {})
+    compact = value.get("compact_aggregate", {})
+    diagnosis = value.get("stable_aggregate_diagnosis", {})
+    resource = value.get("resource_accounting", {})
+    if (
+        cfg.get("schema_version") != 36
+        or value.get("status")
+        != "ENGINEERING_BLOCKER_ATTEMPT_16_BEFORE_RUNNER_PROGRESS_NO_SCIENTIFIC_METRICS_OPENED"
+        or value.get("classification")
+        != "ENGINEERING_HISTORICAL_INCOMPLETE_RESOURCE_DISPATCH_PRECEDENCE_FAILURE_NOT_SCIENTIFIC_NO_GO"
+        or value.get("preserved_active_dispatch_repair_sha256")
+        != repair["repair_commitment_sha256"]
+        or expected != ENGINEERING_HEALTH_ATTEMPT_16_BLOCKER_SHA256
+        or digest(payload) != expected
+        or submission.get("job_id") != 316924
+        or submission.get("attempt") != 16
+        or submission.get("scheduler_state") != "FAILED"
+        or submission.get("scheduler_exit_code") != "1:0"
+        or submission.get("scheduler_elapsed_seconds") != 11
+        or compact.get("topology_attestation_count") != 1
+        or compact.get("runner_progress_record_count") != 0
+        or compact.get("module_execution_count") != 0
+        or compact.get("scientific_metric_count") != 0
+        or compact.get("stderr_bytes") != 857
+        or compact.get("retained_file_count") != 4
+        or compact.get("retained_bytes") != 1536
+        or diagnosis.get("stable_error_code") != "E_TUPLE_HEALTH_GPU_HOUR_BUDGET"
+        or diagnosis.get("historical_incomplete_attempt_count_mischarged") != 2
+        or diagnosis.get("mischarged_attempts") != [14, 15]
+        or diagnosis.get("default_wall_minutes_each") != 60
+        or diagnosis.get("frozen_actual_wall_minutes")
+        != {"14": 0.15, "15": 0.16666666666666666}
+        or diagnosis.get("excess_GPU_hours_charged") != 1.9947222222222223
+        or diagnosis.get("runner_progress_written") is not False
+        or diagnosis.get("model_module_inference_count") != 0
+        or diagnosis.get("scientific_metric_count") != 0
+        or diagnosis.get("model_or_scientific_outcome_used_for_repair") is not False
+        or resource.get("attempt_GPU_hours_actual") != 0.0030555555555555557
+        or resource.get("protocol_accounted_cumulative_GPU_hours_actual")
+        != 1.5540541611115137
+        or value.get("terminal_gate", {}).get("scientific_decision_opened")
+        is not False
+        or value.get("terminal_gate", {}).get(
+            "attempt_17_authorized_only_after_prospective_historical_resource_dispatch_repair_commit_and_push"
+        )
+        is not True
+        or value.get("blocker_commitment_scope")
+        != "canonical JSON of this result excluding blocker_commitment_sha256"
+    ):
+        raise RuntimeError("E_TUPLE_HEALTH_ATTEMPT_16_RESULT_COMMITMENT")
+    return value
+
+
+def _engineering_health_historical_resource_dispatch_repair(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate active historical resource accounting and attempt-17 policy."""
+
+    attempt_16 = _engineering_health_attempt_16_result(cfg)
+    try:
+        value = cfg[
+            "learner_effective_engineering_health_historical_resource_dispatch_repair"
+        ]
+    except (KeyError, TypeError) as error:
+        raise RuntimeError(
+            "E_TUPLE_HEALTH_HISTORICAL_RESOURCE_DISPATCH_REPAIR_MISSING"
+        ) from error
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("repair_commitment_sha256", None)
+    preserved = value.get("preserved_without_change", {})
+    repair = value.get("failure_specific_repair", {})
+    comparison = value.get("scheduler_only_comparison", {})
+    active = value.get("active_attempt_resource_policy", {})
+    topology = value.get("topology_attestation_contract", {})
+    candidates = comparison.get("candidates")
+    catalog = {
+        "NVIDIA_A30_24GB": ("a30", "gpu:nvidia_a30:1", "NVIDIA A30", 23, 25),
+        "NVIDIA_H100_NVL": ("h100", "gpu:nvidia_h100_nvl:1", "NVIDIA H100 NVL", 85, 100),
+        "NVIDIA_H100_NVL_3G_47GB_MIG": ("h100", "gpu:nvidia_h100_nvl_3g.47gb:1", "NVIDIA H100 NVL MIG 3g.47gb", 45, 50),
+        "NVIDIA_H200_NVL": ("h200", "gpu:nvidia_h200_nvl:1", "NVIDIA H200 NVL", 135, 145),
+    }
+    candidate_shape_ok = (
+        isinstance(candidates, list)
+        and len(candidates) == len(catalog)
+        and {item.get("GPU_type") for item in candidates if isinstance(item, dict)}
+        == set(catalog)
+        and all(
+            item.get("partition") == catalog[item["GPU_type"]][0]
+            and item.get("GRES") == catalog[item["GPU_type"]][1]
+            and item.get("eligible") is True
+            and re.fullmatch(
+                r"2026-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}-0[5-7]:00",
+                str(item.get("estimated_start")),
+            )
+            is not None
+            for item in candidates
+        )
+    )
+    winner = (
+        min(candidates, key=lambda item: (item["estimated_start"], list(catalog).index(item["GPU_type"])))
+        if candidate_shape_ok
+        else {}
+    )
+    selected_type = comparison.get("selected_GPU_type")
+    selected = catalog.get(selected_type, (None, None, None, None, None))
+    if (
+        cfg.get("schema_version") != 36
+        or value.get("status")
+        != "FROZEN_AFTER_ATTEMPT_16_HISTORICAL_RESOURCE_DISPATCH_FAILURE_BEFORE_ATTEMPT_17_OR_NEW_OUTCOME"
+        or value.get("scope")
+        != "OUTCOME_INDEPENDENT_ACTIVE_HISTORICAL_RESOURCE_ACCOUNTING_DISPATCH_FIX_AND_ATTEMPT_17_TOPOLOGY_SELECTION"
+        or expected != ENGINEERING_HEALTH_HISTORICAL_RESOURCE_DISPATCH_REPAIR_SHA256
+        or digest(payload) != expected
+        or preserved.get("attempt_16_blocker_sha256")
+        != attempt_16["blocker_commitment_sha256"]
+        or preserved.get("active_dispatch_repair_sha256")
+        != ENGINEERING_HEALTH_ACTIVE_DISPATCH_REPAIR_SHA256
+        or repair.get("incomplete_resource_policy_dispatch_order")
+        != [
+            "historical_resource_dispatch_repair_attempt_17",
+            "active_dispatch_repair_attempt_16",
+            "generic_GRES_repair_attempt_15",
+            "NLTK_matplotlib_repair_attempt_14",
+            "older_historical_repairs",
+        ]
+        or repair.get("attempts_14_15_16_use_exact_committed_actual_resource_records")
+        is not True
+        or repair.get("default_full_wall_charge_for_these_attempts_prohibited")
+        is not True
+        or repair.get("attempt_16_failure_code_regression_test_required") is not True
+        or repair.get("generic_scheduler_TresPerNode_form_for_attempt_17")
+        != "gres/gpu:1"
+        or repair.get("model_fixture_source_threshold_partition_seed_metric_or_gate_changed")
+        is not False
+        or comparison.get("checked_on") != "2026-08-05"
+        or comparison.get("real_job_submitted_by_checks") is not False
+        or not candidate_shape_ok
+        or selected_type != winner.get("GPU_type")
+        or active.get("attempt") != 17
+        or active.get("partition") != selected[0]
+        or active.get("GRES") != selected[1]
+        or active.get("GPU_type") != selected_type
+        or active.get("prior_protocol_accounted_GPU_hours_actual")
+        != 1.5540541611115137
+        or active.get("active_aggregate_GPU_hours_max") != 2.5540541611115137
+        or topology
+        != {"partition": selected[0], "node_count": 1, "task_count": 1, "CPU_count": 8, "time_limit_minutes": 60, "memory_per_CPU_GiB": 4, "GRES": selected[1], "expected_device_name": selected[2], "visible_memory_GiB_min": selected[3], "visible_memory_GiB_max": selected[4], "world_size": 1, "local_world_size": 1}
+        or value.get("new_health_or_scientific_outcome_opened") is not False
+        or value.get("repair_commitment_scope")
+        != "canonical JSON of this amendment excluding repair_commitment_sha256"
+    ):
+        raise RuntimeError(
+            "E_TUPLE_HEALTH_HISTORICAL_RESOURCE_DISPATCH_REPAIR_COMMITMENT"
+        )
+    return value
+
+
 def _geometry_function_bundle_digests(
     path: Path, names: list[str]
 ) -> tuple[str, str]:
@@ -7652,7 +7852,23 @@ def _tuple_health_incomplete_attempt_resource(
     marker = _tuple_health_wrapper_marker(attempt_root, attempt, cfg)
     policy = _engineering_health_resource_policy(cfg)
     historical = {}
-    if "learner_effective_engineering_health_submission_export_repair" in cfg:
+    if "learner_effective_engineering_health_historical_resource_dispatch_repair" in cfg:
+        historical = _engineering_health_historical_resource_dispatch_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]["historical_incomplete_attempt_wall_minutes"]
+    elif "learner_effective_engineering_health_active_dispatch_repair" in cfg:
+        historical = _engineering_health_active_dispatch_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]["historical_incomplete_attempt_wall_minutes"]
+    elif "learner_effective_engineering_health_generic_GRES_serialization_repair" in cfg:
+        historical = _engineering_health_generic_gres_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]["historical_incomplete_attempt_wall_minutes"]
+    elif "learner_effective_engineering_health_NLTK_matplotlib_repair" in cfg:
+        historical = _engineering_health_nltk_matplotlib_repair(cfg)[
+            "active_attempt_resource_policy"
+        ]["historical_incomplete_attempt_wall_minutes"]
+    elif "learner_effective_engineering_health_submission_export_repair" in cfg:
         historical = _engineering_health_submission_export_repair(cfg)[
             "active_attempt_resource_policy"
         ]["historical_incomplete_attempt_wall_minutes"]
@@ -13700,6 +13916,17 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
         if "learner_effective_engineering_health_active_dispatch_repair" in cfg
         else None
     )
+    attempt_16_result = (
+        _engineering_health_attempt_16_result(cfg)
+        if "learner_effective_engineering_health_attempt_16_result" in cfg
+        else None
+    )
+    historical_resource_dispatch_repair = (
+        _engineering_health_historical_resource_dispatch_repair(cfg)
+        if "learner_effective_engineering_health_historical_resource_dispatch_repair"
+        in cfg
+        else None
+    )
     amendment = _tuple_amendment(cfg)
     runtime = _tuple_runtime_amendment(cfg)
     fixture_protocol = _tuple_fixture_protocol(cfg)
@@ -13761,6 +13988,8 @@ def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
             "generic_gres_repair": generic_gres_repair,
             "attempt_15_result": attempt_15_result,
             "active_dispatch_repair": active_dispatch_repair,
+            "attempt_16_result": attempt_16_result,
+            "historical_resource_dispatch_repair": historical_resource_dispatch_repair,
             "tuple_amendment": amendment,
             "runtime": runtime,
             "fixture_protocol": fixture_protocol,
@@ -14265,6 +14494,17 @@ def _tuple_health_topology_attestation(
     if not job_id.isdecimal() or int(job_id) <= 0:
         raise RuntimeError("E_TUPLE_HEALTH_TOPOLOGY_ATTESTATION")
     if (
+        "learner_effective_engineering_health_historical_resource_dispatch_repair"
+        in cfg
+        and attempt == 17
+    ):
+        topology = _engineering_health_historical_resource_dispatch_repair(cfg)[
+            "topology_attestation_contract"
+        ]
+        expected_partition = topology["partition"]
+        expected_wall_minutes = topology["time_limit_minutes"]
+        expected_gres = topology["GRES"]
+    elif (
         "learner_effective_engineering_health_active_dispatch_repair" in cfg
         and attempt == 16
     ):
@@ -14608,6 +14848,21 @@ def _tuple_health_topology(
             else 0
         )
         if (
+            "learner_effective_engineering_health_historical_resource_dispatch_repair"
+            in cfg
+            and int(attempt) == 17
+        ):
+            topology = _engineering_health_historical_resource_dispatch_repair(cfg)[
+                "topology_attestation_contract"
+            ]
+            configured_name = str(topology["expected_device_name"])
+            expected_device = device_name == configured_name
+            expected_memory = (
+                int(topology["visible_memory_GiB_min"]) * 1024**3
+                <= total_memory
+                <= int(topology["visible_memory_GiB_max"]) * 1024**3
+            )
+        elif (
             "learner_effective_engineering_health_active_dispatch_repair" in cfg
             and int(attempt) == 16
         ):
@@ -14796,7 +15051,13 @@ def run_tuple_health(args: argparse.Namespace) -> dict[str, Any]:
     """Run the bounded production-path microqualification with zero metrics."""
 
     cfg = json.loads(args.config.read_text())
-    if "learner_effective_engineering_health_active_dispatch_repair" in cfg:
+    if "learner_effective_engineering_health_historical_resource_dispatch_repair" in cfg:
+        _engineering_health_historical_resource_dispatch_repair(cfg)
+        if int(args.attempt) != 17:
+            raise RuntimeError(
+                "E_TUPLE_HEALTH_HISTORICAL_RESOURCE_DISPATCH_REPAIR_ATTEMPT"
+            )
+    elif "learner_effective_engineering_health_active_dispatch_repair" in cfg:
         _engineering_health_active_dispatch_repair(cfg)
         if int(args.attempt) != 16:
             raise RuntimeError("E_TUPLE_HEALTH_ACTIVE_DISPATCH_REPAIR_ATTEMPT")
@@ -25209,7 +25470,7 @@ def main() -> None:
         "--container-attestation", type=Path, required=True
     )
     tuple_health_parser.add_argument(
-        "--attempt", type=int, choices=(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), required=True
+        "--attempt", type=int, choices=(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17), required=True
     )
     tuple_health_parser.add_argument("--device", default="cuda")
     tuple_qualify_parser = subparsers.add_parser("tuple-qualify")
