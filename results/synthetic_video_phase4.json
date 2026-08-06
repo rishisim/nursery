@@ -1,13 +1,13 @@
 {
   "schema_version": 26,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_PRIOR_PUBLIC_NO_GO_PRESERVED_PUBLIC_ONLY_READINESS_RENTED_RESOURCE_FROZEN",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_PRIOR_PUBLIC_NO_GO_PRESERVED_PUBLIC_ONLY_READINESS_ENGINEERING_BLOCKER",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
   "signed_on": "2026-08-01",
   "public_only_calibration_readiness": {
-    "status": "RENTED_RESOURCE_FROZEN_BEFORE_FINAL_MICRO_RESMOKE",
+    "status": "ENGINEERING_BLOCKER_RENTED_L40S_CONTAINER_INIT_NO_SCIENTIFIC_METRICS_OPENED",
     "effective_on": "2026-08-05",
     "amendment_commitment_sha256": "03bbf64749b0302a16e97f9b999674e287b7f4fa801df905d09b72ea9c39eeae",
     "prior_terminal_result_commitment_sha256": "42338302949e27e0ed7c3f6e8a5f70e10bb380a5e8158378e89f5ff87c350e9d",
@@ -54,7 +54,19 @@
     "transient_public_input_staging_GiB_max": 65,
     "retained_run_storage_GiB_max": 10,
     "direct_monetary_cost_USD_max": 1.3,
-    "Juno_job_317702_status": "LIVE_UNCHANGED_UNTIL_RENTED_ROUTE_READY_THEN_SINGLE_CHECK",
+    "Juno_job_317702_status": "FAILED_9_SECONDS_EXIT_66_NO_SCIENTIFIC_METRICS",
+    "rented_job_id": "6a740b8ba00abefd4b294f97",
+    "rented_job_submission_count": 1,
+    "rented_provider_exit_code": 128,
+    "rented_stable_error_code": "E_HF_JOBS_NESTED_WRITABLE_MOUNT_UNDER_READ_ONLY_PARENT",
+    "rented_failure_stage": "OCI_CONTAINER_INITIALIZATION_BEFORE_COMMAND_ENTRY",
+    "credential_and_public_staging_validation_pass": true,
+    "public_input_staging_GiB": 60.757,
+    "container_started": false,
+    "runner_entry_count": 0,
+    "model_module_execution_count": 0,
+    "provider_resource_stats_available": false,
+    "rented_attempt_result_commitment_sha256": "200f2d78cd9f80838e574acb3a6e0c59084151d4104d77de0981ca2e5a1781cf",
     "model_inference_executed": false,
     "scientific_metric_count": 0,
     "new_manual_annotation_count": 0,
@@ -2228,5 +2240,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "PUBLIC_ONLY_CALIBRATION_READINESS_IMPLEMENTATION_MICROHEALTH_DEVELOPMENT_AND_CONDITIONAL_HOLDOUT_ONLY; GOVERNED_C_LTX_GENERATION_SYNTHETIC_CORPUS_AND_LEARNER_EXECUTION_REMAIN_UNAUTHORIZED"
+  "next_authorized_scope": "NONE_UNDER_SINGLE_APPROVED_L40S_JOB_STOP; A_SEPARATELY_AUTHORIZED_PROVIDER_MOUNT_LAYOUT_REPAIR_WOULD_BE_REQUIRED; GOVERNED_C_LTX_GENERATION_SYNTHETIC_CORPUS_AND_LEARNER_EXECUTION_REMAIN_UNAUTHORIZED"
 }

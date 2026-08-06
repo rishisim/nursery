@@ -817,3 +817,14 @@ run storage, and USD 1.30. Only public/self-authored fixtures, public weights,
 and canonical public-only code/config may leave Juno. Job 317702 is checked
 once only after the rental is ready and may be canceled only if it is still
 pending at zero runtime; a running or terminal Juno job is never duplicated.
+
+The one-time credential and staging validation then passed with 60.757 GiB of
+public-only input and no restricted source. Juno job 317702 was already
+terminal after nine seconds with no scientific metric, so no live job was
+duplicated. The sole approved L40S job failed during OCI container
+initialization with provider exit 128 because the runtime could not create the
+writable output mount beneath the read-only input mount. It never entered the
+wrapper, loaded a model, or opened a scientific metric. Compact blocker
+`200f2d78…781cf` is an engineering provider-volume-layout blocker, not a
+scientific no-go; development and holdout remain unopened, and no automatic
+resubmission is authorized.

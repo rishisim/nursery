@@ -2447,3 +2447,14 @@ preserved SIF. No ChildLens, BabyView, governed material, or derivative may
 leave Juno. Existing Juno job 317702 remains untouched until the rental is
 fully staged, is then inspected once, and may be canceled only if still pending
 at zero runtime with no output; otherwise no rented duplicate is launched.
+
+The one-time credential and staging check subsequently passed with 60.757 GiB
+of public-only input and no restricted source. Juno job 317702 was already
+terminal after nine seconds with no scientific metric. The sole approved L40S
+job then stopped at provider OCI initialization (exit 128) because the provider
+could not create a writable nested output mount below the read-only input
+mount. The wrapper and model code never started, development and holdout were
+not opened, and the scientific contract was unchanged. Result commitment
+`200f2d78…781cf` seals this as an engineering provider-volume-layout blocker,
+not a scientific no-go. Under the one-job instruction, no automatic repair or
+resubmission is authorized.

@@ -122,7 +122,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["schema_version"] == 29
     assert config["status"] == (
         "PHASE4_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_"
-        "RENTED_RESOURCE_FROZEN"
+        "ENGINEERING_BLOCKER"
     )
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
@@ -622,6 +622,16 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert readiness["absolute_scope"]["governed_C"] is False
     assert readiness["combined_gate"]["critical_axes_must_all_pass"] is True
     assert readiness["combined_gate"]["validated_axes_min"] == 6
+    rented_result = dict(
+        config["public_only_calibration_readiness_rented_attempt_result"]
+    )
+    rented_result_commitment = rented_result.pop("result_commitment_sha256")
+    assert rented_result_commitment == canonical_json_sha256(rented_result)
+    assert rented_result_commitment == (
+        "200f2d78cd9f80838e574acb3a6e0c59084151d4104d77de0981ca2e5a1781cf"
+    )
+    assert rented_result["scientific_metric_count"] == 0
+    assert rented_result["container_started"] is False
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)
