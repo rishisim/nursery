@@ -122,7 +122,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["schema_version"] == 29
     assert config["status"] == (
         "PHASE4_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_"
-        "ENGINEERING_BLOCKER"
+        "SIBLING_MOUNT_REPAIR_FROZEN"
     )
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
@@ -632,6 +632,17 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     )
     assert rented_result["scientific_metric_count"] == 0
     assert rented_result["container_started"] is False
+    mount_repair = dict(
+        config["public_only_calibration_readiness_mount_layout_repair"]
+    )
+    mount_repair_commitment = mount_repair.pop("repair_commitment_sha256")
+    assert mount_repair_commitment == canonical_json_sha256(mount_repair)
+    assert mount_repair_commitment == (
+        "b740a3edb36a09da33edb01f6248315ec314c182deea24de908ecf990653f2f9"
+    )
+    assert mount_repair["mount_relationship"] == (
+        "SEPARATE_SIBLING_PATHS_NON_NESTED"
+    )
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)

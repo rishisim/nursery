@@ -2458,3 +2458,12 @@ not opened, and the scientific contract was unchanged. Result commitment
 `200f2d78…781cf` seals this as an engineering provider-volume-layout blocker,
 not a scientific no-go. Under the one-job instruction, no automatic repair or
 resubmission is authorized.
+
+On 2026-08-06 the user prospectively authorized the narrow mount-layout repair
+while preserving blocker `200f2d78…781cf`. Commitment `b740a3ed…53f2f9`
+freezes two non-nested sibling provider mounts: a read-only private public-input
+bucket and a writable private output bucket. A per-job scratch root links only
+`models`, `public`, and `source` from input plus `runs` from output. No model,
+fixture, label, partition, threshold, metric, seed, gate, privacy rule, or
+resource ceiling changes. Microhealth must pass and be committed before public
+development can open.

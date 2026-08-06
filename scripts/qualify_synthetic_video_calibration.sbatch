@@ -17,6 +17,30 @@
 set -euo pipefail
 umask 077
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 WANDB_DISABLED=true TOKENIZERS_PARALLELISM=false PYTHONNOUSERSITE=1
+execution_backend="${PHASE4_EXECUTION_BACKEND:-slurm}"
+if [[ "$execution_backend" == "hf_jobs_public_only" ]]; then
+  execution_id="${PHASE4_PUBLIC_EXECUTION_ID:-}"
+  [[ "$execution_id" =~ ^readiness-(health|development|holdout)-[a-z0-9-]+$ ]] || exit 66
+  public_input_root="${PHASE4_PUBLIC_INPUT_ROOT:-}"
+  public_output_root="${PHASE4_PUBLIC_OUTPUT_ROOT:-}"
+  [[ "$public_input_root" == /* && "$public_output_root" == /* ]] || exit 65
+  [[ -d "$public_input_root" && -d "$public_output_root" && -w "$public_output_root" ]] || exit 65
+  public_input_root="$(readlink -f "$public_input_root")"
+  public_output_root="$(readlink -f "$public_output_root")"
+  [[ "$public_input_root" != "$public_output_root" ]] || exit 66
+  [[ "$public_input_root" != "$public_output_root/"* ]] || exit 66
+  [[ "$public_output_root" != "$public_input_root/"* ]] || exit 66
+  [[ -d "$public_input_root/models" && -d "$public_input_root/public" && -d "$public_input_root/source" ]] || exit 65
+  scratch="${TMPDIR:-/tmp}/synthetic-calibration-qualify-${execution_id}"
+  merged_public_root="$scratch/public-root"
+  [[ ! -e "$merged_public_root" ]] || exit 65
+  install -d -m 700 "$scratch" "$merged_public_root"
+  ln -s "$public_input_root/models" "$merged_public_root/models"
+  ln -s "$public_input_root/public" "$merged_public_root/public"
+  ln -s "$public_input_root/source" "$merged_public_root/source"
+  ln -s "$public_output_root" "$merged_public_root/runs"
+  export PHASE4_PUBLIC_ROOT="$merged_public_root"
+fi
 candidate_id="${PHASE4_ACTIVITY_CANDIDATE:-legacy-repair}"
 activity_run_mode="${PHASE4_ACTIVITY_RUN_MODE:-development}"
 tuple_run_mode="${PHASE4_TUPLE_RUN_MODE:-none}"
@@ -44,7 +68,7 @@ fi
 
 # Hugging Face Jobs runs this same canonical wrapper inside the immutable OCI
 # source image used to build the pinned SIF. Only the resource backend differs.
-if [[ "${PHASE4_EXECUTION_BACKEND:-slurm}" == "hf_jobs_public_only" ]]; then
+if [[ "$execution_backend" == "hf_jobs_public_only" ]]; then
   [[ "$readiness_run_mode" != "none" ]] || exit 64
   [[ "${WORLD_SIZE:-1}" == "1" && "${LOCAL_WORLD_SIZE:-1}" == "1" ]] || exit 66
   [[ "${PHASE4_PUBLIC_ROOT:-}" == /* ]] || exit 65
@@ -54,15 +78,12 @@ if [[ "${PHASE4_EXECUTION_BACKEND:-slurm}" == "hf_jobs_public_only" ]]; then
     [[ "${PHASE4_PUBLIC_WALL_MINUTES:-}" == "15" ]] || exit 66
   fi
   [[ "${PHASE4_RUNTIME_IMAGE_DIGEST:-}" == "sha256:dab81780fd94483b67b4b5679cc0024939b08e48540d39476d284cb29002ed69" ]] || exit 66
-  execution_id="${PHASE4_PUBLIC_EXECUTION_ID:-}"
-  [[ "$execution_id" =~ ^readiness-(health|development|holdout)-[a-z0-9-]+$ ]] || exit 66
   [[ "$(nproc)" -ge 8 ]] || exit 66
   memory_kib="$(awk '/^MemTotal:/{print $2}' /proc/meminfo)"
   [[ "$memory_kib" -ge 33554432 ]] || exit 66
 
   install -d -m 700 "$output_root" "$output_root/logs"
   exec >"$output_root/logs/${execution_id}.out" 2>"$output_root/logs/${execution_id}.err"
-  scratch="${TMPDIR:-/tmp}/synthetic-calibration-qualify-${execution_id}"
   install -d -m 700 "$scratch" "$scratch/pydeps" "$scratch/network-guard" "$scratch/bin"
   trap 'find "$scratch" -mindepth 1 -delete 2>/dev/null || true; rmdir "$scratch" 2>/dev/null || true' EXIT
   export PYTHONPYCACHEPREFIX="$scratch/pycache"

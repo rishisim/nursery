@@ -6150,6 +6150,7 @@ def _public_only_readiness_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
             "PUBLIC_ONLY_CALIBRATION_READINESS_TOPOLOGY_FROZEN_BEFORE_MODEL_OUTCOMES",
             "PUBLIC_ONLY_CALIBRATION_READINESS_ENGINEERING_REPAIR_FROZEN_BEFORE_FINAL_MICRO_ATTEMPT",
             "PUBLIC_ONLY_CALIBRATION_READINESS_RENTED_RESOURCE_FROZEN_BEFORE_FINAL_MICRO_ATTEMPT",
+            "PUBLIC_ONLY_CALIBRATION_READINESS_SIBLING_MOUNT_REPAIR_FROZEN_BEFORE_NEW_MODEL_OUTCOME",
             "PUBLIC_ONLY_CALIBRATION_READINESS_ENGINEERING_HEALTH_PASS",
             "PUBLIC_ONLY_CALIBRATION_READINESS_DEVELOPMENT_PASS_THRESHOLDS_SEALED",
             "NO_GO_PUBLIC_ONLY_COMPLETE_VALID_SCIENTIFIC_METRICS",
@@ -19263,6 +19264,73 @@ def _public_readiness_rented_resource_amendment(
     return value
 
 
+def _public_readiness_mount_layout_repair(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Validate the prospective sibling-mount repair and preserved blocker."""
+
+    trigger = cfg.get("public_only_calibration_readiness_rented_attempt_result")
+    value = cfg.get("public_only_calibration_readiness_mount_layout_repair")
+    if not isinstance(trigger, dict) or not isinstance(value, dict):
+        raise RuntimeError("E_PUBLIC_READINESS_MOUNT_LAYOUT_REPAIR_SCHEMA")
+    trigger_payload = json.loads(json.dumps(trigger))
+    trigger_expected = trigger_payload.pop("result_commitment_sha256", None)
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("repair_commitment_sha256", None)
+    if (
+        trigger_expected
+        != "200f2d78cd9f80838e574acb3a6e0c59084151d4104d77de0981ca2e5a1781cf"
+        or digest(trigger_payload) != trigger_expected
+        or trigger.get("status")
+        != "ENGINEERING_BLOCKER_RENTED_L40S_CONTAINER_INIT_NO_MODEL_OR_SCIENTIFIC_METRICS_OPENED"
+        or trigger.get("stable_error_code")
+        != "E_HF_JOBS_NESTED_WRITABLE_MOUNT_UNDER_READ_ONLY_PARENT"
+        or trigger.get("container_started") is not False
+        or trigger.get("scientific_metric_count") != 0
+        or value.get("status")
+        != "FROZEN_BEFORE_PUBLIC_RESTAGING_OR_NEW_MODEL_OUTCOME"
+        or value.get("scope") != "RESOURCE_WIRING_ONLY_PUBLIC_INPUTS_ONLY"
+        or value.get("trigger_result_commitment_sha256") != trigger_expected
+        or value.get("trigger_stable_error_code")
+        != trigger["stable_error_code"]
+        or value.get("provider") != "HUGGING_FACE_JOBS"
+        or value.get("provider_flavor") != "l40sx1"
+        or value.get("GPU_type") != "NVIDIA_L40S_48GB"
+        or value.get("GPU_count") != 1
+        or value.get("single_process") is not True
+        or value.get("DDP") is not False
+        or value.get("public_input_mount_role")
+        != "READ_ONLY_PRIVATE_BUCKET"
+        or value.get("public_output_mount_role")
+        != "WRITABLE_PRIVATE_BUCKET"
+        or value.get("mount_relationship")
+        != "SEPARATE_SIBLING_PATHS_NON_NESTED"
+        or value.get("ephemeral_merged_root") is not True
+        or value.get("merged_root_entries")
+        != {
+            "models": "public_input",
+            "public": "public_input",
+            "source": "public_input",
+            "runs": "public_output",
+        }
+        or value.get("input_root_environment_variable")
+        != "PHASE4_PUBLIC_INPUT_ROOT"
+        or value.get("output_root_environment_variable")
+        != "PHASE4_PUBLIC_OUTPUT_ROOT"
+        or value.get("prior_blocker_reinterpreted_or_overwritten") is not False
+        or value.get(
+            "models_fixtures_labels_partitions_thresholds_metrics_seeds_or_gates_changed"
+        )
+        is not False
+        or value.get("restricted_or_governed_material_permitted") is not False
+        or value.get("micro_development_holdout_wall_minutes") != [5, 15, 15]
+        or float(value.get("conditional_rented_GPU_minutes_max", math.inf)) > 35
+        or float(value.get("total_direct_monetary_cost_USD_max", math.inf)) > 1.3
+        or expected is None
+        or digest(payload) != expected
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_MOUNT_LAYOUT_REPAIR_COMMITMENT")
+    return value
+
+
 def _public_readiness_topology(cfg: dict[str, Any]) -> dict[str, Any]:
     """Validate the one-provider, one-process topology frozen before outcomes."""
 
@@ -19276,6 +19344,8 @@ def _public_readiness_topology(cfg: dict[str, Any]) -> dict[str, Any]:
     payload = json.loads(json.dumps(value))
     expected = payload.pop("topology_commitment_sha256", None)
     rented = _public_readiness_rented_resource_amendment(cfg)
+    if rented is not None:
+        _public_readiness_mount_layout_repair(cfg)
     allowed_slurm = {
         ("NVIDIA_A30_24GB", "a30", "gpu:nvidia_a30:1"),
         ("NVIDIA_H100_NVL", "h100", "gpu:nvidia_h100_nvl:1"),

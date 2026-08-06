@@ -150,6 +150,20 @@ def test_public_readiness_scheduler_redirect_is_resource_only_and_committed() ->
     assert rented["restricted_or_governed_material_permitted_off_Juno"] is False
     assert rented["total_direct_monetary_cost_USD_max"] == 1.3
 
+    repair = dict(config["public_only_calibration_readiness_mount_layout_repair"])
+    expected = repair.pop("repair_commitment_sha256")
+    assert MODULE.digest(repair) == expected
+    assert expected == (
+        "b740a3edb36a09da33edb01f6248315ec314c182deea24de908ecf990653f2f9"
+    )
+    validated = MODULE._public_readiness_mount_layout_repair(config)
+    assert validated["trigger_result_commitment_sha256"] == (
+        "200f2d78cd9f80838e574acb3a6e0c59084151d4104d77de0981ca2e5a1781cf"
+    )
+    assert validated["mount_relationship"] == (
+        "SEPARATE_SIBLING_PATHS_NON_NESTED"
+    )
+
 
 def test_public_readiness_fixture_result_is_sealed_before_inference() -> None:
     result = MODULE._public_readiness_fixture_result(_config())
@@ -424,6 +438,13 @@ def test_wrapper_has_readiness_blocking_job_contract_without_poll_loop() -> None
     assert "require_readiness_topology" in wrapper
     assert "hf_jobs_public_only" in wrapper
     assert "E_PUBLIC_READINESS_EXTERNAL_NETWORK_DISABLED" in wrapper
+    assert "PHASE4_PUBLIC_INPUT_ROOT" in wrapper
+    assert "PHASE4_PUBLIC_OUTPUT_ROOT" in wrapper
+    assert 'ln -s "$public_input_root/models" "$merged_public_root/models"' in wrapper
+    assert 'ln -s "$public_input_root/public" "$merged_public_root/public"' in wrapper
+    assert 'ln -s "$public_input_root/source" "$merged_public_root/source"' in wrapper
+    assert 'ln -s "$public_output_root" "$merged_public_root/runs"' in wrapper
+    assert '"$public_output_root" != "$public_input_root/"*' in wrapper
     assert "ChildLens" not in wrapper
     assert "BabyView" not in wrapper
     assert "squeue" not in wrapper

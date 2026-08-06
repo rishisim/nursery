@@ -828,3 +828,12 @@ wrapper, loaded a model, or opened a scientific metric. Compact blocker
 `200f2d78…781cf` is an engineering provider-volume-layout blocker, not a
 scientific no-go; development and holdout remain unopened, and no automatic
 resubmission is authorized.
+
+The user subsequently authorized a prospective resource-only repair without
+reinterpreting that blocker. Repair commitment `b740a3ed…53f2f9` mounts the
+private public-input bucket read-only and the private output bucket writable at
+separate sibling paths, then exposes `models`, `public`, `source`, and `runs`
+through one per-job scratch merge. The L40S topology, scientific configuration,
+privacy boundary, and resource ceilings are unchanged. The next gate is the
+complete metric-withheld microhealth suite; public development remains locked
+until an all-module PASS is committed.
