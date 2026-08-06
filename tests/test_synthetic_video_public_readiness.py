@@ -102,6 +102,28 @@ def test_public_readiness_topology_is_separately_committed() -> None:
         MODULE._public_readiness_topology(mutated)
 
 
+def test_public_readiness_scheduler_redirect_is_resource_only_and_committed() -> None:
+    config = _config()
+    topology = MODULE._public_readiness_topology(config)
+    assert topology["GPU_type"] == "NVIDIA_A30_24GB"
+    redirect = dict(config["public_only_calibration_readiness_scheduler_redirect"])
+    expected = redirect.pop("redirect_commitment_sha256")
+    assert MODULE.digest(redirect) == expected
+    assert expected == (
+        "4a08175c799f2961421c88a47f45aad7c0c7af3f2d53d15e76b55a1a00328d87"
+    )
+    assert {
+        row["job_id"] for row in redirect["canceled_zero_runtime_jobs"]
+    } == {317679, 317697}
+    assert all(
+        row["elapsed_seconds"] == 0 and row["GPU_hours"] == 0
+        for row in redirect["canceled_zero_runtime_jobs"]
+    )
+    assert redirect[
+        "model_fixture_partition_threshold_metric_seed_or_gate_changed"
+    ] is False
+
+
 def test_public_readiness_fixture_result_is_sealed_before_inference() -> None:
     result = MODULE._public_readiness_fixture_result(_config())
     assert result["readiness_fixture_commitment_sha256"] == (

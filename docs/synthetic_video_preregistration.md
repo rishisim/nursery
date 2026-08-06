@@ -2426,3 +2426,11 @@ per-CPU request yielding the same 32-GiB allocation. Attempt 2 reruns the entire
 metric-withheld micro suite and is the final permitted micro attempt. Scientific
 development remains locked until that complete resmoke is committed as an
 all-module engineering-health pass.
+
+Before attempt 2 produced any runtime or model outcome, pending jobs 317679 and
+317697 were canceled at zero elapsed time. A scheduler-only check estimated the
+single A30 earlier than the H100 slice, and the user explicitly selected it.
+Resource-only redirect `4a08175c…28d87` therefore freezes one A30, one process,
+eight CPUs, 32 GiB, and five minutes at topology commitment
+`b7c00058…92b3`; every scientific input, threshold, metric, gate, and ceiling is
+unchanged.

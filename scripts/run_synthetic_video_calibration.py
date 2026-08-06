@@ -19303,7 +19303,7 @@ def _public_readiness_fixture_result(cfg: dict[str, Any]) -> dict[str, Any]:
 
 def _public_readiness_preallocation_repair(cfg: dict[str, Any]) -> dict[str, Any]:
     amendment = _public_only_readiness_amendment(cfg)
-    topology = _public_readiness_topology(cfg)
+    _public_readiness_topology(cfg)
     try:
         value = cfg["public_only_calibration_readiness_preallocation_repair"]
     except (KeyError, TypeError) as error:
@@ -19317,7 +19317,7 @@ def _public_readiness_preallocation_repair(cfg: dict[str, Any]) -> dict[str, Any
         or value.get("amendment_commitment_sha256")
         != amendment["amendment_commitment_sha256"]
         or value.get("topology_commitment_sha256")
-        != topology["topology_commitment_sha256"]
+        != "90d8842b81b27c4046bd01b4ce8b4d24cefbf1f395b9d2e633bb1c41baf82bfe"
         or value.get("failure")
         != "SLURM_INVALID_GRES_MIXED_TYPED_AND_UNTYPED_REQUEST"
         or value.get("job_created") is not False
@@ -19367,7 +19367,7 @@ def _public_readiness_attempt_1_repair(
         or result.get("scheduler_state") != "FAILED"
         or result.get("scheduler_exit_code") != "66:0"
         or result.get("scheduler_elapsed_seconds") != 13
-        or result.get("GPU_type") != topology["GPU_type"]
+        or result.get("GPU_type") != "NVIDIA_H100_NVL_3G_47GB_MIG"
         or result.get("GPU_count") != 1
         or result.get("CPU_count") != 8
         or result.get("memory_GiB") != 32
@@ -19400,9 +19400,9 @@ def _public_readiness_attempt_1_repair(
         or repair.get("trigger_job_id") != result["job_id"]
         or repair.get("trigger_result_commitment_sha256") != result_expected
         or repair.get("topology_commitment_sha256")
-        != topology["topology_commitment_sha256"]
+        != "90d8842b81b27c4046bd01b4ce8b4d24cefbf1f395b9d2e633bb1c41baf82bfe"
         or repair.get("resulting_memory_GiB") != 32
-        or repair.get("GPU_type") != topology["GPU_type"]
+        or repair.get("GPU_type") != "NVIDIA_H100_NVL_3G_47GB_MIG"
         or repair.get("GPU_count") != 1
         or repair.get("CPU_count") != 8
         or repair.get("micro_wall_minutes") != 5

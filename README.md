@@ -802,3 +802,8 @@ opened no metric; compact failure `067656db…e1f8` records 0.003611 GPU-hours.
 The one allowed complete resmoke is frozen at `247971e1…f067` with the same
 scientific contract and wrapper-native memory request. Public development
 remains locked until that final micro attempt passes and is committed.
+
+Pending zero-runtime jobs 317679 and 317697 were then canceled before any
+outcome. User-directed resource-only redirect `4a08175c…28d87` selects the
+scheduler-estimated earlier single A30 under topology commitment
+`b7c00058…92b3`; the scientific contract is unchanged.
