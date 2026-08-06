@@ -58,12 +58,13 @@ namespace ProceduralSceneGate
         public float closureCommanded;
         public float closureObserved;
         public float closureError;
+        public string authority = "dynamic PhysX Rigidbody + compliant ConfigurableJoint drive";
     }
 
     [Serializable]
     public sealed class MotionControllerSnapshot
     {
-        public const string Schema = "embodied.full_body_motion_controller.v1";
+        public const string Schema = "embodied.full_body_motion_controller.v2";
         public int physicsStep;
         public float physicsTimeSeconds;
         public string activePrimitive;
@@ -76,6 +77,7 @@ namespace ProceduralSceneGate
         public float rightClosureCommanded;
         public bool rightOppositionQualified;
         public bool meaningfulLeftSupportQualified;
+        public bool supportContinuousThroughCommandedOpen;
         public int rightOppositionDwellSteps;
         public int leftSupportDwellSteps;
         public float maximumPalmLinearSpeedMps;
@@ -84,7 +86,7 @@ namespace ProceduralSceneGate
         public float maximumClosurePerSecond;
         public float maximumAcceptedContactImpulseNs;
         public float maximumAcceptedFingerPenetrationM;
-        public string controlClaim = "kinematic engineering control; biological torque unavailable";
+        public string controlClaim = "bounded kinematic wrist/palm servo with compliant dynamic articulated fingers; biological torque unavailable";
     }
 
     public sealed class FullBodyMotionTelemetryProvider : MonoBehaviour, IPhysicsTruthControllerTelemetryProvider
@@ -118,15 +120,31 @@ namespace ProceduralSceneGate
         public const float MaximumFingerSegmentLinearSpeedMps = 0.45f;
         public const float MaximumClosurePerSecond = 0.6f;
         public const float MaximumAcceptedContactImpulseNs = 0.08f;
-        public const float MaximumAcceptedFingerPenetrationM = 0.0022f;
+        public const float MaximumAcceptedFingerPenetrationM = FrozenGate.FingerObjectPenetrationMaxM;
         public const float MaximumQualifiedContactSeparationM = 0.0005f;
-        public const float RequiredOppositionSeconds = 0.25f;
+        public const float MinimumQualifiedImpulseNs = 1e-6f;
 
         const float RootLinearSpeedMps = 0.10f;
         const float BodyAngularSpeedDegps = 50f;
         const float ContactShellM = 0.018f;
         const float GripClampM = 0f;
+        const float CommandedObjectTurnDeg = 35f;
+        const float UnsupportedLiftHeightM = 0.115f;
         const int ArmSolverPasses = 4;
+
+        static readonly string[] FrozenActivityPhaseIds =
+        {
+            "scan",
+            "body_reorientation",
+            "anticipatory_right_reach",
+            "visible_touch_and_force_capture",
+            "left_assistance",
+            "unsupported_lift_inspect_turn",
+            "lower_place_commanded_open",
+            "free_release_settle",
+            "both_hand_withdrawal",
+            "final_gaze_transition"
+        };
 
         static readonly string[] SideCodes = { "L", "R" };
         static readonly string[] ArmBoneStems =
@@ -145,6 +163,11 @@ namespace ProceduralSceneGate
         readonly Dictionary<string, float> boundedContactClosureLatch = new Dictionary<string, float>();
         readonly Dictionary<string, float> qualifiedContactClosureBase = new Dictionary<string, float>();
         readonly Dictionary<string, float> qualifiedPreloadClosureTarget = new Dictionary<string, float>();
+        readonly Dictionary<string, Vector3> authorityBonePositionInBody = new Dictionary<string, Vector3>();
+        readonly Dictionary<string, Quaternion> authorityBoneRotationInBody = new Dictionary<string, Quaternion>();
+        readonly Dictionary<string, Quaternion> jointStartLocalRotation = new Dictionary<string, Quaternion>();
+        readonly Dictionary<string, Quaternion> desiredAuthorityLocalRotation = new Dictionary<string, Quaternion>();
+        readonly Dictionary<string, Vector2> activityPhasesSeconds = new Dictionary<string, Vector2>();
 
         Transform avatar;
         Transform root;
@@ -153,9 +176,12 @@ namespace ProceduralSceneGate
         Transform head;
         Transform leftPalm;
         Transform rightPalm;
+        Transform destination;
+        Transform finalGazeTarget;
         Vector3 rootRestPosition;
         Quaternion rootRestRotation;
         Vector3 interactionAnchorWorld;
+        Vector3 placementAnchorWorld;
         Vector3 interactionRightWorld;
         Vector3 interactionUpWorld;
         Vector3 interactionForwardWorld;
@@ -165,6 +191,7 @@ namespace ProceduralSceneGate
         Vector3 latchedRightContactWaypoint;
         Vector3 qualifiedSqueezeAxisWorld;
         float targetContactRadiusM;
+        float targetHalfHeightM;
         float leftClosure;
         float rightClosure;
         int rightOppositionDwellSteps;
@@ -173,11 +200,19 @@ namespace ProceduralSceneGate
         bool rightOppositionQualified;
         bool meaningfulLeftSupportQualified;
         bool carryContactsMaintained;
+        bool supportContinuityViolated;
+        bool initialOverlapDisqualified;
+        bool targetTrackingDisclosureRecorded;
         bool leftContactWaypointLatched;
         bool rightContactWaypointLatched;
         bool bound;
+        int lastSynchronizedPhysicsStep = -1;
+        MotionRecoveryState lastLoggedRecovery = MotionRecoveryState.Nominal;
         OperatingStage operatingStage;
         GateContext boundContext;
+        string contactStrategyId;
+        string destinationId;
+        string finalGazeZoneId;
 
         public MotionControllerSnapshot ControllerSnapshot { get; private set; }
 
@@ -193,6 +228,17 @@ namespace ProceduralSceneGate
             boundedContactClosureLatch.Clear();
             qualifiedContactClosureBase.Clear();
             qualifiedPreloadClosureTarget.Clear();
+            authorityBonePositionInBody.Clear();
+            authorityBoneRotationInBody.Clear();
+            jointStartLocalRotation.Clear();
+            desiredAuthorityLocalRotation.Clear();
+            lastSynchronizedPhysicsStep = -1;
+            supportContinuityViolated = false;
+            initialOverlapDisqualified = false;
+            targetTrackingDisclosureRecorded = false;
+            lastLoggedRecovery = MotionRecoveryState.Nominal;
+            BindFrozenActivityPlan(context);
+            BindActivitySemantics(context);
 
             avatar = context.AvatarRoot.transform;
             var byName = avatar.GetComponentsInChildren<Transform>(true)
@@ -242,6 +288,7 @@ namespace ProceduralSceneGate
                 if (!restLocalRotations.ContainsKey(row.Value)) restLocalRotations.Add(row.Value, row.Value.localRotation);
                 restPointsInAvatar[row.Key] = avatar.InverseTransformPoint(row.Value.position);
             }
+            BindCompliantFingerAuthority(context);
 
             interactionRightWorld = rootRestRotation * Vector3.right;
             interactionUpWorld = rootRestRotation * Vector3.up;
@@ -249,11 +296,15 @@ namespace ProceduralSceneGate
             interactionAnchorWorld = context.TargetBody != null
                 ? context.TargetBody.worldCenterOfMass
                 : rootRestPosition + interactionUpWorld * 0.62f + interactionForwardWorld * 0.38f + interactionRightWorld * 0.18f;
-            Collider targetCollider = context.TargetBody == null ? null : context.TargetBody.GetComponent<Collider>();
+            Collider targetCollider = context.TargetBody == null ? null : context.TargetBody.GetComponentInChildren<Collider>();
+            targetHalfHeightM = targetCollider == null ? 0.0275f : targetCollider.bounds.extents.y;
             targetContactRadiusM = targetCollider == null
                 ? 0.045f
                 : Mathf.Max(targetCollider.bounds.extents.x, Mathf.Max(targetCollider.bounds.extents.y, targetCollider.bounds.extents.z));
             targetContactRadiusM += ContactShellM;
+            placementAnchorWorld = ResolvePlacementAnchor(destination, context.DestinationId, targetHalfHeightM);
+            if (context.TargetBody != null)
+                RecordTargetTrackingDisclosure(context);
 
             previousLeftWaypoint = leftPalm.position;
             previousRightWaypoint = rightPalm.position;
@@ -266,24 +317,117 @@ namespace ProceduralSceneGate
             bound = true;
         }
 
+        void BindFrozenActivityPlan(GateContext context)
+        {
+            activityPhasesSeconds.Clear();
+            float priorEnd = 0f;
+            foreach (string phaseId in FrozenActivityPhaseIds)
+            {
+                if (!context.ActivityPhasesSeconds.TryGetValue(phaseId, out Vector2 span))
+                    throw new InvalidOperationException("frozen activity phase is absent from GateContext: " + phaseId);
+                if (span.y <= span.x || !Mathf.Approximately(span.x, priorEnd))
+                    throw new InvalidOperationException("frozen activity phases must be positive and contiguous at " + phaseId);
+                activityPhasesSeconds.Add(phaseId, span);
+                priorEnd = span.y;
+            }
+            if (!Mathf.Approximately(priorEnd, FrozenGate.DurationSeconds))
+                throw new InvalidOperationException("GateContext activity phases do not cover the frozen 24 second clock");
+        }
+
+        void BindActivitySemantics(GateContext context)
+        {
+            destinationId = context.DestinationId;
+            finalGazeZoneId = context.FinalGazeZone;
+            if (string.IsNullOrWhiteSpace(destinationId) ||
+                !context.Destinations.TryGetValue(destinationId, out destination) || destination == null)
+                throw new InvalidOperationException("DestinationId must resolve to its compiled destination transform");
+            if (string.IsNullOrWhiteSpace(finalGazeZoneId) ||
+                !context.Destinations.TryGetValue(finalGazeZoneId, out finalGazeTarget) || finalGazeTarget == null)
+                throw new InvalidOperationException("FinalGazeZone must resolve to its compiled scene-zone transform");
+
+            contactStrategyId = context.ContactStrategy;
+            if (contactStrategyId != "radial_thumb_index_middle" &&
+                contactStrategyId != "cup_body_thumb_middle_ring" &&
+                contactStrategyId != "face_opposition_thumb_index_middle")
+                throw new InvalidOperationException("unsupported frozen ContactStrategy: " + contactStrategyId);
+        }
+
+        static Vector3 ResolvePlacementAnchor(Transform destinationTransform, string destinationId, float targetHalfHeight)
+        {
+            Collider[] colliders = destinationTransform.GetComponentsInChildren<Collider>(true)
+                .Where(value => value.enabled).ToArray();
+            if (colliders.Length == 0)
+                throw new InvalidOperationException("compiled destination has no physical support collider: " + destinationId);
+
+            Collider supportSurface = destinationId == "shallow_bin" || destinationId == "tray"
+                ? colliders.OrderByDescending(value => value.bounds.size.x * value.bounds.size.z).First()
+                : colliders.OrderByDescending(value => value.bounds.max.y).First();
+            Vector3 center = destinationTransform.position;
+            center.y = supportSurface.bounds.max.y + targetHalfHeight + 0.0005f;
+            return center;
+        }
+
+        void BindCompliantFingerAuthority(GateContext context)
+        {
+            foreach (string hand in new[] { "left", "right" })
+            foreach (string digit in FrozenGate.Digits)
+            for (int segment = 1; segment <= 3; segment++)
+            {
+                string key = hand + "_" + digit + "_segment" + segment;
+                if (!context.FingerBodies.TryGetValue(key, out Rigidbody body) || body == null || body.isKinematic)
+                    throw new InvalidOperationException("dynamic PhysX finger body is missing: " + key);
+                if (!context.FingerJoints.TryGetValue(key, out ConfigurableJoint joint) || joint == null ||
+                    joint.connectedBody == null)
+                    throw new InvalidOperationException("compliant finger joint is missing: " + key);
+                if (!context.FingerAuthorityBones.TryGetValue(key, out Transform bone) || bone == null ||
+                    bone != bindings[key])
+                    throw new InvalidOperationException("weighted finger authority bone does not match the compliant body: " + key);
+                authorityBonePositionInBody[key] = body.transform.InverseTransformPoint(bone.position);
+                authorityBoneRotationInBody[key] = Quaternion.Inverse(body.rotation) * bone.rotation;
+                jointStartLocalRotation[key] = Quaternion.Inverse(joint.connectedBody.rotation) * body.rotation;
+                desiredAuthorityLocalRotation[key] = restLocalRotations[bone];
+            }
+            if (authorityBonePositionInBody.Count != 30)
+                throw new InvalidOperationException("the frozen hybrid controller requires thirty compliant finger segments");
+        }
+
+        void RecordTargetTrackingDisclosure(GateContext context)
+        {
+            if (targetTrackingDisclosureRecorded) return;
+            context.RecoveryLedger.Add(new AuthorityLedgerEntry
+            {
+                physicsStep = context.PhysicsStep,
+                category = "bounded_prequalification_hand_target_tracking",
+                actor = nameof(FullBodyBimanualMotion),
+                target = context.TargetBody.name,
+                detail = "reads measured worldCenterOfMass only to update bounded wrist/palm waypoints until bimanual qualification; never writes, forces, joints, parents, or repairs the object"
+            });
+            targetTrackingDisclosureRecorded = true;
+        }
+
         public void ApplyCommand(GateContext context, int physicsStep)
         {
             RequireBound(context, physicsStep);
-            if (physicsStep > FrozenGate.PhysicsHz * 20)
-                throw new ArgumentOutOfRangeException(nameof(physicsStep), "motion commands are frozen to a maximum 20 second episode");
+            if (physicsStep < 0 || physicsStep >= Mathf.RoundToInt(FrozenGate.PhysicsHz * FrozenGate.DurationSeconds))
+                throw new ArgumentOutOfRangeException(nameof(physicsStep), "motion command is outside the frozen 24 second episode clock");
 
             if (context.TargetBody != null && (!rightOppositionQualified || !meaningfulLeftSupportQualified))
                 interactionAnchorWorld = context.TargetBody.worldCenterOfMass;
 
             ContactEvidence evidence = ReadMeasuredContactEvidence(context, physicsStep);
-            UpdateQualification(evidence);
+            MotionPrimitive primitive = operatingStage == OperatingStage.MotionCamera
+                ? MotionCameraPrimitiveAt(physicsStep)
+                : operatingStage == OperatingStage.GarmentSweep
+                    ? MotionPrimitive.GarmentSweep
+                    : PrimitiveAt(physicsStep);
+            UpdateQualification(evidence, primitive);
             if (rightOppositionQualified && meaningfulLeftSupportQualified && bimanualQualificationStep < 0)
             {
                 bimanualQualificationStep = physicsStep;
                 if (context.TargetBody != null)
                     interactionAnchorWorld = context.TargetBody.worldCenterOfMass;
-                Vector3 rightMeanNormal = MeanDirection(evidence.rightNormals);
-                Vector3 leftMeanNormal = MeanDirection(evidence.leftNormals);
+                Vector3 rightMeanNormal = MeanDirection(evidence.rightNonThumbForceNormals);
+                Vector3 leftMeanNormal = MeanDirection(evidence.leftForceNormals);
                 qualifiedSqueezeAxisWorld = (rightMeanNormal - leftMeanNormal).normalized;
                 if (qualifiedSqueezeAxisWorld.sqrMagnitude < 0.99f)
                     throw new InvalidOperationException("qualified bimanual contact normals did not define a squeeze axis");
@@ -306,13 +450,11 @@ namespace ProceduralSceneGate
                     boundedContactClosureLatch[key] = qualifiedPreloadClosureTarget[key];
                 }
             }
-            MotionPrimitive primitive = operatingStage == OperatingStage.MotionCamera
-                ? MotionCameraPrimitiveAt(physicsStep)
-                : operatingStage == OperatingStage.GarmentSweep
-                    ? MotionPrimitive.GarmentSweep
-                    : PrimitiveAt(physicsStep);
-            int measuredRightNonThumbDigits = evidence.rightDigits.Count(value => value != "thumb");
-            if (measuredRightNonThumbDigits >= 1 &&
+            int measuredRightNonThumbDigits = evidence.rightDigits
+                .Where(value => value != "thumb").Distinct().Count();
+            bool measuredRightOppositionGeometry = evidence.rightDigits.Contains("thumb") &&
+                measuredRightNonThumbDigits >= 2;
+            if (measuredRightOppositionGeometry &&
                 (!rightContactWaypointLatched || rightOppositionDwellSteps == 1) &&
                 Between(primitive, MotionPrimitive.Touch, MotionPrimitive.BimanualTurn))
             {
@@ -329,7 +471,14 @@ namespace ProceduralSceneGate
                 latchedLeftContactWaypoint = leftPalm.position;
             }
             MotionRecoveryState recovery = RecoveryFor(primitive, evidence);
-            carryContactsMaintained = bimanualQualificationStep >= 0 && evidence.rightOpposed && evidence.leftMeaningful;
+            RecordBoundedRecovery(context, recovery, physicsStep);
+            bool beforeCommandedOpening = (int)primitive < (int)MotionPrimitive.CommandedOpen;
+            if (bimanualQualificationStep >= 0 && beforeCommandedOpening &&
+                (!evidence.rightOpposed || !evidence.leftMeaningful))
+                RecordSupportContinuityFailure(context, physicsStep);
+            carryContactsMaintained = bimanualQualificationStep >= 0 &&
+                                      !supportContinuityViolated &&
+                                      (!beforeCommandedOpening || (evidence.rightOpposed && evidence.leftMeaningful));
             RegulateQualifiedGrip(evidence, physicsStep);
             context.AnatomicalColliderVelocityDriveCommanded =
                 rightOppositionQualified && meaningfulLeftSupportQualified &&
@@ -366,10 +515,64 @@ namespace ProceduralSceneGate
             PopulateSnapshotChannels();
         }
 
+        void RecordBoundedRecovery(GateContext context, MotionRecoveryState recovery, int physicsStep)
+        {
+            if (recovery == lastLoggedRecovery) return;
+            lastLoggedRecovery = recovery;
+            if (recovery == MotionRecoveryState.Nominal) return;
+            context.AuthorityAudit.recoveryCounter++;
+            context.RecoveryLedger.Add(new AuthorityLedgerEntry
+            {
+                physicsStep = physicsStep,
+                category = "bounded_visible_hand_target_recovery",
+                actor = nameof(FullBodyBimanualMotion),
+                target = "avatar wrists/palms/finger joint targets",
+                detail = recovery + "; controller changes only bounded embodiment targets and never modifies the free object"
+            });
+        }
+
+        void RecordSupportContinuityFailure(GateContext context, int physicsStep)
+        {
+            if (supportContinuityViolated) return;
+            supportContinuityViolated = true;
+            context.RecoveryLedger.Add(new AuthorityLedgerEntry
+            {
+                physicsStep = physicsStep,
+                category = "qualification_failure",
+                actor = nameof(FullBodyBimanualMotion),
+                target = context.TargetBody == null ? "none" : context.TargetBody.name,
+                detail = "measured force-bearing support broke after bimanual qualification and before commanded opening; no recovery may restore this run's continuity claim"
+            });
+        }
+
         /// <summary>
-        /// Called by the truth recorder after the same Physics.Simulate step. If a
-        /// recorder does not call it, the next ApplyCommand refreshes observations
-        /// before issuing the following step's command.
+        /// Called exactly once after Physics.Simulate. The weighted finger bones
+        /// follow the completed dynamic Rigidbody state; they never lead the
+        /// force-producing segment colliders.
+        /// </summary>
+        public void SynchronizeCompletedPhysicsState(GateContext context, int physicsStep)
+        {
+            RequireBound(context, physicsStep);
+            if (lastSynchronizedPhysicsStep == physicsStep)
+                throw new InvalidOperationException("completed PhysX state was already synchronized for step " + physicsStep);
+            foreach (string hand in new[] { "left", "right" })
+            foreach (string digit in FrozenGate.Digits)
+            for (int segment = 1; segment <= 3; segment++)
+            {
+                string key = hand + "_" + digit + "_segment" + segment;
+                Rigidbody body = context.FingerBodies[key];
+                Transform bone = context.FingerAuthorityBones[key];
+                Vector3 position = body.transform.TransformPoint(authorityBonePositionInBody[key]);
+                Quaternion rotation = body.rotation * authorityBoneRotationInBody[key];
+                bone.SetPositionAndRotation(position, rotation);
+            }
+            lastSynchronizedPhysicsStep = physicsStep;
+            ObserveAfterPhysicsStep(context);
+        }
+
+        /// <summary>
+        /// Observation-only telemetry hook. Physics-to-skin synchronization is
+        /// exclusively owned by SynchronizeCompletedPhysicsState.
         /// </summary>
         public void ObserveAfterPhysicsStep(GateContext context)
         {
@@ -395,8 +598,10 @@ namespace ProceduralSceneGate
                 control_id = channel.binding,
                 position_world_m = channel.commanded.positionWorldM,
                 rotation_world_xyzw = channel.commanded.rotationWorldXyzw,
-                provenance = "commanded",
-                formula_or_source = "FullBodyBimanualMotion command held for this PhysicsStep"
+                provenance = IsFingerSegmentBinding(channel.binding) ? "commanded_compliant_joint_drive" : "commanded",
+                formula_or_source = IsFingerSegmentBinding(channel.binding)
+                    ? "ConfigurableJoint targetRotation; weighted authority bone follows completed PhysX body after simulation"
+                    : "bounded FullBodyBimanualMotion kinematic wrist/palm/body target held for this PhysicsStep"
             }).ToArray();
             var errors = ControllerSnapshot.channels.Select(channel => new ControllerErrorTruth
             {
@@ -494,8 +699,18 @@ namespace ProceduralSceneGate
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (context.AvatarRoot == null || context.AvatarRoot.transform != avatar)
                 throw new InvalidOperationException("the motion module cannot switch authority roots after Bind");
+            if (!string.Equals(context.ContactStrategy, contactStrategyId, StringComparison.Ordinal) ||
+                !string.Equals(context.DestinationId, destinationId, StringComparison.Ordinal) ||
+                !string.Equals(context.FinalGazeZone, finalGazeZoneId, StringComparison.Ordinal) ||
+                !context.Destinations.TryGetValue(destinationId, out Transform currentDestination) ||
+                currentDestination != destination ||
+                !context.Destinations.TryGetValue(finalGazeZoneId, out Transform currentGazeTarget) ||
+                currentGazeTarget != finalGazeTarget)
+                throw new InvalidOperationException("activity semantics changed after motion binding");
             if (context.PhysicsStep != physicsStep)
                 throw new InvalidOperationException("ApplyCommand must use GateContext.PhysicsStep as its only clock");
+            if (physicsStep > 0 && lastSynchronizedPhysicsStep != physicsStep - 1)
+                throw new InvalidOperationException("the prior completed PhysX finger state was not synchronized before the next command");
         }
 
         static int StepAt(float seconds)
@@ -503,38 +718,62 @@ namespace ProceduralSceneGate
             return Mathf.RoundToInt(seconds * FrozenGate.PhysicsHz);
         }
 
-        static float PhaseProgress(int physicsStep, float startSeconds, float endSeconds)
+        float PlanProgress(int physicsStep, string phaseId)
         {
-            int start = StepAt(startSeconds);
-            int end = StepAt(endSeconds);
+            Vector2 span = activityPhasesSeconds[phaseId];
+            int start = StepAt(span.x);
+            int end = StepAt(span.y);
             return Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(start, end, physicsStep));
         }
 
-        static MotionPrimitive PrimitiveAt(int physicsStep)
+        float SubphaseProgress(int physicsStep, string phaseId, float startFraction, float endFraction)
         {
-            if (physicsStep < StepAt(1.8f)) return MotionPrimitive.Scan;
-            if (physicsStep < StepAt(3.0f)) return MotionPrimitive.TorsoReorientation;
-            if (physicsStep < StepAt(4.2f)) return MotionPrimitive.RightReach;
-            if (physicsStep < StepAt(5.0f)) return MotionPrimitive.Preshape;
-            if (physicsStep < StepAt(6.2f)) return MotionPrimitive.Touch;
-            if (physicsStep < StepAt(6.6f)) return MotionPrimitive.ContactAwareClosure;
-            if (physicsStep < StepAt(7.55f)) return MotionPrimitive.LeftJoin;
-            if (physicsStep < StepAt(8.0f)) return MotionPrimitive.OpposingSupport;
-            if (physicsStep < StepAt(11.3f)) return MotionPrimitive.BimanualTurn;
-            if (physicsStep < StepAt(12.2f)) return MotionPrimitive.Lower;
-            if (physicsStep < StepAt(12.8f)) return MotionPrimitive.CommandedOpen;
-            if (physicsStep < StepAt(13.0f)) return MotionPrimitive.Release;
-            if (physicsStep < StepAt(14.4f)) return MotionPrimitive.Withdraw;
+            Vector2 span = activityPhasesSeconds[phaseId];
+            float start = Mathf.Lerp(span.x, span.y, startFraction);
+            float end = Mathf.Lerp(span.x, span.y, endFraction);
+            return Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(StepAt(start), StepAt(end), physicsStep));
+        }
+
+        int PhaseEndStep(string phaseId)
+        {
+            return StepAt(activityPhasesSeconds[phaseId].y);
+        }
+
+        int SubphaseBoundaryStep(string phaseId, float fraction)
+        {
+            Vector2 span = activityPhasesSeconds[phaseId];
+            return StepAt(Mathf.Lerp(span.x, span.y, fraction));
+        }
+
+        MotionPrimitive PrimitiveAt(int physicsStep)
+        {
+            if (physicsStep < PhaseEndStep("scan")) return MotionPrimitive.Scan;
+            if (physicsStep < PhaseEndStep("body_reorientation")) return MotionPrimitive.TorsoReorientation;
+            if (physicsStep < PhaseEndStep("anticipatory_right_reach"))
+                return physicsStep < SubphaseBoundaryStep("anticipatory_right_reach", 0.72f)
+                    ? MotionPrimitive.RightReach : MotionPrimitive.Preshape;
+            if (physicsStep < PhaseEndStep("visible_touch_and_force_capture"))
+                return physicsStep < SubphaseBoundaryStep("visible_touch_and_force_capture", 0.50f)
+                    ? MotionPrimitive.Touch : MotionPrimitive.ContactAwareClosure;
+            if (physicsStep < PhaseEndStep("left_assistance"))
+                return physicsStep < SubphaseBoundaryStep("left_assistance", 0.65f)
+                    ? MotionPrimitive.LeftJoin : MotionPrimitive.OpposingSupport;
+            if (physicsStep < PhaseEndStep("unsupported_lift_inspect_turn")) return MotionPrimitive.BimanualTurn;
+            if (physicsStep < PhaseEndStep("lower_place_commanded_open"))
+                return physicsStep < SubphaseBoundaryStep("lower_place_commanded_open", 0.50f)
+                    ? MotionPrimitive.Lower : MotionPrimitive.CommandedOpen;
+            if (physicsStep < PhaseEndStep("free_release_settle")) return MotionPrimitive.Release;
+            if (physicsStep < PhaseEndStep("both_hand_withdrawal")) return MotionPrimitive.Withdraw;
             return MotionPrimitive.FinalGaze;
         }
 
-        static MotionPrimitive MotionCameraPrimitiveAt(int physicsStep)
+        MotionPrimitive MotionCameraPrimitiveAt(int physicsStep)
         {
-            if (physicsStep < StepAt(1.8f)) return MotionPrimitive.Scan;
-            if (physicsStep < StepAt(3.0f)) return MotionPrimitive.TorsoReorientation;
-            if (physicsStep < StepAt(6.0f)) return MotionPrimitive.RightReach;
-            if (physicsStep < StepAt(12.5f)) return MotionPrimitive.Gaze;
-            if (physicsStep < StepAt(14.4f)) return MotionPrimitive.Withdraw;
+            if (physicsStep < PhaseEndStep("scan")) return MotionPrimitive.Scan;
+            if (physicsStep < PhaseEndStep("body_reorientation")) return MotionPrimitive.TorsoReorientation;
+            if (physicsStep < PhaseEndStep("anticipatory_right_reach")) return MotionPrimitive.RightReach;
+            if (physicsStep < PhaseEndStep("free_release_settle")) return MotionPrimitive.Gaze;
+            if (physicsStep < PhaseEndStep("both_hand_withdrawal")) return MotionPrimitive.Withdraw;
             return MotionPrimitive.FinalGaze;
         }
 
@@ -584,19 +823,27 @@ namespace ProceduralSceneGate
         void ApplyRootAndGaze(int physicsStep, MotionPrimitive primitive)
         {
             float timeSeconds = physicsStep / (float)FrozenGate.PhysicsHz;
-            float reorient = PhaseProgress(physicsStep, 1.8f, 3.0f);
-            float unwind = PhaseProgress(physicsStep, 13.0f, 15.8f);
+            float reorient = PlanProgress(physicsStep, "body_reorientation");
+            float unwind = PlanProgress(physicsStep, "both_hand_withdrawal");
+            float finalGazeTransition = PlanProgress(physicsStep, "final_gaze_transition");
             float bodyAmount = reorient * (1f - unwind);
             float scan = primitive == MotionPrimitive.Scan ? Mathf.Sin(timeSeconds * 2.25f) : 0f;
             float inspectActivation = primitive == MotionPrimitive.BimanualTurn &&
                                       rightOppositionQualified && meaningfulLeftSupportQualified
-                ? QualifiedPhaseProgress(physicsStep, 2.0f, 2.4f)
+                ? PlanProgress(physicsStep, "unsupported_lift_inspect_turn")
                 : 0f;
             float inspect = inspectActivation * Mathf.Sin(timeSeconds * 1.7f);
             bool taskView = primitive == MotionPrimitive.Gaze || Between(primitive, MotionPrimitive.RightReach, MotionPrimitive.Release);
 
             Vector3 desiredRootPosition = rootRestPosition + interactionRightWorld * (0.008f * bodyAmount);
             Quaternion desiredRootRotation = rootRestRotation * Quaternion.Euler(0f, 11f * bodyAmount, -1.5f * bodyAmount);
+            Vector3 flatFinalGaze = Vector3.ProjectOnPlane(finalGazeTarget.position - root.position, interactionUpWorld);
+            if (primitive == MotionPrimitive.FinalGaze && flatFinalGaze.sqrMagnitude > 1e-8f)
+            {
+                Quaternion gazeFacingWorld = Quaternion.LookRotation(flatFinalGaze.normalized, interactionUpWorld);
+                Quaternion boundedGazeFacingWorld = Quaternion.RotateTowards(rootRestRotation, gazeFacingWorld, 35f);
+                desiredRootRotation = Quaternion.Slerp(desiredRootRotation, boundedGazeFacingWorld, finalGazeTransition);
+            }
             root.position = Vector3.MoveTowards(root.position, desiredRootPosition, RootLinearSpeedMps / FrozenGate.PhysicsHz);
             root.rotation = Quaternion.RotateTowards(root.rotation, desiredRootRotation, BodyAngularSpeedDegps / FrozenGate.PhysicsHz);
 
@@ -605,13 +852,23 @@ namespace ProceduralSceneGate
             SetLocalRotationBounded(torso, restLocalRotations[torso] * Quaternion.Euler(torsoPitch, torsoYaw, -1.5f * bodyAmount), BodyAngularSpeedDegps);
 
             float neckPitch = primitive == MotionPrimitive.Gaze || Between(primitive, MotionPrimitive.Preshape, MotionPrimitive.Release) ? 13f : 0f;
-            float neckYaw = primitive == MotionPrimitive.Scan ? 4f * scan : primitive == MotionPrimitive.FinalGaze ? -7f * unwind : 2f * inspect;
+            float neckYaw = primitive == MotionPrimitive.Scan ? 4f * scan : 2f * inspect;
             SetLocalRotationBounded(neck, restLocalRotations[neck] * Quaternion.Euler(neckPitch, neckYaw, 0f), BodyAngularSpeedDegps);
 
             float headPitch = taskView ? 44f : 2f;
-            float headYaw = primitive == MotionPrimitive.Scan ? 11f * scan : primitive == MotionPrimitive.FinalGaze ? -15f * unwind : 4f * inspect;
+            float headYaw = primitive == MotionPrimitive.Scan ? 11f * scan : 4f * inspect;
             float headRoll = primitive == MotionPrimitive.Scan ? -1.8f * scan : 0f;
-            SetLocalRotationBounded(head, restLocalRotations[head] * Quaternion.Euler(headPitch, headYaw, headRoll), BodyAngularSpeedDegps);
+            Quaternion desiredHeadLocal = restLocalRotations[head] * Quaternion.Euler(headPitch, headYaw, headRoll);
+            if (primitive == MotionPrimitive.FinalGaze)
+            {
+                Vector3 toActualZone = finalGazeTarget.position - head.position;
+                if (toActualZone.sqrMagnitude <= 1e-8f)
+                    throw new InvalidOperationException("FinalGazeZone transform coincides with the authoritative head");
+                Quaternion lookAtZoneWorld = Quaternion.LookRotation(toActualZone.normalized, interactionUpWorld);
+                Quaternion lookAtZoneLocal = Quaternion.Inverse(head.parent.rotation) * lookAtZoneWorld;
+                desiredHeadLocal = Quaternion.Slerp(desiredHeadLocal, lookAtZoneLocal, finalGazeTransition);
+            }
+            SetLocalRotationBounded(head, desiredHeadLocal, BodyAngularSpeedDegps);
         }
 
         void DesiredPalmWaypoints(int physicsStep, MotionPrimitive primitive, out Vector3 left, out Vector3 right)
@@ -627,7 +884,7 @@ namespace ProceduralSceneGate
 
             if (primitive == MotionPrimitive.RightReach || primitive == MotionPrimitive.Preshape)
             {
-                float reach = PhaseProgress(physicsStep, 3.0f, 4.2f);
+                float reach = SubphaseProgress(physicsStep, "anticipatory_right_reach", 0f, 0.72f);
                 right = Vector3.Lerp(rightRest, rightStandOff, reach);
                 return;
             }
@@ -641,7 +898,7 @@ namespace ProceduralSceneGate
 
             if (primitive == MotionPrimitive.Touch)
             {
-                float touch = PhaseProgress(physicsStep, 5.0f, 6.2f);
+                float touch = SubphaseProgress(physicsStep, "visible_touch_and_force_capture", 0f, 0.50f);
                 right = rightContactWaypointLatched
                     ? latchedRightContactWaypoint
                     : Vector3.Lerp(rightStandOff, rightContact, touch);
@@ -662,7 +919,7 @@ namespace ProceduralSceneGate
                     left = leftRest;
                     return;
                 }
-                float join = PhaseProgress(physicsStep, 6.6f, 7.8f);
+                float join = SubphaseProgress(physicsStep, "left_assistance", 0f, 0.65f);
                 right = rightContactWaypointLatched ? latchedRightContactWaypoint : rightContact;
                 if (primitive == MotionPrimitive.LeftJoin)
                 {
@@ -670,7 +927,7 @@ namespace ProceduralSceneGate
                 }
                 else
                 {
-                    float support = PhaseProgress(physicsStep, 7.55f, 8.0f);
+                    float support = SubphaseProgress(physicsStep, "left_assistance", 0.65f, 1f);
                     left = leftContactWaypointLatched
                         ? latchedLeftContactWaypoint
                         : Vector3.Lerp(leftStandOff, leftContact, support);
@@ -698,11 +955,14 @@ namespace ProceduralSceneGate
                     left = latchedLeftContactWaypoint;
                     return;
                 }
-                float lift = QualifiedPhaseProgress(physicsStep, 1.0f, 3.0f);
-                float turn = 28f * QualifiedPhaseProgress(physicsStep, 2.1f, 3.0f);
-                Vector3 center = interactionAnchorWorld + interactionUpWorld * (0.105f * lift);
+                float lift = SubphaseProgress(physicsStep, "unsupported_lift_inspect_turn", 0f, 0.30f);
+                float transfer = SubphaseProgress(physicsStep, "unsupported_lift_inspect_turn", 0.25f, 1f);
+                float turn = CommandedObjectTurnDeg * PlanProgress(physicsStep, "unsupported_lift_inspect_turn");
+                Vector3 liftedSource = interactionAnchorWorld + interactionUpWorld * (UnsupportedLiftHeightM * lift);
+                Vector3 liftedDestination = placementAnchorWorld + interactionUpWorld * UnsupportedLiftHeightM;
+                Vector3 center = Vector3.Lerp(liftedSource, liftedDestination, transfer);
                 Quaternion turnRotation = Quaternion.AngleAxis(turn, interactionUpWorld);
-                float clamp = GripClampM * QualifiedPhaseProgress(physicsStep, 0f, 0.35f);
+                float clamp = GripClampM * SubphaseProgress(physicsStep, "unsupported_lift_inspect_turn", 0f, 0.12f);
                 Vector3 rightOffset = latchedRightContactWaypoint - interactionAnchorWorld + qualifiedSqueezeAxisWorld * clamp;
                 Vector3 leftOffset = latchedLeftContactWaypoint - interactionAnchorWorld - qualifiedSqueezeAxisWorld * clamp;
                 right = center + turnRotation * rightOffset;
@@ -730,9 +990,12 @@ namespace ProceduralSceneGate
                     left = latchedLeftContactWaypoint;
                     return;
                 }
-                float lower = PhaseProgress(physicsStep, 11.3f, 12.2f);
-                float turn = 28f;
-                Vector3 center = interactionAnchorWorld + interactionUpWorld * (0.105f * (1f - lower));
+                float lower = SubphaseProgress(physicsStep, "lower_place_commanded_open", 0f, 0.50f);
+                float turn = CommandedObjectTurnDeg;
+                Vector3 center = Vector3.Lerp(
+                    placementAnchorWorld + interactionUpWorld * UnsupportedLiftHeightM,
+                    placementAnchorWorld,
+                    lower);
                 Quaternion turnRotation = Quaternion.AngleAxis(turn, interactionUpWorld);
                 Vector3 rightOffset = latchedRightContactWaypoint - interactionAnchorWorld + qualifiedSqueezeAxisWorld * GripClampM;
                 Vector3 leftOffset = latchedLeftContactWaypoint - interactionAnchorWorld - qualifiedSqueezeAxisWorld * GripClampM;
@@ -743,13 +1006,13 @@ namespace ProceduralSceneGate
 
             if (primitive == MotionPrimitive.Withdraw || primitive == MotionPrimitive.FinalGaze)
             {
-                float withdraw = PhaseProgress(physicsStep, 13.0f, 14.3f);
-                Quaternion turnRotation = Quaternion.AngleAxis(28f, interactionUpWorld);
+                float withdraw = PlanProgress(physicsStep, "both_hand_withdrawal");
+                Quaternion turnRotation = Quaternion.AngleAxis(CommandedObjectTurnDeg, interactionUpWorld);
                 Vector3 rightReleased = rightContactWaypointLatched
-                    ? interactionAnchorWorld + turnRotation * (latchedRightContactWaypoint - interactionAnchorWorld)
+                    ? placementAnchorWorld + turnRotation * (latchedRightContactWaypoint - interactionAnchorWorld)
                     : rightContact;
                 Vector3 leftReleased = leftContactWaypointLatched
-                    ? interactionAnchorWorld + turnRotation * (latchedLeftContactWaypoint - interactionAnchorWorld)
+                    ? placementAnchorWorld + turnRotation * (latchedLeftContactWaypoint - interactionAnchorWorld)
                     : leftContact;
                 right = Vector3.Lerp(rightReleased, rightRest, withdraw);
                 left = Vector3.Lerp(leftReleased, leftRest, withdraw);
@@ -761,9 +1024,13 @@ namespace ProceduralSceneGate
             Transform palm = side == "L" ? leftPalm : rightPalm;
             float handed = side == "L" ? -1f : 1f;
             float preshape = Between(primitive, MotionPrimitive.Preshape, MotionPrimitive.Release) ? 1f : 0f;
-            float turn = Between(primitive, MotionPrimitive.BimanualTurn, MotionPrimitive.Withdraw)
-                ? 28f * QualifiedPhaseProgress(physicsStep, 2.1f, 3.0f)
-                : 0f;
+            float turn = primitive == MotionPrimitive.BimanualTurn
+                ? CommandedObjectTurnDeg * PlanProgress(physicsStep, "unsupported_lift_inspect_turn")
+                : Between(primitive, MotionPrimitive.Lower, MotionPrimitive.Release)
+                    ? CommandedObjectTurnDeg
+                    : primitive == MotionPrimitive.Withdraw
+                        ? CommandedObjectTurnDeg * (1f - PlanProgress(physicsStep, "both_hand_withdrawal"))
+                        : 0f;
             float anatomicalRoll = side == "R" ? 15f : 9f;
             return restLocalRotations[palm] * Quaternion.Euler(8f * preshape, handed * (18f * preshape + turn), anatomicalRoll * preshape);
         }
@@ -817,7 +1084,8 @@ namespace ProceduralSceneGate
             if (primitive == MotionPrimitive.CommandedOpen)
             {
                 float current = side == "R" ? rightClosure : leftClosure;
-                return Mathf.Min(current, 0.82f * (1f - PhaseProgress(physicsStep, 12.2f, 12.8f)));
+                return Mathf.Min(current, 0.82f * (1f - SubphaseProgress(
+                    physicsStep, "lower_place_commanded_open", 0.50f, 1f)));
             }
             if (primitive == MotionPrimitive.Release || primitive == MotionPrimitive.Withdraw || primitive == MotionPrimitive.FinalGaze)
                 return 0f;
@@ -847,23 +1115,24 @@ namespace ProceduralSceneGate
             {
                 string hand = side == "L" ? "left" : "right";
                 string digit = FrozenGate.Digits[digitIndex];
-                float targetClosure = closure;
+                float targetClosure = closure * StrategyDigitClosureScale(digit);
                 bool rightInteraction = side == "R" &&
                     Between(primitive, MotionPrimitive.Preshape, MotionPrimitive.Lower);
                 bool leftInteraction = side == "L" && rightOppositionQualified &&
                     Between(primitive, MotionPrimitive.LeftJoin, MotionPrimitive.Lower);
                 if (rightInteraction && digit == "thumb")
                 {
-                    int measuredNonThumbDigits = evidence.rightDigits.Count(value => value != "thumb");
-                    targetClosure = Mathf.Min(targetClosure, measuredNonThumbDigits >= 1 ? 0.60f : 0.04f);
+                    int measuredNonThumbDigits = evidence.rightDigits
+                        .Where(value => value != "thumb").Distinct().Count();
+                    targetClosure = Mathf.Min(targetClosure, measuredNonThumbDigits >= 1 ? 0.82f : 0.04f);
                 }
                 string key = hand + "_" + digit;
                 digitClosureCommanded.TryGetValue(key, out float priorClosure);
                 bool boundedContact = evidence.maximumImpulseNs <= MaximumAcceptedContactImpulseNs &&
                                       evidence.maximumPenetrationM <= MaximumAcceptedFingerPenetrationM;
                 bool digitInMeasuredContact = side == "R"
-                    ? evidence.rightDigits.Contains(digit)
-                    : evidence.leftDigits.Contains(digit);
+                    ? evidence.rightForceDigits.Contains(digit)
+                    : evidence.leftForceDigits.Contains(digit);
                 bool interactionContactLatchActive = rightInteraction || leftInteraction;
                 if (interactionContactLatchActive && digitInMeasuredContact && boundedContact &&
                     !boundedContactClosureLatch.ContainsKey(key))
@@ -898,9 +1167,11 @@ namespace ProceduralSceneGate
                 if (digit == "middle" && segment == 1)
                 {
                     float middleFlexionPlaneCorrection = Mathf.Min(side == "R" ? 30f : 40f, 100f * closure);
-                    abduction += side == "R"
-                        ? middleFlexionPlaneCorrection
-                        : -middleFlexionPlaneCorrection;
+                    // Attempt-1 truth showed the right middle segment moving
+                    // farther from the radial target as closure increased.  The
+                    // opposite flexion plane closes that measured aperture while
+                    // retaining the same compliant joint and bounded rate.
+                    abduction -= middleFlexionPlaneCorrection;
                 }
                 if (side == "L" && digit == "index" && segment == 1)
                     abduction -= Mathf.Min(2.1f, 5f * closure);
@@ -911,8 +1182,36 @@ namespace ProceduralSceneGate
                         : -handed * thumbOppositionMaximum * closure
                     : 0f;
                 Quaternion desired = restLocalRotations[bone] * Quaternion.Euler(handed * curlMaximum * closure, opposition, abduction);
-                SetLocalRotationBounded(bone, desired, MaximumFingerAngularSpeedDegps);
+                SetCompliantFingerDrive(hand + "_" + digit + "_segment" + segment, desired);
             }
+        }
+
+        void SetCompliantFingerDrive(string segmentKey, Quaternion desiredAuthorityLocal)
+        {
+            ConfigurableJoint joint = boundContext.FingerJoints[segmentKey];
+            Rigidbody body = boundContext.FingerBodies[segmentKey];
+            Transform bone = boundContext.FingerAuthorityBones[segmentKey];
+            Quaternion restAuthorityLocal = restLocalRotations[bone];
+            Quaternion desiredDelta = Quaternion.Inverse(restAuthorityLocal) * desiredAuthorityLocal;
+            Quaternion desiredBodyLocal = jointStartLocalRotation[segmentKey] * desiredDelta;
+            joint.targetRotation = JointSpaceTargetRotation(joint, desiredBodyLocal, jointStartLocalRotation[segmentKey]);
+            joint.targetAngularVelocity = Vector3.zero;
+            desiredAuthorityLocalRotation[segmentKey] = desiredAuthorityLocal;
+            body.WakeUp();
+        }
+
+        static Quaternion JointSpaceTargetRotation(
+            ConfigurableJoint joint,
+            Quaternion targetLocalRotation,
+            Quaternion startLocalRotation)
+        {
+            Vector3 right = joint.axis.normalized;
+            Vector3 forward = Vector3.Cross(right, joint.secondaryAxis).normalized;
+            Vector3 up = Vector3.Cross(forward, right).normalized;
+            Quaternion worldToJointSpace = Quaternion.LookRotation(forward, up);
+            return Quaternion.Inverse(worldToJointSpace) *
+                   (Quaternion.Inverse(targetLocalRotation) * startLocalRotation) *
+                   worldToJointSpace;
         }
 
         ContactEvidence ReadMeasuredContactEvidence(GateContext context, int physicsStep)
@@ -923,23 +1222,40 @@ namespace ProceduralSceneGate
             string targetName = context.TargetBody.name;
             foreach (ContactTruth contact in context.Contacts.Where(value => value.physicsStep == measuredStep))
             {
-                if (!ContainsIdentity(contact.colliderA, targetName) && !ContainsIdentity(contact.colliderB, targetName)) continue;
+                bool targetIsA = ContainsIdentity(contact.colliderA, targetName);
+                bool targetIsB = ContainsIdentity(contact.colliderB, targetName);
+                if (!targetIsA && !targetIsB) continue;
+                if (measuredStep == 0 && contact.separationM < 0f)
+                    initialOverlapDisqualified = true;
                 if (contact.separationM > MaximumQualifiedContactSeparationM) continue;
-                string handCollider = ContainsIdentity(contact.colliderA, targetName) ? contact.colliderB : contact.colliderA;
+                string handCollider = targetIsA ? contact.colliderB : contact.colliderA;
                 string side = SideFor(handCollider);
                 string digit = DigitFor(handCollider);
+                float impulse = contact.availableImpulseNs.magnitude;
+                bool eligibleForceContact = contact.provenance == TruthSource.PhysXMeasured &&
+                                            contact.separationM >= -MaximumAcceptedFingerPenetrationM &&
+                                            impulse > MinimumQualifiedImpulseNs;
+                Vector3 handLoadNormal = (targetIsA ? contact.normalWorld : -contact.normalWorld).normalized;
                 if (side == "R")
                 {
                     result.rightAny = true;
                     if (digit != null) result.rightDigits.Add(digit);
-                    result.rightNormals.Add(contact.normalWorld.normalized);
+                    if (eligibleForceContact && digit != null) {
+                        result.rightForceDigits.Add(digit);
+                        result.rightForceNormals.Add(handLoadNormal);
+                        if (digit == "thumb") result.rightThumbForceNormals.Add(handLoadNormal);
+                        else result.rightNonThumbForceNormals.Add(handLoadNormal);
+                    }
                 }
                 else if (side == "L")
                 {
                     result.leftAny = true;
                     if (digit != null) result.leftDigits.Add(digit);
                     if (ContainsIgnoreCase(handCollider, "palm") || ContainsIgnoreCase(handCollider, "wrist")) result.leftPalm = true;
-                    result.leftNormals.Add(contact.normalWorld.normalized);
+                    if (eligibleForceContact && digit != null) {
+                        result.leftForceDigits.Add(digit);
+                        result.leftForceNormals.Add(handLoadNormal);
+                    }
                 }
                 if (digit != null && side != null)
                 {
@@ -947,32 +1263,40 @@ namespace ProceduralSceneGate
                     if (!result.minimumSeparationByDigitM.TryGetValue(key, out float priorSeparation) ||
                         contact.separationM < priorSeparation)
                         result.minimumSeparationByDigitM[key] = contact.separationM;
-                    float impulse = contact.availableImpulseNs.magnitude;
                     if (!result.maximumImpulseByDigitNs.TryGetValue(key, out float priorImpulse) || impulse > priorImpulse)
                         result.maximumImpulseByDigitNs[key] = impulse;
                 }
                 result.maximumImpulseNs = Mathf.Max(result.maximumImpulseNs, contact.availableImpulseNs.magnitude);
                 result.maximumPenetrationM = Mathf.Max(result.maximumPenetrationM, Mathf.Max(0f, -contact.separationM));
             }
-            int rightNonThumb = result.rightDigits.Count(value => value != "thumb");
-            result.rightOpposed = result.rightDigits.Contains("thumb") && rightNonThumb >= 2;
-            bool leftNotLittleOnly = result.leftPalm || result.leftDigits.Contains("thumb") ||
-                                     result.leftDigits.Count(value => value != "little") >= 2;
-            bool normalsOppose = result.rightNormals.Any(rightNormal =>
-                result.leftNormals.Any(leftNormal => Vector3.Dot(rightNormal, leftNormal) <= -0.25f));
-            result.leftMeaningful = result.leftAny && leftNotLittleOnly && normalsOppose;
+            int rightForceNonThumb = result.rightForceDigits.Count(value => value != "thumb");
+            bool rightForceNormalsOppose = result.rightThumbForceNormals.Any(thumbNormal =>
+                result.rightNonThumbForceNormals.Any(fingerNormal => Vector3.Dot(thumbNormal, fingerNormal) <= -0.25f));
+            result.rightOpposed = result.rightForceDigits.Contains("thumb") &&
+                                  rightForceNonThumb >= 2 && rightForceNormalsOppose;
+            bool leftHasNonLittleForceDigit = result.leftForceDigits.Any(value => value != "little");
+            bool bimanualNormalsOppose = result.rightForceNormals.Any(rightNormal =>
+                result.leftForceNormals.Any(leftNormal => Vector3.Dot(rightNormal, leftNormal) <= -0.25f));
+            result.leftMeaningful = leftHasNonLittleForceDigit && bimanualNormalsOppose;
             return result;
         }
 
-        void UpdateQualification(ContactEvidence evidence)
+        void UpdateQualification(ContactEvidence evidence, MotionPrimitive primitive)
         {
+            if (initialOverlapDisqualified || (int)primitive >= (int)MotionPrimitive.CommandedOpen)
+            {
+                rightOppositionDwellSteps = 0;
+                leftSupportDwellSteps = 0;
+                return;
+            }
             rightOppositionDwellSteps = evidence.rightOpposed ? rightOppositionDwellSteps + 1 : 0;
             leftSupportDwellSteps = evidence.leftMeaningful && evidence.rightOpposed && rightOppositionQualified
                 ? leftSupportDwellSteps + 1
                 : 0;
-            int requiredSteps = Mathf.CeilToInt(RequiredOppositionSeconds * FrozenGate.PhysicsHz);
-            if (rightOppositionDwellSteps >= requiredSteps) rightOppositionQualified = true;
-            if (leftSupportDwellSteps >= requiredSteps) meaningfulLeftSupportQualified = true;
+            int requiredRightSteps = Mathf.FloorToInt(FrozenGate.RightForceOppositionSeconds * FrozenGate.PhysicsHz) + 1;
+            int requiredLeftSteps = Mathf.FloorToInt(FrozenGate.LeftForceSupportSeconds * FrozenGate.PhysicsHz) + 1;
+            if (rightOppositionDwellSteps >= requiredRightSteps) rightOppositionQualified = true;
+            if (leftSupportDwellSteps >= requiredLeftSteps) meaningfulLeftSupportQualified = true;
         }
 
         static MotionRecoveryState BoundedRecoveryFor(MotionPrimitive primitive, ContactEvidence evidence)
@@ -999,14 +1323,6 @@ namespace ProceduralSceneGate
             return avatar.TransformPoint(restPointsInAvatar[binding]);
         }
 
-        float QualifiedPhaseProgress(int physicsStep, float startAfterQualificationS, float endAfterQualificationS)
-        {
-            if (bimanualQualificationStep < 0) return 0f;
-            int start = bimanualQualificationStep + StepAt(startAfterQualificationS);
-            int end = bimanualQualificationStep + StepAt(endAfterQualificationS);
-            return Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(start, end, physicsStep));
-        }
-
         Vector3 GraspCenteredPalmWaypoint(string side, Vector3 objectCenterWorld)
         {
             string hand = side == "L" ? "left" : "right";
@@ -1016,7 +1332,31 @@ namespace ProceduralSceneGate
             Vector3 middleTip = bindings[hand + "_middle_segment3"].position;
             Vector3 opposedFingerCenter = 0.5f * (indexTip + middleTip);
             Vector3 apertureCenter = 0.5f * (thumbTip + opposedFingerCenter);
-            return objectCenterWorld + (palm.position - apertureCenter);
+            return objectCenterWorld + (palm.position - apertureCenter) + ContactStrategyPalmBias(side);
+        }
+
+        Vector3 ContactStrategyPalmBias(string side)
+        {
+            float handed = side == "R" ? 1f : -1f;
+            if (contactStrategyId == "radial_thumb_index_middle")
+                return interactionRightWorld * (handed * 0.0025f) + interactionUpWorld * 0.0015f;
+            if (contactStrategyId == "cup_body_thumb_middle_ring")
+                return interactionForwardWorld * (handed * 0.0055f) + interactionUpWorld * 0.0060f;
+            if (contactStrategyId == "face_opposition_thumb_index_middle")
+                return -interactionForwardWorld * 0.0050f + interactionRightWorld * (handed * 0.0015f);
+            throw new InvalidOperationException("unbound ContactStrategy: " + contactStrategyId);
+        }
+
+        float StrategyDigitClosureScale(string digit)
+        {
+            if (digit == "thumb") return 1f;
+            if (contactStrategyId == "radial_thumb_index_middle")
+                return digit == "index" || digit == "middle" ? 1f : digit == "ring" ? 0.72f : 0.58f;
+            if (contactStrategyId == "cup_body_thumb_middle_ring")
+                return digit == "middle" || digit == "ring" ? 1f : digit == "index" ? 0.68f : 0.62f;
+            if (contactStrategyId == "face_opposition_thumb_index_middle")
+                return digit == "index" || digit == "middle" ? 1f : digit == "ring" ? 0.60f : 0.50f;
+            throw new InvalidOperationException("unbound ContactStrategy: " + contactStrategyId);
         }
 
         void CaptureCommanded(int physicsStep)
@@ -1025,7 +1365,24 @@ namespace ProceduralSceneGate
             foreach (var row in commanded) priorCommanded[row.Key] = row.Value;
             commanded.Clear();
             foreach (var row in bindings)
-                commanded[row.Key] = PoseFor(row.Value, physicsStep, priorCommanded);
+            {
+                PoseState pose = PoseFor(row.Value, physicsStep, priorCommanded);
+                if (desiredAuthorityLocalRotation.TryGetValue(row.Key, out Quaternion desiredLocal))
+                {
+                    pose.rotationWorldXyzw = row.Value.parent.rotation * desiredLocal;
+                    if (priorCommanded.TryGetValue(row.Key, out PoseState prior))
+                        pose.angularVelocityWorldRadps = AngularVelocity(
+                            prior.rotationWorldXyzw,
+                            pose.rotationWorldXyzw,
+                            1f / FrozenGate.PhysicsHz);
+                }
+                commanded[row.Key] = pose;
+            }
+        }
+
+        static bool IsFingerSegmentBinding(string binding)
+        {
+            return !string.IsNullOrEmpty(binding) && binding.IndexOf("_segment", StringComparison.Ordinal) >= 0;
         }
 
         PoseState PoseFor(Transform value, int physicsStep, Dictionary<string, PoseState> previousByBinding)
@@ -1073,6 +1430,7 @@ namespace ProceduralSceneGate
                 rightClosureCommanded = rightClosure,
                 rightOppositionQualified = rightOppositionQualified,
                 meaningfulLeftSupportQualified = meaningfulLeftSupportQualified,
+                supportContinuousThroughCommandedOpen = !supportContinuityViolated,
                 rightOppositionDwellSteps = rightOppositionDwellSteps,
                 leftSupportDwellSteps = leftSupportDwellSteps,
                 maximumPalmLinearSpeedMps = MaximumPalmLinearSpeedMps,
@@ -1231,10 +1589,11 @@ namespace ProceduralSceneGate
         static OperatingStage ReadOperatingStage()
         {
             string raw = Environment.GetEnvironmentVariable("PROCEDURAL_GATE_STAGE");
-            if (string.IsNullOrWhiteSpace(raw) || raw == "integrated") return OperatingStage.Integrated;
-            if (raw == "garment_sweep") return OperatingStage.GarmentSweep;
+            if (string.IsNullOrWhiteSpace(raw) || raw == "integrated" || raw == "robustness" ||
+                raw == "replay" || raw == "rerender" || raw == "qa") return OperatingStage.Integrated;
+            if (raw == "clipping") return OperatingStage.GarmentSweep;
             if (raw == "motion_camera") return OperatingStage.MotionCamera;
-            if (raw == "bimanual_cell") return OperatingStage.BimanualCell;
+            if (raw == "microcell" || raw == "polished_cell") return OperatingStage.BimanualCell;
             throw new InvalidOperationException("unsupported PROCEDURAL_GATE_STAGE: " + raw);
         }
 
@@ -1250,8 +1609,12 @@ namespace ProceduralSceneGate
         {
             public readonly HashSet<string> rightDigits = new HashSet<string>();
             public readonly HashSet<string> leftDigits = new HashSet<string>();
-            public readonly List<Vector3> rightNormals = new List<Vector3>();
-            public readonly List<Vector3> leftNormals = new List<Vector3>();
+            public readonly HashSet<string> rightForceDigits = new HashSet<string>();
+            public readonly HashSet<string> leftForceDigits = new HashSet<string>();
+            public readonly List<Vector3> rightForceNormals = new List<Vector3>();
+            public readonly List<Vector3> leftForceNormals = new List<Vector3>();
+            public readonly List<Vector3> rightThumbForceNormals = new List<Vector3>();
+            public readonly List<Vector3> rightNonThumbForceNormals = new List<Vector3>();
             public readonly Dictionary<string, float> minimumSeparationByDigitM = new Dictionary<string, float>();
             public readonly Dictionary<string, float> maximumImpulseByDigitNs = new Dictionary<string, float>();
             public bool rightAny;

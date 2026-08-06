@@ -34,7 +34,7 @@ def test_one_cc0_weighted_mpfb_body_and_complete_anatomical_hands_are_required()
     assert "CompleteHandColliderSet" in text
 
 
-def test_bone_bound_kinematic_colliders_cover_palms_arms_and_every_digit_segment():
+def test_hybrid_colliders_keep_palms_kinematic_and_make_all_finger_segments_dynamic():
     text = source_text()
     assert "BuildPalmBox" in text
     assert "AddBoneCapsule" in text
@@ -43,8 +43,29 @@ def test_bone_bound_kinematic_colliders_cover_palms_arms_and_every_digit_segment
     assert "collider.transform.parent == bone" in text
     assert "body.isKinematic = true" in text
     assert "CollisionDetectionMode.ContinuousSpeculative" in text
+    assert "BindHybridColliderDrivers(context)" in text
+    assert "ConfigureDynamicFingerBody" in text
+    assert "body.isKinematic = false" in text
+    assert "CollisionDetectionMode.ContinuousDynamic" in text
+    assert "context.FingerBodies.Add(segmentKey, body)" in text
+    assert "context.FingerAuthorityBones.Add(segmentKey, authorityBones[segment - 1])" in text
+    assert "context.FingerBodies.Count != 30" in text
     assert "AddFittedEnvelopeSpheres" in text
     assert "both_palms_and_all_finger_segments_have_colliders" in text
+
+
+def test_each_dynamic_chain_uses_bounded_compliant_physx_joints_connected_to_the_palm():
+    text = source_text()
+    assert "ConfigureCompliantFingerJoint" in text
+    assert "joint.connectedBody = connectedBody" in text
+    assert "joint.xMotion = ConfigurableJointMotion.Locked" in text
+    assert "joint.angularXMotion = ConfigurableJointMotion.Limited" in text
+    assert "joint.rotationDriveMode = RotationDriveMode.Slerp" in text
+    assert "joint.slerpDrive = new JointDrive" in text
+    assert "maximumForce = 1.15f" in text
+    assert "joint.enableCollision = false" in text
+    assert "dynamic_finger_body_count = context.FingerBodies.Count" in text
+    assert "compliant_finger_joint_count = context.FingerJoints.Count" in text
 
 
 def test_garments_are_loaded_from_frozen_catalog_not_variant_branches():
@@ -86,6 +107,103 @@ def test_registration_is_observation_only_and_dense_over_the_physics_clock():
     assert "affected_vertex_distribution_counts" in text
     assert "body_collider_registration" in text
     assert "collider.transform.parent == bone" in text
+
+
+def test_frozen_registration_bounds_and_affected_vertex_limit_are_part_of_pass_logic():
+    text = source_text()
+    assert "const float SkinColliderToleranceM = .005f;" in text
+    assert "const float GarmentBodyToleranceM = .002f;" in text
+    assert "const float GarmentAffectedVertexFractionMax = .001f;" in text
+    assert "x.affected_fraction <= GarmentAffectedVertexFractionMax" in text
+    assert "affectedUniqueVertexIndices.Add(i)" in text
+    assert "affectedUniqueVertexIndices.Count / (float)usedVertexIndices.Length <= GarmentAffectedVertexFractionMax" in text
+    assert "affected_unique_vertex_numerator = affectedUniqueVertexIndices.Count" in text
+    assert "affected_unique_vertex_denominator = usedVertexIndices.Length" in text
+    assert "unique garment vertices penetrated at any audited pose / unique garment vertices" in text
+    assert "penetration.affected / (float)penetration.count" not in text
+    assert "garment_affected_vertex_fraction_max = GarmentAffectedVertexFractionMax" in text
+
+
+def test_all_embodiment_colliders_are_registered_independently_of_avatar_hierarchy():
+    text = source_text()
+    assert "context.AvatarColliders.Clear()" in text
+    assert "context.AvatarColliders.Add(collider)" in text
+    assert "context.AvatarColliders.Add(queryCollider)" in text
+    assert "context.AvatarColliders.Count != anatomicalColliders.Count" in text
+    assert "every force/query embodiment collider must be registered independently of hierarchy" in text
+    assert "context.AvatarColliders.Count == anatomicalColliders.Count" in text
+    assert "registered_avatar_collider_count = context.AvatarColliders.Count" in text
+    assert "avatar_collider_registry_complete = context.AvatarColliders.Count == anatomicalColliders.Count" in text
+
+
+def test_body_segment_registry_covers_required_full_upper_body_proprioception():
+    text = source_text()
+    required = {
+        "root", "pelvis", "torso", "neck", "head",
+        "left_shoulder", "left_upper_arm", "left_elbow", "left_lower_arm",
+        "left_forearm", "left_wrist", "left_palm",
+        "right_shoulder", "right_upper_arm", "right_elbow", "right_lower_arm",
+        "right_forearm", "right_wrist", "right_palm",
+    }
+    assert "context.BodySegments.Clear()" in text
+    assert "body_segment_ids = context.BodySegments.Keys.OrderBy" in text
+    for segment in required:
+        assert f'"{segment}"' in text or f'side + "_{segment.split("_", 1)[-1]}"' in text
+    assert 'context.BodySegments.Add(side + "_lower_arm", lowerArm)' in text
+    assert 'context.BodySegments.Add(side + "_forearm", forearmBody.transform)' in text
+    assert 'context.BodySegments.Add(side + "_palm", palmBody.transform)' in text
+
+
+def test_self_collision_uses_selective_adjacent_exclusions_and_runtime_swept_evidence():
+    text = source_text()
+    assert "Physics.IgnoreLayerCollision" not in text
+    assert "Physics.GetIgnoreLayerCollision(AnatomicalColliderLayer, AnatomicalColliderLayer)" in text
+    assert "only explicit adjacent links may be excluded" in text
+    assert "ConfigureSelectiveAdjacentCollisionExclusions" in text
+    assert "AreSameOrAdjacentAnatomicalLinks" in text
+    assert "Physics.IgnoreCollision(a, b, true)" in text
+    assert "ignoredAdjacentColliderPairs.Contains(ColliderPairKey(a, b))" in text
+    assert "MeasureProspectiveNonAdjacentSelfClearance" in text
+    assert "SelfSweepMinimumSubsteps = 8" in text
+    assert "SelfSweepMaximumSubsteps = 32" in text
+    assert "SelfSweepMaximumSurfaceMotionPerSubstepM = .0005f" in text
+    assert "a.bounds.extents.magnitude * rotationADeg * Mathf.Deg2Rad" in text
+    assert "b.bounds.extents.magnitude * rotationBDeg * Mathf.Deg2Rad" in text
+    assert "SelfSweepMaximumRotationPerSubstepDeg = 1f" in text
+    assert "requiredSubsteps" in text
+    assert "sweepSample <= substeps" in text
+    assert "ConservativeSweptBoundingSphereClearance" in text
+    assert "broadphase_certified_separated_pairs = broadphaseCertifiedPairs" in text
+    assert "var startPoses = anatomicalColliders" in text
+    assert "PredictEndOfStepPose" in text
+    assert "start.position + body.linearVelocity * dt" in text
+    assert "MeasureProspectiveNonAdjacentSelfClearance(context, startPoses, prospectivePoses)" in text
+    assert "Physics.ComputePenetration" in text
+    assert "collider_a = a.name" in text
+    assert "collider_b = b.name" in text
+    assert "incompleteSelfSweepIntervals == 0" in text
+    assert "self_sweep_motion_bounds_respected" in text
+    assert "sweep_coverage_complete = evaluatedPairs > 0 && incompleteIntervals == 0" in text
+    assert "selfClearanceSteps.Count == expectedSamples" in text
+    assert "nonAdjacentSelfOverlapSamples == 0" in text
+    assert "self_clearance_sampled_every_physics_step = completeSelfClearance" in text
+    assert "non_adjacent_anatomy_clearance_passed = selfClearancePass" in text
+    assert "completeMotion && bodyPass && garmentPass && selfClearancePass && solverSelfClearancePass && penetrationPass" in text
+
+
+def test_registration_report_carries_physx_measured_interaction_penetration_receipts():
+    text = source_text()
+    assert "SampleInteractionPenetration(context, context.PhysicsStep - 1)" in text
+    assert "SampleInteractionPenetration(context, context.PhysicsStep)" in text
+    assert "interactionPenetrationSampledSteps.Add(sampledPhysicsStep)" in text
+    assert "value.provenance == TruthSource.PhysXMeasured" in text
+    assert "finger_object_max_penetration_m = fingerObjectMaxPenetrationM" in text
+    assert "target_support_max_penetration_m = targetSupportMaxPenetrationM" in text
+    assert "finger_object_penetration_provenance" in text
+    assert "target_support_penetration_provenance" in text
+    assert "fingerSamples > 0 && supportSamples > 0" in text
+    assert "FrozenGate.FingerObjectPenetrationMaxM" in text
+    assert "FrozenGate.SupportPenetrationMaxM" in text
 
 
 def test_unavailable_registration_fields_are_explicit_not_fabricated():

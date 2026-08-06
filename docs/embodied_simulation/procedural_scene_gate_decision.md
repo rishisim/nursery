@@ -1,10 +1,130 @@
-# Procedural Clothed Child Scene Gate Decision
+# Integrated Dexterous Embodiment Gate Decision
 
 ## Decision
 
-**NO-GO.** One Unity-native implementation now owns the avatar, garments, full-body controller, PhysX target, room compiler, head camera, synchronized capture, and truth recorder. The final frozen primary Stage-D run nevertheless failed genuine free-object capture and lift, failed a clean commanded release, and did not provide a usable child-head view of the interaction. These are multiple hard promotion failures, not one localized bounded repair.
+**NO-GO at ordered Gate A (2026-08-05).** Two sealed, eligible Unity-native
+microcell attempts completed the frozen 24 s / 5,760-step / 720-frame clock.
+The first failed physical capture; the only authorized controller/contact repair
+was then frozen and the second also failed. Attempt 2 produced no simultaneous
+right-thumb plus two-non-thumb force-bearing row, no qualified dwell, no lift,
+and no release at the required destination. The target was pushed from the
+table and first registered floor support at 8.6375 s. A third controller/contact
+repair is outside the bounded protocol, so Gates B--F stop unexecuted.
 
 The decision is limited to public/synthetic engineering qualification. It makes no infant-trained, age-matched, ChildLens-calibrated, human-validated, biological-torque, or real-child claim. No restricted ChildLens media or restricted external drive was accessed.
+
+## Current Gate-A freeze and retained attempts
+
+- Engine/authority: Unity 6000.0.80f1 ARM64/Metal, Unity/PhysX sole physics
+  authority, Unity sole renderer, 240 Hz manual physics and 30 Hz render with
+  exact 8:1 mapping.
+- Canonical entry point:
+  `python -m babyworld_lite.childlens_engine_bakeoff.procedural_scene_gate`.
+- Executed config SHA-256:
+  `3001b37bcaae9f9616f719431e8f56d96886adbb283a3efe9d9e1f83886c83d6`.
+- Episode A contract SHA-256:
+  `eb8fc293718bba694952b24a901835ca42f98eb5a1b9976343b43151374de66c`.
+- Attempt-2 source-audit receipt SHA-256:
+  `281670aaf1e245ad5b1ec02d8e77e5efba60681477a3cd6fe55ecf0146b091a0`;
+  source-set SHA-256:
+  `2baec75c7b7b75169e329a1700f90aab0ee6ef53931d19291e42fe9d4472e5c9`.
+- Retained ignored evidence roots:
+  `runs/embodied_simulation/procedural_scene_gate/episodes/A_playroom_red_toy/physical_attempt_01_failure`
+  and
+  `runs/embodied_simulation/procedural_scene_gate/episodes/A_playroom_red_toy/physical_attempt_02_failure`.
+
+Both traces contain 5,760 post-`Physics.Simulate` rows over 24 s and map to 720
+render frames. All six head/external/overlay videos are H.264, 1920x1080, 30
+fps, 720 frames, 24 s, pass full ffmpeg decode, and were inspected in complete
+0.5 s and 1 s contact sheets. Attempt-1 and attempt-2 trace SHA-256 values are
+`2ddcbdbd062b0b1bdff9397c8fd839480b20b8e5a14311ea683f0dad13c54fc1`
+and `7c0b6f57f53e21c40006b82877731c476d170ca9d09cf32d31670f5352d5a002`.
+
+## Force-bearing result
+
+| Measure | Attempt 1 | Attempt 2 | Frozen requirement |
+|---|---:|---:|---:|
+| Simultaneous right thumb + at least two non-thumb eligible nonzero-impulse rows | 0 | 0 | >0.30 s continuously |
+| Right force-bearing qualification | false | false | true |
+| Left non-little force-bearing support qualification | false | false | >0.25 s |
+| Raw lift above initial center | 0 m | 0 m | >0.10 m after qualification |
+| Commanded opening | 19.0042 s | 19.0042 s | required after supported manipulation |
+| Free release at `shallow_bin` | false | false | true |
+| Empty assistance ledger | 0 entries | 0 entries | 0 entries |
+
+Attempt 1 developed only index force evidence: its index-only eligible impulse
+interval lasted 526 steps / 2.1917 s (steps 3064--3589), with maximum impulse
+`4.2621e-5 N s`. The thumb's closest separation was 5.8949 mm; middle and ring
+never contacted. The object never lifted, and a late left-hand impact swept it
+off the table. The single permitted repair removed the premature index-only
+palm latch and required complete thumb-plus-two-digit geometry before latch,
+with bounded radial thumb/middle preshape changes.
+
+Attempt 2 still had only index force evidence. Across the full trace the thumb
+closest separation was 1.6033 mm with zero eligible impulse, the middle closest
+separation was 8.3450 mm with zero impulse, and no row contained thumb plus two
+non-thumb eligible impulses. The index reached `0.0162103 N s`, but index-only
+contact cannot qualify. Maximum finger/object penetration was 5.9321 mm, above
+the frozen 2 mm limit. The object center never rose above its initial
+0.6483297 m, first contacted the floor at step 2072 / 8.6375 s, and ended away
+from the required shallow bin. Opening therefore was not a release from capture.
+
+## Authority and truth limits
+
+Both runtime receipts report zero post-initialization target pose writes,
+velocity writes, external force/torque calls, attachment/joint changes,
+parenting changes, and kinematic changes. Runtime accounting passed, the
+assistance ledgers are empty, and the mandatory source audits passed. These
+receipts support a clean no-assistance result, but their zero counters are not
+claimed as universal independent proof beyond their declared coverage.
+
+The compliant-drive telemetry channel is **invalid and excluded from
+acceptance**. All 172,800 attempt-2 `compliant_joint_states` rows report the
+inactive `angularXDrive` (spring 0, damper 0, maximum force `FLT_MAX`), while
+the executed joints use `rotationDriveMode = Slerp` and `slerpDrive` spring
+2.4, damper 0.075, maximum force 1.15. No physical conclusion is inferred from
+that channel, and it was not repaired or reinterpreted after the terminal
+physical failure.
+
+## Registration and camera failures
+
+Neither run qualifies anti-clipping or registration. Attempt 1 reports 144.279
+mm maximum skin/collider error, 18.648 mm maximum nonadjacent self penetration,
+15.731 mm post-solver maximum, and 2,038 incomplete prospective sweep intervals.
+Attempt 2 reports 85.368 mm, 18.542 mm, 18.981 mm, and 942 respectively, plus
+the failed 5.932 mm finger/object penetration bound. Each Unity log contains
+38,934 nonconvex `Physics.ClosestPoint` errors. These are recorded failures,
+not Gate-B evidence.
+
+The target center and both palm inputs are outside the head-camera frustum in
+720/720 frames of each run, and the registered contact projection contains zero
+visible records. Full head videos show an unreadable interaction while the
+clean external and labeled overlay streams expose the physical failure. The
+prospective geometric FOV receipt is therefore not accepted as a camera or
+event-visibility pass.
+
+## Ordered stopping result
+
+| Gate | Status | Consequence |
+|---|---|---|
+| A -- compliant free-object microcell | **FAIL / NO-GO** | Two eligible attempts exhausted the one-repair limit. |
+| B -- anatomy, anti-clipping, three garments | Not executed | Existing failed registration diagnostics are not qualification sweeps. |
+| C -- body-derived camera and contact-free motion | Not executed | Head streams are retained failure evidence only. |
+| D -- polished furnished bimanual episode | Not generated | Gate A prerequisite failed. |
+| E -- three rich no-retuning cells | Not generated | Gate A prerequisite failed. |
+| F -- robustness, replay/rerender, multimodal QA | Not generated | Gate A prerequisite failed. |
+
+This result is specific to the tested compliant-hand/controller configuration.
+It does not generalize to Unity, PhysX, or the wider project.
+
+## Preserved prior corrected Stage-D decision
+
+The record below is retained verbatim as the corrected historical baseline from
+the preceding procedural scene-gate run. Its `STAGE_D_NO_GO_PROMOTION_VETO`
+label and metrics remain historical evidence only; they are not reused as
+current Gate-A acceptance evidence.
+
+**Historical decision: NO-GO.** One Unity-native implementation owned the avatar, garments, full-body controller, PhysX target, room compiler, head camera, synchronized capture, and truth recorder. Its final frozen primary Stage-D run failed genuine free-object capture and lift, failed a clean commanded release, and did not provide a usable child-head view of the interaction. These were multiple hard promotion failures, not one localized bounded repair.
 
 ## Final freeze and eligible run
 

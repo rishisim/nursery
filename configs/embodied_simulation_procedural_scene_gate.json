@@ -7,9 +7,27 @@
   "output_root": "runs/embodied_simulation/procedural_scene_gate",
   "ordered_gate": ["A", "B", "C", "D", "E", "F"],
   "implementation_freeze": {
-    "status": "interfaces_frozen_pre_audition",
-    "classification": "prospective integrated qualification; source hashes must be sealed before any eligible Unity execution",
-    "sealed_source_sha256": {},
+    "status": "sealed_for_execution",
+    "classification": "Gate-A physical microcell execution eligible after independent semantic/source/Unity compile audit; no empirical manipulation pass yet",
+    "sealed_source_sha256": {
+      "EmbodimentGarments.cs": "7098fb4dcb994fa8ea995f5739952319dfe76d304c7113807af026fc96ee6ac6",
+      "FullBodyBimanualMotion.cs": "5ae2a8cbe72346b76f6d2f276f3a3c8a683eb4f138df101a5f5c3d424f1915bf",
+      "GateContracts.cs": "bc97a9acd943dbbc646e95c32edd6fddba4ed68f855383c28afa116f131296d4",
+      "MetricDepth.shader": "38b9755073963924b6a487ab9fa1915c72399ff159d4e81824223c0dc89d6da5",
+      "PhysicsTruthRecorder.cs": "1c97762b16f8150a76f9dc3103c1a05b4415ac8c5cc27deb6aac31591d7968a6",
+      "ProceduralSceneCompiler.cs": "f4e39b39bdce48cd903046e097495304e9f5ad635343584d76ec9c0da6b1ef6e",
+      "ProceduralSceneGateBuilder.cs": "a6a51d2410cf8f9652b616da4b102323976c3fe91bdc360d6b15b2e460f9cd2c",
+      "RegisteredCapture.cs": "6913c5d3bdc54b576e9f58e83fcb7c9aaf15bdeec0ede716a113a5560fa9be43",
+      "SemanticInstance.shader": "55379eb852190d816b733a33a591910713c6f5a9e8b887975730c00246c7ea6c",
+      "__init__.py": "137db911f1bb25fe011f5d71329808d1233fe7cec50c4fe55be399e6a543ca59",
+      "__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "cli.py": "a9b8050f680c1022bf88f69e5fe53358bc38d19f3a9823b2dca6e101f57fc7f8",
+      "contracts.py": "e635232921c7fce37704ef460e04ffa1b1f4fafa58a9fc478727f0fa361b878f",
+      "independent_qa.py": "71f6580c3fd41c2b6fb8112ccc77f702b0d70b27b287331babed8df58fc0bb6a",
+      "runner.py": "5c8cd41ca4f8941c5d95d0de8155d243ce162204876770cbd3e283f744176eaa"
+    },
+    "invalidated_seal_config_sha256": "25871e5bf0ed98092b03cdc3d34f56bccbfd7b642bb7f2bd52c03baf2f520434",
+    "invalidated_reason": "independent pre-execution audit found authority classification, anti-clipping, plan/controller, trace/adapter, destination behavior, compiled-contract, and F-stage plumbing blockers; no eligible Unity result exists",
     "same_controller_all_seeds_and_garments": true,
     "seed_specific_retuning": false,
     "audition_limit": 2,
@@ -51,7 +69,7 @@
     "deterministic_mapping": "0.355 m + 0.015 m * ((seed % 3) - 1)",
     "same_band_all_room_seeds": true,
     "seed_specific_retuning": false,
-    "minimum_contextual_objects": 10,
+    "minimum_contextual_objects": 11,
     "reachable_objects_physics_backed": true,
     "deterministic_prospective_rejection_only": true
   },
@@ -99,16 +117,17 @@
   "trace_contract": {
     "schema": "embodied.episode_trace.v2",
     "clock": ["physics_step", "render_frame", "time_s", "phase_id"],
-    "body_state": ["root", "torso", "neck", "head"],
+    "body_state": ["root", "pelvis", "torso", "neck", "head", "left_shoulder", "left_upper_arm", "left_elbow", "left_lower_arm", "left_forearm", "left_wrist", "left_palm", "right_shoulder", "right_upper_arm", "right_elbow", "right_lower_arm", "right_forearm", "right_wrist", "right_palm"],
     "pose_fields": ["position_world_m", "rotation_world_xyzw", "linear_velocity_world_m_s", "angular_velocity_world_rad_s"],
     "hand_state": ["left_palm", "right_palm", "left_thumb", "left_index", "left_middle", "left_ring", "left_little", "right_thumb", "right_index", "right_middle", "right_ring", "right_little"],
     "per_digit_fields": ["segments", "dynamic_body_pose", "joint_drive", "velocity", "closure_commanded", "closure_observed", "drive_provenance"],
     "controller_state": ["targets", "tracking_source", "errors", "recovery_state", "speed_limits", "right_force_opposition_qualified", "meaningful_left_force_support_qualified", "support_continuous", "qualification_steps"],
     "contact_fields": ["collider_a", "collider_b", "point_world_m", "normal_world", "separation_m", "relative_velocity_world_m_s", "available_impulse_n_s", "nonzero_impulse_observed", "mean_force_equivalent_n", "qualification_eligible", "visible_projection", "provenance"],
-    "object_fields": ["persistent_id", "semantic_id", "instance_id", "pose", "linear_velocity_world_m_s", "angular_velocity_world_rad_s", "support_id", "sleeping", "free_dynamic"],
+    "object_fields": ["persistent_id", "semantic_id", "instance_id", "pose", "linear_velocity_world_m_s", "angular_velocity_world_rad_s", "support_id", "destination_id", "released_at_required_destination", "sleeping", "free_dynamic"],
     "camera_fields": ["parent_id", "mount_id", "position_world_m", "rotation_world_xyzw", "intrinsics", "clearance_m", "optical_vs_face_forward_deg", "roll_deg", "velocity"],
     "derived_fields": ["joint_proprioception", "head_accelerometer_m_s2", "head_gyroscope_rad_s"],
     "authority_audit": ["target_pose_write_counter", "target_velocity_write_counter", "target_force_counter", "target_torque_counter", "target_joint_counter", "target_parenting_counter", "target_kinematic_change_counter", "recovery_counter", "source_audit_sha256"],
+    "required_run_artifacts": ["episode_spec.json", "scene_spec.json", "avatar_spec.json", "embodiment_manifest.json", "activity_plan.json", "trace.jsonl", "authority_receipt.json", "registration_report.json", "contact_projection.json", "visual_audit.json", "qa_evidence.json"],
     "recovery_ledger": [], "assistance_ledger": []
   },
   "truth_provenance": [
@@ -131,6 +150,11 @@
   },
   "forbidden_assistance": ["parenting free object", "FixedJoint grasp", "free-object transform writes after initialization", "free-object velocity writes after initialization", "snapping", "teleportation", "hidden force torque spring fixture or catch tray", "kinematic object lift", "object trajectory", "post-step repair"],
   "source_audit": {"mandatory_before_execution": true, "scan_extensions": [".cs", ".py", ".shader"], "forbidden_target_operations": ["SetParent", "FixedJoint", "AddForce", "AddTorque", "MovePosition", "MoveRotation", "isKinematic", "velocity", "angularVelocity", "SetPositionAndRotation"], "manual_allowlist_required_for_initialization_and_non_target_bodies": true},
+  "robustness_variants": [
+    {"id": "nominal", "target_lateral_shift_m": 0.0, "mass_scale": 1.0, "static_friction_scale": 1.0, "dynamic_friction_scale": 1.0},
+    {"id": "lateral_target_shift", "target_lateral_shift_m": 0.015, "mass_scale": 1.0, "static_friction_scale": 1.0, "dynamic_friction_scale": 1.0},
+    {"id": "mass_friction_change", "target_lateral_shift_m": 0.0, "mass_scale": 1.25, "static_friction_scale": 0.8, "dynamic_friction_scale": 0.8}
+  ],
   "promotion": {"pass_minimum_episode_cells": 2, "pass_total_episode_cells": 3, "pass_minimum_clothing_variants": 2, "primary_robustness_minimum_passes": 2, "primary_robustness_total": 3, "qa_may_veto": true, "promising_bounded_repair_max_localized_defects": 1, "hard_no_go": ["failed compliant manipulation", "clipping", "event visibility", "procedural generality", "assistance", "registration"]},
   "preserved_evidence": {
     "visual_feasibility": {"decision": "PASS_VISUAL_SHELL_ONLY", "record": "docs/embodied_simulation/unity_visual_audition.md"},

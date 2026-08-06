@@ -21,11 +21,16 @@ namespace ProceduralSceneGate
         public const string LedgerFileName = "capture_frame_ledger.jsonl";
         public const string ManifestFileName = "registered_capture_manifest.json";
         public const string LabelManifestFileName = "semantic_instance_manifest.json";
+        public const string FovQualificationFileName = "camera_fov_qualification.json";
+        public const string ContactProjectionFileName = "contact_projection.json";
+        public const string VisualMeasurementsFileName = "visual_measurements.json";
 
-        private const float VerticalFovDeg = 68f;
+        private static readonly float[] VerticalFovCandidatesDeg = { 60f, 68f, 75f };
         private const float NearClipM = 0.01f;
         private const float FarClipM = 20f;
         private const float MinimumClearanceM = 0.001f;
+        private const float MinimumMilestoneViewportMargin = 0.035f;
+        private const int SweptClearanceIntervals = 8;
         private const float MaximumOpticalAngleDeg = 15f;
         private const float MaximumRollDeg = 12f;
         private const float MaximumLinearSpeedMps = 1.5f;
@@ -38,6 +43,8 @@ namespace ProceduralSceneGate
         private readonly List<float> absoluteRolls = new List<float>();
         private readonly List<float> linearSpeeds = new List<float>();
         private readonly List<float> angularSpeeds = new List<float>();
+        private readonly List<RegisteredContactProjectionRecord> contactProjectionRecords =
+            new List<RegisteredContactProjectionRecord>();
 
         private GateContext boundContext;
         private string captureMode;
@@ -58,6 +65,12 @@ namespace ProceduralSceneGate
         private bool hasPreviousCameraPose;
         private Vector3 frozenExternalPosition;
         private Quaternion frozenExternalRotation;
+        private Vector3 frozenHeadMountLocalPosition;
+        private Quaternion frozenHeadMountLocalRotation;
+        private Vector3 previousClearancePosition;
+        private Quaternion previousClearanceRotation;
+        private bool hasPreviousClearancePose;
+        private FovQualificationReceipt fovQualification;
 
         public void Bind(GateContext context)
         {
@@ -73,7 +86,21 @@ namespace ProceduralSceneGate
             ConfigureRendererLabels(context);
             ConfigureQaOverlay(context);
 
-            CameraClearanceResult bindClearance = MeasureCameraClearance(context);
+            ValidateAuthoritativeCameraChain(context);
+            CameraClearanceResult bindClearance = ProspectivelyFreezeHeadMountClearance(context);
+            fovQualification = ProspectivelyFreezeFieldOfView(context);
+            Directory.CreateDirectory(context.OutputRoot);
+            File.WriteAllText(
+                Path.Combine(context.OutputRoot, FovQualificationFileName),
+                JsonUtility.ToJson(fovQualification, true) + "\n",
+                new UTF8Encoding(false)
+            );
+            if (!fovQualification.qualification_pass)
+                throw new InvalidOperationException("prospective FOV/event-view qualification rejected before capture: " + fovQualification.failure_reason);
+            context.HeadCamera.fieldOfView = fovQualification.selected_vertical_fov_deg;
+            frozenHeadMountLocalPosition = context.HeadCameraMount.localPosition;
+            frozenHeadMountLocalRotation = context.HeadCameraMount.localRotation;
+
             float opticalAngle = Vector3.Angle(context.Head.forward, context.HeadCamera.transform.forward);
             if (opticalAngle > MaximumOpticalAngleDeg + 1e-4f)
                 throw new InvalidOperationException("head optical mount exceeds the frozen 15 degree neutral-axis limit");
@@ -101,6 +128,15 @@ namespace ProceduralSceneGate
             string authorityState = AuthorityStateSha256(context);
             PoseFingerprint headCameraPose = PoseFingerprint.From(context.HeadCamera.transform);
             AssertExternalCameraStillFixed();
+            AssertFixedHeadMountAndChain(context);
+
+            // Clearance is a prospective render reject, not a diagnostic sampled
+            // after pixels have already been emitted. The sweep covers the prior
+            // registered pose through this frozen pose, including the near plane.
+            CameraClearanceResult clearance = MeasureSweptCameraClearance(context);
+            if (clearance.inside_body_mesh || clearance.minimum_surface_distance_m < MinimumClearanceM)
+                throw new InvalidOperationException("camera swept origin/near plane lacks positive head/hair/garment/furniture clearance before render");
+            EventVisibilityInput[] visibility = EventVisibilityInputs(context);
 
             var receipts = new List<CaptureStreamReceipt>();
             string frameName = "frame_" + context.RenderFrame.ToString("D4", CultureInfo.InvariantCulture) + ".png";
@@ -125,7 +161,8 @@ namespace ProceduralSceneGate
                     0f,
                     heroMask,
                     authorityState,
-                    context
+                    context,
+                    null
                 ));
                 AssertFrozenState(context, physicsStepAtEntry, renderFrameAtEntry, authorityState, headCameraPose);
                 receipts.Add(CaptureReplacement(
@@ -136,7 +173,8 @@ namespace ProceduralSceneGate
                     0f,
                     heroMask,
                     authorityState,
-                    context
+                    context,
+                    visibility
                 ));
                 AssertFrozenState(context, physicsStepAtEntry, renderFrameAtEntry, authorityState, headCameraPose);
                 receipts.Add(CaptureReplacement(
@@ -147,9 +185,32 @@ namespace ProceduralSceneGate
                     1f,
                     heroMask,
                     authorityState,
-                    context
+                    context,
+                    visibility
                 ));
                 AssertFrozenState(context, physicsStepAtEntry, renderFrameAtEntry, authorityState, headCameraPose);
+                FinalizeRenderedLabelSamples(visibility, context, labelBindings);
+                foreach (EventVisibilityInput input in visibility.Where(value =>
+                             StringComparer.Ordinal.Equals(value.input_id, "physx_contact_point_input")))
+                {
+                    contactProjectionRecords.Add(new RegisteredContactProjectionRecord
+                    {
+                        render_frame = context.RenderFrame,
+                        physics_step = context.PhysicsStep,
+                        physical_contact_point_world_m = input.point_world_m,
+                        expected_contact_collider_a = input.expected_contact_collider_a,
+                        expected_contact_collider_b = input.expected_contact_collider_b,
+                        pixel_xy = input.rendered_label_pixel_xy,
+                        first_visible_collider_id = input.first_visible_collider_id,
+                        first_visible_renderer_path = input.first_visible_renderer_path,
+                        first_visible_semantic_uint24 = input.first_visible_semantic_uint24,
+                        first_visible_persistent_instance_uint24 = input.first_visible_persistent_instance_uint24,
+                        contact_projects_to_expected_visible_surface = input.contact_projects_to_expected_visible_surface,
+                        contact_visible_in_registered_frame = input.contact_visible_in_registered_frame,
+                        method = input.contact_projection_method,
+                        provenance = input.provenance
+                    });
+                }
             }
 
             int externalMask = context.ExternalCamera.cullingMask & ~(1 << QaOverlayLayer);
@@ -177,12 +238,10 @@ namespace ProceduralSceneGate
             qaOverlay.capture_enabled = false;
             AssertFrozenState(context, physicsStepAtEntry, renderFrameAtEntry, authorityState, headCameraPose);
 
-            CameraClearanceResult clearance = MeasureCameraClearance(context);
             CameraMotionSample motion = CameraMotion(context.HeadCamera.transform);
             float opticalVsFaceForward = Vector3.Angle(context.Head.forward, context.HeadCamera.transform.forward);
             float roll = CameraRollDeg(context.HeadCamera.transform, context.Head);
             CameraIntrinsics intrinsics = Intrinsics(context.HeadCamera);
-            EventVisibilityInput[] visibility = EventVisibilityInputs(context);
 
             clearances.Add(clearance.minimum_surface_distance_m);
             opticalAngles.Add(opticalVsFaceForward);
@@ -220,6 +279,9 @@ namespace ProceduralSceneGate
                 intrinsics_provenance = "derived from frozen Unity Camera vertical FOV and exact 1920x1080 raster",
                 clearance_m = clearance.minimum_surface_distance_m,
                 clearance_inside_body_mesh = clearance.inside_body_mesh,
+                swept_clearance_m = clearance.minimum_surface_distance_m,
+                swept_clearance_samples = clearance.sweep_samples,
+                swept_clearance_scene_collider_m = clearance.minimum_scene_collider_distance_m,
                 clearance_method = clearance.method,
                 optical_vs_face_forward_deg = opticalVsFaceForward,
                 roll_deg = roll,
@@ -292,6 +354,11 @@ namespace ProceduralSceneGate
                 label_manifest = LabelManifestFileName,
                 frame_ledger = captureMode == "none" ? "UNAVAILABLE_CAPTURE_MODE_NONE" : LedgerFileName,
                 stream_roots = StreamRoots(captureMode),
+                fov_qualification = fovQualification,
+                fov_qualification_file = FovQualificationFileName,
+                fov_qualification_sha256 = FileSha256(Path.Combine(context.OutputRoot, FovQualificationFileName)),
+                selected_vertical_fov_deg = fovQualification != null ? fovQualification.selected_vertical_fov_deg : -1f,
+                fov_freeze_rule = "prospectively audition 60/68/75 degrees on one immutable bind-time milestone geometry receipt; freeze the narrowest candidate with every required event inside the safe viewport and no body/support/furniture occluder",
                 minimum_clearance_m = MinOrUnavailable(clearances),
                 maximum_optical_vs_face_forward_deg = MaxOrUnavailable(opticalAngles),
                 maximum_abs_roll_deg = MaxOrUnavailable(absoluteRolls),
@@ -308,8 +375,57 @@ namespace ProceduralSceneGate
                 new UTF8Encoding(false)
             );
 
+            if (captureMode != "none")
+            {
+                WriteMeasuredCaptureAdapters(context);
+            }
+
             qaOverlay?.DisposeMaterial();
             completed = true;
+        }
+
+        private void WriteMeasuredCaptureAdapters(GateContext context)
+        {
+            string ledgerPath = Path.Combine(context.OutputRoot, LedgerFileName);
+            var projection = new RegisteredContactProjectionReport
+            {
+                schema = "embodied.registered_contact_projection.v1",
+                episode_id = context.EpisodeId,
+                source_capture_ledger = LedgerFileName,
+                source_capture_ledger_sha256 = FileSha256(ledgerPath),
+                records = contactProjectionRecords.ToArray(),
+                provenance = "direct adapter of same-state PhysX ContactTruth projection rows embedded in the registered capture ledger"
+            };
+            string projectionPath = Path.Combine(context.OutputRoot, ContactProjectionFileName);
+            File.WriteAllText(
+                projectionPath,
+                JsonUtility.ToJson(projection, true) + "\n",
+                new UTF8Encoding(false)
+            );
+
+            // This receipt intentionally contains measurements only.  It cannot
+            // stand in for the independent dense decoded-frame review required by
+            // the visual gates, so the auditor keeps those checks UNAVAILABLE.
+            var visualMeasurements = new RegisteredVisualMeasurements
+            {
+                schema = "embodied.registered_visual_measurements.v1",
+                episode_id = context.EpisodeId,
+                source_capture_ledger = LedgerFileName,
+                source_capture_ledger_sha256 = FileSha256(ledgerPath),
+                registered_contact_projection = ContactProjectionFileName,
+                registered_contact_projection_sha256 = FileSha256(projectionPath),
+                measured_capture_evidence_only = true,
+                direct_decoded_frame_review_performed = false,
+                registered_projection_record_count = contactProjectionRecords.Count,
+                measurement_scope = "camera calibration/motion/clearance, rendered stream hashes, and same-state first-visible-surface projections only",
+                provenance = "Unity-observed registered capture receipts; no anatomy, clipping, coherence, or aesthetic judgment is inferred"
+            };
+            File.WriteAllText(
+                Path.Combine(context.OutputRoot, VisualMeasurementsFileName),
+                JsonUtility.ToJson(visualMeasurements, true) + "\n",
+                new UTF8Encoding(false)
+            );
+
         }
 
         private static void ValidateBaseBindings(GateContext context)
@@ -344,7 +460,9 @@ namespace ProceduralSceneGate
             mount.position = ComputeHeadSurfaceMountWorld(context, 0.032f);
 
             camera.enabled = false; // only explicit synchronous Camera.Render is permitted
-            camera.fieldOfView = VerticalFovDeg;
+            // ProspectivelyFreezeFieldOfView replaces this widest temporary
+            // preflight value with exactly one frozen candidate before capture.
+            camera.fieldOfView = VerticalFovCandidatesDeg[VerticalFovCandidatesDeg.Length - 1];
             camera.aspect = FrozenGate.Width / (float)FrozenGate.Height;
             camera.nearClipPlane = NearClipM;
             camera.farClipPlane = FarClipM;
@@ -359,6 +477,167 @@ namespace ProceduralSceneGate
             semanticInstanceShader = Shader.Find("ProceduralSceneGate/SemanticInstanceUint24");
             if (metricDepthShader == null || semanticInstanceShader == null)
                 throw new InvalidOperationException("registered capture replacement shaders are missing");
+        }
+
+        private static void ValidateAuthoritativeCameraChain(GateContext context)
+        {
+            if (!context.Torso || !context.Neck || !context.Head)
+                throw new InvalidOperationException("camera requires the frozen root/pelvis-to-torso-to-neck-to-head chain");
+            if (!IsChildOrSelf(context.AvatarRoot.transform, context.AuthorityRoot.transform)
+                || !IsChildOrSelf(context.Torso, context.AvatarRoot.transform)
+                || !IsChildOrSelf(context.Neck, context.Torso)
+                || !IsChildOrSelf(context.Head, context.Neck)
+                || context.HeadCameraMount.parent != context.Head
+                || context.HeadCamera.transform != context.HeadCameraMount)
+                throw new InvalidOperationException("camera authority must be avatar root -> torso -> neck -> head -> one fixed measured optical mount");
+        }
+
+        private void AssertFixedHeadMountAndChain(GateContext context)
+        {
+            ValidateAuthoritativeCameraChain(context);
+            if (Vector3.Distance(context.HeadCameraMount.localPosition, frozenHeadMountLocalPosition) > 1e-7f
+                || Quaternion.Angle(context.HeadCameraMount.localRotation, frozenHeadMountLocalRotation) > 1e-5f)
+                throw new InvalidOperationException("head optical mount changed after its bind-time measured local pose was frozen");
+            if (Mathf.Abs(context.HeadCamera.fieldOfView - fovQualification.selected_vertical_fov_deg) > 1e-5f)
+                throw new InvalidOperationException("head camera FOV changed after prospective candidate freeze");
+        }
+
+        private FovQualificationReceipt ProspectivelyFreezeFieldOfView(GateContext context)
+        {
+            MilestoneViewAnchor[] anchors = BuildMilestoneViewAnchors(context);
+            if (anchors.Length == 0)
+                throw new InvalidOperationException("FOV preflight has no required milestone geometry");
+
+            Vector3 origin = context.HeadCamera.transform.position;
+            Vector3 taskCentroid = Vector3.zero;
+            foreach (MilestoneViewAnchor anchor in anchors) taskCentroid += anchor.point_world_m;
+            taskCentroid /= anchors.Length;
+            Vector3 predictedTaskAxis = (taskCentroid - origin).normalized;
+            if (predictedTaskAxis.sqrMagnitude < 1e-8f)
+                throw new InvalidOperationException("FOV preflight task axis is degenerate");
+            Vector3 predictedUp = Vector3.ProjectOnPlane(context.Head.up, predictedTaskAxis).normalized;
+            if (predictedUp.sqrMagnitude < 1e-8f) predictedUp = Vector3.up;
+            Quaternion predictedTaskView = Quaternion.LookRotation(predictedTaskAxis, predictedUp);
+
+            string geometrySha256 = MilestoneGeometrySha256(context, anchors, origin, predictedTaskView);
+            var candidates = new List<FovCandidateReceipt>();
+            foreach (float candidate in VerticalFovCandidatesDeg)
+            {
+                MilestoneCandidateResult[] results = anchors
+                    .Select(anchor => EvaluateMilestoneCandidate(context, anchor, origin, predictedTaskView, candidate))
+                    .ToArray();
+                candidates.Add(new FovCandidateReceipt
+                {
+                    vertical_fov_deg = candidate,
+                    same_prerun_geometry_sha256 = geometrySha256,
+                    same_prerun_geometry_trace_sha256 = geometrySha256,
+                    milestone_results = results,
+                    all_required_events_inspectable = results.All(value => value.inside_safe_viewport && !value.occluded),
+                    provenance = "derived prospectively from one immutable bind-time milestone geometry set; virtual evaluation pose is never applied to the authoritative fixed head mount"
+                });
+            }
+            FovCandidateReceipt selected = candidates.FirstOrDefault(value => value.all_required_events_inspectable);
+            string failures = selected == null
+                ? string.Join(", ", candidates.Select(value =>
+                    value.vertical_fov_deg.ToString("0", CultureInfo.InvariantCulture) + "deg="
+                    + string.Join("/", value.milestone_results.Where(row => !row.inside_safe_viewport || row.occluded)
+                        .Select(row => row.event_id + (row.occluded ? ":occluded_by_" + row.first_blocker_id : ":outside_safe_viewport")))))
+                : null;
+            return new FovQualificationReceipt
+            {
+                schema = "embodied.camera_fov_qualification.v1",
+                auditioned_vertical_fov_deg = VerticalFovCandidatesDeg.ToArray(),
+                selected_vertical_fov_deg = selected != null ? selected.vertical_fov_deg : -1f,
+                selection_rule = "narrowest candidate with every required milestone inside a 3.5% safe viewport margin and no measured body/support/furniture ray occluder",
+                same_prerun_geometry_sha256 = geometrySha256,
+                same_prerun_geometry_trace_sha256 = geometrySha256,
+                prerun_trace_definition = "ordered touch/capture/left-assistance/minimum-lift/turn/placement/free-release/bilateral-withdrawal milestone anchors derived once before physics execution",
+                predicted_task_view_axis_world = predictedTaskAxis,
+                virtual_pose_applied_to_camera = false,
+                camera_mount_changed_during_audition = false,
+                candidates = candidates.ToArray(),
+                geometric_prediction_is_visual_pass_evidence = false,
+                qualification_pass = selected != null,
+                failure_reason = failures
+            };
+        }
+
+        private static MilestoneViewAnchor[] BuildMilestoneViewAnchors(GateContext context)
+        {
+            var result = new List<MilestoneViewAnchor>();
+            bool targetAvailable = context.TargetBody != null;
+            Bounds targetBounds = targetAvailable ? CombinedColliderBounds(context.TargetBody.gameObject) : new Bounds();
+            if (targetAvailable)
+            {
+                Vector3 center = targetBounds.center;
+                Vector3 lateral = context.Head.right.normalized * Mathf.Max(targetBounds.extents.x, 0.035f);
+                result.Add(new MilestoneViewAnchor("touch", center, "target collider bounds center at bind"));
+                result.Add(new MilestoneViewAnchor("capture", center + lateral * 0.45f, "predicted right opposition side of bind-time target bounds"));
+                result.Add(new MilestoneViewAnchor("left_assistance", center - lateral * 0.45f, "predicted left load-sharing side of bind-time target bounds"));
+                result.Add(new MilestoneViewAnchor("lift", center + Vector3.up * 0.10f, "frozen minimum qualified lift displacement above bind-time target"));
+                result.Add(new MilestoneViewAnchor("turn", center + Vector3.up * 0.10f + lateral * 0.35f, "predicted visible turned-target extent at minimum lift"));
+            }
+
+            SceneIdentity destination = UnityEngine.Object.FindObjectsByType<SceneIdentity>(FindObjectsSortMode.None)
+                .Where(value => value != null)
+                .FirstOrDefault(value => !string.IsNullOrWhiteSpace(context.DestinationId)
+                    && (StringComparer.Ordinal.Equals(value.persistent_id, context.DestinationId)
+                        || value.name.IndexOf(context.DestinationId, StringComparison.OrdinalIgnoreCase) >= 0));
+            Vector3 placement;
+            string placementSource;
+            if (destination != null)
+            {
+                placement = CombinedRendererOrColliderBounds(destination.gameObject).center;
+                placementSource = "SceneIdentity matching frozen destination_id";
+            }
+            else if (targetAvailable)
+            {
+                Collider support = FindInitialSupportBelow(targetBounds, context.TargetBody.gameObject);
+                placement = support != null
+                    ? new Vector3(targetBounds.center.x, support.bounds.max.y + targetBounds.extents.y, targetBounds.center.z)
+                    : targetBounds.center;
+                placementSource = support != null
+                    ? "bind-time support top fallback; destination SceneIdentity unavailable"
+                    : "bind-time target center fallback; destination SceneIdentity and support unavailable";
+            }
+            else
+            {
+                placement = context.RightPalm.position;
+                placementSource = "contact-free measured right-hand workspace";
+            }
+            result.Add(new MilestoneViewAnchor("placement", placement, placementSource));
+            result.Add(new MilestoneViewAnchor("free_release", placement + Vector3.up * 0.015f, placementSource + "; visible free-settle volume"));
+            result.Add(new MilestoneViewAnchor("withdrawal", Vector3.Lerp(placement, context.RightPalm.position, 0.55f), "mid-sweep from placement to bind-time measured right-hand rest"));
+            result.Add(new MilestoneViewAnchor("withdrawal_left", Vector3.Lerp(placement, context.LeftPalm.position, 0.55f), "mid-sweep from placement to bind-time measured left-hand rest"));
+            return result.ToArray();
+        }
+
+        private static MilestoneCandidateResult EvaluateMilestoneCandidate(
+            GateContext context,
+            MilestoneViewAnchor anchor,
+            Vector3 origin,
+            Quaternion virtualRotation,
+            float verticalFovDeg)
+        {
+            Vector3 cameraLocal = Quaternion.Inverse(virtualRotation) * (anchor.point_world_m - origin);
+            float tanHalfVertical = Mathf.Tan(0.5f * verticalFovDeg * Mathf.Deg2Rad);
+            float tanHalfHorizontal = tanHalfVertical * (FrozenGate.Width / (float)FrozenGate.Height);
+            float x = cameraLocal.z > 1e-6f ? 0.5f + 0.5f * cameraLocal.x / (cameraLocal.z * tanHalfHorizontal) : -1f;
+            float y = cameraLocal.z > 1e-6f ? 0.5f + 0.5f * cameraLocal.y / (cameraLocal.z * tanHalfVertical) : -1f;
+            bool safe = cameraLocal.z >= NearClipM
+                && x >= MinimumMilestoneViewportMargin && x <= 1f - MinimumMilestoneViewportMargin
+                && y >= MinimumMilestoneViewportMargin && y <= 1f - MinimumMilestoneViewportMargin;
+            OcclusionResult occlusion = ProspectivelyMeasureOcclusion(context, origin, anchor.point_world_m);
+            return new MilestoneCandidateResult
+            {
+                event_id = anchor.event_id,
+                point_world_m = anchor.point_world_m,
+                predicted_viewport_xyz = new Vector3(x, y, cameraLocal.z),
+                inside_safe_viewport = safe,
+                occluded = occlusion.occluded,
+                first_blocker_id = occlusion.first_blocker_id,
+                anchor_provenance = anchor.provenance
+            };
         }
 
         private static Vector3 ComputeHeadSurfaceMountWorld(GateContext context, float forwardClearanceM)
@@ -402,6 +681,28 @@ namespace ProceduralSceneGate
             Vector3 faceForward = context.Head.forward.normalized;
             float forwardSurface = headWeightedWorld.Max(point => Vector3.Dot(point, faceForward));
             return centroid + faceForward * (forwardSurface - Vector3.Dot(centroid, faceForward) + forwardClearanceM);
+        }
+
+        private CameraClearanceResult ProspectivelyFreezeHeadMountClearance(GateContext context)
+        {
+            float[] forwardClearanceCandidatesM = { 0.032f, 0.045f, 0.060f, 0.080f };
+            CameraClearanceResult last = null;
+            foreach (float candidate in forwardClearanceCandidatesM)
+            {
+                context.HeadCameraMount.position = ComputeHeadSurfaceMountWorld(context, candidate);
+                hasPreviousClearancePose = false;
+                last = MeasureSweptCameraClearance(context);
+                if (!last.inside_body_mesh && last.minimum_surface_distance_m >= MinimumClearanceM)
+                    return last;
+            }
+            throw new InvalidOperationException(
+                "no bounded fixed head-mount candidate has positive avatar/clothing/collider clearance; last minimum="
+                + (last == null ? "unavailable" : last.minimum_surface_distance_m.ToString("R", CultureInfo.InvariantCulture))
+                + "; avatar_minimum=" + (last == null ? "unavailable" : last.minimum_avatar_surface_distance_m.ToString("R", CultureInfo.InvariantCulture))
+                + "; scene_minimum=" + (last == null ? "unavailable" : last.minimum_scene_collider_distance_m.ToString("R", CultureInfo.InvariantCulture))
+                + "; avatar_renderer=" + (last == null ? "unavailable" : last.minimum_avatar_renderer_id)
+                + "; scene_collider=" + (last == null ? "unavailable" : last.minimum_scene_collider_id)
+            );
         }
 
         private static void ConfigureFixedExternalCamera(GateContext context)
@@ -513,9 +814,10 @@ namespace ProceduralSceneGate
             float labelMode,
             int cullingMask,
             string authorityState,
-            GateContext context)
+            GateContext context,
+            EventVisibilityInput[] labelSamples)
         {
-            return RenderToPng(camera, path, stream, shader, labelMode, cullingMask, true, authorityState, context);
+            return RenderToPng(camera, path, stream, shader, labelMode, cullingMask, true, authorityState, context, labelSamples);
         }
 
         private CaptureStreamReceipt RenderToPng(
@@ -527,7 +829,8 @@ namespace ProceduralSceneGate
             int cullingMask,
             bool linear,
             string authorityState,
-            GateContext context)
+            GateContext context,
+            EventVisibilityInput[] labelSamples = null)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             cullingMask = cullingMask & ~(1 << QaOverlayLayer);
@@ -569,6 +872,19 @@ namespace ProceduralSceneGate
                     qaOverlay.DrawNow(camera);
                 texture.ReadPixels(new Rect(0, 0, FrozenGate.Width, FrozenGate.Height), 0, 0, false);
                 texture.Apply(false, false);
+                if (labelSamples != null && (stream == "head_semantic_uint24" || stream == "head_persistent_instance_uint24"))
+                {
+                    foreach (EventVisibilityInput input in labelSamples.Where(value => value.available && value.geometric_frustum_input))
+                    {
+                        int x = Mathf.Clamp(Mathf.FloorToInt(input.pixel_xy.x), 0, FrozenGate.Width - 1);
+                        int y = Mathf.Clamp(Mathf.FloorToInt(input.pixel_xy.y), 0, FrozenGate.Height - 1);
+                        Color32 pixel = texture.GetPixel(x, y);
+                        int uint24 = pixel.r + 256 * pixel.g + 65536 * pixel.b;
+                        input.rendered_label_pixel_xy = new Vector2(x, y);
+                        if (stream == "head_semantic_uint24") input.rendered_semantic_uint24 = uint24;
+                        else input.rendered_persistent_instance_uint24 = uint24;
+                    }
+                }
                 File.WriteAllBytes(path, texture.EncodeToPNG());
             }
             finally
@@ -679,34 +995,149 @@ namespace ProceduralSceneGate
         private static EventVisibilityInput[] EventVisibilityInputs(GateContext context)
         {
             var result = new List<EventVisibilityInput>();
-            AddVisibilityInput(result, context.HeadCamera, "right_palm", context.RightPalm ? context.RightPalm.position : Vector3.zero, context.RightPalm);
-            AddVisibilityInput(result, context.HeadCamera, "left_palm", context.LeftPalm ? context.LeftPalm.position : Vector3.zero, context.LeftPalm);
+            AddVisibilityInput(result, context.HeadCamera, "right_palm", context.RightPalm ? context.RightPalm.position : Vector3.zero, context.RightPalm, null, null);
+            AddVisibilityInput(result, context.HeadCamera, "left_palm", context.LeftPalm ? context.LeftPalm.position : Vector3.zero, context.LeftPalm, null, null);
             bool targetActive = context.TargetBody && context.TargetBody.gameObject.activeInHierarchy;
             AddVisibilityInput(
                 result,
                 context.HeadCamera,
                 "target_center_of_mass",
                 targetActive ? context.TargetBody.worldCenterOfMass : Vector3.zero,
-                targetActive
+                targetActive,
+                null,
+                null
             );
             foreach (ContactTruth contact in context.Contacts.Where(value => value.physicsStep == context.PhysicsStep))
-                AddVisibilityInput(result, context.HeadCamera, "physx_contact_point_input", contact.pointWorldM, true);
+                AddVisibilityInput(
+                    result,
+                    context.HeadCamera,
+                    "physx_contact_point_input",
+                    contact.pointWorldM,
+                    true,
+                    contact.colliderA,
+                    contact.colliderB
+                );
             return result.ToArray();
         }
 
-        private static void AddVisibilityInput(List<EventVisibilityInput> rows, Camera camera, string id, Vector3 world, bool available)
+        private static void AddVisibilityInput(
+            List<EventVisibilityInput> rows,
+            Camera camera,
+            string id,
+            Vector3 world,
+            bool available,
+            string expectedColliderA,
+            string expectedColliderB)
         {
-            Vector3 viewport = available ? camera.WorldToViewportPoint(world) : new Vector3(float.NaN, float.NaN, float.NaN);
+            Vector3 viewport = available ? camera.WorldToViewportPoint(world) : new Vector3(-1f, -1f, -1f);
+            ContactProjectionResult projection = available
+                ? ProjectToFirstVisibleSurface(camera, world, expectedColliderA, expectedColliderB)
+                : ContactProjectionResult.Unavailable();
+            bool inFrustum = available && viewport.z > camera.nearClipPlane
+                && viewport.x >= 0f && viewport.x <= 1f && viewport.y >= 0f && viewport.y <= 1f;
             rows.Add(new EventVisibilityInput
             {
                 input_id = id,
                 available = available,
                 point_world_m = world,
                 viewport_xyz = viewport,
-                geometric_frustum_input = available && viewport.z > camera.nearClipPlane
-                    && viewport.x >= 0f && viewport.x <= 1f && viewport.y >= 0f && viewport.y <= 1f,
-                provenance = "derived projection input; occlusion, anatomy, clipping, and visual coherence require decoded-frame review"
+                pixel_xy = new Vector2(viewport.x * FrozenGate.Width, viewport.y * FrozenGate.Height),
+                geometric_frustum_input = inFrustum,
+                ray_occluded = projection.occluded,
+                first_visible_collider_id = projection.first_visible_collider_id,
+                first_visible_renderer_path = projection.first_visible_renderer_path,
+                first_visible_semantic_uint24 = 0,
+                first_visible_persistent_instance_uint24 = 0,
+                expected_contact_collider_a = expectedColliderA,
+                expected_contact_collider_b = expectedColliderB,
+                contact_projects_to_expected_visible_surface = false,
+                contact_visible_in_registered_frame = false,
+                contact_projection_method = "actual semantic/instance uint24 values decoded at the projected contact pixel after both frozen replacement-shader renders; Physics.RaycastAll supplies only the expected collider surface check",
+                provenance = "rendered-pixel measured labels plus same-state PhysX contact and ray surface; producer booleans and renderer ancestry cannot establish label identity"
             });
+        }
+
+        private static ContactProjectionResult ProjectToFirstVisibleSurface(
+            Camera camera,
+            Vector3 world,
+            string expectedColliderA,
+            string expectedColliderB)
+        {
+            Vector3 origin = camera.transform.position;
+            Vector3 delta = world - origin;
+            float distance = delta.magnitude;
+            if (distance <= 1e-7f) return ContactProjectionResult.Unavailable();
+            RaycastHit[] hits = Physics.RaycastAll(origin, delta / distance, distance + 0.003f, camera.cullingMask, QueryTriggerInteraction.Ignore)
+                .OrderBy(value => value.distance)
+                .ToArray();
+            if (hits.Length == 0)
+            {
+                return new ContactProjectionResult
+                {
+                    occluded = false,
+                    expected_surface_match = string.IsNullOrEmpty(expectedColliderA) && string.IsNullOrEmpty(expectedColliderB),
+                    first_visible_collider_id = "NO_RENDERED_PHYSICS_SURFACE",
+                    first_visible_renderer_path = "UNAVAILABLE"
+                };
+            }
+
+            Collider collider = hits[0].collider;
+            string colliderId = StableTransformPath(collider.transform);
+            bool expected = string.IsNullOrEmpty(expectedColliderA) && string.IsNullOrEmpty(expectedColliderB)
+                || StringComparer.Ordinal.Equals(colliderId, expectedColliderA)
+                || StringComparer.Ordinal.Equals(colliderId, expectedColliderB);
+            return new ContactProjectionResult
+            {
+                occluded = !expected && (!string.IsNullOrEmpty(expectedColliderA) || !string.IsNullOrEmpty(expectedColliderB)),
+                expected_surface_match = expected,
+                first_visible_collider_id = colliderId,
+                first_visible_renderer_path = "RESOLVED_FROM_RENDERED_LABEL_PIXEL_NOT_COLLIDER_ANCESTRY"
+            };
+        }
+
+        private static void FinalizeRenderedLabelSamples(
+            IEnumerable<EventVisibilityInput> inputs,
+            GateContext context,
+            IReadOnlyList<CaptureLabelBinding> bindings)
+        {
+            foreach (EventVisibilityInput input in inputs)
+            {
+                CaptureLabelBinding sampled = bindings.FirstOrDefault(value =>
+                    value.semantic_uint24 == input.rendered_semantic_uint24
+                    && value.persistent_instance_uint24 == input.rendered_persistent_instance_uint24);
+                bool sampledIdentity = sampled != null && input.rendered_semantic_uint24 > 0
+                    && input.rendered_persistent_instance_uint24 > 0;
+                bool expectedIdentity = sampledIdentity && SampledBindingMatchesExpectedContact(
+                    sampled, input.expected_contact_collider_a, input.expected_contact_collider_b, context);
+                input.first_visible_semantic_uint24 = input.rendered_semantic_uint24;
+                input.first_visible_persistent_instance_uint24 = input.rendered_persistent_instance_uint24;
+                input.first_visible_renderer_path = sampled != null ? sampled.renderer_path : "UNRESOLVED_RENDERED_LABEL_PAIR";
+                input.rendered_label_sample_complete = sampledIdentity;
+                input.contact_projects_to_expected_visible_surface = expectedIdentity
+                    && !input.ray_occluded && input.first_visible_collider_id != "NO_RENDERED_PHYSICS_SURFACE";
+                input.contact_visible_in_registered_frame = input.geometric_frustum_input
+                    && input.contact_projects_to_expected_visible_surface;
+            }
+        }
+
+        private static bool SampledBindingMatchesExpectedContact(
+            CaptureLabelBinding binding,
+            string expectedColliderA,
+            string expectedColliderB,
+            GateContext context)
+        {
+            string expected = ((expectedColliderA ?? "") + " " + (expectedColliderB ?? "")).ToLowerInvariant();
+            bool expectsHand = expected.Contains("left") || expected.Contains("right")
+                || expected.Contains("thumb") || expected.Contains("index") || expected.Contains("middle")
+                || expected.Contains("ring") || expected.Contains("little") || expected.Contains("pinky")
+                || expected.Contains("finger") || expected.Contains("palm");
+            bool weightedSkin = StringComparer.Ordinal.Equals(binding.semantic_name, "body_skin")
+                && binding.renderer_path.StartsWith(StableTransformPath(context.AvatarRoot.transform), StringComparison.Ordinal);
+            bool expectsTarget = !string.IsNullOrWhiteSpace(context.TargetId)
+                && expected.IndexOf(context.TargetId, StringComparison.OrdinalIgnoreCase) >= 0;
+            bool targetIdentity = expectsTarget
+                && StringComparer.Ordinal.Equals(binding.persistent_instance_name, context.TargetId);
+            return expectsHand ? weightedSkin : targetIdentity;
         }
 
         private static float CameraRollDeg(Transform camera, Transform head)
@@ -718,23 +1149,26 @@ namespace ProceduralSceneGate
             return Vector3.SignedAngle(referenceUp, Vector3.ProjectOnPlane(camera.up, forward), forward);
         }
 
-        private static CameraClearanceResult MeasureCameraClearance(GateContext context)
+        private CameraClearanceResult MeasureSweptCameraClearance(GateContext context)
         {
-            Vector3[] frustum = new Vector3[4];
-            context.HeadCamera.CalculateFrustumCorners(
-                new Rect(0f, 0f, 1f, 1f),
-                context.HeadCamera.nearClipPlane,
-                Camera.MonoOrStereoscopicEye.Mono,
-                frustum
-            );
-            var probes = new List<Vector3>
+            Camera camera = context.HeadCamera;
+            Vector3 currentPosition = camera.transform.position;
+            Quaternion currentRotation = camera.transform.rotation;
+            Vector3 startPosition = hasPreviousClearancePose ? previousClearancePosition : currentPosition;
+            Quaternion startRotation = hasPreviousClearancePose ? previousClearanceRotation : currentRotation;
+            var probes = new List<Vector3>();
+            for (int interval = 0; interval <= SweptClearanceIntervals; interval++)
             {
-                context.HeadCamera.transform.position,
-                context.HeadCamera.transform.TransformPoint(new Vector3(0f, 0f, context.HeadCamera.nearClipPlane))
-            };
-            probes.AddRange(frustum.Select(context.HeadCamera.transform.TransformPoint));
+                float t = interval / (float)SweptClearanceIntervals;
+                Vector3 position = Vector3.Lerp(startPosition, currentPosition, t);
+                Quaternion rotation = Quaternion.Slerp(startRotation, currentRotation, t);
+                probes.AddRange(CameraClearanceProbes(camera, position, rotation));
+            }
 
             float minimum = float.PositiveInfinity;
+            float sceneColliderMinimum = float.PositiveInfinity;
+            string minimumAvatarRendererId = "NONE";
+            string minimumSceneColliderId = "NONE";
             bool insideBody = false;
             int trianglesTested = 0;
             foreach (Renderer renderer in context.AvatarRoot.GetComponentsInChildren<Renderer>(true)
@@ -746,9 +1180,16 @@ namespace ProceduralSceneGate
                 {
                     trianglesTested += snapshot.triangles.Length / 3;
                     foreach (Vector3 probe in probes)
-                        minimum = Mathf.Min(minimum, snapshot.DistanceToSurface(probe));
-                    if (InferredSemanticName(renderer, context) == "body_skin")
-                        insideBody |= snapshot.ContainsByOddEvenRay(probes[0]);
+                    {
+                        float distance = snapshot.DistanceToSurface(probe);
+                        if (distance < minimum)
+                        {
+                            minimum = distance;
+                            minimumAvatarRendererId = StableTransformPath(renderer.transform);
+                        }
+                    }
+                    foreach (Vector3 probe in probes)
+                        insideBody |= snapshot.ContainsByOddEvenRay(probe);
                 }
                 finally
                 {
@@ -757,13 +1198,160 @@ namespace ProceduralSceneGate
             }
             if (float.IsPositiveInfinity(minimum))
                 throw new InvalidOperationException("camera clearance unavailable: avatar has no readable rendered triangles");
+
+            foreach (Collider collider in UnityEngine.Object.FindObjectsByType<Collider>(FindObjectsSortMode.None)
+                         .Where(value => value != null && value.enabled && value.gameObject.activeInHierarchy
+                             && !value.isTrigger
+                             && !context.AvatarColliders.Contains(value)
+                             && !value.transform.IsChildOf(context.AvatarRoot.transform)))
+            {
+                foreach (Vector3 probe in probes)
+                {
+                    Vector3 nearest = collider.ClosestPoint(probe);
+                    float distance = Vector3.Distance(probe, nearest);
+                    // A non-convex MeshCollider can return the query point even
+                    // when it lies demonstrably outside the collider's world
+                    // AABB. The AABB distance is a conservative lower bound on
+                    // distance to every collider surface.
+                    float boundsLowerBound = Mathf.Sqrt(collider.bounds.SqrDistance(probe));
+                    distance = Mathf.Max(distance, boundsLowerBound);
+                    if (distance < sceneColliderMinimum)
+                    {
+                        sceneColliderMinimum = distance;
+                        minimumSceneColliderId = StableTransformPath(collider.transform);
+                    }
+                    if (distance <= 1e-7f) insideBody = true;
+                }
+            }
+            float combinedMinimum = float.IsPositiveInfinity(sceneColliderMinimum)
+                ? minimum : Mathf.Min(minimum, sceneColliderMinimum);
+            if (float.IsPositiveInfinity(sceneColliderMinimum)) sceneColliderMinimum = -1f;
+            previousClearancePosition = currentPosition;
+            previousClearanceRotation = currentRotation;
+            hasPreviousClearancePose = true;
             return new CameraClearanceResult
             {
-                minimum_surface_distance_m = minimum,
+                minimum_surface_distance_m = combinedMinimum,
+                minimum_avatar_surface_distance_m = minimum,
+                minimum_scene_collider_distance_m = sceneColliderMinimum,
+                minimum_avatar_renderer_id = minimumAvatarRendererId,
+                minimum_scene_collider_id = minimumSceneColliderId,
                 inside_body_mesh = insideBody,
                 triangles_tested = trianglesTested,
-                method = "minimum exact point-to-rendered-triangle distance from optical origin and near-plane center/corners; odd-even ray rejects origin inside weighted body"
+                sweep_samples = probes.Count,
+                sweep_intervals = SweptClearanceIntervals,
+                method = "swept bind/prior-to-current optical origin plus near-plane center/corners; exact point-to-rendered-triangle distance and odd-even containment for skin/hair/garments, plus Collider.ClosestPoint for furniture/support/objects"
             };
+        }
+
+        private static Vector3[] CameraClearanceProbes(Camera camera, Vector3 position, Quaternion rotation)
+        {
+            Vector3[] frustum = new Vector3[4];
+            camera.CalculateFrustumCorners(
+                new Rect(0f, 0f, 1f, 1f),
+                camera.nearClipPlane,
+                Camera.MonoOrStereoscopicEye.Mono,
+                frustum
+            );
+            var probes = new Vector3[6];
+            probes[0] = position;
+            probes[1] = position + rotation * new Vector3(0f, 0f, camera.nearClipPlane);
+            for (int index = 0; index < frustum.Length; index++) probes[index + 2] = position + rotation * frustum[index];
+            return probes;
+        }
+
+        private static OcclusionResult ProspectivelyMeasureOcclusion(GateContext context, Vector3 origin, Vector3 endpoint)
+        {
+            Vector3 delta = endpoint - origin;
+            float distance = delta.magnitude;
+            if (distance <= 1e-6f) return new OcclusionResult(false, "NONE");
+            foreach (RaycastHit hit in Physics.RaycastAll(origin, delta / distance, distance, ~0, QueryTriggerInteraction.Ignore)
+                         .OrderBy(value => value.distance))
+            {
+                if (context.TargetBody && hit.transform.IsChildOf(context.TargetBody.transform))
+                    continue; // the free target occupies each predicted manipulation endpoint
+                Bounds expanded = hit.collider.bounds;
+                expanded.Expand(0.006f);
+                if (expanded.Contains(endpoint))
+                    continue; // endpoint hand/destination geometry is not an occluder
+                if (hit.distance < distance - 0.003f)
+                    return new OcclusionResult(true, StableTransformPath(hit.collider.transform));
+            }
+            return new OcclusionResult(false, "NONE");
+        }
+
+        private static Collider FindInitialSupportBelow(Bounds targetBounds, GameObject target)
+        {
+            return UnityEngine.Object.FindObjectsByType<Collider>(FindObjectsSortMode.None)
+                .Where(value => value != null && value.enabled && value.gameObject.activeInHierarchy
+                    && value.gameObject != target && !value.transform.IsChildOf(target.transform)
+                    && value.bounds.max.y <= targetBounds.min.y + 0.01f
+                    && Mathf.Abs(value.bounds.center.x - targetBounds.center.x) <= value.bounds.extents.x + targetBounds.extents.x
+                    && Mathf.Abs(value.bounds.center.z - targetBounds.center.z) <= value.bounds.extents.z + targetBounds.extents.z)
+                .OrderBy(value => Mathf.Abs(targetBounds.min.y - value.bounds.max.y))
+                .FirstOrDefault();
+        }
+
+        private static Bounds CombinedColliderBounds(GameObject root)
+        {
+            Collider[] colliders = root.GetComponentsInChildren<Collider>(true);
+            if (colliders.Length == 0)
+                throw new InvalidOperationException("milestone object has no collider bounds: " + root.name);
+            Bounds bounds = colliders[0].bounds;
+            for (int index = 1; index < colliders.Length; index++) bounds.Encapsulate(colliders[index].bounds);
+            return bounds;
+        }
+
+        private static Bounds CombinedRendererOrColliderBounds(GameObject root)
+        {
+            Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
+            if (renderers.Length > 0)
+            {
+                Bounds bounds = renderers[0].bounds;
+                for (int index = 1; index < renderers.Length; index++) bounds.Encapsulate(renderers[index].bounds);
+                return bounds;
+            }
+            return CombinedColliderBounds(root);
+        }
+
+        private static Renderer ClosestRenderer(Transform colliderTransform)
+        {
+            Renderer renderer = colliderTransform.GetComponent<Renderer>();
+            if (renderer) return renderer;
+            renderer = colliderTransform.GetComponentInChildren<Renderer>(true);
+            if (renderer) return renderer;
+            for (Transform cursor = colliderTransform.parent; cursor != null; cursor = cursor.parent)
+            {
+                renderer = cursor.GetComponent<Renderer>();
+                if (renderer) return renderer;
+                renderer = cursor.GetComponentInChildren<Renderer>(true);
+                if (renderer) return renderer;
+            }
+            return null;
+        }
+
+        private static bool IsChildOrSelf(Transform child, Transform ancestor)
+        {
+            return child != null && ancestor != null && (child == ancestor || child.IsChildOf(ancestor));
+        }
+
+        private static string MilestoneGeometrySha256(
+            GateContext context,
+            IEnumerable<MilestoneViewAnchor> anchors,
+            Vector3 origin,
+            Quaternion virtualRotation)
+        {
+            var builder = new StringBuilder();
+            builder.Append(context.EpisodeId).Append('|').Append(context.RoomFamily).Append('|');
+            AppendVector(builder, origin);
+            AppendQuaternion(builder, virtualRotation);
+            foreach (MilestoneViewAnchor anchor in anchors.OrderBy(value => value.event_id, StringComparer.Ordinal))
+            {
+                builder.Append(anchor.event_id).Append('|').Append(anchor.provenance).Append('|');
+                AppendVector(builder, anchor.point_world_m);
+            }
+            using (SHA256 sha = SHA256.Create())
+                return Hex(sha.ComputeHash(Encoding.UTF8.GetBytes(builder.ToString())));
         }
 
         private static string AuthorityStateSha256(GateContext context)
@@ -1001,6 +1589,53 @@ namespace ProceduralSceneGate
             {
                 return position == other.position && rotation == other.rotation
                     && localPosition == other.localPosition && localRotation == other.localRotation;
+            }
+        }
+
+        private readonly struct MilestoneViewAnchor
+        {
+            public readonly string event_id;
+            public readonly Vector3 point_world_m;
+            public readonly string provenance;
+
+            public MilestoneViewAnchor(string eventId, Vector3 pointWorldM, string source)
+            {
+                event_id = eventId;
+                point_world_m = pointWorldM;
+                provenance = source;
+            }
+        }
+
+        private readonly struct OcclusionResult
+        {
+            public readonly bool occluded;
+            public readonly string first_blocker_id;
+
+            public OcclusionResult(bool isOccluded, string blocker)
+            {
+                occluded = isOccluded;
+                first_blocker_id = blocker;
+            }
+        }
+
+        private struct ContactProjectionResult
+        {
+            public bool occluded;
+            public bool expected_surface_match;
+            public string first_visible_collider_id;
+            public string first_visible_renderer_path;
+            public int semantic_uint24;
+            public int persistent_instance_uint24;
+
+            public static ContactProjectionResult Unavailable()
+            {
+                return new ContactProjectionResult
+                {
+                    occluded = false,
+                    expected_surface_match = false,
+                    first_visible_collider_id = "UNAVAILABLE",
+                    first_visible_renderer_path = "UNAVAILABLE"
+                };
             }
         }
 
@@ -1305,7 +1940,22 @@ namespace ProceduralSceneGate
         public bool available;
         public Vector3 point_world_m;
         public Vector3 viewport_xyz;
+        public Vector2 pixel_xy;
+        public Vector2 rendered_label_pixel_xy;
+        public int rendered_semantic_uint24;
+        public int rendered_persistent_instance_uint24;
+        public bool rendered_label_sample_complete;
         public bool geometric_frustum_input;
+        public bool ray_occluded;
+        public string first_visible_collider_id;
+        public string first_visible_renderer_path;
+        public int first_visible_semantic_uint24;
+        public int first_visible_persistent_instance_uint24;
+        public string expected_contact_collider_a;
+        public string expected_contact_collider_b;
+        public bool contact_projects_to_expected_visible_surface;
+        public bool contact_visible_in_registered_frame;
+        public string contact_projection_method;
         public string provenance;
     }
 
@@ -1339,6 +1989,9 @@ namespace ProceduralSceneGate
         public string intrinsics_provenance;
         public float clearance_m;
         public bool clearance_inside_body_mesh;
+        public float swept_clearance_m;
+        public int swept_clearance_samples;
+        public float swept_clearance_scene_collider_m;
         public string clearance_method;
         public float optical_vs_face_forward_deg;
         public float roll_deg;
@@ -1355,6 +2008,49 @@ namespace ProceduralSceneGate
         public int overlay_qa_penetration_proxy_count;
         public bool overlay_is_hero;
         public bool overlay_contains_labeled_qa_proxies;
+    }
+
+    [Serializable] public sealed class RegisteredContactProjectionRecord
+    {
+        public int render_frame;
+        public int physics_step;
+        public Vector3 physical_contact_point_world_m;
+        public string expected_contact_collider_a;
+        public string expected_contact_collider_b;
+        public Vector2 pixel_xy;
+        public string first_visible_collider_id;
+        public string first_visible_renderer_path;
+        public int first_visible_semantic_uint24;
+        public int first_visible_persistent_instance_uint24;
+        public bool contact_projects_to_expected_visible_surface;
+        public bool contact_visible_in_registered_frame;
+        public string method;
+        public string provenance;
+    }
+
+    [Serializable] public sealed class RegisteredContactProjectionReport
+    {
+        public string schema;
+        public string episode_id;
+        public string source_capture_ledger;
+        public string source_capture_ledger_sha256;
+        public RegisteredContactProjectionRecord[] records;
+        public string provenance;
+    }
+
+    [Serializable] public sealed class RegisteredVisualMeasurements
+    {
+        public string schema;
+        public string episode_id;
+        public string source_capture_ledger;
+        public string source_capture_ledger_sha256;
+        public string registered_contact_projection;
+        public string registered_contact_projection_sha256;
+        public bool measured_capture_evidence_only;
+        public bool direct_decoded_frame_review_performed;
+        public int registered_projection_record_count;
+        public string measurement_scope;
+        public string provenance;
     }
 
     [Serializable] public sealed class CaptureLabelBinding
@@ -1416,6 +2112,11 @@ namespace ProceduralSceneGate
         public string label_manifest;
         public string frame_ledger;
         public string[] stream_roots;
+        public FovQualificationReceipt fov_qualification;
+        public string fov_qualification_file;
+        public string fov_qualification_sha256;
+        public float selected_vertical_fov_deg;
+        public string fov_freeze_rule;
         public float minimum_clearance_m;
         public float maximum_optical_vs_face_forward_deg;
         public float maximum_abs_roll_deg;
@@ -1430,9 +2131,54 @@ namespace ProceduralSceneGate
     [Serializable] public sealed class CameraClearanceResult
     {
         public float minimum_surface_distance_m;
+        public float minimum_avatar_surface_distance_m;
+        public float minimum_scene_collider_distance_m;
+        public string minimum_avatar_renderer_id;
+        public string minimum_scene_collider_id;
         public bool inside_body_mesh;
         public int triangles_tested;
+        public int sweep_samples;
+        public int sweep_intervals;
         public string method;
+    }
+
+    [Serializable] public sealed class FovQualificationReceipt
+    {
+        public string schema;
+        public float[] auditioned_vertical_fov_deg;
+        public float selected_vertical_fov_deg;
+        public string selection_rule;
+        public string same_prerun_geometry_sha256;
+        public string same_prerun_geometry_trace_sha256;
+        public string prerun_trace_definition;
+        public Vector3 predicted_task_view_axis_world;
+        public bool virtual_pose_applied_to_camera;
+        public bool camera_mount_changed_during_audition;
+        public FovCandidateReceipt[] candidates;
+        public bool geometric_prediction_is_visual_pass_evidence;
+        public bool qualification_pass;
+        public string failure_reason;
+    }
+
+    [Serializable] public sealed class FovCandidateReceipt
+    {
+        public float vertical_fov_deg;
+        public string same_prerun_geometry_sha256;
+        public string same_prerun_geometry_trace_sha256;
+        public bool all_required_events_inspectable;
+        public MilestoneCandidateResult[] milestone_results;
+        public string provenance;
+    }
+
+    [Serializable] public sealed class MilestoneCandidateResult
+    {
+        public string event_id;
+        public Vector3 point_world_m;
+        public Vector3 predicted_viewport_xyz;
+        public bool inside_safe_viewport;
+        public bool occluded;
+        public string first_blocker_id;
+        public string anchor_provenance;
     }
 
     [Serializable] public sealed class CameraMotionSample

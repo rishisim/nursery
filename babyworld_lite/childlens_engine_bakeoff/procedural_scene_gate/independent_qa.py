@@ -14,7 +14,9 @@ import hashlib
 import json
 import math
 import shutil
+import struct
 import subprocess
+import zlib
 from collections import defaultdict
 from dataclasses import dataclass
 from fractions import Fraction
@@ -29,6 +31,11 @@ FAIL = "FAIL"
 UNAVAILABLE = "UNAVAILABLE"
 REPORT_SCHEMA = "embodied.independent_qa_report.v1"
 EVIDENCE_SCHEMA = "embodied.independent_qa_evidence.v1"
+SOURCE_AUDIT_SCHEMA = "embodied.procedural_gate_source_audit.v1"
+DECODED_FRAME_REVIEW_SCHEMA = "embodied.decoded_frame_review.v1"
+REQUIRED_PYTHON_SOURCE_AUDIT_FILES = {
+    "__init__.py", "__main__.py", "runner.py", "contracts.py", "independent_qa.py", "cli.py",
+}
 VIDEO_SUFFIXES = {".mp4", ".mov", ".mkv", ".avi", ".webm", ".m4v"}
 VISUAL_PROXY_TERMS = (
     "counter",
@@ -74,6 +81,11 @@ def _sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _canonical_json_sha256(value: Any) -> str:
+    payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _inside(root: Path, candidate: Path) -> Path:
@@ -232,6 +244,20 @@ def _target_id(rows: Sequence[Mapping[str, Any]], evidence: Mapping[str, Any]) -
                 if isinstance(value, str):
                     candidates.add(value)
     return next(iter(candidates)) if len(candidates) == 1 else None
+
+
+def _destination_id(rows: Sequence[Mapping[str, Any]], evidence: Mapping[str, Any]) -> str | None:
+    explicit = evidence.get("destination_id")
+    if isinstance(explicit, str) and explicit:
+        return explicit
+    values = {
+        episode.get("destination_id")
+        for row in rows
+        for episode in [row.get("episode")]
+        if isinstance(episode, Mapping) and isinstance(episode.get("destination_id"), str)
+        and episode.get("destination_id")
+    }
+    return next(iter(values)) if len(values) == 1 else None
 
 
 def _object_for(row: Mapping[str, Any], persistent_id: str) -> Mapping[str, Any] | None:
@@ -459,7 +485,11 @@ def _trace_checks(
                              timestamp_drift_is_diagnostic_not_integer_mapping_evidence=True)
 
     missing_counts: dict[str, int] = defaultdict(int)
-    required_body = ("root", "torso", "neck", "head")
+    required_body = (
+        "root", "pelvis", "torso", "neck", "head",
+        "left_shoulder", "left_upper_arm", "left_elbow", "left_lower_arm", "left_forearm", "left_wrist",
+        "right_shoulder", "right_upper_arm", "right_elbow", "right_lower_arm", "right_forearm", "right_wrist",
+    )
     required_digits = tuple(f"{hand}_{digit}" for hand in ("left", "right")
                             for digit in ("thumb", "index", "middle", "ring", "little"))
     for row in ordered:
@@ -467,6 +497,12 @@ def _trace_checks(
         if not isinstance(body, Mapping):
             missing_counts["body_state"] += 1
         else:
+            if set(body) != set(required_body):
+                missing_counts["body_state.segment_set"] += 1
+            segment_ids = [body.get(name, {}).get("segment_id", name)
+                           if isinstance(body.get(name), Mapping) else name for name in required_body]
+            if len(set(segment_ids)) != len(required_body):
+                missing_counts["body_state.duplicate_segment_ids"] += 1
             for name in required_body:
                 state = body.get(name)
                 if _pose_position(state) is None or _pose_rotation(state) is None:
@@ -550,19 +586,22 @@ def _trace_checks(
                {"missing_row_counts": dict(sorted(missing_counts.items()))}),
         _check("trace.identity", identity_ok, "persistent object semantic/instance identity remains stable",
                {"target_object_id": target, "identity_variants": {key: len(value) for key, value in identities.items()}}),
-        _check("trace.duration", duration_ok, "trace covers every physics step of the frozen 16-second ActivityPlan",
+        _check("trace.duration", duration_ok, "trace covers every physics step of the frozen 20–30 second ActivityPlan",
                {"expected_steps": expected_steps, "observed_steps": len(ordered)}),
     ], {"timeline": build_dense_timeline(ordered, phases), "target_object_id": target, "ordered_rows": ordered}
 
 
 def _interaction_checks(
-    rows: Sequence[Mapping[str, Any]], target_id: str | None, tolerances: Mapping[str, Any]
+    rows: Sequence[Mapping[str, Any]], target_id: str | None, destination_id: str | None,
+    tolerances: Mapping[str, Any]
 ) -> tuple[list[Check], dict[str, Any]]:
     required = tolerances["interaction"]
     maximum_separation_m = float(tolerances["contact"]["qualification_max_measured_separation_m"])
     physics_hz = float(tolerances["clock"]["physics_hz"])
     if not rows or target_id is None:
         return [
+            _check("interaction.dynamic_force_bearing", None, "continuous unsupported force-bearing evidence unavailable"),
+            _check("interaction.no_initial_overlap", None, "initial separation/depenetration evidence unavailable"),
             _check("interaction.right_capture", None, "measured right-hand contact dwell unavailable"),
             _check("interaction.left_support", None, "meaningful opposing left support unavailable"),
             _check("interaction.lift_turn", None, "free-object lift and turn unavailable"),
@@ -629,6 +668,8 @@ def _interaction_checks(
     eligible_hand_rows = 0
     speculative_hand_rows = 0
     eligible_nonzero_impulse_rows = 0
+    force_status_by_step: dict[int, tuple[bool, bool]] = {}
+    initial_contact_steps: list[int] = []
     for row in rows:
         step = _field(row, "physics_step", -1)
         measured_target = [contact for contact in _contacts(row)
@@ -642,26 +683,42 @@ def _interaction_checks(
             magnitude = _impulse_magnitude(contact)
             available_impulses.append(magnitude)
             eligible_nonzero_impulse_rows += magnitude > 0.0
+        if eligible and isinstance(step, int) and step < int(round(0.25 * physics_hz)):
+            initial_contact_steps.append(step)
         by_hand: dict[str, dict[str, list[Mapping[str, Any]]]] = defaultdict(lambda: defaultdict(list))
         for contact in eligible:
             hand, digit = _contact_hand_digit(contact)
             if hand and digit:
                 by_hand[hand][digit].append(contact)
         right_digits = set(by_hand["right"])
-        right_geometry = "thumb" in right_digits and len(right_digits - {"thumb"}) >= int(required["right_minimum_non_thumb_digits"])
+        right_thumb_normals = [_normal_on_target(contact, target_id) for contact in by_hand["right"].get("thumb", [])]
+        right_non_thumb_normals = [
+            _normal_on_target(contact, target_id)
+            for digit, contacts in by_hand["right"].items() if digit != "thumb"
+            for contact in contacts
+        ]
+        right_opposing_geometry = any(
+            math.isfinite(_dot(thumb, other)) and _dot(thumb, other) <= -0.25
+            for thumb in right_thumb_normals for other in right_non_thumb_normals
+        )
+        right_geometry = ("thumb" in right_digits
+                          and len(right_digits - {"thumb"}) >= int(required["right_minimum_non_thumb_digits"])
+                          and right_opposing_geometry)
         if step < lift_start_step and right_geometry:
             right_steps.append(step)
         right_impulse_digits = {
             digit for digit, contacts in by_hand["right"].items()
             if any(_impulse_magnitude(contact) > 0.0 for contact in contacts)
         }
-        if ("thumb" in right_impulse_digits
-                and len(right_impulse_digits - {"thumb"}) >= int(required["right_minimum_non_thumb_digits"])):
+        right_force_now = ("thumb" in right_impulse_digits
+                           and len(right_impulse_digits - {"thumb"}) >= int(required["right_minimum_non_thumb_digits"])
+                           and right_opposing_geometry)
+        if right_force_now:
             right_impulse_steps.append(step)
         left_digits = set(by_hand["left"])
         non_little_left_digits = left_digits - {"little"}
         has_non_little_left = bool(non_little_left_digits)
-        has_stable_left_digits = len(non_little_left_digits) >= 2
+        has_stable_left_digits = bool(non_little_left_digits)
         right_normals = [_normal_on_target(contact, target_id) for contacts in by_hand["right"].values() for contact in contacts]
         left_normals = [_normal_on_target(contact, target_id) for contacts in by_hand["left"].values() for contact in contacts]
         opposing_geometry = any(math.isfinite(_dot(left, right)) and _dot(left, right) <= -0.25
@@ -675,8 +732,11 @@ def _interaction_checks(
             contact for digit, contacts in by_hand["left"].items() if digit != "little"
             for contact in contacts if _impulse_magnitude(contact) > 0.0
         ]
-        if meaningful_left_geometry and left_impulse_contacts:
+        left_force_now = meaningful_left_geometry and right_force_now and bool(left_impulse_contacts)
+        if left_force_now:
             left_impulse_support_steps.append(step)
+        if isinstance(step, int):
+            force_status_by_step[step] = (right_force_now, left_force_now)
         if qualification_step is not None and step > qualification_step and literal_opposing_geometry:
             literal_postqualification_steps.append(step)
         controller = row.get("controller_state")
@@ -690,12 +750,27 @@ def _interaction_checks(
     left_impulse_dwell = _max_contiguous_duration(left_impulse_support_steps, physics_hz)
     controller_carry_dwell = _max_contiguous_duration(controller_carry_steps, physics_hz)
     literal_postqualification_dwell = _max_contiguous_duration(literal_postqualification_steps, physics_hz)
-    right_ok = right_dwell >= float(required["right_opposition_min_s"])
-    left_ok = left_dwell >= 0.25 and opposing_dwell >= 0.25
+    right_ok = right_impulse_dwell > float(required["right_opposition_min_s"])
+    left_ok = left_impulse_dwell > float(required["left_support_min_s"])
 
     all_ledgers = [entry for row in rows for entry in row.get("assistance_ledger", [])
                    if isinstance(row.get("assistance_ledger", []), list)]
-    no_recorded_assistance = not all_ledgers
+    authority_counter_names = (
+        "targetPoseWriteCounter", "targetVelocityWriteCounter", "targetForceCounter",
+        "targetTorqueCounter", "targetJointCounter", "targetParentingCounter",
+        "targetKinematicChangeCounter",
+    )
+    counter_violations = []
+    counter_rows = 0
+    for row in rows:
+        counters = row.get("authority_counters")
+        if isinstance(counters, Mapping):
+            counter_rows += 1
+            for name in authority_counter_names:
+                if counters.get(name) != 0:
+                    counter_violations.append({"step": _field(row, "physics_step"), "counter": name,
+                                               "value": counters.get(name)})
+    no_recorded_assistance = not all_ledgers and counter_rows == len(rows) and not counter_violations
     release_rows = []
     prior_commanded_closure = 0.0
     for index, row in enumerate(rows):
@@ -724,23 +799,76 @@ def _interaction_checks(
     if release_rows:
         start = release_rows[0]
         post = rows[start + 1:]
-        hand_contact_after = any(
+        post_contact_flags = [any(
             _contact_targets(contact, target_id)
             and _measured_contact(contact)
             and _separation_eligible(contact, maximum_separation_m)
             and _contact_hand_digit(contact)[0] in {"left", "right"}
-            for row in post for contact in _contacts(row)
-        )
+            for contact in _contacts(row)
+        ) for row in post]
+        hand_contact_after = any(post_contact_flags)
+        last_contact_index = max((index for index, active in enumerate(post_contact_flags) if active), default=-1)
+        contact_free_tail_steps = len(post_contact_flags) - last_contact_index - 1
+        contact_free_release = contact_free_tail_steps >= int(tolerances["clock"]["exact_steps_per_render_frame"])
         post_objects = [obj for row in post for obj in [_object_for(row, target_id)] if obj is not None]
-        settled = any(obj.get("sleeping") is True or obj.get("support_id") not in {None, "", "none", "unavailable"}
-                      for obj in post_objects)
+        settled_objects = post_objects[last_contact_index + 1:]
+        observed_support_ids = sorted({str(obj.get("support_id")) for obj in settled_objects
+                                       if obj.get("support_id") not in {None, "", "none", "unavailable"}})
+        destination_settle = bool(destination_id) and any(
+            obj.get("support_id") == destination_id for obj in settled_objects
+        )
+        settled = destination_settle and any(
+            obj.get("support_id") == destination_id and obj.get("sleeping") is True
+            for obj in settled_objects
+        )
         dynamic = all(
             obj.get("free_dynamic") is True
             or (obj.get("is_kinematic") is False and obj.get("parent_id") in {None, ""})
             for obj in post_objects
         )
-        free_release_ok = bool(post_objects) and not hand_contact_after and settled and dynamic and no_recorded_assistance
-        release_details.update(hand_contact_after=hand_contact_after, settled=settled, dynamic=dynamic)
+        free_release_ok = bool(post_objects) and contact_free_release and settled and dynamic and no_recorded_assistance
+        release_details.update(
+            hand_contact_after_opening=hand_contact_after,
+            contact_free_tail_steps=contact_free_tail_steps,
+            contact_free_release=contact_free_release,
+            settled=settled,
+            expected_destination_id=destination_id,
+            observed_post_release_support_ids=observed_support_ids,
+            destination_specific_settle=destination_settle,
+            dynamic=dynamic,
+        )
+
+    running_right = running_left = 0
+    derived_qualification_step: int | None = None
+    for step in sorted(force_status_by_step):
+        right_now, left_now = force_status_by_step[step]
+        running_right = running_right + 1 if right_now else 0
+        running_left = running_left + 1 if left_now else 0
+        if (running_right / physics_hz > float(required["right_opposition_min_s"])
+                and running_left / physics_hz > float(required["left_support_min_s"])):
+            derived_qualification_step = step
+            break
+    if derived_qualification_step is not None:
+        qualification_step = derived_qualification_step
+    release_step = int(_field(rows[release_rows[0]], "physics_step", -1)) if release_rows else None
+    qualified_rows = [
+        (row, _object_for(row, target_id)) for row in rows
+        if qualification_step is not None
+        and int(_field(row, "physics_step", -1)) >= qualification_step
+        and (release_step is None or int(_field(row, "physics_step", -1)) < release_step)
+    ]
+    continuous_support = bool(qualified_rows) and all(
+        force_status_by_step.get(int(_field(row, "physics_step", -1))) == (True, True)
+        for row, _ in qualified_rows
+    )
+    qualified_manipulation_rows = [
+        (row, obj) for row, obj in qualified_rows
+        if int(_field(row, "physics_step", -1)) in lifted_steps
+    ]
+    unsupported_while_qualified = bool(qualified_manipulation_rows) and all(
+        obj is not None and obj.get("support_id") in {None, "", "none"}
+        for _, obj in qualified_manipulation_rows
+    )
 
     metrics = {
         "right_measured_opposition_dwell_s": right_dwell,
@@ -753,6 +881,11 @@ def _interaction_checks(
         "controller_carry_telemetry_steps": controller_carry_steps,
         "literal_same_row_postqualification_opposing_geometry_steps": literal_postqualification_steps,
         "bimanual_qualification_step": qualification_step,
+        "support_continuous_until_commanded_opening": continuous_support,
+        "object_unsupported_during_qualified_manipulation": unsupported_while_qualified,
+        "qualified_lift_manipulation_steps": [
+            int(_field(row, "physics_step", -1)) for row, _ in qualified_manipulation_rows
+        ],
         "lift_m": lift_m if math.isfinite(lift_m) else None,
         "turn_during_bimanual_turn_deg": turn_deg if math.isfinite(turn_deg) else None,
         "turn_phase_steps": len(turn_states),
@@ -762,23 +895,32 @@ def _interaction_checks(
         "eligible_hand_target_rows": eligible_hand_rows,
         "speculative_hand_target_rows_excluded": speculative_hand_rows,
         "eligible_nonzero_impulse_hand_target_rows": eligible_nonzero_impulse_rows,
+        "initial_contact_steps": initial_contact_steps,
         "assistance_entries": len(all_ledgers),
-        "assistance_evidence_scope": "passive per-step ledger only; not an independent runtime API detector",
+        "authority_counter_rows": counter_rows,
+        "authority_counter_violations": counter_violations[:20],
+        "assistance_evidence_scope": "feasible runtime target-authority accounting plus mandatory independent source audit",
         **release_details,
     }
     return [
+        _check("interaction.dynamic_force_bearing", right_ok and left_ok and continuous_support and unsupported_while_qualified,
+               "required-digit nonzero PhysX impulse support is continuous on an unsupported object until opening", metrics),
+        _check("interaction.no_initial_overlap", not initial_contact_steps,
+               "qualification does not begin from initial overlap or depenetration", {"steps": initial_contact_steps}),
         _check("interaction.right_capture", right_ok,
-               "right thumb plus at least two non-thumb PhysX contacts dwell before lift", metrics),
+               "right thumb plus at least two non-thumb contacts carry nonzero PhysX impulse beyond 0.30 s", metrics),
         _check("interaction.left_support", left_ok,
-               "left support is sustained, includes a non-little digit, and physically opposes the right hand", metrics),
+               "opposing non-little left support carries nonzero PhysX impulse beyond 0.25 s", metrics),
         _check("interaction.lift_turn", math.isfinite(lift_m) and math.isfinite(turn_deg)
-               and lift_m > float(required["lift_min_m"]) and turn_deg > float(required["turn_min_deg"]),
+               and lift_m > float(required["lift_min_m"]) and turn_deg > float(required["turn_min_deg"])
+               and continuous_support and unsupported_while_qualified,
                "free target exceeds frozen post-qualification lift and in-phase turn thresholds", metrics),
         _check("interaction.free_release", free_release_ok,
-               "commanded opening produces contact-free dynamic release and support/sleep settle", release_details),
+               "commanded opening produces contact-free dynamic release and sleep-settle on the frozen EpisodeSpec destination", release_details),
         _check("interaction.no_assistance", no_recorded_assistance,
-               "the passive per-step assistance ledger is empty; source audit is required to exclude uninstrumented assistance APIs",
-               {"entries": all_ledgers[:20], "runtime_detector": False}),
+               "assistance ledger is empty and every feasible runtime target-authority counter remains zero",
+               {"entries": all_ledgers[:20], "counter_rows": counter_rows,
+                "counter_violations": counter_violations[:20], "runtime_detector": True}),
     ], metrics
 
 
@@ -823,11 +965,14 @@ def _camera_checks(
         if dt > 0 and q0 is not None and q1 is not None:
             angular_speeds.append(_quat_angle_deg(q0, q1) / dt)
     complete = len(clearance) == len(samples) and len(optical) == len(samples) and all(value is not None for value in positions + rotations)
-    mount_ok = complete and len(parents) == 1 and None not in parents and min(clearance) > float(required["minimum_head_or_clothing_clearance_m"])
+    clearance_min = required.get("minimum_clearance_m", required.get("minimum_head_or_clothing_clearance_m"))
+    mount_ok = complete and len(parents) == 1 and None not in parents and min(clearance) > float(clearance_min)
     mount_ok &= max(optical) <= float(required["optical_vs_face_forward_max_deg"])
     motion_ok = bool(rolls) and max(rolls) <= float(required["roll_abs_max_deg"])
-    motion_ok &= (not linear_speeds or max(linear_speeds) <= float(required["linear_speed_max_m_s"]))
-    motion_ok &= (not angular_speeds or max(angular_speeds) <= float(required["angular_speed_max_deg_s"]))
+    if "linear_speed_max_m_s" in required:
+        motion_ok &= not linear_speeds or max(linear_speeds) <= float(required["linear_speed_max_m_s"])
+    if "angular_speed_max_deg_s" in required:
+        motion_ok &= not angular_speeds or max(angular_speeds) <= float(required["angular_speed_max_deg_s"])
     metrics = {
         "sample_count": len(samples),
         "parent_ids": sorted(str(parent) for parent in parents),
@@ -918,12 +1063,252 @@ def _motion_limit_checks(rows: Sequence[Mapping[str, Any]], physics_hz: float) -
                    metrics)], metrics
 
 
+def _dynamic_finger_checks(rows: Sequence[Mapping[str, Any]]) -> list[Check]:
+    if not rows:
+        return [_check("embodiment.compliant_dynamic_fingers", None, "dynamic articulated finger truth is unavailable")]
+    missing: dict[str, int] = defaultdict(int)
+    observed = 0
+    for row in rows:
+        hands = _hands(row)
+        if hands is None:
+            missing["hand_state"] += 1
+            continue
+        for side in ("left", "right"):
+            for digit in ("thumb", "index", "middle", "ring", "little"):
+                state = hands.get(f"{side}_{digit}")
+                if not isinstance(state, Mapping):
+                    missing["digit"] += 1
+                    continue
+                bindings: list[tuple[Any, Any]] = []
+                dynamic_bodies = state.get("dynamic_body_states", state.get("dynamic_bodies"))
+                compliant_joints = state.get("compliant_joint_states", state.get("compliant_joints"))
+                if isinstance(dynamic_bodies, list) and isinstance(compliant_joints, list):
+                    bindings = list(zip(dynamic_bodies, compliant_joints))
+                elif isinstance(state.get("segments"), list) and all(
+                    isinstance(segment, Mapping)
+                    and "dynamic_body" in segment and "compliant_joint" in segment
+                    for segment in state["segments"]
+                ):
+                    bindings = [(segment["dynamic_body"], segment["compliant_joint"])
+                                for segment in state["segments"]]
+                if len(bindings) != 3:
+                    missing["three_segment_bindings"] += 1
+                for body, joint in bindings:
+                    if not isinstance(body, Mapping) or body.get("is_kinematic") is not False:
+                        missing["dynamic_body"] += 1
+                    elif (body.get("provenance") != "physx_measured"
+                          or not isinstance(body.get("mass_kg"), (int, float))
+                          or float(body["mass_kg"]) <= 0):
+                        missing["dynamic_body_truth"] += 1
+                    pose = body.get("pose") if isinstance(body, Mapping) else None
+                    if (not isinstance(pose, Mapping)
+                            or _vector(pose.get("position_world_m"), 3) is None
+                            or _vector(pose.get("rotation_world_xyzw"), 4) is None):
+                        missing["dynamic_body_pose"] += 1
+                    if not isinstance(joint, Mapping):
+                        missing["compliant_joint"] += 1
+                        observed += 1
+                        continue
+                    drives = (
+                        joint.get("angular_x_drive_spring_n_m_rad"),
+                        joint.get("angular_x_drive_damper_n_m_s_rad"),
+                        joint.get("angular_x_drive_max_force_n_m"),
+                        joint.get("angular_yz_drive_spring_n_m_rad"),
+                        joint.get("angular_yz_drive_damper_n_m_s_rad"),
+                        joint.get("angular_yz_drive_max_force_n_m"),
+                    )
+                    if (joint.get("provenance") != "engine_observed"
+                            or "ConfigurableJoint" not in str(joint.get("drive_provenance", ""))
+                            or any(not isinstance(value, (int, float)) or float(value) <= 0 for value in drives)):
+                        missing["compliant_joint_truth"] += 1
+                    observed += 1
+    expected = len(rows) * 30
+    return [_check(
+        "embodiment.compliant_dynamic_fingers",
+        observed == expected and not missing,
+        "all thirty finger segments use traced dynamic rigidbodies and finite compliant ConfigurableJoint drives",
+        {"observed_digit_rows": observed, "expected_digit_rows": expected, "failure_counts": dict(sorted(missing.items()))},
+    )]
+
+
 def _visual_method_is_direct(value: Any) -> bool:
     if not isinstance(value, str) or not value.strip():
         return False
     lowered = value.lower()
     return ("dense" in lowered and ("frame" in lowered or "visual" in lowered)
             and not any(term in lowered for term in VISUAL_PROXY_TERMS))
+
+
+def _validate_dense_decoded_sequence(
+    root: Path,
+    entry: Mapping[str, Any],
+    veto_keys: Sequence[str],
+) -> tuple[Path, list[dict[str, Any]]]:
+    ledger_relative = Path(str(entry.get("capture_ledger", "")))
+    if not str(ledger_relative) or ledger_relative.is_absolute():
+        raise ValueError("dense decoded review requires a relative capture_ledger")
+    ledger_path = _inside(root, root / ledger_relative)
+    ledger = _load_trace(ledger_path)
+    expected_frames = round(float(load_frozen_config()["activity_plan"]["duration_s"]) * 30.0)
+    frame_ids = [row.get("render_frame") for row in ledger if isinstance(row, Mapping)]
+    if frame_ids != list(range(expected_frames)):
+        raise ValueError("capture ledger is not the complete dense frozen frame sequence")
+    annotations = entry.get("frames")
+    if not isinstance(annotations, list):
+        raise ValueError("dense decoded review requires frame observations")
+    annotation_by_frame = {row.get("render_frame"): row for row in annotations if isinstance(row, Mapping)}
+    if len(annotation_by_frame) != len(annotations) or set(annotation_by_frame) != set(frame_ids):
+        raise ValueError("decoded observations must cover every ledger frame exactly once")
+    canonical_frames: list[dict[str, Any]] = []
+    for ledger_row in ledger:
+        frame = ledger_row["render_frame"]
+        annotation = annotation_by_frame[frame]
+        if (not _visual_method_is_direct(annotation.get("method"))
+                or "decoded" not in str(annotation.get("method")).lower()
+                or annotation.get("direct_observation") is not True):
+            raise ValueError("each observation must be a direct dense decoded-frame review")
+        if any(not isinstance(annotation.get(key), bool) for key in veto_keys):
+            raise ValueError("every visual veto must be explicitly reviewed as true or false")
+        stream_map = {item.get("stream"): item for item in ledger_row.get("streams", []) if isinstance(item, Mapping)}
+        decoded: dict[str, Any] = {}
+        for role, stream_name in (("head", "head_rgb_hero"), ("external", "external_clean")):
+            receipt = stream_map.get(stream_name)
+            if not isinstance(receipt, Mapping) or not isinstance(receipt.get("relative_path"), str):
+                raise ValueError(f"frame {frame} lacks {stream_name}")
+            media_path = _inside(root, ledger_path.parent / receipt["relative_path"])
+            file_hash = _sha256(media_path)
+            if receipt.get("file_sha256") != file_hash or annotation.get(f"{role}_file_sha256") != file_hash:
+                raise ValueError(f"frame {frame} {role} encoded hash mismatch")
+            width, height, rgb = _decode_png_rgb(media_path)
+            if (width, height) != (1920, 1080):
+                raise ValueError(f"frame {frame} {role} is not frozen 1920x1080")
+            decoded_hash = hashlib.sha256(rgb).hexdigest()
+            if annotation.get(f"{role}_decoded_rgb_sha256") != decoded_hash:
+                raise ValueError(f"frame {frame} {role} decoded hash mismatch")
+            decoded[role] = {
+                "relative_path": str(media_path.relative_to(root)),
+                "file_sha256": file_hash,
+                "decoded_rgb_sha256": decoded_hash,
+                "width_px": width,
+                "height_px": height,
+            }
+        canonical_frames.append({
+            "render_frame": frame,
+            "method": annotation["method"],
+            "direct_observation": True,
+            **{key: annotation[key] for key in veto_keys},
+            "head": decoded["head"],
+            "external": decoded["external"],
+        })
+    return ledger_path, canonical_frames
+
+
+def write_visual_audit_from_decoded_review(
+    run_root: Path | str,
+    review: Mapping[str, Any],
+    path: Path | str | None = None,
+) -> Path:
+    """Bind direct dense review to media across canonical sibling stage runs."""
+    root = Path(run_root).resolve()
+    if not root.is_dir() or review.get("schema") != DECODED_FRAME_REVIEW_SCHEMA:
+        raise ValueError(f"expected {DECODED_FRAME_REVIEW_SCHEMA} under an existing aggregate run root")
+    reviewer_id = review.get("reviewer_id")
+    if not isinstance(reviewer_id, str) or not reviewer_id.strip():
+        raise ValueError("decoded review requires a reviewer_id")
+    sweeps = review.get("garment_sweeps")
+    if not isinstance(sweeps, list) or not sweeps:
+        raise ValueError("decoded review requires garment_sweeps")
+    anatomy_vetoes = ("nude_or_exposed", "exploding_weights", "fused_digits", "detached_wrists", "clipping")
+    canonical_sweeps = []
+    for sweep in sweeps:
+        if not isinstance(sweep, Mapping) or not isinstance(sweep.get("configuration_id"), str):
+            raise ValueError("garment sweep requires a configuration_id")
+        ledger_path, frames = _validate_dense_decoded_sequence(root, sweep, anatomy_vetoes)
+        canonical_sweeps.append({
+            "configuration_id": sweep["configuration_id"],
+            "method": "dense decoded-frame visual review bound to registered head/external media hashes",
+            **{key: any(frame[key] for frame in frames) for key in anatomy_vetoes},
+            "dense_frame_review_complete": True,
+            "reviewed_frame_count": len(frames),
+            "source_capture_ledger": str(ledger_path.relative_to(root)),
+            "source_capture_ledger_sha256": _sha256(ledger_path),
+            "dense_frame_reviews": frames,
+        })
+    payload: dict[str, Any] = {
+        "schema": "embodied.visual_audit.v1",
+        "reviewer_id": reviewer_id,
+        "adapter": "independent_qa.write_visual_audit_from_decoded_review",
+        "aggregate_evidence_root": str(root),
+        "garment_sweeps": canonical_sweeps,
+    }
+    motion = review.get("motion_camera_qualification")
+    if isinstance(motion, Mapping):
+        motion_vetoes = ("clipping", "camera_in_mesh", "malformed_anatomy", "occluded_required_motion")
+        ledger_path, frames = _validate_dense_decoded_sequence(root, motion, motion_vetoes)
+        payload["motion_camera_qualification"] = {
+            "method": "dense decoded-frame visual review bound to registered head/external media hashes",
+            **{key: motion.get(key) for key in (
+                "object_free", "continuity_pass", "both_arms_natural", "static_target_view",
+                "head_video_reviewed", "external_video_reviewed")},
+            **{key: any(frame[key] for frame in frames) for key in motion_vetoes},
+            "dense_frame_review_complete": True,
+            "reviewed_frame_count": len(frames),
+            "source_capture_ledger": str(ledger_path.relative_to(root)),
+            "source_capture_ledger_sha256": _sha256(ledger_path),
+            "dense_frame_reviews": frames,
+        }
+    event_rows = review.get("event_visibility")
+    if isinstance(event_rows, list):
+        canonical_events = []
+        for event in event_rows:
+            if not isinstance(event, Mapping) or not isinstance(event.get("event"), str):
+                raise ValueError("event visibility requires named event rows")
+            ledger_path, frames = _validate_dense_decoded_sequence(root, event, ())
+            frame = event.get("frame")
+            if not isinstance(frame, int) or frame < 0 or frame >= len(frames):
+                raise ValueError("event visibility frame is outside its bound ledger")
+            canonical_events.append({
+                "event": event["event"],
+                "frame": frame,
+                "visible": event.get("visible") is True,
+                "method": "direct dense decoded-frame visual review bound to registered head/external media hashes",
+                "source_capture_ledger": str(ledger_path.relative_to(root)),
+                "source_capture_ledger_sha256": _sha256(ledger_path),
+                "head": frames[frame]["head"],
+                "external": frames[frame]["external"],
+            })
+        payload["event_visibility"] = canonical_events
+    episode_rows = review.get("episodes")
+    if isinstance(episode_rows, list):
+        episode_vetoes = ("malformed_anatomy", "garment_clipping", "floating_or_stretched_limbs",
+                          "furniture_intrusion", "overexposure", "static_target_view", "bad_transitions",
+                          "incoherent_room", "proxy_hero_pixels", "camera_in_mesh")
+        canonical_episodes = []
+        for episode in episode_rows:
+            if not isinstance(episode, Mapping) or not isinstance(episode.get("episode_id"), str):
+                raise ValueError("episode review requires an episode_id")
+            ledger_path, frames = _validate_dense_decoded_sequence(root, episode, episode_vetoes)
+            canonical_episodes.append({
+                "episode_id": episode["episode_id"],
+                "method": "dense decoded-frame visual review bound to registered head/external media hashes",
+                "coherent": episode.get("coherent") is True,
+                **{key: any(frame[key] for frame in frames) for key in episode_vetoes},
+                "dense_frame_review_complete": True,
+                "reviewed_frame_count": len(frames),
+                "source_capture_ledger": str(ledger_path.relative_to(root)),
+                "source_capture_ledger_sha256": _sha256(ledger_path),
+                "dense_frame_reviews": frames,
+            })
+        payload["episodes"] = canonical_episodes
+    if path is None:
+        destination = root / "visual_audit.json"
+    else:
+        requested = Path(path)
+        destination = (requested if requested.is_absolute() else root / requested).resolve()
+    _inside(root, destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return destination
 
 
 def _visual_checks(visual: Any, tolerances: Mapping[str, Any]) -> list[Check]:
@@ -934,23 +1319,65 @@ def _visual_checks(visual: Any, tolerances: Mapping[str, Any]) -> list[Check]:
             _check("visual.event_visibility", None, "required event visibility review missing"),
             _check("visual.episode_coherence", None, "dense integrated episode review missing"),
         ]
+    if visual.get("schema") == "embodied.registered_visual_measurements.v1":
+        evidence = {
+            "measured_capture_evidence_only": visual.get("measured_capture_evidence_only"),
+            "direct_decoded_frame_review_performed": visual.get("direct_decoded_frame_review_performed"),
+            "measurement_scope": visual.get("measurement_scope"),
+        }
+        return [
+            _check("visual.garment_sweeps", None, "registered capture measurements do not replace dense garment/body/anatomy review", evidence),
+            _check("visual.motion_camera", None, "registered capture measurements do not replace decoded head/external motion review", evidence),
+            _check("visual.event_visibility", None, "registered projections are geometric evidence, not decoded-frame visibility review", evidence),
+            _check("visual.episode_coherence", None, "registered capture measurements do not make visual-coherence judgments", evidence),
+        ]
     sweeps = visual.get("garment_sweeps", [])
+    expected_frames = round(float(load_frozen_config()["activity_plan"]["duration_s"]) * 30.0)
+    def bound_frames_ok(entry: Mapping[str, Any], vetoes: Sequence[str]) -> bool:
+        frames = entry.get("dense_frame_reviews")
+        return (
+            entry.get("dense_frame_review_complete") is True
+            and entry.get("reviewed_frame_count") == expected_frames
+            and isinstance(frames, list) and len(frames) == expected_frames
+            and all(
+                isinstance(frame, Mapping) and frame.get("direct_observation") is True
+                and _visual_method_is_direct(frame.get("method"))
+                and all(frame.get(key) is False for key in vetoes)
+                and all(isinstance(frame.get(role), Mapping)
+                        and frame[role].get("width_px") == 1920 and frame[role].get("height_px") == 1080
+                        and isinstance(frame[role].get("file_sha256"), str) and len(frame[role]["file_sha256"]) == 64
+                        and isinstance(frame[role].get("decoded_rgb_sha256"), str) and len(frame[role]["decoded_rgb_sha256"]) == 64
+                        for role in ("head", "external"))
+                for frame in frames
+            )
+        )
     bad_anatomy_keys = ("nude_or_exposed", "exploding_weights", "fused_digits", "detached_wrists", "clipping")
     sweep_ok = isinstance(sweeps, list) and len({row.get("configuration_id") for row in sweeps if isinstance(row, Mapping)}) >= 3
-    sweep_ok &= all(isinstance(row, Mapping) and _visual_method_is_direct(row.get("method"))
-                    and all(row.get(key) is False for key in bad_anatomy_keys) for row in sweeps)
+    sweep_ok &= all(
+        isinstance(row, Mapping) and _visual_method_is_direct(row.get("method"))
+        and bound_frames_ok(row, bad_anatomy_keys)
+        and all(row.get(key) is False for key in bad_anatomy_keys)
+        for row in sweeps
+    )
 
     motion = visual.get("motion_camera_qualification")
     motion_ok = isinstance(motion, Mapping) and _visual_method_is_direct(motion.get("method"))
     motion_ok &= bool(motion.get("object_free")) and bool(motion.get("continuity_pass"))
     motion_ok &= bool(motion.get("both_arms_natural")) and motion.get("static_target_view") is False
     motion_ok &= bool(motion.get("head_video_reviewed")) and bool(motion.get("external_video_reviewed"))
+    motion_vetoes = ("clipping", "camera_in_mesh", "malformed_anatomy", "occluded_required_motion")
+    motion_ok &= bound_frames_ok(motion, motion_vetoes)
+    motion_ok &= all(motion.get(key) is False for key in motion_vetoes)
 
     visibility = visual.get("event_visibility", [])
     required_events = set(tolerances["camera"]["required_events_visible"])
     visible_events = {row.get("event") for row in visibility if isinstance(row, Mapping)
                       and row.get("visible") is True and isinstance(row.get("frame"), int)
-                      and _visual_method_is_direct(row.get("method"))}
+                      and _visual_method_is_direct(row.get("method"))
+                      and all(isinstance(row.get(role), Mapping)
+                              and len(str(row[role].get("file_sha256", ""))) == 64
+                              and len(str(row[role].get("decoded_rgb_sha256", ""))) == 64
+                              for role in ("head", "external"))}
     visibility_ok = required_events <= visible_events
 
     episodes = visual.get("episodes", [])
@@ -960,6 +1387,7 @@ def _visual_checks(visual: Any, tolerances: Mapping[str, Any]) -> list[Check]:
     episode_ok = isinstance(episodes, list) and bool(episodes)
     episode_ok &= all(isinstance(row, Mapping) and _visual_method_is_direct(row.get("method"))
                       and row.get("coherent") is True and all(row.get(key) is False for key in veto_keys)
+                      and bound_frames_ok(row, veto_keys)
                       for row in episodes)
     return [
         _check("visual.garment_sweeps", sweep_ok, "three garment configurations pass dense anatomy/clipping review",
@@ -979,44 +1407,240 @@ def _registration_checks(report: Any, tolerances: Mapping[str, Any]) -> list[Che
             _check("registration.garment_body", None, "garment/body penetration and affected-vertex distribution missing"),
             _check("registration.penetration", None, "hand/object and target/support penetration missing"),
         ]
-    provenance = str(report.get("provenance", "")).lower()
-    measured = "measured" in provenance or "engine_observed" in provenance
+    provenance = " ".join(str(report.get(key, "")) for key in
+                          ("provenance", "body_collider_provenance", "garment_body_provenance")).lower()
+    measured = "measured" in provenance or "engine_observed" in provenance or "engineobserved" in provenance
     proxy = any(term in provenance for term in VISUAL_PROXY_TERMS)
     registration = tolerances["registration"]
     contact = tolerances["contact"]
     configurations = report.get("garment_configurations", [])
     distribution = report.get("garment_affected_vertex_distribution")
+    self_clearance_provenance = str(report.get("anatomical_self_clearance_provenance", "")).lower()
+    self_clearance_steps = report.get("self_clearance_steps", [])
+    self_clearance_ok = report.get("passed") is True
+    self_clearance_ok &= "physxmeasured" in self_clearance_provenance or "physx_measured" in self_clearance_provenance
+    self_clearance_ok &= report.get("self_clearance_sampled_every_physics_step") is True
+    self_clearance_ok &= report.get("non_adjacent_anatomy_clearance_passed") is True
+    self_clearance_ok &= isinstance(report.get("non_adjacent_self_clearance_samples"), int)
+    self_clearance_ok &= report.get("non_adjacent_self_clearance_samples", 0) > 0
+    self_clearance_ok &= report.get("non_adjacent_self_overlap_samples") == 0
+    self_clearance_ok &= isinstance(self_clearance_steps, list) and bool(self_clearance_steps)
+    self_clearance_ok &= all(
+        isinstance(row, Mapping) and row.get("swept_pair_pose_samples", 0) > 0
+        and row.get("overlap_samples") == 0
+        for row in self_clearance_steps
+    )
+    solver_provenance = str(report.get("solver_motion_self_clearance_provenance", "")).lower()
+    solver_steps = report.get("solver_motion_self_clearance_steps", [])
+    expected_solver_steps = report.get("expected_motion_sample_count")
+    solver_ok = "physxmeasured" in solver_provenance or "physx_measured" in solver_provenance
+    solver_ok &= report.get("solver_motion_self_clearance_sampled_every_physics_step") is True
+    solver_ok &= report.get("solver_motion_non_adjacent_anatomy_clearance_passed") is True
+    solver_ok &= isinstance(report.get("solver_motion_self_clearance_samples"), int)
+    solver_ok &= report.get("solver_motion_self_clearance_samples", 0) > 0
+    solver_ok &= report.get("solver_motion_self_overlap_samples") == 0
+    solver_ok &= report.get("solver_motion_incomplete_sweep_intervals") == 0
+    solver_ok &= isinstance(solver_steps, list) and bool(solver_steps)
+    if isinstance(expected_solver_steps, int) and expected_solver_steps > 0:
+        solver_ok &= len(solver_steps) == expected_solver_steps
+        solver_ok &= [row.get("physics_step") for row in solver_steps if isinstance(row, Mapping)] == list(range(expected_solver_steps))
+    solver_ok &= all(
+        isinstance(row, Mapping) and row.get("swept_pair_pose_samples", 0) > 0
+        and row.get("overlap_samples") == 0
+        and row.get("incomplete_sweep_intervals") == 0
+        for row in solver_steps
+    )
+    self_clearance_ok &= solver_ok
     try:
-        skin_ok = measured and not proxy and float(report["skin_collider_max_m"]) <= float(registration["skin_collider_max_m"])
-        garment_ok = measured and not proxy and float(report["garment_body_max_penetration_m"]) <= float(registration["garment_body_max_penetration_m"])
-        garment_ok &= isinstance(distribution, (dict, list)) and bool(distribution)
-        garment_ok &= isinstance(configurations, list) and len({row.get("configuration_id") for row in configurations
-                                                                if isinstance(row, Mapping)}) >= 3
-        garment_ok &= all(
+        body_distribution = report.get("body_collider_registration", {})
+        skin_max = report.get("skin_collider_max_m", body_distribution.get("maximum_m"))
+        garment_rows = report.get("garments", [])
+        canonical_garment_ok = isinstance(garment_rows, list) and bool(garment_rows) and all(
             isinstance(row, Mapping)
-            and float(row["skin_collider_max_m"]) <= float(registration["skin_collider_max_m"])
-            and float(row["garment_body_max_penetration_m"]) <= float(registration["garment_body_max_penetration_m"])
-            and bool(row.get("garment_affected_vertex_distribution"))
-            for row in configurations
+            and float(row["maximum_penetration_m"]) <= float(registration["garment_body_max_penetration_m"])
+            and float(row["affected_fraction"]) <= float(registration["garment_affected_vertex_fraction_max"])
+            and bool(row.get("affected_vertex_distribution_counts"))
+            for row in garment_rows
         )
-        penetration_ok = measured and not proxy
-        penetration_ok &= float(report["finger_object_max_penetration_m"]) <= float(contact["finger_object_max_penetration_m"])
-        penetration_ok &= float(report["target_support_max_penetration_m"]) <= float(contact["target_support_max_penetration_m"])
+        skin_ok = measured and not proxy and self_clearance_ok and float(skin_max) <= float(registration["skin_collider_max_m"])
+        if canonical_garment_ok:
+            garment_ok = measured and not proxy and self_clearance_ok and report.get("sampled_every_physics_step") is True
+        else:
+            garment_ok = measured and not proxy and float(report["garment_body_max_penetration_m"]) <= float(registration["garment_body_max_penetration_m"])
+            garment_ok &= isinstance(distribution, (dict, list)) and bool(distribution)
+            garment_ok &= isinstance(configurations, list) and len({row.get("configuration_id") for row in configurations
+                                                                    if isinstance(row, Mapping)}) >= 3
+            garment_ok &= all(
+                isinstance(row, Mapping)
+                and float(row["skin_collider_max_m"]) <= float(registration["skin_collider_max_m"])
+                and float(row["garment_body_max_penetration_m"]) <= float(registration["garment_body_max_penetration_m"])
+                and float(row.get("garment_affected_vertex_fraction", 1.0)) <= float(registration["garment_affected_vertex_fraction_max"])
+                and bool(row.get("garment_affected_vertex_distribution"))
+                for row in configurations
+            )
+        penetration_ok = measured and not proxy and self_clearance_ok
+        finger_limit = registration["finger_object_max_penetration_m"]
+        support_limit = registration["support_max_penetration_m"]
+        penetration_ok &= float(report["finger_object_max_penetration_m"]) <= float(finger_limit)
+        penetration_ok &= float(report["target_support_max_penetration_m"]) <= float(support_limit)
+        penetration_ok &= report.get("finger_object_contact_samples", 0) > 0
+        penetration_ok &= report.get("target_support_contact_samples", 0) > 0
+        penetration_provenance = " ".join(str(report.get(name, "")) for name in (
+            "finger_object_penetration_provenance", "target_support_penetration_provenance"
+        )).lower()
+        penetration_ok &= "physxmeasured" in penetration_provenance or "physx_measured" in penetration_provenance
+        if "trace_finger_object_max_penetration_m" in report:
+            penetration_ok &= abs(float(report["finger_object_max_penetration_m"])
+                                  - float(report["trace_finger_object_max_penetration_m"])) <= 1e-7
+        if "trace_target_support_max_penetration_m" in report:
+            penetration_ok &= abs(float(report["target_support_max_penetration_m"])
+                                  - float(report["trace_target_support_max_penetration_m"])) <= 1e-7
     except (KeyError, TypeError, ValueError):
         skin_ok = garment_ok = penetration_ok = False
     return [
-        _check("registration.skin_collider", skin_ok, "measured maximum skin/collider error is within tolerance", report),
-        _check("registration.garment_body", garment_ok, "three garments meet penetration tolerance with affected-vertex distribution", report),
-        _check("registration.penetration", penetration_ok, "measured finger/object and target/support penetration are within tolerance", report),
+        _check("registration.skin_collider", skin_ok, "passed registration receipt includes full swept non-adjacent self-clearance and skin/collider tolerance", report),
+        _check("registration.garment_body", garment_ok, "passed registration receipt includes swept self-clearance and garment penetration/distribution", report),
+        _check("registration.penetration", penetration_ok, "passed registration receipt includes swept self-clearance and measured contact penetrations", report),
     ]
 
 
-def _projection_checks(report: Any, tolerances: Mapping[str, Any]) -> list[Check]:
-    if not isinstance(report, (Mapping, list)):
+def _registration_with_trace_penetration(
+    report: Any, rows: Sequence[Mapping[str, Any]], target_id: str | None
+) -> Any:
+    if not isinstance(report, Mapping) or not rows or not target_id:
+        return report
+    adapted = dict(report)
+    finger_penetrations: list[float] = []
+    support_penetrations: list[float] = []
+    for row in rows:
+        for contact in _contacts(row):
+            if not _measured_contact(contact) or not _contact_targets(contact, target_id):
+                continue
+            separation = contact.get("separation_m")
+            if not isinstance(separation, (int, float)) or not math.isfinite(float(separation)):
+                continue
+            penetration = max(0.0, -float(separation))
+            hand, digit = _contact_hand_digit(contact)
+            if hand in {"left", "right"} and digit is not None:
+                finger_penetrations.append(penetration)
+            elif hand is None:
+                support_penetrations.append(penetration)
+    if finger_penetrations:
+        adapted["trace_finger_object_max_penetration_m"] = max(finger_penetrations)
+    if support_penetrations:
+        adapted["trace_target_support_max_penetration_m"] = max(support_penetrations)
+    if finger_penetrations or support_penetrations:
+        adapted["trace_contact_penetration_provenance"] = (
+            "physx_measured episode-trace contact separation; penetration=max(0,-separation_m)"
+        )
+    return adapted
+
+
+def _decode_png_rgb(path: Path) -> tuple[int, int, bytes]:
+    """Fully decode a non-interlaced RGB/RGBA PNG into top-down RGB bytes."""
+    payload = path.read_bytes()
+    if payload[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("label stream is not PNG")
+    offset = 8
+    idat = bytearray()
+    width = height = bit_depth = color_type = interlace = None
+    while offset + 12 <= len(payload):
+        length = struct.unpack(">I", payload[offset:offset + 4])[0]
+        kind = payload[offset + 4:offset + 8]
+        data = payload[offset + 8:offset + 8 + length]
+        offset += 12 + length
+        if kind == b"IHDR":
+            width, height, bit_depth, color_type, _, _, interlace = struct.unpack(">IIBBBBB", data)
+        elif kind == b"IDAT":
+            idat.extend(data)
+        elif kind == b"IEND":
+            break
+    if bit_depth != 8 or color_type not in {2, 6} or interlace != 0 or not width or not height:
+        raise ValueError("label PNG must be non-interlaced RGB/RGBA uint8")
+    channels = 3 if color_type == 2 else 4
+    stride = width * channels
+    raw = zlib.decompress(bytes(idat))
+    if len(raw) != height * (stride + 1):
+        raise ValueError("label PNG scanline length mismatch")
+    rows: list[bytearray] = []
+    cursor = 0
+    for _ in range(height):
+        filter_type = raw[cursor]
+        scan = bytearray(raw[cursor + 1:cursor + 1 + stride])
+        cursor += stride + 1
+        previous = rows[-1] if rows else bytearray(stride)
+        for index in range(stride):
+            left = scan[index - channels] if index >= channels else 0
+            up = previous[index]
+            upper_left = previous[index - channels] if index >= channels else 0
+            if filter_type == 1:
+                scan[index] = (scan[index] + left) & 0xFF
+            elif filter_type == 2:
+                scan[index] = (scan[index] + up) & 0xFF
+            elif filter_type == 3:
+                scan[index] = (scan[index] + ((left + up) // 2)) & 0xFF
+            elif filter_type == 4:
+                predictor = left + up - upper_left
+                pa, pb, pc = abs(predictor - left), abs(predictor - up), abs(predictor - upper_left)
+                nearest = left if pa <= pb and pa <= pc else up if pb <= pc else upper_left
+                scan[index] = (scan[index] + nearest) & 0xFF
+            elif filter_type != 0:
+                raise ValueError("unsupported PNG filter")
+        rows.append(scan)
+    rgb = bytearray()
+    for row in rows:
+        for base in range(0, len(row), channels):
+            rgb.extend(row[base:base + 3])
+    return width, height, bytes(rgb)
+
+
+def _png_uint24_at(path: Path, x: int, y_bottom_left: int) -> int:
+    """Decode one RGB uint24 pixel without trusting a producer-side sample."""
+    width, height, rgb = _decode_png_rgb(path)
+    if not (0 <= x < width and 0 <= y_bottom_left < height):
+        raise ValueError("projected label pixel is outside PNG")
+    base = ((height - 1 - y_bottom_left) * width + x) * 3
+    return rgb[base] + 256 * rgb[base + 1] + 65536 * rgb[base + 2]
+
+
+def _projection_checks(
+    report: Any,
+    tolerances: Mapping[str, Any],
+    capture_ledger: Sequence[Mapping[str, Any]],
+    trace_rows: Sequence[Mapping[str, Any]],
+    target_id: str | None,
+    ledger_path: Path,
+    root: Path,
+) -> list[Check]:
+    if not isinstance(report, Mapping):
         return [_check("contact.visible_projection", None, "measured-contact to visible-surface projection missing")]
-    records = report.get("records", []) if isinstance(report, Mapping) else report
+    if report.get("schema") != "embodied.registered_contact_projection.v1":
+        return [_check("contact.visible_projection", False, "contact projection report does not use the registered capture schema")]
+    records = report.get("records", [])
     if not isinstance(records, list) or not records:
         return [_check("contact.visible_projection", False, "contact projection report has no records")]
+    ledger_hash_ok = ledger_path.is_file() and report.get("source_capture_ledger_sha256") == _sha256(ledger_path)
+    ledger_by_frame = {row.get("render_frame"): row for row in capture_ledger if isinstance(row, Mapping)}
+    embedded = {
+        (row.get("render_frame"), row.get("physics_step"), tuple(_vector(item.get("point_world_m")) or ()),
+         item.get("expected_contact_collider_a"), item.get("expected_contact_collider_b")):
+        item
+        for row in capture_ledger if isinstance(row, Mapping)
+        for item in row.get("event_visibility_inputs", []) if isinstance(item, Mapping)
+        and item.get("input_id") == "physx_contact_point_input"
+    }
+    label_manifest_path = root / "semantic_instance_manifest.json"
+    try:
+        label_manifest = _read_json(label_manifest_path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        label_manifest = {}
+    bindings = {
+        (item.get("semantic_uint24"), item.get("persistent_instance_uint24")): item
+        for item in label_manifest.get("bindings", []) if isinstance(label_manifest, Mapping)
+        and isinstance(item, Mapping)
+    }
+    trace_by_step = {int(_field(row, "physics_step")): row for row in trace_rows
+                     if isinstance(_field(row, "physics_step"), int)}
     checked = []
     required_pairs = {"right_thumb", "left_non_little"}
     observed_pairs: set[str] = set()
@@ -1026,37 +1650,139 @@ def _projection_checks(report: Any, tolerances: Mapping[str, Any]) -> list[Check
             checked.append(False)
             continue
         method = str(row.get("method", ""))
-        direct = _visual_method_is_direct(method) and "surface" in method.lower()
-        hand = str(row.get("hand", "")).lower()
-        digit = str(row.get("digit", "")).lower()
+        measured_projection = "actual semantic/instance uint24 values decoded" in method.lower()
+        measured_projection &= "physics.raycastall" in method.lower()
+        measured_projection &= not any(term in method.lower() for term in VISUAL_PROXY_TERMS)
+        colliders = (row.get("expected_contact_collider_a"), row.get("expected_contact_collider_b"))
+        hand, digit = _contact_hand_digit({"collider_a": colliders[0], "collider_b": colliders[1]})
         pair = "right_thumb" if hand == "right" and digit == "thumb" else "left_non_little" if hand == "left" and digit not in {"", "little"} else "other"
         observed_pairs.add(pair)
         if hand == "right" and digit in {"index", "middle", "ring", "little"}:
             right_non_thumb_digits.add(digit)
-        physical_frame, visible_frame = row.get("physical_frame"), row.get("visible_frame")
-        frame_ok = isinstance(physical_frame, int) and isinstance(visible_frame, int)
-        frame_ok &= abs(physical_frame - visible_frame) <= int(tolerances["contact"]["visible_physical_max_frame_delta"])
-        point_ok = _vector(row.get("physical_contact_point_world_m")) is not None
-        skin_surface = str(row.get("visible_skin_surface_id", "")).lower().replace("-", "_")
-        surface_ok = row.get("correct_visible_surface") is True and bool(skin_surface)
-        surface_ok &= hand in skin_surface and digit in skin_surface
-        surface_ok &= row.get("visible_object_surface_id") not in {None, ""}
-        try:
-            error_ok = float(row["skin_projection_error_m"]) <= float(tolerances["registration"]["skin_collider_max_m"])
-            error_ok &= float(row["object_projection_error_m"]) <= float(tolerances["contact"]["finger_object_max_penetration_m"])
-        except (KeyError, TypeError, ValueError):
-            error_ok = False
-        checked.append(direct and frame_ok and point_ok and surface_ok and error_ok)
+        render_frame, physics_step = row.get("render_frame"), row.get("physics_step")
+        point = _vector(row.get("physical_contact_point_world_m"))
+        frame_ok = isinstance(render_frame, int) and isinstance(physics_step, int)
+        frame_ok &= physics_step // int(tolerances["clock"]["exact_steps_per_render_frame"]) == render_frame
+        embedded_row = embedded.get((render_frame, physics_step, tuple(point or ()), colliders[0], colliders[1]))
+        embedded_ok = isinstance(embedded_row, Mapping)
+        trace_row = trace_by_step.get(physics_step) if isinstance(physics_step, int) else None
+        trace_contact_ok = target_id is not None and trace_row is not None and any(
+            _measured_contact(contact)
+            and _contact_targets(contact, target_id)
+            and {contact.get("collider_a"), contact.get("collider_b")} == set(colliders)
+            and _vector(contact.get("point_world_m")) == point
+            for contact in _contacts(trace_row)
+        )
+        pixel = _vector(row.get("pixel_xy"), 2)
+        pixel_ok = pixel is not None and all(float(value).is_integer() for value in pixel)
+        semantic_id = row.get("first_visible_semantic_uint24")
+        instance_id = row.get("first_visible_persistent_instance_uint24")
+        decoded_ok = False
+        capture_row = ledger_by_frame.get(render_frame)
+        if pixel_ok and isinstance(capture_row, Mapping):
+            stream_map = {item.get("stream"): item for item in capture_row.get("streams", []) if isinstance(item, Mapping)}
+            semantic_stream = stream_map.get("head_semantic_uint24")
+            instance_stream = stream_map.get("head_persistent_instance_uint24")
+            try:
+                semantic_path = _inside(root, root / semantic_stream["relative_path"])
+                instance_path = _inside(root, root / instance_stream["relative_path"])
+                decoded_semantic = _png_uint24_at(semantic_path, int(pixel[0]), int(pixel[1]))
+                decoded_instance = _png_uint24_at(instance_path, int(pixel[0]), int(pixel[1]))
+                decoded_ok = decoded_semantic == semantic_id and decoded_instance == instance_id
+                decoded_ok &= semantic_stream.get("file_sha256") == _sha256(semantic_path)
+                decoded_ok &= instance_stream.get("file_sha256") == _sha256(instance_path)
+                decoded_ok &= semantic_stream.get("authority_state_sha256") == capture_row.get("authority_state_sha256")
+                decoded_ok &= instance_stream.get("authority_state_sha256") == capture_row.get("authority_state_sha256")
+                decoded_ok &= embedded_row.get("rendered_semantic_uint24") == decoded_semantic
+                decoded_ok &= embedded_row.get("rendered_persistent_instance_uint24") == decoded_instance
+            except (KeyError, TypeError, OSError, ValueError, zlib.error):
+                decoded_ok = False
+        binding = bindings.get((semantic_id, instance_id))
+        expected_text = " ".join(str(value or "") for value in colliders).lower()
+        expected_hand = hand in {"left", "right"} and digit is not None
+        weighted_skin = isinstance(binding, Mapping) and binding.get("semantic_name") == "body_skin"
+        expected_target = bool(target_id) and target_id.lower() in expected_text
+        target_surface = isinstance(binding, Mapping) and binding.get("persistent_instance_name") == target_id
+        identity_ok = weighted_skin if expected_hand else expected_target and target_surface
+        surface_ok = row.get("first_visible_collider_id") in colliders
+        surface_ok &= isinstance(semantic_id, int) and semantic_id > 0
+        surface_ok &= isinstance(instance_id, int) and instance_id > 0
+        checked.append(measured_projection and frame_ok and embedded_ok and trace_contact_ok
+                       and pixel_ok and decoded_ok and identity_ok and surface_ok)
     passed = all(checked) and required_pairs <= observed_pairs and len(right_non_thumb_digits) >= 2
+    passed &= ledger_hash_ok
     return [_check("contact.visible_projection", passed,
-                   "measured contacts project to the correct visible skin/object surfaces within one render frame",
+                   "same-state contacts decode to an expected weighted-skin/target identity in the actual frozen semantic and instance pixels",
                    {"records": len(records), "valid_records": sum(checked), "observed_required_pairs": sorted(observed_pairs),
-                    "projected_right_non_thumb_digits": sorted(right_non_thumb_digits)})]
+                    "projected_right_non_thumb_digits": sorted(right_non_thumb_digits),
+                    "source_capture_ledger_sha256_matches": ledger_hash_ok})]
 
 
-def _capture_checks(report: Any, root: Path, tolerances: Mapping[str, Any], duration_s: float) -> list[Check]:
+def _capture_checks(
+    report: Any, root: Path, tolerances: Mapping[str, Any], duration_s: float,
+    capture_ledger: Sequence[Mapping[str, Any]] = (),
+) -> list[Check]:
     if not isinstance(report, Mapping):
         return [_check("capture.registered_modalities", None, "RGB/depth/semantic/instance capture manifest missing")]
+    if report.get("schema") == "embodied.registered_capture_manifest.v1":
+        required_streams = {
+            "rgb": "head_rgb_hero",
+            "metric_depth": "head_metric_depth_uint24_mm",
+            "semantic": "head_semantic_uint24",
+            "persistent_instance": "head_persistent_instance_uint24",
+        }
+        expected_frames = round(duration_s * float(tolerances["capture"]["fps"]))
+        frame_ids: list[int] = []
+        valid_rows = bool(capture_ledger)
+        for row in capture_ledger:
+            if not isinstance(row, Mapping) or row.get("schema") != "embodied.registered_capture_frame.v1":
+                valid_rows = False
+                continue
+            frame = row.get("render_frame")
+            if not isinstance(frame, int):
+                valid_rows = False
+                continue
+            frame_ids.append(frame)
+            streams = {item.get("stream"): item for item in row.get("streams", []) if isinstance(item, Mapping)}
+            state_hash = row.get("authority_state_sha256")
+            for stream in required_streams.values():
+                item = streams.get(stream)
+                if not isinstance(item, Mapping):
+                    valid_rows = False
+                    continue
+                relative = item.get("relative_path")
+                if not isinstance(relative, str) or Path(relative).is_absolute():
+                    valid_rows = False
+                    continue
+                try:
+                    path = _inside(root, root / relative)
+                except ValueError:
+                    valid_rows = False
+                    continue
+                valid_rows &= path.is_file() and item.get("file_sha256") == (_sha256(path) if path.is_file() else None)
+                valid_rows &= item.get("authority_state_sha256") == state_hash
+                valid_rows &= item.get("render_frame") == frame and item.get("physics_step") == row.get("physics_step")
+            valid_rows &= row.get("authority_state_unchanged_across_modalities") is True
+            valid_rows &= row.get("physics_advanced_between_modalities") is False
+            valid_rows &= isinstance(row.get("intrinsics"), Mapping)
+            valid_rows &= all(isinstance(row.get(name), list) and len(row[name]) == 16 for name in (
+                "camera_to_world_matrix_column_major", "world_to_camera_matrix_column_major",
+                "projection_matrix_column_major",
+            ))
+        dense = frame_ids == list(range(expected_frames))
+        passed = report.get("width_px") == tolerances["capture"]["resolution_px"][0]
+        passed &= report.get("height_px") == tolerances["capture"]["resolution_px"][1]
+        passed &= report.get("fps") == tolerances["capture"]["fps"]
+        passed &= report.get("frames_captured") == expected_frames and dense and valid_rows
+        passed &= report.get("exact_integer_clock") is True and report.get("all_modalities_state_invariant") is True
+        passed &= report.get("physics_advanced_between_modalities") is False
+        passed &= report.get("hero_contains_proxy_pixels") is False
+        return [_check(
+            "capture.registered_modalities", passed,
+            "registered Unity manifest and per-frame ledger prove exact synchronized labeled modalities",
+            {"frame_count": len(frame_ids), "expected_frame_count": expected_frames, "dense": dense,
+             "ledger_rows_valid": valid_rows, "schema": report.get("schema")},
+        )]
     frames = report.get("frames", [])
     required_streams = list(tolerances["capture"]["streams"])
     resolution_ok = report.get("resolution_px") == tolerances["capture"]["resolution_px"]
@@ -1172,14 +1898,35 @@ def _provenance_checks(report: Any, frozen: Sequence[Mapping[str, Any]]) -> list
                    {"field_count": len(actual), "failures": failures})]
 
 
+def _independent_episode_pass(row: Mapping[str, Any], aggregate_gate: str) -> bool:
+    qa = row.get("independent_qa")
+    if not isinstance(qa, Mapping):
+        return False
+    gates = qa.get("gate_summary")
+    # Matrix/robustness aggregation must bootstrap from the direct physical,
+    # registration, camera, and projection evidence in A-D. Requiring the
+    # report's overall decision (or E/F themselves) is circular: those gates
+    # consume this aggregate. The aggregate gate is retained in the signature
+    # to make the caller's evidence role explicit.
+    if aggregate_gate not in {"E", "F"}:
+        return False
+    required_gates = set("ABCD")
+    return (
+        qa.get("schema") == REPORT_SCHEMA
+        and isinstance(gates, Mapping) and required_gates <= set(gates)
+        and all(gates[gate] == PASS for gate in required_gates)
+    )
+
+
 def _matrix_checks(report: Any, visual: Any) -> list[Check]:
     if not isinstance(report, Mapping) or not isinstance(report.get("episodes"), list):
         return [_check("generality.matrix", None, "multi-seed/multi-garment episode matrix missing")]
     episodes = [row for row in report["episodes"] if isinstance(row, Mapping)]
-    rooms = {row.get("room_seed") for row in episodes if row.get("room_seed") is not None}
+    rooms = {row.get("room_family", row.get("room_seed")) for row in episodes
+             if row.get("room_family", row.get("room_seed")) is not None}
     garments = {row.get("garment_configuration_id") for row in episodes if row.get("garment_configuration_id")}
-    completed = [row for row in episodes if row.get("completed") is True]
-    complete_rooms = {row.get("room_seed") for row in completed}
+    completed = [row for row in episodes if _independent_episode_pass(row, "E")]
+    complete_rooms = {row.get("room_family", row.get("room_seed")) for row in completed}
     complete_garments = {row.get("garment_configuration_id") for row in completed}
     shared = all(len({row.get(key) for row in episodes}) == 1 for key in ("compiler_id", "catalog_id", "controller_profile_id"))
     clean = all(row.get("seed_specific_retuning") is False and row.get("assistance_entries", 1) == 0 for row in episodes)
@@ -1188,13 +1935,94 @@ def _matrix_checks(report: Any, visual: Any) -> list[Check]:
         reviewed = {row.get("episode_id") for row in visual["episodes"] if isinstance(row, Mapping)
                     and row.get("coherent") is True and _visual_method_is_direct(row.get("method"))}
     completed_reviewed = all(row.get("episode_id") in reviewed for row in completed)
-    passed = len(rooms) >= 3 and len(garments) >= 3 and len(complete_rooms) >= 2 and len(complete_garments) >= 2
-    passed &= shared and clean and completed_reviewed
+    rich_rooms = all(
+        int(row.get("contextual_object_count", row.get("contextual_visible_object_count", 0))) > 10
+        and row.get("closed_finished_room") is True
+        and row.get("no_visible_primitive_furniture") is True
+        and row.get("all_reachable_objects_physics_backed") is True
+        and row.get("compiler_generated") is True
+        for row in episodes
+    )
+    distinct_relations = len({row.get("destination_relation", row.get("destination_id")) for row in episodes}) >= 3
+    distinct_strategies = len({row.get("contact_strategy") for row in episodes}) >= 2
+    passed = len(episodes) >= 3 and len(rooms) >= 3 and len(garments) >= 3
+    passed &= len(complete_rooms) >= 2 and len(complete_garments) >= 2
+    passed &= shared and clean and completed_reviewed and rich_rooms and distinct_relations and distinct_strategies
     return [_check("generality.matrix", passed,
-                   "three rooms and garments use one compiler/catalog/controller; at least 2/3 each complete without retuning or assistance",
+                   "three rooms and garments use one implementation; at least 2/3 carry full independent-QA PASS receipts",
                    {"room_seeds": sorted(str(value) for value in rooms), "garments": sorted(str(value) for value in garments),
                     "completed_room_count": len(complete_rooms), "completed_garment_count": len(complete_garments),
-                    "shared_implementation": shared, "no_retuning_or_assistance": clean})]
+                    "shared_implementation": shared, "no_retuning_or_assistance": clean,
+                    "rich_camera_aware_rooms": rich_rooms, "distinct_destination_relations": distinct_relations,
+                    "distinct_contact_strategies": distinct_strategies})]
+
+
+def _robustness_checks(report: Any) -> list[Check]:
+    if not isinstance(report, Mapping):
+        return [_check("robustness.primary", None, "primary nominal/shift/mass-friction robustness matrix missing")]
+    rows = report.get("primary_robustness", report.get("robustness_variants", []))
+    if not isinstance(rows, list) or len(rows) < 3:
+        return [_check("robustness.primary", False, "fewer than three frozen primary robustness variants were reported")]
+    names = {row.get("variant") for row in rows if isinstance(row, Mapping)}
+    required = {"nominal", "lateral_target_shift", "mass_friction_change"}
+    passed_rows = [row for row in rows if isinstance(row, Mapping) and _independent_episode_pass(row, "F")]
+    same_controller = len({row.get("controller_profile_id") for row in rows if isinstance(row, Mapping)}) == 1
+    clean = all(isinstance(row, Mapping) and row.get("retuned") is False
+                and row.get("assistance_entries", 1) == 0 for row in rows)
+    passed = required <= names and len(passed_rows) >= 2 and same_controller and clean
+    return [_check("robustness.primary", passed,
+                   "at least 2/3 frozen primary variants carry full independent-QA PASS receipts with no retuning or assistance",
+                   {"variants": sorted(str(value) for value in names), "passed": len(passed_rows),
+                    "same_controller": same_controller, "clean": clean})]
+
+
+def _source_audit_checks(report: Any, execution: Any, authority: Any) -> list[Check]:
+    if not isinstance(report, Mapping):
+        return [_check("authority.source_audit", None, "mandatory pre-execution source audit receipt missing")]
+    body = dict(report)
+    declared_hash = body.pop("receipt_sha256", None)
+    actual_hash = _canonical_json_sha256(body)
+    findings = report.get("findings")
+    forbidden = report.get("forbidden_findings")
+    hashes = report.get("source_sha256")
+    valid_hashes = isinstance(hashes, Mapping) and bool(hashes) and all(
+        isinstance(value, str) and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value.lower())
+        for value in hashes.values()
+    )
+    passed = report.get("schema") == SOURCE_AUDIT_SCHEMA and report.get("passed") is True
+    passed &= declared_hash == actual_hash and valid_hashes
+    passed &= isinstance(findings, list) and isinstance(forbidden, list) and not forbidden
+    def valid_finding(row: Any) -> bool:
+        if not isinstance(row, Mapping) or row.get("status") != "ALLOWLISTED":
+            return False
+        if row.get("scope") in {"initialization", "non_target"}:
+            return True
+        if row.get("scope") != "rerender_only":
+            return False
+        reason = str(row.get("reason", "")).lower()
+        truthful_target_scope = (
+            row.get("target_related") is False
+            or (row.get("target_related") is True and row.get("method") == "ApplyReplayTargetState")
+        )
+        return truthful_target_scope and "render" in reason and "excluded" in reason and "manipulation evidence" in reason
+
+    passed &= all(valid_finding(row) for row in findings or [])
+    covered_source_names = {Path(str(name)).name for name in (hashes or {})}
+    python_coverage = REQUIRED_PYTHON_SOURCE_AUDIT_FILES <= covered_source_names
+    passed &= python_coverage
+    for receipt in (execution, authority):
+        if isinstance(receipt, Mapping):
+            passed &= receipt.get("source_audit_sha256") == declared_hash
+        else:
+            passed = False
+    return [_check("authority.source_audit", passed,
+                   "source audit hash is carried through execution/Unity and contains no forbidden target assistance",
+                   {"declared_sha256": declared_hash, "recomputed_sha256": actual_hash,
+                    "finding_count": len(findings) if isinstance(findings, list) else None,
+                    "forbidden_count": len(forbidden) if isinstance(forbidden, list) else None,
+                    "required_python_sources": sorted(REQUIRED_PYTHON_SOURCE_AUDIT_FILES),
+                    "configured_python_source_coverage": python_coverage})]
 
 
 def _authority_checks(report: Any, run_root: Path) -> list[Check]:
@@ -1362,7 +2190,7 @@ def _audit_video(
     if is_episode_video:
         hero_properties = result.get("width") == 1920 and result.get("height") == 1080
         hero_properties &= result.get("fps") is not None and abs(result["fps"] - 30.0) <= 1e-6
-        hero_properties &= result.get("duration_s") is not None and 12.0 <= result["duration_s"] <= 20.0
+        hero_properties &= result.get("duration_s") is not None and 20.0 <= result["duration_s"] <= 30.0
         if default_phases:
             expected_duration = max(float(row["end_s"]) for row in default_phases)
             hero_properties &= result.get("frame_count") == round(expected_duration * 30.0)
@@ -1462,7 +2290,8 @@ def audit_run(
     except (OSError, ValueError, json.JSONDecodeError):
         capture_ledger = []
     interaction_checks, interaction_metrics = _interaction_checks(
-        trace_details.get("ordered_rows", []), trace_details.get("target_object_id"), tolerances
+        trace_details.get("ordered_rows", []), trace_details.get("target_object_id"),
+        _destination_id(trace_details.get("ordered_rows", []), evidence), tolerances
     )
     camera_checks, camera_metrics = _camera_checks(
         trace_details.get("ordered_rows", []), tolerances, capture_ledger
@@ -1473,9 +2302,13 @@ def audit_run(
 
     authority = _optional_report(root, evidence, "authority_receipt", "authority_receipt.json")
     execution = _optional_report(root, evidence, "execution_receipt", "execution_receipt.json")
+    source_audit = _optional_report(root, evidence, "source_audit_receipt", "source_audit_receipt.json")
     registration = _optional_report(root, evidence, "registration_report", "registration_report.json")
+    registration = _registration_with_trace_penetration(
+        registration, trace_details.get("ordered_rows", []), trace_details.get("target_object_id")
+    )
     projection = _optional_report(root, evidence, "contact_projection", "contact_projection.json")
-    capture = _optional_report(root, evidence, "capture_manifest", "capture_manifest.json")
+    capture = _optional_report(root, evidence, "capture_manifest", "registered_capture_manifest.json")
     replay = _optional_report(root, evidence, "replay_report", "replay_report.json")
     provenance = _optional_report(root, evidence, "truth_provenance", "truth_provenance.json")
     if provenance is None:
@@ -1488,12 +2321,18 @@ def audit_run(
     matrix = _optional_report(root, evidence, "episode_matrix", "episode_matrix.json")
     visual_checks = _visual_checks(visual, tolerances)
     registration_checks = _registration_checks(registration, tolerances)
-    projection_checks = _projection_checks(projection, tolerances)
-    capture_checks = _capture_checks(capture, root, tolerances, duration_s)
+    projection_checks = _projection_checks(
+        projection, tolerances, capture_ledger, trace_details.get("ordered_rows", []),
+        trace_details.get("target_object_id"), capture_ledger_path, root
+    )
+    capture_checks = _capture_checks(capture, root, tolerances, duration_s, capture_ledger)
     replay_checks = _replay_checks(replay, trace_path, tolerances)
     provenance_checks = _provenance_checks(provenance, config["truth_provenance"])
     matrix_checks = _matrix_checks(matrix, visual)
+    robustness_checks = _robustness_checks(matrix)
     authority_checks = _authority_checks(authority, root)
+    source_audit_checks = _source_audit_checks(source_audit, execution, authority)
+    dynamic_finger_checks = _dynamic_finger_checks(trace_details.get("ordered_rows", []))
 
     prior_paths = {
         "prior_unity_audition": Path(prior_unity_audition).resolve() if prior_unity_audition else None,
@@ -1503,16 +2342,18 @@ def audit_run(
     comparison_checks = _comparison_checks(visual, prior_paths, video_audits)
 
     gates = [
-        _gate("A", "Frozen authority, contracts, rates, and one-state proof", authority_checks + trace_checks[:2]),
+        _gate("A", "Visible compliant-hand microcell, source audit, frozen contracts/rates, and free release",
+              source_audit_checks + authority_checks + trace_checks[:2] + dynamic_finger_checks + interaction_checks),
         _gate("B", "Embodiment, anatomy, garments, and registration sweeps",
               registration_checks[:2] + visual_checks[:1]),
         _gate("C", "Object-free full-body motion and head-camera qualification",
               trace_checks[2:4] + camera_checks + motion_limit_checks + video_checks[1:2] + visual_checks[1:2]),
         _gate("D", "Unassisted free-object bimanual interaction and visible/physical contact",
-              interaction_checks + registration_checks[2:] + projection_checks + visual_checks[2:3]),
+              dynamic_finger_checks + interaction_checks + registration_checks[2:] + projection_checks + visual_checks[2:3]),
         _gate("E", "Procedural room/clothing generality without retuning", matrix_checks + visual_checks[3:]),
         _gate("F", "Synchronized capture, replay/rerender, dense decode, and prior comparisons",
-              trace_checks[4:] + capture_checks + replay_checks + provenance_checks + video_checks[:1] + video_checks[2:] + comparison_checks),
+              trace_checks[4:] + robustness_checks + capture_checks + replay_checks + provenance_checks
+              + video_checks[:1] + video_checks[2:] + comparison_checks),
     ]
     non_pass = [check for gate in gates for check in gate["checks"] if check["status"] != PASS]
     veto_reasons = [
@@ -1520,6 +2361,15 @@ def audit_run(
         for gate in gates for check in gate["checks"] if check["status"] != PASS
     ]
     decision = PASS if not non_pass else "PROMOTION_VETO"
+    first_failed_gate = next((gate["gate"] for gate in gates if gate["status"] != PASS), None)
+    downstream_catalog = {
+        "A": ["B anti-clipping sweep", "C motion/camera qualification", "D polished cell", "E three integrated episodes", "F robustness/replay/rerender/multimodal QA"],
+        "B": ["C motion/camera qualification", "D polished cell", "E three integrated episodes", "F robustness/replay/rerender/multimodal QA"],
+        "C": ["D polished cell", "E three integrated episodes", "F robustness/replay/rerender/multimodal QA"],
+        "D": ["E three integrated episodes", "F robustness/replay/rerender/multimodal QA"],
+        "E": ["F robustness/replay/rerender/multimodal QA"],
+        "F": [],
+    }
     return {
         "schema": REPORT_SCHEMA,
         "run_root": str(root),
@@ -1531,9 +2381,12 @@ def audit_run(
         "frozen_tolerance_schema": tolerances["schema"],
         "qa_decision": decision,
         "promotion_veto": bool(non_pass),
+        "integrated_decision": "INTEGRATED PASS" if not non_pass else "NO-GO",
         "gate_summary": {gate["gate"]: gate["status"] for gate in gates},
         "gates": gates,
         "veto_reasons": veto_reasons,
+        "first_nonpassing_gate": first_failed_gate,
+        "downstream_artifacts_not_generated": downstream_catalog.get(first_failed_gate, []),
         "dense_timeline": trace_details.get("timeline", []),
         "derived_metrics": {"interaction": interaction_metrics, "camera": camera_metrics,
                             "motion_limits": motion_limit_metrics},

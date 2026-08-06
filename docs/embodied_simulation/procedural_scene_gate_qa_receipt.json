@@ -1,72 +1,160 @@
 {
-  "schema": "embodied.corrected_qa_receipt.v1",
-  "classification": "post-outcome QA and decision-record correction; no new experiment",
-  "new_experiment": false,
+  "schema": "embodied.corrected_qa_receipt.v2",
+  "classification": "terminal integrated Gate-A result after one bounded controller/contact repair",
+  "date": "2026-08-05",
+  "new_experiment": true,
   "scientific_outcome": "NO-GO",
-  "promotion_label": "STAGE_D_NO_GO_PROMOTION_VETO",
-  "outcome_unchanged": true,
-  "executed_evidence": {
-    "eligible_config_sha256": "3e24522b0cda7bce99f50d07fe94004a1ce1ea53ecd876bfb0600881fa085519",
-    "primary_episode_contract_sha256": "507677658a2df717d222856221abe7c66277bc4cc1ac0f6badf52c6be2ff4570",
-    "trace_sha256": "9bf8f001acae001d32aa69b4e085460ea8429421940e5c299fe8c8065845abec",
-    "episode_id": "sage_living_corner__sunset_play",
-    "stage": "bimanual_cell",
-    "capture_mode": "qualification"
+  "promotion_label": "GATE_A_COMPLIANT_MANIPULATION_NO_GO",
+  "ordered_gate_reached": "A",
+  "attempt_policy": {
+    "eligible_physical_attempts_completed": 2,
+    "bounded_controller_contact_repairs_consumed": 1,
+    "third_controller_contact_attempt_permitted": false,
+    "downstream_gates_executed": []
   },
-  "post_outcome_record": {
-    "config_sha256": "7183b79cbe88ea70f2c66eb4bd1ddbba82c92f0c98c093118b053d06b1b06336",
-    "qa_source_sha256": "6e18c17354c84c2feb579aa7d89cb3b933ed6e5dc91195e177b6167847f2e197",
-    "corrected_full_report_sha256": "1d1e23bfe93a8bbbaa2a937b83f79bc2ecea8e283a7cadad6efd634afabf64c7",
-    "corrected_full_report_path": "runs/embodied_simulation/procedural_scene_gate/episodes/sage_living_corner__sunset_play/bimanual_cell/independent_qa_report.json",
-    "full_report_is_generated_and_ignored": true,
-    "invalid_stale_report_sha256": "443d5d4bc2adf9acdf4b4f970c79b45d2a4043ba53574a24e81fb41c695a0226",
-    "invalid_stale_report_reasons": [
-      "admitted speculative contacts above the frozen 0.0005 m separation maximum",
-      "misreported dwell and turn metrics",
-      "false-failed integer 8:1 mapping on serialized floating timestamp drift",
-      "computed camera roll from a world quaternion instead of the registered capture ledger"
-    ]
+  "executed_freeze": {
+    "engine": "Unity 6000.0.80f1 ARM64/Metal",
+    "physics_hz": 240,
+    "render_hz": 30,
+    "steps_per_render_frame": 8,
+    "config_sha256": "3001b37bcaae9f9616f719431e8f56d96886adbb283a3efe9d9e1f83886c83d6",
+    "episode_id": "A_playroom_red_toy",
+    "episode_contract_sha256": "eb8fc293718bba694952b24a901835ca42f98eb5a1b9976343b43151374de66c",
+    "attempt_2_source_audit_receipt_sha256": "281670aaf1e245ad5b1ec02d8e77e5efba60681477a3cd6fe55ecf0146b091a0",
+    "attempt_2_source_set_sha256": "2baec75c7b7b75169e329a1700f90aab0ee6ef53931d19291e42fe9d4472e5c9",
+    "attempt_2_motion_source_sha256": "5ae2a8cbe72346b76f6d2f276f3a3c8a683eb4f138df101a5f5c3d424f1915bf",
+    "compile_only_passed": true,
+    "focused_tests_passed": 129
   },
-  "corrected_metrics": {
-    "eligible_contact_rows": 3613,
-    "speculative_contact_rows_excluded": 23851,
-    "eligible_nonzero_impulse_rows": 419,
-    "right_thumb_two_non_thumb_geometric_dwell_s": 1.6875,
-    "right_thumb_two_non_thumb_nonzero_impulse_dwell_s": 0.0,
-    "meaningful_opposing_left_geometric_dwell_s": 0.3125,
-    "meaningful_opposing_left_nonzero_impulse_dwell_s": 0.0,
-    "qualification_step": 1922,
-    "controller_carry_telemetry_steps": 16,
-    "controller_carry_telemetry_dwell_s": 0.06666666666666667,
-    "literal_same_row_postqualification_opposing_geometry_steps": 15,
-    "literal_same_row_postqualification_opposing_geometry_dwell_s": 0.0625,
-    "lift_after_bimanual_qualification_m": 0.0,
-    "supported_turn_during_bimanual_turn_deg": 57.06412496399321,
-    "supported_turn_steps": 792,
-    "bimanual_turn_steps": 792,
-    "maximum_hand_target_impulse_n_s": 0.07174254208803177,
-    "maximum_float_timestamp_drift_s": 1.271348446962861e-06,
-    "exact_integer_clock_mapping_pass": true,
-    "maximum_absolute_optical_roll_deg": 7.9146270751953125,
-    "optical_roll_source": "registered_capture_ledger.roll_deg"
+  "attempts": [
+    {
+      "attempt": 1,
+      "classification": "eligible physical failure before the single bounded repair",
+      "ignored_evidence_root": "runs/embodied_simulation/procedural_scene_gate/episodes/A_playroom_red_toy/physical_attempt_01_failure",
+      "physics_steps": 5760,
+      "render_frames": 720,
+      "duration_s": 24.0,
+      "trace_sha256": "2ddcbdbd062b0b1bdff9397c8fd839480b20b8e5a14311ea683f0dad13c54fc1",
+      "right_thumb_two_non_thumb_impulse_rows": 0,
+      "right_measured_impulse_qualified": false,
+      "index_only_impulse_interval_steps": 526,
+      "index_only_impulse_interval_s": 2.191666666666667,
+      "index_only_impulse_interval_range": [3064, 3589],
+      "index_maximum_impulse_n_s": 0.000042621,
+      "thumb_minimum_separation_m": 0.0058949,
+      "maximum_raw_lift_m": 0.0,
+      "commanded_open_time_s": 19.004167556762695,
+      "release_at_required_destination": false,
+      "head_target_center_frustum_frames": 0,
+      "head_total_frames": 720,
+      "assistance_ledger_entries": 0,
+      "head_rgb_sha256": "a8f41e1abfd770cdbd17317e2172eebb1d911f6cec4f1c02ef1d7f1695df92de",
+      "external_clean_sha256": "f701697f905fca76eb1b3a8d0b11a85a8992ba18363f22b4a5e2adc331160e81",
+      "external_overlay_sha256": "fd9763ca24275f2fb94c47687565d58a140cc6b82ae590d12f629886a9dde28b"
+    },
+    {
+      "attempt": 2,
+      "classification": "terminal eligible physical failure after the single bounded repair",
+      "ignored_evidence_root": "runs/embodied_simulation/procedural_scene_gate/episodes/A_playroom_red_toy/physical_attempt_02_failure",
+      "physics_steps": 5760,
+      "render_frames": 720,
+      "duration_s": 24.0,
+      "trace_sha256": "7c0b6f57f53e21c40006b82877731c476d170ca9d09cf32d31670f5352d5a002",
+      "right_thumb_two_non_thumb_impulse_rows": 0,
+      "right_measured_impulse_qualified": false,
+      "left_measured_impulse_qualified": false,
+      "thumb_minimum_separation_m": 0.0016032643616199493,
+      "thumb_maximum_impulse_n_s": 0.0,
+      "middle_minimum_separation_m": 0.008345033973455429,
+      "middle_maximum_impulse_n_s": 0.0,
+      "index_maximum_impulse_n_s": 0.016210302710533142,
+      "finger_object_maximum_penetration_m": 0.0059321168810129166,
+      "maximum_raw_lift_m": 0.0,
+      "first_floor_support_step": 2072,
+      "first_floor_support_time_s": 8.637500762939453,
+      "commanded_open_step": 4560,
+      "commanded_open_time_s": 19.004167556762695,
+      "release_at_required_destination": false,
+      "head_target_center_frustum_frames": 0,
+      "head_total_frames": 720,
+      "registered_visible_contact_records": 0,
+      "assistance_ledger_entries": 0,
+      "head_rgb_sha256": "a6bb7f9b88cc8bfaa74baad39fc901a766c43266714a9d303ae26fb8a6105675",
+      "external_clean_sha256": "09c36269b9b3e013a157b6dcf33e8ffbd3f95e91f403e484e9b1e7b63dcbb6f2",
+      "external_overlay_sha256": "cde53ff3eff4675f44936c6c212194e389bc01a48be48ed9e49c9c3da292d8ff"
+    }
+  ],
+  "authority_evidence": {
+    "runtime_accounting_passed_both_attempts": true,
+    "object_pose_writes_after_initialization": 0,
+    "object_velocity_writes_after_initialization": 0,
+    "object_external_forces": 0,
+    "object_external_torques": 0,
+    "attachment_or_joint_count": 0,
+    "object_parenting_changes": 0,
+    "object_joint_changes": 0,
+    "object_kinematic_changes": 0,
+    "assistance_ledger_entries": 0,
+    "zero_counters_are_independent_universal_proof": false,
+    "source_audit_required_and_passed": true
   },
-  "authority_evidence_scope": {
-    "passive_fields": [
-      "object_pose_write_count",
-      "object_velocity_write_count",
-      "hidden_force_count",
-      "parenting_count",
-      "joint_count",
-      "assistance_ledger"
-    ],
-    "runtime_detector_claim": false,
-    "source_audit": "Canonical source contains no direct free-object pose or velocity write, force or torque application, parenting, or joint construction after initialization.",
-    "controller_target_tracking": "Before qualification, live interactionAnchorWorld follows the free target Rigidbody center of mass and drives only bounded kinematic hand waypoints; it is latched at qualification. This is scene-conditioned hand target tracking, not object assistance, and was not separately instrumented in the executed trace."
+  "invalid_or_failed_evidence": {
+    "compliant_drive_state_channel": {
+      "valid": false,
+      "invalid_rows_attempt_2": 172800,
+      "recorded_field": "inactive ConfigurableJoint.angularXDrive",
+      "recorded_values": {
+        "spring": 0.0,
+        "damper": 0.0,
+        "maximum_force": "FLT_MAX"
+      },
+      "executed_drive": "ConfigurableJoint.rotationDriveMode=Slerp; slerpDrive spring=2.4, damper=0.075, maximumForce=1.15",
+      "acceptance_use": "excluded; not repaired or reinterpreted"
+    },
+    "registration": {
+      "attempt_1_passed": false,
+      "attempt_1_skin_collider_maximum_m": 0.14427906274795532,
+      "attempt_1_nonadjacent_self_penetration_m": 0.0186481773853302,
+      "attempt_1_solver_motion_penetration_m": 0.015730995684862137,
+      "attempt_1_incomplete_sweep_intervals": 2038,
+      "attempt_2_passed": false,
+      "attempt_2_skin_collider_maximum_m": 0.08536802977323532,
+      "attempt_2_nonadjacent_self_penetration_m": 0.018542097881436348,
+      "attempt_2_solver_motion_penetration_m": 0.018980860710144043,
+      "attempt_2_incomplete_sweep_intervals": 942,
+      "nonconvex_closest_point_errors_per_unity_log": 38934
+    },
+    "camera_and_projection": {
+      "target_center_outside_frustum_frames_each_attempt": 720,
+      "total_frames_each_attempt": 720,
+      "registered_visible_contact_records_each_attempt": 0,
+      "prospective_fov_receipt_promoted": false,
+      "direct_video_result": "head interaction unreadable; external and overlay expose failure"
+    }
   },
-  "video_receipts": {
-    "head_rgb_sha256": "ab0a92164a5bca53d1283a5456638de014d2df6d6e7335fff3df00d214652940",
-    "external_rgb_sha256": "ae867e3bb4470067d7245b2fbfd4469e90c3d9aff818764321dafc661884fdba",
-    "contact_overlay_sha256": "3dc4b7b07e6edd0349a50c94450a0bb835e13cb090fbfbf006c230902c7d01d8"
+  "downstream_artifacts_not_generated": [
+    "Gate-B anatomical/finger/three-garment qualification sweeps",
+    "Gate-C contact-free motion and body-derived camera qualification",
+    "Gate-D polished furnished bimanual episode",
+    "Gate-E cells B and C and no-retuning episode matrix",
+    "Gate-F robustness variants",
+    "Gate-F fresh-process replay",
+    "Gate-F same-trace rerender",
+    "Gate-F promotable RGB/depth/semantic/instance/contact QA bundle"
+  ],
+  "preserved_historical_record": {
+    "promotion_label": "STAGE_D_NO_GO_PROMOTION_VETO",
+    "decision": "NO-GO",
+    "record": "docs/embodied_simulation/procedural_scene_gate_freeze_amendment.json",
+    "right_geometric_dwell_s": 1.6875,
+    "right_nonzero_impulse_dwell_s": 0.0,
+    "left_geometric_dwell_s": 0.3125,
+    "left_nonzero_impulse_dwell_s": 0.0,
+    "postqualification_opposition_s": 0.0625,
+    "lift_m": 0.0,
+    "turn_deg_support_bound": 57.0641,
+    "clean_release": false,
+    "head_view_readable": false
   },
-  "scope_limit": "The trace provides expanded synchronized body, hand, contact, object, camera-parent, and controller state. Registered depth/semantic/instance capture, fresh-process replay, same-trace rerender, and multi-seed robustness evidence are absent and are not claimed."
+  "scope_limit": "This NO-GO applies only to the tested compliant-hand/controller configuration and does not generalize to Unity, PhysX, or the wider project."
 }

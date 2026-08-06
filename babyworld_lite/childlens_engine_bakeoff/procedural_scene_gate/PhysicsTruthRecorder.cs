@@ -110,12 +110,17 @@ namespace ProceduralSceneGate
         public const string ManifestFileName = "episode_trace_manifest.json";
         public const string ClockReceiptFileName = "episode_trace_clock_receipt.json";
         public const string HashReceiptFileName = "episode_trace_hash_receipt.json";
+        public const string InteractionSummaryFileName = "interaction_summary.json";
         public const float ObservedClosureNormalizationDeg = 90f;
         private const float Dt = 1f / FrozenGate.PhysicsHz;
         // GateContext stores seconds as a Unity float; near 16 s, adjacent
         // representable values introduce about 1.02 us of quantization. The
         // integer physics/render indices remain the exact clock authority.
         private const float ClockToleranceSeconds = 2e-6f;
+        private const float OutOfPhysicsPositionToleranceM = 1e-6f;
+        private const float OutOfPhysicsRotationToleranceDeg = 1e-4f;
+        private const float OutOfPhysicsLinearVelocityToleranceMps = 1e-6f;
+        private const float OutOfPhysicsAngularVelocityToleranceRadps = 1e-6f;
 
         private readonly Dictionary<string, PriorPose> priorPoses = new Dictionary<string, PriorPose>();
         private readonly Dictionary<string, Quaternion> priorRelativeRotations = new Dictionary<string, Quaternion>();
@@ -123,6 +128,8 @@ namespace ProceduralSceneGate
         private readonly Dictionary<string, PendingContact> pendingContacts = new Dictionary<string, PendingContact>();
         private readonly HashSet<string> avatarColliderIds = new HashSet<string>();
         private readonly HashSet<string> targetColliderIds = new HashSet<string>();
+        private readonly Dictionary<string, string> externalColliderPersistentIds = new Dictionary<string, string>();
+        private readonly Dictionary<string, Transform> bodySegments = new Dictionary<string, Transform>();
         private readonly List<PhysicsTruthContactProbe> installedProbes = new List<PhysicsTruthContactProbe>();
 
         private GateContext boundContext;
@@ -149,7 +156,31 @@ namespace ProceduralSceneGate
         private int unavailableCameraClearanceSteps;
         private int nonFreeObjectSteps;
         private int cameraParentMismatchSteps;
+        private int unavailableDynamicFingerBindings;
         private bool authorityBindingsVerified;
+        private TargetAuthoritySnapshot lastCompletedTargetState;
+        private TargetAuthoritySnapshot beforePhysicsTargetState;
+        private bool hasLastCompletedTargetState;
+        private bool hasBeforePhysicsTargetState;
+        private int rightMeasuredImpulseDwellSteps;
+        private int leftMeasuredImpulseDwellSteps;
+        private bool measuredRightQualified;
+        private bool measuredLeftQualified;
+        private bool objectUnsupportedDuringQualifiedManipulation = true;
+        private bool supportContinuousUntilCommandedOpening = true;
+        private bool qualificationEverActive;
+        private float qualificationTargetCenterY;
+        private Quaternion qualificationTargetRotation;
+        private bool hasQualificationBaseline;
+        private int measuredBimanualQualificationStep = -1;
+        private float maximumQualifiedLiftM;
+        private float maximumQualifiedTurnDeg;
+        private bool initialFingerOverlapDisqualified;
+        private float fingerObjectMaximumPenetrationM;
+        private float targetSupportMaximumPenetrationM;
+        private bool releaseEverCommanded;
+        private bool releaseAtRequiredDestination;
+        private string lastObservedDestinationSupportId = "";
         private Vector3 priorHeadPosition;
         private Vector3 priorPriorHeadPosition;
         private Quaternion priorHeadRotation;
@@ -174,11 +205,24 @@ namespace ProceduralSceneGate
                 .GetComponentsInChildren<MonoBehaviour>(true)
                 .OfType<IPhysicsTruthControllerTelemetryProvider>()
                 .SingleOrDefault();
-            avatarColliders = context.AvatarRoot.GetComponentsInChildren<Collider>(true);
+            // Collider ownership is an explicit embodiment contract. Dynamic palm/finger
+            // collision drivers are intentionally reparented outside AvatarRoot, so a
+            // hierarchy scan would misclassify those force-producing colliders as an
+            // external support for the manipulated object.
+            avatarColliders = context.AvatarColliders
+                .Where(collider => collider != null)
+                .Distinct()
+                .ToArray();
+            if (avatarColliders.Length == 0)
+                throw new InvalidOperationException("GateContext.AvatarColliders must enumerate every anatomical collider");
             foreach (Collider collider in avatarColliders)
                 avatarColliderIds.Add(StableTransformId(collider.transform));
             foreach (Collider collider in context.TargetBody.GetComponentsInChildren<Collider>(true))
                 targetColliderIds.Add(StableTransformId(collider.transform));
+            IndexExternalColliderIdentities(context);
+            BindBodySegments(context);
+            if (!IsSha256(context.AuthorityAudit.sourceAuditSha256))
+                throw new InvalidOperationException("a frozen source-audit SHA-256 must be supplied before truth binding");
             authorityBindingsVerified = IsChildOrSelf(context.AvatarRoot.transform, context.AuthorityRoot.transform)
                                         && IsChildOrSelf(context.HeadCameraMount, context.Head)
                                         && IsChildOrSelf(context.HeadCamera.transform, context.HeadCameraMount);
@@ -190,10 +234,30 @@ namespace ProceduralSceneGate
                 bindDigitLocalRotations[key] = context.FingerSegments[key]
                     .Select(segment => segment.localRotation)
                     .ToArray();
+                for (int segment = 1; segment <= 3; segment++)
+                {
+                    string authorityKey = key + "_segment" + segment;
+                    if (!context.FingerBodies.ContainsKey(authorityKey) || context.FingerBodies[authorityKey] == null
+                        || !context.FingerJoints.ContainsKey(authorityKey) || context.FingerJoints[authorityKey] == null)
+                        unavailableDynamicFingerBindings++;
+                }
             }
 
-            IEnumerable<Collider> observedColliders = context.AuthorityRoot
-                .GetComponentsInChildren<Collider>(true)
+            lastCompletedTargetState = SampleTargetAuthorityState(context.TargetBody);
+            hasLastCompletedTargetState = true;
+            if (lastCompletedTargetState.jointIds.Length > 0)
+                RegisterAuthorityViolation(
+                    context,
+                    "target_joint",
+                    lastCompletedTargetState.jointIds.Length,
+                    "target was bound with a Joint or as a Joint.connectedBody"
+                );
+            if (!string.IsNullOrWhiteSpace(lastCompletedTargetState.parentId))
+                RegisterAuthorityViolation(context, "target_parenting", 1, "target was bound with a parent");
+            if (lastCompletedTargetState.isKinematic)
+                RegisterAuthorityViolation(context, "target_kinematic", 1, "target was bound as kinematic");
+
+            IEnumerable<Collider> observedColliders = avatarColliders
                 .Concat(context.TargetBody.GetComponentsInChildren<Collider>(true))
                 .Where(collider => collider != null)
                 .Distinct();
@@ -209,17 +273,51 @@ namespace ProceduralSceneGate
             Physics.ContactEvent += ObserveContactEvent;
         }
 
+        /// <summary>
+        /// Read-only boundary sample taken after all controller commands and
+        /// Physics.SyncTransforms, immediately before the sole Physics.Simulate call.
+        /// A difference from the prior completed state occurred outside PhysX.
+        /// </summary>
+        public void RecordBeforePhysicsStep(GateContext context)
+        {
+            RequireActiveContext(context);
+            TargetAuthoritySnapshot current = SampleTargetAuthorityState(context.TargetBody);
+            if (hasLastCompletedTargetState)
+                AuditOutOfPhysicsChanges(context, lastCompletedTargetState, current);
+            beforePhysicsTargetState = current;
+            hasBeforePhysicsTargetState = true;
+        }
+
         public void RecordAfterPhysicsStep(GateContext context)
         {
             RequireActiveContext(context);
+            CompleteTargetAuthorityAudit(context);
             ValidateAndAccumulateClock(context);
             ControllerTelemetrySnapshot telemetry = SampleControllerTelemetry(context.PhysicsStep);
             ContactTruthRow[] contacts = ConsumeContacts(context);
             ControllerStateTruth controllerState = BuildControllerState(telemetry, context.PhysicsStep);
 
+            ObjectTruth freeObject = SampleFreeObject(context, contacts);
+            ForceBearingQualificationTruth forceQualification = SampleForceBearingQualification(
+                context,
+                telemetry,
+                contacts,
+                freeObject
+            );
             EpisodeTraceRow row = new EpisodeTraceRow
             {
                 schema = FrozenGate.TraceSchema,
+                episode = new EpisodeContextTruth
+                {
+                    episode_id = context.EpisodeId,
+                    cell_id = context.CellId,
+                    room_family = context.RoomFamily,
+                    garment_configuration_id = context.GarmentConfigurationId,
+                    target_id = context.TargetId,
+                    destination_id = context.DestinationId,
+                    contact_strategy = context.ContactStrategy,
+                    final_gaze_zone = context.FinalGazeZone
+                },
                 clock = new ClockTruth
                 {
                     physics_step = context.PhysicsStep,
@@ -234,16 +332,34 @@ namespace ProceduralSceneGate
                 },
                 body_state = new BodyStateTruth
                 {
-                    root = SampleTransformPose(context.AvatarRoot.transform, "body/root"),
-                    torso = SampleTransformPose(context.Torso, "body/torso"),
-                    neck = SampleTransformPose(context.Neck, "body/neck"),
-                    head = SampleTransformPose(context.Head, "body/head")
+                    root = SampleTransformPose(bodySegments["root"], "body/root"),
+                    pelvis = SampleTransformPose(bodySegments["pelvis"], "body/pelvis"),
+                    torso = SampleTransformPose(bodySegments["torso"], "body/torso"),
+                    neck = SampleTransformPose(bodySegments["neck"], "body/neck"),
+                    head = SampleTransformPose(bodySegments["head"], "body/head"),
+                    left_shoulder = SampleTransformPose(bodySegments["left_shoulder"], "body/left/shoulder"),
+                    left_upper_arm = SampleTransformPose(bodySegments["left_upper_arm"], "body/left/upper_arm"),
+                    left_elbow = SampleTransformPose(bodySegments["left_elbow"], "body/left/elbow"),
+                    left_lower_arm = SampleTransformPose(bodySegments["left_lower_arm"], "body/left/lower_arm"),
+                    left_forearm = SampleTransformPose(bodySegments["left_forearm"], "body/left/forearm"),
+                    left_wrist = SampleTransformPose(bodySegments["left_wrist"], "body/left/wrist"),
+                    left_palm = SampleTransformPose(bodySegments["left_palm"], "body/left/palm"),
+                    right_shoulder = SampleTransformPose(bodySegments["right_shoulder"], "body/right/shoulder"),
+                    right_upper_arm = SampleTransformPose(bodySegments["right_upper_arm"], "body/right/upper_arm"),
+                    right_elbow = SampleTransformPose(bodySegments["right_elbow"], "body/right/elbow"),
+                    right_lower_arm = SampleTransformPose(bodySegments["right_lower_arm"], "body/right/lower_arm"),
+                    right_forearm = SampleTransformPose(bodySegments["right_forearm"], "body/right/forearm"),
+                    right_wrist = SampleTransformPose(bodySegments["right_wrist"], "body/right/wrist"),
+                    right_palm = SampleTransformPose(bodySegments["right_palm"], "body/right/palm")
                 },
                 controller_state = controllerState,
                 contacts = contacts,
-                objects = new[] { SampleFreeObject(context, contacts) },
+                objects = new[] { freeObject },
                 camera_state = SampleCamera(context),
-                assistance_ledger = context.AssistanceLedger.ToArray()
+                assistance_ledger = context.AssistanceLedger.ToArray(),
+                recovery_ledger = context.RecoveryLedger.ToArray(),
+                authority_counters = CopyAuthorityAudit(context.AuthorityAudit),
+                force_bearing_qualification = forceQualification
             };
             row.hand_state = SampleHands(context, telemetry);
             row.derived_state = SampleDerivedState(context);
@@ -295,6 +411,30 @@ namespace ProceduralSceneGate
 
             string traceSha256 = Sha256(tracePath);
             string clockSha256 = Sha256(clockPath);
+            InteractionSummary interactionSummary = new InteractionSummary
+            {
+                schema = "embodied.physics_truth.interaction_summary.v1",
+                episode_id = context.EpisodeId,
+                target_id = context.TargetId,
+                required_destination_id = context.DestinationId,
+                observed_destination_support_id = lastObservedDestinationSupportId,
+                finger_object_max_penetration_m = fingerObjectMaximumPenetrationM,
+                target_support_max_penetration_m = targetSupportMaximumPenetrationM,
+                finger_object_penetration_limit_m = FrozenGate.FingerObjectPenetrationMaxM,
+                target_support_penetration_limit_m = FrozenGate.SupportPenetrationMaxM,
+                finger_object_penetration_passed = fingerObjectMaximumPenetrationM <= FrozenGate.FingerObjectPenetrationMaxM,
+                target_support_penetration_passed = targetSupportMaximumPenetrationM <= FrozenGate.SupportPenetrationMaxM,
+                right_measured_impulse_qualified = measuredRightQualified,
+                left_measured_impulse_qualified = measuredLeftQualified,
+                lift_over_0_10_m = maximumQualifiedLiftM > 0.10f,
+                turn_over_30_deg = maximumQualifiedTurnDeg > 30f,
+                object_unsupported_during_qualified_manipulation = objectUnsupportedDuringQualifiedManipulation,
+                release_command_ever_observed = releaseEverCommanded,
+                release_at_required_destination = releaseAtRequiredDestination,
+                provenance = "derived_from_post_Physics.Simulate_contact_rows"
+            };
+            string interactionSummaryPath = Path.Combine(context.OutputRoot, InteractionSummaryFileName);
+            WriteJson(interactionSummaryPath, interactionSummary);
             TraceManifest manifest = new TraceManifest
             {
                 schema = "embodied.episode_trace.manifest.v1",
@@ -304,6 +444,14 @@ namespace ProceduralSceneGate
                 trace_sha256 = traceSha256,
                 clock_receipt_file = ClockReceiptFileName,
                 clock_receipt_sha256 = clockSha256,
+                interaction_summary_file = InteractionSummaryFileName,
+                interaction_summary_sha256 = Sha256(interactionSummaryPath),
+                finger_object_max_penetration_m = fingerObjectMaximumPenetrationM,
+                target_support_max_penetration_m = targetSupportMaximumPenetrationM,
+                required_destination_id = context.DestinationId,
+                observed_destination_support_id = lastObservedDestinationSupportId,
+                object_unsupported_during_qualified_manipulation = objectUnsupportedDuringQualifiedManipulation,
+                release_at_required_destination = releaseAtRequiredDestination,
                 row_count = rowCount,
                 controller_provider_bound = controllerProvider != null,
                 unavailable_controller_steps = unavailableControllerSteps,
@@ -315,7 +463,15 @@ namespace ProceduralSceneGate
                 unavailable_camera_clearance_steps = unavailableCameraClearanceSteps,
                 non_free_object_steps = nonFreeObjectSteps,
                 camera_parent_mismatch_steps = cameraParentMismatchSteps,
+                unavailable_dynamic_finger_bindings = unavailableDynamicFingerBindings,
                 assistance_ledger_empty = maximumAssistanceEntries == 0,
+                recovery_ledger_entries = context.RecoveryLedger.Count,
+                authority_counters = CopyAuthorityAudit(context.AuthorityAudit),
+                source_audit_sha256 = context.AuthorityAudit.sourceAuditSha256,
+                source_audit_present = IsSha256(context.AuthorityAudit.sourceAuditSha256),
+                runtime_detection_coverage = "boundary-sampled target parenting, Joint graph, isKinematic, and between-step Rigidbody/Transform pose and velocity discontinuities",
+                force_torque_detection_boundary = "counters require instrumented call sites; mandatory source audit covers uninstrumented calls",
+                zero_counters_are_independent_proof = false,
                 clock_passed = clockValid,
                 one_authority_state = authorityBindingsVerified,
                 object_state_authority = "Unity Rigidbody/PhysX sampled after Physics.Simulate",
@@ -329,7 +485,10 @@ namespace ProceduralSceneGate
                                  && nonFreeObjectSteps == 0
                                  && cameraParentMismatchSteps == 0
                                  && authorityBindingsVerified
-                                 && maximumAssistanceEntries == 0,
+                                 && unavailableDynamicFingerBindings == 0
+                                 && maximumAssistanceEntries == 0
+                                 && AuthorityAuditPassed(context.AuthorityAudit)
+                                 && IsSha256(context.AuthorityAudit.sourceAuditSha256),
                 provenance_registry = ProvenanceRegistry()
             };
             string manifestPath = Path.Combine(context.OutputRoot, ManifestFileName);
@@ -345,7 +504,9 @@ namespace ProceduralSceneGate
                 manifest_file = ManifestFileName,
                 manifest_sha256 = Sha256(manifestPath),
                 clock_receipt_file = ClockReceiptFileName,
-                clock_receipt_sha256 = clockSha256
+                clock_receipt_sha256 = clockSha256,
+                interaction_summary_file = InteractionSummaryFileName,
+                interaction_summary_sha256 = Sha256(interactionSummaryPath)
             };
             WriteJson(Path.Combine(context.OutputRoot, HashReceiptFileName), hashReceipt);
             completed = true;
@@ -498,6 +659,159 @@ namespace ProceduralSceneGate
                 throw new InvalidOperationException("PhysicsTruthRecorder is already complete");
         }
 
+        private void CompleteTargetAuthorityAudit(GateContext context)
+        {
+            TargetAuthoritySnapshot completedState = SampleTargetAuthorityState(context.TargetBody);
+            if (!hasBeforePhysicsTargetState)
+            {
+                RegisterAuthorityViolation(
+                    context,
+                    "audit_boundary_missing",
+                    1,
+                    "RecordBeforePhysicsStep was not called for the completed manual physics step"
+                );
+            }
+            else
+            {
+                AuditStructuralChanges(context, beforePhysicsTargetState, completedState);
+            }
+            lastCompletedTargetState = completedState;
+            hasLastCompletedTargetState = true;
+            hasBeforePhysicsTargetState = false;
+        }
+
+        private void AuditOutOfPhysicsChanges(
+            GateContext context,
+            TargetAuthoritySnapshot completed,
+            TargetAuthoritySnapshot beforePhysics
+        )
+        {
+            AuditStructuralChanges(context, completed, beforePhysics);
+            if (Vector3.Distance(completed.rigidbodyPosition, beforePhysics.rigidbodyPosition)
+                    > OutOfPhysicsPositionToleranceM
+                || Quaternion.Angle(completed.rigidbodyRotation, beforePhysics.rigidbodyRotation)
+                    > OutOfPhysicsRotationToleranceDeg
+                || Vector3.Distance(completed.transformPosition, beforePhysics.transformPosition)
+                    > OutOfPhysicsPositionToleranceM
+                || Quaternion.Angle(completed.transformRotation, beforePhysics.transformRotation)
+                    > OutOfPhysicsRotationToleranceDeg)
+            {
+                RegisterAuthorityViolation(
+                    context,
+                    "target_pose_write",
+                    1,
+                    "target Rigidbody/Transform pose changed between completed PhysX state and next pre-sim boundary"
+                );
+            }
+            if (Vector3.Distance(completed.linearVelocity, beforePhysics.linearVelocity)
+                    > OutOfPhysicsLinearVelocityToleranceMps
+                || Vector3.Distance(completed.angularVelocity, beforePhysics.angularVelocity)
+                    > OutOfPhysicsAngularVelocityToleranceRadps)
+            {
+                RegisterAuthorityViolation(
+                    context,
+                    "target_velocity_write",
+                    1,
+                    "target Rigidbody velocity changed between completed PhysX state and next pre-sim boundary"
+                );
+            }
+        }
+
+        private void AuditStructuralChanges(
+            GateContext context,
+            TargetAuthoritySnapshot previous,
+            TargetAuthoritySnapshot current
+        )
+        {
+            if (!string.Equals(previous.parentId, current.parentId, StringComparison.Ordinal))
+                RegisterAuthorityViolation(context, "target_parenting", 1, "target parent changed at runtime");
+            if (previous.isKinematic != current.isKinematic)
+                RegisterAuthorityViolation(context, "target_kinematic", 1, "target Rigidbody.isKinematic changed at runtime");
+            int changedJoints = previous.jointIds.Except(current.jointIds, StringComparer.Ordinal).Count()
+                                + current.jointIds.Except(previous.jointIds, StringComparer.Ordinal).Count();
+            if (changedJoints > 0)
+                RegisterAuthorityViolation(context, "target_joint", changedJoints, "target Joint graph changed at runtime");
+        }
+
+        private static TargetAuthoritySnapshot SampleTargetAuthorityState(Rigidbody body)
+        {
+            string[] jointIds = UnityEngine.Object.FindObjectsByType<Joint>(FindObjectsSortMode.None)
+                .Where(joint => joint != null
+                                && (joint.GetComponent<Rigidbody>() == body || joint.connectedBody == body))
+                .Select(joint => StableTransformId(joint.transform) + "::" + joint.GetType().Name)
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+            return new TargetAuthoritySnapshot
+            {
+                rigidbodyPosition = body.position,
+                rigidbodyRotation = body.rotation,
+                transformPosition = body.transform.position,
+                transformRotation = body.transform.rotation,
+                linearVelocity = body.linearVelocity,
+                angularVelocity = body.angularVelocity,
+                isKinematic = body.isKinematic,
+                parentId = body.transform.parent == null ? "" : StableTransformId(body.transform.parent),
+                jointIds = jointIds
+            };
+        }
+
+        private static void RegisterAuthorityViolation(
+            GateContext context,
+            string category,
+            int count,
+            string detail
+        )
+        {
+            if (count <= 0) return;
+            AuthorityAuditState audit = context.AuthorityAudit;
+            switch (category)
+            {
+                case "target_pose_write": audit.targetPoseWriteCounter += count; break;
+                case "target_velocity_write": audit.targetVelocityWriteCounter += count; break;
+                case "target_joint": audit.targetJointCounter += count; break;
+                case "target_parenting": audit.targetParentingCounter += count; break;
+                case "target_kinematic": audit.targetKinematicChangeCounter += count; break;
+            }
+            string ledgerEntry = "step=" + context.PhysicsStep + " category=" + category
+                                 + " target=" + context.TargetId + " detail=" + detail;
+            if (!context.AssistanceLedger.Contains(ledgerEntry))
+                context.AssistanceLedger.Add(ledgerEntry);
+        }
+
+        private static AuthorityAuditState CopyAuthorityAudit(AuthorityAuditState source)
+        {
+            return new AuthorityAuditState
+            {
+                targetPoseWriteCounter = source.targetPoseWriteCounter,
+                targetVelocityWriteCounter = source.targetVelocityWriteCounter,
+                targetForceCounter = source.targetForceCounter,
+                targetTorqueCounter = source.targetTorqueCounter,
+                targetJointCounter = source.targetJointCounter,
+                targetParentingCounter = source.targetParentingCounter,
+                targetKinematicChangeCounter = source.targetKinematicChangeCounter,
+                recoveryCounter = source.recoveryCounter,
+                sourceAuditSha256 = source.sourceAuditSha256
+            };
+        }
+
+        private static bool AuthorityAuditPassed(AuthorityAuditState audit)
+        {
+            return audit.targetPoseWriteCounter == 0
+                   && audit.targetVelocityWriteCounter == 0
+                   && audit.targetForceCounter == 0
+                   && audit.targetTorqueCounter == 0
+                   && audit.targetJointCounter == 0
+                   && audit.targetParentingCounter == 0
+                   && audit.targetKinematicChangeCounter == 0;
+        }
+
+        private static bool IsSha256(string value)
+        {
+            return !string.IsNullOrWhiteSpace(value)
+                   && value.Length == 64
+                   && value.All(Uri.IsHexDigit);
+        }
+
         private void ValidateAndAccumulateClock(GateContext context)
         {
             int expectedRenderFrame = context.PhysicsStep / FrozenGate.StepsPerFrame;
@@ -565,7 +879,8 @@ namespace ProceduralSceneGate
 
         private static ControllerStateTruth BuildControllerState(ControllerTelemetrySnapshot telemetry, int physicsStep)
         {
-            bool releaseCommanded = string.Equals(telemetry.phase_id, "Release", StringComparison.OrdinalIgnoreCase);
+            bool releaseCommanded = string.Equals(telemetry.phase_id, "CommandedOpen", StringComparison.OrdinalIgnoreCase)
+                                    || string.Equals(telemetry.phase_id, "Release", StringComparison.OrdinalIgnoreCase);
             return new ControllerStateTruth
             {
                 telemetry_physics_step = telemetry.physics_step,
@@ -593,8 +908,8 @@ namespace ProceduralSceneGate
         {
             return new BodyHandsTruth
             {
-                left_palm = SampleTransformPose(context.LeftPalm, "hands/left/palm"),
-                right_palm = SampleTransformPose(context.RightPalm, "hands/right/palm"),
+                left_palm = SampleTransformPose(bodySegments["left_palm"], "hands/left/palm"),
+                right_palm = SampleTransformPose(bodySegments["right_palm"], "hands/right/palm"),
                 left_thumb = SampleDigit(context, telemetry, "left", "thumb"),
                 left_index = SampleDigit(context, telemetry, "left", "index"),
                 left_middle = SampleDigit(context, telemetry, "left", "middle"),
@@ -638,7 +953,78 @@ namespace ProceduralSceneGate
                 closure_commanded_provenance = command == null ? "unavailable" : "commanded",
                 closure_observed = Mathf.Clamp01(observedDegrees / ObservedClosureNormalizationDeg),
                 closure_observed_provenance = "derived",
-                closure_observed_formula = "mean Quaternion.Angle(bind_local_rotation,current_local_rotation) / 90 deg"
+                closure_observed_formula = "mean Quaternion.Angle(bind_local_rotation,current_local_rotation) / 90 deg",
+                dynamic_body_states = Enumerable.Range(1, 3)
+                    .Select(index => SampleFingerBody(context, key + "_segment" + index))
+                    .ToArray(),
+                compliant_joint_states = Enumerable.Range(1, 3)
+                    .Select(index => SampleFingerJoint(context, key + "_segment" + index))
+                    .ToArray()
+            };
+        }
+
+        private static DynamicFingerBodyTruth SampleFingerBody(GateContext context, string key)
+        {
+            if (!context.FingerBodies.TryGetValue(key, out Rigidbody body) || body == null)
+                return new DynamicFingerBodyTruth
+                {
+                    body_id = "unavailable",
+                    provenance = "unavailable",
+                    physical_authority = "unavailable"
+                };
+            return new DynamicFingerBodyTruth
+            {
+                body_id = StableTransformId(body.transform),
+                pose = new PoseTruth
+                {
+                    position_world_m = body.position,
+                    rotation_world_xyzw = body.rotation,
+                    linear_velocity_world_m_s = body.linearVelocity,
+                    angular_velocity_world_rad_s = body.angularVelocity,
+                    position_provenance = "engine_observed",
+                    rotation_provenance = "engine_observed",
+                    linear_velocity_provenance = "physx_measured",
+                    angular_velocity_provenance = "physx_measured",
+                    velocity_formula_or_source = "Unity Rigidbody state sampled after Physics.Simulate"
+                },
+                is_kinematic = body.isKinematic,
+                mass_kg = body.mass,
+                linear_velocity_world_m_s = body.linearVelocity,
+                angular_velocity_world_rad_s = body.angularVelocity,
+                sleeping = body.IsSleeping(),
+                collision_detection_mode = body.collisionDetectionMode.ToString(),
+                provenance = "physx_measured",
+                physical_authority = body.isKinematic
+                    ? "Unity Rigidbody kinematic (not compliant dynamic authority)"
+                    : "Unity dynamic Rigidbody/PhysX"
+            };
+        }
+
+        private static CompliantFingerJointTruth SampleFingerJoint(GateContext context, string key)
+        {
+            if (!context.FingerJoints.TryGetValue(key, out ConfigurableJoint joint) || joint == null)
+                return new CompliantFingerJointTruth
+                {
+                    joint_id = "unavailable",
+                    provenance = "unavailable",
+                    drive_provenance = "unavailable"
+                };
+            return new CompliantFingerJointTruth
+            {
+                joint_id = StableTransformId(joint.transform),
+                connected_body_id = joint.connectedBody == null
+                    ? "world"
+                    : StableTransformId(joint.connectedBody.transform),
+                target_rotation_xyzw = joint.targetRotation,
+                target_angular_velocity_rad_s = joint.targetAngularVelocity,
+                angular_x_drive_spring_n_m_rad = joint.angularXDrive.positionSpring,
+                angular_x_drive_damper_n_m_s_rad = joint.angularXDrive.positionDamper,
+                angular_x_drive_max_force_n_m = joint.angularXDrive.maximumForce,
+                angular_yz_drive_spring_n_m_rad = joint.angularYZDrive.positionSpring,
+                angular_yz_drive_damper_n_m_s_rad = joint.angularYZDrive.positionDamper,
+                angular_yz_drive_max_force_n_m = joint.angularYZDrive.maximumForce,
+                provenance = "engine_observed",
+                drive_provenance = "commanded ConfigurableJoint drive consumed by PhysX"
             };
         }
 
@@ -757,6 +1143,54 @@ namespace ProceduralSceneGate
                 .ToArray();
         }
 
+        private void IndexExternalColliderIdentities(GateContext context)
+        {
+            externalColliderPersistentIds.Clear();
+            foreach (SceneIdentity identity in UnityEngine.Object.FindObjectsByType<SceneIdentity>(FindObjectsSortMode.None))
+            {
+                if (identity == null || string.IsNullOrWhiteSpace(identity.persistent_id))
+                    continue;
+                foreach (Collider collider in identity.GetComponentsInChildren<Collider>(true))
+                    if (collider != null)
+                        externalColliderPersistentIds[StableTransformId(collider.transform)] = identity.persistent_id;
+            }
+            foreach (KeyValuePair<string, Transform> destination in context.Destinations)
+            {
+                if (destination.Value == null
+                    || !string.Equals(destination.Key, context.DestinationId, StringComparison.Ordinal))
+                    continue;
+                foreach (Collider collider in destination.Value.GetComponentsInChildren<Collider>(true))
+                    if (collider != null)
+                        externalColliderPersistentIds[StableTransformId(collider.transform)] = context.DestinationId;
+            }
+        }
+
+        private void BindBodySegments(GateContext context)
+        {
+            bodySegments.Clear();
+            foreach (string semanticId in new[]
+                     {
+                         "root", "pelvis", "torso", "neck", "head",
+                         "left_shoulder", "left_upper_arm", "left_elbow", "left_lower_arm", "left_forearm", "left_wrist", "left_palm",
+                         "right_shoulder", "right_upper_arm", "right_elbow", "right_lower_arm", "right_forearm", "right_wrist", "right_palm"
+                     })
+                BindBodySegment(context, semanticId);
+            string[] stableIds = bodySegments.Values.Select(StableTransformId).ToArray();
+            if (stableIds.Distinct(StringComparer.Ordinal).Count() != stableIds.Length)
+                throw new InvalidOperationException("frozen body truth segments must map one-to-one to distinct Transforms");
+        }
+
+        private void BindBodySegment(GateContext context, string semanticId)
+        {
+            Transform segment = context.BodySegments
+                .Where(pair => string.Equals(pair.Key, semanticId, StringComparison.OrdinalIgnoreCase))
+                .Select(pair => pair.Value)
+                .FirstOrDefault(value => value != null);
+            if (segment == null)
+                throw new InvalidOperationException("required body truth segment is unavailable: " + semanticId);
+            bodySegments[semanticId] = segment;
+        }
+
         private ObjectTruth SampleFreeObject(GateContext context, ContactTruthRow[] contacts)
         {
             Rigidbody body = context.TargetBody;
@@ -771,10 +1205,23 @@ namespace ProceduralSceneGate
                 ? identity.semantic_id : "interactive_target";
             string instanceId = identity != null && !string.IsNullOrWhiteSpace(identity.instance_id)
                 ? identity.instance_id : context.EpisodeId + "::" + stableName;
-            string supportId = contacts
+            ContactTruthRow[] targetContacts = contacts
                 .Where(contact => targetColliderIds.Contains(contact.collider_a) || targetColliderIds.Contains(contact.collider_b))
-                .Select(contact => targetColliderIds.Contains(contact.collider_a) ? contact.collider_b : contact.collider_a)
+                .ToArray();
+            foreach (ContactTruthRow contact in targetContacts)
+            {
+                string pairedCollider = PairedTargetCollider(contact);
+                float penetrationM = Mathf.Max(0f, -contact.separation_m);
+                if (avatarColliderIds.Contains(pairedCollider))
+                    fingerObjectMaximumPenetrationM = Mathf.Max(fingerObjectMaximumPenetrationM, penetrationM);
+                else
+                    targetSupportMaximumPenetrationM = Mathf.Max(targetSupportMaximumPenetrationM, penetrationM);
+            }
+            string supportColliderId = targetContacts
+                .OrderBy(contact => contact.separation_m)
+                .Select(PairedTargetCollider)
                 .FirstOrDefault(candidate => !avatarColliderIds.Contains(candidate));
+            string supportId = ResolveExternalSupportId(supportColliderId);
             return new ObjectTruth
             {
                 active = active,
@@ -801,7 +1248,7 @@ namespace ProceduralSceneGate
                 angular_velocity_world_rad_s = active ? body.angularVelocity : Vector3.zero,
                 support_id = active ? supportId ?? "" : "",
                 support_provenance = !active ? "unavailable" : supportId == null ? "physx_measured_no_active_support_contact" : "derived",
-                support_formula_or_source = "non-avatar collider paired with the free object in current PhysX contacts",
+                support_formula_or_source = "persistent SceneIdentity for a non-avatar collider paired with the free object in current PhysX contacts",
                 sleeping = active && body.IsSleeping(),
                 sleeping_provenance = active ? "physx_measured" : "unavailable",
                 is_kinematic = body.isKinematic,
@@ -809,6 +1256,181 @@ namespace ProceduralSceneGate
                 free_dynamic = active && !body.isKinematic,
                 physical_authority = active ? "Unity Rigidbody/PhysX" : "unavailable_in_object_free_stage"
             };
+        }
+
+        private string PairedTargetCollider(ContactTruthRow contact)
+        {
+            if (contact == null)
+                return null;
+            if (targetColliderIds.Contains(contact.collider_a))
+                return contact.collider_b;
+            if (targetColliderIds.Contains(contact.collider_b))
+                return contact.collider_a;
+            return null;
+        }
+
+        private string ResolveExternalSupportId(string colliderId)
+        {
+            if (string.IsNullOrWhiteSpace(colliderId))
+                return null;
+            return externalColliderPersistentIds.TryGetValue(colliderId, out string persistentId)
+                ? persistentId
+                : colliderId;
+        }
+
+        private ForceBearingQualificationTruth SampleForceBearingQualification(
+            GateContext context,
+            ControllerTelemetrySnapshot telemetry,
+            ContactTruthRow[] contacts,
+            ObjectTruth freeObject
+        )
+        {
+            if (context.PhysicsStep == 0 && contacts.Any(contact =>
+                    !string.IsNullOrWhiteSpace(contact.hand)
+                    && !string.IsNullOrWhiteSpace(contact.persistent_object_id)
+                    && contact.separation_m < 0f))
+                initialFingerOverlapDisqualified = true;
+            ContactTruthRow[] eligible = contacts.Where(contact =>
+                    contact.provenance == "physx_measured"
+                    && contact.qualification_separation_eligible
+                    && contact.separation_m >= -FrozenGate.FingerObjectPenetrationMaxM
+                    && contact.available_impulse_magnitude_n_s > FullBodyBimanualMotion.MinimumQualifiedImpulseNs
+                    && !string.IsNullOrWhiteSpace(contact.persistent_object_id)
+                    && (contact.hand == "left" || contact.hand == "right")
+                )
+                .ToArray();
+            ContactTruthRow[] right = eligible.Where(contact => contact.hand == "right").ToArray();
+            ContactTruthRow[] thumb = right.Where(contact => contact.digit == "thumb").ToArray();
+            ContactTruthRow[] nonThumb = right.Where(contact =>
+                    contact.digit == "index" || contact.digit == "middle"
+                    || contact.digit == "ring" || contact.digit == "little"
+                )
+                .ToArray();
+            string[] rightNonThumbDigits = nonThumb.Select(contact => contact.digit)
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+            bool rightOpposingNow = !initialFingerOverlapDisqualified
+                                    && thumb.Length > 0 && rightNonThumbDigits.Length >= 2
+                                    && HasOpposingNormals(thumb, nonThumb);
+            rightMeasuredImpulseDwellSteps = rightOpposingNow ? rightMeasuredImpulseDwellSteps + 1 : 0;
+            if (rightMeasuredImpulseDwellSteps > FrozenGate.RightForceOppositionSeconds * FrozenGate.PhysicsHz)
+                measuredRightQualified = true;
+
+            ContactTruthRow[] left = eligible.Where(contact => contact.hand == "left" && contact.digit != "little").ToArray();
+            string[] leftDigits = left.Select(contact => contact.digit)
+                .Where(value => !string.IsNullOrWhiteSpace(value) && value != "palm")
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+            bool leftSupportingNow = rightOpposingNow && leftDigits.Length > 0
+                                     && HasOpposingNormals(left, right);
+            leftMeasuredImpulseDwellSteps = leftSupportingNow ? leftMeasuredImpulseDwellSteps + 1 : 0;
+            if (leftMeasuredImpulseDwellSteps > FrozenGate.LeftForceSupportSeconds * FrozenGate.PhysicsHz)
+                measuredLeftQualified = true;
+
+            bool fullyQualified = measuredRightQualified && measuredLeftQualified;
+            qualificationEverActive |= fullyQualified;
+            if (fullyQualified)
+            {
+                if (!hasQualificationBaseline)
+                {
+                    qualificationTargetCenterY = context.TargetBody.worldCenterOfMass.y;
+                    qualificationTargetRotation = context.TargetBody.rotation;
+                    hasQualificationBaseline = true;
+                    measuredBimanualQualificationStep = context.PhysicsStep;
+                }
+                maximumQualifiedLiftM = Mathf.Max(
+                    maximumQualifiedLiftM,
+                    context.TargetBody.worldCenterOfMass.y - qualificationTargetCenterY
+                );
+                maximumQualifiedTurnDeg = Mathf.Max(
+                    maximumQualifiedTurnDeg,
+                    Quaternion.Angle(qualificationTargetRotation, context.TargetBody.rotation)
+                );
+            }
+            bool openingCommanded = string.Equals(telemetry.phase_id, "CommandedOpen", StringComparison.OrdinalIgnoreCase)
+                                    || string.Equals(telemetry.phase_id, "Release", StringComparison.OrdinalIgnoreCase);
+            releaseEverCommanded |= openingCommanded;
+            bool currentSupportIsRequiredDestination = !string.IsNullOrWhiteSpace(context.DestinationId)
+                                                       && string.Equals(
+                                                           freeObject.support_id,
+                                                           context.DestinationId,
+                                                           StringComparison.Ordinal
+                                                       );
+            bool objectHasAvatarContact = contacts
+                .Where(contact => targetColliderIds.Contains(contact.collider_a)
+                                  || targetColliderIds.Contains(contact.collider_b))
+                .Select(PairedTargetCollider)
+                .Any(colliderId => avatarColliderIds.Contains(colliderId));
+            bool freeReleaseAtRequiredDestinationCurrent = releaseEverCommanded
+                                                           && currentSupportIsRequiredDestination
+                                                           && !objectHasAvatarContact
+                                                           && freeObject.free_dynamic;
+            if (currentSupportIsRequiredDestination)
+                lastObservedDestinationSupportId = freeObject.support_id;
+            if (freeReleaseAtRequiredDestinationCurrent)
+                releaseAtRequiredDestination = true;
+            if (fullyQualified && !openingCommanded && (!rightOpposingNow || !leftSupportingNow))
+                supportContinuousUntilCommandedOpening = false;
+            string normalizedPhase = (telemetry.phase_id ?? "").Replace("_", "").Replace("-", "").ToLowerInvariant();
+            bool manipulationPhase = normalizedPhase.Contains("lift") || normalizedPhase.Contains("turn")
+                                     || normalizedPhase.Contains("inspect") || normalizedPhase.Contains("transfer");
+            bool qualifiedLiftWindow = fullyQualified && maximumQualifiedLiftM > 0.005f
+                                       && manipulationPhase && !openingCommanded;
+            if (qualifiedLiftWindow && !string.IsNullOrWhiteSpace(freeObject.support_id))
+                objectUnsupportedDuringQualifiedManipulation = false;
+
+            return new ForceBearingQualificationTruth
+            {
+                right_current_measured_impulse_opposition = rightOpposingNow,
+                right_current_thumb_present = thumb.Length > 0,
+                right_current_non_thumb_digits = rightNonThumbDigits,
+                right_measured_impulse_dwell_steps = rightMeasuredImpulseDwellSteps,
+                right_measured_impulse_dwell_s = rightMeasuredImpulseDwellSteps * Dt,
+                right_measured_impulse_qualified = measuredRightQualified,
+                right_required_strictly_greater_s = FrozenGate.RightForceOppositionSeconds,
+                left_current_measured_impulse_support = leftSupportingNow,
+                left_current_non_little_digits = leftDigits,
+                left_measured_impulse_dwell_steps = leftMeasuredImpulseDwellSteps,
+                left_measured_impulse_dwell_s = leftMeasuredImpulseDwellSteps * Dt,
+                left_measured_impulse_qualified = measuredLeftQualified,
+                left_required_strictly_greater_s = FrozenGate.LeftForceSupportSeconds,
+                object_unsupported_current = string.IsNullOrWhiteSpace(freeObject.support_id),
+                object_unsupported_during_qualified_manipulation = objectUnsupportedDuringQualifiedManipulation,
+                required_destination_id = context.DestinationId,
+                observed_support_id = freeObject.support_id,
+                current_support_is_required_destination = currentSupportIsRequiredDestination,
+                release_command_ever_observed = releaseEverCommanded,
+                free_release_at_required_destination_current = freeReleaseAtRequiredDestinationCurrent,
+                release_at_required_destination = releaseAtRequiredDestination,
+                finger_object_max_penetration_m = fingerObjectMaximumPenetrationM,
+                target_support_max_penetration_m = targetSupportMaximumPenetrationM,
+                support_continuous_until_commanded_opening = supportContinuousUntilCommandedOpening,
+                qualification_ever_active = qualificationEverActive,
+                measured_bimanual_qualification_step = measuredBimanualQualificationStep,
+                initial_overlap_disqualified = initialFingerOverlapDisqualified,
+                maximum_qualified_lift_m = maximumQualifiedLiftM,
+                lift_over_0_10_m = maximumQualifiedLiftM > 0.10f,
+                maximum_qualified_turn_deg = maximumQualifiedTurnDeg,
+                turn_over_30_deg = maximumQualifiedTurnDeg > 30f,
+                impulse_semantics = "current-step PhysX ContactPairPoint impulse; geometry and impulse are independently required",
+                maximum_eligible_separation_m = FullBodyBimanualMotion.MaximumQualifiedContactSeparationM,
+                maximum_eligible_penetration_m = FrozenGate.FingerObjectPenetrationMaxM,
+                minimum_nonzero_impulse_n_s = FullBodyBimanualMotion.MinimumQualifiedImpulseNs,
+                maximum_opposing_normal_dot = -0.25f,
+                provenance = "derived_from_physx_measured_contacts"
+            };
+        }
+
+        private static bool HasOpposingNormals(ContactTruthRow[] first, ContactTruthRow[] second)
+        {
+            return first.Any(a => a.normal_on_object_world.sqrMagnitude > 0f
+                                  && second.Any(b => b.normal_on_object_world.sqrMagnitude > 0f
+                                                     && Vector3.Dot(
+                                                         a.normal_on_object_world.normalized,
+                                                         b.normal_on_object_world.normalized
+                                                     ) <= -0.25f));
         }
 
         private CameraTruth SampleCamera(GateContext context)
@@ -866,11 +1488,25 @@ namespace ProceduralSceneGate
         {
             List<JointProprioceptionTruth> joints = new List<JointProprioceptionTruth>
             {
-                SampleRelativeJoint("torso", context.AvatarRoot.transform, context.Torso),
-                SampleRelativeJoint("neck", context.Torso, context.Neck),
-                SampleRelativeJoint("head", context.Neck, context.Head),
-                SampleRelativeJoint("left_palm", context.Torso, context.LeftPalm),
-                SampleRelativeJoint("right_palm", context.Torso, context.RightPalm)
+                SampleRelativeJoint("root", context.AuthorityRoot.transform, bodySegments["root"]),
+                SampleRelativeJoint("pelvis", bodySegments["root"], bodySegments["pelvis"]),
+                SampleRelativeJoint("torso", bodySegments["pelvis"], bodySegments["torso"]),
+                SampleRelativeJoint("neck", bodySegments["torso"], bodySegments["neck"]),
+                SampleRelativeJoint("head", bodySegments["neck"], bodySegments["head"]),
+                SampleRelativeJoint("left_shoulder", bodySegments["torso"], bodySegments["left_shoulder"]),
+                SampleRelativeJoint("left_upper_arm", bodySegments["left_shoulder"], bodySegments["left_upper_arm"]),
+                SampleRelativeJoint("left_elbow", bodySegments["left_upper_arm"], bodySegments["left_elbow"]),
+                SampleRelativeJoint("left_lower_arm", bodySegments["left_elbow"], bodySegments["left_lower_arm"]),
+                SampleRelativeJoint("left_forearm", bodySegments["left_lower_arm"], bodySegments["left_forearm"]),
+                SampleRelativeJoint("left_wrist", bodySegments["left_forearm"], bodySegments["left_wrist"]),
+                SampleRelativeJoint("left_palm", bodySegments["left_wrist"], bodySegments["left_palm"]),
+                SampleRelativeJoint("right_shoulder", bodySegments["torso"], bodySegments["right_shoulder"]),
+                SampleRelativeJoint("right_upper_arm", bodySegments["right_shoulder"], bodySegments["right_upper_arm"]),
+                SampleRelativeJoint("right_elbow", bodySegments["right_upper_arm"], bodySegments["right_elbow"]),
+                SampleRelativeJoint("right_lower_arm", bodySegments["right_elbow"], bodySegments["right_lower_arm"]),
+                SampleRelativeJoint("right_forearm", bodySegments["right_lower_arm"], bodySegments["right_forearm"]),
+                SampleRelativeJoint("right_wrist", bodySegments["right_forearm"], bodySegments["right_wrist"]),
+                SampleRelativeJoint("right_palm", bodySegments["right_wrist"], bodySegments["right_palm"])
             };
             foreach (string side in new[] { "left", "right" })
             foreach (string digit in FrozenGate.Digits)
@@ -878,13 +1514,13 @@ namespace ProceduralSceneGate
                 Transform[] segments = context.FingerSegments[side + "_" + digit];
                 for (int index = 0; index < segments.Length; index++)
                 {
-                    Transform parent = index == 0 ? (side == "left" ? context.LeftPalm : context.RightPalm) : segments[index - 1];
+                    Transform parent = index == 0 ? bodySegments[side + "_palm"] : segments[index - 1];
                     joints.Add(SampleRelativeJoint(side + "_" + digit + "_" + index, parent, segments[index]));
                 }
             }
 
-            Vector3 headPosition = context.Head.position;
-            Quaternion headRotation = context.Head.rotation;
+            Vector3 headPosition = bodySegments["head"].position;
+            Quaternion headRotation = bodySegments["head"].rotation;
             DerivedVectorTruth gyroscope;
             if (hasPriorHead)
             {
@@ -1106,6 +1742,10 @@ namespace ProceduralSceneGate
                 new TruthProvenanceRow("controller_errors", "derived", "commanded target minus engine-observed state", "m, deg, unit closure"),
                 new TruthProvenanceRow("contacts", "physx_measured", "Unity collision callback ContactPoint and Collision", "m, m/s, N*s"),
                 new TruthProvenanceRow("free_object", "physx_measured", "Unity Rigidbody after Physics.Simulate", "m, m/s, rad/s"),
+                new TruthProvenanceRow("dynamic_finger_bodies", "physx_measured", "thirty Unity dynamic Rigidbodies after Physics.Simulate", "kg, m/s, rad/s"),
+                new TruthProvenanceRow("compliant_finger_joints", "engine_observed", "ConfigurableJoint targets and drives consumed by PhysX", "quaternion_xyzw, rad/s, N*m"),
+                new TruthProvenanceRow("force_bearing_qualification", "derived", "strict dwell over eligible current-step separation, per-point impulse, digit identity, and opposing normals", "s, m, N*s"),
+                new TruthProvenanceRow("authority_counters", "engine_observed_and_source_audited", "runtime boundary snapshots plus mandatory hashed canonical source audit", "event counts"),
                 new TruthProvenanceRow("joint_proprioception", "derived", "relative rotations and finite differences", "rad and rad/s"),
                 new TruthProvenanceRow("head_imu", "derived", "head pose finite differences in head-local coordinates", "m/s2 and rad/s"),
                 new TruthProvenanceRow("biological_torque", "unavailable", "not measured and not claimed", "unavailable")
@@ -1128,6 +1768,19 @@ namespace ProceduralSceneGate
         {
             public Vector3 position;
             public Quaternion rotation;
+        }
+
+        private struct TargetAuthoritySnapshot
+        {
+            public Vector3 rigidbodyPosition;
+            public Quaternion rigidbodyRotation;
+            public Vector3 transformPosition;
+            public Quaternion transformRotation;
+            public Vector3 linearVelocity;
+            public Vector3 angularVelocity;
+            public bool isKinematic;
+            public string parentId;
+            public string[] jointIds;
         }
 
         private sealed class PendingContact
@@ -1171,6 +1824,7 @@ namespace ProceduralSceneGate
     public sealed class EpisodeTraceRow
     {
         public string schema;
+        public EpisodeContextTruth episode;
         public ClockTruth clock;
         public BodyStateTruth body_state;
         public BodyHandsTruth hand_state;
@@ -1180,6 +1834,22 @@ namespace ProceduralSceneGate
         public CameraTruth camera_state;
         public DerivedStateTruth derived_state;
         public string[] assistance_ledger;
+        public AuthorityLedgerEntry[] recovery_ledger;
+        public AuthorityAuditState authority_counters;
+        public ForceBearingQualificationTruth force_bearing_qualification;
+    }
+
+    [Serializable]
+    public sealed class EpisodeContextTruth
+    {
+        public string episode_id;
+        public string cell_id;
+        public string room_family;
+        public string garment_configuration_id;
+        public string target_id;
+        public string destination_id;
+        public string contact_strategy;
+        public string final_gaze_zone;
     }
 
     [Serializable]
@@ -1214,9 +1884,24 @@ namespace ProceduralSceneGate
     public sealed class BodyStateTruth
     {
         public PoseTruth root;
+        public PoseTruth pelvis;
         public PoseTruth torso;
         public PoseTruth neck;
         public PoseTruth head;
+        public PoseTruth left_shoulder;
+        public PoseTruth left_upper_arm;
+        public PoseTruth left_elbow;
+        public PoseTruth left_lower_arm;
+        public PoseTruth left_forearm;
+        public PoseTruth left_wrist;
+        public PoseTruth left_palm;
+        public PoseTruth right_shoulder;
+        public PoseTruth right_upper_arm;
+        public PoseTruth right_elbow;
+        public PoseTruth right_lower_arm;
+        public PoseTruth right_forearm;
+        public PoseTruth right_wrist;
+        public PoseTruth right_palm;
     }
 
     [Serializable]
@@ -1247,6 +1932,40 @@ namespace ProceduralSceneGate
         public float closure_observed;
         public string closure_observed_provenance;
         public string closure_observed_formula;
+        public DynamicFingerBodyTruth[] dynamic_body_states;
+        public CompliantFingerJointTruth[] compliant_joint_states;
+    }
+
+    [Serializable]
+    public sealed class DynamicFingerBodyTruth
+    {
+        public string body_id;
+        public PoseTruth pose;
+        public bool is_kinematic;
+        public float mass_kg;
+        public Vector3 linear_velocity_world_m_s;
+        public Vector3 angular_velocity_world_rad_s;
+        public bool sleeping;
+        public string collision_detection_mode;
+        public string provenance;
+        public string physical_authority;
+    }
+
+    [Serializable]
+    public sealed class CompliantFingerJointTruth
+    {
+        public string joint_id;
+        public string connected_body_id;
+        public Quaternion target_rotation_xyzw = Quaternion.identity;
+        public Vector3 target_angular_velocity_rad_s;
+        public float angular_x_drive_spring_n_m_rad;
+        public float angular_x_drive_damper_n_m_s_rad;
+        public float angular_x_drive_max_force_n_m;
+        public float angular_yz_drive_spring_n_m_rad;
+        public float angular_yz_drive_damper_n_m_s_rad;
+        public float angular_yz_drive_max_force_n_m;
+        public string provenance;
+        public string drive_provenance;
     }
 
     [Serializable]
@@ -1303,6 +2022,48 @@ namespace ProceduralSceneGate
         public Vector3 normal_on_object_world;
         public string provenance;
         public string formula_or_source;
+    }
+
+    [Serializable]
+    public sealed class ForceBearingQualificationTruth
+    {
+        public bool right_current_measured_impulse_opposition;
+        public bool right_current_thumb_present;
+        public string[] right_current_non_thumb_digits;
+        public int right_measured_impulse_dwell_steps;
+        public float right_measured_impulse_dwell_s;
+        public bool right_measured_impulse_qualified;
+        public float right_required_strictly_greater_s;
+        public bool left_current_measured_impulse_support;
+        public string[] left_current_non_little_digits;
+        public int left_measured_impulse_dwell_steps;
+        public float left_measured_impulse_dwell_s;
+        public bool left_measured_impulse_qualified;
+        public float left_required_strictly_greater_s;
+        public bool object_unsupported_current;
+        public bool object_unsupported_during_qualified_manipulation;
+        public string required_destination_id;
+        public string observed_support_id;
+        public bool current_support_is_required_destination;
+        public bool release_command_ever_observed;
+        public bool free_release_at_required_destination_current;
+        public bool release_at_required_destination;
+        public float finger_object_max_penetration_m;
+        public float target_support_max_penetration_m;
+        public bool support_continuous_until_commanded_opening;
+        public bool qualification_ever_active;
+        public int measured_bimanual_qualification_step;
+        public bool initial_overlap_disqualified;
+        public float maximum_qualified_lift_m;
+        public bool lift_over_0_10_m;
+        public float maximum_qualified_turn_deg;
+        public bool turn_over_30_deg;
+        public string impulse_semantics;
+        public float maximum_eligible_separation_m;
+        public float maximum_eligible_penetration_m;
+        public float minimum_nonzero_impulse_n_s;
+        public float maximum_opposing_normal_dot;
+        public string provenance;
     }
 
     [Serializable]
@@ -1453,6 +2214,14 @@ namespace ProceduralSceneGate
         public string trace_sha256;
         public string clock_receipt_file;
         public string clock_receipt_sha256;
+        public string interaction_summary_file;
+        public string interaction_summary_sha256;
+        public float finger_object_max_penetration_m;
+        public float target_support_max_penetration_m;
+        public string required_destination_id;
+        public string observed_destination_support_id;
+        public bool object_unsupported_during_qualified_manipulation;
+        public bool release_at_required_destination;
         public int row_count;
         public bool controller_provider_bound;
         public int unavailable_controller_steps;
@@ -1464,7 +2233,15 @@ namespace ProceduralSceneGate
         public int unavailable_camera_clearance_steps;
         public int non_free_object_steps;
         public int camera_parent_mismatch_steps;
+        public int unavailable_dynamic_finger_bindings;
         public bool assistance_ledger_empty;
+        public int recovery_ledger_entries;
+        public AuthorityAuditState authority_counters;
+        public string source_audit_sha256;
+        public bool source_audit_present;
+        public string runtime_detection_coverage;
+        public string force_torque_detection_boundary;
+        public bool zero_counters_are_independent_proof;
         public bool clock_passed;
         public bool one_authority_state;
         public string object_state_authority;
@@ -1472,6 +2249,30 @@ namespace ProceduralSceneGate
         public string biological_torque;
         public bool trace_complete;
         public TruthProvenanceRow[] provenance_registry;
+    }
+
+    [Serializable]
+    public sealed class InteractionSummary
+    {
+        public string schema;
+        public string episode_id;
+        public string target_id;
+        public string required_destination_id;
+        public string observed_destination_support_id;
+        public float finger_object_max_penetration_m;
+        public float target_support_max_penetration_m;
+        public float finger_object_penetration_limit_m;
+        public float target_support_penetration_limit_m;
+        public bool finger_object_penetration_passed;
+        public bool target_support_penetration_passed;
+        public bool right_measured_impulse_qualified;
+        public bool left_measured_impulse_qualified;
+        public bool lift_over_0_10_m;
+        public bool turn_over_30_deg;
+        public bool object_unsupported_during_qualified_manipulation;
+        public bool release_command_ever_observed;
+        public bool release_at_required_destination;
+        public string provenance;
     }
 
     [Serializable]
@@ -1486,6 +2287,8 @@ namespace ProceduralSceneGate
         public string manifest_sha256;
         public string clock_receipt_file;
         public string clock_receipt_sha256;
+        public string interaction_summary_file;
+        public string interaction_summary_sha256;
     }
 }
 #endif

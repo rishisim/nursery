@@ -19,10 +19,16 @@ namespace ProceduralSceneGate
         const string FrozenConfigName = "embodied_simulation_procedural_scene_gate.json";
         const string ExpectedAvatarId = "mpfb_child_cc0";
         const float AvatarScale = 1.9f;
-        const float SkinColliderToleranceM = .0075f;
-        const float GarmentBodyToleranceM = .004f;
+        const float SkinColliderToleranceM = .005f;
+        const float GarmentBodyToleranceM = .002f;
+        const float GarmentAffectedVertexFractionMax = .001f;
         const float AffectedEpsilonM = 1e-5f;
         const int AnatomicalColliderLayer = 29;
+        const int SelfSweepMinimumSubsteps = 8;
+        const int SelfSweepMaximumSubsteps = 32;
+        const float SelfSweepMaximumSurfaceMotionPerSubstepM = .0005f;
+        const float SelfSweepMaximumRotationPerSubstepDeg = 1f;
+        const int SelfOverlapEvidenceRowsPerStep = 4;
 
         static readonly string[] Digits = { "thumb", "index", "middle", "ring", "little" };
         static readonly string[] MpfbDigits = { "finger1", "finger2", "finger3", "finger4", "finger5" };
@@ -40,6 +46,12 @@ namespace ProceduralSceneGate
         readonly List<Collider> anatomicalColliders = new List<Collider>();
         readonly List<FittedColliderBinding> fittedColliderBindings = new List<FittedColliderBinding>();
         readonly List<KinematicColliderBinding> kinematicColliderBindings = new List<KinematicColliderBinding>();
+        readonly Dictionary<Collider, Transform> anatomicalAuthorityBones = new Dictionary<Collider, Transform>();
+        readonly HashSet<string> ignoredAdjacentColliderPairs = new HashSet<string>(StringComparer.Ordinal);
+        readonly List<SelfClearanceStep> selfClearanceSteps = new List<SelfClearanceStep>();
+        readonly List<SelfClearanceStep> solverSelfClearanceSteps = new List<SelfClearanceStep>();
+        readonly Dictionary<Collider, Pose> pendingPrePhysicsColliderPoses = new Dictionary<Collider, Pose>();
+        readonly HashSet<int> interactionPenetrationSampledSteps = new HashSet<int>();
         readonly Dictionary<int, List<Collider>> fittedCollidersByVertex = new Dictionary<int, List<Collider>>();
         readonly HashSet<Transform> fittedEnvelopeBones = new HashSet<Transform>();
         readonly Dictionary<Transform, Collider[]> collidersByDominantBone = new Dictionary<Transform, Collider[]>();
@@ -56,6 +68,27 @@ namespace ProceduralSceneGate
         int fallbackRegistrationVertexCount;
         bool samplesContiguousFromZero = true;
         int moduleCreatedProxyRenderers;
+        int lastSelfClearanceStep = -1;
+        bool selfClearanceSamplesContiguousFromZero = true;
+        float minimumNonAdjacentSelfClearanceM = float.PositiveInfinity;
+        float maximumNonAdjacentSelfPenetrationM;
+        long nonAdjacentSelfClearanceSamples;
+        long nonAdjacentSelfOverlapSamples;
+        long broadphaseCertifiedSelfSweepPairs;
+        long incompleteSelfSweepIntervals;
+        float maximumSelfSweepSurfaceMotionPerSubstepM;
+        float maximumSelfSweepRotationPerSubstepDeg;
+        int pendingPrePhysicsStep = -1;
+        int lastSolverSelfClearanceStep = -1;
+        bool solverSelfClearanceSamplesContiguousFromZero = true;
+        long solverNonAdjacentSelfClearanceSamples;
+        long solverNonAdjacentSelfOverlapSamples;
+        long solverIncompleteSelfSweepIntervals;
+        float solverMaximumNonAdjacentSelfPenetrationM;
+        float fingerObjectMaxPenetrationM;
+        float targetSupportMaxPenetrationM;
+        int fingerObjectContactSamples;
+        int targetSupportContactSamples;
 
         public void Build(GateContext context, string avatarAssetPath)
         {
@@ -103,12 +136,12 @@ namespace ProceduralSceneGate
                 if (group.Count() != 1) throw new InvalidOperationException("duplicate MPFB bone name: " + group.Key);
                 bones.Add(group.Key, group.Single());
             }
-            BindAnatomy(context);
+            BindAnatomy(context, avatar.transform);
             VerifyWeightedFiveFingerHands();
             bodyBake = new Mesh { name = "MPFB_BODY_REGISTRATION_BAKE" };
             bodyRenderer.BakeMesh(bodyBake, true);
             BuildAnatomicalColliders();
-            BindKinematicColliderDrivers(avatar.transform);
+            BindHybridColliderDrivers(context);
 
             garmentRoot = new GameObject("CATALOG_DRIVEN_SKINNED_GARMENTS");
             garmentRoot.transform.SetParent(bodyRenderer.transform.parent, false);
@@ -153,6 +186,7 @@ namespace ProceduralSceneGate
         {
             RequireBoundContext(context);
             if (activeAvatarSpec == null) throw new InvalidOperationException("apply a frozen garment configuration before sampling");
+            MeasurePostPhysicsSolverSelfClearance(context);
             if (context.PhysicsStep == lastSampledStep) return;
             if (lastSampledStep < 0) samplesContiguousFromZero = context.PhysicsStep == 0;
             else samplesContiguousFromZero &= context.PhysicsStep == lastSampledStep + 1;
@@ -191,7 +225,19 @@ namespace ProceduralSceneGate
         public void UpdateRegisteredCollidersBeforePhysics(GateContext context)
         {
             RequireBoundContext(context);
+            // Record contacts published by the truth recorder after the prior
+            // simulation step before beginning this step's prospective audit.
+            SampleInteractionPenetration(context, context.PhysicsStep - 1);
             bodyRenderer.BakeMesh(bodyBake, true);
+            var startPoses = anatomicalColliders
+                .Where(value => value && value.enabled && !value.isTrigger)
+                .ToDictionary(value => value, value => new Pose(value.transform.position, value.transform.rotation));
+            if (pendingPrePhysicsStep >= 0)
+                throw new InvalidOperationException("post-solver self-clearance audit was not consumed for step " + pendingPrePhysicsStep);
+            pendingPrePhysicsColliderPoses.Clear();
+            foreach (var row in startPoses) pendingPrePhysicsColliderPoses.Add(row.Key, row.Value);
+            pendingPrePhysicsStep = context.PhysicsStep;
+            var prospectivePoses = startPoses.ToDictionary(row => row.Key, row => PredictEndOfStepPose(row.Key, row.Value));
             Vector3[] vertices = bodyBake.vertices;
             foreach (FittedColliderBinding binding in fittedColliderBindings) {
                 Vector3[] points = binding.vertexIndices
@@ -217,14 +263,198 @@ namespace ProceduralSceneGate
                     binding.body.position = desiredPosition;
                     binding.body.rotation = desiredRotation;
                 }
+                prospectivePoses[binding.collider] = new Pose(desiredPosition, desiredRotation);
             }
+            MeasureProspectiveNonAdjacentSelfClearance(context, startPoses, prospectivePoses);
         }
+
+        static Pose PredictEndOfStepPose(Collider collider, Pose start)
+        {
+            Rigidbody body = collider.attachedRigidbody;
+            if (body == null || body.isKinematic) return start;
+            float dt = 1f / FrozenGate.PhysicsHz;
+            Vector3 angularVelocity = body.angularVelocity;
+            Quaternion rotationDelta = angularVelocity.sqrMagnitude > 1e-12f
+                ? Quaternion.AngleAxis(angularVelocity.magnitude * Mathf.Rad2Deg * dt, angularVelocity.normalized)
+                : Quaternion.identity;
+            return new Pose(start.position + body.linearVelocity * dt, rotationDelta * start.rotation);
+        }
+
+        void MeasureProspectiveNonAdjacentSelfClearance(
+            GateContext context,
+            Dictionary<Collider, Pose> startPoses,
+            Dictionary<Collider, Pose> prospectivePoses)
+        {
+            if (context.PhysicsStep == lastSelfClearanceStep) return;
+            if (lastSelfClearanceStep < 0) selfClearanceSamplesContiguousFromZero = context.PhysicsStep == 0;
+            else selfClearanceSamplesContiguousFromZero &= context.PhysicsStep == lastSelfClearanceStep + 1;
+            SelfClearanceStep result = EvaluateNonAdjacentSelfClearanceSweep(startPoses, prospectivePoses);
+            result.physics_step = context.PhysicsStep;
+            result.time_s = context.TimeSeconds;
+            minimumNonAdjacentSelfClearanceM = Mathf.Min(minimumNonAdjacentSelfClearanceM, result.minimum_conservative_clearance_m);
+            maximumNonAdjacentSelfPenetrationM = Mathf.Max(maximumNonAdjacentSelfPenetrationM, result.maximum_penetration_m);
+            nonAdjacentSelfClearanceSamples += result.swept_pair_pose_samples;
+            nonAdjacentSelfOverlapSamples += result.overlap_samples;
+            broadphaseCertifiedSelfSweepPairs += result.broadphase_certified_separated_pairs;
+            incompleteSelfSweepIntervals += result.incomplete_sweep_intervals;
+            maximumSelfSweepSurfaceMotionPerSubstepM = Mathf.Max(maximumSelfSweepSurfaceMotionPerSubstepM, result.maximum_surface_motion_per_substep_m);
+            maximumSelfSweepRotationPerSubstepDeg = Mathf.Max(maximumSelfSweepRotationPerSubstepDeg, result.maximum_rotation_per_substep_deg);
+            selfClearanceSteps.Add(result);
+            lastSelfClearanceStep = context.PhysicsStep;
+        }
+
+        void MeasurePostPhysicsSolverSelfClearance(GateContext context)
+        {
+            if (context.PhysicsStep == lastSolverSelfClearanceStep) return;
+            if (pendingPrePhysicsStep != context.PhysicsStep || pendingPrePhysicsColliderPoses.Count == 0)
+                throw new InvalidOperationException("post-solver self-clearance requires the matching pre-physics pose set");
+            if (lastSolverSelfClearanceStep < 0) solverSelfClearanceSamplesContiguousFromZero = context.PhysicsStep == 0;
+            else solverSelfClearanceSamplesContiguousFromZero &= context.PhysicsStep == lastSolverSelfClearanceStep + 1;
+
+            var actualPostPhysicsPoses = pendingPrePhysicsColliderPoses.Keys.ToDictionary(
+                value => value,
+                value => new Pose(value.transform.position, value.transform.rotation));
+            SelfClearanceStep result = EvaluateNonAdjacentSelfClearanceSweep(
+                pendingPrePhysicsColliderPoses,
+                actualPostPhysicsPoses);
+            result.physics_step = context.PhysicsStep;
+            result.time_s = context.TimeSeconds;
+            solverNonAdjacentSelfClearanceSamples += result.swept_pair_pose_samples;
+            solverNonAdjacentSelfOverlapSamples += result.overlap_samples;
+            solverIncompleteSelfSweepIntervals += result.incomplete_sweep_intervals;
+            solverMaximumNonAdjacentSelfPenetrationM = Mathf.Max(
+                solverMaximumNonAdjacentSelfPenetrationM,
+                result.maximum_penetration_m);
+            solverSelfClearanceSteps.Add(result);
+            lastSolverSelfClearanceStep = context.PhysicsStep;
+            pendingPrePhysicsColliderPoses.Clear();
+            pendingPrePhysicsStep = -1;
+        }
+
+        SelfClearanceStep EvaluateNonAdjacentSelfClearanceSweep(
+            Dictionary<Collider, Pose> startPoses,
+            Dictionary<Collider, Pose> endPoses)
+        {
+            Collider[] colliders = endPoses.Keys.OrderBy(value => value.GetInstanceID()).ToArray();
+            long evaluated = 0, overlaps = 0, incompleteIntervals = 0, evaluatedPairs = 0, broadphaseCertifiedPairs = 0;
+            float minimumClearance = float.PositiveInfinity, maximumPenetration = 0f;
+            float maximumSurfaceMotionPerSubstep = 0f, maximumRotationPerSubstep = 0f;
+            int maximumSubsteps = 0;
+            var overlapEvidence = new List<SelfOverlapEvidence>();
+            for (int first = 0; first < colliders.Length; first++) {
+                Collider a = colliders[first];
+                Pose aStart = startPoses[a], aEnd = endPoses[a];
+                for (int second = first + 1; second < colliders.Length; second++) {
+                    Collider b = colliders[second];
+                    if (ignoredAdjacentColliderPairs.Contains(ColliderPairKey(a, b))) continue;
+                    Pose bStart = startPoses[b], bEnd = endPoses[b];
+                    evaluatedPairs++;
+                    float sweptClearance = ConservativeSweptBoundingSphereClearance(a, aStart, aEnd, b, bStart, bEnd);
+                    if (sweptClearance > 0f) {
+                        broadphaseCertifiedPairs++;
+                        evaluated++;
+                        minimumClearance = Mathf.Min(minimumClearance, sweptClearance);
+                        continue;
+                    }
+                    Vector3 relativeTranslation = (aEnd.position - aStart.position) - (bEnd.position - bStart.position);
+                    float rotationADeg = Quaternion.Angle(aStart.rotation, aEnd.rotation);
+                    float rotationBDeg = Quaternion.Angle(bStart.rotation, bEnd.rotation);
+                    float rotationDeg = Mathf.Max(rotationADeg, rotationBDeg);
+                    float surfaceMotionM = relativeTranslation.magnitude +
+                        a.bounds.extents.magnitude * rotationADeg * Mathf.Deg2Rad +
+                        b.bounds.extents.magnitude * rotationBDeg * Mathf.Deg2Rad;
+                    int requiredSubsteps = Mathf.Max(SelfSweepMinimumSubsteps, Mathf.Max(
+                        Mathf.CeilToInt(surfaceMotionM / SelfSweepMaximumSurfaceMotionPerSubstepM),
+                        Mathf.CeilToInt(rotationDeg / SelfSweepMaximumRotationPerSubstepDeg)));
+                    int substeps = Mathf.Min(requiredSubsteps, SelfSweepMaximumSubsteps);
+                    if (requiredSubsteps > SelfSweepMaximumSubsteps) incompleteIntervals++;
+                    maximumSubsteps = Mathf.Max(maximumSubsteps, substeps);
+                    maximumSurfaceMotionPerSubstep = Mathf.Max(maximumSurfaceMotionPerSubstep, surfaceMotionM / substeps);
+                    maximumRotationPerSubstep = Mathf.Max(maximumRotationPerSubstep, rotationDeg / substeps);
+                    for (int sweepSample = 0; sweepSample <= substeps; sweepSample++) {
+                        float t = sweepSample / (float)substeps;
+                        Pose poseA = InterpolatePose(aStart, aEnd, t), poseB = InterpolatePose(bStart, bEnd, t);
+                        evaluated++;
+                        minimumClearance = Mathf.Min(minimumClearance, ConservativeBoundingSphereClearance(a, poseA, b, poseB));
+                        if (!Physics.ComputePenetration(a, poseA.position, poseA.rotation, b, poseB.position, poseB.rotation,
+                                out Vector3 _, out float penetrationM)) continue;
+                        overlaps++;
+                        maximumPenetration = Mathf.Max(maximumPenetration, penetrationM);
+                        if (overlapEvidence.Count < SelfOverlapEvidenceRowsPerStep)
+                            overlapEvidence.Add(new SelfOverlapEvidence { collider_a = a.name, collider_b = b.name, sweep_fraction = t, penetration_m = penetrationM });
+                    }
+                }
+            }
+            return new SelfClearanceStep {
+                swept_pair_pose_samples = evaluated,
+                evaluated_non_adjacent_pairs = evaluatedPairs,
+                broadphase_certified_separated_pairs = broadphaseCertifiedPairs,
+                overlap_samples = overlaps,
+                incomplete_sweep_intervals = incompleteIntervals,
+                maximum_substeps_per_pair = maximumSubsteps,
+                maximum_surface_motion_per_substep_m = maximumSurfaceMotionPerSubstep,
+                maximum_rotation_per_substep_deg = maximumRotationPerSubstep,
+                minimum_conservative_clearance_m = float.IsFinite(minimumClearance) ? minimumClearance : 0f,
+                maximum_penetration_m = maximumPenetration,
+                sweep_coverage_complete = evaluatedPairs > 0 && incompleteIntervals == 0,
+                overlap_evidence = overlapEvidence.ToArray(),
+                overlap_evidence_truncated = overlaps > overlapEvidence.Count,
+                passed = evaluated > 0 && incompleteIntervals == 0 && overlaps == 0,
+            };
+        }
+
+        static Pose InterpolatePose(Pose start, Pose end, float t)
+            => new Pose(Vector3.Lerp(start.position, end.position, t), Quaternion.Slerp(start.rotation, end.rotation, t));
+
+        static float ConservativeBoundingSphereClearance(Collider first, Pose firstPose, Collider second, Pose secondPose)
+        {
+            Bounds firstBounds = first.bounds;
+            Bounds secondBounds = second.bounds;
+            Vector3 firstCenter = firstBounds.center + firstPose.position - first.transform.position;
+            Vector3 secondCenter = secondBounds.center + secondPose.position - second.transform.position;
+            float separation = Vector3.Distance(firstCenter, secondCenter) - firstBounds.extents.magnitude - secondBounds.extents.magnitude;
+            return Mathf.Max(0f, separation);
+        }
+
+        static float ConservativeSweptBoundingSphereClearance(
+            Collider first, Pose firstStart, Pose firstEnd,
+            Collider second, Pose secondStart, Pose secondEnd)
+        {
+            Bounds firstBounds = first.bounds;
+            Bounds secondBounds = second.bounds;
+            Vector3 firstCenterStart = firstBounds.center + firstStart.position - first.transform.position;
+            Vector3 firstCenterEnd = firstBounds.center + firstEnd.position - first.transform.position;
+            Vector3 secondCenterStart = secondBounds.center + secondStart.position - second.transform.position;
+            Vector3 secondCenterEnd = secondBounds.center + secondEnd.position - second.transform.position;
+            Vector3 relativeStart = firstCenterStart - secondCenterStart;
+            Vector3 relativeDelta = (firstCenterEnd - firstCenterStart) - (secondCenterEnd - secondCenterStart);
+            float closestT = relativeDelta.sqrMagnitude > 1e-12f
+                ? Mathf.Clamp01(-Vector3.Dot(relativeStart, relativeDelta) / relativeDelta.sqrMagnitude)
+                : 0f;
+            float centerDistance = (relativeStart + relativeDelta * closestT).magnitude;
+            return centerDistance - firstBounds.extents.magnitude - secondBounds.extents.magnitude;
+        }
+
+        static bool InteractionPenetrationApplicableForStage(string stage)
+            => stage != "clipping" && stage != "motion_camera";
+
+        static bool InteractionPenetrationPass(
+            bool applicable,
+            int fingerSamples,
+            float fingerMaximumM,
+            int supportSamples,
+            float supportMaximumM)
+            => !applicable ||
+               (fingerSamples > 0 && supportSamples > 0 &&
+                fingerMaximumM <= FrozenGate.FingerObjectPenetrationMaxM &&
+                supportMaximumM <= FrozenGate.SupportPenetrationMaxM);
 
         public void MeasureRegistration(GateContext context, string reportPath)
         {
             RequireBoundContext(context);
             if (string.IsNullOrWhiteSpace(reportPath)) throw new ArgumentException("registration report path is required", nameof(reportPath));
             if (lastSampledStep != context.PhysicsStep) SampleRegistrationAtPhysicsStep(context);
+            SampleInteractionPenetration(context, context.PhysicsStep);
 
             int expectedSamples = Mathf.RoundToInt(FrozenGate.DurationSeconds * FrozenGate.PhysicsHz);
             bool completeMotion = samplesContiguousFromZero && registrationSteps.Count == expectedSamples &&
@@ -234,10 +464,34 @@ namespace ProceduralSceneGate
             var garmentReceipts = garments.Select(x => x.Receipt()).ToArray();
             bool garmentAvailable = garmentReceipts.Length > 0 && garmentReceipts.All(x => x.samples > 0);
             bool bodyPass = colliderAvailable && skinColliderErrors.maximum_m <= SkinColliderToleranceM;
-            bool garmentPass = garmentAvailable && garmentReceipts.All(x => x.maximum_penetration_m <= GarmentBodyToleranceM);
+            bool garmentPass = garmentAvailable && garmentReceipts.All(x =>
+                x.maximum_penetration_m <= GarmentBodyToleranceM &&
+                x.affected_fraction <= GarmentAffectedVertexFractionMax);
+            bool completeSelfClearance = selfClearanceSamplesContiguousFromZero &&
+                                         selfClearanceSteps.Count == expectedSamples &&
+                                         selfClearanceSteps[0].physics_step == 0 &&
+                                         selfClearanceSteps[selfClearanceSteps.Count - 1].physics_step == expectedSamples - 1;
+            bool selfClearancePass = completeSelfClearance && nonAdjacentSelfClearanceSamples > 0 &&
+                                     incompleteSelfSweepIntervals == 0 && nonAdjacentSelfOverlapSamples == 0;
+            bool completeSolverSelfClearance = solverSelfClearanceSamplesContiguousFromZero &&
+                                               solverSelfClearanceSteps.Count == expectedSamples &&
+                                               solverSelfClearanceSteps[0].physics_step == 0 &&
+                                               solverSelfClearanceSteps[solverSelfClearanceSteps.Count - 1].physics_step == expectedSamples - 1;
+            bool solverSelfClearancePass = completeSolverSelfClearance &&
+                                           solverNonAdjacentSelfClearanceSamples > 0 &&
+                                           solverIncompleteSelfSweepIntervals == 0 &&
+                                           solverNonAdjacentSelfOverlapSamples == 0;
+            string gateStage = Environment.GetEnvironmentVariable("PROCEDURAL_GATE_STAGE") ?? "integrated";
+            bool interactionPenetrationApplicable = InteractionPenetrationApplicableForStage(gateStage);
+            bool penetrationPass = InteractionPenetrationPass(
+                interactionPenetrationApplicable,
+                fingerObjectContactSamples,
+                fingerObjectMaxPenetrationM,
+                targetSupportContactSamples,
+                targetSupportMaxPenetrationM);
 
             var report = new EmbodimentRegistrationReport {
-                schema = "embodied.embodiment_registration.v1",
+                schema = "embodied.embodiment_registration.v2",
                 avatar_spec_schema = activeAvatarSpec.schema,
                 embodiment_manifest_schema = "embodied.embodiment_manifest.v1",
                 avatar_id = activeAvatarSpec.avatar_id,
@@ -253,7 +507,12 @@ namespace ProceduralSceneGate
                 body_bones = bodyRenderer.bones.Select(x => x.name).ToArray(),
                 anatomical_collider_ids = anatomicalColliders.Select(x => x.name).OrderBy(x => x, StringComparer.Ordinal).ToArray(),
                 anatomical_collider_count = anatomicalColliders.Count,
+                registered_avatar_collider_count = context.AvatarColliders.Count,
+                avatar_collider_registry_complete = context.AvatarColliders.Count == anatomicalColliders.Count,
+                body_segment_ids = context.BodySegments.Keys.OrderBy(value => value, StringComparer.Ordinal).ToArray(),
                 kinematic_collider_body_count = anatomicalColliders.Count(x => x.attachedRigidbody != null && x.attachedRigidbody.isKinematic),
+                dynamic_finger_body_count = context.FingerBodies.Count,
+                compliant_finger_joint_count = context.FingerJoints.Count,
                 registration_eligible_vertex_count = registrationEligibleVertexCount,
                 exact_fitted_registration_vertex_count = exactFittedRegistrationVertexCount,
                 fallback_registration_vertex_count = fallbackRegistrationVertexCount,
@@ -280,6 +539,53 @@ namespace ProceduralSceneGate
                 garment_self_intersection_provenance = TruthSource.Unavailable.ToString(),
                 garment_self_intersection_unavailable_reason = "no validated robust skinned self-intersection solver is present",
                 garments = garmentReceipts,
+                anatomical_self_clearance_provenance = nonAdjacentSelfClearanceSamples > 0 ? TruthSource.PhysXMeasured.ToString() : TruthSource.Unavailable.ToString(),
+                anatomical_self_clearance_method = "continuous swept bounding-sphere separation certificate, otherwise adaptive motion-bounded shape-pose Physics.ComputePenetration sweep, for every non-adjacent force-collider pair before each authoritative 240 Hz physics step",
+                anatomical_self_clearance_collider_ids = anatomicalColliders
+                    .Where(value => value && value.enabled && !value.isTrigger)
+                    .Select(value => value.name).OrderBy(value => value, StringComparer.Ordinal).ToArray(),
+                selective_adjacent_collision_exclusion_count = ignoredAdjacentColliderPairs.Count,
+                non_adjacent_self_clearance_samples = nonAdjacentSelfClearanceSamples,
+                non_adjacent_self_overlap_samples = nonAdjacentSelfOverlapSamples,
+                broadphase_certified_self_sweep_pairs = broadphaseCertifiedSelfSweepPairs,
+                incomplete_self_sweep_intervals = incompleteSelfSweepIntervals,
+                self_sweep_minimum_substeps = SelfSweepMinimumSubsteps,
+                self_sweep_maximum_substeps = SelfSweepMaximumSubsteps,
+                self_sweep_surface_motion_limit_per_substep_m = SelfSweepMaximumSurfaceMotionPerSubstepM,
+                self_sweep_rotation_limit_per_substep_deg = SelfSweepMaximumRotationPerSubstepDeg,
+                maximum_observed_self_sweep_surface_motion_per_substep_m = maximumSelfSweepSurfaceMotionPerSubstepM,
+                maximum_observed_self_sweep_rotation_per_substep_deg = maximumSelfSweepRotationPerSubstepDeg,
+                self_sweep_motion_bounds_respected = incompleteSelfSweepIntervals == 0 &&
+                    maximumSelfSweepSurfaceMotionPerSubstepM <= SelfSweepMaximumSurfaceMotionPerSubstepM + 1e-7f &&
+                    maximumSelfSweepRotationPerSubstepDeg <= SelfSweepMaximumRotationPerSubstepDeg + 1e-5f,
+                minimum_non_adjacent_self_clearance_m = float.IsFinite(minimumNonAdjacentSelfClearanceM) ? minimumNonAdjacentSelfClearanceM : 0f,
+                maximum_non_adjacent_self_penetration_m = maximumNonAdjacentSelfPenetrationM,
+                self_clearance_sampled_every_physics_step = completeSelfClearance,
+                non_adjacent_anatomy_clearance_passed = selfClearancePass,
+                self_clearance_steps = selfClearanceSteps.ToArray(),
+                solver_motion_self_clearance_provenance = solverNonAdjacentSelfClearanceSamples > 0 ? TruthSource.PhysXMeasured.ToString() : TruthSource.Unavailable.ToString(),
+                solver_motion_self_clearance_method = "post-solver actual collider pose sweep using the canonical non-adjacent evaluator; includes solver joint and contact response",
+                solver_motion_self_clearance_samples = solverNonAdjacentSelfClearanceSamples,
+                solver_motion_self_overlap_samples = solverNonAdjacentSelfOverlapSamples,
+                solver_motion_incomplete_sweep_intervals = solverIncompleteSelfSweepIntervals,
+                solver_motion_maximum_non_adjacent_penetration_m = solverMaximumNonAdjacentSelfPenetrationM,
+                solver_motion_self_clearance_sampled_every_physics_step = completeSolverSelfClearance,
+                solver_motion_non_adjacent_anatomy_clearance_passed = solverSelfClearancePass,
+                solver_motion_self_clearance_steps = solverSelfClearanceSteps.ToArray(),
+                gate_stage = gateStage,
+                interaction_penetration_applicable = interactionPenetrationApplicable,
+                interaction_penetration_applicability_reason = interactionPenetrationApplicable
+                    ? "target interaction is present; measured finger/object and target/support bounds are mandatory"
+                    : "stage is an object-free B/C anatomy and camera sweep",
+                interaction_penetration_passed = penetrationPass,
+                finger_object_penetration_provenance = fingerObjectContactSamples > 0 ? TruthSource.PhysXMeasured.ToString() : TruthSource.Unavailable.ToString(),
+                target_support_penetration_provenance = targetSupportContactSamples > 0 ? TruthSource.PhysXMeasured.ToString() : TruthSource.Unavailable.ToString(),
+                finger_object_contact_samples = fingerObjectContactSamples,
+                target_support_contact_samples = targetSupportContactSamples,
+                finger_object_max_penetration_m = fingerObjectMaxPenetrationM,
+                target_support_max_penetration_m = targetSupportMaxPenetrationM,
+                finger_object_penetration_tolerance_m = FrozenGate.FingerObjectPenetrationMaxM,
+                target_support_penetration_tolerance_m = FrozenGate.SupportPenetrationMaxM,
                 motion_sample_count = registrationSteps.Count,
                 audited_motion_sample_count = auditedMotionSampleCount,
                 registration_audit_stride_physics_steps = FrozenGate.StepsPerFrame,
@@ -292,7 +598,10 @@ namespace ProceduralSceneGate
                 independently_advanced_animation = false,
                 body_collider_tolerance_m = SkinColliderToleranceM,
                 garment_body_tolerance_m = GarmentBodyToleranceM,
-                passed = completeMotion && bodyPass && garmentPass && CompleteHandColliderSet() && moduleCreatedProxyRenderers == 0,
+                garment_affected_vertex_fraction_max = GarmentAffectedVertexFractionMax,
+                passed = completeMotion && bodyPass && garmentPass && selfClearancePass && solverSelfClearancePass && penetrationPass &&
+                         CompleteHandColliderSet() && context.AvatarColliders.Count == anatomicalColliders.Count &&
+                         moduleCreatedProxyRenderers == 0,
             };
 
             string directory = Path.GetDirectoryName(Path.GetFullPath(reportPath));
@@ -369,6 +678,7 @@ namespace ProceduralSceneGate
                 renderer = renderer,
                 baked = new Mesh { name = spec.id + "_REGISTRATION_BAKE" },
                 usedVertexIndices = triangles.Distinct().OrderBy(x => x).ToArray(),
+                affectedUniqueVertexIndices = new HashSet<int>(),
                 penetration = new Distribution(GarmentPenetrationEdgesM),
                 minimumClearanceM = float.PositiveInfinity,
             };
@@ -425,6 +735,7 @@ namespace ProceduralSceneGate
                 float signedClearance = Vector3.Dot(garmentWorld - bodyWorld, normalWorld);
                 float penetration = Mathf.Max(0, -signedClearance);
                 garment.penetration.Observe(penetration, penetration > AffectedEpsilonM);
+                if (penetration > AffectedEpsilonM) garment.affectedUniqueVertexIndices.Add(i);
                 garment.minimumClearanceM = Mathf.Min(garment.minimumClearanceM, signedClearance);
                 minimumClearance = Mathf.Min(minimumClearance, signedClearance);
                 maximum = Mathf.Max(maximum, penetration);
@@ -442,13 +753,52 @@ namespace ProceduralSceneGate
             };
         }
 
-        void BindAnatomy(GateContext context)
+        void SampleInteractionPenetration(GateContext context, int sampledPhysicsStep)
+        {
+            if (sampledPhysicsStep < 0 || context.TargetBody == null ||
+                !interactionPenetrationSampledSteps.Add(sampledPhysicsStep)) return;
+            Collider[] targetColliders = context.TargetBody.GetComponentsInChildren<Collider>(true);
+            foreach (ContactTruth contact in context.Contacts.Where(value =>
+                         value.physicsStep == sampledPhysicsStep && value.provenance == TruthSource.PhysXMeasured)) {
+                bool targetIsA = targetColliders.Any(value => ContactIdentityMatches(contact.colliderA, value.name));
+                bool targetIsB = targetColliders.Any(value => ContactIdentityMatches(contact.colliderB, value.name));
+                if (targetIsA == targetIsB) continue;
+                string otherIdentity = targetIsA ? contact.colliderB : contact.colliderA;
+                Collider avatarCollider = context.AvatarColliders.FirstOrDefault(value =>
+                    value && ContactIdentityMatches(otherIdentity, value.name));
+                float penetrationM = Mathf.Max(0f, -contact.separationM);
+                if (avatarCollider != null && IsForceProducingFingerSegment(avatarCollider.name)) {
+                    fingerObjectContactSamples++;
+                    fingerObjectMaxPenetrationM = Mathf.Max(fingerObjectMaxPenetrationM, penetrationM);
+                } else if (avatarCollider == null) {
+                    targetSupportContactSamples++;
+                    targetSupportMaxPenetrationM = Mathf.Max(targetSupportMaxPenetrationM, penetrationM);
+                }
+            }
+        }
+
+        static bool ContactIdentityMatches(string contactIdentity, string objectName)
+        {
+            if (string.IsNullOrEmpty(contactIdentity) || string.IsNullOrEmpty(objectName)) return false;
+            return contactIdentity.Equals(objectName, StringComparison.Ordinal) ||
+                   contactIdentity.IndexOf(objectName, StringComparison.Ordinal) >= 0;
+        }
+
+        void BindAnatomy(GateContext context, Transform avatarRoot)
         {
             context.Torso = FindFirstRequired("spine03", "spine02", "spine01");
             context.Neck = FindFirstRequired("neck", "neck01");
             context.Head = FindRequired("head");
             context.LeftPalm = FindRequired("wrist.L");
             context.RightPalm = FindRequired("wrist.R");
+            context.BodySegments.Clear();
+            context.BodySegments.Add("root", avatarRoot);
+            context.BodySegments.Add("pelvis", FindFirstRequired("pelvis", "root", "spine01"));
+            context.BodySegments.Add("torso", context.Torso);
+            context.BodySegments.Add("neck", context.Neck);
+            context.BodySegments.Add("head", context.Head);
+            BindArmBodySegments(context, "left", ".L");
+            BindArmBodySegments(context, "right", ".R");
             context.FingerSegments.Clear();
             for (int side = 0; side < 2; side++) {
                 string suffix = side == 0 ? ".L" : ".R";
@@ -460,6 +810,20 @@ namespace ProceduralSceneGate
                     context.FingerSegments.Add(semanticSide + Digits[digit], segments);
                 }
             }
+        }
+
+        void BindArmBodySegments(GateContext context, string side, string suffix)
+        {
+            Transform shoulder = FindRequired("upperarm01" + suffix);
+            Transform upperArm = FindRequired("upperarm02" + suffix);
+            Transform elbow = FindRequired("lowerarm01" + suffix);
+            Transform lowerArm = FindRequired("lowerarm02" + suffix);
+            Transform wrist = FindRequired("wrist" + suffix);
+            context.BodySegments.Add(side + "_shoulder", shoulder);
+            context.BodySegments.Add(side + "_upper_arm", upperArm);
+            context.BodySegments.Add(side + "_elbow", elbow);
+            context.BodySegments.Add(side + "_lower_arm", lowerArm);
+            context.BodySegments.Add(side + "_wrist", wrist);
         }
 
         void VerifyWeightedFiveFingerHands()
@@ -481,11 +845,14 @@ namespace ProceduralSceneGate
 
         void BuildAnatomicalColliders()
         {
+            if (Physics.GetIgnoreLayerCollision(AnatomicalColliderLayer, AnatomicalColliderLayer))
+                throw new InvalidOperationException("anatomical collider layer must retain self-collision; only explicit adjacent links may be excluded");
             anatomicalColliders.Clear();
+            anatomicalAuthorityBones.Clear();
+            ignoredAdjacentColliderPairs.Clear();
             fittedColliderBindings.Clear();
             fittedCollidersByVertex.Clear();
             fittedEnvelopeBones.Clear();
-            Physics.IgnoreLayerCollision(AnatomicalColliderLayer, AnatomicalColliderLayer, true);
             PhysicsMaterial handMaterial = ColliderMaterial("MPFB_HAND_HIGH_FRICTION", 1f, 1f);
             PhysicsMaterial bodyMaterial = ColliderMaterial("MPFB_BODY_MATERIAL", .65f, .75f);
 
@@ -524,6 +891,9 @@ namespace ProceduralSceneGate
             }
             AddMissingRegistrationEnvelopeSpheres(bodyMaterial);
 
+            foreach (Collider collider in anatomicalColliders.Where(value => value))
+                anatomicalAuthorityBones.Add(collider, collider.transform.parent);
+
             if (!CompleteHandColliderSet())
                 throw new InvalidOperationException("anatomical collider build did not cover both palms and all thirty finger segments");
 
@@ -538,24 +908,163 @@ namespace ProceduralSceneGate
             BuildVertexRegistrationCandidateCache();
         }
 
-        void BindKinematicColliderDrivers(Transform avatarRoot)
+        void BindHybridColliderDrivers(GateContext context)
         {
             kinematicColliderBindings.Clear();
+            context.AvatarColliders.Clear();
+            context.FingerBodies.Clear();
+            context.FingerJoints.Clear();
+            context.FingerAuthorityBones.Clear();
             var root = new GameObject("PHYSICS_ANATOMICAL_COLLIDER_DRIVERS");
-            root.transform.SetParent(avatarRoot, false);
+            root.transform.SetParent(context.AuthorityRoot.transform, false);
             foreach (Collider collider in anatomicalColliders.Where(value => value && !value.isTrigger)) {
+                context.AvatarColliders.Add(collider);
                 Transform bone = collider.transform.parent;
                 Vector3 positionInBone = bone.InverseTransformPoint(collider.transform.position);
                 Quaternion rotationInBone = Quaternion.Inverse(bone.rotation) * collider.transform.rotation;
                 Rigidbody body = collider.attachedRigidbody;
                 collider.transform.SetParent(root.transform, true);
+                if (IsForceProducingFingerSegment(collider.name)) continue;
                 kinematicColliderBindings.Add(new KinematicColliderBinding {
+                    collider = collider,
                     body = body,
                     bone = bone,
                     positionInBone = positionInBone,
                     rotationInBone = rotationInBone,
                 });
             }
+            foreach (Collider queryCollider in anatomicalColliders.Where(value => value && value.isTrigger))
+                context.AvatarColliders.Add(queryCollider);
+
+            foreach (string side in new[] { "left", "right" }) {
+                Rigidbody palmBody = RequireForceColliderBody("COLLIDER_" + side + "_palm");
+                Rigidbody forearmBody = RequireForceColliderBody("COLLIDER_" + side + "_forearm_2");
+                context.BodySegments.Add(side + "_forearm", forearmBody.transform);
+                context.BodySegments.Add(side + "_palm", palmBody.transform);
+                for (int digitIndex = 0; digitIndex < Digits.Length; digitIndex++) {
+                    string digitKey = side + "_" + Digits[digitIndex];
+                    if (!context.FingerSegments.TryGetValue(digitKey, out Transform[] authorityBones) ||
+                        authorityBones == null || authorityBones.Length != 3)
+                        throw new InvalidOperationException("missing weighted authority bones for compliant chain: " + digitKey);
+                    Rigidbody connectedBody = palmBody;
+                    for (int segment = 1; segment <= 3; segment++) {
+                        string segmentKey = digitKey + "_segment" + segment;
+                        Rigidbody body = RequireForceColliderBody(
+                            "COLLIDER_" + side + "_" + Digits[digitIndex] + "_segment_" + segment);
+                        ConfigureDynamicFingerBody(body, segment);
+                        ConfigurableJoint joint = ConfigureCompliantFingerJoint(
+                            body,
+                            connectedBody,
+                            authorityBones[segment - 1].position);
+                        context.FingerBodies.Add(segmentKey, body);
+                        context.FingerJoints.Add(segmentKey, joint);
+                        context.FingerAuthorityBones.Add(segmentKey, authorityBones[segment - 1]);
+                        connectedBody = body;
+                    }
+                }
+            }
+
+            if (context.FingerBodies.Count != 30 || context.FingerJoints.Count != 30 ||
+                context.FingerAuthorityBones.Count != 30)
+                throw new InvalidOperationException("the compliant hand authority must contain exactly thirty dynamic segment bodies and joints");
+            if (context.AvatarColliders.Count != anatomicalColliders.Count)
+                throw new InvalidOperationException("every force/query embodiment collider must be registered independently of hierarchy");
+
+            ConfigureSelectiveAdjacentCollisionExclusions();
+        }
+
+        void ConfigureSelectiveAdjacentCollisionExclusions()
+        {
+            ignoredAdjacentColliderPairs.Clear();
+            Collider[] forceColliders = anatomicalColliders.Where(value => value && value.enabled && !value.isTrigger).ToArray();
+            for (int first = 0; first < forceColliders.Length; first++) {
+                for (int second = first + 1; second < forceColliders.Length; second++) {
+                    Collider a = forceColliders[first];
+                    Collider b = forceColliders[second];
+                    if (!anatomicalAuthorityBones.TryGetValue(a, out Transform boneA) ||
+                        !anatomicalAuthorityBones.TryGetValue(b, out Transform boneB) ||
+                        !AreSameOrAdjacentAnatomicalLinks(boneA, boneB)) continue;
+                    Physics.IgnoreCollision(a, b, true);
+                    ignoredAdjacentColliderPairs.Add(ColliderPairKey(a, b));
+                }
+            }
+        }
+
+        static bool AreSameOrAdjacentAnatomicalLinks(Transform first, Transform second)
+        {
+            if (first == null || second == null) return false;
+            if (first == second) return true;
+            return first.parent == second || second.parent == first;
+        }
+
+        static string ColliderPairKey(Collider first, Collider second)
+        {
+            int a = first.GetInstanceID();
+            int b = second.GetInstanceID();
+            return a < b ? a + ":" + b : b + ":" + a;
+        }
+
+        static bool IsForceProducingFingerSegment(string colliderName)
+        {
+            return !string.IsNullOrEmpty(colliderName) &&
+                   colliderName.StartsWith("COLLIDER_", StringComparison.Ordinal) &&
+                   colliderName.IndexOf("_segment_", StringComparison.Ordinal) >= 0;
+        }
+
+        Rigidbody RequireForceColliderBody(string colliderName)
+        {
+            Collider collider = anatomicalColliders.SingleOrDefault(value =>
+                value && !value.isTrigger && value.name == colliderName);
+            if (collider == null || collider.attachedRigidbody == null)
+                throw new InvalidOperationException("missing force-producing anatomical collider body: " + colliderName);
+            return collider.attachedRigidbody;
+        }
+
+        static void ConfigureDynamicFingerBody(Rigidbody body, int segment)
+        {
+            body.isKinematic = false;
+            body.useGravity = false;
+            body.mass = segment == 1 ? .010f : segment == 2 ? .007f : .004f;
+            body.linearDamping = 1.25f;
+            body.angularDamping = .12f;
+            body.maxAngularVelocity = 22f;
+            body.maxDepenetrationVelocity = .35f;
+            body.interpolation = RigidbodyInterpolation.None;
+            body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        }
+
+        static ConfigurableJoint ConfigureCompliantFingerJoint(
+            Rigidbody body,
+            Rigidbody connectedBody,
+            Vector3 authorityPivotWorld)
+        {
+            var joint = body.gameObject.AddComponent<ConfigurableJoint>();
+            joint.connectedBody = connectedBody;
+            joint.autoConfigureConnectedAnchor = false;
+            joint.anchor = body.transform.InverseTransformPoint(authorityPivotWorld);
+            joint.connectedAnchor = connectedBody.transform.InverseTransformPoint(authorityPivotWorld);
+            joint.xMotion = ConfigurableJointMotion.Locked;
+            joint.yMotion = ConfigurableJointMotion.Locked;
+            joint.zMotion = ConfigurableJointMotion.Locked;
+            joint.angularXMotion = ConfigurableJointMotion.Limited;
+            joint.angularYMotion = ConfigurableJointMotion.Limited;
+            joint.angularZMotion = ConfigurableJointMotion.Limited;
+            joint.lowAngularXLimit = new SoftJointLimit { limit = -12f, bounciness = 0f, contactDistance = 1f };
+            joint.highAngularXLimit = new SoftJointLimit { limit = 72f, bounciness = 0f, contactDistance = 1f };
+            joint.angularYLimit = new SoftJointLimit { limit = 34f, bounciness = 0f, contactDistance = 1f };
+            joint.angularZLimit = new SoftJointLimit { limit = 34f, bounciness = 0f, contactDistance = 1f };
+            joint.rotationDriveMode = RotationDriveMode.Slerp;
+            joint.slerpDrive = new JointDrive {
+                positionSpring = 2.4f,
+                positionDamper = .075f,
+                maximumForce = 1.15f,
+            };
+            joint.projectionMode = JointProjectionMode.PositionAndRotation;
+            joint.projectionDistance = .001f;
+            joint.projectionAngle = 4f;
+            joint.enableCollision = false;
+            joint.enablePreprocessing = true;
+            return joint;
         }
 
         void BuildPalmBox(string side, string suffix, PhysicsMaterial material)
@@ -961,14 +1470,43 @@ namespace ProceduralSceneGate
         void ResetRegistrationAccumulators()
         {
             registrationSteps.Clear();
+            selfClearanceSteps.Clear();
+            solverSelfClearanceSteps.Clear();
+            pendingPrePhysicsColliderPoses.Clear();
+            interactionPenetrationSampledSteps.Clear();
             skinColliderErrors.Clear();
             exactFittedSkinColliderErrors.Clear();
             fallbackSkinColliderErrors.Clear();
             skinColliderErrorsByBone.Clear();
-            foreach (var garment in garments) { garment.penetration.Clear(); garment.minimumClearanceM = float.PositiveInfinity; }
+            foreach (var garment in garments) {
+                garment.penetration.Clear();
+                garment.affectedUniqueVertexIndices.Clear();
+                garment.minimumClearanceM = float.PositiveInfinity;
+            }
             lastSampledStep = -1;
             auditedMotionSampleCount = 0;
             samplesContiguousFromZero = true;
+            lastSelfClearanceStep = -1;
+            selfClearanceSamplesContiguousFromZero = true;
+            minimumNonAdjacentSelfClearanceM = float.PositiveInfinity;
+            maximumNonAdjacentSelfPenetrationM = 0f;
+            nonAdjacentSelfClearanceSamples = 0;
+            nonAdjacentSelfOverlapSamples = 0;
+            broadphaseCertifiedSelfSweepPairs = 0;
+            incompleteSelfSweepIntervals = 0;
+            maximumSelfSweepSurfaceMotionPerSubstepM = 0f;
+            maximumSelfSweepRotationPerSubstepDeg = 0f;
+            pendingPrePhysicsStep = -1;
+            lastSolverSelfClearanceStep = -1;
+            solverSelfClearanceSamplesContiguousFromZero = true;
+            solverNonAdjacentSelfClearanceSamples = 0;
+            solverNonAdjacentSelfOverlapSamples = 0;
+            solverIncompleteSelfSweepIntervals = 0;
+            solverMaximumNonAdjacentSelfPenetrationM = 0f;
+            fingerObjectMaxPenetrationM = 0f;
+            targetSupportMaxPenetrationM = 0f;
+            fingerObjectContactSamples = 0;
+            targetSupportContactSamples = 0;
         }
 
         static FrozenDocument LoadFrozenDocument()
@@ -1058,6 +1596,7 @@ namespace ProceduralSceneGate
             public SkinnedMeshRenderer renderer;
             public Mesh baked;
             public int[] usedVertexIndices;
+            public HashSet<int> affectedUniqueVertexIndices;
             public Distribution penetration;
             public float minimumClearanceM;
 
@@ -1068,15 +1607,20 @@ namespace ProceduralSceneGate
                 material = spec.material,
                 color_rgba = spec.color_rgba,
                 samples = penetration.count,
-                affected_vertices = penetration.affected,
-                affected_fraction = penetration.count > 0 ? penetration.affected / (float)penetration.count : 0,
+                affected_vertices = affectedUniqueVertexIndices.Count,
+                affected_fraction = usedVertexIndices.Length > 0 ? affectedUniqueVertexIndices.Count / (float)usedVertexIndices.Length : 0,
+                affected_unique_vertex_numerator = affectedUniqueVertexIndices.Count,
+                affected_unique_vertex_denominator = usedVertexIndices.Length,
+                affected_vertex_semantics = "unique garment vertices penetrated at any audited pose / unique garment vertices",
                 affected_vertex_distribution_edges_m = penetration.edges,
                 affected_vertex_distribution_counts = penetration.bins,
                 penetration_p50_upper_bound_m = penetration.QuantileUpperBound(.50f),
                 penetration_p95_upper_bound_m = penetration.QuantileUpperBound(.95f),
                 maximum_penetration_m = penetration.maximum_m,
                 minimum_signed_clearance_m = float.IsFinite(minimumClearanceM) ? minimumClearanceM : 0,
-                passed = penetration.count > 0 && penetration.maximum_m <= GarmentBodyToleranceM,
+                passed = penetration.count > 0 && usedVertexIndices.Length > 0 &&
+                         penetration.maximum_m <= GarmentBodyToleranceM &&
+                         affectedUniqueVertexIndices.Count / (float)usedVertexIndices.Length <= GarmentAffectedVertexFractionMax,
             };
         }
 
@@ -1089,6 +1633,7 @@ namespace ProceduralSceneGate
 
         sealed class KinematicColliderBinding
         {
+            public Collider collider;
             public Rigidbody body;
             public Transform bone;
             public Vector3 positionInBone;
@@ -1151,9 +1696,10 @@ namespace ProceduralSceneGate
             public string schema, avatar_spec_schema, embodiment_manifest_schema, avatar_id, garment_configuration_id;
             public string source_asset_id, source_asset_sha256, source_license, construction_license, construction_method;
             public string authority_root, avatar_root, body_renderer;
-            public string[] body_bones, anatomical_collider_ids, garment_renderers, garment_materials;
+            public string[] body_bones, body_segment_ids, anatomical_collider_ids, anatomical_self_clearance_collider_ids, garment_renderers, garment_materials;
             public HandTopology hand_topology;
-            public int anatomical_collider_count, kinematic_collider_body_count;
+            public int anatomical_collider_count, registered_avatar_collider_count, kinematic_collider_body_count;
+            public int dynamic_finger_body_count, compliant_finger_joint_count;
             public int registration_eligible_vertex_count, exact_fitted_registration_vertex_count, fallback_registration_vertex_count;
             public int[] garment_layers;
             public float[] garment_fit_offsets_m;
@@ -1165,11 +1711,31 @@ namespace ProceduralSceneGate
             public string garment_body_provenance, garment_body_method;
             public string garment_body_full_triangle_intersection_provenance, garment_body_full_triangle_intersection_unavailable_reason;
             public string garment_self_intersection_provenance, garment_self_intersection_unavailable_reason;
+            public string anatomical_self_clearance_provenance, anatomical_self_clearance_method;
+            public string solver_motion_self_clearance_provenance, solver_motion_self_clearance_method;
+            public string gate_stage, interaction_penetration_applicability_reason;
+            public string finger_object_penetration_provenance, target_support_penetration_provenance;
             public GarmentRegistrationReceipt[] garments;
             public int motion_sample_count, audited_motion_sample_count, registration_audit_stride_physics_steps, expected_motion_sample_count, first_physics_step, last_physics_step, module_created_proxy_renderers;
-            public bool both_palms_and_all_finger_segments_have_colliders, sampled_every_physics_step, independently_advanced_animation, passed;
-            public float body_collider_tolerance_m, garment_body_tolerance_m;
+            public int selective_adjacent_collision_exclusion_count, self_sweep_minimum_substeps, self_sweep_maximum_substeps;
+            public int finger_object_contact_samples, target_support_contact_samples;
+            public long non_adjacent_self_clearance_samples, non_adjacent_self_overlap_samples;
+            public long broadphase_certified_self_sweep_pairs, incomplete_self_sweep_intervals;
+            public long solver_motion_self_clearance_samples, solver_motion_self_overlap_samples, solver_motion_incomplete_sweep_intervals;
+            public bool avatar_collider_registry_complete, both_palms_and_all_finger_segments_have_colliders, sampled_every_physics_step, independently_advanced_animation;
+            public bool self_clearance_sampled_every_physics_step, self_sweep_motion_bounds_respected, non_adjacent_anatomy_clearance_passed, passed;
+            public bool solver_motion_self_clearance_sampled_every_physics_step, solver_motion_non_adjacent_anatomy_clearance_passed;
+            public bool interaction_penetration_applicable, interaction_penetration_passed;
+            public float body_collider_tolerance_m, garment_body_tolerance_m, garment_affected_vertex_fraction_max;
+            public float minimum_non_adjacent_self_clearance_m, maximum_non_adjacent_self_penetration_m;
+            public float self_sweep_surface_motion_limit_per_substep_m, self_sweep_rotation_limit_per_substep_deg;
+            public float maximum_observed_self_sweep_surface_motion_per_substep_m, maximum_observed_self_sweep_rotation_per_substep_deg;
+            public float solver_motion_maximum_non_adjacent_penetration_m;
+            public float finger_object_max_penetration_m, target_support_max_penetration_m;
+            public float finger_object_penetration_tolerance_m, target_support_penetration_tolerance_m;
             public RegistrationStep[] registration_steps;
+            public SelfClearanceStep[] self_clearance_steps;
+            public SelfClearanceStep[] solver_motion_self_clearance_steps;
         }
         [Serializable] sealed class CandidateCoverageReceipt { public string bone; public int eligible, exact_fitted, fallback, unavailable; }
 
@@ -1189,11 +1755,12 @@ namespace ProceduralSceneGate
 
         [Serializable] sealed class GarmentRegistrationReceipt
         {
-            public string garment_id, material;
+            public string garment_id, material, affected_vertex_semantics;
             public int layer;
             public float fit_offset_m;
             public float[] color_rgba;
             public long samples, affected_vertices;
+            public int affected_unique_vertex_numerator, affected_unique_vertex_denominator;
             public float affected_fraction;
             public float[] affected_vertex_distribution_edges_m;
             public long[] affected_vertex_distribution_counts;
@@ -1202,6 +1769,23 @@ namespace ProceduralSceneGate
         }
 
         [Serializable] sealed class RegistrationStep { public int physics_step; public float time_s; public bool audited; public BodyColliderStep body_collider; public GarmentStep[] garments; }
+        [Serializable] sealed class SelfClearanceStep
+        {
+            public int physics_step;
+            public float time_s;
+            public long evaluated_non_adjacent_pairs, broadphase_certified_separated_pairs;
+            public long swept_pair_pose_samples, overlap_samples, incomplete_sweep_intervals;
+            public int maximum_substeps_per_pair;
+            public float maximum_surface_motion_per_substep_m, maximum_rotation_per_substep_deg;
+            public float minimum_conservative_clearance_m, maximum_penetration_m;
+            public bool sweep_coverage_complete, overlap_evidence_truncated, passed;
+            public SelfOverlapEvidence[] overlap_evidence;
+        }
+        [Serializable] sealed class SelfOverlapEvidence
+        {
+            public string collider_a, collider_b;
+            public float sweep_fraction, penetration_m;
+        }
         [Serializable] sealed class BodyColliderStep { public string provenance; public int samples; public float maximum_error_m; }
         [Serializable] sealed class GarmentStep
         {

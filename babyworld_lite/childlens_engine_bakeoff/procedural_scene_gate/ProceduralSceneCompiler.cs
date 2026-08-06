@@ -21,31 +21,40 @@ namespace ProceduralSceneGate
         private const string CatalogId = "kenney_furniture_kit_cc0_curated";
         private const string CatalogLicense = "CC0";
         private const string CatalogArchiveSha256 = "68afa4e6dc8a53942379fb47f1e84ec735d46b77bb1c1ceb968e245693dde067";
-        private const string TargetPersistentId = "target_001";
-        private const int TargetSemanticId = 41;
-        private const int TargetInstanceId = 41001;
-        private const string TargetGeometrySpecSha256 = "9d9963e46446fb05187c285062e7562af142a82906b5adf3f491f1d70060e5c5";
-        private const float TargetDiameterM = 0.055f;
-        private const float TargetMassKg = 0.12f;
-        private const float TargetStaticFriction = 1.0f;
-        private const float TargetDynamicFriction = 0.9f;
         private const float FurnitureStaticFriction = 0.75f;
         private const float FurnitureDynamicFriction = 0.65f;
         private const float SupportGapM = 0.001f;
-        private const float TargetMidpointReachCenterM = 0.36f;
-        private const float TargetSeedReachOffsetM = 0.020f;
-        private const float TargetLateralBiasTowardRightShoulderM = 0.025f;
+        private const float ProspectiveViewHalfAngleDeg = 37.5f;
+
+        private static readonly TargetDefinition[] Targets =
+        {
+            new TargetDefinition(
+                "red_toy_001", 41, 41001, "rounded_toy",
+                "9d9963e46446fb05187c285062e7562af142a82906b5adf3f491f1d70060e5c5",
+                new Vector3(0.055f, 0.055f, 0.055f), 0.09f, 1.0f, 0.9f,
+                "analytic_sphere", "radial_thumb_index_middle", new Color(0.92f, 0.18f, 0.10f)),
+            new TargetDefinition(
+                "blue_cup_001", 42, 42001, "handled_cup",
+                "f79ab83b8850ec62bfe84c07b81793e42bfed6ae8158b06736e4467f05f96885",
+                new Vector3(0.065f, 0.075f, 0.065f), 0.08f, 0.9f, 0.8f,
+                "compound_analytic", "cup_body_thumb_middle_ring", new Color(0.10f, 0.38f, 0.88f)),
+            new TargetDefinition(
+                "yellow_block_001", 43, 43001, "beveled_block",
+                "c60dba9e25789265ef8aecc27f670fe0ca8988feefc9c7c9ea4a9bf74de14e06",
+                new Vector3(0.060f, 0.050f, 0.060f), 0.10f, 0.95f, 0.85f,
+                "analytic_box", "face_opposition_thumb_index_middle", new Color(0.96f, 0.72f, 0.08f))
+        };
 
         private static readonly CatalogMember[] Catalog =
         {
-            new CatalogMember("tableCoffee", "8c81c31a74aadc1e89e334eb1ac43380f41c14f47e5dd9a6b029ebf74850adda", new Vector3(1.15f, 0.62f, 0.86f), "support_table", "mesh_or_compound_box"),
-            new CatalogMember("loungeSofaLong", "bbc91d1b01537dbc847685560265b6fcd72a21333c8aab7f8906a5addf8dbd20", new Vector3(1.65f, 0.92f, 0.78f), "sofa", "compound_box"),
-            new CatalogMember("bookcaseOpen", "31beea66f34e64660c870e39c52ed2e81984939c88f4bd763c7dce56e9ef76a9", new Vector3(0.72f, 1.64f, 0.35f), "storage", "compound_box"),
-            new CatalogMember("chairCushion", "afc684f28ab2e4ee3fe9cd59a92f03103e4f62c74ae785029fdd672fc6914cdd", new Vector3(0.55f, 1.24f, 0.55f), "chair", "compound_box"),
-            new CatalogMember("rugRectangle", "0cdd8cea357bc267c9f121b4e7d32513c08f1b179522d95c6632bf2306d38f79", new Vector3(1.75f, 0.015f, 1.20f), "rug", "box"),
-            new CatalogMember("lampSquareFloor", "c4b35656f587cacf2ccf57d1c0216541923890e878cec0d0f58ff71cd4a71bfc", new Vector3(0.42f, 1.35f, 0.42f), "lamp", "compound_box"),
-            new CatalogMember("pottedPlant", "cf66928b943e30ef5c1f06145419ca2cda534249bb4d77831ae723532c4f8de3", new Vector3(0.55f, 1.00f, 0.55f), "plant", "compound_box"),
-            new CatalogMember("books", "91fd64f5fd821b5046724ffa18974e8964b85bfbd4a0d89687d2283966394f5f", new Vector3(0.32f, 0.14f, 0.24f), "books", "box")
+            new CatalogMember("tableCoffee", "8c81c31a74aadc1e89e334eb1ac43380f41c14f47e5dd9a6b029ebf74850adda", new Vector3(1.15f, .62f, .86f), "support_table", "mesh_or_compound_box"),
+            new CatalogMember("loungeSofaLong", "bbc91d1b01537dbc847685560265b6fcd72a21333c8aab7f8906a5addf8dbd20", new Vector3(1.65f, .92f, .78f), "sofa", "compound_box"),
+            new CatalogMember("bookcaseOpen", "31beea66f34e64660c870e39c52ed2e81984939c88f4bd763c7dce56e9ef76a9", new Vector3(.72f, 1.64f, .35f), "storage", "compound_box"),
+            new CatalogMember("chairCushion", "afc684f28ab2e4ee3fe9cd59a92f03103e4f62c74ae785029fdd672fc6914cdd", new Vector3(.55f, 1.24f, .55f), "chair", "compound_box"),
+            new CatalogMember("rugRectangle", "0cdd8cea357bc267c9f121b4e7d32513c08f1b179522d95c6632bf2306d38f79", new Vector3(1.75f, .015f, 1.20f), "rug", "box"),
+            new CatalogMember("lampSquareFloor", "c4b35656f587cacf2ccf57d1c0216541923890e878cec0d0f58ff71cd4a71bfc", new Vector3(.42f, 1.35f, .42f), "lamp", "compound_box"),
+            new CatalogMember("pottedPlant", "cf66928b943e30ef5c1f06145419ca2cda534249bb4d77831ae723532c4f8de3", new Vector3(.55f, 1.00f, .55f), "plant", "compound_box"),
+            new CatalogMember("books", "91fd64f5fd821b5046724ffa18974e8964b85bfbd4a0d89687d2283966394f5f", new Vector3(.32f, .14f, .24f), "books", "box")
         };
 
         // These are family constraints, not seed-specific scenes.  Every placement
@@ -61,8 +70,14 @@ namespace ProceduralSceneGate
                 {
                     new Placement("bookcaseOpen", -1.55f, 3.55f, 2f, false, "toy_shelf"),
                     new Placement("rugRectangle", 0.05f, 1.75f, 0f, true, "rug"),
-                    new Placement("chairCushion", 1.25f, 2.45f, 212f, false, "reading_corner"),
-                    new Placement("books", -1.54f, 3.36f, 8f, false, "shelf_clutter")
+                    new Placement("chairCushion", 1.10f, 2.35f, 212f, false, "reading_corner"),
+                    new Placement("books", -1.54f, 3.05f, 8f, false, "shelf_clutter"),
+                    new Placement("books", -0.85f, 3.98f, -9f, false, "toy_shelf_books"),
+                    new Placement("pottedPlant", 1.72f, 3.80f, 179f, false, "window_plant"),
+                    new Placement("lampSquareFloor", 1.85f, 3.10f, 184f, false, "reading_lamp"),
+                    new Placement("chairCushion", -1.35f, 2.30f, 148f, false, "caregiver_chair"),
+                    new Placement("books", 0.92f, 3.38f, 14f, false, "picture_books"),
+                    new Placement("rugRectangle", -0.15f, 3.42f, 0f, false, "back_play_mat")
                 }),
             new RoomProfile(
                 "sage_living_corner", "painted_sage", new Vector3(4.8f, 2.55f, 5.2f),
@@ -70,10 +85,16 @@ namespace ProceduralSceneGate
                 new Color(0.65f, 0.73f, 0.66f), new Color(0.35f, 0.27f, 0.20f), new Color(0.75f, 0.84f, 0.66f),
                 new[]
                 {
-                    new Placement("loungeSofaLong", 0.75f, 4.15f, 2f, false, "sofa"),
+                    new Placement("loungeSofaLong", 0.65f, 4.02f, 2f, false, "sofa"),
                     new Placement("rugRectangle", 0.05f, 1.85f, 90f, true, "rug"),
-                    new Placement("lampSquareFloor", 1.82f, 3.88f, 185f, false, "distant_lamp"),
-                    new Placement("pottedPlant", -1.82f, 3.08f, 178f, false, "distant_plant")
+                    new Placement("lampSquareFloor", 1.92f, 3.48f, 185f, false, "distant_lamp"),
+                    new Placement("pottedPlant", -1.92f, 3.20f, 178f, false, "distant_plant"),
+                    new Placement("books", -1.58f, 4.18f, -6f, false, "bookcase"),
+                    new Placement("chairCushion", -1.35f, 2.24f, 154f, false, "reading_chair"),
+                    new Placement("books", 1.18f, 3.08f, 11f, false, "side_books"),
+                    new Placement("pottedPlant", 1.94f, 2.55f, 183f, false, "window_plant"),
+                    new Placement("rugRectangle", -0.20f, 3.50f, 0f, false, "sofa_rug"),
+                    new Placement("books", -0.92f, 3.72f, 7f, false, "family_books")
                 }),
             new RoomProfile(
                 "birch_art_room", "natural_birch", new Vector3(4.2f, 2.55f, 4.6f),
@@ -84,7 +105,13 @@ namespace ProceduralSceneGate
                     new Placement("bookcaseOpen", -1.48f, 3.45f, 1f, false, "art_shelf"),
                     new Placement("chairCushion", 1.25f, 2.38f, 202f, false, "reading_chair"),
                     new Placement("rugRectangle", -0.08f, 1.72f, 0f, true, "rug"),
-                    new Placement("pottedPlant", 1.60f, 3.54f, 183f, false, "distant_plant")
+                    new Placement("pottedPlant", 1.68f, 3.46f, 183f, false, "distant_plant"),
+                    new Placement("books", -0.82f, 3.05f, 6f, false, "art_books"),
+                    new Placement("lampSquareFloor", -1.75f, 2.48f, 176f, false, "task_lamp"),
+                    new Placement("books", 0.10f, 3.05f, -12f, false, "portfolio_stack"),
+                    new Placement("chairCushion", 0.82f, 3.46f, 214f, false, "observer_chair"),
+                    new Placement("rugRectangle", 0.10f, 3.28f, 0f, false, "gallery_rug"),
+                    new Placement("books", -0.78f, 3.68f, 9f, false, "paper_stack")
                 })
         };
 
@@ -95,6 +122,8 @@ namespace ProceduralSceneGate
         private Transform _sceneRoot;
         private string _furnitureAssetRoot;
         private System.Random _random;
+        private TargetDefinition _target;
+        private CompiledInstance _destination;
 
         public void Build(GateContext context, string furnitureAssetRoot)
         {
@@ -102,8 +131,10 @@ namespace ProceduralSceneGate
             _context = context;
             _furnitureAssetRoot = furnitureAssetRoot.TrimEnd('/', '\\');
             _profile = Profiles.Single(profile => profile.RoomFamily == context.RoomFamily);
+            _target = ResolveTarget(context);
             _random = new System.Random(context.Seed);
             _instances.Clear();
+            context.Destinations.Clear();
 
             var rootObject = new GameObject("COMPILED_ROOM_" + context.RoomFamily);
             rootObject.transform.SetParent(context.AuthorityRoot.transform, false);
@@ -123,15 +154,15 @@ namespace ProceduralSceneGate
                 "primary_support",
                 0);
 
-            float desiredReachM = TargetMidpointReachCenterM + TargetSeedReachOffsetM * (PositiveModulo(context.Seed, 3) - 1);
+            float desiredReachM = context.TargetMidpointReachM;
             Transform rightShoulder = FindRightShoulder(context);
             Transform leftShoulder = FindLeftShoulder(context);
             Vector3 shoulderMidpoint = 0.5f * (leftShoulder.position + rightShoulder.position);
-            Vector3 targetPosition = SolveTargetPosition(shoulderMidpoint, table.Bounds.max.y, desiredReachM);
+            Vector3 targetPosition = SolveTargetPosition(shoulderMidpoint, table.Bounds.max.y, desiredReachM, _target.DimensionsM.y);
             Vector3 towardRightShoulder = Vector3.ProjectOnPlane(rightShoulder.position - shoulderMidpoint, Vector3.up).normalized;
-            targetPosition += towardRightShoulder * TargetLateralBiasTowardRightShoulderM;
+            targetPosition += towardRightShoulder * context.TargetLateralBiasM;
             MoveStaticSupportUnderTarget(table, targetPosition);
-            targetPosition.y = table.Bounds.max.y + TargetDiameterM * 0.5f + SupportGapM;
+            targetPosition.y = table.Bounds.max.y + _target.DimensionsM.y * 0.5f + SupportGapM;
 
             foreach (Placement placement in _profile.Placements)
             {
@@ -147,7 +178,13 @@ namespace ProceduralSceneGate
                     _instances.Count);
             }
 
+            BindGazeZoneTransforms(table);
             Physics.SyncTransforms();
+            _destination = CreateActivityContext(table, targetPosition);
+            Physics.SyncTransforms();
+            RejectOverlappingFurnishings();
+            RejectObjectsOutsideFinishedRoom();
+            RejectFurnitureInInteractionCorridor(table, targetPosition, _destination.Bounds.center);
             CreateFreeTarget(targetPosition, table.PersistentId);
             Physics.SyncTransforms();
 
@@ -166,10 +203,72 @@ namespace ProceduralSceneGate
             if (context.Seed == 0) throw new InvalidOperationException("a nonzero frozen scene seed is required");
             if (!Profiles.Any(profile => profile.RoomFamily == context.RoomFamily))
                 throw new InvalidOperationException("unknown frozen room family: " + context.RoomFamily);
+            if (string.IsNullOrWhiteSpace(context.TargetId) || string.IsNullOrWhiteSpace(context.DestinationId) ||
+                string.IsNullOrWhiteSpace(context.ContactStrategy) || string.IsNullOrWhiteSpace(context.FinalGazeZone))
+                throw new InvalidOperationException("GateContext must freeze TargetId, DestinationId, ContactStrategy, and FinalGazeZone");
+            if (string.IsNullOrWhiteSpace(context.CompiledContractPath) || string.IsNullOrWhiteSpace(context.CompiledContractSha256))
+                throw new InvalidOperationException("GateContext must be populated from the authoritative compiled contract");
+            if (context.TargetReachBandMinM <= 0f || context.TargetReachBandMaxM < context.TargetReachBandMinM ||
+                context.TargetMidpointReachM < context.TargetReachBandMinM || context.TargetMidpointReachM > context.TargetReachBandMaxM)
+                throw new InvalidOperationException("compiled-contract target reach is unset or outside its authoritative band");
+            if (context.TargetLateralBiasM < 0f || context.TargetDimensionsM.x <= 0f || context.TargetDimensionsM.y <= 0f ||
+                context.TargetDimensionsM.z <= 0f || context.TargetMassKg <= 0f || context.TargetStaticFriction < 0f ||
+                context.TargetDynamicFriction < 0f || string.IsNullOrWhiteSpace(context.TargetGeometry) ||
+                context.TargetSemanticId <= 0 || context.TargetInstanceId <= 0)
+                throw new InvalidOperationException("compiled-contract target geometry, identity, or physical parameters are unset");
+            RoomProfile profile = Profiles.Single(candidate => candidate.RoomFamily == context.RoomFamily);
+            if (!Approximately(context.SceneEnvelopeM, profile.EnvelopeM))
+                throw new InvalidOperationException("compiled-contract scene envelope does not match the approved room profile");
+            if (!string.Equals(context.SceneMaterialVariant, profile.MaterialVariant, StringComparison.Ordinal))
+                throw new InvalidOperationException("compiled-contract material variant does not match the approved room profile");
+            if (context.SceneZoneIds == null || !context.SceneZoneIds.SequenceEqual(profile.ZoneIds, StringComparer.Ordinal))
+                throw new InvalidOperationException("compiled-contract scene zones do not match the approved room profile");
+            string[] profileAssets = new[] { "tableCoffee" }.Concat(profile.Placements.Select(placement => placement.AssetId)).ToArray();
+            if (context.ExpectedSceneAssetIds == null || !SameMultiset(context.ExpectedSceneAssetIds, profileAssets))
+                throw new InvalidOperationException("compiled-contract scene asset identities do not match the approved room profile");
+            if (context.ExpectedSceneInstances == null || context.ExpectedSceneInstances.Length != profileAssets.Length)
+                throw new InvalidOperationException("compiled-contract scene instance authorities are incomplete");
+            for (int index = 0; index < profileAssets.Length; index++)
+            {
+                SceneInstanceAuthority authority = context.ExpectedSceneInstances[index];
+                CatalogMember catalog = FindCatalog(profileAssets[index]);
+                string expectedPersistentId = context.RoomFamily + "_" + profileAssets[index] + "_" + index.ToString("D2");
+                if (authority == null || authority.AssetId != profileAssets[index]
+                    || authority.PersistentId != expectedPersistentId
+                    || !Approximately(authority.AssetDimensionsM, catalog.DimensionsM)
+                    || authority.SemanticClass != catalog.SemanticClass
+                    || authority.CollisionSource != catalog.CollisionSource
+                    || authority.Interactive || authority.MassKg != 0f
+                    || authority.StaticFriction < 0f || authority.DynamicFriction < 0f)
+                    throw new InvalidOperationException("compiled-contract scene instance authority diverges at index " + index);
+            }
+            if (context.ExpectedSupportRelations == null || context.ExpectedSupportRelations.Length != 2
+                || context.ExpectedSupportRelations[0].ChildId != context.TargetId
+                || context.ExpectedSupportRelations[0].SupportId != context.ExpectedSceneInstances[0].PersistentId
+                || !string.IsNullOrEmpty(context.ExpectedSupportRelations[0].DestinationId)
+                || context.ExpectedSupportRelations[1].ChildId != context.TargetId
+                || context.ExpectedSupportRelations[1].DestinationId != context.DestinationId
+                || !string.IsNullOrEmpty(context.ExpectedSupportRelations[1].SupportId))
+                throw new InvalidOperationException("compiled-contract support relations are incomplete or divergent");
+            if (!context.ExpectedTargetVisibleAtRequiredEvents
+                || context.ExpectedFinalGazeZone != context.FinalGazeZone
+                || context.SceneStabilizationSeconds <= 0f
+                || !context.RequireNoVisiblePrimitiveFurniture)
+                throw new InvalidOperationException("compiled-contract sightline/stabilization/visible-furniture policy is incomplete");
+            if (context.MinimumContextualObjects <= 0 ||
+                context.MinimumContextualObjects > context.ExpectedSceneAssetIds.Length ||
+                context.MinimumContextualObjects <= 10)
+                throw new InvalidOperationException("compiled-contract contextual-object minimum is inconsistent with its scene asset inventory");
             if (string.IsNullOrWhiteSpace(context.OutputRoot)) throw new InvalidOperationException("GateContext.OutputRoot is required for scene receipts");
             if (string.IsNullOrWhiteSpace(furnitureAssetRoot) || !furnitureAssetRoot.Replace('\\', '/').StartsWith("Assets/", StringComparison.Ordinal))
                 throw new InvalidOperationException("furnitureAssetRoot must be a Unity project Assets path");
             if (context.AssistanceLedger.Count != 0) throw new InvalidOperationException("assistance ledger was nonempty before scene compilation");
+        }
+
+        private static bool SameMultiset(IEnumerable<string> left, IEnumerable<string> right)
+        {
+            return left.OrderBy(value => value, StringComparer.Ordinal)
+                .SequenceEqual(right.OrderBy(value => value, StringComparer.Ordinal), StringComparer.Ordinal);
         }
 
         private void ConfigureEnvironment()
@@ -202,9 +301,9 @@ namespace ProceduralSceneGate
 
         private void BuildRoomSurfaces()
         {
-            float width = _profile.EnvelopeM.x;
-            float height = _profile.EnvelopeM.y;
-            float depth = _profile.EnvelopeM.z;
+            float width = _context.SceneEnvelopeM.x;
+            float height = _context.SceneEnvelopeM.y;
+            float depth = _context.SceneEnvelopeM.z;
             float roomCenterDepth = depth * 0.5f - 0.55f;
             float backDepth = depth - 0.55f;
 
@@ -212,6 +311,8 @@ namespace ProceduralSceneGate
             CreateRoomSurface("back_wall_surface", new Vector3(0f, height * 0.5f, -backDepth), new Vector3(width, height, 0.08f), _profile.WallColor, "wall");
             CreateRoomSurface("left_wall_surface", new Vector3(-width * 0.5f, height * 0.5f, -roomCenterDepth), new Vector3(0.08f, height, depth), _profile.WallColor, "wall");
             CreateRoomSurface("right_wall_surface", new Vector3(width * 0.5f, height * 0.5f, -roomCenterDepth), new Vector3(0.08f, height, depth), _profile.WallColor, "wall");
+            CreateRoomSurface("front_wall_surface", new Vector3(0f, height * 0.5f, 0.55f), new Vector3(width, height, 0.08f), _profile.WallColor, "wall");
+            CreateRoomSurface("ceiling_surface", new Vector3(0f, height + 0.04f, -roomCenterDepth), new Vector3(width, 0.08f, depth), Color.Lerp(_profile.WallColor, Color.white, 0.22f), "ceiling");
             CreateRoomSurface("back_baseboard", new Vector3(0f, 0.09f, -backDepth + 0.055f), new Vector3(width - 0.10f, 0.18f, 0.045f), Color.Lerp(_profile.WallColor, Color.white, 0.68f), "trim");
             CreateRoomSurface("window_scan_surface", new Vector3(0.72f, 1.52f, -backDepth + 0.055f), new Vector3(1.12f, 0.86f, 0.025f), new Color(0.54f, 0.75f, 0.90f), "window");
         }
@@ -239,10 +340,10 @@ namespace ProceduralSceneGate
 
         private void BuildZones()
         {
-            float backDepth = _profile.EnvelopeM.z - 0.62f;
-            for (int index = 0; index < _profile.ZoneIds.Length; index++)
+            float backDepth = _context.SceneEnvelopeM.z - 0.62f;
+            for (int index = 0; index < _context.SceneZoneIds.Length; index++)
             {
-                string zoneId = _profile.ZoneIds[index];
+                string zoneId = _context.SceneZoneIds[index];
                 var zoneObject = new GameObject("ZONE_" + zoneId);
                 zoneObject.transform.SetParent(_sceneRoot, false);
                 Vector3 localCenter;
@@ -275,8 +376,69 @@ namespace ProceduralSceneGate
             }
         }
 
+        private void BindGazeZoneTransforms(CompiledInstance table)
+        {
+            foreach (SceneZone zone in _sceneRoot.GetComponentsInChildren<SceneZone>(true))
+            {
+                GameObject backing;
+                if (zone.zone_id == "low_table") backing = table.game_object;
+                else if (zone.zone_id == "window_scan") backing = RequireSceneChild("window_scan_surface");
+                else
+                {
+                    CompiledInstance instance = _instances.FirstOrDefault(candidate => candidate.role == zone.zone_id);
+                    if (instance == null)
+                        throw new InvalidOperationException("gaze zone has no visible physics-backed scene object: " + zone.zone_id);
+                    backing = instance.game_object;
+                }
+                Bounds bounds = BoundsOf(backing);
+                Transform anchor = CreateBackedAnchor("GAZE_ANCHOR_" + zone.zone_id, backing.transform, bounds.center);
+                zone.transform.position = anchor.position;
+                zone.center_world_m = anchor.position;
+                zone.extents_m = bounds.size;
+                RegisterContextDestination(zone.zone_id, anchor);
+            }
+
+            GameObject backWall = RequireSceneChild("back_wall_surface");
+            Bounds backWallBounds = BoundsOf(backWall);
+            Vector3 lookAwayWorld = _sceneRoot.TransformPoint(new Vector3(-0.72f, 1.30f, 0f));
+            lookAwayWorld.z = backWallBounds.max.z;
+            RegisterContextDestination(
+                "look_away",
+                CreateBackedAnchor("GAZE_ANCHOR_look_away", backWall.transform, lookAwayWorld));
+        }
+
+        private GameObject RequireSceneChild(string name)
+        {
+            Transform child = _sceneRoot.Find(name);
+            if (!child) throw new InvalidOperationException("compiled scene is missing required physical object: " + name);
+            return child.gameObject;
+        }
+
+        private static Transform CreateBackedAnchor(string name, Transform backing, Vector3 worldPosition)
+        {
+            if (!backing.GetComponentsInChildren<Renderer>(true).Any(renderer => renderer.enabled) ||
+                !backing.GetComponentsInChildren<Collider>(true).Any(collider => collider.enabled))
+                throw new InvalidOperationException("destination/gaze anchor backing must be visible and physics-backed: " + backing.name);
+            var anchor = new GameObject(name);
+            anchor.transform.SetPositionAndRotation(worldPosition, backing.rotation);
+            anchor.transform.SetParent(backing, true);
+            return anchor.transform;
+        }
+
+        private void RegisterContextDestination(string id, Transform transform)
+        {
+            if (string.IsNullOrWhiteSpace(id) || !transform)
+                throw new InvalidOperationException("cannot register an empty GateContext destination transform");
+            if (_context.Destinations.ContainsKey(id))
+                throw new InvalidOperationException("duplicate GateContext destination transform: " + id);
+            _context.Destinations.Add(id, transform);
+        }
+
         private CompiledInstance PlaceCatalogInstance(CatalogMember member, Vector2 floorCoordinate, float yawDeg, bool reachable, string role, int index)
         {
+            SceneInstanceAuthority authority = _context.ExpectedSceneInstances[index];
+            if (authority.AssetId != member.AssetId)
+                throw new InvalidOperationException("compiled instance ordering diverged before placement at index " + index);
             string assetPath = _furnitureAssetRoot + "/" + member.AssetId + ".obj";
             VerifyCatalogSource(assetPath, member.Sha256);
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
@@ -284,12 +446,12 @@ namespace ProceduralSceneGate
             var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             if (!instance) throw new InvalidOperationException("could not instantiate frozen furniture asset: " + assetPath);
 
-            instance.name = _context.RoomFamily + "_" + member.AssetId + "_" + index.ToString("D2");
+            instance.name = authority.PersistentId;
             instance.transform.SetParent(_sceneRoot, false);
             instance.transform.localPosition = Vector3.zero;
             instance.transform.localRotation = Quaternion.identity;
             instance.transform.localScale = Vector3.one;
-            ScaleToCatalogDimensions(instance, member.DimensionsM);
+            ScaleToCatalogDimensions(instance, authority.AssetDimensionsM);
             instance.transform.localRotation = Quaternion.Euler(0f, yawDeg, 0f);
 
             Bounds current = BoundsOf(instance);
@@ -299,19 +461,20 @@ namespace ProceduralSceneGate
                 desiredFloorCenter.y - current.min.y,
                 desiredFloorCenter.z - current.center.z);
 
-            Collider[] colliders = AddCatalogColliders(instance, member.CollisionSource);
+            Collider[] colliders = AddCatalogColliders(instance, authority.CollisionSource);
             foreach (Collider collider in colliders)
-                collider.sharedMaterial = MakePhysicsMaterial("furniture", FurnitureStaticFriction, FurnitureDynamicFriction);
+                collider.sharedMaterial = MakePhysicsMaterial(
+                    "furniture_" + index, authority.StaticFriction, authority.DynamicFriction);
             foreach (Renderer renderer in instance.GetComponentsInChildren<Renderer>(true))
-                renderer.sharedMaterial = FurnitureMaterial(member.SemanticClass);
+                renderer.sharedMaterial = FurnitureMaterial(authority.SemanticClass);
 
             string persistentId = instance.name;
             SceneIdentity identity = instance.AddComponent<SceneIdentity>();
             identity.persistent_id = persistentId;
-            identity.semantic_id = SemanticId(member.SemanticClass);
+            identity.semantic_id = SemanticId(authority.SemanticClass);
             identity.instance_id = StableInstanceId(_context.Seed, persistentId);
-            identity.semantic_class = member.SemanticClass;
-            identity.interactive = false;
+            identity.semantic_class = authority.SemanticClass;
+            identity.interactive = authority.Interactive;
             identity.physics_role = reachable ? "reachable_static_physx_collider" : "distant_noninteractive_static_physx_collider";
             identity.support_id = role == "primary_support" ? persistentId : string.Empty;
             identity.license = CatalogLicense;
@@ -325,20 +488,25 @@ namespace ProceduralSceneGate
                 asset_path = assetPath,
                 source_sha256 = member.Sha256,
                 license = CatalogLicense,
-                catalog_dimensions_m = member.DimensionsM,
+                catalog_dimensions_m = authority.AssetDimensionsM,
                 compiled_bounds_center_world_m = current.center,
                 compiled_bounds_size_m = current.size,
                 rotation_world_xyzw = instance.transform.rotation,
-                semantic_class = member.SemanticClass,
+                semantic_class = authority.SemanticClass,
                 semantic_id = identity.semantic_id,
                 instance_id = identity.instance_id,
-                material_variant = _profile.MaterialVariant,
-                collision_source = member.CollisionSource,
+                material_variant = _context.SceneMaterialVariant,
+                collision_source = authority.CollisionSource,
                 collider_count = colliders.Length,
-                interactive = false,
+                interactive = authority.Interactive,
+                mass_kg = authority.MassKg,
+                static_friction = authority.StaticFriction,
+                dynamic_friction = authority.DynamicFriction,
                 reachable = reachable,
                 role = role,
                 visible_geometry_source = "verified_imported_kenney_mesh",
+                physics_backed = true,
+                provenance = "hash-verified Kenney CC0 catalog mesh with deterministic PhysX collider",
                 game_object = instance,
                 Bounds = current
             };
@@ -357,11 +525,11 @@ namespace ProceduralSceneGate
             table.compiled_bounds_size_m = table.Bounds.size;
         }
 
-        private Vector3 SolveTargetPosition(Vector3 shoulderMidpoint, float supportTopY, float desiredReachM)
+        private Vector3 SolveTargetPosition(Vector3 shoulderMidpoint, float supportTopY, float desiredReachM, float targetHeightM)
         {
             Vector3 target = shoulderMidpoint;
             Vector3 roomForward = _sceneRoot.TransformDirection(Vector3.back);
-            float targetY = supportTopY + TargetDiameterM * 0.5f + SupportGapM;
+            float targetY = supportTopY + targetHeightM * 0.5f + SupportGapM;
             float vertical = targetY - shoulderMidpoint.y;
             float forwardSquared = desiredReachM * desiredReachM - vertical * vertical;
             if (forwardSquared <= 0.01f)
@@ -371,39 +539,305 @@ namespace ProceduralSceneGate
             return target;
         }
 
+        private static TargetDefinition ResolveTarget(GateContext context)
+        {
+            TargetDefinition template = Targets.SingleOrDefault(candidate => candidate.PersistentId == context.TargetId);
+            if (template == null) throw new InvalidOperationException("unknown frozen target: " + context.TargetId);
+            if (!string.Equals(template.ContactStrategy, context.ContactStrategy, StringComparison.Ordinal))
+                throw new InvalidOperationException("target/contact strategy mismatch: " + context.TargetId + "/" + context.ContactStrategy);
+            string requiredDestination = template.PersistentId == "red_toy_001" ? "shallow_bin" :
+                template.PersistentId == "blue_cup_001" ? "tray" : "marked_support";
+            if (!string.Equals(requiredDestination, context.DestinationId, StringComparison.Ordinal))
+                throw new InvalidOperationException("target/destination mismatch: " + context.TargetId + "/" + context.DestinationId);
+            string requiredRoom = template.PersistentId == "red_toy_001" ? "warm_playroom" :
+                template.PersistentId == "blue_cup_001" ? "sage_living_corner" : "birch_art_room";
+            if (!string.Equals(requiredRoom, context.RoomFamily, StringComparison.Ordinal))
+                throw new InvalidOperationException("target/room-family mismatch: " + context.TargetId + "/" + context.RoomFamily);
+            float expectedMassScale = context.RobustnessVariant == "mass_friction_change" ? 1.25f : 1f;
+            float expectedFrictionScale = context.RobustnessVariant == "mass_friction_change" ? .8f : 1f;
+            if (context.RobustnessVariant != "nominal" && context.RobustnessVariant != "lateral_target_shift" &&
+                context.RobustnessVariant != "mass_friction_change")
+                throw new InvalidOperationException("target uses an unknown prospectively frozen robustness variant: " + context.RobustnessVariant);
+            bool targetContractMatchesTemplate = context.TargetSemanticId == template.SemanticId &&
+                context.TargetInstanceId == template.InstanceId && context.TargetGeometry == template.Geometry &&
+                Approximately(context.TargetDimensionsM, template.DimensionsM) &&
+                Mathf.Approximately(context.TargetMassKg, template.MassKg * expectedMassScale) &&
+                Mathf.Approximately(context.TargetStaticFriction, template.StaticFriction * expectedFrictionScale) &&
+                Mathf.Approximately(context.TargetDynamicFriction, template.DynamicFriction * expectedFrictionScale);
+            if (!targetContractMatchesTemplate)
+                throw new InvalidOperationException("authoritative compiled-contract target does not match the approved asset template: " + context.TargetId);
+            return new TargetDefinition(
+                context.TargetId, context.TargetSemanticId, context.TargetInstanceId, context.TargetGeometry,
+                template.GeometrySpecSha256, context.TargetDimensionsM, context.TargetMassKg,
+                context.TargetStaticFriction, context.TargetDynamicFriction, template.CollisionSource,
+                context.ContactStrategy, template.Color);
+        }
+
+        private static bool Approximately(Vector3 left, Vector3 right)
+        {
+            return Mathf.Approximately(left.x, right.x) && Mathf.Approximately(left.y, right.y) &&
+                Mathf.Approximately(left.z, right.z);
+        }
+
+        private CompiledInstance CreateActivityContext(CompiledInstance table, Vector3 targetPosition)
+        {
+            Vector3 right = _sceneRoot.TransformDirection(Vector3.right);
+            Vector3 forward = _sceneRoot.TransformDirection(Vector3.back);
+            float supportTop = table.Bounds.max.y;
+            if (_context.TargetId == "red_toy_001")
+            {
+                CreateAuthoredProp(
+                    "picture_book", SupportedCenter(targetPosition + right * 0.145f + forward * 0.015f, supportTop, 0.012f),
+                    new Vector3(0.135f, 0.012f, 0.105f), new Color(0.18f, 0.55f, 0.82f),
+                    "picture_book", "beside_picture_book", table.PersistentId, UnitBoxMesh(), false);
+                return CreateDestination(
+                    "shallow_bin", targetPosition - right * 0.255f + forward * 0.025f,
+                    new Vector3(0.185f, 0.050f, 0.155f), new Color(0.92f, 0.62f, 0.18f),
+                    0.045f, table.PersistentId, supportTop);
+            }
+            if (_context.TargetId == "blue_cup_001")
+            {
+                CreateAuthoredProp(
+                    "reading_book", SupportedCenter(targetPosition + right * 0.150f + forward * 0.010f, supportTop, 0.014f),
+                    new Vector3(0.145f, 0.014f, 0.110f), new Color(0.68f, 0.22f, 0.24f),
+                    "book", "beside_book", table.PersistentId, UnitBoxMesh(), false);
+                return CreateDestination(
+                    "tray", targetPosition - right * 0.260f + forward * 0.030f,
+                    new Vector3(0.205f, 0.026f, 0.165f), new Color(0.86f, 0.79f, 0.62f),
+                    0.020f, table.PersistentId, supportTop);
+            }
+
+            Color[] craftColors =
+            {
+                new Color(0.88f, 0.20f, 0.28f), new Color(0.12f, 0.55f, 0.74f),
+                new Color(0.32f, 0.68f, 0.30f), new Color(0.72f, 0.28f, 0.76f)
+            };
+            for (int index = 0; index < craftColors.Length; index++)
+            {
+                float side = index % 2 == 0 ? 1f : -1f;
+                float lateral = side > 0f ? 0.125f + 0.025f * index : 0.100f;
+                float depth = index < 2 ? 0.085f : -0.075f;
+                CreateAuthoredProp(
+                    "craft_stick_" + index.ToString("D2"),
+                    SupportedCenter(targetPosition + right * side * lateral + forward * depth, supportTop, 0.010f),
+                    new Vector3(0.010f, 0.010f, 0.105f), craftColors[index],
+                    "craft_object", "among_craft_objects", table.PersistentId, UnitBoxMesh(), false);
+            }
+            return CreateDestination(
+                "marked_support", targetPosition - right * 0.255f + forward * 0.020f,
+                new Vector3(0.155f, 0.010f, 0.145f), new Color(0.18f, 0.68f, 0.48f),
+                0f, table.PersistentId, supportTop);
+        }
+
+        private static Vector3 SupportedCenter(Vector3 position, float supportTop, float height)
+        {
+            position.y = supportTop + height * 0.5f + SupportGapM;
+            return position;
+        }
+
+        private CompiledInstance CreateDestination(
+            string destinationId,
+            Vector3 desiredCenter,
+            Vector3 dimensions,
+            Color color,
+            float wallHeightM,
+            string supportId,
+            float supportTop)
+        {
+            if (!string.Equals(destinationId, _context.DestinationId, StringComparison.Ordinal))
+                throw new InvalidOperationException("activity destination did not match GateContext.DestinationId");
+            desiredCenter.y = supportTop + dimensions.y * 0.5f + SupportGapM;
+            bool openContainer = wallHeightM > 0f;
+            Mesh mesh = openContainer ? OpenContainerMesh() : UnitBoxMesh();
+            CompiledInstance destination = CreateAuthoredProp(
+                destinationId, desiredCenter, dimensions, color, "activity_destination",
+                "free_release_destination", supportId, mesh, openContainer);
+            destination.game_object.name = destinationId;
+            RegisterContextDestination(destinationId, destination.game_object.transform);
+            return destination;
+        }
+
+        private CompiledInstance CreateAuthoredProp(
+            string persistentSuffix,
+            Vector3 centerWorld,
+            Vector3 dimensions,
+            Color color,
+            string semanticClass,
+            string role,
+            string supportId,
+            Mesh mesh,
+            bool compoundContainer)
+        {
+            string persistentId = persistentSuffix == _context.DestinationId
+                ? persistentSuffix
+                : _context.RoomFamily + "_" + persistentSuffix;
+            var instance = new GameObject(persistentId);
+            instance.transform.SetParent(_sceneRoot, true);
+            instance.transform.SetPositionAndRotation(centerWorld, _sceneRoot.rotation);
+            instance.transform.localScale = dimensions;
+            instance.AddComponent<MeshFilter>().sharedMesh = mesh;
+            instance.AddComponent<MeshRenderer>().sharedMaterial = MaterialFor(
+                _context.SceneMaterialVariant + "_" + semanticClass + "_" + persistentSuffix, color, 0.16f);
+
+            var colliders = new List<Collider>();
+            if (compoundContainer)
+            {
+                const float wall = 0.08f;
+                const float baseHeight = 0.16f;
+                colliders.Add(AddBoxCollider(instance, new Vector3(0f, -0.5f + baseHeight * 0.5f, 0f), new Vector3(1f, baseHeight, 1f)));
+                colliders.Add(AddBoxCollider(instance, new Vector3(-0.5f + wall * 0.5f, 0f, 0f), new Vector3(wall, 1f, 1f)));
+                colliders.Add(AddBoxCollider(instance, new Vector3(0.5f - wall * 0.5f, 0f, 0f), new Vector3(wall, 1f, 1f)));
+                colliders.Add(AddBoxCollider(instance, new Vector3(0f, 0f, -0.5f + wall * 0.5f), new Vector3(1f, 1f, wall)));
+                colliders.Add(AddBoxCollider(instance, new Vector3(0f, 0f, 0.5f - wall * 0.5f), new Vector3(1f, 1f, wall)));
+            }
+            else colliders.Add(AddBoxCollider(instance, Vector3.zero, Vector3.one));
+            foreach (Collider collider in colliders)
+                collider.sharedMaterial = MakePhysicsMaterial("reachable_context", FurnitureStaticFriction, FurnitureDynamicFriction);
+
+            SceneIdentity identity = instance.AddComponent<SceneIdentity>();
+            identity.persistent_id = persistentId;
+            identity.semantic_id = SemanticId(semanticClass);
+            identity.instance_id = StableInstanceId(_context.Seed, persistentId);
+            identity.semantic_class = semanticClass;
+            identity.interactive = false;
+            identity.physics_role = "reachable_static_physx_collider";
+            identity.support_id = supportId;
+            identity.license = "repository-authored";
+            identity.source_sha256 = Sha256Hex("authored-mesh:" + semanticClass + ":" + dimensions.ToString("R"));
+
+            Bounds bounds = BoundsOf(instance);
+            var compiled = new CompiledInstance
+            {
+                persistent_id = persistentId,
+                asset_id = "repository_authored_" + semanticClass,
+                asset_path = "ProceduralSceneCompiler.cs",
+                source_sha256 = identity.source_sha256,
+                license = "repository-authored",
+                catalog_dimensions_m = dimensions,
+                compiled_bounds_center_world_m = bounds.center,
+                compiled_bounds_size_m = bounds.size,
+                rotation_world_xyzw = instance.transform.rotation,
+                semantic_class = semanticClass,
+                semantic_id = identity.semantic_id,
+                instance_id = identity.instance_id,
+                material_variant = _context.SceneMaterialVariant,
+                collision_source = compoundContainer ? "compound_analytic_static" : "analytic_box_static",
+                collider_count = colliders.Count,
+                interactive = false,
+                reachable = true,
+                role = role,
+                visible_geometry_source = "repository_authored_context_mesh",
+                physics_backed = true,
+                provenance = "deterministic SceneCompiler authored mesh and PhysX collider",
+                game_object = instance,
+                Bounds = bounds
+            };
+            _instances.Add(compiled);
+            return compiled;
+        }
+
+        private static BoxCollider AddBoxCollider(GameObject instance, Vector3 center, Vector3 size)
+        {
+            BoxCollider collider = instance.AddComponent<BoxCollider>();
+            collider.center = center;
+            collider.size = size;
+            return collider;
+        }
+
+        private void RejectFurnitureInInteractionCorridor(CompiledInstance table, Vector3 target, Vector3 destination)
+        {
+            Bounds corridor = new Bounds(0.5f * (target + destination), Vector3.zero);
+            corridor.Encapsulate(target);
+            corridor.Encapsulate(destination);
+            corridor.Expand(new Vector3(0.30f, 0.42f, 0.30f));
+            foreach (CompiledInstance instance in _instances)
+            {
+                if (instance == table || instance.reachable || instance.semantic_class == "rug") continue;
+                if (corridor.Intersects(instance.Bounds))
+                    throw new InvalidOperationException("prospective swept interaction corridor blocked by " + instance.persistent_id);
+            }
+        }
+
+        private void RejectOverlappingFurnishings()
+        {
+            CompiledInstance[] furniture = _instances
+                .Where(instance => instance.license == CatalogLicense && instance.semantic_class != "rug")
+                .ToArray();
+            for (int first = 0; first < furniture.Length; first++)
+            {
+                for (int second = first + 1; second < furniture.Length; second++)
+                {
+                    if (furniture[first].Bounds.Intersects(furniture[second].Bounds))
+                        throw new InvalidOperationException(
+                            "prospective furnishing overlap: " + furniture[first].persistent_id + "/" + furniture[second].persistent_id);
+                }
+            }
+            CompiledInstance[] activityContext = _instances
+                .Where(instance => instance.visible_geometry_source == "repository_authored_context_mesh")
+                .ToArray();
+            for (int first = 0; first < activityContext.Length; first++)
+            {
+                for (int second = first + 1; second < activityContext.Length; second++)
+                {
+                    if (activityContext[first].Bounds.Intersects(activityContext[second].Bounds))
+                        throw new InvalidOperationException(
+                            "prospective activity-context overlap: " + activityContext[first].persistent_id + "/" + activityContext[second].persistent_id);
+                }
+            }
+        }
+
+        private void RejectObjectsOutsideFinishedRoom()
+        {
+            float halfWidth = _context.SceneEnvelopeM.x * 0.5f - 0.045f;
+            float backInterior = -(_context.SceneEnvelopeM.z - 0.55f) + 0.045f;
+            float frontInterior = 0.55f - 0.045f;
+            foreach (CompiledInstance instance in _instances)
+            {
+                foreach (Vector3 cornerWorld in BoundsCorners(instance.Bounds))
+                {
+                    Vector3 corner = _sceneRoot.InverseTransformPoint(cornerWorld);
+                    if (corner.x < -halfWidth || corner.x > halfWidth ||
+                        corner.z < backInterior || corner.z > frontInterior ||
+                        corner.y < -0.002f || corner.y > _context.SceneEnvelopeM.y)
+                        throw new InvalidOperationException("prospective finished-room envelope violation: " + instance.persistent_id);
+                }
+            }
+        }
+
         private void CreateFreeTarget(Vector3 initialPosition, string supportId)
         {
-            var target = new GameObject(TargetPersistentId);
+            var target = new GameObject(_target.PersistentId);
             target.transform.SetPositionAndRotation(
                 initialPosition,
                 _sceneRoot.rotation * Quaternion.Euler(0f, NextSigned(18f), 0f));
-            target.transform.localScale = Vector3.one * TargetDiameterM;
+            target.transform.localScale = _target.DimensionsM;
 
-            Mesh targetMesh = RoundedGraspToyMesh();
+            Mesh targetMesh = _target.Geometry == "rounded_toy" ? RoundedGraspToyMesh() :
+                _target.Geometry == "handled_cup" ? HandledCupMesh() : BeveledBlockMesh();
             target.AddComponent<MeshFilter>().sharedMesh = targetMesh;
-            target.AddComponent<MeshRenderer>().sharedMaterial = MaterialFor("interactive_target", new Color(0.92f, 0.24f, 0.10f), 0.24f);
-            var targetCollider = target.AddComponent<SphereCollider>();
-            targetCollider.radius = 0.5f;
-            targetCollider.sharedMaterial = MakePhysicsMaterial("interactive_target", TargetStaticFriction, TargetDynamicFriction);
+            target.AddComponent<MeshRenderer>().sharedMaterial = MaterialFor("interactive_target_" + _target.PersistentId, _target.Color, 0.24f);
+            Collider[] targetColliders = AddTargetColliders(target, _target);
+            foreach (Collider targetCollider in targetColliders)
+                targetCollider.sharedMaterial = MakePhysicsMaterial("interactive_target", _target.StaticFriction, _target.DynamicFriction);
 
             SceneIdentity identity = target.AddComponent<SceneIdentity>();
-            identity.persistent_id = TargetPersistentId;
-            identity.semantic_id = TargetSemanticId;
-            identity.instance_id = TargetInstanceId;
+            identity.persistent_id = _target.PersistentId;
+            identity.semantic_id = _target.SemanticId;
+            identity.instance_id = _target.InstanceId;
             identity.semantic_class = "interactive_target";
             identity.interactive = true;
             identity.physics_role = "free_non_kinematic_physx_rigidbody";
             identity.support_id = supportId;
             identity.license = "repository-authored";
-            identity.source_sha256 = TargetGeometrySpecSha256;
+            identity.source_sha256 = _target.GeometrySpecSha256;
 
             PhysicsTruthObjectIdentity truthIdentity = target.AddComponent<PhysicsTruthObjectIdentity>();
-            truthIdentity.persistent_id = TargetPersistentId;
-            truthIdentity.semantic_id = TargetSemanticId.ToString();
-            truthIdentity.instance_id = TargetInstanceId.ToString();
+            truthIdentity.persistent_id = _target.PersistentId;
+            truthIdentity.semantic_id = _target.SemanticId.ToString();
+            truthIdentity.instance_id = _target.InstanceId.ToString();
 
             Rigidbody body = target.AddComponent<Rigidbody>();
-            body.mass = TargetMassKg;
+            body.mass = _target.MassKg;
             body.useGravity = true;
             body.isKinematic = false;
             body.interpolation = RigidbodyInterpolation.None;
@@ -427,28 +861,41 @@ namespace ProceduralSceneGate
             }).ToArray();
             Vector3 targetPosition = _context.TargetBody.position;
             Vector3 sightlineOrigin = _context.Head.position;
+            Transform destinationAnchor = RequireContextDestination(_context.DestinationId);
+            Transform finalGazeAnchor = RequireContextDestination(_context.FinalGazeZone);
+            Vector3 finalGazePoint = finalGazeAnchor.position;
             return new SceneSpecReceipt
             {
                 schema = SceneSchema,
+                authoritative_contract_sha256 = _context.CompiledContractSha256,
                 seed = _context.Seed,
+                cell_id = _context.CellId,
                 room_family = _context.RoomFamily,
-                material_variant = _profile.MaterialVariant,
-                envelope_m = _profile.EnvelopeM,
+                material_variant = _context.SceneMaterialVariant,
+                target_id = _context.TargetId,
+                destination_id = _context.DestinationId,
+                contact_strategy = _context.ContactStrategy,
+                final_gaze_zone = _context.FinalGazeZone,
+                destination_transform_name = destinationAnchor.name,
+                final_gaze_transform_name = finalGazeAnchor.name,
+                expected_scene_asset_ids = _context.ExpectedSceneAssetIds.ToArray(),
+                minimum_contextual_objects = _context.MinimumContextualObjects,
+                envelope_m = _context.SceneEnvelopeM,
                 zones = zones,
                 instances = _instances.Select(instance => instance.WithoutRuntimeReferences()).ToArray(),
                 target = new TargetReceipt
                 {
-                    persistent_id = TargetPersistentId,
-                    semantic_id = TargetSemanticId,
-                    instance_id = TargetInstanceId,
-                    geometry = "repository_authored_rounded_grasp_toy",
-                    geometry_spec_sha256 = TargetGeometrySpecSha256,
+                    persistent_id = _target.PersistentId,
+                    semantic_id = _target.SemanticId,
+                    instance_id = _target.InstanceId,
+                    geometry = _target.Geometry,
+                    geometry_spec_sha256 = _target.GeometrySpecSha256,
                     license = "repository-authored",
-                    dimensions_m = Vector3.one * TargetDiameterM,
-                    mass_kg = TargetMassKg,
-                    static_friction = TargetStaticFriction,
-                    dynamic_friction = TargetDynamicFriction,
-                    collision_source = "analytic_sphere_matching_render_envelope",
+                    dimensions_m = _target.DimensionsM,
+                    mass_kg = _target.MassKg,
+                    static_friction = _target.StaticFriction,
+                    dynamic_friction = _target.DynamicFriction,
+                    collision_source = _target.CollisionSource,
                     collision_policy = "free_non_kinematic_physx_rigidbody",
                     support_id = table.PersistentId,
                     initial_position_world_m = targetPosition,
@@ -459,9 +906,26 @@ namespace ProceduralSceneGate
                 {
                     new SupportRelation
                     {
-                        child_id = TargetPersistentId,
-                        support_id = table.PersistentId,
+                        child_id = _context.ExpectedSupportRelations[0].ChildId,
+                        support_id = _context.ExpectedSupportRelations[0].SupportId,
+                        relation = "initial_physical_support",
                         initial_separation_m = TargetBounds().min.y - table.Bounds.max.y
+                    },
+                    new SupportRelation
+                    {
+                        child_id = _context.ExpectedSupportRelations[1].ChildId,
+                        destination_id = _context.ExpectedSupportRelations[1].DestinationId,
+                        support_id = table.PersistentId,
+                        relation = "intended_free_release_destination",
+                        initial_separation_m = Vector3.Distance(targetPosition, destinationAnchor.position)
+                    },
+                    new SupportRelation
+                    {
+                        child_id = _context.DestinationId,
+                        destination_id = _context.DestinationId,
+                        support_id = table.PersistentId,
+                        relation = "destination_physical_support",
+                        initial_separation_m = _destination.Bounds.min.y - table.Bounds.max.y
                     }
                 },
                 reachability = new ReachabilityReceipt
@@ -471,12 +935,12 @@ namespace ProceduralSceneGate
                     target_from_right_shoulder_m = Vector3.Distance(rightShoulder.position, targetPosition),
                     target_from_left_shoulder_m = Vector3.Distance(leftShoulder.position, targetPosition),
                     compiled_requested_m = desiredReachM,
-                    compiled_midpoint_band_m = new Vector2(0.34f, 0.38f),
-                    lateral_bias_toward_right_shoulder_m = TargetLateralBiasTowardRightShoulderM,
+                    compiled_midpoint_band_m = new Vector2(_context.TargetReachBandMinM, _context.TargetReachBandMaxM),
+                    lateral_bias_toward_right_shoulder_m = _context.TargetLateralBiasM,
                     aperture_aware = true,
                     seed_specific_retuning = false,
-                    compiled_limit_m = new Vector2(0.34f, 0.48f),
-                    corridor_radius_m = 0.055f
+                    compiled_limit_m = new Vector2(_context.TargetReachBandMinM, _context.TargetReachBandMaxM),
+                    corridor_radius_m = 0.060f
                 },
                 sightlines = new SightlineReceipt
                 {
@@ -484,10 +948,16 @@ namespace ProceduralSceneGate
                     origin_world_m = sightlineOrigin,
                     target_world_m = targetPosition,
                     target_visible_from_head_geometry = HasClearSightline(sightlineOrigin, _context.TargetBody.gameObject),
-                    final_gaze_zone = "window_scan"
+                    final_gaze_zone = _context.FinalGazeZone,
+                    final_gaze_world_m = finalGazePoint,
+                    final_gaze_zone_compiled = _context.Destinations.ContainsKey(_context.FinalGazeZone),
+                    final_gaze_visible_from_head_geometry = HasClearSightlineToAnchor(sightlineOrigin, finalGazeAnchor),
+                    destination_world_m = destinationAnchor.position,
+                    destination_visible_from_head_geometry = HasClearSightlineToObject(sightlineOrigin, _destination.game_object),
+                    prospective_view_half_angle_deg = ProspectiveViewHalfAngleDeg
                 },
-                stabilization_s = 1.0f,
-                no_visible_primitive_furniture = true,
+                stabilization_s = _context.SceneStabilizationSeconds,
+                no_visible_primitive_furniture = _context.RequireNoVisiblePrimitiveFurniture,
                 catalog_id = CatalogId,
                 catalog_archive_sha256 = CatalogArchiveSha256,
                 catalog_license = CatalogLicense
@@ -503,17 +973,71 @@ namespace ProceduralSceneGate
             bool targetColliderValid = target.GetComponentsInChildren<Collider>(true).Any(collider => collider.enabled);
             bool reachableColliders = _instances.Where(instance => instance.reachable)
                 .All(instance => instance.game_object.GetComponentsInChildren<Collider>(true).Any(collider => collider.enabled));
-            bool importedHeroFurniture = _instances.All(instance => instance.visible_geometry_source == "verified_imported_kenney_mesh");
-            bool hashesVerified = _instances.All(instance => instance.source_sha256 == FindCatalog(instance.asset_id).Sha256);
+            bool importedHeroFurniture = _instances
+                .Where(instance => instance.license == CatalogLicense)
+                .All(instance => instance.visible_geometry_source == "verified_imported_kenney_mesh");
+            bool hashesVerified = _instances
+                .Where(instance => instance.license == CatalogLicense)
+                .All(instance => instance.source_sha256 == FindCatalog(instance.asset_id).Sha256);
+            string[] actualCatalogAssetIds = _instances.Where(instance => instance.license == CatalogLicense)
+                .Select(instance => instance.asset_id).ToArray();
+            int contextualVisibleObjectCount = actualCatalogAssetIds.Length;
+            bool contextualObjectCountPass = contextualVisibleObjectCount >= _context.MinimumContextualObjects;
+            string[] actualZoneIds = _sceneRoot.GetComponentsInChildren<SceneZone>(true)
+                .Select(zone => zone.zone_id).ToArray();
+            bool compiledInstanceAuthorityPass = _context.ExpectedSceneInstances.Length == actualCatalogAssetIds.Length &&
+                _context.ExpectedSceneInstances.Select((authority, index) => new { authority, index }).All(row =>
+                    row.authority.PersistentId == _instances[row.index].persistent_id &&
+                    row.authority.AssetId == _instances[row.index].asset_id &&
+                    Approximately(row.authority.AssetDimensionsM, _instances[row.index].catalog_dimensions_m) &&
+                    row.authority.SemanticClass == _instances[row.index].semantic_class &&
+                    row.authority.CollisionSource == _instances[row.index].collision_source &&
+                    row.authority.Interactive == _instances[row.index].interactive &&
+                    Mathf.Abs(row.authority.MassKg - _instances[row.index].mass_kg) <= 1e-6f &&
+                    Mathf.Abs(row.authority.StaticFriction - _instances[row.index].static_friction) <= 1e-6f &&
+                    Mathf.Abs(row.authority.DynamicFriction - _instances[row.index].dynamic_friction) <= 1e-6f);
+            bool compiledRelationAuthorityPass = spec.support_relations.Length >= 2 &&
+                spec.support_relations[0].child_id == _context.ExpectedSupportRelations[0].ChildId &&
+                spec.support_relations[0].support_id == _context.ExpectedSupportRelations[0].SupportId &&
+                spec.support_relations[1].child_id == _context.ExpectedSupportRelations[1].ChildId &&
+                spec.support_relations[1].destination_id == _context.ExpectedSupportRelations[1].DestinationId;
+            bool compiledSceneContractPass = SameMultiset(actualCatalogAssetIds, _context.ExpectedSceneAssetIds) &&
+                SameMultiset(actualZoneIds, _context.SceneZoneIds) &&
+                _instances.All(instance => instance.material_variant == _context.SceneMaterialVariant) &&
+                Approximately(spec.envelope_m, _context.SceneEnvelopeM) &&
+                spec.minimum_contextual_objects == _context.MinimumContextualObjects &&
+                compiledInstanceAuthorityPass && compiledRelationAuthorityPass &&
+                spec.sightlines.final_gaze_zone == _context.ExpectedFinalGazeZone &&
+                _context.ExpectedTargetVisibleAtRequiredEvents &&
+                Mathf.Abs(spec.stabilization_s - _context.SceneStabilizationSeconds) <= 1e-6f &&
+                spec.no_visible_primitive_furniture == _context.RequireNoVisiblePrimitiveFurniture &&
+                spec.authoritative_contract_sha256 == _context.CompiledContractSha256;
+            bool persistentIdentitiesUnique = _instances.Select(instance => instance.persistent_id).Distinct().Count() == _instances.Count;
+            bool allVisibleContextPhysicsBacked = _instances.All(instance => instance.physics_backed);
             float rightReach = Vector3.Distance(rightShoulder.position, _context.TargetBody.position);
             float leftReach = Vector3.Distance(leftShoulder.position, _context.TargetBody.position);
+            float midpointReach = Vector3.Distance(
+                0.5f * (rightShoulder.position + leftShoulder.position),
+                _context.TargetBody.position);
             float supportSeparation = TargetBounds().min.y - table.Bounds.max.y;
-            bool reachPass = rightReach >= 0.34f && rightReach <= 0.48f && leftReach >= 0.34f && leftReach <= 0.48f;
+            bool reachPass = midpointReach >= _context.TargetReachBandMinM &&
+                midpointReach <= _context.TargetReachBandMaxM;
             bool supportPass = supportSeparation >= 0f && supportSeparation <= 0.002f;
-            bool sightlinePass = spec.sightlines.target_visible_from_head_geometry;
+            bool sightlinePass = spec.sightlines.target_visible_from_head_geometry &&
+                spec.sightlines.destination_visible_from_head_geometry;
+            bool cameraConePass = IsInProspectiveTaskView(_context.Head, spec.sightlines.target_world_m) &&
+                IsInProspectiveTaskView(_context.Head, spec.sightlines.destination_world_m);
+            bool finalGazePass = spec.sightlines.final_gaze_zone_compiled &&
+                spec.sightlines.final_gaze_visible_from_head_geometry;
+            bool authoritativeMappingsPass = RequireContextDestination(_context.DestinationId) == _destination.game_object.transform &&
+                RequireContextDestination(_context.DestinationId).GetComponentsInChildren<Collider>(true).Any(collider => collider.enabled) &&
+                _context.Destinations.ContainsKey(_context.FinalGazeZone) &&
+                _context.Destinations.All(mapping => IsBackedByVisiblePhysics(mapping.Value));
             bool assistanceClean = _context.AssistanceLedger.Count == 0;
             bool passed = targetUnparented && targetFree && noJoints && targetColliderValid && reachableColliders &&
-                          importedHeroFurniture && hashesVerified && reachPass && supportPass && sightlinePass && assistanceClean;
+                          importedHeroFurniture && hashesVerified && contextualObjectCountPass && persistentIdentitiesUnique &&
+                          compiledSceneContractPass && allVisibleContextPhysicsBacked && reachPass && supportPass && sightlinePass && cameraConePass &&
+                          finalGazePass && authoritativeMappingsPass && assistanceClean;
             if (!passed)
             {
                 throw new InvalidOperationException(
@@ -527,9 +1051,16 @@ namespace ProceduralSceneGate
                         "reachable_colliders=" + reachableColliders,
                         "imported_furniture=" + importedHeroFurniture,
                         "hashes=" + hashesVerified,
+                        "contextual_count=" + contextualObjectCountPass,
+                        "compiled_scene_contract=" + compiledSceneContractPass,
+                        "identity_unique=" + persistentIdentitiesUnique,
+                        "physics_backed=" + allVisibleContextPhysicsBacked,
                         "reach=" + reachPass,
                         "support=" + supportPass,
                         "sightline=" + sightlinePass,
+                        "camera_cone=" + cameraConePass,
+                        "final_gaze=" + finalGazePass,
+                        "authoritative_mappings=" + authoritativeMappingsPass,
                         "assistance=" + assistanceClean
                     }));
             }
@@ -539,7 +1070,7 @@ namespace ProceduralSceneGate
                 episode_id = _context.EpisodeId,
                 seed = _context.Seed,
                 room_family = _context.RoomFamily,
-                material_variant = _profile.MaterialVariant,
+                material_variant = _context.SceneMaterialVariant,
                 status = "COMPILED_CONTRACT_VALIDATED_ONLY",
                 visual_pass_claimed = false,
                 physical_episode_pass_claimed = false,
@@ -547,6 +1078,15 @@ namespace ProceduralSceneGate
                 imported_visible_furniture_only = importedHeroFurniture,
                 reachable_elements_have_physx_colliders = reachableColliders,
                 distant_decor_explicit_noninteractive = _instances.Where(instance => !instance.reachable).All(instance => !instance.interactive),
+                contextual_visible_object_count = contextualVisibleObjectCount,
+                contextual_visible_object_minimum = _context.MinimumContextualObjects,
+                compiled_scene_contract_authority_validated = compiledSceneContractPass,
+                persistent_identities_unique = persistentIdentitiesUnique,
+                all_visible_context_physics_backed = allVisibleContextPhysicsBacked,
+                camera_aware_target_and_destination_sightlines = sightlinePass && cameraConePass,
+                final_gaze_zone_compiled = finalGazePass,
+                authoritative_destination_and_gaze_mappings = authoritativeMappingsPass,
+                deterministic_prospective_rejection_only = true,
                 target_unparented = targetUnparented,
                 target_non_kinematic = targetFree,
                 target_joint_count = target.GetComponentsInChildren<Joint>(true).Length,
@@ -555,10 +1095,11 @@ namespace ProceduralSceneGate
                 target_support_initial_separation_m = supportSeparation,
                 measured_right_shoulder_target_distance_m = rightReach,
                 measured_left_shoulder_target_distance_m = leftReach,
+                measured_shoulder_midpoint_target_distance_m = midpointReach,
                 head_target_sightline_clear = sightlinePass,
                 assistance_ledger_entries_at_compile = _context.AssistanceLedger.Count,
                 no_seed_specific_controller_or_scene_code = true,
-                deterministic_selection_inputs = "GateContext.Seed + GateContext.RoomFamily + frozen catalog/profile data",
+                deterministic_selection_inputs = "authoritative compiled GateContext contract + GateContext.Seed + frozen catalog/profile data",
                 disclosure = "Scene compilation receipt only. It is not visual evidence, contact evidence, interaction evidence, or a PASS decision."
             };
         }
@@ -572,16 +1113,71 @@ namespace ProceduralSceneGate
 
         private bool HasClearSightline(Vector3 origin, GameObject target)
         {
-            Vector3 destination = target.GetComponent<Collider>().bounds.center;
+            return HasClearSightlineToObject(origin, target);
+        }
+
+        private bool HasClearSightlineToObject(Vector3 origin, GameObject target)
+        {
+            Collider targetCollider = target.GetComponents<Collider>().First(collider => collider.enabled);
+            Vector3 destination = targetCollider.bounds.center;
             Vector3 direction = destination - origin;
-            RaycastHit[] hits = Physics.RaycastAll(origin, direction.normalized, direction.magnitude + TargetDiameterM, ~0, QueryTriggerInteraction.Ignore);
+            float targetExtent = targetCollider.bounds.extents.magnitude;
+            RaycastHit[] hits = Physics.RaycastAll(origin, direction.normalized, direction.magnitude + targetExtent, ~0, QueryTriggerInteraction.Ignore);
             foreach (RaycastHit hit in hits.OrderBy(hit => hit.distance))
             {
-                if (_context.AvatarRoot && (hit.transform == _context.AvatarRoot.transform || hit.transform.IsChildOf(_context.AvatarRoot.transform)))
+                if (_context.AvatarColliders.Contains(hit.collider) ||
+                    (_context.AvatarRoot && (hit.transform == _context.AvatarRoot.transform || hit.transform.IsChildOf(_context.AvatarRoot.transform))))
                     continue;
                 return hit.transform == target.transform || hit.transform.IsChildOf(target.transform);
             }
             return false;
+        }
+
+        private bool HasClearSightlineToAnchor(Vector3 origin, Transform anchor)
+        {
+            Transform backing = VisiblePhysicsBacking(anchor);
+            if (!backing) return false;
+            Vector3 direction = anchor.position - origin;
+            RaycastHit[] hits = Physics.RaycastAll(
+                origin, direction.normalized, direction.magnitude + 0.01f, ~0, QueryTriggerInteraction.Ignore);
+            foreach (RaycastHit hit in hits.OrderBy(hit => hit.distance))
+            {
+                if (_context.AvatarColliders.Contains(hit.collider) ||
+                    (_context.AvatarRoot && (hit.transform == _context.AvatarRoot.transform || hit.transform.IsChildOf(_context.AvatarRoot.transform))))
+                    continue;
+                return hit.transform == backing || hit.transform.IsChildOf(backing);
+            }
+            return false;
+        }
+
+        private Transform RequireContextDestination(string id)
+        {
+            if (!_context.Destinations.TryGetValue(id, out Transform transform) || !transform)
+                throw new InvalidOperationException("GateContext has no compiled transform for contract label: " + id);
+            return transform;
+        }
+
+        private static bool IsBackedByVisiblePhysics(Transform anchor)
+        {
+            return VisiblePhysicsBacking(anchor) != null;
+        }
+
+        private static Transform VisiblePhysicsBacking(Transform anchor)
+        {
+            for (Transform cursor = anchor; cursor; cursor = cursor.parent)
+            {
+                bool visible = cursor.GetComponentsInChildren<Renderer>(true).Any(renderer => renderer.enabled);
+                bool physical = cursor.GetComponentsInChildren<Collider>(true).Any(collider => collider.enabled);
+                if (visible && physical) return cursor;
+            }
+            return null;
+        }
+
+        private static bool IsInProspectiveTaskView(Transform head, Vector3 point)
+        {
+            Vector3 toPoint = (point - head.position).normalized;
+            Vector3 plannedTaskForward = (head.rotation * Quaternion.Euler(44f, 0f, 0f)) * Vector3.forward;
+            return Vector3.Angle(plannedTaskForward, toPoint) <= ProspectiveViewHalfAngleDeg;
         }
 
         private static Transform FindRightShoulder(GateContext context)
@@ -718,7 +1314,7 @@ namespace ProceduralSceneGate
         private Material FurnitureMaterial(string semanticClass)
         {
             Color baseColor;
-            switch (_profile.MaterialVariant)
+            switch (_context.SceneMaterialVariant)
             {
                 case "painted_sage": baseColor = new Color(0.31f, 0.56f, 0.42f); break;
                 case "natural_birch": baseColor = new Color(0.76f, 0.64f, 0.44f); break;
@@ -728,7 +1324,7 @@ namespace ProceduralSceneGate
             else if (semanticClass == "plant") baseColor = new Color(0.20f, 0.48f, 0.25f);
             else if (semanticClass == "lamp") baseColor = Color.Lerp(_profile.AccentColor, Color.white, 0.35f);
             else if (semanticClass == "books") baseColor = new Color(0.74f, 0.29f, 0.17f);
-            return MaterialFor(_profile.MaterialVariant + "_" + semanticClass, baseColor, semanticClass == "rug" ? 0.05f : 0.20f);
+            return MaterialFor(_context.SceneMaterialVariant + "_" + semanticClass, baseColor, semanticClass == "rug" ? 0.05f : 0.20f);
         }
 
         private Material MaterialFor(string key, Color color, float glossiness)
@@ -838,6 +1434,140 @@ namespace ProceduralSceneGate
             return mesh;
         }
 
+        private static Collider[] AddTargetColliders(GameObject target, TargetDefinition definition)
+        {
+            if (definition.CollisionSource == "analytic_sphere")
+            {
+                SphereCollider sphere = target.AddComponent<SphereCollider>();
+                sphere.radius = 0.5f;
+                return new Collider[] { sphere };
+            }
+            if (definition.CollisionSource == "compound_analytic")
+            {
+                CapsuleCollider body = target.AddComponent<CapsuleCollider>();
+                body.direction = 1;
+                body.center = new Vector3(-0.08f, -0.03f, 0f);
+                body.radius = 0.33f;
+                body.height = 0.94f;
+                BoxCollider handle = target.AddComponent<BoxCollider>();
+                handle.center = new Vector3(0.41f, 0.03f, 0f);
+                handle.size = new Vector3(0.18f, 0.54f, 0.20f);
+                return new Collider[] { body, handle };
+            }
+            BoxCollider box = target.AddComponent<BoxCollider>();
+            box.size = new Vector3(0.96f, 0.96f, 0.96f);
+            return new Collider[] { box };
+        }
+
+        private static Mesh OpenContainerMesh()
+        {
+            var vertices = new List<Vector3>();
+            var triangles = new List<int>();
+            const float wall = 0.08f;
+            const float baseHeight = 0.16f;
+            float top = 0.5f;
+            float wallCenterY = 0.5f * (-0.5f + top);
+            float wallSizeY = top + 0.5f;
+            AppendBox(vertices, triangles, new Vector3(0f, -0.5f + baseHeight * 0.5f, 0f), new Vector3(1f, baseHeight, 1f));
+            AppendBox(vertices, triangles, new Vector3(-0.5f + wall * 0.5f, wallCenterY, 0f), new Vector3(wall, wallSizeY, 1f));
+            AppendBox(vertices, triangles, new Vector3(0.5f - wall * 0.5f, wallCenterY, 0f), new Vector3(wall, wallSizeY, 1f));
+            AppendBox(vertices, triangles, new Vector3(0f, wallCenterY, -0.5f + wall * 0.5f), new Vector3(1f, wallSizeY, wall));
+            AppendBox(vertices, triangles, new Vector3(0f, wallCenterY, 0.5f - wall * 0.5f), new Vector3(1f, wallSizeY, wall));
+            var mesh = new Mesh { name = "RepositoryAuthoredOpenActivityDestination" };
+            mesh.SetVertices(vertices);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        private static Mesh HandledCupMesh()
+        {
+            const int segments = 32;
+            const float radius = 0.34f;
+            var vertices = new List<Vector3>();
+            var triangles = new List<int>();
+            for (int segment = 0; segment < segments; segment++)
+            {
+                float a0 = 2f * Mathf.PI * segment / segments;
+                float a1 = 2f * Mathf.PI * (segment + 1) / segments;
+                Vector3 bottom0 = new Vector3(Mathf.Cos(a0) * radius - 0.08f, -0.5f, Mathf.Sin(a0) * radius);
+                Vector3 bottom1 = new Vector3(Mathf.Cos(a1) * radius - 0.08f, -0.5f, Mathf.Sin(a1) * radius);
+                Vector3 top1 = new Vector3(Mathf.Cos(a1) * radius - 0.08f, 0.5f, Mathf.Sin(a1) * radius);
+                Vector3 top0 = new Vector3(Mathf.Cos(a0) * radius - 0.08f, 0.5f, Mathf.Sin(a0) * radius);
+                AppendQuad(vertices, triangles, bottom0, bottom1, top1, top0);
+                AppendTriangle(vertices, triangles, new Vector3(-0.08f, -0.5f, 0f), bottom1, bottom0);
+            }
+            AppendBox(vertices, triangles, new Vector3(0.39f, 0.35f, 0f), new Vector3(0.22f, 0.16f, 0.16f));
+            AppendBox(vertices, triangles, new Vector3(0.46f, 0.02f, 0f), new Vector3(0.08f, 0.58f, 0.16f));
+            AppendBox(vertices, triangles, new Vector3(0.39f, -0.31f, 0f), new Vector3(0.22f, 0.16f, 0.16f));
+            var mesh = new Mesh { name = "RepositoryAuthoredHandledCup" };
+            mesh.SetVertices(vertices);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        private static Mesh BeveledBlockMesh()
+        {
+            const int sides = 8;
+            var vertices = new List<Vector3>();
+            var triangles = new List<int>();
+            for (int side = 0; side < sides; side++)
+            {
+                float a0 = Mathf.PI * 0.25f * side + Mathf.PI * 0.125f;
+                float a1 = Mathf.PI * 0.25f * (side + 1) + Mathf.PI * 0.125f;
+                Vector3 lower0 = new Vector3(Mathf.Cos(a0) * 0.52f, -0.5f, Mathf.Sin(a0) * 0.52f);
+                Vector3 lower1 = new Vector3(Mathf.Cos(a1) * 0.52f, -0.5f, Mathf.Sin(a1) * 0.52f);
+                Vector3 upper1 = new Vector3(lower1.x, 0.5f, lower1.z);
+                Vector3 upper0 = new Vector3(lower0.x, 0.5f, lower0.z);
+                AppendQuad(vertices, triangles, lower0, lower1, upper1, upper0);
+                AppendTriangle(vertices, triangles, Vector3.down * 0.5f, lower1, lower0);
+                AppendTriangle(vertices, triangles, Vector3.up * 0.5f, upper0, upper1);
+            }
+            var mesh = new Mesh { name = "RepositoryAuthoredBeveledBlock" };
+            mesh.SetVertices(vertices);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        private static void AppendTriangle(List<Vector3> vertices, List<int> triangles, Vector3 a, Vector3 b, Vector3 c)
+        {
+            int start = vertices.Count;
+            vertices.Add(a); vertices.Add(b); vertices.Add(c);
+            triangles.Add(start); triangles.Add(start + 1); triangles.Add(start + 2);
+        }
+
+        private static void AppendQuad(List<Vector3> vertices, List<int> triangles, Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+        {
+            int start = vertices.Count;
+            vertices.Add(a); vertices.Add(b); vertices.Add(c); vertices.Add(d);
+            triangles.Add(start); triangles.Add(start + 1); triangles.Add(start + 2);
+            triangles.Add(start); triangles.Add(start + 2); triangles.Add(start + 3);
+        }
+
+        private static void AppendBox(List<Vector3> vertices, List<int> triangles, Vector3 center, Vector3 size)
+        {
+            Vector3 e = size * 0.5f;
+            Vector3 p000 = center + new Vector3(-e.x, -e.y, -e.z);
+            Vector3 p001 = center + new Vector3(-e.x, -e.y, e.z);
+            Vector3 p010 = center + new Vector3(-e.x, e.y, -e.z);
+            Vector3 p011 = center + new Vector3(-e.x, e.y, e.z);
+            Vector3 p100 = center + new Vector3(e.x, -e.y, -e.z);
+            Vector3 p101 = center + new Vector3(e.x, -e.y, e.z);
+            Vector3 p110 = center + new Vector3(e.x, e.y, -e.z);
+            Vector3 p111 = center + new Vector3(e.x, e.y, e.z);
+            AppendQuad(vertices, triangles, p000, p100, p110, p010);
+            AppendQuad(vertices, triangles, p101, p001, p011, p111);
+            AppendQuad(vertices, triangles, p001, p000, p010, p011);
+            AppendQuad(vertices, triangles, p100, p101, p111, p110);
+            AppendQuad(vertices, triangles, p010, p110, p111, p011);
+            AppendQuad(vertices, triangles, p001, p101, p100, p000);
+        }
+
         private static CatalogMember FindCatalog(string assetId)
         {
             CatalogMember member = Catalog.SingleOrDefault(candidate => candidate.AssetId == assetId);
@@ -875,7 +1605,20 @@ namespace ProceduralSceneGate
                 case "lamp": return 25;
                 case "plant": return 26;
                 case "books": return 27;
+                case "picture_book": return 31;
+                case "book": return 32;
+                case "craft_object": return 33;
+                case "activity_destination": return 34;
                 default: return 10;
+            }
+        }
+
+        private static string Sha256Hex(string value)
+        {
+            using (SHA256 hash = SHA256.Create())
+            {
+                byte[] digest = hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(value));
+                return BitConverter.ToString(digest).Replace("-", string.Empty).ToLowerInvariant();
             }
         }
 
@@ -892,12 +1635,6 @@ namespace ProceduralSceneGate
                 }
                 return 100000 + (int)(hash % 900000000);
             }
-        }
-
-        private static int PositiveModulo(int value, int divisor)
-        {
-            int remainder = value % divisor;
-            return remainder < 0 ? remainder + divisor : remainder;
         }
 
         private float NextSigned(float magnitude)
@@ -928,6 +1665,42 @@ namespace ProceduralSceneGate
                 DimensionsM = dimensionsM;
                 SemanticClass = semanticClass;
                 CollisionSource = collisionSource;
+            }
+        }
+
+        private sealed class TargetDefinition
+        {
+            public readonly string PersistentId;
+            public readonly int SemanticId;
+            public readonly int InstanceId;
+            public readonly string Geometry;
+            public readonly string GeometrySpecSha256;
+            public readonly Vector3 DimensionsM;
+            public readonly float MassKg;
+            public readonly float StaticFriction;
+            public readonly float DynamicFriction;
+            public readonly string CollisionSource;
+            public readonly string ContactStrategy;
+            public readonly Color Color;
+
+            public TargetDefinition(
+                string persistentId, int semanticId, int instanceId, string geometry,
+                string geometrySpecSha256, Vector3 dimensionsM, float massKg,
+                float staticFriction, float dynamicFriction, string collisionSource,
+                string contactStrategy, Color color)
+            {
+                PersistentId = persistentId;
+                SemanticId = semanticId;
+                InstanceId = instanceId;
+                Geometry = geometry;
+                GeometrySpecSha256 = geometrySpecSha256;
+                DimensionsM = dimensionsM;
+                MassKg = massKg;
+                StaticFriction = staticFriction;
+                DynamicFriction = dynamicFriction;
+                CollisionSource = collisionSource;
+                ContactStrategy = contactStrategy;
+                Color = color;
             }
         }
 
@@ -1001,9 +1774,19 @@ namespace ProceduralSceneGate
     public sealed class SceneSpecReceipt
     {
         public string schema;
+        public string authoritative_contract_sha256;
         public int seed;
+        public string cell_id;
         public string room_family;
         public string material_variant;
+        public string target_id;
+        public string destination_id;
+        public string contact_strategy;
+        public string final_gaze_zone;
+        public string destination_transform_name;
+        public string final_gaze_transform_name;
+        public string[] expected_scene_asset_ids;
+        public int minimum_contextual_objects;
         public Vector3 envelope_m;
         public ZoneReceipt[] zones;
         public CompiledInstance[] instances;
@@ -1037,9 +1820,14 @@ namespace ProceduralSceneGate
         public string collision_source;
         public int collider_count;
         public bool interactive;
+        public float mass_kg;
+        public float static_friction;
+        public float dynamic_friction;
         public bool reachable;
         public string role;
         public string visible_geometry_source;
+        public bool physics_backed;
+        public string provenance;
         [NonSerialized] public GameObject game_object;
         [NonSerialized] public Bounds Bounds;
 
@@ -1065,9 +1853,14 @@ namespace ProceduralSceneGate
                 collision_source = collision_source,
                 collider_count = collider_count,
                 interactive = interactive,
+                mass_kg = mass_kg,
+                static_friction = static_friction,
+                dynamic_friction = dynamic_friction,
                 reachable = reachable,
                 role = role,
-                visible_geometry_source = visible_geometry_source
+                visible_geometry_source = visible_geometry_source,
+                physics_backed = physics_backed,
+                provenance = provenance
             };
         }
     }
@@ -1107,6 +1900,8 @@ namespace ProceduralSceneGate
     {
         public string child_id;
         public string support_id;
+        public string destination_id;
+        public string relation;
         public float initial_separation_m;
     }
 
@@ -1134,6 +1929,12 @@ namespace ProceduralSceneGate
         public Vector3 target_world_m;
         public bool target_visible_from_head_geometry;
         public string final_gaze_zone;
+        public Vector3 final_gaze_world_m;
+        public bool final_gaze_zone_compiled;
+        public bool final_gaze_visible_from_head_geometry;
+        public Vector3 destination_world_m;
+        public bool destination_visible_from_head_geometry;
+        public float prospective_view_half_angle_deg;
     }
 
     [Serializable]
@@ -1151,6 +1952,15 @@ namespace ProceduralSceneGate
         public bool imported_visible_furniture_only;
         public bool reachable_elements_have_physx_colliders;
         public bool distant_decor_explicit_noninteractive;
+        public int contextual_visible_object_count;
+        public int contextual_visible_object_minimum;
+        public bool compiled_scene_contract_authority_validated;
+        public bool persistent_identities_unique;
+        public bool all_visible_context_physics_backed;
+        public bool camera_aware_target_and_destination_sightlines;
+        public bool final_gaze_zone_compiled;
+        public bool authoritative_destination_and_gaze_mappings;
+        public bool deterministic_prospective_rejection_only;
         public bool target_unparented;
         public bool target_non_kinematic;
         public int target_joint_count;
@@ -1159,6 +1969,7 @@ namespace ProceduralSceneGate
         public float target_support_initial_separation_m;
         public float measured_right_shoulder_target_distance_m;
         public float measured_left_shoulder_target_distance_m;
+        public float measured_shoulder_midpoint_target_distance_m;
         public bool head_target_sightline_clear;
         public int assistance_ledger_entries_at_compile;
         public bool no_seed_specific_controller_or_scene_code;

@@ -155,6 +155,7 @@ def _scene_spec(
         "room_family": scene["room_family"],
         "material_variant": scene["material_variant"],
         "envelope_m": layout["envelope_m"],
+        "minimum_contextual_objects": compiler["minimum_contextual_objects"],
         "zones": scene["zones"],
         "instances": instances,
         "target": deepcopy(next(row for row in assets["interactive_targets"] if row["persistent_id"] == scene["target_id"])),
@@ -207,6 +208,7 @@ def compile_contract_matrix(config: dict[str, Any]) -> list[dict[str, Any]]:
                 "qa_tolerances": deepcopy(config["qa_tolerances"]),
                 "forbidden_assistance": list(config["forbidden_assistance"]),
                 "authority": deepcopy(config["authority"]),
+                "robustness_variants": deepcopy(config["robustness_variants"]),
             }
             contract["contract_sha256"] = _canonical_sha256(contract)
             result.append(contract)

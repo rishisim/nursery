@@ -62,7 +62,11 @@ def test_contact_qualification_shell_and_force_semantics_are_distinct():
 def test_trace_closes_corrected_bimanual_truth_gaps():
     config = load_frozen_config()
     trace = config["trace_contract"]
-    assert trace["body_state"] == ["root", "torso", "neck", "head"]
+    assert trace["body_state"] == [
+        "root", "pelvis", "torso", "neck", "head",
+        "left_shoulder", "left_upper_arm", "left_elbow", "left_lower_arm", "left_forearm", "left_wrist", "left_palm",
+        "right_shoulder", "right_upper_arm", "right_elbow", "right_lower_arm", "right_forearm", "right_wrist", "right_palm",
+    ]
     assert "rotation_world_xyzw" in trace["pose_fields"]
     assert "segments" in trace["per_digit_fields"]
     assert "angular_velocity_world_rad_s" in trace["object_fields"]
@@ -120,5 +124,24 @@ def test_integrated_anti_clipping_and_rich_scene_contract_is_frozen():
     assert registration["garment_affected_vertex_fraction_max"] == 0.001
     assert registration["finger_object_max_penetration_m"] == 0.002
     assert registration["support_max_penetration_m"] == 0.0015
-    assert config["scene_compiler"]["minimum_contextual_objects"] == 10
-    assert all(len(row["scene_spec"]["instances"]) > 10 for row in compile_contract_matrix(config))
+    assert config["scene_compiler"]["minimum_contextual_objects"] == 11
+    compiled = compile_contract_matrix(config)
+    assert all(len(row["scene_spec"]["instances"]) > 10 for row in compiled)
+    assert all(row["scene_spec"]["minimum_contextual_objects"] == 11 for row in compiled)
+    assert all({"persistent_id", "asset_id", "asset_dimensions_m", "semantic_class",
+                "collision_source", "static_friction", "dynamic_friction"}
+               <= set(instance)
+               for row in compiled for instance in row["scene_spec"]["instances"])
+
+
+def test_unity_interface_freezes_dynamic_finger_post_step_synchronization():
+    source = Path(
+        "babyworld_lite/childlens_engine_bakeoff/procedural_scene_gate/GateContracts.cs"
+    ).read_text()
+    assert 'DurationSeconds = 24f' in source
+    assert 'RightForceOppositionSeconds = 0.30f' in source
+    assert 'LeftForceSupportSeconds = 0.25f' in source
+    assert 'Dictionary<string, Rigidbody> FingerBodies' in source
+    assert 'Dictionary<string, ConfigurableJoint> FingerJoints' in source
+    assert 'SynchronizeCompletedPhysicsState' in source
+    assert 'AuthorityAuditState' in source
