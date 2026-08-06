@@ -34,6 +34,11 @@ def test_reference_hand_config_is_pinned_and_bounded():
     assert CONFIG["qualification"]["controllable_pass_count"] == 20
     assert CONFIG["qualification"]["dof_sweep_pass_count"] == 20
     assert CONFIG["qualification"]["max_visible_registration_error_m"] == 0.04622013
+    assert CONFIG["qualification"]["visible_registration_status"] == "FAILED_NOT_VISUALLY_DEMONSTRATED"
+    assert CONFIG["qualification"]["visible_registration_demonstrated"] is False
+    assert CONFIG["qualification"]["max_steady_state_thumb_tracking_error_m"] == 0.04756707
+    assert CONFIG["qualification"]["max_steady_state_index_tracking_error_m"] == 0.01517247
+    assert CONFIG["qualification"]["max_steady_state_middle_tracking_error_m"] == 0.01467135
     assert CONFIG["qualification"]["active_right_hand_renderer_count"] == 0
     assert CONFIG["qualification"]["right_hand_binder_count"] == 1
     assert CONFIG["physical_execution"]["attempts_consumed"] == 0
@@ -65,6 +70,7 @@ def test_reference_hand_decision_stops_downstream_work_after_two_failures():
     assert "eligible physical attempts consumed: 0" in decision
     assert "no ContactPose seed was consumed" in decision
     assert "zero active right-hand renderers" in decision
+    assert "not visually demonstrated" in decision
     assert "ArticulationBody has no `slerpDrive`" in decision
 
 

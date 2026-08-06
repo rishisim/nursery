@@ -73,13 +73,13 @@ was audited at runtime:
 - The post-step output is independently reconstructed from the physical
   capsule endpoints using the package's `ToWorldSpaceCapsule` convention; the
   pre-sim `CurrentFixedFrame` is not treated as post-step truth. Capsule/FK
-  agreement was 0.0 m, while commanded-to-post-step fingertip tracking reached
-  47.567 mm in steady-state rows against the frozen 8 mm tolerance.
+  agreement was 0.0 m. In steady-state rows, thumb/index/middle errors reached
+  47.567/15.172/14.671 mm respectively against the frozen 8 mm tolerance.
 - The complete package visual route was exercised through the right
   `HandBinder`, with the left root disabled. Preflight found one right binder
-  but zero active right-hand renderers, and measured named-landmark registration
-  reached 46.220 mm. Therefore visual registration is a failing measured gate,
-  not a copied-transform zero.
+but zero active right-hand renderers. Visual registration was therefore not visually demonstrated. The inactive named transforms were numerically
+  compared only, with a maximum mismatch of 46.220 mm; this is failure
+  evidence, not a visual pass or a copied-transform zero.
 - Active-phase reset/ghost ledger count was zero; palm command speed was zero
   and bounded.
 - The frozen fingertip tracking tolerance was `0.008 m`. The repaired run's
@@ -101,10 +101,11 @@ frames, all ignored under the run root:
 - `qualification/dof_manifest.json`, `trace.json`, `qualification_metrics.json`,
   and `reset_ledger.json` contain the corresponding runtime truth.
 
-The video is failure evidence: it shows the commanded/physical markers and
-telemetry overlay, but no active right-hand renderers (only the diagnostic
-markers are visible). The full HandBinder route therefore did not produce a
-readable anatomical hand, and no grasp or target is shown.
+The video is failure evidence: it shows only the commanded/physical markers
+and telemetry overlay on black, with no active right-hand renderers. The full
+HandBinder route therefore did not produce a readable anatomical hand, and no
+grasp or target is shown. The inactive-transform numeric comparison must not
+be described as visual registration evidence.
 
 ## Ordered stop
 
