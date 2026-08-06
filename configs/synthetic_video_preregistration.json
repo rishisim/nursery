@@ -3,7 +3,7 @@
   "phase": 4,
   "status": "PHASE4_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_VAST_L4_RESOURCE_FROZEN",
   "evidence_cutoff": "2026-08-06",
-  "active_exploratory_amendment": "configs/synthetic_video_real_only_proof.json schema 38 preserves every prior result including exact L40S infrastructure blocker 200f2d78...781cf and sibling-mount repair b740a3ed...53f2f9; the repaired Hugging Face job was canceled at zero runtime under commitment 683c40d8...2471a, and exact verified on-demand Vast L4 offer 45699409 is prospectively frozen at d534e302...00b9 before any new model outcome, while every model, fixture, label, partition, threshold, metric, seed, gate, and privacy boundary remains unchanged",
+  "active_exploratory_amendment": "configs/synthetic_video_real_only_proof.json schema 38 preserves every prior result including exact L40S infrastructure blocker 200f2d78...781cf and sibling-mount repair b740a3ed...53f2f9; the repaired Hugging Face job was canceled at zero runtime under commitment 683c40d8...2471a, and exact verified on-demand Vast L4 offer 45699409 is prospectively frozen at 13d171f6...9186f before any new model outcome, while every model, fixture, label, partition, threshold, metric, seed, gate, and privacy boundary remains unchanged",
   "public_only_calibration_readiness_amendment": {
     "status": "TOPOLOGY_AND_PUBLIC_FIXTURES_FROZEN_BEFORE_MODEL_OUTCOMES",
     "canonical_source": "configs/synthetic_video_real_only_proof.json#public_only_calibration_readiness_amendment",
@@ -32,7 +32,7 @@
     "selected_GPU_count": 1,
     "micro_wall_minutes": 5,
     "scientific_partition_wall_minutes": 15,
-    "topology_commitment_sha256": "d534e302e998eb30e536754ea7e8cb414abbdc4fb15808f4c0a5e8715fa200b9",
+    "topology_commitment_sha256": "13d171f6af241bb4c2235e1d71224ba37b7d834cfa7229549307108f2289186f",
     "preallocation_failure": "SLURM_INVALID_GRES_MIXED_TYPED_AND_UNTYPED_REQUEST",
     "preallocation_job_created": false,
     "preallocation_GPU_hours": 0,
@@ -174,7 +174,7 @@
     "direct_monetary_cost_USD_max": 0.4,
     "restricted_or_governed_material_permitted": false,
     "scientific_contract_changed": false,
-    "topology_commitment_sha256": "d534e302e998eb30e536754ea7e8cb414abbdc4fb15808f4c0a5e8715fa200b9"
+    "topology_commitment_sha256": "13d171f6af241bb4c2235e1d71224ba37b7d834cfa7229549307108f2289186f"
   },
   "mechanistic_training_tuple_premodel_result": {"status": "PASS_ARTIFACTS_READY_LOCAL_RELOAD_PENDING_BLIND_SIZING", "dependency_manifest_commitment_sha256": "8c787a01f2e0f6224bc96989d3e3bd28ef6f6b03e0459599507636e41c85b527", "component_count": 7, "repository_count": 4, "weight_and_resource_file_count": 10, "artifact_bytes": 14621041722, "model_inference_executed": false, "restricted_mount_present": false, "egohos_archive_license_file_count": 0, "egohos_license_limitation": "official MIT project distributes the checkpoint bundle but the archive contains no separate license file; academic local prototype use only is asserted"},
   "mechanistic_training_tuple_runtime_amendment": {"status": "FROZEN_BEFORE_LOCAL_RELOAD_SIZING_OR_PUBLIC_MODEL_OUTCOMES", "runtime_amendment_commitment_sha256": "eb878d8c68aa6f79b5115502beb4c8b64d84e9f495b7cec4513abc3e94effbea", "prior_commitments_sha256": ["adcac3fc45133ab8697923fd473fd692d9c79de48b5cc10b58e4d01cad92b285", "6c3c76e3c5661255dba0131f9b20c6d4daf3b994a8e8c9013bbddbc8213ddec1", "c59a81f4b428ed26b0167959cb06437757429bcd4a047d52b36dacb1e0500acc", "ee70ae314afe018ff9745814ff6011036086cf7cbca6a31a63dfedf3e4cdb41b", "623225bf24f67743e1e8990e02cebe8364191bcd17f89859c27213488ea009e4"], "clarifications": ["seven calibration axes plus one separate blocking order-action control means eight label-blind sizing modules", "pinned einops 0.8.0 because the selected PE-Core loader imports it; no model inference had run", "after hash verification create scratch-only NLTK taggers/corpora namespace symlinks because the official resource archives extract top-level directories; the failed sizing attempt stopped before model inference", "remove one exact unused COCOVisualizer import from pinned Grounding DINO after original and patched source hash verification; the triggering sizing attempt stopped before model construction", "add exact submitit 1.5.3 and cloudpickle 3.1.1 public wheels after label-blind sizing reached the pinned EgoBabyVLM package import and stopped before PE-Core construction"], "base_container_sha256": "f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792", "dependency_count": 55, "compatibility_adapter_count": 7, "label_blind_module_count": 8, "label_blind_item_count_per_module": 1, "aggregate_GPU_hours_max": 1.0, "model_substitution": false},

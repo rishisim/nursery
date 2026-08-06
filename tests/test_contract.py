@@ -656,7 +656,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     vast_commitment = vast.pop("topology_commitment_sha256")
     assert vast_commitment == canonical_json_sha256(vast)
     assert vast_commitment == (
-        "d534e302e998eb30e536754ea7e8cb414abbdc4fb15808f4c0a5e8715fa200b9"
+        "13d171f6af241bb4c2235e1d71224ba37b7d834cfa7229549307108f2289186f"
     )
     assert vast["provider"] == "VAST_AI"
     assert vast["selected_offer_id"] == 45699409

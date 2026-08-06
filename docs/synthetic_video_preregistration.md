@@ -2475,7 +2475,7 @@ job was canceled before allocation and sealed at `683c40d8…2471a`. This is a
 provider handoff, not a scientific result.
 
 Before a Vast instance or model outcome, topology commitment
-`d534e302…00b9` freezes verified on-demand offer `45699409`: one NVIDIA L4,
+`13d171f6…9186f` freezes verified on-demand offer `45699409`: one NVIDIA L4,
 one process/no DDP, a minimum of eight CPUs and 32 GiB system RAM, the pinned
 OCI digest, 80 GiB transient disk, 25 minutes for public-input staging, and the
 unchanged five/15/15-minute microhealth/development/holdout caps. The total

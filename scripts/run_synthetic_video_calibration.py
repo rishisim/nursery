@@ -19411,7 +19411,7 @@ def _public_readiness_vast_resource_amendment(
         != "pytorch/pytorch@sha256:dab81780fd94483b67b4b5679cc0024939b08e48540d39476d284cb29002ed69"
         or value.get("runtime_image_manifest_sha256")
         != "dab81780fd94483b67b4b5679cc0024939b08e48540d39476d284cb29002ed69"
-        or value.get("public_input_bytes") != 64246300520
+        or value.get("public_input_bytes") != 64246311665
         or value.get("transient_disk_GiB") != 80
         or float(value.get("transient_public_input_staging_GiB_max", math.inf))
         > 65

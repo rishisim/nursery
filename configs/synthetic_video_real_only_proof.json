@@ -549,7 +549,7 @@
     "DDP": false,
     "runtime_image": "pytorch/pytorch@sha256:dab81780fd94483b67b4b5679cc0024939b08e48540d39476d284cb29002ed69",
     "runtime_image_manifest_sha256": "dab81780fd94483b67b4b5679cc0024939b08e48540d39476d284cb29002ed69",
-    "public_input_bytes": 64246300520,
+    "public_input_bytes": 64246311665,
     "transient_disk_GiB": 80,
     "new_storage_GiB_max": 10,
     "transient_public_input_staging_GiB_max": 65,
@@ -571,7 +571,7 @@
     "ChildLens_or_BabyView_material_permitted": false,
     "model_inference_executed_before_freeze": false,
     "scientific_metric_count_before_freeze": 0,
-    "topology_commitment_sha256": "d534e302e998eb30e536754ea7e8cb414abbdc4fb15808f4c0a5e8715fa200b9"
+    "topology_commitment_sha256": "13d171f6af241bb4c2235e1d71224ba37b7d834cfa7229549307108f2289186f"
   },
   "public_only_calibration_readiness_preallocation_repair": {
     "status": "FROZEN_AFTER_ZERO_JOB_PREALLOCATION_GRES_WIRING_FAILURE_BEFORE_MODEL_OUTCOMES",
