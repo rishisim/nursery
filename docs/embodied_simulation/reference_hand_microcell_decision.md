@@ -1,78 +1,105 @@
-# Reference-hand microcell decision
+# Reference-hand microcell continuation decision
 
-Decision: **NO-GO for the adopted Ultraleap Hard Contact source architecture**.
+Decision: **HAND-QUALIFICATION NO-GO; eligible physical attempts consumed: 0.**
 
-This is a bounded result for the exact `com.ultraleap.tracking` 7.3.0 source
-and the two permitted physical executions. It does not reopen or weaken the
-preserved old compliant-finger/controller NO-GO at commit `3e9d2d9`, and it is
-not a claim against Unity PhysX or the wider Embodied Simulation program.
+This corrects the earlier commit `02af1d9`. The two old `player_run` receipts
+are preserved, but are reclassified as non-eligible prequalification harness /
+alignment diagnostics. They used a hand-authored `MakeFinger`/`PoseCommand`
+pose before object-free hand qualification and therefore cannot falsify the
+Ultraleap donor architecture or consume either physical execution attempt.
 
-## Question and contract
+## Canonical source and reproducibility
 
-The test asked whether a maintained anatomical Unity hand could perform one
-unassisted tabletop grasp with: contact-free approach; visible thumb/index/
-middle contact; simultaneous opposing nonzero `Physics.ContactEvent`
-point-impulse support for at least 0.30 s; unsupported lift of at least 0.10 m;
-commanded opening; and free release/settling.
+The canonical source and runner are tracked under
+`babyworld_lite/childlens_engine_bakeoff/reference_hand_microcell/`. The runner
+stages those files into the ignored Unity project and uses the exact pinned
+Ultraleap artifact recorded in
+`configs/embodied_simulation_reference_hand_microcell.json`. A fresh checkout
+can run `stage`, `build`, and `run` without relying on a pre-existing ignored
+project source file.
 
-## Foundation and preflight
+The package was compiled with Unity `6000.0.80f1` on Apple M5 ARM64/Metal.
+The manager received an explicitly assigned deterministic
+`SyntheticLeapProvider`; no service, hardware, or service clock was used. The
+stock manager prefab was not instantiated, and runtime preflight found zero
+`GrabHelper` or `GrabHelperObject` instances. Ultraleap’s documented Physical
+Hands foundation is [here](https://docs.ultraleap.com/xr-and-tabletop/xr/unity/plugin/features/physical-hands.html).
 
-- Ultraleap UnityPlugin `com.ultraleap.tracking` 7.3.0 was resolved from the
-  exact public commit `833d82e7333a5f37ebc0844d02431acf74f35d24`, with the
-  pinned source, package, license, archive, native library, and GenericHand
-  hashes recorded in
-  `configs/embodied_simulation_reference_hand_microcell.json`.
-- Unity `6000.0.80f1` ARM64/Metal compiled the package and built a standalone
-  macOS player. The runtime used an explicitly assigned deterministic
-  `SyntheticLeapProvider`; no Leap service, hardware, or service clock was
-  used. This is a source-backed engineering inference because the manager
-  accepts a `LeapProvider`, not an official device-free mode.
-- The manager was authored with `HardContactParent`. The stock prefab was not
-  instantiated. Runtime receipts report zero `GrabHelper` components and zero
-  `GrabHelperObject` instances. Ultraleap grab flags were recorded only as
-  diagnostics, never as qualification evidence.
-- The physics clock was one explicit `FixedUpdate` command/provider/
-  `Physics.Simulate`/record loop at 240 Hz, with exactly 8 steps per 30 Hz
-  render marker. The target was a free, non-kinematic, gravity-enabled
-  `Rigidbody`; the authority receipt records zero post-initialization target
-  pose, velocity, force, torque, kinematic, parenting, or joint writes.
+## Corrected interpretation of earlier receipts
 
-## Physical results
+The old receipts at `receipts/player_run` and `receipts/player_run3` answer only
+that the bespoke synthetic pose was not a plausible grasp goal. Their target
+support predicate was also wrong: the support top was `y=0.74 m`, the target
+half-height was `0.05 m`, and its settled center was approximately `y=0.79 m`.
+The old `center_y < 0.78 m` test therefore mislabeled support as absent. Phase
+presence and a package grab flag likewise cannot prove free release. The old
+JSON files and hashes remain unchanged historical diagnostics; their metrics
+are not used for this decision.
 
-| Execution | Change | Point-contact rows | Thumb/index/middle support | Lift | Result |
-|---|---|---:|---:|---:|---|
-| Attempt 1 | frozen initial goal | 0 | 0.00 s | 0.000 m | NO-GO |
-| Attempt 2 | one permitted wrist/hand vertical alignment repair | 0 | 0.00 s | 0.000 m | NO-GO |
+The corrected definitions are frozen in the canonical config: support requires
+measured support contact plus center height at or below the support-top-plus-
+half-height tolerance; unsupported lift requires support-contact loss and the
+height threshold; free release requires a previously qualified support window,
+opening after that window, measured contact loss, and subsequent gravity
+settling.
 
-Both traces observed commanded opening and free settling, but neither
-observed any measured thumb, index, or middle point impulse. The target never
-left its support. The complete raw receipts remain in the ignored run root
-`runs/embodied_simulation/reference_hand_microcell/`; their hashes and paths
-are frozen in the canonical config.
+## Object-free qualification result
 
-The failure is therefore earlier than the grasp qualification contract. No third physical attempt was run, and no object assistance, reset, teleport,
-ghost recovery, force injection, attachment, or hidden support was added.
+The tracked harness uses the package’s neutral `TestHandFactory` topology only
+as an object-free input fixture. It contains no object, grasp geometry,
+ContactPose pose, or target-specific closure. The package-created physical hand
+was audited at runtime:
 
-## Recorder truth repair
+- 16 physical ArticulationBody links and 31 total articulation reduced
+  coordinates were recorded, including 25 finger coordinates.
+- 20 unlocked finger DOFs were individually swept; all 20 swept ranges passed.
+- Every telemetry row records the body, `dofStartIndex`, joint position,
+  velocity, force, link transform, and x/y/z `ArticulationDrive` target,
+  stiffness, damping, limits, and force limit.
+- Physics-derived thumb/index/middle output and GenericHand/contact-site
+  landmarks were recorded at 240 Hz with 30 Hz diagnostic frames.
+- The visible landmark registration error was zero for the explicit
+  physics-derived adapter; this is not an independent animation pass and is
+  not used to override the failed fingertip tracking result.
+- Active-phase reset/ghost ledger count was zero; palm command speed was zero
+  and bounded.
+- The frozen fingertip tracking tolerance was `0.008 m`. The maximum
+  physics-derived fingertip tracking error was `0.05772646 m`, dominated by
+  the thumb, so stable thumb/index/middle tracking did not qualify.
 
-The canonical `PhysicsTruthRecorder` was repaired so a `ConfigurableJoint` now
-reports the engine-observed `rotationDriveMode` and reads the active `slerpDrive`
-when Slerp is configured, rather than sampling inactive `angularXDrive` fields.
-Legacy field names remain for schema compatibility and are explicitly sourced
-from the active drive. A focused regression test covers this mapping, and the
-sealed source hash in the procedural gate config was updated; the historical
-NO-GO receipts remain immutable evidence of their original run.
+This is a bounded **hand-qualification** failure after ordinary source,
+package, axis, clock, and telemetry integration repair. No target was present
+and no grasp execution was started.
 
-## Ordered stop and absent artifacts
+## Visual evidence
 
-Because the adopted hand did not produce measured contact in either permitted
-execution, the cell is not eligible for PASS or
-PROMISING-BUT-ONE-BOUNDED-REPAIR. The following were not generated after the
-hard stop: object-free per-DOF qualification/active-drive plots, a frozen
-ContactPose-derived grasp goal and optimizer receipt, nominal 1080p Unity
-video, collider/contact overlay and dense ffmpeg frames, grasp/lift/release
-plots, and the two additional frozen-shape runs. No video is presented as
-success evidence; the available receipts are failure traces and diagnostics.
+The qualification produced an actual Unity diagnostic video and dense PNG
+frames, all ignored under the run root:
+
+- `qualification/dof_sweep_diagnostic.mp4`: 1920x1080, 30 fps, 336 frames,
+  11.2 s; verified with `ffprobe` and complete frame decoding.
+- `qualification/frames/`: 336 dense Unity frames.
+- `qualification/dof_manifest.json`, `trace.json`, `qualification_metrics.json`,
+  and `reset_ledger.json` contain the corresponding runtime truth.
+
+The video is failure evidence: the visible package hand/contact-site overlay
+does not establish the frozen fingertip tracking tolerance, and no grasp or
+target is shown.
+
+## Ordered stop
+
+Because object-free hand qualification failed, the ordered gate stops here:
+
+- no ContactPose seed was consumed;
+- no DexGraspNet-style analytic SDF objective or candidate ranking was run;
+- no frozen static grasp goal was rendered or executed;
+- no eligible physical attempt was consumed;
+- no target shapes, lift, release, or downstream child/POV integration were run.
+
+The next authorized repair must address the verified thumb/index/middle
+physics-output registration and coordinate convention, then rerun this same
+object-free qualification harness. It must not proceed to a grasp until the
+frozen tolerances and visual/contact-site registration pass.
 
 No restricted ChildLens media, external drive, child-trained prior, age-matched
-asset, or licensed MANO bundle was accessed.
+asset, human validation, or licensed MANO bundle was accessed.

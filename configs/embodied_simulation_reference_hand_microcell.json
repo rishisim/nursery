@@ -1,8 +1,10 @@
 {
-  "schema": "embodied.reference_hand_microcell.config.v1",
+  "schema": "embodied.reference_hand_microcell.config.v2",
   "lineage_origin_commit": "3e9d2d92492d29b77ca3a2d068cd7be63633b25f",
-  "decision_question": "Can the maintained, reference-backed Ultraleap Hard Contact hand execute one genuinely unassisted dexterous tabletop grasp in Unity PhysX on this Apple-Silicon host?",
+  "decision_question": "Can a maintained, reference-backed Ultraleap anatomical Unity hand execute one genuinely unassisted dexterous tabletop grasp in Unity PhysX on this Apple-Silicon host?",
   "scope": "public_synthetic_engineering_qualification_only",
+  "status": "HAND_QUALIFICATION_NO_GO",
+  "eligible_physical_attempts_consumed": 0,
   "package": {
     "name": "com.ultraleap.tracking",
     "version": "7.3.0",
@@ -12,9 +14,9 @@
     "license": "Apache-2.0",
     "license_sha256": "4efb6259472a49061bc4ee94319e4d5360d7226d61821c7d5401f40eaad1283b",
     "package_json_sha256": "58fe9f0a9fb5569c7f12147c3a47d684f1f183ce2c4d64f3c7a371a590f6e92d",
+    "archive": ".external/archives/ultraleap-unityplugin-833d82e.tar.gz",
     "archive_sha256": "ace19aab2578fd7d5d6674e9181a1bfcd2bc380dd38b8a47035b129ee41d1775",
     "source_checkout": ".external/ultraleap-unityplugin-7.3.0",
-    "source_archive": ".external/archives/ultraleap-unityplugin-833d82e.tar.gz",
     "artifact_root": ".external/ultraleap-unityplugin-7.3.0-artifact",
     "libLeapC_sha256": "b1c559de2f78b985eb2779cccb508339bfd3f6118f9f80333d18193e9fede271",
     "GenericHand_fbx_sha256": "47abe80be2bc2ff6ad8012749dec03620ced45d479592bc901bba0b679125853"
@@ -22,15 +24,10 @@
   "unity": {
     "editor": "6000.0.80f1",
     "platform": "StandaloneOSX ARM64/Metal",
-    "project_root": "runs/embodied_simulation/reference_hand_microcell/project",
-    "build_command": "Unity -batchmode -nographics -quit -projectPath runs/embodied_simulation/reference_hand_microcell/project -executeMethod ReferenceHandMicrocell.ReferenceHandMicrocellBuilder.BuildPlayer",
-    "run_command": "REFERENCE_HAND_OUTPUT=runs/embodied_simulation/reference_hand_microcell/receipts/player_run3 runs/embodied_simulation/reference_hand_microcell/ReferenceHandMicrocell.app/Contents/MacOS/ReferenceHandMicrocell -batchmode -nographics"
-  },
-  "hardware": {
-    "model": "MacBook Pro Mac17,2",
-    "chip": "Apple M5",
-    "memory_gb": 32,
-    "os": "macOS (Apple Silicon)"
+    "hardware": "MacBook Pro Mac17,2; Apple M5; 32 GB",
+    "tracked_source_root": "babyworld_lite/childlens_engine_bakeoff/reference_hand_microcell",
+    "staged_project_root": "runs/embodied_simulation/reference_hand_microcell/project",
+    "runner": "python3 -m babyworld_lite.childlens_engine_bakeoff.reference_hand_microcell.runner"
   },
   "clock": {
     "physics_hz": 240,
@@ -43,11 +40,14 @@
   "hand": {
     "manager": "Leap.PhysicalHands.PhysicalHandsManager",
     "contact_parent": "Leap.PhysicalHands.HardContactParent",
-    "provider": "ReferenceHandMicrocell.SyntheticLeapProvider",
+    "provider": "EmbodiedReferenceHand.SyntheticLeapProvider",
     "provider_explicitly_assigned": true,
+    "stock_prefab_grab_helper_instantiated": false,
     "grab_helper_components": 0,
     "grab_helper_object_instances": 0,
     "package_grab_flags_are_evidence": false,
+    "input_topology_source": "Ultraleap TestHandFactory neutral topology only; no grasp geometry",
+    "tracked_visual_asset": "package GenericHand_Arm prefab",
     "bounded_defaults": {
       "max_palm_velocity_m_s": 1.0,
       "min_finger_velocity_m_s": 0.1,
@@ -58,40 +58,77 @@
       "bone_damping": 3.0
     }
   },
-  "target": {
-    "shape": "analytic_box",
-    "mass_kg": 0.04,
-    "free_non_kinematic_rigidbody": true,
-    "gravity": true,
-    "post_initialization_pose_writes": 0,
-    "post_initialization_velocity_writes": 0,
-    "external_force_or_torque_writes": 0,
-    "parenting_or_joint_assistance": 0
-  },
   "qualification": {
-    "point_contact_source": "Unity Physics.ContactEvent ContactPairPoint.impulse",
-    "point_impulses_are_pair_aggregated": false,
-    "required_digits": ["thumb", "index", "middle"],
-    "minimum_simultaneous_support_s": 0.30,
-    "minimum_unsupported_lift_m": 0.10,
-    "opening_required": true,
-    "free_release_and_settling_required": true,
-    "target_authority_violation": false,
-    "assistance_ledger": []
+    "phase": "object_free_hand_qualification",
+    "dof_manifest": "runs/embodied_simulation/reference_hand_microcell/qualification/dof_manifest.json",
+    "trace": "runs/embodied_simulation/reference_hand_microcell/qualification/trace.json",
+    "metrics": "runs/embodied_simulation/reference_hand_microcell/qualification/qualification_metrics.json",
+    "reset_ledger": "runs/embodied_simulation/reference_hand_microcell/qualification/reset_ledger.json",
+    "video": "runs/embodied_simulation/reference_hand_microcell/qualification/dof_sweep_diagnostic.mp4",
+    "physical_body_count": 16,
+    "total_articulation_dof_count": 31,
+    "finger_dof_count": 25,
+    "controllable_dof_count": 20,
+    "dof_sweep_pass_count": 20,
+    "active_phase_reset_count": 0,
+    "max_fingertip_tracking_error_m": 0.05772646,
+    "max_visible_registration_error_m": 0.0,
+    "visible_registration_method": "physics-derived contact-site transforms drive the package GenericHand landmarks; no independent animation timeline",
+    "max_commanded_palm_speed_m_s": 0.0,
+    "frozen_fingertip_tracking_tolerance_m": 0.008,
+    "frozen_visible_registration_tolerance_m": 0.002,
+    "result": "HAND_QUALIFICATION_NO_GO",
+    "failure": "thumb/index/middle physics-derived output tracking exceeded frozen tolerance; maximum was 57.7 mm, dominated by the thumb",
+    "no_object_or_grasp_run_started": true,
+    "artifact_sha256": {
+      "preflight.json": "9f37d8c608d27884e56966e6c8bf64b14809e8ea9826e332a06d3cbd80d5b4f7",
+      "dof_manifest.json": "99321ab822cf0e9a12681c3b256f24a6de99b7554aa27abb9fcc65a27e92486e",
+      "trace.json": "01e18d63923ee0630278bf4ac62b96390b7d972b2dcda60ec0cdc2fa27454d9a",
+      "qualification_metrics.json": "c3a1b0e7dc8a9fea0709d7cc4faa2dd57bebdf1b5712c5daff97399c3a10b2ea",
+      "reset_ledger.json": "ac0e135e52dd4aef5ac7c253c248787087bfd5c287e75e2d38bda7608021acd6",
+      "dof_sweep_diagnostic.mp4": "1c5ef1414a9474083e817d68d6a912c186ffc354ba11d9add216be0bd7b4d6f8"
+    }
   },
-  "attempts": {
-    "maximum_physical_attempts": 2,
-    "attempt_1": "runs/embodied_simulation/reference_hand_microcell/receipts/player_run",
-    "attempt_2": "runs/embodied_simulation/reference_hand_microcell/receipts/player_run3",
-    "bounded_repair": "one wrist/hand vertical alignment change from palm y=0.98 m to y=0.86 m; no object/controller assistance",
-    "result": "NO-GO"
+  "metric_definitions": {
+    "support_top_y_m": 0.74,
+    "target_half_height_m": 0.05,
+    "support_center_tolerance_m": 0.002,
+    "target_is_supported": "measured support ContactEvent remains active and target center_y <= support_top_y + target_half_height + tolerance",
+    "unsupported_lift": "target support ContactEvent is absent throughout the qualified lift window and center height exceeds support center by the declared lift threshold",
+    "free_release_and_settling": "a previously qualified support window exists; commanded opening follows it; measured hand-target point contacts are lost after opening; target then settles under gravity",
+    "phase_presence_or_package_grab_flag_is_not_evidence": true
   },
-  "downstream_artifacts_not_generated": [
-    "object-free DOF sweep and active ArticulationBody per-DOF qualification report",
-    "frozen ContactPose-derived static grasp goal and optimizer receipt",
-    "nominal 1080p Unity microcell video",
-    "clean/collider overlay video and dense ffmpeg frame set",
-    "plots for qualified contacts, lift, and release",
-    "two-additional-shape generalization runs"
-  ]
+  "physical_execution": {
+    "maximum_eligible_attempts": 2,
+    "attempts_consumed": 0,
+    "prequalification_diagnostics": [
+      "runs/embodied_simulation/reference_hand_microcell/receipts/player_run",
+      "runs/embodied_simulation/reference_hand_microcell/receipts/player_run3"
+    ],
+    "diagnostic_interpretation": "These earlier zero-contact runs used an unqualified hand-authored pose and invalid support/release metrics. They do not falsify the donor architecture and do not consume an eligible physical attempt."
+  },
+  "static_goal": {
+    "status": "NOT_STARTED_HAND_QUALIFICATION_HARD_STOP",
+    "contactpose_seed": "not consumed",
+    "optimizer": "not run",
+    "candidate_ranking": "not run",
+    "unity_execution": "not run"
+  },
+  "forbidden_assistance": [
+    "GrabHelper.cs and GrabHelperObject.cs",
+    "Soft Contact and No Contact modes",
+    "object pose/velocity/force/torque writes after initialization",
+    "teleport/reset/ghost recovery during active qualification",
+    "parenting, joints, attachment, hidden supports, or release velocity injection"
+  ],
+  "privacy_and_claims": {
+    "restricted_childlens_access_permitted": false,
+    "restricted_external_drive_access_permitted": false,
+    "public_synthetic_inputs_only": true,
+    "child_trained": false,
+    "age_matched": false,
+    "childlens_calibrated": false,
+    "human_validated": false,
+    "licensed_mano_accessed": false
+  }
 }
