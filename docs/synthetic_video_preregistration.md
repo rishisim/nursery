@@ -2434,3 +2434,16 @@ Resource-only redirect `4a08175c…28d87` therefore freezes one A30, one process
 eight CPUs, 32 GiB, and five minutes at topology commitment
 `b7c00058…92b3`; every scientific input, threshold, metric, gate, and ceiling is
 unchanged.
+
+Before any outcome from that A30 resmoke, the user approved a second
+prospective resource-only latency amendment. Amendment `11e94b43…fafbd` and
+topology `a13d763a…f4850` select Hugging Face Jobs `l40sx1`: one NVIDIA L40S,
+one process/no DDP, eight CPUs, 62 GiB advertised RAM, and conditional
+five/15/15-minute microhealth/development/holdout caps. The paid ceiling is 35
+rented GPU-minutes, 65 GiB transient public-input staging, 10 GiB retained run
+storage, and USD 1.30. The OCI runtime is pinned at
+`pytorch/pytorch@sha256:dab81780…ed69`, the source tag used to build the
+preserved SIF. No ChildLens, BabyView, governed material, or derivative may
+leave Juno. Existing Juno job 317702 remains untouched until the rental is
+fully staged, is then inspected once, and may be canceled only if still pending
+at zero runtime with no output; otherwise no rented duplicate is launched.

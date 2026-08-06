@@ -807,3 +807,13 @@ Pending zero-runtime jobs 317679 and 317697 were then canceled before any
 outcome. User-directed resource-only redirect `4a08175c…28d87` selects the
 scheduler-estimated earlier single A30 under topology commitment
 `b7c00058…92b3`; the scientific contract is unchanged.
+
+Before that A30 resmoke produced an observed outcome, the user prospectively
+approved a paid public-only latency redirect. Resource amendment
+`11e94b43…fafbd` and topology `a13d763a…f4850` freeze Hugging Face Jobs with
+one L40S, one process/no DDP, five/15/15-minute conditional stage caps, at most
+35 rented GPU-minutes, 65 GiB transient public-input staging, 10 GiB retained
+run storage, and USD 1.30. Only public/self-authored fixtures, public weights,
+and canonical public-only code/config may leave Juno. Job 317702 is checked
+once only after the rental is ready and may be canceled only if it is still
+pending at zero runtime; a running or terminal Juno job is never duplicated.

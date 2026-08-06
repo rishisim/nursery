@@ -119,10 +119,10 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 28
+    assert config["schema_version"] == 29
     assert config["status"] == (
         "PHASE4_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_"
-        "FINAL_MICRO_REPAIR_FROZEN"
+        "RENTED_RESOURCE_FROZEN"
     )
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
@@ -608,7 +608,7 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert config["learner"]["objective_steps"] == 4668
     assert config["learner"]["objective_counts"] == {"contrastive": 3112, "mlm": 778, "dinov2": 778}
     assert config["sealed_prior_570_step_pilot"]["status"] == "PRESERVED_NOT_REINTERPRETED"
-    assert config["schema_version"] == 37
+    assert config["schema_version"] == 38
     readiness = dict(config["public_only_calibration_readiness_amendment"])
     readiness_commitment = readiness.pop("amendment_commitment_sha256")
     assert readiness_commitment == canonical_json_sha256(readiness)

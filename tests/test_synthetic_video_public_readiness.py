@@ -26,35 +26,9 @@ def _config() -> dict:
 
 def _config_with_topology() -> dict:
     config = _config()
-    amendment = config["public_only_calibration_readiness_amendment"]
-    topology = {
-        "status": "FROZEN_SCHEDULER_ONLY_BEFORE_MODEL_OUTCOMES",
-        "route_id": amendment["route_id"],
-        "amendment_commitment_sha256": amendment[
-            "amendment_commitment_sha256"
-        ],
-        "selected_at": "2026-08-05T00:00:00Z",
-        "selection_evidence": "SCHEDULER_ONLY_NO_MODEL_OUTCOME",
-        "GPU_type": "NVIDIA_A30_24GB",
-        "partition": "a30",
-        "GRES": "gpu:nvidia_a30:1",
-        "expected_device_name_prefix": "NVIDIA A30",
-        "visible_memory_GiB_min": 23,
-        "visible_memory_GiB_max": 25,
-        "node_count": 1,
-        "task_count": 1,
-        "GPU_count": 1,
-        "CPU_count": 8,
-        "memory_GiB": 32,
-        "single_process": True,
-        "DDP": False,
-        "micro_wall_minutes": 5,
-        "scientific_partition_wall_minutes": 15,
-        "micro_attempt_count_max": 2,
-        "aggregate_GPU_hours_max": 2.0 / 3.0,
-        "new_storage_GiB_max": 10,
-        "direct_monetary_cost_USD": 0,
-    }
+    topology = dict(config["public_only_calibration_readiness_topology"])
+    topology.pop("topology_commitment_sha256")
+    topology["selected_at"] = "2026-08-05T00:00:00Z"
     topology["topology_commitment_sha256"] = MODULE.digest(topology)
     config["public_only_calibration_readiness_topology"] = topology
     return config
@@ -102,10 +76,49 @@ def test_public_readiness_topology_is_separately_committed() -> None:
         MODULE._public_readiness_topology(mutated)
 
 
+def test_rented_topology_attestation_uses_semantic_provider_contract(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = _config()
+    execution_id = "readiness-health-unit"
+    monkeypatch.setenv("PHASE4_PUBLIC_EXECUTION_ID", execution_id)
+    attestation = {
+        "schema_version": 1,
+        "route_id": "learner_effective_public_only_readiness",
+        "run_mode": "health",
+        "execution_id": execution_id,
+        "provider": "HUGGING_FACE_JOBS",
+        "provider_flavor": "l40sx1",
+        "node_count": 1,
+        "task_count": 1,
+        "GPU_count": 1,
+        "CPU_count": 8,
+        "memory_GiB": 62,
+        "time_limit_minutes": 5,
+        "world_size": 1,
+        "local_world_size": 1,
+        "source": "CANONICAL_WRAPPER_PROVIDER_ATTESTATION",
+    }
+    path = tmp_path / "topology.json"
+    path.write_text(json.dumps(attestation, sort_keys=True, separators=(",", ":")))
+    path.chmod(0o600)
+    assert MODULE._public_readiness_attestation(path, config, "health") == (
+        MODULE.file_digest(path)
+    )
+
+    attestation["GPU_count"] = 2
+    path.write_text(json.dumps(attestation, sort_keys=True, separators=(",", ":")))
+    path.chmod(0o600)
+    with pytest.raises(RuntimeError, match="E_PUBLIC_READINESS_TOPOLOGY_ATTESTATION"):
+        MODULE._public_readiness_attestation(path, config, "health")
+
+
 def test_public_readiness_scheduler_redirect_is_resource_only_and_committed() -> None:
     config = _config()
     topology = MODULE._public_readiness_topology(config)
-    assert topology["GPU_type"] == "NVIDIA_A30_24GB"
+    assert topology["GPU_type"] == "NVIDIA_L40S_48GB"
+    assert topology["provider"] == "HUGGING_FACE_JOBS"
+    assert topology["provider_flavor"] == "l40sx1"
     redirect = dict(config["public_only_calibration_readiness_scheduler_redirect"])
     expected = redirect.pop("redirect_commitment_sha256")
     assert MODULE.digest(redirect) == expected
@@ -122,6 +135,20 @@ def test_public_readiness_scheduler_redirect_is_resource_only_and_committed() ->
     assert redirect[
         "model_fixture_partition_threshold_metric_seed_or_gate_changed"
     ] is False
+
+    rented = dict(
+        config["public_only_calibration_readiness_rented_resource_amendment"]
+    )
+    expected = rented.pop("resource_amendment_commitment_sha256")
+    assert MODULE.digest(rented) == expected
+    assert expected == (
+        "11e94b437e468aa3a76a0a546bbea8fc0ee44bd5a9cf2875e5b3f08dc39fafbd"
+    )
+    assert rented["prior_A30_topology_commitment_sha256"] == (
+        "b7c000581234493414c55c6be48ea47fe06044ef3b73ff6a03e833fa855c92b3"
+    )
+    assert rented["restricted_or_governed_material_permitted_off_Juno"] is False
+    assert rented["total_direct_monetary_cost_USD_max"] == 1.3
 
 
 def test_public_readiness_fixture_result_is_sealed_before_inference() -> None:
@@ -395,6 +422,8 @@ def test_wrapper_has_readiness_blocking_job_contract_without_poll_loop() -> None
     assert "readiness-qualify" in wrapper
     assert "--network none" in wrapper
     assert "require_readiness_topology" in wrapper
+    assert "hf_jobs_public_only" in wrapper
+    assert "E_PUBLIC_READINESS_EXTERNAL_NETWORK_DISABLED" in wrapper
     assert "ChildLens" not in wrapper
     assert "BabyView" not in wrapper
     assert "squeue" not in wrapper

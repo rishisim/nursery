@@ -41,6 +41,108 @@ else
   esac
   output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/extractor-redesign/activity-checkpoint-selection"
 fi
+
+# Hugging Face Jobs runs this same canonical wrapper inside the immutable OCI
+# source image used to build the pinned SIF. Only the resource backend differs.
+if [[ "${PHASE4_EXECUTION_BACKEND:-slurm}" == "hf_jobs_public_only" ]]; then
+  [[ "$readiness_run_mode" != "none" ]] || exit 64
+  [[ "${WORLD_SIZE:-1}" == "1" && "${LOCAL_WORLD_SIZE:-1}" == "1" ]] || exit 66
+  [[ "${PHASE4_PUBLIC_ROOT:-}" == /* ]] || exit 65
+  if [[ "$readiness_run_mode" == "health" ]]; then
+    [[ "${PHASE4_PUBLIC_WALL_MINUTES:-}" == "5" ]] || exit 66
+  else
+    [[ "${PHASE4_PUBLIC_WALL_MINUTES:-}" == "15" ]] || exit 66
+  fi
+  [[ "${PHASE4_RUNTIME_IMAGE_DIGEST:-}" == "sha256:dab81780fd94483b67b4b5679cc0024939b08e48540d39476d284cb29002ed69" ]] || exit 66
+  execution_id="${PHASE4_PUBLIC_EXECUTION_ID:-}"
+  [[ "$execution_id" =~ ^readiness-(health|development|holdout)-[a-z0-9-]+$ ]] || exit 66
+  [[ "$(nproc)" -ge 8 ]] || exit 66
+  memory_kib="$(awk '/^MemTotal:/{print $2}' /proc/meminfo)"
+  [[ "$memory_kib" -ge 33554432 ]] || exit 66
+
+  install -d -m 700 "$output_root" "$output_root/logs"
+  exec >"$output_root/logs/${execution_id}.out" 2>"$output_root/logs/${execution_id}.err"
+  scratch="${TMPDIR:-/tmp}/synthetic-calibration-qualify-${execution_id}"
+  install -d -m 700 "$scratch" "$scratch/pydeps" "$scratch/network-guard" "$scratch/bin"
+  trap 'find "$scratch" -mindepth 1 -delete 2>/dev/null || true; rmdir "$scratch" 2>/dev/null || true' EXIT
+  export PYTHONPYCACHEPREFIX="$scratch/pycache"
+
+  container_image="${PHASE4_PUBLIC_ROOT}/models/pytorch-2.8.0-cu126.sif"
+  [[ -f "$container_image" && "$(stat -c %s "$container_image")" -eq 3731320832 ]] || exit 65
+  printf '%s  %s\n' f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792 "$container_image" | sha256sum --check --status
+  fixture_target="${PHASE4_PUBLIC_ROOT}/public/mechanistic-training-tuple-fixtures"
+  source_record="$fixture_target/visor-hos-source-feasibility.json"
+  no_hand_seal="$fixture_target/no-hand-review/verified-no-hand-seal.json"
+  fixture_manifest="$fixture_target/fixture-manifest.json"
+  [[ -f "$source_record" && "$(stat -c %s "$source_record")" -eq 838802 ]] || exit 65
+  [[ -f "$no_hand_seal" && "$(stat -c %s "$no_hand_seal")" -eq 19579 ]] || exit 65
+  [[ -f "$fixture_manifest" && "$(stat -c %s "$fixture_manifest")" -eq 1426457 ]] || exit 65
+  printf '%s  %s\n' 64176cf282f1038174b12277560cb5f7aa8d61aa027599ad5c44b53e066f9f9e "$source_record" | sha256sum --check --status
+  printf '%s  %s\n' 362ab55a026110e7035fb1b1e24bc959023a353849e8f4c246f66b59e041743e "$no_hand_seal" | sha256sum --check --status
+  printf '%s  %s\n' 740eebfce87cc8cf543fefcb8015a3ec75b934acc9a39c8d81adb5a7dd331371 "$fixture_manifest" | sha256sum --check --status
+
+  language_archive="${PHASE4_PUBLIC_ROOT}/models/phase4-language-pydeps.tar"
+  [[ -f "$language_archive" && "$(stat -c %s "$language_archive")" -eq 542423040 ]] || exit 65
+  printf '%s  %s\n' 97ef52ecaa8c99db017e598d8a63d0d2170affef14ef46e7df7a656abd3a1a07 "$language_archive" | sha256sum --check --status
+  tar -C "$scratch/pydeps" -xf "$language_archive"
+  printf '%s\n' \
+    'import socket' \
+    '_original_socket = socket.socket' \
+    'class _OfflineSocket(_original_socket):' \
+    '    def connect(self, address):' \
+    '        if self.family in {socket.AF_INET, socket.AF_INET6}:' \
+    '            raise OSError("E_PUBLIC_READINESS_EXTERNAL_NETWORK_DISABLED")' \
+    '        return super().connect(address)' \
+    '    def connect_ex(self, address):' \
+    '        if self.family in {socket.AF_INET, socket.AF_INET6}:' \
+    '            return 101' \
+    '        return super().connect_ex(address)' \
+    'socket.socket = _OfflineSocket' \
+    'def _blocked(*_args, **_kwargs):' \
+    '    raise OSError("E_PUBLIC_READINESS_EXTERNAL_NETWORK_DISABLED")' \
+    'socket.create_connection = _blocked' \
+    >"$scratch/network-guard/sitecustomize.py"
+  export PYTHONPATH="$scratch/network-guard:${PHASE4_PUBLIC_ROOT}/models/mechanistic-tuples/runtime-pydeps:${PHASE4_PUBLIC_ROOT}/source:${PHASE4_PUBLIC_ROOT}/models/mechanistic-tuples/code/egobabyvlm:${PHASE4_PUBLIC_ROOT}/models/activity-pydeps/egohod_egovideo_l_zero_shot:$scratch/pydeps"
+  ffmpeg_exe="$(env PYTHONPATH="$scratch/pydeps" python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
+  [[ -x "$ffmpeg_exe" && "$(stat -c %s "$ffmpeg_exe")" -eq 79826272 ]] || exit 65
+  printf '%s  %s\n' e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99 "$ffmpeg_exe" | sha256sum --check --status
+  ln -s "$ffmpeg_exe" "$scratch/bin/ffmpeg"
+  export PATH="$scratch/bin:$PATH"
+
+  attestation_root="$output_root/attestations"
+  install -d -m 700 "$attestation_root"
+  container_attestation="$attestation_root/${execution_id}-container.json"
+  fixture_bind_attestation="$attestation_root/${execution_id}-fixture.json"
+  topology_attestation="$attestation_root/${execution_id}-topology.json"
+  [[ ! -e "$container_attestation" && ! -e "$fixture_bind_attestation" && ! -e "$topology_attestation" ]] || exit 65
+  printf '{"artifact_family":"BASE_CONTAINER_OCI_WITH_PRESERVED_SIF_PROVENANCE","execution_id":"%s","legacy_SIF_bytes":3731320832,"legacy_SIF_sha256":"f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792","predicate_count":4,"predicate_pass_count":4,"run_mode":"readiness-%s","runtime_image_manifest_sha256":"dab81780fd94483b67b4b5679cc0024939b08e48540d39476d284cb29002ed69","schema_version":1,"source":"CANONICAL_WRAPPER_OCI_RUNTIME"}\n' "$execution_id" "$readiness_run_mode" >"$container_attestation"
+  printf '{"active_fixture_root_verified":true,"artifact_family":"SEALED_PUBLIC_FIXTURE_READ_ONLY_VOLUME","execution_id":"%s","fixture_manifest_bytes":1426457,"fixture_manifest_file_sha256":"740eebfce87cc8cf543fefcb8015a3ec75b934acc9a39c8d81adb5a7dd331371","path_field_count":0,"predicate_count":9,"predicate_pass_count":9,"read_only":true,"run_mode":"readiness-%s","schema_version":1,"source":"CANONICAL_WRAPPER_READ_ONLY_PUBLIC_VOLUME","source_record_bytes":838802,"source_record_file_sha256":"64176cf282f1038174b12277560cb5f7aa8d61aa027599ad5c44b53e066f9f9e","verified_no_hand_seal_bytes":19579,"verified_no_hand_seal_file_sha256":"362ab55a026110e7035fb1b1e24bc959023a353849e8f4c246f66b59e041743e"}\n' "$execution_id" "$readiness_run_mode" >"$fixture_bind_attestation"
+  printf '{"CPU_count":8,"GPU_count":1,"execution_id":"%s","local_world_size":1,"memory_GiB":62,"node_count":1,"provider":"HUGGING_FACE_JOBS","provider_flavor":"l40sx1","route_id":"learner_effective_public_only_readiness","run_mode":"%s","schema_version":1,"source":"CANONICAL_WRAPPER_PROVIDER_ATTESTATION","task_count":1,"time_limit_minutes":%s,"world_size":1}\n' "$execution_id" "$readiness_run_mode" "$PHASE4_PUBLIC_WALL_MINUTES" >"$topology_attestation"
+  chmod 600 "$container_attestation" "$fixture_bind_attestation" "$topology_attestation"
+
+  python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" readiness-prepare \
+    --public-root "${PHASE4_PUBLIC_ROOT}" \
+    --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json"
+  if [[ "$readiness_run_mode" == "health" ]]; then
+    [[ "${PHASE4_READINESS_ATTEMPT:-}" == "2" ]] || exit 64
+    python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" readiness-health \
+      --public-root "${PHASE4_PUBLIC_ROOT}" --scratch-root "$scratch" \
+      --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json" \
+      --container-attestation "$container_attestation" \
+      --fixture-bind-attestation "$fixture_bind_attestation" \
+      --topology-attestation "$topology_attestation" --attempt 2 --device cuda
+  else
+    python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" readiness-qualify \
+      --public-root "${PHASE4_PUBLIC_ROOT}" --scratch-root "$scratch" \
+      --config "${PHASE4_PUBLIC_ROOT}/source/synthetic_video_real_only_proof.json" \
+      --container-attestation "$container_attestation" \
+      --fixture-bind-attestation "$fixture_bind_attestation" \
+      --topology-attestation "$topology_attestation" \
+      --partition "$readiness_run_mode" --device cuda
+  fi
+  exit 0
+fi
+
 install -d -m 700 "$output_root" "$output_root/logs"
 exec >"$output_root/logs/qualify-${SLURM_JOB_ID}.out" 2>"$output_root/logs/qualify-${SLURM_JOB_ID}.err"
 if [[ "$tuple_run_mode" == "health" ]]; then
