@@ -18,7 +18,7 @@ set -euo pipefail
 umask 077
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 WANDB_DISABLED=true TOKENIZERS_PARALLELISM=false PYTHONNOUSERSITE=1
 execution_backend="${PHASE4_EXECUTION_BACKEND:-slurm}"
-if [[ "$execution_backend" == "hf_jobs_public_only" ]]; then
+if [[ "$execution_backend" == "hf_jobs_public_only" || "$execution_backend" == "vastai_public_only" ]]; then
   execution_id="${PHASE4_PUBLIC_EXECUTION_ID:-}"
   [[ "$execution_id" =~ ^readiness-(health|development|holdout)-[a-z0-9-]+$ ]] || exit 66
   public_input_root="${PHASE4_PUBLIC_INPUT_ROOT:-}"
@@ -66,9 +66,9 @@ else
   output_root="${PHASE4_PUBLIC_ROOT}/runs/synthetic-video-calibration/extractor-redesign/activity-checkpoint-selection"
 fi
 
-# Hugging Face Jobs runs this same canonical wrapper inside the immutable OCI
-# source image used to build the pinned SIF. Only the resource backend differs.
-if [[ "$execution_backend" == "hf_jobs_public_only" ]]; then
+# Rented public-only backends run this same canonical wrapper inside the
+# immutable OCI source image used to build the pinned SIF.
+if [[ "$execution_backend" == "hf_jobs_public_only" || "$execution_backend" == "vastai_public_only" ]]; then
   [[ "$readiness_run_mode" != "none" ]] || exit 64
   [[ "${WORLD_SIZE:-1}" == "1" && "${LOCAL_WORLD_SIZE:-1}" == "1" ]] || exit 66
   [[ "${PHASE4_PUBLIC_ROOT:-}" == /* ]] || exit 65
@@ -81,6 +81,18 @@ if [[ "$execution_backend" == "hf_jobs_public_only" ]]; then
   [[ "$(nproc)" -ge 8 ]] || exit 66
   memory_kib="$(awk '/^MemTotal:/{print $2}' /proc/meminfo)"
   [[ "$memory_kib" -ge 33554432 ]] || exit 66
+  if [[ "$execution_backend" == "vastai_public_only" ]]; then
+    [[ -z "$(find "$public_input_root" -perm /222 -print -quit)" ]] || exit 66
+    mapfile -t provider_gpu_names < <(nvidia-smi --query-gpu=name --format=csv,noheader)
+    [[ "${#provider_gpu_names[@]}" -eq 1 && "${provider_gpu_names[0]}" == NVIDIA\ L4* ]] || exit 66
+    provider_name="VAST_AI"
+    provider_flavor="on_demand_verified"
+    provider_memory_gib=32
+  else
+    provider_name="HUGGING_FACE_JOBS"
+    provider_flavor="l40sx1"
+    provider_memory_gib=62
+  fi
 
   install -d -m 700 "$output_root" "$output_root/logs"
   exec >"$output_root/logs/${execution_id}.out" 2>"$output_root/logs/${execution_id}.err"
@@ -138,7 +150,7 @@ if [[ "$execution_backend" == "hf_jobs_public_only" ]]; then
   [[ ! -e "$container_attestation" && ! -e "$fixture_bind_attestation" && ! -e "$topology_attestation" ]] || exit 65
   printf '{"artifact_family":"BASE_CONTAINER_OCI_WITH_PRESERVED_SIF_PROVENANCE","execution_id":"%s","legacy_SIF_bytes":3731320832,"legacy_SIF_sha256":"f274f1ac3726376b762b557ff9a07203b2d42aac3157a7a354b998e589c35792","predicate_count":4,"predicate_pass_count":4,"run_mode":"readiness-%s","runtime_image_manifest_sha256":"dab81780fd94483b67b4b5679cc0024939b08e48540d39476d284cb29002ed69","schema_version":1,"source":"CANONICAL_WRAPPER_OCI_RUNTIME"}\n' "$execution_id" "$readiness_run_mode" >"$container_attestation"
   printf '{"active_fixture_root_verified":true,"artifact_family":"SEALED_PUBLIC_FIXTURE_READ_ONLY_VOLUME","execution_id":"%s","fixture_manifest_bytes":1426457,"fixture_manifest_file_sha256":"740eebfce87cc8cf543fefcb8015a3ec75b934acc9a39c8d81adb5a7dd331371","path_field_count":0,"predicate_count":9,"predicate_pass_count":9,"read_only":true,"run_mode":"readiness-%s","schema_version":1,"source":"CANONICAL_WRAPPER_READ_ONLY_PUBLIC_VOLUME","source_record_bytes":838802,"source_record_file_sha256":"64176cf282f1038174b12277560cb5f7aa8d61aa027599ad5c44b53e066f9f9e","verified_no_hand_seal_bytes":19579,"verified_no_hand_seal_file_sha256":"362ab55a026110e7035fb1b1e24bc959023a353849e8f4c246f66b59e041743e"}\n' "$execution_id" "$readiness_run_mode" >"$fixture_bind_attestation"
-  printf '{"CPU_count":8,"GPU_count":1,"execution_id":"%s","local_world_size":1,"memory_GiB":62,"node_count":1,"provider":"HUGGING_FACE_JOBS","provider_flavor":"l40sx1","route_id":"learner_effective_public_only_readiness","run_mode":"%s","schema_version":1,"source":"CANONICAL_WRAPPER_PROVIDER_ATTESTATION","task_count":1,"time_limit_minutes":%s,"world_size":1}\n' "$execution_id" "$readiness_run_mode" "$PHASE4_PUBLIC_WALL_MINUTES" >"$topology_attestation"
+  printf '{"CPU_count":8,"GPU_count":1,"execution_id":"%s","local_world_size":1,"memory_GiB":%s,"node_count":1,"provider":"%s","provider_flavor":"%s","route_id":"learner_effective_public_only_readiness","run_mode":"%s","schema_version":1,"source":"CANONICAL_WRAPPER_PROVIDER_ATTESTATION","task_count":1,"time_limit_minutes":%s,"world_size":1}\n' "$execution_id" "$provider_memory_gib" "$provider_name" "$provider_flavor" "$readiness_run_mode" "$PHASE4_PUBLIC_WALL_MINUTES" >"$topology_attestation"
   chmod 600 "$container_attestation" "$fixture_bind_attestation" "$topology_attestation"
 
   python "${PHASE4_PUBLIC_ROOT}/source/run_synthetic_video_calibration.py" readiness-prepare \

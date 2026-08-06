@@ -2467,3 +2467,19 @@ bucket and a writable private output bucket. A per-job scratch root links only
 fixture, label, partition, threshold, metric, seed, gate, privacy rule, or
 resource ceiling changes. Microhealth must pass and be committed before public
 development can open.
+
+The repaired Hugging Face job `6a74ccf2…ed9b8` subsequently remained in
+provider scheduling with zero runtime and no container, model, or scientific
+metric outcome. The user selected their already-funded Vast.ai account, so the
+job was canceled before allocation and sealed at `683c40d8…2471a`. This is a
+provider handoff, not a scientific result.
+
+Before a Vast instance or model outcome, topology commitment
+`d534e302…00b9` freezes verified on-demand offer `45699409`: one NVIDIA L4,
+one process/no DDP, a minimum of eight CPUs and 32 GiB system RAM, the pinned
+OCI digest, 80 GiB transient disk, 25 minutes for public-input staging, and the
+unchanged five/15/15-minute microhealth/development/holdout caps. The total
+instance cap is 65 minutes and USD 0.40. Only the already validated public
+inputs may be staged; ChildLens, BabyView, governed material, and derivatives
+remain prohibited. Models, fixtures, partitions, thresholds, metrics, seeds,
+and readiness gates do not change.

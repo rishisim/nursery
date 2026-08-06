@@ -122,7 +122,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["schema_version"] == 29
     assert config["status"] == (
         "PHASE4_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_"
-        "SIBLING_MOUNT_REPAIR_FROZEN"
+        "VAST_L4_RESOURCE_FROZEN"
     )
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
@@ -643,6 +643,23 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     assert mount_repair["mount_relationship"] == (
         "SEPARATE_SIBLING_PATHS_NON_NESTED"
     )
+    handoff = dict(
+        config["public_only_calibration_readiness_hf_zero_runtime_handoff_result"]
+    )
+    handoff_commitment = handoff.pop("result_commitment_sha256")
+    assert handoff_commitment == canonical_json_sha256(handoff)
+    assert handoff_commitment == (
+        "683c40d8805cdc07d13083f3da90fb517db9e88e9ca2c6a45e02c6f8edc2471a"
+    )
+    assert handoff["runtime_seconds"] == 0
+    vast = dict(config["public_only_calibration_readiness_vast_resource_amendment"])
+    vast_commitment = vast.pop("topology_commitment_sha256")
+    assert vast_commitment == canonical_json_sha256(vast)
+    assert vast_commitment == (
+        "d534e302e998eb30e536754ea7e8cb414abbdc4fb15808f4c0a5e8715fa200b9"
+    )
+    assert vast["provider"] == "VAST_AI"
+    assert vast["selected_offer_id"] == 45699409
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)

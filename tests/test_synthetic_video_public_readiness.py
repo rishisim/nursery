@@ -87,13 +87,13 @@ def test_rented_topology_attestation_uses_semantic_provider_contract(
         "route_id": "learner_effective_public_only_readiness",
         "run_mode": "health",
         "execution_id": execution_id,
-        "provider": "HUGGING_FACE_JOBS",
-        "provider_flavor": "l40sx1",
+        "provider": "VAST_AI",
+        "provider_flavor": "on_demand_verified",
         "node_count": 1,
         "task_count": 1,
         "GPU_count": 1,
         "CPU_count": 8,
-        "memory_GiB": 62,
+        "memory_GiB": 32,
         "time_limit_minutes": 5,
         "world_size": 1,
         "local_world_size": 1,
@@ -116,9 +116,9 @@ def test_rented_topology_attestation_uses_semantic_provider_contract(
 def test_public_readiness_scheduler_redirect_is_resource_only_and_committed() -> None:
     config = _config()
     topology = MODULE._public_readiness_topology(config)
-    assert topology["GPU_type"] == "NVIDIA_L40S_48GB"
-    assert topology["provider"] == "HUGGING_FACE_JOBS"
-    assert topology["provider_flavor"] == "l40sx1"
+    assert topology["GPU_type"] == "NVIDIA_L4_24GB"
+    assert topology["provider"] == "VAST_AI"
+    assert topology["provider_flavor"] == "on_demand_verified"
     redirect = dict(config["public_only_calibration_readiness_scheduler_redirect"])
     expected = redirect.pop("redirect_commitment_sha256")
     assert MODULE.digest(redirect) == expected
@@ -163,6 +163,13 @@ def test_public_readiness_scheduler_redirect_is_resource_only_and_committed() ->
     assert validated["mount_relationship"] == (
         "SEPARATE_SIBLING_PATHS_NON_NESTED"
     )
+    handoff = MODULE._public_readiness_hf_zero_runtime_handoff_result(config)
+    assert handoff["runtime_seconds"] == 0
+    assert handoff["scientific_metric_count"] == 0
+    vast = MODULE._public_readiness_vast_resource_amendment(config)
+    assert vast is not None
+    assert vast["selected_offer_id"] == 45699409
+    assert vast["direct_monetary_cost_USD_max"] == 0.4
 
 
 def test_public_readiness_fixture_result_is_sealed_before_inference() -> None:
@@ -437,6 +444,9 @@ def test_wrapper_has_readiness_blocking_job_contract_without_poll_loop() -> None
     assert "--network none" in wrapper
     assert "require_readiness_topology" in wrapper
     assert "hf_jobs_public_only" in wrapper
+    assert "vastai_public_only" in wrapper
+    assert 'provider_name="VAST_AI"' in wrapper
+    assert '"${provider_gpu_names[0]}" == NVIDIA\\ L4*' in wrapper
     assert "E_PUBLIC_READINESS_EXTERNAL_NETWORK_DISABLED" in wrapper
     assert "PHASE4_PUBLIC_INPUT_ROOT" in wrapper
     assert "PHASE4_PUBLIC_OUTPUT_ROOT" in wrapper

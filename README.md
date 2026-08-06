@@ -837,3 +837,14 @@ through one per-job scratch merge. The L40S topology, scientific configuration,
 privacy boundary, and resource ceilings are unchanged. The next gate is the
 complete metric-withheld microhealth suite; public development remains locked
 until an all-module PASS is committed.
+
+The repaired Hugging Face job `6a74ccf2…ed9b8` remained scheduling with zero
+runtime and no container, model, or metric outcome, then was canceled before
+allocation when the user selected an already-funded Vast.ai account. Handoff
+commitment `683c40d8…2471a` preserves that zero-runtime provenance. Prospective
+topology `d534e302…00b9` freezes exact verified on-demand Vast offer `45699409`:
+one L4, one process/no DDP, at least eight CPUs and 32 GiB RAM, 80 GiB transient
+disk, the same five/15/15-minute scientific stage caps, at most 65 total
+instance minutes, and USD 0.40. This changes only public-only staging and
+compute; every scientific input, threshold, metric, fixture, seed, and gate is
+unchanged.

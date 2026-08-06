@@ -96,7 +96,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
     assert result["schema_version"] == 26
     assert result["status"] == (
         "CORRECTED_COMMON_ASSETS_PASS_PRIOR_PUBLIC_NO_GO_PRESERVED_"
-        "PUBLIC_ONLY_READINESS_SIBLING_MOUNT_REPAIR_FROZEN"
+        "PUBLIC_ONLY_READINESS_VAST_L4_RESOURCE_FROZEN"
     )
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
@@ -520,7 +520,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     assert proof["status"] == (
-        "PUBLIC_ONLY_CALIBRATION_READINESS_SIBLING_MOUNT_REPAIR_"
+        "PUBLIC_ONLY_CALIBRATION_READINESS_VAST_L4_RESOURCE_"
         "FROZEN_BEFORE_NEW_MODEL_OUTCOME"
     )
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]

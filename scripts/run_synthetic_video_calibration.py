@@ -6151,6 +6151,7 @@ def _public_only_readiness_amendment(cfg: dict[str, Any]) -> dict[str, Any]:
             "PUBLIC_ONLY_CALIBRATION_READINESS_ENGINEERING_REPAIR_FROZEN_BEFORE_FINAL_MICRO_ATTEMPT",
             "PUBLIC_ONLY_CALIBRATION_READINESS_RENTED_RESOURCE_FROZEN_BEFORE_FINAL_MICRO_ATTEMPT",
             "PUBLIC_ONLY_CALIBRATION_READINESS_SIBLING_MOUNT_REPAIR_FROZEN_BEFORE_NEW_MODEL_OUTCOME",
+            "PUBLIC_ONLY_CALIBRATION_READINESS_VAST_L4_RESOURCE_FROZEN_BEFORE_NEW_MODEL_OUTCOME",
             "PUBLIC_ONLY_CALIBRATION_READINESS_ENGINEERING_HEALTH_PASS",
             "PUBLIC_ONLY_CALIBRATION_READINESS_DEVELOPMENT_PASS_THRESHOLDS_SEALED",
             "NO_GO_PUBLIC_ONLY_COMPLETE_VALID_SCIENTIFIC_METRICS",
@@ -19331,6 +19332,120 @@ def _public_readiness_mount_layout_repair(cfg: dict[str, Any]) -> dict[str, Any]
     return value
 
 
+def _public_readiness_hf_zero_runtime_handoff_result(
+    cfg: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the canceled, zero-runtime HF scheduling handoff."""
+
+    value = cfg.get("public_only_calibration_readiness_hf_zero_runtime_handoff_result")
+    if not isinstance(value, dict):
+        raise RuntimeError("E_PUBLIC_READINESS_HF_HANDOFF_SCHEMA")
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("result_commitment_sha256", None)
+    if (
+        value.get("status")
+        != "CANCELED_ZERO_RUNTIME_BEFORE_VAST_PROVIDER_AMENDMENT"
+        or value.get("provider") != "HUGGING_FACE_JOBS"
+        or value.get("provider_job_id") != "6a74ccf2da2af92a634ed9b8"
+        or value.get("last_observed_stage") != "SCHEDULING"
+        or value.get("runtime_seconds") != 0
+        or value.get("container_started") is not False
+        or value.get("model_inference_executed") is not False
+        or value.get("scientific_metric_count") != 0
+        or value.get("duplicate_provider_job_created") is not False
+        or value.get("prior_mount_blocker_commitment_sha256")
+        != "200f2d78cd9f80838e574acb3a6e0c59084151d4104d77de0981ca2e5a1781cf"
+        or value.get("sibling_mount_repair_commitment_sha256")
+        != "b740a3edb36a09da33edb01f6248315ec314c182deea24de908ecf990653f2f9"
+        or value.get("public_inputs_only") is not True
+        or value.get("scientific_contract_changed") is not False
+        or expected is None
+        or digest(payload) != expected
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_HF_HANDOFF_COMMITMENT")
+    return value
+
+
+def _public_readiness_vast_resource_amendment(
+    cfg: dict[str, Any],
+) -> dict[str, Any] | None:
+    """Validate the exact public-only Vast L4 resource frozen before launch."""
+
+    value = cfg.get("public_only_calibration_readiness_vast_resource_amendment")
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise RuntimeError("E_PUBLIC_READINESS_VAST_RESOURCE_SCHEMA")
+    handoff = _public_readiness_hf_zero_runtime_handoff_result(cfg)
+    payload = json.loads(json.dumps(value))
+    expected = payload.pop("topology_commitment_sha256", None)
+    if (
+        value.get("status") != "FROZEN_BEFORE_VAST_INSTANCE_OR_NEW_MODEL_OUTCOME"
+        or value.get("scope")
+        != "PROVIDER_RESOURCE_AND_STAGING_ONLY_PUBLIC_INPUTS_ONLY"
+        or value.get("trigger_hf_handoff_result_commitment_sha256")
+        != handoff["result_commitment_sha256"]
+        or value.get("provider") != "VAST_AI"
+        or value.get("provider_flavor") != "on_demand_verified"
+        or value.get("selected_offer_id") != 45699409
+        or value.get("selection_rule")
+        != "lowest_dph_total_from_single_frozen_eligible_L4_search"
+        or value.get("credential_verified") is not True
+        or value.get("positive_account_credit_verified") is not True
+        or value.get("SSH_public_key_registered_before_launch") is not True
+        or value.get("on_demand_only") is not True
+        or value.get("verified_host_only") is not True
+        or value.get("cancel_if_unavailable") is not True
+        or value.get("GPU_type") != "NVIDIA_L4_24GB"
+        or value.get("expected_device_name_prefix") != "NVIDIA L4"
+        or value.get("visible_memory_GiB_min") != 21
+        or value.get("visible_memory_GiB_max") != 24
+        or value.get("GPU_count") != 1
+        or value.get("CPU_count") != 8
+        or value.get("memory_GiB") != 32
+        or value.get("node_count") != 1
+        or value.get("task_count") != 1
+        or value.get("single_process") is not True
+        or value.get("DDP") is not False
+        or value.get("runtime_image")
+        != "pytorch/pytorch@sha256:dab81780fd94483b67b4b5679cc0024939b08e48540d39476d284cb29002ed69"
+        or value.get("runtime_image_manifest_sha256")
+        != "dab81780fd94483b67b4b5679cc0024939b08e48540d39476d284cb29002ed69"
+        or value.get("public_input_bytes") != 64246300520
+        or value.get("transient_disk_GiB") != 80
+        or float(value.get("transient_public_input_staging_GiB_max", math.inf))
+        > 65
+        or float(value.get("new_storage_GiB_max", math.inf)) > 10
+        or value.get("input_staging_wall_minutes_max") != 25
+        or value.get("micro_wall_minutes") != 5
+        or value.get("scientific_partition_wall_minutes") != 15
+        or value.get("micro_attempt_count_max") != 2
+        or value.get("micro_development_holdout_wall_minutes") != [5, 15, 15]
+        or float(value.get("scientific_GPU_minutes_max", math.inf)) > 35
+        or float(value.get("total_instance_wall_minutes_max", math.inf)) > 65
+        or float(value.get("aggregate_GPU_hours_max", math.inf)) > 2.0 / 3.0
+        or float(value.get("rented_GPU_hours_max", math.inf)) > 35.0 / 60.0
+        or float(value.get("provider_price_USD_per_GPU_hour_max", math.inf))
+        > 0.3555555555555555
+        or float(value.get("direct_monetary_cost_USD_max", math.inf)) > 0.4
+        or value.get("route_id") != "learner_effective_public_only_readiness"
+        or value.get("amendment_commitment_sha256")
+        != PUBLIC_ONLY_READINESS_AMENDMENT_SHA256
+        or value.get(
+            "models_fixtures_labels_partitions_thresholds_metrics_seeds_or_gates_changed"
+        )
+        is not False
+        or value.get("restricted_or_governed_material_permitted") is not False
+        or value.get("ChildLens_or_BabyView_material_permitted") is not False
+        or value.get("model_inference_executed_before_freeze") is not False
+        or value.get("scientific_metric_count_before_freeze") != 0
+        or expected is None
+        or digest(payload) != expected
+    ):
+        raise RuntimeError("E_PUBLIC_READINESS_VAST_RESOURCE_COMMITMENT")
+    return value
+
+
 def _public_readiness_topology(cfg: dict[str, Any]) -> dict[str, Any]:
     """Validate the one-provider, one-process topology frozen before outcomes."""
 
@@ -19407,7 +19522,8 @@ def _public_readiness_topology(cfg: dict[str, Any]) -> dict[str, Any]:
         or digest(payload) != expected
     ):
         raise RuntimeError("E_PUBLIC_READINESS_TOPOLOGY_COMMITMENT")
-    return value
+    vast = _public_readiness_vast_resource_amendment(cfg)
+    return vast if vast is not None else value
 
 
 def _public_readiness_fixture_result(cfg: dict[str, Any]) -> dict[str, Any]:
@@ -19633,13 +19749,13 @@ def _public_readiness_attestation(
             "route_id": "learner_effective_public_only_readiness",
             "run_mode": run_mode,
             "execution_id": execution_id,
-            "provider": "HUGGING_FACE_JOBS",
-            "provider_flavor": "l40sx1",
+            "provider": topology["provider"],
+            "provider_flavor": topology["provider_flavor"],
             "node_count": 1,
             "task_count": 1,
             "GPU_count": 1,
             "CPU_count": 8,
-            "memory_GiB": 62,
+            "memory_GiB": topology["memory_GiB"],
             "time_limit_minutes": wall_minutes,
             "world_size": 1,
             "local_world_size": 1,
