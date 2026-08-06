@@ -102,6 +102,8 @@ def build(editor: Path) -> None:
 
 def run_player(visual: bool = False) -> None:
     _assert_ignored(OUTPUT_ROOT)
+    if OUTPUT_ROOT.exists():
+        shutil.rmtree(OUTPUT_ROOT)
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
     player = RUN_ROOT / "ReferenceHandQualification.app/Contents/MacOS/Reference Hand Microcell"
     if not player.is_file():

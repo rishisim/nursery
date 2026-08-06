@@ -31,7 +31,11 @@ def test_reference_hand_config_is_pinned_and_bounded():
     assert CONFIG["hand"]["grab_helper_components"] == 0
     assert CONFIG["hand"]["grab_helper_object_instances"] == 0
     assert CONFIG["qualification"]["controllable_dof_count"] == 20
+    assert CONFIG["qualification"]["controllable_pass_count"] == 20
     assert CONFIG["qualification"]["dof_sweep_pass_count"] == 20
+    assert CONFIG["qualification"]["max_visible_registration_error_m"] == 0.04622013
+    assert CONFIG["qualification"]["active_right_hand_renderer_count"] == 0
+    assert CONFIG["qualification"]["right_hand_binder_count"] == 1
     assert CONFIG["physical_execution"]["attempts_consumed"] == 0
 
 
@@ -44,6 +48,13 @@ def test_reference_hand_source_contains_no_object_assistance_operations():
     assert "MovePosition(" not in SOURCE
     assert "MoveRotation(" not in SOURCE
     assert "TeleportRoot" not in SOURCE
+    assert "dof_start_indices[ArticulationBody.index]" in SOURCE
+    assert "axisIndex < 0 || axisIndex > 1" in SOURCE
+    assert "SweepRampSteps" in SOURCE
+    assert "steady_state" in SOURCE
+    assert "post_step_articulation_capsule_fk" in SOURCE
+    assert "CurrentFixedFrame" not in SOURCE
+    assert "slerpDrive" not in SOURCE
     assert "provider.EmitFixedFrame(command);" in SOURCE
     assert "Physics.Simulate(Dt);" in SOURCE
 
@@ -53,6 +64,8 @@ def test_reference_hand_decision_stops_downstream_work_after_two_failures():
     assert "HAND-QUALIFICATION NO-GO" in decision
     assert "eligible physical attempts consumed: 0" in decision
     assert "no ContactPose seed was consumed" in decision
+    assert "zero active right-hand renderers" in decision
+    assert "ArticulationBody has no `slerpDrive`" in decision
 
 
 def test_support_and_release_definitions_require_measured_events():
@@ -67,4 +80,5 @@ def test_fresh_checkout_runner_stages_tracked_sources_into_ignored_project():
     assert "shutil.copy2(SOURCE_ROOT / name" in RUNNER
     assert "ReferenceHandQualification.cs" in RUNNER
     assert "ReferenceHandMicrocellBuilder.cs" in RUNNER
+    assert "shutil.rmtree(OUTPUT_ROOT)" in RUNNER
     assert "runs/embodied_simulation/reference_hand_microcell/project" not in SOURCE

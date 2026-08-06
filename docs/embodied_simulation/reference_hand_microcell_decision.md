@@ -25,6 +25,11 @@ stock manager prefab was not instantiated, and runtime preflight found zero
 `GrabHelper` or `GrabHelperObject` instances. Ultraleap’s documented Physical
 Hands foundation is [here](https://docs.ultraleap.com/xr-and-tabletop/xr/unity/plugin/features/physical-hands.html).
 
+The separate historical ConfigurableJoint recorder correction reports the
+active `slerpDrive` when that discarded controller uses Slerp mode. It is not
+used as evidence here: this donor is an ArticulationBody hand, whose runtime
+evidence is the recorded x/y/z `ArticulationDrive` state above. ArticulationBody has no `slerpDrive` field in this harness.
+
 ## Corrected interpretation of earlier receipts
 
 The old receipts at `receipts/player_run` and `receipts/player_run3` answer only
@@ -52,20 +57,34 @@ was audited at runtime:
 
 - 16 physical ArticulationBody links and 31 total articulation reduced
   coordinates were recorded, including 25 finger coordinates.
-- 20 unlocked finger DOFs were individually swept; all 20 swept ranges passed.
-- Every telemetry row records the body, `dofStartIndex`, joint position,
+- 25 finger coordinates were inventoried; 20 unlocked coordinates were
+  individually swept and all 20 passed. The five spherical-joint Z coordinates
+  (indices 2, 7, 12, 17, and 22) are explicitly recorded as
+  `locked_ineligible`; they are not included in the controllable pass count.
+- Each sweep uses the declared Articulation axis: x/flexion uses the local
+  physical x axis, y/abduction uses local y, and locked z sends no perturbation.
+  Active drive target ranges were approximately 22.918 degrees with off-axis
+  target deltas below 0.001 degrees. The profile is a frozen ramp/hold/cross
+  sequence whose peak command speed is below the package's 1.75 rad/s bound.
+- Every telemetry row records the body, `dofStartIndex` using the invariant
+  `dof_start_indices[ArticulationBody.index]`, joint position,
   velocity, force, link transform, and x/y/z `ArticulationDrive` target,
   stiffness, damping, limits, and force limit.
-- Physics-derived thumb/index/middle output and GenericHand/contact-site
-  landmarks were recorded at 240 Hz with 30 Hz diagnostic frames.
-- The visible landmark registration error was zero for the explicit
-  physics-derived adapter; this is not an independent animation pass and is
-  not used to override the failed fingertip tracking result.
+- The post-step output is independently reconstructed from the physical
+  capsule endpoints using the package's `ToWorldSpaceCapsule` convention; the
+  pre-sim `CurrentFixedFrame` is not treated as post-step truth. Capsule/FK
+  agreement was 0.0 m, while commanded-to-post-step fingertip tracking reached
+  47.567 mm in steady-state rows against the frozen 8 mm tolerance.
+- The complete package visual route was exercised through the right
+  `HandBinder`, with the left root disabled. Preflight found one right binder
+  but zero active right-hand renderers, and measured named-landmark registration
+  reached 46.220 mm. Therefore visual registration is a failing measured gate,
+  not a copied-transform zero.
 - Active-phase reset/ghost ledger count was zero; palm command speed was zero
   and bounded.
-- The frozen fingertip tracking tolerance was `0.008 m`. The maximum
-  physics-derived fingertip tracking error was `0.05772646 m`, dominated by
-  the thumb, so stable thumb/index/middle tracking did not qualify.
+- The frozen fingertip tracking tolerance was `0.008 m`. The repaired run's
+  maximum steady-state error was `0.04756707 m`, and the all-row maximum was
+  `0.04873600 m`, so stable thumb/index/middle tracking did not qualify.
 
 This is a bounded **hand-qualification** failure after ordinary source,
 package, axis, clock, and telemetry integration repair. No target was present
@@ -76,15 +95,16 @@ and no grasp execution was started.
 The qualification produced an actual Unity diagnostic video and dense PNG
 frames, all ignored under the run root:
 
-- `qualification/dof_sweep_diagnostic.mp4`: 1920x1080, 30 fps, 336 frames,
-  11.2 s; verified with `ffprobe` and complete frame decoding.
-- `qualification/frames/`: 336 dense Unity frames.
+- `qualification/dof_sweep_diagnostic.mp4`: 1920x1080, 30 fps, 1536 frames,
+  51.2 s; verified with `ffprobe` and complete frame decoding.
+- `qualification/frames/`: 1536 dense Unity frames.
 - `qualification/dof_manifest.json`, `trace.json`, `qualification_metrics.json`,
   and `reset_ledger.json` contain the corresponding runtime truth.
 
-The video is failure evidence: the visible package hand/contact-site overlay
-does not establish the frozen fingertip tracking tolerance, and no grasp or
-target is shown.
+The video is failure evidence: it shows the commanded/physical markers and
+telemetry overlay, but no active right-hand renderers (only the diagnostic
+markers are visible). The full HandBinder route therefore did not produce a
+readable anatomical hand, and no grasp or target is shown.
 
 ## Ordered stop
 
@@ -96,10 +116,11 @@ Because object-free hand qualification failed, the ordered gate stops here:
 - no eligible physical attempt was consumed;
 - no target shapes, lift, release, or downstream child/POV integration were run.
 
-The next authorized repair must address the verified thumb/index/middle
-physics-output registration and coordinate convention, then rerun this same
-object-free qualification harness. It must not proceed to a grasp until the
-frozen tolerances and visual/contact-site registration pass.
+The bounded repair cycle ends here. A future authorized task would need to
+repair the package visual activation/registration and the thumb/index/middle
+post-step tracking convention, then rerun this same object-free qualification
+harness. It must not proceed to a grasp until the frozen tolerances and
+visual/contact-site registration pass.
 
 No restricted ChildLens media, external drive, child-trained prior, age-matched
 asset, human validation, or licensed MANO bundle was accessed.
