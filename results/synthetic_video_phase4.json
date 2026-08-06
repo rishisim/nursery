@@ -1,13 +1,13 @@
 {
   "schema_version": 26,
   "phase": 4,
-  "status": "CORRECTED_COMMON_ASSETS_PASS_PRIOR_PUBLIC_NO_GO_PRESERVED_PUBLIC_ONLY_READINESS_VAST_L4_RESOURCE_FROZEN",
+  "status": "CORRECTED_COMMON_ASSETS_PASS_PRIOR_PUBLIC_NO_GO_PRESERVED_PUBLIC_ONLY_READINESS_RESOURCE_BLOCKER",
   "scientifically_accepted": true,
   "claim_scope": "corrected_common_evaluation_assets_only_not_confirmatory_phase5_readiness",
   "signed_by_role": "authorized_applicant_technical_lead",
   "signed_on": "2026-08-01",
   "public_only_calibration_readiness": {
-    "status": "VAST_L4_RESOURCE_FROZEN_BEFORE_INSTANCE_OR_NEW_MODEL_OUTCOME",
+    "status": "RESOURCE_BLOCKER_VAST_STAGING_CAP_EXHAUSTED_BEFORE_MODEL_OR_SCIENTIFIC_METRICS",
     "effective_on": "2026-08-06",
     "amendment_commitment_sha256": "03bbf64749b0302a16e97f9b999674e287b7f4fa801df905d09b72ea9c39eeae",
     "prior_terminal_result_commitment_sha256": "42338302949e27e0ed7c3f6e8a5f70e10bb380a5e8158378e89f5ff87c350e9d",
@@ -77,6 +77,13 @@
     "vast_total_instance_wall_minutes_max": 65,
     "vast_transient_disk_GiB": 80,
     "vast_direct_monetary_cost_USD_max": 0.4,
+    "vast_instance_id": 47010535,
+    "vast_staged_partial_bytes": 9199918714,
+    "vast_required_public_input_bytes": 64246311665,
+    "vast_staging_wall_minutes_max": 25,
+    "vast_instance_destroyed": true,
+    "vast_observed_direct_monetary_cost_USD": 0.17400000000000002,
+    "vast_staging_blocker_result_commitment_sha256": "d3d38a652641d9589c022201a25212214c11bb61d78302d121f49855777284c2",
     "new_model_outcome_count_after_repair_freeze": 0,
     "model_inference_executed": false,
     "scientific_metric_count": 0,
@@ -2251,5 +2258,5 @@
     "perceptual-hash and public-embedding near-duplicate checks are diagnostic; exact source/session-time/content overlap is blocking",
     "the authorized one-seed real-only proof is exploratory and cannot establish confirmatory Phase 5 readiness"
   ],
-  "next_authorized_scope": "PUBLIC_ONLY_VAST_L4_METRIC_WITHHELD_MICROHEALTH_THEN_CONDITIONAL_DEVELOPMENT_AND_HOLDOUT; GOVERNED_C_LTX_GENERATION_SYNTHETIC_CORPUS_AND_LEARNER_EXECUTION_REMAIN_UNAUTHORIZED"
+  "next_authorized_scope": "NONE_UNDER_THE_FROZEN_VAST_ROUTE_AFTER_THE_25_MINUTE_PUBLIC_INPUT_STAGING_CAP_WAS_EXHAUSTED; A_NEW_PROSPECTIVE_RESOURCE_AMENDMENT_IS_REQUIRED; GOVERNED_C_LTX_GENERATION_SYNTHETIC_CORPUS_AND_LEARNER_EXECUTION_REMAIN_UNAUTHORIZED"
 }

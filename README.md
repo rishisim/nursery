@@ -848,3 +848,11 @@ disk, the same five/15/15-minute scientific stage caps, at most 65 total
 instance minutes, and USD 0.40. This changes only public-only staging and
 compute; every scientific input, threshold, metric, fixture, seed, and gate is
 unchanged.
+
+The one Vast instance then exhausted the frozen 25-minute input-staging cap
+after transferring 9,199,918,714 of 64,246,311,665 public-only bytes. The
+canonical wrapper never started, no model ran, and development, holdout, and
+all scientific metrics remained unopened. The instance was destroyed; the
+observed provider charge was USD 0.174, within the USD 0.40 ceiling. Commitment
+`d3d38a65…84c2` seals an exact resource-ceiling blocker, not a scientific
+no-go. Resuming or widening staging requires a new prospective authorization.

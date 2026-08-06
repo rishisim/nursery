@@ -122,7 +122,7 @@ def test_phase4_preregistration_preserves_frozen_contract() -> None:
     assert config["schema_version"] == 29
     assert config["status"] == (
         "PHASE4_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_"
-        "VAST_L4_RESOURCE_FROZEN"
+        "ENGINEERING_BLOCKER"
     )
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
@@ -660,6 +660,16 @@ def test_one_hour_coverage_redesign_is_exploratory_and_exact_schedule() -> None:
     )
     assert vast["provider"] == "VAST_AI"
     assert vast["selected_offer_id"] == 45699409
+    blocker = dict(
+        config["public_only_calibration_readiness_vast_staging_blocker_result"]
+    )
+    blocker_commitment = blocker.pop("result_commitment_sha256")
+    assert blocker_commitment == canonical_json_sha256(blocker)
+    assert blocker_commitment == (
+        "d3d38a652641d9589c022201a25212214c11bb61d78302d121f49855777284c2"
+    )
+    assert blocker["scientific_metric_count"] == 0
+    assert blocker["instance_destroyed"] is True
     health = dict(config["learner_effective_engineering_health_amendment"])
     health_commitment = health.pop("amendment_commitment_sha256")
     assert health_commitment == canonical_json_sha256(health)

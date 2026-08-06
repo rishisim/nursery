@@ -2483,3 +2483,12 @@ instance cap is 65 minutes and USD 0.40. Only the already validated public
 inputs may be staged; ChildLens, BabyView, governed material, and derivatives
 remain prohibited. Models, fixtures, partitions, thresholds, metrics, seeds,
 and readiness gates do not change.
+
+The sole Vast instance reached the frozen 25-minute input-staging ceiling after
+9,199,918,714 of 64,246,311,665 public-only bytes and five files had arrived.
+Transfer stopped before the canonical wrapper, model inference, development,
+holdout, or any scientific metric. The instance was destroyed and the observed
+charge was USD 0.174, below the USD 0.40 ceiling. Result commitment
+`d3d38a65…84c2` classifies this as an exact frozen resource-ceiling blocker,
+not a scientific no-go. No partial transfer may be resumed and no cap may be
+widened under this route without a new prospective resource amendment.
