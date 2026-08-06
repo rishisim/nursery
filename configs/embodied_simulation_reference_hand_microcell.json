@@ -1,0 +1,97 @@
+{
+  "schema": "embodied.reference_hand_microcell.config.v1",
+  "lineage_origin_commit": "3e9d2d92492d29b77ca3a2d068cd7be63633b25f",
+  "decision_question": "Can the maintained, reference-backed Ultraleap Hard Contact hand execute one genuinely unassisted dexterous tabletop grasp in Unity PhysX on this Apple-Silicon host?",
+  "scope": "public_synthetic_engineering_qualification_only",
+  "package": {
+    "name": "com.ultraleap.tracking",
+    "version": "7.3.0",
+    "repository": "https://github.com/ultraleap/UnityPlugin.git",
+    "commit": "833d82e7333a5f37ebc0844d02431acf74f35d24",
+    "source_tree": "7827b020cec370320a8eeec1dd70fe4cbc91f7a8",
+    "license": "Apache-2.0",
+    "license_sha256": "4efb6259472a49061bc4ee94319e4d5360d7226d61821c7d5401f40eaad1283b",
+    "package_json_sha256": "58fe9f0a9fb5569c7f12147c3a47d684f1f183ce2c4d64f3c7a371a590f6e92d",
+    "archive_sha256": "ace19aab2578fd7d5d6674e9181a1bfcd2bc380dd38b8a47035b129ee41d1775",
+    "source_checkout": ".external/ultraleap-unityplugin-7.3.0",
+    "source_archive": ".external/archives/ultraleap-unityplugin-833d82e.tar.gz",
+    "artifact_root": ".external/ultraleap-unityplugin-7.3.0-artifact",
+    "libLeapC_sha256": "b1c559de2f78b985eb2779cccb508339bfd3f6118f9f80333d18193e9fede271",
+    "GenericHand_fbx_sha256": "47abe80be2bc2ff6ad8012749dec03620ced45d479592bc901bba0b679125853"
+  },
+  "unity": {
+    "editor": "6000.0.80f1",
+    "platform": "StandaloneOSX ARM64/Metal",
+    "project_root": "runs/embodied_simulation/reference_hand_microcell/project",
+    "build_command": "Unity -batchmode -nographics -quit -projectPath runs/embodied_simulation/reference_hand_microcell/project -executeMethod ReferenceHandMicrocell.ReferenceHandMicrocellBuilder.BuildPlayer",
+    "run_command": "REFERENCE_HAND_OUTPUT=runs/embodied_simulation/reference_hand_microcell/receipts/player_run3 runs/embodied_simulation/reference_hand_microcell/ReferenceHandMicrocell.app/Contents/MacOS/ReferenceHandMicrocell -batchmode -nographics"
+  },
+  "hardware": {
+    "model": "MacBook Pro Mac17,2",
+    "chip": "Apple M5",
+    "memory_gb": 32,
+    "os": "macOS (Apple Silicon)"
+  },
+  "clock": {
+    "physics_hz": 240,
+    "render_hz": 30,
+    "steps_per_render_frame": 8,
+    "mapping": "FixedUpdate command -> assigned SyntheticLeapProvider fixed event -> Physics.Simulate(1/240) -> post-step record",
+    "independent_animation_timeline": false,
+    "independent_device_or_service_clock": false
+  },
+  "hand": {
+    "manager": "Leap.PhysicalHands.PhysicalHandsManager",
+    "contact_parent": "Leap.PhysicalHands.HardContactParent",
+    "provider": "ReferenceHandMicrocell.SyntheticLeapProvider",
+    "provider_explicitly_assigned": true,
+    "grab_helper_components": 0,
+    "grab_helper_object_instances": 0,
+    "package_grab_flags_are_evidence": false,
+    "bounded_defaults": {
+      "max_palm_velocity_m_s": 1.0,
+      "min_finger_velocity_m_s": 0.1,
+      "max_finger_velocity_m_s": 0.8,
+      "teleport_distance_m": 0.035,
+      "bone_mass_kg": 0.025,
+      "bone_stiffness": 80.0,
+      "bone_damping": 3.0
+    }
+  },
+  "target": {
+    "shape": "analytic_box",
+    "mass_kg": 0.04,
+    "free_non_kinematic_rigidbody": true,
+    "gravity": true,
+    "post_initialization_pose_writes": 0,
+    "post_initialization_velocity_writes": 0,
+    "external_force_or_torque_writes": 0,
+    "parenting_or_joint_assistance": 0
+  },
+  "qualification": {
+    "point_contact_source": "Unity Physics.ContactEvent ContactPairPoint.impulse",
+    "point_impulses_are_pair_aggregated": false,
+    "required_digits": ["thumb", "index", "middle"],
+    "minimum_simultaneous_support_s": 0.30,
+    "minimum_unsupported_lift_m": 0.10,
+    "opening_required": true,
+    "free_release_and_settling_required": true,
+    "target_authority_violation": false,
+    "assistance_ledger": []
+  },
+  "attempts": {
+    "maximum_physical_attempts": 2,
+    "attempt_1": "runs/embodied_simulation/reference_hand_microcell/receipts/player_run",
+    "attempt_2": "runs/embodied_simulation/reference_hand_microcell/receipts/player_run3",
+    "bounded_repair": "one wrist/hand vertical alignment change from palm y=0.98 m to y=0.86 m; no object/controller assistance",
+    "result": "NO-GO"
+  },
+  "downstream_artifacts_not_generated": [
+    "object-free DOF sweep and active ArticulationBody per-DOF qualification report",
+    "frozen ContactPose-derived static grasp goal and optimizer receipt",
+    "nominal 1080p Unity microcell video",
+    "clean/collider overlay video and dense ffmpeg frame set",
+    "plots for qualified contacts, lift, and release",
+    "two-additional-shape generalization runs"
+  ]
+}

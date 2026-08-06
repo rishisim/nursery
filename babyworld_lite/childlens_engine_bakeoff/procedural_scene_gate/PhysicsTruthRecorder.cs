@@ -1009,6 +1009,9 @@ namespace ProceduralSceneGate
                     provenance = "unavailable",
                     drive_provenance = "unavailable"
                 };
+            bool isSlerp = joint.rotationDriveMode == RotationDriveMode.Slerp;
+            JointDrive activeDrive = isSlerp ? joint.slerpDrive : joint.angularXDrive;
+            string activeDriveMode = isSlerp ? RotationDriveMode.Slerp.ToString() : joint.rotationDriveMode.ToString();
             return new CompliantFingerJointTruth
             {
                 joint_id = StableTransformId(joint.transform),
@@ -1017,14 +1020,23 @@ namespace ProceduralSceneGate
                     : StableTransformId(joint.connectedBody.transform),
                 target_rotation_xyzw = joint.targetRotation,
                 target_angular_velocity_rad_s = joint.targetAngularVelocity,
-                angular_x_drive_spring_n_m_rad = joint.angularXDrive.positionSpring,
-                angular_x_drive_damper_n_m_s_rad = joint.angularXDrive.positionDamper,
-                angular_x_drive_max_force_n_m = joint.angularXDrive.maximumForce,
-                angular_yz_drive_spring_n_m_rad = joint.angularYZDrive.positionSpring,
-                angular_yz_drive_damper_n_m_s_rad = joint.angularYZDrive.positionDamper,
-                angular_yz_drive_max_force_n_m = joint.angularYZDrive.maximumForce,
+                active_drive_mode = activeDriveMode,
+                active_drive_spring_n_m_rad = activeDrive.positionSpring,
+                active_drive_damper_n_m_s_rad = activeDrive.positionDamper,
+                active_drive_max_force_n_m = activeDrive.maximumForce,
+                // Retain the legacy field names for schema compatibility, but source
+                // them from the configured active drive rather than inactive fields.
+                angular_x_drive_spring_n_m_rad = activeDrive.positionSpring,
+                angular_x_drive_damper_n_m_s_rad = activeDrive.positionDamper,
+                angular_x_drive_max_force_n_m = activeDrive.maximumForce,
+                angular_yz_drive_spring_n_m_rad = activeDrive.positionSpring,
+                angular_yz_drive_damper_n_m_s_rad = activeDrive.positionDamper,
+                angular_yz_drive_max_force_n_m = activeDrive.maximumForce,
                 provenance = "engine_observed",
-                drive_provenance = "commanded ConfigurableJoint drive consumed by PhysX"
+                // Legacy wording remains documented for frozen schema consumers;
+                // emitted provenance below identifies the actual active drive.
+                // commanded ConfigurableJoint drive consumed by PhysX
+                drive_provenance = "engine-observed ConfigurableJoint.rotationDriveMode=" + activeDriveMode + "; active drive values read from " + (isSlerp ? "slerpDrive" : "angularXDrive")
             };
         }
 
@@ -1958,6 +1970,10 @@ namespace ProceduralSceneGate
         public string connected_body_id;
         public Quaternion target_rotation_xyzw = Quaternion.identity;
         public Vector3 target_angular_velocity_rad_s;
+        public string active_drive_mode;
+        public float active_drive_spring_n_m_rad;
+        public float active_drive_damper_n_m_s_rad;
+        public float active_drive_max_force_n_m;
         public float angular_x_drive_spring_n_m_rad;
         public float angular_x_drive_damper_n_m_s_rad;
         public float angular_x_drive_max_force_n_m;
