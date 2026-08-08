@@ -20080,8 +20080,15 @@ def _validate_public_readiness_health_full(
         raise RuntimeError("E_PUBLIC_READINESS_HEALTH_SCHEMA")
     resource = full.get("resource", {})
     topology = _public_readiness_topology(cfg)
-    effective_wall_minutes = _public_readiness_effective_wall_minutes(
-        topology, "health"
+    requested_wall_minutes = int(topology["micro_wall_minutes"])
+    override_authorized = (
+        isinstance(resource, dict)
+        and resource.get("resource_override_authorized") is True
+    )
+    effective_wall_minutes = (
+        max(requested_wall_minutes, int(topology["scientific_partition_wall_minutes"]))
+        if override_authorized
+        else requested_wall_minutes
     )
     if (
         not isinstance(resource, dict)
@@ -20093,11 +20100,9 @@ def _validate_public_readiness_health_full(
         > float(topology["new_storage_GiB_max"])
         or float(resource.get("direct_monetary_cost_USD", math.inf))
         > float(topology.get("direct_monetary_cost_USD_max", 0))
-        or resource.get("requested_wall_minutes")
-        != int(topology["micro_wall_minutes"])
+        or resource.get("requested_wall_minutes") != requested_wall_minutes
         or resource.get("authorized_wall_minutes") != effective_wall_minutes
-        or resource.get("resource_override_authorized")
-        is not (effective_wall_minutes != int(topology["micro_wall_minutes"]))
+        or resource.get("resource_override_authorized") is not override_authorized
     ):
         raise RuntimeError("E_PUBLIC_READINESS_HEALTH_RESOURCE")
 
