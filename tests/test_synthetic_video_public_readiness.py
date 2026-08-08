@@ -6,6 +6,7 @@ import inspect
 import json
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from nursery_egobaby_preflight.contract import compact_aggregate_json
@@ -346,6 +347,64 @@ def test_readiness_attribute_metrics_cover_all_families_and_semantics() -> None:
     rows[0]["pe_label"] = MODULE.READINESS_ATTRIBUTE_PAIRS["color"][1]
     degraded = MODULE._readiness_attribute_metrics(rows, 0.1, 1.0, mask)
     assert MODULE._readiness_attribute_gate_pass(degraded, gate) is False
+
+
+def test_attribute_truth_uses_actual_adapter_sample_frame(tmp_path: Path) -> None:
+    config = _config()
+    fps = config["calibration_C"]["extractor"][
+        "mechanistic_training_tuple_fixture_preparation_amendment"
+    ]["referent_attribute_rendering"]["geometry"]["fps"]
+    sample_time = 1.0
+    masks = np.zeros((32, 4, 4), dtype=np.uint8)
+    masks[round(sample_time * fps)] = 1
+    archive = tmp_path / "truth.npz"
+    np.savez_compressed(archive, target_mask=masks)
+
+    row = {
+        "fixture_ordinal": 0,
+        "category": "cup",
+        "mask_relative_path": archive.name,
+        "mask_sha256": MODULE.file_digest(archive),
+        "mask_bytes": archive.stat().st_size,
+        "truth": {"sampled_mask_truth": []},
+    }
+    predicted = np.ones((4, 4), dtype=bool)
+    tracks = [
+        {
+            "fixture_ordinal": 0,
+            "adapter_observation": {"status": "ACCEPT"},
+            "samples": [
+                {
+                    "phase": "during",
+                    "sample_time": sample_time,
+                    "candidates": [
+                        {
+                            "category": "cup",
+                            "box_score": 1.0,
+                            "text_score": 1.0,
+                            "box": [0.0, 0.0, 1.0, 1.0],
+                            "center_distance": 0.0,
+                            "valid": True,
+                            "mask": predicted,
+                        }
+                    ],
+                }
+            ],
+        }
+    ]
+    context = {
+        "cfg": config,
+        "fixture_root": tmp_path,
+        "rows": {"referent_attribute": [row]},
+    }
+
+    metrics = MODULE._readiness_attribute_mask_metrics(
+        context, tracks, box=0.2, text=0.15
+    )
+
+    assert metrics["positive_sample_count"] == 1
+    assert metrics["predicted_mask_coverage"] == 1.0
+    assert metrics["median_predicted_mask_IoU"] == 1.0
 
 
 def test_attribute_executes_after_independent_referent_no_go(tmp_path: Path) -> None:

@@ -14811,12 +14811,21 @@ def _readiness_attribute_mask_metrics(
     context: dict[str, Any], tracks: list[dict[str, Any]], box: float, text: float
 ) -> dict[str, Any]:
     import numpy as np
-    from PIL import Image
 
     rows = {
         int(row["fixture_ordinal"]): row
         for row in context["rows"]["referent_attribute"]
     }
+    definitions = _tuple_axis(
+        context["cfg"],
+        "utterance_centered_referent_visibility_dominance_ambiguity",
+    )["definitions"]
+    visible_floor = float(definitions["visible_mask_fraction_min"])
+    geometry = _tuple_fixture_preparation_amendment(context["cfg"])[
+        "referent_attribute_rendering"
+    ]["geometry"]
+    fps = int(geometry["fps"])
+    target_masks_by_ordinal: dict[int, Any] = {}
     positive_count = measured_count = negative_count = negative_correct = 0
     invalid_mask_count = 0
     ious: list[float] = []
@@ -14825,22 +14834,43 @@ def _readiness_attribute_mask_metrics(
         "Grounding_DINO_text_score": float(text),
     }
     for track in tracks:
-        row = rows[int(track["fixture_ordinal"])]
+        ordinal = int(track["fixture_ordinal"])
+        row = rows[ordinal]
         if track["adapter_observation"].get("status") != "ACCEPT":
             continue
-        truth_by_key = {
-            (str(sample["phase"]), round(float(sample["sample_time"]), 6)): sample
-            for sample in row["truth"]["sampled_mask_truth"]
-        }
+        if ordinal not in target_masks_by_ordinal:
+            mask_path = _tuple_fixture_file(
+                context["fixture_root"],
+                row["mask_relative_path"],
+                row["mask_sha256"],
+                row.get("mask_bytes"),
+            )
+            with np.load(mask_path, allow_pickle=False) as archive:
+                if "target_mask" not in archive:
+                    raise RuntimeError("E_PUBLIC_READINESS_ATTRIBUTE_TRUTH_MASK")
+                masks = np.asarray(archive["target_mask"])
+            if (
+                masks.ndim != 3
+                or masks.shape[0] < 1
+                or not np.isfinite(masks).all()
+                or not set(int(value) for value in np.unique(masks)) <= {0, 1}
+            ):
+                raise RuntimeError("E_PUBLIC_READINESS_ATTRIBUTE_TRUTH_MASK")
+            target_masks_by_ordinal[ordinal] = masks.astype(bool, copy=False)
+        target_masks = target_masks_by_ordinal[ordinal]
         for sample in track["samples"]:
-            key = (str(sample["phase"]), round(float(sample["sample_time"]), 6))
-            truth = truth_by_key.get(key)
-            if truth is None:
+            sample_time = float(sample.get("sample_time", math.nan))
+            if not math.isfinite(sample_time) or sample_time < 0.0:
                 raise RuntimeError("E_PUBLIC_READINESS_ATTRIBUTE_TRUTH_ALIGNMENT")
+            frame_index = min(
+                target_masks.shape[0] - 1,
+                max(0, int(round(sample_time * fps))),
+            )
+            expected_mask = target_masks[frame_index]
             candidate = _tuple_attribute_target_candidate(
                 sample, str(row["category"]), thresholds
             )
-            expected_positive = bool(truth["target_visible"])
+            expected_positive = float(expected_mask.mean()) >= visible_floor
             if expected_positive:
                 positive_count += 1
                 if candidate is None:
@@ -14848,14 +14878,6 @@ def _readiness_attribute_mask_metrics(
                 if candidate.get("valid") is not True or candidate.get("mask") is None:
                     invalid_mask_count += 1
                     continue
-                truth_path = _tuple_fixture_file(
-                    context["fixture_root"],
-                    truth["target_mask_relative_path"],
-                    truth["target_mask_sha256"],
-                    truth["target_mask_bytes"],
-                )
-                with Image.open(truth_path) as source:
-                    expected_mask = np.asarray(source.convert("L")) > 0
                 predicted_mask = np.asarray(candidate["mask"], dtype=bool)
                 if predicted_mask.shape != expected_mask.shape or not predicted_mask.any():
                     invalid_mask_count += 1
