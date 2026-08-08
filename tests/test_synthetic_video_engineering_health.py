@@ -88,6 +88,18 @@ def test_git_free_clean_tree_attestation_detects_modified_or_untracked_source(
     )
     MODULE._tuple_health_verify_git_tree(repository, commit, attestation)
 
+    index_digest = MODULE.file_digest(index)
+    monkeypatch.setattr(MODULE.shutil, "which", lambda _name: "/usr/bin/git")
+    monkeypatch.setattr(
+        MODULE.subprocess,
+        "run",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            AssertionError("attested verification must not invoke Git")
+        ),
+    )
+    MODULE._tuple_health_verify_git_tree(repository, commit, attestation)
+    assert MODULE.file_digest(index) == index_digest
+
     tracked.write_text("VALUE = 2\n")
     with pytest.raises(
         RuntimeError, match="E_TUPLE_HEALTH_CODE_TREE_ATTESTATION"

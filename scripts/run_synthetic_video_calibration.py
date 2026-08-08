@@ -16497,7 +16497,12 @@ def _tuple_health_verify_git_tree(
         "tree_commitment_sha256",
         "host_unexpected_status_count",
     }
-    _verify_repository_commit(root, expected_commit)
+    # A Git diff can refresh the index stat cache.  When a host-side immutable
+    # index/tree attestation is available, verify HEAD from repository files so
+    # the act of verification cannot change the bytes being attested.
+    _verify_repository_commit(
+        root, expected_commit, filesystem_only=attestation is not None
+    )
     git = shutil.which("git")
     if attestation is None:
         if git is None:
@@ -16554,30 +16559,6 @@ def _tuple_health_verify_git_tree(
         }
     ):
         raise RuntimeError("E_TUPLE_HEALTH_CODE_TREE_ATTESTATION")
-    if git is not None:
-        completed = subprocess.run(
-            [
-                git,
-                "-C",
-                str(root),
-                "status",
-                "--porcelain",
-                "--untracked-files=all",
-            ],
-            text=True,
-            capture_output=True,
-            check=True,
-        )
-        unexpected = []
-        for line in completed.stdout.splitlines():
-            path = line[3:]
-            if "__pycache__/" in path or path.endswith(".pyc"):
-                continue
-            unexpected.append(line)
-        if unexpected:
-            raise RuntimeError("E_TUPLE_HEALTH_CODE_TREE_DIRTY")
-
-
 def _tuple_health_configuration_preflight(cfg: dict[str, Any]) -> str:
     """Validate every module-facing frozen field before any model is loaded."""
 
@@ -27121,8 +27102,10 @@ def _verify_activity_dependency_manifest(
     return value
 
 
-def _verify_repository_commit(path: Path, expected: str) -> None:
-    git = shutil.which("git")
+def _verify_repository_commit(
+    path: Path, expected: str, *, filesystem_only: bool = False
+) -> None:
+    git = None if filesystem_only else shutil.which("git")
     if git is not None:
         completed = subprocess.run(
             [git, "-C", str(path), "rev-parse", "HEAD"],
