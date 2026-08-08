@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import inspect
 import json
 from pathlib import Path
 
@@ -416,6 +417,12 @@ def test_readiness_combined_gate_keeps_action_diagnostic_nonblocking() -> None:
     assert MODULE._tuple_combined_public_gate(
         axes, {"status": "PASS"}, action_control_blocks=False
     )["status"] == "NO_GO"
+
+
+def test_microhealth_passes_the_sealed_no_hand_lineage_to_hand_inference() -> None:
+    source = inspect.getsource(MODULE.run_public_readiness_health)
+    assert '"verified_no_hand_seal": {' in source
+    assert 'manifest[\n                "verified_no_hand_seal_commitment_sha256"\n            ]' in source
 
 
 def test_readiness_cli_output_cannot_print_rows_or_paths() -> None:

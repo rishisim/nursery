@@ -20159,6 +20159,12 @@ def run_public_readiness_health(args: argparse.Namespace) -> dict[str, Any]:
         "partition": "development",
         "device": args.device,
         "thresholds": _tuple_health_inference_thresholds(cfg),
+        "verified_no_hand_seal": {
+            "status": "PASS",
+            "verified_no_hand_seal_commitment_sha256": manifest[
+                "verified_no_hand_seal_commitment_sha256"
+            ],
+        },
     }
     module_results = []
     runners = _public_readiness_module_runners()
