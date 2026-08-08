@@ -344,17 +344,17 @@
     "failure_count": 0,
     "external_call_count": 0,
     "unaccounted_failure_count": 0,
-    "wall_minutes": 5.464703955998023,
-    "GPU_hours": 0.09107839926663372,
-    "new_storage_GiB": 0.00036362744867801666,
+    "wall_minutes": 4.956532485441615,
+    "GPU_hours": 0.08260887475736026,
+    "new_storage_GiB": 0.0005979184061288834,
     "direct_monetary_cost_USD": 0.0,
     "public_fixture_manifest_commitment_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
     "readiness_fixture_commitment_sha256": "2b30f892ee327e2a1e39e35e41fec7a1e60adeef9b3df4c4c594e8eab45e1b1b",
     "topology_commitment_sha256": "13d171f6af241bb4c2235e1d71224ba37b7d834cfa7229549307108f2289186f",
-    "runner_commitment_sha256": "e27cc2f13689a839af1716f19bde22811a96b7924605a8f48219fb0aa17cefb9",
+    "runner_commitment_sha256": "7884c9ce2c2660c18e61ec6cbbf41256c6793971de9fde3961b908ceec71fd9e",
     "dependency_config_commitment_sha256": "26e695a59923e0141ca06716c121909459d7259bf1375b32a5300212097c01df",
     "microfixture_manifest_commitment_sha256": "d133bfba1da833ffe01d1186537b772f1a6c431cb03c4d6b4a74750b6c82f188",
-    "engineering_health_commitment_sha256": "c1553c5212a2cfa205d768c0734b06c983ccdb709959c15c31d8d16acd3db7b2"
+    "engineering_health_commitment_sha256": "716772dfa566f79ec38d12fb6c7c993b5e17973dcac0dd87ea60616440bd3d84"
   },
   "public_only_calibration_readiness_topology": {
     "status": "FROZEN_PROVIDER_RESOURCE_ONLY_BEFORE_MODEL_OUTCOMES",

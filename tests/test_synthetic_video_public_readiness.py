@@ -214,7 +214,7 @@ def test_public_readiness_engineering_health_pass_is_sealed() -> None:
     assert result["failed_module_count"] == 0
     assert result["scientific_metric_count"] == 0
     assert result["engineering_health_commitment_sha256"] == (
-        "c1553c5212a2cfa205d768c0734b06c983ccdb709959c15c31d8d16acd3db7b2"
+        "716772dfa566f79ec38d12fb6c7c993b5e17973dcac0dd87ea60616440bd3d84"
     )
 
 
