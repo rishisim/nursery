@@ -113,6 +113,17 @@ def test_rented_topology_attestation_uses_semantic_provider_contract(
     with pytest.raises(RuntimeError, match="E_PUBLIC_READINESS_TOPOLOGY_ATTESTATION"):
         MODULE._public_readiness_attestation(path, config, "health")
 
+    monkeypatch.setenv(
+        "PHASE4_PUBLIC_RESOURCE_OVERRIDE", "USER_AUTHORIZED_RESOURCE_ONLY"
+    )
+    attestation["GPU_count"] = 1
+    attestation["time_limit_minutes"] = 15
+    path.write_text(json.dumps(attestation, sort_keys=True, separators=(",", ":")))
+    path.chmod(0o600)
+    assert MODULE._public_readiness_attestation(path, config, "health") == (
+        MODULE.file_digest(path)
+    )
+
 
 def test_public_readiness_scheduler_redirect_is_resource_only_and_committed() -> None:
     config = _config()
@@ -462,6 +473,7 @@ def test_wrapper_has_readiness_blocking_job_contract_without_poll_loop() -> None
     assert 'ln -s "$public_input_root/source" "$merged_public_root/source"' in wrapper
     assert 'ln -s "$public_output_root" "$merged_public_root/runs"' in wrapper
     assert 'find "$public_input_root" ! -type l -perm /222 -print -quit' in wrapper
+    assert "USER_AUTHORIZED_RESOURCE_ONLY" in wrapper
     assert '"$public_output_root" != "$public_input_root/"*' in wrapper
     assert "ChildLens" not in wrapper
     assert "BabyView" not in wrapper

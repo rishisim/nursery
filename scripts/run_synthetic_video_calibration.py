@@ -19686,6 +19686,23 @@ def _public_readiness_execution_commitment(cfg: dict[str, Any]) -> str:
     )
 
 
+def _public_readiness_effective_wall_minutes(
+    topology: dict[str, Any], run_mode: str
+) -> int:
+    wall_minutes = int(
+        topology["micro_wall_minutes"]
+        if run_mode == "health"
+        else topology["scientific_partition_wall_minutes"]
+    )
+    if (
+        run_mode == "health"
+        and os.environ.get("PHASE4_PUBLIC_RESOURCE_OVERRIDE")
+        == "USER_AUTHORIZED_RESOURCE_ONLY"
+    ):
+        return max(wall_minutes, int(topology["scientific_partition_wall_minutes"]))
+    return wall_minutes
+
+
 def _public_readiness_attestation(
     path: Path, cfg: dict[str, Any], run_mode: str
 ) -> str:
@@ -19695,11 +19712,7 @@ def _public_readiness_attestation(
         raise RuntimeError("E_PUBLIC_READINESS_TOPOLOGY_ATTESTATION")
     topology = _public_readiness_topology(cfg)
     rented = _public_readiness_rented_resource_amendment(cfg)
-    wall_minutes = (
-        topology["micro_wall_minutes"]
-        if run_mode == "health"
-        else topology["scientific_partition_wall_minutes"]
-    )
+    wall_minutes = _public_readiness_effective_wall_minutes(topology, run_mode)
     if rented is None:
         job_id = os.environ.get("SLURM_JOB_ID", "")
         if not job_id.isdecimal() or int(job_id) <= 0:
@@ -20067,16 +20080,24 @@ def _validate_public_readiness_health_full(
         raise RuntimeError("E_PUBLIC_READINESS_HEALTH_SCHEMA")
     resource = full.get("resource", {})
     topology = _public_readiness_topology(cfg)
+    effective_wall_minutes = _public_readiness_effective_wall_minutes(
+        topology, "health"
+    )
     if (
         not isinstance(resource, dict)
         or float(resource.get("wall_minutes", math.inf))
-        > float(topology["micro_wall_minutes"])
+        > float(effective_wall_minutes)
         or float(resource.get("GPU_hours", math.inf))
-        > float(topology["micro_wall_minutes"]) / 60.0
+        > float(effective_wall_minutes) / 60.0
         or float(resource.get("new_storage_GiB", math.inf))
         > float(topology["new_storage_GiB_max"])
         or float(resource.get("direct_monetary_cost_USD", math.inf))
         > float(topology.get("direct_monetary_cost_USD_max", 0))
+        or resource.get("requested_wall_minutes")
+        != int(topology["micro_wall_minutes"])
+        or resource.get("authorized_wall_minutes") != effective_wall_minutes
+        or resource.get("resource_override_authorized")
+        is not (effective_wall_minutes != int(topology["micro_wall_minutes"]))
     ):
         raise RuntimeError("E_PUBLIC_READINESS_HEALTH_RESOURCE")
 
@@ -20194,6 +20215,9 @@ def run_public_readiness_health(args: argparse.Namespace) -> dict[str, Any]:
     passed = sum(row["status"] == "PASS_ENGINEERING" for row in module_results)
     failed = len(module_results) - passed
     wall_minutes = (time.monotonic() - started) / 60.0
+    effective_wall_minutes = _public_readiness_effective_wall_minutes(
+        topology, "health"
+    )
     resource = {
         "GPU_type": topology["GPU_type"],
         "GPU_count": 1,
@@ -20208,6 +20232,11 @@ def run_public_readiness_health(args: argparse.Namespace) -> dict[str, Any]:
         "direct_monetary_cost_USD": wall_minutes
         / 60.0
         * float(topology.get("provider_price_USD_per_GPU_hour", 0)),
+        "requested_wall_minutes": int(topology["micro_wall_minutes"]),
+        "authorized_wall_minutes": effective_wall_minutes,
+        "resource_override_authorized": (
+            effective_wall_minutes != int(topology["micro_wall_minutes"])
+        ),
     }
     full = {
         "schema_version": 1,
@@ -20256,7 +20285,7 @@ def run_public_readiness_health(args: argparse.Namespace) -> dict[str, Any]:
     }
     if any(
         (
-            wall_minutes > float(topology["micro_wall_minutes"]),
+            wall_minutes > float(effective_wall_minutes),
             resource["new_storage_GiB"] > float(topology["new_storage_GiB_max"]),
             wrapper_preflight_GPU_hours
             + sum(float(record["resource"]["GPU_hours"]) for record in prior_records)

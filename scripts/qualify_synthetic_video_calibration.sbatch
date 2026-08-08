@@ -73,7 +73,10 @@ if [[ "$execution_backend" == "hf_jobs_public_only" || "$execution_backend" == "
   [[ "${WORLD_SIZE:-1}" == "1" && "${LOCAL_WORLD_SIZE:-1}" == "1" ]] || exit 66
   [[ "${PHASE4_PUBLIC_ROOT:-}" == /* ]] || exit 65
   if [[ "$readiness_run_mode" == "health" ]]; then
-    [[ "${PHASE4_PUBLIC_WALL_MINUTES:-}" == "5" ]] || exit 66
+    case "${PHASE4_PUBLIC_WALL_MINUTES:-}|${PHASE4_PUBLIC_RESOURCE_OVERRIDE:-}" in
+      5\|""|15\|USER_AUTHORIZED_RESOURCE_ONLY) ;;
+      *) exit 66 ;;
+    esac
   else
     [[ "${PHASE4_PUBLIC_WALL_MINUTES:-}" == "15" ]] || exit 66
   fi
