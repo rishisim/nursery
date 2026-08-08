@@ -454,6 +454,7 @@ def test_wrapper_has_readiness_blocking_job_contract_without_poll_loop() -> None
     assert 'ln -s "$public_input_root/public" "$merged_public_root/public"' in wrapper
     assert 'ln -s "$public_input_root/source" "$merged_public_root/source"' in wrapper
     assert 'ln -s "$public_output_root" "$merged_public_root/runs"' in wrapper
+    assert 'find "$public_input_root" ! -type l -perm /222 -print -quit' in wrapper
     assert '"$public_output_root" != "$public_input_root/"*' in wrapper
     assert "ChildLens" not in wrapper
     assert "BabyView" not in wrapper

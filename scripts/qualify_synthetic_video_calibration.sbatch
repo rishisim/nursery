@@ -82,7 +82,9 @@ if [[ "$execution_backend" == "hf_jobs_public_only" || "$execution_backend" == "
   memory_kib="$(awk '/^MemTotal:/{print $2}' /proc/meminfo)"
   [[ "$memory_kib" -ge 33554432 ]] || exit 66
   if [[ "$execution_backend" == "vastai_public_only" ]]; then
-    [[ -z "$(find "$public_input_root" -perm /222 -print -quit)" ]] || exit 66
+    # Symlink mode bits are not mutable access controls on Linux; validate the
+    # actual files and directories while allowing links within the sealed tree.
+    [[ -z "$(find "$public_input_root" ! -type l -perm /222 -print -quit)" ]] || exit 66
     mapfile -t provider_gpu_names < <(nvidia-smi --query-gpu=name --format=csv,noheader)
     [[ "${#provider_gpu_names[@]}" -eq 1 && "${provider_gpu_names[0]}" == NVIDIA\ L4* ]] || exit 66
     provider_name="VAST_AI"
