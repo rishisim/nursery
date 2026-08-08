@@ -19695,11 +19695,13 @@ def _public_readiness_effective_wall_minutes(
         else topology["scientific_partition_wall_minutes"]
     )
     if (
-        run_mode == "health"
-        and os.environ.get("PHASE4_PUBLIC_RESOURCE_OVERRIDE")
+        os.environ.get("PHASE4_PUBLIC_RESOURCE_OVERRIDE")
         == "USER_AUTHORIZED_RESOURCE_ONLY"
     ):
-        return max(wall_minutes, int(topology["scientific_partition_wall_minutes"]))
+        authorized = os.environ.get("PHASE4_PUBLIC_WALL_MINUTES", "")
+        if not authorized.isdecimal() or int(authorized) not in {15, 60}:
+            raise RuntimeError("E_PUBLIC_READINESS_RESOURCE_OVERRIDE")
+        return max(wall_minutes, int(authorized))
     return wall_minutes
 
 

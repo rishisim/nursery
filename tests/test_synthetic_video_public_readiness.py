@@ -116,11 +116,23 @@ def test_rented_topology_attestation_uses_semantic_provider_contract(
     monkeypatch.setenv(
         "PHASE4_PUBLIC_RESOURCE_OVERRIDE", "USER_AUTHORIZED_RESOURCE_ONLY"
     )
+    monkeypatch.setenv("PHASE4_PUBLIC_WALL_MINUTES", "15")
     attestation["GPU_count"] = 1
     attestation["time_limit_minutes"] = 15
     path.write_text(json.dumps(attestation, sort_keys=True, separators=(",", ":")))
     path.chmod(0o600)
     assert MODULE._public_readiness_attestation(path, config, "health") == (
+        MODULE.file_digest(path)
+    )
+
+    monkeypatch.setenv("PHASE4_PUBLIC_WALL_MINUTES", "60")
+    monkeypatch.setenv("PHASE4_PUBLIC_EXECUTION_ID", "readiness-development-unit")
+    attestation["run_mode"] = "development"
+    attestation["execution_id"] = "readiness-development-unit"
+    attestation["time_limit_minutes"] = 60
+    path.write_text(json.dumps(attestation, sort_keys=True, separators=(",", ":")))
+    path.chmod(0o600)
+    assert MODULE._public_readiness_attestation(path, config, "development") == (
         MODULE.file_digest(path)
     )
 

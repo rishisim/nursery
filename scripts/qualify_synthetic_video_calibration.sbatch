@@ -78,7 +78,10 @@ if [[ "$execution_backend" == "hf_jobs_public_only" || "$execution_backend" == "
       *) exit 66 ;;
     esac
   else
-    [[ "${PHASE4_PUBLIC_WALL_MINUTES:-}" == "15" ]] || exit 66
+    case "${PHASE4_PUBLIC_WALL_MINUTES:-}|${PHASE4_PUBLIC_RESOURCE_OVERRIDE:-}" in
+      15\|""|60\|USER_AUTHORIZED_RESOURCE_ONLY) ;;
+      *) exit 66 ;;
+    esac
   fi
   [[ "${PHASE4_RUNTIME_IMAGE_DIGEST:-}" == "sha256:dab81780fd94483b67b4b5679cc0024939b08e48540d39476d284cb29002ed69" ]] || exit 66
   [[ "$(nproc)" -ge 8 ]] || exit 66
