@@ -194,6 +194,17 @@ def test_public_readiness_fixture_result_is_sealed_before_inference() -> None:
     assert result["model_inference_executed"] is False
 
 
+def test_public_readiness_engineering_health_pass_is_sealed() -> None:
+    result = _config()["public_only_calibration_readiness_engineering_health_result"]
+    assert result["status"] == "PASS_ENGINEERING_HEALTH"
+    assert result["completed_module_count"] == result["module_count"] == 7
+    assert result["failed_module_count"] == 0
+    assert result["scientific_metric_count"] == 0
+    assert result["engineering_health_commitment_sha256"] == (
+        "0827a10b8f382c179d1e4219adc0e1ce52a7301406434cccb47fcffdc19d3aa0"
+    )
+
+
 def test_zero_job_preallocation_repair_changes_no_scientific_rule() -> None:
     result = MODULE._public_readiness_preallocation_repair(_config())
     assert result["job_created"] is False
