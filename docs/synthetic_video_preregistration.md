@@ -2492,3 +2492,47 @@ charge was USD 0.174, below the USD 0.40 ceiling. Result commitment
 `d3d38a65…84c2` classifies this as an exact frozen resource-ceiling blocker,
 not a scientific no-go. No partial transfer may be resumed and no cap may be
 widened under this route without a new prospective resource amendment.
+
+The user later authorized completion of the same frozen scientific route while
+removing resource-attempt ceremony as a blocker. The prior staging blocker and
+all earlier no-gos remain unchanged. The only validity-critical implementation
+repair aligned the attribute validator with the production adapter: instead of
+demanding equality with nominal authored utterance times, it now selects the
+already sealed per-frame truth mask at the actual adapter-selected timestamp,
+using the fixture's frozen frame-rate and decoder rounding rule. No fixture,
+label, model, partition, threshold, metric, or combined-gate rule changed.
+
+A fresh metric-withheld production microhealth run passed 7/7 modules, with
+zero failures, external calls, unaccounted failures, or scientific metrics.
+Its exact runner (`7884c9ce…fd9e`), dependencies, fixtures, topology, and result
+are sealed at `716772df…d3d84`. The subsequent development qualification passed
+all seven engineering-integrity modules and executed every independent
+scientific module. It released 46 aggregate metrics with zero execution,
+serialization, retained-record, truncation, external-call, or unaccounted
+failure. Development thresholds are sealed at `ca53b0b7…d749`; the complete
+scientific record is committed at `ad4d829c…ede23`, with compact terminal record
+`da9d5bb8…343bd`.
+
+The unchanged combined gate returned `NO_GO`. Adapter-qualified yield,
+cross-episode recurrence, and egocentric sensor regime passed. Noun/adjective
+exposure failed because noun total-count relative error was 0.381 (>0.15), noun
+type-count relative error was 0.222 (>0.20), and noun event precision was 0.724
+(<0.75). Utterance-centered grounding failed no-referent specificity at 0.571
+(<0.80) and ambiguity macro-F1 at 0.505 (<0.65), although timing, coverage,
+geometry, and dominance passed. The independently executed attribute axis
+failed combined macro-F1 at 0.577 (<0.70), ambiguity specificity at 0.625
+(<0.80), and multiple family coverage/accuracy requirements; its mask IoU,
+mask coverage, event F1, null specificity, and invalid-mask checks passed.
+Supporting hand/contact failed only its 0.80 coverage requirement (observed
+0.688); its sensitivity, specificity, contact macro-F1, and mention-contact F1
+passed. The order-action control remained a nonblocking failed diagnostic.
+
+Only 2/5 critical axes and 3/7 learner-effective axes validated, below the
+frozen 5/5 and 6/7 requirements. Therefore the public package is not
+`CALIBRATION_READY_PUBLIC_ONLY`; the untouched holdout was not opened, and no
+ChildLens/BabyView, governed C, LTX/TTS, synthetic generation, or learner work
+occurred. The final health plus development runs consumed 0.502780 single-L4
+GPU-hours. The complete public-only instance charge, including staging and
+preserved engineering attempts, was USD 2.234. The 237-file, 927,951-byte
+external run record was copied with tree commitment `e0c4bad6…c243`, and the
+transient instance was destroyed.

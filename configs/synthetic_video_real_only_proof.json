@@ -1,6 +1,6 @@
 {
   "schema_version": 38,
-  "status": "PUBLIC_ONLY_CALIBRATION_READINESS_ENGINEERING_HEALTH_PASS",
+  "status": "PUBLIC_ONLY_CALIBRATION_READINESS_DEVELOPMENT_SCIENTIFIC_NO_GO",
   "claim_role": "user_authorized_post_gate_descriptive_equal_one_accepted_hour_extension_not_equivalence_noninferiority_directional_competitiveness_or_confirmatory_phase5",
   "public_only_calibration_readiness_amendment": {
     "status": "FROZEN_BEFORE_NEW_PUBLIC_MODEL_FIXTURE_OR_SCIENTIFIC_OUTCOMES",
@@ -355,6 +355,192 @@
     "dependency_config_commitment_sha256": "26e695a59923e0141ca06716c121909459d7259bf1375b32a5300212097c01df",
     "microfixture_manifest_commitment_sha256": "d133bfba1da833ffe01d1186537b772f1a6c431cb03c4d6b4a74750b6c82f188",
     "engineering_health_commitment_sha256": "716772dfa566f79ec38d12fb6c7c993b5e17973dcac0dd87ea60616440bd3d84"
+  },
+  "public_only_calibration_readiness_development_result": {
+    "status": "NO_GO_DEVELOPMENT_COMBINED_GATE",
+    "effective_on": "2026-08-08",
+    "partition": "DEVELOPMENT",
+    "complete_valid_scientific_metrics": true,
+    "module_count": 7,
+    "completed_module_count": 7,
+    "failed_module_count": 0,
+    "scientific_metric_count": 46,
+    "critical_axis_pass_count": 2,
+    "critical_axis_required_count": 5,
+    "validated_axis_count": 3,
+    "validated_axis_required_count": 6,
+    "axis_results": {
+      "adapter_qualified_yield": {
+        "metrics": {
+          "case_accuracy": 1.0,
+          "invalid_timestamp_count": 0,
+          "silent_truncation_count": 0
+        },
+        "status": "PASS"
+      },
+      "adjective_attribute_contrast": {
+        "metrics": {
+          "Attribute_Grounding_DINO_box_score": 0.25,
+          "Attribute_Grounding_DINO_text_score": 0.25,
+          "adjective_noun_event_f1": 0.7692307692307693,
+          "ambiguous_specificity": 0.625,
+          "combined_macro_f1": 0.5766666666666667,
+          "family_metrics": {
+            "color": {"coverage": 0.5, "macro_f1": 0.6428571428571428},
+            "relative_size": {"coverage": 0.5, "macro_f1": 0.7499999999999999},
+            "shape": {"coverage": 0.0, "macro_f1": 0.1},
+            "state": {"coverage": 1.0, "macro_f1": 0.75}
+          },
+          "invalid_mask_count": 0,
+          "median_predicted_mask_IoU": 0.9512935929871166,
+          "negative_sample_count": 109,
+          "null_specificity": 1.0,
+          "positive_sample_count": 147,
+          "predicted_mask_coverage": 0.9931972789115646,
+          "predicted_mask_negative_specificity": 0.11926605504587157
+        },
+        "status": "NO_GO"
+      },
+      "cross_episode_recurrence": {
+        "metrics": {
+          "coverage": 1.0,
+          "near_duplicate_pair_balanced_accuracy": 0.9270833333333333,
+          "negative_pair_false_positive_rate": 0.0,
+          "recurrence_event_f1": 1.0,
+          "same_object_cross_episode_balanced_accuracy": 1.0
+        },
+        "status": "PASS"
+      },
+      "egocentric_sensor_regime": {
+        "metrics": {
+          "controlled_perturbation_direction_fraction": 1.0,
+          "finite_in_bounds_fraction": 1.0,
+          "frozen_bin_accuracy": 0.9583333333333334
+        },
+        "status": "PASS"
+      },
+      "hand_action_coupling": {
+        "metrics": {
+          "contact_metric_item_count": 96,
+          "contact_no_contact_macro_f1": 0.6611111111111111,
+          "contact_state_coverage": 0.6875,
+          "coverage": 0.6875,
+          "hand_presence_coverage": 0.9583333333333334,
+          "hand_sensitivity": 0.8229166666666666,
+          "hand_specificity": 0.9791666666666666,
+          "invalid_retained_record_count": 0,
+          "mention_contact_alignment_f1": 0.7111111111111111,
+          "verified_no_hand_item_count": 48,
+          "visible_hand_item_count": 96
+        },
+        "status": "NO_GO"
+      },
+      "noun_adjective_exposure": {
+        "metrics": {
+          "adjective_event_precision": 1.0,
+          "adjective_event_recall": 1.0,
+          "adjective_noun_span_f1": 1.0,
+          "adjective_total_count_relative_error": 0.0,
+          "adjective_type_count_relative_error": 0.0,
+          "eligible_case_coverage": 1.0,
+          "episode_repetition_distribution_total_variation": 0.04545454545454544,
+          "exact_episode_repetition_fraction_diagnostic": 0.9090909090909091,
+          "exact_token_ordinal_precision_adjective_diagnostic": 0.5,
+          "exact_token_ordinal_precision_noun_diagnostic": 0.5862068965517241,
+          "exact_token_ordinal_recall_adjective_diagnostic": 0.5,
+          "exact_token_ordinal_recall_noun_diagnostic": 0.8095238095238095,
+          "frequency_band_total_variation": 0.05964585274930101,
+          "lemma_and_frequency_band_accuracy": 1.0,
+          "long_tail_share_absolute_error": 0.0,
+          "noun_event_precision": 0.7241379310344828,
+          "noun_event_recall": 1.0,
+          "noun_total_count_relative_error": 0.38095238095238093,
+          "noun_type_count_relative_error": 0.2222222222222222
+        },
+        "status": "NO_GO"
+      },
+      "utterance_centered_referent_visibility_dominance_ambiguity": {
+        "metrics": {
+          "ambiguity_macro_f1": 0.5054626532887403,
+          "dominance_weighted_kappa": 0.6057781919850885,
+          "event_coverage": 0.9375,
+          "no_referent_specificity": 0.5714285714285714,
+          "valid_geometry_and_monotonic_track_fraction": 1.0,
+          "visibility_timing_macro_f1": 0.7268912905276541
+        },
+        "status": "NO_GO"
+      }
+    },
+    "combined_gate_failures": [
+      "critical_axis:noun_adjective_exposure",
+      "critical_axis:utterance_centered_referent_visibility_dominance_ambiguity",
+      "critical_axis:adjective_attribute_contrast",
+      "validated_axes_minimum:6_of_7"
+    ],
+    "selected_thresholds": {
+      "Attribute_Grounding_DINO_box_score": 0.25,
+      "Attribute_Grounding_DINO_text_score": 0.25,
+      "DINOv2_recurrence_cosine": 0.85,
+      "EgoHOS_min_mask_fraction": 0.0025,
+      "Grounding_DINO_box_score": 0.4,
+      "Grounding_DINO_text_score": 0.3,
+      "PE_Core_attribute_margin": 0.01,
+      "action_abstention_margin": 0.0
+    },
+    "order_action_diagnostic": {
+      "status": "NO_GO_DIAGNOSTIC",
+      "used_in_gate": false,
+      "metrics": {
+        "abstention_margin": 0.0,
+        "coverage": 1.0,
+        "eligible": false,
+        "opposite_pair_correct_margin_fraction": 0.5454545454545454,
+        "ordered_action_direction_macro_f1": 0.47352065826330536,
+        "ordered_over_repeated_center_confidence_fraction": 0.5681818181818182,
+        "ordered_over_time_reversed_target_score_fraction": 0.5
+      }
+    },
+    "integrity": {
+      "error_module_count": 0,
+      "external_call_count": 0,
+      "failure_count": 0,
+      "invalid_retained_record_count": 0,
+      "silent_truncation_count": 0,
+      "unaccounted_failure_count": 0
+    },
+    "engineering_health_commitment_sha256": "716772dfa566f79ec38d12fb6c7c993b5e17973dcac0dd87ea60616440bd3d84",
+    "development_threshold_commitment_sha256": "ca53b0b79daf6992eb66f74c964c28110d751f949c0c674b1959901e702bd749",
+    "public_qualification_commitment_sha256": "ad4d829c04e3b37a8f2644c9439de510554d49466e871b57d5aebf4cecfede23",
+    "public_fixture_manifest_commitment_sha256": "2758557fe4844225220192eb285526d90b8420f730b946374d03163c7903dae6",
+    "readiness_fixture_commitment_sha256": "2b30f892ee327e2a1e39e35e41fec7a1e60adeef9b3df4c4c594e8eab45e1b1b",
+    "prior_terminal_result_commitment_sha256": "42338302949e27e0ed7c3f6e8a5f70e10bb380a5e8158378e89f5ff87c350e9d",
+    "prior_results_reinterpreted_or_overwritten": false,
+    "holdout_opened": false,
+    "governed_C_or_LTX_or_synthetic_or_learner_work_run": false,
+    "restricted_or_governed_material_used": false,
+    "new_manual_annotation_count": 0,
+    "ongoing_human_QA_required": false,
+    "resource": {
+      "provider": "VAST_AI",
+      "GPU_type": "NVIDIA_L4_24GB",
+      "GPU_count": 1,
+      "process_count": 1,
+      "DDP": false,
+      "microhealth_wall_minutes": 4.956532485441615,
+      "microhealth_GPU_hours": 0.08260887475736026,
+      "development_wall_minutes": 25.210289016666664,
+      "development_GPU_hours": 0.42017148361111106,
+      "final_health_plus_development_GPU_hours": 0.5027803583684713,
+      "provider_rate_USD_per_hour": 0.37777777777777777,
+      "final_health_plus_development_compute_cost_USD": 0.18993924649475583,
+      "complete_instance_charge_USD": 2.234,
+      "retained_run_file_count": 237,
+      "retained_run_bytes": 927951,
+      "retained_run_tree_commitment_sha256": "e0c4bad69c6ecfd258143e897f25daacd2614e6a8971cf541d9f1fe06145c243",
+      "transient_instance_destroyed": true
+    },
+    "terminal_interpretation": "PUBLIC_ONLY_PACKAGE_NOT_READY; DEVELOPMENT_FAILED_FROZEN_COMBINED_GATE; HOLDOUT_AND_ALL_DOWNSTREAM_STAGES_STOPPED",
+    "terminal_result_commitment_sha256": "da9d5bb8db5760345cc868b1e31e544258c1af3f3c71c9b1f6503e9c2db343bd"
   },
   "public_only_calibration_readiness_topology": {
     "status": "FROZEN_PROVIDER_RESOURCE_ONLY_BEFORE_MODEL_OUTCOMES",

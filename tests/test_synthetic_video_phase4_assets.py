@@ -93,10 +93,10 @@ def test_governed_build_freezes_final_topology_and_seals_common_assets():
 def test_phase4_seal_contract_is_identical_for_every_later_arm():
     result = json.loads(Path("results/synthetic_video_phase4.json").read_text())
     references = result["common_asset_references"]
-    assert result["schema_version"] == 26
+    assert result["schema_version"] == 27
     assert result["status"] == (
-        "CORRECTED_COMMON_ASSETS_PASS_PRIOR_PUBLIC_NO_GO_PRESERVED_"
-        "PUBLIC_ONLY_READINESS_RESOURCE_BLOCKER"
+        "CORRECTED_COMMON_ASSETS_PASS_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_"
+        "READINESS_DEVELOPMENT_SCIENTIFIC_NO_GO"
     )
     assert result["scientifically_accepted"] is True
     assert result["contract_identical_all_arms"] is True
@@ -520,7 +520,7 @@ def test_phase4_seal_contract_is_identical_for_every_later_arm():
 def test_coverage_redesign_is_frozen_without_rewriting_prior_stop():
     proof = json.loads(Path("configs/synthetic_video_real_only_proof.json").read_text())
     assert proof["status"] == (
-        "PUBLIC_ONLY_CALIBRATION_READINESS_ENGINEERING_HEALTH_PASS"
+        "PUBLIC_ONLY_CALIBRATION_READINESS_DEVELOPMENT_SCIENTIFIC_NO_GO"
     )
     geometry_repair = proof["public_fixture_geometry_rasterization_repair"]
     assert geometry_repair["repair_commitment_sha256"] == "6084fd937c208feda00aa3dc1cf14d0ec56e8f13bd24b56e23e4a6a6553e61ef"

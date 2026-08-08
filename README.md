@@ -856,3 +856,31 @@ all scientific metrics remained unopened. The instance was destroyed; the
 observed provider charge was USD 0.174, within the USD 0.40 ceiling. Commitment
 `d3d38a65…84c2` seals an exact resource-ceiling blocker, not a scientific
 no-go. Resuming or widening staging requires a new prospective authorization.
+
+The user subsequently authorized completing the existing public-only route.
+After the attribute validator was corrected to read the sealed truth mask at
+the actual adapter-selected frame, a fresh production-path microhealth run
+passed all seven modules with zero scientific metrics opened and is sealed at
+`716772df…d3d84`. The complete development run then executed all seven modules,
+released 46 aggregate metrics with no integrity failure, and returned the
+frozen combined-gate scientific no-go at `ad4d829c…ede23` (compact terminal
+commitment `da9d5bb8…343bd`).
+
+Adapter-qualified yield, cross-episode recurrence, and egocentric sensor regime
+passed. Noun/adjective exposure failed primarily on noun count error (0.381),
+noun type-count error (0.222), and noun event precision (0.724); grounding
+failed no-referent specificity (0.571) and ambiguity macro-F1 (0.505); and the
+independently executed attribute axis failed combined macro-F1 (0.577), family
+coverage/accuracy, and ambiguity specificity (0.625). Supporting hand/contact
+failed coverage at 0.688. The result therefore passed 2/5 critical axes and
+3/7 total axes, below the unchanged 5/5 and 6/7 rules. Order-action was a
+nonblocking failed diagnostic. The untouched holdout and every governed or
+downstream stage remain unopened; this public-only package is not calibration
+ready.
+
+The final health plus development runs used 0.502780 L4 GPU-hours. The complete
+public-only Vast instance charge, including staging and preserved engineering
+attempts, was USD 2.234. Its 927,951-byte run record was copied and verified in
+applicant-controlled storage at `e0c4bad6…c243`, and the transient instance was
+destroyed. No ChildLens, BabyView, governed material, generator, synthetic
+corpus, or learner run was involved.

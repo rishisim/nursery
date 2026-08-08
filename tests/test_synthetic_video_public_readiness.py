@@ -218,6 +218,40 @@ def test_public_readiness_engineering_health_pass_is_sealed() -> None:
     )
 
 
+def test_public_readiness_complete_development_no_go_is_terminal() -> None:
+    config = _config()
+    result = dict(config["public_only_calibration_readiness_development_result"])
+    commitment = result.pop("terminal_result_commitment_sha256")
+    assert MODULE.digest(result) == commitment
+    assert commitment == (
+        "da9d5bb8db5760345cc868b1e31e544258c1af3f3c71c9b1f6503e9c2db343bd"
+    )
+    assert result["status"] == "NO_GO_DEVELOPMENT_COMBINED_GATE"
+    assert result["complete_valid_scientific_metrics"] is True
+    assert result["completed_module_count"] == result["module_count"] == 7
+    assert result["failed_module_count"] == 0
+    assert result["critical_axis_pass_count"] == 2
+    assert result["validated_axis_count"] == 3
+    assert result["holdout_opened"] is False
+    assert result["governed_C_or_LTX_or_synthetic_or_learner_work_run"] is False
+    assert result["restricted_or_governed_material_used"] is False
+    assert result["prior_results_reinterpreted_or_overwritten"] is False
+    assert result["resource"]["transient_instance_destroyed"] is True
+
+    preregistration = json.loads(
+        Path("configs/synthetic_video_preregistration.json").read_text()
+    )["public_only_calibration_readiness_scientific_result"]
+    phase4 = json.loads(Path("results/synthetic_video_phase4.json").read_text())[
+        "public_only_calibration_readiness_scientific_result"
+    ]
+    for record in (preregistration, phase4):
+        assert record["terminal_result_commitment_sha256"] == commitment
+        assert record["public_qualification_commitment_sha256"] == (
+            result["public_qualification_commitment_sha256"]
+        )
+        assert record["holdout_opened"] is False
+
+
 def test_zero_job_preallocation_repair_changes_no_scientific_rule() -> None:
     result = MODULE._public_readiness_preallocation_repair(_config())
     assert result["job_created"] is False

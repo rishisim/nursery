@@ -102,8 +102,11 @@ def validate_phase_state(config: Mapping[str, Any]) -> None:
         raise ValueError("phase status and gates.phase4_status are required")
     top_provisional = "REOPENED" in top or "PROVISIONAL" in top
     nested_provisional = "PROVISIONAL" in nested or "SUPERSEDED" in nested
-    top_pass = top.startswith("PASS") or "CORRECTED_ASSETS_PASS" in top
-    nested_pass = nested.startswith("PASS") or "CORRECTED_COMMON_ASSETS_PASS" in nested
+    pass_markers = ("CORRECTED_ASSETS_PASS", "CORRECTED_COMMON_ASSETS_PASS")
+    top_pass = top.startswith("PASS") or any(marker in top for marker in pass_markers)
+    nested_pass = nested.startswith("PASS") or any(
+        marker in nested for marker in pass_markers
+    )
     top_no_go = "NO_GO" in top
     nested_no_go = "NO_GO" in nested
     active_markers = (

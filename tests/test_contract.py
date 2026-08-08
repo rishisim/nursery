@@ -119,10 +119,10 @@ def test_lexical_wiring_requires_noun_then_adjective() -> None:
 
 def test_phase4_preregistration_preserves_frozen_contract() -> None:
     config = json.loads(Path("configs/synthetic_video_preregistration.json").read_text())
-    assert config["schema_version"] == 29
+    assert config["schema_version"] == 30
     assert config["status"] == (
-        "PHASE4_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_"
-        "ENGINEERING_BLOCKER"
+        "PHASE4_CORRECTED_COMMON_ASSETS_PASS_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_"
+        "CALIBRATION_READINESS_DEVELOPMENT_SCIENTIFIC_NO_GO"
     )
     validate_phase_state(config)
     geometry_repair = config["public_fixture_geometry_rasterization_repair"]
