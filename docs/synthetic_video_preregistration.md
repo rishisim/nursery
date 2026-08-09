@@ -92,6 +92,33 @@ mismatch; activity, primary objects, hand action, viewpoint, continuity, and
 severe-artifact checks passed. These are one-pair preservation measurements,
 not acquisition, human-likeness, equivalence, or dataset-scale evidence.
 
+The matched three-arm extension completed locally in 12.242 seconds. Recomputed
+real and Hailuo metrics reproduce the committed pair result within `1e-6`.
+The complete table is below; `p` is mean target probability and `margin` is
+mean target probability minus the best distractor probability.
+
+| Probe / metric | Real | Hailuo | LTX | H−R | L−R | L−H |
+|---|---:|---:|---:|---:|---:|---:|
+| Noun top-1 | 0.900 | 0.800 | 0.900 | -0.100 | 0.000 | 0.100 |
+| Noun p | 0.487791 | 0.519231 | 0.631510 | 0.031440 | 0.143718 | 0.112278 |
+| Noun margin | 0.265515 | 0.282218 | 0.441250 | 0.016703 | 0.175735 | 0.159032 |
+| Adjective top-1 | 0.900 | 0.800 | 1.000 | -0.100 | 0.100 | 0.200 |
+| Adjective p | 0.467488 | 0.427173 | 0.627156 | -0.040315 | 0.159668 | 0.199983 |
+| Adjective margin | 0.220467 | 0.128969 | 0.451536 | -0.091498 | 0.231069 | 0.322567 |
+| Action top-1 | 0.500 | 1.000 | 0.700 | 0.500 | 0.200 | -0.300 |
+| Action p | 0.458998 | 0.630135 | 0.597061 | 0.171137 | 0.138063 | -0.033074 |
+| Action margin | 0.036830 | 0.352932 | 0.266472 | 0.316102 | 0.229642 | -0.086460 |
+| Viewpoint top-1 | 0.100 | 0.200 | 0.000 | 0.100 | -0.100 | -0.200 |
+| Viewpoint p | 0.171038 | 0.228936 | 0.222848 | 0.057898 | 0.051810 | -0.006088 |
+| Viewpoint margin | -0.426165 | -0.301403 | -0.294885 | 0.124761 | 0.131279 | 0.006518 |
+
+LTX matched real noun top-1 and was highest on noun probability/margin and all
+three adjective measurements. Hailuo was highest on all three action measures;
+LTX remained above real. Every arm had a negative viewpoint margin, so that
+guardrail failed and its deltas do not support a viewpoint ranking. The table
+is descriptive for one public source and creates no omnibus score, acquisition
+result, equivalence conclusion, or generator ranking claim.
+
 **Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ATTEMPT-8 CONTAINER-GIT ENGINEERING BLOCKER PRESERVED; CLEAN-TREE-ATTESTED ATTEMPT 9 FROZEN BEFORE NEW OUTCOME; ALL PRIOR NO-GOS PRESERVED**
 
 **Evidence cut-off:** 2026-08-04
