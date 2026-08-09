@@ -1,5 +1,5 @@
 {
-  "schema_version": 31,
+  "schema_version": 32,
   "phase": 4,
   "status": "PHASE4_CORRECTED_COMMON_ASSETS_PASS_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_DEVELOPMENT_SCIENTIFIC_NO_GO",
   "evidence_cutoff": "2026-08-08",
@@ -50,6 +50,22 @@
     "resource_ceiling": {"wall_minutes_max": 10, "GPU_required": false, "vast_rental_authorized_only_if_needed_and_complete_output_within_10_minutes": true},
     "outputs": "ignored output root plus one compact aggregate result; no media frames model weights caches row-level scores or prompts in Git",
     "claim_limits": ["one_pair_only", "exploratory", "grounded_lexical_preservation_not_acquisition", "no_human_likeness_claim", "no_dataset_scale_claim", "no_equivalence", "no_scale_up_authorization"]
+  },
+  "public_three_arm_grounded_lexical_test": {
+    "status": "FROZEN_BEFORE_THREE_ARM_FRAME_EXTRACTION_OR_SCORE",
+    "question": "on the one frozen public source prompt, how do real, Hailuo, and LTX compare under the identical frozen grounded lexical probes",
+    "relationship_to_prior_results": "matched three-arm extension of the completed one-pair exploratory metric; the prior real-Hailuo result and all calibration no-gos Phase 4 Real-1h and provenance records remain unchanged",
+    "arms": ["public_real_source", "public_hailuo_derived", "public_ltx_derived"],
+    "shared_source_prompt_commitment_sha256": "63e20f20c29cf6d88116172ec245a10b788753581fc4643e773104f7eb6a71cb",
+    "frames": {"timestamps_seconds": [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5], "same_timestamps_and_preprocessing_for_all_arms": true},
+    "evaluator": {"family": "OpenAI_CLIP_ViT_B_32", "repository": "Xenova/clip-vit-base-patch32", "revision": "d15189d7028b43f1d3e65039190477f6af591c2a", "upstream_license": "MIT", "runtime": "@huggingface/transformers@3.8.1", "dtype": "q8", "execution": "local_CPU_ONNX", "independent_of_descriptor_and_generators": true},
+    "probes_source": "public_single_pair_grounded_lexical_test.probes unchanged",
+    "per_probe_metrics": ["top1_accuracy_over_10_frames", "mean_target_probability", "mean_target_minus_best_distractor_margin"],
+    "pairwise_deltas": ["hailuo_minus_real", "ltx_minus_real", "ltx_minus_hailuo"],
+    "reporting": "one matched table per metric with real Hailuo LTX and all three pairwise deltas; noun adjective action and viewpoint never averaged into an omnibus score",
+    "resource_ceiling": {"wall_minutes_max": 10, "GPU_required": false, "vast_GPU_rental": false},
+    "outputs": "ignored output root plus one compact aggregate result; no media frames model cache row-level scores or prompts in Git",
+    "claim_limits": ["one_public_source_only", "exploratory", "grounded_lexical_preservation_not_acquisition", "no_human_likeness_claim", "no_dataset_scale_claim", "no_equivalence", "no_noninferiority", "no_generator_ranking_claim", "no_scale_up_authorization"]
   },
   "active_exploratory_amendment": "configs/synthetic_video_real_only_proof.json schema 38 preserves every prior result and seals the complete valid public-only development scientific no-go ad4d829c...ede23 after a 7-of-7 metric-withheld engineering-health pass 716772df...d3d84; only 2 of 5 critical axes and 3 of 7 total axes passed, so holdout and all governed or downstream work remain unopened",
   "public_only_calibration_readiness_amendment": {

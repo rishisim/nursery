@@ -71,6 +71,17 @@ held-out lexical asset. The CPU/ONNX test has a ten-minute wall ceiling; a Vast
 GPU is unnecessary unless a later fully pre-staged trained-checkpoint test can
 also finish inside that ceiling.
 
+Before any LTX scores are opened, the identical local evaluator is extended to
+one matched three-arm table: the public real source, its Hailuo generation, and
+its LTX generation. All arms use the same ten half-second-centered timestamps,
+image preprocessing, immutable CLIP revision and q8 runtime, and the same noun,
+adjective, action, and viewpoint probes. Each probe reports top-1 accuracy,
+mean target probability, and target-minus-best-distractor margin for all three
+arms, plus Hailuo-minus-real, LTX-minus-real, and LTX-minus-Hailuo deltas. Probe
+families are not averaged. This remains one-source exploratory grounded lexical
+preservation, not lexical acquisition, generator ranking, equivalence, or
+dataset-scale evidence.
+
 The test completed locally on CPU in 4.816 seconds after model caching. Noun
 top-1 accuracy was 0.90 real and 0.80 synthetic; white-attribute accuracy was
 0.90 and 0.80. The action guardrail was 0.50 and 1.00. The viewpoint guardrail

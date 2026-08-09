@@ -1,4 +1,4 @@
-from scripts.run_synthetic_video_paired_grounding import aggregate, qualitative
+from scripts.run_synthetic_video_paired_grounding import aggregate, aggregate_three_arm, qualitative
 
 
 PROBES = {
@@ -39,6 +39,22 @@ def test_qualitative_mapping_preserves_direct_mismatch():
     assert result["attribute"] == "covered_by_grounded_adjective_probe"
     assert result["speech_and_referent_timing"] is None
     assert "score" not in result
+
+
+def test_three_arm_aggregate_reports_all_matched_deltas():
+    rows = []
+    arms = (("real", [0.7, 0.1, 0.1, 0.1]), ("hailuo", [0.4, 0.5, 0.05, 0.05]), ("ltx", [0.8, 0.1, 0.05, 0.05]))
+    for arm, scores in arms:
+        for frame in range(10):
+            for probe in PROBES:
+                rows.append({"arm": arm, "frame_ordinal": frame, "probe": probe, "scores": scores})
+    result = aggregate_three_arm(rows, PROBES, ("real", "hailuo", "ltx"))
+    assert result["noun"]["real"]["top1_accuracy"] == 1.0
+    assert result["noun"]["hailuo"]["top1_accuracy"] == 0.0
+    assert result["noun"]["ltx"]["top1_accuracy"] == 1.0
+    assert result["noun"]["deltas"]["hailuo_minus_real"]["top1_accuracy"] == -1.0
+    assert result["noun"]["deltas"]["ltx_minus_real"]["top1_accuracy"] == 0.0
+    assert result["noun"]["deltas"]["ltx_minus_hailuo"]["top1_accuracy"] == 1.0
 
 
 def test_node_scorer_handles_commonjs_default_export():
