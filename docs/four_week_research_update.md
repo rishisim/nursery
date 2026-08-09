@@ -32,7 +32,7 @@ I wanted to send you a consolidated update on what I have done over the past fou
 \endgroup
 ```
 
-\clearpage
+## EXPLANATION
 
 In your previous email, you suggested matching aspects of the natural data distribution measured in BabyView, generating the additional side-information streams, and then applying the same models to the natural and simulated data apples-to-apples. I used that as the central target for this work.
 
