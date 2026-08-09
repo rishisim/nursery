@@ -24,8 +24,8 @@ I wanted to send you a consolidated update on what I have done over the past fou
 ```{=latex}
 \begingroup
 \setlength{\parskip}{0pt}
-\noindent\includegraphics[width=\linewidth]{docs/assets/four_week_research_update/figure-1-two-routes.png}\par\nointerlineskip
-\noindent\includegraphics[width=\linewidth]{docs/assets/four_week_research_update/figure-2-frame-comparison.png}\par\nointerlineskip
+\noindent\makebox[\linewidth][c]{\includegraphics[width=0.70\linewidth]{docs/assets/four_week_research_update/figure-1-two-routes.png}}\par\nointerlineskip
+\noindent\makebox[\linewidth][c]{\includegraphics[width=0.70\linewidth]{docs/assets/four_week_research_update/figure-2-frame-comparison.png}}\par\nointerlineskip
 \noindent\includegraphics[width=\linewidth]{docs/assets/four_week_research_update/figure-3-evaluation-metrics.png}\par\nointerlineskip
 \noindent\includegraphics[width=\linewidth]{docs/assets/four_week_research_update/figure-4-cost-projection.png}\par\nointerlineskip
 \noindent\includegraphics[width=\linewidth]{docs/assets/four_week_research_update/figure-5-model-selection.png}\par
