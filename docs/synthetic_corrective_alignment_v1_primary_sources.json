@@ -1,0 +1,112 @@
+{
+  "schema_version": "nursery-corrective-primary-sources-v1",
+  "retrieved_date": "2026-07-16",
+  "scope_note": "Primary methods justify design components only; none establishes infant learning or ecological validity for this synthetic study.",
+  "sources": [
+    {
+      "title": "Rapid Word Learning Under Uncertainty via Cross-Situational Statistics",
+      "authors": "Yu and Smith",
+      "year": 2007,
+      "url": "https://doi.org/10.1111/j.1467-9280.2007.01915.x",
+      "role": "cross-occurrence accumulation under referential ambiguity"
+    },
+    {
+      "title": "Cross-Situational Learning of a Natural Language Lexicon",
+      "authors": "Smith and Yu",
+      "year": 2008,
+      "url": "https://doi.org/10.1016/j.cognition.2007.06.010",
+      "role": "distributed evidence across individually ambiguous situations"
+    },
+    {
+      "title": "A Probabilistic Computational Model of Cross-Situational Word Learning",
+      "authors": "Fazly, Alishahi, and Stevenson",
+      "year": 2010,
+      "url": "https://doi.org/10.1111/j.1551-6709.2010.01104.x",
+      "role": "joint noisy alignment and incremental meaning updates"
+    },
+    {
+      "title": "Solving the Multiple Instance Problem with Axis-Parallel Rectangles",
+      "authors": "Dietterich, Lathrop, and Lozano-Perez",
+      "year": 1997,
+      "url": "https://doi.org/10.1016/S0004-3702(96)00034-3",
+      "role": "canonical multiple-instance bags and latent responsible instances"
+    },
+    {
+      "title": "A Unified Model of Early Word Learning: Integrating Statistical and Social Cues",
+      "authors": "Yu and Ballard",
+      "year": 2007,
+      "url": "https://doi.org/10.1016/j.neucom.2006.01.034",
+      "role": "multimodal cues as alignment spotlights rather than post-hoc calibration"
+    },
+    {
+      "title": "Proposal-Based Multiple Instance Learning for Weakly-Supervised Temporal Action Localization",
+      "authors": "Ren et al.",
+      "year": 2023,
+      "url": "https://openaccess.thecvf.com/content/CVPR2023/html/Ren_Proposal-Based_Multiple_Instance_Learning_for_Weakly-Supervised_Temporal_Action_Localization_CVPR_2023_paper.html",
+      "role": "event proposals inside untrimmed temporal bags"
+    },
+    {
+      "title": "Weakly-Supervised Temporal Action Localization by Uncertainty Modeling",
+      "authors": "Lee et al.",
+      "year": 2021,
+      "url": "https://doi.org/10.1609/aaai.v35i3.16280",
+      "role": "explicit background/null state in weak temporal localization"
+    },
+    {
+      "title": "Using Time-Series Privileged Information for Provably Efficient Learning of Prediction Models",
+      "authors": "Karlsson et al.",
+      "year": 2022,
+      "url": "https://proceedings.mlr.press/v151/k-a-karlsson22a.html",
+      "role": "training-only privileged information and side-free prediction"
+    },
+    {
+      "title": "Measuring Compositional Generalization: A Comprehensive Method on Realistic Data",
+      "authors": "Keysers et al.",
+      "year": 2020,
+      "url": "https://openreview.net/forum?id=SygcCnNKwr",
+      "role": "withhold compounds while retaining atomic constituent coverage"
+    },
+    {
+      "title": "Accounting for Variance in Machine Learning Benchmarks",
+      "authors": "Bouthillier et al.",
+      "year": 2021,
+      "url": "https://proceedings.mlsys.org/paper_files/paper/2021/hash/0184b0cd3cfb185989f858a1d9f5c1eb-Abstract.html",
+      "role": "meaningful initialization/training variation and variance-aware comparison"
+    },
+    {
+      "title": "Strictly Proper Scoring Rules, Prediction, and Estimation",
+      "authors": "Gneiting and Raftery",
+      "year": 2007,
+      "url": "https://doi.org/10.1198/016214506000001437",
+      "role": "predeclared log-loss and Brier secondary scores"
+    },
+    {
+      "title": "Bioequivalence Trials, Intersection-Union Tests and Equivalence Confidence Sets",
+      "authors": "Berger and Hsu",
+      "year": 1996,
+      "url": "https://doi.org/10.1214/ss/1032280304",
+      "role": "intersection-union logic and equivalence decisions"
+    },
+    {
+      "title": "Inference with Few Heterogeneous Clusters",
+      "authors": "Ibragimov and Muller",
+      "year": 2016,
+      "url": "https://doi.org/10.1162/REST_a_00545",
+      "role": "group/corpus-level t inference under heterogeneity"
+    },
+    {
+      "title": "Using Simulation Studies to Evaluate Statistical Methods",
+      "authors": "Morris, White, and Crowther",
+      "year": 2019,
+      "url": "https://doi.org/10.1002/sim.8086",
+      "role": "prospective simulation-design and estimand discipline"
+    },
+    {
+      "title": "Leakage and the Reproducibility Crisis in Machine-Learning-Based Science",
+      "authors": "Kapoor and Narayanan",
+      "year": 2023,
+      "url": "https://doi.org/10.1016/j.patter.2023.100804",
+      "role": "split-before-processing provenance and leakage auditing"
+    }
+  ]
+}

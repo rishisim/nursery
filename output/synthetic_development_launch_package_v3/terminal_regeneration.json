@@ -1,0 +1,15 @@
+{
+  "byte_identical": true,
+  "frozen_adjudicator_used": true,
+  "primary_sha256": "827fdad181e8f4e8b74ef3b4c913337f38fcdc7a394549856e908f8fb8de3447",
+  "process": {
+    "command": "/Users/rishisim/Documents/research/nursery/.venv/bin/python /Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v3/frozen_source_snapshot/scripts/run_synthetic_development_launch_v3.py adjudicate --input-path /Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v3/terminal_staging/adjudication_inputs.json --output-path /Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v3/terminal_staging/package_terminal.json --snapshot-root /Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v3/frozen_source_snapshot",
+    "cwd": "/Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v3/terminal_staging",
+    "exit_code": 0,
+    "output": "{\n  \"claim_scope\": \"narrow_raw_sensor_assisted_weak_lexical_action_grounding\",\n  \"confirmation_authorized\": false,\n  \"confirmation_outcome_count\": 0,\n  \"decision\": \"DEVELOPMENT_PACKAGE_SEALED\",\n  \"development_authorized\": true,\n  \"development_outcome_count\": 0,\n  \"ecological_validity_claim_authorized\": false,\n  \"gates\": {\n    \"complete_manifest\": true,\n    \"confirmation_command_absent\": true,\n    \"confirmation_outcome_count_zero\": true,\n    \"cue_free_endpoints_frozen\": true,\n    \"development_outcome_count_zero\": true,\n    \"development_registry_has_40_corpora\": true,\n    \"exact_runner_independent_reproduction\": true,\n    \"excluded_rehearsal_pass\": true,\n    \"fixture_rehearsal_pass\": true,\n    \"freeze_integrity\": true,\n    \"identifier_registry_reconciliation\": true,\n    \"inference_contract_frozen\": true,\n    \"negative_source_and_input_mutations\": true,\n    \"official_tests\": true,\n    \"one_shot_command_frozen\": true,\n    \"one_shot_output_absent\": true,\n    \"prior_v1_v8_preservation\": true,\n    \"side_modality_firewall\": true,\n    \"terminal_regeneration\": true,\n    \"three_stochastic_model_replicates\": true,\n    \"traceability\": true,\n    \"v8_adversarial_audit_pass\": true,\n    \"v8_version_ready\": true\n  },\n  \"infant_learning_claim_authorized\": false,\n  \"input_contract\": {\n    \"contradictions\": [],\n    \"missing_gates\": [],\n    \"stale_inputs\": [],\n    \"unexpected_gates\": [],\n    \"well_formed\": true\n  },\n  \"protocol_id\": \"synthetic-development-launch-v3\",\n  \"reason\": \"Every frozen launch-package gate passed; a later separate one-shot development run is authorized.\"\n}\n",
+    "snapshot_root": "/Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v3/frozen_source_snapshot"
+  },
+  "regenerated_sha256": "827fdad181e8f4e8b74ef3b4c913337f38fcdc7a394549856e908f8fb8de3447",
+  "separate_process": true,
+  "status": "PASS"
+}

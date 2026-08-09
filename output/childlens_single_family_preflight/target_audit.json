@@ -1,0 +1,182 @@
+{
+  "estimator_reproduction": {
+    "definitions_exactly_match_frozen_V5": true,
+    "dinov2_weights_hash_verified_by_V5_receipt": true,
+    "language_interpretation_used": false
+  },
+  "freeze_sha256": "27e527ef23dd3db41aeef29c43ce5d11197c76a8eff66d7feef4a7c95fad815e",
+  "limitations": [
+    "ChildLens ages 3-to-5 are a provisional developmental calibration, not an infant age match.",
+    "The exact timed condition is coarse playing_with_object activity, not a lexical referent label.",
+    "DINOv2 persistence is a transparent model-model sensitivity, not human validation or ground truth.",
+    "The participant sample is development-only (n=18); locked participants were not read."
+  ],
+  "primary_timed_object_play_participant_clustered": {
+    "adjacent_frame_persistence": {
+      "participant_cluster_90pct": [
+        0.6526,
+        0.6954
+      ],
+      "participant_count": 18,
+      "participant_mean": 0.6736,
+      "participant_quantiles_10_50_90": [
+        0.6101,
+        0.6693,
+        0.7518
+      ]
+    },
+    "motion": {
+      "participant_cluster_90pct": [
+        0.1167,
+        0.1379
+      ],
+      "participant_count": 18,
+      "participant_mean": 0.1275,
+      "participant_quantiles_10_50_90": [
+        0.0927,
+        0.1365,
+        0.1609
+      ]
+    },
+    "scene_change_rate": {
+      "participant_cluster_90pct": [
+        0.1006,
+        0.1698
+      ],
+      "participant_count": 18,
+      "participant_mean": 0.1343,
+      "participant_quantiles_10_50_90": [
+        0.0247,
+        0.1346,
+        0.2718
+      ]
+    }
+  },
+  "privacy": {
+    "AEA_or_BabyView_used": false,
+    "identifiers_paths_raw_media_or_annotation_rows_exported": false,
+    "participant_level_values_exported": false
+  },
+  "private_input_hashes": {
+    "administrative_input_sha256": "137d8e8457150b992ef56e27f65c970c187b2dfd5c4d4d9dc5722442998c9ac7",
+    "annotation_aggregate_sha256": "410edf7a8f62a7647c32dcca6c4d926cee51f4f561ccc93c4a0ce9c4dede1278",
+    "feature_manifest_sha256": "f7b4108c956b65470611fe28f103458b3e7c1c67589166d51161813ef25dba42",
+    "frontend_features_sha256": "724618bba42f748f86a9680cf3a5f843e497d8416b39eeb9390e1d2a9d1e4285"
+  },
+  "recording_level_fallback_relationship_only": {
+    "not_used_to_replace_natural_mixture": true,
+    "participant_clustered": {
+      "adjacent_frame_persistence": {
+        "participant_cluster_90pct": [
+          0.7885,
+          0.8301
+        ],
+        "participant_count": 11,
+        "participant_mean": 0.8091,
+        "participant_quantiles_10_50_90": [
+          0.767,
+          0.8024,
+          0.856
+        ]
+      },
+      "audio_log_rms": {
+        "participant_cluster_90pct": [
+          -4.116,
+          -3.4335
+        ],
+        "participant_count": 11,
+        "participant_mean": -3.7568,
+        "participant_quantiles_10_50_90": [
+          -4.2866,
+          -3.8003,
+          -2.9876
+        ]
+      },
+      "motion": {
+        "participant_cluster_90pct": [
+          0.0782,
+          0.1072
+        ],
+        "participant_count": 11,
+        "participant_mean": 0.0925,
+        "participant_quantiles_10_50_90": [
+          0.0583,
+          0.1015,
+          0.1244
+        ]
+      },
+      "released_speech_support_fraction": {
+        "participant_cluster_90pct": [
+          0.5882,
+          0.7802
+        ],
+        "participant_count": 11,
+        "participant_mean": 0.6904,
+        "participant_quantiles_10_50_90": [
+          0.5363,
+          0.7043,
+          0.884
+        ]
+      }
+    },
+    "participant_count": 11,
+    "status": "REPORTED_CONDITIONALLY"
+  },
+  "schema": "ChildLensTimedObjectPlayTargetAudit.v1",
+  "scientific_role": "provisional_ages_3_to_5_single_object_play_family_calibration_not_infant_calibration",
+  "secondary_full_representative_natural_mixture": {
+    "adjacent_frame_persistence": {
+      "participant_cluster_90pct": [
+        0.6912,
+        0.733
+      ],
+      "participant_count": 18,
+      "participant_mean": 0.7124,
+      "participant_quantiles_10_50_90": [
+        0.6517,
+        0.7195,
+        0.7754
+      ]
+    },
+    "motion": {
+      "participant_cluster_90pct": [
+        0.1095,
+        0.1273
+      ],
+      "participant_count": 18,
+      "participant_mean": 0.1185,
+      "participant_quantiles_10_50_90": [
+        0.0946,
+        0.1234,
+        0.1445
+      ]
+    },
+    "scene_change_rate": {
+      "participant_cluster_90pct": [
+        0.1069,
+        0.1558
+      ],
+      "participant_count": 18,
+      "participant_mean": 0.131,
+      "participant_quantiles_10_50_90": [
+        0.0624,
+        0.1324,
+        0.2088
+      ]
+    }
+  },
+  "status": "VALID_CONDITIONAL_TARGET",
+  "support": {
+    "development_participants": 18,
+    "eligible_windows_per_participant_max": 166,
+    "eligible_windows_per_participant_median": 88.5,
+    "eligible_windows_per_participant_min": 14,
+    "eligible_zero_lag_windows": 1756,
+    "locked_participants": 0,
+    "minimum_overlap_fraction": 0.8,
+    "participants_with_eligible_zero_lag_windows": 18,
+    "timed_object_play_events": 149
+  },
+  "v5_runner_sha256": "d8110b850537b0392e97526b3f0ae039fcd9f8dfc3a2d8a32181e860fe71be44",
+  "v5_summary_sha256": "9797185cd5fcdaf44c19f1c6493dc5caac5e5f8196c64aa6bfeafd12075953e6"
+}

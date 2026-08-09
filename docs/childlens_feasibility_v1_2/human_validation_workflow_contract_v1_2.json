@@ -1,0 +1,93 @@
+{
+  "schema_version": "childlens-human-validation-workflow-contract-v1.2.0",
+  "implementation_version": "childlens-human-validation-workflow-v1.2.0",
+  "status": "IMPLEMENTED_AWAITING_RESTRICTED_PACKET_POPULATION",
+  "scientific_learner_outcome_authorized": false,
+  "store": {
+    "location": "EXPLICIT_AUTHORIZED_RESTRICTED_ROOT_ONLY",
+    "repository_store_permitted": false,
+    "owner_only_required": true,
+    "symlinks_permitted": false,
+    "localhost_only": true,
+    "telemetry": false,
+    "retention_deadline": "2027-07-31"
+  },
+  "packet": {
+    "sample_size_min": 15,
+    "sample_size_max": 15,
+    "frozen_v1_1_skeleton_sha256": "ae8503fc5c21fc6df0b08c763202eab074b2526f83ef847d2faca3ae4eb217a5",
+    "frozen_v1_1_restricted_input_sha256": "81282e6a4d8178b1559a7473d22c70a36e44450467b6b5e2ff70ad9b7e9f049a",
+    "exact_frozen_key_set_match_required": true,
+    "key_media_duration_stratum_annotation_linkage_required": true,
+    "sealed_complete_native_transfer_receipt_required": true,
+    "selection_digest_required": true,
+    "opaque_keys_only": true,
+    "byte_identical_source_objects_may_share_content_addressed_path": true,
+    "distinct_source_object_linkage_required": true,
+    "source_names_or_identifiers_permitted": false,
+    "immutable_after_initialization": true
+  },
+  "speaker_roles": [
+    "NON_CHILD",
+    "CHILD",
+    "OVERLAP",
+    "UNCERTAIN",
+    "NONSPEECH"
+  ],
+  "referential_statuses": [
+    "VISIBLE_SINGLE",
+    "VISIBLE_MULTIPLE",
+    "NULL_NOT_VISIBLE",
+    "IRRELEVANT",
+    "UNDECIDABLE",
+    "UNUSABLE"
+  ],
+  "context_window_seconds": [-5, 5],
+  "timing_validation": {
+    "independent_passes": 2,
+    "stopping_rule": "FIRST_OF_300_ADJUDICATED_UTTERANCES_OR_30_ADJUDICATED_SPEECH_MINUTES",
+    "nonspeech_counts_toward_stopping_rule": false,
+    "all_language_routes_required_before_timing": true,
+    "item_completion_state_required": true,
+    "new_utterances_rejected_after_first_threshold_crossing": true,
+    "peer_labels_hidden_until_both_passes_lock": true,
+    "adjudication_preserves_independent_records": true
+  },
+  "referential_validation": {
+    "pass_a_fraction": 1.0,
+    "pass_b_minimum_fraction": 0.2,
+    "selection": "DETERMINISTIC_RELEASE_BOUND_HASH_ORDER_WITHIN_OPAQUE_METADATA_STRATUM",
+    "selection_frozen_before_referential_labels": true,
+    "machine_proposal_condition": "HUMAN_ONLY_REFERENCE",
+    "peer_labels_hidden_until_both_passes_lock": true,
+    "adjudication_preserves_independent_records": true
+  },
+  "human_requirements": {
+    "codex_may_code_or_adjudicate": false,
+    "same_human_may_fill_both_independent_passes": false,
+    "language_matched_humans_required": true,
+    "second_independent_human_required": true
+  },
+  "coder_access": {
+    "self_claim_permitted": false,
+    "coordinator_generated_high_entropy_tokens": true,
+    "plaintext_tokens_location": "OWNER_ONLY_RESTRICTED_COORDINATOR_PACKET",
+    "database_stores_hmac_only": true
+  },
+  "browser": {
+    "launcher_arguments_permitted": false,
+    "restricted_root_in_argv_or_child_environment_permitted": false,
+    "unique_fail_closed_runtime_discovery_required": true,
+    "general_browser_profile_permitted": false,
+    "dedicated_profile_and_cache_inside_quarantine": true,
+    "ephemeral_launcher_token_required": true
+  },
+  "instrument_firewall": {
+    "machine_output_is_gold": false,
+    "instrument_features_enter_learner": false,
+    "instrument_weights_enter_learner": false,
+    "instrument_tokenizer_or_vocabulary_enters_learner": false,
+    "unreviewed_records_enter_learner": false
+  },
+  "repository_exports": "PERMITTED_NONIDENTIFYING_CELL_SUPPRESSED_AGGREGATES_AND_DIGESTS_ONLY"
+}

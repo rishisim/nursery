@@ -1,0 +1,441 @@
+{
+  "schema_version": "childlens-annotation-audit-evidence-v1.1.0",
+  "generated_at_utc": "2026-07-21T23:40:49Z",
+  "audit_scope": {
+    "kind": "FEASIBILITY_GOVERNANCE_ONLY",
+    "scientific_outcome_authorized": false,
+    "learner_training_run": false,
+    "empirical_corpus": "CHILDLENS_ONLY",
+    "release_specific_evidence_status": "SANITIZED_AUTHENTICATED_LIVE_VIEW_COUNTS_AND_SCHEMA_OBSERVED_IMMUTABLE_REVISION_AND_LINKAGE_PENDING"
+  },
+  "sources": [
+    {
+      "source_id": "childlens_vor_2026",
+      "kind": "PRIMARY_PAPER_VERSION_OF_RECORD",
+      "title": "ChildLens: An egocentric video dataset for activity analysis in children",
+      "url": "https://link.springer.com/article/10.3758/s13428-026-02982-6",
+      "published": "2026-04-13",
+      "accessed": "2026-07-21"
+    },
+    {
+      "source_id": "childlens_table_1",
+      "kind": "PRIMARY_PAPER_TABLE",
+      "title": "Activity classes in the ChildLens dataset",
+      "url": "https://link.springer.com/article/10.3758/s13428-026-02982-6/tables/1",
+      "accessed": "2026-07-21"
+    },
+    {
+      "source_id": "childlens_table_4",
+      "kind": "PRIMARY_PAPER_TABLE",
+      "title": "Paper-snapshot activity and location statistics",
+      "url": "https://link.springer.com/article/10.3758/s13428-026-02982-6/tables/4",
+      "accessed": "2026-07-21",
+      "privacy_note": "Sparse class cells were not reproduced in the audit outputs."
+    },
+    {
+      "source_id": "childlens_official_project_page",
+      "kind": "OFFICIAL_PROJECT_PAGE",
+      "url": "https://www.eva.mpg.de/comparative-cultural-psychology/technical-development/childlens/",
+      "accessed": "2026-07-21"
+    },
+    {
+      "source_id": "childlens_keeper_doi_snapshot",
+      "kind": "PUBLIC_RELEASE_IDENTITY",
+      "url": "https://keeper.mpdl.mpg.de/doi/libs/c8ed0104-b793-4c35-817e-302afd4e036b/4856662653b2fa183e53268d088cffba02a33443/",
+      "access": "LOGIN_REQUIRED",
+      "accessed": "2026-07-21"
+    },
+    {
+      "source_id": "childlens_datacite",
+      "kind": "DOI_REGISTRATION_METADATA",
+      "url": "https://api.datacite.org/dois/10.17617/4.fe",
+      "accessed": "2026-07-21"
+    },
+    {
+      "source_id": "childlens_official_code",
+      "kind": "OFFICIAL_CODE_DOCUMENTATION",
+      "url": "https://github.com/neleSuffo/ChildLens/tree/4923ca1411e9622ec91367d03e23627ed70ef19a",
+      "commit": "4923ca1411e9622ec91367d03e23627ed70ef19a",
+      "accessed": "2026-07-21"
+    },
+    {
+      "source_id": "childlens_authenticated_keeper_receipt",
+      "kind": "SANITIZED_AUTHENTICATED_READ_ONLY_OBSERVATION",
+      "observed": "2026-07-21",
+      "content": "AGGREGATE_OBJECT_COUNTS_AND_FIELD_NAMES_ONLY",
+      "media_downloaded": false,
+      "identifier_or_timestamp_values_exported": false
+    }
+  ],
+  "release_boundary": {
+    "paper_snapshot_is_release_manifest": false,
+    "doi_is_sufficient_to_freeze_instance": false,
+    "reason": "The DOI pins a public Keeper snapshot and the authenticated live view uses the same library UUID, but the live UI exposes no immutable revision/hash. Content equivalence, distinct-content counts, links, and grouping completeness require a canonical manifest.",
+    "public_doi_snapshot_identity": {
+      "doi": "10.17617/4.fe",
+      "keeper_library_id": "c8ed0104-b793-4c35-817e-302afd4e036b",
+      "keeper_snapshot_commit": "4856662653b2fa183e53268d088cffba02a33443",
+      "datacite_version": null,
+      "datacite_rights_list": []
+    },
+    "authenticated_live_view": {
+      "keeper_library_uuid_matches_public_doi": true,
+      "immutable_live_revision_exposed": false,
+      "content_equivalence_to_public_snapshot_commit": "UNRESOLVED"
+    },
+    "exact_keeper_manifest_digest": "PENDING_CANONICAL_RESTRICTED_MANIFEST"
+  },
+  "public_keeper_landing_snapshot": {
+    "snapshot_status": "PUBLIC_LANDING_NOT_FILE_MANIFEST",
+    "total_duration_hours_rounded": 109,
+    "participant_groups_claimed": 62,
+    "annotated_duration_hours_rounded": 54,
+    "video_file_count": null,
+    "annotated_video_file_count": null
+  },
+  "preliminary_authenticated_view_from_task_input": {
+    "status": "UNVERIFIED_DIFFERENT_COUNTING_BASIS_OR_VIEW_NOT_CURRENT_MP4_COUNT",
+    "video_file_count_approximate": 343,
+    "annotated_video_file_count_approximate": 192,
+    "delta_from_paper_if_same_counting_basis": -11,
+    "required_resolution": "REASON_CODED_CANONICAL_RELEASE_MANIFEST"
+  },
+  "authenticated_live_view_inventory": {
+    "observation_date": "2026-07-21",
+    "keeper_library_uuid_matches_public_doi": true,
+    "mp4_objects_ui_count": 192,
+    "final_json_objects_ui_count": 192,
+    "platform_json_objects_ui_count": 192,
+    "annotation_json_interpretation": "CANDIDATE_ALTERNATE_SERIALIZATIONS_NOT_INDEPENDENT_ANNOTATION_COUNTS_PENDING_HASH_AND_LINKAGE_AUDIT",
+    "mp4_delta_from_public_paper_total_video_files": -162,
+    "mp4_count_matches_public_paper_annotated_video_count": true,
+    "annotated_subset_package_inference": "CONSISTENT_BUT_NOT_PROVEN",
+    "immutable_live_revision": null,
+    "canonical_manifest_digest": null,
+    "full_schema_exported": false,
+    "media_downloaded": false
+  },
+  "public_paper_snapshot": {
+    "snapshot_status": "PUBLIC_PAPER_NOT_RELEASE_MANIFEST",
+    "video_files": 354,
+    "total_duration_hours": 108.58,
+    "participant_groups": 62,
+    "age_range_years": [
+      3,
+      5
+    ],
+    "annotated_video_files": 192,
+    "annotated_fraction_reported": 0.51,
+    "annotated_duration_description": "approximately 55 hours",
+    "annotation_ongoing_at_snapshot": true,
+    "aggregation_caution": "Concurrent multi-label intervals overlap; class durations cannot be summed to obtain unique annotated duration."
+  },
+  "modality_findings": [
+    {
+      "modality": "EGOCENTRIC_RGB_VIDEO",
+      "public_status": "REPORTED_RAW",
+      "details": {
+        "mount": "CHILD_WORN_VEST_FORWARD_VIEW",
+        "reported_resolution": "1920x1080",
+        "reported_frame_rate_fps": 30,
+        "reported_lens_field_degrees": 140
+      },
+      "authenticated_live_ui_object_count": 192,
+      "authenticated_live_ui_extension": "MP4",
+      "release_validation": "REQUIRED_FOR_STREAM_PROPERTIES_DISTINCT_CONTENT_PARSEABILITY_AND_LINKAGE"
+    },
+    {
+      "modality": "SYNCHRONIZED_AUDIO",
+      "public_status": "REPORTED_RAW",
+      "authenticated_release_description_status": "CLAIMS_VIDEO_PLUS_AUDIO",
+      "audio_stream_decoded_in_audit": false,
+      "release_validation": "REQUIRED_FOR_PER_MP4_STREAM_PRESENCE_CODEC_CHANNEL_RATE_AND_USABILITY"
+    },
+    {
+      "modality": "TIMED_ACTIVITY_LOCATION_SPEECH_BOUT_ANNOTATIONS",
+      "public_status": "REPORTED_MANUAL_DERIVATIVE",
+      "authenticated_live_ui_final_json_count": 192,
+      "authenticated_live_ui_platform_json_count": 192,
+      "representations_are_independent_annotations": false,
+      "utterance_transcript": false,
+      "lexical_content": false
+    },
+    {
+      "modality": "LEXICAL_TRANSCRIPT",
+      "public_status": "NOT_REPORTED",
+      "authenticated_prefix_field_observation": "NO_LEXICAL_TRANSCRIPT_FIELD_OBSERVED",
+      "audit_status": "UNAVAILABLE_ON_INSPECTED_EVIDENCE_FULL_SCHEMA_ABSENCE_NOT_PROVEN"
+    },
+    {
+      "modality": "OBJECT_REFERENT_FINE_ACTION_GAZE_HAND_CONTACT_ANNOTATIONS",
+      "public_status": "NOT_REPORTED",
+      "audit_status": "UNAVAILABLE_ON_PUBLIC_EVIDENCE"
+    },
+    {
+      "modality": "IMU_TOUCH_PROPRIOCEPTION_MOTOR",
+      "public_status": "NOT_REPORTED",
+      "audit_status": "UNAVAILABLE_UNLESS_EXACT_RELEASE_MANIFEST_PROVES_OTHERWISE",
+      "scientific_role": "SIMULATOR_DEFINED_COUNTERFACTUAL_ONLY_IF_ABSENT"
+    }
+  ],
+  "annotation_schema": {
+    "published_conceptual_fields": [
+      "MEDIA_ASSOCIATION",
+      "START_TIME",
+      "END_TIME",
+      "ACTIVITY_CLASS",
+      "LOCATION",
+      "ALONE_OR_WITH_OTHERS",
+      "PERSON_AGE_CLASS",
+      "PERSON_GENDER"
+    ],
+    "serialization_in_exact_release": "FINAL_JSON_AND_PLATFORM_FORMAT_JSON_REPRESENTATIONS_OBSERVED",
+    "exact_release_representation_counts": {
+      "final_json": 192,
+      "platform_format_json": 192
+    },
+    "representations_presumed_alternates_pending_hash_and_linkage": true,
+    "multi_label": true,
+    "simultaneous_activities_are_separate_annotations": true,
+    "audio_bout_merge_rule_seconds": 2,
+    "audio_bouts_are_utterances": false,
+    "public_code_expected_input": "INDIVIDUAL_JSON_ANNOTATION_FILES_FOR_BENCHMARK_PREPARATION",
+    "code_interface_proves_exact_release_serialization": false,
+    "authenticated_final_json_visible_prefix": {
+      "scope": "REPRESENTATIVE_PREFIX_ONLY_NOT_FULL_SCHEMA",
+      "top_level_fields": [
+        "video_name",
+        "videoName",
+        "duration",
+        "annotations"
+      ],
+      "event_fields": [
+        "startTime",
+        "endTime",
+        "time",
+        "category_id",
+        "categoryId",
+        "eventId",
+        "type",
+        "fields"
+      ],
+      "contextual_fields": [
+        "Type of Location",
+        "Alone?",
+        "UP_TO_SIX_OTHER_PERSON_AGE_GROUP_SLOTS",
+        "UP_TO_SIX_OTHER_PERSON_GENDER_SLOTS"
+      ],
+      "time_unit_or_base": "UNRESOLVED",
+      "full_category_codebook": "UNRESOLVED",
+      "lexical_transcript_field_observed": false,
+      "dedicated_utterance_speaker_role_field_observed": false
+    },
+    "authenticated_participant_table_schema": {
+      "fields": [
+        "MEDIA_FILE_LINK",
+        "ANONYMIZED_CHILD_GROUP",
+        "RECORDING_DATE",
+        "BIRTHDAY_FOR_AGE_DERIVATION",
+        "GENDER",
+        "COMMENTS"
+      ],
+      "value_content_exported": false,
+      "participant_split_key_available_in_schema": true,
+      "session_day_split_key_available_in_schema": true,
+      "linkage_completeness": "UNRESOLVED",
+      "comments_scientific_path": "EXCLUDE",
+      "exact_dates_and_birthdays_exportable": false
+    }
+  },
+  "label_inventory": {
+    "location": [
+      "livingroom",
+      "playroom",
+      "bathroom",
+      "hallway",
+      "other"
+    ],
+    "location_literal_codebook_caution": "Public aggregate table uses Other Room while prose uses other.",
+    "activity_audio": [
+      "child talking",
+      "other person talking",
+      "overheard speech",
+      "singing/humming",
+      "listening to music/audiobook"
+    ],
+    "activity_visual_as_paper_prose": [
+      "watching something",
+      "drawing",
+      "crafting things",
+      "dancing",
+      "playing with object"
+    ],
+    "activity_multimodal_as_paper_prose": [
+      "playing without object",
+      "reading a book",
+      "making music",
+      "pretend play"
+    ],
+    "public_category_discrepancy": "PAPER_PROSE_LISTS_PLAYING_WITH_OBJECT_AS_VISUAL_WHILE_PUBLIC_TABLE_4_PLACES_IT_UNDER_MULTIMODAL",
+    "canonical_higher_level_modality_family": "PENDING_EXACT_RELEASE_CODEBOOK_OR_EXPLICIT_AUDIT_DEFINITION",
+    "fine_grained_noun_object_labels": false,
+    "fine_grained_verb_action_labels": false,
+    "word_referent_links": false
+  },
+  "missingness_findings": [
+    {
+      "dimension": "PAPER_ANNOTATION_COVERAGE",
+      "finding": "The public paper reports only part of the corpus annotated and says annotation is ongoing."
+    },
+    {
+      "dimension": "CLASS_BALANCE",
+      "finding": "The public paper reports pronounced imbalance across activity counts and durations; participant/session distribution is not published."
+    },
+    {
+      "dimension": "OVERHEARD_SPEAKER_ATTRIBUTES",
+      "finding": "The paper's voice-type mapping states that overheard speech lacks speaker age/gender information."
+    },
+    {
+      "dimension": "RELEASE_LINK_COVERAGE",
+      "finding": "MEDIA_LINK_PARTICIPANT_GROUP_AND_RECORDING_DATE_FIELDS_OBSERVED_LINKAGE_COMPLETENESS_PENDING"
+    },
+    {
+      "dimension": "RELEASE_SERIALIZATION_DUPLICATION",
+      "finding": "TWO_EQUAL_COUNT_JSON_FAMILIES_OBSERVED_TREAT_AS_ALTERNATE_SERIALIZATIONS_PENDING_HASH_AND_LINKAGE_AUDIT"
+    },
+    {
+      "dimension": "WITHIN_FILE_TEMPORAL_COVERAGE",
+      "finding": "PENDING_UNION_INTERVAL_AUDIT"
+    },
+    {
+      "dimension": "TECHNICAL_DECODE_USABILITY",
+      "finding": "PENDING_AUTHORIZED_PILOT"
+    }
+  ],
+  "language_evidence": {
+    "recorded_language_status": "UNKNOWN_PENDING_RELEASE_OR_PERMITTED_PILOT",
+    "direct_public_language_statement_found": false,
+    "direct_authenticated_schema_language_statement_found": false,
+    "context_only": [
+      "FAMILIES_LIVED_IN_A_MID_SIZED_GERMAN_CITY",
+      "ACTIVITY_ANNOTATORS_WERE_NATIVE_GERMAN_SPEAKERS"
+    ],
+    "forbidden_inference": "DO_NOT_ASSUME_ENGLISH_GERMAN_MONOLINGUAL_OR_SINGLE_LANGUAGE",
+    "asr_routing_required": true
+  },
+  "grouping_and_split_feasibility": {
+    "paper_participant_grouping": {
+      "status": "DEMONSTRATED_FOR_AUTHOR_VOICE_TYPE_BENCHMARK_SUBSET",
+      "split_group_counts": {
+        "train": 38,
+        "validation": 10,
+        "test": 10
+      },
+      "sum_differs_from_public_corpus_participants": true,
+      "difference_interpretation": "UNEXPLAINED_BENCHMARK_SUBSET_COVERAGE_NOT_RELEASE_COUNT"
+    },
+    "exact_release_participant_key": "ANONYMIZED_CHILD_GROUP_FIELD_OBSERVED_VALUES_QUARANTINED",
+    "participant_disjoint_primary_split": "SUPPORTED_IN_SCHEMA_PENDING_COMPLETE_MEDIA_LINKAGE_AND_LEXICAL_SUPPORT",
+    "paper_recording_structure": "ONE_PARTICIPATION_INSTANCE_PER_CHILD_OVER_ONE_TO_TWO_WEEKS_WITH_ONE_OR_MULTIPLE_DAYS",
+    "exact_release_session_day_key": "RECORDING_DATE_FIELD_OBSERVED_VALUES_QUARANTINED",
+    "session_disjoint_sensitivity_split": "SUPPORTED_IN_SCHEMA_PENDING_COMPLETE_LINKAGE_AND_FROZEN_SAME_DATE_GROUPING_RULE",
+    "household_coplayer_grouping": "NOT_PUBLICLY_DOCUMENTED",
+    "paper_video_benchmark_split": "CLIP_LEVEL_80_10_10_NOT_DOCUMENTED_AS_PARTICIPANT_DISJOINT",
+    "lexical_support_after_group_split": "REQUIRES_CORRECTED_TRANSCRIPT_PILOT"
+  },
+  "release_paper_reconciliation": {
+    "status": "AUTHENTICATED_UI_COUNTS_OBSERVED_CANONICAL_HASHED_MANIFEST_PENDING",
+    "current_ui_observation": {
+      "mp4_objects": 192,
+      "final_json_objects": 192,
+      "platform_json_objects": 192
+    },
+    "paper_comparison": {
+      "total_video_files": 354,
+      "annotated_video_files": 192,
+      "current_mp4_minus_paper_total": -162,
+      "current_mp4_equals_paper_annotated": true,
+      "annotated_subset_interpretation": "CONSISTENT_NOT_PROVEN"
+    },
+    "required_count_units": [
+      "VIDEO_FILE",
+      "ANNOTATION_FILE",
+      "ANNOTATED_VIDEO",
+      "USABLE_LINKED_VIDEO",
+      "PARTICIPANT_GROUP",
+      "SESSION_GROUP"
+    ],
+    "allowed_explanations_to_test": [
+      "RELEASE_VERSION_CHANGE",
+      "PAPER_EXCLUSION_RULE",
+      "DUPLICATE_OR_ALTERNATE_ENCODING",
+      "ORPHAN_OR_MISSING_LINK",
+      "ASSET_CLASSIFICATION_DIFFERENCE"
+    ],
+    "silent_count_selection_forbidden": true
+  },
+  "gate_implications": [
+    {
+      "gate_id": "G2_RELEASE_GROUPING",
+      "status": "CONDITIONAL",
+      "reason": "The live library UUID matches the DOI library; current UI counts plus anonymized-child and recording-date grouping fields are observed. Immutable live revision, canonical hashes, and linkage completeness remain unresolved."
+    },
+    {
+      "gate_id": "G3_AUDIO_TIMING",
+      "status": "UNRESOLVED",
+      "reason": "Audio and coarse speech bouts are reported; utterance timing and technical usability require an authorized pilot."
+    },
+    {
+      "gate_id": "G4_TRANSCRIPT_ROLE",
+      "status": "UNRESOLVED",
+      "reason": "No lexical transcript or dedicated utterance-level speaker-role field was observed in the inspected final-JSON prefix; full-schema absence and validated derived roles remain unresolved."
+    },
+    {
+      "gate_id": "G5_INPUT_LEXICON",
+      "status": "UNRESOLVED",
+      "reason": "Non-child and overheard speech categories exist but lexical recurrence is unknown."
+    },
+    {
+      "gate_id": "G6_REFERENTIAL_ANNOTATION",
+      "status": "UNRESOLVED",
+      "reason": "Broad object/activity contexts exist but referential candidates and reliability are unmeasured."
+    },
+    {
+      "gate_id": "G7_HELDOUT_EVALUATION",
+      "status": "UNRESOLVED",
+      "reason": "Participant and recording-date split keys exist in schema, but complete linkage and lexical/action support after splitting are unproven."
+    },
+    {
+      "gate_id": "G9_SIMULATOR_CALIBRATION",
+      "status": "UNRESOLVED",
+      "reason": "Public evidence reports video/audio only; exact release and terms must confirm aggregates and absence of physical streams."
+    }
+  ],
+  "required_release_checks": [
+    "OBTAIN_IMMUTABLE_LIVE_REVISION_IF_EXPOSED_AND_CANONICAL_RESTRICTED_MANIFEST_DIGEST",
+    "COUNT_BYTES_DISTINCT_CONTENT_PARSEABLE_MP4_AND_LINKABLE_JSON_REPRESENTATIONS_WITHOUT_PATH_OR_ID_EXPORT",
+    "AUDIT_LITERAL_ANNOTATION_FIELDS_TYPES_CODEBOOK_TIMEBASE_AND_MISSING_ENCODING",
+    "AUDIT_ANNOTATION_MEDIA_PARTICIPANT_FOREIGN_KEY_COVERAGE",
+    "AUDIT_COMPLETE_PARTICIPANT_AND_RECORDING_DATE_LINKAGE_AND_FREEZE_SAME_DATE_SESSION_RULE",
+    "COMPUTE_UNION_ANNOTATION_COVERAGE_WITHOUT_EXPORTING_TIMESTAMPS",
+    "CONFIRM_PRESENCE_OR_ABSENCE_OF_TRANSCRIPT_REFERENT_AND_PHYSICAL_SENSOR_STREAMS",
+    "IDENTIFY_EXPLICIT_LANGUAGE_DOCUMENTATION_OR_RECORD_UNKNOWN"
+  ],
+  "privacy_receipt": {
+    "raw_video_accessed": false,
+    "raw_audio_accessed": false,
+    "frames_accessed": false,
+    "transcript_content_accessed": false,
+    "participant_or_session_identifier_values_inspected": false,
+    "exact_media_timestamps_inspected": false,
+    "small_release_cells_exported": false,
+    "sanitized_authenticated_keeper_receipt_used": true,
+    "authenticated_keeper_media_downloaded": false,
+    "authenticated_receipt_exported_field_names_only": true,
+    "aea_empirical_ancestry": false,
+    "babyview_empirical_ancestry": false,
+    "temporary_public_code_checkout": "DOCUMENTATION_ONLY_AUXILIARY_DATA_FILES_NOT_OPENED_CHECKOUT_TRASHED",
+    "restricted_payload_in_outputs": false
+  },
+  "terminal_decision": null
+}

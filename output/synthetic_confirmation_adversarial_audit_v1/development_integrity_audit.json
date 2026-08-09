@@ -1,0 +1,231 @@
+{
+  "closed_gates": {
+    "failed": [],
+    "passed": 33,
+    "total": 33
+  },
+  "closed_output_inventory": {
+    "digest_scheme": "sorted path\\0bytes\\0sha256\\n",
+    "expected_digest": "8b97ec7c5f4667b1fd0236bd556d92ff6c0f4ea807bdfabd5d9b44d974d5150f",
+    "file_count": 1104,
+    "match": true,
+    "observed_digest": "8b97ec7c5f4667b1fd0236bd556d92ff6c0f4ea807bdfabd5d9b44d974d5150f",
+    "total_bytes": 9576760450
+  },
+  "cohort_terminal": {
+    "confirmation_authorized": false,
+    "confirmation_outcomes": 0,
+    "development_decision": "DEVELOPMENT_PASS",
+    "development_outcomes": 1,
+    "status": "PASS"
+  },
+  "guard_defects": [
+    "Authorization validates a command string stored in the payload but does not bind actual parsed CLI paths.",
+    "The caller may select any absent output root, so the same authorization is replayable.",
+    "The frozen package outcome registry remains at its prelaunch zero state and is not consumed.",
+    "The frozen manifest verifier checks listed rows but not the exact file set, file_count, duplicates, or path confinement.",
+    "Current bytes were independently closed by stricter checks above; these are mechanism defects, not evidence that a replay occurred."
+  ],
+  "key_hashes": {
+    "ONE_SHOT_EXECUTION.json": {
+      "expected": "2e043cc042ddf2727f9ba10cbe7cdac46a413839c6b9ec5f64c338753954c9ee",
+      "match": true,
+      "observed": "2e043cc042ddf2727f9ba10cbe7cdac46a413839c6b9ec5f64c338753954c9ee"
+    },
+    "cohort_summary.json": {
+      "expected": "0217203e707a761cf488a85a11c52c1711309cc3c310d9fb2fc7a43ccf561727",
+      "match": true,
+      "observed": "0217203e707a761cf488a85a11c52c1711309cc3c310d9fb2fc7a43ccf561727"
+    },
+    "identifier_reference_audit.json": {
+      "expected": "c75778a012448984c88160ee07f6a8a7c2ee0716d76e2b8f075490e061653edd",
+      "match": true,
+      "observed": "c75778a012448984c88160ee07f6a8a7c2ee0716d76e2b8f075490e061653edd"
+    },
+    "persisted_inputs/input_manifest.json": {
+      "expected": "d8e31df113f47c10397abe76a58eaebd79b9100f13defb92b9e8aa1581e64453",
+      "match": true,
+      "observed": "d8e31df113f47c10397abe76a58eaebd79b9100f13defb92b9e8aa1581e64453"
+    },
+    "recomputable/development_inference.json": {
+      "expected": "e4dfc945ff2bb3777a3f0354d9b2fd6ede18a272480b5fdd932d0e610506dd6d",
+      "match": true,
+      "observed": "e4dfc945ff2bb3777a3f0354d9b2fd6ede18a272480b5fdd932d0e610506dd6d"
+    }
+  },
+  "launch_package_manifest": {
+    "actual_count": 458,
+    "declared_count": 458,
+    "file_count_field": 458,
+    "manifest_digest": "9705c205776905316915838f93684a15cc05978df710c351930732140d58ee6d",
+    "manifest_digest_recomputed": "9705c205776905316915838f93684a15cc05978df710c351930732140d58ee6d",
+    "missing": [],
+    "problems": [],
+    "status": "PASS",
+    "unexpected": [],
+    "unique_path_count": 458
+  },
+  "marker": {
+    "authorization_digest": "1af7285f5f716c2e0a3fce0f0b4b118acde3d0607105125d2ed09d1922d1ce55",
+    "cohort_summary_sha256": "0217203e707a761cf488a85a11c52c1711309cc3c310d9fb2fc7a43ccf561727",
+    "confirmation_authorized": false,
+    "confirmation_outcome_count": 0,
+    "development_outcome_count": 1,
+    "protocol_id": "synthetic-development-launch-v3",
+    "status": "COMPLETE"
+  },
+  "one_shot_markers_in_output": [
+    "output/synthetic_development_v3_one_shot/ONE_SHOT_EXECUTION.json"
+  ],
+  "persisted_input_manifest": {
+    "actual_count": 1082,
+    "declared_count": 1082,
+    "expected_digest": "31b2600e1a6685b21a857f1054b926d483e72c847decb6ba54a8edcd738e2a68",
+    "expected_digest_match": true,
+    "file_count_field": 1082,
+    "manifest_digest": "31b2600e1a6685b21a857f1054b926d483e72c847decb6ba54a8edcd738e2a68",
+    "manifest_digest_recomputed": "31b2600e1a6685b21a857f1054b926d483e72c847decb6ba54a8edcd738e2a68",
+    "missing": [],
+    "problems": [],
+    "status": "PASS",
+    "unexpected": [],
+    "unique_path_count": 1082
+  },
+  "persisted_recomputation": {
+    "execution_transcript": {
+      "recompute_exit_code": 0,
+      "recorded_recompute_invocations": 1,
+      "recorded_run_development_invocations": 1,
+      "rollout_path": "/Users/rishisim/.codex/sessions/2026/07/16/rollout-2026-07-16T16-28-33-019f6d42-ac65-7c31-9fd8-82e06fd7b548.jsonl",
+      "run_development_exit_code": 0,
+      "task_id": "019f6d42-ac65-7c31-9fd8-82e06fd7b548"
+    },
+    "files_compared": 13,
+    "rows": [
+      {
+        "byte_identical": true,
+        "original_bytes": 2477632,
+        "original_sha256": "c9f71d7720108816920765a803727d49048985ff4924253b7136489e131c01ec",
+        "path": "compute_operation_log.json",
+        "staged_bytes": 2477632,
+        "staged_sha256": "c9f71d7720108816920765a803727d49048985ff4924253b7136489e131c01ec"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 2333643,
+        "original_sha256": "c2379c0ba4cd56cdd3963d7ede980bb68fc07ef2e8a523cd2cd1ac826b10a820",
+        "path": "control_results.json",
+        "staged_bytes": 2333643,
+        "staged_sha256": "c2379c0ba4cd56cdd3963d7ede980bb68fc07ef2e8a523cd2cd1ac826b10a820"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 2108813,
+        "original_sha256": "cca952c9308759cc8579a60a11e1417be72bc3434e4bec9e788ff5a56c513b83",
+        "path": "core_gates.json",
+        "staged_bytes": 2108813,
+        "staged_sha256": "cca952c9308759cc8579a60a11e1417be72bc3434e4bec9e788ff5a56c513b83"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 103408,
+        "original_sha256": "968172c4da166c4756940a7501af462eb7c5be85ec80a435f742020ee548db9d",
+        "path": "development_controls.json",
+        "staged_bytes": 103408,
+        "staged_sha256": "968172c4da166c4756940a7501af462eb7c5be85ec80a435f742020ee548db9d"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 5042,
+        "original_sha256": "e4dfc945ff2bb3777a3f0354d9b2fd6ede18a272480b5fdd932d0e610506dd6d",
+        "path": "development_inference.json",
+        "staged_bytes": 5042,
+        "staged_sha256": "e4dfc945ff2bb3777a3f0354d9b2fd6ede18a272480b5fdd932d0e610506dd6d"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 447280,
+        "original_sha256": "e71cdb41c464b37bc11650e0c9e8db4485def5fe0fee09fffe2f332105731b10",
+        "path": "factor_audit.json",
+        "staged_bytes": 447280,
+        "staged_sha256": "e71cdb41c464b37bc11650e0c9e8db4485def5fe0fee09fffe2f332105731b10"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 68970922,
+        "original_sha256": "1e5ae307e327be8e12075caa92554aeb424831c3c34e641bcf05bb6c3c15fcbb",
+        "path": "factor_results.json",
+        "staged_bytes": 68970922,
+        "staged_sha256": "1e5ae307e327be8e12075caa92554aeb424831c3c34e641bcf05bb6c3c15fcbb"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 342,
+        "original_sha256": "dd290bdc51822a4821b06acabb1dceda637c4480cc5d089deef8e60d40653e2f",
+        "path": "leakage_audit.json",
+        "staged_bytes": 342,
+        "staged_sha256": "dd290bdc51822a4821b06acabb1dceda637c4480cc5d089deef8e60d40653e2f"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 411,
+        "original_sha256": "0a2a63da705c561ec4b91845f3565c8b60200aa1954ae02c7330cffa23ad4b2f",
+        "path": "learner_numeric_audit.json",
+        "staged_bytes": 411,
+        "staged_sha256": "0a2a63da705c561ec4b91845f3565c8b60200aa1954ae02c7330cffa23ad4b2f"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 2065647,
+        "original_sha256": "dc604d236d0ced99dbf3ae436395f2026ec5effb4292f6ba1074d677c8f98fc4",
+        "path": "model_averages.json",
+        "staged_bytes": 2065647,
+        "staged_sha256": "dc604d236d0ced99dbf3ae436395f2026ec5effb4292f6ba1074d677c8f98fc4"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 43789806,
+        "original_sha256": "3dc99fe30ab62fd9f0897ec3cfa8d57921bd7405c4c273c1e770cad39980b2d9",
+        "path": "model_results.json",
+        "staged_bytes": 43789806,
+        "staged_sha256": "3dc99fe30ab62fd9f0897ec3cfa8d57921bd7405c4c273c1e770cad39980b2d9"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 5765705,
+        "original_sha256": "423e9133d4a7af0bb1609ecf085452fc104568a7b5ce16de181a8f1563d39bc0",
+        "path": "null_capacity_audit.json",
+        "staged_bytes": 5765705,
+        "staged_sha256": "423e9133d4a7af0bb1609ecf085452fc104568a7b5ce16de181a8f1563d39bc0"
+      },
+      {
+        "byte_identical": true,
+        "original_bytes": 287645,
+        "original_sha256": "ba141f6d2a278130022db68bfc55153111ad3ec0def94699c44b69ba3f94c305",
+        "path": "order_invariance_audit.json",
+        "staged_bytes": 287645,
+        "staged_sha256": "ba141f6d2a278130022db68bfc55153111ad3ec0def94699c44b69ba3f94c305"
+      }
+    ],
+    "source": "/tmp/nursery-development-v3-audit.sIEJgF/recompute",
+    "status": "PASS"
+  },
+  "recomputable_gates": {
+    "failed": [],
+    "passed": 23,
+    "total": 23
+  },
+  "source_snapshot_manifest": {
+    "actual_count": 49,
+    "declared_count": 49,
+    "file_count_field": 49,
+    "manifest_digest": "837171ab05c9c38715104b09635aa20d0d405cc4d4b355b76d8611eb5b072253",
+    "manifest_digest_recomputed": "837171ab05c9c38715104b09635aa20d0d405cc4d4b355b76d8611eb5b072253",
+    "missing": [],
+    "problems": [],
+    "status": "PASS",
+    "unexpected": [],
+    "unique_path_count": 49
+  },
+  "status": "PASS"
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "nursery-childlens-isolated-author-module-alias-implementation-receipt-v1.8.8",
+  "status": "PASS",
+  "amendment": "isolated_author_module_alias_amendment_v1_8_8.json",
+  "post_change_runner_sha256": "697e105574825c35c6f426f7a1fa262d8b451bff413b02e9e4ebe30636db6f47",
+  "test_file_sha256": "524a175593f83ccf495b8a151e759fac02a5679506cdd60d1f195c2ec8b0d053",
+  "tests_passed": 18,
+  "isolated_interpreter_preserved": true,
+  "filesystem_path_added_to_sys_path": false,
+  "model_inference_rerun": false,
+  "sample_or_scientific_protocol_changed": false,
+  "restricted_payload_exported": false,
+  "scientific_endpoint_opened": false
+}

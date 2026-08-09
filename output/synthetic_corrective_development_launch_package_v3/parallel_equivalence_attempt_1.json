@@ -1,0 +1,17 @@
+{
+  "adjudication_relevant_file_count": 17,
+  "byte_identical": true,
+  "expected_file_set_complete": true,
+  "jobs_and_runtime_telemetry_excluded": true,
+  "left_digest": "86c8d5a6c8222c2170655e0450c2125b9f3676f8ae7a4be8bf042c295d61ed57",
+  "mismatched": [],
+  "missing_from_jobs_1": [],
+  "missing_from_jobs_n": [],
+  "missing_required_from_jobs_1": [],
+  "missing_required_from_jobs_n": [],
+  "right_digest": "86c8d5a6c8222c2170655e0450c2125b9f3676f8ae7a4be8bf042c295d61ed57",
+  "schema_version": "nursery-corrective-parallel-equivalence-v3",
+  "status": "PASS",
+  "unexpected_in_jobs_1": [],
+  "unexpected_in_jobs_n": []
+}

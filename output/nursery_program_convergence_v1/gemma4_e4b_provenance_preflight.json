@@ -1,0 +1,101 @@
+{
+  "schema_version": "nursery-gemma4-e4b-provenance-preflight-v1",
+  "generated_at": "2026-07-22",
+  "status": "RECOMMEND_PINNED_LOCAL_CONVERSION",
+  "scope": "PUBLIC_PRIMARY_METADATA_ONLY",
+  "downloads_performed": false,
+  "restricted_content_accessed": false,
+  "license_clickthrough_accepted": false,
+  "upstream": {
+    "repository": "google/gemma-4-E4B-it",
+    "revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+    "instruction_tuned": true,
+    "private": false,
+    "gated": false,
+    "license": "Apache-2.0",
+    "file_count": 9,
+    "artifact_bytes": 16024823729,
+    "weight_file": {
+      "name": "model.safetensors",
+      "bytes": 15992595884,
+      "sha256": "cfbd3d2f1cd71bd471c37fe2bf8546d5028d41e5736f64e1ca6c6b8893125503"
+    },
+    "architecture": "Gemma4ForConditionalGeneration",
+    "source_dtype": "bfloat16"
+  },
+  "converter": {
+    "repository": "Blaizzy/mlx-vlm",
+    "version": "0.6.6",
+    "revision": "c9e27b08311f9c1f38690c46034b04c7598d73ee",
+    "convert_source_blob": "5793d33dec6d982a5e55d2c0b305a925234e0eca",
+    "license": "MIT",
+    "wheel": {
+      "filename": "mlx_vlm-0.6.6-py3-none-any.whl",
+      "bytes": 1948458,
+      "sha256": "c0fcbd9c0297ac94e923772a59610173553a42b36c74370dc65191250b91ef6e"
+    }
+  },
+  "conversion_recipe": {
+    "input": "PINNED_LOCAL_GOOGLE_SNAPSHOT_ONLY",
+    "quantize": true,
+    "mode": "affine",
+    "bits": 4,
+    "group_size": 64,
+    "mixed_bit_recipe": null,
+    "trust_remote_code": false,
+    "upload": false,
+    "network_denied": true
+  },
+  "previous_mlx_community_conversion": {
+    "repository": "mlx-community/gemma-4-e4b-it-4bit",
+    "revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+    "private": false,
+    "gated": false,
+    "declared_license": "gemma",
+    "declared_base_model": "google/gemma-4-E4B-it",
+    "immutable_upstream_revision_declared": false,
+    "converter_version_or_revision_declared": false,
+    "license_file_present": false,
+    "file_count": 10,
+    "artifact_bytes": 5179241512,
+    "weight_bytes": 5146800534,
+    "weight_sha256": "932b8271fc3fe65adcc78b96c10c6268bbfb13e8f67d1358727c0d6ee97e1eff",
+    "config_quantization": {
+      "mode": "affine",
+      "bits": 4,
+      "group_size": 64
+    },
+    "provenance_sufficient": false,
+    "disposition": "FAIL_CLOSED_PROVENANCE"
+  },
+  "required_local_receipt": {
+    "apache_license_copy": true,
+    "modification_notice": true,
+    "source_manifest": true,
+    "converter_and_dependency_lock": true,
+    "quantization_recipe": true,
+    "converted_manifest": true,
+    "no_remote_code_auth_upload_receipt": true,
+    "public_network_denied_canary": true
+  },
+  "storage": {
+    "source_bytes_exact": 16024823729,
+    "converted_bytes_unmeasured": true,
+    "comparison_conversion_bytes": 5179241512,
+    "minimum_source_plus_output_reserve_decimal_gb": 22,
+    "post_peak_free_space_floor_gib": 50
+  },
+  "recommended_path": "PINNED_GOOGLE_APACHE2_UPSTREAM_TO_LOCAL_PINNED_MIT_MLX_VLM_CONVERSION",
+  "restricted_inference_authorized": false,
+  "sources": [
+    "https://huggingface.co/api/models/google/gemma-4-E4B-it?blobs=true",
+    "https://huggingface.co/google/gemma-4-E4B-it/tree/ee0ef6023621cff504d758262d4e04895a5af4a2",
+    "https://ai.google.dev/gemma/apache_2",
+    "https://huggingface.co/api/models/mlx-community/gemma-4-e4b-it-4bit?blobs=true",
+    "https://huggingface.co/mlx-community/gemma-4-e4b-it-4bit/tree/475b9088d29754a3379866cf5aeb6b41acd313c2",
+    "https://github.com/Blaizzy/mlx-vlm/releases/tag/v0.6.6",
+    "https://github.com/Blaizzy/mlx-vlm/blob/c9e27b08311f9c1f38690c46034b04c7598d73ee/mlx_vlm/convert.py",
+    "https://github.com/Blaizzy/mlx-vlm/blob/c9e27b08311f9c1f38690c46034b04c7598d73ee/LICENSE",
+    "https://pypi.org/pypi/mlx-vlm/0.6.6/json"
+  ]
+}

@@ -1,0 +1,667 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:nursery:gemma4-e4b:prototype-full-activation-receipt:v1",
+  "title": "Gemma 4 E4B bounded prototype full-activation receipt v1",
+  "description": "Fail-closed schema for a future receipt that may activate only the exact cached Gemma 4 E4B artifact for the bounded ChildLens pseudo-calibration replacement branch after the frozen public canary passes. This schema is not itself an activation receipt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "created_at",
+    "status",
+    "scope",
+    "immutable_bindings",
+    "artifact_binding",
+    "runtime_binding",
+    "resource_binding",
+    "public_canary_binding",
+    "qwen3_read_only_binding",
+    "unchanged_contract",
+    "gate_results",
+    "authorization_boundary",
+    "privacy_and_scientific_attestations",
+    "next_action"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "nursery-gemma4-e4b-prototype-full-activation-receipt-v1"
+    },
+    "created_at": {
+      "type": "string",
+      "pattern": "^2026-[0-9]{2}-[0-9]{2}$"
+    },
+    "status": {
+      "const": "PROTOTYPE_INSTRUMENT_ACTIVATED_RESTRICTED_INFERENCE_NOT_RUN"
+    },
+    "scope": {
+      "const": "EXACT_CACHED_GEMMA4_E4B_INTERNAL_PSEUDO_CALIBRATION_ONLY"
+    },
+    "immutable_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "replacement_amendment",
+        "opaque_provenance_amendment",
+        "opaque_provenance_activation_receipt",
+        "resource_receipt",
+        "common_schema_canary_contract"
+      ],
+      "properties": {
+        "replacement_amendment": {
+          "$ref": "#/$defs/replacement_binding"
+        },
+        "opaque_provenance_amendment": {
+          "$ref": "#/$defs/provenance_binding"
+        },
+        "opaque_provenance_activation_receipt": {
+          "$ref": "#/$defs/provenance_receipt_binding"
+        },
+        "resource_receipt": {
+          "$ref": "#/$defs/resource_binding"
+        },
+        "common_schema_canary_contract": {
+          "$ref": "#/$defs/canary_contract_binding"
+        }
+      }
+    },
+    "artifact_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "conversion_revision",
+        "upstream_repository",
+        "current_upstream_revision",
+        "snapshot_file_count",
+        "snapshot_bytes",
+        "snapshot_manifest_sha256",
+        "weight_bytes",
+        "weight_sha256",
+        "all_ten_files_match_provenance_amendment",
+        "cached_rehash_exact_match",
+        "artifact_substitution_mutation_download_or_copy",
+        "opaque_internal_only_limitations_visible"
+      ],
+      "properties": {
+        "repository": {
+          "const": "mlx-community/gemma-4-e4b-it-4bit"
+        },
+        "conversion_revision": {
+          "const": "475b9088d29754a3379866cf5aeb6b41acd313c2"
+        },
+        "upstream_repository": {
+          "const": "google/gemma-4-E4B-it"
+        },
+        "current_upstream_revision": {
+          "const": "ee0ef6023621cff504d758262d4e04895a5af4a2"
+        },
+        "snapshot_file_count": {
+          "const": 10
+        },
+        "snapshot_bytes": {
+          "const": 5179241512
+        },
+        "snapshot_manifest_sha256": {
+          "const": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae"
+        },
+        "weight_bytes": {
+          "const": 5146800534
+        },
+        "weight_sha256": {
+          "const": "932b8271fc3fe65adcc78b96c10c6268bbfb13e8f67d1358727c0d6ee97e1eff"
+        },
+        "all_ten_files_match_provenance_amendment": {
+          "const": true
+        },
+        "cached_rehash_exact_match": {
+          "const": true
+        },
+        "artifact_substitution_mutation_download_or_copy": {
+          "const": false
+        },
+        "opaque_internal_only_limitations_visible": {
+          "const": true
+        }
+      }
+    },
+    "runtime_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "python",
+        "mlx_vlm",
+        "mlx",
+        "transformers",
+        "tokenizers",
+        "numpy",
+        "pillow",
+        "llguidance",
+        "ffmpeg",
+        "complete_hash_locked_dependency_file_sha256",
+        "interpreter_executable_sha256",
+        "mlx_vlm_installed_tree_manifest_sha256",
+        "ffmpeg_executable_sha256",
+        "canary_adapter_sha256",
+        "network_denial_profile_sha256",
+        "say_executable_sha256",
+        "german_voice_inventory_sha256",
+        "compiled_runtime_lock_available",
+        "all_runtime_hashes_verified"
+      ],
+      "properties": {
+        "python": {
+          "const": "3.12.13"
+        },
+        "mlx_vlm": {
+          "const": "0.6.6"
+        },
+        "mlx": {
+          "const": "0.32.0"
+        },
+        "transformers": {
+          "const": "5.14.1"
+        },
+        "tokenizers": {
+          "const": "0.22.2"
+        },
+        "numpy": {
+          "const": "2.5.1"
+        },
+        "pillow": {
+          "const": "12.3.0"
+        },
+        "llguidance": {
+          "const": "1.7.6"
+        },
+        "ffmpeg": {
+          "const": "8.0.1"
+        },
+        "complete_hash_locked_dependency_file_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "interpreter_executable_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "mlx_vlm_installed_tree_manifest_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "ffmpeg_executable_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "canary_adapter_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "network_denial_profile_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "say_executable_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "german_voice_inventory_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "compiled_runtime_lock_available": {
+          "const": true
+        },
+        "all_runtime_hashes_verified": {
+          "const": true
+        }
+      }
+    },
+    "resource_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "status",
+        "launch_rehash_passed",
+        "launch_disk_floor_passed",
+        "launch_memory_pressure_passed",
+        "single_MPS_lock_acquired"
+      ],
+      "properties": {
+        "path": {
+          "const": "output/nursery_program_convergence_v1/gemma4_e4b_prototype_activation_resource_receipt.json"
+        },
+        "sha256": {
+          "const": "363fda5ebc189216b2d8e9a9133cb51cea91fcc0ea9dc15fef023a028648dcd4"
+        },
+        "status": {
+          "const": "VERIFIED_REUSE_RESOURCE_ADMITTED"
+        },
+        "launch_rehash_passed": {
+          "const": true
+        },
+        "launch_disk_floor_passed": {
+          "const": true
+        },
+        "launch_memory_pressure_passed": {
+          "const": true
+        },
+        "single_MPS_lock_acquired": {
+          "const": true
+        }
+      }
+    },
+    "public_canary_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_schema_version",
+        "receipt_status",
+        "receipt_path",
+        "receipt_sha256",
+        "contract_path",
+        "contract_sha256",
+        "fixture_manifest_sha256",
+        "prompt_sha256",
+        "common_schema_sha256",
+        "parser_contract_sha256",
+        "parser_correction_count",
+        "audio_consumed",
+        "five_frames_consumed_in_order",
+        "exact_schema_valid",
+        "all_parser_negative_fixtures_pass",
+        "network_denial_sentinel_passed",
+        "external_request_or_telemetry",
+        "semantic_quality_or_restricted_content_inspected",
+        "canary_authorizes_restricted_inference"
+      ],
+      "properties": {
+        "receipt_schema_version": {
+          "const": "nursery-gemma4-e4b-prototype-common-schema-public-canary-receipt-v1"
+        },
+        "receipt_status": {
+          "const": "PUBLIC_COMMON_SCHEMA_CANARY_PASS"
+        },
+        "receipt_path": {
+          "const": "output/nursery_program_convergence_v1/gemma4_e4b_prototype_common_schema_public_canary_receipt_v1.json"
+        },
+        "receipt_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "contract_path": {
+          "const": "docs/nursery_program_convergence_v1/frozen_gemma4_prototype_common_schema_canary_contract_v1.json"
+        },
+        "contract_sha256": {
+          "const": "9b894fcfd47df93824d25a467961d2c9f3398666dbe824367f2d8e1afe0635e9"
+        },
+        "fixture_manifest_sha256": {
+          "$ref": "#/$defs/hex64"
+        },
+        "prompt_sha256": {
+          "const": "93e51fb982bd3ea47dd4defbd24e818cf67aee89c6df9d98fd1ec40fc2188ff6"
+        },
+        "common_schema_sha256": {
+          "const": "19b7ae8948aed46410e1307c0a302303813422995c8f4cdc19949118693a8089"
+        },
+        "parser_contract_sha256": {
+          "const": "af8e5988febb42e378bb3b6c8cbbb2799cca167cb4b3f4be5d32732a6035974a"
+        },
+        "parser_correction_count": {
+          "type": "integer",
+          "enum": [0, 1]
+        },
+        "audio_consumed": {
+          "const": true
+        },
+        "five_frames_consumed_in_order": {
+          "const": true
+        },
+        "exact_schema_valid": {
+          "const": true
+        },
+        "all_parser_negative_fixtures_pass": {
+          "const": true
+        },
+        "network_denial_sentinel_passed": {
+          "const": true
+        },
+        "external_request_or_telemetry": {
+          "const": false
+        },
+        "semantic_quality_or_restricted_content_inspected": {
+          "const": false
+        },
+        "canary_authorizes_restricted_inference": {
+          "const": false
+        }
+      }
+    },
+    "qwen3_read_only_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instrument_id",
+        "revision",
+        "public_canary_sha256",
+        "restricted_hypotheses_recomputed",
+        "restricted_hypotheses_opened_for_activation",
+        "quarantine_binding_digest_match",
+        "restricted_digest_exported",
+        "third_visual_model"
+      ],
+      "properties": {
+        "instrument_id": {
+          "const": "qwen3_vl_8b_instruct_4bit"
+        },
+        "revision": {
+          "const": "defcdea7cc7a4b0858fea563cbbce171d328e457"
+        },
+        "public_canary_sha256": {
+          "const": "eb5447e13f44cc35c64e433f7217dc2423c5aff799c27101b6ce22bec50390b3"
+        },
+        "restricted_hypotheses_recomputed": {
+          "const": false
+        },
+        "restricted_hypotheses_opened_for_activation": {
+          "const": false
+        },
+        "quarantine_binding_digest_match": {
+          "const": true
+        },
+        "restricted_digest_exported": {
+          "const": false
+        },
+        "third_visual_model": {
+          "const": false
+        }
+      }
+    },
+    "unchanged_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary_item_count",
+        "primary_total_seconds",
+        "candidate_window_count",
+        "frame_offsets_seconds",
+        "minimum_export_cell_items",
+        "schema_validity_minimum",
+        "primary_item_coverage_minimum",
+        "primary_seconds_coverage_minimum",
+        "maximum_abstention_for_a_dimension",
+        "minimum_paths_per_task_family",
+        "K5_complement_protection",
+        "outward_rounding_unchanged",
+        "agreement_is_not_a_pass_gate",
+        "reserve_activation",
+        "reselection"
+      ],
+      "properties": {
+        "primary_item_count": {
+          "const": 15
+        },
+        "primary_total_seconds": {
+          "const": 900
+        },
+        "candidate_window_count": {
+          "const": 137
+        },
+        "frame_offsets_seconds": {
+          "const": [-5.0, -2.5, 0.0, 2.5, 5.0]
+        },
+        "minimum_export_cell_items": {
+          "const": 5
+        },
+        "schema_validity_minimum": {
+          "const": 0.95
+        },
+        "primary_item_coverage_minimum": {
+          "const": 0.8
+        },
+        "primary_seconds_coverage_minimum": {
+          "const": 0.8
+        },
+        "maximum_abstention_for_a_dimension": {
+          "const": 0.5
+        },
+        "minimum_paths_per_task_family": {
+          "const": 2
+        },
+        "K5_complement_protection": {
+          "const": true
+        },
+        "outward_rounding_unchanged": {
+          "const": true
+        },
+        "agreement_is_not_a_pass_gate": {
+          "const": true
+        },
+        "reserve_activation": {
+          "const": false
+        },
+        "reselection": {
+          "const": false
+        }
+      }
+    },
+    "gate_results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "opaque_provenance_gate",
+        "artifact_manifest_gate",
+        "resource_and_launch_recheck_gate",
+        "runtime_and_adapter_hash_gate",
+        "public_joint_common_schema_canary_gate",
+        "network_denial_gate",
+        "qwen3_read_only_gate",
+        "quarantine_preflight_gate",
+        "restricted_schema_coverage_abstention_K5_gates",
+        "scientific_outcome_gate"
+      ],
+      "properties": {
+        "opaque_provenance_gate": {
+          "const": "PASS_OPAQUE_INTERNAL_ONLY"
+        },
+        "artifact_manifest_gate": {
+          "const": "PASS"
+        },
+        "resource_and_launch_recheck_gate": {
+          "const": "PASS"
+        },
+        "runtime_and_adapter_hash_gate": {
+          "const": "PASS"
+        },
+        "public_joint_common_schema_canary_gate": {
+          "const": "PASS"
+        },
+        "network_denial_gate": {
+          "const": "PASS"
+        },
+        "qwen3_read_only_gate": {
+          "const": "PASS"
+        },
+        "quarantine_preflight_gate": {
+          "const": "PASS"
+        },
+        "restricted_schema_coverage_abstention_K5_gates": {
+          "const": "PENDING_RESTRICTED_EXECUTION"
+        },
+        "scientific_outcome_gate": {
+          "const": "NOT_AUTHORIZED"
+        }
+      }
+    },
+    "authorization_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "full_instrument_activation",
+        "authorized_restricted_action",
+        "restricted_inference_run",
+        "fresh_download_copy_or_artifact_change",
+        "external_or_hosted_inference",
+        "learner_tokenizer_checkpoint_or_causal_outcome",
+        "authorization_expires_on_any_binding_or_gate_mismatch"
+      ],
+      "properties": {
+        "full_instrument_activation": {
+          "const": "ACTIVE_ONLY_FOR_ONE_BOUNDED_15_ITEM_137_WINDOW_LOCAL_PSEUDO_CALIBRATION_PASS"
+        },
+        "authorized_restricted_action": {
+          "const": "RUN_EXACT_GEMMA_REPLACEMENT_PATH_ON_FROZEN_137_WINDOWS_UNDER_NETWORK_DENIAL_AND_EXPORT_ONLY_FROZEN_K5_AGGREGATES"
+        },
+        "restricted_inference_run": {
+          "const": false
+        },
+        "fresh_download_copy_or_artifact_change": {
+          "const": false
+        },
+        "external_or_hosted_inference": {
+          "const": false
+        },
+        "learner_tokenizer_checkpoint_or_causal_outcome": {
+          "const": false
+        },
+        "authorization_expires_on_any_binding_or_gate_mismatch": {
+          "const": true
+        }
+      }
+    },
+    "privacy_and_scientific_attestations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "restricted_content_accessed_to_issue_receipt",
+        "restricted_payload_exported",
+        "hosted_or_cloud_inference_used",
+        "public_canary_semantics_tuned",
+        "model_agreement_is_ground_truth",
+        "pseudo_labels_are_human_evidence",
+        "learner_ancestry_allowed",
+        "simulator_oracle_remains_only_evaluation_truth",
+        "scientific_outcome_run",
+        "scientific_outcome_authorized"
+      ],
+      "properties": {
+        "restricted_content_accessed_to_issue_receipt": {
+          "const": false
+        },
+        "restricted_payload_exported": {
+          "const": false
+        },
+        "hosted_or_cloud_inference_used": {
+          "const": false
+        },
+        "public_canary_semantics_tuned": {
+          "const": false
+        },
+        "model_agreement_is_ground_truth": {
+          "const": false
+        },
+        "pseudo_labels_are_human_evidence": {
+          "const": false
+        },
+        "learner_ancestry_allowed": {
+          "const": false
+        },
+        "simulator_oracle_remains_only_evaluation_truth": {
+          "const": true
+        },
+        "scientific_outcome_run": {
+          "const": false
+        },
+        "scientific_outcome_authorized": {
+          "const": false
+        }
+      }
+    },
+    "next_action": {
+      "const": "A separately launched fail-closed coordinator may execute only the authorized bounded restricted pseudo-calibration pass; no scientific learner or causal outcome is authorized."
+    }
+  },
+  "$defs": {
+    "hex64": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "replacement_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "const": "docs/nursery_program_convergence_v1/frozen_gemma4_replacement_instrument_amendment.json"
+        },
+        "sha256": {
+          "const": "8e6d7a43ea9639fa451a59386b8657495558fde77fb2147a20767388d47ed24a"
+        }
+      }
+    },
+    "provenance_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "status"],
+      "properties": {
+        "path": {
+          "const": "docs/nursery_program_convergence_v1/frozen_gemma4_e4b_opaque_instrument_provenance_amendment_v1.json"
+        },
+        "sha256": {
+          "const": "93874c69153daaf41d902216351666c59b12aeb656b9739ecd07d1e6e4fe42b1"
+        },
+        "status": {
+          "const": "FROZEN_PROVENANCE_GATE_PASS_OPAQUE_INTERNAL_ONLY"
+        }
+      }
+    },
+    "provenance_receipt_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "status"],
+      "properties": {
+        "path": {
+          "const": "output/nursery_program_convergence_v1/gemma4_e4b_opaque_instrument_provenance_activation_receipt_v1.json"
+        },
+        "sha256": {
+          "const": "2f25cff5d8fc140fb7dddeebae4cccfa83880327b5d383d14b3f21f3e2adcf13"
+        },
+        "status": {
+          "const": "OPAQUE_PROVENANCE_BRANCH_ACTIVATED_FULL_INSTRUMENT_PENDING"
+        }
+      }
+    },
+    "resource_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "status"],
+      "properties": {
+        "path": {
+          "const": "output/nursery_program_convergence_v1/gemma4_e4b_prototype_activation_resource_receipt.json"
+        },
+        "sha256": {
+          "const": "363fda5ebc189216b2d8e9a9133cb51cea91fcc0ea9dc15fef023a028648dcd4"
+        },
+        "status": {
+          "const": "VERIFIED_REUSE_RESOURCE_ADMITTED"
+        }
+      }
+    },
+    "canary_contract_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "status"],
+      "properties": {
+        "path": {
+          "const": "docs/nursery_program_convergence_v1/frozen_gemma4_prototype_common_schema_canary_contract_v1.json"
+        },
+        "sha256": {
+          "const": "9b894fcfd47df93824d25a467961d2c9f3398666dbe824367f2d8e1afe0635e9"
+        },
+        "status": {
+          "const": "FROZEN_FOR_PUBLIC_SYNTHETIC_CANARY_ONLY"
+        }
+      }
+    }
+  },
+  "x_contract_state": {
+    "schema_frozen": true,
+    "activation_receipt_created": false,
+    "public_canary_run": false,
+    "restricted_inference_run": false,
+    "scientific_outcome_run": false,
+    "schema_itself_authorizes_restricted_inference": false
+  }
+}

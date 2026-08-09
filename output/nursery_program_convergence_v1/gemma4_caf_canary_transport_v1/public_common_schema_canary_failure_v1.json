@@ -1,0 +1,17 @@
+{
+  "automatic_calibration_fallback_allowed": false,
+  "caf_transport_amendment_sha256": "3ecf4bf6c62920d73177d029c18918f38366d34f7d7997642037696def37bbd0",
+  "failure_code": "E_INTERNAL",
+  "historical_output_paths_overwritten": false,
+  "legacy_runner_sha256": "d5f3402c21043a0bba480e9540db7bac2d2eb01f65887673538db5211d19e8ea",
+  "no_automatic_fallback_override_sha256": "cb9e7061a5725050e6a71a7b6e41f6f5e7bf30d104bc46bae233816ca99a90b7",
+  "parser_correction_eligible": false,
+  "parser_mode": "PRIMARY",
+  "prior_aiff_failure_receipt_sha256": "ef5031b3b90a3611eb488ff9fa76a48e0b2f2a0af0ab5e2230316d3234a0eda6",
+  "raw_model_output_exported": false,
+  "restricted_inference_run": false,
+  "restricted_payload_accessed": false,
+  "schema_version": "nursery-gemma4-public-canary-caf-failure-v1",
+  "scientific_endpoint_allowed": false,
+  "status": "REVISE"
+}

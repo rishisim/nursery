@@ -1,0 +1,10 @@
+{
+  "automatic_calibration_fallback_allowed": false,
+  "failure_code": "E_INTERNAL",
+  "no_automatic_fallback_override_sha256": "cb9e7061a5725050e6a71a7b6e41f6f5e7bf30d104bc46bae233816ca99a90b7",
+  "preflight_delegation_recursion_amendment_sha256": "16049ce3bcbeb9f3ae91c28695c7dafb10c9a013ff64b301d977b96f9943429a",
+  "restricted_payload_exported": false,
+  "schema_version": "nursery-childlens-gemma-substitution-preflight-delegation-failure-v1.5",
+  "scientific_endpoint_allowed": false,
+  "status": "REVISE"
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "childlens-terminal-synthesis-template-v1.2.0",
+  "evidence_inputs": [
+    "acquisition aggregate receipt",
+    "automated diagnostics aggregate receipt",
+    "human workflow aggregate receipt",
+    "immutability receipt",
+    "immutability baseline receipt"
+  ],
+  "reports": [
+    "executive decision",
+    "native selective acquisition",
+    "local measurement pilot",
+    "commands tests and limitations"
+  ],
+  "decision_record_terminal_placeholder": "__EXACTLY_ONE_TERMINAL_VALUE__",
+  "quarantine_read_permitted": false,
+  "human_evidence_inference_permitted": false,
+  "official_speech_windows_are_utterances": false,
+  "atomic_replacement_order": "REPORTS_FIRST_DECISION_LAST_WITH_ROLLBACK"
+}

@@ -1,0 +1,227 @@
+{
+  "historical_preflight_superseded_by": [
+    "qwen3_asr_public_synthetic_runtime_receipt.json",
+    "gemma4_public_synthetic_runtime_bakeoff.json"
+  ],
+  "schema_version": "childlens_m5_model_shortlist_preflight_v1_3_1",
+  "generated_on": "2026-07-22",
+  "scope": "public_synthetic_only",
+  "privacy": {
+    "childlens_or_quarantine_accessed": false,
+    "restricted_payload_processed": false,
+    "candidate_weights_downloaded": false,
+    "hosted_model_received_restricted_content": false
+  },
+  "host": {
+    "chip": "Apple M5",
+    "cpu_cores": 10,
+    "unified_memory_gib": 32,
+    "observed_free_disk_gib_approx": 89,
+    "existing_public_instrument_cache_gib_approx": 15,
+    "required_free_disk_floor_gib": 50,
+    "required_system_memory_headroom_gib": 4
+  },
+  "public_measurements": [
+    {
+      "instrument": "whisper.cpp large-v3-turbo",
+      "input": "public_audio_approximately_11_seconds",
+      "wall_seconds": 1.88,
+      "peak_rss_bytes": 1973370880,
+      "peak_rss_gib_approx": 1.84,
+      "realtime_factor_approx": 0.17,
+      "note": "Installed turbo model, not full large-v3."
+    },
+    {
+      "instrument": "existing_v1_3_qwen2_vl_whisper_smoke",
+      "input": "public_synthetic_audio_plus_one_five_frame_window",
+      "wall_seconds": 36.19,
+      "peak_rss_bytes": 8316420096,
+      "peak_rss_gib_approx": 7.75,
+      "note": "Includes startup and mixed stages; not a per-window throughput estimate."
+    }
+  ],
+  "candidates": [
+    {
+      "id": "qwen3_asr_0_6b_plus_aligner_0_6b",
+      "commit_refs": [
+        "7f1569a48a89f3e3f4dc3a5c9d28bddd903bc76c",
+        "c07281df297b9905d24a508279258cccf987a064"
+      ],
+      "bf16_payload_bytes": 3400474048,
+      "bf16_payload_gib_approx": 3.17,
+      "estimated_working_memory_gib": [8, 10],
+      "free_disk_after_single_install_gib_approx": 85.8,
+      "license_metadata": "Apache-2.0",
+      "status": "CONDITIONAL_CANARY",
+      "conditions": [
+        "isolated_newer_transformers_environment",
+        "public_MPS_or_CPU_canary",
+        "forced_aligner_only_if_language_is_in_its_11_language_support_set"
+      ]
+    },
+    {
+      "id": "qwen3_asr_1_7b_plus_aligner_0_6b",
+      "commit_refs": [
+        "bcd2b5b7f32b480ab5790554cfa8347f246a14f3",
+        "c07281df297b9905d24a508279258cccf987a064"
+      ],
+      "bf16_payload_bytes": 5911739040,
+      "bf16_payload_gib_approx": 5.51,
+      "estimated_working_memory_gib": [8, 12],
+      "free_disk_after_single_install_gib_approx": 83.5,
+      "license_metadata": "Apache-2.0",
+      "status": "CONDITIONAL_CANARY",
+      "conditions": [
+        "escalate_only_if_0_6b_quality_is_inadequate",
+        "isolated_newer_transformers_environment",
+        "public_MPS_or_CPU_canary"
+      ]
+    },
+    {
+      "id": "openai_whisper_large_v3",
+      "commit": "06f233fe06e710322aca913c1bc4249a0d71fce1",
+      "selected_safetensors_bytes": 3087130976,
+      "selected_safetensors_gib_approx": 2.88,
+      "official_memory_gb_approx": 10,
+      "free_disk_after_single_install_gib_approx": 86.1,
+      "status": "LOCAL_PREFLIGHT_PASS",
+      "conditions": [
+        "use_only_if_installed_turbo_quality_is_inadequate",
+        "measure_actual_M5_runtime_before_restricted_use"
+      ]
+    },
+    {
+      "id": "gemma_4_e2b_it",
+      "commit": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+      "bf16_payload_bytes": 10246621918,
+      "bf16_payload_gib_approx": 9.54,
+      "official_loaded_memory_gb_including_20_percent_overhead": 11.4,
+      "free_disk_after_single_install_gib_approx": 79.5,
+      "modalities": ["text", "image", "audio"],
+      "license_metadata": "Apache-2.0",
+      "status": "CONDITIONAL_CANARY",
+      "role": "low_risk_fallback"
+    },
+    {
+      "id": "gemma_4_e4b_it",
+      "commit": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+      "bf16_payload_bytes": 15992595884,
+      "bf16_payload_gib_approx": 14.89,
+      "official_loaded_memory_gb_including_20_percent_overhead": 17.9,
+      "free_disk_after_single_install_gib_approx": 74.1,
+      "modalities": ["text", "image", "audio"],
+      "license_metadata": "Apache-2.0",
+      "status": "CONDITIONAL_CANARY",
+      "role": "preferred_vision_referential_candidate"
+    },
+    {
+      "id": "qwen3_vl_8b_instruct",
+      "commit": "0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
+      "bf16_payload_bytes": 17534339512,
+      "bf16_payload_gib_approx": 16.33,
+      "estimated_five_frame_working_memory_gib": [22, 27],
+      "free_disk_after_single_install_gib_approx": 72.7,
+      "modalities": ["text", "image", "video"],
+      "license_metadata": "Apache-2.0",
+      "status": "CONDITIONAL_CANARY",
+      "conditions": [
+        "reserve_for_gemma_failure_or_inadequacy",
+        "isolated_newer_transformers_environment",
+        "measured_peak_RSS_below_28_GiB",
+        "separate_ASR_required"
+      ]
+    },
+    {
+      "id": "gemma_4_12b",
+      "commit": "707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7",
+      "bf16_payload_bytes": 23919549408,
+      "bf16_payload_gib_approx": 22.28,
+      "official_loaded_memory_bf16_gb": 26.7,
+      "official_loaded_memory_q4_0_gb": 6.7,
+      "free_disk_after_single_bf16_install_gib_approx": 66.7,
+      "status": "QUANTIZED_ONLY"
+    },
+    {
+      "id": "gemma_4_26b_a4b_it",
+      "commit": "4d7ae4984b7db7de8f8457170b3f1a419ee76d52",
+      "bf16_payload_bytes": 51612009916,
+      "bf16_payload_gib_approx": 48.07,
+      "official_loaded_memory_bf16_gb": 57.7,
+      "official_loaded_memory_q4_0_gb": 14.4,
+      "free_disk_after_single_bf16_install_gib_approx": 40.9,
+      "status": "QUANTIZED_ONLY_DEFER"
+    },
+    {
+      "id": "gemma_4_31b",
+      "commit": "842da3794eaa0b77d5f08bae87a17459d91ff475",
+      "bf16_payload_bytes": 62546338248,
+      "bf16_payload_gib_approx": 58.25,
+      "official_loaded_memory_bf16_gb": 69.9,
+      "official_loaded_memory_q4_0_gb": 17.5,
+      "free_disk_after_single_bf16_install_gib_approx": 30.8,
+      "status": "QUANTIZED_ONLY_DEFER"
+    },
+    {
+      "id": "qwen3_6_27b",
+      "commit": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+      "bf16_payload_bytes": 55563006400,
+      "bf16_payload_gib_approx": 51.75,
+      "free_disk_after_single_bf16_install_gib_approx": 37.3,
+      "license_metadata": "Apache-2.0",
+      "status": "LOCAL_BF16_STOP",
+      "download_authorized": false
+    },
+    {
+      "id": "qwen3_6_35b_a3b",
+      "commit": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "bf16_payload_bytes": 71903776776,
+      "bf16_payload_gib_approx": 66.97,
+      "free_disk_after_single_bf16_install_gib_approx": 22.0,
+      "license_metadata": "Apache-2.0",
+      "status": "LOCAL_BF16_STOP",
+      "download_authorized": false
+    }
+  ],
+  "rankings": {
+    "speech_timing": [
+      "installed_whisper_large_v3_turbo",
+      "qwen3_asr_0_6b_plus_aligner_0_6b",
+      "qwen3_asr_1_7b_plus_aligner_0_6b",
+      "openai_whisper_large_v3"
+    ],
+    "vision_referential": [
+      "gemma_4_e4b_it",
+      "gemma_4_e2b_it",
+      "qwen3_vl_8b_instruct",
+      "gemma_4_12b_quantized_only",
+      "gemma_4_26b_a4b_quantized_only_defer",
+      "gemma_4_31b_quantized_only_defer",
+      "qwen3_6_27b_stop",
+      "qwen3_6_35b_a3b_stop"
+    ]
+  },
+  "recommended_public_canary_order": [
+    "qwen3_asr_0_6b_then_conditionally_forced_aligner",
+    "gemma_4_e4b_it",
+    "gemma_4_e2b_it_fallback",
+    "qwen3_vl_8b_only_if_needed"
+  ],
+  "required_canary_gates": [
+    "authoritative_source_and_license_receipt",
+    "exact_commit_selected_files_and_sha256",
+    "isolated_dependency_lock",
+    "public_or_synthetic_input_only",
+    "telemetry_disabled_and_outbound_network_denied_during_inference",
+    "measured_peak_RSS_and_runtime",
+    "deterministic_resume_and_failure_handling",
+    "at_least_4_GiB_memory_headroom",
+    "at_least_50_GiB_free_disk",
+    "remove_rejected_candidate_before_next_install"
+  ],
+  "instrument_boundary": {
+    "outputs_are_pseudo_labels": true,
+    "human_ground_truth": false,
+    "learner_ancestry_permitted": false,
+    "restricted_inference_authorized_by_this_receipt": false
+  }
+}

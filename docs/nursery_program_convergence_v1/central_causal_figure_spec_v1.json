@@ -1,0 +1,50 @@
+{
+  "schema_version": "nursery-central-causal-figure-spec-v1",
+  "status": "FROZEN_EMPTY_NO_RESULT",
+  "title": "Do synchronized training-only event cues survive the bounded weak-alignment envelope?",
+  "subtitle": "Cue-free simulator-oracle grounding; synchronized minus matched control",
+  "input_schema": "nursery-causal-reporting-aggregate-projection-v1",
+  "input_policy": "One validated local aggregate projection only; no bundle, seed, draw, model, item, window, empirical cell, text, media, or restricted payload input.",
+  "layout": {
+    "panels": [
+      {
+        "endpoint": "cue_free_heldout_noun_object_macro_top1",
+        "label": "Noun → object"
+      },
+      {
+        "endpoint": "cue_free_heldout_verb_action_macro_top1",
+        "label": "Verb → action"
+      }
+    ],
+    "rows": "Five range families, each with absent, shuffled, time-shifted, and corrupted comparators",
+    "x_axis": "Synchronized-minus-control percentage-point lift",
+    "mark": "Point at mean effect with a line from the one-sided 95% lower bound to the mean",
+    "reference_lines": [
+      "zero effect",
+      "+3 percentage-point minimum mean gate"
+    ],
+    "cell_annotation": "positive-corpus percentage / large-negative percentage",
+    "pass_encoding": "filled circle and PASS",
+    "nonpass_encoding": "open circle and NONPASS",
+    "decision_banner": "POSITIVE_PROTOTYPE_EFFECT or VALID_NULL_OR_NONPROMOTION only after complete validation"
+  },
+  "frozen_cell_inventory": {
+    "range_families": 5,
+    "comparators": 4,
+    "endpoints": 2,
+    "total_cells": 40,
+    "synthetic_corpora_per_cell": 40
+  },
+  "caption_shell": "Mean paired synchronized-minus-control lift and one-sided 95% lower bound across 40 synthetic corpus effects. Every displayed value is from the validated aggregate projection. Filled marks pass all frozen directional gates; open marks do not. [DECISION_SENTENCE]",
+  "mandatory_footer": "Synthetic prototype only • cue absent at evaluation • simulator-oracle truth • ChildLens aggregate calibration is model-derived, not human gold • no infant or naturalistic acquisition claim",
+  "generator": {
+    "path": "scripts/generate_nursery_causal_central_figure_v1.py",
+    "outputs": [
+      "SVG central figure",
+      "fixed-schema JSON reporting summary"
+    ],
+    "network": false,
+    "external_dependencies": false,
+    "overwrite": false
+  }
+}

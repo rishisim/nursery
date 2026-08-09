@@ -1,0 +1,33 @@
+{
+  "confirmation_authorized": false,
+  "decision": "V4_READY",
+  "development_outcome_authorized": false,
+  "gates": {
+    "confirmation_untouched": true,
+    "development_outcomes_untouched": true,
+    "freeze_integrity": true,
+    "qualification_competition": true,
+    "qualification_detector_runtime": true,
+    "qualification_direct_capacity_executed": true,
+    "qualification_exact_balance": true,
+    "qualification_factor_exact_recomputation": true,
+    "qualification_factors_executable_and_stratified": true,
+    "qualification_inference_contract": true,
+    "qualification_noun_detector_selectivity": true,
+    "qualification_noun_sensor_weight_zero": true,
+    "qualification_noun_structural_selectivity": true,
+    "qualification_oracle_control_executed": true,
+    "qualification_oracle_leakage_absent": true,
+    "qualification_seed_firewall": true,
+    "qualification_sensor_free_non_degenerate": true,
+    "qualification_status": true,
+    "reproduction": true,
+    "tests": true,
+    "v1_v3_preservation": true
+  },
+  "package_readiness_only": true,
+  "reason": "All qualification gates passed; readiness does not authorize an outcome run.",
+  "scientific_go": false,
+  "v3_scientific_execution_valid": false,
+  "v3_stop_retained": true
+}

@@ -1,0 +1,96 @@
+{
+  "schema_version": "childlens-author-audit-workflow-contract-v1.3.0",
+  "implementation_version": "childlens-author-audit-workflow-v1.3.0",
+  "route": "AUTHOR_AUDIT_A",
+  "author_count": 1,
+  "second_human_required": false,
+  "adjudicator_required": false,
+  "inter_human_reliability_available": false,
+  "model_human_agreement_only": true,
+  "sample": {
+    "item_count": 15,
+    "total_speech_minutes": 15,
+    "all_items_represented": true,
+    "selection_model_independent": true,
+    "primary_packet_only_before_lock": true,
+    "borderline_reserve_loaded_in_primary_route": false
+  },
+  "state_machine": [
+    "SAMPLE_FROZEN",
+    "AUTHOR_BLIND_OPEN",
+    "AUTHOR_LOCKED",
+    "PREDICTION_JOIN_ENABLED"
+  ],
+  "prediction_boundary": {
+    "prediction_store_path_known_to_prelock_controller": false,
+    "prediction_store_mounted_before_author_lock": false,
+    "prediction_store_parsed_before_author_lock": false,
+    "prediction_ui_route": false,
+    "post_lock_attachment_only": true,
+    "cloud_or_hosted_content_path": false
+  },
+  "storage": {
+    "owner_private_quarantine_only": true,
+    "autosave": true,
+    "resumable": true,
+    "database_mode": "0600",
+    "browser_profile_cache_downloads_inside_quarantine": true,
+    "restricted_rows_exported_to_repository": false
+  },
+  "browser": {
+    "launcher_arguments_permitted": false,
+    "bind_address": "127.0.0.1",
+    "external_host_resolution_blocked": true,
+    "telemetry": false,
+    "dedicated_profile": true,
+    "ephemeral_launch_nonce": true
+  },
+  "author_labels": {
+    "language_and_competence": true,
+    "wer_applicability_before_prediction_reveal": true,
+    "utterance_boundaries_and_source_text": true,
+    "source_role": true,
+    "coarse_referential_status": true,
+    "noun_object_and_verb_action_decisions": true,
+    "mention_text_spans": true,
+    "candidate_count_bands": true,
+    "visible_candidate_time_bands": true,
+    "uncertain_and_unusable_routes": true
+  },
+  "lock": {
+    "item_locks_irreversible": true,
+    "complete_author_lock_irreversible": true,
+    "protocol_digest_included": true,
+    "sample_digest_included": true,
+    "all_author_rows_included": true,
+    "completeness_receipt_included": true
+  },
+  "scientific_boundary": {
+    "pseudo_labels_are_ground_truth": false,
+    "unaudited_pseudo_labels_are_primary_evaluation_truth": false,
+    "permitted_unaudited_uses": [
+      "NONIDENTIFYING_AGGREGATE_SIMULATOR_CALIBRATION",
+      "CANDIDATE_GENERATION"
+    ],
+    "primary_later_evaluation_truth": "SIMULATOR_ORACLE_ONLY",
+    "learner_or_causal_outcome_authorized": false
+  },
+  "initial_author_time_estimate_minutes": 75,
+  "estimate_basis": "15 frozen speech-minutes at an estimated four annotation minutes per media minute plus 15 minutes for item checks and irreversible locking",
+  "repository_safe_receipt": {
+    "status": "READY",
+    "audit_speech_seconds": 900,
+    "zero_argument_exporter": true,
+    "aggregate_state_only": true,
+    "autosave_to_quarantine_only": true,
+    "predictions_hidden_before_author_lock": true,
+    "sample_independent_of_model_outputs": true,
+    "uncertain_route_available": true,
+    "unusable_route_available": true,
+    "qualification_instruction_present": true,
+    "external_hosting": false,
+    "network_exposure": false,
+    "model_predictions_revealed_before_lock": false,
+    "human_evidence_fabricated": false
+  }
+}

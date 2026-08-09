@@ -1,0 +1,100 @@
+{
+  "artifact_id": "childlens-measurement-tooling-readiness-v1.2.0",
+  "audit_date": "2026-07-21",
+  "scope": "LOCAL_ONLY_SYNTHETIC_AND_HOST_PREFLIGHT_NO_RESTRICTED_INPUT",
+  "status": "STRUCTURAL_DECODE_TOOLING_READY_HUMAN_FIRST_SPEECH_ROUTE",
+  "tooling": {
+    "local_media_auditor": {
+      "sha256": "19053aae5404bee62febf29d1da32445926ec7c68f3d350c29b25477ca46bd3e",
+      "aggregate_only": true,
+      "cell_suppression_k": 5,
+      "exact_local_size_and_sha256_required": true,
+      "full_decode": true,
+      "network_protocols_allowed": false,
+      "restricted_run_completed": false
+    },
+    "local_instrument_inventory": {
+      "sha256": "09d1aed619e44f45132a81f1e6a0116c514b0933eefe2bc43d62cec0c8635c88",
+      "generated_receipt_sha256": "326953b576a95dc93a6459dc5ee5440bb4dcb4b33efbc98c5dbcd2b5f87ca3a2"
+    },
+    "tests": {
+      "media_auditor_test_sha256": "4e347d5b38451772ebbc95008bcdb0f7038eac62a623ec94e421acaea129e73d",
+      "instrument_inventory_test_sha256": "5fb80147982605bf3d67ec7a469edbf7307d8f20c45c15abf8e69d800a5e24a1",
+      "passed": 14,
+      "failed": 0
+    }
+  },
+  "local_components": {
+    "ffmpeg": {
+      "available": true,
+      "version": "8.0.1",
+      "sha256": "0a96da2735695308d964e25fa6f4a0db2e9d24031390360f4c5ff96a4f8938e5",
+      "license_disposition": "GPL_V3_OR_LATER_LOCAL_EXECUTION_ONLY_NO_REDISTRIBUTION"
+    },
+    "ffprobe": {
+      "available": true,
+      "version": "8.0.1",
+      "sha256": "68447e67105534f3f43b95c94983ed56fbdd7125e5724cc56499ad538c2b86a7"
+    },
+    "ffplay": {
+      "available": true,
+      "version": "8.0.1",
+      "sha256": "f45eb57c768b46ae70195ee06e7d5d6f2d732e4e801b5d6d9ea44e7e97f93acc"
+    },
+    "streamlit": {
+      "available": true,
+      "version": "1.56.0",
+      "frozen_version_match": true
+    }
+  },
+  "speech_instrument_route": {
+    "human_language_identification": "REQUIRED",
+    "offline_asr": "NOT_LOCAL_DO_NOT_RUN",
+    "offline_alignment": "NOT_LOCAL_DO_NOT_RUN",
+    "automated_speaker_role": "EXCLUDED_HUMAN_ONLY",
+    "referential_annotation": "HUMAN_ONLY",
+    "reliability_scoring": "IMPLEMENTATION_NOT_FROZEN"
+  },
+  "targeted_absent_packages": [
+    "faster-whisper",
+    "whisperx",
+    "openai-whisper",
+    "ctranslate2",
+    "torch",
+    "torchaudio",
+    "pyannote.audio",
+    "speechbrain",
+    "silero-vad",
+    "jiwer",
+    "krippendorff"
+  ],
+  "license_and_access": {
+    "model_or_weight_download_performed": false,
+    "license_or_gated_condition_accepted": false,
+    "model_license_inferred_from_code_license": false,
+    "pyannote_model_use": "PROHIBITED_PENDING_SEPARATE_USER_ACTION_AND_REVIEW",
+    "vtc_use": "PROHIBITED_LICENSE_UNRESOLVED"
+  },
+  "instrument_to_learner_firewall": {
+    "weights_checkpoints_tokenizers_vocabularies_features_embeddings_scores_to_learner": false,
+    "raw_or_unreviewed_proposals_to_learner": false,
+    "qualified_human_disposition_required": true,
+    "learner_or_tokenizer_training_authorized": false,
+    "causal_arm_authorized": false
+  },
+  "privacy_export": {
+    "restricted_data_accessed": false,
+    "paths_or_filenames_exported": false,
+    "identifiers_exported": false,
+    "exact_timestamps_exported": false,
+    "transcript_or_lexical_content_exported": false,
+    "media_or_frames_exported": false,
+    "external_api_or_upload_used": false
+  },
+  "limitations": [
+    "No restricted media audit has been run by this workstream.",
+    "Speech-window validation is structural and cannot establish intelligibility or timing accuracy.",
+    "Actual language, transcript, speaker role, and visible reference require qualified humans.",
+    "Per-stream duration metadata can be absent even when full decode succeeds."
+  ]
+}

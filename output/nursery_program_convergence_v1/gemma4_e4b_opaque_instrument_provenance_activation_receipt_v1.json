@@ -1,0 +1,96 @@
+{
+  "schema_version": "nursery-gemma4-e4b-opaque-instrument-provenance-activation-receipt-v1",
+  "created_at": "2026-07-22",
+  "status": "OPAQUE_PROVENANCE_BRANCH_ACTIVATED_FULL_INSTRUMENT_PENDING",
+  "scope": "EXACT_CACHED_ARTIFACT_INTERNAL_PROTOTYPE_ONLY",
+  "frozen_amendment": {
+    "path": "docs/nursery_program_convergence_v1/frozen_gemma4_e4b_opaque_instrument_provenance_amendment_v1.json",
+    "sha256": "93874c69153daaf41d902216351666c59b12aeb656b9739ecd07d1e6e4fe42b1"
+  },
+  "historical_stop_binding": {
+    "gemma_replacement_terminal_decision": {
+      "decision": "CALIBRATION_STOP_MODEL_TRIANGULATION",
+      "path": "output/nursery_program_convergence_v1/gemma4_replacement_terminal_decision.json",
+      "sha256": "a9f955d53768e0295d61a58e8ecf73d7e8658890ec56a4408772cd6bb10612b6",
+      "preserved": true
+    },
+    "gemma_replacement_terminal_disposition": {
+      "path": "docs/nursery_program_convergence_v1/gemma4_replacement_terminal_disposition.md",
+      "sha256": "831a7d96d598f45e81514fb1cec5a0c4eaf2f84d6726ae4eb86dcd161e932be6",
+      "preserved": true
+    },
+    "frozen_replacement_amendment": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_replacement_instrument_amendment.json",
+      "sha256": "8e6d7a43ea9639fa451a59386b8657495558fde77fb2147a20767388d47ed24a",
+      "preserved": true
+    },
+    "childlens_lexical_stop": "CHILDLENS_LEXICAL_FEASIBILITY_STOP_CURRENT_RESOURCES",
+    "historical_decisions_overwritten": false
+  },
+  "artifact_binding": {
+    "repository_label": "mlx-community/gemma-4-e4b-it-4bit",
+    "conversion_revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+    "artifact_manifest_sha256": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae",
+    "artifact_bytes": 5179241512,
+    "artifact_file_count": 10,
+    "model_weight_sha256": "932b8271fc3fe65adcc78b96c10c6268bbfb13e8f67d1358727c0d6ee97e1eff",
+    "model_weight_bytes": 5146800534,
+    "cached_rehash_exact_match": true,
+    "artifact_mutation_or_substitution_allowed": false
+  },
+  "official_source_rationale": {
+    "declared_source_revision": "fee6332c1abaafb77f6f9624236c63aa2f1d0187",
+    "current_pinned_revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+    "source_weight_sha256_at_both_revisions": "cfbd3d2f1cd71bd471c37fe2bf8546d5028d41e5736f64e1ca6c6b8893125503",
+    "source_weight_bytes_at_both_revisions": 15992595884,
+    "license_metadata_at_both_revisions": "apache-2.0",
+    "public_and_ungated_at_receipt_time": true,
+    "official_license_url": "https://ai.google.dev/gemma/apache_2",
+    "legal_advice_or_clearance": false
+  },
+  "unresolved_limitations": {
+    "conversion_metadata_license": "gemma",
+    "conversion_license_or_notice_present": false,
+    "converter_version_or_commit_known": false,
+    "complete_transform_recipe_known": false,
+    "cryptographic_derivation_proven": false,
+    "byte_reconstructibility_claimed": false,
+    "official_google_conversion_claimed": false,
+    "limitations_accepted_only_for_fixed_internal_prototype_instrument": true
+  },
+  "covenants": {
+    "local_internal_use_only": true,
+    "redistribution_upload_publication_or_sharing": false,
+    "new_download_or_clickthrough": false,
+    "network_denied_inference_required": true,
+    "telemetry_or_external_service": false,
+    "quarantine_only_outputs": true,
+    "pseudo_labels_are_ground_truth": false,
+    "model_agreement_is_human_evidence": false,
+    "learner_ancestry_allowed": false,
+    "simulator_oracle_remains_evaluation_truth": true
+  },
+  "gate_result": {
+    "original_reconstructible_provenance_gate": "HISTORICAL_FAIL_PRESERVED",
+    "new_opaque_internal_only_provenance_gate": "PASS",
+    "manifest_gate": "PASS",
+    "exact_common_schema_public_canary": "PENDING",
+    "runtime_and_adapter_hash_gate": "PENDING",
+    "network_denial_gate": "PENDING_CANARY",
+    "quarantine_and_restricted_execution_gate": "PENDING",
+    "scientific_schema_coverage_abstention_K5_gates": "UNCHANGED_PENDING",
+    "full_instrument_activation": "NOT_ACTIVE",
+    "restricted_inference_authorized_by_this_receipt": false,
+    "learner_or_causal_outcome_authorized": false
+  },
+  "privacy_and_ancestry": {
+    "restricted_content_accessed": false,
+    "hosted_or_cloud_inference_used": false,
+    "new_model_bytes_downloaded": 0,
+    "license_or_clickthrough_accepted": false,
+    "restricted_payload_exported": false,
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false
+  },
+  "next_task": "Freeze exact runtime and adapter hashes, run the frozen common-schema public joint audio-plus-five-frame canary under OS network denial, and issue a separate full activation receipt only if every unchanged gate passes."
+}

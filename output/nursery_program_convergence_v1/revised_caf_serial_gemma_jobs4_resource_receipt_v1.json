@@ -1,0 +1,204 @@
+{
+  "schema_version": "nursery-revised-caf-serial-gemma-jobs4-resource-receipt-v1",
+  "created_at": "2026-07-22",
+  "status": "PUBLIC_RESOURCE_SEQUENCE_ADMITTED_WITH_MANDATORY_LAUNCH_RECHECKS",
+  "scope": "PUBLIC_BYTE_AND_HOST_PREFLIGHT_ONLY_NO_MODEL_EXECUTION_NO_RESTRICTED_ACCESS_NO_ENDPOINT",
+  "purpose": "Recheck resource fit for the additive CAF public canary, a later authorized serial 137-window Gemma calibration, and the separately gated 40-bundle symbolic runner at jobs=4.",
+  "immutable_bindings": {
+    "caf_transport_amendment": {
+      "path": "docs/nursery_program_convergence_v1/gemma4_caf_canary_transport_v1/frozen_caf_transport_amendment_v1.json",
+      "sha256": "3ecf4bf6c62920d73177d029c18918f38366d34f7d7997642037696def37bbd0",
+      "status": "FROZEN_PRE_CANARY_CAF_TRANSPORT_ONLY"
+    },
+    "prototype_resource_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_e4b_prototype_activation_resource_receipt.json",
+      "sha256": "363fda5ebc189216b2d8e9a9133cb51cea91fcc0ea9dc15fef023a028648dcd4"
+    },
+    "historical_resource_planning_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_e4b_resource_receipt.json",
+      "sha256": "099af484dce9c2e00e2fd2afbc578ea98ca12679c9797c2079e19586474b49a9"
+    },
+    "historical_public_runtime_receipt": {
+      "path": "output/childlens_feasibility_v1_3_1/gemma4_public_synthetic_runtime_bakeoff.json",
+      "sha256": "6eafc9518dcfbbd82fe5d1cddd4063c47d388b757f1565ab4aeb3478867d5695"
+    },
+    "calibration_protocol": {
+      "path": "docs/nursery_program_convergence_v1/frozen_childlens_pseudo_calibration_protocol.json",
+      "sha256": "db5336726f4841e592cb9c73df5ab22a0887d1bd34c7cf673146f38de9e86961"
+    },
+    "symbolic_protocol": {
+      "path": "docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json",
+      "sha256": "c6b7afab6c8914a968b0f06706a222d2771863c2a3fd2017184c17d431bfa7d6"
+    },
+    "symbolic_execution_contract": {
+      "path": "docs/nursery_program_convergence_v1/calibration_conditioned_symbolic_execution_contract_v2.json",
+      "sha256": "db760f4135f81f7f78184a80f8abae16578918ff10b44c952f83a76cf5daa810"
+    },
+    "symbolic_protocol_erratum": {
+      "path": "docs/nursery_program_convergence_v1/calibration_conditioned_symbolic_protocol_erratum_v2.json",
+      "sha256": "e550cbd6b935e71006f2c740466f939ab6a89963dbe0e686c4854846b4392b6b"
+    }
+  },
+  "cached_artifact_recheck": {
+    "repository": "mlx-community/gemma-4-e4b-it-4bit",
+    "conversion_revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+    "noncache_regular_file_count": 10,
+    "snapshot_bytes": 5179241512,
+    "snapshot_manifest_sha256": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae",
+    "expected_manifest_sha256": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae",
+    "manifest_match": true,
+    "symlink_count": 0,
+    "new_model_bytes_downloaded_during_this_preflight": 0,
+    "duplicate_model_copy_created": false,
+    "fresh_download_or_requantization_performed": false,
+    "reuse_only": true
+  },
+  "host_resource_snapshot": {
+    "host_class": "APPLE_M5_32_GIB_UNIFIED_MEMORY",
+    "observed_free_bytes": 59705008128,
+    "observed_free_gib": 55.604622,
+    "declared_nonmodel_peak_reserve_bytes": 2684354560,
+    "declared_nonmodel_peak_reserve_gib": 2.5,
+    "projected_post_peak_free_bytes": 57020653568,
+    "projected_post_peak_free_gib": 53.104622,
+    "mandatory_floor_bytes": 53687091200,
+    "mandatory_floor_gib": 50.0,
+    "projected_margin_above_floor_bytes": 3333562368,
+    "projected_margin_above_floor_gib": 3.104622,
+    "disk_gate_pass": true,
+    "observed_system_wide_memory_free_percent": 75,
+    "observed_pages_throttled": 0,
+    "minimum_memory_free_percent_at_launch": 25,
+    "maximum_pages_throttled_at_launch": 0,
+    "memory_pressure_gate_pass": true,
+    "matching_heavy_process_count_at_probe": 0,
+    "snapshot_is_not_a_future_runtime_guarantee": true
+  },
+  "public_mps_lock_probe": {
+    "scope": "PUBLIC_MODEL_BAKEOFF_LOCK_ONLY",
+    "nonblocking_exclusive_acquisition_succeeded": true,
+    "owner_matches_current_user": true,
+    "mode_is_0600": true,
+    "lock_released_immediately_after_probe": true,
+    "restricted_quarantine_lock_inspected": false,
+    "future_runner_must_acquire_its_controlling_lock_before_model_load": true,
+    "maximum_simultaneous_mps_heavy_processes": 1
+  },
+  "runtime_projection": {
+    "evidence_class": "HISTORICAL_PUBLIC_SYNTHETIC_ANALOG_AND_FROZEN_WORKLOAD_COUNTS_ONLY",
+    "historical_single_request": {
+      "request_shape": "BATCH_ONE_ONE_AUDIO_PLUS_FIVE_FRAMES_PLUS_TEXT",
+      "measured_wall_seconds": 17.135,
+      "measured_peak_mlx_unified_memory_gib": 6.247,
+      "strict_schema_output_valid": true,
+      "network_denied": true,
+      "single_fixture_is_structural_not_semantic_evidence": true,
+      "audio_preprocessor_numerical_warnings_observed": true
+    },
+    "revised_caf_public_canary": {
+      "planned_request_count": 1,
+      "historical_analog_point_seconds": 17.135,
+      "interpretation": "The historical timer included model loading, prompt assembly, and generation, but excluded fixture construction and outer process/receipt validation; it is a one-fixture analog rather than a guarantee.",
+      "runtime_guarantee": false
+    },
+    "later_serial_gemma_calibration": {
+      "candidate_window_count": 137,
+      "batch_size": 1,
+      "maximum_prefetched_windows": 1,
+      "historical_rate_extrapolation_seconds": 2347.495,
+      "historical_rate_extrapolation_minutes": 39.125,
+      "operational_wall_time_budget_minutes": 90,
+      "budget_source": "output/nursery_program_convergence_v1/gemma4_e4b_resource_receipt.json",
+      "budget_is_not_a_throughput_guarantee": true,
+      "checkpoint_between_windows_required": true
+    },
+    "later_paired_causal_bundles": {
+      "corpus_seed_bundle_count": 40,
+      "jobs": 4,
+      "minimum_complete_bundle_waves_if_balanced": 10,
+      "range_family_count": 5,
+      "range_draws_per_family": 7,
+      "model_seed_count": 3,
+      "arm_count": 5,
+      "arm_model_draw_family_cells": 21000,
+      "representative_historical_scientific_runtime_available": false,
+      "wall_time_estimate_seconds": null,
+      "reason_no_wall_time_claim": "The bound public CPU microbenchmark measures hash/controller overhead and deterministic merge behavior only; its own receipt forbids treating it as learner or scientific-runtime evidence.",
+      "public_controller_evidence": {
+        "jobs4_median_wall_seconds_for_12_hash_only_fixture_bundles": 0.558681,
+        "jobs4_speedup_vs_jobs1": 2.443502,
+        "maximum_conservative_sum_worker_peak_rss_bytes": 72646656,
+        "merge_equivalent_across_all_runs": true,
+        "scientific_runtime_extrapolation_permitted": false
+      }
+    }
+  },
+  "required_phase_order": [
+    {
+      "phase": 1,
+      "name": "REVISED_CAF_PUBLIC_CANARY",
+      "mps_heavy_processes": 1,
+      "cpu_workers_maximum": 2,
+      "requires_fresh_artifact_disk_memory_and_lock_recheck": true
+    },
+    {
+      "phase": 2,
+      "name": "AUTHORIZED_SERIAL_GEMMA_CALIBRATION",
+      "mps_heavy_processes": 1,
+      "cpu_workers_maximum": 2,
+      "may_start_only_after_fresh_canary_and_activation_pass": true,
+      "requires_separate_restricted_privacy_and_lock_gates": true
+    },
+    {
+      "phase": 3,
+      "name": "SEPARATELY_AUTHORIZED_PAIRED_CAUSAL_BUNDLES",
+      "mps_heavy_processes": 0,
+      "jobs": 4,
+      "may_start_only_after_mps_phase_releases_all_model_resources": true,
+      "one_worker_owns_one_complete_paired_bundle": true,
+      "partial_bundle_fails_the_run": true
+    }
+  ],
+  "launch_rechecks": {
+    "rehash_same_ten_model_files": true,
+    "reject_symlinks_or_manifest_count_or_byte_mismatch": true,
+    "require_free_bytes_minus_remaining_declared_peak_at_least_floor": true,
+    "require_memory_free_percent_at_least_25": true,
+    "require_pages_throttled_equal_zero": true,
+    "require_nonblocking_single_mps_lock_before_model_load": true,
+    "require_no_parallel_model_load": true,
+    "require_mps_release_before_jobs4_bundle_phase": true,
+    "abort_fail_closed_on_any_mismatch": true
+  },
+  "implementation_observations_not_activation_bindings": {
+    "caf_runner_available_at_receipt_time": false,
+    "calibration_coordinator_sha256": "4fdacb4a0bf4e03627c4c036ec65107bb249bf0a4b35564f3cf7a5a58dbeeeed",
+    "symbolic_runner_sha256": "5d25a9ddea0479a46f9178ff87a8d99eef56de94fc874ebd28eda7a1e4a30c87",
+    "require_new_caf_runner_hash_in_fresh_canary_and_activation_receipts": true,
+    "resource_receipt_does_not_validate_or_activate_future_runner_code": true
+  },
+  "authorization_and_privacy_boundary": {
+    "resource_fit_is_execution_authorization": false,
+    "caf_amendment_is_execution_authorization": false,
+    "model_executed_during_this_preflight": false,
+    "restricted_or_quarantine_content_accessed": false,
+    "restricted_inference_run": false,
+    "scientific_endpoint_opened": false,
+    "learner_or_tokenizer_trained": false,
+    "causal_or_acquisition_outcome_run": false,
+    "hosted_or_cloud_inference_used": false,
+    "network_or_external_endpoint_used": false,
+    "license_or_clickthrough_accepted": false,
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false,
+    "restricted_payload_or_small_cell_exported": false
+  },
+  "resource_disposition": {
+    "revised_caf_canary_resource_fit": true,
+    "later_serial_gemma_calibration_resource_fit_after_all_separate_gates": true,
+    "jobs4_complete_bundle_controller_fit_after_mps_release": true,
+    "fresh_or_duplicate_model_download_needed": false,
+    "current_new_model_byte_budget": 0,
+    "next_action": "Bind and validate a new CAF runner, then repeat the mandatory byte, disk, memory, and lock checks immediately before any separately authorized public canary launch."
+  }
+}

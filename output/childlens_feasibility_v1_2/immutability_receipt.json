@@ -1,0 +1,13 @@
+{
+  "schema_version": "childlens-v1.2-immutability-receipt-v1",
+  "captured_date": "2026-07-21",
+  "canonical_serialization": "UTF-8 lines lexicographically sorted as complete lines, each formatted as SHA256 two-spaces repository-relative-PATH newline",
+  "v1_artifact_count": 23,
+  "v1_set_digest": "35ba9acbba0fc11fc3419c88ea57d0721e08486c6d37595812ce6c77ce994abf",
+  "v1_1_artifact_count": 40,
+  "v1_1_set_digest": "3acd969804d71979ba8071e2446e8ee1ceb3194fc90dcfda802a99e296b7bf48",
+  "v1_preserved": true,
+  "v1_1_preserved": true,
+  "historical_decisions_overwritten": false,
+  "mutation_authorized": false
+}

@@ -1,0 +1,191 @@
+{
+  "schema_version": "nursery-calibration-conditioned-sensitivity-v1",
+  "protocol_id": "nursery-provisional-childlens-calibrated-symbolic-grounding",
+  "frozen_at": "2026-07-22",
+  "status": "CALIBRATION_GATE_REVISE_OUTCOME_REMAINS_UNAUTHORIZED",
+  "pre_amendment_file_sha256": "be6b24a8e0abb686ed2cb0b0e193186e4dc01a6c4495947358769ff4943e5a28",
+  "revision_history": [
+    {
+      "predecessor_sha256": "0ed3c46f0c35f0e3c34df34cb051db678f22e735bb5ace66643d09e5a42e3082",
+      "reason": "Replaced the inactive Gemma visual path with the predeclared Qwen3-VL fallback before restricted challenger inference."
+    },
+    {
+      "predecessor_sha256": "be6b24a8e0abb686ed2cb0b0e193186e4dc01a6c4495947358769ff4943e5a28",
+      "reason": "Removed unsupported speech-by-vision cross-products and bound range families to the two actually executed instrument paths before restricted challenger inference."
+    }
+  ],
+  "amendment_reason": "Bind complete range families to the two actually executed instrument paths rather than imply unexecuted ASR-by-VLM cross-products; no calibration aggregate or causal outcome was inspected.",
+  "decision": "REUSE_EXISTING_SYNTHETIC_MECHANISM_PROOF_AND_FREEZE_MINIMAL_REALISM_EXTENSION",
+  "evidence_reused": {
+    "study": "synthetic weak-alignment recovery v1",
+    "permitted_label": "provisional symbolic action-alignment mechanism proof",
+    "not_permitted": [
+      "general lexical-acquisition proof",
+      "noun-object result",
+      "raw-perception result",
+      "naturalistic or infant result",
+      "confirmation outcome"
+    ],
+    "terminal_artifact": "output/synthetic_weak_alignment_recovery_v1/terminal_decision.json",
+    "adversarial_boundary": "The later confidence-sharpening lineage remains terminally stopped and is not reused."
+  },
+  "primary_question": "Across synthetic weak-alignment regimes provisionally bounded by multiple local instruments on one frozen ChildLens pilot, do synchronized training-only simulator-defined embodied cues improve simulator-oracle noun-object and verb-action grounding over matched absent, shuffled, time-shifted, and corrupted controls when side cues are absent at evaluation?",
+  "permitted_claim_template": "Across synthetic weak-alignment regimes provisionally bounded by multiple local instruments on one ChildLens pilot, synchronized training-only embodied cues [improved/did not improve] simulator-oracle noun-object and verb-action grounding relative to matched controls.",
+  "forbidden_claims": [
+    "ChildLens transcripts or referents are correct.",
+    "ChildLens demonstrates language-acquisition improvement.",
+    "Local models substitute for German human annotation.",
+    "Model agreement is human reliability or ground truth.",
+    "The result generalizes to infants or BabyView."
+  ],
+  "ancestry": {
+    "mode": "CHILDLENS_AGGREGATE_CALIBRATED_SEPARATE_PROTOCOL",
+    "allowed_childlens_input": "Only cell-suppressed, outward-rounded aggregate uncertainty ranges emitted by the frozen pseudo-calibration protocol.",
+    "forbidden_childlens_input": "Raw media, audio, frames, text, translations, item rows, timestamps, identifiers, exact small cells, pseudo-label payloads, model confidence, vocabulary, tokenizer, embeddings, weights, checkpoints, or effect sizes.",
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false,
+    "pooling": false,
+    "learner_weights": "scratch",
+    "learner_vocabulary": "new opaque synthetic noun and verb symbols independent of ChildLens lexical content",
+    "evaluation_truth": "simulator oracle only"
+  },
+  "naturalistic_calibration_layer": {
+    "protocol": "docs/nursery_program_convergence_v1/frozen_childlens_pseudo_calibration_protocol.json",
+    "dimensions": [
+      "speech-event lag",
+      "visible-candidate rate",
+      "null-or-irrelevant rate",
+      "ambiguity-or-undecidable rate",
+      "candidate multiplicity",
+      "visibility",
+      "coarse noun-object support",
+      "coarse verb-action support"
+    ],
+    "range_families": [
+      "existing_whisper_qwen2_path",
+      "challenger_qwen3asr_qwen3vl_path",
+      "model_intersection",
+      "model_union",
+      "conservative_envelope"
+    ],
+    "no_point_estimate_default": true,
+    "disagreement_policy": "retain and widen ranges; never majority vote"
+  },
+  "synthetic_layer": {
+    "base_generator": "reuse the synthetic weak-alignment v1 event-bag and cross-situational mechanism interfaces after verifying zero empirical-value paths",
+    "required_extension": "Add factorized opaque noun/object and verb/action meanings, a genuinely corrective event-selection update for both token kinds, and parameterized range input from the aggregate calibration receipt.",
+    "language": "weakly delayed, nullable, ambiguous opaque noun and verb tokens with repeated cross-situational exposure",
+    "vision": "synthetic object-form and action-dynamics observations with calibrated visibility and candidate multiplicity; no oracle IDs visible to the learner",
+    "side_cues": "concept-agnostic simulator-defined event boundary, motion-change, and contact-change streams synchronized to latent events during training only",
+    "side_physics_calibrated_from_childlens": false,
+    "oracle": "physically separate latent ledger used only for evaluation and a strong-alignment diagnostic ceiling"
+  },
+  "five_arms": [
+    "weak_vl_absent_side",
+    "weak_vl_synchronized_side",
+    "weak_vl_group_shuffled_side",
+    "weak_vl_balanced_time_shifted_side",
+    "weak_vl_corrupted_uninformative_side"
+  ],
+  "fairness": {
+    "identical_primary_episodes": true,
+    "identical_candidate_bags": true,
+    "identical_architecture": true,
+    "identical_scratch_initialization_within_bundle": true,
+    "identical_batch_order_optimizer_updates_and_compute": true,
+    "side_values_and_masks_transformed_as_one_bundle": true,
+    "side_fields_rejected_at_evaluation": true,
+    "evaluator_inputs": "synthetic vision plus language only"
+  },
+  "stress_construction": {
+    "unit": "range family",
+    "within_family_sampling": "For every corpus seed, use the same fixed seven-point maximin Latin-hypercube draw over that family's outward-rounded joint bounds; reuse the draws across all five arms.",
+    "range_family_conclusions_reported_separately": true,
+    "envelope_conclusion_required": true,
+    "no_pooling_across_range_families": true,
+    "no_parameter_tuning_after_calibration": true,
+    "calibration_only_selects_ranges_not_thresholds": true,
+    "fallback_if_a_dimension_is_suppressed": "Use the full prespecified simulator domain for that dimension and label the family conservative-unbounded; do not impute a point value."
+  },
+  "concepts_and_splits": {
+    "noun_object_concepts": 8,
+    "verb_action_concepts": 8,
+    "scored_atomic_concepts_have_training_exposure": true,
+    "heldout": [
+      "new noun-object exemplars",
+      "new verb-action exemplars",
+      "new scenes and distractor layouts",
+      "object-action compositions with both atoms exposed elsewhere",
+      "independent corpus and evaluation seeds"
+    ],
+    "zero_exposure_panel": "chance-only leakage falsifier, not an acquisition endpoint"
+  },
+  "seed_plan": {
+    "corpus_seeds": "40 fixed odd integers 740001 through 740079",
+    "model_seeds": [750001, 750003, 750007],
+    "inference_seed": 760001,
+    "independent_unit": "corpus seed",
+    "paired_bundle": "all seven range families, all five arms, and all three model seeds for one corpus seed",
+    "no_adaptive_extension": true
+  },
+  "endpoints": {
+    "co_primary": [
+      "cue-free heldout noun-object macro top-1",
+      "cue-free heldout verb-action macro top-1"
+    ],
+    "secondary": [
+      "heldout object-action composition top-1",
+      "null rejection",
+      "log loss",
+      "Brier score",
+      "calibration",
+      "range-family-specific effects"
+    ]
+  },
+  "inference": {
+    "contrast": "synchronized minus each of absent, shuffled, time-shifted, and corrupted within each corpus and range family",
+    "model_seed_handling": "average within corpus before contrasts",
+    "method": "one-sided 95% Student-t lower confidence bound over 40 corpus effects with exact sign test as corroboration",
+    "intersection_union": "both endpoints and all four comparators must pass separately within every required range family",
+    "minimum_mean_effect": 0.03,
+    "lower_bound_must_exceed": 0.0,
+    "minimum_positive_corpus_fraction": 0.6,
+    "maximum_large_negative_fraction": 0.2,
+    "large_negative_threshold": -0.05
+  },
+  "falsification_and_gates": {
+    "pre_outcome": [
+      "calibration receipt passes local/privacy/path/schema/coverage/envelope gates",
+      "strong-alignment ceiling learns both endpoints",
+      "side-only concept probes are at most chance plus 0.02",
+      "all weak controls have learnable headroom and are non-saturated",
+      "shuffled, shifted, and corrupted bundles preserve their declared nuisance marginals",
+      "event-selection disconnection removes the synchronized fixture advantage",
+      "no side, oracle, concept, target, or empirical field reaches evaluation",
+      "no AEA or BabyView ancestry"
+    ],
+    "go": "Every range family, including the conservative envelope, passes both co-primary endpoints against every comparator and every falsification passes.",
+    "revise": "A technical, privacy, model-path, calibration-envelope, strong-ceiling, or construction gate fails before scientific endpoints are opened; permit one bounded engineering correction without changing ranges or thresholds.",
+    "stop": "The valid one-shot outcome fails either co-primary endpoint in any required range family, confidence changes occur without corrected wrong/tied mappings, corrupted/disrupted cues match synchronized, or empirical/privacy leakage is detected."
+  },
+  "calibration_disposition": {
+    "receipt": "output/nursery_program_convergence_v1/childlens_pseudo_calibration_receipt.json",
+    "status": "CALIBRATION_REVISE",
+    "two_path_visual_gate_passed": false,
+    "single_schema_only_retry_exhausted": true,
+    "scientific_thresholds_changed": false,
+    "range_or_effect_outcome_opened": false,
+    "causal_outcome_may_launch": false,
+    "required_next_action": "A separately frozen user-chosen calibration remedy or an explicitly empirical-free protocol must supersede this blocked launch state."
+  },
+  "execution": {
+    "implementation_task": "Add only the aggregate-range binding and dual noun/verb corrective update to a small nonempirical extension of weak-alignment v1, with synthetic fixtures and fail-closed ancestry/evaluation tests; do not build a new infrastructure lineage.",
+    "parallel_unit": "complete paired corpus-seed bundle",
+    "multi_gpu": "one complete bundle per identical GPU; never split arms or range families across device types within a bundle",
+    "single_m5": "serialize the one MPS-heavy trainer and use two to four CPU workers for generation/scoring",
+    "outcome_authorized": false,
+    "next_task": "Do not launch. Obtain the user's substantive choice between a separately frozen replacement-instrument calibration revision and an explicitly empirical-free sensitivity protocol.",
+    "planned_launch_command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python scripts/run_calibration_conditioned_symbolic_grounding.py run --protocol docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json --calibration-receipt output/nursery_program_convergence_v1/childlens_pseudo_calibration_receipt.json --output-root output/nursery_calibration_conditioned_symbolic_grounding --jobs 4",
+    "launch_command_status": "PLANNED_NOT_YET_IMPLEMENTED_OR_AUTHORIZED"
+  }
+}

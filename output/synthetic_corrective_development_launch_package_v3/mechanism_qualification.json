@@ -1,0 +1,1816 @@
+{
+  "active_minimum": 0.75,
+  "case_count": 32,
+  "cases": [
+    {
+      "case_id": "case-00",
+      "foil": 1,
+      "initial_top": 1,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 0,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 1,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 0
+    },
+    {
+      "case_id": "case-01",
+      "foil": 2,
+      "initial_top": 2,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 1,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 2,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 1
+    },
+    {
+      "case_id": "case-02",
+      "foil": 3,
+      "initial_top": 3,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 2,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040817,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.020408163265306124,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 3,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 2
+    },
+    {
+      "case_id": "case-03",
+      "foil": 0,
+      "initial_top": 0,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 3,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777456599150166,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 0,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 3
+    },
+    {
+      "case_id": "case-04",
+      "foil": 1,
+      "initial_top": 1,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 0,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 1,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 0
+    },
+    {
+      "case_id": "case-05",
+      "foil": 2,
+      "initial_top": 2,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 1,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 2,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 1
+    },
+    {
+      "case_id": "case-06",
+      "foil": 3,
+      "initial_top": 3,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 2,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040817,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.020408163265306124,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 3,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 2
+    },
+    {
+      "case_id": "case-07",
+      "foil": 0,
+      "initial_top": 0,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 3,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777456599150166,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 0,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 3
+    },
+    {
+      "case_id": "case-08",
+      "foil": 2,
+      "initial_top": 2,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 0,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 2,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 0
+    },
+    {
+      "case_id": "case-09",
+      "foil": 3,
+      "initial_top": 3,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298612,
+          "top": 1,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985233,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476651,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985233,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476651,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040817,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.020408163265306124,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 3,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 1
+    },
+    {
+      "case_id": "case-10",
+      "foil": 0,
+      "initial_top": 0,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 2,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 0,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 2
+    },
+    {
+      "case_id": "case-11",
+      "foil": 1,
+      "initial_top": 1,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 3,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777456599150166,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 1,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 3
+    },
+    {
+      "case_id": "case-12",
+      "foil": 2,
+      "initial_top": 2,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 0,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 2,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 0
+    },
+    {
+      "case_id": "case-13",
+      "foil": 3,
+      "initial_top": 3,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298612,
+          "top": 1,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985233,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476651,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985233,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476651,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040817,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.020408163265306124,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 3,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 1
+    },
+    {
+      "case_id": "case-14",
+      "foil": 0,
+      "initial_top": 0,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 2,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 0,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 2
+    },
+    {
+      "case_id": "case-15",
+      "foil": 1,
+      "initial_top": 1,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 3,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777456599150166,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 1,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 3
+    },
+    {
+      "case_id": "case-16",
+      "foil": 1,
+      "initial_top": 1,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 0,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 1,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 0
+    },
+    {
+      "case_id": "case-17",
+      "foil": 2,
+      "initial_top": 2,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 1,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 2,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 1
+    },
+    {
+      "case_id": "case-18",
+      "foil": 3,
+      "initial_top": 3,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 2,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040817,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.020408163265306124,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 3,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 2
+    },
+    {
+      "case_id": "case-19",
+      "foil": 0,
+      "initial_top": 0,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 3,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777456599150166,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 0,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 3
+    },
+    {
+      "case_id": "case-20",
+      "foil": 1,
+      "initial_top": 1,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 0,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 1,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 0
+    },
+    {
+      "case_id": "case-21",
+      "foil": 2,
+      "initial_top": 2,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 1,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 2,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 1
+    },
+    {
+      "case_id": "case-22",
+      "foil": 3,
+      "initial_top": 3,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 2,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040817,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.020408163265306124,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 3,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 2
+    },
+    {
+      "case_id": "case-23",
+      "foil": 0,
+      "initial_top": 0,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 3,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777456599150166,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 0,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 3
+    },
+    {
+      "case_id": "case-24",
+      "foil": 2,
+      "initial_top": 2,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 0,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 2,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 0
+    },
+    {
+      "case_id": "case-25",
+      "foil": 3,
+      "initial_top": 3,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298612,
+          "top": 1,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985233,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476651,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985233,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476651,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040817,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.020408163265306124,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 3,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 1
+    },
+    {
+      "case_id": "case-26",
+      "foil": 0,
+      "initial_top": 0,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 2,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 0,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 2
+    },
+    {
+      "case_id": "case-27",
+      "foil": 1,
+      "initial_top": 1,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 3,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777456599150166,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 1,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 3
+    },
+    {
+      "case_id": "case-28",
+      "foil": 2,
+      "initial_top": 2,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.031819759428165784,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.904543916629861,
+          "top": 0,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985232,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777317484766515,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 2,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 2,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 0
+    },
+    {
+      "case_id": "case-29",
+      "foil": 3,
+      "initial_top": 3,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298612,
+          "top": 1,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985233,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476651,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985233,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476651,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588767,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915015,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040817,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.020408163265306124,
+          "top": 3,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870403,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.03181816197098657,
+          "top": 3,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 1
+    },
+    {
+      "case_id": "case-30",
+      "foil": 0,
+      "initial_top": 0,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 2,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577745659915016,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 0,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 0,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 2
+    },
+    {
+      "case_id": "case-31",
+      "foil": 1,
+      "initial_top": 1,
+      "mutation_results": {
+        "active": {
+          "foil_probability": 0.03181975942816579,
+          "semantic_disagreement_count": 5,
+          "target_probability": 0.9045439166298611,
+          "top": 3,
+          "unique_correct_flip": true
+        },
+        "evidence_disconnected": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "old_agreement_gate": {
+          "foil_probability": 0.9005863848985234,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.03577731748476652,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_side_zero": {
+          "foil_probability": 0.9005862194588768,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.035777456599150166,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "semantic_update_disconnected": {
+          "foil_probability": 0.9387755102040816,
+          "semantic_disagreement_count": 96,
+          "target_probability": 0.02040816326530612,
+          "top": 1,
+          "unique_correct_flip": false
+        },
+        "within_bag_permuted": {
+          "foil_probability": 0.9045455140870404,
+          "semantic_disagreement_count": 0,
+          "target_probability": 0.031818161970986567,
+          "top": 1,
+          "unique_correct_flip": false
+        }
+      },
+      "target": 3
+    }
+  ],
+  "flip_fractions": {
+    "active": 1.0,
+    "evidence_disconnected": 0.0,
+    "old_agreement_gate": 0.0,
+    "semantic_side_zero": 0.0,
+    "semantic_update_disconnected": 0.0,
+    "within_bag_permuted": 0.0
+  },
+  "mutation_maximum": 0.25,
+  "null_suppression": {
+    "cases": [
+      {
+        "case_id": "case-00",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-01",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-02",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-03",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-04",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-05",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-06",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-07",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-08",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-09",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-10",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-11",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-12",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-13",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-14",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-15",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-16",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-17",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-18",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-19",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-20",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-21",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-22",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-23",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-24",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-25",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-26",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-27",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-28",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-29",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-30",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      },
+      {
+        "case_id": "case-31",
+        "mean_event_posterior_mass": 1.7513021525393037e-26,
+        "mean_null_posterior": 1.0,
+        "mean_semantic_update_l1": 0.0
+      }
+    ],
+    "maximum_mean_semantic_update_l1": 0.02,
+    "minimum_mean_null_posterior": 0.9,
+    "status": "PASS"
+  },
+  "prespecified_cases": true,
+  "status": "PASS"
+}

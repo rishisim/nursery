@@ -1,0 +1,430 @@
+{
+  "artifact_id": "childlens-instrument-preflight-v1.1.0",
+  "audit_date": "2026-07-21",
+  "scope": "LOCAL_ONLY_STRUCTURAL_PREFLIGHT_NO_RESTRICTED_DATA",
+  "terminal_decision_authority": false,
+  "scientific_outcome_authorized": false,
+  "summary_status": "HUMAN_ONLY_PATH_STRUCTURALLY_READY_AUTOMATED_SPEECH_STACK_NOT_LOCAL",
+  "boundary_receipt": {
+    "keeper_accessed": false,
+    "email_accessed": false,
+    "childlens_media_or_metadata_accessed": false,
+    "restricted_payload_read": false,
+    "model_or_data_downloaded": false,
+    "model_weights_loaded_or_executed": false,
+    "license_or_model_conditions_accepted": false,
+    "learner_trained": false,
+    "scientific_effect_inspected": false,
+    "aea_empirical_ancestry": false,
+    "babyview_empirical_ancestry": false,
+    "v1_artifacts_modified": false
+  },
+  "governing_v1_inputs": [
+    {
+      "path": "docs/childlens_feasibility_v1/frozen_pilot_protocol_v1.json",
+      "sha256": "63be49d470c79e94f26240e73b314cdc42f2a6e6a57e96c897340d856f561ecb"
+    },
+    {
+      "path": "docs/childlens_feasibility_v1/language_transcription_diarization_feasibility.md",
+      "sha256": "79b0ec5603edf67c5f935a6a9e3d40b94dc0861101c9d2cc342aa67cd4f1f8ad"
+    },
+    {
+      "path": "docs/childlens_feasibility_v1/proposed_annotation_instrument_contract_amendment.md",
+      "sha256": "7857e630e66d76a7462cbac85805e6e54f56f36f1f6e693f43845596fbd5979f"
+    },
+    {
+      "path": "output/childlens_feasibility_v1/transcription_instrument_receipt.json",
+      "sha256": "e67d1f1a9f03a1bd4c125c8dfa45e7b9fa24c9fcb6499633479cc459ae504db0"
+    }
+  ],
+  "host_observation": {
+    "os": "macOS 26.5.2",
+    "architecture": "arm64",
+    "logical_cpu_count": 10,
+    "memory_bytes": 34359738368,
+    "python_default": "3.14.6",
+    "python_isolation_candidate": "3.10.20",
+    "python_isolation_candidate_binary_sha256": "d41269aa625b27fe9792c39a1867414002585447149997fe9f6c5621f0d44c06",
+    "observation_note": "Host facts are engineering observations only and contain no corpus evidence."
+  },
+  "stage_inventory": [
+    {
+      "stage": "LANGUAGE_IDENTIFICATION",
+      "status": "HUMAN_PROTOCOL_PINNED_AUTOMATED_LID_NOT_LOCAL",
+      "locally_available": true,
+      "local_component": "No-model human routing protocol",
+      "frozen_labels": [
+        "ISO_639_LANGUAGE_CODE",
+        "MIXED_OR_CODE_SWITCHED",
+        "UNDECIDABLE"
+      ],
+      "rule": "Two qualified humans establish source language before alignment. Any future Whisper language probability is advisory discrepancy evidence only and cannot override a human label.",
+      "actual_childlens_language": "UNKNOWN_NOT_INSPECTED_IN_THIS_WORKSTREAM"
+    },
+    {
+      "stage": "AUDIO_EXTRACTION",
+      "status": "LOCAL_EXECUTABLE_PINNED_SYNTHETIC_SENTINEL_PASS",
+      "locally_available": true,
+      "local_component": "Homebrew FFmpeg 8.0.1_4",
+      "ffmpeg_reported_version": "8.0.1",
+      "ffmpeg_binary_sha256": "0a96da2735695308d964e25fa6f4a0db2e9d24031390360f4c5ff96a4f8938e5",
+      "ffprobe_binary_sha256": "68447e67105534f3f43b95c94983ed56fbdd7125e5724cc56499ad538c2b86a7",
+      "ffplay_binary_sha256": "f45eb57c768b46ae70195ee06e7d5d6f2d732e4e801b5d6d9ea44e7e97f93acc",
+      "compiled_license_mode": "GPL_V3_OR_LATER_BECAUSE_ENABLE_GPL_AND_ENABLE_VERSION3",
+      "decode_contract": {
+        "input_map": "0:a:0",
+        "video_disabled": true,
+        "channels": 1,
+        "sample_rate_hz": 16000,
+        "codec": "pcm_s16le",
+        "metadata_removed": true,
+        "bitexact_flags": true,
+        "source_immutable": true,
+        "restricted_logs_must_suppress_paths": true
+      }
+    },
+    {
+      "stage": "MULTILINGUAL_ASR_PROPOSAL",
+      "status": "UPSTREAM_PIN_KNOWN_NOT_INSTALLED_MODEL_ABSENT",
+      "locally_available": false,
+      "runtime": {
+        "package": "faster-whisper",
+        "version": "1.2.1",
+        "upstream_commit": "65882eee9f5cdbeeb2d877f1131d48cf241b327d",
+        "wheel_sha256": "79a66ad50688c0b794dd501dc340a736992a6342f7f95e5811be60b5224a26a7",
+        "code_license_metadata": "MIT",
+        "installed": false
+      },
+      "model": {
+        "repository": "Systran/faster-whisper-large-v3",
+        "revision": "edaa852ec7e145841d8ffdb056a99866b5f0a478",
+        "model_bin_lfs_sha256_from_v1_receipt": "69f74147e3334731bc3a76048724833325d2ec74642fb52620eda87352e3d4f1",
+        "license_metadata": "MIT",
+        "locally_materialized": false
+      },
+      "fixed_role": "Quarantined source-language text proposal only; task=transcribe; no translation, prompt, hotwords, external vocabulary, or machine-only acceptance.",
+      "next_precondition": "After ChildLens G1 and release binding pass, acquire verified code and weights into an isolated restricted instrument cache under a separately logged action."
+    },
+    {
+      "stage": "MULTILINGUAL_ALIGNMENT",
+      "status": "INTERFACE_PIN_KNOWN_NOT_INSTALLED_ROUTE_MODEL_UNRESOLVED",
+      "locally_available": false,
+      "interface": {
+        "package": "whisperx",
+        "version": "3.8.5",
+        "upstream_commit": "4a6477e5e52ad516faab5363bdafbfa9840aec5e",
+        "wheel_sha256": "842f9ef5c2c2d33ccb6e68f5d5b233ded9d77a7e89bba06a1d55a9704cef50c3",
+        "code_license_metadata": "BSD-2-Clause",
+        "python_requirement": ">=3.10,<3.14",
+        "installed": false
+      },
+      "environment_feasibility": "Python 3.10.20 is present and version-compatible, but no environment, package, aligner, or weight is installed.",
+      "route_rule": "Pin a language-specific aligner only after genuine human language identification and before any alignment. Unsupported, mixed, or undecidable language routes use manual utterance timing.",
+      "fallback": "MANUAL_HUMAN_UTTERANCE_ONSET_OFFSET"
+    },
+    {
+      "stage": "SPEAKER_ROLE_PROPOSAL",
+      "status": "AUTOMATED_MODELS_BLOCKED_HUMAN_ONLY",
+      "locally_available": false,
+      "frozen_roles": [
+        "NON_CHILD",
+        "CHILD",
+        "OVERLAP",
+        "UNCERTAIN",
+        "NONSPEECH"
+      ],
+      "vtc": {
+        "code_commit": "9308411fb47f4290dfcd84338fc84bfb7f91227f",
+        "weight_repository": "coml/VTC-2",
+        "weight_revision": "6b1a95508302edc14c50f670cd9a30d66fa4f88a",
+        "code_license_metadata": null,
+        "weight_license_metadata": null,
+        "github_license_endpoint_observation": "HTTP_404",
+        "weight_repository_gated": false,
+        "installed_or_cached": false,
+        "status": "BLOCKED_PUBLIC_AVAILABILITY_IS_NOT_PERMISSION"
+      },
+      "pyannote": {
+        "repository": "pyannote/speaker-diarization-community-1",
+        "license_metadata": "CC-BY-4.0",
+        "access_condition": "USER_ACCEPTANCE_AND_CONTACT_INFORMATION_SHARING_REQUIRED",
+        "conditions_accepted": false,
+        "installed_or_cached": false,
+        "status": "BLOCKED_NO_AUTHORITY_TO_ACCEPT_AND_ANONYMOUS_CLUSTERS_DO_NOT_ESTABLISH_CHILD_ROLE"
+      },
+      "fallback": "Language-matched humans directly label all five roles; all G4 timing/role validation items are independently double coded."
+    },
+    {
+      "stage": "REFERENTIAL_ANNOTATION",
+      "status": "HUMAN_ONLY_PROTOCOL_PINNED_NO_VISUAL_MODEL",
+      "locally_available": true,
+      "context_window_seconds": [-5, 5],
+      "frozen_statuses": [
+        "VISIBLE_SINGLE",
+        "VISIBLE_MULTIPLE",
+        "NULL_NOT_VISIBLE",
+        "IRRELEVANT",
+        "UNDECIDABLE",
+        "UNUSABLE"
+      ],
+      "selection_rule": "Pilot and annotation items remain metadata/hash selected; no ASR word, detector, visual salience, or apparent grounding quality may select content.",
+      "automation_rule": "No pretrained detector, tracker, temporal ranker, embedding, or external label vocabulary is approved or locally pinned in this preflight.",
+      "human_requirement": "Humans judge visible object/action candidates, null, ambiguity, unusability, and the utterance-to-nearest-visible-candidate lag."
+    },
+    {
+      "stage": "ANNOTATION_INTERFACE",
+      "status": "LOCAL_RUNTIME_PINNED_APP_NOT_YET_IMPLEMENTED_OR_RESTRICTED_SMOKE_TESTED",
+      "locally_available": true,
+      "runtime": {
+        "package": "streamlit",
+        "version": "1.56.0",
+        "license_expression": "Apache-2.0",
+        "metadata_sha256": "6f33fc197860fdaf25b85bf08b086857881c38174746e061be4f2425d6be8f26",
+        "record_sha256": "63755d6f181d9c9680b26b3995f79bc0d74669326fb551389b5ab56c8b393350",
+        "import_test": "PASS"
+      },
+      "storage": {
+        "engine": "Python sqlite3",
+        "library_version": "3.53.3",
+        "scope": "RESTRICTED_QUARANTINE_ONLY"
+      },
+      "required_security_configuration": {
+        "server_address": "127.0.0.1",
+        "headless": true,
+        "show_email_prompt": false,
+        "file_watcher_type": "none",
+        "enable_cors": true,
+        "enable_xsrf_protection": true,
+        "enable_static_serving": false,
+        "browser_gather_usage_stats": false,
+        "network_egress_during_use": "DISABLED",
+        "file_uploader_widget": "PROHIBITED",
+        "cloud_deployment": "PROHIBITED",
+        "logs": "NO_MEDIA_PATHS_TRANSCRIPTS_IDENTIFIERS_OR_EXACT_TIMESTAMPS"
+      },
+      "minimal_fallback": "Version-pinned ffplay for local playback plus restricted SQLite entry; no remote web service."
+    },
+    {
+      "stage": "RELIABILITY_AND_ERROR_SCORING",
+      "status": "METRICS_FROZEN_IMPLEMENTATION_NOT_PINNED",
+      "locally_available": false,
+      "observed_absent_packages": [
+        "jiwer",
+        "krippendorff"
+      ],
+      "rule": "Before receiving human labels, freeze and unit-test either exact package pins or a reviewed local implementation for token/grapheme error, macro-F1, boundary error, cluster-aware uncertainty, and referential agreement. Do not choose an estimator after seeing agreement or lexical quality."
+    }
+  ],
+  "local_absence_checks": {
+    "python_packages_absent": [
+      "whisperx",
+      "faster-whisper",
+      "ctranslate2",
+      "torch",
+      "torchaudio",
+      "pyannote.audio",
+      "openai-whisper",
+      "silero-vad",
+      "speechbrain",
+      "jiwer",
+      "krippendorff"
+    ],
+    "standard_model_caches_absent": [
+      "Systran/faster-whisper-large-v3@edaa852ec7e145841d8ffdb056a99866b5f0a478",
+      "coml/VTC-2@6b1a95508302edc14c50f670cd9a30d66fa4f88a",
+      "pyannote/speaker-diarization-community-1",
+      "OpenAI Whisper large-v3 checkpoint"
+    ],
+    "interpretation": "The upstream pins are an acquisition specification only. No runnable ASR, alignment, VAD, diarization, voice-type, or reliability environment exists locally."
+  },
+  "synthetic_sentinel_tests": [
+    {
+      "test_id": "FFMPEG_48KHZ_STEREO_TO_16KHZ_MONO_PCM_S16LE",
+      "restricted_input_used": false,
+      "input": "Locally generated 0.25-second 1 kHz sine",
+      "run_1_output_sha256": "dc12c788bdbd055cf39663361ba0ba024e2313b5ec2ea918bd2704fd32f1495a",
+      "run_2_output_sha256": "dc12c788bdbd055cf39663361ba0ba024e2313b5ec2ea918bd2704fd32f1495a",
+      "observed_codec": "pcm_s16le",
+      "observed_sample_format": "s16",
+      "observed_sample_rate_hz": 16000,
+      "observed_channels": 1,
+      "result": "PASS"
+    },
+    {
+      "test_id": "LOCAL_UI_RUNTIME_IMPORT",
+      "restricted_input_used": false,
+      "streamlit_version": "1.56.0",
+      "sqlite_library_version": "3.53.3",
+      "result": "PASS"
+    }
+  ],
+  "human_validation_packet_requirements": {
+    "status": "SPECIFIED_NOT_POPULATED_NO_RESTRICTED_DATA",
+    "codex_human_judgment_policy": "Codex may build, blind, validate structure, and aggregate the packet, but it cannot count as a human auditory, linguistic, speaker-role, or visible-referent annotator.",
+    "minimum_people": {
+      "reference_annotators": 2,
+      "production_corrector_separate_from_reference": true,
+      "adjudicator": "A qualified human not substitutable by an instrument; may be one of the qualified people only after independent labels are locked."
+    },
+    "qualifications": [
+      "Source-language competence documented before exposure to machine proposals",
+      "Training on the frozen role and referential ontologies using non-ChildLens practice material or terms-permitted internal training items",
+      "Ability to hear child versus other-person speech and code overlap/uncertainty without identity inference",
+      "Referential coders trained to retain null, ambiguous, undecidable, and unusable cases"
+    ],
+    "restricted_packet_layers": [
+      {
+        "layer": "A_LANGUAGE_AND_TIMING_DISCOVERY",
+        "content": "Opaque item key, selected local media window, waveform/playback controls, language label, utterance onset/offset, intelligibility and overlap flags",
+        "proposal_visibility": "NONE"
+      },
+      {
+        "layer": "B_BLINDED_REFERENCE",
+        "content": "At least the frozen 20 percent ASR-hidden subset; independent source-language verbatim text, timing, and frozen speaker role",
+        "proposal_visibility": "NONE",
+        "peer_label_visibility": "NONE"
+      },
+      {
+        "layer": "C_PRODUCTION_CORRECTION",
+        "content": "Machine proposal only if its software and corpus permissions pass; otherwise blank manual entry; every accepted text/timing/role field receives an explicit human disposition",
+        "proposal_visibility": "PERMITTED_ONLY_OUTSIDE_BLINDED_REFERENCE"
+      },
+      {
+        "layer": "D_REFERENTIAL",
+        "content": "Frozen +/-5 second window, visible object/action candidate status, null/ambiguity/unusable status, candidate count, nearest visible-candidate boundary, confidence and notes",
+        "double_code": "At least 20 percent, stratified by participant and speech/activity stratum"
+      }
+    ],
+    "validation_stop_rule": "FIRST_OF_300_UTTERANCES_OR_30_SPEECH_MINUTES",
+    "all_timing_and_role_validation_items_double_coded": true,
+    "reference_subset_fraction": 0.2,
+    "required_metrics": [
+      "DECODABLE_DURATION_FRACTION_WITH_CLUSTER_AWARE_UNCERTAINTY",
+      "USABLE_HUMAN_CORRECTED_BOUNDARY_FRACTION_WITH_500MS_PER_EDGE_TOLERANCE",
+      "ONSET_AND_OFFSET_ERROR_INSERTION_DELETION",
+      "FOUR_CLASS_ROLE_MACRO_F1_AND_CLASSWISE_PRECISION_RECALL",
+      "NONSPEECH_FALSE_DETECTION_AND_COVERAGE",
+      "LANGUAGE_APPROPRIATE_POST_CORRECTION_TOKEN_ERROR_AND_GRAPHEME_ERROR_WHEN_NEEDED",
+      "ASR_HIDDEN_VERSUS_ASSISTED_TRANSCRIPTION_BIAS",
+      "REFERENTIAL_STATUS_AGREEMENT_WITH_KRIPPENDORFF_ALPHA_OR_FROZEN_EQUIVALENT",
+      "CORRECTION_REAL_TIME_FACTOR_ADJUDICATION_FRACTION_AND_UNRESOLVED_COVERAGE"
+    ],
+    "privacy": "Packet, media, text, paths, identifiers, exact times, item labels, and disagreements remain in the untracked restricted quarantine. Only terms-permitted, nonidentifying, cell-suppressed aggregates and protocol/digest receipts may leave."
+  },
+  "instrument_to_learner_firewall": {
+    "status": "FAIL_CLOSED",
+    "zones": [
+      "Z0_EXTERNAL_CODE_AND_WEIGHT_CACHE",
+      "Z1_MACHINE_PROPOSAL_QUARANTINE",
+      "Z2_BLINDED_HUMAN_REFERENCE_AND_ADJUDICATED_CHILDLENS_DERIVATIVES",
+      "Z3_FUTURE_CHILDLENS_LEARNER_STORE",
+      "Z4_NONIDENTIFYING_REPORT_EXPORT"
+    ],
+    "permitted_edges": [
+      "PINNED_CHILDLENS_SOURCE_TO_Z1_FOR_LOCAL_INFERENCE_ONLY_AFTER_G1",
+      "PINNED_CHILDLENS_SOURCE_TO_Z2_FOR_DIRECT_HUMAN_JUDGMENT",
+      "Z1_PROPOSALS_TO_HUMAN_REVIEW_UI_WITHIN_QUARANTINE",
+      "FULLY_HUMAN_DISPOSITIONED_SOURCE_TEXT_TIMING_ROLE_AND_REFERENTIAL_LABELS_TO_Z2",
+      "PROTOCOL_AUTHORIZED_HUMAN_ACCEPTED_CHILDLENS_TEXT_AND_RGB_TO_Z3_ONLY_IN_A_LATER_TASK",
+      "VERSION_LICENSE_HASH_AND_SETTINGS_RECEIPTS_WITHOUT_RESTRICTED_PAYLOAD_TO_Z4"
+    ],
+    "forbidden_edges_or_fields": [
+      "Z0_OR_Z1_TO_Z3_DIRECT",
+      "INSTRUMENT_WEIGHTS_CHECKPOINTS_TOKENIZERS_VOCABULARIES_TOKEN_IDS_PROMPTS_OR_HOTWORDS",
+      "INSTRUMENT_FEATURES_EMBEDDINGS_HIDDEN_STATES_LOGITS_SCORES_CONFIDENCES_OR_ALTERNATIVES",
+      "UNREVIEWED_ASR_TEXT_WORD_TIMES_VAD_SEGMENTS_DIARIZATION_CLUSTERS_OR_ROLE_PROPOSALS",
+      "DETECTOR_CLASSES_TRACKS_BOXES_MASKS_OR_MODEL_SELECTED_EXAMPLES",
+      "REMOTE_ASR_DIARIZATION_VISION_OR_ANNOTATION_API_CALLS",
+      "MACHINE_PROPOSALS_IN_BLINDED_REFERENCE_ITEMS",
+      "RAW_OR_CORRECTED_TEXT_MEDIA_FRAMES_IDENTIFIERS_EXACT_TIMESTAMPS_OR_SMALL_CELLS_IN_Z4"
+    ],
+    "tokenizer_rule": "A future tokenizer is initialized from scratch using only authorized, fully human-dispositioned ChildLens-local text. No instrument tokenizer or vocabulary supplies tokens or initialization.",
+    "ancestry_rule": "External instruments remain measurement-process ancestors recorded in receipts but never scientific learner ancestors. Human-assisted text is admissible only under the proposed amendment, full human disposition, and an ASR-hidden bias subset; the human-only fallback has the cleanest ancestry."
+  },
+  "public_primary_metadata_receipts": [
+    {
+      "source": "https://pypi.org/pypi/faster-whisper/1.2.1/json",
+      "observed": "version 1.2.1, MIT metadata, wheel SHA-256 and Python >=3.9",
+      "access_date": "2026-07-21"
+    },
+    {
+      "source": "https://pypi.org/pypi/whisperx/3.8.5/json",
+      "observed": "version 3.8.5, BSD-2-Clause metadata, wheel SHA-256 and Python >=3.10,<3.14",
+      "access_date": "2026-07-21"
+    },
+    {
+      "source": "https://huggingface.co/api/models/Systran/faster-whisper-large-v3/revision/edaa852ec7e145841d8ffdb056a99866b5f0a478",
+      "observed": "immutable revision, public/ungated status, MIT model-card metadata",
+      "access_date": "2026-07-21"
+    },
+    {
+      "source": "https://github.com/openai/whisper/blob/main/model-card.md",
+      "observed": "multilingual capability plus explicit language, accent, dialect and hallucination limitations",
+      "access_date": "2026-07-21"
+    },
+    {
+      "source": "https://api.github.com/repos/LAAC-LSCP/VTC/license?ref=9308411fb47f4290dfcd84338fc84bfb7f91227f",
+      "observed": "HTTP 404; no repository license returned",
+      "access_date": "2026-07-21"
+    },
+    {
+      "source": "https://huggingface.co/api/models/coml/VTC-2/revision/6b1a95508302edc14c50f670cd9a30d66fa4f88a",
+      "observed": "public/ungated repository with no license metadata",
+      "access_date": "2026-07-21"
+    },
+    {
+      "source": "https://huggingface.co/pyannote/speaker-diarization-community-1",
+      "observed": "CC-BY-4.0 metadata plus required user acceptance and contact-information sharing",
+      "access_date": "2026-07-21"
+    },
+    {
+      "source": "https://ffmpeg.org/legal.html",
+      "observed": "FFmpeg licensing depends on build options; the observed local build enables GPL and version3",
+      "access_date": "2026-07-21"
+    },
+    {
+      "source": "https://docs.streamlit.io/develop/api-reference/configuration/config.toml",
+      "observed": "loopback address, CORS, XSRF, file-watcher, static-serving and usage-statistics controls",
+      "access_date": "2026-07-21"
+    },
+    {
+      "source": "https://pypi.org/pypi/streamlit/1.56.0/json",
+      "observed": "version 1.56.0 and Apache-2.0 license expression",
+      "access_date": "2026-07-21"
+    }
+  ],
+  "gate_implications": {
+    "G1_TERMS": "NO_FINDING_THIS_WORKSTREAM_DID_NOT_INSPECT_CHILDLENS_PERMISSION_EVIDENCE",
+    "G3_AUDIO_TIMING": "STRUCTURAL_AUDIO_DECODE_PREFLIGHT_PASS_EMPIRICAL_GATE_UNRESOLVED_UNTIL_AUTHORIZED_HUMAN_PILOT",
+    "G4_TRANSCRIPT_ROLE": "HUMAN_ONLY_PATH_SPECIFIED_AUTOMATED_ASR_NOT_LOCAL_AUTOMATED_ROLE_MODELS_BLOCKED_EMPIRICAL_GATE_UNRESOLVED",
+    "G6_REFERENTIAL_ANNOTATION": "HUMAN_PACKET_AND_ONTOLOGY_SPECIFIED_NO_HUMAN_JUDGMENTS_OR_RELIABILITY_OBSERVED",
+    "G10_RESOURCES": "LOCAL_DECODE_AND_UI_RUNTIME_AVAILABLE_ASR_ALIGNMENT_INSTALLATION_AND_HUMAN_STAFFING_REMAIN"
+  },
+  "validation": {
+    "json_parsers": [
+      "jq",
+      "python_json_tool"
+    ],
+    "json_parse_result": "PASS",
+    "synthetic_ffmpeg_repeatability": "PASS",
+    "streamlit_sqlite_import": "PASS",
+    "governing_v1_hash_recheck": "PASS_UNCHANGED",
+    "existing_v1_validator": "PASS",
+    "existing_v1_pytest": {
+      "passed": 17,
+      "failed": 0
+    },
+    "restricted_payload_pattern_scan": "PASS_NO_PAYLOAD_FOUND"
+  },
+  "required_next_actions_before_restricted_use": [
+    "Coordinator establishes ChildLens G1 separately for local decode, restricted derivatives, fixed local instruments, retention/deletion, and aggregate export.",
+    "Coordinator binds the release and selects the frozen content-blind pilot before any content tool runs.",
+    "Create an isolated Python 3.10 instrument environment and acquire only hash-verified, license-reviewed ASR/alignment artifacts after authorization; keep network disabled during inference.",
+    "Freeze the human-established language route and any language-specific aligner before alignment, or use manual utterance timing.",
+    "Do not acquire or execute VTC or pyannote under current evidence; use direct human role coding.",
+    "Implement and sentinel-test the loopback-only UI in the restricted namespace with telemetry disabled and logs redacted.",
+    "Freeze and unit-test reliability/error metric implementations before any human packet is scored.",
+    "Populate a blinded packet and obtain genuine language-matched human annotation; pause rather than attributing human reliability to Codex or a model."
+  ],
+  "workstream_conclusion": "This preflight does not issue or alter a ChildLens feasibility decision. It establishes a locally pinned decode and UI base, a fully specified human-only fallback, and a strict instrument firewall; automated ASR/alignment remain upstream-pinned but absent, and automated speaker-role tools remain blocked."
+}

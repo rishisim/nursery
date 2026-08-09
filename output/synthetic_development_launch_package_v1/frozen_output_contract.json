@@ -1,0 +1,9 @@
+{
+  "confirmation_outcome_count_before_run": 0,
+  "confirmation_output_supported": false,
+  "development_outcome_count_before_run": 0,
+  "development_output_must_not_exist_before_run": true,
+  "development_output_root": "output/synthetic_development_v1_one_shot",
+  "exact_one_shot_command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python output/synthetic_development_launch_package_v1/frozen_source_snapshot/scripts/run_synthetic_development_launch_v1.py run-development --snapshot-root output/synthetic_development_launch_package_v1/frozen_source_snapshot --authorization output/synthetic_development_launch_package_v1/DEVELOPMENT_LAUNCH_READY.json --output-root output/synthetic_development_v1_one_shot",
+  "one_shot_marker": "ONE_SHOT_EXECUTION.json"
+}

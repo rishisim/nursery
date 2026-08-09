@@ -1,0 +1,49 @@
+{
+  "schema_version": "nursery-grounded-videollm-mac-runtime-v2-lock-v1.0.0",
+  "protocol_id": "childlens-independent-second-instrument-mac-runtime-v2",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_BEFORE_FULL_MODEL_LOAD_OR_OUTPUT",
+  "selected_runtime_path": "PYTORCH_2_13_NATIVE_MPS_CONV3D",
+  "model": {
+    "repository": "WHB139426/Grounded-Video-LLM",
+    "hugging_face_revision": "b97f0e826a0b6c292ca54d9c02c483c479952501",
+    "official_source_revision": "e26da4e4b681357fd911d5ace3467f031af29208",
+    "checkpoint_sha256": "5967e1138fc1106e1c3b384b96af3120405f455475308b4067bb785ac560f588",
+    "weight_manifest_digest": "a2ab012a3a39c1a63ace406ff6ec0b9cdeb5482c1fc87e4a43326ee89daf2d47"
+  },
+  "runtime": {
+    "python": "3.10.20",
+    "torch": "2.13.0",
+    "torchvision": "0.28.0",
+    "device": "mps",
+    "dtype": "float16",
+    "attention_implementation": "eager",
+    "environment_package_count": 38,
+    "environment_package_digest": "1f46288a772ad88ec290a53bd57f90ff425e446bc6ee1f3cbdaa7af15e0a39ac",
+    "requirements_sha256": "5e1dbeb32fd743e2ffe581b7065f195515b03d5b876a9ac9b2a2315be1267bce",
+    "patched_source_tree_digest": "f3e9032dc7e197810c4a3eca384ef05838c7f82490a5bb87aba837b0585ebd53",
+    "compatibility_changes": [
+      "Make flash_attn import optional; eager attention remains selected.",
+      "Use CUDA autocast only on CUDA and a no-op context on MPS."
+    ],
+    "weights_changed": false,
+    "architecture_changed": false,
+    "network": "denied"
+  },
+  "unscored_smoke": {
+    "runner_sha256": "2888b0f71186139e8d7e32eee3684e0d5f168c8bd34382d51c8988a252115ec7",
+    "attempts": 1,
+    "fixture": "New self-generated five-frame scene with a blue circle in the middle frame; expanded deterministically to 96 frames.",
+    "query": "der blaue Kreis",
+    "semantic_correctness_scored": false,
+    "permitted_inspection": [
+      "model load and generation completion",
+      "exact frozen-schema parseability",
+      "runtime and memory",
+      "raw and canonical response hashes"
+    ],
+    "response_text_may_influence_later_steps": false,
+    "failure_rule": "Stop v2 before the scored public canary; do not retry, repair, or select a different runtime after an answer is generated."
+  },
+  "restricted_data_access_authorized": false
+}

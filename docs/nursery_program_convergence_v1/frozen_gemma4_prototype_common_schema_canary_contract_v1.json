@@ -1,0 +1,324 @@
+{
+  "schema_version": "nursery-gemma4-prototype-common-schema-canary-contract-v1",
+  "contract_id": "gemma4-e4b-prototype-joint-audio-five-frame-common-schema-canary-v1",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_FOR_PUBLIC_SYNTHETIC_CANARY_ONLY",
+  "current_execution_state": "NOT_RUN",
+  "restricted_content_permitted": false,
+  "scientific_outcome_permitted": false,
+  "immutable_bindings": {
+    "replacement_amendment": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_replacement_instrument_amendment.json",
+      "sha256": "8e6d7a43ea9639fa451a59386b8657495558fde77fb2147a20767388d47ed24a"
+    },
+    "prototype_provenance_amendment": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_e4b_opaque_instrument_provenance_amendment_v1.json",
+      "sha256": "93874c69153daaf41d902216351666c59b12aeb656b9739ecd07d1e6e4fe42b1"
+    },
+    "prototype_provenance_activation_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_e4b_opaque_instrument_provenance_activation_receipt_v1.json",
+      "sha256": "2f25cff5d8fc140fb7dddeebae4cccfa83880327b5d383d14b3f21f3e2adcf13",
+      "scope": "PROVENANCE_ONLY_NOT_FULL_INSTRUMENT_ACTIVATION"
+    },
+    "prototype_resource_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_e4b_prototype_activation_resource_receipt.json",
+      "sha256": "363fda5ebc189216b2d8e9a9133cb51cea91fcc0ea9dc15fef023a028648dcd4",
+      "status": "VERIFIED_REUSE_RESOURCE_ADMITTED",
+      "scope": "RESOURCE_ONLY_NOT_FULL_INSTRUMENT_ACTIVATION"
+    },
+    "original_calibration_protocol": {
+      "path": "docs/nursery_program_convergence_v1/frozen_childlens_pseudo_calibration_protocol.json",
+      "sha256": "db5336726f4841e592cb9c73df5ab22a0887d1bd34c7cf673146f38de9e86961"
+    }
+  },
+  "prototype_instrument": {
+    "instrument_id": "gemma4_e4b_it_4bit_joint_audio_five_frame",
+    "runtime_artifact_kind": "cached opaque public MLX conversion admitted only under the separately bound prototype provenance amendment",
+    "activation_scope": "bounded pseudo-calibration measurement instrument only",
+    "learner_ancestor": false,
+    "evaluation_truth": false,
+    "hosted_or_external_inference": false
+  },
+  "unchanged_calibration_contract": {
+    "primary_item_count": 15,
+    "primary_total_seconds": 900,
+    "candidate_window_count": 137,
+    "frame_offsets_seconds": [-5.0, -2.5, 0.0, 2.5, 5.0],
+    "minimum_export_cell_items": 5,
+    "schema_validity_minimum": 0.95,
+    "primary_item_coverage_minimum": 0.8,
+    "primary_seconds_coverage_minimum": 0.8,
+    "maximum_abstention_for_a_dimension": 0.5,
+    "minimum_paths_per_task_family": 2,
+    "agreement_is_not_a_pass_gate": true,
+    "K5_complement_protection": true,
+    "outward_rounding_unchanged": true,
+    "reserve_activation": false,
+    "reselection": false
+  },
+  "public_fixture": {
+    "scope": "SELF_GENERATED_PUBLIC_SYNTHETIC_ONLY",
+    "fixture_count": 1,
+    "audio": {
+      "container": "WAV",
+      "sample_format": "signed 16-bit little-endian PCM",
+      "channels": 1,
+      "sample_rate_hz": 16000,
+      "sample_count": 160000,
+      "duration_seconds": 10.0,
+      "language": "de-DE",
+      "phrase_utf8": "Nimm die rote Tasse.",
+      "local_TTS": {
+        "executable": "/usr/bin/say",
+        "voice": "Anna",
+        "voice_locale": "de_DE",
+        "rate_words_per_minute": 170,
+        "invocation": "/usr/bin/say -v Anna -r 170 -o <owner-private-public-scratch>/german.aiff --data-format=LEI16@22050 'Nimm die rote Tasse.'",
+        "executable_sha256_required_in_receipt": true,
+        "OS_build_and_voice_inventory_digest_required_in_receipt": true
+      },
+      "ffmpeg_normalization": "/opt/homebrew/bin/ffmpeg -nostdin -hide_banner -loglevel error -i german.aiff -af apad=pad_dur=10 -t 10 -vn -ac 1 -ar 16000 -c:a pcm_s16le -bitexact german.wav",
+      "speech_or_language_content": "fixed public German phrase only",
+      "expected_semantic_label": null
+    },
+    "frames": {
+      "count": 5,
+      "format": "PNG",
+      "width": 448,
+      "height": 252,
+      "color_mode": "RGB",
+      "generator": "Create five lossless RGB images in offset order with the same off-white background F5F2E8. Draw one stylized red cup using a solid C83232 body rectangle 96 by 88 pixels, a 12-pixel C83232 handle outline on its right, and a 10-pixel dark tabletop line. Move the cup center through x positions 128,176,224,272,320 at fixed y=132. Disable metadata, color profiles, text chunks, timestamps, and nondeterministic compression fields.",
+      "offset_order_seconds": [-5.0, -2.5, 0.0, 2.5, 5.0],
+      "expected_semantic_label": null
+    },
+    "fixture_manifest": {
+      "required_fields": [
+        "generator_source_sha256",
+        "audio_sha256",
+        "audio_bytes",
+        "frame_sha256s_in_order",
+        "frame_bytes_in_order",
+        "combined_fixture_sha256"
+      ],
+      "hash_algorithm": "SHA-256",
+      "manifest_serialization": "UTF-8 canonical JSON with sorted keys, no insignificant whitespace, and no NaN"
+    },
+    "modality_consumption_evidence": {
+      "audio_processor_output_nonempty": true,
+      "audio_sample_count_seen": 160000,
+      "image_processor_count_seen": 5,
+      "image_order_digest_matches_fixture": true,
+      "joint_request_single_model_invocation": true,
+      "semantic_recovery_required": false
+    }
+  },
+  "exact_multimodal_request": {
+    "message_order": ["system", "user"],
+    "user_content_order": [
+      "audio_clip",
+      "frame_minus_5_seconds",
+      "frame_minus_2_5_seconds",
+      "frame_center",
+      "frame_plus_2_5_seconds",
+      "frame_plus_5_seconds",
+      "exact_user_prompt"
+    ],
+    "system_prompt_utf8": "You are a fixed local measurement instrument. Use only the supplied audio clip and five ordered frames. Return only the exact JSON object requested. Do not add prose or markdown.",
+    "user_prompt_utf8": "The audio is the complete frozen candidate window. The five frames are ordered at offsets -5,-2.5,0,+2.5,+5 seconds from the window center. Classify only what is supported jointly by the spoken audio and visible frames. Count de-duplicated visible noun/object or verb/action candidates related to the speech, not all visible entities. Return exactly one JSON object with exactly these five keys and one allowed string value per key: candidate_count_bin=[zero,one,two,three_or_more,abstain]; visibility_bin=[none,partial,clear,abstain]; referential_status=[visible_candidate,null_or_irrelevant,ambiguous,undecidable]; lexical_support=[noun_object,verb_action,both,neither,undecidable]; lag_event_unit_bin=[lead_two_plus,lead_one,overlap,lag_one,lag_two_plus,undecidable]. Use abstain or undecidable whenever the audio, language, visibility, reference, or temporal relation is insufficient. Do not output confidence, candidate text, transcript text, translation, explanation, prose, or markdown.",
+    "dynamic_text_interpolation": false,
+    "transcript_translation_identifier_timestamp_or_confidence_input": false,
+    "thinking_mode": false,
+    "speculative_decoding": false
+  },
+  "exact_common_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "candidate_count_bin": {
+        "type": "string",
+        "enum": ["zero", "one", "two", "three_or_more", "abstain"]
+      },
+      "visibility_bin": {
+        "type": "string",
+        "enum": ["none", "partial", "clear", "abstain"]
+      },
+      "referential_status": {
+        "type": "string",
+        "enum": ["visible_candidate", "null_or_irrelevant", "ambiguous", "undecidable"]
+      },
+      "lexical_support": {
+        "type": "string",
+        "enum": ["noun_object", "verb_action", "both", "neither", "undecidable"]
+      },
+      "lag_event_unit_bin": {
+        "type": "string",
+        "enum": ["lead_two_plus", "lead_one", "overlap", "lag_one", "lag_two_plus", "undecidable"]
+      }
+    },
+    "required": [
+      "candidate_count_bin",
+      "visibility_bin",
+      "referential_status",
+      "lexical_support",
+      "lag_event_unit_bin"
+    ],
+    "additionalProperties": false
+  },
+  "contract_digests": {
+    "prompt_sha256": "93e51fb982bd3ea47dd4defbd24e818cf67aee89c6df9d98fd1ec40fc2188ff6",
+    "prompt_hash_serialization": "SHA-256(system_prompt UTF-8 bytes + one NUL byte + user_prompt UTF-8 bytes)",
+    "common_schema_sha256": "19b7ae8948aed46410e1307c0a302303813422995c8f4cdc19949118693a8089",
+    "parser_contract_sha256": "af8e5988febb42e378bb3b6c8cbbb2799cca167cb4b3f4be5d32732a6035974a",
+    "object_hash_serialization": "UTF-8 canonical JSON with sorted keys, compact separators, ensure_ascii=false, and no NaN"
+  },
+  "generation_contract": {
+    "batch_size": 1,
+    "max_new_tokens": 192,
+    "do_sample": false,
+    "temperature": 0.0,
+    "num_beams": 1,
+    "enable_thinking": false,
+    "speculative_decoding": false,
+    "use_cache": true,
+    "decode_generated_token_ids_only": true,
+    "skip_special_tokens": true,
+    "clean_up_tokenization_spaces": false,
+    "server_or_cloud_endpoint": false
+  },
+  "parser_contract": {
+    "primary": "Trim ASCII whitespace only; reject duplicate keys; parse the entire UTF-8 string as one JSON object; validate the exact five-key Draft 2020-12 schema; reject prose, markdown, trailing content, extra keys, unknown enum values, non-string values, and non-finite values.",
+    "outer_fence_correction": {
+      "maximum_uses": 1,
+      "default_used": false,
+      "activation_trigger": "public canary transport/parser failure only, before any restricted output or model-model agreement exists",
+      "exact_operation": "Remove ASCII whitespace and at most one complete outer wrapper matching ```json newline JSON newline ``` or ``` newline JSON newline ```; require no other byte outside the fence; then apply the unchanged duplicate-key and exact-schema parser.",
+      "JSON_substring_search": false,
+      "prose_removal": false,
+      "per_request_fallback": false,
+      "semantic_prompt_or_schema_change": false,
+      "model_revision_or_generation_change": false,
+      "requires_new_adapter_hash": true
+    },
+    "negative_parser_fixtures": [
+      "duplicate key rejects",
+      "extra key rejects",
+      "unknown enum rejects",
+      "missing key rejects",
+      "two JSON objects reject",
+      "leading or trailing prose rejects",
+      "partial or nested markdown fence rejects",
+      "valid bare exact object accepts",
+      "exact single outer fence accepts only when the one correction is activated"
+    ]
+  },
+  "cached_artifact_and_runtime_requirements": {
+    "artifact": {
+      "repository": "mlx-community/gemma-4-e4b-it-4bit",
+      "revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+      "snapshot_file_count": 10,
+      "snapshot_bytes": 5179241512,
+      "snapshot_manifest_sha256": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae",
+      "weight_bytes": 5146800534,
+      "weight_sha256": "932b8271fc3fe65adcc78b96c10c6268bbfb13e8f67d1358727c0d6ee97e1eff",
+      "all_cached_files_rehashed_before_canary": true,
+      "duplicate_snapshot_copy": false
+    },
+    "upstream_binding": {
+      "repository": "google/gemma-4-E4B-it",
+      "revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+      "weight_byte_equivalence": true,
+      "prototype_permission_interpretation_source": "bound prototype provenance amendment only"
+    },
+    "runtime_exact_pins": {
+      "python_version": "3.12.13",
+      "mlx_vlm": "0.6.6",
+      "mlx": "0.32.0",
+      "transformers": "5.14.1",
+      "tokenizers": "0.22.2",
+      "numpy": "2.5.1",
+      "pillow": "12.3.0",
+      "llguidance": "1.7.6",
+      "jsonschema": "NOT_USED_MANUAL_EXACT_VALIDATOR",
+      "ffmpeg_version": "8.0.1"
+    },
+    "required_runtime_hashes": [
+      "complete hash-locked dependency file SHA-256",
+      "interpreter executable SHA-256",
+      "mlx-vlm installed tree manifest SHA-256",
+      "ffmpeg executable SHA-256",
+      "canary adapter SHA-256",
+      "network-denial profile SHA-256",
+      "macOS say executable SHA-256 and German voice inventory digest"
+    ],
+    "offline_environment": [
+      "HF_HUB_OFFLINE=1",
+      "TRANSFORMERS_OFFLINE=1",
+      "HF_HUB_DISABLE_TELEMETRY=1",
+      "no authentication token variables",
+      "OS-level deny network"
+    ]
+  },
+  "qwen3_read_only_binding": {
+    "instrument_id": "qwen3_vl_8b_instruct_4bit",
+    "revision": "defcdea7cc7a4b0858fea563cbbce171d328e457",
+    "public_canary_path": "output/nursery_program_convergence_v1/qwen3_vl_public_canary.json",
+    "public_canary_sha256": "eb5447e13f44cc35c64e433f7217dc2423c5aff799c27101b6ce22bec50390b3",
+    "restricted_hypotheses_recomputed": false,
+    "restricted_hypotheses_opened_by_public_canary": false,
+    "quarantine_binding_digest_match_required": true,
+    "restricted_digest_exported": false,
+    "third_visual_model": false
+  },
+  "public_canary_receipt_contract": {
+    "schema_version": "nursery-gemma4-e4b-prototype-common-schema-public-canary-receipt-v1",
+    "required_status": "PUBLIC_COMMON_SCHEMA_CANARY_PASS",
+    "required_bindings": [
+      "replacement amendment path and SHA-256",
+      "prototype provenance amendment path and SHA-256",
+      "this canary contract path and SHA-256",
+      "cached artifact repository, revision, file count, bytes, manifest SHA-256, weight bytes, and weight SHA-256",
+      "fixture manifest and component SHA-256 values",
+      "exact prompt SHA-256",
+      "exact common-schema SHA-256",
+      "runtime pins and required runtime hashes",
+      "parser mode and correction count"
+    ],
+    "required_passes": [
+      "all public fixture digests match",
+      "cached artifact rehash matches",
+      "joint request structurally consumes one audio clip and five ordered frames",
+      "one exact-schema object validates",
+      "all parser negative fixtures behave as frozen",
+      "network-denial sentinel passes",
+      "no external request or telemetry occurs",
+      "resource admission receipt passes"
+    ],
+    "semantic_quality_gate": false,
+    "restricted_inference_authorized_by_canary": false,
+    "scientific_outcome_authorized_by_canary": false
+  },
+  "resource_and_privacy_gates": {
+    "resource_receipt_schema": "nursery-program-convergence-gemma4-e4b-prototype-activation-resource-receipt-v1",
+    "resource_receipt_path": "output/nursery_program_convergence_v1/gemma4_e4b_prototype_activation_resource_receipt.json",
+    "required_resource_status": "VERIFIED_REUSE_RESOURCE_ADMITTED",
+    "post_peak_free_space_floor_gib": 50,
+    "maximum_MPS_heavy_processes": 1,
+    "batch_size_windows": 1,
+    "maximum_staged_next_window": 1,
+    "restricted_or_item_level_output": false,
+    "hosted_or_cloud_inference": false,
+    "external_API": false,
+    "telemetry": false,
+    "restricted_inference": false,
+    "causal_or_learner_outcome": false
+  },
+  "terminal_state": {
+    "contract_frozen": true,
+    "canary_run": false,
+    "canary_receipt_created": false,
+    "activation_receipt_created": false,
+    "restricted_inference_run": false,
+    "scientific_outcome_run": false,
+    "reason": "The exact public-only contract is frozen. It creates no activation receipt and authorizes neither restricted inference nor a scientific outcome."
+  }
+}

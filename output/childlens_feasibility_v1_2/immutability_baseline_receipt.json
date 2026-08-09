@@ -1,0 +1,36 @@
+{
+  "canonical_serialization": "UTF-8 lines lexicographically sorted as complete lines; each line is SHA256 two ASCII spaces repository-relative-PATH newline",
+  "captured_date": "2026-07-21",
+  "mutation_authorized": false,
+  "path_normalization": "POSIX_REPOSITORY_RELATIVE_NO_LEADING_DOT_SLASH",
+  "schema_version": "childlens-immutable-baseline-v1.2.0",
+  "v1": {
+    "artifact_count": 23,
+    "artifact_set_digest": "35ba9acbba0fc11fc3419c88ea57d0721e08486c6d37595812ce6c77ce994abf",
+    "expected_artifact_count": 23,
+    "expected_artifact_set_digest": "35ba9acbba0fc11fc3419c88ea57d0721e08486c6d37595812ce6c77ce994abf",
+    "historical_decision_preserved": true,
+    "include_rules": [
+      "docs/childlens_feasibility_v1",
+      "output/childlens_feasibility_v1",
+      "scripts/validate_childlens_feasibility_v1.py",
+      "tests/test_childlens_feasibility_v1.py"
+    ],
+    "matches_prior_baseline": true
+  },
+  "v1_1": {
+    "artifact_count": 40,
+    "artifact_set_digest": "3acd969804d71979ba8071e2446e8ee1ceb3194fc90dcfda802a99e296b7bf48",
+    "expected_artifact_count": 40,
+    "expected_artifact_set_digest": "3acd969804d71979ba8071e2446e8ee1ceb3194fc90dcfda802a99e296b7bf48",
+    "historical_decision_preserved": true,
+    "include_rules": [
+      "docs/childlens_feasibility_v1_1",
+      "output/childlens_feasibility_v1_1",
+      "scripts/*v1_1*",
+      "tests/*v1_1*"
+    ],
+    "matches_v1_2_baseline": true
+  },
+  "validation_status": "PASS"
+}

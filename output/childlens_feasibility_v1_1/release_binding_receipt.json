@@ -1,0 +1,47 @@
+{
+  "schema_version": "childlens-release-binding-receipt-v1.1.0",
+  "observation_date": "2026-07-21",
+  "extractor_version": "childlens-keeper-redacted-extractor-v1.1.7",
+  "immutable_public_snapshot": {
+    "doi": "10.17617/4.fe",
+    "keeper_library_id": "c8ed0104-b793-4c35-817e-302afd4e036b",
+    "snapshot_commit": "4856662653b2fa183e53268d088cffba02a33443",
+    "doi_observed": true,
+    "library_id_observed": true,
+    "snapshot_commit_observed": true,
+    "extractor_status": "ok"
+  },
+  "accessible_live_view": {
+    "keeper_library_id_observed": true,
+    "immutable_live_revision_observed": false,
+    "root_folder_count": 3,
+    "root_file_count": 5,
+    "participant_table_count": 1,
+    "annotation_representation_folder_count": 2,
+    "final_annotation_object_count": 192,
+    "final_annotation_known_bytes": 18295700,
+    "video_object_count": 192,
+    "video_display_parsed_byte_total": 201584000000,
+    "video_exact_byte_attribute_count": 0,
+    "video_display_parsed_byte_count": 192,
+    "participant_table_row_count": 192,
+    "participant_group_count": 58,
+    "participant_plus_recording_group_count": 141,
+    "participant_and_recording_grouping_complete_count": 192
+  },
+  "binding": {
+    "pilot_source": "ACCESSIBLE_LIVE_VIEW",
+    "public_snapshot_identity_bound": true,
+    "live_observation_bound_by_this_receipt": true,
+    "live_to_public_snapshot_byte_equivalence": "NOT_PROVEN",
+    "reason": "NO_COMPLETE_SIZE_AND_SHA256_MULTISET_COMPARISON",
+    "deterministic_restricted_manifest_digest_required": true
+  },
+  "privacy_controls": {
+    "raw_text_returned": false,
+    "directory_rows_returned": false,
+    "restricted_identifiers_returned": false,
+    "exact_media_timestamps_returned": false,
+    "cell_suppression_threshold": 5
+  }
+}

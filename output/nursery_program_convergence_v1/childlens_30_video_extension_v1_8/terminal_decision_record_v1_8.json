@@ -1,0 +1,53 @@
+{
+  "schema_version": "nursery-childlens-30-video-terminal-decision-v1.8.0",
+  "terminal_state": "PROTOTYPE_CAUSAL_STOP_VALID_NULL_OR_FAILED_GATE",
+  "calibration_decision": "CALIBRATION_STOP_MODEL_TRIANGULATION",
+  "causal_endpoint_opened": false,
+  "causal_outcome_run": false,
+  "valid_causal_null_observed": false,
+  "failed_frozen_gates": [
+    "ABSTENTION_LAG_EVENT_UNIT",
+    "ENVELOPE_NULL_OR_IRRELEVANT"
+  ],
+  "combined_item_count": 30,
+  "combined_participants_distinct": true,
+  "combined_speech_seconds": 1800,
+  "combined_candidate_window_count": 272,
+  "schema_validity": {
+    "qwen3asr_plus_qwen3vl_path": [
+      1.0,
+      1.0
+    ],
+    "qwen3asr_plus_gemma4_path": [
+      1.0,
+      1.0
+    ]
+  },
+  "lag_event_unit_abstention": {
+    "qwen3asr_plus_qwen3vl_path": [
+      0.0,
+      0.1
+    ],
+    "qwen3asr_plus_gemma4_path": [
+      0.8,
+      0.9
+    ],
+    "frozen_maximum": 0.5
+  },
+  "null_or_irrelevant_conservative_envelope_status": "SUPPRESSED_K5",
+  "further_sample_expansion_allowed": false,
+  "third_visual_model_allowed": false,
+  "qwen_only_or_empirical_free_fallback_used": false,
+  "model_model_agreement_is_ground_truth": false,
+  "human_validation_claimed": false,
+  "restricted_payload_exported": false,
+  "AEA_empirical_ancestry": false,
+  "BabyView_empirical_ancestry": false,
+  "recommended_program_action": "STOP_INVESTMENT_IN_CHILDLENS_PSEUDO_CALIBRATION_FOR_THIS_NUDGE",
+  "recommended_next_choice": "If the user still wants a near-term Michael-facing directional result, separately authorize a fresh synthetic-only simulator-oracle protocol with no ChildLens calibration claim; otherwise wait for a separate BabyView-only study.",
+  "show_to_michael_as_positive_mechanism_nudge": false,
+  "combined_calibration_receipt_sha256": "e5a5d9a1488e91b54926c6ab9428f6cee5e48cc34ad0f203abe38f29cdbf2379",
+  "frozen_protocol_sha256": "e8d7ca48ed888f990730861e8f5a97274743dfc0e08befcdf40a508356c2aa56",
+  "runner_sha256": "b882b6520b334483ddb025745a40d136d17a1303a170f081e00977428ff93b78",
+  "generated_at": "2026-07-23T05:15:57Z"
+}

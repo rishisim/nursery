@@ -1,0 +1,43 @@
+{
+  "schema_version": "nursery-prototype-no-automatic-fallback-override-v1",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_BEFORE_REVISED_GEMMA_CANARY_OR_SCIENTIFIC_ENDPOINT",
+  "supersedes": "Any prior instruction authorizing an automatic conservative-unbounded, full-simulator-domain, empirical-free, or Qwen3-only fallback after a failed Gemma gate.",
+  "active_primary_path": "CAF-revised exact cached Gemma 4 E4B plus read-only Qwen3 bounded two-model calibration, followed only on passed gates by the frozen one-shot simulator-oracle causal outcome.",
+  "automatic_fallbacks_forbidden": [
+    "QWEN3_ONLY_CALIBRATION",
+    "CONSERVATIVE_UNBOUNDED_OR_FULL_DOMAIN_SYNTHETIC_SENSITIVITY",
+    "EMPIRICAL_FREE_AUTOMATIC_OUTCOME",
+    "THIRD_VISUAL_MODEL",
+    "ALTERED_CLAIM_WORDING_TO_ENABLE_AN_OUTCOME"
+  ],
+  "failure_behavior": {
+    "trigger": "Gemma remains unusable after the CAF transport amendment and bounded content-independent technical fixes.",
+    "restricted_calibration_fallback_allowed": false,
+    "scientific_endpoint_allowed": false,
+    "required_terminal_behavior": "Stop and return a genuine user decision point without taking another scientific branch.",
+    "required_decision_packet": [
+      "exact_failed_gemma_gate_and_evidence",
+      "bounded_fixes_attempted",
+      "whether_restricted_gemma_inference_opened",
+      "whether_any_scientific_endpoint_opened",
+      "two_to_four_scientifically_distinct_options_with_cost_risk_and_expected_value",
+      "one_recommended_option_without_execution"
+    ]
+  },
+  "success_behavior": "If the revised Gemma path passes, continue autonomously through the unchanged bounded calibration, pre-outcome gates, exactly one authorized outcome, and the Michael-facing decision package.",
+  "scientific_invariants": {
+    "prompt_tuning_after_output": false,
+    "range_seed_threshold_learner_or_control_tuning": false,
+    "model_agreement_is_human_truth": false,
+    "simulator_oracle_is_only_evaluation_truth": true,
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false,
+    "restricted_payload_export": false
+  },
+  "state_at_freeze": {
+    "CAF_revised_canary_run": false,
+    "restricted_Gemma_inference_run": false,
+    "scientific_endpoint_opened": false
+  }
+}

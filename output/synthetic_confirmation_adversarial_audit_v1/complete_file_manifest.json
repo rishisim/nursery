@@ -1,0 +1,89 @@
+{
+  "digest": "3bfb79aa7d2f158ed9081a391650b8d024c8ecd784da6b0da84ad0a86a78289a",
+  "file_count": 16,
+  "files": [
+    {
+      "bytes": 2232,
+      "path": "CONFIRMATION_STOP.md",
+      "sha256": "ab9e6981ef939d5d899aff7cd09483be04b25d4cea45758cd30892abe926a814"
+    },
+    {
+      "bytes": 3121,
+      "path": "CONFIRMATION_STOP_FINAL.md",
+      "sha256": "948115890f679c8b45efb438bdb18735b58b42c1f4a1b9e0fd956b7d44eaa40b"
+    },
+    {
+      "bytes": 36419,
+      "path": "audit.py",
+      "sha256": "7136fd528fc62d3dadf25f9ecf4f7e97b4d973a78b8d11e4c98c8666afdf47cd"
+    },
+    {
+      "bytes": 9481,
+      "path": "development_integrity_audit.json",
+      "sha256": "dca20dfc9e34fbf200087e3956440062c169302c4231f1e10b5ee2b4113b7563"
+    },
+    {
+      "bytes": 9339,
+      "path": "finalize.py",
+      "sha256": "10566de4e8bbe1c1922ee74456795abe5ddd26c66f82040a99d151e6b3e9c238"
+    },
+    {
+      "bytes": 15725507,
+      "path": "preservation/after.sha256",
+      "sha256": "71e03308400540b755f04265fc047bb97516ff780707031e1617239af183670c"
+    },
+    {
+      "bytes": 576,
+      "path": "preservation/after.symlinks",
+      "sha256": "b37c566c99e5327700cd0473104f3a9a0dd0a81991bfd624720af7c25c4b5eb3"
+    },
+    {
+      "bytes": 15725507,
+      "path": "preservation/after_v2.sha256",
+      "sha256": "71e03308400540b755f04265fc047bb97516ff780707031e1617239af183670c"
+    },
+    {
+      "bytes": 576,
+      "path": "preservation/after_v2.symlinks",
+      "sha256": "b37c566c99e5327700cd0473104f3a9a0dd0a81991bfd624720af7c25c4b5eb3"
+    },
+    {
+      "bytes": 15725507,
+      "path": "preservation/baseline.sha256",
+      "sha256": "71e03308400540b755f04265fc047bb97516ff780707031e1617239af183670c"
+    },
+    {
+      "bytes": 10017844,
+      "path": "preservation/baseline.stat",
+      "sha256": "cac2fb22adfdf209d52d38e90d4de69c0af859b91ad542f60571a69954004253"
+    },
+    {
+      "bytes": 576,
+      "path": "preservation/baseline.symlinks",
+      "sha256": "b37c566c99e5327700cd0473104f3a9a0dd0a81991bfd624720af7c25c4b5eb3"
+    },
+    {
+      "bytes": 42486742,
+      "path": "preservation_proof.json",
+      "sha256": "588d03621df1d01be7c073737cfa74df40db3caf7edd6693d8270bf0b2d22cff"
+    },
+    {
+      "bytes": 1010,
+      "path": "preservation_proof_v2.json",
+      "sha256": "b17a0312fb39a94bf1518d547ddcd57b24dd431ef869ec54c932398ab670b82f"
+    },
+    {
+      "bytes": 7159,
+      "path": "registry_audit.json",
+      "sha256": "692067b1abc4207cd62a558dd70b54dae86b8c4db46bb2e65b4d5ee17b312f0c"
+    },
+    {
+      "bytes": 18752,
+      "path": "scientific_diagnostics.json",
+      "sha256": "9e1813bf22b71252b8a9d00360bf08b2c73dd5483366b8bd456008f7439086c4"
+    }
+  ],
+  "protocol_id": "synthetic-confirmation-adversarial-audit-v1",
+  "self_excluded_by_definition": true,
+  "terminal": "CONFIRMATION_STOP"
+}

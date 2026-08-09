@@ -1,0 +1,212 @@
+protocol:
+  id: synthetic-development-launch-v1
+  schema_version: nursery-synthetic-development-v1
+  status: frozen
+  phase: development_package_sealing_only
+  scientific_claim: narrow_raw_sensor_assisted_weak_lexical_action_grounding
+  infant_learning_claim_authorized: false
+  ecological_validity_claim_authorized: false
+  development_execution_authorized: false
+  confirmation_authorized: false
+  prior_outcomes_authorized: false
+
+registries:
+  fixture_rehearsal:
+    corpus: [290001, 290003]
+    model: [290101, 290103, 290107]
+    inference: [290401]
+  excluded_rehearsal:
+    corpus: [290201, 290203, 290205, 290207]
+    model: [290301, 290303, 290307]
+    inference: [290403]
+  development:
+    corpus:
+      [281001, 281003, 281005, 281007, 281009, 281011, 281013, 281015,
+       281017, 281019, 281021, 281023, 281025, 281027, 281029, 281031,
+       281033, 281035, 281037, 281039, 281041, 281043, 281045, 281047,
+       281049, 281051, 281053, 281055, 281057, 281059, 281061, 281063,
+       281065, 281067, 281069, 281071, 281073, 281075, 281077, 281079]
+    model: [281101, 281103, 281107]
+    inference: [281201]
+  confirmation_reserve:
+    corpus:
+      [289001, 289003, 289005, 289007, 289009, 289011, 289013, 289015,
+       289017, 289019, 289021, 289023, 289025, 289027, 289029, 289031,
+       289033, 289035, 289037, 289039, 289041, 289043, 289045, 289047,
+       289049, 289051, 289053, 289055, 289057, 289059, 289061, 289063,
+       289065, 289067, 289069, 289071, 289073, 289075, 289077, 289079]
+    model: [289101, 289103, 289107]
+    inference: [289201]
+  prior_registry_files:
+    - configs/synthetic_weak_alignment_recovery_v1.yaml
+    - configs/synthetic_sensor_event_robustness_v2.yaml
+    - configs/synthetic_component_robustness_v3.yaml
+    - configs/synthetic_protocol_fidelity_v4.yaml
+    - configs/synthetic_identifiability_qualification_v5.yaml
+    - configs/synthetic_identifiability_qualification_v6.yaml
+    - configs/synthetic_identifiability_qualification_v7.yaml
+  qualification_registry_file: configs/synthetic_identifiability_qualification_v8.yaml
+
+design:
+  action_concepts: 6
+  noun_concepts: 6
+  raw_samples: 72
+  interval_width: 7
+  conditions:
+    - synchronized
+    - randomized_shuffle
+    - shift_minus_8
+    - shift_plus_8
+    - uninformative
+    - absent_channel
+    - sensor_corrupted
+  detector_strata: [informative, weak, zero_information, corrupted]
+  candidate_counts: [2, 3, 4, 5]
+  action_distractor_cycles: 5
+  noun_target_owner_pair_repetitions_per_sensor_stratum: 1
+  factor_assignment_search_trials: 512
+  target_presence_levels: [present, absent]
+  action_visibility_levels: [0.55, 0.75, 1.0]
+  lags: [-8, -4, 0, 4, 8]
+  dropout_levels: [0.0, 0.25]
+  noise_levels: [0.035, 0.14]
+  false_positive_levels: [0, 1]
+  time_shifts: [-8, 8]
+  null_option: learnable
+  null_parameterization: independently_learned_presence_mass
+  candidate_count_normalized_alignment: true
+  noun_exact_independence_strata: [noun_identity, candidate_count, grounding, sensor_stratum]
+  action_exact_balance_strata: [action_identity, candidate_count, grounding, sensor_stratum]
+  evaluation_candidate_order_policy: fractional_credit_across_exact_maxima
+  held_out_endpoints:
+    instance: cue_free_evaluation_prompt_instances_not_used_for_fit
+    composition: primitive_manner_compositional_action_prompts
+    component: separate_primitive_and_manner_prompts
+    noun: cue_free_noun_prompts_with_zero_sensor_weight
+
+detector:
+  frozen_v2_path: output/synthetic_sensor_event_robustness_v2/detector/frozen_detector.json
+  frozen_v2_sha256: a487035deba4692728240eb593ba16e1182d9b5959b43d950b60883d1ed08b33
+  required_class: babyworld_lite.sensor_alignment_v2.detector.SensorEventDetector
+  required_function: babyworld_lite.sensor_alignment_v2.detector.candidate_evidence
+  strata_capacity_bounds:
+    informative: {minimum: 0.55, maximum: 1.0}
+    weak: {minimum: 0.20, maximum: 0.95}
+    zero_information: {minimum: 0.0, maximum: 0.70}
+    corrupted: {minimum: 0.0, maximum: 0.70}
+  overall_minimum: 0.25
+  overall_maximum: 0.92
+
+learner:
+  name: factorized_presence_semantic_cross_situational_v8
+  iterations: 10
+  competition_weight: 0.55
+  temperature: 0.55
+  sensor_weight: 0.10
+  sensor_null_calibration_weight: 0.0
+  sensor_calibration_temperature: 1.0
+  sensor_joint_update_weight: 0.0
+  sensor_semantic_sharpening_weight: 0.50
+  noun_sensor_weight: 0.0
+  update_rate: 0.65
+  smoothing: 0.04
+  presence_smoothing: 0.50
+  initial_presence_probability: 0.75
+  initialization_jitter: 0.015
+  lag_scale: 10.0
+  token_joint_rule: geometric_mean_log_likelihood
+  semantic_competition_excludes_presence_parameter: true
+  candidate_count_normalization: false
+  visible_cooccurrence_initialization: true
+  cooccurrence_initialization_passes: 3
+  null_margin_alpha: 0.80
+  no_absence_null_mass: 1.0e-6
+
+qualification_gates:
+  minimum_present_fractional_margin_over_exact_chance: 0.15
+  minimum_null_fractional_margin_over_exact_chance: 0.15
+  minimum_present_probability_margin_over_exact_chance: 0.03
+  minimum_null_probability_margin_over_exact_chance: 0.05
+  minimum_log_loss_improvement_over_exact_chance: 0.05
+  minimum_brier_improvement_over_exact_chance: 0.003
+  maximum_tie_frequency: 0.25
+  minimum_present_sensor_probability_delta: 0.005
+  maximum_null_sensor_probability_harm: 0.02
+  maximum_corrupted_sensor_probability_gain: 0.03
+  minimum_null_ablation_fractional_drop: 0.20
+  minimum_null_corruption_fractional_drop: 0.20
+  minimum_oracle_fractional: 0.80
+  minimum_direct_capacity_fractional: 0.95
+  maximum_noun_sensor_application_count: 0
+  maximum_noun_target_owner_gap: 0.0
+  maximum_noun_target_owner_cramers_v: 0.0
+  maximum_factor_pair_cramers_v: 0.20
+  maximum_factor_control_cramers_v: 0.20
+  maximum_constructed_factor_control_cramers_v: 0.16
+  order_metric_tolerance: 1.0e-12
+  exact_tie_tolerance: 1.0e-12
+
+analysis:
+  independent_unit: corpus_seed
+  model_replicate_handling: average_within_corpus_before_inference
+  development_corpus_count: 40
+  stochastic_model_replicates: 3
+  inference_method: deterministic_paired_corpus_bootstrap_plus_exact_sign_test
+  bootstrap_replicates: 20000
+  confidence_level_one_sided: 0.95
+  minimum_nonzero_corpora_for_non_degenerate_inference: 8
+  minimum_positive_corpus_fraction: 0.60
+  primary_endpoint:
+    family: action
+    presence: present
+    metric: mean_correct_probability
+    cue_free: true
+  co_primary_contrasts:
+    - synchronized_minus_absent_channel
+    - synchronized_minus_randomized_shuffle
+  intersection_union_rule: every_co_primary_contrast_must_pass
+  minimum_primary_probability_delta: 0.005
+  lower_confidence_bound_must_exceed: 0.005
+  maximum_one_sided_sign_test_p: 0.05
+  null_noninferiority_margin: -0.02
+  null_comparators: [absent_channel, randomized_shuffle]
+  corrupted_gain_maximum: 0.03
+  degenerate_behavior:
+    all_zero: FAIL_DEGENERATE_ZERO
+    all_identical_positive_above_threshold: PASS_POINT_MASS_WITH_EXACT_SIGN_TEST
+    all_identical_nonpositive_or_below_threshold: FAIL_POINT_MASS
+    too_few_nonzero: FAIL_INSUFFICIENT_NONZERO_CORPORA
+  secondary_controls:
+    - shift_minus_8
+    - shift_plus_8
+    - uninformative
+    - sensor_corrupted
+    - noun
+    - zero_information
+    - primitive
+    - manner
+
+firewalls:
+  side_modality_evaluation_fields_forbidden:
+    - raw_stream
+    - event_owners
+    - target_event_index
+    - answer_index
+  confirmation_command_exists: false
+  development_output_must_not_exist_before_run: true
+  one_shot_marker_required: true
+
+environment:
+  python: .venv/bin/python
+  version_test_root: tests/test_synthetic_development_launch_v1.py
+  repository_test_root: tests
+  bytecode_writes_disabled: true
+
+commands:
+  development_one_shot: >-
+    PYTHONDONTWRITEBYTECODE=1 .venv/bin/python
+    output/synthetic_development_launch_package_v1/frozen_source_snapshot/scripts/run_synthetic_development_launch_v1.py
+    run-development
+    --snapshot-root output/synthetic_development_launch_package_v1/frozen_source_snapshot
+    --authorization output/synthetic_development_launch_package_v1/DEVELOPMENT_LAUNCH_READY.json
+    --output-root output/synthetic_development_v1_one_shot

@@ -1,0 +1,125 @@
+{
+  "schema_version": "nursery-causal-outcome-reporting-shell-v1",
+  "frozen_at": "2026-07-22",
+  "status": "SHELL_FROZEN_NO_OUTCOME",
+  "scope": "ADDITIVE_REPORTING_ONLY_DOES_NOT_AUTHORIZE_OR_RUN_AN_OUTCOME",
+  "no_automatic_fallback_override": {
+    "path": "docs/nursery_program_convergence_v1/frozen_no_automatic_fallback_override_v1.json",
+    "sha256": "cb9e7061a5725050e6a71a7b6e41f6f5e7bf30d104bc46bae233816ca99a90b7",
+    "rule": "If the revised Gemma path fails, do not generate a causal-result figure or choose another scientific branch. Return USER_DECISION_REQUIRED_NO_OUTCOME with the frozen decision packet only."
+  },
+  "input_interface": {
+    "schema_version": "nursery-causal-reporting-aggregate-projection-v1",
+    "single_local_json_input_only": true,
+    "aggregate_only": true,
+    "additional_properties_allowed": false,
+    "allowed_binding_fields": [
+      "no_automatic_fallback_override_sha256",
+      "protocol_sha256",
+      "execution_contract_sha256",
+      "public_calibration_receipt_sha256",
+      "preoutcome_receipt_sha256",
+      "one_shot_authorization_sha256",
+      "aggregate_results_sha256",
+      "execution_receipt_sha256"
+    ],
+    "allowed_validity_fields": [
+      "gemma_path_passed",
+      "automatic_fallback_used",
+      "scientific_outcome_run",
+      "fixture_only",
+      "preoutcome_all_passed",
+      "one_shot_complete",
+      "complete_paired_bundles",
+      "cue_free_evaluation",
+      "simulator_oracle_only",
+      "privacy_passed",
+      "ancestry_passed",
+      "restricted_payload_absent",
+      "item_level_rows_absent"
+    ],
+    "range_families": [
+      "qwen3asr_plus_qwen3vl_path",
+      "qwen3asr_plus_gemma4_path",
+      "model_intersection",
+      "model_union",
+      "conservative_envelope"
+    ],
+    "comparators": [
+      "weak_vl_absent_side",
+      "weak_vl_group_shuffled_side",
+      "weak_vl_balanced_time_shifted_side",
+      "weak_vl_corrupted_uninformative_side"
+    ],
+    "endpoints": [
+      "cue_free_heldout_noun_object_macro_top1",
+      "cue_free_heldout_verb_action_macro_top1"
+    ],
+    "cell_fields": [
+      "synthetic_corpus_count",
+      "mean_effect",
+      "one_sided_95_lower",
+      "positive_corpus_fraction",
+      "exact_one_sided_sign_p",
+      "large_negative_fraction",
+      "passed"
+    ],
+    "synthetic_corpus_count": 40,
+    "free_form_text_allowed": false,
+    "empirical_values_allowed": false,
+    "childlens_binding": "Public aggregate calibration receipt SHA-256 only; do not reproduce its counts, denominators, item totals, range values, or payloads."
+  },
+  "frozen_thresholds": {
+    "minimum_mean_effect": 0.03,
+    "lower_bound_must_exceed": 0.0,
+    "minimum_positive_corpus_fraction": 0.6,
+    "maximum_large_negative_fraction": 0.2,
+    "large_negative_threshold": -0.05,
+    "one_sided_t_critical_95_df39": 1.684875
+  },
+  "decision_rules": {
+    "USER_DECISION_REQUIRED_NO_OUTCOME": {
+      "when": "Gemma path, calibration, privacy, activation, or pre-outcome gate fails before scientific endpoints are validly opened.",
+      "required_action": "Stop. Present the exact failed Gemma gate, bounded fixes attempted, whether restricted inference or scientific endpoints opened, and two to four scientifically distinct options with cost, risk, expected value, and one recommendation. Execute none.",
+      "automatic_fallback_allowed": false
+    },
+    "POSITIVE_PROTOTYPE_EFFECT": {
+      "when": "Every validity and falsification gate passes and every one of the five range-family by four-comparator by two-endpoint cells passes all four frozen directional thresholds.",
+      "claim_limit": "A positive simulator-family prototype result over the tested aggregate-calibrated envelope; not naturalistic acquisition evidence."
+    },
+    "VALID_NULL_OR_NONPROMOTION": {
+      "when": "The authorized one-shot outcome, privacy, pairing, ancestry, cue-free evaluation, simulator-oracle truth, and falsifications are valid, but one or more directional cells fails a frozen threshold.",
+      "interpretation": "Do not promote the mechanism. This is a valid non-positive result under the tested learner, simulator, controls, and envelope; it is not proof of zero effect or general impossibility."
+    },
+    "INVALID_OUTCOME_NOT_REPORTABLE": {
+      "when": "The aggregate is incomplete, malformed, inconsistent, fixture-only, privacy-unsafe, ancestry-invalid, or fails a scientific-validity/falsification requirement.",
+      "action": "Fail closed without a scientific interpretation or result figure."
+    }
+  },
+  "privacy_sentinels": {
+    "closed_schema_every_object": true,
+    "no_recursive_discovery_glob_or_quarantine_access": true,
+    "reject_symlink_or_nonregular_input": true,
+    "reject_nonfinite_numbers": true,
+    "reject_arbitrary_strings_urls_paths_media_or_timecodes": true,
+    "reject_item_seed_model_draw_or_window_rows": true,
+    "reject_transcripts_lexical_content_identifiers_filenames_timestamps_frames_audio_video": true,
+    "reject_predictions_confidence_logits_embeddings_features_or_raw_payloads": true,
+    "reject_restricted_or_quarantine_manifest_digests": true,
+    "write_only_after_complete_validation": true,
+    "refuse_overwrite": true,
+    "fixed_error_codes_do_not_echo_values": true
+  },
+  "report_artifacts": {
+    "memo_template": "docs/nursery_program_convergence_v1/michael_facing_causal_outcome_memo_template_v1.md",
+    "caveat_box": "docs/nursery_program_convergence_v1/mandatory_causal_outcome_caveat_box_v1.md",
+    "central_figure_specification": "docs/nursery_program_convergence_v1/central_causal_figure_spec_v1.json",
+    "generator": "scripts/generate_nursery_causal_central_figure_v1.py"
+  },
+  "current_state": {
+    "scientific_outcome_run": false,
+    "result_values_present": false,
+    "decision_instantiated": false,
+    "prior_artifacts_overwritten": false
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "schema_version": "childlens-gemma4-public-synthetic-runtime-bakeoff-v1.3.1",
+  "status": "COMPLETE_PUBLIC_SYNTHETIC_ONLY",
+  "scope": "SELF_GENERATED_GERMAN_TTS_AND_SYNTHETIC_FRAMES_ONLY",
+  "childlens_or_quarantine_accessed": false,
+  "hosted_or_cloud_inference_used": false,
+  "network_denied_during_inference": true,
+  "network_denial_sentinel_passed_for_each_model": true,
+  "model_download_authentication_used": false,
+  "license_clickthrough_accepted": false,
+  "runtime": {
+    "mlx_vlm": "0.6.6",
+    "mlx": "0.32.0",
+    "transformers": "5.14.1"
+  },
+  "fixture": {
+    "self_generated_german_speech": true,
+    "synthetic_frame_count": 5,
+    "known_visible_object": "red_ball",
+    "known_spoken_object_visible_relation": true,
+    "known_voice_type": "synthetic_adult",
+    "raw_model_outputs_exported": false
+  },
+  "models": {
+    "gemma4_e4b_it_4bit_mlx": {
+      "conversion_revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+      "upstream_revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+      "artifact_manifest_sha256": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae",
+      "artifact_bytes": 5179241512,
+      "joint_audio_and_five_frames_executed": true,
+      "strict_schema_output_valid": true,
+      "language_correct": true,
+      "transcript_wer": 0.0,
+      "transcript_cer": 0.0,
+      "visual_object_correct": true,
+      "joint_relation_correct": true,
+      "synthetic_adult_role_correct": true,
+      "peak_mlx_unified_memory_gib": 6.247,
+      "wall_time_seconds": 17.135,
+      "audio_preprocessor_numerical_warnings_observed": true
+    },
+    "gemma4_12b_unified_it_4bit_mlx": {
+      "conversion_revision": "73bcf09092aa277861d5a191b989b666f7f32e8f",
+      "upstream_revision": "707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7",
+      "artifact_manifest_sha256": "4bb19924881dcab682d588299faf1141ea393b28f617657d43eab388b9189c48",
+      "artifact_bytes": 6773372848,
+      "joint_audio_and_five_frames_executed": true,
+      "strict_schema_output_valid": true,
+      "language_correct": true,
+      "transcript_wer": 1.0,
+      "transcript_cer": 0.7576,
+      "visual_object_correct": true,
+      "joint_relation_correct": true,
+      "synthetic_adult_role_correct": true,
+      "peak_mlx_unified_memory_gib": 8.017,
+      "wall_time_seconds": 16.204,
+      "audio_preprocessor_numerical_warnings_observed": false
+    }
+  },
+  "initial_runtime_failure": {
+    "mlx_vlm_version": "0.5.0",
+    "model": "gemma4_e4b_it_4bit_mlx",
+    "failure_class": "KV_SHARED_WEIGHT_LOADING_INCOMPATIBILITY",
+    "resolved_by_pinned_release": "mlx-vlm-0.6.6"
+  },
+  "interpretation": {
+    "single_fixture_accuracy_generalizes_to_childlens": false,
+    "model_model_agreement_is_human_evidence": false,
+    "translation_is_human_source_language_evidence": false,
+    "restricted_childlens_rerun_authorized": false,
+    "recommended_joint_instrument_for_any_future_public_or_authorized_canary": "GEMMA4_E4B_IT_4BIT_MLX",
+    "recommendation_basis": "LOWER_PEAK_MEMORY_AND_CORRECT_TRANSCRIPT_ON_THE_ONLY_PUBLIC_SYNTHETIC_FIXTURE",
+    "conversion_license_metadata_fully_reconciled": false
+  }
+}

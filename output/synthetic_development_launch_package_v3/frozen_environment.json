@@ -1,0 +1,17 @@
+{
+  "bytecode_writes_disabled": true,
+  "configured_python_executable": "/Users/rishisim/Documents/research/nursery/.venv/bin/python",
+  "official_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 /Users/rishisim/Documents/research/nursery/.venv/bin/python -m pytest -q -p no:cacheprovider tests/test_synthetic_development_launch_v3.py",
+    "PYTHONDONTWRITEBYTECODE=1 /Users/rishisim/Documents/research/nursery/.venv/bin/python -m pytest -q -p no:cacheprovider tests"
+  ],
+  "python_executable": "/Users/rishisim/Documents/research/nursery/.venv/bin/python",
+  "python_resolved_executable": "/Users/rishisim/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/bin/python3.12",
+  "python_sha256": "f8cf5db64fd3715840686fcdb0f00b8b7e6c9b1e9b5f10a31183160c9bb6a6fc",
+  "python_version": "3.12.13 (main, Mar 10 2026, 18:18:07) [Clang 21.1.4 ]",
+  "resolution_strategy": "configured_repository_virtual_environment",
+  "test_roots": [
+    "tests/test_synthetic_development_launch_v3.py",
+    "tests"
+  ]
+}

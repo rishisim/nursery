@@ -1,0 +1,584 @@
+{
+  "activation_receipt_sha256": "10cb7d0151e2fff40a3f5bf006ea510a3f82a4223410dec51ebfb08a34f14d7f",
+  "aggregate_only": true,
+  "all_frozen_calibration_gates_passed": false,
+  "amendment_sha256": "93874c69153daaf41d902216351666c59b12aeb656b9739ecd07d1e6e4fe42b1",
+  "ancestry": {
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false,
+    "cross_corpus_pooling": false,
+    "learner_ancestry_from_instruments": false,
+    "sole_empirical_anchor": "ChildLens frozen pilot"
+  },
+  "automatic_fallback_allowed": false,
+  "caf_transport_amendment_sha256": "3ecf4bf6c62920d73177d029c18918f38366d34f7d7997642037696def37bbd0",
+  "calibration_ranges": {
+    "ambiguous_or_undecidable": {
+      "conservative_envelope": {
+        "interval": [
+          0.0,
+          0.7
+        ],
+        "status": "PUBLISHED"
+      },
+      "model_intersection": {
+        "interval": [
+          0.0,
+          0.2
+        ],
+        "status": "PUBLISHED"
+      },
+      "model_union": {
+        "interval": [
+          0.3,
+          0.7
+        ],
+        "status": "PUBLISHED"
+      },
+      "qwen3asr_plus_gemma4_path": {
+        "interval": [
+          0.2,
+          0.6
+        ],
+        "status": "PUBLISHED"
+      },
+      "qwen3asr_plus_qwen3vl_path": {
+        "interval": [
+          0.1,
+          0.4
+        ],
+        "status": "PUBLISHED"
+      }
+    },
+    "candidate_multiplicity": {
+      "one": {
+        "conservative_envelope": {
+          "interval": [
+            0.5,
+            0.8
+          ],
+          "status": "PUBLISHED"
+        },
+        "model_intersection": {
+          "interval": [
+            0.5,
+            0.8
+          ],
+          "status": "PUBLISHED"
+        },
+        "model_union": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_gemma4_path": {
+          "interval": [
+            0.5,
+            0.8
+          ],
+          "status": "PUBLISHED"
+        },
+        "qwen3asr_plus_qwen3vl_path": {
+          "status": "SUPPRESSED_K5"
+        }
+      },
+      "three_or_more": {
+        "conservative_envelope": {
+          "interval": [
+            0.0,
+            0.3
+          ],
+          "status": "PUBLISHED"
+        },
+        "model_intersection": {
+          "status": "SUPPRESSED_K5"
+        },
+        "model_union": {
+          "interval": [
+            0.0,
+            0.3
+          ],
+          "status": "PUBLISHED"
+        },
+        "qwen3asr_plus_gemma4_path": {
+          "interval": [
+            0.0,
+            0.3
+          ],
+          "status": "PUBLISHED"
+        },
+        "qwen3asr_plus_qwen3vl_path": {
+          "status": "SUPPRESSED_K5"
+        }
+      },
+      "two": {
+        "conservative_envelope": {
+          "status": "SUPPRESSED_K5"
+        },
+        "model_intersection": {
+          "status": "SUPPRESSED_K5"
+        },
+        "model_union": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_gemma4_path": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_qwen3vl_path": {
+          "status": "SUPPRESSED_K5"
+        }
+      },
+      "zero": {
+        "conservative_envelope": {
+          "interval": [
+            0.1,
+            0.4
+          ],
+          "status": "PUBLISHED"
+        },
+        "model_intersection": {
+          "status": "SUPPRESSED_K5"
+        },
+        "model_union": {
+          "interval": [
+            0.1,
+            0.3
+          ],
+          "status": "PUBLISHED"
+        },
+        "qwen3asr_plus_gemma4_path": {
+          "interval": [
+            0.1,
+            0.4
+          ],
+          "status": "PUBLISHED"
+        },
+        "qwen3asr_plus_qwen3vl_path": {
+          "status": "SUPPRESSED_K5"
+        }
+      }
+    },
+    "lag_event_unit": {
+      "lag_one": {
+        "conservative_envelope": {
+          "interval": [
+            0.1,
+            0.5
+          ],
+          "status": "PUBLISHED"
+        },
+        "model_intersection": {
+          "status": "SUPPRESSED_K5"
+        },
+        "model_union": {
+          "interval": [
+            0.1,
+            0.5
+          ],
+          "status": "PUBLISHED"
+        },
+        "qwen3asr_plus_gemma4_path": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_qwen3vl_path": {
+          "interval": [
+            0.1,
+            0.4
+          ],
+          "status": "PUBLISHED"
+        }
+      },
+      "lag_two_plus": {
+        "conservative_envelope": {
+          "status": "SUPPRESSED_K5"
+        },
+        "model_intersection": {
+          "status": "SUPPRESSED_K5"
+        },
+        "model_union": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_gemma4_path": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_qwen3vl_path": {
+          "status": "SUPPRESSED_K5"
+        }
+      },
+      "lead_one": {
+        "conservative_envelope": {
+          "status": "SUPPRESSED_K5"
+        },
+        "model_intersection": {
+          "status": "SUPPRESSED_K5"
+        },
+        "model_union": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_gemma4_path": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_qwen3vl_path": {
+          "status": "SUPPRESSED_K5"
+        }
+      },
+      "lead_two_plus": {
+        "conservative_envelope": {
+          "status": "SUPPRESSED_K5"
+        },
+        "model_intersection": {
+          "status": "SUPPRESSED_K5"
+        },
+        "model_union": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_gemma4_path": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_qwen3vl_path": {
+          "status": "SUPPRESSED_K5"
+        }
+      },
+      "overlap": {
+        "conservative_envelope": {
+          "interval": [
+            0.4,
+            0.9
+          ],
+          "status": "PUBLISHED"
+        },
+        "model_intersection": {
+          "interval": [
+            0.4,
+            0.9
+          ],
+          "status": "PUBLISHED"
+        },
+        "model_union": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_gemma4_path": {
+          "status": "SUPPRESSED_K5"
+        },
+        "qwen3asr_plus_qwen3vl_path": {
+          "interval": [
+            0.5,
+            0.9
+          ],
+          "status": "PUBLISHED"
+        }
+      }
+    },
+    "noun_object_support": {
+      "conservative_envelope": {
+        "interval": [
+          0.3,
+          1.0
+        ],
+        "status": "PUBLISHED"
+      },
+      "model_intersection": {
+        "interval": [
+          0.3,
+          0.6
+        ],
+        "status": "PUBLISHED"
+      },
+      "model_union": {
+        "interval": [
+          0.6,
+          1.0
+        ],
+        "status": "PUBLISHED"
+      },
+      "qwen3asr_plus_gemma4_path": {
+        "interval": [
+          0.5,
+          0.8
+        ],
+        "status": "PUBLISHED"
+      },
+      "qwen3asr_plus_qwen3vl_path": {
+        "interval": [
+          0.4,
+          0.8
+        ],
+        "status": "PUBLISHED"
+      }
+    },
+    "null_or_irrelevant": {
+      "conservative_envelope": {
+        "status": "SUPPRESSED_K5"
+      },
+      "model_intersection": {
+        "status": "SUPPRESSED_K5"
+      },
+      "model_union": {
+        "status": "SUPPRESSED_K5"
+      },
+      "qwen3asr_plus_gemma4_path": {
+        "status": "SUPPRESSED_K5"
+      },
+      "qwen3asr_plus_qwen3vl_path": {
+        "status": "SUPPRESSED_K5"
+      }
+    },
+    "partial_or_clear_visibility": {
+      "conservative_envelope": {
+        "interval": [
+          0.7,
+          1.0
+        ],
+        "status": "PUBLISHED"
+      },
+      "model_intersection": {
+        "interval": [
+          0.7,
+          1.0
+        ],
+        "status": "PUBLISHED"
+      },
+      "model_union": {
+        "status": "SUPPRESSED_K5"
+      },
+      "qwen3asr_plus_gemma4_path": {
+        "interval": [
+          0.7,
+          1.0
+        ],
+        "status": "PUBLISHED"
+      },
+      "qwen3asr_plus_qwen3vl_path": {
+        "status": "SUPPRESSED_K5"
+      }
+    },
+    "verb_action_support": {
+      "conservative_envelope": {
+        "interval": [
+          0.1,
+          0.9
+        ],
+        "status": "PUBLISHED"
+      },
+      "model_intersection": {
+        "interval": [
+          0.1,
+          0.5
+        ],
+        "status": "PUBLISHED"
+      },
+      "model_union": {
+        "interval": [
+          0.6,
+          0.9
+        ],
+        "status": "PUBLISHED"
+      },
+      "qwen3asr_plus_gemma4_path": {
+        "interval": [
+          0.5,
+          0.8
+        ],
+        "status": "PUBLISHED"
+      },
+      "qwen3asr_plus_qwen3vl_path": {
+        "interval": [
+          0.2,
+          0.7
+        ],
+        "status": "PUBLISHED"
+      }
+    },
+    "visible_candidate": {
+      "conservative_envelope": {
+        "interval": [
+          0.6,
+          1.0
+        ],
+        "status": "PUBLISHED"
+      },
+      "model_intersection": {
+        "interval": [
+          0.6,
+          1.0
+        ],
+        "status": "PUBLISHED"
+      },
+      "model_union": {
+        "status": "SUPPRESSED_K5"
+      },
+      "qwen3asr_plus_gemma4_path": {
+        "status": "SUPPRESSED_K5"
+      },
+      "qwen3asr_plus_qwen3vl_path": {
+        "interval": [
+          0.6,
+          0.9
+        ],
+        "status": "PUBLISHED"
+      }
+    }
+  },
+  "canary_contract_sha256": "9b894fcfd47df93824d25a467961d2c9f3398666dbe824367f2d8e1afe0635e9",
+  "candidate_window_count": 137,
+  "checkpoint_resume_preserved": true,
+  "correction_scope": "NONE",
+  "corrections_used": 0,
+  "decision": "CALIBRATION_REVISE_INTERNAL_PROTOTYPE",
+  "gate_failures": [
+    "ENVELOPE_NULL_OR_IRRELEVANT"
+  ],
+  "human_evidence_available": false,
+  "human_validation_claimed": false,
+  "instrument_paths": [
+    "qwen3asr_plus_qwen3vl_path",
+    "qwen3asr_plus_gemma4_path"
+  ],
+  "model_model_agreement_is_human_reliability": false,
+  "no_automatic_fallback_override_sha256": "cb9e7061a5725050e6a71a7b6e41f6f5e7bf30d104bc46bae233816ca99a90b7",
+  "preflight_delegation_recursion_amendment_sha256": "16049ce3bcbeb9f3ae91c28695c7dafb10c9a013ff64b301d977b96f9943429a",
+  "primary_item_count": 15,
+  "primary_total_seconds": 900,
+  "pseudo_labels_are_ground_truth": false,
+  "public_export": {
+    "complementary_suppression": true,
+    "confidence_or_raw_model_payload": false,
+    "confidence_or_raw_payload": false,
+    "exact_timestamps": false,
+    "exact_timestamps_or_intervals": false,
+    "filenames": false,
+    "frames_or_audio": false,
+    "free_form_errors": false,
+    "identifiers": false,
+    "identifiers_or_paths": false,
+    "item_level_predictions": false,
+    "item_level_results": false,
+    "lag_rounding_step_event_units": 0.5,
+    "minimum_cluster_k": 5,
+    "outward_rounding": {
+      "lag_step_event_units": 0.5,
+      "rate_step": 0.1
+    },
+    "paths": false,
+    "rate_rounding_step": 0.1,
+    "raw_counts": false,
+    "transcript_or_lexical_content": false
+  },
+  "qwen3_reused_read_only": true,
+  "referential_instrument_ids": [
+    "qwen3_vl_8b_instruct_4bit",
+    "gemma4_e4b_it_4bit_joint_audio_five_frame"
+  ],
+  "restricted_worker_environment_amendment_sha256": "316fd2f1f9e4c1b69936703f86eb6b72e0fff574e9115d2a5bb138e5fa7da577",
+  "runtime_pin_erratum_sha256": "b84da17121dd3235b1b6799d91c077d542e30e384f5cff5e131ec6c9755cecc1",
+  "sample_reselected": false,
+  "schema_version": "nursery-prototype-opaque-gemma-calibration-receipt-v1",
+  "scientific_endpoint_if_gemma_fails": false,
+  "scientific_endpoint_opened": false,
+  "scientific_outcome_authorized": false,
+  "scientific_outcome_run": false,
+  "scope": "FROZEN_PREDICTION_INDEPENDENT_15_SPEECH_MINUTE_SAMPLE",
+  "security": {
+    "external_api_used": false,
+    "hosted_or_cloud_content_path": false,
+    "memory_heavy_inference_serialized": true,
+    "quarantine_only_pseudo_payloads": true,
+    "restricted_inference_network_disabled": true
+  },
+  "semantic_tuning_performed": false,
+  "simulator_oracle_only_evaluation_truth": true,
+  "speech_model_model_diagnostics": {
+    "boundary_f1_interval": [
+      0.1,
+      0.2
+    ],
+    "boundary_precision_interval": [
+      0.1,
+      0.2
+    ],
+    "boundary_recall_interval": [
+      0.2,
+      0.3
+    ],
+    "challenger_nonempty_item_coverage_interval": [
+      1.0,
+      1.0
+    ],
+    "language_id_agreement_interval": [
+      0.9,
+      1.0
+    ],
+    "reference_path_declared": false,
+    "status": "MODEL_MODEL_DIAGNOSTIC_NOT_HUMAN_VALIDATED",
+    "symmetric_cer_interval": [
+      3.9,
+      4.0
+    ],
+    "symmetric_wer_interval": [
+      3.3,
+      3.4
+    ],
+    "translation_used_as_truth": false
+  },
+  "status": "CALIBRATION_REVISE",
+  "subprocess_environment_contract_sha256": "bf67ff8d311d901d39d8f996339e33f62c72b2f87a0c4ff9d997dce069cdf822",
+  "subprocess_environment_correction_amendment_sha256": "ac05205256bc1e949c0a70a9dc865cebc2ea50beb73770319e816cec0910ceb1",
+  "success_receipt_path_compatibility_erratum_sha256": "c85eb4034fbf7c02e4ddba8b48cb36c877ce27a968f22a619a3b4175ef6dd693",
+  "template_order_correction_digest": "c9601f529ef3008ad2374e810b9b0b741c285373ca5ae2f346ffc960707c2132",
+  "template_placeholder_order_amendment_sha256": "2d117cf0f1619d43d6e71a90aa853241f0a5a7c331e84fc04af8231c5d6081fb",
+  "third_visual_model_used": false,
+  "unchanged_contract": true,
+  "visual_model_model_diagnostics": {
+    "agreement": {
+      "candidate_count_bin": {
+        "interval": [
+          0.6,
+          0.7
+        ],
+        "status": "MODEL_MODEL_DIAGNOSTIC_ONLY"
+      },
+      "lag_event_unit_bin": {
+        "interval": [
+          0.6,
+          0.7
+        ],
+        "status": "MODEL_MODEL_DIAGNOSTIC_ONLY"
+      },
+      "lexical_support": {
+        "interval": [
+          0.2,
+          0.3
+        ],
+        "status": "MODEL_MODEL_DIAGNOSTIC_ONLY"
+      },
+      "referential_status": {
+        "interval": [
+          0.8,
+          0.8
+        ],
+        "status": "MODEL_MODEL_DIAGNOSTIC_ONLY"
+      },
+      "visibility_bin": {
+        "interval": [
+          0.4,
+          0.5
+        ],
+        "status": "MODEL_MODEL_DIAGNOSTIC_ONLY"
+      }
+    },
+    "candidate_window_count": 137,
+    "challenger_schema_validity_interval": [
+      1.0,
+      1.0
+    ],
+    "existing_schema_validity_interval": [
+      1.0,
+      1.0
+    ],
+    "visual_item_coverage_interval": [
+      1.0,
+      1.0
+    ]
+  },
+  "worker_environment_mandatory_key_count": 14,
+  "worker_environment_quarantine_tmpdir_key_count": 1,
+  "worker_environment_thread_extra_key_count": 2
+}

@@ -1,0 +1,160 @@
+{
+  "schema": "childlens-public-instrument-cache-reconciliation-v1.3.0",
+  "reconciliation_date": "2026-07-22",
+  "scope": "public_instruments_and_synthetic_inputs_only",
+  "restricted_childlens_input_used": false,
+  "restricted_inference_run": false,
+  "hosted_or_cloud_model_used": false,
+  "cache_paths_exported": false,
+  "disposition": "REQUIRED_LOCAL_INSTRUMENTS_HASH_VERIFIED_AND_SYNTHETIC_SMOKE_PASSED",
+  "selected_stack": {
+    "vad": {
+      "instrument": "Silero VAD",
+      "version": "6.2.1",
+      "source_revision": "7e30209a3e901f9842f81b225f3e93d8199902b1",
+      "license_spdx": "MIT",
+      "artifact": {
+        "filename": "silero_vad.onnx",
+        "size_bytes": 2327524,
+        "sha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3"
+      },
+      "package": {
+        "filename": "silero_vad-6.2.1-py3-none-any.whl",
+        "size_bytes": 9146242,
+        "sha256": "09de93c4d874bb19c53e62a47dd38be5f163cedad2b5599583231f2a84ef79cb"
+      },
+      "runtime": {
+        "name": "onnxruntime",
+        "version": "1.23.2",
+        "python_version": "3.10.20",
+        "device": "CPUExecutionProvider",
+        "wheel_filename": "onnxruntime-1.23.2-cp310-cp310-macosx_13_0_arm64.whl",
+        "wheel_size_bytes": 17195934,
+        "wheel_sha256": "a7730122afe186a784660f6ec5807138bf9d792fa1df76556b27307ea9ebcbe3"
+      },
+      "public_cache_manifest": {
+        "entry_count": 2,
+        "aggregate_sha256": "68cb8972c6439d6c77ca79053b4d2ec222fe1fbcac4a214b4d7a1c96ea4990c0",
+        "manifest_file_sha256": "92fa22b784239596692405eb6e061c506fbc5677739c6574836c290456e0010e"
+      },
+      "synthetic_smoke": {
+        "input": "zero_signal_array_only",
+        "outbound_network_denied": true,
+        "output_structure_valid": true,
+        "finite_outputs": true,
+        "result": "PASS"
+      }
+    },
+    "asr": {
+      "instrument": "whisper.cpp",
+      "version": "1.9.1",
+      "source_revision": "f049fff95a089aa9969deb009cdd4892b3e74916",
+      "source_git_tree": "f49541eaed447bce9b5e3598cc7a487ce5e54678",
+      "license_spdx": "MIT",
+      "build": {
+        "compiler": "Apple clang 21.0.0 (clang-2100.1.1.101)",
+        "cmake_version": "4.4.0",
+        "cmake_flags": [
+          "CMAKE_BUILD_TYPE=Release",
+          "GGML_METAL=ON",
+          "WHISPER_BUILD_TESTS=OFF",
+          "WHISPER_BUILD_SERVER=OFF"
+        ],
+        "target": "whisper-cli",
+        "executable_size_bytes": 845064,
+        "executable_sha256": "9613b31e5380c184ae29ccb1d4046953d7037e8eb55308c9f1a34f145143b892",
+        "bundle_entry_count": 19,
+        "bundle_aggregate_sha256": "9b13133224ff0e86ca48b3ab1138864080d9034718650d564eb91e665c2ee252",
+        "bundle_manifest_file_sha256": "f69466209b4d1c6f9e252fd115b3f4f40684b6e83b3703e47582a1104056f82d"
+      },
+      "model": {
+        "filename": "ggml-large-v3-turbo.bin",
+        "repository_revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+        "quantized": false,
+        "size_bytes": 1624555275,
+        "sha256": "1fc70f774d38eb169993ac391eea357ef47c88757ef72ee5943879b7e8e2bc69"
+      },
+      "synthetic_smoke": {
+        "input": "whisper_cpp_public_jfk_sample",
+        "outbound_network_denied": true,
+        "json_parse_succeeded": true,
+        "nonempty_segment_structure": true,
+        "result": "PASS"
+      }
+    },
+    "visual_referential": {
+      "instrument": "Qwen2-VL-2B-Instruct",
+      "source_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+      "cache_revision_receipt_count": 13,
+      "cache_revision_receipt_unique_revision_count": 1,
+      "license_spdx": "Apache-2.0",
+      "runtime": {
+        "python_version": "3.10.20",
+        "torch_version": "2.7.1",
+        "torchvision_version": "0.22.1",
+        "transformers_version": "4.53.3",
+        "device": "mps",
+        "batch_size": 1,
+        "local_files_only": true,
+        "trust_remote_code": false,
+        "safetensors_only": true
+      },
+      "weight_shards": [
+        {
+          "filename": "model-00001-of-00002.safetensors",
+          "size_bytes": 3988609112,
+          "sha256": "994ac2b03f97de8bc647d0fe5eba2e4b632b3e28dc03574c29bdfc36cf47e1b9"
+        },
+        {
+          "filename": "model-00002-of-00002.safetensors",
+          "size_bytes": 429441656,
+          "sha256": "92540d8353c8d226a589a3b179bdb33851c970ee2cc2ac7ba035f79425e7b833"
+        }
+      ],
+      "configuration_hashes": {
+        "config_json_sha256": "422adefa19e62dd175961cec85bc0400344fe5bf9b22bd1182e05aaae78556e0",
+        "preprocessor_config_json_sha256": "b5eaad0c2815f07631535dcc58f3c462b0d73693638ad21d19f3c50820eae1cc",
+        "readme_sha256": "74fbe869df708593087ae2ee66a6605d33fc2025937644721dc1360963d037f4"
+      },
+      "public_cache_manifest": {
+        "entry_count": 40,
+        "total_entry_bytes": 4429622733,
+        "aggregate_sha256": "56f8306e4799e9cd9e5222831d5e856f9616a508f7b9761cd2de2ddd05eceb05",
+        "manifest_file_sha256": "5254d4565d12097c9049b1dceb12b306c2d716e18894b0d0143825e29c7f10c7"
+      },
+      "synthetic_smoke": {
+        "input": "single_in_memory_synthetic_image_and_generic_prompt",
+        "outbound_network_denied": true,
+        "local_files_only": true,
+        "trust_remote_code": false,
+        "generation_shape_valid": true,
+        "result": "PASS"
+      }
+    }
+  },
+  "present_but_unselected": [
+    {
+      "artifact": "ggml-large-v3-turbo-q5_0.bin",
+      "sha256": "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2",
+      "reason": "unquantized selected model fits the host and avoids an unnecessary accuracy concession"
+    },
+    {
+      "artifact": "ggml-silero-v6.2.0.bin",
+      "sha256": "2aa269b785eeb53a82983a20501ddf7c1d9c48e33ab63a41391ac6c9f7fb6987",
+      "reason": "exact Silero 6.2.1 ONNX artifact is selected instead"
+    },
+    {
+      "artifact": "newer_whisper_cpp_checkout",
+      "source_revision": "080bbbe85230f624f0b52127f1ae1218247989f9",
+      "reason": "preserved but excluded; the runnable build is isolated at the exact v1.9.1 tag"
+    }
+  ],
+  "controls": {
+    "selected_runtime_uses_absolute_local_paths_only": true,
+    "network_denial_mandatory_before_restricted_input": true,
+    "synthetic_smokes_do_not_certify_restricted_inference": true,
+    "instrument_outputs_are_pseudo_labels_never_ground_truth": true,
+    "instrument_ancestry_into_learner_forbidden": true,
+    "unaudited_pseudo_labels_as_primary_evaluation_truth_forbidden": true
+  }
+}

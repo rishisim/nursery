@@ -1,0 +1,17 @@
+{
+  "confirmation_outcome_count": 0,
+  "development_outcome_count": 0,
+  "measured_jobs_4_speedup": 2.872115182651006,
+  "parallel_equivalence_status": "PASS",
+  "partial_tree_preserved": [
+    "parallel_micro_attempt_3_persisted_inputs",
+    "parallel_micro_attempt_3_jobs_1",
+    "parallel_micro_attempt_3_jobs_n",
+    "parallel_equivalence.json",
+    "parallel_benchmark.json"
+  ],
+  "reason": "read-only adversarial review found pre-freeze construct, ledger, resource-gate, shard-validation, and failure-label defects; the valid timing/equivalence evidence cannot freeze superseded source",
+  "schema_version": "nursery-corrective-prefreeze-supersession-v1",
+  "scientific_outcome": false,
+  "status": "SUPERSEDED_NO_OUTCOME"
+}

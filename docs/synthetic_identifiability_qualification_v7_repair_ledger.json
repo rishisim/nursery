@@ -1,0 +1,104 @@
+{
+  "schema_version": "nursery-cross-version-repair-ledger-v1",
+  "outcome_counts": {
+    "development": 0,
+    "confirmation": 0
+  },
+  "versions": [
+    {
+      "version": 5,
+      "terminal_state": "REVISE",
+      "preserved": true,
+      "repairs_carried_forward": [
+        "exact structural noun target-owner independence",
+        "corpus-by-level factor-refit audit cardinality",
+        "exact declared-versus-observed identifier reconciliation",
+        "separate present/null gates for every prompt kind",
+        "factorized and diagnostically ablatable null learning"
+      ]
+    },
+    {
+      "version": 6,
+      "terminal_state": "INVALIDATED_PRE_FREEZE",
+      "preserved": true,
+      "repairs_carried_forward": [
+        "fresh fixture and excluded-smoke identifiers",
+        "strict prohibition on any excluded-smoke reference before freeze"
+      ],
+      "contaminated_identifiers": {
+        "corpus": [
+          260201,
+          260207
+        ],
+        "model": [],
+        "inference": []
+      }
+    },
+    {
+      "version": 7,
+      "terminal_state": "FROZEN_PENDING_EXCLUDED_SMOKE",
+      "preserved": true,
+      "repairs_implemented": [
+        "exact noun target-owner independence in every declared stratum",
+        "factor audits at exact corpus-by-level grain with independently recomputed episode membership",
+        "empty unused inference registries and exact declared-versus-observed role reconciliation",
+        "separate present and null gates for primitive, manner, action, and noun prompts",
+        "learned null capacity requiring target-absent training and uncorrupted target-absence evidence",
+        "uniform detector-language corroboration with bounded corrupted-sensor gain"
+      ],
+      "fixture_identifiers": {
+        "corpus": [
+          270001
+        ],
+        "model": [
+          270101
+        ],
+        "inference": []
+      },
+      "excluded_smoke_identifiers": {
+        "corpus": [
+          270201,
+          270207
+        ],
+        "model": [
+          270301,
+          270303
+        ],
+        "inference": []
+      },
+      "excluded_smoke_touched": false,
+      "fixture_cycles": [
+        {
+          "cycle": 1,
+          "status": "REVISE_FIXTURE",
+          "failed_gates": [
+            "sensor_helpful_not_required"
+          ],
+          "diagnosis": "Detector evidence had no measurable effect on present or null action probabilities.",
+          "qualification_summary_sha256": "3893e9525c4da1b6a9c348ce282ee4a61647ca492478b222003f6071cb667756",
+          "core_gates_sha256": "1de1e7d891009d9c60224580756f37e6af9efcefd99285d7ca686fe84f045f43"
+        },
+        {
+          "cycle": 2,
+          "status": "REVISE_FIXTURE",
+          "failed_gates": [
+            "sensor_helpful_not_required"
+          ],
+          "diagnosis": "The first sensor repair harmed synchronized present and null action probabilities relative to absent channel.",
+          "qualification_summary_sha256": "3893e9525c4da1b6a9c348ce282ee4a61647ca492478b222003f6071cb667756",
+          "core_gates_sha256": "160c82b11bfe8a380e1b51a113f31c72029f7a7601cc083b01c05da740692570"
+        },
+        {
+          "cycle": 3,
+          "status": "PASS_FIXTURE",
+          "failed_gates": [],
+          "diagnosis": "A uniform predeclared detector-language corroboration rule improved synchronized present and null action probabilities while corrupted gains remained below 0.03.",
+          "qualification_summary_sha256": "af22194a167390a20319da94f4c845100fa23094146f2365bccbcd38404ddfd6",
+          "core_gates_sha256": "70d6ac87133cfca7dcdecd207e607e4a49f31927da0ef5d395484410d712f3a9",
+          "null_capacity_audit_sha256": "580088b4dd6184ec5a38d3afa2f16fb55ae44799bd9bd8c14726cbaa92c3e18e",
+          "identifier_reference_audit_sha256": "7eb4b8af3c5a846e9d8ebe9a726015143509364d0d16c3295a9378e7bc1e79a0"
+        }
+      ]
+    }
+  ]
+}

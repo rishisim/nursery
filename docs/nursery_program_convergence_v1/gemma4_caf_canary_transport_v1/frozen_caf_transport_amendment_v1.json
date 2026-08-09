@@ -1,0 +1,201 @@
+{
+  "schema_version": "nursery-gemma4-public-canary-caf-transport-amendment-v1",
+  "amendment_id": "gemma4-e4b-public-canary-tts-intermediate-aiff-to-caf-v1",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_PRE_CANARY_CAF_TRANSPORT_ONLY",
+  "namespace": "docs/nursery_program_convergence_v1/gemma4_caf_canary_transport_v1",
+  "amendment_mode": "ADDITIVE_CONTENT_INDEPENDENT_TRANSPORT_OVERLAY",
+  "historical_artifacts_modified": false,
+  "public_canary_run": false,
+  "restricted_content_accessed": false,
+  "restricted_inference_run": false,
+  "scientific_outcome_run": false,
+  "trigger": {
+    "classification": "TECHNICAL_FAIL_BEFORE_MODEL_LOAD",
+    "stage": "SELF_GENERATED_PUBLIC_TTS_INTERMEDIATE_TRANSPORT",
+    "cause": "The frozen macOS say invocation attempted to write little-endian PCM into an AIFF intermediate and exited nonzero before creating audio.",
+    "model_loaded": false,
+    "model_generation_called": false,
+    "raw_model_output_existed": false,
+    "semantic_or_scientific_evidence_involved": false,
+    "outer_fence_parser_correction_applicable": false,
+    "outer_fence_parser_corrections_spent": 0
+  },
+  "immutable_bindings": {
+    "prior_common_schema_canary_contract": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_prototype_common_schema_canary_contract_v1.json",
+      "sha256": "9b894fcfd47df93824d25a467961d2c9f3398666dbe824367f2d8e1afe0635e9"
+    },
+    "runtime_pin_erratum": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_prototype_runtime_pin_erratum_v1_1.json",
+      "sha256": "b84da17121dd3235b1b6799d91c077d542e30e384f5cff5e131ec6c9755cecc1"
+    },
+    "activation_receipt_schema": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_prototype_activation_receipt_schema_v1.json",
+      "sha256": "0668d8d304a1be30e43e9df2c05469a338d647c262418a04c6d067d2e77f8b05"
+    },
+    "replacement_amendment": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_replacement_instrument_amendment.json",
+      "sha256": "8e6d7a43ea9639fa451a59386b8657495558fde77fb2147a20767388d47ed24a"
+    },
+    "opaque_provenance_amendment": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_e4b_opaque_instrument_provenance_amendment_v1.json",
+      "sha256": "93874c69153daaf41d902216351666c59b12aeb656b9739ecd07d1e6e4fe42b1"
+    },
+    "resource_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_e4b_prototype_activation_resource_receipt.json",
+      "sha256": "363fda5ebc189216b2d8e9a9133cb51cea91fcc0ea9dc15fef023a028648dcd4",
+      "status": "VERIFIED_REUSE_RESOURCE_ADMITTED"
+    },
+    "calibration_protocol": {
+      "path": "docs/nursery_program_convergence_v1/frozen_childlens_pseudo_calibration_protocol.json",
+      "sha256": "db5336726f4841e592cb9c73df5ab22a0887d1bd34c7cf673146f38de9e86961"
+    },
+    "calibration_conditioned_sensitivity_protocol": {
+      "path": "docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json",
+      "sha256": "c6b7afab6c8914a968b0f06706a222d2771863c2a3fd2017184c17d431bfa7d6"
+    }
+  },
+  "prior_technical_revise_receipts_preserved": {
+    "terminal_decision": {
+      "path": "output/nursery_program_convergence_v1/prototype_gemma_activation_terminal_decision_v1.json",
+      "sha256": "046b06209bd644ae5f3ebcb0f83bb37edca42f0fdb3a1dfff2bb492a0ffecb90",
+      "terminal_state": "PROTOTYPE_TECHNICAL_REVISE_PRE_OUTCOME"
+    },
+    "validation_receipt": {
+      "path": "output/nursery_program_convergence_v1/prototype_gemma_activation_validation_receipt_v1.json",
+      "sha256": "c5a94a2098a7e07e0d43c77da9d018444773519a0e5adaca276fcaa0ff2340c3",
+      "status": "VALID_TECHNICAL_REVISE_PRE_OUTCOME"
+    },
+    "canary_failure_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_e4b_prototype_common_schema_public_canary_failure_v1.json",
+      "sha256": "ef5031b3b90a3611eb488ff9fa76a48e0b2f2a0af0ab5e2230316d3234a0eda6",
+      "status": "REVISE"
+    },
+    "technical_revision_disposition": {
+      "path": "docs/nursery_program_convergence_v1/prototype_gemma_activation_technical_revision_disposition_v1.md",
+      "sha256": "ee04891eb010a5244ec5de2a813154c58d9e48a7ddfbcc6612106ed759b74a7d"
+    },
+    "all_prior_receipts_remain_authoritative_for_failed_AIFF_attempt": true,
+    "no_prior_receipt_overwritten_or_reinterpreted": true
+  },
+  "exact_transport_delta": {
+    "maximum_changed_contract_fields": 2,
+    "changes": [
+      {
+        "source_document": "prior_common_schema_canary_contract",
+        "JSON_pointer": "/public_fixture/audio/local_TTS/invocation",
+        "frozen_value": "/usr/bin/say -v Anna -r 170 -o <owner-private-public-scratch>/german.aiff --data-format=LEI16@22050 'Nimm die rote Tasse.'",
+        "amended_value": "/usr/bin/say -v Anna -r 170 -o <owner-private-public-scratch>/german.caf --data-format=LEI16@22050 'Nimm die rote Tasse.'"
+      },
+      {
+        "source_document": "prior_common_schema_canary_contract",
+        "JSON_pointer": "/public_fixture/audio/ffmpeg_normalization",
+        "frozen_value": "/opt/homebrew/bin/ffmpeg -nostdin -hide_banner -loglevel error -i german.aiff -af apad=pad_dur=10 -t 10 -vn -ac 1 -ar 16000 -c:a pcm_s16le -bitexact german.wav",
+        "amended_value": "/opt/homebrew/bin/ffmpeg -nostdin -hide_banner -loglevel error -i german.caf -af apad=pad_dur=10 -t 10 -vn -ac 1 -ar 16000 -c:a pcm_s16le -bitexact german.wav"
+      }
+    ],
+    "semantic_fields_changed": 0,
+    "model_runtime_or_artifact_fields_changed": 0,
+    "scientific_fields_changed": 0,
+    "parser_allowance_changed": false,
+    "does_not_spend_outer_fence_parser_correction": true
+  },
+  "preserved_public_fixture_contract": {
+    "phrase_utf8": "Nimm die rote Tasse.",
+    "language": "de-DE",
+    "voice": "Anna",
+    "voice_locale": "de_DE",
+    "rate_words_per_minute": 170,
+    "TTS_data_format": "LEI16@22050",
+    "temporary_intermediate_is_owner_private_public_scratch": true,
+    "temporary_intermediate_deleted_after_normalization": true,
+    "final_WAV": {
+      "filename": "german.wav",
+      "container": "WAV",
+      "channels": 1,
+      "sample_format": "signed 16-bit little-endian PCM",
+      "sample_rate_hz": 16000,
+      "sample_count": 160000,
+      "duration_seconds": 10.0,
+      "normalization_or_loudness_filter": false,
+      "final_hash_bound_in_future_canary_receipt": true
+    },
+    "five_frame_generator_contract_unchanged": true,
+    "frame_count": 5,
+    "frame_offsets_seconds": [-5.0, -2.5, 0.0, 2.5, 5.0],
+    "exact_prompt_sha256": "93e51fb982bd3ea47dd4defbd24e818cf67aee89c6df9d98fd1ec40fc2188ff6",
+    "exact_common_schema_sha256": "19b7ae8948aed46410e1307c0a302303813422995c8f4cdc19949118693a8089",
+    "exact_parser_contract_sha256": "af8e5988febb42e378bb3b6c8cbbb2799cca167cb4b3f4be5d32732a6035974a",
+    "outer_fence_parser_correction_maximum": 1,
+    "outer_fence_parser_correction_used_before_amendment": 0,
+    "dynamic_prompt_or_transcript_input": false,
+    "expected_semantic_label": null
+  },
+  "preserved_artifact_runtime_and_comparator_contract": {
+    "cached_artifact_repository": "mlx-community/gemma-4-e4b-it-4bit",
+    "cached_artifact_revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+    "cached_artifact_file_count": 10,
+    "cached_artifact_bytes": 5179241512,
+    "cached_artifact_manifest_sha256": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae",
+    "model_weight_sha256": "932b8271fc3fe65adcc78b96c10c6268bbfb13e8f67d1358727c0d6ee97e1eff",
+    "effective_runtime_pins_source": "docs/nursery_program_convergence_v1/frozen_gemma4_prototype_runtime_pin_erratum_v1_1.json",
+    "qwen3_instrument_id": "qwen3_vl_8b_instruct_4bit",
+    "qwen3_revision": "defcdea7cc7a4b0858fea563cbbce171d328e457",
+    "qwen3_restricted_hypotheses_recomputed": false,
+    "qwen3_read_only_digest_match_still_required": true,
+    "third_visual_model": false
+  },
+  "preserved_sample_export_and_gate_contract": {
+    "primary_item_count": 15,
+    "primary_total_seconds": 900,
+    "candidate_window_count": 137,
+    "reserve_activation": false,
+    "reselection": false,
+    "minimum_export_cell_items": 5,
+    "K5_complement_protection": true,
+    "outward_rounding_unchanged": true,
+    "schema_validity_minimum": 0.95,
+    "primary_item_coverage_minimum": 0.8,
+    "primary_seconds_coverage_minimum": 0.8,
+    "maximum_abstention_for_a_dimension": 0.5,
+    "minimum_paths_per_task_family": 2,
+    "agreement_is_not_a_pass_gate": true,
+    "simulator_oracle_remains_only_evaluation_truth": true,
+    "causal_thresholds_changed": false,
+    "calibration_range_or_scientific_protocol_changed": false
+  },
+  "overlay_application_rule": {
+    "required_steps": [
+      "Recompute and match every immutable binding and prior technical-revise receipt SHA-256.",
+      "Resolve each of the two exact JSON Pointers in the bound prior canary contract and require the frozen_value.",
+      "Apply both filename substitutions in memory and no other change.",
+      "Apply the separately bound runtime-pin erratum without modifying either original artifact.",
+      "Require the effective prompt, schema, parser, artifact, sample, K5, rounding, and gate values to equal the preserved contract above.",
+      "Bind this amendment path and SHA-256 in every new CAF canary, failure, runtime-lock, activation, and validation receipt."
+    ],
+    "reject_if_any_bound_digest_differs": true,
+    "reject_if_pointer_or_frozen_value_differs": true,
+    "reject_if_any_unlisted_field_changes": true,
+    "reuse_prior_AIFF_failure_or_success_receipt_as_CAF_receipt": false
+  },
+  "new_immutable_output_namespace": {
+    "path": "output/nursery_program_convergence_v1/gemma4_caf_canary_transport_v1",
+    "must_not_exist_before_execution": true,
+    "owner_private_during_public_execution": true,
+    "future_public_canary_receipt": "public_common_schema_canary_receipt_v1.json",
+    "future_public_canary_failure": "public_common_schema_canary_failure_v1.json",
+    "future_runtime_lock_receipt": "runtime_lock_receipt_v1.json",
+    "future_activation_receipt": "full_activation_receipt_v1.json",
+    "historical_output_paths_overwritten": false
+  },
+  "authorization_boundary": {
+    "amendment_is_canary_execution": false,
+    "amendment_is_activation_receipt": false,
+    "public_canary_authorized_by_amendment_alone": false,
+    "restricted_inference_authorized": false,
+    "scientific_outcome_authorized": false,
+    "model_agreement_or_pseudo_labels_are_ground_truth": false,
+    "next_action": "A separately validated public-only runner may sentinel-test and execute the CAF fixture in the new namespace. Full activation, restricted calibration, and any scientific outcome remain gated by fresh immutable receipts."
+  }
+}

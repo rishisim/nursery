@@ -1,0 +1,289 @@
+{
+  "artifact_id": "childlens-lexical-protocol-evidence-v1.0.0",
+  "status": "PROTOCOL_ONLY_NOT_RUN",
+  "created_date": "2026-07-21",
+  "scientific_outcome_authorized": false,
+  "terminal_decision": null,
+  "scope": {
+    "corpus": "CURRENTLY_ACCESSIBLE_CHILDLENS_KEEPER_RELEASE_ONLY",
+    "workstream": [
+      "G5_INPUT_LEXICON",
+      "G6_REFERENTIAL_ANNOTATION",
+      "G7_HELDOUT_EVALUATION",
+      "G8_BASELINE_CEILING"
+    ],
+    "media_inspected_by_this_workstream": false,
+    "learner_trained": false,
+    "acquisition_effect_computed": false
+  },
+  "source_artifacts": [
+    {
+      "path": "docs/childlens_feasibility_v1/frozen_feasibility_rubric_v1.json",
+      "role": "FROZEN_GATE_RULES"
+    },
+    {
+      "path": "docs/childlens_feasibility_v1/frozen_pilot_protocol_v1.json",
+      "role": "FROZEN_CONTENT_BLIND_PILOT"
+    },
+    {
+      "path": "docs/child_only_prototype_v1/scientific_data_boundary_contract_v1.md",
+      "role": "SCIENTIFIC_AND_ANCESTRY_BOUNDARY"
+    },
+    {
+      "path": "docs/child_only_prototype_v1/calibration/childlens_measurement_spec_v1.json",
+      "role": "MEASUREMENT_DEFINITIONS"
+    },
+    {
+      "path": "docs/child_only_prototype_v1/evaluation_spec_v1.json",
+      "role": "HELD_OUT_ENDPOINT_INTERFACE"
+    },
+    {
+      "path": "docs/child_only_prototype_v1/causal_protocol_v1.json",
+      "role": "BASELINE_AND_CEILING_INTERFACE"
+    },
+    {
+      "path": ".external/egobabyvlm/README.md",
+      "role": "PUBLIC_METHOD_INTERFACE_ONLY_NO_EMPIRICAL_ANCESTRY"
+    }
+  ],
+  "privacy_boundary": {
+    "restricted_internal_only": [
+      "RAW_VIDEO",
+      "RAW_AUDIO",
+      "FRAMES",
+      "RAW_OR_DERIVED_TRANSCRIPTS",
+      "LEXICAL_STRINGS_BY_DEFAULT",
+      "PARTICIPANT_OR_SESSION_IDENTIFIERS",
+      "OPAQUE_INTERNAL_KEYS",
+      "EXACT_TIMESTAMPS",
+      "CANDIDATE_TRACKS",
+      "PER_ITEM_ANNOTATIONS",
+      "SMALL_IDENTIFIABLE_CELLS"
+    ],
+    "reportable": "TERMS_PERMITTED_NONIDENTIFYING_CELL_SUPPRESSED_AGGREGATES_AND_PROTOCOL_DIGESTS_ONLY",
+    "small_cell_minimum": 5,
+    "complementary_suppression_required": true,
+    "internal_lexical_hash_export": false
+  },
+  "pilot_binding": {
+    "protocol_id": "childlens-lexical-feasibility-pilot-v1.0.0",
+    "target_videos": 15,
+    "allowable_video_range": [
+      12,
+      18
+    ],
+    "context_seconds_relative_to_utterance_onset": [
+      -5,
+      5
+    ],
+    "selection_uses_content": false,
+    "selection_adjustment_allowed_only_before_content_inspection_for": [
+      "ACCESS",
+      "BYTE_SIZE",
+      "EMPTY_STRATUM"
+    ],
+    "selection_adjustment_prohibited_for": [
+      "LEXICAL_RICHNESS",
+      "VISIBLE_REFERENT_YIELD",
+      "ANNOTATION_AGREEMENT",
+      "VISUAL_SALIENCE",
+      "LEARNER_RESULT"
+    ]
+  },
+  "annotation_protocol": {
+    "primary_speech_role": "NON_CHILD",
+    "speaker_roles_excluded_from_primary_support": [
+      "CHILD",
+      "OVERLAP_UNLESS_HUMAN_SEPARATED_AND_RECODED",
+      "UNCERTAIN",
+      "NONSPEECH"
+    ],
+    "referent_status_order": [
+      "UNUSABLE",
+      "UNDECIDABLE",
+      "IRRELEVANT",
+      "NULL_NOT_VISIBLE",
+      "VISIBLE_SINGLE",
+      "VISIBLE_MULTIPLE"
+    ],
+    "visible_definition": "DIRECTLY_OBSERVABLE_OBJECT_OR_ACTION_CONFIGURATION_PLAUSIBLY_LINKED_TO_AN_ELIGIBLE_MENTION_WITHIN_FIXED_WINDOW",
+    "visible_multiple_definition": "TWO_OR_MORE_PLAUSIBLE_ALTERNATIVE_LINK_CONFIGURATIONS_NOT_MERE_MULTIWORD_OR_MULTIARGUMENT_CONTENT",
+    "mixed_utterance_policy": "DERIVE_UTTERANCE_STATUS_BUT_RETAIN_MENTION_LEVEL_LINK_AND_NULL_STATUS",
+    "candidate_count_export_bands": [
+      "0",
+      "1",
+      "2",
+      "3_4",
+      "5_PLUS"
+    ],
+    "lag_definition": "UTTERANCE_ONSET_MINUS_NEAREST_ADJUDICATED_VISIBLE_CANDIDATE_BOUNDARY",
+    "lag_tie_break": "ONSET_BOUNDARY",
+    "censored_boundary_policy": "FLAG_AND_EXCLUDE_FROM_EXACT_LAG_NEVER_IMPUTE",
+    "multiple_candidate_lag_policy": "ONE_RECORD_PER_PLAUSIBLE_PAIR_PLUS_MINIMUM_ABSOLUTE_UTTERANCE_SUMMARY_NO_INVENTED_TARGET",
+    "double_coded_fraction_minimum": 0.2,
+    "double_code_selection": "PRESELECTED_RELEASE_BOUND_HASH_ORDER_STRATIFIED_BY_PARTICIPANT_AND_SPEECH_ACTIVITY",
+    "status_agreement_metric": "KRIPPENDORFF_ALPHA_NOMINAL_PRE_ADJUDICATION",
+    "status_alpha_minimum": 0.67,
+    "boundary_tolerance_seconds": 1.0,
+    "boundary_agreement_fraction_minimum_for_G8": 0.8,
+    "cluster_unit": "PARTICIPANT_GROUP",
+    "remediation_cycles_maximum": 1,
+    "remediation_may_change": [
+      "CODEBOOK_WORDING",
+      "NON_STUDY_EXAMPLES",
+      "ANNOTATOR_TRAINING"
+    ],
+    "remediation_may_not_change": [
+      "STATUS_SET",
+      "CONTEXT_WINDOW",
+      "CANDIDATE_DEFINITION",
+      "LAG_ANCHOR",
+      "PASS_THRESHOLDS"
+    ]
+  },
+  "lexical_eligibility": {
+    "normalization_freeze": "AFTER_LANGUAGE_IDENTIFICATION_BEFORE_FREQUENCY_OR_SUPPORT_INSPECTION",
+    "tokenizer": "SCRATCH_TRAIN_PARTITION_ONLY_NO_EXTERNAL_VOCABULARY_OR_WEIGHTS",
+    "noun_object_definition": "CORPUS_LOCAL_COMMON_NOUN_LEMMA_OR_FIXED_EXPRESSION_DENOTING_A_DIRECTLY_VISIBLE_DISCRIMINABLE_OBJECT_CATEGORY",
+    "verb_action_definition": "CORPUS_LOCAL_DYNAMIC_VERB_LEMMA_OR_FIXED_EXPRESSION_DENOTING_A_DIRECTLY_VISIBLE_TEMPORALLY_BOUNDED_ACTION",
+    "per_type_requirements_both_splits": {
+      "training_non_child_occurrences_minimum": 10,
+      "training_participant_groups_minimum": 3,
+      "training_visible_links_minimum": 5,
+      "training_visible_link_participant_groups_minimum": 3,
+      "training_visible_single_links_minimum": 3,
+      "training_visible_single_participant_groups_minimum": 2,
+      "heldout_visible_link_participant_groups_minimum": 3,
+      "heldout_visible_links_per_required_group_minimum": 1
+    },
+    "gate_minimum_type_counts": {
+      "NOUN_OBJECT": 8,
+      "VERB_ACTION": 6
+    },
+    "unsupported_type_policy": "MARK_UNAVAILABLE_NEVER_BORROW_OR_TRANSLATE_FROM_ANOTHER_CORPUS",
+    "endpoint_cap_ranking": [
+      "DESCENDING_MINIMUM_SUPPORT_ACROSS_SPLITS",
+      "DESCENDING_TRAIN_PARTICIPANT_COVERAGE",
+      "DESCENDING_VISIBLE_LINK_COUNT",
+      "RELEASE_PROTOCOL_BOUND_KEYED_HASH_TIE_BREAK"
+    ],
+    "learner_result_used_for_selection": false
+  },
+  "split_support_audit": {
+    "split_protocol_id": "childlens-lexical-split-support-v1.0.0",
+    "primary": {
+      "group": "PARTICIPANT",
+      "targets_by_usable_annotated_duration": [
+        0.7,
+        0.15,
+        0.15
+      ],
+      "development_participant_groups_minimum": 3,
+      "test_participant_groups_minimum": 3,
+      "participant_overlap": false
+    },
+    "sensitivity": {
+      "group": "SESSION",
+      "targets_by_usable_annotated_duration": [
+        0.7,
+        0.15,
+        0.15
+      ],
+      "session_overlap": false,
+      "participant_overlap_allowed": true
+    },
+    "assignment_inputs": [
+      "INTERNAL_GROUP_KEY",
+      "USABLE_ANNOTATED_DURATION",
+      "COARSE_ACTIVITY",
+      "SPEECH_PRESENCE",
+      "LOCATION_WHEN_AVAILABLE",
+      "RELEASE_MANIFEST_DIGEST"
+    ],
+    "assignment_prohibited_inputs": [
+      "TRANSCRIPT_TEXT",
+      "LEXICAL_COUNTS",
+      "REFERENTIAL_YIELD",
+      "LEARNER_RESULT"
+    ],
+    "missing_participant_grouping": "G7_FAIL",
+    "missing_session_grouping": "G7_CANNOT_PASS",
+    "split_reassignment_after_lexical_inspection": false,
+    "report_form": "CELL_SUPPRESSED_AGGREGATE_SUPPORT_BANDS_NO_TYPE_KEYS"
+  },
+  "baseline_ceiling_construction": {
+    "state": "PROTOCOL_PROOF_REQUIRED_NO_TRAINING",
+    "canonical_inventory": "SAME_OPAQUE_RECORD_TEXT_FIXED_RGB_WINDOW_VALIDITY_AND_WEIGHT",
+    "weak_vl_baseline": "NATURAL_UTTERANCE_CENTERED_CHRONOLOGY_AND_FROZEN_POOLING_WITH_NO_REFERENTIAL_ORACLE",
+    "strong_alignment_ceiling": "HIDDEN_ADJUDICATED_ALIGNMENT_TARGET_OR_READOUT_MASK_OVER_THE_SAME_FIXED_FRAME_SEQUENCE",
+    "visible_multiple": "FROZEN_MULTIPLE_POSITIVE_BAG",
+    "null_not_visible": "EXPLICIT_NULL_TARGET_IN_STRONG_CONTROL_RETAIN_RECORD_IN_BOTH",
+    "irrelevant": "NO_LEXICAL_ALIGNMENT_TARGET_RETAIN_IDENTICAL_MLM_AND_VISUAL_SELF_SUPERVISION_EXPOSURE",
+    "equalities_required": [
+      "RAW_RGB_TEXT_RECORD_MEMBERSHIP",
+      "RECORD_MULTIPLICITY",
+      "SPLITS",
+      "TOKENIZER",
+      "MODEL_ARCHITECTURE",
+      "INITIALIZATION_RECEIPT",
+      "EXAMPLE_ORDER",
+      "UPDATE_COUNT",
+      "BATCH_AND_PADDING_SHAPES",
+      "OPTIMIZER",
+      "STOPPING_RULE",
+      "COMPUTE_BUDGET"
+    ],
+    "only_permitted_difference": "FROZEN_ALIGNMENT_TARGET_AND_READOUT_TRANSFORMATION",
+    "strong_annotations_in_primary_evaluation": false,
+    "evaluation_inputs": [
+      "VISION",
+      "TEXT"
+    ]
+  },
+  "feasibility_judgment": {
+    "G5_INPUT_LEXICON": {
+      "pass": "AT_LEAST_8_NOUN_OBJECT_AND_6_VERB_ACTION_TYPES_MEET_ALL_PER_TYPE_REQUIREMENTS_IN_BOTH_SPLITS",
+      "observed_status": "NOT_RUN"
+    },
+    "G6_REFERENTIAL_ANNOTATION": {
+      "pass": "VISIBLE_SINGLE_OR_MULTIPLE_POINT_PROPORTION_AT_LEAST_0.15_STATUS_ALPHA_AT_LEAST_0.67_BOUNDED_ADJUDICATION_PATH_AND_CLUSTER_INTERVALS_COVERAGE_REPORTED",
+      "visible_fraction_minimum": 0.15,
+      "confidence_interval_is_reported_not_an_ADDITIONAL_PASS_THRESHOLD": true,
+      "observed_status": "NOT_RUN"
+    },
+    "G7_HELDOUT_EVALUATION": {
+      "pass": "STABLE_GROUPING_SUPPORTS_BOTH_FIXED_SPLITS_AND_MINIMUM_TYPE_INVENTORY_REMAINS_ELIGIBLE_IN_BOTH",
+      "observed_status": "NOT_RUN"
+    },
+    "G8_BASELINE_CEILING": {
+      "pass": "MANIFEST_VALIDATOR_PROVES_CANONICAL_INVENTORY_EQUALITY_ORACLE_SEPARATION_ONLY_FROZEN_ALIGNMENT_TRANSFORMATION_DIFFERING_AND_BOUNDARY_AGREEMENT_WITHIN_1_SECOND_AT_LEAST_0.80",
+      "observed_status": "NOT_RUN"
+    }
+  },
+  "evidence_state": {
+    "pilot_statistics_present": false,
+    "lexical_strings_present": false,
+    "restricted_identifiers_present": false,
+    "exact_timestamps_present": false,
+    "example_text_or_frames_present": false,
+    "gate_results_are_claimed": false
+  },
+  "unresolved_dependencies": [
+    "G1_TERMS_PERMISSION",
+    "EXACT_RELEASE_PIN",
+    "PARTICIPANT_AND_SESSION_GROUPING",
+    "G3_AUDIO_TIMING",
+    "G4_LANGUAGE_TRANSCRIPT_AND_SPEAKER_ROLE",
+    "AUTHORIZED_CONTENT_BLIND_PILOT_RESULTS"
+  ],
+  "prohibited_actions": [
+    "MEDIA_SELECTION_BY_CONTENT",
+    "LEARNER_TRAINING_OR_PROBING",
+    "ACQUISITION_EFFECT_INSPECTION",
+    "BABYVIEW_OR_AEA_EMPIRICAL_ANCESTRY",
+    "EXTERNAL_VOCABULARY_OR_TOKENIZER_ANCESTRY",
+    "RAW_ASR_AS_GOLD",
+    "DROPPING_NULL_OR_AMBIGUOUS_CASES",
+    "REPRESENTING_SIMULATOR_PHYSICAL_STREAMS_AS_CHILDLENS_MEASURED"
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "automatic_fallback_allowed": false,
+  "calibration": {
+    "aggregate_only": true,
+    "candidate_window_count": 137,
+    "corrections_used": 0,
+    "failed_gates": [
+      "ENVELOPE_NULL_OR_IRRELEVANT"
+    ],
+    "frozen_item_count": 15,
+    "frozen_speech_seconds": 900,
+    "human_ground_truth": false,
+    "model_model_diagnostic_only": true,
+    "null_or_irrelevant_statuses": {
+      "conservative_envelope": "SUPPRESSED_K5",
+      "model_intersection": "SUPPRESSED_K5",
+      "model_union": "SUPPRESSED_K5",
+      "qwen3asr_plus_gemma4_path": "SUPPRESSED_K5",
+      "qwen3asr_plus_qwen3vl_path": "SUPPRESSED_K5"
+    },
+    "receipt_sha256": "2918e5094071e003931f79286945ad515ad41a2c5987eee3e98b14ea398f5b56",
+    "referential_status_agreement_interval": [
+      0.8,
+      0.8
+    ],
+    "sample_reselected": false,
+    "schema_validity_intervals": {
+      "gemma_path": [
+        1.0,
+        1.0
+      ],
+      "qwen3_path": [
+        1.0,
+        1.0
+      ]
+    },
+    "status": "CALIBRATION_REVISE",
+    "third_visual_model_used": false,
+    "visual_item_coverage_interval": [
+      1.0,
+      1.0
+    ]
+  },
+  "causal_outcome": {
+    "authorization_seal_exists": false,
+    "endpoint_opened": false,
+    "output_exists": false,
+    "preoutcome_receipt_exists": false,
+    "run": false
+  },
+  "decision_required": true,
+  "exact_next_task_if_recommended_option_selected": "Freeze one deterministic content-blind ChildLens calibration extension with a single K5-coverage objective and a no-further-expansion stop rule; do not open causal endpoints.",
+  "no_automatic_fallback_override_sha256": "cb9e7061a5725050e6a71a7b6e41f6f5e7bf30d104bc46bae233816ca99a90b7",
+  "options": [
+    {
+      "id": "A_CONTENT_BLIND_K5_EXTENSION",
+      "recommended": true
+    },
+    {
+      "id": "B_NEW_PARTIALLY_CALIBRATED_PROTOCOL",
+      "recommended": false
+    },
+    {
+      "id": "C_SEPARATE_EMPIRICAL_FREE_SYNTHETIC_STUDY",
+      "recommended": false
+    },
+    {
+      "id": "D_WAIT_FOR_SEPARATE_BABYVIEW_ONLY_STUDY",
+      "recommended": false
+    }
+  ],
+  "privacy": {
+    "exact_sub_k_counts_exported": false,
+    "restricted_gemma_inference_completed_locally": true,
+    "restricted_hypotheses_quarantined": true,
+    "restricted_payload_exported": false
+  },
+  "protocol_sha256": "c6b7afab6c8914a968b0f06706a222d2771863c2a3fd2017184c17d431bfa7d6",
+  "runner_sha256": "8518daec3f3f6490d9eb8bca985523220c1091cb7ae7836fe85a5e728a7caab9",
+  "schema_version": "nursery-gemma-two-model-calibration-gate-decision-v1.7",
+  "technical_fix_coordinator_sha256": "c532777f3492a4c5a407814f48e792270ca309d9c7d92e2be37af6ec2a4ccae4",
+  "terminal_state": "GENUINE_USER_ONLY_BLOCKER"
+}

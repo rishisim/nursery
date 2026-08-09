@@ -1,0 +1,9 @@
+{
+  "authorization_digest": "1af7285f5f716c2e0a3fce0f0b4b118acde3d0607105125d2ed09d1922d1ce55",
+  "cohort_summary_sha256": "0217203e707a761cf488a85a11c52c1711309cc3c310d9fb2fc7a43ccf561727",
+  "confirmation_authorized": false,
+  "confirmation_outcome_count": 0,
+  "development_outcome_count": 1,
+  "protocol_id": "synthetic-development-launch-v3",
+  "status": "COMPLETE"
+}

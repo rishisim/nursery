@@ -1,0 +1,27 @@
+{
+  "alternate_or_corrected_report_allowed": false,
+  "bytecode_writes_disabled": true,
+  "official": true,
+  "only_admissible_test_report": true,
+  "order": "v5 tests first, then complete repository tests root",
+  "python_executable": "/Users/rishisim/Documents/research/nursery/.venv/bin/python",
+  "python_sha256": "f8cf5db64fd3715840686fcdb0f00b8b7e6c9b1e9b5f10a31183160c9bb6a6fc",
+  "python_version": "3.12.13 (main, Mar 10 2026, 18:18:07) [Clang 21.1.4 ]",
+  "results": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 /Users/rishisim/Documents/research/nursery/.venv/bin/python -m pytest -q tests/test_synthetic_identifiability_qualification_v5.py",
+      "exit_code": 0,
+      "output": ".................                                                        [100%]\n17 passed in 6.42s\n"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 /Users/rishisim/Documents/research/nursery/.venv/bin/python -m pytest -q tests",
+      "exit_code": 0,
+      "output": "........................................................................ [ 46%]\n........................................................................ [ 92%]\n...........                                                              [100%]\n155 passed in 18.20s\n"
+    }
+  ],
+  "status": "PASS",
+  "test_roots": [
+    "tests/test_synthetic_identifiability_qualification_v5.py",
+    "tests"
+  ]
+}

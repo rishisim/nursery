@@ -1,0 +1,32 @@
+{
+  "schema_version": "childlens-pilot-preselection-receipt-v1.1.0",
+  "frozen_protocol_id": "childlens-lexical-feasibility-pilot-v1.0.0",
+  "target_video_count": 15,
+  "selected_video_count": 15,
+  "selection_source_pool_count": 192,
+  "selection_participant_group_count": 15,
+  "maximum_selected_videos_per_participant": 1,
+  "metadata_fields": [
+    "coarse_activity_label",
+    "speech_presence_bin",
+    "annotation_derived_duration_proxy_tertile",
+    "location_label_when_available"
+  ],
+  "selection_content_blind": true,
+  "lexical_content_used": false,
+  "asr_output_used": false,
+  "visual_content_used": false,
+  "learner_result_used": false,
+  "restricted_input_sha256": "81282e6a4d8178b1559a7473d22c70a36e44450467b6b5e2ff70ad9b7e9f049a",
+  "placeholder_manifest_sha256": "cc2b669e811ff78a045565be031537d5a93bfece40f27de3482768350adc1deb",
+  "restricted_download_plan_sha256": "bb39c32139310e30ac15095a15b3d4b95508ab217694f591845aac38e00364b8",
+  "human_validation_packet_sha256": "ae8503fc5c21fc6df0b08c763202eab074b2526f83ef847d2faca3ae4eb217a5",
+  "video_size_status": "EXACT_REMOTE_BYTES_UNRESOLVED",
+  "placeholder_video_sizes_are_scientific_evidence": false,
+  "canonical_final_manifest_complete": false,
+  "video_acquisition_started": false,
+  "audio_or_video_content_inspected": false,
+  "human_validation_started": false,
+  "learner_training_started": false,
+  "status": "FROZEN_PRESELECTION_NOT_ACQUISITION_ADMISSION"
+}

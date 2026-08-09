@@ -1,0 +1,391 @@
+{
+  "schema": "childlens-v1.3.1-public-model-shortlist-primary-source-evidence-v1",
+  "checked_date": "2026-07-22",
+  "scope": "public_primary_sources_and_unauthenticated_public_repository_metadata_only",
+  "restricted_childlens_input_used": false,
+  "model_download_performed": false,
+  "license_clickthrough_accepted": false,
+  "authentication_used": false,
+  "runtime_executed": false,
+  "repository_metadata_method": "Unauthenticated GET requests to each official Hugging Face model API entry; gated, private, license, and revision fields were recorded without downloading weights.",
+  "candidates": [
+    {
+      "family": "Qwen3.6",
+      "official_variants": [
+        {
+          "model_id": "Qwen/Qwen3.6-35B-A3B",
+          "revision_observed": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+          "total_parameters": "35B",
+          "activated_parameters": "3B",
+          "official_bf16_weight_bytes_observed": 71903776776,
+          "license_spdx": "Apache-2.0",
+          "private": false,
+          "gated": false
+        },
+        {
+          "model_id": "Qwen/Qwen3.6-27B",
+          "revision_observed": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+          "total_parameters": "27B dense",
+          "official_bf16_weight_bytes_observed": 55563006400,
+          "license_spdx": "Apache-2.0",
+          "private": false,
+          "gated": false
+        }
+      ],
+      "capabilities": [
+        "text generation and reasoning",
+        "image understanding",
+        "video understanding",
+        "visual grounding and document understanding",
+        "agentic coding and tool use"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "audio_input_supported": false,
+      "audio_limit": "not_applicable",
+      "context": {
+        "native_tokens": 262144,
+        "documented_yarn_extension_tokens": 1010000
+      },
+      "local_runtime_support": {
+        "officially_documented": [
+          "latest Hugging Face Transformers",
+          "SGLang >= 0.5.10",
+          "vLLM >= 0.19.0",
+          "KTransformers",
+          "llama.cpp for text and vision GGUF",
+          "mlx-lm for text-only Apple Silicon",
+          "mlx-vlm for vision plus text Apple Silicon"
+        ],
+        "host_32_gib_assessment": "The official unquantized weights alone exceed host memory for both variants. Only a separately pinned quantized GGUF or MLX artifact could be considered, with a new license, hash, quantization, and synthetic-quality receipt.",
+        "apple_mps_unquantized_supported_by_evidence": false
+      },
+      "childlens_shortlist_interpretation": "Not an ASR candidate because it has no audio input. It is also not an unquantized 32-GiB visual-instrument candidate. Retain only as a quantized visual-model research alternative, not as the default local instrument.",
+      "authoritative_sources": [
+        "https://github.com/QwenLM/Qwen3.6",
+        "https://huggingface.co/Qwen/Qwen3.6-35B-A3B",
+        "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/blob/main/LICENSE",
+        "https://huggingface.co/Qwen/Qwen3.6-27B",
+        "https://huggingface.co/Qwen/Qwen3.6-27B/blob/main/LICENSE",
+        "https://huggingface.co/api/models/Qwen/Qwen3.6-35B-A3B",
+        "https://huggingface.co/api/models/Qwen/Qwen3.6-27B"
+      ]
+    },
+    {
+      "family": "Gemma 4",
+      "license_spdx": "Apache-2.0",
+      "official_variants": [
+        {
+          "model_id": "google/gemma-4-E2B-it",
+          "revision_observed": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+          "private": false,
+          "gated": false,
+          "context_tokens": 131072,
+          "audio_supported": true,
+          "official_memory_gb_bf16": 11.4,
+          "official_memory_gb_q4_0": 2.9
+        },
+        {
+          "model_id": "google/gemma-4-E4B-it",
+          "revision_observed": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+          "private": false,
+          "gated": false,
+          "context_tokens": 131072,
+          "audio_supported": true,
+          "official_memory_gb_bf16": 17.9,
+          "official_memory_gb_q4_0": 4.5
+        },
+        {
+          "model_id": "google/gemma-4-12B-it",
+          "revision_observed": "707f0a3b8a3c7ad586ed01e27eafbad8a27dd0f7",
+          "private": false,
+          "gated": false,
+          "context_tokens": 262144,
+          "audio_supported": true,
+          "official_memory_gb_bf16": 26.7,
+          "official_memory_gb_q4_0": 6.7
+        },
+        {
+          "model_id": "google/gemma-4-26B-A4B-it",
+          "revision_observed": "4d7ae4984b7db7de8f8457170b3f1a419ee76d52",
+          "private": false,
+          "gated": false,
+          "context_tokens": 262144,
+          "audio_supported": false,
+          "official_memory_gb_bf16": 57.7,
+          "official_memory_gb_q4_0": 14.4
+        },
+        {
+          "model_id": "google/gemma-4-31B-it",
+          "revision_observed": "842da3794eaa0b77d5f08bae87a17459d91ff475",
+          "private": false,
+          "gated": false,
+          "context_tokens": 262144,
+          "audio_supported": false,
+          "official_memory_gb_bf16": 69.9,
+          "official_memory_gb_q4_0": 17.5
+        }
+      ],
+      "capabilities": [
+        "text generation and reasoning",
+        "image understanding for every variant",
+        "video represented as frames for every variant",
+        "audio understanding and prompted ASR for E2B, E4B, and 12B only",
+        "multilingual support",
+        "object detection, pointing, OCR, and visual understanding"
+      ],
+      "input_modalities": {
+        "E2B_E4B_12B": [
+          "text",
+          "image",
+          "video_frames",
+          "audio"
+        ],
+        "26B_A4B_31B": [
+          "text",
+          "image",
+          "video_frames"
+        ]
+      },
+      "audio_and_video_limits": {
+        "audio_max_seconds": 30,
+        "audio_sample_rate_hz": 16000,
+        "audio_channels": 1,
+        "audio_token_cost_per_second": 25,
+        "video_max_seconds_at_one_frame_per_second": 60
+      },
+      "local_runtime_support": {
+        "transformers": "Official model pages provide local AutoProcessor and AutoModelForMultimodalLM examples, including audio examples for the audio-capable sizes.",
+        "litert_lm": "Google's open LiteRT-LM supports macOS CPU and GPU and documents Gemma 4 on-device support, including Gemma 4 12B in v0.13.",
+        "ollama_llama_cpp": "Google's official Ollama guide documents quantized local Gemma 4 E2B, E4B, 26B A4B, and 31B with text and image input. That guide does not establish audio support through Ollama.",
+        "host_32_gib_assessment": "E2B and E4B are the clearest unquantized host candidates. The 12B BF16 memory estimate leaves too little safety headroom on a 32-GiB unified-memory host; Q4_0 is more plausible but requires a quantization-specific quality audit. Larger variants are visual-only and require quantization."
+      },
+      "childlens_shortlist_interpretation": "Gemma 4 E2B and E4B are the only reviewed single-model candidates that officially combine audio and image input while fitting the host in unquantized form. Their 30-second audio and 60-second-at-1-fps video limits require deterministic windowing. They still require an offline local synthetic smoke and a frozen comparison against the task-specific ASR plus VLM pipeline before selection.",
+      "authoritative_sources": [
+        "https://ai.google.dev/gemma/docs/core/model_card_4",
+        "https://ai.google.dev/gemma/docs/core",
+        "https://ai.google.dev/gemma/docs/capabilities/audio",
+        "https://ai.google.dev/gemma/docs/get_started",
+        "https://ai.google.dev/gemma/docs/integrations/ollama",
+        "https://github.com/google-ai-edge/LiteRT-LM",
+        "https://huggingface.co/google/gemma-4-E2B-it",
+        "https://huggingface.co/google/gemma-4-E4B-it",
+        "https://huggingface.co/google/gemma-4-12B-it",
+        "https://huggingface.co/google/gemma-4-26B-A4B-it",
+        "https://huggingface.co/google/gemma-4-31B-it"
+      ]
+    },
+    {
+      "family": "Qwen3-ASR plus Qwen3 ForcedAligner",
+      "recommended_public_distribution_for_preflight": {
+        "asr_model_id": "Qwen/Qwen3-ASR-1.7B-hf",
+        "asr_revision_observed": "bcd2b5b7f32b480ab5790554cfa8347f246a14f3",
+        "asr_safetensors_bytes": 4076193080,
+        "aligner_model_id": "Qwen/Qwen3-ForcedAligner-0.6B-hf",
+        "aligner_revision_observed": "c07281df297b9905d24a508279258cccf987a064",
+        "aligner_safetensors_bytes": 1835545960,
+        "license_spdx": "Apache-2.0",
+        "private": false,
+        "gated": false
+      },
+      "capabilities": {
+        "asr": [
+          "automatic language identification",
+          "speech recognition for 30 languages and 22 Chinese dialects",
+          "offline and streaming inference",
+          "speech, singing voice, and songs with background music",
+          "long-audio transcription"
+        ],
+        "forced_aligner": [
+          "word- or character-level timestamps from an audio and transcript pair",
+          "arbitrary alignment units",
+          "batch inference"
+        ]
+      },
+      "input_modalities": [
+        "audio",
+        "text transcript for forced alignment"
+      ],
+      "limits": {
+        "asr_numeric_max_audio_duration": "not_declared_in_the_official_open_model_documentation_reviewed",
+        "forced_aligner_max_audio_seconds": 300,
+        "forced_aligner_language_count": 11,
+        "forced_aligner_languages": [
+          "Chinese",
+          "English",
+          "Cantonese",
+          "French",
+          "German",
+          "Italian",
+          "Japanese",
+          "Korean",
+          "Portuguese",
+          "Russian",
+          "Spanish"
+        ],
+        "streaming_timestamps_supported": false
+      },
+      "local_runtime_support": {
+        "native_transformers": "Supported starting with Transformers 5.13.0 for the -hf checkpoints.",
+        "official_qwen_asr_package": "Provides local Transformers and vLLM backends plus a local forced-aligner path.",
+        "official_examples_hardware": "Official performance and quickstart examples use CUDA and optionally FlashAttention 2.",
+        "apple_mps_status": "No official Apple MPS support claim or validated MPS recipe was found. The roughly 5.9-GB combined safetensor payload is memory-plausible on the host, but MPS operator compatibility, speed, and offline behavior require a public/synthetic smoke before selection."
+      },
+      "childlens_shortlist_interpretation": "This is the strongest task-specific ASR and timing challenger found. It must not replace Whisper without a content-blind public/runtime preflight and the locked author audit. If the encountered language is outside the aligner's 11 languages, its timestamps cannot be treated as supported even though ASR may still support that language.",
+      "authoritative_sources": [
+        "https://github.com/QwenLM/Qwen3-ASR",
+        "https://huggingface.co/Qwen/Qwen3-ASR-1.7B-hf",
+        "https://huggingface.co/Qwen/Qwen3-ForcedAligner-0.6B-hf",
+        "https://huggingface.co/collections/Qwen/qwen3-asr",
+        "https://huggingface.co/api/models/Qwen/Qwen3-ASR-1.7B-hf",
+        "https://huggingface.co/api/models/Qwen/Qwen3-ForcedAligner-0.6B-hf"
+      ]
+    },
+    {
+      "family": "Qwen3-VL-8B",
+      "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+      "revision_observed": "0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
+      "license_spdx": "Apache-2.0",
+      "private": false,
+      "gated": false,
+      "official_safetensors_bytes": 17534339512,
+      "capabilities": [
+        "image and multi-image understanding",
+        "video understanding and temporal grounding",
+        "2D object grounding with points and boxes",
+        "OCR and document parsing",
+        "spatial understanding",
+        "visual agent tasks"
+      ],
+      "input_modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "audio_input_supported": false,
+      "audio_limit": "not_applicable",
+      "context": {
+        "native_tokens": 262144,
+        "documented_yarn_extension_tokens": 1000000,
+        "fixed_video_duration_limit_declared": false,
+        "official_description": "hours-long video support is claimed; actual input is bounded by the configured frame/pixel budget and context"
+      },
+      "local_runtime_support": {
+        "officially_documented": [
+          "Hugging Face Transformers >= 4.57.0",
+          "vLLM >= 0.11.0",
+          "SGLang"
+        ],
+        "apple_mps_status": "The official repository does not document MLX, llama.cpp, or an Apple MPS validation. The 17.5-GB BF16 weight payload is memory-plausible but leaves limited unified-memory headroom for the vision encoder, activations, frames, and video preprocessing; a batch-1 public synthetic MPS smoke is required."
+      },
+      "childlens_shortlist_interpretation": "A credible stronger visual/referential challenger to Qwen2-VL-2B, but not an audio model. It should remain a bounded challenger until host MPS compatibility, peak memory, latency, and synthetic grounding output are measured.",
+      "authoritative_sources": [
+        "https://github.com/QwenLM/Qwen3-VL",
+        "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct",
+        "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct/blob/main/LICENSE",
+        "https://huggingface.co/api/models/Qwen/Qwen3-VL-8B-Instruct"
+      ]
+    },
+    {
+      "family": "OpenAI Whisper large-v3 and large-v3-turbo",
+      "official_variants": [
+        {
+          "name": "large-v3",
+          "parameters": 1550000000,
+          "approximate_required_vram_gb": 10,
+          "relative_speed_to_large": "1x",
+          "official_openai_original_license": "MIT",
+          "huggingface_model_id": "openai/whisper-large-v3",
+          "huggingface_revision_observed": "06f233fe06e710322aca913c1bc4249a0d71fce1",
+          "huggingface_metadata_license": "Apache-2.0",
+          "private": false,
+          "gated": false
+        },
+        {
+          "name": "large-v3-turbo",
+          "parameters": 809000000,
+          "approximate_required_vram_gb": 6,
+          "relative_speed_to_large": "8x",
+          "official_openai_original_license": "MIT",
+          "huggingface_model_id": "openai/whisper-large-v3-turbo",
+          "huggingface_revision_observed": "41f01f3fe87f28c78e2fbf8b568835947dd65ed9",
+          "huggingface_metadata_license": "MIT",
+          "private": false,
+          "gated": false
+        }
+      ],
+      "capabilities": [
+        "multilingual speech recognition",
+        "language identification",
+        "speech translation for large-v3",
+        "long-file transcription through sliding or chunked windows"
+      ],
+      "input_modalities": [
+        "audio"
+      ],
+      "limits": {
+        "model_receptive_field_seconds": 30,
+        "long_audio_method": "sliding 30-second windows in the official OpenAI implementation; sequential or overlapping chunked long-form in Transformers",
+        "turbo_translation_supported": false,
+        "performance_varies_by_language": true
+      },
+      "local_runtime_support": {
+        "official_openai_runtime": "openai-whisper provides local PyTorch CLI and Python inference and documents macOS ffmpeg installation.",
+        "transformers_runtime": "Both official Hugging Face model pages provide local AutoModelForSpeechSeq2Seq support.",
+        "existing_v1_3_public_smoke": "The exact pinned whisper.cpp v1.9.1 plus unquantized large-v3-turbo conversion already passed the project's public, network-denied Apple Metal smoke; that is an engineering receipt, not a scientific quality result."
+      },
+      "license_correction": "OpenAI's original Whisper repository states that both code and model weights are MIT. The current openai/whisper-large-v3 Hugging Face repository metadata instead reports Apache-2.0, while the turbo repository reports MIT. A future acquisition receipt must name the exact distribution and preserve its bundled license rather than collapsing these metadata differences.",
+      "childlens_shortlist_interpretation": "Turbo remains the proven host-efficient baseline. Full large-v3 is a quality-oriented challenger with higher cost. Neither supplies human truth, and both require the same locked author audit for transcript and timing quality.",
+      "authoritative_sources": [
+        "https://github.com/openai/whisper",
+        "https://github.com/openai/whisper/discussions/1762",
+        "https://github.com/openai/whisper/discussions/2363",
+        "https://openai.com/index/whisper/",
+        "https://huggingface.co/openai/whisper-large-v3",
+        "https://huggingface.co/openai/whisper-large-v3-turbo",
+        "https://huggingface.co/api/models/openai/whisper-large-v3",
+        "https://huggingface.co/api/models/openai/whisper-large-v3-turbo"
+      ]
+    }
+  ],
+  "fact_corrections": [
+    "Qwen3.6 is an official current release with two reviewed public Apache-2.0 checkpoints, not an unreleased name. Both are vision-language models, not audio models, and neither unquantized checkpoint fits a 32-GiB host.",
+    "The exact Gemma 4 repositories reviewed are currently public, ungated, and Apache-2.0. This differs from older Gemma/PaliGemma assumptions and must not be generalized backward to other Google model families.",
+    "Only Gemma 4 E2B, E4B, and 12B accept audio. Audio is limited to 30 seconds; 26B A4B and 31B are image/video plus text only.",
+    "Qwen3-ASR recognizes 30 languages plus 22 Chinese dialects, but its forced aligner supports only 11 languages and at most five minutes per aligned audio-text pair. Streaming ASR does not return timestamps.",
+    "Qwen3-VL-8B-Instruct is Apache-2.0 and ungated, unlike some earlier Qwen-VL license assumptions. It has no audio input and its official local recipes do not establish Apple MPS support.",
+    "Whisper large-v3 and turbo have a 30-second receptive field even when their runtimes accept arbitrary-length files. Long audio is segmented internally. Turbo is transcription-oriented and does not perform speech translation.",
+    "Whisper license statements must be distribution-specific: OpenAI's original repository says code and weights are MIT, the current large-v3 Hugging Face metadata says Apache-2.0, and the turbo Hugging Face metadata says MIT."
+  ],
+  "provisional_shortlist_for_public_synthetic_preflight_only": {
+    "asr_and_timing": [
+      "Qwen/Qwen3-ASR-1.7B-hf plus Qwen/Qwen3-ForcedAligner-0.6B-hf",
+      "OpenAI Whisper large-v3",
+      "existing Whisper large-v3-turbo baseline"
+    ],
+    "joint_audio_visual": [
+      "google/gemma-4-E2B-it",
+      "google/gemma-4-E4B-it"
+    ],
+    "visual_referential": [
+      "Qwen/Qwen3-VL-8B-Instruct",
+      "existing Qwen2-VL-2B baseline"
+    ],
+    "defer_on_32_gib_host": [
+      "Qwen/Qwen3.6-35B-A3B unquantized",
+      "Qwen/Qwen3.6-27B unquantized",
+      "Gemma 4 26B A4B and 31B because they add no audio and require quantization",
+      "Gemma 4 12B BF16 until peak-memory safety is demonstrated"
+    ]
+  },
+  "next_evidence_required_before_any_selection_change": [
+    "Pin exact revisions and bundled license files without accepting any click-through.",
+    "Run only public or synthetic, network-denied, local-file-only smokes for MPS/operator compatibility and peak memory.",
+    "Measure task-specific latency and output-schema reliability without ChildLens content.",
+    "Freeze a model-comparison rule before any restricted pseudo-label or author-agreement evidence is inspected.",
+    "Keep every candidate output as a measurement-instrument hypothesis and outside learner ancestry."
+  ]
+}

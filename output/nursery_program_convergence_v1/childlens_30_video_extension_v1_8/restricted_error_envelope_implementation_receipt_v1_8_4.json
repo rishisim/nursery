@@ -1,0 +1,17 @@
+{
+  "schema_version": "nursery-childlens-restricted-error-envelope-implementation-receipt-v1.8.4",
+  "status": "PASS",
+  "amendment": "restricted_error_envelope_amendment_v1_8_4.json",
+  "post_change_runner_sha256": "ccf9f7ab28640fd9008e20d7b9bd8413e7d47d02560eb965e6d4210f16ff4e06",
+  "test_file_sha256": "2f686c1f0825eeb456902048f29f2949b8d0b4bb31411b3fba6e11596c39c4f3",
+  "tests_passed": 13,
+  "restricted_fields_permitted": [
+    "schema_version",
+    "status",
+    "failure_code"
+  ],
+  "restricted_payload_exported": false,
+  "sample_or_scientific_protocol_changed": false,
+  "restricted_gemma_inference_opened": false,
+  "scientific_endpoint_opened": false
+}

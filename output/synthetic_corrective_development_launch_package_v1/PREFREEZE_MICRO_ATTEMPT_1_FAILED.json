@@ -1,0 +1,11 @@
+{
+  "confirmation_outcome_count": 0,
+  "development_outcome_count": 0,
+  "failure": "no exact different-composition donor existed inside one overly narrow bag-size-by-presence shuffle stratum",
+  "guarded_model_operations": 0,
+  "partial_tree_preserved": "parallel_micro_persisted_inputs",
+  "repair_scope": "prefreeze shuffle donor blocking only; attempt 2 uses a corpus-wide exact bijection preserving the full side-stream marginal",
+  "schema_version": "nursery-corrective-prefreeze-failure-v1",
+  "scientific_outcome": false,
+  "status": "FAILED_NO_OUTCOME"
+}

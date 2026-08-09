@@ -1,0 +1,251 @@
+{
+  "schema_version": "childlens-resource-admission-preflight-v1.1.0",
+  "created_date": "2026-07-21",
+  "observed_at_local": "2026-07-21T16:58:32-07:00",
+  "observed_at_utc": "2026-07-21T23:58:32Z",
+  "status": "HOST_CAPACITY_CONDITIONAL_QUARANTINE_NOT_ADMITTED",
+  "time_scoped_preflight": true,
+  "superseded_for_metadata_and_annotation_shards_by": "childlens-quarantine-admission-receipt-v1.1.0",
+  "video_transfer_still_not_admitted": true,
+  "terminal_decision": null,
+  "scientific_outcome_executed": false,
+  "scope": {
+    "keeper_accessed": false,
+    "email_accessed": false,
+    "restricted_payload_accessed": false,
+    "download_executed": false,
+    "quarantine_created": false,
+    "measurement_instrument_run": false,
+    "learner_training_run": false,
+    "v1_modified": false,
+    "aea_empirical_material_accessed": false,
+    "aea_nonempirical_provenance_search_match": true
+  },
+  "host_receipt": {
+    "storage": {
+      "filesystem": "/dev/disk3s5",
+      "mount": "/System/Volumes/Data",
+      "block_size_bytes": 1024,
+      "available_blocks": 128274540,
+      "available_bytes": 131353128960,
+      "available_gib": 122.33213424682617,
+      "capacity_percent": 87,
+      "shared_volume": true,
+      "time_varying": true
+    },
+    "memory": {
+      "unified_memory_bytes": 34359738368,
+      "unified_memory_gib": 32,
+      "memory_pressure_system_wide_free_percent_snapshot": 87,
+      "swap_total_mib": 0,
+      "swap_used_mib": 0,
+      "snapshot_not_worker_admission_by_itself": true
+    },
+    "cpu": {
+      "logical_count": 10,
+      "physical_count": 10,
+      "initial_worker_count": 2,
+      "hard_max_worker_count": 4,
+      "nested_threads_per_worker": 1
+    },
+    "accelerator": {
+      "machine": "arm64",
+      "gpu": "Apple M5",
+      "gpu_core_count": 10,
+      "metal_support": "Metal 4",
+      "python_version": "3.12.13",
+      "torch_version": "2.13.0",
+      "mps_built": true,
+      "mps_available": true,
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "global_mps_process_limit": 1,
+      "learner_training_authorized": false
+    },
+    "local_storage_controls": {
+      "filevault": "ON",
+      "parent_time_machine_scope": "INCLUDED",
+      "volume_content_indexing": "ENABLED",
+      "exact_quarantine_root_disposition_verified": false
+    }
+  },
+  "quarantine": {
+    "proposed_root": "RESTRICTED_ROOT_OUTSIDE_REPOSITORY",
+    "repository_root": "/Users/rishisim/Documents/research/nursery",
+    "exists": false,
+    "outside_repository": true,
+    "same_device_as_repository": true,
+    "device_id": 16777230,
+    "required_directory_mode_octal": "0700",
+    "required_file_mode_octal": "0600",
+    "required_umask_octal": "077",
+    "symlinks_permitted": false,
+    "cloud_sync_permitted": false,
+    "unapproved_acl_permitted": false,
+    "git_tracking_permitted": false,
+    "admission": "NOT_ADMITTED_NOT_CREATED",
+    "remaining_checks": [
+      "G1_PERMISSION_FOR_EACH_ACTION_AND_DERIVATIVE_CLASS",
+      "EXACT_ROOT_REALPATH_AND_NON_SYMLINK_CHECK",
+      "OWNER_ONLY_MODE_AND_ACL_CHECK",
+      "EXACT_ROOT_BACKUP_DISPOSITION",
+      "EXACT_ROOT_CONTENT_INDEXING_DISPOSITION",
+      "FRESH_NAMESPACE_AND_VOLUME_CAPACITY_CHECK"
+    ]
+  },
+  "capacity_controls": {
+    "gib_bytes": 1073741824,
+    "raw_cap_gib": 20,
+    "raw_cap_bytes": 21474836480,
+    "namespace_peak_cap_gib": 73,
+    "namespace_peak_cap_bytes": 78383153152,
+    "minimum_free_after_peak_gib": 50,
+    "minimum_free_after_peak_bytes": 53687091200,
+    "maximum_additional_allocation_if_namespace_initially_empty_at_snapshot_gib": 72.33213424682617,
+    "maximum_additional_allocation_if_namespace_initially_empty_at_snapshot_bytes": 77666037760,
+    "full_archive_permitted": false,
+    "full_frame_materialization_permitted": false,
+    "simultaneous_in_flight_shards": 1,
+    "exact_selected_sizes_required": true,
+    "finite_derivative_and_scratch_bounds_required": true
+  },
+  "equations": {
+    "symbols": {
+      "F0": "fresh shared-volume free bytes",
+      "N0": "allocated bytes already charged to the complete v1.1 namespace",
+      "R": "sum of exact byte sizes over unique selected raw acquisition objects",
+      "D": "conservative restricted-derivative byte upper bound",
+      "S": "conservative scratch and in-flight transfer byte upper bound",
+      "Q": "annotation, restricted receipt, and QA byte upper bound",
+      "T": "dedicated instrument and environment byte upper bound",
+      "C": "frozen contingency bytes",
+      "Delta": "maximum additional bytes coexisting above current state in the proposed phase",
+      "Npeak": "N0 + Delta",
+      "Fafter": "F0 - Delta"
+    },
+    "required_predicates": [
+      "R <= 20 * 1073741824",
+      "N0 + Delta <= 73 * 1073741824",
+      "F0 - Delta >= 50 * 1073741824",
+      "Delta <= min(73 * 1073741824 - N0, F0 - 50 * 1073741824)",
+      "ALL_SELECTED_SIZES_EXACT_AND_NONNEGATIVE",
+      "D_S_Q_T_C_AND_DOWNLOADER_DUPLICATION_HAVE_FINITE_UPPER_BOUNDS"
+    ]
+  },
+  "v1_literal_planning_envelopes": [
+    {
+      "name": "low",
+      "raw_gib": 8.0,
+      "derivative_gib": 2.0,
+      "scratch_gib": 16.0,
+      "tools_gib": 8.0,
+      "qa_gib": 0.5,
+      "contingency_gib": 6.9,
+      "peak_gib": 41.4,
+      "projected_free_at_snapshot_gib": 80.93213424682617,
+      "namespace_headroom_gib": 31.6,
+      "free_floor_headroom_gib": 30.93213424682617,
+      "capacity_status": "PASS_AT_SNAPSHOT"
+    },
+    {
+      "name": "base",
+      "raw_gib": 15.0,
+      "derivative_gib": 3.8,
+      "scratch_gib": 30.0,
+      "tools_gib": 8.0,
+      "qa_gib": 1.0,
+      "contingency_gib": 11.6,
+      "peak_gib": 69.4,
+      "projected_free_at_snapshot_gib": 52.93213424682617,
+      "namespace_headroom_gib": 3.6,
+      "free_floor_headroom_gib": 2.932134246826172,
+      "capacity_status": "CONDITIONAL_PASS_NARROW_MARGIN"
+    },
+    {
+      "name": "high",
+      "raw_gib": 20.0,
+      "derivative_gib": 5.0,
+      "scratch_gib": 40.0,
+      "tools_gib": 8.0,
+      "qa_gib": 2.0,
+      "contingency_gib": 15.0,
+      "peak_gib": 90.0,
+      "projected_free_at_snapshot_gib": 32.33213424682617,
+      "namespace_headroom_gib": -17.0,
+      "free_floor_headroom_gib": -17.667865753173828,
+      "capacity_status": "FAIL_NAMESPACE_CAP_AND_FREE_FLOOR"
+    }
+  ],
+  "acquisition_controls": {
+    "mode": "METADATA_FIRST_CONTENT_BLIND_SELECTIVE_SERIAL_SHARDS",
+    "deduplication_scope": "WITHIN_BOUND_CHILDLENS_RELEASE_ONLY",
+    "deduplication_key_pretransfer": "IMMUTABLE_RELEASE_RECEIPT_PLUS_REMOTE_OBJECT_IDENTITY_SIZE_AND_ETAG_OR_CHECKSUM_WHEN_EXPOSED",
+    "deduplication_key_posttransfer": "LOCAL_SHA256_IN_RESTRICTED_MANIFEST",
+    "one_partial_per_object": true,
+    "parallel_or_speculative_downloads": false,
+    "atomic_same_filesystem_promotion_required": true,
+    "fresh_capacity_check_before_each_shard": true,
+    "unknown_size_object_selectable": false,
+    "downloader_double_materialization_must_be_charged_if_not_disproven": true,
+    "cross_corpus_cache_reuse_or_scan": false
+  },
+  "compute_controls": {
+    "cpu_worker_admission": "CONDITIONAL_PASS_AT_2_WORKERS",
+    "four_workers_requires_content_blind_benchmark": true,
+    "memory_equation": "W*worker_peak_RSS + controller_peak_RSS + instrument_peak_RSS + 8_GiB_reserve <= 32_GiB",
+    "abort_on_swap_or_memory_pressure": true,
+    "abort_on_sustained_pageout_growth": true,
+    "abort_on_io_saturation": true,
+    "mps_status": "AVAILABLE_SINGLE_PROCESS_ONLY",
+    "measurement_and_training_overlap_permitted": false,
+    "learner_training_permitted": false
+  },
+  "abort_conditions": [
+    "G1_NOT_PASS_FOR_SPECIFIC_ACTION_OR_DERIVATIVE",
+    "IMMUTABLE_RELEASE_OR_RESTRICTED_MANIFEST_DIGEST_ABSENT_OR_CHANGED",
+    "FROZEN_SELECTION_RULE_VIOLATION",
+    "UNKNOWN_SELECTED_SIZE_DUPLICATE_KEY_EXPANSION_BOUND_TEMP_BOUND_OR_CACHE_LOCATION",
+    "RAW_BYTES_ABOVE_20_GIB",
+    "PROJECTED_NAMESPACE_ABOVE_73_GIB",
+    "PROJECTED_FREE_SPACE_BELOW_50_GIB",
+    "FULL_ARCHIVE_OR_ALL_FRAME_MATERIALIZATION",
+    "MORE_THAN_ONE_IN_FLIGHT_SHARD",
+    "UNCOUNTED_CACHE_OUTSIDE_NAMESPACE",
+    "QUARANTINE_PATH_INSIDE_REPO_SYMLINKED_GROUP_WORLD_ACCESSIBLE_UNAPPROVED_ACL_OR_CLOUD_SYNCED",
+    "BACKUP_OR_INDEXING_DISPOSITION_UNRESOLVED_UNDER_TERMS",
+    "RESTRICTED_PAYLOAD_WOULD_ENTER_GIT_REPORT_TOOL_OUTPUT_OR_EXTERNAL_SERVICE",
+    "CPU_WORKERS_ABOVE_4_OR_NESTED_THREADS_ABOVE_1",
+    "MEMORY_IO_OR_MPS_CONTENTION_GATE_FAILS",
+    "LEARNER_OR_CAUSAL_OUTCOME_WOULD_RUN"
+  ],
+  "disposition": {
+    "host_storage": "PASS_LOW_CONDITIONAL_PASS_BASE_FAIL_HIGH_AT_SNAPSHOT",
+    "cpu_memory": "CONDITIONAL_PASS_AT_2_WORKERS",
+    "mps": "AVAILABLE_BUT_SINGLE_PROCESS_ONLY_NO_TRAINING",
+    "quarantine": "NOT_ADMITTED_NOT_CREATED",
+    "transfer": "NOT_ADMITTED",
+    "reason_transfer_not_admitted": [
+      "G1_NOT_RESOLVED_IN_THIS_WORKSTREAM",
+      "EXACT_SELECTED_BYTES_NOT_AVAILABLE_IN_THIS_WORKSTREAM",
+      "DERIVATIVE_AND_TEMPORARY_EXPANSION_BOUNDS_NOT_MEASURED",
+      "EXACT_QUARANTINE_ROOT_CONTROLS_NOT_VERIFIED"
+    ]
+  },
+  "privacy_and_provenance": {
+    "childlens_empirical_material_used": false,
+    "aea_empirical_material_used": false,
+    "babyview_empirical_material_used": false,
+    "procedural_search_scope_incident": {
+      "occurred": true,
+      "description": "OVERBROAD_RUNTIME_PATH_SEARCH_MATCHED_TWO_NONEMPIRICAL_ENVIRONMENT_FIELDS_IN_AN_AEA_PROVENANCE_RECEIPT",
+      "aea_data_aggregate_identifier_result_code_tokenizer_checkpoint_or_weight_opened": false,
+      "matched_values_used": false,
+      "host_values_independently_reprobed": true,
+      "containment": "SUBSEQUENT_PROBES_USED_FIXED_CHILDLENS_RELEVANT_PATHS"
+    },
+    "identifiers_in_artifact": false,
+    "transcript_or_lexical_strings_in_artifact": false,
+    "exact_media_timestamps_in_artifact": false,
+    "external_service_used": false
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "alternate_or_corrected_report_allowed": false,
+  "bytecode_writes_disabled": true,
+  "freeze_after": {
+    "checked_frozen_artifacts": 10,
+    "checked_tracked_files": 48,
+    "problems": [],
+    "status": "PASS"
+  },
+  "freeze_before": {
+    "checked_frozen_artifacts": 10,
+    "checked_tracked_files": 48,
+    "problems": [],
+    "status": "PASS"
+  },
+  "official": true,
+  "only_admissible_test_report": true,
+  "order": "development launch tests first, then complete repository tests",
+  "python_executable": "/Users/rishisim/Documents/research/nursery/.venv/bin/python",
+  "python_sha256": "f8cf5db64fd3715840686fcdb0f00b8b7e6c9b1e9b5f10a31183160c9bb6a6fc",
+  "python_version": "3.12.13 (main, Mar 10 2026, 18:18:07) [Clang 21.1.4 ]",
+  "results": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 /Users/rishisim/Documents/research/nursery/.venv/bin/python -m pytest -q -p no:cacheprovider /Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v3/frozen_source_snapshot/tests/test_synthetic_development_launch_v3.py",
+      "cwd": "/Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v3/frozen_source_snapshot",
+      "exit_code": 0,
+      "output": "....................                                                     [100%]\n20 passed in 6.69s\n",
+      "source_scope": "frozen_source_snapshot"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 /Users/rishisim/Documents/research/nursery/.venv/bin/python -m pytest -q -p no:cacheprovider /Users/rishisim/Documents/research/nursery/tests",
+      "cwd": "/Users/rishisim/Documents/research/nursery",
+      "exit_code": 0,
+      "output": "........................................................................ [ 27%]\n........................................................................ [ 54%]\n..sssssssssssssssss..................................................... [ 82%]\n...............................................                          [100%]\n246 passed, 17 skipped in 176.67s (0:02:56)\n",
+      "source_scope": "full_live_repository_after_tracked_freeze_verification"
+    }
+  ],
+  "status": "PASS"
+}

@@ -1,0 +1,18 @@
+{
+  "confirmation_outcome_count": 0,
+  "development_outcome_count": 0,
+  "frozen_jobs": 4,
+  "input_manifest_sha256": "3a90f335ef6d9657483cbb1c956aa6a491e62d91f2d214c1ad128a3e12a85157",
+  "jobs_1_complete_manifest_sha256": "a2e7b98d83eb8e9431c4c66efab6487b7e640d8a84fce04974c64adbb1a1a19f",
+  "jobs_n_complete_manifest_sha256": "0f0e54493788e0923cbaee5b6855cc368849a7fbff3f1232ec261a062f07f331",
+  "micro_attempt_receipt_sha256": "0461870672ee84f948869e216d3a1b08b74809365c91461c5ceac3fa00c4e7c2",
+  "micro_attempt_validation_digest": "0c19bda6b293915545ed1ef22cd4b73ab560ab94685638dece90bb9679caf25f",
+  "non_replayable": true,
+  "parallel_benchmark_sha256": "e93b3573de915930dd992a93abdf587c8393b81deae7fe0316ae88c3cf330b4f",
+  "parallel_equivalence_sha256": "a88d2f8998709bd4a53a963ece248cfbf77793af5f2e832389b61911693faee8",
+  "prequalification_design_lock_sha256": "3188f1b41a21bfd88afb246f4162435b5d6e3abe3f61e9fc2361e1901913045c",
+  "schema_version": "nursery-corrective-parallel-micro-completion-v3",
+  "scientific_inference_suppressed": true,
+  "status": "PASS",
+  "worker_launcher_preflight_sha256": "ebfac78ebc983a30ace71c361a94e9154a9835ea5fc39d9cadc99e3a0352f938"
+}

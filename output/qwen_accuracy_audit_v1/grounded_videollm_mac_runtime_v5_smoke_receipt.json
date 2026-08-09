@@ -1,0 +1,57 @@
+{
+  "schema_version": "nursery-grounded-videollm-mac-runtime-v5-smoke-v1.0.0",
+  "protocol_id": "childlens-independent-second-instrument-mac-runtime-v5",
+  "executed_at": "2026-07-23",
+  "status": "PASS",
+  "prospective_freeze": {
+    "v5_protocol_sha256": "2c9d3cb4042378975e2174f495a088e7d017fcfc946ce97e4936b4d140deebbf",
+    "smoke_runner_sha256": "9bf1ca5fee73c8631022b6269c64fd963ee68377f9b41c9edf6a4dcb9cf1df2d",
+    "private_smoke_receipt_sha256": "24f34437333172f6dba777b6629407e209cae8b48d2a14c4300ddb3a1a0056d8"
+  },
+  "runtime": {
+    "host": "Apple M5",
+    "architecture": "arm64",
+    "unified_memory_gib": 32,
+    "python": "3.10.20",
+    "pytorch": "2.13.0",
+    "attention": "eager",
+    "module_placement": {
+      "vision_tower": "MPS float32",
+      "video_encoder": "CPU float32",
+      "multi_modal_projector": "MPS float32",
+      "video_projecter": "MPS float32",
+      "language_model": "MPS float16"
+    },
+    "module_placement_preflight_passed": true,
+    "network_denial_sentinel_passed": true,
+    "model_loaded": true,
+    "generation_completed": true,
+    "schema_parseable": true,
+    "semantic_correctness_scored": false,
+    "response_text_retained": false,
+    "raw_output_sha256": "e0fbd679dec6fa2b438550a6b0c9c29e110650cb3079e90ea515f70a4ac6b299",
+    "canonical_output_sha256": "a7ece448846097e0616b0e8b48054b91352072e119d0e3a20d67f858250a0551",
+    "elapsed_seconds": 180.31157803535461,
+    "peak_rss_bytes": 16875552768,
+    "mps_driver_allocated_bytes": 22089023488
+  },
+  "privacy_and_scope": {
+    "public_synthetic_fixture_only": true,
+    "restricted_packet_discovered_or_opened": false,
+    "restricted_inference_run": false,
+    "qwen_rerun": false,
+    "new_acquisition": false,
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false
+  },
+  "decision": {
+    "public_canary_authorized_next": true,
+    "restricted_stage_authorized": false,
+    "childlens_branch_reopen": false
+  },
+  "repository_actions": {
+    "committed": false,
+    "pushed": false,
+    "published": false
+  }
+}

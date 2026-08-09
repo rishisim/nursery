@@ -1,0 +1,32 @@
+{
+  "alternate_or_corrected_report_allowed": false,
+  "bytecode_writes_disabled": true,
+  "freeze_after": {
+    "checked_frozen_artifacts": 10,
+    "checked_tracked_files": 49,
+    "problems": [],
+    "status": "PASS"
+  },
+  "freeze_before": {
+    "checked_frozen_artifacts": 10,
+    "checked_tracked_files": 49,
+    "problems": [],
+    "status": "PASS"
+  },
+  "official": true,
+  "only_admissible_test_report": true,
+  "order": "development launch tests first, then complete repository tests",
+  "python_executable": "/Users/rishisim/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/bin/python3.12",
+  "python_sha256": "f8cf5db64fd3715840686fcdb0f00b8b7e6c9b1e9b5f10a31183160c9bb6a6fc",
+  "python_version": "3.12.13 (main, Mar 10 2026, 18:18:07) [Clang 21.1.4 ]",
+  "results": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 /Users/rishisim/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/bin/python3.12 -m pytest -q -p no:cacheprovider /Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v1/frozen_source_snapshot/tests/test_synthetic_development_launch_v1.py",
+      "cwd": "/Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v1/frozen_source_snapshot",
+      "exit_code": 1,
+      "output": "/Users/rishisim/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/bin/python3.12: No module named pytest\n",
+      "source_scope": "frozen_source_snapshot"
+    }
+  ],
+  "status": "FAIL"
+}

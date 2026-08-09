@@ -1,0 +1,31 @@
+{
+  "schema_version": "nursery-childlens-overlapping-candidate-window-validator-amendment-v1.8.5",
+  "status": "FROZEN_BEFORE_RETRY",
+  "date": "2026-07-22",
+  "failure_code": "E_QWEN_VLM",
+  "diagnosis": {
+    "candidate_windows_total": 135,
+    "adjacent_overlap_pairs": 90,
+    "nonmonotonic_pairs": 0,
+    "root_cause": "The generic non-overlapping speech-interval validator was incorrectly reused for intentionally overlapping candidate windows."
+  },
+  "scope": "CONTENT_INDEPENDENT_INPUT_VALIDATION_CORRECTION_ONLY",
+  "allowed_change": "Add a candidate-window validator that permits overlap while retaining exact key, finite numeric, nonnegative, positive-duration, and monotonic-start requirements.",
+  "unchanged": [
+    "strict non-overlap validation for speech extraction intervals",
+    "selected items and participant grouping",
+    "candidate-window values and order",
+    "frame offsets",
+    "Qwen and Gemma artifacts",
+    "prompts and semantic decoding",
+    "parser allowance",
+    "calibration thresholds and ranges",
+    "causal protocol, learner, controls, seeds, and endpoints",
+    "privacy and network denial"
+  ],
+  "pre_change_worker_sha256": "e785ea475aee62fd72ab9bc064f3c9c3dcbc189b4361e996963edf9f2ab14f88",
+  "pre_change_runner_sha256": "ccf9f7ab28640fd9008e20d7b9bd8413e7d47d02560eb965e6d4210f16ff4e06",
+  "restricted_qwen_vlm_output_created_before_amendment": false,
+  "restricted_gemma_inference_opened_before_amendment": false,
+  "scientific_endpoint_opened_before_amendment": false
+}

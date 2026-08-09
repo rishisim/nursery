@@ -1,0 +1,124 @@
+{
+  "schema_version": "nursery-childlens-pseudo-calibration-coordinator-design-v1",
+  "generated_on": "2026-07-22",
+  "status": "REVISE_BEFORE_IMPLEMENTATION",
+  "scope": {
+    "design_only": true,
+    "restricted_or_quarantine_access": false,
+    "historical_childlens_namespace_modified": false,
+    "scientific_outcome_run": false
+  },
+  "frozen_protocols": {
+    "pseudo_calibration": {
+      "path": "docs/nursery_program_convergence_v1/frozen_childlens_pseudo_calibration_protocol.json",
+      "file_sha256": "a39841818f7b4393e9dcc0f92ae282b7488780f70615a59a38c5bfdaf6fb9c2b",
+      "status": "FROZEN_BEFORE_AGREEMENT_AGGREGATES"
+    },
+    "minimal_realism": {
+      "path": "docs/nursery_program_convergence_v1/frozen_minimal_realism_protocol.json",
+      "file_sha256": "662d8b8f988f2168b81bfce7d62a59855394398ac170eef052ab2303ddc1ec1c",
+      "status": "FROZEN_FOR_IMPLEMENTATION_NOT_AUTHORIZED_FOR_SCIENTIFIC_OUTCOME"
+    }
+  },
+  "proposed_files": {
+    "coordinator_and_exporter": "scripts/nursery_childlens_pseudo_calibration_v1.py",
+    "tests": "tests/test_nursery_childlens_pseudo_calibration_v1.py",
+    "future_public_receipt": "output/nursery_program_convergence_v1/childlens_pseudo_calibration_receipt.json"
+  },
+  "minimal_architecture": {
+    "new_runtime_scripts": 1,
+    "new_test_modules": 1,
+    "public_phase_opens_quarantine": false,
+    "restricted_phase_network_denied": true,
+    "restricted_result_transport": "bounded_inherited_file_descriptor",
+    "aggregate_exporter": "pure_function_inside_coordinator",
+    "historical_registry_mutation": false,
+    "maximum_concurrent_mps_heavy_processes": 1,
+    "cpu_workers": [2, 4]
+  },
+  "safe_firewall_imports": [
+    "NetworkIsolationBackend",
+    "verify_network_isolation",
+    "scrubbed_subprocess_environment",
+    "validate_quarantine_root",
+    "ResourceBudget"
+  ],
+  "historical_nonintegration_points": [
+    "do_not_mutate_FIXED_ADAPTER_PROFILES",
+    "do_not_reuse_full_pilot_build_aggregate_receipt_for_comparisons",
+    "do_not_update_historical_checkpoint_or_pseudo_label_files",
+    "do_not_use_full_pilot_runner_as_15_minute_coordinator"
+  ],
+  "instrument_pairs": {
+    "speech": [
+      "whisper_cpp_large_v3_turbo",
+      "qwen3_asr_1_7b_plus_forced_aligner_0_6b"
+    ],
+    "referential": [
+      "qwen2_vl_2b_existing",
+      "gemma4_e4b_it_4bit"
+    ]
+  },
+  "sample_binding": {
+    "item_count": 15,
+    "total_seconds": 900,
+    "prediction_independent": true,
+    "speech_units": "exact_preselected_one_minute_intervals",
+    "referential_crosswalk_proposal": "existing_frozen_window_center_in_selected_half_open_interval",
+    "crosswalk_requires_pre_output_approval": true,
+    "reserve_trigger_can_use_agreement": false
+  },
+  "baseline_reuse": {
+    "whisper": "read_only_hash_verified_subset",
+    "qwen2": "read_only_hash_verified_subset_with_strict_schema_bridge",
+    "qwen2_missing_fields": ["visibility_bin", "lag_event_unit_bin"],
+    "qwen2_missing_field_policy": "abstain_then_one_schema_retry_only_if_frozen_schema_or_abstention_gate_fails",
+    "historical_file_write": false
+  },
+  "comparisons": {
+    "speech_boundary": "maximum_cardinality_one_to_one_500ms_collar_then_minimum_total_boundary_error",
+    "transcript": "symmetric_German_source_normalized_WER_and_CER_disagreement_only",
+    "language_id": "aggregate_item_level_agreement_and_abstention",
+    "referential": "raw_agreement_kappa_when_defined_prevalence_abstention_schema_validity",
+    "majority_vote": false,
+    "translation_as_gold": false,
+    "model_as_human": false
+  },
+  "uncertainty": {
+    "cluster_unit": "selected_item",
+    "resamples": 5000,
+    "seed": 730001,
+    "intersection_union_and_disagreement_retained": true,
+    "grid_resolution_declared": false,
+    "envelope_status_until_resolution_freeze": "BLOCKED_GRID_RESOLUTION_UNFROZEN"
+  },
+  "public_export": {
+    "exact_schema_only": true,
+    "raw_counts": false,
+    "minimum_cluster_k": 5,
+    "complementary_suppression": true,
+    "paths": false,
+    "identifiers": false,
+    "filenames": false,
+    "exact_timestamps_or_intervals": false,
+    "transcript_or_lexical_content": false,
+    "frames_or_audio": false,
+    "item_level_predictions": false,
+    "confidence_or_raw_model_payload": false,
+    "free_form_errors": false
+  },
+  "consumer_compatibility": {
+    "standalone_future_protocol_that_explicitly_permits_childlens_aggregates": "CONDITIONAL",
+    "nursery_synthetic_minimal_realism_extension": false,
+    "minimal_realism_conflict": "frozen ancestry firewall forbids ChildLens empirical data pseudo-labels aggregates priors calibration and results"
+  },
+  "preimplementation_blockers": [
+    "simulator_grid_resolution_per_dimension_missing",
+    "referential_window_crosswalk_not_explicitly_frozen",
+    "boundary_matching_tie_break_not_explicitly_frozen",
+    "German_normalization_not_explicitly_frozen",
+    "standalone_consumer_boundary_must_be_confirmed"
+  ],
+  "required_test_count": 25,
+  "exact_next_action": "freeze a short implementation clarification, then implement only new nursery_* coordinator/test files and run synthetic-sentinel validation before any separately authorized restricted inference"
+}

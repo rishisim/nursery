@@ -1,0 +1,36 @@
+{
+  "protocol_id": "synthetic-benchmark-protocol-fidelity-v4",
+  "retrieved_utc_date": "2026-07-15",
+  "sources": [
+    {
+      "citation": "Yu, C. & Smith, L. B. (2007). Rapid word learning under uncertainty via cross-situational statistics. Psychological Science 18(5).",
+      "doi": "10.1111/j.1467-9280.2007.01915.x",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/17576281/",
+      "use": "Multiple ambiguous word-referent exposures can be informative through cross-situational co-occurrence; motivates the non-oracular repeated-occurrence fixture."
+    },
+    {
+      "citation": "Fazly, A., Alishahi, A. & Stevenson, S. (2010). A probabilistic computational model of cross-situational word learning. Cognitive Science 34(6).",
+      "doi": "10.1111/j.1551-6709.2010.01104.x",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21564243/",
+      "use": "Probabilistic alignment normalized against co-occurring words motivates explicit within-episode competition instead of independent token fits."
+    },
+    {
+      "citation": "Dempster, A. P., Laird, N. M. & Rubin, D. B. (1977). Maximum likelihood from incomplete data via the EM algorithm. JRSS B 39(1).",
+      "url": "https://www.jstor.org/stable/2984875",
+      "use": "Motivates repeated latent-assignment and parameter-update iterations; v4 does not claim its custom objective is a likelihood-equivalent EM implementation."
+    },
+    {
+      "citation": "Efron, B. (1987). Better bootstrap confidence intervals. JASA 82(397).",
+      "doi": "10.1080/01621459.1987.10478410",
+      "url": "https://doi.org/10.1080/01621459.1987.10478410",
+      "use": "Supports predeclared bootstrap inference while v4 explicitly branches away from undefined studentization under zero variance."
+    },
+    {
+      "citation": "SciPy bootstrap reference, version 1.17 documentation.",
+      "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html",
+      "use": "Documents that degenerate bootstrap distributions can yield invalid intervals, motivating an explicit labelled degenerate-data branch rather than silent NaNs or an empty quantile call."
+    }
+  ],
+  "scope_note": "Sources constrain method design only. No source was used to tune a language outcome, and no restricted or AEA material was accessed."
+}
+

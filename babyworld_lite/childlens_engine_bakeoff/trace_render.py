@@ -26,13 +26,21 @@ def _scene_option(kernel: KernelModel, *, show_collision_hand: bool) -> mujoco.M
         )
     ]
     model.geom_group[kernel_geom_ids] = 5
-    # The deterministic support is part of the staged activity, not a scene
-    # replacement.  Keep it in both layers while hiding the physics hand/target
-    # from the appearance background.
-    model.geom_group[model.geom("kernel_support_geom").id] = 0
     if show_collision_hand:
         model.geom_group[list(kernel.hand_geom_ids)] = 0
         model.geom_group[kernel.target_geom_id] = 0
+        model.geom_group[model.geom("kernel_support_geom").id] = 0
+    # MolmoSpaces FloorPlan201 contains one textureless, extremely elongated
+    # floor-lamp mesh that crosses the egocentric view like a skin-coloured
+    # collision capsule.  Exclude only that malformed visual submesh; retain
+    # the rest of the lamp and all collision geometry for simulation.
+    for geom_id in range(model.ngeom):
+        name = model.geom(geom_id).name or ""
+        if "floorlamp_" not in name or not name.endswith("_visual_3"):
+            continue
+        positive = model.geom_size[geom_id][model.geom_size[geom_id] > 1e-9]
+        if positive.size and float(positive.max() / positive.min()) >= 20:
+            model.geom_group[geom_id] = 5
     option.geomgroup[5] = 0
     return option
 

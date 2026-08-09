@@ -1,0 +1,182 @@
+{
+  "schema_version": "nursery-childlens-30-video-extension-v1.8.0",
+  "protocol_id": "childlens-provisional-pseudo-calibration-one-time-30-video-extension",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_BEFORE_ADDITIONAL_ITEM_SELECTION_OR_MEDIA_OPEN",
+  "decision_context": {
+    "user_selected_option": "A_ONE_TIME_SAMPLE_SIZE_EXTENSION",
+    "reason": "The 15-item two-model calibration was structurally valid but the null-or-irrelevant envelope was not publishable under K=5 cluster suppression.",
+    "predecessor_calibration_receipt_sha256": "2918e5094071e003931f79286945ad515ad41a2c5987eee3e98b14ea398f5b56",
+    "predecessor_terminal_state": "GENUINE_USER_ONLY_BLOCKER",
+    "post_failure_extension_disclosed": true,
+    "effect_direction_or_causal_endpoint_inspected": false
+  },
+  "claim_boundary": {
+    "permitted": "Two fixed local model paths provide provisional aggregate ranges from one bounded ChildLens pilot for a later simulator-oracle directional prototype.",
+    "forbidden": [
+      "model agreement as ground truth or human validation",
+      "ChildLens transcript or referent correctness",
+      "ChildLens evidence of language-acquisition improvement",
+      "generalization to infants or BabyView",
+      "publication-grade naturalistic validation"
+    ]
+  },
+  "corpus_and_ancestry_boundary": {
+    "sole_empirical_anchor": "ChildLens currently authorized release",
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false,
+    "cross_corpus_pooling": false,
+    "learner_ancestry_from_instruments": false,
+    "simulator_oracle_only_evaluation_truth": true
+  },
+  "sample": {
+    "original_items_retained_unchanged": 15,
+    "additional_items": 15,
+    "combined_items": 30,
+    "original_participants_retained_unchanged": true,
+    "additional_participant_rule": "Exactly one additional video from each of 15 participant groups absent from the original sample.",
+    "combined_participant_target": 30,
+    "no_reselection_of_original_items": true,
+    "maximum_additional_selection_attempts": 1,
+    "no_further_expansion": true
+  },
+  "additional_item_eligibility": {
+    "requires_release_annotation_link": true,
+    "requires_selective_copy_availability": true,
+    "requires_participant_and_session_grouping": true,
+    "requires_speech_presence_bin": "PRESENT",
+    "requires_at_least_one_verified_local_official_annotation": true,
+    "requires_at_least_60000_ms_unioned_official_speech_presence": true,
+    "excludes_original_media_and_participant_groups": true,
+    "content_fields_consulted": false,
+    "model_outputs_consulted": false,
+    "lexical_content_consulted": false,
+    "visual_content_consulted": false
+  },
+  "selection": {
+    "release_binding": "existing immutable public snapshot observation plus deterministic restricted-manifest digest",
+    "strata": [
+      "coarse activity label",
+      "speech-presence bin",
+      "duration tertile over the eligible unused pool",
+      "location label when available"
+    ],
+    "selection_hash": "SHA256(restricted_release_binding_digest || protocol_id || media_key)",
+    "algorithm": "Within each metadata stratum sort by selection hash. Repeatedly choose the stratum with the fewest already selected additions, breaking stratum ties by SHA256(restricted_release_binding_digest || protocol_id || canonical_stratum), then choose its first hash-ordered candidate whose participant is unused. Stop exactly at 15.",
+    "media_size_used_for_ranking": false,
+    "access_failure_reselection": false,
+    "selection_receipt_export": "digest plus K=5-safe aggregate counts only"
+  },
+  "speech_sample": {
+    "additional_seconds_per_item": 60,
+    "additional_total_seconds": 900,
+    "combined_total_seconds": 1800,
+    "source": "official speech-presence windows only",
+    "time_grid": "integer milliseconds with start ceiling and end floor",
+    "window_normalization": "sort and coalesce overlap or adjacency",
+    "block_placement": "Choose one 60000-ms block in unioned official speech time using SHA256(combined_selection_digest || protocol_id || speech-block || media_key), then map it back to physical source intervals.",
+    "model_predictions_used": false,
+    "confidence_used": false,
+    "lexical_content_used": false,
+    "visual_content_used": false
+  },
+  "candidate_windows": {
+    "additional_windows_per_item": 9,
+    "additional_window_count": 135,
+    "combined_expected_window_count": 272,
+    "placement": "Nine equally spaced centers at the odd eighteenth quantiles of the selected 60000-ms union-speech block, mapped to physical source time.",
+    "window_duration_seconds": 10,
+    "frame_offsets_seconds": [
+      -5.0,
+      -2.5,
+      0.0,
+      2.5,
+      5.0
+    ],
+    "boundary_rule": "Shift, without resizing, any ten-second window that would cross the retained clip boundary.",
+    "same_ordered_windows_for_both_visual_models": true,
+    "prediction_adaptive_resampling": false
+  },
+  "restricted_acquisition_and_retention": {
+    "mode": "SEQUENTIAL_TRANSIENT_FULL_SOURCE_TO_BOUNDED_DERIVED_CLIP",
+    "selected_source_objects_only": 15,
+    "full_archive_download": false,
+    "maximum_concurrent_full_source_objects": 1,
+    "hard_simultaneous_raw_media_cap_bytes": 21474836480,
+    "historical_original_raw_sample_immutable": true,
+    "extension_cumulative_transfer_is_separately_receipted": true,
+    "transient_source_removed_after_verified_clip_and_before_next_transfer": true,
+    "retained_clip_profile": {
+      "video": "H.264 yuv420p CRF 24, 15 fps, maximum edge 640",
+      "audio": "AAC-LC mono 96 kbit/s",
+      "physical_span": "earliest selected speech segment minus five seconds through latest selected speech segment plus five seconds, clipped to source duration",
+      "prediction_independent": true
+    },
+    "derived_clip_conservative_bitrate_bound_bps": 3000000,
+    "derived_clip_total_admission_cap_bytes": 4294967296,
+    "namespace_cap_bytes": 78383153152,
+    "post_peak_free_space_floor_bytes": 53687091200,
+    "source_and_derived_content_location": "owner-private untracked quarantine only",
+    "retention_deadline": "2027-07-31",
+    "external_or_cloud_transfer": false
+  },
+  "instruments": {
+    "speech_paths": [
+      "existing whisper.cpp large-v3-turbo",
+      "pinned Qwen3-ASR-1.7B plus Qwen3-ForcedAligner-0.6B"
+    ],
+    "visual_paths": [
+      "pinned Qwen3-VL-8B-Instruct 4-bit",
+      "pinned opaque local Gemma 4 E4B instrument"
+    ],
+    "original_successful_outputs_reused_read_only": true,
+    "new_inference_scope": "15 additional items only",
+    "network_during_restricted_inference": "denied",
+    "maximum_concurrent_MPS_heavy_processes": 1,
+    "third_visual_model_allowed": false,
+    "semantic_prompt_tuning_allowed": false,
+    "new_parser_correction_allowed": false,
+    "pseudo_labels_are_ground_truth": false
+  },
+  "unchanged_calibration_gates": {
+    "schema_validity_minimum": 0.95,
+    "primary_item_coverage_minimum": 0.8,
+    "primary_seconds_coverage_minimum": 0.8,
+    "maximum_abstention_for_a_dimension": 0.5,
+    "minimum_export_cell_items": 5,
+    "minimum_paths_per_task_family": 2,
+    "agreement_is_not_a_pass_gate": true,
+    "all_requested_dimensions_require_model_specific_intervals_and_conservative_envelope": true,
+    "required_dimensions": [
+      "speech_to_event_lag",
+      "visible_candidate",
+      "null_or_irrelevant",
+      "ambiguous_or_undecidable",
+      "candidate_multiplicity",
+      "partial_or_clear_visibility",
+      "noun_object_support",
+      "verb_action_support"
+    ],
+    "K5_complementary_suppression": true,
+    "outward_rate_rounding_step": 0.1,
+    "outward_lag_rounding_step_event_units": 0.5,
+    "no_majority_vote": true
+  },
+  "terminal_rules": {
+    "combined_calibration_pass": "Every unchanged gate passes on the combined 30-item sample and every required envelope is publishable.",
+    "combined_calibration_stop": "Any unchanged gate still fails, including K=5 suppression of a required dimension; no third model, further expansion, Qwen-only calibration, or empirical-free fallback is allowed.",
+    "causal_endpoint": "Closed until a passing combined-calibration receipt is bound to the already frozen pre-outcome construction and falsification gates."
+  },
+  "privacy_export": {
+    "K": 5,
+    "aggregate_only": true,
+    "outward_rounded": true,
+    "transcripts_or_translations": false,
+    "frames_or_audio": false,
+    "filenames_or_paths": false,
+    "participant_session_or_item_identifiers": false,
+    "exact_timestamps_or_intervals": false,
+    "per_window_predictions": false,
+    "small_cells": false
+  }
+}

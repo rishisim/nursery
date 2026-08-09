@@ -1,0 +1,13 @@
+{
+  "schema_version": "nursery-childlens-qwen-historical-worker-restoration-v1.8.10",
+  "status": "POST_CALIBRATION_LINEAGE_REPAIR_NO_RERUN",
+  "date": "2026-07-22",
+  "reason": "The v1.8 overlapping-window validator correction had been applied directly to the historical shared Qwen worker. Restore that file to its prior hash and place the identical v1.8-only input-validation behavior in an additive adapter.",
+  "historical_worker_required_sha256": "e785ea475aee62fd72ab9bc064f3c9c3dcbc189b4361e996963edf9f2ab14f88",
+  "completed_qwen_outputs_rerun": false,
+  "completed_gemma_outputs_rerun": false,
+  "calibration_receipt_changed": false,
+  "scientific_gate_or_threshold_changed": false,
+  "causal_endpoint_opened": false,
+  "restricted_payload_exported": false
+}

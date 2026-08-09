@@ -1,0 +1,91 @@
+{
+  "schema_version": "childlens-native-transfer-controller-validation-v1.2.0",
+  "date": "2026-07-21",
+  "status": "CONTROLLER_AND_KEYCHAIN_LAUNCHER_VALIDATED_NATIVE_AUTHENTICATION_NOT_EXERCISED_NO_DATA_ACQUIRED",
+  "frozen_selection": {
+    "selected_count": 15,
+    "selection_revisited": false,
+    "scientific_thresholds_changed": false
+  },
+  "admission": {
+    "conservative_upper_bound_bytes": 14970186240,
+    "conservative_ceiling_bytes": 19327352832,
+    "hard_raw_cap_bytes": 21474836480,
+    "hard_stream_limit_bytes": 21474836479,
+    "minimum_margin_bytes": 2147483648,
+    "amendment_scope": "STORAGE_ADMISSION_ONLY"
+  },
+  "official_routes": {
+    "exact_current_file_metadata": "GET_API2_REPOS_REPO_ID_FILE_DETAIL",
+    "current_file_download_link": "GET_API2_REPOS_REPO_ID_FILE",
+    "immutable_revision_download_link": "GET_API2_REPOS_REPO_ID_FILE_REVISION",
+    "keeper_base_version_evidence": "SEAFILE_PROFESSIONAL_12_0_16"
+  },
+  "authentication_disposition": {
+    "keeper_authentication_attempted": false,
+    "authorization_material_inspected": false,
+    "browser_cookie_exported": false,
+    "api_token_exported": false,
+    "bearer_download_url_exported": false,
+    "official_local_seafile_cli_present": false,
+    "native_controller_path": "TEMPORARY_READ_ONLY_REPO_TOKEN_FROM_FIXED_MACOS_KEYCHAIN_ITEM",
+    "web_session_alone_sufficient_for_external_controller": false
+  },
+  "controller_controls": {
+    "sequential_single_stream": true,
+    "hard_cumulative_counter": true,
+    "per_object_conservative_bound": true,
+    "namespace_cap_bytes": 78383153152,
+    "free_space_floor_bytes": 53687091200,
+    "atomic_same_filesystem_promotion": true,
+    "content_addressed_storage": true,
+    "duplicate_full_resolution_storage_prevented": true,
+    "restricted_exact_bytes_sha256_etag": true,
+    "aggregate_only_public_receipt": true,
+    "small_partial_cells_suppressed": true,
+    "constant_error_codes": true,
+    "https_origin_allowlist": true,
+    "credential_forwarding_default": false
+  },
+  "launcher_controls": {
+    "command_line_arguments_accepted": false,
+    "childlens_hidden_roots_only": true,
+    "bounded_plan_config_json_candidates_only": true,
+    "exactly_one_digest_matched_bundle_required": true,
+    "coordinator_config_json_shape_supported": true,
+    "deepest_common_owner_only_namespace_root": true,
+    "keeper_hostname_and_bearer_required": true,
+    "frozen_conservative_bound_required": true,
+    "fixed_keychain_service_and_account": true,
+    "token_present_only_during_controller_calls": true,
+    "valid_existing_receipt_resumed_without_reprepare": true,
+    "invalid_existing_receipt_fails_before_keychain_read": true,
+    "keychain_item_deleted_only_after_verified_complete": true,
+    "keychain_item_retained_on_failure": true,
+    "terminal_output_fixed_and_redacted": true
+  },
+  "validation": {
+    "synthetic_tests_passed": 25,
+    "synthetic_tests_failed": 0,
+    "network_requests_made_by_tests": 0,
+    "restricted_data_read": false,
+    "childlens_media_downloaded": false,
+    "media_decoded": false,
+    "learner_or_causal_outcome_run": false
+  },
+  "artifact_sha256": {
+    "controller": "0917a3ff553cfd8a2b607e19048fc1ad779c7399e00df6feff3695d311b4b721",
+    "keychain_launcher": "3245947ced158437a6856c9ef940538394f2fd3fad5784c51eef8a8cff550b28",
+    "synthetic_tests": "18896a903079fb9d6743f9b4c9c4fe98922bf646583b181b4cd2d31f19f00c33",
+    "launcher_synthetic_tests": "ff2971ba71714d31e70f03dce8e3c592ac17c075cdfed4f067810c2ffb907e10",
+    "engineering_report": "42549a6c7870cd9f563cbd16dce2d4e45213467d908f07a8b186d18e4c8b439d"
+  },
+  "primary_sources": [
+    "https://www.mpdl.mpg.de/en/about-us/news/1100-keeper-7-0-new-features-and-improved-user-experience.html",
+    "https://seafile-api.readme.io/reference/get_api2-repos-repo-id-file-detail",
+    "https://seafile-api.readme.io/reference/get_api2-repos-repo-id-file",
+    "https://seafile-api.readme.io/reference/get_api2-repos-repo-id-file-revision",
+    "https://seafile-api.readme.io/reference/authentication",
+    "https://manual.seafile.com/latest/administration/security_features/"
+  ]
+}

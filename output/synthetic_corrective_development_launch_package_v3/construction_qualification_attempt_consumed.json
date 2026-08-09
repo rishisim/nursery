@@ -1,0 +1,16 @@
+{
+  "confirmation_outcome_count": 0,
+  "development_outcome_count": 0,
+  "micro_attempt_receipt_sha256": "0461870672ee84f948869e216d3a1b08b74809365c91461c5ceac3fa00c4e7c2",
+  "micro_lock_verification_digest": "a2fe99f690f1e6f31ff14919d37dd5c0affa2cadbb7ba7551132907a34148011",
+  "non_replayable": true,
+  "parallel_benchmark_sha256": "e93b3573de915930dd992a93abdf587c8393b81deae7fe0316ae88c3cf330b4f",
+  "parallel_equivalence_sha256": "a88d2f8998709bd4a53a963ece248cfbf77793af5f2e832389b61911693faee8",
+  "parallel_micro_completion_sha256": "34c24b3e1c42afa8f074a382a20e867ff1b911151d305c57453a4104a9fe6ce0",
+  "parallel_micro_validation_digest": "ab4bace38b03caba1507496a86915d0427609b015b6fec7757ab2f25d1df694e",
+  "prequalification_design_lock_sha256": "3188f1b41a21bfd88afb246f4162435b5d6e3abe3f61e9fc2361e1901913045c",
+  "schema_version": "nursery-corrective-construction-attempt-v3",
+  "scientific_inference_suppressed": true,
+  "status": "ONE_CONSTRUCTION_ATTEMPT_CONSUMED",
+  "worker_launcher_preflight_sha256": "ebfac78ebc983a30ace71c361a94e9154a9835ea5fc39d9cadc99e3a0352f938"
+}

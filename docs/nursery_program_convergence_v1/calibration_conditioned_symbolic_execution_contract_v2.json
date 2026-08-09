@@ -1,0 +1,60 @@
+{
+  "arms": [
+    "weak_vl_absent_side",
+    "weak_vl_synchronized_side",
+    "weak_vl_group_shuffled_side",
+    "weak_vl_balanced_time_shifted_side",
+    "weak_vl_corrupted_uninformative_side"
+  ],
+  "bundle_unit": "ONE_CORPUS_SEED_ALL_RANGE_FAMILIES_ALL_DRAWS_ALL_MODEL_SEEDS_ALL_ARMS",
+  "checkpoint_policy": {
+    "atomic_complete_bundle_only": true,
+    "deterministic_merge_order": "ASCENDING_CORPUS_SEED",
+    "resume_incomplete_authorization_only": true,
+    "reuse_complete_authorization": false
+  },
+  "corpus_seeds": [
+    740001, 740003, 740005, 740007, 740009, 740011, 740013, 740015,
+    740017, 740019, 740021, 740023, 740025, 740027, 740029, 740031,
+    740033, 740035, 740037, 740039, 740041, 740043, 740045, 740047,
+    740049, 740051, 740053, 740055, 740057, 740059, 740061, 740063,
+    740065, 740067, 740069, 740071, 740073, 740075, 740077, 740079
+  ],
+  "evaluation": {
+    "concept_count_per_family": 8,
+    "cue_fields_allowed": false,
+    "primary_truth": "SIMULATOR_ORACLE_ONLY",
+    "training_repetitions_per_object_action_composition": 8
+  },
+  "falsifications": {
+    "confidence_only_rule": "BOTH_NOUN_AND_VERB_WRONG_OR_TIED_TOP_MAPPINGS_MUST_BECOME_UNIQUELY_CORRECT",
+    "event_selection_disconnection_required": true,
+    "scientific_endpoints_are_top_mapping_metrics_only": true,
+    "side_only_maximum_above_chance": 0.02
+  },
+  "inference_seed": 760001,
+  "model_seeds": [750001, 750003, 750007],
+  "planned_outcome_command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python scripts/run_calibration_conditioned_symbolic_grounding_v2.py run --protocol docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json --execution-contract docs/nursery_program_convergence_v1/calibration_conditioned_symbolic_execution_contract_v2.json --calibration-receipt output/nursery_program_convergence_v1/childlens_pseudo_calibration_gemma_substitution_receipt.json --preoutcome-receipt output/nursery_program_convergence_v1/symbolic_preoutcome_receipt_v2.json --authorization-seal output/nursery_program_convergence_v1/symbolic_one_shot_authorization_v2.json --output-root output/nursery_calibration_conditioned_symbolic_grounding_v2 --jobs 4",
+  "protocol_erratum": "docs/nursery_program_convergence_v1/calibration_conditioned_symbolic_protocol_erratum_v2.json",
+  "protocol_erratum_required": true,
+  "range_draws_per_family": 7,
+  "range_families": [
+    "qwen3asr_plus_qwen3vl_path",
+    "qwen3asr_plus_gemma4_path",
+    "model_intersection",
+    "model_union",
+    "conservative_envelope"
+  ],
+  "range_sampling": "DETERMINISTIC_MAXIMIN_LATIN_HYPERCUBE_OVER_OUTWARD_ROUNDED_BOUNDS",
+  "schema_version": "nursery-calibration-conditioned-symbolic-execution-contract-v2",
+  "source_protocol": "docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json",
+  "status": "FROZEN_IMPLEMENTED_NOT_AUTHORIZED",
+  "thresholds": {
+    "large_negative_threshold": -0.05,
+    "lower_bound_must_exceed": 0.0,
+    "maximum_large_negative_fraction": 0.2,
+    "minimum_mean_effect": 0.03,
+    "minimum_positive_corpus_fraction": 0.6,
+    "one_sided_t_critical_95_df39": 1.684875
+  }
+}

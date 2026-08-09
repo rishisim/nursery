@@ -1,0 +1,104 @@
+{
+  "rubric_id": "childlens-feasibility-rubric-v1.0.0",
+  "frozen_at": "2026-07-21T00:00:00-07:00",
+  "freeze_scope": "FEASIBILITY_ONLY_BEFORE_MEDIA_CONTENT_INSPECTION",
+  "scientific_outcome_authorized": false,
+  "empirical_corpus": "CURRENTLY_ACCESSIBLE_CHILDLENS_KEEPER_RELEASE_ONLY",
+  "terminal_states": [
+    "CHILDLENS_FEASIBILITY_GO",
+    "CHILDLENS_FEASIBILITY_REVISE",
+    "CHILDLENS_FEASIBILITY_STOP"
+  ],
+  "decision_logic": {
+    "GO": "Every essential gate is PASS on release-specific evidence. No gate relies only on a promise, public-paper aggregate, unvalidated ASR, or simulator substitution for an absent ChildLens measure.",
+    "REVISE": "No fundamental STOP condition is established, but at least one essential gate is CONDITIONAL or UNRESOLVED and has a bounded, named correction that preserves the scientific aim and one-corpus boundary.",
+    "STOP": "At least one essential gate FAILS in a way that cannot be repaired without prohibited data ancestry, corpus mixing, materially changing the lexical-grounding question, or violating the release terms/privacy boundary.",
+    "blocked": "If a license or DUA action must be taken by the user before the evidence can be inspected or the predeclared pilot can run, do not assign a terminal scientific state; identify the exact user-only action and pause."
+  },
+  "statuses": ["PASS", "CONDITIONAL", "FAIL", "UNRESOLVED", "NOT_APPLICABLE"],
+  "gates": [
+    {
+      "gate_id": "G1_TERMS",
+      "essential": true,
+      "pass_rule": "Release-specific terms or certificate explicitly support research access, local read-only processing, restricted derived transcripts/annotations, and export of nonidentifying aggregates under required safeguards.",
+      "fail_rule": "Terms prohibit any required processing or derivative, or require a use incompatible with the scientific aim.",
+      "evidence_minimum": "Verbatim-free permission matrix with source path/version/date and unresolved clauses; no acceptance or share mutation."
+    },
+    {
+      "gate_id": "G2_RELEASE_GROUPING",
+      "essential": true,
+      "pass_rule": "The accessible release can be pinned by Keeper library/share identity plus a canonical nonidentifying file manifest, and participant/session grouping needed for leakage control is available without exporting identifiers.",
+      "fail_rule": "No stable release identity or no defensible participant/session grouping can be obtained.",
+      "evidence_minimum": "Counts and byte totals by top-level class, metadata checksums where permitted, reconciliation against public-paper counts, and grouping-field audit."
+    },
+    {
+      "gate_id": "G3_AUDIO_TIMING",
+      "essential": true,
+      "pass_rule": "On a predeclared authorized pilot, at least 80% of sampled annotated-video duration is technically decodable and at least 70% of speech-bearing sampled windows have usable utterance boundaries after manual correction; coverage and uncertainty are reported.",
+      "fail_rule": "Audio is absent, systematically unusable, or cannot support utterance timing even with bounded correction.",
+      "evidence_minimum": "Container/codec audit plus content-blind selection and human timing validation; coarse speech-presence labels alone do not pass."
+    },
+    {
+      "gate_id": "G4_TRANSCRIPT_ROLE",
+      "essential": true,
+      "pass_rule": "Actual language is identified from release evidence or a permitted pilot; fixed ASR/diarization output is human-validated and correctable. On a stratified validation set of at least 300 utterances or 30 speech minutes, whichever comes first, non-child versus child/uncertain speaker-role macro-F1 is at least 0.80 and adult-directed lexical token error after correction is bounded. Raw ASR is never gold.",
+      "fail_rule": "Language-compatible transcription is unavailable or speaker role cannot be recovered adequately for non-child input.",
+      "evidence_minimum": "Model/version/provenance receipt, language-routing rule, blinded double annotation on at least 20% of validation items, uncertainty, and error taxonomy."
+    },
+    {
+      "gate_id": "G5_INPUT_LEXICON",
+      "essential": true,
+      "pass_rule": "Validated non-child speech contains recurring corpus-local lexical material sufficient to predeclare at least 8 noun/object and 6 verb/action candidate types, each supported across at least 3 participant groups and with a feasible train-only exposure threshold to be frozen before outcome training.",
+      "fail_rule": "Non-child speech is too sparse, lexical recurrence is too low, or candidate types are confined to one participant/session.",
+      "evidence_minimum": "Cell-suppressed distribution summaries only; no token strings unless terms explicitly permit a nonidentifying vocabulary export."
+    },
+    {
+      "gate_id": "G6_REFERENTIAL_ANNOTATION",
+      "essential": true,
+      "pass_rule": "At least 15% of validated non-child utterances in usable video windows have one or more annotatable visible object/action candidates, null and ambiguous cases are retained, and double-coded status agreement is Krippendorff alpha or equivalent at least 0.67 with a bounded adjudication path.",
+      "fail_rule": "Visible candidates are vanishingly rare or the frozen ontology cannot be applied reliably after bounded revision.",
+      "evidence_minimum": "Predeclared context window, status ontology, blinded double coding, cluster-aware interval, and no example frames/text in exported reports."
+    },
+    {
+      "gate_id": "G7_HELDOUT_EVALUATION",
+      "essential": true,
+      "pass_rule": "A participant-disjoint primary split and session-disjoint sensitivity split can be constructed, with candidate noun/action types retaining train exposure and held-out evaluation support across at least 3 held-out participant groups; exact thresholds freeze before any learner outcome.",
+      "fail_rule": "Leakage-resistant splitting destroys lexical/action support or grouping cannot be enforced.",
+      "evidence_minimum": "No identifiers; report only cell-suppressed support counts and deterministic split algorithm/digest."
+    },
+    {
+      "gate_id": "G8_BASELINE_CEILING",
+      "essential": true,
+      "pass_rule": "The same ChildLens-derived vision/text inventory can later instantiate a strong-alignment ceiling and weak baseline using frozen alignment transformations, without inspecting cue effects or changing endpoints.",
+      "fail_rule": "The corpus cannot define both controls without unequal empirical exposure or outcome-driven alignment choices.",
+      "evidence_minimum": "Protocol-level construction proof only; no learner training in this audit."
+    },
+    {
+      "gate_id": "G9_SIMULATOR_CALIBRATION",
+      "essential": true,
+      "pass_rule": "Terms allow required nonidentifying ChildLens video/audio aggregates; all absent IMU, touch, contact, proprioception, and motor variables are explicitly unavailable and only simulator-defined counterfactual modalities, with no claim of ChildLens measurement.",
+      "fail_rule": "Required aggregate calibration is prohibited or absent physical streams are represented as measured/calibrated from another corpus.",
+      "evidence_minimum": "Measurement-by-measurement source/availability table and ancestry policy."
+    },
+    {
+      "gate_id": "G10_RESOURCES",
+      "essential": true,
+      "pass_rule": "Selective acquisition fits the host with at least 30 GiB reserve, the annotation plan is bounded and staffable, and later paired bundles have a deterministic one-MPS or identical-CUDA/Slurm execution plan.",
+      "fail_rule": "The minimal prototype cannot fit plausible storage, annotation, or compute constraints.",
+      "evidence_minimum": "Low/base/high projections, cache deletion policy, worker caps, and paired-bundle merge controls."
+    }
+  ],
+  "privacy_rules": {
+    "restricted": [
+      "RAW_VIDEO",
+      "RAW_AUDIO",
+      "FRAMES",
+      "RAW_OR_DERIVED_TRANSCRIPTS",
+      "PARTICIPANT_OR_SESSION_IDENTIFIERS",
+      "EXACT_TIMESTAMPS",
+      "SMALL_IDENTIFIABLE_CELLS"
+    ],
+    "reportable": "Only terms-permitted, nonidentifying, cell-suppressed aggregates, schemas, hashes, counts, and procedural evidence.",
+    "small_cell_rule": "Suppress or coarsen any participant-linked or lexical cell below 5; never use complementary cells to reconstruct a suppressed cell."
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "receipt_id": "childlens-feasibility-v1-immutability-baseline-for-v1.1",
+  "captured_date": "2026-07-21",
+  "v1_artifact_count": 23,
+  "v1_sorted_path_and_sha256_set_digest": "35ba9acbba0fc11fc3419c88ea57d0721e08486c6d37595812ce6c77ce994abf",
+  "canonical_serialization": "UTF-8 lines lexicographically sorted as complete lines, each formatted as SHA256 two-spaces repository-relative-PATH newline",
+  "included_namespaces": [
+    "docs/childlens_feasibility_v1",
+    "output/childlens_feasibility_v1",
+    "scripts/validate_childlens_feasibility_v1.py",
+    "tests/test_childlens_feasibility_v1.py"
+  ],
+  "historical_decision_preserved": true,
+  "mutation_authorized": false,
+  "handoff_recomputed_digest": "35ba9acbba0fc11fc3419c88ea57d0721e08486c6d37595812ce6c77ce994abf",
+  "handoff_digest_match": true,
+  "verification_rule": "RECOMPUTE_IDENTICAL_SORTED_PATH_AND_SHA256_SET_DIGEST_AT_V1_1_HANDOFF"
+}

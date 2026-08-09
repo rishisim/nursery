@@ -1,0 +1,78 @@
+{
+  "schema_version": "nursery-grounded-videollm-public-canary-execution-v1.0.0",
+  "protocol_id": "childlens-independent-second-instrument-one-shot-minitest-v1",
+  "executed_at": "2026-07-22",
+  "status": "FAIL_RUNTIME_BEFORE_FIRST_MODEL_OUTPUT",
+  "result_class": "PUBLIC_MPS_COMPATIBILITY_FAILURE_NOT_MODEL_ACCURACY",
+  "admission": {
+    "free_disk_gib_before_download": 124.83769989013672,
+    "projected_free_disk_gib_after_weights": 99.1985682155937,
+    "minimum_free_disk_floor_gib": 50,
+    "disk_gate_passed": true,
+    "checkpoint_clarification_frozen_before_model_output": true,
+    "checkpoint_training_variant_status": "UNDOCUMENTED_GENERAL_VS_BENCHMARK_SUBSET_TUNED"
+  },
+  "artifacts": {
+    "hugging_face_repository": "WHB139426/Grounded-Video-LLM",
+    "hugging_face_revision": "b97f0e826a0b6c292ca54d9c02c483c479952501",
+    "checkpoint_sha256": "5967e1138fc1106e1c3b384b96af3120405f455475308b4067bb785ac560f588",
+    "downloaded_payload_file_count": 21,
+    "downloaded_payload_bytes": 27529808010,
+    "hugging_face_checksum_verification": "PASS_ALL_21_LOCAL_PAYLOAD_FILES",
+    "local_weight_manifest_digest": "a2ab012a3a39c1a63ace406ff6ec0b9cdeb5482c1fc87e4a43326ee89daf2d47",
+    "official_github_revision": "e26da4e4b681357fd911d5ace3467f031af29208",
+    "patched_source_tree_digest": "c88668d7345bbbc4f5c48182299843e7f12aa3f5784cb009d012d62b857b0b1f",
+    "runner_sha256": "1deea56ce13302b0db0a2e94df3e860ead8e290edbd407d24ea37c93c135d730",
+    "requirements_sha256": "b96feddfb507123251fdcdba98b5e6793cd9211b3c313d9d98edd3051473fb39",
+    "environment_digest": "03aa98c5afbc0d54a22ec62a7bff481eb10516bbbe514a58c1d2b907eaf2ebf3"
+  },
+  "runtime": {
+    "host": "Apple M5",
+    "architecture": "arm64",
+    "unified_memory_gib": 32,
+    "python": "3.10.20",
+    "pytorch": "2.1.2",
+    "device": "mps",
+    "dtype": "float16",
+    "attention": "eager",
+    "network_denial_sentinel_passed": true,
+    "public_canary_attempts": 1,
+    "model_weights_loaded": true,
+    "first_case_inference_started": true,
+    "model_outputs_produced": 0,
+    "failure_component": "InternVideo2 temporal patch embedding",
+    "failure_operation": "torch.nn.functional.conv3d",
+    "failure": "RuntimeError: Conv3D is not supported on MPS"
+  },
+  "frozen_canary_metrics": {
+    "case_count": 8,
+    "schema_valid_count": "NOT_OBSERVED",
+    "oracle_referential_plus_lag_correct_count": "NOT_OBSERVED",
+    "canary_passed": false,
+    "reason": "Runtime ended before the first model output."
+  },
+  "privacy_and_scope": {
+    "public_synthetic_frames_only": true,
+    "restricted_packet_discovered_or_opened": false,
+    "restricted_inference_run": false,
+    "grounded_videollm_restricted_predictions_created": 0,
+    "qwen_rerun": false,
+    "new_acquisition": false,
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false,
+    "raw_restricted_content_exported": false
+  },
+  "decision": {
+    "retry_or_post_failure_port_patch_permitted": false,
+    "grounded_videollm_substantially_better_than_qwen": "NOT_TESTED",
+    "childlens_branch_reopen": false,
+    "larger_human_grounded_calibration_study": "DO_NOT_INVEST_BASED_ON_THIS_ATTEMPT",
+    "interpretation": "The local MPS port is unusable for the frozen one-shot test. This receipt contains no evidence about Grounded-VideoLLM accuracy."
+  },
+  "repository_actions": {
+    "committed": false,
+    "pushed": false,
+    "published": false,
+    "license_clickthrough_or_acceptance": false
+  }
+}

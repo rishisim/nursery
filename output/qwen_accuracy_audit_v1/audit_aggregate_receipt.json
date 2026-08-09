@@ -1,0 +1,114 @@
+{
+  "as_of": "2026-07-22",
+  "decision": {
+    "observed_defensible_count": 7,
+    "observed_defensible_wilson_lower_bound": 0.132,
+    "reopen_larger_human_grounded_calibration_study": false,
+    "screening_threshold_count": 19,
+    "screening_threshold_wilson_lower_bound": 0.5
+  },
+  "limitations": [
+    "Reviewer was not a qualified German interpreter.",
+    "This is a single-reviewer visual/temporal plausibility audit, not human gold or inter-rater reliability.",
+    "Only the 15 retained v1.8 extension clips were reviewable; the original 15 videos were not reacquired.",
+    "The existing five-frame representation can miss events between frames.",
+    "ASR errors and utterance-window alignment errors are inseparable from Qwen3-VL errors in this diagnostic.",
+    "The sample is too small for publication-grade accuracy estimation."
+  ],
+  "privacy": {
+    "complementary_suppression_applied": true,
+    "minimum_cell_k": 5,
+    "raw_or_per_window_payload_exported": false,
+    "restricted_review_stayed_local": true
+  },
+  "provenance": {
+    "private_labels_sha256_recorded_publicly": false,
+    "private_packet_sha256_recorded_publicly": false,
+    "protocol_sha256": "4c1c1e5ec2669d829fc9f77e82b055c96ec8042bf27d939f20b69918da788f89"
+  },
+  "qwen_sample_composition_k5_safe": {
+    "lag_nonoverlap": 7,
+    "lag_overlap": 20,
+    "referential_ambiguous_or_other": 5,
+    "referential_visible_candidate": 22
+  },
+  "review_metrics": {
+    "clear_candidate_rather_than_ambiguity_null_or_undecidable": {
+      "metric": "clear_candidate_rather_than_ambiguity_null_or_undecidable",
+      "other_count": 19,
+      "positive_count": 8,
+      "positive_rate": 0.296,
+      "status": "PUBLISHED",
+      "total": 27,
+      "wilson_95_interval": [
+        0.159,
+        0.485
+      ]
+    },
+    "qwen_complete_answer_defensible": {
+      "metric": "qwen_complete_answer_defensible",
+      "other_count": 20,
+      "positive_count": 7,
+      "positive_rate": 0.259,
+      "status": "PUBLISHED",
+      "total": 27,
+      "wilson_95_interval": [
+        0.132,
+        0.447
+      ]
+    },
+    "qwen_exact_lag_bin_visually_supported": {
+      "metric": "qwen_exact_lag_bin_visually_supported",
+      "other_count": 20,
+      "positive_count": 7,
+      "positive_rate": 0.259,
+      "status": "PUBLISHED",
+      "total": 27,
+      "wilson_95_interval": [
+        0.132,
+        0.447
+      ]
+    },
+    "speech_referent_identifiable": {
+      "metric": "speech_referent_identifiable",
+      "other_count": 11,
+      "positive_count": 16,
+      "positive_rate": 0.593,
+      "status": "PUBLISHED",
+      "total": 27,
+      "wilson_95_interval": [
+        0.407,
+        0.755
+      ]
+    },
+    "visible_candidate_present": {
+      "metric": "visible_candidate_present",
+      "other_count": 14,
+      "positive_count": 13,
+      "positive_rate": 0.481,
+      "status": "PUBLISHED",
+      "total": 27,
+      "wilson_95_interval": [
+        0.307,
+        0.66
+      ]
+    }
+  },
+  "sampling": {
+    "content_blind": true,
+    "one_window_from_every_retained_item_plus_second_window_from_twelve_items": true,
+    "prediction_blind": true
+  },
+  "schema_version": "nursery-qwen-accuracy-audit-aggregate-v1.0.0",
+  "scope": {
+    "audited_existing_windows": 27,
+    "causal_endpoint_opened": false,
+    "distinct_retained_extension_items": 15,
+    "new_acquisition": false,
+    "parent_frozen_calibration_items": 30,
+    "qwen_rerun": false,
+    "scientific_outcome_run": false,
+    "source_population_existing_extension_windows": 135
+  },
+  "status": "PROVISIONAL_VISUAL_TEMPORAL_PLAUSIBILITY_ONLY"
+}

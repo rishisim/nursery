@@ -1,0 +1,85 @@
+{
+  "schema_version": "nursery-prototype-limited-gemma-terminal-decision-v1",
+  "created_at": "2026-07-22",
+  "terminal_state": "PROTOTYPE_TECHNICAL_REVISE_PRE_OUTCOME",
+  "goal": "prototype-limited Gemma activation, bounded ChildLens triangulation, and gated one-shot minimal causal demonstration",
+  "decision_basis": {
+    "opaque_internal_provenance_gate": "PASS_WITH_DISCLOSED_LIMITATIONS",
+    "cached_artifact_and_resource_gate": "PASS",
+    "fresh_public_common_schema_canary": "TECHNICAL_FAIL_BEFORE_MODEL_LOAD",
+    "failure_stage": "SELF_GENERATED_PUBLIC_TTS_INTERMEDIATE_TRANSPORT",
+    "frozen_parser_correction_applicable": false,
+    "parser_corrections_used": 0,
+    "restricted_calibration_run": false,
+    "preoutcome_gate_run": false,
+    "scientific_endpoint_opened": false,
+    "causal_outcome_run": false
+  },
+  "failure_evidence": {
+    "canary_failure_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_e4b_prototype_common_schema_public_canary_failure_v1.json",
+      "sha256": "ef5031b3b90a3611eb488ff9fa76a48e0b2f2a0af0ab5e2230316d3234a0eda6",
+      "safe_failure_code": "E_INTERNAL"
+    },
+    "stage_isolation": {
+      "runtime_lock_function_public_diagnostic": "PASS",
+      "frozen_aiff_tts_transport": "NONZERO_EXIT_NO_AUDIO_CREATED",
+      "model_loaded": false,
+      "model_generation_called": false,
+      "raw_model_output_existed": false
+    },
+    "canonical_outputs_absent": [
+      "output/nursery_program_convergence_v1/gemma4_e4b_prototype_common_schema_public_canary_receipt_v1.json",
+      "output/nursery_program_convergence_v1/gemma4_e4b_prototype_runtime_lock_v1.json",
+      "output/nursery_program_convergence_v1/gemma4_e4b_prototype_full_activation_receipt_v1_1.json",
+      "output/nursery_program_convergence_v1/childlens_pseudo_calibration_gemma_substitution_receipt.json",
+      "output/nursery_program_convergence_v1/symbolic_preoutcome_receipt_v2.json",
+      "output/nursery_program_convergence_v1/symbolic_one_shot_authorization_v2.json"
+    ]
+  },
+  "public_only_remedy_diagnostic": {
+    "restricted_or_quarantine_content_used": false,
+    "intermediate_container": "CAF",
+    "say_exit_zero": true,
+    "ffmpeg_normalization_exit_zero": true,
+    "final_wav_contract": {
+      "channels": 1,
+      "sample_width_bytes": 2,
+      "sample_rate_hz": 16000,
+      "sample_count": 160000,
+      "exact_match": true
+    },
+    "activated_in_frozen_protocol": false,
+    "scientific_or_semantic_change": false
+  },
+  "immutable_bindings": {
+    "opaque_provenance_amendment_sha256": "93874c69153daaf41d902216351666c59b12aeb656b9739ecd07d1e6e4fe42b1",
+    "public_canary_contract_sha256": "9b894fcfd47df93824d25a467961d2c9f3398666dbe824367f2d8e1afe0635e9",
+    "activation_schema_sha256": "0668d8d304a1be30e43e9df2c05469a338d647c262418a04c6d067d2e77f8b05",
+    "runtime_pin_erratum_sha256": "b84da17121dd3235b1b6799d91c077d542e30e384f5cff5e131ec6c9755cecc1",
+    "resource_receipt_sha256": "363fda5ebc189216b2d8e9a9133cb51cea91fcc0ea9dc15fef023a028648dcd4",
+    "sensitivity_protocol_sha256": "c6b7afab6c8914a968b0f06706a222d2771863c2a3fd2017184c17d431bfa7d6",
+    "symbolic_execution_contract_sha256": "db760f4135f81f7f78184a80f8abae16578918ff10b44c952f83a76cf5daa810",
+    "symbolic_protocol_erratum_sha256": "e550cbd6b935e71006f2c740466f939ab6a89963dbe0e686c4854846b4392b6b",
+    "historical_gemma_stop_sha256": "a9f955d53768e0295d61a58e8ecf73d7e8658890ec56a4408772cd6bb10612b6"
+  },
+  "implementation_hashes": {
+    "public_canary_and_activation_runner_sha256": "d5f3402c21043a0bba480e9540db7bac2d2eb01f65887673538db5211d19e8ea",
+    "gemma_worker_sha256": "6f6ad2f2605c94aec8f92cd927248367eef74e16222768cced3a4cc25c050a2f",
+    "restricted_calibration_coordinator_sha256": "4fdacb4a0bf4e03627c4c036ec65107bb249bf0a4b35564f3cf7a5a58dbeeeed",
+    "opaque_chain_validator_sha256": "41287026edbe42acdaadfb81a071437766b5802698eb512e73ca63e96a5fc9cb",
+    "symbolic_one_shot_runner_sha256": "5d25a9ddea0479a46f9178ff87a8d99eef56de94fc874ebd28eda7a1e4a30c87"
+  },
+  "privacy_and_ancestry": {
+    "childlens_restricted_content_accessed_in_this_goal": false,
+    "restricted_payload_exported": false,
+    "hosted_or_cloud_content_inference": false,
+    "new_model_bytes_downloaded": 0,
+    "license_or_clickthrough_accepted": false,
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false,
+    "model_agreement_claimed_as_ground_truth": false,
+    "human_validation_claimed": false
+  },
+  "next_task": "Freeze a new immutable public-canary transport amendment changing only the intermediate TTS container from AIFF to CAF, preserve the exact final WAV/prompt/schema/sample/gates, and rerun the public canary before any restricted inference."
+}

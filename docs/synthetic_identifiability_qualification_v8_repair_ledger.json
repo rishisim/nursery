@@ -1,0 +1,205 @@
+{
+  "schema_version": "nursery-cross-version-repair-ledger-v1",
+  "outcome_counts": {
+    "development": 0,
+    "confirmation": 0
+  },
+  "versions": [
+    {
+      "version": 5,
+      "terminal_state": "REVISE",
+      "preserved": true,
+      "repairs_carried_forward": [
+        "exact structural noun target-owner independence",
+        "corpus-by-level factor-refit audit cardinality",
+        "exact declared-versus-observed identifier reconciliation",
+        "separate present/null gates for every prompt kind",
+        "factorized and diagnostically ablatable null learning"
+      ]
+    },
+    {
+      "version": 6,
+      "terminal_state": "INVALIDATED_PRE_FREEZE",
+      "preserved": true,
+      "repairs_carried_forward": [
+        "fresh fixture and excluded-smoke identifiers",
+        "strict prohibition on any excluded-smoke reference before freeze"
+      ],
+      "contaminated_identifiers": {
+        "corpus": [
+          260201,
+          260207
+        ],
+        "model": [],
+        "inference": []
+      }
+    },
+    {
+      "version": 7,
+      "terminal_state": "REVISE",
+      "preserved": true,
+      "repairs_implemented": [
+        "exact noun target-owner independence in every declared stratum",
+        "factor audits at exact corpus-by-level grain with independently recomputed episode membership",
+        "empty unused inference registries and exact declared-versus-observed role reconciliation",
+        "separate present and null gates for primitive, manner, action, and noun prompts",
+        "learned null capacity requiring target-absent training and uncorrupted target-absence evidence",
+        "uniform detector-language corroboration with bounded corrupted-sensor gain"
+      ],
+      "fixture_identifiers": {
+        "corpus": [
+          270001
+        ],
+        "model": [
+          270101
+        ],
+        "inference": []
+      },
+      "excluded_smoke_identifiers": {
+        "corpus": [
+          270201,
+          270207
+        ],
+        "model": [
+          270301,
+          270303
+        ],
+        "inference": []
+      },
+      "excluded_smoke_touched": true,
+      "frozen_failure": {
+        "failed_gates": [
+          "corpus_design"
+        ],
+        "diagnosis": "Seed-dependent factor assignment allowed noun owner position to correlate above the unchanged 0.20 factor/control bound.",
+        "corpus_failures": [
+          {
+            "corpus_seed": 270201,
+            "maximum_factor_control_cramers_v": 0.2090605025017727,
+            "maximum_cell": "noun|candidate_count=2|owner_position|false_positive"
+          },
+          {
+            "corpus_seed": 270207,
+            "maximum_factor_control_cramers_v": 0.22961557339788813,
+            "maximum_cell": "noun|candidate_count=2|owner_position|noise"
+          }
+        ],
+        "terminal_decision_sha256": "22af309f96a7cf8b2cbfd817555fe073578348cd0e1db2ef2e927b27c7cb8b58",
+        "qualification_summary_sha256": "9eddb0088e2cfbac0f81fbc00927e62ec1cc75eccce2018126fb0225d304e070",
+        "corpus_audits_sha256": "27d79acc3f2542bb13be5f50305cb68c6b0a9d4821766077c6f25c044092b0df",
+        "core_gates_sha256": "2c8f356062a98ed6d429d1e8a409db783d1065ab21650fb47f980345a83124d2"
+      },
+      "fixture_cycles": [
+        {
+          "cycle": 1,
+          "status": "REVISE_FIXTURE",
+          "failed_gates": [
+            "sensor_helpful_not_required"
+          ],
+          "diagnosis": "Detector evidence had no measurable effect on present or null action probabilities.",
+          "qualification_summary_sha256": "3893e9525c4da1b6a9c348ce282ee4a61647ca492478b222003f6071cb667756",
+          "core_gates_sha256": "1de1e7d891009d9c60224580756f37e6af9efcefd99285d7ca686fe84f045f43"
+        },
+        {
+          "cycle": 2,
+          "status": "REVISE_FIXTURE",
+          "failed_gates": [
+            "sensor_helpful_not_required"
+          ],
+          "diagnosis": "The first sensor repair harmed synchronized present and null action probabilities relative to absent channel.",
+          "qualification_summary_sha256": "3893e9525c4da1b6a9c348ce282ee4a61647ca492478b222003f6071cb667756",
+          "core_gates_sha256": "160c82b11bfe8a380e1b51a113f31c72029f7a7601cc083b01c05da740692570"
+        },
+        {
+          "cycle": 3,
+          "status": "PASS_FIXTURE",
+          "failed_gates": [],
+          "diagnosis": "A uniform predeclared detector-language corroboration rule improved synchronized present and null action probabilities while corrupted gains remained below 0.03.",
+          "qualification_summary_sha256": "af22194a167390a20319da94f4c845100fa23094146f2365bccbcd38404ddfd6",
+          "core_gates_sha256": "70d6ac87133cfca7dcdecd207e607e4a49f31927da0ef5d395484410d712f3a9",
+          "null_capacity_audit_sha256": "580088b4dd6184ec5a38d3afa2f16fb55ae44799bd9bd8c14726cbaa92c3e18e",
+          "identifier_reference_audit_sha256": "7eb4b8af3c5a846e9d8ebe9a726015143509364d0d16c3295a9378e7bc1e79a0"
+        }
+      ]
+    },
+    {
+      "version": 8,
+      "terminal_state": "FROZEN_PENDING_EXCLUDED_SMOKE",
+      "preserved": true,
+      "principled_repairs": [
+        "factor schedules are corpus-seed invariant",
+        "each assignment executes at most 512 deterministic trials with an early-acceptance target of 0.16",
+        "construction search scores the exact grounded noun controls and distractor-expanded action controls used by the persisted audit",
+        "construction search also scores action candidate cycle, target presence, sensor stratum, concept, and every previously assigned nuisance factor",
+        "every assignment reports its audited-control and previous-factor Cramer's V values",
+        "the final construction check is recomputed from the exact persisted factor/control and pairwise audits",
+        "the strengthened pre-outcome construction bound is 0.16 while the unchanged terminal factor/control gate remains 0.20"
+      ],
+      "fixture_identifiers": {
+        "corpus": [
+          280001
+        ],
+        "model": [
+          280101
+        ],
+        "inference": []
+      },
+      "excluded_smoke_identifiers": {
+        "corpus": [
+          280201,
+          280207
+        ],
+        "model": [
+          280301,
+          280303
+        ],
+        "inference": []
+      },
+      "excluded_smoke_touched": false,
+      "freeze_preconditions": {
+        "fixture_qualification_status": "PASS",
+        "version_test_count": 18,
+        "version_tests_status": "PASS",
+        "collected_tests_sha256": "24428c507cbd7ff2e839f42a264002800408af7b3d93bb51acc54d2c5d271f4a",
+        "prior_v1_v7_file_count": 1747,
+        "prior_v1_v7_baseline_sha256": "f157eb931615b7e559de6250d5f0321ba10ce9fa78436d58ec3a647467659147",
+        "development_outcome_count": 0,
+        "confirmation_outcome_count": 0
+      },
+      "fixture_cycles": [
+        {
+          "cycle": 0,
+          "status": "REVISE_FIXTURE_PROBE",
+          "failed_assertion": "corpus.audit.status == PASS",
+          "duration_seconds": 94.63,
+          "diagnosis": "The failing in-memory audit was not persisted before the pre-freeze implementation changed; no unsupported numerical diagnosis is asserted.",
+          "artifact": "output/synthetic_identifiability_qualification_v8/fixture_probe_0_failure.json",
+          "artifact_sha256": "6f141cd2c3c3f6e793802dced1355015f6d07abb5edaa82f3b4471c59351d141"
+        },
+        {
+          "cycle": 1,
+          "status": "PASS_CONSTRUCTION_PROBE",
+          "maximum_factor_control_cramers_v": 0.15153695784819085,
+          "maximum_pairwise_cramers_v": 0.1346159059147068,
+          "construction_bound": 0.16,
+          "corpus_audit_sha256": "e2b556116e753077a9725a639ab933d0a4e285d07204134f66727ad84aef96b0",
+          "operation_log_sha256": "ea8fb87311efcd0f973900f4ea7678fe2c77d8cc886b9b3ae73ab5f17eb04fa9"
+        },
+        {
+          "cycle": 2,
+          "status": "PASS_FIXTURE_QUALIFICATION",
+          "failed_gates": [],
+          "maximum_factor_control_cramers_v": 0.15153695784819085,
+          "maximum_pairwise_cramers_v": 0.1346159059147068,
+          "maximum_conditional_noun_target_owner_gap": 0.0,
+          "action_relation_and_target_position_exact": true,
+          "qualification_summary_sha256": "bd1130c017470675b175c9686f5fba6ad4822544d1e1eaec96f594950f010885",
+          "corpus_audits_sha256": "a09fedf91cff2fadb6e73548d851b0d48728669d83f457441ffa67da6e0ca6dd",
+          "core_gates_sha256": "2930b94626a04b117ce89517e93000a030299b1c77dd81b3ec44dee52e3b3dd9",
+          "null_capacity_audit_sha256": "76cc78a5a900f34bdfbf9858ce49bf6df494e81e2f11410b641923a669e23793",
+          "identifier_reference_audit_sha256": "df56aed7457ff55d5e2d07b89aa0b9e00ee26ddc94e02de2588adb73d142aa1f"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "schema_version": "nursery-gemma4-restricted-worker-subprocess-environment-amendment-v1.6",
+  "amendment_id": "gemma4-e4b-restricted-worker-redundant-firewall-extra-removal-v1.6",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_PRE_RESTRICTED_RERUN_WORKER_ENVIRONMENT_ONLY",
+  "namespace": "docs/nursery_program_convergence_v1/gemma4_restricted_worker_environment_v1_6",
+  "amendment_mode": "ADDITIVE_CONTENT_INDEPENDENT_RESTRICTED_WORKER_ENVIRONMENT_CALL_CORRECTION",
+  "historical_artifacts_modified": false,
+  "restricted_rerun_executed": false,
+  "Gemma_worker_process_launched": false,
+  "Gemma_worker_inference_run": false,
+  "Gemma_model_output_existed": false,
+  "scientific_endpoint_opened": false,
+  "scientific_outcome_run": false,
+  "diagnosed_failure_and_restricted_access_state": {
+    "v1_5_failure_receipt_code": "E_INTERNAL",
+    "typed_local_diagnostic_symbol": "E_SUBPROCESS_ENV",
+    "failure_stage": "AFTER_BOUNDED_RESTRICTED_PREFLIGHT_AND_BEFORE_GEMMA_WORKER_SUBPROCESS_LAUNCH",
+    "cause": "The base restricted coordinator passed four mandatory offline and telemetry defaults through the firewall scrubber's restricted extra mapping together with two allowed thread controls. The extra whitelist correctly rejected the four mandatory keys before worker launch.",
+    "v1_5_public_seal_passed": true,
+    "quarantine_sample_and_Qwen_read_only_inputs_validated": true,
+    "restricted_inputs_locally_opened_or_read_during_bounded_preflight": true,
+    "bounded_media_file_descriptors_opened": true,
+    "Gemma_worker_process_launched": false,
+    "Gemma_worker_inference_run": false,
+    "Gemma_model_output_existed": false,
+    "restricted_payload_exported": false,
+    "restricted_payload_logged_or_serialized_to_repository": false,
+    "scientific_endpoint_opened": false,
+    "outer_fence_parser_correction_applicable": false,
+    "outer_fence_parser_corrections_spent": 0
+  },
+  "immutable_bindings": {
+    "v1_5_preflight_delegation_amendment": {
+      "path": "docs/nursery_program_convergence_v1/gemma4_preflight_delegation_v1_5/frozen_preflight_delegation_recursion_amendment_v1_5.json",
+      "sha256": "16049ce3bcbeb9f3ae91c28695c7dafb10c9a013ff64b301d977b96f9943429a"
+    },
+    "v1_5_public_canary_runner": {
+      "path": "scripts/run_gemma4_prototype_common_schema_canary_v1_5.py",
+      "sha256": "4657eccaf04f08e0b689d14be5e3577ed483882e3f1212fcdab0f476ee28025b"
+    },
+    "v1_5_restricted_calibration_coordinator": {
+      "path": "scripts/nursery_gemma_substitution_calibration_v1_5.py",
+      "sha256": "66e0454d854ecada6eddb1580312c63fd38656892b15bfb8b4ccf1339604958e"
+    },
+    "v1_5_public_canary_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_preflight_delegation_v1_5/public_common_schema_canary_receipt_v1_5.json",
+      "sha256": "9843e812b605979641a6a777f870348c9aa3c7f10ec382a082bb87c84def4e3b"
+    },
+    "v1_5_runtime_lock_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_preflight_delegation_v1_5/runtime_lock_receipt_v1_5.json",
+      "sha256": "69e0ef3a47198956bc06a123d6bfbc6b448ebeef5c8e6ed5e248bb882ba92b1f"
+    },
+    "v1_5_full_activation_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_preflight_delegation_v1_5/full_activation_receipt_v1_5.json",
+      "sha256": "10cb7d0151e2fff40a3f5bf006ea510a3f82a4223410dec51ebfb08a34f14d7f"
+    },
+    "v1_5_restricted_calibration_failure_receipt": {
+      "path": "output/nursery_program_convergence_v1/childlens_pseudo_calibration_gemma_substitution_preflight_delegation_failure_v1_5.json",
+      "sha256": "eb8dc3313c746bc6b6ca100ebab30853607191c625ed0bfc1a2f3fe292dc6b79"
+    },
+    "base_restricted_calibration_coordinator": {
+      "path": "scripts/nursery_gemma_substitution_calibration.py",
+      "sha256": "4fdacb4a0bf4e03627c4c036ec65107bb249bf0a4b35564f3cf7a5a58dbeeeed"
+    },
+    "restricted_Gemma_worker": {
+      "path": "scripts/nursery_gemma4_referential_worker_v1_3.py",
+      "sha256": "c78fa8e9c0f995ed611f7fd8f7d2076f03a73d370574d3c92cf5e107f236c38f"
+    },
+    "local_inference_firewall": {
+      "path": "scripts/childlens_local_inference_firewall_v1_3.py",
+      "sha256": "a10f8c2568d402259215afe18f6005ceb4b52431607b42b132a8db849ff32f7b"
+    },
+    "v1_4_public_subprocess_environment_amendment": {
+      "path": "docs/nursery_program_convergence_v1/gemma4_subprocess_environment_v1_4/frozen_subprocess_environment_correction_amendment_v1_4.json",
+      "sha256": "ac05205256bc1e949c0a70a9dc865cebc2ea50beb73770319e816cec0910ceb1"
+    },
+    "no_automatic_fallback_override": {
+      "path": "docs/nursery_program_convergence_v1/frozen_no_automatic_fallback_override_v1.json",
+      "sha256": "cb9e7061a5725050e6a71a7b6e41f6f5e7bf30d104bc46bae233816ca99a90b7"
+    }
+  },
+  "exact_restricted_worker_environment_delta": {
+    "maximum_worker_environment_call_site_changes": 1,
+    "bound_function": "_worker_environment in the bound base restricted calibration coordinator",
+    "frozen_scrubber_extra_mapping": {
+      "OMP_NUM_THREADS": "2",
+      "VECLIB_MAXIMUM_THREADS": "2",
+      "HF_HUB_OFFLINE": "1",
+      "TRANSFORMERS_OFFLINE": "1",
+      "HF_HUB_DISABLE_TELEMETRY": "1",
+      "DO_NOT_TRACK": "1"
+    },
+    "amended_scrubber_extra_mapping": {
+      "OMP_NUM_THREADS": "2",
+      "VECLIB_MAXIMUM_THREADS": "2"
+    },
+    "exact_deleted_extra_keys": [
+      "HF_HUB_OFFLINE",
+      "TRANSFORMERS_OFFLINE",
+      "HF_HUB_DISABLE_TELEMETRY",
+      "DO_NOT_TRACK"
+    ],
+    "deleted_extra_key_count": 4,
+    "retained_thread_extra_key_count": 2,
+    "retained_thread_extra_values_UTF8_hex": {
+      "OMP_NUM_THREADS": "32",
+      "VECLIB_MAXIMUM_THREADS": "32"
+    },
+    "firewall_mandatory_environment_contract": {
+      "exact_mandatory_key_count": 14,
+      "canonical_JSON_sort_keys_compact_UTF8_sha256": "bf67ff8d311d901d39d8f996339e33f62c72b2f87a0c4ff9d997dce069cdf822",
+      "removed_extra_keys_remain_mandatory_with_values": {
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "HF_HUB_DISABLE_TELEMETRY": "1",
+        "DO_NOT_TRACK": "1"
+      },
+      "removed_extra_values_UTF8_hex": {
+        "HF_HUB_OFFLINE": "31",
+        "TRANSFORMERS_OFFLINE": "31",
+        "HF_HUB_DISABLE_TELEMETRY": "31",
+        "DO_NOT_TRACK": "31"
+      },
+      "mandatory_defaults_changed": false,
+      "extra_whitelist_changed": false
+    },
+    "TMPDIR_rule": {
+      "existing_addition_preserved": true,
+      "assignment": "environment['TMPDIR'] = str(work)",
+      "stage": "After materializing the scrubbed mandatory environment plus the two allowed thread extras and before worker subprocess launch.",
+      "work_must_be_absolute_owner_private_quarantine_local_directory": true,
+      "TMPDIR_may_not_be_exported_logged_or_written_to_repository_artifacts": true,
+      "other_post_scrubber_environment_mutations_allowed": false
+    },
+    "expected_final_environment_shape": {
+      "mandatory_key_count": 14,
+      "allowed_thread_extra_key_count": 2,
+      "quarantine_local_TMPDIR_key_count": 1,
+      "exact_total_key_count": 17,
+      "inherited_environment_keys_allowed": false,
+      "credential_authorization_cookie_secret_or_nonblocked_proxy_keys_allowed": false
+    },
+    "deterministic_algorithm": [
+      "At the single bound _worker_environment call site, call scrubbed_subprocess_environment with exactly OMP_NUM_THREADS='2' and VECLIB_MAXIMUM_THREADS='2' as the extra mapping.",
+      "Do not pass HF_HUB_OFFLINE, TRANSFORMERS_OFFLINE, HF_HUB_DISABLE_TELEMETRY, or DO_NOT_TRACK as extras; obtain their unchanged value '1' only from the firewall's mandatory defaults.",
+      "Fail closed unless the returned mandatory mapping digest, the two thread extras, and the four mandatory offline and telemetry values match this amendment exactly.",
+      "Add only the existing TMPDIR=str(work) value after verifying work is an absolute owner-private quarantine-local directory; do not print or export its value.",
+      "Fail closed unless the final mapping contains exactly 17 keys and then pass it unchanged to the restricted Gemma worker subprocess."
+    ],
+    "worker_subprocess_argv_changed": false,
+    "worker_subprocess_cwd_stdio_passed_FDs_or_checkpointing_changed": false,
+    "bounded_media_FD_set_or_order_changed": false,
+    "network_denial_or_firewall_policy_changed": false,
+    "quarantine_or_privacy_policy_changed": false,
+    "model_prompt_schema_or_parser_changed": false,
+    "sample_selection_or_thresholds_changed": false,
+    "does_not_spend_outer_fence_parser_correction": true
+  },
+  "preserved_calibration_and_scientific_contract": {
+    "v1_5_public_canary_activation_and_runtime_receipts_reused_read_only": true,
+    "v1_5_preflight_delegation_and_v1_4_public_environment_corrections_unchanged": true,
+    "model_repository_revision_manifest_weights_and_runtime_pins_unchanged": true,
+    "prompt_message_media_schema_and_parser_contracts_unchanged": true,
+    "sample_15_items_900_seconds_137_candidate_windows_unchanged": true,
+    "K5_complement_protection_and_outward_rounding_unchanged": true,
+    "coverage_abstention_path_and_schema_gates_unchanged": true,
+    "Qwen3_hypotheses_and_digest_remain_read_only": true,
+    "agreement_is_not_a_pass_gate": true,
+    "simulator_oracle_remains_only_evaluation_truth": true,
+    "calibration_range_or_scientific_protocol_changed": false,
+    "causal_thresholds_changed": false,
+    "automatic_fallback_allowed": false
+  },
+  "overlay_application_rule": {
+    "reject_if_any_bound_digest_differs": true,
+    "reject_if_any_extra_key_other_than_the_two_exact_thread_controls_is_passed_to_the_scrubber": true,
+    "reject_if_any_mandatory_default_or_its_digest_changes": true,
+    "reject_if_TMPDIR_is_not_the_existing_owner_private_quarantine_local_work_directory": true,
+    "reject_if_final_environment_has_any_key_beyond_14_mandatory_2_thread_and_TMPDIR": true,
+    "reject_if_any_worker_argument_FD_network_model_sample_prompt_parser_threshold_or_scientific_field_changes": true,
+    "reuse_prior_v1_5_failure_or_success_receipt_as_v1_6_receipt": false
+  },
+  "new_immutable_output_namespace": {
+    "path": "output/nursery_program_convergence_v1/gemma4_restricted_worker_environment_v1_6",
+    "must_not_exist_before_execution": true,
+    "owner_private_during_restricted_execution": true,
+    "future_restricted_calibration_receipt": "childlens_pseudo_calibration_gemma_substitution_receipt_v1_6.json",
+    "future_restricted_calibration_failure": "childlens_pseudo_calibration_gemma_substitution_failure_v1_6.json",
+    "prior_v1_5_failure_receipt_remains_immutable": true,
+    "historical_output_paths_overwritten": false
+  },
+  "authorization_boundary": {
+    "amendment_is_restricted_rerun": false,
+    "amendment_is_calibration_receipt": false,
+    "restricted_worker_launch_authorized_by_amendment_alone": false,
+    "scientific_endpoint_authorized": false,
+    "scientific_outcome_authorized": false,
+    "automatic_fallback_authorized": false,
+    "model_agreement_or_pseudo_labels_are_ground_truth": false,
+    "next_action": "A separately validated local-only v1.6 coordinator may apply this one-call correction and rerun the already-bounded restricted calibration in the new namespace. No scientific endpoint may open without a fresh validated calibration receipt and unchanged frozen gates."
+  }
+}

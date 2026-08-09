@@ -1,0 +1,24 @@
+{
+  "protocol_id": "synthetic-identifiability-qualification-v8",
+  "purpose": "fixture_only",
+  "status": "REVISE_FIXTURE_PROBE",
+  "command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider tests/test_synthetic_identifiability_qualification_v8.py::test_v8_corpus_crosses_required_factors_absence_null_and_noun_independence",
+  "exit_code": 1,
+  "duration_seconds": 94.63,
+  "failed_assertion": "corpus.audit.status == PASS",
+  "observed_status": "FAIL",
+  "identifiers_touched_by_role": {
+    "corpus": [
+      280001
+    ],
+    "model": [],
+    "inference": []
+  },
+  "development_outcome_count": 0,
+  "confirmation_outcome_count": 0,
+  "scientific_outcome_count": 0,
+  "qualification_admissible": false,
+  "source_state_frozen": false,
+  "limitation": "The failing in-memory corpus audit was not persisted before the pre-freeze implementation changed, so no unsupported numerical diagnosis is asserted.",
+  "disposition": "Preserved as a pre-freeze implementation failure; the next fixture probe persists the complete corpus audit and guarded operation log."
+}

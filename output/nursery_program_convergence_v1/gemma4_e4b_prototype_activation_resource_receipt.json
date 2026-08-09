@@ -1,0 +1,167 @@
+{
+  "schema_version": "nursery-program-convergence-gemma4-e4b-prototype-activation-resource-receipt-v1",
+  "status": "VERIFIED_REUSE_RESOURCE_ADMITTED",
+  "measured_on_date": "2026-07-22",
+  "scope": "RESOURCE_GATE_ONLY_PUBLIC_AND_SYNTHETIC_NO_RESTRICTED_INFERENCE",
+  "resource_authorization": {
+    "authorized_action": "REUSE_THE_EXISTING_EXACT_CACHED_E4B_BYTES_WITHOUT_COPY_OR_DOWNLOAD_AFTER_LAUNCH_RECHECK",
+    "fresh_download_authorized": false,
+    "duplicate_copy_authorized": false,
+    "different_revision_or_manifest_authorized": false,
+    "license_or_provenance_activation_authorized": false,
+    "restricted_inference_authorized": false,
+    "scientific_outcome_authorized": false,
+    "overrides_existing_terminal_disposition": false,
+    "valid_only_if_launch_recheck_passes": true
+  },
+  "host": {
+    "chip": "Apple M5",
+    "unified_memory_gib": 32,
+    "host_identifiers_exported": false
+  },
+  "artifact_binding": {
+    "repository": "mlx-community/gemma-4-e4b-it-4bit",
+    "conversion_revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+    "upstream_repository": "google/gemma-4-E4B-it",
+    "upstream_revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+    "verified_local_snapshot_is_full_file_tree": true,
+    "verified_noncache_file_count": 10,
+    "verified_snapshot_bytes": 5179241512,
+    "verified_manifest_sha256": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae",
+    "manifest_matches_historical_public_canary": true,
+    "snapshot_rehashed_during_this_preflight": true,
+    "symlinked_model_files_permitted": false
+  },
+  "disk_gate": {
+    "observed_free_bytes": 59775721472,
+    "observed_free_gib": 55.670479,
+    "mandatory_post_peak_floor_bytes": 53687091200,
+    "mandatory_post_peak_floor_gib": 50,
+    "nonmodel_peak_reserve_bytes": 2684354560,
+    "nonmodel_peak_reserve_gib": 2.5,
+    "projected_post_peak_free_bytes": 57091366912,
+    "projected_post_peak_free_gib": 53.170479,
+    "projected_margin_above_floor_bytes": 3404275712,
+    "projected_margin_above_floor_gib": 3.170479,
+    "verified_reuse_floor_pass": true,
+    "fresh_or_duplicate_snapshot_floor_pass": false,
+    "required_launch_check": "STATVFS_FREE_MINUS_DECLARED_REMAINING_PEAK_BYTES_MUST_BE_AT_LEAST_53687091200",
+    "abort_before_opening_model_if_check_fails": true
+  },
+  "memory_pressure_gate": {
+    "measurement_command_class": "MACOS_MEMORY_PRESSURE_QUERY",
+    "observed_system_wide_memory_free_percent": 86,
+    "observed_pages_throttled": 0,
+    "minimum_memory_free_percent_at_launch": 25,
+    "maximum_pages_throttled_at_launch": 0,
+    "current_pressure_pass": true,
+    "historical_public_canary_peak_mlx_gib": 6.247,
+    "historical_request_shape": "BATCH_ONE_ONE_AUDIO_PLUS_FIVE_FRAMES_PLUS_TEXT",
+    "conservative_two_x_peak_envelope_gib": 12.494,
+    "required_additional_live_headroom_gib": 4,
+    "current_measurement_is_not_a_future_runtime_guarantee": true,
+    "recheck_immediately_before_model_load": true,
+    "abort_on_pressure_or_peak_guard_failure": true
+  },
+  "historical_public_canary_binding": {
+    "receipt_schema": "childlens-gemma4-public-synthetic-runtime-bakeoff-v1.3.1",
+    "receipt_sha256": "6eafc9518dcfbbd82fe5d1cddd4063c47d388b757f1565ab4aeb3478867d5695",
+    "joint_audio_and_five_frames_executed": true,
+    "network_denied_during_inference": true,
+    "strict_schema_output_valid": true,
+    "peak_mlx_unified_memory_gib": 6.247,
+    "wall_time_seconds": 17.135,
+    "single_fixture_is_structural_evidence_only": true,
+    "audio_preprocessor_numerical_warnings_observed": true
+  },
+  "parallel_limits": {
+    "maximum_mps_heavy_processes": 1,
+    "one_shared_fail_closed_mps_lock_required": true,
+    "parallel_model_loads_permitted": false,
+    "model_batch_size_windows": 1,
+    "maximum_prefetched_windows": 1,
+    "cpu_workers_while_mps_active": 2,
+    "maximum_cpu_paired_bundle_workers_while_mps_idle": 4,
+    "openmp_threads_per_cpu_worker": 1,
+    "mkl_threads_per_cpu_worker": 1,
+    "veclib_threads_per_cpu_worker": 1,
+    "resource_gate_pass": true,
+    "launch_must_fail_if_lock_or_limits_cannot_be_enforced": true
+  },
+  "public_synthetic_cpu_microbenchmark": {
+    "schema_version": "public-synthetic-paired-bundle-cpu-microbenchmark-v1",
+    "benchmark_spec_sha256": "29d38b67053355dc9915238ae10b94dff9769bcca4e04276eda59a67bfe189a2",
+    "scientific_dataset_or_outcome_used": false,
+    "bundle_count": 12,
+    "paired_units_per_bundle": 15,
+    "paired_shape": "FIVE_SYNTHETIC_ARM_KEYS_BY_THREE_SYNTHETIC_SEED_KEYS",
+    "sha256_rounds_per_bundle": 180000,
+    "scratch_bytes_per_worker": 8388608,
+    "repeats_per_worker_count": 3,
+    "results": [
+      {
+        "workers": 1,
+        "wall_seconds_trials": [1.643428, 1.351735, 1.365139],
+        "median_wall_seconds": 1.365139,
+        "median_speedup_vs_one": 1.0,
+        "maximum_conservative_sum_worker_peak_rss_bytes": 18710528
+      },
+      {
+        "workers": 2,
+        "wall_seconds_trials": [0.822493, 0.855175, 0.833584],
+        "median_wall_seconds": 0.833584,
+        "median_speedup_vs_one": 1.637673,
+        "maximum_conservative_sum_worker_peak_rss_bytes": 36438016
+      },
+      {
+        "workers": 4,
+        "wall_seconds_trials": [0.603717, 0.558681, 0.488252],
+        "median_wall_seconds": 0.558681,
+        "median_speedup_vs_one": 2.443502,
+        "maximum_conservative_sum_worker_peak_rss_bytes": 72646656
+      }
+    ],
+    "canonical_merge_sha256": "894d6a8194eb25ca2ced83e0b7c04dcba4082e7f675ce1b016301dadb76c3442",
+    "merge_equivalent_across_all_nine_runs": true,
+    "recommended_maximum_paired_bundle_workers": 4,
+    "benchmark_supports_cpu_overhead_and_determinism_only": true,
+    "benchmark_does_not_estimate_learner_memory_or_scientific_runtime": true
+  },
+  "deterministic_merge_layout": {
+    "ownership_unit": "ONE_WORKER_OWNS_ONE_COMPLETE_PAIRED_BUNDLE",
+    "never_split_arms_or_model_seeds_across_workers": true,
+    "worker_output_layout": "bundles/<zero_padded_bundle_index>/bundle_result.json plus complete_manifest.json",
+    "worker_commit": "WRITE_OWNER_PRIVATE_TEMPORARY_DIRECTORY_FSYNC_THEN_ATOMIC_RENAME",
+    "coordinator_acceptance": "READ_ONLY_BUNDLES_WITH_VALID_COMPLETE_MANIFEST_AND_EXPECTED_PROTOCOL_INPUT_DIGESTS",
+    "merge_order": [
+      "integer_bundle_index",
+      "corpus_seed",
+      "model_seed",
+      "frozen_arm_order"
+    ],
+    "canonical_encoding": "UTF8_JSON_SORTED_KEYS_COMPACT_SEPARATORS_NO_NAN_TRAILING_NEWLINE",
+    "partial_or_failed_bundle_policy": "EXCLUDE_AND_FAIL_WHOLE_RUN_DO_NOT_ANALYZE",
+    "coordinator_recomputes_tree_and_merged_digests": true
+  },
+  "contract_bindings": {
+    "frozen_replacement_amendment_sha256": "8e6d7a43ea9639fa451a59386b8657495558fde77fb2147a20767388d47ed24a",
+    "existing_terminal_disposition_sha256": "831a7d96d598f45e81514fb1cec5a0c4eaf2f84d6726ae4eb86dcd161e932be6",
+    "historical_public_canary_runner_sha256": "c459c4a8aeb83b8d51b6c91124ac3a639aabb965530ee7508b4afb19be2961fc",
+    "runtime_lock_input_sha256": "039f58e62a5b2a04dc0c88574b978b8e1c8a3aabfd5397832e4b0e6924d88fc8",
+    "prior_resource_receipt_sha256": "099af484dce9c2e00e2fd2afbc578ea98ca12679c9797c2079e19586474b49a9",
+    "complete_compiled_runtime_lock_available": false,
+    "resource_receipt_cannot_replace_missing_runtime_or_provenance_evidence": true
+  },
+  "boundary_attestations": {
+    "model_bytes_downloaded": false,
+    "restricted_or_quarantine_data_accessed": false,
+    "restricted_inference_run": false,
+    "hosted_or_cloud_inference_used": false,
+    "model_output_inspected": false,
+    "learner_or_tokenizer_trained": false,
+    "causal_or_acquisition_outcome_run": false,
+    "license_or_clickthrough_accepted": false,
+    "host_identifier_exported": false
+  },
+  "next_resource_action": "AT_ANY_FUTURE_PROTOTYPE_LAUNCH_REHASH_THE_SAME_TEN_FILES_RECHECK_STATVFS_AND_MEMORY_PRESSURE_ACQUIRE_THE_SINGLE_MPS_LOCK_AND_ABORT_ON_ANY_MISMATCH"
+}

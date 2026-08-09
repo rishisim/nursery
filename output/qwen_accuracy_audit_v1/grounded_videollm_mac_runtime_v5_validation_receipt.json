@@ -1,0 +1,53 @@
+{
+  "answer": "No. It passed runtime and schema checks but failed the public semantic gate 4/8 versus a 6/8 minimum.",
+  "caveats": [
+    "The public canary is a small synthetic admission screen, not a paired ChildLens accuracy estimate.",
+    "Grounded-VideoLLM was not run on the 27 restricted windows because the prospectively frozen gate failed.",
+    "No qualified German human lexical review was performed or claimed.",
+    "The exact released checkpoint is not documented as cleanly separable into general versus benchmark-subset-tuned variants."
+  ],
+  "checks": {
+    "canary_case_order_and_count_match_frozen_protocol": true,
+    "network_denied": true,
+    "oracle_lag_correct_count": 4,
+    "oracle_status_correct_count": 6,
+    "predicted_lag_counts": {
+      "lag": 1,
+      "lead": 6,
+      "overlap": 1
+    },
+    "predicted_status_counts": {
+      "present": 8
+    },
+    "public_canary_passed": false,
+    "public_runner_restricted_packet_reference_scan_passed": true,
+    "referential_plus_lag_correct_count_independently_recomputed": 4,
+    "restricted_stage_authorized": false,
+    "runtime_protocol_frozen_before_output": true,
+    "schema_valid_count_independently_recomputed": 8,
+    "smoke_passed": true
+  },
+  "decision": {
+    "grounded_videollm_substantially_better_than_qwen": "NOT_DEMONSTRATED",
+    "reopen_larger_human_grounded_calibration_study": false,
+    "run_27_restricted_windows": false
+  },
+  "privacy": {
+    "public_synthetic_aggregate_only": true,
+    "raw_model_text_exported": false,
+    "restricted_inference_run": false,
+    "restricted_packet_opened_by_public_runners": false
+  },
+  "provenance": {
+    "canary_private_receipt_sha256": "925e8c77c114329067fc65d920df2002d55dd21a823019f4d1b45094acfa20db",
+    "canary_protocol_sha256": "b199063399ecae820c379ca8876f9a62db1895cf22c04f7b3478118495394da3",
+    "canary_runner_sha256": "52d156ac9d0a68b04d36c7e17c136865f3ac16273975550c0d3b7268ab225eec",
+    "runtime_protocol_sha256": "2c9d3cb4042378975e2174f495a088e7d017fcfc946ce97e4936b4d140deebbf",
+    "smoke_private_receipt_sha256": "24f34437333172f6dba777b6629407e209cae8b48d2a14c4300ddb3a1a0056d8",
+    "smoke_runner_sha256": "9bf1ca5fee73c8631022b6269c64fd963ee68377f9b41c9edf6a4dcb9cf1df2d"
+  },
+  "question": "Did the independent Grounded-VideoLLM instrument pass the frozen public admission screen required before comparison with Qwen on 27 restricted ChildLens windows?",
+  "schema_version": "nursery-grounded-videollm-v5-validation-v1.0.0",
+  "status": "READY_TO_SHARE_WITH_CAVEATS",
+  "validated_at": "2026-07-23"
+}

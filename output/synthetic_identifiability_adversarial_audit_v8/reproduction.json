@@ -1,0 +1,17 @@
+{
+  "schema_version": "nursery-v8-adversarial-audit-reproduction-v1",
+  "status": "PASS",
+  "command_template": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python output/synthetic_identifiability_adversarial_audit_v8/audit.py --repository /Users/rishisim/Documents/research/nursery --package /Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v8 --output <fresh-output.json>",
+  "source_sha256": "b1c9fa6c4b885bbfc4ac9871881d9c145318cbe73e180856216a85cf9c7ddc44",
+  "first_run": {
+    "path": "run_2.json",
+    "sha256": "fefb0bfd370b65faa8a03a3e83fe08466cf8f7652d04e30ac3b136a80eec6c9b"
+  },
+  "second_run": {
+    "path": "run_3.json",
+    "sha256": "fefb0bfd370b65faa8a03a3e83fe08466cf8f7652d04e30ac3b136a80eec6c9b"
+  },
+  "byte_identical": true,
+  "development_outcome_count": 0,
+  "confirmation_outcome_count": 0
+}

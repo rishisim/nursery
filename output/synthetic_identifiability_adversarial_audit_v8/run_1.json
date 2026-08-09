@@ -1,0 +1,890 @@
+{
+  "audit_scope": "frozen snapshot and persisted excluded-smoke evidence only",
+  "checks": {
+    "adjudication_provenance": {
+      "confirmation_authorized": false,
+      "contract": {
+        "missing_contradictory_or_stale_fails_closed": true,
+        "official_paths": {
+          "negative_recompute": "negative_recompute_tests.json",
+          "preservation": "preservation_proof.json",
+          "qualification": "qualification_run/qualification_summary.json",
+          "recompute": "independent_recompute_comparison.json",
+          "terminal": "terminal_decision.json",
+          "tests": "official_test_execution_report.json",
+          "traceability": "traceability_validation.json"
+        },
+        "terminal_decision_function": "babyworld_lite/sensor_alignment_v8/adjudicator.py:terminal_decision",
+        "test_report_substitution_allowed": false
+      },
+      "development_authorized": false,
+      "frozen_adjudicator_regeneration_exact": true,
+      "official_digest_problems": [],
+      "status": "PASS",
+      "terminal_decision": "VERSION_READY"
+    },
+    "config_identity": {
+      "frozen_and_persisted_config_identical": true,
+      "status": "PASS"
+    },
+    "detector_bounds_and_runtime": {
+      "capacity_recomputation_exact": true,
+      "overall_fractional_accuracy": 0.4152777777777778,
+      "runtime_class": "babyworld_lite.sensor_alignment_v2.detector.SensorEventDetector",
+      "runtime_function": "babyworld_lite.sensor_alignment_v2.detector.candidate_evidence",
+      "runtime_inference_calls": 45506,
+      "sample_runtime_evidence_exact": true,
+      "status": "PASS",
+      "strata": {
+        "corrupted": {
+          "count": 1080,
+          "fractional_accuracy": 0.0,
+          "maximum": 0.7,
+          "minimum": 0.0,
+          "status": "PASS"
+        },
+        "informative": {
+          "count": 1080,
+          "fractional_accuracy": 0.8675925925925926,
+          "maximum": 1.0,
+          "minimum": 0.55,
+          "status": "PASS"
+        },
+        "weak": {
+          "count": 1080,
+          "fractional_accuracy": 0.5888888888888889,
+          "maximum": 0.95,
+          "minimum": 0.2,
+          "status": "PASS"
+        },
+        "zero_information": {
+          "count": 1080,
+          "fractional_accuracy": 0.20462962962962963,
+          "maximum": 0.7,
+          "minimum": 0.0,
+          "status": "PASS"
+        }
+      }
+    },
+    "environment_reproduction": {
+      "independent_recompute_status": "PASS",
+      "negative_recompute_status": "PASS",
+      "python_executable": "/Users/rishisim/Documents/research/nursery/.venv/bin/python",
+      "python_sha256_matches": true,
+      "separate_process_exit_code": 0,
+      "separate_process_probe": {
+        "module_root": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v8/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/__init__.py",
+        "package_terminal_sha256": "ae836a172509f6853f8f131b82a6e222f4d72dae034b0770b8c5d066dee23363",
+        "protocol_id": "synthetic-identifiability-qualification-v8",
+        "snapshot_verification": {
+          "checked_files": 45,
+          "manifest_digest_valid": true,
+          "problems": [],
+          "status": "PASS"
+        },
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    "factor_balance_and_conditions": {
+      "condition_audits": [
+        {
+          "absent_channel_rows": 3792,
+          "conditions": [
+            "absent_channel",
+            "randomized_shuffle",
+            "sensor_corrupted",
+            "shift_minus_8",
+            "shift_plus_8",
+            "synchronized",
+            "uninformative"
+          ],
+          "corpus_seed": 280201,
+          "episode_identity_exactly_matched": true,
+          "randomized_shuffle_deranged_and_factor_matched": true,
+          "randomized_shuffle_rows": 3792,
+          "status": "PASS",
+          "time_shifts": {
+            "shift_minus_8": -8,
+            "shift_plus_8": 8
+          },
+          "uninformative_distinct_streams": 1
+        },
+        {
+          "absent_channel_rows": 3792,
+          "conditions": [
+            "absent_channel",
+            "randomized_shuffle",
+            "sensor_corrupted",
+            "shift_minus_8",
+            "shift_plus_8",
+            "synchronized",
+            "uninformative"
+          ],
+          "corpus_seed": 280207,
+          "episode_identity_exactly_matched": true,
+          "randomized_shuffle_deranged_and_factor_matched": true,
+          "randomized_shuffle_rows": 3792,
+          "status": "PASS",
+          "time_shifts": {
+            "shift_minus_8": -8,
+            "shift_plus_8": 8
+          },
+          "uninformative_distinct_streams": 1
+        }
+      ],
+      "corpus_audits": [
+        {
+          "base_audit_fields_exact": false,
+          "construction_digest": "18d226a9d1a8b3de1c6a083d9abad01b6043fe54b3f47627a4a7ecb9a1bbea35",
+          "corpus_seed": 280201,
+          "maximum_factor_control_cramers_v": 0.15153695784819085,
+          "maximum_noun_target_owner_gap": 0.0,
+          "maximum_pairwise_cramers_v": 0.1346159059147068,
+          "status": "FAIL"
+        },
+        {
+          "base_audit_fields_exact": false,
+          "construction_digest": "18d226a9d1a8b3de1c6a083d9abad01b6043fe54b3f47627a4a7ecb9a1bbea35",
+          "corpus_seed": 280207,
+          "maximum_factor_control_cramers_v": 0.15153695784819085,
+          "maximum_noun_target_owner_gap": 0.0,
+          "maximum_pairwise_cramers_v": 0.1346159059147068,
+          "status": "FAIL"
+        }
+      ],
+      "factor_refit_status": "PASS",
+      "seed_invariant_construction_digest": "18d226a9d1a8b3de1c6a083d9abad01b6043fe54b3f47627a4a7ecb9a1bbea35",
+      "status": "FAIL"
+    },
+    "immutable_frozen_inputs": {
+      "frozen_artifact_problems": [],
+      "frozen_imports_only": true,
+      "module_paths": {
+        "babyworld_lite.sensor_alignment_v8": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v8/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/__init__.py",
+        "babyworld_lite.sensor_alignment_v8.adjudicator": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v8/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/adjudicator.py",
+        "babyworld_lite.sensor_alignment_v8.benchmark": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v8/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/benchmark.py",
+        "babyworld_lite.sensor_alignment_v8.detector_runtime": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v8/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/detector_runtime.py",
+        "babyworld_lite.sensor_alignment_v8.learner": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v8/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/learner.py",
+        "babyworld_lite.sensor_alignment_v8.protocol": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v8/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/protocol.py"
+      },
+      "persisted_input_manifest": {
+        "checked_files": 56,
+        "problems": [],
+        "status": "PASS"
+      },
+      "snapshot_manifest": {
+        "checked_files": 45,
+        "problems": [],
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    "leakage_and_non_oracularity": {
+      "fit_subscript_keys": [
+        "candidate_count_normalization",
+        "competition_weight",
+        "cooccurrence_initialization_passes",
+        "end",
+        "episode_id",
+        "event_logits",
+        "events",
+        "family",
+        "initial_presence_probability",
+        "initialization_jitter",
+        "items",
+        "iterations",
+        "lag_scale",
+        "learner",
+        "name",
+        "no_absence_null_mass",
+        "noun_sensor_weight",
+        "null",
+        "null_logit",
+        "null_margin_alpha",
+        "presence_smoothing",
+        "present",
+        "quality",
+        "sensor_calibration_temperature",
+        "sensor_joint_update_weight",
+        "sensor_null_calibration_weight",
+        "sensor_semantic_sharpening_weight",
+        "sensor_weight",
+        "slot",
+        "smoothing",
+        "speech_time",
+        "start",
+        "temperature",
+        "update_rate",
+        "utterance",
+        "visible_cooccurrence_initialization"
+      ],
+      "forbidden_fit_keys": [],
+      "forbidden_predict_keys": [],
+      "keys_loaded_only_for_post_prediction_scoring_in_adversarial_audit": true,
+      "predict_subscript_keys": [
+        "candidate_id",
+        "candidates",
+        "kind",
+        "learner",
+        "prompt_id",
+        "temperature",
+        "tokens"
+      ],
+      "prompt_failures": [],
+      "status": "PASS",
+      "training_trace_flag_failures": [],
+      "visible_ledger_failures": []
+    },
+    "manifest_completeness": {
+      "actual_file_count_excluding_manifest": 306,
+      "listed_file_count": 306,
+      "missing": [],
+      "self_excluded_by_definition": true,
+      "status": "PASS",
+      "unexpected": [],
+      "verification": {
+        "checked_files": 306,
+        "problems": [],
+        "status": "PASS"
+      }
+    },
+    "order_invariance": {
+      "adversarial_operation_count": 200,
+      "adversarial_references_by_role": {
+        "corpus": [
+          280201,
+          280207
+        ],
+        "inference": [],
+        "model": [
+          280301,
+          280303
+        ]
+      },
+      "contexts": [
+        {
+          "candidate_variants": [
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 1
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 2
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 3
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 4
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 5
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 6
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 7
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 8
+            }
+          ],
+          "condition": "absent_channel",
+          "corpus_seed": 280201,
+          "distinct_candidate_permutations": 8,
+          "model_seed": 280301,
+          "refit_matches_official_metrics": true,
+          "refit_model_digest_matches_official": true,
+          "status": "PASS",
+          "training_variants": [
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "reversed",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            },
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "hash_permuted",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            }
+          ]
+        },
+        {
+          "candidate_variants": [
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 1
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 2
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 3
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 4
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 5
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 6
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 7
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 8
+            }
+          ],
+          "condition": "synchronized",
+          "corpus_seed": 280201,
+          "distinct_candidate_permutations": 8,
+          "model_seed": 280301,
+          "refit_matches_official_metrics": true,
+          "refit_model_digest_matches_official": true,
+          "status": "PASS",
+          "training_variants": [
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "reversed",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            },
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "hash_permuted",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            }
+          ]
+        },
+        {
+          "candidate_variants": [
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 1
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 2
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 3
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 4
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 5
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 6
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 7
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 8
+            }
+          ],
+          "condition": "absent_channel",
+          "corpus_seed": 280201,
+          "distinct_candidate_permutations": 8,
+          "model_seed": 280303,
+          "refit_matches_official_metrics": true,
+          "refit_model_digest_matches_official": true,
+          "status": "PASS",
+          "training_variants": [
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "reversed",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            },
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "hash_permuted",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            }
+          ]
+        },
+        {
+          "candidate_variants": [
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 1
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 2
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 3
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 4
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 5
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 6
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 7
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 8
+            }
+          ],
+          "condition": "synchronized",
+          "corpus_seed": 280201,
+          "distinct_candidate_permutations": 8,
+          "model_seed": 280303,
+          "refit_matches_official_metrics": true,
+          "refit_model_digest_matches_official": true,
+          "status": "PASS",
+          "training_variants": [
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "reversed",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            },
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "hash_permuted",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            }
+          ]
+        },
+        {
+          "candidate_variants": [
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 1
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 2
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 3
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 4
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 5
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 6
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 7
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 8
+            }
+          ],
+          "condition": "absent_channel",
+          "corpus_seed": 280207,
+          "distinct_candidate_permutations": 8,
+          "model_seed": 280301,
+          "refit_matches_official_metrics": true,
+          "refit_model_digest_matches_official": true,
+          "status": "PASS",
+          "training_variants": [
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "reversed",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            },
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "hash_permuted",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            }
+          ]
+        },
+        {
+          "candidate_variants": [
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 1
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 2
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 3
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 4
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 5
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 6
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 7
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 8
+            }
+          ],
+          "condition": "synchronized",
+          "corpus_seed": 280207,
+          "distinct_candidate_permutations": 8,
+          "model_seed": 280301,
+          "refit_matches_official_metrics": true,
+          "refit_model_digest_matches_official": true,
+          "status": "PASS",
+          "training_variants": [
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "reversed",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            },
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "hash_permuted",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            }
+          ]
+        },
+        {
+          "candidate_variants": [
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 1
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 2
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 3
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 4
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 5
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 6
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 7
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 8
+            }
+          ],
+          "condition": "absent_channel",
+          "corpus_seed": 280207,
+          "distinct_candidate_permutations": 8,
+          "model_seed": 280303,
+          "refit_matches_official_metrics": true,
+          "refit_model_digest_matches_official": true,
+          "status": "PASS",
+          "training_variants": [
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "reversed",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            },
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "hash_permuted",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            }
+          ]
+        },
+        {
+          "candidate_variants": [
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 1
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 2
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 3
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 4
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 5
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 6
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 7
+            },
+            {
+              "exact_metrics_match": true,
+              "maximum_numeric_delta": 0.0,
+              "variant": 8
+            }
+          ],
+          "condition": "synchronized",
+          "corpus_seed": 280207,
+          "distinct_candidate_permutations": 8,
+          "model_seed": 280303,
+          "refit_matches_official_metrics": true,
+          "refit_model_digest_matches_official": true,
+          "status": "PASS",
+          "training_variants": [
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "reversed",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            },
+            {
+              "maximum_numeric_delta": 0.0,
+              "metrics_digest_exact": true,
+              "model_digest_exact": true,
+              "order": "hash_permuted",
+              "same_subgroup_gate_decisions": true,
+              "within_frozen_tolerance": true
+            }
+          ]
+        }
+      ],
+      "official_all_condition_reversal_audit": "PASS",
+      "status": "PASS"
+    },
+    "seed_firewalls": {
+      "adversarial_observed": {
+        "corpus": [
+          280201,
+          280207
+        ],
+        "inference": [],
+        "model": [
+          280301,
+          280303
+        ]
+      },
+      "confirmation_identifiers_touched": [],
+      "confirmation_outcome_count": 0,
+      "development_outcome_count": 0,
+      "forbidden_operation_references": [],
+      "future_development_identifiers_touched": [],
+      "official_declared_and_observed": {
+        "corpus": [
+          280201,
+          280207
+        ],
+        "inference": [],
+        "model": [
+          280301,
+          280303
+        ]
+      },
+      "overlaps": {},
+      "status": "PASS"
+    },
+    "separated_null_present_validity": {
+      "aggregation_used_to_rescue_subgroups": false,
+      "every_corpus_model_kind_presence_independent": true,
+      "failed_rows": [],
+      "maximum_action_null_exact_chance": 0.16666666666666666,
+      "minimum_action_null_correct_probability": 0.5136086305585699,
+      "minimum_action_null_fractional_accuracy": 1.0,
+      "null_capacity_controls": "PASS",
+      "rows_checked": 64,
+      "status": "PASS"
+    }
+  },
+  "confirmation_authorized": false,
+  "confirmation_outcome_count": 0,
+  "decision": "REVISE",
+  "development_outcome_count": 0,
+  "failed_checks": [
+    "factor_balance_and_conditions"
+  ],
+  "identifiers_touched_by_role": {
+    "corpus": [
+      280201,
+      280207
+    ],
+    "inference": [],
+    "model": [
+      280301,
+      280303
+    ]
+  },
+  "protocol_id": "synthetic-identifiability-qualification-v8",
+  "schema_version": "nursery-v8-adversarial-launch-audit-v1",
+  "source_sha256": "4030167e3ec9adf8c9f2ce0a8ec519045c7b173ec10f3cfbd21653abd41713ac",
+  "status": "FAIL",
+  "v8_complete_manifest_sha256": "f5147cf3a3c9fff6b2111e27201c0fec1fab4ea52581f72acb44919de370ff86",
+  "v8_qualification_sha256": "165ab935ac9b5bad1614bb8e6273fb2803f595d68ab2fa5813eb2f8d3b7237eb",
+  "v8_terminal_sha256": "ae836a172509f6853f8f131b82a6e222f4d72dae034b0770b8c5d066dee23363"
+}

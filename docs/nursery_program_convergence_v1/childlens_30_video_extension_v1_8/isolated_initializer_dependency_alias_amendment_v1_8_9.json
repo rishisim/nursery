@@ -1,0 +1,21 @@
+{
+  "schema_version": "nursery-childlens-isolated-initializer-dependency-alias-amendment-v1.8.9",
+  "status": "FROZEN_BEFORE_ASSEMBLY_RETRY",
+  "date": "2026-07-22",
+  "failure_code": "E_INTERNAL",
+  "diagnosis": "The historical initializer has exactly one additional sibling import, childlens_human_validation_v1_2, which is unavailable by name under isolated -I execution.",
+  "scope": "CONTENT_INDEPENDENT_HASH_PINNED_IMPORT_BINDING_ONLY",
+  "allowed_change": "Hash-bind and load the existing v1.2 workflow file, then register that same module object under the initializer's exact historical import name, failing closed on conflicts.",
+  "author_module_sha256": "4701390b00de5306baf4b877db972570cd7c1d67b97e9e6801b4e83c5405350c",
+  "human_v1_2_module_sha256": "8bb132a5e0e7ea3b6e9fdcc005c197de109361f9d2e99a088c167e6f23459661",
+  "unchanged": [
+    "all completed Qwen and Gemma outputs",
+    "sample and candidate windows",
+    "models, prompts, schemas, parsers, and labels",
+    "calibration thresholds and ranges",
+    "causal protocol and endpoints",
+    "isolated execution and network denial"
+  ],
+  "model_inference_rerun_allowed": false,
+  "scientific_endpoint_opened_before_amendment": false
+}

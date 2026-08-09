@@ -1,0 +1,87 @@
+{
+  "schema_version": "nursery-gemma4-restricted-worker-success-receipt-path-compatibility-erratum-v1.6.1",
+  "erratum_id": "gemma4-e4b-restricted-calibration-original-success-path-v1.6.1",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_PRE_RESTRICTED_RERUN_SUCCESS_PATH_ONLY",
+  "namespace": "docs/nursery_program_convergence_v1/gemma4_restricted_worker_environment_v1_6_1",
+  "erratum_mode": "ADDITIVE_ONE_FIELD_OUTPUT_PATH_COMPATIBILITY_OVERRIDE",
+  "v1_6_amendment_modified": false,
+  "historical_artifacts_modified": false,
+  "restricted_rerun_executed": false,
+  "restricted_content_accessed": false,
+  "Gemma_worker_process_launched": false,
+  "Gemma_worker_inference_run": false,
+  "scientific_endpoint_opened": false,
+  "scientific_outcome_run": false,
+  "immutable_bindings": {
+    "v1_6_restricted_worker_environment_amendment": {
+      "path": "docs/nursery_program_convergence_v1/gemma4_restricted_worker_environment_v1_6/frozen_restricted_worker_environment_amendment_v1_6.json",
+      "sha256": "316fd2f1f9e4c1b69936703f86eb6b72e0fff574e9115d2a5bb138e5fa7da577"
+    },
+    "frozen_causal_execution_contract_v2": {
+      "path": "docs/nursery_program_convergence_v1/calibration_conditioned_symbolic_execution_contract_v2.json",
+      "sha256": "db760f4135f81f7f78184a80f8abae16578918ff10b44c952f83a76cf5daa810"
+    }
+  },
+  "exact_field_supersession": {
+    "source_document": "v1_6_restricted_worker_environment_amendment",
+    "source_JSON_pointer": "/new_immutable_output_namespace/future_restricted_calibration_receipt",
+    "frozen_field_value": "childlens_pseudo_calibration_gemma_substitution_receipt_v1_6.json",
+    "frozen_namespaced_resolution_superseded": "output/nursery_program_convergence_v1/gemma4_restricted_worker_environment_v1_6/childlens_pseudo_calibration_gemma_substitution_receipt_v1_6.json",
+    "superseding_repo_relative_success_path": "output/nursery_program_convergence_v1/childlens_pseudo_calibration_gemma_substitution_receipt.json",
+    "superseding_path_interpretation": "FULL_REPOSITORY_RELATIVE_PATH; do not join it to the v1.6 diagnostic namespace.",
+    "maximum_superseded_fields": 1,
+    "success_receipt_schema_or_content_changed": false
+  },
+  "execution_contract_compatibility": {
+    "contract_field": "planned_outcome_command",
+    "required_calibration_receipt_argument": "--calibration-receipt output/nursery_program_convergence_v1/childlens_pseudo_calibration_gemma_substitution_receipt.json",
+    "superseding_success_path_matches_contract": true,
+    "causal_execution_contract_changed": false
+  },
+  "success_path_creation_contract": {
+    "path_must_be_absent_before_restricted_execution": true,
+    "absence_verified_at_freeze": true,
+    "exclusive_creation_required": true,
+    "exclusive_creation_semantics": "Create the planned success path once with O_WRONLY|O_CREAT|O_EXCL and owner-only mode 0600 only after the complete aggregate calibration receipt validates.",
+    "fail_if_path_exists": true,
+    "overwrite_truncate_replace_rename_over_existing_or_reuse_allowed": false,
+    "partial_or_unvalidated_success_receipt_allowed": false,
+    "historical_file_overwritten": false
+  },
+  "failure_and_diagnostic_path_preserved": {
+    "v1_6_output_namespace": "output/nursery_program_convergence_v1/gemma4_restricted_worker_environment_v1_6",
+    "future_restricted_calibration_failure": "childlens_pseudo_calibration_gemma_substitution_failure_v1_6.json",
+    "resolved_failure_path": "output/nursery_program_convergence_v1/gemma4_restricted_worker_environment_v1_6/childlens_pseudo_calibration_gemma_substitution_failure_v1_6.json",
+    "failure_or_diagnostic_artifact_at_planned_success_path_allowed": false,
+    "v1_5_failure_receipt_overwritten": false
+  },
+  "all_other_v1_6_fields_preserved": {
+    "restricted_worker_environment_delta_unchanged": true,
+    "exact_14_mandatory_plus_2_thread_plus_TMPDIR_environment_unchanged": true,
+    "quarantine_privacy_network_FD_and_subprocess_contracts_unchanged": true,
+    "model_prompt_schema_parser_and_sample_unchanged": true,
+    "calibration_thresholds_and_gates_unchanged": true,
+    "no_automatic_fallback_rule_unchanged": true,
+    "simulator_oracle_scientific_boundary_unchanged": true,
+    "scientific_or_content_fields_changed": false
+  },
+  "overlay_application_rule": {
+    "reject_if_either_bound_digest_differs": true,
+    "reject_if_v1_6_source_pointer_or_frozen_value_differs": true,
+    "reject_if_execution_contract_no_longer_names_the_superseding_success_path": true,
+    "reject_if_planned_success_path_exists_before_execution": true,
+    "reject_if_success_path_is_not_exclusive_created_after_full_receipt_validation": true,
+    "reject_if_failure_or_diagnostic_output_leaves_the_v1_6_namespace": true,
+    "reject_if_any_field_other_than_the_future_success_path_changes": true
+  },
+  "authorization_boundary": {
+    "erratum_is_restricted_rerun": false,
+    "erratum_is_calibration_receipt": false,
+    "restricted_worker_launch_authorized_by_erratum_alone": false,
+    "scientific_endpoint_authorized": false,
+    "scientific_outcome_authorized": false,
+    "automatic_fallback_authorized": false,
+    "next_action": "A separately validated v1.6 coordinator must bind this erratum, exclusive-create the original planned aggregate success receipt path only on validated success, and keep every v1.6 failure or diagnostic artifact in the v1.6 namespace."
+  }
+}

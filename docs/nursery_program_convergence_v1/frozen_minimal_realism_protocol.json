@@ -1,0 +1,295 @@
+{
+  "schema_version": "nursery-minimal-realism-protocol-v1",
+  "protocol_id": "nursery-synthetic-minimal-realism-extension",
+  "frozen_at": "2026-07-22",
+  "status": "SUPERSEDED_BY_PROTOTYPE_STANDARD_CLARIFICATION_BEFORE_ANY_OUTCOME",
+  "superseded_by": "docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json",
+  "supersession_note": "This empirical-free dual-endpoint design is retained as history. The user subsequently authorized bounded ChildLens aggregate pseudo-calibration for a smaller directional prototype; this file must not consume that calibration.",
+  "decision": "EXISTING_SYNTHETIC_EVIDENCE_INADEQUATE_NEW_MINIMAL_PROTOCOL_REQUIRED",
+  "primary_question": "Given identical weakly aligned synthetic vision-language experience, learner initialization, updates, and compute, do synchronized training-only event cues improve cue-free held-out noun-object and verb-action grounding over absent, shuffled, time-shifted, and corrupted controls?",
+  "primary_claim_if_all_gates_pass": "In this simulator and learner family, event-synchronized training-only cues causally improve both noun-object and verb-action grounding under weak language-event alignment, and the improvement transfers to cue-free held-out instances, scenes, and object-action compositions.",
+  "nonclaims": [
+    "No infant-learning, developmental, ecological-validity, or real-corpus claim.",
+    "No claim that any empirical child corpus measured the simulator-defined side cues.",
+    "No claim that the selected learner is cognitively realistic or that the effect transfers to a neural video-language learner.",
+    "No arbitrary zero-exposure word-learning claim.",
+    "No ChildLens, AEA, or BabyView calibration or ancestry claim."
+  ],
+  "ancestry_firewall": {
+    "allowed": [
+      "new simulator randomness fixed before outcomes",
+      "generic mathematical methods",
+      "public paper and public code-interface descriptions without empirical values or trained artifacts",
+      "existing synthetic code whose configuration and data path are verified free of empirical values"
+    ],
+    "forbidden": [
+      "AEA empirical data, aggregates, priors, code paths carrying empirical values, vocabulary, tokenizer, weights, checkpoints, or results",
+      "ChildLens empirical data, pseudo-labels, aggregates, priors, vocabulary, tokenizer, weights, checkpoints, or results",
+      "BabyView empirical data, measurements, distributions, vocabulary, tokenizer, weights, checkpoints, or results",
+      "cross-corpus pooling, calibration, initialization, or outcome transfer"
+    ],
+    "learner_initialization": "scratch",
+    "synthetic_vocabulary": "new opaque symbols sampled independently of all corpora",
+    "oracle_use": "evaluation and diagnostic ceilings only; never learner input"
+  },
+  "simulator": {
+    "units": "event-duration-normalized and deliberately not calibrated to any empirical corpus",
+    "latent_event": [
+      "scene",
+      "object_concept",
+      "action_concept",
+      "event_start",
+      "event_end",
+      "referential_status"
+    ],
+    "vision_stream": "Noisy, randomly rotated object-form and action-dynamics observations with independent object/action occlusion; no oracle concept identifier is visible.",
+    "language_stream": "Opaque synthetic noun and verb tokens, appearing alone or compositionally, with delay, null references, competing events, and repeated cross-situational exposure.",
+    "side_stream": "Concept-agnostic event-boundary, motion-change, and contact-change signals synchronized to the latent event during training only; side-only concept decoding must remain at chance.",
+    "alignment_rule": "Language is weakly delayed, nullable, and ambiguous relative to event windows; synchronized side cues follow latent event time rather than the language timestamp.",
+    "evaluation_truth": "simulator oracle latent labels"
+  },
+  "factorial_content": {
+    "noun_object_concepts": 8,
+    "verb_action_concepts": 8,
+    "heldout_object_action_compositions_per_corpus": 16,
+    "exposure_rule": "Every scored noun and verb is exposed in training, but held-out exemplars, scenes, and scored object-action compositions are not.",
+    "zero_exposure_panel": "Two noun and two verb tokens remain completely unexposed and must stay at exact candidate-set chance as a leakage falsifier.",
+    "evaluation_splits": [
+      "new exemplars for every exposed noun and verb",
+      "new scene layouts and distractor arrangements",
+      "held-out object-action compositions with both atomic concepts exposed elsewhere",
+      "independent evaluation RNG streams per corpus seed"
+    ]
+  },
+  "arms": [
+    {
+      "id": "vl_weak_baseline",
+      "role": "language+vision baseline",
+      "training_side_input": "structurally absent mask with zero values"
+    },
+    {
+      "id": "side_synchronized",
+      "role": "causal treatment",
+      "training_side_input": "concept-agnostic side stream synchronized to the latent event"
+    },
+    {
+      "id": "side_group_shuffled",
+      "role": "marginal-preserving synchrony control",
+      "training_side_input": "side windows permuted within corpus, stress cell, missingness block, and energy bin"
+    },
+    {
+      "id": "side_time_shifted",
+      "role": "temporal-specificity control",
+      "training_side_input": "balanced positive and negative shifts of one complete event duration, with wraparound forbidden"
+    },
+    {
+      "id": "side_corrupted_uninformative",
+      "role": "capacity and nuisance control",
+      "training_side_input": "phase-randomized signal matched on dimension, energy, dropout, and missingness but independent of event time and identity"
+    }
+  ],
+  "fairness_contract": {
+    "same_generated_primary_stream_across_arms": true,
+    "same_candidate_bags_across_arms": true,
+    "same_initial_weights_across_arms_within_bundle": true,
+    "same_optimizer_updates_and_compute_budget": true,
+    "same_architecture_including_side_adapter": true,
+    "baseline_side_adapter_input": "all-missing mask and zero values",
+    "same_scoring_and_early_stopping_rule": true,
+    "side_fields_rejected_by_evaluation_schema": true,
+    "side_adapter_and_side_inputs_absent_from_exported_evaluator": true
+  },
+  "learner": {
+    "family": "minimal corrective cross-situational multiple-instance learner",
+    "reuse": "Reuse only the validated synthetic bag construction, paired-control transformations, and cue-free evaluation interfaces; do not reuse the confidence-only sharpening path stopped by the adversarial audit.",
+    "required_new_mechanism": "A single event-selection posterior gates ordinary noun and verb evidence updates. Synchronized cues may change which visible event supplies learning evidence but may not directly change class scores, encode concept identity, or sharpen an already-computed output distribution.",
+    "noun_and_verb_symmetry": "Identical event-selection mechanism, update rule, capacity, and loss for noun and verb tokens, with separate visual object-form and action-dynamics observations.",
+    "strong_alignment_ceiling": "A diagnostic oracle-event selector using the same learner and compute; excluded from causal arm inference.",
+    "forbidden_path": "Any side-conditioned post-hoc logit temperature, probability power transform, direct concept classifier, oracle pointer, or answer-key alignment."
+  },
+  "stress_grid": [
+    {
+      "id": "center",
+      "grounded_fraction": 0.75,
+      "ambiguous_fraction": 0.25,
+      "candidate_events": 2,
+      "object_visibility": 0.8,
+      "action_visibility": 0.8,
+      "language_delay_event_units": [0.25, 0.75]
+    },
+    {
+      "id": "high_lag",
+      "grounded_fraction": 0.75,
+      "ambiguous_fraction": 0.25,
+      "candidate_events": 2,
+      "object_visibility": 0.8,
+      "action_visibility": 0.8,
+      "language_delay_event_units": [1.0, 2.0]
+    },
+    {
+      "id": "high_null",
+      "grounded_fraction": 0.5,
+      "ambiguous_fraction": 0.25,
+      "candidate_events": 2,
+      "object_visibility": 0.8,
+      "action_visibility": 0.8,
+      "language_delay_event_units": [0.25, 0.75]
+    },
+    {
+      "id": "high_ambiguity",
+      "grounded_fraction": 0.75,
+      "ambiguous_fraction": 0.5,
+      "candidate_events": 4,
+      "object_visibility": 0.8,
+      "action_visibility": 0.8,
+      "language_delay_event_units": [0.25, 0.75]
+    },
+    {
+      "id": "low_object_visibility",
+      "grounded_fraction": 0.75,
+      "ambiguous_fraction": 0.25,
+      "candidate_events": 2,
+      "object_visibility": 0.5,
+      "action_visibility": 0.8,
+      "language_delay_event_units": [0.25, 0.75]
+    },
+    {
+      "id": "low_action_visibility",
+      "grounded_fraction": 0.75,
+      "ambiguous_fraction": 0.25,
+      "candidate_events": 2,
+      "object_visibility": 0.8,
+      "action_visibility": 0.5,
+      "language_delay_event_units": [0.25, 0.75]
+    },
+    {
+      "id": "combined_stress",
+      "grounded_fraction": 0.5,
+      "ambiguous_fraction": 0.5,
+      "candidate_events": 4,
+      "object_visibility": 0.5,
+      "action_visibility": 0.5,
+      "language_delay_event_units": [1.0, 2.0]
+    }
+  ],
+  "seed_and_pairing_plan": {
+    "independent_unit": "synthetic corpus seed",
+    "corpus_seeds": [
+      700001,
+      700003,
+      700005,
+      700007,
+      700009,
+      700011,
+      700013,
+      700015,
+      700017,
+      700019,
+      700021,
+      700023,
+      700025,
+      700027,
+      700029,
+      700031,
+      700033,
+      700035,
+      700037,
+      700039,
+      700041,
+      700043,
+      700045,
+      700047,
+      700049,
+      700051,
+      700053,
+      700055,
+      700057,
+      700059,
+      700061,
+      700063,
+      700065,
+      700067,
+      700069,
+      700071,
+      700073,
+      700075,
+      700077,
+      700079
+    ],
+    "model_seeds": [710001, 710003, 710007],
+    "inference_seed": 720001,
+    "within_bundle_rule": "One bundle generates one corpus and runs every arm with the same three initializations; model-seed metrics are averaged before the arm contrast.",
+    "no_adaptive_extension": true,
+    "no_seed_replacement": true
+  },
+  "primary_endpoints": [
+    "cue_free_heldout_noun_object_macro_top1",
+    "cue_free_heldout_verb_action_macro_top1"
+  ],
+  "secondary_endpoints": [
+    "heldout_object_action_composition_joint_top1",
+    "mean_correct_probability",
+    "multiclass_log_loss",
+    "multiclass_brier",
+    "null_rejection_accuracy",
+    "stress_cell_specific_effects"
+  ],
+  "primary_inference": {
+    "estimands": "For each primary endpoint, synchronized minus each of baseline, shuffled, time-shifted, and corrupted controls, averaged across the seven equally weighted stress cells.",
+    "model_seed_handling": "Average the three paired model replicates within corpus and arm before contrasts.",
+    "method": "One-sided 95% Student-t lower confidence bound over 40 paired corpus effects; exact sign test is corroborating.",
+    "intersection_union": "All eight endpoint-by-comparator primary contrasts must pass.",
+    "minimum_practical_effect": 0.03,
+    "lower_bound_must_exceed": 0.0,
+    "minimum_positive_corpus_fraction": 0.6,
+    "multiplicity": "No alpha splitting is needed for an intersection-union claim; failure of any component fails the conjunctive claim. Secondary intervals are descriptive."
+  },
+  "frozen_gates": {
+    "go": [
+      "All integrity, pairing, compute-equality, ancestry, and side-withholding audits pass.",
+      "The strong-alignment ceiling exceeds exact candidate-set chance by at least 0.30 for both noun and verb endpoints.",
+      "Every primary synchronized contrast has mean at least 0.03, one-sided 95% lower bound above 0, at least 60% positive corpus effects, and no more than 20% corpus effects below -0.05.",
+      "The synchronized arm exceeds exact chance by at least 0.15 on both primary endpoints.",
+      "Baseline and every negative control remain non-saturated: mean top-1 below 0.90 with at least 60% of corpora containing an error or tie.",
+      "Side-only noun and verb probes are no more than 0.02 above exact chance.",
+      "Zero-exposure noun and verb panels remain within 0.02 of exact chance.",
+      "Synchronized is positive versus the best matched negative in the center cell and at least four of five single-factor stress cells; combined stress is descriptive and may fail without changing the primary decision.",
+      "Ablating the event-selection gate removes at least half the synchronized advantage without directly changing evaluation logits."
+    ],
+    "revise": [
+      "A technical failure occurs before any scientific endpoint is revealed.",
+      "The strong-alignment ceiling is learnable but one predeclared negative-control manipulation fails its marginal-matching audit before outcomes.",
+      "The implementation does not yet provide a valid event-selection correction path for both nouns and verbs."
+    ],
+    "stop": [
+      "Oracle/strong alignment cannot learn both endpoints.",
+      "Side-only probes decode concept identity above the frozen tolerance.",
+      "Any side field, side adapter, or side-derived representation reaches evaluation.",
+      "Synchronized gain is confidence sharpening without correcting at least one wrong or tied training alignment per passing corpus.",
+      "Corrupted or time-shifted cues match the synchronized arm on either primary endpoint under the frozen intersection-union rule.",
+      "Any empirical corpus ancestry is discovered."
+    ]
+  },
+  "execution": {
+    "implementation_scope": "Add only the dual noun/verb event-selection manipulation and its falsification probes in a new nonempirical module; reuse tested synthetic pairing/statistics interfaces where they carry no empirical values.",
+    "next_task": "Implement and fixture-test this frozen protocol without reading outcomes; then create a separate authorization receipt for exactly one outcome run.",
+    "planned_module": "babyworld_lite/minimal_realism",
+    "planned_runner": "scripts/run_minimal_realism_extension.py",
+    "planned_output_root": "output/nursery_minimal_realism_extension",
+    "reserved_launch_command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python scripts/run_minimal_realism_extension.py run --protocol docs/nursery_program_convergence_v1/frozen_minimal_realism_protocol.json --output-root output/nursery_minimal_realism_extension --jobs 4",
+    "launch_command_status": "RESERVED_NOT_YET_IMPLEMENTED_OR_AUTHORIZED",
+    "parallel_unit": "complete paired corpus-seed bundle containing all five arms and all three model seeds",
+    "cuda_slurm": "Assign one complete bundle per identical GPU; never split arms of a bundle across GPU types. Merge only after every arm and initialization in the bundle completes.",
+    "single_mac": "Use at most four CPU workers for generation/scoring and one MPS-heavy trainer at a time; if the minimal learner remains CPU-only, run four complete bundles concurrently.",
+    "measured_reference": "A prior synthetic corrective benchmark on this host reached four workers and projected 100 corpora by three model units in about 409 seconds with contingency, about 12.2 GB concurrent peak RSS, and about 1.44 GB output. This is engineering evidence only, not a runtime guarantee for the new dual-endpoint protocol.",
+    "planning_budget": "Admit only after a four-bundle outcome-blind smoke projects at most 30 minutes wall time, 16 GB peak RSS, and 3 GB disk on the current Mac; otherwise revise engineering before any outcome.",
+    "stop_conditions": [
+      "any arm mismatch in examples, initialization, optimizer steps, or compute",
+      "any side data at evaluation",
+      "any empirical ancestry",
+      "RSS above 16 GB or projected wall time above 30 minutes on the Mac without a frozen resource amendment",
+      "partial bundle or worker failure; never analyze incomplete paired bundles",
+      "any endpoint read during implementation qualification"
+    ]
+  }
+}

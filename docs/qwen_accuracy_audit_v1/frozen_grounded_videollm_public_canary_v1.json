@@ -1,0 +1,97 @@
+{
+  "schema_version": "nursery-grounded-videollm-public-canary-v1.0.0",
+  "protocol_id": "childlens-independent-second-instrument-one-shot-minitest-v1",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_BEFORE_MODEL_LOAD_OR_OUTPUT",
+  "purpose": "Public-only compatibility and German temporal-grounding screen before any restricted ChildLens packet discovery.",
+  "input": {
+    "cases": 8,
+    "duration_seconds": 10,
+    "source_frames_per_case": 5,
+    "source_frame_times_seconds": [0, 2.5, 5, 7.5, 10],
+    "model_frames": 96,
+    "model_segments": 12,
+    "expansion": "Nearest-neighbor repetition of the five ordered source frames only; no generated intermediate visual content.",
+    "utterance_anchor_seconds": 5,
+    "visual_style": "Self-generated 512x512 vector scenes with common objects and actions; no external or restricted media."
+  },
+  "prompt": "Give you a textual query: '<GERMAN_QUERY>'. When does the described content occur in the video? Return exactly one line using one of these forms: 'From <start> seconds to <end> seconds.', 'NOT_VISIBLE', or 'AMBIGUOUS'.",
+  "output_schema": {
+    "present_regex": "^From ([0-9]+(?:\\.[0-9]+)?) seconds to ([0-9]+(?:\\.[0-9]+)?) seconds\\.$",
+    "null_literal": "NOT_VISIBLE",
+    "ambiguous_literal": "AMBIGUOUS",
+    "no_other_text": true,
+    "pre_schema_canonicalization": "Apply the authors' deterministic <0..300> temporal-token-to-seconds conversion for a 10-second clip, format to two decimals, strip leading/trailing whitespace, and collapse repeated internal whitespace. No lexical rewriting or answer extraction is permitted."
+  },
+  "lag_mapping": {
+    "lead": "Parsed end is less than 4.0 seconds.",
+    "overlap": "Parsed interval intersects the closed 4.0-to-6.0-second anchor band.",
+    "lag": "Parsed start is greater than 6.0 seconds.",
+    "ambiguous_boundary": "Any present interval not assigned by the three rules above.",
+    "null": "NOT_VISIBLE",
+    "ambiguous": "AMBIGUOUS"
+  },
+  "cases": [
+    {
+      "case": "public_01",
+      "query_de": "der rote Ball",
+      "oracle_status": "present",
+      "oracle_lag": "lead"
+    },
+    {
+      "case": "public_02",
+      "query_de": "die blaue Tasse",
+      "oracle_status": "present",
+      "oracle_lag": "overlap"
+    },
+    {
+      "case": "public_03",
+      "query_de": "das grüne Spielzeugauto",
+      "oracle_status": "present",
+      "oracle_lag": "lag"
+    },
+    {
+      "case": "public_04",
+      "query_de": "der gelbe Stern",
+      "oracle_status": "null",
+      "oracle_lag": "null"
+    },
+    {
+      "case": "public_05",
+      "query_de": "der rote Ball",
+      "oracle_status": "ambiguous",
+      "oracle_lag": "ambiguous"
+    },
+    {
+      "case": "public_06",
+      "query_de": "der rote Ball rollt nach rechts",
+      "oracle_status": "present",
+      "oracle_lag": "lead"
+    },
+    {
+      "case": "public_07",
+      "query_de": "die Hand hebt den gelben Würfel an",
+      "oracle_status": "present",
+      "oracle_lag": "overlap"
+    },
+    {
+      "case": "public_08",
+      "query_de": "die blaue Tür öffnet sich",
+      "oracle_status": "present",
+      "oracle_lag": "lag"
+    }
+  ],
+  "generation": {
+    "seed": 730119,
+    "do_sample": false,
+    "num_beams": 1,
+    "max_new_tokens": 64,
+    "temperature": null,
+    "top_p": null
+  },
+  "pass": {
+    "exact_schema_minimum": 7,
+    "oracle_referential_plus_lag_correct_minimum": 6
+  },
+  "failure": "Stop without restricted packet discovery, prompt repair, retry, translation, or model substitution."
+}

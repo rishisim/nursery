@@ -1,0 +1,370 @@
+{
+  "artifact_id": "childlens-governance-evidence-v1.0.0",
+  "as_of_date": "2026-07-21",
+  "scope": "PUBLIC_AND_SANITIZED_RELEASE_GOVERNANCE_EVIDENCE_ONLY",
+  "authenticated_keeper_access_used_by_this_workstream": false,
+  "sanitized_authenticated_keeper_receipt_integrated": true,
+  "scientific_outcome_run": false,
+  "terminal_decision": null,
+  "boundary_assertions": {
+    "empirical_corpus": "CHILDLENS_ONLY",
+    "aea_empirical_ancestry": false,
+    "babyview_empirical_ancestry": false,
+    "restricted_payload_exported": false,
+    "license_accepted": false,
+    "share_modified": false,
+    "bulk_download_performed": false
+  },
+  "release_identity": {
+    "doi": "10.17617/4.fe",
+    "title": "ChildLens: An Egocentric Video Dataset for Activity Analysis in Children",
+    "keeper_library_id": "c8ed0104-b793-4c35-817e-302afd4e036b",
+    "keeper_snapshot_commit": "4856662653b2fa183e53268d088cffba02a33443",
+    "identity_tuple": "10.17617/4.fe|c8ed0104-b793-4c35-817e-302afd4e036b|4856662653b2fa183e53268d088cffba02a33443",
+    "doi_landing_url": "https://keeper.mpdl.mpg.de/doi/libs/c8ed0104-b793-4c35-817e-302afd4e036b/4856662653b2fa183e53268d088cffba02a33443/",
+    "snapshot_access": "LOGIN_REQUIRED",
+    "accessible_live_library_id_matches_doi_library": true,
+    "accessible_live_revision": null,
+    "accessible_live_revision_status": "UNPINNED_NO_IMMUTABLE_REVISION_HASH_IN_SANITIZED_RECEIPT",
+    "doi_snapshot_equals_accessible_live_revision": "UNRESOLVED",
+    "datacite": {
+      "publication_year": 2025,
+      "created": "2025-07-23T09:30:45.000Z",
+      "updated": "2025-07-23T09:30:45.000Z",
+      "publisher": "MPDL Keeper Service, Max-Planck-Gesellschaft zur Foerderung der Wissenschaften e. V.",
+      "resource_type_general": "Dataset",
+      "resource_type": "Library",
+      "version": null,
+      "rights_list": []
+    },
+    "interpretation": "The DOI target pins a public Keeper library and snapshot commit. The current read-only library UUID matches, but no immutable live revision hash was exposed, so byte-for-byte equivalence to the DOI snapshot is unresolved. DataCite supplies no semantic version or rights statement."
+  },
+  "sanitized_keeper_receipt": {
+    "receipt_date": "2026-07-21",
+    "supplied_by": "COORDINATOR",
+    "access_mode": "AUTHENTICATED_READ_ONLY",
+    "restricted_payload_received_by_this_workstream": false,
+    "library_uuid_matches_public_doi_library_id": true,
+    "immutable_live_revision_hash_available": false,
+    "root_classes": [
+      "ANNOTATIONS_FINAL_FORMAT",
+      "ANNOTATIONS_PLATFORM_FORMAT",
+      "IMAGES",
+      "VIDEOS",
+      "ARCHIVE_METADATA",
+      "ARCHIVAL_CERTIFICATE",
+      "PARTICIPANT_TABLE",
+      "README"
+    ],
+    "inventory": {
+      "mp4_row_count": 192,
+      "mp4_rows_with_displayed_size": 191,
+      "mp4_rows_without_displayed_size": 1,
+      "displayed_mp4_size_sum_gb_approximate_lower_bound": 201.33,
+      "final_format_json_row_count": 192,
+      "platform_format_json_row_count": 192
+    },
+    "archive_metadata": {
+      "license_field": null,
+      "license_field_status": "HEADING_PRESENT_VALUE_BLANK",
+      "description_total_duration_hours_rounded": 109,
+      "description_participant_count": 62,
+      "description_annotated_duration_hours_rounded": 54
+    },
+    "readme_grouping_statement": {
+      "participant_table_documented": true,
+      "maps_anonymized_participant_group_to_media": true,
+      "age_field_documented": true,
+      "gender_field_documented": true,
+      "recording_date_field_documented": true,
+      "row_level_linkage_audited": false
+    },
+    "actions": {
+      "download": false,
+      "share_mutation": false,
+      "license_acceptance": false
+    }
+  },
+  "source_separation": {
+    "release_public_landing_claims": {
+      "total_duration_hours_rounded": 109,
+      "participant_count": 62,
+      "annotated_duration_hours_rounded": 54,
+      "video_file_count": null,
+      "annotated_video_count": null,
+      "modalities": [
+        "VIDEO",
+        "AUDIO"
+      ],
+      "annotation_classes": {
+        "location": 5,
+        "activity": 14
+      }
+    },
+    "paper_claims_not_release_manifest_facts": {
+      "paper_doi": "10.3758/s13428-026-02982-6",
+      "version_of_record_date": "2026-04-13",
+      "total_duration_hours": 108.58,
+      "participant_count": 62,
+      "video_file_count": 354,
+      "annotated_fraction_percent": 51,
+      "annotated_duration_hours_approximate": 55,
+      "annotated_video_count": 192,
+      "annotations_ongoing_at_publication": true
+    },
+    "current_live_release_observations_from_sanitized_receipt": {
+      "revision_status": "UNPINNED_LIVE_REVISION",
+      "video_mp4_row_count": 192,
+      "final_annotation_json_row_count": 192,
+      "platform_annotation_json_row_count": 192,
+      "displayed_video_size_sum_gb_lower_bound": 201.33,
+      "video_rows_missing_displayed_size": 1,
+      "paper_full_corpus_video_count_delta": -162,
+      "annotated_subset_interpretation": "CONSISTENT_WITH_BUT_NOT_PROVEN",
+      "retired_preliminary_343_video_claim": "CONTRADICTED_DO_NOT_USE"
+    }
+  },
+  "governance_gate_implications": {
+    "G1_TERMS": {
+      "status": "UNRESOLVED",
+      "reason": "Public sources support reviewed research access but do not grant or define local copying, local decoding, derived transcripts or annotations, learner training, aggregate export, redistribution, retention, or deletion. DataCite rightsList is empty and the accessible archive-metadata License field is blank.",
+      "required_evidence": "Recipient- and release-specific DUA/access letter or applicable release README clauses; do not accept an instrument without the user."
+    },
+    "G2_RELEASE_GROUPING": {
+      "status": "CONDITIONAL",
+      "reason": "The accessible read-only library UUID matches the DOI library and its README documents participant-to-file grouping with recording date, but no immutable live revision hash was exposed and row-level linkage has not been audited.",
+      "required_evidence": "Canonical restricted manifest digest, immutable live revision receipt or read-only DOI-snapshot inventory receipt, and complete grouping-field/linkage audit."
+    },
+    "G9_SIMULATOR_CALIBRATION_PERMISSION_COMPONENT": {
+      "status": "UNRESOLVED",
+      "reason": "Public sources do not explicitly permit export of the required nonidentifying video/audio calibration aggregates."
+    }
+  },
+  "certificate_assessment": {
+    "marker_observed_on_public_doi_landing": true,
+    "commitment_supported_properties": [
+      "ACCESS_FOR_ENTITLED_PERSONS_AT_LEAST_TEN_YEARS",
+      "CHECKSUM_BASED_INTEGRITY",
+      "LOSSLESS_EXPORTABILITY_AS_A_STORAGE_SERVICE_PROPERTY",
+      "BACKUPS_AND_RETRIEVABILITY",
+      "DEPOSITOR_CONTROLLED_ACCESS"
+    ],
+    "does_not_establish": [
+      "DATASET_LICENSE",
+      "RECIPIENT_DUA",
+      "LOCAL_PROCESSING_PERMISSION",
+      "TRANSCRIPT_OR_ANNOTATION_DERIVATIVE_PERMISSION",
+      "MODEL_TRAINING_PERMISSION",
+      "AGGREGATE_PUBLICATION_PERMISSION",
+      "REDISTRIBUTION_PERMISSION"
+    ],
+    "note": "Keeper exportability is a preservation promise, not a legal reuse or public-export grant."
+  },
+  "permission_matrix": [
+    {
+      "action": "REQUEST_RESEARCH_ACCESS",
+      "status": "SUPPORTED_FOR_ACCESS_ONLY"
+    },
+    {
+      "action": "READ_RELEASE_METADATA_AND_TERMS_IN_PLACE",
+      "status": "OBSERVED_READ_ONLY_ACCESS_NOT_A_PROCESSING_GRANT"
+    },
+    {
+      "action": "SELECTIVE_LOCAL_PILOT_ACQUISITION",
+      "status": "UNRESOLVED_TERMS"
+    },
+    {
+      "action": "FULL_ARCHIVE_DOWNLOAD",
+      "status": "PROHIBITED_BY_AUDIT_POLICY"
+    },
+    {
+      "action": "LOCAL_AUDIO_VIDEO_DECODING",
+      "status": "UNRESOLVED_TERMS"
+    },
+    {
+      "action": "CREATE_RESTRICTED_TRANSCRIPTS_DIARIZATION_OR_REFERENTIAL_ANNOTATIONS",
+      "status": "UNRESOLVED_TERMS"
+    },
+    {
+      "action": "TRAIN_CHILDLENS_ONLY_LEARNER",
+      "status": "UNRESOLVED_TERMS"
+    },
+    {
+      "action": "EXPORT_NONIDENTIFYING_CELL_SUPPRESSED_AGGREGATES",
+      "status": "UNRESOLVED_TERMS"
+    },
+    {
+      "action": "EXPORT_RESTRICTED_PAYLOAD",
+      "status": "PROHIBITED"
+    },
+    {
+      "action": "REDISTRIBUTE_MEDIA_OR_RESTRICTED_DERIVATIVES",
+      "status": "PROHIBITED_UNLESS_EXPLICITLY_GRANTED"
+    },
+    {
+      "action": "MODIFY_SHARE_UPLOAD_OR_INVITE",
+      "status": "PROHIBITED"
+    },
+    {
+      "action": "ACCEPT_LICENSE_OR_DUA",
+      "status": "DO_NOT_ACCEPT_USER_ONLY_ACTION"
+    }
+  ],
+  "manifest_policy": {
+    "schema_version": "childlens-release-manifest-v1.0.0",
+    "canonicalization": "SORT_RESTRICTED_RECORDS_BY_INTERNAL_OBJECT_KEY_THEN_SHA256_CANONICAL_JSON",
+    "exported_fields": [
+      "PUBLIC_RELEASE_IDENTITY",
+      "CANONICAL_RESTRICTED_MANIFEST_SHA256",
+      "TOP_LEVEL_CLASS_COUNTS",
+      "DISTINCT_CONTENT_COUNTS",
+      "CLASS_BYTE_TOTALS",
+      "ANNOTATION_LINKAGE_AGGREGATES",
+      "GROUPING_FIELD_AVAILABILITY",
+      "CELL_SUPPRESSED_GROUP_TOTALS_WHEN_PERMITTED",
+      "REASON_CODED_COUNT_RECONCILIATION"
+    ],
+    "restricted_internal_fields": [
+      "RELATIVE_PATH",
+      "ORIGINAL_FILENAME",
+      "REMOTE_ETAG_OR_VERSION",
+      "FILE_BYTES",
+      "SHA256",
+      "CONTAINER_CODEC_STREAM_METADATA",
+      "PER_FILE_DURATION",
+      "ANNOTATION_LINKAGE",
+      "HMAC_PARTICIPANT_KEY",
+      "HMAC_SESSION_KEY",
+      "HMAC_MEDIA_KEY",
+      "RECORDING_DATE_OR_TIME"
+    ],
+    "object_classes": [
+      "VIDEO",
+      "ANNOTATION",
+      "IMAGE",
+      "METADATA",
+      "PARTICIPANT_TABLE",
+      "README_TERMS",
+      "CERTIFICATE",
+      "OTHER"
+    ],
+    "privacy": {
+      "internal_identifier_method": "HMAC_SHA256_WITH_SEPARATELY_STORED_AUDIT_SECRET",
+      "export_filenames_paths_or_source_ids": false,
+      "export_exact_recording_timestamps": false,
+      "small_cell_threshold": 5,
+      "complementary_cell_reconstruction_forbidden": true
+    }
+  },
+  "count_reconciliation": {
+    "video_count_bases": [
+      "FILESYSTEM_VIDEO_OBJECTS",
+      "DISTINCT_VIDEO_CONTENT_SHA256",
+      "TECHNICALLY_PARSEABLE_VIDEO_CONTAINERS",
+      "ANNOTATION_LINKED_VIDEO_OBJECTS"
+    ],
+    "annotated_duration_primary_definition": "UNION_OF_VALID_ANNOTATION_INTERVALS_WITHIN_MEDIA_THEN_SUM",
+    "reason_codes": [
+      "ROUNDING",
+      "VERSION_DIFFERENCE",
+      "ANNOTATED_SUBSET",
+      "COUNTING_UNIT",
+      "DUPLICATE",
+      "UNLINKED_ANNOTATION",
+      "MISSING_MEDIA",
+      "CORRUPT",
+      "UNRESOLVED"
+    ],
+    "current_result": "PENDING_RELEASE_MANIFEST"
+  },
+  "storage_policy": {
+    "host_available_gib_observed": 122.3,
+    "mandatory_reserve_gib": 30,
+    "operational_minimum_free_space_after_peak_gib": 50,
+    "maximum_current_project_peak_headroom_gib_approximate": 72.3,
+    "raw_pilot_payload_cap_gib": 20,
+    "namespace_peak_cap_gib": 73,
+    "displayed_video_size_sum_gb_lower_bound": 201.33,
+    "displayed_video_size_sum_gib_lower_bound_approximate": 187.5,
+    "video_rows_missing_displayed_size": 1,
+    "complete_video_byte_total_known": false,
+    "full_archive_download": false,
+    "full_current_video_inventory_fit": false,
+    "required_free_gib_for_displayed_video_lower_bound_plus_reserve_greater_than": 217.5,
+    "current_shortfall_gib_for_displayed_video_lower_bound_plus_reserve_greater_than": 95.2,
+    "pilot_mode": "METADATA_FIRST_DETERMINISTIC_SELECTIVE_SHARDS_ONLY",
+    "active_shard_video_count": "3_TO_5",
+    "preflight": "HEAD_OR_EQUIVALENT_PLUS_SOURCE_BYTES_AND_DERIVATIVE_TEMP_SPACE_PROJECTION",
+    "stop_rule": "PROJECTED_POST_PEAK_FREE_SPACE_BELOW_50_GIB_OR_RELEASE_VERSION_CHANGE_OR_TERMS_ACTION_REQUIRED",
+    "external_upload": false
+  },
+  "sources": [
+    {
+      "source_id": "S1_KEEPER_DOI_LANDING",
+      "title": "ChildLens Keeper DOI landing",
+      "url": "https://keeper.mpdl.mpg.de/doi/libs/c8ed0104-b793-4c35-817e-302afd4e036b/4856662653b2fa183e53268d088cffba02a33443/",
+      "source_role": "PUBLIC_RELEASE_IDENTITY_AND_DESCRIPTION"
+    },
+    {
+      "source_id": "S2_DATACITE",
+      "title": "DataCite record for 10.17617/4.fe",
+      "url": "https://api.datacite.org/dois/10.17617/4.fe",
+      "source_role": "DOI_REGISTRATION_METADATA"
+    },
+    {
+      "source_id": "S3_MPI_PROJECT",
+      "title": "MPI-EVA ChildLens project page",
+      "url": "https://www.eva.mpg.de/comparative-cultural-psychology/technical-development/childlens/",
+      "source_role": "OFFICIAL_DISCOVERY_AND_ACCESS_STATEMENT"
+    },
+    {
+      "source_id": "S4_ARTICLE",
+      "title": "ChildLens: An egocentric video dataset for activity analysis in children",
+      "url": "https://doi.org/10.3758/s13428-026-02982-6",
+      "source_role": "VERSION_OF_RECORD_CORPUS_AND_ANNOTATION_CLAIMS"
+    },
+    {
+      "source_id": "S5_OFFICIAL_CODE",
+      "title": "Official ChildLens code repository",
+      "url": "https://github.com/neleSuffo/ChildLens",
+      "source_role": "PUBLIC_PROJECT_METHOD_DESCRIPTION"
+    },
+    {
+      "source_id": "S6_CARED_COMMITMENT",
+      "title": "Keeper Cared Data Commitment",
+      "url": "https://keeper.mpdl.mpg.de/f/1b0bfceac2/",
+      "source_role": "ARCHIVAL_CERTIFICATION_SCOPE"
+    },
+    {
+      "source_id": "S7_KEEPER_OVERVIEW",
+      "title": "About the Keeper Service",
+      "url": "https://keeper.mpdl.mpg.de/f/d17ecbb967/",
+      "source_role": "ARCHIVAL_SERVICE_DESCRIPTION"
+    },
+    {
+      "source_id": "S8_KEEPER_PROVIDER_NOTICE",
+      "title": "Keeper Provider Identification",
+      "url": "https://keeper.mpdl.mpg.de/f/2206ad0c0a8346cb8f9e/",
+      "source_role": "WEBSITE_PROVIDER_AND_DATA_PROTECTION_NOTICE_NOT_DATASET_REUSE_TERMS"
+    },
+    {
+      "source_id": "S9_SANITIZED_KEEPER_RECEIPT",
+      "title": "Coordinator-supplied sanitized read-only Keeper receipt",
+      "url": null,
+      "source_role": "CURRENT_LIVE_LIBRARY_AGGREGATE_INVENTORY_LICENSE_AND_GROUPING_DESCRIPTION",
+      "receipt_date": "2026-07-21",
+      "restricted_payload_included": false
+    }
+  ],
+  "limitations": [
+    "NO_RECIPIENT_DUA_OR_ACCESS_LETTER_REVIEWED",
+    "ARCHIVE_METADATA_LICENSE_FIELD_BLANK",
+    "NO_IMMUTABLE_CURRENT_LIVE_REVISION_HASH_AVAILABLE",
+    "DOI_SNAPSHOT_AND_CURRENT_LIVE_BYTE_EQUIVALENCE_UNRESOLVED",
+    "ONE_OF_192_VIDEO_ROWS_LACKS_DISPLAYED_SIZE",
+    "NO_MEDIA_STREAM_CODEC_OR_DURATION_AUDIT",
+    "NO_ROW_LEVEL_ANNOTATION_OR_PARTICIPANT_SESSION_LINKAGE_AUDIT",
+    "PRELIMINARY_343_VIDEO_CLAIM_CONTRADICTED_AND_RETIRED",
+    "NO_TERMINAL_FEASIBILITY_DECISION_ASSIGNED_BY_THIS_WORKSTREAM"
+  ]
+}

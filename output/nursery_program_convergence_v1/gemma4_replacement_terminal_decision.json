@@ -1,0 +1,109 @@
+{
+  "schema_version": "nursery-gemma4-replacement-terminal-decision-v1",
+  "decided_at": "2026-07-22",
+  "decision": "CALIBRATION_STOP_MODEL_TRIANGULATION",
+  "decision_scope": "ONE_INSTRUMENT_QWEN2_TO_GEMMA4_E4B_SUBSTITUTION_ONLY",
+  "stage_reached": "PRE_RESTRICTED_INFERENCE_PROVENANCE_AND_STORAGE_GATE",
+  "restricted_gemma_inference_run": false,
+  "restricted_gemma_output_opened": false,
+  "qwen3_instruments_rerun": false,
+  "calibration_receipt_replaced": false,
+  "scientific_outcome_run": false,
+  "single_parser_correction_spent": false,
+  "third_visual_model_tried": false,
+  "evidence": {
+    "official_upstream": {
+      "repository": "google/gemma-4-E4B-it",
+      "revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+      "license": "Apache-2.0",
+      "public": true,
+      "ungated": true,
+      "weight_sha256": "cfbd3d2f1cd71bd471c37fe2bf8546d5028d41e5736f64e1ca6c6b8893125503",
+      "weight_bytes": 15992595884
+    },
+    "available_mlx_artifact": {
+      "repository": "mlx-community/gemma-4-e4b-it-4bit",
+      "revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+      "artifact_manifest_sha256": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae",
+      "artifact_bytes": 5179241512,
+      "declared_source_revision": "fee6332c1abaafb77f6f9624236c63aa2f1d0187",
+      "source_weight_byte_identical_to_current_official_snapshot": true,
+      "metadata_license": "gemma",
+      "license_or_notice_file_present": false,
+      "converter_family_declared": "mlx_vlm.convert",
+      "converter_version_or_revision_declared": false,
+      "exact_conversion_provenance_complete": false,
+      "activation_authorized": false
+    },
+    "runtime_and_public_canary": {
+      "runtime": {
+        "mlx_vlm": "0.6.6",
+        "mlx": "0.32.0",
+        "transformers": "5.14.1"
+      },
+      "historical_public_joint_audio_five_frame_canary_passed": true,
+      "historical_canary_network_denied": true,
+      "historical_canary_used_exact_frozen_referential_schema": false,
+      "historical_canary_is_semantic_or_restricted_quality_evidence": false,
+      "measured_peak_mlx_memory_gib": 6.247,
+      "measured_wall_seconds_one_fixture": 17.135
+    },
+    "storage": {
+      "current_free_gib": 55.515732,
+      "required_post_peak_free_floor_gib": 50,
+      "current_headroom_above_floor_gib": 5.515732,
+      "minimum_pinned_source_plus_local_conversion_reserve_decimal_gb": 22,
+      "pinned_source_plus_local_conversion_admitted": false,
+      "existing_ambiguous_conversion_reuse_fits": true,
+      "resource_fit_does_not_resolve_authorization": true
+    }
+  },
+  "gate_results": {
+    "G1_exact_license_and_conversion_provenance_unambiguous": "FAIL",
+    "G2_frozen_replacement_amendment": "PASS_NOT_ACTIVE",
+    "G3_exact_common_schema_public_canary": "NOT_REACHED",
+    "G4_disk_memory_and_one_mps_serialization": "MEMORY_PASS_DISK_FAIL_FOR_REPRODUCIBLE_PATH",
+    "G5_restricted_gemma_137_window_execution": "NOT_RUN",
+    "G6_two_path_visual_schema_and_coverage": "NOT_EVALUABLE",
+    "G7_calibration_envelope_binding": "NOT_RUN",
+    "G8_minimal_outcome_authorization": "FAIL_CLOSED"
+  },
+  "stop_rationale": "The only locally available 4-bit MLX artifact has internally conflicting license metadata and no pinned converter version or revision. The unambiguous alternative is a local conversion from the exact Apache-2.0 upstream with a pinned MIT converter, but the required source-plus-output peak cannot preserve the frozen 50-GiB free-space floor. The protocol forbids a third model and offers only one transport/parser correction, which cannot cure provenance or storage. Restricted inference therefore stopped before content access.",
+  "frozen_artifacts": {
+    "replacement_amendment": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_replacement_instrument_amendment.json",
+      "sha256": "8e6d7a43ea9639fa451a59386b8657495558fde77fb2147a20767388d47ed24a"
+    },
+    "original_calibration_protocol": {
+      "path": "docs/nursery_program_convergence_v1/frozen_childlens_pseudo_calibration_protocol.json",
+      "sha256": "db5336726f4841e592cb9c73df5ab22a0887d1bd34c7cf673146f38de9e86961"
+    },
+    "calibration_conditioned_protocol": {
+      "path": "docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json",
+      "sha256": "c6b7afab6c8914a968b0f06706a222d2771863c2a3fd2017184c17d431bfa7d6"
+    },
+    "historical_calibration_receipt": {
+      "path": "output/nursery_program_convergence_v1/childlens_pseudo_calibration_receipt.json",
+      "sha256": "c8da2349663f7e49291381c42e15f8972bb3b13b0b739dad4e1221ee937dfc59"
+    }
+  },
+  "minimal_symbolic_runner": {
+    "implemented": true,
+    "fixture_only_smoke_available": true,
+    "scientific_run_entrypoint_fail_closed": true,
+    "runner_sha256": "2863dd90e025c08df9d262daea2f2f959cde7caa84ae413c0f15ea194d2e8a3f",
+    "fixture_sha256": "1e062ca383b41142a04d673e025e51318b3d4f42c50187d7602f7a5333525c97",
+    "outcome_launch_command": null,
+    "why_no_launch_command": "The two-path visual calibration gate is not satisfied, so the outcome remains unauthorized."
+  },
+  "privacy_and_ancestry": {
+    "restricted_examples_or_payloads_exported": false,
+    "transcripts_frames_audio_identifiers_or_exact_times_exported": false,
+    "hosted_or_cloud_inference_used": false,
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false,
+    "ChildLens_pseudo_labels_used_as_ground_truth": false,
+    "simulator_oracle_remains_only_future_evaluation_truth": true
+  },
+  "next_task": "No one-shot outcome task is authorized from this branch. A future fresh task may reconsider only after at least 22 GB decimal of additional safe local workspace is available for a pinned official-source conversion while preserving the 50-GiB floor; it must freeze a new activation receipt and exact common-schema public canary before any restricted inference."
+}

@@ -1,0 +1,94 @@
+{
+  "schema_version": "childlens-gemma4-mlx-vlm-primary-sources-v1.3.1",
+  "as_of_date": "2026-07-22",
+  "scope": "PUBLIC_PRIMARY_SOURCES_ONLY",
+  "restricted_content_accessed": false,
+  "weights_downloaded": false,
+  "license_clickthrough_accepted": false,
+  "sources": [
+    {
+      "claim_scope": "Google native modalities and architecture",
+      "publisher": "Google",
+      "title": "Gemma 4 model card",
+      "url": "https://ai.google.dev/gemma/docs/core/model_card_4"
+    },
+    {
+      "claim_scope": "E4B modalities and Apache-2.0 status",
+      "publisher": "Google",
+      "title": "google/gemma-4-E4B-it",
+      "url": "https://huggingface.co/google/gemma-4-E4B-it"
+    },
+    {
+      "claim_scope": "12B modalities and Apache-2.0 status",
+      "publisher": "Google",
+      "title": "google/gemma-4-12B-it",
+      "url": "https://huggingface.co/google/gemma-4-12B-it"
+    },
+    {
+      "claim_scope": "12B joint multimodal design and deployment target",
+      "publisher": "Google",
+      "title": "Gemma 4 12B: The developer guide",
+      "url": "https://developers.googleblog.com/gemma-4-12b-the-developer-guide/"
+    },
+    {
+      "claim_scope": "Gemma 4 E4B MLX-VLM image/audio documentation",
+      "publisher": "MLX-VLM",
+      "title": "Gemma 4 support README",
+      "url": "https://github.com/Blaizzy/mlx-vlm/blob/main/mlx_vlm/models/gemma4/README.md"
+    },
+    {
+      "claim_scope": "Multimodal endpoints and strict JSON-schema decoding",
+      "publisher": "MLX-VLM",
+      "title": "MLX-VLM README — structured outputs",
+      "url": "https://github.com/Blaizzy/mlx-vlm#structured-outputs"
+    },
+    {
+      "claim_scope": "Structured-output implementation and tested-model limits",
+      "publisher": "MLX-VLM",
+      "title": "Structured outputs pull request 1047",
+      "url": "https://github.com/Blaizzy/mlx-vlm/pull/1047"
+    },
+    {
+      "claim_scope": "E4B MLX implementation",
+      "publisher": "MLX-VLM",
+      "title": "Gemma 4 MLX support pull request 890",
+      "url": "https://github.com/Blaizzy/mlx-vlm/pull/890"
+    },
+    {
+      "claim_scope": "E4B audio defects and fixes",
+      "publisher": "MLX-VLM",
+      "title": "Gemma 4 audio fix pull request 931",
+      "url": "https://github.com/Blaizzy/mlx-vlm/pull/931"
+    },
+    {
+      "claim_scope": "12B Unified image/audio/video and mixed-input reproduction",
+      "publisher": "MLX-VLM",
+      "title": "Gemma 4 Unified support pull request 1267",
+      "url": "https://github.com/Blaizzy/mlx-vlm/pull/1267"
+    },
+    {
+      "claim_scope": "Current MLX-VLM release",
+      "publisher": "MLX-VLM",
+      "title": "MLX-VLM v0.6.6 release",
+      "url": "https://github.com/Blaizzy/mlx-vlm/releases/tag/v0.6.6"
+    },
+    {
+      "claim_scope": "E4B conversion metadata and published artifact size",
+      "publisher": "MLX Community",
+      "title": "mlx-community/gemma-4-e4b-it-4bit",
+      "url": "https://huggingface.co/mlx-community/gemma-4-e4b-it-4bit"
+    },
+    {
+      "claim_scope": "12B conversion metadata and published artifact size",
+      "publisher": "MLX Community",
+      "title": "mlx-community/gemma-4-12B-it-4bit",
+      "url": "https://huggingface.co/mlx-community/gemma-4-12B-it-4bit"
+    },
+    {
+      "claim_scope": "MLX-VLM code license",
+      "publisher": "MLX-VLM",
+      "title": "MIT License",
+      "url": "https://github.com/Blaizzy/mlx-vlm/blob/main/LICENSE"
+    }
+  ]
+}

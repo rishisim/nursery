@@ -1,0 +1,79 @@
+{
+  "schema_version": "nursery-grounded-videollm-mac-runtime-v4-execution-v1.0.0",
+  "protocol_id": "childlens-independent-second-instrument-mac-runtime-v4",
+  "executed_at": "2026-07-22",
+  "status": "FAIL_RECEIPT_AFTER_ONE_UNOBSERVED_PUBLIC_SMOKE_OUTPUT",
+  "result_class": "PUBLIC_RUNNER_RECEIPT_FAILURE_NOT_MODEL_ACCURACY",
+  "prospective_freeze": {
+    "v4_protocol_frozen_before_model_load": true,
+    "v4_protocol_sha256": "7eb19ee69223403d5b1aaf19bbdc8fd8f95ffaa99f93f995b2139d60d159eb87"
+  },
+  "artifacts": {
+    "hugging_face_repository": "WHB139426/Grounded-Video-LLM",
+    "hugging_face_revision": "b97f0e826a0b6c292ca54d9c02c483c479952501",
+    "official_source_revision": "e26da4e4b681357fd911d5ace3467f031af29208",
+    "checkpoint_sha256": "5967e1138fc1106e1c3b384b96af3120405f455475308b4067bb785ac560f588",
+    "weight_manifest_digest": "a2ab012a3a39c1a63ace406ff6ec0b9cdeb5482c1fc87e4a43326ee89daf2d47",
+    "source_tree_digest": "48cd6f7330df160f17f2590c98d548c20f5b0c3699748a64e07fc95e91a76ec8",
+    "runner_sha256": "c3bb7b3e61178b0f4fadd086792a74013f3c2f2799eafd99a0976d3f9870fbe6",
+    "environment_package_digest": "1f46288a772ad88ec290a53bd57f90ff425e446bc6ee1f3cbdaa7af15e0a39ac"
+  },
+  "runtime": {
+    "host": "Apple M5",
+    "architecture": "arm64",
+    "unified_memory_gib": 32,
+    "python": "3.10.20",
+    "pytorch": "2.13.0",
+    "attention": "eager",
+    "network_denial_sentinel_passed": true,
+    "module_placement": {
+      "vision_tower": "MPS float32",
+      "video_encoder": "CPU float32",
+      "multi_modal_projector": "MPS float32",
+      "video_projecter": "MPS float32",
+      "language_model": "MPS float16"
+    },
+    "module_placement_preflight_passed": true,
+    "full_model_forward_completed": true,
+    "generation_completed": true,
+    "model_outputs_generated": 1,
+    "response_printed_or_retained": false,
+    "semantic_correctness_scored": false,
+    "schema_parseability": "NOT_RECOVERABLE",
+    "failure_component": "Private receipt construction after generation",
+    "failure": "NameError: Python boolean was written as JSON-style true in the frozen runner.",
+    "private_success_receipt_created": false
+  },
+  "public_canary": {
+    "attempted": false,
+    "case_count": 8,
+    "model_outputs_produced": 0,
+    "passed": false,
+    "reason": "The required v4 smoke schema result was lost after generation, and the frozen one-attempt rule forbids rerunning it."
+  },
+  "privacy_and_scope": {
+    "public_synthetic_frames_only": true,
+    "restricted_packet_discovered_or_opened": false,
+    "restricted_inference_run": false,
+    "grounded_videollm_restricted_predictions_created": 0,
+    "qwen_rerun": false,
+    "new_acquisition": false,
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false,
+    "raw_restricted_content_exported": false
+  },
+  "decision": {
+    "local_mac_execution_feasibility": "END_TO_END_GENERATION_DEMONSTRATED_WITH_WHOLE_INTERNVIDEO2_ON_CPU",
+    "public_canary_admission": false,
+    "grounded_videollm_substantially_better_than_qwen": "NOT_TESTED",
+    "childlens_branch_reopen": false,
+    "larger_human_grounded_calibration_study": "DO_NOT_INVEST_BASED_ON_THIS_ATTEMPT",
+    "interpretation": "The v4 backend split is technically capable of end-to-end Grounded-VideoLLM generation on this M5 Mac, but the frozen smoke cannot be scored and the independent-model accuracy experiment did not run."
+  },
+  "repository_actions": {
+    "committed": false,
+    "pushed": false,
+    "published": false,
+    "license_clickthrough_or_acceptance": false
+  }
+}

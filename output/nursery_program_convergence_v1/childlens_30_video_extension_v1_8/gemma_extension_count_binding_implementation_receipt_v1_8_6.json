@@ -1,0 +1,15 @@
+{
+  "schema_version": "nursery-childlens-gemma-extension-count-binding-implementation-receipt-v1.8.6",
+  "status": "PASS",
+  "amendment": "gemma_extension_count_binding_amendment_v1_8_6.json",
+  "post_change_extension_worker_sha256": "a98ce153d6b368813efa22b6fd28f4ac338444b97f1c8bfc03a979b3841e8be3",
+  "post_change_runner_sha256": "97ff880ec9eff561109572b60c59b68c83403ee1bdfa2cb41eca8ddf1bf5465e",
+  "test_file_sha256": "bd265b429d73bda928ee781d8bc7c32946c7555f56667962814db405bbc66ee0",
+  "tests_passed": 16,
+  "extension_adapter_window_count": 135,
+  "nested_legacy_worker_window_count": 135,
+  "prompt_or_schema_changed": false,
+  "sample_or_scientific_protocol_changed": false,
+  "restricted_payload_exported": false,
+  "scientific_endpoint_opened": false
+}

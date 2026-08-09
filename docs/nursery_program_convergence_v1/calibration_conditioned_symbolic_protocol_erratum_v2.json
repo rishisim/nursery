@@ -1,0 +1,47 @@
+{
+  "authoritative_interpretation": {
+    "range_family_count": 5,
+    "historical_range_family_names_source": "naturalistic_calibration_layer.range_families",
+    "replacement_range_family_names": [
+      "qwen3asr_plus_qwen3vl_path",
+      "qwen3asr_plus_gemma4_path",
+      "model_intersection",
+      "model_union",
+      "conservative_envelope"
+    ],
+    "replacement_source": "docs/nursery_program_convergence_v1/gemma_substitution_integration_note.md"
+  },
+  "corrections": [
+    {
+      "corrected_wording": "all five range families",
+      "field": "seed_plan.paired_bundle",
+      "original_wording": "all seven range families"
+    },
+    {
+      "corrected_names": [
+        "qwen3asr_plus_qwen3vl_path",
+        "qwen3asr_plus_gemma4_path",
+        "model_intersection",
+        "model_union",
+        "conservative_envelope"
+      ],
+      "field": "naturalistic_calibration_layer.range_families",
+      "historical_names": [
+        "existing_whisper_qwen2_path",
+        "challenger_qwen3asr_qwen3vl_path",
+        "model_intersection",
+        "model_union",
+        "conservative_envelope"
+      ],
+      "scope": "PREDECLARED_ONE_INSTRUMENT_SUBSTITUTION_LABELS_ONLY"
+    }
+  ],
+  "effect_or_endpoint_opened_before_erratum": false,
+  "families_added_or_removed": false,
+  "ranges_changed": false,
+  "reason": "Resolve the content-independent count-word inconsistency and bind the already frozen one-instrument Gemma substitution labels before any scientific endpoint is opened. The five-family domain, ranges, and thresholds remain unchanged.",
+  "schema_version": "nursery-calibration-conditioned-symbolic-protocol-erratum-v2",
+  "source_protocol": "docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json",
+  "status": "FROZEN_PRE_OUTCOME_EXECUTION_ERRATUM",
+  "thresholds_changed": false
+}

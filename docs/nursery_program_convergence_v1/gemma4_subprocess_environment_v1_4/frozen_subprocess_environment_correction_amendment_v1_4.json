@@ -1,0 +1,189 @@
+{
+  "schema_version": "nursery-gemma4-public-canary-subprocess-environment-correction-amendment-v1.4",
+  "amendment_id": "gemma4-e4b-public-canary-redundant-firewall-extra-removal-v1.4",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_PRE_CANARY_SUBPROCESS_ENVIRONMENT_ONLY",
+  "namespace": "docs/nursery_program_convergence_v1/gemma4_subprocess_environment_v1_4",
+  "amendment_mode": "ADDITIVE_CONTENT_INDEPENDENT_SUBPROCESS_ENVIRONMENT_CALL_CORRECTION",
+  "historical_artifacts_modified": false,
+  "public_canary_run": false,
+  "child_process_launched": false,
+  "restricted_content_accessed": false,
+  "restricted_inference_run": false,
+  "model_generation_called": false,
+  "scientific_outcome_run": false,
+  "trigger": {
+    "classification": "PUBLIC_RUNNER_REDUNDANT_FIREWALL_EXTRA_WHITELIST_REJECTION",
+    "stage": "BEFORE_CHILD_PROCESS_LAUNCH_AND_BEFORE_MODEL_GENERATION",
+    "failure_symbol": "E_SUBPROCESS_ENV",
+    "cause": "The runner supplied four mandatory scrubber defaults through the separately restricted extra mapping. The extra whitelist correctly rejected those keys even though the same key-value pairs were already present in the scrubber's mandatory returned environment.",
+    "child_process_launched": false,
+    "model_generation_called": false,
+    "raw_model_output_existed": false,
+    "semantic_or_scientific_evidence_involved": false,
+    "outer_fence_parser_correction_applicable": false,
+    "outer_fence_parser_corrections_spent": 0
+  },
+  "immutable_bindings": {
+    "v1_3_public_canary_runner": {
+      "path": "scripts/run_gemma4_prototype_common_schema_canary_v1_3.py",
+      "sha256": "dcbdf8714f12a114806ef4c903ee1a7f95b65647f58273b47fd184fb1143cf44"
+    },
+    "v1_3_worker": {
+      "path": "scripts/nursery_gemma4_referential_worker_v1_3.py",
+      "sha256": "c78fa8e9c0f995ed611f7fd8f7d2076f03a73d370574d3c92cf5e107f236c38f"
+    },
+    "v1_3_public_canary_failure_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_template_placeholder_order_v1_3/public_common_schema_canary_failure_v1_3.json",
+      "sha256": "e69abc985a7400d5305eab9f76217a4bdb9f60baaf78715a87f3abf63ca75492"
+    },
+    "template_placeholder_order_amendment": {
+      "path": "docs/nursery_program_convergence_v1/gemma4_template_placeholder_order_v1_3/frozen_template_placeholder_order_amendment_v1_3.json",
+      "sha256": "2d117cf0f1619d43d6e71a90aa853241f0a5a7c331e84fc04af8231c5d6081fb"
+    },
+    "CAF_transport_amendment": {
+      "path": "docs/nursery_program_convergence_v1/gemma4_caf_canary_transport_v1/frozen_caf_transport_amendment_v1.json",
+      "sha256": "3ecf4bf6c62920d73177d029c18918f38366d34f7d7997642037696def37bbd0"
+    },
+    "no_automatic_fallback_override": {
+      "path": "docs/nursery_program_convergence_v1/frozen_no_automatic_fallback_override_v1.json",
+      "sha256": "cb9e7061a5725050e6a71a7b6e41f6f5e7bf30d104bc46bae233816ca99a90b7"
+    },
+    "firewall_scrubber_implementation_at_failure": {
+      "path": "scripts/childlens_local_inference_firewall_v1_3.py",
+      "sha256": "a10f8c2568d402259215afe18f6005ceb4b52431607b42b132a8db849ff32f7b"
+    }
+  },
+  "exact_subprocess_environment_delta": {
+    "maximum_runner_call_site_changes": 1,
+    "bound_call_site": "The subprocess.Popen env argument in the v1.3 public canary runner.",
+    "frozen_call_semantics": {
+      "function": "scrubbed_subprocess_environment",
+      "positional_argument_count": 1,
+      "extra_mapping": {
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "HF_HUB_DISABLE_TELEMETRY": "1",
+        "DO_NOT_TRACK": "1"
+      }
+    },
+    "amended_call_semantics": {
+      "function": "scrubbed_subprocess_environment",
+      "positional_argument_count": 0,
+      "keyword_argument_count": 0,
+      "extra_mapping": null,
+      "returned_mapping_materialized_for_subprocess": true
+    },
+    "scrubber_mandatory_environment_contract": {
+      "inherited_environment_keys_allowed": false,
+      "extra_key_count": 0,
+      "exact_returned_key_count": 14,
+      "PATH_source": "os.defpath",
+      "PATH_value_at_freeze": "/bin:/usr/bin",
+      "exact_returned_mapping": {
+        "PATH": "/bin:/usr/bin",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "PYTHONNOUSERSITE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "TOKENIZERS_PARALLELISM": "false",
+        "HF_HUB_OFFLINE": "1",
+        "HF_HUB_DISABLE_TELEMETRY": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "HF_DATASETS_OFFLINE": "1",
+        "WANDB_DISABLED": "true",
+        "DO_NOT_TRACK": "1",
+        "NO_PROXY": "*",
+        "no_proxy": "*"
+      },
+      "canonical_JSON_sort_keys_compact_UTF8_sha256": "bf67ff8d311d901d39d8f996339e33f62c72b2f87a0c4ff9d997dce069cdf822",
+      "credential_authorization_cookie_secret_or_nonblocked_proxy_keys_allowed": false
+    },
+    "mandatory_post_call_assertions": {
+      "comparison": "EXACT_UTF8_BYTE_EQUALITY",
+      "required_key_values": {
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "HF_HUB_DISABLE_TELEMETRY": "1",
+        "DO_NOT_TRACK": "1"
+      },
+      "required_value_UTF8_hex": {
+        "HF_HUB_OFFLINE": "31",
+        "TRANSFORMERS_OFFLINE": "31",
+        "HF_HUB_DISABLE_TELEMETRY": "31",
+        "DO_NOT_TRACK": "31"
+      },
+      "failure_symbol_on_missing_or_different_value": "E_SUBPROCESS_ENV",
+      "assert_before_subprocess_launch": true
+    },
+    "deterministic_algorithm": [
+      "At the single bound call site, invoke scrubbed_subprocess_environment() with no positional argument, no keyword argument, and no extra mapping.",
+      "Materialize the returned mapping for the subprocess without adding or overriding any environment key.",
+      "Before subprocess launch, encode each of the four returned mandatory values as UTF-8 and fail closed with E_SUBPROCESS_ENV unless every value is exactly the single byte 0x31.",
+      "Pass that otherwise unchanged scrubbed mapping as subprocess.Popen env."
+    ],
+    "firewall_implementation_changed": false,
+    "firewall_extra_whitelist_changed": false,
+    "mandatory_environment_defaults_changed": false,
+    "credential_or_proxy_inheritance_allowed": false,
+    "network_policy_changed": false,
+    "subprocess_argv_changed": false,
+    "subprocess_cwd_changed": false,
+    "subprocess_stdio_or_passed_FDs_changed": false,
+    "semantic_fields_changed": false,
+    "model_runtime_or_artifact_fields_changed": false,
+    "scientific_fields_changed": false,
+    "parser_allowance_changed": false,
+    "does_not_spend_outer_fence_parser_correction": true
+  },
+  "preserved_public_canary_contract": {
+    "CAF_transport_and_final_WAV_contract_unchanged": true,
+    "template_placeholder_relocation_unchanged": true,
+    "declarative_messages_and_exact_prompt_text_unchanged": true,
+    "five_frame_generator_and_offsets_unchanged": true,
+    "model_repository_revision_manifest_weights_and_runtime_pins_unchanged": true,
+    "schema_parser_and_semantic_label_space_unchanged": true,
+    "outer_fence_parser_correction_maximum": 1,
+    "outer_fence_parser_corrections_spent_before_amendment": 0,
+    "parser_mode": "PRIMARY"
+  },
+  "preserved_sample_export_and_scientific_contract": {
+    "sample_15_items_900_seconds_137_candidate_windows_unchanged": true,
+    "K5_complement_protection_and_outward_rounding_unchanged": true,
+    "coverage_abstention_path_and_schema_gates_unchanged": true,
+    "Qwen3_read_only_digest_contract_unchanged": true,
+    "agreement_is_not_a_pass_gate": true,
+    "simulator_oracle_remains_only_evaluation_truth": true,
+    "calibration_range_or_scientific_protocol_changed": false,
+    "causal_thresholds_changed": false,
+    "automatic_fallback_allowed": false
+  },
+  "overlay_application_rule": {
+    "reject_if_any_bound_digest_differs": true,
+    "reject_if_scrubber_is_called_with_any_argument_or_extra_mapping": true,
+    "reject_if_any_required_returned_flag_is_missing_or_not_exactly_UTF8_0x31": true,
+    "reject_if_the_scrubbed_mapping_is_mutated_after_return": true,
+    "reject_if_any_unlisted_runner_or_contract_field_changes": true,
+    "reuse_prior_v1_3_failure_or_success_receipt_as_v1_4_receipt": false
+  },
+  "new_immutable_output_namespace": {
+    "path": "output/nursery_program_convergence_v1/gemma4_subprocess_environment_v1_4",
+    "must_not_exist_before_execution": true,
+    "owner_private_during_public_execution": true,
+    "future_public_canary_receipt": "public_common_schema_canary_receipt_v1_4.json",
+    "future_public_canary_failure": "public_common_schema_canary_failure_v1_4.json",
+    "future_runtime_lock_receipt": "runtime_lock_receipt_v1_4.json",
+    "future_activation_receipt": "full_activation_receipt_v1_4.json",
+    "historical_output_paths_overwritten": false
+  },
+  "authorization_boundary": {
+    "amendment_is_canary_execution": false,
+    "amendment_is_activation_receipt": false,
+    "public_canary_authorized_by_amendment_alone": false,
+    "child_process_launch_authorized_by_amendment_alone": false,
+    "restricted_inference_authorized": false,
+    "scientific_outcome_authorized": false,
+    "model_agreement_or_pseudo_labels_are_ground_truth": false,
+    "next_action": "A separately validated public-only v1.4 runner may apply this one-call correction and re-run the unchanged public canary in the new namespace. Full activation, restricted calibration, and any scientific outcome remain gated by fresh immutable receipts."
+  }
+}

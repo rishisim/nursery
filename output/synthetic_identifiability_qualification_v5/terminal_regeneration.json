@@ -1,0 +1,16 @@
+{
+  "byte_identical": true,
+  "clean_staging_directory": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v5/terminal_staging",
+  "frozen_adjudicator_used": true,
+  "primary_sha256": "e17b06e8e9e111762d8197ef9b09125e6510a4c88c400e0cbb0a1e399baebdbb",
+  "process": {
+    "command": "/Users/rishisim/Documents/research/nursery/.venv/bin/python /Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v5/frozen_source_snapshot/scripts/run_synthetic_identifiability_qualification_v5.py adjudicate --input-path /Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v5/terminal_staging/adjudication_inputs.json --output-path /Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v5/terminal_staging/terminal_decision.json --snapshot-root /Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v5/frozen_source_snapshot",
+    "cwd": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v5/terminal_staging",
+    "exit_code": 0,
+    "output": "{\n  \"confirmation_authorized\": false,\n  \"decision\": \"REVISE\",\n  \"future_development_authorized\": false,\n  \"gates\": {\n    \"actual_frozen_v2_detector_runtime\": true,\n    \"all_conditions_executed\": true,\n    \"complete_manifest\": true,\n    \"condition_design\": true,\n    \"confirmation_outcome_count_zero\": true,\n    \"corpus_design\": false,\n    \"detector_capacity_predeclared_bounds\": true,\n    \"direct_capacity_control_executed\": true,\n    \"factor_refits_executed\": false,\n    \"freeze_integrity\": true,\n    \"future_development_outcome_count_zero\": true,\n    \"identifiability_sensor_free_genuine_fit\": true,\n    \"independent_recompute\": true,\n    \"joint_iterations_and_competition_numeric\": true,\n    \"negative_recompute_mutations\": true,\n    \"no_projection_or_answer_key_fit\": true,\n    \"noun_sensor_weight_zero\": true,\n    \"official_tests\": true,\n    \"oracle_control_executed\": true,\n    \"order_invariance\": true,\n    \"prior_v1_v4_preservation\": true,\n    \"scientific_outcome_count_zero\": true,\n    \"seed_firewall\": true,\n    \"sensor_corruption_control_executed\": true,\n    \"sensor_helpful_not_required\": true,\n    \"side_modalities_absent_at_language_evaluation\": true,\n    \"terminal_regeneration\": true,\n    \"traceability\": true\n  },\n  \"identifiability_structural_failure\": false,\n  \"input_contract\": {\n    \"contradictions\": [],\n    \"missing_gates\": [],\n    \"stale_inputs\": [],\n    \"unexpected_gates\": [],\n    \"well_formed\": true\n  },\n  \"package_readiness_only\": true,\n  \"protocol_id\": \"synthetic-identifiability-qualification-v5\",\n  \"reason\": \"At least one repairable frozen package-qualification gate failed or was missing, stale, or contradictory.\",\n  \"scientific_go\": false,\n  \"scientific_outcome_authorized\": false\n}\n",
+    "snapshot_root": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v5/frozen_source_snapshot"
+  },
+  "regenerated_sha256": "e17b06e8e9e111762d8197ef9b09125e6510a4c88c400e0cbb0a1e399baebdbb",
+  "separate_process": true,
+  "status": "PASS"
+}

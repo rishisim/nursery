@@ -1,0 +1,15 @@
+{
+  "schema_version": "nursery-childlens-isolated-initializer-dependency-alias-implementation-receipt-v1.8.9",
+  "status": "PASS",
+  "amendment": "isolated_initializer_dependency_alias_amendment_v1_8_9.json",
+  "post_change_runner_sha256": "b5073cc31112a82f2e03638baaf66c153696b705d19376df122ad392ef96ae59",
+  "test_file_sha256": "705afde27ec423a4da3ca1579829809413ec0161633dead3433e24602e647a14",
+  "tests_passed": 19,
+  "author_module_hash_bound": true,
+  "human_v1_2_module_hash_bound": true,
+  "isolated_interpreter_preserved": true,
+  "model_inference_rerun": false,
+  "sample_or_scientific_protocol_changed": false,
+  "restricted_payload_exported": false,
+  "scientific_endpoint_opened": false
+}

@@ -1,0 +1,84 @@
+{
+  "record_id": "childlens-feasibility-decision-v1.0.0",
+  "rubric_id": "childlens-feasibility-rubric-v1.0.0",
+  "decision_date": "2026-07-21",
+  "terminal_decision": "CHILDLENS_FEASIBILITY_REVISE",
+  "scientific_outcome_authorized": false,
+  "scientific_outcome_executed": false,
+  "feasibility_pilot_executed": false,
+  "empirical_corpus": "CURRENTLY_ACCESSIBLE_CHILDLENS_KEEPER_RELEASE_ONLY",
+  "release_binding": {
+    "public_doi": "10.17617/4.fe",
+    "accessible_live_revision": "UNPINNED",
+    "canonical_manifest_status": "NOT_CREATED_TERMS_UNRESOLVED"
+  },
+  "gate_assessments": [
+    {
+      "gate_id": "G1_TERMS",
+      "status": "UNRESOLVED",
+      "evidence": "The archive license field is blank and public access, article licensing, Keeper service terms, and the archival certificate do not grant the required local-copy, derivative, training, retention, or aggregate-export permissions.",
+      "bounded_correction": "The user reviews a recipient- and release-specific DUA or written permission that explicitly covers local selective copying, local decoding, restricted transcripts and referential annotations, fixed local measurement instruments, learner training and checkpoint treatment, retention/deletion, and nonidentifying aggregate export. No instrument is accepted on the user's behalf."
+    },
+    {
+      "gate_id": "G2_RELEASE_GROUPING",
+      "status": "CONDITIONAL",
+      "evidence": "The live library shares the public DOI library identity and exposes 192 videos, two 192-object annotation representations, and participant/date linkage fields, but no immutable live revision or complete linkage audit was obtained.",
+      "bounded_correction": "Bind the study to either the DOI snapshot or an immutable live revision, then build a restricted canonical manifest with object checksums, annotation-media foreign keys, and complete participant/date grouping coverage; export only its digest and permitted aggregates."
+    },
+    {
+      "gate_id": "G3_AUDIO_TIMING",
+      "status": "UNRESOLVED",
+      "evidence": "Synchronized microphone audio and coarse speech bouts are documented, but no stream/codec audit, decode coverage measurement, utterance-boundary validation, or authorized pilot was run.",
+      "bounded_correction": "After G1 and G2 pass, run the frozen 12-18-video content-blind pilot and require the frozen audio-decode and utterance-boundary coverage thresholds with cluster-aware uncertainty."
+    },
+    {
+      "gate_id": "G4_TRANSCRIPT_ROLE",
+      "status": "UNRESOLVED",
+      "evidence": "The recorded language is unknown, no timed lexical transcript exists, no validated child-versus-non-child role pipeline was run, and the candidate voice-type tool has unresolved license/version provenance.",
+      "bounded_correction": "Human-establish the source language, pin a permitted local multilingual ASR/alignment instrument or use manual timing, use human-only role annotation unless a voice-type instrument is licensed, and validate at least the frozen 300-utterance or 30-minute sample with role macro-F1 and blinded post-correction text audit."
+    },
+    {
+      "gate_id": "G5_INPUT_LEXICON",
+      "status": "UNRESOLVED",
+      "evidence": "Other-person and overheard speech categories make non-child input plausible, but corrected non-child transcript volume and lexical recurrence were not measured.",
+      "bounded_correction": "From fully human-dispositioned ChildLens-only transcripts, measure terms-permitted cell-suppressed recurrence and require at least 8 noun/object and 6 verb/action candidates with the frozen cross-participant support criteria before selecting endpoints."
+    },
+    {
+      "gate_id": "G6_REFERENTIAL_ANNOTATION",
+      "status": "UNRESOLVED",
+      "evidence": "The release has object/action contexts but no word-referent labels; visible, null, ambiguous, unusable, and lag cases were not double-coded.",
+      "bounded_correction": "Apply the frozen plus-or-minus-five-second referential protocol to the preselected pilot, retain null and ambiguity, double-code at least 20 percent, and require at least 15 percent visible-candidate coverage with reliability at least 0.67 or execute only the single bounded ontology-remediation cycle."
+    },
+    {
+      "gate_id": "G7_HELDOUT_EVALUATION",
+      "status": "UNRESOLVED",
+      "evidence": "Participant and recording-date keys exist in schema, but complete linkage and noun/action exposure after participant-disjoint and session-disjoint splitting are unmeasured.",
+      "bounded_correction": "Build deterministic participant-disjoint primary and date/session-disjoint sensitivity splits inside quarantine, then require frozen training exposure and held-out visible support across at least three held-out participant groups without inspecting learner outcomes."
+    },
+    {
+      "gate_id": "G8_BASELINE_CEILING",
+      "status": "PASS",
+      "evidence": "The frozen protocol can construct a strong-alignment ceiling and weak baseline from one immutable ChildLens-derived RGB/text inventory while changing only alignment targets/readout; no learner run is needed for this construction proof."
+    },
+    {
+      "gate_id": "G9_SIMULATOR_CALIBRATION",
+      "status": "CONDITIONAL",
+      "evidence": "ChildLens documents video/audio but no IMU, touch/contact, proprioception, or motor streams. Those streams are explicitly unavailable and simulator-defined only; permission to compute/export video/audio aggregates is unresolved.",
+      "bounded_correction": "After G1 passes, compute only the permitted measurement-spec aggregates with coverage and uncertainty, mark every absent physical stream unavailable, and preserve a source-level firewall that prevents any other corpus or annotation instrument from supplying physical measurements."
+    },
+    {
+      "gate_id": "G10_RESOURCES",
+      "status": "CONDITIONAL",
+      "evidence": "The host has about 122.3 GiB free, one MPS trainer, and 2-4 safe CPU workers; low/base selective allocations fit while the high case and full archive do not. Actual selected bytes, language-matched staffing, correction rate, and later update budget remain unmeasured.",
+      "bounded_correction": "Preflight exact selected-object sizes under the 50-GiB post-peak floor and 73-GiB namespace cap, staff the measured language/annotation workload, benchmark the frozen compact learner, and retain one-MPS or identical-GPU complete paired bundles."
+    }
+  ],
+  "decision_basis": {
+    "fundamental_stop_condition_observed": false,
+    "go_condition_met": false,
+    "revision_is_bounded": true,
+    "summary": "ChildLens is a plausible sole ecological anchor because it exposes synchronized naturalistic video/audio, non-child speech-context labels, object/action contexts, and participant/date grouping schema. It is not launch-ready because permission, immutable release binding, audio/language/transcript/role quality, lexical recurrence, referential annotatability, held-out support, and exact resources remain unresolved."
+  },
+  "next_authorized_scope": "GOVERNANCE_CLARIFICATION_AND_PREDECLARED_FEASIBILITY_PILOT_ONLY_NO_SCIENTIFIC_LEARNER_OUTCOME",
+  "privacy_disposition": "ON_DISK_REPORT_NAMESPACE_CLEANING_REQUIRED_AND_BROWSER_TOOL_RESPONSE_INCIDENT_REQUIRES_REMEDIATION_BEFORE_FURTHER_AUTHENTICATED_INSPECTION"
+}

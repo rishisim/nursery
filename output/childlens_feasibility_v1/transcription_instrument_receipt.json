@@ -1,0 +1,349 @@
+{
+  "receipt_id": "childlens-transcription-instrument-receipt-v1.0.0",
+  "audit_date": "2026-07-21",
+  "scope": "FEASIBILITY_AND_GOVERNANCE_ONLY",
+  "status": "PROPOSED_NOT_EXECUTED_G3_G4_UNRESOLVED",
+  "terminal_decision_authority": false,
+  "scientific_outcome_authorized": false,
+  "execution_status": {
+    "childlens_media_acquired": false,
+    "childlens_media_inspected": false,
+    "childlens_audio_decoded": false,
+    "asr_run": false,
+    "alignment_run": false,
+    "speaker_role_instrument_run": false,
+    "learner_training_run": false,
+    "license_or_model_conditions_accepted": false,
+    "quality_metrics_observed": false
+  },
+  "empirical_status": {
+    "childlens_language": "UNKNOWN_PENDING_RELEASE_OR_PERMITTED_PILOT",
+    "audio_timing_quality": "UNMEASURED",
+    "transcript_quality": "UNMEASURED",
+    "speaker_role_quality": "UNMEASURED",
+    "language_matched_annotator_availability": "UNCONFIRMED"
+  },
+  "governing_inputs": [
+    {
+      "path": "docs/child_only_prototype_v1/scientific_data_boundary_contract_v1.md",
+      "sha256": "becee16df429bbff82309444ea1a27824ec5d0599dae5c3b9002e173c6929240"
+    },
+    {
+      "path": "docs/child_only_prototype_v1/calibration/childlens_measurement_spec_v1.json",
+      "sha256": "7b66f3352109216002bb091bb3b9a9c0a404fdb287cd44cdab3063f66058c576"
+    },
+    {
+      "path": "docs/child_only_prototype_v1/readiness_report_v1.md",
+      "sha256": "fdbd9fc6cb453ec368af445f2a8b0ace59415d3f055b00273a9155ad9330e8b0"
+    },
+    {
+      "path": "docs/child_only_prototype_v1/parallel_execution_design_v1.md",
+      "sha256": "5d20e61b75584810cbf08fed99172061c6120c99b3dd1845f4847b3761a25a8b"
+    },
+    {
+      "path": "docs/childlens_feasibility_v1/frozen_feasibility_rubric_v1.json",
+      "sha256": "4c5ceb7427f10fcac5932d0c642d0918fff190307035c2322ef1ce12981edd36"
+    },
+    {
+      "path": "docs/childlens_feasibility_v1/frozen_pilot_protocol_v1.json",
+      "sha256": "63be49d470c79e94f26240e73b314cdc42f2a6e6a57e96c897340d856f561ecb"
+    }
+  ],
+  "method_reference_checkout": {
+    "repository": ".external/egobabyvlm",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "usage": "PUBLIC_METHOD_AND_CODE_INTERFACE_REFERENCE_ONLY",
+    "empirical_ancestry_allowed": false,
+    "files_consulted": [
+      {
+        "path": ".external/egobabyvlm/README.md",
+        "sha256": "d28d992b9781f3be236f3909baa99c6a5817523149976cf46a3ffbba89d60b17"
+      },
+      {
+        "path": ".external/egobabyvlm/apps/data_preprocessing/README.md",
+        "sha256": "ed4e6df9ff213fa1c536ff41bef125010cbee8cd5745927fe71b67f653d263b2"
+      },
+      {
+        "path": ".external/egobabyvlm/apps/data_preprocessing/transcription/whisperx_transcribe.py",
+        "sha256": "5a9c84ba8ffd1a31942c1a1a05db682030cae8ac5f24685c277eb8835078e2ce"
+      },
+      {
+        "path": ".external/egobabyvlm/apps/data_preprocessing/transcription/filter_with_vtc.py",
+        "sha256": "2c624663fc793a5d91c0ce467fddff373b58331b21cc086ac80bd1c8eee96e90"
+      }
+    ],
+    "babyview_empirical_artifacts_used": [],
+    "aea_artifacts_used": []
+  },
+  "proposed_pipeline": {
+    "pipeline_status": "LOCK_CANDIDATE_RESOLVE_PRECONDITIONS_BEFORE_USE",
+    "stages": [
+      "TERMS_AND_RELEASE_GATE",
+      "RESTRICTED_DETERMINISTIC_AUDIO_DECODE",
+      "HUMAN_LED_LANGUAGE_IDENTIFICATION",
+      "VERSIONED_MULTILINGUAL_ASR_PROPOSAL",
+      "LANGUAGE_ROUTED_ALIGNMENT_OR_MANUAL_TIMING",
+      "VTC_ROLE_PROPOSAL_OR_HUMAN_ONLY_FALLBACK",
+      "BLINDED_HUMAN_VALIDATION_AND_CORRECTION",
+      "RESTRICTED_FINAL_ANNOTATION",
+      "PERMITTED_CELL_SUPPRESSED_AGGREGATES_ONLY"
+    ],
+    "language_routing": {
+      "human_led": true,
+      "allowed_labels": [
+        "ISO_639_LANGUAGE_CODE",
+        "MIXED_OR_CODE_SWITCHED",
+        "UNDECIDABLE"
+      ],
+      "automatic_language_id_role": "ADVISORY_DISCREPANCY_FLAG_ONLY",
+      "translation_allowed": false,
+      "alignment_resolution_time": "AFTER_HUMAN_LANGUAGE_IDENTIFICATION_BEFORE_ANY_PILOT_ALIGNMENT",
+      "unsupported_language_fallback": "MANUAL_UTTERANCE_TIMING_AND_HUMAN_SOURCE_LANGUAGE_TRANSCRIPTION"
+    },
+    "asr_settings": {
+      "task": "transcribe",
+      "language": "HUMAN_FIXED_PER_ROUTE",
+      "beam_size": 5,
+      "temperature": 0.0,
+      "condition_on_previous_text": false,
+      "initial_prompt": null,
+      "hotwords": null,
+      "device": "cpu",
+      "compute_type": "float32",
+      "processes": 1,
+      "cpu_threads_max": 4,
+      "network_during_inference": "DISABLED"
+    },
+    "vad_settings_if_used": {
+      "implementation": "FASTER_WHISPER_BUNDLED_SILERO_VAD",
+      "threshold": 0.5,
+      "min_speech_duration_ms": 250,
+      "min_silence_duration_ms": 500,
+      "speech_pad_ms": 250,
+      "max_speech_duration_s": 30,
+      "scientific_status": "CANDIDATE_BOUNDARIES_HUMAN_CHECK_REQUIRED"
+    },
+    "speaker_role_mapping": {
+      "KCHI_ONLY": "CHILD",
+      "ONE_OF_OCH_FEM_MAL_WITHOUT_KCHI": "NON_CHILD",
+      "TWO_OR_MORE_CONCURRENT_VOICE_SOURCES": "OVERLAP",
+      "AUDIBLE_SPEECH_SOURCE_UNRESOLVED": "UNCERTAIN",
+      "NO_SPEECH_AFTER_HUMAN_REVIEW": "NONSPEECH",
+      "non_child_definition": "ANY_PERSON_OTHER_THAN_CAMERA_WEARING_CHILD",
+      "och_is_adult": false,
+      "gender_as_scientific_endpoint": false
+    }
+  },
+  "instrument_artifacts": [
+    {
+      "artifact_id": "whisperx-3.8.5",
+      "role": "LANGUAGE_SPECIFIC_FORCED_ALIGNMENT_INTERFACE_ONLY",
+      "code_version": "3.8.5",
+      "upstream_commit": "4a6477e5e52ad516faab5363bdafbfa9840aec5e",
+      "package_sha256": "842f9ef5c2c2d33ccb6e68f5d5b233ded9d77a7e89bba06a1d55a9704cef50c3",
+      "license": "BSD-2-Clause",
+      "downloaded_by_audit": false,
+      "learner_ancestor_allowed": false
+    },
+    {
+      "artifact_id": "faster-whisper-1.2.1",
+      "role": "LOCAL_MULTILINGUAL_ASR_RUNTIME_AND_OPTIONAL_VAD",
+      "code_version": "1.2.1",
+      "upstream_commit": "65882eee9f5cdbeeb2d877f1131d48cf241b327d",
+      "package_sha256": "79a66ad50688c0b794dd501dc340a736992a6342f7f95e5811be60b5224a26a7",
+      "license": "MIT",
+      "downloaded_by_audit": false,
+      "learner_ancestor_allowed": false
+    },
+    {
+      "artifact_id": "systran-faster-whisper-large-v3",
+      "role": "LOCAL_MULTILINGUAL_ASR_CANDIDATE_TEXT",
+      "repository_revision": "edaa852ec7e145841d8ffdb056a99866b5f0a478",
+      "weight_path": "model.bin",
+      "weight_lfs_sha256": "69f74147e3334731bc3a76048724833325d2ec74642fb52620eda87352e3d4f1",
+      "reported_size_bytes": 3087284237,
+      "license_metadata": "MIT",
+      "downloaded_by_audit": false,
+      "learner_ancestor_allowed": false,
+      "raw_output_is_gold": false
+    },
+    {
+      "artifact_id": "whisperx-language-aligner",
+      "role": "CONDITIONAL_WORD_AND_UTTERANCE_ALIGNMENT",
+      "registry_commit": "4a6477e5e52ad516faab5363bdafbfa9840aec5e",
+      "language": "PENDING_HUMAN_LANGUAGE_ROUTE",
+      "model_repository_revision": null,
+      "weight_sha256": null,
+      "permission_status": "MUST_RESOLVE_BEFORE_USE",
+      "downloaded_by_audit": false,
+      "fallback": "MANUAL_UTTERANCE_TIMING",
+      "learner_ancestor_allowed": false
+    },
+    {
+      "artifact_id": "laac-lscp-vtc-candidate",
+      "role": "CHILD_OTHER_PERSON_OVERLAP_ROLE_PROPOSAL",
+      "code_declared_version": "2.2.0",
+      "code_commit": "9308411fb47f4290dfcd84338fc84bfb7f91227f",
+      "model_repository": "coml/VTC-2",
+      "model_repository_revision": "6b1a95508302edc14c50f670cd9a30d66fa4f88a",
+      "model_readme_version_label": "2.1",
+      "version_label_discrepancy": true,
+      "weight_path": "model/best.ckpt",
+      "weight_lfs_sha256": "5c3446d037f9c6746cbe19bb77a77973354d3443556f9e2278e83cd4fe7db5a2",
+      "reported_size_bytes": 1099159455,
+      "threshold_path": "thresholds/f1.toml",
+      "threshold_sha256": "88e325a7a351f7484a11155e30644802ec2f3625636894b196af1bb2ff52ed3a",
+      "code_license_metadata": null,
+      "weight_license_metadata": null,
+      "permission_status": "BLOCKED_PENDING_EXPLICIT_PERMISSION_OR_HUMAN_ONLY_FALLBACK",
+      "repository_gated": false,
+      "downloaded_by_audit": false,
+      "learner_ancestor_allowed": false
+    },
+    {
+      "artifact_id": "pyannote-speaker-diarization-community-1",
+      "role": "EXCLUDED_FROM_BASE_PLAN",
+      "license_metadata": "CC-BY-4.0",
+      "access_condition": "USER_MUST_ACCEPT_MODEL_CONDITIONS_AND_SHARE_CONTACT_INFORMATION",
+      "conditions_accepted_by_audit": false,
+      "exclusion_reason": "NO_AUTHORITY_TO_ACCEPT_AND_ANONYMOUS_CLUSTERS_DO_NOT_ESTABLISH_CHILD_OTHER_ROLE",
+      "downloaded_by_audit": false,
+      "learner_ancestor_allowed": false
+    }
+  ],
+  "human_validation_protocol": {
+    "validation_stop_rule": "FIRST_OF_300_UTTERANCES_OR_30_SPEECH_MINUTES",
+    "selection_blind_to": [
+      "ASR_WORDS",
+      "LEXICAL_RICHNESS",
+      "VISUAL_SALIENCE",
+      "GROUNDING_QUALITY",
+      "LEARNER_OUTCOME"
+    ],
+    "all_timing_and_role_items_double_coded": true,
+    "blinded_reference_subset_fraction": 0.2,
+    "blinded_reference_annotators": 2,
+    "separate_production_corrector": true,
+    "speaker_roles": [
+      "NON_CHILD",
+      "CHILD",
+      "OVERLAP",
+      "UNCERTAIN",
+      "NONSPEECH"
+    ],
+    "role_macro_f1_minimum": 0.8,
+    "role_macro_f1_classes": [
+      "NON_CHILD",
+      "CHILD",
+      "OVERLAP",
+      "UNCERTAIN"
+    ],
+    "nonspeech_evaluated_as": "FALSE_SPEECH_DETECTION_AND_COVERAGE",
+    "usable_boundary_tolerance_ms_each_edge": 500,
+    "g3_min_decodable_duration_fraction": 0.8,
+    "g3_min_usable_speech_window_fraction": 0.7,
+    "lexical_error_metric": "LANGUAGE_APPROPRIATE_ORTHOGRAPHIC_TOKEN_ERROR_PLUS_GRAPHEME_ERROR_WHEN_NO_WHITESPACE",
+    "lexical_error_numeric_ceiling": null,
+    "lexical_error_ceiling_status": "MUST_BE_FROZEN_BEFORE_PILOT_OR_ALL_LEARNER_VISIBLE_UTTERANCES_ADJUDICATED",
+    "uncertainty": "PARTICIPANT_CLUSTER_THEN_VIDEO_OR_SESSION_RESAMPLING",
+    "raw_asr_is_gold": false,
+    "machine_confidence_can_waive_human_review": false,
+    "uncertain_and_overlap_cases_retained": true
+  },
+  "gate_mapping": {
+    "G1_TERMS": {
+      "status": "UNRESOLVED",
+      "reason": "CHILDLENS_DERIVATIVE_PERMISSION_AND_VTC_PERMISSION_NOT_ESTABLISHED_HERE"
+    },
+    "G3_AUDIO_TIMING": {
+      "status": "UNRESOLVED",
+      "reason": "NO_AUTHORIZED_MEDIA_PILOT_OR_HUMAN_TIMING_VALIDATION"
+    },
+    "G4_TRANSCRIPT_ROLE": {
+      "status": "UNRESOLVED",
+      "reason": "LANGUAGE_UNKNOWN_AND_NO_EMPIRICAL_ASR_ROLE_VALIDATION"
+    },
+    "G5_INPUT_LEXICON": {
+      "status": "UNRESOLVED",
+      "reason": "NO_CORRECTED_NON_CHILD_TRANSCRIPT_OR_LEXICAL_RECURRENCE_MEASURED"
+    },
+    "G10_RESOURCES": {
+      "status": "UNRESOLVED",
+      "reason": "NO_MEASURED_MEDIA_DURATION_CORRECTION_RATE_OR_LANGUAGE_MATCHED_STAFFING"
+    }
+  },
+  "quarantine_and_ancestry": {
+    "restricted_payloads": [
+      "RAW_VIDEO",
+      "RAW_AUDIO",
+      "EXTRACTED_AUDIO",
+      "ASR_TEXT",
+      "HUMAN_TRANSCRIPTS",
+      "WORD_OR_UTTERANCE_TIMES",
+      "SPEAKER_ROLE_INTERVALS",
+      "PARTICIPANT_OR_SESSION_IDENTIFIERS",
+      "MODEL_CONFIDENCES"
+    ],
+    "instrument_outputs_allowed_to_learner": [],
+    "human_accepted_fields_potentially_allowed_after_contract_amendment": [
+      "SOURCE_LANGUAGE_TEXT",
+      "UTTERANCE_INTERVAL",
+      "FROZEN_SPEAKER_ROLE"
+    ],
+    "instrument_features_prohibited": [
+      "TOKEN_IDS",
+      "TOKENIZER",
+      "EMBEDDINGS",
+      "HIDDEN_STATES",
+      "LOGITS",
+      "CONFIDENCE_SCORES",
+      "SPEAKER_EMBEDDINGS",
+      "CHECKPOINTS",
+      "UNREVIEWED_PSEUDOLABELS"
+    ],
+    "learner_tokenizer": "FRESH_CHILDLENS_CORPUS_LOCAL_FROM_HUMAN_APPROVED_TEXT_ONLY",
+    "learner_weights": "SCRATCH_ONLY",
+    "contract_amendment_required_before_instrument_use": true
+  },
+  "privacy_export": {
+    "allowed_if_terms_permit": [
+      "CELL_SUPPRESSED_COVERAGE_RATES",
+      "CLUSTER_AWARE_QUALITY_INTERVALS",
+      "ERROR_CATEGORY_COUNTS_WITH_SMALL_CELL_SUPPRESSION",
+      "PROCEDURAL_AND_MODEL_PROVENANCE",
+      "AGGREGATE_ANNOTATION_LABOR"
+    ],
+    "forbidden": [
+      "MEDIA",
+      "FRAMES",
+      "TRANSCRIPT_STRINGS",
+      "LEXICAL_EXAMPLES",
+      "EXACT_TIMESTAMPS",
+      "PARTICIPANT_OR_SESSION_IDENTIFIERS",
+      "SMALL_IDENTIFIABLE_CELLS"
+    ],
+    "small_cell_rule": "SUPPRESS_OR_COARSEN_CELLS_BELOW_5_AND_PREVENT_COMPLEMENTARY_RECONSTRUCTION"
+  },
+  "unresolved_blockers": [
+    "CHILDLENS_TERMS_MUST_PERMIT_RESTRICTED_DERIVED_TRANSCRIPTS_AND_ROLE_ANNOTATIONS",
+    "ACTUAL_LANGUAGE_OR_LANGUAGES_MUST_BE_HUMAN_ESTABLISHED",
+    "ALIGNER_REVISION_LICENSE_AND_WEIGHT_HASH_DEPEND_ON_LANGUAGE_ROUTE",
+    "VTC_CODE_AND_WEIGHT_PERMISSION_IS_NOT_EXPLICITLY DOCUMENTED",
+    "POST_CORRECTION_LEXICAL_TOKEN_ERROR_NUMERIC_BOUND_IS_NOT_FROZEN",
+    "AUTHORIZED_PILOT_IS_REQUIRED_FOR_G3_AND_G4_EVIDENCE",
+    "LANGUAGE_MATCHED_ANNOTATOR_STAFFING_MUST_BE_CONFIRMED"
+  ],
+  "source_urls": [
+    "https://github.com/openai/whisper/blob/main/model-card.md",
+    "https://arxiv.org/abs/2303.00747",
+    "https://github.com/m-bain/whisperX/tree/4a6477e5e52ad516faab5363bdafbfa9840aec5e",
+    "https://github.com/SYSTRAN/faster-whisper/tree/65882eee9f5cdbeeb2d877f1131d48cf241b327d",
+    "https://huggingface.co/Systran/faster-whisper-large-v3/tree/edaa852ec7e145841d8ffdb056a99866b5f0a478",
+    "https://github.com/LAAC-LSCP/VTC/tree/9308411fb47f4290dfcd84338fc84bfb7f91227f",
+    "https://huggingface.co/coml/VTC-2/tree/6b1a95508302edc14c50f670cd9a30d66fa4f88a",
+    "https://api.github.com/repos/LAAC-LSCP/VTC/license?ref=9308411fb47f4290dfcd84338fc84bfb7f91227f",
+    "https://huggingface.co/api/models/coml/VTC-2",
+    "https://www.isca-archive.org/interspeech_2020/lavechin20_interspeech.html",
+    "https://huggingface.co/pyannote/speaker-diarization-community-1"
+  ]
+}

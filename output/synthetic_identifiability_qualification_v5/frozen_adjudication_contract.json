@@ -1,0 +1,14 @@
+{
+  "missing_contradictory_or_stale_fails_closed": true,
+  "official_paths": {
+    "negative_recompute": "negative_recompute_tests.json",
+    "preservation": "preservation_proof.json",
+    "qualification": "qualification_run/qualification_summary.json",
+    "recompute": "independent_recompute_comparison.json",
+    "terminal": "terminal_decision.json",
+    "tests": "official_test_execution_report.json",
+    "traceability": "traceability_validation.json"
+  },
+  "terminal_decision_function": "babyworld_lite/sensor_alignment_v5/adjudicator.py:terminal_decision",
+  "test_report_substitution_allowed": false
+}

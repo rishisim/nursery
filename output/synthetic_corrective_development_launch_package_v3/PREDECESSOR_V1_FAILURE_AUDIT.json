@@ -1,0 +1,108 @@
+{
+  "attempt_4_partial_jobs_1_digest": "6715c1017b102826feb8f9e06ff606cfb9e9531c3cee59d7046913d7944ac5ce",
+  "attempt_4_persisted_inputs_digest": "b9643cd4889628a67988a05770fcad06e051d4c32dc79c217f070227ec5f702d",
+  "authorization_consumed": false,
+  "confirmation_outcome_count": 0,
+  "critical_lstat_absences": {
+    "output/..synthetic_corrective_development_v1.staging.cohort-staging": true,
+    "output/.synthetic_corrective_development_launch_seal_v1.staging": true,
+    "output/.synthetic_corrective_development_v1.staging": true,
+    "output/synthetic_corrective_development_launch_package_v1/construction_qualification_attempt_consumed.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/construction_qualification_decision.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/development_authorization_consumed.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/development_capability_issued.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/excluded_rehearsal": true,
+    "output/synthetic_corrective_development_launch_package_v1/freeze_attempt_consumed.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/freeze_receipt.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/frozen_source_snapshot": true,
+    "output/synthetic_corrective_development_launch_package_v1/independent_recompute": true,
+    "output/synthetic_corrective_development_launch_package_v1/launch_seal": true,
+    "output/synthetic_corrective_development_launch_package_v1/mechanism_qualification.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/official_test_execution_report.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/parallel_benchmark_attempt_4.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/parallel_equivalence_attempt_4.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/parallel_micro_attempt_4_completion.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/parallel_micro_attempt_4_jobs_n": true,
+    "output/synthetic_corrective_development_launch_package_v1/prequalification_transition_verification.json": true,
+    "output/synthetic_corrective_development_launch_package_v1/preservation": true,
+    "output/synthetic_corrective_development_v1_one_shot": true
+  },
+  "development_outcome_count": 0,
+  "directory_manifest_sha256": "f0a18c3583dddda2806cd2c786c7596423965fa884b5b1d2111f87f424aa3518",
+  "directory_tree": {
+    "directory_count": 51,
+    "directory_rows_digest": "59bae7012c6cbb982a8d32d9b9f994a7462ba2bd76c50e44fc1f0ab32362d39e",
+    "failed_shards_directory_preserved_empty": true,
+    "symlink_count": 0
+  },
+  "failed_namespace_permanently_quarantined": [
+    320000,
+    329999
+  ],
+  "failure": {
+    "cwd_persisted_in_v1_receipt": false,
+    "errno": 1,
+    "exact_argv_persisted_in_v1_receipt": false,
+    "exception_class": "PermissionError",
+    "exit_status_persisted_in_v1_receipt": false,
+    "independent_traceback_transcript_persisted": false,
+    "limitation": "The live traceback was observed in command output but no separate byte-for-byte traceback transcript was persisted; this audit records only the observed failure class, locus, and message and does not claim a verbatim reconstruction.",
+    "observed_call_chain": [
+      "ProcessPoolExecutor initialization",
+      "multiprocessing synchronization resource setup",
+      "os.sysconf(\"SC_SEM_NSEMS_MAX\")"
+    ],
+    "observed_message": "[Errno 1] Operation not permitted",
+    "official_attempt": 4,
+    "operation": "parallel_micro_attempt_4_jobs_1",
+    "published_worker_shards": 0,
+    "stage": "before first worker shard publication",
+    "verbatim_traceback_reconstructed": false
+  },
+  "failure_receipt": {
+    "bytes": 1121,
+    "included_commitments_reverified": "PASS",
+    "mode": "0644",
+    "path": "output/synthetic_corrective_development_launch_package_v1/OFFICIAL_MICRO_ATTEMPT_4_FAILED.json",
+    "sha256": "19ca0d4704d0d0a10a537bed24a1ffa837edb30bb66b91c8f8b33334cda92204"
+  },
+  "file_manifest_sha256": "cc342ea3b5246db3eec9d823196c15790329b7e3f5e1b45716d2109414ad287d",
+  "file_tree": {
+    "bytes": 52881819,
+    "file_count": 174,
+    "file_rows_digest": "cb4c9596f8ed5cd9bc64311162c3abb09d3f6765a55a3a26915c0f1e630414e4"
+  },
+  "fresh_successor_namespace_required": [
+    330000,
+    339999
+  ],
+  "guarded_281xxx_references": 0,
+  "guarded_289xxx_references": 0,
+  "guarded_322xxx_references": 0,
+  "guarded_329xxx_references": 0,
+  "immutable": true,
+  "official_delta_from_design_lock": {
+    "bytes": 2870115,
+    "directory_count": 9,
+    "directory_rows_digest": "de325c8df27b564ab069ede684841ba935237bc68eb989d4700a4dc073dbcdb2",
+    "file_count": 25,
+    "file_rows_digest": "a1c7a927f539e700b3b6f1a8bfd51a179e41a21d133925feba27e735f84311a5"
+  },
+  "operation_ledger_file_count": 19,
+  "outcome_registry_sha256": "f8256576ffb619cbf7e3196ab720736d514cdb0cb6653f88bb636476cf5ad845",
+  "predecessor_package_version": 1,
+  "predecessor_path": "output/synthetic_corrective_development_launch_package_v1",
+  "retry_forbidden": true,
+  "schema_version": "nursery-corrective-predecessor-failure-audit-v2",
+  "scientific_outcome": false,
+  "status": "PASS_PRESERVED_FAILED_NO_OUTCOME",
+  "structured_identifier_references": [
+    320001,
+    320003,
+    320005,
+    320007,
+    320201,
+    320203
+  ],
+  "successor_package_version": 2
+}

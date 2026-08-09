@@ -1,0 +1,311 @@
+protocol:
+  id: synthetic-corrective-alignment-v1
+  schema_version: nursery-corrective-alignment-v1
+  package_version: 1
+  status: pre_freeze
+  phase: corrective_development_launch_preparation
+  scientific_claim: synthetic_training_only_event_cues_can_correct_transferable_lexical_action_meanings
+  infant_learning_claim_authorized: false
+  ecological_validity_claim_authorized: false
+  development_execution_authorized: false
+  confirmation_authorized: false
+  prior_outcomes_authorized: false
+
+registries:
+  namespace_family: [320000, 329999]
+  construction_micro:
+    corpus: [320001, 320003, 320005, 320007]
+    model: [320201, 320203]
+    inference: [320401]
+  construction_qualification:
+    corpus: [320021, 320023, 320025, 320027, 320029, 320031, 320033, 320035,
+             320037, 320039, 320041, 320043, 320045, 320047, 320049, 320051]
+    model: [320301, 320303, 320307]
+    inference: [320403]
+  construction_mechanism:
+    corpus: [320501]
+    model: [320601, 320603, 320605, 320607, 320609, 320611, 320613, 320615,
+            320617, 320619, 320621, 320623, 320625, 320627, 320629, 320631,
+            320633, 320635, 320637, 320639, 320641, 320643, 320645, 320647,
+            320649, 320651, 320653, 320655, 320657, 320659, 320661, 320663]
+    inference: [320701]
+  excluded_rehearsal:
+    corpus: [321001, 321003, 321005, 321007, 321009, 321011]
+    model: [321301, 321303, 321307]
+    inference: [321401]
+  development:
+    corpus: [322001, 322003, 322005, 322007, 322009, 322011, 322013, 322015,
+             322017, 322019, 322021, 322023, 322025, 322027, 322029, 322031,
+             322033, 322035, 322037, 322039, 322041, 322043, 322045, 322047,
+             322049, 322051, 322053, 322055, 322057, 322059, 322061, 322063,
+             322065, 322067, 322069, 322071, 322073, 322075, 322077, 322079,
+             322081, 322083, 322085, 322087, 322089, 322091, 322093, 322095,
+             322097, 322099, 322101, 322103, 322105, 322107, 322109, 322111,
+             322113, 322115, 322117, 322119, 322121, 322123, 322125, 322127,
+             322129, 322131, 322133, 322135, 322137, 322139, 322141, 322143,
+             322145, 322147, 322149, 322151, 322153, 322155, 322157, 322159,
+             322161, 322163, 322165, 322167, 322169, 322171, 322173, 322175,
+             322177, 322179, 322181, 322183, 322185, 322187, 322189, 322191,
+             322193, 322195, 322197, 322199]
+    model: [322301, 322303, 322307]
+    inference: [322401]
+  confirmation_reserve:
+    corpus: [329001, 329003, 329005, 329007, 329009, 329011, 329013, 329015,
+             329017, 329019, 329021, 329023, 329025, 329027, 329029, 329031,
+             329033, 329035, 329037, 329039, 329041, 329043, 329045, 329047,
+             329049, 329051, 329053, 329055, 329057, 329059, 329061, 329063,
+             329065, 329067, 329069, 329071, 329073, 329075, 329077, 329079,
+             329081, 329083, 329085, 329087, 329089, 329091, 329093, 329095,
+             329097, 329099, 329101, 329103, 329105, 329107, 329109, 329111,
+             329113, 329115, 329117, 329119, 329121, 329123, 329125, 329127,
+             329129, 329131, 329133, 329135, 329137, 329139, 329141, 329143,
+             329145, 329147, 329149, 329151, 329153, 329155, 329157, 329159,
+             329161, 329163, 329165, 329167, 329169, 329171, 329173, 329175,
+             329177, 329179, 329181, 329183, 329185, 329187, 329189, 329191,
+             329193, 329195, 329197, 329199]
+    model: [329301, 329303, 329307]
+    inference: [329401]
+  deliberately_unused_package_ranges: [[323000, 328999]]
+  permanently_quarantined_ranges: [[281000, 281999], [289000, 289999]]
+  canonical_prior_registry: output/synthetic_development_launch_package_v3/frozen_seed_registries.json
+  canonical_prior_registry_sha256: 6c5b0899dbbd4d93fbd56bd3342eb2ecea697802a510626182997841733f55d3
+
+design:
+  primitive_concepts: 4
+  manner_concepts: 3
+  action_compositions: 12
+  held_out_compositions_per_corpus: 4
+  training_repetitions_per_composition: [8, 14]
+  candidate_event_count: [3, 5]
+  raw_sensor_samples: 96
+  event_width: [7, 12]
+  event_gap: [4, 10]
+  ambiguity_strata: [correction, ambiguous, recoverable]
+  grounded_rate_range: [0.58, 0.82]
+  foil_rate_by_stratum:
+    correction: [0.88, 0.96]
+    ambiguous: [0.70, 0.84]
+    recoverable: [0.35, 0.55]
+  visibility_range: [0.52, 0.90]
+  lag_mean_range: [-12.0, 12.0]
+  lag_sd_range: [3.0, 8.0]
+  side_informativeness_range: [0.65, 0.92]
+  side_noise_range: [0.04, 0.14]
+  action_geometry:
+    rng_namespace: action-geometry-v1
+    off_diagonal_mass_range: [0.12, 0.24]
+    minimum_self_cross_dot_margin: 0.25
+    maximum_generation_attempts: 128
+  grounded_sensor_peak_range: [1.6, 2.4]
+  null_sensor_peak_range: [1.6, 2.4]
+  signed_shift_samples: 13
+  conditions: [synchronized, shuffled, shift_minus, shift_plus, absent,
+               uninformative, corrupted, oracle_alignment, exact_window]
+  negative_controls: [shuffled, shift_minus, shift_plus, absent, uninformative, corrupted]
+  primary_comparators: [absent, shuffled]
+  exact_window_comparator: exact_window
+  positive_control: oracle_alignment
+  mechanism_mutations: [semantic_side_zero, evidence_disconnected,
+                        within_bag_permuted, old_agreement_gate,
+                        semantic_update_disconnected, null_side_zero,
+                        null_update_disconnected,
+                        null_head_ablation]
+  evaluation:
+    held_out_instances_per_lexical_concept: 6
+    held_out_instances_per_composition: 6
+    presence_bags_per_composition: 4
+    presence_bag_candidates: 4
+    train_rng_namespace: train-v1
+    lexical_eval_rng_namespace: lexical-eval-v1
+    composition_eval_rng_namespace: composition-eval-v1
+    presence_eval_rng_namespace: presence-eval-v1
+    zero_exposure_tokens: 2
+    side_modality_withheld: true
+
+learner:
+  name: corrective_event_null_stochastic_mil_v1
+  epochs: 16
+  language_weight: 1.0
+  temporal_weight: 0.20
+  temporal_scale: 12.0
+  semantic_side_weight: 2.75
+  null_side_weight: 2.75
+  posterior_temperature: 0.55
+  semantic_learning_rate: 0.16
+  semantic_learning_rate_decay: 0.035
+  null_learning_rate: 0.10
+  initialization_concentration: 1.35
+  smoothing: 0.025
+  null_prior: 0.30
+  null_mismatch_weight: 2.0
+  exact_tie_tolerance: 1.0e-12
+
+analysis:
+  independent_unit: corpus_seed
+  development_corpus_count: 100
+  paired_model_replicates: 3
+  model_replicate_handling: average_within_corpus_in_frozen_seed_order
+  co_primary_endpoints: [lexical_acquisition_top1, heldout_composition_top1]
+  comparator_definition: per_corpus_max_of_absent_and_shuffled
+  intersection_union_rule: both_co_primary_estimands_must_pass_every_gate
+  minimum_practical_effect: 0.10
+  primary_one_sided_confidence_level: 0.95
+  primary_lower_bound_must_exceed: 0.10
+  synchronized_lcb_above_exact_chance: 0.20
+  minimum_positive_corpus_fraction: 0.60
+  maximum_large_negative_corpus_fraction: 0.20
+  large_negative_threshold: -0.10
+  all_identical_effects_fail: true
+  primary_uncertainty: one_sided_student_t_over_corpus_means
+  bootstrap_sensitivity_replicates: 20000
+  secondary_metrics: [mean_rank, mrr, multiclass_log_loss, multiclass_brier,
+                      tie_rate]
+  secondary_multiplicity: descriptive_only_no_p_values_or_confirmatory_claims
+  planning:
+    true_mean_effect: 0.20
+    null_margin: 0.10
+    paired_corpus_sd: 0.30
+    one_sided_alpha: 0.05
+    per_endpoint_power: 0.952
+    conjunctive_power_lower_bound: 0.904
+    adaptive_extension: false
+
+qualification_gates:
+  construction_fixture_selection: preallocated_all_retained_no_search
+  maximum_negative_control_top1: 0.80
+  minimum_negative_control_wrong_or_tied_fraction: 0.20
+  minimum_oracle_top1: 0.90
+  minimum_oracle_lcb: 0.85
+  minimum_oracle_lift_lcb: 0.15
+  disagreement_case_count: 32
+  minimum_active_disagreement_flip_fraction: 0.75
+  maximum_mutated_disagreement_flip_fraction: 0.25
+  minimum_hand_case_null_posterior: 0.90
+  maximum_hand_case_null_semantic_update_l1: 0.02
+  uninformative_equivalence_margin: 0.03
+  equivalence_confidence_level: 0.90
+  maximum_corrupted_gain_ucb: 0.03
+  minimum_shift_lcb: 0.0
+  minimum_informativeness_interaction_lcb: 0.10
+  minimum_exact_window_high_lag_drop: 0.10
+  minimum_latent_high_lag_recovery: 0.05
+  minimum_null_ablation_drop: 0.10
+  minimum_null_ablation_lcb: 0.05
+  maximum_null_ablation_present_harm: 0.03
+  semantic_ablation_null_equivalence_margin: 0.03
+  minimum_semantic_disconnect_endpoint_drop_lcb: 0.05
+  minimum_side_semantic_mutation_drop_lcb: 0.03
+  minimum_alignment_mutation_drop_lcb: 0.02
+  minimum_null_update_disconnect_drop_lcb: 0.05
+  null_update_semantic_equivalence_margin: 0.03
+  minimum_null_side_mutation_drop_lcb: 0.05
+  null_side_semantic_equivalence_margin: 0.03
+  presence_null_effect_equality_tolerance: 1.0e-12
+  high_lag_rms_threshold: 8.0
+  minimum_high_lag_corpus_count: 4
+  minimum_low_lag_corpus_count: 4
+  minimum_synchronized_detector_lift_lcb: 0.10
+  maximum_corrupted_detector_accuracy: 0.0
+  minimum_distinct_action_geometry_digests: 12
+  minimum_distinct_episode_geometry_digests: 12
+  minimum_action_geometry_pairwise_distance_range: 0.02
+  minimum_action_geometry_self_cross_dot_margin: 0.25
+  minimum_distinct_heldout_split_digests: 8
+  minimum_distinct_repetition_digests: 12
+  minimum_distinct_ambiguity_strata: 3
+  minimum_distinct_candidate_count_histograms: 4
+  minimum_distinct_grounded_episode_counts: 4
+  minimum_realized_grounded_rate_range: 0.05
+  minimum_realized_foil_rate_range: 0.05
+  minimum_observed_lag_mean_range: 5.0
+  minimum_realized_visibility_peak_range: 0.03
+  minimum_realized_detector_accuracy_range: 0.05
+  minimum_nonzero_within_corpus_model_metric_sd: 1.0e-6
+  maximum_side_only_concept_accuracy_above_chance: 0.10
+  exact_present_null_effect_vector_equality_forbidden: true
+
+parallel:
+  frozen_jobs: 4
+  start_method: spawn
+  bundle_unit: corpus_seed_x_model_seed_all_conditions
+  one_inflight_model_per_corpus: true
+  canonical_merge_order: corpus_then_model_then_condition
+  worker_isolated_shards: true
+  worker_isolated_tmp: true
+  atomic_final_publish: true
+  require_jobs_1_jobs_n_byte_identity: true
+  minimum_benchmark_speedup: 1.20
+  resource_contingency_multiplier: 1.50
+  maximum_host_ram_fraction: 0.50
+  maximum_current_free_disk_fraction: 0.50
+  minimum_logical_cpu_count: 4
+  thread_environment:
+    PYTHONHASHSEED: "0"
+    OMP_NUM_THREADS: "1"
+    OPENBLAS_NUM_THREADS: "1"
+    MKL_NUM_THREADS: "1"
+    VECLIB_MAXIMUM_THREADS: "1"
+    NUMEXPR_NUM_THREADS: "1"
+    BLIS_NUM_THREADS: "1"
+
+firewalls:
+  forbidden_visible_fields: [answer_index, correct_candidate_id, concept_id,
+                             intended_concept, oracle, oracle_alignment,
+                             side_scores, side_stream, target_event_index,
+                             training_side_evidence, event_logits, null_logit,
+                             detector_input_present, positive_control,
+                             exact_window, corruption, detector_feature,
+                             detector_features, post_outcome]
+  confirmation_command_exists: false
+  confirmation_execution_supported: false
+  development_output_must_be_pristine: true
+  authorization_consumption_required: true
+  authorization_replay_forbidden: true
+  exact_manifest_file_set_required: true
+  symlinks_forbidden_in_package_snapshot_shards_and_outputs: true
+
+paths:
+  package_root: output/synthetic_corrective_development_launch_package_v1
+  frozen_snapshot: output/synthetic_corrective_development_launch_package_v1/frozen_source_snapshot
+  excluded_rehearsal: output/synthetic_corrective_development_launch_package_v1/excluded_rehearsal
+  excluded_rehearsal_attempt_receipt: output/synthetic_corrective_development_launch_package_v1/excluded_rehearsal_attempt_consumed.json
+  excluded_rehearsal_completion: output/synthetic_corrective_development_launch_package_v1/excluded_rehearsal_completion.json
+  independent_recompute: output/synthetic_corrective_development_launch_package_v1/independent_recompute
+  launch_seal: output/synthetic_corrective_development_launch_package_v1/launch_seal
+  launch_seal_staging: output/.synthetic_corrective_development_launch_seal_v1.staging
+  authorization: output/synthetic_corrective_development_launch_package_v1/launch_seal/CORRECTIVE_DEVELOPMENT_LAUNCH_READY.json
+  authorization_claim: output/synthetic_corrective_development_launch_package_v1/development_authorization_consumed.json
+  authorization_capability_receipt: output/synthetic_corrective_development_launch_package_v1/development_capability_issued.json
+  development_output: output/synthetic_corrective_development_v1_one_shot
+  development_staging: output/.synthetic_corrective_development_v1.staging
+  development_inner_staging: output/..synthetic_corrective_development_v1.staging.cohort-staging
+  development_publication_seal: output/synthetic_corrective_development_v1_one_shot/SCIENTIFIC_OUTCOME.json
+  preservation_baseline: output/synthetic_confirmation_adversarial_audit_v1/preservation/baseline.sha256
+  preservation_baseline_sha256: 71e03308400540b755f04265fc047bb97516ff780707031e1617239af183670c
+  preservation_stat: output/synthetic_confirmation_adversarial_audit_v1/preservation/baseline.stat
+  preservation_stat_sha256: cac2fb22adfdf209d52d38e90d4de69c0af859b91ad542f60571a69954004253
+  preservation_symlinks: output/synthetic_confirmation_adversarial_audit_v1/preservation/baseline.symlinks
+  preservation_symlinks_sha256: b37c566c99e5327700cd0473104f3a9a0dd0a81991bfd624720af7c25c4b5eb3
+  preservation_audit_manifest_sha256: fdd92f2599acfb83eb22016d013c957608c985937e8bde5b2962b93f655c7dd1
+
+environment:
+  python: .venv/bin/python
+  required_modules: [numpy, scipy, yaml, pytest, threadpoolctl]
+  bytecode_writes_disabled: true
+
+commands:
+  development_argv: [run-development,
+    --snapshot-root, output/synthetic_corrective_development_launch_package_v1/frozen_source_snapshot,
+    --authorization, output/synthetic_corrective_development_launch_package_v1/launch_seal/CORRECTIVE_DEVELOPMENT_LAUNCH_READY.json,
+    --output-root, output/synthetic_corrective_development_v1_one_shot,
+    --jobs, "4"]
+  development_one_shot: >-
+    env PYTHONDONTWRITEBYTECODE=1 PYTHONHASHSEED=0 OMP_NUM_THREADS=1
+    OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
+    NUMEXPR_NUM_THREADS=1 BLIS_NUM_THREADS=1 .venv/bin/python
+    output/synthetic_corrective_development_launch_package_v1/frozen_source_snapshot/scripts/run_synthetic_corrective_alignment_v1.py
+    run-development
+    --snapshot-root output/synthetic_corrective_development_launch_package_v1/frozen_source_snapshot
+    --authorization output/synthetic_corrective_development_launch_package_v1/launch_seal/CORRECTIVE_DEVELOPMENT_LAUNCH_READY.json
+    --output-root output/synthetic_corrective_development_v1_one_shot
+    --jobs 4

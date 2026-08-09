@@ -1,0 +1,239 @@
+{
+  "schema_version": "childlens-resource-projection-v1.0.0",
+  "created_date": "2026-07-21",
+  "status": "NONSCIENTIFIC_CAPACITY_SCENARIOS",
+  "scientific_outcome_executed": false,
+  "terminal_decision": null,
+  "scope": "STORAGE_PREPROCESSING_ANNOTATION_AND_FUTURE_EXECUTION_PLANNING_ONLY",
+  "evidence": {
+    "host_probe": {
+      "probe_mode": "READ_ONLY",
+      "available_kib": 128260468,
+      "available_gib": 122.3,
+      "unified_memory_bytes": 34359738368,
+      "unified_memory_gib": 32,
+      "logical_cpu_count": 10,
+      "physical_cpu_count": 10,
+      "torch_version": "2.13.0",
+      "mps_built": true,
+      "mps_available": true,
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "observed_date": "2026-07-21",
+      "time_varying": true
+    },
+    "release_level_planning_basis": {
+      "receipt_type": "AUTHENTICATED_SANITIZED_LIVE_UI_RECEIPT",
+      "live_ui_mp4_count": 192,
+      "mp4_count_with_displayed_size": 191,
+      "mp4_count_without_displayed_size": 1,
+      "sum_displayed_sizes_decimal_gb_approx": 201.33,
+      "live_package_version_pinned": false,
+      "live_package_relationship_to_public_corpus": "UNRESOLVED_POSSIBLE_ANNOTATED_SUBSET",
+      "public_report_total_hours": 108.58,
+      "public_report_video_count": 354,
+      "retired_preliminary_count_used": false,
+      "status": "LIVE_PACKAGE_REQUIRES_LOCAL_FINGERPRINT_AND_PUBLIC_RELEASE_RECONCILIATION",
+      "count_discrepancy_resolved_here": false,
+      "public_hour_ratio_used_for_size_estimation": false,
+      "selection_size_authority": "EXACT_PREFLIGHT_FILE_BYTE_SUM",
+      "unknown_size_file_selectable": false,
+      "use": "RELEASE_RECONCILIATION_AND_FULL_PACKAGE_CAPACITY_WARNING_ONLY"
+    }
+  },
+  "capacity_controls": {
+    "raw_pilot_payload_cap_gib": 20,
+    "namespace_peak_cap_gib": 73,
+    "minimum_free_space_after_projected_peak_gib": 50,
+    "full_archive_download_permitted": false,
+    "full_frame_materialization_permitted": false,
+    "acquisition_mode": "METADATA_FIRST_SELECTIVE_RESUMABLE_SHARDS",
+    "exact_selected_bytes_required_before_transfer": true
+  },
+  "pilot_scenarios": [
+    {
+      "name": "low",
+      "video_count": 12,
+      "planning_minutes_per_video": 12,
+      "media_hours": 2.4,
+      "raw_storage_allocation_gib": 8.0,
+      "raw_size_is_empirical_estimate": false,
+      "storage_peak_gib": 41.4,
+      "free_space_after_peak_gib": 80.9,
+      "current_host_storage_admission": "PASS",
+      "cpu_preprocessing_worker_hours": 2.4,
+      "cpu_wall_hours_at_2_to_4_workers": [0.6, 1.2],
+      "asr_diarization_instrument_accelerator_hours": 1.2,
+      "visual_instrument_accelerator_hours": 0.6,
+      "manual_annotation_person_hours": 41.0
+    },
+    {
+      "name": "base",
+      "video_count": 15,
+      "planning_minutes_per_video": 18,
+      "media_hours": 4.5,
+      "raw_storage_allocation_gib": 15.0,
+      "raw_size_is_empirical_estimate": false,
+      "storage_peak_gib": 69.4,
+      "free_space_after_peak_gib": 52.9,
+      "current_host_storage_admission": "PASS",
+      "cpu_preprocessing_worker_hours": 13.5,
+      "cpu_wall_hours_at_2_to_4_workers": [3.4, 6.8],
+      "asr_diarization_instrument_accelerator_hours": 6.8,
+      "visual_instrument_accelerator_hours": 4.5,
+      "manual_annotation_person_hours": 105.9
+    },
+    {
+      "name": "high",
+      "video_count": 18,
+      "planning_minutes_per_video": 30,
+      "media_hours": 9.0,
+      "raw_storage_allocation_gib": 20.0,
+      "raw_size_is_empirical_estimate": false,
+      "storage_peak_gib": 90.0,
+      "free_space_after_peak_gib": 32.3,
+      "current_host_storage_admission": "FAIL_ABOVE_NAMESPACE_CAP_AND_BELOW_50_GIB_FREE_SPACE_FLOOR",
+      "cpu_preprocessing_worker_hours": 54.0,
+      "cpu_wall_hours_at_2_to_4_workers": [13.5, 27.0],
+      "asr_diarization_instrument_accelerator_hours": 36.0,
+      "visual_instrument_accelerator_hours": 27.0,
+      "manual_annotation_person_hours": 310.0
+    }
+  ],
+  "storage_components_gib": {
+    "low": {
+      "fixed_measurement_tools_environment": 8.0,
+      "raw_selective_shard": 8.0,
+      "restricted_derivatives": 2.0,
+      "scratch_temporary_decode": 16.0,
+      "manifests_annotations_qa_logs": 0.5,
+      "contingency": 6.9,
+      "peak": 41.4
+    },
+    "base": {
+      "fixed_measurement_tools_environment": 8.0,
+      "raw_selective_shard": 15.0,
+      "restricted_derivatives": 3.8,
+      "scratch_temporary_decode": 30.0,
+      "manifests_annotations_qa_logs": 1.0,
+      "contingency": 11.6,
+      "peak": 69.4
+    },
+    "high": {
+      "fixed_measurement_tools_environment": 8.0,
+      "raw_selective_shard": 20.0,
+      "restricted_derivatives": 5.0,
+      "scratch_temporary_decode": 40.0,
+      "manifests_annotations_qa_logs": 2.0,
+      "contingency": 15.0,
+      "peak": 90.0
+    }
+  },
+  "annotation_labor_model": {
+    "requires_language_matched_humans": true,
+    "machine_outputs_are_gold": false,
+    "reliability_duplication_optional": false,
+    "low": {
+      "protocol_setup_training_hours": 16.0,
+      "transcript_timing_speaker_hours": 7.2,
+      "referential_event_hours": 12.0,
+      "reliability_adjudication_hours": 5.8,
+      "total_person_hours": 41.0
+    },
+    "base": {
+      "protocol_setup_training_hours": 24.0,
+      "transcript_timing_speaker_hours": 22.5,
+      "referential_event_hours": 36.0,
+      "reliability_adjudication_hours": 23.4,
+      "total_person_hours": 105.9
+    },
+    "high": {
+      "protocol_setup_training_hours": 40.0,
+      "transcript_timing_speaker_hours": 72.0,
+      "referential_event_hours": 108.0,
+      "reliability_adjudication_hours": 90.0,
+      "total_person_hours": 310.0
+    }
+  },
+  "future_training_capacity_scenarios": [
+    {
+      "name": "low",
+      "complete_paired_bundles": 4,
+      "arms_per_bundle": 5,
+      "updates_per_arm": 10000,
+      "total_arm_runs": 20,
+      "total_updates": 200000,
+      "planning_seconds_per_update": 0.25,
+      "accelerator_device_hours": 13.9,
+      "local_elapsed_hours_with_20_percent_overhead": 16.7,
+      "evaluation_cpu_worker_hours": 8,
+      "evaluation_cpu_wall_hours_at_2_to_4_workers": [2, 4],
+      "evaluation_accelerator_hours": 1,
+      "evaluation_scratch_allowance_gib": 2
+    },
+    {
+      "name": "base",
+      "complete_paired_bundles": 8,
+      "arms_per_bundle": 5,
+      "updates_per_arm": 25000,
+      "total_arm_runs": 40,
+      "total_updates": 1000000,
+      "planning_seconds_per_update": 0.75,
+      "accelerator_device_hours": 208.3,
+      "local_elapsed_hours_with_20_percent_overhead": 250.0,
+      "evaluation_cpu_worker_hours": 32,
+      "evaluation_cpu_wall_hours_at_2_to_4_workers": [8, 16],
+      "evaluation_accelerator_hours": 4,
+      "evaluation_scratch_allowance_gib": 8
+    },
+    {
+      "name": "high",
+      "complete_paired_bundles": 12,
+      "arms_per_bundle": 5,
+      "updates_per_arm": 50000,
+      "total_arm_runs": 60,
+      "total_updates": 3000000,
+      "planning_seconds_per_update": 1.5,
+      "accelerator_device_hours": 1250.0,
+      "local_elapsed_hours_with_20_percent_overhead": 1500.0,
+      "evaluation_cpu_worker_hours": 96,
+      "evaluation_cpu_wall_hours_at_2_to_4_workers": [24, 48],
+      "evaluation_accelerator_hours": 12,
+      "evaluation_scratch_allowance_gib": 20
+    }
+  ],
+  "parallel_execution_invariants": {
+    "atomic_unit": "COMPLETE_CORPUS_SEED_MODEL_SEED_FIVE_ARM_BUNDLE",
+    "parallelize_across_complete_bundles_only": true,
+    "conditions_serial_within_bundle": true,
+    "local_mps_global_trainer_limit": 1,
+    "cpu_worker_range_after_measurement": [2, 4],
+    "nested_threads_per_worker": 1,
+    "cuda_gpu_types_must_match": true,
+    "slurm_array_index_maps_to_complete_bundle": true,
+    "outcome_driven_retries_or_seed_changes_permitted": false,
+    "canonical_merge_requires_complete_inventory": true
+  },
+  "privacy_and_provenance": {
+    "childlens_only_empirical_anchor": true,
+    "aea_empirical_ancestry": false,
+    "babyview_empirical_ancestry": false,
+    "restricted_payload_opened_for_projection": false,
+    "restricted_payload_exported": false,
+    "identifiers_in_artifact": false,
+    "exact_media_timestamps_in_artifact": false,
+    "transcript_or_lexical_strings_in_artifact": false,
+    "measurement_instrument_embeddings_pass_to_learner": false,
+    "absent_physical_modalities": "SIMULATOR_DEFINED_COUNTERFACTUAL_ONLY"
+  },
+  "unresolved_before_launch": [
+    "EXACT_ACCESSIBLE_RELEASE_AND_SELECTED_SHARD_BYTES",
+    "TERMS_FOR_LOCAL_PROCESSING_DERIVATIVES_RETENTION_AND_EXPORT",
+    "ACTUAL_MEDIA_DURATION_CODECS_AND_PREPROCESSING_THROUGHPUT",
+    "CORPUS_LANGUAGE_AND_LANGUAGE_MATCHED_ANNOTATOR_AVAILABILITY",
+    "INSTRUMENT_VERSIONS_MEMORY_THROUGHPUT_CACHE_AND_FAILURE_RATE",
+    "FINAL_LEARNER_SHAPE_BATCH_CLIP_CHECKPOINT_AND_SECONDS_PER_UPDATE",
+    "FROZEN_BUNDLE_SEEDS_UPDATES_STOPPING_AND_EVALUATION_INVENTORY",
+    "AUTHORIZED_STORAGE_CONTROLS_RETENTION_AND_DELETION"
+  ]
+}

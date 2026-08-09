@@ -1,0 +1,242 @@
+{
+  "changes_after_smoke_permitted": false,
+  "frozen_artifacts": [
+    {
+      "bytes": 786,
+      "path": "frozen_environment.json",
+      "sha256": "0b86f997a86643e1805c3c2a0fe32a741e8ee6128f2a40c5a347ca8844dcabc7"
+    },
+    {
+      "bytes": 5407,
+      "path": "frozen_config_snapshot.yaml",
+      "sha256": "cb519a936f8d4486fdd7a2f71f199644d266ac855277ad3fef34bc04121bcf34"
+    },
+    {
+      "bytes": 4185,
+      "path": "frozen_protocol_snapshot.md",
+      "sha256": "9129792fa73a96b48c296586d1d30da1c60c5dd08807831ba4d066132baf3d7f"
+    },
+    {
+      "bytes": 546,
+      "path": "frozen_primary_sources.json",
+      "sha256": "1c1ee6d85cc02e5b98d213004cefbcf87f38eba764c581a1151c73338a2be4f0"
+    },
+    {
+      "bytes": 8781,
+      "path": "frozen_traceability.json",
+      "sha256": "49c44066c9e55c37a73d2ac0e47f5e6f0c657c5e9434e988f9d432d874b01309"
+    },
+    {
+      "bytes": 5758,
+      "path": "frozen_seed_registries.json",
+      "sha256": "332e19776f73eaf3d689bbc912bc30ce20040d539fba827bdc5f089d5f978cd4"
+    },
+    {
+      "bytes": 1105,
+      "path": "frozen_gates.json",
+      "sha256": "370a6bcffae6aeaf35cf88964a96350a578fa2df62cfedf6727a5dc1adf75fdc"
+    },
+    {
+      "bytes": 611,
+      "path": "frozen_adjudication_contract.json",
+      "sha256": "9a60dc04530c240a2e8e9bc2af407306e3d21707cbe3a229e4104f6e7c959657"
+    },
+    {
+      "bytes": 4718,
+      "path": "collected_tests_pre_freeze.json",
+      "sha256": "27cb83b86c470586881f943e8f83e083f91edbe9141be5c7b13b6a372e07797e"
+    }
+  ],
+  "frozen_before_excluded_smoke": true,
+  "snapshot_manifest_sha256": "c332488033893130c7cc12c5d7bdef57b6a3451180e1fa9d3149df923a1828f0",
+  "status": "FROZEN",
+  "tracked": [
+    {
+      "bytes": 106,
+      "live_sha256": "5f5caa88371c3ab9324ded4afe95eb5428224a772c1f478a21cbb0bf24766986",
+      "path": "babyworld_lite/__init__.py",
+      "snapshot_sha256": "5f5caa88371c3ab9324ded4afe95eb5428224a772c1f478a21cbb0bf24766986"
+    },
+    {
+      "bytes": 157,
+      "live_sha256": "c57a0e190b8f02bf89a698a272dc0f4fd254a6324cd39ca639165a623e68978c",
+      "path": "babyworld_lite/sensor_alignment_v2/__init__.py",
+      "snapshot_sha256": "c57a0e190b8f02bf89a698a272dc0f4fd254a6324cd39ca639165a623e68978c"
+    },
+    {
+      "bytes": 16759,
+      "live_sha256": "6d74817b5bb30b4b265f2ec246b71be432d68ca6f545d50b04a153d77df33b6d",
+      "path": "babyworld_lite/sensor_alignment_v2/detector.py",
+      "snapshot_sha256": "6d74817b5bb30b4b265f2ec246b71be432d68ca6f545d50b04a153d77df33b6d"
+    },
+    {
+      "bytes": 16903,
+      "live_sha256": "a66d16f515d275fcd08c1db7293ca9ba50c14e7e60b820bba5d2eca3c8338bd8",
+      "path": "babyworld_lite/sensor_alignment_v2/protocol.py",
+      "snapshot_sha256": "a66d16f515d275fcd08c1db7293ca9ba50c14e7e60b820bba5d2eca3c8338bd8"
+    },
+    {
+      "bytes": 46948,
+      "live_sha256": "31aaba45e98455138ba798806497fbc83ab9f02e6843c0364f3378d1056eae1f",
+      "path": "babyworld_lite/sensor_alignment_v2/synthetic.py",
+      "snapshot_sha256": "31aaba45e98455138ba798806497fbc83ab9f02e6843c0364f3378d1056eae1f"
+    },
+    {
+      "bytes": 140,
+      "live_sha256": "16e9e72ab238a27dcba2a9b871aec8abd266a75417c2d5d212c5fe420418f086",
+      "path": "babyworld_lite/sensor_alignment_v7/__init__.py",
+      "snapshot_sha256": "16e9e72ab238a27dcba2a9b871aec8abd266a75417c2d5d212c5fe420418f086"
+    },
+    {
+      "bytes": 3689,
+      "live_sha256": "71954e71d385c11b30ab7dcfc61b2618572400f229f269d4d07b717f3c5a6b0a",
+      "path": "babyworld_lite/sensor_alignment_v7/adjudicator.py",
+      "snapshot_sha256": "71954e71d385c11b30ab7dcfc61b2618572400f229f269d4d07b717f3c5a6b0a"
+    },
+    {
+      "bytes": 43724,
+      "live_sha256": "9d017ffcfc48f8f0b9ad8803ea378a09385e9690e7647ef7ec936f7e00b5da18",
+      "path": "babyworld_lite/sensor_alignment_v7/benchmark.py",
+      "snapshot_sha256": "9d017ffcfc48f8f0b9ad8803ea378a09385e9690e7647ef7ec936f7e00b5da18"
+    },
+    {
+      "bytes": 4073,
+      "live_sha256": "72de2b8c3643c9f6eb7b5c3b7cda0fdd1d6be7d464fb51d998e3e784199d1936",
+      "path": "babyworld_lite/sensor_alignment_v7/controls.py",
+      "snapshot_sha256": "72de2b8c3643c9f6eb7b5c3b7cda0fdd1d6be7d464fb51d998e3e784199d1936"
+    },
+    {
+      "bytes": 7692,
+      "live_sha256": "2c2508d4d3cb83afcde1e7d870795a74bcc427e2535e697070592e134e4966ad",
+      "path": "babyworld_lite/sensor_alignment_v7/detector_runtime.py",
+      "snapshot_sha256": "2c2508d4d3cb83afcde1e7d870795a74bcc427e2535e697070592e134e4966ad"
+    },
+    {
+      "bytes": 27401,
+      "live_sha256": "917aae4cff4726565bbbc26b19dfa563251342cd2814ba686b979819f551df38",
+      "path": "babyworld_lite/sensor_alignment_v7/integrity.py",
+      "snapshot_sha256": "917aae4cff4726565bbbc26b19dfa563251342cd2814ba686b979819f551df38"
+    },
+    {
+      "bytes": 34033,
+      "live_sha256": "4dd17af4940c3464ba99ea4703d9c97a69b20dc551a8274bd1acaebdb4d9ad9b",
+      "path": "babyworld_lite/sensor_alignment_v7/learner.py",
+      "snapshot_sha256": "4dd17af4940c3464ba99ea4703d9c97a69b20dc551a8274bd1acaebdb4d9ad9b"
+    },
+    {
+      "bytes": 12144,
+      "live_sha256": "f69dd1e92b876f372449124425da889d9fa768aebc9c1e26bb735b8c09b6c516",
+      "path": "babyworld_lite/sensor_alignment_v7/protocol.py",
+      "snapshot_sha256": "f69dd1e92b876f372449124425da889d9fa768aebc9c1e26bb735b8c09b6c516"
+    },
+    {
+      "bytes": 44558,
+      "live_sha256": "78361182be14c8c1d47794dce012211b7e8485883e0d170825023a0ef69ddfbf",
+      "path": "babyworld_lite/sensor_alignment_v7/study.py",
+      "snapshot_sha256": "78361182be14c8c1d47794dce012211b7e8485883e0d170825023a0ef69ddfbf"
+    },
+    {
+      "bytes": 3544,
+      "live_sha256": "176eb21e52f6910e22702022a23f31a56d3ccb8cf5b66533cebd35636482ee7e",
+      "path": "configs/synthetic_component_robustness_v3.yaml",
+      "snapshot_sha256": "176eb21e52f6910e22702022a23f31a56d3ccb8cf5b66533cebd35636482ee7e"
+    },
+    {
+      "bytes": 3273,
+      "live_sha256": "5921aa7e70b507b5c5c0a706e508f1ae7da1ab54398f4f96c296b902aa244b18",
+      "path": "configs/synthetic_identifiability_qualification_v5.yaml",
+      "snapshot_sha256": "5921aa7e70b507b5c5c0a706e508f1ae7da1ab54398f4f96c296b902aa244b18"
+    },
+    {
+      "bytes": 5408,
+      "live_sha256": "5c896116d5fd4cf9efa94d0178989f28f15fc7776fc0d740c3022faf672cf94c",
+      "path": "configs/synthetic_identifiability_qualification_v6.yaml",
+      "snapshot_sha256": "5c896116d5fd4cf9efa94d0178989f28f15fc7776fc0d740c3022faf672cf94c"
+    },
+    {
+      "bytes": 5407,
+      "live_sha256": "cb519a936f8d4486fdd7a2f71f199644d266ac855277ad3fef34bc04121bcf34",
+      "path": "configs/synthetic_identifiability_qualification_v7.yaml",
+      "snapshot_sha256": "cb519a936f8d4486fdd7a2f71f199644d266ac855277ad3fef34bc04121bcf34"
+    },
+    {
+      "bytes": 3427,
+      "live_sha256": "4d1aa3bac16f463dfef9081d15c4032cc8206e799b3a68390e1ac6df1c074690",
+      "path": "configs/synthetic_protocol_fidelity_v4.yaml",
+      "snapshot_sha256": "4d1aa3bac16f463dfef9081d15c4032cc8206e799b3a68390e1ac6df1c074690"
+    },
+    {
+      "bytes": 7278,
+      "live_sha256": "c1e90423ad197bf97e12f1bb719c92886218c1c4873e55ee849ed62dede30d10",
+      "path": "configs/synthetic_sensor_event_robustness_v2.yaml",
+      "snapshot_sha256": "c1e90423ad197bf97e12f1bb719c92886218c1c4873e55ee849ed62dede30d10"
+    },
+    {
+      "bytes": 4534,
+      "live_sha256": "19de1000f0eca2250e63e64a87e9691fce70616bf99f0bef7b80a6eb3b0879ef",
+      "path": "configs/synthetic_weak_alignment_recovery_v1.yaml",
+      "snapshot_sha256": "19de1000f0eca2250e63e64a87e9691fce70616bf99f0bef7b80a6eb3b0879ef"
+    },
+    {
+      "bytes": 1573,
+      "live_sha256": "8f16bae6a91c32f4a0afae9ef9deadd1bd8b7aa3311b4597f0399f6135aa8abd",
+      "path": "docs/synthetic_identifiability_qualification_v7_limitations.md",
+      "snapshot_sha256": "8f16bae6a91c32f4a0afae9ef9deadd1bd8b7aa3311b4597f0399f6135aa8abd"
+    },
+    {
+      "bytes": 546,
+      "live_sha256": "1c1ee6d85cc02e5b98d213004cefbcf87f38eba764c581a1151c73338a2be4f0",
+      "path": "docs/synthetic_identifiability_qualification_v7_primary_sources.json",
+      "snapshot_sha256": "1c1ee6d85cc02e5b98d213004cefbcf87f38eba764c581a1151c73338a2be4f0"
+    },
+    {
+      "bytes": 4185,
+      "live_sha256": "9129792fa73a96b48c296586d1d30da1c60c5dd08807831ba4d066132baf3d7f",
+      "path": "docs/synthetic_identifiability_qualification_v7_protocol.md",
+      "snapshot_sha256": "9129792fa73a96b48c296586d1d30da1c60c5dd08807831ba4d066132baf3d7f"
+    },
+    {
+      "bytes": 3906,
+      "live_sha256": "1f22c667d8488ea62001bcd99b23ad5e361074bfb6a5c1654dcf45681baffebf",
+      "path": "docs/synthetic_identifiability_qualification_v7_repair_ledger.json",
+      "snapshot_sha256": "1f22c667d8488ea62001bcd99b23ad5e361074bfb6a5c1654dcf45681baffebf"
+    },
+    {
+      "bytes": 8781,
+      "live_sha256": "49c44066c9e55c37a73d2ac0e47f5e6f0c657c5e9434e988f9d432d874b01309",
+      "path": "docs/synthetic_identifiability_qualification_v7_traceability.json",
+      "snapshot_sha256": "49c44066c9e55c37a73d2ac0e47f5e6f0c657c5e9434e988f9d432d874b01309"
+    },
+    {
+      "bytes": 2877,
+      "live_sha256": "bbb837b2eb63ad7ef2c35ac916b4ce19f91e66752ba8b77154045b7adb3b31ec",
+      "path": "docs/synthetic_identifiability_qualification_v7_v5_v6_audit.json",
+      "snapshot_sha256": "bbb837b2eb63ad7ef2c35ac916b4ce19f91e66752ba8b77154045b7adb3b31ec"
+    },
+    {
+      "bytes": 892,
+      "live_sha256": "b4b0e30bf7fd692ef5bf254c0c020641bb3591f4453c27747a944f52110db62b",
+      "path": "output/synthetic_identifiability_qualification_v6/prefreeze_invalidation.json",
+      "snapshot_sha256": "b4b0e30bf7fd692ef5bf254c0c020641bb3591f4453c27747a944f52110db62b"
+    },
+    {
+      "bytes": 7297,
+      "live_sha256": "0f7e42788a6545a937ee1d6afb8ce08e5c069bf90268f6f96bdad4324eff3f01",
+      "path": "scripts/run_synthetic_identifiability_qualification_v7.py",
+      "snapshot_sha256": "0f7e42788a6545a937ee1d6afb8ce08e5c069bf90268f6f96bdad4324eff3f01"
+    },
+    {
+      "bytes": 595,
+      "live_sha256": "dcfabd18135bf240338722ca2bc6c14bcd2d3be0ea917eb65e22624342059c30",
+      "path": "tests/conftest.py",
+      "snapshot_sha256": "dcfabd18135bf240338722ca2bc6c14bcd2d3be0ea917eb65e22624342059c30"
+    },
+    {
+      "bytes": 20833,
+      "live_sha256": "07d25c2527bc767c8be2fa44214e65cffd95390bc071091fe5f42f513947c331",
+      "path": "tests/test_synthetic_identifiability_qualification_v7.py",
+      "snapshot_sha256": "07d25c2527bc767c8be2fa44214e65cffd95390bc071091fe5f42f513947c331"
+    }
+  ],
+  "tracked_file_count": 31
+}

@@ -1,0 +1,119 @@
+{
+  "schema_version": "nursery-corrective-traceability-v4",
+  "requirements": [
+    {
+      "id": "prior_line_independently_closed",
+      "artifacts": [
+        "prior_line_reverification.json",
+        "preservation/preservation_proof.json"
+      ]
+    },
+    {
+      "id": "brief_construct_mechanism_and_rationale",
+      "artifacts": [
+        "design_contract_validation.json",
+        "construction_qualification_decision.json",
+        "mechanism_qualification.json",
+        "construction_qualification/adjudication/mechanism_mutations.json",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v4_brief_trace.json",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v4_protocol.md",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v4_research_rationale.md",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v4_threshold_rationale.md",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v4_primary_sources.json",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v4_sample_size.md"
+      ]
+    },
+    {
+      "id": "parallel_equivalence_benchmark_and_shards",
+      "artifacts": [
+        "micro_attempt_consumed.json",
+        "worker_launcher_preflight.json",
+        "parallel_equivalence_attempt_1.json",
+        "parallel_benchmark_attempt_1.json",
+        "development_command_walltime_estimate.json",
+        "walltime_estimate_validation.json",
+        "parallel_micro_attempt_1_completion.json",
+        "parallel_micro_attempt_1_persisted_inputs/input_manifest.json",
+        "parallel_micro_attempt_1_jobs_1/complete_manifest.json",
+        "parallel_micro_attempt_1_jobs_n/complete_manifest.json",
+        "parallel_micro_attempt_1_jobs_1/adjudication/manifest.json",
+        "parallel_micro_attempt_1_jobs_n/adjudication/manifest.json",
+        "parallel_micro_attempt_1_jobs_1/runtime/scheduler_validation.json",
+        "parallel_micro_attempt_1_jobs_n/runtime/scheduler_validation.json"
+      ]
+    },
+    {
+      "id": "prefreeze_and_frozen_package_evidence",
+      "artifacts": [
+        "prequalification_design_lock.json",
+        "construction_qualification_attempt_consumed.json",
+        "prequalification_transition_verification.json",
+        "freeze_attempt_consumed.json",
+        "prefreeze_evidence_manifest.json",
+        "prefreeze_evidence_contract.json",
+        "freeze_receipt.json",
+        "frozen_environment.json",
+        "frozen_seed_registries.json",
+        "frozen_source_snapshot/snapshot_manifest.json"
+      ]
+    },
+    {
+      "id": "retired_failed_v1_preserved",
+      "artifacts": [
+        "PREDECESSOR_V1_FAILURE_AUDIT.json",
+        "PREDECESSOR_V1_FILE_MANIFEST.json",
+        "PREDECESSOR_V1_DIRECTORY_MANIFEST.json",
+        "PREDECESSOR_V1_FINAL_REVERIFICATION.json"
+      ]
+    },
+    {
+      "id": "retired_failed_v2_preserved",
+      "artifacts": [
+        "PREDECESSOR_V2_FAILURE_AUDIT.json",
+        "PREDECESSOR_V2_TREE_MANIFEST.json",
+        "PREDECESSOR_V2_FINAL_REVERIFICATION.json"
+      ]
+    },
+    {
+      "id": "exactly_one_excluded_rehearsal_and_independent_recompute",
+      "artifacts": [
+        "excluded_rehearsal_attempt_consumed.json",
+        "excluded_rehearsal_completion.json",
+        "independent_recompute_attempt_consumed.json",
+        "rehearsal_contract_validation.json",
+        "excluded_rehearsal/cohort_summary.json",
+        "excluded_rehearsal/complete_manifest.json",
+        "excluded_rehearsal/adjudication/execution_contract.json",
+        "independent_recompute/complete_manifest.json",
+        "independent_recompute/adjudication/manifest.json",
+        "independent_recompute_comparison.json"
+      ]
+    },
+    {
+      "id": "tests_identifiers_preservation_and_pristine_state",
+      "artifacts": [
+        "official_test_execution_report.json",
+        "official_tests_attempt_consumed.json",
+        "preservation_attempt_consumed.json",
+        "preservation/preservation_proof.json",
+        "preservation_timing.json",
+        "preservation_completion.json",
+        "preservation_completion_validation.json",
+        "preservation/preservation_after.sha256",
+        "preservation/preservation_after.stat",
+        "preservation/preservation_after.symlinks",
+        "identifier_operation_audit.json",
+        "repository_operation_census.json",
+        "pristine_state_validation.json"
+      ]
+    },
+    {
+      "id": "zero_outcome_scientific_handoff",
+      "artifacts": [
+        "outcome_registry.json",
+        "finalization_attempt_consumed.json",
+        "SCIENTIFIC_REPORT.md"
+      ]
+    }
+  ]
+}

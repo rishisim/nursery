@@ -1,0 +1,73 @@
+{
+  "schema_version": "nursery-development-launch-repair-ledger-v2",
+  "protocol_id": "synthetic-development-launch-v2",
+  "predecessor_protocol_id": "synthetic-development-launch-v1",
+  "predecessor_decision": "REVISE",
+  "predecessor_audit": "output/synthetic_development_launch_package_v1/post_freeze_cycle_audit.json",
+  "gate_changes": "none",
+  "development_outcome_count": 0,
+  "confirmation_outcome_count": 0,
+  "repairs": [
+    {
+      "id": "fresh-rehearsal-identifiers",
+      "failure": "A frozen failed package cannot be patched or rerun.",
+      "repair": "Create a separate v2 namespace with fixture identifiers 300001, 300003, 300101, 300103, 300107, 300401 and excluded-rehearsal identifiers 300201, 300203, 300205, 300207, 300301, 300303, 300307, 300403.",
+      "principle": "No identifier used by the v1 fixture or excluded rehearsal is reused."
+    },
+    {
+      "id": "virtual-environment-launcher-preservation",
+      "failure": "V1 resolved .venv/bin/python to the base interpreter, losing PyYAML and pytest in separate processes.",
+      "repair": "Freeze the absolute but unresolved virtual-environment launcher path and separately record the resolved executable and its digest.",
+      "gate_weakened": false
+    },
+    {
+      "id": "mutation-specific-negative-controls",
+      "failure": "V1 accepted any nonzero mutation-process exit, including an unrelated missing-dependency failure.",
+      "repair": "Require the input mutation to report persisted-input manifest rejection and the source mutation to report frozen-source manifest rejection.",
+      "gate_weakened": false
+    },
+    {
+      "id": "fail-closed-finalization",
+      "failure": "V1 finalization raised FileNotFoundError when recomputation evidence was absent.",
+      "repair": "Treat every missing or malformed finalization input as an explicit contradiction, produce a REVISE terminal, and catch unavailable regeneration environments as a failed terminal-regeneration gate.",
+      "gate_weakened": false
+    },
+    {
+      "id": "traceability-artifact-ordering",
+      "failure": "V1 required DEVELOPMENT_LAUNCH_READY.json before finalization was allowed to create it.",
+      "repair": "Machine traceability references only artifacts that must exist before terminal adjudication. The final authorization is instead protected by its digest, terminal provenance, and the exact complete-file manifest.",
+      "gate_weakened": false
+    },
+    {
+      "id": "complete-manifest-canonical-digest",
+      "failure": "V1's complete manifest omitted the canonical digest required by its own verifier.",
+      "repair": "Include the canonical file-list digest and perform a post-write exact file-set, byte-size, and SHA-256 reconciliation before returning.",
+      "gate_weakened": false
+    },
+    {
+      "id": "prior-package-preservation",
+      "failure": "A successor package must preserve the entire failed v1 launch package as evidence.",
+      "repair": "Extend the preservation baseline to all v1-v8 qualification evidence, the V8 adversarial audit, and every v1 development-launch source, document, test, configuration, and output byte.",
+      "gate_weakened": false
+    }
+  ],
+  "pre_freeze_validation": {
+    "fixture_status": "PASS",
+    "fixture_cohort_summary_sha256": "92bd4be34d7da5391c4885f54ede377772564ca38a3f854615a7330d43af7afd",
+    "fixture_identifier_reference_audit_sha256": "ee02e6a3173b59dd1e97237f7c0506ffb4fd54442a3b85a4ea16a69bde5eaea1",
+    "fixture_development_inference_sha256": "13bb5fb3af5674192e63adbf714c27702240461e517a86291b3200e98e90157f",
+    "fixture_development_controls_sha256": "d0efd2b0bce25f9f9e93a5cc152be2a65ef5d93c31a4b6d9b3cfba78d3a0b6ca",
+    "fixture_scientific_decision_suppressed": true,
+    "fixture_development_outcome_count": 0,
+    "fixture_confirmation_outcome_count": 0,
+    "package_tests_passed": 20,
+    "repository_tests_passed": 226,
+    "repository_tests_skipped": 17,
+    "collected_tests_sha256": "2f9676799f7a710317b943ae6647e6454bf2a53e05f61d962ea2e7031da11f6c",
+    "prior_evidence_file_count": 2765,
+    "prior_evidence_baseline_sha256": "9c0633ac6b8ddc6bc88b80d4fe570972bc9ffa20e56ee158634c8ad608ac466c",
+    "development_outcome_count": 0,
+    "confirmation_outcome_count": 0
+  },
+  "status": "FROZEN_PENDING_EXCLUDED_REHEARSAL"
+}

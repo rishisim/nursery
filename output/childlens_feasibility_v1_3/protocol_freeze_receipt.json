@@ -1,0 +1,63 @@
+{
+  "adjudicator_required": false,
+  "agreement_target": "MODEL_HUMAN_NOT_INTER_ANNOTATOR",
+  "author_blinded_to_model_predictions": true,
+  "author_record_lock_irreversible": true,
+  "author_record_lock_required_before_prediction_reveal": true,
+  "author_uses_raw_audio_video": true,
+  "bounded_escalation_only_if_borderline": true,
+  "cluster_aware_uncertainty_required": true,
+  "frozen_before_author_labels": true,
+  "frozen_payload_sha256": "90a981b99c152c0a8258a9bcae1e8126be65699c168c5496df7ba0eb9d76135f",
+  "inter_human_reliability_available": false,
+  "maximum_additional_speech_seconds": 900,
+  "primary_audit_speech_seconds": 900,
+  "protocol_document_sha256": "e88c844b2cf4d85e3b88118752e7cbc9d561b30c4b540a42b113dcc003484f13",
+  "pseudo_labels_for_aggregate_calibration_only": true,
+  "schema_version": "childlens-v1.3-protocol-freeze-receipt-v1",
+  "second_human_required": false,
+  "selected_item_count": 15,
+  "selection_hash_deterministic": true,
+  "selection_independent_of_apparent_success": true,
+  "selection_independent_of_lexical_content": true,
+  "selection_independent_of_model_confidence": true,
+  "selection_independent_of_model_predictions": true,
+  "selection_independent_of_visual_salience": true,
+  "simulator_oracle_labels_primary_evaluation_truth": true,
+  "small_sample_limitation_required": true,
+  "status": "FROZEN",
+  "thresholds": {
+    "coarse_referential_status": {
+      "frozen_before_author_labels": true,
+      "frozen_gate_digest": "68d6f2fc6e7972b3f323515ce4f430098125596c65ab8d878b05269dc9251f62",
+      "pass_rule": "MEET_MINIMUM_SUPPORT_AND_ALL_POINT_AND_CLUSTER_BOUND_PASS_THRESHOLDS"
+    },
+    "non_child_transcript_error_and_coverage": {
+      "frozen_before_author_labels": true,
+      "frozen_gate_digest": "fb712cab01402cc3c655b709b893958bae211f2e9ff3ef8730f3c1fff5d3029a",
+      "pass_rule": "MEET_MINIMUM_SUPPORT_AND_ALL_POINT_AND_CLUSTER_BOUND_PASS_THRESHOLDS"
+    },
+    "noun_object_candidate_precision_coverage": {
+      "frozen_before_author_labels": true,
+      "frozen_gate_digest": "2d24a4dd80266ae0b8448f54dce33c2b8008433346974dccf6516e88d856cad4",
+      "pass_rule": "MEET_MINIMUM_SUPPORT_AND_ALL_POINT_AND_CLUSTER_BOUND_PASS_THRESHOLDS"
+    },
+    "source_role_non_child_priority": {
+      "frozen_before_author_labels": true,
+      "frozen_gate_digest": "f06beedb32702418b1240264d3393c6fdc2e4ac737b64381333096cfdcbd5b48",
+      "pass_rule": "MEET_MINIMUM_SUPPORT_AND_ALL_POINT_AND_CLUSTER_BOUND_PASS_THRESHOLDS"
+    },
+    "speech_utterance_boundary": {
+      "frozen_before_author_labels": true,
+      "frozen_gate_digest": "9891e4e63d8c5ae36ed90e2b4c0965774b8fd83cf6a3cd2281875875c1ef6fa5",
+      "pass_rule": "MEET_MINIMUM_SUPPORT_AND_ALL_POINT_AND_CLUSTER_BOUND_PASS_THRESHOLDS"
+    },
+    "verb_action_candidate_precision_coverage": {
+      "frozen_before_author_labels": true,
+      "frozen_gate_digest": "bd2a53713aee99221edecce7060bfa869e09336c3c6f403939b0ef09db7e5d73",
+      "pass_rule": "MEET_MINIMUM_SUPPORT_AND_ALL_POINT_AND_CLUSTER_BOUND_PASS_THRESHOLDS"
+    }
+  },
+  "thresholds_frozen_before_author_labels": true,
+  "unaudited_pseudo_labels_primary_evaluation_truth": false
+}

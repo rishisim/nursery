@@ -1,0 +1,35 @@
+{
+  "schema_version": "nursery-qwen-accuracy-audit-validation-v1.0.0",
+  "status": "PASS_WITH_PROVISIONAL_INTERPRETATION_ONLY",
+  "validated_at": "2026-07-22",
+  "checks": {
+    "frozen_protocol_json_valid": true,
+    "second_instrument_protocol_json_valid": true,
+    "aggregate_receipt_json_valid": true,
+    "aggregate_metrics_recomputed_from_private_review": true,
+    "aggregate_metric_count_verified": 5,
+    "review_row_count": 27,
+    "distinct_retained_item_count": 15,
+    "minimum_public_cell_k": 5,
+    "public_namespace_restricted_pattern_scan": "PASS",
+    "private_directory_mode": "0700",
+    "private_review_file_mode": "0600",
+    "qwen_rerun": false,
+    "new_acquisition": false,
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false
+  },
+  "limitations": [
+    "No qualified German interpreter participated.",
+    "No second reviewer or inter-rater reliability estimate exists.",
+    "Only the retained 15-video extension subset was reviewable.",
+    "Model benchmark values are author-reported and not fully apples-to-apples."
+  ],
+  "repository_actions": {
+    "committed": false,
+    "pushed": false,
+    "published": false,
+    "model_downloaded": false,
+    "license_accepted": false
+  }
+}

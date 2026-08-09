@@ -1,0 +1,23 @@
+{
+  "schema_version": "nursery-corrective-original-brief-trace-v2",
+  "source_path": "/Users/rishisim/.codex/attachments/33f2d090-d199-4a11-a1a2-b978bceb36d6/pasted-text.txt",
+  "source_sha256": "fd82757ae95fafe56dacc6c1d3f54a62411d55c13c941e77911737a3ab4b12be",
+  "source_bytes": 5758,
+  "source_lines": 80,
+  "scope_resolution": "Operational package v3 implements the requested synthetic weak-alignment recovery study while preserving the narrow lexical/action claim and all operating boundaries. Scientific protocol/core v2 is inherited byte-for-byte for generator, learner, statistics, and the frozen scientific config projection.",
+  "explicit_scope_deviation": "The original brief's held-out-concepts phrase is narrowed to unseen independently generated instances of exposed opaque atomic concepts plus never-trained compositions. A wholly unexposed atomic label is not identifiable from the deliberately non-semantic boundary cue; zero-exposure tokens are leakage controls and no zero-shot atomic-category claim is authorized.",
+  "retired_package_history": {
+    "v1_320_329": "failed closed on the sole official multiprocessing micro before any worker shard or outcome; permanently retired",
+    "v2_330_339": "failed closed on the first worker import after the lexical venv launcher was resolved to a base interpreter without threadpoolctl; no learner computation or outcome; permanently retired",
+    "v3_340_349": "current operational package; no official seeded micro or scientific outcome at protocol assembly"
+  },
+  "mapped_requirements": {
+    "temporal_episode_bags_and_null": ["design.candidate_event_count", "learner posterior event-plus-null"],
+    "cross_occurrence_learning": ["learner.epochs", "semantic posterior-weighted aggregation"],
+    "training_only_side_information": ["evaluation allowlist", "side-free serialized model"],
+    "matched_controls": ["synchronized", "shuffled", "shift_minus", "shift_plus", "absent", "uninformative", "corrupted", "oracle_alignment", "exact_window"],
+    "independent_transfer": ["independently generated unseen instances for every exposed corpus-specific lexical concept", "independently generated held-out action instances", "never-observed held-out compositions", "explicit narrowing of held-out-concept language", "no zero-shot atomic-category claim"],
+    "confirmation_reserve_uninspected": ["349xxx registry", "no confirmation command"],
+    "no_new_external_dataset": ["synthetic generator only", "no AEA download"]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "schema_version": "nursery-v8-adversarial-audit-manifest-v1",
+  "status": "PASS",
+  "file_count": 7,
+  "self_excluded_by_definition": true,
+  "files": [
+    {
+      "path": "audit.py",
+      "bytes": 41942,
+      "sha256": "b1c9fa6c4b885bbfc4ac9871881d9c145318cbe73e180856216a85cf9c7ddc44"
+    },
+    {
+      "path": "audit_v1.py",
+      "bytes": 41906,
+      "sha256": "4030167e3ec9adf8c9f2ce0a8ec519045c7b173ec10f3cfbd21653abd41713ac"
+    },
+    {
+      "path": "repair_ledger.json",
+      "bytes": 1487,
+      "sha256": "0a3965344baa4c70eb1b5796a9cd1a21e065de3072925cc1bd076b7b187f2728"
+    },
+    {
+      "path": "reproduction.json",
+      "bytes": 851,
+      "sha256": "af473853cae5caa3f2a925407808631eddb01b7baefc0e687d7b2be9d544a122"
+    },
+    {
+      "path": "run_1.json",
+      "bytes": 28832,
+      "sha256": "e6308b968ec434262e7e10c8c219248a83a8ce8cff29517adc046cc334e1a48f"
+    },
+    {
+      "path": "run_2.json",
+      "bytes": 28811,
+      "sha256": "fefb0bfd370b65faa8a03a3e83fe08466cf8f7652d04e30ac3b136a80eec6c9b"
+    },
+    {
+      "path": "run_3.json",
+      "bytes": 28811,
+      "sha256": "fefb0bfd370b65faa8a03a3e83fe08466cf8f7652d04e30ac3b136a80eec6c9b"
+    }
+  ],
+  "development_outcome_count": 0,
+  "confirmation_outcome_count": 0
+}

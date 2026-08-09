@@ -1,0 +1,53 @@
+{
+  "author_action_only_remaining": true,
+  "author_audit_complete": false,
+  "author_audited_subset_only_human_labeled_childlens_evidence": true,
+  "bounded_escalation_available": true,
+  "causal_arm_executed": false,
+  "corpus_tokenizer_trained": false,
+  "decision_basis_code": "FULL_LOCAL_PSEUDO_ANNOTATION_AND_BLINDED_AUTHOR_PACKET_READY",
+  "exact_next_task": "QUALIFIED_AUTHOR_COMPLETES_AND_IRREVERSIBLY_LOCKS_AUTHOR_AUDIT_A_THEN_RUNS_MODEL_HUMAN_COMPARISON",
+  "fundamental_failure_established": false,
+  "historical_artifact_sets": {
+    "v1": {
+      "artifact_count": 23,
+      "artifact_set_digest": "35ba9acbba0fc11fc3419c88ea57d0721e08486c6d37595812ce6c77ce994abf",
+      "expected_artifact_count": 23,
+      "expected_artifact_set_digest": "35ba9acbba0fc11fc3419c88ea57d0721e08486c6d37595812ce6c77ce994abf",
+      "preserved": true
+    },
+    "v1_1": {
+      "artifact_count": 40,
+      "artifact_set_digest": "3acd969804d71979ba8071e2446e8ee1ceb3194fc90dcfda802a99e296b7bf48",
+      "expected_artifact_count": 40,
+      "expected_artifact_set_digest": "3acd969804d71979ba8071e2446e8ee1ceb3194fc90dcfda802a99e296b7bf48",
+      "preserved": true
+    },
+    "v1_2": {
+      "artifact_count": 53,
+      "artifact_set_digest": "f3bbfd9051e33fc33e44b9cab3c7546b77b1acba4904cc73fb116a3cbe7da01f",
+      "expected_artifact_count": 53,
+      "expected_artifact_set_digest": "f3bbfd9051e33fc33e44b9cab3c7546b77b1acba4904cc73fb116a3cbe7da01f",
+      "preserved": true
+    }
+  },
+  "historical_v1_1_preserved": true,
+  "historical_v1_2_preserved": true,
+  "historical_v1_preserved": true,
+  "hosted_or_cloud_model_inspected_restricted_content": false,
+  "input_receipt_sha256": {
+    "protocol": "6b2e069b5b41d2c355a059f5b0645a2f32012f2de27408ae94208a80c31c1d28",
+    "pseudo": "6803788e4c1e7e28c5195e2408f5cce54d09baab5d54ab7401647a85da52129f",
+    "sampling": "d3d4b81509d97de55b4428691ef237f27fdb618ac22aec900ffacd6d8a415ac6",
+    "workflow": "054225c0c7b50fd8033b9a04be3f10b4cf5afad81cdc47c8cda96fbf420d5098"
+  },
+  "inter_human_reliability_available": false,
+  "learner_training_executed": false,
+  "model_outputs_are_pseudo_labels_not_ground_truth": true,
+  "restricted_network_egress": false,
+  "schema_version": "childlens-v1.3-decision-record-v1",
+  "scientific_acquisition_outcome_executed": false,
+  "simulator_oracle_labels_primary_later_evaluation_truth": true,
+  "synthesizer_version": "childlens-model-assisted-terminal-synthesizer-v1.3.0",
+  "terminal_state": "CHILDLENS_AUTHOR_AUDIT_READY"
+}

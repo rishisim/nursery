@@ -1,0 +1,104 @@
+protocol:
+  id: synthetic-identifiability-qualification-v5
+  schema_version: nursery-synthetic-v5
+  status: frozen
+  phase: package_qualification_only
+  scientific_outcomes_authorized: false
+  future_development_authorized: false
+  confirmation_authorized: false
+  prior_outcomes_authorized: false
+
+registries:
+  fixture_only:
+    corpus: [250001]
+    model: [250101]
+    inference: [250151]
+  excluded_smoke:
+    corpus: [250201, 250207]
+    model: [250301, 250303]
+    inference: [250351]
+  future_development:
+    corpus: [251001, 251011, 251019, 251031]
+    model: [251101, 251107]
+    inference: [251151]
+  confirmation_reserve:
+    corpus: [259001, 259011, 259021, 259029]
+    model: [259101, 259113]
+    inference: [259151]
+  prior_registry_files:
+    - configs/synthetic_weak_alignment_recovery_v1.yaml
+    - configs/synthetic_sensor_event_robustness_v2.yaml
+    - configs/synthetic_component_robustness_v3.yaml
+    - configs/synthetic_protocol_fidelity_v4.yaml
+
+design:
+  action_concepts: 6
+  noun_concepts: 6
+  repetitions_per_concept: 40
+  raw_samples: 72
+  interval_width: 7
+  conditions:
+    - synchronized
+    - randomized_shuffle
+    - shift_minus_8
+    - shift_plus_8
+    - uninformative
+    - absent_channel
+    - sensor_corrupted
+  detector_strata: [informative, weak, zero_information, corrupted]
+  candidate_counts: [2, 3, 4, 5]
+  action_visibility_levels: [0.55, 0.75, 1.0]
+  lags: [-8, -4, 0, 4, 8]
+  grounded_pattern: [true, true, true, false]
+  dropout_levels: [0.0, 0.25]
+  noise_levels: [0.035, 0.14]
+  false_positive_levels: [0, 1]
+  time_shifts: [-8, 8]
+  null_option: learnable
+  evaluation_candidate_order_policy: fractional_credit_across_exact_maxima
+
+detector:
+  frozen_v2_path: output/synthetic_sensor_event_robustness_v2/detector/frozen_detector.json
+  frozen_v2_sha256: a487035deba4692728240eb593ba16e1182d9b5959b43d950b60883d1ed08b33
+  required_class: babyworld_lite.sensor_alignment_v2.detector.SensorEventDetector
+  required_function: babyworld_lite.sensor_alignment_v2.detector.candidate_evidence
+  strata_capacity_bounds:
+    informative: {minimum: 0.55, maximum: 1.0}
+    weak: {minimum: 0.20, maximum: 0.95}
+    zero_information: {minimum: 0.0, maximum: 0.70}
+    corrupted: {minimum: 0.0, maximum: 0.70}
+  overall_minimum: 0.25
+  overall_maximum: 0.92
+
+learner:
+  name: joint_competitive_cross_situational_v5
+  iterations: 8
+  competition_weight: 0.55
+  temperature: 0.55
+  sensor_weight: 0.10
+  noun_sensor_weight: 0.0
+  update_rate: 0.65
+  smoothing: 0.04
+  initialization_jitter: 0.015
+  lag_scale: 10.0
+
+gates:
+  minimum_sensor_free_fractional_action: 0.40
+  minimum_sensor_free_action_probability: 0.22
+  minimum_synchronized_action_probability: 0.25
+  minimum_helpful_sensor_probability_delta: 0.005
+  minimum_oracle_fractional: 0.80
+  minimum_direct_capacity_fractional: 0.95
+  maximum_noun_sensor_application_count: 0
+  maximum_noun_target_owner_gap: 0.022
+  maximum_factor_pair_cramers_v: 0.36
+  order_metric_tolerance: 1.0e-12
+  exact_tie_tolerance: 1.0e-12
+  require_zero_development_outcomes: true
+  require_zero_confirmation_outcomes: true
+
+environment:
+  python: .venv/bin/python
+  v5_test_root: tests/test_synthetic_identifiability_qualification_v5.py
+  repository_test_root: tests
+  bytecode_writes_disabled: true

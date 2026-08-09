@@ -1,0 +1,51 @@
+{
+  "schema_version": "nursery-grounded-videollm-checkpoint-clarification-v1.0.0",
+  "protocol_id": "childlens-independent-second-instrument-one-shot-minitest-v1",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_BEFORE_MODEL_OUTPUT",
+  "reason": "The user's requested instrument is the released Grounded-VideoLLM Phi-3.5 model. The authors publish one Phi inference checkpoint but do not label whether it is the general or Charades-STA/ActivityNet-subset-tuned table variant.",
+  "prospective_binding": {
+    "repository": "WHB139426/Grounded-Video-LLM",
+    "revision": "b97f0e826a0b6c292ca54d9c02c483c479952501",
+    "checkpoint_path": "ckpt/sft_llava_next_video_phi3.5_mix_sft_multi_modal_projector_video_projecter_language_model.pth",
+    "checkpoint_sha256": "5967e1138fc1106e1c3b384b96af3120405f455475308b4067bb785ac560f588",
+    "selection_basis": "This is the single Phi checkpoint bound by the authors' official inference.py and scripts/inference_phi3_5.sh at the pinned official code revision.",
+    "training_variant_status": "UNDOCUMENTED_GENERAL_VS_BENCHMARK_SUBSET_TUNED",
+    "benchmark_cleanliness_claim_permitted": false,
+    "childlens_independence_claim": "Independent model family and training stack from Qwen3-VL; no claim that its public training corpus excludes content categories related to ChildLens."
+  },
+  "unchanged_one_shot_rules": {
+    "exact_same_frozen_windows": 27,
+    "public_canary_required_first": true,
+    "public_canary_attempts": 1,
+    "restricted_inference_attempts_per_window": 1,
+    "semantic_prompt_tuning": false,
+    "model_substitution": false,
+    "qwen_predictions_visible_to_model": false,
+    "network_during_restricted_inference": "denied",
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false
+  },
+  "runtime_port_rule": {
+    "official_cuda_path_preferred": true,
+    "current_host": "Apple M5 with 32 GiB unified memory",
+    "public_only_mps_port_permitted": true,
+    "port_may_change_only": [
+      "device plumbing",
+      "CUDA autocast replacement",
+      "optional FlashAttention import and eager-attention selection",
+      "video decoding implementation",
+      "output serialization"
+    ],
+    "port_may_not_change": [
+      "weights",
+      "frame order or content",
+      "model architecture",
+      "prompt semantics",
+      "generation semantics after the prompt is frozen",
+      "decision thresholds"
+    ],
+    "restricted_inference_condition": "The exact port, environment, code, weights, prompt, and public canary receipt must be hash-pinned before restricted packet discovery."
+  },
+  "interpretation": "A result from this checkpoint may answer whether this exact released Grounded-VideoLLM artifact is a promising second ChildLens instrument. It may not be represented as a clean reproduction of either benchmark-table row."
+}

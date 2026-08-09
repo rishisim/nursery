@@ -1,0 +1,25 @@
+{
+  "schema_version": "nursery-childlens-extension-quarantine-control-amendment-v1.8.1",
+  "status": "FROZEN_AFTER_PRE_AUTHENTICATION_CONTROL_CHECK_FAILURE_BEFORE_RETRY",
+  "frozen_at": "2026-07-22",
+  "trigger": "The new acquisition controller required the no-index sentinel on the nested runtime directory even though the already approved v1.2 quarantine attaches that recursive control to an owner-private enclosing control directory.",
+  "observed_failure_code": "E_QUARANTINE",
+  "failure_stage": "BEFORE_KEYCHAIN_READ_AUTHENTICATION_REMOTE_METADATA_OR_MEDIA_OPEN",
+  "permitted_change": "Resolve the nearest owner-private enclosing directory, within at most five ancestors and outside the repository, that contains the owner-private .metadata_never_index sentinel. Require every directory from the runtime root through that control root to remain owner-private, non-symlinked, and outside the repository. Use the control root for namespace and free-space accounting.",
+  "forbidden_changes": [
+    "selection or sample",
+    "source locators",
+    "storage limits",
+    "retention deadline",
+    "transfer order",
+    "clip intervals or encoding",
+    "model prompts or schemas",
+    "scientific thresholds",
+    "causal protocol"
+  ],
+  "restricted_media_opened_before_amendment": false,
+  "remote_metadata_requested_before_amendment": false,
+  "read_only_authentication_attempted_before_amendment": false,
+  "keychain_secret_exposed": false,
+  "scientific_endpoint_opened": false
+}

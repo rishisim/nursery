@@ -1,0 +1,57 @@
+{
+  "schema_version": "nursery-program-convergence-validation-receipt-v1",
+  "created_at": "2026-07-22",
+  "status": "PASS_WITH_ONE_PRESERVED_LEGACY_VALIDATOR_EXCEPTION",
+  "terminal_decision": "REUSE_EXISTING_SYNTHETIC_MECHANISM_PROOF_AND_FREEZE_MINIMAL_REALISM_EXTENSION",
+  "public_artifact_validation": {
+    "status": "PASS",
+    "issue_count": 0,
+    "restricted_or_quarantine_access": false
+  },
+  "synthetic_and_public_tests": {
+    "status": "PASS",
+    "passed": 47,
+    "failed": 0
+  },
+  "historical_digest_validation": {
+    "v1_preserved": true,
+    "v1_1_preserved": true,
+    "v1_2_preserved": true,
+    "v1_3_preserved": true,
+    "prior_decisions_overwritten": false
+  },
+  "preserved_legacy_validator_exception": {
+    "validator_status": "FAIL",
+    "issue_count": 1,
+    "issue": "ABSOLUTE_PATH_IN_PREEXISTING_V1_3_1_EXECUTION_DESIGN",
+    "disposition": "Not edited because the task requires immutable preservation of v1-v1.3.1 evidence; the path is a workspace instruction, not a restricted ChildLens payload. The new convergence namespace contains no absolute workspace path."
+  },
+  "privacy": {
+    "restricted_payload_in_new_docs_or_outputs": false,
+    "raw_media_or_audio_exported": false,
+    "transcript_or_lexical_content_exported": false,
+    "item_rows_or_identifiers_exported": false,
+    "exact_timestamps_or_intervals_exported": false,
+    "minimum_cluster_k": 5,
+    "complementary_suppression": true,
+    "restricted_inference_network_disabled": true,
+    "hosted_or_cloud_content_path": false
+  },
+  "ancestry": {
+    "ChildLens_role": "CELL_SUPPRESSED_OUTWARD_ROUNDED_AGGREGATE_PSEUDO_CALIBRATION_ONLY",
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false,
+    "cross_corpus_pooling": false,
+    "learner_ancestry_from_instruments": false,
+    "scientific_outcome_run": false
+  },
+  "sha256": {
+    "decision_record": "7d5bc3a36cf933b1c4394c725ec855c8e70cfb04f530e234b8211871f6557bff",
+    "calibration_receipt": "c8da2349663f7e49291381c42e15f8972bb3b13b0b739dad4e1221ee937dfc59",
+    "pseudo_calibration_protocol": "db5336726f4841e592cb9c73df5ab22a0887d1bd34c7cf673146f38de9e86961",
+    "sensitivity_protocol": "c6b7afab6c8914a968b0f06706a222d2771863c2a3fd2017184c17d431bfa7d6",
+    "coordinator": "810ba0caf4bf5cfbb94917ecd4747c328633d21a8fb5733be28e6fc6bc5faaed",
+    "challenger_worker": "e785ea475aee62fd72ab9bc064f3c9c3dcbc189b4361e996963edf9f2ab14f88",
+    "qwen2_retry_worker": "eec84b4e397bc9ffb0e05a2e7dafed6c94ef83dcc38bfd1396dc16eca46681d1"
+  }
+}

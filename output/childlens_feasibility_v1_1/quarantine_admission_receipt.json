@@ -1,0 +1,30 @@
+{
+  "schema_version": "childlens-quarantine-admission-receipt-v1.1.0",
+  "observation_date": "2026-07-21",
+  "status": "ADMITTED_FOR_METADATA_AND_ANNOTATION_SHARDS_ONLY",
+  "root_location": "HIDDEN_OUTSIDE_REPOSITORY_NOT_EXPORTED",
+  "outside_repository": true,
+  "same_encrypted_data_volume": true,
+  "filevault_on": true,
+  "directory_mode": "0700",
+  "file_mode": "0600",
+  "symlink_count": 0,
+  "time_machine_excluded": true,
+  "content_indexing_exclusion_sentinel_present": true,
+  "git_tracking_possible": false,
+  "allocated_kib_at_receipt": 19972,
+  "file_count_at_receipt": 201,
+  "restricted_payload_classes_present": [
+    "PARTICIPANT_TABLE",
+    "FINAL_ANNOTATIONS",
+    "RESTRICTED_MANIFESTS_AND_RECEIPTS"
+  ],
+  "video_file_count": 0,
+  "decoded_audio_file_count": 0,
+  "frame_file_count": 0,
+  "transcript_file_count": 0,
+  "invalid_html_staging_files_unlinked": 2,
+  "invalid_html_staging_recoverable": false,
+  "video_transfer_admitted": false,
+  "reason_video_transfer_not_admitted": "EXACT_SELECTED_REMOTE_BYTES_UNRESOLVED"
+}

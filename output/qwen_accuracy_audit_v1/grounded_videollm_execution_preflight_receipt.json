@@ -1,0 +1,79 @@
+{
+  "schema_version": "nursery-grounded-videollm-execution-preflight-v1.0.0",
+  "protocol_id": "childlens-independent-second-instrument-one-shot-minitest-v1",
+  "evaluated_at": "2026-07-22",
+  "status": "STOPPED_BEFORE_PUBLIC_CANARY",
+  "result_class": "RUNTIME_AND_PROVENANCE_BLOCKER_NOT_MODEL_PERFORMANCE",
+  "authorization": {
+    "user_authorized_exactly_one_independent_model": true,
+    "instrument": "Grounded-VideoLLM Phi-3.5",
+    "same_frozen_windows_required": 27
+  },
+  "pinned_public_artifacts": {
+    "hugging_face_repository": "WHB139426/Grounded-Video-LLM",
+    "hugging_face_revision": "b97f0e826a0b6c292ca54d9c02c483c479952501",
+    "github_repository": "WHB139426/Grounded-Video-LLM",
+    "github_revision": "e26da4e4b681357fd911d5ace3467f031af29208",
+    "license_reported_by_repository": "MIT",
+    "license_acceptance_required": false,
+    "weight_file_count": 21,
+    "weight_bytes": 27529808010,
+    "weight_gib": 25.639131674543023,
+    "large_weight_sha256": {
+      "phi_language_shard_1": "599c0ba7cae7aa7b0ad9a834825058c083ba1ceea47de4c00f598982c04521af",
+      "phi_language_shard_2": "61fb5974420e2878366d989ed7276cd3717aff964f34e571b4d1e65ba43c1bea",
+      "phi_language_shard_3": "5e50b32aaa8400cc8c44a2688c33c38e0e9ab3530a681443b21466f5947e0644",
+      "phi_language_shard_4": "ca06cf6e8cb7b968c6c0950284aae41a79128decfd501c5b2b7115e993b97bb5",
+      "spatial_vision_model": "3e9343c0cbcf2a9b93d40e794e997da7b3e9fc327286544dad458e45ab07c253",
+      "multimodal_projector": "a73e79299457a25afc5c0f00f869530f94151b4a8de4b562571aab821cab34ed",
+      "grounded_videollm_phi_checkpoint": "5967e1138fc1106e1c3b384b96af3120405f455475308b4067bb785ac560f588",
+      "internvideo2_1b_temporal_encoder": "8b871c9f8986123482a33401fb94de32833426a5e6c76facc4bf3278705713ce"
+    }
+  },
+  "host_preflight": {
+    "architecture": "arm64",
+    "host": "Apple M5",
+    "unified_memory_bytes": 34359738368,
+    "unified_memory_gib": 32,
+    "cuda_available": false,
+    "official_runtime": "CUDA with BF16 and optional FlashAttention",
+    "author_recommended_vram_gib": 24,
+    "local_torch_installed": false,
+    "free_disk_bytes_before_download": 59525238784,
+    "free_disk_gib_before_download": 55.437198638916016,
+    "projected_free_disk_bytes_after_weights_only": 31995430774,
+    "projected_free_disk_gib_after_weights_only": 29.798066964372993,
+    "governing_minimum_free_disk_floor_gib": 50,
+    "disk_gate_passed": false,
+    "official_mps_runner_available": false,
+    "public_only_mps_port_prevalidated": false
+  },
+  "provenance_gate": {
+    "required_variant": "general checkpoint without Charades-STA or ActivityNet subset third-stage tuning",
+    "repository_observation": "The model card reports general and benchmark-subset-tuned Phi variants, but the public weight repository exposes one generically named Phi SFT checkpoint.",
+    "required_variant_unambiguously_resolved": false,
+    "complete_required_file_sha256_manifest_recorded": false,
+    "public_code_preflight_deviation": "The official GitHub source was shallow-cloned for read-only compatibility inspection before a per-file SHA-256 manifest was frozen. No weights or restricted data were accessed. This public-only deviation independently prevents activation under the frozen resolution rule.",
+    "gate_passed": false
+  },
+  "execution": {
+    "public_source_code_shallow_clone_for_inspection": true,
+    "weights_downloaded": false,
+    "dependencies_installed": false,
+    "public_synthetic_canary_run": false,
+    "restricted_quarantine_discovered_or_opened": false,
+    "restricted_inference_run": false,
+    "grounded_videollm_window_predictions_created": 0,
+    "qwen_rerun": false,
+    "new_acquisition": false,
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false,
+    "license_accepted": false
+  },
+  "decision": {
+    "grounded_videollm_substantially_better_than_qwen": "NOT_TESTED",
+    "childlens_branch_reopen": false,
+    "interpretation": "No claim about Grounded-VideoLLM accuracy is permitted. The test stopped before the public canary because the exact variant and a safe compatible runtime were not available.",
+    "smallest_unblock": "Obtain written identification of the general checkpoint and run the frozen protocol on an owner-controlled local CUDA host with at least 24 GiB VRAM, enough scratch to retain the 50 GiB free-space floor, and network denial during restricted inference."
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "changes_after_smoke_permitted": false,
+  "frozen_artifacts": [
+    {
+      "bytes": 746,
+      "path": "frozen_environment.json",
+      "sha256": "e3480776b2a662e8aacff8cfd68c63645710632980a10bdd9693b5cd1d772945"
+    },
+    {
+      "bytes": 3273,
+      "path": "frozen_config_snapshot.yaml",
+      "sha256": "5921aa7e70b507b5c5c0a706e508f1ae7da1ab54398f4f96c296b902aa244b18"
+    },
+    {
+      "bytes": 3374,
+      "path": "frozen_protocol_snapshot.md",
+      "sha256": "00bb972b5cb1c8b68eede602ad078c40fd50a4b205558b6f1b20abc8f945b96d"
+    },
+    {
+      "bytes": 419,
+      "path": "frozen_primary_sources.json",
+      "sha256": "c2ae1814d2b22f596543bc03e038ed2ff159e3b59f2fbbe156938082a9549abe"
+    },
+    {
+      "bytes": 8271,
+      "path": "frozen_traceability.json",
+      "sha256": "90bb291c92ef04ac2e78956fd04c08813180bb5ddc7acd5e79e356e64f6b9273"
+    },
+    {
+      "bytes": 3010,
+      "path": "frozen_seed_registries.json",
+      "sha256": "31cd618c92a8c4c19870d435a43d798b2aaa78cc594551f2bfe91e44378c510e"
+    },
+    {
+      "bytes": 574,
+      "path": "frozen_gates.json",
+      "sha256": "99a8dbb94328fed3baefb48369e30ba66b8940ac40802f0c6f4a175049ce7e84"
+    },
+    {
+      "bytes": 611,
+      "path": "frozen_adjudication_contract.json",
+      "sha256": "e6737c389f352a273d06182407eec729033cda2eab90e9a124b34d3f1f486ab1"
+    },
+    {
+      "bytes": 4466,
+      "path": "collected_tests_pre_freeze.json",
+      "sha256": "7a9b6824e06836f0934034a93f8c27151ab9f6a69957a50da7fe880a91b139c7"
+    }
+  ],
+  "frozen_before_excluded_smoke": true,
+  "snapshot_manifest_sha256": "2aadc10a97aa0565a9fff7a3995d3d9890759d6e5a2e8aafed168ee594a874ae",
+  "status": "FROZEN",
+  "tracked": [
+    {
+      "bytes": 106,
+      "live_sha256": "5f5caa88371c3ab9324ded4afe95eb5428224a772c1f478a21cbb0bf24766986",
+      "path": "babyworld_lite/__init__.py",
+      "snapshot_sha256": "5f5caa88371c3ab9324ded4afe95eb5428224a772c1f478a21cbb0bf24766986"
+    },
+    {
+      "bytes": 157,
+      "live_sha256": "c57a0e190b8f02bf89a698a272dc0f4fd254a6324cd39ca639165a623e68978c",
+      "path": "babyworld_lite/sensor_alignment_v2/__init__.py",
+      "snapshot_sha256": "c57a0e190b8f02bf89a698a272dc0f4fd254a6324cd39ca639165a623e68978c"
+    },
+    {
+      "bytes": 16759,
+      "live_sha256": "6d74817b5bb30b4b265f2ec246b71be432d68ca6f545d50b04a153d77df33b6d",
+      "path": "babyworld_lite/sensor_alignment_v2/detector.py",
+      "snapshot_sha256": "6d74817b5bb30b4b265f2ec246b71be432d68ca6f545d50b04a153d77df33b6d"
+    },
+    {
+      "bytes": 16903,
+      "live_sha256": "a66d16f515d275fcd08c1db7293ca9ba50c14e7e60b820bba5d2eca3c8338bd8",
+      "path": "babyworld_lite/sensor_alignment_v2/protocol.py",
+      "snapshot_sha256": "a66d16f515d275fcd08c1db7293ca9ba50c14e7e60b820bba5d2eca3c8338bd8"
+    },
+    {
+      "bytes": 46948,
+      "live_sha256": "31aaba45e98455138ba798806497fbc83ab9f02e6843c0364f3378d1056eae1f",
+      "path": "babyworld_lite/sensor_alignment_v2/synthetic.py",
+      "snapshot_sha256": "31aaba45e98455138ba798806497fbc83ab9f02e6843c0364f3378d1056eae1f"
+    },
+    {
+      "bytes": 140,
+      "live_sha256": "b1c49a9df3a83e6087c245d72619d9330ca1f788e4247bed88e5dee07ee89346",
+      "path": "babyworld_lite/sensor_alignment_v5/__init__.py",
+      "snapshot_sha256": "b1c49a9df3a83e6087c245d72619d9330ca1f788e4247bed88e5dee07ee89346"
+    },
+    {
+      "bytes": 3429,
+      "live_sha256": "e876b659d7e813fdeb5593f7e87b70348231457eda368f3a4e2f8a934058ff0d",
+      "path": "babyworld_lite/sensor_alignment_v5/adjudicator.py",
+      "snapshot_sha256": "e876b659d7e813fdeb5593f7e87b70348231457eda368f3a4e2f8a934058ff0d"
+    },
+    {
+      "bytes": 27315,
+      "live_sha256": "b9d31e52435f320cde3ca5b4d99c2164cc184c82b446b14ddae35bdd8c210217",
+      "path": "babyworld_lite/sensor_alignment_v5/benchmark.py",
+      "snapshot_sha256": "b9d31e52435f320cde3ca5b4d99c2164cc184c82b446b14ddae35bdd8c210217"
+    },
+    {
+      "bytes": 4073,
+      "live_sha256": "8168e05ba6778f02575cfb229fb72d04d853e9cfdd332aad2bb32b700d19fd1c",
+      "path": "babyworld_lite/sensor_alignment_v5/controls.py",
+      "snapshot_sha256": "8168e05ba6778f02575cfb229fb72d04d853e9cfdd332aad2bb32b700d19fd1c"
+    },
+    {
+      "bytes": 7692,
+      "live_sha256": "d876b48f138cbe307c885f9ef406012a881f77f330553c3907d100f7c6f87f0a",
+      "path": "babyworld_lite/sensor_alignment_v5/detector_runtime.py",
+      "snapshot_sha256": "d876b48f138cbe307c885f9ef406012a881f77f330553c3907d100f7c6f87f0a"
+    },
+    {
+      "bytes": 23692,
+      "live_sha256": "8f736716ca9fe4dc49833c01df585719bf786aec59fedfe0a31cd44a88c2115d",
+      "path": "babyworld_lite/sensor_alignment_v5/integrity.py",
+      "snapshot_sha256": "8f736716ca9fe4dc49833c01df585719bf786aec59fedfe0a31cd44a88c2115d"
+    },
+    {
+      "bytes": 17736,
+      "live_sha256": "c98319c3a3eb4956224db061f2d738c956f8f37f5343665b9530bdfff1a134c0",
+      "path": "babyworld_lite/sensor_alignment_v5/learner.py",
+      "snapshot_sha256": "c98319c3a3eb4956224db061f2d738c956f8f37f5343665b9530bdfff1a134c0"
+    },
+    {
+      "bytes": 11751,
+      "live_sha256": "d41a0f0f8c565797bafcbc683ea25ac580cde43a6cec34942e286d003e7df009",
+      "path": "babyworld_lite/sensor_alignment_v5/protocol.py",
+      "snapshot_sha256": "d41a0f0f8c565797bafcbc683ea25ac580cde43a6cec34942e286d003e7df009"
+    },
+    {
+      "bytes": 29576,
+      "live_sha256": "ee5df0a1628ac0fda3e9347749ded4ec66185385f04040f860882fa3b950f24d",
+      "path": "babyworld_lite/sensor_alignment_v5/study.py",
+      "snapshot_sha256": "ee5df0a1628ac0fda3e9347749ded4ec66185385f04040f860882fa3b950f24d"
+    },
+    {
+      "bytes": 3273,
+      "live_sha256": "5921aa7e70b507b5c5c0a706e508f1ae7da1ab54398f4f96c296b902aa244b18",
+      "path": "configs/synthetic_identifiability_qualification_v5.yaml",
+      "snapshot_sha256": "5921aa7e70b507b5c5c0a706e508f1ae7da1ab54398f4f96c296b902aa244b18"
+    },
+    {
+      "bytes": 1164,
+      "live_sha256": "2b55587c0b91e51ec5884b732ca13fc4bc453a0e416b52f99c40cb8374e9182e",
+      "path": "docs/synthetic_identifiability_qualification_v5_limitations.md",
+      "snapshot_sha256": "2b55587c0b91e51ec5884b732ca13fc4bc453a0e416b52f99c40cb8374e9182e"
+    },
+    {
+      "bytes": 419,
+      "live_sha256": "c2ae1814d2b22f596543bc03e038ed2ff159e3b59f2fbbe156938082a9549abe",
+      "path": "docs/synthetic_identifiability_qualification_v5_primary_sources.json",
+      "snapshot_sha256": "c2ae1814d2b22f596543bc03e038ed2ff159e3b59f2fbbe156938082a9549abe"
+    },
+    {
+      "bytes": 3374,
+      "live_sha256": "00bb972b5cb1c8b68eede602ad078c40fd50a4b205558b6f1b20abc8f945b96d",
+      "path": "docs/synthetic_identifiability_qualification_v5_protocol.md",
+      "snapshot_sha256": "00bb972b5cb1c8b68eede602ad078c40fd50a4b205558b6f1b20abc8f945b96d"
+    },
+    {
+      "bytes": 8271,
+      "live_sha256": "90bb291c92ef04ac2e78956fd04c08813180bb5ddc7acd5e79e356e64f6b9273",
+      "path": "docs/synthetic_identifiability_qualification_v5_traceability.json",
+      "snapshot_sha256": "90bb291c92ef04ac2e78956fd04c08813180bb5ddc7acd5e79e356e64f6b9273"
+    },
+    {
+      "bytes": 1350,
+      "live_sha256": "5e03ca321d5b2c5368598420036629f0b722df540c993b86241fce65f911460e",
+      "path": "docs/synthetic_identifiability_qualification_v5_v4_disposition.md",
+      "snapshot_sha256": "5e03ca321d5b2c5368598420036629f0b722df540c993b86241fce65f911460e"
+    },
+    {
+      "bytes": 6393,
+      "live_sha256": "5a83db30c7afdd2111829afa42beed147b561452d1db6e0880218b79d3d0a324",
+      "path": "scripts/run_synthetic_identifiability_qualification_v5.py",
+      "snapshot_sha256": "5a83db30c7afdd2111829afa42beed147b561452d1db6e0880218b79d3d0a324"
+    },
+    {
+      "bytes": 16104,
+      "live_sha256": "04bf49ff8c57405aee3d4c8654bb0afebc0349e7b873170f0e5eb9bec252cd57",
+      "path": "tests/test_synthetic_identifiability_qualification_v5.py",
+      "snapshot_sha256": "04bf49ff8c57405aee3d4c8654bb0afebc0349e7b873170f0e5eb9bec252cd57"
+    }
+  ],
+  "tracked_file_count": 22
+}

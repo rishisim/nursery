@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "order": "v4 tests first, then full repository suite",
+  "bytecode_writes_disabled": true,
+  "environment_correction": {
+    "reason": "The initial system Python lacked repository dependencies torch and sklearn, and an unscoped repository-root collection discovered the frozen snapshot test copy.",
+    "source_or_protocol_changed": false,
+    "initial_failure_report_retained": "test_execution_report.json",
+    "repository_virtual_environment": ".venv/bin/python",
+    "full_suite_scope": "tests"
+  },
+  "results": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q tests/test_synthetic_protocol_fidelity_v4.py",
+      "exit_code": 0,
+      "output": ".................                                                        [100%]\n17 passed in 1.88s\n"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q tests",
+      "exit_code": 0,
+      "output": "........................................................................ [ 52%]\n..................................................................       [100%]\n138 passed in 10.57s\n"
+    }
+  ]
+}

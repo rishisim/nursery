@@ -1,0 +1,121 @@
+{
+  "schema_version": "nursery-program-convergence-gemma4-e4b-resource-receipt-v1",
+  "status": "RESOURCE_FIT_BY_VERIFIED_REUSE_ONLY_LICENSE_ACTIVATION_BLOCKED",
+  "measured_on_date": "2026-07-22",
+  "scope": "PUBLIC_METADATA_AND_EXISTING_PUBLIC_SYNTHETIC_RECEIPTS_ONLY",
+  "host": {
+    "chip": "Apple M5",
+    "unified_memory_gib": 32,
+    "host_identifiers_exported": false
+  },
+  "runtime_candidate": {
+    "repository": "mlx-community/gemma-4-e4b-it-4bit",
+    "conversion_revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+    "upstream_repository": "google/gemma-4-E4B-it",
+    "upstream_revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+    "upstream_is_provenance_only_not_runtime_candidate": true,
+    "conversion_file_count": 10,
+    "conversion_snapshot_bytes": 5179241512,
+    "conversion_snapshot_gib": 4.823545,
+    "conversion_manifest_sha256": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae",
+    "upstream_snapshot_bytes_metadata_only": 16024823729,
+    "upstream_snapshot_gib_metadata_only": 14.92428,
+    "upstream_download_planned": false
+  },
+  "metadata_dry_run": {
+    "tool": "hf 1.8.0",
+    "authentication_used": false,
+    "conversion_dry_run_file_count": 10,
+    "conversion_dry_run_display_total": "5.2G",
+    "conversion_exact_metadata_total_bytes": 5179241512,
+    "upstream_dry_run_file_count": 9,
+    "upstream_dry_run_display_total": "16.0G",
+    "upstream_exact_metadata_total_bytes": 16024823729,
+    "new_model_bytes_downloaded": 0,
+    "license_or_clickthrough_accepted": false
+  },
+  "existing_public_snapshot": {
+    "present": true,
+    "rehash_file_count": 10,
+    "rehash_snapshot_bytes": 5179241512,
+    "rehash_manifest_sha256": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae",
+    "exact_receipt_match": true,
+    "reuse_without_duplicate_full_resolution_copy_required": true
+  },
+  "disk_admission": {
+    "current_free_bytes": 59609563136,
+    "current_free_gib": 55.515732,
+    "required_post_peak_free_floor_bytes": 53687091200,
+    "required_post_peak_free_floor_gib": 50,
+    "current_headroom_above_floor_gib": 5.515732,
+    "verified_reuse_nonmodel_reserve_gib": 2.5,
+    "verified_reuse_projected_post_peak_free_gib": 53.015732,
+    "verified_reuse_admitted": true,
+    "fresh_download_conservative_policy": "TWO_CONVERSION_SNAPSHOT_EQUIVALENTS_PLUS_2_5_GIB_NONMODEL_RESERVE",
+    "fresh_download_required_initial_free_gib": 62.147089,
+    "fresh_download_current_shortfall_gib": 6.631357,
+    "fresh_download_admitted_now": false,
+    "upstream_full_precision_download_admitted_or_needed": false,
+    "sequential_transfer_only": true,
+    "duplicate_snapshot_prohibited": true,
+    "recheck_free_space_immediately_before_any_install_or_run": true
+  },
+  "mlx_memory": {
+    "existing_public_synthetic_measured_peak_gib": 6.247,
+    "measured_request_shape": "ONE_AUDIO_PLUS_FIVE_FRAMES_PLUS_TEXT_BATCH_ONE",
+    "planning_multiplier": 2,
+    "conservative_per_process_planning_envelope_gib": 12.494,
+    "nominal_headroom_at_measured_peak_gib": 25.753,
+    "nominal_headroom_at_planning_envelope_gib": 19.506,
+    "required_live_headroom_beyond_envelope_gib": 4,
+    "peak_abort_guard_required": true,
+    "host_unified_memory_fit": true,
+    "live_memory_pressure_must_be_rechecked_at_launch": true
+  },
+  "joint_runtime_compatibility": {
+    "existing_public_synthetic_joint_audio_and_five_frames_executed": true,
+    "network_denied_during_public_synthetic_canary": true,
+    "strict_schema_output_valid": true,
+    "measured_wall_seconds_per_synthetic_request": 17.135,
+    "audio_preprocessor_numerical_warnings_observed": true,
+    "structural_runtime_compatibility": true,
+    "semantic_or_restricted_data_readiness_established": false,
+    "single_synthetic_fixture_is_not_quality_evidence": true,
+    "candidate_window_count_for_planning_only": 137,
+    "serialized_fixture_rate_floor_minutes": 39.125,
+    "operational_wall_time_budget_minutes": 90,
+    "wall_time_budget_is_not_a_throughput_guarantee": true
+  },
+  "safe_concurrency": {
+    "maximum_mps_heavy_processes": 1,
+    "mps_batch_size_windows": 1,
+    "frames_per_window": 5,
+    "maximum_staged_next_window": 1,
+    "recommended_cpu_preprocessing_workers_while_mps_active": 2,
+    "maximum_cpu_workers_while_mps_idle": 4,
+    "parallel_model_loads_permitted": false,
+    "one_shared_mps_lock_required": true,
+    "process_windows_sequentially_and_checkpoint_between_windows": true
+  },
+  "activation_boundary": {
+    "conversion_metadata_license": "gemma",
+    "upstream_metadata_license": "apache-2.0",
+    "conversion_contains_unambiguous_license_provenance_receipt": false,
+    "resource_fit_implies_permission": false,
+    "activation_permitted_now": false,
+    "required_resolution": "WRITTEN_CONVERSION_PROVENANCE_AND_LICENSE_RECEIPT_BEFORE_ANY_NEW_INFERENCE"
+  },
+  "privacy_and_scientific_boundary": {
+    "restricted_data_accessed": false,
+    "hosted_or_cloud_inference_used": false,
+    "scientific_outcome_run": false,
+    "model_output_inspected_this_preflight": false,
+    "existing_public_synthetic_receipt_used": true
+  },
+  "authoritative_sources": [
+    "https://huggingface.co/mlx-community/gemma-4-e4b-it-4bit",
+    "https://huggingface.co/google/gemma-4-E4B-it",
+    "https://github.com/Blaizzy/mlx-vlm/releases/tag/v0.6.6",
+    "https://ml-explore.github.io/mlx/build/html/usage/unified_memory.html"
+  ]
+}

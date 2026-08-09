@@ -1,0 +1,21 @@
+{
+  "schema_version": "nursery-childlens-gemma-output-schema-binding-amendment-v1.8.7",
+  "status": "FROZEN_BEFORE_ASSEMBLY_RETRY",
+  "date": "2026-07-22",
+  "failure_code": "E_INTERNAL",
+  "diagnosis": "The v1.3 Gemma adapter exposes OUTPUT_SCHEMA on its nested immutable legacy module, while the combined runner referenced a nonexistent top-level adapter attribute during assembly.",
+  "scope": "CONTENT_INDEPENDENT_SCHEMA_CONSTANT_BINDING_ONLY",
+  "allowed_change": "Reference the same immutable OUTPUT_SCHEMA constant through gemma_worker.legacy at output assembly, historical-output validation, and combined-document validation.",
+  "unchanged": [
+    "all 135 completed Gemma checkpoints",
+    "selected sample and candidate windows",
+    "Gemma and Qwen artifacts and outputs",
+    "prompt, schema value, parser, and categorical labels",
+    "calibration thresholds and ranges",
+    "causal protocol, learner, controls, seeds, and endpoints",
+    "privacy and network denial"
+  ],
+  "completed_gemma_checkpoint_count_before_amendment": 135,
+  "gemma_inference_rerun_allowed": false,
+  "scientific_endpoint_opened_before_amendment": false
+}

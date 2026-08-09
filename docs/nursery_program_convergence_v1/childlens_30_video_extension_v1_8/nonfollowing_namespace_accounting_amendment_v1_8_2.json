@@ -1,0 +1,31 @@
+{
+  "schema_version": "nursery-childlens-extension-nonfollowing-namespace-accounting-amendment-v1.8.2",
+  "status": "FROZEN_AFTER_EXACT_METADATA_PREFLIGHT_BEFORE_MEDIA_TRANSFER_RETRY",
+  "frozen_at": "2026-07-22",
+  "trigger": "The extension size scanner rejected existing symbolic-link file entries anywhere below the approved control root, although the validated v1.2 namespace scanner neither follows nor counts non-regular entries.",
+  "observed_failure_code": "E_QUARANTINE",
+  "diagnostic": {
+    "symbolic_link_file_count": 4,
+    "symbolic_link_directory_count": 0,
+    "regular_file_bytes_rounded_up_gib": 14,
+    "paths_or_targets_inspected_or_exported": false
+  },
+  "permitted_change": "Match the validated v1.2 accounting behavior: do not follow symbolic-link directories; ignore symbolic-link and other non-regular file entries; sum only lstat-confirmed regular-file bytes. Continue to require the runtime-to-control-root ancestor chain and every acquired or derived extension artifact itself to be owner-private and non-symlinked.",
+  "forbidden_changes": [
+    "follow a symbolic link",
+    "read a symbolic-link target",
+    "weaken extension input or output file checks",
+    "selection or sample",
+    "storage limits",
+    "transfer order",
+    "clip intervals or encoding",
+    "model prompts schemas or thresholds",
+    "causal protocol"
+  ],
+  "read_only_authentication_succeeded_before_amendment": true,
+  "exact_remote_metadata_preflight_may_have_run_for_first_selected_object": true,
+  "restricted_media_transfer_opened_before_amendment": false,
+  "restricted_media_bytes_downloaded_before_amendment": false,
+  "keychain_secret_exposed": false,
+  "scientific_endpoint_opened": false
+}

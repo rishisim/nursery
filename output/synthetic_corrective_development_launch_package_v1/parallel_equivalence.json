@@ -1,0 +1,12 @@
+{
+  "adjudication_relevant_file_count": 11,
+  "byte_identical": true,
+  "jobs_and_runtime_telemetry_excluded": true,
+  "left_digest": "caef82db59d65c3bb55d9408290a232760c18c86ca7917ecb124d2c8644571a8",
+  "mismatched": [],
+  "missing_from_jobs_1": [],
+  "missing_from_jobs_n": [],
+  "right_digest": "caef82db59d65c3bb55d9408290a232760c18c86ca7917ecb124d2c8644571a8",
+  "schema_version": "nursery-corrective-parallel-equivalence-v1",
+  "status": "PASS"
+}

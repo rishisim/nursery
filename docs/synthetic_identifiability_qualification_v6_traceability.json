@@ -1,0 +1,204 @@
+{
+  "protocol_id": "synthetic-identifiability-qualification-v6",
+  "requirements": [
+    {
+      "id": "registries-and-firewall",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/protocol.py:load_config",
+        "babyworld_lite/sensor_alignment_v6/protocol.py:IdentifierFirewall"
+      ],
+      "tests": [
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_registries_are_disjoint_and_block_every_v1_v5_identifier",
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_firewall_blocks_prior_development_confirmation_for_all_operations"
+      ],
+      "artifacts": [
+        "frozen_seed_registries.json",
+        "qualification_run/seed_operation_log.json"
+      ],
+      "gates": [
+        "seed_firewall",
+        "future_development_outcome_count_zero",
+        "confirmation_outcome_count_zero",
+        "scientific_outcome_count_zero"
+      ]
+    },
+    {
+      "id": "crossed-corpus-and-conditions",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/benchmark.py:generate_corpus",
+        "babyworld_lite/sensor_alignment_v6/benchmark.py:condition_view",
+        "babyworld_lite/sensor_alignment_v6/benchmark.py:condition_audit"
+      ],
+      "tests": [
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_corpus_crosses_required_factors_absence_null_and_noun_independence",
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_matched_conditions_and_time_shifts_are_real"
+      ],
+      "artifacts": [
+        "qualification_run/corpus_audits.json",
+        "qualification_run/condition_audits.json"
+      ],
+      "gates": ["corpus_design", "condition_design", "all_conditions_executed"]
+    },
+    {
+      "id": "ledger-separation-and-leakage",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/protocol.py:reject_oracle_fields",
+        "babyworld_lite/sensor_alignment_v6/study.py:compute_from_persisted"
+      ],
+      "tests": [
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_visible_oracle_and_key_ledgers_are_separate"
+      ],
+      "artifacts": [
+        "qualification_run/recomputable/leakage_audit.json"
+      ],
+      "gates": [
+        "side_modalities_absent_at_language_evaluation",
+        "no_projection_or_answer_key_fit"
+      ]
+    },
+    {
+      "id": "actual-detector-and-capacity",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/detector_runtime.py:DetectorRuntime",
+        "babyworld_lite/sensor_alignment_v6/detector_runtime.py:detector_capacity_audit"
+      ],
+      "tests": [
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_actual_frozen_v2_detector_class_and_function_are_invoked",
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_detector_capacity_is_helpful_imperfect_and_stratified"
+      ],
+      "artifacts": [
+        "qualification_run/detector_runtime_audit.json",
+        "qualification_run/detector_capacity_audit.json"
+      ],
+      "gates": [
+        "actual_frozen_v2_detector_runtime",
+        "detector_capacity_predeclared_bounds",
+        "sensor_helpful_not_required"
+      ]
+    },
+    {
+      "id": "order-invariant-identifiable-learning",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/learner.py:fit_joint_cross_situational",
+        "babyworld_lite/sensor_alignment_v6/learner.py:score_predictions",
+        "babyworld_lite/sensor_alignment_v6/learner.py:reorder_prompts_and_keys"
+      ],
+      "tests": [
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_order_invariant_metrics_and_fractional_ties",
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_sensor_free_gate_uses_genuine_fitted_outputs"
+      ],
+      "artifacts": [
+        "qualification_run/recomputable/order_invariance_audit.json",
+        "qualification_run/recomputable/model_results.json"
+      ],
+      "gates": ["order_invariance", "identifiability_sensor_free_genuine_fit"]
+    },
+    {
+      "id": "joint-learner-and-noun-selectivity",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/learner.py:fit_joint_cross_situational"
+      ],
+      "tests": [
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_iterations_competition_and_sensor_change_numeric_fit",
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_noun_sensor_weight_is_exactly_zero"
+      ],
+      "artifacts": [
+        "qualification_run/recomputable/learner_numeric_audit.json"
+      ],
+      "gates": ["joint_iterations_and_competition_numeric", "noun_sensor_weight_zero"]
+    },
+    {
+      "id": "executed-controls-and-factors",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/controls.py:fit_oracle_control",
+        "babyworld_lite/sensor_alignment_v6/controls.py:fit_direct_capacity_control",
+        "babyworld_lite/sensor_alignment_v6/study.py:_factor_results"
+      ],
+      "tests": [
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_oracle_and_direct_controls_are_executed_not_constant_and_corruptible"
+      ],
+      "artifacts": [
+        "qualification_run/recomputable/control_results.json",
+        "qualification_run/recomputable/factor_results.json"
+      ],
+      "gates": [
+        "oracle_control_executed",
+        "direct_capacity_control_executed",
+        "sensor_corruption_control_executed",
+        "factor_refits_executed"
+      ]
+    },
+    {
+      "id": "independent-process-recomputation",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/study.py:compute_from_persisted",
+        "babyworld_lite/sensor_alignment_v6/integrity.py:run_independent_recompute",
+        "babyworld_lite/sensor_alignment_v6/integrity.py:run_negative_recompute_tests"
+      ],
+      "tests": [
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_input_and_source_manifests_fail_on_one_byte_mutation"
+      ],
+      "artifacts": [
+        "independent_recompute_process.json",
+        "independent_recompute_comparison.json",
+        "negative_recompute_tests.json"
+      ],
+      "gates": ["independent_recompute", "negative_recompute_mutations"]
+    },
+    {
+      "id": "frozen-tests-environment",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/integrity.py:run_official_tests",
+        "babyworld_lite/sensor_alignment_v6/integrity.py:verify_freeze"
+      ],
+      "tests": [],
+      "artifacts": [
+        "frozen_environment.json",
+        "freeze_receipt.json",
+        "official_test_execution_report.json"
+      ],
+      "gates": ["freeze_integrity", "official_tests"]
+    },
+    {
+      "id": "machine-traceability",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/integrity.py:validate_traceability"
+      ],
+      "tests": [
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_traceability_breaks_each_reference_class"
+      ],
+      "artifacts": ["frozen_traceability.json"],
+      "gates": ["traceability"]
+    },
+    {
+      "id": "terminal-regeneration-and-fail-closed",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/adjudicator.py:terminal_decision",
+        "babyworld_lite/sensor_alignment_v6/adjudicator.py:adjudicate_file"
+      ],
+      "tests": [
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_adjudicator_fails_closed_and_uses_stop_only_for_structural_failure"
+      ],
+      "artifacts": [
+        "terminal_decision.json"
+      ],
+      "gates": ["terminal_regeneration"]
+    },
+    {
+      "id": "preservation-and-complete-manifest",
+      "symbols": [
+        "babyworld_lite/sensor_alignment_v6/protocol.py:verify_prior_preservation",
+        "babyworld_lite/sensor_alignment_v6/integrity.py:write_complete_manifest"
+      ],
+      "tests": [
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_complete_manifest_is_per_file_and_second_pass_verified",
+        "tests/test_synthetic_identifiability_qualification_v6.py::test_v6_v4_disposition_invalidates_promotion_without_rewriting_v4"
+      ],
+      "artifacts": [
+        "preservation_proof.json",
+        "complete_file_manifest.json"
+      ],
+      "gates": ["prior_v1_v5_preservation", "complete_manifest"]
+    }
+  ]
+}

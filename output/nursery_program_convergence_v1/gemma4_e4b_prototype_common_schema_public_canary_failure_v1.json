@@ -1,0 +1,7 @@
+{
+  "failure_code": "E_INTERNAL",
+  "raw_model_output_exported": false,
+  "restricted_payload_accessed": false,
+  "schema_version": "nursery-gemma4-canary-failure-v1",
+  "status": "REVISE"
+}

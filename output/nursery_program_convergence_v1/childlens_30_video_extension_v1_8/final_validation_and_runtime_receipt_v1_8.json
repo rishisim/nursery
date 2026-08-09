@@ -1,0 +1,58 @@
+{
+  "schema_version": "nursery-childlens-30-video-final-validation-runtime-receipt-v1.8.0",
+  "status": "PASS_WITH_STRUCTURAL_ONLY_REPORT_QA",
+  "terminal_state": "PROTOTYPE_CAUSAL_STOP_VALID_NULL_OR_FAILED_GATE",
+  "tests": {
+    "passed": 20,
+    "failed": 0,
+    "test_file_sha256": "9090424a6420466c0b1a48b122adc2c156f742f1c8f6579cee6571573df220c5"
+  },
+  "privacy": {
+    "public_files_scanned": 5,
+    "restricted_payload_patterns_found": 0,
+    "restricted_git_confinement": "PASS",
+    "credential_present_after_successful_acquisition": false
+  },
+  "ancestry": {
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false,
+    "cross_corpus_import_or_path_literals_found": 0
+  },
+  "immutability": {
+    "historical_qwen_worker_restored": true,
+    "historical_qwen_worker_sha256": "e785ea475aee62fd72ab9bc064f3c9c3dcbc189b4361e996963edf9f2ab14f88",
+    "v1_8_extension_worker_sha256": "83ab0bf22240ee15a2fa7065bf57452e5361da5c0b943e07c764ccfbff61118c",
+    "prior_v1_through_v1_3_decisions_overwritten": false
+  },
+  "resource_and_runtime": {
+    "acquisition_source_transfer_gib_rounded_up": 17,
+    "retained_clip_gib_rounded_up": 1,
+    "post_acquisition_free_space_gib_rounded_down": 56,
+    "minimum_free_space_floor_gib": 50,
+    "maximum_concurrent_full_source_objects": 1,
+    "maximum_MPS_heavy_processes": 1,
+    "qwen_asr_to_vlm_completion_seconds_rounded_up": 834,
+    "gemma_first_to_last_checkpoint_seconds_rounded_up": 654,
+    "gemma_checkpoint_count": 135
+  },
+  "report_delivery": {
+    "canonical_artifact_validation": "PASS",
+    "portable_package": "PASS",
+    "verification": "STRUCTURAL_ONLY",
+    "browser_QA_attempt": "TIMEOUT",
+    "browser_QA_limitation": "The self-contained report and semantic fallback passed exact structural validation, but enhanced-reader viewport and source-dialog interaction were not browser-verified.",
+    "report_artifact_sha256": "f79130e7b84f3807066f7bcd491bec0d8ac873dd5000c6b8b2a037ee6ddd4c58",
+    "report_html_sha256": "4c7c6980dbb1a5a213feb57ae8724114099baebae926516cbc72c3ef08d03850",
+    "terminal_decision_record_sha256_before_receipt": "bd522ca49117b9bfb7c9b6643e06daf03d0f4c7b21a870b760d6a7bd84755c90",
+    "source_notes_sha256": "de36c92d823773f12d075203286227a01da93168b498b22e368b6cc7121db9e8"
+  },
+  "scientific_disposition": {
+    "calibration_gate_passed": false,
+    "causal_endpoint_opened": false,
+    "causal_outcome_run": false,
+    "valid_causal_null_observed": false,
+    "third_model_used": false,
+    "further_sample_expansion_used_or_allowed": false,
+    "fallback_used": false
+  }
+}

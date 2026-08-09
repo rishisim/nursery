@@ -1,0 +1,35 @@
+{
+  "schema_version": "nursery-grounded-videollm-mac-runtime-v2-selection-v1.0.0",
+  "protocol_id": "childlens-independent-second-instrument-mac-runtime-v2",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_AFTER_OPERATOR_PREFLIGHT_BEFORE_MODEL_LOAD_OR_OUTPUT",
+  "selected_runtime_path": "PYTORCH_2_13_NATIVE_MPS_CONV3D",
+  "selection_basis": {
+    "operator_input_shape": [12, 3, 8, 224, 224],
+    "operator_weight_shape": [1408, 3, 1, 14, 14],
+    "expected_output_shape": [12, 1408, 8, 16, 16],
+    "torch_version": "2.13.0",
+    "dtype": "float16",
+    "native_shape_and_finite": true,
+    "cpu_reference_allclose": true,
+    "rtol": 0.01,
+    "atol": 0.05,
+    "max_abs_error": 0.0005390644073486328,
+    "mean_abs_error": 0.00007105893746484071,
+    "elapsed_seconds": 0.7204627990722656,
+    "operator_runner_sha256": "71c654436ce186ab967e327f024ac3915ec737e385679a5448ab371fd57cc16d",
+    "private_operator_receipt_sha256": "791916e5ecb4a63f613ce48ead63aeb07a4e7ca65c6e95f743bfe953f1e55e4f"
+  },
+  "fallbacks_not_selected": [
+    "MPS_CONV2D_ALGEBRAIC_LOWERING",
+    "CPU_CONV3D_SHIM",
+    "WHOLE_INTERNVIDEO2_CPU"
+  ],
+  "full_model_smoke_next": {
+    "attempts": 1,
+    "fixture": "One new self-generated public five-frame case outside the scored canary.",
+    "semantic_scoring": false,
+    "response_use": "Runtime completion and frozen-schema parseability only; response text may not be used to change runtime, prompt, parser, or cases."
+  },
+  "restricted_access_authorized": false
+}

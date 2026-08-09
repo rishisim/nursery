@@ -1,0 +1,50 @@
+{
+  "schema_version": "nursery-development-launch-post-freeze-audit-v1",
+  "protocol_id": "synthetic-development-launch-v1",
+  "decision": "REVISE",
+  "frozen_package_modified": false,
+  "excluded_rehearsal_count": 1,
+  "excluded_rehearsal_status": "PASS",
+  "failures": [
+    {
+      "stage": "independent_reproduction",
+      "failure_class": "frozen_environment_resolution",
+      "diagnosis": "The frozen environment recorded the resolved base interpreter behind .venv/bin/python. The separate process therefore lacked PyYAML and failed before recomputation.",
+      "evidence": "independent_recompute_process.json",
+      "evidence_sha256": "f4c77a3ac16a549c1482dfc9f16a9a877fd1ded2c421148b823464672ad8967d"
+    },
+    {
+      "stage": "negative_mutation_tests",
+      "failure_class": "non_specific_rejection",
+      "diagnosis": "Both mutation cases exited nonzero because the base interpreter lacked PyYAML, so their nominal PASS does not demonstrate rejection of the mutations.",
+      "evidence": "negative_recompute_tests.json",
+      "evidence_sha256": "07afa801790eca554213118ad13a3b284b40055021384fd9642e6b475d8497e3"
+    },
+    {
+      "stage": "official_tests",
+      "failure_class": "frozen_environment_resolution",
+      "diagnosis": "The official frozen test command used the same base interpreter, which lacked pytest.",
+      "evidence": "official_test_execution_report.json",
+      "evidence_sha256": "6dac971ed35e2a13dbc9422eca9642cab57f419fb7d545282b353db7c53b12d9"
+    },
+    {
+      "stage": "finalization",
+      "failure_class": "missing_failed_recomputation_artifact",
+      "diagnosis": "Finalization aborted with FileNotFoundError for independent_recompute_comparison.json rather than producing a fail-closed REVISE terminal.",
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python scripts/run_synthetic_development_launch_v1.py finalize",
+      "exception": "FileNotFoundError: output/synthetic_development_launch_package_v1/independent_recompute_comparison.json"
+    },
+    {
+      "stage": "finalization_contract_audit",
+      "failure_class": "precreation_traceability_dependency",
+      "diagnosis": "The frozen traceability specification requires DEVELOPMENT_LAUNCH_READY.json before finalization creates it, so even a successful recomputation could not pass the traceability gate in this cycle."
+    }
+  ],
+  "preservation_proof_sha256": "a3603910babefa92b7299703fbb57def973e96f75db29d6f26c60d581ad1ea75",
+  "freeze_receipt_sha256": "d678f80fceb7b5d5a0be202415621b9c474150142f74943904a1dfb1ca304da1",
+  "development_outcome_count": 0,
+  "confirmation_outcome_count": 0,
+  "development_output_absent": true,
+  "next_cycle": "synthetic-development-launch-v2",
+  "gate_changes": "none"
+}

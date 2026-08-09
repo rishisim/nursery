@@ -1,0 +1,30 @@
+{
+  "schema_version": "nursery-childlens-restricted-error-envelope-amendment-v1.8.4",
+  "status": "FROZEN_BEFORE_RETRY",
+  "date": "2026-07-22",
+  "trigger": "The first combined-calibration launch exited before Qwen completion, but the immutable historical public failure slot could not record the new sanitized stage code.",
+  "scope": "CONTENT_INDEPENDENT_DIAGNOSTIC_TRANSPORT_ONLY",
+  "allowed_change": {
+    "restricted_child_result": "Return either the existing aggregate-safe success receipt or a fixed-schema error envelope containing only a bounded internal failure code.",
+    "public_failure_history": "Write the retry failure, if any, to a new additive versioned public artifact rather than overwriting the historical pre-acquisition failure.",
+    "resume": "Reuse only already validated exact checkpoints from the identical frozen run."
+  },
+  "forbidden_changes": [
+    "sample or participant selection",
+    "media or speech windows",
+    "model artifact or model count",
+    "prompt or semantic decoding",
+    "parser allowance",
+    "calibration ranges or thresholds",
+    "causal protocol, seeds, learner, controls, or endpoints",
+    "restricted payload export"
+  ],
+  "permitted_error_fields": [
+    "schema_version",
+    "status",
+    "failure_code"
+  ],
+  "pre_change_runner_sha256": "b6e70e3bfc78e05bb6664731f8cbdc5e39d6c7341a49d2a01738ac7b27f91809",
+  "restricted_gemma_inference_opened_before_amendment": false,
+  "scientific_endpoint_opened_before_amendment": false
+}

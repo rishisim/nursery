@@ -1,0 +1,84 @@
+{
+  "schema_version": "nursery-grounded-videollm-mac-runtime-v2.0.0",
+  "protocol_id": "childlens-independent-second-instrument-mac-runtime-v2",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_BEFORE_V2_OPERATOR_TEST_OR_MODEL_OUTPUT",
+  "relationship_to_v1": "New prospective runtime protocol. The failed PyTorch-2.1.2 MPS attempt and its receipts remain immutable and are not reclassified.",
+  "instrument": {
+    "repository": "WHB139426/Grounded-Video-LLM",
+    "revision": "b97f0e826a0b6c292ca54d9c02c483c479952501",
+    "checkpoint_sha256": "5967e1138fc1106e1c3b384b96af3120405f455475308b4067bb785ac560f588",
+    "weight_manifest_digest": "a2ab012a3a39c1a63ace406ff6ec0b9cdeb5482c1fc87e4a43326ee89daf2d47",
+    "checkpoint_variant_status": "UNDOCUMENTED_GENERAL_VS_BENCHMARK_SUBSET_TUNED",
+    "benchmark_cleanliness_claim_permitted": false
+  },
+  "operator_preflight": {
+    "environment": "Isolated Python 3.10 environment with PyTorch 2.13 and a compatible torchvision version; no model output is generated.",
+    "exact_input_shape": [12, 3, 8, 224, 224],
+    "exact_weight_shape": [1408, 3, 1, 14, 14],
+    "bias_shape": [1408],
+    "kernel": [1, 14, 14],
+    "stride": [1, 14, 14],
+    "padding": [0, 0, 0],
+    "dtype": "float16",
+    "native_mps_conv3d_pass": "The full-shape operation completes, returns [12,1408,8,16,16], contains only finite values, and a four-output-channel deterministic slice agrees with CPU float32 reference at rtol 0.01 and atol 0.05.",
+    "no_model_output": true
+  },
+  "prospective_runtime_selection": [
+    {
+      "priority": 1,
+      "path": "PYTORCH_2_13_NATIVE_MPS_CONV3D",
+      "condition": "Select only if the exact native operator preflight passes."
+    },
+    {
+      "priority": 2,
+      "path": "MPS_CONV2D_ALGEBRAIC_LOWERING",
+      "condition": "Select only if native Conv3D fails and the lowering passes both a deterministic CPU-Conv3D equivalence test and the full production-shape finite-output test.",
+      "definition": "Because temporal kernel=stride=1 with zero temporal padding, reshape [B,C,T,H,W] to [B*T,C,H,W], apply Conv2D with weight.squeeze(2), then restore [B,O,T,H2,W2].",
+      "weights_or_architecture_changed": false
+    },
+    {
+      "priority": 3,
+      "path": "CPU_CONV3D_SHIM",
+      "condition": "Select only if both MPS paths fail and an explicit CPU Conv3D with cached weights passes the same equivalence and full-shape tests.",
+      "transfer": "Only patch-embedding input and output cross CPU/MPS; the remainder of InternVideo2 stays on MPS."
+    }
+  ],
+  "runtime_smoke": {
+    "required_before_canary": true,
+    "data": "One new self-generated public five-frame fixture not used for scoring.",
+    "output_inspection": "Runtime completion, schema parseability, memory, and timing only; semantic correctness is not scored and the response text is not used to tune code or prompt.",
+    "attempts_per_selected_path": 1,
+    "failure": "Stop this v2 path before the scored canary. Do not move to the next runtime path after a full-model smoke has generated an answer."
+  },
+  "public_canary": {
+    "condition": "Only after one selected runtime passes the unscored smoke and its code/environment hashes are frozen.",
+    "specification": "Reuse the existing eight-case German public canary without changing cases, prompt, schema, parser, seed, thresholds, or generation parameters.",
+    "specification_sha256": "b199063399ecae820c379ca8876f9a62db1895cf22c04f7b3478118495394da3",
+    "attempts": 1,
+    "pass": "At least 7/8 exact-schema outputs and at least 6/8 oracle referential-plus-lag decisions correct.",
+    "failure": "Stop before restricted packet discovery; no prompt repair, retry, translation, or model substitution."
+  },
+  "restricted_stage": {
+    "condition": "Only after the v2 public canary passes.",
+    "sample": "Exactly the same 27 frozen qwen_accuracy_audit_v1 windows in the same order.",
+    "attempts_per_window": 1,
+    "network": "denied",
+    "qwen_predictions_visible_to_model": false,
+    "qwen_predictions_visible_to_reviewer": false,
+    "semantic_prompt_tuning": false,
+    "new_acquisition": false,
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false
+  },
+  "decision": {
+    "promising_second_instrument": "At least 19/27 complete answers defensible, Wilson 95% lower bound at least 0.50, schema validity at least 0.90, and abstention at most 0.50.",
+    "qualified_german_reviewer_required_for_accuracy_claim": true,
+    "otherwise": "Do not reopen the larger ChildLens calibration study."
+  },
+  "privacy": {
+    "restricted_payload_location": "owner-private quarantine only",
+    "raw_restricted_content_or_item_level_output_in_repository": false,
+    "public_repository_output": "K=5-safe aggregates and runtime/provenance hashes only"
+  }
+}

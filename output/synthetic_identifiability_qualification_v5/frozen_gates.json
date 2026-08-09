@@ -1,0 +1,15 @@
+{
+  "exact_tie_tolerance": 1e-12,
+  "maximum_factor_pair_cramers_v": 0.36,
+  "maximum_noun_sensor_application_count": 0,
+  "maximum_noun_target_owner_gap": 0.022,
+  "minimum_direct_capacity_fractional": 0.95,
+  "minimum_helpful_sensor_probability_delta": 0.005,
+  "minimum_oracle_fractional": 0.8,
+  "minimum_sensor_free_action_probability": 0.22,
+  "minimum_sensor_free_fractional_action": 0.4,
+  "minimum_synchronized_action_probability": 0.25,
+  "order_metric_tolerance": 1e-12,
+  "require_zero_confirmation_outcomes": true,
+  "require_zero_development_outcomes": true
+}

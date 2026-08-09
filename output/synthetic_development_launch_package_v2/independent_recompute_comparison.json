@@ -1,0 +1,77 @@
+{
+  "byte_and_sha256_identity": true,
+  "file_count": 13,
+  "file_sets_identical": true,
+  "files": [
+    {
+      "bytes": 256303,
+      "path": "compute_operation_log.json",
+      "sha256": "ccbb769819e693dabc081add2034f61123d7d9a78c3281893aba5227116f88d0"
+    },
+    {
+      "bytes": 233367,
+      "path": "control_results.json",
+      "sha256": "332dc08e999703849ac44f0607a31dc96bab69c29b9f352302e07b3065bdd7da"
+    },
+    {
+      "bytes": 214830,
+      "path": "core_gates.json",
+      "sha256": "0744aa4caddc0becc9d4dc44f76e5f544d8656ad696f51e64870c18fa705a0a7"
+    },
+    {
+      "bytes": 11267,
+      "path": "development_controls.json",
+      "sha256": "180a0074e5b486d8232cdc44294d2c780dca80673793cd793c427e8ce509ced0"
+    },
+    {
+      "bytes": 5009,
+      "path": "development_inference.json",
+      "sha256": "9a7f27583f7c4e9f15e5281bd4b72fc41dbdff88b0bcf72c5b6469f3615fe959"
+    },
+    {
+      "bytes": 47887,
+      "path": "factor_audit.json",
+      "sha256": "383da86e951b30ecfb8ee930fae2cb203e372a56fed406b558372771361e20a6"
+    },
+    {
+      "bytes": 6895685,
+      "path": "factor_results.json",
+      "sha256": "c5f7642b89c1f20b93ca7933b172489f8dc4fdcdb28ed0a9b4d32dc576ad8427"
+    },
+    {
+      "bytes": 342,
+      "path": "leakage_audit.json",
+      "sha256": "dd290bdc51822a4821b06acabb1dceda637c4480cc5d089deef8e60d40653e2f"
+    },
+    {
+      "bytes": 411,
+      "path": "learner_numeric_audit.json",
+      "sha256": "aecaa1fdbf3803b723eb023b04d1b6fd10c9d4b04d2fc359ed408d05cc0e4a4a"
+    },
+    {
+      "bytes": 206772,
+      "path": "model_averages.json",
+      "sha256": "076e8ab94ea0e19e4809ad68a80c3b3ad9c5064a7b1b04a44a146c0eb7f667db"
+    },
+    {
+      "bytes": 4379194,
+      "path": "model_results.json",
+      "sha256": "0d20c541701164057508fe168d05e8bb7e9eb27f1a9d9a5ce75cd3a744689b51"
+    },
+    {
+      "bytes": 576729,
+      "path": "null_capacity_audit.json",
+      "sha256": "771ce97f29c3f3f92f522b61b9a760e84eee9a96e841dd22d1f500aa13ca9867"
+    },
+    {
+      "bytes": 29092,
+      "path": "order_invariance_audit.json",
+      "sha256": "c5c7b5c4db0926bc0b211d3cf3990785510f8a89455873906728d8785d0b58ab"
+    }
+  ],
+  "mismatches": [],
+  "missing_from_recompute": [],
+  "separate_process_executed": true,
+  "status": "PASS",
+  "unexpected_in_recompute": []
+}

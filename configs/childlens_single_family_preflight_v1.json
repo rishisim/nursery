@@ -1,0 +1,94 @@
+{
+  "schema": "ChildLensSingleFamilyPreflightFreeze.v1",
+  "frozen_before_conditional_visual_outcomes": true,
+  "scientific_role": "provisional_ages_3_to_5_single_object_play_family_calibration_not_infant_calibration",
+  "empirical_source": "ChildLens_only",
+  "immutable_prior_decision": {
+    "commit": "67542cf",
+    "decision": "NO_GO_REQUIRES_USER_CHOICE",
+    "global_target_may_be_reinterpreted_or_replaced": false
+  },
+  "target_audit": {
+    "authorized_scope": "exact_18_development_participants_locked_0",
+    "annotation_event_id": "playing_with_object",
+    "annotation_type": "complete",
+    "language_interpretation_used": false,
+    "eligible_frontend_rows": "V5 zero-lag requests only",
+    "window_durations_seconds": [2, 6, 18],
+    "minimum_object_play_overlap_fraction": 0.8,
+    "participant_aggregation": "unweighted mean of eligible zero-lag request measurements within participant",
+    "population_aggregation": "unweighted mean across participants",
+    "uncertainty": {
+      "method": "participant_cluster_bootstrap",
+      "replicates": 10000,
+      "confidence": 0.9,
+      "seed_base": 20261220,
+      "minimum_participants": 5
+    },
+    "estimators": {
+      "sampling": "nearest decoded RGB frame to each start+0.5s+n*1s timestamp",
+      "grayscale_motion": "mean adjacent absolute difference after RGB_to_L and 64x64 resize, intensities divided by 255",
+      "dinov2_adjacent_persistence": {
+        "definition": "mean adjacent cosine similarity of pooler_output",
+        "repository": "facebook/dinov2-small",
+        "revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056",
+        "weights_sha256": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1",
+        "processor_sha256": "14e780d86fa1861f8751f868d7f45425b5feb55c38ca26f152ca5097ab30f828",
+        "role": "transparent_model_model_sensitivity_not_human_validation_or_ground_truth"
+      },
+      "scene_change_rate": "fraction of adjacent grayscale differences greater_than_or_equal_to 0.2"
+    },
+    "primary_target": "timed_playing_with_object_participant_clustered_90pct",
+    "secondary_stress_target": "immutable_V5_full_representative_natural_activity_mixture",
+    "recording_level_grounding_enriched_fallback_role": "reported_for_relationship_only_never_promoted_to_primary"
+  },
+  "fit_check_separation": {
+    "controller_selection": "frozen factorial fit cells",
+    "independent_check": "held_out seeds plus held_out room_target_appearance combinations",
+    "final_qualification_cells_may_select_controller": false
+  },
+  "appearance_gates": {
+    "native_mimo_body_pixels_visible": 0,
+    "target_visible_frame_fraction_min": 0.95,
+    "large_unattributed_foreground_component_area_fraction_max": 0.02,
+    "inspection_frames": "episode boundaries, every phase boundary, first contact, grasp transitions, and uniform 1Hz frames",
+    "both_scenes_required": ["FloorPlan1", "FloorPlan201"],
+    "single_best_frame_acceptance_allowed": false
+  },
+  "controllability_preflight": {
+    "cell_count": 10,
+    "fit_cell_count": 8,
+    "held_out_cell_count": 2,
+    "decoded_canonical_media_only": true,
+    "controls": [
+      "smooth_embodied_ego_head_motion",
+      "gaze_fixation_transitions",
+      "scene_event_driven_object_or_distractor_motion",
+      "natural_occlusion_reappearance",
+      "bounded_within_episode_viewpoint_transition"
+    ],
+    "one_scalar_camera_jitter_route_allowed": false,
+    "all_three_primary_visual_intervals_must_pass_jointly": true,
+    "global_natural_mixture": "secondary_stress_analysis_no_GO_gate_substitution",
+    "scientific_gate_failure_replacement_seed_allowed": false
+  },
+  "acoustic": {
+    "decoded_local_synthetic_german_tts_only": true,
+    "observables": ["audio_log_rms", "audio_non_silent_fraction", "audio_clipped_fraction"],
+    "waveform_metric_definitions_must_match_V5": true,
+    "inappropriate_waveform_manipulation_allowed": false,
+    "noncomparability_must_be_preregistered_before_final_batch": true
+  },
+  "lexical_transfer": {
+    "minimum_nouns": 4,
+    "minimum_instances_per_noun": 3,
+    "disjoint_instance_splits": ["train", "validation", "test"],
+    "balanced_rooms": true,
+    "noun_not_determined_by": ["color", "texture", "room", "path", "manifest_field", "side_stream"],
+    "new_activity_families_allowed": false
+  },
+  "terminal_decisions": [
+    "GO_CHILDLENS_SINGLE_FAMILY_BATCH_READY_FOR_LEARNER_PREFLIGHT",
+    "NO_GO_REQUIRES_USER_CHOICE"
+  ]
+}

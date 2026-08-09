@@ -1,0 +1,101 @@
+{
+  "schema_version": "nursery-corrective-traceability-v1",
+  "requirements": [
+    {
+      "id": "prior_line_independently_closed",
+      "artifacts": [
+        "prior_line_reverification.json",
+        "preservation/preservation_proof.json"
+      ]
+    },
+    {
+      "id": "brief_construct_mechanism_and_rationale",
+      "artifacts": [
+        "design_contract_validation.json",
+        "construction_qualification_decision.json",
+        "mechanism_qualification.json",
+        "construction_qualification/adjudication/mechanism_mutations.json",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v1_brief_trace.json",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v1_protocol.md",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v1_research_rationale.md",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v1_threshold_rationale.md",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v1_primary_sources.json",
+        "frozen_source_snapshot/docs/synthetic_corrective_alignment_v1_sample_size.md"
+      ]
+    },
+    {
+      "id": "parallel_equivalence_benchmark_and_shards",
+      "artifacts": [
+        "parallel_equivalence_attempt_4.json",
+        "parallel_benchmark_attempt_4.json",
+        "parallel_micro_attempt_4_completion.json",
+        "parallel_micro_attempt_4_persisted_inputs/input_manifest.json",
+        "parallel_micro_attempt_4_jobs_1/complete_manifest.json",
+        "parallel_micro_attempt_4_jobs_n/complete_manifest.json",
+        "parallel_micro_attempt_4_jobs_1/adjudication/manifest.json",
+        "parallel_micro_attempt_4_jobs_n/adjudication/manifest.json"
+      ]
+    },
+    {
+      "id": "prefreeze_and_frozen_package_evidence",
+      "artifacts": [
+        "prequalification_design_lock.json",
+        "construction_qualification_attempt_consumed.json",
+        "prequalification_transition_verification.json",
+        "freeze_attempt_consumed.json",
+        "prefreeze_evidence_manifest.json",
+        "prefreeze_evidence_contract.json",
+        "freeze_receipt.json",
+        "frozen_environment.json",
+        "frozen_seed_registries.json",
+        "frozen_source_snapshot/snapshot_manifest.json"
+      ]
+    },
+    {
+      "id": "preserved_excluded_qualification_history",
+      "artifacts": [
+        "PREFREEZE_MICRO_ATTEMPT_1_FAILED.json",
+        "PREFREEZE_MICRO_ATTEMPT_2_FAILED.json",
+        "PREFREEZE_MICRO_ATTEMPT_3_SUPERSEDED.json"
+      ]
+    },
+    {
+      "id": "exactly_one_excluded_rehearsal_and_independent_recompute",
+      "artifacts": [
+        "excluded_rehearsal_attempt_consumed.json",
+        "excluded_rehearsal_completion.json",
+        "independent_recompute_attempt_consumed.json",
+        "rehearsal_contract_validation.json",
+        "excluded_rehearsal/cohort_summary.json",
+        "excluded_rehearsal/complete_manifest.json",
+        "excluded_rehearsal/adjudication/execution_contract.json",
+        "independent_recompute/complete_manifest.json",
+        "independent_recompute/adjudication/manifest.json",
+        "independent_recompute_comparison.json"
+      ]
+    },
+    {
+      "id": "tests_identifiers_preservation_and_pristine_state",
+      "artifacts": [
+        "official_test_execution_report.json",
+        "official_tests_attempt_consumed.json",
+        "preservation_attempt_consumed.json",
+        "preservation/preservation_proof.json",
+        "preservation/preservation_after.sha256",
+        "preservation/preservation_after.stat",
+        "preservation/preservation_after.symlinks",
+        "identifier_operation_audit.json",
+        "repository_operation_census.json",
+        "pristine_state_validation.json"
+      ]
+    },
+    {
+      "id": "zero_outcome_scientific_handoff",
+      "artifacts": [
+        "outcome_registry.json",
+        "finalization_attempt_consumed.json",
+        "SCIENTIFIC_REPORT.md"
+      ]
+    }
+  ]
+}

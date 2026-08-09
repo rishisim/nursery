@@ -1,0 +1,882 @@
+[
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281001,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281003,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281005,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281007,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281009,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281011,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281013,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281015,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281017,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281019,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281021,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281023,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281025,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281027,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281029,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281031,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281033,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281035,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281037,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281039,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281041,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281043,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281045,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281047,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281049,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281051,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281053,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281055,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281057,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281059,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281061,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281063,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281065,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281067,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281069,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281071,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281073,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281075,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281077,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  },
+  {
+    "absent_channel_rows": 3792,
+    "conditions": [
+      "absent_channel",
+      "randomized_shuffle",
+      "sensor_corrupted",
+      "shift_minus_8",
+      "shift_plus_8",
+      "synchronized",
+      "uninformative"
+    ],
+    "corpus_seed": 281079,
+    "episode_identity_exactly_matched": true,
+    "randomized_shuffle_deranged_and_factor_matched": true,
+    "randomized_shuffle_rows": 3792,
+    "status": "PASS",
+    "time_shifts": {
+      "shift_minus_8": -8,
+      "shift_plus_8": 8
+    },
+    "uninformative_distinct_streams": 1
+  }
+]

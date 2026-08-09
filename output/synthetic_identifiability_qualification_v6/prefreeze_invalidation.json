@@ -1,0 +1,28 @@
+{
+  "confirmation_outcome_count": 0,
+  "decision": "REVISE",
+  "development_outcome_count": 0,
+  "excluded_smoke_executed": false,
+  "invalidating_event": {
+    "guarded_operation": "generate",
+    "purpose": "excluded_smoke",
+    "references": [
+      {
+        "role": "corpus",
+        "value": 260201
+      },
+      {
+        "role": "corpus",
+        "value": 260207
+      }
+    ],
+    "stage": "pre_freeze_construction_probe"
+  },
+  "learner_fit_count": 0,
+  "model_identifiers_touched": [],
+  "protocol_id": "synthetic-identifiability-qualification-v6",
+  "reason": "Reserved excluded-smoke corpus identifiers were used for a pre-freeze construction audit. This contaminates V6 for tuning even though no detector, learner, scoring, development, confirmation, or scientific outcome executed.",
+  "scientific_outcome_count": 0,
+  "status": "INVALIDATED_PRE_FREEZE",
+  "terminal": true
+}

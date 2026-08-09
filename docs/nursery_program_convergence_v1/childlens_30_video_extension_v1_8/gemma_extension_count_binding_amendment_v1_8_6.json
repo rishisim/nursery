@@ -1,0 +1,26 @@
+{
+  "schema_version": "nursery-childlens-gemma-extension-count-binding-amendment-v1.8.6",
+  "status": "FROZEN_BEFORE_RETRY",
+  "date": "2026-07-22",
+  "failure_code": "E_GEMMA",
+  "diagnosis": "The extension wrapper set its exported WINDOW_COUNT to 135 but did not set the nested legacy module global used by job validation and loop termination, which remained 137.",
+  "scope": "CONTENT_INDEPENDENT_FROZEN_COUNT_BINDING_ONLY",
+  "allowed_change": "Bind the already frozen count 135 into both the extension adapter and its nested legacy worker module before invoking the unchanged worker main function.",
+  "unchanged": [
+    "selected 15 added items and combined 30-item sample",
+    "900 added speech seconds",
+    "135 added candidate windows and their values/order",
+    "audio and five-frame inputs",
+    "Gemma artifact",
+    "prompt, rendered-template correction, schema, and parser",
+    "calibration thresholds and ranges",
+    "Qwen outputs",
+    "causal protocol, learner, controls, seeds, and endpoints",
+    "privacy and network denial"
+  ],
+  "pre_change_extension_worker_sha256": "19b7c3b888d41bc640b6aa18f1c2b7d0361e3922cb1f561d8bfc007d289474e8",
+  "pre_change_runner_sha256": "ab79a227811f11afed8d4975619f3812130019a22da9a7c71369e968fc285b3c",
+  "restricted_gemma_checkpoint_count_before_amendment": 0,
+  "restricted_gemma_predictions_created_before_amendment": false,
+  "scientific_endpoint_opened_before_amendment": false
+}

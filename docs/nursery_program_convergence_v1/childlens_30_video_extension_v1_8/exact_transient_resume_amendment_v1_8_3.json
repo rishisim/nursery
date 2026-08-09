@@ -1,0 +1,31 @@
+{
+  "schema_version": "nursery-childlens-extension-exact-transient-resume-amendment-v1.8.3",
+  "status": "FROZEN_AFTER_EXTERNAL_PROCESS_KILL_BEFORE_RETRY",
+  "frozen_at": "2026-07-22",
+  "trigger": "The acquisition process was externally killed after the first selected source completed transfer but before its derived clip and checkpoint were committed.",
+  "evidence": {
+    "process_exit_code": 137,
+    "restricted_checkpoint_created": false,
+    "completed_item_count": 0,
+    "transient_regular_file_count": 1,
+    "transient_source_bytes_rounded_up_mib": 292,
+    "independent_exact_transform_smoke_status": "PASS",
+    "independent_transform_elapsed_seconds_rounded": 10,
+    "independent_transform_output_mib_rounded_up": 7,
+    "system_free_memory_percentage_after_interruption": 81,
+    "restricted_content_semantics_inspected": false
+  },
+  "permitted_change": "On retry, allow exactly one owner-private non-symlink transient file with the fixed controller name. Re-request exact read-only remote metadata; reuse the transient only when its byte length exactly matches that metadata; recompute its full SHA-256 before clipping. Delete and redownload an incomplete mismatch. Retain the same clip command, selection, intervals, hashes, and checkpoint rules.",
+  "forbidden_changes": [
+    "trust a partial or size-mismatched transient",
+    "skip the full local SHA-256",
+    "reuse a differently named transient",
+    "selection sampling or candidate windows",
+    "clip codec or scientific content",
+    "model prompts schemas or thresholds",
+    "causal protocol"
+  ],
+  "diagnostic_derived_duplicate_retained": false,
+  "restricted_model_inference_run": false,
+  "scientific_endpoint_opened": false
+}

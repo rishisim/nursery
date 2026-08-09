@@ -1,0 +1,74 @@
+{
+  "schema_version": "nursery-qwen-accuracy-audit-v1.0.0",
+  "protocol_id": "childlens-qwen-existing-prediction-provisional-plausibility-audit-v1",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_BEFORE_RESTRICTED_PREDICTION_OR_MEDIA_REVIEW",
+  "purpose": "Run one small diagnostic of existing Qwen3-VL ChildLens judgments without reopening the v1.8 calibration or any causal endpoint.",
+  "scope": {
+    "source_population": "The 135 already-frozen candidate windows from the retained 15-video v1.8 extension subset of the completed 30-video calibration.",
+    "reason_for_subset": "Only the 15 bounded extension clips remain locally retained; no acquisition or inference is authorized.",
+    "sample_size": 27,
+    "instrument_rerun": false,
+    "scientific_acquisition_outcome": false,
+    "causal_endpoint_opened": false
+  },
+  "sampling": {
+    "content_blind": true,
+    "prediction_blind": true,
+    "algorithm": "For each of the 15 retained extension items, rank its existing windows by SHA256(protocol_id || opaque_item_key || window_index). Select the first ranked window from every item. Then rank each item's second window by the same digest and select the lowest 12, yielding 27 windows with one or two windows per item.",
+    "media_content_used": false,
+    "speech_text_used": false,
+    "model_label_used": false,
+    "confidence_used": false,
+    "replacement_or_resampling": false
+  },
+  "review_rubric": {
+    "speech_referent_identifiable": [
+      "yes",
+      "no",
+      "uncertain"
+    ],
+    "visible_object_or_action_candidate_present": [
+      "yes",
+      "no",
+      "uncertain"
+    ],
+    "qwen_lag_bin_supported": [
+      "yes",
+      "no",
+      "uncertain",
+      "not_applicable"
+    ],
+    "ambiguity_or_null": [
+      "clear_candidate",
+      "ambiguous",
+      "null_or_irrelevant",
+      "undecidable"
+    ],
+    "qwen_answer_defensible": [
+      "yes",
+      "no",
+      "uncertain"
+    ]
+  },
+  "review_boundary": {
+    "reviewer": "Codex visual review with access to the already-local five-frame representation and existing local ASR hypothesis",
+    "qualified_german_interpreter_available": false,
+    "claim": "Provisional visual/temporal plausibility only, not German lexical gold, human reliability, or accuracy.",
+    "lag_rule": "Supported only when the ordered five-frame evidence visibly supports Qwen's relative lead/overlap/lag category for a plausible speech-related candidate; otherwise uncertain or not applicable.",
+    "defensible_rule": "Yes requires internal consistency between the existing ASR hypothesis, visible evidence, and Qwen category. Uncertain is not counted as defensible."
+  },
+  "privacy": {
+    "restricted_review_location": "Existing owner-private quarantine plus a new owner-private quarantine-local audit namespace.",
+    "external_or_cloud_transfer": false,
+    "raw_frames_audio_transcripts_timestamps_identifiers_or_paths_exported": false,
+    "repository_output": "Aggregate-safe counts only.",
+    "minimum_cell_k": 5,
+    "complementary_suppression": true,
+    "per_window_output_exported": false
+  },
+  "decision_rule": {
+    "larger_human_grounded_calibration_reopen": "Recommend only if the provisional defensible count is at least 19 of 27 and the lower Wilson 95% bound is at least 0.50, with no claim of lexical accuracy; otherwise do not reopen.",
+    "reason": "This intentionally low-cost screen asks only whether a qualified German human study is worth funding. It cannot validate Qwen."
+  }
+}

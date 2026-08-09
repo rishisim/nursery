@@ -1,0 +1,193 @@
+{
+  "index_id": "childlens-feasibility-audit-evidence-index-v1.0.0",
+  "generated_date": "2026-07-21",
+  "scope": "REPORTABLE_NONIDENTIFYING_ARTIFACTS_ONLY",
+  "final_validator": {
+    "status": "PASS_ISSUE_COUNT_0",
+    "command": "python3 scripts/validate_childlens_feasibility_v1.py --json"
+  },
+  "artifacts": [
+    {
+      "artifact": "docs/childlens_feasibility_v1/annotation_schema_modality_audit.md",
+      "sha256": "7dc31a06b60bd8210588cbb8e347ef14e75ec3e678b2a9324a6d0b5312f520a9",
+      "origin_workstream": "ANNOTATION_DATA_AUDIT",
+      "evidence_class": "REPORT",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/commands_tests_and_limitations.md",
+      "sha256": "83778ffc8e18d8f41a4e7083d185b24a65531c0140f850528a2e7bb4a3d3d697",
+      "origin_workstream": "COORDINATOR",
+      "evidence_class": "AUDIT_LOG",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/decision_record_v1.json",
+      "sha256": "5f1ad36bf89e6b4b7aa399585a66fa18a10909319843f36723d3461114dce5e8",
+      "origin_workstream": "COORDINATOR",
+      "evidence_class": "DECISION_RECORD",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/executive_decision_report.md",
+      "sha256": "c1e8a51511016e2a2a6700b012b14d164a99c61584ece0d5b7e0b019ad920eb8",
+      "origin_workstream": "COORDINATOR",
+      "evidence_class": "EXECUTIVE_REPORT",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/frozen_feasibility_rubric_v1.json",
+      "sha256": "4c5ceb7427f10fcac5932d0c642d0918fff190307035c2322ef1ce12981edd36",
+      "origin_workstream": "COORDINATOR",
+      "evidence_class": "FROZEN_PROTOCOL",
+      "restriction_class": "PROCEDURAL",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/frozen_pilot_protocol_v1.json",
+      "sha256": "63be49d470c79e94f26240e73b314cdc42f2a6e6a57e96c897340d856f561ecb",
+      "origin_workstream": "COORDINATOR",
+      "evidence_class": "FROZEN_PROTOCOL",
+      "restriction_class": "PROCEDURAL",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/future_parallel_execution_plan.md",
+      "sha256": "0cbd478f80cbe39944c7286f6a11d3d978ade2c213868a7ae292c0a28fb42cbb",
+      "origin_workstream": "RESOURCE_PARALLEL_PLAN",
+      "evidence_class": "EXECUTION_PLAN",
+      "restriction_class": "PROCEDURAL",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/language_transcription_diarization_feasibility.md",
+      "sha256": "79b0ec5603edf67c5f935a6a9e3d40b94dc0861101c9d2cc342aa67cd4f1f8ad",
+      "origin_workstream": "TRANSCRIPTION_DIARIZATION",
+      "evidence_class": "REPORT",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/lexical_grounding_referential_feasibility.md",
+      "sha256": "ca794d6913f2372e68b317af08609827311c298137aaf43c4a1b1a0ca128c483",
+      "origin_workstream": "LEXICAL_REFERENTIAL",
+      "evidence_class": "REPORT",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/proposed_annotation_instrument_contract_amendment.md",
+      "sha256": "7857e630e66d76a7462cbac85805e6e54f56f36f1f6e693f43845596fbd5979f",
+      "origin_workstream": "PROVENANCE_PRIVACY",
+      "evidence_class": "PROPOSED_CONTRACT_AMENDMENT",
+      "restriction_class": "PROCEDURAL",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/provenance_privacy_audit.md",
+      "sha256": "060e118147e624bb624ba82d7d286e92170f62859c3898a3048094f7c31238b7",
+      "origin_workstream": "PROVENANCE_PRIVACY",
+      "evidence_class": "AUDIT_REPORT",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/release_manifest_summary.json",
+      "sha256": "1fb89342cc6a29b82b5c4fbb199e14cd2f31cee6256bce3b14fbecf4bb266ead",
+      "origin_workstream": "COORDINATOR",
+      "evidence_class": "RELEASE_MANIFEST_SUMMARY",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/release_terms_permissions_matrix.md",
+      "sha256": "44ef13343533c8f2e98b61dc544ef99919c39d987f397f59f6406016b5d9c459",
+      "origin_workstream": "GOVERNANCE_RELEASE",
+      "evidence_class": "REPORT",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "docs/childlens_feasibility_v1/storage_compute_annotation_projection.md",
+      "sha256": "b8f0856ddb15f59fc6e0f9c94926435cf78d55fdd3e0fb6f315993d6dc88e9df",
+      "origin_workstream": "RESOURCE_PARALLEL_PLAN",
+      "evidence_class": "RESOURCE_PROJECTION",
+      "restriction_class": "NONEMPIRICAL_PLANNING_SCENARIOS",
+      "validation_status": "HASHED"
+    },
+    {
+      "artifact": "output/childlens_feasibility_v1/annotation_audit_evidence.json",
+      "sha256": "10be758bbe816b7647dabc0354e62533cabf4f8ede54b2e9e2d83af9e931ddff",
+      "origin_workstream": "ANNOTATION_DATA_AUDIT",
+      "evidence_class": "MACHINE_EVIDENCE",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED_JSON"
+    },
+    {
+      "artifact": "output/childlens_feasibility_v1/governance_evidence.json",
+      "sha256": "5f1e1fd74ad0df78a8df059c0d01154b038e094b8a49785c136983e2e202841d",
+      "origin_workstream": "GOVERNANCE_RELEASE",
+      "evidence_class": "MACHINE_EVIDENCE",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED_JSON"
+    },
+    {
+      "artifact": "output/childlens_feasibility_v1/lexical_protocol_evidence.json",
+      "sha256": "276bc6d1925c8ed0168586ab3d098aa2206bf91aab7626d6b385c6258d8f7671",
+      "origin_workstream": "LEXICAL_REFERENTIAL",
+      "evidence_class": "MACHINE_EVIDENCE",
+      "restriction_class": "PROCEDURAL_AND_NONIDENTIFYING",
+      "validation_status": "HASHED_JSON"
+    },
+    {
+      "artifact": "output/childlens_feasibility_v1/release_manifest_nonidentifying.json",
+      "sha256": "cfcf6bc84db6bc6d5de2426cee211af318fd8f078eafaf97fc867f325f2fdf07",
+      "origin_workstream": "COORDINATOR",
+      "evidence_class": "NONIDENTIFYING_RELEASE_RECEIPT",
+      "restriction_class": "NONIDENTIFYING_LOCAL_AUDIT",
+      "validation_status": "HASHED_JSON"
+    },
+    {
+      "artifact": "output/childlens_feasibility_v1/resource_projection.json",
+      "sha256": "11cadce70f00ca1a8e813cab3f208228f773f65374599b46135749f3c6b5a4b1",
+      "origin_workstream": "RESOURCE_PARALLEL_PLAN",
+      "evidence_class": "MACHINE_EVIDENCE",
+      "restriction_class": "NONEMPIRICAL_PLANNING_SCENARIOS",
+      "validation_status": "HASHED_JSON"
+    },
+    {
+      "artifact": "output/childlens_feasibility_v1/transcription_instrument_receipt.json",
+      "sha256": "e67d1f1a9f03a1bd4c125c8dfa45e7b9fa24c9fcb6499633479cc459ae504db0",
+      "origin_workstream": "TRANSCRIPTION_DIARIZATION",
+      "evidence_class": "PROPOSED_INSTRUMENT_RECEIPT",
+      "restriction_class": "PROCEDURAL_NO_MODEL_OR_MEDIA_PAYLOAD",
+      "validation_status": "HASHED_JSON"
+    },
+    {
+      "artifact": "scripts/validate_childlens_feasibility_v1.py",
+      "sha256": "6d7e2b09b242f976d0fb0dca95611816fb1d095d0a997c56accfac65a8584c23",
+      "origin_workstream": "PROVENANCE_PRIVACY",
+      "evidence_class": "VALIDATOR_SOURCE",
+      "restriction_class": "CODE_ONLY",
+      "validation_status": "COMPILED"
+    },
+    {
+      "artifact": "tests/test_childlens_feasibility_v1.py",
+      "sha256": "30a66b9ea7262f2917553708e834edf55596b146df1616171c32745fa43f418a",
+      "origin_workstream": "PROVENANCE_PRIVACY",
+      "evidence_class": "VALIDATOR_TEST_SOURCE",
+      "restriction_class": "SYNTHETIC_FIXTURES_ONLY",
+      "validation_status": "17_TESTS_PASS"
+    }
+  ],
+  "privacy_incident": {
+    "value_free_receipt_present": true,
+    "on_disk_restricted_payload_detected": false,
+    "zero_tool_output_leakage_claimed": false,
+    "further_authenticated_inspection_fail_closed": true
+  }
+}

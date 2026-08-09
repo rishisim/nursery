@@ -1,0 +1,7 @@
+{
+  "byte_identical": false,
+  "frozen_adjudicator_used": true,
+  "problem": "terminal changed after manifest reconciliation failure",
+  "separate_process": true,
+  "status": "FAIL"
+}

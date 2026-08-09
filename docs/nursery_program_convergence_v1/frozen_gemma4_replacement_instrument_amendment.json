@@ -1,0 +1,337 @@
+{
+  "schema_version": "nursery-gemma4-replacement-instrument-amendment-v1",
+  "amendment_id": "childlens-gemma4-e4b-joint-audio-five-frame-replacement-v1",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_NOT_ACTIVE_PENDING_PROVENANCE",
+  "activation_state": "NOT_ACTIVE",
+  "amendment_mode": "ADDITIVE_REPLACEMENT_CONTRACT_ONLY",
+  "historical_protocols_modified": false,
+  "restricted_payload_accessed_to_draft": false,
+  "scientific_outcome_authorized": false,
+  "trigger": "The historical Qwen2 visual path failed the frozen exact-schema gate before and after its single allowed schema-only retry, so the required two-family visual envelope could not be formed.",
+  "claim_boundary": {
+    "permitted": "Gemma 4 and the retained Qwen3-VL path may provide provisional model-model agreement and conservative aggregate uncertainty ranges for synthetic stress calibration after every activation gate passes.",
+    "forbidden": [
+      "human validation or inter-human reliability",
+      "ChildLens transcript, referent, or lexical correctness",
+      "majority-vote ground truth",
+      "ChildLens evidence of an acquisition effect",
+      "causal effect-size calibration",
+      "infant or BabyView generalization"
+    ],
+    "pseudo_labels_are_ground_truth": false,
+    "synthetic_evaluation_truth": "simulator oracle only"
+  },
+  "substitution": {
+    "before_active_referential_paths": [
+      "qwen2_vl_2b_existing",
+      "qwen3_vl_8b_instruct_4bit"
+    ],
+    "after_active_referential_paths": [
+      "gemma4_e4b_it_4bit_joint_audio_five_frame",
+      "qwen3_vl_8b_instruct_4bit"
+    ],
+    "removed_path_id": "qwen2_vl_2b_existing",
+    "added_path_id": "gemma4_e4b_it_4bit_joint_audio_five_frame",
+    "retained_path_id": "qwen3_vl_8b_instruct_4bit",
+    "substitution_count": 1,
+    "no_third_model": true,
+    "historical_qwen2_outputs": "preserved but excluded from every replacement comparison, interval, intersection, union, and envelope"
+  },
+  "unchanged_contract": {
+    "sample": true,
+    "schema": true,
+    "gates": true,
+    "thresholds": true,
+    "K5_suppression": true,
+    "outward_rounding": true,
+    "before_protocol": "docs/nursery_program_convergence_v1/frozen_childlens_pseudo_calibration_protocol.json",
+    "before_protocol_sha256": "db5336726f4841e592cb9c73df5ab22a0887d1bd34c7cf673146f38de9e86961",
+    "before_invariant_contract_id": "childlens-pseudo-calibration-referential-invariants-v1",
+    "after_invariant_contract_id": "childlens-pseudo-calibration-referential-invariants-v1",
+    "invariant_projection": {
+      "primary_item_count": 15,
+      "primary_total_seconds": 900,
+      "candidate_window_count": 137,
+      "frame_offsets_seconds": [-5.0, -2.5, 0.0, 2.5, 5.0],
+      "minimum_export_cell_items": 5,
+      "schema_validity_minimum": 0.95,
+      "primary_item_coverage_minimum": 0.8,
+      "primary_seconds_coverage_minimum": 0.8,
+      "maximum_abstention_for_a_dimension": 0.5,
+      "minimum_paths_per_task_family": 2,
+      "agreement_is_not_a_pass_gate": true
+    }
+  },
+  "sample_and_crosswalk": {
+    "sample": "the same prediction-independent frozen primary audit sample only",
+    "primary_item_count": 15,
+    "primary_total_seconds": 900,
+    "candidate_window_count": 137,
+    "reserve_activation": false,
+    "reselection": false,
+    "window_rule": "Use exactly the already materialized ordered windows whose centers fall in the frozen half-open primary audit intervals [start,end); do not regenerate, filter, expand, or reorder them.",
+    "window_and_item_digests": "remain quarantine-only",
+    "content_model_confidence_or_agreement_dependent_selection": false
+  },
+  "qwen3_reuse": {
+    "instrument_id": "qwen3_vl_8b_instruct_4bit",
+    "revision": "defcdea7cc7a4b0858fea563cbbce171d328e457",
+    "read_only": true,
+    "predictions_recomputed": false,
+    "restricted_output_digest_match_required": true,
+    "digest_match": "PENDING_ACTIVATION_RECEIPT_NOT_ACTIVE",
+    "public_canary": "output/nursery_program_convergence_v1/qwen3_vl_public_canary.json",
+    "public_canary_sha256": "eb5447e13f44cc35c64e433f7217dc2423c5aff799c27101b6ce22bec50390b3",
+    "shared_vendor_limitation_removed": true
+  },
+  "gemma4_provenance_placeholders": {
+    "instrument_id": "gemma4_e4b_it_4bit_joint_audio_five_frame",
+    "intended_upstream_repository": "google/gemma-4-E4B-it",
+    "intended_conversion_repository": "mlx-community/gemma-4-e4b-it-4bit",
+    "upstream_revision": "PLACEHOLDER_EXACT_REVISION_REQUIRED_NOT_ACTIVE",
+    "conversion_revision": "PLACEHOLDER_EXACT_REVISION_REQUIRED_NOT_ACTIVE",
+    "upstream_license_identifier": "PLACEHOLDER_REQUIRED_NOT_ACTIVE",
+    "conversion_license_identifier": "PLACEHOLDER_REQUIRED_NOT_ACTIVE",
+    "license_reconciliation_receipt_sha256": "PLACEHOLDER_64_HEX_REQUIRED_NOT_ACTIVE",
+    "upstream_model_card_sha256": "PLACEHOLDER_64_HEX_REQUIRED_NOT_ACTIVE",
+    "conversion_model_card_sha256": "PLACEHOLDER_64_HEX_REQUIRED_NOT_ACTIVE",
+    "artifact_manifest_sha256": "PLACEHOLDER_64_HEX_REQUIRED_NOT_ACTIVE",
+    "artifact_file_count": "PLACEHOLDER_POSITIVE_INTEGER_REQUIRED_NOT_ACTIVE",
+    "artifact_bytes": "PLACEHOLDER_POSITIVE_INTEGER_REQUIRED_NOT_ACTIVE",
+    "processor_config_sha256": "PLACEHOLDER_64_HEX_REQUIRED_NOT_ACTIVE",
+    "tokenizer_config_sha256": "PLACEHOLDER_64_HEX_REQUIRED_NOT_ACTIVE",
+    "chat_template_sha256": "PLACEHOLDER_64_HEX_REQUIRED_NOT_ACTIVE",
+    "generation_config_sha256": "PLACEHOLDER_64_HEX_REQUIRED_NOT_ACTIVE",
+    "runtime_lock_sha256": "PLACEHOLDER_64_HEX_REQUIRED_NOT_ACTIVE",
+    "adapter_sha256": "PLACEHOLDER_64_HEX_REQUIRED_NOT_ACTIVE",
+    "public_canary_receipt_sha256": "PLACEHOLDER_64_HEX_REQUIRED_NOT_ACTIVE",
+    "placeholder_values_are_activation_evidence": false,
+    "activation_guard": "A separate immutable activation receipt must replace every placeholder with exact verified values and bind this amendment's SHA-256. Any placeholder, metadata/license contradiction, gated click-through, missing hash, or unpinned transitive runtime keeps the instrument NOT_ACTIVE."
+  },
+  "joint_input_contract": {
+    "unit": "one frozen candidate window",
+    "multimodal_content_order": [
+      "audio_clip",
+      "frame_minus_5_seconds",
+      "frame_minus_2_5_seconds",
+      "frame_center",
+      "frame_plus_2_5_seconds",
+      "frame_plus_5_seconds",
+      "exact_user_prompt"
+    ],
+    "audio": {
+      "source_interval": "the exact frozen half-open candidate interval [window_start,window_end)",
+      "decode": "Pinned ffmpeg decodes from the inherited read-only media descriptor to mono 16000-Hz signed 16-bit little-endian PCM WAV; sample indices are round(start*16000) through round(end*16000)-1, clamped only to the decoded stream bounds.",
+      "normalization": "none",
+      "padding": "none",
+      "resampling_or_channel_fallback": "forbidden beyond the declared mono 16000-Hz ffmpeg conversion",
+      "temporary_location": "owner-private quarantine scratch only, deleted after the window"
+    },
+    "frames": {
+      "offsets_seconds": [-5.0, -2.5, 0.0, 2.5, 5.0],
+      "origin": "candidate-window center (window_start + window_end) / 2",
+      "target_rule": "max(0.0, center+offset), formatted to exactly three decimal places",
+      "decode": "Reuse the pinned Qwen3-VL ffmpeg extractor exactly: seek with -ss before the inherited media descriptor, decode one frame, and apply scale='min(448,iw)':-2.",
+      "file_format": "PNG",
+      "processor_order": "strictly ascending offset order",
+      "temporary_location": "owner-private quarantine scratch only, each frame deleted after the window"
+    },
+    "transcript_text_supplied_to_gemma": false,
+    "translation_supplied_to_gemma": false,
+    "identifiers_or_filenames_supplied_to_gemma": false,
+    "confidence_supplied_to_gemma": false
+  },
+  "exact_prompt_contract": {
+    "system_prompt_utf8": "You are a fixed local measurement instrument. Use only the supplied audio clip and five ordered frames. Return only the exact JSON object requested. Do not add prose or markdown.",
+    "user_prompt_utf8": "The audio is the complete frozen candidate window. The five frames are ordered at offsets -5,-2.5,0,+2.5,+5 seconds from the window center. Classify only what is supported jointly by the spoken audio and visible frames. Count de-duplicated visible noun/object or verb/action candidates related to the speech, not all visible entities. Return exactly one JSON object with exactly these five keys and one allowed string value per key: candidate_count_bin=[zero,one,two,three_or_more,abstain]; visibility_bin=[none,partial,clear,abstain]; referential_status=[visible_candidate,null_or_irrelevant,ambiguous,undecidable]; lexical_support=[noun_object,verb_action,both,neither,undecidable]; lag_event_unit_bin=[lead_two_plus,lead_one,overlap,lag_one,lag_two_plus,undecidable]. Use abstain or undecidable whenever the audio, language, visibility, reference, or temporal relation is insufficient. Do not output confidence, candidate text, transcript text, translation, explanation, prose, or markdown.",
+    "prompt_construction": "The pinned processor's exact chat template receives one system message and one user message whose content array follows multimodal_content_order. No dynamic text, transcript, item value, filename, identifier, timestamp, prior prediction, or confidence is interpolated.",
+    "thinking_mode": false,
+    "semantic_prompt_variants": 0,
+    "prompt_tuning_after_any_restricted_output": false
+  },
+  "exact_output_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "candidate_count_bin": {
+        "type": "string",
+        "enum": ["zero", "one", "two", "three_or_more", "abstain"]
+      },
+      "visibility_bin": {
+        "type": "string",
+        "enum": ["none", "partial", "clear", "abstain"]
+      },
+      "referential_status": {
+        "type": "string",
+        "enum": ["visible_candidate", "null_or_irrelevant", "ambiguous", "undecidable"]
+      },
+      "lexical_support": {
+        "type": "string",
+        "enum": ["noun_object", "verb_action", "both", "neither", "undecidable"]
+      },
+      "lag_event_unit_bin": {
+        "type": "string",
+        "enum": ["lead_two_plus", "lead_one", "overlap", "lag_one", "lag_two_plus", "undecidable"]
+      }
+    },
+    "required": [
+      "candidate_count_bin",
+      "visibility_bin",
+      "referential_status",
+      "lexical_support",
+      "lag_event_unit_bin"
+    ],
+    "additionalProperties": false
+  },
+  "generation_and_parser": {
+    "generation": {
+      "do_sample": false,
+      "temperature": 0.0,
+      "num_beams": 1,
+      "max_new_tokens": 192,
+      "enable_thinking": false,
+      "use_cache": true,
+      "batch_size": 1,
+      "maximum_concurrent_MPS_processes": 1
+    },
+    "decode": "Decode generated token IDs only, excluding prompt IDs, with the pinned tokenizer, skip_special_tokens=true, and clean_up_tokenization_spaces=false.",
+    "primary_parser": "Trim ASCII whitespace only; reject duplicate JSON keys; parse the entire remaining UTF-8 string as one JSON value; require the exact Draft 2020-12 schema, exact enum spelling, no non-finite value, no extra key, no prose, and no trailing content.",
+    "invalid_output_record": {
+      "candidate_count_bin": "abstain",
+      "visibility_bin": "abstain",
+      "referential_status": "undecidable",
+      "lexical_support": "undecidable",
+      "lag_event_unit_bin": "undecidable",
+      "schema_valid": false
+    },
+    "raw_response_location": "quarantine only and never exported",
+    "confidence_exported": false
+  },
+  "correction_policy": {
+    "maximum_corrections": 1,
+    "trigger": "A public canary or aggregate path gate identifies a transport/parser-only failure before any semantic field, Gemma-Qwen3 agreement, lexical content, visibility pattern, or apparent quality is inspected.",
+    "only_permitted_correction": "Replace the primary whole-string parser with a deterministic wrapper parser that removes ASCII whitespace and at most one exact outer fenced block of the form ```json newline JSON newline ``` or ``` newline JSON newline ```, then applies the identical duplicate-key and exact-schema validator. It may not search for a JSON substring or ignore any other text.",
+    "applies_uniformly": "the corrected parser version applies to the public canary and all 137 windows; no per-window fallback",
+    "requires_new_adapter_hash_and_activation_receipt": true,
+    "rerun_limit": "one complete Gemma path rerun only",
+    "transport_or_parser_only": true,
+    "prompt_change": false,
+    "model_or_revision_change": false,
+    "input_or_window_change": false,
+    "semantic_bin_or_definition_change": false,
+    "threshold_or_gate_change": false,
+    "semantic_tuning": false,
+    "agreement_or_confidence_directed": false
+  },
+  "public_canary_binding": {
+    "required_schema_version": "nursery-gemma4-e4b-joint-public-canary-v1",
+    "scope": "self-generated public/synthetic audio plus five self-generated frames only",
+    "must_bind": [
+      "this amendment SHA-256",
+      "exact upstream and conversion revisions",
+      "license-reconciliation receipt SHA-256",
+      "complete artifact manifest SHA-256 and bytes",
+      "processor, tokenizer, chat-template, generation-config, runtime-lock, and adapter SHA-256 values",
+      "exact prompt and schema",
+      "primary or once-corrected parser version"
+    ],
+    "required_booleans": {
+      "audio_consumed": true,
+      "five_frames_consumed_in_order": true,
+      "exact_schema_valid": true,
+      "network_denial_sentinel_passed": true,
+      "no_external_request": true,
+      "restricted_inference_authorized_by_canary": false
+    },
+    "resource_gates": {
+      "MPS_available": true,
+      "peak_MLX_memory_below_GiB": 28,
+      "minimum_live_memory_headroom_GiB": 4,
+      "minimum_free_disk_floor_GiB": 50
+    },
+    "current_status": "NOT_RUN_NOT_ACTIVE"
+  },
+  "activation_gates": {
+    "separate_activation_receipt_required": true,
+    "all_provenance_placeholders_replaced_by_exact_values": true,
+    "license_and_conversion_provenance_unambiguous": true,
+    "license_clickthrough_or_acceptance_by_agent": false,
+    "artifact_manifest_and_runtime_hashes_verified": true,
+    "public_joint_modal_canary_passes": true,
+    "network_denial_verified": true,
+    "quarantine_only_output_verified": true,
+    "qwen3_restricted_output_digest_matches_read_only_source": true,
+    "same_15_items_900_seconds_137_windows_verified": true,
+    "no_semantic_output_inspected_for_activation": true,
+    "no_restricted_inference_before_all_gates": true,
+    "current_activation_result": "NOT_ACTIVE"
+  },
+  "comparison_and_aggregation": {
+    "instrument_A": "qwen3_vl_8b_instruct_4bit retained read-only",
+    "instrument_B": "gemma4_e4b_it_4bit_joint_audio_five_frame replacement",
+    "comparison_name": "Gemma-vs-Qwen3VL",
+    "same_ordered_windows": true,
+    "same_frame_offsets": true,
+    "same_exact_common_schema": true,
+    "fields": [
+      "candidate_count_bin",
+      "visibility_bin",
+      "referential_status",
+      "lexical_support",
+      "lag_event_unit_bin"
+    ],
+    "statistics": "Raw agreement, Cohen kappa when mathematically defined, path-specific prevalence and abstention, item-cluster bootstrap intervals, intersection prevalence, union prevalence, disagreement rate, and conservative envelope.",
+    "cluster_unit": "frozen selected item",
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 730001,
+    "majority_vote": false,
+    "agreement_is_truth_or_pass_gate": false
+  },
+  "K5_and_rounding": {
+    "minimum_export_cell_items": 5,
+    "suppression_marker": "SUPPRESSED_K5",
+    "complement_protection": "If a published proportion plus any public denominator could reveal a 1-4 item cell or its complement, suppress the complete categorical field.",
+    "zero_and_one_policy": "Represent only by outward-rounded intervals after K5 eligibility; never publish exact raw counts.",
+    "rate_dimensions": "round lower bounds down and upper bounds up to the nearest 0.10",
+    "absolute_lag_event_units": "map categorical lag bins to closed event-unit bands and round outward to the nearest 0.5 event duration",
+    "candidate_multiplicity": "preserve zero/one/two/three-or-more; simulator maps them to 0/1/2/4",
+    "visibility": "preserve categorical visibility and round partial-or-clear prevalence outward to 0.10",
+    "support": "round noun-object and verb-action support prevalence outward to 0.10",
+    "clamp": "rates to [0,1] and lag magnitude to [0,2.5] event durations"
+  },
+  "unchanged_gates": {
+    "schema_validity_minimum": 0.95,
+    "primary_item_coverage_minimum": 0.8,
+    "primary_seconds_coverage_minimum": 0.8,
+    "maximum_abstention_for_a_dimension": 0.5,
+    "minimum_export_cell_items": 5,
+    "minimum_paths_per_task_family": 2,
+    "agreement_is_not_a_pass_gate": true,
+    "usable": "Both Qwen3-VL and Gemma paths meet license, provenance, canary, network, schema, coverage, abstention, digest, and confinement gates and every requested visual dimension has model-specific, intersection, union, and conservative-envelope output after K5 suppression and outward rounding.",
+    "revise": "Any activation, transport/parser, schema, coverage, abstention, digest, envelope, K5, or quarantine gate fails after the single permitted correction, or a dimension remains suppressed such that the required envelope cannot be formed.",
+    "stop": "Restricted processing cannot remain local/private, exact provenance or permission cannot be established, or no distinct two-family visual pair can emit the required dimensions."
+  },
+  "privacy_and_execution": {
+    "restricted_inference": "local-only under OS network denial after activation",
+    "media_access": "inherited read-only descriptors only",
+    "owner_private_quarantine": true,
+    "hosted_or_external_model": false,
+    "external_API": false,
+    "telemetry": false,
+    "stdout_or_stderr_content": false,
+    "raw_or_item_level_repository_output": false,
+    "aggregate_only_tool_output": true,
+    "maximum_concurrent_MPS_heavy_processes": 1,
+    "cpu_workers": [2, 4],
+    "no_learner_tokenizer_checkpoint_or_causal_arm": true
+  },
+  "terminal_state": {
+    "amendment": "FROZEN_NOT_ACTIVE_PENDING_PROVENANCE",
+    "restricted_gemma_inference_run": false,
+    "replacement_comparison_run": false,
+    "calibration_receipt_reissued": false,
+    "scientific_outcome_run": false,
+    "next_task": "Resolve Gemma upstream/conversion permission and exact provenance in a separate activation receipt, run the public joint audio-plus-five-frame canary, and only then decide whether restricted replacement inference may activate."
+  }
+}

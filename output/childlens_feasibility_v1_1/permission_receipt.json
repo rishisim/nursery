@@ -1,0 +1,57 @@
+{
+  "receipt_id": "childlens-v1.1-permission-receipt-v1.0.0",
+  "review_date": "2026-07-21",
+  "gate_id": "G1_TERMS",
+  "status": "PASS_WITH_CONTROLLING_CONSTRAINTS",
+  "evidence": [
+    {
+      "document_title": "Dataset Access Request and Agreement Form",
+      "document_date": "2026-07-15",
+      "source": "UTD_EXCHANGE_SIGNED_ATTACHMENT_AND_MATCHING_LOCAL_PDF",
+      "sha256": "332d638f1b1f27e10e3b65d9d4342a246b488fe0978cd5130ba75c04a552b066",
+      "role": "CONTROLLING_SIGNED_USE_AGREEMENT"
+    },
+    {
+      "document_title": "ChildLens access approval correspondence",
+      "document_date": "2026-07-16",
+      "source": "UTD_EXCHANGE_READ_ONLY",
+      "role": "DATASET_MANAGER_APPROVAL_AFTER_SIGNED_FORM"
+    },
+    {
+      "document_title": "Keeper ChildLens invitation completion correspondence",
+      "document_date": "2026-07-21",
+      "source": "UTD_EXCHANGE_READ_ONLY",
+      "role": "ACCESS_COMPLETION"
+    }
+  ],
+  "approved_project": {
+    "purpose": "NONCOMMERCIAL_ACADEMIC_ACTION_LANGUAGE_GROUNDING_AND_MODEL_CALIBRATION_WITH_MATCHED_CONTROLS",
+    "reporting": "NONIDENTIFYING_AGGREGATES_ONLY_WITH_REQUIRED_CITATION",
+    "start_month": "2026-07",
+    "end_month": "2027-07"
+  },
+  "action_coverage": {
+    "selective_local_copy": "PASS_SECURE_STORAGE_CONTEMPLATED",
+    "local_decode": "PASS_INTERNAL_NECESSARY_PROCESSING",
+    "restricted_transcripts_and_annotations": "PASS_WITHIN_APPROVED_PURPOSE_AND_RESTRICTED_BOUNDARY",
+    "fixed_local_measurement_instruments": "PASS_WITHIN_APPROVED_MODEL_EVALUATION_SUBJECT_TO_SEPARATE_INSTRUMENT_LICENSE",
+    "learner_and_checkpoint_treatment": "PASS_INTERNAL_NONCOMMERCIAL_RESTRICTED_NONSHARED_ONLY",
+    "retention_and_deletion": "PASS_USE_PERIOD_BOUND_FAIL_CLOSED_REVIEW_OR_DELETE_BY_2027_07_31",
+    "nonidentifying_aggregate_export": "PASS_AGGREGATE_ONLY_WITH_CITATION"
+  },
+  "prohibitions": [
+    "COMMERCIAL_USE_OR_COMMERCIAL_MODEL_TRAINING",
+    "SHARING_REDISTRIBUTION_OR_THIRD_PARTY_ACCESS",
+    "REMOTE_OR_CLOUD_PROCESSING_OF_RESTRICTED_DATA",
+    "PUBLIC_MEDIA_TRANSCRIPTS_IDENTIFIERS_TIMESTAMPS_OR_CHECKPOINTS",
+    "USE_AFTER_2027_07_WITHOUT_RENEWED_WRITTEN_PERMISSION"
+  ],
+  "task_actions": {
+    "agreement_accepted_or_modified": false,
+    "message_status_changed": false,
+    "message_moved": false,
+    "draft_created": false,
+    "message_sent": false
+  },
+  "contains_personal_or_restricted_payload": false
+}

@@ -1,0 +1,200 @@
+{
+  "schema_version": "nursery-gemma4-e4b-opaque-instrument-provenance-amendment-v1",
+  "amendment_id": "gemma4-e4b-exact-cached-artifact-prototype-only-opaque-instrument-v1",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_PROVENANCE_GATE_PASS_OPAQUE_INTERNAL_ONLY",
+  "amendment_mode": "ADDITIVE_NEW_BRANCH_NO_HISTORICAL_OVERWRITE",
+  "restricted_content_accessed_to_draft": false,
+  "new_model_downloaded": false,
+  "license_or_clickthrough_accepted": false,
+  "historical_decisions_preserved": {
+    "childlens_lexical_stop": {
+      "decision": "CHILDLENS_LEXICAL_FEASIBILITY_STOP_CURRENT_RESOURCES",
+      "path": "output/childlens_feasibility_v1_3_1/decision_record.json",
+      "sha256": "6634767ffdbf03a746019353225317d3ae3ce1f785fee8e997f9e7364208cba3",
+      "unchanged": true
+    },
+    "gemma_replacement_stop": {
+      "decision": "CALIBRATION_STOP_MODEL_TRIANGULATION",
+      "path": "output/nursery_program_convergence_v1/gemma4_replacement_terminal_decision.json",
+      "sha256": "a9f955d53768e0295d61a58e8ecf73d7e8658890ec56a4408772cd6bb10612b6",
+      "disposition_path": "docs/nursery_program_convergence_v1/gemma4_replacement_terminal_disposition.md",
+      "disposition_sha256": "831a7d96d598f45e81514fb1cec5a0c4eaf2f84d6726ae4eb86dcd161e932be6",
+      "unchanged_and_correct_under_original_gate": true
+    },
+    "original_replacement_amendment": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_replacement_instrument_amendment.json",
+      "sha256": "8e6d7a43ea9639fa451a59386b8657495558fde77fb2147a20767388d47ed24a",
+      "unchanged": true
+    },
+    "original_calibration_protocol": {
+      "path": "docs/nursery_program_convergence_v1/frozen_childlens_pseudo_calibration_protocol.json",
+      "sha256": "db5336726f4841e592cb9c73df5ab22a0887d1bd34c7cf673146f38de9e86961",
+      "unchanged": true
+    }
+  },
+  "decision": {
+    "exact_cached_artifact_provenance_gate": "PASS_WITH_OPAQUE_INTERNAL_ONLY_LIMITATIONS",
+    "complete_conversion_reconstructibility": "NOT_ESTABLISHED_AND_NOT_CLAIMED",
+    "legal_clearance": "NOT_CLAIMED_NOT_LEGAL_ADVICE",
+    "full_instrument_activation": "PENDING_UNCHANGED_NON_PROVENANCE_GATES",
+    "restricted_inference_authorized_by_this_amendment_alone": false,
+    "scientific_outcome_authorized": false
+  },
+  "exact_cached_artifact": {
+    "repository_label": "mlx-community/gemma-4-e4b-it-4bit",
+    "conversion_revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+    "file_count": 10,
+    "artifact_bytes": 5179241512,
+    "artifact_manifest_sha256": "34310498dc5b809bf4baa79a5290c9e675022d12b725993317bccbffacf1d3ae",
+    "cached_rehash_matches_historical_receipt": true,
+    "historical_resource_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_e4b_resource_receipt.json",
+      "sha256": "099af484dce9c2e00e2fd2afbc578ea98ca12679c9797c2079e19586474b49a9"
+    },
+    "files": [
+      {
+        "path": ".gitattributes",
+        "bytes": 1570,
+        "sha256": "34448b82c17d60fec9b65b1f093c115ddbaadc04beb1b0140b6bfed2e012a930"
+      },
+      {
+        "path": "README.md",
+        "bytes": 593,
+        "sha256": "8e9717df49219943b8992eeccecd8050535318d34fffbbaeaac924ed01f27155"
+      },
+      {
+        "path": "chat_template.jinja",
+        "bytes": 17336,
+        "sha256": "2f1b4d75d067bae3fe44e676721c7f077d243bc007156cb9c2f8b5836613d082"
+      },
+      {
+        "path": "config.json",
+        "bytes": 6628,
+        "sha256": "780ccb3a514a5f1ced161d383f948fc22eca9b84b752ca19494f625bd9bad7a6"
+      },
+      {
+        "path": "generation_config.json",
+        "bytes": 208,
+        "sha256": "d4226bbe3117d2d253ba4609720ba82c6c4ce4627a9a6ae05387c78983ac03de"
+      },
+      {
+        "path": "model.safetensors",
+        "bytes": 5146800534,
+        "sha256": "932b8271fc3fe65adcc78b96c10c6268bbfb13e8f67d1358727c0d6ee97e1eff"
+      },
+      {
+        "path": "model.safetensors.index.json",
+        "bytes": 240961,
+        "sha256": "f8accac59ee7efe87e0c298c854610b262c3cadd477407503147c71209ff0093"
+      },
+      {
+        "path": "processor_config.json",
+        "bytes": 1316,
+        "sha256": "de3e580aebdc98272d4c4547daffe6525fcbae18a83a0e0bcf0d7444d4ee6f37"
+      },
+      {
+        "path": "tokenizer.json",
+        "bytes": 32169626,
+        "sha256": "cc8d3a0ce36466ccc1278bf987df5f71db1719b9ca6b4118264f45cb627bfe0f"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "bytes": 2740,
+        "sha256": "080d9e1aff284e2f6043889cd05367966f7c7b80e025fbc0b06745e218158656"
+      }
+    ],
+    "configured_quantization": {
+      "mode": "affine",
+      "bits": 4,
+      "group_size": 64
+    },
+    "artifact_substitution_or_mutation_permitted": false
+  },
+  "official_source_rationale": {
+    "purpose": "Bounded research-governance rationale for internal opaque-instrument use; not a legal opinion or a claim of complete conversion lineage.",
+    "declared_source_revision": {
+      "repository": "google/gemma-4-E4B-it",
+      "revision": "fee6332c1abaafb77f6f9624236c63aa2f1d0187",
+      "public": true,
+      "ungated": true,
+      "license_metadata": "apache-2.0",
+      "weight_bytes": 15992595884,
+      "weight_sha256": "cfbd3d2f1cd71bd471c37fe2bf8546d5028d41e5736f64e1ca6c6b8893125503"
+    },
+    "current_pinned_official_revision": {
+      "repository": "google/gemma-4-E4B-it",
+      "revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+      "public": true,
+      "ungated": true,
+      "license_metadata": "apache-2.0",
+      "weight_bytes": 15992595884,
+      "weight_sha256": "cfbd3d2f1cd71bd471c37fe2bf8546d5028d41e5736f64e1ca6c6b8893125503"
+    },
+    "source_weight_byte_identity_across_revisions": true,
+    "official_license_source": "https://ai.google.dev/gemma/apache_2",
+    "inference_from_public_evidence": "The public metadata supports a bounded internal-use rationale for treating the fixed cached conversion as an opaque instrument candidate. It does not prove who converted it, the exact converter code, or byte-for-byte reproducibility from the official source.",
+    "legal_advice": false
+  },
+  "known_provenance_limitations": {
+    "conversion_card_license_metadata": "gemma",
+    "license_or_notice_file_in_conversion": false,
+    "exact_converter_version_or_commit": null,
+    "complete_transform_recipe": null,
+    "reconstructible_from_upstream": false,
+    "cryptographic_proof_of_derivation": false,
+    "permission_inferred_from_public_access": false,
+    "limitations_must_remain_visible_in_every_activation_and_report": true
+  },
+  "allowed_scope": {
+    "use": "One fixed, separately versioned local measurement instrument for the already frozen prototype-only Gemma-versus-Qwen3 pseudo-calibration branch after every unchanged activation gate passes.",
+    "execution": "Owner-controlled local host only, network denied, no telemetry, no external service, one MPS-heavy process at a time.",
+    "artifact_treatment": "Opaque immutable bytes; verify the complete manifest before every new execution session.",
+    "outputs": "Quarantine-only pseudo-label hypotheses; repository export is limited to the already frozen K=5-protected, outward-rounded nonidentifying aggregates.",
+    "evaluation_truth": "Simulator oracle only",
+    "duration": "This prototype branch only; no general or publication-grade approval."
+  },
+  "prohibited_scope": [
+    "redistribute, upload, publish, mirror, or provide the cached artifact or any of its files to another person or service",
+    "claim that the cached artifact is an official Google conversion",
+    "claim exact converter ancestry, reproducibility, or byte-for-byte reconstructibility",
+    "represent this amendment as legal advice, institutional legal approval, or resolution of the conversion card's license inconsistency",
+    "use another revision, altered file, tokenizer, processor, adapter, quantization, or replacement artifact under this amendment",
+    "allow weights, tokenizer, vocabulary, embeddings, hidden features, confidence scores, or model encodings into learner ancestry",
+    "treat pseudo-labels, model agreement, translation, or model outputs as human evidence or ground truth",
+    "change the frozen sample, windows, prompts, schema, thresholds, gates, K5 suppression, rounding, or simulator-oracle boundary",
+    "run a scientific learner, tokenizer, causal arm, or acquisition outcome"
+  ],
+  "unchanged_non_provenance_activation_gates": {
+    "complete_manifest_match": true,
+    "runtime_and_adapter_hashes_frozen": true,
+    "exact_common_schema_public_joint_audio_five_frame_canary": "PENDING",
+    "public_canary_network_denial": true,
+    "quarantine_confinement": true,
+    "qwen3_read_only_digest_match": true,
+    "same_15_items_900_seconds_137_windows": true,
+    "schema_validity_minimum": 0.95,
+    "primary_item_coverage_minimum": 0.8,
+    "primary_seconds_coverage_minimum": 0.8,
+    "maximum_abstention_for_a_dimension": 0.5,
+    "minimum_export_cell_items": 5,
+    "minimum_paths_per_task_family": 2,
+    "agreement_is_not_a_pass_gate": true,
+    "no_restricted_inference_before_separate_full_activation_receipt": true
+  },
+  "failure_and_revocation": {
+    "fail_closed_if": [
+      "any cached file or manifest value differs",
+      "the official source license evidence is withdrawn or contradicted",
+      "institutional policy or qualified legal review requires a different treatment",
+      "network denial, quarantine confinement, runtime lock, public canary, or any scientific gate fails",
+      "use would require redistribution, a new download, a clickthrough, external processing, or a different artifact"
+    ],
+    "effect": "Return to CALIBRATION_STOP_MODEL_TRIANGULATION for this branch without changing historical evidence."
+  },
+  "next_state": {
+    "provenance_branch": "OPAQUE_INTERNAL_ONLY_PASS",
+    "instrument": "NOT_FULLY_ACTIVE",
+    "next_required_task": "Freeze runtime/adapter hashes and run the exact common-schema public joint audio-plus-five-frame canary under network denial, then issue a separate full activation receipt if every unchanged gate passes."
+  }
+}

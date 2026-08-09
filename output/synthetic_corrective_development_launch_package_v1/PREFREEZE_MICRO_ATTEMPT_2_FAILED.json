@@ -1,0 +1,16 @@
+{
+  "confirmation_outcome_count": 0,
+  "development_outcome_count": 0,
+  "failure": "macOS sandbox denied SC_SEM_NSEMS_MAX while ProcessPoolExecutor initialized",
+  "guarded_model_operations": 0,
+  "partial_input_manifest_sha256": "ae117381d4dd1256f81c5334de2b54a52523deab560af2e2d1dce8ab0ec8a3fd",
+  "partial_tree_preserved": [
+    "parallel_micro_attempt_2_persisted_inputs",
+    "parallel_micro_attempt_2_jobs_1"
+  ],
+  "repair_scope": "no scientific or learner change; attempt 3 uses fresh paths and the same process-level implementation outside the restricted sandbox",
+  "schema_version": "nursery-corrective-prefreeze-failure-v1",
+  "scientific_outcome": false,
+  "status": "FAILED_NO_OUTCOME",
+  "work_plan_sha256": "66328e0b807ca0f5f440fdf1d371c4d49cb8821b9d5a157f4d914d3844173cd9"
+}

@@ -1,0 +1,78 @@
+{
+  "schema_version": "nursery-causal-outcome-packaging-preflight-v1",
+  "created_at": "2026-07-22",
+  "status": "AGGREGATE_ONLY_PACKAGER_AND_MEMO_SYNTHESIZER_READY_NO_OUTCOME",
+  "bindings": {
+    "no_automatic_fallback_override_sha256": "cb9e7061a5725050e6a71a7b6e41f6f5e7bf30d104bc46bae233816ca99a90b7",
+    "reporting_shell_sha256": "f77d5e38294b480de3ce9a433556d72a5919a8c41cd2172cf18a3217f9ae63c5",
+    "figure_generator_sha256": "9fa41950e34ab4d6a67dc4782b7be03394f77fbf6e9015012f56efac470963e8",
+    "mandatory_caveat_sha256": "f6c5d1d2c091935d68aefb1e2b1d5a35a579105a17850acde55297e59ee47831",
+    "packaging_interface": {
+      "path": "docs/nursery_program_convergence_v1/causal_outcome_packaging_interface_v1.md",
+      "sha256": "95c8b3a9d712c1aeb045f3e912c3849e799417fb130b5c8fd0919c61d857278b"
+    },
+    "aggregate_packager": {
+      "path": "scripts/package_nursery_causal_outcome_reporting_v1.py",
+      "sha256": "869b8f61a5a9cc5bcd58619faf83400a4e700d500a7bf3d612aa66198613498e"
+    },
+    "memo_synthesizer": {
+      "path": "scripts/synthesize_nursery_causal_outcome_memo_v1.py",
+      "sha256": "14f840879355c24ad5dc498f9de2f39237f391d13531d39767a6ec1d1ae0eba9"
+    },
+    "tests": {
+      "path": "tests/test_package_nursery_causal_outcome_reporting_v1.py",
+      "sha256": "dd6f93da6d50b0ce7cae607e689a29415dbd72083a214ea773e779459a529f69"
+    }
+  },
+  "packager_contract": {
+    "reads_public_calibration_receipt": true,
+    "reads_v2_preoutcome_receipt": true,
+    "reads_authorization_seal_content": false,
+    "accepts_authorization_seal_sha256_only": true,
+    "reads_v2_aggregate_results": true,
+    "reads_v2_execution_receipt": true,
+    "reads_bundle_or_seed_rows": false,
+    "copies_calibration_ranges_or_empirical_values": false,
+    "transforms_corpus_count_to_synthetic_corpus_count": true,
+    "drops_merge_order_and_bundle_hashes": true,
+    "validates_canonical_merge_digest": true,
+    "validates_no_automatic_fallback": true,
+    "writes_exact_reporting_projection_schema": "nursery-causal-reporting-aggregate-projection-v1",
+    "hardcoded_outcome_values": false
+  },
+  "memo_contract": {
+    "reads_validated_projection_only": true,
+    "reads_hash_bound_figure_summary_and_svg": true,
+    "includes_mandatory_caveat_verbatim": true,
+    "positive_and_valid_null_language_are_mutually_exclusive": true,
+    "technical_failure_can_be_called_valid_null": false,
+    "arbitrary_input_text_interpolated": false
+  },
+  "privacy_and_execution": {
+    "repository_public_output_paths_only_in_production": true,
+    "symlink_input_rejected": true,
+    "recursive_discovery": false,
+    "network_or_external_service": false,
+    "exclusive_create_outputs": true,
+    "restricted_content_accessed": false,
+    "current_outcome_outputs_read": false,
+    "scientific_outcome_run": false,
+    "result_values_present": false,
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false
+  },
+  "tests_run": {
+    "focused_packager_memo": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q tests/test_package_nursery_causal_outcome_reporting_v1.py",
+      "passed": 10,
+      "failed": 0
+    },
+    "combined_convergence_runner_reporting": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q tests/test_validate_nursery_program_convergence_v1.py tests/test_calibration_conditioned_symbolic_grounding_v2.py tests/test_generate_nursery_causal_central_figure_v1.py tests/test_package_nursery_causal_outcome_reporting_v1.py",
+      "passed": 73,
+      "failed": 0
+    },
+    "synthetic_fixture_only": true,
+    "git_diff_check": "PASS"
+  }
+}

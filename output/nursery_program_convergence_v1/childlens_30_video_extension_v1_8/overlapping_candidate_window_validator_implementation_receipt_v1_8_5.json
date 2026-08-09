@@ -1,0 +1,16 @@
+{
+  "schema_version": "nursery-childlens-overlapping-candidate-window-validator-implementation-receipt-v1.8.5",
+  "status": "PASS",
+  "amendment": "overlapping_candidate_window_validator_amendment_v1_8_5.json",
+  "post_change_worker_sha256": "569f8cbfde6fc47cce5a5ba0ddac085f202d1efa137c96635b9a09cdf52ef755",
+  "post_change_runner_sha256": "ab79a227811f11afed8d4975619f3812130019a22da9a7c71369e968fc285b3c",
+  "test_file_sha256": "b0b8a7d786fbba812c275261a7bbc4702f2f098735272ef14cdf130bcff326f1",
+  "tests_passed": 15,
+  "candidate_window_overlap_supported": true,
+  "candidate_window_monotonic_start_required": true,
+  "speech_interval_nonoverlap_still_required": true,
+  "sample_or_scientific_protocol_changed": false,
+  "restricted_payload_exported": false,
+  "restricted_gemma_inference_opened": false,
+  "scientific_endpoint_opened": false
+}

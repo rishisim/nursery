@@ -1,0 +1,181 @@
+{
+  "schema_version": "nursery-gemma4-public-canary-preflight-delegation-recursion-amendment-v1.5",
+  "amendment_id": "gemma4-e4b-public-canary-immutable-seal-projection-v1.5",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_PRE_CANARY_PREFLIGHT_DELEGATION_ONLY",
+  "namespace": "docs/nursery_program_convergence_v1/gemma4_preflight_delegation_v1_5",
+  "amendment_mode": "ADDITIVE_CONTENT_INDEPENDENT_IMMUTABLE_SEAL_PROJECTION_OVERLAY",
+  "historical_artifacts_modified": false,
+  "public_canary_run": false,
+  "fixture_created": false,
+  "model_loaded_by_failed_v1_4_attempt": false,
+  "model_generation_called": false,
+  "restricted_content_accessed": false,
+  "restricted_inference_run": false,
+  "scientific_endpoint_opened": false,
+  "scientific_outcome_run": false,
+  "diagnosed_failures": {
+    "observed_v1_4_receipt": {
+      "receipt_failure_code": "E_SANDBOXED_CANARY",
+      "root_cause": "The v1.4 sandboxed executor temporarily assigned its own public preflight to v13._public_preflight while its helper dynamically called v13._public_preflight, creating preflight recursion before fixture creation or model generation."
+    },
+    "public_synthetic_followup": {
+      "failure_symbol": "E_TEMPLATE_BINDING",
+      "root_cause": "Capturing only the original v1.3 preflight avoids recursion but remains insufficient: nested v1.3 execution mutates the historical worker binding before v1.2 revalidates the full v1.4 preflight, so amendment preflight logic is rerun against deliberately overlaid historical globals.",
+      "scientific_or_restricted_content_involved": false
+    },
+    "model_generation_called": false,
+    "raw_model_output_existed": false,
+    "outer_fence_parser_correction_applicable": false,
+    "outer_fence_parser_corrections_spent": 0
+  },
+  "immutable_bindings": {
+    "v1_4_subprocess_environment_amendment": {
+      "path": "docs/nursery_program_convergence_v1/gemma4_subprocess_environment_v1_4/frozen_subprocess_environment_correction_amendment_v1_4.json",
+      "sha256": "ac05205256bc1e949c0a70a9dc865cebc2ea50beb73770319e816cec0910ceb1"
+    },
+    "v1_4_public_canary_runner": {
+      "path": "scripts/run_gemma4_prototype_common_schema_canary_v1_4.py",
+      "sha256": "76d040b88cf1f3eb205524bc82839c1851d2ab293b1f7bb633358fe55763204c"
+    },
+    "v1_4_calibration_coordinator": {
+      "path": "scripts/nursery_gemma_substitution_calibration_v1_4.py",
+      "sha256": "7c62c302205c505d9aa01c6b5e9894cdc1b9ac3d9be335b6066362773b0448a2"
+    },
+    "v1_4_public_canary_failure_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_subprocess_environment_v1_4/public_common_schema_canary_failure_v1_4.json",
+      "sha256": "db0b1b9431d1e1eaa602d5e09f6ce7505b6bdc13adcfd492341ee7bd3fae1f2a"
+    },
+    "v1_3_public_canary_runner": {
+      "path": "scripts/run_gemma4_prototype_common_schema_canary_v1_3.py",
+      "sha256": "dcbdf8714f12a114806ef4c903ee1a7f95b65647f58273b47fd184fb1143cf44"
+    },
+    "v1_3_worker": {
+      "path": "scripts/nursery_gemma4_referential_worker_v1_3.py",
+      "sha256": "c78fa8e9c0f995ed611f7fd8f7d2076f03a73d370574d3c92cf5e107f236c38f"
+    },
+    "template_placeholder_order_amendment": {
+      "path": "docs/nursery_program_convergence_v1/gemma4_template_placeholder_order_v1_3/frozen_template_placeholder_order_amendment_v1_3.json",
+      "sha256": "2d117cf0f1619d43d6e71a90aa853241f0a5a7c331e84fc04af8231c5d6081fb"
+    },
+    "CAF_transport_amendment": {
+      "path": "docs/nursery_program_convergence_v1/gemma4_caf_canary_transport_v1/frozen_caf_transport_amendment_v1.json",
+      "sha256": "3ecf4bf6c62920d73177d029c18918f38366d34f7d7997642037696def37bbd0"
+    },
+    "no_automatic_fallback_override": {
+      "path": "docs/nursery_program_convergence_v1/frozen_no_automatic_fallback_override_v1.json",
+      "sha256": "cb9e7061a5725050e6a71a7b6e41f6f5e7bf30d104bc46bae233816ca99a90b7"
+    }
+  },
+  "insufficient_correction_explicitly_forbidden": {
+    "capture_original_v1_3_preflight_then_rerun_it_under_mutated_historical_globals": true,
+    "dynamic_self_call_through_v13_public_preflight": true,
+    "rerun_any_v1_5_v1_4_v1_3_or_v1_2_amendment_preflight_during_nested_seal_equality_checks": true,
+    "derive_or_modify_the_seal_after_historical_worker_fixture_or_preflight_bindings_are_overlaid": true
+  },
+  "exact_preflight_delegation_delta": {
+    "maximum_scientific_or_content_changes": 0,
+    "allowed_function_scope": "The v1.5 public canary runner sandboxed_execute preflight validation and temporary nested preflight delegation only.",
+    "precompute_stage": "Inside the sandboxed child, before any assignment to a historical v1.3 or v1.2 module global and before fixture creation, model load, or generation.",
+    "precompute_count_per_sandboxed_execution": 1,
+    "immutable_representation": "Canonical compact sorted-key UTF-8 JSON bytes of the fully validated v1.5 public seal, retained in a local lexical closure together with its SHA-256 and exact parser_mode string.",
+    "required_precompute_and_validation": [
+      "Require the supplied seal to be a mapping and parser_mode to be an exact string accepted by the unchanged parser-correction state machine.",
+      "Run the full v1.5 public preflight exactly once while all bound historical module globals still have their original values.",
+      "Canonicalize that expected seal to compact sorted-key UTF-8 JSON bytes and compute its SHA-256.",
+      "Canonicalize the supplied seal and fail closed with E_SEAL unless its bytes are identical to the precomputed expected bytes.",
+      "Do not call any amendment preflight again during the nested v1.3 or v1.2 seal checks."
+    ],
+    "pure_projection_callable_contract": {
+      "state_source": "Only the local immutable canonical seal bytes, their SHA-256, and the exact parser_mode captured before historical state mutation.",
+      "module_global_reads": false,
+      "filesystem_reads": false,
+      "environment_reads": false,
+      "network_access": false,
+      "content_or_model_reads": false,
+      "accepted_argument_count": 1,
+      "accepted_argument": "parser_mode",
+      "parser_mode_comparison": "EXACT_TYPE_AND_UTF8_BYTE_EQUALITY",
+      "parser_mismatch_failure_symbol": "E_PARSER_MODE",
+      "return_value": "A fresh JSON decoding of the immutable precomputed canonical seal bytes.",
+      "return_canonical_bytes_must_equal_precomputed_bytes": true,
+      "return_SHA256_must_equal_precomputed_SHA256": true,
+      "other_return_or_fallback_allowed": false
+    },
+    "temporary_substitution_and_restoration": [
+      "Save the exact existing v13._public_preflight callable before substitution.",
+      "Temporarily assign only the pure projection callable to v13._public_preflight immediately before invoking the unchanged nested v1.3 sandboxed executor.",
+      "Allow the already-bound v1.3 executor to propagate that same projection to v12._public_preflight only for its nested seal equality check.",
+      "Require the v1.3 executor to restore v12._public_preflight in its existing finally block.",
+      "Restore the exact saved v13._public_preflight callable in a v1.5 finally block for every success or exception path.",
+      "After restoration, fail closed unless both historical preflight callable identities equal their respective saved identities."
+    ],
+    "direct_v1_5_mutated_module_targets": [
+      "v13._public_preflight"
+    ],
+    "v12_projection_propagation_is_only_via_bound_v1_3_executor": true,
+    "historical_preflight_source_changed": false,
+    "historical_worker_or_fixture_binding_policy_changed": false,
+    "subprocess_environment_contract_changed": false,
+    "subprocess_argv_cwd_stdio_or_passed_FDs_changed": false,
+    "network_or_firewall_policy_changed": false,
+    "semantic_fields_changed": false,
+    "model_runtime_or_artifact_fields_changed": false,
+    "parser_allowance_changed": false,
+    "does_not_spend_outer_fence_parser_correction": true
+  },
+  "preserved_public_canary_contract": {
+    "v1_4_exact_14_key_scrubbed_environment_and_four_byte_assertions_unchanged": true,
+    "CAF_transport_and_final_WAV_contract_unchanged": true,
+    "template_placeholder_relocation_unchanged": true,
+    "declarative_messages_and_exact_prompt_text_unchanged": true,
+    "five_frame_generator_and_offsets_unchanged": true,
+    "model_repository_revision_manifest_weights_and_runtime_pins_unchanged": true,
+    "schema_parser_and_semantic_label_space_unchanged": true,
+    "outer_fence_parser_correction_maximum": 1,
+    "outer_fence_parser_corrections_spent_before_amendment": 0,
+    "parser_mode": "PRIMARY"
+  },
+  "preserved_sample_export_and_scientific_contract": {
+    "sample_15_items_900_seconds_137_candidate_windows_unchanged": true,
+    "K5_complement_protection_and_outward_rounding_unchanged": true,
+    "coverage_abstention_path_and_schema_gates_unchanged": true,
+    "Qwen3_read_only_digest_contract_unchanged": true,
+    "agreement_is_not_a_pass_gate": true,
+    "simulator_oracle_remains_only_evaluation_truth": true,
+    "calibration_range_or_scientific_protocol_changed": false,
+    "causal_thresholds_changed": false,
+    "automatic_fallback_allowed": false
+  },
+  "overlay_application_rule": {
+    "reject_if_any_bound_digest_differs": true,
+    "reject_if_the_full_seal_is_computed_more_than_once_inside_sandboxed_execute": true,
+    "reject_if_any_nested_historical_preflight_is_dynamically_recomputed": true,
+    "reject_if_projection_parser_mode_is_not_exact": true,
+    "reject_if_projection_output_differs_from_precomputed_canonical_seal": true,
+    "reject_if_v13_or_v12_preflight_callable_is_not_restored_on_every_path": true,
+    "reject_if_any_unlisted_runtime_content_or_contract_field_changes": true,
+    "reuse_prior_v1_4_failure_or_success_receipt_as_v1_5_receipt": false
+  },
+  "new_immutable_output_namespace": {
+    "path": "output/nursery_program_convergence_v1/gemma4_preflight_delegation_v1_5",
+    "must_not_exist_before_execution": true,
+    "owner_private_during_public_execution": true,
+    "future_public_canary_receipt": "public_common_schema_canary_receipt_v1_5.json",
+    "future_public_canary_failure": "public_common_schema_canary_failure_v1_5.json",
+    "future_runtime_lock_receipt": "runtime_lock_receipt_v1_5.json",
+    "future_activation_receipt": "full_activation_receipt_v1_5.json",
+    "historical_output_paths_overwritten": false
+  },
+  "authorization_boundary": {
+    "amendment_is_canary_execution": false,
+    "amendment_is_activation_receipt": false,
+    "public_canary_authorized_by_amendment_alone": false,
+    "child_process_launch_authorized_by_amendment_alone": false,
+    "restricted_inference_authorized": false,
+    "scientific_endpoint_authorized": false,
+    "scientific_outcome_authorized": false,
+    "model_agreement_or_pseudo_labels_are_ground_truth": false,
+    "next_action": "A separately validated public-only v1.5 runner may implement this exact immutable-seal projection and rerun the unchanged public canary in the new namespace. Full activation, restricted calibration, and any scientific outcome remain gated by fresh immutable receipts."
+  }
+}

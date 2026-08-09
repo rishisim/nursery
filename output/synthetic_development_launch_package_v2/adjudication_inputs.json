@@ -1,0 +1,46 @@
+{
+  "contradictions": [
+    {
+      "path": "complete_file_manifest.json",
+      "problem": "post-write exact reconciliation failed"
+    }
+  ],
+  "gates": {
+    "complete_manifest": false,
+    "confirmation_command_absent": true,
+    "confirmation_outcome_count_zero": true,
+    "cue_free_endpoints_frozen": true,
+    "development_outcome_count_zero": true,
+    "development_registry_has_40_corpora": true,
+    "exact_runner_independent_reproduction": true,
+    "excluded_rehearsal_pass": true,
+    "fixture_rehearsal_pass": true,
+    "freeze_integrity": true,
+    "identifier_registry_reconciliation": true,
+    "inference_contract_frozen": true,
+    "negative_source_and_input_mutations": true,
+    "official_tests": false,
+    "one_shot_command_frozen": true,
+    "one_shot_output_absent": true,
+    "prior_v1_v8_preservation": true,
+    "side_modality_firewall": true,
+    "terminal_regeneration": false,
+    "three_stochastic_model_replicates": true,
+    "traceability": true,
+    "v8_adversarial_audit_pass": true,
+    "v8_version_ready": true
+  },
+  "official_artifact_digests": {
+    "excluded_rehearsal": "e4ad0fc5f63a184802920915c15007112e9cace99f7bd971846b63503584d0a7",
+    "fixture_rehearsal": "92bd4be34d7da5391c4885f54ede377772564ca38a3f854615a7330d43af7afd",
+    "freeze_receipt": "59aaf45fe53d81ce79891158c6bc919776640c63bcf5b114ff54ef58750655f0",
+    "negative_recompute": "daaf7256a1e98d280c3ae420c895401b8567722b9838bc5060582298752c02e2",
+    "preservation": "d2ccba778d6cfd70566bad922677ea5536202f00db766691f8e0627fce561110",
+    "recompute": "fcd3525de554dc4e992476e7c80d96bf8f202b7559d5bf74434ddd974e8d2cd1",
+    "tests": "18feb6696d812a0c71db643f14530deff4d63de7eefb84edf05f9e78710207bb",
+    "v8_adversarial": "fefb0bfd370b65faa8a03a3e83fe08466cf8f7652d04e30ac3b136a80eec6c9b",
+    "v8_terminal": "ae836a172509f6853f8f131b82a6e222f4d72dae034b0770b8c5d066dee23363"
+  },
+  "protocol_id": "synthetic-development-launch-v2",
+  "stale_inputs": []
+}

@@ -1,0 +1,109 @@
+{
+  "schema_version": "nursery-grounded-videollm-mac-runtime-v5.0.0",
+  "protocol_id": "childlens-independent-second-instrument-mac-runtime-v5",
+  "frozen_at": "2026-07-23",
+  "status": "FROZEN_BEFORE_V5_MODEL_LOAD_OR_OUTPUT",
+  "authorization": "The user explicitly authorized a new prospective attempt after disclosure of the v4 post-generation receipt defect.",
+  "relationship_to_prior_attempts": {
+    "v1": "Immutable PyTorch-2.1.2 Conv3D runtime failure before output.",
+    "v2": "Immutable PyTorch-2.13 mixed-dtype projector failure before output.",
+    "v3": "Immutable full-fp16 MPS matrix-multiplication failure before output.",
+    "v4": "Immutable successful end-to-end public smoke generation whose schema result was lost to a post-generation receipt typo.",
+    "v5": "New prospective attempt using the proven v4 device split with only the receipt boolean corrected and pre-output static/unit validation added."
+  },
+  "scientific_boundary": {
+    "separate_from_failed_v1_8_calibration": true,
+    "v1_8_terminal_decision_overwritten": false,
+    "third_model_added_to_v1_8_calibration": false,
+    "new_acquisition": false,
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false
+  },
+  "instrument": {
+    "repository": "WHB139426/Grounded-Video-LLM",
+    "hugging_face_revision": "b97f0e826a0b6c292ca54d9c02c483c479952501",
+    "official_source_revision": "e26da4e4b681357fd911d5ace3467f031af29208",
+    "checkpoint_sha256": "5967e1138fc1106e1c3b384b96af3120405f455475308b4067bb785ac560f588",
+    "weight_manifest_digest": "a2ab012a3a39c1a63ace406ff6ec0b9cdeb5482c1fc87e4a43326ee89daf2d47",
+    "checkpoint_variant_status": "UNDOCUMENTED_GENERAL_VS_BENCHMARK_SUBSET_TUNED",
+    "benchmark_cleanliness_claim_permitted": false,
+    "weights_changed": false,
+    "architecture_changed": false
+  },
+  "runtime": {
+    "python": "3.10.20",
+    "torch": "2.13.0",
+    "torchvision": "0.28.0",
+    "attention": "eager",
+    "network": "denied",
+    "module_placement": {
+      "vision_tower": "MPS float32",
+      "video_encoder": "CPU float32",
+      "multi_modal_projector": "MPS float32",
+      "video_projecter": "MPS float32",
+      "language_model": "MPS float16"
+    },
+    "source_tree_digest": "48cd6f7330df160f17f2590c98d548c20f5b0c3699748a64e07fc95e91a76ec8",
+    "environment_package_digest": "1f46288a772ad88ec290a53bd57f90ff425e446bc6ee1f3cbdaa7af15e0a39ac"
+  },
+  "v5_change_control": {
+    "single_runtime_change_from_v4": "Replace the invalid Python name true with the built-in boolean True in the private smoke receipt.",
+    "smoke_runner_sha256": "9bf1ca5fee73c8631022b6269c64fd963ee68377f9b41c9edf6a4dcb9cf1df2d",
+    "canary_runner_sha256": "52d156ac9d0a68b04d36c7e17c136865f3ac16273975550c0d3b7268ab225eec",
+    "pre_output_validation": [
+      "Python bytecode compilation passed for both v5 runners.",
+      "AST lint found no JSON-style true, false, or null names.",
+      "Canary parser, canonicalizer, and all eight five-frame fixture constructors passed unit tests."
+    ],
+    "prompt_changed": false,
+    "parser_changed": false,
+    "canary_cases_changed": false,
+    "generation_parameters_changed": false,
+    "decision_thresholds_changed": false
+  },
+  "unscored_smoke": {
+    "attempts": 1,
+    "fixture": "The unchanged self-generated five-frame blue-circle scene, outside the scored canary.",
+    "semantic_correctness_scored": false,
+    "response_text_retained": false,
+    "pass": "One generation completes, the private receipt is written, and its canonical response matches the unchanged schema.",
+    "failure": "Stop v5 before the scored canary."
+  },
+  "public_canary": {
+    "condition": "Only after the v5 smoke passes.",
+    "specification": "Reuse the existing eight-case German public canary without changing cases, prompt, schema, parser, seed, thresholds, or generation parameters.",
+    "specification_sha256": "b199063399ecae820c379ca8876f9a62db1895cf22c04f7b3478118495394da3",
+    "attempts": 1,
+    "pass": "At least 7/8 exact-schema outputs and at least 6/8 oracle referential-plus-lag decisions correct.",
+    "failure": "Stop before restricted packet discovery; no prompt repair, retry, translation, or model substitution."
+  },
+  "restricted_stage": {
+    "condition": "Only after the v5 public canary passes and the exact restricted runner is hash-pinned.",
+    "sample": "Exactly the same 27 frozen qwen_accuracy_audit_v1 windows in the same order; no reselection.",
+    "inputs": "The same five ordered frames and existing local ASR hypothesis used in the Qwen audit.",
+    "attempts_per_window": 1,
+    "temperature": 0,
+    "network": "denied",
+    "qwen_predictions_visible_to_model": false,
+    "qwen_predictions_visible_to_reviewer": false,
+    "semantic_prompt_tuning": false,
+    "new_acquisition": false,
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false
+  },
+  "review_and_decision": {
+    "qualified_german_reviewer_required_for_accuracy_or_substantially_better_claim": true,
+    "if_unavailable": "Report schema/runtime feasibility, abstention, and explicitly provisional non-gold descriptive comparisons only; do not claim lexical accuracy.",
+    "promising_second_instrument": "At least 19/27 complete answers defensible, Wilson 95% lower bound at least 0.50, schema validity at least 0.90, and abstention at most 0.50.",
+    "qwen_comparison": "Paired descriptive counts only; no agreement-as-truth or majority-vote claim.",
+    "otherwise": "Do not reopen the larger ChildLens calibration study."
+  },
+  "privacy": {
+    "restricted_payload_location": "owner-private quarantine only",
+    "raw_frames_audio_transcripts_timestamps_identifiers_paths_or_per_window_predictions_exported": false,
+    "public_repository_output": "K=5-safe aggregates and hashes only",
+    "minimum_cell_k": 5,
+    "complementary_suppression": true
+  },
+  "restricted_data_access_authorized": false
+}

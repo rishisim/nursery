@@ -1,0 +1,19 @@
+{
+  "author_pass_globally_locked": false,
+  "disposition_hmac_sha256": "181af07967dc944cf21160d3a15fe3bd93f441009822a233ad808f0b469f986f",
+  "model_human_comparison_executed": false,
+  "model_model_agreement_allowed_as_human_validation": false,
+  "partial_labels_allowed_to_contribute_to_any_gate": false,
+  "partial_record_counts_exported": false,
+  "partial_records_preserved_in_quarantine": false,
+  "prediction_join_enabled": false,
+  "predictions_remained_blinded": true,
+  "reason_codes": [
+    "LANGUAGE_NOT_QUALIFIED",
+    "UI_WINDOW_SCOPE_AMBIGUOUS"
+  ],
+  "restricted_payload_exported": false,
+  "schema_version": "childlens-author-attempt-disposition-v1.3.1",
+  "status": "INVALID_FOR_SCIENTIFIC_COMPARISON",
+  "translation_as_gold_allowed": false
+}

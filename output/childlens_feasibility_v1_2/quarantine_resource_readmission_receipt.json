@@ -1,0 +1,72 @@
+{
+  "admission_scope": {
+    "host_capacity_state": "TIME_SCOPED_PASS",
+    "media_transfer_authorized_by_this_receipt": false,
+    "quarantine_control_state": "ADMITTED",
+    "remaining_external_gates": [
+      "FROZEN_SELECTION_AND_RELEASE_RECEIPT_MATCH",
+      "NATIVE_TRANSFER_OR_PREDECLARED_CONSERVATIVE_BOUND_CONTROLLER_PASS",
+      "OBJECT_LEVEL_CUMULATIVE_BYTE_COUNTER_ACTIVE"
+    ]
+  },
+  "candidate_count": 1,
+  "capacity_controls": {
+    "full_archive_permitted": false,
+    "minimum_free_after_peak_bytes": 53687091200,
+    "namespace_peak_cap_bytes": 78383153152,
+    "raw_cap_bytes": 21474836480,
+    "raw_cap_enforcement": "HARD_CUMULATIVE_BYTE_COUNTER_ABORT_BEFORE_CAP",
+    "simultaneous_full_object_downloads": 1
+  },
+  "control_sentinel_mode_repaired": false,
+  "observed_date": "2026-07-21",
+  "privacy": {
+    "descendant_names_serialized": false,
+    "external_service_used": false,
+    "identifiers_or_exact_media_times_serialized": false,
+    "restricted_file_content_opened": false,
+    "restricted_path_serialized": false
+  },
+  "quarantine": {
+    "acl_check_failure_count": 0,
+    "acl_entry_path_count": 0,
+    "allocated_bytes_at_observation": 20451328,
+    "apparent_bytes_at_observation": 20051460,
+    "cloud_sync_path_detected": false,
+    "directory_count": 10,
+    "directory_mode_violation_count": 0,
+    "exists": true,
+    "file_count": 201,
+    "file_mode_violation_count": 0,
+    "filevault_on": true,
+    "git_tracking_possible": false,
+    "outside_repository": true,
+    "owner_mismatch_count": 0,
+    "root_mode": "0700",
+    "same_device_as_repository": true,
+    "same_encrypted_local_volume": true,
+    "spotlight_no_index_sentinel_present": true,
+    "symlink_count": 0,
+    "time_machine_excluded": true
+  },
+  "quarantine_controls_pass": true,
+  "repaired_directory_mode_count": 0,
+  "repaired_file_mode_count": 1,
+  "resource_snapshot": {
+    "current_namespace_allocated_bytes": 20451328,
+    "free_floor_headroom_bytes": 77549334528,
+    "fresh_recheck_required_before_every_object": true,
+    "full_raw_cap_fits_current_controls": true,
+    "maximum_additional_bytes_now": 77549334528,
+    "namespace_headroom_bytes": 78362701824,
+    "shared_volume_free_bytes": 131236425728
+  },
+  "resource_snapshot_pass": true,
+  "restricted_names_or_payload_opened": false,
+  "restricted_root_exported": false,
+  "retention_days_remaining_at_observation": 375,
+  "retention_deadline": "2027-07-31",
+  "schema_version": "childlens-quarantine-resource-readmission-v1.2.0",
+  "status": "PASS_QUARANTINE_AND_RESOURCE_SNAPSHOT",
+  "time_scoped": true
+}

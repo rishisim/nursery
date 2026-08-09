@@ -1,0 +1,18 @@
+{
+  "after_v2_sha256_manifest_sha256": "71e03308400540b755f04265fc047bb97516ff780707031e1617239af183670c",
+  "all_preexisting_bytes_unchanged": true,
+  "baseline_and_after_sha256_manifests_byte_identical": true,
+  "baseline_file_count": 100728,
+  "baseline_sha256_manifest_sha256": "71e03308400540b755f04265fc047bb97516ff780707031e1617239af183670c",
+  "baseline_stat_manifest_sha256": "cac2fb22adfdf209d52d38e90d4de69c0af859b91ad542f60571a69954004253",
+  "baseline_symlink_count": 10,
+  "baseline_symlink_manifest_sha256": "b37c566c99e5327700cd0473104f3a9a0dd0a81991bfd624720af7c25c4b5eb3",
+  "changed_paths": [],
+  "changed_symlinks": [],
+  "missing_paths": [],
+  "new_audit_files_are_not_part_of_the_preedit_baseline": true,
+  "status": "PASS",
+  "validator_note": "The retained v1 proof parsed octal mode text as decimal. It found zero hash/size changes but falsely flagged modes. This v2 pass uses base-8 parsing and rehashes every file.",
+  "verified_file_count": 100728,
+  "verified_symlink_count": 10
+}

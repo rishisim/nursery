@@ -1,0 +1,11 @@
+{
+  "added_paths": [],
+  "after_file_count": 725,
+  "after_manifest_sha256": "020c982a3a7bb0d37fcdcb8ff61abdf1937f5b97de1a13fcb4bcec57f957e5fe",
+  "baseline_file_count": 725,
+  "before_manifest_sha256": "020c982a3a7bb0d37fcdcb8ff61abdf1937f5b97de1a13fcb4bcec57f957e5fe",
+  "byte_for_byte_preserved": true,
+  "changed_paths": [],
+  "missing_paths": [],
+  "status": "PASS"
+}

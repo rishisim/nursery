@@ -1,0 +1,234 @@
+{
+  "schema_version": "nursery-childlens-pseudo-calibration-v1",
+  "protocol_id": "childlens-bounded-model-triangulation-for-synthetic-calibration",
+  "frozen_at": "2026-07-22",
+  "status": "PREDECLARED_SCHEMA_ONLY_ENGINEERING_RETRY_ACTIVATED_AFTER_SCHEMA_GATE_FAILURE",
+  "pre_amendment_file_sha256": "fe05708f9b0933406db933561e295eadd4f4debc0931cc7da3e7195af0248ff0",
+  "revision_history": [
+    {
+      "predecessor_sha256": "a39841818f7b4393e9dcc0f92ae282b7488780f70615a59a38c5bfdaf6fb9c2b",
+      "reason": "Resolved ancestry mode, reserve use, instrument provenance, window crosswalk, matching, normalization, and grid rounding before any agreement aggregate was inspected."
+    },
+    {
+      "predecessor_sha256": "5422d17e6367ac6134a9e67adef7a730985063ae4e7578210af137cb49d6264f",
+      "reason": "Activated the predeclared Qwen3-VL fallback before restricted challenger inference because the exact Gemma conversion failed its license-provenance gate; no agreement, confidence, lexical content, or apparent semantic quality was inspected."
+    },
+    {
+      "predecessor_sha256": "fe05708f9b0933406db933561e295eadd4f4debc0931cc7da3e7195af0248ff0",
+      "reason": "Activated the single allowed schema-only engineering retry for the historical Qwen2 path after its aggregate schema-validity gate failed. The same checkpoint, frozen windows, Whisper hypotheses, schema, thresholds, and exporter are retained; no semantic label, agreement direction, lexical content, or simulator outcome was inspected or used."
+    }
+  ],
+  "amendment_reason": "Use the single predeclared bounded engineering correction solely to repair Qwen2 structured-output serialization after a schema-validity failure; scientific fields, thresholds, sample, and causal protocol remain frozen.",
+  "engineering_retry": {
+    "trigger": "existing_qwen2_schema_validity_below_0.95",
+    "permitted_change": "Replace the historical free-form output parser with one deterministic exact-schema prompt/parser while retaining the identical Qwen2 checkpoint, frozen windows, Whisper hypotheses, five frame offsets, and network-denied local path.",
+    "forbidden_change": "No reselection, semantic prompt tuning from labels, agreement-directed repair, threshold change, confidence filtering, reserve expansion, or repeated retry.",
+    "maximum_attempts": 1,
+    "semantic_outputs_inspected_to_activate": false,
+    "agreement_direction_inspected_to_activate": false
+  },
+  "purpose": "Estimate broad, uncertainty-preserving weak-alignment ranges for a directional synthetic prototype from the already authorized frozen ChildLens pilot.",
+  "claim_boundary": {
+    "permitted": "Multiple fixed local instruments provide provisional broad ranges for synthetic stress testing; simulator-oracle labels remain the only causal evaluation truth.",
+    "forbidden": [
+      "ChildLens transcript or referential correctness",
+      "human validation or inter-human reliability",
+      "ChildLens lexical feasibility PASS",
+      "model agreement as ground truth",
+      "German translation as source-language truth",
+      "ChildLens evidence of an acquisition improvement",
+      "infant or BabyView generalization"
+    ]
+  },
+  "corpus_boundary": {
+    "sole_empirical_anchor": "ChildLens frozen bounded pilot",
+    "AEA_empirical_ancestry": false,
+    "BabyView_empirical_ancestry": false,
+    "pooling": false,
+    "raw_or_item_level_export": false,
+    "synthetic_evaluation_truth": "simulator oracle"
+  },
+  "sample": {
+    "primary": "existing prediction-independent frozen 15-speech-minute audit sample",
+    "selection_digest_source": "output/childlens_feasibility_v1_3/author_audit_sampling_receipt.json",
+    "content_or_model_dependent_reselection": false,
+    "primary_item_count": 15,
+    "primary_total_seconds": 900,
+    "single_allowed_expansion": "existing disjoint frozen 15-minute reserve under the pseudo-calibration-only amendment below",
+    "reserve_activation_gate": "Activate only if fewer than 12 primary items or fewer than 720 primary seconds yield decodable media and schema-valid output from both required paths for a task family. Agreement, confidence, lexical content, visibility, and apparent success may not trigger expansion.",
+    "no_other_expansion": true,
+    "reserve_amendment": "The historical v1.3 human-audit rule BORDERLINE_ONLY_AFTER_PRIMARY_AUTHOR_RECORD_LOCK remains unchanged and is not invoked. For this new pseudo-calibration protocol only, the already frozen disjoint reserve may be activated once solely by the technical dual-path coverage gate above. This creates no human evidence, does not alter either frozen sample, and cannot be triggered by agreement or apparent quality."
+  },
+  "instrument_paths": {
+    "speech_timing_and_text": [
+      {
+        "id": "whisper_cpp_large_v3_turbo",
+        "family_id": "openai_whisper",
+        "role": "existing fixed baseline",
+        "required": true,
+        "output_status": "pseudo_label_not_ground_truth"
+      },
+      {
+        "id": "qwen3_asr_1_7b_plus_forced_aligner_0_6b",
+        "family_id": "qwen3_asr",
+        "asr_revision": "7278e1e70fe206f11671096ffdd38061171dd6e5",
+        "aligner_revision": "c7cbfc2048c462b0d63a45797104fc9db3ad62b7",
+        "license": "Apache-2.0",
+        "role": "distinct German-capable challenger",
+        "required": true,
+        "output_status": "pseudo_label_not_ground_truth",
+        "activation_requirements": [
+          "authoritative Apache-2.0 license receipt",
+          "pinned revisions and file hashes",
+          "public synthetic German canary",
+          "network-denied local execution",
+          "quarantine-only output"
+        ]
+      }
+    ],
+    "referential_and_visual": [
+      {
+        "id": "qwen2_vl_2b_existing",
+        "family_id": "qwen2_vl",
+        "role": "existing fixed baseline",
+        "required": true,
+        "output_status": "pseudo_label_not_ground_truth"
+      },
+      {
+        "id": "qwen3_vl_8b_instruct_4bit",
+        "family_id": "qwen3_vl",
+        "conversion_revision": "defcdea7cc7a4b0858fea563cbbce171d328e457",
+        "license": "Apache-2.0",
+        "role": "predeclared visual fallback after the Gemma conversion failed its license-provenance gate",
+        "required": true,
+        "output_status": "pseudo_label_not_ground_truth",
+        "triangulation_limitation": "Qwen2-VL and Qwen3-VL are different architecture generations and checkpoints but share vendor lineage, so their disagreement envelope is less independent than the planned Qwen-versus-Gemma pair.",
+        "activation_requirements": [
+          "authoritative Apache-2.0 license receipt and conversion provenance",
+          "pinned revision and file hashes",
+          "public five-frame strict-schema canary",
+          "network-denied local execution",
+          "quarantine-only output"
+        ]
+      }
+    ],
+    "optional": {
+      "gemma4_e4b_it_4bit": "inactive because the exact conversion failed the license-provenance gate before download or restricted inference; reconsider only in a separately frozen protocol after unambiguous permission evidence",
+      "qwen3_6": "excluded because it adds size without a distinct required annotation role"
+    },
+    "hosted_models": "forbidden",
+    "restricted_inference_network": "denied"
+  },
+  "restricted_common_schema": {
+    "speech": [
+      "utterance_intervals",
+      "word_intervals",
+      "source_language_code_hypothesis",
+      "transcript_hypothesis",
+      "abstain"
+    ],
+    "referential_window": {
+      "candidate_count_bin": ["zero", "one", "two", "three_or_more", "abstain"],
+      "visibility_bin": ["none", "partial", "clear", "abstain"],
+      "referential_status": ["visible_candidate", "null_or_irrelevant", "ambiguous", "undecidable"],
+      "lexical_support": ["noun_object", "verb_action", "both", "neither", "undecidable"],
+      "lag_event_unit_bin": ["lead_two_plus", "lead_one", "overlap", "lag_one", "lag_two_plus", "undecidable"]
+    },
+    "payload_location": "owner-private quarantine only",
+    "prohibited_repository_fields": [
+      "transcript text",
+      "translated text",
+      "source filename or path",
+      "participant or item identifier",
+      "exact timestamp or interval",
+      "frame or audio content",
+      "item-level prediction",
+      "confidence score",
+      "small cell"
+    ]
+  },
+  "frozen_comparisons": {
+    "speech_boundary": "Maximum-cardinality bipartite one-to-one interval matching at a 500 ms onset-and-offset collar. Among maximum-cardinality matchings minimize total absolute onset-plus-offset error, then break remaining ties by canonical interval index. Report precision, recall, and F1 as model-model agreement.",
+    "transcript": "Pair matched non-abstained German-source regions. Normalize with Unicode NFKC, Unicode casefold, punctuation-to-space, and whitespace collapse while preserving German letters before casefold. Report the mean of both directional WERs and both directional CERs as disagreement only; never translate or name either path as reference.",
+    "language_id": "aggregate item-level agreement and abstention",
+    "referential_fields": "raw agreement, Cohen kappa when mathematically defined, per-model prevalence, abstention, and schema validity",
+    "no_majority_vote": true,
+    "no_translation_as_gold": true,
+    "no_model_model_as_human": true
+  },
+  "aggregate_estimates": [
+    "speech_to_event_lag bins",
+    "visible-candidate fraction",
+    "null-or-irrelevant fraction",
+    "ambiguous-or-undecidable fraction",
+    "candidate multiplicity bins",
+    "partial-or-clear visibility fraction",
+    "coarse noun-object support fraction",
+    "coarse verb-action support fraction"
+  ],
+  "uncertainty": {
+    "cluster_unit": "frozen selected item",
+    "model_specific": "For each instrument path, report a 95% item-cluster bootstrap interval with 5000 fixed-seed resamples.",
+    "intersection": "Windows where both task-family instruments emit the same non-abstain bin; report its prevalence interval without treating it as truth.",
+    "union": "Windows where either task-family instrument emits the bin; report its prevalence interval without treating it as truth.",
+    "envelope": "For each calibration dimension, take the minimum lower and maximum upper bound across model-specific, intersection, and union estimates, then round outward to the simulator grid resolution.",
+    "disagreement": "Retain as its own rate and widen the envelope; never resolve it by voting.",
+    "bootstrap_seed": 730001,
+    "grid_rounding": {
+      "rate_dimensions": "round lower bounds down and upper bounds up to the nearest 0.10",
+      "absolute_lag_event_units": "map categorical lag bins to closed event-unit bands and round outward to the nearest 0.5 event duration",
+      "candidate_multiplicity": "preserve the ordinal zero/one/two/three-or-more bins; simulator uses 0, 1, 2, and 4 candidates respectively",
+      "visibility": "preserve categorical visibility and round partial-or-clear prevalence outward to 0.10",
+      "support": "round noun-object and verb-action support prevalence outward to 0.10",
+      "clamp": "all rates to [0,1]; lag magnitude to [0,2.5] event durations"
+    }
+  },
+  "predeclared_gates": {
+    "schema_validity_minimum": 0.95,
+    "primary_item_coverage_minimum": 0.8,
+    "primary_seconds_coverage_minimum": 0.8,
+    "maximum_abstention_for_a_dimension": 0.5,
+    "minimum_export_cell_items": 5,
+    "minimum_paths_per_task_family": 2,
+    "agreement_is_not_a_pass_gate": true,
+    "calibration_usable": "Both task families meet path count, schema, coverage, and abstention gates; every requested simulator dimension has a model-specific interval and a conservative envelope.",
+    "calibration_revise": "A required path fails licensing, public canary, network denial, schema, coverage, or quarantine confinement after one bounded engineering retry, or an envelope cannot be formed.",
+    "calibration_stop": "Restricted processing cannot remain local/private or no distinct model pair can emit the required dimensions."
+  },
+  "simulator_binding": {
+    "ancestry_mode": "CHILDLENS_AGGREGATE_CALIBRATED_SEPARATE_PROTOCOL",
+    "authorized_consumer": "docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json",
+    "empirical_free_minimal_realism_consumer": false,
+    "calibrated": [
+      "lag",
+      "null_or_irrelevant",
+      "ambiguity",
+      "candidate_multiplicity",
+      "visibility",
+      "coarse_noun_object_support",
+      "coarse_verb_action_support"
+    ],
+    "not_calibrated": [
+      "IMU",
+      "touch",
+      "contact",
+      "proprioception",
+      "motor command",
+      "causal effect size"
+    ],
+    "absent_physical_measures": "remain simulator-defined counterfactual modalities",
+    "later_reporting": "Report the causal conclusion separately for each instrument-specific range, the intersection range, the union range, and their conservative envelope."
+  },
+  "privacy_and_execution": {
+    "reuse_existing_pseudo_labels_first": true,
+    "sequential_memory_heavy_paths": true,
+    "maximum_concurrent_mps_heavy_processes": 1,
+    "cpu_workers": [2, 4],
+    "checkpoint_resume": true,
+    "no_external_api": true,
+    "no_telemetry": true,
+    "no_repository_restricted_payload": true,
+    "aggregate_only_tool_output": true,
+    "referential_crosswalk": "Use existing frozen v1.3 candidate windows whose center lies inside a selected half-open audit interval [start,end). A center on the right boundary is excluded unless it belongs to a separately selected next interval. Both visual instruments receive the same ordered window set and the same fixed five-frame offsets. The restricted set digest never leaves quarantine."
+  }
+}

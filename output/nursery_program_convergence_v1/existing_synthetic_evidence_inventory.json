@@ -1,0 +1,65 @@
+{
+  "schema_version": "nursery-synthetic-evidence-inventory-v1",
+  "created_at": "2026-07-22",
+  "scope": "synthetic report-level evidence only",
+  "empirical_payloads_accessed": false,
+  "entries": [
+    {
+      "id": "synthetic_weak_alignment_recovery_v1",
+      "status": "COMPLETED_DEVELOPMENT_GO_CONFIRMATION_UNRUN",
+      "evidence_class": "scientific development outcome",
+      "supports": "symbolic action grounding under weak alignment; synchronized versus shuffled/time-shifted/absent controls; cue-free evaluation",
+      "does_not_support": "joint noun-object and verb-action claim, raw perceptual learning, or confirmation",
+      "terminal_artifact": "output/synthetic_weak_alignment_recovery_v1/terminal_decision.json"
+    },
+    {
+      "id": "synthetic_sensor_event_robustness_v2",
+      "status": "COMPLETED_DEVELOPMENT_REVISE_CONFIRMATION_UNRUN",
+      "evidence_class": "scientific development outcome",
+      "supports": "directional raw-synthetic sensor effect and cue-free action endpoint",
+      "does_not_support": "its own conjunctive GO gates or joint noun/verb claim",
+      "terminal_artifact": "output/synthetic_sensor_event_robustness_v2/terminal_decision.json"
+    },
+    {
+      "id": "synthetic_component_robustness_v3",
+      "status": "COMPLETED_DEVELOPMENT_STOP",
+      "evidence_class": "scientific development outcome",
+      "supports": "diagnosis of a synchronized-perfect/control-floor pathology",
+      "does_not_support": "synchronized-sensor added value",
+      "terminal_artifact": "output/synthetic_component_robustness_v3/terminal_decision.json"
+    },
+    {
+      "id": "synthetic_protocol_fidelity_v4",
+      "status": "QUALIFICATION_ONLY_LATER_INVALIDATED_FOR_PROMOTION",
+      "evidence_class": "fixture and package evidence",
+      "supports": "software qualification only",
+      "does_not_support": "any acquisition outcome",
+      "terminal_artifact": "docs/synthetic_identifiability_qualification_v5_v4_disposition.md"
+    },
+    {
+      "id": "synthetic_identifiability_v5_v8",
+      "status": "V8_VERSION_READY_NO_SCIENTIFIC_OUTCOME",
+      "evidence_class": "qualification and adversarial package evidence",
+      "supports": "auditable pairing, withholding, non-oracularity, and package construction",
+      "does_not_support": "any causal acquisition effect",
+      "terminal_artifact": "output/synthetic_identifiability_qualification_v8/terminal_decision.json"
+    },
+    {
+      "id": "synthetic_development_launch_v3_one_shot",
+      "status": "DEVELOPMENT_PASS_SUPERSEDED_BY_CONFIRMATION_STOP",
+      "evidence_class": "scientific outcome with terminal construct invalidation",
+      "supports": "reproducible confidence sharpening and integrity of the saved run",
+      "does_not_support": "sensor-supplied or sensor-corrected grounding; every action ordering was already correct",
+      "terminal_artifact": "output/synthetic_confirmation_adversarial_audit_v1/CONFIRMATION_STOP_FINAL.md"
+    },
+    {
+      "id": "synthetic_corrective_alignment_v1_v4",
+      "status": "NO_SCIENTIFIC_OUTCOME_V4_PREFREEZE",
+      "evidence_class": "failed construction attempts, mechanism fixtures, and prospective code",
+      "supports": "a genuinely corrective event-selection direction and reusable synthetic interfaces",
+      "does_not_support": "a completed effect or a noun-object endpoint",
+      "terminal_artifact": "output/synthetic_corrective_development_launch_package_v3/construction_qualification_decision.json"
+    }
+  ],
+  "conclusion": "No completed, terminally valid study establishes the full cue-free held-out noun-object plus verb-action mechanism claim."
+}

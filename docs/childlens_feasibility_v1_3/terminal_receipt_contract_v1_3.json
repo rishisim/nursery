@@ -1,0 +1,59 @@
+{
+  "schema_version": "childlens-v1.3-terminal-receipt-contract-v1",
+  "aggregate_only": true,
+  "quarantine_input_permitted": false,
+  "terminal_states": [
+    "CHILDLENS_AUTHOR_AUDIT_READY",
+    "CHILDLENS_MODEL_ASSISTED_FEASIBILITY_GO",
+    "CHILDLENS_MODEL_ASSISTED_FEASIBILITY_REVISE",
+    "CHILDLENS_MODEL_ASSISTED_FEASIBILITY_STOP"
+  ],
+  "inputs": {
+    "protocol_freeze_receipt": {
+      "schema_version": "childlens-v1.3-protocol-freeze-receipt-v1",
+      "purpose": "Prove the sample, blinding, lock, escalation, scope, and six agreement gates were frozen before author labels.",
+      "required_metric_groups": [
+        "speech_utterance_boundary",
+        "source_role_non_child_priority",
+        "non_child_transcript_error_and_coverage",
+        "coarse_referential_status",
+        "noun_object_candidate_precision_coverage",
+        "verb_action_candidate_precision_coverage"
+      ]
+    },
+    "author_audit_sampling_receipt": {
+      "schema_version": "childlens-author-audit-sampling-receipt-v1.3.0",
+      "purpose": "Prove a hash-deterministic 900-second primary sample and at most 900-second disjoint reserve independent of model outputs and content quality."
+    },
+    "pseudo_annotation_receipt": {
+      "schema_version": "childlens-v1.3-pseudo-annotation-receipt-v1",
+      "purpose": "Prove full-pilot local pseudo-annotation, license/hash provenance, network isolation, quarantine confinement, and learner/evaluation separation."
+    },
+    "author_workflow_receipt": {
+      "schema_version": "childlens-v1.3-author-workflow-receipt-v1",
+      "purpose": "Prove the loopback-only AUTHOR_AUDIT_A route is populated, resumable, prediction-blinded, and irreversibly lockable."
+    },
+    "author_audit_result_receipt": {
+      "schema_version": "childlens-v1.3-author-audit-result-receipt-v1",
+      "optional_until_author_completion": true,
+      "purpose": "Report only aggregate locked model-human agreement and threshold dispositions; never author labels or model payloads."
+    }
+  },
+  "decision_rules": {
+    "ready": "Every preparation, privacy, isolation, sampling, and workflow condition passes; no completed author result exists.",
+    "go": "A qualified-author record was blinded and irreversibly locked before reveal, and every frozen agreement gate passes.",
+    "revise": "Any required receipt is incomplete, a bounded technical issue remains, or a non-fundamental frozen gate does not pass.",
+    "stop": "A reproducible local-instrument incompatibility remains after bounded correction, or a locked qualified-author audit explicitly establishes fundamental calibration failure."
+  },
+  "forbidden_in_repository_receipts": [
+    "restricted identifiers",
+    "source names",
+    "restricted paths",
+    "transcript or lexical text",
+    "frames or media",
+    "exact media times",
+    "item-level labels",
+    "model-label payloads",
+    "credentials or authorization material"
+  ]
+}

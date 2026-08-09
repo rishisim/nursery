@@ -1,0 +1,27 @@
+{
+  "schema_version": "childlens-history-immutability-receipt-v1.3.1",
+  "artifact_sets": {
+    "v1": {
+      "artifact_count": 23,
+      "artifact_set_sha256": "35ba9acbba0fc11fc3419c88ea57d0721e08486c6d37595812ce6c77ce994abf",
+      "preserved": true
+    },
+    "v1_1": {
+      "artifact_count": 40,
+      "artifact_set_sha256": "3acd969804d71979ba8071e2446e8ee1ceb3194fc90dcfda802a99e296b7bf48",
+      "preserved": true
+    },
+    "v1_2": {
+      "artifact_count": 53,
+      "artifact_set_sha256": "f3bbfd9051e33fc33e44b9cab3c7546b77b1acba4904cc73fb116a3cbe7da01f",
+      "preserved": true
+    },
+    "v1_3": {
+      "artifact_count": 43,
+      "artifact_set_sha256": "af293859abe4fbd835fcbfc1281ec9514e92f41cf24ad571d6592e6b58783292",
+      "preserved": true
+    }
+  },
+  "prior_decisions_overwritten": false,
+  "followup_namespace": "childlens_feasibility_v1_3_1"
+}

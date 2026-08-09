@@ -1,0 +1,455 @@
+{
+  "schema": "childlens-local-instrument-provenance-v1.3.1",
+  "audit_date": "2026-07-22",
+  "scope": "public_sources_only_no_restricted_input_or_execution",
+  "disposition": "APPROVED_FOR_PUBLIC_ACQUISITION_SYNTHETIC_SMOKE_TEST_AND_OFFLINE_QUARANTINED_INFERENCE",
+  "legal_note": "Technical license inventory only; the signed ChildLens agreement remains controlling.",
+  "autonomous_public_acquisition": {
+    "allowed": true,
+    "reason": "All selected repositories are public and ungated and require no click-through or license acceptance workflow.",
+    "must_finish_before_restricted_processing": true
+  },
+  "public_cache_reconciliation": {
+    "schema": "childlens-public-instrument-cache-reconciliation-v1.3.0",
+    "receipt": "output/childlens_feasibility_v1_3/local_instrument_cache_reconciliation.json",
+    "restricted_childlens_input_used": false,
+    "restricted_inference_run": false,
+    "hosted_or_cloud_model_used": false,
+    "required_local_instruments_hash_verified": true,
+    "required_local_instruments_synthetic_smoke_passed": true,
+    "synthetic_smoke_outbound_network_denied": true,
+    "does_not_certify_restricted_inference": true
+  },
+  "observed_public_synthetic_runtime": {
+    "restricted_input_used": false,
+    "model_repository_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "python_version": "3.10.20",
+    "torch_version": "2.7.1",
+    "transformers_version": "4.53.3",
+    "device": "mps",
+    "input": "synthetic_in_memory_only",
+    "outbound_socket_block_active": true,
+    "result": "PASS",
+    "does_not_certify_restricted_inference": true
+  },
+  "selected_stack": [
+    {
+      "id": "silero_vad_6_2_1_onnx",
+      "role": "speech_vad_segmentation_hypotheses",
+      "required": true,
+      "code": {
+        "name": "silero-vad",
+        "version": "6.2.1",
+        "revision": "7e30209a3e901f9842f81b225f3e93d8199902b1",
+        "license_spdx": "MIT",
+        "source_url": "https://github.com/snakers4/silero-vad/tree/7e30209a3e901f9842f81b225f3e93d8199902b1",
+        "release_url": "https://github.com/snakers4/silero-vad/releases/tag/v6.2.1",
+        "license_url": "https://github.com/snakers4/silero-vad/blob/v6.2.1/LICENSE",
+        "wheel": {
+          "filename": "silero_vad-6.2.1-py3-none-any.whl",
+          "sha256": "09de93c4d874bb19c53e62a47dd38be5f163cedad2b5599583231f2a84ef79cb"
+        }
+      },
+      "weights": {
+        "bundled_with_code": true,
+        "license_spdx": "MIT",
+        "gated": false,
+        "clickthrough_required": false,
+        "artifacts": [
+          {
+            "relative_public_source_path": "src/silero_vad/data/silero_vad.onnx",
+            "size_bytes": 2327524,
+            "sha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3"
+          }
+        ]
+      },
+      "runtime": {
+        "device": "cpu_onnx_one_thread",
+        "sample_rate_hz": 16000,
+        "python_version": "3.10.20",
+        "network_required_during_inference": false,
+        "telemetry_declared_by_project": false,
+        "remote_loader_forbidden": true,
+        "public_synthetic_smoke": {
+          "input": "zero_signal_array_only",
+          "outbound_network_denied": true,
+          "provider": "CPUExecutionProvider",
+          "finite_outputs": true,
+          "result": "PASS"
+        },
+        "public_cache_manifest": {
+          "entry_count": 2,
+          "aggregate_sha256": "68cb8972c6439d6c77ca79053b4d2ec222fe1fbcac4a214b4d7a1c96ea4990c0",
+          "manifest_file_sha256": "92fa22b784239596692405eb6e061c506fbc5677739c6574836c290456e0010e"
+        }
+      },
+      "scientific_status": "proposal_only_never_utterance_or_gold_boundary"
+    },
+    {
+      "id": "onnxruntime_1_23_2",
+      "role": "silero_cpu_runtime",
+      "required": true,
+      "code": {
+        "name": "onnxruntime",
+        "version": "1.23.2",
+        "license_spdx": "MIT",
+        "source_url": "https://github.com/microsoft/onnxruntime",
+        "license_url": "https://github.com/microsoft/onnxruntime/blob/main/LICENSE",
+        "wheel_for_observed_python_and_arch": {
+          "python_version": "3.10.20",
+          "filename": "onnxruntime-1.23.2-cp310-cp310-macosx_13_0_arm64.whl",
+          "size_bytes": 17195934,
+          "sha256": "a7730122afe186a784660f6ec5807138bf9d792fa1df76556b27307ea9ebcbe3",
+          "embedded_license_sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+          "source_url": "https://pypi.org/project/onnxruntime/1.23.2/"
+        }
+      },
+      "weights": null,
+      "runtime": {
+        "device": "cpu",
+        "network_required_during_inference": false
+      }
+    },
+    {
+      "id": "whisper_cpp_large_v3_turbo",
+      "role": "multilingual_language_asr_and_timing_hypotheses",
+      "required": true,
+      "code": {
+        "name": "whisper.cpp",
+        "version": "1.9.1",
+        "revision": "f049fff95a089aa9969deb009cdd4892b3e74916",
+        "license_spdx": "MIT",
+        "source_url": "https://github.com/ggml-org/whisper.cpp/tree/f049fff95a089aa9969deb009cdd4892b3e74916",
+        "release_url": "https://github.com/ggml-org/whisper.cpp/releases/tag/v1.9.1",
+        "license_url": "https://github.com/ggml-org/whisper.cpp/blob/v1.9.1/LICENSE",
+        "build_receipt_required": true
+      },
+      "weights": {
+        "repository": "ggerganov/whisper.cpp",
+        "revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+        "license_spdx": "MIT",
+        "source_url": "https://huggingface.co/ggerganov/whisper.cpp/tree/5359861c739e955e79d9a303bcbc70fb988958b1",
+        "upstream_license_source": "https://github.com/openai/whisper",
+        "gated": false,
+        "clickthrough_required": false,
+        "artifacts": [
+          {
+            "filename": "ggml-large-v3-turbo.bin",
+            "size_bytes": 1624555275,
+            "sha256": "1fc70f774d38eb169993ac391eea357ef47c88757ef72ee5943879b7e8e2bc69",
+            "quantized": false
+          }
+        ]
+      },
+      "runtime": {
+        "device": "one_metal_process",
+        "approximate_model_memory_gb_from_upstream": 6,
+        "network_required_during_inference": false,
+        "server_components_forbidden": true,
+        "local_model_path_only": true,
+        "exact_tag_build": {
+          "source_git_tree": "f49541eaed447bce9b5e3598cc7a487ce5e54678",
+          "compiler": "Apple clang 21.0.0 (clang-2100.1.1.101)",
+          "cmake_version": "4.4.0",
+          "cmake_flags": [
+            "CMAKE_BUILD_TYPE=Release",
+            "GGML_METAL=ON",
+            "WHISPER_BUILD_TESTS=OFF",
+            "WHISPER_BUILD_SERVER=OFF"
+          ],
+          "target": "whisper-cli",
+          "executable_size_bytes": 845064,
+          "executable_sha256": "9613b31e5380c184ae29ccb1d4046953d7037e8eb55308c9f1a34f145143b892",
+          "bundle_entry_count": 19,
+          "bundle_aggregate_sha256": "9b13133224ff0e86ca48b3ab1138864080d9034718650d564eb91e665c2ee252",
+          "bundle_manifest_file_sha256": "f69466209b4d1c6f9e252fd115b3f4f40684b6e83b3703e47582a1104056f82d"
+        },
+        "public_sample_smoke": {
+          "input": "whisper_cpp_public_jfk_sample",
+          "outbound_network_denied": true,
+          "json_parse_succeeded": true,
+          "nonempty_segment_structure": true,
+          "transcript_content_exported": false,
+          "result": "PASS"
+        }
+      },
+      "scientific_status": "pseudo_transcript_and_experimental_word_timing_never_gold"
+    },
+    {
+      "id": "speechbrain_ecapa_voxceleb",
+      "role": "anonymous_within_item_speaker_cluster_aid",
+      "required": false,
+      "code": {
+        "name": "speechbrain",
+        "version": "1.1.0",
+        "revision": "36c180c7bfad3bf5c48bd76a24799812952c4565",
+        "license_spdx": "Apache-2.0",
+        "source_url": "https://github.com/speechbrain/speechbrain/tree/36c180c7bfad3bf5c48bd76a24799812952c4565",
+        "release_url": "https://github.com/speechbrain/speechbrain/releases/tag/v1.1.0",
+        "license_url": "https://github.com/speechbrain/speechbrain/blob/v1.1.0/LICENSE"
+      },
+      "weights": {
+        "repository": "speechbrain/spkrec-ecapa-voxceleb",
+        "revision": "0f99f2d0ebe89ac095bcc5903c4dd8f72b367286",
+        "license_spdx": "Apache-2.0",
+        "source_url": "https://huggingface.co/speechbrain/spkrec-ecapa-voxceleb/tree/0f99f2d0ebe89ac095bcc5903c4dd8f72b367286",
+        "gated": false,
+        "clickthrough_required": false,
+        "serialization": "official_pytorch_checkpoint_not_safetensors",
+        "artifacts": [
+          {
+            "filename": "embedding_model.ckpt",
+            "size_bytes": 83316686,
+            "sha256": "0575cb64845e6b9a10db9bcb74d5ac32b326b8dc90352671d345e2ee3d0126a2"
+          },
+          {
+            "filename": "classifier.ckpt",
+            "size_bytes": 5534328,
+            "sha256": "fd9e3634fe68bd0a427c95e354c0c677374f62b3f434e45b78599950d860d535"
+          }
+        ]
+      },
+      "runtime": {
+        "device": "cpu",
+        "network_required_during_inference": false,
+        "speechbrain_allow_network": false,
+        "local_snapshot_only": true
+      },
+      "scientific_status": "anonymous_cluster_only_cannot_establish_child_non_child_or_overlap"
+    },
+    {
+      "id": "librosa_pyin_0_11_0",
+      "role": "deterministic_f0_and_voicing_evidence",
+      "required": false,
+      "code": {
+        "name": "librosa",
+        "version": "0.11.0",
+        "license_spdx": "ISC",
+        "source_url": "https://github.com/librosa/librosa/tree/0.11.0",
+        "license_url": "https://github.com/librosa/librosa/blob/0.11.0/LICENSE.md",
+        "documentation_url": "https://librosa.org/doc/0.11.0/generated/librosa.pyin.html",
+        "wheel": {
+          "filename": "librosa-0.11.0-py3-none-any.whl",
+          "size_bytes": 260749,
+          "sha256": "0b6415c4fd68bff4c29288abe67c6d80b587e0e1e2cfb0aad23e4559504a7fa1"
+        }
+      },
+      "weights": null,
+      "runtime": {
+        "device": "cpu",
+        "network_required_during_inference": false
+      },
+      "scientific_status": "conservative_role_evidence_only_prefer_uncertain"
+    },
+    {
+      "id": "qwen2_vl_2b_instruct",
+      "role": "primary_multilingual_multiframe_visual_referential_candidate_instrument",
+      "required": true,
+      "code": {
+        "name": "transformers",
+        "version": "4.53.3",
+        "revision": "a5923d4de7df2fbd1f373dfcfe983216b79b6937",
+        "license_spdx": "Apache-2.0",
+        "source_url": "https://github.com/huggingface/transformers/tree/v4.53.3",
+        "license_url": "https://github.com/huggingface/transformers/blob/v4.53.3/LICENSE",
+        "model_documentation_url": "https://huggingface.co/docs/transformers/v4.53.3/model_doc/qwen2_vl",
+        "wheel": {
+          "filename": "transformers-4.53.3-py3-none-any.whl",
+          "size_bytes": 10826382,
+          "sha256": "5aba81c92095806b6baf12df35d756cf23b66c356975fb2a7fa9e536138d7c75"
+        }
+      },
+      "weights": {
+        "repository": "Qwen/Qwen2-VL-2B-Instruct",
+        "revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+        "license_spdx": "Apache-2.0",
+        "license_url": "https://huggingface.co/Qwen/Qwen2-VL-2B-Instruct/blob/895c3a49bc3fa70a340399125c650a463535e71c/LICENSE",
+        "source_url": "https://huggingface.co/Qwen/Qwen2-VL-2B-Instruct/tree/895c3a49bc3fa70a340399125c650a463535e71c",
+        "official_multilingual_source_url": "https://qwenlm.github.io/blog/qwen2-vl/",
+        "gated": false,
+        "clickthrough_required": false,
+        "artifacts": [
+          {
+            "filename": "model-00001-of-00002.safetensors",
+            "size_bytes": 3988609112,
+            "sha256": "994ac2b03f97de8bc647d0fe5eba2e4b632b3e28dc03574c29bdfc36cf47e1b9"
+          },
+          {
+            "filename": "model-00002-of-00002.safetensors",
+            "size_bytes": 429441656,
+            "sha256": "92540d8353c8d226a589a3b179bdb33851c970ee2cc2ac7ba035f79425e7b833"
+          }
+        ],
+        "full_retained_snapshot_manifest_required": true,
+        "local_revision_receipts": {
+          "receipt_count": 13,
+          "unique_revision_count": 1,
+          "revision": "895c3a49bc3fa70a340399125c650a463535e71c"
+        },
+        "public_cache_manifest": {
+          "entry_count": 40,
+          "total_entry_bytes": 4429622733,
+          "aggregate_sha256": "56f8306e4799e9cd9e5222831d5e856f9616a508f7b9761cd2de2ddd05eceb05",
+          "manifest_file_sha256": "5254d4565d12097c9049b1dceb12b306c2d716e18894b0d0143825e29c7f10c7"
+        }
+      },
+      "runtime": {
+        "preferred_device": "mps_batch_size_1",
+        "fallback_device": "cpu",
+        "max_concurrent_heavy_processes": 1,
+        "network_required_during_inference": false,
+        "local_files_only": true,
+        "trust_remote_code": false,
+        "safetensors_only": true,
+        "synthetic_in_memory_mps_smoke_passed": true,
+        "synthetic_smoke_outbound_socket_block_active": true,
+        "synthetic_smoke_generation_shape_valid": true,
+        "torch": {
+          "version": "2.7.1",
+          "revision": "e2d141dbde55c2a4370fac5165b0561b6af4798b",
+          "license_spdx": "BSD-3-Clause",
+          "source_url": "https://github.com/pytorch/pytorch/tree/v2.7.1",
+          "license_url": "https://github.com/pytorch/pytorch/blob/v2.7.1/LICENSE",
+          "installed_wheel": {
+            "filename": "torch-2.7.1-cp310-none-macosx_11_0_arm64.whl",
+            "size_bytes": 68630914,
+            "sha256": "d72acfdb86cee2a32c0ce0101606f3758f0d8bb5f8f31e7920dc2809e963aa7c"
+          },
+          "torchvision": {
+            "version": "0.22.1",
+            "wheel_filename": "torchvision-0.22.1-cp310-cp310-macosx_11_0_arm64.whl",
+            "wheel_size_bytes": 1947825,
+            "wheel_sha256": "3b47d8369ee568c067795c0da0b4078f39a9dfea6f3bc1f3ac87530dfda1dd56"
+          }
+        },
+        "qwen_vl_utils": {
+          "version": "0.0.14",
+          "license_spdx": "Apache-2.0",
+          "installed": true,
+          "required": false,
+          "imported_by_restricted_runner": false,
+          "wheel_filename": "qwen_vl_utils-0.0.14-py3-none-any.whl",
+          "wheel_sha256": "5e28657bfd031e56bd447c5901b58ddfc3835285ed100f4c56580e0ade054e96"
+        },
+        "local_decoded_frames_only": true
+      },
+      "scientific_status": "multilingual_multiframe_candidate_proposals_only_never_reference_truth"
+    },
+    {
+      "id": "florence_2_base",
+      "role": "engineering_fallback_for_explicit_visual_localization_candidates",
+      "required": false,
+      "code": {
+        "name": "transformers",
+        "version": "4.57.2",
+        "revision": "2915fb36cf8a48cad730f444b6057d18a6176d59",
+        "license_spdx": "Apache-2.0",
+        "source_url": "https://github.com/huggingface/transformers/tree/v4.57.2",
+        "license_url": "https://github.com/huggingface/transformers/blob/v4.57.2/LICENSE",
+        "model_documentation_url": "https://huggingface.co/docs/transformers/v4.57.2/model_doc/florence2"
+      },
+      "weights": {
+        "repository": "microsoft/Florence-2-base",
+        "revision": "5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac",
+        "license_spdx": "MIT",
+        "license_url": "https://huggingface.co/microsoft/Florence-2-base/blob/5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac/LICENSE",
+        "source_url": "https://huggingface.co/microsoft/Florence-2-base/tree/5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac",
+        "gated": false,
+        "clickthrough_required": false,
+        "artifacts": [
+          {
+            "filename": "model.safetensors",
+            "size_bytes": 463221266,
+            "sha256": "03075d2d2d2bbd3e180b9ba0afae4aa8563226e2d32911656966e05b2f2ee060"
+          }
+        ],
+        "pytorch_model_bin_allowed": false,
+        "repository_custom_code_allowed": false,
+        "full_retained_snapshot_manifest_required": true
+      },
+      "runtime": {
+        "preferred_device": "mps_batch_size_1_after_synthetic_smoke_test",
+        "fallback_device": "cpu",
+        "max_concurrent_heavy_processes": 1,
+        "network_required_during_inference": false,
+        "local_files_only": true,
+        "trust_remote_code": false,
+        "safetensors_only": true
+      },
+      "scientific_status": "candidate_proposals_only_never_reference_truth"
+    }
+  ],
+  "inference_firewall": {
+    "os_or_supervisor_outbound_network_deny_required": true,
+    "denied_socket_sentinel_required": true,
+    "offline_environment": {
+      "HF_HUB_OFFLINE": "1",
+      "TRANSFORMERS_OFFLINE": "1",
+      "HF_DATASETS_OFFLINE": "1",
+      "HF_HUB_DISABLE_TELEMETRY": "1",
+      "DO_NOT_TRACK": "1"
+    },
+    "remote_model_identifiers_forbidden_during_restricted_inference": true,
+    "hub_clients_and_download_helpers_excluded_from_runnable_bundle": true,
+    "absolute_local_model_paths_only": true,
+    "quarantine_output_only": true
+  },
+  "learner_ancestry_firewall": {
+    "instrument_weights_allowed": false,
+    "instrument_tokenizers_or_vocabularies_allowed": false,
+    "instrument_embeddings_or_features_allowed": false,
+    "instrument_logits_or_confidences_allowed": false,
+    "raw_pseudo_labels_allowed": false,
+    "unaudited_pseudo_labels_as_primary_evaluation_truth_allowed": false,
+    "author_audited_subset_is_only_human_labeled_childlens_evidence": true,
+    "synthetic_primary_evaluation_uses_simulator_oracle_labels": true
+  },
+  "not_selected": [
+    {
+      "id": "hosted_gpt_luna_codex_or_other_cloud_models",
+      "reason": "Restricted content or label payload would leave the approved local environment.",
+      "status": "categorically_forbidden_for_content_annotation"
+    },
+    {
+      "id": "pyannote_speaker_diarization_community_1",
+      "source_url": "https://huggingface.co/pyannote/speaker-diarization-community-1",
+      "reason": "Official access requires accepting user conditions and sharing contact information.",
+      "status": "gated_not_acquired"
+    },
+    {
+      "id": "google_paligemma2",
+      "source_url": "https://huggingface.co/google/paligemma2-3b-pt-224",
+      "reason": "Official repository requires reviewing and agreeing to the Gemma usage license.",
+      "status": "gated_not_acquired"
+    },
+    {
+      "id": "qwen_2_5_vl_3b_instruct",
+      "source_url": "https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct",
+      "reason": "Qwen Research License is not permissive and the artifact is heavier than necessary for the bounded candidate task.",
+      "status": "not_selected"
+    },
+    {
+      "id": "smolvlm2",
+      "source_url": "https://huggingface.co/HuggingFaceTB/SmolVLM2-2.2B-Instruct",
+      "reason": "Permissive but English-centered model card offers no advantage over the selected multilingual Apache-2.0 Qwen2-VL-2B checkpoint.",
+      "status": "not_selected"
+    },
+    {
+      "id": "audeering_age_gender_model",
+      "source_url": "https://huggingface.co/audeering/wav2vec2-large-robust-6-ft-age-gender",
+      "reason": "Jointly infers unnecessary sensitive attributes and uses CC-BY-NC-SA-4.0; conservative clustering and signal evidence are preferred.",
+      "status": "not_selected"
+    }
+  ],
+  "runtime_receipt_requirements": [
+    "full_retained_file_manifest_and_sha256",
+    "package_lock_and_wheel_hashes",
+    "compiler_toolchain_and_build_flags",
+    "final_executable_sha256",
+    "synthetic_public_smoke_tests",
+    "mps_or_cpu_device_receipt",
+    "outbound_network_denial_sentinel",
+    "quarantine_write_confinement_sentinel",
+    "no_restricted_payload_in_public_reports"
+  ]
+}

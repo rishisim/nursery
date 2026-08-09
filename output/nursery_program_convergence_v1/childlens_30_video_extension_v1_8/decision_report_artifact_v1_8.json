@@ -1,0 +1,295 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "ChildLens 30-Video Calibration Stop: Decision Memo",
+    "description": "Decision-ready record of the frozen provisional two-model calibration and the closed causal endpoint.",
+    "generatedAt": "2026-07-23T05:15:57Z",
+    "sources": [
+      {
+        "id": "combined-calibration-receipt",
+        "label": "Aggregate-safe 30-video combined calibration receipt",
+        "path": "output/nursery_program_convergence_v1/childlens_30_video_extension_v1_8/combined_calibration_receipt.json",
+        "query": {
+          "description": "Frozen gate evaluation over cell-suppressed, outward-rounded aggregate model diagnostics.",
+          "engine": "local-python",
+          "language": "python",
+          "executed_at": "2026-07-23T05:15:57Z",
+          "filters": [
+            "Exactly 30 participant-distinct selected ChildLens items",
+            "Exactly 1,800 frozen speech seconds",
+            "Exactly 272 frozen candidate windows",
+            "Minimum export cell K=5",
+            "No human gold; model diagnostics only"
+          ],
+          "metric_definitions": [
+            "Lag abstention is the share of candidate-window outputs marked abstain or undecidable for lag_event_unit_bin; the frozen maximum is 0.50 for either path.",
+            "Schema validity is the share of candidate-window outputs matching the exact frozen categorical schema; the frozen minimum is 0.95.",
+            "A conservative envelope is publishable only when its supporting aggregate cell satisfies K=5 suppression."
+          ]
+        }
+      }
+    ],
+    "charts": [
+      {
+        "id": "lag-abstention-chart",
+        "title": "Lag-event abstention upper bounds",
+        "description": "Gemma exceeds the frozen 50% maximum; values are outward-rounded aggregate rates.",
+        "type": "bar",
+        "dataset": "lag_abstention",
+        "encodings": {
+          "x": {
+            "field": "comparison",
+            "type": "nominal",
+            "title": "Path or reference"
+          },
+          "y": {
+            "field": "rate",
+            "type": "quantitative",
+            "title": "Rate"
+          }
+        },
+        "options": {
+          "orientation": "vertical",
+          "grouping": "single"
+        },
+        "source": {
+          "id": "lag-abstention-derived-table",
+          "label": "Lag-abstention rows derived from the aggregate-safe combined calibration receipt",
+          "path": "output/nursery_program_convergence_v1/childlens_30_video_extension_v1_8/combined_calibration_receipt.json",
+          "query": {
+            "description": "Reproduce the three reviewed chart rows from the outward-rounded aggregate receipt.",
+            "engine": "duckdb",
+            "language": "sql",
+            "sql": "SELECT * FROM (VALUES ('Qwen3-VL upper bound', 0.1, 0.0, 0.1, 0.5, 30, 272, 'PASS'), ('Gemma 4 E4B upper bound', 0.9, 0.8, 0.9, 0.5, 30, 272, 'FAIL'), ('Frozen ceiling', 0.5, 0.5, 0.5, 0.5, 30, 272, 'REFERENCE')) AS t(comparison, rate, lower_bound, upper_bound, frozen_ceiling, sample_items, window_count, disposition)",
+            "filters": [
+              "Exactly 30 participant-distinct items",
+              "Outward-rounded aggregate intervals only"
+            ],
+            "metric_definitions": [
+              "rate is the outward-rounded upper bound of lag-event abstention for each instrument path; the reference row is the frozen 0.50 ceiling."
+            ]
+          }
+        }
+      }
+    ],
+    "tables": [
+      {
+        "id": "gate-disposition-table",
+        "title": "Frozen gate and endpoint disposition",
+        "description": "All values are aggregate-safe; causal contrasts remain closed because calibration did not pass.",
+        "dataset": "gate_disposition",
+        "columns": [
+          {
+            "field": "order",
+            "label": "Order",
+            "type": "number"
+          },
+          {
+            "field": "check",
+            "label": "Check",
+            "type": "text"
+          },
+          {
+            "field": "evidence",
+            "label": "Evidence",
+            "type": "text"
+          },
+          {
+            "field": "threshold",
+            "label": "Frozen rule",
+            "type": "text"
+          },
+          {
+            "field": "disposition",
+            "label": "Disposition",
+            "type": "text"
+          }
+        ],
+        "defaultSort": {
+          "field": "order",
+          "direction": "asc"
+        },
+        "source": {
+          "id": "gate-disposition-derived-table",
+          "label": "Frozen gate rows derived from the aggregate-safe combined calibration receipt",
+          "path": "output/nursery_program_convergence_v1/childlens_30_video_extension_v1_8/combined_calibration_receipt.json",
+          "query": {
+            "description": "Reproduce the reviewed gate and endpoint disposition rows.",
+            "engine": "duckdb",
+            "language": "sql",
+            "sql": "SELECT * FROM (VALUES (1, 'Qwen3-VL schema validity', '100%', 'At least 95%', 'PASS'), (2, 'Gemma schema validity', '100%', 'At least 95%', 'PASS'), (3, 'Gemma lag abstention', '80-90%', 'At most 50%', 'FAIL'), (4, 'Null/irrelevant conservative envelope', 'K=5 suppressed', 'Must be published', 'FAIL'), (5, 'Synchronized minus absent', 'Not run', 'Calibration must pass first', 'CLOSED'), (6, 'Synchronized minus shuffled', 'Not run', 'Calibration must pass first', 'CLOSED'), (7, 'Synchronized minus shifted', 'Not run', 'Calibration must pass first', 'CLOSED'), (8, 'Synchronized minus corrupted', 'Not run', 'Calibration must pass first', 'CLOSED')) AS t(\"order\", \"check\", evidence, threshold, disposition)",
+            "filters": [
+              "Frozen v1.8 gate rules",
+              "Causal endpoint closed when any calibration gate fails"
+            ],
+            "metric_definitions": [
+              "disposition is PASS, FAIL, or CLOSED under the prespecified gate logic."
+            ]
+          }
+        }
+      }
+    ],
+    "blocks": [
+      {
+        "id": "title",
+        "type": "markdown",
+        "body": "# ChildLens 30-Video Calibration Stop: Decision Memo"
+      },
+      {
+        "id": "technical-summary",
+        "type": "markdown",
+        "sourceId": "combined-calibration-receipt",
+        "body": "## Technical summary\n\n**Stop before the causal outcome.** Doubling the frozen sample to 30 participant-distinct videos produced complete, schema-valid outputs from both local visual paths, but it did not satisfy the unchanged triangulation gates. Gemma abstained on lag for an outward-rounded 80–90% of windows, above the frozen 50% maximum, and the conservative null/irrelevant envelope remained K=5-suppressed. No causal endpoint opened, so this is a failed calibration gate—not a causal null and not evidence about whether synchronized embodied cues help."
+      },
+      {
+        "id": "key-finding",
+        "type": "markdown",
+        "sourceId": "combined-calibration-receipt",
+        "body": "## The added sample did not rescue the two-model calibration\n\nBoth paths achieved 100% schema validity and full visual item coverage, which rules out malformed output as the explanation. The decisive problem is scientific usability: Qwen3-VL stayed below the lag-abstention ceiling, while Gemma did not. The figure shows the outward-rounded upper bounds against the prespecified ceiling."
+      },
+      {
+        "id": "lag-abstention-figure",
+        "type": "chart",
+        "chartId": "lag-abstention-chart"
+      },
+      {
+        "id": "gate-record",
+        "type": "markdown",
+        "sourceId": "combined-calibration-receipt",
+        "body": "## The endpoint remained closed by construction\n\nThe null/irrelevant range was still too sparse to export under K=5, even after the one permitted expansion. Because either failed gate is sufficient to stop, none of the synchronized-minus-absent, shuffled, shifted, or corrupted causal contrasts was run."
+      },
+      {
+        "id": "gate-table",
+        "type": "table",
+        "tableId": "gate-disposition-table"
+      },
+      {
+        "id": "scope-definitions",
+        "type": "markdown",
+        "sourceId": "combined-calibration-receipt",
+        "body": "## Scope and metric definitions\n\nThe calibration covers exactly 30 participant-distinct items, 1,800 speech seconds, and 272 candidate windows from the authorized frozen ChildLens pilot. Rates are outward-rounded; small cells are suppressed at K=5. Local-model outputs are provisional measurement hypotheses, not German human labels or ground truth. Simulator-oracle labels would have been the only evaluation truth had the causal run opened."
+      },
+      {
+        "id": "method-validation",
+        "type": "markdown",
+        "sourceId": "combined-calibration-receipt",
+        "body": "## Method and validation record\n\nThe original 15 items and successful Qwen outputs were reused read-only. Fifteen additional participant-distinct items were selected content-blind, transferred sequentially, clipped locally, and processed offline. Qwen3-ASR, Qwen3-VL, and Gemma 4 E4B ran as separate instruments; model-specific estimates, disagreement, and abstention were preserved rather than majority-voted. The final extension suite passed 20 tests, and no restricted payload left quarantine."
+      },
+      {
+        "id": "limitations",
+        "type": "markdown",
+        "sourceId": "combined-calibration-receipt",
+        "body": "## Limitations and claim boundary\n\nThere is no qualified German human gold, so model disagreement cannot be interpreted as reliability. The 30-item expansion was a disclosed post-failure attempt and cannot be expanded again under the frozen design. This report makes no ChildLens language-acquisition claim, no infant or BabyView generalization, and no statement about the synchronized-cue mechanism because the causal outcome was never run."
+      },
+      {
+        "id": "recommendation",
+        "type": "markdown",
+        "body": "## Recommendation\n\n**Do not present this as the intended Michael Frank mechanism nudge, and stop investing in the ChildLens pseudo-calibration branch.** If a near-term directional demo remains valuable, the clean next choice is a separately authorized synthetic-only simulator-oracle prototype with no ChildLens calibration claim. Otherwise, wait for a completely fresh BabyView-only study. The removed fallback is not activated here; either branch requires a new substantive user decision."
+      },
+      {
+        "id": "further-questions",
+        "type": "markdown",
+        "body": "## Further questions\n\nWould a transparent synthetic-only mechanism demonstration still be useful enough to justify one small one-shot run, or is the absence of a defensible naturalistic calibration anchor a reason to pause until BabyView access exists?"
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "status": "ready",
+    "generatedAt": "2026-07-23T05:15:57Z",
+    "datasets": {
+      "lag_abstention": [
+        {
+          "comparison": "Qwen3-VL upper bound",
+          "rate": 0.1,
+          "lower_bound": 0.0,
+          "upper_bound": 0.1,
+          "frozen_ceiling": 0.5,
+          "sample_items": 30,
+          "window_count": 272,
+          "disposition": "PASS"
+        },
+        {
+          "comparison": "Gemma 4 E4B upper bound",
+          "rate": 0.9,
+          "lower_bound": 0.8,
+          "upper_bound": 0.9,
+          "frozen_ceiling": 0.5,
+          "sample_items": 30,
+          "window_count": 272,
+          "disposition": "FAIL"
+        },
+        {
+          "comparison": "Frozen ceiling",
+          "rate": 0.5,
+          "lower_bound": 0.5,
+          "upper_bound": 0.5,
+          "frozen_ceiling": 0.5,
+          "sample_items": 30,
+          "window_count": 272,
+          "disposition": "REFERENCE"
+        }
+      ],
+      "gate_disposition": [
+        {
+          "order": 1,
+          "check": "Qwen3-VL schema validity",
+          "evidence": "100%",
+          "threshold": "At least 95%",
+          "disposition": "PASS"
+        },
+        {
+          "order": 2,
+          "check": "Gemma schema validity",
+          "evidence": "100%",
+          "threshold": "At least 95%",
+          "disposition": "PASS"
+        },
+        {
+          "order": 3,
+          "check": "Gemma lag abstention",
+          "evidence": "80–90%",
+          "threshold": "At most 50%",
+          "disposition": "FAIL"
+        },
+        {
+          "order": 4,
+          "check": "Null/irrelevant conservative envelope",
+          "evidence": "K=5 suppressed",
+          "threshold": "Must be published",
+          "disposition": "FAIL"
+        },
+        {
+          "order": 5,
+          "check": "Synchronized minus absent",
+          "evidence": "Not run",
+          "threshold": "Calibration must pass first",
+          "disposition": "CLOSED"
+        },
+        {
+          "order": 6,
+          "check": "Synchronized minus shuffled",
+          "evidence": "Not run",
+          "threshold": "Calibration must pass first",
+          "disposition": "CLOSED"
+        },
+        {
+          "order": 7,
+          "check": "Synchronized minus shifted",
+          "evidence": "Not run",
+          "threshold": "Calibration must pass first",
+          "disposition": "CLOSED"
+        },
+        {
+          "order": 8,
+          "check": "Synchronized minus corrupted",
+          "evidence": "Not run",
+          "threshold": "Calibration must pass first",
+          "disposition": "CLOSED"
+        }
+      ]
+    }
+  }
+}

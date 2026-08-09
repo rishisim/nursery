@@ -1,0 +1,46 @@
+{
+  "schema_version": "nursery-prototype-limited-gemma-validation-receipt-v1",
+  "created_at": "2026-07-22",
+  "status": "VALID_TECHNICAL_REVISE_PRE_OUTCOME",
+  "test_summary": {
+    "root_focused_tests_passed": 101,
+    "root_focused_tests_failed": 0,
+    "python_compile_passed": true,
+    "public_fixture_only_parallel_smoke": {
+      "jobs_1_vs_4_exact_merge_equivalence": true,
+      "aggregate_digest": "d064d07439179a18c1867db6fc30bc0b338f3c5382f705607177f59bb5c532c7",
+      "fixture_only": true,
+      "scientific_outcome_run": false
+    },
+    "public_caf_transport_smoke": {
+      "say_exit_zero": true,
+      "normalization_exit_zero": true,
+      "final_wav_contract_exact": true
+    }
+  },
+  "gate_disposition": {
+    "canary_failure_classified_without_model_text": true,
+    "failure_precedes_model_load": true,
+    "parser_correction_withheld_as_inapplicable": true,
+    "canonical_canary_activation_outputs_absent": true,
+    "restricted_calibration_output_absent": true,
+    "preoutcome_and_authorization_outputs_absent": true,
+    "causal_output_root_absent": true,
+    "michael_facing_causal_figure_created": false,
+    "michael_facing_figure_reason": "NO_CAUSAL_ENDPOINT_OPENED"
+  },
+  "resource_summary": {
+    "free_space_gib_at_disposition": 55.644,
+    "projected_floor_required_gib": 50.0,
+    "single_MPS_heavy_process_limit_preserved": true,
+    "no_model_download_or_requantization": true
+  },
+  "privacy_summary": {
+    "restricted_examples_or_payloads_in_report": false,
+    "transcripts_or_translations_in_report": false,
+    "frames_or_audio_in_report": false,
+    "identifiers_filenames_paths_or_exact_timestamps_in_report": false,
+    "restricted_inference_run": false,
+    "external_content_service_used": false
+  }
+}

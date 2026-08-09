@@ -1,0 +1,82 @@
+{
+  "manifest_schema_version": "childlens-release-manifest-summary-v1.0.0",
+  "artifact_status": "NONIDENTIFYING_UI_RECEIPT_NOT_CANONICAL_RESTRICTED_MANIFEST",
+  "observation_date": "2026-07-21",
+  "release_identity": {
+    "dataset_doi": "10.17617/4.fe",
+    "public_keeper_library_id": "c8ed0104-b793-4c35-817e-302afd4e036b",
+    "public_doi_snapshot_commit": "4856662653b2fa183e53268d088cffba02a33443",
+    "accessible_live_library_matches_public_library": true,
+    "accessible_live_revision": "UNPINNED",
+    "doi_snapshot_equivalence": "UNRESOLVED"
+  },
+  "inventory_summary": {
+    "video_objects": {
+      "count": 192,
+      "displayed_size_count": 191,
+      "displayed_size_sum_decimal_gb_lower_bound": 201.33,
+      "objects_without_displayed_size": 1,
+      "container_and_audio_stream_validation": "NOT_RUN_TERMS_UNRESOLVED"
+    },
+    "annotation_objects": {
+      "final_representation_count": 192,
+      "platform_representation_count": 192,
+      "unique_annotated_media_count": "UNRESOLVED_PENDING_LINKAGE_AND_HASH_AUDIT",
+      "interpretation": "CANDIDATE_PARALLEL_REPRESENTATIONS_NOT_384_INDEPENDENT_ANNOTATIONS"
+    },
+    "root_classes_present": [
+      "ANNOTATIONS",
+      "IMAGES",
+      "VIDEOS",
+      "ARCHIVE_METADATA",
+      "ARCHIVAL_CERTIFICATE",
+      "PARTICIPANT_TABLE",
+      "README"
+    ]
+  },
+  "grouping_schema": {
+    "participant_grouping_available": true,
+    "recording_date_grouping_available": true,
+    "media_link_field_available": true,
+    "complete_linkage_verified": false,
+    "session_definition_frozen": false,
+    "sensitive_fields_quarantined": [
+      "BIRTHDAY",
+      "RECORDING_DATE",
+      "FREE_TEXT_COMMENTS"
+    ]
+  },
+  "release_reconciliation": {
+    "paper_video_file_count": 354,
+    "paper_total_duration_hours": 108.58,
+    "paper_participant_count": 62,
+    "paper_annotated_video_count": 192,
+    "keeper_description_total_duration_hours_rounded": 109,
+    "keeper_description_annotated_duration_hours_rounded": 54,
+    "accessible_live_video_object_count": 192,
+    "paper_minus_live_video_count": 162,
+    "annotated_subset_interpretation": "PLAUSIBLE_INFERENCE_NOT_VERIFIED",
+    "retired_preliminary_video_count": "CONTRADICTED_BY_CURRENT_UI_NOT_USED"
+  },
+  "terms": {
+    "archive_license_field": "BLANK",
+    "local_copy_permission": "UNRESOLVED",
+    "derived_transcript_annotation_permission": "UNRESOLVED",
+    "local_model_processing_permission": "UNRESOLVED",
+    "aggregate_export_permission": "UNRESOLVED",
+    "cared_certificate_role": "ARCHIVAL_STEWARDSHIP_NOT_DATA_USE_PERMISSION"
+  },
+  "canonical_manifest": {
+    "restricted_row_manifest_created": false,
+    "canonical_digest": "UNAVAILABLE_BECAUSE_TERMS_PREVENTED_MANIFEST_PROCESSING",
+    "required_next_step": "PIN_LIVE_REVISION_OR_USE_DOI_SNAPSHOT_THEN_BUILD_RESTRICTED_CANONICAL_MANIFEST_AFTER_PERMISSION"
+  },
+  "privacy": {
+    "contains_media": false,
+    "contains_transcript": false,
+    "contains_participant_or_session_values": false,
+    "contains_exact_media_timestamps": false,
+    "contains_file_level_records": false,
+    "cell_suppression_required_for_future_aggregates": true
+  }
+}

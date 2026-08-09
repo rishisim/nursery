@@ -1,0 +1,45 @@
+{
+  "schema_version": "childlens-author-language-blocker-decision-v1.3.1",
+  "terminal_state": "CHILDLENS_LEXICAL_FEASIBILITY_STOP_CURRENT_RESOURCES",
+  "decision_basis": [
+    "SOLE_AVAILABLE_AUTHOR_NOT_QUALIFIED_FOR_DOMINANT_GERMAN_SOURCE_LANGUAGE",
+    "ATTEMPTED_UI_DID_NOT_PHYSICALLY_CONFINE_FROZEN_AUDIT_WINDOW",
+    "NO_VALID_HUMAN_SOURCE_LANGUAGE_EVIDENCE_AVAILABLE",
+    "TRANSLATION_OR_MODEL_CONSENSUS_CANNOT_REPLACE_HUMAN_VALIDATION"
+  ],
+  "author_attempt": {
+    "status": "INVALID_FOR_SCIENTIFIC_COMPARISON",
+    "partial_records_preserved": false,
+    "prediction_blinding_preserved": true,
+    "author_pass_globally_locked": false,
+    "model_human_comparison_executed": false,
+    "gate_contribution_allowed": false
+  },
+  "language_evidence": {
+    "status": "MODEL_DIAGNOSTIC_NOT_HUMAN_VALIDATED",
+    "aggregate_dominant_language": "German",
+    "dominance_threshold": 0.8,
+    "item_window_and_duration_threshold_passed": true,
+    "per_item_language_exported": false
+  },
+  "ui_correction": {
+    "legacy_full_source_media_object_exposed_to_player": true,
+    "future_player_uses_physically_bounded_duration_verified_clips": true,
+    "tested_with_synthetic_media_only": true,
+    "relaunched_to_current_author": false
+  },
+  "current_resource_failure": {
+    "qualified_authorized_german_annotator_available": false,
+    "bounded_childlens_remedy": "WRITTEN_AUTHORIZATION_PLUS_QUALIFIED_GERMAN_ANNOTATOR_AND_CLEAN_CORRECTED_15_MINUTE_AUDIT"
+  },
+  "recommended_pivot": "SEPARATELY_INITIALIZED_BABYVIEW_ONLY_STUDY_WITH_ZERO_CHILDLENS_EMPIRICAL_ANCESTRY",
+  "acceptable_interim": "FULLY_SYNTHETIC_CAUSAL_PROTOTYPE_WITH_SIMULATOR_ORACLE_AND_NO_CHILDLENS_LANGUAGE_CLAIM",
+  "learner_or_causal_outcome_run": false,
+  "aea_empirical_ancestry": false,
+  "babyview_empirical_ancestry": false,
+  "babyview_or_childlens_pooling": false,
+  "pseudo_labels_treated_as_human_ground_truth": false,
+  "hosted_model_received_restricted_content": false,
+  "restricted_childlens_upgrade_rerun": false,
+  "historical_v1_v1_1_v1_2_v1_3_preserved": true
+}

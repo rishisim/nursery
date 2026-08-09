@@ -1,0 +1,19 @@
+{
+  "detector_model_digest": "a487035deba4692728240eb593ba16e1182d9b5959b43d950b60883d1ed08b33",
+  "evidence_digest": "02863d18e894992796a11610433e5d077e25492414fb97446860a89f26265dcf",
+  "file_sha256": "a487035deba4692728240eb593ba16e1182d9b5959b43d950b60883d1ed08b33",
+  "hash_only_placeholder": false,
+  "implementation_class": "babyworld_lite.sensor_alignment_v2.detector.SensorEventDetector",
+  "implementation_function": "babyworld_lite.sensor_alignment_v2.detector.candidate_evidence",
+  "inference_calls": 910082,
+  "load_calls": 1,
+  "minimum_required_calls": 910082,
+  "perturbation": {
+    "changed_only_visible_raw_sensor_byte_value": true,
+    "original_digest": "1541bb379a09ec4bb8ad3c9c7a84953e741365c9fbc9904729677b0d95ffd514",
+    "output_changed": true,
+    "perturbed_digest": "05cb57f7c1094cd3932bca1eb3f7b04e2a9fbc8034f7d166cbea7fd7bf8e55a5",
+    "status": "PASS"
+  },
+  "status": "PASS"
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": "nursery-development-launch-post-freeze-audit-v2",
+  "protocol_id": "synthetic-development-launch-v2",
+  "decision": "REVISE",
+  "frozen_package_modified": false,
+  "excluded_rehearsal_count": 1,
+  "excluded_rehearsal_status": "PASS",
+  "excluded_rehearsal_sha256": "e4ad0fc5f63a184802920915c15007112e9cace99f7bd971846b63503584d0a7",
+  "independent_recompute_status": "PASS",
+  "independent_recompute_comparison_sha256": "fcd3525de554dc4e992476e7c80d96bf8f202b7559d5bf74434ddd974e8d2cd1",
+  "negative_mutation_status": "PASS",
+  "negative_mutation_tests_sha256": "daaf7256a1e98d280c3ae420c895401b8567722b9838bc5060582298752c02e2",
+  "failures": [
+    {
+      "stage": "official_frozen_tests",
+      "failure_class": "snapshot-relative-test-runtime-assumption",
+      "diagnosis": "The environment regression test called environment_record with the frozen snapshot as repository root and incorrectly required a .venv directory inside that snapshot. The actual frozen runtime command had already imported successfully and reproduced all 13 artifacts byte-identically.",
+      "evidence": "official_test_execution_report.json",
+      "evidence_sha256": "18feb6696d812a0c71db643f14530deff4d63de7eefb84edf05f9e78710207bb"
+    },
+    {
+      "stage": "complete_manifest_reconciliation",
+      "failure_class": "overbroad-self-exclusion",
+      "diagnosis": "Post-write file-set reconciliation excluded every nested file named complete_file_manifest.json rather than excluding only the package root manifest. The manifest itself was internally stable, but exact reconciliation correctly failed closed.",
+      "evidence": "complete_file_manifest.json",
+      "evidence_sha256": "e1611367a05ef480be22a2ad4b1c430775528dcc4f6aa1b0f6b590195a6065db"
+    }
+  ],
+  "package_terminal_sha256": "5962d5fe7b7b374cb02c328151cfe4d9573ca113e1ee10b42b11f7396cc13d03",
+  "preservation_proof_sha256": "d2ccba778d6cfd70566bad922677ea5536202f00db766691f8e0627fce561110",
+  "development_outcome_count": 0,
+  "confirmation_outcome_count": 0,
+  "development_output_absent": true,
+  "authorization_absent": true,
+  "next_cycle": "synthetic-development-launch-v3",
+  "next_fixture_identifiers": {
+    "corpus": [310001, 310003],
+    "model": [310101, 310103, 310107],
+    "inference": [310401]
+  },
+  "next_excluded_rehearsal_identifiers": {
+    "corpus": [310201, 310203, 310205, 310207],
+    "model": [310301, 310303, 310307],
+    "inference": [310403]
+  },
+  "gate_changes": "none"
+}

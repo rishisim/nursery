@@ -1,0 +1,21 @@
+{
+  "aggregate_dominant_language": "German",
+  "alternative_languages_suppressed": true,
+  "cell_suppression_k": 5,
+  "dominance_requires_item_window_and_duration_shares": true,
+  "dominance_rule_frozen_before_read": true,
+  "dominance_threshold": 0.8,
+  "dominance_threshold_passed": true,
+  "dominant_duration_share_band": "GE_80_PERCENT",
+  "dominant_item_share_band": "GE_80_PERCENT",
+  "dominant_window_share_band": "GE_80_PERCENT",
+  "frozen_candidate_window_count": 912,
+  "frozen_selected_item_count": 15,
+  "human_validation_claimed": false,
+  "instrument": "whisper.cpp-large-v3-turbo-fixed-v1.3",
+  "per_item_languages_exported": false,
+  "qualified_human_ground_truth_replaced": false,
+  "schema_version": "childlens-language-diagnostic-v1.3.1",
+  "status": "MODEL_DIAGNOSTIC_NOT_HUMAN_VALIDATED",
+  "transcript_or_lexical_content_exported": false
+}

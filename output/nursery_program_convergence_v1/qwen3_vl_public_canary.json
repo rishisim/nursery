@@ -1,0 +1,19 @@
+{
+  "artifact_bytes": 5776633051,
+  "artifact_file_count": 17,
+  "artifact_manifest_sha256": "1980efbd9c9c976560b95e162a56e2057a910649552ef945e5f967becc644f81",
+  "childlens_or_quarantine_accessed": false,
+  "exact_schema_valid": true,
+  "five_frames_consumed": true,
+  "hosted_or_cloud_inference_used": false,
+  "network_denial_sentinel_passed": true,
+  "peak_mlx_memory_gib": 6.04,
+  "pseudo_output_is_human_evidence": false,
+  "restricted_inference_authorized_by_canary": false,
+  "revision": "defcdea7cc7a4b0858fea563cbbce171d328e457",
+  "schema_version": "nursery-qwen3-vl-public-canary-v1",
+  "scope": "SELF_GENERATED_FIVE_FRAME_FIXTURE_ONLY",
+  "status": "PASS",
+  "synthetic_semantic_fixture_passed": true,
+  "wall_time_seconds": 5.898
+}

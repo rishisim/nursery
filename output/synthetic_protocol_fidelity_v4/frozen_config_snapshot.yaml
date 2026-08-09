@@ -1,0 +1,83 @@
+protocol:
+  id: synthetic-benchmark-protocol-fidelity-v4
+  schema_version: nursery-synthetic-v4
+  status: frozen
+  phase: fixture_only_qualification
+  scientific_outcomes_authorized: false
+  confirmation_authorized: false
+  claim_scope: package qualification only; no scientific effect is estimated
+
+seeds:
+  fixture_only:
+    corpus: [140001]
+    model: [140101]
+    inference: [140151]
+  excluded_smoke:
+    corpus: [140201, 140207]
+    model: [140301, 140303]
+    inference: [140351]
+  future_development:
+    corpus: [141001, 141011, 141019, 141031, 141037, 141041, 141061, 141067]
+    model: [141101, 141107, 141121]
+    inference: [141151]
+  confirmation_reserve:
+    corpus: [149001, 149011, 149021, 149029]
+    model: [149101, 149113, 149119]
+    inference: [149151]
+  prior_v1_v3: [7, 17, 29, 43, 101, 103, 107, 211, 223, 401, 409, 419, 809, 811, 821, 881, 883, 887, 907, 911, 919, 991, 1103, 2207, 3301, 4409, 12011, 12037, 12049, 12071, 12097, 12101, 12113, 12119, 12143, 12149, 12157, 12161, 12163, 12197, 12203, 12211, 12227, 12239, 12241, 12251, 31013, 31019, 31033, 31039, 31051, 31063, 31069, 31079, 31091, 31121, 31123, 31139, 31147, 31151, 31153, 31159, 31177, 31181, 31183, 31189, 31193, 31219, 31223, 31231, 31237, 31247, 31249, 31253, 31259, 31267, 31271, 31277, 31279, 31283, 31289, 31307, 31319, 31321, 31327, 31333, 52021, 52027, 52051, 52057, 52103, 52121, 61001, 61007, 61027, 61031, 61043, 61051, 70123, 88001, 88003, 88007, 88177, 88179, 88211, 88223, 88989, 88993, 91009, 92009, 93001, 94007, 96103, 96137, 96149, 96157, 96931, 96959, 97103, 97117, 97127, 97151, 97931, 97943, 99001]
+
+design:
+  action_concepts: 6
+  noun_concepts: 6
+  primitive_count: 3
+  manner_count: 2
+  candidates_per_episode: 4
+  episodes_per_concept: 16
+  visibility_levels: [0.55, 1.0]
+  lag_levels: [0, 8]
+  raw_samples: 64
+  interval_width: 7
+  action_sensor_owner: intended_event
+  noun_sensor_owner: exact_target_position_by_owner_position_factorial
+  target_grounding: always_present_fixed_design
+  conditions: [synchronized, shuffled, absent]
+
+detector:
+  frozen_v2_path: output/synthetic_sensor_event_robustness_v2/detector/frozen_detector.json
+  frozen_v2_sha256: a487035deba4692728240eb593ba16e1182d9b5959b43d950b60883d1ed08b33
+  required_runtime_class: babyworld_lite.sensor_alignment_v2.detector.SensorEventDetector
+  required_runtime_function: babyworld_lite.sensor_alignment_v2.detector.candidate_evidence
+  minimum_inference_calls_per_raw_episode: 1
+
+learner:
+  name: joint_competitive_cross_situational_v4
+  iterations: 7
+  competition_weight: 0.65
+  temperature: 0.65
+  sensor_weight: 0.65
+  lag_scale: 8.0
+  update_rate: 0.55
+  smoothing: 0.08
+  null_logit: -0.25
+  noun_sensor_weight: 0.0
+  sensor_free_unidentified_manner_policy: symmetric_projection
+
+inference:
+  resamples: 1200
+  alpha: 0.05
+  zero_variance_tolerance: 1.0e-12
+  degenerate_behavior: exact_empirical_point_mass_interval_with_population_warning
+
+gates:
+  exact_action_relation_balance: true
+  exact_noun_owner_target_independence: true
+  maximum_noun_target_distractor_detector_gap: 0.15
+  minimum_sensor_free_action_accuracy: 0.20
+  maximum_sensor_free_action_accuracy: 0.99
+  minimum_oracle_action_accuracy: 0.75
+  minimum_direct_capacity_action_accuracy: 0.95
+  detector_runtime_required: true
+  factor_stratification_required: true
+  reproduction_byte_identity_required: true
+  preservation_required: true
+  all_tests_required: true

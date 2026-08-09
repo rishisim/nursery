@@ -1,0 +1,31 @@
+{
+  "schema_version": "nursery-v8-adversarial-audit-repair-ledger-v1",
+  "v8_package_modified": false,
+  "development_outcome_count": 0,
+  "confirmation_outcome_count": 0,
+  "cycles": [
+    {
+      "cycle": 1,
+      "status": "REVISE_AUDITOR",
+      "failed_check": "factor_balance_and_conditions",
+      "diagnosis": "The auditor compared a persisted JSON mapping with string object keys to a recomputed Python mapping with integer keys using native equality. Their canonical JSON digests were identical, so the reported factor mismatch was an auditor type-normalization bug rather than a V8 package defect.",
+      "run_sha256": "e6308b968ec434262e7e10c8c219248a83a8ce8cff29517adc046cc334e1a48f",
+      "source_sha256": "4030167e3ec9adf8c9f2ce0a8ec519045c7b173ec10f3cfbd21653abd41713ac",
+      "preserved_source": "audit_v1.py"
+    },
+    {
+      "cycle": 2,
+      "status": "PASS",
+      "repair": "Compare every recomputed base-audit field by frozen canonical JSON digest.",
+      "decision": "SURVIVES_ADVERSARIAL_AUDIT",
+      "source_sha256": "b1c9fa6c4b885bbfc4ac9871881d9c145318cbe73e180856216a85cf9c7ddc44",
+      "run_2_sha256": "fefb0bfd370b65faa8a03a3e83fe08466cf8f7652d04e30ac3b136a80eec6c9b",
+      "run_3_sha256": "fefb0bfd370b65faa8a03a3e83fe08466cf8f7652d04e30ac3b136a80eec6c9b",
+      "independent_runs_byte_identical": true,
+      "failed_checks": [],
+      "order_contexts": 8,
+      "candidate_permutations": 64,
+      "training_order_permutations": 16
+    }
+  ]
+}

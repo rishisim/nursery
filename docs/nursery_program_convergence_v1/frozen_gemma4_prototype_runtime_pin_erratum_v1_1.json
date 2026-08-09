@@ -1,0 +1,115 @@
+{
+  "schema_version": "nursery-gemma4-prototype-runtime-pin-erratum-v1.1",
+  "erratum_id": "gemma4-e4b-cached-venv-python-numpy-pin-correction-v1.1",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_PRE_CANARY_CONTENT_INDEPENDENT_ERRATUM",
+  "authority": "This additive erratum is the authoritative runtime-pin overlay for the bound v1 activation schema and public-canary contract. The original files remain immutable.",
+  "trigger": "A public runtime inspection of the exact cached-model virtual environment, performed before any public canary or restricted inference, found Python 3.10.20 and NumPy 2.2.6 rather than the host-interpreter values copied into the frozen contracts.",
+  "timing_and_independence": {
+    "public_canary_run_before_erratum": false,
+    "public_model_output_existed_before_erratum": false,
+    "restricted_content_accessed": false,
+    "restricted_inference_run": false,
+    "model_semantics_agreement_or_quality_inspected": false,
+    "scientific_outcome_run": false,
+    "content_independent_runtime_correction": true
+  },
+  "immutable_original_bindings": {
+    "activation_receipt_schema_v1": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_prototype_activation_receipt_schema_v1.json",
+      "sha256": "0668d8d304a1be30e43e9df2c05469a338d647c262418a04c6d067d2e77f8b05"
+    },
+    "common_schema_canary_contract_v1": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_prototype_common_schema_canary_contract_v1.json",
+      "sha256": "9b894fcfd47df93824d25a467961d2c9f3398666dbe824367f2d8e1afe0635e9"
+    },
+    "replacement_amendment": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_replacement_instrument_amendment.json",
+      "sha256": "8e6d7a43ea9639fa451a59386b8657495558fde77fb2147a20767388d47ed24a"
+    },
+    "opaque_provenance_amendment": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_e4b_opaque_instrument_provenance_amendment_v1.json",
+      "sha256": "93874c69153daaf41d902216351666c59b12aeb656b9739ecd07d1e6e4fe42b1"
+    }
+  },
+  "exact_corrections": [
+    {
+      "document": "activation_receipt_schema_v1",
+      "JSON_pointer": "/properties/runtime_binding/properties/python/const",
+      "frozen_value": "3.12.13",
+      "corrected_value": "3.10.20"
+    },
+    {
+      "document": "activation_receipt_schema_v1",
+      "JSON_pointer": "/properties/runtime_binding/properties/numpy/const",
+      "frozen_value": "2.5.1",
+      "corrected_value": "2.2.6"
+    },
+    {
+      "document": "common_schema_canary_contract_v1",
+      "JSON_pointer": "/cached_artifact_and_runtime_requirements/runtime_exact_pins/python_version",
+      "frozen_value": "3.12.13",
+      "corrected_value": "3.10.20"
+    },
+    {
+      "document": "common_schema_canary_contract_v1",
+      "JSON_pointer": "/cached_artifact_and_runtime_requirements/runtime_exact_pins/numpy",
+      "frozen_value": "2.5.1",
+      "corrected_value": "2.2.6"
+    }
+  ],
+  "effective_runtime_pins": {
+    "python": "3.10.20",
+    "mlx_vlm": "0.6.6",
+    "mlx": "0.32.0",
+    "transformers": "5.14.1",
+    "tokenizers": "0.22.2",
+    "numpy": "2.2.6",
+    "pillow": "12.3.0",
+    "llguidance": "1.7.6",
+    "ffmpeg": "8.0.1",
+    "jsonschema": "NOT_USED_MANUAL_EXACT_VALIDATOR"
+  },
+  "unchanged_contract": {
+    "exact_cached_artifact_revision_manifest_and_file_hashes": true,
+    "German_audio_plus_five_frame_fixture": true,
+    "exact_five_field_prompt_and_schema": true,
+    "greedy_generation_and_token_only_decode": true,
+    "primary_whole_output_parser": true,
+    "one_outer_fence_correction_maximum": true,
+    "qwen3_read_only_binding": true,
+    "primary_item_count_15": true,
+    "primary_total_seconds_900": true,
+    "candidate_window_count_137": true,
+    "frame_offsets": [-5.0, -2.5, 0.0, 2.5, 5.0],
+    "K5_complement_suppression": true,
+    "outward_rounding": true,
+    "schema_coverage_abstention_and_path_gates": true,
+    "network_denial_and_quarantine": true,
+    "simulator_oracle_evaluation_boundary": true,
+    "no_other_field_changed": true
+  },
+  "fail_closed_application_rule": {
+    "required_steps": [
+      "Recompute and match both bound original SHA-256 values before applying the overlay.",
+      "Resolve each exact JSON Pointer and require its frozen_value before substitution.",
+      "Apply all four substitutions in memory and no others.",
+      "Require the two resulting runtime-pin views to equal effective_runtime_pins for every named package.",
+      "Bind this erratum path and SHA-256 in every future canary and activation receipt."
+    ],
+    "maximum_corrected_semantic_or_scientific_fields": 0,
+    "maximum_runtime_fields_changed_per_document": 2,
+    "reject_if_original_digest_differs": true,
+    "reject_if_pointer_or_frozen_value_differs": true,
+    "reject_if_any_unlisted_field_changes": true,
+    "does_not_spend_outer_fence_parser_correction": true
+  },
+  "activation_boundary": {
+    "erratum_is_activation_receipt": false,
+    "public_canary_authorized_by_erratum_alone": false,
+    "restricted_inference_authorized": false,
+    "scientific_outcome_authorized": false,
+    "future_activation_receipt_schema_version": "nursery-gemma4-e4b-prototype-full-activation-receipt-v1-plus-runtime-pin-erratum-v1.1",
+    "next_action": "A public-only canary implementation may validate the bound v1 contract with this exact overlay after all compiled runtime hashes exist; a separate conforming activation receipt remains required before restricted inference."
+  }
+}

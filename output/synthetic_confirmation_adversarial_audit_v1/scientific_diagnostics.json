@@ -1,0 +1,535 @@
+{
+  "action_ceiling": {
+    "all_fractional_accuracy_exactly_one": true,
+    "all_tie_frequency_zero": true,
+    "averaged_action_presence_cells": 560,
+    "averaged_all_fractional_accuracy_exactly_one": true,
+    "mean_correct_probability_by_condition_presence": {
+      "absent_channel|null": 0.5136087005251654,
+      "absent_channel|present": 0.5332976132666881,
+      "randomized_shuffle|null": 0.5569268937707067,
+      "randomized_shuffle|present": 0.578203183648503,
+      "sensor_corrupted|null": 0.5316069529855704,
+      "sensor_corrupted|present": 0.5521289371447994,
+      "shift_minus_8|null": 0.5234958750183211,
+      "shift_minus_8|present": 0.5436776932291191,
+      "shift_plus_8|null": 0.515961573458132,
+      "shift_plus_8|present": 0.5357738103193784,
+      "synchronized|null": 0.5919911387875342,
+      "synchronized|present": 0.613398939682799,
+      "uninformative|null": 0.5136087005251654,
+      "uninformative|present": 0.5332976132666881
+    },
+    "unaveraged_action_presence_cells_all_conditions": 1680,
+    "unaveraged_focal_action_presence_cells": 720
+  },
+  "code_path_evidence": [
+    {
+      "fact": "joint update and null calibration weights are 0.0; sharpening weight is 0.50",
+      "lines": "103-126",
+      "path": "output/synthetic_development_launch_package_v3/frozen_config_snapshot.yaml"
+    },
+    {
+      "fact": "detector contribution requires agreement with the learner's current maximum",
+      "lines": "249-327",
+      "path": "output/synthetic_development_launch_package_v3/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/learner.py"
+    },
+    {
+      "fact": "the only detector-selected semantic update is multiplied by the frozen zero joint-update weight",
+      "lines": "385-393",
+      "path": "output/synthetic_development_launch_package_v3/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/learner.py"
+    },
+    {
+      "fact": "the operative path power-sharpens an already inferred distribution and preserves component ordering",
+      "lines": "450-460",
+      "path": "output/synthetic_development_launch_package_v3/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/learner.py"
+    },
+    {
+      "fact": "null mass is derived from semantic top/runner-up margins; declared presence_smoothing does not enter the update",
+      "lines": "461-487",
+      "path": "output/synthetic_development_launch_package_v3/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/learner.py"
+    },
+    {
+      "fact": "action factor schedule and candidate lattice are corpus-seed invariant",
+      "lines": "575-615",
+      "path": "output/synthetic_development_launch_package_v3/frozen_source_snapshot/babyworld_lite/sensor_alignment_v8/benchmark.py"
+    },
+    {
+      "fact": "the co-primary endpoint is mean correct probability, not top-1 accuracy",
+      "lines": "209-250",
+      "path": "output/synthetic_development_launch_package_v3/frozen_source_snapshot/babyworld_lite/development_launch_v3/statistics.py"
+    },
+    {
+      "fact": "fixture cycles selected the corroboration/sharpening rule after no-effect and harmful variants",
+      "lines": "70-99",
+      "path": "docs/synthetic_identifiability_qualification_v7_repair_ledger.json"
+    }
+  ],
+  "corpus_units": {
+    "all_evaluation_prompt_files_unique": true,
+    "all_lexicon_files_unique": true,
+    "all_oracle_episode_files_unique": true,
+    "all_visible_episode_files_unique": true,
+    "ecological_heterogeneity_supported": false,
+    "pseudoreplication": false,
+    "seed_count": 40,
+    "seeds": [
+      281001,
+      281003,
+      281005,
+      281007,
+      281009,
+      281011,
+      281013,
+      281015,
+      281017,
+      281019,
+      281021,
+      281023,
+      281025,
+      281027,
+      281029,
+      281031,
+      281033,
+      281035,
+      281037,
+      281039,
+      281041,
+      281043,
+      281045,
+      281047,
+      281049,
+      281051,
+      281053,
+      281055,
+      281057,
+      281059,
+      281061,
+      281063,
+      281065,
+      281067,
+      281069,
+      281071,
+      281073,
+      281075,
+      281077,
+      281079
+    ],
+    "stream_sha256_uniqueness": {
+      "conditions/absent_channel.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "conditions/randomized_shuffle.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "conditions/sensor_corrupted.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "conditions/shift_minus_8.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "conditions/shift_plus_8.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "conditions/synchronized.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "conditions/uninformative.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "corpus_audit.json": {
+        "corpora": 40,
+        "unique_sha256": 1
+      },
+      "donor_maps/absent_channel.json": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "donor_maps/randomized_shuffle.json": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "donor_maps/sensor_corrupted.json": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "donor_maps/shift_minus_8.json": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "donor_maps/shift_plus_8.json": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "donor_maps/synchronized.json": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "donor_maps/uninformative.json": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "evaluation_keys.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "evaluation_prompts.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "evidence/absent_channel.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 1
+      },
+      "evidence/randomized_shuffle.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "evidence/sensor_corrupted.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "evidence/shift_minus_8.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "evidence/shift_plus_8.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "evidence/synchronized.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "evidence/uninformative.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "lexicon_oracle.json": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "oracle_episodes.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      },
+      "visible_episodes.jsonl": {
+        "corpora": 40,
+        "unique_sha256": 40
+      }
+    },
+    "structural_heterogeneity": "fixed, exactly balanced action geometry; stochastic raw noise/token/donor realizations only",
+    "unique_seed_count": 40
+  },
+  "direct_leakage_audit": {
+    "condition_state_reuse_found": false,
+    "note": "The STOP is measurement/construct invalidity, not direct answer-key leakage.",
+    "oracle_or_keys_consumed_by_primary_fit": false,
+    "order_effect_found": false,
+    "post_development_adaptation_found": false,
+    "predevelopment_fixture_mechanism_selection_found": true,
+    "side_modalities_present_at_language_evaluation": false
+  },
+  "frozen_inference_reconstruction": {
+    "synchronized_minus_absent_channel": {
+      "bootstrap_lcb_recomputed": 0.08003548781337018,
+      "bootstrap_lcb_saved": 0.08003548781337018,
+      "distinct_value_count": 40,
+      "exact_match": true,
+      "maximum": 0.08082983504354191,
+      "mean": 0.08010132641611085,
+      "mean_saved": 0.08010132641611085,
+      "minimum": 0.07967120331518596,
+      "positive_relative_to_threshold": 40,
+      "sample_sd": 0.00026034331449975063,
+      "sign_test_p": 9.094947017729282e-13,
+      "threshold": 0.005,
+      "value_count": 40,
+      "values": [
+        0.08004040083927477,
+        0.08027842844389521,
+        0.08074341077621627,
+        0.07967120331518596,
+        0.08002139784734019,
+        0.08003621453287568,
+        0.08030970245895441,
+        0.08082983504354191,
+        0.08013496404401144,
+        0.07993175750253356,
+        0.0804281033269304,
+        0.0800713248991557,
+        0.07978470482935895,
+        0.08029068978554987,
+        0.07990168053534252,
+        0.08018542312170851,
+        0.0799692898955624,
+        0.07987292962318127,
+        0.07981584555148968,
+        0.08021856436274344,
+        0.08034465017692649,
+        0.07983255289011626,
+        0.0797711237725518,
+        0.0799807633111731,
+        0.08020925010465707,
+        0.08032457042538166,
+        0.07985434126133018,
+        0.08033474943152108,
+        0.0798250730672716,
+        0.0799062189122609,
+        0.08034090493035706,
+        0.08001601284339077,
+        0.07977652265566271,
+        0.08005270309352208,
+        0.08019105225280931,
+        0.08016125148616138,
+        0.0802493740052671,
+        0.0804468336590205,
+        0.07984258135933486,
+        0.08005665627086633
+      ],
+      "values_digest_recomputed": "ff172254982149712cf2f16777955da32f6aa683a8927353617f07f8061a9ee4",
+      "values_digest_saved": "ff172254982149712cf2f16777955da32f6aa683a8927353617f07f8061a9ee4"
+    },
+    "synchronized_minus_absent_channel_null": {
+      "bootstrap_lcb_recomputed": 0.07831621450860547,
+      "bootstrap_lcb_saved": 0.07831621450860547,
+      "distinct_value_count": 40,
+      "exact_match": true,
+      "maximum": 0.07911985359563944,
+      "mean": 0.07838243826236879,
+      "mean_saved": 0.07838243826236879,
+      "minimum": 0.07794172679234013,
+      "positive_relative_to_threshold": 40,
+      "sample_sd": 0.0002636242216508845,
+      "sign_test_p": 9.094947017729282e-13,
+      "threshold": -0.02,
+      "value_count": 40,
+      "values": [
+        0.07831641703997239,
+        0.07856136964228744,
+        0.07902883370833091,
+        0.07794172679234013,
+        0.07830244964261024,
+        0.07831330428911287,
+        0.07859470757243192,
+        0.07911985359563944,
+        0.07841128557969546,
+        0.07821044464250637,
+        0.07871317843392567,
+        0.0783503920144486,
+        0.07806519537138346,
+        0.07857773027256043,
+        0.07818194358825203,
+        0.07846732348447916,
+        0.07825062554303774,
+        0.07815254991768628,
+        0.07809301092819909,
+        0.07850327025769976,
+        0.07862769253494184,
+        0.0781083291473531,
+        0.07804905755919855,
+        0.07826332910153089,
+        0.07849345907815153,
+        0.07860963162191947,
+        0.07813305686046346,
+        0.07862064481290765,
+        0.07810334823639487,
+        0.07817894172962858,
+        0.07862584802016215,
+        0.07829927196409336,
+        0.07805405124518128,
+        0.0783319547075485,
+        0.07847855727056052,
+        0.07844126355650094,
+        0.07853485546451644,
+        0.07872936443263845,
+        0.0781200297638186,
+        0.07833923107064211
+      ],
+      "values_digest_recomputed": "d26caec201edfed3da138532491e24833f187b70969999853a626e710c095655",
+      "values_digest_saved": "d26caec201edfed3da138532491e24833f187b70969999853a626e710c095655"
+    },
+    "synchronized_minus_randomized_shuffle": {
+      "bootstrap_lcb_recomputed": 0.034829951340445524,
+      "bootstrap_lcb_saved": 0.034829951340445524,
+      "distinct_value_count": 40,
+      "exact_match": true,
+      "maximum": 0.03895219069977507,
+      "mean": 0.03519575603429608,
+      "mean_saved": 0.03519575603429608,
+      "minimum": 0.032791208701107744,
+      "positive_relative_to_threshold": 40,
+      "sample_sd": 0.0014332143511106685,
+      "sign_test_p": 9.094947017729282e-13,
+      "threshold": 0.005,
+      "value_count": 40,
+      "values": [
+        0.03883983665745294,
+        0.03540519681193155,
+        0.03655219909228369,
+        0.033914421416506135,
+        0.03626002548162355,
+        0.03430903018137654,
+        0.03486252368386156,
+        0.036434492869827695,
+        0.034558704030901666,
+        0.03321165208315813,
+        0.03613984758101241,
+        0.03383914201700977,
+        0.03342920194134913,
+        0.03398768772605276,
+        0.032847341738192815,
+        0.03492213879121109,
+        0.035158450866540236,
+        0.03621385739917127,
+        0.03486353904119299,
+        0.03399937029796707,
+        0.03357484450545223,
+        0.03421293753751775,
+        0.036785717042943866,
+        0.03584256813206721,
+        0.035327668651566335,
+        0.03895219069977507,
+        0.03378672556437401,
+        0.03517113613719325,
+        0.03629436782640438,
+        0.0345152696657538,
+        0.03626738384044892,
+        0.03716973293483439,
+        0.03676060493002109,
+        0.036019376287945826,
+        0.03573941093103172,
+        0.03476803708449627,
+        0.032791208701107744,
+        0.035031725247807954,
+        0.03489677339078601,
+        0.0341739025516925
+      ],
+      "values_digest_recomputed": "39a7d8e9e6e239f1b73c45b5681939000d69830541ca84ee8521df30562ecaaa",
+      "values_digest_saved": "39a7d8e9e6e239f1b73c45b5681939000d69830541ca84ee8521df30562ecaaa"
+    },
+    "synchronized_minus_randomized_shuffle_null": {
+      "bootstrap_lcb_recomputed": 0.034709073064585934,
+      "bootstrap_lcb_saved": 0.034709073064585934,
+      "distinct_value_count": 40,
+      "exact_match": true,
+      "maximum": 0.038772390918721644,
+      "mean": 0.03506424501682741,
+      "mean_saved": 0.03506424501682741,
+      "minimum": 0.03271510739823813,
+      "positive_relative_to_threshold": 40,
+      "sample_sd": 0.0014100735967434738,
+      "sign_test_p": 9.094947017729282e-13,
+      "threshold": -0.02,
+      "value_count": 40,
+      "values": [
+        0.03863701562339572,
+        0.035299444064774366,
+        0.036419241130333235,
+        0.03376976091258688,
+        0.03610364860150439,
+        0.03418921486867221,
+        0.03475411022032693,
+        0.036311931383045004,
+        0.03445188827120771,
+        0.033081249190460404,
+        0.03599227727263776,
+        0.0337980939159066,
+        0.033299958704364196,
+        0.03388670027046781,
+        0.03275726059558903,
+        0.034798601773461835,
+        0.0350463322033685,
+        0.03604590668918184,
+        0.03471925821599475,
+        0.03389566637866881,
+        0.03346677775742091,
+        0.03407268528278784,
+        0.036628927724883464,
+        0.03570565054171915,
+        0.03520282190758672,
+        0.038772390918721644,
+        0.033673399608213694,
+        0.03503278230133722,
+        0.03612584832025334,
+        0.034377273650135654,
+        0.036097613328157196,
+        0.03700795453669381,
+        0.03656760440701823,
+        0.03584285486659544,
+        0.035658054323206345,
+        0.0346594233250187,
+        0.03271510739823813,
+        0.03491402316427372,
+        0.03474075014226885,
+        0.03405029688261829
+      ],
+      "values_digest_recomputed": "de8ee8547ce8f9ed5a81f3d1dcf8ed5b8ebff52ca8ff810a9748d3edcb90097b",
+      "values_digest_saved": "de8ee8547ce8f9ed5a81f3d1dcf8ed5b8ebff52ca8ff810a9748d3edcb90097b"
+    }
+  },
+  "frozen_source_matches_live": {
+    "babyworld_lite/development_launch_v3/statistics.py": {
+      "byte_identical": true,
+      "frozen_sha256": "3d91208f227b4ff17209d0d5bc965047c652e074f5a9296e98244a2841c8385a",
+      "live_sha256": "3d91208f227b4ff17209d0d5bc965047c652e074f5a9296e98244a2841c8385a"
+    },
+    "babyworld_lite/development_launch_v3/study.py": {
+      "byte_identical": true,
+      "frozen_sha256": "ac48574f053f46fec33d6b3341e7d6968e25f49cdbe08bcc74fc9c0ac0fa51a8",
+      "live_sha256": "ac48574f053f46fec33d6b3341e7d6968e25f49cdbe08bcc74fc9c0ac0fa51a8"
+    },
+    "babyworld_lite/sensor_alignment_v8/benchmark.py": {
+      "byte_identical": true,
+      "frozen_sha256": "d6c378326f676ca5f8ca166c3e746de2eedb99e2d22a34464d02f38dd5d6f373",
+      "live_sha256": "d6c378326f676ca5f8ca166c3e746de2eedb99e2d22a34464d02f38dd5d6f373"
+    },
+    "babyworld_lite/sensor_alignment_v8/learner.py": {
+      "byte_identical": true,
+      "frozen_sha256": "442a45d899b9b490a5c2f066dff10df82f79ac374f063fd8950c67e4e6435a0d",
+      "live_sha256": "442a45d899b9b490a5c2f066dff10df82f79ac374f063fd8950c67e4e6435a0d"
+    }
+  },
+  "frozen_weights": {
+    "initialization_jitter": 0.015,
+    "sensor_joint_update_weight": 0.0,
+    "sensor_null_calibration_weight": 0.0,
+    "sensor_semantic_sharpening_weight": 0.5,
+    "sensor_weight": 0.1
+  },
+  "model_replicates": {
+    "all_groups_have_three_distinct_serialized_digests": true,
+    "corpus_condition_groups": 280,
+    "forbidden_claim": "model-initialization-population, architecture, or hyperparameter robustness",
+    "maximum_sd": 2.2010972030617617e-07,
+    "mean_within_corpus_condition_presence_sample_sd": 2.4410252428215216e-08,
+    "minimum_sd": 1.3417404666084592e-09,
+    "model_seeds": [
+      281101,
+      281103,
+      281107
+    ],
+    "permitted_claim": "numerical convergence for these three tiny deterministic hash jitters",
+    "serialized_digest_includes_model_seed_metadata": true
+  },
+  "present_null_dependence": {
+    "interpretation": "shared alignment-conditioned confidence sharpening; not independent present and null evidence",
+    "sync_minus_absent_correlation": 0.9999517662355136,
+    "sync_minus_absent_present_minus_null_mean": 0.0017188881537420681,
+    "sync_minus_randomized_correlation": 0.9998640634247947,
+    "sync_minus_randomized_present_minus_null_mean": 0.00013151101746867455
+  },
+  "status": "PASS",
+  "terminal_decision": {
+    "reason": "The frozen sensor path cannot supply or correct an action meaning: disagreement is ignored, the detector-selected semantic update has weight zero, and the operative power transform only sharpens the learner's existing ordering. Every persisted action-present and action-null cell already has perfect fractional top accuracy in every condition. The declared co-primary gains therefore measure detector-agreement-conditioned confidence sharpening of already-correct mappings. The nearly identical present/null effects are a structural consequence of that shared distribution, not independent grounding and presence evidence. Repeating the same seed-invariant geometry on 289xxx would confirm this constructed calibration mechanism, not the frozen claim of sensor-assisted lexical/action grounding. Renaming the claim or changing the learner/design would broaden or alter the frozen science and is prohibited.",
+    "reason_code": "ALREADY_CORRECT_MAPPING_CONFIDENCE_SHARPENING_IS_NOT_A_CONFIRMATORY_SEMANTIC_GROUNDING_TEST",
+    "terminal": "CONFIRMATION_STOP"
+  }
+}

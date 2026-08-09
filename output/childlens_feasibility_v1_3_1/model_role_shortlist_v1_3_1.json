@@ -1,0 +1,50 @@
+{
+  "historical_broad_shortlist_superseded_by": "model_upgrade_appendix_v1_3_1.md",
+  "schema": "childlens.model_role_shortlist.v1_3_1",
+  "date": "2026-07-22",
+  "public_only_analysis": true,
+  "restricted_content_accessed": false,
+  "hosted_content_models_allowed": false,
+  "roles": {
+    "source_transcript": {
+      "primary": "whisper.cpp + Whisper large-v3-turbo",
+      "status": "KEEP_AS_PSEUDO_INSTRUMENT",
+      "human_source_text_required_for_wer_cer": true
+    },
+    "word_timing": {
+      "primary": "WhisperX alignment-only with pinned German alignment model",
+      "status": "CONDITIONAL_LICENSE_PROVENANCE_AND_OFFLINE_CPU_SMOKE",
+      "validates_word_identity": false
+    },
+    "voice_source_role": {
+      "primary": "VTC 2.2",
+      "status": "BLOCKED_PENDING_AFFIRMATIVE_CODE_AND_WEIGHT_LICENSE",
+      "generic_diarization_is_semantic_role_typing": false
+    },
+    "joint_audio_frame": {
+      "primary": "Phi-4-multimodal-instruct",
+      "status": "CONDITIONAL_PINNED_CODE_SECURITY_AND_MPS_SMOKE",
+      "german_audiovisual_grounding_established_by_public_card": false,
+      "secondary": "Qwen2.5-Omni-7B",
+      "secondary_status": "DEFER_HOST_MEMORY_RISK"
+    },
+    "visual_disagreement_judge": {
+      "primary": "Florence-2-base",
+      "status": "CONDITIONAL_SOURCE_GERMAN_INTERFACE_SMOKE",
+      "secondary": "Qwen2.5-VL-7B-Instruct",
+      "secondary_status": "CONDITIONAL_MPS_MEMORY_SMOKE_AND_CORRELATED_LINEAGE_WARNING"
+    }
+  },
+  "interpretive_constraints": {
+    "model_model_agreement_is_human_evidence": false,
+    "translation_is_source_transcription_evidence": false,
+    "diarization_alone_types_child_vs_adult": false,
+    "model_consensus_can_be_ground_truth": false,
+    "simulator_oracle_remains_primary_later_evaluation_truth": true
+  },
+  "branches": {
+    "qualified_german_annotator": "BLINDED_SOURCE_GERMAN_HUMAN_AUDIT_THEN_MODEL_HUMAN_AGREEMENT",
+    "no_qualified_german_annotator": "DESCRIPTIVE_PSEUDO_ONLY"
+  },
+  "hosted_model_rule": "LUNA_CODEX_AND_ALL_CLOUD_MODELS_INELIGIBLE_FOR_RESTRICTED_CONTENT_OR_LABEL_PAYLOADS"
+}

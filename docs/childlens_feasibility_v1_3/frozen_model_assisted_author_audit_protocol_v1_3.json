@@ -1,0 +1,479 @@
+{
+  "schema_version": "childlens-model-assisted-author-audit-protocol-v1.3.0",
+  "status": "FROZEN_BEFORE_AUTHOR_LABELS",
+  "supersedes_prior_protocols": false,
+  "preserved_historical_designs": [
+    "childlens_feasibility_v1",
+    "childlens_feasibility_v1_1",
+    "childlens_feasibility_v1_2_TWO_HUMAN_GOLD_STANDARD"
+  ],
+  "scientific_interpretation": {
+    "study_class": "FEASIBILITY_PROTOTYPE",
+    "publication_grade_human_annotation_claimed": false,
+    "machine_outputs": "PSEUDO_LABELS_AND_MEASUREMENT_INSTRUMENT_HYPOTHESES_ONLY",
+    "only_human_labeled_childlens_evidence": "LOCKED_AUTHOR_AUDIT_SUBSET",
+    "unaudited_pseudo_label_uses": [
+      "NONIDENTIFYING_AGGREGATE_SIMULATOR_CALIBRATION",
+      "CANDIDATE_GENERATION"
+    ],
+    "main_later_synthetic_causal_evaluation_truth": "SIMULATOR_ORACLE_LABELS"
+  },
+  "scientific_boundaries": {
+    "hosted_model_content_access": false,
+    "cloud_or_external_inference": false,
+    "pseudo_labels_are_ground_truth": false,
+    "unaudited_pseudo_labels_are_primary_evaluation_truth": false,
+    "instrument_ancestry_enters_learner": false,
+    "scientific_learner_outcome_authorized": false,
+    "simulator_oracle_labels_are_primary_causal_evaluation_truth": true,
+    "restricted_processing_location": "APPROVED_OWNER_PRIVATE_QUARANTINE_ONLY",
+    "restricted_inference_network_state": "NO_NETWORK",
+    "instrument_outputs_enter_later_learner": false,
+    "instrument_embeddings_features_weights_tokenizers_vocabularies_enter_later_learner": false
+  },
+  "audit_sampling": {
+    "selected_item_count": 15,
+    "selected_item_binding": "UNCHANGED_FROZEN_V1_1_PARTICIPANT_DISTINCT_SELECTION",
+    "eligible_source": "OFFICIAL_SPEECH_PRESENCE_WINDOWS_ONLY",
+    "source_window_input": "SECONDS_ROUNDED_INWARD_START_CEILING_END_FLOOR_AND_CLIPPED_TO_REFERENCE_MEDIA_DURATION",
+    "interval_convention": "HALF_OPEN_INTEGER_MILLISECONDS",
+    "primary_target_total_ms": 900000,
+    "preferred_per_item_ms": 60000,
+    "minimum_per_item_per_sample_ms": 1000,
+    "primary_representation_rule": "ALL_15_ITEMS_MUST_CONTRIBUTE_POSITIVE_SPEECH_DURATION",
+    "short_item_fallback": "SPLIT_SHORT_ITEM_CAPACITY_EVENLY_BETWEEN_PRIMARY_AND_RESERVE_THEN_HASH_ORDER_DEFICIT_DONORS",
+    "insufficient_total_rule": "FAIL_CLOSED_UNLESS_PRIMARY_AND_RESERVE_CAN_EACH_TOTAL_EXACTLY_900000_MS_AND_EACH_ITEM_CONTRIBUTES_AT_LEAST_1000_MS_TO_EACH",
+    "reserve_target_total_ms": 900000,
+    "reserve_max_total_ms": 900000,
+    "reserve_representation_rule": "ALL_15_ITEMS_MUST_CONTRIBUTE_AT_LEAST_1000_MS",
+    "reserve_disjoint_from_primary": true,
+    "reserve_frozen_with_primary_before_author_labels": true,
+    "allocation_quantum_ms": 1000,
+    "hash_namespace": "childlens-v1.3-author-audit-sample-2026-07-22",
+    "hash_inputs": [
+      "FROZEN_V1_2_SELECTION_BINDING",
+      "SAMPLER_VERSION",
+      "ALLOCATION_OR_PLACEMENT_PURPOSE",
+      "OPAQUE_ITEM_KEY"
+    ],
+    "permitted_manifest_top_level_fields": [
+      "schema_version",
+      "pilot_selection_sha256",
+      "items"
+    ],
+    "permitted_item_input_fields": [
+      "blinded_item_key",
+      "media_relpath",
+      "expected_size_bytes",
+      "expected_media_sha256",
+      "reference_duration_seconds",
+      "reference_duration_basis",
+      "speech_presence_expectation",
+      "speech_windows"
+    ],
+    "permitted_speech_window_fields": [
+      "start_seconds",
+      "end_seconds"
+    ],
+    "selection_basis_fields": [
+      "pilot_selection_sha256",
+      "blinded_item_key",
+      "reference_duration_seconds_for_clipping_ONLY",
+      "official_speech_window_start_seconds",
+      "official_speech_window_end_seconds"
+    ],
+    "selection_hash_deterministic": true,
+    "selection_independence": {
+      "model_predictions": true,
+      "confidence": true,
+      "lexical_content": true,
+      "transcript_text": true,
+      "visual_content": true,
+      "visual_salience": true,
+      "referential_status": true,
+      "apparent_success": true,
+      "learner_outcome": true
+    },
+    "algorithm": [
+      "VERIFY_EXACT_15_OPAQUE_ITEMS_AND_STRICT_INPUT_FIELD_ALLOWLIST",
+      "SORT_AND_UNION_OFFICIAL_WINDOWS_WITHIN_ITEM",
+      "HASH_ORDER_ITEMS_FROM_FROZEN_BINDINGS",
+      "INITIALIZE_BOTH_PRIMARY_AND_RESERVE_TO_MINIMUM_OF_60000_MS_AND_HALF_THE_ITEMS_AVAILABLE_UNIONED_SPEECH",
+      "REQUIRE_AT_LEAST_1000_MS_PER_ITEM_IN_EACH_SAMPLE",
+      "REDISTRIBUTE_PRIMARY_THEN_RESERVE_DEFICITS_FROM_REMAINING_CAPACITY_BY_DISTINCT_FROZEN_HASH_DONOR_ORDERS",
+      "DERIVE_LEADING_SLACK_MIDDLE_GAP_AND_PRIMARY_RESERVE_ORIENTATION_BY_DISTINCT_FROZEN_HASHES",
+      "MAP_BOTH_BLOCKS_BACK_TO_PHYSICAL_OFFICIAL_WINDOWS_AND_VERIFY_DISJOINTNESS",
+      "FREEZE_EXACTLY_900000_MS_PRIMARY_AND_EXACTLY_900000_MS_DISJOINT_RESERVE"
+    ],
+    "restricted_outputs": [
+      "ITEM_KEYS",
+      "EXACT_INTERVALS",
+      "ITEM_LEVEL_ALLOCATIONS",
+      "AUTHOR_ROWS",
+      "MODEL_ROWS"
+    ],
+    "repository_safe_outputs": [
+      "DIGESTS",
+      "TOTAL_SELECTED_ITEM_COUNT",
+      "TOTAL_SELECTED_SPEECH_MINUTES",
+      "ONE_MINUTE_PER_ITEM_BOOLEAN",
+      "CELL_SUPPRESSED_AGGREGATES"
+    ]
+  },
+  "author_audit": {
+    "route": "AUTHOR_AUDIT_A",
+    "qualified_author_count": 1,
+    "qualification": "AUTHOR_MUST_UNDERSTAND_THE_ENCOUNTERED_LANGUAGE_WELL_ENOUGH_TO_CORRECT_SOURCE_LANGUAGE_TRANSCRIPTS_AND_ASSIGN_SOURCE_ROLE",
+    "insufficient_language_competence_action": "MARK_UNUSABLE_OR_UNCERTAIN_AND_DO_NOT_GUESS",
+    "author_uses_raw_audio_video": true,
+    "author_blinded_to_predictions": true,
+    "author_blinded_to_confidence": true,
+    "author_blinded_to_model_identity": true,
+    "prediction_store_mounted_in_author_app_before_lock": false,
+    "author_lock_required_before_comparison": true,
+    "author_lock_mutable": false,
+    "author_lock_contents": [
+      "PROTOCOL_DIGEST",
+      "RESTRICTED_SAMPLE_DIGEST",
+      "ALL_AUTHOR_ROWS",
+      "COMPLETENESS_RECEIPT",
+      "LANGUAGE_AND_NORMALIZATION_APPLICABILITY_DECISIONS"
+    ],
+    "state_machine": [
+      "SAMPLE_FROZEN",
+      "AUTHOR_BLIND_OPEN",
+      "AUTHOR_LOCKED",
+      "PREDICTION_JOIN_ENABLED",
+      "MODEL_HUMAN_AGREEMENT_COMPUTED"
+    ],
+    "comparison_before_author_lock": false,
+    "second_human_required": false,
+    "adjudicator_required": false,
+    "inter_human_reliability_available": false,
+    "model_human_agreement_only": true,
+    "autosave_location": "OWNER_PRIVATE_QUARANTINE_ONLY",
+    "resumable": true,
+    "loopback_only": true,
+    "uncertain_and_unusable_routes_required": true
+  },
+  "annotation_ontology": {
+    "speech_segments": {
+      "unit": "ONE_CONTINUOUS_LINGUISTIC_CONTRIBUTION_BY_ONE_SOURCE_ROLE",
+      "boundary_reference": "FIRST_TO_FINAL_AUDIBLE_LINGUISTIC_SIGNAL",
+      "retain_false_official_speech_windows_as": "NONSPEECH"
+    },
+    "source_roles": [
+      "NON_CHILD",
+      "CHILD",
+      "OVERLAP",
+      "UNCERTAIN",
+      "NONSPEECH"
+    ],
+    "primary_role_contrast": "NON_CHILD_VERSUS_CHILD_OR_OVERLAP",
+    "referential_statuses": [
+      "VISIBLE_CANDIDATE",
+      "NULL_NOT_VISIBLE",
+      "IRRELEVANT",
+      "UNDECIDABLE",
+      "UNUSABLE"
+    ],
+    "referential_context_seconds": [-5, 5],
+    "mention_families": [
+      "NOUN_OBJECT",
+      "VERB_ACTION"
+    ],
+    "author_independent_candidate_record": [
+      "SOURCE_TRANSCRIPT_MENTION_SPAN",
+      "MENTION_FAMILY",
+      "REFERENTIAL_STATUS",
+      "CANDIDATE_COUNT_BAND",
+      "VISIBLE_CANDIDATE_TIME_BAND_WHEN_APPLICABLE",
+      "UNCERTAIN_OR_UNUSABLE_REASON"
+    ],
+    "candidate_count_bands": [
+      "ZERO",
+      "ONE",
+      "TWO",
+      "THREE_PLUS",
+      "UNKNOWN"
+    ],
+    "null_ambiguity_uncertain_and_unusable_retained": true
+  },
+  "comparison_rules": {
+    "normalization_locked_during_blind_language_stage": true,
+    "text_normalization": [
+      "UNICODE_NFC",
+      "UNICODE_CASEFOLD",
+      "REMOVE_UNICODE_PUNCTUATION_AND_SYMBOLS",
+      "COLLAPSE_WHITESPACE",
+      "NO_TRANSLATION",
+      "NO_EXTERNAL_LEXICON"
+    ],
+    "wer_applicability": "REQUIRED_ONLY_WHEN_THE_AUTHOR_LOCKS_WHITESPACE_TOKENIZATION_AS_LINGUISTICALLY_VALID_BEFORE_PREDICTION_REVEAL",
+    "cer_applicability": "ALWAYS_REQUIRED_FOR_USABLE_NON_CHILD_REFERENCE_TEXT",
+    "unmatched_reference_text": "COUNT_AS_DELETIONS",
+    "unmatched_machine_text": "COUNT_AS_INSERTIONS",
+    "boundary_matching": "ONE_TO_ONE_MAXIMUM_CARDINALITY_THEN_MAXIMUM_TEMPORAL_IOU_WITHOUT_USING_TEXT_ROLE_OR_MODEL_CONFIDENCE",
+    "coarse_referential_mapping": {
+      "VISIBLE_CANDIDATE": "VISIBLE",
+      "NULL_NOT_VISIBLE": "NULL",
+      "IRRELEVANT": "IRRELEVANT",
+      "UNDECIDABLE": "UNDECIDABLE_OR_UNUSABLE",
+      "UNUSABLE": "UNDECIDABLE_OR_UNUSABLE"
+    },
+    "candidate_match": [
+      "SAME_MENTION_FAMILY",
+      "MACHINE_MENTION_MAPS_TO_AN_INDEPENDENT_HUMAN_MENTION_THROUGH_LOCKED_TRANSCRIPT_ALIGNMENT",
+      "MACHINE_VISIBLE_CANDIDATE_POINT_OR_BAND_INTERSECTS_THE_HUMAN_BAND_WITH_A_1000_MS_COLLAR",
+      "EACH_HUMAN_AND_MACHINE_CANDIDATE_USED_AT_MOST_ONCE"
+    ],
+    "candidate_precision_denominator": "ALL_MODEL_PROPOSED_AUDITABLE_CANDIDATES_OF_THE_FAMILY",
+    "candidate_coverage_denominator": "ALL_HUMAN_MARKED_ELIGIBLE_VISIBLE_CANDIDATES_OF_THE_FAMILY"
+  },
+  "agreement_gates": {
+    "boundary_matching": {
+      "minimum_support": {
+        "human_linguistic_utterances": 30,
+        "represented_items": 10,
+        "human_linguistic_speech_ms": 300000
+      },
+      "declared_tolerances_ms": {
+        "strict_both_edges": 500,
+        "segment_match": 1000
+      },
+      "pass_thresholds": {
+        "segment_f1_at_1000ms_min": 0.75,
+        "matched_both_edges_within_500ms_min": 0.7,
+        "human_speech_time_recall_min": 0.8,
+        "machine_speech_time_precision_min": 0.75
+      },
+      "cluster_bound_floors": {
+        "segment_f1_at_1000ms_lcb90_min": 0.65,
+        "matched_both_edges_within_500ms_lcb90_min": 0.6,
+        "human_speech_time_recall_lcb90_min": 0.7,
+        "machine_speech_time_precision_lcb90_min": 0.65
+      },
+      "hard_fail_thresholds": {
+        "segment_f1_at_1000ms_below": 0.6,
+        "matched_both_edges_within_500ms_below": 0.55,
+        "human_speech_time_recall_below": 0.65,
+        "machine_speech_time_precision_below": 0.6
+      }
+    },
+    "source_role": {
+      "minimum_support": {
+        "human_decidable_linguistic_utterances": 30,
+        "represented_items": 10,
+        "non_child_utterances": 10,
+        "child_or_overlap_utterances": 10
+      },
+      "primary_comparison": "NON_CHILD_VERSUS_CHILD_OR_OVERLAP",
+      "uncertain_machine_output": "ABSTENTION_THAT_LOWERS_DECISION_COVERAGE_AND_RECALL",
+      "pass_thresholds": {
+        "non_child_precision_min": 0.85,
+        "non_child_recall_min": 0.7,
+        "binary_macro_f1_min": 0.75,
+        "role_decision_coverage_min": 0.8
+      },
+      "cluster_bound_floors": {
+        "non_child_precision_lcb90_min": 0.75,
+        "non_child_recall_lcb90_min": 0.6,
+        "binary_macro_f1_lcb90_min": 0.65,
+        "role_decision_coverage_lcb90_min": 0.7
+      },
+      "hard_fail_thresholds": {
+        "non_child_precision_below": 0.7,
+        "non_child_recall_below": 0.5,
+        "binary_macro_f1_below": 0.6,
+        "role_decision_coverage_below": 0.6
+      },
+      "secondary_report_only": [
+        "FIVE_CLASS_CONFUSION_MATRIX",
+        "EXACT_ROLE_AGREEMENT"
+      ]
+    },
+    "non_child_transcription": {
+      "minimum_support": {
+        "normalized_reference_characters": 500,
+        "represented_items": 10,
+        "human_non_child_speech_ms": 180000,
+        "normalized_reference_words_if_wer_applicable": 100
+      },
+      "pass_thresholds": {
+        "cer_max": 0.25,
+        "wer_max_if_applicable": 0.4,
+        "usable_transcript_coverage_min": 0.75
+      },
+      "cluster_bound_floors": {
+        "cer_ucb90_max": 0.35,
+        "wer_ucb90_max_if_applicable": 0.5,
+        "usable_transcript_coverage_lcb90_min": 0.65
+      },
+      "hard_fail_thresholds": {
+        "cer_above": 0.4,
+        "wer_above_if_applicable": 0.6,
+        "usable_transcript_coverage_below": 0.55
+      }
+    },
+    "coarse_referential": {
+      "minimum_support": {
+        "auditable_non_child_utterances": 20,
+        "represented_items": 8,
+        "human_visible_candidates": 8
+      },
+      "classes": [
+        "VISIBLE",
+        "NULL",
+        "IRRELEVANT",
+        "UNDECIDABLE_OR_UNUSABLE"
+      ],
+      "pass_thresholds": {
+        "four_class_exact_agreement_min": 0.65,
+        "four_class_macro_f1_min": 0.6,
+        "visible_precision_min": 0.75,
+        "visible_recall_min": 0.6,
+        "referential_decision_coverage_min": 0.7
+      },
+      "cluster_bound_floors": {
+        "four_class_exact_agreement_lcb90_min": 0.55,
+        "four_class_macro_f1_lcb90_min": 0.5,
+        "visible_precision_lcb90_min": 0.65,
+        "visible_recall_lcb90_min": 0.5,
+        "referential_decision_coverage_lcb90_min": 0.6
+      },
+      "hard_fail_thresholds": {
+        "four_class_exact_agreement_below": 0.45,
+        "four_class_macro_f1_below": 0.4,
+        "visible_precision_below": 0.55,
+        "visible_recall_below": 0.4,
+        "referential_decision_coverage_below": 0.5
+      }
+    },
+    "noun_object_candidates": {
+      "minimum_support": {
+        "human_eligible_visible_candidates": 20,
+        "represented_items": 8
+      },
+      "pass_thresholds": {
+        "candidate_precision_min": 0.75,
+        "candidate_coverage_min": 0.5
+      },
+      "cluster_bound_floors": {
+        "candidate_precision_lcb90_min": 0.6,
+        "candidate_coverage_lcb90_min": 0.35
+      },
+      "hard_fail_thresholds": {
+        "candidate_precision_below": 0.55,
+        "candidate_coverage_below": 0.25
+      }
+    },
+    "verb_action_candidates": {
+      "minimum_support": {
+        "human_eligible_visible_candidates": 15,
+        "represented_items": 6
+      },
+      "pass_thresholds": {
+        "candidate_precision_min": 0.7,
+        "candidate_coverage_min": 0.4
+      },
+      "cluster_bound_floors": {
+        "candidate_precision_lcb90_min": 0.55,
+        "candidate_coverage_lcb90_min": 0.25
+      },
+      "hard_fail_thresholds": {
+        "candidate_precision_below": 0.5,
+        "candidate_coverage_below": 0.2
+      }
+    }
+  },
+  "cluster_aware_uncertainty": {
+    "cluster_unit": "FROZEN_SELECTED_ITEM_EQUIVALENT_TO_PARTICIPANT_IN_THIS_15_ITEM_SAMPLE",
+    "method": "PERCENTILE_CLUSTER_BOOTSTRAP_RESAMPLING_WHOLE_ITEMS_WITH_REPLACEMENT",
+    "confidence_level": 0.9,
+    "replicates": 10000,
+    "seed": "SHA256_OF_FROZEN_PROTOCOL_DIGEST_AND_RESTRICTED_SAMPLE_DIGEST",
+    "ratio_metrics": "RECOMPUTE_POOLED_NUMERATOR_AND_DENOMINATOR_WITHIN_EACH_CLUSTER_RESAMPLE",
+    "minimum_defined_replicate_fraction": 0.8,
+    "undefined_bound_action": "GATE_CANNOT_PASS",
+    "leave_one_item_out_influence_report_required": true,
+    "maximum_single_item_support_share_for_PASS": 0.3,
+    "small_sample_inference": "DESCRIPTIVE_FEASIBILITY_UNCERTAINTY_ONLY_NOT_POPULATION_OR_PUBLICATION_INFERENCE"
+  },
+  "bounded_escalation": {
+    "maximum_activations": 1,
+    "maximum_additional_speech_ms": 900000,
+    "sample_source": "PREFROZEN_DISJOINT_BORDERLINE_RESERVE",
+    "activation_condition": "PRIMARY_BORDERLINE_ONLY",
+    "borderline_definition": [
+      "NO_ESSENTIAL_GATE_HAS_A_HARD_FAIL_METRIC",
+      "AT_LEAST_ONE_ESSENTIAL_GATE_MISSES_A_PASS_POINT_OR_CLUSTER_BOUND_BUT_DOES_NOT_CROSS_ITS_HARD_FAIL_THRESHOLD",
+      "OR_MINIMUM_SUPPORT_IS_NOT_MET_BUT_COULD_BE_MET_BY_THE_PREFROZEN_RESERVE"
+    ],
+    "activation_prohibited_for": [
+      "CHASING_A_PASS_AFTER_HARD_FAILURE",
+      "MODEL_CONFIDENCE",
+      "LEXICAL_RICHNESS",
+      "VISUAL_SALIENCE",
+      "APPARENT_SUCCESS",
+      "LEARNER_OUTCOME"
+    ],
+    "post_escalation_rule": "POOL_PRIMARY_AND_RESERVE_BY_THE_SAME_FROZEN_METRICS_AND_MAKE_A_FINAL_DECISION_WITH_NO_FURTHER_SAMPLE_EXPANSION"
+  },
+  "decision_logic": {
+    "before_author_completion": "CHILDLENS_AUTHOR_AUDIT_READY_ONLY_IF_FULL_PILOT_LOCAL_PSEUDO_ANNOTATIONS_AND_BLINDED_APP_ARE_COMPLETE",
+    "gate_statuses": [
+      "PASS",
+      "BORDERLINE",
+      "HARD_FAIL",
+      "NOT_ESTIMABLE"
+    ],
+    "primary_all_pass": "CHILDLENS_MODEL_ASSISTED_FEASIBILITY_GO",
+    "primary_borderline_no_hard_fail": "ACTIVATE_THE_ONE_PREFROZEN_RESERVE_AUDIT",
+    "primary_hard_fail": "CHILDLENS_MODEL_ASSISTED_FEASIBILITY_STOP",
+    "post_escalation_all_pass": "CHILDLENS_MODEL_ASSISTED_FEASIBILITY_GO",
+    "post_escalation_borderline_or_not_estimable": "CHILDLENS_MODEL_ASSISTED_FEASIBILITY_REVISE",
+    "post_escalation_hard_fail": "CHILDLENS_MODEL_ASSISTED_FEASIBILITY_STOP",
+    "technical_or_license_blocker_with_bounded_local_correction": "CHILDLENS_MODEL_ASSISTED_FEASIBILITY_REVISE",
+    "support_shortfall_alone_is_structural_corpus_failure": false,
+    "stop_interpretation": "AN_ESSENTIAL_LOCAL_INSTRUMENT_GATE_WITH_ADEQUATE_HUMAN_SUPPORT_CROSSES_A_FROZEN_HARD_FAIL_THRESHOLD_OR_THE_LOCAL_PIPELINE_CANNOT_PRODUCE_THE_REQUIRED_MODALITY",
+    "go_interpretation": "MODEL_ASSISTED_AGGREGATE_CALIBRATION_AND_CANDIDATE_GENERATION_ARE_FEASIBLE_NOT_THAT_THE_ACQUISITION_HYPOTHESIS_IS_SUPPORTED"
+  },
+  "prohibited_adaptations": [
+    "CHANGE_THE_15_FROZEN_ITEMS",
+    "SELECT_AUDIT_INTERVALS_FROM_MODEL_OUTPUT_CONFIDENCE_TEXT_VISUAL_CONTENT_OR_SUCCESS",
+    "REVEAL_PREDICTIONS_BEFORE_AUTHOR_LOCK",
+    "MUTATE_A_LOCKED_AUTHOR_RECORD",
+    "CHANGE_THRESHOLDS_AFTER_AUTHOR_LABELS",
+    "DROP_NULL_AMBIGUOUS_UNCERTAIN_OR_UNUSABLE_ROWS_TO_IMPROVE_METRICS",
+    "USE_A_HOSTED_MODEL_OR_EXTERNAL_SERVICE_ON_RESTRICTED_CONTENT",
+    "PROMOTE_PSEUDO_LABELS_TO_GROUND_TRUTH_OR_PRIMARY_EVALUATION_TRUTH",
+    "EXPAND_BEYOND_THE_ONE_PREFROZEN_BORDERLINE_RESERVE",
+    "TRAIN_OR_EVALUATE_A_SCIENTIFIC_LEARNER_OR_CAUSAL_ARM"
+  ],
+  "limitations": [
+    "ONE_AUTHOR_CANNOT_ESTIMATE_INTER_HUMAN_RELIABILITY",
+    "MODEL_HUMAN_AGREEMENT_INCLUDES_AUTHOR_SPECIFIC_JUDGMENT_AND_ERROR",
+    "FIFTEEN_PARTICIPANT_DISTINCT_ITEMS_AND_FIFTEEN_TO_THIRTY_SPEECH_MINUTES_DO_NOT_SUPPORT_POPULATION_GENERALIZATION",
+    "RARE_LANGUAGES_ROLES_REFERENTIAL_CLASSES_NOUNS_OR_ACTIONS_MAY_BE_NOT_ESTIMABLE",
+    "MODEL_HUMAN_AGREEMENT_IS_NOT_MODEL_ACCURACY_AGAINST_PUBLICATION_GRADE_GOLD",
+    "UNAUDITED_FULL_PILOT_PSEUDO_LABELS_REMAIN_CANDIDATES_AND_AGGREGATE_CALIBRATION_INPUTS_ONLY",
+    "THE_MAIN_SYNTHETIC_CAUSAL_EVALUATION_MUST_USE_SIMULATOR_ORACLE_LABELS"
+  ],
+  "freeze_binding": {
+    "frozen_top_level_fields": [
+      "scientific_interpretation",
+      "scientific_boundaries",
+      "audit_sampling",
+      "author_audit",
+      "annotation_ontology",
+      "comparison_rules",
+      "agreement_gates",
+      "cluster_aware_uncertainty",
+      "bounded_escalation",
+      "decision_logic",
+      "prohibited_adaptations",
+      "limitations"
+    ],
+    "frozen_payload_sha256": "90a981b99c152c0a8258a9bcae1e8126be65699c168c5496df7ba0eb9d76135f"
+  }
+}

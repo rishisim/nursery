@@ -1,0 +1,155 @@
+{
+  "record_id": "childlens-feasibility-decision-v1.1.0",
+  "decision_date": "2026-07-21",
+  "terminal_decision": "CHILDLENS_FEASIBILITY_REVISE",
+  "controlling_rubric_id": "childlens-feasibility-rubric-v1.0.0",
+  "controlling_pilot_id": "childlens-lexical-feasibility-pilot-v1.0.0",
+  "rubric_or_threshold_changed": false,
+  "scientific_outcome_authorized": false,
+  "scientific_outcome_executed": false,
+  "learner_training_executed": false,
+  "causal_arm_executed": false,
+  "media_pilot_executed": false,
+  "historical_v1": {
+    "decision": "CHILDLENS_FEASIBILITY_REVISE",
+    "preserved": true,
+    "artifact_count": 23,
+    "baseline_sorted_path_and_sha256_set_digest": "35ba9acbba0fc11fc3419c88ea57d0721e08486c6d37595812ce6c77ce994abf"
+  },
+  "permission": {
+    "gate": "G1_TERMS",
+    "status": "PASS_WITH_CONTROLLING_CONSTRAINTS",
+    "receipt_id": "childlens-v1.1-permission-receipt-v1.0.0",
+    "covered_actions": [
+      "SELECTIVE_LOCAL_COPY",
+      "LOCAL_DECODE",
+      "RESTRICTED_TRANSCRIPTS_AND_REFERENTIAL_ANNOTATIONS",
+      "FIXED_LOCAL_MEASUREMENT_INSTRUMENTS_SUBJECT_TO_SEPARATE_LICENSE",
+      "INTERNAL_NONCOMMERCIAL_RESTRICTED_NONSHARED_LEARNER_AND_CHECKPOINT_TREATMENT",
+      "RETENTION_AND_DELETION_WITH_FAIL_CLOSED_REVIEW_BY_2027_07_31",
+      "NONIDENTIFYING_AGGREGATE_EXPORT_WITH_CITATION"
+    ],
+    "prohibited_actions": [
+      "COMMERCIAL_USE_OR_COMMERCIAL_MODEL_TRAINING",
+      "SHARING_REDISTRIBUTION_OR_THIRD_PARTY_ACCESS",
+      "REMOTE_OR_CLOUD_PROCESSING_OF_RESTRICTED_DATA",
+      "PUBLIC_MEDIA_TRANSCRIPTS_IDENTIFIERS_TIMESTAMPS_OR_CHECKPOINTS",
+      "USE_AFTER_2027_07_WITHOUT_RENEWED_WRITTEN_PERMISSION"
+    ],
+    "agreement_accepted_or_modified_by_task": false
+  },
+  "release_binding": {
+    "public_doi": "10.17617/4.fe",
+    "keeper_library_id": "c8ed0104-b793-4c35-817e-302afd4e036b",
+    "public_snapshot_commit": "4856662653b2fa183e53268d088cffba02a33443",
+    "public_snapshot_identity_bound": true,
+    "pilot_source": "ACCESSIBLE_LIVE_VIEW",
+    "live_observation_bound": true,
+    "live_immutable_revision_observed": false,
+    "live_to_public_snapshot_byte_equivalence": "NOT_PROVEN",
+    "final_canonical_restricted_manifest_complete": false,
+    "exact_selected_remote_bytes_resolved": false
+  },
+  "nonidentifying_release_observation": {
+    "video_object_count": 192,
+    "final_annotation_object_count": 192,
+    "participant_table_row_count": 192,
+    "participant_group_count": 58,
+    "participant_plus_recording_group_count": 141,
+    "participant_and_recording_grouping_complete_count": 192
+  },
+  "pilot_preselection": {
+    "status": "FROZEN_PRESELECTION_NOT_ACQUISITION_ADMISSION",
+    "target_video_count": 15,
+    "selected_video_count": 15,
+    "selection_source_pool_count": 192,
+    "selection_participant_group_count": 15,
+    "maximum_selected_videos_per_participant": 1,
+    "selection_content_blind": true,
+    "restricted_input_sha256": "81282e6a4d8178b1559a7473d22c70a36e44450467b6b5e2ff70ad9b7e9f049a",
+    "placeholder_manifest_sha256": "cc2b669e811ff78a045565be031537d5a93bfece40f27de3482768350adc1deb",
+    "restricted_download_plan_sha256": "bb39c32139310e30ac15095a15b3d4b95508ab217694f591845aac38e00364b8",
+    "human_validation_packet_sha256": "ae8503fc5c21fc6df0b08c763202eab074b2526f83ef847d2faca3ae4eb217a5",
+    "placeholder_sizes_are_scientific_evidence": false,
+    "video_acquisition_started": false,
+    "audio_or_video_content_inspected": false,
+    "human_validation_started": false
+  },
+  "gate_assessments": [
+    {
+      "gate_id": "G1_TERMS",
+      "status": "PASS_WITH_CONTROLLING_CONSTRAINTS",
+      "evidence": "Signed approved project evidence covers required bounded local actions under secure noncommercial nonsharing aggregate-only citation and time constraints."
+    },
+    {
+      "gate_id": "G2_RELEASE_GROUPING",
+      "status": "CONDITIONAL",
+      "evidence": "The immutable DOI snapshot identity and a redacted live observation are bound and grouping is complete at the table level, but exact selected bytes, final canonical manifest and live-to-snapshot byte equivalence are incomplete.",
+      "bounded_correction": "Resolve exact selected remote bytes content-blindly and complete the restricted canonical manifest, linkage and checksum receipts without claiming equivalence unless a complete comparison succeeds."
+    },
+    {
+      "gate_id": "G3_AUDIO_TIMING",
+      "status": "UNRESOLVED",
+      "evidence": "Synthetic local decode preflight passed, but no selected ChildLens video or audio was processed and no human timing coverage was measured.",
+      "bounded_correction": "Run the frozen selective pilot and apply the 80 percent decode and 70 percent manually corrected boundary thresholds."
+    },
+    {
+      "gate_id": "G4_TRANSCRIPT_ROLE",
+      "status": "UNRESOLVED",
+      "evidence": "Actual language, corrected transcript and timing quality, and five-way role reliability remain unmeasured.",
+      "bounded_correction": "Use qualified language-matched humans on the first 300 utterances or 30 speech minutes and require role macro-F1 of at least 0.80 with blinded reference and bounded corrected text error."
+    },
+    {
+      "gate_id": "G5_INPUT_LEXICON",
+      "status": "UNRESOLVED",
+      "evidence": "No fully human-dispositioned non-child transcript recurrence audit was run.",
+      "bounded_correction": "Require at least 8 noun/object and 6 verb/action candidates meeting every frozen cross-participant train visible-link and held-out support rule."
+    },
+    {
+      "gate_id": "G6_REFERENTIAL_ANNOTATION",
+      "status": "UNRESOLVED",
+      "evidence": "The packet and ontology are frozen but no genuine human visible null ambiguity or lag judgments were collected.",
+      "bounded_correction": "Double-code at least 20 percent, retain all null and ambiguous cases, require at least 15 percent visible-candidate coverage and nominal status alpha or equivalent of at least 0.67."
+    },
+    {
+      "gate_id": "G7_HELDOUT_EVALUATION",
+      "status": "UNRESOLVED",
+      "evidence": "Participant and session grouping can support deterministic splits, but release-specific lexical/action support after splitting is unmeasured.",
+      "bounded_correction": "Freeze participant-disjoint and session-disjoint split manifests before lexical inspection and establish frozen support in at least 3 held-out participant groups."
+    },
+    {
+      "gate_id": "G8_BASELINE_CEILING",
+      "status": "CONDITIONAL",
+      "evidence": "The construction protocol is frozen, but release-specific timing/referential target reliability and paired canonical manifest equality are not established.",
+      "bounded_correction": "Validate the strong-target annotations and prove equal RGB/text inventory exposure with only the named alignment transformation; do not train either control in the feasibility task."
+    },
+    {
+      "gate_id": "G9_SIMULATOR_CALIBRATION",
+      "status": "PASS_WITH_LIMITATIONS",
+      "evidence": "The permission receipt supports nonidentifying ChildLens video/audio aggregates; absent physical modalities remain explicitly unavailable and simulator-defined only."
+    },
+    {
+      "gate_id": "G10_RESOURCES",
+      "status": "CONDITIONAL",
+      "evidence": "The low storage envelope passes, two CPU workers are admitted and metadata-quarantine owner indexing and backup controls were established, but exact selected media bytes, human labor and later compute remain unresolved.",
+      "bounded_correction": "Revalidate quarantine and selective shards under the 20 GiB raw cap, 73 GiB peak namespace cap and 50 GiB post-peak free-space floor, then measure annotation labor."
+    }
+  ],
+  "decision_basis": {
+    "all_essential_gates_pass": false,
+    "fundamental_stop_condition_observed": false,
+    "bounded_revision_exists": true,
+    "summary": "Permissions and immutable public identity are resolved sufficiently for a bounded local pilot, and a content-blind 15-item preselection is frozen. Exact selected bytes and final manifest, media pilot evidence and genuine human language timing role referential validation remain; therefore GO is unsupported and STOP is unwarranted."
+  },
+  "privacy_and_provenance": {
+    "restricted_payload_in_report_artifacts": false,
+    "raw_media_or_transcript_exported": false,
+    "restricted_identifiers_or_exact_timestamps_exported": false,
+    "aea_empirical_ancestry": false,
+    "aea_strict_scope_procedural_exception_recorded": true,
+    "babyview_empirical_ancestry": false,
+    "external_instrument_features_or_vocabularies_entered_learner": false,
+    "historical_v1_browser_incident_preserved": true
+  },
+  "next_authorized_task": "CHILDLENS_V1_1_RESTRICTED_EXACT_SIZE_MANIFEST_SELECTIVE_ACQUISITION_AND_GENUINE_BLINDED_HUMAN_VALIDATION_NO_LEARNER_OR_CAUSAL_OUTCOME"
+}

@@ -1,0 +1,28 @@
+{
+  "command": "/Users/rishisim/Documents/research/nursery/.venv/bin/python -m pytest --collect-only -q tests/test_synthetic_development_launch_v3.py",
+  "exit_code": 0,
+  "nodeids": [
+    "tests/test_synthetic_development_launch_v3.py::test_authorization_is_digest_bound_and_confirmation_false",
+    "tests/test_synthetic_development_launch_v3.py::test_bounded_inference_fails_closed_on_fixture_degeneracy",
+    "tests/test_synthetic_development_launch_v3.py::test_complete_manifest_has_canonical_digest_and_exact_file_set",
+    "tests/test_synthetic_development_launch_v3.py::test_confirmation_command_is_absent_and_claim_is_narrow",
+    "tests/test_synthetic_development_launch_v3.py::test_development_and_confirmation_cannot_run_through_rehearsal_api",
+    "tests/test_synthetic_development_launch_v3.py::test_development_registries_carry_v8_reserves_and_are_disjoint",
+    "tests/test_synthetic_development_launch_v3.py::test_environment_record_preserves_virtual_environment_launcher",
+    "tests/test_synthetic_development_launch_v3.py::test_exact_one_shot_command_and_output_are_frozen",
+    "tests/test_synthetic_development_launch_v3.py::test_final_runner_authorization_guard_verifies_manifest_and_zero_outcomes",
+    "tests/test_synthetic_development_launch_v3.py::test_finalization_fails_closed_when_required_artifacts_are_missing",
+    "tests/test_synthetic_development_launch_v3.py::test_firewall_blocks_development_without_authorization_and_confirmation",
+    "tests/test_synthetic_development_launch_v3.py::test_fixture_corpus_retains_exact_v8_design",
+    "tests/test_synthetic_development_launch_v3.py::test_held_out_endpoint_contract_is_cue_free",
+    "tests/test_synthetic_development_launch_v3.py::test_inference_contract_uses_corpus_as_unit_and_iut",
+    "tests/test_synthetic_development_launch_v3.py::test_manifest_rejects_one_byte_mutation",
+    "tests/test_synthetic_development_launch_v3.py::test_model_replicates_are_averaged_within_corpus",
+    "tests/test_synthetic_development_launch_v3.py::test_negative_recompute_rejections_must_be_mutation_specific",
+    "tests/test_synthetic_development_launch_v3.py::test_package_adjudicator_fails_closed",
+    "tests/test_synthetic_development_launch_v3.py::test_traceability_has_no_precreation_dependency",
+    "tests/test_synthetic_development_launch_v3.py::test_v8_qualification_and_adversarial_evidence_are_ready"
+  ],
+  "output": "tests/test_synthetic_development_launch_v3.py::test_development_registries_carry_v8_reserves_and_are_disjoint\ntests/test_synthetic_development_launch_v3.py::test_firewall_blocks_development_without_authorization_and_confirmation\ntests/test_synthetic_development_launch_v3.py::test_fixture_corpus_retains_exact_v8_design\ntests/test_synthetic_development_launch_v3.py::test_model_replicates_are_averaged_within_corpus\ntests/test_synthetic_development_launch_v3.py::test_bounded_inference_fails_closed_on_fixture_degeneracy\ntests/test_synthetic_development_launch_v3.py::test_authorization_is_digest_bound_and_confirmation_false\ntests/test_synthetic_development_launch_v3.py::test_final_runner_authorization_guard_verifies_manifest_and_zero_outcomes\ntests/test_synthetic_development_launch_v3.py::test_package_adjudicator_fails_closed\ntests/test_synthetic_development_launch_v3.py::test_confirmation_command_is_absent_and_claim_is_narrow\ntests/test_synthetic_development_launch_v3.py::test_exact_one_shot_command_and_output_are_frozen\ntests/test_synthetic_development_launch_v3.py::test_development_and_confirmation_cannot_run_through_rehearsal_api\ntests/test_synthetic_development_launch_v3.py::test_manifest_rejects_one_byte_mutation\ntests/test_synthetic_development_launch_v3.py::test_environment_record_preserves_virtual_environment_launcher\ntests/test_synthetic_development_launch_v3.py::test_negative_recompute_rejections_must_be_mutation_specific\ntests/test_synthetic_development_launch_v3.py::test_complete_manifest_has_canonical_digest_and_exact_file_set\ntests/test_synthetic_development_launch_v3.py::test_finalization_fails_closed_when_required_artifacts_are_missing\ntests/test_synthetic_development_launch_v3.py::test_traceability_has_no_precreation_dependency\ntests/test_synthetic_development_launch_v3.py::test_inference_contract_uses_corpus_as_unit_and_iut\ntests/test_synthetic_development_launch_v3.py::test_held_out_endpoint_contract_is_cue_free\ntests/test_synthetic_development_launch_v3.py::test_v8_qualification_and_adversarial_evidence_are_ready\n\n20 tests collected in 0.15s\n",
+  "status": "PASS"
+}

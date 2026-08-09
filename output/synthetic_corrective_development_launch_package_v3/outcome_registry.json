@@ -1,0 +1,8 @@
+{
+  "authorization_consumed": false,
+  "confirmation_outcome_count": 0,
+  "confirmation_output_exists": false,
+  "development_outcome_count": 0,
+  "development_output_exists": false,
+  "schema_version": "nursery-corrective-outcome-registry-v3"
+}

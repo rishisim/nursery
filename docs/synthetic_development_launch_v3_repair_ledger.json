@@ -1,0 +1,65 @@
+{
+  "schema_version": "nursery-development-launch-repair-ledger-v3",
+  "protocol_id": "synthetic-development-launch-v3",
+  "predecessor_protocol_id": "synthetic-development-launch-v2",
+  "predecessor_decision": "REVISE",
+  "predecessor_audit": "output/synthetic_development_launch_package_v2/post_freeze_cycle_audit.json",
+  "gate_changes": "none",
+  "development_outcome_count": 0,
+  "confirmation_outcome_count": 0,
+  "repairs": [
+    {
+      "id": "fresh-rehearsal-identifiers",
+      "repair": "Use fixture identifiers 310001, 310003, 310101, 310103, 310107, 310401 and excluded-rehearsal identifiers 310201, 310203, 310205, 310207, 310301, 310303, 310307, 310403.",
+      "prior_rehearsal_registries_blocked": [
+        "configs/synthetic_development_launch_v1.yaml",
+        "configs/synthetic_development_launch_v2.yaml"
+      ],
+      "gate_weakened": false
+    },
+    {
+      "id": "snapshot-aware-runtime-regression",
+      "failure": "The v2 official frozen test assumed the frozen source snapshot itself contained .venv.",
+      "repair": "environment_record first uses the configured repository virtual-environment launcher and, when called from an isolated frozen snapshot, falls back to the active virtual environment at sys.prefix. The frozen environment still records the configured repository launcher during sealing.",
+      "validation": "The same test must pass both in the live repository and inside the frozen source snapshot and must import numpy, pytest, and yaml.",
+      "gate_weakened": false
+    },
+    {
+      "id": "root-only-manifest-self-exclusion",
+      "failure": "V2 exact reconciliation excluded every nested file named complete_file_manifest.json.",
+      "repair": "Exclude only output_root/complete_file_manifest.json by exact path. Preserve and verify nested evidence manifests as ordinary package files.",
+      "validation": "Regression tests create a nested complete_file_manifest.json and require both the manifest writer and authorization guard to include it.",
+      "gate_weakened": false
+    },
+    {
+      "id": "prior-package-preservation",
+      "repair": "Extend the prior-evidence baseline through every v2 source, document, configuration, test, frozen output, failed official report, independent reproduction, mutation evidence, terminal, manifest, and post-freeze audit.",
+      "gate_weakened": false
+    }
+  ],
+  "inherited_v2_repairs": [
+    "virtual-environment-launcher-preservation",
+    "mutation-specific-negative-controls",
+    "fail-closed-finalization",
+    "traceability-artifact-ordering",
+    "complete-manifest-canonical-digest"
+  ],
+  "pre_freeze_validation": {
+    "live_package_tests_passed": 20,
+    "isolated_snapshot_package_tests_passed": 20,
+    "repository_tests_passed": 246,
+    "repository_tests_skipped": 17,
+    "fixture_status": "PASS",
+    "fixture_cohort_summary_sha256": "6a1c1e3d005b220aef63f3482b38499565a1da3a7c3bb154ecfa5f09eac21f35",
+    "fixture_identifier_reference_audit_sha256": "3d053295b588abd7d4f5d88a8f5f34696e51c6aaffd7dc0b3b028daf05de6ad0",
+    "fixture_development_controls_sha256": "c60cfde0465999a27fc9d87829a36a5258e638354c91bbc38ccbdde8c04e0bc4",
+    "fixture_development_inference_sha256": "d574419574052d3f5f3cdfe70e861d492ea6cca0dcdc1c77ffc4aece22a492b8",
+    "fixture_scientific_decision_suppressed": true,
+    "prior_evidence_file_count": 3235,
+    "prior_evidence_baseline_sha256": "b2e3428f66f3e40320ebc40056f58e298a948342a42d3bb527091223329096f8",
+    "collected_tests_sha256": "f5b8716eba7641868ccbbb9a52118904b59335172033f883b1dd501f9c293ae6",
+    "development_outcome_count": 0,
+    "confirmation_outcome_count": 0
+  },
+  "status": "FROZEN_PENDING_EXCLUDED_REHEARSAL"
+}

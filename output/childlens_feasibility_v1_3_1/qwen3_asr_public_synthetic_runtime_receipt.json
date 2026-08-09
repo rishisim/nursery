@@ -1,0 +1,31 @@
+{
+  "asr": {
+    "artifact_bytes": 4087646324,
+    "artifact_manifest_sha256": "16d6148c1b3c5ad1e791ec3373d73f18023ad559674b421d54afd68d37665073",
+    "language_identification_correct": true,
+    "peak_process_rss_gib": 6.14,
+    "revision": "bcd2b5b7f32b480ab5790554cfa8347f246a14f3",
+    "transcript_cer": 0.0,
+    "transcript_wer": 0.0,
+    "wall_time_seconds": 28.458
+  },
+  "childlens_or_quarantine_accessed": false,
+  "device": "MPS",
+  "forced_aligner": {
+    "artifact_bytes": 1847236856,
+    "artifact_manifest_sha256": "c1668c6b377fb29288316b6d6036cdbb4c6f15360abe9d8dd0f90a2e0554226a",
+    "peak_process_rss_gib": 1.072,
+    "revision": "c07281df297b9905d24a508279258cccf987a064",
+    "timestamp_count_matches_asr_words": true,
+    "timestamps_monotonic_and_nonnegative": true,
+    "wall_time_seconds": 3.403,
+    "word_timestamp_count": 7
+  },
+  "hosted_or_cloud_inference_used": false,
+  "model_output_is_human_evidence": false,
+  "network_denial_sentinel_passed": true,
+  "restricted_inference_authorized": false,
+  "schema_version": "childlens-qwen3-asr-public-synthetic-smoke-v1.3.1",
+  "scope": "SELF_GENERATED_GERMAN_TTS_ONLY",
+  "status": "COMPLETE_PUBLIC_SYNTHETIC_ONLY"
+}

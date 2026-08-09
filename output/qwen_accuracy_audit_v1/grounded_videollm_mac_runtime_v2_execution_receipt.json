@@ -1,0 +1,88 @@
+{
+  "schema_version": "nursery-grounded-videollm-mac-runtime-v2-execution-v1.0.0",
+  "protocol_id": "childlens-independent-second-instrument-mac-runtime-v2",
+  "executed_at": "2026-07-22",
+  "status": "FAIL_FULL_MODEL_SMOKE_BEFORE_FIRST_MODEL_OUTPUT",
+  "result_class": "PUBLIC_MPS_COMPATIBILITY_FAILURE_NOT_MODEL_ACCURACY",
+  "prospective_freeze": {
+    "runtime_protocol_frozen_before_operator_test": true,
+    "runtime_selection_frozen_before_model_load": true,
+    "full_model_runtime_lock_frozen_before_model_load": true,
+    "runtime_lock_sha256": "cd6bd5f829427274b76906161cf5784a44600aa8cfd0dc05a10d5d05f5d2320d"
+  },
+  "artifacts": {
+    "hugging_face_repository": "WHB139426/Grounded-Video-LLM",
+    "hugging_face_revision": "b97f0e826a0b6c292ca54d9c02c483c479952501",
+    "official_source_revision": "e26da4e4b681357fd911d5ace3467f031af29208",
+    "checkpoint_sha256": "5967e1138fc1106e1c3b384b96af3120405f455475308b4067bb785ac560f588",
+    "weight_manifest_digest": "a2ab012a3a39c1a63ace406ff6ec0b9cdeb5482c1fc87e4a43326ee89daf2d47",
+    "patched_source_tree_digest": "f3e9032dc7e197810c4a3eca384ef05838c7f82490a5bb87aba837b0585ebd53",
+    "runner_sha256": "2888b0f71186139e8d7e32eee3684e0d5f168c8bd34382d51c8988a252115ec7",
+    "requirements_sha256": "5e1dbeb32fd743e2ffe581b7065f195515b03d5b876a9ac9b2a2315be1267bce",
+    "environment_package_digest": "1f46288a772ad88ec290a53bd57f90ff425e446bc6ee1f3cbdaa7af15e0a39ac"
+  },
+  "operator_preflight": {
+    "selected_runtime_path": "PYTORCH_2_13_NATIVE_MPS_CONV3D",
+    "pytorch": "2.13.0",
+    "exact_production_shape_passed": true,
+    "cpu_reference_allclose_passed": true,
+    "max_abs_error": 0.0005390644073486328,
+    "mean_abs_error": 0.00007105893746484071,
+    "private_operator_receipt_sha256": "791916e5ecb4a63f613ce48ead63aeb07a4e7ca65c6e95f743bfe953f1e55e4f"
+  },
+  "full_model_smoke": {
+    "host": "Apple M5",
+    "architecture": "arm64",
+    "unified_memory_gib": 32,
+    "python": "3.10.20",
+    "pytorch": "2.13.0",
+    "device": "mps",
+    "dtype": "float16",
+    "attention": "eager",
+    "network_denial_sentinel_passed": true,
+    "attempts": 1,
+    "fixture": "One self-generated public five-frame scene; not part of the scored canary.",
+    "model_components_loaded": true,
+    "checkpoint_shards_loaded": 4,
+    "inference_started": true,
+    "model_outputs_produced": 0,
+    "schema_parseability": "NOT_OBSERVED",
+    "semantic_correctness_scored": false,
+    "failure_component": "Post-Conv3D MPS graph during full-model forward pass",
+    "failure_operation": "MPS add associated with a projection or linear bias",
+    "failure_operand_types": "tensor<1536x3072xf16> plus tensor<3072xf32>",
+    "failure": "MetalPerformanceShadersGraph rejected operands with mixed float16 and float32 element types.",
+    "private_success_receipt_created": false
+  },
+  "public_canary": {
+    "attempted": false,
+    "case_count": 8,
+    "model_outputs_produced": 0,
+    "passed": false,
+    "reason": "The required unscored full-model smoke did not pass."
+  },
+  "privacy_and_scope": {
+    "public_synthetic_frames_only": true,
+    "restricted_packet_discovered_or_opened": false,
+    "restricted_inference_run": false,
+    "grounded_videollm_restricted_predictions_created": 0,
+    "qwen_rerun": false,
+    "new_acquisition": false,
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false,
+    "raw_restricted_content_exported": false
+  },
+  "decision": {
+    "retry_or_post_failure_port_patch_permitted_in_v2": false,
+    "grounded_videollm_substantially_better_than_qwen": "NOT_TESTED",
+    "childlens_branch_reopen": false,
+    "larger_human_grounded_calibration_study": "DO_NOT_INVEST_BASED_ON_THIS_ATTEMPT",
+    "interpretation": "PyTorch 2.13 fixes the first Conv3D blocker, but the exact released Grounded-VideoLLM checkpoint still does not complete one MPS forward pass. This receipt contains no evidence about Grounded-VideoLLM accuracy."
+  },
+  "repository_actions": {
+    "committed": false,
+    "pushed": false,
+    "published": false,
+    "license_clickthrough_or_acceptance": false
+  }
+}

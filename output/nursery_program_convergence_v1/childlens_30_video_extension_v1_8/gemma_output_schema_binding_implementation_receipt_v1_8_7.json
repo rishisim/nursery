@@ -1,0 +1,14 @@
+{
+  "schema_version": "nursery-childlens-gemma-output-schema-binding-implementation-receipt-v1.8.7",
+  "status": "PASS",
+  "amendment": "gemma_output_schema_binding_amendment_v1_8_7.json",
+  "post_change_runner_sha256": "d22e1088f359aa5367e9bf434d37e5b067c3781476b7049fe583f2734a3554d5",
+  "test_file_sha256": "149229a6a9efd36c1a22e45af3c2e3f56878948cba14f16973499806a82c388f",
+  "tests_passed": 17,
+  "completed_gemma_checkpoints_reused": 135,
+  "gemma_inference_rerun": false,
+  "schema_value_changed": false,
+  "sample_or_scientific_protocol_changed": false,
+  "restricted_payload_exported": false,
+  "scientific_endpoint_opened": false
+}

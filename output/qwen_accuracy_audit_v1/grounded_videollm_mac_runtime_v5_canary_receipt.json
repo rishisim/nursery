@@ -1,0 +1,86 @@
+{
+  "schema_version": "nursery-grounded-videollm-mac-runtime-v5-canary-v1.0.0",
+  "protocol_id": "childlens-independent-second-instrument-mac-runtime-v5",
+  "executed_at": "2026-07-23",
+  "status": "FAIL_PUBLIC_CANARY",
+  "result_class": "PUBLIC_MODEL_PERFORMANCE_GATE_FAILURE",
+  "prospective_freeze": {
+    "v5_protocol_sha256": "2c9d3cb4042378975e2174f495a088e7d017fcfc946ce97e4936b4d140deebbf",
+    "public_canary_specification_sha256": "b199063399ecae820c379ca8876f9a62db1895cf22c04f7b3478118495394da3",
+    "canary_runner_sha256": "52d156ac9d0a68b04d36c7e17c136865f3ac16273975550c0d3b7268ab225eec",
+    "private_canary_receipt_sha256": "925e8c77c114329067fc65d920df2002d55dd21a823019f4d1b45094acfa20db"
+  },
+  "instrument": {
+    "repository": "WHB139426/Grounded-Video-LLM",
+    "hugging_face_revision": "b97f0e826a0b6c292ca54d9c02c483c479952501",
+    "official_source_revision": "e26da4e4b681357fd911d5ace3467f031af29208",
+    "checkpoint_sha256": "5967e1138fc1106e1c3b384b96af3120405f455475308b4067bb785ac560f588",
+    "checkpoint_variant_status": "UNDOCUMENTED_GENERAL_VS_BENCHMARK_SUBSET_TUNED"
+  },
+  "runtime": {
+    "host": "Apple M5",
+    "architecture": "arm64",
+    "unified_memory_gib": 32,
+    "python": "3.10.20",
+    "pytorch": "2.13.0",
+    "attention": "eager",
+    "network_denial_sentinel_passed": true,
+    "module_placement": {
+      "vision_tower": "MPS float32",
+      "video_encoder": "CPU float32",
+      "multi_modal_projector": "MPS float32",
+      "video_projecter": "MPS float32",
+      "language_model": "MPS float16"
+    },
+    "elapsed_seconds": 703.3454968929291
+  },
+  "canary": {
+    "case_count": 8,
+    "schema_valid_count": 8,
+    "schema_valid_minimum": 7,
+    "oracle_referential_plus_lag_correct_count": 4,
+    "oracle_referential_plus_lag_correct_minimum": 6,
+    "passed": false,
+    "predicted_status_counts": {
+      "present": 8,
+      "null": 0,
+      "ambiguous": 0
+    },
+    "predicted_lag_counts": {
+      "lead": 6,
+      "overlap": 1,
+      "lag": 1
+    },
+    "oracle_status_correct_count": 6,
+    "oracle_lag_correct_count": 4,
+    "present_case_correct_count": 4,
+    "present_case_count": 6,
+    "null_case_correct_count": 0,
+    "ambiguous_case_correct_count": 0,
+    "interpretation": "The model obeyed the schema but called every case present, including the null and ambiguous controls, and was strongly lead-biased. This is consistent with over-alignment rather than a usable independent calibration instrument."
+  },
+  "privacy_and_scope": {
+    "public_self_generated_synthetic_cases_only": true,
+    "restricted_packet_discovered_or_opened": false,
+    "restricted_inference_run": false,
+    "grounded_videollm_restricted_predictions_created": 0,
+    "qwen_rerun": false,
+    "new_acquisition": false,
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false,
+    "raw_restricted_content_exported": false
+  },
+  "decision": {
+    "restricted_stage_authorized": false,
+    "grounded_videollm_substantially_better_than_qwen": "NOT_DEMONSTRATED",
+    "childlens_branch_reopen": false,
+    "larger_human_grounded_calibration_study": "DO_NOT_INVEST",
+    "reason": "The predeclared public admission gate failed before any ChildLens inference."
+  },
+  "repository_actions": {
+    "committed": false,
+    "pushed": false,
+    "published": false,
+    "license_clickthrough_or_acceptance": false
+  }
+}

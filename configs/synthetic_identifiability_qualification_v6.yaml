@@ -1,0 +1,145 @@
+protocol:
+  id: synthetic-identifiability-qualification-v6
+  schema_version: nursery-synthetic-v6
+  status: pre_freeze
+  phase: package_qualification_only
+  scientific_outcomes_authorized: false
+  future_development_authorized: false
+  confirmation_authorized: false
+  prior_outcomes_authorized: false
+
+registries:
+  fixture_only:
+    corpus: [260001]
+    model: [260101]
+    inference: []
+  excluded_smoke:
+    corpus: [260211, 260219]
+    model: [260311, 260313]
+    inference: []
+  retired_pre_freeze:
+    corpus: [260201, 260207]
+    model: [260301, 260303]
+    inference: []
+  future_development:
+    corpus:
+      [261001, 261003, 261005, 261007, 261009, 261011, 261013, 261015,
+       261017, 261019, 261021, 261023, 261025, 261027, 261029, 261031,
+       261033, 261035, 261037, 261039, 261041, 261043, 261045, 261047,
+       261049, 261051, 261053, 261055, 261057, 261059, 261061, 261063,
+       261065, 261067, 261069, 261071, 261073, 261075, 261077, 261079]
+    model: [261101, 261103, 261107]
+    inference: []
+  confirmation_reserve:
+    corpus:
+      [269001, 269003, 269005, 269007, 269009, 269011, 269013, 269015,
+       269017, 269019, 269021, 269023, 269025, 269027, 269029, 269031,
+       269033, 269035, 269037, 269039, 269041, 269043, 269045, 269047,
+       269049, 269051, 269053, 269055, 269057, 269059, 269061, 269063,
+       269065, 269067, 269069, 269071, 269073, 269075, 269077, 269079]
+    model: [269101, 269103, 269107]
+    inference: []
+  prior_registry_files:
+    - configs/synthetic_weak_alignment_recovery_v1.yaml
+    - configs/synthetic_sensor_event_robustness_v2.yaml
+    - configs/synthetic_component_robustness_v3.yaml
+    - configs/synthetic_protocol_fidelity_v4.yaml
+    - configs/synthetic_identifiability_qualification_v5.yaml
+
+design:
+  action_concepts: 6
+  noun_concepts: 6
+  raw_samples: 72
+  interval_width: 7
+  conditions:
+    - synchronized
+    - randomized_shuffle
+    - shift_minus_8
+    - shift_plus_8
+    - uninformative
+    - absent_channel
+    - sensor_corrupted
+  detector_strata: [informative, weak, zero_information, corrupted]
+  candidate_counts: [2, 3, 4, 5]
+  action_distractor_cycles: 5
+  noun_target_owner_pair_repetitions_per_sensor_stratum: 1
+  factor_schedule_seed: 260001
+  target_presence_levels: [present, absent]
+  action_visibility_levels: [0.55, 0.75, 1.0]
+  lags: [-8, -4, 0, 4, 8]
+  dropout_levels: [0.0, 0.25]
+  noise_levels: [0.035, 0.14]
+  false_positive_levels: [0, 1]
+  time_shifts: [-8, 8]
+  null_option: learnable
+  null_parameterization: independently_learned_unsupervised_rejection_threshold
+  candidate_count_normalized_alignment: true
+  noun_exact_independence_strata: [noun_identity, candidate_count, grounding, sensor_stratum]
+  action_exact_balance_strata: [action_identity, candidate_count, grounding, sensor_stratum]
+  evaluation_candidate_order_policy: fractional_credit_across_exact_maxima
+
+detector:
+  frozen_v2_path: output/synthetic_sensor_event_robustness_v2/detector/frozen_detector.json
+  frozen_v2_sha256: a487035deba4692728240eb593ba16e1182d9b5959b43d950b60883d1ed08b33
+  required_class: babyworld_lite.sensor_alignment_v2.detector.SensorEventDetector
+  required_function: babyworld_lite.sensor_alignment_v2.detector.candidate_evidence
+  strata_capacity_bounds:
+    informative: {minimum: 0.55, maximum: 1.0}
+    weak: {minimum: 0.20, maximum: 0.95}
+    zero_information: {minimum: 0.0, maximum: 0.70}
+    corrupted: {minimum: 0.0, maximum: 0.70}
+  overall_minimum: 0.25
+  overall_maximum: 0.92
+
+learner:
+  name: factorized_presence_semantic_cross_situational_v6
+  iterations: 12
+  competition_weight: 0.55
+  temperature: 0.30
+  sensor_weight: 0.10
+  noun_sensor_weight: 0.0
+  update_rate: 0.65
+  smoothing: 0.04
+  initial_null_score: 0.05
+  null_threshold_floor: 0.01
+  null_threshold_ceiling: 0.95
+  null_threshold_minimum_cluster_fraction: 0.02
+  null_threshold_minimum_log_cluster_gap: 0.10
+  null_threshold_maximum_low_cluster_compatibility: 0.48
+  null_threshold_log_interpolation: 0.65
+  initialization_jitter: 0.015
+  lag_scale: 10.0
+  token_joint_rule: geometric_mean_log_likelihood
+  semantic_competition_excludes_null_threshold: true
+  candidate_count_normalization: true
+  candidate_count_normalization_power: 0.25
+
+gates:
+  minimum_present_fractional_margin_over_exact_chance: 0.15
+  minimum_null_fractional_margin_over_exact_chance: 0.15
+  minimum_present_probability_margin_over_exact_chance: 0.03
+  minimum_null_probability_margin_over_exact_chance: 0.05
+  minimum_log_loss_improvement_over_exact_chance: 0.05
+  minimum_brier_improvement_over_exact_chance: 0.003
+  maximum_tie_frequency: 0.25
+  minimum_present_sensor_probability_delta: 0.005
+  maximum_null_sensor_probability_harm: 0.02
+  minimum_null_ablation_fractional_drop: 0.20
+  minimum_null_corruption_fractional_drop: 0.20
+  minimum_oracle_fractional: 0.80
+  minimum_direct_capacity_fractional: 0.95
+  maximum_noun_sensor_application_count: 0
+  maximum_noun_target_owner_gap: 0.0
+  maximum_noun_target_owner_cramers_v: 0.0
+  maximum_factor_pair_cramers_v: 0.20
+  maximum_factor_control_cramers_v: 0.20
+  order_metric_tolerance: 1.0e-12
+  exact_tie_tolerance: 1.0e-12
+  require_zero_development_outcomes: true
+  require_zero_confirmation_outcomes: true
+
+environment:
+  python: .venv/bin/python
+  version_test_root: tests/test_synthetic_identifiability_qualification_v6.py
+  repository_test_root: tests
+  bytecode_writes_disabled: true

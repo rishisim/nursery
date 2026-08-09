@@ -1,0 +1,53 @@
+{
+  "protocol_id": "childlens-lexical-feasibility-pilot-v1.0.0",
+  "status": "FROZEN_BEFORE_MEDIA_CONTENT_INSPECTION_NOT_AUTHORIZATION_TO_ACQUIRE",
+  "scientific_outcome_authorized": false,
+  "preconditions": [
+    "G1 terms permission is PASS",
+    "exact accessible release is pinned",
+    "selective acquisition does not require accepting terms or modifying a share",
+    "quarantined restricted workspace exists outside report artifacts"
+  ],
+  "target_sample": {
+    "videos": 15,
+    "allowable_range": [12, 18],
+    "participant_rule": "Prefer one annotated video from each of 15 distinct participant groups; never exceed two per group; if grouping is unavailable the pilot cannot begin.",
+    "eligible_pool": "Videos represented in the release annotation table with usable file linkage; eligibility is defined without watching/listening.",
+    "strata": [
+      "coarse activity label",
+      "speech-presence bin",
+      "duration tertile",
+      "location label when available"
+    ],
+    "selection": "Deterministic balanced allocation over metadata strata, then hash-order sampling using SHA-256(release_manifest_digest || protocol_id || internal_episode_key).",
+    "adjustment_rule": "Sample size may move within 12-18 only for access, byte-size, or empty-stratum constraints identified before content inspection; record the reason and preserve the hash order.",
+    "prohibited_selection": [
+      "lexical content",
+      "ASR output",
+      "visual salience",
+      "apparent grounding quality",
+      "any learner result"
+    ]
+  },
+  "acquisition": {
+    "mode": "selective_or_sharded_only",
+    "full_archive_download": false,
+    "preflight": "HEAD or equivalent metadata first; acquire only selected files and required annotation/metadata tables.",
+    "storage_reserve_gib": 30,
+    "integrity": "Record remote version/etag/size where exposed and local SHA-256 in the restricted manifest; never copy restricted paths or identifiers into reports."
+  },
+  "measurement": {
+    "asr_and_diarization": "Fixed local pretrained measurement instruments are quarantined; humans correct timing/text/role. Instrument embeddings and features cannot enter learner data.",
+    "speaker_roles": ["NON_CHILD", "CHILD", "OVERLAP", "UNCERTAIN", "NONSPEECH"],
+    "referent_status": ["VISIBLE_SINGLE", "VISIBLE_MULTIPLE", "NULL_NOT_VISIBLE", "IRRELEVANT", "UNDECIDABLE", "UNUSABLE"],
+    "context_windows_seconds": [-5, 5],
+    "event_lag_anchor": "utterance onset minus nearest adjudicated visible candidate boundary",
+    "double_annotation": "All timing/speaker validation items and at least 20% of referential items, stratified by participant and speech/activity stratum.",
+    "adjudication": "Blind independent coding first; adjudicate disagreements without changing the frozen status set."
+  },
+  "stopping": {
+    "early_stop": "Stop only for privacy/terms violation, corrupt or absent audio/video, unresolvable participant grouping, or infeasible storage. Do not stop or expand based on lexical richness or apparent cue effect.",
+    "no_training": "Do not train, fine-tune, probe, or compare any scientific learner or causal arm."
+  },
+  "exports": "Gate decisions and nonidentifying aggregates with uncertainty/coverage only; no media, transcript text, identifiers, exact timestamps, or small cells."
+}

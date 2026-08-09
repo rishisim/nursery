@@ -1,0 +1,47 @@
+{
+  "bootstrap_replicates": 20000,
+  "co_primary_contrasts": [
+    "synchronized_minus_absent_channel",
+    "synchronized_minus_randomized_shuffle"
+  ],
+  "confidence_level_one_sided": 0.95,
+  "corrupted_gain_maximum": 0.03,
+  "degenerate_behavior": {
+    "all_identical_nonpositive_or_below_threshold": "FAIL_POINT_MASS",
+    "all_identical_positive_above_threshold": "PASS_POINT_MASS_WITH_EXACT_SIGN_TEST",
+    "all_zero": "FAIL_DEGENERATE_ZERO",
+    "too_few_nonzero": "FAIL_INSUFFICIENT_NONZERO_CORPORA"
+  },
+  "development_corpus_count": 40,
+  "independent_unit": "corpus_seed",
+  "inference_method": "deterministic_paired_corpus_bootstrap_plus_exact_sign_test",
+  "intersection_union_rule": "every_co_primary_contrast_must_pass",
+  "lower_confidence_bound_must_exceed": 0.005,
+  "maximum_one_sided_sign_test_p": 0.05,
+  "minimum_nonzero_corpora_for_non_degenerate_inference": 8,
+  "minimum_positive_corpus_fraction": 0.6,
+  "minimum_primary_probability_delta": 0.005,
+  "model_replicate_handling": "average_within_corpus_before_inference",
+  "null_comparators": [
+    "absent_channel",
+    "randomized_shuffle"
+  ],
+  "null_noninferiority_margin": -0.02,
+  "primary_endpoint": {
+    "cue_free": true,
+    "family": "action",
+    "metric": "mean_correct_probability",
+    "presence": "present"
+  },
+  "secondary_controls": [
+    "shift_minus_8",
+    "shift_plus_8",
+    "uninformative",
+    "sensor_corrupted",
+    "noun",
+    "zero_information",
+    "primitive",
+    "manner"
+  ],
+  "stochastic_model_replicates": 3
+}

@@ -1,0 +1,122 @@
+{
+  "audit_scope": "independent preserved-evidence audit before V8 qualification",
+  "development_outcome_count": 0,
+  "confirmation_outcome_count": 0,
+  "v5": {
+    "protocol_id": "synthetic-identifiability-qualification-v5",
+    "terminal_decision": "REVISE",
+    "credible_strengths": [
+      "frozen source and persisted-input recomputation are byte-identical",
+      "one-byte source and input mutations are rejected",
+      "actual frozen v2 detector runtime executes",
+      "candidate-order reversal preserves every metric",
+      "official version and repository tests pass",
+      "complete manifest contains 331 non-self files"
+    ],
+    "confirmed_failures": {
+      "corpus_design": {
+        "bound": 0.022,
+        "observed_maximum_gaps": [
+          0.0222222222222222,
+          0.024390243902439046
+        ]
+      },
+      "factor_refits_executed": {
+        "classification": "audit cardinality bug",
+        "observed_distinct_episode_sets": "corpus-by-level",
+        "incorrect_expected_cardinality": "level only"
+      },
+      "identifier_touches": {
+        "declared_inference_identifiers": [
+          250351
+        ],
+        "observed_guarded_inference_identifiers": []
+      },
+      "null_learning": {
+        "sensor_free_action_present_fractional_accuracy": 1.0,
+        "sensor_free_action_null_fractional_accuracy": 0.0,
+        "sensor_free_action_null_probability_approximate": 0.000065,
+        "aggregate_action_fractional_accuracy": 0.5,
+        "aggregate_masked_subgroup_failure": true
+      }
+    },
+    "detector_capacity": {
+      "overall": 0.41875,
+      "informative": 0.8416666666666667,
+      "weak": 0.5666666666666667,
+      "zero_information": 0.26666666666666666,
+      "corrupted": 0.0
+    },
+    "artifact_sha256": {
+      "terminal_decision": "e17b06e8e9e111762d8197ef9b09125e6510a4c88c400e0cbb0a1e399baebdbb",
+      "qualification_summary": "f675cb16f6f195a952d1ef8bc6e922bd756ea9710cb2bbf277bbd2506706a949",
+      "model_results": "de7ac6c8eb29432a55a18e1c8e42d5ffb15e750e20bf656a878abaee7fdb6339",
+      "factor_audit": "d9f7a8c2dbeea57186cab16be27df85af11f086ff0f401c62ef45e68e85e654e",
+      "seed_operation_log": "2efd10dbd74701b89786414f88ec0e5abc89e8b2166277c643e8b885cc2d3c66"
+    }
+  },
+  "v6": {
+    "protocol_id": "synthetic-identifiability-qualification-v6",
+    "status": "INVALIDATED_PRE_FREEZE",
+    "decision": "REVISE",
+    "reason": "Reserved excluded-smoke corpus identifiers were used in a pre-freeze construction probe.",
+    "touched_identifiers": {
+      "corpus": [
+        260201,
+        260207
+      ],
+      "model": [],
+      "inference": []
+    },
+    "excluded_smoke_executed": false,
+    "learner_fit_count": 0,
+    "scientific_outcome_count": 0,
+    "artifact_sha256": {
+      "prefreeze_invalidation": "b4b0e30bf7fd692ef5bf254c0c020641bb3591f4453c27747a944f52110db62b"
+    }
+  },
+  "v7": {
+    "protocol_id": "synthetic-identifiability-qualification-v7",
+    "terminal_decision": "REVISE",
+    "identifiability_structural_failure": false,
+    "failed_gates": [
+      "corpus_design"
+    ],
+    "excluded_smoke_identifiers_touched": {
+      "corpus": [
+        270201,
+        270207
+      ],
+      "model": [
+        270301,
+        270303
+      ],
+      "inference": []
+    },
+    "confirmed_failure": {
+      "unchanged_maximum_factor_control_cramers_v": 0.2,
+      "corpus_270201_maximum": 0.2090605025017727,
+      "corpus_270201_cell": "noun|candidate_count=2|owner_position|false_positive",
+      "corpus_270207_maximum": 0.22961557339788813,
+      "corpus_270207_cell": "noun|candidate_count=2|owner_position|noise",
+      "classification": "repairable seed-dependent construction failure"
+    },
+    "credible_strengths": [
+      "all learner, null, detector, order, leakage, registry, factor-refit, sensor, and zero-outcome gates pass",
+      "ten recomputable artifacts reproduce byte-identically in a separate process",
+      "one-byte persisted-input and frozen-source mutations are rejected",
+      "18 frozen V7 tests and 173 repository tests pass",
+      "1357 prior-evidence files are preserved byte-for-byte",
+      "terminal decision regenerates byte-identically and complete manifest reconciliation passes"
+    ],
+    "artifact_sha256": {
+      "terminal_decision": "22af309f96a7cf8b2cbfd817555fe073578348cd0e1db2ef2e927b27c7cb8b58",
+      "qualification_summary": "9eddb0088e2cfbac0f81fbc00927e62ec1cc75eccce2018126fb0225d304e070",
+      "corpus_audits": "27d79acc3f2542bb13be5f50305cb68c6b0a9d4821766077c6f25c044092b0df",
+      "core_gates": "2c8f356062a98ed6d429d1e8a409db783d1065ab21650fb47f980345a83124d2",
+      "traceability_validation": "2b47644e09a850828f54e67dcaf607627885d638d469d7d63c927ab8c8fcb1a4",
+      "terminal_regeneration": "7f4a3acdf1ec9c602d936302e0e476fd56e4fa6b998715684e72a71cd7bcd34a",
+      "complete_file_manifest": "009afb669b6a692f4856eb20b9f7fe1eb23edb6b0069933e24e643859a1d26fe"
+    }
+  }
+}

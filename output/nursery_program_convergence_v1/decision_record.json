@@ -1,0 +1,115 @@
+{
+  "schema_version": "nursery-program-convergence-decision-v2",
+  "created_at": "2026-07-22",
+  "decision": "REUSE_EXISTING_SYNTHETIC_MECHANISM_PROOF_AND_FREEZE_MINIMAL_REALISM_EXTENSION",
+  "supersedes_convergence_decision": "EXISTING_SYNTHETIC_EVIDENCE_INADEQUATE_NEW_MINIMAL_PROTOCOL_REQUIRED",
+  "reason": "Under the revised directional prototype standard, synthetic weak-alignment recovery v1 is adequate as a provisional symbolic action-alignment mechanism proof. The missing test is a minimal calibration-conditioned sensitivity extension over permitted aggregate uncertainty ranges, with genuinely corrective dual noun/verb event selection and the later confidence-sharpening STOP preserved as a falsification boundary.",
+  "reused_evidence": {
+    "study": "synthetic_weak_alignment_recovery_v1",
+    "terminal_artifact": "output/synthetic_weak_alignment_recovery_v1/terminal_decision.json",
+    "permitted_label": "PROVISIONAL_SYMBOLIC_ACTION_ALIGNMENT_MECHANISM_PROOF",
+    "development_only": true,
+    "confirmation_run": false,
+    "not_permitted": [
+      "general lexical-acquisition proof",
+      "noun-object result",
+      "raw-perception result",
+      "naturalistic or infant result",
+      "confirmation outcome"
+    ],
+    "adversarial_boundary": "The separate confidence-sharpening lineage remains terminally stopped and supplies no grounding-effect evidence."
+  },
+  "childlens_disposition": {
+    "lexical_role": "STOP_REMAINS_TERMINAL",
+    "qualified_human_lexical_validation": "UNAVAILABLE_CURRENT_RESOURCES",
+    "prior_terminal_state": "CHILDLENS_LEXICAL_FEASIBILITY_STOP_CURRENT_RESOURCES",
+    "lexical_reopening_allowed": false,
+    "pseudo_calibration_allowed": true,
+    "pseudo_calibration_scope": "Only cell-suppressed, outward-rounded aggregate uncertainty ranges from the authorized frozen pilot may condition synthetic stress ranges.",
+    "active_calibration_protocol": "docs/nursery_program_convergence_v1/frozen_childlens_pseudo_calibration_protocol.json",
+    "active_sensitivity_protocol": "docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json",
+    "permitted_dimensions": [
+      "speech-event lag",
+      "visible-candidate prevalence",
+      "null-or-irrelevant prevalence",
+      "ambiguity-or-undecidable prevalence",
+      "candidate multiplicity",
+      "visibility",
+      "coarse noun-object support",
+      "coarse verb-action support"
+    ],
+    "forbidden_inputs": [
+      "raw media, frames, or audio",
+      "transcripts or translations",
+      "filenames, identifiers, timestamps, or item rows",
+      "small cells or item-level pseudo-label payloads",
+      "confidence values",
+      "vocabulary or tokenizers",
+      "embeddings, weights, or checkpoints",
+      "empirical causal effect sizes"
+    ],
+    "simulator_defined_only": [
+      "IMU",
+      "touch or contact",
+      "proprioception",
+      "motor commands",
+      "causal effect size"
+    ],
+    "model_agreement_is_ground_truth": false,
+    "evaluation_truth": "SIMULATOR_ORACLE_ONLY"
+  },
+  "active_protocol": "docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json",
+  "retained_stronger_protocol": "docs/nursery_program_convergence_v1/frozen_minimal_realism_protocol.json",
+  "protocol_status": "FROZEN_MINIMAL_EXTENSION_CALIBRATION_GATE_REVISE_OUTCOME_BLOCKED",
+  "calibration_execution": {
+    "receipt": "output/nursery_program_convergence_v1/childlens_pseudo_calibration_receipt.json",
+    "status": "CALIBRATION_REVISE",
+    "frozen_primary_items": 15,
+    "frozen_primary_seconds": 900,
+    "crosswalked_candidate_windows": 137,
+    "qwen2_schema_only_retry_attempts": 1,
+    "retry_budget_exhausted": true,
+    "speech_challenger_nonempty_item_coverage_interval": [
+      1.0,
+      1.0
+    ],
+    "challenger_visual_schema_validity_interval": [
+      1.0,
+      1.0
+    ],
+    "existing_visual_schema_validity_interval_after_retry": [
+      0.0,
+      0.0
+    ],
+    "gate_failures": [
+      "ENVELOPE_CANDIDATE_MULTIPLICITY",
+      "ENVELOPE_NULL_OR_IRRELEVANT",
+      "ENVELOPE_PARTIAL_OR_CLEAR_VISIBILITY",
+      "EXISTING_SCHEMA_VALIDITY"
+    ],
+    "model_agreement_is_ground_truth": false,
+    "human_validation": false,
+    "scientific_outcome_run": false
+  },
+  "new_scientific_outcome_run": false,
+  "scientific_outcome_authorized": false,
+  "scientific_endpoint_opened": false,
+  "empirical_payloads_accessed_for_this_decision": false,
+  "AEA_empirical_ancestry": false,
+  "BabyView_empirical_ancestry": false,
+  "cross_corpus_pooling": false,
+  "program_memo": "docs/nursery_program_convergence_v1/program_convergence_memo.md",
+  "immediately_runnable_lane": "Public/synthetic implementation fixtures only; the scientific outcome is blocked by the failed two-path visual calibration gate.",
+  "future_babyview_lane": {
+    "status": "SEPARATE_FRESH_STUDY_REQUIRES_USER_AND_INSTITUTIONAL_ACTION",
+    "blocks_synthetic_lane": false,
+    "pooling_or_ChildLens_transfer_allowed": false,
+    "role": "independent ecological validation, not confirmation through data reuse"
+  },
+  "user_input_required_before_minimal_outcome": true,
+  "required_user_choice": "Authorize a separately frozen replacement visual-instrument calibration revision using one distinct, unambiguously licensed local model, or explicitly drop the ChildLens-calibrated layer and revert to an empirical-free synthetic sensitivity study. Do not run the outcome under the current failed calibration receipt.",
+  "recommended_choice": "Preserve the Michael-facing naturalistic-envelope concept and first replace only the failed Qwen2 visual path with one distinct license-cleared local instrument under a new one-shot calibration protocol; do not relax the two-path gate.",
+  "next_task": "After the user's substantive choice, either freeze one replacement-instrument calibration revision or freeze an explicitly empirical-free sensitivity protocol; only then implement fixtures and request separate outcome authorization.",
+  "planned_launch_command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python scripts/run_calibration_conditioned_symbolic_grounding.py run --protocol docs/nursery_program_convergence_v1/frozen_calibration_conditioned_sensitivity_protocol.json --calibration-receipt output/nursery_program_convergence_v1/childlens_pseudo_calibration_receipt.json --output-root output/nursery_calibration_conditioned_symbolic_grounding --jobs 4",
+  "planned_launch_command_status": "NOT_YET_IMPLEMENTED_OR_AUTHORIZED"
+}

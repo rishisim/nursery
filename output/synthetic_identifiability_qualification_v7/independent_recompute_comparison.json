@@ -1,0 +1,64 @@
+{
+  "byte_and_sha256_identity": true,
+  "file_count": 10,
+  "file_sets_identical": true,
+  "files": [
+    {
+      "bytes": 104187,
+      "path": "compute_operation_log.json",
+      "sha256": "2a6395daad3b79cc4b3da38e391c63363794e49bab4f1e2218a7e994e7532206"
+    },
+    {
+      "bytes": 116675,
+      "path": "control_results.json",
+      "sha256": "5e81c674d3e4c05bd8175c11c1a00d21a7cc6dac2f528e3a2bdd5a330623b5c3"
+    },
+    {
+      "bytes": 68970,
+      "path": "core_gates.json",
+      "sha256": "2c8f356062a98ed6d429d1e8a409db783d1065ab21650fb47f980345a83124d2"
+    },
+    {
+      "bytes": 25685,
+      "path": "factor_audit.json",
+      "sha256": "5da474cc0cca932997bb4c7c38f309cb9a6fa312e44c4c30a4a3059742fcbce1"
+    },
+    {
+      "bytes": 3448366,
+      "path": "factor_results.json",
+      "sha256": "2906d2a9342d3cf813f77fd979fb4fba743769c72b265d0cddd8b0a60ec612e7"
+    },
+    {
+      "bytes": 342,
+      "path": "leakage_audit.json",
+      "sha256": "dd290bdc51822a4821b06acabb1dceda637c4480cc5d089deef8e60d40653e2f"
+    },
+    {
+      "bytes": 411,
+      "path": "learner_numeric_audit.json",
+      "sha256": "f20a8d3e159a9b80564bb16c9bc0670715ea994cc75cd10872949250868e0977"
+    },
+    {
+      "bytes": 1457549,
+      "path": "model_results.json",
+      "sha256": "c1e277e32c7f16fa65895d2b432b49ad958accb1c747594336d10ef33be8dea7"
+    },
+    {
+      "bytes": 288398,
+      "path": "null_capacity_audit.json",
+      "sha256": "7b902d43e89ba6ba0b54bd0a78848d5cb68016c9bb46eba22d0ea1b663149c52"
+    },
+    {
+      "bytes": 9940,
+      "path": "order_invariance_audit.json",
+      "sha256": "8bff2f35261a23ebec03c90c820ed6b8b16d7d8e909bcfb661742088aa4a0821"
+    }
+  ],
+  "mismatches": [],
+  "missing_from_recompute": [],
+  "original_directory": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v7/qualification_run/recomputable",
+  "recomputed_directory": "/Users/rishisim/Documents/research/nursery/output/synthetic_identifiability_qualification_v7/independent_recompute",
+  "separate_process_executed": true,
+  "status": "PASS",
+  "unexpected_in_recompute": []
+}

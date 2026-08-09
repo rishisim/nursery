@@ -1,0 +1,75 @@
+{
+  "historical_preflight_superseded_by": "gemma4_public_synthetic_runtime_bakeoff.json",
+  "childlens_or_quarantine_accessed": false,
+  "documentation_preflight": {
+    "conversion_license_metadata_consistent": false,
+    "mlx_vlm_code_license": "MIT",
+    "mlx_vlm_reference_release": "0.6.6",
+    "published_conversion_artifact_gb_not_runtime_memory": {
+      "gemma4_12b_unified": 6.74,
+      "gemma4_e4b": 5.15
+    },
+    "strict_schema_server_feature": "DOCUMENTED_GENERIC_MULTIMODAL",
+    "upstream_model_license": "Apache-2.0"
+  },
+  "host": {
+    "architecture": "arm64",
+    "physical_memory_gib": 32.0,
+    "physical_memory_measurement": "OS_SYSCONF_INSTALLED_MEMORY",
+    "platform": "Darwin"
+  },
+  "hosted_or_cloud_inference_used": false,
+  "license_clickthrough_accepted": false,
+  "local_preflight": {
+    "any_shortlist_weights_cached": true,
+    "model_cache_present": {
+      "gemma4_12b_unified": true,
+      "gemma4_e4b": true
+    },
+    "packages": {
+      "PIL": true,
+      "jsonschema": true,
+      "mlx": false,
+      "mlx_vlm": false
+    },
+    "runtime_ready": false
+  },
+  "measured_preflight_wall_seconds": 0.021043,
+  "model_dispositions": {
+    "gemma4_12b_unified": {
+      "mlx_vlm_audio_path": "DOCUMENTED_IN_MERGED_UNIFIED_SUPPORT",
+      "mlx_vlm_image_path": "DOCUMENTED",
+      "mlx_vlm_joint_audio_image": "DOCUMENTED_MIXED_INPUT_REPRODUCTION",
+      "mlx_vlm_joint_audio_image_strict_schema": "NOT_EXECUTED",
+      "native_joint_audio_image": "DOCUMENTED_UPSTREAM",
+      "shortlist_status": "CONDITIONAL_SMOKE_REQUIRED"
+    },
+    "gemma4_e4b": {
+      "mlx_vlm_audio_path": "DOCUMENTED",
+      "mlx_vlm_image_path": "DOCUMENTED",
+      "mlx_vlm_joint_audio_image_strict_schema": "NOT_EXECUTED",
+      "native_joint_audio_image": "DOCUMENTED_UPSTREAM",
+      "shortlist_status": "CONDITIONAL_SMOKE_REQUIRED"
+    }
+  },
+  "model_inference_executed": false,
+  "model_weights_downloaded": false,
+  "schema_version": "childlens-gemma4-mlx-vlm-shortlist-receipt-v1.3.1",
+  "scope": "PUBLIC_SYNTHETIC_ONLY",
+  "status": "NOT_EXECUTED",
+  "synthetic_schema_harness": {
+    "extra_property_rejected": true,
+    "joint_audio_image_request_shape_built": true,
+    "server_call_executed": false,
+    "strict_json_schema_requested": true,
+    "valid_fixture_accepted": true
+  },
+  "unmeasured_fields": [
+    "model_load_peak_memory",
+    "joint_prefill_peak_memory",
+    "generation_wall_time",
+    "schema_validity_from_model_output",
+    "semantic_audio_image_use"
+  ],
+  "wall_time_or_memory_compared": false
+}

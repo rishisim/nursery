@@ -1,0 +1,109 @@
+{
+  "schema_version": "childlens-annotation-structural-receipt-v1.1.0",
+  "observation_date": "2026-07-21",
+  "scope": {
+    "kind": "AGGREGATE_STRUCTURAL_AUDIT_ONLY",
+    "empirical_corpus": "CHILDLENS_ONLY",
+    "restricted_payload_read_by_this_workstream": false,
+    "media_decoded": false,
+    "transcript_inspected": false,
+    "lexical_selection_performed": false,
+    "learner_trained": false,
+    "scientific_outcome_inspected": false
+  },
+  "release_binding": {
+    "doi": "10.17617/4.fe",
+    "keeper_library_id": "c8ed0104-b793-4c35-817e-302afd4e036b",
+    "public_snapshot_commit": "4856662653b2fa183e53268d088cffba02a33443",
+    "public_snapshot_commit_bound": true,
+    "live_immutable_revision_observed": false,
+    "live_to_public_snapshot_byte_equivalence": "NOT_PROVEN",
+    "canonical_restricted_manifest_sha256": null,
+        "canonical_restricted_manifest_status": "PENDING_EXACT_REMOTE_BYTES_AND_LOCAL_CHECKSUMS",
+        "placeholder_manifest_sha256": "cc2b669e811ff78a045565be031537d5a93bfece40f27de3482768350adc1deb"
+  },
+  "live_inventory": {
+    "video_object_count": 192,
+    "video_display_parsed_byte_count": 192,
+    "video_display_parsed_byte_total": 201584000000,
+    "video_byte_total_semantics": "APPROXIMATE_DISPLAY_PARSED_NOT_EXACT",
+    "video_exact_byte_attribute_count": 0,
+    "final_annotation_object_count": 192,
+    "final_annotation_display_known_bytes": 18295700
+  },
+  "local_annotation_summary": {
+    "archive_bytes": 1021655,
+    "extracted_file_count": 192,
+    "extracted_filesystem_summary_kib": 18236,
+    "annotation_row_count": 27167,
+    "files_with_location_key": 191,
+    "files_without_location_key": 1,
+    "files_with_at_least_one_speech_like_string_value": 192,
+    "speech_like_file_count_unit": "ANNOTATION_FILES_NOT_INTERVALS_OR_UTTERANCES",
+    "archive_to_live_annotation_byte_equivalence": "NOT_PROVEN",
+        "media_annotation_one_to_one_linkage": "STRUCTURAL_CANONICAL_STEM_LINK_PROVEN_192_OF_192_BYTE_CHECKSUM_LINK_NOT_PROVEN",
+        "participant_table_structural_link_complete_count": 192
+  },
+  "grouping": {
+    "participant_table_row_count": 192,
+    "participant_group_count": 58,
+    "participant_plus_recording_group_count": 141,
+    "participant_and_recording_grouping_complete_count": 192,
+    "participant_and_recording_grouping_complete_fraction": 1.0,
+    "participant_disjoint_construction_supported_in_schema": true,
+    "heldout_lexical_adequacy_established": false
+  },
+  "field_availability": {
+    "location_key": "PRESENT_IN_191_OF_192_FILES",
+    "speech_like_structure": "PRESENT_IN_192_OF_192_FILES_FILE_LEVEL_ONLY",
+    "lexical_text": false,
+    "word_or_token_labels": false,
+    "timed_utterance_transcript": false,
+    "speaker_role": false,
+    "language": false,
+    "age": false,
+    "word_referent_labels": false
+  },
+  "modality_disposition": {
+    "video_objects_observed": true,
+    "audio_decode_or_usability_tested": false,
+    "imu_measured": false,
+    "touch_or_contact_measured": false,
+    "proprioception_measured": false,
+    "motor_stream_measured": false,
+    "absent_physical_stream_policy": "SIMULATOR_DEFINED_COUNTERFACTUAL_ONLY"
+  },
+  "pilot_preselection": {
+    "frozen_protocol_id": "childlens-lexical-feasibility-pilot-v1.0.0",
+    "target_count": 15,
+    "allowable_count_min": 12,
+    "allowable_count_max": 18,
+        "selection_status": "FROZEN_PRESELECTION_NOT_ACQUISITION_ADMISSION",
+        "restricted_input_sha256": "81282e6a4d8178b1559a7473d22c70a36e44450467b6b5e2ff70ad9b7e9f049a",
+        "placeholder_manifest_sha256": "cc2b669e811ff78a045565be031537d5a93bfece40f27de3482768350adc1deb",
+        "restricted_download_plan_sha256": "bb39c32139310e30ac15095a15b3d4b95508ab217694f591845aac38e00364b8",
+        "selected_count": 15,
+        "selected_participant_group_count": 15,
+        "maximum_selected_videos_per_participant": 1,
+        "content_blind": true,
+        "placeholder_sizes_are_scientific_evidence": false,
+        "limitation": "EXACT_SELECTED_REMOTE_BYTES_LOCAL_CHECKSUMS_AND_FINAL_CANONICAL_MANIFEST_REQUIRED_BEFORE_ACQUISITION"
+  },
+  "digests": {
+    "release_binding_receipt_sha256": "2aa1dcf53fc5592965019afe5df97b51ccc2fe05e70acb2d51aa396c73843805",
+    "frozen_pilot_protocol_sha256": "63be49d470c79e94f26240e73b314cdc42f2a6e6a57e96c897340d856f561ecb",
+    "preserved_v1_artifact_set_sha256": "35ba9acbba0fc11fc3419c88ea57d0721e08486c6d37595812ce6c77ce994abf"
+  },
+  "privacy": {
+    "restricted_identifiers_exported": false,
+    "filenames_or_paths_exported": false,
+    "timestamps_exported": false,
+    "transcripts_exported": false,
+    "annotation_rows_exported": false,
+    "selected_episode_keys_exported": false,
+    "small_identifiable_cells_exported": false,
+    "aea_empirical_ancestry": false,
+    "babyview_empirical_ancestry": false
+  },
+  "decision": null
+}

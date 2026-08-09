@@ -1,0 +1,19 @@
+{
+  "schema_version": "nursery-childlens-isolated-author-module-alias-amendment-v1.8.8",
+  "status": "FROZEN_BEFORE_ASSEMBLY_RETRY",
+  "date": "2026-07-22",
+  "failure_code": "E_INTERNAL",
+  "diagnosis": "The restricted interpreter runs with -I and intentionally omits the scripts directory from sys.path. A historical initializer imports the already hash-pinned author module by its sibling module name, causing ModuleNotFoundError during original-sample assembly.",
+  "scope": "CONTENT_INDEPENDENT_ISOLATED_IMPORT_BINDING_ONLY",
+  "allowed_change": "Bind the already loaded author module object to the exact historical sibling import name in sys.modules, failing closed if a different object already owns that name.",
+  "unchanged": [
+    "all completed Qwen and Gemma outputs",
+    "sample and candidate windows",
+    "model artifacts, prompts, schemas, parsers, and labels",
+    "calibration thresholds and ranges",
+    "causal protocol, learner, controls, seeds, and endpoints",
+    "isolated interpreter mode, filesystem confinement, and network denial"
+  ],
+  "model_inference_rerun_allowed": false,
+  "scientific_endpoint_opened_before_amendment": false
+}

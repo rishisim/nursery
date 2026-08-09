@@ -1,0 +1,112 @@
+{
+  "aggregate_only": true,
+  "annotation_linkage_actual_source": "RESTRICTED_CANONICAL_MANIFEST",
+  "annotation_linkage_verified_count": 15,
+  "annotation_source_file_verified_count": 15,
+  "annotation_source_file_verified_count_suppressed": false,
+  "audio_stream_media_count": 15,
+  "automated_outputs_not_gold": true,
+  "automated_preparation_complete": true,
+  "candidate_duration_basis": "UNIONED_OFFICIAL_SPEECH_PRESENCE_WINDOWS",
+  "candidate_utterances_inferred": 0,
+  "cell_suppression_k": 5,
+  "container_probe_attempted_count": 15,
+  "container_probe_success_count": 15,
+  "corruption_free_media_count": 15,
+  "cpu_worker_cap": 2,
+  "decode_attempted_count": 15,
+  "decode_success_count": 15,
+  "diagnostics_passed_for_human_workflow": true,
+  "duration_consistent_media_count": 15,
+  "effective_heavy_decode_concurrency": 1,
+  "external_api_used": false,
+  "frames_exported": false,
+  "instrument_embeddings_passed_to_learner": false,
+  "instrument_features_passed_to_learner": false,
+  "instrument_tokenizer_or_vocabulary_passed_to_learner": false,
+  "invalid_official_speech_timing_row_count": null,
+  "invalid_official_speech_timing_row_count_suppressed": true,
+  "learner_data_created": false,
+  "lexical_content_exported": false,
+  "local_offline_only": true,
+  "measurement_executed_on_acquired_bytes": true,
+  "measurement_source": "LOCAL_RESTRICTED_MEDIA_AUDIT_V1_2",
+  "media_preparation_attempted_count": 15,
+  "network_protocols_allowed": false,
+  "no_speech_window_media_count": 0,
+  "no_speech_window_media_count_suppressed": false,
+  "official_speech_window_union_minutes": 135.25,
+  "official_speech_windows_are_utterances": false,
+  "pilot_selection_sha256": "61526ea6cebc256314b0b9e574fb1a5986fcd83a534979e93134c4163c55253f",
+  "restricted_measurement_receipt_sha256": "6cbb1fb8280650b08427e7f0c76bde363dfa53f74dc07c7f5d6aae04def67fc0",
+  "schema_version": "childlens-v1.2-automated-diagnostics-receipt-v1",
+  "small_nonzero_failure_cells_exported": false,
+  "source_acquired_media_count": 15,
+  "source_native_transfer_receipt_sha256": "0de682a138ec4074e519e08d6d472b17e43244759eca134d4532fef817b18757",
+  "speaker_labels_exported": false,
+  "speech_expectation_concordant_media_count": 15,
+  "speech_presence_window_actual_source_count": 15,
+  "speech_presence_window_actual_source_count_suppressed": false,
+  "speech_presence_window_media_count": 15,
+  "speech_window_actual_source": "OFFICIAL_ANNOTATION_WINDOWS_LINKED_TO_ACQUIRED_MEDIA",
+  "status": "PASS",
+  "structural_metrics": {
+    "annotation_linkage_verified": {
+      "cell_suppressed": false,
+      "fail_count": 0,
+      "pass_count": 15,
+      "status": "ALL_PASS"
+    },
+    "audio_stream_present": {
+      "cell_suppressed": false,
+      "fail_count": 0,
+      "pass_count": 15,
+      "status": "ALL_PASS"
+    },
+    "corruption_absence_evidenced": {
+      "cell_suppressed": false,
+      "fail_count": 0,
+      "pass_count": 15,
+      "status": "ALL_PASS"
+    },
+    "duration_consistency_evidenced": {
+      "cell_suppressed": false,
+      "fail_count": 0,
+      "pass_count": 15,
+      "status": "ALL_PASS"
+    },
+    "full_decode_success": {
+      "cell_suppressed": false,
+      "fail_count": 0,
+      "pass_count": 15,
+      "status": "ALL_PASS"
+    },
+    "probe_success": {
+      "cell_suppressed": false,
+      "fail_count": 0,
+      "pass_count": 15,
+      "status": "ALL_PASS"
+    },
+    "restricted_manifest_file_integrity_match": {
+      "cell_suppressed": false,
+      "fail_count": 0,
+      "pass_count": 15,
+      "status": "ALL_PASS"
+    },
+    "speech_presence_window_expectation_satisfied": {
+      "cell_suppressed": false,
+      "fail_count": 0,
+      "pass_count": 15,
+      "status": "ALL_PASS"
+    },
+    "video_stream_present": {
+      "cell_suppressed": false,
+      "fail_count": 0,
+      "pass_count": 15,
+      "status": "ALL_PASS"
+    }
+  },
+  "transcript_text_exported": false,
+  "unioned_official_speech_window_count": 912,
+  "unioned_official_speech_window_count_suppressed": false
+}

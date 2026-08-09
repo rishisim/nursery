@@ -1,0 +1,32 @@
+{
+  "alternate_or_corrected_report_allowed": false,
+  "bytecode_writes_disabled": true,
+  "freeze_after": {
+    "checked_frozen_artifacts": 10,
+    "checked_tracked_files": 46,
+    "problems": [],
+    "status": "PASS"
+  },
+  "freeze_before": {
+    "checked_frozen_artifacts": 10,
+    "checked_tracked_files": 46,
+    "problems": [],
+    "status": "PASS"
+  },
+  "official": true,
+  "only_admissible_test_report": true,
+  "order": "development launch tests first, then complete repository tests",
+  "python_executable": "/Users/rishisim/Documents/research/nursery/.venv/bin/python",
+  "python_sha256": "f8cf5db64fd3715840686fcdb0f00b8b7e6c9b1e9b5f10a31183160c9bb6a6fc",
+  "python_version": "3.12.13 (main, Mar 10 2026, 18:18:07) [Clang 21.1.4 ]",
+  "results": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 /Users/rishisim/Documents/research/nursery/.venv/bin/python -m pytest -q -p no:cacheprovider /Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v2/frozen_source_snapshot/tests/test_synthetic_development_launch_v2.py",
+      "cwd": "/Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v2/frozen_source_snapshot",
+      "exit_code": 1,
+      "output": "............F.......                                                     [100%]\n=================================== FAILURES ===================================\n________ test_environment_record_preserves_virtual_environment_launcher ________\n\nconfig = {'protocol': {'id': 'synthetic-development-launch-v2', 'schema_version': 'nursery-synthetic-development-v2', 'status':...SensorEventDetector', 'required_function': 'babyworld_lite.sensor_alignment_v2.detector.candidate_evidence', ...}, ...}\n\n    def test_environment_record_preserves_virtual_environment_launcher(config):\n>       record = environment_record(ROOT, config)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_synthetic_development_launch_v2.py:411: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nbabyworld_lite/development_launch_v2/integrity.py:78: in environment_record\n    \"python_sha256\": sha256_file(executable),\n                     ^^^^^^^^^^^^^^^^^^^^^^^\nbabyworld_lite/development_launch_v2/protocol.py:52: in sha256_file\n    with Path(path).open(\"rb\") as handle:\n         ^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = PosixPath('/Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v2/frozen_source_snapshot/.venv/bin/python')\nmode = 'rb', buffering = -1, encoding = None, errors = None, newline = None\n\n    def open(self, mode='r', buffering=-1, encoding=None,\n             errors=None, newline=None):\n        \"\"\"\n        Open the file pointed to by this path and return a file object, as\n        the built-in open() function does.\n        \"\"\"\n        if \"b\" not in mode:\n            encoding = io.text_encoding(encoding)\n>       return io.open(self, mode, buffering, encoding, errors, newline)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: '/Users/rishisim/Documents/research/nursery/output/synthetic_development_launch_package_v2/frozen_source_snapshot/.venv/bin/python'\n\n/Users/rishisim/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/pathlib.py:1013: FileNotFoundError\n=========================== short test summary info ============================\nFAILED tests/test_synthetic_development_launch_v2.py::test_environment_record_preserves_virtual_environment_launcher\n1 failed, 19 passed in 6.17s\n",
+      "source_scope": "frozen_source_snapshot"
+    }
+  ],
+  "status": "FAIL"
+}

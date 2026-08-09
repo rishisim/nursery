@@ -1,0 +1,145 @@
+{
+  "config_sha256": "483faf7d5ad33e2cd9895d78d2aaa3f27cadd91a35c589551ac20ba0605c9eda",
+  "configured_lexical_python": "/Users/rishisim/Documents/research/nursery/.venv/bin/python",
+  "confirmation_outcome_count": 0,
+  "development_outcome_count": 0,
+  "non_replayable": true,
+  "official_micro_attempt": 1,
+  "package_version": 3,
+  "predecessor_v1_failure_audit_sha256": "ff64f093d9a17cb4e3bf1de9c0069b6dc0d1b8478ceeba47c7603eb1832088c1",
+  "predecessor_v2_failure_audit_sha256": "94b71fd08d862c1ee21f719b7242ceba1fe25ed003e737f48b249ab9de27d05c",
+  "predecessor_v2_tree_manifest_sha256": "34cf5be8b30750a30661adb6b603d8461c09d99849347301f432605c91b4e8e2",
+  "runner_sha256": "ad4b9b4165c95661a79c0d50616218f03010dbab3eb174a832808d8b6f51aded",
+  "schema_version": "nursery-corrective-micro-attempt-v3",
+  "scientific_inference_suppressed": true,
+  "status": "ONE_MICRO_ATTEMPT_CONSUMED_BEFORE_LAUNCHER_PREFLIGHT",
+  "tracked_nonconfig_manifest": {
+    "digest": "632692e30379daa8bf3643755034ece9f5750db2f7373ea79464dc49f48a0c66",
+    "digest_scheme": "canonical-json-of-sorted-file-rows",
+    "file_count": 20,
+    "files": [
+      {
+        "bytes": 106,
+        "mode": "0644",
+        "path": "babyworld_lite/__init__.py",
+        "sha256": "5f5caa88371c3ab9324ded4afe95eb5428224a772c1f478a21cbb0bf24766986"
+      },
+      {
+        "bytes": 201,
+        "mode": "0644",
+        "path": "babyworld_lite/corrective_alignment_v3/__init__.py",
+        "sha256": "719c80b3ab6f4db188350d65b7f8b702d4876d23f4be4ace96d998df9f7e9ca1"
+      },
+      {
+        "bytes": 23440,
+        "mode": "0644",
+        "path": "babyworld_lite/corrective_alignment_v3/adjudicator.py",
+        "sha256": "a67cac52c5969dc51a8cb1847ead65aa3434b4dd29508055fb4ccd19ef2fb136"
+      },
+      {
+        "bytes": 47875,
+        "mode": "0644",
+        "path": "babyworld_lite/corrective_alignment_v3/generator.py",
+        "sha256": "32e9f2e024c7e65414fb5bbd39f525d02fedde3a9a063de015db55ac77696fc7"
+      },
+      {
+        "bytes": 135196,
+        "mode": "0644",
+        "path": "babyworld_lite/corrective_alignment_v3/integrity.py",
+        "sha256": "e6fc60e5fb4a3dcbffb03bfaa24981319fee6188961533ad9d5172832d7960b8"
+      },
+      {
+        "bytes": 28246,
+        "mode": "0644",
+        "path": "babyworld_lite/corrective_alignment_v3/learner.py",
+        "sha256": "cbabfcaf570edfe5ef96b68c4d07b69b17fdcbdb7c79a6ada711f4703514615f"
+      },
+      {
+        "bytes": 213229,
+        "mode": "0644",
+        "path": "babyworld_lite/corrective_alignment_v3/parallel.py",
+        "sha256": "e966de4cc59a4aa1ac2e0323b38be36635e9b8330374640b1f72b013699f3a5d"
+      },
+      {
+        "bytes": 76708,
+        "mode": "0644",
+        "path": "babyworld_lite/corrective_alignment_v3/protocol.py",
+        "sha256": "f78b8334e162a18f207ee8f8d5988b8ec825a3a410e19117825f7e374b7be748"
+      },
+      {
+        "bytes": 46907,
+        "mode": "0644",
+        "path": "babyworld_lite/corrective_alignment_v3/statistics.py",
+        "sha256": "55a24f5ee80c814298c744c06780b9c901cb68b71329ff2efd32462e6789610f"
+      },
+      {
+        "bytes": 2494,
+        "mode": "0644",
+        "path": "docs/synthetic_corrective_alignment_v3_brief_trace.json",
+        "sha256": "1ec44efcdc915f0d4804827b40132688d6a9e86f731fee37b394a4d85f4d1060"
+      },
+      {
+        "bytes": 5263,
+        "mode": "0644",
+        "path": "docs/synthetic_corrective_alignment_v3_primary_sources.json",
+        "sha256": "d41bf7580217b9d21748a10cde5e9022cb624af106dd51641d22d2f3bae1f743"
+      },
+      {
+        "bytes": 23058,
+        "mode": "0644",
+        "path": "docs/synthetic_corrective_alignment_v3_protocol.md",
+        "sha256": "dd432253baff92f77dc08337eb17f9c305becd177beb75f36d2447ded43ebc7f"
+      },
+      {
+        "bytes": 4690,
+        "mode": "0644",
+        "path": "docs/synthetic_corrective_alignment_v3_research_rationale.md",
+        "sha256": "8179edede6e586c64216719e8c60ab3018e2be953d06f77f26c036674885028e"
+      },
+      {
+        "bytes": 3772,
+        "mode": "0644",
+        "path": "docs/synthetic_corrective_alignment_v3_sample_size.md",
+        "sha256": "4cf56b8e4ea0ce50523427aa1b73e634ce45ad9828a83cc94101bb50f0357ea5"
+      },
+      {
+        "bytes": 12242,
+        "mode": "0644",
+        "path": "docs/synthetic_corrective_alignment_v3_threshold_rationale.md",
+        "sha256": "19097bbad5c872f308f1be539a06e301b197f814fcc02317a371dabdcea652cb"
+      },
+      {
+        "bytes": 4634,
+        "mode": "0644",
+        "path": "docs/synthetic_corrective_alignment_v3_traceability.json",
+        "sha256": "40ceb988cec7dd1da6af87957cf7987db766f94267722024494a32e6867a78cf"
+      },
+      {
+        "bytes": 7742,
+        "mode": "0644",
+        "path": "output/synthetic_development_launch_package_v3/frozen_seed_registries.json",
+        "sha256": "6c5b0899dbbd4d93fbd56bd3342eb2ecea697802a510626182997841733f55d3"
+      },
+      {
+        "bytes": 220198,
+        "mode": "0644",
+        "path": "scripts/run_synthetic_corrective_alignment_v3.py",
+        "sha256": "ad4b9b4165c95661a79c0d50616218f03010dbab3eb174a832808d8b6f51aded"
+      },
+      {
+        "bytes": 9357,
+        "mode": "0644",
+        "path": "scripts/run_synthetic_corrective_alignment_v3_worker.py",
+        "sha256": "41ad68dd94023781561f7a0f0d6093b6a4c93b22704a7ffb984e22207ab913f2"
+      },
+      {
+        "bytes": 220600,
+        "mode": "0644",
+        "path": "tests/test_synthetic_corrective_alignment_v3.py",
+        "sha256": "73355d282c024c8585d33d3ca5061e6c56e1a28d8c593d23924a36baeb2f4caa"
+      }
+    ],
+    "schema_version": "nursery-exact-file-manifest-v1"
+  },
+  "worker_sha256": "41ad68dd94023781561f7a0f0d6093b6a4c93b22704a7ffb984e22207ab913f2"
+}

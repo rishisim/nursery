@@ -1,0 +1,40 @@
+{
+  "artifact_id": "childlens-live-release-nonidentifying-receipt-v1",
+  "status": "LOCAL_AUDIT_ONLY_TERMS_UNRESOLVED",
+  "observation_date": "2026-07-21",
+  "public_release": {
+    "doi": "10.17617/4.fe",
+    "keeper_library": "c8ed0104-b793-4c35-817e-302afd4e036b",
+    "doi_snapshot_commit": "4856662653b2fa183e53268d088cffba02a33443"
+  },
+  "accessible_release": {
+    "same_keeper_library": true,
+    "live_revision_pinned": false,
+    "video_object_count": 192,
+    "video_size_rows_count": 191,
+    "video_displayed_size_sum_decimal_gb_lower_bound": 201.33,
+    "video_size_unknown_count": 1,
+    "final_annotation_object_count": 192,
+    "platform_annotation_object_count": 192,
+    "participant_grouping_field_available": true,
+    "recording_date_grouping_field_available": true,
+    "complete_grouping_linkage_verified": false,
+    "dataset_license_stated": false
+  },
+  "comparison": {
+    "paper_video_file_count": 354,
+    "paper_duration_hours": 108.58,
+    "paper_participant_count": 62,
+    "paper_annotated_video_count": 192,
+    "paper_live_video_count_difference": 162,
+    "likely_release_role": "ANNOTATED_SUBSET_INFERENCE_PENDING_MANIFEST"
+  },
+  "prohibited_payload_absence": {
+    "media": true,
+    "transcript_payload": true,
+    "identifier_values": true,
+    "exact_media_timing": true,
+    "file_level_locator": true
+  },
+  "canonical_restricted_manifest": "NOT_CREATED_TERMS_UNRESOLVED"
+}

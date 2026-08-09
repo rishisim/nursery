@@ -1,0 +1,14 @@
+{
+  "all_tests_required": true,
+  "detector_runtime_required": true,
+  "exact_action_relation_balance": true,
+  "exact_noun_owner_target_independence": true,
+  "factor_stratification_required": true,
+  "maximum_noun_target_distractor_detector_gap": 0.15,
+  "maximum_sensor_free_action_accuracy": 0.99,
+  "minimum_direct_capacity_action_accuracy": 0.95,
+  "minimum_oracle_action_accuracy": 0.75,
+  "minimum_sensor_free_action_accuracy": 0.2,
+  "preservation_required": true,
+  "reproduction_byte_identity_required": true
+}

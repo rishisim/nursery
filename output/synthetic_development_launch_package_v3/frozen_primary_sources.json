@@ -1,0 +1,35 @@
+{
+  "protocol_id": "synthetic-development-launch-v3",
+  "sources": [
+    {
+      "path": "output/synthetic_identifiability_qualification_v8/terminal_decision.json",
+      "role": "frozen VERSION_READY qualification"
+    },
+    {
+      "path": "output/synthetic_identifiability_qualification_v8/complete_file_manifest.json",
+      "role": "qualified-package complete manifest"
+    },
+    {
+      "path": "output/synthetic_identifiability_adversarial_audit_v8/run_2.json",
+      "role": "adversarial launch audit that survived every check"
+    },
+    {
+      "path": "output/synthetic_identifiability_adversarial_audit_v8/reproduction.json",
+      "role": "byte-identical independent adversarial-audit reproduction"
+    },
+    {
+      "path": "configs/synthetic_identifiability_qualification_v8.yaml",
+      "role": "untouched development and confirmation identifier reserves"
+    },
+    {
+      "path": "output/synthetic_development_launch_package_v1/post_freeze_cycle_audit.json",
+      "role": "preserved evidence and diagnosis for the frozen v1 REVISE cycle"
+    },
+    {
+      "path": "output/synthetic_development_launch_package_v2/post_freeze_cycle_audit.json",
+      "role": "preserved evidence and diagnosis for the frozen v2 REVISE cycle"
+    }
+  ],
+  "development_outcome_count": 0,
+  "confirmation_outcome_count": 0
+}

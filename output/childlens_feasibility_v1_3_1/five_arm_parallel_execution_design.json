@@ -1,0 +1,169 @@
+{
+  "schema_version": "childlens_five_arm_parallel_execution_design_v1_3_1",
+  "generated_on": "2026-07-22",
+  "status": "DESIGN_ONLY_NOT_AUTHORIZED",
+  "scope": {
+    "synthetic_code_config_and_aggregate_receipts_only": true,
+    "scientific_outcome_run": false,
+    "empirical_child_payload_accessed": false,
+    "quarantine_accessed": false,
+    "new_training_infrastructure_created": false
+  },
+  "current_protocol": {
+    "path": "docs/child_only_prototype_v1/causal_protocol_v1.json",
+    "digest": "52ded736d54af136b5767ede1dc8a8125f71a2bbfdd0184e247248170fc7da13",
+    "status": "CONSTRUCTION_ONLY_NOT_FROZEN_FOR_OUTCOME",
+    "scientific_outcome_authorized": false
+  },
+  "minimum_design": {
+    "corpus_instance_id": "synthetic-minimum-paired-v1",
+    "corpus_seeds": [510101, 510113],
+    "model_seeds": [510211, 510223],
+    "bundle_count": 4,
+    "conditions_per_bundle": 5,
+    "total_arm_trainings": 20,
+    "claim_boundary": "minimum procedural paired experiment; insufficient for stable hierarchical population inference"
+  },
+  "condition_order": [
+    "strong_alignment_ceiling",
+    "weak_vl_baseline",
+    "weak_synchronized_side",
+    "weak_episode_shuffled_side",
+    "weak_time_shifted_side"
+  ],
+  "atomic_unit": "COMPLETE_CORPUS_SEED_BY_MODEL_SEED_FIVE_CONDITION_BUNDLE",
+  "pairing_policy": {
+    "condition_sharding": "FORBIDDEN",
+    "conditions_serial_on_one_device": true,
+    "one_initialization_then_independent_clones_per_arm": true,
+    "initialize_arm_from_previous_arm": false,
+    "single_arm_retry": false,
+    "retry_unit": "COMPLETE_BUNDLE_UNDER_IDENTICAL_PLAN_DIGEST",
+    "weak_shared_receipts": [
+      "data",
+      "tokenizer",
+      "architecture",
+      "initialization",
+      "optimizer",
+      "example_order",
+      "updates",
+      "batch_shapes",
+      "stopping_rule",
+      "compute"
+    ],
+    "strong_arm_required_amendment": "share initialization architecture optimizer update count batch shapes stopping and compute; differ only in declared strong language alignment"
+  },
+  "schedules": {
+    "four_identical_gpus": {
+      "waves": 1,
+      "concurrent_trainers": 4,
+      "bundles_per_wave": 4
+    },
+    "two_identical_gpus": {
+      "waves": 2,
+      "concurrent_trainers": 2,
+      "bundles_per_wave": 2
+    },
+    "single_mps": {
+      "waves": 4,
+      "concurrent_trainers": 1,
+      "cpu_workers_default": 2,
+      "cpu_workers_ceiling_after_canary": 4
+    }
+  },
+  "thread_caps": {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "TORCH_NUM_THREADS": "1",
+    "TORCH_NUM_INTEROP_THREADS": "1"
+  },
+  "candidate_plan_dry_runs": {
+    "mps": {
+      "plan_digest": "6e915ea59671b0357fc1d9af572f61ee5491600328d86aa15d78abbaefa19cf0",
+      "max_trainers": 1,
+      "validated": true
+    },
+    "slurm_cuda_four_workers": {
+      "plan_digest": "1d0b3370b52972f3d6c7b4308496214ae54b99151917e87aedea56def36ff705",
+      "max_trainers": 4,
+      "validated": true
+    },
+    "reusable_for_outcome": false,
+    "reason": "bound to construction-only protocol/profile; regenerate after outcome freeze"
+  },
+  "existing_paths": {
+    "planner_and_merge": "babyworld_lite/child_only_v1/parallel.py",
+    "plan_cli": "scripts/plan_child_only_v1_parallel.py",
+    "paired_contract": "babyworld_lite/child_only_v1/protocol.py",
+    "tests": "tests/test_child_only_prototype_v1.py"
+  },
+  "execution_availability": {
+    "plan_only_cli_available": true,
+    "scientific_bundle_worker_available": false,
+    "slurm_submission_entrypoint_available": false,
+    "actual_launch_command_available": false
+  },
+  "expected_bundle_files": [
+    "result_manifest.json",
+    "one_sealed_direct_child_payload"
+  ],
+  "canonical_merge": {
+    "partial_aggregate_permitted": false,
+    "rejects_missing_duplicate_extra_symlinked_foreign_nonfinal_or_checksum_conflicting_shards": true,
+    "sort_order": ["corpus_instance_id", "corpus_seed", "model_seed"]
+  },
+  "resource_evidence": {
+    "construction_model_parameters": 348933,
+    "fp32_parameter_bytes": 1395732,
+    "rough_adam_training_state_bytes": 5582928,
+    "mps_forward_seconds_per_two_example_fixture_batch_range": [0.00207, 0.00237],
+    "mps_forward_only_total_coefficient_seconds_per_step_across_20_arms_range": [0.0414, 0.0474],
+    "cpu_parallel_receipt": {
+      "units": 8,
+      "serial_wall_seconds": 15.914217374986038,
+      "four_worker_wall_seconds": 5.2603731250273995,
+      "speedup": 3.0253020074318675,
+      "maximum_worker_peak_rss_bytes": 116555776,
+      "conservative_concurrent_peak_rss_bytes": 12215648256
+    },
+    "wall_hour_estimate_defensible": false,
+    "missing_for_wall_hour_estimate": [
+      "full_forward_backward_optimizer_canary",
+      "final_clip_and_batch_shapes",
+      "final_model_width",
+      "update_count",
+      "evaluation_inventory",
+      "target_GPU_measurement"
+    ],
+    "wall_formula": {
+      "bundle": "5*T_arm_train + T_bundle_eval + T_bundle_seal",
+      "four_gpu": "T_bundle + T_merge",
+      "two_gpu": "2*T_bundle + T_merge",
+      "single_mps": "4*T_bundle + T_merge"
+    },
+    "minimum_wall_contingency_after_canary": 1.2
+  },
+  "hard_stop_conditions": [
+    "outcome_protocol_not_frozen_and_authorized",
+    "seed_registry_or_scientific_claim_unfrozen",
+    "strong_arm_equality_amendment_missing",
+    "full_training_resource_canary_missing",
+    "heterogeneous_GPU_model_runtime_or_precision",
+    "memory_or_disk_reserve_failure",
+    "arm_specific_override_surface",
+    "OOM_or_nonfinite_loss",
+    "shared_receipt_mismatch",
+    "condition_incomplete_bundle",
+    "evaluation_side_channel_leakage",
+    "missing_duplicate_extra_foreign_or_checksum_conflicting_shard"
+  ],
+  "validation": {
+    "in_memory_plan_validation": "PASS",
+    "parallel_and_merge_pytests": "PASS_2_OF_2",
+    "outcome_execution": "NOT_RUN"
+  },
+  "exact_next_task": "separately authorized outcome-protocol freeze and full-training synthetic canary, including strong-arm equality amendment and a no-free-form-overrides bundle worker against the existing planner/merge API"
+}

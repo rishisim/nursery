@@ -1,0 +1,213 @@
+{
+  "digest": "59bae7012c6cbb982a8d32d9b9f994a7462ba2bd76c50e44fc1f0ab32362d39e",
+  "digest_scheme": "canonical-json-of-sorted-mode-path-rows",
+  "directories": [
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_2_jobs_1"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_2_jobs_1/adjudication"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_2_jobs_1/runtime"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_2_jobs_1/shards"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_2_persisted_inputs"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_2_persisted_inputs/corpus-320001"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_2_persisted_inputs/corpus-320003"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_2_persisted_inputs/corpus-320005"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_2_persisted_inputs/corpus-320007"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1/adjudication"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1/runtime"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1/shards"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1/shards/corpus-320001__model-320201"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1/shards/corpus-320001__model-320203"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1/shards/corpus-320003__model-320201"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1/shards/corpus-320003__model-320203"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1/shards/corpus-320005__model-320201"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1/shards/corpus-320005__model-320203"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1/shards/corpus-320007__model-320201"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_1/shards/corpus-320007__model-320203"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n/adjudication"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n/runtime"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n/shards"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n/shards/corpus-320001__model-320201"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n/shards/corpus-320001__model-320203"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n/shards/corpus-320003__model-320201"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n/shards/corpus-320003__model-320203"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n/shards/corpus-320005__model-320201"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n/shards/corpus-320005__model-320203"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n/shards/corpus-320007__model-320201"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_jobs_n/shards/corpus-320007__model-320203"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_persisted_inputs"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_persisted_inputs/corpus-320001"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_persisted_inputs/corpus-320003"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_persisted_inputs/corpus-320005"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_3_persisted_inputs/corpus-320007"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_4_jobs_1"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_4_jobs_1/adjudication"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_4_jobs_1/runtime"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_4_jobs_1/shards"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_4_persisted_inputs"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_4_persisted_inputs/corpus-320001"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_4_persisted_inputs/corpus-320003"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_4_persisted_inputs/corpus-320005"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_attempt_4_persisted_inputs/corpus-320007"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_persisted_inputs"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_persisted_inputs/corpus-320001"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_persisted_inputs/corpus-320003"
+    },
+    {
+      "mode": "0755",
+      "path": "parallel_micro_persisted_inputs/corpus-320005"
+    }
+  ],
+  "directory_count": 51,
+  "schema_version": "nursery-corrective-predecessor-directory-manifest-v2",
+  "symlink_count": 0
+}

@@ -1,0 +1,21 @@
+{
+  "conservative_concurrent_peak_rss_native_units": 426115072,
+  "development_unit_count": 300,
+  "estimated_development_wall_hours": 0.04785052968727541,
+  "estimated_development_wall_seconds_with_20_percent_contingency": 172.26190687419148,
+  "jobs_1_disk_bytes": 21515991,
+  "jobs_1_wall_seconds": 10.994578625017311,
+  "jobs_n": 4,
+  "jobs_n_disk_bytes": 21515989,
+  "jobs_n_wall_seconds": 3.828042374982033,
+  "maximum_worker_peak_rss_native_units": 106528768,
+  "measured_speedup": 2.872115182651006,
+  "micro_unit_count": 8,
+  "minimum_speedup": 1.2,
+  "nested_blas_openmp_threads": 1,
+  "resource_telemetry_excluded_from_equivalence": true,
+  "rss_units": "bytes_on_macos_kibibytes_on_linux",
+  "scheduling": "one_model_wave_across_distinct_corpora",
+  "schema_version": "nursery-corrective-parallel-benchmark-v1",
+  "status": "PASS"
+}

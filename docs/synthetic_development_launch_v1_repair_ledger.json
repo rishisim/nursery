@@ -1,0 +1,68 @@
+{
+  "schema_version": "nursery-development-launch-repair-ledger-v1",
+  "protocol_id": "synthetic-development-launch-v1",
+  "development_outcome_count": 0,
+  "confirmation_outcome_count": 0,
+  "cycles": [
+    {
+      "cycle": 1,
+      "status": "REVISE_FIXTURE",
+      "failed_stage": "development_inference_serialization",
+      "diagnosis": "NumPy integer sign-test counters were not converted to canonical JSON-compatible Python integers.",
+      "artifact": "output/synthetic_development_launch_package_v1/fixture_rehearsal/failure.json",
+      "development_outcome_count": 0,
+      "confirmation_outcome_count": 0
+    },
+    {
+      "cycle": 2,
+      "status": "REVISE_FIXTURE_OUTPUT_CONTRACT",
+      "diagnosis": "The detailed inference correctly reported FAIL_INSUFFICIENT_NONZERO_CORPORA and suppressed scientific interpretation, but the top-level rehearsal gate was misleadingly named development_inference_pass and displayed true.",
+      "repair": "Replace the top-level field with development_inference_suppressed_or_passed and verify the persisted cohort metadata has scientific_outcome=false.",
+      "cohort_summary_sha256": "8f316eee722c5489b4513b4cc52f3fa8a2f905ab00d3bffd38e6f4df8b7b7573",
+      "development_inference_sha256": "76c9380d2ac1565b4b95823e75952ee01db94bae271c917494a5b121c8335e2a",
+      "identifier_reference_audit_sha256": "f688e09bb3a20b2c10fb1388363eb2b82f4b57ee1fe48c272cc53fb431d17808",
+      "development_outcome_count": 0,
+      "confirmation_outcome_count": 0
+    },
+    {
+      "cycle": 3,
+      "status": "PASS_FIXTURE_REHEARSAL",
+      "scientific_decision_suppressed": true,
+      "detailed_inference_status": "FAIL_INSUFFICIENT_NONZERO_CORPORA",
+      "pipeline_status": "PASS",
+      "cohort_summary_sha256": "a232e10d21f3e99b0c2fe822d465cca1872d2311959069cb0261442f09508b9a",
+      "identifier_reference_audit_sha256": "f688e09bb3a20b2c10fb1388363eb2b82f4b57ee1fe48c272cc53fb431d17808",
+      "development_inference_sha256": "76c9380d2ac1565b4b95823e75952ee01db94bae271c917494a5b121c8335e2a",
+      "development_controls_sha256": "834ebe3ffc3cc44bc5cad5e194eff4d7340ad4dcc163fe7f253b309c0a85f8dc",
+      "development_outcome_count": 0,
+      "confirmation_outcome_count": 0
+    },
+    {
+      "cycle": 4,
+      "status": "PASS_FIXTURE_REHEARSAL",
+      "diagnosis": "The exact sign test and positive-fraction diagnostic were centered at zero rather than at each contrast's frozen required lower bound.",
+      "repair": "Shift paired differences by the frozen lower-bound threshold before the sign test, nonzero count, and positive-fraction calculation.",
+      "gate_changes": "none",
+      "cohort_summary_sha256": "a232e10d21f3e99b0c2fe822d465cca1872d2311959069cb0261442f09508b9a",
+      "identifier_reference_audit_sha256": "f688e09bb3a20b2c10fb1388363eb2b82f4b57ee1fe48c272cc53fb431d17808",
+      "development_inference_sha256": "2b64f9e886067186276388d07e318cabd8ecc86b08b96b9d57cf7a8052681089",
+      "development_controls_sha256": "834ebe3ffc3cc44bc5cad5e194eff4d7340ad4dcc163fe7f253b309c0a85f8dc",
+      "development_outcome_count": 0,
+      "confirmation_outcome_count": 0
+    }
+  ],
+  "freeze_preconditions": {
+    "final_fixture_cycle": 4,
+    "fixture_status": "PASS",
+    "package_test_count": 15,
+    "package_tests_status": "PASS",
+    "repository_tests_passed": 205,
+    "repository_tests_skipped": 17,
+    "collected_tests_sha256": "0d119e54b8039bd21d37605d88282b72b72f3f57961f825ebed4682c9248c667",
+    "prior_v1_v8_file_count": 2089,
+    "prior_v1_v8_baseline_sha256": "261e61d6958c59fdabed3a6387b9e4027a246a98e9046567730a3af5ff91389e",
+    "development_outcome_count": 0,
+    "confirmation_outcome_count": 0
+  },
+  "status": "FROZEN_PENDING_EXCLUDED_REHEARSAL"
+}

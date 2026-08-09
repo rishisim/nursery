@@ -1,0 +1,74 @@
+{
+  "schema_version": "nursery-grounded-videollm-second-instrument-minitest-v1.0.0",
+  "protocol_id": "childlens-independent-second-instrument-one-shot-minitest-v1",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_NOT_AUTHORIZED_OR_EXECUTED",
+  "instrument": {
+    "model": "Grounded-VideoLLM-Phi3.5-Vision-Instruct-4B",
+    "repository": "WHB139426/Grounded-Video-LLM",
+    "variant": "general checkpoint without the Charades-STA/ActivityNet-subset third-stage tuning",
+    "base_family": "Microsoft Phi-3.5-Vision-Instruct",
+    "license": "MIT",
+    "independent_from_qwen_family": true,
+    "resolution_rule": "Before any download, record one exact repository revision and SHA-256 for every required weight and code artifact. Abort if the general and benchmark-subset-tuned variants cannot be unambiguously separated.",
+    "license_acceptance_required": false
+  },
+  "resource_boundary": {
+    "preferred_runtime": "Authors' CUDA/BF16 path on one NVIDIA GPU with at least 24 GB VRAM",
+    "apple_silicon": "M5 32 GB is memory-feasible in principle but requires a separately validated public-only port; no restricted run may be the first Mac compatibility test.",
+    "maximum_model_download": "Only the exact pinned 4B checkpoint and required code after explicit execution authorization; no dataset or model archive.",
+    "network_during_restricted_inference": "denied"
+  },
+  "stage_0_public_canary": {
+    "required": true,
+    "data": "Eight newly generated public synthetic clips with oracle German object/action queries, balanced across lead, overlap, lag, null, and ambiguous cases.",
+    "same_input_representation_as_restricted_test": "Five ordered frames at -5, -2.5, 0, +2.5, and +5 seconds plus one German query.",
+    "prompt_tuning": "One frozen prompt written before model output is viewed.",
+    "pass": "At least 7 of 8 exact-schema outputs and at least 6 of 8 oracle referential-plus-lag decisions correct.",
+    "failure": "Stop before quarantine discovery. Do not translate, tune, retry, substitute a model, or run restricted inference."
+  },
+  "stage_1_restricted_one_shot": {
+    "condition": "Only after the public canary passes and the exact runtime is hash-pinned.",
+    "sample": "Reuse the same 27 prediction-blind windows frozen in qwen_accuracy_audit_v1; no reselection.",
+    "inputs": "The same existing five-frame representation and the same existing local ASR hypothesis used by Qwen3-VL.",
+    "inference_attempts": 1,
+    "temperature": 0,
+    "semantic_prompt_tuning": false,
+    "qwen_predictions_visible_to_model": false,
+    "qwen_predictions_visible_to_reviewer": false,
+    "new_acquisition": false,
+    "causal_endpoint_opened": false,
+    "scientific_outcome_run": false
+  },
+  "human_review": {
+    "required_for_accuracy_claim": true,
+    "reviewer": "Qualified German interpreter, blinded to instrument identity and Qwen output",
+    "rubric": [
+      "speech referent identifiable",
+      "visible object/action candidate present",
+      "lag bin supported",
+      "ambiguity/null",
+      "instrument answer defensible"
+    ],
+    "if_unavailable": "Report only schema/runtime feasibility and abstention; make no lexical or accuracy claim."
+  },
+  "predeclared_metrics": {
+    "schema_validity": true,
+    "abstention": true,
+    "referential_defensibility": true,
+    "exact_lag_defensibility": true,
+    "qwen_comparison": "Paired descriptive counts only; no majority vote and no agreement-as-truth claim.",
+    "minimum_cell_k": 5,
+    "complementary_suppression": true,
+    "confidence_interval": "Wilson 95%"
+  },
+  "screening_decision": {
+    "promising_second_instrument": "At least 19 of 27 complete answers defensible, Wilson 95% lower bound at least 0.50, schema validity at least 0.90, and abstention at most 0.50.",
+    "otherwise": "Do not use the model to reopen the ChildLens calibration branch."
+  },
+  "privacy": {
+    "restricted_payload_location": "owner-private quarantine only",
+    "raw_frames_audio_transcripts_timestamps_identifiers_paths_or_per_window_predictions_exported": false,
+    "repository_output": "K=5-safe aggregates and hashes only"
+  }
+}

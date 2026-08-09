@@ -1,0 +1,178 @@
+{
+  "schema_version": "nursery-gemma4-public-canary-rendered-template-placeholder-order-amendment-v1.3",
+  "amendment_id": "gemma4-e4b-public-canary-post-render-audio-placeholder-relocation-v1.3",
+  "frozen_at": "2026-07-22",
+  "status": "FROZEN_PRE_CANARY_TEMPLATE_PLACEHOLDER_ORDER_ONLY",
+  "namespace": "docs/nursery_program_convergence_v1/gemma4_template_placeholder_order_v1_3",
+  "amendment_mode": "ADDITIVE_CONTENT_INDEPENDENT_POST_RENDER_PLACEHOLDER_ORDER_OVERLAY",
+  "historical_artifacts_modified": false,
+  "public_canary_run": false,
+  "restricted_content_accessed": false,
+  "restricted_inference_run": false,
+  "scientific_outcome_run": false,
+  "trigger": {
+    "classification": "PUBLIC_FIXTURE_TEMPLATE_PLACEHOLDER_ORDER_INCOMPATIBILITY",
+    "stage": "AFTER_CAF_FIXTURE_RUNTIME_AND_MODEL_LOAD_BEFORE_GENERATION",
+    "failure_symbol": "E_CONTENT_ORDER",
+    "CAF_fixture_passed": true,
+    "runtime_load_passed": true,
+    "model_load_passed": true,
+    "model_generation_called": false,
+    "raw_model_output_existed": false,
+    "semantic_or_scientific_evidence_involved": false,
+    "outer_fence_parser_correction_applicable": false,
+    "outer_fence_parser_corrections_spent": 0,
+    "public_token_diagnostic_anchor_sequence": [
+      "SYSTEM_PROMPT",
+      "<|image|>",
+      "<|image|>",
+      "<|image|>",
+      "<|image|>",
+      "<|image|>",
+      "USER_PROMPT",
+      "<|audio|>"
+    ]
+  },
+  "immutable_bindings": {
+    "CAF_transport_amendment": {
+      "path": "docs/nursery_program_convergence_v1/gemma4_caf_canary_transport_v1/frozen_caf_transport_amendment_v1.json",
+      "sha256": "3ecf4bf6c62920d73177d029c18918f38366d34f7d7997642037696def37bbd0"
+    },
+    "no_automatic_fallback_override": {
+      "path": "docs/nursery_program_convergence_v1/frozen_no_automatic_fallback_override_v1.json",
+      "sha256": "cb9e7061a5725050e6a71a7b6e41f6f5e7bf30d104bc46bae233816ca99a90b7"
+    },
+    "CAF_public_canary_failure_receipt": {
+      "path": "output/nursery_program_convergence_v1/gemma4_caf_canary_transport_v1/public_common_schema_canary_failure_v1.json",
+      "sha256": "f84bf0c82136f4479258e6b4d9212c104487dc101deae67afdcc5a92d2a50ac4"
+    },
+    "CAF_public_canary_runner": {
+      "path": "scripts/run_gemma4_prototype_common_schema_canary_v1_2.py",
+      "sha256": "4506897e0a115f0d119990a9434eb37a3093b1a0f08947bff8553372466a81e2"
+    },
+    "bound_worker_at_failure": {
+      "path": "scripts/nursery_gemma4_referential_worker.py",
+      "sha256": "6f6ad2f2605c94aec8f92cd927248367eef74e16222768cced3a4cc25c050a2f"
+    },
+    "prior_common_schema_canary_contract": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_prototype_common_schema_canary_contract_v1.json",
+      "sha256": "9b894fcfd47df93824d25a467961d2c9f3398666dbe824367f2d8e1afe0635e9"
+    },
+    "runtime_pin_erratum": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_prototype_runtime_pin_erratum_v1_1.json",
+      "sha256": "b84da17121dd3235b1b6799d91c077d542e30e384f5cff5e131ec6c9755cecc1"
+    },
+    "activation_receipt_schema": {
+      "path": "docs/nursery_program_convergence_v1/frozen_gemma4_prototype_activation_receipt_schema_v1.json",
+      "sha256": "0668d8d304a1be30e43e9df2c05469a338d647c262418a04c6d067d2e77f8b05"
+    }
+  },
+  "exact_post_render_delta": {
+    "maximum_relocated_substrings": 1,
+    "relocated_substring_utf8": "<|audio|>",
+    "relocation_stage": "AFTER_EXACT_PROCESSOR_CHAT_TEMPLATE_RENDERING_AND_BEFORE_PROCESSOR_TOKENIZATION_OR_GENERATION",
+    "frozen_observed_anchor_sequence": [
+      "SYSTEM_PROMPT",
+      "<|image|>",
+      "<|image|>",
+      "<|image|>",
+      "<|image|>",
+      "<|image|>",
+      "USER_PROMPT",
+      "<|audio|>"
+    ],
+    "amended_anchor_sequence": [
+      "SYSTEM_PROMPT",
+      "<|audio|>",
+      "<|image|>",
+      "<|image|>",
+      "<|image|>",
+      "<|image|>",
+      "<|image|>",
+      "USER_PROMPT"
+    ],
+    "deterministic_algorithm": [
+      "Render the unchanged frozen declarative messages exactly once with the bound processor and unchanged template arguments.",
+      "Fail closed unless the rendered string contains exactly one literal <|audio|>, exactly five literal <|image|> placeholders, the exact SYSTEM_PROMPT once, and the exact USER_PROMPT once.",
+      "Fail closed unless the five image placeholders are contiguous in placeholder order and the observed anchor order is exactly SYSTEM_PROMPT, five image placeholders, USER_PROMPT, audio placeholder.",
+      "Remove only the nine UTF-8 bytes spelling the single literal <|audio|> from its rendered position.",
+      "Insert those identical nine UTF-8 bytes immediately before the first of the five image placeholders; do not remove, insert, normalize, or reorder any other byte.",
+      "Fail closed unless the amended anchor order is exactly SYSTEM_PROMPT, audio placeholder, five image placeholders, USER_PROMPT; counts are unchanged; and deleting the audio placeholder from both original and amended strings yields byte-identical strings."
+    ],
+    "declarative_message_content_order_remains": [
+      "audio",
+      "image_1",
+      "image_2",
+      "image_3",
+      "image_4",
+      "image_5",
+      "text"
+    ],
+    "declarative_messages_changed": false,
+    "system_prompt_text_changed": false,
+    "user_prompt_text_changed": false,
+    "template_arguments_changed": false,
+    "placeholder_text_changed": false,
+    "placeholder_counts_changed": false,
+    "non_placeholder_rendered_bytes_changed": false,
+    "media_argument_order_changed": false,
+    "semantic_fields_changed": false,
+    "model_runtime_or_artifact_fields_changed": false,
+    "scientific_fields_changed": false,
+    "parser_allowance_changed": false,
+    "does_not_spend_outer_fence_parser_correction": true
+  },
+  "preserved_public_canary_contract": {
+    "CAF_transport_overlay_unchanged": true,
+    "public_fixture_phrase_voice_rate_unchanged": true,
+    "final_WAV_contract_unchanged": true,
+    "five_frame_generator_and_offsets_unchanged": true,
+    "exact_system_and_user_prompt_text_unchanged": true,
+    "exact_prompt_sha256_unchanged": true,
+    "exact_common_schema_sha256_unchanged": true,
+    "exact_parser_contract_sha256_unchanged": true,
+    "outer_fence_parser_correction_maximum": 1,
+    "outer_fence_parser_correction_used_before_amendment": 0,
+    "parser_mode": "PRIMARY",
+    "schema_and_semantic_label_space_unchanged": true
+  },
+  "preserved_artifact_sample_and_scientific_contract": {
+    "cached_Gemma_repository_revision_manifest_and_weight_hashes_unchanged": true,
+    "Qwen3_read_only_digest_contract_unchanged": true,
+    "sample_15_items_900_seconds_137_candidate_windows_unchanged": true,
+    "K5_complement_protection_and_outward_rounding_unchanged": true,
+    "coverage_abstention_path_and_schema_gates_unchanged": true,
+    "agreement_is_not_a_pass_gate": true,
+    "simulator_oracle_remains_only_evaluation_truth": true,
+    "causal_thresholds_changed": false,
+    "calibration_range_or_scientific_protocol_changed": false,
+    "automatic_fallback_allowed": false
+  },
+  "overlay_application_rule": {
+    "reject_if_any_bound_digest_differs": true,
+    "reject_if_exact_render_preconditions_differ": true,
+    "reject_if_more_or_less_than_one_audio_placeholder_is_relocated": true,
+    "reject_if_any_non_audio_placeholder_byte_changes": true,
+    "reject_if_any_prompt_message_schema_parser_artifact_sample_threshold_or_scientific_field_changes": true,
+    "reuse_prior_CAF_failure_or_success_receipt_as_template_order_receipt": false
+  },
+  "new_immutable_output_namespace": {
+    "path": "output/nursery_program_convergence_v1/gemma4_template_placeholder_order_v1_3",
+    "must_not_exist_before_execution": true,
+    "owner_private_during_public_execution": true,
+    "future_public_canary_receipt": "public_common_schema_canary_receipt_v1_3.json",
+    "future_public_canary_failure": "public_common_schema_canary_failure_v1_3.json",
+    "future_runtime_lock_receipt": "runtime_lock_receipt_v1_3.json",
+    "future_activation_receipt": "full_activation_receipt_v1_3.json",
+    "historical_output_paths_overwritten": false
+  },
+  "authorization_boundary": {
+    "amendment_is_canary_execution": false,
+    "amendment_is_activation_receipt": false,
+    "public_canary_authorized_by_amendment_alone": false,
+    "restricted_inference_authorized": false,
+    "scientific_outcome_authorized": false,
+    "model_agreement_or_pseudo_labels_are_ground_truth": false,
+    "next_action": "A separately validated public-only runner may apply this exact post-render relocation and re-run the unchanged public canary in the new namespace. Full activation, restricted calibration, and any scientific outcome remain gated by fresh immutable receipts."
+  }
+}

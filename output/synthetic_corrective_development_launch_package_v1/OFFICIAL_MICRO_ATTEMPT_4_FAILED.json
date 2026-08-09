@@ -1,0 +1,20 @@
+{
+  "config_sha256": "cf7213445a74f48629f0146341fa95dfa3720e0a98c6bb8b4476d0fae4f7f02b",
+  "confirmation_authorized": false,
+  "confirmation_outcome_count": 0,
+  "development_outcome_count": 0,
+  "failure_class": "PermissionError",
+  "failure_message": "macOS denied os.sysconf(SC_SEM_NSEMS_MAX) while ProcessPoolExecutor initialized before any worker cohort completed",
+  "failed_operation": "parallel_micro_attempt_4_jobs_1",
+  "input_manifest_sha256": "305925d54f40d14d02d4f90c7c676758829e1777a93d25bce5cef493b6828936",
+  "outcome_registry_sha256": "f8256576ffb619cbf7e3196ab720736d514cdb0cb6653f88bb636476cf5ad845",
+  "package_version": 1,
+  "prequalification_design_lock_sha256": "ba03b676009dba587963a7d5bd185afc7b3b4467f4f4055cfa7d226890ebf796",
+  "retry_forbidden": true,
+  "runner_sha256": "ba57261bd3db9a9c28c4a8664c432de342f26003bf70815d04357a93a57b24fb",
+  "schema_version": "nursery-corrective-failed-package-v1",
+  "scientific_inference_suppressed": true,
+  "scientific_outcome": false,
+  "status": "FAILED_NO_OUTCOME",
+  "successor_package_required": "synthetic_corrective_development_launch_package_v2"
+}

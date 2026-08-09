@@ -1,0 +1,12 @@
+{
+  "scope": "retained local implementation sources only",
+  "network_access_used": false,
+  "restricted_data_used": false,
+  "sources": [
+    "babyworld_lite/sensor_alignment_v2/detector.py",
+    "output/synthetic_sensor_event_robustness_v2/detector/frozen_detector.json",
+    "output/synthetic_identifiability_qualification_v5/qualification_run/qualification_summary.json",
+    "output/synthetic_identifiability_qualification_v5/terminal_decision.json",
+    "output/synthetic_identifiability_qualification_v6/prefreeze_invalidation.json"
+  ]
+}
