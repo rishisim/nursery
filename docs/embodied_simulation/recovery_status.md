@@ -52,6 +52,27 @@ restored under ignored `.external/` roots:
 - the Kenney Furniture Kit archive with SHA-256
   `68afa4e6dc8a53942379fb47f1e84ec735d46b77bb1c1ceb968e245693dde067`.
 
+## Exact Juno recovery completed
+
+After VPN access was restored, the recorded Phase 3 path
+`/work/dal503972/embodied_phase3` on `juno.hpcre.utdallas.edu` was reachable.
+The scientific inputs, source/config snapshot, logs, and appearance run were
+copied into ignored
+`runs/embodied_simulation/recovery/juno_embodied_phase3/`.
+
+The recovered scope contains 243 files totaling 273,361,097 bytes, including
+108 MP4 files. A fresh remote SHA-256 manifest matched the local copy for all
+243 files. The local verification manifest is
+`juno_recovery_sha256.txt`; its SHA-256 is
+`3f6560fc3a3de25f1fcd2fffc7ea11b268aa04c72ea0a58ede50574fb94513ef`.
+Reproducible model weights, environments, caches, runtimes, and public source
+checkouts were deliberately left on Juno rather than duplicating approximately
+58 GB of model weights alone.
+
+This remote path contains the July 31 Phase 3 egocentric appearance corpus. It
+does not contain the later Unity visual-audition, native, anatomical, bimanual,
+procedural, or August 5 reference-hand runs.
+
 ## Derivative evidence recovered
 
 Codex session records retained 137 viewed-image records representing 126 unique
@@ -82,9 +103,16 @@ weakened.
 
 ## Still missing locally
 
-- Original ignored Phase 1-6 run trees and their complete intermediate media;
+- Original ignored Phase 1-2 and Phase 4-6 run trees and their complete
+  intermediate media; the exact Phase 3 appearance subset on Juno is restored
+  as described above;
 - original Unity visual-audition, integrated, native, anatomical, bimanual,
   and procedural-gate run trees, except for session-cached visual derivatives;
+- the 56.033-second bimanual Stage-D clean external video
+  `baseline_external.mp4` (historical SHA-256
+  `8bf8fb480e6d7a2044717cc7d3c26e95360a212e5172e39dd4d8e6d1eea23859`)
+  and Stage-F audio mux (historical SHA-256
+  `7e3932fa6e0d280ff09b40b5075fc7697ea57febdaaf20812e818c622c20d0fe`);
 - the historical MPFB `.blend` and `child.fbx` containers with their frozen
   hashes;
 - superseded development attempts, caches, environments, and duplicated
@@ -92,11 +120,10 @@ weakened.
 
 Local recovery checks found no matching Trash contents, Time Machine
 destination, Data-volume APFS snapshot, open deleted-file handle, or surviving
-local duplicate. The Phase 3 remote path was recorded as
-`/work/dal503972/embodied_phase3` on `juno.hpcre.utdallas.edu`, but the host was
-not resolvable from the current network. The historical external volume
-`EOS_202603` is not mounted. Either source may contain additional originals if
-it becomes reachable.
+local duplicate. The Juno Phase 3 path has now been recovered and verified, but
+it does not contain the later Unity outputs. The historical external volume
+`EOS_202603` is not mounted and remains the outstanding source that may contain
+additional originals.
 
 Generated recovery outputs remain ignored and are not committed as repository
 source. This document is the compact retained recovery/decision record.
