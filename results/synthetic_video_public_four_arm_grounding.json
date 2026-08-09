@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "status": "EXPLORATORY_COMPLETE",
+  "scope": "one_public_source_real_hailuo_ltx_api_ltx_juno_matched_comparison",
+  "provenance": {
+    "shared_prompt_commitment_sha256": "63e20f20c29cf6d88116172ec245a10b788753581fc4643e773104f7eb6a71cb",
+    "evaluator": "OpenAI_CLIP_ViT_B_32",
+    "repository": "Xenova/clip-vit-base-patch32",
+    "revision": "d15189d7028b43f1d3e65039190477f6af591c2a",
+    "runtime": "@huggingface/transformers@3.8.1",
+    "dtype": "q8",
+    "execution": "local_CPU_ONNX",
+    "frame_count_per_arm": 10,
+    "score_row_count": 160,
+    "wall_seconds": 13.181157,
+    "rented_GPU": false,
+    "prior_three_arm_reproduced_within_1e_6": true
+  },
+  "qualitative": {
+    "frozen_checklist_fail_count": {"hailuo_vs_real": 1, "ltx_api_vs_real": 0, "ltx_juno_vs_real": 0},
+    "ltx_juno_reported_feature_mismatch_count": 4,
+    "method": "same frozen checklist domains; Juno judgments use the preregistered ten-frame one-time review and retain four additional feature-level mismatches"
+  },
+  "grounded_lexical_metrics": {
+    "noun": {
+      "real": {"top1_accuracy": 0.9, "mean_target_probability": 0.487791, "mean_target_minus_best_distractor_margin": 0.265515},
+      "hailuo": {"top1_accuracy": 0.8, "mean_target_probability": 0.519231, "mean_target_minus_best_distractor_margin": 0.282218},
+      "ltx_api": {"top1_accuracy": 0.9, "mean_target_probability": 0.63151, "mean_target_minus_best_distractor_margin": 0.44125},
+      "ltx_juno": {"top1_accuracy": 0.8, "mean_target_probability": 0.509403, "mean_target_minus_best_distractor_margin": 0.247903},
+      "hailuo_minus_real": {"top1_accuracy": -0.1, "mean_target_probability": 0.03144, "mean_target_minus_best_distractor_margin": 0.016703},
+      "ltx_api_minus_real": {"top1_accuracy": 0.0, "mean_target_probability": 0.143718, "mean_target_minus_best_distractor_margin": 0.175735},
+      "ltx_juno_minus_real": {"top1_accuracy": -0.1, "mean_target_probability": 0.021611, "mean_target_minus_best_distractor_margin": -0.017612},
+      "ltx_api_minus_hailuo": {"top1_accuracy": 0.1, "mean_target_probability": 0.112278, "mean_target_minus_best_distractor_margin": 0.159032},
+      "ltx_juno_minus_hailuo": {"top1_accuracy": 0.0, "mean_target_probability": -0.009829, "mean_target_minus_best_distractor_margin": -0.034315},
+      "ltx_juno_minus_ltx_api": {"top1_accuracy": -0.1, "mean_target_probability": -0.122107, "mean_target_minus_best_distractor_margin": -0.193347}
+    },
+    "adjective": {
+      "real": {"top1_accuracy": 0.9, "mean_target_probability": 0.467488, "mean_target_minus_best_distractor_margin": 0.220467},
+      "hailuo": {"top1_accuracy": 0.8, "mean_target_probability": 0.427173, "mean_target_minus_best_distractor_margin": 0.128969},
+      "ltx_api": {"top1_accuracy": 1.0, "mean_target_probability": 0.627156, "mean_target_minus_best_distractor_margin": 0.451536},
+      "ltx_juno": {"top1_accuracy": 0.8, "mean_target_probability": 0.456419, "mean_target_minus_best_distractor_margin": 0.180818},
+      "hailuo_minus_real": {"top1_accuracy": -0.1, "mean_target_probability": -0.040315, "mean_target_minus_best_distractor_margin": -0.091498},
+      "ltx_api_minus_real": {"top1_accuracy": 0.1, "mean_target_probability": 0.159668, "mean_target_minus_best_distractor_margin": 0.231069},
+      "ltx_juno_minus_real": {"top1_accuracy": -0.1, "mean_target_probability": -0.011069, "mean_target_minus_best_distractor_margin": -0.039649},
+      "ltx_api_minus_hailuo": {"top1_accuracy": 0.2, "mean_target_probability": 0.199983, "mean_target_minus_best_distractor_margin": 0.322567},
+      "ltx_juno_minus_hailuo": {"top1_accuracy": 0.0, "mean_target_probability": 0.029246, "mean_target_minus_best_distractor_margin": 0.051849},
+      "ltx_juno_minus_ltx_api": {"top1_accuracy": -0.2, "mean_target_probability": -0.170737, "mean_target_minus_best_distractor_margin": -0.270718}
+    },
+    "action_guardrail": {
+      "real": {"top1_accuracy": 0.5, "mean_target_probability": 0.458998, "mean_target_minus_best_distractor_margin": 0.03683},
+      "hailuo": {"top1_accuracy": 1.0, "mean_target_probability": 0.630135, "mean_target_minus_best_distractor_margin": 0.352932},
+      "ltx_api": {"top1_accuracy": 0.7, "mean_target_probability": 0.597061, "mean_target_minus_best_distractor_margin": 0.266472},
+      "ltx_juno": {"top1_accuracy": 0.9, "mean_target_probability": 0.605875, "mean_target_minus_best_distractor_margin": 0.334239},
+      "hailuo_minus_real": {"top1_accuracy": 0.5, "mean_target_probability": 0.171137, "mean_target_minus_best_distractor_margin": 0.316102},
+      "ltx_api_minus_real": {"top1_accuracy": 0.2, "mean_target_probability": 0.138063, "mean_target_minus_best_distractor_margin": 0.229642},
+      "ltx_juno_minus_real": {"top1_accuracy": 0.4, "mean_target_probability": 0.146877, "mean_target_minus_best_distractor_margin": 0.297409},
+      "ltx_api_minus_hailuo": {"top1_accuracy": -0.3, "mean_target_probability": -0.033074, "mean_target_minus_best_distractor_margin": -0.08646},
+      "ltx_juno_minus_hailuo": {"top1_accuracy": -0.1, "mean_target_probability": -0.02426, "mean_target_minus_best_distractor_margin": -0.018693},
+      "ltx_juno_minus_ltx_api": {"top1_accuracy": 0.2, "mean_target_probability": 0.008814, "mean_target_minus_best_distractor_margin": 0.067767}
+    },
+    "viewpoint_guardrail": {
+      "real": {"top1_accuracy": 0.1, "mean_target_probability": 0.171038, "mean_target_minus_best_distractor_margin": -0.426165},
+      "hailuo": {"top1_accuracy": 0.2, "mean_target_probability": 0.228936, "mean_target_minus_best_distractor_margin": -0.301403},
+      "ltx_api": {"top1_accuracy": 0.0, "mean_target_probability": 0.222848, "mean_target_minus_best_distractor_margin": -0.294885},
+      "ltx_juno": {"top1_accuracy": 0.1, "mean_target_probability": 0.215307, "mean_target_minus_best_distractor_margin": -0.297916},
+      "hailuo_minus_real": {"top1_accuracy": 0.1, "mean_target_probability": 0.057898, "mean_target_minus_best_distractor_margin": 0.124761},
+      "ltx_api_minus_real": {"top1_accuracy": -0.1, "mean_target_probability": 0.05181, "mean_target_minus_best_distractor_margin": 0.131279},
+      "ltx_juno_minus_real": {"top1_accuracy": 0.0, "mean_target_probability": 0.044269, "mean_target_minus_best_distractor_margin": 0.128249},
+      "ltx_api_minus_hailuo": {"top1_accuracy": -0.2, "mean_target_probability": -0.006088, "mean_target_minus_best_distractor_margin": 0.006518},
+      "ltx_juno_minus_hailuo": {"top1_accuracy": -0.1, "mean_target_probability": -0.013629, "mean_target_minus_best_distractor_margin": 0.003488},
+      "ltx_juno_minus_ltx_api": {"top1_accuracy": 0.1, "mean_target_probability": -0.007541, "mean_target_minus_best_distractor_margin": -0.003031},
+      "interpretation": "evaluator guardrail failed on all four arms because every mean margin is negative; pairwise deltas are descriptive only"
+    }
+  },
+  "interpretation": {
+    "noun": "Juno LTX matched Hailuo top-1 and was one frame below real and LTX API; its margin was slightly below real and Hailuo and below LTX API",
+    "adjective": "Juno LTX matched Hailuo top-1 and was one frame below real and two below LTX API; its margin was between Hailuo and real",
+    "action": "Juno LTX was one frame below Hailuo and above LTX API and real; one source cannot establish generator superiority",
+    "viewpoint": "the evaluator failed this guardrail on all arms, so no viewpoint ranking is supported"
+  },
+  "human_response_KL_created": false,
+  "lexical_acquisition_measured": false,
+  "omnibus_score_created": false,
+  "comparison_commitment_sha256": "c5c17fe83ef3626393345a3774635688c14e51ccfcfdb930deeec31efd2fc2b6",
+  "claim_limits": ["one_public_source_only", "exploratory", "grounded_lexical_preservation_not_acquisition", "no_human_likeness_claim", "no_dataset_scale_claim", "no_equivalence", "no_noninferiority", "no_generator_ranking_claim", "no_scale_up_authorization"],
+  "artifact_policy": "media frames model cache and row-level scores remain only in the ignored output root"
+}

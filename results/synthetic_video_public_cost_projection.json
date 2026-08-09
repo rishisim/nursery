@@ -1,39 +1,58 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "EXPLORATORY_COST_PROJECTION_COMPLETE",
-  "scope": "one_public_10_second_source_clip_generation_only_cost_projection",
+  "scope": "one_public_10_second_source_clip_generation_only_cost_projection_with_local_juno_extension",
   "pathway_cost_coverage": {
     "structured_scene_description": "NOT_INSTRUMENTED_FOR_COST",
-    "video_generation": "OBSERVED_ACCEPTED_REQUEST_CHARGE",
+    "video_generation": "OBSERVED_ACCEPTED_API_CHARGE_OR_OBSERVED_JUNO_GPU_ALLOCATION",
     "modular_audio_and_QA": "ZERO_DIRECT_AUDIO_API_COST_FOR_DIGITAL_SILENCE_BUT_LOCAL_COMPUTE_AND_LABOR_UNPRICED"
   },
-  "observed_accepted_request_cost_USD_per_10_seconds": {
-    "hailuo_2K": 1.287,
-    "ltx_2_3_1080p": 0.8
+  "observed_per_10_seconds": {
+    "hailuo_2K_direct_API_USD": 1.287,
+    "ltx_2_3_1080p_direct_API_USD": 0.8,
+    "ltx_2_3_juno_direct_incremental_USD": 0,
+    "ltx_2_3_juno_allocated_GPU_hours": 0.039444,
+    "ltx_2_3_juno_allocated_job_seconds": 142,
+    "ltx_2_3_juno_generation_wall_seconds": 108.212319
+  },
+  "juno_shadow_cost_sensitivity": {
+    "predeclared_rates_USD_per_GPU_hour": [1, 2, 4, 8],
+    "shadow_cost_USD_per_10_seconds": {"1": 0.039444, "2": 0.078889, "4": 0.157778, "8": 0.315556},
+    "shadow_cost_USD_per_generated_hour_at_100_percent_yield": {"1": 14.2, "2": 28.4, "4": 56.8, "8": 113.6},
+    "base_visualization_rate_USD_per_GPU_hour": 4,
+    "why_shadow_not_zero": "Juno has no observed incremental cash charge to this prototype but consumes scarce institutional GPU allocation"
   },
   "generation_only_projection_USD_per_usable_hour": {
-    "100_percent_accepted_output_yield": {"hailuo": 463.32, "ltx": 288.0, "ltx_minus_hailuo": -175.32},
-    "80_percent_accepted_output_yield": {"hailuo": 579.15, "ltx": 360.0, "ltx_minus_hailuo": -219.15},
-    "50_percent_accepted_output_yield": {"hailuo": 926.64, "ltx": 576.0, "ltx_minus_hailuo": -350.64}
+    "100_percent_accepted_output_yield": {"hailuo": 463.32, "ltx_api": 288.0, "ltx_juno_direct": 0.0, "ltx_juno_shadow_at_4_USD_per_GPU_hour": 56.8},
+    "80_percent_accepted_output_yield": {"hailuo": 579.15, "ltx_api": 360.0, "ltx_juno_direct": 0.0, "ltx_juno_shadow_at_4_USD_per_GPU_hour": 71.0},
+    "50_percent_accepted_output_yield": {"hailuo": 926.64, "ltx_api": 576.0, "ltx_juno_direct": 0.0, "ltx_juno_shadow_at_4_USD_per_GPU_hour": 113.6}
   },
-  "generation_only_comparison": {
-    "ltx_percent_lower_than_hailuo_at_matched_yield": 37.839938,
-    "break_even_real_cost_USD_per_usable_hour_at_100_percent_synthetic_yield": {"hailuo": 463.32, "ltx": 288.0},
-    "break_even_definition": "prospective real fully loaded cost equals direct synthetic video-generation API cost only"
+  "juno_compute_projection": {
+    "allocated_GPU_hours_per_generated_hour_at_100_percent_yield": 14.2,
+    "allocated_GPU_hours_per_usable_hour_at_80_percent_yield": 17.75,
+    "allocated_GPU_hours_per_usable_hour_at_50_percent_yield": 28.4,
+    "break_even_shadow_rate_USD_per_GPU_hour_vs_ltx_API_at_100_percent_yield": 20.28169,
+    "break_even_shadow_rate_USD_per_GPU_hour_vs_hailuo_API_at_100_percent_yield": 32.628169
+  },
+  "generation_only_comparison_at_100_percent_yield_and_4_USD_shadow_rate": {
+    "juno_shadow_percent_lower_than_hailuo_API": 87.740089,
+    "juno_shadow_percent_lower_than_ltx_API": 80.277778,
+    "ltx_API_percent_lower_than_hailuo_API": 37.839938,
+    "break_even_definition": "prospective real fully loaded cost equals direct API generation cost or Juno shadow-priced GPU allocation only"
   },
   "performance_context": {
-    "source": "results/synthetic_video_public_three_arm_grounding.json",
-    "noun_top1": {"real": 0.9, "hailuo": 0.8, "ltx": 0.9},
-    "adjective_top1": {"real": 0.9, "hailuo": 0.8, "ltx": 1.0},
-    "action_top1": {"real": 0.5, "hailuo": 1.0, "ltx": 0.7},
+    "source": "results/synthetic_video_public_four_arm_grounding.json",
+    "noun_top1": {"real": 0.9, "hailuo": 0.8, "ltx_api": 0.9, "ltx_juno": 0.8},
+    "adjective_top1": {"real": 0.9, "hailuo": 0.8, "ltx_api": 1.0, "ltx_juno": 0.8},
+    "action_top1": {"real": 0.5, "hailuo": 1.0, "ltx_api": 0.7, "ltx_juno": 0.9},
     "viewpoint_guardrail": "FAILED_ALL_ARMS_NEGATIVE_MEAN_MARGIN",
     "omnibus_score_created": false
   },
-  "unpriced_synthetic_categories": ["descriptor_API_usage", "local_audio_compute", "ASR_translation_when_applicable", "storage", "QA_and_human_review", "development_labor", "failed_or_rejected_paid_attempts"],
+  "unpriced_synthetic_categories": ["descriptor_API_usage", "model_setup_bandwidth_and_CPU_time", "model_and_environment_storage", "local_audio_compute", "ASR_translation_when_applicable", "QA_and_human_review", "development_labor", "failed_or_rejected_attempts"],
   "unpriced_real_categories": ["recruitment_and_consent", "participant_and_staff_time", "equipment", "collection_failures", "secure_transfer_and_storage", "ASR_translation", "QA_and_human_review", "usable_hour_yield"],
   "real_fully_loaded_cost_observed": false,
   "lower_fully_loaded_cost_claim_supported": false,
-  "why_not": "the prospective real ledger and multiple synthetic pathway categories are missing; missing categories fail closed and are not set to zero",
-  "rendered_outputs": ["ignored performance comparison PNG", "ignored generation cost and break-even PNG"],
-  "claim_limits": ["one_public_clip_only", "linear_generation_projection", "direct_generation_API_cost_only", "no_fully_loaded_cost_claim", "no_equivalence", "no_generator_ranking", "no_scale_up_authorization"]
+  "why_not": "the prospective real ledger and multiple synthetic pathway categories are missing; one clip does not establish matched realism or scalable accepted yield, and missing categories fail closed rather than being set to zero",
+  "rendered_outputs": ["ignored four-arm performance comparison PNG", "ignored API-versus-Juno-shadow generation cost PNG"],
+  "claim_limits": ["one_public_clip_only", "linear_generation_projection", "generation_only_cost", "Juno_shadow_rate_is_sensitivity_not_invoice", "no_fully_loaded_cost_claim", "no_equivalence", "no_generator_ranking", "no_scale_up_authorization"]
 }
