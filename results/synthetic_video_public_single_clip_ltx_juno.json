@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "status": "EXPLORATORY_LTX_JUNO_CLIP_COMPLETE",
+  "public_only": true,
+  "question": "can the exact frozen public single-clip episode prompt produce one valid 10-second clip with the pinned official LTX-2.3 distilled pipeline on one Juno GPU",
+  "provider": "Juno_institutional_GPU_allocation",
+  "generator_model": "LTX-2.3-22B-Distilled-1.1",
+  "prompt_commitment_sha256": "63e20f20c29cf6d88116172ec245a10b788753581fc4643e773104f7eb6a71cb",
+  "manual_prompt_edit": false,
+  "generation_attempt_count": 1,
+  "accepted_synthetic_clip_count": 1,
+  "generation_provenance": {
+    "source_revision": "9377758131b1ffde4b7f766804590a6617bf2ab9",
+    "weights_revision": "4229404625088d21c4f112eb640fb04a0900ee25",
+    "gemma_revision": "68f7ee4fbd59087436ada77ed2d62f373fdd4482",
+    "pipeline": "official_ltx_pipelines_distilled_two_stage",
+    "seed": 314159,
+    "prompt_enhancement": false,
+    "quantization": "fp8-cast",
+    "offload": "none"
+  },
+  "observed_resource": {
+    "GPU_model": "NVIDIA H100 NVL",
+    "GPU_count": 1,
+    "generation_wall_seconds": 108.212319,
+    "allocated_job_seconds": 142,
+    "allocated_GPU_hours": 0.039444,
+    "peak_torch_allocated_GiB": 23.682236,
+    "direct_incremental_charge_USD": 0
+  },
+  "media": {
+    "duration_seconds": 10.0,
+    "width": 1152,
+    "height": 640,
+    "fps": 24,
+    "video_frame_count": 240,
+    "video_codec": "h264",
+    "audio_codec": "aac",
+    "audio_sample_rate": 48000,
+    "audio_channels": 2,
+    "native_generated_audio": false,
+    "digital_silence_expected_and_observed": true
+  },
+  "technical_checks": {
+    "valid_10_second_decode_and_synchronized_audio": true,
+    "exact_frozen_prompt_commitment": true,
+    "one_generation_attempt_only": true,
+    "adapter_accepts_synthetic_audio_same_abstention_rules": true
+  },
+  "one_time_qualitative_check": {
+    "method": "ten one-second sampled frames reviewed only after technical acceptance",
+    "first_person_camera_retained": true,
+    "setting_broadly_retained": true,
+    "garment_care_activity_broadly_retained": true,
+    "primary_public_category_garment_retained": true,
+    "two_hand_contact_and_manipulation_retained": true,
+    "single_shot_continuity_retained": true,
+    "no_obvious_caption_logo_watermark_impossible_physics_floating_object_or_severe_anatomy_defect_in_sampled_frames": true,
+    "speech_or_referent_timing": "NOT_APPLICABLE_SOURCE_SPEECH_UNSUPPORTED",
+    "reported_mismatches": [
+      "room layout and support surface are not retained exactly",
+      "synthetic setting is more cluttered and contains additional public-category distractors",
+      "garment shape and fold state drift across the manipulation sequence",
+      "visible sleeves and arm appearance differ from the source non-identifying role"
+    ]
+  },
+  "omnibus_score": null,
+  "artifact_policy": "media prompt job logs native audio frames model assets and row-level artifacts remain outside Git in ignored or governed roots",
+  "claim_limits": [
+    "one_public_clip_only",
+    "one_local_GPU_attempt_only",
+    "exploratory_generator_comparison",
+    "sampled_frame_qualitative_check_only",
+    "no_equivalence",
+    "no_noninferiority",
+    "no_synthetic_data_quality_validation",
+    "no_scale_up_authorization",
+    "no_learner_training"
+  ]
+}

@@ -1,4 +1,4 @@
-from scripts.run_synthetic_video_paired_grounding import aggregate, aggregate_three_arm, qualitative
+from scripts.run_synthetic_video_paired_grounding import aggregate, aggregate_four_arm, aggregate_three_arm, qualitative
 
 
 PROBES = {
@@ -55,6 +55,25 @@ def test_three_arm_aggregate_reports_all_matched_deltas():
     assert result["noun"]["deltas"]["hailuo_minus_real"]["top1_accuracy"] == -1.0
     assert result["noun"]["deltas"]["ltx_minus_real"]["top1_accuracy"] == 0.0
     assert result["noun"]["deltas"]["ltx_minus_hailuo"]["top1_accuracy"] == 1.0
+
+
+def test_four_arm_aggregate_reports_juno_deltas_without_omnibus():
+    rows = []
+    arms = (
+        ("real", [0.7, 0.1, 0.1, 0.1]),
+        ("hailuo", [0.4, 0.5, 0.05, 0.05]),
+        ("ltx_api", [0.8, 0.1, 0.05, 0.05]),
+        ("ltx_juno", [0.9, 0.05, 0.025, 0.025]),
+    )
+    for arm, scores in arms:
+        for frame in range(10):
+            for probe in PROBES:
+                rows.append({"arm": arm, "frame_ordinal": frame, "probe": probe, "scores": scores})
+    result = aggregate_four_arm(rows, PROBES, tuple(arm for arm, _ in arms))
+    assert result["noun"]["ltx_juno"]["top1_accuracy"] == 1.0
+    assert result["noun"]["deltas"]["ltx_juno_minus_real"]["top1_accuracy"] == 0.0
+    assert result["noun"]["deltas"]["ltx_juno_minus_ltx_api"]["mean_target_probability"] > 0
+    assert "omnibus" not in result
 
 
 def test_node_scorer_handles_commonjs_default_export():

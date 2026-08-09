@@ -101,6 +101,22 @@ def aggregate_three_arm(rows: list[dict], probes: dict, arms: tuple[str, str, st
     return metrics
 
 
+def aggregate_four_arm(rows: list[dict], probes: dict, arms: tuple[str, str, str, str]) -> dict:
+    metrics = aggregate_arm_metrics(rows, probes, arms)
+    real_arm, hailuo_arm, ltx_api_arm, ltx_juno_arm = arms
+    for probe in probes:
+        values = metrics[probe]
+        values["deltas"] = {
+            "hailuo_minus_real": metric_delta(values[hailuo_arm], values[real_arm]),
+            "ltx_api_minus_real": metric_delta(values[ltx_api_arm], values[real_arm]),
+            "ltx_juno_minus_real": metric_delta(values[ltx_juno_arm], values[real_arm]),
+            "ltx_api_minus_hailuo": metric_delta(values[ltx_api_arm], values[hailuo_arm]),
+            "ltx_juno_minus_hailuo": metric_delta(values[ltx_juno_arm], values[hailuo_arm]),
+            "ltx_juno_minus_ltx_api": metric_delta(values[ltx_juno_arm], values[ltx_api_arm]),
+        }
+    return metrics
+
+
 def qualitative(existing: dict) -> dict:
     checks = existing["checks"]
     return {
@@ -120,10 +136,13 @@ def qualitative(existing: dict) -> dict:
 def run(args: argparse.Namespace) -> dict:
     started = time.monotonic()
     preregistration = json.loads(args.config.read_text())
+    four_arm = args.ltx_juno_root is not None
     three_arm = args.ltx_root is not None
-    config_key = "public_three_arm_grounded_lexical_test" if three_arm else "public_single_pair_grounded_lexical_test"
+    if four_arm and not three_arm:
+        raise GroundingError("E_LTX_API_ARM_REQUIRED")
+    config_key = "public_four_arm_grounded_lexical_test" if four_arm else ("public_three_arm_grounded_lexical_test" if three_arm else "public_single_pair_grounded_lexical_test")
     config = preregistration[config_key]
-    frozen_status = "FROZEN_BEFORE_THREE_ARM_FRAME_EXTRACTION_OR_SCORE" if three_arm else "FROZEN_BEFORE_CLIP_EVALUATOR_DOWNLOAD_OR_SCORE"
+    frozen_status = "FROZEN_BEFORE_FOUR_ARM_FRAME_EXTRACTION_OR_SCORE" if four_arm else ("FROZEN_BEFORE_THREE_ARM_FRAME_EXTRACTION_OR_SCORE" if three_arm else "FROZEN_BEFORE_CLIP_EVALUATOR_DOWNLOAD_OR_SCORE")
     if config["status"] != frozen_status:
         raise GroundingError("E_PROTOCOL_NOT_FROZEN")
     ltx_result = None
@@ -133,6 +152,10 @@ def run(args: argparse.Namespace) -> dict:
         commitment = config["shared_source_prompt_commitment_sha256"]
         if episode_plan["commitment_sha256"] != commitment or ltx_result["prompt_commitment_sha256"] != commitment:
             raise GroundingError("E_SHARED_PROMPT_COMMITMENT")
+        if four_arm:
+            ltx_juno_result = json.loads(args.ltx_juno_result.read_text())
+            if ltx_juno_result["prompt_commitment_sha256"] != commitment:
+                raise GroundingError("E_SHARED_JUNO_PROMPT_COMMITMENT")
     root = args.output_root.resolve()
     root.mkdir(parents=True, exist_ok=True, mode=0o700)
     timestamps = [float(value) for value in config["frames"]["timestamps_seconds"]]
@@ -145,7 +168,10 @@ def run(args: argparse.Namespace) -> dict:
     ]
     if three_arm:
         ltx_frames = extract_frames(args.ltx_root / "synthetic_10s.mp4", root / "frames/ltx", timestamps)
-        arms.append({"name": "public_ltx_derived", "frames": [str(path) for path in ltx_frames]})
+        arms.append({"name": "public_ltx_api_derived" if four_arm else "public_ltx_derived", "frames": [str(path) for path in ltx_frames]})
+    if four_arm:
+        ltx_juno_frames = extract_frames(args.ltx_juno_root / "synthetic_10s.mp4", root / "frames/ltx_juno", timestamps)
+        arms.append({"name": "public_ltx_juno_derived", "frames": [str(path) for path in ltx_juno_frames]})
     manifest = {
         "schema_version": 1,
         "evaluator": config["evaluator"],
@@ -160,7 +186,7 @@ def run(args: argparse.Namespace) -> dict:
     subprocess.run(["node", str(args.scorer), str(manifest_path), str(scores_path)], check=True, env=environment)
     scores = json.loads(scores_path.read_text())
     arm_names = tuple(arm["name"] for arm in arms)
-    metrics = aggregate_three_arm(scores["rows"], probes, arm_names) if three_arm else aggregate(scores["rows"], probes, arm_names)
+    metrics = aggregate_four_arm(scores["rows"], probes, arm_names) if four_arm else (aggregate_three_arm(scores["rows"], probes, arm_names) if three_arm else aggregate(scores["rows"], probes, arm_names))
     existing = json.loads((args.prototype_root / "exploratory_comparison.json").read_text())
     qualitative_result = qualitative(existing)
     if three_arm:
@@ -180,6 +206,20 @@ def run(args: argparse.Namespace) -> dict:
                 "null_meaning": "not_applicable_because_source_speech_was_unsupported",
             },
         }
+        if four_arm:
+            juno_qualitative = ltx_juno_result["one_time_qualitative_check"]
+            qualitative_result["ltx_juno_vs_real"] = {
+                "setting": juno_qualitative["setting_broadly_retained"],
+                "activity": juno_qualitative["garment_care_activity_broadly_retained"],
+                "primary_objects": juno_qualitative["primary_public_category_garment_retained"],
+                "attribute": "covered_by_grounded_adjective_probe",
+                "hand_action": juno_qualitative["two_hand_contact_and_manipulation_retained"],
+                "viewpoint": juno_qualitative["first_person_camera_retained"],
+                "continuity": juno_qualitative["single_shot_continuity_retained"],
+                "artifacts": juno_qualitative["no_obvious_caption_logo_watermark_impossible_physics_floating_object_or_severe_anatomy_defect_in_sampled_frames"],
+                "speech_and_referent_timing": None,
+                "null_meaning": "not_applicable_because_source_speech_was_unsupported",
+            }
     result = {
         "schema_version": 1,
         "status": "EXPLORATORY_COMPLETE",
@@ -196,12 +236,12 @@ def run(args: argparse.Namespace) -> dict:
         "wall_seconds": time.monotonic() - started,
     }
     result["commitment_sha256"] = digest({key: value for key, value in result.items() if key != "wall_seconds"})
-    private_write(root / ("three_arm_grounded_lexical_result.json" if three_arm else "paired_grounded_lexical_result.json"), result)
+    private_write(root / ("four_arm_grounded_lexical_result.json" if four_arm else ("three_arm_grounded_lexical_result.json" if three_arm else "paired_grounded_lexical_result.json")), result)
     real_key, synthetic_key = arm_names[0], arm_names[1]
     compact = {
         "status": result["status"],
         "arm_count": len(arm_names),
-        "pair_count": 3 if three_arm else 1,
+        "pair_count": 6 if four_arm else (3 if three_arm else 1),
         "frame_count_per_arm": 10,
         "probe_count": len(metrics),
         "noun_real_top1": metrics["noun"][real_key]["top1_accuracy"],
@@ -227,6 +267,14 @@ def run(args: argparse.Namespace) -> dict:
             "hailuo_qualitative_mismatch_count": sum(value is False for key, value in result["qualitative"]["hailuo_vs_real"].items() if key != "null_meaning"),
             "ltx_qualitative_mismatch_count": sum(value is False for key, value in result["qualitative"]["ltx_vs_real"].items() if key != "null_meaning"),
         })
+        if four_arm:
+            compact.update({
+                "noun_ltx_juno_top1": metrics["noun"][arm_names[3]]["top1_accuracy"],
+                "adjective_ltx_juno_top1": metrics["adjective"][arm_names[3]]["top1_accuracy"],
+                "action_ltx_juno_top1": metrics["action_guardrail"][arm_names[3]]["top1_accuracy"],
+                "viewpoint_ltx_juno_top1": metrics["viewpoint_guardrail"][arm_names[3]]["top1_accuracy"],
+                "ltx_juno_qualitative_mismatch_count": sum(value is False for key, value in result["qualitative"]["ltx_juno_vs_real"].items() if key != "null_meaning"),
+            })
     else:
         compact["qualitative_mismatch_count"] = sum(value is False for key, value in result["qualitative"].items() if key != "null_meaning")
     private_write(root / "compact_result.json", compact)
@@ -240,6 +288,8 @@ def main() -> None:
     parser.add_argument("--prototype-root", type=Path, required=True)
     parser.add_argument("--ltx-root", type=Path)
     parser.add_argument("--ltx-result", type=Path, default=Path("results/synthetic_video_public_single_clip_ltx_api.json"))
+    parser.add_argument("--ltx-juno-root", type=Path)
+    parser.add_argument("--ltx-juno-result", type=Path, default=Path("results/synthetic_video_public_single_clip_ltx_juno.json"))
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--transformers-js-root", type=Path, required=True)
     parser.add_argument("--scorer", type=Path, default=Path("scripts/synthetic_video_clip_scores.mjs"))
