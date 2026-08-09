@@ -22,6 +22,24 @@ noninferiority, directionally competitive quality, synthetic-data validity, or
 authorization for a corpus or learner run. Every earlier calibration no-go,
 Phase 4 seal, Real-1h result, and provenance record remains unchanged.
 
+### Same-prompt LTX-2.3 API comparison (prospective)
+
+One additional public-only generator comparison reuses the exact frozen episode
+prompt committed as
+`63e20f20c29cf6d88116172ec245a10b788753581fc4643e773104f7eb6a71cb`.
+Only the generator changes: `fal-ai/ltx-2.3/text-to-video` receives one
+10-second, 1080p, 16:9, 24 fps request with native audio disabled. The prompt
+cannot be edited after viewing the result. The existing modular local audio path
+adds German TTS only when the frozen plan supports it; this speech-unsupported
+plan therefore receives digital silence.
+
+Exactly one API submission is permitted, priced prospectively at USD 0.80.
+An interrupted client resumes the persisted ignored job rather than submitting
+again. Acceptance requires a decodable 10-second 1920x1080 video, an audio
+track, the exact prompt commitment, and a single submission. This is a
+one-clip exploratory generator comparison, not equivalence, validation of
+synthetic-data quality, learner evidence, or authorization to scale.
+
 ### Paired grounded lexical follow-up
 
 One bounded follow-up compares that public source/synthetic pair at the same

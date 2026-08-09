@@ -1,5 +1,5 @@
 {
-  "schema_version": 30,
+  "schema_version": 31,
   "phase": 4,
   "status": "PHASE4_CORRECTED_COMMON_ASSETS_PASS_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_DEVELOPMENT_SCIENTIFIC_NO_GO",
   "evidence_cutoff": "2026-08-08",
@@ -15,6 +15,18 @@
     "outputs": "ignored output root only; media descriptions prompts logs predictions and generated artifacts never enter Git",
     "checks": ["valid_10_second_decode_and_synchronized_audio", "schema_completeness_and_explicit_uncertainty", "no_identifying_or_reconstructive_export", "first_person_camera_retained", "setting_and_activity_broadly_retained", "primary_public_category_objects_retained", "speech_and_referent_timing_within_0_75_seconds", "intended_hand_action_beat_retained_when_present", "no_cuts_or_severe_object_identity_drift", "no_caption_logo_watermark_physics_or_anatomy_defect", "adapter_accepts_synthetic_audio_same_abstention_rules"],
     "claim_limits": ["exploratory_only", "no_omnibus_score", "no_equivalence", "no_noninferiority", "no_directionally_competitive_claim", "no_synthetic_data_quality_validation", "no_one_hour_corpus_authorization", "no_learner_training"]
+  },
+  "public_single_clip_ltx_api_comparison": {
+    "status": "FROZEN_BEFORE_LTX_API_SUBMISSION_OR_OUTPUT",
+    "question": "can the exact frozen public single-clip episode prompt produce one valid 10-second LTX-2.3 comparison clip",
+    "relationship_to_prior_results": "new public-only generator comparison; no reinterpretation or repair of the Hailuo prototype, calibration no-gos, Phase 4 seal, Real-1h result, or provenance records",
+    "source_of_truth": {"episode_plan": "ignored outputs/public_single_clip_api/episode_plan.json", "prompt_commitment_sha256": "63e20f20c29cf6d88116172ec245a10b788753581fc4643e773104f7eb6a71cb", "exact_prompt_reused": true, "manual_prompt_edit": false},
+    "generator": {"provider": "fal.ai", "model": "fal-ai/ltx-2.3/text-to-video", "duration_seconds": 10, "resolution": "1080p", "aspect_ratio": "16:9", "fps": 24, "native_generated_audio": false, "accepted_clip_max": 1, "submission_max": 1, "engineering_retry": false},
+    "audio": {"same_modular_local_path": true, "german_tts_when_supported": true, "digital_silence_when_source_speech_is_unsupported": true},
+    "resource_ceiling": {"provider_price_usd_per_second_1080p": 0.08, "request_cost_usd_max": 0.8, "submission_count_max": 1},
+    "outputs": "ignored outputs/public_single_clip_ltx_api only; no media prompt job response or generated artifact enters Git",
+    "checks": ["valid_10_second_decode", "1920x1080_video", "synchronized_audio_track", "exact_frozen_prompt_commitment", "one_submission_only"],
+    "claim_limits": ["one_public_clip_only", "exploratory_generator_comparison", "no_omnibus_score", "no_equivalence", "no_noninferiority", "no_synthetic_data_quality_validation", "no_scale_up_authorization", "no_learner_training"]
   },
   "public_single_pair_grounded_lexical_test": {
     "status": "FROZEN_BEFORE_CLIP_EVALUATOR_DOWNLOAD_OR_SCORE",
