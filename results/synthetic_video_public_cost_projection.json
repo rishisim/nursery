@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "EXPLORATORY_COST_PROJECTION_COMPLETE",
+  "scope": "one_public_10_second_source_clip_generation_only_cost_projection",
+  "pathway_cost_coverage": {
+    "structured_scene_description": "NOT_INSTRUMENTED_FOR_COST",
+    "video_generation": "OBSERVED_ACCEPTED_REQUEST_CHARGE",
+    "modular_audio_and_QA": "ZERO_DIRECT_AUDIO_API_COST_FOR_DIGITAL_SILENCE_BUT_LOCAL_COMPUTE_AND_LABOR_UNPRICED"
+  },
+  "observed_accepted_request_cost_USD_per_10_seconds": {
+    "hailuo_2K": 1.287,
+    "ltx_2_3_1080p": 0.8
+  },
+  "generation_only_projection_USD_per_usable_hour": {
+    "100_percent_accepted_output_yield": {"hailuo": 463.32, "ltx": 288.0, "ltx_minus_hailuo": -175.32},
+    "80_percent_accepted_output_yield": {"hailuo": 579.15, "ltx": 360.0, "ltx_minus_hailuo": -219.15},
+    "50_percent_accepted_output_yield": {"hailuo": 926.64, "ltx": 576.0, "ltx_minus_hailuo": -350.64}
+  },
+  "generation_only_comparison": {
+    "ltx_percent_lower_than_hailuo_at_matched_yield": 37.839938,
+    "break_even_real_cost_USD_per_usable_hour_at_100_percent_synthetic_yield": {"hailuo": 463.32, "ltx": 288.0},
+    "break_even_definition": "prospective real fully loaded cost equals direct synthetic video-generation API cost only"
+  },
+  "performance_context": {
+    "source": "results/synthetic_video_public_three_arm_grounding.json",
+    "noun_top1": {"real": 0.9, "hailuo": 0.8, "ltx": 0.9},
+    "adjective_top1": {"real": 0.9, "hailuo": 0.8, "ltx": 1.0},
+    "action_top1": {"real": 0.5, "hailuo": 1.0, "ltx": 0.7},
+    "viewpoint_guardrail": "FAILED_ALL_ARMS_NEGATIVE_MEAN_MARGIN",
+    "omnibus_score_created": false
+  },
+  "unpriced_synthetic_categories": ["descriptor_API_usage", "local_audio_compute", "ASR_translation_when_applicable", "storage", "QA_and_human_review", "development_labor", "failed_or_rejected_paid_attempts"],
+  "unpriced_real_categories": ["recruitment_and_consent", "participant_and_staff_time", "equipment", "collection_failures", "secure_transfer_and_storage", "ASR_translation", "QA_and_human_review", "usable_hour_yield"],
+  "real_fully_loaded_cost_observed": false,
+  "lower_fully_loaded_cost_claim_supported": false,
+  "why_not": "the prospective real ledger and multiple synthetic pathway categories are missing; missing categories fail closed and are not set to zero",
+  "rendered_outputs": ["ignored performance comparison PNG", "ignored generation cost and break-even PNG"],
+  "claim_limits": ["one_public_clip_only", "linear_generation_projection", "direct_generation_API_cost_only", "no_fully_loaded_cost_claim", "no_equivalence", "no_generator_ranking", "no_scale_up_authorization"]
+}

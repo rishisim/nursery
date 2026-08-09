@@ -69,6 +69,15 @@ the graph cannot establish lower fully loaded cost. It is a planning view for
 the three-step description → generation → modular-audio/QA pathway and leaves
 the repository's stricter cost gate unchanged.
 
+The rendered projection gives USD 463.32 per generated hour for Hailuo and USD
+288.00 for LTX at 100% accepted-output yield. At matched yield, LTX's direct
+generation API cost is 37.84% lower. At 80% yield the projections are USD
+579.15 and USD 360.00; at 50% they are USD 926.64 and USD 576.00. The
+generation-only break-even real-data costs at 100% synthetic yield are thus USD
+463.32 per usable hour for Hailuo and USD 288.00 for LTX, plus every currently
+unpriced synthetic pathway category. These thresholds are planning inputs, not
+a result that synthetic data is cheaper.
+
 ### Paired grounded lexical follow-up
 
 One bounded follow-up compares that public source/synthetic pair at the same
