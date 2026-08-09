@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "status": "EXPLORATORY_COMPLETE",
+  "public_only": true,
+  "source": {
+    "dataset": "RekaAI/RekaDaily-10k-raw",
+    "revision": "a42e2da9aaeef7c8653d9de50772c97ceb954251",
+    "license": "Apache-2.0",
+    "prospective_selection_rule_followed": true,
+    "source_clip_count": 1,
+    "credited_seconds": 10
+  },
+  "models": {
+    "descriptor": "openai/gpt-5.6-luna-20260709",
+    "generator": "minimax/hailuo-03-20260730",
+    "gateway": "OpenRouter"
+  },
+  "attempts": {
+    "count": 2,
+    "retry_count": 1,
+    "attempt_1": "transport_polling_failure_after_successful_submission_no_clip_downloaded_or_accepted",
+    "attempt_2": "accepted",
+    "accepted_clip_count": 1,
+    "accepted_seconds": 10
+  },
+  "checks": {
+    "pass_count": 10,
+    "fail_count": 1,
+    "not_applicable_count": 1,
+    "failed": ["setting_broadly_retained"],
+    "not_applicable": ["speech_and_referent_timing_within_0_75_seconds_source_speech_unsupported"],
+    "passed": [
+      "valid_10_second_decode_and_synchronized_audio",
+      "schema_completeness_and_explicit_uncertainty",
+      "no_identifying_or_reconstructive_export",
+      "first_person_camera_retained",
+      "activity_broadly_retained",
+      "primary_public_category_objects_retained",
+      "intended_hand_action_beat_retained_when_present",
+      "no_cuts_or_severe_object_identity_drift",
+      "no_caption_logo_watermark_physics_or_anatomy_defect_one_time_qualitative_check",
+      "adapter_abstains_on_synthetic_digital_silence_under_same_rules"
+    ]
+  },
+  "omnibus_score_created": false,
+  "comparison_commitment_sha256": "03adc2c3ace514d818b48a0a87d0ac382a87945fd8a9cfb67d9282f9759ae5d8",
+  "claim_limits": [
+    "one_public_clip_only",
+    "exploratory",
+    "no_equivalence",
+    "no_noninferiority",
+    "no_directionally_competitive_claim",
+    "no_synthetic_data_quality_validation",
+    "no_scale_up_or_one_hour_authorization",
+    "no_learner_training"
+  ],
+  "artifact_policy": "all media frames descriptions prompts API job records and generated artifacts retained only in the ignored local output root"
+}

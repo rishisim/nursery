@@ -1,5 +1,27 @@
 # Synthetic-video governance and preregistration
 
+## Public single-clip API prototype (prospective)
+
+This separately authorized quick test asks only whether one prospectively
+selected 10-second public RekaDaily egocentric clip can be described with a
+fixed non-identifying schema and compiled deterministically into one 10-second
+MiniMax Hailuo 3 clip. It uses OpenRouter with `openai/gpt-5.6-luna` for ten
+ordered one-second frames and `minimax/hailuo-3` for video generation. Luna
+must abstain on speech content because the quick frame-only description path
+does not establish audio content. Hailuo native audio is disabled; a modular
+German track is added locally only when a supported paraphrase and timing are
+present, otherwise digital silence is used.
+
+The first duration-at-least-10-second media member in the first RekaDaily
+household shard is selected before viewing. All media, sampled frames,
+descriptions, prompts, API responses, and generated results remain in an
+ignored output root. At most one clip is accepted; one retry is reserved only
+for API/transport or decode/duration failure. Feature checks are reported
+directly with no omnibus score. This is not evidence of equivalence,
+noninferiority, directionally competitive quality, synthetic-data validity, or
+authorization for a corpus or learner run. Every earlier calibration no-go,
+Phase 4 seal, Real-1h result, and provenance record remains unchanged.
+
 **Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ATTEMPT-8 CONTAINER-GIT ENGINEERING BLOCKER PRESERVED; CLEAN-TREE-ATTESTED ATTEMPT 9 FROZEN BEFORE NEW OUTCOME; ALL PRIOR NO-GOS PRESERVED**
 
 **Evidence cut-off:** 2026-08-04

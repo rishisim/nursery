@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Public egocentric scene description",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "setting", "camera", "entities", "activity", "temporal_beats", "hands", "speech", "learning_opportunity", "scene_dynamics", "uncertainty"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "setting": {"$ref": "#/$defs/setting"},
+    "camera": {"$ref": "#/$defs/camera"},
+    "entities": {"type": "array", "items": {"$ref": "#/$defs/entity"}},
+    "activity": {"type": "string"},
+    "temporal_beats": {"type": "array", "items": {"$ref": "#/$defs/beat"}},
+    "hands": {"$ref": "#/$defs/hands"},
+    "speech": {"$ref": "#/$defs/speech"},
+    "learning_opportunity": {"$ref": "#/$defs/learning"},
+    "scene_dynamics": {"$ref": "#/$defs/dynamics"},
+    "uncertainty": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  },
+  "$defs": {
+    "interval": {"type": "object", "additionalProperties": false, "required": ["start", "end"], "properties": {"start": {"type": "number", "minimum": 0, "maximum": 10}, "end": {"type": "number", "minimum": 0, "maximum": 10}}},
+    "setting": {"type": "object", "additionalProperties": false, "required": ["public_room_category", "lighting"], "properties": {"public_room_category": {"type": "string"}, "lighting": {"type": "string"}}},
+    "camera": {"type": "object", "additionalProperties": false, "required": ["first_person", "height", "framing", "motion", "blur", "continuity"], "properties": {"first_person": {"type": ["boolean", "null"]}, "height": {"type": "string"}, "framing": {"type": "string"}, "motion": {"type": "string"}, "blur": {"type": "string"}, "continuity": {"type": "string"}}},
+    "entity": {"type": "object", "additionalProperties": false, "required": ["category", "role", "attributes", "recurs"], "properties": {"category": {"type": "string"}, "role": {"enum": ["object", "person_role"]}, "attributes": {"type": "array", "items": {"type": "string"}}, "recurs": {"type": ["boolean", "null"]}}},
+    "beat": {"type": "object", "additionalProperties": false, "required": ["start", "end", "action"], "properties": {"start": {"type": "number", "minimum": 0, "maximum": 10}, "end": {"type": "number", "minimum": 0, "maximum": 10}, "action": {"type": "string"}}},
+    "hands": {"type": "object", "additionalProperties": false, "required": ["visibility", "contact", "manipulation", "intervals"], "properties": {"visibility": {"type": "string"}, "contact": {"type": "string"}, "manipulation": {"type": "string"}, "intervals": {"type": "array", "items": {"$ref": "#/$defs/interval"}}}},
+    "speech": {"type": "object", "additionalProperties": false, "required": ["observable", "semantic_summary", "tts_de_paraphrase", "intervals"], "properties": {"observable": {"type": ["boolean", "null"]}, "semantic_summary": {"type": "string"}, "tts_de_paraphrase": {"type": "string"}, "intervals": {"type": "array", "items": {"$ref": "#/$defs/interval"}}}},
+    "learning": {"type": "object", "additionalProperties": false, "required": ["visible_nouns", "attribute_contrasts", "referent_candidates", "ambiguity", "no_referent_intervals"], "properties": {"visible_nouns": {"type": "array", "items": {"type": "string"}}, "attribute_contrasts": {"type": "array", "items": {"type": "string"}}, "referent_candidates": {"type": "array", "items": {"type": "string"}}, "ambiguity": {"type": "string"}, "no_referent_intervals": {"type": "array", "items": {"$ref": "#/$defs/interval"}}}},
+    "dynamics": {"type": "object", "additionalProperties": false, "required": ["clutter", "distractors", "occlusion", "recurrence", "idle_intervals", "transitions"], "properties": {"clutter": {"type": "string"}, "distractors": {"type": "string"}, "occlusion": {"type": "string"}, "recurrence": {"type": "string"}, "idle_intervals": {"type": "array", "items": {"$ref": "#/$defs/interval"}}, "transitions": {"type": "array", "items": {"type": "string"}}}}
+  }
+}

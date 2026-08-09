@@ -3,6 +3,19 @@
   "phase": 4,
   "status": "PHASE4_CORRECTED_COMMON_ASSETS_PASS_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_DEVELOPMENT_SCIENTIFIC_NO_GO",
   "evidence_cutoff": "2026-08-08",
+  "public_single_clip_api_prototype": {
+    "status": "FROZEN_BEFORE_FIRST_PUBLIC_CLIP_DESCRIPTION_OR_GENERATION",
+    "question": "can one prospectively selected 10-second public RekaDaily egocentric clip be converted to a fixed non-identifying semantic description and one directionally matched exploratory synthetic clip",
+    "separation": "new prospective public-only feasibility question; no reinterpretation or repair of calibration no-gos Phase 4 Real-1h or provenance records",
+    "source": {"dataset": "RekaAI/RekaDaily-10k-raw", "revision": "a42e2da9aaeef7c8653d9de50772c97ceb954251", "license": "Apache-2.0", "selection": "first duration-at-least-10-second media member in egocentric_household_tasks shard-00000 tar order before viewing", "clip_seconds": 10},
+    "descriptor": {"gateway": "OpenRouter", "model": "openai/gpt-5.6-luna", "canonical_slug": "openai/gpt-5.6-luna-20260709", "inputs": "ten ordered one-second public clip frames", "schema": "configs/synthetic_video_scene_schema.json", "temperature": 0, "speech_rule": "abstain because frame-only input cannot establish audio content"},
+    "compiler": {"entry_point": "scripts/run_synthetic_video_prototype.py", "deterministic": true, "manual_description_or_prompt_edit": false},
+    "generator": {"gateway": "OpenRouter", "model": "minimax/hailuo-3", "canonical_slug": "minimax/hailuo-03-20260730", "duration_seconds": 10, "resolution": "2K", "accepted_clip_max": 1, "attempts_max": 2, "retry_reasons": ["api_or_transport_failure", "decode_or_duration_failure"]},
+    "audio": {"native_generated_audio": false, "modular_german_tts": true, "explicit_timing": true, "empty_when_source_speech_is_unsupported": true},
+    "outputs": "ignored output root only; media descriptions prompts logs predictions and generated artifacts never enter Git",
+    "checks": ["valid_10_second_decode_and_synchronized_audio", "schema_completeness_and_explicit_uncertainty", "no_identifying_or_reconstructive_export", "first_person_camera_retained", "setting_and_activity_broadly_retained", "primary_public_category_objects_retained", "speech_and_referent_timing_within_0_75_seconds", "intended_hand_action_beat_retained_when_present", "no_cuts_or_severe_object_identity_drift", "no_caption_logo_watermark_physics_or_anatomy_defect", "adapter_accepts_synthetic_audio_same_abstention_rules"],
+    "claim_limits": ["exploratory_only", "no_omnibus_score", "no_equivalence", "no_noninferiority", "no_directionally_competitive_claim", "no_synthetic_data_quality_validation", "no_one_hour_corpus_authorization", "no_learner_training"]
+  },
   "active_exploratory_amendment": "configs/synthetic_video_real_only_proof.json schema 38 preserves every prior result and seals the complete valid public-only development scientific no-go ad4d829c...ede23 after a 7-of-7 metric-withheld engineering-health pass 716772df...d3d84; only 2 of 5 critical axes and 3 of 7 total axes passed, so holdout and all governed or downstream work remain unopened",
   "public_only_calibration_readiness_amendment": {
     "status": "TOPOLOGY_AND_PUBLIC_FIXTURES_FROZEN_BEFORE_MODEL_OUTCOMES",
