@@ -1,6 +1,6 @@
 # Embodied artifact recovery status
 
-Status date: 2026-08-08 (America/Phoenix).
+Status date: 2026-08-09 (America/Phoenix).
 
 ## Incident boundary
 
@@ -73,6 +73,41 @@ This remote path contains the July 31 Phase 3 egocentric appearance corpus. It
 does not contain the later Unity visual-audition, native, anatomical, bimanual,
 procedural, or August 5 reference-hand runs.
 
+## Exact complementary visual recovery completed
+
+The two complementary Unity visual experiments that led into the August 5
+reference-hand reset have been reconstructed under ignored
+`runs/embodied_simulation/recovery/complementary_visuals/`. The render staging
+was recovered from the original August 2-3 Codex session records and rerun with
+Unity `6000.0.80f1` arm64/Metal. These are byte-identical recoveries, not merely
+visually similar rerenders:
+
+| Artifact | SHA-256 | Validation |
+| --- | --- | --- |
+| Unity visual-audition movie | `5039aeaf0abe2f261ce09feef37e960c4d4c71abd1ab4c3d1b2da0095d8fb76c` | frozen hash match; 960x540, 210 frames, 7.0 s; full decode |
+| Unity visual-audition diagnostics | `48851e6bc7a670979448b88322e44051d59e1c1264164058a6a42377dc077cd0` | frozen hash match |
+| Unity visual-audition dense timeline | `077ae6e31ec8b0a02829d7975fcd0376eed516ebc71c4768cd6b200b1d742926` | frozen hash match |
+| Bimanual Stage-D head view | `c133699038a10c12e0ca1ed07b4ef41e1765f8cf731302fdb320370226a21ae6` | frozen hash match; 960x540, 1,681 frames, 56.033333 s; full decode |
+| Bimanual Stage-D external view | `8bf8fb480e6d7a2044717cc7d3c26e95360a212e5172e39dd4d8e6d1eea23859` | frozen hash match; 960x540, 1,681 frames, 56.033333 s; full decode |
+| Bimanual Stage-D dense timeline | `c584e009b29262ed6648004f115835d7cc45379776ca210476b56047a9a781a2` | frozen hash match |
+| Bimanual event-audio mux | `7e3932fa6e0d280ff09b40b5075fc7697ea57febdaaf20812e818c622c20d0fe` | frozen hash match; H.264/AAC; full decode |
+
+The bimanual rerender used the surviving exact authority trace
+(`7fe3777fe03806984378e9695371e885db31672d88d3df01e6fe4f99b0bc30e7`)
+and contact record
+(`5820f755ce45e25a4e191e46729495ee563a5d44363ee8de1a9983de09e4986d`).
+For the visual audition, `frame_0120.png` is also byte-identical to the
+historical session-cached frame. Although the regenerated FBX container has a
+different nondeterministic container hash, the recovered flat OBJ/material
+staging reproduces the imported scene, diagnostics, representative frame,
+timeline, and encoded movie exactly.
+
+The ignored machine-readable provenance and verification record is
+`runs/embodied_simulation/recovery/complementary_visuals/recovery_receipt.json`.
+The only missing part of the visual-audition comparison bundle is the Phase 6
+MIMo source clip and the two derivatives made from it (`mimo_reference_6_13.mp4`
+and `side_by_side.mp4`). Their source did not survive locally or on Juno.
+
 ## Derivative evidence recovered
 
 Codex session records retained 137 viewed-image records representing 126 unique
@@ -106,13 +141,14 @@ weakened.
 - Original ignored Phase 1-2 and Phase 4-6 run trees and their complete
   intermediate media; the exact Phase 3 appearance subset on Juno is restored
   as described above;
-- original Unity visual-audition, integrated, native, anatomical, bimanual,
-  and procedural-gate run trees, except for session-cached visual derivatives;
-- the 56.033-second bimanual Stage-D clean external video
-  `baseline_external.mp4` (historical SHA-256
-  `8bf8fb480e6d7a2044717cc7d3c26e95360a212e5172e39dd4d8e6d1eea23859`)
-  and Stage-F audio mux (historical SHA-256
-  `7e3932fa6e0d280ff09b40b5075fc7697ea57febdaaf20812e818c622c20d0fe`);
+- the Phase 6 accepted episode
+  `runs/embodied_simulation/phase_6/final/accepted_episode.mp4` (historical
+  SHA-256
+  `93885e1f6cdf9eaed34ab32d8795f489e67ee6541cc7795765a0330aa0f378c3`),
+  needed to recreate the Unity-versus-MIMo side-by-side comparison;
+- complete original Unity integrated, native, anatomical, and procedural-gate
+  run trees, plus noncanonical intermediates from the visual-audition and
+  bimanual runs; their session-cached visual derivatives remain available;
 - the historical MPFB `.blend` and `child.fbx` containers with their frozen
   hashes;
 - superseded development attempts, caches, environments, and duplicated

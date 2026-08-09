@@ -24,8 +24,9 @@ outputs/
 rendered/
 tmp/
 
-# Run records and curated recovery media may be versioned. Keep only bulky,
-# reproducible Unity caches and frame sequences out of Git.
+# Embodied experiment and recovery runs are disposable/generated. Existing
+# historical files already tracked under this root remain versioned by Git.
+runs/embodied_simulation/
 runs/**/Library/
 runs/**/Logs/
 runs/**/UserSettings/
