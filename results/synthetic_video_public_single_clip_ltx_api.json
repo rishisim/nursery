@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "status": "EXPLORATORY_LTX_CLIP_COMPLETE",
+  "public_only": true,
+  "question": "can the exact frozen public single-clip episode prompt produce one valid 10-second LTX-2.3 comparison clip",
+  "provider": "fal.ai",
+  "generator_model": "fal-ai/ltx-2.3/text-to-video",
+  "prompt_commitment_sha256": "63e20f20c29cf6d88116172ec245a10b788753581fc4643e773104f7eb6a71cb",
+  "manual_prompt_edit": false,
+  "submission_count": 1,
+  "accepted_synthetic_clip_count": 1,
+  "request_cost_usd": 0.8,
+  "media": {
+    "duration_seconds": 10.0,
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "video_codec": "h264",
+    "audio_codec": "aac",
+    "native_generated_audio": false,
+    "digital_silence_expected_and_observed": true
+  },
+  "technical_checks": {
+    "valid_10_second_decode": true,
+    "1920x1080_video": true,
+    "synchronized_audio_track": true,
+    "exact_frozen_prompt_commitment": true,
+    "one_submission_only": true
+  },
+  "one_time_qualitative_check": {
+    "method": "ten one-second sampled frames reviewed after technical acceptance",
+    "first_person_camera_retained": true,
+    "setting_broadly_retained": true,
+    "garment_care_activity_broadly_retained": true,
+    "primary_public_category_garment_retained": true,
+    "two_hand_contact_and_manipulation_retained": true,
+    "single_shot_continuity_retained": true,
+    "no_obvious_caption_logo_watermark_impossible_physics_floating_object_or_severe_anatomy_defect_in_sampled_frames": true,
+    "speech_or_referent_timing": "NOT_APPLICABLE_SOURCE_SPEECH_UNSUPPORTED"
+  },
+  "omnibus_score": null,
+  "artifact_policy": "media prompt job response and per-frame artifacts remain in the ignored output root",
+  "claim_limits": [
+    "one_public_clip_only",
+    "exploratory_generator_comparison",
+    "sampled_frame_qualitative_check_only",
+    "no_equivalence",
+    "no_noninferiority",
+    "no_synthetic_data_quality_validation",
+    "no_scale_up_authorization",
+    "no_learner_training"
+  ]
+}

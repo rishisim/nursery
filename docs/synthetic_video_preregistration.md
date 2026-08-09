@@ -40,6 +40,17 @@ track, the exact prompt commitment, and a single submission. This is a
 one-clip exploratory generator comparison, not equivalence, validation of
 synthetic-data quality, learner evidence, or authorization to scale.
 
+The single request completed and was accepted without retry. The locally
+remuxed result is exactly 10.000 seconds, 1920x1080 at 24 fps, with H.264 video
+and the expected AAC digital-silence track. All five frozen technical checks
+passed. A one-time review of ten one-second sampled frames found the
+first-person view, domestic garment-care setting, white garment, two-hand
+contact/manipulation, and continuous activity broadly retained. No obvious
+caption, logo, watermark, impossible physics, floating object, or severe
+anatomy defect appeared in those sampled frames. Speech timing was not
+applicable because source speech was unsupported. This direct feature report
+is not an omnibus score or a scientific comparison result.
+
 ### Paired grounded lexical follow-up
 
 One bounded follow-up compares that public source/synthetic pair at the same
