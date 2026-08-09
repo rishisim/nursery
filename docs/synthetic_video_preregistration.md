@@ -51,6 +51,24 @@ anatomy defect appeared in those sampled frames. Speech timing was not
 applicable because source speech was unsupported. This direct feature report
 is not an omnibus score or a scientific comparison result.
 
+### Public prototype cost projection (prospective)
+
+The cost view uses observed accepted-request charges only: USD 1.287 for the
+10-second 2K Hailuo job and USD 0.80 for the 10-second 1080p LTX job. It
+projects 360 accepted ten-second clips to one generated hour and shows 100%,
+80%, and 50% accepted-output yield scenarios. A real-data cost sensitivity from
+USD 0 to USD 1,000 per usable hour reveals the generation-only break-even
+threshold rather than assigning an unsupported cost to real collection.
+
+The projection excludes uninstrumented descriptor usage, local compute,
+storage, ASR/translation when applicable, QA and human review, development
+labor, and paid failed/rejected attempts. The prospective real comparator is
+also missing its recruitment, consent, participant/staff, equipment,
+collection-failure, secure-storage, processing, QA, and yield ledger. Therefore
+the graph cannot establish lower fully loaded cost. It is a planning view for
+the three-step description → generation → modular-audio/QA pathway and leaves
+the repository's stricter cost gate unchanged.
+
 ### Paired grounded lexical follow-up
 
 One bounded follow-up compares that public source/synthetic pair at the same

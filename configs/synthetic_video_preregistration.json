@@ -1,5 +1,5 @@
 {
-  "schema_version": 32,
+  "schema_version": 33,
   "phase": 4,
   "status": "PHASE4_CORRECTED_COMMON_ASSETS_PASS_PRIOR_RESULTS_PRESERVED_PUBLIC_ONLY_CALIBRATION_READINESS_DEVELOPMENT_SCIENTIFIC_NO_GO",
   "evidence_cutoff": "2026-08-08",
@@ -66,6 +66,21 @@
     "resource_ceiling": {"wall_minutes_max": 10, "GPU_required": false, "vast_GPU_rental": false},
     "outputs": "ignored output root plus one compact aggregate result; no media frames model cache row-level scores or prompts in Git",
     "claim_limits": ["one_public_source_only", "exploratory", "grounded_lexical_preservation_not_acquisition", "no_human_likeness_claim", "no_dataset_scale_claim", "no_equivalence", "no_noninferiority", "no_generator_ranking_claim", "no_scale_up_authorization"]
+  },
+  "public_single_clip_cost_projection": {
+    "status": "FROZEN_BEFORE_COST_PROJECTION_RENDER",
+    "question": "what do the observed public prototype generator charges imply for direct API cost per generated hour, and at what prospective real-data cost would each synthetic route break even",
+    "pathway": ["structured_scene_description", "video_generation", "modular_audio_and_QA"],
+    "performance_source": "results/synthetic_video_public_three_arm_grounding.json",
+    "observed_accepted_request_costs_USD": {"hailuo_10_seconds_2K": 1.287, "ltx_2_3_10_seconds_1080p": 0.8},
+    "cost_sources": {"hailuo": "accepted OpenRouter job usage.cost read 2026-08-09", "ltx": "frozen accepted fal.ai request cost in results/synthetic_video_public_single_clip_ltx_api.json"},
+    "projection": {"accepted_clip_seconds": 10, "clips_per_generated_hour": 360, "first_pass_yield": 1.0, "yield_scenarios": [1.0, 0.8, 0.5], "real_fully_loaded_cost_sensitivity_USD_per_usable_hour": [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]},
+    "known_direct_costs": {"video_generation_API": true, "modular_audio_API_for_this_speech_unsupported_clip": 0},
+    "unpriced_synthetic_categories": ["descriptor_API_usage", "local_audio_compute", "ASR_translation_when_applicable", "storage", "QA_and_human_review", "development_labor", "failed_or_rejected_paid_attempts"],
+    "unpriced_real_categories": ["recruitment_and_consent", "participant_and_staff_time", "equipment", "collection_failures", "secure_transfer_and_storage", "ASR_translation", "QA_and_human_review", "usable_hour_yield"],
+    "interpretation_rule": "generation-only break-even is descriptive; no lower-cost conclusion until complete prospective real and synthetic marginal and fully loaded ledgers plus performance criteria are available",
+    "visuals": ["grouped_top1_accuracy", "grouped_target_margin", "generation_cost_by_acceptance_yield", "real_cost_break_even_sensitivity"],
+    "claim_limits": ["one_public_clip_only", "linear_generation_projection", "direct_generation_API_cost_only", "no_fully_loaded_cost_claim", "no_equivalence", "no_generator_ranking", "no_scale_up_authorization"]
   },
   "active_exploratory_amendment": "configs/synthetic_video_real_only_proof.json schema 38 preserves every prior result and seals the complete valid public-only development scientific no-go ad4d829c...ede23 after a 7-of-7 metric-withheld engineering-health pass 716772df...d3d84; only 2 of 5 critical axes and 3 of 7 total axes passed, so holdout and all governed or downstream work remain unopened",
   "public_only_calibration_readiness_amendment": {
