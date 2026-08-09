@@ -16,9 +16,9 @@ RUN_ROOT = ROOT / "runs/embodied_simulation/reference_hand_microcell"
 PROJECT_ROOT = RUN_ROOT / "project"
 OUTPUT_ROOT = RUN_ROOT / "qualification"
 PACKAGE_ROOT = ROOT / ".external/ultraleap-unityplugin-7.3.0-artifact/Packages/Tracking"
-EDITOR_DEFAULT = Path(
-    "/Users/rishisim/.codex/worktrees/9122/nursery/.external/unity-editors/"
-    "6000.0.80f1/Unity.app/Contents/MacOS/Unity"
+EDITOR_DEFAULT = (
+    ROOT
+    / ".external/unity-editors/6000.0.80f1/Unity.app/Contents/MacOS/Unity"
 )
 
 

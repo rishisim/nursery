@@ -13,6 +13,10 @@ SOURCE = (
 RUNNER = (
     ROOT / "babyworld_lite/childlens_engine_bakeoff/reference_hand_microcell/runner.py"
 ).read_text()
+BUILDER = (
+    ROOT
+    / "babyworld_lite/childlens_engine_bakeoff/reference_hand_microcell/ReferenceHandMicrocellBuilder.cs"
+).read_text()
 
 
 def test_reference_hand_config_is_pinned_and_bounded():
@@ -88,3 +92,5 @@ def test_fresh_checkout_runner_stages_tracked_sources_into_ignored_project():
     assert "ReferenceHandMicrocellBuilder.cs" in RUNNER
     assert "shutil.rmtree(OUTPUT_ROOT)" in RUNNER
     assert "runs/embodied_simulation/reference_hand_microcell/project" not in SOURCE
+    assert 'PlayerSettings.productName = "Reference Hand Microcell";' in BUILDER
+    assert 'ROOT\n    / ".external/unity-editors/6000.0.80f1' in RUNNER

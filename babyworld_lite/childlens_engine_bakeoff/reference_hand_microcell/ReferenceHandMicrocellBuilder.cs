@@ -23,6 +23,7 @@ namespace EmbodiedReferenceHand
             SceneManager.MoveGameObjectToScene(visible, bootstrap.scene);
             EditorSceneManager.SetActiveScene(bootstrap.scene);
             EditorSceneManager.SaveScene(bootstrap.scene, scenePath);
+            PlayerSettings.productName = "Reference Hand Microcell";
             BuildReport report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
             {
                 scenes = new[] { scenePath },
