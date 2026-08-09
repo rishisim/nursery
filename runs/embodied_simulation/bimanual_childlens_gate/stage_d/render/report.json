@@ -1,0 +1,22 @@
+{
+    "schema": "embodied.weighted_bimanual_baseline.v1",
+    "unity_version": "6000.0.80f1",
+    "source_fbx_sha256": "90206af9a95d25f151c00deb321aadaff7be2af32ae92eaf9fce129ae9e2a16b",
+    "source_license": "CC0",
+    "camera_parent_bone": "head",
+    "authoritative_physics_trace": "/Users/rishisim/Documents/research/nursery/runs/embodied_simulation/bimanual_childlens_gate/stage_d/authority/trace.json",
+    "duration_s": 56.0,
+    "fov_deg": 68.0,
+    "near_clip_m": 0.029999999329447748,
+    "frames": 1681,
+    "proxy_renderers_visible": 0,
+    "rendering_only_object_pose_assignments": 3362,
+    "contact_projection_rows": 592,
+    "contact_event_frames_visible": 592,
+    "hero_nonbackground_pixels_max": 492836,
+    "contextual_object_count": 11,
+    "one_weighted_visible_child": true,
+    "both_arms_registered": true,
+    "camera_body_derived": true,
+    "passed": true
+}

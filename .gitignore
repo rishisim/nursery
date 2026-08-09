@@ -22,8 +22,20 @@ models/
 output/
 outputs/
 rendered/
-runs/
 tmp/
+
+# Run records and curated recovery media may be versioned. Keep only bulky,
+# reproducible Unity caches and frame sequences out of Git.
+runs/**/Library/
+runs/**/Logs/
+runs/**/UserSettings/
+runs/**/Temp/
+runs/**/obj/
+runs/**/*.log
+runs/**/speech_segments/
+runs/**/stage_d/render/head_frames/
+runs/**/stage_d/render/external_frames/
+runs/**/qualification/frames/
 
 # Local environment and editor state.
 .env

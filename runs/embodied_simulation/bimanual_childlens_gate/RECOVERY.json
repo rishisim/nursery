@@ -1,0 +1,45 @@
+{
+  "schema": "embodied.unity_recovery.v1",
+  "recovered_on": "2026-08-09",
+  "source_git_commit": "3de548ae4d0b546490f8d9ef360babc8f9219873",
+  "unity_version": "6000.0.80f1",
+  "status": "faithful_regeneration",
+  "exactly_recovered": {
+    "stage_d/authority/trace.json": "7fe3777fe03806984378e9695371e885db31672d88d3df01e6fe4f99b0bc30e7",
+    "stage_d/authority/contacts.json": "5820f755ce45e25a4e191e46729495ee563a5d44363ee8de1a9983de09e4986d"
+  },
+  "regenerated": {
+    "stage_d/baseline_external.mp4": {
+      "sha256": "97012af595136f18526e6f9687a3a5f750d921db730c194d8b93280124d0d614",
+      "historical_sha256": "8bf8fb480e6d7a2044717cc7d3c26e95360a212e5172e39dd4d8e6d1eea23859",
+      "duration_s": 56.033333,
+      "dimensions": "960x540",
+      "fps": 30,
+      "frames": 1681
+    },
+    "stage_d/baseline_head_view.mp4": {
+      "sha256": "7498ac69b6378d4cec31496f2928b145458b400b53c67a33285bf2da039edc21",
+      "historical_sha256": "c133699038a10c12e0ca1ed07b4ef41e1765f8cf731302fdb320370226a21ae6"
+    },
+    "stage_d/full_dense_timeline.png": {
+      "sha256": "3bb49f77d89c013bc7b6f10c85a7fb59a44d5edae930e89624556f2e2656fe65",
+      "historical_sha256": "c584e009b29262ed6648004f115835d7cc45379776ca210476b56047a9a781a2"
+    },
+    "stage_f/baseline_with_event_audio.mp4": {
+      "sha256": "3d05c16d451157ff4236aff5ad21ccde16c13f203aef03242dffe192894e4138",
+      "historical_sha256": "7e3932fa6e0d280ff09b40b5075fc7697ea57febdaaf20812e818c622c20d0fe"
+    }
+  },
+  "avatar": {
+    "reconstructed_sha256": "90206af9a95d25f151c00deb321aadaff7be2af32ae92eaf9fce129ae9e2a16b",
+    "historical_sha256": "b766981d9d3504cea220c0d72ad8aa56cbd80453e910fc76dc8c8814fbd980de",
+    "note": "The original FBX byte stream was unavailable; a compatible regenerated FBX was used."
+  },
+  "validation": {
+    "authority_passed": true,
+    "render_passed": true,
+    "external_video_full_decode_passed": true,
+    "audio_video_full_decode_passed": true
+  },
+  "note": "The deterministic simulation state is exact. Rendered media is a verified faithful regeneration and is not byte-identical to the deleted historical media."
+}

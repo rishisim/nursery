@@ -1,0 +1,17 @@
+{
+  "alignment_sha256": "f2a20cb0fdfe8bd9d21c918fc51b0a061d3803309135f13e66769eb7f8092a47",
+  "channels": 1,
+  "clipped_samples": 0,
+  "duration_s": 56.0,
+  "engine": "macOS say",
+  "locale": "en_US",
+  "neural_render_audio_used": false,
+  "sample_count": 2688000,
+  "sample_format": "pcm_s16le",
+  "sample_rate_hz": 48000,
+  "schema": "AuthoritativeSpeechQA.v1",
+  "transcript_sha256": "873684d3f2427f02d53cd9ae650183dc58e35747001790f3171061aa8e508ff1",
+  "utterance_count": 6,
+  "voice": "Samantha",
+  "waveform_sha256": "6471b8b4c163f905e98135e730df5cf541b71e7b6e8860e21036ebfb48898346"
+}
