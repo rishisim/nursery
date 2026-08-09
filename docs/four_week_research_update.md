@@ -19,7 +19,7 @@ header-includes:
 
 I wanted to send you a consolidated update on what I have done over the past four weeks and ask for your advice about the next phase. Below are the referenced figures, followed by a detailed explanation of what I did.
 
-\clearpage
+## FIGURES
 
 ```{=latex}
 \begingroup
