@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "status": "EXPLORATORY_COMPLETE",
+  "scope": "one_public_real_synthetic_pair",
+  "provenance": {
+    "source_prototype_commit": "37c94facc4a17468aafa5ac0f3a75ffd8f4eaf31",
+    "evaluator": "OpenAI_CLIP_ViT_B_32",
+    "repository": "Xenova/clip-vit-base-patch32",
+    "revision": "d15189d7028b43f1d3e65039190477f6af591c2a",
+    "upstream_license": "MIT",
+    "runtime": "@huggingface/transformers@3.8.1",
+    "dtype": "q8",
+    "execution": "local_CPU_ONNX",
+    "frame_count_per_arm": 10,
+    "wall_seconds": 4.816,
+    "vast_GPU_rented": false
+  },
+  "qualitative": {
+    "setting_retained": false,
+    "activity_retained": true,
+    "primary_objects_retained": true,
+    "hand_action_retained": true,
+    "first_person_view_retained": true,
+    "continuity_retained": true,
+    "severe_artifacts_absent": true,
+    "speech_and_referent_timing": "NOT_APPLICABLE_SOURCE_SPEECH_UNSUPPORTED"
+  },
+  "grounded_lexical_metrics": {
+    "noun": {
+      "real": {"top1_accuracy": 0.9, "mean_target_probability": 0.487791, "mean_target_minus_best_distractor_margin": 0.265515},
+      "synthetic": {"top1_accuracy": 0.8, "mean_target_probability": 0.519231, "mean_target_minus_best_distractor_margin": 0.282218},
+      "synthetic_minus_real": {"top1_accuracy": -0.1, "mean_target_probability": 0.03144, "mean_target_minus_best_distractor_margin": 0.016703}
+    },
+    "adjective": {
+      "real": {"top1_accuracy": 0.9, "mean_target_probability": 0.467488, "mean_target_minus_best_distractor_margin": 0.220467},
+      "synthetic": {"top1_accuracy": 0.8, "mean_target_probability": 0.427173, "mean_target_minus_best_distractor_margin": 0.128969},
+      "synthetic_minus_real": {"top1_accuracy": -0.1, "mean_target_probability": -0.040315, "mean_target_minus_best_distractor_margin": -0.091498}
+    },
+    "action_guardrail": {
+      "real": {"top1_accuracy": 0.5, "mean_target_probability": 0.458998, "mean_target_minus_best_distractor_margin": 0.03683},
+      "synthetic": {"top1_accuracy": 1.0, "mean_target_probability": 0.630135, "mean_target_minus_best_distractor_margin": 0.352932},
+      "synthetic_minus_real": {"top1_accuracy": 0.5, "mean_target_probability": 0.171137, "mean_target_minus_best_distractor_margin": 0.316102}
+    },
+    "viewpoint_guardrail": {
+      "real": {"top1_accuracy": 0.1, "mean_target_probability": 0.171038, "mean_target_minus_best_distractor_margin": -0.426165},
+      "synthetic": {"top1_accuracy": 0.2, "mean_target_probability": 0.228936, "mean_target_minus_best_distractor_margin": -0.301403},
+      "synthetic_minus_real": {"top1_accuracy": 0.1, "mean_target_probability": 0.057898, "mean_target_minus_best_distractor_margin": 0.124761}
+    }
+  },
+  "interpretation": {
+    "noun": "synthetic was one frame lower in top-1 accuracy while mean target probability and margin were slightly higher",
+    "adjective": "synthetic was one frame lower and had lower target probability and margin",
+    "action": "synthetic scored higher on this guardrail but one pair cannot establish superiority",
+    "viewpoint": "the frozen CLIP evaluator failed this guardrail on both arms so the small delta is not evidence of improved viewpoint preservation"
+  },
+  "devbench_alignment": "image_text_forced_choice_and_accuracy_only",
+  "human_response_KL_created": false,
+  "human_response_KL_reason": "no participant response distribution for this custom pair",
+  "lexical_acquisition_measured": false,
+  "lexical_acquisition_reason": "requires identically initialized trained real and synthetic checkpoints plus a common held-out lexical asset",
+  "omnibus_score_created": false,
+  "comparison_commitment_sha256": "b874c94b4919a6d03e64fe6b78a60e38c1dc20995d301da3e55e9a18a817ab74",
+  "claim_limits": ["one_pair_only", "exploratory", "grounded_lexical_preservation_not_acquisition", "no_human_likeness_claim", "no_dataset_scale_claim", "no_equivalence", "no_scale_up_authorization"],
+  "artifact_policy": "frames model cache manifests and row-level scores remain only in the ignored output root"
+}

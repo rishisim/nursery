@@ -22,6 +22,36 @@ noninferiority, directionally competitive quality, synthetic-data validity, or
 authorization for a corpus or learner run. Every earlier calibration no-go,
 Phase 4 seal, Real-1h result, and provenance record remains unchanged.
 
+### Paired grounded lexical follow-up
+
+One bounded follow-up compares that public source/synthetic pair at the same
+ten half-second-centered timestamps. A frozen local OpenAI CLIP ViT-B/32 ONNX
+evaluator runs identical four-way probes for the observed noun (`garment`),
+attribute (`white`), action, and first-person viewpoint. Each probe reports
+top-1 accuracy, target probability, and target-minus-best-distractor margin for
+real and synthetic separately plus the paired delta. Probe families are never
+averaged into an omnibus score.
+
+This resembles DevBench's image-text forced-choice scoring interface and its
+reference accuracy reporting, but it is not a DevBench leaderboard result:
+the custom pair has no child/adult response distribution, so no human-response
+KL divergence is computed. It is also grounded lexical preservation, not
+lexical acquisition. Acquisition would require identically initialized models
+trained separately on real and synthetic tuples and evaluated on one common
+held-out lexical asset. The CPU/ONNX test has a ten-minute wall ceiling; a Vast
+GPU is unnecessary unless a later fully pre-staged trained-checkpoint test can
+also finish inside that ceiling.
+
+The test completed locally on CPU in 4.816 seconds after model caching. Noun
+top-1 accuracy was 0.90 real and 0.80 synthetic; white-attribute accuracy was
+0.90 and 0.80. The action guardrail was 0.50 and 1.00. The viewpoint guardrail
+was only 0.10 and 0.20, with negative mean margins for both arms, so the small
+synthetic increase is treated as evaluator failure rather than improved
+first-person preservation. Qualitatively, setting was the only direct
+mismatch; activity, primary objects, hand action, viewpoint, continuity, and
+severe-artifact checks passed. These are one-pair preservation measurements,
+not acquisition, human-likeness, equivalence, or dataset-scale evidence.
+
 **Phase 4 status:** **CORRECTED COMMON ASSETS PASS — ATTEMPT-8 CONTAINER-GIT ENGINEERING BLOCKER PRESERVED; CLEAN-TREE-ATTESTED ATTEMPT 9 FROZEN BEFORE NEW OUTCOME; ALL PRIOR NO-GOS PRESERVED**
 
 **Evidence cut-off:** 2026-08-04

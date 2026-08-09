@@ -16,6 +16,29 @@
     "checks": ["valid_10_second_decode_and_synchronized_audio", "schema_completeness_and_explicit_uncertainty", "no_identifying_or_reconstructive_export", "first_person_camera_retained", "setting_and_activity_broadly_retained", "primary_public_category_objects_retained", "speech_and_referent_timing_within_0_75_seconds", "intended_hand_action_beat_retained_when_present", "no_cuts_or_severe_object_identity_drift", "no_caption_logo_watermark_physics_or_anatomy_defect", "adapter_accepts_synthetic_audio_same_abstention_rules"],
     "claim_limits": ["exploratory_only", "no_omnibus_score", "no_equivalence", "no_noninferiority", "no_directionally_competitive_claim", "no_synthetic_data_quality_validation", "no_one_hour_corpus_authorization", "no_learner_training"]
   },
+  "public_single_pair_grounded_lexical_test": {
+    "status": "FROZEN_BEFORE_CLIP_EVALUATOR_DOWNLOAD_OR_SCORE",
+    "question": "does the accepted synthetic clip preserve the source clip's observable lexical grounding opportunity on one public paired example",
+    "scope": "one public real-synthetic pair; qualitative comparison plus zero-shot grounded lexical preservation; no model training",
+    "relationship_to_prior_results": "new exploratory engineering measurement; no reopening reinterpretation or repair of calibration Phase 4 Real-1h or public prototype results",
+    "arms": ["public_real_source", "public_synthetic_derived"],
+    "frames": {"timestamps_seconds": [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5], "same_timestamps_and_preprocessing": true},
+    "evaluator": {"family": "OpenAI_CLIP_ViT_B_32", "repository": "Xenova/clip-vit-base-patch32", "revision": "d15189d7028b43f1d3e65039190477f6af591c2a", "upstream_license": "MIT", "runtime": "@huggingface/transformers@3.8.1", "dtype": "q8", "execution": "local_CPU_ONNX", "independent_of_descriptor_and_generator": true},
+    "probes": {
+      "noun": {"target": "a garment", "distractors": ["a cup", "a book", "a ball"]},
+      "adjective": {"target": "a white garment", "distractors": ["a black garment", "a red garment", "a blue garment"]},
+      "action_guardrail": {"target": "folding or arranging clothing", "distractors": ["washing dishes", "reading a book", "stacking blocks"]},
+      "viewpoint_guardrail": {"target": "first-person view", "distractors": ["third-person view", "a landscape without people", "a close-up product photograph"]}
+    },
+    "per_probe_metrics": ["top1_accuracy_over_10_frames", "mean_target_probability", "mean_target_minus_best_distractor_margin"],
+    "paired_reporting": "real value synthetic value and synthetic-minus-real delta for every metric; noun adjective action and viewpoint never averaged into an omnibus score",
+    "qualitative_domains": ["setting", "activity", "primary_objects", "attribute", "hand_action", "viewpoint", "continuity", "artifacts"],
+    "devbench_alignment": "same image-text forced-choice scoring shape and accuracy reporting; no softmax-optimized human-response KL because this custom pair has no participant response distribution",
+    "acquisition_status": "NOT_MEASURED_REQUIRES_IDENTICALLY_INITIALIZED_TRAINED_REAL_AND_SYNTHETIC_CHECKPOINTS_PLUS_COMMON_HELD_OUT_LEXICAL_ASSET",
+    "resource_ceiling": {"wall_minutes_max": 10, "GPU_required": false, "vast_rental_authorized_only_if_needed_and_complete_output_within_10_minutes": true},
+    "outputs": "ignored output root plus one compact aggregate result; no media frames model weights caches row-level scores or prompts in Git",
+    "claim_limits": ["one_pair_only", "exploratory", "grounded_lexical_preservation_not_acquisition", "no_human_likeness_claim", "no_dataset_scale_claim", "no_equivalence", "no_scale_up_authorization"]
+  },
   "active_exploratory_amendment": "configs/synthetic_video_real_only_proof.json schema 38 preserves every prior result and seals the complete valid public-only development scientific no-go ad4d829c...ede23 after a 7-of-7 metric-withheld engineering-health pass 716772df...d3d84; only 2 of 5 critical axes and 3 of 7 total axes passed, so holdout and all governed or downstream work remain unopened",
   "public_only_calibration_readiness_amendment": {
     "status": "TOPOLOGY_AND_PUBLIC_FIXTURES_FROZEN_BEFORE_MODEL_OUTCOMES",
