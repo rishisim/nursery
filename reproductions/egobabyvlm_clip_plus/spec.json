@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "phase": {
+    "number": 0,
+    "name": "frozen_specification",
+    "status": "complete",
+    "completion_gate": "python3 verify_phase0.py"
+  },
+  "scope": {
+    "model_row": "BabyView CLIP+",
+    "evaluation_family": "cross-modal grounding",
+    "benchmark": "Machine-DevBench",
+    "tasks": ["lexical", "grammatical"],
+    "included": "Only the published BabyView CLIP+ Machine-DevBench row",
+    "excluded": [
+      "vision evaluation family",
+      "language evaluation family",
+      "other models",
+      "other training corpora",
+      "training or data processing during Phase 0"
+    ],
+    "reproduction_mode": "faithful_independent_reproduction",
+    "exact_replay_status": "not_claimed"
+  },
+  "paper": {
+    "title": "EgoBabyVLM: Benchmarking Cross-Modal Learning from Naturalistic Egocentric Video Data",
+    "arxiv_id": "2605.19130",
+    "version": "v1",
+    "submitted_date": "2026-05-18",
+    "url": "https://arxiv.org/abs/2605.19130v1"
+  },
+  "official_code": {
+    "repository_url": "https://github.com/facebookresearch/egobabyvlm",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "environment_manifest": "pixi.toml",
+    "lockfile": "pixi.lock",
+    "lockfile_sha256": "360c372997ea7f9ba89abcf87796e57ebcd2fdbc9734489666120073752e7244",
+    "environment_pins": {
+      "platform": "linux-64",
+      "python": "3.12.*",
+      "cuda": "12.6",
+      "torch": "2.8.0",
+      "torchvision": "0.23.0",
+      "transformers": "4.57.6"
+    }
+  },
+  "training_data": {
+    "dataset": "BabyView",
+    "release": "2025.1",
+    "official_page": "https://databrary.org/volume/1882",
+    "access": "controlled Databrary access; authorization and participant privacy terms required",
+    "redistribution": "forbidden for raw and derived sensitive content"
+  },
+  "evaluation_data": {
+    "release_name": "Evaluation Datasets",
+    "tag": "Eval-Data",
+    "tag_commit": "33ce498242ed61890671ee5ea4c7ea73a3b228a9",
+    "release_url": "https://github.com/facebookresearch/egobabyvlm/releases/tag/Eval-Data",
+    "release_id": 330254039,
+    "published_at": "2026-05-27T14:12:45Z",
+    "asset": {
+      "name": "MachineDevBench.tar",
+      "asset_id": 431146658,
+      "content_type": "application/x-tar",
+      "size_bytes": 1635409920,
+      "sha256": "5f4c662919e3b0abdb85f5d6520350f10c374f087886f4257bbe1bd336f3b13c",
+      "url": "https://github.com/facebookresearch/egobabyvlm/releases/download/Eval-Data/MachineDevBench.tar",
+      "created_at": "2026-05-27T14:07:19Z",
+      "updated_at": "2026-05-27T14:08:55Z"
+    }
+  },
+  "targets_percent": {
+    "chance": 50.0,
+    "runs": 3,
+    "lexical": {"mean": 53.4, "stddev": 0.7},
+    "grammatical": {"mean": 53.8, "stddev": 2.4},
+    "overall": {"mean": 53.6, "stddev": 1.5},
+    "aggregation": "For each run, overall is the unweighted arithmetic mean of lexical and grammatical; report mean and sample standard deviation across the same three seeds."
+  },
+  "data_and_initialization_policy": {
+    "allowed_training_data": [
+      "authorized BabyView release 2025.1 inputs and protocol-permitted derivatives only"
+    ],
+    "allowed_evaluation_data": [
+      "the checksum-verified official Eval-Data MachineDevBench.tar asset only"
+    ],
+    "forbidden": [
+      "public or web data as scientific-run training data",
+      "other training corpora",
+      "BabyView evaluation examples",
+      "redistribution of BabyView raw or derived sensitive data",
+      "public or web pretrained weights as initialization for any scientific-run learned component"
+    ],
+    "scientific_run_initialization": "from_scratch_only",
+    "external_pretrained_initialization_allowed": false,
+    "preprocessing_models": "Only paper-permitted preprocessing use may be considered; it must be pinned and must not initialize the scientific model."
+  },
+  "assumptions_and_deviations": {
+    "source_of_truth": "this object",
+    "entries": [
+      {
+        "id": "A001",
+        "kind": "assumption",
+        "status": "accepted_phase0",
+        "statement": "The published overall mean is the equal-weight mean of lexical and grammatical subgroup means.",
+        "basis": "53.6 = (53.4 + 53.8) / 2; this must be confirmed against released evaluation aggregation before Phase 4."
+      },
+      {
+        "id": "D001",
+        "kind": "deviation",
+        "status": "none",
+        "statement": "No deviation from the frozen target protocol is authorized in Phase 0."
+      }
+    ]
+  },
+  "unresolved_reproduction_variables": [
+    {"id": "U001", "variable": "exact train/validation/test manifests and manifest hashes", "status": "unresolved", "blocking_phase": 2},
+    {"id": "U002", "variable": "exact BabyView participant/session subset used for the row", "status": "unresolved", "blocking_phase": 2},
+    {"id": "U003", "variable": "split unit and leakage-prevention grouping (participant, session, recording, or other)", "status": "unresolved", "blocking_phase": 2},
+    {"id": "U004", "variable": "ordered list of the three training seeds", "status": "unresolved", "blocking_phase": 3},
+    {"id": "U005", "variable": "WhisperX package/model/repository revision, model weights, decoding parameters, diarization behavior, and transcript postprocessing", "status": "unresolved", "blocking_phase": 2},
+    {"id": "U006", "variable": "VTC filter code/model revision, weights, thresholds, and execution parameters", "status": "unresolved", "blocking_phase": 2},
+    {"id": "U007", "variable": "frame extraction rate, timestamp alignment, sampling, and missing/corrupt media handling", "status": "unresolved", "blocking_phase": 2},
+    {"id": "U008", "variable": "BERT pretraining seed and selected epoch/checkpoint used to initialize the CLIP+ text tower, if separately trained from scratch", "status": "unresolved", "blocking_phase": 3},
+    {"id": "U009", "variable": "vision-tower from-scratch initialization and exact CLIP+ objective/mode represented by the published row", "status": "unresolved", "blocking_phase": 3},
+    {"id": "U010", "variable": "per-device/global batch sizes, gradient accumulation, distributed all-gather, cross-rank negative semantics, and world size", "status": "unresolved", "blocking_phase": 3},
+    {"id": "U011", "variable": "training-loop epoch meaning for multi-frame manifests, sampler reshuffling, drop-last, and step/scheduler counts", "status": "unresolved", "blocking_phase": 3},
+    {"id": "U012", "variable": "optimizer, learning-rate schedule, warmup, weight decay, precision, clipping, temperature, augmentation, and stopping criteria for the exact row", "status": "unresolved", "blocking_phase": 3},
+    {"id": "U013", "variable": "checkpoint selection rule independently applied to each seed", "status": "unresolved", "blocking_phase": 3},
+    {"id": "U014", "variable": "Machine-DevBench exact style/subset inclusion and task file inventory for the reported row", "status": "unresolved", "blocking_phase": 4},
+    {"id": "U015", "variable": "per-task scoring, subgroup weighting, tie handling, failed-example handling, and confirmation of sample-standard-deviation convention", "status": "unresolved", "blocking_phase": 4},
+    {"id": "U016", "variable": "hardware topology and nondeterministic kernel controls needed to interpret run-to-run variance", "status": "unresolved", "blocking_phase": 3},
+    {"id": "U017", "variable": "unpinned VCS dependencies in the upstream lock/environment and any artifact/model-weight digests not captured by pixi.lock", "status": "unresolved", "blocking_phase": 1}
+  ],
+  "required_ignored_roots": [
+    "raw_data", "derived_data", "downloads", "runs", "outputs", "artifacts",
+    "checkpoints", "logs", "caches", "rendered_reports"
+  ]
+}
