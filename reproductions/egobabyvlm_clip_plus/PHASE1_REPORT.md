@@ -170,6 +170,27 @@ on the laptop. The control therefore cannot currently be treated as a viable
 filtered 2025.1/`BV-main` workflow. It also provides no cohort selector, so even
 a successful date-filtered ZIP would not establish `BV-main` membership.
 
+## `databraryr` API assessment
+
+The linked [`databraryr` documentation](https://databrary.github.io/databraryr/)
+is an official wrapper for a Databrary API. Its documented metadata function
+returns asset IDs, durations, sizes, session dates, release levels, and formats;
+the source also contains authenticated `download_video()`,
+`download_session_zip()`, and `download_volume_zip()` helpers. Authentication
+is an email/password login request (optionally stored in the local system
+keyring), not a separately issued API-key workflow.
+
+The current package source inspected at commit
+`c91d1043658c30e52e786dbfeafafa8a42a5315e` still targets the legacy
+`nyu.databrary.org/api` endpoints. The Databrary 2 web client currently targets
+`api.databrary.org:443` and uses bearer access/refresh tokens. A direct,
+unauthenticated request to that current API from this environment returned the
+service's browser/allowed-path denial, so `databraryr` has not been shown to be
+a usable authenticated route for the present governed Juno workflow. No
+credentials or tokens were handled, and no controlled data were accessed via
+this package. The API discovery therefore does not change the exact-subset
+blocker or authorize bulk download.
+
 ## Primary evidence inspected
 
 - BabyView 2025.1 controlled release: <https://databrary.org/volume/1882>
@@ -186,6 +207,8 @@ a successful date-filtered ZIP would not establish `BV-main` membership.
 - Official BabyView pipeline showing explicit release membership:
   <https://github.com/babyview-project/babyview-pipeline>
 - EgoBabyVLM paper v1: <https://arxiv.org/abs/2605.19130v1>
+- Official `databraryr` API wrapper: <https://databrary.github.io/databraryr/>
+- Official `databraryr` source: <https://github.com/databrary/databraryr/>
 
 Only this aggregate status is tracked. Detailed ledger rows, source paths,
 references, and hashes are restricted to governed storage.

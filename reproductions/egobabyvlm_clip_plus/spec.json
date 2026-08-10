@@ -92,6 +92,16 @@
       "zip_test_archive_retained": false,
       "bulk_download_started": false
     },
+    "api_assessment": {
+      "official_databraryr_wrapper": true,
+      "source_commit": "c91d1043658c30e52e786dbfeafafa8a42a5315e",
+      "legacy_base_url": "https://nyu.databrary.org/api",
+      "current_databrary2_base_url": "https://api.databrary.org:443",
+      "authenticated_helpers": ["download_video", "download_session_zip", "download_volume_zip"],
+      "direct_current_api_probe": "browser_or_allowed_path_denied",
+      "usable_authorized_path_confirmed": false,
+      "selection_evidence_changed": false
+    },
     "current_blocker": "Neither public code nor authorized exports identify the exact approximately 863-hour usable subset, its record-level exclusion reasons, or the frozen release/accounting crosswalk needed to reconcile 894 hours with the official candidate mapping.",
     "public_code_finding": "Pinned code recursively discovers supplied video files and does not publish the exact BabyView inclusion manifest or a release-to-training selection rule.",
     "minimum_external_evidence": "Author-provided privacy-safe inclusion-manifest digest plus a governed matchable list and record-level exclusion reasons; the frozen 2025.1 Airtable export or authoritative asset rename/supersession crosswalk is also needed to reconcile release accounting.",
@@ -211,6 +221,13 @@
         "status": "accepted_phase1",
         "statement": "The official BabyView mapping resolves the 868-hour figure to 4,610 BV-main recordings totaling 868.4602 hours, strongly supporting BV-main as the EgoBabyVLM source cohort but not proving the exact approximately 863-hour usable subset.",
         "basis": "Governed exact matching of the 5,566-entry candidate list to the official mapping resolved 5,498 entries: 4,610 BV-main recordings (868.4602 hours) and 888 legacy single-child recordings (69.6941 hours). Public artifacts contain no record-level usable exclusion manifest."
+      },
+      {
+        "id": "A005",
+        "kind": "evidence_note",
+        "status": "accepted_phase1",
+        "statement": "The official databraryr wrapper exposes metadata and authenticated download helpers, but its inspected source targets legacy Databrary endpoints and has not been validated against the current Databrary 2 bearer-token API from governed Juno storage.",
+        "basis": "Official databraryr documentation/source and a read-only direct probe of the current API; no credentials or controlled data were handled."
       }
     ]
   },
