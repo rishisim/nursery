@@ -1,10 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "phase": {
-    "number": 0,
-    "name": "frozen_specification",
-    "status": "complete",
-    "completion_gate": "python3 verify_phase0.py"
+    "number": 1,
+    "name": "source_data_access_and_audit",
+    "status": "blocked_by_external_evidence",
+    "completion_gate": "Exact paper inclusion subset and the 894-to-approximately-863-hour discrepancy must be evidenced; tooling completion is insufficient."
   },
   "scope": {
     "model_row": "BabyView CLIP+",
@@ -49,7 +49,32 @@
     "release": "2025.1",
     "official_page": "https://databrary.org/volume/1882",
     "access": "controlled Databrary access; authorization and participant privacy terms required",
-    "redistribution": "forbidden for raw and derived sensitive content"
+    "redistribution": "forbidden for raw and derived sensitive content",
+    "published_duration_hours": {
+      "databrary_release_metadata_reported": 894,
+      "official_babyview_analysis": 868,
+      "egobabyvlm_usable_approximate": 863,
+      "databrary_to_egobabyvlm_difference_approximate": 31,
+      "babyview_analysis_to_egobabyvlm_difference_approximate": 5,
+      "reconciliation_status": "not_reconciled"
+    }
+  },
+  "phase1_audit": {
+    "status": "blocked_by_external_evidence",
+    "ledger_schema": "inclusion_ledger.schema.json",
+    "audit_tool": "audit_phase1.py",
+    "aggregate_report": "PHASE1_REPORT.md",
+    "populated_ledger_trackable": false,
+    "governed_storage_available_during_audit": false,
+    "complete_release_inventory_assessed": false,
+    "public_code_finding": "Pinned code recursively discovers supplied video files and does not publish the exact BabyView inclusion manifest or a release-to-training selection rule.",
+    "minimum_external_evidence": "Author-provided privacy-safe inclusion-manifest digest plus a governed matchable list, or an equivalent deterministic selection rule with excluded duration by reason.",
+    "privacy_boundary": "Detailed rows, record references, filenames, paths, and hashes remain only in governed storage; Git retains schema and aggregates only.",
+    "controlled_exclusion_reasons": [
+      "none", "not_in_release", "not_in_paper_subset", "missing", "corrupt",
+      "audio_missing", "audio_unusable", "duplicate", "unsupported_media",
+      "probe_error", "undetermined"
+    ]
   },
   "storage_policy": {
     "mode": "juno_two_tier_storage",
@@ -144,6 +169,20 @@
         "kind": "deviation",
         "status": "none",
         "statement": "No deviation from the frozen target protocol is authorized in Phase 0."
+      },
+      {
+        "id": "A002",
+        "kind": "decision",
+        "status": "accepted_phase1",
+        "statement": "The approximately 31-hour discrepancy remains unexplained; no recording-level inclusion decision may be inferred from the two aggregate duration claims.",
+        "basis": "The official release and pinned EgoBabyVLM README provide aggregate hours, while the pinned code provides no exact inclusion manifest or deterministic selection rule."
+      },
+      {
+        "id": "A003",
+        "kind": "evidence_note",
+        "status": "accepted_phase1",
+        "statement": "Official BabyView project analyses describe 868 hours of release-2025.1 video, introducing a second accounting figure alongside the reported 894-hour Databrary metadata and EgoBabyVLM's approximately 863 hours.",
+        "basis": "Official BabyView project CCN 2025 materials state 3,163,675 one-Hz frames and 868 hours from release 2025.1; public sources do not define a record-level mapping among these totals."
       }
     ]
   },
@@ -164,7 +203,8 @@
     {"id": "U014", "variable": "Machine-DevBench exact style/subset inclusion and task file inventory for the reported row", "status": "unresolved", "blocking_phase": 4},
     {"id": "U015", "variable": "per-task scoring, subgroup weighting, tie handling, failed-example handling, and confirmation of sample-standard-deviation convention", "status": "unresolved", "blocking_phase": 4},
     {"id": "U016", "variable": "hardware topology and nondeterministic kernel controls needed to interpret run-to-run variance", "status": "unresolved", "blocking_phase": 3},
-    {"id": "U017", "variable": "unpinned VCS dependencies in the upstream lock/environment and any artifact/model-weight digests not captured by pixi.lock", "status": "unresolved", "blocking_phase": 1}
+    {"id": "U017", "variable": "unpinned VCS dependencies in the upstream lock/environment and any artifact/model-weight digests not captured by pixi.lock", "status": "unresolved", "blocking_phase": 1},
+    {"id": "U018", "variable": "exact BabyView 2025.1 release-to-paper inclusion ledger and exclusion reasons reconciling 894 hours to approximately 863 hours", "status": "unresolved", "blocking_phase": 1}
   ],
   "required_ignored_roots": [
     "logs", "caches"

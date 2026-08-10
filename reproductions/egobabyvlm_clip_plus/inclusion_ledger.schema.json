@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BabyView 2025.1 private inclusion ledger row",
+  "description": "SENSITIVE: populated rows belong only in governed storage; never commit them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_key", "databrary_reference", "source_filename", "sha256", "duration_seconds", "audio_present", "audio_usable", "decision", "exclusion_reason", "group_key", "release_membership", "probe_version", "probe_error"],
+  "properties": {
+    "record_key": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "databrary_reference": {"type": ["string", "null"]},
+    "source_filename": {"type": "string"},
+    "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "duration_seconds": {"type": ["number", "null"], "minimum": 0},
+    "audio_present": {"type": ["boolean", "null"]},
+    "audio_usable": {"type": ["boolean", "null"]},
+    "decision": {"enum": ["include", "exclude", "undetermined"]},
+    "exclusion_reason": {"enum": ["none", "not_in_release", "not_in_paper_subset", "missing", "corrupt", "audio_missing", "audio_unusable", "duplicate", "unsupported_media", "probe_error", "undetermined"]},
+    "group_key": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "release_membership": {"enum": ["confirmed", "not_member", "unverified"]},
+    "probe_version": {"type": "string"},
+    "probe_error": {"type": ["string", "null"]}
+  }
+}

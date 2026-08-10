@@ -27,9 +27,10 @@ is recorded only in `spec.json`; it must never be silently guessed.
   pins are recorded; scope, data policy, unresolved variables and metrics are
   explicit; durable Juno storage is isolated from disposable worktrees;
   `verify_phase0.py` passes.
-- **Phase 1 — source/data access and audit (pending):** obtain authorized
-  BabyView access without redistribution, inspect upstream code at the pin, and
-  resolve or formally register every blocking variable. No training.
+- **Phase 1 — source/data access and audit (blocked by external evidence):**
+  the audit schema, privacy-safe tooling, and public-source review are complete,
+  but the exact paper subset is not published and governed storage was not
+  reachable during this audit. See `PHASE1_REPORT.md`. No training occurred.
 - **Phase 2 — preprocessing/manifests (pending):** create the authorized 2025.1
   manifests and derived inputs under ignored roots, with provenance checks.
 - **Phase 3 — training (pending):** execute three from-scratch BabyView CLIP+
@@ -43,6 +44,17 @@ Phase 0 is complete only while this command succeeds from this directory:
 ```sh
 python3 verify_phase0.py
 ```
+
+Phase 1 tooling and privacy boundaries are verified by the same command. A
+passing command does not make Phase 1 scientifically complete: completion also
+requires evidence identifying the exact paper subset and reconciling 894 hours
+to approximately 863 hours.
+
+The private inventory tool is `audit_phase1.py`. Its populated JSONL ledger must
+be written outside Git to verified governed storage and requires a private
+secret file for stable HMAC record keys. `--limit` bounds a test run and
+`--dry-run` discovers/probes without hashing or writing a ledger. The tool never
+modifies or copies source media and prints counts only.
 
 ## Data and initialization policy
 

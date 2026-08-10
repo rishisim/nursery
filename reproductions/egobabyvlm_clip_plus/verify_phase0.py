@@ -19,6 +19,8 @@ EXPECTED_VISIBLE = {
     "output", "outputs", "runs", "artifacts", "checkpoints", "weights",
     "generated", "tmp", "rendered", "rendered_reports",
 }
+PHASE1_SCHEMA = ROOT / "inclusion_ledger.schema.json"
+PHASE1_REPORT = ROOT / "PHASE1_REPORT.md"
 
 
 def require(condition: bool, message: str) -> None:
@@ -91,6 +93,33 @@ def main() -> None:
     unresolved = spec["unresolved_reproduction_variables"]
     require(len(unresolved) >= 17, "unresolved-variable inventory unexpectedly incomplete")
     require(all(item["status"] == "unresolved" for item in unresolved), "variable silently resolved")
+    require(any(item["id"] == "U018" for item in unresolved), "subset discrepancy blocker missing")
+
+    phase = spec["phase"]
+    require(phase["number"] == 1, "Phase 1 status not recorded")
+    require(phase["status"] == "blocked_by_external_evidence", "Phase 1 status overclaimed")
+    audit = spec["phase1_audit"]
+    require(audit["populated_ledger_trackable"] is False, "private ledger made trackable")
+    require(audit["complete_release_inventory_assessed"] is False, "inventory falsely assessed")
+    require(spec["training_data"]["published_duration_hours"]["reconciliation_status"] == "not_reconciled", "duration discrepancy falsely reconciled")
+
+    schema = json.loads(PHASE1_SCHEMA.read_text(encoding="utf-8"))
+    required = set(schema["required"])
+    expected_fields = {"record_key", "databrary_reference", "source_filename", "sha256",
+                       "duration_seconds", "audio_present", "audio_usable", "decision",
+                       "exclusion_reason", "group_key", "release_membership",
+                       "probe_version", "probe_error"}
+    require(required == expected_fields, "private ledger schema fields changed")
+    reasons = schema["properties"]["exclusion_reason"]["enum"]
+    require(reasons == audit["controlled_exclusion_reasons"], "exclusion vocabularies differ")
+    report = PHASE1_REPORT.read_text(encoding="utf-8")
+    require("blocked by external evidence" in report.lower(), "report status missing")
+    require("894 → ~863 reconciled: no" in report, "report overclaims reconciliation")
+
+    audit_source = (ROOT / "audit_phase1.py").read_text(encoding="utf-8")
+    require("stream_sha256" in audit_source and "os.replace" in audit_source, "streaming/atomic audit invariants missing")
+    require("ledger output must not be inside the Git repository" in audit_source, "repository privacy boundary missing")
+    require("validate_governed_output" in audit_source, "governed-storage boundary missing")
 
     ignored = set(spec["required_ignored_roots"])
     require(ignored == EXPECTED_IGNORED, "required ignored-root set changed")
