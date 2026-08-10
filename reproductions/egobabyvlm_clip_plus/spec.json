@@ -3,7 +3,7 @@
   "phase": {
     "number": 1,
     "name": "source_data_access_and_audit",
-    "status": "blocked_by_external_evidence",
+    "status": "blocked_by_governed_metadata_transfer",
     "completion_gate": "Exact paper inclusion subset and the 894-to-approximately-863-hour discrepancy must be evidenced; tooling completion is insufficient."
   },
   "scope": {
@@ -60,11 +60,19 @@
     }
   },
   "phase1_evidence": {
-    "status": "blocked_by_external_evidence",
+    "status": "blocked_by_governed_metadata_transfer",
     "aggregate_report": "PHASE1_REPORT.md",
     "populated_ledger_trackable": false,
-    "governed_storage_available_during_audit": false,
+    "governed_storage_available_during_audit": "intermittent; candidate transfer and verification succeeded before SSH authentication failed again",
     "complete_release_inventory_assessed": false,
+    "candidate_list_provenance": {
+      "entry_count": 5566,
+      "repository_head": "94b1dffb5e9a488dc2c08a84ce7967cdcae272ab",
+      "file_commit": "59cc646e6d73a54a37e0c0820f9389f2e4737595",
+      "sha256": "0e79d853b1c78d0c0272391ba1109b3525790f5a59a8421bc4df6b2f42153d40",
+      "governed_copy_verified": true
+    },
+    "current_blocker": "Authorized Databrary metadata must be transferred directly into governed storage; local controlled-data staging is forbidden and Juno SSH authentication is not stable.",
     "public_code_finding": "Pinned code recursively discovers supplied video files and does not publish the exact BabyView inclusion manifest or a release-to-training selection rule.",
     "minimum_external_evidence": "Author-provided privacy-safe inclusion-manifest digest plus a governed matchable list, or an equivalent deterministic selection rule with excluded duration by reason.",
     "privacy_boundary": "Detailed rows, record references, filenames, paths, and hashes remain only in governed storage; Git retains aggregate evidence only."

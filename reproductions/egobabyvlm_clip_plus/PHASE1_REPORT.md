@@ -1,6 +1,6 @@
 # Phase 1 source/data audit report
 
-## Status: blocked by external evidence
+## Status: blocked by governed metadata transfer
 
 The exact BabyView 2025.1 subset used for the published BabyView CLIP+ row is
 not yet fully confirmed, but official public sources now provide a strong
@@ -80,6 +80,29 @@ The frozen dataset is ready for download only after all of the following pass:
    unmatched totals, exclusion reasons, manifest hashes, and the confirmed
    download selection. Only then start the bulk video download.
 
+## Governed readiness run
+
+The official candidate list has been copied to the owner-only durable manifest
+area without writing it to the worktree. Its governed provenance record contains:
+
+- 5,566 entries;
+- repository head `94b1dffb5e9a488dc2c08a84ce7967cdcae272ab`;
+- file-introducing/last-modifying commit
+  `59cc646e6d73a54a37e0c0820f9389f2e4737595`;
+- SHA-256 `0e79d853b1c78d0c0272391ba1109b3525790f5a59a8421bc4df6b2f42153d40`.
+
+The checksum was verified after transfer. No candidate rows or identifiers are
+tracked in Git.
+
+The current Databrary metadata file was confirmed in the authorized web session,
+but was not exported: the browser authorization cannot be safely delegated to a
+Juno-side downloader, local controlled-data staging is forbidden, and Juno SSH
+authentication became intermittent after the candidate transfer. The minimum
+handoff is stable Juno SSH plus either (a) a Juno-side authorized Databrary
+download mechanism or (b) a manual export of the current metadata CSV directly
+into the governed manifest area. Exact matching, duration totals, and the bounded
+media check remain gated on that file.
+
 If exact matching cannot be completed, request the frozen
 `babyview-videos-metadata-2025.1.csv` or the 2025.1 Airtable release export from
 the BabyView maintainers. Official pipeline code confirms that release
@@ -87,7 +110,8 @@ membership is represented as an explicit Airtable list, not a date rule.
 
 ## Aggregate audit
 
-- Candidate 2025.1 membership list located: yes (5,566 entries)
+- Candidate 2025.1 membership list located and checksum-verified in governed
+  storage: yes (5,566 entries)
 - Candidate/current aggregate comparison completed: yes, in memory
 - Exact asset-level match: not completed; governed comparison required
 - Complete authorized 2025.1 inventory present: not yet confirmed
@@ -97,6 +121,7 @@ membership is represented as an explicit Airtable list, not a date rule.
 - Release membership evidence: official BabyView candidate inclusion list plus
   aggregate comparison against authorized current metadata
 - 894 → ~863 reconciled: no
+- Video downloads performed: none
 
 ## Primary evidence inspected
 

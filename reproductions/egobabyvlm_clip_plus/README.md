@@ -26,10 +26,11 @@ is recorded only in `spec.json`; it must never be silently guessed.
 - **Phase 0 — frozen specification (complete):** official sources and immutable
   pins are recorded; scope, data policy, unresolved variables and metrics are
   explicit; durable Juno storage is isolated from disposable worktrees.
-- **Phase 1 — source/data access and audit (blocked by external evidence):**
-  the public-source review is complete, but the exact paper subset is not
-  published and governed storage was not reachable during this audit. See
-  `PHASE1_REPORT.md`. No training occurred.
+- **Phase 1 — source/data access and audit (blocked by governed metadata
+  transfer):** the official candidate list is checksum-verified in durable
+  governed storage, but the authorized current Databrary metadata export has
+  not yet been transferred there for exact matching. See `PHASE1_REPORT.md`.
+  No training or media download occurred.
 - **Phase 2 — preprocessing/manifests (pending):** create the authorized 2025.1
   manifests and derived inputs under ignored roots, with provenance checks.
 - **Phase 3 — training (pending):** execute three from-scratch BabyView CLIP+
