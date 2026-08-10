@@ -86,6 +86,12 @@
       "exact_current_asset_filename_matches": 1639,
       "requires_authoritative_rename_crosswalk": 3927
     },
+    "download_workflow_probe": {
+      "rolling_browser_to_juno": "validated_one_file",
+      "zip_one_day_filter": "not_viable_no_archive_and_no_session_rows",
+      "zip_test_archive_retained": false,
+      "bulk_download_started": false
+    },
     "current_blocker": "Neither public code nor authorized exports identify the exact approximately 863-hour usable subset, its record-level exclusion reasons, or the frozen release/accounting crosswalk needed to reconcile 894 hours with the official candidate mapping.",
     "public_code_finding": "Pinned code recursively discovers supplied video files and does not publish the exact BabyView inclusion manifest or a release-to-training selection rule.",
     "minimum_external_evidence": "Author-provided privacy-safe inclusion-manifest digest plus a governed matchable list and record-level exclusion reasons; the frozen 2025.1 Airtable export or authoritative asset rename/supersession crosswalk is also needed to reconcile release accounting.",

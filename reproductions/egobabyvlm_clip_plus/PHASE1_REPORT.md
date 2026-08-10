@@ -152,8 +152,23 @@ Airtable list, not a date rule.
   aggregate comparison against authorized current metadata
 - 894 → ~863 reconciled: no; `BV-main` is strongly supported, but the exact
   approximately 5.46-hour usability exclusion and 894-hour boundary are unknown
-- Video downloads performed: none; bulk download remains gated on a frozen
-  manifest, and no bounded media sample was needed for the metadata-only result
+- Video downloads performed: two bounded exact-match files; bulk download
+  remains gated on a frozen manifest and the unresolved 489-record rename set
+
+## Rolling-transfer and ZIP workflow check
+
+With explicit authorization, a one-file rolling transfer was tested: one exact
+`BV-main` video was downloaded through the authorized browser, streamed to
+governed Juno, byte-count and SHA-256 verified, and deleted from the laptop.
+The governed queue checkpoint records two completed exact files at this stage;
+no bulk run has been started.
+
+The Databrary `Download all as ZIP` control was then tested with one-day date
+ranges. The session table remained empty for the tested recording/upload-date
+windows, the ZIP request produced no downloadable archive, and no ZIP was left
+on the laptop. The control therefore cannot currently be treated as a viable
+filtered 2025.1/`BV-main` workflow. It also provides no cohort selector, so even
+a successful date-filtered ZIP would not establish `BV-main` membership.
 
 ## Primary evidence inspected
 
