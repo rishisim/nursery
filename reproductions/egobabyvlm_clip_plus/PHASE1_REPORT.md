@@ -1,10 +1,11 @@
 # Phase 1 source/data audit report
 
-## Status: blocked by governed metadata transfer
+## Status: blocked by exact usable-subset evidence
 
 The exact BabyView 2025.1 subset used for the published BabyView CLIP+ row is
-not yet fully confirmed, but official public sources now provide a strong
-candidate inclusion list that can be checked against authorized Databrary data.
+not yet fully confirmed. The official candidate list, official BabyView mapping,
+and authorized Databrary exports have now been copied to owner-only governed
+storage, checksum-recorded, and compared there.
 The Databrary release metadata is reported as 894 hours; the pinned EgoBabyVLM
 README describes approximately 863 hours. An official BabyView project analysis
 of release 2025.1 separately reports 868 analyzed hours (and 3,163,675 frames
@@ -42,19 +43,43 @@ These results make the official February-2025 list the best available candidate
 for frozen 2025.1 membership. They do not yet prove its total media duration or
 that every listed file remains downloadable.
 
-## What the three hour totals may mean
+## Governed exact-match results
+
+The official February-2025 candidate list contains 5,566 entries. The official
+BabyView analysis mapping resolves 5,498 of them and leaves 68 without a mapping.
+Its mapped durations split as follows:
+
+- `BV-main`: 4,610 recordings and 868.4602 hours;
+- legacy single-child cohort: 888 recordings and 69.6941 hours;
+- mapped total: 5,498 recordings and 938.1543 hours.
+
+Of the 5,498 mapped records, 5,456 occur in the current authorized BabyView
+metadata and 42 do not. In a separate direct comparison of all 5,566 candidate
+names to current Databrary asset filenames, 1,639 resolved uniquely and 3,927
+require an authoritative rename/supersession crosswalk. No ambiguous exact
+matches were found. Detailed rows, filenames, identifiers, references, paths,
+and hashes remain only in governed storage.
+
+## What the three hour totals mean so far
 
 - **894 hours:** the official total for the complete 2025.1 release.
 - **868 hours:** the total used by an official BabyView analysis of the main
   cohort.
 - **approximately 863 hours:** the video total reported by EgoBabyVLM.
 
-The current metadata distinguishes `BV-main` and `Ego-SingleChild`. Within the
-candidate date range it contains 4,733 main-cohort records and 893 single-child
-records. This makes cohort selection a plausible explanation for much of the
-894-to-868-hour difference, but it remains a hypothesis until durations are
-summed. The remaining approximately five hours may reflect unusable or excluded
-media, but no exclusion cause should be asserted without evidence.
+The exact official mapping establishes that the 868-hour figure is the
+`BV-main` cohort: 868.4602 hours. EgoBabyVLM's approximately 863 hours is thus
+consistent with using `BV-main` followed by about 5.46 hours of usability loss,
+and is inconsistent with using the full mapped candidate list. This is strong
+aggregate evidence for `BV-main`, but it is not an exact paper manifest. Neither
+the public code nor the governed exports identify which recordings account for
+the remaining approximately 5.46 hours or why they were excluded.
+
+The official 894-hour release total also does not equal the 938.1543 hours in
+the candidate mapping. The sources evidently use different release/accounting
+boundaries, but no record-level official crosswalk currently explains that
+difference. It would be scientifically incorrect to force 894, 868.4602, and
+approximately 863 into a single inferred ledger.
 
 ## Readiness gate before downloading video
 
@@ -94,34 +119,41 @@ area without writing it to the worktree. Its governed provenance record contains
 The checksum was verified after transfer. No candidate rows or identifiers are
 tracked in Git.
 
-The current Databrary metadata file was confirmed in the authorized web session,
-but was not exported: the browser authorization cannot be safely delegated to a
-Juno-side downloader, local controlled-data staging is forbidden, and Juno SSH
-authentication became intermittent after the candidate transfer. The minimum
-handoff is stable Juno SSH plus either (a) a Juno-side authorized Databrary
-download mechanism or (b) a manual export of the current metadata CSV directly
-into the governed manifest area. Exact matching, duration totals, and the bounded
-media check remain gated on that file.
+The authorized full-volume asset export, session sample, current BabyView
+metadata export, and official BabyView duration/mapping table were transferred
+to governed storage and checksum-recorded. A governed private match ledger and
+aggregate companion record were produced. The task-created local metadata
+download was then deleted. Intermittent SSH authentication remains an
+operational concern but did not prevent the completed governed comparison.
 
-If exact matching cannot be completed, request the frozen
-`babyview-videos-metadata-2025.1.csv` or the 2025.1 Airtable release export from
-the BabyView maintainers. Official pipeline code confirms that release
-membership is represented as an explicit Airtable list, not a date rule.
+The minimum external evidence is the authors' exact privacy-safe training
+inclusion manifest (or its digest plus a governed matchable list), including
+record-level exclusion reasons, together with the frozen 2025.1
+release-to-asset rename/supersession crosswalk. The frozen 2025.1 Airtable
+release export would also resolve the release/accounting boundary. Official
+pipeline code confirms that release membership is represented as an explicit
+Airtable list, not a date rule.
 
 ## Aggregate audit
 
 - Candidate 2025.1 membership list located and checksum-verified in governed
   storage: yes (5,566 entries)
-- Candidate/current aggregate comparison completed: yes, in memory
-- Exact asset-level match: not completed; governed comparison required
+- Candidate/current aggregate comparison completed: yes, in governed storage
+- Official candidate-to-duration mapping: 5,498 matched; 68 unmapped
+- Exact current asset filename match: 1,639 matched; 3,927 need an authoritative
+  rename/supersession crosswalk
 - Complete authorized 2025.1 inventory present: not yet confirmed
-- Total recordings and duration: not assessed
+- Official mapped recordings and duration: 5,498 and 938.1543 hours
+- `BV-main` recordings and duration: 4,610 and 868.4602 hours
+- Legacy single-child recordings and duration: 888 and 69.6941 hours
 - Included/excluded duration: not assessed
 - Missing, corrupt, or audio-unusable totals: not assessed
 - Release membership evidence: official BabyView candidate inclusion list plus
   aggregate comparison against authorized current metadata
-- 894 → ~863 reconciled: no
-- Video downloads performed: none
+- 894 → ~863 reconciled: no; `BV-main` is strongly supported, but the exact
+  approximately 5.46-hour usability exclusion and 894-hour boundary are unknown
+- Video downloads performed: none; bulk download remains gated on a frozen
+  manifest, and no bounded media sample was needed for the metadata-only result
 
 ## Primary evidence inspected
 

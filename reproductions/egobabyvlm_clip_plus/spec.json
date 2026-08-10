@@ -3,7 +3,7 @@
   "phase": {
     "number": 1,
     "name": "source_data_access_and_audit",
-    "status": "blocked_by_governed_metadata_transfer",
+    "status": "blocked_by_exact_usable_subset_evidence",
     "completion_gate": "Exact paper inclusion subset and the 894-to-approximately-863-hour discrepancy must be evidenced; tooling completion is insufficient."
   },
   "scope": {
@@ -60,10 +60,10 @@
     }
   },
   "phase1_evidence": {
-    "status": "blocked_by_governed_metadata_transfer",
+    "status": "blocked_by_exact_usable_subset_evidence",
     "aggregate_report": "PHASE1_REPORT.md",
     "populated_ledger_trackable": false,
-    "governed_storage_available_during_audit": "intermittent; candidate transfer and verification succeeded before SSH authentication failed again",
+    "governed_storage_available_during_audit": "yes; all controlled exports and detailed matching outputs remained in owner-only governed storage, although SSH authentication was intermittent",
     "complete_release_inventory_assessed": false,
     "candidate_list_provenance": {
       "entry_count": 5566,
@@ -72,9 +72,23 @@
       "sha256": "0e79d853b1c78d0c0272391ba1109b3525790f5a59a8421bc4df6b2f42153d40",
       "governed_copy_verified": true
     },
-    "current_blocker": "Authorized Databrary metadata must be transferred directly into governed storage; local controlled-data staging is forbidden and Juno SSH authentication is not stable.",
+    "governed_match_aggregates": {
+      "candidate_entries": 5566,
+      "official_mapping_matched": 5498,
+      "official_mapping_unmatched": 68,
+      "mapped_bv_main_recordings": 4610,
+      "mapped_bv_main_hours": 868.4602,
+      "mapped_legacy_single_child_recordings": 888,
+      "mapped_legacy_single_child_hours": 69.6941,
+      "mapped_total_hours": 938.1543,
+      "mapped_present_in_current_metadata": 5456,
+      "mapped_absent_from_current_metadata": 42,
+      "exact_current_asset_filename_matches": 1639,
+      "requires_authoritative_rename_crosswalk": 3927
+    },
+    "current_blocker": "Neither public code nor authorized exports identify the exact approximately 863-hour usable subset, its record-level exclusion reasons, or the frozen release/accounting crosswalk needed to reconcile 894 hours with the official candidate mapping.",
     "public_code_finding": "Pinned code recursively discovers supplied video files and does not publish the exact BabyView inclusion manifest or a release-to-training selection rule.",
-    "minimum_external_evidence": "Author-provided privacy-safe inclusion-manifest digest plus a governed matchable list, or an equivalent deterministic selection rule with excluded duration by reason.",
+    "minimum_external_evidence": "Author-provided privacy-safe inclusion-manifest digest plus a governed matchable list and record-level exclusion reasons; the frozen 2025.1 Airtable export or authoritative asset rename/supersession crosswalk is also needed to reconcile release accounting.",
     "privacy_boundary": "Detailed rows, record references, filenames, paths, and hashes remain only in governed storage; Git retains aggregate evidence only."
   },
   "storage_policy": {
@@ -184,6 +198,13 @@
         "status": "accepted_phase1",
         "statement": "Official BabyView project analyses describe 868 hours of release-2025.1 video, introducing a second accounting figure alongside the reported 894-hour Databrary metadata and EgoBabyVLM's approximately 863 hours.",
         "basis": "Official BabyView project CCN 2025 materials state 3,163,675 one-Hz frames and 868 hours from release 2025.1; public sources do not define a record-level mapping among these totals."
+      },
+      {
+        "id": "A004",
+        "kind": "evidence_note",
+        "status": "accepted_phase1",
+        "statement": "The official BabyView mapping resolves the 868-hour figure to 4,610 BV-main recordings totaling 868.4602 hours, strongly supporting BV-main as the EgoBabyVLM source cohort but not proving the exact approximately 863-hour usable subset.",
+        "basis": "Governed exact matching of the 5,566-entry candidate list to the official mapping resolved 5,498 entries: 4,610 BV-main recordings (868.4602 hours) and 888 legacy single-child recordings (69.6941 hours). Public artifacts contain no record-level usable exclusion manifest."
       }
     ]
   },
