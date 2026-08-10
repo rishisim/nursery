@@ -1,0 +1,10 @@
+/raw_data/
+/derived_data/
+/downloads/
+/runs/
+/outputs/
+/artifacts/
+/checkpoints/
+/logs/
+/caches/
+/rendered_reports/
