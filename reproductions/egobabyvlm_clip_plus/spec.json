@@ -59,22 +59,15 @@
       "reconciliation_status": "not_reconciled"
     }
   },
-  "phase1_audit": {
+  "phase1_evidence": {
     "status": "blocked_by_external_evidence",
-    "ledger_schema": "inclusion_ledger.schema.json",
-    "audit_tool": "audit_phase1.py",
     "aggregate_report": "PHASE1_REPORT.md",
     "populated_ledger_trackable": false,
     "governed_storage_available_during_audit": false,
     "complete_release_inventory_assessed": false,
     "public_code_finding": "Pinned code recursively discovers supplied video files and does not publish the exact BabyView inclusion manifest or a release-to-training selection rule.",
     "minimum_external_evidence": "Author-provided privacy-safe inclusion-manifest digest plus a governed matchable list, or an equivalent deterministic selection rule with excluded duration by reason.",
-    "privacy_boundary": "Detailed rows, record references, filenames, paths, and hashes remain only in governed storage; Git retains schema and aggregates only.",
-    "controlled_exclusion_reasons": [
-      "none", "not_in_release", "not_in_paper_subset", "missing", "corrupt",
-      "audio_missing", "audio_unusable", "duplicate", "unsupported_media",
-      "probe_error", "undetermined"
-    ]
+    "privacy_boundary": "Detailed rows, record references, filenames, paths, and hashes remain only in governed storage; Git retains aggregate evidence only."
   },
   "storage_policy": {
     "mode": "juno_two_tier_storage",
