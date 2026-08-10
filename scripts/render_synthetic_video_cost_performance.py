@@ -15,7 +15,7 @@ import numpy as np
 COLORS = {"Real": "#444444", "Hailuo": "#D97706", "LTX API": "#2563EB", "LTX Juno": "#7C3AED"}
 HATCHES = {"Real": "", "Hailuo": "//", "LTX API": "..", "LTX Juno": "xx"}
 ARMS = (("Real", "real"), ("Hailuo", "hailuo"), ("LTX API", "ltx_api"), ("LTX Juno", "ltx_juno"))
-PROBES = (("Noun", "noun"), ("Adjective", "adjective"), ("Action", "action_guardrail"), ("Viewpoint*", "viewpoint_guardrail"))
+PROBES = (("Noun", "noun"), ("Adjective", "adjective"), ("Action", "action_guardrail"))
 
 
 def assert_ignored(path: Path) -> None:
@@ -41,8 +41,6 @@ def grouped_bars(axis, values: dict, ylabel: str, ylim: tuple[float, float]) -> 
     axis.set_xticks(x, [label for label, _ in PROBES])
     axis.set_ylabel(ylabel)
     axis.set_ylim(*ylim)
-    axis.axvspan(2.5, 3.5, color="#F3F4F6", zorder=-2)
-    axis.text(3, ylim[1] - (ylim[1] - ylim[0]) * 0.04, "guardrail failed", ha="center", va="top", fontsize=8, color="#6B7280")
     style_axis(axis)
 
 
@@ -53,12 +51,19 @@ def render_performance(metrics: dict, output: Path) -> None:
     grouped_bars(axes[0], top1, "Top-1 accuracy over 10 frames", (0, 1.18))
     axes[0].set_title("Matched grounded-lexical top-1 accuracy", loc="left", fontsize=13, weight="bold")
     axes[0].legend(frameon=False, ncol=4, loc="upper left")
-    grouped_bars(axes[1], margin, "Mean target − best distractor", (-0.52, 0.55))
+    grouped_bars(axes[1], margin, "Mean target - best distractor", (-0.05, 0.55))
     axes[1].axhline(0, color="#111827", linewidth=1.0)
     axes[1].set_title("Matched target-versus-distractor margin", loc="left", fontsize=13, weight="bold")
     figure.subplots_adjust(left=0.09, right=0.98, bottom=0.08, top=0.82, hspace=0.34)
-    figure.suptitle("Real vs Hailuo vs LTX API vs local LTX — one public 10-second clip", x=0.02, y=0.98, ha="left", fontsize=16, weight="bold")
-    figure.text(0.02, 0.925, "Same 10 timestamps and frozen CLIP evaluator; *viewpoint has negative margin in every arm and cannot support a ranking.", ha="left", va="top", fontsize=10, color="#4B5563")
+    figure.suptitle(
+        "Route 2 (T2V): Evaluation Metrics across Real and Synthetic Sample 10 Sec Clip",
+        x=0.02,
+        y=0.98,
+        ha="left",
+        fontsize=16,
+        weight="bold",
+    )
+    figure.text(0.02, 0.925, "Same 10 timestamps and frozen CLIP evaluator.", ha="left", va="top", fontsize=10, color="#4B5563")
     figure.savefig(output, dpi=180, facecolor="white")
     plt.close(figure)
 

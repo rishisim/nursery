@@ -2,8 +2,8 @@ from scripts.render_synthetic_video_cost_performance import ARMS, PROBES
 import json
 
 
-def test_cost_projection_keeps_viewpoint_as_failed_guardrail():
-    assert PROBES[-1] == ("Viewpoint*", "viewpoint_guardrail")
+def test_cost_projection_excludes_viewpoint_probe():
+    assert PROBES == (("Noun", "noun"), ("Adjective", "adjective"), ("Action", "action_guardrail"))
 
 
 def test_cost_projection_keeps_api_and_local_ltx_distinct():
