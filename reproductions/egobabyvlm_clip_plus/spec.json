@@ -51,6 +51,40 @@
     "access": "controlled Databrary access; authorization and participant privacy terms required",
     "redistribution": "forbidden for raw and derived sensitive content"
   },
+  "storage_policy": {
+    "mode": "juno_two_tier_storage",
+    "resolver": "python3 storage.py root <durable|scratch>",
+    "remote": {
+      "host": "juno.hpcre.utdallas.edu",
+      "user": "dal503972"
+    },
+    "durable": {
+      "root": "/work/dal503972/egobabyvlm_clip_plus",
+      "environment_override": "EGOBABYVLM_REPRO_DURABLE_ROOT",
+      "directories": [
+        "manifests", "checkpoints", "run_records", "aggregate_results",
+        "decision_reports", "logs"
+      ]
+    },
+    "scratch": {
+      "root": "/scratch/juno/dal503972/egobabyvlm_clip_plus",
+      "environment_override": "EGOBABYVLM_REPRO_SCRATCH_ROOT",
+      "directories": [
+        "raw_data", "derived_data", "downloads", "evaluation_data", "runs",
+        "outputs", "artifacts", "caches", "rendered_reports"
+      ],
+      "sole_copy_of_irreplaceable_artifact_allowed": false
+    },
+    "linked_worktrees_are_disposable": true,
+    "force_worktree_removal_allowed": false,
+    "fallback_to_local_or_worktree_storage_allowed": false,
+    "promotion_requires_checksum_verification": true,
+    "tracked_records": [
+      "source code", "resolved configurations", "checksums",
+      "non-sensitive compact manifests", "aggregate results", "decision reports"
+    ],
+    "backup_required": true
+  },
   "evaluation_data": {
     "release_name": "Evaluation Datasets",
     "tag": "Eval-Data",
@@ -133,7 +167,11 @@
     {"id": "U017", "variable": "unpinned VCS dependencies in the upstream lock/environment and any artifact/model-weight digests not captured by pixi.lock", "status": "unresolved", "blocking_phase": 1}
   ],
   "required_ignored_roots": [
-    "raw_data", "derived_data", "downloads", "runs", "outputs", "artifacts",
-    "checkpoints", "logs", "caches", "rendered_reports"
+    "logs", "caches"
+  ],
+  "required_visible_if_accidentally_local": [
+    "raw_data", "derived_data", "local_storage", "data", "downloads",
+    "output", "outputs", "runs", "artifacts", "checkpoints", "weights",
+    "generated", "tmp", "rendered", "rendered_reports"
   ]
 }

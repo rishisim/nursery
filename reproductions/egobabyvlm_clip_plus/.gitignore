@@ -1,10 +1,21 @@
-/raw_data/
-/derived_data/
-/downloads/
-/runs/
-/outputs/
-/artifacts/
-/checkpoints/
+# The only disposable reproduction-local roots.
 /logs/
 /caches/
-/rendered_reports/
+
+# Override broad repository rules here. Important data accidentally written to
+# a linked worktree must be visible to Git and block worktree cleanup.
+!/raw_data/
+!/derived_data/
+!/local_storage/
+!/data/
+!/downloads/
+!/output/
+!/outputs/
+!/runs/
+!/artifacts/
+!/checkpoints/
+!/weights/
+!/generated/
+!/tmp/
+!/rendered/
+!/rendered_reports/

@@ -25,7 +25,8 @@ is recorded only in `spec.json`; it must never be silently guessed.
 
 - **Phase 0 — frozen specification (complete):** official sources and immutable
   pins are recorded; scope, data policy, unresolved variables and metrics are
-  explicit; generated/sensitive roots are ignored; `verify_phase0.py` passes.
+  explicit; durable Juno storage is isolated from disposable worktrees;
+  `verify_phase0.py` passes.
 - **Phase 1 — source/data access and audit (pending):** obtain authorized
   BabyView access without redistribution, inspect upstream code at the pin, and
   resolve or formally register every blocking variable. No training.
@@ -65,9 +66,62 @@ only the pinned official Machine-DevBench release asset.
 `spec.json` is the single machine-readable source of truth for the frozen
 protocol and its assumptions/deviations ledger. Curated configs, compact
 aggregate result tables, concise decision reports, and this protocol remain
-trackable. All downloads, data, runs, outputs, artifacts, checkpoints, logs,
-caches, and rendered reports belong only in the ignored roots listed in
-`.gitignore`.
+trackable.
+
+## Local project and Juno storage
+
+The complete Git project remains on the laptop at
+`/Users/rishisim/Documents/research/nursery`. Code, configs, checksums,
+non-sensitive compact manifests, aggregate results, and decision reports are
+committed there so Codex can work normally.
+
+Worktrees are disposable code checkouts; they are never data or run-storage
+locations. Large, sensitive, or generated material uses two applicant-private
+Juno roots:
+
+```text
+Durable: /work/dal503972/egobabyvlm_clip_plus
+Scratch: /scratch/juno/dal503972/egobabyvlm_clip_plus
+```
+
+The durable root holds manifests, promoted checkpoints, compact run records,
+aggregate results, decision reports, and important logs. The larger scratch
+root holds authorized raw/derived data, downloads, evaluation data, active
+runs, outputs, artifacts, caches, and rendered reports. Scratch is not treated
+as a backup: every irreplaceable run output must be checksum-verified and
+promoted to the durable root before its scratch run may be removed.
+
+Initialize or verify the Juno layout from the laptop with:
+
+```sh
+python3 storage.py init-juno
+python3 storage.py check-juno
+```
+
+Resolve paths without hard-coding them in later scripts:
+
+```sh
+python3 storage.py root durable
+python3 storage.py path durable checkpoints
+python3 storage.py path scratch runs
+```
+
+The environment variables `EGOBABYVLM_REPRO_DURABLE_ROOT` and
+`EGOBABYVLM_REPRO_SCRATCH_ROOT` may override the frozen Juno paths. If Juno is
+unavailable, jobs must stop rather than fall back to a laptop or worktree path.
+Juno protects against worktree deletion, but its backup/snapshot policy must be
+verified before it is treated as the sole copy of an irreplaceable artifact.
+
+Before archiving or deleting a linked worktree, run from that worktree:
+
+```sh
+python3 reproductions/egobabyvlm_clip_plus/storage.py safe-to-remove
+```
+
+The guard verifies the Juno roots first, then refuses to approve the primary
+checkout, any modified/untracked files, or any unexpected ignored files. Only
+disposable caches and logs are allowed inside a linked worktree. Never use
+forced worktree removal.
 
 ## Official sources and provenance
 

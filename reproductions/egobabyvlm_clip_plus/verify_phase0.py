@@ -13,9 +13,11 @@ ROOT = Path(__file__).resolve().parent
 SPEC_PATH = ROOT / "spec.json"
 EXPECTED_COMMIT = "224621caf0628270b6115845ac75a65b984234a3"
 EXPECTED_ARCHIVE_SHA256 = "5f4c662919e3b0abdb85f5d6520350f10c374f087886f4257bbe1bd336f3b13c"
-EXPECTED_IGNORED = {
-    "raw_data", "derived_data", "downloads", "runs", "outputs", "artifacts",
-    "checkpoints", "logs", "caches", "rendered_reports",
+EXPECTED_IGNORED = {"logs", "caches"}
+EXPECTED_VISIBLE = {
+    "raw_data", "derived_data", "local_storage", "data", "downloads",
+    "output", "outputs", "runs", "artifacts", "checkpoints", "weights",
+    "generated", "tmp", "rendered", "rendered_reports",
 }
 
 
@@ -67,6 +69,23 @@ def main() -> None:
     require(any("public or web pretrained weights" in item for item in policy["forbidden"]),
             "external pretrained initialization is not explicitly forbidden")
 
+    storage = spec["storage_policy"]
+    require(storage["mode"] == "juno_two_tier_storage", "wrong storage mode")
+    require(storage["remote"] == {
+        "host": "juno.hpcre.utdallas.edu", "user": "dal503972"
+    }, "wrong Juno endpoint")
+    require(storage["durable"]["root"] == "/work/dal503972/egobabyvlm_clip_plus",
+            "wrong durable Juno root")
+    require(storage["scratch"]["root"] ==
+            "/scratch/juno/dal503972/egobabyvlm_clip_plus", "wrong scratch Juno root")
+    require(storage["linked_worktrees_are_disposable"] is True, "worktrees not disposable")
+    require(storage["force_worktree_removal_allowed"] is False, "forced removal allowed")
+    require(storage["fallback_to_local_or_worktree_storage_allowed"] is False,
+            "local fallback allowed")
+    require(storage["promotion_requires_checksum_verification"] is True,
+            "promotion checksum not required")
+    require(storage["backup_required"] is True, "persistent storage lacks backup policy")
+
     ledger = spec["assumptions_and_deviations"]
     require(ledger["source_of_truth"] == "this object" and ledger["entries"], "ledger missing")
     unresolved = spec["unresolved_reproduction_variables"]
@@ -81,6 +100,15 @@ def main() -> None:
             ["git", "check-ignore", "--quiet", str(probe)], cwd=ROOT, check=False
         )
         require(result.returncode == 0, f"generated root is not ignored: {root}/")
+
+    visible = set(spec["required_visible_if_accidentally_local"])
+    require(visible == EXPECTED_VISIBLE, "required visible-root set changed")
+    for root in sorted(visible):
+        probe = ROOT / root / ".phase0-visible-probe"
+        result = subprocess.run(
+            ["git", "check-ignore", "--quiet", str(probe)], cwd=ROOT, check=False
+        )
+        require(result.returncode != 0, f"important local root is silently ignored: {root}/")
 
     # A stable digest is useful in logs without creating an output artifact.
     digest = hashlib.sha256(SPEC_PATH.read_bytes()).hexdigest()
