@@ -40,14 +40,3 @@
 - Retain in Git only intentionally curated, compact, non-sensitive scientific
   records. Large or sensitive artifacts remain on governed Juno storage and are
   referenced by opaque run IDs and checksums.
-
-## Completed-task cleanup
-
-- Do not retain one-off phase scripts, audit helpers, verification scripts, or
-  task-specific test files after their immediate purpose is complete.
-- Before completing work, delete task-created temporary executable scaffolding
-  and remove its documentation/config references. Retain only canonical
-  production code and durable scientific records needed by the active workflow.
-- Add permanent tests only when they protect an ongoing production behavior;
-  otherwise run temporary tests from framework-managed or OS temporary storage
-  and remove them before committing.

@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "pilot_id": "juno_sample",
+  "status": "planned",
+  "classification": [
+    "engineering_only",
+    "non_comparable",
+    "not_a_reproduction_result"
+  ],
+  "scientific_spec": "../../spec.json",
+  "purpose": "Exercise the canonical BabyView CLIP+ pipeline end to end on the two governed videos already present on Juno.",
+  "fixed_decisions": {
+    "endpoint": "single_end_to_end_rehearsal_through_pilot_model_evaluation",
+    "input_count": 2,
+    "additional_video_downloads_authorized": false,
+    "exact_usable_subset_discrepancy": "out_of_scope_for_pilot_and_still_unresolved_for_full_reproduction",
+    "tokenizer": {
+      "type": "WordPiece",
+      "target_vocabulary_size": 2048,
+      "disposition": "pilot_only_never_promote_to_full_reproduction"
+    },
+    "preprocessing": {
+      "audio": "mono_16_kHz",
+      "transcription_model": "WhisperX_large-v2_pinned_for_pilot",
+      "word_confidence_rule": "greater_than_or_equal_to_0.50_pilot_choice",
+      "key_child_speech": "remove_KCHI_overlaps",
+      "frame_sampling": "1_fps_with_at_most_32_aligned_frames_per_utterance"
+    },
+    "split": "different_recordings_when_both_are_usable_otherwise_explicitly_leaky_engineering_only_split",
+    "vision_architecture": "DINOv2_ViT-B/14",
+    "text_architecture": "BERT-base_12x768x12",
+    "initialization": "random_for_all_pilot_learned_components",
+    "clip_plus_cycle": {
+      "contrastive_steps": 100,
+      "mlm_steps": 20,
+      "dino_steps": 10
+    },
+    "training_seed_count": 1,
+    "evaluator_calibration": "isolated_off_the_shelf_CLIP-L_then_one_frozen_pilot_checkpoint_evaluation",
+    "gpu_memory_policy": "use_the_smallest_implementation_valid_microbatch_without_changing_architecture_then_stop_and_review_if_it_does_not_fit",
+    "full_reproduction_reuse": "reuse_validated_code_and_hash_valid_preprocessing_only_never_pilot_tokenizer_or_weights"
+  },
+  "scientific_status_effect": "none",
+  "full_reproduction_recalibration_required": true
+}

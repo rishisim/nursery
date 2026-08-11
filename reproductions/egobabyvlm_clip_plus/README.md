@@ -32,7 +32,8 @@ is recorded only in `spec.json`; it must never be silently guessed.
   `BV-main` as the source cohort. Public artifacts still do not identify the
   exact approximately 863-hour usable subset, its exclusions, or the accounting
   boundary behind the separate 894-hour release total. See `PHASE1_REPORT.md`.
-  No training or media download occurred.
+  Two bounded exact-match files were transferred to governed Juno storage; no
+  bulk download or training occurred.
 - **Phase 2 — preprocessing/manifests (pending):** create the authorized 2025.1
   manifests and derived inputs under ignored roots, with provenance checks.
 - **Phase 3 — training (pending):** execute three from-scratch BabyView CLIP+
@@ -44,8 +45,21 @@ is recorded only in `spec.json`; it must never be silently guessed.
 Phase 1 is scientifically complete only when evidence identifies the exact
 paper subset and reconciles 894 hours to approximately 863 hours. A future
 inventory implementation must remain read-only and write detailed records only
-to verified governed storage; temporary audit and verification scripts are not
-retained after their immediate use.
+to verified governed storage.
+
+The frozen protocol invariants remain executable while this command succeeds
+from this directory:
+
+```sh
+python3 verify_phase0.py
+```
+
+## Two-video engineering pilot
+
+The governed two-video pilot is specified in `pilots/juno_sample/README.md`,
+with frozen decisions in `pilots/juno_sample/decision_record.json`. It is an
+end-to-end engineering rehearsal of the canonical pipeline, not a scientific
+reproduction result. It does not resolve Phase 1 or alter the full-run target.
 
 ## Data and initialization policy
 
