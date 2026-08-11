@@ -1,10 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "phase": {
-    "number": 0,
-    "name": "frozen_specification",
-    "status": "complete",
-    "completion_gate": "python3 verify_phase0.py"
+    "number": 1,
+    "name": "source_data_access_and_audit",
+    "status": "blocked_by_exact_usable_subset_evidence",
+    "completion_gate": "Exact paper inclusion subset and the 894-to-approximately-863-hour discrepancy must be evidenced; tooling completion is insufficient."
   },
   "scope": {
     "model_row": "BabyView CLIP+",
@@ -49,7 +49,63 @@
     "release": "2025.1",
     "official_page": "https://databrary.org/volume/1882",
     "access": "controlled Databrary access; authorization and participant privacy terms required",
-    "redistribution": "forbidden for raw and derived sensitive content"
+    "redistribution": "forbidden for raw and derived sensitive content",
+    "published_duration_hours": {
+      "databrary_release_metadata_reported": 894,
+      "official_babyview_analysis": 868,
+      "egobabyvlm_usable_approximate": 863,
+      "databrary_to_egobabyvlm_difference_approximate": 31,
+      "babyview_analysis_to_egobabyvlm_difference_approximate": 5,
+      "reconciliation_status": "not_reconciled"
+    }
+  },
+  "phase1_evidence": {
+    "status": "blocked_by_exact_usable_subset_evidence",
+    "aggregate_report": "PHASE1_REPORT.md",
+    "populated_ledger_trackable": false,
+    "governed_storage_available_during_audit": "yes; all controlled exports and detailed matching outputs remained in owner-only governed storage, although SSH authentication was intermittent",
+    "complete_release_inventory_assessed": false,
+    "candidate_list_provenance": {
+      "entry_count": 5566,
+      "repository_head": "94b1dffb5e9a488dc2c08a84ce7967cdcae272ab",
+      "file_commit": "59cc646e6d73a54a37e0c0820f9389f2e4737595",
+      "sha256": "0e79d853b1c78d0c0272391ba1109b3525790f5a59a8421bc4df6b2f42153d40",
+      "governed_copy_verified": true
+    },
+    "governed_match_aggregates": {
+      "candidate_entries": 5566,
+      "official_mapping_matched": 5498,
+      "official_mapping_unmatched": 68,
+      "mapped_bv_main_recordings": 4610,
+      "mapped_bv_main_hours": 868.4602,
+      "mapped_legacy_single_child_recordings": 888,
+      "mapped_legacy_single_child_hours": 69.6941,
+      "mapped_total_hours": 938.1543,
+      "mapped_present_in_current_metadata": 5456,
+      "mapped_absent_from_current_metadata": 42,
+      "exact_current_asset_filename_matches": 1639,
+      "requires_authoritative_rename_crosswalk": 3927
+    },
+    "download_workflow_probe": {
+      "rolling_browser_to_juno": "validated_one_file",
+      "zip_one_day_filter": "not_viable_no_archive_and_no_session_rows",
+      "zip_test_archive_retained": false,
+      "bulk_download_started": false
+    },
+    "api_assessment": {
+      "official_databraryr_wrapper": true,
+      "source_commit": "c91d1043658c30e52e786dbfeafafa8a42a5315e",
+      "legacy_base_url": "https://nyu.databrary.org/api",
+      "current_databrary2_base_url": "https://api.databrary.org:443",
+      "authenticated_helpers": ["download_video", "download_session_zip", "download_volume_zip"],
+      "direct_current_api_probe": "browser_or_allowed_path_denied",
+      "usable_authorized_path_confirmed": false,
+      "selection_evidence_changed": false
+    },
+    "current_blocker": "Neither public code nor authorized exports identify the exact approximately 863-hour usable subset, its record-level exclusion reasons, or the frozen release/accounting crosswalk needed to reconcile 894 hours with the official candidate mapping.",
+    "public_code_finding": "Pinned code recursively discovers supplied video files and does not publish the exact BabyView inclusion manifest or a release-to-training selection rule.",
+    "minimum_external_evidence": "Author-provided privacy-safe inclusion-manifest digest plus a governed matchable list and record-level exclusion reasons; the frozen 2025.1 Airtable export or authoritative asset rename/supersession crosswalk is also needed to reconcile release accounting.",
+    "privacy_boundary": "Detailed rows, record references, filenames, paths, and hashes remain only in governed storage; Git retains aggregate evidence only."
   },
   "storage_policy": {
     "mode": "juno_two_tier_storage",
@@ -144,6 +200,34 @@
         "kind": "deviation",
         "status": "none",
         "statement": "No deviation from the frozen target protocol is authorized in Phase 0."
+      },
+      {
+        "id": "A002",
+        "kind": "decision",
+        "status": "accepted_phase1",
+        "statement": "The approximately 31-hour discrepancy remains unexplained; no recording-level inclusion decision may be inferred from the two aggregate duration claims.",
+        "basis": "The official release and pinned EgoBabyVLM README provide aggregate hours, while the pinned code provides no exact inclusion manifest or deterministic selection rule."
+      },
+      {
+        "id": "A003",
+        "kind": "evidence_note",
+        "status": "accepted_phase1",
+        "statement": "Official BabyView project analyses describe 868 hours of release-2025.1 video, introducing a second accounting figure alongside the reported 894-hour Databrary metadata and EgoBabyVLM's approximately 863 hours.",
+        "basis": "Official BabyView project CCN 2025 materials state 3,163,675 one-Hz frames and 868 hours from release 2025.1; public sources do not define a record-level mapping among these totals."
+      },
+      {
+        "id": "A004",
+        "kind": "evidence_note",
+        "status": "accepted_phase1",
+        "statement": "The official BabyView mapping resolves the 868-hour figure to 4,610 BV-main recordings totaling 868.4602 hours, strongly supporting BV-main as the EgoBabyVLM source cohort but not proving the exact approximately 863-hour usable subset.",
+        "basis": "Governed exact matching of the 5,566-entry candidate list to the official mapping resolved 5,498 entries: 4,610 BV-main recordings (868.4602 hours) and 888 legacy single-child recordings (69.6941 hours). Public artifacts contain no record-level usable exclusion manifest."
+      },
+      {
+        "id": "A005",
+        "kind": "evidence_note",
+        "status": "accepted_phase1",
+        "statement": "The official databraryr wrapper exposes metadata and authenticated download helpers, but its inspected source targets legacy Databrary endpoints and has not been validated against the current Databrary 2 bearer-token API from governed Juno storage.",
+        "basis": "Official databraryr documentation/source and a read-only direct probe of the current API; no credentials or controlled data were handled."
       }
     ]
   },
@@ -164,7 +248,8 @@
     {"id": "U014", "variable": "Machine-DevBench exact style/subset inclusion and task file inventory for the reported row", "status": "unresolved", "blocking_phase": 4},
     {"id": "U015", "variable": "per-task scoring, subgroup weighting, tie handling, failed-example handling, and confirmation of sample-standard-deviation convention", "status": "unresolved", "blocking_phase": 4},
     {"id": "U016", "variable": "hardware topology and nondeterministic kernel controls needed to interpret run-to-run variance", "status": "unresolved", "blocking_phase": 3},
-    {"id": "U017", "variable": "unpinned VCS dependencies in the upstream lock/environment and any artifact/model-weight digests not captured by pixi.lock", "status": "unresolved", "blocking_phase": 1}
+    {"id": "U017", "variable": "unpinned VCS dependencies in the upstream lock/environment and any artifact/model-weight digests not captured by pixi.lock", "status": "unresolved", "blocking_phase": 1},
+    {"id": "U018", "variable": "exact BabyView 2025.1 release-to-paper inclusion ledger and exclusion reasons reconciling 894 hours to approximately 863 hours", "status": "unresolved", "blocking_phase": 1}
   ],
   "required_ignored_roots": [
     "logs", "caches"

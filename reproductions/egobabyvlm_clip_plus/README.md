@@ -25,11 +25,14 @@ is recorded only in `spec.json`; it must never be silently guessed.
 
 - **Phase 0 — frozen specification (complete):** official sources and immutable
   pins are recorded; scope, data policy, unresolved variables and metrics are
-  explicit; durable Juno storage is isolated from disposable worktrees;
-  `verify_phase0.py` passes.
-- **Phase 1 — source/data access and audit (pending):** obtain authorized
-  BabyView access without redistribution, inspect upstream code at the pin, and
-  resolve or formally register every blocking variable. No training.
+  explicit; durable Juno storage is isolated from disposable worktrees.
+- **Phase 1 — source/data access and audit (blocked by exact usable-subset
+  evidence):** governed matching establishes that the official 868-hour figure
+  is 4,610 `BV-main` recordings totaling 868.4602 hours, strongly supporting
+  `BV-main` as the source cohort. Public artifacts still do not identify the
+  exact approximately 863-hour usable subset, its exclusions, or the accounting
+  boundary behind the separate 894-hour release total. See `PHASE1_REPORT.md`.
+  No training or media download occurred.
 - **Phase 2 — preprocessing/manifests (pending):** create the authorized 2025.1
   manifests and derived inputs under ignored roots, with provenance checks.
 - **Phase 3 — training (pending):** execute three from-scratch BabyView CLIP+
@@ -38,11 +41,11 @@ is recorded only in `spec.json`; it must never be silently guessed.
   archive, evaluate only lexical and grammatical tasks, aggregate identically,
   and compare with the target row.
 
-Phase 0 is complete only while this command succeeds from this directory:
-
-```sh
-python3 verify_phase0.py
-```
+Phase 1 is scientifically complete only when evidence identifies the exact
+paper subset and reconciles 894 hours to approximately 863 hours. A future
+inventory implementation must remain read-only and write detailed records only
+to verified governed storage; temporary audit and verification scripts are not
+retained after their immediate use.
 
 ## Data and initialization policy
 
