@@ -189,6 +189,17 @@ pilot cannot honestly proceed to paired CLIP+ training with the fixed inputs.
 
 Retain in Git: privacy-safe aggregate preprocessing report and config hashes.
 
+P3 completed on 2026-08-12 for exactly the two governed inputs. The first
+input was intentionally stopped after its atomically completed audio stage;
+resume validated that completion and skipped the stage before executing the
+remaining path. Both inputs then completed the identical pinned VTC,
+WhisperX, one-Hz frame, normalization, pairing, and QA contract. A final
+all-two rerun produced twelve valid stage cache hits and no repeated stage
+execution. The tracked `p3_aggregate.json` contains privacy-safe totals only;
+raw and normalized text, frames, detailed manifests, checksum inventory, and
+important logs remain owner-only in governed storage. This engineering result
+does not resolve the full-corpus inventory discrepancy or start P4.
+
 ## Pilot P4 — Calibrate Machine-DevBench in isolation
 
 **Question:** Is the evaluator correct before it sees any pilot checkpoint?

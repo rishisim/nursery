@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p3_frozen_preprocessing_config",
+  "pilot_id": "juno_sample",
+  "engineering_run_id": "p3-3d96f71c",
+  "stage": "P3",
+  "classification": [
+    "engineering_only",
+    "non_comparable",
+    "not_a_reproduction_result"
+  ],
+  "input_contract": {
+    "count": 2,
+    "slots": ["input_1", "input_2"],
+    "selection": "owner_only_governed_ledger_completed_records_in_ledger_order",
+    "additional_downloads": false,
+    "inventory_status": "incomplete_inventory"
+  },
+  "storage": {
+    "resolver": "storage.py",
+    "scratch_run_subdirectory": "pilot_p3/p3-3d96f71c",
+    "scratch_cache_subdirectory": "pilot_p3",
+    "durable_record_subdirectory": "pilot_p0/p0-4cc3af23/pilot_p3",
+    "local_or_worktree_fallback": false,
+    "owner_only_required": true
+  },
+  "source": {
+    "repository": "https://github.com/facebookresearch/egobabyvlm",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "upstream_inspected_paths": [
+      "apps/data_preprocessing/frames/extract_frames.py",
+      "apps/data_preprocessing/manifests/build_manifest.py",
+      "apps/data_preprocessing/transcription/filter_with_vtc.py",
+      "apps/data_preprocessing/transcription/whisperx_transcribe.py"
+    ]
+  },
+  "audio": {
+    "sample_rate_hz": 16000,
+    "channels": 1,
+    "codec": "pcm_s16le",
+    "ffmpeg_version": "7.1.1",
+    "ffmpeg_source": "p2_canonical_pixi_lock"
+  },
+  "speaker": {
+    "tool": "VTC",
+    "code_revision": "9308411fb47f4290dfcd84338fc84bfb7f91227f",
+    "model_version": "2.2",
+    "model_revision": "6b1a95508302edc14c50f670cd9a30d66fa4f88a",
+    "uv_lock_sha256": "cf1525880c3a2e3dd502409ebd62ec6c4269d0d2da9c9e4b446d764ea09baa4e",
+    "segma_revision_from_frozen_lock": "dad876e2268799ff12671a865167126eef66c34c",
+    "checkpoint_sha256": "5c3446d037f9c6746cbe19bb77a77973354d3443556f9e2278e83cd4fe7db5a2",
+    "remove_label": "KCHI",
+    "overlap_interval": "half_open"
+  },
+  "transcription": {
+    "whisperx_version": "3.8.5",
+    "whisperx_revision": "4a6477e5e52ad516faab5363bdafbfa9840aec5e",
+    "model": "large-v2",
+    "model_revision": "f0fe81560cb8b68660e564f55dd99207059c092e",
+    "language": "en",
+    "alignment_model": "WAV2VEC2_ASR_BASE_960H",
+    "compute_type": "float16",
+    "batch_size_start": 1024,
+    "batch_size_policy": "largest_implementation_safe_not_exceeding_1024",
+    "confidence_threshold": 0.5,
+    "confidence_comparison": "word_score_greater_than_or_equal",
+    "aggregation": "utterance_text_is_space_joined_retained_words_in_source_order",
+    "empty_word_behavior": "drop_word_without_finite_score_and_drop_utterance_if_no_retained_words",
+    "preserve_raw_and_normalized": true
+  },
+  "frames": {
+    "fps": 1,
+    "timestamp_rule": "ffmpeg_fps_index_start_seconds_equals_index_minus_one",
+    "format": "jpg",
+    "source_hash_recorded": true
+  },
+  "pairing": {
+    "interval": "closed_utterance_interval",
+    "maximum_candidate_frames": 32,
+    "overflow_selection": "deterministic_linearly_spread_including_endpoints_round_half_up_deduplicated"
+  },
+  "execution": {
+    "independent_resumable_units": true,
+    "atomic_stage_writes": true,
+    "completion_key": "source_sha256_plus_p3_config_sha256_plus_tool_model_revision_sha256",
+    "valid_stage_never_rerun": true,
+    "controlled_stop_after_stage_supported": true,
+    "allowed_slots": ["input_1", "input_2", "all"]
+  },
+  "weight_boundary": {
+    "namespace": "p2_preprocessing_only_not_learned_initialization",
+    "referenceable_by_learned_initialization": false,
+    "training_or_optimization": false
+  },
+  "scientific_status_effect": "none",
+  "full_corpus_discrepancy": "unresolved_and_out_of_scope",
+  "next_stage_started": false
+}
