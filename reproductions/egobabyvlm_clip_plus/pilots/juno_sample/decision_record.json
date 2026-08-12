@@ -2,7 +2,7 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "status": "p1_complete",
+  "status": "p2_complete",
   "classification": [
     "engineering_only",
     "non_comparable",
@@ -73,6 +73,24 @@
       "tracked_aggregate_privacy_safe"
     ],
     "next_stage": "P2",
+    "next_stage_started": true
+  },
+  "p2_completion": {
+    "stage": "P2",
+    "completed_on": "2026-08-11",
+    "aggregate_record": "p2_aggregate.json",
+    "environment_config": "../../pilot_p2_config.json",
+    "gates": [
+      "juno_owner_and_mode_verification_passed",
+      "pinned_upstream_lock_resolved_without_modification",
+      "real_dinov2_vit_base_patch14_constructed_from_random_initialization",
+      "real_bert_base_12x768x12_constructed_from_random_initialization",
+      "external_learned_initialization_and_network_fallback_rejected",
+      "preprocessing_only_assets_isolated_and_checksum_pinned",
+      "detailed_record_and_log_owner_only_in_governed_durable_storage",
+      "tracked_aggregate_privacy_safe"
+    ],
+    "next_stage": "P3",
     "next_stage_started": false
   }
 }

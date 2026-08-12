@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p2_environment_and_weight_boundary_config",
+  "pilot_id": "juno_sample",
+  "engineering_run_id": "p2-7e49c8a1",
+  "stage": "P2",
+  "classification": [
+    "engineering_only",
+    "non_comparable",
+    "not_a_reproduction_result"
+  ],
+  "source": {
+    "repository": "https://github.com/facebookresearch/egobabyvlm",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "required_files": {
+      "pixi.toml": "fddc6cc39aef37a1bab825fcc6eca13cb132218eb6b408c3cb2f9cefba87099b",
+      "pixi.lock": "360c372997ea7f9ba89abcf87796e57ebcd2fdbc9734489666120073752e7244",
+      "apps/baselines/clip/modeling/vision_encoder.py": "6bbc68276a8144225f812c271d634d5b29b21d5c54b57ed3fb5bd5ac8deea832",
+      "apps/baselines/clip/modeling/text_encoder.py": "a91543b66446bada64e2fe6e4688d978a3bcb6081e4d0cd8ed87e8ac0747fa0c",
+      "apps/baselines/clip/configs/vision_encoder/random_vit_b14.yaml": "3bf7b13136655f42b3797e2cd6e768f1a8cd55d68e1935e651a397ab4f08f843",
+      "apps/baselines/clip/configs/text_encoder/bert_base.yaml": "4281dcbce48a5c0daf041c05beef65ad858a91cfccf6cd399b49e2374499e3ec",
+      "apps/baselines/dinov2/third_party/dinov2/models/vision_transformer.py": "8dc1e2ededd4893a335aa2f524c15554bcdb14d824e310ca3df825e16081a268",
+      "apps/baselines/dinov2/third_party/dinov2/configs/ssl_default_config.yaml": "e9bd403ecddf727d7ad2c53283e57125367650ff1287b7d13221838f36882045",
+      "apps/baselines/dinov2/third_party/dinov2/configs/train/vitb14_babyview.yaml": "ce591773551d2286ee114d4762361d971a839dcccc10db1d201fb81d8815eac1",
+      "apps/data_preprocessing/transcription/whisperx_transcribe.py": "5a9c84ba8ffd1a31942c1a1a05db682030cae8ac5f24685c277eb8835078e2ce",
+      "apps/data_preprocessing/transcription/filter_with_vtc.py": "2c624663fc793a5d91c0ce467fddff373b58331b21cc086ac80bd1c8eee96e90"
+    }
+  },
+  "environment": {
+    "platform": "linux-64",
+    "python": "3.12.*",
+    "cuda_contract": "12.6",
+    "torch": "2.8.0",
+    "torchvision": "0.23.0",
+    "transformers": "4.57.6",
+    "resolved_lock_note": "The immutable upstream lock resolves torch 2.8.0+cu128 while torchvision resolves 0.23.0+cu126; P2 records this upstream lock result and does not create a replacement environment protocol.",
+    "pixi": {
+      "version": "0.70.0",
+      "artifact_sha256": "23cb0b727b187a7c57aafe9456a76272bdbff30372be6e6f72187df948ad89df"
+    },
+    "resolved_vcs_revisions": {
+      "facebookresearch/stopes": "e582066bc542caddbef12aa4b008610bbafc4ba1",
+      "babylm/evaluation-pipeline-2023": "17b3806376fa90c24653efe0c6c571adfb6a72c7",
+      "bigscience-workshop/promptsource": "e3a22e09d0131a6ca6810ad8684c59eab3ede13d",
+      "huggingface/accelerate": "29e03d185d6c4608472b3b866964c8942c2fa4a3"
+    },
+    "creation_command": "PIXI_HOME=<storage.py scratch caches>/p2_pixi <storage.py scratch caches>/p2_tools/pixi-0.70.0/pixi install --locked --environment default",
+    "activation_command": "<storage.py scratch caches>/p2_tools/pixi-0.70.0/pixi run --manifest-path <storage.py scratch caches>/p2_source/egobabyvlm/pixi.toml --environment default -- <command>",
+    "p1_ffprobe_cache_reused": false
+  },
+  "learned_initialization": {
+    "policy": "explicit_config_random_only",
+    "external_pretrained_allowed": false,
+    "network_allowed_during_construction": false,
+    "checkpoint_paths_allowed": false,
+    "hugging_face_model_names_allowed": false,
+    "from_pretrained_allowed": false,
+    "torch_hub_allowed": false
+  },
+  "architectures": {
+    "vision": {
+      "family": "DINOv2",
+      "arch": "vit_base",
+      "image_size": 224,
+      "patch_size": 14,
+      "hidden_size": 768,
+      "layers": 12,
+      "attention_heads": 12,
+      "mlp_ratio": 4,
+      "register_tokens": 0
+    },
+    "text": {
+      "family": "BERT",
+      "vocab_size": 2048,
+      "hidden_size": 768,
+      "layers": 12,
+      "attention_heads": 12,
+      "intermediate_size": 3072,
+      "max_position_embeddings": 512,
+      "type_vocab_size": 2,
+      "pooling_layer": false
+    }
+  },
+  "preprocessing_only": {
+    "namespace": "p2_preprocessing_only_not_learned_initialization",
+    "referenceable_by_learned_initialization": false,
+    "ffmpeg": {
+      "version": "7.1.1",
+      "source": "pinned_upstream_pixi_lock"
+    },
+    "whisperx": {
+      "version": "3.8.5",
+      "source_revision": "4a6477e5e52ad516faab5363bdafbfa9840aec5e",
+      "model": "large-v2",
+      "model_repository": "Systran/faster-whisper-large-v2",
+      "model_revision": "f0fe81560cb8b68660e564f55dd99207059c092e",
+      "model_artifact_digests": {
+        "config.json": "d86b7a7664a12559d644aa210a32ce9a7e03913e794b7ea4fb7182de69e273a7",
+        "model.bin": "bf2a9746382e1aa7ffff6b3a0d137ed9edbd9670c3b87e5d35f5e85e70d0333a",
+        "tokenizer.json": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab",
+        "vocabulary.txt": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913"
+      },
+      "bundled_vad_sha256": "0b5b3216d60a2d32fc086b47ea8c67589aaeb26b7e07fcbe620d6d0b83e209ea",
+      "english_alignment_model": "WAV2VEC2_ASR_BASE_960H",
+      "english_alignment_sha256": "488fd4f16de84438ffc945334278c1b9fb9b7159a806c1080b16111a958c945d"
+    },
+    "vtc": {
+      "repository": "https://github.com/LAAC-LSCP/VTC",
+      "revision": "9308411fb47f4290dfcd84338fc84bfb7f91227f",
+      "model_version": "2.2",
+      "model_repository": "coml/VTC-2",
+      "model_revision": "6b1a95508302edc14c50f670cd9a30d66fa4f88a",
+      "checkpoint_sha256": "5c3446d037f9c6746cbe19bb77a77973354d3443556f9e2278e83cd4fe7db5a2",
+      "config_sha256": "e2110e032aa6ce6ebfb8c86c39aa7e3c013ad9a77ff67938ad30d9c36ff9b07f",
+      "authentication_required": false
+    }
+  },
+  "storage": {
+    "resolver": "storage.py",
+    "scratch_cache_subdirectories": [
+      "p2_tools",
+      "p2_pixi",
+      "p2_runtime_cache",
+      "p2_source",
+      "p2_preprocessing_only_not_learned_initialization"
+    ],
+    "scratch_run_subdirectory": "pilot_p2",
+    "durable_record_subdirectory": "pilot_p2",
+    "local_or_worktree_fallback": false
+  },
+  "forbidden_actions": [
+    "media_access",
+    "audio_or_frame_extraction",
+    "preprocessing_execution",
+    "evaluation_data_access",
+    "training_or_optimization",
+    "checkpoint_creation",
+    "p3_or_later"
+  ]
+}
