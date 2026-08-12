@@ -8,9 +8,9 @@ import json
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 SPEC_PATH = ROOT / "spec.json"
-CONFIG_PATH = ROOT / "pilot_config.json"
+CONFIG_PATH = ROOT / "configs" / "pilot.json"
 DECISION_PATH = ROOT / "pilots" / "juno_sample" / "decision_record.json"
 EXPECTED_COMMIT = "224621caf0628270b6115845ac75a65b984234a3"
 EXPECTED_CLASSIFICATION = [

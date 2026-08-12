@@ -9,7 +9,7 @@ import subprocess
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 SPEC_PATH = ROOT / "spec.json"
 PILOT_DECISION_PATH = ROOT / "pilots" / "juno_sample" / "decision_record.json"
 EXPECTED_COMMIT = "224621caf0628270b6115845ac75a65b984234a3"

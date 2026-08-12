@@ -44,7 +44,7 @@ ffprobe=$("$pixi" run --manifest-path "$source_root/pixi.toml" --environment def
 test -x "$ffmpeg"; test -x "$ffprobe"
 
 args=(
-  --config "$P3_CODE_ROOT/pilot_p3_config.json"
+  --config "$P3_CODE_ROOT/configs/pilot_p3.json"
   --ledger "$P3_LEDGER"
   --media-root "$P3_MEDIA_ROOT"
   --scratch-root "$P3_SCRATCH_ROOT"
@@ -54,7 +54,7 @@ args=(
   --ffprobe "$ffprobe"
   --vtc-python "$vtc_python"
   --vtc-script "$vtc_root/scripts/infer.py"
-  --vtc-runner "$P3_CODE_ROOT/pilot_p3_vtc_runner.py"
+  --vtc-runner "$P3_CODE_ROOT/scripts/pilot_p3_vtc_runner.py"
   --vtc-root "$vtc_root"
   --vtc-config "$preprocess_root/vtc_2_2/model/config.toml"
   --vtc-checkpoint "$preprocess_root/vtc_2_2/model/best.ckpt"
@@ -68,4 +68,4 @@ args=(
 if [[ -n "${P3_STOP_AFTER:-}" ]]; then args+=(--stop-after "$P3_STOP_AFTER"); fi
 
 "$pixi" run --manifest-path "$source_root/pixi.toml" --environment default -- \
-  python "$P3_CODE_ROOT/pilot_p3.py" "${args[@]}"
+  python "$P3_CODE_ROOT/scripts/pilot_p3.py" "${args[@]}"

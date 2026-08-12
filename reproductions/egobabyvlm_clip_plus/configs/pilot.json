@@ -137,7 +137,7 @@
   },
   "p2": {
     "status": "p2_complete",
-    "canonical_environment_config": "pilot_p2_config.json",
+    "canonical_environment_config": "configs/pilot_p2.json",
     "aggregate_record": "pilots/juno_sample/p2_aggregate.json",
     "learned_initialization": "explicit_config_random_only",
     "next_stage": "P3",
@@ -145,7 +145,7 @@
   },
   "p3": {
     "status": "p3_complete",
-    "canonical_preprocessing_config": "pilot_p3_config.json",
+    "canonical_preprocessing_config": "configs/pilot_p3.json",
     "aggregate_record": "pilots/juno_sample/p3_aggregate.json",
     "inventory_status": "incomplete_inventory",
     "next_stage": "P4",

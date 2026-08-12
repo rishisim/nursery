@@ -66,13 +66,13 @@ Work:
 
 Gate:
 
-- `verify_phase0.py` passes.
+- `../../tests/verify_phase0.py` passes.
 - `decision_record.json` is valid and agrees with the resolved pilot config.
 - No scientific target or unresolved variable is changed.
 
 Retain in Git: frozen pilot config and decision record only.
 
-P0 uses `../../pilot_config.json` as the single canonical machine-readable
+P0 uses `../../configs/pilot.json` as the single canonical machine-readable
 configuration. Its two input slots are resolved at execution only through
 opaque keys in the governed ledger; no record key, filename, or governed path
 is frozen in Git. The fixed seed is a deterministic engineering seed for this
@@ -148,9 +148,9 @@ The upstream lock has a reproducible internal CUDA detail worth preserving: its
 system contract says CUDA 12.6 and torchvision resolves to cu126, while its
 locked torch wheel resolves CUDA 12.8 runtime packages. P2 records that exact
 upstream result and does not create a replacement environment protocol.
-`../../pilot_p2_config.json` is the canonical safe environment/boundary config,
-`../../pilot_p2_preflight.py` is the construction preflight, and
-`../../pilot_p2_juno_job.sh` is the canonical GPU job entry point. The tracked
+`../../configs/pilot_p2.json` is the canonical safe environment/boundary config,
+`../../scripts/pilot_p2_preflight.py` is the construction preflight, and
+`../../scripts/pilot_p2_juno_job.sh` is the canonical GPU job entry point. The tracked
 aggregate is `p2_aggregate.json`; the detailed record and log remain owner-only
 in durable governed storage. P3 or later has not started.
 

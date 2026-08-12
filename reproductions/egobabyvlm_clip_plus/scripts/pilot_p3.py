@@ -458,7 +458,7 @@ def aggregate_results(results, config, detail_path, log_path=None):
         "stage": "P3", "status": "p3_complete" if passed else "p3_incomplete",
         "classification": LABELS, "scientific_status_effect": "none",
         "inventory_status": "incomplete_inventory", "input_count": len(results),
-        "provenance": {"p3_config_sha256": sha256_file(Path(__file__).with_name("pilot_p3_config.json")),
+        "provenance": {"p3_config_sha256": sha256_file(Path(__file__).parent.parent / "configs" / "pilot_p3.json"),
                        "upstream_commit": config["source"]["commit"],
                        "tool_model_revision_sha256": tool_revision_hash(config)},
         "aggregate_total_source_hours": round(total_duration / 3600, 6),

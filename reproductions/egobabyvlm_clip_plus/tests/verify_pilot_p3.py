@@ -11,8 +11,8 @@ import tempfile
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent
-CONFIG = ROOT / "pilot_p3_config.json"
+ROOT = Path(__file__).resolve().parent.parent
+CONFIG = ROOT / "configs" / "pilot_p3.json"
 AGGREGATE = ROOT / "pilots" / "juno_sample" / "p3_aggregate.json"
 EXPECTED_LABELS = ["engineering_only", "non_comparable", "not_a_reproduction_result"]
 
@@ -23,7 +23,7 @@ def require(value, message):
 
 
 def load_p3():
-    spec = importlib.util.spec_from_file_location("pilot_p3", ROOT / "pilot_p3.py")
+    spec = importlib.util.spec_from_file_location("pilot_p3", ROOT / "scripts" / "pilot_p3.py")
     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
     return module
 
