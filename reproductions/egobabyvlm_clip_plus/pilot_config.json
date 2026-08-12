@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "pilot_id": "juno_sample",
+  "engineering_run_id": "p0-4cc3af23",
+  "pilot_stage": "P0",
+  "classification": [
+    "engineering_only",
+    "non_comparable",
+    "not_a_reproduction_result"
+  ],
+  "scientific_spec": "spec.json",
+  "scientific_status_effect": "none",
+  "source": {
+    "repository": "https://github.com/facebookresearch/egobabyvlm",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "inspection": "read_only_local_checkout",
+    "pilot_schedule_is_scientific_default": false,
+    "inspected_configuration": [
+      {
+        "path": "apps/baselines/clip/configs/model/default.yaml",
+        "sha256": "6e56528dc1904472123f0d70ee23923fac71b9573a564fbcf0f2e2888dbd42f7"
+      },
+      {
+        "path": "apps/baselines/clip/configs/mode/triple.yaml",
+        "sha256": "3c229347cb8563e4adbdc003c90eacf8bfeef4edd12a9a0880f344a77209505a"
+      },
+      {
+        "path": "apps/baselines/clip/configs/text_encoder/bert_base.yaml",
+        "sha256": "4281dcbce48a5c0daf041c05beef65ad858a91cfccf6cd399b49e2374499e3ec"
+      },
+      {
+        "path": "apps/baselines/clip/configs/vision_encoder/random_vit_b14.yaml",
+        "sha256": "3bf7b13136655f42b3797e2cd6e768f1a8cd55d68e1935e651a397ab4f08f843"
+      },
+      {
+        "path": "apps/baselines/clip/configs/dinov2/vitb14_coco.yaml",
+        "sha256": "c58f9c8f1e2758896833aa7ff5035ccffe6c7271e36f8b03b7045806d5def550"
+      },
+      {
+        "path": "apps/baselines/dinov2/third_party/dinov2/configs/train/vitb14_babyview.yaml",
+        "sha256": "ce591773551d2286ee114d4762361d971a839dcccc10db1d201fb81d8815eac1"
+      }
+    ],
+    "pilot_overrides": [
+      "exact_100_contrastive_20_mlm_10_dino_ibot_single_cycle",
+      "pilot_only_wordpiece_vocabulary_size_2048",
+      "single_deterministic_engineering_seed"
+    ]
+  },
+  "inputs": {
+    "count": 2,
+    "selection": "exactly_the_two_already_governed_records",
+    "execution_references": [
+      {
+        "slot": "input_1",
+        "addressing": "opaque_governed_ledger_key_required_at_execution"
+      },
+      {
+        "slot": "input_2",
+        "addressing": "opaque_governed_ledger_key_required_at_execution"
+      }
+    ],
+    "filenames_paths_and_dataset_identifiers_forbidden": true,
+    "additional_downloads": false
+  },
+  "engineering_seed": {
+    "value": 1287892771,
+    "scientific_seed": false,
+    "derivation": "uint32_be_first_4_bytes_of_sha256('egobabyvlm_clip_plus:juno_sample:P0:engineering_seed')_mod_2^31",
+    "purpose": "fixed_single_engineering_rehearsal_only"
+  },
+  "tokenizer": {
+    "type": "WordPiece",
+    "vocabulary_size": 2048,
+    "pilot_only": true
+  },
+  "model": {
+    "vision": "DINOv2_ViT-B/14",
+    "text": "BERT-base_12x768x12",
+    "learned_component_initialization": "random_for_every_learned_pilot_component"
+  },
+  "preprocessing": {
+    "audio": "mono_16_kHz",
+    "transcription_model": "WhisperX_large-v2_pinned_for_pilot",
+    "word_confidence_rule": "greater_than_or_equal_to_0.50_pilot_choice",
+    "key_child_speech": "remove_KCHI_overlaps",
+    "frame_sampling": "1_fps_with_at_most_32_aligned_frames_per_utterance"
+  },
+  "clip_plus_cycle": {
+    "order": [
+      "contrastive",
+      "mlm",
+      "dino_ibot"
+    ],
+    "steps": {
+      "contrastive": 100,
+      "mlm": 20,
+      "dino_ibot": 10
+    },
+    "total_steps": 130,
+    "cycles": 1
+  },
+  "evaluation": {
+    "calibration": "isolated_off_the_shelf_CLIP-L",
+    "pilot_model_evaluations_after_calibration": 1,
+    "checkpoint_selection_uses_benchmark_feedback": false
+  },
+  "split": {
+    "preferred": "recording_level_when_both_records_yield_usable_pairs",
+    "fallback": "explicitly_leaky_engineering_only_when_only_one_record_yields_usable_pairs"
+  },
+  "storage": {
+    "resolver": "storage.py",
+    "durable": {
+      "root_command": ["python3", "storage.py", "root", "durable"],
+      "retained_subdirectories": ["run_records", "decision_reports"]
+    },
+    "scratch": {
+      "root_command": ["python3", "storage.py", "root", "scratch"],
+      "working_subdirectories": ["derived_data", "evaluation_data", "runs", "outputs", "caches"]
+    },
+    "local_or_worktree_fallback": false,
+    "juno_owner_mode_check_required_before_restricted_access": true
+  },
+  "gpu_memory_policy": {
+    "action": "use_smallest_implementation_valid_microbatch_then_stop_and_review_if_it_does_not_fit",
+    "architecture_changes_automatic": false,
+    "later_stage_continuation_after_failure": false
+  },
+  "full_corpus_discrepancy": "unresolved_and_out_of_scope",
+  "expected_retained_p0_record": {
+    "location": "pilots/juno_sample/decision_record.json",
+    "privacy_safe_fields": [
+      "pilot_id",
+      "engineering_run_id",
+      "status",
+      "classification",
+      "canonical_config",
+      "scientific_status_effect",
+      "p0_completion"
+    ],
+    "forbidden_content": [
+      "data_identifiers",
+      "media_filenames",
+      "governed_paths",
+      "media_or_derived_content",
+      "model_weights",
+      "predictions"
+    ]
+  }
+}

@@ -72,6 +72,13 @@ Gate:
 
 Retain in Git: frozen pilot config and decision record only.
 
+P0 uses `../../pilot_config.json` as the single canonical machine-readable
+configuration. Its two input slots are resolved at execution only through
+opaque keys in the governed ledger; no record key, filename, or governed path
+is frozen in Git. The fixed seed is a deterministic engineering seed for this
+single rehearsal, not one of the scientific reproduction seeds. P0 completion
+does not start P1, access either input, or change the blocked scientific status.
+
 ## Pilot P1 — Verify Juno and audit the two inputs
 
 **Question:** Can both governed videos safely support the intended data paths?
