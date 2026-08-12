@@ -2,7 +2,7 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "pilot_stage": "P0",
+  "pilot_stage": "P1",
   "classification": [
     "engineering_only",
     "non_comparable",
@@ -128,6 +128,13 @@
     "later_stage_continuation_after_failure": false
   },
   "full_corpus_discrepancy": "unresolved_and_out_of_scope",
+  "p1": {
+    "status": "p1_complete",
+    "aggregate_record": "pilots/juno_sample/p1_aggregate.json",
+    "inventory_status": "incomplete_inventory",
+    "next_stage": "P2",
+    "next_stage_started": false
+  },
   "expected_retained_p0_record": {
     "location": "pilots/juno_sample/decision_record.json",
     "privacy_safe_fields": [

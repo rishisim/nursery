@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p1_privacy_safe_aggregate",
+  "pilot_id": "juno_sample",
+  "engineering_run_id": "p0-4cc3af23",
+  "stage": "P1",
+  "status": "p1_complete",
+  "classification": [
+    "engineering_only",
+    "non_comparable",
+    "not_a_reproduction_result"
+  ],
+  "scientific_status_effect": "none",
+  "inventory_status": "incomplete_inventory",
+  "sample_scope": "two_video_engineering_sample_not_full_release_ledger",
+  "input_count": 2,
+  "verification": {
+    "juno_owner_mode_check_passed": true,
+    "byte_count_consistent_count": 2,
+    "sha256_consistent_count": 2,
+    "video_decodable_count": 2,
+    "usable_audio_count": 2
+  },
+  "aggregate_total_duration_seconds": 683.516167,
+  "aggregate_categories": {
+    "containers": ["mov,mp4,m4a,3gp,3g2,mj2"],
+    "video_codecs": ["h264"],
+    "frame_rates": ["30000/1001"],
+    "dimensions": ["1080x1920", "2160x3840"],
+    "audio_codecs": ["aac"],
+    "audio_sample_rates": [48000],
+    "audio_channel_counts": [2]
+  },
+  "ffprobe_version": "ffprobe version n8.1.2-34-g9b6c8969e0-20260811 Copyright (c) 2007-2026 the FFmpeg developers",
+  "tool_provenance": {
+    "source_repository": "BtbN/FFmpeg-Builds",
+    "release_tag": "autobuild-2026-08-11-13-11",
+    "asset_name": "ffmpeg-n8.1.2-34-g9b6c8969e0-linux64-lgpl-8.1.tar.xz",
+    "asset_sha256": "2e1e71f7eb1ea34d80dff8c3dbd34dfa03df64c0a84a94b22198dc7a83f1e714",
+    "asset_size_bytes": 112259680,
+    "platform": "linux-x86_64",
+    "license_variant": "lgpl",
+    "ffprobe_sha256": "f963e3bc239c269d0445c35ecca15101545d575cb6970db9476fe79a2b3fcdf5",
+    "ffprobe_version": "ffprobe version n8.1.2-34-g9b6c8969e0-20260811 Copyright (c) 2007-2026 the FFmpeg developers"
+  },
+  "governed_detailed_record": {
+    "opaque_run_id": "p0-4cc3af23",
+    "sha256": "ba335766ec50199d5735d4d5d28389fb95b2f615f68ba5fe69eb897e4bbb9adc",
+    "owner_only": true
+  },
+  "p1_gate": {
+    "passed": true,
+    "stop_reason": null
+  },
+  "p0_status_preserved": true,
+  "full_corpus_discrepancy": "unresolved_and_out_of_scope",
+  "later_stage_started": false
+}

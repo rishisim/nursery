@@ -103,6 +103,14 @@ Gate:
 
 Retain in Git: aggregate counts and an opaque governed-record checksum only.
 
+P1 completed on 2026-08-11 for the fixed two-video engineering sample. Both
+governed transfers remained byte- and checksum-consistent, both videos were
+decodable, and the sample contains usable audio. The inventory remains
+`incomplete_inventory`; this result does not represent the full release ledger
+or change the blocked scientific reproduction status. Detailed rows remain in
+owner-only durable Juno storage. The exact next gate is P2 environment and
+learned-weight-boundary verification; P2 has not started.
+
 ## Pilot P2 — Pin the executable environment and weight boundary
 
 **Question:** Can the real model shapes be constructed without contaminating

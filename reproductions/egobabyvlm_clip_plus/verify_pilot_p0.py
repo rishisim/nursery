@@ -47,8 +47,9 @@ def main() -> None:
     require(config["pilot_id"] == decision["pilot_id"] == "juno_sample", "pilot IDs disagree")
     require(config["engineering_run_id"] == decision["engineering_run_id"] == "p0-4cc3af23",
             "opaque engineering run IDs disagree")
-    require(decision["status"] == "p0_complete", "P0 status is not complete")
-    require(config["pilot_stage"] == decision["p0_completion"]["stage"] == "P0", "stage disagrees")
+    require(decision["status"] in {"p0_complete", "p1_complete"}, "P0 status is not preserved")
+    require(config["pilot_stage"] in {"P0", "P1"}, "unexpected pilot stage")
+    require(decision["p0_completion"]["stage"] == "P0", "P0 completion stage disagrees")
     require(decision["p0_completion"]["next_stage_started"] is False, "later pilot stage started")
     require(config["classification"] == decision["classification"] == EXPECTED_CLASSIFICATION,
             "classification labels disagree")
