@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p2_privacy_safe_aggregate",
+  "pilot_id": "juno_sample",
+  "engineering_run_id": "p2-7e49c8a1",
+  "stage": "P2",
+  "status": "p2_complete",
+  "classification": [
+    "engineering_only",
+    "non_comparable",
+    "not_a_reproduction_result"
+  ],
+  "scientific_status_effect": "none",
+  "inventory_status": "incomplete_inventory",
+  "environment": {
+    "os": "Rocky Linux 9.5",
+    "kernel": "5.14.0-503.40.1.el9_5.x86_64",
+    "platform": "linux-64",
+    "python": "3.12.13",
+    "cuda_contract": "12.6",
+    "resolved_torch_cuda_runtime": "12.8",
+    "gpu_driver": "550.163.01",
+    "torch": "2.8.0+cu128",
+    "torchvision": "0.23.0+cu126",
+    "transformers": "4.57.6",
+    "gpu_model": "NVIDIA A30 MIG 2g.12gb",
+    "gpu_count_used": 1,
+    "upstream_lock_resolved_without_modification": true,
+    "upstream_lock_cuda_note": "The immutable upstream lock resolves torch with CUDA 12.8 runtime packages despite its CUDA 12.6 system contract and cu126 torchvision; no replacement environment protocol was created."
+  },
+  "provenance": {
+    "upstream_commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "pixi_toml_sha256": "fddc6cc39aef37a1bab825fcc6eca13cb132218eb6b408c3cb2f9cefba87099b",
+    "pixi_lock_sha256": "360c372997ea7f9ba89abcf87796e57ebcd2fdbc9734489666120073752e7244",
+    "p2_config_sha256": "6ea63d53980c818956da8899572f36b143e9fb6c14fc0bd211416468e25f14a3",
+    "pixi_version": "0.70.0",
+    "pixi_artifact_sha256": "23cb0b727b187a7c57aafe9456a76272bdbff30372be6e6f72187df948ad89df",
+    "unpinned_vcs_revisions_resolved_count": 4
+  },
+  "weight_boundary": {
+    "learned_initialization": "explicit_config_random_only",
+    "external_pretrained_allowed": false,
+    "hugging_face_model_names_allowed": false,
+    "from_pretrained_allowed": false,
+    "torch_hub_allowed": false,
+    "learned_checkpoint_paths_allowed": false,
+    "network_allowed_during_construction": false,
+    "runtime_guards_installed": true,
+    "preprocessing_namespace_isolated": true,
+    "checkpoint_loaded": false,
+    "network_fallback_used": false
+  },
+  "construction": {
+    "vision": {
+      "architecture": "DINOv2_ViT-B/14",
+      "hidden_size": 768,
+      "layers": 12,
+      "attention_heads": 12,
+      "parameter_count": 85737984,
+      "constructed": true
+    },
+    "text": {
+      "architecture": "BERT-base_12x768x12",
+      "vocabulary_size": 2048,
+      "hidden_size": 768,
+      "layers": 12,
+      "attention_heads": 12,
+      "parameter_count": 87023616,
+      "constructed": true
+    },
+    "checkpoint_created": false,
+    "training_step_executed": false
+  },
+  "preprocessing_only_provenance": {
+    "ffmpeg_version": "7.1.1",
+    "whisperx_version": "3.8.5",
+    "whisper_model_revision": "f0fe81560cb8b68660e564f55dd99207059c092e",
+    "whisper_model_artifact_count": 4,
+    "alignment_and_vad_artifact_count": 2,
+    "vtc_code_revision": "9308411fb47f4290dfcd84338fc84bfb7f91227f",
+    "vtc_model_revision": "6b1a95508302edc14c50f670cd9a30d66fa4f88a",
+    "vtc_checkpoint_sha256": "5c3446d037f9c6746cbe19bb77a77973354d3443556f9e2278e83cd4fe7db5a2",
+    "authentication_blocker": null,
+    "preprocessing_executed": false
+  },
+  "governed_detailed_record": {
+    "opaque_run_id": "p2-7e49c8a1",
+    "sha256": "80cdf4d873fb50454e6842d65487df540539e81e389bcf5cd7005e4e6600057a",
+    "log_sha256": "8d9405b662eec7f8b7313a346257be74184b8655a153d12f90853286a82c579a",
+    "owner_only": true
+  },
+  "p2_gate": {
+    "passed": true,
+    "stop_reason": null
+  },
+  "p0_status_preserved": true,
+  "p1_status_preserved": true,
+  "full_corpus_discrepancy": "unresolved_and_out_of_scope",
+  "next_stage": "P3",
+  "next_stage_started": false
+}

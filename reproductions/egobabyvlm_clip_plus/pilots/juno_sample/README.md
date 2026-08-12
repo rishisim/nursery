@@ -108,8 +108,8 @@ governed transfers remained byte- and checksum-consistent, both videos were
 decodable, and the sample contains usable audio. The inventory remains
 `incomplete_inventory`; this result does not represent the full release ledger
 or change the blocked scientific reproduction status. Detailed rows remain in
-owner-only durable Juno storage. The exact next gate is P2 environment and
-learned-weight-boundary verification; P2 has not started.
+owner-only durable Juno storage. P2 subsequently verified the environment and
+learned-weight boundary without accessing either input.
 
 ## Pilot P2 — Pin the executable environment and weight boundary
 
@@ -134,6 +134,25 @@ Gate:
 - The permitted preprocessing-model boundary is explicit and checksum-recorded.
 
 Retain in Git: non-sensitive resolved configuration and dependency digests.
+
+P2 completed on 2026-08-11 in a one-GPU Juno allocation. The immutable upstream
+Pixi lock resolved without modification, and the real DINOv2 ViT-B/14 and
+BERT-base 12x768x12 shapes constructed from explicit configuration and random
+initialization. Runtime guards rejected Hugging Face model-name/from-pretrained,
+torch.hub, checkpoint-path, and network fallback for learned initialization.
+No checkpoint or training step was created. FFmpeg, WhisperX large-v2, its VAD
+and English alignment artifacts, and VTC 2.2 were revision/checksum-pinned in a
+separate preprocessing-only namespace and were not executed.
+
+The upstream lock has a reproducible internal CUDA detail worth preserving: its
+system contract says CUDA 12.6 and torchvision resolves to cu126, while its
+locked torch wheel resolves CUDA 12.8 runtime packages. P2 records that exact
+upstream result and does not create a replacement environment protocol.
+`../../pilot_p2_config.json` is the canonical safe environment/boundary config,
+`../../pilot_p2_preflight.py` is the construction preflight, and
+`../../pilot_p2_juno_job.sh` is the canonical GPU job entry point. The tracked
+aggregate is `p2_aggregate.json`; the detailed record and log remain owner-only
+in durable governed storage. P3 or later has not started.
 
 ## Pilot P3 — Preprocess one video, then both
 
