@@ -1,0 +1,86 @@
+{
+  "aggregate_total_source_hours": 0.189849,
+  "batch": {
+    "largest_implementation_safe": 1024,
+    "lower_value_is_engineering_only_deviation": true,
+    "paper_target": 1024
+  },
+  "classification": [
+    "engineering_only",
+    "non_comparable",
+    "not_a_reproduction_result"
+  ],
+  "counts": {
+    "confidence_filtered_words": 426,
+    "empty_after_filter_utterances": 30,
+    "empty_score_words": 0,
+    "frames": 684,
+    "kchi_removed_segments": 26,
+    "paired_frame_references": 194,
+    "paired_records": 81,
+    "raw_segments": 155,
+    "retained_utterances": 99,
+    "retained_words": 228,
+    "speech_segments": 296
+  },
+  "engineering_run_id": "p3-3d96f71c",
+  "failures": {
+    "reason_categories": [],
+    "retry_count": 0
+  },
+  "full_corpus_discrepancy": "unresolved_and_out_of_scope",
+  "governed_detailed_record": {
+    "log_sha256": "70118f8fb57c7be8e1668a278a24397e8d594357ee52ad3592b061ebf7ea689a",
+    "opaque_run_id": "p3-3d96f71c",
+    "owner_only": true,
+    "sha256": "6ce74e678429522037ee49fb8c1d6877c57928e2c465087ff06a13eeaa3555d3"
+  },
+  "input_count": 2,
+  "inventory_status": "incomplete_inventory",
+  "kchi_removed_duration_seconds": 97.671,
+  "next_stage_started": false,
+  "p0_status_preserved": true,
+  "p1_status_preserved": true,
+  "p2_status_preserved": true,
+  "p3_gate": {
+    "passed": true,
+    "stop_reason": null
+  },
+  "pilot_id": "juno_sample",
+  "provenance": {
+    "p3_config_sha256": "6fd9e8ff73f1a94887334ac9ee2e19b1242312b73b77b2f89258f1910a5bec51",
+    "tool_model_revision_sha256": "b5ab361b367254520ce4f9790d7a21cee57ca05da1382b9dd79ca8e7dc5ca918",
+    "upstream_commit": "224621caf0628270b6115845ac75a65b984234a3"
+  },
+  "record_type": "pilot_p3_privacy_safe_aggregate",
+  "resources": {
+    "peak_cpu_ram_kb": 2310588,
+    "peak_gpu_memory_bytes": 787130880
+  },
+  "resume": {
+    "controlled_interruption_tested": true,
+    "idempotent_rerun_passed": true,
+    "stage_cache_hits": 12,
+    "stages_executed": 0
+  },
+  "schema_version": 1,
+  "scientific_status_effect": "none",
+  "stage": "P3",
+  "status": "p3_complete",
+  "storage_bytes": {
+    "audio": 21870748,
+    "frames": 86060330
+  },
+  "verification": {
+    "audio_contract_count": 2,
+    "counts_reconciled": true,
+    "qa_passed_count": 2,
+    "source_integrity_count": 2
+  },
+  "wall_seconds_per_video_hour": {
+    "audio_wall_seconds": 3.64,
+    "frame_wall_seconds": 306.645824,
+    "vtc_wall_seconds": 119.92444,
+    "whisperx_wall_seconds": 38.856541
+  }
+}

@@ -11,7 +11,7 @@ import stat
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 AGGREGATE = ROOT / "pilots" / "juno_sample" / "p1_aggregate.json"
 
 
@@ -21,7 +21,7 @@ def require(value, message):
 
 
 def load_audit():
-    spec = importlib.util.spec_from_file_location("pilot_p1_audit", ROOT / "pilot_p1_audit.py")
+    spec = importlib.util.spec_from_file_location("pilot_p1_audit", ROOT / "scripts" / "pilot_p1_audit.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module

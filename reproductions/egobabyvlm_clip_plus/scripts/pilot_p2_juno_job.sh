@@ -34,8 +34,8 @@ export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_DATASETS_OFFLINE=1
 export WANDB_MODE=disabled WANDB_DISABLED=true
 
 "$pixi" run --manifest-path "$source_root/pixi.toml" --environment default -- \
-  python "$P2_RUN_ROOT/pilot_p2_preflight.py" \
-    --config "$P2_RUN_ROOT/pilot_p2_config.json" \
+  python "$P2_RUN_ROOT/scripts/pilot_p2_preflight.py" \
+    --config "$P2_RUN_ROOT/configs/pilot_p2.json" \
     --source-root "$source_root" \
     --scratch-root "$P2_SCRATCH_ROOT" \
     --durable-root "$P2_DURABLE_ROOT" \

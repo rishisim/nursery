@@ -10,8 +10,8 @@ import tempfile
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent
-CONFIG = ROOT / "pilot_p2_config.json"
+ROOT = Path(__file__).resolve().parent.parent
+CONFIG = ROOT / "configs" / "pilot_p2.json"
 AGGREGATE = ROOT / "pilots" / "juno_sample" / "p2_aggregate.json"
 
 
@@ -21,7 +21,7 @@ def require(value, message):
 
 
 def load_preflight():
-    spec = importlib.util.spec_from_file_location("pilot_p2_preflight", ROOT / "pilot_p2_preflight.py")
+    spec = importlib.util.spec_from_file_location("pilot_p2_preflight", ROOT / "scripts" / "pilot_p2_preflight.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module

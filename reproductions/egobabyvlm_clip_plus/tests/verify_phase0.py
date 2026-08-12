@@ -9,7 +9,7 @@ import subprocess
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 SPEC_PATH = ROOT / "spec.json"
 PILOT_DECISION_PATH = ROOT / "pilots" / "juno_sample" / "decision_record.json"
 EXPECTED_COMMIT = "224621caf0628270b6115845ac75a65b984234a3"
@@ -123,7 +123,7 @@ def main() -> None:
 
     pilot = json.loads(PILOT_DECISION_PATH.read_text(encoding="utf-8"))
     fixed = pilot["fixed_decisions"]
-    require(pilot["status"] in {"p0_complete", "p1_complete", "p2_complete"}, "pilot P0 contract is not preserved")
+    require(pilot["status"] in {"p0_complete", "p1_complete", "p2_complete", "p3_complete"}, "pilot P0 contract is not preserved")
     require(fixed["input_count"] == 2, "pilot input count changed")
     require(fixed["additional_video_downloads_authorized"] is False, "pilot download scope broadened")
     require(fixed["tokenizer"]["target_vocabulary_size"] == 2048, "pilot vocabulary changed")

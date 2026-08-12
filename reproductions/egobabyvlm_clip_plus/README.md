@@ -51,7 +51,7 @@ The frozen protocol invariants remain executable while this command succeeds
 from this directory:
 
 ```sh
-python3 verify_phase0.py
+python3 tests/verify_phase0.py
 ```
 
 ## Two-video engineering pilot
