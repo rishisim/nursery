@@ -2,7 +2,7 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "pilot_stage": "P3",
+  "pilot_stage": "P4",
   "classification": [
     "engineering_only",
     "non_comparable",
@@ -101,7 +101,7 @@
     "cycles": 1
   },
   "evaluation": {
-    "calibration": "isolated_off_the_shelf_CLIP-L",
+    "calibration": "isolated_external_evaluator_calibration_only",
     "pilot_model_evaluations_after_calibration": 1,
     "checkpoint_selection_uses_benchmark_feedback": false
   },
@@ -149,6 +149,16 @@
     "aggregate_record": "pilots/juno_sample/p3_aggregate.json",
     "inventory_status": "incomplete_inventory",
     "next_stage": "P4",
+    "next_stage_started": true
+  },
+  "p4": {
+    "status": "p4_incomplete",
+    "canonical_calibration_config": "configs/pilot_p4.json",
+    "aggregate_record": "pilots/juno_sample/p4_aggregate.json",
+    "model_role": "external_evaluator_calibration_only",
+    "cannot_initialize_training": true,
+    "acceptance_passed": false,
+    "next_stage": "P5",
     "next_stage_started": false
   },
   "expected_retained_p0_record": {

@@ -198,7 +198,7 @@ all-two rerun produced twelve valid stage cache hits and no repeated stage
 execution. The tracked `p3_aggregate.json` contains privacy-safe totals only;
 raw and normalized text, frames, detailed manifests, checksum inventory, and
 important logs remain owner-only in governed storage. This engineering result
-does not resolve the full-corpus inventory discrepancy or start P4.
+does not resolve the full-corpus inventory discrepancy.
 
 ## Pilot P4 — Calibrate Machine-DevBench in isolation
 
@@ -208,11 +208,11 @@ Work:
 
 1. Download the pinned official evaluation archive directly to governed Juno
    scratch and verify its recorded size and SHA-256.
-2. Run the released evaluator with the specified off-the-shelf CLIP-L model and
+2. Run the released evaluator with the pinned runnable off-the-shelf CLIP-B model and
    compare with the approximate 78.8 sanity result.
 3. Record per-task and aggregate scoring behavior, tie handling, failure
    handling, and lexical/grammatical aggregation.
-4. Store CLIP-L weights and cache paths under an evaluator-calibration-only
+4. Store CLIP-B weights and cache paths under an evaluator-calibration-only
    namespace that no training configuration can reference.
 5. Freeze the evaluator after calibration. Do not tune the pilot using benchmark
    feedback.
@@ -222,11 +222,23 @@ Gate:
 - Archive checksum and task inventory pass.
 - The calibration result is acceptably consistent with the released sanity
   result, or the discrepancy is resolved before training continues.
-- An automated configuration check proves that no CLIP-L path is referenced by
+- An automated configuration check proves that no calibration model path is referenced by
   DINO, BERT, or CLIP+ training.
 
 Retain in Git: calibration provenance, aggregate result, and the explicit label
-`external_CLIP-L_evaluator_calibration_only`.
+`external_CLIP-B_evaluator_calibration_only`.
+
+Status: **incomplete after the single frozen calibration execution**. The
+predeclared acceptance window was 78.3–79.3 around the released 78.8 result.
+The observed pooled result was lexical 89.658468, grammatical 70.504965, and
+overall 80.081716. Deterministic recomputation from the identical governed
+predictions without the current low-frequency-bin merge yielded 79.890328,
+which still misses the frozen window; the discrepancy is therefore not a
+reporting-only correction. No second inference run or benchmark-driven tuning
+is authorized, and P5 has not started. Full predictions, detailed results,
+checksum inventory, diagnosis, and important logs remain owner-only on Juno.
+The calibration weights are not the BabyView/pilot model, cannot initialize
+training, and full-reproduction evaluator recalibration remains required.
 
 ## Pilot P5 — Short real-shape DINO rehearsal
 

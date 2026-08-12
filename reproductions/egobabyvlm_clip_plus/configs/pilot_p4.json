@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p4_frozen_evaluator_calibration_config",
+  "pilot_id": "juno_sample",
+  "stage": "P4",
+  "status": "frozen_before_score",
+  "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+  "source": {
+    "repository": "https://github.com/facebookresearch/egobabyvlm",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "code_sha256": {
+      "evaluation/data/machine_devbench.py": "5fbf7cbafbd94537d3c9afbdf2be75f542a8d27df1c0ba632f48efb04b7878b9",
+      "evaluation/multimodal/machine_devbench/base.py": "2d2084a9f079a03ce7ed4c14bce494de06d1503dc2cdb7a5816bde974079e004",
+      "evaluation/multimodal/machine_devbench/metrics.py": "71c517c6afadc1ddbdc1fa19f10be008896e528d2a0caea938167e55dc55f7aa",
+      "apps/baselines/clip/openclip_extractor.py": "1000529bf84bfac14039b276fd291c543c43c12a176472633605266ae0c64f8d",
+      "evaluation/configs/model/clip_example.yaml": "238c76c557adfc94ae761120f5175c7f7e3dc9a2bacabf0450f526de1e737338"
+    },
+    "label_resolution": "The paper/leaderboard CLIP-L label conflicts with paper prose calling the same 78.8 result CLIP-B; operator direction selects the pinned runnable ViT-B configuration without benchmark-driven tuning."
+  },
+  "archive": {
+    "release": "Evaluation Datasets",
+    "tag": "Eval-Data",
+    "release_id": 330254039,
+    "asset_id": 431146658,
+    "name": "MachineDevBench.tar",
+    "size_bytes": 1635409920,
+    "sha256": "5f4c662919e3b0abdb85f5d6520350f10c374f087886f4257bbe1bd336f3b13c",
+    "url": "https://github.com/facebookresearch/egobabyvlm/releases/download/Eval-Data/MachineDevBench.tar",
+    "expected_wrapper": "MachineDevBench",
+    "expected_roots": ["Lexical", "Grammatical"]
+  },
+  "inventory": {
+    "styles": ["realistic", "cartoon"],
+    "lexical_tasks": ["lex_nouns", "lex_adjectives"],
+    "grammatical_tasks": ["gram_embedded_relative", "gram_subject_verb", "gram_order_matters", "gram_subject_adjective", "gram_negation", "gram_prepositions", "gram_comparatives", "gram_counting"],
+    "manifest_count": 20,
+    "verbs_excluded": true
+  },
+  "model": {
+    "role": "external_CLIP-B_evaluator_calibration_only",
+    "implementation": "open_clip_torch",
+    "implementation_version": "3.3.0",
+    "model_name": "ViT-B-16-quickgelu",
+    "pretrained": "openai",
+    "public_source": "OpenAI CLIP public weights",
+    "artifact_url": "https://openaipublic.azureedge.net/clip/models/5806e77cd80f8b59890b7e101eabd078d9fb84e6937f9e85e4ecb61988df416f/ViT-B-16.pt",
+    "artifact_sha256": "5806e77cd80f8b59890b7e101eabd078d9fb84e6937f9e85e4ecb61988df416f",
+    "tokenizer": "open_clip.get_tokenizer(ViT-B-16-quickgelu)",
+    "transforms": {"resize": [224, 224], "interpolation": "bicubic", "mean": [0.48145466, 0.4578275, 0.40821073], "std": [0.26862954, 0.26130258, 0.27577711]},
+    "precision": "float32",
+    "batch_size": 1,
+    "batch_size_may_only_decrease_for_gpu_memory": true
+  },
+  "scoring": {
+    "lexical": "positive-image similarity strictly compared by argmax against negative-image similarity; target index zero",
+    "grammatical": "matched diagonal similarity sum compared by argmax against swapped off-diagonal sum; target index zero",
+    "frequency_bin_merge": {"[1,2)": "[1,4)", "[2,4)": "[1,4)"},
+    "lexical_task_score": "unweighted mean of nonempty merged frequency-bin accuracies",
+    "grammatical_task_score": "plain trial accuracy",
+    "tie_handling": "official strict-greater comparison routes an exact tie to prediction index one, therefore a tie is scored incorrect",
+    "failed_example_handling": "fail the complete execution; do not drop, impute, or partially aggregate malformed/failed examples",
+    "lexical_aggregate": "equal mean of lex_nouns and lex_adjectives",
+    "grammatical_aggregate": "equal mean of the eight frozen grammatical task scores",
+    "overall": "equal mean of lexical and grammatical aggregates",
+    "style_behavior": "pool raw trials across realistic and cartoon before task aggregation"
+  },
+  "acceptance": {
+    "released_overall_percent": 78.8,
+    "released_lexical_percent": 87.3,
+    "released_grammatical_percent": 70.4,
+    "rule": "observed overall must be within plus-or-minus 0.5 percentage points of released 78.8",
+    "minimum_percent": 78.3,
+    "maximum_percent": 79.3,
+    "declared_before_score": true
+  },
+  "execution": {
+    "authorized_completed_score_runs": 1,
+    "benchmark_driven_tuning": false,
+    "retry_before_score_only": true,
+    "offline_after_assets_pinned": true,
+    "completion_marker": "score_complete.json",
+    "freeze_after_complete_score": true
+  },
+  "storage": {
+    "resolver": "storage.py",
+    "scratch_namespace": "pilot_p4_calibration_only",
+    "durable_record_namespace": "pilot_p4",
+    "owner_only_required": true,
+    "local_or_worktree_fallback": false
+  },
+  "separation": {
+    "not_the_babyview_or_pilot_model": true,
+    "cannot_initialize_training": true,
+    "export_to_learned_initialization_prohibited": true,
+    "training_checkpoint_creation": false,
+    "training_or_optimization": false,
+    "babyview_and_p3_access_prohibited": true,
+    "full_reproduction_recalibration_required": true
+  },
+  "scientific_status_effect": "none",
+  "inventory_status": "incomplete_inventory",
+  "p0_p1_p2_p3_status_preserved": true,
+  "p5_started": false
+}
