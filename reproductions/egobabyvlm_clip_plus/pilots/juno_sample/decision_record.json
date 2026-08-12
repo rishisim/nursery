@@ -2,7 +2,7 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "status": "p0_complete",
+  "status": "p1_complete",
   "classification": [
     "engineering_only",
     "non_comparable",
@@ -56,6 +56,23 @@
       "scientific_target_status_and_unresolved_variables_unchanged",
       "no_media_or_evaluation_assets_accessed"
     ],
+    "next_stage_started": false
+  },
+  "p1_completion": {
+    "stage": "P1",
+    "completed_on": "2026-08-11",
+    "aggregate_record": "p1_aggregate.json",
+    "inventory_status": "incomplete_inventory",
+    "gates": [
+      "juno_owner_and_mode_verification_passed",
+      "exactly_two_governed_transfer_records_verified",
+      "both_inputs_byte_and_sha256_consistent",
+      "both_inputs_video_decodable",
+      "at_least_one_usable_audio_stream",
+      "detailed_record_owner_only_in_governed_durable_storage",
+      "tracked_aggregate_privacy_safe"
+    ],
+    "next_stage": "P2",
     "next_stage_started": false
   }
 }
