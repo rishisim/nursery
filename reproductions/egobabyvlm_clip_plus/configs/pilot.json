@@ -2,9 +2,9 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "pilot_stage": "P4",
-  "status": "p4_complete",
-  "next_stage": "P5",
+  "pilot_stage": "P5",
+  "status": "p5_complete",
+  "next_stage": "P6",
   "next_stage_started": false,
   "classification": [
     "engineering_only",
@@ -166,6 +166,18 @@
     "cannot_initialize_training": true,
     "acceptance_passed": true,
     "next_stage": "P5",
+    "next_stage_started": true
+  },
+  "p5": {
+    "status": "p5_complete",
+    "canonical_training_config": "configs/pilot_p5.json",
+    "aggregate_record": "pilots/juno_sample/p5_aggregate.json",
+    "architecture": "DINOv2_ViT-B/14",
+    "initialization": "random_only",
+    "objectives": ["DINO", "iBOT", "KoLeo", "EMA_teacher"],
+    "optimizer_steps": 100,
+    "health_checkpoint_step": 10,
+    "next_stage": "P6",
     "next_stage_started": false
   },
   "expected_retained_p0_record": {

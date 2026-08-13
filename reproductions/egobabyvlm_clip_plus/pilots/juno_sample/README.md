@@ -264,6 +264,15 @@ predictions remain governed and P5 has not started.
 
 ## Pilot P5 — Short real-shape DINO rehearsal
 
+Status: **complete (engineering-only)**. The frozen minimum-valid microbatch of
+two completed a checkpointed health segment through step 10, resumed in a fresh
+process, and reached exactly 100 optimizer steps. DINO, iBOT, KoLeo, and the EMA
+teacher remained active with the official ViT-B/14 shape and random
+initialization. The final checkpoint, resolved config, detailed record,
+checksum inventory, and important logs are owner-only on governed durable
+storage; Git retains only the privacy-safe aggregate. P6 is next and has not
+started.
+
 **Question:** Can the real visual tower train, checkpoint, and resume on Juno?
 
 Work:

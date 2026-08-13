@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p5_frozen_dino_rehearsal_config",
+  "pilot_id": "juno_sample",
+  "engineering_run_id": "p5-91c43e2a",
+  "stage": "P5",
+  "status": "frozen_before_gpu_execution",
+  "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+  "source": {
+    "repository": "https://github.com/facebookresearch/egobabyvlm",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "required_files": {
+      "apps/baselines/dinov2/third_party/dinov2/configs/ssl_default_config.yaml": "e9bd403ecddf727d7ad2c53283e57125367650ff1287b7d13221838f36882045",
+      "apps/baselines/dinov2/third_party/dinov2/configs/train/vitb14_babyview.yaml": "ce591773551d2286ee114d4762361d971a839dcccc10db1d201fb81d8815eac1",
+      "apps/baselines/dinov2/third_party/dinov2/train/train.py": "ad7ef566a9cc3b57fbb3ba652c42d8f060a59fc4964c79e4672ffd82341e2db6",
+      "apps/baselines/dinov2/third_party/dinov2/train/ssl_meta_arch.py": "5d2d0dd59432c4f385c9ba2b0e4a3eb14ab9bed669650861af411207fc557ec0",
+      "apps/baselines/dinov2/third_party/dinov2/data/augmentations.py": "10e949f266c7cffa57ffc8c5cf9dc094a8e701cdc74f1a3fefd2e02f78f8cdf7",
+      "apps/baselines/dinov2/third_party/dinov2/data/collate.py": "0d2bb0060094b8c86838ad5af2572a9ff0e66c73660b61be70d60f64b9508570",
+      "apps/baselines/dinov2/third_party/dinov2/data/datasets/babyview.py": "879bf44bddb1ad6fa6e42cdf8448f1dfd3c9910068f96f4396be3f5c4d94eb22",
+      "apps/baselines/dinov2/third_party/dinov2/loss/dino_clstoken_loss.py": "49f0b2b75c2feba83b3fc9dfb40ef5eb4e3db350ab1e12a63d75d3060a88f7df",
+      "apps/baselines/dinov2/third_party/dinov2/loss/ibot_patch_loss.py": "19c0ffc85c8af01657ad2e6cffc2d4d311415b10807f63c2d6341195c7a62ddb",
+      "apps/baselines/dinov2/third_party/dinov2/loss/koleo_loss.py": "cc01e18d57d305e0f169d9d7508717ca2e75fe493782493514ab1674c5ed204e"
+    }
+  },
+  "environment": {
+    "p2_config_sha256": "6ea63d53980c818956da8899572f36b143e9fb6c14fc0bd211416468e25f14a3",
+    "p2_detail_sha256": "80cdf4d873fb50454e6842d65487df540539e81e389bcf5cd7005e4e6600057a",
+    "pixi_lock_sha256": "360c372997ea7f9ba89abcf87796e57ebcd2fdbc9734489666120073752e7244",
+    "pixi_version": "0.70.0",
+    "platform": "linux-64",
+    "torch": "2.8.0",
+    "cuda_contract": "12.6"
+  },
+  "input": {
+    "p3_opaque_run_id": "p3-3d96f71c",
+    "p3_detail_sha256": "6ce74e678429522037ee49fb8c1d6877c57928e2c465087ff06a13eeaa3555d3",
+    "p3_config_sha256": "6fd9e8ff73f1a94887334ac9ee2e19b1242312b73b77b2f89258f1910a5bec51",
+    "split_policy": "official_babyview_adapter_sorted_frame_paths_first_90_percent_train",
+    "privacy_safe_total_frame_count": 684,
+    "allowed_derivative": "governed_p3_frames_only"
+  },
+  "model": {
+    "architecture": "DINOv2_ViT-B/14",
+    "arch": "vit_base", "patch_size": 14, "hidden_size": 768, "layers": 12,
+    "attention_heads": 12, "mlp_ratio": 4, "register_tokens": 0,
+    "initialization": "random_only", "pretrained_weights": "",
+    "external_learned_initialization_allowed": false
+  },
+  "objectives": {
+    "dino": {"enabled": true, "loss_weight": 1.0, "head_n_prototypes": 131072, "head_hidden_dim": 2048, "head_bottleneck_dim": 256, "head_nlayers": 3, "centering": "sinkhorn_knopp"},
+    "ibot": {"enabled": true, "loss_weight": 1.0, "separate_head": true, "head_n_prototypes": 131072, "head_hidden_dim": 2048, "head_bottleneck_dim": 256, "head_nlayers": 3, "mask_probability": 0.5, "mask_ratio": [0.1, 0.5]},
+    "koleo": {"enabled": true, "loss_weight": 0.1},
+    "teacher": {"ema_only": true, "momentum_start": 0.994, "momentum_end": 1.0, "temperature_warmup_start": 0.04, "temperature": 0.07, "temperature_warmup_steps": 100}
+  },
+  "augmentation": {"global_crops_size": 224, "global_crops_count": 2, "global_crops_scale": [0.32, 1.0], "local_crops_size": 98, "local_crops_count": 8, "local_crops_scale": [0.05, 0.32]},
+  "optimization": {"optimizer": "AdamW", "learning_rate": 0.00002, "base_learning_rate": 0.00008, "weight_decay_start": 0.04, "weight_decay_end": 0.2, "warmup_steps": 100, "minimum_learning_rate": 0.000001, "clip_grad_norm": 3.0, "precision": "upstream_fp16_fsdp_with_sharded_grad_scaler", "seed": 1287892771, "workers": 2},
+  "batch": {"microbatch_per_gpu": 2, "gradient_accumulation_steps": 1, "effective_batch": 2, "world_size": 1, "minimum_valid_rationale": "KoLeo nearest-neighbor loss requires at least two examples per crop; two preserves the official crop and negative semantics and is the smallest valid integer batch.", "memory_prescore": "One H100 80GB; exact dual ViT-B/14 teacher/student plus separate 131072-prototype DINO/iBOT heads retained; no architecture or objective reduction authorized."},
+  "execution": {"authorized_completed_runs": 1, "authorized_reproducible_minimum_oom_records": 1, "health_checkpoint_step": 10, "final_optimizer_step": 100, "fresh_process_resume_required": true, "fresh_process_final_load_required": true},
+  "checkpoint": {"required_state": ["student", "teacher", "optimizer", "scaler", "scheduler", "python_rng", "numpy_rng", "torch_cpu_rng", "torch_cuda_rng", "sampler", "optimizer_step", "config_sha256", "input_sha256", "source_commit"]},
+  "acceptance": {"exact_step": 100, "all_losses_finite": true, "component_losses_required": ["dino_local_crops_loss", "dino_global_crops_loss", "koleo_loss", "ibot_loss"], "student_update_required": true, "teacher_ema_update_required": true, "teacher_gradient_forbidden": true, "fresh_load_required": true, "resource_metrics_required": true},
+  "stop_conditions": ["minimum_valid_out_of_memory_after_one_record", "nonfinite_loss_or_gradient", "missing_objective_component", "teacher_gradient_or_non_ema_update", "checkpoint_or_resume_mismatch", "source_environment_config_or_input_hash_mismatch", "forbidden_initialization_reference", "second_valid_completion"],
+  "storage": {"resolver": "storage.py", "scratch_namespace": "pilot_p5/p5-91c43e2a", "durable_namespace": "pilot_p0/p0-4cc3af23/pilot_p5", "owner_only_required": true, "local_or_worktree_fallback": false},
+  "forbidden": ["P4 calibration namespace or artifact", "CLIP-L weights", "CLIP-B weights", "DINO pretrained weights", "BERT tokenization or training", "CLIP+ construction or training", "Machine-DevBench evaluation", "P6 or later"],
+  "scientific_status_effect": "none",
+  "inventory_status": "incomplete_inventory",
+  "p0_p1_p2_p3_p4_status_preserved": true,
+  "next_stage": "P6",
+  "next_stage_started": false
+}

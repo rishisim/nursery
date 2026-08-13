@@ -2,7 +2,7 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "status": "p4_complete",
+  "status": "p5_complete",
   "classification": [
     "engineering_only",
     "non_comparable",
@@ -164,5 +164,30 @@
     "observed_overall_percent": 80.081716,
     "acceptance_passed": false,
     "immutable_historical_provenance": true
+  },
+  "p5_completion": {
+    "stage": "P5",
+    "completed_on": "2026-08-12",
+    "status": "p5_complete",
+    "aggregate_record": "p5_aggregate.json",
+    "training_config": "../../configs/pilot_p5.json",
+    "engineering_run_id": "p5-91c43e2a",
+    "gates": [
+      "juno_owner_and_mode_verification_passed",
+      "p3_input_count_and_provenance_verified",
+      "pinned_source_environment_and_config_hashes_verified",
+      "exact_vit_base_patch14_random_initialization",
+      "dino_ibot_koleo_and_ema_teacher_active",
+      "minimum_valid_microbatch_two_completed",
+      "health_checkpoint_at_step_ten_and_fresh_process_resume_passed",
+      "exactly_one_hundred_optimizer_steps",
+      "finite_logged_total_and_component_losses",
+      "student_and_ema_teacher_updates_observed",
+      "fresh_process_final_checkpoint_load_passed",
+      "durable_checkpoint_config_records_logs_and_checksum_inventory_verified",
+      "p4_training_reference_guard_passed"
+    ],
+    "next_stage": "P6",
+    "next_stage_started": false
   }
 }
