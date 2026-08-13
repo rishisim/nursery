@@ -9,6 +9,7 @@ import json
 import os
 import shutil
 import stat
+import subprocess
 import sys
 import tempfile
 import time
@@ -19,6 +20,8 @@ from typing import Any
 RUN_ID = "p6-6d31a4e7"
 P3_RUN_ID = "p3-3d96f71c"
 SPECIAL_TOKENS = ("[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]")
+EXPECTED_SCRATCH_SUFFIX = Path("runs/pilot_p6") / RUN_ID
+EXPECTED_DURABLE_SUFFIX = Path("run_records/pilot_p0/p0-4cc3af23/pilot_p6")
 
 
 class GateError(RuntimeError):
@@ -65,11 +68,60 @@ def load_config(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     if value["engineering_run_id"] != RUN_ID or value["stage"] != "P6":
         raise GateError("wrong frozen P6 config")
-    forbidden = json.dumps(value).lower()
-    for needle in ("model_name_or_path", "from_pretrained", "torch.hub"):
-        if needle in forbidden:
-            raise GateError("forbidden pretrained initialization reference")
+    if value["tokenizer"]["vocab_size"] != 380 or value["model"]["vocab_size"] != 380:
+        raise GateError("active vocabulary must be the authorized natural size 380")
+    active = json.dumps({key: value[key] for key in ("source", "environment", "tokenizer", "model", "training", "storage", "forbidden")}).lower()
+    for needle in ("model_name_or_path", "from_pretrained", "torch.hub", "pilot_p4_calibration_only", "pilot_p5/"):
+        if needle in active:
+            raise GateError("forbidden initialization/runtime reference")
     return value
+
+
+def governed_paths(cfg: dict[str, Any], scratch_root: Path, durable_root: Path) -> tuple[Path, Path]:
+    run_root = scratch_root.resolve() / "runs" / cfg["storage"]["scratch_namespace"]
+    record_root = durable_root.resolve() / "run_records" / cfg["storage"]["durable_namespace"]
+    if run_root.relative_to(scratch_root.resolve()) != EXPECTED_SCRATCH_SUFFIX:
+        raise GateError("wrong scratch namespace")
+    if record_root.relative_to(durable_root.resolve()) != EXPECTED_DURABLE_SUFFIX:
+        raise GateError("wrong durable namespace")
+    require_owner_only(scratch_root.resolve()); require_owner_only(durable_root.resolve())
+    for parent in (scratch_root.resolve() / "runs", durable_root.resolve() / "run_records"):
+        if parent.exists(): require_owner_only(parent)
+    return run_root, record_root
+
+
+def reject_completed(record_root: Path) -> None:
+    if (record_root / "completion.json").exists():
+        raise GateError("P6 already completed; mutation refused")
+
+
+def validate_checkpoint_state(state: dict[str, Any], cfg: dict[str, Any], expected_step: int, tokenizer_hash: str, config_hash: str) -> None:
+    required = {"model", "optimizer", "scheduler", "optimizer_step", "iteration", "tokenizer_sha256", "config_sha256", "torch_cpu_rng", "torch_cuda_rng", "sampler_state", "slurm_job_id"}
+    if not required <= state.keys(): raise GateError("checkpoint required state missing")
+    if state["optimizer_step"] != expected_step or state["iteration"] != expected_step: raise GateError("checkpoint step/iteration mismatch")
+    if state["config_sha256"] != config_hash or state["tokenizer_sha256"] != tokenizer_hash: raise GateError("checkpoint config/tokenizer digest mismatch")
+    if not isinstance(state["model"], dict) or not state["model"] or not isinstance(state["optimizer"], dict) or not isinstance(state["scheduler"], dict): raise GateError("checkpoint payload incompatible")
+    if state["scheduler"].get("last_epoch") != expected_step: raise GateError("checkpoint scheduler step mismatch")
+    if state["torch_cpu_rng"] is None or state["torch_cuda_rng"] is None or state["sampler_state"] is None: raise GateError("checkpoint RNG/sampler state missing")
+    if state.get("python_rng") is not None: raise GateError("Python RNG is unused and must not be claimed")
+    if not str(state["slurm_job_id"]).isdigit(): raise GateError("checkpoint Slurm job identity missing")
+
+
+def verify_source_environment(cfg: dict[str, Any], source_root: Path, python_bin: Path, p2_config: Path | None = None, durable_root: Path | None = None) -> None:
+    source_root=source_root.resolve(); python_bin=python_bin.resolve()
+    if python_bin != (source_root / ".pixi/envs/default/bin/python").resolve(): raise GateError("not the verified P2 Python")
+    head=subprocess.run(["git", "-C", str(source_root), "rev-parse", "HEAD"], check=True, text=True, capture_output=True).stdout.strip()
+    if head != cfg["source"]["commit"]: raise GateError("pinned source commit mismatch")
+    if sha256(source_root/"pixi.lock") != cfg["environment"]["pixi_lock_sha256"]: raise GateError("P2 pixi lock mismatch")
+    for relative, expected in cfg["source"]["required_files"].items():
+        if sha256(source_root/relative) != expected: raise GateError("pinned source file hash mismatch")
+    version=subprocess.run([str(python_bin),"-c","import transformers; print(transformers.__version__)"],check=True,text=True,capture_output=True).stdout.strip()
+    if version != cfg["environment"]["transformers"]: raise GateError("P2 transformers version mismatch")
+    if p2_config is not None and sha256(p2_config.resolve()) != cfg["environment"]["p2_config_sha256"]: raise GateError("P2 environment config mismatch")
+    if durable_root is not None:
+        p2_detail=durable_root.resolve()/"run_records/pilot_p2/p2-7e49c8a1.json"
+        require_owner_only(p2_detail,directory=False)
+        if sha256(p2_detail) != cfg["environment"]["p2_detail_sha256"]: raise GateError("P2 detail provenance mismatch")
 
 
 def find_manifest(p3_root: Path, slot: str) -> Path:
@@ -185,10 +237,27 @@ def save_checkpoint(torch: Any, path: Path, payload: dict[str, Any]) -> None:
     torch.save(payload, temporary); os.chmod(temporary,0o600); os.replace(temporary,path)
 
 
+def build_durable_inventory(durable_root: Path, record: Path, promoted: Path, jobs: dict[str, str]) -> dict[str, Any]:
+    log_root=durable_root/"logs/pilot_p6"/RUN_ID
+    invalid=durable_root/"run_records/pilot_p0/p0-4cc3af23/pilot_p6_invalid_config_attempt"
+    roots={"canonical_checkpoint":promoted,"canonical_records":record,"important_logs":log_root}
+    if invalid.exists(): roots["invalid_attempt"]=invalid
+    entries=[]
+    for namespace,root in roots.items():
+        require_owner_only(root)
+        for path in sorted(root.rglob("*")):
+            if not path.is_file() or path.name=="durable_inventory.json": continue
+            require_owner_only(path,directory=False)
+            entries.append({"namespace":namespace,"opaque_name":path.name,"sha256":sha256(path),"bytes":path.stat().st_size})
+    for role,job in jobs.items():
+        expected=log_root/f"valid-{role}-{job}.log"
+        if not expected.is_file(): raise GateError("important Slurm log missing")
+    return {"schema_version":1,"record_type":"pilot_p6_durable_inventory","owner_only_verified":True,"entries":entries}
+
+
 def train_phase(args: argparse.Namespace) -> int:
     torch, BertConfig, BertForMaskedLM, BertTokenizerFast = runtime_imports()
-    cfg=load_config(args.config.resolve()); run_root=args.scratch_root.resolve()/"runs"/"pilot_p6"/RUN_ID
-    require_owner_only(args.scratch_root.resolve()); require_owner_only(args.durable_root.resolve())
+    cfg=load_config(args.config.resolve()); run_root,record_root=governed_paths(cfg,args.scratch_root,args.durable_root); reject_completed(record_root)
     gate=json.loads((run_root/"tokenizer_gate.json").read_text()); target=cfg["tokenizer"]["vocab_size"]
     if gate["tokenizer"]["observed_unique_vocab_size"] != target: raise GateError("tokenizer gate does not match authorized vocabulary")
     tokenizer=make_tokenizer(run_root,BertTokenizerFast)
@@ -198,7 +267,7 @@ def train_phase(args: argparse.Namespace) -> int:
     resume=args.resume_step is not None
     if resume:
         state=torch.load(checkpoint_path(run_root,args.resume_step),map_location="cpu",weights_only=False)
-        if state["optimizer_step"]!=args.resume_step or state["config_sha256"]!=sha256(args.config): raise GateError("checkpoint step/config mismatch")
+        validate_checkpoint_state(state,cfg,args.resume_step,sha256(run_root/"tokenizer/tokenizer.json"),sha256(args.config))
         model=BertForMaskedLM(model_config(cfg,BertConfig)); model.load_state_dict(state["model"])
     else:
         torch.manual_seed(cfg["training"]["seed"]); torch.cuda.manual_seed_all(cfg["training"]["seed"])
@@ -226,17 +295,19 @@ def train_phase(args: argparse.Namespace) -> int:
     peak=torch.cuda.max_memory_allocated(); elapsed=time.time()-started
     encoder_updated=not torch.equal(initial_encoder,next(model.bert.encoder.parameters()).detach().float().cpu())
     head_updated=not torch.equal(initial_head,model.cls.predictions.bias.detach().float().cpu())
-    payload={"model":model.state_dict(),"optimizer":optimizer.state_dict(),"scheduler":scheduler.state_dict(),"scaler":None,"optimizer_step":args.target_step,"iteration":args.target_step,"tokenizer_sha256":sha256(run_root/"tokenizer/tokenizer.json"),"config_sha256":sha256(args.config),"python_rng":None,"torch_cpu_rng":torch.get_rng_state(),"torch_cuda_rng":torch.cuda.get_rng_state_all(),"sampler_state":generator.get_state(),"process_id":os.getpid()}
+    job_id=os.environ.get("SLURM_JOB_ID","")
+    if not job_id.isdigit(): raise GateError("training requires Slurm job identity")
+    payload={"model":model.state_dict(),"optimizer":optimizer.state_dict(),"scheduler":scheduler.state_dict(),"scaler":None,"optimizer_step":args.target_step,"iteration":args.target_step,"tokenizer_sha256":sha256(run_root/"tokenizer/tokenizer.json"),"config_sha256":sha256(args.config),"python_rng":None,"torch_cpu_rng":torch.get_rng_state(),"torch_cuda_rng":torch.cuda.get_rng_state_all(),"sampler_state":generator.get_state(),"process_id":os.getpid(),"slurm_job_id":job_id}
     save_checkpoint(torch,checkpoint_path(run_root,args.target_step),payload)
-    atomic_json(run_root/f"segment_{args.target_step}.json",{"start_step":start,"end_step":args.target_step,"process_id":os.getpid(),"losses":losses,"all_losses_finite":True,"encoder_updated":encoder_updated,"mlm_head_updated":head_updated,"scheduler_last_epoch":scheduler.last_epoch,"peak_allocated_gpu_memory_bytes":peak,"wall_seconds":elapsed})
+    atomic_json(run_root/f"segment_{args.target_step}.json",{"start_step":start,"end_step":args.target_step,"process_id":os.getpid(),"slurm_job_id":job_id,"losses":losses,"all_losses_finite":True,"encoder_updated":encoder_updated,"mlm_head_updated":head_updated,"scheduler_last_epoch":scheduler.last_epoch,"peak_allocated_gpu_memory_bytes":peak,"wall_seconds":elapsed})
     print(json.dumps({"status":"segment_complete","start":start,"end":args.target_step,"pid":os.getpid()})); return 0
 
 
 def finalize(args: argparse.Namespace) -> int:
     torch,BertConfig,BertForMaskedLM,BertTokenizerFast=runtime_imports(); cfg=load_config(args.config.resolve())
-    run_root=args.scratch_root.resolve()/"runs"/"pilot_p6"/RUN_ID; durable=args.durable_root.resolve()/"run_records/pilot_p0/p0-4cc3af23/pilot_p6"
-    if (durable/"completion.json").exists(): raise GateError("P6 already completed")
+    run_root,durable=governed_paths(cfg,args.scratch_root,args.durable_root); reject_completed(durable)
     tokenizer=make_tokenizer(run_root,BertTokenizerFast); state=torch.load(checkpoint_path(run_root,100),map_location="cpu",weights_only=False)
+    validate_checkpoint_state(state,cfg,100,sha256(run_root/"tokenizer/tokenizer.json"),sha256(args.config))
     model=BertForMaskedLM(model_config(cfg,BertConfig)); model.load_state_dict(state["model"]); model.cuda().eval()
     validation=(run_root/"corpus/validation.txt").read_text().splitlines(); generator=torch.Generator().manual_seed(cfg["training"]["seed"]+1)
     losses=[]
@@ -249,13 +320,18 @@ def finalize(args: argparse.Namespace) -> int:
     with torch.no_grad(): logits=model(input_ids=smoke["input_ids"],attention_mask=smoke["attention_mask"]).logits
     if logits.shape[-1]!=len(tokenizer): raise GateError("fresh-load smoke incompatibility")
     s50=json.loads((run_root/"segment_50.json").read_text()); s100=json.loads((run_root/"segment_100.json").read_text())
-    if s50["process_id"]==s100["process_id"] or s100["start_step"]!=50: raise GateError("distinct-process resume not proven")
+    finalize_job=os.environ.get("SLURM_JOB_ID","")
+    jobs={str(s50.get("slurm_job_id","")),str(s100.get("slurm_job_id","")),finalize_job}
+    if len(jobs)!=3 or not all(x.isdigit() for x in jobs) or s100["start_step"]!=50: raise GateError("three distinct Slurm jobs not proven")
     promoted=args.durable_root.resolve()/"checkpoints/pilot_p6"/RUN_ID; promoted.mkdir(parents=True,exist_ok=True,mode=0o700)
     for source in (checkpoint_path(run_root,100),run_root/"tokenizer/vocab.txt",run_root/"tokenizer/tokenizer.json",args.config.resolve()):
         target=promoted/source.name; shutil.copy2(source,target); os.chmod(target,0o600)
     inventory={p.name:sha256(p) for p in promoted.iterdir() if p.is_file()}
-    detail={"schema_version":1,"status":"p6_complete","optimizer_step":100,"health_process_id":s50["process_id"],"resume_process_id":s100["process_id"],"losses":s50["losses"]+s100["losses"],"encoder_updated":s50["encoder_updated"] and s100["encoder_updated"],"mlm_head_updated":s50["mlm_head_updated"] and s100["mlm_head_updated"],"validation_runs":1,"validation_loss":sum(losses)/len(losses),"validation_non_generalizing":True,"fresh_load_smoke":True,"resources":{"peak_allocated_gpu_memory_bytes":max(s50["peak_allocated_gpu_memory_bytes"],s100["peak_allocated_gpu_memory_bytes"]),"training_wall_seconds":s50["wall_seconds"]+s100["wall_seconds"],"checkpoint_bytes":checkpoint_path(run_root,100).stat().st_size},"inventory":inventory}
+    detail={"schema_version":1,"status":"p6_complete","optimizer_step":100,"iteration":100,"slurm_job_ids":{"health":s50["slurm_job_id"],"resume":s100["slurm_job_id"],"finalize":finalize_job},"losses":s50["losses"]+s100["losses"],"encoder_updated":s50["encoder_updated"] and s100["encoder_updated"],"mlm_head_updated":s50["mlm_head_updated"] and s100["mlm_head_updated"],"validation_runs":1,"validation_used_for_selection":False,"validation_loss":sum(losses)/len(losses),"validation_non_generalizing":True,"fresh_load_smoke":True,"python_rng_restored":False,"torch_rng_and_sampler_restored":True,"resources":{"peak_allocated_gpu_memory_bytes":max(s50["peak_allocated_gpu_memory_bytes"],s100["peak_allocated_gpu_memory_bytes"]),"training_wall_seconds":s50["wall_seconds"]+s100["wall_seconds"],"checkpoint_bytes":checkpoint_path(run_root,100).stat().st_size,"driver_memory_bytes":None},"inventory":inventory}
     atomic_json(durable/"detail.json",detail); atomic_json(durable/"checksum_inventory.json",inventory); atomic_json(durable/"completion.json",{"status":"p6_complete","detail_sha256":sha256(durable/"detail.json"),"inventory_sha256":sha256(durable/"checksum_inventory.json")})
+    jobs={"health":str(s50["slurm_job_id"]),"resume":str(s100["slurm_job_id"]),"finalize":finalize_job}
+    atomic_json(durable/"audit_attestation.json",{"schema_version":1,"record_type":"pilot_p6_completion_attestation","slurm_job_ids":jobs,"three_distinct_jobs":len(set(jobs.values()))==3,"fresh_final_load":{"optimizer_step":100,"iteration":100,"config_and_tokenizer_hashes_verified":True,"exact_model_shape_and_vocab_verified":True,"smoke_forward_passed":True},"python_rng_used":False,"python_rng_restored":False,"torch_rng_and_sampler_restored":True,"validation_runs":1,"validation_used_for_selection":False,"driver_memory_bytes":None})
+    atomic_json(durable/"durable_inventory.json",build_durable_inventory(args.durable_root.resolve(),durable,promoted,jobs))
     print(json.dumps({"status":"p6_complete","validation_loss":detail["validation_loss"]})); return 0
 
 
@@ -266,11 +342,8 @@ def prepare(args: argparse.Namespace) -> int:
     require_owner_only(durable_root)
     config = load_config(args.config.resolve())
     config_hash = sha256(args.config.resolve())
-    run_root = scratch_root / "runs" / "pilot_p6" / RUN_ID
-    durable = durable_root / "run_records" / "pilot_p0" / "p0-4cc3af23" / "pilot_p6"
-    completion = durable / "completion.json"
-    if completion.exists():
-        raise GateError("P6 already has a completion marker")
+    run_root,durable=governed_paths(config,scratch_root,durable_root)
+    reject_completed(durable)
     run_root.mkdir(parents=True, exist_ok=True, mode=0o700)
     os.chmod(run_root, 0o700)
     durable.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -352,18 +425,23 @@ def prepare(args: argparse.Namespace) -> int:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("prepare-tokenizer","train","finalize"))
+    parser.add_argument("command", choices=("preflight","prepare-tokenizer","train","finalize"))
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--scratch-root", type=Path, required=True)
     parser.add_argument("--durable-root", type=Path, required=True)
     parser.add_argument("--target-step", type=int)
     parser.add_argument("--resume-step", type=int)
+    parser.add_argument("--source-root", type=Path)
+    parser.add_argument("--python-bin", type=Path)
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     try:
+        if args.command == "preflight":
+            if args.source_root is None or args.python_bin is None: raise GateError("source root and Python are required")
+            verify_source_environment(load_config(args.config.resolve()),args.source_root,args.python_bin,args.config.resolve().parent/"pilot_p2.json",args.durable_root); print("P6 source/environment preflight passed"); return 0
         if args.command == "prepare-tokenizer":
             return prepare(args)
         if args.command == "train":

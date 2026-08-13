@@ -47,8 +47,8 @@ def main() -> None:
     require(config["pilot_id"] == decision["pilot_id"] == "juno_sample", "pilot IDs disagree")
     require(config["engineering_run_id"] == decision["engineering_run_id"] == "p0-4cc3af23",
             "opaque engineering run IDs disagree")
-    require(decision["status"] in {"p0_complete", "p1_complete", "p2_complete", "p3_complete", "p4_incomplete", "p4_complete", "p5_complete"}, "P0 status is not preserved")
-    require(config["pilot_stage"] in {"P0", "P1", "P2", "P3", "P4", "P5"}, "unexpected pilot stage")
+    require(decision["status"] in {"p0_complete", "p1_complete", "p2_complete", "p3_complete", "p4_incomplete", "p4_complete", "p5_complete", "p6_complete"}, "P0 status is not preserved")
+    require(config["pilot_stage"] in {"P0", "P1", "P2", "P3", "P4", "P5", "P6"}, "unexpected pilot stage")
     require(decision["p0_completion"]["stage"] == "P0", "P0 completion stage disagrees")
     require(decision["p0_completion"]["next_stage_started"] is False, "later pilot stage started")
     require(config["classification"] == decision["classification"] == EXPECTED_CLASSIFICATION,
@@ -78,7 +78,9 @@ def main() -> None:
     require(config["tokenizer"]["type"] == fixed["tokenizer"]["type"] == "WordPiece",
             "tokenizer types disagree")
     require(config["tokenizer"]["vocabulary_size"] ==
-            fixed["tokenizer"]["target_vocabulary_size"] == 2048, "vocabulary sizes disagree")
+            fixed["tokenizer"]["target_vocabulary_size"] == 380, "vocabulary sizes disagree")
+    require(fixed["tokenizer"]["historical_initial_target"].startswith("2048_stopped"),
+            "superseded initial tokenizer gate not preserved")
     require(config["model"]["vision"] == fixed["vision_architecture"] == "DINOv2_ViT-B/14",
             "vision architectures disagree")
     require(config["model"]["text"] == fixed["text_architecture"] == "BERT-base_12x768x12",

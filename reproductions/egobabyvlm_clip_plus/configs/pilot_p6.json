@@ -16,7 +16,7 @@
       "apps/baselines/clip/modeling/mlm_head.py": "b95600dde2dca34b7f4fb547b68c2dc0013b26d5385ec20714691489ffb30a19"
     },
     "adapter": "scripts/pilot_p6.py",
-    "official_reuse": "BertConfig, BertForMaskedLM, DataCollatorForLanguageModeling, AdamW-compatible torch optimizer; bounded adapter replaces the official external-base tokenizer path and adds exact step/resume/evidence gates"
+    "official_reuse": "Bounded adapter using official transformers BertConfig, BertForMaskedLM/BertOnlyMLMHead components and an AdamW-compatible torch optimizer; it does not claim reuse of the complete official trainer or external-base tokenizer path."
   },
   "environment": {
     "p2_config_sha256": "6ea63d53980c818956da8899572f36b143e9fb6c14fc0bd211416468e25f14a3",
@@ -103,8 +103,9 @@
     "validation": "once_after_step_100_not_for_selection_non_generalizing_engineering_evidence"
   },
   "checkpoint": {
-    "required_state": ["model", "optimizer", "scheduler", "scaler_if_enabled", "optimizer_step", "iteration", "tokenizer_sha256", "config_sha256", "python_rng", "torch_cpu_rng", "torch_cuda_rng_if_available", "sampler_state"],
-    "continuity_proof": "fresh process id differs; checkpoint says step 50; resumed first completed step is 51; final is exactly 100; deterministic cyclic sampler cursor and Python/Torch RNG restored",
+    "required_state": ["model", "optimizer", "scheduler", "scaler_if_enabled", "optimizer_step", "iteration", "tokenizer_sha256", "config_sha256", "torch_cpu_rng", "torch_cuda_rng_if_available", "sampler_state", "slurm_job_id"],
+    "continuity_proof": "health and resume Slurm job IDs differ; checkpoint step and iteration are 50; scheduler step is 50; resumed first completed optimizer step is 51; final step and iteration are exactly 100; deterministic cyclic sampler plus Torch CPU/CUDA RNG are restored",
+    "python_rng": "unused_not_checkpointed_or_restored",
     "unsupported_claims_forbidden": true
   },
   "execution": {
@@ -113,10 +114,11 @@
     "completion_marker": "completion.json",
     "atomic_owner_only_records": true,
     "refuse_second_completion": true,
-    "phases": ["prepare_tokenizer", "health_to_50", "fresh_resume_to_100", "fresh_final_load"]
+    "phases": ["prepare_tokenizer", "health_to_50", "fresh_resume_to_100", "fresh_finalize_audit"]
   },
-  "acceptance": ["juno_guard", "recording_split_and_input_hashes", "authorized_reproducible_natural_380_unique_vocab", "tokenizer_model_special_id_compatibility", "exact_BERT_base_MLM_random_initialization", "finite_all_emitted_losses", "encoder_and_MLM_head_update", "step_50_checkpoint", "distinct_process_exact_resume_to_100", "scheduler_advance", "single_non_generalizing_validation", "fresh_load_and_smoke_forward", "attributed_resource_metrics", "durable_promotion_checksum_verified"],
-  "stop_conditions": ["juno_or_owner_mode_failure", "input_source_environment_or_config_hash_mismatch", "natural_vocab_not_exactly_2048", "minimum_microbatch_OOM_after_one_record", "nonfinite_loss_or_gradient", "checkpoint_corruption_or_mismatch", "forbidden_initialization_reference", "second_completed_execution"],
+  "acceptance": ["juno_guard", "recording_split_and_input_hashes", "authorized_reproducible_natural_380_unique_vocab", "tokenizer_model_special_id_compatibility", "exact_BERT_base_MLM_random_initialization", "finite_all_emitted_losses", "encoder_and_MLM_head_update", "step_50_checkpoint", "distinct_slurm_job_exact_resume_to_100", "scheduler_advance", "single_non_generalizing_validation", "fresh_distinct_slurm_finalize_load_and_smoke_forward", "attributed_resource_metrics", "durable_promotion_checksum_verified"],
+  "stop_conditions": ["juno_or_owner_mode_failure", "input_source_environment_or_config_hash_mismatch", "authorized_natural_vocab_not_exactly_380", "minimum_microbatch_OOM_after_one_record", "nonfinite_loss_or_gradient", "checkpoint_corruption_or_mismatch", "forbidden_initialization_reference", "second_completed_execution"],
+  "historical_provenance": {"initial_2048_gate": "stopped_before_BERT_because_natural_training_only_vocabulary_was_smaller", "stale_acceptance_label_attempt": "invalid_and_excluded_from_canonical_completion"},
   "storage": {"resolver": "storage.py", "scratch_namespace": "pilot_p6/p6-6d31a4e7", "durable_namespace": "pilot_p0/p0-4cc3af23/pilot_p6", "owner_only_required": true, "local_or_worktree_fallback": false},
   "forbidden": ["P4 calibration artifact or namespace", "P5 checkpoint or DINO artifact", "external pretrained BERT or tokenizer", "external or fabricated corpus/token", "CLIP+ construction or training", "Machine-DevBench access or evaluation", "P7 or later"],
   "scientific_status_effect": "none",

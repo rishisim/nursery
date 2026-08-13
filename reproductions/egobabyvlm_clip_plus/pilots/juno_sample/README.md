@@ -334,6 +334,13 @@ were fabricated or imported. Exact BERT-base MLM training checkpointed at step
 head updates, finite losses, one non-generalizing validation pass, and a fresh
 final load/smoke pass were verified. P7 was not started.
 
+The preserved completion was subsequently hardened without rerunning the
+tokenizer or BERT. Slurm accounting and important logs prove three distinct
+health, resume, and finalize jobs. Python `random` was unused and is not claimed
+as restored; continuity covers Torch CPU/CUDA RNG and the deterministic sampler.
+The original stopped 2,048-token gate and an invalid stale-label execution are
+retained only as excluded owner-only historical provenance.
+
 ## Pilot P7 — One complete CLIP+ cycle
 
 **Question:** Does the full multimodal control flow work with the pilot towers?

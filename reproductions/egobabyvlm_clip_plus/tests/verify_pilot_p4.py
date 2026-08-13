@@ -157,14 +157,14 @@ def main():
     require(not any(token in selection_text.lower() for token in ("/work/", "/scratch/", "image_",
             "caption_", "raw_predictions", "participant", "session")), "selection is not privacy-safe")
     pilot = json.loads(PILOT_CONFIG.read_text()); decision = json.loads(DECISION.read_text())
-    require(pilot["pilot_stage"] in {"P4", "P5"} and pilot["status"] in {"p4_complete", "p5_complete"} and
-            pilot["next_stage"] in {"P5", "P6"} and
+    require(pilot["pilot_stage"] in {"P4", "P5", "P6"} and pilot["status"] in {"p4_complete", "p5_complete", "p6_complete"} and
+            pilot["next_stage"] in {"P5", "P6", "P7"} and
             pilot["p4"]["status"] == "p4_complete" and
             pilot["p4"]["canonical_selection_record"].endswith("p4_selection.json") and
             pilot["p4"]["selected_model"] == "ViT-L-14/openai" and
             pilot["p4"]["next_stage"] == "P5" and isinstance(pilot["p4"]["next_stage_started"], bool),
             "canonical pilot P4/P5 state is inconsistent")
-    require(decision["status"] in {"p4_complete", "p5_complete"} and
+    require(decision["status"] in {"p4_complete", "p5_complete", "p6_complete"} and
             decision["p4_completion"]["canonical_selection_record"] == "p4_selection.json" and
             decision["p4_completion"]["acceptance_passed"] and
             decision["full_reproduction_recalibration_required"], "decision record is inconsistent")

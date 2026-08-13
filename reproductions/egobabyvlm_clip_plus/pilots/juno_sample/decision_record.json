@@ -2,7 +2,7 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "status": "p5_complete",
+  "status": "p6_complete",
   "classification": [
     "engineering_only",
     "non_comparable",
@@ -18,7 +18,9 @@
     "exact_usable_subset_discrepancy": "out_of_scope_for_pilot_and_still_unresolved_for_full_reproduction",
     "tokenizer": {
       "type": "WordPiece",
-      "target_vocabulary_size": 2048,
+      "target_vocabulary_size": 380,
+      "authorization": "operator_authorized_reproducible_natural_training_only_vocabulary",
+      "historical_initial_target": "2048_stopped_before_BERT_and_superseded",
       "disposition": "pilot_only_never_promote_to_full_reproduction"
     },
     "preprocessing": {
@@ -208,8 +210,12 @@
     "vocab_size": 380,
     "bert_training_started": true,
     "final_optimizer_step": 100,
-    "distinct_process_resume_proven": true,
+    "distinct_slurm_health_resume_finalize_jobs_proven": true,
     "validation_non_generalizing": true,
+    "python_rng_used_or_restored": false,
+    "torch_rng_and_sampler_restored": true,
+    "historical_initial_2048_gate": "superseded_stop_before_BERT",
+    "invalid_stale_label_attempt": "preserved_owner_only_and_excluded",
     "p0_p1_p2_p3_p4_p5_status_preserved": true,
     "next_stage": "P7",
     "next_stage_started": false
