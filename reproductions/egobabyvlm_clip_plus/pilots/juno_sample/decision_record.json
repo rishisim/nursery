@@ -218,6 +218,15 @@
     "invalid_stale_label_attempt": "preserved_owner_only_and_excluded",
     "p0_p1_p2_p3_p4_p5_status_preserved": true,
     "next_stage": "P7",
-    "next_stage_started": false
+    "next_stage_started": true
+  },
+  "p7_status": {
+    "stage": "P7", "status": "p7_complete", "aggregate_record": "p7_aggregate.json",
+    "training_config": "../../configs/pilot_p7.json", "engineering_run_id": "p7-7b9e2c41",
+    "exact_update_counts": {"contrastive": 100, "mlm": 20, "dinov2": 10, "total": 130},
+    "checkpoint_global_update": 65, "batch": 2, "genuine_contrastive_negatives": true,
+    "distinct_slurm_health_resume_finalize_jobs_proven": true, "machine_devbench_accessed": false,
+    "clip_l_used_for_training": false, "full_reproduction_evaluator_recalibration_required": true,
+    "p0_p1_p2_p3_p4_p5_p6_status_preserved": true, "next_stage": "P8", "next_stage_started": false
   }
 }

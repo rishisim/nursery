@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p7_frozen_complete_clip_plus_cycle_config",
+  "pilot_id": "juno_sample",
+  "engineering_run_id": "p7-7b9e2c41",
+  "stage": "P7",
+  "status": "frozen_before_gpu_execution",
+  "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+  "question": "Does the full multimodal CLIP+ control flow work with the pilot towers?",
+  "source": {
+    "repository": "https://github.com/facebookresearch/egobabyvlm",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3",
+    "pixi_lock_sha256": "360c372997ea7f9ba89abcf87796e57ebcd2fdbc9734489666120073752e7244",
+    "required_files": {
+      "apps/baselines/clip/modeling/multimodal_model.py": "0f2a8e91c80765cea806e0d95a6b1eaac82f283990042271e396b83b8d223d9f",
+      "apps/baselines/clip/modeling/vision_encoder.py": "6bbc68276a8144225f812c271d634d5b29b21d5c54b57ed3fb5bd5ac8deea832",
+      "apps/baselines/clip/modeling/text_encoder.py": "a91543b66446bada64e2fe6e4688d978a3bcb6081e4d0cd8ed87e8ac0747fa0c",
+      "apps/baselines/clip/modeling/dinov2_ssl.py": "01526fef1110dd47a66711b0e0b08be15afa57e192b1fd140cf564b890cb2a17",
+      "apps/baselines/clip/modeling/mlm_head.py": "b95600dde2dca34b7f4fb547b68c2dc0013b26d5385ec20714691489ffb30a19"
+    }
+  },
+  "prerequisites": {
+    "p3_run_id": "p3-3d96f71c",
+    "training_pair_manifest_sha256": "95e79070598915e2ef480d507467abb07c2ab87b6dc446697950db62df449ecf",
+    "training_pair_count": 80,
+    "validation_pair_manifest_sha256": "9c75f97ad03374d530c172a83949bdd36cdac0a285d2d8071714abd1dfc3acd7",
+    "p5_run_id": "p5-91c43e2a",
+    "p5_checkpoint_sha256": "0ff45fe6d3ed6ca5402c4138474fb45a50aed006a45ee92ac1cf1bbba76ac280",
+    "p6_run_id": "p6-6d31a4e7",
+    "p6_checkpoint_sha256": "a0b5973a8b0f0aba98a4b1d72d3d24ec97c53fb459209857eff295411850a2d9",
+    "p6_tokenizer_sha256": "6e83befd3847c71aaa7b904458defacb4bc87818805f7dab4007cee5b56cd736",
+    "p6_vocab_sha256": "830e52d4711d4900d5cd77f9ec47fac6a44a02ffdfc0be126178258c0e53b0ae",
+    "p6_vocab_size": 380
+  },
+  "model": {
+    "vision": {"architecture": "DINOv2_ViT-B/14", "hidden_size": 768, "projection_size": 512, "backbone_frozen": false, "projection_trainable": true},
+    "text": {"architecture": "BERT-base", "hidden_size": 768, "projection_size": 512, "pooling": "cls", "backbone_frozen": false, "projection_trainable": true, "mlm_head_trainable": true},
+    "contrastive": {"normalize_features": true, "symmetric": true, "temperature_initial": 0.07, "temperature_trainable": true},
+    "dino_ibot": {"p5_teacher_initializes_vision_and_teacher_student": true, "teacher_ema_only": true, "sync_vision_from_teacher_after_each_dino_update": true}
+  },
+  "batch": {"microbatch": 2, "gradient_accumulation_steps": 1, "effective_batch": 2, "world_size": 1, "distinct_examples_required": true, "minimum_valid_rationale": "Two distinct paired examples provide one genuine in-batch negative per direction and are the smallest valid contrastive batch."},
+  "optimization": {"seed": 1287892771, "precision": "bfloat16", "contrastive_optimizer": "AdamW", "contrastive_learning_rate": 0.00002, "mlm_optimizer": "AdamW", "mlm_learning_rate": 0.0001, "weight_decay": 0.01, "warmup_updates_per_mode": 2, "gradient_clip_norm": 3.0, "mlm_probability": 0.15, "sequence_length": 64},
+  "schedule": {
+    "construction": "repeat_exactly_10_times([contrastive x10, mlm x2, dinov2 x1])",
+    "cycle_modes": ["contrastive", "contrastive", "contrastive", "contrastive", "contrastive", "contrastive", "contrastive", "contrastive", "contrastive", "contrastive", "mlm", "mlm", "dinov2"],
+    "repetitions": 10,
+    "exact_counts": {"contrastive": 100, "mlm": 20, "dinov2": 10},
+    "total_updates": 130,
+    "checkpoint_after_global_update": 65,
+    "checkpoint_counts": {"contrastive": 50, "mlm": 10, "dinov2": 5},
+    "resume_next_mode": "contrastive"
+  },
+  "checkpoint": {"health_global_update": 65, "final_global_update": 130, "fresh_distinct_resume_job": true, "fresh_distinct_finalize_job": true, "python_rng": "used_by_DINO_augmentation_and_restored", "numpy_rng": "used_by_DINO_augmentation_and_restored", "torch_cpu_cuda_rng": "restored", "deterministic_sampler_position": "restored"},
+  "storage": {"resolver": "storage.py", "scratch_namespace": "pilot_p7/p7-7b9e2c41", "durable_namespace": "pilot_p0/p0-4cc3af23/pilot_p7", "owner_only_required": true, "local_or_worktree_fallback": false},
+  "forbidden": ["P4 calibration artifact or namespace", "CLIP-L or CLIP-B initialization", "Machine-DevBench access or evaluation", "architecture substitution", "fake contrastive negatives", "P8 or later"],
+  "scientific_status_effect": "none",
+  "inventory_status": "incomplete_inventory",
+  "p0_p1_p2_p3_p4_p5_p6_status_preserved": true,
+  "next_stage": "P8",
+  "next_stage_started": false
+}

@@ -370,6 +370,15 @@ Gate:
 Retain in Git: aggregate loss/step checks, configuration hash, memory, throughput,
 checkpoint size, and resume evidence only.
 
+Status: **complete**. The frozen schedule repeated `10 contrastive, 2 MLM, 1
+DINO/iBOT` ten times for exactly `100:20:10` and 130 updates. Batch 2 supplied
+genuine negatives. The update-65 checkpoint contained `50:10:5`; distinct
+resume and finalize Slurm jobs proved exact continuation and fresh loading.
+All loss, gradient/update, forbidden-update, scheduler, teacher-to-vision copy,
+transition, and checksum-promotion gates passed. This is engineering-only:
+Machine-DevBench was not accessed, CLIP-L did not initialize or tune P7, and
+full reproduction evaluator calibration remains required. P8 was not started.
+
 ## Pilot P8 — Evaluate one frozen pilot checkpoint once
 
 **Question:** Can a pilot checkpoint pass through the frozen evaluator without
