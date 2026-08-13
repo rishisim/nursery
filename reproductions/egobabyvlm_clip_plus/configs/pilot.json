@@ -2,9 +2,9 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "pilot_stage": "P5",
-  "status": "p5_complete",
-  "next_stage": "P6",
+  "pilot_stage": "P6",
+  "status": "p6_complete",
+  "next_stage": "P7",
   "next_stage_started": false,
   "classification": [
     "engineering_only",
@@ -46,7 +46,7 @@
     ],
     "pilot_overrides": [
       "exact_100_contrastive_20_mlm_10_dino_ibot_single_cycle",
-      "pilot_only_wordpiece_vocabulary_size_2048",
+      "pilot_P6_operator_authorized_natural_wordpiece_vocabulary_size_380",
       "single_deterministic_engineering_seed"
     ]
   },
@@ -74,7 +74,9 @@
   },
   "tokenizer": {
     "type": "WordPiece",
-    "vocabulary_size": 2048,
+    "vocabulary_size": 380,
+    "p6_authorization": "operator_authorized_natural_training_only_vocabulary",
+    "historical_initial_gate": "superseded_2048_target_stopped_before_BERT",
     "pilot_only": true
   },
   "model": {
@@ -178,6 +180,19 @@
     "optimizer_steps": 100,
     "health_checkpoint_step": 10,
     "next_stage": "P6",
+    "next_stage_started": true
+  },
+  "p6": {
+    "status": "p6_complete",
+    "canonical_training_config": "configs/pilot_p6.json",
+    "aggregate_record": "pilots/juno_sample/p6_aggregate.json",
+    "architecture": "BERT-base_12x768x12_with_MLM_head",
+    "initialization": "random_only",
+    "authorized_natural_vocabulary_size": 380,
+    "optimizer_steps": 100,
+    "health_checkpoint_step": 50,
+    "recording_level_validation": true,
+    "next_stage": "P7",
     "next_stage_started": false
   },
   "expected_retained_p0_record": {
