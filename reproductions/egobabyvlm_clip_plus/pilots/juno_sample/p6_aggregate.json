@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p6_privacy_safe_aggregate",
+  "pilot_id": "juno_sample",
+  "engineering_run_id": "p6-6d31a4e7",
+  "stage": "P6",
+  "status": "p6_stopped_natural_vocabulary_below_target",
+  "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+  "scientific_status_effect": "none",
+  "inventory_status": "incomplete_inventory",
+  "split": {"recording_level_disjoint": true, "fallback_used": false, "train_utterances": 98, "train_words": 219, "validation_utterances": 1, "validation_words": 9},
+  "tokenizer": {"algorithm": "WordPiece", "training_split_only": true, "external_tokens": false, "fabricated_tokens": false, "target_vocab_size": 2048, "observed_unique_vocab_size": 381, "required_special_token_count": 5, "special_token_ids_match": true},
+  "execution": {"juno_guard_passed": true, "tokenizer_gate_executed_once": true, "bert_constructed": false, "optimizer_steps": 0, "validation_executed": false, "p4_loaded": false, "p5_or_dino_loaded": false, "p7_started": false},
+  "provenance": {"source_commit": "224621caf0628270b6115845ac75a65b984234a3", "p3_detail_sha256": "6ce74e678429522037ee49fb8c1d6877c57928e2c465087ff06a13eeaa3555d3", "p3_config_sha256": "6fd9e8ff73f1a94887334ac9ee2e19b1242312b73b77b2f89258f1910a5bec51", "p6_config_sha256": "17fdec5440338dab6eed88a4770aa6c79cd2a3523d028ab45aa9dcff899de6cd", "executed_adapter_sha256": "09d3abc6f80bac7378e00cefbaa762f6e0e6b0b2c473590781762aa89ad83d03", "tokenizers_version": "0.22.2"},
+  "governed_records": {"tokenizer_gate_detail_sha256": "7a90893adea450fde7ea5b36e7141aa95d0594bc182aa3727ad8fae878034ac8", "owner_only": true},
+  "stop_reason": "The natural training-only vocabulary is smaller than the frozen exact target; arbitrary or external token padding is prohibited.",
+  "decision_required": "Authorize a smaller natural vocabulary or authorize a precisely defined governed-only vocabulary completion rule; otherwise P6 remains stopped.",
+  "p0_p1_p2_p3_p4_p5_status_preserved": true,
+  "next_stage": "P6_protocol_decision",
+  "next_stage_started": false
+}

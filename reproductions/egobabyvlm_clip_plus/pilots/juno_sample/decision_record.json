@@ -193,6 +193,23 @@
       "exact_sample_continuity_not_proven_because_upstream_sampler_advance_is_zero"
     ],
     "next_stage": "P6",
+    "next_stage_started": true
+  },
+  "p6_status": {
+    "stage": "P6",
+    "attempted_on": "2026-08-12",
+    "status": "stopped_natural_vocabulary_below_target",
+    "aggregate_record": "p6_aggregate.json",
+    "training_config": "../../configs/pilot_p6.json",
+    "engineering_run_id": "p6-6d31a4e7",
+    "recording_level_split_used": true,
+    "leaky_fallback_used": false,
+    "target_vocab_size": 2048,
+    "observed_natural_vocab_size": 381,
+    "bert_training_started": false,
+    "decision_required": "explicit_tokenizer_protocol_choice",
+    "p0_p1_p2_p3_p4_p5_status_preserved": true,
+    "next_stage": "P6_protocol_decision",
     "next_stage_started": false
   }
 }

@@ -326,6 +326,14 @@ Gate:
 Retain in Git: vocabulary size, corpus aggregates, config hashes, and resource
 measurements—not tokenizer files or model weights.
 
+Status on 2026-08-12: **stopped before BERT construction**. The required
+recording-level split was available, and the tokenizer was trained once on the
+training recording only. Its natural WordPiece vocabulary contained 381 unique
+entries, below the frozen exact target of 2,048. The protocol forbids padding
+with arbitrary or external tokens, so no model, optimizer, checkpoint,
+validation, or P7 work was started. Continuing requires an explicit tokenizer
+protocol decision; `p6_aggregate.json` is the privacy-safe stop record.
+
 ## Pilot P7 — One complete CLIP+ cycle
 
 **Question:** Does the full multimodal control flow work with the pilot towers?
