@@ -2,7 +2,7 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "status": "p4_incomplete",
+  "status": "p4_complete",
   "classification": [
     "engineering_only",
     "non_comparable",
@@ -117,13 +117,16 @@
   "p4_completion": {
     "stage": "P4",
     "completed_on": "2026-08-12",
-    "status": "p4_incomplete",
-    "aggregate_record": "p4_aggregate.json",
-    "calibration_config": "../../configs/pilot_p4.json",
-    "model_role": "external_CLIP-B_evaluator_calibration_only",
+    "status": "p4_complete",
+    "canonical_selection_record": "p4_selection.json",
+    "aggregate_record": "p4_clip_l_diagnostic_aggregate.json",
+    "calibration_config": "../../configs/pilot_p4_clip_l_diagnostic.json",
+    "model_role": "external_CLIP-L_evaluator_calibration_only",
     "cannot_initialize_training": true,
-    "acceptance_passed": false,
-    "observed_overall_percent": 80.081716,
+    "acceptance_passed": true,
+    "observed_lexical_percent": 87.196202,
+    "observed_overall_percent": 78.972910,
+    "selection_basis": "passed_original_78.3_to_79.3_overall_window_closely_reproduced_87.3_lexical_and_improved_ten_task_mae_over_clip_b",
     "gates": [
       "juno_owner_and_mode_verification_passed",
       "official_archive_size_hash_and_safe_extraction_passed",
@@ -132,7 +135,9 @@
       "task_inventory_scoring_tie_failure_and_aggregation_verified",
       "training_reference_guard_passed",
       "detailed_predictions_record_inventory_diagnosis_and_logs_owner_only",
-      "acceptance_rule_failed_and_result_frozen"
+      "selected_clip_l_passed_original_acceptance_window",
+      "selected_clip_l_closer_than_clip_b_on_predeclared_ten_task_mae",
+      "historical_clip_b_failure_preserved_unchanged"
     ],
     "next_stage": "P5",
     "next_stage_started": false
@@ -140,7 +145,7 @@
   "p4_clip_l_provenance_diagnostic": {
     "stage": "P4-diagnostic",
     "completed_on": "2026-08-12",
-    "status": "diagnostic_complete",
+    "status": "diagnostic_complete_selected_as_canonical_calibration",
     "aggregate_record": "p4_clip_l_diagnostic_aggregate.json",
     "config": "../../configs/pilot_p4_clip_l_diagnostic.json",
     "model_role": "external_CLIP-L_evaluator_provenance_diagnostic_only",
@@ -150,5 +155,14 @@
     "closer_than_recorded_clip_b_across_ten_tasks": true,
     "original_p4_record_untouched": true,
     "next_stage_started": false
+  },
+  "p4_historical_initial_clip_b_calibration": {
+    "status": "p4_incomplete",
+    "aggregate_record": "p4_aggregate.json",
+    "config": "../../configs/pilot_p4.json",
+    "model_role": "external_CLIP-B_evaluator_calibration_only_historical",
+    "observed_overall_percent": 80.081716,
+    "acceptance_passed": false,
+    "immutable_historical_provenance": true
   }
 }

@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p4_canonical_calibration_selection",
+  "pilot_id": "juno_sample",
+  "stage": "P4",
+  "status": "p4_complete",
+  "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+  "selected_calibration": {
+    "aggregate_record": "p4_clip_l_diagnostic_aggregate.json",
+    "executed_config": "../../configs/pilot_p4_clip_l_diagnostic.json",
+    "model_name": "ViT-L-14",
+    "pretrained": "openai",
+    "model_role": "external_CLIP-L_evaluator_calibration_only",
+    "observed_lexical_percent": 87.196202,
+    "observed_overall_percent": 78.972910,
+    "acceptance_minimum_percent": 78.3,
+    "acceptance_maximum_percent": 79.3,
+    "acceptance_passed": true,
+    "ten_task_mean_absolute_error": 2.847925,
+    "single_completed_execution": true
+  },
+  "selection_basis": [
+    "observed_overall_within_original_predeclared_78.3_to_79.3_window",
+    "observed_lexical_closely_reproduced_released_87.3",
+    "ten_task_mean_absolute_error_lower_than_historical_clip_b"
+  ],
+  "historical_initial_calibration": {
+    "aggregate_record": "p4_aggregate.json",
+    "executed_config": "../../configs/pilot_p4.json",
+    "model_name": "ViT-B-16-quickgelu",
+    "pretrained": "openai",
+    "status": "p4_incomplete",
+    "observed_overall_percent": 80.081716,
+    "acceptance_passed": false,
+    "ten_task_mean_absolute_error": 3.306422,
+    "immutable_historical_provenance": true
+  },
+  "not_the_babyview_or_pilot_model": true,
+  "cannot_initialize_training": true,
+  "full_reproduction_recalibration_required": true,
+  "scientific_status_effect": "none",
+  "p0_p1_p2_p3_status_preserved": true,
+  "next_stage": "P5",
+  "p5_started": false
+}

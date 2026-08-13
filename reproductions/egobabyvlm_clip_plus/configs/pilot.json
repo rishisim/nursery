@@ -3,6 +3,9 @@
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
   "pilot_stage": "P4",
+  "status": "p4_complete",
+  "next_stage": "P5",
+  "next_stage_started": false,
   "classification": [
     "engineering_only",
     "non_comparable",
@@ -152,12 +155,16 @@
     "next_stage_started": true
   },
   "p4": {
-    "status": "p4_incomplete",
-    "canonical_calibration_config": "configs/pilot_p4.json",
-    "aggregate_record": "pilots/juno_sample/p4_aggregate.json",
-    "model_role": "external_evaluator_calibration_only",
+    "status": "p4_complete",
+    "canonical_selection_record": "pilots/juno_sample/p4_selection.json",
+    "selected_calibration_config": "configs/pilot_p4_clip_l_diagnostic.json",
+    "selected_aggregate_record": "pilots/juno_sample/p4_clip_l_diagnostic_aggregate.json",
+    "historical_failed_calibration_config": "configs/pilot_p4.json",
+    "historical_failed_aggregate_record": "pilots/juno_sample/p4_aggregate.json",
+    "selected_model": "ViT-L-14/openai",
+    "model_role": "external_CLIP-L_evaluator_calibration_only",
     "cannot_initialize_training": true,
-    "acceptance_passed": false,
+    "acceptance_passed": true,
     "next_stage": "P5",
     "next_stage_started": false
   },

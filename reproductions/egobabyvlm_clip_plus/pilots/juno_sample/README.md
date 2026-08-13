@@ -208,11 +208,11 @@ Work:
 
 1. Download the pinned official evaluation archive directly to governed Juno
    scratch and verify its recorded size and SHA-256.
-2. Run the released evaluator with the pinned runnable off-the-shelf CLIP-B model and
-   compare with the approximate 78.8 sanity result.
+2. Run the released evaluator with a pinned off-the-shelf CLIP model and compare
+   with the approximate 78.8 sanity result.
 3. Record per-task and aggregate scoring behavior, tie handling, failure
    handling, and lexical/grammatical aggregation.
-4. Store CLIP-B weights and cache paths under an evaluator-calibration-only
+4. Store calibration weights and cache paths under an evaluator-calibration-only
    namespace that no training configuration can reference.
 5. Freeze the evaluator after calibration. Do not tune the pilot using benchmark
    feedback.
@@ -226,21 +226,27 @@ Gate:
   DINO, BERT, or CLIP+ training.
 
 Retain in Git: calibration provenance, aggregate result, and the explicit label
-`external_CLIP-B_evaluator_calibration_only`.
+`external_CLIP-L_evaluator_calibration_only`.
 
-Status: **incomplete after the single frozen calibration execution**. The
-predeclared acceptance window was 78.3–79.3 around the released 78.8 result.
-The observed pooled result was lexical 89.658468, grammatical 70.504965, and
-overall 80.081716. Deterministic recomputation from the identical governed
-predictions without the current low-frequency-bin merge yielded 79.890328,
-which still misses the frozen window; the discrepancy is therefore not a
-reporting-only correction. No second inference run or benchmark-driven tuning
-is authorized, and P5 has not started. Full predictions, detailed results,
-checksum inventory, diagnosis, and important logs remain owner-only on Juno.
-The calibration weights are not the BabyView/pilot model, cannot initialize
-training, and full-reproduction evaluator recalibration remains required.
+Status: **complete for the pilot engineering gate**. The canonical selection is
+recorded in `p4_selection.json`: OpenAI `ViT-L-14` scored lexical 87.196202 and
+overall 78.972910, passing the original predeclared 78.3–79.3 overall window,
+closely reproducing released lexical 87.3, and improving the predeclared
+ten-task mean absolute error from 3.306422 to 2.847925. This selection used the
+already completed, frozen CLIP-L execution; no inference was rerun.
 
-### P4 CLIP-L provenance diagnostic
+The initial CLIP-B execution remains immutable historical evidence. It scored
+lexical 89.658468, grammatical 70.504965, and overall 80.081716 and failed the
+original acceptance window. Its frozen config, aggregate, diagnosis, and
+governed checksums were not relabeled or overwritten. CLIP-L is the sole active
+selected calibration; CLIP-B is not an alternative active protocol.
+
+P4 remains engineering-only, non-comparable, and not a reproduction result.
+The calibration weights are not the BabyView/pilot model and cannot initialize
+training. Full-reproduction evaluator recalibration remains required. P5 is the
+next stage and has not started.
+
+### P4 CLIP-L provenance and selection
 
 After preserving the failed frozen CLIP-B calibration, one separately frozen
 offline diagnostic tested the model identity repeatedly named in paper Tables 3
@@ -251,9 +257,10 @@ were 79.598683 versus 80.0. The ten-task mean absolute error improved from
 3.306422 for CLIP-B to 2.847925 for CLIP-L. This strongly supports CLIP-L as
 the published reference identity and falls inside the original overall window,
 but individual grammatical discrepancies remain as large as 6.227273 points.
-The diagnostic does not erase the original P4 record or retroactively change
-its predeclared execution; full predictions remain governed and P5 has not
-started.
+The completed diagnostic was subsequently selected as the canonical P4
+engineering calibration by explicit decision. That selection does not erase
+the original P4 record or retroactively change either executed protocol; full
+predictions remain governed and P5 has not started.
 
 ## Pilot P5 — Short real-shape DINO rehearsal
 

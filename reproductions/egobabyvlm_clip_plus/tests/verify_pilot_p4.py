@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import io
 import json
 import tarfile
@@ -15,6 +16,15 @@ CONFIG = ROOT / "configs" / "pilot_p4.json"
 AGGREGATE = ROOT / "pilots" / "juno_sample" / "p4_aggregate.json"
 CLIP_L_CONFIG = ROOT / "configs" / "pilot_p4_clip_l_diagnostic.json"
 CLIP_L_AGGREGATE = ROOT / "pilots" / "juno_sample" / "p4_clip_l_diagnostic_aggregate.json"
+SELECTION = ROOT / "pilots" / "juno_sample" / "p4_selection.json"
+PILOT_CONFIG = ROOT / "configs" / "pilot.json"
+DECISION = ROOT / "pilots" / "juno_sample" / "decision_record.json"
+HISTORICAL_HASHES = {
+    CONFIG: "c168ea207a7bb822c0a490514e2dee841f59d1c7a6cba15a1031e2bf9d03d2fb",
+    AGGREGATE: "56b1d99303cedf1088486071c6ae73002bd3b1d10845dc1a67c81ce492e19d25",
+    CLIP_L_CONFIG: "06d8aefca22f25b0dbccf6c91c94f84fbf3fff9a2cd3f99403ac81923d5f3339",
+    CLIP_L_AGGREGATE: "90065d5791734230c88308ad2e70a984ba026bd6639d08680c61fc113379fc49",
+}
 
 
 def require(value, message):
@@ -84,9 +94,14 @@ def main():
     require(config["separation"]["cannot_initialize_training"] and
             config["separation"]["export_to_learned_initialization_prohibited"], "weight boundary changed")
     forbidden = [config["storage"]["scratch_namespace"], config["model"]["model_name"],
-                 config["model"]["artifact_sha256"], "ViT-B-16.pt"]
-    for name in ("pilot.json", "pilot_p2.json", "pilot_p3.json"):
-        text = (ROOT / "configs" / name).read_text()
+                 config["model"]["artifact_sha256"], "ViT-B-16.pt", "ViT-L-14.pt",
+                 "b8cca3fd41ae0c99ba7e8951adf17d267cdb84cd88be6f7c2e0eca1737a03836"]
+    pilot_without_p4 = json.loads(PILOT_CONFIG.read_text())
+    del pilot_without_p4["p4"]
+    training_texts = {"pilot.json outside p4 metadata": json.dumps(pilot_without_p4)}
+    training_texts.update({name: (ROOT / "configs" / name).read_text()
+                           for name in ("pilot_p2.json", "pilot_p3.json")})
+    for name, text in training_texts.items():
         require(not any(token in text for token in forbidden), f"P4 reference leaked into {name}")
     if not AGGREGATE.exists():
         print("Pilot P4 pre-execution verification passed")
@@ -117,6 +132,42 @@ def main():
             "diagnostic crossed training boundary")
     require(not any(token in diagnostic_text.lower() for token in ("/work/", "/scratch/", "image_",
             "caption_", "raw_predictions", "participant", "session")), "diagnostic aggregate is not privacy-safe")
+    for path, expected in HISTORICAL_HASHES.items():
+        require(hashlib.sha256(path.read_bytes()).hexdigest() == expected,
+                f"immutable executed P4 record changed: {path.name}")
+    selection_text = SELECTION.read_text(); selection = json.loads(selection_text)
+    selected = selection["selected_calibration"]
+    historical = selection["historical_initial_calibration"]
+    require(selection["status"] == "p4_complete", "canonical P4 selection is not complete")
+    require(selected["model_name"] == "ViT-L-14" and selected["pretrained"] == "openai",
+            "selected evaluator is not ViT-L-14/openai")
+    require(selected["observed_overall_percent"] == 78.972910 and
+            selected["acceptance_minimum_percent"] <= selected["observed_overall_percent"] <=
+            selected["acceptance_maximum_percent"] and selected["acceptance_passed"],
+            "selected result does not pass original acceptance window")
+    require(selected["single_completed_execution"], "selected CLIP-L execution is not singular/complete")
+    require(historical["model_name"] == "ViT-B-16-quickgelu" and
+            historical["observed_overall_percent"] == 80.081716 and
+            historical["acceptance_passed"] is False and historical["immutable_historical_provenance"],
+            "failed historical CLIP-B record changed")
+    require(selection["cannot_initialize_training"] and
+            selection["full_reproduction_recalibration_required"], "selection crossed calibration boundary")
+    require(selection["p0_p1_p2_p3_status_preserved"] and selection["next_stage"] == "P5" and
+            selection["p5_started"] is False, "phase transition state changed")
+    require(not any(token in selection_text.lower() for token in ("/work/", "/scratch/", "image_",
+            "caption_", "raw_predictions", "participant", "session")), "selection is not privacy-safe")
+    pilot = json.loads(PILOT_CONFIG.read_text()); decision = json.loads(DECISION.read_text())
+    require(pilot["pilot_stage"] == "P4" and pilot["status"] == "p4_complete" and
+            pilot["next_stage"] == "P5" and pilot["next_stage_started"] is False and
+            pilot["p4"]["status"] == "p4_complete" and
+            pilot["p4"]["canonical_selection_record"].endswith("p4_selection.json") and
+            pilot["p4"]["selected_model"] == "ViT-L-14/openai" and
+            pilot["p4"]["next_stage"] == "P5" and pilot["p4"]["next_stage_started"] is False,
+            "canonical pilot P4/P5 state is inconsistent")
+    require(decision["status"] == "p4_complete" and
+            decision["p4_completion"]["canonical_selection_record"] == "p4_selection.json" and
+            decision["p4_completion"]["acceptance_passed"] and
+            decision["full_reproduction_recalibration_required"], "decision record is inconsistent")
     print("Pilot P4 verification passed")
 
 
