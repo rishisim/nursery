@@ -136,5 +136,19 @@
     ],
     "next_stage": "P5",
     "next_stage_started": false
+  },
+  "p4_clip_l_provenance_diagnostic": {
+    "stage": "P4-diagnostic",
+    "completed_on": "2026-08-12",
+    "status": "diagnostic_complete",
+    "aggregate_record": "p4_clip_l_diagnostic_aggregate.json",
+    "config": "../../configs/pilot_p4_clip_l_diagnostic.json",
+    "model_role": "external_CLIP-L_evaluator_provenance_diagnostic_only",
+    "observed_overall_percent": 78.972910,
+    "published_overall_percent": 78.8,
+    "within_original_p4_overall_window": true,
+    "closer_than_recorded_clip_b_across_ten_tasks": true,
+    "original_p4_record_untouched": true,
+    "next_stage_started": false
   }
 }

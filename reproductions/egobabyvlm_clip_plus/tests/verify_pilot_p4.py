@@ -13,6 +13,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "configs" / "pilot_p4.json"
 AGGREGATE = ROOT / "pilots" / "juno_sample" / "p4_aggregate.json"
+CLIP_L_CONFIG = ROOT / "configs" / "pilot_p4_clip_l_diagnostic.json"
+CLIP_L_AGGREGATE = ROOT / "pilots" / "juno_sample" / "p4_clip_l_diagnostic_aggregate.json"
 
 
 def require(value, message):
@@ -98,6 +100,23 @@ def main():
     require(aggregate["verification"]["single_completed_execution"], "single score marker absent")
     require(not any(token in text.lower() for token in ("/work/", "/scratch/", "image_", "caption_",
             "raw_predictions", "participant", "session")), "aggregate is not privacy-safe")
+    diagnostic_config = json.loads(CLIP_L_CONFIG.read_text())
+    diagnostic_text = CLIP_L_AGGREGATE.read_text(); diagnostic = json.loads(diagnostic_text)
+    require(diagnostic_config["model"]["model_name"] == "ViT-L-14" and
+            diagnostic_config["model"]["pretrained"] == "openai", "CLIP-L identity changed")
+    require(diagnostic_config["execution"]["authorized_completed_score_runs"] == 1,
+            "CLIP-L diagnostic execution count changed")
+    require(len(diagnostic_config["published_targets_percent"]) == 13,
+            "published per-task/subgroup target vector incomplete")
+    require(diagnostic["status"] == "diagnostic_complete" and
+            diagnostic["verification"]["single_completed_execution"], "CLIP-L diagnostic incomplete")
+    require(diagnostic["comparison"]["closer_than_recorded_clip_b"] and
+            diagnostic["comparison"]["within_original_p4_overall_window"], "CLIP-L comparison changed")
+    require(diagnostic["verification"]["original_clip_b_record_untouched"], "CLIP-B record overwritten")
+    require(diagnostic["cannot_initialize_training"] and diagnostic["p5_started"] is False,
+            "diagnostic crossed training boundary")
+    require(not any(token in diagnostic_text.lower() for token in ("/work/", "/scratch/", "image_",
+            "caption_", "raw_predictions", "participant", "session")), "diagnostic aggregate is not privacy-safe")
     print("Pilot P4 verification passed")
 
 

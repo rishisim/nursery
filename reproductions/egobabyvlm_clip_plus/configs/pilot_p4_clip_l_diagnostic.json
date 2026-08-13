@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p4_frozen_clip_l_provenance_diagnostic",
+  "pilot_id": "juno_sample",
+  "stage": "P4-diagnostic",
+  "status": "frozen_before_score",
+  "purpose": "Test the paper Table 3 and Table 5 CLIP-L label without replacing or rerunning the completed CLIP-B calibration.",
+  "classification": ["engineering_only", "diagnostic_only", "not_a_reproduction_result"],
+  "source": {
+    "repository": "https://github.com/facebookresearch/egobabyvlm",
+    "commit": "224621caf0628270b6115845ac75a65b984234a3"
+  },
+  "archive": {
+    "name": "MachineDevBench.tar",
+    "size_bytes": 1635409920,
+    "sha256": "5f4c662919e3b0abdb85f5d6520350f10c374f087886f4257bbe1bd336f3b13c"
+  },
+  "inventory": {
+    "styles": ["realistic", "cartoon"],
+    "lexical_tasks": ["lex_nouns", "lex_adjectives"],
+    "grammatical_tasks": ["gram_embedded_relative", "gram_subject_verb", "gram_order_matters", "gram_subject_adjective", "gram_negation", "gram_prepositions", "gram_comparatives", "gram_counting"]
+  },
+  "model": {
+    "role": "external_CLIP-L_evaluator_provenance_diagnostic_only",
+    "implementation": "open_clip_torch",
+    "implementation_version": "3.3.0",
+    "model_name": "ViT-L-14",
+    "pretrained": "openai",
+    "artifact_name": "ViT-L-14.pt",
+    "artifact_url": "https://openaipublic.azureedge.net/clip/models/b8cca3fd41ae0c99ba7e8951adf17d267cdb84cd88be6f7c2e0eca1737a03836/ViT-L-14.pt",
+    "artifact_sha256": "b8cca3fd41ae0c99ba7e8951adf17d267cdb84cd88be6f7c2e0eca1737a03836",
+    "image_size": 224,
+    "interpolation": "bicubic",
+    "precision": "float32",
+    "batch_size": 1
+  },
+  "published_targets_percent": {
+    "lex_nouns": 94.6,
+    "lex_adjectives": 80.0,
+    "gram_subject_verb": 63.2,
+    "gram_subject_adjective": 76.9,
+    "gram_negation": 75.7,
+    "gram_order_matters": 61.7,
+    "gram_prepositions": 75.4,
+    "gram_comparatives": 55.9,
+    "gram_counting": 99.5,
+    "gram_embedded_relative": 54.5,
+    "lexical": 87.3,
+    "grammatical": 70.4,
+    "overall": 78.8
+  },
+  "comparison": {
+    "primary": "mean_absolute_error_across_the_ten_published_task_scores",
+    "secondary": ["lexical_absolute_error", "grammatical_absolute_error", "overall_absolute_error", "maximum_absolute_task_error"],
+    "recorded_clip_b_ten_task_mean_absolute_error": 3.306422,
+    "closer_than_clip_b_rule": "CLIP-L ten-task mean absolute error must be strictly below 3.306422 percentage points",
+    "no_retroactive_threshold_change": true
+  },
+  "execution": {
+    "authorized_completed_score_runs": 1,
+    "offline_after_artifact_pin": true,
+    "benchmark_driven_tuning": false,
+    "completion_marker": "clip_l_score_complete.json",
+    "original_clip_b_marker_untouched": true
+  },
+  "storage": {
+    "resolver": "storage.py",
+    "scratch_namespace": "pilot_p4_calibration_only/clip_l_diagnostic",
+    "durable_record_namespace": "pilot_p4/clip_l_diagnostic",
+    "owner_only_required": true,
+    "local_or_worktree_fallback": false
+  },
+  "separation": {
+    "not_the_babyview_or_pilot_model": true,
+    "cannot_initialize_training": true,
+    "export_to_learned_initialization_prohibited": true,
+    "training_or_optimization": false,
+    "babyview_and_p3_access_prohibited": true,
+    "p5_started": false
+  }
+}

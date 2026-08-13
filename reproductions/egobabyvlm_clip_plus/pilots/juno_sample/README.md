@@ -240,6 +240,21 @@ checksum inventory, diagnosis, and important logs remain owner-only on Juno.
 The calibration weights are not the BabyView/pilot model, cannot initialize
 training, and full-reproduction evaluator recalibration remains required.
 
+### P4 CLIP-L provenance diagnostic
+
+After preserving the failed frozen CLIP-B calibration, one separately frozen
+offline diagnostic tested the model identity repeatedly named in paper Tables 3
+and 5: OpenAI `ViT-L-14` with OpenAI weights. It scored lexical 87.196202,
+grammatical 70.749617, and overall 78.972910, compared with the published 87.3,
+70.4, and 78.8. Within lexical, nouns were 94.793720 versus 94.6 and adjectives
+were 79.598683 versus 80.0. The ten-task mean absolute error improved from
+3.306422 for CLIP-B to 2.847925 for CLIP-L. This strongly supports CLIP-L as
+the published reference identity and falls inside the original overall window,
+but individual grammatical discrepancies remain as large as 6.227273 points.
+The diagnostic does not erase the original P4 record or retroactively change
+its predeclared execution; full predictions remain governed and P5 has not
+started.
+
 ## Pilot P5 — Short real-shape DINO rehearsal
 
 **Question:** Can the real visual tower train, checkpoint, and resume on Juno?
