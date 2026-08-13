@@ -271,7 +271,11 @@ teacher remained active with the official ViT-B/14 shape and random
 initialization. The final checkpoint, resolved config, detailed record,
 checksum inventory, and important logs are owner-only on governed durable
 storage; Git retains only the privacy-safe aggregate. P6 is next and has not
-started.
+started. The post-run audit proves finiteness for every row emitted by the
+upstream ten-iteration metric logger, not for unlogged individual steps. The
+official resume restored model, optimizer, and iteration state; the pinned
+loader does not restore scaler, RNG, or sampler state and uses sampler advance
+zero, so exact sample continuity is not claimed.
 
 **Question:** Can the real visual tower train, checkpoint, and resume on Juno?
 

@@ -11,8 +11,8 @@
   "architecture": "DINOv2_ViT-B/14",
   "initialization": "random_only",
   "objectives": {"dino": true, "ibot": true, "koleo": true, "ema_teacher": true},
-  "execution": {"health_checkpoint_step": 10, "resume_start_step": 10, "final_optimizer_step": 100, "effective_batch": 2, "single_completed_execution": true, "oom_records": 0},
-  "verification": {"all_logged_losses_finite": true, "required_components_observed": true, "student_updated": true, "teacher_ema_updated": true, "teacher_gradients_disabled": true, "checkpoint_schema_passed": true, "fresh_process_resume_passed": true, "fresh_process_final_load_passed": true, "forbidden_initialization_guard_passed": true},
+  "execution": {"health_checkpoint_step": 10, "resume_start_step": 10, "final_optimizer_step": 100, "effective_batch": 2, "single_completed_execution": true, "separate_process_job_resume_proven": true, "sample_continuity": "not_proven_upstream_sampler_advance_is_zero", "oom_records": 0},
+  "verification": {"all_logged_losses_finite": true, "required_components_observed": true, "student_updated": true, "teacher_ema_updated": true, "teacher_gradients_disabled": true, "supplemental_metadata_schema_passed": true, "fresh_process_resume_passed": true, "fresh_process_final_deserialization_passed": true, "official_model_restore_proven": true, "official_optimizer_restore_proven": true, "official_iteration_restore_proven": true, "official_scaler_restore_proven": false, "rng_restore_proven": false, "sampler_restore_proven": false, "forbidden_initialization_guard_passed": true},
   "losses": {
     "total_loss": {"min": 15.466169357299805, "max": 15.704366683959961, "final": 15.466169357299805},
     "dino_local_crops_loss": {"min": 10.63784408569336, "max": 10.647334098815918, "final": 10.63784408569336},
@@ -20,8 +20,10 @@
     "koleo_loss": {"min": 0.51123046875, "max": 0.740234375, "final": 0.51123046875},
     "ibot_loss": {"min": 2.9734904766082764, "max": 2.988712787628174, "final": 2.988240957260132}
   },
-  "resources": {"checkpoint_bytes": 2652621452, "effective_batch": 2, "health_wall_seconds": 21.961471076123416, "resume_wall_seconds": 30.297333037480712, "total_training_wall_seconds": 52.25880411360413, "optimizer_steps_per_second": 1.9135531647952078, "peak_allocated_gpu_memory_bytes": 4032823296, "peak_reserved_or_driver_gpu_memory_bytes": 7511998464},
-  "governed_records": {"detail_sha256": "26e76567404c85c31264d67e573ed704cf6f0eecfe4ec57a325985dc0ce04ca7", "inventory_sha256": "ca19b3814ea41b35a48f2a8c661970a992bf0e5972235aefe1b28a75952a1fa2", "checkpoint_sha256": "0ff45fe6d3ed6ca5402c4138474fb45a50aed006a45ee92ac1cf1bbba76ac280", "owner_only": true},
+  "metric_log_coverage": {"row_count": 10, "iterations": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90], "first_iteration": 0, "final_logged_iteration": 90, "target_optimizer_step": 100, "logging_convention": "iteration_zero_then_every_ten; final checkpoint iteration target_minus_one"},
+  "resources": {"checkpoint_bytes": 2652621452, "effective_batch": 2, "health_wall_seconds": 21.961471076123416, "resume_wall_seconds": 30.297333037480712, "total_training_wall_seconds": 52.25880411360413, "optimizer_steps_per_second": 1.9135531647952078, "peak_allocated_gpu_memory_bytes": 4032823296, "peak_reserved_or_driver_gpu_memory_bytes": 7511998464, "allocated_source": "pinned_upstream_allocator_max_mem_log_mib", "reserved_source": "slurm_sacct_gres_gpumem_inmax_mib", "allocator_log_sha256": "3beec7deac81368533d758042be3ff7d7045043ee79bb69d322ea48d9a0be7bc", "scheduler_record_sha256": "466999562612dbce33db95134d57b7c2ed86b24d9badcf2f8c8a23aa0301f20e", "scheduler_job_id": "324801"},
+  "governed_records": {"detail_sha256": "26e76567404c85c31264d67e573ed704cf6f0eecfe4ec57a325985dc0ce04ca7", "inventory_sha256": "ca19b3814ea41b35a48f2a8c661970a992bf0e5972235aefe1b28a75952a1fa2", "checkpoint_sha256": "0ff45fe6d3ed6ca5402c4138474fb45a50aed006a45ee92ac1cf1bbba76ac280", "audit_attestation_sha256": "2150d5f430f111133094e7e5b7eea1b02cbe6232f3679267b82f5bf292f511eb", "audit_inventory_sha256": "9c483aee9fd8891c7a5dc2083156f787968d4f75d461ccb8ec71dbb12f0fbc62", "owner_only": true},
+  "limitations": ["Exact sample continuity is not proven because the pinned upstream loader resumes with sampler_advance=0; optimizer-step accounting is exact.", "Loss finiteness is proven for every upstream-logged row, not for unlogged individual steps."],
   "p0_p1_p2_p3_p4_status_preserved": true,
   "next_stage": "P6",
   "next_stage_started": false

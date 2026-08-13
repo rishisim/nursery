@@ -183,9 +183,14 @@
       "exactly_one_hundred_optimizer_steps",
       "finite_logged_total_and_component_losses",
       "student_and_ema_teacher_updates_observed",
-      "fresh_process_final_checkpoint_load_passed",
+      "fresh_process_final_checkpoint_deserialization_and_payload_validation_passed",
       "durable_checkpoint_config_records_logs_and_checksum_inventory_verified",
       "p4_training_reference_guard_passed"
+    ],
+    "audit_limitations": [
+      "loss_finiteness_proven_for_each_upstream_logged_row_not_unlogged_individual_steps",
+      "official_resume_restored_model_optimizer_and_iteration_not_scaler_rng_or_sampler",
+      "exact_sample_continuity_not_proven_because_upstream_sampler_advance_is_zero"
     ],
     "next_stage": "P6",
     "next_stage_started": false
