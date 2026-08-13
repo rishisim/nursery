@@ -47,8 +47,8 @@ def main() -> None:
     require(config["pilot_id"] == decision["pilot_id"] == "juno_sample", "pilot IDs disagree")
     require(config["engineering_run_id"] == decision["engineering_run_id"] == "p0-4cc3af23",
             "opaque engineering run IDs disagree")
-    require(decision["status"] in {"p0_complete", "p1_complete", "p2_complete", "p3_complete"}, "P0 status is not preserved")
-    require(config["pilot_stage"] in {"P0", "P1", "P2", "P3"}, "unexpected pilot stage")
+    require(decision["status"] in {"p0_complete", "p1_complete", "p2_complete", "p3_complete", "p4_incomplete", "p4_complete"}, "P0 status is not preserved")
+    require(config["pilot_stage"] in {"P0", "P1", "P2", "P3", "P4"}, "unexpected pilot stage")
     require(decision["p0_completion"]["stage"] == "P0", "P0 completion stage disagrees")
     require(decision["p0_completion"]["next_stage_started"] is False, "later pilot stage started")
     require(config["classification"] == decision["classification"] == EXPECTED_CLASSIFICATION,
@@ -105,10 +105,10 @@ def main() -> None:
             "decision step cycle disagrees")
     require(config["evaluation"]["pilot_model_evaluations_after_calibration"] == 1,
             "pilot checkpoint evaluation count changed")
-    require(config["evaluation"]["calibration"] == "isolated_off_the_shelf_CLIP-L",
+    require(config["evaluation"]["calibration"] == "isolated_external_evaluator_calibration_only",
             "evaluator calibration is not isolated")
     require(fixed["evaluator_calibration"] ==
-            "isolated_off_the_shelf_CLIP-L_then_one_frozen_pilot_checkpoint_evaluation",
+            "isolated_external_evaluator_calibration_only_then_one_frozen_pilot_checkpoint_evaluation",
             "evaluation decisions disagree")
     require(config["source"]["commit"] == spec["official_code"]["commit"] == EXPECTED_COMMIT,
             "upstream source pin disagrees")

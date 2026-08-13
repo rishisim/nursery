@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p4_clip_l_provenance_diagnostic_aggregate",
+  "pilot_id": "juno_sample",
+  "run_id": "p4l-6c16b754",
+  "status": "diagnostic_complete",
+  "classification": ["engineering_only", "diagnostic_only", "not_a_reproduction_result"],
+  "model_role": "external_CLIP-L_evaluator_provenance_diagnostic_only",
+  "results_percent": {
+    "lex_nouns": 94.793720,
+    "lex_adjectives": 79.598683,
+    "lexical": 87.196202,
+    "gram_subject_verb": 59.210526,
+    "gram_subject_adjective": 72.189349,
+    "gram_negation": 81.081081,
+    "gram_order_matters": 58.333333,
+    "gram_prepositions": 75.123153,
+    "gram_comparatives": 59.803922,
+    "gram_counting": 99.528302,
+    "gram_embedded_relative": 60.727273,
+    "grammatical": 70.749617,
+    "overall": 78.972910
+  },
+  "signed_errors_percentage_points": {
+    "lex_nouns": 0.193720,
+    "lex_adjectives": -0.401317,
+    "lexical": -0.103798,
+    "gram_subject_verb": -3.989474,
+    "gram_subject_adjective": -4.710651,
+    "gram_negation": 5.381081,
+    "gram_order_matters": -3.366667,
+    "gram_prepositions": -0.276847,
+    "gram_comparatives": 3.903922,
+    "gram_counting": 0.028302,
+    "gram_embedded_relative": 6.227273,
+    "grammatical": 0.349617,
+    "overall": 0.172910
+  },
+  "comparison": {
+    "ten_task_mean_absolute_error": 2.847925,
+    "recorded_clip_b_ten_task_mean_absolute_error": 3.306422,
+    "closer_than_recorded_clip_b": true,
+    "maximum_absolute_task_error": 6.227273,
+    "original_p4_overall_window_minimum": 78.3,
+    "original_p4_overall_window_maximum": 79.3,
+    "within_original_p4_overall_window": true,
+    "interpretation": "CLIP-L strongly supports the paper table label and reproduces lexical and aggregate values closely, while nontrivial grammatical per-task differences remain."
+  },
+  "verification": {
+    "single_completed_execution": true,
+    "offline": true,
+    "archive_hash_passed": true,
+    "model_hash_passed": true,
+    "frozen_inventory_passed": true,
+    "original_clip_b_record_untouched": true,
+    "training_reference_guard_passed": true
+  },
+  "governed_records": {
+    "detail_sha256": "ebe3af37acddc4084218271edea29249ca72d9adf5eca6fc9de92476ed9e660b",
+    "completion_marker_sha256": "ad16b2b1f95c43e6130ae935100f923e189ec9e1de18eb30bc33d56d47794984",
+    "important_log_sha256": "7429327843207adbe952278e7732711847d8766e85f09d997ec6005aee7ad5d2",
+    "owner_only": true
+  },
+  "not_the_babyview_or_pilot_model": true,
+  "cannot_initialize_training": true,
+  "scientific_status_effect": "none",
+  "p5_started": false
+}

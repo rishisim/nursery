@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p4_privacy_safe_aggregate",
+  "pilot_id": "juno_sample",
+  "engineering_run_id": "p4-3a56d9c1",
+  "stage": "P4",
+  "status": "p4_incomplete",
+  "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+  "scientific_status_effect": "none",
+  "inventory_status": "incomplete_inventory",
+  "model_role": "external_CLIP-B_evaluator_calibration_only",
+  "not_the_babyview_or_pilot_model": true,
+  "cannot_initialize_training": true,
+  "full_reproduction_recalibration_required": true,
+  "results_percent": {
+    "lexical": 89.658468,
+    "grammatical": 70.504965,
+    "overall": 80.081716,
+    "by_task": {
+      "lex_nouns": 95.559024,
+      "lex_adjectives": 83.757911,
+      "gram_embedded_relative": 61.818182,
+      "gram_subject_verb": 67.763158,
+      "gram_order_matters": 62.222222,
+      "gram_subject_adjective": 79.289941,
+      "gram_negation": 72.972973,
+      "gram_prepositions": 66.995074,
+      "gram_comparatives": 53.921569,
+      "gram_counting": 99.056604
+    }
+  },
+  "acceptance": {
+    "released_lexical_percent": 87.3,
+    "released_grammatical_percent": 70.4,
+    "released_overall_percent": 78.8,
+    "minimum_percent": 78.3,
+    "maximum_percent": 79.3,
+    "declared_before_score": true,
+    "passed": false
+  },
+  "diagnosis": {
+    "method": "deterministic_recomputation_from_identical_governed_predictions_only",
+    "second_inference_run": false,
+    "overall_without_low_frequency_merge_percent": 79.890328,
+    "reporting_or_aggregation_only_discrepancy": false,
+    "conclusion": "selected_CLIP_B_reproduces_released_grammar_but_not_released_lexical_or_overall"
+  },
+  "verification": {
+    "archive_hash_passed": true,
+    "safe_extraction_passed": true,
+    "frozen_inventory_passed": true,
+    "model_hash_passed": true,
+    "offline": true,
+    "single_completed_execution": true,
+    "training_reference_guard_passed": true,
+    "tie_is_incorrect": true,
+    "failed_examples_abort_execution": true
+  },
+  "governed_records": {
+    "detail_sha256": "5a24c7d28cf2931f144e6ba8dcbceda51ea4dd07b032b9b3acb68796fdc6d238",
+    "completion_marker_sha256": "5f731ffa53daeb221852c5fed9695fbe962f601c3100da0c530522982c8e2413",
+    "archive_inventory_sha256": "6b70a3d0fdd7357a9fb4e996febb8d804c8694373f8a2f0f39d6c578b8d6e517",
+    "important_log_sha256": "2000a46279b360403554410dafb150a79e5c4872b5d527ad1fffa0b7974e1df2",
+    "diagnosis_sha256": "dcf2b9a4c25e3854c81f8d80a73b2b611073f137b2ac21d70e90770be2b2c284",
+    "owner_only": true
+  },
+  "p0_status_preserved": true,
+  "p1_status_preserved": true,
+  "p2_status_preserved": true,
+  "p3_status_preserved": true,
+  "p5_started": false
+}
