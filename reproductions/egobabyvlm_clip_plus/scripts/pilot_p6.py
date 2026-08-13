@@ -11,6 +11,7 @@ import shutil
 import stat
 import sys
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
@@ -131,6 +132,133 @@ def train_tokenizer(texts: list[str], output: Path, cfg: dict[str, Any]) -> tupl
     return len(vocab), sha256(output / "tokenizer.json")
 
 
+def runtime_imports():
+    import torch
+    from transformers import BertConfig, BertForMaskedLM, BertTokenizerFast
+    return torch, BertConfig, BertForMaskedLM, BertTokenizerFast
+
+
+def model_config(cfg: dict[str, Any], BertConfig: Any) -> Any:
+    m = cfg["model"]
+    return BertConfig(**{key: m[key] for key in (
+        "vocab_size", "hidden_size", "num_hidden_layers", "num_attention_heads",
+        "intermediate_size", "hidden_act", "hidden_dropout_prob",
+        "attention_probs_dropout_prob", "max_position_embeddings", "type_vocab_size",
+        "initializer_range", "layer_norm_eps", "position_embedding_type", "pad_token_id",
+    )})
+
+
+def make_tokenizer(run_root: Path, BertTokenizerFast: Any) -> Any:
+    return BertTokenizerFast(
+        vocab_file=str(run_root / "tokenizer" / "vocab.txt"), do_lower_case=False,
+        pad_token=SPECIAL_TOKENS[0], unk_token=SPECIAL_TOKENS[1],
+        cls_token=SPECIAL_TOKENS[2], sep_token=SPECIAL_TOKENS[3], mask_token=SPECIAL_TOKENS[4],
+    )
+
+
+def masked_batch(torch: Any, tokenizer: Any, texts: list[str], index: int, cfg: dict[str, Any], device: Any, generator: Any):
+    encoded = tokenizer(texts[index], max_length=cfg["training"]["sequence_length"], truncation=True, return_tensors="pt")
+    ids = encoded["input_ids"].clone(); labels = ids.clone()
+    special = torch.tensor([tokenizer.get_special_tokens_mask(row.tolist(), already_has_special_tokens=True) for row in labels], dtype=torch.bool)
+    probability = torch.full(labels.shape, cfg["training"]["mlm_probability"])
+    masked = torch.bernoulli(probability.masked_fill(special, 0.0), generator=generator).bool()
+    if not masked.any():
+        candidates=(~special).nonzero(as_tuple=False)
+        if not len(candidates): raise GateError("sequence has no maskable tokens")
+        masked[tuple(candidates[0].tolist())]=True
+    labels[~masked]=-100
+    replace = torch.bernoulli(torch.full(labels.shape, 0.8), generator=generator).bool() & masked
+    ids[replace]=tokenizer.mask_token_id
+    random_replace = torch.bernoulli(torch.full(labels.shape, 0.5), generator=generator).bool() & masked & ~replace
+    random_words=torch.randint(len(tokenizer), labels.shape, generator=generator)
+    ids[random_replace]=random_words[random_replace]
+    return {"input_ids":ids.to(device), "attention_mask":encoded["attention_mask"].to(device), "labels":labels.to(device)}
+
+
+def checkpoint_path(run_root: Path, step: int) -> Path:
+    return run_root / "checkpoints" / f"step_{step}.pt"
+
+
+def save_checkpoint(torch: Any, path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    temporary=path.with_suffix(".tmp")
+    torch.save(payload, temporary); os.chmod(temporary,0o600); os.replace(temporary,path)
+
+
+def train_phase(args: argparse.Namespace) -> int:
+    torch, BertConfig, BertForMaskedLM, BertTokenizerFast = runtime_imports()
+    cfg=load_config(args.config.resolve()); run_root=args.scratch_root.resolve()/"runs"/"pilot_p6"/RUN_ID
+    require_owner_only(args.scratch_root.resolve()); require_owner_only(args.durable_root.resolve())
+    gate=json.loads((run_root/"tokenizer_gate.json").read_text()); target=cfg["tokenizer"]["vocab_size"]
+    if gate["tokenizer"]["observed_unique_vocab_size"] != target: raise GateError("tokenizer gate does not match authorized vocabulary")
+    tokenizer=make_tokenizer(run_root,BertTokenizerFast)
+    if len(tokenizer)!=target: raise GateError("tokenizer/model vocabulary mismatch")
+    train_text=(run_root/"corpus/train.txt").read_text().splitlines()
+    device=torch.device("cuda"); generator=torch.Generator(device="cpu")
+    resume=args.resume_step is not None
+    if resume:
+        state=torch.load(checkpoint_path(run_root,args.resume_step),map_location="cpu",weights_only=False)
+        if state["optimizer_step"]!=args.resume_step or state["config_sha256"]!=sha256(args.config): raise GateError("checkpoint step/config mismatch")
+        model=BertForMaskedLM(model_config(cfg,BertConfig)); model.load_state_dict(state["model"])
+    else:
+        torch.manual_seed(cfg["training"]["seed"]); torch.cuda.manual_seed_all(cfg["training"]["seed"])
+        model=BertForMaskedLM(model_config(cfg,BertConfig)); state=None
+    model.to(device); model.train()
+    optimizer=torch.optim.AdamW(model.parameters(),lr=cfg["training"]["learning_rate"],weight_decay=cfg["training"]["weight_decay"])
+    scheduler=torch.optim.lr_scheduler.LambdaLR(optimizer,lambda s: min((s+1)/cfg["training"]["warmup_steps"],max(0.0,(cfg["training"]["final_optimizer_step"]-s)/(cfg["training"]["final_optimizer_step"]-cfg["training"]["warmup_steps"]))))
+    if state:
+        optimizer.load_state_dict(state["optimizer"]); scheduler.load_state_dict(state["scheduler"])
+        torch.set_rng_state(state["torch_cpu_rng"]); torch.cuda.set_rng_state_all(state["torch_cuda_rng"]); generator.set_state(state["sampler_state"]); start=state["optimizer_step"]
+    else:
+        generator.manual_seed(cfg["training"]["seed"]); start=0
+    initial_encoder=next(model.bert.encoder.parameters()).detach().float().cpu().clone()
+    initial_head=model.cls.predictions.bias.detach().float().cpu().clone()
+    losses=[]; started=time.time(); peak=0
+    torch.cuda.reset_peak_memory_stats()
+    for step in range(start+1,args.target_step+1):
+        batch=masked_batch(torch,tokenizer,train_text,(step-1)%len(train_text),cfg,device,generator)
+        optimizer.zero_grad(set_to_none=True)
+        with torch.autocast("cuda",dtype=torch.bfloat16): output=model(**batch); loss=output.loss
+        if not torch.isfinite(loss): raise GateError("nonfinite MLM loss")
+        loss.backward()
+        if not all(p.grad is None or torch.isfinite(p.grad).all() for p in model.parameters()): raise GateError("nonfinite gradient")
+        optimizer.step(); scheduler.step(); losses.append(float(loss.detach()))
+    peak=torch.cuda.max_memory_allocated(); elapsed=time.time()-started
+    encoder_updated=not torch.equal(initial_encoder,next(model.bert.encoder.parameters()).detach().float().cpu())
+    head_updated=not torch.equal(initial_head,model.cls.predictions.bias.detach().float().cpu())
+    payload={"model":model.state_dict(),"optimizer":optimizer.state_dict(),"scheduler":scheduler.state_dict(),"scaler":None,"optimizer_step":args.target_step,"iteration":args.target_step,"tokenizer_sha256":sha256(run_root/"tokenizer/tokenizer.json"),"config_sha256":sha256(args.config),"python_rng":None,"torch_cpu_rng":torch.get_rng_state(),"torch_cuda_rng":torch.cuda.get_rng_state_all(),"sampler_state":generator.get_state(),"process_id":os.getpid()}
+    save_checkpoint(torch,checkpoint_path(run_root,args.target_step),payload)
+    atomic_json(run_root/f"segment_{args.target_step}.json",{"start_step":start,"end_step":args.target_step,"process_id":os.getpid(),"losses":losses,"all_losses_finite":True,"encoder_updated":encoder_updated,"mlm_head_updated":head_updated,"scheduler_last_epoch":scheduler.last_epoch,"peak_allocated_gpu_memory_bytes":peak,"wall_seconds":elapsed})
+    print(json.dumps({"status":"segment_complete","start":start,"end":args.target_step,"pid":os.getpid()})); return 0
+
+
+def finalize(args: argparse.Namespace) -> int:
+    torch,BertConfig,BertForMaskedLM,BertTokenizerFast=runtime_imports(); cfg=load_config(args.config.resolve())
+    run_root=args.scratch_root.resolve()/"runs"/"pilot_p6"/RUN_ID; durable=args.durable_root.resolve()/"run_records/pilot_p0/p0-4cc3af23/pilot_p6"
+    if (durable/"completion.json").exists(): raise GateError("P6 already completed")
+    tokenizer=make_tokenizer(run_root,BertTokenizerFast); state=torch.load(checkpoint_path(run_root,100),map_location="cpu",weights_only=False)
+    model=BertForMaskedLM(model_config(cfg,BertConfig)); model.load_state_dict(state["model"]); model.cuda().eval()
+    validation=(run_root/"corpus/validation.txt").read_text().splitlines(); generator=torch.Generator().manual_seed(cfg["training"]["seed"]+1)
+    losses=[]
+    with torch.no_grad():
+        for i in range(len(validation)):
+            batch=masked_batch(torch,tokenizer,validation,i,cfg,torch.device("cuda"),generator)
+            losses.append(float(model(**batch).loss))
+    if not losses or not all(__import__('math').isfinite(x) for x in losses): raise GateError("validation did not produce finite loss")
+    smoke=masked_batch(torch,tokenizer,validation,0,cfg,torch.device("cuda"),generator)
+    with torch.no_grad(): logits=model(input_ids=smoke["input_ids"],attention_mask=smoke["attention_mask"]).logits
+    if logits.shape[-1]!=len(tokenizer): raise GateError("fresh-load smoke incompatibility")
+    s50=json.loads((run_root/"segment_50.json").read_text()); s100=json.loads((run_root/"segment_100.json").read_text())
+    if s50["process_id"]==s100["process_id"] or s100["start_step"]!=50: raise GateError("distinct-process resume not proven")
+    promoted=args.durable_root.resolve()/"checkpoints/pilot_p6"/RUN_ID; promoted.mkdir(parents=True,exist_ok=True,mode=0o700)
+    for source in (checkpoint_path(run_root,100),run_root/"tokenizer/vocab.txt",run_root/"tokenizer/tokenizer.json",args.config.resolve()):
+        target=promoted/source.name; shutil.copy2(source,target); os.chmod(target,0o600)
+    inventory={p.name:sha256(p) for p in promoted.iterdir() if p.is_file()}
+    detail={"schema_version":1,"status":"p6_complete","optimizer_step":100,"health_process_id":s50["process_id"],"resume_process_id":s100["process_id"],"losses":s50["losses"]+s100["losses"],"encoder_updated":s50["encoder_updated"] and s100["encoder_updated"],"mlm_head_updated":s50["mlm_head_updated"] and s100["mlm_head_updated"],"validation_runs":1,"validation_loss":sum(losses)/len(losses),"validation_non_generalizing":True,"fresh_load_smoke":True,"resources":{"peak_allocated_gpu_memory_bytes":max(s50["peak_allocated_gpu_memory_bytes"],s100["peak_allocated_gpu_memory_bytes"]),"training_wall_seconds":s50["wall_seconds"]+s100["wall_seconds"],"checkpoint_bytes":checkpoint_path(run_root,100).stat().st_size},"inventory":inventory}
+    atomic_json(durable/"detail.json",detail); atomic_json(durable/"checksum_inventory.json",inventory); atomic_json(durable/"completion.json",{"status":"p6_complete","detail_sha256":sha256(durable/"detail.json"),"inventory_sha256":sha256(durable/"checksum_inventory.json")})
+    print(json.dumps({"status":"p6_complete","validation_loss":detail["validation_loss"]})); return 0
+
+
 def prepare(args: argparse.Namespace) -> int:
     scratch_root = args.scratch_root.resolve()
     durable_root = args.durable_root.resolve()
@@ -224,10 +352,12 @@ def prepare(args: argparse.Namespace) -> int:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("prepare-tokenizer",))
+    parser.add_argument("command", choices=("prepare-tokenizer","train","finalize"))
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--scratch-root", type=Path, required=True)
     parser.add_argument("--durable-root", type=Path, required=True)
+    parser.add_argument("--target-step", type=int)
+    parser.add_argument("--resume-step", type=int)
     return parser.parse_args()
 
 
@@ -236,6 +366,10 @@ def main() -> int:
     try:
         if args.command == "prepare-tokenizer":
             return prepare(args)
+        if args.command == "train":
+            if args.target_step not in (50,100): raise GateError("target step must be 50 or 100")
+            return train_phase(args)
+        if args.command == "finalize": return finalize(args)
         raise GateError("unsupported command")
     except (GateError, OSError, ValueError, json.JSONDecodeError) as error:
         print(f"P6 gate error: {error}", file=sys.stderr)

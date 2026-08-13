@@ -4,7 +4,7 @@
   "pilot_id": "juno_sample",
   "engineering_run_id": "p6-6d31a4e7",
   "stage": "P6",
-  "status": "frozen_before_tokenizer_execution",
+  "status": "refrozen_after_authorized_natural_vocabulary_decision",
   "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
   "source": {
     "repository": "https://github.com/facebookresearch/egobabyvlm",
@@ -44,7 +44,7 @@
   },
   "tokenizer": {
     "algorithm": "WordPiece",
-    "vocab_size": 2048,
+    "vocab_size": 380,
     "required_special_token_count": 5,
     "special_tokens": ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"],
     "special_token_ids": {"pad": 0, "unk": 1, "cls": 2, "sep": 3, "mask": 4},
@@ -58,12 +58,12 @@
     "fabricated_padding_tokens": false,
     "seed": 1287892771,
     "implementation": "tokenizers.BertWordPieceTokenizer.train_from_iterator",
-    "tool_revision": "tokenizers version resolved by immutable P2 pixi.lock",
-    "exact_size_failure": "stop_before_BERT_training_and_request_protocol_decision"
+    "tool_revision": "tokenizers_0.22.2_with_RAYON_NUM_THREADS_1",
+    "vocabulary_decision": "operator_authorized_option_1_on_2026-08-12_use_the_reproducible_natural_training_only_vocabulary; the earlier parallel observation of 381 was superseded after a deterministic single-thread rerun produced 380"
   },
   "model": {
     "architecture": "BertForMaskedLM",
-    "vocab_size": 2048,
+    "vocab_size": 380,
     "hidden_size": 768,
     "num_hidden_layers": 12,
     "num_attention_heads": 12,
@@ -115,7 +115,7 @@
     "refuse_second_completion": true,
     "phases": ["prepare_tokenizer", "health_to_50", "fresh_resume_to_100", "fresh_final_load"]
   },
-  "acceptance": ["juno_guard", "recording_split_and_input_hashes", "natural_exact_2048_unique_vocab", "tokenizer_model_special_id_compatibility", "exact_BERT_base_MLM_random_initialization", "finite_all_emitted_losses", "encoder_and_MLM_head_update", "step_50_checkpoint", "distinct_process_exact_resume_to_100", "scheduler_advance", "single_non_generalizing_validation", "fresh_load_and_smoke_forward", "attributed_resource_metrics", "durable_promotion_checksum_verified"],
+  "acceptance": ["juno_guard", "recording_split_and_input_hashes", "authorized_reproducible_natural_380_unique_vocab", "tokenizer_model_special_id_compatibility", "exact_BERT_base_MLM_random_initialization", "finite_all_emitted_losses", "encoder_and_MLM_head_update", "step_50_checkpoint", "distinct_process_exact_resume_to_100", "scheduler_advance", "single_non_generalizing_validation", "fresh_load_and_smoke_forward", "attributed_resource_metrics", "durable_promotion_checksum_verified"],
   "stop_conditions": ["juno_or_owner_mode_failure", "input_source_environment_or_config_hash_mismatch", "natural_vocab_not_exactly_2048", "minimum_microbatch_OOM_after_one_record", "nonfinite_loss_or_gradient", "checkpoint_corruption_or_mismatch", "forbidden_initialization_reference", "second_completed_execution"],
   "storage": {"resolver": "storage.py", "scratch_namespace": "pilot_p6/p6-6d31a4e7", "durable_namespace": "pilot_p0/p0-4cc3af23/pilot_p6", "owner_only_required": true, "local_or_worktree_fallback": false},
   "forbidden": ["P4 calibration artifact or namespace", "P5 checkpoint or DINO artifact", "external pretrained BERT or tokenizer", "external or fabricated corpus/token", "CLIP+ construction or training", "Machine-DevBench access or evaluation", "P7 or later"],

@@ -326,13 +326,13 @@ Gate:
 Retain in Git: vocabulary size, corpus aggregates, config hashes, and resource
 measurements—not tokenizer files or model weights.
 
-Status on 2026-08-12: **stopped before BERT construction**. The required
-recording-level split was available, and the tokenizer was trained once on the
-training recording only. Its natural WordPiece vocabulary contained 381 unique
-entries, below the frozen exact target of 2,048. The protocol forbids padding
-with arbitrary or external tokens, so no model, optimizer, checkpoint,
-validation, or P7 work was started. Continuing requires an explicit tokenizer
-protocol decision; `p6_aggregate.json` is the privacy-safe stop record.
+Status on 2026-08-12: **complete for the engineering gate** after the operator
+authorized the smaller natural vocabulary. A deterministic single-thread
+tokenizer run produced 380 entries from the training recording only; no tokens
+were fabricated or imported. Exact BERT-base MLM training checkpointed at step
+50, resumed in a distinct job, and ended at exactly step 100. Encoder and MLM
+head updates, finite losses, one non-generalizing validation pass, and a fresh
+final load/smoke pass were verified. P7 was not started.
 
 ## Pilot P7 — One complete CLIP+ cycle
 
