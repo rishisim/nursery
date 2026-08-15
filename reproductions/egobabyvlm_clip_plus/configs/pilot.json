@@ -2,9 +2,9 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "pilot_stage": "P8",
-  "status": "p8_complete",
-  "next_stage": "P9",
+  "pilot_stage": "P9",
+  "status": "p9_complete",
+  "next_stage": "mandatory_full_reproduction_reset_and_readiness_gates",
   "next_stage_started": false,
   "classification": [
     "engineering_only",
@@ -223,7 +223,17 @@
     "completed_score_runs": 1,
     "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
     "next_stage": "P9",
-    "next_stage_started": false
+    "next_stage_started": true
+  },
+  "p9": {
+    "status": "p9_complete",
+    "canonical_audit_config": "configs/pilot_p9.json",
+    "decision_record": "pilots/juno_sample/p9_decision.json",
+    "pilot_engineering_completion": "complete",
+    "infrastructure_pipeline_scale_readiness": "conditional_go",
+    "scientific_full_reproduction_readiness": "no_go_blocked",
+    "next_action": "mandatory_full_reproduction_reset_and_readiness_gates",
+    "next_action_started": false
   },
   "expected_retained_p0_record": {
     "location": "pilots/juno_sample/decision_record.json",

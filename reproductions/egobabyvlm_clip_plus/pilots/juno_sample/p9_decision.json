@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p9_compact_promotion_readiness_decision",
+  "pilot_id": "juno_sample",
+  "stage": "P9",
+  "status": "p9_complete",
+  "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+  "three_axis_decision": {
+    "pilot_engineering_completion": "complete",
+    "infrastructure_pipeline_scale_readiness": "conditional_go",
+    "scientific_full_reproduction_readiness": "no_go_blocked"
+  },
+  "scientific_status_effect": "none",
+  "scientific_phase_status_preserved": "blocked_by_exact_usable_subset_evidence",
+  "gate_reconciliation": {
+    "P0": "passed_frozen_two_video_engineering_contract",
+    "P1": "passed_two_video_inventory; full_dataset_inventory_remains_unavailable_and_out_of_scope",
+    "P2": "passed_real_shape_random_initialization_and_preprocessing_weight_boundary",
+    "P3": "passed_recording_disjoint_preprocessing_resume_idempotence_and_count_reconciliation",
+    "P4": "passed_selected_CLIP_L_calibration; failed_CLIP_B_attempt_preserved_as_historical_provenance",
+    "P5": "passed_100_step_DINO_checkpoint_resume_with_documented_nonexact_sample_continuity",
+    "P6": "passed_after_user_authorized_deterministic_380_token_training_only_vocabulary; 2048_gate_and_stale_label_attempt_preserved_and_excluded",
+    "P7": "passed_exact_100_20_10_cycle_resume_and_zero_update_preserved_artifact_hardening",
+    "P8": "passed_exactly_one_completed_scoring_attempt_and_preserved_output_integrity_audit"
+  },
+  "excluded_attempt_lessons": [
+    "pre_access_and_environment_failures_stopped_before_forbidden_access_or_training",
+    "invalid_or_stale_acceptance_labels_are_preserved_but_cannot satisfy_a_gate",
+    "retry_is_allowed_only_before an irreversible_or_single_attempt boundary",
+    "P8_attempt_ledger_fails_closed_after_scoring_started_and_forbids_retry",
+    "historical_CLIP_B_failure_was_not_relabelled_or_overwritten"
+  ],
+  "pilot_deviations_not_scientific_protocol": [
+    "exactly_two_videos_and_one_engineering_seed",
+    "recording_disjoint_two_record_split",
+    "deterministic_380_token_natural_training_only_vocabulary_after_2048_was_infeasible",
+    "bounded_100_step_DINO_100_step_BERT_and_100_20_10_joint_cycle",
+    "pilot_only_confidence_threshold_batch_and_single_GPU_choices"
+  ],
+  "measured_resources": {
+    "source_video_hours": 0.189849,
+    "P3": {
+      "wall_seconds_per_source_video_hour": {"audio": 3.64, "VTC": 119.92444, "WhisperX": 38.856541, "frames": 306.645824, "total": 469.066805},
+      "peak_host_ram_kb": 2310588,
+      "peak_gpu_memory_bytes": 787130880,
+      "audio_plus_frames_bytes": 107931078,
+      "audio_plus_frames_bytes_per_source_video_hour": 568510121,
+      "CPU_time": "not_measured",
+      "GPU_time": "not_measured_separately_from_stage_wall_time"
+    },
+    "P4": {"CLIP_L_runtime": "not_measured_in_checked_aggregate", "peak_host_RAM": "not_measured", "peak_GPU_memory": "not_measured"},
+    "P5": {"updates": 100, "training_wall_seconds": 52.258804, "updates_per_second": 1.913553, "peak_allocated_gpu_bytes": 4032823296, "peak_reserved_or_driver_gpu_bytes": 7511998464, "checkpoint_bytes": 2652621452},
+    "P6": {"updates": 100, "training_wall_seconds": 3.006987, "updates_per_second": 33.255879, "peak_allocated_gpu_bytes": 1799271936, "peak_driver_GPU": "not_measured", "checkpoint_bytes": 1036286362},
+    "P7": {"updates": 130, "training_wall_seconds": 495.063309, "updates_per_second": 0.262593, "peak_allocated_gpu_bytes": 8460896256, "peak_driver_GPU": "not_measured", "checkpoint_bytes": 5412483305},
+    "P8": {"trials": 3721, "evaluator_runtime_seconds": 161.250877, "trials_per_second": 23.0758, "slurm_elapsed_seconds": 183, "peak_host_rss_bytes": 11048042496, "peak_driver_gpu_bytes": 4267704320}
+  },
+  "preprocessing_projection": {
+    "formula": "projected_wall_hours = measured_stage_seconds_per_source_video_hour * duration_hours / 3600; low/base/high = 0.5x/1x/2x base because n=2 is not representative",
+    "scenarios": [
+      {"duration_hours": 863, "low_base_high_wall_hours": [56.222868, 112.445737, 224.891474], "base_audio_plus_frames_GB_decimal": 490.624235},
+      {"duration_hours": 868.4602, "low_base_high_wall_hours": [56.57859, 113.157181, 226.314362], "base_audio_plus_frames_GB_decimal": 493.728414},
+      {"duration_hours": 894, "low_base_high_wall_hours": [58.242462, 116.484923, 232.969846], "base_audio_plus_frames_GB_decimal": 508.248048}
+    ],
+    "limitations": "Only audio and frames were measured for storage; raw inputs, transcripts, manifests, caches, training workspaces, and filesystem overhead are additional and not measured. Parallel full-scale throughput is not inferred."
+  },
+  "training_projection": {
+    "formula": "three_seed_cost = 3 * declared_full_run_updates * measured_cost_per_update_at_the_frozen_full_batch_world_size_semantics",
+    "video_hour_ratio_extrapolation": "forbidden_while_step_epoch_batch_world_size_and_distributed_negative_semantics_are_unresolved",
+    "illustrative_only_pilot_cost_per_update_seconds": {"DINO": 0.522588, "BERT": 0.03007, "joint_cycle_weighted": 3.808179},
+    "checkpoint_formula": "durable_bytes = 3 * (N_DINO*2652621452 + N_BERT*1036286362 + N_CLIP*5412483305)",
+    "equal_retention_scenarios_bytes": {"one_each_per_seed": 27304173357, "two_each_per_seed": 54608346714, "five_each_per_seed": 136520866785}
+  },
+  "capacity_conditions": {
+    "likely_retry_margin": "reserve_at_least_25_percent_time_and_space_after frozen_contract_benchmarking",
+    "scratch_headroom": "at_least 2 * projected_preprocessing_derivative_bytes * 1.25 retry margin, plus raw corpus bytes, evaluation archive/extraction, caches, and active training workspaces; approximately 1.23-1.27 TB for audio+frames alone across the three duration scenarios",
+    "durable_storage": "use the checkpoint formula plus resolved configs, metrics, inventories, and important logs; one/two/five equal checkpoint retention scenarios are 27.304/54.608/136.521 GB before record/log overhead",
+    "backup": "no snapshot or independent backup evidence was demonstrable; verify and test an independent durable backup before irreplaceable full-run artifacts exist"
+  },
+  "artifact_classification": {
+    "A": ["canonical code", "configs and guards", "storage resolver", "job wrappers", "verifiers", "resume and attempt-ledger infrastructure"],
+    "B": ["P3 preprocessing derivatives only on exact source_config_tool_model_completeness hash match"],
+    "C": ["380-token tokenizer", "all P5 DINO weights", "all P6 BERT weights", "all P7 CLIP+ weights", "pilot splits and training metrics", "P8 predictions and scores as audit evidence only", "P4 external calibration weights as training initialization"]
+  },
+  "governed_storage_audit": {
+    "owner_only_markers_and_roots_verified": true,
+    "durable_file_modes_0600_after_permissions_hardening": true,
+    "complete_retained_pilot_inventory_scope": "all retained P0-P8 pilot artifacts; distinct from the unavailable full-dataset inventory",
+    "entry_count_before_P9_evidence_bundle": 122,
+    "total_bytes_before_P9_evidence_bundle": 17646791528,
+    "inventory_sha256_before_P9_evidence_bundle": "a4a253d3330c64f2c229c7ca668155b119534863c8cf49793ba4af2b83f17cac",
+    "required_family_missing_count": 0,
+    "scratch_sole_irreplaceable_copy_found": false,
+    "scratch_is_backup": false,
+    "backup_or_snapshot_evidence": "not_demonstrated"
+  },
+  "P8_non_claim": "The P8 score is engineering-only, non-comparable, not a reproduction result, and cannot guide model selection, hyperparameters, seeds, protocol changes, resource estimates, recommendations, or claims about the paper.",
+  "scale_conditions": [
+    "resolve and freeze every scientific blocker and distributed training semantic",
+    "benchmark representative full-scale nodes after the full contract is frozen",
+    "confirm capacity using measured raw corpus and all derivative/cache/workspace sizes",
+    "verify and test independent backup protection",
+    "retain fail-closed attempt ledgers and checksum promotion"
+  ],
+  "mandatory_reset": [
+    "reverify_complete_governed_input_manifest_and_resolve_Phase_1_blockers",
+    "rerun_CLIP_L_calibration_from_pinned_archive_in_isolation_and_prove_training_cannot_reference_it",
+    "create_full_corpus_splits_statistics_and_new_30522_token_tokenizer",
+    "initialize_full_DINO_BERT_and_CLIP_plus_from_scratch",
+    "never_continue_pilot_weights_or_use_pilot_benchmark_score_for_any_scientific_choice",
+    "reuse_pilot_preprocessing_only_on_exact_source_config_tool_model_and_completeness_hash_match"
+  ],
+  "scientific_blockers": ["exact_approximately_863_hour_inclusion_subset_and_release_crosswalk", "split_and_leakage_grouping", "preprocessing_pins", "ordered_three_seeds", "full_30522_token_tokenizer", "batch_distributed_and_cross_rank_negative_semantics", "optimizer_schedule_stopping_rules", "per_seed_checkpoint_selection_rule"],
+  "next_action": "mandatory_full_reproduction_reset_and_readiness_gates",
+  "next_action_started": false
+}

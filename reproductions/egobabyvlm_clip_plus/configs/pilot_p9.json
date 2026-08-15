@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p9_promotion_readiness_audit_config",
+  "pilot_id": "juno_sample",
+  "stage": "P9",
+  "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+  "mode": "evidence_reconciliation_only",
+  "forbidden_actions": [
+    "training",
+    "new_media_preprocessing",
+    "Machine-DevBench_rescoring",
+    "benchmark_output_inspection_for_model_development",
+    "full_reproduction_start",
+    "scratch_or_durable_cleanup"
+  ],
+  "duration_scenarios_hours": [863, 868.4602, 894],
+  "preprocessing_uncertainty_multipliers": {"low": 0.5, "base": 1.0, "high": 2.0},
+  "retry_margin_fraction": 0.25,
+  "checkpoint_retention_counts_per_seed": [1, 2, 5],
+  "scientific_seed_count": 3,
+  "artifact_classes": {
+    "A": "reusable_code_config_and_infrastructure",
+    "B": "conditionally_reusable_preprocessing_only_on_exact_source_config_tool_model_and_completeness_hash_match",
+    "C": "disposable_or_scientifically_ineligible_pilot_artifact"
+  },
+  "durable_namespace": "decision_reports/pilot_p9",
+  "detailed_inventory_name": "retained_p0_p8_inventory.json",
+  "scientific_status_effect": "none",
+  "next_action": "mandatory_full_reproduction_reset_and_readiness_gates",
+  "next_action_started": false
+}

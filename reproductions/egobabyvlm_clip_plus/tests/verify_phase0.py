@@ -123,7 +123,7 @@ def main() -> None:
 
     pilot = json.loads(PILOT_DECISION_PATH.read_text(encoding="utf-8"))
     fixed = pilot["fixed_decisions"]
-    require(pilot["status"] in {"p0_complete", "p1_complete", "p2_complete", "p3_complete", "p4_incomplete", "p4_complete", "p5_complete", "p6_complete", "p7_complete", "p8_complete"}, "pilot P0 contract is not preserved")
+    require(pilot["status"] in {"p0_complete", "p1_complete", "p2_complete", "p3_complete", "p4_incomplete", "p4_complete", "p5_complete", "p6_complete", "p7_complete", "p8_complete", "p9_complete"}, "pilot P0 contract is not preserved")
     require(fixed["input_count"] == 2, "pilot input count changed")
     require(fixed["additional_video_downloads_authorized"] is False, "pilot download scope broadened")
     require(fixed["tokenizer"]["target_vocabulary_size"] == 380, "authorized pilot vocabulary changed")
