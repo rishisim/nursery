@@ -1,0 +1,242 @@
+{
+  "schema_version": "hoidini-intermimic-task-contract-1.0.0",
+  "task_id": "pilot-mug-table-tray",
+  "scene_id": "pilot-mug-table-tray-scene",
+  "activity_prompt": "Pick up the mug from the table, carry it to the tray, and put it down.",
+  "duration_seconds": 10.0,
+  "coordinate_system": {
+    "handedness": "right",
+    "up_axis": "+Z",
+    "linear_unit": "meter",
+    "angle_unit": "radian",
+    "quaternion_order": "xyzw"
+  },
+  "seeds": {
+    "scene": 101,
+    "layout": 102,
+    "motion": 103,
+    "physics": 104,
+    "render": 105
+  },
+  "scene_bindings": {
+    "target": {
+      "source_name": "mug",
+      "allowed_upstream_categories": [
+        "manipulated_objs"
+      ],
+      "body_mode": "dynamic"
+    },
+    "support": {
+      "source_name": "table",
+      "allowed_upstream_categories": [
+        "context"
+      ],
+      "body_mode": "static"
+    },
+    "goal": {
+      "source_name": "tray",
+      "allowed_upstream_categories": [
+        "manipulated_objs",
+        "distractor_objs"
+      ],
+      "body_mode": "static"
+    }
+  },
+  "initial_human_state": {
+    "body_model": "adult_neutral_smplx_beta0",
+    "joint_pose": "neutral_standing",
+    "placement": {
+      "reference_role": "support",
+      "translation_offset_world_m": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "orientation_xyzw": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    }
+  },
+  "initial_object_states": {
+    "target": {
+      "pose_source": "embodiedgen_layout"
+    },
+    "support": {
+      "pose_source": "embodiedgen_layout"
+    },
+    "goal": {
+      "pose_source": "embodiedgen_layout"
+    }
+  },
+  "required_initial_relations": [
+    {
+      "relation_id": "target_starts_on_support",
+      "child_role": "target",
+      "parent_role": "support",
+      "spatial_relation": "ON"
+    },
+    {
+      "relation_id": "goal_starts_on_support",
+      "child_role": "goal",
+      "parent_role": "support",
+      "spatial_relation": "ON"
+    }
+  ],
+  "action_phases": [
+    {
+      "name": "ready",
+      "start_seconds": 0.0,
+      "end_seconds": 1.0,
+      "intent": "Begin in the frozen neutral adult SMPL-X state while the mug rests on the table."
+    },
+    {
+      "name": "reach",
+      "start_seconds": 1.0,
+      "end_seconds": 2.5,
+      "intent": "Move one or both hands toward the mug without moving it prematurely."
+    },
+    {
+      "name": "grasp_and_lift",
+      "start_seconds": 2.5,
+      "end_seconds": 4.0,
+      "intent": "Establish a stable hand-object grasp and lift the mug clear of the table."
+    },
+    {
+      "name": "carry",
+      "start_seconds": 4.0,
+      "end_seconds": 7.0,
+      "intent": "Carry the mug from the table location to the tray without dropping it."
+    },
+    {
+      "name": "place",
+      "start_seconds": 7.0,
+      "end_seconds": 8.5,
+      "intent": "Put the mug onto the tray while retaining hand support until tray contact is established."
+    },
+    {
+      "name": "release_and_settle",
+      "start_seconds": 8.5,
+      "end_seconds": 10.0,
+      "intent": "Release the mug and leave it stably supported by the tray."
+    }
+  ],
+  "contact_windows": [
+    {
+      "contact_id": "mug_on_table_initially",
+      "start_seconds": 0.0,
+      "end_seconds": 2.5,
+      "requirement": "required",
+      "participants": [
+        "target",
+        "support"
+      ]
+    },
+    {
+      "contact_id": "hand_grasps_mug",
+      "start_seconds": 2.5,
+      "end_seconds": 8.5,
+      "requirement": "required",
+      "participants": [
+        "human_hand_left_or_right",
+        "target"
+      ]
+    },
+    {
+      "contact_id": "mug_on_tray_at_end",
+      "start_seconds": 8.0,
+      "end_seconds": 10.0,
+      "requirement": "required",
+      "participants": [
+        "target",
+        "goal"
+      ]
+    },
+    {
+      "contact_id": "hands_clear_after_release",
+      "start_seconds": 8.5,
+      "end_seconds": 10.0,
+      "requirement": "forbidden",
+      "participants": [
+        "human_hands",
+        "target"
+      ]
+    }
+  ],
+  "success_criteria": [
+    {
+      "criterion_id": "correct_target_manipulated",
+      "plain_language": "The mug, and not another object, is the manipulated target.",
+      "measurement": {
+        "type": "identity_match",
+        "role": "target"
+      }
+    },
+    {
+      "criterion_id": "mug_lifted",
+      "plain_language": "The mug is lifted clear of the table during the carry phase.",
+      "measurement": {
+        "type": "support_separation",
+        "minimum_clearance_m": 0.02,
+        "phase": "carry"
+      }
+    },
+    {
+      "criterion_id": "mug_placed_on_tray",
+      "plain_language": "The mug finishes within the tray goal region.",
+      "measurement": {
+        "type": "goal_region",
+        "maximum_horizontal_center_error_m": 0.08,
+        "role": "goal"
+      }
+    },
+    {
+      "criterion_id": "mug_stable_after_release",
+      "plain_language": "The mug remains supported by the tray for the final second after release.",
+      "measurement": {
+        "type": "stable_support_duration",
+        "minimum_seconds": 1.0,
+        "maximum_linear_speed_m_per_s": 0.05
+      }
+    }
+  ],
+  "forbidden_failures": [
+    {
+      "criterion_id": "no_drop",
+      "plain_language": "The mug must not be dropped before placement.",
+      "measurement": {
+        "type": "unexpected_support_loss",
+        "maximum_seconds": 0.15
+      }
+    },
+    {
+      "criterion_id": "no_fall",
+      "plain_language": "The humanoid must not fall.",
+      "measurement": {
+        "type": "humanoid_fall",
+        "allowed": false
+      }
+    },
+    {
+      "criterion_id": "low_penetration",
+      "plain_language": "Human, object, and scene penetrations must remain small.",
+      "measurement": {
+        "type": "maximum_penetration_depth",
+        "maximum_m": 0.02
+      }
+    },
+    {
+      "criterion_id": "no_unintended_object_motion",
+      "plain_language": "Objects other than the mug must not be displaced unintentionally.",
+      "measurement": {
+        "type": "non_target_displacement",
+        "maximum_m": 0.02,
+        "exclude_roles": [
+          "target"
+        ]
+      }
+    }
+  ]
+}
