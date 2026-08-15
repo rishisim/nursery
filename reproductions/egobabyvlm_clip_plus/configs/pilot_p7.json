@@ -54,7 +54,11 @@
   "storage": {"resolver": "storage.py", "scratch_namespace": "pilot_p7/p7-7b9e2c41", "durable_namespace": "pilot_p0/p0-4cc3af23/pilot_p7", "owner_only_required": true, "local_or_worktree_fallback": false},
   "forbidden": ["P4 calibration artifact or namespace", "CLIP-L or CLIP-B initialization", "Machine-DevBench access or evaluation", "architecture substitution", "fake contrastive negatives", "P8 or later"],
   "scientific_status_effect": "none",
-  "inventory_status": "incomplete_inventory",
+  "inventory": {
+    "p7_retained_artifact_inventory_status": "complete_after_preserved_artifact_hardening_audit",
+    "scope": "all retained P7 artifacts: promoted checkpoints and executed config, governed completion/detail/audit records, promoted segment evidence, canonical and excluded-diagnostic Slurm logs, and preserved Slurm accounting evidence",
+    "global_full_dataset_inventory_status": "incomplete_inventory_out_of_scope_for_engineering_pilot"
+  },
   "p0_p1_p2_p3_p4_p5_p6_status_preserved": true,
   "next_stage": "P8",
   "next_stage_started": false

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "status": "p6_complete",
+  "status": "p7_complete",
   "classification": [
     "engineering_only",
     "non_comparable",
@@ -225,7 +225,14 @@
     "training_config": "../../configs/pilot_p7.json", "engineering_run_id": "p7-7b9e2c41",
     "exact_update_counts": {"contrastive": 100, "mlm": 20, "dinov2": 10, "total": 130},
     "checkpoint_global_update": 65, "batch": 2, "genuine_contrastive_negatives": true,
-    "distinct_slurm_health_resume_finalize_jobs_proven": true, "machine_devbench_accessed": false,
+    "distinct_slurm_health_resume_finalize_jobs_proven": true,
+    "preserved_artifact_audit_slurm_job": "326922",
+    "preserved_artifact_audit_zero_training_updates": true,
+    "retained_artifact_inventory_status": "complete_for_p7_retained_artifacts",
+    "retained_artifact_inventory_entry_count": 20,
+    "retained_artifact_inventory_sha256": "9a8abc3c7942e96184fb7a7207f782639f6d153a108f1d060d8cd458dff69914",
+    "global_full_dataset_inventory_status": "incomplete_inventory_out_of_scope_for_engineering_pilot",
+    "machine_devbench_accessed": false,
     "clip_l_used_for_training": false, "full_reproduction_evaluator_recalibration_required": true,
     "p0_p1_p2_p3_p4_p5_p6_status_preserved": true, "next_stage": "P8", "next_stage_started": false
   }

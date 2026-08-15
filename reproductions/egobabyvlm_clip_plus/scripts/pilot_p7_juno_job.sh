@@ -16,8 +16,14 @@ SOURCE_ROOT="$SCRATCH_ROOT/caches/p2_source/egobabyvlm"; PIXI="$SCRATCH_ROOT/cac
 RUN_ROOT="$SCRATCH_ROOT/runs/pilot_p7/p7-7b9e2c41"; RECORD_ROOT="$DURABLE_ROOT/run_records/pilot_p0/p0-4cc3af23/pilot_p7"; LOG_ROOT="$DURABLE_ROOT/logs/pilot_p7/p7-7b9e2c41"
 mkdir -p "$RUN_ROOT" "$RECORD_ROOT" "$LOG_ROOT"; chmod 700 "$RUN_ROOT" "$RECORD_ROOT" "$LOG_ROOT"
 export PIXI_HOME="$SCRATCH_ROOT/caches/p2_pixi" PIXI_CACHE_DIR="$SCRATCH_ROOT/caches/p2_runtime_cache/pixi" XDG_CACHE_HOME="$SCRATCH_ROOT/caches/p2_runtime_cache/xdg" HF_HOME="$SCRATCH_ROOT/caches/p2_runtime_cache/huggingface"
-export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 WANDB_MODE=disabled WANDB_DISABLED=true MASTER_ADDR=127.0.0.1 MASTER_PORT=$((20000 + SLURM_JOB_ID % 30000)) RANK=0 WORLD_SIZE=1 LOCAL_RANK=0 LOCAL_WORLD_SIZE=1
+P7_PORT_SEED="${SLURM_JOB_ID:-1}"
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 WANDB_MODE=disabled WANDB_DISABLED=true MASTER_ADDR=127.0.0.1 MASTER_PORT=$((20000 + P7_PORT_SEED % 30000)) RANK=0 WORLD_SIZE=1 LOCAL_RANK=0 LOCAL_WORLD_SIZE=1
 args=("$P7_PHASE" --config "$REPRO_DIR/configs/pilot_p7.json" --source-root "$SOURCE_ROOT" --p3-root "$SCRATCH_ROOT/runs/pilot_p3/p3-3d96f71c" --p5-checkpoint "$DURABLE_ROOT/checkpoints/pilot_p5/p5-91c43e2a/model_final.rank_0.pth" --p5-training-dir "$SCRATCH_ROOT/runs/pilot_p5/p5-91c43e2a/training" --p6-checkpoint "$DURABLE_ROOT/checkpoints/pilot_p6/p6-6d31a4e7/step_100.pt" --tokenizer "$DURABLE_ROOT/checkpoints/pilot_p6/p6-6d31a4e7/tokenizer.json" --vocab "$DURABLE_ROOT/checkpoints/pilot_p6/p6-6d31a4e7/vocab.txt" --scratch-root "$SCRATCH_ROOT" --durable-root "$DURABLE_ROOT" --run-root "$RUN_ROOT" --record-root "$RECORD_ROOT" --aggregate-output "$DURABLE_ROOT/aggregate_results/pilot_p7_p7-7b9e2c41.json")
+if [[ "$P7_PHASE" = resume || "$P7_PHASE" = finalize || "$P7_PHASE" = audit-existing || "$P7_PHASE" = inventory-existing ]]; then
+  EXECUTED_CONFIG="$DURABLE_ROOT/checkpoints/pilot_p7/p7-7b9e2c41/pilot_p7.json"
+  test -f "$EXECUTED_CONFIG"; test "$(sha256sum "$EXECUTED_CONFIG" | cut -d' ' -f1)" = afda6484fb346780d6f6ad856e0753b7234a7f26e121d001bd17dd7aefe6d818
+  args+=(--executed-config "$EXECUTED_CONFIG")
+fi
 target=65; [[ "$P7_PHASE" = resume ]] && target=130
-[[ "$P7_PHASE" != finalize ]] && args+=(--target "$target")
+[[ "$P7_PHASE" = health || "$P7_PHASE" = resume ]] && args+=(--target "$target")
 "$PIXI" run --manifest-path "$SOURCE_ROOT/pixi.toml" --environment default -- python "$REPRO_DIR/scripts/pilot_p7.py" "${args[@]}"
