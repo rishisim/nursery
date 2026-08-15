@@ -1,0 +1,92 @@
+{
+  "protocol_id": "interactmove_intermimic",
+  "scientific_distinction": "scene-aware InteractMove reference generation followed by InterMimic physics execution",
+  "current_scope": {
+    "implemented_stages": [
+      "activity_specification",
+      "embodiedgen_scene_ingestion",
+      "canonical_scene_bundle"
+    ],
+    "excluded_stages": [
+      "interactmove_point_cloud_conversion",
+      "interactmove_inference",
+      "contact_reconstruction",
+      "smplx_hand_completion",
+      "intermimic_adapter",
+      "physics_rollout",
+      "rgb_recording"
+    ]
+  },
+  "upstream": {
+    "embodiedgen": {
+      "version": "v2.0.1",
+      "commit": "9b333554254af196bace88c1a171a3bf047fa09c",
+      "native_profile": "embodiedgen-v2.0.1-sapien-rh-zup-m-xyzw",
+      "layout_schema_is_self_describing": false
+    }
+  },
+  "canonical_conventions": {
+    "length": "m",
+    "mass": "kg",
+    "angle": "rad",
+    "time": "s",
+    "handedness": "right",
+    "world_up": "+Z",
+    "quaternion_order": "xyzw",
+    "transform_semantics": "T_parent_child",
+    "gravity_m_s2": [0.0, 0.0, -9.81]
+  },
+  "actor": {
+    "body_model": "SMPL-X",
+    "morphology": "adult",
+    "initial_placement_selected_by": "nursery",
+    "native_embodiedgen_robot_pose_is_humanoid_authority": false,
+    "humanoid_accessibility_gate": false
+  },
+  "timing": {
+    "duration_s": 10.0,
+    "fps": 30,
+    "frame_count": 300,
+    "sampling": "half_open_[0,duration)"
+  },
+  "embodiedgen_request": {
+    "render_insert_robot": false,
+    "retry_limits": {
+      "image": 4,
+      "asset": 3,
+      "pipeline": 2
+    },
+    "required_outputs": [
+      "layout.json",
+      "asset3d/**/result/*.urdf",
+      "URDF-referenced visual meshes",
+      "URDF-referenced collision meshes",
+      "background/mesh_model.ply"
+    ],
+    "optional_outputs": [
+      "background/gs_model.ply",
+      "affordance_annot.json",
+      "mesh_part_seg.glb"
+    ]
+  },
+  "scene_policy": {
+    "background_body_type": "static",
+    "context_body_type": "static",
+    "manipulated_body_type": "dynamic",
+    "distractor_body_type": "dynamic",
+    "ground_plane_z_m": 0.0,
+    "mesh_model_is_background_collision": false,
+    "missing_source_physics_is_fabricated": false,
+    "settling_required_for_downstream_physics": true
+  },
+  "artifact_policy": {
+    "run_root": "runs/interactmove_intermimic",
+    "run_root_tracked": false,
+    "retain_in_git": [
+      "canonical protocol/configuration",
+      "small aggregate results",
+      "concise decision records",
+      "external artifact manifests"
+    ]
+  }
+}

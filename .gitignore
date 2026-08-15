@@ -33,3 +33,6 @@ output/synthetic_*/**/*_jobs_*/
 output/synthetic_*/**/*.stdout
 output/synthetic_*/**/*.stderr
 output/synthetic_confirmation_adversarial_audit_v1/preservation_proof.json
+
+# Disposable runs for the separate InteractMove + InterMimic protocol.
+runs/interactmove_intermimic/
