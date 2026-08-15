@@ -1,0 +1,55 @@
+{
+  "tree": {
+    "kitchen": [
+      ["table", "FLOOR"],
+      ["franka", "IN"]
+    ],
+    "table": [
+      ["mug", "ON"],
+      ["tray", "ON"]
+    ]
+  },
+  "relation": {
+    "task_desc": "Pick up the mug from the table, carry it to the tray, and put it down.",
+    "task": "pick and place",
+    "robot": "franka",
+    "background": "kitchen",
+    "context": "table",
+    "manipulated_objs": [
+      "mug"
+    ],
+    "distractor_objs": [
+      "tray"
+    ]
+  },
+  "objs_desc": {
+    "kitchen": "simple kitchen",
+    "table": "wooden table",
+    "mug": "ceramic mug",
+    "tray": "wooden tray"
+  },
+  "objs_mapping": {
+    "kitchen": "background",
+    "table": "context",
+    "mug": "manipulated_objs",
+    "tray": "distractor_objs"
+  },
+  "assets": {
+    "kitchen": "background",
+    "table": "asset3d/table/result",
+    "mug": "asset3d/mug/result",
+    "tray": "asset3d/tray/result"
+  },
+  "quality": {
+    "table": "fixture_only",
+    "mug": "fixture_only",
+    "tray": "fixture_only"
+  },
+  "position": {
+    "kitchen": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "table": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "mug": [-0.25, 0.0, 0.82, 0.0, 0.0, 0.7071067812, 0.7071067812],
+    "tray": [0.3, 0.0, 0.81, 0.0, 0.0, 0.0, 1.0],
+    "franka": [0.0, -0.8, 0.0, 0.0, 0.0, 0.0, 1.0]
+  }
+}
