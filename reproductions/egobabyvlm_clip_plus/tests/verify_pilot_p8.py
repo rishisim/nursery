@@ -22,13 +22,13 @@ def main():
     audit_src=(R/"scripts/pilot_p8_integrity.py").read_text(); req("torch" not in audit_src and "model_inference_executed\":False" in audit_src and "scoring_attempt_started\":False" in audit_src,"preserved-only audit")
     aggregate=R/"pilots/juno_sample/p8_aggregate.json"
     if aggregate.exists():
-        a=json.loads(aggregate.read_text()); req(p["pilot_stage"]=="P8" and p["status"]=="p8_complete" and p["next_stage"]=="P9" and not p["next_stage_started"],"lifecycle")
+        a=json.loads(aggregate.read_text()); req(p["pilot_stage"] in {"P8","P9"} and p["status"] in {"p8_complete","p9_complete"} and p["next_stage"] in {"P9","mandatory_full_reproduction_reset_and_readiness_gates"} and not p["next_stage_started"],"lifecycle")
         req(a["execution"]["attempt_count"]==a["execution"]["scoring_started_count"]==a["execution"]["scoring_complete_count"]==1,"attempt ledger")
         req(a["coverage"]["trial_count"]==3721 and a["coverage"]["missing_trials"]==0 and a["coverage"]["duplicate_trial_identities"]==0 and a["coverage"]["independent_manifest_prediction_multiset_match"],"complete independent coverage")
         req(a["aggregation_equivalence"]["all_ten_tasks_and_three_aggregates_identical"] and a["aggregation_equivalence"]["reporting_precision_decimals"]==6,"aggregation equivalence")
         req(a["pre_access_provenance"]["nursery_commit"]=="c935e9b78f8bc8c59e2a589da2e1824dc8baf577","pre-access commit")
         req(a["governed_records"]["integrity_audit_sha256"]==c["post_run_integrity"]["audit_record_sha256"] and a["governed_records"]["complete_inventory_entry_count"]==11527,"governed hardening")
-        req(d["status"]=="p8_complete" and d["p7_status"]["next_stage_started"] and d["p8_status"]["status"]=="p8_complete" and d["p8_status"]["attempt_ledger"]["scoring_complete"]==1,"decision lifecycle")
+        req(d["status"] in {"p8_complete","p9_complete"} and d["p7_status"]["next_stage_started"] and d["p8_status"]["status"]=="p8_complete" and d["p8_status"]["attempt_ledger"]["scoring_complete"]==1,"decision lifecycle")
         req(set(a["results_percent"])==set(c["inventory"]["tasks"]+['lexical','grammatical','overall']),"all aggregates")
         req(a["next_stage"]=="P9" and not a["next_stage_started"],"P9 not started")
     print("Pilot P8 frozen pre-access verification passed")

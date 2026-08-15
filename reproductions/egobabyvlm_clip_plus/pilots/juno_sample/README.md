@@ -441,6 +441,25 @@ Full predictions remain governed and untracked.
 
 ## Pilot P9 — Promotion-readiness decision
 
+Status: **complete (engineering-only)**. The canonical P0–P8 gates and their
+stopped or invalid attempts reconcile to pilot engineering completion. The
+pipeline is a **conditional go** for infrastructure scaling, subject to a
+representative frozen-contract capacity benchmark, sufficient scratch and
+durable headroom, a retry margin, and demonstrated independent backup. It is a
+**scientific no-go/blocked** until the frozen `spec.json` variables and Phase 1
+evidence gate are resolved. The compact evidence and formulas are in
+`p9_decision.json`; the complete retained-pilot inventory remains owner-only on
+Juno. Earlier `incomplete_inventory` labels refer to the unavailable full-data
+inventory, not to the now-complete inventory of retained P0–P8 pilot artifacts.
+
+The 380-token tokenizer and every P5/P6/P7 weight are ineligible for full-run
+initialization. P8 predictions and scores are audit evidence only and cannot
+guide any model, hyperparameter, seed, protocol, resource estimate, or paper
+claim. No backup or snapshot protection was demonstrable during P9, so backup
+verification remains a scale-readiness condition. P9 is the final pilot phase;
+the next action is the mandatory full-reproduction reset and readiness gates,
+which are not started.
+
 **Question:** Is the canonical pipeline ready to scale when full-data access is
 available?
 
