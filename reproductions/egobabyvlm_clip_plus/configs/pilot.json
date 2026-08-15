@@ -2,9 +2,9 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "pilot_stage": "P6",
-  "status": "p6_complete",
-  "next_stage": "P7",
+  "pilot_stage": "P7",
+  "status": "p7_complete",
+  "next_stage": "P8",
   "next_stage_started": false,
   "classification": [
     "engineering_only",
@@ -193,6 +193,22 @@
     "health_checkpoint_step": 50,
     "recording_level_validation": true,
     "next_stage": "P7",
+    "next_stage_started": true
+  },
+  "p7": {
+    "status": "p7_complete",
+    "canonical_training_config": "configs/pilot_p7.json",
+    "aggregate_record": "pilots/juno_sample/p7_aggregate.json",
+    "engineering_run_id": "p7-7b9e2c41",
+    "architecture": "DINOv2_ViT-B/14_plus_BERT-base_with_768_to_512_projections",
+    "exact_update_counts": {"contrastive": 100, "mlm": 20, "dinov2": 10, "total": 130},
+    "health_checkpoint_step": 65,
+    "canonical_slurm_jobs": {"health": "324893", "resume": "324896", "finalize": "324912", "preserved_artifact_audit": "326922"},
+    "retained_artifact_inventory": "governed_complete_after_hardening_audit",
+    "retained_artifact_inventory_entry_count": 20,
+    "retained_artifact_inventory_sha256": "9a8abc3c7942e96184fb7a7207f782639f6d153a108f1d060d8cd458dff69914",
+    "preserved_artifact_audit_sha256": "6a73aa3d41b28b8986a632588769afdac7daf91dc96c0a426b88354e6757d14f",
+    "next_stage": "P8",
     "next_stage_started": false
   },
   "expected_retained_p0_record": {
