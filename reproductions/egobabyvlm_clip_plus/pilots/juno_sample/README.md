@@ -406,6 +406,17 @@ or score P7. The full reproduction must recalibrate its evaluator without
 leakage. No comparison with a paper result is authorized. P9 is next and was
 not started.
 
+A preserved-artifact hardening audit subsequently executed no model inference
+and started no scoring attempt. It matched canonical full-trial-specification
+fingerprints from all 20 extracted manifests against the 3,721 retained raw
+prediction records with exact per-style/per-task counts and no missing or
+duplicate identities. It also proved the selected P4 CLIP-L `task_aggregate`
+and upstream `ResultAggregator` paths identical for all ten tasks and the three
+aggregates at six-decimal reporting precision. The audit verified the official
+archive and all 11,380 P4 inventory entries, the exact pre-access nursery commit
+used by jobs 326934/326935, and the immutable one-attempt ledger. Full identity,
+inventory, prediction, log, and accounting evidence remains owner-only on Juno.
+
 **Question:** Can a pilot checkpoint pass through the frozen evaluator without
 using the benchmark for development?
 

@@ -26,6 +26,7 @@
   "aggregation": {"lexical_task": "unweighted mean of nonempty merged frequency-bin accuracies", "low_frequency_merge": {"[1,2)": "[1,4)", "[2,4)": "[1,4)"}, "grammatical_task": "plain pooled trial accuracy", "lexical": "equal mean of two lexical tasks", "grammatical": "equal mean of eight grammatical tasks", "overall": "equal mean of lexical and grammatical", "styles": "pool raw trials across both styles before task aggregation", "tie": "incorrect", "failed_example": "abort entire execution"},
   "access_policy": {"qualification_inputs": "synthetic or governed engineering validation only", "benchmark_access_before_scoring_started": false, "benchmark_feedback_for_development": false, "score_driven_changes": false},
   "storage": {"resolver": "storage.py", "scratch_namespace": "pilot_p8/p8-4a20f18d", "durable_namespace": "pilot_p0/p0-4cc3af23/pilot_p8", "owner_only_required": true, "local_fallback": false},
+  "post_run_integrity": {"method": "preserved_artifacts_only_no_model_inference_or_scoring_attempt", "pre_access_nursery_commit": "c935e9b78f8bc8c59e2a589da2e1824dc8baf577", "successful_qualification_job": "326934", "single_scoring_job": "326935", "trial_identity": "sha256_of_canonical_full_manifest_trial_specification", "p4_and_p8_aggregation_reporting_precision_decimals": 6, "audit_record_sha256": "dc4d699fd71ff2a17a70d05608c5d3e9738077641e865e4ff6741d859baaccad"},
   "next_stage": "P9",
   "next_stage_started": false
 }

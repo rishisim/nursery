@@ -101,8 +101,9 @@ def evaluate(c,a):
     for style in c["inventory"]["styles"]:
         cfg=OmegaConf.create({"_target_":"evaluation.multimodal.machine_devbench.base.MachineDevBenchEvalModule","name":"machine_devbench","output_dir":str(base/"outputs"),"data_root":str(data),"style":style,"tasks":tasks,"batch_size":1,"num_workers":c["execution"]["num_workers"],"seed":c["execution"]["seed"],"model":{"_target_":"pilot_p8.P7CheckpointAdapter","name":"p7-pilot","kwargs":kwargs}})
         out=MachineDevBenchEvalModule(cfg).run(); per[style]=out["results"]; raw[style]=out["raw_records"]
-        for i,r in enumerate(out["raw_records"]):
-            key=(style,r["task_name"],i); require(key not in seen,"duplicate_example"); seen.add(key); pooled.add(r["task_name"],r["prediction"],r["target"],r["metadata"])
+        for r in out["raw_records"]:
+            trial_id=hashlib.sha256(json.dumps(r["metadata"],sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
+            key=(style,r["task_name"],trial_id); require(key not in seen,"duplicate_trial_identity"); seen.add(key); pooled.add(r["task_name"],r["prediction"],r["target"],r["metadata"])
     total=pooled.compute(); require(set(total["by_task"])==set(tasks) and all(total["by_task"][t]["n_trials"]>0 for t in tasks),"coverage")
     vals={t:round(total["by_task"][t]["accuracy"]*100,6) for t in tasks}; vals.update({"lexical":round(total["by_task_type"]["lexical"]["accuracy"]*100,6),"grammatical":round(total["by_task_type"]["grammatical"]["accuracy"]*100,6),"overall":round(total["overall"]["accuracy"]*100,6)}); require(all(math.isfinite(x) for x in vals.values()),"finite_scores")
     detail={"schema_version":1,"record_type":"pilot_p8_governed_result","run_id":c["engineering_run_id"],"classification":LABELS,"results":total,"per_style":per,"raw_predictions":raw,"coverage":{"task_count":10,"manifest_count":20,"trial_count":len(seen),"duplicate_count":0},"runtime_seconds":time.monotonic()-began,"slurm_job_id":job,"archive_inventory":inv}

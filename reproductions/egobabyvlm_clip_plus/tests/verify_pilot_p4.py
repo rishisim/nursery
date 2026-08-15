@@ -164,7 +164,7 @@ def main():
             pilot["p4"]["selected_model"] == "ViT-L-14/openai" and
             pilot["p4"]["next_stage"] == "P5" and isinstance(pilot["p4"]["next_stage_started"], bool),
             "canonical pilot P4/P5 state is inconsistent")
-    require(decision["status"] in {"p4_complete", "p5_complete", "p6_complete", "p7_complete"} and
+    require(decision["status"] in {"p4_complete", "p5_complete", "p6_complete", "p7_complete", "p8_complete"} and
             decision["p4_completion"]["canonical_selection_record"] == "p4_selection.json" and
             decision["p4_completion"]["acceptance_passed"] and
             decision["full_reproduction_recalibration_required"], "decision record is inconsistent")
