@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p8_checkpoint_selection",
+  "status": "frozen_before_benchmark_access",
+  "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+  "eligible_checkpoints": [{"run_id": "p7-7b9e2c41", "step": 130, "sha256": "287dc2f08565c5a012d9768e0c06de08804fa73fc82ec498f3ec42726c9cb431", "basis": "completed exact 100:20:10 P7 cycle and checksum-promoted governed completion"}],
+  "ineligible_checkpoints": [{"run_id": "p7-7b9e2c41", "step": 65, "basis": "health checkpoint from incomplete half-cycle with 50:10:5 updates"}],
+  "selected": {"run_id": "p7-7b9e2c41", "step": 130, "sha256": "287dc2f08565c5a012d9768e0c06de08804fa73fc82ec498f3ec42726c9cb431"},
+  "selection_rule": "choose the sole eligible completed-cycle checkpoint",
+  "validation_loss_selection_claimed": false,
+  "benchmark_feedback_used": false,
+  "p4_clip_l_role": "external evaluator calibration only; prohibited from initializing, tuning, altering, ensembling with, or scoring the P7 model",
+  "full_reproduction_recalibration_required": true
+}

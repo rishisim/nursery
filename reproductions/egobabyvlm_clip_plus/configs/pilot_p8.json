@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p8_frozen_single_evaluation_config",
+  "pilot_id": "juno_sample",
+  "engineering_run_id": "p8-4a20f18d",
+  "stage": "P8",
+  "status": "frozen_before_benchmark_access",
+  "question": "Can the single frozen P7 pilot checkpoint pass through the already-frozen Machine-DevBench evaluator without using benchmark feedback for development?",
+  "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+  "selected_checkpoint": {"run_id": "p7-7b9e2c41", "step": 130, "sha256": "287dc2f08565c5a012d9768e0c06de08804fa73fc82ec498f3ec42726c9cb431", "selection": "only eligible completed-cycle checkpoint; step 65 is an ineligible incomplete half-cycle health checkpoint"},
+  "prerequisites": {
+    "p7_executed_config_sha256": "afda6484fb346780d6f6ad856e0753b7234a7f26e121d001bd17dd7aefe6d818",
+    "p7_completion_sha256": "ce467a0937496c3a8e22a97220bc60d1bb3022170e63b1f42df29529cddc9877",
+    "p7_hardening_audit_sha256": "6a73aa3d41b28b8986a632588769afdac7daf91dc96c0a426b88354e6757d14f",
+    "p7_retained_inventory_sha256": "9a8abc3c7942e96184fb7a7207f782639f6d153a108f1d060d8cd458dff69914",
+    "p6_checkpoint_sha256": "a0b5973a8b0f0aba98a4b1d72d3d24ec97c53fb459209857eff295411850a2d9",
+    "p6_tokenizer_sha256": "6e83befd3847c71aaa7b904458defacb4bc87818805f7dab4007cee5b56cd736",
+    "p6_vocab_sha256": "830e52d4711d4900d5cd77f9ec47fac6a44a02ffdfc0be126178258c0e53b0ae"
+  },
+  "source": {"commit": "224621caf0628270b6115845ac75a65b984234a3", "pixi_lock_sha256": "360c372997ea7f9ba89abcf87796e57ebcd2fdbc9734489666120073752e7244", "evaluator_hashes": {"evaluation/data/machine_devbench.py": "5fbf7cbafbd94537d3c9afbdf2be75f542a8d27df1c0ba632f48efb04b7878b9", "evaluation/multimodal/machine_devbench/base.py": "2d2084a9f079a03ce7ed4c14bce494de06d1503dc2cdb7a5816bde974079e004", "evaluation/multimodal/machine_devbench/metrics.py": "71c517c6afadc1ddbdc1fa19f10be008896e528d2a0caea938167e55dc55f7aa"}},
+  "archive": {"name": "MachineDevBench.tar", "size_bytes": 1635409920, "sha256": "5f4c662919e3b0abdb85f5d6520350f10c374f087886f4257bbe1bd336f3b13c", "p4_inventory_sha256": "6b70a3d0fdd7357a9fb4e996febb8d804c8694373f8a2f0f39d6c578b8d6e517", "expected_wrapper": "MachineDevBench", "expected_roots": ["Lexical", "Grammatical"]},
+  "evaluator": {"p4_selection_sha256": "ae746d074c6b6388a4bff9e89343054aab25b94c06425a86cb294fee887c1815", "role": "P4_CLIP-L_calibrated_external_evaluator_and_aggregation_only", "clip_l_must_not_initialize_tune_alter_ensemble_or_score_p7": true, "full_reproduction_recalibration_required": true},
+  "inventory": {"styles": ["realistic", "cartoon"], "tasks": ["lex_nouns", "lex_adjectives", "gram_embedded_relative", "gram_subject_verb", "gram_order_matters", "gram_subject_adjective", "gram_negation", "gram_prepositions", "gram_comparatives", "gram_counting"], "manifest_count": 20, "verbs_excluded": true},
+  "model": {"vision": "DINOv2_ViT-B/14", "vision_preprocess": "resize_256_center_crop_224_imagenet_normalization", "vision_pooling": "canonical_CustomDINOv2VisionEncoder", "vision_projection": "768_to_512", "text": "BERT-base", "text_pooling": "CLS", "text_projection": "768_to_512", "tokenizer": "P6_380_entry_WordPiece_case_sensitive", "sequence_length": 64, "feature_normalization": true, "learned_temperature": "loaded_and_verified_but_similarity_rank_invariant", "strict_checkpoint_load": true},
+  "execution": {"seed": 1287892771, "precision": "float32", "batch_size": 1, "num_workers": 4, "authorized_score_runs": 1, "ledger_states": ["not_started", "scoring_started", "scoring_complete"], "mark_started_before_first_benchmark_read": true, "retry_after_started": false},
+  "aggregation": {"lexical_task": "unweighted mean of nonempty merged frequency-bin accuracies", "low_frequency_merge": {"[1,2)": "[1,4)", "[2,4)": "[1,4)"}, "grammatical_task": "plain pooled trial accuracy", "lexical": "equal mean of two lexical tasks", "grammatical": "equal mean of eight grammatical tasks", "overall": "equal mean of lexical and grammatical", "styles": "pool raw trials across both styles before task aggregation", "tie": "incorrect", "failed_example": "abort entire execution"},
+  "access_policy": {"qualification_inputs": "synthetic or governed engineering validation only", "benchmark_access_before_scoring_started": false, "benchmark_feedback_for_development": false, "score_driven_changes": false},
+  "storage": {"resolver": "storage.py", "scratch_namespace": "pilot_p8/p8-4a20f18d", "durable_namespace": "pilot_p0/p0-4cc3af23/pilot_p8", "owner_only_required": true, "local_fallback": false},
+  "next_stage": "P9",
+  "next_stage_started": false
+}
