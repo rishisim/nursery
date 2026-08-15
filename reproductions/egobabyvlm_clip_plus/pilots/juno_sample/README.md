@@ -390,6 +390,22 @@ started.
 
 ## Pilot P8 — Evaluate one frozen pilot checkpoint once
 
+Status: **complete (engineering-only)**. The sole eligible completed-cycle P7
+checkpoint was checksum-promoted step 130 from run `p7-7b9e2c41`; step 65 was
+an ineligible incomplete half-cycle health checkpoint. Synthetic-only adapter
+qualification completed without benchmark access, then exactly one authorized
+Machine-DevBench scoring attempt completed with all ten tasks, both styles, and
+3,721 trials covered without missing or duplicate examples. Full predictions,
+extracted data, logs, and detailed records remain owner-only on governed Juno.
+
+The resulting aggregates are integration outputs only: `engineering_only`,
+`non_comparable`, and `not_a_reproduction_result`. The two-video pilot and its
+380-token vocabulary do not generalize. P4 CLIP-L calibrated only the external
+evaluator and aggregation; it did not initialize, tune, alter, ensemble with,
+or score P7. The full reproduction must recalibrate its evaluator without
+leakage. No comparison with a paper result is authorized. P9 is next and was
+not started.
+
 **Question:** Can a pilot checkpoint pass through the frozen evaluator without
 using the benchmark for development?
 

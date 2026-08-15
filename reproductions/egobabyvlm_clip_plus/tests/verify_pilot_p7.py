@@ -6,7 +6,7 @@ def req(v,m):
     if not v: raise AssertionError(m)
 def main():
     c=json.loads((R/"configs/pilot_p7.json").read_text()); a=json.loads((R/"pilots/juno_sample/p7_aggregate.json").read_text()); p=json.loads((R/"configs/pilot.json").read_text()); modes=c["schedule"]["cycle_modes"]*10
-    req(p["pilot_stage"]=="P7" and p["status"]=="p7_complete" and p["next_stage"]=="P8" and not p["next_stage_started"],"canonical lifecycle")
+    req(p["pilot_stage"] in {"P7","P8"} and p["status"] in {"p7_complete","p8_complete"} and p["next_stage"] in {"P8","P9"} and not p["next_stage_started"],"canonical lifecycle")
     req(p["p6"]["next_stage_started"] and p["p7"]["canonical_training_config"]=="configs/pilot_p7.json" and p["p7"]["aggregate_record"].endswith("p7_aggregate.json"),"P6/P7 lifecycle metadata")
     req(len(modes)==130 and {k:modes.count(k) for k in c["schedule"]["exact_counts"]}==c["schedule"]["exact_counts"],"schedule")
     req({k:modes[:65].count(k) for k in c["schedule"]["checkpoint_counts"]}==c["schedule"]["checkpoint_counts"] and modes[65]=="contrastive","boundary")

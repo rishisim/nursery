@@ -157,8 +157,8 @@ def main():
     require(not any(token in selection_text.lower() for token in ("/work/", "/scratch/", "image_",
             "caption_", "raw_predictions", "participant", "session")), "selection is not privacy-safe")
     pilot = json.loads(PILOT_CONFIG.read_text()); decision = json.loads(DECISION.read_text())
-    require(pilot["pilot_stage"] in {"P4", "P5", "P6", "P7"} and pilot["status"] in {"p4_complete", "p5_complete", "p6_complete", "p7_complete"} and
-            pilot["next_stage"] in {"P5", "P6", "P7", "P8"} and
+    require(pilot["pilot_stage"] in {"P4", "P5", "P6", "P7", "P8"} and pilot["status"] in {"p4_complete", "p5_complete", "p6_complete", "p7_complete", "p8_complete"} and
+            pilot["next_stage"] in {"P5", "P6", "P7", "P8", "P9"} and
             pilot["p4"]["status"] == "p4_complete" and
             pilot["p4"]["canonical_selection_record"].endswith("p4_selection.json") and
             pilot["p4"]["selected_model"] == "ViT-L-14/openai" and

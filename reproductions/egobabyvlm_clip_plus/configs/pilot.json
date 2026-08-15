@@ -2,9 +2,9 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "pilot_stage": "P7",
-  "status": "p7_complete",
-  "next_stage": "P8",
+  "pilot_stage": "P8",
+  "status": "p8_complete",
+  "next_stage": "P9",
   "next_stage_started": false,
   "classification": [
     "engineering_only",
@@ -209,6 +209,20 @@
     "retained_artifact_inventory_sha256": "9a8abc3c7942e96184fb7a7207f782639f6d153a108f1d060d8cd458dff69914",
     "preserved_artifact_audit_sha256": "6a73aa3d41b28b8986a632588769afdac7daf91dc96c0a426b88354e6757d14f",
     "next_stage": "P8",
+    "next_stage_started": true
+  },
+  "p8": {
+    "status": "p8_complete",
+    "canonical_evaluation_config": "configs/pilot_p8.json",
+    "checkpoint_selection_record": "pilots/juno_sample/p8_checkpoint_selection.json",
+    "aggregate_record": "pilots/juno_sample/p8_aggregate.json",
+    "engineering_run_id": "p8-4a20f18d",
+    "selected_checkpoint_step": 130,
+    "selected_checkpoint_sha256": "287dc2f08565c5a012d9768e0c06de08804fa73fc82ec498f3ec42726c9cb431",
+    "authorized_score_runs": 1,
+    "completed_score_runs": 1,
+    "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+    "next_stage": "P9",
     "next_stage_started": false
   },
   "expected_retained_p0_record": {

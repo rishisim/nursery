@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "record_type": "pilot_p8_privacy_safe_aggregate",
+  "pilot_id": "juno_sample",
+  "engineering_run_id": "p8-4a20f18d",
+  "stage": "P8",
+  "status": "p8_complete",
+  "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+  "scientific_status_effect": "none",
+  "question_answer": "yes_the_single_frozen_P7_checkpoint_completed_the_frozen_evaluator_once",
+  "selected_checkpoint": {"run_id": "p7-7b9e2c41", "step": 130, "sha256": "287dc2f08565c5a012d9768e0c06de08804fa73fc82ec498f3ec42726c9cb431", "basis": "sole eligible completed-cycle checkpoint; step 65 was an ineligible incomplete half-cycle health checkpoint", "validation_loss_selection_claimed": false},
+  "execution": {"qualification_slurm_job_id": "326934", "scoring_slurm_job_id": "326935", "attempt_count": 1, "scoring_started_count": 1, "scoring_complete_count": 1, "benchmark_accessed": true, "score_driven_changes": false},
+  "results_percent": {"lex_nouns": 51.263402, "lex_adjectives": 48.394194, "lexical": 49.828798, "gram_embedded_relative": 43.636364, "gram_subject_verb": 34.210526, "gram_order_matters": 33.333333, "gram_subject_adjective": 31.360947, "gram_negation": 45.945946, "gram_prepositions": 40.886700, "gram_comparatives": 41.176471, "gram_counting": 38.207547, "grammatical": 38.594729, "overall": 44.211763},
+  "coverage": {"task_count": 10, "manifest_count": 20, "trial_count": 3721, "missing_tasks": 0, "duplicate_examples": 0, "all_scores_finite": true},
+  "resources": {"evaluator_runtime_seconds": 161.250877, "slurm_elapsed_seconds": 183, "peak_driver_gpu_memory_bytes": 4267704320, "peak_driver_gpu_memory_source": "Slurm sacct gres/gpumem=4070M", "peak_host_rss_bytes": 11048042496},
+  "adapter_qualification": {"strict_checkpoint_load": true, "model_state_parameter_keys": 386, "model_state_sha256": "7932dd45f55de42f68b3431ca2897539a707698de38fd3aa78d470ce4e749c18", "feature_dimension": 512, "text_pooling": "CLS", "tokenizer_size": 380, "learned_logit_scale": 2.6585874557495117, "synthetic_forward_finite": true, "benchmark_accessed": false},
+  "governed_records": {"opaque_run_id": "p8-4a20f18d", "attempt_ledger_sha256": "db3f88220812c8d36919c42981de1bdf56219c29c6b75eebc5bbf42ee3e34aae", "qualification_sha256": "f8f72e808cad0bf153dcc6cb84e50cdc21951854a9c9ef3951a3538ed25b8c89", "result_sha256": "c3abd02850deadee94e550535d15369d0a18601c4324678e60ddbb850296ac65", "complete_inventory_sha256": "cdbdfad0cbcd3c8670a804b6bbe1aeecf5f77a0fc047e949b8de5fd9b91839bc", "complete_inventory_entry_count": 11390, "complete_inventory_total_bytes": 3266119667, "qualification_log_sha256": "a34e90a69e5c6f72184225e85b16e5e6dceca6676e1934cfc0f9330ba8c6dce6", "scoring_log_sha256": "c90968f569372758aea9cb235bd4c8b370da08e1c93b2b8489657159cfea9ea3", "archive_sha256": "5f4c662919e3b0abdb85f5d6520350f10c374f087886f4257bbe1bd336f3b13c", "owner_only": true},
+  "limitations": ["The two-video pilot and 380-token pilot vocabulary are non-generalizing and non-comparable.", "This is an engineering integration output, not evidence for or against any paper result.", "P4 CLIP-L calibrated only the external evaluator and aggregation; it did not initialize, tune, alter, ensemble with, or score P7.", "The full reproduction must recalibrate its evaluator without leakage."],
+  "p0_p1_p2_p3_p4_p5_p6_p7_status_preserved": true,
+  "next_stage": "P9",
+  "next_stage_started": false
+}
