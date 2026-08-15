@@ -25,7 +25,7 @@ def checkpoint(step=50):
 
 def main():
     p=module(); p.load_config(ROOT/"configs/pilot_p6.json")
-    require(P["pilot_stage"]=="P7" and P["status"]=="p7_complete" and P["next_stage"]=="P8" and not P["next_stage_started"],"canonical lifecycle stale")
+    require(P["pilot_stage"] in {"P7","P8"} and P["status"] in {"p7_complete","p8_complete"} and P["next_stage"] in {"P8","P9"} and not P["next_stage_started"],"canonical lifecycle stale")
     require(P["p5"]["next_stage_started"] and P["p6"]["status"]=="p6_complete" and P["p6"]["next_stage_started"],"stage lifecycle inconsistent")
     require(D["p6_status"]["status"]=="p6_complete" and D["p6_status"]["next_stage"]=="P7","decision lifecycle inconsistent")
     require(C["tokenizer"]["vocab_size"]==C["model"]["vocab_size"]==380,"authorized vocabulary changed")

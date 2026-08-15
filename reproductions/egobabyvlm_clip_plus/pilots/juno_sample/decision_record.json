@@ -2,7 +2,7 @@
   "schema_version": 1,
   "pilot_id": "juno_sample",
   "engineering_run_id": "p0-4cc3af23",
-  "status": "p7_complete",
+  "status": "p8_complete",
   "classification": [
     "engineering_only",
     "non_comparable",
@@ -142,7 +142,7 @@
       "historical_clip_b_failure_preserved_unchanged"
     ],
     "next_stage": "P5",
-    "next_stage_started": false
+    "next_stage_started": true
   },
   "p4_clip_l_provenance_diagnostic": {
     "stage": "P4-diagnostic",
@@ -156,7 +156,7 @@
     "within_original_p4_overall_window": true,
     "closer_than_recorded_clip_b_across_ten_tasks": true,
     "original_p4_record_untouched": true,
-    "next_stage_started": false
+    "next_stage_started": true
   },
   "p4_historical_initial_clip_b_calibration": {
     "status": "p4_incomplete",
@@ -234,6 +234,24 @@
     "global_full_dataset_inventory_status": "incomplete_inventory_out_of_scope_for_engineering_pilot",
     "machine_devbench_accessed": false,
     "clip_l_used_for_training": false, "full_reproduction_evaluator_recalibration_required": true,
-    "p0_p1_p2_p3_p4_p5_p6_status_preserved": true, "next_stage": "P8", "next_stage_started": false
+    "p0_p1_p2_p3_p4_p5_p6_status_preserved": true, "next_stage": "P8", "next_stage_started": true
+  },
+  "p8_status": {
+    "stage": "P8",
+    "status": "p8_complete",
+    "completed_on": "2026-08-14",
+    "aggregate_record": "p8_aggregate.json",
+    "evaluation_config": "../../configs/pilot_p8.json",
+    "checkpoint_selection_record": "p8_checkpoint_selection.json",
+    "engineering_run_id": "p8-4a20f18d",
+    "selected_checkpoint": {"run_id": "p7-7b9e2c41", "step": 130, "sha256": "287dc2f08565c5a012d9768e0c06de08804fa73fc82ec498f3ec42726c9cb431", "basis": "sole_eligible_completed_cycle_checkpoint"},
+    "attempt_ledger": {"authorized": 1, "scoring_started": 1, "scoring_complete": 1, "state": "scoring_complete", "sha256": "db3f88220812c8d36919c42981de1bdf56219c29c6b75eebc5bbf42ee3e34aae"},
+    "preserved_artifact_integrity": {"trial_identity_multiset_match": true, "missing": 0, "duplicates": 0, "aggregation_equivalent_at_six_decimals": true, "pre_access_commit": "c935e9b78f8bc8c59e2a589da2e1824dc8baf577", "audit_sha256": "dc4d699fd71ff2a17a70d05608c5d3e9738077641e865e4ff6741d859baaccad", "inventory_sha256": "e695183330bc587b2b57d5f627d446a1ee15dc58429004e3007a1e9301782c69"},
+    "classification": ["engineering_only", "non_comparable", "not_a_reproduction_result"],
+    "p4_clip_l_role": "external_evaluator_calibration_only_not_model_initialization_tuning_alteration_ensemble_or_scoring",
+    "full_reproduction_evaluator_recalibration_required": true,
+    "p0_p1_p2_p3_p4_p5_p6_p7_status_preserved": true,
+    "next_stage": "P9",
+    "next_stage_started": false
   }
 }

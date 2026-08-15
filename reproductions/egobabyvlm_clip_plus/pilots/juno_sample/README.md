@@ -390,6 +390,33 @@ started.
 
 ## Pilot P8 — Evaluate one frozen pilot checkpoint once
 
+Status: **complete (engineering-only)**. The sole eligible completed-cycle P7
+checkpoint was checksum-promoted step 130 from run `p7-7b9e2c41`; step 65 was
+an ineligible incomplete half-cycle health checkpoint. Synthetic-only adapter
+qualification completed without benchmark access, then exactly one authorized
+Machine-DevBench scoring attempt completed with all ten tasks, both styles, and
+3,721 trials covered without missing or duplicate examples. Full predictions,
+extracted data, logs, and detailed records remain owner-only on governed Juno.
+
+The resulting aggregates are integration outputs only: `engineering_only`,
+`non_comparable`, and `not_a_reproduction_result`. The two-video pilot and its
+380-token vocabulary do not generalize. P4 CLIP-L calibrated only the external
+evaluator and aggregation; it did not initialize, tune, alter, ensemble with,
+or score P7. The full reproduction must recalibrate its evaluator without
+leakage. No comparison with a paper result is authorized. P9 is next and was
+not started.
+
+A preserved-artifact hardening audit subsequently executed no model inference
+and started no scoring attempt. It matched canonical full-trial-specification
+fingerprints from all 20 extracted manifests against the 3,721 retained raw
+prediction records with exact per-style/per-task counts and no missing or
+duplicate identities. It also proved the selected P4 CLIP-L `task_aggregate`
+and upstream `ResultAggregator` paths identical for all ten tasks and the three
+aggregates at six-decimal reporting precision. The audit verified the official
+archive and all 11,380 P4 inventory entries, the exact pre-access nursery commit
+used by jobs 326934/326935, and the immutable one-attempt ledger. Full identity,
+inventory, prediction, log, and accounting evidence remains owner-only on Juno.
+
 **Question:** Can a pilot checkpoint pass through the frozen evaluator without
 using the benchmark for development?
 
