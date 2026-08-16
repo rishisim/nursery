@@ -363,6 +363,53 @@ gate. Table, plate, and spoon result packages remain eligible only after that
 gate is repeated in the publishing run. This preserves earlier accepted stages
 without admitting the known malformed geometry.
 
+Generation job `328413` proved that the corrected generic gate could still
+produce a false positive: direct inspection of its four target renders showed a
+mirrored second mug handle. That package and its scene-only canary are retained
+only under the disposable superseded-run root and are not the shared scene. The
+canonical target gate now asks a separate exact-output multiview question that
+requires exactly one connected handle. It preserves the same prompt and
+hash-bound SD3.5 image while trying only the frozen TRELLIS retry seeds.
+
+The admitted fresh generation is Slurm job `328463`. The first permitted retry
+seed, `33936`, passed the upstream check, corrected generic four-view check, and
+single-handle target check exactly. Direct four-view inspection also confirmed
+one handle and an open cup interior. Its durable package is
+`/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return/`.
+The generation receipt SHA-256 is
+`f507543ca408c143b3a538854bd5b6efec2b251f81945948b007a92d61cfe72a`;
+`layout.json` is
+`400c833dbfc22393800254f998277a3861baa0b5e6aceb7f146affeeca5453b8`.
+The receipt proves `render_insert_robot=false`, `robot_actor_loaded=false`, and
+that the released `sim-cli` was not invoked.
+
+SceneBundle compilation and the bounded scene-only canary passed in Slurm job
+`328468`. The pretty JSON file SHA-256 is
+`9ad409fa58d04dc8faabf802a71f2225968f8341841a5ece3265d03cbe76bba6`;
+its documented canonical JSON digest is
+`6606445cc1d6561bfdb7b5411182841a315f54778cfa180d6a403a0542de4c0a`,
+and its bundle ID is `scene_88520fa08789071d24de23598dbc4add`.
+SAPIEN `3.0.0b1` ran 2,000 physics steps at 200 Hz and wrote a 300-frame,
+30-FPS, 10-second video. The video SHA-256 is
+`d7b3d77a7e80ac5a636f403024bb062617b1bc4db7d76aac9e1e6596c4ea9574`.
+
+This is a canary, not a qualified settling receipt. `interactmove_scene_input_ready`
+and `dynamic_settle_ready` remain false because the selected background has no
+reference mesh/room collision, and the dynamic-object source URDFs omit
+restitution. The canary intentionally exposes the released importer's fallback
+behavior: it does not apply URDF mass, uses hard-coded restitution `0.05`, and
+does not record contacts. No InteractMove motion or InterMimic execution has run.
+
+The fair-comparison handoff is
+`/work/dal503972/interactmove_intermimic/compact_records/shared_scene_red-mug-mouth-return.json`,
+SHA-256
+`5f6a1730bc1bb7c57c62a8f238bafabc5fe04592e2078097901093f5e0f151b9`.
+It binds all 165 files (235,472,771 bytes) by relative path, byte size, and
+SHA-256; the canonical inventory digest is
+`f80c120ef594c097a5e709d6c41bd2f7621d7ec38a29b9c1971f58f3109c3723`.
+The HOIDiNi protocol must consume this package directly or verify an exact
+durable copy against that inventory; it must not independently sample a scene.
+
 EmbodiedGen's released `sim-cli` loads a Franka even when
 `insert_robot=false`; therefore it must not be used as evidence of a robot-free
 simulation. Nursery's robot-free canary calls only the released scene importer
