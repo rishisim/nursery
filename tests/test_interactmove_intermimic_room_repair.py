@@ -31,21 +31,44 @@ def test_room_repair_help_describes_preserved_sam3d_composition() -> None:
     assert "existing accepted SAM3D object scene" in help_text
 
 
-def test_authored_wall_collision_is_finite_room_scale(tmp_path: Path) -> None:
+def test_authored_wall_collisions_are_separate_finite_convex_boxes(
+    tmp_path: Path,
+) -> None:
     runner = _load_runner()
-    path = tmp_path / "walls.obj"
     bounds = {
         "aabb_min_m": [-3.0, -2.5, 0.0],
         "aabb_max_m": [3.0, 2.5, 3.0],
     }
 
-    runner._write_wall_collision(path, bounds)
-    report = inspect_mesh(path, "background/collision/walls.obj", [1.0, 1.0, 1.0])
+    collisions = runner._write_wall_collisions(tmp_path / "collision", bounds)
 
-    assert report["vertex_count"] == 32
-    assert report["face_count"] == 48
-    assert report["finite_vertices"] is True
-    assert report["extents_m"] == [6.1, 5.1, 3.0]
+    assert [collision_id for collision_id, _ in collisions] == [
+        "wall_x_min",
+        "wall_x_max",
+        "wall_y_min",
+        "wall_y_max",
+    ]
+    reports = [
+        inspect_mesh(
+            path,
+            f"background/collision/{path.name}",
+            [1.0, 1.0, 1.0],
+        )
+        for _, path in collisions
+    ]
+    assert all(report["vertex_count"] == 8 for report in reports)
+    assert all(report["face_count"] == 12 for report in reports)
+    assert all(report["finite_vertices"] is True for report in reports)
+    expected_extents = [
+        [0.05, 5.1, 3.0],
+        [0.05, 5.1, 3.0],
+        [6.0, 0.05, 3.0],
+        [6.0, 0.05, 3.0],
+    ]
+    for actual, expected in zip(
+        sorted(report["extents_m"] for report in reports), expected_extents
+    ):
+        assert actual == pytest.approx(expected)
 
 
 def test_preserved_activity_binding_projects_embodiedgen_seeds() -> None:

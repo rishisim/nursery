@@ -365,30 +365,55 @@ def _box_vertices_faces(
     return vertices, [tuple(index + offset for index in face) for face in local_faces]
 
 
-def _write_wall_collision(path: Path, bounds: dict[str, Any]) -> None:
+def _write_wall_collisions(
+    directory: Path, bounds: dict[str, Any]
+) -> list[tuple[str, Path]]:
+    """Write each room wall as its own connected convex collision mesh."""
     minimum = bounds["aabb_min_m"]
     maximum = bounds["aabb_max_m"]
     thickness = 0.05
     z0, z1 = 0.0, maximum[2]
     boxes = [
-        ((minimum[0] - thickness, minimum[1] - thickness, z0), (minimum[0], maximum[1] + thickness, z1)),
-        ((maximum[0], minimum[1] - thickness, z0), (maximum[0] + thickness, maximum[1] + thickness, z1)),
-        ((minimum[0], minimum[1] - thickness, z0), (maximum[0], minimum[1], z1)),
-        ((minimum[0], maximum[1], z0), (maximum[0], maximum[1] + thickness, z1)),
+        (
+            "wall_x_min",
+            (minimum[0] - thickness, minimum[1] - thickness, z0),
+            (minimum[0], maximum[1] + thickness, z1),
+        ),
+        (
+            "wall_x_max",
+            (maximum[0], minimum[1] - thickness, z0),
+            (maximum[0] + thickness, maximum[1] + thickness, z1),
+        ),
+        (
+            "wall_y_min",
+            (minimum[0], minimum[1] - thickness, z0),
+            (maximum[0], minimum[1], z1),
+        ),
+        (
+            "wall_y_max",
+            (minimum[0], maximum[1], z0),
+            (maximum[0], maximum[1] + thickness, z1),
+        ),
     ]
-    vertices: list[tuple[float, float, float]] = []
-    faces: list[tuple[int, int, int]] = []
-    for minimum_box, maximum_box in boxes:
-        box_vertices, box_faces = _box_vertices_faces(
-            minimum_box, maximum_box, len(vertices) + 1
+    directory.mkdir(parents=True, exist_ok=True)
+    results = []
+    for collision_id, minimum_box, maximum_box in boxes:
+        box_vertices, box_faces = _box_vertices_faces(minimum_box, maximum_box, 1)
+        lines = [
+            "# Explicit Nursery room wall collision; world-frame meters.",
+            f"# collision_id={collision_id}",
+        ]
+        lines.extend(
+            "v " + " ".join(f"{value:.9g}" for value in vertex)
+            for vertex in box_vertices
         )
-        vertices.extend(box_vertices)
-        faces.extend(box_faces)
-    lines = ["# Explicit Nursery room wall collision; world-frame meters."]
-    lines.extend("v " + " ".join(f"{value:.9g}" for value in vertex) for vertex in vertices)
-    lines.extend("f " + " ".join(str(index) for index in face) for face in faces)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        lines.extend(
+            "f " + " ".join(str(index) for index in face) for face in box_faces
+        )
+        path = directory / f"{collision_id}.obj"
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        results.append((collision_id, path))
+    return results
 
 
 def _validate_preserved_activity_binding(
@@ -492,8 +517,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     (provenance_root / "prompt.txt").write_text(args.room_prompt + "\n", encoding="utf-8")
     final_mesh = background / "mesh_model.ply"
     transform_receipt = _canonicalize_room_mesh(retained_raw_mesh, final_mesh)
-    walls_path = background / "collision" / "walls.obj"
-    _write_wall_collision(walls_path, transform_receipt)
+    wall_collisions = _write_wall_collisions(
+        background / "collision", transform_receipt
+    )
 
     source_inventory = {
         "schema": "InteractMoveRoomSourceInventory",
@@ -556,15 +582,18 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "z_m": 0.0,
                 "normal": [0.0, 0.0, 1.0],
             },
-            {
-                "collision_id": "walls",
-                "role": "walls",
-                "geometry_type": "mesh",
-                "frame": "world",
-                "path": "collision/walls.obj",
-                "units": "m",
-                "scale_xyz": [1.0, 1.0, 1.0],
-            },
+            *[
+                {
+                    "collision_id": collision_id,
+                    "role": "walls",
+                    "geometry_type": "mesh",
+                    "frame": "world",
+                    "path": path.relative_to(background).as_posix(),
+                    "units": "m",
+                    "scale_xyz": [1.0, 1.0, 1.0],
+                }
+                for collision_id, path in wall_collisions
+            ],
         ],
         "render_mode": "raster_reference_mesh",
         "provenance": {
@@ -575,7 +604,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "source_artifact_sha256": source_inventory_sha,
             "creation_method": (
                 "released panorama and Pano2Mesh stages; baked Y-up-to-Z-up metric "
-                "transform; separate authored floor/wall collision"
+                "transform; separate authored floor and per-wall collision meshes"
             ),
         },
     }
@@ -647,10 +676,14 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "sha256": _sha256(final_mesh),
                 **transform_receipt,
             },
-            "wall_collision": {
-                "path": "background/collision/walls.obj",
-                "sha256": _sha256(walls_path),
-            },
+            "wall_collisions": [
+                {
+                    "collision_id": collision_id,
+                    "path": path.relative_to(candidate).as_posix(),
+                    "sha256": _sha256(path),
+                }
+                for collision_id, path in wall_collisions
+            ],
         },
         "preservation": {
             "pre_repair_generation_receipt_sha256": original_receipt_sha,
