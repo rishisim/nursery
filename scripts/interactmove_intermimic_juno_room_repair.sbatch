@@ -23,6 +23,7 @@ readonly REALESRGAN_REVISION=a64fcdebeea17287d830736cd0853df1093b97ab
 readonly OMNIDATA_COMMIT=152cf1465313b68cdf5d47bb09568a9357c57086
 readonly OMNIDATA_DEPTH_REVISION=3df69f18233d1ffd6161117ee816977d54630d70
 readonly OMNIDATA_NORMAL_REVISION=387d2be61a3f475c0a5ac969768a9c6d0e75dee1
+readonly TINY_CUDA_NN_COMMIT=749dd70c5afc5a9dadb85e5652ed65d55e0ba187
 readonly ACTIVITY_ID=red-mug-mouth-return
 readonly SCRATCH_ROOT=/scratch/juno/dal503972/interactmove_intermimic
 readonly DURABLE_ROOT=/work/dal503972/interactmove_intermimic
@@ -60,6 +61,8 @@ readonly REALESRGAN_ROOT="${CHECKPOINT_ROOT}/roboassetgen-${REALESRGAN_REVISION}
 readonly OMNIDATA_DEPTH_ROOT="${CHECKPOINT_ROOT}/omnidata-depth-${OMNIDATA_DEPTH_REVISION}"
 readonly OMNIDATA_NORMAL_ROOT="${CHECKPOINT_ROOT}/omnidata-normal-${OMNIDATA_NORMAL_REVISION}"
 readonly OMNIDATA_ROOT="${SCRATCH_ROOT}/source/omnidata_models-${OMNIDATA_COMMIT}"
+readonly TINY_CUDA_NN_SOURCE="${SCRATCH_ROOT}/source/tiny-cuda-nn-${TINY_CUDA_NN_COMMIT}"
+readonly TINY_CUDA_NN_WHEEL_ROOT="${CHECKPOINT_ROOT}/tinycudann-${TINY_CUDA_NN_COMMIT}"
 readonly REUSE_PANO_SOURCE_JOB=329209
 readonly REUSE_PANO="${SCRATCH_ROOT}/runs/room_repair/${REUSE_PANO_SOURCE_JOB}/scene3d_generation/pano_image.png"
 readonly REUSE_PANO_SHA256=742a2684dd5b6d628d7d2b9803b9223a414dc11363b3eff0a7127650c4b17740
@@ -137,6 +140,45 @@ python -m pip install --disable-pip-version-check \
     pymeshlab==2022.2.post4 \
     py360convert==1.0.4
 
+if [[ ! -d "${TINY_CUDA_NN_SOURCE}" ]]; then
+    git clone --recursive https://github.com/NVlabs/tiny-cuda-nn.git \
+        "${TINY_CUDA_NN_SOURCE}.staging-${SLURM_JOB_ID}"
+    git -C "${TINY_CUDA_NN_SOURCE}.staging-${SLURM_JOB_ID}" checkout \
+        "${TINY_CUDA_NN_COMMIT}"
+    git -C "${TINY_CUDA_NN_SOURCE}.staging-${SLURM_JOB_ID}" \
+        submodule update --init --recursive
+    mv "${TINY_CUDA_NN_SOURCE}.staging-${SLURM_JOB_ID}" "${TINY_CUDA_NN_SOURCE}"
+fi
+if [[ "$(git -C "${TINY_CUDA_NN_SOURCE}" rev-parse HEAD)" != \
+      "${TINY_CUDA_NN_COMMIT}" ]]; then
+    echo "Tiny-CUDA-NN source commit mismatch" >&2
+    exit 1
+fi
+git -C "${TINY_CUDA_NN_SOURCE}" diff --quiet
+git -C "${TINY_CUDA_NN_SOURCE}" diff --cached --quiet
+if [[ ! -d "${TINY_CUDA_NN_WHEEL_ROOT}" ]]; then
+    wheel_staging="${TINY_CUDA_NN_WHEEL_ROOT}.staging-${SLURM_JOB_ID}"
+    install -d -m 700 "${wheel_staging}"
+    TCNN_CUDA_ARCHITECTURES=90 MAX_JOBS=8 python -m pip wheel \
+        --disable-pip-version-check --no-deps \
+        "${TINY_CUDA_NN_SOURCE}/bindings/torch" \
+        --wheel-dir "${wheel_staging}"
+    printf '%s\n' "${TINY_CUDA_NN_COMMIT}" > "${wheel_staging}/.nursery_revision"
+    mv "${wheel_staging}" "${TINY_CUDA_NN_WHEEL_ROOT}"
+fi
+if [[ "$(<"${TINY_CUDA_NN_WHEEL_ROOT}/.nursery_revision")" != \
+      "${TINY_CUDA_NN_COMMIT}" ]]; then
+    echo "Tiny-CUDA-NN wheel revision mismatch" >&2
+    exit 1
+fi
+mapfile -t tcnn_wheels < <(find "${TINY_CUDA_NN_WHEEL_ROOT}" -maxdepth 1 \
+    -type f -name 'tinycudann-*.whl' -print)
+if [[ "${#tcnn_wheels[@]}" -ne 1 ]]; then
+    echo "Expected exactly one pinned Tiny-CUDA-NN wheel" >&2
+    exit 1
+fi
+python -m pip install --disable-pip-version-check --no-deps "${tcnn_wheels[0]}"
+
 if [[ ! -d "${OMNIDATA_ROOT}" ]]; then
     git clone https://github.com/alexsax/omnidata_models "${OMNIDATA_ROOT}.staging-${SLURM_JOB_ID}"
     git -C "${OMNIDATA_ROOT}.staging-${SLURM_JOB_ID}" checkout "${OMNIDATA_COMMIT}"
@@ -153,6 +195,7 @@ export IMIM_SD2_ROOT="${SD2_ROOT}"
 export IMIM_REALESRGAN_ROOT="${REALESRGAN_ROOT}"
 export IMIM_OMNIDATA_DEPTH_ROOT="${OMNIDATA_DEPTH_ROOT}"
 export IMIM_OMNIDATA_NORMAL_ROOT="${OMNIDATA_NORMAL_ROOT}"
+export IMIM_TINY_CUDA_NN_WHEEL_ROOT="${TINY_CUDA_NN_WHEEL_ROOT}"
 python - <<'PY'
 import os
 from pathlib import Path
@@ -248,6 +291,7 @@ roots = {
     "realesrgan": Path(os.environ["IMIM_REALESRGAN_ROOT"]),
     "omnidata_depth": Path(os.environ["IMIM_OMNIDATA_DEPTH_ROOT"]),
     "omnidata_normal": Path(os.environ["IMIM_OMNIDATA_NORMAL_ROOT"]),
+    "tinycudann_wheel": Path(os.environ["IMIM_TINY_CUDA_NN_WHEEL_ROOT"]),
 }
 def sha256_file(path):
     digest = hashlib.sha256()
@@ -307,7 +351,7 @@ module.rgb_to_grayscale = TF.rgb_to_grayscale
 sys.modules["torchvision.transforms.functional_tensor"] = module
 for name in (
     "txt2panoimg", "equilib", "kornia", "albumentations", "webdataset",
-    "icecream", "lpips", "pymeshlab", "basicsr", "realesrgan",
+    "icecream", "lpips", "pymeshlab", "basicsr", "realesrgan", "tinycudann",
 ):
     __import__(name)
 print("room dependency imports passed")

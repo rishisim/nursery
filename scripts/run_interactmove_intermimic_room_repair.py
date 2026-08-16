@@ -23,6 +23,7 @@ REALESRGAN_REVISION = "a64fcdebeea17287d830736cd0853df1093b97ab"
 OMNIDATA_COMMIT = "152cf1465313b68cdf5d47bb09568a9357c57086"
 OMNIDATA_DEPTH_REVISION = "3df69f18233d1ffd6161117ee816977d54630d70"
 OMNIDATA_NORMAL_REVISION = "387d2be61a3f475c0a5ac969768a9c6d0e75dee1"
+TINY_CUDA_NN_COMMIT = "749dd70c5afc5a9dadb85e5652ed65d55e0ba187"
 NATIVE_PROFILE = "embodiedgen-v2.0.1-sapien-rh-zup-m-xyzw"
 
 
@@ -171,28 +172,10 @@ def _install_torchvision_functional_tensor_compat() -> None:
     sys.modules[module.__name__] = module
 
 
-def _install_unused_tinycudann_import_guard() -> None:
-    """Let Pano2Room import while failing closed if its unused refiner executes."""
-    if "tinycudann" in sys.modules:
-        return
-
-    class UnavailableEncoding:
-        def __init__(self, *args, **kwargs):
-            raise RuntimeError(
-                "tinycudann is unavailable: the frozen room profile must not "
-                "execute PanoGeoRefiner"
-            )
-
-    module = types.ModuleType("tinycudann")
-    module.Encoding = UnavailableEncoding
-    sys.modules[module.__name__] = module
-
-
 def _generate_room(
     args: argparse.Namespace,
 ) -> tuple[Path, Path, dict[str, Any]]:
     _install_torchvision_functional_tensor_compat()
-    _install_unused_tinycudann_import_guard()
     _patch_pinned_model_loaders(args)
     import torch
     from embodied_gen.models.sr_model import ImageRealESRGAN
@@ -470,12 +453,13 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "omnidata_commit": OMNIDATA_COMMIT,
             "omnidata_depth_revision": OMNIDATA_DEPTH_REVISION,
             "omnidata_normal_revision": OMNIDATA_NORMAL_REVISION,
+            "tiny_cuda_nn_commit": TINY_CUDA_NN_COMMIT,
         },
         "execution_profile": {
             "pipeline": "Pano2MeshSRPipeline",
             "pano_geo_refiner_executed": False,
-            "tinycudann_installed": False,
-            "tinycudann_import_guard": "fail_if_Encoding_is_instantiated",
+            "tinycudann_installed": True,
+            "tinycudann_required_by_pano_joint_predictor": True,
             "omnidata_timm_imagenet_bootstrap": False,
             "omnidata_task_checkpoints_supply_full_model": True,
         },

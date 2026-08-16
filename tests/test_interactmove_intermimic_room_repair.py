@@ -98,14 +98,3 @@ def test_torchvision_functional_tensor_compat_exposes_grayscale(monkeypatch) -> 
 
     module = runner.sys.modules["torchvision.transforms.functional_tensor"]
     assert module.rgb_to_grayscale is grayscale
-
-
-def test_unused_tinycudann_guard_fails_if_refiner_executes(monkeypatch) -> None:
-    runner = _load_runner()
-    monkeypatch.delitem(sys.modules, "tinycudann", raising=False)
-
-    runner._install_unused_tinycudann_import_guard()
-
-    module = runner.sys.modules["tinycudann"]
-    with pytest.raises(RuntimeError, match="must not execute PanoGeoRefiner"):
-        module.Encoding(n_input_dims=3)
