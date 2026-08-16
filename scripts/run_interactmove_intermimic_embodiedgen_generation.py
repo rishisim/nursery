@@ -28,10 +28,8 @@ from typing import Any, Mapping, Sequence
 
 EMBODIEDGEN_COMMIT = "9b333554254af196bace88c1a171a3bf047fa09c"
 EMBODIEDGEN_VERSION = "v2.0.1"
-TRELLIS_SOURCE_COMMIT = "55a8e8164b195bbf927e0978f00e76c835e6011f"
-TRELLIS_FLEXICUBES_COMMIT = "f97beb0dd3c6c68f3ab5696b6dcaf9af69f0514e"
-TRELLIS_CHECKPOINT_REVISION = "25e0d31ffbebe4b5a97464dd851910efc3002d96"
-DINOv2_COMMIT = "7764ea0f912e53c92e82eb78a2a1631e92725fc8"
+SAM3D_SOURCE_COMMIT = "01417d16fb5cc762a60f370c1bf7f59d603ddfaf"
+SAM3D_CHECKPOINT_REVISION = "2e73555018d2741ccd486e56c24fac41155a1dc6"
 RECEIPT_SCHEMA = "InteractMoveInterMimicFreshEmbodiedGenReceipt"
 RECEIPT_SCHEMA_VERSION = 1
 OPENAI_API_MODE = "responses"
@@ -276,7 +274,7 @@ class _ResponsesGPTClient:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Run the pinned EmbodiedGen GPT layout, SD3.5 image, TRELLIS asset, "
+            "Run the pinned EmbodiedGen GPT layout, SD3.5 image, SAM3D asset, "
             "background retrieval, and BFS placement stages for one fresh "
             "prompt. This never calls sim_cli and never loads a robot actor."
         )
@@ -291,8 +289,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--resume-scene-tree", type=Path, required=True)
     parser.add_argument("--resume-images", type=Path, required=True)
     parser.add_argument("--resume-receipt", type=Path, required=True)
-    parser.add_argument("--resume-assets", type=Path, required=True)
-    parser.add_argument("--resume-asset-receipt", type=Path, required=True)
+    parser.add_argument("--resume-conditioning", type=Path, required=True)
+    parser.add_argument("--resume-conditioning-receipt", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--receipt", type=Path, required=True)
     return parser
@@ -430,11 +428,9 @@ def _source_state(source_root: Path) -> dict[str, Any]:
         )
         if result.returncode != 0:
             raise ValueError("EmbodiedGen tracked source checkout is dirty")
-    trellis = source / "thirdparty" / "TRELLIS"
-    flexicubes = trellis / "trellis" / "representations" / "mesh" / "flexicubes"
+    sam3d = source / "thirdparty" / "sam3d"
     for path, expected, label in (
-        (trellis, TRELLIS_SOURCE_COMMIT, "TRELLIS"),
-        (flexicubes, TRELLIS_FLEXICUBES_COMMIT, "TRELLIS FlexiCubes"),
+        (sam3d, SAM3D_SOURCE_COMMIT, "SAM3D"),
     ):
         submodule_commit = _command_output(
             ["git", "-C", str(path), "rev-parse", "HEAD"]
@@ -457,10 +453,9 @@ def _source_state(source_root: Path) -> dict[str, Any]:
         "version": EMBODIEDGEN_VERSION,
         "commit": actual,
         "tracked_files_clean": True,
-        "trellis": {
-            "path": str(trellis),
-            "commit": TRELLIS_SOURCE_COMMIT,
-            "flexicubes_commit": TRELLIS_FLEXICUBES_COMMIT,
+        "sam3d": {
+            "path": str(sam3d),
+            "commit": SAM3D_SOURCE_COMMIT,
             "tracked_files_clean": True,
         },
     }
@@ -480,10 +475,9 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
         "text_to_image_model",
         "text_to_image_backend",
         "image_to_3d_backend",
-        "trellis",
-        "sam3d_comparison",
+        "sam3d",
         "resume_source",
-        "asset_resume_source",
+        "conditioning_resume_source",
         "image_samples_per_prompt",
         "text_guidance_scale",
         "image_denoise_steps",
@@ -501,88 +495,86 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
         "openai_sdk_version": OPENAI_SDK_VERSION,
         "text_to_image_model": "stabilityai/stable-diffusion-3.5-medium",
         "text_to_image_backend": "sd35",
-        "image_to_3d_backend": "TRELLIS",
-        "trellis": {
-            "source_repository": "microsoft/TRELLIS",
-            "source_commit": TRELLIS_SOURCE_COMMIT,
-            "source_license": "MIT",
-            "checkpoint_repository": "microsoft/TRELLIS-image-large",
-            "checkpoint_revision": TRELLIS_CHECKPOINT_REVISION,
-            "checkpoint_license": "MIT",
-            "dinov2_repository": "facebookresearch/dinov2",
-            "dinov2_commit": DINOv2_COMMIT,
-            "dinov2_license": "Apache-2.0",
+        "image_to_3d_backend": "SAM3D",
+        "sam3d": {
+            "source_repository": "HochCC/sam-3d-objects",
+            "source_commit": SAM3D_SOURCE_COMMIT,
+            "source_license": "SAM License",
+            "checkpoint_repository": "facebook/sam-3d-objects",
+            "checkpoint_revision": SAM3D_CHECKPOINT_REVISION,
+            "checkpoint_license": "SAM License",
+            "access_status": "authenticated_admitted",
         },
-        "sam3d_comparison": {
-            "repository": "facebook/sam-3d-objects",
-            "commit": "2e73555018d2741ccd486e56c24fac41155a1dc6",
-            "access_status": "pending_not_admitted",
-            "blocks_trellis_run": False,
-        },
-        "asset_resume_source": {
+        "conditioning_resume_source": {
             "job_id": "328381",
             "generation_receipt_sha256": (
                 "0842642b0e10a5ddee297d2188accf3ac3ac95042764551f9c3ce3dd90408d23"
             ),
-            "requalification_policy": "four_separate_views_of_one_asset",
+            "reuse_scope": "accepted_sd35_conditioning_images_only",
+            "source_backend": "TRELLIS",
+            "sam3d_asset_retry_seeds": [2026081502, 33936, 62468],
             "nodes": {
                 "table": {
                     "prompt": (
                         "standalone rectangular wooden table with a clean empty "
                         "tabletop and warm polished surface"
                     ),
-                    "reuse_result": True,
-                    "rejected_results": [],
+                    "conditioning_seed": 50494,
+                    "image_sha256": (
+                        "317b980184bba52c5acb92de0e69d7992ba01dec7746fe5711dca"
+                        "246a80367ef"
+                    ),
+                    "raw_image_sha256": (
+                        "21291ddb429eb8a31fc367a6e390f53033ffe8efff3a09ad89676"
+                        "ac3c6853cf2"
+                    ),
                 },
                 "red mug": {
                     "prompt": (
                         "glossy crimson ceramic mug with curved handle, thick "
                         "rim, and smooth reflective surface"
                     ),
-                    "reuse_result": False,
-                    "rejected_results": [
-                        {
-                            "job_id": "328392",
-                            "generation_receipt_sha256": (
-                                "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b"
-                                "944c32bfef41ef3c"
-                            ),
-                            "reason": "malformed_vertical_side_protrusion",
-                        },
-                        {
-                            "job_id": "328413",
-                            "generation_receipt_sha256": (
-                                "c3e4f6670400bb7a32017da8480627c389879df741819b75"
-                                "e9248ddbd1065f74"
-                            ),
-                            "reason": (
-                                "duplicate_handles_found_by_target_specific_"
-                                "multiview_review"
-                            ),
-                        },
-                    ],
+                    "conditioning_seed": 2026081501,
+                    "image_sha256": (
+                        "7c1f5575a4778a483e0a9e1641c631601ebed106f560c8870c9d"
+                        "695e65ee95a3"
+                    ),
+                    "raw_image_sha256": (
+                        "ef07505fe916c16f64625509e37b34cf69b6da8a2d38a50e3ea"
+                        "fd9f9e5d75942"
+                    ),
                 },
                 "plate": {
                     "prompt": (
                         "white ceramic dinner plate with subtle rim, clean "
                         "glossy finish, and circular form"
                     ),
-                    "reuse_result": True,
-                    "rejected_results": [],
+                    "conditioning_seed": 2026081501,
+                    "image_sha256": (
+                        "0ee9554a5ac158f8e9a31416412b2c4d9795491ecb801e4d05cc"
+                        "b793d2a7454b"
+                    ),
+                    "raw_image_sha256": None,
                 },
                 "spoon": {
                     "prompt": (
                         "small stainless-steel spoon with polished reflective "
                         "bowl and slender rounded handle"
                     ),
-                    "reuse_result": True,
-                    "rejected_results": [],
+                    "conditioning_seed": 2026081501,
+                    "image_sha256": (
+                        "3caeeba8319aeaf9660fa70bd3e30d1e2f6cb788b8f78b78f328"
+                        "0cc033806ac4"
+                    ),
+                    "raw_image_sha256": (
+                        "34c46453d77e9e120ab2254b3332a13d9f9c1a689035c95e2148"
+                        "d9f755ee0fde"
+                    ),
                 },
             },
             "target_geometry_policy": {
                 "source_node_key": "red mug",
                 "exact_handle_count": 1,
-                "trellis_retry_seeds": [33936, 62468],
                 "review_prompt": (
                     "These are four camera views of the same single generated "
                     "red mug asset. Return exactly YES if and only if the asset "
@@ -707,16 +699,27 @@ def _install_resume_conditioning_images(
             raise ValueError(f"resume initial image seed mismatch for {node}")
         destination = Path(save_path)
         raw_destination = destination.with_name(destination.stem + "_raw.png")
+        raw_source = record.get("raw_image_path")
+        raw_hash = record.get("raw_image_sha256")
+        if (raw_source is None) != (raw_hash is None):
+            raise ValueError(f"resume raw image provenance is incomplete for {node}")
         if destination.exists() or raw_destination.exists():
-            if not destination.is_file() or not raw_destination.is_file():
+            if not destination.is_file():
                 raise ValueError(f"resume destination is incomplete for {node}")
             if _sha256(destination) != record["image_sha256"]:
                 raise ValueError(f"resume destination image changed for {node}")
-            if _sha256(raw_destination) != record["raw_image_sha256"]:
+            if raw_source is None:
+                if raw_destination.exists():
+                    raise ValueError(f"unexpected resume raw image for {node}")
+            elif (
+                not raw_destination.is_file()
+                or _sha256(raw_destination) != raw_hash
+            ):
                 raise ValueError(f"resume destination raw image changed for {node}")
         else:
             shutil.copy2(record["image_path"], destination)
-            shutil.copy2(record["raw_image_path"], raw_destination)
+            if raw_source is not None:
+                shutil.copy2(raw_source, raw_destination)
         reused.add(node)
         return True
 
@@ -724,85 +727,85 @@ def _install_resume_conditioning_images(
     return reused
 
 
-def _resume_assets(args: argparse.Namespace, generation: Mapping[str, Any]) -> dict[str, Any]:
-    frozen = generation["asset_resume_source"]
-    root = args.resume_assets.resolve(strict=True)
-    receipt_path = args.resume_asset_receipt.resolve(strict=True)
+def _conditioning_resume_inputs(
+    args: argparse.Namespace, generation: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Admit only hash-bound SD3.5 images from the historical partial run."""
+
+    frozen = generation["conditioning_resume_source"]
+    root = args.resume_conditioning.resolve(strict=True)
+    receipt_path = args.resume_conditioning_receipt.resolve(strict=True)
     if not root.is_dir() or root.is_symlink():
-        raise ValueError("--resume-assets must be a non-symlink directory")
+        raise ValueError("--resume-conditioning must be a non-symlink directory")
     if not receipt_path.is_file() or receipt_path.is_symlink():
-        raise ValueError("--resume-asset-receipt must be a regular non-symlink file")
+        raise ValueError(
+            "--resume-conditioning-receipt must be a regular non-symlink file"
+        )
     if _sha256(receipt_path) != frozen["generation_receipt_sha256"]:
-        raise ValueError("resume asset receipt hash mismatch")
+        raise ValueError("resume conditioning receipt hash mismatch")
     receipt = _read_json(receipt_path)
     if receipt.get("status") != "failed":
-        raise ValueError("resume asset receipt must be a failed partial run")
-    if receipt.get("models", {}).get("image_to_3d_backend") != "TRELLIS":
-        raise ValueError("resume asset receipt was not generated by TRELLIS")
-    if receipt.get("models", {}).get("trellis") != generation["trellis"]:
-        raise ValueError("resume asset receipt TRELLIS pins mismatch")
+        raise ValueError("resume conditioning receipt must be a failed partial run")
+    if receipt.get("models", {}).get("image_to_3d_backend") != frozen[
+        "source_backend"
+    ]:
+        raise ValueError("resume conditioning source backend mismatch")
     if receipt.get("error", {}).get("message") != (
         "resume initial image seed mismatch for table"
     ):
-        raise ValueError("resume asset receipt failure boundary mismatch")
+        raise ValueError("resume conditioning receipt failure boundary mismatch")
 
     manifest: dict[str, dict[str, Any]] = {}
     for record in receipt.get("files", []):
         if not isinstance(record, dict) or set(record) != {"path", "bytes", "sha256"}:
-            raise ValueError("resume asset receipt has malformed file records")
+            raise ValueError("resume conditioning receipt has malformed file records")
         relative = record["path"]
         if not isinstance(relative, str):
-            raise ValueError("resume asset receipt has a non-string path")
+            raise ValueError("resume conditioning receipt has a non-string path")
         safe = PurePosixPath(relative)
         if safe.is_absolute() or not safe.parts or any(
             part in {"", ".", ".."} for part in safe.parts
         ):
-            raise ValueError("resume asset receipt has an unsafe path")
+            raise ValueError("resume conditioning receipt has an unsafe path")
         if relative in manifest:
-            raise ValueError("resume asset receipt has a duplicate path")
+            raise ValueError("resume conditioning receipt has a duplicate path")
         path = root.joinpath(*safe.parts)
         if not path.is_file() or path.is_symlink():
-            raise ValueError(f"resume asset file is missing or unsafe: {relative}")
+            raise ValueError(
+                f"resume conditioning manifest file is missing or unsafe: {relative}"
+            )
         if path.stat().st_size != record["bytes"] or _sha256(path) != record["sha256"]:
-            raise ValueError(f"resume asset file hash mismatch: {relative}")
+            raise ValueError(f"resume conditioning file hash mismatch: {relative}")
         manifest[relative] = copy.deepcopy(record)
 
     nodes: dict[str, dict[str, Any]] = {}
     for node, policy in frozen["nodes"].items():
-        prompt = policy["prompt"]
         save_node = node.replace(" ", "_")
-        result_relative = f"asset3d/{save_node}/result"
-        render_paths = [
-            f"{result_relative}/renders/image_color/{index:04d}.png"
-            for index in range(4)
-        ]
-        required = [
-            f"images/{save_node}.png",
-            *render_paths,
-        ]
-        for relative in required:
-            if relative not in manifest:
-                raise ValueError(f"resume asset is missing required file: {relative}")
-        result_records = [
-            record
-            for relative, record in sorted(manifest.items())
-            if relative.startswith(result_relative + "/")
-        ]
-        if not result_records:
-            raise ValueError(f"resume asset has no result package: {node}")
+        image_relative = f"images/{save_node}.png"
         raw_relative = f"images/{save_node}_raw.png"
+        image_record = manifest.get(image_relative)
+        if image_record is None or image_record["sha256"] != policy["image_sha256"]:
+            raise ValueError(f"resume conditioning image is not hash-bound: {node}")
+        raw_hash = policy["raw_image_sha256"]
+        raw_record = manifest.get(raw_relative)
+        if raw_hash is None:
+            if raw_record is not None:
+                raise ValueError(f"unexpected resumed raw image for {node}")
+            raw_path = None
+        else:
+            if raw_record is None or raw_record["sha256"] != raw_hash:
+                raise ValueError(
+                    f"resume conditioning raw image is not hash-bound: {node}"
+                )
+            raw_path = root / raw_relative
         nodes[node] = {
-            "prompt": prompt,
-            "reuse_result": policy["reuse_result"],
-            "rejected_results": copy.deepcopy(policy["rejected_results"]),
-            "result_relative": result_relative,
-            "result_path": root / result_relative,
-            "image_path": root / f"images/{save_node}.png",
-            "raw_image_path": (
-                root / raw_relative if raw_relative in manifest else None
-            ),
-            "render_paths": [root / relative for relative in render_paths],
-            "result_manifest_sha256": _canonical_sha256(result_records),
+            "prompt": policy["prompt"],
+            "accepted_retry_seed": policy["conditioning_seed"],
+            "image_path": root / image_relative,
+            "raw_image_path": raw_path,
+            "image_sha256": policy["image_sha256"],
+            "raw_image_sha256": raw_hash,
+            "source_job_id": frozen["job_id"],
         }
     return {
         "root": root,
@@ -810,34 +813,6 @@ def _resume_assets(args: argparse.Namespace, generation: Mapping[str, Any]) -> d
         "receipt": receipt,
         "nodes": nodes,
     }
-
-
-def _conditioning_records(
-    resume: Mapping[str, Any],
-    asset_resume: Mapping[str, Any],
-    *,
-    asset_source_job_id: str,
-) -> dict[str, dict[str, Any]]:
-    records = copy.deepcopy(resume["images"])
-    for node, resumed_asset in asset_resume["nodes"].items():
-        if resumed_asset["reuse_result"]:
-            continue
-        if resumed_asset["raw_image_path"] is None:
-            raise RuntimeError(
-                f"conditioning-only resumed asset lacks raw image: {node}"
-            )
-        records[node] = {
-            "prompt": resumed_asset["prompt"],
-            "image_path": resumed_asset["image_path"],
-            "raw_image_path": resumed_asset["raw_image_path"],
-            "image_sha256": _sha256(resumed_asset["image_path"]),
-            "raw_image_sha256": _sha256(resumed_asset["raw_image_path"]),
-            "source_job_id": asset_source_job_id,
-            "rejected_results": copy.deepcopy(
-                resumed_asset["rejected_results"]
-            ),
-        }
-    return records
 
 
 def _query_target_geometry_quality(
@@ -901,7 +876,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     protocol = _read_json(args.protocol.resolve(strict=True))
     generation = _generation_config(protocol)
     resume = _resume_inputs(args, generation)
-    asset_resume = _resume_assets(args, generation)
+    conditioning_resume = _conditioning_resume_inputs(args, generation)
     public_gpt = _configure_gpt(args.gpt_config.resolve(strict=True))
     if public_gpt["model_name"] != generation["gpt_model"]:
         raise ValueError("GPT config model does not match the frozen protocol")
@@ -954,8 +929,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "text_to_image": generation["text_to_image_model"],
             "text_to_image_backend": generation["text_to_image_backend"],
             "image_to_3d_backend": generation["image_to_3d_backend"],
-            "trellis": copy.deepcopy(generation["trellis"]),
-            "sam3d_comparison": copy.deepcopy(generation["sam3d_comparison"]),
+            "sam3d": copy.deepcopy(generation["sam3d"]),
         },
         "generation_config": {
             "image_samples_per_prompt": generation["image_samples_per_prompt"],
@@ -979,19 +953,19 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 ],
                 "layout_recovery": generation["resume_source"]["layout_recovery"],
             },
-            "asset_resume_source": {
-                "job_id": generation["asset_resume_source"]["job_id"],
-                "generation_receipt_sha256": generation["asset_resume_source"][
+            "conditioning_resume_source": {
+                "job_id": generation["conditioning_resume_source"]["job_id"],
+                "generation_receipt_sha256": generation["conditioning_resume_source"][
                     "generation_receipt_sha256"
                 ],
-                "requalification_policy": generation["asset_resume_source"][
-                    "requalification_policy"
+                "reuse_scope": generation["conditioning_resume_source"][
+                    "reuse_scope"
                 ],
                 "nodes": copy.deepcopy(
-                    generation["asset_resume_source"]["nodes"]
+                    generation["conditioning_resume_source"]["nodes"]
                 ),
                 "target_geometry_policy": copy.deepcopy(
-                    generation["asset_resume_source"][
+                    generation["conditioning_resume_source"][
                         "target_geometry_policy"
                     ]
                 ),
@@ -1078,11 +1052,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             resume["receipt_path"], provenance_root / "generation_receipt.json"
         )
         asset_provenance_root = output / "provenance" / (
-            "resume_job_" + generation["asset_resume_source"]["job_id"]
+            "conditioning_job_" + generation["conditioning_resume_source"]["job_id"]
         )
         asset_provenance_root.mkdir(parents=True, exist_ok=False)
         shutil.copy2(
-            asset_resume["receipt_path"],
+            conditioning_resume["receipt_path"],
             asset_provenance_root / "generation_receipt.json",
         )
         manipulated = list(
@@ -1093,7 +1067,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "fresh layout must contain exactly one manipulated object; "
                 f"got {len(manipulated)}"
             )
-        if manipulated[0] != generation["asset_resume_source"][
+        if manipulated[0] != generation["conditioning_resume_source"][
             "target_geometry_policy"
         ]["source_node_key"]:
             raise RuntimeError(
@@ -1119,11 +1093,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         )
         _write_json(receipt_path, receipt)
 
-        conditioning_records = _conditioning_records(
-            resume,
-            asset_resume,
-            asset_source_job_id=generation["asset_resume_source"]["job_id"],
-        )
+        conditioning_records = copy.deepcopy(conditioning_resume["nodes"])
         reused_images = _install_resume_conditioning_images(
             textto3d_module,
             conditioning_records,
@@ -1138,172 +1108,97 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         ]
         for index, prompt in enumerate(prompts):
             node = prompts_mapping[prompt]
-            resumed_asset = asset_resume["nodes"].get(node)
-            target_geometry_attempts = None
-            if resumed_asset is not None and resumed_asset["reuse_result"]:
-                if prompt != resumed_asset["prompt"]:
-                    raise RuntimeError(f"resume asset prompt mismatch for {node}")
-                qa_response = textto3d_module.TXTGEN_CHECKER.query(
-                    node, [str(path) for path in resumed_asset["render_paths"]]
+            record = conditioning_records.get(node)
+            if record is None or record["prompt"] != prompt:
+                raise RuntimeError(f"conditioning image is not bound to prompt: {node}")
+            target_policy = generation["conditioning_resume_source"][
+                "target_geometry_policy"
+            ]
+            is_target = node == target_policy["source_node_key"]
+            quality_attempts: list[dict[str, Any]] = []
+            generation_log = None
+            result_root = output / "asset3d" / node.replace(" ", "_") / "result"
+            render_paths = [
+                result_root / "renders" / "image_color" / f"{view_index:04d}.png"
+                for view_index in range(4)
+            ]
+            for attempt_index, asset_seed in enumerate(
+                generation["conditioning_resume_source"]["sam3d_asset_retry_seeds"]
+            ):
+                if attempt_index:
+                    failed_asset_root = result_root.parent
+                    if failed_asset_root.is_symlink():
+                        raise RuntimeError(f"refusing unsafe failed asset path: {node}")
+                    if failed_asset_root.exists():
+                        shutil.rmtree(failed_asset_root)
+                generation_log = textto3d_module.text_to_3d(
+                    prompts=[prompt],
+                    output_root=str(output),
+                    asset_names=[node],
+                    n_img_sample=generation["image_samples_per_prompt"],
+                    text_guidance_scale=generation["text_guidance_scale"],
+                    img_denoise_step=generation["image_denoise_steps"],
+                    n_image_retry=request["retry_limits"]["image"],
+                    n_asset_retry=request["retry_limits"]["asset"],
+                    n_pipe_retry=1,
+                    seed_img=request["seeds"]["image"],
+                    seed_3d=asset_seed,
+                    keep_intermediate=False,
+                    image3d_model=generation["image_to_3d_backend"],
                 )
-                qa_result = qa_response.strip() if isinstance(qa_response, str) else None
-                if qa_result != "YES":
+                if node not in reused_images:
                     raise RuntimeError(
-                        f"resumed TRELLIS asset failed multiview requalification: "
-                        f"{node}: {qa_result}"
+                        f"SAM3D asset did not consume the hash-bound image: {node}"
                     )
-                save_node = node.replace(" ", "_")
-                destination = output / "asset3d" / save_node / "result"
-                destination.parent.mkdir(parents=True, exist_ok=False)
-                shutil.copytree(resumed_asset["result_path"], destination)
-                images_destination = output / "images"
-                images_destination.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(
-                    resumed_asset["image_path"],
-                    images_destination / f"{save_node}.png",
+                upstream_quality = generation_log["quality"].get(node)
+                if not all(path.is_file() and not path.is_symlink() for path in render_paths):
+                    raise RuntimeError(f"fresh asset is missing multiview renders: {node}")
+                multiview_response = textto3d_module.TXTGEN_CHECKER.query(
+                    node, [str(path) for path in render_paths]
                 )
-                if resumed_asset["raw_image_path"] is not None:
-                    shutil.copy2(
-                        resumed_asset["raw_image_path"],
-                        images_destination / f"{save_node}_raw.png",
-                    )
-                generation_log = {
-                    "assets": {node: resumed_asset["result_relative"]},
-                    "quality": {node: qa_result},
-                }
-                stage_name = "trellis_asset_requalified"
-                conditioning_image = {
-                    "status": "reused",
-                    "source_job_id": generation["asset_resume_source"]["job_id"],
-                    "sha256": _sha256(resumed_asset["image_path"]),
-                }
-            else:
-                target_policy = generation["asset_resume_source"][
-                    "target_geometry_policy"
-                ]
-                is_target = node == target_policy["source_node_key"]
-                retry_seeds = (
-                    target_policy["trellis_retry_seeds"]
+                multiview_quality = (
+                    multiview_response.strip()
+                    if isinstance(multiview_response, str)
+                    else None
+                )
+                target_quality = (
+                    _query_target_geometry_quality(GPT_CLIENT, target_policy, render_paths)
                     if is_target
-                    else [request["seeds"]["asset"]]
+                    else None
                 )
-                target_geometry_attempts = [] if is_target else None
-                generation_log = None
-                qa_result = None
-                for attempt_index, asset_seed in enumerate(retry_seeds):
-                    if attempt_index:
-                        failed_asset_root = (
-                            output / "asset3d" / node.replace(" ", "_")
-                        )
-                        if failed_asset_root.is_symlink():
-                            raise RuntimeError(
-                                f"refusing unsafe failed asset path: {node}"
-                            )
-                        if failed_asset_root.exists():
-                            shutil.rmtree(failed_asset_root)
-                    generation_log = textto3d_module.text_to_3d(
-                        prompts=[prompt],
-                        output_root=str(output),
-                        asset_names=[node],
-                        n_img_sample=generation["image_samples_per_prompt"],
-                        text_guidance_scale=generation["text_guidance_scale"],
-                        img_denoise_step=generation["image_denoise_steps"],
-                        n_image_retry=request["retry_limits"]["image"],
-                        n_asset_retry=request["retry_limits"]["asset"],
-                        n_pipe_retry=(
-                            1
-                            if is_target
-                            else request["retry_limits"]["pipeline"]
-                        ),
-                        seed_img=request["seeds"]["image"],
-                        seed_3d=asset_seed,
-                        keep_intermediate=False,
-                        image3d_model=generation["image_to_3d_backend"],
-                    )
-                    qa_result = generation_log["quality"].get(node)
-                    if not is_target:
-                        break
-                    result_root = (
-                        output
-                        / "asset3d"
-                        / node.replace(" ", "_")
-                        / "result"
-                    )
-                    render_paths = [
-                        result_root
-                        / "renders"
-                        / "image_color"
-                        / f"{view_index:04d}.png"
-                        for view_index in range(4)
-                    ]
-                    if not all(path.is_file() for path in render_paths):
-                        raise RuntimeError(
-                            f"fresh target is missing multiview renders: {node}"
-                        )
-                    multiview_response = textto3d_module.TXTGEN_CHECKER.query(
-                        node, [str(path) for path in render_paths]
-                    )
-                    multiview_result = (
-                        multiview_response.strip()
-                        if isinstance(multiview_response, str)
-                        else None
-                    )
-                    target_result = _query_target_geometry_quality(
-                        GPT_CLIENT, target_policy, render_paths
-                    )
-                    target_geometry_attempts.append(
-                        {
-                            "trellis_seed": asset_seed,
-                            "upstream_quality": qa_result,
-                            "multiview_quality": multiview_result,
-                            "target_geometry_quality": target_result,
-                        }
-                    )
-                    if (
-                        qa_result == "YES"
-                        and multiview_result == "YES"
-                        and target_result == "YES"
-                    ):
-                        break
-                if generation_log is None:
-                    raise RuntimeError(f"no TRELLIS attempts configured for {node}")
-                if is_target and (
-                    not target_geometry_attempts
-                    or target_geometry_attempts[-1]["upstream_quality"] != "YES"
-                    or target_geometry_attempts[-1]["multiview_quality"] != "YES"
-                    or target_geometry_attempts[-1]["target_geometry_quality"]
-                    != "YES"
-                ):
-                    raise RuntimeError(
-                        "fresh target exhausted strict geometry retries: "
-                        + json.dumps(target_geometry_attempts, sort_keys=True)
-                    )
-                if not isinstance(qa_result, str) or qa_result != "YES":
-                    raise RuntimeError(
-                        f"fresh TRELLIS asset failed final quality gate: "
-                        f"{node}: {qa_result}"
-                    )
-                stage_name = "sd35_trellis_asset"
-                conditioning_image = (
+                quality_attempts.append(
                     {
-                        "status": "reused",
-                        "source_job_id": conditioning_records[node].get(
-                            "source_job_id", generation["resume_source"]["job_id"]
-                        ),
-                        "accepted_retry_seed": conditioning_records[node].get(
-                            "accepted_retry_seed"
-                        ),
-                        "sha256": conditioning_records[node]["image_sha256"],
-                        "rejected_results": copy.deepcopy(
-                            conditioning_records[node].get("rejected_results")
-                        ),
-                    }
-                    if node in reused_images
-                    else {
-                        "status": "generated",
-                        "initial_seed": request["seeds"]["image"],
+                        "sam3d_seed": asset_seed,
+                        "upstream_quality": upstream_quality,
+                        "multiview_quality": multiview_quality,
+                        "target_geometry_quality": target_quality,
                     }
                 )
+                if (
+                    upstream_quality == "YES"
+                    and multiview_quality == "YES"
+                    and (not is_target or target_quality == "YES")
+                ):
+                    break
+            if generation_log is None:
+                raise RuntimeError(f"no SAM3D attempts configured for {node}")
+            final_quality = quality_attempts[-1]
+            if (
+                final_quality["upstream_quality"] != "YES"
+                or final_quality["multiview_quality"] != "YES"
+                or (is_target and final_quality["target_geometry_quality"] != "YES")
+            ):
+                raise RuntimeError(
+                    f"fresh SAM3D asset exhausted strict geometry retries: {node}: "
+                    + json.dumps(quality_attempts, sort_keys=True)
+                )
+            stage_name = "sd35_sam3d_asset"
+            conditioning_image = {
+                "status": "reused",
+                "source_job_id": record["source_job_id"],
+                "accepted_retry_seed": record["accepted_retry_seed"],
+                "sha256": record["image_sha256"],
+            }
             layout_info.assets.update(generation_log["assets"])
             layout_info.quality.update(generation_log["quality"])
             receipt["stages"].append(
@@ -1315,12 +1210,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                     "prompt": prompt,
                     "quality": generation_log["quality"].get(node),
                     "conditioning_image": conditioning_image,
-                    "target_geometry_attempts": target_geometry_attempts,
-                    "result_manifest_sha256": (
-                        resumed_asset["result_manifest_sha256"]
-                        if resumed_asset is not None
-                        and resumed_asset["reuse_result"]
-                        else None
+                    "quality_attempts": quality_attempts,
+                    "result_manifest_sha256": _canonical_sha256(
+                        _manifest(result_root, set())
                     ),
                     "finished_utc": _utc_now(),
                 }

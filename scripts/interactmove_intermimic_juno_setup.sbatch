@@ -15,12 +15,10 @@ umask 077
 
 readonly EMBODIEDGEN_COMMIT=9b333554254af196bace88c1a171a3bf047fa09c
 readonly OPENAI_SDK_VERSION=3.1.0
-readonly TRELLIS_SOURCE_COMMIT=55a8e8164b195bbf927e0978f00e76c835e6011f
-readonly TRELLIS_FLEXICUBES_COMMIT=f97beb0dd3c6c68f3ab5696b6dcaf9af69f0514e
-readonly TRELLIS_REPOSITORY=microsoft/TRELLIS-image-large
-readonly TRELLIS_REVISION=25e0d31ffbebe4b5a97464dd851910efc3002d96
-readonly DINOV2_REPOSITORY=https://github.com/facebookresearch/dinov2.git
-readonly DINOV2_COMMIT=7764ea0f912e53c92e82eb78a2a1631e92725fc8
+readonly SAM3D_SOURCE_REPOSITORY=HochCC/sam-3d-objects
+readonly SAM3D_SOURCE_COMMIT=01417d16fb5cc762a60f370c1bf7f59d603ddfaf
+readonly SAM3D_CHECKPOINT_REPOSITORY=facebook/sam-3d-objects
+readonly SAM3D_CHECKPOINT_REVISION=2e73555018d2741ccd486e56c24fac41155a1dc6
 readonly SCRATCH_ROOT=/scratch/juno/dal503972/interactmove_intermimic
 readonly DURABLE_ROOT=/work/dal503972/interactmove_intermimic
 readonly SOURCE_ROOT="${SCRATCH_ROOT}/source/EmbodiedGen"
@@ -29,12 +27,9 @@ readonly RUN_ROOT="${SCRATCH_ROOT}/runs/setup/${SLURM_JOB_ID}"
 readonly BASIC_MARKER="${ENV_ROOT}/.embodiedgen-basic-${EMBODIEDGEN_COMMIT}"
 readonly MANIFEST="${DURABLE_ROOT}/manifests/embodiedgen_environment_${SLURM_JOB_ID}.txt"
 readonly RECEIPT="${DURABLE_ROOT}/compact_records/embodiedgen_setup_${SLURM_JOB_ID}.json"
-readonly TRELLIS_ROOT="${DURABLE_ROOT}/checkpoints/TRELLIS-image-large-${TRELLIS_REVISION}"
-readonly TRELLIS_STAGING="${TRELLIS_ROOT}.staging"
-readonly TRELLIS_MANIFEST="${DURABLE_ROOT}/manifests/trellis_${TRELLIS_REVISION}.sha256"
-readonly TORCH_HOME="${DURABLE_ROOT}/checkpoints/torch-hub"
-readonly DINOV2_SOURCE="${TORCH_HOME}/hub/facebookresearch_dinov2_main"
-readonly DINOV2_MANIFEST="${DURABLE_ROOT}/manifests/dinov2_${DINOV2_COMMIT}.sha256"
+readonly SAM3D_ROOT="${DURABLE_ROOT}/checkpoints/sam-3d-objects-${SAM3D_CHECKPOINT_REVISION}"
+readonly SAM3D_STAGING="${SAM3D_ROOT}.staging"
+readonly SAM3D_MANIFEST="${DURABLE_ROOT}/manifests/sam3d_${SAM3D_CHECKPOINT_REVISION}.sha256"
 readonly RESUME_IMAGE="${SCRATCH_ROOT}/runs/fresh_generation/328320/scene/images/table.png"
 
 install -d -m 700 \
@@ -52,7 +47,6 @@ install -d -m 700 \
 export CONDA_PKGS_DIRS="${SCRATCH_ROOT}/caches/conda"
 export HF_HOME="${SCRATCH_ROOT}/caches/huggingface"
 export HUGGINGFACE_HUB_CACHE="${HF_HOME}/hub"
-export TORCH_HOME
 export PIP_CACHE_DIR="${SCRATCH_ROOT}/caches/pip"
 export MAX_JOBS="${SLURM_CPUS_PER_TASK}"
 export EMBODIEDGEN_TORCH_CUDA_ARCH_LIST=9.0
@@ -62,10 +56,8 @@ export IMIM_SETUP_MANIFEST="${MANIFEST}"
 export IMIM_SETUP_RECEIPT="${RECEIPT}"
 export IMIM_SETUP_SOURCE="${SOURCE_ROOT}"
 export IMIM_SETUP_ENV="${ENV_ROOT}"
-export IMIM_SETUP_TRELLIS_ROOT="${TRELLIS_ROOT}"
-export IMIM_SETUP_TRELLIS_MANIFEST="${TRELLIS_MANIFEST}"
-export IMIM_SETUP_DINOV2_SOURCE="${DINOV2_SOURCE}"
-export IMIM_SETUP_DINOV2_MANIFEST="${DINOV2_MANIFEST}"
+export IMIM_SETUP_SAM3D_ROOT="${SAM3D_ROOT}"
+export IMIM_SETUP_SAM3D_MANIFEST="${SAM3D_MANIFEST}"
 export IMIM_SETUP_STATUS=failed
 export IMIM_SETUP_STARTED_UTC
 IMIM_SETUP_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -94,10 +86,8 @@ def output(command: list[str]) -> str | None:
 manifest = Path(os.environ["IMIM_SETUP_MANIFEST"])
 source = Path(os.environ["IMIM_SETUP_SOURCE"])
 environment = Path(os.environ["IMIM_SETUP_ENV"])
-trellis_root = Path(os.environ["IMIM_SETUP_TRELLIS_ROOT"])
-trellis_manifest = Path(os.environ["IMIM_SETUP_TRELLIS_MANIFEST"])
-dinov2_source = Path(os.environ["IMIM_SETUP_DINOV2_SOURCE"])
-dinov2_manifest = Path(os.environ["IMIM_SETUP_DINOV2_MANIFEST"])
+sam3d_root = Path(os.environ["IMIM_SETUP_SAM3D_ROOT"])
+sam3d_manifest = Path(os.environ["IMIM_SETUP_SAM3D_MANIFEST"])
 manifest_digest = None
 if manifest.is_file():
     manifest_digest = hashlib.sha256(manifest.read_bytes()).hexdigest()
@@ -125,36 +115,24 @@ receipt = {
         "manifest_sha256": manifest_digest,
         "python": output([str(environment / "bin/python"), "--version"]),
     },
-    "trellis": {
-        "source_repository": "microsoft/TRELLIS",
-        "source_commit": "55a8e8164b195bbf927e0978f00e76c835e6011f",
-        "source_license": "MIT",
-        "checkpoint_repository": "microsoft/TRELLIS-image-large",
-        "checkpoint_revision": "25e0d31ffbebe4b5a97464dd851910efc3002d96",
-        "checkpoint_license": "MIT",
-        "checkpoint_path": str(trellis_root),
-        "manifest_path": str(trellis_manifest),
+    "sam3d": {
+        "source_repository": "HochCC/sam-3d-objects",
+        "source_commit": "01417d16fb5cc762a60f370c1bf7f59d603ddfaf",
+        "actual_source_commit": output(
+            ["git", "-C", str(source / "thirdparty" / "sam3d"), "rev-parse", "HEAD"]
+        ),
+        "source_license": "SAM License",
+        "checkpoint_repository": "facebook/sam-3d-objects",
+        "checkpoint_revision": "2e73555018d2741ccd486e56c24fac41155a1dc6",
+        "checkpoint_license": "SAM License",
+        "access_status": "authenticated_admitted",
+        "checkpoint_path": str(sam3d_root),
+        "manifest_path": str(sam3d_manifest),
         "manifest_sha256": (
-            hashlib.sha256(trellis_manifest.read_bytes()).hexdigest()
-            if trellis_manifest.is_file()
+            hashlib.sha256(sam3d_manifest.read_bytes()).hexdigest()
+            if sam3d_manifest.is_file()
             else None
         ),
-    },
-    "dinov2": {
-        "repository": "facebookresearch/dinov2",
-        "commit": "7764ea0f912e53c92e82eb78a2a1631e92725fc8",
-        "license": "Apache-2.0",
-        "source_path": str(dinov2_source),
-        "manifest_path": str(dinov2_manifest),
-        "manifest_sha256": (
-            hashlib.sha256(dinov2_manifest.read_bytes()).hexdigest()
-            if dinov2_manifest.is_file()
-            else None
-        ),
-    },
-    "sam3d_comparison": {
-        "access_status": "pending_not_admitted",
-        "blocks_trellis_run": False,
     },
 }
 path = Path(os.environ["IMIM_SETUP_RECEIPT"])
@@ -183,15 +161,13 @@ if [[ -n "$(git -C "${SOURCE_ROOT}" status --porcelain --untracked-files=no)" ]]
 fi
 git -C "${SOURCE_ROOT}" fetch origin "${EMBODIEDGEN_COMMIT}"
 git -C "${SOURCE_ROOT}" checkout --detach "${EMBODIEDGEN_COMMIT}"
-git -C "${SOURCE_ROOT}" submodule update --init --recursive thirdparty/TRELLIS
-if [[ "$(git -C "${SOURCE_ROOT}/thirdparty/TRELLIS" rev-parse HEAD)" != "${TRELLIS_SOURCE_COMMIT}" ]]; then
-    echo "TRELLIS source checkout does not match the frozen submodule commit" >&2
+git -C "${SOURCE_ROOT}" submodule update --init --recursive thirdparty/sam3d
+if [[ "$(git -C "${SOURCE_ROOT}/thirdparty/sam3d" rev-parse HEAD)" != "${SAM3D_SOURCE_COMMIT}" ]]; then
+    echo "SAM3D source checkout does not match the frozen submodule commit" >&2
     exit 1
 fi
-if [[ "$(git -C "${SOURCE_ROOT}/thirdparty/TRELLIS/trellis/representations/mesh/flexicubes" rev-parse HEAD)" != "${TRELLIS_FLEXICUBES_COMMIT}" ]]; then
-    echo "TRELLIS FlexiCubes checkout does not match the frozen submodule commit" >&2
-    exit 1
-fi
+git -C "${SOURCE_ROOT}/thirdparty/sam3d" diff --quiet
+git -C "${SOURCE_ROOT}/thirdparty/sam3d" diff --cached --quiet
 
 cd "${SOURCE_ROOT}"
 if [[ ! -f "${ENV_ROOT}/etc/conda/activate.d/cuda126.sh" ]]; then
@@ -292,11 +268,11 @@ if [[ ! -f "${HF_TOKEN_PATH}" || -L "${HF_TOKEN_PATH}" ]]; then
 fi
 export HF_TOKEN
 HF_TOKEN=$(<"${HF_TOKEN_PATH}")
-export IMIM_TRELLIS_REPOSITORY="${TRELLIS_REPOSITORY}"
-export IMIM_TRELLIS_REVISION="${TRELLIS_REVISION}"
-export IMIM_TRELLIS_ROOT="${TRELLIS_ROOT}"
-export IMIM_TRELLIS_STAGING="${TRELLIS_STAGING}"
-export IMIM_TRELLIS_MANIFEST="${TRELLIS_MANIFEST}"
+export IMIM_SAM3D_REPOSITORY="${SAM3D_CHECKPOINT_REPOSITORY}"
+export IMIM_SAM3D_REVISION="${SAM3D_CHECKPOINT_REVISION}"
+export IMIM_SAM3D_ROOT="${SAM3D_ROOT}"
+export IMIM_SAM3D_STAGING="${SAM3D_STAGING}"
+export IMIM_SAM3D_MANIFEST="${SAM3D_MANIFEST}"
 python - <<'PY'
 from __future__ import annotations
 
@@ -308,25 +284,27 @@ from huggingface_hub import snapshot_download
 
 
 EXPECTED = {
-    ".gitattributes": 1519,
-    "README.md": 464,
-    "ckpts/slat_dec_gs_swin8_B_64l8gs32_fp16.json": 843,
-    "ckpts/slat_dec_gs_swin8_B_64l8gs32_fp16.safetensors": 171450952,
-    "ckpts/slat_dec_mesh_swin8_B_64l8m256c_fp16.json": 372,
-    "ckpts/slat_dec_mesh_swin8_B_64l8m256c_fp16.safetensors": 181903412,
-    "ckpts/slat_dec_rf_swin8_B_64l8r16_fp16.json": 396,
-    "ckpts/slat_dec_rf_swin8_B_64l8r16_fp16.safetensors": 171450488,
-    "ckpts/slat_enc_swin8_B_64l8_fp16.json": 321,
-    "ckpts/slat_enc_swin8_B_64l8_fp16.safetensors": 173242816,
-    "ckpts/slat_flow_img_dit_L_64l8p2_fp16.json": 442,
-    "ckpts/slat_flow_img_dit_L_64l8p2_fp16.safetensors": 1203755136,
-    "ckpts/ss_dec_conv3d_16l8_fp16.json": 245,
-    "ckpts/ss_dec_conv3d_16l8_fp16.safetensors": 147591972,
-    "ckpts/ss_enc_conv3d_16l8_fp16.json": 244,
-    "ckpts/ss_enc_conv3d_16l8_fp16.safetensors": 119068016,
-    "ckpts/ss_flow_img_dit_L_16l8_fp16.json": 385,
-    "ckpts/ss_flow_img_dit_L_16l8_fp16.safetensors": 1130770840,
-    "pipeline.json": 1987,
+    "LICENSE": 8204,
+    "README.md": 7708,
+    "checkpoints/pipeline.yaml": 3548,
+    "checkpoints/slat_decoder_gs.ckpt": 171476155,
+    "checkpoints/slat_decoder_gs.yaml": 576,
+    "checkpoints/slat_decoder_gs_4.ckpt": 170269801,
+    "checkpoints/slat_decoder_gs_4.yaml": 575,
+    "checkpoints/slat_decoder_mesh.ckpt": 363726862,
+    "checkpoints/slat_decoder_mesh.pt": 363728714,
+    "checkpoints/slat_decoder_mesh.yaml": 300,
+    "checkpoints/slat_encoder.ckpt": 173263986,
+    "checkpoints/slat_encoder.yaml": 268,
+    "checkpoints/slat_generator.ckpt": 4906537684,
+    "checkpoints/slat_generator.yaml": 1986,
+    "checkpoints/ss_decoder.ckpt": 147609242,
+    "checkpoints/ss_decoder.yaml": 244,
+    "checkpoints/ss_encoder.ckpt": 119085402,
+    "checkpoints/ss_encoder.safetensors": 0,
+    "checkpoints/ss_encoder.yaml": 231,
+    "checkpoints/ss_generator.ckpt": 6690136964,
+    "checkpoints/ss_generator.yaml": 5076,
 }
 
 
@@ -339,12 +317,12 @@ def validate(root: Path) -> list[str]:
     if actual != set(EXPECTED):
         missing = sorted(set(EXPECTED) - actual)
         extra = sorted(actual - set(EXPECTED))
-        raise RuntimeError(f"TRELLIS checkpoint file mismatch: missing={missing}, extra={extra}")
+        raise RuntimeError(f"SAM3D checkpoint file mismatch: missing={missing}, extra={extra}")
     records = []
     for relative, expected_size in sorted(EXPECTED.items()):
         path = root / relative
         if path.is_symlink() or path.stat().st_size != expected_size:
-            raise RuntimeError(f"TRELLIS checkpoint size or path mismatch: {relative}")
+            raise RuntimeError(f"SAM3D checkpoint size or path mismatch: {relative}")
         digest = hashlib.sha256()
         with path.open("rb") as stream:
             for block in iter(lambda: stream.read(8 * 1024 * 1024), b""):
@@ -353,19 +331,20 @@ def validate(root: Path) -> list[str]:
     return records
 
 
-repository = os.environ["IMIM_TRELLIS_REPOSITORY"]
-revision = os.environ["IMIM_TRELLIS_REVISION"]
-root = Path(os.environ["IMIM_TRELLIS_ROOT"])
-staging = Path(os.environ["IMIM_TRELLIS_STAGING"])
-manifest = Path(os.environ["IMIM_TRELLIS_MANIFEST"])
+repository = os.environ["IMIM_SAM3D_REPOSITORY"]
+revision = os.environ["IMIM_SAM3D_REVISION"]
+root = Path(os.environ["IMIM_SAM3D_ROOT"])
+staging = Path(os.environ["IMIM_SAM3D_STAGING"])
+manifest = Path(os.environ["IMIM_SAM3D_MANIFEST"])
 if root.exists() and staging.exists():
-    raise RuntimeError("TRELLIS final and staging directories both exist")
+    raise RuntimeError("SAM3D final and staging directories both exist")
 if not root.exists():
     staging.mkdir(mode=0o700, parents=True, exist_ok=True)
     snapshot_download(
         repo_id=repository,
         revision=revision,
         local_dir=staging,
+        allow_patterns=["checkpoints/*", "LICENSE", "README.md"],
         max_workers=4,
         token=os.environ["HF_TOKEN"],
     )
@@ -378,29 +357,14 @@ temporary.write_text(payload, encoding="utf-8")
 os.chmod(temporary, 0o600)
 if manifest.exists():
     if manifest.read_bytes() != temporary.read_bytes():
-        raise RuntimeError("existing TRELLIS manifest does not match checkpoint bytes")
+        raise RuntimeError("existing SAM3D manifest does not match checkpoint bytes")
     temporary.unlink()
 else:
     temporary.replace(manifest)
-print(f"trellis_checkpoint_files={len(records)}")
-print(f"trellis_checkpoint_bytes={sum(EXPECTED.values())}")
+print(f"sam3d_checkpoint_files={len(records)}")
+print(f"sam3d_checkpoint_bytes={sum(EXPECTED.values())}")
 PY
 unset HF_TOKEN
-
-install -d -m 700 "${TORCH_HOME}/hub" "${TORCH_HOME}/hub/checkpoints"
-if [[ ! -d "${DINOV2_SOURCE}/.git" ]]; then
-    git clone "${DINOV2_REPOSITORY}" "${DINOV2_SOURCE}"
-fi
-if [[ -n "$(git -C "${DINOV2_SOURCE}" status --porcelain --untracked-files=no)" ]]; then
-    echo "Refusing a dirty DINOv2 source checkout" >&2
-    exit 1
-fi
-git -C "${DINOV2_SOURCE}" fetch origin "${DINOV2_COMMIT}"
-git -C "${DINOV2_SOURCE}" checkout --detach "${DINOV2_COMMIT}"
-if [[ "$(git -C "${DINOV2_SOURCE}" rev-parse HEAD)" != "${DINOV2_COMMIT}" ]]; then
-    echo "DINOv2 source checkout does not match the frozen commit" >&2
-    exit 1
-fi
 
 python - <<'PY'
 import json
@@ -425,22 +389,22 @@ print(json.dumps({
 PY
 
 if [[ ! -f "${RESUME_IMAGE}" || -L "${RESUME_IMAGE}" ]]; then
-    echo "Hash-bound TRELLIS qualification image is missing or unsafe" >&2
+    echo "Hash-bound SAM3D qualification image is missing or unsafe" >&2
     exit 1
 fi
 if [[ "$(sha256sum "${RESUME_IMAGE}" | cut -d' ' -f1)" != "317b980184bba52c5acb92de0e69d7992ba01dec7746fe5711dca246a80367ef" ]]; then
-    echo "Hash-bound TRELLIS qualification image does not match job 328320" >&2
+    echo "Hash-bound SAM3D qualification image does not match job 328320" >&2
     exit 1
 fi
-install -d -m 700 "${RUN_ROOT}/microsoft"
-ln -s "${TRELLIS_ROOT}" "${RUN_ROOT}/microsoft/TRELLIS-image-large"
-if [[ "$(readlink -f "${RUN_ROOT}/microsoft/TRELLIS-image-large")" != "${TRELLIS_ROOT}" ]]; then
-    echo "TRELLIS checkpoint binding failed" >&2
+install -d -m 700 "${RUN_ROOT}/weights"
+ln -s "${SAM3D_ROOT}" "${RUN_ROOT}/weights/sam-3d-objects"
+if [[ "$(readlink -f "${RUN_ROOT}/weights/sam-3d-objects")" != "${SAM3D_ROOT}" ]]; then
+    echo "SAM3D checkpoint binding failed" >&2
     exit 1
 fi
 (
     cd "${RUN_ROOT}"
-    PYTHONPATH="${SOURCE_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" python - "${RESUME_IMAGE}" <<'PY'
+    PYTHONPATH="${SOURCE_ROOT}:${SOURCE_ROOT}/thirdparty/sam3d${PYTHONPATH:+:${PYTHONPATH}}" python - "${RESUME_IMAGE}" <<'PY'
 import gc
 import json
 import sys
@@ -448,64 +412,36 @@ import sys
 import torch
 from PIL import Image
 
-from embodied_gen.data.utils import trellis_preprocess
-from thirdparty.TRELLIS.trellis.pipelines import TrellisImageTo3DPipeline
+from embodied_gen.models.sam3d import Sam3dInference
 
-pipeline = TrellisImageTo3DPipeline.from_pretrained(
-    "microsoft/TRELLIS-image-large"
-)
-pipeline.cuda()
-image = trellis_preprocess(Image.open(sys.argv[1]))
+pipeline = Sam3dInference(local_dir="weights/sam-3d-objects")
+image = Image.open(sys.argv[1]).convert("RGBA")
 outputs = pipeline.run(
     image,
-    preprocess_image=False,
     seed=2026081502,
-    sparse_structure_sampler_params={"steps": 3},
-    slat_sampler_params={"steps": 3},
-    formats=["mesh", "gaussian"],
+    stage1_inference_steps=1,
+    stage2_inference_steps=1,
 )
 assert len(outputs["mesh"]) == 1
 assert len(outputs["gaussian"]) == 1
-assert outputs["mesh"][0].vertices.shape[0] > 0
-assert outputs["mesh"][0].faces.shape[0] > 0
+mesh = outputs["mesh"][0]
+assert mesh.vertices.shape[0] > 0
+assert mesh.faces.shape[0] > 0
 print(json.dumps({
-    "backend": "TRELLIS",
+    "backend": "SAM3D",
     "cuda_capability": list(torch.cuda.get_device_capability(0)),
     "cuda_device": torch.cuda.get_device_name(0),
-    "mesh_faces": int(outputs["mesh"][0].faces.shape[0]),
-    "mesh_vertices": int(outputs["mesh"][0].vertices.shape[0]),
-    "smoke_sampler_steps": 3,
+    "mesh_faces": int(mesh.faces.shape[0]),
+    "mesh_vertices": int(mesh.vertices.shape[0]),
+    "smoke_stage1_steps": 1,
+    "smoke_stage2_steps": 1,
 }, sort_keys=True))
-pipeline.cpu()
 del outputs, pipeline
 gc.collect()
 torch.cuda.empty_cache()
 PY
 )
 
-if [[ ! -s "${TORCH_HOME}/hub/checkpoints/dinov2_vitl14_reg4_pretrain.pth" ]]; then
-    echo "Pinned DINOv2 checkpoint was not materialized by the TRELLIS smoke test" >&2
-    exit 1
-fi
-dinov2_manifest_tmp="${DINOV2_MANIFEST}.tmp"
-(
-    cd "${TORCH_HOME}"
-    sha256sum hub/checkpoints/dinov2_vitl14_reg4_pretrain.pth > "${dinov2_manifest_tmp}"
-)
-chmod 600 "${dinov2_manifest_tmp}"
-if [[ -e "${DINOV2_MANIFEST}" ]]; then
-    if ! cmp -s "${dinov2_manifest_tmp}" "${DINOV2_MANIFEST}"; then
-        echo "Existing DINOv2 manifest does not match checkpoint bytes" >&2
-        exit 1
-    fi
-    rm "${dinov2_manifest_tmp}"
-else
-    mv "${dinov2_manifest_tmp}" "${DINOV2_MANIFEST}"
-fi
-(
-    cd "${TORCH_HOME}"
-    sha256sum --check "${DINOV2_MANIFEST}"
-)
 layout-cli --help >/dev/null
 sim-cli --help >/dev/null
 

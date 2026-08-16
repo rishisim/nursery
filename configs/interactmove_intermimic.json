@@ -84,23 +84,15 @@
     "openai_sdk_version": "3.1.0",
     "text_to_image_model": "stabilityai/stable-diffusion-3.5-medium",
     "text_to_image_backend": "sd35",
-    "image_to_3d_backend": "TRELLIS",
-    "trellis": {
-      "source_repository": "microsoft/TRELLIS",
-      "source_commit": "55a8e8164b195bbf927e0978f00e76c835e6011f",
-      "source_license": "MIT",
-      "checkpoint_repository": "microsoft/TRELLIS-image-large",
-      "checkpoint_revision": "25e0d31ffbebe4b5a97464dd851910efc3002d96",
-      "checkpoint_license": "MIT",
-      "dinov2_repository": "facebookresearch/dinov2",
-      "dinov2_commit": "7764ea0f912e53c92e82eb78a2a1631e92725fc8",
-      "dinov2_license": "Apache-2.0"
-    },
-    "sam3d_comparison": {
-      "repository": "facebook/sam-3d-objects",
-      "commit": "2e73555018d2741ccd486e56c24fac41155a1dc6",
-      "access_status": "pending_not_admitted",
-      "blocks_trellis_run": false
+    "image_to_3d_backend": "SAM3D",
+    "sam3d": {
+      "source_repository": "HochCC/sam-3d-objects",
+      "source_commit": "01417d16fb5cc762a60f370c1bf7f59d603ddfaf",
+      "source_license": "SAM License",
+      "checkpoint_repository": "facebook/sam-3d-objects",
+      "checkpoint_revision": "2e73555018d2741ccd486e56c24fac41155a1dc6",
+      "checkpoint_license": "SAM License",
+      "access_status": "authenticated_admitted"
     },
     "resume_source": {
       "job_id": "328320",
@@ -117,50 +109,45 @@
         }
       }
     },
-    "asset_resume_source": {
+    "conditioning_resume_source": {
       "job_id": "328381",
       "generation_receipt_sha256": "0842642b0e10a5ddee297d2188accf3ac3ac95042764551f9c3ce3dd90408d23",
-      "requalification_policy": "four_separate_views_of_one_asset",
+      "reuse_scope": "accepted_sd35_conditioning_images_only",
+      "source_backend": "TRELLIS",
+      "sam3d_asset_retry_seeds": [
+        2026081502,
+        33936,
+        62468
+      ],
       "nodes": {
         "table": {
           "prompt": "standalone rectangular wooden table with a clean empty tabletop and warm polished surface",
-          "reuse_result": true,
-          "rejected_results": []
+          "conditioning_seed": 50494,
+          "image_sha256": "317b980184bba52c5acb92de0e69d7992ba01dec7746fe5711dca246a80367ef",
+          "raw_image_sha256": "21291ddb429eb8a31fc367a6e390f53033ffe8efff3a09ad89676ac3c6853cf2"
         },
         "red mug": {
           "prompt": "glossy crimson ceramic mug with curved handle, thick rim, and smooth reflective surface",
-          "reuse_result": false,
-          "rejected_results": [
-            {
-              "job_id": "328392",
-              "generation_receipt_sha256": "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b944c32bfef41ef3c",
-              "reason": "malformed_vertical_side_protrusion"
-            },
-            {
-              "job_id": "328413",
-              "generation_receipt_sha256": "c3e4f6670400bb7a32017da8480627c389879df741819b75e9248ddbd1065f74",
-              "reason": "duplicate_handles_found_by_target_specific_multiview_review"
-            }
-          ]
+          "conditioning_seed": 2026081501,
+          "image_sha256": "7c1f5575a4778a483e0a9e1641c631601ebed106f560c8870c9d695e65ee95a3",
+          "raw_image_sha256": "ef07505fe916c16f64625509e37b34cf69b6da8a2d38a50e3eafd9f9e5d75942"
         },
         "plate": {
           "prompt": "white ceramic dinner plate with subtle rim, clean glossy finish, and circular form",
-          "reuse_result": true,
-          "rejected_results": []
+          "conditioning_seed": 2026081501,
+          "image_sha256": "0ee9554a5ac158f8e9a31416412b2c4d9795491ecb801e4d05ccb793d2a7454b",
+          "raw_image_sha256": null
         },
         "spoon": {
           "prompt": "small stainless-steel spoon with polished reflective bowl and slender rounded handle",
-          "reuse_result": true,
-          "rejected_results": []
+          "conditioning_seed": 2026081501,
+          "image_sha256": "3caeeba8319aeaf9660fa70bd3e30d1e2f6cb788b8f78b78f3280cc033806ac4",
+          "raw_image_sha256": "34c46453d77e9e120ab2254b3332a13d9f9c1a689035c95e2148d9f755ee0fde"
         }
       },
       "target_geometry_policy": {
         "source_node_key": "red mug",
         "exact_handle_count": 1,
-        "trellis_retry_seeds": [
-          33936,
-          62468
-        ],
         "review_prompt": "These are four camera views of the same single generated red mug asset. Return exactly YES if and only if the asset has exactly one connected mug handle on one side. Return NO followed by a short reason if it has zero handles, two or more handles, mirrored or duplicated handles, an unrelated protrusion, or malformed handle geometry. Do not count repeated camera views as additional objects."
       }
     },

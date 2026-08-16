@@ -239,7 +239,7 @@ interactmove_intermimic_juno_scene_canary.sbatch
 The first wrapper qualifies a Juno H100 MIG with CUDA/PyTorch. The second
 creates the dedicated Python 3.10/CUDA 12.6 environment from pinned
 EmbodiedGen commit `9b333554254af196bace88c1a171a3bf047fa09c` on an
-H200 and qualifies the frozen TRELLIS backend. The third performs the fresh,
+H200 and qualifies the frozen SAM 3D backend. The third performs the fresh,
 robot-free prompt-to-scene generation. The fourth downloads official dataset
 commit `58258b50a0fc95034f2f3cc03b332ec6f72b91fd`, runs its `task_0000` layout for
 10 seconds at 200 Hz, records 300 RGB frames at 30 FPS, and never calls
@@ -305,29 +305,21 @@ remain visible in the manifest but do not misclassify a valid Responses overlay
 as failed. The public Hugging Face token already used for downloads is also not
 copied into receipts.
 
-The active image-to-3D backend is EmbodiedGen's released `TRELLIS` path. Source
-is the EmbodiedGen submodule `microsoft/TRELLIS` at commit
-`55a8e8164b195bbf927e0978f00e76c835e6011f` with nested FlexiCubes commit
-`f97beb0dd3c6c68f3ab5696b6dcaf9af69f0514e`. The public, ungated, MIT-licensed
-checkpoint is `microsoft/TRELLIS-image-large` revision
-`25e0d31ffbebe4b5a97464dd851910efc3002d96` (19 files, 3,299,240,850 bytes).
-Its DINOv2 image encoder source is separately pinned to
-`facebookresearch/dinov2` commit
-`7764ea0f912e53c92e82eb78a2a1631e92725fc8` under Apache-2.0. Setup validates
-the complete TRELLIS file list, byte sizes, and SHA-256 values before atomic
-publication, pins and hashes the DINOv2 checkpoint, moves every model to the
-H200, and performs a three-step sparse/structured-latent mesh canary. Generation
-then rechecks both manifests and binds the exact TRELLIS snapshot through the
-upstream-supported `image3d_model=TRELLIS` path.
-
-The Meta SAM 3D comparison remains explicitly pending at repository
-`facebook/sam-3d-objects`, commit
-`2e73555018d2741ccd486e56c24fac41155a1dc6`. Its access request and owner-only
-staging directory are preserved, but neither is an admission dependency for
-the TRELLIS run and no staged bytes are described as a complete checkpoint.
+The active image-to-3D backend is EmbodiedGen's released `SAM3D` path. Source
+is its `HochCC/sam-3d-objects` submodule at commit
+`01417d16fb5cc762a60f370c1bf7f59d603ddfaf`. The gated checkpoint is
+`facebook/sam-3d-objects` revision
+`2e73555018d2741ccd486e56c24fac41155a1dc6`; both source and weights declare
+the SAM License. Authenticated access has been verified for the Juno account.
+Setup resumes only the official Hugging Face staging directory, validates the
+exact 21-file selection (13,105,863,526 bytes), hashes every file, and publishes
+the checkpoint atomically before a one-step-per-stage H200 mesh canary. Partial
+ModelScope fragments from the earlier blocked attempt are not admitted or
+relabelled. Generation rechecks the complete manifest and binds the snapshot
+through the upstream-supported `image3d_model=SAM3D` path.
 
 Fresh job `328320` completed the GPT layout and accepted one SD3.5 conditioning
-image before SAM 3D access blocked asset generation. The canonical TRELLIS run
+image before SAM 3D access blocked asset generation. The canonical SAM 3D run
 resumes those irreplaceable stages. The retained scene tree is SHA-256
 `9e13a26bb74bbda2d35ee65e37fdba14d1876d0be59a5608df48725256782eb2`;
 the recovered layout draft rerenders to those exact bytes and has SHA-256
@@ -336,8 +328,7 @@ The accepted `table.png` and raw image hashes are respectively
 `317b980184bba52c5acb92de0e69d7992ba01dec7746fe5711dca246a80367ef`
 and `21291ddb429eb8a31fc367a6e390f53033ffe8efff3a09ad89676ac3c6853cf2`.
 The resume hook copies those exact bytes only when the source node, full asset
-prompt, initial seed, prior receipt, layout, and all hashes match; every later
-asset was initially produced through the normal SD3.5 and TRELLIS stages.
+prompt, initial seed, prior receipt, layout, and all hashes match.
 
 Continuation job `328381` completed a TRELLIS result package for each of the
 table, mug, plate, and spoon before the released final QA retried the table.
@@ -346,11 +337,11 @@ telling the VLM they were views of the same asset, so every response incorrectly
 counted the camera views as multiple object instances. The partial job is not
 admitted on those responses alone. Its compact receipt SHA-256 is
 `0842642b0e10a5ddee297d2188accf3ac3ac95042764551f9c3ce3dd90408d23`.
-The canonical continuation validates every file against that receipt, presents
-the four renders as four explicitly described views of one asset, and copies a
-result into the scene only if the corrected check returns exactly `YES`. Any
-missing, mutated, or still-rejected result fails closed; unqualified output is
-never promoted merely to avoid recomputation.
+The SAM 3D continuation validates every file against that receipt but admits
+only its four accepted SD3.5 conditioning images. No TRELLIS mesh, URDF,
+render, or result package is copied into the SAM 3D scene. Every asset is
+regenerated by SAM 3D and must pass a corrected four-view exact-`YES` gate;
+the mug must additionally pass the exact-one-handle gate.
 
 Requalification job `328392` admitted the resumed plate but correctly rejected
 the resumed mug because its mesh had a malformed vertical side protrusion. Its
@@ -371,7 +362,7 @@ canonical target gate now asks a separate exact-output multiview question that
 requires exactly one connected handle. It preserves the same prompt and
 hash-bound SD3.5 image while trying only the frozen TRELLIS retry seeds.
 
-The admitted fresh generation is Slurm job `328463`. The first permitted retry
+The previous admitted TRELLIS generation is Slurm job `328463`. The first permitted retry
 seed, `33936`, passed the upstream check, corrected generic four-view check, and
 single-handle target check exactly. Direct four-view inspection also confirmed
 one handle and an open cup interior. Its durable package is
@@ -400,7 +391,7 @@ restitution. The canary intentionally exposes the released importer's fallback
 behavior: it does not apply URDF mass, uses hard-coded restitution `0.05`, and
 does not record contacts. No InteractMove motion or InterMimic execution has run.
 
-The fair-comparison handoff is
+The previous TRELLIS fair-comparison handoff is
 `/work/dal503972/interactmove_intermimic/compact_records/shared_scene_red-mug-mouth-return.json`,
 SHA-256
 `5f6a1730bc1bb7c57c62a8f238bafabc5fe04592e2078097901093f5e0f151b9`.

@@ -56,48 +56,40 @@ def test_generation_protocol_is_real_robot_free_path() -> None:
     assert generation["gpt_reasoning_effort"] == "none"
     assert generation["openai_sdk_version"] == "3.1.0"
     assert generation["text_to_image_backend"] == "sd35"
-    assert generation["image_to_3d_backend"] == "TRELLIS"
-    assert generation["trellis"]["source_commit"] == (
-        "55a8e8164b195bbf927e0978f00e76c835e6011f"
+    assert generation["image_to_3d_backend"] == "SAM3D"
+    assert generation["sam3d"]["source_commit"] == (
+        "01417d16fb5cc762a60f370c1bf7f59d603ddfaf"
     )
-    assert generation["trellis"]["checkpoint_revision"] == (
-        "25e0d31ffbebe4b5a97464dd851910efc3002d96"
+    assert generation["sam3d"]["checkpoint_revision"] == (
+        "2e73555018d2741ccd486e56c24fac41155a1dc6"
     )
-    assert generation["sam3d_comparison"]["access_status"] == (
-        "pending_not_admitted"
-    )
-    assert generation["sam3d_comparison"]["blocks_trellis_run"] is False
+    assert generation["sam3d"]["access_status"] == "authenticated_admitted"
     assert generation["resume_source"]["job_id"] == "328320"
-    assert generation["asset_resume_source"]["job_id"] == "328381"
-    assert generation["asset_resume_source"]["nodes"]["red mug"] == {
+    conditioning = generation["conditioning_resume_source"]
+    assert conditioning["job_id"] == "328381"
+    assert conditioning["reuse_scope"] == "accepted_sd35_conditioning_images_only"
+    assert conditioning["sam3d_asset_retry_seeds"] == [
+        2026081502,
+        33936,
+        62468,
+    ]
+    assert conditioning["nodes"]["red mug"] == {
         "prompt": (
             "glossy crimson ceramic mug with curved handle, thick rim, and "
             "smooth reflective surface"
         ),
-        "reuse_result": False,
-        "rejected_results": [
-            {
-                "job_id": "328392",
-                "generation_receipt_sha256": (
-                    "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b944c32bfef41ef3c"
-                ),
-                "reason": "malformed_vertical_side_protrusion",
-            },
-            {
-                "job_id": "328413",
-                "generation_receipt_sha256": (
-                    "c3e4f6670400bb7a32017da8480627c389879df741819b75e9248ddbd1065f74"
-                ),
-                "reason": (
-                    "duplicate_handles_found_by_target_specific_multiview_review"
-                ),
-            },
-        ],
+        "conditioning_seed": 2026081501,
+        "image_sha256": (
+            "7c1f5575a4778a483e0a9e1641c631601ebed106f560c8870c9d695e65ee95a3"
+        ),
+        "raw_image_sha256": (
+            "ef07505fe916c16f64625509e37b34cf69b6da8a2d38a50e3eafd9f9e5d75942"
+        ),
     }
-    target_policy = generation["asset_resume_source"]["target_geometry_policy"]
+    assert conditioning["nodes"]["plate"]["raw_image_sha256"] is None
+    target_policy = conditioning["target_geometry_policy"]
     assert target_policy["source_node_key"] == "red mug"
     assert target_policy["exact_handle_count"] == 1
-    assert target_policy["trellis_retry_seeds"] == [33936, 62468]
     assert generation["invoke_upstream_sim_cli"] is False
     assert generation["robot_actor_loaded"] is False
     assert generation["background_dataset"][
@@ -271,12 +263,8 @@ def test_source_state_rejects_tracked_embodiedgen_changes(tmp_path: Path) -> Non
         text=True,
     ).stdout.strip()
     runner.EMBODIEDGEN_COMMIT = commit
-    trellis = source / "thirdparty" / "TRELLIS"
-    flexicubes = trellis / "trellis" / "representations" / "mesh" / "flexicubes"
-    for path, constant in (
-        (trellis, "TRELLIS_SOURCE_COMMIT"),
-        (flexicubes, "TRELLIS_FLEXICUBES_COMMIT"),
-    ):
+    sam3d = source / "thirdparty" / "sam3d"
+    for path, constant in ((sam3d, "SAM3D_SOURCE_COMMIT"),):
         path.mkdir(parents=True, exist_ok=True)
         subprocess.run(["git", "init", "-q", str(path)], check=True)
         subprocess.run(
@@ -320,7 +308,7 @@ def test_generation_help_states_actual_and_deferred_boundaries() -> None:
 
     assert "GPT layout" in help_text
     assert "SD3.5" in help_text
-    assert "TRELLIS" in help_text
+    assert "SAM3D" in help_text
     assert "never calls sim_cli" in help_text
     assert "never loads a robot actor" in help_text
 
@@ -435,28 +423,17 @@ def test_resume_conditioning_image_maps_native_spaces_to_filename_underscores(
     assert reused == {"red mug"}
 
 
-def test_resume_assets_verifies_complete_receipt_manifest(tmp_path: Path) -> None:
+def test_resume_conditioning_verifies_complete_receipt_manifest(
+    tmp_path: Path,
+) -> None:
     runner = _load_runner()
     protocol = json.loads(PROTOCOL.read_text(encoding="utf-8"))
     generation = runner._generation_config(protocol)
-    generation["asset_resume_source"]["nodes"] = {
-        "table": {
-            "prompt": "table prompt",
-            "reuse_result": True,
-            "rejected_results": [],
-        }
-    }
     root = tmp_path / "partial"
     files = {
         "images/table.png": b"image",
         "images/table_raw.png": b"raw-image",
         "asset3d/table/result/table.urdf": b"<robot/>",
-        **{
-            f"asset3d/table/result/renders/image_color/{index:04d}.png": (
-                f"view-{index}".encode()
-            )
-            for index in range(4)
-        },
     }
     records = []
     for relative, payload in files.items():
@@ -472,10 +449,7 @@ def test_resume_assets_verifies_complete_receipt_manifest(tmp_path: Path) -> Non
         )
     receipt = {
         "status": "failed",
-        "models": {
-            "image_to_3d_backend": "TRELLIS",
-            "trellis": generation["trellis"],
-        },
+        "models": {"image_to_3d_backend": "TRELLIS"},
         "error": {"message": "resume initial image seed mismatch for table"},
         "files": records,
     }
@@ -483,70 +457,69 @@ def test_resume_assets_verifies_complete_receipt_manifest(tmp_path: Path) -> Non
     receipt_path.write_text(
         json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
-    generation["asset_resume_source"]["generation_receipt_sha256"] = (
+    generation["conditioning_resume_source"]["nodes"] = {
+        "table": {
+            "prompt": "table prompt",
+            "conditioning_seed": 50494,
+            "image_sha256": runner._sha256(root / "images/table.png"),
+            "raw_image_sha256": runner._sha256(root / "images/table_raw.png"),
+        }
+    }
+    generation["conditioning_resume_source"]["generation_receipt_sha256"] = (
         runner._sha256(receipt_path)
     )
     args = SimpleNamespace(
-        resume_assets=root,
-        resume_asset_receipt=receipt_path,
+        resume_conditioning=root,
+        resume_conditioning_receipt=receipt_path,
     )
 
-    resumed = runner._resume_assets(args, generation)
+    resumed = runner._conditioning_resume_inputs(args, generation)
 
     assert set(resumed["nodes"]) == {"table"}
-    assert resumed["nodes"]["table"]["reuse_result"] is True
-    assert len(resumed["nodes"]["table"]["render_paths"]) == 4
-    assert resumed["nodes"]["table"]["result_manifest_sha256"]
+    assert resumed["nodes"]["table"]["accepted_retry_seed"] == 50494
+    assert resumed["nodes"]["table"]["image_path"] == root / "images/table.png"
     (root / "asset3d/table/result/table.urdf").write_bytes(b"tampered")
     try:
-        runner._resume_assets(args, generation)
+        runner._conditioning_resume_inputs(args, generation)
     except ValueError as exc:
         assert "hash mismatch" in str(exc)
     else:
-        raise AssertionError("tampered resumed TRELLIS asset was accepted")
+        raise AssertionError("tampered historical receipt file was accepted")
 
 
-def test_rejected_result_reuses_only_hash_bound_conditioning_image(
+def test_resume_conditioning_allows_documented_absent_raw_image(
     tmp_path: Path,
 ) -> None:
     runner = _load_runner()
-    image = tmp_path / "red_mug.png"
-    raw_image = tmp_path / "red_mug_raw.png"
-    image.write_bytes(b"accepted-red-mug-image")
-    raw_image.write_bytes(b"accepted-red-mug-raw-image")
-    rejections = [
+    image = tmp_path / "plate.png"
+    image.write_bytes(b"accepted-plate-image")
+    module = SimpleNamespace(
+        text_to_image=lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("unexpected SD3.5 generation")
+        )
+    )
+    reused = runner._install_resume_conditioning_images(
+        module,
         {
-            "job_id": "328392",
-            "generation_receipt_sha256": "a" * 64,
-            "reason": "malformed_vertical_side_protrusion",
-        }
-    ]
-
-    records = runner._conditioning_records(
-        {"images": {}},
-        {
-            "nodes": {
-                "red mug": {
-                    "prompt": "frozen red mug prompt",
-                    "reuse_result": False,
-                    "rejected_results": rejections,
-                    "image_path": image,
-                    "raw_image_path": raw_image,
-                }
+            "plate": {
+                "prompt": "frozen plate prompt",
+                "image_path": image,
+                "raw_image_path": None,
+                "image_sha256": runner._sha256(image),
+                "raw_image_sha256": None,
             }
         },
-        asset_source_job_id="328381",
+        initial_image_seed=2026081501,
     )
+    destination = tmp_path / "output" / "plate.png"
+    destination.parent.mkdir()
 
-    assert records["red mug"] == {
-        "prompt": "frozen red mug prompt",
-        "image_path": image,
-        "raw_image_path": raw_image,
-        "image_sha256": runner._sha256(image),
-        "raw_image_sha256": runner._sha256(raw_image),
-        "source_job_id": "328381",
-        "rejected_results": rejections,
-    }
+    assert module.text_to_image(
+        "frozen plate prompt", str(destination), 4, 25, 7.0, 1, seed=2026081501
+    ) is True
+    assert destination.read_bytes() == image.read_bytes()
+    assert not destination.with_name("plate_raw.png").exists()
+    assert reused == {"plate"}
 
 
 def test_target_geometry_quality_requires_exact_plain_yes(tmp_path: Path) -> None:

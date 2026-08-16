@@ -32,6 +32,8 @@ readonly GENERATION_RECEIPT="${SCENE_ROOT}/generation_receipt.json"
 readonly BUNDLE="${RUN_ROOT}/scene_bundle.json"
 readonly COMPACT_BUNDLE="${DURABLE_ROOT}/compact_records/scene_bundle_${ACTIVITY_ID}_${SLURM_JOB_ID}.json"
 readonly COMPACT_RECEIPT="${DURABLE_ROOT}/compact_records/fresh_scene_canary_${SLURM_JOB_ID}.json"
+readonly PREVIOUS_RESULT_RECEIPT_SHA256=9c7fbaa98c700dea861c1543f22b1b97b4cb1138b4efaca25103c9fcb807457b
+readonly SUPERSEDED_RESULT="${DURABLE_ROOT}/simulation_canaries/.superseded/328468/trellis_scene_canary"
 
 install -d -m 700 \
     "${RUN_ROOT}" \
@@ -66,8 +68,20 @@ for required in \
         exit 1
     fi
 done
-if [[ -e "${RESULT_ROOT}" || -e "${COMPACT_BUNDLE}" || -e "${COMPACT_RECEIPT}" ]]; then
-    echo "Refusing to overwrite canonical fresh-scene result" >&2
+if [[ -e "${RESULT_ROOT}" ]]; then
+    if [[ ! -d "${RESULT_ROOT}" || -L "${RESULT_ROOT}" || \
+          ! -f "${RESULT_ROOT}/receipt.json" || \
+          "$(sha256sum "${RESULT_ROOT}/receipt.json" | cut -d' ' -f1)" != "${PREVIOUS_RESULT_RECEIPT_SHA256}" ]]; then
+        echo "Existing canonical result is not the admitted TRELLIS predecessor" >&2
+        exit 1
+    fi
+    if [[ -e "${SUPERSEDED_RESULT}" ]]; then
+        echo "Refusing existing superseded-canary destination" >&2
+        exit 1
+    fi
+fi
+if [[ -e "${COMPACT_BUNDLE}" || -e "${COMPACT_RECEIPT}" ]]; then
+    echo "Refusing to overwrite job-bound fresh-scene records" >&2
     exit 1
 fi
 
@@ -107,6 +121,10 @@ fi
 mkdir -m 700 "${result_tmp}"
 cp -a "${RUN_ROOT}/result/." "${result_tmp}/"
 cp "${BUNDLE}" "${result_tmp}/scene_bundle.json"
+if [[ -e "${RESULT_ROOT}" ]]; then
+    install -d -m 700 "$(dirname "${SUPERSEDED_RESULT}")"
+    mv "${RESULT_ROOT}" "${SUPERSEDED_RESULT}"
+fi
 mv "${result_tmp}" "${RESULT_ROOT}"
 cp "${BUNDLE}" "${COMPACT_BUNDLE}.tmp"
 mv "${COMPACT_BUNDLE}.tmp" "${COMPACT_BUNDLE}"

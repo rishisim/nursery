@@ -15,10 +15,8 @@ umask 077
 
 readonly EMBODIEDGEN_COMMIT=9b333554254af196bace88c1a171a3bf047fa09c
 readonly DATASET_COMMIT=58258b50a0fc95034f2f3cc03b332ec6f72b91fd
-readonly TRELLIS_SOURCE_COMMIT=55a8e8164b195bbf927e0978f00e76c835e6011f
-readonly TRELLIS_FLEXICUBES_COMMIT=f97beb0dd3c6c68f3ab5696b6dcaf9af69f0514e
-readonly TRELLIS_REVISION=25e0d31ffbebe4b5a97464dd851910efc3002d96
-readonly DINOV2_COMMIT=7764ea0f912e53c92e82eb78a2a1631e92725fc8
+readonly SAM3D_SOURCE_COMMIT=01417d16fb5cc762a60f370c1bf7f59d603ddfaf
+readonly SAM3D_CHECKPOINT_REVISION=2e73555018d2741ccd486e56c24fac41155a1dc6
 readonly ACTIVITY_ID=red-mug-mouth-return
 readonly SCRATCH_ROOT=/scratch/juno/dal503972/interactmove_intermimic
 readonly DURABLE_ROOT=/work/dal503972/interactmove_intermimic
@@ -34,11 +32,9 @@ readonly GENERATED_RECEIPT="${GENERATED_ROOT}/generation_receipt.json"
 readonly DURABLE_SCENE="${DURABLE_ROOT}/scene_packages/${ACTIVITY_ID}"
 readonly COMPACT_RECEIPT="${DURABLE_ROOT}/compact_records/fresh_embodiedgen_${SLURM_JOB_ID}.json"
 readonly MANIFEST="${DURABLE_ROOT}/manifests/${ACTIVITY_ID}_${SLURM_JOB_ID}.sha256"
-readonly TRELLIS_ROOT="${DURABLE_ROOT}/checkpoints/TRELLIS-image-large-${TRELLIS_REVISION}"
-readonly TRELLIS_MANIFEST="${DURABLE_ROOT}/manifests/trellis_${TRELLIS_REVISION}.sha256"
-readonly TORCH_HOME="${DURABLE_ROOT}/checkpoints/torch-hub"
-readonly DINOV2_MANIFEST="${DURABLE_ROOT}/manifests/dinov2_${DINOV2_COMMIT}.sha256"
-readonly SETUP_JOB_ID="${IMIM_SETUP_JOB_ID:?submit with the admitted TRELLIS setup job}"
+readonly SAM3D_ROOT="${DURABLE_ROOT}/checkpoints/sam-3d-objects-${SAM3D_CHECKPOINT_REVISION}"
+readonly SAM3D_MANIFEST="${DURABLE_ROOT}/manifests/sam3d_${SAM3D_CHECKPOINT_REVISION}.sha256"
+readonly SETUP_JOB_ID="${IMIM_SETUP_JOB_ID:?submit with the admitted SAM3D setup job}"
 readonly SETUP_RECEIPT="${DURABLE_ROOT}/compact_records/embodiedgen_setup_${SETUP_JOB_ID}.json"
 readonly RESUME_ROOT="${SCRATCH_ROOT}/runs/fresh_generation/328320/scene"
 readonly RESUME_LAYOUT="${SCRATCH_ROOT}/runs/layout_recovery/328320/layout_draft.json"
@@ -47,6 +43,8 @@ readonly RESUME_IMAGES="${RESUME_ROOT}/images"
 readonly RESUME_RECEIPT="${RESUME_ROOT}/generation_receipt.json"
 readonly ASSET_RESUME_ROOT="${SCRATCH_ROOT}/runs/fresh_generation/328381/scene"
 readonly ASSET_RESUME_RECEIPT="${DURABLE_ROOT}/compact_records/fresh_embodiedgen_328381.json"
+readonly PREVIOUS_SCENE_RECEIPT_SHA256=f507543ca408c143b3a538854bd5b6efec2b251f81945948b007a92d61cfe72a
+readonly SUPERSEDED_SCENE="${DURABLE_ROOT}/scene_packages/.superseded/328463/trellis_scene"
 readonly NURSERY_COMMIT="${IMIM_NURSERY_COMMIT:?submit with the exact nursery commit}"
 
 install -d -m 700 \
@@ -86,14 +84,12 @@ if [[ "$(git -C "${SOURCE_ROOT}" rev-parse HEAD)" != "${EMBODIEDGEN_COMMIT}" ]];
 fi
 git -C "${SOURCE_ROOT}" diff --quiet
 git -C "${SOURCE_ROOT}" diff --cached --quiet
-if [[ "$(git -C "${SOURCE_ROOT}/thirdparty/TRELLIS" rev-parse HEAD)" != "${TRELLIS_SOURCE_COMMIT}" ]]; then
-    echo "TRELLIS source checkout does not match the frozen commit" >&2
+if [[ "$(git -C "${SOURCE_ROOT}/thirdparty/sam3d" rev-parse HEAD)" != "${SAM3D_SOURCE_COMMIT}" ]]; then
+    echo "SAM3D source checkout does not match the frozen commit" >&2
     exit 1
 fi
-if [[ "$(git -C "${SOURCE_ROOT}/thirdparty/TRELLIS/trellis/representations/mesh/flexicubes" rev-parse HEAD)" != "${TRELLIS_FLEXICUBES_COMMIT}" ]]; then
-    echo "TRELLIS FlexiCubes checkout does not match the frozen commit" >&2
-    exit 1
-fi
+git -C "${SOURCE_ROOT}/thirdparty/sam3d" diff --quiet
+git -C "${SOURCE_ROOT}/thirdparty/sam3d" diff --cached --quiet
 if [[ "$(git -C "${NURSERY_ROOT}" rev-parse HEAD)" != "${NURSERY_COMMIT}" ]]; then
     echo "Nursery checkout does not match IMIM_NURSERY_COMMIT" >&2
     exit 1
@@ -101,31 +97,31 @@ fi
 git -C "${NURSERY_ROOT}" diff --quiet
 git -C "${NURSERY_ROOT}" diff --cached --quiet
 if [[ -e "${DURABLE_SCENE}" ]]; then
-    echo "Refusing to overwrite durable scene: ${DURABLE_SCENE}" >&2
-    exit 1
+    if [[ ! -d "${DURABLE_SCENE}" || -L "${DURABLE_SCENE}" || \
+          ! -f "${DURABLE_SCENE}/generation_receipt.json" || \
+          "$(sha256sum "${DURABLE_SCENE}/generation_receipt.json" | cut -d' ' -f1)" != "${PREVIOUS_SCENE_RECEIPT_SHA256}" ]]; then
+        echo "Existing canonical scene is not the admitted TRELLIS predecessor" >&2
+        exit 1
+    fi
+    if [[ -e "${SUPERSEDED_SCENE}" ]]; then
+        echo "Refusing existing superseded-scene destination: ${SUPERSEDED_SCENE}" >&2
+        exit 1
+    fi
 fi
 if [[ -e "${COMPACT_RECEIPT}" || -e "${MANIFEST}" ]]; then
     echo "Refusing to overwrite job-bound durable records" >&2
     exit 1
 fi
-if [[ ! -d "${TRELLIS_ROOT}" || -L "${TRELLIS_ROOT}" || ! -s "${TRELLIS_MANIFEST}" ]]; then
-    echo "Pinned TRELLIS checkpoint package or manifest is missing" >&2
+if [[ ! -d "${SAM3D_ROOT}" || -L "${SAM3D_ROOT}" || ! -s "${SAM3D_MANIFEST}" ]]; then
+    echo "Pinned SAM3D checkpoint package or manifest is missing" >&2
     exit 1
 fi
 (
-    cd "${TRELLIS_ROOT}"
-    sha256sum --check "${TRELLIS_MANIFEST}"
-)
-if [[ ! -s "${DINOV2_MANIFEST}" ]]; then
-    echo "Pinned DINOv2 manifest is missing" >&2
-    exit 1
-fi
-(
-    cd "${TORCH_HOME}"
-    sha256sum --check "${DINOV2_MANIFEST}"
+    cd "${SAM3D_ROOT}"
+    sha256sum --check "${SAM3D_MANIFEST}"
 )
 if [[ ! -f "${SETUP_RECEIPT}" || -L "${SETUP_RECEIPT}" ]]; then
-    echo "Admitted TRELLIS setup receipt is missing or unsafe" >&2
+    echo "Admitted SAM3D setup receipt is missing or unsafe" >&2
     exit 1
 fi
 "${ENV_ROOT}/bin/python" - "${SETUP_RECEIPT}" <<'PY'
@@ -135,15 +131,15 @@ import sys
 
 receipt = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 if receipt.get("status") != "passed":
-    raise SystemExit("TRELLIS setup receipt did not pass")
-if receipt.get("trellis", {}).get("checkpoint_revision") != (
-    "25e0d31ffbebe4b5a97464dd851910efc3002d96"
+    raise SystemExit("SAM3D setup receipt did not pass")
+if receipt.get("sam3d", {}).get("checkpoint_revision") != (
+    "2e73555018d2741ccd486e56c24fac41155a1dc6"
 ):
-    raise SystemExit("TRELLIS setup receipt revision mismatch")
-if receipt.get("dinov2", {}).get("commit") != (
-    "7764ea0f912e53c92e82eb78a2a1631e92725fc8"
+    raise SystemExit("SAM3D setup receipt revision mismatch")
+if receipt.get("sam3d", {}).get("source_commit") != (
+    "01417d16fb5cc762a60f370c1bf7f59d603ddfaf"
 ):
-    raise SystemExit("DINOv2 setup receipt commit mismatch")
+    raise SystemExit("SAM3D setup receipt source mismatch")
 PY
 for resume_file in "${RESUME_LAYOUT}" "${RESUME_SCENE_TREE}" "${RESUME_RECEIPT}" \
     "${RESUME_IMAGES}/table.png" "${RESUME_IMAGES}/table_raw.png"; do
@@ -154,11 +150,11 @@ for resume_file in "${RESUME_LAYOUT}" "${RESUME_SCENE_TREE}" "${RESUME_RECEIPT}"
 done
 if [[ ! -d "${ASSET_RESUME_ROOT}" || -L "${ASSET_RESUME_ROOT}" || \
       ! -f "${ASSET_RESUME_RECEIPT}" || -L "${ASSET_RESUME_RECEIPT}" ]]; then
-    echo "Hash-bound job-328381 TRELLIS asset resume package is missing or unsafe" >&2
+    echo "Hash-bound job-328381 conditioning package is missing or unsafe" >&2
     exit 1
 fi
 if [[ "$(sha256sum "${ASSET_RESUME_RECEIPT}" | cut -d' ' -f1)" != "0842642b0e10a5ddee297d2188accf3ac3ac95042764551f9c3ce3dd90408d23" ]]; then
-    echo "Job-328381 TRELLIS asset receipt hash mismatch" >&2
+    echo "Job-328381 conditioning receipt hash mismatch" >&2
     exit 1
 fi
 if [[ "$(sha256sum "${RESUME_LAYOUT}" | cut -d' ' -f1)" != "f3a2125ffce069c251b4db636d5ec1d2da4397ed79414b0ab3b5b8a5caaf7c19" ]] || \
@@ -169,10 +165,10 @@ if [[ "$(sha256sum "${RESUME_LAYOUT}" | cut -d' ' -f1)" != "f3a2125ffce069c251b4
     echo "One or more resume artifacts do not match the frozen job-328320 hashes" >&2
     exit 1
 fi
-install -d -m 700 "${RUN_ROOT}/microsoft"
-ln -s "${TRELLIS_ROOT}" "${RUN_ROOT}/microsoft/TRELLIS-image-large"
-if [[ "$(readlink -f "${RUN_ROOT}/microsoft/TRELLIS-image-large")" != "${TRELLIS_ROOT}" ]]; then
-    echo "TRELLIS run-local checkpoint binding failed" >&2
+install -d -m 700 "${RUN_ROOT}/weights"
+ln -s "${SAM3D_ROOT}" "${RUN_ROOT}/weights/sam-3d-objects"
+if [[ "$(readlink -f "${RUN_ROOT}/weights/sam-3d-objects")" != "${SAM3D_ROOT}" ]]; then
+    echo "SAM3D run-local checkpoint binding failed" >&2
     exit 1
 fi
 
@@ -208,14 +204,13 @@ fi
 
 export HF_HOME="${SCRATCH_ROOT}/caches/huggingface"
 export HUGGINGFACE_HUB_CACHE="${HF_HOME}/hub"
-export TORCH_HOME
 export MODELSCOPE_CACHE="${SCRATCH_ROOT}/caches/modelscope"
 export U2NET_HOME="${SCRATCH_ROOT}/caches/rembg"
 export HF_HUB_DISABLE_PROGRESS_BARS=1
 export TOKENIZERS_PARALLELISM=false
 export TEXT_MODEL=sd35
 export EMBODIEDGEN_SOURCE_ROOT="${SOURCE_ROOT}"
-export PYTHONPATH="${NURSERY_ROOT}:${SOURCE_ROOT}${PYTHONPATH:+:${PYTHONPATH}}"
+export PYTHONPATH="${NURSERY_ROOT}:${SOURCE_ROOT}:${SOURCE_ROOT}/thirdparty/sam3d${PYTHONPATH:+:${PYTHONPATH}}"
 export HF_TOKEN
 HF_TOKEN=$(<"${HOME}/.cache/huggingface/token")
 
@@ -255,8 +250,8 @@ python "${NURSERY_ROOT}/scripts/run_interactmove_intermimic_embodiedgen_generati
     --resume-scene-tree "${RESUME_SCENE_TREE}" \
     --resume-images "${RESUME_IMAGES}" \
     --resume-receipt "${RESUME_RECEIPT}" \
-    --resume-assets "${ASSET_RESUME_ROOT}" \
-    --resume-asset-receipt "${ASSET_RESUME_RECEIPT}" \
+    --resume-conditioning "${ASSET_RESUME_ROOT}" \
+    --resume-conditioning-receipt "${ASSET_RESUME_RECEIPT}" \
     --output-dir "${GENERATED_ROOT}" \
     --receipt "${GENERATED_RECEIPT}"
 
@@ -283,6 +278,10 @@ mkdir -m 700 "${scene_tmp}/metadata"
 cp "${ACTIVITY}" "${scene_tmp}/metadata/activity.json"
 cp "${REQUEST}" "${scene_tmp}/metadata/embodiedgen_request.json"
 cp "${PROTOCOL}" "${scene_tmp}/metadata/protocol.json"
+if [[ -e "${DURABLE_SCENE}" ]]; then
+    install -d -m 700 "$(dirname "${SUPERSEDED_SCENE}")"
+    mv "${DURABLE_SCENE}" "${SUPERSEDED_SCENE}"
+fi
 mv "${scene_tmp}" "${DURABLE_SCENE}"
 
 manifest_tmp="${MANIFEST}.tmp-${SLURM_JOB_ID}"
