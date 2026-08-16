@@ -47,6 +47,9 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--reuse-pano", type=Path)
     parser.add_argument("--reuse-pano-sha256")
     parser.add_argument("--reuse-pano-source-job-id")
+    parser.add_argument("--reuse-raw-mesh", type=Path)
+    parser.add_argument("--reuse-raw-mesh-sha256")
+    parser.add_argument("--reuse-raw-mesh-source-job-id")
     parser.add_argument("--room-prompt", required=True)
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--job-id", required=True)
@@ -186,7 +189,7 @@ def _install_equilib_argument_order_patch(trainer: Any) -> None:
 
 def _generate_room(
     args: argparse.Namespace,
-) -> tuple[Path, Path, dict[str, Any]]:
+) -> tuple[Path, Path, dict[str, Any], dict[str, Any]]:
     _install_torchvision_functional_tensor_compat()
     _patch_pinned_model_loaders(args)
     import torch
@@ -248,17 +251,45 @@ def _generate_room(
             "inference_steps": 40,
         }
 
-    config = Pano2MeshSRConfig()
-    config.trajectory_dir = str(
-        args.embodiedgen_source / "apps" / "assets" / "example_scene" / "camera_trajectory"
-    )
-    pipeline = trainer.Pano2MeshSRPipeline(config)
-    pipeline(str(pano_path), str(work))
-    raw_mesh = work / config.mesh_file
+    raw_mesh = work / "mesh_model.ply"
+    if args.reuse_raw_mesh is not None:
+        actual_mesh_sha256 = _sha256(args.reuse_raw_mesh)
+        if actual_mesh_sha256 != args.reuse_raw_mesh_sha256:
+            raise RuntimeError("reused raw room mesh SHA-256 mismatch")
+        shutil.copy2(args.reuse_raw_mesh, raw_mesh)
+        mesh_stage = {
+            "status": "reused",
+            "source_job_id": args.reuse_raw_mesh_source_job_id,
+            "sha256": actual_mesh_sha256,
+            "pipeline": "Pano2MeshSRPipeline",
+            "gs_data_dump_executed": False,
+        }
+    else:
+        config = Pano2MeshSRConfig()
+        config.trajectory_dir = str(
+            args.embodiedgen_source
+            / "apps"
+            / "assets"
+            / "example_scene"
+            / "camera_trajectory"
+        )
+        config.gs_data_file = None
+        pipeline = trainer.Pano2MeshSRPipeline(config)
+        pipeline(str(pano_path), str(work))
+        raw_mesh = work / config.mesh_file
+        if not raw_mesh.is_file() or raw_mesh.stat().st_size == 0:
+            raise RuntimeError("EmbodiedGen Pano2Mesh did not produce mesh_model.ply")
+        mesh_stage = {
+            "status": "generated",
+            "source_job_id": args.job_id,
+            "sha256": _sha256(raw_mesh),
+            "pipeline": "Pano2MeshSRPipeline",
+            "gs_data_dump_executed": False,
+        }
     if not raw_mesh.is_file() or raw_mesh.stat().st_size == 0:
         raise RuntimeError("EmbodiedGen Pano2Mesh did not produce mesh_model.ply")
     torch.set_default_device("cpu")
-    return pano_path, raw_mesh, panorama_stage
+    return pano_path, raw_mesh, panorama_stage, mesh_stage
 
 
 def _canonicalize_room_mesh(raw_mesh: Path, output_mesh: Path) -> dict[str, Any]:
@@ -415,6 +446,20 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("panorama reuse requires path, SHA-256, and source job ID")
     if args.reuse_pano is not None and not args.reuse_pano.resolve(strict=True).is_file():
         raise ValueError("reused panorama is missing")
+    mesh_reuse_values = (
+        args.reuse_raw_mesh,
+        args.reuse_raw_mesh_sha256,
+        args.reuse_raw_mesh_source_job_id,
+    )
+    if any(value is not None for value in mesh_reuse_values) and not all(
+        value is not None for value in mesh_reuse_values
+    ):
+        raise ValueError("raw mesh reuse requires path, SHA-256, and source job ID")
+    if (
+        args.reuse_raw_mesh is not None
+        and not args.reuse_raw_mesh.resolve(strict=True).is_file()
+    ):
+        raise ValueError("reused raw room mesh is missing")
 
     activity_path = candidate / "metadata" / "activity.json"
     request_path = candidate / "metadata" / "embodiedgen_request.json"
@@ -434,7 +479,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     target_node = "red mug"
     target_instance_id = "egv2_" + hashlib.sha256(target_node.encode()).hexdigest()[:24]
 
-    pano_path, raw_mesh_path, panorama_stage = _generate_room(args)
+    pano_path, raw_mesh_path, panorama_stage, mesh_stage = _generate_room(args)
     background = candidate / "background"
     if background.exists():
         shutil.rmtree(background)
@@ -475,6 +520,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "tinycudann_required_by_pano_joint_predictor": True,
             "omnidata_timm_imagenet_bootstrap": False,
             "omnidata_task_checkpoints_supply_full_model": True,
+            "gs_data_file": None,
+            "gs_data_dump_executed": False,
             "equilib_cube2equi_argument_order_patch": {
                 "upstream_call_order": "height_width",
                 "equilib_0_3_0_signature": "width_height",
@@ -482,6 +529,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             },
         },
         "panorama_stage": panorama_stage,
+        "mesh_stage": mesh_stage,
         "retained_source_files": _inventory(provenance_root),
         "canonical_transform": transform_receipt,
     }

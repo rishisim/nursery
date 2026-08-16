@@ -66,6 +66,9 @@ readonly TINY_CUDA_NN_WHEEL_ROOT="${CHECKPOINT_ROOT}/tinycudann-${TINY_CUDA_NN_C
 readonly REUSE_PANO_SOURCE_JOB=329209
 readonly REUSE_PANO="${SCRATCH_ROOT}/runs/room_repair/${REUSE_PANO_SOURCE_JOB}/scene3d_generation/pano_image.png"
 readonly REUSE_PANO_SHA256=742a2684dd5b6d628d7d2b9803b9223a414dc11363b3eff0a7127650c4b17740
+readonly REUSE_RAW_MESH_SOURCE_JOB=329304
+readonly REUSE_RAW_MESH="${SCRATCH_ROOT}/runs/room_repair/${REUSE_RAW_MESH_SOURCE_JOB}/scene3d_generation/mesh_model.ply"
+readonly REUSE_RAW_MESH_SHA256=96dd3d673cc2f3122ff4047c555ed60a2f4af833dd52fee0ad119e1ba54d2321
 readonly ROOM_PROMPT='Simple empty dining room interior with warm neutral walls, a level wood floor, visible corners and four walls, and no furniture or loose objects; designed as context for the activity: Pick up the red mug from the table, bring it to your mouth, and place it back on the table.'
 readonly ROOM_SEED=2026081501
 
@@ -267,7 +270,8 @@ for required in \
     "${REALESRGAN_ROOT}/super_resolution/RealESRGAN_x4plus.pth" \
     "${OMNIDATA_DEPTH_ROOT}/omnidata_depth_dpt_hybrid.pth" \
     "${OMNIDATA_NORMAL_ROOT}/omnidata_normal_dpt_hybrid.pth" \
-    "${REUSE_PANO}"; do
+    "${REUSE_PANO}" \
+    "${REUSE_RAW_MESH}"; do
     if [[ ! -s "${required}" || -L "${required}" ]]; then
         echo "Pinned room checkpoint file is missing or unsafe: ${required}" >&2
         exit 1
@@ -376,6 +380,9 @@ python "${ROOM_RUNNER}" \
     --reuse-pano "${REUSE_PANO}" \
     --reuse-pano-sha256 "${REUSE_PANO_SHA256}" \
     --reuse-pano-source-job-id "${REUSE_PANO_SOURCE_JOB}" \
+    --reuse-raw-mesh "${REUSE_RAW_MESH}" \
+    --reuse-raw-mesh-sha256 "${REUSE_RAW_MESH_SHA256}" \
+    --reuse-raw-mesh-source-job-id "${REUSE_RAW_MESH_SOURCE_JOB}" \
     --room-prompt "${ROOM_PROMPT}" \
     --seed "${ROOM_SEED}" \
     --job-id "${SLURM_JOB_ID}"
