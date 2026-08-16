@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+import sys
+import types
 
 import pytest
 
@@ -74,3 +76,25 @@ def test_preserved_activity_binding_projects_embodiedgen_seeds() -> None:
     receipt["seeds"]["image"] = 99
     with pytest.raises(RuntimeError, match="seeds changed"):
         runner._validate_preserved_activity_binding(activity, receipt)
+
+
+def test_torchvision_functional_tensor_compat_exposes_grayscale(monkeypatch) -> None:
+    runner = _load_runner()
+    grayscale = lambda value: value
+    functional = types.ModuleType("torchvision.transforms.functional")
+    functional.rgb_to_grayscale = grayscale
+    transforms = types.ModuleType("torchvision.transforms")
+    transforms.functional = functional
+    torchvision = types.ModuleType("torchvision")
+    torchvision.transforms = transforms
+    monkeypatch.setitem(sys.modules, "torchvision", torchvision)
+    monkeypatch.setitem(sys.modules, "torchvision.transforms", transforms)
+    monkeypatch.setitem(sys.modules, "torchvision.transforms.functional", functional)
+    monkeypatch.delitem(
+        sys.modules, "torchvision.transforms.functional_tensor", raising=False
+    )
+
+    runner._install_torchvision_functional_tensor_compat()
+
+    module = runner.sys.modules["torchvision.transforms.functional_tensor"]
+    assert module.rgb_to_grayscale is grayscale

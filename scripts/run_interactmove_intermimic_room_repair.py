@@ -10,6 +10,8 @@ import math
 import os
 from pathlib import Path
 import shutil
+import sys
+import types
 from typing import Any
 
 
@@ -123,7 +125,19 @@ def _patch_pinned_model_loaders(args: argparse.Namespace) -> None:
     pano_patch.hf_hub_download = pinned_hf_download
 
 
+def _install_torchvision_functional_tensor_compat() -> None:
+    """Provide BasicSR's removed TorchVision import without patching site-packages."""
+    if "torchvision.transforms.functional_tensor" in sys.modules:
+        return
+    from torchvision.transforms import functional
+
+    module = types.ModuleType("torchvision.transforms.functional_tensor")
+    module.rgb_to_grayscale = functional.rgb_to_grayscale
+    sys.modules[module.__name__] = module
+
+
 def _generate_room(args: argparse.Namespace) -> tuple[Path, Path]:
+    _install_torchvision_functional_tensor_compat()
     _patch_pinned_model_loaders(args)
     import torch
     from txt2panoimg import Text2360PanoramaImagePipeline
