@@ -36,7 +36,11 @@ from .common import (
     sha256_file,
     transform_matrix,
 )
-from .environment import load_environment_geometry, validate_environment_envelope
+from .environment import (
+    load_environment_geometry,
+    validate_environment_envelope,
+    validate_wall_collision_envelope,
+)
 
 
 SCENE_BUNDLE_SCHEMA = "InteractMoveInterMimicSceneBundle"
@@ -1500,6 +1504,7 @@ def _validate_serialized_environment_geometry(
     collision_ids: set[str] = set()
     floor_count = 0
     walls_count = 0
+    wall_reports: list[Mapping[str, Any]] = []
     expected_consumed = {geometry["manifest_sha256"], reference["sha256"]}
     for index, raw in enumerate(collisions):
         item = require_mapping(raw, where=f"environment collision_geometry[{index}]")
@@ -1541,12 +1546,12 @@ def _validate_serialized_environment_geometry(
             expected_consumed.add(mesh["sha256"])
             if item["role"] == "walls":
                 walls_count += 1
-                if min(mesh["extents_m"][:2]) < 2.0 or mesh["extents_m"][2] < 1.8:
-                    raise ContractError("environment walls collision is not room-scale")
+                wall_reports.append(mesh)
         else:
             raise ContractError("environment collision geometry type is invalid")
     if floor_count != 1 or walls_count < 1:
         raise ContractError("environment requires one floor and at least one walls collision")
+    validate_wall_collision_envelope(wall_reports)
     provenance = require_mapping(geometry["provenance"], where="environment provenance")
     source_artifact_digest = _require_sha256(
         provenance.get("source_artifact_sha256"),

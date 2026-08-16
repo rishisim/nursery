@@ -7,7 +7,10 @@ import types
 
 import pytest
 
-from babyworld_lite.interactmove_intermimic.environment import inspect_mesh
+from babyworld_lite.interactmove_intermimic.environment import (
+    inspect_mesh,
+    validate_wall_collision_envelope,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -69,6 +72,7 @@ def test_authored_wall_collisions_are_separate_finite_convex_boxes(
         sorted(report["extents_m"] for report in reports), expected_extents
     ):
         assert actual == pytest.approx(expected)
+    validate_wall_collision_envelope(reports)
 
 
 def test_preserved_activity_binding_projects_embodiedgen_seeds() -> None:

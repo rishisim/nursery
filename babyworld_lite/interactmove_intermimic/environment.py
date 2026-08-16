@@ -225,6 +225,26 @@ def inspect_mesh(path: Path, relative_path: str, scale_xyz: list[float]) -> dict
     raise ContractError(f"environment mesh format must be OBJ or PLY: {relative_path}")
 
 
+def validate_wall_collision_envelope(
+    reports: list[Mapping[str, Any]],
+) -> None:
+    """Validate room scale across one or more explicit wall collision meshes."""
+    if not reports:
+        raise ContractError("room collision requires at least one walls mesh")
+    for report in reports:
+        if report["extents_m"][2] < 1.8:
+            raise ContractError("each walls collision mesh must have room-scale height")
+    minimum = [
+        min(report["aabb_min_m"][axis] for report in reports) for axis in range(3)
+    ]
+    maximum = [
+        max(report["aabb_max_m"][axis] for report in reports) for axis in range(3)
+    ]
+    extents = [maximum[axis] - minimum[axis] for axis in range(3)]
+    if min(extents[:2]) < 2.0 or extents[2] < 1.8:
+        raise ContractError("walls collision meshes do not enclose a room-scale volume")
+
+
 def load_environment_geometry(
     scene_root: Path,
     background_relative: PurePosixPath,
@@ -348,6 +368,7 @@ def load_environment_geometry(
     ids: set[str] = set()
     floor_count = 0
     walls_count = 0
+    wall_reports: list[Mapping[str, Any]] = []
     consumed = {
         manifest_record["sha256"],
         reference_file["sha256"],
@@ -421,8 +442,7 @@ def load_environment_geometry(
             consumed.add(record["sha256"])
             if role == "walls":
                 walls_count += 1
-                if min(report["extents_m"][:2]) < 2.0 or report["extents_m"][2] < 1.8:
-                    raise ContractError("walls collision mesh does not enclose a room-scale volume")
+                wall_reports.append(report)
             collisions.append(
                 {
                     "collision_id": collision_id,
@@ -435,6 +455,7 @@ def load_environment_geometry(
             )
     if floor_count != 1 or walls_count < 1:
         raise ContractError("room collision requires exactly one floor plane and at least one walls mesh")
+    validate_wall_collision_envelope(wall_reports)
     return {
         "manifest": manifest_relative,
         "manifest_sha256": manifest_record["sha256"],
