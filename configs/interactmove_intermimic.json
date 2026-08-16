@@ -5,7 +5,9 @@
     "implemented_stages": [
       "activity_specification",
       "embodiedgen_scene_ingestion",
-      "canonical_scene_bundle"
+      "canonical_scene_bundle",
+      "complete_scene_geometry_gates",
+      "scene_only_sapien_canary"
     ],
     "excluded_stages": [
       "interactmove_point_cloud_conversion",
@@ -13,8 +15,8 @@
       "contact_reconstruction",
       "smplx_hand_completion",
       "intermimic_adapter",
-      "physics_rollout",
-      "rgb_recording"
+      "humanoid_physics_rollout",
+      "final_humanoid_rgb_recording"
     ]
   },
   "upstream": {
@@ -79,7 +81,11 @@
       "retrieval_is_fresh_background_generation": false
     },
     "room_completion": {
-      "status": "required_before_interactmove",
+      "status": "passed_scene_only_canary",
+      "preserved_object_generation_job_id": "328538",
+      "panorama_source_job_id": "329209",
+      "raw_room_mesh_source_job_id": "329304",
+      "publication_job_id": "329321",
       "generation_stage": "EmbodiedGenV2 panorama plus Pano2Mesh",
       "room_prompt": "Simple empty dining room interior with warm neutral walls, a level wood floor, visible corners and four walls, and no furniture or loose objects; designed as context for the activity: Pick up the red mug from the table, bring it to your mouth, and place it back on the table.",
       "seed_source": "activity.seeds.embodiedgen_image",
@@ -95,10 +101,19 @@
       },
       "collision_policy": {
         "floor": "explicit SceneBundle z=0 plane",
-        "walls": "separate authored mesh derived from the validated room envelope",
+        "walls": "four separate authored convex meshes derived from the validated room envelope",
         "reference_mesh_is_collision": false
       },
       "render_mode": "raster_reference_mesh",
+      "canonical_scene_root": "/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return",
+      "generation_receipt_sha256": "2cca27616f069ce9f0c76ecd0371e9210721390ebc9a86ec3f35480e94211ca9",
+      "layout_sha256": "24dbe1ec235ba09239f568cac9cd376f2d6b9e3ef0ecce61903d7aaaa42850be",
+      "reference_mesh_sha256": "137c59d332c50b533a899447a89826f52dba0ac6a4a9457e568b4ee8ca154c3e",
+      "scene_bundle_id": "scene_da67578846eca4a7f7d4fe4646ae9eb4",
+      "scene_bundle_file_sha256": "fa5ccef6f09a8e795f021e458dc3575e2c8dc46d26cdfe047b1e18a79aa9d7ad",
+      "scene_bundle_semantic_sha256": "39cec5e2537475a2532af88b5f550fd5833ddeefe86e16e0ed3c6c5ea2e29f61",
+      "shared_handoff_sha256": "6f724133d5273afe8559c8d83b247c65ea8522b193f7c69162ba495a591dd27e",
+      "scene_canary_video_sha256": "9d673c913049544e95e689e5456d7d30a84f6536b56d8785624cefb7c31a3fb9",
       "required_gates": [
         "visual_background_ready",
         "reference_mesh_ready",

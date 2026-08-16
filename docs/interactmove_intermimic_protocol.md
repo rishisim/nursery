@@ -234,6 +234,9 @@ interactmove_intermimic_juno_generate.sbatch
 ssh juno sbatch \
   /scratch/juno/dal503972/interactmove_intermimic/remote_scripts/\
 interactmove_intermimic_juno_scene_canary.sbatch
+ssh juno sbatch \
+  /scratch/juno/dal503972/interactmove_intermimic/source/nursery/scripts/\
+interactmove_intermimic_juno_room_repair.sbatch
 ```
 
 The first wrapper qualifies a Juno H100 MIG with CUDA/PyTorch. The second
@@ -243,7 +246,10 @@ H200 and qualifies the frozen SAM 3D backend. The third performs the fresh,
 robot-free prompt-to-scene generation. The fourth downloads official dataset
 commit `58258b50a0fc95034f2f3cc03b332ec6f72b91fd`, runs its `task_0000` layout for
 10 seconds at 200 Hz, records 300 RGB frames at 30 FPS, and never calls
-`load_mani_skill_robot`. It retains the source package and canary result under
+`load_mani_skill_robot`. The fifth completes the accepted SAM 3D object scene
+with the pinned EmbodiedGen panorama-to-mesh room path, compiles the complete
+SceneBundle, and publishes only after the room-inclusive canary passes. These
+wrappers retain the source package and canary result under
 `/work/dal503972/interactmove_intermimic`; caches, logs, and staging remain
 under the matching `/scratch/juno/dal503972` root.
 
@@ -432,22 +438,62 @@ The target is source node `red mug`, instance
 and wrote 300 H.264 frames at 30 FPS for exactly 10 seconds. The video SHA-256
 is `c10c9e9c9a6e338344db58b7e93e33a43ccec89adf5ad9af38280b79ae716ac5`.
 
+That four-object result was not a complete InteractMove scene: its Gaussian-only
+background was absent from the raster canary, with no room reference mesh or
+explicit room collision. Its handoff and canary remain recoverable under
+`/work/dal503972/interactmove_intermimic/.superseded/329321/`; they are not the
+active comparison scene.
+
+The room correction preserves every accepted SAM 3D object byte, the selected
+red-mug instance, support, prompt, seeds, and source physics. EmbodiedGen's
+pinned panorama model produced the retained 1024-by-512 room image in job
+`329209`, SHA-256
+`742a2684dd5b6d628d7d2b9803b9223a414dc11363b3eff0a7127650c4b17740`.
+The official Pano2Mesh path produced the raw finite room mesh in job `329304`,
+SHA-256
+`96dd3d673cc2f3122ff4047c555ed60a2f4af833dd52fee0ad119e1ba54d2321`.
+Its canonical right-handed, Z-up, metric room mesh has 2,110,897 vertices,
+4,200,528 faces, extents 5.80089 by 7.41351 by 3.0 metres, and SHA-256
+`137c59d332c50b533a899447a89826f52dba0ac6a4a9457e568b4ee8ca154c3e`.
+The floor is an explicit z=0 plane. Each of the four walls is an independently
+authored connected convex collision mesh; the raster reference mesh is never
+treated as collision by implication.
+
+Publication job `329321` compiled and independently validated bundle
+`scene_da67578846eca4a7f7d4fe4646ae9eb4`. Its pretty-file SHA-256 is
+`fa5ccef6f09a8e795f021e458dc3575e2c8dc46d26cdfe047b1e18a79aa9d7ad`
+and its semantic digest is
+`39cec5e2537475a2532af88b5f550fd5833ddeefe86e16e0ed3c6c5ea2e29f61`.
+The gates `visual_background_ready`, `reference_mesh_ready`,
+`room_collision_ready`, `complete_scene_ready`, and
+`interactmove_scene_input_ready` are all true. The same job ran SAPIEN
+`3.0.0b1` for 2,000 steps at 200 Hz and rendered exactly 300 room-inclusive
+RGB frames at 30 FPS over 10 seconds. Static drift and final body speeds are
+zero; maximum observed penetration is 0.0000011053 m against the frozen 0.02 m
+limit. The video SHA-256 is
+`9d673c913049544e95e689e5456d7d30a84f6536b56d8785624cefb7c31a3fb9`.
+
 The active fair-comparison handoff is
 `/work/dal503972/interactmove_intermimic/compact_records/shared_scene_red-mug-mouth-return.json`,
 SHA-256
-`9436c6cb6a267d9352cb5a2785374ccde302c0394657cc29c23cb76f0dd69466`.
-It binds all 165 scene files (166,385,332 bytes) by relative path, byte size,
+`6f724133d5273afe8559c8d83b247c65ea8522b193f7c69162ba495a591dd27e`.
+It binds all 171 scene files (221,435,977 bytes) by relative path, byte size,
 and SHA-256; the canonical inventory digest is
-`5a35c99a439fd77b22893d1fb78c461a0171dc81a552b0e61cdd20f9fc18ed0d`.
-The HOIDiNi protocol must consume this package directly or verify an exact
-durable copy against that inventory; it must not independently sample a scene.
+`cd1a8bcde8cd85d884a941b67d140c0d3e284d2f0bcba35867a917fc1885fb09`.
+The canonical generation receipt SHA-256 is
+`2cca27616f069ce9f0c76ecd0371e9210721390ebc9a86ec3f35480e94211ca9`;
+`layout.json` is
+`24dbe1ec235ba09239f568cac9cd376f2d6b9e3ef0ecce61903d7aaaa42850be`.
+No robot actor was inserted. The HOIDiNi protocol must bind this exact package
+directly, or hash-verify an exact durable copy; it must not sample another
+scene.
 
-This remains a scene-only canary, not a qualified settling receipt. The bundle
-is not yet InteractMove-input-ready: the selected Gaussian background has no
-reference mesh or room collision, and the dynamic plate, mug, and spoon URDFs
-omit restitution. The released SAPIEN importer supplies restitution `0.05`,
-does not apply URDF mass, and records no contacts. No InteractMove motion or
-InterMimic execution has run.
+This is still a scene-only canary, not a qualified Stage 3 settling receipt.
+The source URDFs for the dynamic plate, mug, and spoon omit restitution, so
+`physics_material_complete` and `dynamic_settle_ready` remain false. The
+bounded canary explicitly records the released importer's restitution `0.05`
+policy and its failure to apply source URDF mass. InteractMove motion generation
+and InterMimic execution have not run.
 
 EmbodiedGen's released `sim-cli` loads a Franka even when
 `insert_robot=false`; therefore it must not be used as evidence of a robot-free
