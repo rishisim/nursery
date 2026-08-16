@@ -339,6 +339,19 @@ The resume hook copies those exact bytes only when the source node, full asset
 prompt, initial seed, prior receipt, layout, and all hashes match; every later
 asset still runs the normal SD3.5 and TRELLIS stages.
 
+Continuation job `328381` completed a TRELLIS result package for each of the
+table, mug, plate, and spoon before the released final QA retried the table.
+That checker had combined four camera renders into one 2-by-2 image without
+telling the VLM they were views of the same asset, so every response incorrectly
+counted the camera views as multiple object instances. The partial job is not
+admitted on those responses alone. Its compact receipt SHA-256 is
+`0842642b0e10a5ddee297d2188accf3ac3ac95042764551f9c3ce3dd90408d23`.
+The canonical continuation validates every file against that receipt, presents
+the four renders as four explicitly described views of one asset, and copies a
+result into the scene only if the corrected check returns exactly `YES`. Any
+missing, mutated, or still-rejected result fails closed; unqualified output is
+never promoted merely to avoid recomputation.
+
 EmbodiedGen's released `sim-cli` loads a Franka even when
 `insert_robot=false`; therefore it must not be used as evidence of a robot-free
 simulation. Nursery's robot-free canary calls only the released scene importer

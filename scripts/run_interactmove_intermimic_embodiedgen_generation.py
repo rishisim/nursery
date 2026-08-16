@@ -18,7 +18,7 @@ import hashlib
 from io import BytesIO
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
 import sys
@@ -40,6 +40,12 @@ OPENAI_REASONING_EFFORT = "none"
 OPENAI_SDK_VERSION = "3.1.0"
 OPENAI_DEFAULT_MAX_OUTPUT_TOKENS = 8192
 OPENAI_TIMEOUT_S = 120.0
+MULTIVIEW_QUALITY_PREAMBLE = """
+The image input contains four camera views of the same single generated 3D
+asset. Repetition across views is not multiple object instances. Judge whether
+each view consistently depicts that one asset, and only report duplicate
+geometry when a duplicate exists within an individual view.
+"""
 
 
 class _ResponsesGPTClient:
@@ -285,6 +291,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--resume-scene-tree", type=Path, required=True)
     parser.add_argument("--resume-images", type=Path, required=True)
     parser.add_argument("--resume-receipt", type=Path, required=True)
+    parser.add_argument("--resume-assets", type=Path, required=True)
+    parser.add_argument("--resume-asset-receipt", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--receipt", type=Path, required=True)
     return parser
@@ -475,6 +483,7 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
         "trellis",
         "sam3d_comparison",
         "resume_source",
+        "asset_resume_source",
         "image_samples_per_prompt",
         "text_guidance_scale",
         "image_denoise_steps",
@@ -509,6 +518,31 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
             "commit": "2e73555018d2741ccd486e56c24fac41155a1dc6",
             "access_status": "pending_not_admitted",
             "blocks_trellis_run": False,
+        },
+        "asset_resume_source": {
+            "job_id": "328381",
+            "generation_receipt_sha256": (
+                "0842642b0e10a5ddee297d2188accf3ac3ac95042764551f9c3ce3dd90408d23"
+            ),
+            "requalification_policy": "four_separate_views_of_one_asset",
+            "nodes": {
+                "table": (
+                    "standalone rectangular wooden table with a clean empty "
+                    "tabletop and warm polished surface"
+                ),
+                "red mug": (
+                    "glossy crimson ceramic mug with curved handle, thick rim, "
+                    "and smooth reflective surface"
+                ),
+                "plate": (
+                    "white ceramic dinner plate with subtle rim, clean glossy "
+                    "finish, and circular form"
+                ),
+                "spoon": (
+                    "small stainless-steel spoon with polished reflective bowl "
+                    "and slender rounded handle"
+                ),
+            },
         },
         "image_samples_per_prompt": 1,
         "text_guidance_scale": 7.0,
@@ -582,6 +616,7 @@ def _install_resume_conditioning_images(
 ) -> set[str]:
     original = module.text_to_image
     reused: set[str] = set()
+    attempts: dict[str, int] = {}
 
     def text_to_image(
         prompt: str,
@@ -608,23 +643,109 @@ def _install_resume_conditioning_images(
             )
         if prompt != record["prompt"]:
             raise ValueError(f"resume prompt mismatch for {node}")
-        if seed != initial_image_seed:
+        attempts[node] = attempts.get(node, 0) + 1
+        if attempts[node] == 1 and seed != initial_image_seed:
             raise ValueError(f"resume initial image seed mismatch for {node}")
         destination = Path(save_path)
-        if destination.exists() or destination.with_name(
-            destination.stem + "_raw.png"
-        ).exists():
-            raise ValueError(f"resume destination already exists for {node}")
-        shutil.copy2(record["image_path"], destination)
-        shutil.copy2(
-            record["raw_image_path"],
-            destination.with_name(destination.stem + "_raw.png"),
-        )
+        raw_destination = destination.with_name(destination.stem + "_raw.png")
+        if destination.exists() or raw_destination.exists():
+            if not destination.is_file() or not raw_destination.is_file():
+                raise ValueError(f"resume destination is incomplete for {node}")
+            if _sha256(destination) != record["image_sha256"]:
+                raise ValueError(f"resume destination image changed for {node}")
+            if _sha256(raw_destination) != record["raw_image_sha256"]:
+                raise ValueError(f"resume destination raw image changed for {node}")
+        else:
+            shutil.copy2(record["image_path"], destination)
+            shutil.copy2(record["raw_image_path"], raw_destination)
         reused.add(node)
         return True
 
     module.text_to_image = text_to_image
     return reused
+
+
+def _resume_assets(args: argparse.Namespace, generation: Mapping[str, Any]) -> dict[str, Any]:
+    frozen = generation["asset_resume_source"]
+    root = args.resume_assets.resolve(strict=True)
+    receipt_path = args.resume_asset_receipt.resolve(strict=True)
+    if not root.is_dir() or root.is_symlink():
+        raise ValueError("--resume-assets must be a non-symlink directory")
+    if not receipt_path.is_file() or receipt_path.is_symlink():
+        raise ValueError("--resume-asset-receipt must be a regular non-symlink file")
+    if _sha256(receipt_path) != frozen["generation_receipt_sha256"]:
+        raise ValueError("resume asset receipt hash mismatch")
+    receipt = _read_json(receipt_path)
+    if receipt.get("status") != "failed":
+        raise ValueError("resume asset receipt must be a failed partial run")
+    if receipt.get("models", {}).get("image_to_3d_backend") != "TRELLIS":
+        raise ValueError("resume asset receipt was not generated by TRELLIS")
+    if receipt.get("models", {}).get("trellis") != generation["trellis"]:
+        raise ValueError("resume asset receipt TRELLIS pins mismatch")
+    if receipt.get("error", {}).get("message") != (
+        "resume initial image seed mismatch for table"
+    ):
+        raise ValueError("resume asset receipt failure boundary mismatch")
+
+    manifest: dict[str, dict[str, Any]] = {}
+    for record in receipt.get("files", []):
+        if not isinstance(record, dict) or set(record) != {"path", "bytes", "sha256"}:
+            raise ValueError("resume asset receipt has malformed file records")
+        relative = record["path"]
+        if not isinstance(relative, str):
+            raise ValueError("resume asset receipt has a non-string path")
+        safe = PurePosixPath(relative)
+        if safe.is_absolute() or not safe.parts or any(
+            part in {"", ".", ".."} for part in safe.parts
+        ):
+            raise ValueError("resume asset receipt has an unsafe path")
+        if relative in manifest:
+            raise ValueError("resume asset receipt has a duplicate path")
+        path = root.joinpath(*safe.parts)
+        if not path.is_file() or path.is_symlink():
+            raise ValueError(f"resume asset file is missing or unsafe: {relative}")
+        if path.stat().st_size != record["bytes"] or _sha256(path) != record["sha256"]:
+            raise ValueError(f"resume asset file hash mismatch: {relative}")
+        manifest[relative] = copy.deepcopy(record)
+
+    nodes: dict[str, dict[str, Any]] = {}
+    for node, prompt in frozen["nodes"].items():
+        save_node = node.replace(" ", "_")
+        result_relative = f"asset3d/{save_node}/result"
+        render_paths = [
+            f"{result_relative}/renders/image_color/{index:04d}.png"
+            for index in range(4)
+        ]
+        required = [
+            f"images/{save_node}.png",
+            f"images/{save_node}_raw.png",
+            *render_paths,
+        ]
+        for relative in required:
+            if relative not in manifest:
+                raise ValueError(f"resume asset is missing required file: {relative}")
+        result_records = [
+            record
+            for relative, record in sorted(manifest.items())
+            if relative.startswith(result_relative + "/")
+        ]
+        if not result_records:
+            raise ValueError(f"resume asset has no result package: {node}")
+        nodes[node] = {
+            "prompt": prompt,
+            "result_relative": result_relative,
+            "result_path": root / result_relative,
+            "image_path": root / f"images/{save_node}.png",
+            "raw_image_path": root / f"images/{save_node}_raw.png",
+            "render_paths": [root / relative for relative in render_paths],
+            "result_manifest_sha256": _canonical_sha256(result_records),
+        }
+    return {
+        "root": root,
+        "receipt_path": receipt_path,
+        "receipt": receipt,
+        "nodes": nodes,
+    }
 
 
 def _manifest(root: Path, excluded: set[Path]) -> list[dict[str, Any]]:
@@ -672,6 +793,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     protocol = _read_json(args.protocol.resolve(strict=True))
     generation = _generation_config(protocol)
     resume = _resume_inputs(args, generation)
+    asset_resume = _resume_assets(args, generation)
     public_gpt = _configure_gpt(args.gpt_config.resolve(strict=True))
     if public_gpt["model_name"] != generation["gpt_model"]:
         raise ValueError("GPT config model does not match the frozen protocol")
@@ -749,6 +871,15 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 ],
                 "layout_recovery": generation["resume_source"]["layout_recovery"],
             },
+            "asset_resume_source": {
+                "job_id": generation["asset_resume_source"]["job_id"],
+                "generation_receipt_sha256": generation["asset_resume_source"][
+                    "generation_receipt_sha256"
+                ],
+                "requalification_policy": generation["asset_resume_source"][
+                    "requalification_policy"
+                ],
+            },
         },
         "background": {
             "repository": dataset["repository"],
@@ -799,6 +930,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         from embodied_gen.utils.process_media import SceneTreeVisualizer
         from embodied_gen.validators.quality_checkers import SemanticMatcher
 
+        textto3d_module.TXTGEN_CHECKER.prompt = (
+            MULTIVIEW_QUALITY_PREAMBLE + textto3d_module.TXTGEN_CHECKER.prompt
+        )
+
         scene_graph_path = output / "scene_tree.jpg"
         gpt_params = {
             "temperature": 1.0,
@@ -825,6 +960,14 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         )
         shutil.copy2(
             resume["receipt_path"], provenance_root / "generation_receipt.json"
+        )
+        asset_provenance_root = output / "provenance" / (
+            "resume_job_" + generation["asset_resume_source"]["job_id"]
+        )
+        asset_provenance_root.mkdir(parents=True, exist_ok=False)
+        shutil.copy2(
+            asset_resume["receipt_path"],
+            asset_provenance_root / "generation_receipt.json",
         )
         manipulated = list(
             layout_info.relation.get(Scene3DItemEnum.MANIPULATED_OBJS.value, [])
@@ -868,45 +1011,96 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         ]
         for index, prompt in enumerate(prompts):
             node = prompts_mapping[prompt]
-            generation_log = textto3d_module.text_to_3d(
-                prompts=[prompt],
-                output_root=str(output),
-                asset_names=[node],
-                n_img_sample=generation["image_samples_per_prompt"],
-                text_guidance_scale=generation["text_guidance_scale"],
-                img_denoise_step=generation["image_denoise_steps"],
-                n_image_retry=request["retry_limits"]["image"],
-                n_asset_retry=request["retry_limits"]["asset"],
-                n_pipe_retry=request["retry_limits"]["pipeline"],
-                seed_img=request["seeds"]["image"],
-                seed_3d=request["seeds"]["asset"],
-                keep_intermediate=False,
-                image3d_model=generation["image_to_3d_backend"],
-            )
+            resumed_asset = asset_resume["nodes"].get(node)
+            if resumed_asset is not None:
+                if prompt != resumed_asset["prompt"]:
+                    raise RuntimeError(f"resume asset prompt mismatch for {node}")
+                qa_response = textto3d_module.TXTGEN_CHECKER.query(
+                    node, [str(path) for path in resumed_asset["render_paths"]]
+                )
+                qa_result = qa_response.strip() if isinstance(qa_response, str) else None
+                if qa_result != "YES":
+                    raise RuntimeError(
+                        f"resumed TRELLIS asset failed multiview requalification: "
+                        f"{node}: {qa_result}"
+                    )
+                save_node = node.replace(" ", "_")
+                destination = output / "asset3d" / save_node / "result"
+                destination.parent.mkdir(parents=True, exist_ok=False)
+                shutil.copytree(resumed_asset["result_path"], destination)
+                images_destination = output / "images"
+                images_destination.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(
+                    resumed_asset["image_path"],
+                    images_destination / f"{save_node}.png",
+                )
+                shutil.copy2(
+                    resumed_asset["raw_image_path"],
+                    images_destination / f"{save_node}_raw.png",
+                )
+                generation_log = {
+                    "assets": {node: resumed_asset["result_relative"]},
+                    "quality": {node: qa_result},
+                }
+                stage_name = "trellis_asset_requalified"
+                conditioning_image = {
+                    "status": "reused",
+                    "source_job_id": generation["asset_resume_source"]["job_id"],
+                    "sha256": _sha256(resumed_asset["image_path"]),
+                }
+            else:
+                generation_log = textto3d_module.text_to_3d(
+                    prompts=[prompt],
+                    output_root=str(output),
+                    asset_names=[node],
+                    n_img_sample=generation["image_samples_per_prompt"],
+                    text_guidance_scale=generation["text_guidance_scale"],
+                    img_denoise_step=generation["image_denoise_steps"],
+                    n_image_retry=request["retry_limits"]["image"],
+                    n_asset_retry=request["retry_limits"]["asset"],
+                    n_pipe_retry=request["retry_limits"]["pipeline"],
+                    seed_img=request["seeds"]["image"],
+                    seed_3d=request["seeds"]["asset"],
+                    keep_intermediate=False,
+                    image3d_model=generation["image_to_3d_backend"],
+                )
+                qa_result = generation_log["quality"].get(node)
+                if not isinstance(qa_result, str) or qa_result != "YES":
+                    raise RuntimeError(
+                        f"fresh TRELLIS asset failed final quality gate: "
+                        f"{node}: {qa_result}"
+                    )
+                stage_name = "sd35_trellis_asset"
+                conditioning_image = (
+                    {
+                        "status": "reused",
+                        "source_job_id": generation["resume_source"]["job_id"],
+                        "accepted_retry_seed": resume["images"][node][
+                            "accepted_retry_seed"
+                        ],
+                        "sha256": resume["images"][node]["image_sha256"],
+                    }
+                    if node in reused_images
+                    else {
+                        "status": "generated",
+                        "initial_seed": request["seeds"]["image"],
+                    }
+                )
             layout_info.assets.update(generation_log["assets"])
             layout_info.quality.update(generation_log["quality"])
             receipt["stages"].append(
                 {
-                    "name": "sd35_trellis_asset",
+                    "name": stage_name,
                     "status": "passed",
                     "asset_index": index,
                     "source_node_key": node,
                     "prompt": prompt,
                     "quality": generation_log["quality"].get(node),
-                    "conditioning_image": (
-                        {
-                            "status": "reused",
-                            "source_job_id": generation["resume_source"]["job_id"],
-                            "accepted_retry_seed": resume["images"][node][
-                                "accepted_retry_seed"
-                            ],
-                            "sha256": resume["images"][node]["image_sha256"],
-                        }
-                        if node in reused_images
-                        else {
-                            "status": "generated",
-                            "initial_seed": request["seeds"]["image"],
-                        }
+                    "conditioning_image": conditioning_image,
+                    "result_manifest_sha256": (
+                        resumed_asset["result_manifest_sha256"]
+                        if resumed_asset is not None
+                        else None
                     ),
                     "finished_utc": _utc_now(),
                 }

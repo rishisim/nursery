@@ -45,6 +45,8 @@ readonly RESUME_LAYOUT="${SCRATCH_ROOT}/runs/layout_recovery/328320/layout_draft
 readonly RESUME_SCENE_TREE="${RESUME_ROOT}/scene_tree.jpg"
 readonly RESUME_IMAGES="${RESUME_ROOT}/images"
 readonly RESUME_RECEIPT="${RESUME_ROOT}/generation_receipt.json"
+readonly ASSET_RESUME_ROOT="${SCRATCH_ROOT}/runs/fresh_generation/328381/scene"
+readonly ASSET_RESUME_RECEIPT="${DURABLE_ROOT}/compact_records/fresh_embodiedgen_328381.json"
 readonly NURSERY_COMMIT="${IMIM_NURSERY_COMMIT:?submit with the exact nursery commit}"
 
 install -d -m 700 \
@@ -150,6 +152,15 @@ for resume_file in "${RESUME_LAYOUT}" "${RESUME_SCENE_TREE}" "${RESUME_RECEIPT}"
         exit 1
     fi
 done
+if [[ ! -d "${ASSET_RESUME_ROOT}" || -L "${ASSET_RESUME_ROOT}" || \
+      ! -f "${ASSET_RESUME_RECEIPT}" || -L "${ASSET_RESUME_RECEIPT}" ]]; then
+    echo "Hash-bound job-328381 TRELLIS asset resume package is missing or unsafe" >&2
+    exit 1
+fi
+if [[ "$(sha256sum "${ASSET_RESUME_RECEIPT}" | cut -d' ' -f1)" != "0842642b0e10a5ddee297d2188accf3ac3ac95042764551f9c3ce3dd90408d23" ]]; then
+    echo "Job-328381 TRELLIS asset receipt hash mismatch" >&2
+    exit 1
+fi
 if [[ "$(sha256sum "${RESUME_LAYOUT}" | cut -d' ' -f1)" != "f3a2125ffce069c251b4db636d5ec1d2da4397ed79414b0ab3b5b8a5caaf7c19" ]] || \
    [[ "$(sha256sum "${RESUME_SCENE_TREE}" | cut -d' ' -f1)" != "9e13a26bb74bbda2d35ee65e37fdba14d1876d0be59a5608df48725256782eb2" ]] || \
    [[ "$(sha256sum "${RESUME_RECEIPT}" | cut -d' ' -f1)" != "f6d352776d94d52c849bfaa62443ccfaa337a3ec9168293d405c79b6b8cc05c3" ]] || \
@@ -244,6 +255,8 @@ python "${NURSERY_ROOT}/scripts/run_interactmove_intermimic_embodiedgen_generati
     --resume-scene-tree "${RESUME_SCENE_TREE}" \
     --resume-images "${RESUME_IMAGES}" \
     --resume-receipt "${RESUME_RECEIPT}" \
+    --resume-assets "${ASSET_RESUME_ROOT}" \
+    --resume-asset-receipt "${ASSET_RESUME_RECEIPT}" \
     --output-dir "${GENERATED_ROOT}" \
     --receipt "${GENERATED_RECEIPT}"
 

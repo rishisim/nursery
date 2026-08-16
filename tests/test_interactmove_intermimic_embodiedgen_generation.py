@@ -68,6 +68,7 @@ def test_generation_protocol_is_real_robot_free_path() -> None:
     )
     assert generation["sam3d_comparison"]["blocks_trellis_run"] is False
     assert generation["resume_source"]["job_id"] == "328320"
+    assert generation["asset_resume_source"]["job_id"] == "328381"
     assert generation["invoke_upstream_sim_cli"] is False
     assert generation["robot_actor_loaded"] is False
     assert generation["background_dataset"][
@@ -315,6 +316,8 @@ def test_resume_conditioning_image_is_hash_preserving(tmp_path: Path) -> None:
                 "prompt": "frozen table prompt",
                 "image_path": source_image,
                 "raw_image_path": source_raw,
+                "image_sha256": runner._sha256(source_image),
+                "raw_image_sha256": runner._sha256(source_raw),
             }
         },
         initial_image_seed=2026081501,
@@ -339,6 +342,17 @@ def test_resume_conditioning_image_is_hash_preserving(tmp_path: Path) -> None:
     assert original_calls == []
 
     assert module.text_to_image(
+        "frozen table prompt",
+        str(destination),
+        4,
+        25,
+        7.0,
+        1,
+        seed=50494,
+    ) is True
+    assert destination.read_bytes() == source_image.read_bytes()
+
+    assert module.text_to_image(
         "another prompt",
         str(tmp_path / "output" / "mug.png"),
         4,
@@ -348,3 +362,75 @@ def test_resume_conditioning_image_is_hash_preserving(tmp_path: Path) -> None:
         seed=2026081501,
     ) is False
     assert len(original_calls) == 1
+
+
+def test_resume_assets_verifies_complete_receipt_manifest(tmp_path: Path) -> None:
+    runner = _load_runner()
+    protocol = json.loads(PROTOCOL.read_text(encoding="utf-8"))
+    generation = runner._generation_config(protocol)
+    generation["asset_resume_source"]["nodes"] = {"table": "table prompt"}
+    root = tmp_path / "partial"
+    files = {
+        "images/table.png": b"image",
+        "images/table_raw.png": b"raw-image",
+        "asset3d/table/result/table.urdf": b"<robot/>",
+        **{
+            f"asset3d/table/result/renders/image_color/{index:04d}.png": (
+                f"view-{index}".encode()
+            )
+            for index in range(4)
+        },
+    }
+    records = []
+    for relative, payload in files.items():
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(payload)
+        records.append(
+            {
+                "path": relative,
+                "bytes": len(payload),
+                "sha256": runner._sha256(path),
+            }
+        )
+    receipt = {
+        "status": "failed",
+        "models": {
+            "image_to_3d_backend": "TRELLIS",
+            "trellis": generation["trellis"],
+        },
+        "error": {"message": "resume initial image seed mismatch for table"},
+        "files": records,
+    }
+    receipt_path = tmp_path / "receipt.json"
+    receipt_path.write_text(
+        json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    generation["asset_resume_source"]["generation_receipt_sha256"] = (
+        runner._sha256(receipt_path)
+    )
+    args = SimpleNamespace(
+        resume_assets=root,
+        resume_asset_receipt=receipt_path,
+    )
+
+    resumed = runner._resume_assets(args, generation)
+
+    assert set(resumed["nodes"]) == {"table"}
+    assert len(resumed["nodes"]["table"]["render_paths"]) == 4
+    assert resumed["nodes"]["table"]["result_manifest_sha256"]
+    (root / "asset3d/table/result/table.urdf").write_bytes(b"tampered")
+    try:
+        runner._resume_assets(args, generation)
+    except ValueError as exc:
+        assert "hash mismatch" in str(exc)
+    else:
+        raise AssertionError("tampered resumed TRELLIS asset was accepted")
+
+
+def test_multiview_quality_prompt_disambiguates_camera_views() -> None:
+    runner = _load_runner()
+    prompt = " ".join(runner.MULTIVIEW_QUALITY_PREAMBLE.split())
+
+    assert "same single generated 3D asset" in prompt
+    assert "not multiple object instances" in prompt

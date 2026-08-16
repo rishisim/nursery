@@ -117,6 +117,17 @@
         }
       }
     },
+    "asset_resume_source": {
+      "job_id": "328381",
+      "generation_receipt_sha256": "0842642b0e10a5ddee297d2188accf3ac3ac95042764551f9c3ce3dd90408d23",
+      "requalification_policy": "four_separate_views_of_one_asset",
+      "nodes": {
+        "table": "standalone rectangular wooden table with a clean empty tabletop and warm polished surface",
+        "red mug": "glossy crimson ceramic mug with curved handle, thick rim, and smooth reflective surface",
+        "plate": "white ceramic dinner plate with subtle rim, clean glossy finish, and circular form",
+        "spoon": "small stainless-steel spoon with polished reflective bowl and slender rounded handle"
+      }
+    },
     "image_samples_per_prompt": 1,
     "text_guidance_scale": 7.0,
     "image_denoise_steps": 25,
