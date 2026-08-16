@@ -181,12 +181,46 @@ set -u
 python -m pip install "openai==${OPENAI_SDK_VERSION}"
 python - <<'PY'
 import openai
+from importlib.metadata import PackageNotFoundError, distribution
 from openai import OpenAI
+from packaging.requirements import Requirement
 
 assert openai.__version__ == "3.1.0"
 assert hasattr(OpenAI(api_key="not-a-real-key"), "responses")
+pending = ["openai"]
+checked = set()
+while pending:
+    name = pending.pop()
+    package = distribution(name)
+    canonical_name = package.metadata["Name"].lower().replace("_", "-")
+    if canonical_name in checked:
+        continue
+    checked.add(canonical_name)
+    for raw_requirement in package.requires or []:
+        requirement = Requirement(raw_requirement)
+        if requirement.marker and not requirement.marker.evaluate({"extra": ""}):
+            continue
+        try:
+            dependency = distribution(requirement.name)
+        except PackageNotFoundError as exc:
+            raise RuntimeError(
+                f"missing OpenAI dependency: {requirement.name}"
+            ) from exc
+        if requirement.specifier and dependency.version not in requirement.specifier:
+            raise RuntimeError(
+                f"OpenAI dependency mismatch: {requirement}, got {dependency.version}"
+            )
+        pending.append(requirement.name)
+print("openai_dependency_closure=passed")
 PY
-python -m pip check
+set +e
+python -m pip check > "${RUN_ROOT}/pip-check.txt" 2>&1
+GLOBAL_PIP_CHECK_EXIT_CODE=$?
+set -e
+if [[ "${GLOBAL_PIP_CHECK_EXIT_CODE}" -ne 0 ]]; then
+    echo "Global pip check has unrelated pre-existing conflicts:" >&2
+    cat "${RUN_ROOT}/pip-check.txt" >&2
+fi
 
 python - <<'PY'
 import json
@@ -217,6 +251,13 @@ sim-cli --help >/dev/null
     printf 'python=%s\n' "$(python --version 2>&1)"
     printf 'cuda_visible_devices=%s\n' "${CUDA_VISIBLE_DEVICES:-}"
     printf 'torch_cuda_arch_list=%s\n' "${TORCH_CUDA_ARCH_LIST}"
+    printf 'openai_sdk=%s\n' "$(python -c 'import openai; print(openai.__version__)')"
+    printf 'openai_dependency_closure=passed\n'
+    printf 'global_pip_check_exit_code=%s\n' "${GLOBAL_PIP_CHECK_EXIT_CODE}"
+    if [[ -s "${RUN_ROOT}/pip-check.txt" ]]; then
+        printf '\n[global-pip-check]\n'
+        cat "${RUN_ROOT}/pip-check.txt"
+    fi
     conda list --explicit
     printf '\n[pip-freeze]\n'
     python -m pip freeze --all

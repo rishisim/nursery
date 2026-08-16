@@ -292,9 +292,14 @@ The historical environment manifest `embodiedgen_environment_328178.txt`
 records OpenAI SDK `1.58.1`, which has no Responses resource. It remains an
 immutable record of that earlier qualification and is not evidence for the
 GPT-5.6 transport. The canonical setup wrapper overlays exactly `openai==3.1.0`,
-runs `pip check`, proves the Responses resource exists, and writes a new
-job-bound manifest whenever the environment is requalified. The public Hugging
-Face token already used for downloads is also not copied into receipts.
+validates the full transitive OpenAI dependency closure, proves the Responses
+resource exists, and writes a new job-bound manifest whenever the environment
+is requalified. It also records the global `pip check` result. That broader
+check currently reports three pre-existing upstream conflicts unrelated to the
+OpenAI closure (FlashAttention/einops, Plyfile/NumPy, and Dash/Pydantic); they
+remain visible in the manifest but do not misclassify a valid Responses overlay
+as failed. The public Hugging Face token already used for downloads is also not
+copied into receipts.
 EmbodiedGen's released `sim-cli` loads a Franka even when
 `insert_robot=false`; therefore it must not be used as evidence of a robot-free
 simulation. Nursery's robot-free canary calls only the released scene importer
