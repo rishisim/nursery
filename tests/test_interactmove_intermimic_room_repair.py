@@ -3,6 +3,8 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 from babyworld_lite.interactmove_intermimic.environment import inspect_mesh
 
 
@@ -42,3 +44,33 @@ def test_authored_wall_collision_is_finite_room_scale(tmp_path: Path) -> None:
     assert report["face_count"] == 48
     assert report["finite_vertices"] is True
     assert report["extents_m"] == [6.1, 5.1, 3.0]
+
+
+def test_preserved_activity_binding_projects_embodiedgen_seeds() -> None:
+    runner = _load_runner()
+    activity = {
+        "activity_id": "red-mug-mouth-return",
+        "prompt": "Pick up the red mug.",
+        "seeds": {
+            "master": 1,
+            "embodiedgen_image": 2,
+            "embodiedgen_asset": 3,
+            "embodiedgen_layout": 4,
+            "interactmove": 5,
+            "intermimic": 6,
+            "render": 7,
+        },
+    }
+    receipt = {
+        "activity": {
+            "activity_id": "red-mug-mouth-return",
+            "prompt": "Pick up the red mug.",
+        },
+        "seeds": {"image": 2, "asset": 3, "layout": 4},
+    }
+
+    runner._validate_preserved_activity_binding(activity, receipt)
+
+    receipt["seeds"]["image"] = 99
+    with pytest.raises(RuntimeError, match="seeds changed"):
+        runner._validate_preserved_activity_binding(activity, receipt)

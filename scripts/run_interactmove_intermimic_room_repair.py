@@ -272,6 +272,28 @@ def _write_wall_collision(path: Path, bounds: dict[str, Any]) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def _validate_preserved_activity_binding(
+    activity: dict[str, Any], original_receipt: dict[str, Any]
+) -> None:
+    receipt_activity = original_receipt.get("activity")
+    if not isinstance(receipt_activity, dict):
+        raise RuntimeError("accepted generation receipt lacks its activity binding")
+    if receipt_activity.get("activity_id") != activity.get("activity_id"):
+        raise RuntimeError("accepted generation receipt activity ID changed")
+    if receipt_activity.get("prompt") != activity.get("prompt"):
+        raise RuntimeError("accepted generation receipt prompt changed")
+    seeds = activity.get("seeds")
+    if not isinstance(seeds, dict):
+        raise RuntimeError("ActivitySpec lacks its frozen seeds")
+    expected_embodiedgen_seeds = {
+        "image": seeds.get("embodiedgen_image"),
+        "asset": seeds.get("embodiedgen_asset"),
+        "layout": seeds.get("embodiedgen_layout"),
+    }
+    if original_receipt.get("seeds") != expected_embodiedgen_seeds:
+        raise RuntimeError("accepted generation receipt EmbodiedGen seeds changed")
+
+
 def run(args: argparse.Namespace) -> dict[str, Any]:
     candidate = args.candidate_scene.resolve(strict=True)
     source_root = args.embodiedgen_source.resolve(strict=True)
@@ -300,12 +322,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     original_receipt = json.loads(original_receipt_path.read_text(encoding="utf-8"))
     activity_prompt = activity["prompt"]
     seeds = activity["seeds"]
-    if original_receipt.get("prompt") != activity_prompt or original_receipt.get("seeds") != {
-        "image": seeds["embodiedgen_image"],
-        "asset": seeds["embodiedgen_asset"],
-        "layout": seeds["embodiedgen_layout"],
-    }:
-        raise RuntimeError("accepted generation receipt prompt/seeds disagree with ActivitySpec")
+    _validate_preserved_activity_binding(activity, original_receipt)
     if args.seed != seeds["embodiedgen_image"]:
         raise RuntimeError("room generation must reuse the frozen EmbodiedGen image seed")
 
