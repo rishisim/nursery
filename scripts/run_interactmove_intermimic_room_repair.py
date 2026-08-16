@@ -136,8 +136,26 @@ def _install_torchvision_functional_tensor_compat() -> None:
     sys.modules[module.__name__] = module
 
 
+def _install_unused_tinycudann_import_guard() -> None:
+    """Let Pano2Room import while failing closed if its unused refiner executes."""
+    if "tinycudann" in sys.modules:
+        return
+
+    class UnavailableEncoding:
+        def __init__(self, *args, **kwargs):
+            raise RuntimeError(
+                "tinycudann is unavailable: the frozen room profile must not "
+                "execute PanoGeoRefiner"
+            )
+
+    module = types.ModuleType("tinycudann")
+    module.Encoding = UnavailableEncoding
+    sys.modules[module.__name__] = module
+
+
 def _generate_room(args: argparse.Namespace) -> tuple[Path, Path]:
     _install_torchvision_functional_tensor_compat()
+    _install_unused_tinycudann_import_guard()
     _patch_pinned_model_loaders(args)
     import torch
     from txt2panoimg import Text2360PanoramaImagePipeline
@@ -376,6 +394,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "sd2_inpaint_revision": SD2_INPAINT_REVISION,
             "realesrgan_revision": REALESRGAN_REVISION,
             "omnidata_commit": OMNIDATA_COMMIT,
+        },
+        "execution_profile": {
+            "pipeline": "Pano2MeshSRPipeline",
+            "pano_geo_refiner_executed": False,
+            "tinycudann_installed": False,
+            "tinycudann_import_guard": "fail_if_Encoding_is_instantiated",
         },
         "retained_source_files": _inventory(provenance_root),
         "canonical_transform": transform_receipt,
