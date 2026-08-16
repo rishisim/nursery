@@ -98,3 +98,18 @@ def test_torchvision_functional_tensor_compat_exposes_grayscale(monkeypatch) -> 
 
     module = runner.sys.modules["torchvision.transforms.functional_tensor"]
     assert module.rgb_to_grayscale is grayscale
+
+
+def test_equilib_patch_swaps_embodiedgen_height_width_order() -> None:
+    runner = _load_runner()
+    observed = []
+
+    def cube2equi(cubemap, cube_format, width, height):
+        observed.append((cubemap, cube_format, width, height))
+        return "panorama"
+
+    trainer = types.SimpleNamespace(cube2equi=cube2equi)
+    runner._install_equilib_argument_order_patch(trainer)
+
+    assert trainer.cube2equi("cube", "list", 1024, 2048) == "panorama"
+    assert observed == [("cube", "list", 2048, 1024)]

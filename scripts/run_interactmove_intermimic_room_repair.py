@@ -172,6 +172,18 @@ def _install_torchvision_functional_tensor_compat() -> None:
     sys.modules[module.__name__] = module
 
 
+def _install_equilib_argument_order_patch(trainer: Any) -> None:
+    """Align EmbodiedGen's height/width call with pyequilib 0.3.0."""
+    original_cube2equi = trainer.cube2equi
+
+    def corrected_cube2equi(cubemap, cube_format, pano_h, pano_w, *positional, **kwargs):
+        return original_cube2equi(
+            cubemap, cube_format, pano_w, pano_h, *positional, **kwargs
+        )
+
+    trainer.cube2equi = corrected_cube2equi
+
+
 def _generate_room(
     args: argparse.Namespace,
 ) -> tuple[Path, Path, dict[str, Any]]:
@@ -188,6 +200,7 @@ def _generate_room(
         return ImageRealESRGAN(outscale=outscale, model_path=real_esrgan_path)
 
     trainer.ImageRealESRGAN = pinned_realesrgan
+    _install_equilib_argument_order_patch(trainer)
     work = args.generation_work_dir
     if work.exists() and any(work.iterdir()):
         raise RuntimeError("generation work directory must be new or empty")
@@ -462,6 +475,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "tinycudann_required_by_pano_joint_predictor": True,
             "omnidata_timm_imagenet_bootstrap": False,
             "omnidata_task_checkpoints_supply_full_model": True,
+            "equilib_cube2equi_argument_order_patch": {
+                "upstream_call_order": "height_width",
+                "equilib_0_3_0_signature": "width_height",
+                "effect": "swap_arguments_only_no_resampling_change",
+            },
         },
         "panorama_stage": panorama_stage,
         "retained_source_files": _inventory(provenance_root),
