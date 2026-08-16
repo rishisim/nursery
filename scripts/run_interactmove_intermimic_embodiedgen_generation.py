@@ -718,7 +718,6 @@ def _resume_assets(args: argparse.Namespace, generation: Mapping[str, Any]) -> d
         ]
         required = [
             f"images/{save_node}.png",
-            f"images/{save_node}_raw.png",
             *render_paths,
         ]
         for relative in required:
@@ -731,12 +730,15 @@ def _resume_assets(args: argparse.Namespace, generation: Mapping[str, Any]) -> d
         ]
         if not result_records:
             raise ValueError(f"resume asset has no result package: {node}")
+        raw_relative = f"images/{save_node}_raw.png"
         nodes[node] = {
             "prompt": prompt,
             "result_relative": result_relative,
             "result_path": root / result_relative,
             "image_path": root / f"images/{save_node}.png",
-            "raw_image_path": root / f"images/{save_node}_raw.png",
+            "raw_image_path": (
+                root / raw_relative if raw_relative in manifest else None
+            ),
             "render_paths": [root / relative for relative in render_paths],
             "result_manifest_sha256": _canonical_sha256(result_records),
         }
@@ -1034,10 +1036,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                     resumed_asset["image_path"],
                     images_destination / f"{save_node}.png",
                 )
-                shutil.copy2(
-                    resumed_asset["raw_image_path"],
-                    images_destination / f"{save_node}_raw.png",
-                )
+                if resumed_asset["raw_image_path"] is not None:
+                    shutil.copy2(
+                        resumed_asset["raw_image_path"],
+                        images_destination / f"{save_node}_raw.png",
+                    )
                 generation_log = {
                     "assets": {node: resumed_asset["result_relative"]},
                     "quality": {node: qa_result},
