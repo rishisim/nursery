@@ -28,6 +28,10 @@ from typing import Any, Mapping, Sequence
 
 EMBODIEDGEN_COMMIT = "9b333554254af196bace88c1a171a3bf047fa09c"
 EMBODIEDGEN_VERSION = "v2.0.1"
+TRELLIS_SOURCE_COMMIT = "55a8e8164b195bbf927e0978f00e76c835e6011f"
+TRELLIS_FLEXICUBES_COMMIT = "f97beb0dd3c6c68f3ab5696b6dcaf9af69f0514e"
+TRELLIS_CHECKPOINT_REVISION = "25e0d31ffbebe4b5a97464dd851910efc3002d96"
+DINOv2_COMMIT = "7764ea0f912e53c92e82eb78a2a1631e92725fc8"
 RECEIPT_SCHEMA = "InteractMoveInterMimicFreshEmbodiedGenReceipt"
 RECEIPT_SCHEMA_VERSION = 1
 OPENAI_API_MODE = "responses"
@@ -266,7 +270,7 @@ class _ResponsesGPTClient:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Run the pinned EmbodiedGen GPT layout, SD3.5 image, SAM3D asset, "
+            "Run the pinned EmbodiedGen GPT layout, SD3.5 image, TRELLIS asset, "
             "background retrieval, and BFS placement stages for one fresh "
             "prompt. This never calls sim_cli and never loads a robot actor."
         )
@@ -277,6 +281,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--gpt-config", type=Path, required=True)
     parser.add_argument("--background-catalog", type=Path, required=True)
     parser.add_argument("--source-root", type=Path, required=True)
+    parser.add_argument("--resume-layout", type=Path, required=True)
+    parser.add_argument("--resume-scene-tree", type=Path, required=True)
+    parser.add_argument("--resume-images", type=Path, required=True)
+    parser.add_argument("--resume-receipt", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--receipt", type=Path, required=True)
     return parser
@@ -414,11 +422,39 @@ def _source_state(source_root: Path) -> dict[str, Any]:
         )
         if result.returncode != 0:
             raise ValueError("EmbodiedGen tracked source checkout is dirty")
+    trellis = source / "thirdparty" / "TRELLIS"
+    flexicubes = trellis / "trellis" / "representations" / "mesh" / "flexicubes"
+    for path, expected, label in (
+        (trellis, TRELLIS_SOURCE_COMMIT, "TRELLIS"),
+        (flexicubes, TRELLIS_FLEXICUBES_COMMIT, "TRELLIS FlexiCubes"),
+    ):
+        submodule_commit = _command_output(
+            ["git", "-C", str(path), "rev-parse", "HEAD"]
+        )
+        if submodule_commit != expected:
+            raise ValueError(
+                f"{label} commit mismatch: expected {expected}, got {submodule_commit}"
+            )
+        for args in (["diff", "--quiet"], ["diff", "--cached", "--quiet"]):
+            result = subprocess.run(
+                ["git", "-C", str(path), *args],
+                check=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            if result.returncode != 0:
+                raise ValueError(f"{label} tracked source checkout is dirty")
     return {
         "path": str(source),
         "version": EMBODIEDGEN_VERSION,
         "commit": actual,
         "tracked_files_clean": True,
+        "trellis": {
+            "path": str(trellis),
+            "commit": TRELLIS_SOURCE_COMMIT,
+            "flexicubes_commit": TRELLIS_FLEXICUBES_COMMIT,
+            "tracked_files_clean": True,
+        },
     }
 
 
@@ -436,8 +472,9 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
         "text_to_image_model",
         "text_to_image_backend",
         "image_to_3d_backend",
-        "sam3d_model_repository",
-        "sam3d_model_commit",
+        "trellis",
+        "sam3d_comparison",
+        "resume_source",
         "image_samples_per_prompt",
         "text_guidance_scale",
         "image_denoise_steps",
@@ -455,9 +492,24 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
         "openai_sdk_version": OPENAI_SDK_VERSION,
         "text_to_image_model": "stabilityai/stable-diffusion-3.5-medium",
         "text_to_image_backend": "sd35",
-        "image_to_3d_backend": "SAM3D",
-        "sam3d_model_repository": "facebook/sam-3d-objects",
-        "sam3d_model_commit": "2e73555018d2741ccd486e56c24fac41155a1dc6",
+        "image_to_3d_backend": "TRELLIS",
+        "trellis": {
+            "source_repository": "microsoft/TRELLIS",
+            "source_commit": TRELLIS_SOURCE_COMMIT,
+            "source_license": "MIT",
+            "checkpoint_repository": "microsoft/TRELLIS-image-large",
+            "checkpoint_revision": TRELLIS_CHECKPOINT_REVISION,
+            "checkpoint_license": "MIT",
+            "dinov2_repository": "facebookresearch/dinov2",
+            "dinov2_commit": DINOv2_COMMIT,
+            "dinov2_license": "Apache-2.0",
+        },
+        "sam3d_comparison": {
+            "repository": "facebook/sam-3d-objects",
+            "commit": "2e73555018d2741ccd486e56c24fac41155a1dc6",
+            "access_status": "pending_not_admitted",
+            "blocks_trellis_run": False,
+        },
         "image_samples_per_prompt": 1,
         "text_guidance_scale": 7.0,
         "image_denoise_steps": 25,
@@ -469,6 +521,110 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
         if generation.get(key) != value:
             raise ValueError(f"protocol fresh_generation.{key} mismatch")
     return copy.deepcopy(generation)
+
+
+def _resume_inputs(args: argparse.Namespace, generation: Mapping[str, Any]) -> dict[str, Any]:
+    frozen = generation["resume_source"]
+    layout_path = args.resume_layout.resolve(strict=True)
+    scene_tree_path = args.resume_scene_tree.resolve(strict=True)
+    images_root = args.resume_images.resolve(strict=True)
+    receipt_path = args.resume_receipt.resolve(strict=True)
+    if not images_root.is_dir() or images_root.is_symlink():
+        raise ValueError("--resume-images must be a non-symlink directory")
+    expected_hashes = {
+        layout_path: frozen["layout_draft_sha256"],
+        scene_tree_path: frozen["scene_tree_sha256"],
+        receipt_path: frozen["generation_receipt_sha256"],
+    }
+    for path, expected in expected_hashes.items():
+        if not path.is_file() or path.is_symlink() or _sha256(path) != expected:
+            raise ValueError(f"resume artifact hash mismatch: {path.name}")
+    prior_receipt = _read_json(receipt_path)
+    if prior_receipt.get("status") != "failed":
+        raise ValueError("resume receipt must be the admitted failed partial run")
+    if prior_receipt.get("activity", {}).get("activity_id") != "red-mug-mouth-return":
+        raise ValueError("resume receipt activity mismatch")
+    if prior_receipt.get("seeds") != {
+        "asset": 2026081502,
+        "image": 2026081501,
+        "layout": 2026081503,
+    }:
+        raise ValueError("resume receipt seeds mismatch")
+    image_records: dict[str, dict[str, Any]] = {}
+    for node, record in frozen["conditioning_images"].items():
+        image = images_root / f"{node}.png"
+        raw_image = images_root / f"{node}_raw.png"
+        for path, key in (
+            (image, "image_sha256"),
+            (raw_image, "raw_image_sha256"),
+        ):
+            if not path.is_file() or path.is_symlink() or _sha256(path) != record[key]:
+                raise ValueError(f"resume conditioning image hash mismatch: {path.name}")
+        image_records[node] = {
+            **copy.deepcopy(record),
+            "image_path": image,
+            "raw_image_path": raw_image,
+        }
+    return {
+        "layout_path": layout_path,
+        "scene_tree_path": scene_tree_path,
+        "receipt_path": receipt_path,
+        "prior_receipt": prior_receipt,
+        "images": image_records,
+    }
+
+
+def _install_resume_conditioning_images(
+    module: Any,
+    records: Mapping[str, Mapping[str, Any]],
+    *,
+    initial_image_seed: int,
+) -> set[str]:
+    original = module.text_to_image
+    reused: set[str] = set()
+
+    def text_to_image(
+        prompt: str,
+        save_path: str,
+        n_retry: int,
+        img_denoise_step: int,
+        text_guidance_scale: float,
+        n_img_sample: int,
+        image_hw: tuple[int, int] = (1024, 1024),
+        seed: int | None = None,
+    ) -> bool:
+        node = Path(save_path).stem
+        record = records.get(node)
+        if record is None:
+            return original(
+                prompt,
+                save_path,
+                n_retry,
+                img_denoise_step,
+                text_guidance_scale,
+                n_img_sample,
+                image_hw=image_hw,
+                seed=seed,
+            )
+        if prompt != record["prompt"]:
+            raise ValueError(f"resume prompt mismatch for {node}")
+        if seed != initial_image_seed:
+            raise ValueError(f"resume initial image seed mismatch for {node}")
+        destination = Path(save_path)
+        if destination.exists() or destination.with_name(
+            destination.stem + "_raw.png"
+        ).exists():
+            raise ValueError(f"resume destination already exists for {node}")
+        shutil.copy2(record["image_path"], destination)
+        shutil.copy2(
+            record["raw_image_path"],
+            destination.with_name(destination.stem + "_raw.png"),
+        )
+        reused.add(node)
+        return True
+
+    module.text_to_image = text_to_image
+    return reused
 
 
 def _manifest(root: Path, excluded: set[Path]) -> list[dict[str, Any]]:
@@ -515,6 +671,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     request = _read_json(args.request.resolve(strict=True))
     protocol = _read_json(args.protocol.resolve(strict=True))
     generation = _generation_config(protocol)
+    resume = _resume_inputs(args, generation)
     public_gpt = _configure_gpt(args.gpt_config.resolve(strict=True))
     if public_gpt["model_name"] != generation["gpt_model"]:
         raise ValueError("GPT config model does not match the frozen protocol")
@@ -567,10 +724,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "text_to_image": generation["text_to_image_model"],
             "text_to_image_backend": generation["text_to_image_backend"],
             "image_to_3d_backend": generation["image_to_3d_backend"],
-            "sam3d": {
-                "repository": generation["sam3d_model_repository"],
-                "commit": generation["sam3d_model_commit"],
-            },
+            "trellis": copy.deepcopy(generation["trellis"]),
+            "sam3d_comparison": copy.deepcopy(generation["sam3d_comparison"]),
         },
         "generation_config": {
             "image_samples_per_prompt": generation["image_samples_per_prompt"],
@@ -581,6 +736,19 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "gpt_service_seed_supported"
             ],
             "keep_intermediate": False,
+            "resume_source": {
+                "job_id": generation["resume_source"]["job_id"],
+                "generation_receipt_sha256": generation["resume_source"][
+                    "generation_receipt_sha256"
+                ],
+                "scene_tree_sha256": generation["resume_source"][
+                    "scene_tree_sha256"
+                ],
+                "layout_draft_sha256": generation["resume_source"][
+                    "layout_draft_sha256"
+                ],
+                "layout_recovery": generation["resume_source"]["layout_recovery"],
+            },
         },
         "background": {
             "repository": dataset["repository"],
@@ -625,10 +793,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         )
         _write_json(receipt_path, receipt)
 
-        from embodied_gen.models.layout import build_scene_layout
-        from embodied_gen.scripts.textto3d import text_to_3d
+        import embodied_gen.scripts.textto3d as textto3d_module
         from embodied_gen.utils.enum import LayoutInfo, Scene3DItemEnum
         from embodied_gen.utils.geometry import bfs_placement
+        from embodied_gen.utils.process_media import SceneTreeVisualizer
         from embodied_gen.validators.quality_checkers import SemanticMatcher
 
         scene_graph_path = output / "scene_tree.jpg"
@@ -639,8 +807,24 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "presence_penalty": 0.5,
             "max_tokens": 500,
         }
-        layout_info: LayoutInfo = build_scene_layout(
-            activity["prompt"], str(scene_graph_path), gpt_params
+        layout_info = LayoutInfo.from_dict(_read_json(resume["layout_path"]))
+        verification_path = output / "scene_tree.verify.jpg"
+        SceneTreeVisualizer(layout_info).render(save_path=str(verification_path))
+        if _sha256(verification_path) != generation["resume_source"][
+            "scene_tree_sha256"
+        ]:
+            raise RuntimeError("recovered GPT layout does not reproduce scene-tree hash")
+        verification_path.unlink()
+        shutil.copy2(resume["scene_tree_path"], scene_graph_path)
+        provenance_root = output / "provenance" / (
+            "resume_job_" + generation["resume_source"]["job_id"]
+        )
+        provenance_root.mkdir(parents=True, exist_ok=False)
+        shutil.copy2(
+            resume["layout_path"], provenance_root / "layout_draft.json"
+        )
+        shutil.copy2(
+            resume["receipt_path"], provenance_root / "generation_receipt.json"
         )
         manipulated = list(
             layout_info.relation.get(Scene3DItemEnum.MANIPULATED_OBJS.value, [])
@@ -653,12 +837,28 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         receipt["stages"].append(
             {
                 "name": "gpt_scene_layout",
-                "status": "passed",
+                "status": "reused",
                 "finished_utc": _utc_now(),
                 "manipulated_source_keys": manipulated,
+                "source_job_id": generation["resume_source"]["job_id"],
+                "layout_draft_sha256": generation["resume_source"][
+                    "layout_draft_sha256"
+                ],
+                "scene_tree_sha256": generation["resume_source"][
+                    "scene_tree_sha256"
+                ],
+                "recovery_validation": generation["resume_source"][
+                    "layout_recovery"
+                ],
             }
         )
         _write_json(receipt_path, receipt)
+
+        reused_images = _install_resume_conditioning_images(
+            textto3d_module,
+            resume["images"],
+            initial_image_seed=request["seeds"]["image"],
+        )
 
         prompts_mapping = {value: key for key, value in layout_info.objs_desc.items()}
         prompts = [
@@ -668,7 +868,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         ]
         for index, prompt in enumerate(prompts):
             node = prompts_mapping[prompt]
-            generation_log = text_to_3d(
+            generation_log = textto3d_module.text_to_3d(
                 prompts=[prompt],
                 output_root=str(output),
                 asset_names=[node],
@@ -687,12 +887,27 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             layout_info.quality.update(generation_log["quality"])
             receipt["stages"].append(
                 {
-                    "name": "sd35_sam3d_asset",
+                    "name": "sd35_trellis_asset",
                     "status": "passed",
                     "asset_index": index,
                     "source_node_key": node,
                     "prompt": prompt,
                     "quality": generation_log["quality"].get(node),
+                    "conditioning_image": (
+                        {
+                            "status": "reused",
+                            "source_job_id": generation["resume_source"]["job_id"],
+                            "accepted_retry_seed": resume["images"][node][
+                                "accepted_retry_seed"
+                            ],
+                            "sha256": resume["images"][node]["image_sha256"],
+                        }
+                        if node in reused_images
+                        else {
+                            "status": "generated",
+                            "initial_seed": request["seeds"]["image"],
+                        }
+                    ),
                     "finished_utc": _utc_now(),
                 }
             )

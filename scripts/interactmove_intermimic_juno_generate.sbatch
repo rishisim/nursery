@@ -15,7 +15,10 @@ umask 077
 
 readonly EMBODIEDGEN_COMMIT=9b333554254af196bace88c1a171a3bf047fa09c
 readonly DATASET_COMMIT=58258b50a0fc95034f2f3cc03b332ec6f72b91fd
-readonly SAM3D_COMMIT=2e73555018d2741ccd486e56c24fac41155a1dc6
+readonly TRELLIS_SOURCE_COMMIT=55a8e8164b195bbf927e0978f00e76c835e6011f
+readonly TRELLIS_FLEXICUBES_COMMIT=f97beb0dd3c6c68f3ab5696b6dcaf9af69f0514e
+readonly TRELLIS_REVISION=25e0d31ffbebe4b5a97464dd851910efc3002d96
+readonly DINOV2_COMMIT=7764ea0f912e53c92e82eb78a2a1631e92725fc8
 readonly ACTIVITY_ID=red-mug-mouth-return
 readonly SCRATCH_ROOT=/scratch/juno/dal503972/interactmove_intermimic
 readonly DURABLE_ROOT=/work/dal503972/interactmove_intermimic
@@ -31,8 +34,17 @@ readonly GENERATED_RECEIPT="${GENERATED_ROOT}/generation_receipt.json"
 readonly DURABLE_SCENE="${DURABLE_ROOT}/scene_packages/${ACTIVITY_ID}"
 readonly COMPACT_RECEIPT="${DURABLE_ROOT}/compact_records/fresh_embodiedgen_${SLURM_JOB_ID}.json"
 readonly MANIFEST="${DURABLE_ROOT}/manifests/${ACTIVITY_ID}_${SLURM_JOB_ID}.sha256"
-readonly SAM3D_ROOT="${DURABLE_ROOT}/checkpoints/sam-3d-objects-${SAM3D_COMMIT}"
-readonly SAM3D_MANIFEST="${DURABLE_ROOT}/manifests/sam3d_${SAM3D_COMMIT}.sha256"
+readonly TRELLIS_ROOT="${DURABLE_ROOT}/checkpoints/TRELLIS-image-large-${TRELLIS_REVISION}"
+readonly TRELLIS_MANIFEST="${DURABLE_ROOT}/manifests/trellis_${TRELLIS_REVISION}.sha256"
+readonly TORCH_HOME="${DURABLE_ROOT}/checkpoints/torch-hub"
+readonly DINOV2_MANIFEST="${DURABLE_ROOT}/manifests/dinov2_${DINOV2_COMMIT}.sha256"
+readonly SETUP_JOB_ID="${IMIM_SETUP_JOB_ID:?submit with the admitted TRELLIS setup job}"
+readonly SETUP_RECEIPT="${DURABLE_ROOT}/compact_records/embodiedgen_setup_${SETUP_JOB_ID}.json"
+readonly RESUME_ROOT="${SCRATCH_ROOT}/runs/fresh_generation/328320/scene"
+readonly RESUME_LAYOUT="${SCRATCH_ROOT}/runs/layout_recovery/328320/layout_draft.json"
+readonly RESUME_SCENE_TREE="${RESUME_ROOT}/scene_tree.jpg"
+readonly RESUME_IMAGES="${RESUME_ROOT}/images"
+readonly RESUME_RECEIPT="${RESUME_ROOT}/generation_receipt.json"
 readonly NURSERY_COMMIT="${IMIM_NURSERY_COMMIT:?submit with the exact nursery commit}"
 
 install -d -m 700 \
@@ -72,6 +84,14 @@ if [[ "$(git -C "${SOURCE_ROOT}" rev-parse HEAD)" != "${EMBODIEDGEN_COMMIT}" ]];
 fi
 git -C "${SOURCE_ROOT}" diff --quiet
 git -C "${SOURCE_ROOT}" diff --cached --quiet
+if [[ "$(git -C "${SOURCE_ROOT}/thirdparty/TRELLIS" rev-parse HEAD)" != "${TRELLIS_SOURCE_COMMIT}" ]]; then
+    echo "TRELLIS source checkout does not match the frozen commit" >&2
+    exit 1
+fi
+if [[ "$(git -C "${SOURCE_ROOT}/thirdparty/TRELLIS/trellis/representations/mesh/flexicubes" rev-parse HEAD)" != "${TRELLIS_FLEXICUBES_COMMIT}" ]]; then
+    echo "TRELLIS FlexiCubes checkout does not match the frozen commit" >&2
+    exit 1
+fi
 if [[ "$(git -C "${NURSERY_ROOT}" rev-parse HEAD)" != "${NURSERY_COMMIT}" ]]; then
     echo "Nursery checkout does not match IMIM_NURSERY_COMMIT" >&2
     exit 1
@@ -86,18 +106,62 @@ if [[ -e "${COMPACT_RECEIPT}" || -e "${MANIFEST}" ]]; then
     echo "Refusing to overwrite job-bound durable records" >&2
     exit 1
 fi
-if [[ ! -d "${SAM3D_ROOT}" || -L "${SAM3D_ROOT}" || ! -s "${SAM3D_MANIFEST}" ]]; then
-    echo "Pinned SAM3D checkpoint package or manifest is missing" >&2
+if [[ ! -d "${TRELLIS_ROOT}" || -L "${TRELLIS_ROOT}" || ! -s "${TRELLIS_MANIFEST}" ]]; then
+    echo "Pinned TRELLIS checkpoint package or manifest is missing" >&2
     exit 1
 fi
 (
-    cd "${SAM3D_ROOT}"
-    sha256sum --check "${SAM3D_MANIFEST}"
+    cd "${TRELLIS_ROOT}"
+    sha256sum --check "${TRELLIS_MANIFEST}"
 )
-install -d -m 700 "${RUN_ROOT}/weights"
-ln -s "${SAM3D_ROOT}" "${RUN_ROOT}/weights/sam-3d-objects"
-if [[ "$(readlink -f "${RUN_ROOT}/weights/sam-3d-objects")" != "${SAM3D_ROOT}" ]]; then
-    echo "SAM3D run-local checkpoint binding failed" >&2
+if [[ ! -s "${DINOV2_MANIFEST}" ]]; then
+    echo "Pinned DINOv2 manifest is missing" >&2
+    exit 1
+fi
+(
+    cd "${TORCH_HOME}"
+    sha256sum --check "${DINOV2_MANIFEST}"
+)
+if [[ ! -f "${SETUP_RECEIPT}" || -L "${SETUP_RECEIPT}" ]]; then
+    echo "Admitted TRELLIS setup receipt is missing or unsafe" >&2
+    exit 1
+fi
+"${ENV_ROOT}/bin/python" - "${SETUP_RECEIPT}" <<'PY'
+from pathlib import Path
+import json
+import sys
+
+receipt = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+if receipt.get("status") != "passed":
+    raise SystemExit("TRELLIS setup receipt did not pass")
+if receipt.get("trellis", {}).get("checkpoint_revision") != (
+    "25e0d31ffbebe4b5a97464dd851910efc3002d96"
+):
+    raise SystemExit("TRELLIS setup receipt revision mismatch")
+if receipt.get("dinov2", {}).get("commit") != (
+    "7764ea0f912e53c92e82eb78a2a1631e92725fc8"
+):
+    raise SystemExit("DINOv2 setup receipt commit mismatch")
+PY
+for resume_file in "${RESUME_LAYOUT}" "${RESUME_SCENE_TREE}" "${RESUME_RECEIPT}" \
+    "${RESUME_IMAGES}/table.png" "${RESUME_IMAGES}/table_raw.png"; do
+    if [[ ! -f "${resume_file}" || -L "${resume_file}" ]]; then
+        echo "Required resume artifact is missing or unsafe: ${resume_file}" >&2
+        exit 1
+    fi
+done
+if [[ "$(sha256sum "${RESUME_LAYOUT}" | cut -d' ' -f1)" != "f3a2125ffce069c251b4db636d5ec1d2da4397ed79414b0ab3b5b8a5caaf7c19" ]] || \
+   [[ "$(sha256sum "${RESUME_SCENE_TREE}" | cut -d' ' -f1)" != "9e13a26bb74bbda2d35ee65e37fdba14d1876d0be59a5608df48725256782eb2" ]] || \
+   [[ "$(sha256sum "${RESUME_RECEIPT}" | cut -d' ' -f1)" != "f6d352776d94d52c849bfaa62443ccfaa337a3ec9168293d405c79b6b8cc05c3" ]] || \
+   [[ "$(sha256sum "${RESUME_IMAGES}/table.png" | cut -d' ' -f1)" != "317b980184bba52c5acb92de0e69d7992ba01dec7746fe5711dca246a80367ef" ]] || \
+   [[ "$(sha256sum "${RESUME_IMAGES}/table_raw.png" | cut -d' ' -f1)" != "21291ddb429eb8a31fc367a6e390f53033ffe8efff3a09ad89676ac3c6853cf2" ]]; then
+    echo "One or more resume artifacts do not match the frozen job-328320 hashes" >&2
+    exit 1
+fi
+install -d -m 700 "${RUN_ROOT}/microsoft"
+ln -s "${TRELLIS_ROOT}" "${RUN_ROOT}/microsoft/TRELLIS-image-large"
+if [[ "$(readlink -f "${RUN_ROOT}/microsoft/TRELLIS-image-large")" != "${TRELLIS_ROOT}" ]]; then
+    echo "TRELLIS run-local checkpoint binding failed" >&2
     exit 1
 fi
 
@@ -133,6 +197,7 @@ fi
 
 export HF_HOME="${SCRATCH_ROOT}/caches/huggingface"
 export HUGGINGFACE_HUB_CACHE="${HF_HOME}/hub"
+export TORCH_HOME
 export MODELSCOPE_CACHE="${SCRATCH_ROOT}/caches/modelscope"
 export U2NET_HOME="${SCRATCH_ROOT}/caches/rembg"
 export HF_HUB_DISABLE_PROGRESS_BARS=1
@@ -175,6 +240,10 @@ python "${NURSERY_ROOT}/scripts/run_interactmove_intermimic_embodiedgen_generati
     --gpt-config "${GPT_CONFIG}" \
     --background-catalog "${CATALOG_ROOT}/scene_list.txt" \
     --source-root "${SOURCE_ROOT}" \
+    --resume-layout "${RESUME_LAYOUT}" \
+    --resume-scene-tree "${RESUME_SCENE_TREE}" \
+    --resume-images "${RESUME_IMAGES}" \
+    --resume-receipt "${RESUME_RECEIPT}" \
     --output-dir "${GENERATED_ROOT}" \
     --receipt "${GENERATED_RECEIPT}"
 

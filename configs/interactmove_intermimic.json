@@ -84,9 +84,39 @@
     "openai_sdk_version": "3.1.0",
     "text_to_image_model": "stabilityai/stable-diffusion-3.5-medium",
     "text_to_image_backend": "sd35",
-    "image_to_3d_backend": "SAM3D",
-    "sam3d_model_repository": "facebook/sam-3d-objects",
-    "sam3d_model_commit": "2e73555018d2741ccd486e56c24fac41155a1dc6",
+    "image_to_3d_backend": "TRELLIS",
+    "trellis": {
+      "source_repository": "microsoft/TRELLIS",
+      "source_commit": "55a8e8164b195bbf927e0978f00e76c835e6011f",
+      "source_license": "MIT",
+      "checkpoint_repository": "microsoft/TRELLIS-image-large",
+      "checkpoint_revision": "25e0d31ffbebe4b5a97464dd851910efc3002d96",
+      "checkpoint_license": "MIT",
+      "dinov2_repository": "facebookresearch/dinov2",
+      "dinov2_commit": "7764ea0f912e53c92e82eb78a2a1631e92725fc8",
+      "dinov2_license": "Apache-2.0"
+    },
+    "sam3d_comparison": {
+      "repository": "facebook/sam-3d-objects",
+      "commit": "2e73555018d2741ccd486e56c24fac41155a1dc6",
+      "access_status": "pending_not_admitted",
+      "blocks_trellis_run": false
+    },
+    "resume_source": {
+      "job_id": "328320",
+      "generation_receipt_sha256": "f6d352776d94d52c849bfaa62443ccfaa337a3ec9168293d405c79b6b8cc05c3",
+      "scene_tree_sha256": "9e13a26bb74bbda2d35ee65e37fdba14d1876d0be59a5608df48725256782eb2",
+      "layout_draft_sha256": "f3a2125ffce069c251b4db636d5ec1d2da4397ed79414b0ab3b5b8a5caaf7c19",
+      "layout_recovery": "lossless_scene_tree_rerender_sha256_match",
+      "conditioning_images": {
+        "table": {
+          "prompt": "standalone rectangular wooden table with a clean empty tabletop and warm polished surface",
+          "accepted_retry_seed": 50494,
+          "image_sha256": "317b980184bba52c5acb92de0e69d7992ba01dec7746fe5711dca246a80367ef",
+          "raw_image_sha256": "21291ddb429eb8a31fc367a6e390f53033ffe8efff3a09ad89676ac3c6853cf2"
+        }
+      }
+    },
     "image_samples_per_prompt": 1,
     "text_guidance_scale": 7.0,
     "image_denoise_steps": 25,

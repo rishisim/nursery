@@ -56,11 +56,18 @@ def test_generation_protocol_is_real_robot_free_path() -> None:
     assert generation["gpt_reasoning_effort"] == "none"
     assert generation["openai_sdk_version"] == "3.1.0"
     assert generation["text_to_image_backend"] == "sd35"
-    assert generation["image_to_3d_backend"] == "SAM3D"
-    assert generation["sam3d_model_repository"] == "facebook/sam-3d-objects"
-    assert generation["sam3d_model_commit"] == (
-        "2e73555018d2741ccd486e56c24fac41155a1dc6"
+    assert generation["image_to_3d_backend"] == "TRELLIS"
+    assert generation["trellis"]["source_commit"] == (
+        "55a8e8164b195bbf927e0978f00e76c835e6011f"
     )
+    assert generation["trellis"]["checkpoint_revision"] == (
+        "25e0d31ffbebe4b5a97464dd851910efc3002d96"
+    )
+    assert generation["sam3d_comparison"]["access_status"] == (
+        "pending_not_admitted"
+    )
+    assert generation["sam3d_comparison"]["blocks_trellis_run"] is False
+    assert generation["resume_source"]["job_id"] == "328320"
     assert generation["invoke_upstream_sim_cli"] is False
     assert generation["robot_actor_loaded"] is False
     assert generation["background_dataset"][
@@ -234,6 +241,38 @@ def test_source_state_rejects_tracked_embodiedgen_changes(tmp_path: Path) -> Non
         text=True,
     ).stdout.strip()
     runner.EMBODIEDGEN_COMMIT = commit
+    trellis = source / "thirdparty" / "TRELLIS"
+    flexicubes = trellis / "trellis" / "representations" / "mesh" / "flexicubes"
+    for path, constant in (
+        (trellis, "TRELLIS_SOURCE_COMMIT"),
+        (flexicubes, "TRELLIS_FLEXICUBES_COMMIT"),
+    ):
+        path.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["git", "init", "-q", str(path)], check=True)
+        subprocess.run(
+            ["git", "-C", str(path), "config", "user.email", "test@example.com"],
+            check=True,
+        )
+        subprocess.run(
+            ["git", "-C", str(path), "config", "user.name", "Test User"],
+            check=True,
+        )
+        marker = path / "marker.txt"
+        marker.write_text("pinned\n", encoding="utf-8")
+        subprocess.run(["git", "-C", str(path), "add", "marker.txt"], check=True)
+        subprocess.run(
+            ["git", "-C", str(path), "commit", "-qm", "fixture"], check=True
+        )
+        setattr(
+            runner,
+            constant,
+            subprocess.run(
+                ["git", "-C", str(path), "rev-parse", "HEAD"],
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip(),
+        )
 
     assert runner._source_state(source)["tracked_files_clean"] is True
     tracked.write_text("clean = False\n", encoding="utf-8")
@@ -251,6 +290,61 @@ def test_generation_help_states_actual_and_deferred_boundaries() -> None:
 
     assert "GPT layout" in help_text
     assert "SD3.5" in help_text
-    assert "SAM3D" in help_text
+    assert "TRELLIS" in help_text
     assert "never calls sim_cli" in help_text
     assert "never loads a robot actor" in help_text
+
+
+def test_resume_conditioning_image_is_hash_preserving(tmp_path: Path) -> None:
+    runner = _load_runner()
+    source_image = tmp_path / "source.png"
+    source_raw = tmp_path / "source_raw.png"
+    source_image.write_bytes(b"accepted-image")
+    source_raw.write_bytes(b"accepted-raw-image")
+    original_calls = []
+
+    def original(*args, **kwargs):
+        original_calls.append((args, kwargs))
+        return False
+
+    module = SimpleNamespace(text_to_image=original)
+    reused = runner._install_resume_conditioning_images(
+        module,
+        {
+            "table": {
+                "prompt": "frozen table prompt",
+                "image_path": source_image,
+                "raw_image_path": source_raw,
+            }
+        },
+        initial_image_seed=2026081501,
+    )
+    destination = tmp_path / "output" / "table.png"
+    destination.parent.mkdir()
+
+    assert module.text_to_image(
+        "frozen table prompt",
+        str(destination),
+        4,
+        25,
+        7.0,
+        1,
+        seed=2026081501,
+    ) is True
+    assert destination.read_bytes() == source_image.read_bytes()
+    assert destination.with_name("table_raw.png").read_bytes() == (
+        source_raw.read_bytes()
+    )
+    assert reused == {"table"}
+    assert original_calls == []
+
+    assert module.text_to_image(
+        "another prompt",
+        str(tmp_path / "output" / "mug.png"),
+        4,
+        25,
+        7.0,
+        1,
+        seed=2026081501,
+    ) is False
+    assert len(original_calls) == 1
