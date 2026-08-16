@@ -78,6 +78,35 @@
       "scene_id": "scene_0010",
       "retrieval_is_fresh_background_generation": false
     },
+    "room_completion": {
+      "status": "required_before_interactmove",
+      "generation_stage": "EmbodiedGenV2 panorama plus Pano2Mesh",
+      "room_prompt": "Simple empty dining room interior with warm neutral walls, a level wood floor, visible corners and four walls, and no furniture or loose objects; designed as context for the activity: Pick up the red mug from the table, bring it to your mouth, and place it back on the table.",
+      "seed_source": "activity.seeds.embodiedgen_image",
+      "seed": 2026081501,
+      "reference_mesh": {
+        "path": "background/mesh_model.ply",
+        "frame": "world",
+        "units": "m",
+        "purpose": [
+          "interactmove_pointcloud",
+          "raster_render"
+        ]
+      },
+      "collision_policy": {
+        "floor": "explicit SceneBundle z=0 plane",
+        "walls": "separate authored mesh derived from the validated room envelope",
+        "reference_mesh_is_collision": false
+      },
+      "render_mode": "raster_reference_mesh",
+      "required_gates": [
+        "visual_background_ready",
+        "reference_mesh_ready",
+        "room_collision_ready",
+        "complete_scene_ready",
+        "interactmove_scene_input_ready"
+      ]
+    },
     "gpt_api": "responses",
     "gpt_model": "gpt-5.6-luna",
     "gpt_reasoning_effort": "none",

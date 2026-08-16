@@ -218,7 +218,76 @@ def _write_canary(tmp_path: Path, *, collision: bool = True) -> Path:
     (root / "layout.json").write_text(json.dumps(_layout()), encoding="utf-8")
     background = root / "background"
     background.mkdir()
-    (background / "mesh_model.ply").write_bytes(b"ply\ncanary\n")
+    room_vertices = [
+        (-4, -4, 0), (4, -4, 0), (4, 4, 0), (-4, 4, 0),
+        (-4, -4, 3), (4, -4, 3), (4, 4, 3), (-4, 4, 3),
+    ]
+    room_faces = [
+        (0, 1, 2), (0, 2, 3), (4, 6, 5), (4, 7, 6),
+        (0, 4, 5), (0, 5, 1), (1, 5, 6), (1, 6, 2),
+        (2, 6, 7), (2, 7, 3), (3, 7, 4), (3, 4, 0),
+    ]
+    ply = [
+        "ply", "format ascii 1.0", "element vertex 8",
+        "property float x", "property float y", "property float z",
+        "element face 12", "property list uchar int vertex_indices", "end_header",
+    ]
+    ply.extend(" ".join(str(value) for value in vertex) for vertex in room_vertices)
+    ply.extend("3 " + " ".join(str(value) for value in face) for face in room_faces)
+    (background / "mesh_model.ply").write_text("\n".join(ply) + "\n", encoding="ascii")
+    collision_root = background / "collision"
+    collision_root.mkdir()
+    obj = [
+        *("v " + " ".join(str(value) for value in vertex) for vertex in room_vertices),
+        *("f " + " ".join(str(index + 1) for index in face) for face in room_faces),
+    ]
+    (collision_root / "walls.obj").write_text("\n".join(obj) + "\n", encoding="utf-8")
+    (background / "source_inventory.json").write_bytes(b"{}\n")
+    (background / "environment_geometry.json").write_text(
+        json.dumps(
+            {
+                "schema": "InteractMoveEnvironmentGeometry",
+                "schema_version": 1,
+                "native_profile": "embodiedgen-v2.0.1-sapien-rh-zup-m-xyzw",
+                "reference_mesh": {
+                    "path": "mesh_model.ply",
+                    "frame": "world",
+                    "units": "m",
+                    "scale_xyz": [1.0, 1.0, 1.0],
+                    "purposes": ["interactmove_pointcloud", "raster_render"],
+                },
+                "collision_geometry": [
+                    {
+                        "collision_id": "floor",
+                        "role": "floor",
+                        "geometry_type": "plane",
+                        "frame": "world",
+                        "z_m": 0.0,
+                        "normal": [0.0, 0.0, 1.0],
+                    },
+                    {
+                        "collision_id": "walls",
+                        "role": "walls",
+                        "geometry_type": "mesh",
+                        "frame": "world",
+                        "path": "collision/walls.obj",
+                        "units": "m",
+                        "scale_xyz": [1.0, 1.0, 1.0],
+                    },
+                ],
+                "render_mode": "raster_reference_mesh",
+                "provenance": {
+                    "source": "EmbodiedGenV2 canary",
+                    "embodiedgen_commit": UPSTREAM_COMMIT,
+                    "source_job_id": "pytest-canary",
+                    "source_artifact_path": "source_inventory.json",
+                    "source_artifact_sha256": hashlib.sha256(b"{}\n").hexdigest(),
+                    "creation_method": "inline deterministic room fixture",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
     for directory, name in (
         ("asset3d/table/result", "table"),
         ("asset3d/blue_bowl/result", "blue_bowl"),
@@ -379,8 +448,11 @@ def test_manifest_physics_capabilities_and_request_binding(tmp_path: Path) -> No
     assert bundle["capabilities"]["interactmove_scene_input_ready"] is True
     assert bundle["capabilities"]["target_category_exact_match"] is True
     assert bundle["capabilities"]["floor_contact_ready"] is True
-    assert bundle["capabilities"]["room_collision_ready"] is False
-    assert bundle["environment"]["background_geometry_role"] == "render_and_reference_only_not_collision"
+    assert bundle["capabilities"]["room_collision_ready"] is True
+    assert bundle["capabilities"]["visual_background_ready"] is True
+    assert bundle["capabilities"]["complete_scene_ready"] is True
+    assert bundle["environment"]["background_geometry_role"] == "validated_render_reference_with_explicit_collision"
+    assert bundle["validation"]["mesh_content_validation_performed"] is True
     assert bundle["settling"] == {"status": "not_run", "receipt": None}
 
 
@@ -388,6 +460,7 @@ def test_gaussian_only_official_background_is_lossless_but_not_pointcloud_ready(
     tmp_path: Path,
 ) -> None:
     root = _write_canary(tmp_path)
+    (root / "background" / "environment_geometry.json").unlink()
     (root / "background" / "mesh_model.ply").unlink()
     (root / "background" / "gs_model.ply").write_bytes(b"ply\ngaussian-canary\n")
     spec = _activity_spec()
@@ -408,10 +481,48 @@ def test_gaussian_only_official_background_is_lossless_but_not_pointcloud_ready(
 
 def test_background_requires_mesh_or_gaussian_representation(tmp_path: Path) -> None:
     root = _write_canary(tmp_path)
+    (root / "background" / "environment_geometry.json").unlink()
     (root / "background" / "mesh_model.ply").unlink()
     spec = _activity_spec()
 
     with pytest.raises(ContractError, match="at least one"):
+        _compile(root, spec, request=_request(spec))
+
+
+def test_unmanifested_reference_mesh_remains_fail_closed(tmp_path: Path) -> None:
+    root = _write_canary(tmp_path)
+    (root / "background" / "environment_geometry.json").unlink()
+    spec = _activity_spec()
+
+    bundle = _compile(root, spec, request=_request(spec))
+
+    assert bundle["environment"]["reference_mesh"] == "background/mesh_model.ply"
+    assert bundle["capabilities"]["reference_mesh_ready"] is False
+    assert bundle["capabilities"]["room_collision_ready"] is False
+    assert bundle["capabilities"]["interactmove_scene_input_ready"] is False
+    assert "environment:background_geometry_manifest_not_ready" in bundle["capabilities"]["blockers"]
+
+
+def test_environment_manifest_requires_explicit_walls_collision(tmp_path: Path) -> None:
+    root = _write_canary(tmp_path)
+    manifest_path = root / "background" / "environment_geometry.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["collision_geometry"] = manifest["collision_geometry"][:1]
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    spec = _activity_spec()
+
+    with pytest.raises(ContractError, match="floor plane and at least one walls"):
+        _compile(root, spec, request=_request(spec))
+
+
+def test_environment_reference_mesh_rejects_nonfinite_vertex(tmp_path: Path) -> None:
+    root = _write_canary(tmp_path)
+    mesh_path = root / "background" / "mesh_model.ply"
+    text = mesh_path.read_text(encoding="ascii").replace("-4 -4 0", "nan -4 0", 1)
+    mesh_path.write_text(text, encoding="ascii")
+    spec = _activity_spec()
+
+    with pytest.raises(ContractError, match="non-finite vertices"):
         _compile(root, spec, request=_request(spec))
 
 

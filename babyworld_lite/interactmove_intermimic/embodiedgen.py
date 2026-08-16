@@ -36,6 +36,7 @@ from .common import (
     sha256_file,
     transform_matrix,
 )
+from .environment import load_environment_geometry, validate_environment_envelope
 
 
 SCENE_BUNDLE_SCHEMA = "InteractMoveInterMimicSceneBundle"
@@ -1051,6 +1052,16 @@ def compile_scene_bundle(
     background_relative = PurePosixPath(
         require_nonempty_string(assets_map[background_node], where="background asset")
     )
+    environment_geometry = load_environment_geometry(
+        root, background_relative, native_profile, files.add
+    )
+    if environment_geometry is not None and (
+        poses[background_node]["translation_m"] != [0.0, 0.0, 0.0]
+        or poses[background_node]["rotation_xyzw"] != [0.0, 0.0, 0.0, 1.0]
+    ):
+        raise ContractError(
+            "world-frame environment geometry requires an identity background layout pose"
+        )
     reference_record = None
     reference_relative = (background_relative / "mesh_model.ply").as_posix()
     reference_candidate = root.joinpath(*PurePosixPath(reference_relative).parts)
@@ -1079,6 +1090,9 @@ def compile_scene_bundle(
     bg_hashes = (
         [] if reference_record is None else [reference_record["sha256"]]
     ) + ([] if gs_record is None else [gs_record["sha256"]])
+    if environment_geometry is not None:
+        bg_hashes.extend(environment_geometry["consumed_file_sha256"])
+    bg_hashes = sorted(set(bg_hashes))
     background_asset_id = "asset_" + content_sha256(sorted(bg_hashes))[:24]
     asset_records[background_asset_id] = {
         "asset_id": background_asset_id,
@@ -1092,8 +1106,9 @@ def compile_scene_bundle(
         ),
         "gaussian_model": None if gs_record is None else gs_record["path"],
         "gaussian_model_sha256": None if gs_record is None else gs_record["sha256"],
-        "collision_ready": False,
-        "consumed_file_sha256": sorted(bg_hashes),
+        "environment_geometry": copy.deepcopy(environment_geometry),
+        "collision_ready": environment_geometry is not None,
+        "consumed_file_sha256": bg_hashes,
     }
     node_assets[background_node] = background_asset_id
 
@@ -1157,7 +1172,16 @@ def compile_scene_bundle(
                 "geometry_world_transforms": geometry_world_transforms,
             }
         )
-    if reference_record is not None:
+    if environment_geometry is not None:
+        validate_environment_envelope(
+            environment_geometry,
+            {
+                node: poses[node]["translation_m"]
+                for node in physical_nodes
+                if node != background_node
+            },
+        )
+    if reference_record is not None and environment_geometry is None:
         warnings.append(
             "background mesh_model.ply is reference/render geometry, not "
             "validated collision geometry"
@@ -1167,10 +1191,19 @@ def compile_scene_bundle(
             physics_blockers
             + target_blockers
             + scene_conversion_blockers
-            + ["environment:background_room_collision_not_ready"]
+            + (
+                ["environment:background_room_collision_not_ready"]
+                if environment_geometry is None
+                else []
+            )
+            + (
+                ["environment:background_geometry_manifest_not_ready"]
+                if environment_geometry is None
+                else []
+            )
             + (
                 ["environment:background_reference_mesh_not_ready"]
-                if reference_record is None
+                if environment_geometry is None
                 else []
             )
             + ([] if request_sha256 is not None else ["embodiedgen_request_not_bound"])
@@ -1210,7 +1243,29 @@ def compile_scene_bundle(
             ),
             "gaussian_model": None if gs_record is None else gs_record["path"],
             "ground_plane": {"z_m": 0.0, "provenance": "nursery_frozen_scene_policy"},
-            "background_geometry_role": "render_and_reference_only_not_collision",
+            "geometry_manifest": (
+                None if environment_geometry is None else environment_geometry["manifest"]
+            ),
+            "reference_mesh_report": (
+                None
+                if environment_geometry is None
+                else copy.deepcopy(environment_geometry["reference_mesh"])
+            ),
+            "collision_geometry": (
+                []
+                if environment_geometry is None
+                else copy.deepcopy(environment_geometry["collision_geometry"])
+            ),
+            "render_mode": (
+                "unvalidated_native_representation"
+                if environment_geometry is None
+                else environment_geometry["render_mode"]
+            ),
+            "background_geometry_role": (
+                "render_and_reference_only_not_collision"
+                if environment_geometry is None
+                else "validated_render_reference_with_explicit_collision"
+            ),
         },
         "target_request": copy.deepcopy(activity_spec["target_request"]),
         "target_resolution_receipt": receipt,
@@ -1220,22 +1275,31 @@ def compile_scene_bundle(
                 request_sha256 is not None
                 and target_category_match
                 and not scene_conversion_blockers
-                and reference_record is not None
+                and environment_geometry is not None
             ),
             "target_category_exact_match": target_category_match,
             "physics_material_complete": physics_complete,
             "dynamic_settle_ready": physics_complete and request_sha256 is not None,
             "gaussian_render_ready": gs_record is not None,
-            "reference_mesh_ready": reference_record is not None,
+            "reference_mesh_ready": environment_geometry is not None,
             "floor_contact_ready": True,
-            "room_collision_ready": False,
+            "room_collision_ready": environment_geometry is not None,
+            "visual_background_ready": environment_geometry is not None,
+            "complete_scene_ready": environment_geometry is not None,
             "blockers": blockers,
         },
         "validation": {
             "offline_conversion": "passed",
             "warnings": sorted(set(warnings)),
-            "deferred_simulator_checks": sorted(deferred),
-            "mesh_content_validation_performed": False,
+            "deferred_simulator_checks": sorted(
+                item
+                for item in deferred
+                if not (
+                    environment_geometry is not None
+                    and item == "background_room_collision_readiness"
+                )
+            ),
+            "mesh_content_validation_performed": environment_geometry is not None,
             "humanoid_accessibility_check_performed": False,
         },
         "settling": {"status": "not_run", "receipt": None},
@@ -1348,6 +1412,190 @@ def _validate_local_origin(value: Any, *, where: str) -> Mapping[str, Any]:
         raise ContractError(f"{where}.used_urdf_default must be Boolean")
     require_nonempty_string(origin["source_pointer"], where=f"{where}.source_pointer")
     return origin
+
+
+def _validate_mesh_report(
+    value: Any,
+    *,
+    where: str,
+    file_by_path: Mapping[str, Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    report = require_mapping(value, where=where)
+    require_exact_keys(
+        report,
+        required={
+            "path",
+            "format",
+            "vertex_count",
+            "face_count",
+            "scale_xyz",
+            "aabb_min_m",
+            "aabb_max_m",
+            "extents_m",
+            "finite_vertices",
+            "sha256",
+        },
+        where=where,
+    )
+    path = require_nonempty_string(report["path"], where=f"{where}.path")
+    if path not in file_by_path or report["sha256"] != file_by_path[path]["sha256"]:
+        raise ContractError(f"{where} is not bound to the file manifest")
+    if report["format"] not in {"obj", "ply"}:
+        raise ContractError(f"{where}.format must be obj or ply")
+    for key, minimum in (("vertex_count", 4), ("face_count", 2)):
+        value_count = report[key]
+        if isinstance(value_count, bool) or not isinstance(value_count, int) or value_count < minimum:
+            raise ContractError(f"{where}.{key} must be an integer >= {minimum}")
+    require_vector(report["scale_xyz"], length=3, positive=True, where=f"{where}.scale_xyz")
+    minimum_xyz = require_vector(report["aabb_min_m"], length=3, where=f"{where}.aabb_min_m")
+    maximum_xyz = require_vector(report["aabb_max_m"], length=3, where=f"{where}.aabb_max_m")
+    extents = require_vector(report["extents_m"], length=3, positive=True, where=f"{where}.extents_m")
+    expected_extents = [maximum_xyz[index] - minimum_xyz[index] for index in range(3)]
+    if any(not math.isclose(extents[index], expected_extents[index], abs_tol=1e-12) for index in range(3)):
+        raise ContractError(f"{where}.extents_m disagrees with its AABB")
+    if report["finite_vertices"] is not True:
+        raise ContractError(f"{where} must attest finite vertices")
+    return report
+
+
+def _validate_serialized_environment_geometry(
+    value: Any,
+    *,
+    file_by_path: Mapping[str, Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    geometry = require_mapping(value, where="background environment_geometry")
+    require_exact_keys(
+        geometry,
+        required={
+            "manifest",
+            "manifest_sha256",
+            "render_mode",
+            "reference_mesh",
+            "collision_geometry",
+            "provenance",
+            "consumed_file_sha256",
+        },
+        where="background environment_geometry",
+    )
+    manifest = require_nonempty_string(geometry["manifest"], where="environment manifest")
+    if manifest not in file_by_path or geometry["manifest_sha256"] != file_by_path[manifest]["sha256"]:
+        raise ContractError("environment manifest is not bound to the file manifest")
+    if geometry["render_mode"] != "raster_reference_mesh":
+        raise ContractError("environment render mode is invalid")
+    reference = _validate_mesh_report(
+        geometry["reference_mesh"],
+        where="environment reference mesh",
+        file_by_path=file_by_path,
+    )
+    horizontal = sorted(reference["extents_m"][:2])
+    if horizontal[0] < 2.0 or horizontal[1] > 30.0:
+        raise ContractError("environment reference mesh horizontal scale is invalid")
+    if not 1.8 <= reference["extents_m"][2] <= 10.0:
+        raise ContractError("environment reference mesh height is invalid")
+    if abs(reference["aabb_min_m"][2]) > 0.10:
+        raise ContractError("environment reference mesh floor height is invalid")
+    collisions = geometry["collision_geometry"]
+    if not isinstance(collisions, list) or not collisions:
+        raise ContractError("environment collision_geometry must be a non-empty array")
+    collision_ids: set[str] = set()
+    floor_count = 0
+    walls_count = 0
+    expected_consumed = {geometry["manifest_sha256"], reference["sha256"]}
+    for index, raw in enumerate(collisions):
+        item = require_mapping(raw, where=f"environment collision_geometry[{index}]")
+        collision_id = require_nonempty_string(
+            item.get("collision_id"), where=f"environment collision_geometry[{index}].collision_id"
+        )
+        if collision_id in collision_ids:
+            raise ContractError("environment collision IDs must be unique")
+        collision_ids.add(collision_id)
+        kind = item.get("geometry_type")
+        if kind == "plane":
+            require_exact_keys(
+                item,
+                required={"collision_id", "role", "geometry_type", "frame", "z_m", "normal"},
+                where=f"environment collision_geometry[{index}]",
+            )
+            if item["role"] != "floor" or item["frame"] != "world":
+                raise ContractError("environment floor collision labels are invalid")
+            if require_finite_number(item["z_m"], where="environment floor z_m") != 0.0:
+                raise ContractError("environment floor collision must be at z=0")
+            if require_vector(item["normal"], length=3, where="environment floor normal") != [0.0, 0.0, 1.0]:
+                raise ContractError("environment floor collision must have +Z normal")
+            floor_count += 1
+        elif kind == "mesh":
+            require_exact_keys(
+                item,
+                required={"collision_id", "role", "geometry_type", "frame", "units", "mesh"},
+                where=f"environment collision_geometry[{index}]",
+            )
+            if item["role"] not in {"walls", "environment_structure"} or item["frame"] != "world" or item["units"] != "m":
+                raise ContractError("environment collision mesh labels are invalid")
+            mesh = _validate_mesh_report(
+                item["mesh"],
+                where=f"environment collision_geometry[{index}].mesh",
+                file_by_path=file_by_path,
+            )
+            if mesh["path"] == reference["path"]:
+                raise ContractError("environment reference mesh cannot be collision by implication")
+            expected_consumed.add(mesh["sha256"])
+            if item["role"] == "walls":
+                walls_count += 1
+                if min(mesh["extents_m"][:2]) < 2.0 or mesh["extents_m"][2] < 1.8:
+                    raise ContractError("environment walls collision is not room-scale")
+        else:
+            raise ContractError("environment collision geometry type is invalid")
+    if floor_count != 1 or walls_count < 1:
+        raise ContractError("environment requires one floor and at least one walls collision")
+    provenance = require_mapping(geometry["provenance"], where="environment provenance")
+    source_artifact_digest = _require_sha256(
+        provenance.get("source_artifact_sha256"),
+        where="environment provenance.source_artifact_sha256",
+    )
+    expected_consumed.add(source_artifact_digest)
+    consumed = geometry["consumed_file_sha256"]
+    if consumed != sorted(expected_consumed):
+        raise ContractError("environment consumed hashes disagree with serialized geometry")
+    require_exact_keys(
+        provenance,
+        required={
+            "source",
+            "embodiedgen_commit",
+            "source_job_id",
+            "source_artifact_path",
+            "source_artifact_sha256",
+            "creation_method",
+        },
+        where="environment provenance",
+    )
+    for key in ("source", "embodiedgen_commit", "source_job_id", "creation_method"):
+        require_nonempty_string(provenance[key], where=f"environment provenance.{key}")
+    if provenance["embodiedgen_commit"] != EMBODIEDGEN_UPSTREAM_COMMIT:
+        raise ContractError("environment provenance EmbodiedGen commit mismatch")
+    _require_sha256(
+        provenance["source_artifact_sha256"],
+        where="environment provenance.source_artifact_sha256",
+    )
+    source_artifact_path = require_nonempty_string(
+        provenance["source_artifact_path"],
+        where="environment provenance.source_artifact_path",
+    )
+    source_artifact_pure = PurePosixPath(source_artifact_path)
+    if (
+        source_artifact_pure.is_absolute()
+        or source_artifact_pure.as_posix() != source_artifact_path
+        or any(part in {"", ".", ".."} for part in source_artifact_pure.parts)
+    ):
+        raise ContractError("environment provenance source_artifact_path is unsafe")
+    manifest_parent = PurePosixPath(manifest).parent
+    expected_source_path = (manifest_parent / source_artifact_pure).as_posix()
+    if (
+        expected_source_path not in file_by_path
+        or file_by_path[expected_source_path]["sha256"]
+        != provenance["source_artifact_sha256"]
+    ):
+        raise ContractError("environment provenance source artifact is not file-bound")
+    return geometry
 
 
 def validate_scene_bundle(value: Mapping[str, Any]) -> None:
@@ -1493,6 +1741,7 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
                     "reference_mesh_sha256",
                     "gaussian_model",
                     "gaussian_model_sha256",
+                    "environment_geometry",
                     "collision_ready",
                     "consumed_file_sha256",
                 },
@@ -1521,8 +1770,30 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
                 raise ContractError(
                     f"asset {asset_id} has no background render representation"
                 )
-            if asset["collision_ready"] is not False:
-                raise ContractError("background reference geometry cannot claim collision readiness")
+            environment_geometry = asset["environment_geometry"]
+            if environment_geometry is None:
+                if asset["collision_ready"] is not False:
+                    raise ContractError(
+                        "background cannot claim collision readiness without an explicit manifest"
+                    )
+            else:
+                _validate_serialized_environment_geometry(
+                    environment_geometry, file_by_path=file_by_path
+                )
+                if asset["collision_ready"] is not True:
+                    raise ContractError(
+                        "validated explicit room collision must set collision_ready"
+                    )
+                if environment_geometry["reference_mesh"]["path"] != reference:
+                    raise ContractError(
+                        "background reference mesh disagrees with environment geometry"
+                    )
+                if not set(environment_geometry["consumed_file_sha256"]).issubset(
+                    set(consumed)
+                ):
+                    raise ContractError(
+                        "background consumed hashes omit environment geometry"
+                    )
             require_nonempty_string(
                 asset["source_node_key"],
                 where=f"asset {asset_id}.source_node_key",
@@ -2050,6 +2321,10 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
             "reference_mesh",
             "gaussian_model",
             "ground_plane",
+            "geometry_manifest",
+            "reference_mesh_report",
+            "collision_geometry",
+            "render_mode",
             "background_geometry_role",
         },
         where="environment",
@@ -2060,14 +2335,50 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
     background_asset = assets[by_id[background_id]["asset_id"]]
     if environment["reference_mesh"] != background_asset["reference_mesh"] or environment["gaussian_model"] != background_asset["gaussian_model"]:
         raise ContractError("environment render files disagree with the background asset")
+    serialized_geometry = background_asset["environment_geometry"]
+    if serialized_geometry is None:
+        if (
+            environment["geometry_manifest"] is not None
+            or environment["reference_mesh_report"] is not None
+            or environment["collision_geometry"] != []
+            or environment["render_mode"] != "unvalidated_native_representation"
+        ):
+            raise ContractError("environment claims geometry absent from the background asset")
+    else:
+        if (
+            environment["geometry_manifest"] != serialized_geometry["manifest"]
+            or environment["reference_mesh_report"] != serialized_geometry["reference_mesh"]
+            or environment["collision_geometry"] != serialized_geometry["collision_geometry"]
+            or environment["render_mode"] != serialized_geometry["render_mode"]
+        ):
+            raise ContractError("environment geometry disagrees with the background asset")
+        background_pose = by_id[background_id]["initial_pose_world"]
+        if (
+            background_pose["translation_m"] != [0.0, 0.0, 0.0]
+            or background_pose["rotation_xyzw"] != [0.0, 0.0, 0.0, 1.0]
+        ):
+            raise ContractError("world-frame environment geometry requires identity background pose")
+        validate_environment_envelope(
+            serialized_geometry,
+            {
+                item["source_node_key"]: item["initial_pose_world"]["translation_m"]
+                for item in instances
+                if item["instance_id"] != background_id
+            },
+        )
     ground = require_mapping(environment["ground_plane"], where="environment.ground_plane")
     require_exact_keys(
         ground, required={"z_m", "provenance"}, where="environment.ground_plane"
     )
     if require_finite_number(ground["z_m"], where="environment.ground_plane.z_m") != 0.0 or ground["provenance"] != "nursery_frozen_scene_policy":
         raise ContractError("environment ground plane does not match the frozen policy")
-    if environment["background_geometry_role"] != "render_and_reference_only_not_collision":
-        raise ContractError("background geometry cannot be promoted to collision implicitly")
+    expected_geometry_role = (
+        "render_and_reference_only_not_collision"
+        if serialized_geometry is None
+        else "validated_render_reference_with_explicit_collision"
+    )
+    if environment["background_geometry_role"] != expected_geometry_role:
+        raise ContractError("background geometry role disagrees with explicit environment state")
     request_hash = activity.get("embodiedgen_request_sha256")
     if request_hash != source.get("embodiedgen_request_sha256"):
         raise ContractError("EmbodiedGen request bindings disagree")
@@ -2083,6 +2394,8 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
             "reference_mesh_ready",
             "floor_contact_ready",
             "room_collision_ready",
+            "visual_background_ready",
+            "complete_scene_ready",
             "blockers",
         },
         where="capabilities",
@@ -2096,6 +2409,8 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
         "reference_mesh_ready",
         "floor_contact_ready",
         "room_collision_ready",
+        "visual_background_ready",
+        "complete_scene_ready",
     ):
         if not isinstance(capabilities[key], bool):
             raise ContractError(f"capabilities.{key} must be Boolean")
@@ -2103,14 +2418,17 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
         environment["gaussian_model"] is not None
     ):
         raise ContractError("gaussian_render_ready disagrees with the environment")
-    if capabilities["reference_mesh_ready"] is not (
-        environment["reference_mesh"] is not None
-    ):
+    environment_ready = serialized_geometry is not None
+    if capabilities["reference_mesh_ready"] is not environment_ready:
         raise ContractError("reference_mesh_ready disagrees with the environment")
     if capabilities["floor_contact_ready"] is not True:
         raise ContractError("base SceneBundle floor capability is invalid")
-    if capabilities["room_collision_ready"] is not False:
-        raise ContractError("base SceneBundle cannot claim room collision readiness")
+    if capabilities["room_collision_ready"] is not environment_ready:
+        raise ContractError("room_collision_ready disagrees with explicit collision state")
+    if capabilities["visual_background_ready"] is not environment_ready:
+        raise ContractError("visual_background_ready disagrees with the environment")
+    if capabilities["complete_scene_ready"] is not environment_ready:
+        raise ContractError("complete_scene_ready disagrees with the environment")
     blockers = capabilities["blockers"]
     if not isinstance(blockers, list) or blockers != sorted(set(blockers)):
         raise ContractError("capability blockers must be sorted and unique")
@@ -2118,12 +2436,14 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
         not isinstance(request_hash, str) or _SHA256.fullmatch(request_hash) is None
     ):
         raise ContractError("EmbodiedGen request hash is invalid")
-    expected_blockers = {"environment:background_room_collision_not_ready"}
+    expected_blockers: set[str] = set()
     expected_physics_blockers: set[str] = set()
     expected_articulation_blockers: set[str] = set()
     if request_hash is None:
         expected_blockers.add("embodiedgen_request_not_bound")
-    if environment["reference_mesh"] is None:
+    if not environment_ready:
+        expected_blockers.add("environment:background_room_collision_not_ready")
+        expected_blockers.add("environment:background_geometry_manifest_not_ready")
         expected_blockers.add("environment:background_reference_mesh_not_ready")
     if receipt["source_category"] is None:
         expected_blockers.add("target:source_category_missing")
@@ -2177,7 +2497,7 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
         request_hash is not None
         and category_match
         and not expected_articulation_blockers
-        and environment["reference_mesh"] is not None
+        and environment_ready
     )
     if capabilities.get("interactmove_scene_input_ready") is not expected_interactmove_ready:
         raise ContractError("interactmove_scene_input_ready is inconsistent")
@@ -2239,8 +2559,15 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
             or any(not isinstance(item, str) or not item for item in items)
         ):
             raise ContractError(f"validation.{key} must be sorted and unique")
-    if validation["mesh_content_validation_performed"] is not False:
-        raise ContractError("base SceneBundle cannot claim mesh-content validation")
+    if validation["mesh_content_validation_performed"] is not environment_ready:
+        raise ContractError(
+            "mesh_content_validation_performed disagrees with explicit environment geometry"
+        )
+    room_deferred = "background_room_collision_readiness" in validation[
+        "deferred_simulator_checks"
+    ]
+    if room_deferred is environment_ready:
+        raise ContractError("background room collision deferral is inconsistent")
     if validation.get("humanoid_accessibility_check_performed") is not False:
         raise ContractError("the contract forbids a humanoid accessibility gate")
     settling = require_mapping(bundle["settling"], where="settling")

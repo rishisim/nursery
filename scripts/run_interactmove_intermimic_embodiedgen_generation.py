@@ -468,6 +468,7 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
     required = {
         "activity_spec",
         "background_dataset",
+        "room_completion",
         "gpt_api",
         "gpt_model",
         "gpt_reasoning_effort",

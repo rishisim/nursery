@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import subprocess
 from typing import Any, Sequence
+from xml.sax.saxutils import escape
 
 
 EMBODIEDGEN_COMMIT = "9b333554254af196bace88c1a171a3bf047fa09c"
@@ -101,6 +102,102 @@ def _version(module: Any) -> str | None:
     return None if value is None else str(value)
 
 
+def _verify_scene_bundle_files(scene_root: Path, scene_bundle: dict[str, Any]) -> None:
+    root = scene_root.resolve(strict=True)
+    for record in scene_bundle["files"]:
+        relative = Path(*record["path"].split("/"))
+        candidate = root / relative
+        current = root
+        for part in relative.parts:
+            current = current / part
+            if current.is_symlink():
+                raise ValueError(f"SceneBundle file has a symlink component: {record['path']}")
+        resolved = candidate.resolve(strict=True)
+        if root not in resolved.parents or not resolved.is_file():
+            raise ValueError(f"SceneBundle file escapes the scene root: {record['path']}")
+        if resolved.stat().st_size != record["bytes"] or _sha256(resolved) != record["sha256"]:
+            raise ValueError(f"SceneBundle file hash/size mismatch: {record['path']}")
+
+
+def _write_environment_urdf(
+    output_dir: Path,
+    scene_root: Path,
+    scene_bundle: dict[str, Any],
+) -> tuple[Path, dict[str, Any]]:
+    environment = scene_bundle["environment"]
+    if environment["render_mode"] != "raster_reference_mesh":
+        raise ValueError("SceneBundle does not declare a raster room render")
+    reference = environment["reference_mesh_report"]
+    if reference is None:
+        raise ValueError("SceneBundle lacks a validated room reference mesh")
+    visual_path = (scene_root / Path(*reference["path"].split("/"))).resolve(strict=True)
+    visual_scale = " ".join(str(value) for value in reference["scale_xyz"])
+    collision_xml: list[str] = []
+    collision_meshes: list[dict[str, Any]] = []
+    floor_declared = False
+    for collision in environment["collision_geometry"]:
+        if collision["geometry_type"] == "plane":
+            floor_declared = collision["role"] == "floor" and collision["z_m"] == 0.0
+            continue
+        mesh = collision["mesh"]
+        path = (scene_root / Path(*mesh["path"].split("/"))).resolve(strict=True)
+        scale = " ".join(str(value) for value in mesh["scale_xyz"])
+        collision_xml.append(
+            "<collision name=\"{}\"><geometry><mesh filename=\"{}\" scale=\"{}\"/>"
+            "</geometry></collision>".format(
+                escape(collision["collision_id"]), escape(str(path)), escape(scale)
+            )
+        )
+        collision_meshes.append(
+            {
+                "collision_id": collision["collision_id"],
+                "role": collision["role"],
+                "path": mesh["path"],
+                "sha256": mesh["sha256"],
+            }
+        )
+    if not floor_declared or not any(item["role"] == "walls" for item in collision_meshes):
+        raise ValueError("SceneBundle lacks explicit floor and walls collision")
+    urdf = (
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+        "<robot name=\"nursery_room\"><link name=\"room\">"
+        f"<visual name=\"room_reference\"><geometry><mesh filename=\"{escape(str(visual_path))}\" "
+        f"scale=\"{escape(visual_scale)}\"/></geometry></visual>"
+        + "".join(collision_xml)
+        + "</link></robot>\n"
+    )
+    urdf_path = output_dir / "environment_runtime.urdf"
+    urdf_path.write_text(urdf, encoding="utf-8")
+    return urdf_path, {
+        "visual_reference": {
+            "path": reference["path"],
+            "sha256": reference["sha256"],
+        },
+        "floor_collision": "SAPIEN z=0 ground plane bound to explicit SceneBundle plane",
+        "collision_meshes": collision_meshes,
+    }
+
+
+def _contact_metrics(scene: Any) -> dict[str, Any]:
+    if not hasattr(scene, "get_contacts"):
+        raise RuntimeError("SAPIEN scene does not expose contact inspection")
+    contacts = scene.get_contacts()
+    point_count = 0
+    max_penetration = 0.0
+    for contact in contacts:
+        for point in getattr(contact, "points", []):
+            separation = float(point.separation)
+            if not math.isfinite(separation):
+                raise RuntimeError("SAPIEN contact separation is non-finite")
+            point_count += 1
+            max_penetration = max(max_penetration, max(0.0, -separation))
+    return {
+        "contact_pair_count": len(contacts),
+        "contact_point_count": point_count,
+        "max_penetration_m": max_penetration,
+    }
+
+
 def run(args: argparse.Namespace) -> dict[str, Any]:
     import imageio.v2 as imageio
     import numpy as np
@@ -149,6 +246,15 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         validate_scene_bundle(scene_bundle)
         if scene_bundle["source"]["layout"]["sha256"] != _sha256(layout_path):
             raise ValueError("SceneBundle layout hash mismatch")
+        for capability in (
+            "visual_background_ready",
+            "room_collision_ready",
+            "complete_scene_ready",
+            "interactmove_scene_input_ready",
+        ):
+            if scene_bundle["capabilities"].get(capability) is not True:
+                raise ValueError(f"SceneBundle capability gate failed: {capability}")
+        _verify_scene_bundle_files(layout_path.parent, scene_bundle)
     if not math.isfinite(args.duration_s) or args.duration_s <= 0:
         raise ValueError("--duration-s must be finite and positive")
     for name in ("sim_hz", "video_fps", "width", "height"):
@@ -168,6 +274,18 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     layout = LayoutInfo.from_dict(layout_raw)
     native_robot = layout.relation.get(Scene3DItemEnum.ROBOT.value)
     manager = SapienSceneManager(args.sim_hz, ray_tracing=False)
+    environment_import = None
+    room_entity = None
+    environment_urdf_path = None
+    if scene_bundle is not None:
+        environment_urdf_path, environment_import = _write_environment_urdf(
+            output_dir, layout_path.parent, scene_bundle
+        )
+        loader = manager.scene.create_urdf_loader()
+        loader.fix_root_link = True
+        room_entity = loader.load(str(environment_urdf_path))
+        if room_entity is None:
+            raise RuntimeError("SAPIEN failed to import the explicit room geometry")
     manager.initialize_circular_cameras(
         num_cameras=1,
         radius=args.camera_radius_m,
@@ -240,6 +358,21 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     max_final_angular_speed = float(
         np.linalg.norm(velocities[-1, :, 3:], axis=1).max(initial=0.0)
     )
+    contact_metrics = _contact_metrics(manager.scene)
+    settling_thresholds = {
+        "max_final_linear_speed_m_s": 0.01,
+        "max_final_angular_speed_rad_s": 0.01,
+        "max_static_translation_drift_m": 1e-6,
+        "max_penetration_m": 0.02,
+    }
+    settling_passed = (
+        static_drift_m is not None
+        and static_drift_m <= settling_thresholds["max_static_translation_drift_m"]
+        and max_final_linear_speed <= settling_thresholds["max_final_linear_speed_m_s"]
+        and max_final_angular_speed <= settling_thresholds["max_final_angular_speed_rad_s"]
+        and contact_metrics["max_penetration_m"] <= settling_thresholds["max_penetration_m"]
+        and room_entity is not None
+    )
 
     try:
         source_commit = subprocess.run(
@@ -253,7 +386,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     receipt = {
         "schema": "InteractMoveInterMimicSceneCanaryReceipt",
         "schema_version": 1,
-        "status": "completed",
+        "status": "passed" if settling_passed else "failed",
         "scientific_admission": "canary_only_not_stage3_settling_receipt",
         "boundaries": {
             "fresh_embodiedgen_scene_generation": (
@@ -262,7 +395,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "scene_bundle_validation": (
                 "passed" if scene_bundle is not None else "not_bound"
             ),
-            "scene_only_sapien_physics_render": "passed",
+            "scene_only_sapien_physics_render": "passed" if settling_passed else "failed",
             "interactmove_motion_generation": "not_run",
             "intermimic_execution": "not_run",
         },
@@ -296,6 +429,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "native_robot_declared": native_robot,
             "native_robot_loaded": False,
             "humanoid_loaded": False,
+            "explicit_room_loaded": room_entity is not None,
         },
         "timing": {
             "duration_s": args.duration_s,
@@ -310,15 +444,23 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "context_static_translation_drift_m": static_drift_m,
             "max_final_linear_speed_m_s": max_final_linear_speed,
             "max_final_angular_speed_rad_s": max_final_angular_speed,
+            **contact_metrics,
         },
+        "settling_check": {
+            "passed": settling_passed,
+            "thresholds": settling_thresholds,
+            "scope": "scene_objects_only_no_humanoid",
+        },
+        "environment_import": environment_import,
         "physics_semantics": {
             "importer": "EmbodiedGen load_assets_from_layout_file",
             "urdf_mass_applied": False,
             "friction": "upstream clips source mu1/mu2 before SAPIEN material creation",
             "restitution": "upstream hard-coded 0.05",
-            "background_physics": "not_loaded",
-            "floor": "SAPIEN z=0 ground plane",
+            "background_physics": "explicit fixed room collision imported",
+            "floor": "SAPIEN z=0 ground plane explicitly bound by SceneBundle",
             "contact_trace_recorded": False,
+            "contact_summary_recorded": True,
         },
         "outputs": {
             "video": {
@@ -346,8 +488,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         },
         "limitations": [
             "no_humanoid_or_InterMimic_controller",
-            "no_contact_trace",
-            "no_Gaussian_background_compositing",
+            "no_contact_trace_only_contact_summary",
+            "raster_room_mesh_rendered_Gaussian_not_composited",
             "upstream_importer_does_not_apply_URDF_mass",
         ]
         + (
@@ -367,7 +509,7 @@ def main() -> int:
     args = _parser().parse_args()
     receipt = run(args)
     print(json.dumps(receipt, sort_keys=True))
-    return 0
+    return 0 if receipt["status"] == "passed" else 1
 
 
 if __name__ == "__main__":
