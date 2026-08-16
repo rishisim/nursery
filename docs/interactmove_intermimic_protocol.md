@@ -272,15 +272,33 @@ cube` but fails the InteractMove input gate because the official package is
 Gaussian-only and the historical generation request is unavailable. This is
 an honest capability result, not a failed scene import.
 
-Fresh prompt-to-scene generation additionally requires a mode-`0600`, untracked
-Juno file at
-`/home/dal503972/.config/interactmove_intermimic/embodiedgen.env` exporting
-`API_KEY`, `API_VERSION`, `ENDPOINT`, and `MODEL_NAME`. Never put their values
-in Git, Slurm scripts, logs, or command history. The public Hugging Face token
-already used for downloads is also not copied into receipts. EmbodiedGen's
-released `sim-cli` loads a Franka even when `insert_robot=false`; therefore it
-must not be used as evidence of a robot-free simulation. Nursery's robot-free
-canary calls only the released scene importer and renderer.
+Fresh prompt-to-scene generation additionally requires the owner-only Juno
+configuration
+`/work/dal503972/interactmove_intermimic/frozen_configs/gpt_config.yaml` with
+mode `0600`. The file supplies the public OpenAI endpoint, a project API key,
+null Azure API version, and model `gpt-5.6-luna`; its secret value is never
+copied into Git, Slurm scripts, logs, manifests, or receipts. The canonical
+Nursery adapter preserves EmbodiedGen's existing
+`query(text_prompt, image_base64, system_role, params) -> plain text`
+interface while translating calls to OpenAI Responses `input_text` and
+`input_image` blocks. It uses `store=false`, reasoning effort `none`, exact
+OpenAI SDK `3.1.0`, actual PNG/JPEG/WEBP/GIF media types, and the Responses
+`max_output_tokens` field. Legacy Chat sampling and penalty fields are ignored;
+unknown parameters fail closed. Responses are not globally forced to JSON
+because several released EmbodiedGen quality gates require literal plain text
+such as `YES` or `NO`.
+
+The historical environment manifest `embodiedgen_environment_328178.txt`
+records OpenAI SDK `1.58.1`, which has no Responses resource. It remains an
+immutable record of that earlier qualification and is not evidence for the
+GPT-5.6 transport. The canonical setup wrapper overlays exactly `openai==3.1.0`,
+runs `pip check`, proves the Responses resource exists, and writes a new
+job-bound manifest whenever the environment is requalified. The public Hugging
+Face token already used for downloads is also not copied into receipts.
+EmbodiedGen's released `sim-cli` loads a Franka even when
+`insert_robot=false`; therefore it must not be used as evidence of a robot-free
+simulation. Nursery's robot-free canary calls only the released scene importer
+and renderer.
 
 ## Artifact policy and Stage 4 handoff
 

@@ -14,6 +14,7 @@ set -euo pipefail
 umask 077
 
 readonly EMBODIEDGEN_COMMIT=9b333554254af196bace88c1a171a3bf047fa09c
+readonly OPENAI_SDK_VERSION=3.1.0
 readonly SCRATCH_ROOT=/scratch/juno/dal503972/interactmove_intermimic
 readonly DURABLE_ROOT=/work/dal503972/interactmove_intermimic
 readonly SOURCE_ROOT="${SCRATCH_ROOT}/source/EmbodiedGen"
@@ -177,6 +178,15 @@ set +u
 conda deactivate
 conda activate "${ENV_ROOT}"
 set -u
+python -m pip install "openai==${OPENAI_SDK_VERSION}"
+python - <<'PY'
+import openai
+from openai import OpenAI
+
+assert openai.__version__ == "3.1.0"
+assert hasattr(OpenAI(api_key="not-a-real-key"), "responses")
+PY
+python -m pip check
 
 python - <<'PY'
 import json

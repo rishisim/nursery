@@ -78,7 +78,10 @@
       "scene_id": "scene_0010",
       "retrieval_is_fresh_background_generation": false
     },
-    "gpt_model": "gpt-4.1",
+    "gpt_api": "responses",
+    "gpt_model": "gpt-5.6-luna",
+    "gpt_reasoning_effort": "none",
+    "openai_sdk_version": "3.1.0",
     "text_to_image_model": "stabilityai/stable-diffusion-3.5-medium",
     "text_to_image_backend": "sd35",
     "image_to_3d_backend": "SAM3D",
