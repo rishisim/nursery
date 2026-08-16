@@ -539,7 +539,14 @@ def build_embodiedgen_request(
                 "path": "each_urdf_referenced_visual_and_collision_meshes",
                 "required": True,
             },
-            {"path": "background/mesh_model.ply", "required": True},
+            {
+                "path": (
+                    "at_least_one_of_background/mesh_model.ply_or_"
+                    "background/gs_model.ply"
+                ),
+                "required": True,
+            },
+            {"path": "background/mesh_model.ply", "required": False},
             {"path": "background/gs_model.ply", "required": False},
             {"path": "affordance_annot.json", "required": False},
             {"path": "mesh_part_seg.glb", "required": False},

@@ -61,9 +61,10 @@
       "asset3d/**/result/*.urdf",
       "URDF-referenced visual meshes",
       "URDF-referenced collision meshes",
-      "background/mesh_model.ply"
+      "at least one of background/mesh_model.ply or background/gs_model.ply"
     ],
     "optional_outputs": [
+      "background/mesh_model.ply",
       "background/gs_model.ply",
       "affordance_annot.json",
       "mesh_part_seg.glb"
@@ -76,8 +77,41 @@
     "distractor_body_type": "dynamic",
     "ground_plane_z_m": 0.0,
     "mesh_model_is_background_collision": false,
+    "gs_model_is_background_collision": false,
     "missing_source_physics_is_fabricated": false,
     "settling_required_for_downstream_physics": true
+  },
+  "juno_execution": {
+    "ssh_alias": "juno",
+    "durable_root": "/work/dal503972/interactmove_intermimic",
+    "scratch_root": "/scratch/juno/dal503972/interactmove_intermimic",
+    "embodiedgen_environment": "/scratch/juno/dal503972/interactmove_intermimic/environments/embodiedgen-v2.0.1-py310-cu126",
+    "python": "3.10.20",
+    "cuda": "12.6",
+    "torch": "2.8.0+cu126",
+    "numpy": "1.26.4",
+    "flash_attn": "2.8.2",
+    "xformers": "0.0.32.post2",
+    "sapien": "3.0.0b1",
+    "mani_skill": "3.0.0b21",
+    "qualification_gpu": "NVIDIA H100 NVL MIG 3g.47gb",
+    "setup_gpu": "NVIDIA H200 NVL",
+    "secret_file": "/home/dal503972/.config/interactmove_intermimic/embodiedgen.env",
+    "secret_file_tracked": false,
+    "fresh_generation_required_secret_names": [
+      "API_KEY",
+      "API_VERSION",
+      "ENDPOINT",
+      "MODEL_NAME"
+    ],
+    "public_canary": {
+      "dataset": "HorizonRobotics/EmbodiedGenData",
+      "dataset_commit": "58258b50a0fc95034f2f3cc03b332ec6f72b91fd",
+      "layout": "example_layouts/task_0000/layout.json",
+      "native_robot_loaded": false,
+      "humanoid_loaded": false,
+      "scientific_admission": "canary_only_not_stage3_settling_receipt"
+    }
   },
   "artifact_policy": {
     "run_root": "runs/interactmove_intermimic",

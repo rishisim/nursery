@@ -1,0 +1,161 @@
+{
+  "schema": "InteractMoveInterMimicActivitySpec",
+  "schema_version": 1,
+  "protocol_id": "interactmove_intermimic",
+  "activity_id": "public-example-task-0000-retrospective",
+  "prompt": "Move the green cube and put it into the yellow cube on the desk.",
+  "actor": {
+    "body_model": "SMPL-X",
+    "morphology": "adult",
+    "gender": "neutral",
+    "betas": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "initial_stance": "standing_neutral",
+    "initial_placement": {
+      "method": "target_relative",
+      "target_relative_position_m": [-1.0, 0.0, 0.0],
+      "face_target": true,
+      "selected_by": "nursery"
+    }
+  },
+  "target_request": {
+    "description": "the green cube on the desk",
+    "category": "green cube",
+    "prompt_span": "green cube",
+    "resolution_rule": {
+      "method": "exact_source_node_key",
+      "expected_source_node_key": "green cube"
+    }
+  },
+  "relations": {
+    "start": [
+      {
+        "subject": "target",
+        "predicate": "on",
+        "object_description": "the desk",
+        "description": "the green cube starts on the desk"
+      }
+    ],
+    "final": [
+      {
+        "subject": "target",
+        "predicate": "inside",
+        "object_description": "the yellow cube",
+        "description": "the green cube finishes inside the yellow cube"
+      }
+    ]
+  },
+  "phases": [
+    {
+      "id": "approach",
+      "description": "approach the green cube",
+      "start_frame": 0,
+      "end_frame_exclusive": 60,
+      "expected_target_contact_hands": []
+    },
+    {
+      "id": "reach",
+      "description": "reach toward the green cube",
+      "start_frame": 60,
+      "end_frame_exclusive": 100,
+      "expected_target_contact_hands": []
+    },
+    {
+      "id": "grasp-lift",
+      "description": "grasp and lift the green cube",
+      "start_frame": 100,
+      "end_frame_exclusive": 180,
+      "expected_target_contact_hands": ["right"]
+    },
+    {
+      "id": "transfer",
+      "description": "move the green cube above the yellow cube",
+      "start_frame": 180,
+      "end_frame_exclusive": 260,
+      "expected_target_contact_hands": ["right"]
+    },
+    {
+      "id": "release-settle",
+      "description": "release the green cube into the yellow cube and let it settle",
+      "start_frame": 260,
+      "end_frame_exclusive": 300,
+      "expected_target_contact_hands": []
+    }
+  ],
+  "timing": {
+    "duration_s": 10.0,
+    "fps": 30,
+    "frame_count": 300,
+    "sampling": "half_open_[0,duration)"
+  },
+  "hand_use": {
+    "mode": "one_hand",
+    "hands": ["right"]
+  },
+  "seeds": {
+    "master": 1000,
+    "embodiedgen_image": 1001,
+    "embodiedgen_asset": 1002,
+    "embodiedgen_layout": 1003,
+    "interactmove": 1004,
+    "intermimic": 1005,
+    "render": 1006
+  },
+  "success_criteria": [
+    {
+      "id": "target-instance",
+      "metric": "target_instance_correct",
+      "operator": "eq",
+      "threshold": true,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "phase-order",
+      "metric": "phase_order_fraction",
+      "operator": "gte",
+      "threshold": 0.9,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "intended-contact",
+      "metric": "intended_contact_fraction",
+      "operator": "gte",
+      "threshold": 0.9,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "stable-grasp",
+      "metric": "stable_grasp_fraction",
+      "operator": "gte",
+      "threshold": 0.9,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "penetration",
+      "metric": "max_penetration_m",
+      "operator": "lte",
+      "threshold": 0.02,
+      "unit": "m",
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "balance",
+      "metric": "balance_success",
+      "operator": "eq",
+      "threshold": true,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "final-relation",
+      "metric": "final_relation_satisfied",
+      "operator": "eq",
+      "threshold": true,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    }
+  ]
+}

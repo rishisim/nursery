@@ -196,8 +196,12 @@ def canonicalize_quaternion_xyzw(
             f"{where} has invalid quaternion norm {norm}; "
             f"maximum error is {maximum_norm_error}"
         )
-    normalized = [item / norm for item in quaternion]
     changed = abs(norm - 1.0) > 1e-12
+    normalized = (
+        [item / norm for item in quaternion]
+        if changed
+        else list(quaternion)
+    )
     sign_anchor = next(
         (item for item in (normalized[3], *normalized[:3]) if item != 0.0),
         0.0,

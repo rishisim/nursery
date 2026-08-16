@@ -12,6 +12,7 @@ from babyworld_lite.interactmove_intermimic.activity import (
 )
 from babyworld_lite.interactmove_intermimic.common import (
     ContractError,
+    canonicalize_quaternion_xyzw,
     content_sha256,
 )
 from babyworld_lite.interactmove_intermimic.embodiedgen import (
@@ -320,6 +321,32 @@ def test_deterministic_scene_compile_and_validate(tmp_path: Path) -> None:
     assert target["category"] == "bowl"
 
 
+def test_official_relation_task_metadata_is_admitted_strictly(tmp_path: Path) -> None:
+    root = _write_canary(tmp_path)
+    layout = _layout()
+    layout["relation"]["task"] = "pick and place"
+    layout["relation"]["task_desc"] = _activity_spec()["prompt"]
+    (root / "layout.json").write_text(json.dumps(layout), encoding="utf-8")
+    spec = _activity_spec()
+
+    bundle = _compile(root, spec, request=_request(spec))
+
+    validate_scene_bundle(bundle)
+
+
+def test_real_layout_quaternion_canonicalization_is_idempotent() -> None:
+    first, changed = canonicalize_quaternion_xyzw(
+        [0.0, 0.4783, 0.0, -0.8782], where="official background pose"
+    )
+    second, changed_again = canonicalize_quaternion_xyzw(
+        first, where="canonical background pose", maximum_norm_error=1e-9
+    )
+
+    assert changed is True
+    assert second == first
+    assert changed_again is False
+
+
 def test_manifest_physics_capabilities_and_request_binding(tmp_path: Path) -> None:
     root = _write_canary(tmp_path)
     spec = _activity_spec()
@@ -355,6 +382,37 @@ def test_manifest_physics_capabilities_and_request_binding(tmp_path: Path) -> No
     assert bundle["capabilities"]["room_collision_ready"] is False
     assert bundle["environment"]["background_geometry_role"] == "render_and_reference_only_not_collision"
     assert bundle["settling"] == {"status": "not_run", "receipt": None}
+
+
+def test_gaussian_only_official_background_is_lossless_but_not_pointcloud_ready(
+    tmp_path: Path,
+) -> None:
+    root = _write_canary(tmp_path)
+    (root / "background" / "mesh_model.ply").unlink()
+    (root / "background" / "gs_model.ply").write_bytes(b"ply\ngaussian-canary\n")
+    spec = _activity_spec()
+
+    bundle = _compile(root, spec, request=_request(spec))
+    validate_scene_bundle(bundle)
+
+    assert bundle["environment"]["reference_mesh"] is None
+    assert bundle["environment"]["gaussian_model"] == "background/gs_model.ply"
+    assert bundle["capabilities"]["gaussian_render_ready"] is True
+    assert bundle["capabilities"]["reference_mesh_ready"] is False
+    assert bundle["capabilities"]["interactmove_scene_input_ready"] is False
+    assert (
+        "environment:background_reference_mesh_not_ready"
+        in bundle["capabilities"]["blockers"]
+    )
+
+
+def test_background_requires_mesh_or_gaussian_representation(tmp_path: Path) -> None:
+    root = _write_canary(tmp_path)
+    (root / "background" / "mesh_model.ply").unlink()
+    spec = _activity_spec()
+
+    with pytest.raises(ContractError, match="at least one"):
+        _compile(root, spec, request=_request(spec))
 
 
 def test_bundle_mutation_is_rejected_even_with_rehashed_bundle_id(tmp_path: Path) -> None:

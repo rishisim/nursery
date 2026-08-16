@@ -184,7 +184,11 @@ def test_valid_spec_has_deterministic_digest_and_embodiedgen_request() -> None:
         item["path"] for item in request["expected_outputs"] if not item["required"]
     }
     assert "layout.json" in required
-    assert "background/mesh_model.ply" in required
+    assert (
+        "at_least_one_of_background/mesh_model.ply_or_background/gs_model.ply"
+        in required
+    )
+    assert "background/mesh_model.ply" in optional
     assert "background/gs_model.ply" in optional
 
 

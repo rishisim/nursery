@@ -89,13 +89,16 @@ altering its prompt. Its output is the following `EmbodiedGenRequest`.
 EmbodiedGen runs outside this repository. The required returned tree is
 `layout.json`, one `asset3d/**/result/*.urdf` package for every declared
 non-background scene asset, every visual and collision mesh referenced by
-those URDFs, and
-`background/mesh_model.ply`. `background/gs_model.ply`,
-`affordance_annot.json`, and `mesh_part_seg.glb` are optional.
+those URDFs, and at least one background representation:
+`background/mesh_model.ply` or `background/gs_model.ply`. Each background
+file is individually optional because the official public example layouts can
+be Gaussian-only. `affordance_annot.json` and `mesh_part_seg.glb` are optional.
 
 Ingestion is strict and offline. `layout.json` must contain the pinned
 `LayoutInfo` members `tree`, `relation`, `objs_desc`, `objs_mapping`, `assets`,
-and `position`; `quality` is optional opaque source metadata. Each
+and `position`; `quality` is optional opaque source metadata. Within
+`relation`, released layouts may additionally carry the non-empty source
+metadata strings `task` and `task_desc`; other unknown keys remain errors. Each
 non-background asset mapping must resolve to one
 regular, non-symlink URDF below the declared scene root. URDF references must
 likewise be traversal-free relative paths to regular visual and collision mesh
@@ -154,12 +157,15 @@ UTF-8 JSON with the self-hash field excluded; the pretty artifact ends in one
 newline. Repeating compilation from identical bytes must produce identical
 IDs, JSON, and hashes.
 
-The background `mesh_model.ply` is visual scene context, not collision
-geometry. A `gs_model.ply` is also visual only. The explicit ground plane gives
-floor contact at `z=0`, but it does not make furniture, walls, or other
-background surfaces collidable. Object collision exists only where admitted
-URDF collision geometry says it does. Consequently, a scene with a ground
-plane can still lack wall or furniture collision.
+The background `mesh_model.ply` is visual/reference scene context, not
+collision geometry. A `gs_model.ply` is render-only and must never be sampled
+as a collision surface. A Gaussian-only package remains a lossless valid
+SceneBundle but reports `reference_mesh_ready=false` and cannot pass the
+InteractMove full-scene point-cloud gate. The explicit ground plane gives floor
+contact at `z=0`, but it does not make furniture, walls, or other background
+surfaces collidable. Object collision exists only where admitted URDF collision
+geometry says it does. Consequently, a scene with a ground plane can still lack
+wall or furniture collision.
 
 Physics values that EmbodiedGen did not provide remain `null` with provenance.
 No mass, inertia, material, friction, restitution, joint property, transform,
@@ -210,6 +216,71 @@ The equivalent thin entry point is
 `python scripts/run_interactmove_intermimic.py` followed by the same subcommand
 and arguments. Both output-producing commands refuse to overwrite an existing
 output unless `--overwrite` is supplied explicitly.
+
+## Juno GPU execution
+
+Juno is the frozen remote execution target. The canonical wrappers are:
+
+```sh
+ssh juno sbatch \
+  /scratch/juno/dal503972/interactmove_intermimic/remote_scripts/\
+interactmove_intermimic_juno_qualify.sbatch
+ssh juno sbatch \
+  /scratch/juno/dal503972/interactmove_intermimic/remote_scripts/\
+interactmove_intermimic_juno_setup.sbatch
+ssh juno sbatch \
+  /scratch/juno/dal503972/interactmove_intermimic/remote_scripts/\
+interactmove_intermimic_juno_scene_canary.sbatch
+```
+
+The first wrapper qualifies a Juno H100 MIG with CUDA/PyTorch. The second
+creates the dedicated Python 3.10/CUDA 12.6 environment from pinned
+EmbodiedGen commit `9b333554254af196bace88c1a171a3bf047fa09c` on an
+H200. The third downloads official dataset commit
+`58258b50a0fc95034f2f3cc03b332ec6f72b91fd`, runs its `task_0000` layout for
+10 seconds at 200 Hz, records 300 RGB frames at 30 FPS, and never calls
+`load_mani_skill_robot`. It retains the source package and canary result under
+`/work/dal503972/interactmove_intermimic`; caches, logs, and staging remain
+under the matching `/scratch/juno/dal503972` root.
+
+The canary is intentionally narrower than a qualified settling receipt. It
+uses EmbodiedGen's released SAPIEN importer, which does not apply the source
+URDF mass, clips source friction, and supplies restitution `0.05`. Its receipt
+records those facts, the full rigid-body rollout, and that no humanoid,
+InterMimic controller, contact trace, or Gaussian background compositing was
+present. A successful canary proves GPU import/dynamics/RGB rendering only.
+
+The retained Juno qualification receipt is
+`/work/dal503972/interactmove_intermimic/compact_records/`
+`juno_qualification_328046.json`. The qualified EmbodiedGen environment
+receipt is `embodiedgen_setup_328178.json`; its exact conda/pip manifest is
+`/work/dal503972/interactmove_intermimic/manifests/`
+`embodiedgen_environment_328178.txt` with SHA-256
+`9f3ef4bd905f67841e32347fbdb4ad4d015fac957e0463bb977ad8d3628a1f3a`.
+The resolved compatibility set includes Python `3.10.20`, PyTorch
+`2.8.0+cu126`, NumPy `1.26.4`, FlashAttention `2.8.2`, xFormers
+`0.0.32.post2`, SAPIEN `3.0.0b1`, and ManiSkill `3.0.0b21`. The retained
+official-scene canary is
+`/work/dal503972/interactmove_intermimic/simulation_canaries/`
+`official_task_0000/`: SAPIEN `3.0.0b1`, 2,000 physics steps at 200 Hz, 300
+H.264 frames at 30 FPS, zero static desk translation drift, and zero final
+recorded body speeds. The video SHA-256 is
+`8d159e1f2aa94b7963ca606c4ae4ef57eae0343688d53d08028f75998f04c5f8`.
+The corresponding retrospective Stage 2–3 bundle is
+`scene_b81d5c384badc17d99272a4203e85c6a`; it resolves the exact target `green
+cube` but fails the InteractMove input gate because the official package is
+Gaussian-only and the historical generation request is unavailable. This is
+an honest capability result, not a failed scene import.
+
+Fresh prompt-to-scene generation additionally requires a mode-`0600`, untracked
+Juno file at
+`/home/dal503972/.config/interactmove_intermimic/embodiedgen.env` exporting
+`API_KEY`, `API_VERSION`, `ENDPOINT`, and `MODEL_NAME`. Never put their values
+in Git, Slurm scripts, logs, or command history. The public Hugging Face token
+already used for downloads is also not copied into receipts. EmbodiedGen's
+released `sim-cli` loads a Franka even when `insert_robot=false`; therefore it
+must not be used as evidence of a robot-free simulation. Nursery's robot-free
+canary calls only the released scene importer and renderer.
 
 ## Artifact policy and Stage 4 handoff
 

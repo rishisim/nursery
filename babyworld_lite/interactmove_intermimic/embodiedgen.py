@@ -720,8 +720,17 @@ def _parse_asset(
 def _layout_graph(layout: Mapping[str, Any]) -> tuple[dict[str, str], dict[str, str | None], str | None]:
     relation = require_mapping(layout["relation"], where="layout.relation")
     require_exact_keys(
-        relation, required=set(_ROLE_KEYS), optional={"robot"}, where="layout.relation"
+        relation,
+        required=set(_ROLE_KEYS),
+        optional={"robot", "task", "task_desc"},
+        where="layout.relation",
     )
+    for metadata_key in ("task", "task_desc"):
+        if metadata_key in relation:
+            require_nonempty_string(
+                relation[metadata_key],
+                where=f"layout.relation.{metadata_key}",
+            )
     background = require_nonempty_string(relation["background"], where="layout.relation.background")
     context = require_nonempty_string(relation["context"], where="layout.relation.context")
     manipulated = relation["manipulated_objs"]
@@ -1039,26 +1048,48 @@ def compile_scene_bundle(
             physics_blockers.extend(blockers)
 
     background_node = next(node for node, role in native_roles.items() if role == "background")
-    reference_path = _declared_child_path(
-        root, assets_map[background_node], "mesh_model.ply", where="background mesh_model.ply"
+    background_relative = PurePosixPath(
+        require_nonempty_string(assets_map[background_node], where="background asset")
     )
-    reference_record = files.add(reference_path, "background_reference_mesh")
+    reference_record = None
+    reference_relative = (background_relative / "mesh_model.ply").as_posix()
+    reference_candidate = root.joinpath(*PurePosixPath(reference_relative).parts)
+    if reference_candidate.exists() or reference_candidate.is_symlink():
+        reference_path = safe_relative_file(
+            root, reference_relative, where="background mesh_model.ply"
+        )
+        reference_record = files.add(reference_path, "background_reference_mesh")
+    else:
+        warnings.append(
+            "background has no mesh_model.ply reference mesh; Gaussian geometry "
+            "must not be used as collision"
+        )
     gs_record = None
-    gs_relative = (PurePosixPath(require_nonempty_string(assets_map[background_node], where="background asset")) / "gs_model.ply").as_posix()
+    gs_relative = (background_relative / "gs_model.ply").as_posix()
     candidate = root.joinpath(*PurePosixPath(gs_relative).parts)
     if candidate.exists() or candidate.is_symlink():
         gs_path = safe_relative_file(root, gs_relative, where="background gs_model.ply")
         gs_record = files.add(gs_path, "background_gaussian_render")
     else:
         warnings.append("background has no optional gs_model.ply Gaussian representation")
-    bg_hashes = [reference_record["sha256"]] + ([] if gs_record is None else [gs_record["sha256"]])
+    if reference_record is None and gs_record is None:
+        raise ContractError(
+            "background requires at least one of mesh_model.ply or gs_model.ply"
+        )
+    bg_hashes = (
+        [] if reference_record is None else [reference_record["sha256"]]
+    ) + ([] if gs_record is None else [gs_record["sha256"]])
     background_asset_id = "asset_" + content_sha256(sorted(bg_hashes))[:24]
     asset_records[background_asset_id] = {
         "asset_id": background_asset_id,
         "kind": "background_reference",
         "source_node_key": background_node,
-        "reference_mesh": reference_record["path"],
-        "reference_mesh_sha256": reference_record["sha256"],
+        "reference_mesh": (
+            None if reference_record is None else reference_record["path"]
+        ),
+        "reference_mesh_sha256": (
+            None if reference_record is None else reference_record["sha256"]
+        ),
         "gaussian_model": None if gs_record is None else gs_record["path"],
         "gaussian_model_sha256": None if gs_record is None else gs_record["sha256"],
         "collision_ready": False,
@@ -1126,13 +1157,22 @@ def compile_scene_bundle(
                 "geometry_world_transforms": geometry_world_transforms,
             }
         )
-    warnings.append("background mesh_model.ply is reference/render geometry, not validated collision geometry")
+    if reference_record is not None:
+        warnings.append(
+            "background mesh_model.ply is reference/render geometry, not "
+            "validated collision geometry"
+        )
     blockers = sorted(
         set(
             physics_blockers
             + target_blockers
             + scene_conversion_blockers
             + ["environment:background_room_collision_not_ready"]
+            + (
+                ["environment:background_reference_mesh_not_ready"]
+                if reference_record is None
+                else []
+            )
             + ([] if request_sha256 is not None else ["embodiedgen_request_not_bound"])
         )
     )
@@ -1165,7 +1205,9 @@ def compile_scene_bundle(
         "instances": instances,
         "environment": {
             "background_instance_id": ids[background_node],
-            "reference_mesh": reference_record["path"],
+            "reference_mesh": (
+                None if reference_record is None else reference_record["path"]
+            ),
             "gaussian_model": None if gs_record is None else gs_record["path"],
             "ground_plane": {"z_m": 0.0, "provenance": "nursery_frozen_scene_policy"},
             "background_geometry_role": "render_and_reference_only_not_collision",
@@ -1178,12 +1220,13 @@ def compile_scene_bundle(
                 request_sha256 is not None
                 and target_category_match
                 and not scene_conversion_blockers
+                and reference_record is not None
             ),
             "target_category_exact_match": target_category_match,
             "physics_material_complete": physics_complete,
             "dynamic_settle_ready": physics_complete and request_sha256 is not None,
             "gaussian_render_ready": gs_record is not None,
-            "reference_mesh_ready": True,
+            "reference_mesh_ready": reference_record is not None,
             "floor_contact_ready": True,
             "room_collision_ready": False,
             "blockers": blockers,
@@ -1456,7 +1499,16 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
                 where=f"asset {asset_id}",
             )
             reference = asset["reference_mesh"]
-            if reference not in file_by_path or asset["reference_mesh_sha256"] != file_by_path[reference]["sha256"]:
+            reference_sha = asset["reference_mesh_sha256"]
+            if reference is None:
+                if reference_sha is not None:
+                    raise ContractError(
+                        f"asset {asset_id} has a reference hash without a file"
+                    )
+            elif (
+                reference not in file_by_path
+                or reference_sha != file_by_path[reference]["sha256"]
+            ):
                 raise ContractError(f"asset {asset_id} has an invalid reference mesh binding")
             gaussian = asset["gaussian_model"]
             gaussian_sha = asset["gaussian_model_sha256"]
@@ -1465,6 +1517,10 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
                     raise ContractError(f"asset {asset_id} has a Gaussian hash without a file")
             elif gaussian not in file_by_path or gaussian_sha != file_by_path[gaussian]["sha256"]:
                 raise ContractError(f"asset {asset_id} has an invalid Gaussian file binding")
+            if reference is None and gaussian is None:
+                raise ContractError(
+                    f"asset {asset_id} has no background render representation"
+                )
             if asset["collision_ready"] is not False:
                 raise ContractError("background reference geometry cannot claim collision readiness")
             require_nonempty_string(
@@ -2047,8 +2103,12 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
         environment["gaussian_model"] is not None
     ):
         raise ContractError("gaussian_render_ready disagrees with the environment")
-    if capabilities["reference_mesh_ready"] is not True or capabilities["floor_contact_ready"] is not True:
-        raise ContractError("base SceneBundle reference/floor capabilities are invalid")
+    if capabilities["reference_mesh_ready"] is not (
+        environment["reference_mesh"] is not None
+    ):
+        raise ContractError("reference_mesh_ready disagrees with the environment")
+    if capabilities["floor_contact_ready"] is not True:
+        raise ContractError("base SceneBundle floor capability is invalid")
     if capabilities["room_collision_ready"] is not False:
         raise ContractError("base SceneBundle cannot claim room collision readiness")
     blockers = capabilities["blockers"]
@@ -2063,6 +2123,8 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
     expected_articulation_blockers: set[str] = set()
     if request_hash is None:
         expected_blockers.add("embodiedgen_request_not_bound")
+    if environment["reference_mesh"] is None:
+        expected_blockers.add("environment:background_reference_mesh_not_ready")
     if receipt["source_category"] is None:
         expected_blockers.add("target:source_category_missing")
     elif not expected_category_match:
@@ -2115,6 +2177,7 @@ def validate_scene_bundle(value: Mapping[str, Any]) -> None:
         request_hash is not None
         and category_match
         and not expected_articulation_blockers
+        and environment["reference_mesh"] is not None
     )
     if capabilities.get("interactmove_scene_input_ready") is not expected_interactmove_ready:
         raise ContractError("interactmove_scene_input_ready is inconsistent")
