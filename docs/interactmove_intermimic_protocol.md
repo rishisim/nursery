@@ -337,7 +337,7 @@ The accepted `table.png` and raw image hashes are respectively
 and `21291ddb429eb8a31fc367a6e390f53033ffe8efff3a09ad89676ac3c6853cf2`.
 The resume hook copies those exact bytes only when the source node, full asset
 prompt, initial seed, prior receipt, layout, and all hashes match; every later
-asset still runs the normal SD3.5 and TRELLIS stages.
+asset was initially produced through the normal SD3.5 and TRELLIS stages.
 
 Continuation job `328381` completed a TRELLIS result package for each of the
 table, mug, plate, and spoon before the released final QA retried the table.
@@ -351,6 +351,17 @@ the four renders as four explicitly described views of one asset, and copies a
 result into the scene only if the corrected check returns exactly `YES`. Any
 missing, mutated, or still-rejected result fails closed; unqualified output is
 never promoted merely to avoid recomputation.
+
+Requalification job `328392` admitted the resumed plate but correctly rejected
+the resumed mug because its mesh had a malformed vertical side protrusion. Its
+compact receipt SHA-256 is
+`6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b944c32bfef41ef3c`.
+The canonical protocol therefore reuses the hash-bound accepted SD3.5 mug image
+from job `328381` but not that job's mug result package. It regenerates only the
+mug's TRELLIS geometry and applies the same corrected exact-`YES` multiview
+gate. Table, plate, and spoon result packages remain eligible only after that
+gate is repeated in the publishing run. This preserves earlier accepted stages
+without admitting the known malformed geometry.
 
 EmbodiedGen's released `sim-cli` loads a Franka even when
 `insert_robot=false`; therefore it must not be used as evidence of a robot-free

@@ -69,6 +69,20 @@ def test_generation_protocol_is_real_robot_free_path() -> None:
     assert generation["sam3d_comparison"]["blocks_trellis_run"] is False
     assert generation["resume_source"]["job_id"] == "328320"
     assert generation["asset_resume_source"]["job_id"] == "328381"
+    assert generation["asset_resume_source"]["nodes"]["red mug"] == {
+        "prompt": (
+            "glossy crimson ceramic mug with curved handle, thick rim, and "
+            "smooth reflective surface"
+        ),
+        "reuse_result": False,
+        "rejected_result": {
+            "job_id": "328392",
+            "generation_receipt_sha256": (
+                "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b944c32bfef41ef3c"
+            ),
+            "reason": "malformed_vertical_side_protrusion",
+        },
+    }
     assert generation["invoke_upstream_sim_cli"] is False
     assert generation["robot_actor_loaded"] is False
     assert generation["background_dataset"][
@@ -368,7 +382,13 @@ def test_resume_assets_verifies_complete_receipt_manifest(tmp_path: Path) -> Non
     runner = _load_runner()
     protocol = json.loads(PROTOCOL.read_text(encoding="utf-8"))
     generation = runner._generation_config(protocol)
-    generation["asset_resume_source"]["nodes"] = {"table": "table prompt"}
+    generation["asset_resume_source"]["nodes"] = {
+        "table": {
+            "prompt": "table prompt",
+            "reuse_result": True,
+            "rejected_result": None,
+        }
+    }
     root = tmp_path / "partial"
     files = {
         "images/table.png": b"image",
@@ -417,6 +437,7 @@ def test_resume_assets_verifies_complete_receipt_manifest(tmp_path: Path) -> Non
     resumed = runner._resume_assets(args, generation)
 
     assert set(resumed["nodes"]) == {"table"}
+    assert resumed["nodes"]["table"]["reuse_result"] is True
     assert len(resumed["nodes"]["table"]["render_paths"]) == 4
     assert resumed["nodes"]["table"]["result_manifest_sha256"]
     (root / "asset3d/table/result/table.urdf").write_bytes(b"tampered")
@@ -426,6 +447,47 @@ def test_resume_assets_verifies_complete_receipt_manifest(tmp_path: Path) -> Non
         assert "hash mismatch" in str(exc)
     else:
         raise AssertionError("tampered resumed TRELLIS asset was accepted")
+
+
+def test_rejected_result_reuses_only_hash_bound_conditioning_image(
+    tmp_path: Path,
+) -> None:
+    runner = _load_runner()
+    image = tmp_path / "red_mug.png"
+    raw_image = tmp_path / "red_mug_raw.png"
+    image.write_bytes(b"accepted-red-mug-image")
+    raw_image.write_bytes(b"accepted-red-mug-raw-image")
+    rejection = {
+        "job_id": "328392",
+        "generation_receipt_sha256": "a" * 64,
+        "reason": "malformed_vertical_side_protrusion",
+    }
+
+    records = runner._conditioning_records(
+        {"images": {}},
+        {
+            "nodes": {
+                "red mug": {
+                    "prompt": "frozen red mug prompt",
+                    "reuse_result": False,
+                    "rejected_result": rejection,
+                    "image_path": image,
+                    "raw_image_path": raw_image,
+                }
+            }
+        },
+        asset_source_job_id="328381",
+    )
+
+    assert records["red mug"] == {
+        "prompt": "frozen red mug prompt",
+        "image_path": image,
+        "raw_image_path": raw_image,
+        "image_sha256": runner._sha256(image),
+        "raw_image_sha256": runner._sha256(raw_image),
+        "source_job_id": "328381",
+        "rejected_result": rejection,
+    }
 
 
 def test_multiview_quality_prompt_disambiguates_camera_views() -> None:

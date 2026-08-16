@@ -526,22 +526,45 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
             ),
             "requalification_policy": "four_separate_views_of_one_asset",
             "nodes": {
-                "table": (
-                    "standalone rectangular wooden table with a clean empty "
-                    "tabletop and warm polished surface"
-                ),
-                "red mug": (
-                    "glossy crimson ceramic mug with curved handle, thick rim, "
-                    "and smooth reflective surface"
-                ),
-                "plate": (
-                    "white ceramic dinner plate with subtle rim, clean glossy "
-                    "finish, and circular form"
-                ),
-                "spoon": (
-                    "small stainless-steel spoon with polished reflective bowl "
-                    "and slender rounded handle"
-                ),
+                "table": {
+                    "prompt": (
+                        "standalone rectangular wooden table with a clean empty "
+                        "tabletop and warm polished surface"
+                    ),
+                    "reuse_result": True,
+                    "rejected_result": None,
+                },
+                "red mug": {
+                    "prompt": (
+                        "glossy crimson ceramic mug with curved handle, thick "
+                        "rim, and smooth reflective surface"
+                    ),
+                    "reuse_result": False,
+                    "rejected_result": {
+                        "job_id": "328392",
+                        "generation_receipt_sha256": (
+                            "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b"
+                            "944c32bfef41ef3c"
+                        ),
+                        "reason": "malformed_vertical_side_protrusion",
+                    },
+                },
+                "plate": {
+                    "prompt": (
+                        "white ceramic dinner plate with subtle rim, clean "
+                        "glossy finish, and circular form"
+                    ),
+                    "reuse_result": True,
+                    "rejected_result": None,
+                },
+                "spoon": {
+                    "prompt": (
+                        "small stainless-steel spoon with polished reflective "
+                        "bowl and slender rounded handle"
+                    ),
+                    "reuse_result": True,
+                    "rejected_result": None,
+                },
             },
         },
         "image_samples_per_prompt": 1,
@@ -709,7 +732,8 @@ def _resume_assets(args: argparse.Namespace, generation: Mapping[str, Any]) -> d
         manifest[relative] = copy.deepcopy(record)
 
     nodes: dict[str, dict[str, Any]] = {}
-    for node, prompt in frozen["nodes"].items():
+    for node, policy in frozen["nodes"].items():
+        prompt = policy["prompt"]
         save_node = node.replace(" ", "_")
         result_relative = f"asset3d/{save_node}/result"
         render_paths = [
@@ -733,6 +757,8 @@ def _resume_assets(args: argparse.Namespace, generation: Mapping[str, Any]) -> d
         raw_relative = f"images/{save_node}_raw.png"
         nodes[node] = {
             "prompt": prompt,
+            "reuse_result": policy["reuse_result"],
+            "rejected_result": copy.deepcopy(policy["rejected_result"]),
             "result_relative": result_relative,
             "result_path": root / result_relative,
             "image_path": root / f"images/{save_node}.png",
@@ -748,6 +774,32 @@ def _resume_assets(args: argparse.Namespace, generation: Mapping[str, Any]) -> d
         "receipt": receipt,
         "nodes": nodes,
     }
+
+
+def _conditioning_records(
+    resume: Mapping[str, Any],
+    asset_resume: Mapping[str, Any],
+    *,
+    asset_source_job_id: str,
+) -> dict[str, dict[str, Any]]:
+    records = copy.deepcopy(resume["images"])
+    for node, resumed_asset in asset_resume["nodes"].items():
+        if resumed_asset["reuse_result"]:
+            continue
+        if resumed_asset["raw_image_path"] is None:
+            raise RuntimeError(
+                f"conditioning-only resumed asset lacks raw image: {node}"
+            )
+        records[node] = {
+            "prompt": resumed_asset["prompt"],
+            "image_path": resumed_asset["image_path"],
+            "raw_image_path": resumed_asset["raw_image_path"],
+            "image_sha256": _sha256(resumed_asset["image_path"]),
+            "raw_image_sha256": _sha256(resumed_asset["raw_image_path"]),
+            "source_job_id": asset_source_job_id,
+            "rejected_result": copy.deepcopy(resumed_asset["rejected_result"]),
+        }
+    return records
 
 
 def _manifest(root: Path, excluded: set[Path]) -> list[dict[str, Any]]:
@@ -881,6 +933,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "requalification_policy": generation["asset_resume_source"][
                     "requalification_policy"
                 ],
+                "nodes": copy.deepcopy(
+                    generation["asset_resume_source"]["nodes"]
+                ),
             },
         },
         "background": {
@@ -999,9 +1054,14 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         )
         _write_json(receipt_path, receipt)
 
+        conditioning_records = _conditioning_records(
+            resume,
+            asset_resume,
+            asset_source_job_id=generation["asset_resume_source"]["job_id"],
+        )
         reused_images = _install_resume_conditioning_images(
             textto3d_module,
-            resume["images"],
+            conditioning_records,
             initial_image_seed=request["seeds"]["image"],
         )
 
@@ -1014,7 +1074,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         for index, prompt in enumerate(prompts):
             node = prompts_mapping[prompt]
             resumed_asset = asset_resume["nodes"].get(node)
-            if resumed_asset is not None:
+            if resumed_asset is not None and resumed_asset["reuse_result"]:
                 if prompt != resumed_asset["prompt"]:
                     raise RuntimeError(f"resume asset prompt mismatch for {node}")
                 qa_response = textto3d_module.TXTGEN_CHECKER.query(
@@ -1077,11 +1137,16 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 conditioning_image = (
                     {
                         "status": "reused",
-                        "source_job_id": generation["resume_source"]["job_id"],
-                        "accepted_retry_seed": resume["images"][node][
+                        "source_job_id": conditioning_records[node].get(
+                            "source_job_id", generation["resume_source"]["job_id"]
+                        ),
+                        "accepted_retry_seed": conditioning_records[node].get(
                             "accepted_retry_seed"
-                        ],
-                        "sha256": resume["images"][node]["image_sha256"],
+                        ),
+                        "sha256": conditioning_records[node]["image_sha256"],
+                        "rejected_result": copy.deepcopy(
+                            conditioning_records[node].get("rejected_result")
+                        ),
                     }
                     if node in reused_images
                     else {
@@ -1103,6 +1168,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                     "result_manifest_sha256": (
                         resumed_asset["result_manifest_sha256"]
                         if resumed_asset is not None
+                        and resumed_asset["reuse_result"]
                         else None
                     ),
                     "finished_utc": _utc_now(),

@@ -122,10 +122,30 @@
       "generation_receipt_sha256": "0842642b0e10a5ddee297d2188accf3ac3ac95042764551f9c3ce3dd90408d23",
       "requalification_policy": "four_separate_views_of_one_asset",
       "nodes": {
-        "table": "standalone rectangular wooden table with a clean empty tabletop and warm polished surface",
-        "red mug": "glossy crimson ceramic mug with curved handle, thick rim, and smooth reflective surface",
-        "plate": "white ceramic dinner plate with subtle rim, clean glossy finish, and circular form",
-        "spoon": "small stainless-steel spoon with polished reflective bowl and slender rounded handle"
+        "table": {
+          "prompt": "standalone rectangular wooden table with a clean empty tabletop and warm polished surface",
+          "reuse_result": true,
+          "rejected_result": null
+        },
+        "red mug": {
+          "prompt": "glossy crimson ceramic mug with curved handle, thick rim, and smooth reflective surface",
+          "reuse_result": false,
+          "rejected_result": {
+            "job_id": "328392",
+            "generation_receipt_sha256": "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b944c32bfef41ef3c",
+            "reason": "malformed_vertical_side_protrusion"
+          }
+        },
+        "plate": {
+          "prompt": "white ceramic dinner plate with subtle rim, clean glossy finish, and circular form",
+          "reuse_result": true,
+          "rejected_result": null
+        },
+        "spoon": {
+          "prompt": "small stainless-steel spoon with polished reflective bowl and slender rounded handle",
+          "reuse_result": true,
+          "rejected_result": null
+        }
       }
     },
     "image_samples_per_prompt": 1,
