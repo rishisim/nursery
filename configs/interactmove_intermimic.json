@@ -78,6 +78,7 @@
       "scene_id": "scene_0010",
       "retrieval_is_fresh_background_generation": false
     },
+    "gpt_model": "gpt-4.1",
     "text_to_image_model": "stabilityai/stable-diffusion-3.5-medium",
     "text_to_image_backend": "sd35",
     "image_to_3d_backend": "SAM3D",

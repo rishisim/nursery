@@ -176,6 +176,7 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
     required = {
         "activity_spec",
         "background_dataset",
+        "gpt_model",
         "text_to_image_model",
         "text_to_image_backend",
         "image_to_3d_backend",
@@ -190,6 +191,7 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
     if set(generation) != required:
         raise ValueError("protocol fresh_generation fields do not match the schema")
     expected = {
+        "gpt_model": "gpt-4.1",
         "text_to_image_model": "stabilityai/stable-diffusion-3.5-medium",
         "text_to_image_backend": "sd35",
         "image_to_3d_backend": "SAM3D",
@@ -251,6 +253,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     protocol = _read_json(args.protocol.resolve(strict=True))
     generation = _generation_config(protocol)
     public_gpt = _configure_gpt(args.gpt_config.resolve(strict=True))
+    if public_gpt["model_name"] != generation["gpt_model"]:
+        raise ValueError("GPT config model does not match the frozen protocol")
     source = _source_state(args.source_root)
 
     repository_root = Path(__file__).resolve().parents[1]
@@ -342,14 +346,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
 
     secret = os.environ["API_KEY"]
     try:
-        import torch
-        from embodied_gen.models.layout import build_scene_layout
-        from embodied_gen.scripts.textto3d import text_to_3d
-        from embodied_gen.utils.enum import LayoutInfo, Scene3DItemEnum
-        from embodied_gen.utils.geometry import bfs_placement
         from embodied_gen.utils.gpt_clients import GPT_CLIENT
-        from embodied_gen.validators.quality_checkers import SemanticMatcher
 
+        import torch
         if not torch.cuda.is_available():
             raise RuntimeError("CUDA is not available")
         GPT_CLIENT.check_connection()
@@ -357,6 +356,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             {"name": "gpt_connection", "status": "passed", "finished_utc": _utc_now()}
         )
         _write_json(receipt_path, receipt)
+
+        from embodied_gen.models.layout import build_scene_layout
+        from embodied_gen.scripts.textto3d import text_to_3d
+        from embodied_gen.utils.enum import LayoutInfo, Scene3DItemEnum
+        from embodied_gen.utils.geometry import bfs_placement
+        from embodied_gen.validators.quality_checkers import SemanticMatcher
 
         scene_graph_path = output / "scene_tree.jpg"
         gpt_params = {

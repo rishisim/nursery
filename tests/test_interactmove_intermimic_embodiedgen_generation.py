@@ -49,6 +49,7 @@ def test_generation_protocol_is_real_robot_free_path() -> None:
 
     generation = runner._generation_config(protocol)
 
+    assert generation["gpt_model"] == "gpt-4.1"
     assert generation["text_to_image_backend"] == "sd35"
     assert generation["image_to_3d_backend"] == "SAM3D"
     assert generation["invoke_upstream_sim_cli"] is False
