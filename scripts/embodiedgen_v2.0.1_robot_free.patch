@@ -1,0 +1,17 @@
+diff --git a/embodied_gen/scripts/simulate_sapien.py b/embodied_gen/scripts/simulate_sapien.py
+index 8f25c47..4f9534d 100644
+--- a/embodied_gen/scripts/simulate_sapien.py
++++ b/embodied_gen/scripts/simulate_sapien.py
+@@ -101,3 +101,5 @@ def entrypoint(**kwargs):
+-    agent = load_mani_skill_robot(
+-        scene_manager.scene, cfg.layout_path, cfg.control_freq
+-    )
++    agent = None
++    if cfg.insert_robot:
++        agent = load_mani_skill_robot(
++            scene_manager.scene, cfg.layout_path, cfg.control_freq
++        )
+@@ -109 +111,2 @@ def entrypoint(**kwargs):
+-        agent.reset(agent.init_qpos)
++        if agent is not None:
++            agent.reset(agent.init_qpos)

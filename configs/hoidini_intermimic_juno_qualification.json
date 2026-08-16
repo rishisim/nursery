@@ -1,0 +1,53 @@
+{
+  "schema_version": "hoidini-intermimic-juno-qualification-1.0.0",
+  "purpose": "Qualify Juno for the real robot-free EmbodiedGenV2 Stage 2 pilot boundary.",
+  "task_contract": {
+    "path": "configs/hoidini_intermimic_pilot.json",
+    "sha256": "5392938ecc4f5cb017ec714a10f76ac60c8f331570f3e63217a68802bf062f4a"
+  },
+  "stage12_source_commit": "1aab0620156ac6af001d191aa13afc68a3e7518b",
+  "embodiedgen": {
+    "release": "v2.0.1",
+    "commit": "9b333554254af196bace88c1a171a3bf047fa09c",
+    "python": "3.10.13",
+    "cuda_module": "cuda/12.6",
+    "default_asset_backend": "SAM3D"
+  },
+  "juno": {
+    "ssh_alias": "juno",
+    "durable_root": "/work/dal503972/hoidini_intermimic",
+    "scratch_root": "/scratch/juno/dal503972/hoidini_intermimic",
+    "slurm": {
+      "partition": "h100",
+      "nodes": 1,
+      "tasks": 1,
+      "gres": "gpu:nvidia_h100_nvl:1",
+      "qualification_fallback_gres": "gpu:nvidia_h100_nvl_3g.47gb:1",
+      "cpus_per_task": 8,
+      "memory": "128G",
+      "qualification_time": "00:30:00"
+    }
+  },
+  "qualification_gates": [
+    "batchmode_ssh",
+    "h100_allocation",
+    "cuda_driver_visibility",
+    "tiny_pytorch_cuda_operation",
+    "python_3_10_environment_available",
+    "outbound_huggingface_reachable",
+    "durable_and_scratch_storage_available",
+    "huggingface_credential_present",
+    "gpt_vlm_credential_present",
+    "gated_model_license_access_confirmed"
+  ],
+  "terminal_decisions": [
+    "QUALIFIED_STAGE12_BOUNDARY",
+    "REJECTED_STAGE12_BOUNDARY",
+    "INCONCLUSIVE_ENVIRONMENT"
+  ],
+  "scientific_exclusions": [
+    "A qualification job is not scene generation.",
+    "A generated layout is not physics validation.",
+    "No HOIDiNi or InterMimic execution is authorized by this qualification."
+  ]
+}
