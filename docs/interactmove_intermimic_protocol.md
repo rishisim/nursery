@@ -300,6 +300,19 @@ OpenAI closure (FlashAttention/einops, Plyfile/NumPy, and Dash/Pydantic); they
 remain visible in the manifest but do not misclassify a valid Responses overlay
 as failed. The public Hugging Face token already used for downloads is also not
 copied into receipts.
+
+The local image-to-3D backend is pinned separately to Hugging Face repository
+`facebook/sam-3d-objects` at commit
+`2e73555018d2741ccd486e56c24fac41155a1dc6`. Its 21-file, approximately
+13.17 GB checkpoint subset is downloaded into an owner-only staging directory,
+validated against the pinned repository file list and byte sizes, hashed, and
+then atomically published at
+`/work/dal503972/interactmove_intermimic/checkpoints/`
+`sam-3d-objects-2e73555018d2741ccd486e56c24fac41155a1dc6`.
+Generation verifies every checkpoint SHA-256 before binding that immutable
+directory into the run-local `weights/sam-3d-objects` path. Interrupted staging
+is resumable and is never admitted as a checkpoint package.
+
 EmbodiedGen's released `sim-cli` loads a Franka even when
 `insert_robot=false`; therefore it must not be used as evidence of a robot-free
 simulation. Nursery's robot-free canary calls only the released scene importer

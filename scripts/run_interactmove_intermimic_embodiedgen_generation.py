@@ -436,6 +436,8 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
         "text_to_image_model",
         "text_to_image_backend",
         "image_to_3d_backend",
+        "sam3d_model_repository",
+        "sam3d_model_commit",
         "image_samples_per_prompt",
         "text_guidance_scale",
         "image_denoise_steps",
@@ -454,6 +456,8 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
         "text_to_image_model": "stabilityai/stable-diffusion-3.5-medium",
         "text_to_image_backend": "sd35",
         "image_to_3d_backend": "SAM3D",
+        "sam3d_model_repository": "facebook/sam-3d-objects",
+        "sam3d_model_commit": "2e73555018d2741ccd486e56c24fac41155a1dc6",
         "image_samples_per_prompt": 1,
         "text_guidance_scale": 7.0,
         "image_denoise_steps": 25,
@@ -563,6 +567,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "text_to_image": generation["text_to_image_model"],
             "text_to_image_backend": generation["text_to_image_backend"],
             "image_to_3d_backend": generation["image_to_3d_backend"],
+            "sam3d": {
+                "repository": generation["sam3d_model_repository"],
+                "commit": generation["sam3d_model_commit"],
+            },
         },
         "generation_config": {
             "image_samples_per_prompt": generation["image_samples_per_prompt"],

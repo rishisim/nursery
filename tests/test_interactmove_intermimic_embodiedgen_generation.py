@@ -57,6 +57,10 @@ def test_generation_protocol_is_real_robot_free_path() -> None:
     assert generation["openai_sdk_version"] == "3.1.0"
     assert generation["text_to_image_backend"] == "sd35"
     assert generation["image_to_3d_backend"] == "SAM3D"
+    assert generation["sam3d_model_repository"] == "facebook/sam-3d-objects"
+    assert generation["sam3d_model_commit"] == (
+        "2e73555018d2741ccd486e56c24fac41155a1dc6"
+    )
     assert generation["invoke_upstream_sim_cli"] is False
     assert generation["robot_actor_loaded"] is False
     assert generation["background_dataset"][

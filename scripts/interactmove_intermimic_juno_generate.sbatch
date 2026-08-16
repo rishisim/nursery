@@ -15,6 +15,7 @@ umask 077
 
 readonly EMBODIEDGEN_COMMIT=9b333554254af196bace88c1a171a3bf047fa09c
 readonly DATASET_COMMIT=58258b50a0fc95034f2f3cc03b332ec6f72b91fd
+readonly SAM3D_COMMIT=2e73555018d2741ccd486e56c24fac41155a1dc6
 readonly ACTIVITY_ID=red-mug-mouth-return
 readonly SCRATCH_ROOT=/scratch/juno/dal503972/interactmove_intermimic
 readonly DURABLE_ROOT=/work/dal503972/interactmove_intermimic
@@ -30,6 +31,8 @@ readonly GENERATED_RECEIPT="${GENERATED_ROOT}/generation_receipt.json"
 readonly DURABLE_SCENE="${DURABLE_ROOT}/scene_packages/${ACTIVITY_ID}"
 readonly COMPACT_RECEIPT="${DURABLE_ROOT}/compact_records/fresh_embodiedgen_${SLURM_JOB_ID}.json"
 readonly MANIFEST="${DURABLE_ROOT}/manifests/${ACTIVITY_ID}_${SLURM_JOB_ID}.sha256"
+readonly SAM3D_ROOT="${DURABLE_ROOT}/checkpoints/sam-3d-objects-${SAM3D_COMMIT}"
+readonly SAM3D_MANIFEST="${DURABLE_ROOT}/manifests/sam3d_${SAM3D_COMMIT}.sha256"
 readonly NURSERY_COMMIT="${IMIM_NURSERY_COMMIT:?submit with the exact nursery commit}"
 
 install -d -m 700 \
@@ -81,6 +84,20 @@ if [[ -e "${DURABLE_SCENE}" ]]; then
 fi
 if [[ -e "${COMPACT_RECEIPT}" || -e "${MANIFEST}" ]]; then
     echo "Refusing to overwrite job-bound durable records" >&2
+    exit 1
+fi
+if [[ ! -d "${SAM3D_ROOT}" || -L "${SAM3D_ROOT}" || ! -s "${SAM3D_MANIFEST}" ]]; then
+    echo "Pinned SAM3D checkpoint package or manifest is missing" >&2
+    exit 1
+fi
+(
+    cd "${SAM3D_ROOT}"
+    sha256sum --check "${SAM3D_MANIFEST}"
+)
+install -d -m 700 "${RUN_ROOT}/weights"
+ln -s "${SAM3D_ROOT}" "${RUN_ROOT}/weights/sam-3d-objects"
+if [[ "$(readlink -f "${RUN_ROOT}/weights/sam-3d-objects")" != "${SAM3D_ROOT}" ]]; then
+    echo "SAM3D run-local checkpoint binding failed" >&2
     exit 1
 fi
 
@@ -150,7 +167,7 @@ python -m babyworld_lite.interactmove_intermimic prepare-embodiedgen-request \
     --background-list '["scene_0010"]' \
     --output "${REQUEST}"
 
-cd "${SCRATCH_ROOT}/downloads"
+cd "${RUN_ROOT}"
 python "${NURSERY_ROOT}/scripts/run_interactmove_intermimic_embodiedgen_generation.py" \
     --activity "${ACTIVITY}" \
     --request "${REQUEST}" \

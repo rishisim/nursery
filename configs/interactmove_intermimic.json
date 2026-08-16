@@ -85,6 +85,8 @@
     "text_to_image_model": "stabilityai/stable-diffusion-3.5-medium",
     "text_to_image_backend": "sd35",
     "image_to_3d_backend": "SAM3D",
+    "sam3d_model_repository": "facebook/sam-3d-objects",
+    "sam3d_model_commit": "2e73555018d2741ccd486e56c24fac41155a1dc6",
     "image_samples_per_prompt": 1,
     "text_guidance_scale": 7.0,
     "image_denoise_steps": 25,

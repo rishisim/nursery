@@ -15,6 +15,8 @@ umask 077
 
 readonly EMBODIEDGEN_COMMIT=9b333554254af196bace88c1a171a3bf047fa09c
 readonly OPENAI_SDK_VERSION=3.1.0
+readonly SAM3D_REPOSITORY=facebook/sam-3d-objects
+readonly SAM3D_COMMIT=2e73555018d2741ccd486e56c24fac41155a1dc6
 readonly SCRATCH_ROOT=/scratch/juno/dal503972/interactmove_intermimic
 readonly DURABLE_ROOT=/work/dal503972/interactmove_intermimic
 readonly SOURCE_ROOT="${SCRATCH_ROOT}/source/EmbodiedGen"
@@ -23,6 +25,9 @@ readonly RUN_ROOT="${SCRATCH_ROOT}/runs/setup/${SLURM_JOB_ID}"
 readonly BASIC_MARKER="${ENV_ROOT}/.embodiedgen-basic-${EMBODIEDGEN_COMMIT}"
 readonly MANIFEST="${DURABLE_ROOT}/manifests/embodiedgen_environment_${SLURM_JOB_ID}.txt"
 readonly RECEIPT="${DURABLE_ROOT}/compact_records/embodiedgen_setup_${SLURM_JOB_ID}.json"
+readonly SAM3D_ROOT="${DURABLE_ROOT}/checkpoints/sam-3d-objects-${SAM3D_COMMIT}"
+readonly SAM3D_STAGING="${SAM3D_ROOT}.staging"
+readonly SAM3D_MANIFEST="${DURABLE_ROOT}/manifests/sam3d_${SAM3D_COMMIT}.sha256"
 
 install -d -m 700 \
     "${RUN_ROOT}" \
@@ -32,6 +37,7 @@ install -d -m 700 \
     "${SCRATCH_ROOT}/downloads" \
     "${SCRATCH_ROOT}/environments" \
     "${SCRATCH_ROOT}/source" \
+    "${DURABLE_ROOT}/checkpoints" \
     "${DURABLE_ROOT}/compact_records" \
     "${DURABLE_ROOT}/manifests"
 
@@ -47,6 +53,8 @@ export IMIM_SETUP_MANIFEST="${MANIFEST}"
 export IMIM_SETUP_RECEIPT="${RECEIPT}"
 export IMIM_SETUP_SOURCE="${SOURCE_ROOT}"
 export IMIM_SETUP_ENV="${ENV_ROOT}"
+export IMIM_SETUP_SAM3D_ROOT="${SAM3D_ROOT}"
+export IMIM_SETUP_SAM3D_MANIFEST="${SAM3D_MANIFEST}"
 export IMIM_SETUP_STATUS=failed
 export IMIM_SETUP_STARTED_UTC
 IMIM_SETUP_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -75,6 +83,8 @@ def output(command: list[str]) -> str | None:
 manifest = Path(os.environ["IMIM_SETUP_MANIFEST"])
 source = Path(os.environ["IMIM_SETUP_SOURCE"])
 environment = Path(os.environ["IMIM_SETUP_ENV"])
+sam3d_root = Path(os.environ["IMIM_SETUP_SAM3D_ROOT"])
+sam3d_manifest = Path(os.environ["IMIM_SETUP_SAM3D_MANIFEST"])
 manifest_digest = None
 if manifest.is_file():
     manifest_digest = hashlib.sha256(manifest.read_bytes()).hexdigest()
@@ -101,6 +111,17 @@ receipt = {
         "manifest_path": str(manifest),
         "manifest_sha256": manifest_digest,
         "python": output([str(environment / "bin/python"), "--version"]),
+    },
+    "sam3d_checkpoint": {
+        "repository": "facebook/sam-3d-objects",
+        "commit": "2e73555018d2741ccd486e56c24fac41155a1dc6",
+        "path": str(sam3d_root),
+        "manifest_path": str(sam3d_manifest),
+        "manifest_sha256": (
+            hashlib.sha256(sam3d_manifest.read_bytes()).hexdigest()
+            if sam3d_manifest.is_file()
+            else None
+        ),
     },
 }
 path = Path(os.environ["IMIM_SETUP_RECEIPT"])
@@ -221,6 +242,111 @@ if [[ "${GLOBAL_PIP_CHECK_EXIT_CODE}" -ne 0 ]]; then
     echo "Global pip check has unrelated pre-existing conflicts:" >&2
     cat "${RUN_ROOT}/pip-check.txt" >&2
 fi
+
+readonly HF_TOKEN_PATH="${HOME}/.cache/huggingface/token"
+if [[ ! -f "${HF_TOKEN_PATH}" || -L "${HF_TOKEN_PATH}" ]]; then
+    echo "Hugging Face token is missing or unsafe" >&2
+    exit 1
+fi
+export HF_TOKEN
+HF_TOKEN=$(<"${HF_TOKEN_PATH}")
+export IMIM_SAM3D_REPOSITORY="${SAM3D_REPOSITORY}"
+export IMIM_SAM3D_COMMIT="${SAM3D_COMMIT}"
+export IMIM_SAM3D_ROOT="${SAM3D_ROOT}"
+export IMIM_SAM3D_STAGING="${SAM3D_STAGING}"
+export IMIM_SAM3D_MANIFEST="${SAM3D_MANIFEST}"
+python - <<'PY'
+from __future__ import annotations
+
+import hashlib
+import os
+from pathlib import Path
+
+from huggingface_hub import snapshot_download
+
+
+EXPECTED = {
+    "LICENSE": 8204,
+    "README.md": 7708,
+    "checkpoints/pipeline.yaml": 3548,
+    "checkpoints/slat_decoder_gs.ckpt": 171476155,
+    "checkpoints/slat_decoder_gs.yaml": 576,
+    "checkpoints/slat_decoder_gs_4.ckpt": 170269801,
+    "checkpoints/slat_decoder_gs_4.yaml": 575,
+    "checkpoints/slat_decoder_mesh.ckpt": 363726862,
+    "checkpoints/slat_decoder_mesh.pt": 363728714,
+    "checkpoints/slat_decoder_mesh.yaml": 300,
+    "checkpoints/slat_encoder.ckpt": 173263986,
+    "checkpoints/slat_encoder.yaml": 268,
+    "checkpoints/slat_generator.ckpt": 4906537684,
+    "checkpoints/slat_generator.yaml": 1986,
+    "checkpoints/ss_decoder.ckpt": 147609242,
+    "checkpoints/ss_decoder.yaml": 244,
+    "checkpoints/ss_encoder.ckpt": 119085402,
+    "checkpoints/ss_encoder.safetensors": 0,
+    "checkpoints/ss_encoder.yaml": 231,
+    "checkpoints/ss_generator.ckpt": 6690136964,
+    "checkpoints/ss_generator.yaml": 5076,
+}
+
+
+def validate(root: Path) -> list[str]:
+    actual = {
+        path.relative_to(root).as_posix()
+        for path in root.rglob("*")
+        if path.is_file() and ".cache" not in path.relative_to(root).parts
+    }
+    if actual != set(EXPECTED):
+        missing = sorted(set(EXPECTED) - actual)
+        extra = sorted(actual - set(EXPECTED))
+        raise RuntimeError(f"SAM3D checkpoint file mismatch: missing={missing}, extra={extra}")
+    records = []
+    for relative, expected_size in sorted(EXPECTED.items()):
+        path = root / relative
+        if path.is_symlink() or path.stat().st_size != expected_size:
+            raise RuntimeError(f"SAM3D checkpoint size or path mismatch: {relative}")
+        digest = hashlib.sha256()
+        with path.open("rb") as stream:
+            for block in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+                digest.update(block)
+        records.append(f"{digest.hexdigest()}  {relative}")
+    return records
+
+
+repository = os.environ["IMIM_SAM3D_REPOSITORY"]
+commit = os.environ["IMIM_SAM3D_COMMIT"]
+root = Path(os.environ["IMIM_SAM3D_ROOT"])
+staging = Path(os.environ["IMIM_SAM3D_STAGING"])
+manifest = Path(os.environ["IMIM_SAM3D_MANIFEST"])
+if root.exists() and staging.exists():
+    raise RuntimeError("SAM3D final and staging directories both exist")
+if not root.exists():
+    staging.mkdir(mode=0o700, parents=True, exist_ok=True)
+    snapshot_download(
+        repo_id=repository,
+        revision=commit,
+        local_dir=staging,
+        allow_patterns=["checkpoints/*", "LICENSE", "README.md"],
+        max_workers=4,
+        token=os.environ["HF_TOKEN"],
+    )
+    validate(staging)
+    staging.rename(root)
+records = validate(root)
+payload = "\n".join(records) + "\n"
+temporary = manifest.with_name(manifest.name + ".tmp")
+temporary.write_text(payload, encoding="utf-8")
+os.chmod(temporary, 0o600)
+if manifest.exists():
+    if manifest.read_bytes() != temporary.read_bytes():
+        raise RuntimeError("existing SAM3D manifest does not match checkpoint bytes")
+    temporary.unlink()
+else:
+    temporary.replace(manifest)
+print(f"sam3d_checkpoint_files={len(records)}")
+print(f"sam3d_checkpoint_bytes={sum(EXPECTED.values())}")
+PY
+unset HF_TOKEN
 
 python - <<'PY'
 import json
