@@ -46,12 +46,19 @@ def test_contact_summary_reports_maximum_penetration() -> None:
             self.separation = separation
 
     class Contact:
-        def __init__(self, *separations: float) -> None:
+        def __init__(self, names, *separations: float) -> None:
             self.points = [Point(value) for value in separations]
+            self.bodies = [
+                type("Body", (), {"entity": type("Entity", (), {"name": name})()})()
+                for name in names
+            ]
 
     class Scene:
         def get_contacts(self):
-            return [Contact(-0.003, 0.001), Contact(-0.012)]
+            return [
+                Contact(["mug", "table"], -0.003, 0.001),
+                Contact(["plate", "table"], -0.012),
+            ]
 
     metrics = runner._contact_metrics(Scene())
 
@@ -59,6 +66,18 @@ def test_contact_summary_reports_maximum_penetration() -> None:
         "contact_pair_count": 2,
         "contact_point_count": 3,
         "max_penetration_m": pytest.approx(0.012),
+        "contact_pairs_by_penetration": [
+            {
+                "bodies": ["plate", "table"],
+                "contact_point_count": 1,
+                "max_penetration_m": pytest.approx(0.012),
+            },
+            {
+                "bodies": ["mug", "table"],
+                "contact_point_count": 2,
+                "max_penetration_m": pytest.approx(0.003),
+            },
+        ],
     }
 
 

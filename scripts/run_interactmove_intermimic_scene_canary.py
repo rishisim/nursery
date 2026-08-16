@@ -184,17 +184,39 @@ def _contact_metrics(scene: Any) -> dict[str, Any]:
     contacts = scene.get_contacts()
     point_count = 0
     max_penetration = 0.0
+    pair_records: list[dict[str, Any]] = []
     for contact in contacts:
+        body_names = []
+        for body in getattr(contact, "bodies", []):
+            entity = getattr(body, "entity", None)
+            name = getattr(entity, "name", None) or getattr(body, "name", None)
+            body_names.append("<unnamed>" if name is None else str(name))
+        pair_point_count = 0
+        pair_max_penetration = 0.0
         for point in getattr(contact, "points", []):
             separation = float(point.separation)
             if not math.isfinite(separation):
                 raise RuntimeError("SAPIEN contact separation is non-finite")
             point_count += 1
-            max_penetration = max(max_penetration, max(0.0, -separation))
+            penetration = max(0.0, -separation)
+            max_penetration = max(max_penetration, penetration)
+            pair_point_count += 1
+            pair_max_penetration = max(pair_max_penetration, penetration)
+        pair_records.append(
+            {
+                "bodies": body_names,
+                "contact_point_count": pair_point_count,
+                "max_penetration_m": pair_max_penetration,
+            }
+        )
+    pair_records.sort(
+        key=lambda item: (-item["max_penetration_m"], item["bodies"])
+    )
     return {
         "contact_pair_count": len(contacts),
         "contact_point_count": point_count,
         "max_penetration_m": max_penetration,
+        "contact_pairs_by_penetration": pair_records,
     }
 
 
