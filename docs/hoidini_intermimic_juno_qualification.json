@@ -1,0 +1,102 @@
+{
+  "schema_version": "hoidini-intermimic-juno-decision-1.0.0",
+  "recorded_at_utc": "2026-08-16T01:09:26Z",
+  "decision": "INCONCLUSIVE_ENVIRONMENT",
+  "decision_reason": "Juno and the pinned environment were qualified, but SD3.5 Medium access returned HTTP 403 and no GPT/VLM configuration was present, so real generation was not authorized.",
+  "stage2_empirical_gate_complete": false,
+  "source": {
+    "stage12_commit": "1aab0620156ac6af001d191aa13afc68a3e7518b",
+    "task_contract_sha256": "5392938ecc4f5cb017ec714a10f76ac60c8f331570f3e63217a68802bf062f4a",
+    "embodiedgen_release": "v2.0.1",
+    "embodiedgen_commit": "9b333554254af196bace88c1a171a3bf047fa09c",
+    "robot_free_patch_sha256": "6413d54beb3b08971869c88f7a72be23d104952f966f2df07c2265a227069d80"
+  },
+  "juno_qualification": {
+    "job_id": "328049",
+    "state": "COMPLETED",
+    "node": "g-06-01",
+    "os": "Rocky Linux 9.5",
+    "gpu": "NVIDIA H100 NVL MIG 3g.47gb",
+    "driver": "550.163.01",
+    "compute_capability": [9, 0],
+    "cuda_module": "12.6",
+    "pytorch": "2.8.0+cu126",
+    "tiny_cuda_sum": 14.0,
+    "huggingface_public_http_status": 200,
+    "durable_free_space_at_qualification": "431G",
+    "scratch_free_space_at_qualification": "approximately 30T",
+    "receipt": {
+      "path": "/work/dal503972/hoidini_intermimic/compact_records/qualification-328049.txt",
+      "sha256": "3a10a2c705bded1259f305847d811b11858b4ef6503f531e883fdc2f368cec8a"
+    },
+    "limitations": [
+      "The qualification used a 47 GB MIG slice and does not prove that full EmbodiedGen generation fits that slice.",
+      "The CUDA operation used an existing safe PyTorch container, not the newly installed EmbodiedGen environment."
+    ]
+  },
+  "embodiedgen_environment": {
+    "install_job_id": "328191",
+    "install_job_state": "COMPLETED",
+    "install_node_type": "CPU Slurm node",
+    "path": "/scratch/juno/dal503972/hoidini_intermimic/environments/embodiedgen",
+    "python": "3.10.13",
+    "pytorch": "2.8.0+cu126",
+    "torch_cuda_build": "12.6",
+    "layout_cli_present": true,
+    "import_smoke_passed": true,
+    "robot_free_patch_applied": true,
+    "gpu_smoke_of_installed_environment": false,
+    "receipt": {
+      "path": "/work/dal503972/hoidini_intermimic/compact_records/environment-328191.txt",
+      "sha256": "df57db32091fe579d5812b07228d99ac09def76b22d4140608edff4974abc9e6"
+    },
+    "known_dependency_conflicts": [
+      "plyfile 1.1.5 declares numpy>=2.0 while the release explicitly pins numpy 1.26.4",
+      "dash 4.4.1 declares pydantic>=2.10 while the release installs pydantic 2.9.2"
+    ]
+  },
+  "credential_and_license_gates": {
+    "huggingface_token_file_present": true,
+    "sd35_medium_authenticated_http_status": 403,
+    "sam3d_metadata_authenticated_http_status": 200,
+    "sam3d_weight_download_proven": false,
+    "gpt_vlm_config_present": false,
+    "secret_values_recorded": false
+  },
+  "real_scene_generation": {
+    "executed": false,
+    "durable_scene_path": null,
+    "background_downloaded": false,
+    "layout_json_created": false,
+    "resolver_executed_on_real_scene": false,
+    "resolved_robot_instances": null,
+    "reason_not_executed": "Required SD3.5 model access and GPT/VLM configuration were absent.",
+    "prepared_script_preflight_exit": 20,
+    "prepared_script_preflight_result": "blocked=gpt_vlm_config_missing"
+  },
+  "scientific_scope": {
+    "physics_validated": false,
+    "reachability_checked": false,
+    "hoidini_executed": false,
+    "intermimic_executed": false,
+    "video_rendered": false
+  },
+  "task_jobs": [
+    {"job_id": "328042", "state": "CANCELLED", "reason": "Full H100 qualification never allocated; replaced by bounded MIG qualification."},
+    {"job_id": "328049", "state": "COMPLETED", "reason": "H100 CUDA qualification."},
+    {"job_id": "328053", "state": "CANCELLED", "reason": "Conda used a shared system package cache and stalled; replaced with a private scratch cache."},
+    {"job_id": "328109", "state": "CANCELLED", "reason": "Queued H100 installer replaced by CPU installation after a four-hour array job took the resource."},
+    {"job_id": "328158", "state": "FAILED", "reason": "Detected an incomplete conda prefix selecting system Python."},
+    {"job_id": "328165", "state": "FAILED", "reason": "Upstream pip used only the PyTorch index and could not resolve a build dependency."},
+    {"job_id": "328168", "state": "FAILED", "reason": "CPU compilation could not infer the H100 CUDA architecture."},
+    {"job_id": "328182", "state": "FAILED", "reason": "CUDA 12.6 rejected Juno default GCC 14."},
+    {"job_id": "328189", "state": "FAILED", "reason": "Pinned GCC 13 was unavailable from default conda channels."},
+    {"job_id": "328191", "state": "COMPLETED", "reason": "Pinned environment installation and CPU import smoke."}
+  ],
+  "required_user_actions": [
+    "Accept or obtain access to stabilityai/stable-diffusion-3.5-medium for the Hugging Face identity whose token is already present on Juno.",
+    "Provision a working EmbodiedGen v2.0.1 GPT/VLM configuration at /work/dal503972/hoidini_intermimic/frozen_configs/gpt_config.yaml without committing or logging its secret values."
+  ],
+  "resume_command": "sbatch --output=/scratch/juno/dal503972/hoidini_intermimic/logs/generate-%j.out --error=/scratch/juno/dal503972/hoidini_intermimic/logs/generate-%j.err /scratch/juno/dal503972/hoidini_intermimic/jobs/juno_generate_hoidini_intermimic_pilot.sh",
+  "resume_command_status": "Prepared but not submitted; the script fails closed until both user-owned gates pass."
+}

@@ -16,6 +16,8 @@ from babyworld_lite.hoidini_intermimic.stage12 import (
 
 ROOT = Path(__file__).resolve().parents[1]
 TASK = ROOT / "configs" / "hoidini_intermimic_pilot.json"
+JUNO_QUALIFICATION = ROOT / "configs" / "hoidini_intermimic_juno_qualification.json"
+JUNO_RECORD = ROOT / "docs" / "hoidini_intermimic_juno_qualification.json"
 FIXTURE = ROOT / "tests" / "fixtures" / "hoidini_intermimic"
 
 
@@ -32,6 +34,41 @@ def test_pilot_contract_is_explicit_and_covers_ten_seconds() -> None:
     assert contract["action_phases"][0]["start_seconds"] == 0.0
     assert contract["action_phases"][-1]["end_seconds"] == 10.0
     assert set(contract["seeds"]) == {"scene", "layout", "motion", "physics", "render"}
+
+
+def test_juno_qualification_is_pinned_and_scientifically_bounded() -> None:
+    qualification = json.loads(JUNO_QUALIFICATION.read_text(encoding="utf-8"))
+
+    assert qualification["embodiedgen"]["release"] == "v2.0.1"
+    assert qualification["embodiedgen"]["commit"] == (
+        "9b333554254af196bace88c1a171a3bf047fa09c"
+    )
+    assert qualification["juno"]["durable_root"] == (
+        "/work/dal503972/hoidini_intermimic"
+    )
+    assert qualification["juno"]["scratch_root"] == (
+        "/scratch/juno/dal503972/hoidini_intermimic"
+    )
+    assert "A qualification job is not scene generation." in qualification[
+        "scientific_exclusions"
+    ]
+
+
+def test_juno_empirical_record_does_not_overclaim_stage2() -> None:
+    record = json.loads(JUNO_RECORD.read_text(encoding="utf-8"))
+
+    assert record["decision"] in {
+        "QUALIFIED_STAGE12_BOUNDARY",
+        "REJECTED_STAGE12_BOUNDARY",
+        "INCONCLUSIVE_ENVIRONMENT",
+    }
+    if record["decision"] != "QUALIFIED_STAGE12_BOUNDARY":
+        assert record["real_scene_generation"]["executed"] is False
+        assert record["stage2_empirical_gate_complete"] is False
+    assert record["scientific_scope"]["physics_validated"] is False
+    assert record["scientific_scope"]["reachability_checked"] is False
+    assert record["scientific_scope"]["hoidini_executed"] is False
+    assert record["scientific_scope"]["intermimic_executed"] is False
 
 
 def test_task_contract_rejects_a_phase_gap() -> None:

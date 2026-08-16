@@ -72,6 +72,13 @@ No proactive humanoid-reachability gate is performed. The manifest records
 that fact, and an actual placement failure should be reported only if one is
 later observed.
 
+For the pinned `v2.0.1` release, omitting `--insert_robot` is not sufficient by
+itself: the stock SAPIEN preview path constructs a ManiSkill robot
+unconditionally. Juno runs therefore apply the reviewed
+`scripts/embodiedgen_v2.0.1_robot_free.patch` to the exact pinned commit. The
+patch makes robot construction conditional on `insert_robot`; it does not
+change layout generation, object placement, or scene physics.
+
 ### Output
 
 The output manifest contains:
@@ -114,6 +121,29 @@ The checked-in test fixture is representative text data only. It proves this
 file boundary and does **not** claim that a real EmbodiedGenV2 scene was
 generated or loaded in a simulator.
 
+## Juno empirical gate
+
+The reproducible qualification inputs are
+`configs/hoidini_intermimic_juno_qualification.json`,
+`scripts/juno_qualify_hoidini_intermimic.sh`, and
+`scripts/juno_prepare_embodiedgen.sh`. The fail-closed continuation command is
+`scripts/juno_generate_hoidini_intermimic_pilot.sh`. Complete environments,
+caches, logs, downloads, and scene packages live only under the canonical Juno
+roots named in the config. The compact outcome is updated in place at
+`docs/hoidini_intermimic_juno_qualification.json`.
+
+The gate distinguishes three facts:
+
+1. GPU qualification proves only that Slurm, CUDA, and a tiny PyTorch operation
+   work.
+2. Environment qualification proves only that the pinned release installs and
+   imports with the robot-free patch.
+3. `QUALIFIED_STAGE12_BOUNDARY` requires a newly generated real scene package,
+   successful resolution, zero robot instances, and non-rendering asset checks.
+
+No qualification state implies successful HOIDiNi generation, InterMimic
+tracking, reachability, contact, dynamics, or video rendering.
+
 ## Open limitations
 
 - The first task is one rigid manipulated object; articulated, deformable, and
@@ -125,5 +155,5 @@ generated or loaded in a simulator.
 - Background `mesh_model.ply` is visual only unless a separate validated
   collision asset is supplied. The table URDF supplies the pilot's support
   collision.
-- A real EmbodiedGen generation run and physical scene validation remain future
-  work; no checkpoints, assets, or full scenes were downloaded here.
+- The current Juno decision record states whether a real EmbodiedGen package was
+  generated. Physical scene validation remains outside Stages 1–2 regardless.
