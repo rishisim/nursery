@@ -198,6 +198,14 @@ def _contact_metrics(scene: Any) -> dict[str, Any]:
     }
 
 
+def _load_fixed_room(loader: Any, environment_urdf_path: Path):
+    articulations, entities = loader.load_multiple(str(environment_urdf_path))
+    loaded = list(articulations) + list(entities)
+    if not loaded:
+        raise RuntimeError("SAPIEN failed to import the explicit room geometry")
+    return articulations, entities, loaded
+
+
 def run(args: argparse.Namespace) -> dict[str, Any]:
     import imageio.v2 as imageio
     import numpy as np
@@ -275,7 +283,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     native_robot = layout.relation.get(Scene3DItemEnum.ROBOT.value)
     manager = SapienSceneManager(args.sim_hz, ray_tracing=False)
     environment_import = None
-    room_entity = None
+    room_articulations: list[Any] = []
+    room_entities: list[Any] = []
+    room_objects: list[Any] = []
     environment_urdf_path = None
     if scene_bundle is not None:
         environment_urdf_path, environment_import = _write_environment_urdf(
@@ -283,9 +293,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         )
         loader = manager.scene.create_urdf_loader()
         loader.fix_root_link = True
-        room_entity = loader.load(str(environment_urdf_path))
-        if room_entity is None:
-            raise RuntimeError("SAPIEN failed to import the explicit room geometry")
+        room_articulations, room_entities, room_objects = _load_fixed_room(
+            loader, environment_urdf_path
+        )
     manager.initialize_circular_cameras(
         num_cameras=1,
         radius=args.camera_radius_m,
@@ -371,7 +381,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         and max_final_linear_speed <= settling_thresholds["max_final_linear_speed_m_s"]
         and max_final_angular_speed <= settling_thresholds["max_final_angular_speed_rad_s"]
         and contact_metrics["max_penetration_m"] <= settling_thresholds["max_penetration_m"]
-        and room_entity is not None
+        and bool(room_objects)
     )
 
     try:
@@ -429,7 +439,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "native_robot_declared": native_robot,
             "native_robot_loaded": False,
             "humanoid_loaded": False,
-            "explicit_room_loaded": room_entity is not None,
+            "explicit_room_loaded": bool(room_objects),
+            "explicit_room_articulation_count": len(room_articulations),
+            "explicit_room_entity_count": len(room_entities),
         },
         "timing": {
             "duration_s": args.duration_s,

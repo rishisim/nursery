@@ -79,3 +79,20 @@ def test_scene_bundle_file_verification_rejects_mutation(tmp_path: Path) -> None
     artifact.write_bytes(b"mutated")
     with pytest.raises(ValueError, match="hash/size mismatch"):
         runner._verify_scene_bundle_files(scene, bundle)
+
+
+def test_fixed_room_loader_keeps_every_parsed_object(tmp_path: Path) -> None:
+    runner = _load_runner()
+    urdf = tmp_path / "room.urdf"
+    urdf.write_text("<robot name='room'/>", encoding="utf-8")
+
+    class Loader:
+        def load_multiple(self, path):
+            assert path == str(urdf)
+            return ["fixed-articulation"], ["visual", "walls"]
+
+    articulations, entities, loaded = runner._load_fixed_room(Loader(), urdf)
+
+    assert articulations == ["fixed-articulation"]
+    assert entities == ["visual", "walls"]
+    assert loaded == ["fixed-articulation", "visual", "walls"]
