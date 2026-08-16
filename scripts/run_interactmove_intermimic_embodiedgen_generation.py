@@ -532,7 +532,7 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
                         "tabletop and warm polished surface"
                     ),
                     "reuse_result": True,
-                    "rejected_result": None,
+                    "rejected_results": [],
                 },
                 "red mug": {
                     "prompt": (
@@ -540,14 +540,27 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
                         "rim, and smooth reflective surface"
                     ),
                     "reuse_result": False,
-                    "rejected_result": {
-                        "job_id": "328392",
-                        "generation_receipt_sha256": (
-                            "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b"
-                            "944c32bfef41ef3c"
-                        ),
-                        "reason": "malformed_vertical_side_protrusion",
-                    },
+                    "rejected_results": [
+                        {
+                            "job_id": "328392",
+                            "generation_receipt_sha256": (
+                                "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b"
+                                "944c32bfef41ef3c"
+                            ),
+                            "reason": "malformed_vertical_side_protrusion",
+                        },
+                        {
+                            "job_id": "328413",
+                            "generation_receipt_sha256": (
+                                "c3e4f6670400bb7a32017da8480627c389879df741819b75"
+                                "e9248ddbd1065f74"
+                            ),
+                            "reason": (
+                                "duplicate_handles_found_by_target_specific_"
+                                "multiview_review"
+                            ),
+                        },
+                    ],
                 },
                 "plate": {
                     "prompt": (
@@ -555,7 +568,7 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
                         "glossy finish, and circular form"
                     ),
                     "reuse_result": True,
-                    "rejected_result": None,
+                    "rejected_results": [],
                 },
                 "spoon": {
                     "prompt": (
@@ -563,8 +576,22 @@ def _generation_config(protocol: Mapping[str, Any]) -> dict[str, Any]:
                         "bowl and slender rounded handle"
                     ),
                     "reuse_result": True,
-                    "rejected_result": None,
+                    "rejected_results": [],
                 },
+            },
+            "target_geometry_policy": {
+                "source_node_key": "red mug",
+                "exact_handle_count": 1,
+                "trellis_retry_seeds": [33936, 62468],
+                "review_prompt": (
+                    "These are four camera views of the same single generated "
+                    "red mug asset. Return exactly YES if and only if the asset "
+                    "has exactly one connected mug handle on one side. Return "
+                    "NO followed by a short reason if it has zero handles, two "
+                    "or more handles, mirrored or duplicated handles, an "
+                    "unrelated protrusion, or malformed handle geometry. Do "
+                    "not count repeated camera views as additional objects."
+                ),
             },
         },
         "image_samples_per_prompt": 1,
@@ -767,7 +794,7 @@ def _resume_assets(args: argparse.Namespace, generation: Mapping[str, Any]) -> d
         nodes[node] = {
             "prompt": prompt,
             "reuse_result": policy["reuse_result"],
-            "rejected_result": copy.deepcopy(policy["rejected_result"]),
+            "rejected_results": copy.deepcopy(policy["rejected_results"]),
             "result_relative": result_relative,
             "result_path": root / result_relative,
             "image_path": root / f"images/{save_node}.png",
@@ -806,9 +833,27 @@ def _conditioning_records(
             "image_sha256": _sha256(resumed_asset["image_path"]),
             "raw_image_sha256": _sha256(resumed_asset["raw_image_path"]),
             "source_job_id": asset_source_job_id,
-            "rejected_result": copy.deepcopy(resumed_asset["rejected_result"]),
+            "rejected_results": copy.deepcopy(
+                resumed_asset["rejected_results"]
+            ),
         }
     return records
+
+
+def _query_target_geometry_quality(
+    client: Any,
+    policy: Mapping[str, Any],
+    render_paths: list[Path],
+) -> str | None:
+    response = client.query(
+        policy["review_prompt"],
+        image_base64=render_paths,
+        system_role=(
+            "You are a strict 3D asset geometry inspector. Follow the "
+            "requested exact output format."
+        ),
+    )
+    return response.strip() if isinstance(response, str) else None
 
 
 def _manifest(root: Path, excluded: set[Path]) -> list[dict[str, Any]]:
@@ -945,6 +990,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "nodes": copy.deepcopy(
                     generation["asset_resume_source"]["nodes"]
                 ),
+                "target_geometry_policy": copy.deepcopy(
+                    generation["asset_resume_source"][
+                        "target_geometry_policy"
+                    ]
+                ),
             },
         },
         "background": {
@@ -1043,6 +1093,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "fresh layout must contain exactly one manipulated object; "
                 f"got {len(manipulated)}"
             )
+        if manipulated[0] != generation["asset_resume_source"][
+            "target_geometry_policy"
+        ]["source_node_key"]:
+            raise RuntimeError(
+                "target geometry policy does not bind the manipulated object"
+            )
         receipt["stages"].append(
             {
                 "name": "gpt_scene_layout",
@@ -1083,6 +1139,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         for index, prompt in enumerate(prompts):
             node = prompts_mapping[prompt]
             resumed_asset = asset_resume["nodes"].get(node)
+            target_geometry_attempts = None
             if resumed_asset is not None and resumed_asset["reuse_result"]:
                 if prompt != resumed_asset["prompt"]:
                     raise RuntimeError(f"resume asset prompt mismatch for {node}")
@@ -1121,22 +1178,106 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                     "sha256": _sha256(resumed_asset["image_path"]),
                 }
             else:
-                generation_log = textto3d_module.text_to_3d(
-                    prompts=[prompt],
-                    output_root=str(output),
-                    asset_names=[node],
-                    n_img_sample=generation["image_samples_per_prompt"],
-                    text_guidance_scale=generation["text_guidance_scale"],
-                    img_denoise_step=generation["image_denoise_steps"],
-                    n_image_retry=request["retry_limits"]["image"],
-                    n_asset_retry=request["retry_limits"]["asset"],
-                    n_pipe_retry=request["retry_limits"]["pipeline"],
-                    seed_img=request["seeds"]["image"],
-                    seed_3d=request["seeds"]["asset"],
-                    keep_intermediate=False,
-                    image3d_model=generation["image_to_3d_backend"],
+                target_policy = generation["asset_resume_source"][
+                    "target_geometry_policy"
+                ]
+                is_target = node == target_policy["source_node_key"]
+                retry_seeds = (
+                    target_policy["trellis_retry_seeds"]
+                    if is_target
+                    else [request["seeds"]["asset"]]
                 )
-                qa_result = generation_log["quality"].get(node)
+                target_geometry_attempts = [] if is_target else None
+                generation_log = None
+                qa_result = None
+                for attempt_index, asset_seed in enumerate(retry_seeds):
+                    if attempt_index:
+                        failed_asset_root = (
+                            output / "asset3d" / node.replace(" ", "_")
+                        )
+                        if failed_asset_root.is_symlink():
+                            raise RuntimeError(
+                                f"refusing unsafe failed asset path: {node}"
+                            )
+                        if failed_asset_root.exists():
+                            shutil.rmtree(failed_asset_root)
+                    generation_log = textto3d_module.text_to_3d(
+                        prompts=[prompt],
+                        output_root=str(output),
+                        asset_names=[node],
+                        n_img_sample=generation["image_samples_per_prompt"],
+                        text_guidance_scale=generation["text_guidance_scale"],
+                        img_denoise_step=generation["image_denoise_steps"],
+                        n_image_retry=request["retry_limits"]["image"],
+                        n_asset_retry=request["retry_limits"]["asset"],
+                        n_pipe_retry=(
+                            1
+                            if is_target
+                            else request["retry_limits"]["pipeline"]
+                        ),
+                        seed_img=request["seeds"]["image"],
+                        seed_3d=asset_seed,
+                        keep_intermediate=False,
+                        image3d_model=generation["image_to_3d_backend"],
+                    )
+                    qa_result = generation_log["quality"].get(node)
+                    if not is_target:
+                        break
+                    result_root = (
+                        output
+                        / "asset3d"
+                        / node.replace(" ", "_")
+                        / "result"
+                    )
+                    render_paths = [
+                        result_root
+                        / "renders"
+                        / "image_color"
+                        / f"{view_index:04d}.png"
+                        for view_index in range(4)
+                    ]
+                    if not all(path.is_file() for path in render_paths):
+                        raise RuntimeError(
+                            f"fresh target is missing multiview renders: {node}"
+                        )
+                    multiview_response = textto3d_module.TXTGEN_CHECKER.query(
+                        node, [str(path) for path in render_paths]
+                    )
+                    multiview_result = (
+                        multiview_response.strip()
+                        if isinstance(multiview_response, str)
+                        else None
+                    )
+                    target_result = _query_target_geometry_quality(
+                        GPT_CLIENT, target_policy, render_paths
+                    )
+                    target_geometry_attempts.append(
+                        {
+                            "trellis_seed": asset_seed,
+                            "upstream_quality": qa_result,
+                            "multiview_quality": multiview_result,
+                            "target_geometry_quality": target_result,
+                        }
+                    )
+                    if (
+                        qa_result == "YES"
+                        and multiview_result == "YES"
+                        and target_result == "YES"
+                    ):
+                        break
+                if generation_log is None:
+                    raise RuntimeError(f"no TRELLIS attempts configured for {node}")
+                if is_target and (
+                    not target_geometry_attempts
+                    or target_geometry_attempts[-1]["upstream_quality"] != "YES"
+                    or target_geometry_attempts[-1]["multiview_quality"] != "YES"
+                    or target_geometry_attempts[-1]["target_geometry_quality"]
+                    != "YES"
+                ):
+                    raise RuntimeError(
+                        "fresh target exhausted strict geometry retries: "
+                        + json.dumps(target_geometry_attempts, sort_keys=True)
+                    )
                 if not isinstance(qa_result, str) or qa_result != "YES":
                     raise RuntimeError(
                         f"fresh TRELLIS asset failed final quality gate: "
@@ -1153,8 +1294,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                             "accepted_retry_seed"
                         ),
                         "sha256": conditioning_records[node]["image_sha256"],
-                        "rejected_result": copy.deepcopy(
-                            conditioning_records[node].get("rejected_result")
+                        "rejected_results": copy.deepcopy(
+                            conditioning_records[node].get("rejected_results")
                         ),
                     }
                     if node in reused_images
@@ -1174,6 +1315,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                     "prompt": prompt,
                     "quality": generation_log["quality"].get(node),
                     "conditioning_image": conditioning_image,
+                    "target_geometry_attempts": target_geometry_attempts,
                     "result_manifest_sha256": (
                         resumed_asset["result_manifest_sha256"]
                         if resumed_asset is not None

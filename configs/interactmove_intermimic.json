@@ -125,27 +125,43 @@
         "table": {
           "prompt": "standalone rectangular wooden table with a clean empty tabletop and warm polished surface",
           "reuse_result": true,
-          "rejected_result": null
+          "rejected_results": []
         },
         "red mug": {
           "prompt": "glossy crimson ceramic mug with curved handle, thick rim, and smooth reflective surface",
           "reuse_result": false,
-          "rejected_result": {
-            "job_id": "328392",
-            "generation_receipt_sha256": "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b944c32bfef41ef3c",
-            "reason": "malformed_vertical_side_protrusion"
-          }
+          "rejected_results": [
+            {
+              "job_id": "328392",
+              "generation_receipt_sha256": "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b944c32bfef41ef3c",
+              "reason": "malformed_vertical_side_protrusion"
+            },
+            {
+              "job_id": "328413",
+              "generation_receipt_sha256": "c3e4f6670400bb7a32017da8480627c389879df741819b75e9248ddbd1065f74",
+              "reason": "duplicate_handles_found_by_target_specific_multiview_review"
+            }
+          ]
         },
         "plate": {
           "prompt": "white ceramic dinner plate with subtle rim, clean glossy finish, and circular form",
           "reuse_result": true,
-          "rejected_result": null
+          "rejected_results": []
         },
         "spoon": {
           "prompt": "small stainless-steel spoon with polished reflective bowl and slender rounded handle",
           "reuse_result": true,
-          "rejected_result": null
+          "rejected_results": []
         }
+      },
+      "target_geometry_policy": {
+        "source_node_key": "red mug",
+        "exact_handle_count": 1,
+        "trellis_retry_seeds": [
+          33936,
+          62468
+        ],
+        "review_prompt": "These are four camera views of the same single generated red mug asset. Return exactly YES if and only if the asset has exactly one connected mug handle on one side. Return NO followed by a short reason if it has zero handles, two or more handles, mirrored or duplicated handles, an unrelated protrusion, or malformed handle geometry. Do not count repeated camera views as additional objects."
       }
     },
     "image_samples_per_prompt": 1,

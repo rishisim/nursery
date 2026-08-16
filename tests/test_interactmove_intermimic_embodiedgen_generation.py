@@ -75,14 +75,29 @@ def test_generation_protocol_is_real_robot_free_path() -> None:
             "smooth reflective surface"
         ),
         "reuse_result": False,
-        "rejected_result": {
-            "job_id": "328392",
-            "generation_receipt_sha256": (
-                "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b944c32bfef41ef3c"
-            ),
-            "reason": "malformed_vertical_side_protrusion",
-        },
+        "rejected_results": [
+            {
+                "job_id": "328392",
+                "generation_receipt_sha256": (
+                    "6a5160b0f5e0a3bef4ae4a2a51831426adfbcb76b65d0b6b944c32bfef41ef3c"
+                ),
+                "reason": "malformed_vertical_side_protrusion",
+            },
+            {
+                "job_id": "328413",
+                "generation_receipt_sha256": (
+                    "c3e4f6670400bb7a32017da8480627c389879df741819b75e9248ddbd1065f74"
+                ),
+                "reason": (
+                    "duplicate_handles_found_by_target_specific_multiview_review"
+                ),
+            },
+        ],
     }
+    target_policy = generation["asset_resume_source"]["target_geometry_policy"]
+    assert target_policy["source_node_key"] == "red mug"
+    assert target_policy["exact_handle_count"] == 1
+    assert target_policy["trellis_retry_seeds"] == [33936, 62468]
     assert generation["invoke_upstream_sim_cli"] is False
     assert generation["robot_actor_loaded"] is False
     assert generation["background_dataset"][
@@ -428,7 +443,7 @@ def test_resume_assets_verifies_complete_receipt_manifest(tmp_path: Path) -> Non
         "table": {
             "prompt": "table prompt",
             "reuse_result": True,
-            "rejected_result": None,
+            "rejected_results": [],
         }
     }
     root = tmp_path / "partial"
@@ -499,11 +514,13 @@ def test_rejected_result_reuses_only_hash_bound_conditioning_image(
     raw_image = tmp_path / "red_mug_raw.png"
     image.write_bytes(b"accepted-red-mug-image")
     raw_image.write_bytes(b"accepted-red-mug-raw-image")
-    rejection = {
-        "job_id": "328392",
-        "generation_receipt_sha256": "a" * 64,
-        "reason": "malformed_vertical_side_protrusion",
-    }
+    rejections = [
+        {
+            "job_id": "328392",
+            "generation_receipt_sha256": "a" * 64,
+            "reason": "malformed_vertical_side_protrusion",
+        }
+    ]
 
     records = runner._conditioning_records(
         {"images": {}},
@@ -512,7 +529,7 @@ def test_rejected_result_reuses_only_hash_bound_conditioning_image(
                 "red mug": {
                     "prompt": "frozen red mug prompt",
                     "reuse_result": False,
-                    "rejected_result": rejection,
+                    "rejected_results": rejections,
                     "image_path": image,
                     "raw_image_path": raw_image,
                 }
@@ -528,8 +545,37 @@ def test_rejected_result_reuses_only_hash_bound_conditioning_image(
         "image_sha256": runner._sha256(image),
         "raw_image_sha256": runner._sha256(raw_image),
         "source_job_id": "328381",
-        "rejected_result": rejection,
+        "rejected_results": rejections,
     }
+
+
+def test_target_geometry_quality_requires_exact_plain_yes(tmp_path: Path) -> None:
+    runner = _load_runner()
+    calls = []
+
+    class Client:
+        def query(self, prompt, *, image_base64, system_role):
+            calls.append((prompt, image_base64, system_role))
+            return "  NO — the mug has two handles.  "
+
+    views = [tmp_path / f"{index:04d}.png" for index in range(4)]
+    policy = {
+        "review_prompt": "Require exactly one connected mug handle.",
+    }
+
+    result = runner._query_target_geometry_quality(Client(), policy, views)
+
+    assert result == "NO — the mug has two handles."
+    assert calls == [
+        (
+            "Require exactly one connected mug handle.",
+            views,
+            (
+                "You are a strict 3D asset geometry inspector. Follow the "
+                "requested exact output format."
+            ),
+        )
+    ]
 
 
 def test_multiview_quality_prompt_disambiguates_camera_views() -> None:
