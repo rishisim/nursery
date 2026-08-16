@@ -70,6 +70,31 @@
       "mesh_part_seg.glb"
     ]
   },
+  "fresh_generation": {
+    "activity_spec": "configs/interactmove_intermimic_activity.json",
+    "background_dataset": {
+      "repository": "HorizonRobotics/EmbodiedGenData",
+      "commit": "58258b50a0fc95034f2f3cc03b332ec6f72b91fd",
+      "scene_id": "scene_0010",
+      "retrieval_is_fresh_background_generation": false
+    },
+    "text_to_image_model": "stabilityai/stable-diffusion-3.5-medium",
+    "text_to_image_backend": "sd35",
+    "image_to_3d_backend": "SAM3D",
+    "image_samples_per_prompt": 1,
+    "text_guidance_scale": 7.0,
+    "image_denoise_steps": 25,
+    "gpt_service_seed_supported": false,
+    "invoke_upstream_sim_cli": false,
+    "robot_actor_loaded": false,
+    "slurm": {
+      "partition": "h200",
+      "gpu_resource": "gpu:nvidia_h200_nvl:1",
+      "cpus": 8,
+      "memory_gb": 128,
+      "time_limit": "06:00:00"
+    }
+  },
   "scene_policy": {
     "background_body_type": "static",
     "context_body_type": "static",
@@ -96,13 +121,13 @@
     "mani_skill": "3.0.0b21",
     "qualification_gpu": "NVIDIA H100 NVL MIG 3g.47gb",
     "setup_gpu": "NVIDIA H200 NVL",
-    "secret_file": "/home/dal503972/.config/interactmove_intermimic/embodiedgen.env",
+    "secret_file": "/work/dal503972/interactmove_intermimic/frozen_configs/gpt_config.yaml",
     "secret_file_tracked": false,
     "fresh_generation_required_secret_names": [
-      "API_KEY",
-      "API_VERSION",
-      "ENDPOINT",
-      "MODEL_NAME"
+      "agent_type",
+      "openai-platform.endpoint",
+      "openai-platform.api_key",
+      "openai-platform.model_name"
     ],
     "public_canary": {
       "dataset": "HorizonRobotics/EmbodiedGenData",

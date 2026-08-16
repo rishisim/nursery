@@ -1,0 +1,168 @@
+{
+  "schema": "InteractMoveInterMimicActivitySpec",
+  "schema_version": 1,
+  "protocol_id": "interactmove_intermimic",
+  "activity_id": "red-mug-mouth-return",
+  "prompt": "Pick up the red mug from the table, bring it to your mouth, and place it back on the table.",
+  "actor": {
+    "body_model": "SMPL-X",
+    "morphology": "adult",
+    "gender": "neutral",
+    "betas": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "initial_stance": "standing_neutral",
+    "initial_placement": {
+      "method": "target_relative",
+      "target_relative_position_m": [-1.0, 0.0, 0.0],
+      "face_target": true,
+      "selected_by": "nursery"
+    }
+  },
+  "target_request": {
+    "description": "the red mug on the table",
+    "category": "red mug",
+    "prompt_span": "red mug",
+    "resolution_rule": {
+      "method": "sole_manipulated_instance",
+      "expected_source_node_key": null
+    }
+  },
+  "relations": {
+    "start": [
+      {
+        "subject": "target",
+        "predicate": "on",
+        "object_description": "the table",
+        "description": "the red mug starts on the table"
+      }
+    ],
+    "final": [
+      {
+        "subject": "target",
+        "predicate": "on",
+        "object_description": "the table",
+        "description": "the red mug finishes resting on the table"
+      }
+    ]
+  },
+  "phases": [
+    {
+      "id": "approach",
+      "description": "approach the red mug",
+      "start_frame": 0,
+      "end_frame_exclusive": 60,
+      "expected_target_contact_hands": []
+    },
+    {
+      "id": "reach",
+      "description": "reach toward the red mug",
+      "start_frame": 60,
+      "end_frame_exclusive": 100,
+      "expected_target_contact_hands": []
+    },
+    {
+      "id": "grasp-lift",
+      "description": "grasp and lift the red mug",
+      "start_frame": 100,
+      "end_frame_exclusive": 170,
+      "expected_target_contact_hands": ["right"]
+    },
+    {
+      "id": "bring-to-mouth",
+      "description": "bring the red mug toward the mouth",
+      "start_frame": 170,
+      "end_frame_exclusive": 230,
+      "expected_target_contact_hands": ["right"]
+    },
+    {
+      "id": "return",
+      "description": "return the red mug to the table",
+      "start_frame": 230,
+      "end_frame_exclusive": 280,
+      "expected_target_contact_hands": ["right"]
+    },
+    {
+      "id": "release-settle",
+      "description": "release the red mug and let it settle on the table",
+      "start_frame": 280,
+      "end_frame_exclusive": 300,
+      "expected_target_contact_hands": []
+    }
+  ],
+  "timing": {
+    "duration_s": 10.0,
+    "fps": 30,
+    "frame_count": 300,
+    "sampling": "half_open_[0,duration)"
+  },
+  "hand_use": {
+    "mode": "one_hand",
+    "hands": ["right"]
+  },
+  "seeds": {
+    "master": 2026081500,
+    "embodiedgen_image": 2026081501,
+    "embodiedgen_asset": 2026081502,
+    "embodiedgen_layout": 2026081503,
+    "interactmove": 2026081504,
+    "intermimic": 2026081505,
+    "render": 2026081506
+  },
+  "success_criteria": [
+    {
+      "id": "target-instance",
+      "metric": "target_instance_correct",
+      "operator": "eq",
+      "threshold": true,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "phase-order",
+      "metric": "phase_order_fraction",
+      "operator": "gte",
+      "threshold": 0.9,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "intended-contact",
+      "metric": "intended_contact_fraction",
+      "operator": "gte",
+      "threshold": 0.9,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "stable-grasp",
+      "metric": "stable_grasp_fraction",
+      "operator": "gte",
+      "threshold": 0.9,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "penetration",
+      "metric": "max_penetration_m",
+      "operator": "lte",
+      "threshold": 0.02,
+      "unit": "m",
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "balance",
+      "metric": "balance_success",
+      "operator": "eq",
+      "threshold": true,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    },
+    {
+      "id": "final-relation",
+      "metric": "final_relation_satisfied",
+      "operator": "eq",
+      "threshold": true,
+      "unit": null,
+      "evaluation_window": "full_episode"
+    }
+  ]
+}

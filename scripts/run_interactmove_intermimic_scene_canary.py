@@ -25,6 +25,8 @@ def _parser() -> argparse.ArgumentParser:
         )
     )
     parser.add_argument("--layout", type=Path, required=True)
+    parser.add_argument("--generation-receipt", type=Path)
+    parser.add_argument("--scene-bundle", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--duration-s", type=float, default=10.0)
     parser.add_argument("--sim-hz", type=int, default=200)
@@ -118,6 +120,35 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     if output_dir.exists() and any(output_dir.iterdir()):
         raise ValueError("--output-dir must be new or empty")
     output_dir.mkdir(parents=True, exist_ok=True)
+    generation_receipt = None
+    generation_receipt_path = None
+    if args.generation_receipt is not None:
+        generation_receipt_path = args.generation_receipt.resolve(strict=True)
+        generation_receipt = json.loads(
+            generation_receipt_path.read_text(encoding="utf-8")
+        )
+        if generation_receipt.get("status") != "passed":
+            raise ValueError("--generation-receipt must have status=passed")
+        policy = generation_receipt.get("robot_policy", {})
+        if policy.get("upstream_sim_cli_invoked") is not False:
+            raise ValueError("generation receipt must prove sim_cli was omitted")
+        if policy.get("robot_actor_loaded") is not False:
+            raise ValueError("generation receipt must prove robot-free generation")
+        layout_receipt = generation_receipt.get("layout", {})
+        if layout_receipt.get("sha256") != _sha256(layout_path):
+            raise ValueError("generation receipt layout hash mismatch")
+    scene_bundle = None
+    scene_bundle_path = None
+    if args.scene_bundle is not None:
+        from babyworld_lite.interactmove_intermimic.embodiedgen import (
+            validate_scene_bundle,
+        )
+
+        scene_bundle_path = args.scene_bundle.resolve(strict=True)
+        scene_bundle = json.loads(scene_bundle_path.read_text(encoding="utf-8"))
+        validate_scene_bundle(scene_bundle)
+        if scene_bundle["source"]["layout"]["sha256"] != _sha256(layout_path):
+            raise ValueError("SceneBundle layout hash mismatch")
     if not math.isfinite(args.duration_s) or args.duration_s <= 0:
         raise ValueError("--duration-s must be finite and positive")
     for name in ("sim_hz", "video_fps", "width", "height"):
@@ -224,11 +255,40 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "schema_version": 1,
         "status": "completed",
         "scientific_admission": "canary_only_not_stage3_settling_receipt",
+        "boundaries": {
+            "fresh_embodiedgen_scene_generation": (
+                "passed" if generation_receipt is not None else "not_bound"
+            ),
+            "scene_bundle_validation": (
+                "passed" if scene_bundle is not None else "not_bound"
+            ),
+            "scene_only_sapien_physics_render": "passed",
+            "interactmove_motion_generation": "not_run",
+            "intermimic_execution": "not_run",
+        },
         "source": {
             "layout_path": str(layout_path),
             "layout_sha256": _sha256(layout_path),
             "embodiedgen_expected_commit": EMBODIEDGEN_COMMIT,
             "embodiedgen_actual_commit": source_commit,
+            "generation_receipt": (
+                None
+                if generation_receipt_path is None
+                else {
+                    "path": str(generation_receipt_path),
+                    "sha256": _sha256(generation_receipt_path),
+                }
+            ),
+            "scene_bundle": (
+                None
+                if scene_bundle_path is None
+                else {
+                    "path": str(scene_bundle_path),
+                    "sha256": _sha256(scene_bundle_path),
+                    "bundle_id": scene_bundle["bundle_id"],
+                    "capabilities": scene_bundle["capabilities"],
+                }
+            ),
         },
         "simulator": {
             "name": "SAPIEN",
@@ -289,8 +349,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "no_contact_trace",
             "no_Gaussian_background_compositing",
             "upstream_importer_does_not_apply_URDF_mass",
-            "not_a_fresh_prompt_generated_scene",
-        ],
+        ]
+        + (
+            ["fresh_prompt_generation_receipt_not_bound"]
+            if generation_receipt is None
+            else []
+        ),
     }
     receipt_path = output_dir / "receipt.json"
     receipt_path.write_text(
