@@ -40,6 +40,30 @@ export MODELSCOPE_CACHE="$SCRATCH_ROOT/caches/modelscope"
 export TORCH_HOME="$SCRATCH_ROOT/caches/torch"
 export TORCH_CUDA_ARCH_LIST=9.0
 
+python - "$GPT_CONFIG" <<'PY'
+import sys
+import yaml
+
+config = yaml.safe_load(open(sys.argv[1], encoding="utf-8"))
+agent_type = config.get("agent_type")
+agent = config.get(agent_type)
+if not isinstance(agent, dict) or not agent.get("api_key"):
+    raise SystemExit("blocked=usable_private_gpt_config_missing")
+if agent.get("model_name") != "gpt-5.6-luna":
+    raise SystemExit("blocked=openai_model_must_be_gpt-5.6-luna")
+print("openai_model=gpt-5.6-luna")
+PY
+
+python - <<'PY'
+import openai
+from openai import OpenAI
+
+assert openai.__version__ == "3.1.0"
+assert hasattr(OpenAI(api_key="not-a-real-key"), "responses")
+print("openai_responses_sdk=passed")
+PY
+grep -q 'self.client.responses.create' "$SOURCE_ROOT/embodied_gen/utils/gpt_clients.py"
+
 python - <<'PY'
 import torch
 

@@ -132,6 +132,18 @@ caches, logs, downloads, and scene packages live only under the canonical Juno
 roots named in the config. The compact outcome is updated in place at
 `docs/hoidini_intermimic_juno_qualification.json`.
 
+The pinned EmbodiedGen client is migrated from Chat Completions to the OpenAI
+Responses API by `scripts/embodiedgen_v2.0.1_responses_api.patch`. The frozen
+model is `gpt-5.6-luna`, with low reasoning effort and an 8,192-token total
+reasoning-plus-output cap. The isolated environment pins `openai==3.1.0` because
+EmbodiedGen's original `openai==1.58.1` client does not expose Responses.
+Requests set `store=false`, transcode accepted image inputs to PNG before
+constructing `input_image` blocks, and preserve EmbodiedGen's existing
+prompt-constrained plain-text/JSON-repair behavior. Strict Structured Outputs
+are not enabled globally because the same client also returns scalar scores,
+YES/NO decisions, and scene identifiers. This patch qualifies the OpenAI
+Platform path only; Azure and OpenRouter compatibility have not been tested.
+
 The gate distinguishes three facts:
 
 1. GPU qualification proves only that Slurm, CUDA, and a tiny PyTorch operation

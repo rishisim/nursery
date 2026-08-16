@@ -1,0 +1,148 @@
+--- a/embodied_gen/utils/gpt_clients.py
++++ b/embodied_gen/utils/gpt_clients.py
+@@ -51 +51 @@
+-GPT5_DEFAULT_MAX_COMPLETION_TOKENS = 8192
++GPT5_DEFAULT_MAX_OUTPUT_TOKENS = 8192
+@@ -158,0 +159,19 @@
++    def _image_to_png_data_url(self, image: str | Image.Image) -> str:
++        """Normalize supported image inputs to a correctly labelled PNG data URL."""
++        if isinstance(image, Image.Image):
++            loaded = image
++        elif image.startswith("data:"):
++            _, encoded = image.split(",", 1)
++            loaded = Image.open(BytesIO(base64.b64decode(encoded)))
++        elif os.path.splitext(image)[-1].lower() in self.image_formats:
++            if not os.path.exists(image):
++                raise FileNotFoundError(f"Image file not found: {image}")
++            loaded = Image.open(image)
++        else:
++            loaded = Image.open(BytesIO(base64.b64decode(image)))
++
++        buffer = BytesIO()
++        loaded.convert("RGB").save(buffer, format="PNG")
++        encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
++        return f"data:image/png;base64,{encoded}"
++
+@@ -160 +179,8 @@
+-        retry=retry_if_not_exception_type(openai.BadRequestError),
++        retry=retry_if_not_exception_type(
++            (
++                openai.BadRequestError,
++                openai.AuthenticationError,
++                openai.PermissionDeniedError,
++                openai.NotFoundError,
++            )
++        ),
+@@ -164,3 +190,3 @@
+-    def completion_with_backoff(self, **kwargs):
+-        """Performs a chat completion request with retry/backoff."""
+-        return self.client.chat.completions.create(**kwargs)
++    def response_with_backoff(self, **kwargs):
++        """Performs a Responses API request with retry/backoff."""
++        return self.client.responses.create(**kwargs)
+@@ -191 +217 @@
+-                "type": "text",
++                "type": "input_text",
+@@ -204,15 +229,0 @@
+-                if isinstance(img, Image.Image):
+-                    buffer = BytesIO()
+-                    img.save(buffer, format=img.format or "PNG")
+-                    buffer.seek(0)
+-                    image_binary = buffer.read()
+-                    img = base64.b64encode(image_binary).decode("utf-8")
+-                elif (
+-                    len(os.path.splitext(img)) > 1
+-                    and os.path.splitext(img)[-1].lower() in self.image_formats
+-                ):
+-                    if not os.path.exists(img):
+-                        raise FileNotFoundError(f"Image file not found: {img}")
+-                    with open(img, "rb") as f:
+-                        img = base64.b64encode(f.read()).decode("utf-8")
+-
+@@ -221,2 +232,2 @@
+-                        "type": "image_url",
+-                        "image_url": {"url": f"data:image/png;base64,{img}"},
++                        "type": "input_image",
++                        "image_url": self._image_to_png_data_url(img),
+@@ -228,2 +239 @@
+-            # GPT-5.x only supports default temperature/top_p and uses
+-            # `max_completion_tokens` instead of `max_tokens`.
++            # GPT-5.x uses Responses-native reasoning and output controls.
+@@ -231,5 +241,5 @@
+-                "messages": [
+-                    {"role": "system", "content": system_role},
+-                    {"role": "user", "content": content_user},
+-                ],
+-                "max_completion_tokens": GPT5_DEFAULT_MAX_COMPLETION_TOKENS,
++                "instructions": system_role,
++                "input": [{"role": "user", "content": content_user}],
++                "max_output_tokens": GPT5_DEFAULT_MAX_OUTPUT_TOKENS,
++                "reasoning": {"effort": "low"},
++                "store": False,
+@@ -240,4 +250,2 @@
+-                "messages": [
+-                    {"role": "system", "content": system_role},
+-                    {"role": "user", "content": content_user},
+-                ],
++                "instructions": system_role,
++                "input": [{"role": "user", "content": content_user}],
+@@ -245 +253 @@
+-                "max_tokens": 500,
++                "max_output_tokens": 500,
+@@ -247,3 +255 @@
+-                "frequency_penalty": 0,
+-                "presence_penalty": 0,
+-                "stop": None,
++                "store": False,
+@@ -254,0 +261,9 @@
++            if "max_tokens" in params and "max_output_tokens" not in params:
++                params["max_output_tokens"] = params.pop("max_tokens")
++            for k in (
++                "frequency_penalty",
++                "presence_penalty",
++                "stop",
++                "max_completion_tokens",
++            ):
++                params.pop(k, None)
+@@ -256,7 +271,2 @@
+-                # GPT-5.x rejects custom temperature/top_p/penalty/stop and
+-                # uses `max_completion_tokens` instead of `max_tokens`.
+-                if (
+-                    "max_tokens" in params
+-                    and "max_completion_tokens" not in params
+-                ):
+-                    params["max_completion_tokens"] = params.pop("max_tokens")
++                # GPT-5.x rejects custom sampling parameters. Keep the larger
++                # default cap because reasoning tokens count toward it.
+@@ -266,4 +276 @@
+-                    "frequency_penalty",
+-                    "presence_penalty",
+-                    "stop",
+-                    "max_tokens",
++                    "max_output_tokens",
+@@ -276,2 +283,2 @@
+-            response = self.completion_with_backoff(**payload)
+-            response = response.choices[0].message.content
++            response = self.response_with_backoff(**payload)
++            response = response.output_text
+@@ -296,4 +303,2 @@
+-                messages=[
+-                    {"role": "system", "content": "You are a test system."},
+-                    {"role": "user", "content": "Hello"},
+-                ],
++                instructions="You are a test system.",
++                input="Reply with OK.",
+@@ -300,0 +306 @@
++                store=False,
+@@ -303 +309,2 @@
+-                probe_kwargs["max_completion_tokens"] = 100
++                probe_kwargs["max_output_tokens"] = 512
++                probe_kwargs["reasoning"] = {"effort": "low"}
+@@ -306,3 +313,4 @@
+-                probe_kwargs["max_tokens"] = 100
+-            response = self.completion_with_backoff(**probe_kwargs)
+-            response.choices[0].message.content
++                probe_kwargs["max_output_tokens"] = 100
++            response = self.response_with_backoff(**probe_kwargs)
++            if not response.output_text:
++                raise ConnectionError("Responses API returned no output text")

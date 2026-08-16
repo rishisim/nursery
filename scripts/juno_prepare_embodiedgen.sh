@@ -14,7 +14,9 @@ SCRATCH_ROOT=/scratch/juno/dal503972/hoidini_intermimic
 SOURCE_ROOT="$SCRATCH_ROOT/source/EmbodiedGen"
 ENV_PREFIX="$SCRATCH_ROOT/environments/embodiedgen"
 PATCH_PATH="$SCRATCH_ROOT/jobs/embodiedgen_v2.0.1_robot_free.patch"
+RESPONSES_PATCH_PATH="$SCRATCH_ROOT/jobs/embodiedgen_v2.0.1_responses_api.patch"
 EXPECTED_COMMIT=9b333554254af196bace88c1a171a3bf047fa09c
+OPENAI_SDK_VERSION=3.1.0
 
 export HF_HOME="$SCRATCH_ROOT/caches/huggingface"
 export MODELSCOPE_CACHE="$SCRATCH_ROOT/caches/modelscope"
@@ -42,10 +44,12 @@ git -C "$SOURCE_ROOT" checkout --detach v2.0.1
 actual_commit=$(git -C "$SOURCE_ROOT" rev-parse HEAD)
 test "$actual_commit" = "$EXPECTED_COMMIT"
 
-if ! git -C "$SOURCE_ROOT" apply --unidiff-zero --reverse --check "$PATCH_PATH" >/dev/null 2>&1; then
-  git -C "$SOURCE_ROOT" apply --unidiff-zero --check "$PATCH_PATH"
-  git -C "$SOURCE_ROOT" apply --unidiff-zero "$PATCH_PATH"
-fi
+for patch_path in "$PATCH_PATH" "$RESPONSES_PATCH_PATH"; do
+  if ! git -C "$SOURCE_ROOT" apply --unidiff-zero --reverse --check "$patch_path" >/dev/null 2>&1; then
+    git -C "$SOURCE_ROOT" apply --unidiff-zero --check "$patch_path"
+    git -C "$SOURCE_ROOT" apply --unidiff-zero "$patch_path"
+  fi
+done
 
 if test ! -s "$ENV_PREFIX/conda-meta/history"; then
   test ! -e "$ENV_PREFIX" || {
@@ -67,6 +71,16 @@ test -x "$CXX"
 
 cd "$SOURCE_ROOT"
 bash install.sh basic
+python -m pip install --upgrade "openai==$OPENAI_SDK_VERSION"
+
+python - <<'PY'
+import openai
+from openai import OpenAI
+
+assert openai.__version__ == "3.1.0"
+assert hasattr(OpenAI(api_key="not-a-real-key"), "responses")
+print("openai_responses_sdk=passed")
+PY
 
 python - <<'PY'
 import json

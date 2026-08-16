@@ -11,7 +11,11 @@
     "commit": "9b333554254af196bace88c1a171a3bf047fa09c",
     "python": "3.10.13",
     "cuda_module": "cuda/12.6",
-    "default_asset_backend": "SAM3D"
+    "default_asset_backend": "SAM3D",
+    "openai_model": "gpt-5.6-luna",
+    "openai_api": "responses",
+    "openai_sdk": "3.1.0",
+    "openai_responses_patch_sha256": "11caee81f7f52fe90fcff23a85cbd6da8a5a5bb02c01ab1355bc2d7594518f16"
   },
   "juno": {
     "ssh_alias": "juno",

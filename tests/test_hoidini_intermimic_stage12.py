@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -18,6 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 TASK = ROOT / "configs" / "hoidini_intermimic_pilot.json"
 JUNO_QUALIFICATION = ROOT / "configs" / "hoidini_intermimic_juno_qualification.json"
 JUNO_RECORD = ROOT / "docs" / "hoidini_intermimic_juno_qualification.json"
+JUNO_PREPARE = ROOT / "scripts" / "juno_prepare_embodiedgen.sh"
+JUNO_GENERATE = ROOT / "scripts" / "juno_generate_hoidini_intermimic_pilot.sh"
+RESPONSES_PATCH = ROOT / "scripts" / "embodiedgen_v2.0.1_responses_api.patch"
 FIXTURE = ROOT / "tests" / "fixtures" / "hoidini_intermimic"
 
 
@@ -43,6 +47,12 @@ def test_juno_qualification_is_pinned_and_scientifically_bounded() -> None:
     assert qualification["embodiedgen"]["commit"] == (
         "9b333554254af196bace88c1a171a3bf047fa09c"
     )
+    assert qualification["embodiedgen"]["openai_model"] == "gpt-5.6-luna"
+    assert qualification["embodiedgen"]["openai_api"] == "responses"
+    assert qualification["embodiedgen"]["openai_sdk"] == "3.1.0"
+    assert qualification["embodiedgen"]["openai_responses_patch_sha256"] == (
+        "11caee81f7f52fe90fcff23a85cbd6da8a5a5bb02c01ab1355bc2d7594518f16"
+    )
     assert qualification["juno"]["durable_root"] == (
         "/work/dal503972/hoidini_intermimic"
     )
@@ -52,6 +62,28 @@ def test_juno_qualification_is_pinned_and_scientifically_bounded() -> None:
     assert "A qualification job is not scene generation." in qualification[
         "scientific_exclusions"
     ]
+
+
+def test_juno_prepare_pins_responses_sdk_and_applies_vendor_patch() -> None:
+    prepare = JUNO_PREPARE.read_text(encoding="utf-8")
+    generate = JUNO_GENERATE.read_text(encoding="utf-8")
+    patch = RESPONSES_PATCH.read_text(encoding="utf-8")
+
+    assert 'OPENAI_SDK_VERSION=3.1.0' in prepare
+    assert '"$RESPONSES_PATCH_PATH"' in prepare
+    assert 'agent.get("model_name") != "gpt-5.6-luna"' in generate
+    assert 'openai.__version__ == "3.1.0"' in generate
+    assert 'self.client.responses.create(**kwargs)' in patch
+    assert '"type": "input_text"' in patch
+    assert '"type": "input_image"' in patch
+    assert '"store": False' in patch
+    assert '_image_to_png_data_url' in patch
+    assert '"reasoning": {"effort": "low"}' in patch
+    assert 'GPT5_DEFAULT_MAX_OUTPUT_TOKENS = 8192' in patch
+    assert 'response.output_text' in patch
+    assert hashlib.sha256(RESPONSES_PATCH.read_bytes()).hexdigest() == (
+        "11caee81f7f52fe90fcff23a85cbd6da8a5a5bb02c01ab1355bc2d7594518f16"
+    )
 
 
 def test_juno_empirical_record_does_not_overclaim_stage2() -> None:
