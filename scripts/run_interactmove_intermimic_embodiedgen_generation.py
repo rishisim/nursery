@@ -146,6 +146,20 @@ def _configure_gpt(path: Path) -> dict[str, Any]:
     }
 
 
+def _install_openai_platform_client(module: Any) -> Any:
+    """Replace the upstream Azure-default singleton before consumers import it."""
+
+    client = module.GPTclient(
+        endpoint=os.environ["ENDPOINT"],
+        api_key=os.environ["API_KEY"],
+        api_version=None,
+        model_name=os.environ["MODEL_NAME"],
+        check_connection=False,
+    )
+    module.GPT_CLIENT = client
+    return client
+
+
 def _source_state(source_root: Path) -> dict[str, Any]:
     source = source_root.resolve(strict=True)
     actual = _command_output(["git", "-C", str(source), "rev-parse", "HEAD"])
@@ -347,11 +361,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
 
     secret = os.environ["API_KEY"]
     try:
-        from embodied_gen.utils.gpt_clients import GPT_CLIENT
+        import embodied_gen.utils.gpt_clients as gpt_clients
 
         import torch
         if not torch.cuda.is_available():
             raise RuntimeError("CUDA is not available")
+        GPT_CLIENT = _install_openai_platform_client(gpt_clients)
         GPT_CLIENT.check_connection()
         receipt["stages"].append(
             {"name": "gpt_connection", "status": "passed", "finished_utc": _utc_now()}

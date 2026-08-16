@@ -95,6 +95,33 @@ def test_gpt_config_returns_only_redacted_metadata(tmp_path: Path) -> None:
         os.environ.pop("MODEL_NAME", None)
 
 
+def test_public_platform_client_explicitly_disables_azure_fallback() -> None:
+    runner = _load_runner()
+
+    class FakeClient:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+
+    class FakeModule:
+        GPTclient = FakeClient
+        GPT_CLIENT = object()
+
+    os.environ["ENDPOINT"] = "https://api.openai.com/v1/"
+    os.environ["API_KEY"] = "test-secret-value"
+    os.environ["MODEL_NAME"] = "gpt-4.1"
+    try:
+        client = runner._install_openai_platform_client(FakeModule)
+        assert FakeModule.GPT_CLIENT is client
+        assert client.kwargs["api_version"] is None
+        assert client.kwargs["endpoint"] == "https://api.openai.com/v1/"
+        assert client.kwargs["model_name"] == "gpt-4.1"
+        assert client.kwargs["check_connection"] is False
+    finally:
+        os.environ.pop("ENDPOINT", None)
+        os.environ.pop("API_KEY", None)
+        os.environ.pop("MODEL_NAME", None)
+
+
 def test_generation_help_states_actual_and_deferred_boundaries() -> None:
     runner = _load_runner()
     help_text = " ".join(runner._parser().format_help().split())
