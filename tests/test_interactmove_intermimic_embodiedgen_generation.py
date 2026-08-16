@@ -83,7 +83,7 @@ def test_gpt_config_returns_only_redacted_metadata(tmp_path: Path) -> None:
         metadata = runner._configure_gpt(config)
         assert metadata == {
             "agent_type": "openai-platform",
-            "endpoint": "https://api.openai.com/v1",
+            "endpoint": "https://api.openai.com/v1/",
             "api_version": None,
             "model_name": "gpt-5.4",
             "api_key_present": True,

@@ -129,7 +129,8 @@ def _configure_gpt(path: Path) -> dict[str, Any]:
         provider["api_version"], str
     ):
         raise ValueError("GPT provider api_version must be string or null")
-    os.environ["ENDPOINT"] = provider["endpoint"]
+    endpoint = provider["endpoint"].rstrip("/") + "/"
+    os.environ["ENDPOINT"] = endpoint
     os.environ["API_KEY"] = provider["api_key"]
     os.environ["MODEL_NAME"] = provider["model_name"]
     if provider["api_version"] is None:
@@ -138,7 +139,7 @@ def _configure_gpt(path: Path) -> dict[str, Any]:
         os.environ["API_VERSION"] = provider["api_version"]
     return {
         "agent_type": config["agent_type"],
-        "endpoint": provider["endpoint"],
+        "endpoint": endpoint,
         "api_version": provider["api_version"],
         "model_name": provider["model_name"],
         "api_key_present": True,
