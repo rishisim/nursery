@@ -378,6 +378,48 @@ def test_resume_conditioning_image_is_hash_preserving(tmp_path: Path) -> None:
     assert len(original_calls) == 1
 
 
+def test_resume_conditioning_image_maps_native_spaces_to_filename_underscores(
+    tmp_path: Path,
+) -> None:
+    runner = _load_runner()
+    source_image = tmp_path / "source.png"
+    source_raw = tmp_path / "source_raw.png"
+    source_image.write_bytes(b"accepted-red-mug-image")
+    source_raw.write_bytes(b"accepted-red-mug-raw-image")
+    module = SimpleNamespace(
+        text_to_image=lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("unexpected SD3.5 generation")
+        )
+    )
+    reused = runner._install_resume_conditioning_images(
+        module,
+        {
+            "red mug": {
+                "prompt": "frozen red mug prompt",
+                "image_path": source_image,
+                "raw_image_path": source_raw,
+                "image_sha256": runner._sha256(source_image),
+                "raw_image_sha256": runner._sha256(source_raw),
+            }
+        },
+        initial_image_seed=2026081501,
+    )
+    destination = tmp_path / "output" / "red_mug.png"
+    destination.parent.mkdir()
+
+    assert module.text_to_image(
+        "frozen red mug prompt",
+        str(destination),
+        4,
+        25,
+        7.0,
+        1,
+        seed=2026081501,
+    ) is True
+    assert destination.read_bytes() == source_image.read_bytes()
+    assert reused == {"red mug"}
+
+
 def test_resume_assets_verifies_complete_receipt_manifest(tmp_path: Path) -> None:
     runner = _load_runner()
     protocol = json.loads(PROTOCOL.read_text(encoding="utf-8"))

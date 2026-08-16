@@ -640,6 +640,14 @@ def _install_resume_conditioning_images(
     original = module.text_to_image
     reused: set[str] = set()
     attempts: dict[str, int] = {}
+    records_by_stem: dict[str, tuple[str, Mapping[str, Any]]] = {}
+    for source_node_key, record in records.items():
+        save_node = source_node_key.replace(" ", "_")
+        if save_node in records_by_stem:
+            raise ValueError(
+                f"resume node names collide after filename normalization: {save_node}"
+            )
+        records_by_stem[save_node] = (source_node_key, record)
 
     def text_to_image(
         prompt: str,
@@ -651,9 +659,9 @@ def _install_resume_conditioning_images(
         image_hw: tuple[int, int] = (1024, 1024),
         seed: int | None = None,
     ) -> bool:
-        node = Path(save_path).stem
-        record = records.get(node)
-        if record is None:
+        save_node = Path(save_path).stem
+        resolved = records_by_stem.get(save_node)
+        if resolved is None:
             return original(
                 prompt,
                 save_path,
@@ -664,6 +672,7 @@ def _install_resume_conditioning_images(
                 image_hw=image_hw,
                 seed=seed,
             )
+        node, record = resolved
         if prompt != record["prompt"]:
             raise ValueError(f"resume prompt mismatch for {node}")
         attempts[node] = attempts.get(node, 0) + 1
