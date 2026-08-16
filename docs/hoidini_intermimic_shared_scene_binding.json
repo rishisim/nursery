@@ -1,0 +1,908 @@
+{
+  "implementation": {
+    "stage12_path": "/scratch/juno/dal503972/hoidini_intermimic/source/nursery/babyworld_lite/hoidini_intermimic/stage12.py",
+    "stage12_sha256": "fe3ef936dea1d2c8df673ee2100d297496d613b9d921e0ab7dde868a86faa3f5"
+  },
+  "physics_readiness": {
+    "additional_unresolved_physics_inputs": [
+      "table collision restitution is missing even though the SceneBundle blocker list names only dynamic objects",
+      "the scene-only canary did not apply URDF mass",
+      "upstream placeholder inertia remains unresolved where reported by object asset parsing"
+    ],
+    "complete_scene_ready": true,
+    "dynamic_settle_ready": false,
+    "physics_material_complete": false,
+    "room_collision_ready": true,
+    "scene_bundle_reported_blockers": [
+      "plate:plate:collision_0:missing_restitution",
+      "red mug:red_mug:collision_0:missing_restitution",
+      "spoon:spoon:collision_0:missing_restitution"
+    ],
+    "scene_only_canary_is_not_stage3_validation": true,
+    "settling_status": "not_run"
+  },
+  "scene_manifest": {
+    "background": {
+      "collision": {
+        "authority": "validated_shared_scene_bundle",
+        "available": true,
+        "geometries": [
+          {
+            "collision_id": "floor",
+            "frame": "world",
+            "geometry_type": "plane",
+            "normal": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "role": "floor",
+            "z_m": 0.0
+          },
+          {
+            "collision_id": "wall_x_min",
+            "frame": "world",
+            "geometry_type": "mesh",
+            "mesh": {
+              "aabb_max_m": [
+                -2.90044682,
+                3.75675567,
+                3.0
+              ],
+              "aabb_min_m": [
+                -2.95044682,
+                -3.75675567,
+                0.0
+              ],
+              "extents_m": [
+                0.04999999999999982,
+                7.51351134,
+                3.0
+              ],
+              "face_count": 12,
+              "finite_vertices": true,
+              "format": "obj",
+              "path": "background/collision/wall_x_min.obj",
+              "scale_xyz": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "sha256": "9c707f415093bc6b1af1a36b3bdbba426169a0c33d57373af18b2abec7326bed",
+              "vertex_count": 8
+            },
+            "role": "walls",
+            "units": "m"
+          },
+          {
+            "collision_id": "wall_x_max",
+            "frame": "world",
+            "geometry_type": "mesh",
+            "mesh": {
+              "aabb_max_m": [
+                2.95044682,
+                3.75675567,
+                3.0
+              ],
+              "aabb_min_m": [
+                2.90044682,
+                -3.75675567,
+                0.0
+              ],
+              "extents_m": [
+                0.04999999999999982,
+                7.51351134,
+                3.0
+              ],
+              "face_count": 12,
+              "finite_vertices": true,
+              "format": "obj",
+              "path": "background/collision/wall_x_max.obj",
+              "scale_xyz": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "sha256": "d7300eb6f94668bfd6f8afbc1088742076e86d5de2aac2c5b7227c5bcb603e69",
+              "vertex_count": 8
+            },
+            "role": "walls",
+            "units": "m"
+          },
+          {
+            "collision_id": "wall_y_min",
+            "frame": "world",
+            "geometry_type": "mesh",
+            "mesh": {
+              "aabb_max_m": [
+                2.90044682,
+                -3.70675567,
+                3.0
+              ],
+              "aabb_min_m": [
+                -2.90044682,
+                -3.75675567,
+                0.0
+              ],
+              "extents_m": [
+                5.80089364,
+                0.04999999999999982,
+                3.0
+              ],
+              "face_count": 12,
+              "finite_vertices": true,
+              "format": "obj",
+              "path": "background/collision/wall_y_min.obj",
+              "scale_xyz": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "sha256": "22783de2381da84515f4f6e090552b358d69455cf85cb2d5b7758c8671c6435e",
+              "vertex_count": 8
+            },
+            "role": "walls",
+            "units": "m"
+          },
+          {
+            "collision_id": "wall_y_max",
+            "frame": "world",
+            "geometry_type": "mesh",
+            "mesh": {
+              "aabb_max_m": [
+                2.90044682,
+                3.75675567,
+                3.0
+              ],
+              "aabb_min_m": [
+                -2.90044682,
+                3.70675567,
+                0.0
+              ],
+              "extents_m": [
+                5.80089364,
+                0.04999999999999982,
+                3.0
+              ],
+              "face_count": 12,
+              "finite_vertices": true,
+              "format": "obj",
+              "path": "background/collision/wall_y_max.obj",
+              "scale_xyz": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "sha256": "2e0e07026303971885a0e3e10f5ce23619df0340e95de7caeb294bcc2adf5d28",
+              "vertex_count": 8
+            },
+            "role": "walls",
+            "units": "m"
+          }
+        ],
+        "geometry_manifest": "background/environment_geometry.json"
+      },
+      "instance_id": "egv2_3171d89ad00530ffa19a244f",
+      "reference_mesh": {
+        "aabb_max_m": [
+          2.900446891784668,
+          3.7067556381225586,
+          3.0
+        ],
+        "aabb_min_m": [
+          -2.900446891784668,
+          -3.7067556381225586,
+          0.0
+        ],
+        "extents_m": [
+          5.800893783569336,
+          7.413511276245117,
+          3.0
+        ],
+        "face_count": 4200528,
+        "finite_vertices": true,
+        "format": "ply",
+        "path": "background/mesh_model.ply",
+        "scale_xyz": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sha256": "137c59d332c50b533a899447a89826f52dba0ac6a4a9457e568b4ee8ca154c3e",
+        "vertex_count": 2110897
+      },
+      "source_name": "kitchen",
+      "visual_references": [
+        {
+          "path": "background/mesh_model.ply",
+          "representation": "color_mesh",
+          "sha256": "137c59d332c50b533a899447a89826f52dba0ac6a4a9457e568b4ee8ca154c3e"
+        }
+      ],
+      "world_pose": {
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "translation_m": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "coordinate_system": {
+      "angle_unit": "radian",
+      "gravity_m_s2": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "handedness": "right",
+      "linear_unit": "meter",
+      "mass_unit": "kilogram",
+      "quaternion_order": "xyzw",
+      "time_unit": "second",
+      "transform_semantics": "T_parent_child",
+      "up_axis": "+Z"
+    },
+    "initial_human_state": {
+      "body_model": "adult_neutral_smplx_beta0",
+      "joint_pose": "neutral_standing",
+      "placement_provenance": {
+        "activity_spec_sha256": "a66fb6609540136bf15b97a55bf459081493f91bd7b0080bb49c364f387f3a1f",
+        "authority": "stage1_target_relative_placement_not_native_robot_pose",
+        "face_reference": true,
+        "reachability_checked": false,
+        "reference_instance_id": "egv2_028a54da21c1691ae18ea225",
+        "translation_offset_world_m": [
+          -1.0,
+          0.0,
+          0.0
+        ]
+      },
+      "world_pose": {
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "translation_m": [
+          -0.8851,
+          0.1831,
+          0.8242
+        ]
+      }
+    },
+    "instances": [
+      {
+        "body_mode": "dynamic",
+        "body_mode_provenance": "local_policy_from_upstream_category:distractor_objs",
+        "collision_meshes": [
+          {
+            "local_transform": {
+              "rotation_rpy_rad": [
+                1.5708,
+                0.0,
+                0.0
+              ],
+              "translation_m": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "path": "asset3d/plate/result/mesh/plate_collision.obj",
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "sha256": "a98cf2ac5bae7ad20db88dc03d45914d61a7848902f6e163d99bd4f6c88268e2"
+          }
+        ],
+        "instance_id": "egv2_3b56c3520006aaeb038c2486",
+        "instance_id_provenance": "validated_shared_scene_bundle",
+        "physical_properties": {
+          "friction": {
+            "available": true,
+            "dynamic": 0.5,
+            "estimation_surface_pair": "object_material_relative_to_rubber",
+            "source": "embodiedgen_vlm_estimate_urdf_collision_gazebo",
+            "static": 0.7
+          },
+          "inertia": {
+            "available": false,
+            "center_of_mass_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "matrix_kg_m2": null,
+            "raw_upstream_matrix_kg_m2": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "source": "upstream_template_placeholder"
+          },
+          "mass": {
+            "available": true,
+            "source": "embodiedgen_vlm_estimate_midpoint_in_urdf",
+            "upstream_estimate_range_kg": [
+              0.4,
+              0.8
+            ],
+            "value_kg": 0.6
+          },
+          "restitution": {
+            "available": false,
+            "source": "missing_not_embodiedgen_default",
+            "value": null
+          },
+          "upstream_real_height_m": 0.0325
+        },
+        "scientific_roles": [],
+        "source_name": "plate",
+        "upstream_category": "distractor_objs",
+        "upstream_quality": "YES",
+        "urdf": {
+          "link_name": "plate",
+          "path": "asset3d/plate/result/plate.urdf",
+          "sha256": "eabed305cb53b39ca450f0639e998a1d5dc2021d496bb27d50b037e070869111"
+        },
+        "visual_meshes": [
+          {
+            "local_transform": {
+              "rotation_rpy_rad": [
+                1.5708,
+                0.0,
+                0.0
+              ],
+              "translation_m": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "path": "asset3d/plate/result/mesh/plate.obj",
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "sha256": "4e59d76c6254bfa31ab1f5c702ac5d0e8b90c345089a69c303fc48cdb0f9546c"
+          }
+        ],
+        "world_pose": {
+          "orientation_xyzw": [
+            0.0,
+            0.0,
+            0.8340296544515554,
+            0.5517196167397159
+          ],
+          "translation_m": [
+            -0.1633,
+            0.0321,
+            0.7882
+          ]
+        }
+      },
+      {
+        "body_mode": "dynamic",
+        "body_mode_provenance": "task_contract.scene_bindings.target.body_mode",
+        "collision_meshes": [
+          {
+            "local_transform": {
+              "rotation_rpy_rad": [
+                1.5708,
+                0.0,
+                0.0
+              ],
+              "translation_m": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "path": "asset3d/red_mug/result/mesh/red_mug_collision.obj",
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "sha256": "3c004ccbc9ddc7a452df6238060b1e1ee8fefec6142c6624f4991c44482970f0"
+          }
+        ],
+        "instance_id": "egv2_028a54da21c1691ae18ea225",
+        "instance_id_provenance": "validated_shared_scene_bundle",
+        "physical_properties": {
+          "friction": {
+            "available": true,
+            "dynamic": 0.6,
+            "estimation_surface_pair": "object_material_relative_to_rubber",
+            "source": "embodiedgen_vlm_estimate_urdf_collision_gazebo",
+            "static": 0.8
+          },
+          "inertia": {
+            "available": false,
+            "center_of_mass_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "matrix_kg_m2": null,
+            "raw_upstream_matrix_kg_m2": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "source": "upstream_template_placeholder"
+          },
+          "mass": {
+            "available": true,
+            "source": "embodiedgen_vlm_estimate_midpoint_in_urdf",
+            "upstream_estimate_range_kg": [
+              0.25,
+              0.45
+            ],
+            "value_kg": 0.35
+          },
+          "restitution": {
+            "available": false,
+            "source": "missing_not_embodiedgen_default",
+            "value": null
+          },
+          "upstream_real_height_m": 0.105
+        },
+        "scientific_roles": [
+          "target"
+        ],
+        "source_name": "red mug",
+        "upstream_category": "manipulated_objs",
+        "upstream_quality": "YES",
+        "urdf": {
+          "link_name": "red_mug",
+          "path": "asset3d/red_mug/result/red_mug.urdf",
+          "sha256": "114221fa89b9efb749951fa824e6f5d241dd4564371908305c4d010f8e743516"
+        },
+        "visual_meshes": [
+          {
+            "local_transform": {
+              "rotation_rpy_rad": [
+                1.5708,
+                0.0,
+                0.0
+              ],
+              "translation_m": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "path": "asset3d/red_mug/result/mesh/red_mug.obj",
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "sha256": "84abd2cc9437f78ea74ea6e01708ce818432b3387e31b790c2efcef0352373ba"
+          }
+        ],
+        "world_pose": {
+          "orientation_xyzw": [
+            0.0,
+            0.0,
+            0.27769142224444826,
+            0.9606703253519678
+          ],
+          "translation_m": [
+            0.1149,
+            0.1831,
+            0.8242
+          ]
+        }
+      },
+      {
+        "body_mode": "dynamic",
+        "body_mode_provenance": "local_policy_from_upstream_category:distractor_objs",
+        "collision_meshes": [
+          {
+            "local_transform": {
+              "rotation_rpy_rad": [
+                1.5708,
+                0.0,
+                0.0
+              ],
+              "translation_m": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "path": "asset3d/spoon/result/mesh/spoon_collision.obj",
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "sha256": "63ea6e41b61f4bc6513bba650180a50553b8e47720eb9a0b909bee6baa0458e8"
+          }
+        ],
+        "instance_id": "egv2_7f480e744a79953eb916b68f",
+        "instance_id_provenance": "validated_shared_scene_bundle",
+        "physical_properties": {
+          "friction": {
+            "available": true,
+            "dynamic": 0.35,
+            "estimation_surface_pair": "object_material_relative_to_rubber",
+            "source": "embodiedgen_vlm_estimate_urdf_collision_gazebo",
+            "static": 0.45
+          },
+          "inertia": {
+            "available": false,
+            "center_of_mass_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "matrix_kg_m2": null,
+            "raw_upstream_matrix_kg_m2": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "source": "upstream_template_placeholder"
+          },
+          "mass": {
+            "available": true,
+            "source": "embodiedgen_vlm_estimate_midpoint_in_urdf",
+            "upstream_estimate_range_kg": [
+              0.04,
+              0.12
+            ],
+            "value_kg": 0.08
+          },
+          "restitution": {
+            "available": false,
+            "source": "missing_not_embodiedgen_default",
+            "value": null
+          },
+          "upstream_real_height_m": 0.045
+        },
+        "scientific_roles": [],
+        "source_name": "spoon",
+        "upstream_category": "distractor_objs",
+        "upstream_quality": "YES",
+        "urdf": {
+          "link_name": "spoon",
+          "path": "asset3d/spoon/result/spoon.urdf",
+          "sha256": "beaa2c1e884f8cb2b7b1f365e4aebf989329f6e4c6264e00c41f674106930cc4"
+        },
+        "visual_meshes": [
+          {
+            "local_transform": {
+              "rotation_rpy_rad": [
+                1.5708,
+                0.0,
+                0.0
+              ],
+              "translation_m": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "path": "asset3d/spoon/result/mesh/spoon.obj",
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "sha256": "9cedc13dcebeddf3a48cb3657dd94b0b41efd9c9894e84caa95a03ad2dc1db8e"
+          }
+        ],
+        "world_pose": {
+          "orientation_xyzw": [
+            0.0,
+            0.0,
+            0.8066814909055343,
+            -0.5909864399717005
+          ],
+          "translation_m": [
+            0.2821,
+            -0.0158,
+            0.7923
+          ]
+        }
+      },
+      {
+        "body_mode": "static",
+        "body_mode_provenance": "task_contract.scene_bindings.support.body_mode,task_contract.scene_bindings.goal.body_mode",
+        "collision_meshes": [
+          {
+            "local_transform": {
+              "rotation_rpy_rad": [
+                1.5708,
+                0.0,
+                0.0
+              ],
+              "translation_m": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "path": "asset3d/table/result/mesh/table_collision.obj",
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "sha256": "6c752568be3cd56f770d0478899d975ece0b13d2179b7130cb3dc2131c1850c4"
+          }
+        ],
+        "instance_id": "egv2_0d4fc4a78d3706edccafb665",
+        "instance_id_provenance": "validated_shared_scene_bundle",
+        "physical_properties": {
+          "friction": {
+            "available": true,
+            "dynamic": 0.4,
+            "estimation_surface_pair": "object_material_relative_to_rubber",
+            "source": "embodiedgen_vlm_estimate_urdf_collision_gazebo",
+            "static": 0.6
+          },
+          "inertia": {
+            "available": false,
+            "center_of_mass_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "matrix_kg_m2": null,
+            "raw_upstream_matrix_kg_m2": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "source": "upstream_template_placeholder"
+          },
+          "mass": {
+            "available": true,
+            "source": "embodiedgen_vlm_estimate_midpoint_in_urdf",
+            "upstream_estimate_range_kg": [
+              12.0,
+              25.0
+            ],
+            "value_kg": 18.5
+          },
+          "restitution": {
+            "available": false,
+            "source": "missing_not_embodiedgen_default",
+            "value": null
+          },
+          "upstream_real_height_m": 0.775
+        },
+        "scientific_roles": [
+          "support",
+          "goal"
+        ],
+        "source_name": "table",
+        "upstream_category": "context",
+        "upstream_quality": "YES",
+        "urdf": {
+          "link_name": "table",
+          "path": "asset3d/table/result/table.urdf",
+          "sha256": "0f5aa05458e019d6047d36ba0261a0c4e0fc676c71e4b180c77d2e864f01667e"
+        },
+        "visual_meshes": [
+          {
+            "local_transform": {
+              "rotation_rpy_rad": [
+                1.5708,
+                0.0,
+                0.0
+              ],
+              "translation_m": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "path": "asset3d/table/result/mesh/table.obj",
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "sha256": "f4dd79517116b82ad754445dd284ceedc416ac9dbc8360965d3ef6080ed48295"
+          }
+        ],
+        "world_pose": {
+          "orientation_xyzw": [
+            0.0,
+            0.0,
+            0.7161333734119558,
+            0.697963459993152
+          ],
+          "translation_m": [
+            0.0,
+            0.0,
+            0.3843
+          ]
+        }
+      }
+    ],
+    "limitations": [
+      "Missing restitution and upstream placeholder inertia remain unavailable rather than receiving invented values.",
+      "The scene-only SAPIEN canary does not validate humanoid control, intended contact, URDF mass application, or object settling.",
+      "Human accessibility was not proactively evaluated at Stages 1-2, by contract.",
+      "The shared humanoid record fixes world placement metadata and a neutral-stance label, not complete SMPL-X tensors or root/pelvis translation semantics."
+    ],
+    "required_final_relations": [
+      {
+        "activity_object_description": "the table",
+        "child_instance_id": "egv2_028a54da21c1691ae18ea225",
+        "child_role": "target",
+        "evaluation_status": "intended_not_yet_evaluated",
+        "parent_instance_id": "egv2_0d4fc4a78d3706edccafb665",
+        "parent_role": "goal",
+        "relation_id": "target_finishes_on_goal",
+        "spatial_relation": "ON"
+      }
+    ],
+    "required_initial_relations": [
+      {
+        "child_instance_id": "egv2_028a54da21c1691ae18ea225",
+        "child_role": "target",
+        "parent_instance_id": "egv2_0d4fc4a78d3706edccafb665",
+        "parent_role": "support",
+        "relation_id": "target_starts_on_support",
+        "spatial_relation": "ON"
+      }
+    ],
+    "robot_policy": {
+      "native_robot_metadata_only": true,
+      "resolved_robot_instances": 0,
+      "rule": "upstream robot metadata is ignored; no robot asset or instance is preserved",
+      "shared_scene_robot_actor_inserted": false,
+      "stripped_upstream_robot_names": [
+        "franka"
+      ]
+    },
+    "role_bindings": {
+      "goal": "egv2_0d4fc4a78d3706edccafb665",
+      "support": "egv2_0d4fc4a78d3706edccafb665",
+      "target": "egv2_028a54da21c1691ae18ea225"
+    },
+    "scene_id": "egscene_24dbe1ec235ba09239f568ca",
+    "schema_version": "hoidini-intermimic-scene-manifest-1.0.0",
+    "source": {
+      "assumed_commit": "9b333554254af196bace88c1a171a3bf047fa09c",
+      "assumed_release": "v2.0.1",
+      "generation_execution_verified": true,
+      "generation_receipt_path": "/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return/generation_receipt.json",
+      "generation_receipt_sha256": "2cca27616f069ce9f0c76ecd0371e9210721390ebc9a86ec3f35480e94211ca9",
+      "layout_path": "/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return/layout.json",
+      "layout_pose_contract": "right-handed Z-up meters with XYZW quaternions",
+      "layout_sha256": "24dbe1ec235ba09239f568cac9cd376f2d6b9e3ef0ecce61903d7aaaa42850be",
+      "system": "EmbodiedGenV2",
+      "validation_scope": "shared_scene_handoff_full_inventory_and_bundle"
+    },
+    "task": {
+      "activity_id": "red-mug-mouth-return",
+      "contract_path": "hoidini_intermimic_pilot.json",
+      "contract_sha256": "3b91be82a86ca9a5490cf48c5ba94b48af91a7ca511ee0b05fcf6bed7d9c4396",
+      "task_id": "red-mug-mouth-return"
+    }
+  },
+  "schema_version": "hoidini-intermimic-shared-scene-binding-1.0.0",
+  "shared_scene": {
+    "canonical_root": "/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return",
+    "generation_receipt_path": "/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return/generation_receipt.json",
+    "generation_receipt_sha256": "2cca27616f069ce9f0c76ecd0371e9210721390ebc9a86ec3f35480e94211ca9",
+    "handoff_path": "/work/dal503972/interactmove_intermimic/compact_records/shared_scene_red-mug-mouth-return.json",
+    "handoff_sha256": "6f724133d5273afe8559c8d83b247c65ea8522b193f7c69162ba495a591dd27e",
+    "inventory": {
+      "canonical_sha256": "cd1a8bcde8cd85d884a941b67d140c0d3e284d2f0bcba35867a917fc1885fb09",
+      "file_count": 171,
+      "total_bytes": 221435977
+    },
+    "layout_path": "/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return/layout.json",
+    "layout_sha256": "24dbe1ec235ba09239f568cac9cd376f2d6b9e3ef0ecce61903d7aaaa42850be",
+    "object_asset_backend": {
+      "checkpoint_revision": "2e73555018d2741ccd486e56c24fac41155a1dc6",
+      "name": "SAM3D",
+      "source_commit": "01417d16fb5cc762a60f370c1bf7f59d603ddfaf"
+    },
+    "reference_mesh_sha256": "137c59d332c50b533a899447a89826f52dba0ac6a4a9457e568b4ee8ca154c3e",
+    "scene_bundle": {
+      "bundle_id": "scene_da67578846eca4a7f7d4fe4646ae9eb4",
+      "file_sha256": "fa5ccef6f09a8e795f021e458dc3575e2c8dc46d26cdfe047b1e18a79aa9d7ad",
+      "path": "/work/dal503972/interactmove_intermimic/compact_records/scene_bundle_red-mug-mouth-return_329321.json",
+      "semantic_sha256": "39cec5e2537475a2532af88b5f550fd5833ddeefe86e16e0ed3c6c5ea2e29f61"
+    },
+    "scene_id": "egscene_24dbe1ec235ba09239f568ca",
+    "source_assets_copied": false,
+    "superseded_scene_root_rejected": "/work/dal503972/interactmove_intermimic/.superseded/329321"
+  },
+  "stage_status": {
+    "hoidini_motion_generated": false,
+    "intermimic_executed": false,
+    "stage1_activity_contract_complete": true,
+    "stage2_shared_scene_binding_complete": true,
+    "video_rendered": false
+  },
+  "status": "passed",
+  "task": {
+    "activity_prompt": "Pick up the red mug from the table, bring it to your mouth, and place it back on the table.",
+    "activity_spec_sha256": "a66fb6609540136bf15b97a55bf459081493f91bd7b0080bb49c364f387f3a1f",
+    "contract_path": "/scratch/juno/dal503972/hoidini_intermimic/source/nursery/configs/hoidini_intermimic_pilot.json",
+    "contract_sha256": "3b91be82a86ca9a5490cf48c5ba94b48af91a7ca511ee0b05fcf6bed7d9c4396",
+    "duration_seconds": 10.0,
+    "frame_count": 300,
+    "frame_rate_hz": 30,
+    "sampling": "half_open_[0,duration)",
+    "seeds": {
+      "embodiedgen_asset": 2026081502,
+      "embodiedgen_image": 2026081501,
+      "embodiedgen_layout": 2026081503,
+      "interactmove": 2026081504,
+      "intermimic": 2026081505,
+      "master": 2026081500,
+      "render": 2026081506
+    },
+    "task_id": "red-mug-mouth-return"
+  }
+}

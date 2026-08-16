@@ -1,11 +1,14 @@
 {
   "schema_version": "hoidini-intermimic-juno-qualification-1.0.0",
-  "purpose": "Qualify Juno for the real robot-free EmbodiedGenV2 Stage 2 pilot boundary.",
+  "purpose": "Qualify and bind the exact canonical robot-free EmbodiedGenV2 shared scene for the HOIDiNi Stage 2 boundary.",
   "task_contract": {
     "path": "configs/hoidini_intermimic_pilot.json",
-    "sha256": "5392938ecc4f5cb017ec714a10f76ac60c8f331570f3e63217a68802bf062f4a"
+    "sha256": "3b91be82a86ca9a5490cf48c5ba94b48af91a7ca511ee0b05fcf6bed7d9c4396"
   },
-  "stage12_source_commit": "1aab0620156ac6af001d191aa13afc68a3e7518b",
+  "stage12_source": {
+    "path": "babyworld_lite/hoidini_intermimic/stage12.py",
+    "sha256": "fe3ef936dea1d2c8df673ee2100d297496d613b9d921e0ab7dde868a86faa3f5"
+  },
   "embodiedgen": {
     "release": "v2.0.1",
     "commit": "9b333554254af196bace88c1a171a3bf047fa09c",
@@ -16,6 +19,22 @@
     "openai_api": "responses",
     "openai_sdk": "3.1.0",
     "openai_responses_patch_sha256": "11caee81f7f52fe90fcff23a85cbd6da8a5a5bb02c01ab1355bc2d7594518f16"
+  },
+  "shared_scene": {
+    "canonical_root": "/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return",
+    "handoff_path": "/work/dal503972/interactmove_intermimic/compact_records/shared_scene_red-mug-mouth-return.json",
+    "handoff_sha256": "6f724133d5273afe8559c8d83b247c65ea8522b193f7c69162ba495a591dd27e",
+    "inventory_sha256": "cd1a8bcde8cd85d884a941b67d140c0d3e284d2f0bcba35867a917fc1885fb09",
+    "scene_bundle_id": "scene_da67578846eca4a7f7d4fe4646ae9eb4",
+    "object_asset_backend": "SAM3D",
+    "generation_gpt": {
+      "model": "gpt-5.6-luna",
+      "api": "responses",
+      "sdk": "3.1.0",
+      "reasoning_effort": "none"
+    },
+    "independent_generation_allowed": false,
+    "asset_copy_into_hoidini_namespace_allowed": false
   },
   "juno": {
     "ssh_alias": "juno",
@@ -51,7 +70,8 @@
   ],
   "scientific_exclusions": [
     "A qualification job is not scene generation.",
-    "A generated layout is not physics validation.",
+    "The HOIDiNi pipeline consumes the accepted shared scene and must not independently sample another layout or asset set.",
+    "A passed scene-only canary is not humanoid, contact, mass-material, or settling validation.",
     "No HOIDiNi or InterMimic execution is authorized by this qualification."
   ]
 }

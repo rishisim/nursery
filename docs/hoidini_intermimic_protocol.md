@@ -1,171 +1,155 @@
 # HOIDiNi + InterMimic protocol: Stages 1–2
 
-This is the canonical protocol for the contact-precision candidate. These two
-stages stop at a validated, robot-free EmbodiedGenV2 scene manifest. They do
-not run HOIDiNi, InterMimic, a simulator policy, or rendering.
+This is the canonical Stage 1–2 protocol for the contact-precision candidate.
+It ends at an exact, validated binding to the shared EmbodiedGen scene. It does
+not claim HOIDiNi motion generation, InterMimic execution, object settling,
+humanoid contact, or video rendering.
 
-## Stage 1: explicit activity contract
+## Stage 1: activity contract
 
-The checked-in pilot is
-`configs/hoidini_intermimic_pilot.json`. It turns the prompt “Pick up the mug
-from the table, carry it to the tray, and put it down.” into explicit data:
+The checked-in contract is
+`configs/hoidini_intermimic_pilot.json`. Its activity is:
 
-- target (`mug`), initial support (`table`), and goal receiver (`tray`);
-- a ten-second action timeline and intended contact windows;
-- a neutral adult SMPL-X initial state placed by a deterministic world-space
-  offset from the table;
-- initial object poses supplied by the generated layout;
-- scene, layout, motion, physics, and rendering seeds;
-- measurable success criteria and forbidden failures.
+> Pick up the red mug from the table, bring it to your mouth, and place it back
+> on the table.
 
-The contract deliberately does not hide prompt interpretation behind an NLP
-adapter. New activities must be authored and reviewed in the same schema before
-scene generation. The adult body is only the public-system pilot embodiment;
-no infant embodiment claim is made.
+The contract freezes the information that later systems must not reinterpret:
 
-Validate it with:
+- 10 seconds, 30 Hz, 300 half-open frames;
+- all seven shared seeds;
+- the canonical red-mug target and table support IDs;
+- `goal` as an explicit alias of the same table instance as `support`;
+- an adult, neutral, zero-shape SMPL-X actor using the right hand;
+- target-relative initial placement `[-1, 0, 0]` with identity orientation;
+- six authoritative phase intervals in both frames and seconds;
+- intended right-hand and table-contact windows;
+- start and intended final `target ON table` relations;
+- the same seven acceptance metrics used by the InteractMove protocol.
+
+The resolved initial humanoid pose is translation
+`[-0.8851, 0.1831, 0.8242]` metres and XYZW rotation `[0, 0, 0, 1]`.
+It comes from the target-relative Stage 1 rule, not the native Franka pose.
+No proactive accessibility/reachability gate is added at this stage; failure
+would be attributed only if later motion generation or physics execution
+actually demonstrates one.
+
+Validate the contract with:
 
 ```bash
-python scripts/prepare_hoidini_intermimic_scene.py validate-task \
+python3 scripts/prepare_hoidini_intermimic_scene.py validate-task \
   --task-contract configs/hoidini_intermimic_pilot.json
 ```
 
-The contract uses a right-handed, Z-up world in meters and radians. World
-quaternions are stored as `[x, y, z, w]`. This upstream interpretation is
-frozen against EmbodiedGenV2 `v2.0.1` commit
-`9b333554254af196bace88c1a171a3bf047fa09c`; the manifest records that
-assumption because `layout.json` itself has no format-version field.
+## Stage 2: exact shared-scene binding
 
-## Stage 2: EmbodiedGenV2 scene boundary
+### Authoritative input chain
 
-### Input
+The HOIDiNi pipeline does not independently generate a second scene. It binds
+the accepted durable package at:
 
-The resolver accepts an EmbodiedGenV2 task directory containing `layout.json`.
-The required upstream maps are `tree`, `relation`, `objs_desc`,
-`objs_mapping`, `assets`, `quality`, and `position`.
+```text
+/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return
+```
 
-For every non-background object, `assets[name]` must reference either its URDF
-or the directory containing `<name_with_underscores>.urdf`. The URDF is the
-source of truth for:
+The fail-closed binder consumes and cross-checks:
 
-- visual and collision mesh paths;
-- mesh scale and mesh-local `xyz`/`rpy` transforms;
-- mass and center of mass when present;
-- inertia when present and not the known EmbodiedGen template placeholder;
-- static/dynamic friction (`mu1`/`mu2`);
-- restitution when explicitly present.
+1. the Stage 1 task contract;
+2. the shared-scene handoff;
+3. the canonical ActivitySpec;
+4. the EmbodiedGen generation receipt;
+5. `layout.json`;
+6. every file listed in the 171-file inventory;
+7. the validated SceneBundle and its semantic hash.
 
-The resolver preserves raw mesh-local transforms. It does not infer a
-collision mesh from its filename and does not substitute the visual mesh when
-the declared collision mesh is missing.
+It rejects an alternate root, the superseded package, a handoff/path/hash
+mismatch, any missing or additional scene file, a changed byte count or hash,
+an unsafe path or symlink, a different activity/timing/seed block, a different
+asset backend, canonical-ID drift, robot insertion, coordinate drift, or a
+SceneBundle that lacks the required complete-scene capabilities.
 
-### Robot policy
+### What is preserved
 
-Current EmbodiedGen layouts may retain semantic robot names, tree edges, or a
-robot pose even when robot insertion was not requested. Those values are
-accepted only as upstream metadata and stripped. No robot asset or robot
-instance is included in the resolved manifest. Do not use EmbodiedGen's
-current convenience SAPIEN entry point for this robot-free boundary because
-the public implementation may still construct a robot.
+The binding retains:
 
-No proactive humanoid-reachability gate is performed. The manifest records
-that fact, and an actual placement failure should be reported only if one is
-later observed.
+- target `red mug` as `egv2_028a54da21c1691ae18ea225`;
+- support and goal `table` as the same
+  `egv2_0d4fc4a78d3706edccafb665` instance;
+- object URDF, visual mesh, collision mesh, pose, mass, friction, and all hashes;
+- the finite metric room reference mesh;
+- the explicit `z=0` floor and four wall collision definitions;
+- right-handed `+Z`-up metres/kilograms/radians/seconds, XYZW quaternions, and
+  `T_parent_child` transforms;
+- the exact shared world-placement metadata for the declared neutral adult
+  SMPL-X actor;
+- native Franka metadata only as ignored provenance, with zero robot actors.
 
-For the pinned `v2.0.1` release, omitting `--insert_robot` is not sufficient by
-itself: the stock SAPIEN preview path constructs a ManiSkill robot
-unconditionally. Juno runs therefore apply the reviewed
-`scripts/embodiedgen_v2.0.1_robot_free.patch` to the exact pinned commit. The
-patch makes robot construction conditional on `insert_robot`; it does not
-change layout generation, object placement, or scene physics.
+The accepted object assets are SAM3D outputs, pinned to source commit
+`01417d16fb5cc762a60f370c1bf7f59d603ddfaf` and checkpoint revision
+`2e73555018d2741ccd486e56c24fac41155a1dc6`. The repaired room uses the
+panorama/Pano2Mesh path. Neither SAM3D nor TRELLIS is required at binding time:
+the binder consumes the already-generated URDF/OBJ/PLY assets and does not
+regenerate them.
+
+The accepted generation receipt records `gpt-5.6-luna` through the Responses
+API with OpenAI SDK 3.1.0 and reasoning effort `none`. The binder itself makes
+no OpenAI request.
+
+The world placement is not yet a complete SMPL-X tensor state. The later
+embodiment adapter must resolve the SMPL-X root/pelvis convention and construct
+explicit `transl`, global orientation, body, jaw/eye, and articulated-hand pose
+tensors before HOIDiNi or InterMimic can consume it.
 
 ### Output
 
-The output manifest contains:
+The durable compact receipt is:
 
-- deterministic instance IDs and source names;
-- target, support, and goal bindings;
-- normalized world poses;
-- URDF and mesh paths plus SHA-256 hashes;
-- body mode (`dynamic` or `static`);
-- available mass, inertia, friction, and restitution with provenance;
-- the original VLM-estimated mass range, real height, friction provenance, and
-  upstream quality marker when present;
-- verified target-on-support and goal-on-support scene-graph relationships;
-- background visual references;
-- an explicit absence of background collision unless separately designated;
-- the resolved initial adult-human transform;
-- robot-removal evidence and current limitations.
-
-Resolve a scene into an ignored working directory:
-
-```bash
-python scripts/prepare_hoidini_intermimic_scene.py resolve-scene \
-  --task-contract configs/hoidini_intermimic_pilot.json \
-  --layout /path/to/embodiedgen/task_0000/layout.json \
-  --output tmp/hoidini_intermimic/scene_manifest.json
+```text
+/work/dal503972/hoidini_intermimic/compact_records/shared_scene_binding_red-mug-mouth-return.json
 ```
 
-`tmp/` is disposable and ignored. Real generated scene packages, downloads,
-media, and complete runs must not be committed to this repository.
+Its governed checked-in copy is
+`docs/hoidini_intermimic_shared_scene_binding.json`. The receipt points to the
+canonical external assets; no scene asset is copied into Git or the HOIDiNi
+durable scene namespace.
 
-## Done when
+Run the canonical Juno binding with:
 
-Stage 1 is complete when the pilot contract validates and every phase covers
-exactly the ten-second interval. Stage 2 is complete when the resolver can
-bind all three scientific roles, parse every declared object asset without a
-path escape, publish a robot-free manifest, and distinguish known physical
-properties from missing or placeholder values.
+```bash
+bash scripts/juno_bind_hoidini_intermimic_shared_scene.sh
+```
 
-The checked-in test fixture is representative text data only. It proves this
-file boundary and does **not** claim that a real EmbodiedGenV2 scene was
-generated or loaded in a simulator.
+`inspect-layout` remains a low-level layout/URDF inspection command for fixtures
+and diagnostics. A naked `layout.json` resolution is not sufficient to complete
+Stage 2 because it cannot prove inventory, generation, SceneBundle, or canonical
+instance identity.
 
-## Juno empirical gate
+## Physics boundary
 
-The reproducible qualification inputs are
-`configs/hoidini_intermimic_juno_qualification.json`,
-`scripts/juno_qualify_hoidini_intermimic.sh`, and
-`scripts/juno_prepare_embodiedgen.sh`. The fail-closed continuation command is
-`scripts/juno_generate_hoidini_intermimic_pilot.sh`. Complete environments,
-caches, logs, downloads, and scene packages live only under the canonical Juno
-roots named in the config. The compact outcome is updated in place at
-`docs/hoidini_intermimic_juno_qualification.json`.
+The SceneBundle is complete enough for later consumer preparation: visual room,
+metric reference mesh, object assets, explicit floor/walls, and InteractMove
+scene input are present. It is not yet physically complete:
 
-The pinned EmbodiedGen client is migrated from Chat Completions to the OpenAI
-Responses API by `scripts/embodiedgen_v2.0.1_responses_api.patch`. The frozen
-model is `gpt-5.6-luna`, with low reasoning effort and an 8,192-token total
-reasoning-plus-output cap. The isolated environment pins `openai==3.1.0` because
-EmbodiedGen's original `openai==1.58.1` client does not expose Responses.
-Requests set `store=false`, transcode accepted image inputs to PNG before
-constructing `input_image` blocks, and preserve EmbodiedGen's existing
-prompt-constrained plain-text/JSON-repair behavior. Strict Structured Outputs
-are not enabled globally because the same client also returns scalar scores,
-YES/NO decisions, and scene identifiers. This patch qualifies the OpenAI
-Platform path only; Azure and OpenRouter compatibility have not been tested.
+- the SceneBundle blocker list reports missing restitution for the plate, mug,
+  and spoon, while the table URDF also lacks restitution;
+- some upstream inertia values are placeholders;
+- `physics_material_complete=false`;
+- `dynamic_settle_ready=false`;
+- settling remains `not_run`.
 
-The gate distinguishes three facts:
+The 10-second scene-only SAPIEN canary is intentionally narrow. It used no
+humanoid or controller, recorded no intended-contact trace, did not apply URDF
+mass, and hard-coded restitution. It therefore cannot clear the InterMimic,
+mass/material, grasp, contact, balance, or settling gates.
 
-1. GPU qualification proves only that Slurm, CUDA, and a tiny PyTorch operation
-   work.
-2. Environment qualification proves only that the pinned release installs and
-   imports with the robot-free patch.
-3. `QUALIFIED_STAGE12_BOUNDARY` requires a newly generated real scene package,
-   successful resolution, zero robot instances, and non-rendering asset checks.
+## Stage completion
 
-No qualification state implies successful HOIDiNi generation, InterMimic
-tracking, reachability, contact, dynamics, or video rendering.
+Stage 1 is complete because the exact shared ActivitySpec is represented and
+validated without ambiguity. Stage 2 is complete because the full canonical
+package and provenance chain passed on Juno, canonical IDs and transforms were
+retained, room collision definitions were validated and bound from the
+SceneBundle, and zero scene assets were copied or resampled.
 
-## Open limitations
-
-- The first task is one rigid manipulated object; articulated, deformable, and
-  multi-target activities are out of scope.
-- EmbodiedGen's generated identity-like inertia tensor is treated as a template
-  placeholder. A later simulator stage must calculate or validate inertia.
-- EmbodiedGen does not currently provide object restitution, so it remains
-  unavailable instead of inheriting a simulator hard-code.
-- Background `mesh_model.ply` is visual only unless a separate validated
-  collision asset is supplied. The table URDF supplies the pilot's support
-  collision.
-- The current Juno decision record states whether a real EmbodiedGen package was
-  generated. Physical scene validation remains outside Stages 1–2 regardless.
+The next stage must investigate HOIDiNi's actual released inference boundary
+before claiming it can consume this arbitrary object and scene. No current
+record claims HOIDiNi motion, explicit contact-pair output, InterMimic tracking,
+or a final RGB clip.

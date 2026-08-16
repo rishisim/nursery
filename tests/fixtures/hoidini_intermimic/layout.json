@@ -5,18 +5,18 @@
       ["franka", "IN"]
     ],
     "table": [
-      ["mug", "ON"],
+      ["red mug", "ON"],
       ["tray", "ON"]
     ]
   },
   "relation": {
-    "task_desc": "Pick up the mug from the table, carry it to the tray, and put it down.",
+    "task_desc": "Pick up the red mug from the table, bring it to your mouth, and place it back on the table.",
     "task": "pick and place",
     "robot": "franka",
     "background": "kitchen",
     "context": "table",
     "manipulated_objs": [
-      "mug"
+      "red mug"
     ],
     "distractor_objs": [
       "tray"
@@ -25,30 +25,30 @@
   "objs_desc": {
     "kitchen": "simple kitchen",
     "table": "wooden table",
-    "mug": "ceramic mug",
+    "red mug": "ceramic red mug",
     "tray": "wooden tray"
   },
   "objs_mapping": {
     "kitchen": "background",
     "table": "context",
-    "mug": "manipulated_objs",
+    "red mug": "manipulated_objs",
     "tray": "distractor_objs"
   },
   "assets": {
     "kitchen": "background",
     "table": "asset3d/table/result",
-    "mug": "asset3d/mug/result",
+    "red mug": "asset3d/red_mug/result",
     "tray": "asset3d/tray/result"
   },
   "quality": {
     "table": "fixture_only",
-    "mug": "fixture_only",
+    "red mug": "fixture_only",
     "tray": "fixture_only"
   },
   "position": {
     "kitchen": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
     "table": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
-    "mug": [-0.25, 0.0, 0.82, 0.0, 0.0, 0.7071067812, 0.7071067812],
+    "red mug": [0.1149, 0.1831, 0.8242, 0.0, 0.0, 0.27769142224444826, 0.9606703253519678],
     "tray": [0.3, 0.0, 0.81, 0.0, 0.0, 0.0, 1.0],
     "franka": [0.0, -0.8, 0.0, 0.0, 0.0, 0.0, 1.0]
   }

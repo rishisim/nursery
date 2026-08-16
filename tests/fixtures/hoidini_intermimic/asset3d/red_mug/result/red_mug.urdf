@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<robot name="mug">
-  <link name="mug">
+<robot name="red_mug">
+  <link name="red_mug">
     <visual>
       <origin xyz="0.01 0 0" rpy="1.5707963268 0 0"/>
-      <geometry><mesh filename="mesh/mug.obj" scale="1 1 1"/></geometry>
+      <geometry><mesh filename="mesh/red_mug.obj" scale="1 1 1"/></geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="1.5707963268 0 0"/>
-      <geometry><mesh filename="mesh/mug_collision.obj" scale="1 1 1"/></geometry>
+      <geometry><mesh filename="mesh/red_mug_collision.obj" scale="1 1 1"/></geometry>
       <gazebo><mu1>0.60</mu1><mu2>0.45</mu2></gazebo>
     </collision>
     <inertial>

@@ -1,242 +1,238 @@
 {
-  "schema_version": "hoidini-intermimic-task-contract-1.0.0",
-  "task_id": "pilot-mug-table-tray",
-  "scene_id": "pilot-mug-table-tray-scene",
-  "activity_prompt": "Pick up the mug from the table, carry it to the tray, and put it down.",
+  "schema_version": "hoidini-intermimic-task-contract-1.1.0",
+  "task_id": "red-mug-mouth-return",
+  "scene_id": "red-mug-mouth-return",
+  "activity_prompt": "Pick up the red mug from the table, bring it to your mouth, and place it back on the table.",
   "duration_seconds": 10.0,
+  "frame_rate_hz": 30,
+  "frame_count": 300,
+  "sampling": "half_open_[0,duration)",
   "coordinate_system": {
     "handedness": "right",
     "up_axis": "+Z",
     "linear_unit": "meter",
+    "mass_unit": "kilogram",
     "angle_unit": "radian",
-    "quaternion_order": "xyzw"
+    "time_unit": "second",
+    "quaternion_order": "xyzw",
+    "transform_semantics": "T_parent_child",
+    "gravity_m_s2": [0.0, 0.0, -9.81]
+  },
+  "shared_scene_source": {
+    "canonical_root": "/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return",
+    "activity_spec_sha256": "a66fb6609540136bf15b97a55bf459081493f91bd7b0080bb49c364f387f3a1f",
+    "handoff_path": "/work/dal503972/interactmove_intermimic/compact_records/shared_scene_red-mug-mouth-return.json",
+    "handoff_sha256": "6f724133d5273afe8559c8d83b247c65ea8522b193f7c69162ba495a591dd27e",
+    "generation_receipt_path": "/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return/generation_receipt.json",
+    "generation_receipt_sha256": "2cca27616f069ce9f0c76ecd0371e9210721390ebc9a86ec3f35480e94211ca9",
+    "layout_path": "/work/dal503972/interactmove_intermimic/scene_packages/red-mug-mouth-return/layout.json",
+    "layout_sha256": "24dbe1ec235ba09239f568cac9cd376f2d6b9e3ef0ecce61903d7aaaa42850be",
+    "inventory": {
+      "file_count": 171,
+      "total_bytes": 221435977,
+      "canonical_sha256": "cd1a8bcde8cd85d884a941b67d140c0d3e284d2f0bcba35867a917fc1885fb09"
+    },
+    "embodiedgen_commit": "9b333554254af196bace88c1a171a3bf047fa09c",
+    "object_asset_backend": {
+      "name": "SAM3D",
+      "source_commit": "01417d16fb5cc762a60f370c1bf7f59d603ddfaf",
+      "checkpoint_revision": "2e73555018d2741ccd486e56c24fac41155a1dc6"
+    },
+    "scene_bundle": {
+      "path": "/work/dal503972/interactmove_intermimic/compact_records/scene_bundle_red-mug-mouth-return_329321.json",
+      "file_sha256": "fa5ccef6f09a8e795f021e458dc3575e2c8dc46d26cdfe047b1e18a79aa9d7ad",
+      "semantic_sha256": "39cec5e2537475a2532af88b5f550fd5833ddeefe86e16e0ed3c6c5ea2e29f61",
+      "bundle_id": "scene_da67578846eca4a7f7d4fe4646ae9eb4"
+    },
+    "reference_mesh_sha256": "137c59d332c50b533a899447a89826f52dba0ac6a4a9457e568b4ee8ca154c3e",
+    "robot_actor_inserted": false,
+    "source_assets_copied": false,
+    "superseded_scene_root_forbidden": "/work/dal503972/interactmove_intermimic/.superseded/329321"
   },
   "seeds": {
-    "scene": 101,
-    "layout": 102,
-    "motion": 103,
-    "physics": 104,
-    "render": 105
+    "master": 2026081500,
+    "embodiedgen_image": 2026081501,
+    "embodiedgen_asset": 2026081502,
+    "embodiedgen_layout": 2026081503,
+    "interactmove": 2026081504,
+    "intermimic": 2026081505,
+    "render": 2026081506
+  },
+  "hand_use": {
+    "mode": "one_hand",
+    "hands": ["right"]
   },
   "scene_bindings": {
     "target": {
-      "source_name": "mug",
-      "allowed_upstream_categories": [
-        "manipulated_objs"
-      ],
+      "source_name": "red mug",
+      "canonical_instance_id": "egv2_028a54da21c1691ae18ea225",
+      "allowed_upstream_categories": ["manipulated_objs"],
       "body_mode": "dynamic"
     },
     "support": {
       "source_name": "table",
-      "allowed_upstream_categories": [
-        "context"
-      ],
+      "canonical_instance_id": "egv2_0d4fc4a78d3706edccafb665",
+      "allowed_upstream_categories": ["context"],
       "body_mode": "static"
     },
     "goal": {
-      "source_name": "tray",
-      "allowed_upstream_categories": [
-        "manipulated_objs",
-        "distractor_objs"
-      ],
+      "source_name": "table",
+      "canonical_instance_id": "egv2_0d4fc4a78d3706edccafb665",
+      "same_instance_as": "support",
+      "allowed_upstream_categories": ["context"],
       "body_mode": "static"
     }
   },
   "initial_human_state": {
     "body_model": "adult_neutral_smplx_beta0",
+    "source_body_model": "SMPL-X",
+    "morphology": "adult",
+    "gender": "neutral",
+    "betas": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     "joint_pose": "neutral_standing",
+    "source_initial_stance": "standing_neutral",
     "placement": {
-      "reference_role": "support",
-      "translation_offset_world_m": [
-        0.0,
-        -1.0,
-        0.0
-      ],
-      "orientation_xyzw": [
-        0.0,
-        0.0,
-        0.0,
-        1.0
-      ]
+      "method": "target_relative",
+      "reference_role": "target",
+      "translation_offset_world_m": [-1.0, 0.0, 0.0],
+      "face_reference": true,
+      "orientation_xyzw": [0.0, 0.0, 0.0, 1.0]
     }
   },
   "initial_object_states": {
-    "target": {
-      "pose_source": "embodiedgen_layout"
-    },
-    "support": {
-      "pose_source": "embodiedgen_layout"
-    },
-    "goal": {
-      "pose_source": "embodiedgen_layout"
-    }
+    "target": {"pose_source": "embodiedgen_layout"},
+    "support": {"pose_source": "embodiedgen_layout"},
+    "goal": {"pose_source": "embodiedgen_layout"}
   },
   "required_initial_relations": [
     {
       "relation_id": "target_starts_on_support",
       "child_role": "target",
       "parent_role": "support",
-      "spatial_relation": "ON"
-    },
-    {
-      "relation_id": "goal_starts_on_support",
-      "child_role": "goal",
-      "parent_role": "support",
-      "spatial_relation": "ON"
+      "spatial_relation": "ON",
+      "activity_object_description": "the table"
     }
   ],
   "action_phases": [
     {
-      "name": "ready",
+      "id": "approach",
+      "start_frame": 0,
+      "end_frame_exclusive": 60,
       "start_seconds": 0.0,
-      "end_seconds": 1.0,
-      "intent": "Begin in the frozen neutral adult SMPL-X state while the mug rests on the table."
+      "end_seconds": 2.0,
+      "expected_target_contact_hands": [],
+      "intent": "Approach the red mug while it remains supported by the table."
     },
     {
-      "name": "reach",
-      "start_seconds": 1.0,
-      "end_seconds": 2.5,
-      "intent": "Move one or both hands toward the mug without moving it prematurely."
+      "id": "reach",
+      "start_frame": 60,
+      "end_frame_exclusive": 100,
+      "start_seconds": 2.0,
+      "end_seconds": 3.3333333333333335,
+      "expected_target_contact_hands": [],
+      "intent": "Reach the right hand toward the red mug without moving it prematurely."
     },
     {
-      "name": "grasp_and_lift",
-      "start_seconds": 2.5,
-      "end_seconds": 4.0,
-      "intent": "Establish a stable hand-object grasp and lift the mug clear of the table."
+      "id": "grasp-lift",
+      "start_frame": 100,
+      "end_frame_exclusive": 170,
+      "start_seconds": 3.3333333333333335,
+      "end_seconds": 5.666666666666667,
+      "expected_target_contact_hands": ["right"],
+      "intent": "Establish a stable right-hand grasp and lift the red mug clear of the table."
     },
     {
-      "name": "carry",
-      "start_seconds": 4.0,
-      "end_seconds": 7.0,
-      "intent": "Carry the mug from the table location to the tray without dropping it."
+      "id": "bring-to-mouth",
+      "start_frame": 170,
+      "end_frame_exclusive": 230,
+      "start_seconds": 5.666666666666667,
+      "end_seconds": 7.666666666666667,
+      "expected_target_contact_hands": ["right"],
+      "intent": "Bring the grasped red mug toward the mouth without dropping it."
     },
     {
-      "name": "place",
-      "start_seconds": 7.0,
-      "end_seconds": 8.5,
-      "intent": "Put the mug onto the tray while retaining hand support until tray contact is established."
+      "id": "return",
+      "start_frame": 230,
+      "end_frame_exclusive": 280,
+      "start_seconds": 7.666666666666667,
+      "end_seconds": 9.333333333333334,
+      "expected_target_contact_hands": ["right"],
+      "intent": "Return the red mug to its table support while retaining the right-hand grasp."
     },
     {
-      "name": "release_and_settle",
-      "start_seconds": 8.5,
+      "id": "release-settle",
+      "start_frame": 280,
+      "end_frame_exclusive": 300,
+      "start_seconds": 9.333333333333334,
       "end_seconds": 10.0,
-      "intent": "Release the mug and leave it stably supported by the tray."
+      "expected_target_contact_hands": [],
+      "intent": "Release the red mug and leave it stably supported by the table."
     }
   ],
   "contact_windows": [
     {
       "contact_id": "mug_on_table_initially",
+      "start_frame": 0,
+      "end_frame_exclusive": 100,
       "start_seconds": 0.0,
-      "end_seconds": 2.5,
+      "end_seconds": 3.3333333333333335,
       "requirement": "required",
-      "participants": [
-        "target",
-        "support"
-      ]
+      "participants": ["target", "support"]
     },
     {
-      "contact_id": "hand_grasps_mug",
-      "start_seconds": 2.5,
-      "end_seconds": 8.5,
+      "contact_id": "right_hand_grasps_mug",
+      "start_frame": 100,
+      "end_frame_exclusive": 280,
+      "start_seconds": 3.3333333333333335,
+      "end_seconds": 9.333333333333334,
       "requirement": "required",
-      "participants": [
-        "human_hand_left_or_right",
-        "target"
-      ]
+      "participants": ["human_hand_right", "target"]
     },
     {
-      "contact_id": "mug_on_tray_at_end",
-      "start_seconds": 8.0,
+      "contact_id": "mug_on_table_at_end",
+      "start_frame": 280,
+      "end_frame_exclusive": 300,
+      "start_seconds": 9.333333333333334,
       "end_seconds": 10.0,
       "requirement": "required",
-      "participants": [
-        "target",
-        "goal"
-      ]
+      "participants": ["target", "goal"]
     },
     {
       "contact_id": "hands_clear_after_release",
-      "start_seconds": 8.5,
+      "start_frame": 280,
+      "end_frame_exclusive": 300,
+      "start_seconds": 9.333333333333334,
       "end_seconds": 10.0,
       "requirement": "forbidden",
-      "participants": [
-        "human_hands",
-        "target"
-      ]
+      "participants": ["human_hands", "target"]
     }
   ],
-  "success_criteria": [
+  "required_final_relations": [
     {
-      "criterion_id": "correct_target_manipulated",
-      "plain_language": "The mug, and not another object, is the manipulated target.",
-      "measurement": {
-        "type": "identity_match",
-        "role": "target"
-      }
-    },
-    {
-      "criterion_id": "mug_lifted",
-      "plain_language": "The mug is lifted clear of the table during the carry phase.",
-      "measurement": {
-        "type": "support_separation",
-        "minimum_clearance_m": 0.02,
-        "phase": "carry"
-      }
-    },
-    {
-      "criterion_id": "mug_placed_on_tray",
-      "plain_language": "The mug finishes within the tray goal region.",
-      "measurement": {
-        "type": "goal_region",
-        "maximum_horizontal_center_error_m": 0.08,
-        "role": "goal"
-      }
-    },
-    {
-      "criterion_id": "mug_stable_after_release",
-      "plain_language": "The mug remains supported by the tray for the final second after release.",
-      "measurement": {
-        "type": "stable_support_duration",
-        "minimum_seconds": 1.0,
-        "maximum_linear_speed_m_per_s": 0.05
-      }
+      "relation_id": "target_finishes_on_goal",
+      "child_role": "target",
+      "parent_role": "goal",
+      "spatial_relation": "ON",
+      "activity_object_description": "the table"
     }
   ],
-  "forbidden_failures": [
+  "acceptance_metrics": [
+    {"id": "target-instance", "metric": "target_instance_correct", "operator": "eq", "threshold": true, "unit": null, "evaluation_window": "full_episode"},
+    {"id": "phase-order", "metric": "phase_order_fraction", "operator": "gte", "threshold": 0.9, "unit": null, "evaluation_window": "full_episode"},
+    {"id": "intended-contact", "metric": "intended_contact_fraction", "operator": "gte", "threshold": 0.9, "unit": null, "evaluation_window": "full_episode"},
+    {"id": "stable-grasp", "metric": "stable_grasp_fraction", "operator": "gte", "threshold": 0.9, "unit": null, "evaluation_window": "full_episode"},
+    {"id": "penetration", "metric": "max_penetration_m", "operator": "lte", "threshold": 0.02, "unit": "m", "evaluation_window": "full_episode"},
+    {"id": "balance", "metric": "balance_success", "operator": "eq", "threshold": true, "unit": null, "evaluation_window": "full_episode"},
+    {"id": "final-relation", "metric": "final_relation_satisfied", "operator": "eq", "threshold": true, "unit": null, "evaluation_window": "full_episode"}
+  ],
+  "non_acceptance_diagnostics": [
     {
-      "criterion_id": "no_drop",
-      "plain_language": "The mug must not be dropped before placement.",
-      "measurement": {
-        "type": "unexpected_support_loss",
-        "maximum_seconds": 0.15
-      }
+      "id": "mug-lift-clearance",
+      "description": "Measure whether the mug clears the table by at least 0.02 m during bring-to-mouth; this diagnoses failures but does not replace the shared acceptance metrics."
     },
     {
-      "criterion_id": "no_fall",
-      "plain_language": "The humanoid must not fall.",
-      "measurement": {
-        "type": "humanoid_fall",
-        "allowed": false
-      }
-    },
-    {
-      "criterion_id": "low_penetration",
-      "plain_language": "Human, object, and scene penetrations must remain small.",
-      "measurement": {
-        "type": "maximum_penetration_depth",
-        "maximum_m": 0.02
-      }
-    },
-    {
-      "criterion_id": "no_unintended_object_motion",
-      "plain_language": "Objects other than the mug must not be displaced unintentionally.",
-      "measurement": {
-        "type": "non_target_displacement",
-        "maximum_m": 0.02,
-        "exclude_roles": [
-          "target"
-        ]
-      }
+      "id": "non-target-displacement",
+      "description": "Measure unintended table, plate, and spoon displacement; this is an attribution diagnostic, not an additional pass/fail gate."
     }
   ]
 }
