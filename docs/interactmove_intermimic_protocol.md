@@ -318,6 +318,17 @@ ModelScope fragments from the earlier blocked attempt are not admitted or
 relabelled. Generation rechecks the complete manifest and binds the snapshot
 through the upstream-supported `image3d_model=SAM3D` path.
 
+SAM 3D qualification passed in Slurm job `328529` on an NVIDIA H200 NVL. Its
+setup receipt is
+`/work/dal503972/interactmove_intermimic/compact_records/embodiedgen_setup_328529.json`,
+SHA-256
+`515161cafe21ae49eee0370a7137135f00b4c827e8d5f96d49e623370ef8d15f`.
+The exact checkpoint manifest SHA-256 is
+`e3042c85afe94e104d6253f5821f772e057a8d34779b060e744495cf12fe5410`;
+the environment manifest SHA-256 is
+`5d818c05fc84a4efde43bf1ac8cea4515af9cf9c1b37f482bcc4a4116c57323f`.
+The inference canary produced a nonempty 400,172-vertex, 800,416-face mesh.
+
 Fresh job `328320` completed the GPT layout and accepted one SD3.5 conditioning
 image before SAM 3D access blocked asset generation. The canonical SAM 3D run
 resumes those irreplaceable stages. The retained scene tree is SHA-256
@@ -391,15 +402,52 @@ restitution. The canary intentionally exposes the released importer's fallback
 behavior: it does not apply URDF mass, uses hard-coded restitution `0.05`, and
 does not record contacts. No InteractMove motion or InterMimic execution has run.
 
-The previous TRELLIS fair-comparison handoff is
+The previous TRELLIS handoff, SHA-256
+`5f6a1730bc1bb7c57c62a8f238bafabc5fe04592e2078097901093f5e0f151b9`,
+is retained under the durable `.superseded/328463` record root. It is not the
+active shared scene.
+
+The admitted SAM 3D generation is Slurm job `328538`. It reused only the four
+hash-bound SD3.5 conditioning images from job `328381` and generated fresh
+SAM 3D geometry, collision proxies, URDFs, and renders for the plate, red mug,
+spoon, and table. Plate, spoon, and table passed with asset seed `2026081502`.
+The mug rejected seeds `2026081502` and `33936` at the strict geometry gates,
+then seed `62468` passed the upstream, corrected four-view, and exact-one-handle
+checks. Direct inspection confirms one connected handle and an open cup
+interior. The generation receipt SHA-256 is
+`beaeccc61e87e74636171d48b963d01563e107c906f166e8490b32e808f9d3ac`;
+`layout.json` SHA-256 is
+`8062b9ce0608d5851c8ae0ede7a21626fd8dcc99320d06462804c32490dcd207`.
+No robot actor was inserted and released `sim-cli` was not invoked.
+
+SceneBundle validation and the bounded scene-only SAPIEN canary passed in
+Slurm job `328542`. The bundle ID is
+`scene_bc22206bb607d780cc8b415f8d48f584`, its pretty-file SHA-256 is
+`4901e5de136bda18a1f843853894b45cde76121b7e50d5354445afe74b8a859e`,
+and its semantic digest is
+`72d955b5f1bc4ecd63853744ae73b66da5b4182b72348fb25f5a76538f7df5ca`.
+The target is source node `red mug`, instance
+`egv2_028a54da21c1691ae18ea225`; its support is source node `table`, instance
+`egv2_0d4fc4a78d3706edccafb665`. SAPIEN `3.0.0b1` ran 2,000 steps at 200 Hz
+and wrote 300 H.264 frames at 30 FPS for exactly 10 seconds. The video SHA-256
+is `c10c9e9c9a6e338344db58b7e93e33a43ccec89adf5ad9af38280b79ae716ac5`.
+
+The active fair-comparison handoff is
 `/work/dal503972/interactmove_intermimic/compact_records/shared_scene_red-mug-mouth-return.json`,
 SHA-256
-`5f6a1730bc1bb7c57c62a8f238bafabc5fe04592e2078097901093f5e0f151b9`.
-It binds all 165 files (235,472,771 bytes) by relative path, byte size, and
-SHA-256; the canonical inventory digest is
-`f80c120ef594c097a5e709d6c41bd2f7621d7ec38a29b9c1971f58f3109c3723`.
+`9436c6cb6a267d9352cb5a2785374ccde302c0394657cc29c23cb76f0dd69466`.
+It binds all 165 scene files (166,385,332 bytes) by relative path, byte size,
+and SHA-256; the canonical inventory digest is
+`5a35c99a439fd77b22893d1fb78c461a0171dc81a552b0e61cdd20f9fc18ed0d`.
 The HOIDiNi protocol must consume this package directly or verify an exact
 durable copy against that inventory; it must not independently sample a scene.
+
+This remains a scene-only canary, not a qualified settling receipt. The bundle
+is not yet InteractMove-input-ready: the selected Gaussian background has no
+reference mesh or room collision, and the dynamic plate, mug, and spoon URDFs
+omit restitution. The released SAPIEN importer supplies restitution `0.05`,
+does not apply URDF mass, and records no contacts. No InteractMove motion or
+InterMimic execution has run.
 
 EmbodiedGen's released `sim-cli` loads a Franka even when
 `insert_robot=false`; therefore it must not be used as evidence of a robot-free
