@@ -21,6 +21,8 @@ readonly BIG_LAMA_REVISION=05cb2be7f8dbe6ca7c6e78f4fc827a4b2baaa4a9
 readonly SD2_INPAINT_REVISION=5f74973cbb64c8568780732c17f43eb269d63a0d
 readonly REALESRGAN_REVISION=a64fcdebeea17287d830736cd0853df1093b97ab
 readonly OMNIDATA_COMMIT=152cf1465313b68cdf5d47bb09568a9357c57086
+readonly OMNIDATA_DEPTH_REVISION=3df69f18233d1ffd6161117ee816977d54630d70
+readonly OMNIDATA_NORMAL_REVISION=387d2be61a3f475c0a5ac969768a9c6d0e75dee1
 readonly ACTIVITY_ID=red-mug-mouth-return
 readonly SCRATCH_ROOT=/scratch/juno/dal503972/interactmove_intermimic
 readonly DURABLE_ROOT=/work/dal503972/interactmove_intermimic
@@ -55,7 +57,12 @@ readonly PANO_MODEL_ROOT="${CHECKPOINT_ROOT}/pano-${PANO_MODEL_REVISION}"
 readonly BIG_LAMA_ROOT="${CHECKPOINT_ROOT}/big-lama-${BIG_LAMA_REVISION}"
 readonly SD2_ROOT="${CHECKPOINT_ROOT}/sd2-inpaint-${SD2_INPAINT_REVISION}"
 readonly REALESRGAN_ROOT="${CHECKPOINT_ROOT}/roboassetgen-${REALESRGAN_REVISION}"
+readonly OMNIDATA_DEPTH_ROOT="${CHECKPOINT_ROOT}/omnidata-depth-${OMNIDATA_DEPTH_REVISION}"
+readonly OMNIDATA_NORMAL_ROOT="${CHECKPOINT_ROOT}/omnidata-normal-${OMNIDATA_NORMAL_REVISION}"
 readonly OMNIDATA_ROOT="${SCRATCH_ROOT}/source/omnidata_models-${OMNIDATA_COMMIT}"
+readonly REUSE_PANO_SOURCE_JOB=329209
+readonly REUSE_PANO="${SCRATCH_ROOT}/runs/room_repair/${REUSE_PANO_SOURCE_JOB}/scene3d_generation/pano_image.png"
+readonly REUSE_PANO_SHA256=742a2684dd5b6d628d7d2b9803b9223a414dc11363b3eff0a7127650c4b17740
 readonly ROOM_PROMPT='Simple empty dining room interior with warm neutral walls, a level wood floor, visible corners and four walls, and no furniture or loose objects; designed as context for the activity: Pick up the red mug from the table, bring it to your mouth, and place it back on the table.'
 readonly ROOM_SEED=2026081501
 
@@ -144,6 +151,8 @@ export IMIM_PANO_MODEL_ROOT="${PANO_MODEL_ROOT}"
 export IMIM_BIG_LAMA_ROOT="${BIG_LAMA_ROOT}"
 export IMIM_SD2_ROOT="${SD2_ROOT}"
 export IMIM_REALESRGAN_ROOT="${REALESRGAN_ROOT}"
+export IMIM_OMNIDATA_DEPTH_ROOT="${OMNIDATA_DEPTH_ROOT}"
+export IMIM_OMNIDATA_NORMAL_ROOT="${OMNIDATA_NORMAL_ROOT}"
 python - <<'PY'
 import os
 from pathlib import Path
@@ -175,6 +184,18 @@ specs = [
         Path(os.environ["IMIM_REALESRGAN_ROOT"]),
         ["super_resolution/*"],
     ),
+    (
+        "sashasax/omnidata_depth_dpt_hybrid_384",
+        "3df69f18233d1ffd6161117ee816977d54630d70",
+        Path(os.environ["IMIM_OMNIDATA_DEPTH_ROOT"]),
+        ["omnidata_depth_dpt_hybrid.pth"],
+    ),
+    (
+        "sashasax/omnidata_normal_dpt_hybrid_384",
+        "387d2be61a3f475c0a5ac969768a9c6d0e75dee1",
+        Path(os.environ["IMIM_OMNIDATA_NORMAL_ROOT"]),
+        ["omnidata_normal_dpt_hybrid.pth"],
+    ),
 ]
 for repo, revision, root, allow_patterns in specs:
     revision_file = root / ".nursery_revision"
@@ -200,7 +221,10 @@ for required in \
     "${PANO_MODEL_ROOT}/.nursery_revision" \
     "${BIG_LAMA_ROOT}/big-lama.zip" \
     "${SD2_ROOT}/model_index.json" \
-    "${REALESRGAN_ROOT}/super_resolution/RealESRGAN_x4plus.pth"; do
+    "${REALESRGAN_ROOT}/super_resolution/RealESRGAN_x4plus.pth" \
+    "${OMNIDATA_DEPTH_ROOT}/omnidata_depth_dpt_hybrid.pth" \
+    "${OMNIDATA_NORMAL_ROOT}/omnidata_normal_dpt_hybrid.pth" \
+    "${REUSE_PANO}"; do
     if [[ ! -s "${required}" || -L "${required}" ]]; then
         echo "Pinned room checkpoint file is missing or unsafe: ${required}" >&2
         exit 1
@@ -222,6 +246,8 @@ roots = {
     "big_lama": Path(os.environ["IMIM_BIG_LAMA_ROOT"]),
     "sd2_inpaint": Path(os.environ["IMIM_SD2_ROOT"]),
     "realesrgan": Path(os.environ["IMIM_REALESRGAN_ROOT"]),
+    "omnidata_depth": Path(os.environ["IMIM_OMNIDATA_DEPTH_ROOT"]),
+    "omnidata_normal": Path(os.environ["IMIM_OMNIDATA_NORMAL_ROOT"]),
 }
 def sha256_file(path):
     digest = hashlib.sha256()
@@ -301,6 +327,11 @@ python "${ROOM_RUNNER}" \
     --sd2-inpaint-model "${SD2_ROOT}" \
     --realesrgan-model "${REALESRGAN_ROOT}/super_resolution/RealESRGAN_x4plus.pth" \
     --omnidata-source "${OMNIDATA_ROOT}" \
+    --omnidata-depth-model "${OMNIDATA_DEPTH_ROOT}/omnidata_depth_dpt_hybrid.pth" \
+    --omnidata-normal-model "${OMNIDATA_NORMAL_ROOT}/omnidata_normal_dpt_hybrid.pth" \
+    --reuse-pano "${REUSE_PANO}" \
+    --reuse-pano-sha256 "${REUSE_PANO_SHA256}" \
+    --reuse-pano-source-job-id "${REUSE_PANO_SOURCE_JOB}" \
     --room-prompt "${ROOM_PROMPT}" \
     --seed "${ROOM_SEED}" \
     --job-id "${SLURM_JOB_ID}"

@@ -21,6 +21,8 @@ BIG_LAMA_REVISION = "05cb2be7f8dbe6ca7c6e78f4fc827a4b2baaa4a9"
 SD2_INPAINT_REVISION = "5f74973cbb64c8568780732c17f43eb269d63a0d"
 REALESRGAN_REVISION = "a64fcdebeea17287d830736cd0853df1093b97ab"
 OMNIDATA_COMMIT = "152cf1465313b68cdf5d47bb09568a9357c57086"
+OMNIDATA_DEPTH_REVISION = "3df69f18233d1ffd6161117ee816977d54630d70"
+OMNIDATA_NORMAL_REVISION = "387d2be61a3f475c0a5ac969768a9c6d0e75dee1"
 NATIVE_PROFILE = "embodiedgen-v2.0.1-sapien-rh-zup-m-xyzw"
 
 
@@ -39,6 +41,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--sd2-inpaint-model", type=Path, required=True)
     parser.add_argument("--realesrgan-model", type=Path, required=True)
     parser.add_argument("--omnidata-source", type=Path, required=True)
+    parser.add_argument("--omnidata-depth-model", type=Path, required=True)
+    parser.add_argument("--omnidata-normal-model", type=Path, required=True)
+    parser.add_argument("--reuse-pano", type=Path)
+    parser.add_argument("--reuse-pano-sha256")
+    parser.add_argument("--reuse-pano-source-job-id")
     parser.add_argument("--room-prompt", required=True)
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--job-id", required=True)
@@ -84,6 +91,34 @@ def _inventory(root: Path) -> list[dict[str, Any]]:
 
 def _patch_pinned_model_loaders(args: argparse.Namespace) -> None:
     import torch
+    import timm
+
+    original_timm_create_model = timm.create_model
+
+    def task_checkpoint_backbone(model_name, *positional, **kwargs):
+        if model_name in {
+            "vit_base_resnet50_384",
+            "vit_base_r50_s16_384.orig_in21k_ft_in1k",
+        }:
+            kwargs["pretrained"] = False
+        return original_timm_create_model(model_name, *positional, **kwargs)
+
+    timm.create_model = task_checkpoint_backbone
+
+    task_weights = {
+        "https://huggingface.co/sashasax/omnidata_depth_dpt_hybrid_384/resolve/main/omnidata_depth_dpt_hybrid.pth": args.omnidata_depth_model,
+        "https://huggingface.co/sashasax/omnidata_normal_dpt_hybrid_384/resolve/main/omnidata_normal_dpt_hybrid.pth": args.omnidata_normal_model,
+    }
+    original_state_dict_from_url = torch.hub.load_state_dict_from_url
+
+    def pinned_state_dict_from_url(url, *positional, **kwargs):
+        local_path = task_weights.get(url)
+        if local_path is None:
+            return original_state_dict_from_url(url, *positional, **kwargs)
+        map_location = kwargs.get("map_location", "cpu")
+        return torch.load(local_path, map_location=map_location, weights_only=True)
+
+    torch.hub.load_state_dict_from_url = pinned_state_dict_from_url
 
     original_hub_load = torch.hub.load
     omnidata_source = str(args.omnidata_source)
@@ -153,12 +188,13 @@ def _install_unused_tinycudann_import_guard() -> None:
     sys.modules[module.__name__] = module
 
 
-def _generate_room(args: argparse.Namespace) -> tuple[Path, Path]:
+def _generate_room(
+    args: argparse.Namespace,
+) -> tuple[Path, Path, dict[str, Any]]:
     _install_torchvision_functional_tensor_compat()
     _install_unused_tinycudann_import_guard()
     _patch_pinned_model_loaders(args)
     import torch
-    from txt2panoimg import Text2360PanoramaImagePipeline
     from embodied_gen.models.sr_model import ImageRealESRGAN
     from embodied_gen.trainer import pono2mesh_trainer as trainer
     from embodied_gen.utils.config import Pano2MeshSRConfig
@@ -176,21 +212,45 @@ def _generate_room(args: argparse.Namespace) -> tuple[Path, Path]:
     pano_path = work / "pano_image.png"
     (work / "prompt.txt").write_text(args.room_prompt + "\n", encoding="utf-8")
 
-    panorama = Text2360PanoramaImagePipeline(
-        str(args.pano_model), torch_dtype=torch.float16, device="cuda"
-    )
     expanded_prompt = (
         f"{args.room_prompt}, spacious, empty, wide open, open floor, minimal furniture"
     )
-    image = panorama(
-        {
-            "prompt": expanded_prompt,
-            "num_inference_steps": 40,
-            "upscale": False,
+    if args.reuse_pano is not None:
+        actual_sha256 = _sha256(args.reuse_pano)
+        if actual_sha256 != args.reuse_pano_sha256:
+            raise RuntimeError("reused panorama SHA-256 mismatch")
+        shutil.copy2(args.reuse_pano, pano_path)
+        panorama_stage = {
+            "status": "reused",
+            "source_job_id": args.reuse_pano_source_job_id,
+            "sha256": actual_sha256,
+            "expanded_prompt": expanded_prompt,
             "seed": args.seed,
+            "inference_steps": 40,
         }
-    )
-    image.save(pano_path)
+    else:
+        from txt2panoimg import Text2360PanoramaImagePipeline
+
+        panorama = Text2360PanoramaImagePipeline(
+            str(args.pano_model), torch_dtype=torch.float16, device="cuda"
+        )
+        image = panorama(
+            {
+                "prompt": expanded_prompt,
+                "num_inference_steps": 40,
+                "upscale": False,
+                "seed": args.seed,
+            }
+        )
+        image.save(pano_path)
+        panorama_stage = {
+            "status": "generated",
+            "source_job_id": args.job_id,
+            "sha256": _sha256(pano_path),
+            "expanded_prompt": expanded_prompt,
+            "seed": args.seed,
+            "inference_steps": 40,
+        }
 
     config = Pano2MeshSRConfig()
     config.trajectory_dir = str(
@@ -202,7 +262,7 @@ def _generate_room(args: argparse.Namespace) -> tuple[Path, Path]:
     if not raw_mesh.is_file() or raw_mesh.stat().st_size == 0:
         raise RuntimeError("EmbodiedGen Pano2Mesh did not produce mesh_model.ply")
     torch.set_default_device("cpu")
-    return pano_path, raw_mesh
+    return pano_path, raw_mesh, panorama_stage
 
 
 def _canonicalize_room_mesh(raw_mesh: Path, output_mesh: Path) -> dict[str, Any]:
@@ -345,6 +405,20 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     for path in (args.big_lama_zip, args.realesrgan_model):
         if not path.resolve(strict=True).is_file():
             raise ValueError(f"required pinned model file is missing: {path}")
+    for path in (args.omnidata_depth_model, args.omnidata_normal_model):
+        if not path.resolve(strict=True).is_file():
+            raise ValueError(f"required pinned Omnidata task model is missing: {path}")
+    reuse_values = (
+        args.reuse_pano,
+        args.reuse_pano_sha256,
+        args.reuse_pano_source_job_id,
+    )
+    if any(value is not None for value in reuse_values) and not all(
+        value is not None for value in reuse_values
+    ):
+        raise ValueError("panorama reuse requires path, SHA-256, and source job ID")
+    if args.reuse_pano is not None and not args.reuse_pano.resolve(strict=True).is_file():
+        raise ValueError("reused panorama is missing")
 
     activity_path = candidate / "metadata" / "activity.json"
     request_path = candidate / "metadata" / "embodiedgen_request.json"
@@ -364,7 +438,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     target_node = "red mug"
     target_instance_id = "egv2_" + hashlib.sha256(target_node.encode()).hexdigest()[:24]
 
-    pano_path, raw_mesh_path = _generate_room(args)
+    pano_path, raw_mesh_path, panorama_stage = _generate_room(args)
     background = candidate / "background"
     if background.exists():
         shutil.rmtree(background)
@@ -394,13 +468,18 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "sd2_inpaint_revision": SD2_INPAINT_REVISION,
             "realesrgan_revision": REALESRGAN_REVISION,
             "omnidata_commit": OMNIDATA_COMMIT,
+            "omnidata_depth_revision": OMNIDATA_DEPTH_REVISION,
+            "omnidata_normal_revision": OMNIDATA_NORMAL_REVISION,
         },
         "execution_profile": {
             "pipeline": "Pano2MeshSRPipeline",
             "pano_geo_refiner_executed": False,
             "tinycudann_installed": False,
             "tinycudann_import_guard": "fail_if_Encoding_is_instantiated",
+            "omnidata_timm_imagenet_bootstrap": False,
+            "omnidata_task_checkpoints_supply_full_model": True,
         },
+        "panorama_stage": panorama_stage,
         "retained_source_files": _inventory(provenance_root),
         "canonical_transform": transform_receipt,
     }
