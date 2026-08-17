@@ -2,8 +2,8 @@
 
 The module owns only orchestration and small JSON/CSV manifests. Room creation,
 asset retrieval and generation, and collision-aware placement remain native
-EmbodiedGen operations. Activity planning is intentionally injected: the LLM
-prompt and provider are a separate configuration decision.
+EmbodiedGen operations. Native multi-stage planning is adapted to the OpenAI
+Responses API through EmbodiedGen's existing GPTclient protocol.
 """
 
 from __future__ import annotations
@@ -12,6 +12,7 @@ import argparse
 import ast
 import csv
 import hashlib
+import importlib
 import json
 import os
 import re
@@ -27,6 +28,7 @@ from typing import Any
 
 
 DEFAULT_CONFIG = Path(__file__).resolve().parents[1] / "configs/embodiedgen_scene.json"
+OPENAI_MODEL = "gpt-5.6-luna"
 SUPPORTED_RELATIONS = frozenset({"in_room", "on", "beside", "inside"})
 REQUIRED_CONFIG_KEYS = frozenset(
     {
@@ -43,6 +45,66 @@ REQUIRED_CONFIG_KEYS = frozenset(
 
 
 ScenePipelineError = RuntimeError
+_OPENAI_RESPONSES_CLIENT: Any | None = None
+
+
+class _ResponsesGPTClient:
+    """EmbodiedGen GPTclient protocol backed by one lazy Responses client."""
+
+    model_name = OPENAI_MODEL
+
+    def query(
+        self,
+        text_prompt: str,
+        image_base64: Sequence[Any] | None = None,
+        system_role: str | None = None,
+        params: Mapping[str, Any] | None = None,
+    ) -> str:
+        if image_base64:
+            raise ScenePipelineError("Nursery scene planning supports text input only")
+        request: dict[str, Any] = {
+            "model": self.model_name,
+            "input": text_prompt,
+            "reasoning": {"effort": "low"},
+        }
+        if system_role:
+            request["instructions"] = system_role
+        if params:
+            max_output_tokens = (
+                params.get("max_output_tokens")
+                or params.get("max_completion_tokens")
+                or params.get("max_tokens")
+            )
+            if max_output_tokens is not None:
+                request["max_output_tokens"] = int(max_output_tokens)
+            if isinstance(params.get("reasoning"), Mapping):
+                request["reasoning"] = dict(params["reasoning"])
+
+        try:
+            response = _openai_responses_client().responses.create(**request)
+        except Exception as exc:
+            raise ScenePipelineError(f"OpenAI Responses request failed: {exc}") from exc
+        output = str(getattr(response, "output_text", "")).strip()
+        if not output:
+            raise ScenePipelineError("OpenAI Responses request returned no text")
+        return output
+
+
+_RESPONSES_GPT_CLIENT = _ResponsesGPTClient()
+
+
+def _openai_responses_client() -> Any:
+    global _OPENAI_RESPONSES_CLIENT
+    if _OPENAI_RESPONSES_CLIENT is None:
+        try:
+            from openai import OpenAI
+        except ImportError as exc:
+            raise ScenePipelineError(
+                "The EmbodiedGen environment must provide the OpenAI Python SDK"
+            ) from exc
+        # OpenAI() reads OPENAI_API_KEY through the SDK's standard env contract.
+        _OPENAI_RESPONSES_CLIENT = OpenAI()
+    return _OPENAI_RESPONSES_CLIENT
 
 
 def _write_json(path: Path, payload: Any) -> None:
@@ -406,26 +468,160 @@ def _validate_plan(plan: Mapping[str, Any]) -> dict[str, Any]:
     return validated
 
 
+def _import_native_layout(embodiedgen_root: Path) -> Any:
+    if not (embodiedgen_root / "embodied_gen/models/layout.py").is_file():
+        raise ScenePipelineError(
+            f"EmbodiedGen V2 layout module not found under {embodiedgen_root}"
+        )
+    root_text = str(embodiedgen_root)
+    added_to_path = root_text not in sys.path
+    if added_to_path:
+        sys.path.insert(0, root_text)
+    try:
+        return importlib.import_module("embodied_gen.models.layout")
+    except Exception as exc:
+        raise ScenePipelineError(f"Could not import native EmbodiedGen layout: {exc}") from exc
+    finally:
+        if added_to_path:
+            sys.path.remove(root_text)
+
+
+def _native_layout_info(activity: str, embodiedgen_root: Path) -> Any:
+    layout = _import_native_layout(embodiedgen_root)
+    disassemble_prompt = layout.LAYOUT_DISASSEMBLE_PROMPT + """
+
+Nursery scene-only compatibility (these rules override robot-specific rules above):
+- Plan a static activity scene, not a robotic task; never add a robot or human asset.
+- Keep the native output keys for LayoutInfo compatibility, but set "robot" to null.
+- Treat activity objects as fixed visual/collision meshes; do not request soft-body physics.
+- Preserve an explicit on, beside, inside, or in-room relation from the task description.
+"""
+    disassembler = layout.LayoutDesigner(
+        gpt_client=_RESPONSES_GPT_CLIENT,
+        system_prompt=disassemble_prompt,
+    )
+    hierarchy_prompt = layout.LAYOUT_HIERARCHY_PROMPT + """
+
+Nursery scene-only compatibility:
+- A child may be "BESIDE" a parent when the task explicitly says beside or next to.
+- Ignore the robot field and do not emit a robot or human node in the layout tree.
+- Honor explicit object relations from the task instead of robot-manipulation defaults.
+- Do not add coordinates, cameras, human poses, or custom physics parameters.
+"""
+    grapher = layout.LayoutDesigner(
+        gpt_client=_RESPONSES_GPT_CLIENT,
+        system_prompt=hierarchy_prompt,
+    )
+    describer = layout.LayoutDesigner(
+        gpt_client=_RESPONSES_GPT_CLIENT,
+        system_prompt=layout.LAYOUT_DESCRIBER_PROMPT,
+    )
+    try:
+        relation = disassembler(activity)
+        tree = grapher(relation)
+        object_mapping = layout.Scene3DItemEnum.object_mapping(relation)
+        description_prompt = f'{relation["task_desc"]} {object_mapping}'
+        descriptions = describer(description_prompt)
+        return layout.LayoutInfo(tree, relation, descriptions, object_mapping)
+    except ScenePipelineError:
+        raise
+    except Exception as exc:
+        raise ScenePipelineError(f"Native EmbodiedGen planning failed: {exc}") from exc
+
+
+def _canonical_room_type(value: str) -> str:
+    aliases = {
+        "bedroom": "Bedroom",
+        "living room": "LivingRoom",
+        "livingroom": "LivingRoom",
+        "kitchen": "Kitchen",
+        "bathroom": "Bathroom",
+        "dining room": "DiningRoom",
+        "diningroom": "DiningRoom",
+        "office": "Office",
+    }
+    normalized = _normalized_name(value)
+    try:
+        return aliases[normalized]
+    except KeyError as exc:
+        raise ScenePipelineError(
+            f"Native planner selected unsupported room type {value!r}"
+        ) from exc
+
+
+def _plan_from_layout_info(layout_info: Any) -> dict[str, Any]:
+    relation = layout_info.relation
+    tree = layout_info.tree
+    if not isinstance(relation, Mapping) or not isinstance(tree, Mapping):
+        raise ScenePipelineError("Native LayoutInfo has invalid relation or tree data")
+    room_value = relation.get("background")
+    context = relation.get("context")
+    manipulated = relation.get("manipulated_objs", [])
+    distractors = relation.get("distractor_objs", [])
+    if not isinstance(room_value, str) or not isinstance(context, str):
+        raise ScenePipelineError("Native LayoutInfo omitted background or context")
+    if not isinstance(manipulated, list) or not isinstance(distractors, list):
+        raise ScenePipelineError("Native LayoutInfo object groups must be lists")
+
+    edges: dict[str, tuple[str, str]] = {}
+    for parent, children in tree.items():
+        if not isinstance(parent, str) or not isinstance(children, list):
+            continue
+        for edge in children:
+            if (
+                isinstance(edge, (list, tuple))
+                and len(edge) == 2
+                and isinstance(edge[0], str)
+                and isinstance(edge[1], str)
+            ):
+                edges[edge[0]] = (parent, edge[1].rsplit(".", 1)[-1].upper())
+
+    relation_names = {
+        "ON": "on",
+        "INSIDE": "inside",
+        "FLOOR": "in_room",
+        "IN": "in_room",
+        "BESIDE": "beside",
+    }
+
+    def convert(name: Any) -> dict[str, str]:
+        if not isinstance(name, str) or name not in edges:
+            raise ScenePipelineError(f"Native LayoutInfo omitted placement for {name!r}")
+        parent, native_relation = edges[name]
+        if native_relation not in relation_names:
+            raise ScenePipelineError(
+                f"Native LayoutInfo used unsupported relation {native_relation!r}"
+            )
+        local_relation = relation_names[native_relation]
+        target = room_value if local_relation == "in_room" else parent
+        return {"name": name, "relation": local_relation, "target": target}
+
+    return _validate_plan(
+        {
+            "room": _canonical_room_type(room_value),
+            "objects": [convert(name) for name in manipulated],
+            "distractors": [convert(name) for name in distractors],
+        }
+    )
+
+
 def plan_activity(
     activity: str,
     *,
+    config_path: str | os.PathLike[str] | None = None,
     planner: Callable[[str], Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """Create and validate a small activity plan through an injected planner.
-
-    The native GPT client and prompt policy are intentionally not selected in
-    this engineering pass. Supplying a planner keeps the deterministic pipeline
-    runnable without silently choosing an LLM provider or model.
-    """
+    """Create a small plan through native EmbodiedGen multi-stage planning."""
 
     if not isinstance(activity, str) or not activity.strip():
         raise ScenePipelineError("activity must be a non-empty string")
-    if planner is None:
-        raise ScenePipelineError(
-            "Activity planning is not configured yet. Supply plan= to build_scene "
-            "or configure the EmbodiedGen GPT planner in the next milestone."
-        )
-    return _validate_plan(planner(activity.strip()))
+    if planner is not None:
+        return _validate_plan(planner(activity.strip()))
+    config = _load_config(config_path)
+    layout_info = _native_layout_info(
+        activity.strip(), Path(config["embodiedgen_root"])
+    )
+    return _plan_from_layout_info(layout_info)
 
 
 def select_room(
@@ -525,6 +721,69 @@ def _deterministic_asset_choice(
         if any(_normalized_name(str(value)) == normalized_query for value in categories):
             return dict(candidate)
     return None
+
+
+def _json_object_from_response(text: str, *, operation: str) -> dict[str, Any]:
+    candidate = text.strip()
+    fenced = re.fullmatch(r"```(?:json)?\s*(.*?)\s*```", candidate, re.DOTALL)
+    if fenced:
+        candidate = fenced.group(1)
+    try:
+        payload = json.loads(candidate)
+    except json.JSONDecodeError as exc:
+        raise ScenePipelineError(f"{operation} returned invalid JSON") from exc
+    if not isinstance(payload, dict):
+        raise ScenePipelineError(f"{operation} must return one JSON object")
+    return payload
+
+
+def _select_ambiguous_assets(
+    ambiguous: Mapping[str, Sequence[Mapping[str, Any]]],
+) -> dict[str, Mapping[str, Any] | None]:
+    """Select every ambiguous retrieval result in one shared Responses call."""
+
+    choices: dict[str, list[dict[str, Any]]] = {}
+    for name, candidates in ambiguous.items():
+        choices[name] = [
+            {
+                "index": index,
+                "primary_category": candidate.get("primary_category"),
+                "secondary_category": candidate.get("secondary_category"),
+                "category": candidate.get("category"),
+                "description": candidate.get("description"),
+            }
+            for index, candidate in enumerate(candidates)
+        ]
+    prompt = (
+        "Select the most suitable static 3D asset for each requested object. "
+        "Return only one JSON object mapping every object name to its candidate "
+        "index, or null when none is suitable. Do not omit keys.\n\n"
+        + json.dumps(choices, ensure_ascii=False)
+    )
+    payload = _json_object_from_response(
+        _RESPONSES_GPT_CLIENT.query(prompt), operation="Batched asset selection"
+    )
+    if set(payload) != set(ambiguous):
+        raise ScenePipelineError(
+            "Batched asset selection must return exactly the requested object names"
+        )
+
+    selected: dict[str, Mapping[str, Any] | None] = {}
+    for name, candidates in ambiguous.items():
+        index = payload[name]
+        if index is None:
+            selected[name] = None
+        elif (
+            isinstance(index, int)
+            and not isinstance(index, bool)
+            and 0 <= index < len(candidates)
+        ):
+            selected[name] = dict(candidates[index])
+        else:
+            raise ScenePipelineError(
+                f"Batched asset selection returned an invalid index for {name!r}"
+            )
+    return selected
 
 
 def _safe_asset_name(name: str) -> str:
@@ -653,13 +912,7 @@ def resolve_assets(
                 "candidate": choice,
             }
     if ambiguous:
-        if candidate_selector is None:
-            raise ScenePipelineError(
-                "Asset candidates require one batched selection decision. Configure "
-                "the LLM selector in the next milestone instead of generating over "
-                "potentially suitable retrieved assets."
-            )
-        selections = candidate_selector(ambiguous)
+        selections = (candidate_selector or _select_ambiguous_assets)(ambiguous)
         if not isinstance(selections, Mapping):
             raise ScenePipelineError("Asset candidate selector must return a mapping")
         for name, candidates in ambiguous.items():
@@ -755,6 +1008,8 @@ def _placement_config(
         return None
     relation = str(entry["relation"])
     if relation == "inside":
+        # TODO: Enable only when native FloorplanManager provides true
+        # collision-aware container-volume placement.
         raise ScenePipelineError(
             "EmbodiedGen V2 FloorplanManager has no collision-aware inside-container "
             "primitive; use on, beside, or in_room until that native capability exists"
@@ -795,6 +1050,8 @@ def _validate_placement_targets(
     for entry in list(plan.get("objects", [])) + list(plan.get("distractors", [])):
         relation = str(entry["relation"])
         if relation == "inside":
+            # TODO: Enable only when native FloorplanManager provides true
+            # collision-aware container-volume placement.
             raise ScenePipelineError(
                 "EmbodiedGen V2 FloorplanManager has no collision-aware inside-container "
                 "primitive; use on, beside, or in_room until that native capability exists"
@@ -913,7 +1170,7 @@ def build_scene(
     config = _load_config(config_path)
     _validate_native_setup(config, require_room_cli=False)
     validated_plan = _validate_plan(plan) if plan is not None else plan_activity(
-        activity, planner=planner
+        activity, config_path=config["config_path"], planner=planner
     )
     if len(validated_plan["distractors"]) > config["distractor_count"]:
         raise ScenePipelineError(
@@ -974,7 +1231,7 @@ def _build_parser() -> argparse.ArgumentParser:
     build.add_argument(
         "--plan",
         type=Path,
-        help="Explicit plan JSON; temporary non-LLM entry point until planning is configured",
+        help="Use an explicit plan JSON instead of native EmbodiedGen planning",
     )
     return parser
 
