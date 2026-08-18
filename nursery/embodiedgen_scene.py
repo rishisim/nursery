@@ -927,7 +927,11 @@ def _resolve_exactish_name(query: str, names: Sequence[str]) -> str | None:
     ]
     if contained:
         return sorted(contained, key=lambda name: (len(name), name))[0]
-    phrase = [name for name, value in normalized if normalized_query in value]
+    phrase = [
+        name
+        for name, value in normalized
+        if " " in normalized_query and normalized_query in value
+    ]
     return sorted(phrase, key=lambda name: (len(name), name))[0] if phrase else None
 
 
