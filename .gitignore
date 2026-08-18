@@ -10,6 +10,14 @@ __pycache__/
 .venv-*/
 .external/
 
+# Upstream humanoid implementations are local external dependencies. Keep only
+# the tracked placeholders in Nursery; datasets, checkpoints, and environments
+# remain disposable and untracked.
+humanoid/HOIDiNi/*
+!humanoid/HOIDiNi/.gitkeep
+humanoid/InterActMove/*
+!humanoid/InterActMove/.gitkeep
+
 # Complete disposable and generated roots.
 artifacts/
 cache/
