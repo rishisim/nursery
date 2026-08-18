@@ -1026,8 +1026,11 @@ def _select_ambiguous_assets(
         ]
     prompt = (
         "Select the most suitable static 3D asset for each requested object. "
+        "A generic candidate with the same head noun is suitable when its "
+        "description does not explicitly contradict the requested form. "
         "Return only one JSON object mapping every object name to its candidate "
-        "index, or null when none is suitable. Do not omit keys.\n\n"
+        "index, or null only when every candidate is a different object class "
+        "or explicitly contradictory. Do not omit keys.\n\n"
         + json.dumps(choices, ensure_ascii=False)
     )
     payload = _json_object_from_response(
