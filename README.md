@@ -1,37 +1,53 @@
-# Nursery / BabyWorld
+# Nursery Embodied Scene
 
-This branch is the clean scientific starting point for the Embodied Simulation
-research program.
+This branch contains the lightweight Nursery adapter for generating reusable
+EmbodiedGen rooms and composing static activity scenes. EmbodiedGen remains the
+native implementation for room generation, planning, asset retrieval and
+generation, URDF export, and collision-aware placement.
 
-The program asks whether embodied side modalities available only during
-training—action state, proprioception, contact/touch, IMU-like signals, and
-object state—improve transferable lexical and language grounding when
-naturalistic vision and speech are weakly aligned.
+The active tracked workflow is intentionally limited to:
 
-No simulator platform or implementation is currently selected. The next
-authorized engineering study should compare viable rich-scene substrates using
-public or synthetic inputs and attempt one deterministic 15–20 second episode:
+```text
+configs/embodiedgen_scene.json
+nursery/__init__.py
+nursery/embodiedgen_scene.py
+```
 
-`look → reach → grasp → inspect → manipulate → release`
+Historical Nursery research that is not part of this workflow is retained
+under `archive/legacy_research/`. It is inactive on this branch and remains
+unchanged on the synthetic research branches.
 
-The camera must arise from the embodied agent. Physics and contact must remain
-authoritative, and the episode must provide synchronized RGB, depth,
-segmentation, camera, action, proprioception, contact/touch, IMU-like, and
-object-state streams.
+Generated rooms, assets, scenes, and previews belong under the ignored
+`outputs/embodiedgen_scene/` root. The external EmbodiedGen checkout belongs
+under the ignored `.external/EmbodiedGen/` path.
 
-See [Scientific baseline](docs/embodied_simulation_baseline.md) before defining
-or implementing a protocol. The full pre-reset repository remains recoverable
-from Git commit `7571c0e`.
+## Commands
 
-## Current status
+Prepare the configured reusable room bank:
 
-- Active implementation: none
-- Selected simulator: none
-- Authorized experiment: none
-- Empirical child-data source: ChildLens only
-- Restricted-media execution: local only
-- Viewer–view calibration: stopped at the local CUDA/privacy gate
+```bash
+python -m nursery.embodiedgen_scene prepare-bank \
+  --config configs/embodiedgen_scene.json
+```
 
-Generated datasets, runs, media, caches, checkpoints, and reports do not belong
-in Git. Only compact frozen configurations, aggregate results, provenance
-manifests, and concise decision records may be committed.
+Build one static activity scene:
+
+```bash
+python -m nursery.embodiedgen_scene build \
+  --activity "A person folds laundry beside a bed" \
+  --seed 7 \
+  --config configs/embodiedgen_scene.json
+```
+
+Render a fast room-bank preview from a room ID, room directory, or
+`scene.blend` path:
+
+```bash
+python -m nursery.embodiedgen_scene preview \
+  --scene LivingRoom_seed11 \
+  --config configs/embodiedgen_scene.json
+```
+
+On Juno, run generation and rendering commands inside an appropriate Slurm
+allocation. See the upstream [EmbodiedGen documentation](https://horizonrobotics.github.io/EmbodiedGen/docs/index.html)
+for native installation and pipeline details.
