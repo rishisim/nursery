@@ -10,10 +10,13 @@ from __future__ import annotations
 
 import argparse
 import ast
+import base64
 import csv
 import hashlib
 import importlib
+import io
 import json
+import mimetypes
 import os
 import re
 import shutil
@@ -68,11 +71,23 @@ class _ResponsesGPTClient:
         system_role: str | None = None,
         params: Mapping[str, Any] | None = None,
     ) -> str:
+        input_payload: str | list[dict[str, Any]] = text_prompt
         if image_base64:
-            raise ScenePipelineError("Nursery scene planning supports text input only")
+            content: list[dict[str, Any]] = [
+                {"type": "input_text", "text": text_prompt}
+            ]
+            content.extend(
+                {
+                    "type": "input_image",
+                    "image_url": _response_image_url(image),
+                    "detail": "auto",
+                }
+                for image in image_base64
+            )
+            input_payload = [{"role": "user", "content": content}]
         request: dict[str, Any] = {
             "model": self.model_name,
-            "input": text_prompt,
+            "input": input_payload,
             "reasoning": {"effort": "low"},
         }
         if system_role:
@@ -99,6 +114,43 @@ class _ResponsesGPTClient:
 
 
 _RESPONSES_GPT_CLIENT = _ResponsesGPTClient()
+
+
+def _response_image_url(image: Any) -> str:
+    """Convert EmbodiedGen's path/PIL/base64 image protocol for Responses."""
+
+    path: Path | None = None
+    if isinstance(image, os.PathLike):
+        path = Path(image).expanduser()
+    elif isinstance(image, str) and len(image) < 4096:
+        candidate = Path(image).expanduser()
+        try:
+            if candidate.is_file():
+                path = candidate
+        except OSError:
+            path = None
+    if path is not None:
+        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+        media_type = mimetypes.guess_type(path.name)[0] or "image/png"
+        return f"data:{media_type};base64,{encoded}"
+    if hasattr(image, "save"):
+        buffer = io.BytesIO()
+        image_format = str(getattr(image, "format", None) or "PNG").upper()
+        image.save(buffer, format=image_format)
+        media_type = mimetypes.types_map.get(
+            f".{image_format.casefold()}", "image/png"
+        )
+        encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+        return f"data:{media_type};base64,{encoded}"
+    if isinstance(image, str):
+        return (
+            image
+            if image.startswith("data:image/")
+            else f"data:image/png;base64,{image}"
+        )
+    raise ScenePipelineError(
+        f"Unsupported EmbodiedGen image input: {type(image).__name__}"
+    )
 
 
 _BLENDER_PREVIEW_SCRIPT = r'''import sys
@@ -1111,7 +1163,15 @@ def _generate_assets(
     if not names:
         return {}
     asset_names = [_safe_asset_name(name) for name in names]
-    command = ["text3d-cli", "--prompts", *names, "--asset_names", *asset_names]
+    command = [
+        sys.executable,
+        str(Path(__file__).resolve()),
+        "_native-text3d",
+        "--prompts",
+        *names,
+        "--asset_names",
+        *asset_names,
+    ]
     command.extend(["--output_root", str(output_root)])
     _run_native(command, cwd=embodiedgen_root, operation="Generating missing assets")
     local_index = output_root / "local_assets.csv"
@@ -1123,6 +1183,67 @@ def _generate_assets(
         _append_generated_asset(local_index, name=name, urdf_path=urdf_path)
         generated[name] = {"urdf_path": str(urdf_path), "source": "generated"}
     return generated
+
+
+def _preload_sam3d_with_compatible_attention() -> None:
+    """Keep EmbodiedGen's xFormers SAM3D patch from being reset to flash-attn."""
+
+    os.environ["ATTN_BACKEND"] = "xformers"
+    os.environ["SPARSE_ATTN_BACKEND"] = "xformers"
+    try:
+        import torch
+    except ImportError as exc:
+        raise ScenePipelineError(
+            "SAM3D requires PyTorch in the EmbodiedGen environment"
+        ) from exc
+
+    original_get_device_name = torch.cuda.get_device_name
+
+    def compatible_device_name(device: Any = None) -> str:
+        name = (
+            original_get_device_name()
+            if device is None
+            else original_get_device_name(device)
+        )
+        if any(gpu in name for gpu in ("H100", "H200", "A100")):
+            return "NVIDIA CUDA GPU"
+        return name
+
+    torch.cuda.get_device_name = compatible_device_name
+    try:
+        importlib.import_module("embodied_gen.models.sam3d")
+    finally:
+        torch.cuda.get_device_name = original_get_device_name
+        os.environ["ATTN_BACKEND"] = "xformers"
+        os.environ["SPARSE_ATTN_BACKEND"] = "xformers"
+
+
+def _run_native_text3d(arguments: Sequence[str]) -> int:
+    """Launch native Text-to-3D with Nursery's Responses-compatible GPT client."""
+
+    if not os.environ.get("OPENAI_API_KEY"):
+        raise ScenePipelineError("OPENAI_API_KEY is required for native Text-to-3D")
+    native_clients = importlib.import_module("embodied_gen.utils.gpt_clients")
+    native_clients.GPT_CLIENT = _RESPONSES_GPT_CLIENT
+
+    image_model = "SAM3D"
+    if "--image3d_model" in arguments:
+        model_index = arguments.index("--image3d_model") + 1
+        if model_index >= len(arguments):
+            raise ScenePipelineError("--image3d_model requires a value")
+        image_model = arguments[model_index].upper()
+    if image_model == "SAM3D":
+        _preload_sam3d_with_compatible_attention()
+
+    if not os.environ.get("CUDA_HOME"):
+        nvcc = shutil.which("nvcc")
+        if nvcc:
+            os.environ["CUDA_HOME"] = str(Path(nvcc).resolve().parents[1])
+
+    sys.argv = ["text3d-cli", *arguments]
+    native_text3d = importlib.import_module("embodied_gen.scripts.textto3d")
+    native_text3d.text_to_3d()
+    return 0
 
 
 def resolve_assets(
@@ -1663,8 +1784,11 @@ def _build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the preparation or activity-to-scene command."""
 
-    args = _build_parser().parse_args(argv)
+    raw_arguments = list(sys.argv[1:] if argv is None else argv)
     try:
+        if raw_arguments[:1] == ["_native-text3d"]:
+            return _run_native_text3d(raw_arguments[1:])
+        args = _build_parser().parse_args(raw_arguments)
         if args.command == "prepare-bank":
             result = prepare_room_bank(
                 args.config,
