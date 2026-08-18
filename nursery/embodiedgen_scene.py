@@ -765,7 +765,22 @@ def _canonical_room_type(value: str) -> str:
         ) from exc
 
 
-def _plan_from_layout_info(layout_info: Any) -> dict[str, Any]:
+def _explicit_activity_relation(
+    activity: str, object_name: str
+) -> tuple[str, str] | None:
+    name_pattern = re.escape(_normalized_name(object_name)).replace(r"\ ", r"\s+")
+    match = re.search(
+        rf"\b(?:a|an|the)?\s*{name_pattern}\s+"
+        rf"(on|beside|inside)\s+(?:a|an|the)\s+"
+        rf"([a-z0-9][a-z0-9 _-]*?)(?=\s*,|\s+and\b|[.;]|$)",
+        activity.casefold().replace("_", " "),
+    )
+    if match is None:
+        return None
+    return match.group(1), _normalized_name(match.group(2))
+
+
+def _plan_from_layout_info(layout_info: Any, *, activity: str = "") -> dict[str, Any]:
     relation = layout_info.relation
     tree = layout_info.tree
     if not isinstance(relation, Mapping) or not isinstance(tree, Mapping):
@@ -812,11 +827,43 @@ def _plan_from_layout_info(layout_info: Any) -> dict[str, Any]:
         target = room_value if local_relation == "in_room" else parent
         return {"name": name, "relation": local_relation, "target": target}
 
+    explicit_objects = []
+    other_objects = []
+    other_distractors = []
+    seen: set[str] = set()
+    for group, destination in (
+        (manipulated, other_objects),
+        (distractors, other_distractors),
+    ):
+        for name in group:
+            normalized = _normalized_name(str(name))
+            if normalized in seen:
+                continue
+            seen.add(normalized)
+            entry = convert(name)
+            explicit = _explicit_activity_relation(activity, str(name))
+            if explicit is not None:
+                entry["relation"], entry["target"] = explicit
+                explicit_objects.append(entry)
+            else:
+                destination.append(entry)
+
+    target_names = {
+        _normalized_name(entry["target"])
+        for entry in explicit_objects + other_objects + other_distractors
+        if entry["relation"] != "in_room"
+    }
+    ignored_names = {"person", "human", "robot", "franka", "ur5", "piper"}
+
+    def keep(entry: Mapping[str, str]) -> bool:
+        normalized = _normalized_name(entry["name"])
+        return normalized not in target_names and normalized not in ignored_names
+
     return _validate_plan(
         {
             "room": _canonical_room_type(room_value),
-            "objects": [convert(name) for name in manipulated],
-            "distractors": [convert(name) for name in distractors],
+            "objects": explicit_objects + [entry for entry in other_objects if keep(entry)],
+            "distractors": [entry for entry in other_distractors if keep(entry)],
         }
     )
 
@@ -837,7 +884,9 @@ def plan_activity(
     layout_info = _native_layout_info(
         activity.strip(), Path(config["embodiedgen_root"])
     )
-    return _plan_from_layout_info(layout_info)
+    plan = _plan_from_layout_info(layout_info, activity=activity.strip())
+    plan["distractors"] = plan["distractors"][: config["distractor_count"]]
+    return plan
 
 
 def select_room(
@@ -1304,6 +1353,7 @@ def compose_scene(
 
     requested = list(plan.get("objects", [])) + list(plan.get("distractors", []))
     placements = []
+    placed_names = []
     for ordinal, entry in enumerate(requested, 1):
         placement = _placement_config(
             entry,
@@ -1313,6 +1363,7 @@ def compose_scene(
         )
         if placement is not None:
             placements.append(placement)
+            placed_names.append(str(entry["name"]))
 
     scene_urdf = workspace / "scene.urdf"
     updated_urdf = workspace / "scene_updated.urdf"
@@ -1354,6 +1405,13 @@ def compose_scene(
 
     retrieved_count = sum(asset.get("source") == "retrieved" for asset in assets.values())
     generated_count = sum(asset.get("source") == "generated" for asset in assets.values())
+    requested_names = [str(entry["name"]) for entry in requested]
+    retrieved_names = [
+        name for name, asset in assets.items() if asset.get("source") == "retrieved"
+    ]
+    generated_names = [
+        name for name, asset in assets.items() if asset.get("source") == "generated"
+    ]
     manifest = {
         "activity": activity,
         "seed": seed,
@@ -1363,6 +1421,10 @@ def compose_scene(
         "assets_generated": generated_count,
         "placements_requested": len(placements),
         "placements_succeeded": len(placements),
+        "requested_objects": requested_names,
+        "retrieved_objects": retrieved_names,
+        "generated_objects": generated_names,
+        "placed_objects": placed_names,
     }
     _write_json(scene_dir / "scene_manifest.json", manifest)
     return manifest
