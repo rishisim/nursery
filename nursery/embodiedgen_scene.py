@@ -30,6 +30,14 @@ from typing import Any
 DEFAULT_CONFIG = Path(__file__).resolve().parents[1] / "configs/embodiedgen_scene.json"
 OPENAI_MODEL = "gpt-5.6-luna"
 SUPPORTED_RELATIONS = frozenset({"in_room", "on", "beside", "inside"})
+ROOM_CLI_TYPES = {
+    "Bedroom": "bedroom",
+    "LivingRoom": "livingRoom",
+    "Kitchen": "kitchen",
+    "Bathroom": "bathroom",
+    "DiningRoom": "diningRoom",
+    "Office": "office",
+}
 REQUIRED_CONFIG_KEYS = frozenset(
     {
         "embodiedgen_root",
@@ -151,6 +159,11 @@ def _load_config(config_path: str | os.PathLike[str] | None) -> dict[str, Any]:
         raise ScenePipelineError("room_types must be a non-empty list of strings")
     if len(room_types) != len(set(room_types)):
         raise ScenePipelineError("room_types must be unique")
+    unsupported_room_types = sorted(set(room_types) - set(ROOM_CLI_TYPES))
+    if unsupported_room_types:
+        raise ScenePipelineError(
+            f"room_types are unsupported by room-cli: {unsupported_room_types}"
+        )
     if not isinstance(room_seeds, list) or not room_seeds or not all(
         isinstance(value, int) and not isinstance(value, bool) for value in room_seeds
     ):
@@ -375,7 +388,7 @@ def prepare_room_bank(
                     "--output-root",
                     str(room_bank),
                     "--room-type",
-                    room_type,
+                    ROOM_CLI_TYPES[room_type],
                     "--seed",
                     str(seed),
                     "--complexity",
