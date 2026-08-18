@@ -172,6 +172,138 @@ bpy.ops.render.render(write_still=True)
 '''
 
 
+_BLENDER_URDF_PREVIEW_SCRIPT = r'''import sys
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+import bpy
+from mathutils import Euler, Matrix, Vector
+
+
+arguments = sys.argv[sys.argv.index("--") + 1 :]
+urdf_path = Path(arguments[0]).resolve()
+output_path = Path(arguments[1]).resolve()
+root = ET.parse(urdf_path).getroot()
+
+
+def values(element, attribute, default):
+    if element is None or not element.get(attribute):
+        return default
+    return tuple(float(value) for value in element.get(attribute).split())
+
+
+def origin_matrix(element):
+    origin = element.find("origin") if element is not None else None
+    xyz = values(origin, "xyz", (0.0, 0.0, 0.0))
+    rpy = values(origin, "rpy", (0.0, 0.0, 0.0))
+    return Matrix.Translation(Vector(xyz)) @ Euler(rpy, "XYZ").to_matrix().to_4x4()
+
+
+joints = {}
+for joint in root.findall("joint"):
+    parent = joint.find("parent")
+    child = joint.find("child")
+    if parent is not None and child is not None:
+        joints[child.get("link")] = (parent.get("link"), origin_matrix(joint))
+
+link_transforms = {}
+
+
+def link_transform(link_name, active=None):
+    if link_name in link_transforms:
+        return link_transforms[link_name]
+    active = set() if active is None else active
+    if link_name in active:
+        raise RuntimeError(f"joint cycle at {link_name}")
+    active.add(link_name)
+    if link_name not in joints:
+        transform = Matrix.Identity(4)
+    else:
+        parent_name, joint_origin = joints[link_name]
+        transform = link_transform(parent_name, active) @ joint_origin
+    active.remove(link_name)
+    link_transforms[link_name] = transform
+    return transform
+
+
+scene = bpy.context.scene
+scene.render.engine = "BLENDER_WORKBENCH"
+scene.render.resolution_x = 1280
+scene.render.resolution_y = 960
+scene.render.resolution_percentage = 100
+scene.render.image_settings.file_format = "PNG"
+scene.render.filepath = str(output_path)
+scene.display.shading.light = "STUDIO"
+scene.display.shading.color_type = "RANDOM"
+scene.display.shading.show_shadows = True
+scene.display.shading.show_cavity = True
+
+rendered_objects = []
+floor_objects = []
+for link in root.findall("link"):
+    link_name = link.get("name", "")
+    normalized_name = link_name.casefold()
+    if normalized_name.endswith(("_ceiling", "_exterior", "_wall")):
+        continue
+    for visual in link.findall("visual"):
+        mesh = visual.find("./geometry/mesh")
+        if mesh is None or not mesh.get("filename"):
+            continue
+        filename = mesh.get("filename")
+        if filename.startswith("file://"):
+            filename = filename[7:]
+        if filename.startswith("package://"):
+            raise RuntimeError(f"package URI is unsupported: {filename}")
+        mesh_path = Path(filename).expanduser()
+        if not mesh_path.is_absolute():
+            mesh_path = urdf_path.parent / mesh_path
+        mesh_path = mesh_path.resolve()
+        if mesh_path.suffix.casefold() != ".obj":
+            raise RuntimeError(f"preview requires OBJ visual meshes: {mesh_path}")
+        before = set(bpy.data.objects)
+        bpy.ops.wm.obj_import(filepath=str(mesh_path), forward_axis="Y", up_axis="Z")
+        imported = [obj for obj in bpy.data.objects if obj not in before]
+        scale = values(mesh, "scale", (1.0, 1.0, 1.0))
+        mesh_scale = Matrix.Diagonal((*scale, 1.0))
+        transform = link_transform(link_name) @ origin_matrix(visual) @ mesh_scale
+        for obj in imported:
+            obj.matrix_world = transform @ obj.matrix_world
+            obj.name = f"{link_name}:{obj.name}"
+            rendered_objects.append(obj)
+            if normalized_name.endswith("_floor"):
+                floor_objects.append(obj)
+
+if not rendered_objects:
+    raise RuntimeError("URDF has no renderable visual OBJ meshes")
+bpy.context.view_layer.update()
+framing_objects = floor_objects or rendered_objects
+corners = [obj.matrix_world @ Vector(corner) for obj in framing_objects for corner in obj.bound_box]
+minimum = Vector(tuple(min(point[axis] for point in corners) for axis in range(3)))
+maximum = Vector(tuple(max(point[axis] for point in corners) for axis in range(3)))
+center = (minimum + maximum) / 2
+scene_span = max(maximum.x - minimum.x, maximum.y - minimum.y)
+if scene_span <= 0:
+    raise RuntimeError("URDF visual meshes have invalid bounds")
+
+camera_data = bpy.data.cameras.new("nursery_preview_camera")
+camera = bpy.data.objects.new("nursery_preview_camera", camera_data)
+scene.collection.objects.link(camera)
+camera.location = (
+    center.x - scene_span,
+    center.y - scene_span,
+    maximum.z + 0.9 * scene_span,
+)
+camera.data.type = "ORTHO"
+camera.data.ortho_scale = 1.25 * scene_span
+target = center + Vector((0, 0, 0.4))
+camera.rotation_euler = (target - camera.location).to_track_quat("-Z", "Y").to_euler()
+scene.camera = camera
+
+output_path.parent.mkdir(parents=True, exist_ok=True)
+bpy.ops.render.render(write_still=True)
+'''
+
+
 def _openai_responses_client() -> Any:
     global _OPENAI_RESPONSES_CLIENT
     if _OPENAI_RESPONSES_CLIENT is None:
@@ -1287,7 +1419,9 @@ def build_scene(
     )
 
 
-def _resolve_preview_blend(scene: str | os.PathLike[str], config: Mapping[str, Any]) -> Path:
+def _resolve_preview_source(
+    scene: str | os.PathLike[str], config: Mapping[str, Any]
+) -> tuple[str, Path]:
     requested = Path(scene).expanduser()
     candidates = [requested]
     if not requested.is_absolute():
@@ -1300,17 +1434,22 @@ def _resolve_preview_blend(scene: str | os.PathLike[str], config: Mapping[str, A
     checked: list[Path] = []
     for candidate in candidates:
         candidate = candidate.resolve()
-        blend_candidates = (
-            (candidate,)
-            if candidate.suffix == ".blend"
-            else (candidate / "blender/scene.blend", candidate / "scene.blend")
-        )
-        for blend_path in blend_candidates:
-            checked.append(blend_path)
-            if blend_path.is_file():
-                return blend_path
+        if candidate.suffix.casefold() in {".blend", ".urdf"}:
+            source_candidates = (candidate,)
+        else:
+            source_candidates = (
+                candidate / "workspace/scene_updated.urdf",
+                candidate / "scene_updated.urdf",
+                candidate / "blender/scene.blend",
+                candidate / "scene.blend",
+                candidate / "urdf/export_scene/scene.urdf",
+            )
+        for source_path in source_candidates:
+            checked.append(source_path)
+            if source_path.is_file():
+                return source_path.suffix.casefold()[1:], source_path
     raise ScenePipelineError(
-        "No EmbodiedGen scene.blend found; checked: "
+        "No EmbodiedGen scene.blend or scene_updated.urdf found; checked: "
         + ", ".join(str(path) for path in checked)
     )
 
@@ -1321,10 +1460,12 @@ def preview_scene(
     config_path: str | os.PathLike[str] | None = None,
     output_path: str | os.PathLike[str] | None = None,
 ) -> dict[str, str]:
-    """Render a fast, non-mutating isometric preview of a room-bank scene."""
+    """Render a fast isometric preview of a room-bank or composed scene."""
 
     config = _load_config(config_path)
-    blend_path = _resolve_preview_blend(scene, config)
+    source_type, source_path = _resolve_preview_source(scene, config)
+    if source_type == "urdf":
+        _validate_urdf_meshes(source_path, require_floor=True)
     embodiedgen_root = Path(config["embodiedgen_root"])
     bundled_blender = embodiedgen_root / "thirdparty/infinigen/blender/blender"
     blender_command = (
@@ -1337,13 +1478,16 @@ def preview_scene(
             "Blender is unavailable; install EmbodiedGen's room profile first"
         )
 
-    room_id = (
-        blend_path.parent.parent.name
-        if blend_path.parent.name == "blender"
-        else blend_path.stem
-    )
+    if source_path.parent.name == "blender":
+        scene_id = source_path.parent.parent.name
+    elif source_path.parent.name == "workspace":
+        scene_id = source_path.parent.parent.name
+    elif source_path.name == "scene.urdf" and source_path.parent.name == "export_scene":
+        scene_id = source_path.parents[2].name
+    else:
+        scene_id = source_path.stem
     if output_path is None:
-        preview_path = Path(config["output_root"]) / "previews" / f"{room_id}.png"
+        preview_path = Path(config["output_root"]) / "previews" / f"{scene_id}.png"
     else:
         requested_output = Path(output_path).expanduser()
         preview_path = (
@@ -1354,29 +1498,43 @@ def preview_scene(
     preview_path = preview_path.resolve()
     if preview_path.suffix.casefold() != ".png":
         raise ScenePipelineError("Preview output must use a .png extension")
-    _existing_writable_parent(preview_path)
+    _existing_writable_parent(preview_path.parent)
 
     with tempfile.TemporaryDirectory(prefix="nursery-embodied-preview-") as temp_dir:
         script_path = Path(temp_dir) / "render_preview.py"
-        script_path.write_text(_BLENDER_PREVIEW_SCRIPT)
-        _run_native(
-            [
+        if source_type == "blend":
+            script_path.write_text(_BLENDER_PREVIEW_SCRIPT)
+            command = [
                 blender_command,
                 "-b",
-                str(blend_path),
+                str(source_path),
                 "-P",
                 str(script_path),
                 "--",
                 str(preview_path),
-            ],
+            ]
+        else:
+            script_path.write_text(_BLENDER_URDF_PREVIEW_SCRIPT)
+            command = [
+                blender_command,
+                "-b",
+                "--factory-startup",
+                "-P",
+                str(script_path),
+                "--",
+                str(source_path),
+                str(preview_path),
+            ]
+        _run_native(
+            command,
             cwd=embodiedgen_root,
-            operation=f"Previewing {room_id}",
+            operation=f"Previewing {scene_id}",
         )
     if not preview_path.is_file() or preview_path.stat().st_size == 0:
         raise ScenePipelineError(f"Blender did not produce a preview: {preview_path}")
     return {
-        "room_id": room_id,
-        "scene_blend": str(blend_path),
+        "scene_id": scene_id,
+        f"scene_{source_type}": str(source_path),
         "preview_path": str(preview_path),
     }
 
@@ -1412,18 +1570,18 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Use an explicit plan JSON instead of native EmbodiedGen planning",
     )
     preview = subparsers.add_parser(
-        "preview", help="Render a fast isometric preview of a room-bank scene"
+        "preview", help="Render a room-bank or composed-scene preview"
     )
     preview.add_argument(
         "--scene",
         required=True,
-        help="Room ID, room directory, or generated scene.blend path",
+        help="Room ID, scene directory, scene.blend, or scene_updated.urdf",
     )
     preview.add_argument("--config", default=str(DEFAULT_CONFIG))
     preview.add_argument(
         "--output",
         type=Path,
-        help="PNG path (default: outputs/embodiedgen_scene/previews/<room-id>.png)",
+        help="PNG path (default: outputs/embodiedgen_scene/previews/<scene-id>.png)",
     )
     return parser
 

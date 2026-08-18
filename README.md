@@ -39,8 +39,8 @@ python -m nursery.embodiedgen_scene build \
   --config configs/embodiedgen_scene.json
 ```
 
-Render a fast room-bank preview from a room ID, room directory, or
-`scene.blend` path:
+Render a fast preview from a room ID, scene directory, `scene.blend`, or
+composed `scene_updated.urdf` path:
 
 ```bash
 python -m nursery.embodiedgen_scene preview \
