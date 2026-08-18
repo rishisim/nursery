@@ -101,6 +101,77 @@ class _ResponsesGPTClient:
 _RESPONSES_GPT_CLIENT = _ResponsesGPTClient()
 
 
+_BLENDER_PREVIEW_SCRIPT = r'''import sys
+from pathlib import Path
+
+import bpy
+from mathutils import Vector
+
+
+output_path = Path(sys.argv[sys.argv.index("--") + 1]).resolve()
+scene = bpy.context.scene
+scene.render.engine = "BLENDER_WORKBENCH"
+scene.render.resolution_x = 1280
+scene.render.resolution_y = 960
+scene.render.resolution_percentage = 100
+scene.render.image_settings.file_format = "PNG"
+scene.render.filepath = str(output_path)
+scene.display.shading.light = "STUDIO"
+scene.display.shading.color_type = "RANDOM"
+scene.display.shading.show_shadows = True
+scene.display.shading.show_cavity = True
+
+hidden_shell_collections = (
+    "placeholders:room_shells",
+    "placeholders:room_meshes",
+    "placeholders:portal_cutters",
+    "unique_assets:room_ceiling",
+    "unique_assets:room_exterior",
+    "unique_assets:room_wall",
+)
+for collection_name in hidden_shell_collections:
+    collection = bpy.data.collections.get(collection_name)
+    if collection is not None:
+        collection.hide_render = True
+
+floor_collection = bpy.data.collections.get("unique_assets:room_floor")
+if floor_collection is None:
+    raise RuntimeError("scene has no EmbodiedGen room-floor collection")
+visible_floors = [obj for obj in floor_collection.objects if not obj.hide_render]
+if not visible_floors:
+    raise RuntimeError("scene has no visible EmbodiedGen room floor")
+room_floor = max(visible_floors, key=lambda obj: obj.dimensions.x * obj.dimensions.y)
+floor_collection.hide_render = False
+for obj in floor_collection.objects:
+    obj.hide_render = obj != room_floor
+
+corners = [room_floor.matrix_world @ Vector(corner) for corner in room_floor.bound_box]
+minimum = Vector(tuple(min(point[axis] for point in corners) for axis in range(3)))
+maximum = Vector(tuple(max(point[axis] for point in corners) for axis in range(3)))
+center = (minimum + maximum) / 2
+room_span = max(maximum.x - minimum.x, maximum.y - minimum.y)
+if room_span <= 0:
+    raise RuntimeError("room floor has invalid bounds")
+
+camera_data = bpy.data.cameras.new("nursery_preview_camera")
+camera = bpy.data.objects.new("nursery_preview_camera", camera_data)
+scene.collection.objects.link(camera)
+camera.location = (
+    center.x - room_span,
+    center.y - room_span,
+    maximum.z + 0.9 * room_span,
+)
+camera.data.type = "ORTHO"
+camera.data.ortho_scale = 1.25 * room_span
+target = center + Vector((0, 0, 0.4))
+camera.rotation_euler = (target - camera.location).to_track_quat("-Z", "Y").to_euler()
+scene.camera = camera
+
+output_path.parent.mkdir(parents=True, exist_ok=True)
+bpy.ops.render.render(write_still=True)
+'''
+
+
 def _openai_responses_client() -> Any:
     global _OPENAI_RESPONSES_CLIENT
     if _OPENAI_RESPONSES_CLIENT is None:
@@ -1216,6 +1287,100 @@ def build_scene(
     )
 
 
+def _resolve_preview_blend(scene: str | os.PathLike[str], config: Mapping[str, Any]) -> Path:
+    requested = Path(scene).expanduser()
+    candidates = [requested]
+    if not requested.is_absolute():
+        candidates.extend(
+            (
+                Path(config["project_root"]) / requested,
+                Path(config["output_root"]) / "room_bank" / requested,
+            )
+        )
+    checked: list[Path] = []
+    for candidate in candidates:
+        candidate = candidate.resolve()
+        blend_candidates = (
+            (candidate,)
+            if candidate.suffix == ".blend"
+            else (candidate / "blender/scene.blend", candidate / "scene.blend")
+        )
+        for blend_path in blend_candidates:
+            checked.append(blend_path)
+            if blend_path.is_file():
+                return blend_path
+    raise ScenePipelineError(
+        "No EmbodiedGen scene.blend found; checked: "
+        + ", ".join(str(path) for path in checked)
+    )
+
+
+def preview_scene(
+    scene: str | os.PathLike[str],
+    *,
+    config_path: str | os.PathLike[str] | None = None,
+    output_path: str | os.PathLike[str] | None = None,
+) -> dict[str, str]:
+    """Render a fast, non-mutating isometric preview of a room-bank scene."""
+
+    config = _load_config(config_path)
+    blend_path = _resolve_preview_blend(scene, config)
+    embodiedgen_root = Path(config["embodiedgen_root"])
+    bundled_blender = embodiedgen_root / "thirdparty/infinigen/blender/blender"
+    blender_command = (
+        str(bundled_blender)
+        if bundled_blender.is_file()
+        else shutil.which("blender")
+    )
+    if blender_command is None:
+        raise ScenePipelineError(
+            "Blender is unavailable; install EmbodiedGen's room profile first"
+        )
+
+    room_id = (
+        blend_path.parent.parent.name
+        if blend_path.parent.name == "blender"
+        else blend_path.stem
+    )
+    if output_path is None:
+        preview_path = Path(config["output_root"]) / "previews" / f"{room_id}.png"
+    else:
+        requested_output = Path(output_path).expanduser()
+        preview_path = (
+            requested_output
+            if requested_output.is_absolute()
+            else Path(config["project_root"]) / requested_output
+        )
+    preview_path = preview_path.resolve()
+    if preview_path.suffix.casefold() != ".png":
+        raise ScenePipelineError("Preview output must use a .png extension")
+    _existing_writable_parent(preview_path)
+
+    with tempfile.TemporaryDirectory(prefix="nursery-embodied-preview-") as temp_dir:
+        script_path = Path(temp_dir) / "render_preview.py"
+        script_path.write_text(_BLENDER_PREVIEW_SCRIPT)
+        _run_native(
+            [
+                blender_command,
+                "-b",
+                str(blend_path),
+                "-P",
+                str(script_path),
+                "--",
+                str(preview_path),
+            ],
+            cwd=embodiedgen_root,
+            operation=f"Previewing {room_id}",
+        )
+    if not preview_path.is_file() or preview_path.stat().st_size == 0:
+        raise ScenePipelineError(f"Blender did not produce a preview: {preview_path}")
+    return {
+        "room_id": room_id,
+        "scene_blend": str(blend_path),
+        "preview_path": str(preview_path),
+    }
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m nursery.embodiedgen_scene",
@@ -1246,6 +1411,20 @@ def _build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="Use an explicit plan JSON instead of native EmbodiedGen planning",
     )
+    preview = subparsers.add_parser(
+        "preview", help="Render a fast isometric preview of a room-bank scene"
+    )
+    preview.add_argument(
+        "--scene",
+        required=True,
+        help="Room ID, room directory, or generated scene.blend path",
+    )
+    preview.add_argument("--config", default=str(DEFAULT_CONFIG))
+    preview.add_argument(
+        "--output",
+        type=Path,
+        help="PNG path (default: outputs/embodiedgen_scene/previews/<room-id>.png)",
+    )
     return parser
 
 
@@ -1260,7 +1439,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 room_types=args.room_types,
                 room_seeds=args.room_seeds,
             )
-        else:
+        elif args.command == "build":
             explicit_plan = None
             if args.plan is not None:
                 try:
@@ -1272,6 +1451,12 @@ def main(argv: Sequence[str] | None = None) -> int:
                 seed=args.seed,
                 config_path=args.config,
                 plan=explicit_plan,
+            )
+        else:
+            result = preview_scene(
+                args.scene,
+                config_path=args.config,
+                output_path=args.output,
             )
     except ScenePipelineError as exc:
         print(f"error: {exc}", file=sys.stderr)
