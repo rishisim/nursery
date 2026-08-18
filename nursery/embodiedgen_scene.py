@@ -970,7 +970,12 @@ def _asset_candidates(
         raise ScenePipelineError(f"Asset retrieval returned invalid JSON for {query!r}") from exc
     if not isinstance(payload, list):
         raise ScenePipelineError(f"Asset retrieval returned an invalid result for {query!r}")
-    return [candidate for candidate in payload if isinstance(candidate, dict)]
+    return [
+        candidate
+        for candidate in payload
+        if isinstance(candidate, dict)
+        and Path(str(candidate.get("urdf_path", ""))).is_file()
+    ]
 
 
 def _deterministic_asset_choice(
