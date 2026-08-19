@@ -237,6 +237,9 @@ urdf_path = Path(arguments[0]).resolve()
 output_path = Path(arguments[1]).resolve()
 root = ET.parse(urdf_path).getroot()
 
+bpy.ops.object.select_all(action="SELECT")
+bpy.ops.object.delete()
+
 
 def values(element, attribute, default):
     if element is None or not element.get(attribute):
