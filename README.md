@@ -12,13 +12,16 @@ configs/embodiedgen_scene.json
 nursery/__init__.py
 nursery/embodiedgen_scene.py
 nursery/humanoid/
-├── embodiedgen_hoidini.py
+├── embodiedgen_hoidini/
+│   ├── __init__.py
+│   └── prepare_scene.py
 └── hoidini_intermimic/
 ```
 
-The modules under `nursery/humanoid/` are purpose-only scaffolding for two
-future bridges: EmbodiedGen to HOIDiNi, followed by HOIDiNi to InterMimic. They
-do not yet implement conversion or simulation behavior.
+`nursery/humanoid/embodiedgen_hoidini/` deterministically prepares a complete
+EmbodiedGen layout and one selected object/support interaction condition. It
+does not generate the required human prefix or run HOIDiNi. The later HOIDiNi
+to InterMimic modules remain purpose-only scaffolding.
 
 Historical Nursery research that is not part of this workflow is retained
 under `archive/legacy_research/`. It is inactive on this branch and remains
