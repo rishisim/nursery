@@ -19,7 +19,8 @@ nursery/humanoid/
 ```
 
 `nursery/humanoid/embodiedgen_hoidini/` deterministically prepares a complete
-EmbodiedGen layout and one selected object/support interaction condition. It
+EmbodiedGen layout or Nursery composed room and one selected object/support
+interaction condition. It
 does not generate the required human prefix or run HOIDiNi. The later HOIDiNi
 to InterMimic modules remain purpose-only scaffolding.
 
@@ -60,6 +61,44 @@ python -m nursery.embodiedgen_scene preview \
   --scene LivingRoom_seed11 \
   --config configs/embodiedgen_scene.json
 ```
+
+Prepare a built room for one object interaction using the existing Python API:
+
+```python
+from pathlib import Path
+from nursery.embodiedgen_scene import build_scene
+from nursery.humanoid.embodiedgen_hoidini import prepare_scene
+
+scene = build_scene("Pick up the red mug from the table", seed=7)
+manifest_path = Path(scene["scene_urdf"]).parent.parent / "scene_manifest.json"
+bundle = prepare_scene(manifest_path, target="red mug", seed=7)
+```
+
+Use an exact requested object name from `scene["object_instances"]` as `target`.
+The builder records the actual inserted or reused instance and its placement
+relation in this existing manifest. Preparation resolves native room names to
+URDF links, preserves all links and mesh references, and uses the composed
+URDF's joint transforms, mesh origins, and scale for the selected object and
+support. The bundle names these nodes by their URDF link names. Relative
+`scene_urdf` references resolve beside the manifest.
+
+Older room manifests without `object_instances` must be rebuilt with the current
+builder. Native `layout.json` inputs continue to work. Room preparation requires
+an explicit target on one horizontal rectangular support, fixed URDF joints,
+and OBJ target/support geometry; ambiguous or missing instance bindings fail
+explicitly. The prepared bundle still reports `ready_for_hoidini_inference=False`
+because the human prefix and inference are outside this step.
+
+Focused interface validation (no upstream generation or inference):
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/test_embodiedgen_hoidini.py
+```
+
+The room tests call the real composer with a substituted native placement
+command and check composed-world geometry, reused objects, deterministic
+sampling, and rejection of invalid connections. Native GPU execution is not
+covered by these tests.
 
 On Juno, run generation and rendering commands inside an appropriate Slurm
 allocation. See the upstream [EmbodiedGen documentation](https://horizonrobotics.github.io/EmbodiedGen/docs/index.html)

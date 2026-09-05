@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import numpy as np
@@ -323,3 +324,154 @@ def test_bridge_has_no_grab_or_hoidini_runtime_dependency(tmp_path: Path) -> Non
 
     assert bundle.active_interaction.target_name == "red_mug"
     assert bundle.active_interaction.support_name == "table"
+
+
+def _composed_room_fixture(tmp_path: Path, monkeypatch, *, reuse: bool = False) -> Path:
+    """Run the real composer; substitute only the external placement command."""
+    from nursery import embodiedgen_scene as builder
+
+    output_root = tmp_path / "outputs"
+    room_dir = output_root / "room_bank/Kitchen_seed11"
+    room_dir.mkdir(parents=True)
+    (room_dir / "table.obj").write_text(BOX_OBJ)
+    (room_dir / "mug.obj").write_text(TARGET_OBJ)
+    mug = """
+      <link name="red_mug_028a54da_1">
+        <visual><origin xyz="0.1 0.2 0.3"/>
+          <geometry><mesh filename="mug.obj" scale="0.1 0.2 0.1"/></geometry>
+        </visual>
+        <collision><geometry><mesh filename="mug.obj" scale="0.05 0.1 0.05"/></geometry></collision>
+      </link>
+      <joint name="mug_joint" type="fixed"><parent link="base"/><child link="red_mug_028a54da_1"/>
+        <origin xyz="1.2 2.1 1" rpy="0 0 3.141592653589793"/>
+      </joint>
+    """
+    room_xml = """<robot name="room">
+      <link name="base"/>
+      <link name="Kitchen_0_floor">
+        <visual><geometry><mesh filename="table.obj" scale="3 3 0.01"/></geometry></visual>
+      </link>
+      <link name="TableFactory_asset_0">
+        <visual><geometry><mesh filename="table.obj" scale="1 0.5 0.75"/></geometry></visual>
+        <collision><geometry><mesh filename="table.obj" scale="1 0.5 0.75"/></geometry></collision>
+      </link>
+      <link name="room_frame"/>
+      <joint name="frame_joint" type="fixed"><parent link="base"/><child link="room_frame"/>
+        <origin xyz="1 2 0"/>
+      </joint>
+      <joint name="table_joint" type="fixed"><parent link="room_frame"/><child link="TableFactory_asset_0"/>
+        <origin xyz="0 0 0.25" rpy="0 0 1.5707963267948966"/>
+      </joint>
+    </robot>"""
+    if reuse:
+        room_xml = room_xml.replace("</robot>", mug + "</robot>")
+    room_urdf = room_dir / "scene.urdf"
+    room_urdf.write_text(room_xml)
+    room = {
+        "room_id": "Kitchen_seed11", "room_type": "Kitchen",
+        "urdf_path": "Kitchen_seed11/scene.urdf",
+        "instances": ["table_0", "Kitchen_floor"] + (["red_mug_028a54da_1"] if reuse else []),
+        "rooms": ["Kitchen_floor"],
+    }
+    if reuse:
+        assets = {"red mug": {"source": "room", "instance": "red_mug_028a54da_1"}}
+    else:
+        asset = _write_asset(tmp_path, "red_mug", TARGET_OBJ)
+        assets = {"red mug": {"source": "retrieved", "urdf_path": str(asset / "red_mug.urdf")}}
+
+    def place(command, **kwargs):
+        assert not reuse, "Existing room objects must not be placed again"
+        batch = json.loads(Path(command[command.index("--batch_insert_config") + 1]).read_text())
+        assert batch[0]["instance_key"] == "red_mug_028a54da_1"
+        assert batch[0]["on_instance"] == "table_0"
+        source = Path(command[command.index("--urdf_path") + 1])
+        source.with_name("scene_updated.urdf").write_text(
+            source.read_text().replace("</robot>", mug + "</robot>")
+        )
+
+    monkeypatch.setattr(builder, "_run_native", place)
+    manifest = builder.compose_scene(
+        "Pick up the red mug from the table.",
+        {"objects": [{"name": "red mug", "relation": "on", "target": "table"}], "distractors": []},
+        room, assets, seed=7,
+        config={"output_root": str(output_root), "embodiedgen_root": str(tmp_path)},
+    )
+    assert room_urdf.read_text() == room_xml
+    assert manifest["object_instances"] == {
+        "red mug": {"instance": "red_mug_028a54da_1", "relation": "on", "target": "table_0"}
+    }
+    return Path(manifest["scene_urdf"]).parent.parent / "scene_manifest.json"
+
+
+@pytest.mark.parametrize("reuse", [False, True])
+def test_room_builder_output_prepares_same_world_geometry(tmp_path, monkeypatch, reuse):
+    manifest_path = _composed_room_fixture(tmp_path, monkeypatch, reuse=reuse)
+    # Relative room references resolve beside the manifest, not the caller's CWD.
+    manifest = json.loads(manifest_path.read_text())
+    manifest["scene_urdf"] = "workspace/scene_updated.urdf"
+    manifest_path.write_text(json.dumps(manifest))
+    monkeypatch.chdir(tmp_path)
+
+    bundle = prepare_scene(manifest_path, target="red mug", seed=7)
+    active = bundle.active_interaction
+
+    assert bundle.raw_layout == manifest
+    assert set(bundle.nodes) == {
+        "base", "room_frame", "Kitchen_0_floor", "TableFactory_asset_0", "red_mug_028a54da_1"
+    }
+    assert active.target_name == "red_mug_028a54da_1"
+    assert active.support_name == "TableFactory_asset_0"
+    assert active.prompt == manifest["activity"]
+    assert not bundle.ready_for_hoidini_inference
+    assert active.point_cloud.points.shape == (512, 3)
+    # Independently calculated: mesh scale, visual origin, then 180-degree yaw
+    # and world translation. Original retrieved-asset coordinates must not win.
+    expected = np.array([[1.1, 1.9, 1.3], [1.0, 1.9, 1.3], [1.1, 1.5, 1.3], [1.1, 1.9, 1.6]])
+    world = active.canonical_target_mesh.transformed(active.canonical_target_pose.matrix)
+    np.testing.assert_allclose(_sorted_rows(world.vertices), _sorted_rows(expected), atol=1e-10)
+    np.testing.assert_allclose(bundle.nodes["red_mug_028a54da_1"].pose.translation, [1.2, 2.1, 1])
+    np.testing.assert_allclose(bundle.nodes["TableFactory_asset_0"].pose.translation, [1, 2, 0.25])
+    corners = active.support_corners_world
+    np.testing.assert_allclose(corners.min(axis=0), [0.5, 1, 1], atol=1e-10)
+    np.testing.assert_allclose(corners.max(axis=0), [1.5, 3, 1], atol=1e-10)
+    collision = bundle.nodes["red_mug_028a54da_1"].collision_geometry[0]
+    np.testing.assert_allclose(collision.mesh_to_asset, np.diag([0.05, 0.1, 0.05, 1]), atol=1e-10)
+    again = prepare_scene(manifest_path, target="red mug", seed=7)
+    np.testing.assert_array_equal(active.point_cloud.points, again.active_interaction.point_cloud.points)
+    json.dumps(bundle.to_manifest())
+
+
+@pytest.mark.parametrize("failure, message", [
+    ("old_manifest", "lacks object_instances"),
+    ("missing_target", "explicit target"),
+    ("missing_link", "exactly one URDF link"),
+    ("ambiguous_link", "exactly one URDF link"),
+    ("beside", "only ON"),
+    ("missing_mesh", "mesh does not exist"),
+    ("articulated", "Non-fixed URDF joint"),
+])
+def test_room_bridge_rejects_unusable_connections(tmp_path, monkeypatch, failure, message):
+    manifest_path = _composed_room_fixture(tmp_path, monkeypatch)
+    manifest = json.loads(manifest_path.read_text())
+    target = "red mug"
+    urdf_path = Path(manifest["scene_urdf"])
+    root = ET.parse(urdf_path).getroot()
+    if failure == "old_manifest":
+        del manifest["object_instances"]
+    elif failure == "missing_target":
+        target = None
+    elif failure == "missing_link":
+        manifest["object_instances"]["red mug"]["instance"] = "absent"
+    elif failure == "ambiguous_link":
+        ET.SubElement(root, "link", name="TableFactory_other_0")
+    elif failure == "beside":
+        manifest["object_instances"]["red mug"]["relation"] = "beside"
+    elif failure == "missing_mesh":
+        root.find("./link[@name='red_mug_028a54da_1']/visual/geometry/mesh").set("filename", "absent.obj")
+    elif failure == "articulated":
+        root.find("joint").set("type", "revolute")
+    manifest_path.write_text(json.dumps(manifest))
+    ET.ElementTree(root).write(urdf_path)
+
+    with pytest.raises(BridgeValidationError, match=message):
+        prepare_scene(manifest_path, target=target)

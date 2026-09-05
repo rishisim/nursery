@@ -15,8 +15,9 @@ from __future__ import annotations
 import copy
 import json
 import math
+import re
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -268,7 +269,11 @@ def prepare_scene(
     point_count: int = 512,
     seed: int = 0,
 ) -> PreparedSceneBundle:
-    """Prepare one complete scene and one active interaction without inference."""
+    """Prepare layout.json or a room-builder scene_manifest.json without inference.
+
+    Room manifests require an explicit target using its requested object name.
+    Geometry and poses come from the composed URDF, never the original assets.
+    """
 
     layout_path = Path(layout_path).expanduser().resolve()
     if not layout_path.is_file():
@@ -282,11 +287,19 @@ def prepare_scene(
     if not isinstance(raw_layout, dict):
         raise BridgeValidationError("layout.json root must be an object")
 
-    layout = _validate_layout(raw_layout)
-    relationships = _parse_relationships(layout["tree"])
-    active_target = _select_target(layout["relation"], target)
-    roles = _roles_for_all_nodes(layout, relationships)
-    nodes = _prepare_nodes(layout_path, layout, relationships, roles)
+    if "scene_urdf" in raw_layout:
+        nodes, relationships, active_target = _prepare_room_scene(
+            layout_path, raw_layout, target
+        )
+        roles = {name: node.role for name, node in nodes.items()}
+        source_prompt = raw_layout.get("activity")
+    else:
+        layout = _validate_layout(raw_layout)
+        relationships = _parse_relationships(layout["tree"])
+        active_target = _select_target(layout["relation"], target)
+        roles = _roles_for_all_nodes(layout, relationships)
+        nodes = _prepare_nodes(layout_path, layout, relationships, roles)
+        source_prompt = layout["relation"].get("task_desc")
 
     target_node = nodes[active_target]
     support_name = _select_support(active_target, relationships, roles)
@@ -302,10 +315,10 @@ def prepare_scene(
     support_world = support_mesh.transformed(support_node.pose.matrix)
     support_corners = derive_support_corners(support_world)
 
-    selected_prompt = prompt if prompt is not None else layout["relation"].get("task_desc")
+    selected_prompt = prompt if prompt is not None else source_prompt
     if not isinstance(selected_prompt, str) or not selected_prompt.strip():
         raise BridgeValidationError(
-            "A non-empty prompt override or relation.task_desc is required"
+            "A non-empty prompt override, activity, or relation.task_desc is required"
         )
     active = ActiveInteraction(
         target_name=active_target,
@@ -329,6 +342,128 @@ def prepare_scene(
         active_interaction=active,
         human_prefix=HumanPrefixRequirement(),
     )
+
+
+def _room_instance_key(name: str) -> str:
+    """Match EmbodiedGen collector._process_safe_key_robust for room links."""
+    if name.endswith("_floor"):
+        parts = name.split("_")
+        return "_".join(parts[:-2] + ["floor"])
+    prefix = name.split("Factory")[0] if "Factory" in name else name
+    suffix = f"_{name.split('_')[-1]}" if "Factory" in name else ""
+    key = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", prefix.replace(" ", "_")).lower()
+    return re.sub(r"_+", "_", key).strip("_ ") + suffix
+
+
+def _pose_from_transform(transform: np.ndarray) -> Pose:
+    """Convert a rigid URDF link transform to the existing XYZW pose format."""
+    rotation = transform[:3, :3]
+    quaternion = np.zeros(4, dtype=np.float64)
+    trace = np.trace(rotation)
+    if trace > 0:
+        scale = 2 * math.sqrt(trace + 1)
+        quaternion[:] = [
+            (rotation[2, 1] - rotation[1, 2]) / scale,
+            (rotation[0, 2] - rotation[2, 0]) / scale,
+            (rotation[1, 0] - rotation[0, 1]) / scale,
+            scale / 4,
+        ]
+    else:
+        i = int(np.argmax(np.diag(rotation)))
+        j, k = (i + 1) % 3, (i + 2) % 3
+        scale = 2 * math.sqrt(1 + rotation[i, i] - rotation[j, j] - rotation[k, k])
+        quaternion[i] = scale / 4
+        quaternion[j] = (rotation[j, i] + rotation[i, j]) / scale
+        quaternion[k] = (rotation[k, i] + rotation[i, k]) / scale
+        quaternion[3] = (rotation[k, j] - rotation[j, k]) / scale
+    return validate_embodiedgen_pose([*transform[:3, 3], *quaternion])
+
+
+def _prepare_room_scene(
+    manifest_path: Path, manifest: Mapping[str, Any], target: str | None
+) -> tuple[dict[str, SceneNode], tuple[Relationship, ...], str]:
+    bindings = manifest.get("object_instances")
+    if not isinstance(bindings, dict) or not bindings:
+        raise BridgeValidationError(
+            "Room manifest lacks object_instances; rebuild it with the current room builder"
+        )
+    if not isinstance(target, str) or target not in bindings:
+        raise BridgeValidationError(
+            "Room manifest requires an explicit target matching a requested object name: "
+            + ", ".join(bindings)
+        )
+    source = manifest.get("scene_urdf")
+    if not isinstance(source, str) or not source:
+        raise BridgeValidationError("Room manifest requires a scene_urdf path")
+    urdf_path = _resolve_path(manifest_path.parent, source)
+    # Use the same parser as the layout bridge; this also validates mesh references.
+    visual, collision, affordance = _parse_urdf(urdf_path)
+    root = ET.parse(urdf_path).getroot()
+    transforms = _urdf_link_transforms(root, urdf_path)
+    link_names = [link.get("name") for link in root.findall("link")]
+    if len(link_names) != len(set(link_names)):
+        raise BridgeValidationError("Composed room URDF has duplicate link names")
+
+    def resolve_instance(instance: Any) -> str:
+        if not isinstance(instance, str) or not instance:
+            raise BridgeValidationError("Room object binding requires a non-empty instance")
+        matches = [
+            name for name in transforms
+            if name == instance or _room_instance_key(name) == instance
+        ]
+        if len(matches) != 1:
+            raise BridgeValidationError(
+                f"Room instance {instance!r} must resolve to exactly one URDF link; got {matches}"
+            )
+        return matches[0]
+
+    relationships = []
+    selected_link = None
+    for name, binding in bindings.items():
+        if not isinstance(binding, dict):
+            raise BridgeValidationError(f"Invalid room object binding for {name!r}")
+        child = resolve_instance(binding.get("instance"))
+        relation = binding.get("relation")
+        if relation not in {"on", "beside", "in_room"}:
+            raise BridgeValidationError(f"Unsupported room relation for {name!r}: {relation!r}")
+        if relation != "in_room":
+            parent = resolve_instance(binding.get("target"))
+            if parent == child:
+                raise BridgeValidationError(f"Room object {name!r} cannot support itself")
+            relationships.append(Relationship(parent, child, relation.upper()))
+        if name == target:
+            selected_link = child
+    relationships = tuple(relationships)
+    # Only the explicitly selected target's ON support is an active context.
+    roles = {name: "background" for name in transforms}
+    roles[selected_link] = "manipulated_objs"
+    for relationship in relationships:
+        if relationship.child == selected_link:
+            roles[relationship.parent] = "context"
+    _select_support(selected_link, relationships, roles)
+
+    nodes = {}
+    for name, transform in transforms.items():
+        world_to_link = np.linalg.inv(transform)
+        nodes[name] = SceneNode(
+            name=name,
+            role=roles[name],
+            pose=_pose_from_transform(transform),
+            asset_reference=source,
+            asset_path=urdf_path,
+            visual_geometry=tuple(
+                replace(item, mesh_to_asset=world_to_link @ item.mesh_to_asset)
+                for item in visual if item.link == name
+            ),
+            collision_geometry=tuple(
+                replace(item, mesh_to_asset=world_to_link @ item.mesh_to_asset)
+                for item in collision if item.link == name
+            ),
+            parent_relationships=tuple(item for item in relationships if item.child == name),
+            child_relationships=tuple(item for item in relationships if item.parent == name),
+            affordance_metadata=affordance,
+        )
+    return nodes, relationships, selected_link
 
 
 def validate_embodiedgen_pose(values: Sequence[Any], *, name: str = "pose") -> Pose:

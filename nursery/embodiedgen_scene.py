@@ -1490,7 +1490,11 @@ def compose_scene(
     requested = list(plan.get("objects", [])) + list(plan.get("distractors", []))
     placements = []
     placed_names = []
+    object_instances = {}
     for ordinal, entry in enumerate(requested, 1):
+        name = str(entry["name"])
+        if name in object_instances:
+            raise ScenePipelineError(f"Duplicate requested object name: {name!r}")
         placement = _placement_config(
             entry,
             asset=assets[str(entry["name"])],
@@ -1500,6 +1504,15 @@ def compose_scene(
         if placement is not None:
             placements.append(placement)
             placed_names.append(str(entry["name"]))
+        object_instances[name] = {
+            "instance": placement["instance_key"] if placement else assets[name]["instance"],
+            "relation": entry["relation"],
+            "target": (
+                _resolve_exactish_name(str(entry["target"]), room["instances"])
+                if entry["relation"] in {"on", "beside"}
+                else None
+            ),
+        }
 
     scene_urdf = workspace / "scene.urdf"
     updated_urdf = workspace / "scene_updated.urdf"
@@ -1553,6 +1566,7 @@ def compose_scene(
         "seed": seed,
         "room_id": room["room_id"],
         "scene_urdf": str(updated_urdf),
+        "object_instances": object_instances,
         "assets_retrieved": retrieved_count,
         "assets_generated": generated_count,
         "placements_requested": len(placements),
