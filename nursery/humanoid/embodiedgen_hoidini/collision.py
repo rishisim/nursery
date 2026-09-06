@@ -128,7 +128,10 @@ def validate_trajectories(
     for frame, body_points, object_points in _subframes(body, obj, subdivisions):
         for moving_name, points in (("body", body_points), ("object", object_points)):
             for obstacle in obstacles:
-                distance = signed_distance(points, obstacle.mesh)
+                candidates, outside_distance = _aabb_candidates(
+                    points, obstacle.mesh, clearance_m
+                )
+                distance = signed_distance(candidates, obstacle.mesh)
                 # Open/thin meshes have no meaningful inside. Treat them as a
                 # two-sided clearance surface; closed meshes additionally report depth.
                 colliding = distance < clearance_m
@@ -142,7 +145,9 @@ def validate_trajectories(
                         frame=frame,
                         moving_geometry=moving_name,
                         obstacle=obstacle.node_name,
-                        minimum_distance_m=float(distance.min(initial=np.inf)),
+                        minimum_distance_m=float(
+                            min(distance.min(initial=np.inf), outside_distance)
+                        ),
                         maximum_penetration_m=float(penetration.max(initial=0.0)),
                         colliding_vertices=int(colliding.sum()),
                     )
@@ -151,7 +156,10 @@ def validate_trajectories(
             target = TriangleMesh(
                 object_points, np.asarray(object_faces, dtype=np.int64)
             )
-            distance = signed_distance(body_points, target)
+            candidates, outside_distance = _aabb_candidates(
+                body_points, target, clearance_m
+            )
+            distance = signed_distance(candidates, target)
             colliding = distance < clearance_m
             penetration = (
                 np.maximum(-distance, 0.0)
@@ -163,12 +171,30 @@ def validate_trajectories(
                     frame=frame,
                     moving_geometry="body",
                     obstacle=object_name,
-                    minimum_distance_m=float(distance.min(initial=np.inf)),
+                    minimum_distance_m=float(
+                        min(distance.min(initial=np.inf), outside_distance)
+                    ),
                     maximum_penetration_m=float(penetration.max(initial=0.0)),
                     colliding_vertices=int(colliding.sum()),
                 )
             )
     return tuple(samples)
+
+
+def _aabb_candidates(
+    points: np.ndarray, mesh: TriangleMesh, margin: float
+) -> tuple[np.ndarray, float]:
+    """Cull points that cannot be inside or within ``margin`` of a mesh."""
+    lower = mesh.vertices.min(axis=0)
+    upper = mesh.vertices.max(axis=0)
+    inside = np.all((points >= lower - margin) & (points <= upper + margin), axis=1)
+    outside = points[~inside]
+    if len(outside):
+        delta = np.maximum(np.maximum(lower - outside, outside - upper), 0.0)
+        outside_distance = float(np.linalg.norm(delta, axis=1).min())
+    else:
+        outside_distance = np.inf
+    return points[inside], outside_distance
 
 
 def _trajectory(value: np.ndarray, name: str) -> np.ndarray:

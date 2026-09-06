@@ -79,3 +79,14 @@ def test_body_object_penetration_is_checked_without_adding_target_to_room() -> N
     assert rows[0].obstacle == "mug"
     assert rows[0].colliding_vertices == 1
     assert rows[0].maximum_penetration_m == 0.5
+
+
+def test_aabb_broad_phase_preserves_nearest_outside_distance() -> None:
+    box = CollisionGeometry("box", _box(), watertight=True)
+    body = np.array([[[2.0, 0.5, 0.5]]])
+    obj = np.array([[[3.0, 0.5, 0.5]]])
+
+    rows = validate_trajectories(body, obj, [box])
+
+    assert rows[0].minimum_distance_m == 1.0
+    assert rows[0].maximum_penetration_m == 0.0
