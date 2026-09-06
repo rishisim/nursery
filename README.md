@@ -141,6 +141,13 @@ to the scene's object and support; upstream source is not modified. Outputs are
 `input.json`, `prefix.npz`, `sampling.yaml`, `motion.npz`, and optimization plots.
 The validator reloads the artifacts and records explicit mug-lift checks in
 `validation.json`; optional rendering saves a Blender scene and selected frames.
+It also checks reconstructed body and moving-object vertices against the room's
+world-transformed collision geometry, excluding the moving target from static
+obstacles. Closed meshes report signed penetration; open meshes remain unsigned
+surfaces. Two linear samples per frame interval are checked by default to reduce
+missed crossings (`--collision-subdivisions` changes this), but this is not
+continuous collision detection. Intended target/support contact remains governed
+by the existing support-specific check rather than the generic room check.
 
 This demonstrates kinematic object interaction. The optimization sees the mug
 and desk, not every room obstacle, and does not execute physics or generate

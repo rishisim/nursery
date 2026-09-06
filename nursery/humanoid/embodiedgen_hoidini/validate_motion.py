@@ -6,10 +6,73 @@ from pathlib import Path
 
 import numpy as np
 
+from .collision import build_static_collision_scene, validate_trajectories
 from .prepare_scene import prepare_scene
 
 
-def validate_motion(output, *, render=False):
+def evaluate_scene_collisions(
+    bundle,
+    body_vertices,
+    object_vertices,
+    *,
+    subdivisions=2,
+    tolerance_m=0.02,
+):
+    """Return compact collision metrics without storing per-vertex results."""
+    active = bundle.active_interaction
+    obstacles = build_static_collision_scene(bundle)
+    samples = validate_trajectories(
+        body_vertices,
+        object_vertices,
+        obstacles,
+        object_faces=active.canonical_target_mesh.faces,
+        object_name=active.target_name,
+        subdivisions=subdivisions,
+    )
+    body_room = [
+        row
+        for row in samples
+        if row.moving_geometry == "body" and row.obstacle != active.target_name
+    ]
+    object_room = [
+        row
+        for row in samples
+        if row.moving_geometry == "object"
+        and row.obstacle != active.support_name
+    ]
+    body_object = [
+        row
+        for row in samples
+        if row.moving_geometry == "body" and row.obstacle == active.target_name
+    ]
+
+    def maximum(rows):
+        return max((row.maximum_penetration_m for row in rows), default=0.0)
+
+    body_room_depth = maximum(body_room)
+    object_room_depth = maximum(object_room)
+    body_object_depth = maximum(body_object)
+    return {
+        "static_collision_meshes": len(obstacles),
+        "collision_subdivisions_per_frame": subdivisions,
+        "collision_tolerance_m": tolerance_m,
+        "maximum_body_room_penetration_m": body_room_depth,
+        "maximum_object_room_penetration_m": object_room_depth,
+        "maximum_body_object_penetration_m": body_object_depth,
+        "checks": {
+            "body_not_penetrating_room": body_room_depth <= tolerance_m,
+            "object_not_penetrating_room": object_room_depth <= tolerance_m,
+            "body_not_penetrating_target": body_object_depth <= tolerance_m,
+        },
+        "limitations": [
+            "Open meshes are unsigned clearance surfaces, not solid volumes",
+            "Linear subframes reduce tunnelling but are not continuous collision detection",
+            "Target-support contact is assessed by the existing support-specific check",
+        ],
+    }
+
+
+def validate_motion(output, *, render=False, collision_subdivisions=2):
     import torch
     from hoidini.amasstools.geometry import axis_angle_to_matrix
     from hoidini.closd.diffusion_planner.utils import dist_util
@@ -44,10 +107,12 @@ def validate_motion(output, *, render=False):
     vertices = torch.tensor(active.canonical_target_mesh.vertices, dtype=torch.float32, device=device)
     min_hand_distance = []
     object_bottom = []
+    object_vertices_world = []
     table = Table(torch.tensor(active.support_corners_world[None], dtype=torch.float32, device=device))
     table_penetration = []
     for frame in range(len(motion)):
         world_vertices = vertices @ rotation[frame].T + motion.trans_obj[frame]
+        object_vertices_world.append(world_vertices)
         distance = torch.cdist(anchors[frame][None], world_vertices[None]).amin()
         min_hand_distance.append(float(distance))
         object_bottom.append(float(world_vertices[:, 2].min()))
@@ -57,6 +122,12 @@ def validate_motion(output, *, render=False):
     prefix_error = max(float(np.abs(arrays[key][:15] - prefix[key]).max()) for key in ["joints", "trans", "trans_obj"])
     initial_error = float(np.abs(arrays["trans_obj"][0] - active.canonical_target_pose.translation).max())
     table_z = float(active.support_corners_world[:, 2].mean())
+    collision_report = evaluate_scene_collisions(
+        bundle,
+        body.vertices.detach().cpu().numpy(),
+        torch.stack(object_vertices_world).detach().cpu().numpy(),
+        subdivisions=collision_subdivisions,
+    )
     report = {
         "frames": len(motion), "fps": 20,
         "finite": True, "source_prefix_frames": 15,
@@ -69,12 +140,14 @@ def validate_motion(output, *, render=False):
         "maximum_object_penetration_within_table_footprint_m": max(table_penetration),
         "minimum_body_vertex_height_m": float(body.vertices[:, :, 2].min()),
         "minimum_prefix_body_vertex_height_m": float(body.vertices[:15, :, 2].min()),
+        "scene_collisions": collision_report,
         "checks": {
             "prefix_preserved": prefix_error < 0.001,
             "starts_at_scene_object": initial_error < 0.001,
             "mug_lifted_with_nearby_hand": int(touching_lift.sum()) >= 5,
             "object_not_penetrating_table": max(table_penetration) <= 0.02,
             "body_not_below_floor": float(body.vertices[:, :, 2].min()) >= -0.05,
+            **collision_report["checks"],
         },
         "limitations": [
             "Kinematic motion, not physical execution or validated forces",
@@ -150,8 +223,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output")
     parser.add_argument("--render", action="store_true")
+    parser.add_argument("--collision-subdivisions", type=int, default=2)
     args = parser.parse_args()
-    report = validate_motion(args.output, render=args.render)
+    report = validate_motion(
+        args.output,
+        render=args.render,
+        collision_subdivisions=args.collision_subdivisions,
+    )
     if args.render:
         # This installed bpy build segfaults during interpreter teardown.
         # All saves have returned; preserve the validation exit status and
