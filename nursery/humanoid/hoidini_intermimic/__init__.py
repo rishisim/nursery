@@ -1,1 +1,1 @@
-"""Convert future HOIDiNi interaction results into InterMimic references."""
+"""Convert HOIDiNi interaction results into upstream InterMimic references."""

@@ -23,8 +23,9 @@ nursery/humanoid/
 `nursery/humanoid/embodiedgen_hoidini/` deterministically prepares a complete
 EmbodiedGen layout or Nursery composed room and one selected object/support
 interaction condition. Its `run_motion` entry point aligns an explicitly supplied
-pre-contact GRAB prefix and runs one HOIDiNi interaction. The later HOIDiNi to
-InterMimic modules remain purpose-only scaffolding.
+pre-contact GRAB prefix and runs one HOIDiNi interaction. The
+`hoidini_intermimic` entry point converts the saved interaction into an
+InterMimic SMPL-X motion reference for an explicitly supplied humanoid XML.
 
 Historical Nursery research that is not part of this workflow is retained
 under `archive/legacy_research/`. It is inactive on this branch and remains
@@ -34,7 +35,7 @@ Generated rooms, assets, scenes, and previews belong under the ignored
 `outputs/embodiedgen_scene/` root. The external EmbodiedGen checkout belongs
 under the ignored `.external/EmbodiedGen/` path. Local upstream humanoid
 checkouts likewise belong under `.external/HOIDiNi/`,
-`.external/InterActMove/`, and `.external/InterMimic/`; they are dependencies,
+`.external/InterActMove/`, `.external/InterAct/`, and `.external/InterMimic/`; they are dependencies,
 not Nursery-owned source.
 
 ## Commands
@@ -144,7 +145,8 @@ The validator reloads the artifacts and records explicit mug-lift checks in
 
 This demonstrates kinematic object interaction. The optimization sees the mug
 and desk, not every room obstacle, and does not execute physics or generate
-validated forces. Prefix search, grasp retargeting, and InterMimic remain deferred.
+validated forces. Prefix search, grasp retargeting, and InterMimic physics
+execution remain deferred.
 
 ### Current validation result
 
@@ -180,6 +182,71 @@ documented limitation for proceeding with motion conversion. It remains failed;
 no floor penalty or broader collision correction is implemented here.
 The Blender animation and four preview frames saved successfully. The command
 exited with status 1 for the failed floor check; rendering itself completed.
+
+### HOIDiNi to InterMimic conversion
+
+Convert the saved run using the existing Torch environment:
+
+```bash
+python -m nursery.humanoid.hoidini_intermimic \
+  --run outputs/hoidini_scene/run \
+  --humanoid-xml .external/InterMimic/isaacgym/src/intermimic/data/assets/smplx/omomo.xml \
+  --object-name mug \
+  --output outputs/hoidini_intermimic/run
+```
+
+The output directory must be new and ignored. Outputs are the native
+`nursery_mug_000.pt` tensor, the supplied humanoid XML, the unchanged canonical
+object mesh, 1,024 sampled object points, and a provenance manifest. The source
+motion validation is copied into the manifest unchanged, including failures.
+
+The converter maps HOIDiNi's 52 body/finger joints to the XML's body order,
+applies the upstream body-local axis convention, and reconstructs body positions
+and orientations using that skeleton. It preserves metre, +Z world coordinates,
+pelvis motion, and object motion. It resamples translations linearly and rotations
+with SLERP to 30 fps; contacts use the nearest source frame. The final source
+sample is held through its remaining frame interval. A five-second, 100-frame
+input at 20 fps produces 150 frames with 591 fields: root pose, local exponential-map
+DOFs, world body poses, object pose, and contact intent. Quaternions use XYZW.
+
+The 60 source hand-anchor scores are thresholded at 0.4 and aggregated per hand
+at its wrist. Positive labels mean desired contact; zero means unconstrained.
+Object contact means any predicted hand contact, not contact with the desk.
+Finger rotations are retained, but per-finger and full-body contact labels are
+not inferred. Transferring joint angles to the supplied body proportions does
+not preserve hand-object distances or establish physical feasibility.
+
+Juno job `379121` completed conversion and the isolated upstream check:
+
+```bash
+python tests/check_hoidini_intermimic_upstream.py \
+  --output outputs/hoidini_intermimic/run \
+  --intermimic .external/InterMimic \
+  --interact .external/InterAct
+```
+
+The check executes the actual InterMimic loader body and InterAct PoseLib forward
+kinematics without constructing a simulator. Only SDK tensor creation and angle
+wrapping are bound to equivalent Torch primitives. It verified finite loaded
+data of shape `[1, 150, 1211]`, references of shape `[1, 1, 150, 332]`, unchanged
+motion/contact fields, and maximum FK position error of `7.16e-7` m. The tested
+upstreams were [InterMimic](https://github.com/Sirui-Xu/InterMimic) commit
+`60d6d6e0895a308ff8dc8f4c53af211b739cd5e7` and
+[InterAct](https://github.com/wzyabcas/InterAct) commit
+`96180a34f7b516e7f3520b853c19ea8679b8204f`. All 44 focused local tests pass.
+
+The target body's minimum joint height is -0.10534 m. Its positions differ from
+HOIDiNi's separate predicted joint-position channels by 0.07754 m on average
+and 0.44745 m at maximum; this comparison includes both body proportions and
+inconsistency between the source's pose and position channels. It is not a
+contact-preservation check. The original floor check remains **failed**.
+
+Converted artifacts and `upstream_validation.json` remain ignored on Juno at
+`/work/dal503972/nursery/outputs/hoidini_intermimic/run/`. This establishes reference
+format and skeleton compatibility. Registering the room/object physics assets,
+loading a controller, executing the interaction under physics, and recording
+synchronized video and simulator signals are still required for the combined
+workflow; none is claimed by this conversion check.
 
 On Juno, run generation and rendering commands inside an appropriate Slurm
 allocation. See the upstream [EmbodiedGen documentation](https://horizonrobotics.github.io/EmbodiedGen/docs/index.html)
