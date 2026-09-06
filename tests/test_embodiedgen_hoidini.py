@@ -10,6 +10,7 @@ import pytest
 
 from nursery.humanoid.embodiedgen_hoidini import (
     BridgeValidationError,
+    build_static_collision_scene,
     prepare_scene,
 )
 from nursery.humanoid.embodiedgen_hoidini.prepare_scene import (
@@ -326,6 +327,21 @@ def test_bridge_has_no_grab_or_hoidini_runtime_dependency(tmp_path: Path) -> Non
     assert bundle.active_interaction.support_name == "table"
 
 
+def test_collision_scene_excludes_moving_target_and_applies_world_transform(
+    tmp_path: Path,
+) -> None:
+    layout_path, _ = _layout_fixture(tmp_path)
+    bundle = prepare_scene(layout_path, point_count=8)
+
+    obstacles = build_static_collision_scene(bundle)
+
+    assert [item.node_name for item in obstacles] == ["book", "table"]
+    table = next(item for item in obstacles if item.node_name == "table")
+    assert table.source_kind == "collision"
+    np.testing.assert_allclose(table.mesh.vertices.min(axis=0), [0, 1, 0.5])
+    np.testing.assert_allclose(table.mesh.vertices.max(axis=0), [2, 3, 1.5])
+
+
 def _composed_room_fixture(tmp_path: Path, monkeypatch, *, reuse: bool = False) -> Path:
     """Run the real composer; substitute only the external placement command."""
     from nursery import embodiedgen_scene as builder
@@ -436,6 +452,10 @@ def test_room_builder_output_prepares_same_world_geometry(tmp_path, monkeypatch,
     np.testing.assert_allclose(corners.max(axis=0), [1.5, 3, 1], atol=1e-10)
     collision = bundle.nodes["red_mug_028a54da_1"].collision_geometry[0]
     np.testing.assert_allclose(collision.mesh_to_asset, np.diag([0.05, 0.1, 0.05, 1]), atol=1e-10)
+    obstacles = build_static_collision_scene(bundle)
+    assert active.target_name not in {item.node_name for item in obstacles}
+    floor = next(item for item in obstacles if item.node_name == "Kitchen_0_floor")
+    assert floor.source_kind == "visual"
     again = prepare_scene(manifest_path, target="red mug", seed=7)
     np.testing.assert_array_equal(active.point_cloud.points, again.active_interaction.point_cloud.points)
     json.dumps(bundle.to_manifest())
