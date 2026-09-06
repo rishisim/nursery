@@ -313,7 +313,11 @@ def prepare_scene(
     )
     support_mesh, _ = _node_mesh(support_node, prefer="visual")
     support_world = support_mesh.transformed(support_node.pose.matrix)
-    support_corners = derive_support_corners(support_world)
+    # Native room URDFs serialize rotations to four decimal places. A nominal
+    # horizontal desktop can consequently vary by micrometres across its top.
+    support_corners = derive_support_corners(
+        support_world, plane_tolerance=1e-4 if "scene_urdf" in raw_layout else 1e-6
+    )
 
     selected_prompt = prompt if prompt is not None else source_prompt
     if not isinstance(selected_prompt, str) or not selected_prompt.strip():

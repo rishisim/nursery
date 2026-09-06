@@ -475,3 +475,14 @@ def test_room_bridge_rejects_unusable_connections(tmp_path, monkeypatch, failure
 
     with pytest.raises(BridgeValidationError, match=message):
         prepare_scene(manifest_path, target=target)
+
+
+def test_room_support_accepts_native_rotation_rounding(tmp_path, monkeypatch):
+    manifest_path = _composed_room_fixture(tmp_path, monkeypatch)
+    urdf_path = Path(json.loads(manifest_path.read_text())["scene_urdf"])
+    root = ET.parse(urdf_path).getroot()
+    root.find("./joint[@name='table_joint']/origin").set("rpy", "0.000004 0 1.5708")
+    ET.ElementTree(root).write(urdf_path)
+    corners = prepare_scene(manifest_path, target="red mug").active_interaction.support_corners_world
+    np.testing.assert_allclose(corners[:, 2], 1.0, atol=1e-4)
+    assert np.cross(corners[1] - corners[0], corners[2] - corners[1])[2] > 0
