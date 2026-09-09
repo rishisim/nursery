@@ -181,11 +181,33 @@ check (-0.10471 m). The existing upstream foot-skating loss penalizes horizontal
 motion, not penetration below the room floor. These are permissive kinematic
 smoke checks, not physical validation or a demonstrated success rate.
 
+A controlled three-seed H100 collision pilot then held the scene, source prefix,
+checkpoint, prompt, yaw, and optimization settings fixed, changing only seeds
+90324--90326. Juno jobs `384794`, `384796`, and `384797` all completed in
+5:47--5:54. Each motion lifted the mug, kept its desk penetration below 0.02 m,
+and reported exactly zero mug--room and body--mug penetration. None passed the
+full gate because generated body geometry escaped below the enclosing room
+boundary by more than the 0.02 m collision tolerance:
+
+| Seed | Mug lift | Lifted/contact-near frames | Desk penetration | Lowest body vertex | Body--room penetration | Full gate |
+|---:|---:|---:|---:|---:|---:|---|
+| 90324 | 0.38103 m | 66 | 0.00311 m | -0.07177 m | 0.06033 m | Fail |
+| 90325 | 0.33463 m | 60 | 0.01115 m | -0.14084 m | 0.12940 m | Fail |
+| 90326 | 0.31232 m | 64 | 0.00531 m | -0.09042 m | 0.07898 m | Fail |
+
+This pilot is evidence for this one scene/prefix condition, not an estimated
+general success rate. It confirms that the former enclosing-exterior false
+positive is removed and localizes the remaining rejection to generated body
+motion. The next useful model-side experiment is a floor/body scene-guidance
+term; running a larger stochastic batch before that correction is not warranted.
+The disposable reports remain ignored under
+`/work/dal503972/nursery/outputs/hoidini_collision_pilot/`.
+
 Run artifacts remain ignored on Juno at
 `/work/dal503972/nursery/outputs/hoidini_scene/run/`. Its `input.json` records the
 generated scene manifest at
 `/work/dal503972/nursery/outputs/embodiedgen_scene/scenes/20260905T022111338639Z_81fa0b9e43/scene_manifest.json`.
-The 24 focused local tests pass. The user accepted the failed floor check as a
+The 34 focused local tests pass. The user accepted the failed floor check as a
 documented limitation for proceeding with motion conversion. It remains failed;
 no floor penalty or broader collision correction is implemented here.
 The Blender animation and four preview frames saved successfully. The command
