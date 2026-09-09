@@ -80,7 +80,9 @@ def convert_run(run, humanoid_xml, output, object_name):
     points = sample_point_cloud(mesh, point_count=1024, seed=0).points.astype(np.float32)
 
     output = _output_directory(output)
-    motion_path = output / f"nursery_{object_name}_000.pt"
+    # The full environment parses int(subject[3:]); 0 denotes this synthetic
+    # subject, not a GRAB/OMOMO training subject or a controller selection.
+    motion_path = output / f"sub0_{object_name}_000.pt"
     torch.save(torch.from_numpy(data), motion_path)
     loaded = torch.load(motion_path, map_location="cpu", weights_only=True).numpy()
     validate_reference(loaded)

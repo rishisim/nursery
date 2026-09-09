@@ -17,7 +17,7 @@ nursery/humanoid/
 │   ├── prepare_scene.py
 │   ├── run_motion.py
 │   └── validate_motion.py
-└── hoidini_intermimic/
+└── hoidini_intermimic/              Conversion and execute.py simulator launcher
 ```
 
 `nursery/humanoid/embodiedgen_hoidini/` deterministically prepares a complete
@@ -145,8 +145,8 @@ The validator reloads the artifacts and records explicit mug-lift checks in
 
 This demonstrates kinematic object interaction. The optimization sees the mug
 and desk, not every room obstacle, and does not execute physics or generate
-validated forces. Prefix search, grasp retargeting, and InterMimic physics
-execution remain deferred.
+validated forces. Prefix search and grasp retargeting remain deferred. The
+separate simulator launcher below now attempts physical execution.
 
 ### Current validation result
 
@@ -196,7 +196,7 @@ python -m nursery.humanoid.hoidini_intermimic \
 ```
 
 The output directory must be new and ignored. Outputs are the native
-`nursery_mug_000.pt` tensor, the supplied humanoid XML, the unchanged canonical
+`sub0_mug_000.pt` tensor, the supplied humanoid XML, the unchanged canonical
 object mesh, 1,024 sampled object points, and a provenance manifest. The source
 motion validation is copied into the manifest unchanged, including failures.
 
@@ -229,7 +229,11 @@ The check executes the actual InterMimic loader body and InterAct PoseLib forwar
 kinematics without constructing a simulator. Only SDK tensor creation and angle
 wrapping are bound to equivalent Torch primitives. It verified finite loaded
 data of shape `[1, 150, 1211]`, references of shape `[1, 1, 150, 332]`, unchanged
-motion/contact fields, and maximum FK position error of `7.16e-7` m. The tested
+motion/contact fields, and maximum FK position error of `7.16e-7` m. That run
+used the earlier `nursery_mug_000.pt` filename. Full environment construction
+also parses a numeric subject ID, so the converter now writes `sub0_...` for
+the synthetic subject. The execution adapter accepts the earlier saved name.
+This ID does not select a controller or claim an OMOMO subject identity. The tested
 upstreams were [InterMimic](https://github.com/Sirui-Xu/InterMimic) commit
 `60d6d6e0895a308ff8dc8f4c53af211b739cd5e7` and
 [InterAct](https://github.com/wzyabcas/InterAct) commit
@@ -243,10 +247,85 @@ contact-preservation check. The original floor check remains **failed**.
 
 Converted artifacts and `upstream_validation.json` remain ignored on Juno at
 `/work/dal503972/nursery/outputs/hoidini_intermimic/run/`. This establishes reference
-format and skeleton compatibility. Registering the room/object physics assets,
-loading a controller, executing the interaction under physics, and recording
-synchronized video and simulator signals are still required for the combined
-workflow; none is claimed by this conversion check.
+format and skeleton compatibility. The physical attempt below exercises the
+full environment separately; the conversion check alone does not do so.
+
+### Physical execution: integrated, interaction not yet successful
+
+`nursery/humanoid/hoidini_intermimic/execute.py` is a small procedural launcher
+around upstream InterMimic. Its two asset-loading overrides add the recorded
+room collision meshes as static geometry and the canonical mug as a dynamic
+object. The selected mug is excluded from static geometry. The launcher keeps
+the original object origin and sampled points; upstream's usual recentering
+would misalign them with this reference. It reuses upstream observation,
+controller, normalization, rewards, termination, and PhysX stepping code.
+
+Use an isolated Linux Python 3.8 environment with NVIDIA Isaac Gym Preview 4.
+The verified Juno environment is
+`/work/dal503972/nursery/.external/conda-envs/intermimic/`, using PyTorch
+`1.13.1+cu116`, NumPy `1.23.5`, SciPy `1.10.1`, `rl-games==1.1.4`,
+`trimesh==4.2.4`, and `ninja`. Isaac Gym is installed from
+`.external/isaacgym/python`; upstream implementations and checkpoints remain
+under `.external/`. HOIDiNi's environment is unchanged.
+
+The controller is the upstream `smplx_teachers_new/sub2.pth` from the
+[official checkpoint folder](https://drive.google.com/drive/folders/1biDUmde-h66vUW4npp8FVo2w0wOcK2_k),
+stored on Juno at `.external/checkpoints/intermimic/sub2.pth`, with SHA-256
+`57272ea8cfcbc74319b0e60d3d9341e6215c337b61e20488baa595cf00bb0fba`.
+It has not been trained or qualified for this generated mug interaction.
+The loader stages the same checkpoint tensors on CPU in a temporary run file
+before moving the native policy to CUDA. This avoids PyTorch 1.13's CUDA-device
+deserialization failure on Juno's MIG partitions; the temporary file is removed.
+
+Inside a Juno Slurm allocation (`a30-2.12gb`, one GPU, four CPUs, 32 GB RAM):
+
+```bash
+export PATH=/work/dal503972/nursery/.external/conda-envs/intermimic/bin:$PATH
+export LD_LIBRARY_PATH=/work/dal503972/nursery/.external/conda-envs/interactmove/lib:${LD_LIBRARY_PATH:-}
+export PYTHONDONTWRITEBYTECODE=1
+export TORCH_EXTENSIONS_DIR=/work/dal503972/nursery/.external/cache/torch_extensions
+export XDG_CACHE_HOME=/work/dal503972/nursery/.external/xdg-cache
+export CUDA_CACHE_PATH=/work/dal503972/nursery/.external/cache/cuda
+export MAX_JOBS=4
+
+python -m nursery.humanoid.hoidini_intermimic.execute \
+  --converted outputs/hoidini_intermimic/run \
+  --intermimic .external/InterMimic \
+  --checkpoint .external/checkpoints/intermimic/sub2.pth \
+  --output outputs/activity_pipeline/<run-id>
+```
+
+The environment's Python 3.8 base is `interactmove`, hence its library path;
+installed packages are isolated in `intermimic`. Put launch logs in the run's
+`logs/` directory after it has been created. The SDK's native VHACD cache on
+Juno is redirected from `~/.isaacgym/vhacd` into `.external/cache/vhacd`.
+Use a new ignored run directory for each execution. `run.json` records the
+source, checkpoint hash, effective settings, completion, termination, and
+unchanged source validation. `simulation/executed.npz` contains timestamps,
+actor/body poses and velocities, human/object contact forces, and the action
+applied over each preceding interval. Initial actor states are stored separately:
+body tensors immediately after reset can be stale, so trace samples start only
+after the first actual physics step. No reference frames are replayed after
+initialization, and no terminated attempts are restarted or stitched together.
+
+Juno runtime probe `384804` created GPU PhysX successfully. Physical job
+`384809` loaded all assets and the teacher, then stopped at 32 of 149 control
+steps (1.067 s), with finite states and actions. It terminated on **11 consecutive
+missed right-hand contact steps**, not the tracking-termination flag. Maximum
+mug lift was **0 m**; it settled approximately 0.01559 m onto its support.
+The upstream density of 1,000 kg/m³ yielded a mass of 0.14150 kg; these are
+simulator assumptions, not a measured mug mass. The command correctly exited 1.
+
+The retained run is
+`/work/dal503972/nursery/outputs/activity_pipeline/mug-lift-trace-check/`.
+Trace validation checked matching state/action counts, 30 Hz timestamps, finite
+values, agreement between actor and body positions, correct initial human/object
+positions, and executed object motion differing from reference playback.
+All 47 focused local tests pass. This verifies the simulator connection, **not
+a successful mug lift**. Contact-preserving motion transfer/controller suitability
+must be resolved before claiming successful execution. The accepted source floor
+failure is unchanged. Video export and the single `activity_pipeline.py` entry
+point remain deferred until the physical interaction is verified.
 
 On Juno, run generation and rendering commands inside an appropriate Slurm
 allocation. See the upstream [EmbodiedGen documentation](https://horizonrobotics.github.io/EmbodiedGen/docs/index.html)
