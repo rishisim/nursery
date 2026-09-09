@@ -143,9 +143,11 @@ The validator reloads the artifacts and records explicit mug-lift checks in
 `validation.json`; optional rendering saves a Blender scene and selected frames.
 It also checks reconstructed body and moving-object vertices against the room's
 world-transformed collision geometry, excluding the moving target from static
-obstacles. Closed meshes enclosing the complete target/support interaction are
-treated as containment boundaries, while other closed meshes are solid obstacles;
-open meshes remain unsigned surfaces. Two linear samples per frame interval reduce
+obstacles. Closed non-support meshes whose world bounds enclose the complete
+target/support interaction are treated as containment boundaries, while other
+closed meshes are solid obstacles; open meshes remain unsigned surfaces. Boundary
+escape is conservatively checked against world-axis-aligned bounds. Two linear
+samples per frame interval reduce
 missed crossings (`--collision-subdivisions` changes this), but this is not
 continuous collision detection. Intended target/support contact remains governed
 by the existing support-specific check rather than the generic room check.

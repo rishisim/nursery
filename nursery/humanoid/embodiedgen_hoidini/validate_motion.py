@@ -83,6 +83,7 @@ def evaluate_scene_collisions(
         },
         "limitations": [
             "Open meshes are unsigned clearance surfaces, not solid volumes",
+            "Enclosing room boundaries use their world-axis-aligned bounds",
             "Linear subframes reduce tunnelling but are not continuous collision detection",
             "Target-support contact is assessed by the existing support-specific check",
         ],

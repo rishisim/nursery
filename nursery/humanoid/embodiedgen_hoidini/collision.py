@@ -73,8 +73,17 @@ def build_static_collision_scene(
                 node.pose.matrix @ reference.mesh_to_asset
             )
             closed = is_watertight(mesh)
-            enclosing = closed and bool(
-                np.all(signed_distance(interaction_points, mesh) < 0)
+            lower = mesh.vertices.min(axis=0)
+            upper = mesh.vertices.max(axis=0)
+            enclosing = (
+                name != active.support_name
+                and closed
+                and bool(
+                    np.all(
+                        (interaction_points >= lower)
+                        & (interaction_points <= upper)
+                    )
+                )
             )
             result.append(
                 CollisionGeometry(
@@ -141,7 +150,13 @@ def validate_trajectories(
         raise ValueError("clearance_m must be nonnegative and subdivisions positive")
     samples = []
     obstacle_queries = [
-        (obstacle, _distance_query(obstacle.mesh)) for obstacle in obstacles
+        (
+            obstacle,
+            None
+            if obstacle.enclosing_boundary
+            else _distance_query(obstacle.mesh),
+        )
+        for obstacle in obstacles
     ]
     target_query = _distance_query(object_template) if object_template else None
     for frame, body_points, object_points in _subframes(body, obj, subdivisions):
@@ -149,11 +164,12 @@ def validate_trajectories(
             for obstacle, query in obstacle_queries:
                 if obstacle.enclosing_boundary:
                     candidates, outside_distance = points, np.inf
+                    distance = _signed_aabb_distance(points, obstacle.mesh)
                 else:
                     candidates, outside_distance = _aabb_candidates(
                         points, obstacle.mesh, clearance_m
                     )
-                distance = query(candidates)
+                    distance = query(candidates)
                 # Open/thin meshes have no meaningful inside. Treat them as a
                 # two-sided clearance surface; closed meshes additionally report depth.
                 if obstacle.enclosing_boundary:
@@ -271,6 +287,17 @@ def _aabb_candidates(
     else:
         outside_distance = np.inf
     return points[inside], outside_distance
+
+
+def _signed_aabb_distance(points: np.ndarray, mesh: TriangleMesh) -> np.ndarray:
+    """Return negative distance inside an enclosing box and positive outside."""
+    lower = mesh.vertices.min(axis=0)
+    upper = mesh.vertices.max(axis=0)
+    outside_delta = np.maximum(np.maximum(lower - points, points - upper), 0.0)
+    outside_distance = np.linalg.norm(outside_delta, axis=1)
+    inside = np.all((points >= lower) & (points <= upper), axis=1)
+    inside_distance = np.minimum(points - lower, upper - points).min(axis=1)
+    return np.where(inside, -inside_distance, outside_distance)
 
 
 def _trajectory(value: np.ndarray, name: str) -> np.ndarray:
