@@ -50,6 +50,13 @@ def evaluate_scene_collisions(
     def maximum(rows):
         return max((row.maximum_penetration_m for row in rows), default=0.0)
 
+    def maximum_by_obstacle(rows):
+        names = sorted({row.obstacle for row in rows})
+        return {
+            name: maximum([row for row in rows if row.obstacle == name])
+            for name in names
+        }
+
     body_room_depth = maximum(body_room)
     object_room_depth = maximum(object_room)
     body_object_depth = maximum(body_object)
@@ -63,6 +70,12 @@ def evaluate_scene_collisions(
         "maximum_body_room_penetration_m": body_room_depth,
         "maximum_object_room_penetration_m": object_room_depth,
         "maximum_body_object_penetration_m": body_object_depth,
+        "maximum_body_penetration_by_obstacle_m": maximum_by_obstacle(
+            body_room
+        ),
+        "maximum_object_penetration_by_obstacle_m": maximum_by_obstacle(
+            object_room
+        ),
         "checks": {
             "body_not_penetrating_room": body_room_depth <= tolerance_m,
             "object_not_penetrating_room": object_room_depth <= tolerance_m,

@@ -76,6 +76,10 @@ def test_collision_report_preserves_support_contact_and_groups_failures(monkeypa
     assert report["enclosing_boundary_meshes"] == 1
     assert report["maximum_object_room_penetration_m"] == 0.021
     assert report["maximum_body_object_penetration_m"] == 0.01
+    assert report["maximum_body_penetration_by_obstacle_m"] == {"chair": 0.03}
+    assert report["maximum_object_penetration_by_obstacle_m"] == {
+        "chair": 0.021
+    }
     assert report["checks"] == {
         "body_not_penetrating_room": False,
         "object_not_penetrating_room": False,
