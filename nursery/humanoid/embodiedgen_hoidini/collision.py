@@ -109,6 +109,7 @@ def validate_trajectories(
     obstacles: Sequence[CollisionGeometry],
     *,
     object_faces: np.ndarray | None = None,
+    object_template: TriangleMesh | None = None,
     object_name: str = "target_object",
     clearance_m: float = 0.0,
     subdivisions: int = 1,
@@ -125,13 +126,17 @@ def validate_trajectories(
     if clearance_m < 0 or subdivisions < 1:
         raise ValueError("clearance_m must be nonnegative and subdivisions positive")
     samples = []
+    obstacle_queries = [
+        (obstacle, _distance_query(obstacle.mesh)) for obstacle in obstacles
+    ]
+    target_query = _distance_query(object_template) if object_template else None
     for frame, body_points, object_points in _subframes(body, obj, subdivisions):
         for moving_name, points in (("body", body_points), ("object", object_points)):
-            for obstacle in obstacles:
+            for obstacle, query in obstacle_queries:
                 candidates, outside_distance = _aabb_candidates(
                     points, obstacle.mesh, clearance_m
                 )
-                distance = signed_distance(candidates, obstacle.mesh)
+                distance = query(candidates)
                 # Open/thin meshes have no meaningful inside. Treat them as a
                 # two-sided clearance surface; closed meshes additionally report depth.
                 colliding = distance < clearance_m
@@ -159,7 +164,14 @@ def validate_trajectories(
             candidates, outside_distance = _aabb_candidates(
                 body_points, target, clearance_m
             )
-            distance = signed_distance(candidates, target)
+            if target_query is None:
+                distance = signed_distance(candidates, target)
+            else:
+                rotation, translation = _rigid_alignment(
+                    object_template.vertices, object_points
+                )
+                local_candidates = (candidates - translation) @ rotation.T
+                distance = target_query(local_candidates)
             colliding = distance < clearance_m
             penetration = (
                 np.maximum(-distance, 0.0)
@@ -179,6 +191,50 @@ def validate_trajectories(
                 )
             )
     return tuple(samples)
+
+
+def _distance_query(mesh: TriangleMesh | None):
+    """Build one accelerated query, falling back to the NumPy implementation."""
+    if mesh is None:
+        return None
+    try:
+        import open3d as o3d
+    except ImportError:
+        return lambda points: signed_distance(points, mesh)
+    tensor_mesh = o3d.t.geometry.TriangleMesh(
+        o3d.core.Tensor(mesh.vertices.astype(np.float32)),
+        o3d.core.Tensor(mesh.faces.astype(np.int32)),
+    )
+    scene = o3d.t.geometry.RaycastingScene()
+    scene.add_triangles(tensor_mesh)
+    closed = is_watertight(mesh)
+
+    def query(points):
+        if not len(points):
+            return np.empty(0, dtype=np.float64)
+        tensor = o3d.core.Tensor(points.astype(np.float32))
+        result = (
+            scene.compute_signed_distance(tensor)
+            if closed
+            else scene.compute_distance(tensor)
+        )
+        return result.numpy().astype(np.float64)
+
+    return query
+
+
+def _rigid_alignment(source: np.ndarray, target: np.ndarray):
+    """Return the row-vector rigid transform aligning corresponding vertices."""
+    source_center = source.mean(axis=0)
+    target_center = target.mean(axis=0)
+    covariance = (source - source_center).T @ (target - target_center)
+    left, _, right = np.linalg.svd(covariance)
+    rotation = left @ right
+    if np.linalg.det(rotation) < 0:
+        left[:, -1] *= -1
+        rotation = left @ right
+    translation = target_center - source_center @ rotation
+    return rotation, translation
 
 
 def _aabb_candidates(

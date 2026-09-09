@@ -26,6 +26,7 @@ def evaluate_scene_collisions(
         object_vertices,
         obstacles,
         object_faces=active.canonical_target_mesh.faces,
+        object_template=active.canonical_target_mesh,
         object_name=active.target_name,
         subdivisions=subdivisions,
     )

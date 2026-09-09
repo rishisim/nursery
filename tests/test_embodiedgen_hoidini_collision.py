@@ -90,3 +90,21 @@ def test_aabb_broad_phase_preserves_nearest_outside_distance() -> None:
 
     assert rows[0].minimum_distance_m == 1.0
     assert rows[0].maximum_penetration_m == 0.0
+
+
+def test_rigid_target_template_preserves_body_object_distance() -> None:
+    target = _box()
+    rotation = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]], dtype=float)
+    translation = np.array([3.0, 2.0, 1.0])
+    world_target = target.vertices @ rotation + translation
+    body = np.array([[[2.5, 2.5, 1.5]]])
+
+    rows = validate_trajectories(
+        body,
+        world_target[None],
+        [],
+        object_faces=target.faces,
+        object_template=target,
+    )
+
+    assert rows[0].maximum_penetration_m == 0.5
