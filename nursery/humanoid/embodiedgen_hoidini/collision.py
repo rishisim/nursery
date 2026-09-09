@@ -21,6 +21,7 @@ class CollisionGeometry:
     mesh: TriangleMesh
     watertight: bool
     source_kind: str = "collision"
+    enclosing_boundary: bool = False
 
 
 @dataclass(frozen=True)
@@ -54,7 +55,14 @@ def build_static_collision_scene(
 ) -> tuple[CollisionGeometry, ...]:
     """Load transformed room collision meshes, excluding the moving target."""
     result = []
-    target = bundle.active_interaction.target_name
+    active = bundle.active_interaction
+    target = active.target_name
+    interaction_points = np.vstack(
+        (
+            np.asarray(active.canonical_target_pose.translation)[None],
+            active.support_corners_world,
+        )
+    )
     for name in sorted(bundle.nodes):
         if name == target:
             continue
@@ -64,8 +72,14 @@ def build_static_collision_scene(
             mesh = _load_obj(reference.mesh_path).transformed(
                 node.pose.matrix @ reference.mesh_to_asset
             )
+            closed = is_watertight(mesh)
+            enclosing = closed and bool(
+                np.all(signed_distance(interaction_points, mesh) < 0)
+            )
             result.append(
-                CollisionGeometry(name, mesh, is_watertight(mesh), reference.kind)
+                CollisionGeometry(
+                    name, mesh, closed, reference.kind, enclosing
+                )
             )
     return tuple(result)
 
@@ -133,18 +147,24 @@ def validate_trajectories(
     for frame, body_points, object_points in _subframes(body, obj, subdivisions):
         for moving_name, points in (("body", body_points), ("object", object_points)):
             for obstacle, query in obstacle_queries:
-                candidates, outside_distance = _aabb_candidates(
-                    points, obstacle.mesh, clearance_m
-                )
+                if obstacle.enclosing_boundary:
+                    candidates, outside_distance = points, np.inf
+                else:
+                    candidates, outside_distance = _aabb_candidates(
+                        points, obstacle.mesh, clearance_m
+                    )
                 distance = query(candidates)
                 # Open/thin meshes have no meaningful inside. Treat them as a
                 # two-sided clearance surface; closed meshes additionally report depth.
-                colliding = distance < clearance_m
-                penetration = (
-                    np.maximum(-distance, 0.0)
-                    if obstacle.watertight
-                    else np.zeros_like(distance)
-                )
+                if obstacle.enclosing_boundary:
+                    colliding = distance > -clearance_m
+                    penetration = np.maximum(distance, 0.0)
+                elif obstacle.watertight:
+                    colliding = distance < clearance_m
+                    penetration = np.maximum(-distance, 0.0)
+                else:
+                    colliding = distance < clearance_m
+                    penetration = np.zeros_like(distance)
                 samples.append(
                     CollisionSample(
                         frame=frame,

@@ -54,7 +54,14 @@ def test_collision_report_preserves_support_contact_and_groups_failures(monkeypa
         CollisionSample(0, "object", "chair", -0.021, 0.021, 1),
         CollisionSample(0, "body", "mug", -0.01, 0.01, 1),
     )
-    monkeypatch.setattr(validator, "build_static_collision_scene", lambda _: (1, 2))
+    monkeypatch.setattr(
+        validator,
+        "build_static_collision_scene",
+        lambda _: (
+            SimpleNamespace(enclosing_boundary=False),
+            SimpleNamespace(enclosing_boundary=True),
+        ),
+    )
     monkeypatch.setattr(
         validator, "validate_trajectories", lambda *args, **kwargs: rows
     )
@@ -66,6 +73,7 @@ def test_collision_report_preserves_support_contact_and_groups_failures(monkeypa
     )
 
     assert report["maximum_body_room_penetration_m"] == 0.03
+    assert report["enclosing_boundary_meshes"] == 1
     assert report["maximum_object_room_penetration_m"] == 0.021
     assert report["maximum_body_object_penetration_m"] == 0.01
     assert report["checks"] == {

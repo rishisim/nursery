@@ -55,6 +55,9 @@ def evaluate_scene_collisions(
     body_object_depth = maximum(body_object)
     return {
         "static_collision_meshes": len(obstacles),
+        "enclosing_boundary_meshes": sum(
+            item.enclosing_boundary for item in obstacles
+        ),
         "collision_subdivisions_per_frame": subdivisions,
         "collision_tolerance_m": tolerance_m,
         "maximum_body_room_penetration_m": body_room_depth,

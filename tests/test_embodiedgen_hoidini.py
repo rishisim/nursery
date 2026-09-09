@@ -336,10 +336,28 @@ def test_collision_scene_excludes_moving_target_and_applies_world_transform(
     obstacles = build_static_collision_scene(bundle)
 
     assert [item.node_name for item in obstacles] == ["book", "table"]
+    assert not any(item.enclosing_boundary for item in obstacles)
     table = next(item for item in obstacles if item.node_name == "table")
     assert table.source_kind == "collision"
     np.testing.assert_allclose(table.mesh.vertices.min(axis=0), [0, 1, 0.5])
     np.testing.assert_allclose(table.mesh.vertices.max(axis=0), [2, 3, 1.5])
+
+
+def test_collision_scene_classifies_geometry_enclosing_interaction_as_boundary(
+    tmp_path: Path,
+) -> None:
+    layout_path, layout = _layout_fixture(tmp_path)
+    _write_asset(tmp_path, "kitchen_shell", BOX_OBJ, scale="10 10 10")
+    layout["assets"]["kitchen"] = "assets/kitchen_shell"
+    layout_path.write_text(json.dumps(layout), encoding="utf-8")
+
+    obstacles = build_static_collision_scene(
+        prepare_scene(layout_path, point_count=8)
+    )
+
+    room = next(item for item in obstacles if item.node_name == "kitchen")
+    assert room.watertight
+    assert room.enclosing_boundary
 
 
 def _composed_room_fixture(tmp_path: Path, monkeypatch, *, reuse: bool = False) -> Path:

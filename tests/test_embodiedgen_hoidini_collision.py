@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from nursery.humanoid.embodiedgen_hoidini.collision import (
     CollisionGeometry,
@@ -108,3 +109,19 @@ def test_rigid_target_template_preserves_body_object_distance() -> None:
     )
 
     assert rows[0].maximum_penetration_m == 0.5
+
+
+def test_enclosing_boundary_allows_interior_and_rejects_crossing() -> None:
+    room = CollisionGeometry(
+        "room_shell", _box(), watertight=True, enclosing_boundary=True
+    )
+    body = np.array([[[0.5, 0.5, 0.5]], [[1.2, 0.5, 0.5]]])
+    obj = np.array([[[0.6, 0.5, 0.5]], [[0.6, 0.5, 0.5]]])
+
+    rows = validate_trajectories(body, obj, [room], subdivisions=2)
+    body_rows = [row for row in rows if row.moving_geometry == "body"]
+
+    assert body_rows[0].maximum_penetration_m == 0.0
+    assert body_rows[0].colliding_vertices == 0
+    assert body_rows[-1].maximum_penetration_m == pytest.approx(0.2)
+    assert body_rows[-1].colliding_vertices == 1
