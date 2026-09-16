@@ -250,15 +250,24 @@ Converted artifacts and `upstream_validation.json` remain ignored on Juno at
 format and skeleton compatibility. The physical attempt below exercises the
 full environment separately; the conversion check alone does not do so.
 
-### Physical execution: integrated, interaction not yet successful
+### Physical execution: general controller path
 
 `nursery/humanoid/hoidini_intermimic/execute.py` is a small procedural launcher
 around upstream InterMimic. Its two asset-loading overrides add the recorded
-room collision meshes as static geometry and the canonical mug as a dynamic
-object. The selected mug is excluded from static geometry. The launcher keeps
+room collision meshes as static geometry and the selected object as a dynamic
+object. The selected object is excluded from static geometry. The launcher keeps
 the original object origin and sampled points; upstream's usual recentering
 would misalign them with this reference. It reuses upstream observation,
 controller, normalization, rewards, termination, and PhysX stepping code.
+
+`nursery/humanoid/hoidini_intermimic/execution.json` is the canonical execution
+configuration. It starts with one environment on CUDA device 0, 60 Hz physics,
+30 Hz control, the official general SMPL-X student policy, 200 kg/m³ object
+density, explicit plane friction and restitution, explicit PhysX solver values,
+a 0.3 m root-height termination threshold, contact-miss termination, and
+compressed synchronized state/contact/action recording. Scaling changes
+`num_environments` and resource parameters in this config; it does not select a
+different execution path.
 
 Use an isolated Linux Python 3.8 environment with NVIDIA Isaac Gym Preview 4.
 The verified Juno environment is
@@ -268,11 +277,16 @@ The verified Juno environment is
 `.external/isaacgym/python`; upstream implementations and checkpoints remain
 under `.external/`. HOIDiNi's environment is unchanged.
 
-The controller is the upstream `smplx_teachers_new/sub2.pth` from the
-[official checkpoint folder](https://drive.google.com/drive/folders/1biDUmde-h66vUW4npp8FVo2w0wOcK2_k),
-stored on Juno at `.external/checkpoints/intermimic/sub2.pth`, with SHA-256
-`57272ea8cfcbc74319b0e60d3d9341e6215c337b61e20488baa595cf00bb0fba`.
-It has not been trained or qualified for this generated mug interaction.
+The controller is InterMimic's
+[official pretrained student](https://drive.google.com/file/d/1GNFOjBRmiIIxYtfnG9WvK4fELKnDWroR/view),
+with SHA-256
+`400a7860c8f65deea18722fefa1b2e63a721cbf4d8f76605cc6472e350923b22`.
+Selection does not inspect the prompt, object name, or activity. The launcher
+requires the configured artifact hash, `general_student` role, 3,198 normalized
+observations, 153 actions, 52 SMPL-X bodies, 591-column reference, metre units,
+and +Z coordinates. A checkpoint or converted artifact that violates this
+metadata contract is rejected as `controller_mismatch`.
+
 The loader stages the same checkpoint tensors on CPU in a temporary run file
 before moving the native policy to CUDA. This avoids PyTorch 1.13's CUDA-device
 deserialization failure on Juno's MIG partitions; the temporary file is removed.
@@ -291,7 +305,7 @@ export MAX_JOBS=4
 python -m nursery.humanoid.hoidini_intermimic.execute \
   --converted outputs/hoidini_intermimic/run \
   --intermimic .external/InterMimic \
-  --checkpoint .external/checkpoints/intermimic/sub2.pth \
+  --checkpoint .external/checkpoints/intermimic/student.pth \
   --output outputs/activity_pipeline/<run-id>
 ```
 
@@ -300,32 +314,58 @@ installed packages are isolated in `intermimic`. Put launch logs in the run's
 `logs/` directory after it has been created. The SDK's native VHACD cache on
 Juno is redirected from `~/.isaacgym/vhacd` into `.external/cache/vhacd`.
 Use a new ignored run directory for each execution. `run.json` records the
-source, checkpoint hash, effective settings, completion, termination, and
-unchanged source validation. `simulation/executed.npz` contains timestamps,
-actor/body poses and velocities, human/object contact forces, and the action
-applied over each preceding interval. Initial actor states are stored separately:
-body tensors immediately after reset can be stale, so trace samples start only
-after the first actual physics step. No reference frames are replayed after
-initialization, and no terminated attempts are restarted or stitched together.
+source, controller metadata, effective settings, completion, termination, and
+unchanged source validation. `simulation/executed.npz` contains environment-aware
+timestamps, step indices, actor/body poses and velocities, human/object contact
+forces, and the action applied over each preceding interval. Initial actor states
+are stored separately: body tensors immediately after reset can be stale, so
+trace samples start only after the first actual physics step. No reference frames
+are replayed after initialization, and no terminated attempts are restarted or
+stitched together.
 
-Juno runtime probe `384804` created GPU PhysX successfully. Physical job
-`384809` loaded all assets and the teacher, then stopped at 32 of 149 control
-steps (1.067 s), with finite states and actions. It terminated on **11 consecutive
-missed right-hand contact steps**, not the tracking-termination flag. Maximum
-mug lift was **0 m**; it settled approximately 0.01559 m onto its support.
-The upstream density of 1,000 kg/m³ yielded a mass of 0.14150 kg; these are
-simulator assumptions, not a measured mug mass. The command correctly exited 1.
+General measurements cover frame-zero initialization, finite values, completion
+fraction, human-body and object tracking error, expected-contact agreement and
+duration, termination/tracking/fall state, object displacement, and timestamp /
+state / action synchronization. A positive object-contact force can include
+support contact, so it is reported separately from expected human-body contact.
+These measurements do not encode activity-specific success. `decision.json`
+retains a compact outcome and one of six general failure categories:
+`invalid_reference`, `retargeting`, `controller_mismatch`, `asset_mismatch`,
+`simulation_failure`, or `interaction_failure`.
 
-The retained run is
-`/work/dal503972/nursery/outputs/activity_pipeline/mug-lift-trace-check/`.
-Trace validation checked matching state/action counts, 30 Hz timestamps, finite
-values, agreement between actor and body positions, correct initial human/object
-positions, and executed object motion differing from reference playback.
-All 47 focused local tests pass. This verifies the simulator connection, **not
-a successful mug lift**. Contact-preserving motion transfer/controller suitability
-must be resolved before claiming successful execution. The accepted source floor
-failure is unchanged. Video export and the single `activity_pipeline.py` entry
-point remain deferred until the physical interaction is verified.
+The official student checkpoint was inspected against the actual saved converted
+manifest: its normalization and first actor layer are 3,198-dimensional, its
+action head has 153 outputs, and the artifact hash and SMPL-X/reference metadata
+match the canonical contract. Juno job `408829` then ran the changed executor on
+an A30 4.6 GB MIG slice. GPU PhysX, the general student, the room, humanoid, and
+dynamic object all loaded; the slice was large enough for the single environment.
+
+The attempt stopped at 32 of 149 control steps (completion fraction 0.21477),
+after 11 consecutive missed right-hand contacts. It did not fall and did not
+trigger tracking termination. Initialization matched the reference exactly and
+all 32 state/action samples were finite and synchronized at 30 Hz. Mean human
+body-position error was 0.18510 m and mean object-position error was 0.04784 m.
+None of 19 expected human-contact entries agreed with simulated contact; the
+matched expected-contact duration was 0 s. Object-force agreement was 11/11
+expected frames, but this includes support contact and is not evidence of a
+grasp. The 0.02830 kg simulated object moved at most 0.01573 m and moved downward,
+not upward. `decision.json` therefore records `interaction_failure`, and the
+launcher correctly exited 1. The retained ignored run is
+`/work/dal503972/nursery/.external/worktrees/general-physical-executor/outputs/activity_pipeline/general-student-canary-a30-4gb/`.
+
+For historical comparison only, Juno job `384809` used the earlier subject-2
+teacher path and stopped at 32 of 149 control steps (1.067 s), with finite states
+and actions. It terminated on **11 consecutive missed right-hand contact steps**,
+not the tracking-termination flag. Maximum mug lift was **0 m**; it settled
+approximately 0.01559 m onto its support. That failed teacher canary does not
+validate or predict the general student controller.
+
+Both the general-student run and retained historical teacher run are failed
+physical interactions, not successful activities. Contact-preserving motion
+transfer/controller suitability remains unresolved. The accepted source floor
+failure is unchanged. Video export and the single
+`activity_pipeline.py` entry point remain deferred until physical interaction is
+verified.
 
 On Juno, run generation and rendering commands inside an appropriate Slurm
 allocation. See the upstream [EmbodiedGen documentation](https://horizonrobotics.github.io/EmbodiedGen/docs/index.html)

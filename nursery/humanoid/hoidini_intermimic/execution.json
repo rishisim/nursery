@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "seed": 0,
+  "num_environments": 1,
+  "device": {
+    "type": "cuda",
+    "id": 0,
+    "gpu_pipeline": true
+  },
+  "rates_hz": {
+    "physics": 60,
+    "control": 30
+  },
+  "controller": {
+    "role": "general_student",
+    "source": "InterMimic official pretrained SMPL-X student",
+    "source_file_id": "1GNFOjBRmiIIxYtfnG9WvK4fELKnDWroR",
+    "checkpoint_sha256": "400a7860c8f65deea18722fefa1b2e63a721cbf4d8f76605cc6472e350923b22",
+    "policy_config": "isaacgym/src/intermimic/data/cfg/train/rlg/omomo_all.yaml",
+    "observation_source": "converted_reference",
+    "observation_dimension": 3198,
+    "action_dimension": 153,
+    "body_count": 52,
+    "reference_width": 591,
+    "units": "metres",
+    "up_axis": "+Z"
+  },
+  "object": {
+    "density_kg_m3": 200
+  },
+  "plane": {
+    "static_friction": 0.9,
+    "dynamic_friction": 0.9,
+    "restitution": 0.7
+  },
+  "physics": {
+    "substeps": 2,
+    "solver_type": 1,
+    "num_threads": 4,
+    "num_position_iterations": 4,
+    "num_velocity_iterations": 1,
+    "contact_offset_m": 0.02,
+    "rest_offset_m": 0.0,
+    "bounce_threshold_velocity_m_s": 0.2,
+    "maximum_depenetration_velocity_m_s": 100.0
+  },
+  "termination": {
+    "early_termination": true,
+    "root_height_m": 0.3,
+    "contact_miss_streak_steps": 11,
+    "stop_on_any_environment": true
+  },
+  "measurement": {
+    "contact_force_threshold_n": 0.1,
+    "initialization_tolerance_m": 0.0001,
+    "initialization_tolerance_rad": 0.0001
+  },
+  "recording": {
+    "format": "npz_compressed",
+    "states": true,
+    "contacts": true,
+    "actions": true,
+    "video": false
+  }
+}
