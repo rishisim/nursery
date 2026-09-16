@@ -53,15 +53,40 @@ def load_execution_config(path=DEFAULT_CONFIG):
         raise ValueError("num_environments must be a positive integer")
     if physics_hz <= 0 or control_hz <= 0 or physics_hz % control_hz:
         raise ValueError("physics_hz must be a positive integer multiple of control_hz")
+    if control_hz != 30:
+        raise ValueError("InterMimic reference indexing currently requires 30 Hz control")
     if config["controller"]["role"] != "general_student":
         raise ValueError("Only a metadata-declared general student controller is supported")
     if config["termination"]["contact_miss_streak_steps"] != 11:
         raise ValueError("InterMimic contact termination is fixed at 11 missed steps")
+    if not config["termination"]["stop_on_any_environment"]:
+        raise ValueError("The bounded execution protocol requires stop_on_any_environment=true")
     if config["recording"] != {
             "format": "npz_compressed", "states": True, "contacts": True,
             "actions": True, "video": False}:
         raise ValueError("The canonical synchronized state recording cannot be disabled")
     return config
+
+
+def validate_execution_reference(reference, manifest, config):
+    """Validate reference tensor and timebase before simulator construction."""
+    try:
+        validate_reference(reference)
+    except ValueError as exc:
+        raise ExecutionError("invalid_reference", str(exc)) from exc
+    conversion = manifest.get("conversion", {})
+    expected_fps = config["controller"]["reference_fps"]
+    if conversion.get("fps") != expected_fps:
+        raise ExecutionError(
+            "invalid_reference",
+            f"Converted reference fps {conversion.get('fps')} != {expected_fps}",
+        )
+    if conversion.get("frames") != len(reference):
+        raise ExecutionError(
+            "invalid_reference",
+            f"Manifest frame count {conversion.get('frames')} != tensor length {len(reference)}",
+        )
+    return reference
 
 
 def checkpoint_signature(checkpoint):
@@ -103,6 +128,7 @@ def validate_controller(checkpoint_path, checkpoint, manifest, config):
         "units": manifest.get("units"), "up_axis": manifest.get("up_axis"),
         "body_count": len(manifest.get("body_names", [])),
         "reference_width": WIDTH,
+        "reference_fps": manifest.get("conversion", {}).get("fps"),
     }
     declared = {key: expected[key] for key in artifact}
     if artifact != declared:
@@ -125,7 +151,11 @@ def room_collision_mesh(receipt):
             continue
         pose = Pose(tuple(node["pose"][:3]), tuple(node["pose"][3:])).matrix
         for geometry in geometries:
-            mesh = _load_obj(Path(geometry["mesh_path"]))
+            try:
+                mesh = _load_obj(Path(geometry["mesh_path"]))
+            except (OSError, ValueError) as exc:
+                raise ExecutionError(
+                    "asset_mismatch", f"Cannot load room collision mesh for {name}: {exc}") from exc
             meshes.append(mesh.transformed(pose @ np.asarray(geometry["mesh_to_asset"])))
             sources.append({"node": name, "mesh": geometry["mesh_path"]})
     if not meshes:
@@ -190,7 +220,8 @@ def prepare_execution(converted, output, config):
         "source_motion_validation": manifest["source_motion_validation"],
         "room_collision_sources": sources,
         "execution_config": config,
-        "stages": {"prepared": True, "controller_validated": False, "physics_executed": False},
+        "stages": {"prepared": True, "reference_validated": False,
+                   "controller_validated": False, "physics_executed": False},
         "video": None,
     }
     (output / "run.json").write_text(json.dumps(record, indent=2) + "\n")
@@ -215,7 +246,7 @@ def humanoid_body_states(raw_states, num_environments, body_count):
     return shaped[:, :body_count]
 
 
-def measure_execution(reference, initial_actors, states, bodies, contacts,
+def measure_execution(reference, initial_actors, initial_dofs, states, bodies, contacts,
                       object_contacts, actions, config, terminated,
                       tracking_termination, contact_miss_streak):
     """Compute general, activity-independent measurements from saved state."""
@@ -223,7 +254,7 @@ def measure_execution(reference, initial_actors, states, bodies, contacts,
     expected_steps = len(reference) - 1
     steps = len(states)
     finite = all(np.isfinite(value).all() for value in (
-        initial_actors, states, bodies, contacts, object_contacts, actions))
+        initial_actors, initial_dofs, states, bodies, contacts, object_contacts, actions))
     reference_steps = reference[1:steps + 1]
     reference_bodies = reference_steps[:, FIELDS["body_pos"]].reshape(steps, 52, 3)
     reference_bodies = reference_bodies[:, None]
@@ -243,25 +274,60 @@ def measure_execution(reference, initial_actors, states, bodies, contacts,
         initial_actors[:, 1, :3] - reference[0, FIELDS["obj_pos"]], axis=-1)
     initial_object_rotation_error = _quaternion_angle(
         initial_actors[:, 1, 3:7], reference[0, FIELDS["obj_rot"]])
+    initial_dof_error = np.abs(initial_dofs - reference[0, FIELDS["dof_pos"]])
     position_tolerance = config["measurement"]["initialization_tolerance_m"]
     rotation_tolerance = config["measurement"]["initialization_tolerance_rad"]
     initialized = bool(
         max(initial_root_position_error.max(), initial_object_position_error.max()) <= position_tolerance
-        and max(initial_root_rotation_error.max(), initial_object_rotation_error.max()) <= rotation_tolerance)
+        and max(initial_root_rotation_error.max(), initial_object_rotation_error.max()) <= rotation_tolerance
+        and initial_dof_error.max() <= rotation_tolerance)
 
     threshold = config["measurement"]["contact_force_threshold_n"]
-    actual_human_contact = np.linalg.norm(contacts, axis=-1) > threshold
-    expected_human_contact = (
-        reference_steps[:, FIELDS["contact_human"]] == 1)[:, None]
-    expected_human_entries = int(expected_human_contact.sum() * states.shape[1])
-    matched_human_entries = int((actual_human_contact & expected_human_contact).sum())
-    actual_object_contact = (np.linalg.norm(object_contacts, axis=-1) > threshold).any(axis=-1)
-    expected_object_contact = (
-        reference_steps[:, FIELDS["contact_obj"]].reshape(steps, 1) == 1)
-    expected_object_entries = int(expected_object_contact.sum() * states.shape[1])
-    matched_object_entries = int((actual_object_contact & expected_object_contact).sum())
-    expected_contact_frames = np.any(expected_human_contact, axis=-1)
-    matched_contact_frames = np.any(actual_human_contact & expected_human_contact, axis=-1)
+    # Match native observation semantics: a contact is any force component whose
+    # absolute value exceeds the threshold. Positive hand intent is aggregated
+    # over wrist and all finger bodies; forbidden labels remain body-specific.
+    actual_human_contact = np.any(np.abs(contacts) > threshold, axis=-1)
+    reference_contact = reference_steps[:, FIELDS["contact_human"]]
+    hand_groups = (np.arange(17, 33), np.arange(36, 52))
+    hand_indices = np.concatenate(hand_groups)
+    other_indices = np.setdiff1d(np.arange(reference_contact.shape[1]), hand_indices)
+    desired_expected_parts, desired_actual_parts = [], []
+    for indices in hand_groups:
+        desired_expected_parts.append(np.any(reference_contact[:, indices] == 1, axis=-1))
+        desired_actual_parts.append(np.any(actual_human_contact[:, :, indices], axis=-1))
+    desired_expected_parts.append(reference_contact[:, other_indices] == 1)
+    desired_actual_parts.append(actual_human_contact[:, :, other_indices])
+    desired_expected = np.concatenate(
+        [part[:, None] if part.ndim == 1 else part for part in desired_expected_parts], axis=-1)
+    desired_expected = np.repeat(desired_expected[:, None, :], states.shape[1], axis=1)
+    desired_actual = np.concatenate(
+        [part[..., None] if part.ndim == 2 else part for part in desired_actual_parts], axis=-1)
+    desired_matched = desired_expected & desired_actual
+    forbidden_expected = np.repeat(
+        (reference_contact == -1)[:, None, :], states.shape[1], axis=1)
+    forbidden_matched = forbidden_expected & ~actual_human_contact
+
+    def per_environment_counts(expected, matched):
+        expected_count = expected.sum(axis=(0, 2)).astype(int)
+        matched_count = matched.sum(axis=(0, 2)).astype(int)
+        agreement = [float(match / count) if count else None
+                     for count, match in zip(expected_count, matched_count)]
+        return expected_count.tolist(), matched_count.tolist(), agreement
+
+    desired_counts, desired_matches, desired_agreement = per_environment_counts(
+        desired_expected, desired_matched)
+    forbidden_counts, forbidden_matches, forbidden_agreement = per_environment_counts(
+        forbidden_expected, forbidden_matched)
+    expected_contact_frames = np.any(desired_expected, axis=-1)
+    matched_contact_frames = np.any(desired_matched, axis=-1)
+    expected_duration = (expected_contact_frames.sum(axis=0) / control_hz).tolist()
+    matched_duration = (matched_contact_frames.sum(axis=0) / control_hz).tolist()
+
+    actual_object_force_proxy = np.any(np.abs(object_contacts) > threshold, axis=(-1, -2))
+    expected_object_contact = np.repeat(
+        (reference_steps[:, FIELDS["contact_obj"]].reshape(steps, 1) == 1),
+        states.shape[1], axis=1)
+    object_proxy_overlap = expected_object_contact & actual_object_force_proxy
 
     displacement = states[:, :, 1, :3] - initial_actors[None, :, 1, :3]
     root_height = bodies[:, :, 0, 2]
@@ -282,6 +348,7 @@ def measure_execution(reference, initial_actors, states, bodies, contacts,
             "maximum_root_rotation_error_rad": float(initial_root_rotation_error.max()),
             "maximum_object_position_error_m": float(initial_object_position_error.max()),
             "maximum_object_rotation_error_rad": float(initial_object_rotation_error.max()),
+            "maximum_dof_position_error_rad": float(initial_dof_error.max()),
         },
         "finite": bool(finite),
         "completion_fraction": float(steps / expected_steps),
@@ -296,16 +363,21 @@ def measure_execution(reference, initial_actors, states, bodies, contacts,
             "maximum_rotation_error_rad": float(object_rotation_error.max()),
         },
         "expected_contact": {
-            "human_expected_entries": expected_human_entries,
-            "human_matched_entries": matched_human_entries,
-            "human_agreement": (float(matched_human_entries / expected_human_entries)
-                                if expected_human_entries else None),
-            "object_expected_frames": expected_object_entries,
-            "object_matched_frames": matched_object_entries,
-            "object_agreement": (float(matched_object_entries / expected_object_entries)
-                                 if expected_object_entries else None),
-            "expected_duration_s": float(expected_contact_frames.sum() / control_hz),
-            "matched_duration_s": float(matched_contact_frames.sum() / control_hz),
+            "desired_expected_entries_per_environment": desired_counts,
+            "desired_matched_entries_per_environment": desired_matches,
+            "desired_agreement_per_environment": desired_agreement,
+            "forbidden_expected_entries_per_environment": forbidden_counts,
+            "forbidden_matched_entries_per_environment": forbidden_matches,
+            "forbidden_agreement_per_environment": forbidden_agreement,
+            "expected_duration_s_per_environment": expected_duration,
+            "any_matched_duration_s_per_environment": matched_duration,
+        },
+        "object_contact_force_proxy": {
+            "pair_specific_agreement": None,
+            "expected_contact_frames_per_environment": expected_object_contact.sum(axis=0).astype(int).tolist(),
+            "force_proxy_active_frames_per_environment": actual_object_force_proxy.sum(axis=0).astype(int).tolist(),
+            "overlap_frames_per_environment": object_proxy_overlap.sum(axis=0).astype(int).tolist(),
+            "limitation": "Net object force includes support and room contacts; it cannot identify human-object contact",
         },
         "termination": {
             "terminated": bool(terminated),
@@ -362,7 +434,8 @@ def execute(converted, output, upstream, checkpoint, config_path=DEFAULT_CONFIG)
         (failed_output / "run.json").write_text(json.dumps({
             "converted_run": str(Path(converted).resolve()),
             "execution_config": config,
-            "stages": {"prepared": False, "controller_validated": False,
+            "stages": {"prepared": False, "reference_validated": False,
+                       "controller_validated": False,
                        "physics_executed": False},
             "error": str(exc), "decision": decision,
         }, indent=2) + "\n")
@@ -370,6 +443,16 @@ def execute(converted, output, upstream, checkpoint, config_path=DEFAULT_CONFIG)
     environment = None
     category = "simulation_failure"
     try:
+        try:
+            reference_tensor = torch.load(reference_path, map_location="cpu")
+            reference = reference_tensor.numpy()
+            validate_execution_reference(reference, manifest, config)
+        except ExecutionError:
+            raise
+        except Exception as exc:
+            raise ExecutionError("invalid_reference", str(exc)) from exc
+        record["stages"]["reference_validated"] = True
+
         checkpoint_data = torch.load(checkpoint, map_location="cpu")
         controller = validate_controller(checkpoint, checkpoint_data, manifest, config)
         record["controller"] = controller
@@ -452,6 +535,19 @@ def execute(converted, output, upstream, checkpoint, config_path=DEFAULT_CONFIG)
                     np.load(simulation / "sample_points.npy"),
                     dtype=torch.float32, device=self._init_device)[None]
 
+            def _build_target(self, env_id, env_ptr):
+                super()._build_target(env_id, env_ptr)
+                handle = self._target_handles[-1]
+                properties = self.gym.get_actor_rigid_shape_properties(env_ptr, handle)
+                material = config["object"]
+                for prop in properties:
+                    prop.friction = material["friction"]
+                    prop.restitution = material["restitution"]
+                    prop.rolling_friction = material["rolling_friction"]
+                    prop.torsion_friction = material["torsion_friction"]
+                    prop.rest_offset = material["rest_offset_m"]
+                self.gym.set_actor_rigid_shape_properties(env_ptr, handle, properties)
+
         environment = SceneInteraction(
             cfg, params, gymapi.SIM_PHYSX, config["device"]["type"],
             config["device"]["id"], True)
@@ -479,6 +575,7 @@ def execute(converted, output, upstream, checkpoint, config_path=DEFAULT_CONFIG)
         environment.reset()
         num_envs = config["num_environments"]
         initial_actors = environment._root_states.detach().cpu().numpy().copy().reshape(num_envs, -1, 13)
+        initial_dofs = environment._dof_pos.detach().cpu().numpy().copy()
         states, bodies, contacts, object_contacts, actions = [], [], [], [], []
 
         def capture():
@@ -506,20 +603,19 @@ def execute(converted, output, upstream, checkpoint, config_path=DEFAULT_CONFIG)
                     break
         states, bodies, contacts, object_contacts, actions = map(
             np.asarray, (states, bodies, contacts, object_contacts, actions))
-        reference = torch.load(reference_path, map_location="cpu").numpy()
-        validate_reference(reference)
         timestamps = (np.arange(len(states), dtype=np.float64) + 1) / rates["control"]
         np.savez_compressed(
             simulation / "executed.npz", time=timestamps,
             step_index=np.arange(1, len(states) + 1, dtype=np.int64),
             initial_actor_states=initial_actors, actor_states=states,
+            initial_dof_positions=initial_dofs,
             body_states=bodies, contact_forces=contacts,
             object_contact_forces=object_contacts, actions=actions)
         terminated = bool(environment._terminate_buf.any())
         tracking_termination = bool(environment.kinematic_reset.any())
         contact_miss_streak = environment.contact_reset.max(dim=0).values.cpu().tolist()
         measurements = measure_execution(
-            reference, initial_actors, states, bodies, contacts, object_contacts,
+            reference, initial_actors, initial_dofs, states, bodies, contacts, object_contacts,
             actions, config, terminated, tracking_termination, contact_miss_streak)
         props = environment.gym.get_actor_rigid_body_properties(
             environment.envs[0], environment._target_handles[0])

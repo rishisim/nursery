@@ -263,11 +263,12 @@ controller, normalization, rewards, termination, and PhysX stepping code.
 `nursery/humanoid/hoidini_intermimic/execution.json` is the canonical execution
 configuration. It starts with one environment on CUDA device 0, 60 Hz physics,
 30 Hz control, the official general SMPL-X student policy, 200 kg/m³ object
-density, explicit plane friction and restitution, explicit PhysX solver values,
+density, explicit object and plane material properties, explicit PhysX solver values,
 a 0.3 m root-height termination threshold, contact-miss termination, and
 compressed synchronized state/contact/action recording. Scaling changes
 `num_environments` and resource parameters in this config; it does not select a
-different execution path.
+different execution path. This bounded protocol requires 30 Hz reference/control
+indexing and `stop_on_any_environment=true`; unsupported values are rejected.
 
 Use an isolated Linux Python 3.8 environment with NVIDIA Isaac Gym Preview 4.
 The verified Juno environment is
@@ -323,11 +324,13 @@ trace samples start only after the first actual physics step. No reference frame
 are replayed after initialization, and no terminated attempts are restarted or
 stitched together.
 
-General measurements cover frame-zero initialization, finite values, completion
+General measurements cover frame-zero actor and 153-DOF initialization, finite values, completion
 fraction, human-body and object tracking error, expected-contact agreement and
 duration, termination/tracking/fall state, object displacement, and timestamp /
-state / action synchronization. A positive object-contact force can include
-support contact, so it is reported separately from expected human-body contact.
+state / action synchronization. Positive hand intent accepts native-equivalent
+wrist or finger contact; forbidden labels stay body-specific and zero remains
+unconstrained. Net object force can include support or room contact, so it is
+reported only as a force proxy and cannot establish human-object contact.
 These measurements do not encode activity-specific success. `decision.json`
 retains a compact outcome and one of six general failure categories:
 `invalid_reference`, `retargeting`, `controller_mismatch`, `asset_mismatch`,
@@ -336,22 +339,23 @@ retains a compact outcome and one of six general failure categories:
 The official student checkpoint was inspected against the actual saved converted
 manifest: its normalization and first actor layer are 3,198-dimensional, its
 action head has 153 outputs, and the artifact hash and SMPL-X/reference metadata
-match the canonical contract. Juno job `408829` then ran the changed executor on
+match the canonical contract. Revised Juno job `408833` then ran the changed executor on
 an A30 4.6 GB MIG slice. GPU PhysX, the general student, the room, humanoid, and
 dynamic object all loaded; the slice was large enough for the single environment.
 
 The attempt stopped at 32 of 149 control steps (completion fraction 0.21477),
 after 11 consecutive missed right-hand contacts. It did not fall and did not
-trigger tracking termination. Initialization matched the reference exactly and
+trigger tracking termination. Root, object, and all 153 initial DOFs matched the reference exactly, and
 all 32 state/action samples were finite and synchronized at 30 Hz. Mean human
-body-position error was 0.18510 m and mean object-position error was 0.04784 m.
+body-position error was 0.18545 m and mean object-position error was 0.04784 m.
 None of 19 expected human-contact entries agreed with simulated contact; the
-matched expected-contact duration was 0 s. Object-force agreement was 11/11
-expected frames, but this includes support contact and is not evidence of a
-grasp. The 0.02830 kg simulated object moved at most 0.01573 m and moved downward,
+matched expected-contact duration was 0 s. Net object force was active for 31
+frames and overlapped all 11 reference object-contact frames, but pair-specific
+agreement is unavailable because this proxy includes support and room forces.
+The 0.02830 kg simulated object moved at most 0.01573 m and moved downward,
 not upward. `decision.json` therefore records `interaction_failure`, and the
 launcher correctly exited 1. The retained ignored run is
-`/work/dal503972/nursery/.external/worktrees/general-physical-executor/outputs/activity_pipeline/general-student-canary-a30-4gb/`.
+`/work/dal503972/nursery/.external/worktrees/general-physical-executor/outputs/activity_pipeline/general-student-canary-a30-4gb-revised/`.
 
 For historical comparison only, Juno job `384809` used the earlier subject-2
 teacher path and stopped at 32 of 149 control steps (1.067 s), with finite states

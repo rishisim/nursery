@@ -22,11 +22,17 @@
     "action_dimension": 153,
     "body_count": 52,
     "reference_width": 591,
+    "reference_fps": 30,
     "units": "metres",
     "up_axis": "+Z"
   },
   "object": {
-    "density_kg_m3": 200
+    "density_kg_m3": 200,
+    "friction": 0.6,
+    "restitution": 0.05,
+    "rolling_friction": 0.01,
+    "torsion_friction": 0.01,
+    "rest_offset_m": 0.002
   },
   "plane": {
     "static_friction": 0.9,
