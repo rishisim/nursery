@@ -1,4 +1,4 @@
-"""Train the unchanged upstream two-tower with manifest pair weights on CPU."""
+"""Train the upstream two-tower with pair weights on CUDA when available."""
 
 import json
 from pathlib import Path
@@ -12,6 +12,7 @@ from . import _output_directory, _upstream_module
 def train_run(run, condition, seed, epochs=None):
     import torch
 
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     upstream = _upstream_module("train_frame_mil")
     region = _upstream_module("train_region_mil")
     run = Path(run).resolve()
@@ -48,7 +49,7 @@ def train_run(run, condition, seed, epochs=None):
     weights = torch.from_numpy(weights)
     dl = torch.utils.data.DataLoader(ds, batch_size=settings["batch"], shuffle=True,
                                      drop_last=False, collate_fn=upstream.collate, num_workers=0)
-    model = upstream.RegionMIL(len(vocab), emb_dim=emb_dim).to("cpu")
+    model = upstream.RegionMIL(len(vocab), emb_dim=emb_dim).to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=settings["lr"], weight_decay=0.1)
     probes = pd.read_parquet(run / "probes_frames.parquet")
     probe_cache, probe_lut = region.load_region_cache(run / "probes_cache")
@@ -71,7 +72,7 @@ def train_run(run, condition, seed, epochs=None):
         model.train()
         losses = []
         for idx, v, t, n in dl:
-            loss = model.forward_loss(v, t, n, weights[idx])
+            loss = model.forward_loss(v.to(device), t.to(device), n.to(device), weights[idx].to(device))
             opt.zero_grad()
             loss.backward()
             opt.step()
@@ -80,7 +81,7 @@ def train_run(run, condition, seed, epochs=None):
         scores, details = {}, {}
         for split, table in tables.items():
             scores[split], details[split] = region.eval_4afc_region(
-                model, probe_cache, probe_lut, table, vocab, "cpu", return_detail=True,
+                model, probe_cache, probe_lut, table, vocab, device, return_detail=True,
             )
         if not all(np.isfinite(list(scores.values()))) or not np.isfinite(losses).all():
             raise ValueError("Non-finite training loss or probe score")
@@ -104,7 +105,7 @@ def train_run(run, condition, seed, epochs=None):
         "final_test_acc": round(100 * history[-1]["acc"], 3), "history": history,
         "condition": condition, "generator_parameters": config["generator"],
         "generator_seed": generator["seed"], "cue_parameters": config["cues"],
-        "upstream": config["upstream"], "device": "cpu", "n_manifest": int(len(kept)),
+        "upstream": config["upstream"], "device": device, "n_manifest": int(len(kept)),
         "n_novocab": int((~kept).sum()), "frame_coverage": 1.0,
         "mean_weight": float(weights.mean()),
         "probe_counts": {s: {k: d[k] for k in ("n_scored", "n_oov", "n_total")} for s, d in details.items()},

@@ -1,4 +1,4 @@
-"""Generate transcripts, embed episode images, and train a CPU cue learner."""
+"""Generate transcripts, embed episode images, and train a cue learner."""
 
 import argparse
 
@@ -19,6 +19,8 @@ def main():
     embed = commands.add_parser("embed")
     embed.add_argument("--episodes", required=True)
     embed.add_argument("--output", required=True)
+    embed.add_argument("--device", help="Torch device (default: cuda if available, else cpu)")
+    embed.add_argument("--batch", type=int, default=64)
     train = commands.add_parser("train")
     train.add_argument("--run", required=True)
     train.add_argument("--condition", required=True)
@@ -29,7 +31,7 @@ def main():
         write_transcripts(args.episodes, args.output, args.seed,
                           **{k: getattr(args, k) for k in ("p_ref", "q_held", "p_name", "sigma", "rate_hz")})
     elif args.command == "embed":
-        embed_episodes(args.episodes, args.output)
+        embed_episodes(args.episodes, args.output, args.device, args.batch)
     else:
         train_run(args.run, args.condition, args.seed, args.epochs)
 

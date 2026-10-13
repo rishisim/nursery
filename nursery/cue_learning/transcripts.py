@@ -76,7 +76,8 @@ def generate_transcripts(frames, config, seed):
                 elif other:
                     referent = str(rng.choice(other))
                 else:
-                    raise ValueError("Referential sampling needs a visible non-held candidate on this frame")
+                    referential = False
+            if referential:
                 named = bool(rng.random() < parameters["p_name"])
                 templates = pool["named"] if named else pool["pronoun"]
                 text = str(rng.choice(templates))

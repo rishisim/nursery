@@ -1,8 +1,10 @@
 """CPU-only synthetic validation of transcript cues and upstream adapters."""
 
 import json
+from collections import Counter
 import os
 from pathlib import Path
+import re
 import socket
 import subprocess
 
@@ -195,6 +197,32 @@ def test_no_held_referents_and_category_independent_frames():
             assert not nouns.intersection(template.replace("{noun}", "").strip(".!?").split())
 
 
+def test_referential_draw_without_candidate_becomes_nonreferential():
+    frames = synthetic_frames(1000, 2)
+    frames["objects"] = '[]'
+    frames["held_category"] = None
+    config = load_config()
+    config["generator"].update(p_ref=1, p_name=1)
+    manifest, _ = generate_transcripts(frames, config, 10)
+    pool = json.loads((Path(__file__).parents[1] / "nursery/cue_learning/frames.json").read_text())
+    assert len(manifest) > 0
+    assert not manifest.referential.any() and manifest.referent.isna().all()
+    assert not manifest.named.any() and not manifest.held_referent.any()
+    assert set(manifest.text) <= set(pool["nonreferential"])
+
+
+def test_frames_have_no_frequent_pool_exclusive_words():
+    pool = json.loads((Path(__file__).parents[1] / "nursery/cue_learning/frames.json").read_text())
+    counts = [Counter(re.findall(r"[a-z]+(?:'[a-z]+)?", " ".join(templates).lower().replace("{noun}", "")))
+              for templates in pool.values()]
+    total = sum(counts, Counter())
+    exclusive = {word for word, count in total.items() if count >= 3 and sum(word in c for c in counts) == 1}
+    assert not exclusive
+    for word in ("the", "where's", "what's", "it", "that", "this", "your", "yours"):
+        rates = [c[word] for c in counts]
+        assert min(rates) > 0 and max(rates) <= 3 * min(rates)
+
+
 def test_reject_nonignored_outputs_and_unmatched_sessions(tmp_path):
     with pytest.raises(ValueError, match="ignored"):
         _output_directory(tmp_path / "unignored")
@@ -214,16 +242,20 @@ def test_transcript_writer_filters_train(episodes):
         write_transcripts(root, run, 4)
 
 
-def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch):
+@pytest.mark.parametrize("available,device", [(False, None), (True, None), (True, "cpu"), (False, "cuda:0")])
+def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch, available, device):
     import torch
 
     root, run = episodes
     module = _upstream_module("embed_regions")
     requested = []
+    batches = []
+    expected_device = device or ("cuda" if available else "cpu")
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: available)
 
     class Inputs(dict):
         def to(self, device):
-            assert device == "cpu"
+            assert device == expected_device
             return self
 
     class Processor:
@@ -233,6 +265,7 @@ def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch):
             return cls()
 
         def __call__(self, images, return_tensors):
+            batches.append(len(images))
             return Inputs(batch=len(images))
 
     class Encoder:
@@ -247,7 +280,7 @@ def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch):
             return self
 
         def to(self, device):
-            assert device == "cpu"
+            assert device == expected_device
             return self
 
         def __call__(self, batch):
@@ -256,7 +289,8 @@ def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch):
 
     monkeypatch.setattr(module, "AutoImageProcessor", Processor)
     monkeypatch.setattr(module, "AutoModel", Encoder)
-    embed_episodes(root, run)
+    embed_episodes(root, run, device=device, batch=31)
+    assert max(batches) == 31
     for name, count in (("train", 240), ("probes", 32)):
         emb = np.load(run / f"{name}_cache" / "emb.f16.npy")
         index = pd.read_parquet(run / f"{name}_cache" / "index.parquet")
@@ -267,9 +301,10 @@ def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch):
     assert requested == ["facebook/dinov2-base"] * 4
     assert set(pd.read_parquet(run / "train_frames.parquet").video_id) == {"v0", "v1"}
     # Resume uses upstream's own cache logic and performs no additional model loads.
-    embed_episodes(root, run)
+    embed_episodes(root, run, device="cpu")
     assert len(requested) == 4
     assert json.loads((run / "embedding.json").read_text())["device"] == "cpu"
+    assert json.loads((run / "embedding.json").read_text())["batch"] == 64
     provenance = json.loads((run / "embedding.json").read_text())
     provenance["episodes"] = "other"
     (run / "embedding.json").write_text(json.dumps(provenance))
@@ -316,9 +351,22 @@ def test_cpu_train_cli_one_epoch(episodes, upstream):
     assert model.region_prior is None and all(value.device.type == "cpu" for value in state.values())
 
 
-def test_weights_follow_upstream_filtered_pair_indices(episodes, upstream, monkeypatch):
+@pytest.mark.parametrize("device", ["cpu", "cuda"])
+def test_weights_follow_upstream_filtered_pair_indices(episodes, upstream, monkeypatch, device):
+    import torch
     from nursery.cue_learning.train import train_run
 
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: device == "cuda")
+    move = torch.Tensor.to
+    transfers = []
+
+    def to(tensor, *args, **kwargs):
+        if args and isinstance(args[0], (str, torch.device)) and str(args[0]) == "cuda":
+            transfers.append(tensor.shape)
+            args = ("cpu", *args[1:])
+        return move(tensor, *args, **kwargs)
+
+    monkeypatch.setattr(torch.Tensor, "to", to)
     root, run = episodes
     write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
     _fake_caches(root, run)
@@ -350,10 +398,13 @@ def test_weights_follow_upstream_filtered_pair_indices(episodes, upstream, monke
     selection_scores = iter([0.4, 0.9, 0.7, 0.1])
 
     def evaluate(*args, **kwargs):
+        assert args[5] == device
         return next(selection_scores), {"n_scored": 4, "n_oov": 0, "n_total": 4}
 
     monkeypatch.setattr(region, "eval_4afc_region", evaluate)
     metrics = train_run(run, "contact", 9, epochs=2)
+    assert metrics["device"] == device
+    assert bool(transfers) == (device == "cuda")
     np.testing.assert_allclose(observed, batches, atol=1e-7)
     assert metrics["n_novocab"] == 1 and metrics["n_pairs"] == len(manifest) - 1
     assert metrics["selected_epoch"] == 1 and metrics["reported_test_acc"] == 10
