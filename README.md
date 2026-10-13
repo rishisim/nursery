@@ -5,30 +5,6 @@ EmbodiedGen rooms and preparing the human-motion integration boundary.
 EmbodiedGen remains the native implementation for room generation, planning,
 asset retrieval and generation, URDF export, and collision-aware placement.
 
-## Training-only cue learner (Phase 1B)
-
-`nursery/cue_learning/` adapts egocentric episodes to the pinned
-[vlm-headcam](https://github.com/mcfrank/vlm-headcam) learner, comparing contact
-cue weights with unweighted, shuffled, shifted, noisy, and oracle controls.
-Only train sessions supply speech and vocabulary; disjoint dev/test probes
-select and evaluate the model. Embedding and training default to CUDA when available.
-
-The ignored venv `.external/cue-env/` was created with `uv venv --python 3.11 .external/cue-env`.
-Use that environment with the upstream checkout at the commit in `config.json`.
-
-```bash
-.external/cue-env/bin/python -m nursery.cue_learning transcripts \
-  --episodes outputs/egocentric_replay/run --output outputs/cue_learning/run --seed 7
-.external/cue-env/bin/python -m nursery.cue_learning embed \
-  --episodes outputs/egocentric_replay/run --output outputs/cue_learning/run \
-  --device cuda --batch 64
-.external/cue-env/bin/python -m nursery.cue_learning train \
-  --run outputs/cue_learning/run --condition contact --seed 7
-```
-
-Outputs must be ignored; use `--device cpu` for CPU embedding.
-Limitation: synthetic harness checks do not establish learning gains on real episodes.
-
 The active tracked implementation is organized as:
 
 ```text
@@ -42,6 +18,7 @@ nursery/humanoid/
 │   ├── run_motion.py
 │   └── validate_motion.py
 └── hoidini_intermimic/              Conversion and execute.py simulator launcher
+nursery/cue_learning/                Training-only cue learner on vlm-headcam
 ```
 
 `nursery/humanoid/embodiedgen_hoidini/` deterministically prepares a complete
@@ -430,3 +407,27 @@ verified.
 On Juno, run generation and rendering commands inside an appropriate Slurm
 allocation. See the upstream [EmbodiedGen documentation](https://horizonrobotics.github.io/EmbodiedGen/docs/index.html)
 for native installation and pipeline details.
+
+## Training-only cue learner
+
+`nursery/cue_learning/` adapts egocentric episodes to the pinned
+[vlm-headcam](https://github.com/mcfrank/vlm-headcam) learner, comparing contact
+cue weights with unweighted, shuffled, shifted, noisy, and oracle controls.
+Only train sessions supply speech and vocabulary; disjoint dev/test probes
+select and evaluate the model. Embedding and training default to CUDA when available.
+
+The ignored venv `.external/cue-env/` was created with `uv venv --python 3.11 .external/cue-env`.
+Use that environment with the upstream checkout at the commit in `config.json`.
+
+```bash
+.external/cue-env/bin/python -m nursery.cue_learning transcripts \
+  --episodes outputs/egocentric_replay/run --output outputs/cue_learning/run --seed 7
+.external/cue-env/bin/python -m nursery.cue_learning embed \
+  --episodes outputs/egocentric_replay/run --output outputs/cue_learning/run \
+  --device cuda --batch 64
+.external/cue-env/bin/python -m nursery.cue_learning train \
+  --run outputs/cue_learning/run --condition contact --seed 7
+```
+
+Outputs must be ignored; use `--device cpu` for CPU embedding.
+Limitation: synthetic harness checks do not establish learning gains on real episodes.
