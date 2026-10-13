@@ -95,3 +95,69 @@ Stage-C NO-GO, and the visual/camera failures preclude both
 This is public/synthetic engineering evidence only. It is not infant-trained,
 age-matched, ChildLens-calibrated, human-validated, or biologically
 torque-valid.
+
+## Bounded Stage-C reconstruction follow-up (2026-08-03)
+
+Decision: **PASS for the separate eight-second registration question.** This
+does not revise the 56-second gate's NO-GO above. It repairs and tests only the
+specific claim that the retained free-object kernel can be replayed through the
+weighted skin, a correct child-facing workspace, a neutral body-derived camera,
+and an inspectable physics overlay.
+
+The reconstruction records palm rotations, independent digit closures, every
+physical digit-segment pose and velocity, object angular velocity, measured
+contact point/normal/separation, and root/torso/neck/head state at the shared
+240 Hz to 30 Hz clock. The approximately 50-degree target-facing camera and the
+backwards `-Z` workspace were removed. The replacement optical origin is 45.32
+mm outside the head-weighted skin, has zero-degree neutral mount error, uses a
+68-degree vertical FOV, and inherits at most 1.61 degrees of roll. The avatar
+faces `+Z`; the target-front dot product is 1.0.
+
+The manipulation controller was also corrected after dense video/contact
+review. Rotating two wrists in place made the cube look unsupported and dropped
+thumb opposition. The accepted primitive instead orbits both hand frames about
+the lifted interaction center while the object remains a free dynamic PhysX
+body. Across the accepted run:
+
+- lift is 89.65 mm and rotation is 24.99 degrees;
+- thumb-plus-nonthumb opposition is qualified in all 91 required render
+  intervals, with 812 right-thumb, 1,101 right-nonthumb, and 275 left-support
+  contact physics steps;
+- maximum finger penetration is 2.697 mm, maximum palm speed is 0.174 m/s,
+  maximum commanded palm angular speed is 37.50 degrees/s, and no hand contact
+  remains in the final quarter-second;
+- the assistance ledger is empty: zero object pose writes after initialization,
+  external forces, attachments, or joints;
+- a fresh-process same-machine rerun is byte-identical for the authority trace,
+  contact trace, and report.
+
+The 241-frame 1920x1080 replay passes its frozen registration checks: palm
+maximum error 9.92 mm, contact-to-correct-digit p95/max 7.97/8.02 mm, and first
+visible/physical touch difference zero frames. Clean head and external renders
+contain one weighted child and zero collider pixels. A third separately
+labeled QA video identifies green right-hand colliders, cyan left-hand
+colliders, and magenta physical contact points so that these overlays cannot be
+misread as a second body.
+
+Full-video review used 4 Hz dense timelines (96 inspected samples across the
+three videos), in addition to event frames and `ffprobe`. The child is no
+longer backwards and the target is visible throughout touch, lift, turn,
+release, and withdrawal. The result is nevertheless a deliberately simple
+simulator diagnostic. The unclothed generic skin, rigid cube, sparse stylized
+materials, limited camera motion, and only partly readable clean-view finger
+envelopment are not ChildLens-like appearance evidence.
+
+Ignored root: `runs/embodied_simulation/stage_c_reconstruction/`.
+
+- Authority trace SHA-256 `73c55f713d7ed022cff36f88c7da36e37db0af5a7826f1ca948dccf76ba04232`.
+- Contact trace SHA-256 `e856e892ad7bdebf2432315e4283153794c3a3d30d897e1a343993cb6a07fd83`.
+- Registered trace SHA-256 `c634f01edafb8564776adec6b6652988aa49f2f54577f0cb8e0f8be4566d160d`.
+- Head video SHA-256 `616b1fd810daeec0ed5dbfb7ace18feb20ad677e838f522293485295ca936c89`.
+- Clean external video SHA-256 `89f5555f129030d2ed11217a4352440d97148a2ff1015b19dbaf566f14b0a3ab`.
+- Labeled physics-overlay video SHA-256 `452098e146bb77c61cad07f41b163eada35b36a3e2252823040c5759356c587b`.
+
+The smallest next scientific gate is not another longer baseline episode. It
+is to add same-state metric depth and persistent identity/contact masks to this
+exact accepted trace, then audition one tightly conditioned appearance pass
+that must preserve hand/object silhouettes and registered contact timing. No
+appearance run was performed here, and no restricted child media was accessed.
