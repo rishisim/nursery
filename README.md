@@ -431,3 +431,116 @@ Use that environment with the upstream checkout at the commit in `config.json`.
 
 Outputs must be ignored; use `--device cpu` for CPU embedding.
 Limitation: synthetic harness checks do not establish learning gains on real episodes.
+
+## Egocentric GRAB replay
+
+`nursery/egocentric_replay/` reconstructs recorded subject-specific SMPL-X
+motion with 24-component PCA hands and `flat_hand_mean=True`, following
+HOIDiNi's GRAB full-body loader. It makes hard-cut sessions of exactly the
+configured integer duration, samples at 1 Hz, and uses the head's kinematic
+rotation for the camera. The actor, object, and real GRAB table share a rigid
+placement in an open floor area. Three distinct small distractors are placed
+on the actual tabletop away from the full recorded object trajectory; colors
+are randomized by session. Conservative floor/support raycasts and obstacle
+bounds reject interactions that do not fit, rather than changing the motion.
+
+Use an ignored local environment and keep all licensed inputs at their
+installed absolute paths:
+
+```bash
+uv venv --python 3.11 .external/egocentric-env
+uv pip install --python .external/egocentric-env/bin/python \
+  smplx torch numpy scipy trimesh rtree pyarrow pillow pytest
+
+PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python \
+  -m nursery.egocentric_replay build \
+  --config nursery/egocentric_replay/config.json --rooms /path/to/room_bank \
+  --output outputs/egocentric_replay/run --sessions-per-subject 2 --seed 7
+
+PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python \
+  -m nursery.egocentric_replay preview \
+  --episodes outputs/egocentric_replay/run \
+  --output outputs/egocentric_replay/contact_sheet.png
+```
+
+The package-local config is the canonical protocol. The room bank must contain
+at least two `*/urdf/export_scene/scene.urdf` exports with OBJ visuals. The first
+room is reserved for train sessions; remaining rooms supply dev/test sessions
+and probes. Subjects s1–s8 train, s9 dev, and s10 test. Probes cover the full
+GRAB category set, with eight images per category per dev/test split by default.
+Rooms, category identities, source hashes, body-model hashes, software versions,
+and table hashes are recorded in the manifest. No licensed inputs are copied
+into tracked files or sent to a remote host.
+
+`--session-index INDEX` selects one session from the same deterministic
+subject-major schedule and excludes probes. Each worker must receive its own
+new ignored output root; it writes the contract tables for that session, with
+an empty probe table. Shard consolidation belongs to Phase 2.
+
+Cycles CPU is the default renderer. RGB and a second raw emission instance-ID
+pass share geometry and camera; dithering and denoising are disabled and the filter width is minimized
+for IDs. Pixel counts and 4×4 cells come from that pass. Mesh importing and URDF
+transforms reuse the existing EmbodiedGen Blender helpers, and launching reuses
+`_run_native`. `device=GPU` explicitly selects Metal on macOS or CUDA on Linux;
+unavailable devices fail. Performance on Juno has not been measured.
+
+### Phase 1A validation status
+
+The synthetic tests cover contract types/nullability, exact mask pixels and
+cells, session trimming/timebases, subject splits, worker selection, output
+safety, and contact rejection before rendering:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python -m pytest \
+  -q -p no:cacheprovider tests/test_egocentric_replay.py
+```
+
+The supplied `GRAB_RETARGETED_compressed` data fails the requested reconstruction
+check. HOIDiNi's `smplx_retargeting.py` modifies body poses/translations and the
+separate 45-dimensional hand poses for a neutral body, while leaving the
+original body-hand PCA fields unchanged. The adapter intentionally retains the
+requested subject-template/PCA construction. It rejects sessions whose median
+object-surface distance reaches 1 cm, reporting both contact-labelled vertices
+and all vertices of contacting hands; both populations must pass. Successful
+sessions also require at least two visible categories in every frame.
+
+The attempted s1/s9/s10, two-session, 120-second pilot stopped before rendering
+its first session: labelled median **0.062041 m**, whole contacting-hand median
+**0.068546 m**. Neutral-body/45D reconstruction was diagnosed only, not adopted;
+in six sampled `s1/mug_pass_1` right-contact frames it gave **0.007789 m** for
+labelled vertices but **0.033104 m** across the hand, still failing the full-hand
+gate. Original-GRAB input or an explicit protocol change is needed before a
+valid real-session pilot can be claimed.
+
+Local Blender 5.2.2 CPU smoke validation rendered two synthetic RGB/ID pairs in
+0.489 seconds, yielding exactly IDs 0/1 and 200 active-object pixels per frame.
+A four-image RGB probe comparison took 0.886 seconds on CPU and 2.770 seconds
+on warm Metal GPU; the first GPU smoke batch took 306.6 seconds. These small-scene
+measurements do not estimate real-session or Juno throughput. Full-scale build,
+real hand/distractor legibility, contact visibility rates, and credible
+110,000-second/Juno scaling projections remain blocked or unmeasured.
+
+The independent local probe pilot completed **816 images**, covering all **51
+categories** with eight images per dev/test split, in **180.924 seconds**
+(**270.61 images/minute**). All JPEGs decoded at 320×240. Probe viewpoints scale
+with object size; inspection of the contact sheet found the shapes readable,
+including small props, with visible Monte Carlo grain. This is a probe-only
+artifact, not a complete episode root. It is retained under ignored
+`outputs/egocentric_replay/probe_pilot/`, alongside the failed session receipt in
+`outputs/egocentric_replay/pilot/failure.json` and the synthetic renderer
+inspection in `outputs/egocentric_replay/renderer_contact_sheet.png`. Nothing was
+synced to Juno.
+
+The planned six sessions have **456/720 contact-labelled samples (63.33%)**;
+**zero real session frames** rendered, so visible-category and held-object
+visibility rates are unavailable. The small synthetic scene achieved **245.34
+RGB/ID pairs per minute**. Arithmetic extrapolation of that renderer alone
+gives **7.47 hours per worker** for 110,000 images, or **7.47/N hours** for N
+workers (0.93 hours at N=8). This excludes real-body geometry, contact-distance
+validation, loading, scheduling, and hardware differences; it is not a
+validated wall-clock projection for Juno CPU or GPU nodes. The source input or
+reconstruction/contact protocol must be resolved before measuring that pilot.
+
+The loader/retargeter inspection used clean HOIDiNi commit
+`0fc3a78da4d0a6372efd4e52f89c54fd590ce32b`. Blender Python failures propagate
+through `--python-exit-code 1`; renderer errors cannot silently finish a build.
