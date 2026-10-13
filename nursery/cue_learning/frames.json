@@ -1,0 +1,46 @@
+{
+  "named": [
+    "look at the {noun}.", "there's the {noun}.", "here's the {noun}.", "do you see the {noun}?",
+    "can you find the {noun}?", "where's the {noun}?", "that's the {noun}.", "this is the {noun}.",
+    "you found the {noun}!", "oh, the {noun}!", "want the {noun}?", "do you want the {noun}?",
+    "shall we get the {noun}?", "let's look at the {noun}.", "can I see the {noun}?",
+    "show me the {noun}.", "let me see the {noun}.", "there goes the {noun}.",
+    "here comes the {noun}.", "what about the {noun}?", "how about the {noun}?",
+    "is that the {noun}?", "did you see the {noun}?", "you've got the {noun}.",
+    "I've got the {noun}.", "we have the {noun}.", "there it is, the {noun}.",
+    "here it is, the {noun}.", "look, the {noun}.", "see the {noun}?", "the {noun} is right here.",
+    "the {noun} is over there.", "let's find the {noun}.", "let's get the {noun}.",
+    "can you get the {noun}?", "can you show me the {noun}?", "that's the {noun}, yes.",
+    "oh, there's the {noun}.", "here's your {noun}.", "where did the {noun} go?",
+    "did we find the {noun}?", "shall I get the {noun}?", "you can have the {noun}.",
+    "do you like the {noun}?", "let's see the {noun}.", "I see the {noun}.",
+    "is this your {noun}?", "is that your {noun}?", "now we have the {noun}.", "there's your {noun}."
+  ],
+  "pronoun": [
+    "look at that.", "do you want it?", "there it is.", "here it is.", "do you see it?",
+    "can you find it?", "where is it?", "what's that?", "look at this.", "see that?",
+    "you found it!", "oh, there it is!", "want this?", "shall we get it?", "let's look at it.",
+    "can I see it?", "show me that.", "let me see it.", "there it goes.", "here it comes.",
+    "what about this?", "how about that?", "is that it?", "did you see that?", "you've got it.",
+    "I've got it.", "we have it now.", "it's right here.", "it's over there.", "let's find it.",
+    "let's get that.", "can you get it?", "can you show me that?", "that's it, yes.",
+    "oh, look at that.", "here's yours.", "where did it go?", "did we find it?", "shall I get it?",
+    "you can have it.", "do you like it?", "let's see that.", "I see it.", "is this yours?",
+    "is that yours?", "now we have it.", "there's yours.", "what have you got there?",
+    "can you see this?", "take a look at that."
+  ],
+  "nonreferential": [
+    "are you ready?", "here we go.", "one more time.", "let's try again.", "that's all right.",
+    "you're doing fine.", "good job!", "thank you, sweetheart.", "come over here.", "sit with me.",
+    "shall we play?", "do you want to play?", "let's have a little rest.", "are you tired?",
+    "you're getting sleepy.", "it's nearly time to go.", "we'll be back soon.", "wait a little bit.",
+    "just a minute.", "hold on, sweetie.", "I'm right here.", "come on, then.", "off we go.",
+    "let's do some more.", "would you like some more?", "all done?", "we're all done now.",
+    "that was fun.", "did you have fun?", "you make me smile.", "what shall we do now?",
+    "it's your turn.", "now it's my turn.", "we can take turns.", "nice and easy.",
+    "slow down a little.", "let's be gentle.", "oh, bless you!", "excuse me.", "you're welcome.",
+    "yes, I know.", "mm hmm, I hear you.", "tell me some more.", "what did you say?",
+    "shall we sing?", "let's sing together.", "I love you.", "can I have a cuddle?",
+    "time for a little break.", "we can do it together."
+  ]
+}

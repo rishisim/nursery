@@ -1,5 +1,93 @@
 # Nursery Embodied Scene
 
+## Training-only cue learner (Phase 1B)
+
+`nursery/cue_learning/` adapts contract-format egocentric episodes to Michael
+Frank's [vlm-headcam](https://github.com/mcfrank/vlm-headcam) learner, pinned to
+`07244f5af7093dcd3392a741db3e7a299bdbb031` in its package-local `config.json`.
+The upstream checkout is a dependency and is never edited. All commands here
+run on the laptop CPU, including the frozen DINOv2 embedding adapter; no Juno,
+CUDA, MPS, or restricted GRAB data is used by local validation.
+
+Prepare the ignored dependency checkout and use a Python environment containing
+NumPy, pandas, PyArrow, Torch, Pillow, Transformers, and pytest:
+
+```bash
+git clone https://github.com/mcfrank/vlm-headcam .external/vlm-headcam
+git -C .external/vlm-headcam checkout --detach 07244f5af7093dcd3392a741db3e7a299bdbb031
+python -m nursery.cue_learning transcripts \
+  --episodes outputs/egocentric_replay/run --output outputs/cue_learning/run --seed 7
+python -m nursery.cue_learning embed \
+  --episodes outputs/egocentric_replay/run --output outputs/cue_learning/run
+python -m nursery.cue_learning train \
+  --run outputs/cue_learning/run --condition contact --seed 7
+```
+
+Every output writer rejects paths outside ignored repository directories. The
+transcript command saves `manifest.parquet` and `generator.json`; the embedding
+command saves `embedding.json` provenance, `train_frames.parquet`, `probes_frames.parquet`, and `train_cache/`
+and `probes_cache/`, each in upstream's `index.parquet` + float16
+`emb.f16.npy` format (CLS + 4×4 grid). Only train sessions supply transcripts,
+vocabulary, and training images. Probe rooms must be disjoint from train rooms.
+Embedding calls upstream `embed_regions.main` with its default
+`facebook/dinov2-base`, substituting only image paths, a CPU device check, and
+batch size 16. Its first real invocation downloads that encoder into the
+ignored run's `encoder_cache/`; tests replace both encoder loaders.
+
+The generator uses exponential interarrival times at 1/3 Hz, nearest-frame
+pinning, and rounded Normal jitter with boundary clipping. Referential intent
+and the held/visible referent are sampled before jitter; contact and oracle
+visibility are read afterward. A scene must offer a visible non-held object
+when that sampling branch is taken; otherwise generation fails explicitly.
+The 150 original caregiver-style utterance frames in `frames.json` are not
+CHILDES quotations. Named templates are shared uniformly by every category,
+so only their noun slots identify an object. GRAB size variants share nouns
+(block, tube, pyramid, ball, ring); probe categories are pooled by those nouns.
+
+Available conditions are `none`, `contact`, `shuffled`, `shifted`,
+`noisy_0.1`, `noisy_0.25`, `noisy_0.5`, and `oracle`. Configuration holds the
+51 category-to-noun mappings, generator defaults, cue settings, and upstream
+training defaults (20 epochs, window ±2 s, min frequency 5). CLI overrides
+include `--p-ref`, `--q-held`, `--p-name`, `--sigma`, `--rate-hz`, and training
+`--epochs`. Integer shift Δ reads cue[t+Δ] cyclically. Noisy cues are flipped
+once per frame, not once per utterance. Speech and cue randomness use separate
+seeded streams. Shuffled donors are a derangement within equal-length train
+session groups: each donor is used once, preserving the aggregate frame-level
+contact marginal exactly. Each length needs at least two sessions. Unequal
+length repetition/truncation cannot guarantee that marginal, so singleton
+length groups are rejected. Utterance sampling can change observed cue
+marginals; every manifest weight column is nevertheless rescaled to mean 1.
+
+Training imports upstream `FramePairs`, tokenizer, vocabulary builder,
+`collate`, `RegionMIL`, and `eval_4afc_region`. The short loop changes only the
+per-pair `w` argument; it uses all batches, including a partial last batch,
+and rescales weights again after upstream's vocabulary filtering. Missing
+cache coverage is fatal. No cues, referents, visibility, or region priors
+enter evaluation. The saved state loads into unmodified upstream `RegionMIL`.
+Each condition/seed gets `<run>/<condition>_s<seed>/model.pt`, `vocab.json`,
+and `metrics.json`; existing training outputs are refused. Metrics retain all
+upstream frame-MIL fields and add the condition, generator/cue parameters,
+generator seed, pin, CPU device, and coverage/probe counts.
+
+Dev and test probes are scored with upstream's fixed seed 0 and 100 trials
+per category; the first best dev epoch selects the saved state and reported
+test score. Upstream requires ≥4 images per noun and ≥4 in-vocabulary nouns
+in each split; this adapter fails clearly for smaller benchmarks instead of
+writing NaN or silently omitting undersized categories. Remaining OOV nouns
+receive upstream's chance credit. Test scores never select the epoch.
+
+Local offline synthetic validation:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 python -m pytest \
+  -q -s -p no:cacheprovider tests/test_cue_learning.py
+```
+
+Tests use temporary ignored episode roots, fake encoder loaders, and random
+small region caches; they do not download models or access the network.
+Upstream-dependent tests skip explicitly if the pinned checkout is absent.
+These are harness checks, not evidence of cue-learning gains on real episodes.
+
 This branch contains the lightweight Nursery adapters for generating reusable
 EmbodiedGen rooms and preparing the human-motion integration boundary.
 EmbodiedGen remains the native implementation for room generation, planning,

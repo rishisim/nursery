@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "upstream": {
+    "url": "https://github.com/mcfrank/vlm-headcam",
+    "commit": "07244f5af7093dcd3392a741db3e7a299bdbb031"
+  },
+  "generator": {"rate_hz": 0.3333333333333333, "p_ref": 0.15, "q_held": 0.6, "p_name": 0.5, "sigma": 1.0},
+  "cues": {"w_hi": 1.0, "w_lo": 0.2, "shift_s": 10, "noise_eps": [0.1, 0.25, 0.5]},
+  "training": {"epochs": 20, "batch": 256, "lr": 0.0003, "window": 2, "min_freq": 5},
+  "vocabulary": {
+    "airplane": "plane", "alarmclock": "clock", "apple": "apple", "banana": "banana",
+    "binoculars": "binoculars", "bowl": "bowl", "camera": "camera",
+    "cubelarge": "block", "cubemedium": "block", "cubesmall": "block", "cup": "cup",
+    "cylinderlarge": "tube", "cylindermedium": "tube", "cylindersmall": "tube",
+    "doorknob": "knob", "duck": "duck", "elephant": "elephant", "eyeglasses": "glasses",
+    "flashlight": "flashlight", "flute": "flute", "fryingpan": "pan",
+    "gamecontroller": "controller", "hammer": "hammer", "hand": "hand",
+    "headphones": "headphones", "knife": "knife", "lightbulb": "bulb", "mouse": "mouse",
+    "mug": "mug", "phone": "phone", "piggybank": "bank",
+    "pyramidlarge": "pyramid", "pyramidmedium": "pyramid", "pyramidsmall": "pyramid",
+    "scissors": "scissors", "spherelarge": "ball", "spheremedium": "ball", "spheresmall": "ball",
+    "stamp": "stamp", "stanfordbunny": "bunny", "stapler": "stapler", "teapot": "teapot",
+    "toothbrush": "toothbrush", "toothpaste": "toothpaste",
+    "toruslarge": "ring", "torusmedium": "ring", "torussmall": "ring",
+    "train": "train", "watch": "watch", "waterbottle": "bottle", "wineglass": "glass"
+  }
+}
