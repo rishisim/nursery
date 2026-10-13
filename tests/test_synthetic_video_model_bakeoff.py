@@ -1,0 +1,592 @@
+from __future__ import annotations
+
+import copy
+import json
+import urllib.parse
+from decimal import Decimal
+from pathlib import Path
+
+import pytest
+
+import nursery_egobaby_preflight.synthetic_video_model_bakeoff as bakeoff_module
+from nursery_egobaby_preflight.contract import canonical_json_sha256
+from nursery_egobaby_preflight.synthetic_video_model_bakeoff import (
+    GeminiInteractionsClient,
+    OpenRouterVideoClient,
+    compile_bakeoff_work_order,
+    execute_bakeoff,
+    finalize_blinded_review,
+    inspect_blinded_review_status,
+    load_bakeoff_config,
+    planned_cost_usd,
+    validate_bakeoff_config,
+    validate_work_order,
+    write_bakeoff_work_order,
+)
+from nursery_egobaby_preflight.synthetic_video_pilot import (
+    compile_prompt,
+    load_config as load_public_pilot_config,
+)
+from nursery_egobaby_preflight.synthetic_video_quality_ceiling import (
+    load_quality_config,
+)
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+BAKEOFF_CONFIG_PATH = Path("configs/synthetic_video_model_bakeoff.json")
+PUBLIC_CONFIG_PATH = Path("configs/synthetic_video_public_pilot.json")
+COMPLETED_QUALITY_PATH = Path("configs/synthetic_video_quality_ceiling.json")
+CURATED_RESULT_PATH = Path("results/synthetic_video_model_bakeoff.json")
+
+
+@pytest.fixture
+def bakeoff_config() -> dict:
+    return load_bakeoff_config(BAKEOFF_CONFIG_PATH)
+
+
+@pytest.fixture
+def public_config() -> dict:
+    return load_public_pilot_config(PUBLIC_CONFIG_PATH)
+
+
+@pytest.fixture
+def completed_quality() -> dict:
+    return load_quality_config(COMPLETED_QUALITY_PATH)
+
+
+def _order(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+) -> dict:
+    return compile_bakeoff_work_order(
+        bakeoff_config,
+        public_config,
+        completed_quality,
+        REPOSITORY_ROOT,
+        "model-bakeoff-test",
+    )
+
+
+def test_bakeoff_contract_is_frozen_public_only_and_cost_bounded(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+) -> None:
+    validate_bakeoff_config(
+        bakeoff_config,
+        public_config,
+        completed_quality,
+        REPOSITORY_ROOT,
+    )
+    assert planned_cost_usd(bakeoff_config) == Decimal("4.66")
+    assert bakeoff_config["authorization"]["paid_execution_authorized"] is True
+    assert bakeoff_config["provider_cost"]["user_authorized_new_spend_usd"] == 6
+    assert bakeoff_config["authorization"]["scientific_training_use_authorized"] is False
+    assert bakeoff_config["comparison"]["provider_specific_prompt_changes"] == "none"
+    assert bakeoff_config["new_families"]["gemini_omni_flash"]["model"] == (
+        "gemini-omni-flash-preview"
+    )
+    assert bakeoff_config["new_families"]["minimax_h3"]["model"] == (
+        "minimax/hailuo-3"
+    )
+    assert bakeoff_config["new_families"]["minimax_h3"][
+        "credential_environment_variable"
+    ] == "OPENROUTER_API_KEY"
+    assert bakeoff_config["provider_cost"]["gemini"][
+        "maximum_expected_charge_usd"
+    ] == 2.06
+    assert bakeoff_config["provider_cost"]["minimax"][
+        "maximum_expected_charge_usd"
+    ] == 2.6
+
+
+def test_curated_result_matches_frozen_protocol_and_work_order(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+) -> None:
+    result = json.loads(CURATED_RESULT_PATH.read_text())
+    order = compile_bakeoff_work_order(
+        bakeoff_config,
+        public_config,
+        completed_quality,
+        REPOSITORY_ROOT,
+        result["run_id"],
+    )
+    assert result["status"] == "COMPLETE_QUALITATIVE_SCREEN"
+    assert result["protocol"]["bakeoff_protocol_sha256"] == canonical_json_sha256(
+        bakeoff_config
+    )
+    assert result["protocol"]["public_pilot_protocol_sha256"] == (
+        canonical_json_sha256(public_config)
+    )
+    assert result["protocol"]["completed_quality_protocol_sha256"] == (
+        canonical_json_sha256(completed_quality)
+    )
+    assert len(result["protocol"]["work_order_sha256"]) == 64
+    int(result["protocol"]["work_order_sha256"], 16)
+    for family in bakeoff_module.NEW_FAMILIES:
+        records = result["execution"]["new_families"][family]["attempts"]
+        expected = [
+            attempt
+            for attempt in order["attempts"]
+            if attempt["family"] == family
+        ]
+        assert [record["scene_id"] for record in records] == [
+            attempt["scene_id"] for attempt in expected
+        ]
+        assert [record["request_sha256"] for record in records] == [
+            attempt["request_sha256"] for attempt in expected
+        ]
+        assert all(record["status"] == "media_valid" for record in records)
+    assert result["execution"]["new_media_valid_count"] == 8
+    assert result["blinded_qualitative_screen"]["family_metrics"][
+        "gemini_omni_flash"
+    ]["primary_visual"]["pass"] == 27
+    assert result["decisions"]["gemini_omni_flash"][
+        "competitive_with_seedance"
+    ] is True
+    assert result["decisions"]["minimax_h3"][
+        "competitive_with_seedance"
+    ] is True
+    assert result["provider_usage_and_cost"]["maximum_expected_new_charge_usd"] == (
+        4.66
+    )
+    assert result["provider_usage_and_cost"][
+        "openrouter_reported_minimax_usage"
+    ]["cost_usd"] == pytest.approx(2.574)
+    result_text = CURATED_RESULT_PATH.read_text()
+    assert '"interaction_id":' not in result_text
+    assert '"generation_id":' not in result_text
+    assert "OPENROUTER_API_KEY" not in result_text
+    assert "GEMINI_API_KEY" not in result_text
+
+
+def test_work_order_compiles_eight_exact_prompt_requests_and_sixteen_cards(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+) -> None:
+    order = _order(bakeoff_config, public_config, completed_quality)
+    assert len(order["attempts"]) == 8
+    assert len(order["scenes"]) == 4
+    assert sum(len(scene["presentation"]) for scene in order["scenes"]) == 16
+    assert order["planned_cost_usd"] == 4.66
+    assert set(order["blinding_key"]) == {
+        card["blinded_display_id"]
+        for scene in order["scenes"]
+        for card in scene["presentation"]
+    }
+    public_order = {
+        key: value for key, value in order.items() if key != "blinding_key"
+    }
+    expected_hash = public_order.pop("work_order_sha256")
+    assert canonical_json_sha256(public_order) == expected_hash
+
+    for attempt in order["attempts"]:
+        prompt = compile_prompt(public_config, "ltx", attempt["scene_id"])
+        assert attempt["prompt"] == prompt
+        assert attempt["provider_seed_requested"] is None
+        assert "seed" not in json.dumps(attempt["request"]).lower()
+        if attempt["family"] == "gemini_omni_flash":
+            assert attempt["request"]["input"] == prompt
+            assert attempt["request"]["store"] is False
+            assert attempt["request"]["response_format"]["duration"] == "5s"
+            assert attempt["request"]["response_format"]["delivery"] == "inline"
+            assert attempt["planned_charge_usd"] == pytest.approx(0.515)
+        else:
+            assert attempt["request"]["prompt"] == prompt
+            assert attempt["request"]["model"] == "minimax/hailuo-3"
+            assert attempt["request"]["resolution"] == "2K"
+            assert attempt["request"]["duration"] == 5
+            assert attempt["request"]["aspect_ratio"] == "16:9"
+            assert attempt["request"]["generate_audio"] is True
+            assert attempt["planned_charge_usd"] == pytest.approx(0.65)
+
+
+def test_work_order_rejects_rehashed_request_tampering(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+) -> None:
+    order = _order(bakeoff_config, public_config, completed_quality)
+    order["attempts"][0]["request"]["input"] = "tampered"
+    unhashed = {
+        key: value
+        for key, value in order.items()
+        if key not in {"work_order_sha256", "blinding_key"}
+    }
+    order["work_order_sha256"] = canonical_json_sha256(unhashed)
+    with pytest.raises(ValueError, match="attempts changed"):
+        validate_work_order(
+            bakeoff_config,
+            public_config,
+            completed_quality,
+            REPOSITORY_ROOT,
+            order,
+        )
+
+
+def test_work_order_separates_key_and_writes_family_free_qa(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+    tmp_path: Path,
+) -> None:
+    order = _order(bakeoff_config, public_config, completed_quality)
+    work_order_path = write_bakeoff_work_order(
+        tmp_path,
+        order,
+        bakeoff_config,
+        public_config,
+    )
+    public_order = json.loads(work_order_path.read_text())
+    key_path = tmp_path / "blinding_key.json"
+    key = json.loads(key_path.read_text())
+    assert "blinding_key" not in public_order
+    assert canonical_json_sha256(key) == public_order["blinding_key_sha256"]
+    assert key_path.stat().st_mode & 0o777 == 0o600
+    qa_paths = sorted((tmp_path / "qa").glob("*.json"))
+    assert len(qa_paths) == 16
+    for path in qa_paths:
+        qa = json.loads(path.read_text())
+        assert "family" not in qa
+        assert "attempt_id" not in qa
+        assert len(qa["items"]) == 10
+        assert [item["scope"] for item in qa["items"][-2:]] == [
+            "secondary_presentation",
+            "secondary_presentation",
+        ]
+
+
+def test_review_status_remains_blinded_while_records_are_pending(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+    tmp_path: Path,
+) -> None:
+    order = _order(bakeoff_config, public_config, completed_quality)
+    write_bakeoff_work_order(tmp_path, order, bakeoff_config, public_config)
+    public_order = json.loads((tmp_path / "work_order.json").read_text())
+    status = inspect_blinded_review_status(
+        bakeoff_config,
+        public_config,
+        completed_quality,
+        public_order,
+        repository_root=REPOSITORY_ROOT,
+        run_root=tmp_path,
+    )
+    assert status["status"] == "BLINDED_QA_INCOMPLETE"
+    assert status["record_counts"] == {
+        "complete": 0,
+        "pending": 16,
+        "missing": 0,
+    }
+    serialized = json.dumps(status)
+    assert '"family"' not in serialized
+    assert '"attempt_id"' not in serialized
+
+
+def test_paid_runner_refuses_preapproval_protocol_before_contacting_providers(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+    tmp_path: Path,
+) -> None:
+    awaiting = copy.deepcopy(bakeoff_config)
+    awaiting["status"] = "FROZEN_AWAITING_CREDENTIALS_AND_SPEND_APPROVAL"
+    awaiting["authorization"]["paid_execution_authorized"] = False
+    awaiting["provider_cost"]["user_authorized_new_spend_usd"] = None
+    order = compile_bakeoff_work_order(
+        awaiting,
+        public_config,
+        completed_quality,
+        REPOSITORY_ROOT,
+        "model-bakeoff-test",
+    )
+    with pytest.raises(ValueError, match="not authorized"):
+        execute_bakeoff(
+            awaiting,
+            public_config,
+            completed_quality,
+            order,
+            repository_root=REPOSITORY_ROOT,
+            run_root=tmp_path,
+            approved_spend_usd=Decimal("4.66"),
+            gemini_api_key="unused",
+            openrouter_api_key="unused",
+            implementation_commit="a" * 40,
+        )
+
+
+def test_authorized_protocol_still_requires_exact_spend(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+    tmp_path: Path,
+) -> None:
+    authorized = copy.deepcopy(bakeoff_config)
+    authorized["status"] = "FROZEN_EXECUTION_AUTHORIZED"
+    authorized["authorization"]["paid_execution_authorized"] = True
+    authorized["provider_cost"]["user_authorized_new_spend_usd"] = 4.66
+    validate_bakeoff_config(
+        authorized,
+        public_config,
+        completed_quality,
+        REPOSITORY_ROOT,
+    )
+    order = compile_bakeoff_work_order(
+        authorized,
+        public_config,
+        completed_quality,
+        REPOSITORY_ROOT,
+        "model-bakeoff-test",
+    )
+    with pytest.raises(ValueError, match="exactly match"):
+        execute_bakeoff(
+            authorized,
+            public_config,
+            completed_quality,
+            order,
+            repository_root=REPOSITORY_ROOT,
+            run_root=tmp_path,
+            approved_spend_usd=Decimal("5"),
+            gemini_api_key="unused",
+            openrouter_api_key="unused",
+            implementation_commit="a" * 40,
+        )
+
+
+def test_provider_clients_reject_untrusted_urls_and_parse_documented_outputs(
+) -> None:
+    gemini = GeminiInteractionsClient("secret")
+    with pytest.raises(ValueError, match="untrusted"):
+        gemini.create("https://example.com/v1beta/interactions", {"input": "x"})
+    with pytest.raises(ValueError, match="untrusted"):
+        gemini.download_uri(
+            "https://example.com/v1beta/files/x:download",
+            Path("unused"),
+        )
+    assert GeminiInteractionsClient.video_output(
+        {
+            "steps": [
+                {
+                    "type": "model_output",
+                    "content": [
+                        {
+                            "type": "video",
+                            "mime_type": "video/mp4",
+                            "uri": (
+                                "https://generativelanguage.googleapis.com/"
+                                "v1beta/files/file_123:download?alt=media"
+                            ),
+                        }
+                    ],
+                }
+            ]
+        }
+    )["mime_type"] == "video/mp4"
+    assert GeminiInteractionsClient.file_name_from_uri(
+        "https://generativelanguage.googleapis.com/"
+        "v1beta/files/file_123:download?alt=media"
+    ) == "file_123"
+
+    openrouter = OpenRouterVideoClient("secret")
+    with pytest.raises(ValueError, match="untrusted"):
+        openrouter.submit("https://example.com/api/v1/videos", {"model": "x"})
+    with pytest.raises(ValueError, match="untrusted"):
+        openrouter.download_content(
+            "https://example.com/output.mp4",
+            Path("unused"),
+        )
+
+
+def test_openrouter_h3_submit_poll_and_download_contract(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+    tmp_path: Path,
+) -> None:
+    calls = []
+
+    class Response:
+        def __init__(self, payload: bytes) -> None:
+            self.payload = payload
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return None
+
+        def read(self) -> bytes:
+            return self.payload
+
+    def opener(request, *, timeout):
+        calls.append(request)
+        path = urllib.parse.urlparse(request.full_url).path
+        if request.method == "POST":
+            return Response(
+                json.dumps({"id": "job-123", "status": "pending"}).encode()
+            )
+        if path.endswith("/content"):
+            return Response(b"synthetic-mp4")
+        return Response(
+            json.dumps(
+                {
+                    "id": "job-123",
+                    "generation_id": "generation-123",
+                    "model": "minimax/hailuo-3",
+                    "status": "completed",
+                    "unsigned_urls": [
+                        "https://openrouter.ai/api/v1/videos/job-123/content?index=0"
+                    ],
+                    "usage": {"cost": 0.65, "is_byok": False},
+                }
+            ).encode()
+        )
+
+    order = _order(bakeoff_config, public_config, completed_quality)
+    attempt = next(
+        item for item in order["attempts"] if item["family"] == "minimax_h3"
+    )
+    paths = {
+        key: tmp_path / value
+        for key, value in attempt["paths"].items()
+    }
+    client = OpenRouterVideoClient("secret", opener=opener)
+    submission, terminal = bakeoff_module._run_openrouter_h3_attempt(
+        bakeoff_config,
+        attempt,
+        paths,
+        client,
+        poll_interval_seconds=0,
+    )
+
+    assert submission["id"] == "job-123"
+    assert terminal["status"] == "completed"
+    assert terminal["usage"]["cost"] == 0.65
+    assert paths["raw_video"].read_bytes() == b"synthetic-mp4"
+    request_body = json.loads(calls[0].data)
+    assert request_body["model"] == "minimax/hailuo-3"
+    assert request_body["prompt"] == attempt["prompt"]
+    assert [request.method for request in calls] == ["POST", "GET", "GET"]
+    assert all(
+        request.get_header("Authorization") == "Bearer secret"
+        for request in calls
+    )
+
+
+def test_finalizer_freezes_sixteen_records_before_four_family_decisions(
+    bakeoff_config: dict,
+    public_config: dict,
+    completed_quality: dict,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    order = _order(bakeoff_config, public_config, completed_quality)
+    write_bakeoff_work_order(tmp_path, order, bakeoff_config, public_config)
+    for path in (tmp_path / "qa").glob("*.json"):
+        qa = json.loads(path.read_text())
+        family = order["blinding_key"][qa["blinded_display_id"]]["family"]
+        qa["rater_id"] = "blinded-rater-1"
+        qa["rated_at"] = "2026-07-31T12:00:00Z"
+        for item in qa["items"]:
+            if item["scope"] != "primary_visual":
+                response = "pass"
+            elif family in {"seedance", "gemini_omni_flash"}:
+                response = "pass"
+            elif family == "ltx":
+                response = "fail" if item["id"] == "contact_action" else "pass"
+            else:
+                response = (
+                    "fail"
+                    if item["id"] in {"contact_action", "identity"}
+                    else "pass"
+                )
+            item["response"] = response
+            item["confidence"] = "high"
+        path.write_text(json.dumps(qa))
+
+    references = {
+        family: {
+            scene_id: {
+                "attempt_id": (
+                    f"ltx__{scene_id}__s314159__a1__modular"
+                    if family == "ltx"
+                    else f"seedance__{scene_id}__sprovider__a1__modular"
+                ),
+                "record": {
+                    "final_media": {"sha256": f"{family}-{scene_id}-sha"}
+                },
+            }
+            for scene_id in bakeoff_module.SCENE_IDS
+        }
+        for family in bakeoff_module.REFERENCE_FAMILIES
+    }
+    execution_records = {
+        attempt["attempt_id"]: {
+            "attempt": attempt,
+            "status": "media_valid",
+            "provider": {
+                "nursery_adapter_commit": (
+                    "b" * 40
+                    if attempt["attempt_id"]
+                    == order["attempts"][0]["attempt_id"]
+                    else "a" * 40
+                )
+            },
+            "final_media": {"sha256": f"{attempt['attempt_id']}-sha"},
+        }
+        for attempt in order["attempts"]
+    }
+    monkeypatch.setattr(
+        bakeoff_module,
+        "verify_reference_media",
+        lambda *args, **kwargs: references,
+    )
+    monkeypatch.setattr(
+        bakeoff_module,
+        "_verify_new_execution",
+        lambda *args, **kwargs: {
+            "planned_attempt_count": 8,
+            "media_valid_count": 8,
+            "generated_attempt_failure_count": 0,
+            "records": execution_records,
+        },
+    )
+
+    public_order = json.loads((tmp_path / "work_order.json").read_text())
+    result = finalize_blinded_review(
+        bakeoff_config,
+        public_config,
+        completed_quality,
+        public_order,
+        repository_root=REPOSITORY_ROOT,
+        run_root=tmp_path,
+    )
+    assert result["status"] == "COMPLETE_QUALITATIVE_SCREEN"
+    assert result["decisions"]["gemini_omni_flash"]["label"] == (
+        "CLEAR_TASK_ADVANTAGE_OVER_LTX"
+    )
+    assert result["decisions"]["gemini_omni_flash"][
+        "competitive_with_seedance"
+    ] is True
+    assert result["decisions"]["minimax_h3"]["label"] == (
+        "BELOW_SEEDANCE_ON_THIS_SCREEN"
+    )
+    summary = json.loads((tmp_path / "review" / "review_summary.json").read_text())
+    assert summary["qualitative"]["families"]["gemini_omni_flash"][
+        "counts_by_scope"
+    ]["primary_visual"]["pass"] == 28
+    assert summary["provenance"]["qa_bundle_sha256"]
+    assert summary["provenance"]["nursery_adapter_commits"] == [
+        "a" * 40,
+        "b" * 40,
+    ]
+    assert {
+        record["nursery_adapter_commit"]
+        for records in summary["technical"]["new_families"].values()
+        for record in records
+    } == {"a" * 40, "b" * 40}
+    assert (tmp_path / "review" / "qa_freeze.json").is_file()

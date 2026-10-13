@@ -1,0 +1,456 @@
+{
+  "schema_version": 1,
+  "pilot_id": "synthetic-video-public-only-qualitative-pilot",
+  "status": "FROZEN_READY_FOR_CLOUD_PREFLIGHT",
+  "frozen_on": "2026-07-30",
+  "authorization": {
+    "public_only_preview_authorized": true,
+    "authorization_basis": "user-directed public-only qualitative engineering preview",
+    "scientific_or_generator_selection_use": false,
+    "formal_frozen_pilot_replaced": false,
+    "governed_or_child_derived_generator_work_authorized": false
+  },
+  "privacy_boundary": {
+    "allowed": [
+      "self-authored episode plans in this config",
+      "public model code and weights pinned below",
+      "public licensed German TTS pinned below",
+      "generated media and engineering manifests produced from those inputs"
+    ],
+    "prohibited": [
+      "ChildLens or BabyView media",
+      "ChildLens or BabyView transcripts, filenames, identifiers, vocabulary, prompts, statistics, embeddings, or other derivatives",
+      "restricted-data tuning or calibration",
+      "restricted or private paths in prompts, logs, manifests, or cloud uploads"
+    ],
+    "cloud_outputs_private_by_default": true
+  },
+  "delivery": {
+    "width": 1280,
+    "height": 704,
+    "fps": 24,
+    "num_frames": 121,
+    "nominal_duration_s": 5.041666666666667,
+    "container": "mp4",
+    "video_codec": "h264",
+    "audio_codec": "aac",
+    "audio_sample_rate_hz": 48000,
+    "continuous_single_shot": true
+  },
+  "profiles": {
+    "cloud_preflight": {
+      "families": [
+        "wan",
+        "ltx"
+      ],
+      "scene_ids": [
+        "pick_up"
+      ],
+      "seeds": [
+        314159
+      ],
+      "max_attempts_per_seed": 0,
+      "execute_generation": false,
+      "purpose": "remote dependency, compilation, persistence, and manifest check without GPU inference"
+    },
+    "preview": {
+      "families": [
+        "wan",
+        "ltx"
+      ],
+      "scene_ids": [
+        "pick_up",
+        "transfer",
+        "occlusion_persistence",
+        "action_transition"
+      ],
+      "seeds": [
+        314159
+      ],
+      "max_attempts_per_seed": 1,
+      "execute_generation": true,
+      "purpose": "eight-clip public-only qualitative preview; cannot select a generator or support a scientific claim"
+    },
+    "formal": {
+      "families": [
+        "wan",
+        "ltx"
+      ],
+      "scene_ids": [
+        "pick_up",
+        "transfer",
+        "occlusion_persistence",
+        "action_transition"
+      ],
+      "seeds": [
+        314159,
+        271828,
+        161803
+      ],
+      "max_attempts_per_seed": 2,
+      "execute_generation": true,
+      "purpose": "reserved frozen formal pilot profile; retries require a recorded corrective category and this profile is not authorized by the preview"
+    }
+  },
+  "models": {
+    "wan": {
+      "family_label": "Wan 2.2 TI2V-5B",
+      "source_repository": "https://github.com/Wan-Video/Wan2.2.git",
+      "source_commit": "42bf4cfaa384bc21833865abc2f9e6c0e67233dc",
+      "weights_repository": "Wan-AI/Wan2.2-TI2V-5B",
+      "weights_revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+      "license": "Apache-2.0",
+      "runner": "official_generate_py_ti2v_5B",
+      "native_audio_expected": false,
+      "official_minimum_vram_gb": 24,
+      "prompt_extension": false,
+      "sample_steps": 50,
+      "sample_solver": "unipc",
+      "sample_shift": 5.0,
+      "sample_guide_scale": 5.0,
+      "attention_backend": "official_auto_flash_attention_or_sdpa_fallback"
+    },
+    "ltx": {
+      "family_label": "LTX-2.3 22B Distilled 1.1",
+      "source_repository": "https://github.com/Lightricks/LTX-2.git",
+      "source_commit": "9377758131b1ffde4b7f766804590a6617bf2ab9",
+      "weights_repository": "Lightricks/LTX-2.3",
+      "weights_revision": "4229404625088d21c4f112eb640fb04a0900ee25",
+      "checkpoint_filename": "ltx-2.3-22b-distilled-1.1.safetensors",
+      "spatial_upsampler_filename": "ltx-2.3-spatial-upscaler-x2-1.1.safetensors",
+      "text_encoder_repository": "google/gemma-3-12b-it-qat-q4_0-unquantized",
+      "text_encoder_revision": "68f7ee4fbd59087436ada77ed2d62f373fdd4482",
+      "license": "LTX-2 Community License",
+      "runner": "official_ltx_pipelines_distilled_two_stage",
+      "native_audio_expected": true,
+      "native_audio_use": "retained only for the prespecified scene-1 diagnostic; stripped from every modular comparison clip",
+      "offload": "cpu",
+      "prompt_enhancement": false
+    }
+  },
+  "tts": {
+    "engine": "piper-tts",
+    "engine_version": "1.6.0",
+    "engine_license": "GPL-3.0-or-later",
+    "voice_repository": "rhasspy/piper-voices",
+    "voice_revision": "0d907f158acc877ddeebcbf827659ee13bea8bcd",
+    "voice_id": "de_DE-thorsten-medium",
+    "model_path": "de/de_DE/thorsten/medium/de_DE-thorsten-medium.onnx",
+    "config_path": "de/de_DE/thorsten/medium/de_DE-thorsten-medium.onnx.json",
+    "model_card_path": "de/de_DE/thorsten/medium/MODEL_CARD",
+    "voice_dataset_license": "CC0",
+    "voice_lineage_note": "Public Thorsten model card states that the model was fine-tuned from the U.S. English lessac medium voice; use is limited here to non-commercial research preview.",
+    "speaker_description": "neutral licensed German adult voice",
+    "voice_cloning": false,
+    "length_scale": 1.0,
+    "volume": 0.85
+  },
+  "prompt_contract": {
+    "shared_prefix": "Photorealistic naturalistic home-video footage. One continuous uncut first-person egocentric shot from a child-height head-mounted camera about one metre above the floor. Only the camera wearer's two small age-neutral hands may enter the frame; no face or identifiable person is visible.",
+    "shared_suffix": "Use plausible head motion, ordinary indoor lighting, stable object identity, physically realistic contact, and exact chronological action order. No shot cuts, scene changes, captions, subtitles, logos, written text, mirrors, frightening content, unsafe behavior, or anatomical distortion.",
+    "modular_audio_instruction": "The visual action is performed without anyone speaking on camera. Do not depict lip movement or a visible speaker.",
+    "ltx_modular_audio_instruction": "Generate no dialogue, speech, lyrics, or music; quiet room ambience only. Native generated audio will be discarded and replaced by the frozen modular German TTS track.",
+    "wan_audio_instruction": "Generate the silent visual sequence only; the frozen modular German TTS track will be added after video generation.",
+    "joint_audio_diagnostic_instruction": "Diagnostic only: an off-camera neutral German adult voice says exactly \"Das ist der Becher\" once while the red cup is held visible and stable. No other speech, lyrics, or music."
+  },
+  "corrective_suffixes": {
+    "hand": "Correction: show exactly two anatomically plausible hands with stable fingers and unambiguous hand-object contact.",
+    "identity": "Correction: preserve the target object's color, shape, material, and identity continuously through the full shot.",
+    "camera": "Correction: keep one continuous child-height head-camera shot with smooth plausible motion and no cut or viewpoint jump.",
+    "transition": "Correction: execute every stated action once in the stated chronological order with clear pre-action and post-action states.",
+    "referent_timing": "Correction: keep the named target object fully visible, unobstructed, and stable throughout the stated naming interval.",
+    "safety": "Correction: remove any unsafe, frightening, sexualized, or identifiable-person content while preserving the requested harmless object interaction."
+  },
+  "scenes": [
+    {
+      "id": "pick_up",
+      "label": "Pick up",
+      "target_noun_de": "Becher",
+      "utterance_de": "Das ist der Becher",
+      "utterance_onset_s": 2.65,
+      "requested_target_word_interval_s": [
+        3.25,
+        3.85
+      ],
+      "visible_referent_interval_s": [
+        2.2,
+        5.0
+      ],
+      "entities": [
+        {
+          "id": "cup",
+          "description": "one matte red plastic cup",
+          "persistent_attributes": [
+            "red",
+            "matte plastic",
+            "upright",
+            "single handleless cup"
+          ]
+        },
+        {
+          "id": "table",
+          "description": "one low pale wooden table"
+        }
+      ],
+      "initial_state": "The red cup stands upright at the center of the low table within easy reach. Both hands begin empty and visible near the lower edge.",
+      "timeline": [
+        {
+          "start_s": 0.0,
+          "end_s": 0.8,
+          "event": "look steadily at the cup"
+        },
+        {
+          "start_s": 0.8,
+          "end_s": 1.8,
+          "event": "the right hand reaches toward the cup and establishes a clear grasp"
+        },
+        {
+          "start_s": 1.8,
+          "end_s": 2.3,
+          "event": "the right hand lifts the same cup about fifteen centimetres"
+        },
+        {
+          "start_s": 2.3,
+          "end_s": 5.04,
+          "event": "hold the cup still, upright, fully visible, and centered"
+        }
+      ],
+      "prompt_en": "A single matte red plastic cup stands upright on a low pale wooden table. Both empty hands appear near the bottom of frame. The right hand reaches once, makes clear contact, closes around the cup, lifts that same cup about fifteen centimetres, and then holds it upright, centered, fully visible, and still through the end of the shot. The left hand remains empty. The cup never changes color, shape, material, or identity."
+    },
+    {
+      "id": "transfer",
+      "label": "Hand-to-hand transfer",
+      "target_noun_de": "Bauklotz",
+      "utterance_de": "Das ist der Bauklotz",
+      "utterance_onset_s": 2.75,
+      "requested_target_word_interval_s": [
+        3.3,
+        4.0
+      ],
+      "visible_referent_interval_s": [
+        2.35,
+        5.0
+      ],
+      "entities": [
+        {
+          "id": "block",
+          "description": "one blue wooden cube block",
+          "persistent_attributes": [
+            "blue",
+            "wooden",
+            "cube",
+            "one object"
+          ]
+        }
+      ],
+      "initial_state": "The left hand holds one blue wooden cube at the center of frame. The right hand begins empty.",
+      "timeline": [
+        {
+          "start_s": 0.0,
+          "end_s": 0.8,
+          "event": "hold the blue cube steadily in the left hand"
+        },
+        {
+          "start_s": 0.8,
+          "end_s": 2.1,
+          "event": "the right hand grasps the cube before the left hand releases it"
+        },
+        {
+          "start_s": 2.1,
+          "end_s": 2.4,
+          "event": "complete one transfer from left hand to right hand"
+        },
+        {
+          "start_s": 2.4,
+          "end_s": 5.04,
+          "event": "hold the same cube still and fully visible in the right hand"
+        }
+      ],
+      "prompt_en": "The left hand begins holding one blue wooden cube block centered in view while the right hand is empty. The right hand reaches across and establishes a secure grasp before the left hand releases. Complete exactly one left-to-right hand transfer, then hold the same blue wooden cube still and fully visible in the right hand through the end. Its blue color, cube shape, wood material, and size remain unchanged."
+    },
+    {
+      "id": "occlusion_persistence",
+      "label": "Occlusion and persistence",
+      "target_noun_de": "Auto",
+      "utterance_de": "Das ist das Auto",
+      "utterance_onset_s": 3.15,
+      "requested_target_word_interval_s": [
+        3.65,
+        4.25
+      ],
+      "visible_referent_interval_s": [
+        2.85,
+        5.0
+      ],
+      "entities": [
+        {
+          "id": "car",
+          "description": "one small yellow wooden toy car with four black wheels",
+          "persistent_attributes": [
+            "yellow",
+            "wooden",
+            "four black wheels",
+            "same toy before and after occlusion"
+          ]
+        },
+        {
+          "id": "box",
+          "description": "one plain light-brown cardboard box"
+        }
+      ],
+      "initial_state": "The same yellow toy car is plainly visible beside the cardboard box.",
+      "timeline": [
+        {
+          "start_s": 0.0,
+          "end_s": 1.2,
+          "event": "the right hand pushes the car until it is partly hidden behind the box"
+        },
+        {
+          "start_s": 1.2,
+          "end_s": 2.8,
+          "event": "the hand withdraws and the head camera moves smoothly around the box"
+        },
+        {
+          "start_s": 2.8,
+          "end_s": 5.04,
+          "event": "reveal and steadily view the same yellow car"
+        }
+      ],
+      "prompt_en": "One small yellow wooden toy car with four black wheels is clearly visible beside a plain light-brown cardboard box. The right hand pushes that car until it is partly hidden behind the box, then withdraws. The head camera moves smoothly around one side of the stationary box and reveals the very same yellow wooden car. Hold the revealed car fully visible and centered through the end; it never changes identity, color, material, wheel count, or scale."
+    },
+    {
+      "id": "action_transition",
+      "label": "Action transition and camera motion",
+      "target_noun_de": "Löffel",
+      "utterance_de": "Das ist der Löffel",
+      "utterance_onset_s": 3.0,
+      "requested_target_word_interval_s": [
+        3.55,
+        4.15
+      ],
+      "visible_referent_interval_s": [
+        2.35,
+        5.0
+      ],
+      "entities": [
+        {
+          "id": "spoon",
+          "description": "one plain silver metal spoon",
+          "persistent_attributes": [
+            "silver",
+            "metal",
+            "single spoon"
+          ]
+        },
+        {
+          "id": "bowl",
+          "description": "one white ceramic bowl"
+        },
+        {
+          "id": "table",
+          "description": "one low pale wooden table"
+        }
+      ],
+      "initial_state": "A silver spoon lies beside a white bowl on the low table two short steps ahead.",
+      "timeline": [
+        {
+          "start_s": 0.0,
+          "end_s": 1.2,
+          "event": "take exactly two short steps toward the table with plausible head motion"
+        },
+        {
+          "start_s": 1.2,
+          "end_s": 1.55,
+          "event": "stop completely in front of the table"
+        },
+        {
+          "start_s": 1.55,
+          "end_s": 2.45,
+          "event": "the right hand clearly grasps and lifts the spoon"
+        },
+        {
+          "start_s": 2.45,
+          "end_s": 4.7,
+          "event": "place the spoon in the bowl and complete exactly one circular stir"
+        },
+        {
+          "start_s": 4.7,
+          "end_s": 5.04,
+          "event": "stop with the same spoon visible above the bowl"
+        }
+      ],
+      "prompt_en": "A low pale wooden table is two short steps ahead. One plain silver metal spoon lies beside one white ceramic bowl. Take exactly two short forward steps with gentle plausible head motion, stop completely, then reach with the right hand, clearly grasp and lift the spoon, place that same spoon into the bowl, and make exactly one complete circular stirring motion. Stop with the spoon still grasped and visible above the bowl. Preserve the spoon, bowl, table, and action order."
+    }
+  ],
+  "human_qa": {
+    "minimum_raters_for_formal_profile": 3,
+    "preview_raters_required": 1,
+    "blind_fields": [
+      "family",
+      "seed",
+      "attempt_number"
+    ],
+    "items": [
+      {
+        "id": "continuous_egocentric_shot",
+        "question": "Is this one continuous egocentric shot with plausible child-height head-camera motion?"
+      },
+      {
+        "id": "anatomy",
+        "question": "Are there no severe hand or anatomy defects?"
+      },
+      {
+        "id": "contact_action",
+        "question": "Are the intended contact and completed action visually unambiguous?"
+      },
+      {
+        "id": "identity",
+        "question": "Does the target object retain its identity and required attributes?"
+      },
+      {
+        "id": "transition_order",
+        "question": "Does the transition order match the frozen episode plan?"
+      },
+      {
+        "id": "referent_timing",
+        "question": "Is the named referent visible and unambiguous from 500 ms before target-word onset through 500 ms after target-word offset?"
+      },
+      {
+        "id": "speech",
+        "question": "Is the speech exact, intelligible German with no extra lexical content?"
+      },
+      {
+        "id": "safety",
+        "question": "Is the clip free of unsafe, sexualized, frightening, or identifiable-person content?"
+      }
+    ],
+    "response_values": [
+      "pass",
+      "fail",
+      "cannot_judge"
+    ],
+    "confidence_values": [
+      "low",
+      "medium",
+      "high"
+    ]
+  },
+  "cloud": {
+    "provider": "hugging_face_jobs",
+    "output_repository_default": "rishisim/nursery-synthetic-video-public-pilot",
+    "output_repository_type": "dataset",
+    "output_repository_private": true,
+    "hardware_flavor": "a100-large",
+    "hardware": "1x NVIDIA A100 80GB",
+    "hourly_price_usd_at_freeze": 2.5,
+    "pricing_source": "https://huggingface.co/docs/hub/en/jobs-pricing",
+    "cpu_preflight_flavor": "cpu-basic",
+    "cpu_preflight_timeout": "30m",
+    "gpu_timeout_per_family": "4h",
+    "maximum_gpu_charge_per_family_usd": 10.0,
+    "maximum_preview_gpu_charge_usd": 20.0,
+    "paid_launch_requires_explicit_spend_confirmation": true,
+    "persistence": "incremental upload to a private Hugging Face dataset repository after each completed attempt",
+    "ephemeral_job_storage_warning": true
+  }
+}

@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "comparison_id": "synthetic-video-four-family-quality-ceiling",
+  "run_id": "model-bakeoff-20260731",
+  "status": "COMPLETE_QUALITATIVE_SCREEN",
+  "completed_at": "2026-07-31T07:07:41Z",
+  "question": "Do Gemini Omni Flash or MiniMax H3 show a clear task-specific advantage over LTX-2.3, and is either competitive with Seedance 2.0, on the same four frozen public-only scenes?",
+  "authorization_and_boundary": {
+    "public_only_comparison_authorized": true,
+    "user_authorized_total_ceiling_usd": 6.0,
+    "runner_maximum_expected_new_charge_usd": 4.66,
+    "restricted_or_child_derived_input_used": false,
+    "childlens_or_babyview_tuning_performed": false,
+    "scientific_training_use_authorized": false,
+    "gemini_output_as_training_data": "BLOCKED_PENDING_WRITTEN_PROVIDER_AND_INSTITUTIONAL_CLEARANCE",
+    "minimax_output_as_training_data": "BLOCKED_PENDING_WRITTEN_PROVIDER_AND_INSTITUTIONAL_CLEARANCE"
+  },
+  "protocol": {
+    "bakeoff_protocol_sha256": "a7e62143442324800580ff86f9e83b4a782f965b4dee7ed95cd4badd4661239a",
+    "public_pilot_protocol_sha256": "956a76f07b1aa41eaf713bee4d157d8b38b0fe3a04de575587598da615a0a316",
+    "completed_quality_protocol_sha256": "81a57c921c0e2a39dfd726919fc32175b37d1a125a413e1b38559e772cc1ce41",
+    "completed_quality_result_file_sha256": "cab5ee3451dce0757f248fecb4403f8ec2dd016c696533c3879d908977408eb0",
+    "work_order_sha256": "5e70946bb5a4931a62b7447d8f664b1a31e8ade81ef61434123cd9bac9b92786",
+    "blinding_key_sha256": "946ff9b3d75ff179f6023a25348f8b44997b6ebb606d8b2b89fcbe7ddce254a6",
+    "qa_bundle_sha256": "f1a10131b9d0913c68bd9b603d8aa9eb71d746212f4a5e3deffeac20925dfe4e",
+    "ignored_review_summary_sha256": "15361ee41c6cdb42c1e5b1fcf2076d983b96cfd17e6d717cdf3210226b339121",
+    "nursery_adapter_commits": [
+      "9e654912a0ce4bfe92a8793b2628cb0ef683c3b0",
+      "ad506b39583ce186faa4b75368300eed415ee79d"
+    ],
+    "adapter_commit_note": "The first Gemini pick-up result was preserved from the earlier clean adapter commit. The remaining seven results were produced after MiniMax H3 was rerouted through OpenRouter; every new attempt records its exact adapter commit below."
+  },
+  "execution": {
+    "started_at": "2026-07-31T06:35:22Z",
+    "finished_at": "2026-07-31T06:51:49Z",
+    "new_attempt_count": 8,
+    "new_media_valid_count": 8,
+    "new_generated_attempt_failure_count": 0,
+    "reference_media_verified": {
+      "ltx": "4/4",
+      "seedance": "4/4"
+    },
+    "canonical_delivery": {
+      "width": 1280,
+      "height": 704,
+      "fps": 24,
+      "frame_count": 121,
+      "paired_ltx_audio_payload_identity": "8/8"
+    },
+    "new_families": {
+      "gemini_omni_flash": {
+        "provider": "Gemini Developer API",
+        "model": "gemini-omni-flash-preview",
+        "attempts": [
+          {
+            "scene_id": "pick_up",
+            "request_sha256": "58afdb979f6964f4cc421d26f2b3fd41bd54bffcaf816fb4b53f9f29b5c52157",
+            "final_sha256": "43af431654a6ab4864df529f795e2f2022e680099f8f11dcfe3cf71b83b5bc1a",
+            "nursery_adapter_commit": "9e654912a0ce4bfe92a8793b2628cb0ef683c3b0",
+            "status": "media_valid"
+          },
+          {
+            "scene_id": "transfer",
+            "request_sha256": "022dacc0944acd1ad8391d9ff793aa4d0d686381c96985c400bf4f120ce22c7b",
+            "final_sha256": "b4c71cbc63b022ff771f70452152705c11e15e0a2b2846a284b0df0a04bc07b5",
+            "nursery_adapter_commit": "ad506b39583ce186faa4b75368300eed415ee79d",
+            "status": "media_valid"
+          },
+          {
+            "scene_id": "occlusion_persistence",
+            "request_sha256": "7bf82ad5c0fdf8e6b58de25c11c494cdd7eb8eeb11da67d92876778da491841e",
+            "final_sha256": "dae943ffd5f150826353a5309882d23f4096f64b9da6ecdf146be511e4cc6204",
+            "nursery_adapter_commit": "ad506b39583ce186faa4b75368300eed415ee79d",
+            "status": "media_valid"
+          },
+          {
+            "scene_id": "action_transition",
+            "request_sha256": "1d715ce96f1b43e3767cfc2a37e8d2a5f683132a92011b8fb09c312515427dfd",
+            "final_sha256": "ef7856e4c50984969f769b18b0e54890f90767ccb8d03fe7ed43ffdac8e01d60",
+            "nursery_adapter_commit": "ad506b39583ce186faa4b75368300eed415ee79d",
+            "status": "media_valid"
+          }
+        ]
+      },
+      "minimax_h3": {
+        "provider": "OpenRouter",
+        "model": "minimax/hailuo-3",
+        "attempts": [
+          {
+            "scene_id": "pick_up",
+            "request_sha256": "ccf3a6e25d5e7068fe85dc9237d103fb366f2afd58a1027dd295919ddb7094e5",
+            "final_sha256": "e6f57cc880ebf8918d3a2688b9bb3989d4f7da03e079280c8f85887c4fbde6d5",
+            "nursery_adapter_commit": "ad506b39583ce186faa4b75368300eed415ee79d",
+            "status": "media_valid"
+          },
+          {
+            "scene_id": "transfer",
+            "request_sha256": "da900fcf6a9a169227f198d952c8a04792c344aada6e27d907de79bc2fe41d0b",
+            "final_sha256": "967f263920037285187eca7b6a9165a7f812f8da0232262fbec29f31288fcb4e",
+            "nursery_adapter_commit": "ad506b39583ce186faa4b75368300eed415ee79d",
+            "status": "media_valid"
+          },
+          {
+            "scene_id": "occlusion_persistence",
+            "request_sha256": "cdfc5a42a8b206a1c86debdb6eb14d209bbc06d3d3b90254fa26b1229a3a10d7",
+            "final_sha256": "76ee9c2f36f41f9258da5e430152352b4043cf5416c526da7bd2a0d35c455119",
+            "nursery_adapter_commit": "ad506b39583ce186faa4b75368300eed415ee79d",
+            "status": "media_valid"
+          },
+          {
+            "scene_id": "action_transition",
+            "request_sha256": "8c9f3cb17c4c8a658779a595b59c748df41398d7a98712e810374cce585fff8b",
+            "final_sha256": "1773a63724beb885f2516c9ba2c525689b82af86f1fdfeacaefa374e00ba06bb",
+            "nursery_adapter_commit": "ad506b39583ce186faa4b75368300eed415ee79d",
+            "status": "media_valid"
+          }
+        ]
+      }
+    }
+  },
+  "provider_usage_and_cost": {
+    "currency": "USD",
+    "maximum_expected_gemini_charge_usd": 2.06,
+    "maximum_expected_minimax_charge_usd": 2.6,
+    "maximum_expected_new_charge_usd": 4.66,
+    "actual_provider_invoice_usd": null,
+    "gemini_reported_usage": {
+      "total_input_tokens": 1006,
+      "total_output_tokens": 118498,
+      "total_video_output_tokens": 115840,
+      "total_thought_tokens": 1516,
+      "provider_reported_cost_usd": null
+    },
+    "openrouter_reported_minimax_usage": {
+      "cost_usd": 2.574,
+      "per_attempt_cost_usd": [
+        0.6435,
+        0.6435,
+        0.6435,
+        0.6435
+      ],
+      "is_byok": false
+    },
+    "cost_note": "OpenRouter returned usage.cost for each H3 generation. Gemini returned token usage but not a billed-dollar amount, so no combined actual invoice is inferred."
+  },
+  "blinded_qualitative_screen": {
+    "profile": "single-rater four-family blinded qualitative screening; exploratory and not a formal model ranking",
+    "required_unique_raters": 1,
+    "completed_blinded_records": 16,
+    "cannot_judge_count": 0,
+    "family_metrics": {
+      "ltx": {
+        "primary_visual": {
+          "pass": 19,
+          "fail": 9,
+          "cannot_judge": 0,
+          "pass_rate": 0.6785714285714286
+        },
+        "secondary_presentation": {
+          "pass": 0,
+          "fail": 8,
+          "cannot_judge": 0
+        },
+        "critical_visual_failure_count": 8,
+        "safety_failure_count": 0
+      },
+      "seedance": {
+        "primary_visual": {
+          "pass": 24,
+          "fail": 4,
+          "cannot_judge": 0,
+          "pass_rate": 0.8571428571428571
+        },
+        "secondary_presentation": {
+          "pass": 8,
+          "fail": 0,
+          "cannot_judge": 0
+        },
+        "critical_visual_failure_count": 3,
+        "safety_failure_count": 0
+      },
+      "gemini_omni_flash": {
+        "primary_visual": {
+          "pass": 27,
+          "fail": 1,
+          "cannot_judge": 0,
+          "pass_rate": 0.9642857142857143
+        },
+        "secondary_presentation": {
+          "pass": 8,
+          "fail": 0,
+          "cannot_judge": 0
+        },
+        "critical_visual_failure_count": 0,
+        "safety_failure_count": 0
+      },
+      "minimax_h3": {
+        "primary_visual": {
+          "pass": 25,
+          "fail": 3,
+          "cannot_judge": 0,
+          "pass_rate": 0.8928571428571429
+        },
+        "secondary_presentation": {
+          "pass": 8,
+          "fail": 0,
+          "cannot_judge": 0
+        },
+        "critical_visual_failure_count": 3,
+        "safety_failure_count": 0
+      }
+    },
+    "new_family_pairwise": {
+      "gemini_omni_flash": {
+        "versus_ltx": {
+          "primary_visual_pass_difference": 8,
+          "scene_wins": 4,
+          "scene_ties": 0,
+          "scene_losses": 0
+        },
+        "versus_seedance": {
+          "primary_visual_pass_difference": 3,
+          "scene_wins": 2,
+          "scene_ties": 2,
+          "scene_losses": 0
+        }
+      },
+      "minimax_h3": {
+        "versus_ltx": {
+          "primary_visual_pass_difference": 6,
+          "scene_wins": 3,
+          "scene_ties": 1,
+          "scene_losses": 0
+        },
+        "versus_seedance": {
+          "primary_visual_pass_difference": 1,
+          "scene_wins": 1,
+          "scene_ties": 3,
+          "scene_losses": 0
+        }
+      }
+    },
+    "new_family_scene_findings": {
+      "gemini_omni_flash": {
+        "pick_up": "Correct one-handed pick-up with only minor transient cup-rim warping.",
+        "transfer": "Clean transfer with correct overlap, release order, and stable cube identity.",
+        "occlusion_persistence": "The car is correctly occluded and revealed, but the reveal begins after the frozen referent window starts.",
+        "action_transition": "Clean approach, spoon grasp, bowl placement, and one visible stir."
+      },
+      "minimax_h3": {
+        "pick_up": "The one-handed pick-up is clear, but the final cup is tilted rather than upright.",
+        "transfer": "The transfer order is correct; mild cube warping does not break identity.",
+        "occlusion_persistence": "The car remains almost entirely visible, so the required occlusion-and-reveal transition does not occur.",
+        "action_transition": "Clean approach, spoon grasp, bowl placement, and one visible stir."
+      }
+    }
+  },
+  "decisions": {
+    "gemini_omni_flash": {
+      "label": "CLEAR_TASK_ADVANTAGE_OVER_LTX",
+      "clear_task_advantage_over_ltx": true,
+      "competitive_with_seedance": true
+    },
+    "minimax_h3": {
+      "label": "CLEAR_TASK_ADVANTAGE_OVER_LTX",
+      "clear_task_advantage_over_ltx": true,
+      "competitive_with_seedance": true
+    }
+  },
+  "interpretation": {
+    "screen_leader": "gemini_omni_flash",
+    "summary": "Gemini Omni Flash was strongest on this screen, with 27 of 28 primary passes and no critical failures. MiniMax H3 also cleared the LTX advantage rule and remained inside the frozen Seedance competitiveness band.",
+    "limitation": "This is one blinded rater over four hand-authored public scenes. It is a useful qualitative engineering screen, not a formal model ranking or evidence that hosted outputs are suitable for ChildLens tuning."
+  },
+  "retention": {
+    "committed": "This compact aggregate result, protocol, runner, and focused tests.",
+    "ignored": "Full prompts copied into the run, provider records, QA files, native and normalized media, gallery, frames, logs, and review intermediates under runs/synthetic_video_model_bakeoff/model-bakeoff-20260731.",
+    "hosted_output_training_status": "BLOCKED_PENDING_WRITTEN_PROVIDER_AND_INSTITUTIONAL_CLEARANCE"
+  }
+}

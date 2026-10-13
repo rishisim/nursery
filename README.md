@@ -7,6 +7,14 @@ pipeline. The first Stage B build is preserved as provisional engineering
 evidence but is scientifically superseded pending validity repair.
 Confirmatory Phase 5 is not authorized.
 
+Historical public-only generator workflows are also retained here: the completed
+Wan/LTX qualitative preview, LTX/Seedance quality comparison, and four-family
+video bakeoff. Their frozen protocols and results are documented in
+[`docs/synthetic_video_public_pilot.md`](docs/synthetic_video_public_pilot.md),
+[`docs/synthetic_video_quality_ceiling.md`](docs/synthetic_video_quality_ceiling.md),
+and [`docs/synthetic_video_model_bakeoff.md`](docs/synthetic_video_model_bakeoff.md).
+These historical records do not change the current gates or authorize new runs.
+
 This branch is the clean workspace for the Nursery/BabyWorld synthetic-video
 research program.
 

@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "comparison_id": "synthetic-video-ltx-seedance-quality-ceiling",
+  "run_id": "quality-ceiling-20260731",
+  "status": "COMPLETE_QUALITATIVE_SCREEN",
+  "completed_at": "2026-07-31T04:18:06Z",
+  "question": "Does hosted Seedance 2.0 materially improve task-specific visual fidelity over the already-generated LTX-2.3 baseline on the same four frozen public-only episode plans?",
+  "authorization_and_boundary": {
+    "public_only_comparison_authorized": true,
+    "restricted_or_child_derived_input_used": false,
+    "childlens_or_babyview_tuning_performed": false,
+    "scientific_training_use_authorized": false,
+    "seedance_output_as_training_data": "BLOCKED_PENDING_WRITTEN_PROVIDER_AND_INSTITUTIONAL_CLEARANCE"
+  },
+  "protocol": {
+    "quality_protocol_sha256": "81a57c921c0e2a39dfd726919fc32175b37d1a125a413e1b38559e772cc1ce41",
+    "public_pilot_protocol_sha256": "956a76f07b1aa41eaf713bee4d157d8b38b0fe3a04de575587598da615a0a316",
+    "work_order_sha256": "bcb0cee57e69502f55911b8748640d308750edfb4824ad456144e6345c50ab5c",
+    "blinding_key_sha256": "1321c3b2def7273d4278a7670c5b51319c29e5ee9175ebcf55c56f0d9be9a4fc",
+    "qa_bundle_sha256": "8dfdc2abdbcb3a4c7443da43bf5dfe50c9ca49a57402dcc672f034a75b1f494e",
+    "nursery_adapter_commit": "64242ad9deb9bf59b633039a4d8f231fbdbed614"
+  },
+  "candidate": {
+    "family": "seedance",
+    "label": "Seedance 2.0 standard",
+    "developer": "ByteDance",
+    "provider": "fal",
+    "endpoint": "bytedance/seedance-2.0/text-to-video",
+    "model_revision_caveat": "Closed hosted endpoint; exact weights and implementation revision are not exposed.",
+    "request_settings": {
+      "resolution": "720p",
+      "duration": "5",
+      "aspect_ratio": "16:9",
+      "generate_audio": false,
+      "bitrate_mode": "high"
+    },
+    "input_seed_control": "UNSUPPORTED_BY_CURRENT_LIVE_INPUT_SCHEMA",
+    "provider_retries": 0,
+    "protocol_retries": 0
+  },
+  "seedance_attempts": [
+    {
+      "scene_id": "pick_up",
+      "request_id_utf8_sha256": "38e0aa24706341f623ba1b33c53e8004ac837bc7ddd31966bc50e564815a48f1",
+      "request_sha256": "0680fd0846f1a2850cf9e5d1eee7e913b2f8fe6f7b8b365beedc90b6d3c9aef7",
+      "provider_returned_seed": 1850096361,
+      "started_at": "2026-07-31T03:45:36Z",
+      "finished_at": "2026-07-31T03:47:42Z",
+      "final_sha256": "0813f44932fe22b4e224149c63e52db9880d3ed111d985371c8c2269f5ae70b0",
+      "status": "media_valid"
+    },
+    {
+      "scene_id": "transfer",
+      "request_id_utf8_sha256": "0fa922b608d95b672def2df16cb2403ef4b2d05d502e84fd50716659da92f0ac",
+      "request_sha256": "a1fb31f2a32b6512bb4b93e32346e0158e6f6d15955bdbd7efaf0dfc20614f5c",
+      "provider_returned_seed": 2066510327,
+      "started_at": "2026-07-31T03:47:42Z",
+      "finished_at": "2026-07-31T03:51:01Z",
+      "final_sha256": "767719b56dd02e19018a42d3f15108b86a1eaac1424a0fa644fc9d99ddf3d96a",
+      "status": "media_valid"
+    },
+    {
+      "scene_id": "occlusion_persistence",
+      "request_id_utf8_sha256": "70f07cad3b571690cf2dd19df06e64dbda035e693007f96a945a3b7e84dc0215",
+      "request_sha256": "393156775ed595657116f56920d03f1a5e6234f5669de864dea2c6a55357a2fc",
+      "provider_returned_seed": 1645174837,
+      "started_at": "2026-07-31T03:51:01Z",
+      "finished_at": "2026-07-31T03:53:50Z",
+      "final_sha256": "a45af8f29f403c338f857f54708b5054e91f7d074cec3fcbb659fb6622970b48",
+      "status": "media_valid"
+    },
+    {
+      "scene_id": "action_transition",
+      "request_id_utf8_sha256": "5e58465cab4f7dcee20ad2087892029316c5b40c46cfa03a1ea96e5873a5f778",
+      "request_sha256": "acb5e3adb2cb7ecc28c39dd3e3b31719c5c3fc28b8c1efc68027e5beb5774be0",
+      "provider_returned_seed": 556905809,
+      "started_at": "2026-07-31T03:53:50Z",
+      "finished_at": "2026-07-31T03:57:50Z",
+      "final_sha256": "0ebec19e1a6f595b5ea1c557d72e8f08847a880ea9af2f59f41f70e6d3b1614b",
+      "status": "media_valid"
+    }
+  ],
+  "technical": {
+    "ltx": {
+      "planned_attempt_count": 4,
+      "media_valid_count": 4,
+      "generated_attempt_failure_count": 0
+    },
+    "seedance_canonical_comparison": {
+      "planned_attempt_count": 4,
+      "provider_submission_count": 4,
+      "media_valid_count": 4,
+      "generated_attempt_failure_count": 0,
+      "generated_attempt_failure_rate": 0.0
+    },
+    "seedance_including_transport_diagnostic": {
+      "provider_generation_count": 5,
+      "provider_completed_generation_count": 5,
+      "model_generation_failure_count": 0,
+      "model_generation_failure_rate": 0.0,
+      "usable_media_count": 4,
+      "end_to_end_artifact_failure_count": 1,
+      "end_to_end_artifact_failure_rate": 0.2,
+      "diagnostic_status": "EXCLUDED_UNVIEWED_TRANSPORT_FAILURE",
+      "diagnostic_record_sha256": "1a72ddca1778d27817bcf3fd607d1a1ef97d6fc222684b2f6a10be79e03ecd9c"
+    },
+    "canonical_media_conformance": {
+      "seedance_pass_count": "4/4",
+      "width": 1280,
+      "height": 704,
+      "fps": 24,
+      "frame_count": 121,
+      "duration_s": 5.041667,
+      "video_codec": "h264",
+      "audio_codec": "aac",
+      "paired_ltx_audio_payload_identity_count": "4/4"
+    }
+  },
+  "blinded_qualitative_screen": {
+    "profile": "single-rater blinded qualitative screening; not a formal model-selection result",
+    "rater": "codex-blinded-rater-1",
+    "method": "Twelve-frame and twenty-five-frame contact sheets for every clip, focused 8 fps temporal sheets for the complex stir action, frozen plans, and hash-verified paired-audio provenance; the family key was opened only after all eight QA files were frozen.",
+    "ltx": {
+      "visual_pass_count": 23,
+      "visual_fail_count": 5,
+      "cannot_judge_count": 0,
+      "visual_pass_rate": 0.8214285714285714,
+      "critical_visual_failure_count": 4,
+      "safety_failure_count": 0
+    },
+    "seedance": {
+      "visual_pass_count": 25,
+      "visual_fail_count": 3,
+      "cannot_judge_count": 0,
+      "visual_pass_rate": 0.8928571428571429,
+      "critical_visual_failure_count": 3,
+      "safety_failure_count": 0
+    },
+    "candidate_visual_pass_advantage": 2,
+    "candidate_scene_wins": 1,
+    "candidate_scene_losses": 0,
+    "scene_results": [
+      {
+        "scene_id": "pick_up",
+        "winner": "tie",
+        "ltx_visual_pass_count": 6,
+        "seedance_visual_pass_count": 6,
+        "observation": "Both clips clearly pick up the cup but fail the required upright final hold; Seedance is cleaner and avoids pseudo-text."
+      },
+      {
+        "scene_id": "transfer",
+        "winner": "tie",
+        "ltx_visual_pass_count": 7,
+        "seedance_visual_pass_count": 7,
+        "observation": "Both clips complete a clear left-to-right hand transfer; Seedance presents the cleaner frame."
+      },
+      {
+        "scene_id": "occlusion_persistence",
+        "winner": "seedance",
+        "ltx_visual_pass_count": 5,
+        "seedance_visual_pass_count": 7,
+        "observation": "Seedance performs a coherent push, occlusion, camera move, and reveal; LTX keeps the car visible in an open enclosure."
+      },
+      {
+        "scene_id": "action_transition",
+        "winner": "tie",
+        "ltx_visual_pass_count": 5,
+        "seedance_visual_pass_count": 5,
+        "observation": "LTX visibly stirs but duplicates spoons and loses referent identity; Seedance keeps one clean spoon but does not complete a visible circular stir or final lift."
+      }
+    ],
+    "unscored_presentation_observation": "All four LTX clips contain pseudo-caption text and pillarboxed framing, while the four Seedance clips are visually cleaner. The frozen QA instrument has no explicit text-artifact item, so this presentation gap does not directly contribute to the material-win score.",
+    "limitations": [
+      "One assistant rater and four scenes cannot establish a formal model ranking.",
+      "The qualitative screen used dense frame-based review rather than a blinded multi-human real-time playback panel.",
+      "Speech was an excluded identity control because both families use the exact paired LTX AAC payload.",
+      "Seedance does not expose a caller-supplied input seed, so provider-selected candidate seeds cannot be matched to LTX seed 314159."
+    ]
+  },
+  "material_visual_win_rule": {
+    "required_candidate_media_valid_count": 4,
+    "required_minimum_visual_pass_advantage": 4,
+    "required_minimum_candidate_scene_wins": 2,
+    "required_maximum_candidate_scene_losses": 0,
+    "observed_candidate_media_valid_count": 4,
+    "observed_visual_pass_advantage": 2,
+    "observed_candidate_scene_wins": 1,
+    "observed_candidate_scene_losses": 0,
+    "all_criteria_met": false
+  },
+  "cost": {
+    "currency": "USD",
+    "frozen_rate_usd_per_generated_second": 0.3034,
+    "estimated_canonical_comparison_charge_usd": 6.068,
+    "estimated_inaccessible_diagnostic_charge_usd": 1.517,
+    "estimated_total_charge_usd": 7.585,
+    "user_authorized_total_ceiling_usd": 10.0,
+    "actual_provider_invoice_usd": null
+  },
+  "decision": {
+    "label": "NO_CLEAR_ADVANTAGE_KEEP_LTX_REPRODUCIBLE_BASELINE",
+    "interpretation": "Seedance is visibly cleaner and slightly stronger on the frozen QA items, but it does not clear the prospectively frozen material-improvement threshold because only the occlusion scene wins and the visual-pass advantage is two rather than four.",
+    "recommendation": "Keep LTX-2.3 as the reproducible scientific baseline. Treat Seedance only as a public-input qualitative ceiling; do not generate learner training data or transmit ChildLens/BabyView-derived material. Any larger Seedance study requires new authorization, and any training use still requires written provider and institutional clearance.",
+    "scientific_training_use_authorized": false
+  },
+  "retention": {
+    "generated_media_committed_to_git": false,
+    "complete_run_retained_locally_for_viewing": true,
+    "local_ignored_run_root": "runs/synthetic_video_quality_ceiling/quality-ceiling-20260731",
+    "local_blinded_gallery": "runs/synthetic_video_quality_ceiling/quality-ceiling-20260731/gallery/index.html",
+    "compact_result_committed": "results/synthetic_video_quality_ceiling.json"
+  }
+}

@@ -522,9 +522,13 @@ The public pilot may run LTX through pinned LTX Desktop/MPS only if it exposes
 and records all frozen prompts, conditioning, seeds, inference settings,
 attempts, and outputs needed by the manifest. Otherwise LTX must use the pinned
 official/Diffusers CUDA runner. Wan still requires local or institutionally
-controlled CUDA. Closed services may be tested with the same public prompts
-only as a non-canonical quality ceiling, outside the two-candidate decision and
-without influencing selection.
+controlled CUDA. Closed services may be tested with the same public prompts as
+a scientifically separate quality ceiling. A visual win may support a
+recommendation to pursue provider terms and governance clearance, but cannot
+authorize learner training use, restricted prompt transfer, or replacement of
+the reproducible sensitivity baseline by itself. The canonical follow-on is
+`configs/synthetic_video_quality_ceiling.json`, documented in
+[`synthetic_video_quality_ceiling.md`](synthetic_video_quality_ceiling.md).
 
 Sixty seconds is an episode composition target, not a single model-call claim.
 The canonical runner produces 5–10 s planned segments, carries forward explicit
@@ -596,6 +600,21 @@ prompt repetition. A later full study must freeze a single generator family
 after the public pilot; it must not ensemble winners per scene.
 
 ## Frozen public/synthetic-only technical pilot
+
+### Public qualitative preview authorization
+
+On 2026-07-30, the investigator separately authorized an eight-clip,
+public-only qualitative preview while institutional GPU access is delayed.
+The canonical preview contract is
+`configs/synthetic_video_public_pilot.json`, with operating instructions in
+[`synthetic_video_public_pilot.md`](synthetic_video_public_pilot.md).
+
+The preview reuses the four self-authored scenes below but executes only one
+frozen seed per family, with no retries. It may use private commercial cloud
+GPU infrastructure because no ChildLens/BabyView input or derivative is
+permitted. It cannot select a generator, alter the formal pilot, tune prompts
+for governed work, or support a scientific result. The full pilot and all
+decision rules below remain frozen and unexecuted.
 
 ### Question and inputs
 

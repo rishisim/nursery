@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "pilot_id": "synthetic-video-public-only-qualitative-pilot",
+  "run_id": "public-preview-20260730",
+  "stage": "gpu_qualitative_preview",
+  "status": "COMPLETE_WITH_QUALITATIVE_FAILURES",
+  "completed_at": "2026-07-31T02:24:23Z",
+  "implementation": {
+    "nursery_inference_commit": "9c2983355f7ecc41981661cb0dfac0bfa0f6f9d2",
+    "protocol_sha256": "956a76f07b1aa41eaf713bee4d157d8b38b0fe3a04de575587598da615a0a316",
+    "profile": "preview",
+    "seed": 314159
+  },
+  "authorization_and_boundary": {
+    "approved_gpu_ceiling_usd": 20.0,
+    "restricted_or_child_derived_input_used": false,
+    "childlens_or_babyview_tuning_performed": false,
+    "semantic_inputs": "four self-authored public-only episode plans"
+  },
+  "execution": {
+    "provider": "hugging_face_jobs",
+    "account": "rishisim",
+    "hardware_flavor": "a100-large",
+    "hardware": "1x NVIDIA A100 80GB",
+    "hourly_price_usd": 2.5,
+    "successful_jobs": [
+      {
+        "family": "wan",
+        "job_id": "6a6bfb6323ed89c748ec8c95",
+        "job_url": "https://huggingface.co/jobs/rishisim/6a6bfb6323ed89c748ec8c95",
+        "status": "COMPLETED",
+        "job_wall_seconds": 2037.6527860140195,
+        "computed_cost_usd": 1.415037
+      },
+      {
+        "family": "ltx",
+        "job_id": "6a6c03d8b36a6516e96a362f",
+        "job_url": "https://huggingface.co/jobs/rishisim/6a6c03d8b36a6516e96a362f",
+        "status": "COMPLETED",
+        "job_wall_seconds": 609.0970545620658,
+        "computed_cost_usd": 0.422984
+      }
+    ],
+    "pre_inference_diagnostic_jobs": [
+      {
+        "family": "wan",
+        "job_id": "6a6bf7f223ed89c748ec8c66",
+        "status": "FAILED_BEFORE_INFERENCE",
+        "cause": "the frozen Wan TI2V import bound directly to strict FlashAttention instead of its available SDPA fallback"
+      },
+      {
+        "family": "wan",
+        "job_id": "6a6bf9ffb36a6516e96a35e5",
+        "status": "FAILED_BEFORE_INFERENCE",
+        "cause": "the frozen upstream requirements omitted einops and the package eagerly imported unrelated optional pipelines"
+      }
+    ],
+    "cost": {
+      "successful_gpu_jobs_usd": 1.838021,
+      "diagnostic_setup_runtime_upper_bound_seconds": 240,
+      "diagnostic_setup_cost_upper_bound_usd": 0.166667,
+      "conservative_total_gpu_cost_less_than_usd": 2.004688,
+      "approved_ceiling_not_approached": true
+    }
+  },
+  "artifacts": {
+    "remote_repository": "rishisim/nursery-synthetic-video-public-pilot",
+    "remote_repository_type": "private dataset",
+    "remote_run_root": "public-preview-20260730",
+    "local_run_root": "runs/synthetic_video_public_pilot/public-preview-20260730",
+    "local_gallery": "runs/synthetic_video_public_pilot/public-preview-20260730/gallery/index.html",
+    "local_run_is_git_ignored": true,
+    "completed_attempts": 8,
+    "invalid_media_attempts": 0,
+    "missing_attempts": 0,
+    "formal_human_qa_records": {
+      "count": 8,
+      "status": "PENDING",
+      "reason": "assistant contact-sheet screening is not represented as a blinded human rating"
+    }
+  },
+  "attempts": [
+    {
+      "attempt_id": "wan__pick_up__s314159__a1__modular",
+      "family": "wan",
+      "scene_id": "pick_up",
+      "status": "media_valid",
+      "sha256": "bff336d7aee6bcb8a8ae7eeb01e1ab51ea209e1876c0dbac2094b7b7d48968e2"
+    },
+    {
+      "attempt_id": "wan__transfer__s314159__a1__modular",
+      "family": "wan",
+      "scene_id": "transfer",
+      "status": "media_valid",
+      "sha256": "950d5bca5220d7688dc4f995a3be7e029b1dbc0d58af33e4bfb041f2efb91d48"
+    },
+    {
+      "attempt_id": "wan__occlusion_persistence__s314159__a1__modular",
+      "family": "wan",
+      "scene_id": "occlusion_persistence",
+      "status": "media_valid",
+      "sha256": "1584459da08b27e2742039ebd231b7d457e978f955265afa14decb05e2237d3c"
+    },
+    {
+      "attempt_id": "wan__action_transition__s314159__a1__modular",
+      "family": "wan",
+      "scene_id": "action_transition",
+      "status": "media_valid",
+      "sha256": "aabb4b53a81637c33f7595201992196c2fdf8b43845065848bf007c8d62542ae"
+    },
+    {
+      "attempt_id": "ltx__pick_up__s314159__a1__modular",
+      "family": "ltx",
+      "scene_id": "pick_up",
+      "status": "media_valid",
+      "sha256": "028d509146e15c3a5c099fa843b9459ff6e1e96150495f39ee6c7e8f7ba9ee5a"
+    },
+    {
+      "attempt_id": "ltx__transfer__s314159__a1__modular",
+      "family": "ltx",
+      "scene_id": "transfer",
+      "status": "media_valid",
+      "sha256": "4a108d155ed4d8ce07b7dbc6ae5c0126940a96949c10313416797e53e0e2a6f4"
+    },
+    {
+      "attempt_id": "ltx__occlusion_persistence__s314159__a1__modular",
+      "family": "ltx",
+      "scene_id": "occlusion_persistence",
+      "status": "media_valid",
+      "sha256": "a8f37991d5d96be8f4f899615108b321b886bfb3f51c9ac732f7b95e17815055"
+    },
+    {
+      "attempt_id": "ltx__action_transition__s314159__a1__modular",
+      "family": "ltx",
+      "scene_id": "action_transition",
+      "status": "media_valid",
+      "sha256": "a50628befe1d17a79eb7c59e40ead2b48448fb0d3982eff21d856885603bc66f"
+    }
+  ],
+  "verification": {
+    "terminal_family_run_status": "PASS",
+    "media_valid_count": "8/8",
+    "sha256_match_count": "8/8",
+    "container_conformance_count": "8/8",
+    "common_media_shape": {
+      "duration_s": 5.041667,
+      "width": 1280,
+      "height": 704,
+      "fps": 24,
+      "frame_count": 121,
+      "video_codec": "h264",
+      "audio_codec": "aac",
+      "audio_sample_rate_hz": 48000
+    }
+  },
+  "assistant_qualitative_screen": {
+    "status": "FAILURES_OBSERVED",
+    "method": "ten evenly spaced frames per final clip plus the frozen episode plans and verified modular audio provenance",
+    "limitation": "this screen is unblinded and does not replace the pending blinded human QA records",
+    "family_observations": {
+      "wan": [
+        "all four clips are technically valid but repeatedly drift from the required first-person child-height camera",
+        "the transfer does not clearly end with the left hand released",
+        "the action-transition clip omits the planned approach and shows a child's face in a third-person view"
+      ],
+      "ltx": [
+        "the first-person framing and action chronology are substantially closer to the frozen plans",
+        "all four clips contain generated pseudo-subtitle or pseudo-caption text despite the no-text instruction",
+        "the pick-up clip finishes with the cup tilted rather than upright",
+        "the action-transition clip duplicates the spoon, making identity and referent timing ambiguous"
+      ]
+    },
+    "screening_conclusion": "The framework is operational and the outputs are useful for diagnosis, but neither family qualitatively satisfies the frozen preview contract. LTX is closer on viewpoint and action structure; its systematic pseudo-text artifact prevents treating the result as clean. No generator selection or ChildLens-facing prompt change is authorized by this preview."
+  },
+  "retention": {
+    "generated_media_committed_to_git": false,
+    "complete_run_retained_locally_for_viewing": true,
+    "complete_run_retained_in_private_remote_artifact_store": true,
+    "compact_record_committed": "results/synthetic_video_public_pilot_preview.json"
+  }
+}
