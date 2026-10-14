@@ -414,7 +414,7 @@ for native installation and pipeline details.
 [vlm-headcam](https://github.com/mcfrank/vlm-headcam) learner, comparing contact
 cue weights with unweighted, shuffled, shifted, noisy, and oracle controls.
 Only train sessions supply speech and vocabulary; disjoint dev/test probes
-select and evaluate the model. Embedding and training default to CUDA when available.
+select and evaluate the model. Embedding and training select CUDA, then Apple MPS, then CPU when available.
 
 The ignored venv `.external/cue-env/` was created with `uv venv --python 3.11 .external/cue-env`.
 Use that environment with the upstream checkout at the commit in `config.json`.

@@ -19,7 +19,7 @@ def main():
     embed = commands.add_parser("embed")
     embed.add_argument("--episodes", required=True)
     embed.add_argument("--output", required=True)
-    embed.add_argument("--device", help="Torch device (default: cuda if available, else cpu)")
+    embed.add_argument("--device", help="Torch device (default: cuda > mps > cpu)")
     embed.add_argument("--batch", type=int, default=64)
     train = commands.add_parser("train")
     train.add_argument("--run", required=True)

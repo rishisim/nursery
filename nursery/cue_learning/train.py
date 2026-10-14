@@ -1,4 +1,4 @@
-"""Train the upstream two-tower with pair weights on CUDA when available."""
+"""Train the upstream two-tower with pair weights on the available accelerator."""
 
 import json
 from pathlib import Path
@@ -12,7 +12,7 @@ from . import _output_directory, _upstream_module
 def train_run(run, condition, seed, epochs=None):
     import torch
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     upstream = _upstream_module("train_frame_mil")
     region = _upstream_module("train_region_mil")
     run = Path(run).resolve()
@@ -49,7 +49,10 @@ def train_run(run, condition, seed, epochs=None):
     weights = torch.from_numpy(weights)
     dl = torch.utils.data.DataLoader(ds, batch_size=settings["batch"], shuffle=True,
                                      drop_last=False, collate_fn=upstream.collate, num_workers=0)
-    model = upstream.RegionMIL(len(vocab), emb_dim=emb_dim).to(device)
+    model = upstream.RegionMIL(len(vocab), emb_dim=emb_dim)
+    if device == "mps":
+        model = model.float()
+    model = model.to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=settings["lr"], weight_decay=0.1)
     probes = pd.read_parquet(run / "probes_frames.parquet")
     probe_cache, probe_lut = region.load_region_cache(run / "probes_cache")

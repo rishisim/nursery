@@ -242,16 +242,17 @@ def test_transcript_writer_filters_train(episodes):
         write_transcripts(root, run, 4)
 
 
-@pytest.mark.parametrize("available,device", [(False, None), (True, None), (True, "cpu"), (False, "cuda:0")])
-def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch, available, device):
+@pytest.mark.parametrize("available,mps,device", [(False, False, None), (False, True, None), (True, True, None), (True, True, "cpu"), (False, False, "cuda:0")])
+def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch, available, mps, device):
     import torch
 
     root, run = episodes
     module = _upstream_module("embed_regions")
     requested = []
     batches = []
-    expected_device = device or ("cuda" if available else "cpu")
+    expected_device = device or ("cuda" if available else "mps" if mps else "cpu")
     monkeypatch.setattr(torch.cuda, "is_available", lambda: available)
+    monkeypatch.setattr(torch.backends.mps, "is_available", lambda: mps)
 
     class Inputs(dict):
         def to(self, device):
@@ -337,7 +338,7 @@ def test_cpu_train_cli_one_epoch(episodes, upstream):
                             env={**os.environ, "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1"})
     print(result.stdout)
     metrics = json.loads((run / "contact_s8" / "metrics.json").read_text())
-    assert metrics["condition"] == "contact" and metrics["device"] == "cpu"
+    assert metrics["condition"] == "contact" and metrics["device"] in ("cpu", "mps")
     assert metrics["selection"] == "dev" and metrics["selected_epoch"] == 0
     assert metrics["epochs"] == 1 and metrics["n_pairs"] > 300 and metrics["emb_dim"] == 8
     assert metrics["generator_parameters"]["p_ref"] == 1
@@ -351,17 +352,18 @@ def test_cpu_train_cli_one_epoch(episodes, upstream):
     assert model.region_prior is None and all(value.device.type == "cpu" for value in state.values())
 
 
-@pytest.mark.parametrize("device", ["cpu", "cuda"])
+@pytest.mark.parametrize("device", ["cpu", "mps", "cuda"])
 def test_weights_follow_upstream_filtered_pair_indices(episodes, upstream, monkeypatch, device):
     import torch
     from nursery.cue_learning.train import train_run
 
     monkeypatch.setattr(torch.cuda, "is_available", lambda: device == "cuda")
+    monkeypatch.setattr(torch.backends.mps, "is_available", lambda: device == "mps")
     move = torch.Tensor.to
     transfers = []
 
     def to(tensor, *args, **kwargs):
-        if args and isinstance(args[0], (str, torch.device)) and str(args[0]) == "cuda":
+        if args and isinstance(args[0], (str, torch.device)) and str(args[0]) in ("cuda", "mps"):
             transfers.append(tensor.shape)
             args = ("cpu", *args[1:])
         return move(tensor, *args, **kwargs)
@@ -404,7 +406,7 @@ def test_weights_follow_upstream_filtered_pair_indices(episodes, upstream, monke
     monkeypatch.setattr(region, "eval_4afc_region", evaluate)
     metrics = train_run(run, "contact", 9, epochs=2)
     assert metrics["device"] == device
-    assert bool(transfers) == (device == "cuda")
+    assert bool(transfers) == (device != "cpu")
     np.testing.assert_allclose(observed, batches, atol=1e-7)
     assert metrics["n_novocab"] == 1 and metrics["n_pairs"] == len(manifest) - 1
     assert metrics["selected_epoch"] == 1 and metrics["reported_test_acc"] == 10

@@ -25,7 +25,7 @@ def embed_episodes(episodes, output, device=None, batch=64):
     import pandas as pd
     import torch
 
-    device = str(torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu")))
+    device = str(torch.device(device or ("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")))
     if batch < 1:
         raise ValueError("Embedding batch must be positive")
     episodes = Path(episodes).resolve()
