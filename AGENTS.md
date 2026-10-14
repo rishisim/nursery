@@ -1,5 +1,22 @@
 # Repository instructions
 
+## Project goal
+
+Nursery is a long-term build, not a race to a paper. The goal: show that extra
+modalities (contact/touch, proprioception, and others) raise the ceiling on
+language acquisition beyond what video alone can reach. Video-only learners
+plateau; extra modalities should lift that plateau. This extends the
+EgoBabyVLM line of work, and the simulator exists to supply those modalities.
+
+- The core comparison is the gain in language acquisition: video-only versus
+  video plus extra modalities given to the learner as inputs, across amounts of
+  training data.
+- Every experiment is a step toward that goal. Report its result, then say what
+  it means for the next step of the build.
+- Do not turn a subgoal's result into a standalone analysis, paper framing, or
+  stopping point unless the user asks. A null or weak result is a design
+  signal, not an ending.
+
 ## Scope
 
 - The immediate user request is the full scope. Background, long-term goals, and discovered problems do not authorize additional work.
