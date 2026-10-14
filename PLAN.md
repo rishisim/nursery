@@ -6,8 +6,11 @@ video + body.
 
 ## Order
 
-1. **Evaluation suite.** Check vocabulary overlap with benchmarks, pick evals.
-   - Done 2026-10-14. See "Evaluation suite" below.
+1. **Evaluation suite and vocabulary.** In progress.
+   - 1a. Pick evals. Done 2026-10-14. See "Evaluation suite".
+   - 1b. Widen vocabulary to cover all 60 Konkle test categories. See
+     "Vocabulary widening". Needed because 41 GRAB words share only ~16
+     usable words with Konkle test-60, and 41 words may saturate.
 2. **Speech that depends on the body.** Caregiver speech tied to what the
    baby is doing, strength set from developmental studies (not chosen by us).
 3. **Learner with a body input.** Third input next to frozen image encoder and
@@ -31,16 +34,47 @@ video + body.
 
 ## Evaluation suite
 
-Our vocabulary: 41 words from GRAB objects.
+| Benchmark | Use |
+|---|---|
+| Rendered probes, held-out rooms | Primary. All vocabulary words. Dev split picks the epoch; test split reported. Report held and seen-only words separately. |
+| Konkle test-60, Frank's exact protocol | Real-photo transfer, comparable to Frank. Epoch picked on rendered dev (we won't cover Konkle dev-117). |
+| LEVANTE vocab (159 items) | Not usable yet (0 overlap). |
+| EgoBabyVLM Machine-DevBench | Later. Lexical noun 2AFC from own vocab; harness not found yet. Grammar tasks need a non-bag-of-words text model. |
 
-| Benchmark | Overlap | Use |
-|---|---|---|
-| Rendered probes, held-out rooms | 41/41 | Primary. Dev split for epoch selection, test split reported. |
-| Konkle real photos (test-60 + dev-117) | 12 + 7 = 19 | Transfer to real photos: 4AFC over the 19 shared categories, Frank's trial rules. Also report standard test-60 (OOV = chance) for comparison. |
-| LEVANTE vocab (159 items) | 0 | Not usable. |
-| EgoBabyVLM Machine-DevBench | built from own vocab | Later. Lexical noun 2AFC with generated images; harness not found yet. Grammar tasks need a non-bag-of-words text model. |
+Held vs seen-only words is the built-in check: touch should help held words
+and not seen-only ones.
 
-- To do: map GRAB `airplane` to the word `airplane`, not `plane`, to match
-  Konkle (already counted in the 12).
-- Small shared vocabulary limits real-photo tests; more object categories in
-  the simulator would widen it.
+## Vocabulary widening (step 1b)
+
+Checked Objaverse LVIS labels (46k labeled of ~800k objects) for Konkle test-60:
+
+- 57/60 have Objaverse assets; ~50 have 20+ instances.
+- Missing: leaves, rock, tent. Thin (<20): crib 6, cheese 11, tape 13,
+  button 15. Fill from full Objaverse tag search or EmbodiedGen text-to-3D
+  (already wired in `nursery/embodiedgen_scene.py`).
+- Weak label matches to check by eye: bill (dollar), tree (Christmas tree
+  only), trumpet (cornet), rug (doormat/runner), pipe, fan.
+- Objaverse quality varies: filter meshes and normalize scale.
+
+Konkle words by how they enter the simulator:
+
+- **Held, native GRAB grasp (11):** airplane, apple, ball, bottle, bowl,
+  camera, clock, knife, phone, train, watch.
+- **Held, mesh swap on a similar-shape GRAB grasp (13):** bagel←torus,
+  tape←torus, rock←small sphere, balloon←large sphere, pen←toothbrush,
+  spoon←toothbrush, bird←duck, doll←bunny, cheese←small cube, lock←small cube,
+  cookie←small cylinder, juice←cube, sandwich←cube.
+- **Held, loose fit (8):** bell, key, turtle, trumpet, shoe, cake, pipe,
+  umbrella. Grasp shape is off; fix later with HOIDiNi grasps for new meshes.
+- **Seen only (28):** basket, bed, bike, bill, boot, bucket, butterfly,
+  button, cat, chair, crib, dog, fan, guitar, hat, jacket, leaves, meat,
+  necklace, pants, pizza, ring, rug, socks, stool, tent, tree, tv.
+- **Extra:** GRAB words outside Konkle (cup, hammer, scissors, ...) stay.
+
+Speech names seen-only objects too, so the learner hears all words.
+
+To do:
+- Map GRAB `airplane` to `airplane`, not `plane`.
+- GRAB torus is not a Konkle ring; rename it (bagel or tape after swap).
+  Konkle `ring` comes from Objaverse ring meshes.
+- Swaps: scale new mesh to the original's size, recompute contact.
