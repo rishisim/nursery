@@ -285,13 +285,16 @@ def test_contact_gate_rejects_before_render_and_removes_intermediates(tmp_path, 
     monkeypatch.setattr(implementation, "load_clip", lambda path: data)
     monkeypatch.setattr(implementation, "_distractors", lambda *args: ["apple", "pear", "dice"])
     monkeypatch.setattr(implementation, "mesh_path", lambda root, name: tmp_path / name)
-    monkeypatch.setattr(implementation, "_trajectory", lambda *args: [[0, 0, 0], [1, 1, 1]])
-    monkeypatch.setattr(implementation, "_hand_trajectory", lambda *args: [])
-    monkeypatch.setattr(implementation, "reconstruct", lambda *args: (
+    monkeypatch.setattr(implementation, "_trajectory", lambda *args: ([[0, 0, 0], [1, 1, 1]], 0))
+    monkeypatch.setattr(implementation, "contact_indices", lambda *args: np.arange(2))
+    monkeypatch.setattr(implementation, "hand_geometry", lambda *args: (np.zeros((2, 4, 3)), np.arange(4), [], 0))
+    monkeypatch.setattr(implementation, "_body_model", lambda *args: None)
+    monkeypatch.setattr(implementation, "_object_surface", lambda *args: None)
+    monkeypatch.setattr(implementation, "_render_samples", lambda *args: (
         np.zeros((2, 4, 3)), np.array([[0, 1, 2]]), np.tile(np.eye(4), (2, 1, 1)),
         np.ones(2, dtype=bool), np.zeros(2, dtype=bool)))
     # Labelled vertices must pass independently of the whole-hand diagnostic.
-    monkeypatch.setattr(implementation, "contact_distances", lambda *args: ([0.011], [0.03]))
+    monkeypatch.setattr(implementation, "contact_distances", lambda *args, **kwargs: ([0.011], [0.03]))
     monkeypatch.setattr(implementation, "render_job", lambda *args: pytest.fail("Must gate before rendering"))
     rooms = [tmp_path / f"room{i}/urdf/export_scene/scene.urdf" for i in range(2)]
     output = _new_directory(tmp_path / "rejected")
@@ -324,7 +327,8 @@ def test_row_vector_rotation_round_trip_and_contact_distance(tmp_path):
                                        {"left_hand": np.arange(len(world))}, tmp_path)
     assert max(labelled + whole) < 1e-7
     from nursery.egocentric_replay.build import _trajectory
-    swept = np.asarray(_trajectory(data, tmp_path))
+    data["framerate"] = 120
+    swept = np.asarray(_trajectory(data, tmp_path)[0])
     np.testing.assert_allclose(swept[0], [world.min(0), world.max(0)], atol=1e-7)
 
 
@@ -402,27 +406,49 @@ def test_distractor_candidates_include_real_objects_and_exclude_only_current_cli
     assert "mug" in _distractors(categories, "camera", np.random.default_rng(7))
 
 
-def test_hand_clearance_covers_every_source_frame_and_both_hands(monkeypatch):
-    from nursery.egocentric_replay import build as implementation
+def test_sparse_clearance_contains_unsampled_excursions():
+    from nursery.egocentric_replay.grab import clearance_indices, inflated_bounds
 
-    seen = []
-
-    def reconstruct(data, indices, config, ids):
-        seen.extend(indices.tolist())
-        vertices = np.zeros((len(indices), 4, 3))
-        vertices[:, :2, 0] = indices[:, None]
-        vertices[:, 2:, 1] = indices[:, None] + 10
-        return vertices, None, None, None, None
-
-    monkeypatch.setattr(implementation, "reconstruct", reconstruct)
-    swept = implementation._hand_trajectory({"body": {"params": {"transl": np.zeros((260, 3))}}},
-                                          {}, {"left_hand": [0, 1], "right_hand": [2, 3]})
-    assert seen == list(range(260))
-    assert len(swept) == 520
-    assert any(bounds[0][1] == 269 for bounds in swept)
+    points = np.zeros((121, 2, 3))
+    points[5, :, 0] = 0.75
+    points[60:, :, 1] = 0.2
+    indices = clearance_indices(len(points), 120)
+    assert np.diff(indices).min() >= 12
+    bounds, margin = inflated_bounds(points, indices)
+    assert margin == pytest.approx(0.75)
+    for a, b, bound in zip(indices[:-1], indices[1:], bounds):
+        assert np.all(points[a:b + 1] >= bound[0])
+        assert np.all(points[a:b + 1] <= bound[1])
 
 
-def test_placement_resamples_category_after_bounded_positions():
+def test_contact_subsample_is_deterministic_and_keeps_rendered_frames():
+    from nursery.egocentric_replay.grab import contact_indices
+
+    data = {"contact": {"body": np.ones((2400, 4))}, "framerate": 120}
+    rendered = np.array([0, 100, 2399])
+    ids = {"left_hand": [0, 1], "right_hand": [2, 3]}
+    selected = contact_indices(data, rendered, ids)
+    assert set(rendered) <= set(selected)
+    assert set(np.arange(0, 2400, 120)) <= set(selected)
+    assert len(selected) <= 223
+    np.testing.assert_array_equal(selected, contact_indices(data, rendered, ids))
+
+
+def test_surface_search_matches_exact_triangle_queries():
+    import trimesh
+    from nursery.egocentric_replay.grab import _surface_distances, _surface_index
+
+    mesh = trimesh.creation.icosphere(subdivisions=2)
+    points = np.random.default_rng(7).normal(size=(30, 3)) * 2
+    points = np.r_[points, [[0, 0, 0], [10, 0, 0]]]
+    triangles = np.asarray(mesh.triangles)
+    actual = _surface_distances(triangles, _surface_index(triangles), points)
+    expected = trimesh.proximity.closest_point(mesh, points)[1]
+    np.testing.assert_allclose(actual, expected, atol=1e-10)
+
+
+@pytest.mark.parametrize("zero_fit", [False, True])
+def test_placement_resamples_category_after_bounded_positions(zero_fit):
     import ast
     from pathlib import Path
     from types import SimpleNamespace
@@ -455,10 +481,46 @@ def test_placement_resamples_category_after_bounded_positions():
                  "table_surface": lambda table, x, y: (np.array([x, y, 0]), None),
                  "rest_position": lambda obj, point, normal: point}
     exec(compile(ast.Module(body=[function], type_ignores=[]), "placement", "exec"), namespace)
+    occupied = np.array([[[-1, -1, -1], [2, 2, 2]]]) if zero_fit else np.array([[[0.45, 0.45, 0], [0.55, 0.55, 0.2]]])
     objects, names = namespace["_place_distractors"](table,
         [{"mesh": name, "category": name, "color": []} for name in ["oversized", "mug"]], 1,
-        np.array([[[0.45, 0.45, 0], [0.55, 0.55, 0.2]]]), rng)
+        occupied, rng)
+    if zero_fit:
+        assert objects == names == []
+        assert rng.calls == 512 and removed == loaded
+        return
     assert rng.calls == 258
     assert removed == [loaded[0]]
     assert names == ["mug"] and objects[0].instance == 2
     np.testing.assert_allclose(objects[0].location, [0.2, 0.2, 0])
+
+
+def test_hand_only_skinning_matches_upstream_lbs(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    import smplx
+    import torch
+    from smplx.lbs import lbs
+    from nursery.egocentric_replay.grab import hand_geometry
+
+    template = torch.tensor([[0.1, 0, 0], [0.2, 0, 0], [0, 0.1, 0], [0, 0.2, 0]])
+    parents = torch.tensor([-1] + [0] * 54)
+    weights = torch.zeros(4, 55)
+    weights[:2, 25] = 1
+    weights[2:, 40] = 1
+    posedirs = torch.randn(486, 12, generator=torch.Generator().manual_seed(7)) * 0.001
+    model = SimpleNamespace(v_template=template, posedirs=posedirs,
+                            J_regressor=torch.zeros(55, 4), parents=parents, lbs_weights=weights)
+    monkeypatch.setattr(smplx, "create", lambda *args, **kwargs: model)
+    pose = np.random.default_rng(7).normal(size=(3, 165)).astype(np.float32) * 0.2
+    pose[:, 66:75] = 0
+    translation = np.array([[0, 0, 0], [0.01, 0, 0], [0.02, 0, 0]], dtype=np.float32)
+    data = {"framerate": 120, "body": {"params": {"global_orient": pose[:, :3],
+            "body_pose": pose[:, 3:66], "transl": translation}},
+            "lhand": {"params": {"fullpose": pose[:, 75:120]}},
+            "rhand": {"params": {"fullpose": pose[:, 120:]}}}
+    expected = lbs(torch.zeros(3, 1), torch.from_numpy(pose), template, torch.zeros(4, 3, 1),
+                   posedirs, model.J_regressor, parents, weights)[0].numpy() + translation[:, None]
+    actual, ids, bounds, margin = hand_geometry(data, {"left_hand": [0, 1], "right_hand": [2, 3]},
+                                               np.arange(3), {"body_models": str(tmp_path)})
+    np.testing.assert_allclose(actual, expected[:, ids], atol=1e-7)
+    assert len(bounds) == 4 and margin > 0

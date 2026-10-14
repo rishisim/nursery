@@ -12,7 +12,8 @@ import time
 import numpy as np
 
 from ..humanoid.embodiedgen_hoidini.run_motion import _output_directory
-from .grab import contact_distances, load_clip, mesh_path, reconstruct, rigid_matrix
+from .grab import (_body_model, _object_surface, clearance_indices, contact_distances, contact_indices, hand_geometry,
+                   inflated_bounds, load_clip, mesh_path, reconstruct, rigid_matrix)
 from .render import render_job
 from .schema import table, visible_objects
 from .sessions import chain_clips, sample_chain, subject_split
@@ -92,17 +93,6 @@ def _distractors(categories, active, rng):
     return rng.permutation(candidates).tolist()
 
 
-def _hand_trajectory(data, config, hand_ids):
-    bounds = []
-    count = len(data["body"]["params"]["transl"])
-    for start in range(0, count, 128):
-        vertices = reconstruct(data, np.arange(start, min(start + 128, count)), config, hand_ids)[0]
-        for ids in hand_ids.values():
-            hands = vertices[:, ids]
-            bounds.extend(np.stack([hands.min(axis=1), hands.max(axis=1)], axis=1).tolist())
-    return bounds
-
-
 def _trajectory(data, root):
     import trimesh
     from scipy.spatial.transform import Rotation
@@ -112,12 +102,27 @@ def _trajectory(data, root):
     params = data["object"]["params"]
     points = np.einsum("nij,kj->nki", Rotation.from_rotvec(params["global_orient"]).as_matrix().transpose(0, 2, 1),
                        corners) + params["transl"][:, None]
-    return np.stack([points.min(axis=1), points.max(axis=1)], axis=1).tolist()
+    indices = clearance_indices(len(points), data["framerate"])
+    bounds, margin = inflated_bounds(points, indices)
+    return bounds.tolist(), margin
 
+
+
+def _render_samples(data, samples, config, hand_ids):
+    combined = {"body": {"params": {}}, "lhand": {"params": {}},
+                "rhand": {"params": {}}, "contact": {}}
+    for part, keys in (("body", ("global_orient", "body_pose", "transl")),
+                       ("lhand", ("fullpose",)), ("rhand", ("fullpose",))):
+        for key in keys:
+            combined[part]["params"][key] = np.stack([data[clip][part]["params"][key][frame]
+                                                       for clip, frame in samples])
+    combined["contact"]["body"] = np.stack([data[clip]["contact"]["body"][frame] for clip, frame in samples])
+    return reconstruct(combined, np.arange(len(samples)), config, hand_ids)
 
 def _session(config, root, hand_ids, subject, number, rooms, clips, categories, seed, output):
     from PIL import Image
 
+    started = time.monotonic()
     video_id = f"{subject}_{number:04d}"
     rng = np.random.default_rng(seed)
     split = subject_split(subject)
@@ -125,7 +130,10 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
     room_id = room.parents[2].name
     segments = chain_clips(clips, config["duration_s"], seed)
     samples = sample_chain(segments, config["duration_s"])
-    clip_categories = {item["clip"]: _category(root / item["clip"]) for item in segments}
+    data_by_clip = {item["clip"]: load_clip(root / item["clip"]) for item in segments}
+    clip_categories = {name: str(data["obj_name"]) for name, data in data_by_clip.items()}
+    all_vertices, faces, all_camera, all_left, all_right = _render_samples(data_by_clip, samples, config, hand_ids)
+    hand_model = _body_model(config)
     colors = {category: rng.uniform(0.15, 0.85, 3).tolist() for category in categories}
     job = {"room_urdf": str(room), "clear_square": config["clear_squares"][room_id], "job_id": video_id, "seed": seed, "segments": []}
     rows, labelled, whole = [], [], []
@@ -135,11 +143,18 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
                     if clip == segment["clip"] and segment["start"] <= second < segment["stop"]]
         if not selected:
             continue
-        data = load_clip(root / segment["clip"])
+        data = data_by_clip[segment["clip"]]
         category = str(data["obj_name"])
         indices = np.array([source for _, source in selected])
-        vertices, faces, camera, left, right = reconstruct(data, indices, config, hand_ids)
-        distances, all_distances = contact_distances(data, indices, vertices, hand_ids, root)
+        seconds = np.array([second for second, _ in selected])
+        vertices, camera = all_vertices[seconds], all_camera[seconds]
+        left, right = all_left[seconds], all_right[seconds]
+        gate_indices = contact_indices(data, indices, hand_ids)
+        gate_vertices, vertex_ids, hand_bounds, hand_margin = hand_geometry(data, hand_ids, gate_indices, config, hand_model)
+        surface = _object_surface(data, root)
+        distances, _ = contact_distances(data, gate_indices, gate_vertices, hand_ids, root, vertex_ids, labelled_only=True, surface=surface)
+        _, all_distances = contact_distances(data, indices, vertices, hand_ids, root, surface=surface)
+        trajectory_bounds, object_margin = _trajectory(data, root)
         labelled.extend(distances)
         whole.extend(all_distances)
         sources[segment["clip"]] = _sha256(root / segment["clip"])
@@ -158,11 +173,12 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
                          "contact_left": bool(left[index]), "contact_right": bool(right[index]),
                          "held_category": category if left[index] or right[index] else None,
                          "objects": "[]"})
-        job["segments"].append({"arrays": str(array_path), "table_mesh": str(mesh_path(
+        job["segments"].append({"arrays": str(array_path), "clip": segment["clip"], "segment_index": segment_index, "table_mesh": str(mesh_path(
             root, data["table"]["table_mesh"])), "object_mesh": str(mesh_path(
             root, data["object"]["object_mesh"])), "color": colors[category],
-            "trajectory_bounds": _trajectory(data, root),
-            "hand_bounds": _hand_trajectory(data, config, hand_ids), "frames": frames,
+            "trajectory_bounds": trajectory_bounds,
+            "hand_bounds": hand_bounds, "hand_displacement_m": hand_margin,
+            "object_displacement_m": object_margin, "frames": frames,
             "distractor_count": int(rng.integers(3, min(5, len(categories) - 1) + 1)),
             "distractors": [{"mesh": str(root / "contact_meshes" / f"{name}.ply"),
                              "category": name, "color": colors[name]}
@@ -184,8 +200,13 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
     print(json.dumps({"video_id": video_id, "labelled_contact_median_m": float(np.median(labelled)),
                       "labelled_contact_p90_m": float(np.percentile(labelled, 90)),
                       "whole_contacting_hand_median_m": float(np.median(whole))}), flush=True)
+    prepared = time.monotonic()
     render_job(job, config, output)
     receipt = json.loads((output / f"render_stats_{video_id}.json").read_text())
+    receipt["preparation_seconds"] = prepared - started
+    receipt["clearance_displacements"] = [{"clip": s["clip"], "hand_m": s["hand_displacement_m"],
+                                            "object_m": s["object_displacement_m"]} for s in job["segments"]]
+    (output / f"render_stats_{video_id}.json").write_text(json.dumps(receipt) + "\n")
     realized = receipt["distractors"]
     rows.sort(key=lambda row: row["frame_idx"])
     for row in rows:
@@ -297,6 +318,8 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
                   "labelled_contact_median_m": float(np.median(labelled)),
                   "labelled_contact_p90_m": float(np.percentile(labelled, 90)),
                   "whole_contacting_hand_median_m": float(np.median(whole))}
+    statistics["realized_distractor_counts"] = {str(n): sum(c["realized"] == n for r in receipts
+        for c in r.get("clip_counts", [])) for n in range(6)}
     statistics["frames_with_two_visible_categories"] = sum(
         sum(obj["visible_px"] > 0 for obj in json.loads(row["objects"])) >= 2 for row in frames)
     statistics["two_visible_categories_fraction"] = statistics["frames_with_two_visible_categories"] / len(frames)

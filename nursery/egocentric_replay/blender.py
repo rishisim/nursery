@@ -203,8 +203,6 @@ def _place_distractors(table, entries, count, occupied, rng):
         categories.append(entry["category"])
         if len(distractors) == count:
             break
-    if len(distractors) != count:
-        raise RuntimeError("Cannot place requested distractors away from object and hands")
     return distractors, categories
 
 
@@ -250,6 +248,7 @@ def main():
     started = time.monotonic()
     image_seconds = []
     realized = {}
+    clip_counts = []
     rng = np.random.default_rng(job.get("seed", 0))
     for probe in job.get("probes", []):
         table = load_ply(probe["table_mesh"], [0.55, 0.4, 0.25])
@@ -297,6 +296,8 @@ def main():
         occupied = np.asarray(segment["trajectory_bounds"] + segment["hand_bounds"])
         distractors, categories = _place_distractors(
             table, segment["distractors"], segment["distractor_count"], occupied, rng)
+        clip_counts.append({"clip": segment["clip"], "segment_index": segment["segment_index"],
+                            "target": segment["distractor_count"], "realized": len(categories)})
         realized.update({frame["image"]: categories for frame in segment["frames"]})
         actor = mesh_object("actor", arrays["vertices"][0], arrays["faces"], [0.7, 0.5, 0.35])
         extent_points = np.concatenate([arrays["vertices"].reshape(-1, 3),
@@ -323,6 +324,7 @@ def main():
     stats_path.write_text(json.dumps({"seconds": previous.get("seconds", 0) + time.monotonic() - started,
                                                           "engine": "BLENDER_WORKBENCH", "id_engine": "BLENDER_WORKBENCH", "threads": 1, "job_id": job.get("job_id", "job"),
                                                           "distractors": {**previous.get("distractors", {}), **realized},
+                                                          "clip_counts": previous.get("clip_counts", []) + clip_counts,
                                                           "images": len(image_seconds),
                                                           "image_seconds": image_seconds,
                                                           "blender_version": bpy.app.version_string}))

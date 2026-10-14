@@ -71,10 +71,8 @@ def reconstruct(data, indices, config, hand_ids):
     return vertices, model.faces, cameras, left, right
 
 
-def contact_distances(data, indices, vertices, hand_ids, root):
-    import trimesh
-
-    obj = trimesh.load(mesh_path(root, data["object"]["object_mesh"]), process=False)
+def contact_distances(data, indices, vertices, hand_ids, root, vertex_ids=None, labelled_only=False, surface=None):
+    triangles, surface = _object_surface(data, root) if surface is None else surface
     labelled, whole = [], []
     for position, source in enumerate(indices):
         transform = rigid_matrix(data["object"]["params"], source)
@@ -82,10 +80,136 @@ def contact_distances(data, indices, vertices, hand_ids, root):
             contact = data["contact"]["body"][source, ids] != 0
             if not contact.any():
                 continue
-            points = (vertices[position, ids] - transform[:3, 3]) @ transform[:3, :3]
-            # Bound proximity-query intermediates for dense GRAB meshes.
-            distances = np.concatenate([trimesh.proximity.closest_point(obj, chunk)[1]
-                                        for chunk in np.array_split(points, max(1, len(points) // 64))])
-            labelled.extend(distances[contact].tolist())
-            whole.extend(distances.tolist())
+            local_ids = ids if vertex_ids is None else np.searchsorted(vertex_ids, ids)
+            points = (vertices[position, local_ids] - transform[:3, 3]) @ transform[:3, :3]
+            if labelled_only:
+                points = points[contact]
+            distances = np.concatenate([_surface_distances(triangles, surface, chunk)
+                for chunk in np.array_split(points, max(1, len(points) // 64))])
+            labelled.extend((distances if labelled_only else distances[contact]).tolist())
+            if not labelled_only:
+                whole.extend(distances.tolist())
     return labelled, whole
+
+
+def clearance_indices(count, fps):
+    step = max(1, int(np.ceil(fps / 10)))
+    return np.unique(np.r_[np.arange(0, count, step), count - 1])
+
+
+def contact_indices(data, rendered, hand_ids):
+    ids = np.concatenate(list(hand_ids.values()))
+    labelled = np.flatnonzero((data["contact"]["body"][:, ids] != 0).any(axis=1))
+    selected = labelled[np.unique(np.linspace(0, len(labelled) - 1, min(200, len(labelled)), dtype=int))]
+    one_hz = np.arange(0, len(data["contact"]["body"]), max(1, int(round(data["framerate"]))))
+    return np.unique(np.r_[rendered, one_hz, selected])
+
+
+def inflated_bounds(points, indices):
+    points = np.asarray(points)
+    # Include every intervening source sample in the displacement certificate.
+    displacement = max((float(np.linalg.norm(points[a:b + 1] - points[a], axis=-1).max())
+                        for a, b in zip(indices[:-1], indices[1:])), default=0.0)
+    selected = points[indices]
+    bounds = np.stack([selected.min(axis=1) - displacement,
+                       selected.max(axis=1) + displacement], axis=1)
+    return bounds, displacement
+
+
+def hand_geometry(data, hand_ids, gate_indices, config, model=None):
+    import smplx
+    import torch
+    from smplx.lbs import batch_rigid_transform, batch_rodrigues, vertices2joints
+
+    torch.set_num_threads(1)
+    if model is None:
+        model = _body_model(config)
+    ids = np.unique(np.concatenate(list(hand_ids.values())))
+    template = model.v_template[ids]
+    posedirs = model.posedirs.reshape(-1, len(model.v_template), 3)[:, ids].reshape(-1, len(ids) * 3)
+    joints = vertices2joints(model.J_regressor, model.v_template[None])
+    weights = model.lbs_weights[ids]
+    count = len(data["body"]["params"]["transl"])
+    hands = np.empty((count, len(ids), 3), dtype=np.float32)
+    # Upstream skinning on hand vertices certifies displacement without a dense full-body pass.
+    with torch.no_grad():
+        for start in range(0, count, 128):
+            stop = min(start + 128, count)
+            body = data["body"]["params"]
+            pose = np.concatenate([body["global_orient"][start:stop], body["body_pose"][start:stop],
+                                   np.zeros((stop - start, 9)), data["lhand"]["params"]["fullpose"][start:stop],
+                                   data["rhand"]["params"]["fullpose"][start:stop]], axis=1)
+            rotations = batch_rodrigues(torch.tensor(pose, dtype=torch.float32).reshape(-1, 3)).reshape(-1, 55, 3, 3)
+            feature = (rotations[:, 1:] - torch.eye(3)).reshape(stop - start, -1)
+            posed = template + (feature @ posedirs).reshape(stop - start, len(ids), 3)
+            _, transforms = batch_rigid_transform(rotations, joints.expand(stop - start, -1, -1), model.parents)
+            skin = (weights @ transforms.reshape(stop - start, 55, 16)).reshape(-1, len(ids), 4, 4)
+            homogeneous = torch.cat([posed, torch.ones(stop - start, len(ids), 1)], dim=-1)
+            vertices = (skin @ homogeneous[..., None])[:, :, :3, 0]
+            vertices += torch.tensor(body["transl"][start:stop], dtype=torch.float32)[:, None]
+            hands[start:stop] = vertices.numpy()
+    indices = clearance_indices(count, data["framerate"])
+    bounds, margins = [], []
+    for hand in hand_ids.values():
+        values, margin = inflated_bounds(hands[:, np.searchsorted(ids, hand)], indices)
+        bounds.extend(values.tolist())
+        margins.append(margin)
+    return hands[gate_indices], ids, bounds, max(margins)
+
+
+
+def _surface_index(triangles):
+    from scipy.spatial import cKDTree
+
+    tree = cKDTree(triangles.mean(axis=1), leafsize=16)
+    bounds, children, leaves = [], [], []
+
+    def visit(node):
+        index = len(bounds)
+        values = triangles[node.indices]
+        bounds.append([values.min(axis=(0, 1)), values.max(axis=(0, 1))])
+        children.append([-1, -1])
+        leaves.append(np.resize(node.indices, 16) if node.split_dim < 0 else np.zeros(16, dtype=int))
+        if node.split_dim >= 0:
+            children[index] = [visit(node.lesser), visit(node.greater)]
+        return index
+
+    visit(tree.tree)
+    return np.array(bounds), np.array(children), np.array(leaves), cKDTree(triangles.reshape(-1, 3))
+
+
+def _surface_distances(triangles, surface, points):
+    from trimesh.triangles import closest_point
+
+    bounds, children, leaves, vertices = surface
+    result = vertices.query(points)[0] ** 2
+    nodes, rows = np.zeros(len(points), dtype=int), np.arange(len(points))
+    while len(nodes):
+        gap = np.maximum(np.maximum(bounds[nodes, 0] - points[rows], points[rows] - bounds[nodes, 1]), 0)
+        keep = np.sum(gap * gap, axis=1) <= result[rows] + 1e-15
+        nodes, rows = nodes[keep], rows[keep]
+        leaf = children[nodes, 0] < 0
+        if leaf.any():
+            query = np.repeat(points[rows[leaf]], 16, axis=0)
+            nearest = closest_point(triangles[leaves[nodes[leaf]]].reshape(-1, 3, 3), query)
+            distance = np.sum((nearest - query) ** 2, axis=1).reshape(-1, 16).min(axis=1)
+            np.minimum.at(result, rows[leaf], distance)
+        # Node AABBs enclose complete triangles, so pruning preserves exact surface distances.
+        rows = np.repeat(rows[~leaf], 2)
+        nodes = children[nodes[~leaf]].ravel()
+    return np.sqrt(result)
+
+
+def _body_model(config):
+    import smplx
+
+    return smplx.create(config["body_models"], model_type="smplx", ext="npz",
+                        gender="neutral", use_pca=False, flat_hand_mean=True, batch_size=1)
+
+
+def _object_surface(data, root):
+    import trimesh
+
+    mesh = trimesh.load(mesh_path(root, data["object"]["object_mesh"]), process=False)
+    triangles = np.asarray(mesh.triangles)
+    return triangles, _surface_index(triangles)

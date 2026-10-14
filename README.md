@@ -439,8 +439,10 @@ from HOIDiNi's retargeted GRAB with neutral SMPL-X and recorded full hand poses.
 Inputs are licensed GRAB/SMPL-X at the paths in package-local `config.json`,
 the existing `.external/egocentric-env/`, Blender, and a real exported room bank.
 Session and dev/test probe rooms are disjoint; outputs must be Git-ignored.
-Each clip has 3–5 static distractors sampled uniformly from other GRAB categories,
-subject to tabletop placement and full object/hand-trajectory clearance.
+Each clip draws a target of 3–5 static distractors from a shuffled list of other
+GRAB categories. Bounded placement attempts preserve tabletop and object/hand
+clearance; the realized count may be zero. The session render receipt records
+per-clip target and realized counts, and the build manifest reports their distribution.
 Frame `objects` records all realized categories, including zero-pixel visibility.
 
 ```bash
@@ -459,7 +461,18 @@ Probes still render. `--workers N` packs jobs; `--session-index N` renders one
 scheduled session without probes. Gates: labelled contact median <1 cm,
 held object visible in ≥70% of contact frames, mean visible categories ≥2.
 The fraction of frames with ≥2 visible categories is a statistic only.
-Workbench laptop: 228 RGB/ID pairs/min rendering; 61.25 images/min end to end.
+Full-body SMPL-X is batched over the rendered 1-Hz frames. Hand-only upstream
+skinning certifies the maximum intervening source-sample displacement; hand and
+object clearance bounds at at most 10 Hz are inflated by that displacement.
+The unchanged 1-cm contact gate uses 1-Hz frames plus up to 200 evenly spaced
+labelled-contact frames per clip, with exact triangle-surface distances. Whole-hand
+diagnostics continue to use the rendered frames.
+
+On the same `s1_0004`/seed-11 session, the profiled baseline took 193.71 s
+end to end; the optimized profiled run took 62.56 s. The final unprofiled run
+took 36.02 s, with 14.06 s preparation and 20.91 s in Blender. The labelled
+median changed by 0.0554 mm and p90 by 0.2524 mm; the whole-hand median was unchanged.
+These single-worker measurements do not establish packed throughput.
 Limitations: adult motion is an infant proxy; source head turns can hide the
 table/held object, placement rejection biases realized categories, and replay
 provides kinematics rather than physics. Measurements remain in ignored run roots.
