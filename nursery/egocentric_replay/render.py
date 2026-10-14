@@ -27,6 +27,6 @@ def render_job(job, config, output):
         script.write_text(prelude + '\n' + Path(__file__).with_name("blender.py").read_text())
         payload = temporary / "job.json"
         payload.write_text(json.dumps({**job, "config": config, "output": str(output)}))
-        return _run_native([config["blender"], "-b", "--factory-startup", "--python-exit-code", "1", "-P", str(script),
+        return _run_native([config["blender"], "-b", "--factory-startup", "-t", "1", "--python-exit-code", "1", "-P", str(script),
                             "--", job["room_urdf"], str(output), str(payload)],
                            cwd=REPO, operation="Egocentric replay rendering")

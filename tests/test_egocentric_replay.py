@@ -108,7 +108,7 @@ def test_mesh_remapping_and_rigid_pose(tmp_path):
     with pytest.raises(ValueError):
         mesh_path(tmp_path, "../outside.ply")
     matrix = rigid_matrix({"global_orient": [[0, 0, np.pi / 2]], "transl": [[1, 2, 3]]}, 0)
-    np.testing.assert_allclose(matrix @ [1, 0, 0, 1], [1, 3, 3, 1], atol=1e-7)
+    np.testing.assert_allclose(matrix @ [1, 0, 0, 1], [1, 1, 3, 1], atol=1e-7)
 
 
 def test_standin_format_and_room_separation(tmp_path):
@@ -132,6 +132,13 @@ def test_build_contract_with_fake_sessions_and_probes(tmp_path, monkeypatch):
     config_path = tmp_path / "config.json"
     config_path.write_text(json.dumps(config))
     rooms = standin_rooms(tmp_path / "rooms")
+    config["session_rooms"] = ["train"]
+    config["probe_rooms"] = ["heldout"]
+    config_path.write_text(json.dumps(config))
+    (rooms / "room_bank_report.json").write_text(json.dumps({"rooms": [
+        {"room_id": name, "geometry": {"clear_2_5m_square": True, "square_vertices_m": [],
+                                      "square_orientation_degrees": 0, "floor_height_m": 0}}
+        for name in ("train", "heldout")]}))
     monkeypatch.setattr(implementation, "_catalog", lambda config: (
         {subject: [("clip", 100, 10)] for subject in config["subjects"]}, ["mug", "apple"]))
     monkeypatch.setattr(implementation, "_output_directory", lambda path: _new_directory(path))
@@ -140,11 +147,11 @@ def test_build_contract_with_fake_sessions_and_probes(tmp_path, monkeypatch):
 
     def fake_session(config, root, ids, subject, number, rooms, clips, categories, seed, output):
         video = f"{subject}_{number:04d}"
-        room = rooms[0] if subject == "s1" else rooms[1]
+        room = rooms[0]
         rows = [{"video_id": video, "frame_idx": index, "image": f"frames/{video}/{index:05d}.jpg",
                  "subject": subject, "room": room.parents[2].name, "clip": "mug_lift",
                  "contact_left": True, "contact_right": False, "held_category": "mug",
-                 "objects": '[{"category":"mug","visible_px":10,"cells":[1]}]'} for index in range(2)]
+                 "objects": '[{"category":"mug","visible_px":10,"cells":[1]}, {"category":"apple","visible_px":5,"cells":[2]}]'} for index in range(2)]
         session = {"video_id": video, "subject": subject, "room": room.parents[2].name,
                    "split": subject_split(subject), "clips": '["mug_lift"]',
                    "distractors": '["apple"]', "duration_s": 2}
@@ -174,6 +181,44 @@ def test_build_contract_with_fake_sessions_and_probes(tmp_path, monkeypatch):
     assert pq.read_table(tmp_path / "worker/sessions.parquet").to_pylist() == [sessions[3]]
     assert worker["tables_sha256"]["frames"] == implementation._sha256(tmp_path / "worker/frames.parquet")
 
+    from types import SimpleNamespace
+    packed_counts = []
+
+    class Pool:
+        def __init__(self, workers):
+            packed_counts.append(workers)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def starmap(self, function, arguments):
+            return [function(*args) for args in arguments]
+
+    monkeypatch.setattr(implementation.multiprocessing, "get_context",
+                        lambda name: SimpleNamespace(Pool=Pool))
+    packed = implementation.build(config_path, rooms, tmp_path / "packed", 2, 7, workers=2)
+    assert packed_counts == [2, 1]
+    assert packed["workers"] == 2
+    assert pq.read_table(tmp_path / "packed/frames.parquet").to_pylist() == pq.read_table(
+        output / "frames.parquet").to_pylist()
+
+    def invisible_session(*args):
+        result = fake_session(*args)
+        for row in result[0]:
+            row["objects"] = "[]"
+        return result
+
+    monkeypatch.setattr(implementation, "_session", invisible_session)
+    with pytest.raises(ValueError, match="visibility gate failed"):
+        implementation.build(config_path, rooms, tmp_path / "failed_visibility", 2, 7)
+    failed = json.loads((tmp_path / "failed_visibility/manifest.json").read_text())
+    assert failed["status"] == "referential_ambiguity_failed"
+    assert failed["statistics"]["frames"] == 12
+    assert failed["statistics"]["frames_with_two_visible_categories"] == 0
+
 
 def _new_directory(path):
     from pathlib import Path
@@ -198,7 +243,7 @@ def test_contact_gate_rejects_before_render_and_removes_intermediates(tmp_path, 
     from nursery.egocentric_replay import build as implementation
 
     config = load_config()
-    config.update(duration_s=2)
+    config.update(duration_s=2, clear_squares={"room0": {}})
     source = tmp_path / "clip.npz"
     source.touch()
     data = {"obj_name": "mug", "object": {"object_mesh": "mug.ply", "params": {
@@ -213,8 +258,8 @@ def test_contact_gate_rejects_before_render_and_removes_intermediates(tmp_path, 
     monkeypatch.setattr(implementation, "reconstruct", lambda *args: (
         np.zeros((2, 4, 3)), np.array([[0, 1, 2]]), np.tile(np.eye(4), (2, 1, 1)),
         np.ones(2, dtype=bool), np.zeros(2, dtype=bool)))
-    # The labelled subset alone passes; the full contacting hand still fails the requested gate.
-    monkeypatch.setattr(implementation, "contact_distances", lambda *args: ([0.001], [0.03]))
+    # Labelled vertices must pass independently of the whole-hand diagnostic.
+    monkeypatch.setattr(implementation, "contact_distances", lambda *args: ([0.011], [0.03]))
     monkeypatch.setattr(implementation, "render_job", lambda *args: pytest.fail("Must gate before rendering"))
     rooms = [tmp_path / f"room{i}/urdf/export_scene/scene.urdf" for i in range(2)]
     output = _new_directory(tmp_path / "rejected")
@@ -225,3 +270,91 @@ def test_contact_gate_rejects_before_render_and_removes_intermediates(tmp_path, 
     assert not list(output.rglob("*.npz"))
     diagnostic = json.loads((output / "failure.json").read_text())
     assert diagnostic["whole_contacting_hand_median_m"] == 0.03
+
+
+def test_row_vector_rotation_round_trip_and_contact_distance(tmp_path):
+    import trimesh
+    from nursery.egocentric_replay.grab import contact_distances
+
+    mesh = trimesh.creation.box(extents=[0.2, 0.4, 0.6])
+    mesh.export(tmp_path / "box.ply")
+    params = {"global_orient": np.array([[0.3, -0.6, 0.8]]),
+              "transl": np.array([[1, 2, 3]])}
+    from scipy.spatial.transform import Rotation
+    row_rotation = Rotation.from_rotvec(params["global_orient"][0]).as_matrix()
+    world = mesh.vertices @ row_rotation + params["transl"][0]
+    matrix = rigid_matrix(params, 0)
+    np.testing.assert_allclose(world, mesh.vertices @ matrix[:3, :3].T + matrix[:3, 3])
+    np.testing.assert_allclose((world - matrix[:3, 3]) @ matrix[:3, :3], mesh.vertices)
+    data = {"object": {"object_mesh": "box.ply", "params": params},
+            "contact": {"body": np.ones((1, len(world)))}}
+    labelled, whole = contact_distances(data, [0], world[None],
+                                       {"left_hand": np.arange(len(world))}, tmp_path)
+    assert max(labelled + whole) < 1e-7
+    from nursery.egocentric_replay.build import _trajectory
+    swept = np.asarray(_trajectory(data, tmp_path))
+    np.testing.assert_allclose(swept[0], [world.min(0), world.max(0)], atol=1e-7)
+
+
+def test_retargeted_body_ignores_stale_template_gender_and_pca(monkeypatch):
+    import smplx
+    import torch
+    from types import SimpleNamespace
+    from nursery.egocentric_replay.grab import reconstruct
+
+    captured = {}
+
+    class Model:
+        parents = [-1] * 55
+        faces = np.array([[0, 1, 2]])
+
+        def __call__(self, **params):
+            captured.update(params)
+            return SimpleNamespace(full_pose=torch.zeros((1, 165)),
+                                   vertices=torch.zeros((1, 3, 3)),
+                                   joints=torch.zeros((1, 55, 3)))
+
+    def create(path, **kwargs):
+        captured.update(kwargs)
+        return Model()
+
+    monkeypatch.setattr(smplx, "create", create)
+    data = {"gender": "female", "body": {"vtemp": "missing.ply", "params": {
+        "global_orient": np.zeros((1, 3)), "body_pose": np.zeros((1, 63)),
+        "transl": np.zeros((1, 3)), "left_hand_pose": np.ones((1, 24)),
+        "right_hand_pose": np.ones((1, 24)), "betas": np.ones((1, 10))}},
+        "lhand": {"params": {"fullpose": np.full((1, 45), 0.2)}},
+        "rhand": {"params": {"fullpose": np.full((1, 45), 0.3)}},
+        "contact": {"body": np.zeros((1, 3))}}
+    reconstruct(data, np.array([0]), {"body_models": "unused"},
+                {"left_hand": [0], "right_hand": [1]})
+    assert captured["gender"] == "neutral" and captured["use_pca"] is False
+    assert "v_template" not in captured and "betas" not in captured
+    assert captured["left_hand_pose"].shape == (1, 45)
+    np.testing.assert_allclose(captured["right_hand_pose"], 0.3)
+
+
+def test_certified_square_contains_actor_and_table_and_rejects_oversize():
+    import ast
+    import math
+    from pathlib import Path
+    from types import SimpleNamespace
+
+    source = Path("nursery/egocentric_replay/blender.py").read_text()
+    function = next(node for node in ast.parse(source).body
+                    if isinstance(node, ast.FunctionDef) and node.name == "open_area")
+    namespace = {"np": np, "math": math, "Vector": np.asarray}
+    exec(compile(ast.Module(body=[function], type_ignores=[]), "placement", "exec"), namespace)
+    distance = 2.5 / 2**0.5
+    square = {"square_orientation_degrees": 45, "floor_height_m": 0.1,
+              "square_vertices_m": [[1 + distance, 1], [1, 1 + distance],
+                                    [1 - distance, 1], [1, 1 - distance]]}
+    points = np.array([[0, 0, -0.2], [1, 1, 1.8]])
+    table = SimpleNamespace(matrix_world=np.eye(3), bound_box=[[0, 0, 0], [0.5, 0.5, 0.8]])
+    shift = namespace["open_area"](points, [table], square)
+    rotation = np.array([[2**-0.5, -2**-0.5], [2**-0.5, 2**-0.5]])
+    local = (points[:, :2] + shift[:2] - [1, 1]) @ rotation
+    assert np.max(np.abs(local)) <= 1.25
+    assert (points + shift)[:, 2].min() == pytest.approx(0.1)
+    with pytest.raises(RuntimeError, match="does not fit"):
+        namespace["open_area"](points * 4, [table], square)

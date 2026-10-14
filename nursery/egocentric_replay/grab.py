@@ -1,4 +1,4 @@
-"""Reconstruct GRAB using its subject template and PCA hand convention."""
+"""Reconstruct HOIDiNi neutral-body retargeted GRAB motion."""
 
 from pathlib import Path
 
@@ -29,7 +29,7 @@ def rigid_matrix(params, frame):
     from scipy.spatial.transform import Rotation
 
     matrix = np.eye(4)
-    matrix[:3, :3] = Rotation.from_rotvec(params["global_orient"][frame]).as_matrix()
+    matrix[:3, :3] = Rotation.from_rotvec(params["global_orient"][frame]).as_matrix().T
     matrix[:3, 3] = params["transl"][frame]
     return matrix
 
@@ -37,17 +37,18 @@ def rigid_matrix(params, frame):
 def reconstruct(data, indices, config, hand_ids):
     import smplx
     import torch
-    import trimesh
     from smplx.lbs import batch_rodrigues
 
     torch.set_num_threads(1)
-    template = trimesh.load(mesh_path(config["grab_root"], data["body"]["vtemp"]), process=False)
     model = smplx.create(config["body_models"], model_type="smplx", ext="npz",
-                         gender=data["gender"], v_template=np.asarray(template.vertices),
-                         use_pca=True, num_pca_comps=int(data["n_comps"]),
-                         flat_hand_mean=True, batch_size=len(indices))
+                         gender="neutral", use_pca=False, flat_hand_mean=True,
+                         batch_size=len(indices))
+    source = {key: data["body"]["params"][key]
+              for key in ("global_orient", "body_pose", "transl")}
+    source.update(left_hand_pose=data["lhand"]["params"]["fullpose"],
+                  right_hand_pose=data["rhand"]["params"]["fullpose"])
     params = {key: torch.tensor(value[indices], dtype=torch.float32)
-              for key, value in data["body"]["params"].items()}
+              for key, value in source.items()}
     with torch.no_grad():
         result = model(**params, return_full_pose=True)
         rotations = batch_rodrigues(result.full_pose.reshape(-1, 3)).reshape(len(indices), -1, 3, 3)
@@ -82,7 +83,9 @@ def contact_distances(data, indices, vertices, hand_ids, root):
             if not contact.any():
                 continue
             points = (vertices[position, ids] - transform[:3, 3]) @ transform[:3, :3]
-            distances = trimesh.proximity.closest_point(obj, points)[1]
+            # Bound proximity-query intermediates for dense GRAB meshes.
+            distances = np.concatenate([trimesh.proximity.closest_point(obj, chunk)[1]
+                                        for chunk in np.array_split(points, max(1, len(points) // 64))])
             labelled.extend(distances[contact].tolist())
             whole.extend(distances.tolist())
     return labelled, whole

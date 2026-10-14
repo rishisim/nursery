@@ -3,6 +3,7 @@
 import hashlib
 import importlib.metadata
 import json
+import multiprocessing
 from pathlib import Path
 import pickle
 import subprocess
@@ -28,12 +29,14 @@ def load_config(path=DEFAULT_CONFIG):
         raise ValueError("duration_s must be a positive integer")
     if not 0 < config["horizontal_fov_deg"] < 180:
         raise ValueError("Invalid horizontal field of view")
-    if config["device"] not in ("CPU", "GPU"):
-        raise ValueError("device must be CPU or GPU")
     if len(config["resolution"]) != 2 or min(config["resolution"]) < 4:
         raise ValueError("Invalid resolution")
-    if config["samples"] < 1 or config["probes_per_category_per_split"] < 1:
+    if config["probes_per_category_per_split"] < 1:
         raise ValueError("Positive render and probe counts required")
+    session_rooms, probe_rooms = config["session_rooms"], config["probe_rooms"]
+    if (not session_rooms or not probe_rooms or set(session_rooms) & set(probe_rooms) or
+            len(set(session_rooms + probe_rooms)) != len(session_rooms + probe_rooms)):
+        raise ValueError("Session and probe rooms must be distinct nonempty lists")
     for subject in config["subjects"]:
         subject_split(subject)
     if len(set(config["subjects"])) != len(config["subjects"]):
@@ -92,7 +95,7 @@ def _distractors(categories, active, config, rng):
         mesh = trimesh.load(Path(config["grab_root"]) / "contact_meshes" / f"{category}.ply",
                             process=False)
         size = mesh.extents
-        if max(size[:2]) < 0.16:
+        if max(size) < 0.05:
             candidates.append(category)
     if len(candidates) < 3:
         raise ValueError("Need three distinct distractor categories fitting on the GRAB table")
@@ -106,9 +109,9 @@ def _trajectory(data, root):
     mesh = trimesh.load(mesh_path(root, data["object"]["object_mesh"]), process=False)
     corners = trimesh.bounds.corners(mesh.bounds)
     params = data["object"]["params"]
-    points = np.einsum("nij,kj->nki", Rotation.from_rotvec(params["global_orient"]).as_matrix(),
+    points = np.einsum("nij,kj->nki", Rotation.from_rotvec(params["global_orient"]).as_matrix().transpose(0, 2, 1),
                        corners) + params["transl"][:, None]
-    return [points.min(axis=(0, 1)).tolist(), points.max(axis=(0, 1)).tolist()]
+    return np.stack([points.min(axis=1), points.max(axis=1)], axis=1).tolist()
 
 
 def _session(config, root, hand_ids, subject, number, rooms, clips, categories, seed, output):
@@ -117,7 +120,7 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
     video_id = f"{subject}_{number:04d}"
     rng = np.random.default_rng(seed)
     split = subject_split(subject)
-    room = rooms[0] if split == "train" else rooms[1 + number % (len(rooms) - 1)]
+    room = rooms[((int(subject[1:]) - 1) + number) % len(rooms)]
     room_id = room.parents[2].name
     segments = chain_clips(clips, config["duration_s"], seed)
     samples = sample_chain(segments, config["duration_s"])
@@ -125,7 +128,7 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
     active = set(clip_categories.values())
     distractors = _distractors(categories, active, config, rng)
     colors = {category: rng.uniform(0.15, 0.85, 3).tolist() for category in categories}
-    job = {"room_urdf": str(room), "segments": []}
+    job = {"room_urdf": str(room), "clear_square": config["clear_squares"][room_id], "job_id": video_id, "segments": []}
     rows, labelled, whole = [], [], []
     sources = {}
     for segment_index, segment in enumerate(segments):
@@ -163,17 +166,22 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
             "distractors": [{"mesh": str(root / "contact_meshes" / f"{name}.ply"),
                              "color": colors[name]} for name in distractors]})
     # Do not render geometry that has already failed the required contact construction gate.
-    if not labelled or not whole or np.median(labelled) >= 0.01 or np.median(whole) >= 0.01:
+    if not labelled or not whole or np.median(labelled) >= 0.01:
         for segment in job["segments"]:
             Path(segment["arrays"]).unlink()
-        (output / "work").rmdir()
+        if not any((output / "work").iterdir()):
+            (output / "work").rmdir()
         diagnostic = {"status": "contact_reconstruction_failed", "video_id": video_id,
                       "labelled_contact_median_m": float(np.median(labelled)) if labelled else None,
+                      "labelled_contact_p90_m": float(np.percentile(labelled, 90)) if labelled else None,
                       "whole_contacting_hand_median_m": float(np.median(whole)) if whole else None,
                       "source_sha256": sources, "config": config}
         (output / "failure.json").write_text(json.dumps(diagnostic, indent=2) + "\n")
         raise ValueError(f"Contact reconstruction gate failed: labelled median={np.median(labelled) if labelled else None} m; "
                          f"whole contacting-hand median={np.median(whole) if whole else None} m")
+    print(json.dumps({"video_id": video_id, "labelled_contact_median_m": float(np.median(labelled)),
+                      "labelled_contact_p90_m": float(np.percentile(labelled, 90)),
+                      "whole_contacting_hand_median_m": float(np.median(whole))}), flush=True)
     render_job(job, config, output)
     rows.sort(key=lambda row: row["frame_idx"])
     for row in rows:
@@ -184,26 +192,32 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
         mask_path.unlink()
     for segment in job["segments"]:
         Path(segment["arrays"]).unlink()
-    ambiguous = sum(len(json.loads(row["objects"])) >= 2 for row in rows)
-    if ambiguous != len(rows):
-        (output / "failure.json").write_text(json.dumps({
-            "status": "referential_ambiguity_failed", "video_id": video_id,
-            "rendered_frames": len(rows), "frames_with_two_visible_categories": ambiguous,
-        }, indent=2) + "\n")
-        raise ValueError(f"Only {ambiguous}/{len(rows)} frames have two visible categories")
     session = {"video_id": video_id, "subject": subject, "room": room_id, "split": split,
                "clips": json.dumps([item["clip"] for item in segments]),
                "distractors": json.dumps(distractors), "duration_s": config["duration_s"]}
     return rows, session, labelled, whole, sources
 
 
-def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, session_index=None):
+def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, session_index=None, workers=1):
     import pyarrow.parquet as pq
 
     config = load_config(config_path)
+    if not 1 <= workers <= 64:
+        raise ValueError("workers must be between 1 and 64")
     if sessions_per_subject < 1:
         raise ValueError("Positive sessions-per-subject required")
-    rooms = room_bank(rooms_path)
+    available = {room.parents[2].name: room for room in room_bank(rooms_path)}
+    rooms = [available[name] for name in config["session_rooms"]]
+    probe_rooms = [available[name] for name in config["probe_rooms"]]
+    report = json.loads((Path(rooms_path) / "room_bank_report.json").read_text())
+    square_keys = ("clear_2_5m_square", "square_vertices_m", "square_orientation_degrees",
+                   "floor_height_m")
+    config["clear_squares"] = {entry["room_id"]: {key: entry["geometry"][key] for key in square_keys}
+                               for entry in report["rooms"]
+                               if entry["room_id"] in config["session_rooms"] + config["probe_rooms"]}
+    for name in config["session_rooms"] + config["probe_rooms"]:
+        if not config["clear_squares"][name]["clear_2_5m_square"]:
+            raise ValueError(f"No certified square for {name}")
     catalog, categories = _catalog(config)
     schedule = [(subject, number) for subject in config["subjects"]
                 for number in range(sessions_per_subject)]
@@ -216,10 +230,16 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
     output = _output_directory(output_path)
     started = time.monotonic()
     frames, sessions, labelled, whole, sources = [], [], [], [], {}
-    for subject, number in schedule:
-        index = config["subjects"].index(subject) * sessions_per_subject + number
-        result = _session(config, Path(config["grab_root"]), hand_ids, subject, number, rooms,
-                          catalog[subject], categories, seed + index, output)
+    arguments = [(config, Path(config["grab_root"]), hand_ids, subject, number, rooms,
+                  catalog[subject], categories,
+                  seed + config["subjects"].index(subject) * sessions_per_subject + number, output)
+                 for subject, number in schedule]
+    if workers == 1:
+        results = [_session(*args) for args in arguments]
+    else:
+        with multiprocessing.get_context("spawn").Pool(workers) as pool:
+            results = pool.starmap(_session, arguments)
+    for result in results:
         frames.extend(result[0]); sessions.append(result[1])
         labelled.extend(result[2]); whole.extend(result[3]); sources.update(result[4])
     probes = []
@@ -227,11 +247,12 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
         rng = np.random.default_rng(seed + 100000)
         table_pose = rigid_matrix(load_clip(Path(config["grab_root"]) /
             catalog[config["subjects"][0]][0][0])["table"]["params"], 0).tolist()
-        jobs = {str(room): {"room_urdf": str(room), "segments": [], "probes": []} for room in rooms[1:]}
+        jobs = {str(room): {"room_urdf": str(room), "clear_square": config["clear_squares"][room.parents[2].name],
+                            "job_id": "probe_" + room.parents[2].name, "segments": [], "probes": []} for room in probe_rooms}
         for split in ("dev", "test"):
             for category in categories:
                 for number in range(config["probes_per_category_per_split"]):
-                    room = rooms[1 + number % (len(rooms) - 1)]
+                    room = probe_rooms[number % len(probe_rooms)]
                     probe_id = f"{split}_{category}_{number:04d}"
                     probes.append({"probe_id": probe_id, "image": f"probes/{probe_id}.jpg",
                                    "category": category, "room": room.parents[2].name, "split": split})
@@ -241,8 +262,18 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
                         "table_pose": table_pose,
                         "color": rng.uniform(0.15, 0.85, 3).tolist(), "image": probes[-1]["image"],
                         "yaw": float(rng.uniform(0, 2 * np.pi)), "height": float(rng.uniform(0.3, 0.6))})
-        for job in jobs.values():
-            render_job(job, config, output)
+        if workers == 1:
+            for job in jobs.values():
+                render_job(job, config, output)
+        else:
+            with multiprocessing.get_context("spawn").Pool(min(workers, len(jobs))) as pool:
+                pool.starmap(render_job, [(job, config, output) for job in jobs.values()])
+    receipts = [json.loads(path.read_text()) for path in sorted(output.glob("render_stats_*.json"))]
+    if receipts:
+        (output / "render_stats.json").write_text(json.dumps({
+            "seconds": sum(item["seconds"] for item in receipts),
+            "image_seconds": [second for item in receipts for second in item["image_seconds"]],
+            "blender_version": receipts[0]["blender_version"], "jobs": receipts}))
     for name, rows in (("frames", frames), ("sessions", sessions), ("probes", probes)):
         pq.write_table(table(rows, name), output / f"{name}.parquet")
     seconds = time.monotonic() - started
@@ -254,14 +285,19 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
                   "held_visible_fraction": sum(any(obj["category"] == row["held_category"]
                       for obj in json.loads(row["objects"])) for row in contacted) / len(contacted) if contacted else None,
                   "labelled_contact_median_m": float(np.median(labelled)),
+                  "labelled_contact_p90_m": float(np.percentile(labelled, 90)),
                   "whole_contacting_hand_median_m": float(np.median(whole))}
-    manifest = {"schema_version": 1, "config": config, "seed": seed,
-                "sessions_per_subject": sessions_per_subject, "session_index": session_index,
-                "renderer": {"engine": "CYCLES", "device": config["device"],
-                    "passes": "RGB plus raw emission instance-ID",
+    statistics["frames_with_two_visible_categories"] = sum(
+        len(json.loads(row["objects"])) >= 2 for row in frames)
+    status = ("complete" if statistics["frames_with_two_visible_categories"] == len(frames)
+              else "referential_ambiguity_failed")
+    manifest = {"schema_version": 1, "status": status, "config": config, "seed": seed,
+                "sessions_per_subject": sessions_per_subject, "session_index": session_index, "workers": workers,
+                "renderer": {"engine": "BLENDER_WORKBENCH", "threads": 1,
+                    "passes": "Workbench studio/texture RGB; Workbench flat/material raw ID, antialiasing off",
                     "blender_version": json.loads((output / "render_stats.json").read_text())["blender_version"]},
                 "sources": sources,
-                "rooms": {str(room): _sha256(room) for room in rooms},
+                "rooms": {str(room): _sha256(room) for room in rooms + probe_rooms},
                 "hand_vertex_ids_sha256": _sha256(config["hand_vertex_ids"]),
                 "body_models_sha256": {path.name: _sha256(path) for path in
                     sorted((Path(config["body_models"]) / "smplx").glob("SMPLX_*.npz"))},
@@ -273,7 +309,10 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
                 "statistics": statistics}
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     (output / "work").rmdir()
-    print(json.dumps(statistics, indent=2))
+    print(json.dumps(statistics, indent=2), flush=True)
+    if status != "complete":
+        raise ValueError(f"Only {statistics['frames_with_two_visible_categories']}/{len(frames)} "
+                         "frames have two visible categories; pilot saved but visibility gate failed")
     return manifest
 
 

@@ -103,42 +103,20 @@ def rest_position(obj, point, normal):
     return point - obj.rotation_euler.to_matrix() @ anchor
 
 
-def open_area(vertices, objects, floors, obstacles):
-    low, high = vertices.min(axis=(0, 1)), vertices.max(axis=(0, 1))
-    for obj in objects:
-        a, b = bounds(obj)
-        low, high = np.minimum(low, a), np.maximum(high, b)
-    half = (high - low) / 2 + [0.10, 0.10, 0]
-    center = (high + low) / 2
-    for floor in floors:
-        a, b = bounds(floor)
-        xs = sorted(np.linspace(a[0] + half[0], b[0] - half[0], 9),
-                    key=lambda value: abs(value - (a[0] + b[0]) / 2))
-        ys = sorted(np.linspace(a[1] + half[1], b[1] - half[1], 9),
-                    key=lambda value: abs(value - (a[1] + b[1]) / 2))
-        for x in xs:
-            for y in ys:
-                if x - half[0] < a[0] or x + half[0] > b[0]:
-                    continue
-                if y - half[1] < a[1] or y + half[1] > b[1]:
-                    continue
-                inverse = floor.matrix_world.inverted()
-                supported = True
-                for dx in (-half[0], 0, half[0]):
-                    for dy in (-half[1], 0, half[1]):
-                        origin = inverse @ Vector((x + dx, y + dy, b[2] + 0.1))
-                        direction = inverse.to_3x3() @ Vector((0, 0, -1))
-                        hit, point, normal, _ = floor.ray_cast(origin, direction)
-                        if not hit or (floor.matrix_world.to_3x3() @ normal).normalized().z < 0.95:
-                            supported = False
-                if not supported:
-                    continue
-                shift = np.array([x - center[0], y - center[1], b[2] - low[2]])
-                lower, upper = low + shift, high + shift
-                if all(not (np.all(upper > bounds(obj)[0]) and np.all(lower < bounds(obj)[1]))
-                       for obj in obstacles):
-                    return shift
-    raise RuntimeError("No conservative open floor area fits the recorded interaction")
+def open_area(vertices, objects, square):
+    angle = math.radians(square["square_orientation_degrees"])
+    rotation = np.array([[math.cos(angle), -math.sin(angle), 0],
+                         [math.sin(angle), math.cos(angle), 0], [0, 0, 1]])
+    points = [vertices.reshape(-1, 3)]
+    points.extend(np.array([obj.matrix_world @ Vector(corner) for corner in obj.bound_box])
+                  for obj in objects)
+    local = np.concatenate(points) @ rotation
+    low, high = local.min(0), local.max(0)
+    if np.any((high - low)[:2] > 2.5):
+        raise RuntimeError("Recorded interaction does not fit certified 2.5m square")
+    center = np.mean(square["square_vertices_m"], axis=0)
+    return np.array([*center, square["floor_height_m"]]) - rotation @ np.array([
+        *((high + low)[:2] / 2), low[2]])
 
 
 def render_pair(image, mask):
@@ -146,7 +124,7 @@ def render_pair(image, mask):
     scene.render.image_settings.file_format = "JPEG"
     scene.render.image_settings.color_mode = "RGB"
     scene.render.filepath = str(image)
-    scene.cycles.samples = config["samples"]
+    scene.render.engine = "BLENDER_WORKBENCH"
     bpy.ops.render.render(write_still=True)
     original = []
     for obj in scene.objects:
@@ -156,13 +134,7 @@ def render_pair(image, mask):
         material = bpy.data.materials.get(f"instance_{obj.pass_index}")
         if material is None:
             material = bpy.data.materials.new(f"instance_{obj.pass_index}")
-            material.use_nodes = True
-            nodes = material.node_tree.nodes
-            nodes.clear()
-            emission = nodes.new("ShaderNodeEmission")
-            emission.inputs["Color"].default_value = (obj.pass_index / 255, 0, 0, 1)
-            out = nodes.new("ShaderNodeOutputMaterial")
-            material.node_tree.links.new(emission.outputs[0], out.inputs[0])
+            material.diffuse_color = (obj.pass_index / 255, 0, 0, 1)
         obj.data.materials.clear()
         obj.data.materials.append(material)
     previous = scene.view_settings.view_transform
@@ -171,8 +143,12 @@ def render_pair(image, mask):
     if world:
         world.inputs["Strength"].default_value = 0
     scene.view_settings.view_transform = "Raw"
-    scene.cycles.samples = 1
-    scene.cycles.use_denoising = False
+    shading = scene.display.shading
+    display = (shading.light, shading.color_type, shading.show_shadows, shading.show_cavity,
+               scene.display.render_aa)
+    shading.light, shading.color_type = "FLAT", "MATERIAL"
+    shading.show_shadows = shading.show_cavity = False
+    scene.display.render_aa = "OFF"
     scene.render.filter_size = 0.01
     scene.render.dither_intensity = 0
     scene.render.image_settings.file_format = "PNG"
@@ -182,6 +158,7 @@ def render_pair(image, mask):
         obj.data.materials.clear()
         for material in materials:
             obj.data.materials.append(material)
+    shading.light, shading.color_type, shading.show_shadows, shading.show_cavity, scene.display.render_aa = display
     scene.view_settings.view_transform = previous
     if world:
         world.inputs["Strength"].default_value = strength
@@ -196,21 +173,18 @@ def main():
     job = json.loads(Path(arguments[2]).read_text())
     config, output = job["config"], Path(job["output"])
     scene = bpy.context.scene
-    scene.render.engine = "CYCLES"
-    scene.cycles.device = config["device"]
-    if config["device"] == "GPU":
-        preferences = bpy.context.preferences.addons["cycles"].preferences
-        preferences.compute_device_type = "METAL" if sys.platform == "darwin" else "CUDA"
-        preferences.get_devices()
-        for device in preferences.devices:
-            device.use = device.type != "CPU"
-        if not any(device.use for device in preferences.devices):
-            raise RuntimeError("No Cycles GPU available")
+    scene.render.engine = "BLENDER_WORKBENCH"
+    scene.display.shading.light = "STUDIO"
+    scene.display.shading.color_type = "TEXTURE"
+    scene.display.shading.show_shadows = True
+    scene.display.shading.show_cavity = True
+    scene.display.shading.cavity_type = "BOTH"
+    scene.render.threads_mode = "FIXED"
+    scene.render.threads = 1
     scene.render.resolution_x, scene.render.resolution_y = config["resolution"]
     scene.render.resolution_percentage = 100
     scene.render.image_settings.quality = 90
     scene.world.color = (0.35, 0.35, 0.35)
-    scene.cycles.use_denoising = False
     scene.render.film_transparent = False
     scene.view_settings.view_transform = "AgX"
     floors, obstacles = import_room()
@@ -246,7 +220,7 @@ def main():
         active.location = rest_position(active, point, normal)
         bpy.context.view_layer.update()
         floor_anchor = np.array([center_x, center_y, 0.0])
-        shift = open_area(np.array([[a, b, floor_anchor]]), [table, active], floors, obstacles)
+        shift = open_area(np.array([[a, b, floor_anchor]]), [table, active], job["clear_square"])
         translation = Matrix.Translation(Vector(shift))
         for obj in (table, active):
             obj.matrix_world = translation @ obj.matrix_world
@@ -262,7 +236,6 @@ def main():
         scene.render.image_settings.file_format = "JPEG"
         scene.render.filepath = str(output / probe["image"])
         (output / probe["image"]).parent.mkdir(parents=True, exist_ok=True)
-        scene.cycles.samples = config["samples"]
         before_render = time.monotonic()
         bpy.ops.render.render(write_still=True)
         image_seconds.append(time.monotonic() - before_render)
@@ -277,9 +250,12 @@ def main():
         bpy.context.view_layer.update()
         low, high = bounds(table)
         distractors = []
-        occupied = segment["trajectory_bounds"]
-        for index, entry in enumerate(segment["distractors"], 2):
-            obj = load_ply(entry["mesh"], entry["color"], index)
+        occupied = np.asarray(segment["trajectory_bounds"])
+        candidates = [load_ply(entry["mesh"], entry["color"], index)
+                      for index, entry in enumerate(segment["distractors"], 2)]
+        bpy.context.view_layer.update()
+        # Place larger props first so small ones do not consume their only slots.
+        for obj in sorted(candidates, key=lambda obj: -float(np.max(bounds(obj)[1] - bounds(obj)[0]))):
             a, b = bounds(obj)
             placed = False
             for x in np.linspace(low[0], high[0], 14):
@@ -295,7 +271,8 @@ def main():
                     lower, upper = a + pos, b + pos
                     if np.any(lower[:2] < low[:2] + 0.02) or np.any(upper[:2] > high[:2] - 0.02):
                         continue
-                    if np.all(upper > np.array(occupied[0]) - 0.04) and np.all(lower < np.array(occupied[1]) + 0.04):
+                    if np.any(np.all(upper > occupied[:, 0] - 0.04, axis=1) &
+                              np.all(lower < occupied[:, 1] + 0.04, axis=1)):
                         continue
                     if any(np.all(upper > bounds(other)[0] - 0.02) and
                            np.all(lower < bounds(other)[1] + 0.02) for other in distractors):
@@ -307,12 +284,12 @@ def main():
                 if placed:
                     break
             if not placed:
-                raise RuntimeError("Cannot place distractors away from recorded trajectory")
+                raise RuntimeError(f"Cannot place {obj.name} on table away from recorded trajectory")
             distractors.append(obj)
         actor = mesh_object("actor", arrays["vertices"][0], arrays["faces"], [0.7, 0.5, 0.35])
         extent_points = np.concatenate([arrays["vertices"].reshape(-1, 3),
-                                        np.array(segment["trajectory_bounds"])])
-        shift = open_area(extent_points[None], [table, active, *distractors], floors, obstacles)
+                                        np.array(segment["trajectory_bounds"]).reshape(-1, 3)])
+        shift = open_area(extent_points[None], [table, active, *distractors], job["clear_square"])
         translation = Matrix.Translation(Vector(shift))
         relative_distractors = [table.matrix_world.inverted() @ obj.matrix_world for obj in distractors]
         for index, frame in enumerate(segment["frames"]):
@@ -328,8 +305,12 @@ def main():
             image_seconds.append(time.monotonic() - before_render)
         for obj in [actor, table, active, *distractors]:
             remove_object(obj)
-    (output / "render_stats.json").write_text(json.dumps({"seconds": time.monotonic() - started,
-                                                          "engine": "CYCLES", "device": config["device"],
+    stats_path = output / f"render_stats_{job.get('job_id', 'job')}.json"
+    previous = json.loads(stats_path.read_text()) if stats_path.exists() else {}
+    image_seconds = previous.get("image_seconds", []) + image_seconds
+    stats_path.write_text(json.dumps({"seconds": previous.get("seconds", 0) + time.monotonic() - started,
+                                                          "engine": "BLENDER_WORKBENCH", "id_engine": "BLENDER_WORKBENCH", "threads": 1, "job_id": job.get("job_id", "job"),
+                                                          "images": len(image_seconds),
                                                           "image_seconds": image_seconds,
                                                           "blender_version": bpy.app.version_string}))
 
