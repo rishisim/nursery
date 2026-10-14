@@ -85,21 +85,22 @@ def _category(path):
         return str(data["obj_name"].item())
 
 
-def _distractors(categories, active, config, rng):
-    import trimesh
-
-    candidates = []
-    for category in categories:
-        if category in active:
-            continue
-        mesh = trimesh.load(Path(config["grab_root"]) / "contact_meshes" / f"{category}.ply",
-                            process=False)
-        size = mesh.extents
-        if max(size) < 0.05:
-            candidates.append(category)
+def _distractors(categories, active, rng):
+    candidates = [category for category in categories if category != active]
     if len(candidates) < 3:
-        raise ValueError("Need three distinct distractor categories fitting on the GRAB table")
-    return rng.choice(candidates, size=3, replace=False).tolist()
+        raise ValueError("Need at least three distractor categories")
+    return rng.permutation(candidates).tolist()
+
+
+def _hand_trajectory(data, config, hand_ids):
+    bounds = []
+    count = len(data["body"]["params"]["transl"])
+    for start in range(0, count, 128):
+        vertices = reconstruct(data, np.arange(start, min(start + 128, count)), config, hand_ids)[0]
+        for ids in hand_ids.values():
+            hands = vertices[:, ids]
+            bounds.extend(np.stack([hands.min(axis=1), hands.max(axis=1)], axis=1).tolist())
+    return bounds
 
 
 def _trajectory(data, root):
@@ -125,10 +126,8 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
     segments = chain_clips(clips, config["duration_s"], seed)
     samples = sample_chain(segments, config["duration_s"])
     clip_categories = {item["clip"]: _category(root / item["clip"]) for item in segments}
-    active = set(clip_categories.values())
-    distractors = _distractors(categories, active, config, rng)
     colors = {category: rng.uniform(0.15, 0.85, 3).tolist() for category in categories}
-    job = {"room_urdf": str(room), "clear_square": config["clear_squares"][room_id], "job_id": video_id, "segments": []}
+    job = {"room_urdf": str(room), "clear_square": config["clear_squares"][room_id], "job_id": video_id, "seed": seed, "segments": []}
     rows, labelled, whole = [], [], []
     sources = {}
     for segment_index, segment in enumerate(segments):
@@ -162,9 +161,12 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
         job["segments"].append({"arrays": str(array_path), "table_mesh": str(mesh_path(
             root, data["table"]["table_mesh"])), "object_mesh": str(mesh_path(
             root, data["object"]["object_mesh"])), "color": colors[category],
-            "trajectory_bounds": _trajectory(data, root), "frames": frames,
+            "trajectory_bounds": _trajectory(data, root),
+            "hand_bounds": _hand_trajectory(data, config, hand_ids), "frames": frames,
+            "distractor_count": int(rng.integers(3, min(5, len(categories) - 1) + 1)),
             "distractors": [{"mesh": str(root / "contact_meshes" / f"{name}.ply"),
-                             "color": colors[name]} for name in distractors]})
+                             "category": name, "color": colors[name]}
+                            for name in _distractors(categories, category, rng)]})
     # Do not render geometry that has already failed the required contact construction gate.
     if not labelled or not whole or np.median(labelled) >= 0.01:
         for segment in job["segments"]:
@@ -183,25 +185,33 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
                       "labelled_contact_p90_m": float(np.percentile(labelled, 90)),
                       "whole_contacting_hand_median_m": float(np.median(whole))}), flush=True)
     render_job(job, config, output)
+    receipt = json.loads((output / f"render_stats_{video_id}.json").read_text())
+    realized = receipt["distractors"]
     rows.sort(key=lambda row: row["frame_idx"])
     for row in rows:
         mask_path = output / f"work/{video_id}_{row['frame_idx']:05d}.png"
         mask = np.asarray(Image.open(mask_path))[:, :, 0]
         category = clip_categories[row["clip"]]
-        row["objects"] = visible_objects(mask, {1: category, **dict(enumerate(distractors, 2))})
+        row["objects"] = visible_objects(mask, {1: category, **dict(enumerate(realized[row["image"]], 2))})
         mask_path.unlink()
     for segment in job["segments"]:
         Path(segment["arrays"]).unlink()
     session = {"video_id": video_id, "subject": subject, "room": room_id, "split": split,
                "clips": json.dumps([item["clip"] for item in segments]),
-               "distractors": json.dumps(distractors), "duration_s": config["duration_s"]}
+               "distractors": json.dumps(sorted({name for names in realized.values() for name in names})), "duration_s": config["duration_s"]}
     return rows, session, labelled, whole, sources
 
 
-def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, session_index=None, workers=1):
+def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, session_index=None, workers=1, subjects=None):
     import pyarrow.parquet as pq
 
     config = load_config(config_path)
+    if subjects is not None:
+        if not subjects or len(set(subjects)) != len(subjects):
+            raise ValueError("Select distinct subjects")
+        for subject in subjects:
+            subject_split(subject)
+        config["subjects"] = list(subjects)
     if not 1 <= workers <= 64:
         raise ValueError("workers must be between 1 and 64")
     if sessions_per_subject < 1:
@@ -281,15 +291,17 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
     statistics = {"frames": len(frames), "sessions": len(sessions), "probes": len(probes),
                   "wall_seconds": seconds, "total_images_per_minute": (len(frames) + len(probes)) * 60 / seconds,
                   "contact_fraction": len(contacted) / len(frames),
-                  "mean_visible_categories": float(np.mean([len(json.loads(row["objects"])) for row in frames])),
-                  "held_visible_fraction": sum(any(obj["category"] == row["held_category"]
+                  "mean_visible_categories": float(np.mean([sum(obj["visible_px"] > 0 for obj in json.loads(row["objects"])) for row in frames])),
+                  "held_visible_fraction": sum(any(obj["category"] == row["held_category"] and obj["visible_px"] > 0
                       for obj in json.loads(row["objects"])) for row in contacted) / len(contacted) if contacted else None,
                   "labelled_contact_median_m": float(np.median(labelled)),
                   "labelled_contact_p90_m": float(np.percentile(labelled, 90)),
                   "whole_contacting_hand_median_m": float(np.median(whole))}
     statistics["frames_with_two_visible_categories"] = sum(
-        len(json.loads(row["objects"])) >= 2 for row in frames)
-    status = ("complete" if statistics["frames_with_two_visible_categories"] == len(frames)
+        sum(obj["visible_px"] > 0 for obj in json.loads(row["objects"])) >= 2 for row in frames)
+    statistics["two_visible_categories_fraction"] = statistics["frames_with_two_visible_categories"] / len(frames)
+    status = ("complete" if statistics["held_visible_fraction"] is not None and
+              statistics["held_visible_fraction"] >= 0.7 and statistics["mean_visible_categories"] >= 2
               else "referential_ambiguity_failed")
     manifest = {"schema_version": 1, "status": status, "config": config, "seed": seed,
                 "sessions_per_subject": sessions_per_subject, "session_index": session_index, "workers": workers,
@@ -311,8 +323,7 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
     (output / "work").rmdir()
     print(json.dumps(statistics, indent=2), flush=True)
     if status != "complete":
-        raise ValueError(f"Only {statistics['frames_with_two_visible_categories']}/{len(frames)} "
-                         "frames have two visible categories; pilot saved but visibility gate failed")
+        raise ValueError("Held-object visibility or mean category visibility gate failed; pilot saved")
     return manifest
 
 

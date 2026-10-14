@@ -434,156 +434,32 @@ Limitation: synthetic harness checks do not establish learning gains on real epi
 
 ## Egocentric GRAB replay
 
-`nursery/egocentric_replay/` reconstructs HOIDiNi's **retargeted GRAB** with
-neutral SMPL-X, no subject template or betas, full 45D hand poses from
-`lhand/rhand.params.fullpose`, and `flat_hand_mean=True`. Stale gender,
-subject-template and body-hand PCA fields are ignored. Object and table poses
-follow upstream row-vector `v @ R + t`; Blender's column-vector transform is
-`R.T`. Head kinematics supply an eye-position camera; motion is not retargeted
-or tilted to force visibility. Sessions use hard cuts, 120 seconds, and 1 Hz.
-
-The canonical `nursery/egocentric_replay/config.json` fixes session rooms to
-Bedroom 11/23, LivingRoom 11/23/47, DiningRoom 47 and Office 11; probe rooms are
-Bedroom 47, Kitchen 23 and Office 47. These are disjoint for all subjects.
-Each actor/table interaction is translated into the room report's certified
-2.5m square and grounded at its recorded floor height; oversized interactions
-are rejected. Stand-in rooms are test fixtures only. Three distinct small
-props (under 5cm on each axis) rest on the actual GRAB table, with randomized session colors. Prop size
-is checked on all three axes, and placement avoids the union of per-frame
-object bounds rather than a whole-trajectory bounding box.
-
-RGB uses **Blender Workbench**, studio lighting, shadows, cavity, and texture
-color mode. Instance IDs also use **Workbench**, with flat lighting, material
-ID colors, Raw color management, and antialiasing off. Geometry/camera are shared.
-Each Blender worker uses one render thread; on software Mesa set
-`LP_NUM_THREADS=1` as well. Workbench uses the available graphics context;
-there is no Cycles pass. Performance includes both passes; per-image times
-accumulate in `render_stats.json`.
-
-The contact gate requires the median object-surface distance of **labelled hand
-vertices below 1 cm**. Its 90th percentile and whole-contacting-hand median are
-reported separately. The original contact topology/rule is unchanged. Every
-session frame must still contain at least two visible categories. Visibility
-is evaluated after saving the full pilot tables/manifest; failure records
-`status=referential_ambiguity_failed` and returns a nonzero exit, so metrics
-and previews remain inspectable without claiming an accepted episode set. Gates are
-checked without changing the source motion or contact labels.
-
-Use the existing ignored local environment and licensed input locations:
-
-```bash
-OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 \
-.external/egocentric-env/bin/python -m nursery.egocentric_replay build \
-  --config nursery/egocentric_replay/config.json \
-  --rooms /Users/rishisim/Documents/research/nursery/outputs/embodiedgen_scene/room_bank \
-  --output outputs/egocentric_replay/run --sessions-per-subject 2 --seed 7
-
-PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python \
-  -m nursery.egocentric_replay preview --episodes outputs/egocentric_replay/run \
-  --output outputs/egocentric_replay/contact_sheet.png
-
-PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python -m pytest \
-  -q -p no:cacheprovider tests/test_egocentric_replay.py
-```
-
-For the pilot, an ignored config selects only s1/s9/s10, keeping the canonical
-room split, duration and probe count. A complete pilot has 720 session frames
-and 816 probes (51 categories, eight per category per dev/test split).
-`--session-index INDEX` selects one deterministic subject-major session without
-probes. Each indexed worker gets its own ignored output root and contract tables.
-`--workers N` packs complete session jobs and then probe-room jobs into the
-current allocation; it produces one episode root with isolated per-job render
-receipts and an aggregate `render_stats.json`. Use `--workers 1` for throughput
-measurement on the laptop and `--workers 6` for the six-session Juno pilot.
-Completed session manifests with `status=complete` identify shards to skip on subsequent allocations;
-incomplete task-owned shards must be cleared before retrying. Shard consolidation
-remains with Phase 2. On Juno, pack workers into **one** `dev` allocation
-(`--cpus-per-task=64 --time=02:00:00`), rather than submitting 64 competing jobs.
-Use at most 64 workers, further limited by measured memory per worker and node
-RAM, and rerun only unfinished session indices in consecutive allocations.
-Keep licensed inputs at Juno's installed paths and render outputs ignored.
-
-### Follow-up validation
-
-The corrected laptop pilot completed all **720 frames**, **6 sessions**
-(two each for s1/s9/s10), and **816 probes** covering all **51 categories**.
-All 1,536 JPEGs decoded at 320x240; table hashes and room separation checked.
-The contact gate passed in every session: pooled labelled median **2.516 mm**,
-90th percentile **6.193 mm**; whole-contacting-hand median **26.533 mm**
-(diagnostic only). There were **456/720 contact frames (63.33%)**, with the held
-object visible in **428/456 (93.86%)**. Mean visible categories were **3.4847**.
-However, only **651/720 frames** contained at least two categories. The builder
-saved the full contract tables and `status=referential_ambiguity_failed`, then
-exited 1. This is a complete diagnostic pilot, not an accepted training set.
-
-The 28 focused tests passed, including neutral/full-hand parameter selection,
-row-vector rotation, inverse contact distance, trajectory bounds, certified
-square containment, packed-worker scheduling and retained visibility failures.
-The real placement preflight passed every clip in all six sessions. The prop
-filter checks all axes and uses <5cm: an 8cm pyramid failed to fit beside one
-recorded trajectory. Clearances were preserved. This restricts distractor
-variety to small shapes; they remain small in the RGB images.
-
-Visual inspection of all six session previews found readable hands and objects,
-with plausible grasps of the camera, mug, glasses and small shapes. The three
-small distractors sit on the GRAB tabletop. The head-mounted camera is at an
-estimated eye position, generally forward and down toward the table; head turns
-and drinking/face-level actions sometimes point it upward or remove the held
-object/table from view (notably s9_0000). Those source poses remain unchanged.
-The 51-category probe sheet is readable. Workbench removes Monte Carlo grain,
-but cavity highlights expose fine streaks on the original table mesh.
-
-Single-threaded laptop renderer throughput over the six real sessions was
-**266.88 RGB/ID pairs/minute**, including placement, excluding room import and
-reconstruction. Probes averaged **219.64 images/minute**. The complete pipeline
-used **1,075.44 seconds (17.92 minutes)**, or **85.70 total images/minute**.
-An isolated eight-worker benchmark rendered **960 pairs in 112.70 seconds**
-(**511.07 pairs/minute combined**), repeating the real ten-frame
-`s1/airplane_fly_1` window in Bedroom_seed11. It measures rendering only,
-including worker launch/import, with one thread per Blender process.
-
-For **110,000 session frames + 816 probes**, the measured eight-worker rate
-projects **3.61 hours of rendering**. Scaling the pilot's non-render time
-(690.66 seconds) over 110,000 session frames and eight workers adds
-**3.66 hours**: a conservative sequential sum is **7.28 hours**; perfect
-CPU/render overlap gives an optimistic lower estimate around **3.7 hours**.
-These are extrapolations, not a full-build benchmark; room variety, GPU
-contention, memory and I/O can change them. The laptop has 10 CPU cores and
-32GiB RAM. Eight workers share the laptop GPU; measured throughput does not multiply
-single-worker throughput by eight.
-
-Juno's `dev` partition was verified as 64 cores, 384,000MB node RAM, no GPU GRES,
-and a two-hour limit. Its installed Blender `bpy` 4.3 rendered Workbench via
-software EGL; an ignored launcher supplies the existing Blender script entry
-point, with `LP_NUM_THREADS=1`. The six-worker full pilot was launched as job
-**455154** in one allocation (`--cpus-per-task=6 --mem=48G --time=02:00:00`).
-Subsequently `ssh juno true` failed with **Permission denied**; rule 5a stopped
-all Juno actions. Final job state, full pilot output and credible Juno
-throughput/projection remain unverified pending restored authentication.
-Use per-session indexed shards as the resume unit across consecutive jobs,
-skipping completed manifests and retrying only incomplete task-owned shards.
-A 64-worker projection must use measured Juno per-worker throughput and memory,
-not the laptop's GPU rate. Full accepted build remains deferred until the
-visibility gate is resolved; camera/clip policy changes require a separate task.
-
-Actual local commands (the ignored config selects s1/s9/s10):
+`nursery/egocentric_replay/` renders 120-second, 1 Hz head-camera sessions
+from HOIDiNi's retargeted GRAB with neutral SMPL-X and recorded full hand poses.
+Inputs are licensed GRAB/SMPL-X at the paths in package-local `config.json`,
+the existing `.external/egocentric-env/`, Blender, and a real exported room bank.
+Session and dev/test probe rooms are disjoint; outputs must be Git-ignored.
+Each clip has 3–5 static distractors sampled uniformly from other GRAB categories,
+subject to tabletop placement and full object/hand-trajectory clearance.
+Frame `objects` records all realized categories, including zero-pixel visibility.
 
 ```bash
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 LP_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 \
 .external/egocentric-env/bin/python -m nursery.egocentric_replay build \
-  --config outputs/egocentric_replay/followup_config.json \
   --rooms /Users/rishisim/Documents/research/nursery/outputs/embodiedgen_scene/room_bank \
-  --output outputs/egocentric_replay/real_room_pilot --sessions-per-subject 2 --seed 7
-
-PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python \
-  -m nursery.egocentric_replay preview \
-  --episodes outputs/egocentric_replay/real_room_pilot \
-  --output outputs/egocentric_replay/real_room_pilot/contact_sheet.png
+  --subjects s1 s9 s10 --sessions-per-subject 2 --seed 7 \
+  --output outputs/egocentric_replay/run
+.external/egocentric-env/bin/python -m nursery.egocentric_replay preview \
+  --episodes outputs/egocentric_replay/run --output outputs/egocentric_replay/run/contact_sheet.png
+PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python -m pytest -q -p no:cacheprovider tests/test_egocentric_replay.py
 ```
 
-The probe sheet is `outputs/egocentric_replay/real_room_pilot/probe_sheet.png`.
-The retained benchmark receipt is
-`outputs/egocentric_replay/eight_worker_benchmark/benchmark.json`.
-HOIDiNi inspection used commit `0fc3a78da4d0a6372efd4e52f89c54fd590ce32b`.
-Juno runs used an ignored staged copy of this worktree; their Git field refers
-to the host checkout base, not a committed execution snapshot.
+Omit `--subjects` for all subjects; Phase 2 uses `--subjects s1 s2 s3 s4 s5 s6 s7 s8`.
+Probes still render. `--workers N` packs jobs; `--session-index N` renders one
+scheduled session without probes. Gates: labelled contact median <1 cm,
+held object visible in ≥70% of contact frames, mean visible categories ≥2.
+The fraction of frames with ≥2 visible categories is a statistic only.
+Workbench laptop: 228 RGB/ID pairs/min rendering; 61.25 images/min end to end.
+Limitations: adult motion is an infant proxy; source head turns can hide the
+table/held object, placement rejection biases realized categories, and replay
+provides kinematics rather than physics. Measurements remain in ignored run roots.

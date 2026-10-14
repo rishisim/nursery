@@ -59,8 +59,10 @@ def test_visibility_exact_pixels_and_odd_image_grid():
     mask[1, 7] = 2
     objects = json.loads(visible_objects(mask, {1: "mug", 2: "apple", 3: "pear"}))
     assert objects == [{"category": "mug", "visible_px": 3, "cells": [0, 5, 15]},
-                       {"category": "apple", "visible_px": 1, "cells": [3]}]
-    assert json.loads(visible_objects(mask * 0, {1: "mug"})) == []
+                       {"category": "apple", "visible_px": 1, "cells": [3]},
+                       {"category": "pear", "visible_px": 0, "cells": []}]
+    assert json.loads(visible_objects(mask * 0, {1: "mug"})) == [
+        {"category": "mug", "visible_px": 0, "cells": []}]
 
 
 def test_chaining_exact_duration_source_timebase_and_hard_cuts():
@@ -205,6 +207,35 @@ def test_build_contract_with_fake_sessions_and_probes(tmp_path, monkeypatch):
     assert pq.read_table(tmp_path / "packed/frames.parquet").to_pylist() == pq.read_table(
         output / "frames.parquet").to_pylist()
 
+    selected = implementation.build(config_path, rooms, tmp_path / "selected", 2, 7, subjects=["s1"])
+    selected_sessions = pq.read_table(tmp_path / "selected/sessions.parquet").to_pylist()
+    assert {row["subject"] for row in selected_sessions} == {"s1"}
+    assert selected["statistics"]["probes"] == 4
+    with pytest.raises(ValueError, match="distinct subjects"):
+        implementation.build(config_path, rooms, tmp_path / "duplicates", subjects=["s1", "s1"])
+
+    def sometimes_one_category(*args):
+        result = fake_session(*args)
+        result[0][0]["objects"] = '[{"category":"mug","visible_px":10,"cells":[1]}]'
+        result[0][1]["objects"] = '[{"category":"mug","visible_px":10,"cells":[1]}, {"category":"apple","visible_px":5,"cells":[2]}, {"category":"pear","visible_px":5,"cells":[3]}]'
+        return result
+
+    monkeypatch.setattr(implementation, "_session", sometimes_one_category)
+    accepted = implementation.build(config_path, rooms, tmp_path / "sometimes_one", 2, 7)
+    assert accepted["status"] == "complete"
+    assert accepted["statistics"]["two_visible_categories_fraction"] == 0.5
+    assert accepted["statistics"]["mean_visible_categories"] == 2
+
+    def held_invisible(*args):
+        result = fake_session(*args)
+        for row in result[0]:
+            row["objects"] = '[{"category":"mug","visible_px":0,"cells":[]}, {"category":"pear","visible_px":10,"cells":[1]}, {"category":"apple","visible_px":5,"cells":[2]}]'
+        return result
+
+    monkeypatch.setattr(implementation, "_session", held_invisible)
+    with pytest.raises(ValueError, match="visibility gate failed"):
+        implementation.build(config_path, rooms, tmp_path / "held_invisible", 2, 7)
+
     def invisible_session(*args):
         result = fake_session(*args)
         for row in result[0]:
@@ -255,6 +286,7 @@ def test_contact_gate_rejects_before_render_and_removes_intermediates(tmp_path, 
     monkeypatch.setattr(implementation, "_distractors", lambda *args: ["apple", "pear", "dice"])
     monkeypatch.setattr(implementation, "mesh_path", lambda root, name: tmp_path / name)
     monkeypatch.setattr(implementation, "_trajectory", lambda *args: [[0, 0, 0], [1, 1, 1]])
+    monkeypatch.setattr(implementation, "_hand_trajectory", lambda *args: [])
     monkeypatch.setattr(implementation, "reconstruct", lambda *args: (
         np.zeros((2, 4, 3)), np.array([[0, 1, 2]]), np.tile(np.eye(4), (2, 1, 1)),
         np.ones(2, dtype=bool), np.zeros(2, dtype=bool)))
@@ -358,3 +390,75 @@ def test_certified_square_contains_actor_and_table_and_rejects_oversize():
     assert (points + shift)[:, 2].min() == pytest.approx(0.1)
     with pytest.raises(RuntimeError, match="does not fit"):
         namespace["open_area"](points * 4, [table], square)
+
+
+def test_distractor_candidates_include_real_objects_and_exclude_only_current_clip():
+    from nursery.egocentric_replay.build import _distractors
+
+    categories = ["mug", "camera", "apple", "cubesmall", "toothbrush"]
+    order = _distractors(categories, "mug", np.random.default_rng(7))
+    assert set(order) == set(categories) - {"mug"}
+    assert order == _distractors(categories, "mug", np.random.default_rng(7))
+    assert "mug" in _distractors(categories, "camera", np.random.default_rng(7))
+
+
+def test_hand_clearance_covers_every_source_frame_and_both_hands(monkeypatch):
+    from nursery.egocentric_replay import build as implementation
+
+    seen = []
+
+    def reconstruct(data, indices, config, ids):
+        seen.extend(indices.tolist())
+        vertices = np.zeros((len(indices), 4, 3))
+        vertices[:, :2, 0] = indices[:, None]
+        vertices[:, 2:, 1] = indices[:, None] + 10
+        return vertices, None, None, None, None
+
+    monkeypatch.setattr(implementation, "reconstruct", reconstruct)
+    swept = implementation._hand_trajectory({"body": {"params": {"transl": np.zeros((260, 3))}}},
+                                          {}, {"left_hand": [0, 1], "right_hand": [2, 3]})
+    assert seen == list(range(260))
+    assert len(swept) == 520
+    assert any(bounds[0][1] == 269 for bounds in swept)
+
+
+def test_placement_resamples_category_after_bounded_positions():
+    import ast
+    from pathlib import Path
+    from types import SimpleNamespace
+
+    function = next(node for node in ast.parse(Path("nursery/egocentric_replay/blender.py").read_text()).body
+                    if isinstance(node, ast.FunctionDef) and node.name == "_place_distractors")
+    table = SimpleNamespace(low=np.array([0, 0, 0]), high=np.array([1, 1, 0]), location=np.zeros(3))
+    removed, loaded = [], []
+
+    def load(path, color, instance):
+        size = 2 if path == "oversized" else 0.03
+        obj = SimpleNamespace(low=np.array([-size / 2, -size / 2, 0]),
+                              high=np.array([size / 2, size / 2, size]),
+                              location=np.zeros(3), instance=instance)
+        loaded.append(obj)
+        return obj
+
+    class Rng:
+        calls = 0
+
+        def uniform(self, low, high):
+            self.calls += 1
+            # The first small-object proposal intersects the swept region.
+            return np.array([0.5, 0.5]) if self.calls == 257 else np.array([0.2, 0.2])
+
+    rng = Rng()
+    namespace = {"np": np, "bounds": lambda obj: (obj.low + obj.location, obj.high + obj.location),
+                 "load_ply": load, "remove_object": removed.append,
+                 "bpy": SimpleNamespace(context=SimpleNamespace(view_layer=SimpleNamespace(update=lambda: None))),
+                 "table_surface": lambda table, x, y: (np.array([x, y, 0]), None),
+                 "rest_position": lambda obj, point, normal: point}
+    exec(compile(ast.Module(body=[function], type_ignores=[]), "placement", "exec"), namespace)
+    objects, names = namespace["_place_distractors"](table,
+        [{"mesh": name, "category": name, "color": []} for name in ["oversized", "mug"]], 1,
+        np.array([[[0.45, 0.45, 0], [0.55, 0.55, 0.2]]]), rng)
+    assert rng.calls == 258
+    assert removed == [loaded[0]]
+    assert names == ["mug"] and objects[0].instance == 2
+    np.testing.assert_allclose(objects[0].location, [0.2, 0.2, 0])

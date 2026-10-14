@@ -164,6 +164,50 @@ def render_pair(image, mask):
         world.inputs["Strength"].default_value = strength
 
 
+def _place_distractors(table, entries, count, occupied, rng):
+    low, high = bounds(table)
+    distractors = []
+    categories = []
+    # The shuffled category order is uniform; infeasible props are rejected.
+    for entry in entries:
+        obj = load_ply(entry["mesh"], entry["color"], len(distractors) + 2)
+        bpy.context.view_layer.update()
+        placed = False
+        for _ in range(256):
+            x, y = rng.uniform(low[:2], high[:2])
+            surface = table_surface(table, x, y)
+            if surface is None:
+                continue
+            point, normal = surface
+            pos = np.array(rest_position(obj, point, normal))
+            obj.location = (0, 0, 0)
+            bpy.context.view_layer.update()
+            a, b = bounds(obj)
+            lower, upper = a + pos, b + pos
+            if np.any(lower[:2] < low[:2] + 0.02) or np.any(upper[:2] > high[:2] - 0.02):
+                continue
+            if np.any(np.all(upper > occupied[:, 0] - 0.04, axis=1) &
+                      np.all(lower < occupied[:, 1] + 0.04, axis=1)):
+                continue
+            if any(np.all(upper > bounds(other)[0] - 0.02) and
+                   np.all(lower < bounds(other)[1] + 0.02) for other in distractors):
+                continue
+            obj.location = pos
+            bpy.context.view_layer.update()
+            placed = True
+            break
+        if not placed:
+            remove_object(obj)
+            continue
+        distractors.append(obj)
+        categories.append(entry["category"])
+        if len(distractors) == count:
+            break
+    if len(distractors) != count:
+        raise RuntimeError("Cannot place requested distractors away from object and hands")
+    return distractors, categories
+
+
 def main():
     global bpy, Matrix, Vector, scene, config
 
@@ -205,6 +249,8 @@ def main():
     scene.camera = camera
     started = time.monotonic()
     image_seconds = []
+    realized = {}
+    rng = np.random.default_rng(job.get("seed", 0))
     for probe in job.get("probes", []):
         table = load_ply(probe["table_mesh"], [0.55, 0.4, 0.25])
         table.matrix_world = Matrix(probe["table_pose"])
@@ -248,44 +294,10 @@ def main():
         table.matrix_world = Matrix(arrays["table"][0].tolist())
         active.matrix_world = Matrix(arrays["object"][0].tolist())
         bpy.context.view_layer.update()
-        low, high = bounds(table)
-        distractors = []
-        occupied = np.asarray(segment["trajectory_bounds"])
-        candidates = [load_ply(entry["mesh"], entry["color"], index)
-                      for index, entry in enumerate(segment["distractors"], 2)]
-        bpy.context.view_layer.update()
-        # Place larger props first so small ones do not consume their only slots.
-        for obj in sorted(candidates, key=lambda obj: -float(np.max(bounds(obj)[1] - bounds(obj)[0]))):
-            a, b = bounds(obj)
-            placed = False
-            for x in np.linspace(low[0], high[0], 14):
-                for y in np.linspace(low[1], high[1], 14):
-                    surface = table_surface(table, x, y)
-                    if surface is None:
-                        continue
-                    point, normal = surface
-                    pos = np.array(rest_position(obj, point, normal))
-                    obj.location = (0, 0, 0)
-                    bpy.context.view_layer.update()
-                    a, b = bounds(obj)
-                    lower, upper = a + pos, b + pos
-                    if np.any(lower[:2] < low[:2] + 0.02) or np.any(upper[:2] > high[:2] - 0.02):
-                        continue
-                    if np.any(np.all(upper > occupied[:, 0] - 0.04, axis=1) &
-                              np.all(lower < occupied[:, 1] + 0.04, axis=1)):
-                        continue
-                    if any(np.all(upper > bounds(other)[0] - 0.02) and
-                           np.all(lower < bounds(other)[1] + 0.02) for other in distractors):
-                        continue
-                    obj.location = pos
-                    bpy.context.view_layer.update()
-                    placed = True
-                    break
-                if placed:
-                    break
-            if not placed:
-                raise RuntimeError(f"Cannot place {obj.name} on table away from recorded trajectory")
-            distractors.append(obj)
+        occupied = np.asarray(segment["trajectory_bounds"] + segment["hand_bounds"])
+        distractors, categories = _place_distractors(
+            table, segment["distractors"], segment["distractor_count"], occupied, rng)
+        realized.update({frame["image"]: categories for frame in segment["frames"]})
         actor = mesh_object("actor", arrays["vertices"][0], arrays["faces"], [0.7, 0.5, 0.35])
         extent_points = np.concatenate([arrays["vertices"].reshape(-1, 3),
                                         np.array(segment["trajectory_bounds"]).reshape(-1, 3)])
@@ -310,6 +322,7 @@ def main():
     image_seconds = previous.get("image_seconds", []) + image_seconds
     stats_path.write_text(json.dumps({"seconds": previous.get("seconds", 0) + time.monotonic() - started,
                                                           "engine": "BLENDER_WORKBENCH", "id_engine": "BLENDER_WORKBENCH", "threads": 1, "job_id": job.get("job_id", "job"),
+                                                          "distractors": {**previous.get("distractors", {}), **realized},
                                                           "images": len(image_seconds),
                                                           "image_seconds": image_seconds,
                                                           "blender_version": bpy.app.version_string}))

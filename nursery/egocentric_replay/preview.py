@@ -35,7 +35,7 @@ def preview(episodes, output):
         x, y = index % 4 * 320, index // 4 * 280
         sheet.paste(image, (x, y))
         cue = f"L={int(row['contact_left'])} R={int(row['contact_right'])} {row['held_category'] or '-'}"
-        visible = ", ".join(obj["category"] for obj in json.loads(row["objects"]))
+        visible = ", ".join(obj["category"] for obj in json.loads(row["objects"]) if obj["visible_px"] > 0)
         draw.text((x + 4, y + 240), f"{row['video_id']} t={row['frame_idx']} {cue}", fill="black")
         draw.text((x + 4, y + 256), visible, fill="black")
     output.parent.mkdir(parents=True, exist_ok=True)

@@ -38,8 +38,7 @@ def visible_objects(mask, categories):
     result = []
     for instance, category in categories.items():
         y, x = np.nonzero(mask == instance)
-        if len(x):
-            cells = np.unique(np.minimum(y * 4 // height, 3) * 4 +
+        cells = np.unique(np.minimum(y * 4 // height, 3) * 4 +
                               np.minimum(x * 4 // width, 3)).tolist()
-            result.append({"category": category, "visible_px": len(x), "cells": cells})
+        result.append({"category": category, "visible_px": len(x), "cells": cells})
     return json.dumps(result)
