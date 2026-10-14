@@ -92,11 +92,6 @@ def contact_distances(data, indices, vertices, hand_ids, root, vertex_ids=None, 
     return labelled, whole
 
 
-def clearance_indices(count, fps):
-    step = max(1, int(np.ceil(fps / 10)))
-    return np.unique(np.r_[np.arange(0, count, step), count - 1])
-
-
 def contact_indices(data, rendered, hand_ids):
     ids = np.concatenate(list(hand_ids.values()))
     labelled = np.flatnonzero((data["contact"]["body"][:, ids] != 0).any(axis=1))
@@ -105,19 +100,7 @@ def contact_indices(data, rendered, hand_ids):
     return np.unique(np.r_[rendered, one_hz, selected])
 
 
-def inflated_bounds(points, indices):
-    points = np.asarray(points)
-    # Include every intervening source sample in the displacement certificate.
-    displacement = max((float(np.linalg.norm(points[a:b + 1] - points[a], axis=-1).max())
-                        for a, b in zip(indices[:-1], indices[1:])), default=0.0)
-    selected = points[indices]
-    bounds = np.stack([selected.min(axis=1) - displacement,
-                       selected.max(axis=1) + displacement], axis=1)
-    return bounds, displacement
-
-
 def hand_geometry(data, hand_ids, gate_indices, config, model=None):
-    import smplx
     import torch
     from smplx.lbs import batch_rigid_transform, batch_rodrigues, vertices2joints
 
@@ -131,7 +114,7 @@ def hand_geometry(data, hand_ids, gate_indices, config, model=None):
     weights = model.lbs_weights[ids]
     count = len(data["body"]["params"]["transl"])
     hands = np.empty((count, len(ids), 3), dtype=np.float32)
-    # Upstream skinning on hand vertices certifies displacement without a dense full-body pass.
+    # Skin only hand vertices to retain exact full-rate clearance without a dense body pass.
     with torch.no_grad():
         for start in range(0, count, 128):
             stop = min(start + 128, count)
@@ -148,13 +131,11 @@ def hand_geometry(data, hand_ids, gate_indices, config, model=None):
             vertices = (skin @ homogeneous[..., None])[:, :, :3, 0]
             vertices += torch.tensor(body["transl"][start:stop], dtype=torch.float32)[:, None]
             hands[start:stop] = vertices.numpy()
-    indices = clearance_indices(count, data["framerate"])
-    bounds, margins = [], []
+    bounds = []
     for hand in hand_ids.values():
-        values, margin = inflated_bounds(hands[:, np.searchsorted(ids, hand)], indices)
-        bounds.extend(values.tolist())
-        margins.append(margin)
-    return hands[gate_indices], ids, bounds, max(margins)
+        points = hands[:, np.searchsorted(ids, hand)]
+        bounds.extend(np.stack([points.min(axis=1), points.max(axis=1)], axis=1).tolist())
+    return hands[gate_indices], ids, bounds, 0.0
 
 
 

@@ -462,17 +462,20 @@ scheduled session without probes. Gates: labelled contact median <1 cm,
 held object visible in ≥70% of contact frames, mean visible categories ≥2.
 The fraction of frames with ≥2 visible categories is a statistic only.
 Full-body SMPL-X is batched over the rendered 1-Hz frames. Hand-only upstream
-skinning certifies the maximum intervening source-sample displacement; hand and
-object clearance bounds at at most 10 Hz are inflated by that displacement.
-The unchanged 1-cm contact gate uses 1-Hz frames plus up to 200 evenly spaced
-labelled-contact frames per clip, with exact triangle-surface distances. Whole-hand
-diagnostics continue to use the rendered frames.
+skinning retains exact full-rate hand clearance bounds, and object bounds use
+all source frames. There is no sampled-bound displacement inflation. The unchanged
+1-cm contact gate uses 1-Hz frames plus up to 200 evenly spaced labelled-contact
+frames per clip, with exact triangle-surface distances. Whole-hand diagnostics
+continue to use the rendered frames.
 
-On the same `s1_0004`/seed-11 session, the profiled baseline took 193.71 s
-end to end; the optimized profiled run took 62.56 s. The final unprofiled run
-took 36.02 s, with 14.06 s preparation and 20.91 s in Blender. The labelled
-median changed by 0.0554 mm and p90 by 0.2524 mm; the whole-hand median was unchanged.
-These single-worker measurements do not establish packed throughput.
+The s1/s9/s10, two-session-per-subject, seed-7 acceptance pilot rendered 720 frames
+and 816 probes in 164.05 s with six workers. It realized 3/4/5 distractors in
+24/23/29 clips, with no zero-fit clips, mean realized count 4.066 and mean visible
+categories 4.551. Labelled-contact median and p90 changed by -0.0154 mm and
++0.0470 mm against the earlier pilot; the whole-hand median was unchanged.
+Each session's preparation time (17.83–29.04 s) was below its Blender time
+(30.06–45.34 s). The superseded global margin produced 1,155 zero-fit clips out
+of 1,177 and 1.011 mean visible categories; those train sessions are discarded.
 Limitations: adult motion is an infant proxy; source head turns can hide the
 table/held object, placement rejection biases realized categories, and replay
 provides kinematics rather than physics. Measurements remain in ignored run roots.

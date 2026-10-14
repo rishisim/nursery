@@ -406,21 +406,6 @@ def test_distractor_candidates_include_real_objects_and_exclude_only_current_cli
     assert "mug" in _distractors(categories, "camera", np.random.default_rng(7))
 
 
-def test_sparse_clearance_contains_unsampled_excursions():
-    from nursery.egocentric_replay.grab import clearance_indices, inflated_bounds
-
-    points = np.zeros((121, 2, 3))
-    points[5, :, 0] = 0.75
-    points[60:, :, 1] = 0.2
-    indices = clearance_indices(len(points), 120)
-    assert np.diff(indices).min() >= 12
-    bounds, margin = inflated_bounds(points, indices)
-    assert margin == pytest.approx(0.75)
-    for a, b, bound in zip(indices[:-1], indices[1:], bounds):
-        assert np.all(points[a:b + 1] >= bound[0])
-        assert np.all(points[a:b + 1] <= bound[1])
-
-
 def test_contact_subsample_is_deterministic_and_keeps_rendered_frames():
     from nursery.egocentric_replay.grab import contact_indices
 
@@ -523,4 +508,44 @@ def test_hand_only_skinning_matches_upstream_lbs(tmp_path, monkeypatch):
     actual, ids, bounds, margin = hand_geometry(data, {"left_hand": [0, 1], "right_hand": [2, 3]},
                                                np.arange(3), {"body_models": str(tmp_path)})
     np.testing.assert_allclose(actual, expected[:, ids], atol=1e-7)
-    assert len(bounds) == 4 and margin > 0
+    assert len(bounds) == 6 and margin == 0
+    expected_bounds = []
+    for hand in ([0, 1], [2, 3]):
+        points = expected[:, hand]
+        expected_bounds.extend(np.stack([points.min(axis=1), points.max(axis=1)], axis=1))
+    np.testing.assert_allclose(bounds, expected_bounds, atol=1e-7)
+
+
+def test_local_hand_path_does_not_block_free_tabletop(tmp_path, monkeypatch):
+    import ast
+    from pathlib import Path
+    from types import SimpleNamespace
+    from nursery.egocentric_replay.grab import hand_geometry
+    import smplx
+    import torch
+
+    template = torch.tensor([[0.05, 0.05, 0], [0.07, 0.07, 0.1]])
+    weights = torch.zeros(2, 55); weights[:, 0] = 1
+    model = SimpleNamespace(v_template=template, posedirs=torch.zeros(486, 6),
+        J_regressor=torch.zeros(55, 2), parents=torch.tensor([-1] + [0] * 54), lbs_weights=weights)
+    monkeypatch.setattr(smplx, "create", lambda *args, **kwargs: model)
+    translation = np.zeros((25, 3)); translation[:12, 0] = np.linspace(0, .15, 12)
+    data = {"framerate":120,"body":{"params":{"global_orient":np.zeros((25,3)),
+        "body_pose":np.zeros((25,63)),"transl":translation}},
+        "lhand":{"params":{"fullpose":np.zeros((25,45))}},
+        "rhand":{"params":{"fullpose":np.zeros((25,45))}}}
+    _,_,occupied,margin = hand_geometry(data,{"left_hand":[0,1],"right_hand":[0,1]},
+                                         np.array([0]),{"body_models":str(tmp_path)})
+    assert margin == 0 and np.max(np.array(occupied)[:,:,0]) < .23
+    table = SimpleNamespace(low=np.array([0,0,0]),high=np.array([1,1,0]),location=np.zeros(3))
+    function = next(n for n in ast.parse(Path("nursery/egocentric_replay/blender.py").read_text()).body
+                    if isinstance(n,ast.FunctionDef) and n.name=="_place_distractors")
+    namespace = {"np":np,"bounds":lambda o:(o.low+o.location,o.high+o.location),
+        "load_ply":lambda *args:SimpleNamespace(low=np.array([-.03,-.03,0]),high=np.array([.03,.03,.06]),location=np.zeros(3)),
+        "remove_object":lambda o:None, "bpy":SimpleNamespace(context=SimpleNamespace(view_layer=SimpleNamespace(update=lambda:None))),
+        "table_surface":lambda t,x,y:(np.array([x,y,0]),None),
+        "rest_position":lambda o,p,n:p}
+    exec(compile(ast.Module(body=[function],type_ignores=[]),"placement","exec"),namespace)
+    objects,names = namespace["_place_distractors"](table,[{"mesh":"mug","category":"mug","color":[]}],
+        1,np.array(occupied),SimpleNamespace(uniform=lambda *args:np.array([.3,.1])))
+    assert len(objects)==1 and names==["mug"]

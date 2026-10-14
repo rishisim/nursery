@@ -12,8 +12,8 @@ import time
 import numpy as np
 
 from ..humanoid.embodiedgen_hoidini.run_motion import _output_directory
-from .grab import (_body_model, _object_surface, clearance_indices, contact_distances, contact_indices, hand_geometry,
-                   inflated_bounds, load_clip, mesh_path, reconstruct, rigid_matrix)
+from .grab import (_body_model, _object_surface, contact_distances, contact_indices, hand_geometry,
+                   load_clip, mesh_path, reconstruct, rigid_matrix)
 from .render import render_job
 from .schema import table, visible_objects
 from .sessions import chain_clips, sample_chain, subject_split
@@ -102,9 +102,8 @@ def _trajectory(data, root):
     params = data["object"]["params"]
     points = np.einsum("nij,kj->nki", Rotation.from_rotvec(params["global_orient"]).as_matrix().transpose(0, 2, 1),
                        corners) + params["transl"][:, None]
-    indices = clearance_indices(len(points), data["framerate"])
-    bounds, margin = inflated_bounds(points, indices)
-    return bounds.tolist(), margin
+    bounds = np.stack([points.min(axis=1), points.max(axis=1)], axis=1)
+    return bounds.tolist(), 0.0
 
 
 
