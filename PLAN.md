@@ -102,6 +102,28 @@ a higher eventual plateau.
        frozen features + linear projection, not the transfer loss. Unchecked:
        the max picture-only accuracy these frozen features allow with true
        labels (supervised region probe). Run that before more transfer work.
+   - 4.4 next (in order, then stop and report):
+     1. Direct-label check (bounded diagnostic). Same frozen features and
+        visual architecture, 1 seed, no sweep, max 30 epochs, checkpoint on
+        dev. Correct object labels from training data only, and only where
+        the object is visible in the frame window (not every frame labelled
+        with the held object). Report train fit and held-out accuracy. A gain
+        = visual headroom exists. A weak result is inconclusive; it does not
+        justify unfreezing the encoder or more probes.
+     2. Re-score the existing real-body model and the video-only control with
+        soft pooling (no retraining). Same held-out trials: video-only
+        control, body model with body removed, body only, combined. All /
+        held / non-held referent. Main comparison: vision + body vs the
+        separately trained video-only control.
+     3. If no promising real-body gain: retrain the real-body learner with the
+        vision-to-body loss off (pathway, dropout, data, speech unchanged).
+        1 seed, inspect at epoch 30, extend only by a dev rule set in
+        advance. Report body-present and picture-only separately; a reliable
+        body-present gain counts as progress.
+     4. Stop and report. Gain -> shuffled body and matched seeds. No gain ->
+        name the remaining uncertainty and propose one change.
+     Not now: more oracle distillation, unfreezing the image encoder, broad
+     ablations. Priority is whether real body signals improve word learning.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
