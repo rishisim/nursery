@@ -90,6 +90,18 @@ a higher eventual plateau.
      whether explicit teaching can improve picture-only learning with
      privileged input. Success must subsequently be tested with real body
      inputs; failure does not rule out benefits with the body available.
+   - 4.3 oracle transfer (diagnostic; commit 33dd9863): frozen oracle teacher,
+     picture-only student with distillation (T=2, weight 1), matched control.
+     - With training-matched (soft) scoring the teacher's combined score is
+       52.8 / 84.6 (all / held-referent) vs picture 46.0 / 61.7.
+     - Student = control on picture-only: 76.3 vs 76.4 rendered, 68.5 vs
+       69.1 Konkle (selected epoch); same at epoch 30.
+     - Student agrees with the teacher more at epoch 30 (58 vs 48% top-1 on
+       train), then stalls and ends below the control (59 vs 67%).
+     - Reading: the student cannot fit the teacher on train. Most likely the
+       frozen features + linear projection, not the transfer loss. Unchecked:
+       the max picture-only accuracy these frozen features allow with true
+       labels (supervised region probe). Run that before more transfer work.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
