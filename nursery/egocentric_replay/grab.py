@@ -1,5 +1,6 @@
 """Reconstruct HOIDiNi neutral-body retargeted GRAB motion."""
 
+import functools
 from pathlib import Path
 
 import numpy as np
@@ -68,7 +69,7 @@ def reconstruct(data, indices, config, hand_ids):
     cameras[:, :3, 3] = result.joints[:, 15].numpy() + np.einsum(
         "nij,j->ni", head_rotation, [0, 0.05, 0.13])
     left, right = contact_rule(data["contact"]["body"][indices], hand_ids)
-    return vertices, model.faces, cameras, left, right
+    return vertices, model.faces, cameras, left, right, result.joints[:, :55].numpy()
 
 
 def contact_distances(data, indices, vertices, hand_ids, root, vertex_ids=None, labelled_only=False, surface=None):
@@ -189,8 +190,13 @@ def _body_model(config):
 
 
 def _object_surface(data, root):
+    return _surface_for(mesh_path(root, data["object"]["object_mesh"]))
+
+
+@functools.lru_cache(maxsize=None)
+def _surface_for(path):
     import trimesh
 
-    mesh = trimesh.load(mesh_path(root, data["object"]["object_mesh"]), process=False)
+    mesh = trimesh.load(path, process=False)
     triangles = np.asarray(mesh.triangles)
     return triangles, _surface_index(triangles)

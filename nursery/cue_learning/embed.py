@@ -19,6 +19,26 @@ def probe_frames(probes, config):
     return table
 
 
+def konkle_frames(config):
+    """Konkle test-60: 17 photos per category, keyed like frames.
+
+    The public set keeps 15 photos per category folder and 2 more under TestItems/; Vong's split
+    (Frank's konkle/<category>/*.jpg) is all 17, so both are included, sorted by file name.
+    """
+    import pandas as pd
+
+    root = Path(config["konkle"]["root"])
+    rows = []
+    for category in sorted(config["konkle"]["categories"]):
+        photos = sorted((p for p in (root / category).rglob("*") if p.suffix.lower() == ".jpg"
+                         and not p.name.startswith(".")), key=lambda p: p.name)
+        if len(photos) != 17:
+            raise ValueError(f"Konkle {category}: expected 17 photos, found {len(photos)}")
+        rows.extend({"video_id": f"konkle/{category}", "frame_idx": index, "category": category, "path": str(path)}
+                    for index, path in enumerate(photos))
+    return pd.DataFrame(rows)
+
+
 def embed_episodes(episodes, output, device=None, batch=64):
     from unittest.mock import patch
 
@@ -51,6 +71,8 @@ def embed_episodes(episodes, output, device=None, batch=64):
     if set(probes.room) & set(sessions.loc[sessions.split == "train", "room"]):
         raise ValueError("Probe rooms must be disjoint from training rooms")
     tables = {"train": frames, "probes": probe_frames(probes, config)}
+    if "konkle" in config:
+        tables["konkle"] = konkle_frames(config)
     embedding_path.write_text(json.dumps({**provenance, "device": device, "batch": batch}, indent=2) + "\n")
     # HF downloads also belong to the ignored run; tests replace the encoder loaders.
     with patch.dict("os.environ", {"HF_HOME": str(output / "encoder_cache")}):
@@ -79,8 +101,12 @@ def embed_episodes(episodes, output, device=None, batch=64):
         for name, table in tables.items():
             if table.empty or table.duplicated(["video_id", "frame_idx"]).any():
                 raise ValueError(f"Empty or duplicate {name} frame keys")
-            paths = {(r.video_id, int(r.frame_idx)): episodes / r.image for r in table.itertuples()}
-            if not all(p.is_file() and p.resolve().is_relative_to(episodes) for p in paths.values()):
+            if name == "konkle":
+                paths = {(r.video_id, int(r.frame_idx)): Path(r.path) for r in table.itertuples()}
+                table = table.drop(columns="path")
+            else:
+                paths = {(r.video_id, int(r.frame_idx)): episodes / r.image for r in table.itertuples()}
+            if name != "konkle" and not all(p.is_file() and p.resolve().is_relative_to(episodes) for p in paths.values()):
                 raise ValueError(f"Missing images or paths outside episode root: {name}")
             table_path = output / f"{name}_frames.parquet"
             table.to_parquet(table_path, index=False)

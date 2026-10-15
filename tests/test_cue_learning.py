@@ -39,7 +39,7 @@ def upstream():
 
 def synthetic_frames(n=120, videos=2):
     objects = json.dumps([{"category": c, "visible_px": 40, "cells": [0, 1]}
-                          for c in ("mug", "cup", "apple", "banana")])
+                          for c in ("mug", "bowl", "apple", "banana")])
     rows = []
     for video in range(videos):
         for frame in range(n):
@@ -79,7 +79,7 @@ def episodes(tmp_path):
     probes = pd.DataFrame([
         {"probe_id": f"{split}_{cat}_{i}", "image": f"probes/{split}_{cat}_{i}.jpg",
          "category": cat, "room": f"probe_{split}", "split": split}
-        for split in ("dev", "test") for cat in ("mug", "cup", "apple", "banana") for i in range(4)
+        for split in ("dev", "test") for cat in ("mug", "bowl", "apple", "banana") for i in range(4)
     ])
     for image in pd.concat([frames.image, probes.image]):
         path = root / image
@@ -171,7 +171,7 @@ def test_no_held_referents_and_category_independent_frames():
     config["generator"].update(p_ref=1, p_name=1)
     manifest, _ = generate_transcripts(frames, config, 10)
     frequencies = manifest.referent.value_counts(normalize=True)
-    assert set(frequencies.index) == {"mug", "cup", "apple", "banana"}
+    assert set(frequencies.index) == {"mug", "bowl", "apple", "banana"}
     assert not manifest.held_referent.any() and not manifest.held_referent.isna().any()
     np.testing.assert_allclose(frequencies, 0.25, atol=0.06)
     swapped = frames.copy()
@@ -290,20 +290,33 @@ def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch, av
 
     monkeypatch.setattr(module, "AutoImageProcessor", Processor)
     monkeypatch.setattr(module, "AutoModel", Encoder)
+    from PIL import Image
+    from nursery.cue_learning import embed as embed_module
+
+    # Konkle photos live outside the episode root; embed them from their own paths.
+    photos = []
+    for category in ("apple", "bowl"):
+        for index in range(4):
+            path = root.parent / "konkle" / category / f"{index}.jpg"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            Image.new("RGB", (8, 8), (10, 20, 30)).save(path)
+            photos.append({"video_id": f"konkle/{category}", "frame_idx": index, "category": category, "path": str(path)})
+    monkeypatch.setattr(embed_module, "konkle_frames", lambda config: pd.DataFrame(photos))
     embed_episodes(root, run, device=device, batch=31)
     assert max(batches) == 31
-    for name, count in (("train", 240), ("probes", 32)):
+    assert "path" not in pd.read_parquet(run / "konkle_frames.parquet").columns
+    for name, count in (("train", 240), ("probes", 32), ("konkle", 8)):
         emb = np.load(run / f"{name}_cache" / "emb.f16.npy")
         index = pd.read_parquet(run / f"{name}_cache" / "index.parquet")
         assert emb.shape == (count, 17, 8) and emb.dtype == np.float16
         assert set(index.columns) == {"video_id", "frame_idx", "row"}
         expected = np.r_[0, np.array([[1 + 16 * y + 2 * x + 4.5 for x in range(4)] for y in range(4)]).ravel()]
         np.testing.assert_array_equal(emb[0, :, 0], expected)
-    assert requested == ["facebook/dinov2-base"] * 4
+    assert requested == ["facebook/dinov2-base"] * 6
     assert set(pd.read_parquet(run / "train_frames.parquet").video_id) == {"v0", "v1"}
     # Resume uses upstream's own cache logic and performs no additional model loads.
     embed_episodes(root, run, device="cpu")
-    assert len(requested) == 4
+    assert len(requested) == 6
     assert json.loads((run / "embedding.json").read_text())["device"] == "cpu"
     assert json.loads((run / "embedding.json").read_text())["batch"] == 64
     provenance = json.loads((run / "embedding.json").read_text())

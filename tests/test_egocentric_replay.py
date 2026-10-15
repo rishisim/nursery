@@ -166,9 +166,15 @@ def test_build_contract_with_fake_sessions_and_probes(tmp_path, monkeypatch):
     monkeypatch.setattr(implementation, "render_job", lambda job, config, output: rendered.extend(job["probes"]))
     output = tmp_path / "episodes"
     manifest = implementation.build(config_path, rooms, output, 2, 7)
+    vocabulary = implementation.load_vocabulary()
+    words = set(vocabulary["words"]) | set(vocabulary["extras"].values())
     assert manifest["statistics"]["frames"] == 12
-    assert manifest["statistics"]["probes"] == 4
-    assert len(rendered) == 4
+    assert manifest["statistics"]["probes"] == 2 * len(words)
+    assert len(rendered) == 2 * len(words)
+    # Konkle-word probes show held-out instances only; extras keep their single GRAB mesh.
+    assets = json.loads(implementation.MANIFEST.read_text())["words"]
+    train_names = {f"a_{item['id']}" for items in assets.values() for item in items if item["split"] == "train"}
+    assert not train_names & {probe["name"] for probe in rendered if "name" in probe}
     sessions = pq.read_table(output / "sessions.parquet").to_pylist()
     probes = pq.read_table(output / "probes.parquet").to_pylist()
     train_rooms = {row["room"] for row in sessions if row["split"] == "train"}
@@ -199,10 +205,14 @@ def test_build_contract_with_fake_sessions_and_probes(tmp_path, monkeypatch):
         def starmap(self, function, arguments):
             return [function(*args) for args in arguments]
 
+        def apply_async(self, function, arguments):
+            result = function(*arguments)
+            return SimpleNamespace(get=lambda: result)
+
     monkeypatch.setattr(implementation.multiprocessing, "get_context",
                         lambda name: SimpleNamespace(Pool=Pool))
     packed = implementation.build(config_path, rooms, tmp_path / "packed", 2, 7, workers=2)
-    assert packed_counts == [2, 1]
+    assert packed_counts == [2]
     assert packed["workers"] == 2
     assert pq.read_table(tmp_path / "packed/frames.parquet").to_pylist() == pq.read_table(
         output / "frames.parquet").to_pylist()
@@ -210,7 +220,7 @@ def test_build_contract_with_fake_sessions_and_probes(tmp_path, monkeypatch):
     selected = implementation.build(config_path, rooms, tmp_path / "selected", 2, 7, subjects=["s1"])
     selected_sessions = pq.read_table(tmp_path / "selected/sessions.parquet").to_pylist()
     assert {row["subject"] for row in selected_sessions} == {"s1"}
-    assert selected["statistics"]["probes"] == 4
+    assert selected["statistics"]["probes"] == 2 * len(words)
     with pytest.raises(ValueError, match="distinct subjects"):
         implementation.build(config_path, rooms, tmp_path / "duplicates", subjects=["s1", "s1"])
 
@@ -275,15 +285,18 @@ def test_contact_gate_rejects_before_render_and_removes_intermediates(tmp_path, 
 
     config = load_config()
     config.update(duration_s=2, clear_squares={"room0": {}})
+    (tmp_path / "swaps.json").write_text(json.dumps({"sources": {}}))
+    config["swaps"] = str(tmp_path / "swaps.json")
     source = tmp_path / "clip.npz"
     source.touch()
-    data = {"obj_name": "mug", "object": {"object_mesh": "mug.ply", "params": {
+    data = {"obj_name": "mug", "contact": {"body": np.zeros((2, 4))}, "object": {"object_mesh": "mug.ply", "params": {
         "transl": np.zeros((2, 3)), "global_orient": np.zeros((2, 3))}},
         "table": {"table_mesh": "table.ply", "params": {
             "transl": np.zeros((2, 3)), "global_orient": np.zeros((2, 3))}}}
     monkeypatch.setattr(implementation, "_category", lambda path: "mug")
     monkeypatch.setattr(implementation, "load_clip", lambda path: data)
-    monkeypatch.setattr(implementation, "_distractors", lambda *args: ["apple", "pear", "dice"])
+    monkeypatch.setattr(implementation, "_distractors", lambda *args: [
+        {"category": name, "mesh": f"{name}.ply"} for name in ("apple", "pear", "dice")])
     monkeypatch.setattr(implementation, "mesh_path", lambda root, name: tmp_path / name)
     monkeypatch.setattr(implementation, "_trajectory", lambda *args: ([[0, 0, 0], [1, 1, 1]], 0))
     monkeypatch.setattr(implementation, "contact_indices", lambda *args: np.arange(2))
@@ -292,15 +305,16 @@ def test_contact_gate_rejects_before_render_and_removes_intermediates(tmp_path, 
     monkeypatch.setattr(implementation, "_object_surface", lambda *args: None)
     monkeypatch.setattr(implementation, "_render_samples", lambda *args: (
         np.zeros((2, 4, 3)), np.array([[0, 1, 2]]), np.tile(np.eye(4), (2, 1, 1)),
-        np.ones(2, dtype=bool), np.zeros(2, dtype=bool)))
+        np.ones(2, dtype=bool), np.zeros(2, dtype=bool), np.zeros((2, 55, 3))))
     # Labelled vertices must pass independently of the whole-hand diagnostic.
     monkeypatch.setattr(implementation, "contact_distances", lambda *args, **kwargs: ([0.011], [0.03]))
     monkeypatch.setattr(implementation, "render_job", lambda *args: pytest.fail("Must gate before rendering"))
     rooms = [tmp_path / f"room{i}/urdf/export_scene/scene.urdf" for i in range(2)]
     output = _new_directory(tmp_path / "rejected")
     with pytest.raises(ValueError, match="Contact reconstruction"):
-        implementation._session(config, tmp_path, {}, "s1", 0, rooms,
-                                [("clip.npz", 2, 1)], ["mug", "apple", "pear", "dice"], 7, output)
+        implementation._session(config, tmp_path, {"left_hand": [0, 1], "right_hand": [2, 3]}, "s1", 0, rooms,
+                                [("clip.npz", 2, 1)], {"table": [{"category": name, "mesh": f"{name}.ply"}
+                                for name in ("mug", "apple", "pear", "dice")], "floor": []}, 7, output)
     assert not (output / "work").exists()
     assert not list(output.rglob("*.npz"))
     diagnostic = json.loads((output / "failure.json").read_text())
@@ -399,11 +413,94 @@ def test_certified_square_contains_actor_and_table_and_rejects_oversize():
 def test_distractor_candidates_include_real_objects_and_exclude_only_current_clip():
     from nursery.egocentric_replay.build import _distractors
 
-    categories = ["mug", "camera", "apple", "cubesmall", "toothbrush"]
-    order = _distractors(categories, "mug", np.random.default_rng(7))
-    assert set(order) == set(categories) - {"mug"}
-    assert order == _distractors(categories, "mug", np.random.default_rng(7))
-    assert "mug" in _distractors(categories, "camera", np.random.default_rng(7))
+    pool = [{"category": name, "name": f"{name}_{i}"} for name in ["mug", "camera", "apple", "cheese", "pen"]
+            for i in range(3)]
+    order = _distractors(pool, "mug", np.random.default_rng(7))
+    assert {entry["category"] for entry in order} == {"camera", "apple", "cheese", "pen"}
+    assert order == _distractors(pool, "mug", np.random.default_rng(7))
+    assert "mug" in {entry["category"] for entry in _distractors(pool, "camera", np.random.default_rng(7))}
+    assert len(_distractors(pool, "mug", np.random.default_rng(7), limit=5)) == 5
+
+
+def test_pools_hold_train_instances_by_surface_and_extras_on_table(tmp_path):
+    from pathlib import Path
+    from nursery.egocentric_replay.assets import MANIFEST, load_vocabulary
+    from nursery.egocentric_replay.build import _pools
+
+    vocabulary = load_vocabulary()
+    assets = json.loads(MANIFEST.read_text())["words"]
+    pools = _pools({"library": str(tmp_path)}, vocabulary, assets, Path("grab"))
+    floor = {entry["category"] for entry in pools["floor"]}
+    assert floor == {w for w, spec in vocabulary["words"].items() if spec["place"] == "floor"}
+    held_out = {f"a_{item['id']}" for items in assets.values() for item in items if item["split"] != "train"}
+    assert not held_out & {entry.get("name") for entry in pools["table"] + pools["floor"]}
+    assert set(vocabulary["extras"].values()) <= {entry["category"] for entry in pools["table"] if "mesh" in entry}
+
+
+def test_swap_alignment_recovers_rotation_and_scale():
+    import trimesh
+    from scipy.spatial.transform import Rotation
+    from nursery.egocentric_replay.swaps import align
+
+    target = trimesh.creation.box(extents=[0.3, 0.1, 0.05])
+    rotation = Rotation.from_euler("xyz", [20, -35, 50], degrees=True).as_matrix()
+    source = trimesh.Trimesh(target.vertices @ rotation.T * 0.5 + [0.1, 0, 0.2], target.faces)
+    transform, chamfer, scale = align(source, target)
+    assert abs(scale - 0.5) < 0.01 and chamfer < 0.002
+    moved = target.vertices @ transform[:3, :3].T + transform[:3, 3]
+    assert np.abs(np.sort(moved, 0) - np.sort(source.vertices, 0)).max() < 0.01
+
+
+def test_floor_objects_stay_in_square_and_clear_of_occupied():
+    import ast
+    from pathlib import Path
+    from types import SimpleNamespace
+
+    function = next(node for node in ast.parse(Path("nursery/egocentric_replay/blender.py").read_text()).body
+                    if isinstance(node, ast.FunctionDef) and node.name == "_place_floor")
+
+    class Obj:
+        def __init__(self, size):
+            self.size, self.location, self.rotation_euler = size, (0, 0, 0), (0, 0, 0)
+            self.bound_box = [(x, y, z) for x in (-size / 2, size / 2) for y in (-size / 2, size / 2) for z in (0, size)]
+
+        @property
+        def matrix_world(self):
+            return World(self)
+
+    class World:
+        def __init__(self, obj):
+            self.obj = obj
+
+        def __matmul__(self, corner):
+            return np.asarray(corner) + np.asarray(self.obj.location)
+
+    removed = []
+    namespace = {"np": np, "math": __import__("math"), "Vector": np.asarray, "remove_object": removed.append,
+                 "bpy": SimpleNamespace(context=SimpleNamespace(view_layer=SimpleNamespace(update=lambda: None)))}
+    sizes = {"big": 3.0, "rug": 0.6, "ball": 0.2}
+    objects = []
+
+    def load_entry(entry, instance):
+        obj = Obj(sizes[entry["category"]])
+        obj.instance = instance
+        objects.append(obj)
+        return obj
+
+    namespace["load_entry"] = load_entry
+    exec(compile(ast.Module(body=[function], type_ignores=[]), "floor", "exec"), namespace)
+    square = {"square_orientation_degrees": 0, "square_vertices_m": [[-1.25, -1.25], [1.25, -1.25], [1.25, 1.25], [-1.25, 1.25]],
+              "floor_height_m": 0.0}
+    occupied = [np.array([[-0.5, -0.5], [0.5, 0.5]])]
+    placed, names = namespace["_place_floor"]([{"category": c} for c in ("big", "rug", "ball")], 2, occupied,
+                                              square, 5, np.random.default_rng(3))
+    assert names == ["rug", "ball"] and removed and removed[0].size == 3.0
+    assert [obj.instance for obj in placed] == [5, 6]
+    for obj in placed:
+        low = np.asarray(obj.location)[:2] - obj.size / 2
+        high = np.asarray(obj.location)[:2] + obj.size / 2
+        assert np.all(low >= -1.25 - 1e-9) and np.all(high <= 1.25 + 1e-9)
+        assert not (np.all(high > -0.55) and np.all(low < 0.55))
 
 
 def test_contact_subsample_is_deterministic_and_keeps_rendered_frames():
@@ -462,6 +559,7 @@ def test_placement_resamples_category_after_bounded_positions(zero_fit):
     rng = Rng()
     namespace = {"np": np, "bounds": lambda obj: (obj.low + obj.location, obj.high + obj.location),
                  "load_ply": load, "remove_object": removed.append,
+                 "load_entry": lambda entry, instance: load(entry["mesh"], entry["color"], instance),
                  "bpy": SimpleNamespace(context=SimpleNamespace(view_layer=SimpleNamespace(update=lambda: None))),
                  "table_surface": lambda table, x, y: (np.array([x, y, 0]), None),
                  "rest_position": lambda obj, point, normal: point}
@@ -542,6 +640,7 @@ def test_local_hand_path_does_not_block_free_tabletop(tmp_path, monkeypatch):
                     if isinstance(n,ast.FunctionDef) and n.name=="_place_distractors")
     namespace = {"np":np,"bounds":lambda o:(o.low+o.location,o.high+o.location),
         "load_ply":lambda *args:SimpleNamespace(low=np.array([-.03,-.03,0]),high=np.array([.03,.03,.06]),location=np.zeros(3)),
+        "load_entry":lambda *args:SimpleNamespace(low=np.array([-.03,-.03,0]),high=np.array([.03,.03,.06]),location=np.zeros(3)),
         "remove_object":lambda o:None, "bpy":SimpleNamespace(context=SimpleNamespace(view_layer=SimpleNamespace(update=lambda:None))),
         "table_surface":lambda t,x,y:(np.array([x,y,0]),None),
         "rest_position":lambda o,p,n:p}

@@ -39,6 +39,30 @@ def load_ply(path, color, instance=0):
     return obj
 
 
+ASSETS = {}
+
+
+def load_asset(spec, instance=0):
+    """Copy one normalized library object (own mesh data, shared materials) into the scene."""
+    key = (spec["blend"], spec["name"])
+    if key not in ASSETS:
+        with bpy.data.libraries.load(spec["blend"], link=False) as (_, target):
+            target.objects = [spec["name"]]
+        if not target.objects or target.objects[0] is None:
+            raise RuntimeError(f"Asset missing from library: {key}")
+        ASSETS[key] = target.objects[0]
+    source = ASSETS[key]
+    obj = source.copy()
+    obj.data = source.data.copy()
+    scene.collection.objects.link(obj)
+    obj.pass_index = instance
+    return obj
+
+
+def load_entry(entry, instance=0):
+    return load_asset(entry, instance) if "blend" in entry else load_ply(entry["mesh"], entry["color"], instance)
+
+
 def remove_object(obj):
     mesh = obj.data
     materials = list(mesh.materials)
@@ -170,7 +194,7 @@ def _place_distractors(table, entries, count, occupied, rng):
     categories = []
     # The shuffled category order is uniform; infeasible props are rejected.
     for entry in entries:
-        obj = load_ply(entry["mesh"], entry["color"], len(distractors) + 2)
+        obj = load_entry(entry, len(distractors) + 2)
         bpy.context.view_layer.update()
         placed = False
         for _ in range(256):
@@ -206,6 +230,77 @@ def _place_distractors(table, entries, count, occupied, rng):
     return distractors, categories
 
 
+def _place_floor(entries, count, occupied, square, first, rng):
+    """Static floor objects inside the certified square, clear of the actor, table and each other."""
+    angle = math.radians(square["square_orientation_degrees"])
+    rotation = np.array([[math.cos(angle), -math.sin(angle)], [math.sin(angle), math.cos(angle)]])
+    center = np.mean(square["square_vertices_m"], axis=0)[:2]
+    placed, categories, boxes = [], [], [np.asarray(box) for box in occupied]
+    for entry in entries:
+        obj = load_entry(entry, first + len(placed))
+        done = False
+        for _ in range(48):
+            obj.rotation_euler = (0, 0, float(rng.uniform(0, 2 * math.pi)))
+            obj.location = (0, 0, 0)
+            bpy.context.view_layer.update()
+            corners = np.array([obj.matrix_world @ Vector(c) for c in obj.bound_box])
+            local = corners[:, :2] @ rotation
+            half = (local.max(0) - local.min(0)) / 2
+            if np.any(half > 1.2):
+                break
+            middle = (local.max(0) + local.min(0)) / 2
+            target = rng.uniform(-1.25 + half, 1.25 - half)
+            xy = center + rotation @ (target - middle)
+            low = corners.min(0)[:2] + xy
+            high = corners.max(0)[:2] + xy
+            if any(np.all(high > box[0] - 0.05) and np.all(low < box[1] + 0.05) for box in boxes):
+                continue
+            obj.location = (xy[0], xy[1], square["floor_height_m"] - corners.min(0)[2])
+            bpy.context.view_layer.update()
+            boxes.append(np.array([low, high]))
+            done = True
+            break
+        if not done:
+            remove_object(obj)
+            continue
+        placed.append(obj)
+        categories.append(entry["category"])
+        if len(placed) == count:
+            break
+    return placed, categories
+
+
+def floor_probe_camera(camera, obj, target, extent, probe, square):
+    """Camera inside the certified square that frames the whole floor object, trying azimuths from the probe's yaw."""
+    from bpy_extras.object_utils import world_to_camera_view
+    angle = math.radians(square["square_orientation_degrees"])
+    axes = np.array([[math.cos(angle), math.sin(angle)], [-math.sin(angle), math.cos(angle)]])
+    corners = [obj.matrix_world @ Vector(corner) for corner in obj.bound_box]
+    height = max(0.3, extent * 1.5 * probe["height"])
+    best = None
+    for step in range(16):
+        azimuth = probe["yaw"] + step * math.pi / 8
+        direction = np.array([math.cos(azimuth), math.sin(azimuth)])
+        local, start = axes @ direction, axes @ (np.array(target[:2]) - np.mean(square["square_vertices_m"], axis=0))
+        reach = min((1.15 - math.copysign(1, d) * s) / abs(d) for d, s in zip(local, start) if abs(d) > 1e-6)
+        radius = max(0.3, extent * 1.3)
+        while True:
+            radius = min(radius, reach)
+            camera.location = target + Vector((radius * direction[0], radius * direction[1], height))
+            camera.rotation_euler = (target - camera.location).to_track_quat("-Z", "Y").to_euler()
+            bpy.context.view_layer.update()
+            views = [world_to_camera_view(scene, camera, corner) for corner in corners]
+            inside = np.mean([v.z > 0 and 0.03 < v.x < 0.97 and 0.03 < v.y < 0.97 for v in views])
+            if best is None or inside > best[0]:
+                best = (inside, camera.location.copy(), camera.rotation_euler.copy())
+            if inside == 1 or radius >= reach:
+                break
+            radius += 0.1
+        if best[0] == 1:
+            break
+    return best[1], best[2]
+
+
 def main():
     global bpy, Matrix, Vector, scene, config
 
@@ -219,6 +314,7 @@ def main():
     scene.display.shading.light = "STUDIO"
     scene.display.shading.color_type = "TEXTURE"
     scene.display.shading.show_shadows = True
+    scene.display.shadow_shift = 1.0  # removes shadow-acne streaks on the sliver-triangle table mesh
     scene.display.shading.show_cavity = True
     scene.display.shading.cavity_type = "BOTH"
     scene.render.threads_mode = "FIXED"
@@ -251,9 +347,31 @@ def main():
     clip_counts = []
     rng = np.random.default_rng(job.get("seed", 0))
     for probe in job.get("probes", []):
+        active = load_entry(probe, 1)
+        if probe.get("place") == "floor":
+            square = job["clear_square"]
+            center = np.mean(square["square_vertices_m"], axis=0)
+            active.rotation_euler = (0, 0, float(rng.uniform(0, 2 * math.pi)))
+            bpy.context.view_layer.update()
+            low, high = bounds(active)
+            active.location = Vector((center[0] - (low[0] + high[0]) / 2, center[1] - (low[1] + high[1]) / 2,
+                                      square["floor_height_m"] - low[2]))
+            bpy.context.view_layer.update()
+            low, high = bounds(active)
+            target = Vector((low + high) / 2)
+            extent = float(np.max(high - low))
+            camera.location, camera.rotation_euler = floor_probe_camera(
+                camera, active, target, extent, probe, square)
+            scene.render.image_settings.file_format = "JPEG"
+            scene.render.filepath = str(output / probe["image"])
+            (output / probe["image"]).parent.mkdir(parents=True, exist_ok=True)
+            before_render = time.monotonic()
+            bpy.ops.render.render(write_still=True)
+            image_seconds.append(time.monotonic() - before_render)
+            remove_object(active)
+            continue
         table = load_ply(probe["table_mesh"], [0.55, 0.4, 0.25])
         table.matrix_world = Matrix(probe["table_pose"])
-        active = load_ply(probe["mesh"], probe["color"], 1)
         bpy.context.view_layer.update()
         a, b = bounds(table)
         lower, upper = bounds(active)
@@ -289,21 +407,31 @@ def main():
     for segment in job["segments"]:
         arrays = np.load(segment["arrays"])
         table = load_ply(segment["table_mesh"], [0.55, 0.4, 0.25])
-        active = load_ply(segment["object_mesh"], segment["color"], 1)
+        active = (load_asset(segment["object_asset"], 1) if "object_asset" in segment else
+                  load_ply(segment["object_mesh"], segment["color"], 1))
         table.matrix_world = Matrix(arrays["table"][0].tolist())
         active.matrix_world = Matrix(arrays["object"][0].tolist())
         bpy.context.view_layer.update()
         occupied = np.asarray(segment["trajectory_bounds"] + segment["hand_bounds"])
         distractors, categories = _place_distractors(
             table, segment["distractors"], segment["distractor_count"], occupied, rng)
-        clip_counts.append({"clip": segment["clip"], "segment_index": segment["segment_index"],
-                            "target": segment["distractor_count"], "realized": len(categories)})
-        realized.update({frame["image"]: categories for frame in segment["frames"]})
         actor = mesh_object("actor", arrays["vertices"][0], arrays["faces"], [0.7, 0.5, 0.35])
         extent_points = np.concatenate([arrays["vertices"].reshape(-1, 3),
                                         np.array(segment["trajectory_bounds"]).reshape(-1, 3)])
         shift = open_area(extent_points[None], [table, active, *distractors], job["clear_square"])
         translation = Matrix.Translation(Vector(shift))
+        occupied_xy = [np.array([extent_points.min(0)[:2], extent_points.max(0)[:2]]) + shift[:2]]
+        for obj in (table, *distractors):
+            low, high = bounds(obj)
+            occupied_xy.append(np.array([low[:2], high[:2]]) + shift[:2])
+        floor_objects, floor_categories = _place_floor(
+            segment.get("floor_objects", []), segment.get("floor_count", 0), occupied_xy,
+            job["clear_square"], len(distractors) + 2, rng)
+        categories = categories + floor_categories
+        clip_counts.append({"clip": segment["clip"], "segment_index": segment["segment_index"],
+                            "target": segment["distractor_count"], "realized": len(categories) - len(floor_categories),
+                            "floor_target": segment.get("floor_count", 0), "floor_realized": len(floor_categories)})
+        realized.update({frame["image"]: categories for frame in segment["frames"]})
         relative_distractors = [table.matrix_world.inverted() @ obj.matrix_world for obj in distractors]
         for index, frame in enumerate(segment["frames"]):
             actor.data.vertices.foreach_set("co", (arrays["vertices"][index] + shift).ravel())
@@ -316,7 +444,7 @@ def main():
             before_render = time.monotonic()
             render_pair(output / frame["image"], output / frame["mask"])
             image_seconds.append(time.monotonic() - before_render)
-        for obj in [actor, table, active, *distractors]:
+        for obj in [actor, table, active, *distractors, *floor_objects]:
             remove_object(obj)
     stats_path = output / f"render_stats_{job.get('job_id', 'job')}.json"
     previous = json.loads(stats_path.read_text()) if stats_path.exists() else {}

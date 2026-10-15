@@ -36,5 +36,14 @@
     "Bedroom_seed47",
     "Kitchen_seed23",
     "Office_seed47"
+  ],
+  "library": "/Users/rishisim/.codex/worktrees/cue-experiment/nursery/outputs/objaverse/library",
+  "table_distractors": [
+    3,
+    5
+  ],
+  "floor_objects": [
+    2,
+    4
   ]
 }

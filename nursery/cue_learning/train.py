@@ -9,6 +9,26 @@ import pandas as pd
 from . import _output_directory, _upstream_module
 
 
+def _groups(details):
+    """Accuracy at the selected epoch by word group: held (touched) vs seen-only vs GRAB-only extras."""
+    from nursery.egocentric_replay.assets import load_vocabulary
+
+    vocabulary = load_vocabulary()
+    held = {w for sources in vocabulary["held"].values() for words in sources.values() for w in words}
+    seen = set(vocabulary["words"]) - held
+    extras = set(vocabulary["extras"].values())
+    result = {}
+    for split in ("dev", "test", "konkle"):
+        if "per_cat" not in details.get(split, {}):
+            continue
+        per_cat = details[split]["per_cat"]
+        for name, words in (("held", held), ("seen_only", seen), ("extras", extras)):
+            values = [per_cat[w] for w in words if w in per_cat]
+            if values:
+                result[f"{split}_{name}"] = {"acc": round(100 * float(np.mean(values)), 3), "words": len(values)}
+    return result
+
+
 def train_run(run, condition, seed, epochs=None):
     import torch
 
@@ -61,6 +81,10 @@ def train_run(run, condition, seed, epochs=None):
     if any(region.frame_key(r.video_id, r.frame_idx) not in probe_lut for r in probes.itertuples()):
         raise ValueError("Probe cache does not cover all probes")
     tables = {split: probes[probes.split == split] for split in ("dev", "test")}
+    konkle = None
+    if (run / "konkle_frames.parquet").exists():
+        konkle_cache, konkle_lut = region.load_region_cache(run / "konkle_cache")
+        konkle = (konkle_cache, konkle_lut, pd.read_parquet(run / "konkle_frames.parquet"))
     for split, table in tables.items():
         counts = table.groupby("category").size()
         if len(counts) < 4 or (counts < 4).any():
@@ -70,7 +94,7 @@ def train_run(run, condition, seed, epochs=None):
     output = _output_directory(run / f"{condition}_s{seed}")
     if any(output.iterdir()):
         raise FileExistsError(f"Training output already contains files: {output}")
-    history, best_sel, best_state, best_ep = [], -1.0, None, -1
+    history, best_sel, best_state, best_ep, best_details = [], -1.0, None, -1, None
     for epoch in range(epochs):
         model.train()
         losses = []
@@ -86,13 +110,19 @@ def train_run(run, condition, seed, epochs=None):
             scores[split], details[split] = region.eval_4afc_region(
                 model, probe_cache, probe_lut, table, vocab, device, return_detail=True,
             )
+        if konkle is not None:
+            # Frank's Konkle test-60 protocol: 100 trials/category, rng(0), macro mean, OOV at chance.
+            scores["konkle"], details["konkle"] = region.eval_4afc_region(
+                model, konkle[0], konkle[1], konkle[2], vocab, device, return_detail=True)
         if not all(np.isfinite(list(scores.values()))) or not np.isfinite(losses).all():
             raise ValueError("Non-finite training loss or probe score")
         if scores["dev"] > best_sel:
-            best_sel, best_ep = scores["dev"], epoch
+            best_sel, best_ep, best_details = scores["dev"], epoch, details
             best_state = {k: value.detach().cpu().clone() for k, value in model.state_dict().items()}
         record = {"ep": epoch, "acc": round(scores["test"], 4), "dev": round(scores["dev"], 4),
                   "train_loss": float(np.mean(losses))}
+        if konkle is not None:
+            record["konkle"] = round(scores["konkle"], 4)
         history.append(record)
         print(record, flush=True)
     model.load_state_dict(best_state)
@@ -106,6 +136,8 @@ def train_run(run, condition, seed, epochs=None):
         "selected_epoch": best_ep, "reported_test_acc": round(100 * history[best_ep]["acc"], 3),
         "best_test_acc": round(100 * max(h["acc"] for h in history), 3),
         "final_test_acc": round(100 * history[-1]["acc"], 3), "history": history,
+        **({"reported_konkle_acc": round(100 * history[best_ep]["konkle"], 3),
+            "best_konkle_acc": round(100 * max(h["konkle"] for h in history), 3)} if konkle is not None else {}),
         "condition": condition, "generator_parameters": config["generator"],
         "generator_seed": generator["seed"], "cue_parameters": config["cues"],
         "upstream": config["upstream"], "device": device, "n_manifest": int(len(kept)),
@@ -113,6 +145,7 @@ def train_run(run, condition, seed, epochs=None):
         "mean_weight": float(weights.mean()),
         "probe_counts": {s: {k: d[k] for k in ("n_scored", "n_oov", "n_total")} for s, d in details.items()},
     }
+    metrics["groups"] = _groups(best_details)
     (output / "metrics.json").write_text(json.dumps(metrics, indent=2, allow_nan=False) + "\n")
     print(f"DONE {output} selected_ep {best_ep} reported_test_acc {metrics['reported_test_acc']}", flush=True)
     return metrics

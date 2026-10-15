@@ -14,9 +14,11 @@ import numpy as np
 from ..humanoid.embodiedgen_hoidini.run_motion import _output_directory
 from .grab import (_body_model, _object_surface, contact_distances, contact_indices, hand_geometry,
                    load_clip, mesh_path, reconstruct, rigid_matrix)
+from .assets import MANIFEST, load_vocabulary
 from .render import render_job
 from .schema import table, visible_objects
 from .sessions import chain_clips, sample_chain, subject_split
+from .swaps import SWAPS, CONTACT_M, assignment, geometry, signed_distances
 
 
 DEFAULT_CONFIG = Path(__file__).with_name("config.json")
@@ -86,11 +88,38 @@ def _category(path):
         return str(data["obj_name"].item())
 
 
-def _distractors(categories, active, rng):
-    candidates = [category for category in categories if category != active]
-    if len(candidates) < 3:
+def _distractors(pool, active, rng, limit=40):
+    candidates = [entry for entry in pool if entry["category"] != active]
+    if len({entry["category"] for entry in candidates}) < 3:
         raise ValueError("Need at least three distractor categories")
-    return rng.permutation(candidates).tolist()
+    return [candidates[i] for i in rng.permutation(len(candidates))[:limit]]
+
+
+def _pools(config, vocabulary, assets, root):
+    """Seen-object pools: train instances of every word by surface, plus GRAB-only extras on the table."""
+    library = Path(config["library"])
+    pools = {"table": [], "floor": []}
+    for word, spec in vocabulary["words"].items():
+        for item in assets[word]:
+            if item["split"] == "train":
+                pools[spec["place"]].append({"category": word, "blend": str(library / f"{word}.blend"),
+                                             "name": f"a_{item['id']}"})
+    for name, word in vocabulary["extras"].items():
+        pools["table"].append({"category": word, "mesh": str(root / "contact_meshes" / f"{name}.ply")})
+    return pools
+
+
+def _swapped_contact(vertices, pose, mesh, hand_ids):
+    """Per-hand-vertex contact against the swapped mesh: within CONTACT_M of, or inside, its surface."""
+    ids = np.concatenate([hand_ids["left_hand"], hand_ids["right_hand"]])
+    local = (vertices[:, ids] - pose[:, None, :3, 3]) @ pose[:, :3, :3]
+    low, high = mesh.bounds[0] - 0.02, mesh.bounds[1] + 0.02
+    contact = np.zeros(local.shape[:2], dtype=bool)
+    for frame in range(len(local)):
+        near = np.all((local[frame] > low) & (local[frame] < high), axis=1)
+        if near.any():
+            contact[frame, near] = signed_distances(mesh, local[frame, near]) < CONTACT_M
+    return contact
 
 
 def _trajectory(data, root):
@@ -118,8 +147,12 @@ def _render_samples(data, samples, config, hand_ids):
     combined["contact"]["body"] = np.stack([data[clip]["contact"]["body"][frame] for clip, frame in samples])
     return reconstruct(combined, np.arange(len(samples)), config, hand_ids)
 
-def _session(config, root, hand_ids, subject, number, rooms, clips, categories, seed, output):
+def _session(config, root, hand_ids, subject, number, rooms, clips, pools, seed, output):
     from PIL import Image
+    import trimesh
+
+    vocabulary = load_vocabulary()
+    swaps = json.loads(Path(config["swaps"]).read_text())
 
     started = time.monotonic()
     video_id = f"{subject}_{number:04d}"
@@ -130,10 +163,14 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
     segments = chain_clips(clips, config["duration_s"], seed)
     samples = sample_chain(segments, config["duration_s"])
     data_by_clip = {item["clip"]: load_clip(root / item["clip"]) for item in segments}
-    clip_categories = {name: str(data["obj_name"]) for name, data in data_by_clip.items()}
-    all_vertices, faces, all_camera, all_left, all_right = _render_samples(data_by_clip, samples, config, hand_ids)
+    all_vertices, faces, all_camera, all_left, all_right, all_joints = _render_samples(data_by_clip, samples, config, hand_ids)
     hand_model = _body_model(config)
-    colors = {category: rng.uniform(0.15, 0.85, 3).tolist() for category in categories}
+    hand_count = len(hand_ids["left_hand"]) + len(hand_ids["right_hand"])
+    hand_contact = np.zeros((len(samples), hand_count), dtype=bool)
+    object_pose = np.zeros((len(samples), 4, 4))
+    words = {name: (assignment(swaps, name) or {"word": vocabulary["extras"][str(data["obj_name"])]})
+             for name, data in data_by_clip.items()}
+    colors = {entry["category"]: rng.uniform(0.15, 0.85, 3).tolist() for entry in pools["table"] if "mesh" in entry}
     job = {"room_urdf": str(room), "clear_square": config["clear_squares"][room_id], "job_id": video_id, "seed": seed, "segments": []}
     rows, labelled, whole = [], [], []
     sources = {}
@@ -143,11 +180,27 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
         if not selected:
             continue
         data = data_by_clip[segment["clip"]]
-        category = str(data["obj_name"])
+        held = words[segment["clip"]]
+        category = held["word"]
         indices = np.array([source for _, source in selected])
         seconds = np.array([second for second, _ in selected])
         vertices, camera = all_vertices[seconds], all_camera[seconds]
-        left, right = all_left[seconds], all_right[seconds]
+        poses = np.array([rigid_matrix(data["object"]["params"], i) for i in indices])
+        object_pose[seconds] = poses
+        ids = np.concatenate([hand_ids["left_hand"], hand_ids["right_hand"]])
+        if "instance" in held:
+            transform = np.asarray(held["transform"])
+            mesh_vertices, mesh_faces = geometry(config["library"], held["instance"])
+            swapped = trimesh.Trimesh(mesh_vertices @ transform[:3, :3].T + transform[:3, 3], mesh_faces, process=False)
+            contact = _swapped_contact(vertices, poses, swapped, hand_ids)
+            left = contact[:, :len(hand_ids["left_hand"])].any(1)
+            right = contact[:, len(hand_ids["left_hand"]):].any(1)
+            rendered = poses @ transform
+        else:
+            contact = data["contact"]["body"][indices][:, ids] != 0
+            left, right = all_left[seconds], all_right[seconds]
+            rendered = poses
+        hand_contact[seconds] = contact
         gate_indices = contact_indices(data, indices, hand_ids)
         gate_vertices, vertex_ids, hand_bounds, hand_margin = hand_geometry(data, hand_ids, gate_indices, config, hand_model)
         surface = _object_surface(data, root)
@@ -159,8 +212,7 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
         sources[segment["clip"]] = _sha256(root / segment["clip"])
         array_path = output / "work" / f"{video_id}_{segment_index:04d}.npz"
         array_path.parent.mkdir(exist_ok=True)
-        np.savez(array_path, vertices=vertices, faces=faces, camera=camera,
-                 object=np.array([rigid_matrix(data["object"]["params"], i) for i in indices]),
+        np.savez(array_path, vertices=vertices, faces=faces, camera=camera, object=rendered,
                  table=np.array([rigid_matrix(data["table"]["params"], i) for i in indices]))
         frames = []
         for index, (second, _) in enumerate(selected):
@@ -172,16 +224,20 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
                          "contact_left": bool(left[index]), "contact_right": bool(right[index]),
                          "held_category": category if left[index] or right[index] else None,
                          "objects": "[]"})
+        active = ({"object_asset": {"blend": str(Path(config["library"]) / f"{category}.blend"),
+                                    "name": f"a_{held['instance']}"}} if "instance" in held else
+                  {"object_mesh": str(mesh_path(root, data["object"]["object_mesh"])), "color": colors[category]})
+        table_low, table_high = config["table_distractors"]
+        floor_low, floor_high = config["floor_objects"]
         job["segments"].append({"arrays": str(array_path), "clip": segment["clip"], "segment_index": segment_index, "table_mesh": str(mesh_path(
-            root, data["table"]["table_mesh"])), "object_mesh": str(mesh_path(
-            root, data["object"]["object_mesh"])), "color": colors[category],
+            root, data["table"]["table_mesh"])), **active,
             "trajectory_bounds": trajectory_bounds,
             "hand_bounds": hand_bounds, "hand_displacement_m": hand_margin,
             "object_displacement_m": object_margin, "frames": frames,
-            "distractor_count": int(rng.integers(3, min(5, len(categories) - 1) + 1)),
-            "distractors": [{"mesh": str(root / "contact_meshes" / f"{name}.ply"),
-                             "category": name, "color": colors[name]}
-                            for name in _distractors(categories, category, rng)]})
+            "distractor_count": int(rng.integers(table_low, table_high + 1)),
+            "distractors": [{**entry, "color": colors.get(entry["category"])} for entry in _distractors(pools["table"], category, rng)],
+            "floor_count": int(rng.integers(floor_low, floor_high + 1)),
+            "floor_objects": _distractors(pools["floor"], category, rng)})
     # Do not render geometry that has already failed the required contact construction gate.
     if not labelled or not whole or np.median(labelled) >= 0.01:
         for segment in job["segments"]:
@@ -211,11 +267,22 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, categories, 
     for row in rows:
         mask_path = output / f"work/{video_id}_{row['frame_idx']:05d}.png"
         mask = np.asarray(Image.open(mask_path))[:, :, 0]
-        category = clip_categories[row["clip"]]
+        category = words[row["clip"]]["word"]
         row["objects"] = visible_objects(mask, {1: category, **dict(enumerate(realized[row["image"]], 2))})
         mask_path.unlink()
     for segment in job["segments"]:
         Path(segment["arrays"]).unlink()
+    # Body signals for every rendered second; no object identity (contact is per hand vertex, pose is rigid).
+    (output / "body").mkdir(exist_ok=True)
+    body = {key: np.stack([data_by_clip[clip]["body"]["params"][key][source] for clip, source in samples])
+            for key in ("global_orient", "body_pose", "transl")}
+    np.savez_compressed(output / "body" / f"{video_id}.npz", frame_idx=np.arange(len(samples)),
+                        joints=all_joints.astype(np.float32), camera=all_camera.astype(np.float32),
+                        left_hand_pose=np.stack([data_by_clip[c]["lhand"]["params"]["fullpose"][f] for c, f in samples]).astype(np.float32),
+                        right_hand_pose=np.stack([data_by_clip[c]["rhand"]["params"]["fullpose"][f] for c, f in samples]).astype(np.float32),
+                        object_pose=object_pose.astype(np.float32), hand_contact=np.packbits(hand_contact, axis=1),
+                        hand_contact_vertices=np.int32(hand_count),
+                        **{key: value.astype(np.float32) for key, value in body.items()})
     session = {"video_id": video_id, "subject": subject, "room": room_id, "split": split,
                "clips": json.dumps([item["clip"] for item in segments]),
                "distractors": json.dumps(sorted({name for names in realized.values() for name in names})), "duration_s": config["duration_s"]}
@@ -248,7 +315,11 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
     for name in config["session_rooms"] + config["probe_rooms"]:
         if not config["clear_squares"][name]["clear_2_5m_square"]:
             raise ValueError(f"No certified square for {name}")
-    catalog, categories = _catalog(config)
+    catalog, _ = _catalog(config)
+    vocabulary = load_vocabulary()
+    assets = json.loads(Path(config.get("assets", MANIFEST)).read_text())["words"]
+    config.setdefault("swaps", str(SWAPS))
+    pools = _pools(config, vocabulary, assets, Path(config["grab_root"]))
     schedule = [(subject, number) for subject in config["subjects"]
                 for number in range(sessions_per_subject)]
     if session_index is not None:
@@ -259,45 +330,55 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
         hand_ids = pickle.load(stream)
     output = _output_directory(output_path)
     started = time.monotonic()
-    frames, sessions, labelled, whole, sources = [], [], [], [], {}
-    arguments = [(config, Path(config["grab_root"]), hand_ids, subject, number, rooms,
-                  catalog[subject], categories,
-                  seed + config["subjects"].index(subject) * sessions_per_subject + number, output)
-                 for subject, number in schedule]
-    if workers == 1:
-        results = [_session(*args) for args in arguments]
-    else:
-        with multiprocessing.get_context("spawn").Pool(workers) as pool:
-            results = pool.starmap(_session, arguments)
-    for result in results:
-        frames.extend(result[0]); sessions.append(result[1])
-        labelled.extend(result[2]); whole.extend(result[3]); sources.update(result[4])
-    probes = []
+    probes, jobs = [], {}
     if session_index is None:
         rng = np.random.default_rng(seed + 100000)
         table_pose = rigid_matrix(load_clip(Path(config["grab_root"]) /
             catalog[config["subjects"][0]][0][0])["table"]["params"], 0).tolist()
         jobs = {str(room): {"room_urdf": str(room), "clear_square": config["clear_squares"][room.parents[2].name],
                             "job_id": "probe_" + room.parents[2].name, "segments": [], "probes": []} for room in probe_rooms}
+        library = Path(config["library"])
+        # Probes show held-out instances (dev/test splits of the asset library) in held-out rooms.
+        shown = {split: {word: [{"blend": str(library / f"{word}.blend"), "name": f"a_{item['id']}",
+                                 "place": spec["place"]} for item in assets[word] if item["split"] == split]
+                         for word, spec in vocabulary["words"].items()} for split in ("dev", "test")}
+        for split in shown:
+            for name, word in sorted(vocabulary["extras"].items()):
+                shown[split].setdefault(word, []).append(
+                    {"mesh": str(Path(config["grab_root"]) / "contact_meshes" / f"{name}.ply"), "place": "table"})
         for split in ("dev", "test"):
-            for category in categories:
+            for category in sorted(shown[split]):
                 for number in range(config["probes_per_category_per_split"]):
                     room = probe_rooms[number % len(probe_rooms)]
                     probe_id = f"{split}_{category}_{number:04d}"
+                    instance = shown[split][category][number % len(shown[split][category])]
                     probes.append({"probe_id": probe_id, "image": f"probes/{probe_id}.jpg",
                                    "category": category, "room": room.parents[2].name, "split": split})
                     jobs[str(room)]["probes"].append({
-                        "mesh": str(Path(config["grab_root"]) / "contact_meshes" / f"{category}.ply"),
+                        **instance,
                         "table_mesh": str(Path(config["grab_root"]) / "contact_meshes/table.ply"),
                         "table_pose": table_pose,
                         "color": rng.uniform(0.15, 0.85, 3).tolist(), "image": probes[-1]["image"],
                         "yaw": float(rng.uniform(0, 2 * np.pi)), "height": float(rng.uniform(0.3, 0.6))})
-        if workers == 1:
-            for job in jobs.values():
-                render_job(job, config, output)
-        else:
-            with multiprocessing.get_context("spawn").Pool(min(workers, len(jobs))) as pool:
-                pool.starmap(render_job, [(job, config, output) for job in jobs.values()])
+    frames, sessions, labelled, whole, sources = [], [], [], [], {}
+    arguments = [(config, Path(config["grab_root"]), hand_ids, subject, number, rooms,
+                  catalog[subject], pools,
+                  seed + config["subjects"].index(subject) * sessions_per_subject + number, output)
+                 for subject, number in schedule]
+    if workers == 1:
+        results = [_session(*args) for args in arguments]
+        for job in jobs.values():
+            render_job(job, config, output)
+    else:
+        with multiprocessing.get_context("spawn").Pool(workers) as pool:
+            # Probe jobs are queued first so they overlap with sessions instead of forming a serial tail.
+            queued = [pool.apply_async(render_job, (job, config, output)) for job in jobs.values()]
+            results = pool.starmap(_session, arguments)
+            for item in queued:
+                item.get()
+    for result in results:
+        frames.extend(result[0]); sessions.append(result[1])
+        labelled.extend(result[2]); whole.extend(result[3]); sources.update(result[4])
     receipts = [json.loads(path.read_text()) for path in sorted(output.glob("render_stats_*.json"))]
     if receipts:
         (output / "render_stats.json").write_text(json.dumps({
