@@ -6,9 +6,11 @@
   },
   "generator": {
     "rate_hz": 0.3333333333333333,
-    "p_ref": 0.15,
-    "q_held": 0.6,
+    "p_ref": 0.5,
     "p_name": 0.5,
+    "p_held": 0.35,
+    "p_unseen": 0.24,
+    "hold_window_s": 5,
     "sigma": 1.0
   },
   "cues": {

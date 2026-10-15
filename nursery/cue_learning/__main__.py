@@ -14,7 +14,8 @@ def main():
     transcripts.add_argument("--episodes", required=True)
     transcripts.add_argument("--output", required=True)
     transcripts.add_argument("--seed", type=int, required=True)
-    for flag in ("p-ref", "q-held", "p-name", "sigma", "rate-hz"):
+    transcripts.add_argument("--hold-window-s", type=int)
+    for flag in ("p-ref", "p-name", "p-held", "p-unseen", "sigma", "rate-hz"):
         transcripts.add_argument(f"--{flag}", type=float)
     embed = commands.add_parser("embed")
     embed.add_argument("--episodes", required=True)
@@ -29,7 +30,7 @@ def main():
     args = parser.parse_args()
     if args.command == "transcripts":
         write_transcripts(args.episodes, args.output, args.seed,
-                          **{k: getattr(args, k) for k in ("p_ref", "q_held", "p_name", "sigma", "rate_hz")})
+                          **{k: getattr(args, k) for k in ("p_ref", "p_name", "p_held", "p_unseen", "hold_window_s", "sigma", "rate_hz")})
     elif args.command == "embed":
         embed_episodes(args.episodes, args.output, args.device, args.batch)
     else:

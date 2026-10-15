@@ -102,12 +102,13 @@ def test_transcript_statistics_and_determinism():
     assert not manifest.equals(different)
     refs = manifest[manifest.referential]
     measured = {"utterances": len(manifest), "rate_hz": len(manifest) / len(frames),
-                "p_ref": float(manifest.referential.mean()), "q_held": float(refs.held_referent.mean()),
+                "p_ref": float(manifest.referential.mean()), "p_held": float((refs.channel == "held").mean()),
                 "p_name": float(refs.named.mean()), "jitter_mean": float(manifest.jitter_frames.mean()),
                 "jitter_std": float(manifest.jitter_frames.std())}
     print("statistics:", json.dumps(measured, sort_keys=True))
     assert measured["rate_hz"] == pytest.approx(1 / 3, abs=0.01)
-    for key in ("p_ref", "q_held", "p_name"):
+    # Always-held scene: no unseen channel, so held share is p_held after redraws.
+    for key in ("p_ref", "p_held", "p_name"):
         assert measured[key] == pytest.approx(config["generator"][key], abs=0.035)
     assert abs(measured["jitter_mean"]) < 0.04
     assert measured["jitter_std"] == pytest.approx(np.sqrt(1 + 1 / 12), abs=0.04)
@@ -123,7 +124,7 @@ def test_mean_weights_and_oracle():
     # Visibility changes so the oracle must use the shifted frame, not the source.
     frames.loc[frames.frame_idx % 2 == 0, "objects"] = '[]'
     config = load_config()
-    config["generator"].update(p_ref=1, p_name=0.5, q_held=1)
+    config["generator"].update(p_ref=1, p_name=0.5)
     frames["held_category"] = "mug"
     manifest, _ = generate_transcripts(frames, config, 34)
     means = manifest.filter(like="weight_").mean()
@@ -183,7 +184,6 @@ def test_no_held_referents_and_category_independent_frames():
     for table, category in ((frames, "mug"), (swapped, "plane")):
         table["held_category"] = category
         table["objects"] = json.dumps([{"category": category, "visible_px": 5, "cells": [0]}])
-    config["generator"]["q_held"] = changed_config["generator"]["q_held"] = 1
     original, _ = generate_transcripts(frames, config, 10)
     changed, _ = generate_transcripts(swapped, changed_config, 10)
     assert original.text.str.replace("mug", "{noun}").tolist() == changed.text.str.replace("plane", "{noun}").tolist()
@@ -195,6 +195,38 @@ def test_no_held_referents_and_category_independent_frames():
         for template in templates:
             assert ("{noun}" in template) == (kind == "named")
             assert not nouns.intersection(template.replace("{noun}", "").strip(".!?").split())
+
+
+def test_channels_follow_window_and_visibility_and_calibrate():
+    cats = ["mug", "bowl", "apple", "banana", "cup", "pan"]
+    frames = synthetic_frames(n=6000, videos=2)
+    rng = np.random.default_rng(0)
+    for video in ("v0", "v1"):
+        mask = frames.video_id == video
+        shown = [sorted(rng.choice(cats, 3, replace=False)) for _ in range(6000)]
+        frames.loc[mask, "objects"] = [json.dumps([{"category": c, "visible_px": 9, "cells": [0]} for c in cs])
+                                       for cs in shown]
+        held = np.full(6000, None, dtype=object)
+        for start in rng.choice(6000, 300, replace=False):
+            held[start:start + 3] = cats[int(rng.integers(len(cats)))]
+        frames.loc[mask, "held_category"] = held
+    config = load_config()
+    config["vocabulary"].update(cup="cup", pan="pan")
+    manifest, _ = generate_transcripts(frames, config, 5)
+    window = config["generator"]["hold_window_s"]
+    refs = manifest[manifest.referential]
+    assert set(refs.channel) == {"held", "seen", "unseen"} and manifest.channel[~manifest.referential].isna().all()
+    for r in refs.itertuples():
+        group = frames[frames.video_id == r.video_id].reset_index(drop=True)
+        near = set(group.held_category.iloc[max(0, r.source_frame_idx - window):r.source_frame_idx + window + 1].dropna())
+        visible = {o["category"] for o in json.loads(group.objects[r.source_frame_idx])}
+        assert (r.referent in near) == (r.channel == "held")
+        assert (r.referent in visible - near) == (r.channel == "seen")
+        if r.channel == "unseen":
+            assert r.referent not in visible | near
+    shares = refs.channel.value_counts(normalize=True)
+    assert shares["held"] == pytest.approx(0.35, abs=0.02)
+    assert manifest.attrs["p_held_internal"] > 0.35
 
 
 def test_referential_draw_without_candidate_becomes_nonreferential():
