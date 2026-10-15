@@ -31,6 +31,7 @@ video + body.
    - Earlier attempts (hand-location prior, v1/v2) gave no gain; in Git
      history.
    - Open: gaze. Decide later.
+   - Done 2026-10-15 (commit 8b70cca2). Checks pass.
 4. **Staged comparison at max data.**
    1. Matched video-only vs video + body, 1 seed, same data, speech and dev
       rule. Reuse a baseline only if settings match.
@@ -39,6 +40,12 @@ video + body.
    3. If a promising gap: shuffled body and more seeds; 5 seeds to confirm.
    4. If no gap: pick the next diagnostic from the failure (body-present
       test, body probe, or oracle). No automatic ablation sweep.
+   - 4.1 result (seed 0, s8 held out, 60 epochs, both flat by epoch 30):
+     video-only 76.4 rendered / 69.1 Konkle; video + body 75.4 / 69.7. No
+     gap. Body-present test: body term at chance (25.5%), fused = picture.
+     Body latent predicts next-second contact (90% vs 74% persistence) and
+     held word above majority (16% vs 6%), so the body carries information
+     but the fused path does not use it.
 5. **Scaling.** Smaller data sizes from the same render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
    from a higher final plateau.
