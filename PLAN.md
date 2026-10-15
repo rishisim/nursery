@@ -14,24 +14,37 @@ video + body.
 2. **Speech that depends on the body.** Caregiver speech tied to what the
    baby is doing, strength set from developmental studies (not chosen by us).
    Done 2026-10-15. See "Speech coupling".
-3. **Learner with a body input.** Third input next to frozen image encoder and
-   word tower. Trained with the body input randomly switched off; tested
-   vision-only (picture + word, like children).
-   - One body input; contact, hand pose, joints (and any other simulator
-     signal) each encoded separately inside it, so each can be tested alone.
-   - Inventory every signal the simulator can give; use as many as possible.
-     GRAB replay has full-body pose, hand pose, object pose, per-vertex contact;
-     replay currently saves only left/right contact flags.
-   - No object identity in the body signal (leakage).
-   - Open: gaze. Could weight the 17 image regions near the gaze point. Needs a
-     gaze source: rules (risk: we decide the answer) or a model trained on real
-     infant eye-tracking. Head-cam gaze sits near center, so may add little.
-     Decide here.
-4. **Single point at max data.** Conditions: video-only, video + body,
-   video + shuffled body (capacity control), oracle (upper bound). 5 seeds,
-   epoch picked on dev every epoch, test at that epoch.
-5. **If there's a gap:** add two smaller data sizes (subsets of the same
-   render), fit Frank's free-asymptote logistic, compare asymptotes.
+3. **Smallest learner that tests the question.** Design: `docs/learner.md`;
+   sources: `docs/literature/body_input_review.md`.
+   - Body-input pathway: contact, finger pose and arm position encoded
+     separately, then combined with vision during language training.
+   - Random body dropout in training; picture-only test. Body-present test is
+     a supporting diagnostic.
+   - Vision-to-body prediction as an auxiliary loss on the shared visual
+     projection. Supplements the pathway.
+   - Contact-episode grouping optional (flag, off by default).
+   - Visual architecture identical across conditions (linear projection,
+     soft pooling). No object identity in body inputs.
+   - Finish with cheap checks: language loss depends on the body
+     representation, gradients reach its encoder, dropout and body-free eval
+     work. These show the pathway works, not that it helps.
+   - Earlier attempts (hand-location prior, v1/v2) gave no gain; in Git
+     history.
+   - Open: gaze. Decide later.
+4. **Staged comparison at max data.**
+   1. Matched video-only vs video + body, 1 seed, same data, speech and dev
+      rule. Reuse a baseline only if settings match.
+   2. Check learning curves at a set checkpoint (epoch 30); extend only if
+      still rising.
+   3. If a promising gap: shuffled body and more seeds; 5 seeds to confirm.
+   4. If no gap: pick the next diagnostic from the failure (body-present
+      test, body probe, or oracle). No automatic ablation sweep.
+5. **Scaling.** Smaller data sizes from the same render, fit Frank's
+   free-asymptote logistic. Separate faster learning / better at limited data
+   from a higher final plateau.
+
+Held vs seen-only words are a diagnostic breakdown. Better shared visual
+features could help both, so a seen-only gain is not a failure.
 
 ## Evaluation suite
 
@@ -42,8 +55,6 @@ video + body.
 | LEVANTE vocab (159 items) | Not usable yet (0 overlap). |
 | EgoBabyVLM Machine-DevBench | Later. Lexical noun 2AFC from own vocab; harness not found yet. Grammar tasks need a non-bag-of-words text model. |
 
-Held vs seen-only words is the built-in check: touch should help held words
-and not seen-only ones.
 
 ## Vocabulary widening (step 1b)
 
