@@ -124,6 +124,21 @@ a higher eventual plateau.
         name the remaining uncertainty and propose one change.
      Not now: more oracle distillation, unfreezing the image encoder, broad
      ablations. Priority is whether real body signals improve word learning.
+   - 4.4 result (commit db282f39, seed 0):
+     - Direct labels (visible object per pair, same features and head, epoch
+       10 on dev): 90.0 rendered / 84.3 Konkle vs 76.4 / 69.1. The frozen
+       features have ~14 points of headroom; supervision limits picture-only,
+       not the features.
+     - Real body, soft re-score on s8 (705 trials, 175 held-referent):
+       combined 45.4 vs control 48.7 (held 63.4 vs 70.9). Body only 25.5
+       (held 32.0). No gain.
+     - Real body, vision-to-body loss off (60 epochs by the preset rule):
+       picture-only 76.2 / 69.9 vs 76.4 / 69.1; body-present combined 46.1
+       vs 48.7. No gain.
+     - Remaining uncertainty: the real body carries almost no word
+       information (oracle body: 94 on held-referent trials). Grasps are
+       borrowed, so many words share one GRAB grasp; this caps what any
+       body encoder can know.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
