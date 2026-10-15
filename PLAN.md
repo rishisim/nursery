@@ -40,12 +40,26 @@ video + body.
    3. If a promising gap: shuffled body and more seeds; 5 seeds to confirm.
    4. If no gap: pick the next diagnostic from the failure (body-present
       test, body probe, or oracle). No automatic ablation sweep.
-   - 4.1 result (seed 0, s8 held out, 60 epochs, both flat by epoch 30):
-     video-only 76.4 rendered / 69.1 Konkle; video + body 75.4 / 69.7. No
-     gap. Body-present test: body term at chance (25.5%), fused = picture.
-     Body latent predicts next-second contact (90% vs 74% persistence) and
-     held word above majority (16% vs 6%), so the body carries information
-     but the fused path does not use it.
+   - 4.1 result (seed 0, s8 held out, 60 epochs; selected epochs 45 and 47,
+     broadly saturated by ~30): video-only 76.4 rendered / 69.1 Konkle;
+     video + body 75.4 / 69.7. No clear picture-only gain for this
+     configuration.
+     - Body-present test (s8): picture 44.8, body score 25.5 (32 on
+       held-referent trials), combined 44.0. Body weight 0.74, not
+       collapsed. The pathway is active but does not help this test or
+       transfer to picture-only. Open causes: weak speech alignment, poor
+       generalization, score calibration, or the fusion form.
+     - Fusion is an additive body-word score: it cannot model body-vision
+       interactions. Minimal by design; revisit after the oracle check.
+     - Body probe: next-second contact 90% vs 74% persistence, but the
+       encoder sees +-5 s both ways, so the future is in its window. Not
+       evidence of prediction. Held word 16.5% vs 6.0% majority, same as raw
+       features (17.0%). The grasp-family split is degenerate (100%
+       majority). No evidence yet of category information across grasp
+       families.
+   - 4.2 next: oracle body (true held-object identity) with the vision-to-body
+     loss off, so only the pathway changes. Read body-only, combined and
+     picture-only, on held-referent trials too.
 5. **Scaling.** Smaller data sizes from the same render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
    from a higher final plateau.
