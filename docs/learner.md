@@ -88,3 +88,21 @@ Video-only (soft-MIL) vs video + body. Seed 0, same data, speech, dev selection.
   condition requires `--pool soft`.
 - Late fusion uses the picture score during training with body dropout (the pathway), instead of a
   detached test-only term.
+
+## Oracle-to-picture distillation (ORACLE DIAGNOSTIC)
+
+Flags: `--distill-from <oracle run dir>`, `--distill-weight` (lambda, default 1), `--distill-temp` (T, default 2),
+`--inspect-epoch N`. Off by default; the default path is unchanged. Needs a picture-only soft-pooling student.
+
+- Teacher: a finished `--body oracle` run, frozen, eval mode, always given its oracle body (no dropout). Its target for
+  each training batch is the detached scaled training score matrix (soft-MIL picture score + beta * body cosine, the
+  same code as the language loss, tau_p of the run). Candidates are the batch's word bags, as in training.
+- Loss: language loss + lambda * T^2 * KL(teacher || student), both matching directions, with the student's own
+  picture-only scaled score. The KL updates the visual projection and word vectors. Lambda 0 is the plain run.
+- Building the teacher does not touch the student's CPU RNG stream. Check a new control against the stored
+  video-only history before reading a comparison.
+- Body-present diagnostic: `picture` / `fused` use hard max over regions (old); `picture_soft` / `fused_soft` use the
+  training pooling (soft-MIL, tau_p). Read the soft ones. `body` is unchanged.
+- Agreement (metrics `checkpoints`, at epoch N and at the dev-selected epoch): KL at T and top-1 agreement with the
+  teacher on training pairs and on s8 named visible-referent pairs (random fixed batches of 128). s8 pairs are used
+  because dev here is a picture-probe split with no teacher body.

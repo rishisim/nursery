@@ -429,6 +429,74 @@ def test_body_dropout_one_equals_video_only_and_each_loss_switches_off(episodes)
     assert data.batch(np.arange(6), generator)["keep"].sum() == 0
 
 
+def _distill_pair(episodes):
+    import torch
+    from nursery.learner.model import LearnerMIL
+
+    root, _ = episodes
+    teacher, data = _tiny_model(_store(root, clips=10))
+    teacher.eval()
+    torch.manual_seed(2)
+    student = LearnerMIL(30, 8, 0.1).eval()
+    v, t, n, w = _batch(student, data)
+    ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0), training=False)
+    return teacher, student, (v, t, n, w), ctx
+
+
+def test_distillation_targets_are_detached_and_the_kl_reaches_the_student(episodes):
+    import torch
+
+    teacher, student, (v, t, n, w), ctx = _distill_pair(episodes)
+    target = teacher.teacher_logits(v, t, n, ctx)
+    assert not target.requires_grad and target.shape == (6, 6)
+    weights = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "distill": 1.0}
+    terms = student.losses(v, t, n, w, None, weights, target, 2.0)
+    assert set(terms) == {"match", "distill"} and terms["distill"] > 0
+    terms["distill"].backward()
+    assert student.vproj[2].weight.grad.abs().sum() > 0 and student.word.weight.grad.abs().sum() > 0
+    assert all(p.grad is None for p in teacher.parameters())
+    # the teacher's own body is always on, whatever the batch context says
+    off = teacher.teacher_logits(v, t, n, dict(ctx, keep=torch.zeros(6)))
+    assert torch.equal(off, target)
+
+
+def test_distillation_weight_zero_equals_the_plain_loss(episodes):
+    import torch
+
+    teacher, student, (v, t, n, w), ctx = _distill_pair(episodes)
+    target = teacher.teacher_logits(v, t, n, ctx)
+    weights = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0}
+    plain = student.forward_loss(v, t, n, w, None, weights)
+    assert torch.equal(student.forward_loss(v, t, n, w, None, {**weights, "distill": 0.0}, target, 2.0), plain)
+    assert not torch.equal(student.forward_loss(v, t, n, w, None, {**weights, "distill": 1.0}, target, 2.0), plain)
+
+
+def test_distill_run_with_weight_zero_equals_the_plain_run(episodes, upstream, monkeypatch):
+    import torch
+    from nursery.learner.train import train_run
+
+    monkeypatch.setattr(torch.backends.mps, "is_available", lambda: False)  # CPU: exact repeatability
+
+    root, run = episodes
+    _write_body(root)
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    common = dict(pool="soft", tau_p=0.1, heldout_subject="s2", epochs=2)
+    plain = train_run(run, "none", 3, name="plain", **common)
+    train_run(run, "none", 3, name="teacher", body="oracle", **common)
+    again = train_run(run, "none", 3, name="again", **common)
+    again2 = train_run(run, "none", 3, name="again2", **common)
+    print("RUNS", plain["history"][0]["train_loss"], again["history"][0]["train_loss"], again2["history"][0]["train_loss"])
+    assert plain["history"] == again["history"]
+    zero = train_run(run, "none", 3, name="zero", distill_from=run / "teacher_s3", distill_weight=0.0, inspect_epoch=1, **common)
+    live = train_run(run, "none", 3, name="live", distill_from=run / "teacher_s3", inspect_epoch=1, **common)
+    assert plain["history"] == zero["history"]
+    assert live["history"][0]["losses"]["distill"] > 0 and "distill" not in zero["history"][0]["losses"]
+    assert live["history"] != plain["history"]
+    assert set(live["checkpoints"]) == {"epoch_1", "selected"} and live["checkpoints"]["selected"]["agreement"]["train"]["kl"] >= 0
+    assert "picture_soft" in live["distill"]["teacher_body_present"] and "fused_soft" in live["distill"]["teacher_body_present"]
+
+
 def test_picture_eval_does_not_touch_the_body(episodes, upstream, monkeypatch):
     import torch
 

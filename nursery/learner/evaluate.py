@@ -4,6 +4,8 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+from .model import soft_pool
+
 
 @torch.no_grad()
 def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch=256):
@@ -11,8 +13,10 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
 
     `manifest` holds the held-out subject's named utterances with a visible referent; `ds` is the upstream
     FramePairs over those rows and `data` a BodyData over the same rows (None without a body). Each trial: the true situation plus three foils from other sessions with other
-    referents. Scores per candidate: picture (max over the window's regions), body (fused-projection cosine to the
-    word) and their sum (late fusion). Foils use their own body, so the body must match the situation.
+    referents. Scores per candidate: picture (hard max over the window's regions), body (fused-projection cosine to
+    the word) and their sum (late fusion), plus `picture_soft` / `fused_soft`: the same with the training pooling
+    (soft-MIL, uniform region prior, tau_p), which is the score the model was trained on and the one to read.
+    Foils use their own body, so the body must match the situation.
     """
     model.eval()
     tokens, counts, regions, latents = [], [], [], []
@@ -31,7 +35,8 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
     video = manifest.video_id.to_numpy()
     held_all = manifest.held_referent.to_numpy().astype(bool)
     held = []
-    correct = {"picture": [], "body": [], "fused": []}
+    correct = {"picture": [], "body": [], "fused": [], "picture_soft": [], "fused_soft": []}
+    tau = getattr(model, "tau_p", None)
     for i in range(len(manifest)):
         pool = np.flatnonzero((referent != referent[i]) & (video != video[i]))
         if len(pool) < 3:
@@ -42,9 +47,14 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
         cand = np.concatenate([[i], rng.choice(pool, 3, replace=False)])
         pic = (R[cand].float() @ T[i]).max(1).values
         scores = {"picture": pic}
+        if tau is not None:
+            soft = soft_pool((R[cand].float() @ T[i]).unsqueeze(-1), torch.full((4, R.shape[1]), -np.log(R.shape[1]), device=R.device), tau).squeeze(1)
+            scores["picture_soft"] = soft
         if Z is not None:
             body = model.body_similarity(Z[cand], T[i:i + 1]).squeeze(1)
             scores["body"], scores["fused"] = body, pic + model.beta * body
+            if tau is not None:
+                scores["fused_soft"] = soft + model.beta * body
         for k, s in scores.items():
             correct[k].append(float(s.argmax() == 0))
     held = np.array(held, bool)
@@ -57,6 +67,30 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
     if Z is not None:
         out["beta"] = round(float(model.beta), 4)
     return out
+
+
+@torch.no_grad()
+def distill_agreement(student, teacher, upstream, ds, tdata, device, temp, seed=0, batch=128):
+    """Student (picture only) vs teacher (picture + oracle body) on the training score matrix, over fixed random
+    batches of `ds` pairs (candidate words are the batch's, as in training). Image -> words direction:
+    KL(teacher || student) at `temp` (unscaled), top-1 agreement, and each model's accuracy at picking the true pair."""
+    student.eval(), teacher.eval()
+    order = np.random.default_rng(seed).permutation(len(ds))
+    kl, agree, acc_s, acc_t, n = 0.0, 0, 0, 0, 0
+    for start in range(0, len(order) - batch + 1, batch):
+        rows = order[start:start + batch]
+        _, v, t, c = upstream.collate([ds[i] for i in rows])
+        v, t, c = v.to(device), t.to(device), c.to(device)
+        ls = student.scale() * student.pair_scores(v, t, c)[2]
+        lt = teacher.teacher_logits(v, t, c, tdata.batch(rows, None, training=False))
+        kl += float(F.kl_div(F.log_softmax(ls / temp, -1), F.softmax(lt / temp, -1), reduction="sum"))
+        agree += int((ls.argmax(1) == lt.argmax(1)).sum())
+        diag = torch.arange(len(rows), device=device)
+        acc_s += int((ls.argmax(1) == diag).sum())
+        acc_t += int((lt.argmax(1) == diag).sum())
+        n += len(rows)
+    return {"n_pairs": n, "kl": round(kl / n, 5), "top1_agree": round(100 * agree / n, 3),
+            "student_acc": round(100 * acc_s / n, 3), "teacher_acc": round(100 * acc_t / n, 3)}
 
 
 def _fit_probe(x_train, y_train, classes, multilabel=False, steps=300):

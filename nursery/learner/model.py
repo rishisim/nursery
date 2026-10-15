@@ -28,6 +28,15 @@ def weighted_nce(logits, w):
     return (0.5 * w * (li + lt)).sum() / w.sum().clamp(min=1e-6)
 
 
+def distill_kl(logits, target, w, temp):
+    """Hinton distillation KL(teacher || student) at temperature `temp`, scaled by temp^2, in both matching directions
+    (image -> candidate words, word -> candidate images) like the symmetric language loss. Weighted by pair weight."""
+    def kl(s, t):
+        return F.kl_div(F.log_softmax(s / temp, -1), F.softmax(t / temp, -1), reduction="none").sum(-1)
+
+    return temp ** 2 * (0.5 * w * (kl(logits, target) + kl(logits.t(), target.t()))).sum() / w.sum().clamp(min=1e-6)
+
+
 class BodyData:
     """The body store, pair metadata and episode bags on one device; builds the per-batch context.
 
@@ -203,11 +212,10 @@ def _model_class():
                 return states.sum() * 0
             return F.mse_loss(self.decoder(states)[chosen], target[chosen])
 
-        def losses(self, v, t, n, w, ctx=None, weights=None):
-            """Dict of loss terms. 'match' is the picture-only soft-MIL term (always on); an auxiliary term is computed
-            only when its weight is positive. With a body, 'match' includes the body pathway."""
+        def pair_scores(self, v, t, n, ctx=None):
+            """Training score matrix [B,B] (image i against word bag j): soft-MIL picture score (uniform region prior,
+            tau_p) plus, with a body and kept pairs, beta * body-word cosine (late fusion). Returns R, T, scores."""
             R, T = self.enc_regions(v), self.enc_text(t, n)
-            scale = self.scale()
             s = torch.einsum("brd,md->brm", R, T)
             uniform = torch.full(s.shape[:2], -np.log(s.shape[1]), device=s.device, dtype=s.dtype)
             pic = soft_pool(s, uniform, self.tau_p)
@@ -216,8 +224,23 @@ def _model_class():
                 # loss depends on the body; gradients reach the regions, words and every body sub-encoder.
                 z = self.latent_of(ctx)
                 pic = pic + ctx["keep"].unsqueeze(1) * self.beta * self.body_similarity(z, T)
+            return R, T, pic
+
+        @torch.no_grad()
+        def teacher_logits(self, v, t, n, ctx):
+            """Detached scaled combined (picture + body) logits [B,B], exactly as in training; the body is always kept."""
+            return self.scale() * self.pair_scores(v, t, n, dict(ctx, keep=torch.ones_like(ctx["keep"])))[2]
+
+        def losses(self, v, t, n, w, ctx=None, weights=None, target=None, temp=2.0):
+            """Dict of loss terms. 'match' is the picture-only soft-MIL term (always on); an auxiliary term is computed
+            only when its weight is positive. With a body, 'match' includes the body pathway. 'distill' (weights key,
+            needs `target`, detached teacher logits) pulls the batch's scaled logits toward the teacher's."""
+            scale = self.scale()
+            R, T, pic = self.pair_scores(v, t, n, ctx)
             out = {"match": weighted_nce(scale * pic, w)}
             weights = weights or {}
+            if weights.get("distill", 0) > 0 and target is not None:
+                out["distill"] = distill_kl(scale * pic, target.detach(), w, temp)
             if weights.get("pred", 0) > 0:
                 out["pred"] = self.predict_loss(R, ctx)
             if weights.get("episode", 0) > 0:
@@ -228,8 +251,8 @@ def _model_class():
                 out["mask"] = self.mask_loss(ctx)
             return {k: v for k, v in out.items() if v is not None}
 
-        def forward_loss(self, v, t, n, w, ctx=None, weights=None):
-            terms = self.losses(v, t, n, w, ctx, weights)
+        def forward_loss(self, v, t, n, w, ctx=None, weights=None, target=None, temp=2.0):
+            terms = self.losses(v, t, n, w, ctx, weights, target, temp)
             return terms["match"] + sum((weights or {})[k] * terms[k] for k in terms if k != "match")
 
     return LearnerMIL

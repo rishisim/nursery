@@ -28,6 +28,10 @@ def main():
     train.add_argument("--heldout-subject", help="Subject excluded from training (default in config.json; 'none' keeps everyone)")
     train.add_argument("--pool", choices=("max", "soft"), default="max", help="Region pooling in the training loss; --body requires soft")
     train.add_argument("--tau-p", type=float, default=0.1, help="Soft-pooling temperature")
+    train.add_argument("--distill-from", help="ORACLE DIAGNOSTIC: finished oracle-body run directory used as a frozen teacher (picture-only student)")
+    train.add_argument("--distill-weight", type=float, default=1.0, help="Weight of KL(teacher || student) (with --distill-from; 0 = plain run)")
+    train.add_argument("--distill-temp", type=float, default=2.0, help="Distillation temperature")
+    train.add_argument("--inspect-epoch", type=int, help="Also record probe scores, word-group accuracy and teacher agreement after this many epochs")
     train.add_argument("--name", help="Output directory prefix (default: the condition)")
     args = parser.parse_args()
     if args.command == "embed":
@@ -35,7 +39,8 @@ def main():
     else:
         weights = {loss: getattr(args, f"w_{loss}") for loss in LOSSES}
         train_run(args.run, args.condition, args.seed, args.epochs, args.name, args.pool, args.tau_p, args.body,
-                  args.episodes, weights, args.heldout_subject, args.body_dropout)
+                  args.episodes, weights, args.heldout_subject, args.body_dropout, args.distill_from, args.distill_weight,
+                  args.distill_temp, args.inspect_epoch)
 
 
 if __name__ == "__main__":

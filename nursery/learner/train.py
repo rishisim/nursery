@@ -55,8 +55,42 @@ def _pair_meta(manifest, store, lut, window):
     return ps, pt, frames
 
 
+def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_root, lut, window, learner, device, tau_p):
+    """Frozen oracle learner from a finished run directory, and its oracle-body data over `manifest`.
+    Refuses a teacher whose vocabulary, pooling or body mode differs from this run's."""
+    import torch
+
+    from . import body as bodylib
+    from .model import BodyData, LearnerMIL
+
+    path = Path(path)
+    info = json.loads((path / "metrics.json").read_text())
+    if json.loads((path / "vocab.json").read_text()) != vocab:
+        raise ValueError("The teacher's vocabulary differs from this run's")
+    if info.get("pool") != "soft" or info.get("tau_p") != tau_p or info.get("body", {}).get("mode") != "oracle":
+        raise ValueError("The teacher must be an oracle-body soft-pooling run with this run's tau_p")
+    frames = pd.read_parquet(episode_root / "frames.parquet")
+    video_ids = sorted(set(manifest.video_id) | set(heldout_manifest.video_id))
+    store = bodylib.oracle_store(bodylib.load_store(episode_root, frames, video_ids, set(heldout_manifest.video_id)))
+    store["subject"] = np.array([subject_of[v] for v in video_ids])
+
+    def data(rows):
+        ps, pt, win = _pair_meta(rows, store, lut, window)
+        return BodyData(store, ps, pt, win, None, None, None, None, device, learner["window_s"], 0.0, 0.0)
+
+    with torch.random.fork_rng(devices=[]):  # building the teacher must not move the student's RNG stream
+        dims = {k: v.shape[-1] for k, v in store["groups"].items()}
+        model = LearnerMIL(len(vocab), info["emb_dim"], tau_p, dims, len(store["categories"]))
+    model.load_state_dict(torch.load(path / "model.pt", map_location="cpu", weights_only=True))
+    model = model.float().to(device).eval()
+    for p in model.parameters():
+        p.requires_grad_(False)
+    return model, data
+
+
 def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.1, body="none", episodes="none",
-              weights=None, heldout_subject=None, body_dropout=None):
+              weights=None, heldout_subject=None, body_dropout=None, distill_from=None, distill_weight=1.0,
+              distill_temp=2.0, inspect_epoch=None):
     import torch
 
     from . import body as bodylib
@@ -82,6 +116,10 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         raise ValueError(f"--episodes must be one of {EPISODE_MODES}")
     if body != "none" and pool != "soft":
         raise ValueError("--body requires --pool soft")
+    if distill_from and (body != "none" or pool != "soft"):
+        raise ValueError("--distill-from needs a picture-only student: --body none --pool soft")
+    if distill_weight < 0 or distill_temp <= 0:
+        raise ValueError("--distill-weight must be non-negative and --distill-temp positive")
     weights = {**learner["weights"], **{k: v for k, v in (weights or {}).items() if v is not None}}
     if set(weights) != set(LOSSES) or min(weights.values()) < 0:
         raise ValueError(f"Loss weights must be non-negative: {LOSSES}")
@@ -164,6 +202,11 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     if device == "mps":
         model = model.float()
     model = model.to(device)
+    teacher = None
+    if distill_from:
+        teacher, make_data = _load_teacher(distill_from, vocab, manifest, heldout_manifest, subject_of, episode_root, lut,
+                                           window, learner, device, tau_p)
+        teacher_train = make_data(manifest)
     opt = torch.optim.AdamW(model.parameters(), lr=settings["lr"], weight_decay=0.1)
     probes = pd.read_parquet(run / "probes_frames.parquet")
     probe_cache, probe_lut = region.load_region_cache(run / "probes_cache")
@@ -185,7 +228,28 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     output = _output_directory(run / f"{name or condition}_s{seed}")
     if any(output.iterdir()):
         raise FileExistsError(f"Training output already contains files: {output}")
+    # Held-out subject: named utterances with a visible referent.
+    test_rows = None
+    if pool == "soft" and heldout and len(heldout_manifest):
+        test_rows = heldout_manifest[heldout_manifest.named.astype(bool) & heldout_manifest.referent_visible.astype(bool)]
+        test_rows = test_rows[test_rows.text.map(lambda text: bool(upstream.encode(text, vocab)))].reset_index(drop=True)
+        if len(test_rows) >= 8:
+            held_ds = upstream.FramePairs(caches, lut, test_rows, vocab, window, False)
+    teacher_held = make_data(test_rows) if teacher is not None and held_ds is not None else None
+    checkpoints = {}
+
+    def checkpoint(ep, scores, details):
+        """Inspection record of the model as it is now: probe scores, word-group accuracy and teacher agreement."""
+        record = {"ep": ep, "dev": round(100 * scores["dev"], 3), "test": round(100 * scores["test"], 3),
+                  "konkle": round(100 * scores["konkle"], 3) if "konkle" in scores else None, "groups": _groups(details)}
+        if teacher is not None:
+            record["agreement"] = {"train": evaluate.distill_agreement(model, teacher, upstream, ds, teacher_train, device, distill_temp, seed)}
+            if teacher_held is not None:
+                record["agreement"]["heldout"] = evaluate.distill_agreement(model, teacher, upstream, held_ds, teacher_held, device, distill_temp, seed)
+        return record
+
     soft = pool == "soft"
+    lw = {**weights, "distill": distill_weight}
     history, best_sel, best_state, best_ep, best_details = [], -1.0, None, -1, None
     mask_generator = torch.Generator().manual_seed(seed + 1000)  # keeps the default RNG stream identical to video-only
     for epoch in range(epochs):
@@ -195,8 +259,11 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
             w = pair_weights[idx].to(device)
             if soft:
                 ctx = data.batch(idx.numpy(), mask_generator) if data is not None else None
-                terms = model.losses(v.to(device), t.to(device), n.to(device), w, ctx, weights)
-                loss = terms["match"] + sum(weights[k] * terms[k] for k in terms if k != "match")
+                target = None
+                if teacher is not None and distill_weight > 0:
+                    target = teacher.teacher_logits(v.to(device), t.to(device), n.to(device), teacher_train.batch(idx.numpy(), None, training=False))
+                terms = model.losses(v.to(device), t.to(device), n.to(device), w, ctx, lw, target, distill_temp)
+                loss = terms["match"] + sum(lw[k] * terms[k] for k in terms if k != "match")
                 for k, x in terms.items():
                     terms_sum.setdefault(k, []).append(float(x.detach()))
             else:
@@ -228,7 +295,11 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
             record["losses"] = {k: round(float(np.mean(x)), 5) for k, x in terms_sum.items()}
         history.append(record)
         print(record, flush=True)
+        if inspect_epoch == epoch + 1:
+            checkpoints[f"epoch_{inspect_epoch}"] = checkpoint(epoch, scores, details)
     model.load_state_dict(best_state)
+    if teacher is not None or inspect_epoch:
+        checkpoints["selected"] = checkpoint(best_ep, {k: history[best_ep][k2] for k, k2 in (("dev", "dev"), ("test", "acc"), ("konkle", "konkle")) if k2 in history[best_ep]}, best_details)
     metrics = {
         "run": output.name, "seed": seed, "manifest": str(manifest_path),
         "caches": [str(run / "train_cache")], "eval_frames": str(run / "probes_frames.parquet"),
@@ -250,20 +321,22 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     if "losses" in history[best_ep]:
         metrics["losses_selected_epoch"], metrics["losses_final_epoch"] = history[best_ep]["losses"], history[-1]["losses"]
     # Held-out subject: named utterances with a visible referent (picture-only for every condition).
-    test_rows = None
     if soft and heldout and len(heldout_manifest):
-        test_rows = heldout_manifest[heldout_manifest.named.astype(bool) & heldout_manifest.referent_visible.astype(bool)]
-        test_rows = test_rows[test_rows.text.map(lambda text: bool(upstream.encode(text, vocab)))].reset_index(drop=True)
         if body != "none":
             ps, pt, win = _pair_meta(test_rows, real, lut, window)
             eval_data = BodyData(real, ps, pt, win, None, None, None, None, device, learner["window_s"], 0.0, 0.0)
-        if len(test_rows) >= 8:
-            held_ds = upstream.FramePairs(caches, lut, test_rows, vocab, window, False)
+        if held_ds is not None:
             metrics["body_present"] = evaluate.body_present_4afc(model, upstream, held_ds, eval_data, test_rows, device, seed)
     if eval_data is not None and len(eval_data.ps):
         metrics["probe"] = evaluate.body_probe(model, eval_data, real, heldout, device)
     if body_info is not None:
         metrics["body"] = body_info
+    if teacher is not None:
+        metrics["distill"] = {"from": str(Path(distill_from).resolve()), "weight": distill_weight, "temp": distill_temp}
+        if held_ds is not None:  # ORACLE DIAGNOSTIC: the teacher's own body-present numbers (hard and soft pooling)
+            metrics["distill"]["teacher_body_present"] = evaluate.body_present_4afc(teacher, upstream, held_ds, teacher_held, test_rows, device, seed)
+    if checkpoints:
+        metrics["checkpoints"] = checkpoints
     metrics["groups"] = _groups(best_details)
     torch.save(model.state_dict(), output / "model.pt")
     (output / "vocab.json").write_text(json.dumps(vocab, indent=2) + "\n")
