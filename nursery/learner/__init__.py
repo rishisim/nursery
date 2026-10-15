@@ -1,35 +1,14 @@
 """Training-only embodied cues for the pinned vlm-headcam learner."""
 
 import importlib
-import json
 from pathlib import Path
 import subprocess
 import sys
 
-
-DEFAULT_CONFIG = Path(__file__).with_name("config.json")
-UPSTREAM = Path(__file__).resolve().parents[2] / ".external" / "vlm-headcam"
+from nursery.common import REPO, load_config
 
 
-def load_config():
-    config = json.loads(DEFAULT_CONFIG.read_text())
-    if config["schema_version"] != 1:
-        raise ValueError("Unsupported cue-learning configuration")
-    return config
-
-
-def _output_directory(path):
-    path = Path(path).expanduser().resolve()
-    parent = path
-    while not parent.exists():
-        parent = parent.parent
-    ignored = subprocess.run(
-        ["git", "-C", str(parent), "check-ignore", "--quiet", str(path)], check=False,
-    )
-    if ignored.returncode != 0:
-        raise ValueError("Cue outputs must be inside an ignored repository directory")
-    path.mkdir(parents=True, exist_ok=True)
-    return path
+UPSTREAM = REPO / ".external" / "vlm-headcam"
 
 
 def _upstream_module(name):

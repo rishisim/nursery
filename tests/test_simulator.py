@@ -4,10 +4,10 @@ import xml.etree.ElementTree as ET
 import numpy as np
 import pytest
 
-from nursery.egocentric_replay.build import load_config, room_bank
-from nursery.egocentric_replay.grab import mesh_path, rigid_matrix
-from nursery.egocentric_replay.schema import FIELDS, table, visible_objects
-from nursery.egocentric_replay.sessions import chain_clips, contact_rule, sample_chain, subject_split
+from nursery.simulator.build import load_config, room_bank
+from nursery.simulator.grab import mesh_path, rigid_matrix
+from nursery.simulator.schema import FIELDS, table, visible_objects
+from nursery.simulator.sessions import chain_clips, contact_rule, sample_chain, subject_split
 
 
 def standin_rooms(output):
@@ -123,7 +123,7 @@ def test_standin_format_and_room_separation(tmp_path):
 def test_build_contract_with_fake_sessions_and_probes(tmp_path, monkeypatch):
     import pickle
     import pyarrow.parquet as pq
-    from nursery.egocentric_replay import build as implementation
+    from nursery.simulator import build as implementation
 
     config = load_config()
     config.update(subjects=["s1", "s9", "s10"], duration_s=2, probes_per_category_per_split=1)
@@ -271,7 +271,7 @@ def _new_directory(path):
 
 def test_renderer_refuses_unignored_output(tmp_path, monkeypatch):
     from types import SimpleNamespace
-    from nursery.egocentric_replay import render
+    from nursery.simulator import render
 
     monkeypatch.setattr(render.subprocess, "run", lambda *args, **kwargs: SimpleNamespace(returncode=1))
     monkeypatch.setattr(render, "_run_native", lambda *args, **kwargs: pytest.fail("Renderer must not launch"))
@@ -281,7 +281,7 @@ def test_renderer_refuses_unignored_output(tmp_path, monkeypatch):
 
 
 def test_contact_gate_rejects_before_render_and_removes_intermediates(tmp_path, monkeypatch):
-    from nursery.egocentric_replay import build as implementation
+    from nursery.simulator import build as implementation
 
     config = load_config()
     config.update(duration_s=2, clear_squares={"room0": {}})
@@ -323,7 +323,7 @@ def test_contact_gate_rejects_before_render_and_removes_intermediates(tmp_path, 
 
 def test_row_vector_rotation_round_trip_and_contact_distance(tmp_path):
     import trimesh
-    from nursery.egocentric_replay.grab import contact_distances
+    from nursery.simulator.grab import contact_distances
 
     mesh = trimesh.creation.box(extents=[0.2, 0.4, 0.6])
     mesh.export(tmp_path / "box.ply")
@@ -340,7 +340,7 @@ def test_row_vector_rotation_round_trip_and_contact_distance(tmp_path):
     labelled, whole = contact_distances(data, [0], world[None],
                                        {"left_hand": np.arange(len(world))}, tmp_path)
     assert max(labelled + whole) < 1e-7
-    from nursery.egocentric_replay.build import _trajectory
+    from nursery.simulator.build import _trajectory
     data["framerate"] = 120
     swept = np.asarray(_trajectory(data, tmp_path)[0])
     np.testing.assert_allclose(swept[0], [world.min(0), world.max(0)], atol=1e-7)
@@ -350,7 +350,7 @@ def test_retargeted_body_ignores_stale_template_gender_and_pca(monkeypatch):
     import smplx
     import torch
     from types import SimpleNamespace
-    from nursery.egocentric_replay.grab import reconstruct
+    from nursery.simulator.grab import reconstruct
 
     captured = {}
 
@@ -390,7 +390,7 @@ def test_certified_square_contains_actor_and_table_and_rejects_oversize():
     from pathlib import Path
     from types import SimpleNamespace
 
-    source = Path("nursery/egocentric_replay/blender.py").read_text()
+    source = Path("nursery/simulator/blender.py").read_text()
     function = next(node for node in ast.parse(source).body
                     if isinstance(node, ast.FunctionDef) and node.name == "open_area")
     namespace = {"np": np, "math": math, "Vector": np.asarray}
@@ -411,7 +411,7 @@ def test_certified_square_contains_actor_and_table_and_rejects_oversize():
 
 
 def test_distractor_candidates_include_real_objects_and_exclude_only_current_clip():
-    from nursery.egocentric_replay.build import _distractors
+    from nursery.simulator.build import _distractors
 
     pool = [{"category": name, "name": f"{name}_{i}"} for name in ["mug", "camera", "apple", "cheese", "pen"]
             for i in range(3)]
@@ -424,8 +424,8 @@ def test_distractor_candidates_include_real_objects_and_exclude_only_current_cli
 
 def test_pools_hold_train_instances_by_surface_and_extras_on_table(tmp_path):
     from pathlib import Path
-    from nursery.egocentric_replay.assets import MANIFEST, load_vocabulary
-    from nursery.egocentric_replay.build import _pools
+    from nursery.simulator.assets import MANIFEST, load_vocabulary
+    from nursery.simulator.build import _pools
 
     vocabulary = load_vocabulary()
     assets = json.loads(MANIFEST.read_text())["words"]
@@ -440,7 +440,7 @@ def test_pools_hold_train_instances_by_surface_and_extras_on_table(tmp_path):
 def test_swap_alignment_recovers_rotation_and_scale():
     import trimesh
     from scipy.spatial.transform import Rotation
-    from nursery.egocentric_replay.swaps import align
+    from nursery.simulator.swaps import align
 
     target = trimesh.creation.box(extents=[0.3, 0.1, 0.05])
     rotation = Rotation.from_euler("xyz", [20, -35, 50], degrees=True).as_matrix()
@@ -456,7 +456,7 @@ def test_floor_objects_stay_in_square_and_clear_of_occupied():
     from pathlib import Path
     from types import SimpleNamespace
 
-    function = next(node for node in ast.parse(Path("nursery/egocentric_replay/blender.py").read_text()).body
+    function = next(node for node in ast.parse(Path("nursery/simulator/blender.py").read_text()).body
                     if isinstance(node, ast.FunctionDef) and node.name == "_place_floor")
 
     class Obj:
@@ -504,7 +504,7 @@ def test_floor_objects_stay_in_square_and_clear_of_occupied():
 
 
 def test_contact_subsample_is_deterministic_and_keeps_rendered_frames():
-    from nursery.egocentric_replay.grab import contact_indices
+    from nursery.simulator.grab import contact_indices
 
     data = {"contact": {"body": np.ones((2400, 4))}, "framerate": 120}
     rendered = np.array([0, 100, 2399])
@@ -518,7 +518,7 @@ def test_contact_subsample_is_deterministic_and_keeps_rendered_frames():
 
 def test_surface_search_matches_exact_triangle_queries():
     import trimesh
-    from nursery.egocentric_replay.grab import _surface_distances, _surface_index
+    from nursery.simulator.grab import _surface_distances, _surface_index
 
     mesh = trimesh.creation.icosphere(subdivisions=2)
     points = np.random.default_rng(7).normal(size=(30, 3)) * 2
@@ -535,7 +535,7 @@ def test_placement_resamples_category_after_bounded_positions(zero_fit):
     from pathlib import Path
     from types import SimpleNamespace
 
-    function = next(node for node in ast.parse(Path("nursery/egocentric_replay/blender.py").read_text()).body
+    function = next(node for node in ast.parse(Path("nursery/simulator/blender.py").read_text()).body
                     if isinstance(node, ast.FunctionDef) and node.name == "_place_distractors")
     table = SimpleNamespace(low=np.array([0, 0, 0]), high=np.array([1, 1, 0]), location=np.zeros(3))
     removed, loaded = [], []
@@ -583,7 +583,7 @@ def test_hand_only_skinning_matches_upstream_lbs(tmp_path, monkeypatch):
     import smplx
     import torch
     from smplx.lbs import lbs
-    from nursery.egocentric_replay.grab import hand_geometry
+    from nursery.simulator.grab import hand_geometry
 
     template = torch.tensor([[0.1, 0, 0], [0.2, 0, 0], [0, 0.1, 0], [0, 0.2, 0]])
     parents = torch.tensor([-1] + [0] * 54)
@@ -618,7 +618,7 @@ def test_local_hand_path_does_not_block_free_tabletop(tmp_path, monkeypatch):
     import ast
     from pathlib import Path
     from types import SimpleNamespace
-    from nursery.egocentric_replay.grab import hand_geometry
+    from nursery.simulator.grab import hand_geometry
     import smplx
     import torch
 
@@ -636,7 +636,7 @@ def test_local_hand_path_does_not_block_free_tabletop(tmp_path, monkeypatch):
                                          np.array([0]),{"body_models":str(tmp_path)})
     assert margin == 0 and np.max(np.array(occupied)[:,:,0]) < .23
     table = SimpleNamespace(low=np.array([0,0,0]),high=np.array([1,1,0]),location=np.zeros(3))
-    function = next(n for n in ast.parse(Path("nursery/egocentric_replay/blender.py").read_text()).body
+    function = next(n for n in ast.parse(Path("nursery/simulator/blender.py").read_text()).body
                     if isinstance(n,ast.FunctionDef) and n.name=="_place_distractors")
     namespace = {"np":np,"bounds":lambda o:(o.low+o.location,o.high+o.location),
         "load_ply":lambda *args:SimpleNamespace(low=np.array([-.03,-.03,0]),high=np.array([.03,.03,.06]),location=np.zeros(3)),

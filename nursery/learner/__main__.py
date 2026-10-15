@@ -1,22 +1,14 @@
-"""Generate transcripts, embed episode images, and train a cue learner."""
+"""Embed episode images and train the cue learner on a speech run."""
 
 import argparse
 
 from .embed import embed_episodes
 from .train import train_run
-from .transcripts import write_transcripts
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    transcripts = commands.add_parser("transcripts")
-    transcripts.add_argument("--episodes", required=True)
-    transcripts.add_argument("--output", required=True)
-    transcripts.add_argument("--seed", type=int, required=True)
-    transcripts.add_argument("--hold-window-s", type=int)
-    for flag in ("p-ref", "p-name", "p-held", "p-unseen", "sigma", "rate-hz"):
-        transcripts.add_argument(f"--{flag}", type=float)
     embed = commands.add_parser("embed")
     embed.add_argument("--episodes", required=True)
     embed.add_argument("--output", required=True)
@@ -34,10 +26,7 @@ def main():
     train.add_argument("--tau-p", type=float, default=0.1, help="Soft-pooling temperature")
     train.add_argument("--name", help="Output directory prefix (default: the condition)")
     args = parser.parse_args()
-    if args.command == "transcripts":
-        write_transcripts(args.episodes, args.output, args.seed,
-                          **{k: getattr(args, k) for k in ("p_ref", "p_name", "p_held", "p_unseen", "hold_window_s", "sigma", "rate_hz")})
-    elif args.command == "embed":
+    if args.command == "embed":
         embed_episodes(args.episodes, args.output, args.device, args.batch)
     else:
         train_run(args.run, args.condition, args.seed, args.epochs, args.body, args.body_control, args.body_drop, args.name, args.pool, args.tau_p)

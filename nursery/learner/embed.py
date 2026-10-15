@@ -4,7 +4,8 @@ import json
 from pathlib import Path
 import sys
 
-from . import _output_directory, _upstream_module, load_config
+from nursery.common import REPO, _output_directory, load_config
+from nursery.learner import _upstream_module
 
 
 def probe_frames(probes, config):
@@ -27,7 +28,7 @@ def konkle_frames(config):
     """
     import pandas as pd
 
-    root = Path(config["konkle"]["root"])
+    root = REPO / config["konkle"]["root"]  # relative to the repo root unless absolute
     rows = []
     for category in sorted(config["konkle"]["categories"]):
         photos = sorted((p for p in (root / category).rglob("*") if p.suffix.lower() == ".jpg"

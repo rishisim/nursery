@@ -6,12 +6,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from . import _output_directory, _upstream_module
+from nursery.common import _output_directory
+from nursery.learner import _upstream_module
 
 
 def _groups(details):
     """Accuracy at the selected epoch by word group: held (touched) vs seen-only vs GRAB-only extras."""
-    from nursery.egocentric_replay.assets import load_vocabulary
+    from nursery.simulator.assets import load_vocabulary
 
     vocabulary = load_vocabulary()
     held = {w for sources in vocabulary["held"].values() for words in sources.values() for w in words}

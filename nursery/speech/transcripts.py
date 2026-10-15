@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from . import _output_directory, load_config
+from nursery.common import _output_directory, load_config
 
 
 def cue_timelines(frames, config, rng):
