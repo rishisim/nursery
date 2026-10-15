@@ -103,7 +103,8 @@ def _pools(config, vocabulary, assets, root):
         for item in assets[word]:
             if item["split"] == "train":
                 pools[spec["place"]].append({"category": word, "blend": str(library / f"{word}.blend"),
-                                             "name": f"a_{item['id']}"})
+                                             "name": f"a_{item['id']}", "size_m": spec["size_m"],
+                                             "scale": spec["size_m"] / max(item["extents_m"])})
     for name, word in vocabulary["extras"].items():
         pools["table"].append({"category": word, "mesh": str(root / "contact_meshes" / f"{name}.ply")})
     return pools
@@ -340,7 +341,8 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
         library = Path(config["library"])
         # Probes show held-out instances (dev/test splits of the asset library) in held-out rooms.
         shown = {split: {word: [{"blend": str(library / f"{word}.blend"), "name": f"a_{item['id']}",
-                                 "place": spec["place"]} for item in assets[word] if item["split"] == split]
+                                 "place": spec["place"], "scale": spec["size_m"] / max(item["extents_m"])}
+                                for item in assets[word] if item["split"] == split]
                          for word, spec in vocabulary["words"].items()} for split in ("dev", "test")}
         for split in shown:
             for name, word in sorted(vocabulary["extras"].items()):

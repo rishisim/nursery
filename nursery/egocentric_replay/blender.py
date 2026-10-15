@@ -60,7 +60,9 @@ def load_asset(spec, instance=0):
 
 
 def load_entry(entry, instance=0):
-    return load_asset(entry, instance) if "blend" in entry else load_ply(entry["mesh"], entry["color"], instance)
+    obj = load_asset(entry, instance) if "blend" in entry else load_ply(entry["mesh"], entry["color"], instance)
+    obj.scale = (entry.get("scale", 1.0),) * 3  # library instances are baked at assets.json size
+    return obj
 
 
 def remove_object(obj):
@@ -127,7 +129,7 @@ def rest_position(obj, point, normal):
     return point - obj.rotation_euler.to_matrix() @ anchor
 
 
-def open_area(vertices, objects, square):
+def open_area(vertices, objects, square, edge=0):
     angle = math.radians(square["square_orientation_degrees"])
     rotation = np.array([[math.cos(angle), -math.sin(angle), 0],
                          [math.sin(angle), math.cos(angle), 0], [0, 0, 1]])
@@ -139,7 +141,13 @@ def open_area(vertices, objects, square):
     if np.any((high - low)[:2] > 2.5):
         raise RuntimeError("Recorded interaction does not fit certified 2.5m square")
     center = np.mean(square["square_vertices_m"], axis=0)
-    return np.array([*center, square["floor_height_m"]]) - rotation @ np.array([
+    offset = np.zeros(3)
+    if edge:
+        # Push the interaction flush to one edge (0.05 m margin) of the square along the roomier axis.
+        free = 2.5 - (high - low)[:2]
+        axis = int(np.argmax(free))
+        offset[axis] = edge * max(free[axis] / 2 - 0.05, 0)
+    return np.array([*center, square["floor_height_m"]]) + rotation @ offset - rotation @ np.array([
         *((high + low)[:2] / 2), low[2]])
 
 
@@ -192,7 +200,9 @@ def _place_distractors(table, entries, count, occupied, rng):
     low, high = bounds(table)
     distractors = []
     categories = []
-    # The shuffled category order is uniform; infeasible props are rejected.
+    # The shuffled category order is uniform; infeasible props are rejected. The drawn props are packed
+    # largest first so big ones get room, and a rejected prop falls through to the next shuffled entry.
+    entries = sorted(entries[:count], key=lambda e: -e.get("size_m", 0)) + list(entries[count:])
     for entry in entries:
         obj = load_entry(entry, len(distractors) + 2)
         bpy.context.view_layer.update()
@@ -236,28 +246,34 @@ def _place_floor(entries, count, occupied, square, first, rng):
     rotation = np.array([[math.cos(angle), -math.sin(angle)], [math.sin(angle), math.cos(angle)]])
     center = np.mean(square["square_vertices_m"], axis=0)[:2]
     placed, categories, boxes = [], [], [np.asarray(box) for box in occupied]
+    fixed = len(boxes)
+    entries = sorted(entries[:count], key=lambda e: -e.get("size_m", 0)) + list(entries[count:])
     for entry in entries:
         obj = load_entry(entry, first + len(placed))
         done = False
-        for _ in range(48):
-            obj.rotation_euler = (0, 0, float(rng.uniform(0, 2 * math.pi)))
+        for _ in range(200):
+            # Quarter turns of the square plus a 3 degree jitter keep long objects aligned with the free strip.
+            obj.rotation_euler = (0, 0, angle + int(rng.integers(4)) * math.pi / 2 + float(rng.uniform(-1, 1)) * math.radians(3))
             obj.location = (0, 0, 0)
             bpy.context.view_layer.update()
             corners = np.array([obj.matrix_world @ Vector(c) for c in obj.bound_box])
             local = corners[:, :2] @ rotation
             half = (local.max(0) - local.min(0)) / 2
             if np.any(half > 1.2):
-                break
+                continue
             middle = (local.max(0) + local.min(0)) / 2
             target = rng.uniform(-1.25 + half, 1.25 - half)
             xy = center + rotation @ (target - middle)
             low = corners.min(0)[:2] + xy
             high = corners.max(0)[:2] + xy
-            if any(np.all(high > box[0] - 0.05) and np.all(low < box[1] + 0.05) for box in boxes):
+            # A flat rug may lie under the actor and table; nothing else may overlap the actor or other objects.
+            if any(np.all(high > box[0] - 0.05) and np.all(low < box[1] + 0.05)
+                   for box in (boxes[fixed:] if entry["category"] == "rug" else boxes)):
                 continue
             obj.location = (xy[0], xy[1], square["floor_height_m"] - corners.min(0)[2])
             bpy.context.view_layer.update()
-            boxes.append(np.array([low, high]))
+            if entry["category"] != "rug":
+                boxes.append(np.array([low, high]))
             done = True
             break
         if not done:
@@ -418,7 +434,10 @@ def main():
         actor = mesh_object("actor", arrays["vertices"][0], arrays["faces"], [0.7, 0.5, 0.35])
         extent_points = np.concatenate([arrays["vertices"].reshape(-1, 3),
                                         np.array(segment["trajectory_bounds"]).reshape(-1, 3)])
-        shift = open_area(extent_points[None], [table, active, *distractors], job["clear_square"])
+        floor_entries = segment.get("floor_objects", [])[:segment.get("floor_count", 0)]
+        big = any(entry.get("size_m", 0) > 0.5 for entry in floor_entries)
+        edge = int(rng.choice([-1, 1])) if big else 0
+        shift = open_area(extent_points[None], [table, active, *distractors], job["clear_square"], edge)
         translation = Matrix.Translation(Vector(shift))
         occupied_xy = [np.array([extent_points.min(0)[:2], extent_points.max(0)[:2]]) + shift[:2]]
         for obj in (table, *distractors):
