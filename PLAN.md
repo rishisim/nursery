@@ -6,9 +6,9 @@ video + body.
 
 ## Order
 
-1. **Evaluation suite and vocabulary.** In progress.
+1. **Evaluation suite and vocabulary.** Done 2026-10-14.
    - 1a. Pick evals. Done 2026-10-14. See "Evaluation suite".
-   - 1b. Widen vocabulary to cover all 60 Konkle test categories. See
+   - 1b. Widen vocabulary to cover all 60 Konkle test categories. Done. See
      "Vocabulary widening". Needed because 41 GRAB words share only ~16
      usable words with Konkle test-60, and 41 words may saturate.
 2. **Speech that depends on the body.** Caregiver speech tied to what the
@@ -73,8 +73,41 @@ Konkle words by how they enter the simulator:
 
 Speech names seen-only objects too, so the learner hears all words.
 
-To do:
-- Map GRAB `airplane` to `airplane`, not `plane`.
-- GRAB torus is not a Konkle ring; rename it (bagel or tape after swap).
-  Konkle `ring` comes from Objaverse ring meshes.
-- Swaps: scale new mesh to the original's size, recompute contact.
+Done 2026-10-14 (branch `cue/vocabulary`, commits 68a6dea7, 16425a6a, 164bd04d):
+
+- Assets: 1,210 screened instances, ≥10 per Konkle word (most 20+), split
+  train/dev/test by instance. Fills: procedural meshes for balloon, bill,
+  button, tape, bagel (not EmbodiedGen). 35 instances are CC-NC; licenses in
+  `assets.json`. cookie comes from small torus, not small cylinder.
+- Swaps: every held word (native too) uses Objaverse instances on GRAB grasps,
+  contact recomputed. Loose fits (<30% of contact within 5 mm): watch, bottle,
+  rock, balloon, bird, doll, juice, sandwich, key, turtle, umbrella. Better
+  alignment is being tried.
+- Placement: tent shrunk to 1.0 m; hat, pizza, cake, trumpet, airplane go on
+  the floor (table too small); big floor objects push the actor to the edge
+  of the open square. 104 extra sessions boost the rare words; all 78 words
+  are now in the learner's vocabulary (bed barely: 5 mentions).
+- Render: 856 sessions (752 + 104 extras), 102,720 frames, body signals saved
+  per frame (joints, hand pose, object pose, per-vertex contact).
+- Video-only smoke run (1 seed, 20 epochs): rendered test 45.3% (held 41.0,
+  seen-only 39.8, extras 61.5); Konkle test-60 45.2% (chance 25%). Not
+  saturated, still rising at epoch 20.
+
+Before the final experiment (step 4):
+- One clean full render with all fixes (not the patched set; step 5 slices
+  data by size). New placement code shows ~30% fewer floor words per
+  session; check before that render.
+- Train long enough that video-only plateaus.
+- Step 2 speech must keep every word ≥5 mentions (seen-only words are rarely
+  named in real data, ~0.04/min).
+
+## Speech coupling (step 2 inputs)
+
+From literature and the Karmazyn-Raz & Smith OSF data (12 mo, 16 dyads);
+details in `outputs/step2/speech_coupling_lit.md` (worktree):
+- Named object held by infant: 23% (12 mo) to ~42% (12–26 mo).
+- Handled objects named ~6× more per minute than never-handled ones.
+- ~30% of utterances name an object; ~3.6–6 names/min.
+- Name falls −10 to +10 s around grasp onset; at 12 mo before ≈ after.
+- No parent hands in the simulator: parent-held naming (~29%) needs a
+  design choice.
