@@ -229,12 +229,12 @@ def test_training_rejects_incomplete_inputs(episodes, upstream, failure):
         train_run(run, "contact", 8, epochs=1)
 
 
-# ---- step 3: body input ----
+# ---- body input and the body pathway (docs/learner.md) ----
 
 def _body_session(seed, frames=120):
     rng = np.random.default_rng(seed)
     bits = np.zeros((frames, 1556), dtype=bool)
-    bits[::3, :40] = True                                   # left hand touches every third second
+    bits[np.arange(frames) % 6 < 3, :40] = True             # left hand touches for 3 s out of every 6
     joints = rng.normal(size=(frames, 55, 3)).astype(np.float32) * 0.1
     joints[:, :, 2] -= 1.0                                  # everything in front of an identity camera
     camera = np.tile(np.eye(4, dtype=np.float32), (frames, 1, 1))
@@ -250,155 +250,213 @@ def _write_body(root, video_ids=("v0", "v1")):
         np.savez(root / "body" / f"{video_id}.npz", **_body_session(k))
 
 
-def test_projection_convention_and_regions():
+def _store(root, clips=None):
     from nursery.learner import body
 
-    camera = np.tile(np.eye(4), (3, 1, 1))
-    camera[1, :3, 3] = (0.5, 0, 0)                           # camera-to-world: moved right by 0.5 m
-    points = np.array([[0, 0, -1.0], [0.5, 0, -1.0], [0, 0, 1.0]])
-    pixels, front = body.project_points(points, camera)
-    np.testing.assert_allclose(pixels[0], (160, 120), atol=1e-4)
-    np.testing.assert_allclose(pixels[1], (160, 120), atol=1e-4)  # same point relative to the moved camera
-    assert front.tolist() == [True, True, False]
-    right, _ = body.project_points(np.array([[0.2, 0.1, -1.0]]), camera[:1])
-    assert right[0, 0] > 160 and right[0, 1] < 120            # +x is right, +y is up (smaller row)
-    centre = body.GRID_CENTRES[5]                             # region (1, 1)
-    d = body.region_distance(centre[None], np.array([True]))[0]
-    assert d[6] == pytest.approx(0, abs=1e-5) and d[1:].argmin() == 5 and d.shape == (17,)
-    assert body.region_distance(centre[None], np.array([False]))[0].tolist() == [body.D_NEUTRAL] * 17
-    joints = np.zeros((1, 55, 3), np.float32)
-    joints[0, body.RIGHT_HAND] = (0, 0, -1)
-    dist, _ = body.project_hand(joints, camera[:1], np.array([-1]))
-    assert (dist == body.D_NEUTRAL).all()                     # no hand in contact: no preference
-    dist, pix = body.project_hand(joints, camera[:1], np.array([1]))
-    np.testing.assert_allclose(pix[0], (160, 120), atol=1e-4)
+    _write_body(root)
+    frames = pd.read_parquet(root / "frames.parquet")
+    if clips:  # split each session into clips of the given length
+        frames["clip"] = frames.video_id + "/" + (frames.frame_idx // clips).astype(str)
+    return body.load_store(root, frames, ["v0", "v1"], set())
 
 
-def test_contact_is_coarse_and_joints_are_pose_invariant():
+def test_patch_pooling_shapes_and_map():
     from nursery.learner import body
 
-    bits = np.zeros((3, 1556), dtype=bool)
-    bits[1, :5] = True
-    bits[2, 778:778 + 200] = True
-    scalars, active = body._contact(np.packbits(bits, axis=1))
-    assert scalars.shape == (3, 4) and active.tolist() == [-1, 0, 1]
-    np.testing.assert_allclose(scalars[1], [1, 1 / 3, 0, 0])
-    np.testing.assert_allclose(scalars[2], [0, 0, 1, 1])
-    joints = np.random.default_rng(0).normal(size=(2, 55, 3)).astype(np.float32)
-    theta = 0.7
-    turn = np.array([[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0], [0, 0, 1]], np.float32)
-    moved = joints @ turn.T + np.array([3, -2, 0], np.float32)
-    np.testing.assert_allclose(body._joints(joints), body._joints(moved), atol=1e-4)
-    assert body._joints(joints).shape == (2, 6)
+    patches = json.loads(body.PATCH_FILE.read_text())
+    assert len(patches["left"]) == len(patches["right"]) == body.VERTS_PER_HAND
+    assert set(patches["left"]) == set(range(11)) and len(body.PATCH_NAMES) == 11
+    matrix = body.patch_matrix()
+    assert matrix.shape == (1556, 22) and np.allclose(matrix.sum(0), 1)
+    session = _body_session(0)
+    feats = body.session_features(session)
+    assert feats["contact"].shape == (120, 22) and feats["fingers"].shape == (120, 90)
+    assert feats["arm"].shape == (120, 15) and feats["aperture"].shape == (120, 2)
+    assert feats["contact"][0, :11].max() > 0 and feats["contact"][4].max() == 0  # left hand only, 3 s on / 3 s off
+    assert feats["contact"][:, 11:].max() == 0 and feats["hand"][0] == 0 and feats["hand"][4] == -1
 
 
-def test_body_windows_match_framepairs(upstream):
+def test_arm_is_in_the_camera_frame_with_full_rotation():
     from nursery.learner import body
 
-    region = _upstream_module("train_region_mil")
-    present = {("v0", f) for f in range(120) if f not in (5, 6, 7, 8)} | {("v1", f) for f in range(10, 120)}
-    lut = {region.frame_key(v, f): (0, k) for k, (v, f) in enumerate(sorted(present))}
-    manifest = pd.DataFrame([{"video_id": v, "frame_idx": f, "text": "mug"}
-                             for v, f in (("v0", 0), ("v0", 1), ("v0", 4), ("v0", 9), ("v0", 119), ("v1", 10), ("v1", 12))])
-    vocab = {"<pad>": 0, "mug": 1}
-    ds = upstream.FramePairs([np.zeros((len(lut), 17, 4), np.float16)], lut, manifest, vocab, 2, False)
-    has = lambda v, f: region.frame_key(v, f) in lut
-    for i, row in enumerate(manifest.itertuples()):
-        frames = body.window_frames(row.video_id, row.frame_idx, has, 2)
-        assert len(frames) == 5
-        unpadded = [lut[region.frame_key(row.video_id, f)] for f in dict.fromkeys(frames)]
-        assert unpadded == ds.locs[i]
-    sessions = {"video_ids": ["v0", "v1"], "row": {"v0": 0, "v1": 1}, "frame_row": np.tile(np.arange(120), (2, 1)),
-                "dist": np.arange(2 * 120 * 17, dtype=np.float32).reshape(2, 120, 17),
-                **{k: np.arange(2 * 120, dtype=np.float32).reshape(2, 120, 1).repeat(n, 2)
-                   for k, n in (("contact", 4), ("hand", 2), ("joints", 6))}}
-    pairs = body.pair_arrays(sessions, manifest, has, 2)
-    first = pairs["dist"][0].reshape(5, 17)                   # v0 t=0: frames 0,1,2 then padding with frame 0
-    np.testing.assert_array_equal(first[:, 0], sessions["dist"][0, [0, 1, 2, 0, 0], 0])
-    assert pairs["contact"][0, 0] == pytest.approx(1.0)       # mean of frames 0, 1, 2
-    assert pairs["dist"].shape == (len(manifest), 85)
+    session = _body_session(1)
+    base = body.session_features(session)["arm"]
+    turned = dict(session)
+    rotation = np.array([[0, -1, 0, 0], [1, 0, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]], np.float32)  # head yaw 90 deg
+    turned["camera"] = np.tile(rotation, (120, 1, 1))
+    other = body.session_features(turned)["arm"]
+    assert not np.allclose(base[:, :12], other[:, :12])       # positions follow the camera rotation
+    np.testing.assert_allclose(np.linalg.norm(base[:, 12:], axis=1), 1, atol=1e-5)  # gravity direction
 
 
-def test_drop_masks_and_isolated_rng():
+def test_clip_boundaries_reset_and_mask(episodes):
     import torch
     from nursery.learner import body
 
-    state = torch.get_rng_state()
-    generator = torch.Generator().manual_seed(0)
-    on, keep, noise = body.drop_masks(20000, body.SIGNALS, 0.5, generator)
-    assert on.mean().item() == pytest.approx(0.5, abs=0.02) and keep.mean().item() == pytest.approx(0.7, abs=0.02)
-    assert keep.shape == (20000, 3) and noise.shape == (20000, 12) and noise.std().item() == pytest.approx(body.INPUT_NOISE, abs=0.02)
-    assert body.drop_masks(100, body.SIGNALS, 1.0, generator)[0].sum() == 0
-    assert body.drop_masks(100, body.SIGNALS, 0.0, generator)[0].sum() == 100
-    assert torch.equal(torch.get_rng_state(), state)           # default stream (shuffling, dropout) untouched
-    again = body.drop_masks(20000, body.SIGNALS, 0.5, torch.Generator().manual_seed(0))
-    assert torch.equal(again[0], on) and torch.equal(again[1], keep)
+    root, _ = episodes
+    store = _store(root, clips=10)
+    assert store["clip"][0, 9] != store["clip"][0, 10] and store["clip"][0, 10] == store["clip"][0, 19]
+    np.testing.assert_array_equal(store["groups"]["arm"][0, 10, 12:24], 0)  # no 1-step difference across a boundary
+    encoder = body.BodyEncoder({k: v.shape[-1] for k, v in store["groups"].items()}).eval()
+    s, t = np.zeros(1, int), np.array([12])
+    steps, seg = body.window_steps(store["clip"], s, t, 5)
+    groups = {k: torch.as_tensor(g[s[:, None], steps]) for k, g in store["groups"].items()}
+    seg = torch.as_tensor(seg)
+    missing = (seg == -2).float()
+    base = encoder(groups, missing, seg)[:, 5]
+    other = {k: g.clone() for k, g in groups.items()}
+    outside = (seg != seg[:, 5:6])
+    for k in other:
+        other[k][outside] += 5.0                           # change everything outside the centre's clip
+    assert torch.allclose(base, encoder(other, missing, seg)[:, 5], atol=1e-6)
+    inside = {k: g.clone() for k, g in groups.items()}
+    inside["arm"][:, 5] += 5.0
+    assert not torch.allclose(base, encoder(inside, missing, seg)[:, 5], atol=1e-4)
 
 
-def test_body_model_matches_upstream_without_body_and_gate_learns(upstream):
-    import torch
+def test_episode_segmentation_and_controls(episodes):
     from nursery.learner import body
 
-    region = _upstream_module("train_region_mil")
+    hand = np.array([-1, 0, 0, 0, 1, 1, 0, 0, -1, 0, 0, 0])
+    clip = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1])
+    ids = body.contact_episodes(hand, clip, min_len=2)
+    assert ids.tolist() == [-1, 0, 0, 0, 1, 1, 2, 2, -1, 3, 4, 4][:3] + [1, 1, 1, 1, 2, 2, -1, 3, 4, 4][:0] + ids.tolist()[3:]
+    # same hand, new clip: ends the episode; other hand: ends it; lone second (min length 2): dropped
+    assert ids[1] == ids[3] != ids[4] == ids[5] != ids[6] == ids[7] and ids[9] == -1 and ids[10] == ids[11] >= 0
+    assert ids[0] == ids[8] == -1
+    root, _ = episodes
+    store = _store(root, clips=10)
+    frames = pd.read_parquet(root / "frames.parquet")
+    for mode in ("contact", "temporal"):
+        episode = body.build_episodes(store, mode)
+        assert (episode >= 0).any()
+        for s in range(2):
+            for e in np.unique(episode[s][episode[s] >= 0]):
+                members = np.flatnonzero(episode[s] == e)
+                assert len(members) >= 2 and len(set(store["clip"][s, members])) == 1  # inside one clip
+    contact = body.build_episodes(store, "contact")
+    for s in range(2):  # held_category (a label) only checks episodes: one object per episode
+        held = frames[frames.video_id == f"v{s}"].sort_values("frame_idx").held_category.tolist()
+        for e in np.unique(contact[s][contact[s] >= 0]):
+            assert len({held[t] for t in np.flatnonzero(contact[s] == e) if isinstance(held[t], str)}) <= 1
+    assert (body.build_episodes(store, "none") == -1).all()
+
+
+def test_shuffled_keeps_marginals(episodes):
+    from nursery.learner import body
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    shuffled, info = body.shuffle_store(store, 0)
+    assert info["moved"] == info["units"] > 0
+    for key in store["groups"]:
+        np.testing.assert_allclose(np.sort(shuffled["groups"][key].reshape(-1)), np.sort(store["groups"][key].reshape(-1)))
+    assert not np.allclose(shuffled["groups"]["contact"], store["groups"]["contact"])
+    np.testing.assert_array_equal(shuffled["clip"], store["clip"])  # boundaries and images stay put
+    kept, _ = body.shuffle_store(store, 0, exclude=("v0", "v1"))
+    np.testing.assert_array_equal(kept["groups"]["fingers"], store["groups"]["fingers"])
+
+
+def _tiny_model(store, device="cpu", weights=None):
+    import torch
+    from nursery.learner.model import BodyData, LearnerMIL
+
     torch.manual_seed(0)
-    plain = region.RegionMIL(12, emb_dim=8)
-    state = torch.get_rng_state()
-    torch.manual_seed(0)
-    model = body.BodyRegionMIL(12, emb_dim=8)
-    # Building the body encoders leaves the default RNG stream where video-only training has it.
-    assert torch.equal(torch.get_rng_state(), state) and model.region_prior is None
-    model.load_state_dict({**plain.state_dict(), **{k: v for k, v in model.state_dict().items() if k.startswith("body.")}})
-    v, t, n, w = torch.randn(6, 85, 8), torch.randint(1, 12, (6, 4)), torch.full((6,), 4), torch.ones(6)
-    model.eval(); plain.eval()
-    reference = plain.forward_loss(v, t, n, w)
-    assert torch.equal(model.forward_loss(v, t, n, w), reference)  # pool=max, no body: upstream path, byte-identical
-    with pytest.raises(ValueError, match="pool='soft'"):
-        model.forward_loss(v, t, n, w, torch.rand(6, 85), {}, torch.ones(6), torch.ones(6, 3), torch.zeros(6, 12))
-    soft = body.BodyRegionMIL(12, SIGNALS_ALL, pool="soft", tau_p=0.1, emb_dim=8)
-    soft.load_state_dict(model.state_dict())
-    soft.eval()
-    feats = {k: torch.randn(6, d) for k, d in (("contact", 4), ("hand", 2), ("joints", 6))}
-    dist = torch.rand(6, 85) * 3
-    keep, noise = torch.ones(6, 3), torch.zeros(6, 12)
-    plain_soft = soft.forward_loss(v, t, n, w)                  # soft pooling, uniform prior
-    off = soft.forward_loss(v, t, n, w, dist, feats, torch.zeros(6), keep, noise)
-    torch.testing.assert_close(off, plain_soft)                 # whole body dropped: gate 0, uniform prior
-    soft.train()
-    loss = soft.forward_loss(v, t, n, w, dist, feats, torch.ones(6), keep, noise)
+    model = LearnerMIL(30, 8, 0.1, {k: v.shape[-1] for k, v in store["groups"].items()})
+    model.region_head[0] = torch.nn.Linear(model.region_head[0].in_features, 128)
+    bags = np.full(store["clip"].shape + (4,), -1)
+    ps, pt = np.zeros(6, int), np.arange(10, 16)
+    win = np.tile(np.arange(5), (6, 1)) + pt[:, None] - 2
+    data = BodyData(store, ps, pt, win, bags, np.full(store["clip"].shape, -1), None, None, device, 5, 0.5, 0.0)
+    return model, data
+
+
+def _batch(model, data):
+    import torch
+
+    torch.manual_seed(1)
+    v = torch.randn(6, 85, 8)
+    t = torch.randint(1, 30, (6, 4))
+    return v, t, torch.full((6,), 4), torch.ones(6)
+
+
+def test_language_loss_depends_on_body_and_reaches_every_encoder(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model, data = _tiny_model(store)
+    v, t, n, w = _batch(model, data)
+    ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0))
+    ctx["keep"] = torch.ones(6)
+    weights = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0}
+    loss = model.forward_loss(v, t, n, w, ctx, weights)
+    other = dict(ctx, groups={k: g + torch.randn_like(g) for k, g in ctx["groups"].items()})
+    assert not torch.isclose(loss, model.forward_loss(v, t, n, w, other, weights))
     loss.backward()
-    assert soft.body.head.weight.grad.abs().sum() > 0          # the gate is trained through the prior
-    assert body.BodyRegionMIL(12, None, pool="soft", emb_dim=8).body is None
+    for name, module in model.encoder.named_children():
+        grads = [p.grad for p in module.parameters() if p.grad is not None]
+        assert grads and any(g.abs().sum() > 0 for g in grads), name
+    for group in model.encoder.mlps:
+        assert any(p.grad is not None and p.grad.abs().sum() > 0 for p in model.encoder.mlps[group].parameters()), group
+    assert model.vproj[2].weight.grad.abs().sum() > 0 and model.beta.grad.abs() > 0
 
 
-SIGNALS_ALL = ("contact", "hand", "joints")
-
-
-def test_soft_pool_shape_and_uniform_prior_at_zero_gate():
+def test_body_dropout_one_equals_video_only_and_each_loss_switches_off(episodes):
     import torch
-    from nursery.learner import body
 
-    dist = torch.rand(5, 85) * 3
-    uniform = body.region_log_prior(dist, torch.zeros(5))
-    torch.testing.assert_close(uniform, torch.full((5, 85), -np.log(85)))     # g = 0: uniform prior
-    sharp = body.region_log_prior(dist, torch.full((5,), 3.0))
-    torch.testing.assert_close(sharp.exp().sum(1), torch.ones(5))
-    assert (sharp.argmax(1) == dist.argmin(1)).all()                          # mass goes to the region nearest the hand
-    s = torch.randn(5, 85, 7)
-    pooled = body.soft_pool(s, uniform, 0.1)
-    assert pooled.shape == (5, 7)
-    torch.testing.assert_close(pooled, 0.1 * (torch.logsumexp(s / 0.1, 1) - np.log(85)))
-    assert (pooled <= s.max(1).values + 1e-6).all()
-    near_max = body.soft_pool(s, uniform, 1e-3)                               # tau -> 0 recovers the hard max (up to tau * log R)
-    torch.testing.assert_close(near_max, s.max(1).values, atol=1e-2, rtol=0)
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model, data = _tiny_model(store)
+    model.eval()
+    v, t, n, w = _batch(model, data)
+    ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0))
+    off = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0}
+    ctx["keep"] = torch.zeros(6)  # dropout 1.0
+    baseline = model.forward_loss(v, t, n, w, None, off)
+    assert torch.equal(model.forward_loss(v, t, n, w, ctx, off), baseline)
+    assert set(model.losses(v, t, n, w, ctx, off)) == {"match"}
+    ctx["keep"] = torch.ones(6)
+    assert not torch.equal(model.forward_loss(v, t, n, w, ctx, off), baseline)
+    on = model.losses(v, t, n, w, ctx, {**off, "pred": 1.0, "mask": 1.0})
+    assert set(on) == {"match", "pred", "mask"}
+    for name in ("pred", "mask"):
+        model.zero_grad()
+        on[name].backward(retain_graph=True)
+    generator = torch.Generator().manual_seed(0)
+    assert data.dropout == 0.0
+    data.dropout = 1.0
+    assert data.batch(np.arange(6), generator)["keep"].sum() == 0
 
 
-def test_upstream_checkout_is_unmodified(upstream):
-    assert subprocess.run(["git", "-C", str(UPSTREAM), "diff", "--quiet"]).returncode == 0
+def test_picture_eval_does_not_touch_the_body(episodes, upstream, monkeypatch):
+    import torch
+
+    root, run = episodes
+    store = _store(root, clips=10)
+    model, _ = _tiny_model(store)
+    region = _upstream_module("train_region_mil")
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    probes = pd.read_parquet(run / "probes_frames.parquet")
+    cache, lut = region.load_region_cache(run / "probes_cache")
+    vocab = {"<pad>": 0, **{c: i + 1 for i, c in enumerate(("mug", "bowl", "apple", "banana"))}}
+    score = lambda: region.eval_4afc_region(model, cache, lut, probes[probes.split == "dev"], vocab, "cpu")
+    before = score()
+
+    def refuse(*args, **kwargs):
+        raise AssertionError("evaluation used the body")
+
+    monkeypatch.setattr(type(model.encoder), "forward", refuse)
+    for module in (model.fuse, model.decoder, model.region_head):
+        for p in module.parameters():
+            p.data.add_(torch.randn_like(p))
+    assert score() == before
 
 
 @pytest.mark.parametrize("options", [
-    {"body": "all"}, {"body": "geometry"}, {"body": "contact,joints", "body_control": "shuffle"},
-    {"body": "all", "body_control": "oracle", "body_drop": 1.0}, {"body": None}])
+    {"body": "real"}, {"body": "shuffled", "episodes": "temporal", "weights": {"episode": 1, "consist": 0.1, "mask": 0.5}},
+    {"body": "oracle", "episodes": "contact", "weights": {"episode": 1, "consist": 0.1}}, {"body": "none"}])
 def test_body_training_runs(episodes, upstream, options):
     from nursery.learner.train import train_run
 
@@ -406,17 +464,16 @@ def test_body_training_runs(episodes, upstream, options):
     _write_body(root)
     write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
     _fake_caches(root, run)
-    metrics = train_run(run, "none", 3, epochs=2, name="body", pool="soft", tau_p=0.1, **options)
+    metrics = train_run(run, "none", 3, epochs=2, name="body", pool="soft", tau_p=0.1, heldout_subject="s2", **options)
     assert metrics["pool"] == "soft" and metrics["tau_p"] == 0.1
-    if options["body"] is None:
-        assert "body" not in metrics
-    else:
-        assert metrics["body"]["control"] == options.get("body_control", "none")
-        gate = metrics["body"]["gate"]
-        assert 0 <= gate["mean"] <= 3 and 0 <= gate["frac_below_0.1"] <= 1
-        assert "gate_mean" in metrics["history"][0]
+    assert ("body" in metrics) == (options["body"] != "none")
+    if options["body"] != "none":
+        assert metrics["history"][0]["losses"]["pred"] > 0
+        assert metrics["probe"]["splits"]["subject"] and metrics["body_present"]["n_trials"] >= 8
     assert (run / "body_s3" / "metrics.json").exists()
-    with pytest.raises(ValueError, match="requires --body"):
-        train_run(run, "none", 4, epochs=1, body_control="shuffle")
     with pytest.raises(ValueError, match="requires --pool soft"):
-        train_run(run, "none", 5, epochs=1, body="all")
+        train_run(run, "none", 5, epochs=1, body="real")
+
+
+def test_upstream_checkout_is_unmodified(upstream):
+    assert subprocess.run(["git", "-C", str(UPSTREAM), "diff", "--quiet"]).returncode == 0

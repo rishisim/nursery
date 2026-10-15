@@ -11,6 +11,20 @@
     "window": 2,
     "min_freq": 5
   },
+  "body": {
+    "heldout_subject": "s8",
+    "window_s": 5,
+    "dropout": 0.5,
+    "min_episode_s": 2,
+    "bag_frames": 9,
+    "mask_prob": 0.3,
+    "weights": {
+      "pred": 0.5,
+      "episode": 0.0,
+      "consist": 0.0,
+      "mask": 0.0
+    }
+  },
   "konkle": {
     "root": "outputs/assets/konkle/raw/17-objects",
     "categories": [

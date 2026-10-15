@@ -1,0 +1,167 @@
+"""Body-side tests: body-present 4AFC on the held-out subject and the body probe."""
+
+import numpy as np
+import torch
+import torch.nn.functional as F
+
+
+@torch.no_grad()
+def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch=256):
+    """4AFC with the word given and four candidate situations (image window + body), held-out subject only.
+
+    `manifest` holds the held-out subject's named utterances with a visible referent; `ds` is the upstream
+    FramePairs over those rows and `data` a BodyData over the same rows (None without a body). Each trial: the true situation plus three foils from other sessions with other
+    referents. Scores per candidate: picture (max over the window's regions), body (fused-projection cosine to the
+    word) and their sum (late fusion). Foils use their own body, so the body must match the situation.
+    """
+    model.eval()
+    tokens, counts, regions, latents = [], [], [], []
+    generator = torch.Generator().manual_seed(seed)
+    for start in range(0, len(ds), batch):
+        rows = list(range(start, min(start + batch, len(ds))))
+        _, v, t, n = upstream.collate([ds[i] for i in rows])
+        tokens.append(model.enc_text(t.to(device), n.to(device)))
+        regions.append(model.enc_regions(v.to(device)).half())
+        if model.encoder is not None:
+            latents.append(model.latent_of(data.batch(np.array(rows), generator, training=False)))
+    T, R = torch.cat(tokens), torch.cat(regions)
+    Z = torch.cat(latents) if latents else None
+    rng = np.random.default_rng(seed)
+    referent = manifest.referent.to_numpy()
+    video = manifest.video_id.to_numpy()
+    held_all = manifest.held_referent.to_numpy().astype(bool)
+    held = []
+    correct = {"picture": [], "body": [], "fused": []}
+    for i in range(len(manifest)):
+        pool = np.flatnonzero((referent != referent[i]) & (video != video[i]))
+        if len(pool) < 3:
+            pool = np.flatnonzero(referent != referent[i])
+        if len(pool) < 3:
+            continue
+        held.append(held_all[i])
+        cand = np.concatenate([[i], rng.choice(pool, 3, replace=False)])
+        pic = (R[cand].float() @ T[i]).max(1).values
+        scores = {"picture": pic}
+        if Z is not None:
+            body = model.body_similarity(Z[cand], T[i:i + 1]).squeeze(1)
+            scores["body"], scores["fused"] = body, pic + model.beta * body
+        for k, s in scores.items():
+            correct[k].append(float(s.argmax() == 0))
+    held = np.array(held, bool)
+    out = {"n_trials": len(next(iter(correct.values()))), "chance": 0.25}
+    for k, c in correct.items():
+        if c:
+            c = np.array(c)
+            out[k] = {"acc": round(100 * float(c.mean()), 3), "acc_held": round(100 * float(c[held].mean()), 3) if held.any() else None,
+                      "acc_not_held": round(100 * float(c[~held].mean()), 3) if (~held).any() else None}
+    if Z is not None:
+        out["beta"] = round(float(model.beta), 4)
+    return out
+
+
+def _fit_probe(x_train, y_train, classes, multilabel=False, steps=300):
+    """Linear probe on standardised inputs (Adam, full batch, small weight decay)."""
+    mean, std = x_train.mean(0), x_train.std(0) + 1e-6
+    x = (x_train - mean) / std
+    layer = torch.nn.Linear(x.shape[1], classes)
+    opt = torch.optim.Adam(layer.parameters(), lr=0.05, weight_decay=1e-4)
+    for _ in range(steps):
+        opt.zero_grad()
+        out = layer(x)
+        loss = F.binary_cross_entropy_with_logits(out, y_train) if multilabel else F.cross_entropy(out, y_train)
+        loss.backward()
+        opt.step()
+    return lambda z: layer((z - mean) / std).detach()
+
+
+@torch.no_grad()
+def _latents(model, data, store, device, batch=2048):
+    """Body latent (at each present second) and the raw input vector, plus the (session, second) of each row."""
+    s, t = np.nonzero(store["present"])
+    data.ps, data.pt = torch.as_tensor(s, device=device), torch.as_tensor(t, device=device)
+    data.win_frames = torch.full((len(s), 1), -1, device=device)
+    generator = torch.Generator().manual_seed(0)
+    z = []
+    for start in range(0, len(s), batch):
+        z.append(model.latent_of(data.batch(np.arange(start, min(start + batch, len(s))), generator, training=False)).cpu())
+    raw = torch.cat([torch.as_tensor(g[s, t]) for g in store["groups"].values()], 1)
+    return s, t, torch.cat(z), raw
+
+
+def body_probe(model, data, store, heldout_subject, device):
+    """Probe held word, grasp family and next-second contact from the body latent.
+
+    Splits: by subject (probe fitted on the other subjects, tested on the held-out one) and by source grasp family
+    (fitted on three quarters of the source objects, tested on the rest; same subjects). The source grasp family
+    is the GRAB object of the clip (clip file name), which differs from the held word because grasps are borrowed.
+    Baselines: majority class / train mean for every task, and persistence (contact now = contact next second).
+    Also probes the raw input vector, to separate what the encoder adds.
+    """
+    model.eval()
+    s, t, z, raw = _latents(model, data, store, device)
+    subject = store["subject"][s]
+    names = store["clip_names"]
+    family_names = [[n.split("/")[-1].split("_")[0] for n in row] for row in names]
+    family_of = lambda i, c: family_names[i][c]
+    clip_id = store["clip"][s, t]
+    family = np.array([family_of(i, c) for i, c in zip(s, clip_id)])
+    held = store["held"][s, t]
+    contact = torch.as_tensor(store["targets"]["contact"][s, t]) if "contact" in store["targets"] else None
+    nxt = np.minimum(t + 1, store["steps"] - 1)
+    next_ok = store["next_valid"][s, t]
+    next_contact = torch.as_tensor(store["targets"]["contact"][s, nxt]) if contact is not None else None
+    train_subject = subject != heldout_subject
+    families = sorted(set(family[train_subject]))
+    test_families = set(families[::4])
+    in_test_family = np.array([f in test_families for f in family])
+    splits = {"subject": (train_subject, ~train_subject), "family": (train_subject & ~in_test_family, train_subject & in_test_family)}
+    features = {"latent": z, **({"raw": raw} if contact is not None else {})}
+    out = {"heldout_subject": heldout_subject, "test_families": sorted(test_families), "splits": {}}
+    for split, (train, test) in splits.items():
+        result = {}
+        for task in ("held_word", "grasp_family", "next_contact"):
+            if task == "grasp_family" and split == "family":
+                continue  # a held-out family has no training label
+            if task == "next_contact":
+                if contact is None:
+                    continue
+                tr, te = train & next_ok, test & next_ok
+                y = (next_contact > 0).float()
+                persistence = ((contact > 0).float() == y).float()
+                anyc = lambda a: (a > 0).any(1)
+                entry = {"n_test": int(te.sum()),
+                         "persistence": {"any_acc": round(100 * float((anyc(contact[te]) == anyc(y[te])).float().mean()), 3),
+                                         "patch_acc": round(100 * float(persistence[te].mean()), 3)}}
+                prior = (y[tr].mean(0) > 0.5).float()
+                majority_any = anyc(y[tr]).float().mean() > 0.5
+                entry["mean"] = {"any_acc": round(100 * float((anyc(y[te]) == majority_any).float().mean()), 3),
+                                 "patch_acc": round(100 * float((y[te] == prior).float().mean()), 3)}
+                for name, x in features.items():
+                    predict = _fit_probe(x[tr], y[tr], y.shape[1], multilabel=True)
+                    guess = (predict(x[te]) > 0).float()
+                    entry[name] = {"any_acc": round(100 * float((anyc(guess) == anyc(y[te])).float().mean()), 3),
+                                   "patch_acc": round(100 * float((guess == y[te]).float().mean()), 3)}
+                result[task] = entry
+                continue
+            if task == "held_word":
+                label = held
+                valid = held >= 0
+            else:
+                label = np.array([families.index(f) if f in families else -1 for f in family])
+                valid = held >= 0
+            tr, te = train & valid, test & valid
+            classes = np.unique(label[tr])
+            remap = {c: i for i, c in enumerate(classes)}
+            te = te & np.isin(label, classes)
+            if tr.sum() == 0 or te.sum() == 0:
+                continue
+            y_tr = torch.as_tensor([remap[c] for c in label[tr]])
+            y_te = torch.as_tensor([remap[c] for c in label[te]])
+            majority = int(torch.bincount(y_tr).argmax())
+            entry = {"n_test": int(te.sum()), "n_classes": len(classes), "majority": round(100 * float((y_te == majority).float().mean()), 3)}
+            for name, x in features.items():
+                predict = _fit_probe(x[tr], y_tr, len(classes))
+                entry[name] = round(100 * float((predict(x[te]).argmax(1) == y_te).float().mean()), 3)
+            result[task] = entry
+        out["splits"][split] = result
+    return out

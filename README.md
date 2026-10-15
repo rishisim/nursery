@@ -77,6 +77,13 @@ scripts/render.sh outputs/renders/new                      # resumable; episodes
 python scripts/summarize.py 'outputs/runs/new/none_s*/metrics.json'
 ```
 
+Body conditions (design in `docs/learner.md`; the body flags need `--pool soft`):
+
+```bash
+.external/cue-env/bin/python -m nursery.learner train --run outputs/runs/new --condition none --seed 0 --epochs 60 --pool soft --name video_only
+.external/cue-env/bin/python -m nursery.learner train --run outputs/runs/new --condition none --seed 0 --epochs 60 --pool soft --body real --name body_real
+```
+
 `scripts/pipeline.sh <episodes> <run_dir> [seed]` chains speech, embed and train.
 `scripts/train_seeds.sh <run_dir> none "--condition none" 0 1 2 3 4` trains several seeds, two at a time.
 

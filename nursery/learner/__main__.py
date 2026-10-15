@@ -3,7 +3,8 @@
 import argparse
 
 from .embed import embed_episodes
-from .train import train_run
+from .train import BODY_MODES, EPISODE_MODES, train_run
+from .model import LOSSES
 
 
 def main():
@@ -19,9 +20,12 @@ def main():
     train.add_argument("--condition", required=True)
     train.add_argument("--seed", type=int, required=True)
     train.add_argument("--epochs", type=int)
-    train.add_argument("--body", help="Body signals for training-only region guidance: all, geometry, or a comma list of contact,hand,joints")
-    train.add_argument("--body-control", choices=("none", "shuffle", "oracle"), default="none")
-    train.add_argument("--body-drop", type=float, default=0.5, help="Per-pair probability of dropping the whole body")
+    train.add_argument("--body", choices=BODY_MODES, default="none", help="Body input: none, real, shuffled (whole sequences swapped across clips) or oracle (true held-object identity)")
+    train.add_argument("--episodes", choices=EPISODE_MODES, default="none", help="Bags for the optional episode losses: contact episodes, temporal control blocks, or none (default)")
+    train.add_argument("--body-dropout", type=float, help="Probability of scoring a pair without its body (default in config.json)")
+    for loss in LOSSES:
+        train.add_argument(f"--w-{loss}", type=float, help=f"Weight of the {loss} loss (0 switches it off; default in config.json)")
+    train.add_argument("--heldout-subject", help="Subject excluded from training (default in config.json; 'none' keeps everyone)")
     train.add_argument("--pool", choices=("max", "soft"), default="max", help="Region pooling in the training loss; --body requires soft")
     train.add_argument("--tau-p", type=float, default=0.1, help="Soft-pooling temperature")
     train.add_argument("--name", help="Output directory prefix (default: the condition)")
@@ -29,7 +33,9 @@ def main():
     if args.command == "embed":
         embed_episodes(args.episodes, args.output, args.device, args.batch)
     else:
-        train_run(args.run, args.condition, args.seed, args.epochs, args.body, args.body_control, args.body_drop, args.name, args.pool, args.tau_p)
+        weights = {loss: getattr(args, f"w_{loss}") for loss in LOSSES}
+        train_run(args.run, args.condition, args.seed, args.epochs, args.name, args.pool, args.tau_p, args.body,
+                  args.episodes, weights, args.heldout_subject, args.body_dropout)
 
 
 if __name__ == "__main__":
