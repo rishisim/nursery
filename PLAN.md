@@ -13,6 +13,7 @@ video + body.
      usable words with Konkle test-60, and 41 words may saturate.
 2. **Speech that depends on the body.** Caregiver speech tied to what the
    baby is doing, strength set from developmental studies (not chosen by us).
+   Done 2026-10-15. See "Speech coupling".
 3. **Learner with a body input.** Third input next to frozen image encoder and
    word tower. Trained with the body input randomly switched off; tested
    vision-only (picture + word, like children).
@@ -101,7 +102,7 @@ Before the final experiment (step 4):
 - Step 2 speech must keep every word ≥5 mentions (seen-only words are rarely
   named in real data, ~0.04/min).
 
-## Speech coupling (step 2 inputs)
+## Speech coupling (step 2)
 
 From literature and the Karmazyn-Raz & Smith OSF data (12 mo, 16 dyads);
 details in `outputs/step2/speech_coupling_lit.md` (worktree):
@@ -111,3 +112,18 @@ details in `outputs/step2/speech_coupling_lit.md` (worktree):
 - Name falls −10 to +10 s around grasp onset; at 12 mo before ≈ after.
 - No parent hands in the simulator: parent-held naming (~29%) needs a
   design choice.
+
+Done 2026-10-15 (branch `cue/vocabulary`, commit cea4af3d):
+
+- 25% of utterances name an object (~5/min). Each name picks a channel:
+  infant-held within ±5 s (35%), visible not held (41%, also stands in for
+  parent-held), in the room but out of view (24%). Uniform within channel.
+  Held share is calibrated after redraws (achieved 0.341).
+- Implied lift, held vs never-held objects per object-minute: ~2.8x, below
+  the ~6x in the data (holds are frequent here: 55% of frames). Anchored on
+  the share; lift is a sensitivity knob for step 4.
+- Every word ≥20 named mentions (median 97; lowest tent 20, tree 22).
+- Video-only smoke (1 seed, 20 epochs, same render): rendered test 69.5%
+  (held 69.3, seen-only 56.4, extras 89.9); Konkle 67.7%. Up from 45% mostly
+  because names are ~3x more frequent. Still rising at epoch 20, so the
+  plateau and remaining headroom are unknown; check before step 4.
