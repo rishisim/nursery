@@ -18,7 +18,7 @@ nursery/humanoid/
 │   ├── run_motion.py
 │   └── validate_motion.py
 └── hoidini_intermimic/              Conversion and execute.py simulator launcher
-nursery/cue_learning/                Training-only cue learner on vlm-headcam
+nursery/simulator/, speech/, learner/   See Layout below
 ```
 
 `nursery/humanoid/embodiedgen_hoidini/` deterministically prepares a complete
@@ -38,6 +38,47 @@ under the ignored `.external/EmbodiedGen/` path. Local upstream humanoid
 checkouts likewise belong under `.external/HOIDiNi/`,
 `.external/InterActMove/`, `.external/InterAct/`, and `.external/InterMimic/`; they are dependencies,
 not Nursery-owned source.
+
+## Layout
+
+```text
+nursery/
+  simulator/    GRAB replay, Objaverse assets, mesh swaps, Blender render
+  speech/       Caregiver speech: transcripts, utterance templates, cue weights, speech config
+  learner/      Embedding and training on the pinned vlm-headcam, body input, Konkle eval, learner config
+  common.py     Repo root, merged config loading, ignored-output guard
+  humanoid/, embodiedgen_scene.py   EmbodiedGen rooms and HOIDiNi/InterMimic motion
+tests/          test_simulator.py (egocentric-env), test_speech.py and test_learner.py (cue-env)
+docs/           Design notes and literature reviews
+scripts/        render.sh, pipeline.sh, train_seeds.sh, summarize.py, merge_render.py
+outputs/        Ignored data and runs
+  assets/       objaverse, konkle
+  renders/      clean_856 (current dataset), patched_856 (old patched render)
+  runs/         One directory per embedded dataset and its trained conditions
+  speech_data/  osf_254yq (research use only, never commit)
+  legacy/       Earlier experiments and working directories
+.external/      Ignored envs (cue-env, egocentric-env) and checkouts (vlm-headcam, HOIDiNi, ...)
+```
+
+Configs: `nursery/simulator/config.json` (render), `nursery/speech/config.json`
+(generator, cues, vocabulary map), `nursery/learner/config.json` (training,
+Konkle root, upstream pin). `nursery.common.load_config()` merges the speech and
+learner files into the single dict stored in each run's `generator.json`.
+
+## How to run
+
+Render, then speech, embed, train, summarize. Paths are relative to the repo root.
+
+```bash
+scripts/render.sh outputs/renders/new                      # resumable; episodes land in outputs/renders/new/episodes
+.external/cue-env/bin/python -m nursery.speech transcripts --episodes outputs/renders/new/episodes --output outputs/runs/new --seed 0
+.external/cue-env/bin/python -m nursery.learner embed --episodes outputs/renders/new/episodes --output outputs/runs/new
+.external/cue-env/bin/python -m nursery.learner train --run outputs/runs/new --condition none --seed 0
+python scripts/summarize.py 'outputs/runs/new/none_s*/metrics.json'
+```
+
+`scripts/pipeline.sh <episodes> <run_dir> [seed]` chains speech, embed and train.
+`scripts/train_seeds.sh <run_dir> none "--condition none" 0 1 2 3 4` trains several seeds, two at a time.
 
 ## Commands
 
@@ -410,23 +451,23 @@ for native installation and pipeline details.
 
 ## Training-only cue learner
 
-`nursery/cue_learning/` adapts egocentric episodes to the pinned
+`nursery/speech/` and `nursery/learner/` adapt egocentric episodes to the pinned
 [vlm-headcam](https://github.com/mcfrank/vlm-headcam) learner, comparing contact
 cue weights with unweighted, shuffled, shifted, noisy, and oracle controls.
 Only train sessions supply speech and vocabulary; disjoint dev/test probes
 select and evaluate the model. Embedding and training select CUDA, then Apple MPS, then CPU when available.
 
 The ignored venv `.external/cue-env/` was created with `uv venv --python 3.11 .external/cue-env`.
-Use that environment with the upstream checkout at the commit in `config.json`.
+Use that environment with the upstream checkout at the commit in `nursery/learner/config.json`.
 
 ```bash
-.external/cue-env/bin/python -m nursery.cue_learning transcripts \
-  --episodes outputs/egocentric_replay/run --output outputs/cue_learning/run --seed 7
-.external/cue-env/bin/python -m nursery.cue_learning embed \
-  --episodes outputs/egocentric_replay/run --output outputs/cue_learning/run \
+.external/cue-env/bin/python -m nursery.speech transcripts \
+  --episodes outputs/renders/run --output outputs/runs/run --seed 7
+.external/cue-env/bin/python -m nursery.learner embed \
+  --episodes outputs/renders/run --output outputs/runs/run \
   --device cuda --batch 64
-.external/cue-env/bin/python -m nursery.cue_learning train \
-  --run outputs/cue_learning/run --condition contact --seed 7
+.external/cue-env/bin/python -m nursery.learner train \
+  --run outputs/runs/run --condition contact --seed 7
 ```
 
 Outputs must be ignored; use `--device cpu` for CPU embedding.
@@ -434,7 +475,7 @@ Limitation: synthetic harness checks do not establish learning gains on real epi
 
 ## Egocentric GRAB replay
 
-`nursery/egocentric_replay/` renders 120-second, 1 Hz head-camera sessions
+`nursery/simulator/` renders 120-second, 1 Hz head-camera sessions
 from HOIDiNi's retargeted GRAB with neutral SMPL-X and recorded full hand poses.
 Inputs are licensed GRAB/SMPL-X at the paths in package-local `config.json`,
 the existing `.external/egocentric-env/`, Blender, and a real exported room bank.
@@ -447,13 +488,13 @@ Frame `objects` records all realized categories, including zero-pixel visibility
 
 ```bash
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 LP_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 \
-.external/egocentric-env/bin/python -m nursery.egocentric_replay build \
+.external/egocentric-env/bin/python -m nursery.simulator build \
   --rooms /Users/rishisim/Documents/research/nursery/outputs/embodiedgen_scene/room_bank \
   --subjects s1 s9 s10 --sessions-per-subject 2 --seed 7 \
-  --output outputs/egocentric_replay/run
-.external/egocentric-env/bin/python -m nursery.egocentric_replay preview \
-  --episodes outputs/egocentric_replay/run --output outputs/egocentric_replay/run/contact_sheet.png
-PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python -m pytest -q -p no:cacheprovider tests/test_egocentric_replay.py
+  --output outputs/renders/run
+.external/egocentric-env/bin/python -m nursery.simulator preview \
+  --episodes outputs/renders/run --output outputs/renders/run/contact_sheet.png
+PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python -m pytest -q -p no:cacheprovider tests/test_simulator.py
 ```
 
 Omit `--subjects` for all subjects; Phase 2 uses `--subjects s1 s2 s3 s4 s5 s6 s7 s8`.
