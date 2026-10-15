@@ -30,6 +30,8 @@ def main():
     train.add_argument("--body", help="Body signals for training-only region guidance: all, geometry, or a comma list of contact,hand,joints")
     train.add_argument("--body-control", choices=("none", "shuffle", "oracle"), default="none")
     train.add_argument("--body-drop", type=float, default=0.5, help="Per-pair probability of dropping the whole body")
+    train.add_argument("--pool", choices=("max", "soft"), default="max", help="Region pooling in the training loss; --body requires soft")
+    train.add_argument("--tau-p", type=float, default=0.1, help="Soft-pooling temperature")
     train.add_argument("--name", help="Output directory prefix (default: the condition)")
     args = parser.parse_args()
     if args.command == "transcripts":
@@ -38,7 +40,7 @@ def main():
     elif args.command == "embed":
         embed_episodes(args.episodes, args.output, args.device, args.batch)
     else:
-        train_run(args.run, args.condition, args.seed, args.epochs, args.body, args.body_control, args.body_drop, args.name)
+        train_run(args.run, args.condition, args.seed, args.epochs, args.body, args.body_control, args.body_drop, args.name, args.pool, args.tau_p)
 
 
 if __name__ == "__main__":

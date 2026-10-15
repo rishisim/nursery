@@ -56,7 +56,7 @@ def _gate_stats(model, bodyset, device, signals):
             "frac_contact": round(float(contact.mean()), 4)}
 
 
-def train_run(run, condition, seed, epochs=None, body=None, body_control="none", body_drop=0.5, name=None):
+def train_run(run, condition, seed, epochs=None, body=None, body_control="none", body_drop=0.5, name=None, pool="max", tau_p=0.1):
     import torch
 
     device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
@@ -71,6 +71,10 @@ def train_run(run, condition, seed, epochs=None, body=None, body_control="none",
         raise ValueError("epochs must be positive")
     if body is None and body_control != "none":
         raise ValueError("--body-control requires --body")
+    if pool not in ("max", "soft"):
+        raise ValueError("--pool must be max or soft")
+    if body is not None and pool != "soft":
+        raise ValueError("--body requires --pool soft")
     if not 0 <= body_drop <= 1:
         raise ValueError("--body-drop must be in [0, 1]")
     torch.manual_seed(seed)
@@ -114,7 +118,11 @@ def train_run(run, condition, seed, epochs=None, body=None, body_control="none",
             arrays["oracle"] = bodylib.oracle_distances(manifest, frames, lut_has, window)
         bodyset = {k: torch.from_numpy(a) for k, a in arrays.items()}
         gate_generator = torch.Generator().manual_seed(seed + 1000)  # keeps the default RNG stream identical to video-only
-        model = bodylib.BodyRegionMIL(len(vocab), signals, emb_dim=emb_dim)
+        model = bodylib.BodyRegionMIL(len(vocab), signals, pool=pool, tau_p=tau_p, emb_dim=emb_dim)
+    elif pool == "soft":
+        from . import body as bodylib
+
+        model = bodylib.BodyRegionMIL(len(vocab), None, pool=pool, tau_p=tau_p, emb_dim=emb_dim)
     else:
         model = upstream.RegionMIL(len(vocab), emb_dim=emb_dim)
     if device == "mps":
@@ -200,7 +208,7 @@ def train_run(run, condition, seed, epochs=None, body=None, body_control="none",
         "final_test_acc": round(100 * history[-1]["acc"], 3), "history": history,
         **({"reported_konkle_acc": round(100 * history[best_ep]["konkle"], 3),
             "best_konkle_acc": round(100 * max(h["konkle"] for h in history), 3)} if konkle is not None else {}),
-        "condition": condition, "generator_parameters": config["generator"],
+        "pool": pool, **({"tau_p": tau_p} if pool == "soft" else {}), "condition": condition, "generator_parameters": config["generator"],
         "generator_seed": generator["seed"], "cue_parameters": config["cues"],
         "upstream": config["upstream"], "device": device, "n_manifest": int(len(kept)),
         "n_novocab": int((~kept).sum()), "frame_coverage": 1.0,

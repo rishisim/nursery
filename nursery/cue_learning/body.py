@@ -1,4 +1,4 @@
-"""Body input for the word learner: training-only, body-guided region selection (step 3)."""
+"""Body input for the word learner: a training-only body prior over regions in a soft-MIL likelihood (step 3)."""
 
 from functools import lru_cache
 
@@ -25,7 +25,7 @@ LEFT_HAND = [20] + list(range(25, 40))
 RIGHT_HAND = [21] + list(range(40, 55))
 VERTS_PER_HAND = 778
 AREA_EDGES = (0.058, 0.129)  # tertiles of nonzero contact fractions
-GATE_MAX, SIGMA, SELECT_TAU = 3.0, 1.0, 0.05
+GATE_MAX, SIGMA = 3.0, 1.0
 INPUT_NOISE, SIGNAL_DROP = 1.0, 0.3
 SIGNAL_DIMS = {"contact": 4, "hand": 2, "joints": 6}  # standardised inputs; noise is added to all in training
 
@@ -202,40 +202,53 @@ class BodyEncoders(nn.Module):
         return GATE_MAX * torch.sigmoid(self.head(total)).squeeze(-1)
 
 
+def region_log_prior(dist, gate):
+    """Per-pair log prior over the window regions: log_softmax(-g * d / sigma). gate 0 -> uniform. dist [B,R], gate [B]."""
+    return F.log_softmax(-gate.unsqueeze(1) * dist / SIGMA, dim=1)
+
+
+def soft_pool(s, log_prior, tau):
+    """Soft-MIL score tau * logsumexp_r(log_prior_r + s_r / tau). s [B,R,M], log_prior [B,R] -> [B,M]."""
+    return tau * torch.logsumexp(log_prior.unsqueeze(-1) + s / tau, dim=1)
+
+
 @lru_cache(maxsize=None)
 def _model_class():
     region = _upstream_module("train_region_mil")
 
     class BodyRegionMIL(region.RegionMIL):
-        """RegionMIL whose training selection is biased toward the active hand; evaluation is unchanged."""
+        """RegionMIL trained with a soft-MIL likelihood whose region prior comes from the body; evaluation is unchanged.
 
-        def __init__(self, vocab, signals=SIGNALS, **kwargs):
+        pool="max" is the upstream loss. pool="soft" pools regions with a per-image prior; with no body
+        (signals=None) or the body dropped (gate 0) the prior is uniform.
+        """
+
+        def __init__(self, vocab, signals=SIGNALS, pool="max", tau_p=0.1, **kwargs):
             super().__init__(vocab, **kwargs)
-            with torch.random.fork_rng(devices=[]):  # leave the default RNG stream exactly as video-only training sees it
-                torch.manual_seed(0)
-                self.body = BodyEncoders(signals)
-
-        def sims(self, R, T, bias=None):
-            if bias is None:
-                return super().sims(R, T)
-            s = torch.einsum("brd,md->brm", R, T)
-            biased = s.detach() + bias.unsqueeze(-1)
-            hard = s.gather(1, biased.argmax(1, keepdim=True)).squeeze(1)
-            # Straight-through: the forward value is the raw sim at the selected region; the gate
-            # (and nothing else) gets gradient through a soft selection.
-            weights = torch.softmax(biased / SELECT_TAU, dim=1)
-            soft = (weights * s.detach()).sum(1)
-            return hard + (soft - soft.detach())
+            if pool not in ("max", "soft"):
+                raise ValueError("pool must be max or soft")
+            self.pool, self.tau_p = pool, tau_p
+            self.body = None
+            if signals is not None:
+                with torch.random.fork_rng(devices=[]):  # leave the default RNG stream exactly as video-only training sees it
+                    torch.manual_seed(0)
+                    self.body = BodyEncoders(signals)
 
         def gate(self, feats, on, keep, noise):
             return self.body(feats, keep, noise) * on
 
         def forward_loss(self, v, t, n, w, dist=None, feats=None, on=None, keep=None, noise=None):
-            if dist is None:
+            if self.pool == "max":
+                if dist is not None:
+                    raise ValueError("Body guidance requires pool='soft'")
                 return super().forward_loss(v, t, n, w)
             R, T = self.enc_regions(v), self.enc_text(t, n)
-            bias = -self.gate(feats, on, keep, noise).unsqueeze(1) * dist / SIGMA
-            logits = self.logit_scale.clamp(max=np.log(100)).exp() * self.sims(R, T, bias)
+            s = torch.einsum("brd,md->brm", R, T)
+            if dist is None:
+                log_prior = torch.full(s.shape[:2], -np.log(s.shape[1]), device=s.device, dtype=s.dtype)
+            else:
+                log_prior = region_log_prior(dist, self.gate(feats, on, keep, noise))
+            logits = self.logit_scale.clamp(max=np.log(100)).exp() * soft_pool(s, log_prior, self.tau_p)
             lab = torch.arange(len(v), device=v.device)
             li = F.cross_entropy(logits, lab, reduction="none")
             lt = F.cross_entropy(logits.t(), lab, reduction="none")
@@ -244,6 +257,6 @@ def _model_class():
     return BodyRegionMIL
 
 
-def BodyRegionMIL(vocab, signals=SIGNALS, **kwargs):
+def BodyRegionMIL(vocab, signals=SIGNALS, pool="max", tau_p=0.1, **kwargs):
     """Build the model (the class subclasses the pinned upstream RegionMIL, imported lazily)."""
-    return _model_class()(vocab, signals, **kwargs)
+    return _model_class()(vocab, signals, pool, tau_p, **kwargs)

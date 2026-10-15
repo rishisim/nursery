@@ -607,21 +607,45 @@ def test_body_model_matches_upstream_without_body_and_gate_learns(upstream):
     v, t, n, w = torch.randn(6, 85, 8), torch.randint(1, 12, (6, 4)), torch.full((6,), 4), torch.ones(6)
     model.eval(); plain.eval()
     reference = plain.forward_loss(v, t, n, w)
-    assert torch.equal(model.forward_loss(v, t, n, w), reference)  # no body: upstream path, byte-identical
+    assert torch.equal(model.forward_loss(v, t, n, w), reference)  # pool=max, no body: upstream path, byte-identical
+    with pytest.raises(ValueError, match="pool='soft'"):
+        model.forward_loss(v, t, n, w, torch.rand(6, 85), {}, torch.ones(6), torch.ones(6, 3), torch.zeros(6, 12))
+    soft = body.BodyRegionMIL(12, SIGNALS_ALL, pool="soft", tau_p=0.1, emb_dim=8)
+    soft.load_state_dict(model.state_dict())
+    soft.eval()
     feats = {k: torch.randn(6, d) for k, d in (("contact", 4), ("hand", 2), ("joints", 6))}
     dist = torch.rand(6, 85) * 3
     keep, noise = torch.ones(6, 3), torch.zeros(6, 12)
-    off = model.forward_loss(v, t, n, w, dist, feats, torch.zeros(6), keep, noise)
-    assert torch.equal(off, reference)                          # whole body dropped: plain MIL, same loss
-    model.train()
-    loss = model.forward_loss(v, t, n, w, dist, feats, torch.ones(6), keep, noise)
+    plain_soft = soft.forward_loss(v, t, n, w)                  # soft pooling, uniform prior
+    off = soft.forward_loss(v, t, n, w, dist, feats, torch.zeros(6), keep, noise)
+    torch.testing.assert_close(off, plain_soft)                 # whole body dropped: gate 0, uniform prior
+    soft.train()
+    loss = soft.forward_loss(v, t, n, w, dist, feats, torch.ones(6), keep, noise)
     loss.backward()
-    assert model.body.head.weight.grad.abs().sum() > 0          # the gate is trained through the soft selection
-    model.eval()
-    chosen = model.sims(model.enc_regions(v), model.enc_text(t, n), bias=-5 * dist)
-    s = torch.einsum("brd,md->brm", model.enc_regions(v), model.enc_text(t, n))
-    expected = s.gather(1, (s - 5 * dist.unsqueeze(-1)).argmax(1, keepdim=True)).squeeze(1)
-    assert torch.equal(chosen, expected)                        # value is the raw sim at the biased-argmax region
+    assert soft.body.head.weight.grad.abs().sum() > 0          # the gate is trained through the prior
+    assert body.BodyRegionMIL(12, None, pool="soft", emb_dim=8).body is None
+
+
+SIGNALS_ALL = ("contact", "hand", "joints")
+
+
+def test_soft_pool_shape_and_uniform_prior_at_zero_gate():
+    import torch
+    from nursery.cue_learning import body
+
+    dist = torch.rand(5, 85) * 3
+    uniform = body.region_log_prior(dist, torch.zeros(5))
+    torch.testing.assert_close(uniform, torch.full((5, 85), -np.log(85)))     # g = 0: uniform prior
+    sharp = body.region_log_prior(dist, torch.full((5,), 3.0))
+    torch.testing.assert_close(sharp.exp().sum(1), torch.ones(5))
+    assert (sharp.argmax(1) == dist.argmin(1)).all()                          # mass goes to the region nearest the hand
+    s = torch.randn(5, 85, 7)
+    pooled = body.soft_pool(s, uniform, 0.1)
+    assert pooled.shape == (5, 7)
+    torch.testing.assert_close(pooled, 0.1 * (torch.logsumexp(s / 0.1, 1) - np.log(85)))
+    assert (pooled <= s.max(1).values + 1e-6).all()
+    near_max = body.soft_pool(s, uniform, 1e-3)                               # tau -> 0 recovers the hard max (up to tau * log R)
+    torch.testing.assert_close(near_max, s.max(1).values, atol=1e-2, rtol=0)
 
 
 def test_upstream_checkout_is_unmodified(upstream):
@@ -630,7 +654,7 @@ def test_upstream_checkout_is_unmodified(upstream):
 
 @pytest.mark.parametrize("options", [
     {"body": "all"}, {"body": "geometry"}, {"body": "contact,joints", "body_control": "shuffle"},
-    {"body": "all", "body_control": "oracle", "body_drop": 1.0}])
+    {"body": "all", "body_control": "oracle", "body_drop": 1.0}, {"body": None}])
 def test_body_training_runs(episodes, upstream, options):
     from nursery.cue_learning.train import train_run
 
@@ -638,10 +662,17 @@ def test_body_training_runs(episodes, upstream, options):
     _write_body(root)
     write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
     _fake_caches(root, run)
-    metrics = train_run(run, "none", 3, epochs=2, name="body", **options)
-    assert metrics["body"]["control"] == options.get("body_control", "none")
-    gate = metrics["body"]["gate"]
-    assert 0 <= gate["mean"] <= 3 and 0 <= gate["frac_below_0.1"] <= 1
-    assert (run / "body_s3" / "metrics.json").exists() and "gate_mean" in metrics["history"][0]
+    metrics = train_run(run, "none", 3, epochs=2, name="body", pool="soft", tau_p=0.1, **options)
+    assert metrics["pool"] == "soft" and metrics["tau_p"] == 0.1
+    if options["body"] is None:
+        assert "body" not in metrics
+    else:
+        assert metrics["body"]["control"] == options.get("body_control", "none")
+        gate = metrics["body"]["gate"]
+        assert 0 <= gate["mean"] <= 3 and 0 <= gate["frac_below_0.1"] <= 1
+        assert "gate_mean" in metrics["history"][0]
+    assert (run / "body_s3" / "metrics.json").exists()
     with pytest.raises(ValueError, match="requires --body"):
         train_run(run, "none", 4, epochs=1, body_control="shuffle")
+    with pytest.raises(ValueError, match="requires --pool soft"):
+        train_run(run, "none", 5, epochs=1, body="all")
