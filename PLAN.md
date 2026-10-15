@@ -1,8 +1,20 @@
 # Plan: do extra modalities raise the language-acquisition ceiling?
 
-Claim: video-only word learning plateaus; adding embodied modalities as learner
-inputs lifts that plateau. Measure gain in word learning, video-only vs
-video + body.
+Question: does adding bodily input during learning improve language acquisition
+over video alone? The long-term hypothesis is that it raises the plateau.
+Measure two outcomes separately:
+
+- **Understanding with the body available:** real vision + body versus a matched
+  video-only learner on the same held-out situations, words and candidates.
+- **Learning that carries over:** picture-only performance after learning with
+  real bodily input versus after learning with video alone.
+
+A reliable gain in either outcome advances the goal. A body-present gain does
+not establish transfer to vision, and absent transfer does not negate a
+body-present gain. Oracle identity inputs are privileged diagnostics, not
+evidence of benefit from real bodily experience. Learning curves and data
+scaling distinguish immediate multimodal performance, learning efficiency and
+a higher eventual plateau.
 
 ## Order
 
@@ -18,8 +30,8 @@ video + body.
    sources: `docs/literature/body_input_review.md`.
    - Body-input pathway: contact, finger pose and arm position encoded
      separately, then combined with vision during language training.
-   - Random body dropout in training; picture-only test. Body-present test is
-     a supporting diagnostic.
+   - Random body dropout in training; evaluate both body-present understanding
+     and picture-only transfer as distinct outcomes.
    - Vision-to-body prediction as an auxiliary loss on the shared visual
      projection. Supplements the pathway.
    - Contact-episode grouping optional (flag, off by default).
@@ -34,12 +46,17 @@ video + body.
    - Done 2026-10-15 (commit 8b70cca2). Checks pass.
 4. **Staged comparison at max data.**
    1. Matched video-only vs video + body, 1 seed, same data, speech and dev
-      rule. Reuse a baseline only if settings match.
+      rule. Report both outcomes; compare body-present scores against the
+      video-only learner on the same trials, not just the multimodal learner
+      with its body removed. Reuse a baseline only if its settings match.
+      Predefine dev selection for each outcome; never select on test scores.
    2. Check learning curves at a set checkpoint (epoch 30); extend only if
       still rising.
-   3. If a promising gap: shuffled body and more seeds; 5 seeds to confirm.
-   4. If no gap: pick the next diagnostic from the failure (body-present
-      test, body probe, or oracle). No automatic ablation sweep.
+   3. If a promising real-body gap in either outcome: shuffled body and more
+      seeds; 5 seeds to confirm that outcome.
+   4. If no gap in either outcome: pick the next diagnostic from the failure
+      (body probe or oracle). If only transfer is absent, investigate transfer
+      without dismissing the body-present result. No automatic ablation sweep.
    - 4.1 result (seed 0, s8 held out, 60 epochs; selected epochs 45 and 47,
      broadly saturated by ~30): video-only 76.4 rendered / 69.1 Konkle;
      video + body 75.4 / 69.7. No clear picture-only gain for this
@@ -69,7 +86,12 @@ video + body.
      - So two separate gaps: transfer to the visual path, and the real body
        carrying far less word information than the oracle (32 vs 94 on
        held-referent trials).
-5. **Scaling.** Smaller data sizes from the same render, fit Frank's
+   - Next: retain the bounded oracle-to-picture transfer diagnostic. It tests
+     whether explicit teaching can improve picture-only learning with
+     privileged input. Success must subsequently be tested with real body
+     inputs; failure does not rule out benefits with the body available.
+5. **Scaling.** Track both outcomes across smaller data sizes from the same
+   render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
    from a higher final plateau.
 
@@ -80,7 +102,8 @@ features could help both, so a seen-only gain is not a failure.
 
 | Benchmark | Use |
 |---|---|
-| Rendered probes, held-out rooms | Primary. All vocabulary words. Dev split picks the epoch; test split reported. Report held and seen-only words separately. |
+| Body-present word understanding, held-out situations | Real vision + body versus matched video-only on identical trials. Existing s8 4AFC is the initial measure. Report all, held-referent and non-held-referent trials. |
+| Rendered probes, held-out rooms | Picture-only transfer. All vocabulary words. Dev split picks the epoch; test split reported. Report held and seen-only words separately. |
 | Konkle test-60, Frank's exact protocol | Real-photo transfer, comparable to Frank. Epoch picked on rendered dev (we won't cover Konkle dev-117). |
 | LEVANTE vocab (159 items) | Not usable yet (0 overlap). |
 | EgoBabyVLM Machine-DevBench | Later. Lexical noun 2AFC from own vocab; harness not found yet. Grammar tasks need a non-bag-of-words text model. |

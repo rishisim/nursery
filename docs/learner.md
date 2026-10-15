@@ -1,7 +1,11 @@
 # Learner: how the body is used
 
 Goal (AGENTS.md): body inputs should raise the word-learning ceiling beyond
-video alone. The test is picture + word only, like children.
+video alone. Measure both understanding with real vision + body available and
+transfer to later picture + word testing without the body. A reliable gain in
+either advances the goal; picture-only retention is an additional achievement,
+not a requirement for recognizing a body-present benefit. Oracle inputs remain
+diagnostics. See `PLAN.md` for the staged comparisons.
 
 ## Why this design
 
@@ -61,6 +65,9 @@ not tuned (no dev sweep): pred 0.5, dropout 0.5.
 
 ## Tests
 
+- Body-present understanding: compare real vision + body with the matched video-only learner on identical
+  held-out trials. Report all, held-referent and non-held-referent trials; removing the body from the multimodal
+  learner is an additional ablation, not a substitute for the video-only baseline.
 - Picture-only 4AFC: rendered test (held / seen-only / extras), Konkle-60. Epoch picked on rendered dev.
 - Unit tests (`tests/test_learner.py`): the language loss changes with the body; gradients reach every
   sub-encoder; dropout 1.0 equals video-only; picture-only eval never calls the body; clip-boundary reset and
