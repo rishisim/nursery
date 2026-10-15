@@ -135,10 +135,22 @@ a higher eventual plateau.
      - Real body, vision-to-body loss off (60 epochs by the preset rule):
        picture-only 76.2 / 69.9 vs 76.4 / 69.1; body-present combined 46.1
        vs 48.7. No gain.
-     - Remaining uncertainty: the real body carries almost no word
-       information (oracle body: 94 on held-referent trials). Grasps are
-       borrowed, so many words share one GRAB grasp; this caps what any
-       body encoder can know.
+     - Remaining uncertainty: the real body carries almost no usable word
+       information (oracle body: 94 on held-referent trials).
+   - 4.5 body-signal audit (`docs/body_signal_audit.md`, no training):
+     - Grasp sharing is small, correcting 4.4: only pen/spoon and
+       lock/cheese share a source (2.6% of held frames). Grasp-only
+       predictability 98.5% on s8.
+     - Contact is healthy and recomputed per mesh, but varies about as much
+       between clips of one object as between objects.
+     - Fixed probe on body features, s8 held out: 18% balanced over 50 words
+       (chance 2%). Far below grasp-only, so the gap is recognising the grasp
+       across subjects. Instance-disjoint split not scorable on this render.
+     - The language pathway's body-only score is at chance (25.5) while the
+       probe is above chance: the learner misses information the body has.
+     - Next (one change): a body-only word-matching loss on the same named
+       pairs (weak speech, no labels). Check with the s8 body-present test
+       (body-only and combined) vs the control and a shuffled body.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
