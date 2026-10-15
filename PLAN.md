@@ -57,9 +57,18 @@ video + body.
        features (17.0%). The grasp-family split is degenerate (100%
        majority). No evidence yet of category information across grasp
        families.
-   - 4.2 next: oracle body (true held-object identity) with the vision-to-body
-     loss off, so only the pathway changes. Read body-only, combined and
-     picture-only, on held-referent trials too.
+   - 4.2 oracle pathway check (true held-object identity as body, vision-to-
+     body loss off, seed 0): picture-only 75.5 rendered / 68.8 Konkle (no
+     change). Body-present test, all / held-referent trials:
+     picture 43.7 / 61.7, body 50.5 / 94.3, combined 49.8 / 76.6.
+     - The pathway can use a strongly informative body when present.
+     - Combined (76.6) is far below body alone (94.3) on held trials: the
+       additive score is poorly calibrated (body weight 0.61).
+     - Nothing reaches picture-only; picture held-referent accuracy dips
+       (65.1 video-only -> 61.7), as if the body explains away held cases.
+     - So two separate gaps: transfer to the visual path, and the real body
+       carrying far less word information than the oracle (32 vs 94 on
+       held-referent trials).
 5. **Scaling.** Smaller data sizes from the same render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
    from a higher final plateau.
