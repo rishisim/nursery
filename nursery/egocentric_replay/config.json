@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "grab_root": "/Users/rishisim/Documents/research/nursery/.external/HOIDiNi/hoidini_data/datasets/GRAB_RETARGETED_compressed",
+  "hand_vertex_ids": "/Users/rishisim/Documents/research/nursery/.external/HOIDiNi/hoidini_data/datasets/MANO_SMPLX_vertex_ids.pkl",
+  "body_models": "/Users/rishisim/Documents/research/nursery/data/body_models",
+  "blender": "/opt/homebrew/bin/blender",
+  "duration_s": 120,
+  "horizontal_fov_deg": 100,
+  "resolution": [
+    320,
+    240
+  ],
+  "subjects": [
+    "s1",
+    "s2",
+    "s3",
+    "s4",
+    "s5",
+    "s6",
+    "s7",
+    "s8",
+    "s9",
+    "s10"
+  ],
+  "probes_per_category_per_split": 8,
+  "session_rooms": [
+    "Bedroom_seed11",
+    "Bedroom_seed23",
+    "LivingRoom_seed11",
+    "LivingRoom_seed23",
+    "LivingRoom_seed47",
+    "DiningRoom_seed47",
+    "Office_seed11"
+  ],
+  "probe_rooms": [
+    "Bedroom_seed47",
+    "Kitchen_seed23",
+    "Office_seed47"
+  ],
+  "library": "/Users/rishisim/.codex/worktrees/cue-experiment/nursery/outputs/objaverse/library",
+  "table_distractors": [
+    3,
+    5
+  ],
+  "floor_objects": [
+    2,
+    4
+  ]
+}

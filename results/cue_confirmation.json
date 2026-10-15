@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "preregistered_ct": "2026-10-14",
+  "purpose": "Confirm the Phase 2 contact-cue trend at q_held=0.6 with fresh seeds; Phase 2 seeds are not pooled.",
+  "data": {
+    "frames_and_embeddings": "Phase 2 caches unchanged (90,240 train frames, 816 probes); no rendering or embedding",
+    "code_commit": "e4d9dffb5260763595a7ada1beaa5b9bf265ccb5"
+  },
+  "fixed_settings": {
+    "generator": {
+      "p_ref": 0.05,
+      "q_held": 0.6,
+      "p_name": 0.5,
+      "sigma": 1.0,
+      "rate_hz": 0.3333333333333333
+    },
+    "training": "nursery/cue_learning/config.json unchanged: 20 epochs, batch 256, lr 0.0003, window 2, min_freq 5",
+    "cues": "unchanged: w_hi 1.0, w_lo 0.2, shift 10 s"
+  },
+  "seeds": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29
+  ],
+  "conditions": [
+    "none",
+    "contact",
+    "shuffled",
+    "shifted"
+  ],
+  "runs": 100,
+  "primary_metric": "test-probe 4AFC accuracy at dev-selected epoch, percent",
+  "contrasts": [
+    "contact - none",
+    "contact - shuffled",
+    "contact - shifted"
+  ],
+  "analysis": "Paired by seed; mean difference and 95% Student t interval, df=24.",
+  "decision_rule": {
+    "confirmed": "all three interval lower bounds > 0 (the Phase 2 positive criterion)",
+    "timing_only": "contact - shuffled and contact - shifted lower bounds > 0, contact - none not",
+    "not_confirmed": "otherwise"
+  },
+  "exclusions": "None. Every run must finish; a crashed run is rerun once with the identical command and reported. No run is selected, excluded or rerun on accuracy.",
+  "cells": [
+    {
+      "condition": "none",
+      "mean": 43.8416,
+      "sd": 4.0123140455353195,
+      "n": 25
+    },
+    {
+      "condition": "contact",
+      "mean": 44.7816,
+      "sd": 3.938088241774173,
+      "n": 25
+    },
+    {
+      "condition": "shuffled",
+      "mean": 41.0028,
+      "sd": 4.657193826043032,
+      "n": 25
+    },
+    {
+      "condition": "shifted",
+      "mean": 40.4512,
+      "sd": 3.8799670531247203,
+      "n": 25
+    }
+  ],
+  "primary_contrasts": [
+    {
+      "contrast": "contact - none",
+      "mean_difference_pp": 0.9399999999999994,
+      "sd_difference_pp": 4.567663516503814,
+      "ci95_pp": [
+        -0.9454388323426056,
+        2.8254388323426043
+      ],
+      "interval_width_pp": 3.77087766468521,
+      "n": 25
+    },
+    {
+      "contrast": "contact - shuffled",
+      "mean_difference_pp": 3.7788,
+      "sd_difference_pp": 5.208206121113102,
+      "ci95_pp": [
+        1.6289581755944793,
+        5.928641824405521
+      ],
+      "interval_width_pp": 4.299683648811041,
+      "n": 25
+    },
+    {
+      "contrast": "contact - shifted",
+      "mean_difference_pp": 4.330399999999999,
+      "sd_difference_pp": 5.196793466488093,
+      "ci95_pp": [
+        2.1852690878874617,
+        6.475530912112537
+      ],
+      "interval_width_pp": 4.290261824225075,
+      "n": 25
+    }
+  ],
+  "criteria": {
+    "contact - none": false,
+    "contact - shuffled": true,
+    "contact - shifted": true
+  },
+  "verdict": "timing_only",
+  "reruns": [],
+  "selected_epochs": {
+    "none": [
+      19,
+      18,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      18,
+      19,
+      19,
+      19
+    ],
+    "contact": [
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      18,
+      19,
+      18,
+      19,
+      19,
+      19,
+      19,
+      19,
+      18,
+      19,
+      18,
+      17,
+      18,
+      19,
+      19,
+      19,
+      19,
+      19
+    ],
+    "shuffled": [
+      18,
+      19,
+      19,
+      19,
+      18,
+      18,
+      19,
+      15,
+      19,
+      19,
+      17,
+      17,
+      19,
+      18,
+      18,
+      19,
+      18,
+      19,
+      19,
+      19,
+      18,
+      19,
+      19,
+      19,
+      17
+    ],
+    "shifted": [
+      19,
+      19,
+      19,
+      19,
+      19,
+      19,
+      18,
+      19,
+      19,
+      19,
+      18,
+      19,
+      19,
+      19,
+      17,
+      19,
+      19,
+      19,
+      18,
+      19,
+      16,
+      19,
+      19,
+      16,
+      19
+    ]
+  }
+}

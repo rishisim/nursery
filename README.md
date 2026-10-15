@@ -18,6 +18,7 @@ nursery/humanoid/
 │   ├── run_motion.py
 │   └── validate_motion.py
 └── hoidini_intermimic/              Conversion and execute.py simulator launcher
+nursery/cue_learning/                Training-only cue learner on vlm-headcam
 ```
 
 `nursery/humanoid/embodiedgen_hoidini/` deterministically prepares a complete
@@ -406,3 +407,75 @@ verified.
 On Juno, run generation and rendering commands inside an appropriate Slurm
 allocation. See the upstream [EmbodiedGen documentation](https://horizonrobotics.github.io/EmbodiedGen/docs/index.html)
 for native installation and pipeline details.
+
+## Training-only cue learner
+
+`nursery/cue_learning/` adapts egocentric episodes to the pinned
+[vlm-headcam](https://github.com/mcfrank/vlm-headcam) learner, comparing contact
+cue weights with unweighted, shuffled, shifted, noisy, and oracle controls.
+Only train sessions supply speech and vocabulary; disjoint dev/test probes
+select and evaluate the model. Embedding and training select CUDA, then Apple MPS, then CPU when available.
+
+The ignored venv `.external/cue-env/` was created with `uv venv --python 3.11 .external/cue-env`.
+Use that environment with the upstream checkout at the commit in `config.json`.
+
+```bash
+.external/cue-env/bin/python -m nursery.cue_learning transcripts \
+  --episodes outputs/egocentric_replay/run --output outputs/cue_learning/run --seed 7
+.external/cue-env/bin/python -m nursery.cue_learning embed \
+  --episodes outputs/egocentric_replay/run --output outputs/cue_learning/run \
+  --device cuda --batch 64
+.external/cue-env/bin/python -m nursery.cue_learning train \
+  --run outputs/cue_learning/run --condition contact --seed 7
+```
+
+Outputs must be ignored; use `--device cpu` for CPU embedding.
+Limitation: synthetic harness checks do not establish learning gains on real episodes.
+
+## Egocentric GRAB replay
+
+`nursery/egocentric_replay/` renders 120-second, 1 Hz head-camera sessions
+from HOIDiNi's retargeted GRAB with neutral SMPL-X and recorded full hand poses.
+Inputs are licensed GRAB/SMPL-X at the paths in package-local `config.json`,
+the existing `.external/egocentric-env/`, Blender, and a real exported room bank.
+Session and dev/test probe rooms are disjoint; outputs must be Git-ignored.
+Each clip draws a target of 3–5 static distractors from a shuffled list of other
+GRAB categories. Bounded placement attempts preserve tabletop and object/hand
+clearance; the realized count may be zero. The session render receipt records
+per-clip target and realized counts, and the build manifest reports their distribution.
+Frame `objects` records all realized categories, including zero-pixel visibility.
+
+```bash
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 LP_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 \
+.external/egocentric-env/bin/python -m nursery.egocentric_replay build \
+  --rooms /Users/rishisim/Documents/research/nursery/outputs/embodiedgen_scene/room_bank \
+  --subjects s1 s9 s10 --sessions-per-subject 2 --seed 7 \
+  --output outputs/egocentric_replay/run
+.external/egocentric-env/bin/python -m nursery.egocentric_replay preview \
+  --episodes outputs/egocentric_replay/run --output outputs/egocentric_replay/run/contact_sheet.png
+PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python -m pytest -q -p no:cacheprovider tests/test_egocentric_replay.py
+```
+
+Omit `--subjects` for all subjects; Phase 2 uses `--subjects s1 s2 s3 s4 s5 s6 s7 s8`.
+Probes still render. `--workers N` packs jobs; `--session-index N` renders one
+scheduled session without probes. Gates: labelled contact median <1 cm,
+held object visible in ≥70% of contact frames, mean visible categories ≥2.
+The fraction of frames with ≥2 visible categories is a statistic only.
+Full-body SMPL-X is batched over the rendered 1-Hz frames. Hand-only upstream
+skinning retains exact full-rate hand clearance bounds, and object bounds use
+all source frames. There is no sampled-bound displacement inflation. The unchanged
+1-cm contact gate uses 1-Hz frames plus up to 200 evenly spaced labelled-contact
+frames per clip, with exact triangle-surface distances. Whole-hand diagnostics
+continue to use the rendered frames.
+
+The s1/s9/s10, two-session-per-subject, seed-7 acceptance pilot rendered 720 frames
+and 816 probes in 164.05 s with six workers. It realized 3/4/5 distractors in
+24/23/29 clips, with no zero-fit clips, mean realized count 4.066 and mean visible
+categories 4.551. Labelled-contact median and p90 changed by -0.0154 mm and
++0.0470 mm against the earlier pilot; the whole-hand median was unchanged.
+Each session's preparation time (17.83–29.04 s) was below its Blender time
+(30.06–45.34 s). The superseded global margin produced 1,155 zero-fit clips out
+of 1,177 and 1.011 mean visible categories; those train sessions are discarded.
+Limitations: adult motion is an infant proxy; source head turns can hide the
+table/held object, placement rejection biases realized categories, and replay
+provides kinematics rather than physics. Measurements remain in ignored run roots.
