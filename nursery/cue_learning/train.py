@@ -29,7 +29,34 @@ def _groups(details):
     return result
 
 
-def train_run(run, condition, seed, epochs=None):
+def _body_signals(body):
+    from .body import SIGNALS
+
+    if body in ("all", None):
+        return SIGNALS
+    names = () if body == "geometry" else tuple(body.split(","))
+    if not set(names) <= set(SIGNALS):
+        raise ValueError(f"Unknown body signals: {body}")
+    return names
+
+
+def _gate_stats(model, bodyset, device, signals):
+    """Gate over all training pairs with every signal present, plus the pairs whose window has a hand in contact."""
+    import torch
+
+    model.eval()
+    with torch.no_grad():
+        n = len(bodyset["dist"])
+        feats = {k: bodyset[k].to(device) for k in signals}
+        g = model.body(feats, torch.ones(n, max(len(signals), 1), device=device), None).cpu().numpy()
+    model.train()
+    contact = ((bodyset["contact"][:, 0] > 0) | (bodyset["contact"][:, 2] > 0)).numpy()
+    return {"mean": round(float(g.mean()), 4), "frac_below_0.1": round(float((g < 0.1).mean()), 4),
+            "mean_contact": round(float(g[contact].mean()), 4) if contact.any() else None,
+            "frac_contact": round(float(contact.mean()), 4)}
+
+
+def train_run(run, condition, seed, epochs=None, body=None, body_control="none", body_drop=0.5, name=None):
     import torch
 
     device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
@@ -42,6 +69,10 @@ def train_run(run, condition, seed, epochs=None):
     epochs = settings["epochs"] if epochs is None else epochs
     if epochs < 1:
         raise ValueError("epochs must be positive")
+    if body is None and body_control != "none":
+        raise ValueError("--body-control requires --body")
+    if not 0 <= body_drop <= 1:
+        raise ValueError("--body-drop must be in [0, 1]")
     torch.manual_seed(seed)
     np.random.seed(seed)
     manifest_path = run / "manifest.parquet"
@@ -69,7 +100,23 @@ def train_run(run, condition, seed, epochs=None):
     weights = torch.from_numpy(weights)
     dl = torch.utils.data.DataLoader(ds, batch_size=settings["batch"], shuffle=True,
                                      drop_last=False, collate_fn=upstream.collate, num_workers=0)
-    model = upstream.RegionMIL(len(vocab), emb_dim=emb_dim)
+    bodyset = None
+    if body is not None:
+        from . import body as bodylib
+
+        signals = _body_signals(body)
+        window = settings["window"]
+        lut_has = lambda video_id, frame: region.frame_key(video_id, frame) in lut
+        arrays = bodylib.pair_arrays(bodylib.load_body(generator["episodes"], manifest.video_id.unique()),
+                                     manifest, lut_has, window)
+        if body_control == "oracle":
+            frames = pd.read_parquet(Path(generator["episodes"]) / "frames.parquet")
+            arrays["oracle"] = bodylib.oracle_distances(manifest, frames, lut_has, window)
+        bodyset = {k: torch.from_numpy(a) for k, a in arrays.items()}
+        gate_generator = torch.Generator().manual_seed(seed + 1000)  # keeps the default RNG stream identical to video-only
+        model = bodylib.BodyRegionMIL(len(vocab), signals, emb_dim=emb_dim)
+    else:
+        model = upstream.RegionMIL(len(vocab), emb_dim=emb_dim)
     if device == "mps":
         model = model.float()
     model = model.to(device)
@@ -91,15 +138,25 @@ def train_run(run, condition, seed, epochs=None):
             raise ValueError(f"Upstream 4AFC requires at least four probes/category and four categories: {split}")
         if sum(bool(upstream.encode(cat, vocab)) for cat in counts.index) < 4:
             raise ValueError(f"Upstream 4AFC needs four in-vocabulary categories: {split}")
-    output = _output_directory(run / f"{condition}_s{seed}")
+    output = _output_directory(run / f"{name or condition}_s{seed}")
     if any(output.iterdir()):
         raise FileExistsError(f"Training output already contains files: {output}")
     history, best_sel, best_state, best_ep, best_details = [], -1.0, None, -1, None
     for epoch in range(epochs):
         model.train()
         losses = []
+        if bodyset is not None and body_control == "shuffle":
+            others = torch.randperm(len(ds), generator=gate_generator)  # each pair gets another pair's body this epoch
         for idx, v, t, n in dl:
-            loss = model.forward_loss(v.to(device), t.to(device), n.to(device), weights[idx].to(device))
+            if bodyset is None:
+                loss = model.forward_loss(v.to(device), t.to(device), n.to(device), weights[idx].to(device))
+            else:
+                ids = others[idx] if body_control == "shuffle" else idx
+                on, keep, noise = bodylib.drop_masks(len(idx), signals, body_drop, gate_generator)
+                dist = bodyset["oracle" if body_control == "oracle" else "dist"][ids]
+                loss = model.forward_loss(
+                    v.to(device), t.to(device), n.to(device), weights[idx].to(device), dist.to(device),
+                    {k: bodyset[k][ids].to(device) for k in signals}, on.to(device), keep.to(device), noise.to(device))
             opt.zero_grad()
             loss.backward()
             opt.step()
@@ -123,9 +180,14 @@ def train_run(run, condition, seed, epochs=None):
                   "train_loss": float(np.mean(losses))}
         if konkle is not None:
             record["konkle"] = round(scores["konkle"], 4)
+        if bodyset is not None:
+            record["gate_mean"] = _gate_stats(model, bodyset, device, signals)["mean"]
         history.append(record)
         print(record, flush=True)
     model.load_state_dict(best_state)
+    if bodyset is not None:
+        body_info = {"signals": list(signals), "control": body_control, "drop": body_drop,
+                     "gate": _gate_stats(model, bodyset, device, signals)}
     torch.save(model.state_dict(), output / "model.pt")
     (output / "vocab.json").write_text(json.dumps(vocab, indent=2) + "\n")
     metrics = {
@@ -145,6 +207,8 @@ def train_run(run, condition, seed, epochs=None):
         "mean_weight": float(weights.mean()),
         "probe_counts": {s: {k: d[k] for k in ("n_scored", "n_oov", "n_total")} for s, d in details.items()},
     }
+    if bodyset is not None:
+        metrics["body"] = body_info
     metrics["groups"] = _groups(best_details)
     (output / "metrics.json").write_text(json.dumps(metrics, indent=2, allow_nan=False) + "\n")
     print(f"DONE {output} selected_ep {best_ep} reported_test_acc {metrics['reported_test_acc']}", flush=True)

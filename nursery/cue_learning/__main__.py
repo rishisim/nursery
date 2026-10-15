@@ -27,6 +27,10 @@ def main():
     train.add_argument("--condition", required=True)
     train.add_argument("--seed", type=int, required=True)
     train.add_argument("--epochs", type=int)
+    train.add_argument("--body", help="Body signals for training-only region guidance: all, geometry, or a comma list of contact,hand,joints")
+    train.add_argument("--body-control", choices=("none", "shuffle", "oracle"), default="none")
+    train.add_argument("--body-drop", type=float, default=0.5, help="Per-pair probability of dropping the whole body")
+    train.add_argument("--name", help="Output directory prefix (default: the condition)")
     args = parser.parse_args()
     if args.command == "transcripts":
         write_transcripts(args.episodes, args.output, args.seed,
@@ -34,7 +38,7 @@ def main():
     elif args.command == "embed":
         embed_episodes(args.episodes, args.output, args.device, args.batch)
     else:
-        train_run(args.run, args.condition, args.seed, args.epochs)
+        train_run(args.run, args.condition, args.seed, args.epochs, args.body, args.body_control, args.body_drop, args.name)
 
 
 if __name__ == "__main__":
