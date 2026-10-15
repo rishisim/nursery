@@ -106,3 +106,15 @@ Flags: `--distill-from <oracle run dir>`, `--distill-weight` (lambda, default 1)
 - Agreement (metrics `checkpoints`, at epoch N and at the dev-selected epoch): KL at T and top-1 agreement with the
   teacher on training pairs and on s8 named visible-referent pairs (random fixed batches of 128). s8 pairs are used
   because dev here is a picture-probe split with no teacher body.
+
+## Direct-label check (LABEL DIAGNOSTIC)
+
+Flag: `--labels` (picture-only, `--pool soft`, no `--body`/`--distill-from`). Off by default.
+
+- Same frozen features, linear projection, soft-MIL and vocabulary (built from the speech). Only the text changes.
+- Each speech pair (training sessions only, s8 excluded) keeps its frame window and gets the word of one object whose
+  `visible_px > 0` in the centre frame of `frames.parquet`, drawn once, uniformly, seeded. Pairs with no visible object
+  are dropped (226 of 29,960), so the pair count stays matched. A frame shows about 5 objects, so one label is one of
+  several correct words and the loss cannot go to zero (same word several times in a batch).
+- `metrics.json["labels"]`: pair counts and `fit` on a fixed 4096 training pairs: `top1` (drawn label among all 78
+  object words, soft pooling) and `top1_visible` (any visible object).

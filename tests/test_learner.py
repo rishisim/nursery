@@ -543,5 +543,44 @@ def test_body_training_runs(episodes, upstream, options):
         train_run(run, "none", 5, epochs=1, body="real")
 
 
+def test_label_pairs_use_only_visible_objects_of_training_sessions(episodes):
+    from nursery.learner.evaluate import label_manifest
+
+    root, run = episodes
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    frames = pd.read_parquet(root / "frames.parquet")
+    seen = lambda *c: json.dumps([{"category": k, "visible_px": 40 if k in c else 0, "cells": []} for k in ("mug", "bowl", "apple")])
+    frames["objects"] = [seen("mug", "bowl") if f % 3 == 0 else seen() if f % 3 == 1 else seen("apple") for f in frames.frame_idx]
+    frames.to_parquet(root / "frames.parquet", index=False)
+    manifest = pd.read_parquet(run / "manifest.parquet")
+    manifest = manifest[manifest.video_id.isin(["v0", "v1"])]
+    labelled, info = label_manifest(manifest, root, 0)
+    assert set(labelled.video_id) <= {"v0", "v1"}
+    assert info["n_speech_pairs"] == len(manifest) and info["n_pairs"] == len(labelled) < len(manifest)
+    assert all(text in visible and "apple" != text or text == "apple" and visible == ["apple"] for text, visible in zip(labelled.text, labelled.visible))
+    assert (labelled.frame_idx % 3 != 1).all() and set(labelled.text) == {"mug", "bowl", "apple"}
+    again, _ = label_manifest(manifest, root, 0)
+    assert again.text.tolist() == labelled.text.tolist()
+
+
+def test_label_training_runs_and_reports_fit(episodes, upstream):
+    from nursery.learner.train import train_run
+
+    root, run = episodes
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    manifest = pd.read_parquet(run / "manifest.parquet")
+    vocab = upstream.build_vocab(manifest.text, 5)
+    frames = pd.read_parquet(root / "frames.parquet")
+    word = next(w for w in vocab if w != "<pad>")  # a category the vocabulary knows
+    frames["objects"] = json.dumps([{"category": word, "visible_px": 40, "cells": []}])
+    frames.to_parquet(root / "frames.parquet", index=False)
+    metrics = train_run(run, "none", 3, epochs=2, name="labels", pool="soft", heldout_subject="s2", labels=True)
+    assert metrics["labels"]["n_words"] == 1 and metrics["labels"]["n_pairs"] <= metrics["labels"]["n_speech_pairs"]
+    assert metrics["labels"]["fit"]["top1"] == 100 and metrics["n_pairs"] == metrics["labels"]["n_pairs"]
+    with pytest.raises(ValueError, match="picture-only"):
+        train_run(run, "none", 4, epochs=1, pool="soft", labels=True, body="real")
+
+
 def test_upstream_checkout_is_unmodified(upstream):
     assert subprocess.run(["git", "-C", str(UPSTREAM), "diff", "--quiet"]).returncode == 0

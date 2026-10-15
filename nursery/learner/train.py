@@ -90,7 +90,7 @@ def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_r
 
 def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.1, body="none", episodes="none",
               weights=None, heldout_subject=None, body_dropout=None, distill_from=None, distill_weight=1.0,
-              distill_temp=2.0, inspect_epoch=None):
+              distill_temp=2.0, inspect_epoch=None, labels=False):
     import torch
 
     from . import body as bodylib
@@ -118,6 +118,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         raise ValueError("--body requires --pool soft")
     if distill_from and (body != "none" or pool != "soft"):
         raise ValueError("--distill-from needs a picture-only student: --body none --pool soft")
+    if labels and (body != "none" or distill_from or pool != "soft"):
+        raise ValueError("--labels is a picture-only soft-pooling diagnostic: use --pool soft, no --body or --distill-from")
     if distill_weight < 0 or distill_temp <= 0:
         raise ValueError("--distill-weight must be non-negative and --distill-temp positive")
     weights = {**learner["weights"], **{k: v for k, v in (weights or {}).items() if v is not None}}
@@ -145,7 +147,10 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     is_heldout = manifest.video_id.map(subject_of).eq(heldout).to_numpy() if heldout else np.zeros(len(manifest), bool)
     heldout_manifest = manifest[is_heldout].reset_index(drop=True)
     manifest = manifest[~is_heldout]
-    vocab = upstream.build_vocab(manifest.text, settings["min_freq"])
+    vocab = upstream.build_vocab(manifest.text, settings["min_freq"])  # always from the speech, so labels share the vocabulary
+    label_info = None
+    if labels:  # LABEL DIAGNOSTIC: replace the speech by the word of one object visible in the frame
+        manifest, label_info = evaluate.label_manifest(manifest, episode_root, seed)
     caches, lut = upstream.load_multi([run / "train_cache"])
     emb_dim = caches[0].shape[-1]
     if caches[0].ndim != 3 or caches[0].shape[1] != 17:
@@ -335,6 +340,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         metrics["distill"] = {"from": str(Path(distill_from).resolve()), "weight": distill_weight, "temp": distill_temp}
         if held_ds is not None:  # ORACLE DIAGNOSTIC: the teacher's own body-present numbers (hard and soft pooling)
             metrics["distill"]["teacher_body_present"] = evaluate.body_present_4afc(teacher, upstream, held_ds, teacher_held, test_rows, device, seed)
+    if label_info is not None:  # fit of the selected model on its own training labels
+        metrics["labels"] = {**label_info, "fit": evaluate.label_fit(model, upstream, ds, manifest, vocab, device, seed)}
     if checkpoints:
         metrics["checkpoints"] = checkpoints
     metrics["groups"] = _groups(best_details)

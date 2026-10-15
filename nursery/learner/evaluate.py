@@ -1,6 +1,9 @@
 """Body-side tests: body-present 4AFC on the held-out subject and the body probe."""
 
+import json
+
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn.functional as F
 
@@ -199,3 +202,51 @@ def body_probe(model, data, store, heldout_subject, device):
             result[task] = entry
         out["splits"][split] = result
     return out
+
+
+def label_manifest(manifest, episode_root, seed):
+    """LABEL DIAGNOSTIC: one pair per speech pair, with the speech replaced by the word of one object that is visible
+    (visible_px > 0 in `frames.parquet`) in that pair's centre frame, drawn uniformly once (seeded). Only the rows of
+    `manifest` (training sessions) are used, so a held-out subject never enters. Pairs with no visible object are dropped.
+    Adds `visible`: all visible categories of the frame."""
+    frames = pd.read_parquet(episode_root / "frames.parquet", columns=["video_id", "frame_idx", "objects"])
+    table = manifest.merge(frames, on=["video_id", "frame_idx"], how="left", validate="many_to_one")
+    if table.objects.isna().any():
+        raise ValueError("Training pairs without a frame record")
+    table["visible"] = table.objects.map(lambda o: sorted({x["category"] for x in json.loads(o) if x["visible_px"] > 0}))
+    table = table.drop(columns="objects")
+    rng = np.random.default_rng(seed)
+    some = table.visible.map(len) > 0
+    kept = table[some].reset_index(drop=True)
+    kept["text"] = [rng.choice(v) for v in kept.visible]
+    info = {"n_speech_pairs": int(len(table)), "n_pairs": int(len(kept)), "n_dropped_none_visible": int((~some).sum()),
+            "mean_visible_objects": round(float(kept.visible.map(len).mean()), 3), "n_words": int(kept.text.nunique())}
+    return kept, info
+
+
+@torch.no_grad()
+def label_fit(model, upstream, ds, manifest, vocab, device, seed=0, n=4096, batch=256):
+    """Top-1 of the label words on training pairs: each pair's image window against every object word (soft pooling,
+    uniform region prior). `top1` counts the drawn label; `top1_visible` counts any object visible in the frame.
+    A fixed random subset of `n` pairs. `ds` is the FramePairs over `manifest` (same order)."""
+    model.eval()
+    words = sorted({w for v in manifest.visible for w in v})
+    t = torch.zeros(len(words), 16, dtype=torch.long)
+    for i, w in enumerate(words):
+        ids = upstream.encode(w, vocab)
+        t[i, :len(ids)] = torch.tensor(ids)
+    T = model.enc_text(t.to(device), torch.ones(len(words), dtype=torch.long, device=device))
+    rows = np.sort(np.random.default_rng(seed).choice(len(ds), min(n, len(ds)), replace=False))
+    top, any_visible = 0, 0
+    for start in range(0, len(rows), batch):
+        chosen = rows[start:start + batch]
+        _, v, _, _ = upstream.collate([ds[i] for i in chosen])
+        R = model.enc_regions(v.to(device))
+        s = torch.einsum("brd,md->brm", R, T)
+        uniform = torch.full(s.shape[:2], -np.log(s.shape[1]), device=device, dtype=s.dtype)
+        pred = soft_pool(s, uniform, model.tau_p).argmax(1).cpu().numpy()
+        for p, i in zip(pred, chosen):
+            top += words[p] == manifest.text[i]
+            any_visible += words[p] in manifest.visible[i]
+    return {"n_pairs": int(len(rows)), "n_words": len(words), "top1": round(100 * top / len(rows), 3),
+            "top1_visible": round(100 * any_visible / len(rows), 3)}
