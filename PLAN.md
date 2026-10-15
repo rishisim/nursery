@@ -82,8 +82,13 @@ Done 2026-10-14 (branch `cue/vocabulary`, commits 68a6dea7, 16425a6a, 164bd04d):
   `assets.json`. cookie comes from small torus, not small cylinder.
 - Swaps: every held word (native too) uses Objaverse instances on GRAB grasps,
   contact recomputed. Loose fits (<30% of contact within 5 mm): watch, bottle,
-  rock, balloon, bird, doll, juice, sandwich, key, turtle, umbrella. Better
-  alignment is being tried.
+  rock, balloon, bird, doll, juice, sandwich, key, turtle, umbrella.
+  v2 alignment (`--align v2`, not yet used in the render) brings 22/32
+  word-source pairs to ≥50% within 5 mm. Still loose (shape mismatch with the
+  GRAB source): bird, turtle, doll, sandwich, key, juice, watch, umbrella.
+  Untested better sources: gamecontroller/mouse (sandwich, doll, bird),
+  alarmclock (turtle), wristwatch (watch), stapler/waterbottle (juice).
+  watch and umbrella penetrate more under v2. Use v2 in the clean render.
 - Placement: tent shrunk to 1.0 m; hat, pizza, cake, trumpet, airplane go on
   the floor (table too small); big floor objects push the actor to the edge
   of the open square. 104 extra sessions boost the rare words; all 78 words
