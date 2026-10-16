@@ -163,6 +163,14 @@ a higher eventual plateau.
      - Promising = combined (fused_soft) on all 705 s8 trials at least 2.0
        points above the control's picture_soft. Then one shuffled-body run,
        same config, before any seeds. Otherwise stop and report.
+   - 4.6 result (commit f10c0fde, seed 0): not promising, stopped.
+     - Combined (fused_soft) on s8: 43.7 vs control picture 48.7 (paired
+       bootstrap -5.0, 95% CI [-8.5, -1.4]). Held-referent 60.6 vs 70.9.
+     - Body only: 27.9 (held 37.1) vs 26.2 (33.7) without the loss; chance 25.
+     - Picture-only: 75.5 / 69.0 vs control 76.4 / 69.1 (epoch 58).
+     - Reading: a direct word loss barely moves the body pathway, and adding
+       it hurts the combined score. Unchecked: whether the body term fits on
+       training subjects and fails on s8, or fails to fit at all.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
