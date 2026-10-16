@@ -235,6 +235,27 @@ a higher eventual plateau.
      - Decision (row 2): the body pathway memorizes episodes. Next work is
        episode memorization, speech alignment and body representation
        learning. Subject normalisation is dropped for now.
+   - 4.9 joint learner (set before running; `--arch joint`, `docs/learner.md`):
+     - Change: replace the additive body-word score with joint feature
+       learning. Visual-region tokens and the body encoder's per-second
+       states (+-5 s) share a small transformer (2 layers, width 128, 4
+       heads, ff 512; bounded pilot settings). The contextualized visual
+       tokens are scored with the same soft-MIL word matching. The utterance
+       stays outside the encoder. Dropped or absent body tokens are masked.
+     - Unchanged: vocabulary, speech, pair weights, clip split, s8, trials.
+       DINO frozen; body dropout 0.5; auxiliary losses and distillation off.
+     - Control: the same architecture with visual tokens only, matched
+       initialization of common parameters, same data and update budget. The
+       old linear video-only (`video_only_clips60_s0`) is a reference only.
+     - Matched pair, seed 0, 60 epochs, epoch-30 readout. Selection as in
+       4.8 (picture-only on rendered dev; body-present on clips_dev). The
+       same soft score is used in training and every evaluation.
+     - Primary: body-present nouns on clips_test, joint body `fused_soft`
+       minus joint control `picture_soft`, paired bootstrap 95% CI. Also s8,
+       rendered/Konkle picture-only, held vs non-held.
+     - Promising = at least +2.0 points on clips_test. Then one
+       episode-shuffled-body run (shuffle within partitions), then matched
+       seeds. Beating only the old linear baseline does not count.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data

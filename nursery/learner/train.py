@@ -55,6 +55,17 @@ def _pair_meta(manifest, store, lut, window):
     return ps, pt, frames
 
 
+def _window_layout(manifest, lut, window):
+    """Per pair, in FramePairs order: seconds from the centre frame of each window frame that exists [N,Fmax] and a
+    valid mask (False = the repeated padding FramePairs adds). Independent of the body store."""
+    offset = np.zeros((len(manifest), 2 * window + 1), np.int64)
+    valid = np.zeros(offset.shape, bool)
+    for i, (v, f) in enumerate(zip(manifest.video_id, manifest.frame_idx.astype(int))):
+        here = [g - f for g in range(f - window, f + window + 1) if f"{v}|{g}" in lut]
+        offset[i, :len(here)], valid[i, :len(here)] = here, True
+    return offset, valid
+
+
 def clip_partition(frames, heldout, cfg, steps=120):
     """Per-session partition of every second: 0 train, 1 dev, 2 test, -1 no frame. Within each subject (the held-out one
     stays all-train, unused) the sorted unique source clips are assigned at random by clip count; all replays of a
@@ -127,12 +138,12 @@ def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_r
 
 def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.1, body="none", episodes="none",
               weights=None, heldout_subject=None, body_dropout=None, distill_from=None, distill_weight=1.0,
-              distill_temp=2.0, inspect_epoch=None, labels=False, split="subject"):
+              distill_temp=2.0, inspect_epoch=None, labels=False, split="subject", arch="additive"):
     import torch
 
     from . import body as bodylib
     from . import evaluate
-    from .model import BodyData, LearnerMIL
+    from .model import BodyData, JointMIL, LearnerMIL
 
     device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     upstream = _upstream_module("train_frame_mil")
@@ -164,12 +175,20 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     by_clips = split == "clips"  # `split` is reused as a loop name below
     if distill_weight < 0 or distill_temp <= 0:
         raise ValueError("--distill-weight must be non-negative and --distill-temp positive")
+    if arch not in ("additive", "joint"):
+        raise ValueError("--arch must be additive or joint")
+    joint = arch == "joint"
+    if joint:
+        if pool != "soft" or body not in ("none", "real") or distill_from or labels or episodes != "none":
+            raise ValueError("--arch joint needs --pool soft, --body none or real, --episodes none, and no --distill-from or --labels")
+        if any(v is not None and v > 0 for v in (weights or {}).values()):
+            raise ValueError("--arch joint has no auxiliary losses: do not pass a positive --w-*")
     weights = {**learner["weights"], **{k: v for k, v in (weights or {}).items() if v is not None}}
     if set(weights) != set(LOSSES) or min(weights.values()) < 0:
         raise ValueError(f"Loss weights must be non-negative: {LOSSES}")
     if body == "none" and weights["bodymatch"] > 0:
         raise ValueError("--w-bodymatch needs --body")
-    if body == "none":
+    if body == "none" or joint:
         weights = {k: 0.0 for k in LOSSES}
     if episodes == "none":
         weights["episode"] = weights["consist"] = 0.0
@@ -229,8 +248,11 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     window = settings["window"]
     body_info = None
     data = eval_data = held_ds = held_pairs = None
+    if joint:  # window offsets and padding of every training pair, for control and body runs alike
+        offset, valid = (torch.as_tensor(a, device=device) for a in _window_layout(manifest, lut, window))
     if body == "none":
-        model = LearnerMIL(len(vocab), emb_dim, tau_p) if pool == "soft" else upstream.RegionMIL(len(vocab), emb_dim=emb_dim)
+        model = (JointMIL(len(vocab), emb_dim, tau_p) if joint else
+                 LearnerMIL(len(vocab), emb_dim, tau_p) if pool == "soft" else upstream.RegionMIL(len(vocab), emb_dim=emb_dim))
     else:
         frames = pd.read_parquet(episode_root / "frames.parquet")
         video_ids = sorted(set(all_manifest.video_id) | set(heldout_manifest.video_id))
@@ -257,7 +279,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         data = BodyData(train_store, ps, pt, win, bags, episode_ids, cache, row_of, device, learner["window_s"],
                         learner["mask_prob"] if weights["mask"] > 0 else 0.0, dropout)
         oracle_classes = len(real["categories"]) if body == "oracle" else 0
-        model = LearnerMIL(len(vocab), emb_dim, tau_p, data.dims, oracle_classes)
+        model = JointMIL(len(vocab), emb_dim, tau_p, data.dims) if joint else LearnerMIL(len(vocab), emb_dim, tau_p, data.dims, oracle_classes)
         body_info = {"mode": body, "dropout": dropout, "episodes": episodes, "weights": weights, "shuffle": shuffle_info,
                      "n_episodes": int(len(np.unique(episode_ids[episode_ids >= 0]))),
                      "episode_frames": float((episode_ids >= 0).sum() / max(real["present"].sum(), 1))}
@@ -306,7 +328,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
                 raise ValueError("Too few body-present trials in a split")
             ps, pt, win = _pair_meta(rows, real, lut, window) if body != "none" else (None,) * 3
             edata = BodyData(real, ps, pt, win, None, None, None, None, device, learner["window_s"], 0.0, 0.0) if body != "none" else None
-            return upstream.FramePairs(caches, lut, rows, vocab, window, False), edata, rows, rows.video_id.map(subject_of).to_numpy()
+            lay = tuple(torch.as_tensor(a, device=device) for a in _window_layout(rows, lut, window)) if joint else None
+            return upstream.FramePairs(caches, lut, rows, vocab, window, False), edata, rows, rows.video_id.map(subject_of).to_numpy(), lay
 
         for k, n in ((1, "clips_dev"), (2, "clips_test")):
             bp_sets[n] = make_set(all_manifest[pair_part == k])
@@ -319,8 +342,11 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         split_info["coverage"] = {n: {"n_words": len(w), "words": sorted(w), "held_missing": sorted(held_words - w)} for n, w in words.items()}
 
     def bp_run(trials=False):
+        if joint:
+            return {n: evaluate.joint_body_present_4afc(model, upstream, d, e, r, lay, device, seed, subject=subj, trials=trials)
+                    for n, (d, e, r, subj, lay) in bp_sets.items()}
         return {n: evaluate.body_present_4afc(model, upstream, d, e, r, device, seed, subject=subj, trials=trials)
-                for n, (d, e, r, subj) in bp_sets.items()}
+                for n, (d, e, r, subj, _) in bp_sets.items()}
 
     checkpoints = {}
 
@@ -347,6 +373,9 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
             w = pair_weights[idx].to(device)
             if soft:
                 ctx = data.batch(idx.numpy(), mask_generator) if data is not None else None
+                if joint:
+                    ix = idx.to(device)
+                    ctx = {**(ctx or {}), "vis_offset": offset[ix], "vis_valid": valid[ix]}
                 target = None
                 if teacher is not None and distill_weight > 0:
                     target = teacher.teacher_logits(v.to(device), t.to(device), n.to(device), teacher_train.batch(idx.numpy(), None, training=False))
@@ -362,14 +391,23 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
             losses.append(float(loss.detach()))
         # Evaluation sees only image regions and word tokens; no body, cues or oracle labels.
         scores, details = {}, {}
+        hard = {}
         for split, table in tables.items():
+            if joint:  # soft score drives selection; upstream's hard max is logged for reference
+                scores[split], details[split] = evaluate.probe_4afc_soft(model, region, probe_cache, probe_lut, table, vocab, device)
+                hard[split] = region.eval_4afc_region(model, probe_cache, probe_lut, table, vocab, device)
+                continue
             scores[split], details[split] = region.eval_4afc_region(
                 model, probe_cache, probe_lut, table, vocab, device, return_detail=True,
             )
         if konkle is not None:
             # Frank's Konkle test-60 protocol: 100 trials/category, rng(0), macro mean, OOV at chance.
-            scores["konkle"], details["konkle"] = region.eval_4afc_region(
-                model, konkle[0], konkle[1], konkle[2], vocab, device, return_detail=True)
+            if joint:
+                scores["konkle"], details["konkle"] = evaluate.probe_4afc_soft(model, region, konkle[0], konkle[1], konkle[2], vocab, device)
+                hard["konkle"] = region.eval_4afc_region(model, konkle[0], konkle[1], konkle[2], vocab, device)
+            else:
+                scores["konkle"], details["konkle"] = region.eval_4afc_region(
+                    model, konkle[0], konkle[1], konkle[2], vocab, device, return_detail=True)
         if not all(np.isfinite(list(scores.values()))) or not np.isfinite(losses).all():
             raise ValueError("Non-finite training loss or probe score")
         if scores["dev"] > best_sel:
@@ -379,6 +417,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
                   "train_loss": float(np.mean(losses))}
         if konkle is not None:
             record["konkle"] = round(scores["konkle"], 4)
+        if joint:
+            record.update({f"hard_{k}": round(x, 4) for k, x in hard.items()})
         if bp_sets:  # test curves are logged only; the body-present epoch is picked on clips_dev
             record["bp"] = {n: {k: r[k]["acc"] for k in ("picture_soft", "body", "fused_soft") if k in r} for n, r in bp_run().items()}
             if record["bp"]["clips_dev"][bp_key] > best_bp:
@@ -420,15 +460,22 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         if body != "none":
             ps, pt, win = _pair_meta(test_rows, real, lut, window)
             eval_data = BodyData(real, ps, pt, win, None, None, None, None, device, learner["window_s"], 0.0, 0.0)
-        if held_ds is not None:
+        if held_ds is not None and joint:
+            lay = tuple(torch.as_tensor(a, device=device) for a in _window_layout(test_rows, lut, window))
+            metrics["body_present"] = evaluate.joint_body_present_4afc(model, upstream, held_ds, eval_data, test_rows, lay, device, seed)
+        elif held_ds is not None:
             metrics["body_present"] = evaluate.body_present_4afc(model, upstream, held_ds, eval_data, test_rows, device, seed)
-    if eval_data is not None and len(eval_data.ps):
+    if eval_data is not None and len(eval_data.ps) and not joint:
         metrics["probe"] = evaluate.body_probe(model, eval_data, real, heldout, device)
     if split_info is not None:
         metrics["body_present_at_picture_epoch"] = split_info.pop("body_present_at_picture_epoch")
         metrics["split"] = split_info
     if body_info is not None:
         metrics["body"] = body_info
+    if joint:
+        metrics["arch"], metrics["joint"] = arch, {**model.settings, "params": model.param_counts()}
+        if epochs >= 30:
+            metrics["readout_epoch_30"] = history[29]
     if teacher is not None:
         metrics["distill"] = {"from": str(Path(distill_from).resolve()), "weight": distill_weight, "temp": distill_temp}
         if held_ds is not None:  # ORACLE DIAGNOSTIC: the teacher's own body-present numbers (hard and soft pooling)

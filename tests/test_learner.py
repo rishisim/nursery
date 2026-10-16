@@ -656,3 +656,220 @@ def test_clip_split_training_runs_and_default_is_unchanged(episodes, upstream):
         assert (run / f"clips_{body}_s3" / "model_bodypresent.pt").exists()
     with pytest.raises(ValueError, match="--split clips"):
         train_run(run, "none", 5, epochs=1, split="clips")
+
+
+# ---- joint visual-body learner (--arch joint) ----
+
+def _joint_model(store, with_body=True, seed=0):
+    import torch
+    from nursery.learner.model import JointMIL
+
+    torch.manual_seed(seed)
+    dims = {k: v.shape[-1] for k, v in store["groups"].items()} if with_body else None
+    return JointMIL(30, 8, 0.1, dims)
+
+
+def _joint_batch(store, pt=(2, 3, 10, 11, 12, 13), device="cpu"):
+    """Tiny window batch: frames at offsets -2..2, pair 0 has two padded frames; pt < 5 reach before the session."""
+    import torch
+    from nursery.learner.model import BodyData
+
+    n = len(pt)
+    data = BodyData(store, np.zeros(n, int), np.array(pt), np.zeros((n, 5), int), None, None, None, None, device, 5, 0.0, 0.0)
+    torch.manual_seed(1)
+    offset = torch.arange(-2, 3).repeat(n, 1)
+    valid = torch.ones(n, 5, dtype=torch.bool)
+    valid[0, 3:], offset[0, 3:] = False, 0
+    v, t = torch.randn(n, 85, 8), torch.randint(1, 30, (n, 4))
+    ctx = data.batch(np.arange(n), torch.Generator().manual_seed(0), training=False)
+    ctx.update(vis_offset=offset, vis_valid=valid)
+    return data, ctx, v, t, torch.full((n,), 4)
+
+
+def test_joint_body_masking(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model = _joint_model(store).eval()
+    _, ctx, v, t, n = _joint_batch(store)
+    run = lambda c: model.represent(v, c["vis_offset"], c["vis_valid"], c)[0]
+    plain = model.represent(v, ctx["vis_offset"], ctx["vis_valid"])[0]
+    keep = model.body_keep(ctx)
+    assert (ctx["seg"] == -2).any() and (ctx["seg"] != ctx["seg"][:, 5:6]).any() and not keep.all()
+    assert (ctx["seg"][keep] == ctx["seg"][:, 5:6].expand_as(ctx["seg"])[keep]).all()
+    # dropped body = no body tokens (mixed batch: only the dropped pairs match the control)
+    dropped = run(dict(ctx, keep=torch.zeros(6)))
+    assert torch.allclose(dropped, plain, atol=1e-6)
+    mixed = run(dict(ctx, keep=torch.tensor([1., 0, 1, 0, 1, 0])))
+    assert torch.allclose(mixed[1::2], plain[1::2], atol=1e-6) and not torch.allclose(mixed[::2], plain[::2], atol=1e-4)
+    # inputs of dropped pairs, other clips and missing steps do not matter; a kept same-clip step does
+    noise = {k: g + torch.randn_like(g) for k, g in ctx["groups"].items()}
+    base = run(ctx)
+    masked = (~keep).unsqueeze(-1)
+    other = dict(ctx, groups={k: torch.where(masked, noise[k], g) for k, g in ctx["groups"].items()})
+    assert torch.allclose(run(other), base, atol=1e-5)
+    off = torch.tensor([1., 0, 1, 0, 1, 0])
+    a, b = dict(ctx, keep=off), dict(ctx, keep=off, groups=noise)
+    assert torch.allclose(run(a)[1::2], run(b)[1::2], atol=1e-6)
+    centre = {k: g.clone() for k, g in ctx["groups"].items()}
+    centre["arm"][:, 5] += 5.0
+    assert not torch.allclose(run(dict(ctx, groups=centre)), base, atol=1e-4)
+    # padded visual frames are ignored too
+    junk = v.clone()
+    junk[0, 51:] = 7.0
+    assert torch.allclose(model.represent(junk, ctx["vis_offset"], ctx["vis_valid"], ctx)[0][0, :51], base[0, :51], atol=1e-5)
+
+
+def test_joint_gradients_reach_every_module(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model = _joint_model(store)
+    _, ctx, v, t, n = _joint_batch(store)
+    ctx["keep"] = torch.ones(6)
+    assert not v.requires_grad
+    model.losses(v, t, n, torch.ones(6), ctx)["match"].backward()
+    live = lambda params: any(p.grad is not None and p.grad.abs().sum() > 0 for p in params)
+    assert live([model.vproj[2].weight]) and live(model.word.parameters()) and live([model.logit_scale])
+    assert live([model.modality]) and live([model.position]) and live(model.final_norm.parameters())
+    for layer in model.transformer.layers:
+        for part in (layer.self_attn, layer.linear1, layer.linear2, layer.norm1, layer.norm2):
+            assert live(part.parameters())
+    assert model.modality.grad[1].abs().sum() > 0 and model.position.grad[5].abs().sum() > 0
+    for group in model.encoder.mlps:
+        assert live(model.encoder.mlps[group].parameters()), group
+    assert live(model.encoder.fwd.parameters()) and live(model.encoder.bwd.parameters()) and live(model.body_proj.parameters())
+
+
+def test_joint_matched_init(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    control, body = _joint_model(store, False), None
+    after = torch.get_rng_state()
+    body = _joint_model(store, True)
+    assert torch.equal(after, torch.get_rng_state())  # body modules leave the default RNG stream alone
+    cs, bs = control.state_dict(), body.state_dict()
+    common = [k for k in bs if not k.startswith(("encoder.", "body_proj."))]
+    assert set(common) == set(cs) and len(common) > 20
+    assert all(torch.equal(cs[k], bs[k]) for k in common)
+    counts = body.param_counts()
+    assert control.param_counts()["body_only"] == 0 and counts["common"] == control.param_counts()["total"]
+    assert counts["total"] == counts["common"] + counts["body_only"] > counts["common"]
+
+
+def test_joint_train_and_eval_scores_agree(episodes, upstream):
+    import torch
+    from nursery.learner import evaluate
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model = _joint_model(store).eval()
+    data, ctx, v, t, n = _joint_batch(store)
+    ctx["keep"] = torch.ones(6)
+    with torch.no_grad():
+        both = model.pair_scores(v, t, n, ctx)
+        pic = model.pair_scores(v, t, n, {k: x for k, x in ctx.items() if k.startswith("vis_")})
+
+    class Pairs:
+        def __len__(self):
+            return 6
+
+        def __getitem__(self, i):
+            return i, v[i], t[i], int(n[i])
+
+    layout = (ctx["vis_offset"], ctx["vis_valid"])
+    for batch in (6, 4):
+        T, R, Rb, ok = evaluate.joint_reps(model, upstream, Pairs(), data, layout, "cpu", batch)
+        assert torch.allclose(model.score(Rb, ok, T), both, atol=1e-5)
+        assert torch.allclose(model.score(R, ok, T), pic, atol=1e-5)
+    assert not torch.allclose(both, pic, atol=1e-4)
+    # padded frames get no weight: 51 valid tokens in pair 0
+    assert ok[0].sum() == 51 and ok[1:].all()
+    # single-frame probe input == a one-frame window at offset 0 with no body
+    x = torch.randn(3, 17, 8)
+    one = torch.ones(3, 1, dtype=torch.bool)
+    with torch.no_grad():
+        single = model.enc_regions(x)
+        assert torch.equal(single, model.represent(x, torch.zeros(3, 1, dtype=torch.long), one)[0])
+        vis = {"vis_offset": torch.zeros(3, 1, dtype=torch.long), "vis_valid": one}
+        probe = model.score(single, torch.ones(3, 17, dtype=torch.bool), model.enc_text(t[:3], n[:3]))
+        assert torch.allclose(probe, model.pair_scores(x, t[:3], n[:3], vis), atol=1e-6)
+    # body-present trials run on the same scores
+    manifest = pd.DataFrame({"referent": list("abcdef"), "video_id": ["v0"] * 3 + ["v1"] * 3, "held_referent": [True, False] * 3})
+    out = evaluate.joint_body_present_4afc(model, upstream, Pairs(), data, manifest, layout, "cpu", trials=True)
+    assert out["n_trials"] == 6 and set(out["trials"]) == {"picture_soft", "fused_soft"} and "body" not in out
+
+
+def test_joint_probe_reproduces_upstream_trials(episodes, upstream):
+    import torch
+    from nursery.learner import evaluate
+
+    root, run = episodes
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    region = _upstream_module("train_region_mil")
+    model = _joint_model(_store(root, clips=10), False).eval()
+    model.tau_p = 1e-4  # soft pooling ~ hard max: same trials must give the same per-category results
+    probes = pd.read_parquet(run / "probes_frames.parquet")
+    cache, lut = region.load_region_cache(run / "probes_cache")
+    vocab = {"<pad>": 0, **{c: i + 1 for i, c in enumerate(("mug", "bowl", "apple", "banana"))}}
+    table = probes[probes.split == "dev"]
+    acc, detail = evaluate.probe_4afc_soft(model, region, cache, lut, table, vocab, "cpu")
+    ref_acc, ref = region.eval_4afc_region(model, cache, lut, table, vocab, "cpu", return_detail=True)
+    assert detail == ref and acc == ref_acc
+
+
+def test_joint_body_tokens_never_cross_clips_or_partitions(episodes):
+    from nursery.learner import body
+    from nursery.learner.model import BodyData
+    from nursery.learner.train import clip_partition
+
+    root, _ = episodes
+    frames = _clip_frames(root)
+    _write_body(root)
+    store = body.load_store(root, frames, ["v0", "v1"], set())
+    part, _ = clip_partition(frames, "s2", {"dev": 0.15, "test": 0.15, "seed": 0})
+    model = _joint_model(store)
+    pt = np.arange(1, 119)
+    data = BodyData(store, np.zeros(len(pt), int), pt, np.zeros((len(pt), 5), int), None, None, None, None, "cpu", 5, 0.0, 0.0)
+    import torch
+    ctx = data.batch(np.arange(len(pt)), torch.Generator().manual_seed(0), training=False)
+    keep = model.body_keep(ctx).numpy()
+    steps = pt[:, None] + np.arange(-5, 6)
+    inside = (steps >= 0) & (steps < 120)
+    other = inside & (part["v0"][np.clip(steps, 0, 119)] != part["v0"][pt][:, None])
+    assert other.any() and keep.any() and not (keep & other).any()
+    clip = store["clip"][0][np.clip(steps, 0, 119)]
+    assert not (keep & (clip != store["clip"][0][pt][:, None])).any()
+
+
+def test_joint_training_runs_and_rejections(episodes, upstream):
+    from nursery.learner.train import train_run
+
+    root, run = episodes
+    _clip_frames(root)
+    _write_body(root)
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    common = dict(epochs=2, pool="soft", heldout_subject="s2", split="clips", arch="joint")
+    counts = {}
+    for body in ("real", "none"):
+        m = train_run(run, "none", 3, name=f"joint_{body}", body=body, **common)
+        assert m["arch"] == "joint" and m["joint"]["layers"] == 2 and "readout_epoch_30" not in m
+        counts[body] = m["joint"]["params"]
+        assert {"hard_dev", "hard_test", "dev", "acc"} <= set(m["history"][0])
+        bp = m["history"][0]["bp"]["clips_dev"]
+        assert set(bp) == ({"picture_soft", "fused_soft"} if body == "real" else {"picture_soft"})
+        assert "body" not in m["body_present_selected"]["clips_dev"] and "probe" not in m
+        assert m["selection_body_present"]["rule"] == ("clips_dev fused_soft" if body == "real" else "clips_dev picture_soft")
+    assert counts["none"]["common"] == counts["real"]["common"] and counts["none"]["body_only"] == 0 < counts["real"]["body_only"]
+    m = train_run(run, "none", 3, name="joint_subject", epochs=1, pool="soft", heldout_subject="s2", arch="joint", body="real")
+    assert "split" not in m and m["body_present"]["n_trials"] >= 8
+    for bad, match in (({"pool": "max"}, "--arch joint"), ({"body": "shuffled"}, "--arch joint"), ({"episodes": "contact"}, "--arch joint"),
+                       ({"labels": True}, "--arch joint"), ({"weights": {"pred": 0.5}}, "auxiliary")):
+        with pytest.raises(ValueError, match=match):
+            train_run(run, "none", 5, **{**dict(epochs=1, pool="soft", arch="joint"), **bad})

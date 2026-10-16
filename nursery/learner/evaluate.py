@@ -79,6 +79,112 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
 
 
 @torch.no_grad()
+def joint_reps(model, upstream, ds, data, layout, device, batch=256):
+    """Joint model over every pair of `ds`: word vectors T [N,D], visual-token outputs without a body R and (with `data`,
+    a BodyData over the same rows) with the pair's own body Rb, and token validity [N,F*17]. `layout` = (offset, valid)
+    [N,F] of the image windows."""
+    model.eval()
+    offset, valid = layout
+    generator = torch.Generator().manual_seed(0)
+    T, R, Rb, ok = [], [], [], []
+    for start in range(0, len(ds), batch):
+        rows = list(range(start, min(start + batch, len(ds))))
+        _, v, t, n = upstream.collate([ds[i] for i in rows])
+        v, ix = v.to(device), torch.as_tensor(rows, device=device)
+        T.append(model.enc_text(t.to(device), n.to(device)))
+        r, o = model.represent(v, offset[ix], valid[ix])
+        R.append(r), ok.append(o)
+        if data is not None:
+            Rb.append(model.represent(v, offset[ix], valid[ix], data.batch(np.array(rows), generator, training=False))[0])
+    return torch.cat(T), torch.cat(R), (torch.cat(Rb) if Rb else None), torch.cat(ok)
+
+
+@torch.no_grad()
+def joint_body_present_4afc(model, upstream, ds, data, manifest, layout, device, seed=0, batch=256, subject=None, trials=False):
+    """`body_present_4afc` for the joint model, same trial sampling. `picture_soft`: each candidate's window scored with
+    no body tokens; `fused_soft` (body model): with the candidate's own body tokens. Both use `model.score`, the
+    training score. No body-only score exists for this model."""
+    T, R, Rb, ok = joint_reps(model, upstream, ds, data, layout, device, batch)
+    rng = np.random.default_rng(seed)
+    referent = manifest.referent.to_numpy()
+    video = manifest.video_id.to_numpy()
+    held_all = manifest.held_referent.to_numpy().astype(bool)
+    held, rows_used = [], []
+    correct = {"picture_soft": [], "fused_soft": []}
+    for i in range(len(manifest)):
+        same = np.ones(len(referent), bool) if subject is None else subject == subject[i]
+        pool = np.flatnonzero((referent != referent[i]) & (video != video[i]) & same)
+        if len(pool) < 3:
+            pool = np.flatnonzero((referent != referent[i]) & same)
+        if len(pool) < 3:
+            continue
+        held.append(held_all[i])
+        rows_used.append(i)
+        cand = np.concatenate([[i], rng.choice(pool, 3, replace=False)])
+        scores = {"picture_soft": model.score(R[cand], ok[cand], T[i:i + 1]).squeeze(1)}
+        if Rb is not None:
+            scores["fused_soft"] = model.score(Rb[cand], ok[cand], T[i:i + 1]).squeeze(1)
+        for k, s in scores.items():
+            correct[k].append(float(s.argmax() == 0))
+    held = np.array(held, bool)
+    out = {"n_trials": len(correct["picture_soft"]), "chance": 0.25}
+    for k, c in correct.items():
+        if c:
+            c = np.array(c)
+            out[k] = {"acc": round(100 * float(c.mean()), 3), "acc_held": round(100 * float(c[held].mean()), 3) if held.any() else None,
+                      "acc_not_held": round(100 * float(c[~held].mean()), 3) if (~held).any() else None}
+    if trials:
+        out["trial_rows"] = rows_used
+        out["trials"] = {k: [int(x) for x in c] for k, c in correct.items() if c}
+    return out
+
+
+@torch.no_grad()
+def probe_4afc_soft(model, region, emb, lut, ev, vocab, dev, n_trials=100, seed=0, max_len=16):
+    """Upstream `eval_4afc_region` (same rng, candidate draws, OOV at chance, `per_cat`) scoring each candidate frame
+    with the model's soft `score` (single frame, no body) instead of the hard max over regions."""
+    was_training = model.training
+    model.eval()
+    rng = np.random.default_rng(seed)
+    pools, cat_ids, oov = {}, {}, []
+    for cat, g in ev.groupby("category"):
+        ids = region.encode(cat, vocab, max_len)
+        rows = [lut[region.frame_key(v, f)] for v, f in zip(g.video_id, g.frame_idx) if region.frame_key(v, f) in lut]
+        if len(rows) < 4:
+            continue
+        if ids:
+            pools[cat], cat_ids[cat] = rows, ids
+        else:
+            oov.append(cat)
+    cats = sorted(pools)
+    if len(cats) < 4:
+        model.train(was_training)
+        return float("nan"), {}
+    all_rows = sorted({r for rs in pools.values() for r in rs})
+    V = torch.from_numpy(np.asarray(emb[all_rows], dtype=np.float32)).to(dev)
+    Rp = model.enc_regions(V)
+    r2i = {r: i for i, r in enumerate(all_rows)}
+    valid = torch.ones(4, Rp.shape[1], dtype=torch.bool, device=dev)
+    accs = []
+    for cat in cats:
+        toks = cat_ids[cat]
+        t = torch.zeros(1, max_len, dtype=torch.long, device=dev)
+        t[0, :len(toks)] = torch.tensor(toks, device=dev)
+        tv = model.enc_text(t, torch.tensor([len(toks)], device=dev))
+        others = [c for c in cats if c != cat]
+        correct = 0
+        for _ in range(n_trials):
+            cand = [rng.choice(pools[cat])] + [rng.choice(pools[c]) for c in rng.choice(others, 3, replace=False)]
+            correct += model.score(Rp[[r2i[r] for r in cand]], valid, tv).squeeze(1).argmax().item() == 0
+        accs.append(correct / n_trials)
+    model.train(was_training)
+    per_cat = dict(zip(cats, accs))
+    per_cat.update({c: 0.25 for c in oov})
+    return float(np.mean(list(per_cat.values()))), {"per_cat": per_cat, "n_scored": len(cats), "n_oov": len(oov),
+                                                   "n_total": len(cats) + len(oov)}
+
+
+@torch.no_grad()
 def distill_agreement(student, teacher, upstream, ds, tdata, device, temp, seed=0, batch=128):
     """Student (picture only) vs teacher (picture + oracle body) on the training score matrix, over fixed random
     batches of `ds` pairs (candidate words are the batch's, as in training). Image -> words direction:

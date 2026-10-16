@@ -119,6 +119,30 @@ epoch is selected on `clips_dev` (`fused_soft`, or `picture_soft` for `--body no
 `model.pt` stays the picture-dev epoch. Metrics: `split`, `selection_body_present`, `body_present_selected`,
 `body_present_at_picture_epoch` (with per-trial 0/1 for paired bootstrap).
 
+## Joint learner (`--arch joint`)
+
+Default `--arch additive` is the path above, unchanged. `joint` needs `--pool soft`, `--body none|real`, `--episodes none`,
+no `--distill-from`/`--labels`; every auxiliary loss is off (a positive `--w-*` is an error). Works with both splits.
+Model `JointMIL` (subclass of upstream `RegionMIL`, width 128); the transformer settings are bounded pilot settings.
+
+- Tokens: the window's frames x 17 regions, `vproj(v - center_mu)` (768 -> 128), and with `--body real` all 11 states of the
+  body encoder (unchanged) through a Linear(128, 128). Learned modality embedding (visual / body) plus a learned
+  temporal embedding shared by both (11 rows, seconds from the pair's centre frame; visual frames use their true offset).
+- Transformer: shared, 2 layers, 4 heads, feed-forward 512, dropout 0 (so body tokens never change RNG use), pre-norm,
+  final LayerNorm. Only the contextualised visual tokens (unit norm) are kept.
+- Masks: repeated padding frames are masked. Body tokens are masked when the pair's body is dropped (p = 0.5 in training),
+  the step is missing or outside the session, or the step is in another clip than the centre (so under `--split clips`
+  no other partition reaches the tokens).
+- Score (`JointMIL.score`, used by training and every evaluation): soft-MIL at tau_p over valid visual tokens, uniform
+  prior, against the word vectors. No body-word term, no beta. Loss: the usual weighted symmetric InfoNCE.
+- Control: the same model with no body modules. Common parameters get the same init as the body run for the same seed;
+  body-only modules are built in a forked RNG, so the default stream and data order match.
+- Evaluation: picture probe uses upstream's exact trials scored with `score` (single frame, no body); upstream's hard-max
+  numbers are logged as `hard_dev/hard_test/hard_konkle`. Body-present 4AFC: `picture_soft` = no body tokens,
+  `fused_soft` = the candidate's own body tokens (no `body` score). Epoch selection rules are unchanged.
+- Metrics: `arch`, `joint` (settings, parameter counts total/common/body_only), `readout_epoch_30` (history record of
+  epoch 30 when epochs >= 30). No `body_probe`.
+
 ## Direct-label check (LABEL DIAGNOSTIC)
 
 Flag: `--labels` (picture-only, `--pool soft`, no `--body`/`--distill-from`). Off by default.
