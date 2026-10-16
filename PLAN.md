@@ -256,6 +256,23 @@ a higher eventual plateau.
      - Promising = at least +2.0 points on clips_test. Then one
        episode-shuffled-body run (shuffle within partitions), then matched
        seeds. Beating only the old linear baseline does not count.
+   - 4.9 result (commit 89f619df, seed 0, 60 epochs): no body gain, and the
+     joint architecture itself is far below the old linear model.
+     - Body-present (clips_dev epochs 12 body, 8 control), body fused_soft
+       minus control picture_soft: clips_test -0.8 [-5.1, +3.4], s8 +0.3
+       [-2.8, +3.4], dev -0.2. Held-referent clips_test 49.0 vs 45.5,
+       non-held 30.3 vs 33.0. Dev gap never reaches +2.0 (max +0.7).
+     - Absolute level: control 36.9 on clips_test vs 48.3 for the old linear
+       control; picture-only rendered/Konkle 46.2/41.8 (body 47.1/42.4) vs
+       69.7/62.6.
+     - Epoch-30 readout: same picture (46.8/40.7 vs 45.2/41.6); clips_test
+       body-present 35.2 vs 32.6.
+     - Cause: memorization. Train loss falls to 2.0 (linear: 4.6); dev peaks
+       at epochs 8-22 and then declines. The body is not the bottleneck
+       here; the shared encoder overfits both conditions alike.
+     - Not promising: no shuffled-body run, no seeds. The joint control must
+       first come near the linear control before the body comparison means
+       anything.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
