@@ -151,6 +151,18 @@ a higher eventual plateau.
      - Next (one change): a body-only word-matching loss on the same named
        pairs (weak speech, no labels). Check with the s8 body-present test
        (body-only and combined) vs the control and a shuffled body.
+   - 4.6 body-only language-loss pilot (set before running):
+     - One change vs `body_real_nopred60_s0`: add a body-only matching term,
+       weighted InfoNCE between the body latent and the word bag of every
+       training pair. Same pairs, speech and pair weights as the combined
+       loss; no filtering by held object or referent. Weight 1.0, fixed.
+     - Unchanged: architecture, combined loss, body dropout 0.5, vision-to-body
+       loss off, s8 held out, 60 epochs, epoch picked on rendered dev.
+     - Report separately: body-only, combined, picture-only (rendered, Konkle)
+       vs the matched run and the video-only control (soft scoring).
+     - Promising = combined (fused_soft) on all 705 s8 trials at least 2.0
+       points above the control's picture_soft. Then one shuffled-body run,
+       same config, before any seeds. Otherwise stop and report.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
