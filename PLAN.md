@@ -319,7 +319,7 @@ Before the final experiment (step 4):
 ## Speech coupling (step 2)
 
 From literature and the Karmazyn-Raz & Smith OSF data (12 mo, 16 dyads);
-details in `outputs/step2/speech_coupling_lit.md` (worktree):
+details in `docs/speech_coupling.md`:
 - Named object held by infant: 23% (12 mo) to ~42% (12–26 mo).
 - Handled objects named ~6× more per minute than never-handled ones.
 - ~30% of utterances name an object; ~3.6–6 names/min.

@@ -1,43 +1,21 @@
-# Nursery Embodied Scene
+# Nursery
 
-This branch contains the lightweight Nursery adapters for generating reusable
-EmbodiedGen rooms and preparing the human-motion integration boundary.
-EmbodiedGen remains the native implementation for room generation, planning,
-asset retrieval and generation, URDF export, and collision-aware placement.
+Nursery tests whether extra modalities (contact, finger pose, arm position) raise
+the language-acquisition ceiling beyond what video alone reaches. A simulator
+replays GRAB grasps as egocentric head-camera sessions, a speech generator adds
+caregiver utterances tied to what the infant does, and a learner built on the
+pinned [vlm-headcam](https://github.com/mcfrank/vlm-headcam) compares video-only
+with video + body. Plan and results: `PLAN.md`. Learner design: `docs/learner.md`.
 
-The active tracked implementation is organized as:
-
-```text
-configs/embodiedgen_scene.json
-nursery/__init__.py
-nursery/embodiedgen_scene.py
-nursery/humanoid/
-├── embodiedgen_hoidini/
-│   ├── __init__.py
-│   ├── prepare_scene.py
-│   ├── run_motion.py
-│   └── validate_motion.py
-└── hoidini_intermimic/              Conversion and execute.py simulator launcher
-nursery/simulator/, speech/, learner/   See Layout below
-```
-
-`nursery/humanoid/embodiedgen_hoidini/` deterministically prepares a complete
-EmbodiedGen layout or Nursery composed room and one selected object/support
-interaction condition. Its `run_motion` entry point aligns an explicitly supplied
-pre-contact GRAB prefix and runs one HOIDiNi interaction. The
-`hoidini_intermimic` entry point converts the saved interaction into an
-InterMimic SMPL-X motion reference for an explicitly supplied humanoid XML.
-
-Historical Nursery research that is not part of this workflow is retained
-under `archive/legacy_research/`. It is inactive on this branch and remains
-unchanged on the synthetic research branches.
+The EmbodiedGen room builder and HOIDiNi/InterMimic motion adapters
+(`nursery/embodiedgen_scene.py`, `nursery/humanoid/`) supply rooms to the
+simulator and the future physics path; their commands are below.
+Historical research is under `archive/` (inactive).
 
 Generated rooms, assets, scenes, and previews belong under the ignored
-`outputs/embodiedgen_scene/` root. The external EmbodiedGen checkout belongs
-under the ignored `.external/EmbodiedGen/` path. Local upstream humanoid
-checkouts likewise belong under `.external/HOIDiNi/`,
-`.external/InterActMove/`, `.external/InterAct/`, and `.external/InterMimic/`; they are dependencies,
-not Nursery-owned source.
+`outputs/embodiedgen_scene/` root. External checkouts (EmbodiedGen, HOIDiNi,
+InterAct, InterActMove, InterMimic, vlm-headcam) live under the ignored
+`.external/`; they are dependencies, not Nursery-owned source.
 
 ## Layout
 
@@ -68,6 +46,9 @@ learner files into the single dict stored in each run's `generator.json`.
 ## How to run
 
 Render, then speech, embed, train, summarize. Paths are relative to the repo root.
+The ignored venv `.external/cue-env/` was created with `uv venv --python 3.11 .external/cue-env`;
+use it with the upstream checkout at the commit in `nursery/learner/config.json`.
+Embedding and training pick CUDA, then Apple MPS, then CPU.
 
 ```bash
 scripts/render.sh outputs/renders/new                      # resumable; episodes land in outputs/renders/new/episodes
@@ -455,30 +436,6 @@ verified.
 On Juno, run generation and rendering commands inside an appropriate Slurm
 allocation. See the upstream [EmbodiedGen documentation](https://horizonrobotics.github.io/EmbodiedGen/docs/index.html)
 for native installation and pipeline details.
-
-## Training-only cue learner
-
-`nursery/speech/` and `nursery/learner/` adapt egocentric episodes to the pinned
-[vlm-headcam](https://github.com/mcfrank/vlm-headcam) learner, comparing contact
-cue weights with unweighted, shuffled, shifted, noisy, and oracle controls.
-Only train sessions supply speech and vocabulary; disjoint dev/test probes
-select and evaluate the model. Embedding and training select CUDA, then Apple MPS, then CPU when available.
-
-The ignored venv `.external/cue-env/` was created with `uv venv --python 3.11 .external/cue-env`.
-Use that environment with the upstream checkout at the commit in `nursery/learner/config.json`.
-
-```bash
-.external/cue-env/bin/python -m nursery.speech transcripts \
-  --episodes outputs/renders/run --output outputs/runs/run --seed 7
-.external/cue-env/bin/python -m nursery.learner embed \
-  --episodes outputs/renders/run --output outputs/runs/run \
-  --device cuda --batch 64
-.external/cue-env/bin/python -m nursery.learner train \
-  --run outputs/runs/run --condition contact --seed 7
-```
-
-Outputs must be ignored; use `--device cpu` for CPU embedding.
-Limitation: synthetic harness checks do not establish learning gains on real episodes.
 
 ## Egocentric GRAB replay
 
