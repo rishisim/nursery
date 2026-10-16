@@ -22,7 +22,8 @@
       "pred": 0.5,
       "episode": 0.0,
       "consist": 0.0,
-      "mask": 0.0
+      "mask": 0.0,
+      "bodymatch": 0.0
     }
   },
   "konkle": {

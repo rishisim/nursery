@@ -125,6 +125,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     weights = {**learner["weights"], **{k: v for k, v in (weights or {}).items() if v is not None}}
     if set(weights) != set(LOSSES) or min(weights.values()) < 0:
         raise ValueError(f"Loss weights must be non-negative: {LOSSES}")
+    if body == "none" and weights["bodymatch"] > 0:
+        raise ValueError("--w-bodymatch needs --body")
     if body == "none":
         weights = {k: 0.0 for k in LOSSES}
     if episodes == "none":

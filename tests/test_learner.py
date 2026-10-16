@@ -389,7 +389,7 @@ def test_language_loss_depends_on_body_and_reaches_every_encoder(episodes):
     v, t, n, w = _batch(model, data)
     ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0))
     ctx["keep"] = torch.ones(6)
-    weights = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0}
+    weights = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "bodymatch": 0.0}
     loss = model.forward_loss(v, t, n, w, ctx, weights)
     other = dict(ctx, groups={k: g + torch.randn_like(g) for k, g in ctx["groups"].items()})
     assert not torch.isclose(loss, model.forward_loss(v, t, n, w, other, weights))
@@ -411,7 +411,7 @@ def test_body_dropout_one_equals_video_only_and_each_loss_switches_off(episodes)
     model.eval()
     v, t, n, w = _batch(model, data)
     ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0))
-    off = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0}
+    off = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "bodymatch": 0.0}
     ctx["keep"] = torch.zeros(6)  # dropout 1.0
     baseline = model.forward_loss(v, t, n, w, None, off)
     assert torch.equal(model.forward_loss(v, t, n, w, ctx, off), baseline)
@@ -427,6 +427,26 @@ def test_body_dropout_one_equals_video_only_and_each_loss_switches_off(episodes)
     assert data.dropout == 0.0
     data.dropout = 1.0
     assert data.batch(np.arange(6), generator)["keep"].sum() == 0
+
+
+def test_bodymatch_loss_is_body_only_and_reaches_the_body_encoder(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model, data = _tiny_model(store)
+    v, t, n, w = _batch(model, data)
+    ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0))
+    ctx["keep"] = torch.zeros(6)  # dropout does not apply to the term
+    off = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "bodymatch": 0.0}
+    assert "bodymatch" not in model.losses(v, t, n, w, ctx, off)
+    term = model.losses(v, t, n, w, ctx, {**off, "bodymatch": 1.0})["bodymatch"]
+    assert torch.isfinite(term)
+    term.backward()
+    assert model.fuse.weight.grad.abs().sum() > 0
+    assert any(p.grad is not None and p.grad.abs().sum() > 0 for p in model.encoder.parameters())
+    with pytest.raises(ValueError):
+        model.losses(v, t, n, w, None, {**off, "bodymatch": 1.0})
 
 
 def _distill_pair(episodes):
@@ -465,7 +485,7 @@ def test_distillation_weight_zero_equals_the_plain_loss(episodes):
 
     teacher, student, (v, t, n, w), ctx = _distill_pair(episodes)
     target = teacher.teacher_logits(v, t, n, ctx)
-    weights = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0}
+    weights = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "bodymatch": 0.0}
     plain = student.forward_loss(v, t, n, w, None, weights)
     assert torch.equal(student.forward_loss(v, t, n, w, None, {**weights, "distill": 0.0}, target, 2.0), plain)
     assert not torch.equal(student.forward_loss(v, t, n, w, None, {**weights, "distill": 1.0}, target, 2.0), plain)

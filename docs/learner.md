@@ -88,6 +88,8 @@ Video-only (soft-MIL) vs video + body. Seed 0, same data, speech, dev selection.
   condition requires `--pool soft`.
 - Late fusion uses the picture score during training with body dropout (the pathway), instead of a
   detached test-only term.
+- `--w-bodymatch` (default 0): body-only matching, weighted InfoNCE between `fuse(latent)` cosine scores and the batch's
+  word bags, with the same pair weights as the language loss, on every pair (body dropout does not apply).
 
 ## Oracle-to-picture distillation (ORACLE DIAGNOSTIC)
 

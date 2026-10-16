@@ -11,7 +11,7 @@ import torch.nn.functional as F
 from . import _upstream_module
 from .body import N_PATCH, BodyEncoder
 
-LOSSES = ("pred", "episode", "consist", "mask")
+LOSSES = ("pred", "episode", "consist", "mask", "bodymatch")
 REGIONS = 17
 
 
@@ -249,6 +249,11 @@ def _model_class():
                 out["consist"] = self.consistency_loss(w, ctx, scale)
             if weights.get("mask", 0) > 0:
                 out["mask"] = self.mask_loss(ctx)
+            if weights.get("bodymatch", 0) > 0:
+                if self.encoder is None or ctx is None:
+                    raise ValueError("The bodymatch loss needs a body")
+                # body-only word matching on every pair of the batch (no body dropout)
+                out["bodymatch"] = weighted_nce(scale * self.body_similarity(self.latent_of(ctx), T), w)
             return {k: v for k, v in out.items() if v is not None}
 
         def forward_loss(self, v, t, n, w, ctx=None, weights=None, target=None, temp=2.0):
