@@ -171,6 +171,19 @@ a higher eventual plateau.
      - Reading: a direct word loss barely moves the body pathway, and adding
        it hurts the combined score. Unchecked: whether the body term fits on
        training subjects and fails on s8, or fails to fit at all.
+   - 4.7 in-sample fit (saved models, no training; s1-s7, 4440 trials,
+     same 4AFC and soft scoring, foils within subject; no unused clips exist):
+     - In-sample (not generalization) vs s8, all trials: control picture
+       83.7 vs 48.7; no-loss body only 57.1 vs 26.2, combined 87.5 vs 46.1;
+       body-loss body only 74.6 vs 27.9, combined 90.7 vs 43.7.
+     - Composition matches s8 (held share 0.24-0.31 vs 0.25, 73-78 words vs 77).
+     - Reading: the body pathway fits training subjects well but falls to
+       chance on a new subject. It learns subject- or clip-specific body
+       patterns, not ones shared across people.
+     - Next (one change): normalise body features per subject (label-free,
+       uses the subject's own unlabelled body data). Check first with the
+       audit's fixed probe on s8 (18% balanced); one language run only if
+       the probe rises.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
