@@ -31,10 +31,10 @@ docs/           Design notes and literature reviews
 scripts/        render.sh, pipeline.sh, train_seeds.sh, summarize.py, merge_render.py
 outputs/        Ignored data and runs
   assets/       objaverse, konkle
-  renders/      clean_856 (current dataset), patched_856 (old patched render)
+  renders/      clean_856 (current dataset)
   runs/         One directory per embedded dataset and its trained conditions
   speech_data/  osf_254yq (research use only, never commit)
-  legacy/       Earlier experiments and working directories
+  legacy/       Earlier experiments, working directories and superseded runs (patched/)
 .external/      Ignored envs (cue-env, egocentric-env) and checkouts (vlm-headcam, HOIDiNi, ...)
 ```
 
