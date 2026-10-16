@@ -109,6 +109,16 @@ Flags: `--distill-from <oracle run dir>`, `--distill-weight` (lambda, default 1)
   teacher on training pairs and on s8 named visible-referent pairs (random fixed batches of 128). s8 pairs are used
   because dev here is a picture-probe split with no teacher body.
 
+## Clip split (`--split clips`)
+
+Default `--split subject` is unchanged. `--split clips` (needs `--pool soft`; no distill/labels/shuffled/oracle) also
+holds out 15% dev / 15% test of each of s1-s7's source clips (config `body.clip_split`, seed 0; all replays of a clip
+stay together). Pairs whose image window touches another partition are dropped; body normalisation uses train frames only.
+Every epoch logs body-present 4AFC (foils from the same subject) on `clips_dev`, `clips_test` and `s8` as `bp`. A second
+epoch is selected on `clips_dev` (`fused_soft`, or `picture_soft` for `--body none`) and saved as `model_bodypresent.pt`;
+`model.pt` stays the picture-dev epoch. Metrics: `split`, `selection_body_present`, `body_present_selected`,
+`body_present_at_picture_epoch` (with per-trial 0/1 for paired bootstrap).
+
 ## Direct-label check (LABEL DIAGNOSTIC)
 
 Flag: `--labels` (picture-only, `--pool soft`, no `--body`/`--distill-from`). Off by default.

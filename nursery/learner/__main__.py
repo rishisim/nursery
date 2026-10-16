@@ -33,6 +33,7 @@ def main():
     train.add_argument("--distill-temp", type=float, default=2.0, help="Distillation temperature")
     train.add_argument("--inspect-epoch", type=int, help="Also record probe scores, word-group accuracy and teacher agreement after this many epochs")
     train.add_argument("--labels", action="store_true", help="LABEL DIAGNOSTIC: train on the word of an object visible in the frame instead of the speech (picture-only)")
+    train.add_argument("--split", choices=("subject", "clips"), default="subject", help="subject: s8 held out (default). clips: also hold out dev/test source clips of s1-s7 and select epochs on body-present dev (needs --pool soft)")
     train.add_argument("--name", help="Output directory prefix (default: the condition)")
     args = parser.parse_args()
     if args.command == "embed":
@@ -41,7 +42,7 @@ def main():
         weights = {loss: getattr(args, f"w_{loss}") for loss in LOSSES}
         train_run(args.run, args.condition, args.seed, args.epochs, args.name, args.pool, args.tau_p, args.body,
                   args.episodes, weights, args.heldout_subject, args.body_dropout, args.distill_from, args.distill_weight,
-                  args.distill_temp, args.inspect_epoch, args.labels)
+                  args.distill_temp, args.inspect_epoch, args.labels, args.split)
 
 
 if __name__ == "__main__":

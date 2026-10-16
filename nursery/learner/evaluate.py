@@ -11,7 +11,7 @@ from .model import soft_pool
 
 
 @torch.no_grad()
-def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch=256):
+def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch=256, subject=None, trials=False):
     """4AFC with the word given and four candidate situations (image window + body), held-out subject only.
 
     `manifest` holds the held-out subject's named utterances with a visible referent; `ds` is the upstream
@@ -19,7 +19,8 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
     referents. Scores per candidate: picture (hard max over the window's regions), body (fused-projection cosine to
     the word) and their sum (late fusion), plus `picture_soft` / `fused_soft`: the same with the training pooling
     (soft-MIL, uniform region prior, tau_p), which is the score the model was trained on and the one to read.
-    Foils use their own body, so the body must match the situation.
+    Foils use their own body, so the body must match the situation. `subject` [rows] restricts foils to the target's
+    subject; `trials` adds `trial_rows` (manifest row of each scored trial) and per-trial 0/1 `trials` for the soft scores.
     """
     model.eval()
     tokens, counts, regions, latents = [], [], [], []
@@ -37,16 +38,18 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
     referent = manifest.referent.to_numpy()
     video = manifest.video_id.to_numpy()
     held_all = manifest.held_referent.to_numpy().astype(bool)
-    held = []
+    held, rows_used = [], []
     correct = {"picture": [], "body": [], "fused": [], "picture_soft": [], "fused_soft": []}
     tau = getattr(model, "tau_p", None)
     for i in range(len(manifest)):
-        pool = np.flatnonzero((referent != referent[i]) & (video != video[i]))
+        same = np.ones(len(referent), bool) if subject is None else subject == subject[i]
+        pool = np.flatnonzero((referent != referent[i]) & (video != video[i]) & same)
         if len(pool) < 3:
-            pool = np.flatnonzero(referent != referent[i])
+            pool = np.flatnonzero((referent != referent[i]) & same)
         if len(pool) < 3:
             continue
         held.append(held_all[i])
+        rows_used.append(i)
         cand = np.concatenate([[i], rng.choice(pool, 3, replace=False)])
         pic = (R[cand].float() @ T[i]).max(1).values
         scores = {"picture": pic}
@@ -69,6 +72,9 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
                       "acc_not_held": round(100 * float(c[~held].mean()), 3) if (~held).any() else None}
     if Z is not None:
         out["beta"] = round(float(model.beta), 4)
+    if trials:
+        out["trial_rows"] = rows_used
+        out["trials"] = {k: [int(x) for x in correct[k]] for k in ("picture_soft", "fused_soft") if correct[k]}
     return out
 
 

@@ -604,3 +604,55 @@ def test_label_training_runs_and_reports_fit(episodes, upstream):
 
 def test_upstream_checkout_is_unmodified(upstream):
     assert subprocess.run(["git", "-C", str(UPSTREAM), "diff", "--quiet"]).returncode == 0
+
+
+def _clip_frames(root):
+    frames = pd.read_parquet(root / "frames.parquet")
+    frames["clip"] = [f"{s}/c{f // 10}" for s, f in zip(frames.subject, frames.frame_idx)]
+    frames.to_parquet(root / "frames.parquet")
+    return frames
+
+
+def test_clip_partition_is_deterministic_and_never_splits_clips(episodes):
+    from nursery.learner.train import clip_partition, split_pairs
+
+    root, _ = episodes
+    frames = _clip_frames(root)
+    cfg = {"dev": 0.15, "test": 0.15, "seed": 0}
+    part, counts = clip_partition(frames, "s2", cfg)
+    again, _ = clip_partition(frames, "s2", cfg)
+    assert all((part[v] == again[v]).all() for v in part)
+    assert counts["s1"] == {"train": 8, "dev": 2, "test": 2} and "s2" not in counts
+    seen = {}
+    for v, g in frames[frames.subject == "s1"].groupby("video_id"):
+        for clip, f in zip(g["clip"], g.frame_idx):
+            assert seen.setdefault(clip, part[v][f]) == part[v][f]
+    assert set(seen.values()) == {0, 1, 2}
+    pairs = pd.DataFrame({"video_id": "v0", "frame_idx": np.arange(120)})
+    out = split_pairs(pairs, part, 2)
+    for i in np.flatnonzero(out >= 0):
+        win = part["v0"][max(i - 2, 0):i + 3]
+        assert (win == out[i]).all()
+    assert (out < 0).any() and (out >= 0).sum() > 60
+
+
+def test_clip_split_training_runs_and_default_is_unchanged(episodes, upstream):
+    from nursery.learner.train import train_run
+
+    root, run = episodes
+    _clip_frames(root)
+    _write_body(root)
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    common = dict(epochs=2, pool="soft", heldout_subject="s2")
+    base = train_run(run, "none", 3, name="base", body="real", **common)
+    assert "split" not in base and "bp" not in base["history"][0]
+    for body in ("real", "none"):
+        m = train_run(run, "none", 3, name=f"clips_{body}", body=body, split="clips", **common)
+        assert m["split"]["mode"] == "clips" and m["n_pairs"] < base["n_pairs"] and m["split"]["n_dropped_crossing"] > 0
+        assert set(m["history"][0]["bp"]) == {"clips_dev", "clips_test", "s8"}
+        assert m["body_present_selected"]["clips_dev"]["n_trials"] == len(m["body_present_selected"]["clips_dev"]["trials"]["picture_soft"])
+        assert m["selection_body_present"]["epoch"] in (0, 1)
+        assert (run / f"clips_{body}_s3" / "model_bodypresent.pt").exists()
+    with pytest.raises(ValueError, match="--split clips"):
+        train_run(run, "none", 5, epochs=1, split="clips")

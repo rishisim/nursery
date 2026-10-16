@@ -184,6 +184,38 @@ a higher eventual plateau.
        uses the subject's own unlabelled body data). Check first with the
        audit's fixed probe on s8 (18% balanced); one language run only if
        the probe rises.
+     - Superseded by 4.8: s1-s7 vs s8 changes two things at once (new
+       person and unseen clips). Subject normalisation is deferred until
+       the split below says which one fails.
+   - 4.8 generalization split (set before running; one cycle, then decide):
+     - New partition: in each of s1-s7, GRAB source clips assigned at
+       random (seed 0) to train 70% / dev 15% / test 15%. All replays of a
+       clip stay in one partition. Pairs whose image window (+-2 s) touches
+       another partition are dropped; the body window already stays inside
+       one clip. Body normalisation stats from train frames only. s8 stays
+       fully held out as the cross-person test. Report word coverage per
+       split.
+     - Body-present 4AFC on each split: foils from the same subject and
+       split, other referent, other session. A body-present dev curve is
+       logged every epoch; test curves are logged but never used to select.
+     - Two epochs selected per run, by rules fixed now: picture-only = best
+       rendered dev (as before); body-present = best body-present dev
+       (fused_soft for body runs, picture_soft for video-only). Each outcome
+       is reported at its own epoch.
+     - Matched pair, seed 0, 60 epochs, same data and speech: video-only
+       (soft pooling) and real body (vision-to-body loss off, no body-only
+       loss, dropout 0.5).
+     - Gain = body fused_soft minus video-only picture_soft, same trials,
+       paired bootstrap 95% CI. Promising = at least +2.0 points.
+     - Decision:
+       - Gain on familiar-subject test, none on s8 -> subject calibration
+         or invariance is next.
+       - No gain on familiar-subject test -> episode memorization, speech
+         alignment and representation learning are next, not subject
+         normalisation.
+       - Dev gap reaches +2.0 at some epoch but is below +1.0 at the final
+         epoch -> modality-specific overfitting and checkpoint/loss control
+         are next.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data

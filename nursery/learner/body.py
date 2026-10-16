@@ -174,10 +174,11 @@ def temporal_blocks(clip, lengths, rng, min_len=2, first_id=0):
     return out
 
 
-def load_store(episodes, frames, video_ids, heldout_videos, steps=120):
+def load_store(episodes, frames, video_ids, heldout_videos, steps=120, exclude=None):
     """Per-session body arrays [S,steps,...] indexed by frame_idx, normalised on sessions not in `heldout_videos`.
 
     heldout_videos: video ids whose sessions are excluded from the normalisation fit (the held-out subject).
+    exclude: optional bool [S,steps] of further seconds kept out of the fit (dev/test clips).
     Groups (encoder inputs): contact [22], fingers [90], arm [27] = positions 12 + 1-step differences 12 +
     gravity 3. Differences are zero at the first second of a clip. `present` [S,T] marks seconds that exist.
     """
@@ -202,6 +203,8 @@ def load_store(episodes, frames, video_ids, heldout_videos, steps=120):
     diff[first | ~present] = 0
     arm = np.concatenate([pos, diff, raw["arm"][..., 12:]], -1)
     train = ~np.isin(video_ids, list(heldout_videos))[:, None] & present
+    if exclude is not None:
+        train &= ~exclude
     stats = {}
     for key, value in (("fingers", raw["fingers"]), ("arm", arm), ("aperture", raw["aperture"])):
         stats[key] = (value[train].mean(0), value[train].std(0) + 1e-6)

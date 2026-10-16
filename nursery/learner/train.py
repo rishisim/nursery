@@ -55,6 +55,43 @@ def _pair_meta(manifest, store, lut, window):
     return ps, pt, frames
 
 
+def clip_partition(frames, heldout, cfg, steps=120):
+    """Per-session partition of every second: 0 train, 1 dev, 2 test, -1 no frame. Within each subject (the held-out one
+    stays all-train, unused) the sorted unique source clips are assigned at random by clip count; all replays of a
+    clip share a partition. Seconds without a clip count as train. Also returns the clip counts per subject."""
+    part = {}
+    for v, g in frames.groupby("video_id"):
+        part[v] = np.full(steps, -1, np.int64)
+        part[v][g.frame_idx.to_numpy()] = 0
+    rng = np.random.default_rng(cfg["seed"])
+    counts = {}
+    for subject, g in frames.groupby("subject"):
+        if subject == heldout:
+            continue
+        g = g[g["clip"].map(lambda c: isinstance(c, str) and c != "")]
+        clips = sorted(g["clip"].unique())
+        n_dev, n_test = round(cfg["dev"] * len(clips)), round(cfg["test"] * len(clips))
+        order = rng.permutation(len(clips))
+        label = np.zeros(len(clips), np.int64)
+        label[order[:n_dev]], label[order[n_dev:n_dev + n_test]] = 1, 2
+        lab = dict(zip(clips, label))
+        for v, gv in g.groupby("video_id"):
+            part[v][gv.frame_idx.to_numpy()] = gv["clip"].map(lab).to_numpy()
+        counts[subject] = {n: int((label == k).sum()) for k, n in enumerate(("train", "dev", "test"))}
+    return part, counts
+
+
+def split_pairs(manifest, part, window):
+    """Partition of each pair = that of its centre frame; -1 if its image window (frames that exist) touches another one."""
+    out = np.zeros(len(manifest), np.int64)
+    for i, (v, f) in enumerate(zip(manifest.video_id, manifest.frame_idx.astype(int))):
+        a = part[v]
+        c = max(int(a[f]), 0)
+        win = a[max(f - window, 0):f + window + 1]
+        out[i] = c if (win[win >= 0] == c).all() else -1
+    return out
+
+
 def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_root, lut, window, learner, device, tau_p):
     """Frozen oracle learner from a finished run directory, and its oracle-body data over `manifest`.
     Refuses a teacher whose vocabulary, pooling or body mode differs from this run's."""
@@ -90,7 +127,7 @@ def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_r
 
 def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.1, body="none", episodes="none",
               weights=None, heldout_subject=None, body_dropout=None, distill_from=None, distill_weight=1.0,
-              distill_temp=2.0, inspect_epoch=None, labels=False):
+              distill_temp=2.0, inspect_epoch=None, labels=False, split="subject"):
     import torch
 
     from . import body as bodylib
@@ -120,6 +157,11 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         raise ValueError("--distill-from needs a picture-only student: --body none --pool soft")
     if labels and (body != "none" or distill_from or pool != "soft"):
         raise ValueError("--labels is a picture-only soft-pooling diagnostic: use --pool soft, no --body or --distill-from")
+    if split not in ("subject", "clips"):
+        raise ValueError("--split must be subject or clips")
+    if split == "clips" and (pool != "soft" or body in ("shuffled", "oracle") or distill_from or labels):
+        raise ValueError("--split clips needs --pool soft, --body none or real, and no --distill-from or --labels")
+    by_clips = split == "clips"  # `split` is reused as a loop name below
     if distill_weight < 0 or distill_temp <= 0:
         raise ValueError("--distill-weight must be non-negative and --distill-temp positive")
     weights = {**learner["weights"], **{k: v for k, v in (weights or {}).items() if v is not None}}
@@ -153,6 +195,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     label_info = None
     if labels:  # LABEL DIAGNOSTIC: replace the speech by the word of one object visible in the frame
         manifest, label_info = evaluate.label_manifest(manifest, episode_root, seed)
+    clip_cfg = learner["clip_split"]
     caches, lut = upstream.load_multi([run / "train_cache"])
     emb_dim = caches[0].shape[-1]
     if caches[0].ndim != 3 or caches[0].shape[1] != 17:
@@ -162,6 +205,17 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     manifest = manifest[kept].reset_index(drop=True)
     if any(region.frame_key(r.video_id, r.frame_idx) not in lut for r in manifest.itertuples()):
         raise ValueError("Training cache does not cover the manifest")
+    all_manifest = manifest  # every s1-s7 pair; the body store covers all of them
+    split_info = part = None
+    if by_clips:
+        part, clip_counts = clip_partition(pd.read_parquet(episode_root / "frames.parquet"), heldout, clip_cfg)
+        pair_part = split_pairs(manifest, part, settings["window"])
+        subjects = manifest.video_id.map(subject_of).to_numpy()
+        names = ("train", "dev", "test")
+        split_info = {"mode": "clips", "dev": clip_cfg["dev"], "test": clip_cfg["test"], "seed": clip_cfg["seed"],
+                      "clips": clip_counts, "n_dropped_crossing": int((pair_part < 0).sum()),
+                      "pairs": {s: {n: int(((subjects == s) & (pair_part == k)).sum()) for k, n in enumerate(names)} for s in clip_counts}}
+        manifest = manifest[pair_part == 0].reset_index(drop=True)
     ds = upstream.FramePairs(caches, lut, manifest, vocab, settings["window"], False)
     if len(ds) < 2 or ds.n_noframe or ds.n_novocab:
         raise ValueError("Need at least two fully cached, vocabulary-bearing training pairs")
@@ -179,9 +233,10 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         model = LearnerMIL(len(vocab), emb_dim, tau_p) if pool == "soft" else upstream.RegionMIL(len(vocab), emb_dim=emb_dim)
     else:
         frames = pd.read_parquet(episode_root / "frames.parquet")
-        video_ids = sorted(set(manifest.video_id) | set(heldout_manifest.video_id))
+        video_ids = sorted(set(all_manifest.video_id) | set(heldout_manifest.video_id))
         heldout_videos = set(heldout_manifest.video_id)
-        real = bodylib.load_store(episode_root, frames, video_ids, heldout_videos)
+        exclude = np.array([np.isin(part[v], (1, 2)) for v in video_ids]) if part else None  # dev/test clips stay out of the stats
+        real = bodylib.load_store(episode_root, frames, video_ids, heldout_videos, exclude=exclude)
         real["subject"] = np.array([subject_of[v] for v in video_ids])
         shuffle_info = None
         train_store = real
@@ -243,6 +298,30 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         if len(test_rows) >= 8:
             held_ds = upstream.FramePairs(caches, lut, test_rows, vocab, window, False)
     teacher_held = make_data(test_rows) if teacher is not None and held_ds is not None else None
+    bp_sets = {}
+    if by_clips:  # body-present 4AFC sets: named, visible-referent pairs of each held-out partition (+ s8)
+        def make_set(rows):
+            rows = rows[rows.named.astype(bool) & rows.referent_visible.astype(bool)].reset_index(drop=True)
+            if len(rows) < 8:
+                raise ValueError("Too few body-present trials in a split")
+            ps, pt, win = _pair_meta(rows, real, lut, window) if body != "none" else (None,) * 3
+            edata = BodyData(real, ps, pt, win, None, None, None, None, device, learner["window_s"], 0.0, 0.0) if body != "none" else None
+            return upstream.FramePairs(caches, lut, rows, vocab, window, False), edata, rows, rows.video_id.map(subject_of).to_numpy()
+
+        for k, n in ((1, "clips_dev"), (2, "clips_test")):
+            bp_sets[n] = make_set(all_manifest[pair_part == k])
+        if held_ds is not None:
+            bp_sets["s8"] = make_set(test_rows)
+        held_words = set(pd.read_parquet(episode_root / "frames.parquet", columns=["held_category"]).held_category.dropna())
+        train_rows = manifest[manifest.named.astype(bool) & manifest.referent_visible.astype(bool)]
+        words = {"train": set(train_rows.referent), **{n: set(v[2].referent) for n, v in bp_sets.items()}}
+        split_info["trials"] = {n: {s: int((v[3] == s).sum()) for s in sorted(set(v[3]))} for n, v in bp_sets.items()}
+        split_info["coverage"] = {n: {"n_words": len(w), "words": sorted(w), "held_missing": sorted(held_words - w)} for n, w in words.items()}
+
+    def bp_run(trials=False):
+        return {n: evaluate.body_present_4afc(model, upstream, d, e, r, device, seed, subject=subj, trials=trials)
+                for n, (d, e, r, subj) in bp_sets.items()}
+
     checkpoints = {}
 
     def checkpoint(ep, scores, details):
@@ -258,6 +337,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     soft = pool == "soft"
     lw = {**weights, "distill": distill_weight}
     history, best_sel, best_state, best_ep, best_details = [], -1.0, None, -1, None
+    best_bp, best_bp_state, best_bp_ep = -1.0, None, -1
+    bp_key = "fused_soft" if body != "none" else "picture_soft"
     mask_generator = torch.Generator().manual_seed(seed + 1000)  # keeps the default RNG stream identical to video-only
     for epoch in range(epochs):
         model.train()
@@ -298,6 +379,11 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
                   "train_loss": float(np.mean(losses))}
         if konkle is not None:
             record["konkle"] = round(scores["konkle"], 4)
+        if bp_sets:  # test curves are logged only; the body-present epoch is picked on clips_dev
+            record["bp"] = {n: {k: r[k]["acc"] for k in ("picture_soft", "body", "fused_soft") if k in r} for n, r in bp_run().items()}
+            if record["bp"]["clips_dev"][bp_key] > best_bp:
+                best_bp, best_bp_ep = record["bp"]["clips_dev"][bp_key], epoch
+                best_bp_state = {k: value.detach().cpu().clone() for k, value in model.state_dict().items()}
         if terms_sum:
             record["losses"] = {k: round(float(np.mean(x)), 5) for k, x in terms_sum.items()}
         history.append(record)
@@ -305,6 +391,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         if inspect_epoch == epoch + 1:
             checkpoints[f"epoch_{inspect_epoch}"] = checkpoint(epoch, scores, details)
     model.load_state_dict(best_state)
+    if bp_sets:
+        split_info["body_present_at_picture_epoch"] = bp_run(trials=True)
     if teacher is not None or inspect_epoch:
         checkpoints["selected"] = checkpoint(best_ep, {k: history[best_ep][k2] for k, k2 in (("dev", "dev"), ("test", "acc"), ("konkle", "konkle")) if k2 in history[best_ep]}, best_details)
     metrics = {
@@ -336,6 +424,9 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
             metrics["body_present"] = evaluate.body_present_4afc(model, upstream, held_ds, eval_data, test_rows, device, seed)
     if eval_data is not None and len(eval_data.ps):
         metrics["probe"] = evaluate.body_probe(model, eval_data, real, heldout, device)
+    if split_info is not None:
+        metrics["body_present_at_picture_epoch"] = split_info.pop("body_present_at_picture_epoch")
+        metrics["split"] = split_info
     if body_info is not None:
         metrics["body"] = body_info
     if teacher is not None:
@@ -348,6 +439,11 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         metrics["checkpoints"] = checkpoints
     metrics["groups"] = _groups(best_details)
     torch.save(model.state_dict(), output / "model.pt")
+    if bp_sets:  # the body-present-selected state is evaluated last and saved beside the picture-selected one
+        model.load_state_dict(best_bp_state)
+        metrics["selection_body_present"] = {"epoch": best_bp_ep, "dev_score": best_bp, "rule": f"clips_dev {bp_key}"}
+        metrics["body_present_selected"] = bp_run(trials=True)
+        torch.save(model.state_dict(), output / "model_bodypresent.pt")
     (output / "vocab.json").write_text(json.dumps(vocab, indent=2) + "\n")
     text = json.dumps(_finite(metrics), indent=2, allow_nan=False)
     (output / "metrics.json").write_text(text + "\n")
