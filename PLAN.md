@@ -216,6 +216,25 @@ a higher eventual plateau.
        - Dev gap reaches +2.0 at some epoch but is below +1.0 at the final
          epoch -> modality-specific overfitting and checkpoint/loss control
          are next.
+   - 4.8 result (commit 84016bec, seed 0, 60 epochs): no gain, even on new
+     clips from familiar people.
+     - Split: 18,716 train pairs (vs 29,960; 5,206 dropped at partition
+       edges). 4AFC trials: dev 449, test 472, s8 705. Dev misses bulb,
+       headphones, pan; test misses ball, banana, bulb, hammer, stapler.
+     - Body-present epoch (32 body, 49 video-only), gain = body fused_soft
+       minus video-only picture_soft: familiar-subject test -2.8
+       [-6.8, +1.5], s8 -3.1 [-6.7, +0.4], dev -2.0.
+     - Body-only score on new familiar-subject clips: 29.2 (dev 31.2,
+       chance 25), vs 57.1 in-sample (4.7). The fit is lost on new clips,
+       not just on a new person.
+     - Dev gap never reaches +2.0 (max +0.7 at epoch 2; -2.7 at the end).
+       Not the early-help-then-fade pattern.
+     - Picture-only (picture epoch): 69.7 / 62.6 video-only vs 68.8 / 62.1
+       body (rendered test / Konkle). Lower than 4.1 because of the smaller
+       training set; matched across the pair.
+     - Decision (row 2): the body pathway memorizes episodes. Next work is
+       episode memorization, speech alignment and body representation
+       learning. Subject normalisation is dropped for now.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
