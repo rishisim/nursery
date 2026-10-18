@@ -377,6 +377,26 @@ a higher eventual plateau.
      - Next: one matched language run (existing linear learner, clip split)
        with real body + per-clip wrist load vs video-only, then shuffled
        load if promising.
+   - 4.12 temperature rework (set before running; gate only, per-clip
+     properties as in the decisive 4.11 control).
+     - Problem: skin dT was scaled by contact area (vertices / 100), so it
+       mostly tracked how much hand touched, not the material.
+     - Change: per hand, report the skin temperature change at the touched
+       skin, without area scaling (thermoreceptors sense local skin
+       temperature), with the same 1 s / 5 s dynamics and 0.3 C noise.
+       Report contact area as its own channel value (contacted vertices /
+       100, capped at 1), so a learner can weigh it but the temperature is
+       not multiplied by it. Zero temperature change where the hand is
+       not touching.
+     - Ceiling probe: V + material one-hot (held object's material on
+       touched seconds, else zeros). Not a sensory signal; it sizes how much
+       word information the authored material mix can give at most.
+     - Probes: V, V+T2, V+W, V+W+T2, V+Mat. Same splits, seeds, selection
+       and subsets as 4.11.
+     - Decision: same rule on clips_test. If T2 fails and V+Mat also gains
+       < 2.0, the limit is the material table (most words share plastic),
+       not the signal; stop work on temperature. If V+Mat passes and T2
+       fails, the signal still loses material information; report why.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
