@@ -325,6 +325,35 @@ a higher eventual plateau.
        signals in the simulator that pass this gate (grasps fitted to each
        mesh, wrist load from mass, thermal contact by material), each
        checked here before any language run.
+   - 4.11 wrist load and skin temperature (set before running; simulator
+     signals + 4.10 gate, no language training).
+     - Properties: `nursery/simulator/materials.json`, authored before any
+       result. Per held word, a real-world mass range and a material mix.
+       Each instance (or native GRAB object) draws one material and a
+       log-uniform mass, seeded by its id. Values vary within a word and
+       overlap across words. Properties never reach the learner; only their
+       sensory consequences do.
+     - Wrist load, per hand per second: felt force m(g - a) from the GRAB
+       object trajectory at 120 Hz over the second (source frame matched
+       from the stored object pose), in the head-camera frame like the arm
+       features, plus its magnitude and within-second spread. Split between
+       hands by contact vertices; zero unless the object is lifted (> 1 cm
+       above its resting height). Weber noise: 10% lognormal on magnitude.
+     - Skin temperature change, per hand per second: contact temperature
+       from skin and material effusivity (object at 22 C, skin 33 C),
+       scaled by contact area (contacted vertices / 100, capped at 1).
+       First-order skin dynamics, 1 s toward contact, 5 s recovery after
+       release. Noise 0.3 C. Simplified; not a heat-transfer simulation.
+     - Gate: 4.10 probes and splits, with channels W (load) and T
+       (temperature), each with its +-5 s clip-internal mean. Probes: V,
+       V+W, V+T, V+W+T, W, T. Subsets as 4.10, plus swapped vs native GRAB
+       objects, and instances unseen in training.
+     - Decision per channel, same rule as 4.10 on clips_test. A pass that
+       comes only from instances seen in training counts as weak.
+     - Expected bias: the table ties properties to words, so some pass is
+       built in. The gate sizes the information and catches pipeline bugs;
+       credibility rests on the table being realistic. A pass sets up the
+       language run; it is not evidence of better word learning.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
