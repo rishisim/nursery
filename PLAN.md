@@ -273,6 +273,35 @@ a higher eventual plateau.
      - Not promising: no shuffled-body run, no seeds. The joint control must
        first come near the linear control before the body comparison means
        anything.
+   - 4.10 beyond-vision gate (set before running; diagnostic, no language
+     training). Every check so far asked whether the body carries word
+     information at all. Only information the picture lacks can lift the
+     ceiling. The frames render the hand, arm and held object (held object
+     visible in 94% of held frames), finger pose is replayed from GRAB
+     unchanged by the swap, and there are ~21 body clips per word.
+     - Task: supervised probe for the held word on held frames (labels for
+       diagnosis only). Inputs: vision = cached DINO tokens of the frame
+       (CLS + 4x4 grid); body = the audit's contact + finger + arm features
+       with their +-5 s clip-internal mean.
+     - Probes, same architecture: vision only; vision + body; vision +
+       shuffled body (body from a random other clip of the same subject and
+       partition); body only (sanity vs the audit's 18%). 3 seeds; epoch
+       picked on clips_dev balanced accuracy.
+     - Split: 4.8 clip partition (train on s1-s7 clips_train). Test on
+       clips_test (primary) and s8. Subsets: held object visible (>=100 px)
+       and tiny or hidden (<100 px).
+     - Gain = (vision + body) minus vision only, balanced accuracy, mean of 3
+       seeds, 95% CI from a bootstrap over source clips.
+     - Decision on clips_test:
+       - Gain >= 2.0 points, CI above 0, and above vision + shuffled body ->
+         the body adds information; return to the learner with the existing
+         simple pathway.
+       - Gain < 1.0 point or CI includes 0 -> the current body stream adds
+         nothing usable beyond vision; stop learner work on it and build
+         body signals in the simulator that pass this gate.
+       - Between -> weak; report, decide with the subsets.
+     - A pass is necessary, not sufficient, for a language gain. The same
+       gate applies to every new body channel before any language run.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
