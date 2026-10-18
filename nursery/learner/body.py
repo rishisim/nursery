@@ -174,13 +174,16 @@ def temporal_blocks(clip, lengths, rng, min_len=2, first_id=0):
     return out
 
 
-def load_store(episodes, frames, video_ids, heldout_videos, steps=120, exclude=None):
+def load_store(episodes, frames, video_ids, heldout_videos, steps=120, exclude=None, physical=None):
     """Per-session body arrays [S,steps,...] indexed by frame_idx, normalised on sessions not in `heldout_videos`.
 
     heldout_videos: video ids whose sessions are excluded from the normalisation fit (the held-out subject).
     exclude: optional bool [S,steps] of further seconds kept out of the fit (dev/test clips).
     Groups (encoder inputs): contact [22], fingers [90], arm [27] = positions 12 + 1-step differences 12 +
     gravity 3. Differences are zero at the first second of a clip. `present` [S,T] marks seconds that exist.
+    physical: optional directory of per-clip `<video_id>.npz` (nursery/simulator/physical.py). Adds groups load [10]
+    (per hand mean force xyz, |F|, spread) and skin [4] (per hand skin dT, contact area), standardised on the same
+    training seconds as fingers/arm, zero on absent seconds.
     """
     video_ids = list(video_ids)
     matrix = patch_matrix()
@@ -209,6 +212,16 @@ def load_store(episodes, frames, video_ids, heldout_videos, steps=120, exclude=N
     for key, value in (("fingers", raw["fingers"]), ("arm", arm), ("aperture", raw["aperture"])):
         stats[key] = (value[train].mean(0), value[train].std(0) + 1e-6)
     norm = lambda key, value: ((value - stats[key][0]) / stats[key][1] * present[..., None]).astype(np.float32)
+    if physical is not None:
+        phys = {"load": np.zeros((len(video_ids), steps, 10), np.float32), "skin": np.zeros((len(video_ids), steps, 4), np.float32)}
+        for s, video_id in enumerate(video_ids):
+            with np.load(Path(physical) / f"{video_id}.npz") as data:
+                index = data["frame_idx"]
+                phys["load"][s, index] = data["load"].reshape(len(index), 10)
+                phys["skin"][s, index] = np.concatenate([data["skin_dT"], data["contact_area"]], 1)
+        for key, value in phys.items():
+            stats[key] = (value[train].mean(0), value[train].std(0) + 1e-6)
+        phys = {key: norm(key, value) for key, value in phys.items()}
     arm_norm = norm("arm", arm)
     arm_norm[first | ~present, 12:24] = 0  # no difference at the first second of a clip
     contact = (raw["contact"] * present[..., None]).astype(np.float32)
@@ -227,7 +240,49 @@ def load_store(episodes, frames, video_ids, heldout_videos, steps=120, exclude=N
                     "in_view": (raw["in_view"] * present[..., None]).astype(np.float32)},
         "stats": {k: [v[0].tolist(), v[1].tolist()] for k, v in stats.items()},
     }
+    if physical is not None:
+        store["groups"].update(phys)
     return store
+
+
+def physical_shuffle_store(store, part, seed):
+    """Control: swap the physical groups (load, skin) between source clips of the same subject and partition.
+
+    Each source clip name inside a (subject, partition) group gets another clip of that group (a cyclic derangement
+    after a random permutation; a group with one clip keeps its own). Each run of seconds of a clip takes a random
+    run of its assigned clip; position k takes position k mod the run's length. Contact, fingers, arm, images and
+    clip structure stay put. part [S,T] is the clip partition per second. Returns the new store and counts.
+    """
+    rng = np.random.default_rng(seed)
+    runs = {}  # (subject, partition, clip name) -> [(session, start, length)]
+    for s in range(len(store["video_ids"])):
+        clip = store["clip"][s]
+        t = 0
+        while t < store["steps"]:
+            end = t
+            while end < store["steps"] and clip[end] == clip[t] and clip[t] >= 0:
+                end += 1
+            if end > t:
+                runs.setdefault((store["subject"][s], int(part[s, t]), store["clip_names"][s][clip[t]]), []).append((s, t, end - t))
+                t = end
+            else:
+                t += 1
+    assigned = {}
+    for subject, partition in sorted({k[:2] for k in runs}):
+        names = sorted(k[2] for k in runs if k[:2] == (subject, partition))
+        order = rng.permutation(len(names))
+        shifted = np.roll(order, 1) if len(names) > 1 else order
+        for dest, src in zip(order, shifted):
+            assigned[(subject, partition, names[dest])] = (subject, partition, names[src])
+    groups = {k: v.copy() for k, v in store["groups"].items()}
+    for key, source in assigned.items():
+        pool = runs[source]
+        for s, t, length in runs[key]:
+            s2, t2, length2 = pool[int(rng.integers(len(pool)))]
+            for name in ("load", "skin"):
+                groups[name][s, t:t + length] = store["groups"][name][s2, t2 + np.arange(length) % length2]
+    own = sum(k == v for k, v in assigned.items())
+    return {**store, "groups": groups}, {"clips": len(assigned), "kept_own": int(own)}
 
 
 def oracle_store(store):

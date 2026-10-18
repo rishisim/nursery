@@ -138,7 +138,7 @@ def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_r
 
 def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.1, body="none", episodes="none",
               weights=None, heldout_subject=None, body_dropout=None, distill_from=None, distill_weight=1.0,
-              distill_temp=2.0, inspect_epoch=None, labels=False, split="subject", arch="additive"):
+              distill_temp=2.0, inspect_epoch=None, labels=False, split="subject", arch="additive", physical=None, physical_shuffle=False):
     import torch
 
     from . import body as bodylib
@@ -178,6 +178,10 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     if arch not in ("additive", "joint"):
         raise ValueError("--arch must be additive or joint")
     joint = arch == "joint"
+    if physical and body != "real":
+        raise ValueError("--physical needs --body real")
+    if physical_shuffle and not physical:
+        raise ValueError("--physical-shuffle needs --physical")
     if joint:
         if pool != "soft" or body not in ("none", "real") or distill_from or labels or episodes != "none":
             raise ValueError("--arch joint needs --pool soft, --body none or real, --episodes none, and no --distill-from or --labels")
@@ -258,10 +262,13 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         video_ids = sorted(set(all_manifest.video_id) | set(heldout_manifest.video_id))
         heldout_videos = set(heldout_manifest.video_id)
         exclude = np.array([np.isin(part[v], (1, 2)) for v in video_ids]) if part else None  # dev/test clips stay out of the stats
-        real = bodylib.load_store(episode_root, frames, video_ids, heldout_videos, exclude=exclude)
+        real = bodylib.load_store(episode_root, frames, video_ids, heldout_videos, exclude=exclude, physical=physical)
         real["subject"] = np.array([subject_of[v] for v in video_ids])
-        shuffle_info = None
+        shuffle_info = physical_info = None
         train_store = real
+        if physical_shuffle:  # training sees load/skin from another clip; evaluation keeps the real store
+            same = np.array([part[v] for v in video_ids]) if part else np.zeros(real["clip"].shape, np.int64)
+            train_store, physical_info = bodylib.physical_shuffle_store(real, same, seed)
         if body == "shuffled":
             train_store, shuffle_info = bodylib.shuffle_store(real, seed, heldout_videos)
         elif body == "oracle":
@@ -281,6 +288,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         oracle_classes = len(real["categories"]) if body == "oracle" else 0
         model = JointMIL(len(vocab), emb_dim, tau_p, data.dims) if joint else LearnerMIL(len(vocab), emb_dim, tau_p, data.dims, oracle_classes)
         body_info = {"mode": body, "dropout": dropout, "episodes": episodes, "weights": weights, "shuffle": shuffle_info,
+                     "physical": physical, "physical_shuffle": physical_info if physical_shuffle else False,
                      "n_episodes": int(len(np.unique(episode_ids[episode_ids >= 0]))),
                      "episode_frames": float((episode_ids >= 0).sum() / max(real["present"].sum(), 1))}
     if device == "mps":

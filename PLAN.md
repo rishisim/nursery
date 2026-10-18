@@ -434,6 +434,24 @@ a higher eventual plateau.
      - If promising: one shuffled-signals run, same config, with the load
        and skin groups taken from another clip of the same subject and
        partition (real body groups stay paired). Otherwise stop and report.
+   - 4.13 result (`--physical`, run `body_phys_clips60_s0`, ~24 s/epoch):
+     not promising; shuffled run not triggered.
+     - Body-present epochs: control 49, plain body 32, new 41. fused_soft
+       vs control picture_soft: clips_test 42.4 vs 48.3, -5.9 [-10.6,
+       -1.3]; s8 40.9 vs 43.7, -2.8 [-6.1, +0.4]; dev -2.9. Vs plain body
+       (4.8): -3.2 [-7.2, +0.8] clips_test, +0.3 s8. Dev gap peaks +1.6 at
+       epoch 0, then mostly negative.
+     - Body-only score 31.1 clips_test, 26.1 s8 (chance 25). Picture-only
+       69.0 / 61.7 vs control 69.7 / 62.6.
+     - Reading: the new signals did not change the 4.8 pattern. The body
+       pathway still fits training clips and fails on new ones; the 14 new
+       dims sit beside 139 dims of contact, finger and arm features that
+       act as clip fingerprints (4.10). Also, the gate gain (+2.7 on 50-way
+       held-word, labels given) applies to held-referent trials only
+       (~31% of 4AFC trials), so +2.0 on all trials was a high bar for a
+       signal this size.
+     - Not yet tested: the new signals without the fingerprint channels
+       (body = load + skin only), which removes the memorisation route.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data

@@ -250,14 +250,24 @@ def _write_body(root, video_ids=("v0", "v1")):
         np.savez(root / "body" / f"{video_id}.npz", **_body_session(k))
 
 
-def _store(root, clips=None):
+def _store(root, clips=None, physical=None):
     from nursery.learner import body
 
     _write_body(root)
     frames = pd.read_parquet(root / "frames.parquet")
     if clips:  # split each session into clips of the given length
         frames["clip"] = frames.video_id + "/" + (frames.frame_idx // clips).astype(str)
-    return body.load_store(root, frames, ["v0", "v1"], set())
+    return body.load_store(root, frames, ["v0", "v1"], set(), physical=physical)
+
+
+def _write_physical(root, video_ids=("v0", "v1")):
+    (root / "physical").mkdir(exist_ok=True)
+    for k, video_id in enumerate(video_ids):
+        rng = np.random.default_rng(100 + k)
+        np.savez(root / "physical" / f"{video_id}.npz", frame_idx=np.arange(120),
+                 load=rng.normal(size=(120, 2, 5)).astype(np.float32), skin_dT=rng.normal(size=(120, 2)).astype(np.float32),
+                 contact_area=rng.random((120, 2)).astype(np.float32), material_idx=np.zeros(120, np.int8))
+    return root / "physical"
 
 
 def test_patch_pooling_shapes_and_map():
@@ -400,6 +410,84 @@ def test_language_loss_depends_on_body_and_reaches_every_encoder(episodes):
     for group in model.encoder.mlps:
         assert any(p.grad is not None and p.grad.abs().sum() > 0 for p in model.encoder.mlps[group].parameters()), group
     assert model.vproj[2].weight.grad.abs().sum() > 0 and model.beta.grad.abs() > 0
+
+
+def test_physical_off_leaves_store_unchanged_and_on_adds_groups(episodes):
+    from nursery.learner import body
+
+    root, _ = episodes
+    plain = _store(root, clips=10)
+    assert set(plain["groups"]) == {"contact", "fingers", "arm"}
+    store = _store(root, clips=10, physical=_write_physical(root))
+    assert list(store["groups"]) == ["contact", "fingers", "arm", "load", "skin"]
+    assert store["groups"]["load"].shape == (2, 120, 10) and store["groups"]["skin"].shape == (2, 120, 4)
+    for key in plain["groups"]:
+        np.testing.assert_array_equal(store["groups"][key], plain["groups"][key])
+    for key in ("load", "skin"):  # standardised on present seconds
+        np.testing.assert_allclose(store["groups"][key].mean((0, 1)), 0, atol=1e-5)
+        np.testing.assert_allclose(store["groups"][key].std((0, 1)), 1, atol=1e-3)
+    with np.load(root / "physical" / "v0.npz") as raw:  # indexed by frame_idx; skin = dT then area
+        mean, std = (np.array(x) for x in store["stats"]["skin"])
+        np.testing.assert_allclose(store["groups"]["skin"][0, 7], (np.r_[raw["skin_dT"][7], raw["contact_area"][7]] - mean) / std, rtol=1e-4)
+    # train-only statistics: excluded seconds do not enter the fit
+    frames = pd.read_parquet(root / "frames.parquet")
+    exclude = np.zeros((2, 120), bool)
+    exclude[:, 60:] = True
+    fit = body.load_store(root, frames, ["v0", "v1"], set(), exclude=exclude, physical=root / "physical")
+    with np.load(root / "physical" / "v0.npz") as a, np.load(root / "physical" / "v1.npz") as b:
+        raw = np.concatenate([a["load"][:60].reshape(60, 10), b["load"][:60].reshape(60, 10)])
+    np.testing.assert_allclose(fit["stats"]["load"][0], raw.mean(0), rtol=1e-4, atol=1e-5)
+
+
+def test_physical_groups_are_encoded_and_get_gradients(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10, physical=_write_physical(root))
+    model, data = _tiny_model(store)
+    assert set(model.encoder.mlps) == {"contact", "fingers", "arm", "load", "skin"}
+    assert model.encoder.mlps["load"][0].in_features == 10 and model.encoder.mlps["skin"][0].in_features == 4
+    v, t, n, w = _batch(model, data)
+    ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0))
+    ctx["keep"] = torch.ones(6)
+    off = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "bodymatch": 0.0}
+    model.forward_loss(v, t, n, w, ctx, off).backward()
+    for group in ("load", "skin"):
+        assert any(p.grad is not None and p.grad.abs().sum() > 0 for p in model.encoder.mlps[group].parameters()), group
+
+
+def test_physical_shuffle_keeps_partitions_and_avoids_own_clip(episodes):
+    from nursery.learner import body
+
+    root, _ = episodes
+    store = _store(root, clips=10, physical=_write_physical(root))
+    store["subject"] = np.array(["s1", "s2"])
+    part = np.zeros((2, 120), int)
+    part[:, 60:] = 1  # clips 0-5 train, 6-11 dev, in both sessions
+    shuffled, info = body.physical_shuffle_store(store, part, 0)
+    again, _ = body.physical_shuffle_store(store, part, 0)
+    np.testing.assert_array_equal(shuffled["groups"]["load"], again["groups"]["load"])
+    assert info["clips"] == 24 and info["kept_own"] == 0
+    for key in ("contact", "fingers", "arm"):  # real groups stay paired
+        np.testing.assert_array_equal(shuffled["groups"][key], store["groups"][key])
+    for key in ("load", "skin"):
+        assert not np.allclose(shuffled["groups"][key], store["groups"][key])
+    # every shuffled clip equals a clip of the same session/partition, never itself
+    for name in ("load", "skin"):
+        for s in range(2):
+            for c in range(12):
+                got = shuffled["groups"][name][s, c * 10:(c + 1) * 10]
+                own = store["groups"][name][s, c * 10:(c + 1) * 10]
+                same = [(c2 // 6 == c // 6) and np.allclose(got, store["groups"][name][s, c2 * 10:(c2 + 1) * 10]) for c2 in range(12) if c2 != c]
+                assert any(same) and not np.allclose(got, own)
+    # a lone clip in its group cannot be deranged and keeps its own signals
+    lone = np.zeros((2, 120), int)
+    lone[0, :], lone[1, :] = 0, 1
+    kept, info = body.physical_shuffle_store(store, lone, 0)
+    assert info["clips"] == 24 and info["kept_own"] == 0  # 12 clips per (subject, partition) here
+    solo = {**store, "clip": np.where(store["clip"] < 1, store["clip"], -1)}
+    _, info = body.physical_shuffle_store(solo, part, 0)
+    assert info["kept_own"] == info["clips"] == 2
 
 
 def test_body_dropout_one_equals_video_only_and_each_loss_switches_off(episodes):
@@ -656,6 +744,26 @@ def test_clip_split_training_runs_and_default_is_unchanged(episodes, upstream):
         assert (run / f"clips_{body}_s3" / "model_bodypresent.pt").exists()
     with pytest.raises(ValueError, match="--split clips"):
         train_run(run, "none", 5, epochs=1, split="clips")
+
+
+def test_physical_training_runs_and_records_flags(episodes, upstream):
+    from nursery.learner.train import train_run
+
+    root, run = episodes
+    _clip_frames(root)
+    _write_body(root)
+    physical = _write_physical(root)
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    common = dict(epochs=1, pool="soft", heldout_subject="s2", split="clips", body="real")
+    base = train_run(run, "none", 3, name="p_off", **common)
+    assert base["body"]["physical"] is None and base["body"]["physical_shuffle"] is False
+    on = train_run(run, "none", 3, name="p_on", physical=str(physical), **common)
+    shuf = train_run(run, "none", 3, name="p_shuf", physical=str(physical), physical_shuffle=True, **common)
+    assert on["body"]["physical"] == str(physical) and on["body"]["physical_shuffle"] is False
+    assert shuf["body"]["physical_shuffle"]["clips"] > 0
+    with pytest.raises(ValueError, match="--physical-shuffle needs --physical"):
+        train_run(run, "none", 3, name="bad", physical_shuffle=True, **common)
 
 
 # ---- joint visual-body learner (--arch joint) ----
