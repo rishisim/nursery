@@ -3,6 +3,7 @@
 import argparse
 
 from .build import DEFAULT_CONFIG, build
+from .physical import build_physical
 from .preview import preview
 
 
@@ -21,10 +22,15 @@ def main():
     viewer = commands.add_parser("preview")
     viewer.add_argument("--episodes", required=True)
     viewer.add_argument("--output", required=True)
+    signals = commands.add_parser("physical", help="Write wrist-load and skin-temperature signals per session")
+    signals.add_argument("--episodes", required=True)
+    signals.add_argument("--key-by", choices=["instance", "clip"], default="instance")
     args = parser.parse_args()
     if args.command == "build":
         build(args.config, args.rooms, args.output, args.sessions_per_subject, args.seed,
               args.session_index, args.workers, args.subjects)
+    elif args.command == "physical":
+        build_physical(args.episodes, key_by=args.key_by)
     else:
         preview(args.episodes, args.output)
 

@@ -354,6 +354,29 @@ a higher eventual plateau.
        built in. The gate sizes the information and catches pipeline bugs;
        credibility rests on the table being realistic. A pass sets up the
        language run; it is not evidence of better word learning.
+   - 4.11 result (`nursery/simulator/physical.py`, `physical` subcommand;
+     outputs `physical/`, `physical_by_clip/`; gate in
+     `outputs/audits/beyond_vision/`): wrist load passes, temperature fails.
+     - Only 126 held-object instances exist, and the unseen-instance test
+       subset is 4 clips, so the per-instance run could not separate word
+       information from instance recognition. Added control (not in the
+       pre-registration): properties drawn per clip (`--key-by clip`), so
+       every test clip is a new object.
+     - Per instance, (V+W)-V: clips_test +4.8 [+3.1, +6.9], s8 +11.8
+       [+9.1, +13.9]; V+W+T +8.5 / +10.8.
+     - Per clip (decisive), balanced accuracy V 56.6 / 50.1 (clips_test /
+       s8): (V+W)-V +2.7 [+0.8, +4.9] / +6.6 [+4.8, +8.8]; tiny or hidden
+       +6.6 / +7.5. (V+T)-V +0.2 [-1.6, +1.1] / +2.4 [+1.0, +4.7].
+       (V+W+T)-V +3.4 [-0.2, +5.0] / +5.2: no better than W.
+     - Reading: about half the per-instance weight gain was instance
+       recognition. The rest survives all-new objects and a new person:
+       the first body signal with word information beyond vision.
+       Temperature as modelled is swamped by contact area and adds nothing.
+     - Built in: the gain follows from the authored table, so its size
+       depends on the table being realistic.
+     - Next: one matched language run (existing linear learner, clip split)
+       with real body + per-clip wrist load vs video-only, then shuffled
+       load if promising.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
