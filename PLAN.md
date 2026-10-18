@@ -397,6 +397,20 @@ a higher eventual plateau.
        < 2.0, the limit is the material table (most words share plastic),
        not the signal; stop work on temperature. If V+Mat passes and T2
        fails, the signal still loses material information; report why.
+   - 4.12 result (`gate_physical_t2`, per-clip properties): temperature alone
+     still fails; together with weight it adds.
+     - (X)-V, clips_test / s8: T2 -1.1 [-3.3, +1.2] / +3.7 [+0.0, +5.9];
+       W +2.7 / +6.6; W+T2 +5.8 [+1.8, +8.3] / +10.8 [+7.4, +13.6];
+       material one-hot +7.3 [+3.2, +10.8] / +14.2.
+     - W+T2 now beats W alone on both test sets (area-scaled T did not).
+     - Why T2 alone fails while the one-hot passes: temperature is one
+       number per hand. Different materials land on the same value
+       (plastic = rubber -3.5 C; wood, leather, dry food -2.4 to -2.7 C),
+       and the value also depends on time since touch. The one-hot is not
+       reachable by any thermal sense, so it overstates the ceiling.
+       Untested: V + noise-free effusivity as the true thermal ceiling.
+     - Decision: keep T2 with W as the embodied channel set (W+T2 passes).
+       Next is the language run with real body + W + T2.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data

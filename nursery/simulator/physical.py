@@ -8,8 +8,9 @@ Simplifications:
   The trajectory is smoothed with a Savitzky-Golay filter (15 frames, cubic) before the second derivative.
   Mean/std are over the raw frames within +-0.5 s of the second's source frame. Frames where the object is not
   lifted (z <= resting z + 1 cm) count as zero force. The force is split between hands by contacted vertices.
-- Skin temperature is a one-line contact-temperature formula (effusivity weighted) scaled by contact area, with
-  first-order dynamics at 1 s steps. It is not a heat-transfer simulation.
+- Skin temperature change is a one-line contact-temperature formula (effusivity weighted) at the touched skin,
+  not scaled by area, with first-order dynamics at 1 s steps. Contact area (contacted vertices / 100, capped at
+  1) is a separate channel. It is not a heat-transfer simulation.
 """
 
 import hashlib
@@ -85,12 +86,17 @@ def load_stats(force_world, rotation):
     return np.concatenate([rotation.T @ force_world.mean(0), [magnitude.mean(), magnitude.std()]])
 
 
-def contact_target(table, material, vertices):
-    """Target skin temperature change (C) for one hand holding a `material` object with `vertices` in contact."""
+def contact_area(vertices):
+    """Contact area value in [0, 1]: contacted vertices / 100, capped."""
+    return min(1.0, vertices / FULL_CONTACT_VERTICES)
+
+
+def contact_target(table, material):
+    """Target skin temperature change (C) at the touched skin of a hand holding a `material` object."""
     skin, room = table["skin"], table["room_temperature_c"]
     e_skin, e_obj = skin["effusivity"], table["materials"][material]
     contact = (e_skin * skin["temperature_c"] + e_obj * room) / (e_skin + e_obj)
-    return (contact - skin["temperature_c"]) * min(1.0, vertices / FULL_CONTACT_VERTICES)
+    return contact - skin["temperature_c"]
 
 
 def skin_dynamics(target, touching, new_clip):
@@ -169,6 +175,9 @@ def session_signals(video_id, group, body, clips, table):
             run[t] = count
     load = np.zeros((steps, 2, 5))
     target = np.zeros((steps, 2))
+    area = (np.minimum(1.0, counts / FULL_CONTACT_VERTICES) * present[:, None]).astype(np.float32)
+    names = sorted(table["materials"])
+    material_idx = np.full(steps, -1)
     key, material, mass, errors = np.full(steps, "", dtype=object), np.full(steps, "", dtype=object), np.zeros(steps), []
     for r in range(count + 1):
         seconds = np.flatnonzero(run == r)
@@ -187,11 +196,14 @@ def session_signals(video_id, group, body, clips, table):
                     load[t, hand] = stats * (counts[t, hand] / total) * scale
             for hand in (0, 1):
                 if counts[t, hand] > 0:
-                    target[t, hand] = contact_target(table, info["material"], counts[t, hand])
+                    target[t, hand] = contact_target(table, info["material"])
+            if counts[t].sum() > 0:
+                material_idx[t] = names.index(info["material"])
     new_clip = np.r_[True, run[1:] != run[:-1]]
     skin = np.stack([skin_dynamics(target[:, h], counts[:, h] > 0, new_clip) for h in (0, 1)], 1)
     skin = (skin + noise) * present[:, None]
-    return dict(frame_idx=body["frame_idx"], load=load.astype(np.float32), skin_dT=skin.astype(np.float32),
+    return dict(frame_idx=body["frame_idx"], load=load.astype(np.float32), skin_dT=skin.astype(np.float32), contact_area=area,
+                material_idx=material_idx.astype(np.int8),
                 instance_key=key.astype(str), material=material.astype(str), mass_kg=mass.astype(np.float32),
                 clip_run=run.astype(np.int16), match_error_m=np.array(errors, np.float32)), errors
 

@@ -1,6 +1,6 @@
 import numpy as np
 
-from nursery.simulator.physical import (contact_target, draw_properties, load_materials, load_stats,
+from nursery.simulator.physical import (contact_area, contact_target, draw_properties, load_materials, load_stats,
                                         object_acceleration, skin_dynamics, window_force)
 
 TABLE = load_materials()
@@ -29,10 +29,9 @@ def test_camera_frame_rotation():
     assert np.allclose(stats[:3], rotation.T @ [0, 0, -1.0])
 
 
-def test_metal_cools_more_than_wood_and_area_scales():
-    assert contact_target(TABLE, "metal", 200) < contact_target(TABLE, "wood", 200) < 0
-    assert np.isclose(contact_target(TABLE, "metal", 50), contact_target(TABLE, "metal", 100) / 2)
-    assert contact_target(TABLE, "metal", 400) == contact_target(TABLE, "metal", 100)
+def test_metal_cooler_than_wood_and_target_ignores_area():
+    assert contact_target(TABLE, "metal") < contact_target(TABLE, "wood") < 0
+    assert contact_area(50) == 0.5 and contact_area(400) == 1.0 and contact_area(0) == 0.0
 
 
 def test_skin_dynamics_rise_fast_recover_slow_and_reset():
