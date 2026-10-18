@@ -409,8 +409,12 @@ a higher eventual plateau.
        and the value also depends on time since touch. The one-hot is not
        reachable by any thermal sense, so it overstates the ceiling.
        Untested: V + noise-free effusivity as the true thermal ceiling.
+     - Caveat: T2 includes contact area, which the vision-only probe lacks.
+       The W+T2 gain over W may come partly from area, not temperature;
+       area alone was not run. The real body stream already has contact.
      - Decision: keep T2 with W as the embodied channel set (W+T2 passes).
-       Next is the language run with real body + W + T2.
+       Next is the language run with real body + W + T2; whether
+       temperature adds beyond the body's own contact is settled there.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
