@@ -415,6 +415,25 @@ a higher eventual plateau.
      - Decision: keep T2 with W as the embodied channel set (W+T2 passes).
        Next is the language run with real body + W + T2; whether
        temperature adds beyond the body's own contact is settled there.
+   - 4.13 language run with wrist load and skin temperature (set before
+     running).
+     - Change vs `body_real_clips60_s0` (4.8): two more body-encoder input
+       groups from `physical_by_clip/` (per-clip properties): load (10:
+       per hand mean force xyz, |F|, spread) and skin (4: per hand skin dT
+       and contact area), each standardised on train-partition seconds
+       and encoded like contact/fingers/arm. Flag off by default.
+     - Unchanged: additive linear learner, soft pooling, clip split, s8,
+       60 epochs, body dropout 0.5, vision-to-body and body-only losses
+       off, seed 0, speech, pairs, trials, selection rules of 4.8.
+     - Control: `video_only_clips60_s0` (4.8), reused because its settings
+       match. Also compared: `body_real_clips60_s0` (body without the new
+       groups).
+     - Gain = new run fused_soft minus control picture_soft on clips_test,
+       paired bootstrap 95% CI, at each run's body-present epoch.
+       Promising = at least +2.0. Also s8, held vs non-held, picture-only.
+     - If promising: one shuffled-signals run, same config, with the load
+       and skin groups taken from another clip of the same subject and
+       partition (real body groups stay paired). Otherwise stop and report.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
