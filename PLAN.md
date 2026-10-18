@@ -302,6 +302,29 @@ a higher eventual plateau.
        - Between -> weak; report, decide with the subsets.
      - A pass is necessary, not sufficient, for a language gain. The same
        gate applies to every new body channel before any language run.
+   - 4.10 result (`outputs/audits/beyond_vision/`, 3 seeds, 50 classes;
+     train 36,031 frames / 631 clips, clips_test 7,066 / 135, s8 7,197 /
+     162; 2,136 frames dropped whose image window crosses partitions):
+     fails the gate.
+     - Balanced accuracy, clips_test / s8: vision 56.6 / 50.1; vision + body
+       57.6 / 45.0; vision + shuffled body 35.9 / 32.1; body only 33.3 /
+       14.0.
+     - (V+B) - V: clips_test +1.0 [-2.5, +6.1]; s8 -5.1 [-9.4, -1.2].
+     - Held object visible (>=100 px): clips_test -0.9, s8 -6.6. Tiny or
+       hidden (<100 px; 978 and 698 frames): clips_test +15.8 [+7.8,
+       +25.2], s8 -0.3. The body's only extra information is where the
+       camera misses the object, and it does not carry to a new person.
+     - Best case if that subset gain were kept with no harm elsewhere:
+       about +2 points on held frames (13.8% of clips_test), roughly +0.5
+       on the language 4AFC (25% held-referent trials).
+     - Shuffled body is mapped per clip, so in training it is still a clip
+       fingerprint; its large drop shows the probe leans on body
+       fingerprints, not extra capacity. Same overfitting as the language
+       learner (4.7, 4.8).
+     - Decision (row 2): stop learner work on this body stream. Next: body
+       signals in the simulator that pass this gate (grasps fitted to each
+       mesh, wrist load from mass, thermal contact by material), each
+       checked here before any language run.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
