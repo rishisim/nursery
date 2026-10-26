@@ -1,3 +1,8 @@
+> Historical step 4.5 diagnostic, archived 26 October 2026. The recommendation
+> below was followed by the body-only loss and later beyond-vision tests; it is
+> not the current work queue. See [subsequent experiments](experiments.md).
+> Inline source and output paths remain relative to the repository root.
+
 # Body-signal audit (no training of the language learner)
 
 Data: `outputs/renders/clean_856` (856 sessions, 102,720 frames, 59,681 held frames, 50 held categories, 51 GRAB

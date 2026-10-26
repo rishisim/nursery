@@ -5,16 +5,22 @@ video alone. Measure both understanding with real vision + body available and
 transfer to later picture + word testing without the body. A reliable gain in
 either advances the goal; picture-only retention is an additional achievement,
 not a requirement for recognizing a body-present benefit. Oracle inputs remain
-diagnostics. See `PLAN.md` for the staged comparisons.
+diagnostics. See the [current plan](../PLAN.md) and the
+[archived comparisons](../archive/language_learning/experiments.md).
 
-## Why this design
+## Status and scope
 
-- Using the body only to say where to look failed twice (the trust in the body fell to ~0).
-- Perfect naming adds only ~2 points over video-only, so cleaning up "which object was named" is capped.
-- The picture-only path is frozen DINOv2 regions -> linear projection -> word vectors. Only the projection and
-  word vectors can change, so the body has to shape them through the language loss.
-- Grasps are borrowed (spoon and pen share the toothbrush grasp). Finger pose tells the grasp family, not the
-  word. Contact is computed against the swapped mesh, so it is the signal most tied to the actual object.
+This is the implementation reference, including diagnostic flags retained for
+reproduction. Their presence does not mean they are recommended next runs.
+The additive linear learner is the reference baseline; the joint learner is a
+completed comparison. Results and superseded design rationales belong to the
+[experiment archive](../archive/language_learning/experiments.md) and
+[cue/gate history](../archive/language_learning/cue_experiments.md).
+
+Frozen DINOv2 features feed a trainable visual projection and trainable word
+vectors. The direct-label diagnostic demonstrated visual headroom; earlier
+claims that perfect naming capped improvement at about two points must not be
+treated as a general limit. Weak naming remains part of the scientific task.
 
 ## Visual side (identical in every condition)
 
