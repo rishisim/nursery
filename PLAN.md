@@ -24,26 +24,38 @@ advances the build; neither is established by a supervised sensor diagnostic.
   same speech; do not select ordinary learning examples using hidden referent
   identity. See the [design history](archive/language_learning/design_intent.md).
 
-## Immediate order
+## Proposed direction
 
-1. Preserve completed experiments and clarify historical intent before changing
-   the protocol. The [archive](archive/README.md) now holds the completed record.
-2. Resolve the narrower experience/window and scoring questions: contact can
-   support a held-channel name across a hard clip cut that resets body memory;
-   distractor scenes can also contain the target object. The audits establish
-   these conditions, not their causal contribution to the failed learning runs.
-   Preserve natural ambiguity and delayed naming when defining any repair.
-3. Specify and validate the smallest correction, then compare the existing
-   video-only and body learners on identical revised exposure and defensible
-   trials. Record the protocol before new training; do not bundle architecture
-   changes, new sensors or privileged filtering into this comparison.
-4. Choose the next single diagnostic from that result. Separate better use of
-   current signals, sensory representation learning, and simulator changes.
-   Scaling across independent data amounts follows a trustworthy comparison.
+1. **Trustworthy experiences and tests.** Resolve artificial clip-boundary
+   mismatches between speech and accessible body history, and ambiguous scoring
+   where distractor scenes also contain the target. Preserve intentional weak,
+   delayed and nonheld naming. Compare the existing learners on identical
+   corrected exposure before changing their architecture; the audits have not
+   established how much these issues explain the failed runs.
+2. **Small diagnostic capability.** Test whether relevant bodily information can
+   support language on unfamiliar objects, for example heavy/light during
+   lifting. Check that the sensory evidence is physically consistent and whether
+   video already reveals it. Success would establish a useful capability, not
+   broad noun learning or a higher language ceiling.
+3. **One embodied learning mechanism.** Test whether coherent sensory experience
+   helps form reusable object representations before sparse speech names them.
+   Preserve the working visual baseline and give video-only controls the same
+   temporal history and comparable training opportunities. Test one mechanism
+   at a time; sensory pretraining remains a hypothesis, not a demonstrated fix.
+4. **Broader generalization.** Vary object instances, interactions and people,
+   including similar grasps for different objects and different grasps for the
+   same category. Keep video-only exposure matched. More replayed frames do not
+   substitute for independent experience.
+5. **Learning curves.** Compare learners across independent amounts of training
+   experience to distinguish faster learning from a higher eventual ceiling.
+   Continue reporting body-present understanding and picture-only transfer
+   separately.
 
-This archive checkpoint changes documentation and historical aggregate locations
-only. Connection/scoring repairs, new training and architecture changes are
-deferred; the historical experiment queue is not an instruction to rerun it.
+This is the single direction document; completed experiments stay in the
+[archive](archive/README.md). Later stages are conditional hypotheses requiring
+bounded, recorded protocols and decisions from earlier results, not an automatic
+experiment queue. This documentation update launches no implementation changes
+or training runs.
 
 ## Where to look
 
