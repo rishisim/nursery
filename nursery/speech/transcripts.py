@@ -37,8 +37,19 @@ def cue_timelines(frames, config, rng):
     return cues, donors
 
 
+def clip_bounds(group):
+    """Inclusive bounds of each contiguous source clip; repeated IDs start new segments."""
+    if "clip" not in group or not group["clip"].map(lambda c: isinstance(c, str) and bool(c.strip())).all():
+        raise ValueError("Speech generation requires a nonempty string clip identity on every frame")
+    starts = np.flatnonzero(np.r_[True, group["clip"].to_numpy()[1:] != group["clip"].to_numpy()[:-1]])
+    ends = np.r_[starts[1:] - 1, len(group) - 1]
+    lengths = ends - starts + 1
+    return np.repeat(starts, lengths), np.repeat(ends, lengths)
+
+
 def session_scene(group, vocabulary, window):
-    """Per-frame visible categories and held-window categories, plus session categories."""
+    """Per-frame visible and clip-local held-window categories, plus session categories."""
+    starts, ends = clip_bounds(group)
     visible = [sorted({o["category"] for o in json.loads(objects) if o["visible_px"] > 0})
                for objects in group.objects]
     held = [None if pd.isna(c) else c for c in group.held_category]
@@ -47,7 +58,8 @@ def session_scene(group, vocabulary, window):
     if missing:
         raise ValueError(f"Categories missing from vocabulary: {sorted(missing)}")
     n = len(group)
-    windows = [sorted({c for c in held[max(0, t - window):t + window + 1] if c is not None})
+    windows = [sorted({c for c in held[max(starts[t], t - window):min(ends[t], t + window) + 1]
+                       if c is not None})
                for t in range(n)]
     return visible, held, windows, categories
 
@@ -86,6 +98,14 @@ def calibrate_p_held(scenes, parameters):
 
 
 def generate_transcripts(frames, config, seed):
+    """Sample weak speech without crossing source-clip cuts.
+
+    source_frame_idx and utterance_time_s retain the original speech time.
+    jitter_draw_frames is the rounded Gaussian draw; jitter_frames is the effective
+    aligned-minus-source offset. Clamping puts boundary mass at clip endpoints.
+    held_referent describes the aligned frame; source_held_referent describes the
+    source frame. Neither flag filters speech or forces names to be held objects.
+    """
     parameters = config["generator"]
     for key in ("p_ref", "p_name", "p_held", "p_unseen"):
         if not 0 <= parameters[key] <= 1:
@@ -114,6 +134,7 @@ def generate_transcripts(frames, config, seed):
               "seen": 1 - p_held - parameters["p_unseen"]}
     rows = []
     for video, (group, visible, held_all, windows, categories) in scenes.items():
+        starts, ends = clip_bounds(group)
         time = rng.exponential(1 / parameters["rate_hz"])
         while time < len(group):
             source = min(int(np.floor(time + 0.5)), len(group) - 1)
@@ -144,12 +165,15 @@ def generate_transcripts(frames, config, seed):
             else:
                 text = str(rng.choice(pool["nonreferential"]))
             jitter = int(np.rint(rng.normal(0, parameters["sigma"])))
-            aligned = int(np.clip(source + jitter, 0, len(group) - 1))
+            aligned = int(np.clip(source + jitter, starts[source], ends[source]))
             row = {"video_id": video, "frame_idx": aligned, "text": text,
                    "referential": referential, "referent": referent, "named": named,
                    "source_frame_idx": source, "utterance_time_s": float(time),
-                   "jitter_frames": jitter, "channel": channel, "referent_visible": referent in visible[aligned],
-                   "held_referent": referent is not None and referent == held,
+                   "jitter_frames": aligned - source, "channel": channel,
+                   "referent_visible": referent in visible[aligned],
+                   "held_referent": referent is not None and referent == held_all[aligned],
+                   "source_held_referent": referent is not None and referent == held,
+                   "jitter_draw_frames": jitter,
                    "weight_none": 1.0}
             indicators = {name: values[aligned] for name, values in cues[video].items()}
             indicators["oracle"] = referential and named and row["referent_visible"]

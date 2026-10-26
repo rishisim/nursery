@@ -10,8 +10,90 @@ import torch.nn.functional as F
 from .model import soft_pool
 
 
+def body_present_context(manifest, frames, lut, window, body_half, subject=None):
+    """Renderer truth shared by all controls; full-frame visibility does not
+    establish recognizability after the image encoder crop."""
+    if not {"video_id", "frame_idx", "referent"} <= set(manifest.columns):
+        raise ValueError("Body-present manifest requires video_id, frame_idx and referent")
+    if window < 0 or body_half < 0:
+        raise ValueError("Body-present windows must be nonnegative")
+    required = {"video_id", "frame_idx", "objects", "clip", "held_category", "subject"}
+    if not required <= set(frames.columns):
+        raise ValueError(f"Body-present scoring requires renderer metadata: {sorted(required - set(frames.columns))}")
+    if frames.duplicated(["video_id", "frame_idx"]).any():
+        raise ValueError("Duplicate renderer frame metadata")
+    table = {(r.video_id, int(r.frame_idx)): r for r in frames.itertuples()}
+    visible, accessible, held, subjects = [], [], [], []
+    for r in manifest.itertuples():
+        word = r.referent
+        if not isinstance(word, str) or not word.strip():
+            raise ValueError("Body-present target referent must be a nonempty category")
+        key = (r.video_id, int(r.frame_idx))
+        if key not in table or f"{key[0]}|{key[1]}" not in lut:
+            raise ValueError(f"Missing aligned renderer/cache frame: {key}")
+        centre = table[key]
+        if pd.isna(centre.clip) or pd.isna(centre.subject):
+            raise ValueError(f"Missing aligned renderer clip/subject: {key}")
+        def seen(row):
+            return {o["category"] for o in json.loads(row.objects) if o["visible_px"] > 0}
+        if word not in seen(centre):
+            raise ValueError(f"Body-present positive target absent at aligned frame: {key}, {word}")
+        words = set()
+        for f in range(key[1] - window, key[1] + window + 1):
+            if f"{key[0]}|{f}" in lut:
+                if (key[0], f) not in table:
+                    raise ValueError(f"Missing renderer metadata for supplied visual frame: {(key[0], f)}")
+                words.update(seen(table[key[0], f]))
+        body_words = {centre.held_category} if pd.notna(centre.held_category) else set()
+        for direction in (-1, 1):
+            for delta in range(1, body_half + 1):
+                row = table.get((key[0], key[1] + direction * delta))
+                if row is None or row.clip != centre.clip or pd.isna(row.clip):
+                    break
+                if pd.notna(row.held_category):
+                    body_words.add(row.held_category)
+        visible.append(words)
+        accessible.append(body_words)
+        held.append(centre.held_category == word)
+        subjects.append(centre.subject)
+    if subject is not None and not np.array_equal(np.asarray(subject), np.asarray(subjects)):
+        raise ValueError("Body-present subjects disagree with renderer metadata")
+    ref, videos = manifest.referent.to_numpy(), manifest.video_id.to_numpy()
+    pools_by_query = {}
+    pools = []
+    for i, word in enumerate(ref):
+        key = (subjects[i], videos[i], word)
+        if key not in pools_by_query:
+            base = np.flatnonzero((np.asarray(subjects) == subjects[i]) & (videos != videos[i]) & (ref != word))
+            pools_by_query[key] = np.array([j for j in base if word not in visible[j] and word not in accessible[j]], dtype=int)
+        pools.append(pools_by_query[key])
+    return {"pools": pools, "held": held, "subjects": subjects, "identity": list(zip(videos.tolist(), manifest.frame_idx.astype(int).tolist(), ref.tolist())),
+            "definition": {"version": 2, "visual_half_window": int(window), "body_half_window": int(body_half),
+                           "foil_rule": "different_session_same_subject_target_absent_from_cached_visual_and_clip_local_body_windows",
+                           "visibility": "renderer_full_frame_visible_px_gt_0", "correct_position": "seeded_uniform_permutation", "partition": "provided_manifest_only", "n_rows": len(manifest),
+                           "n_eligible_trials": sum(len(p) >= 3 for p in pools),
+                           "n_insufficient_foils": sum(len(p) < 3 for p in pools)}}
+
+
+def _body_trials(manifest, context, seed, subject):
+    if context is None:
+        raise ValueError("Body-present scoring requires validated renderer context")
+    identity = list(zip(manifest.video_id.tolist(), manifest.frame_idx.astype(int).tolist(), manifest.referent.tolist()))
+    if identity != context["identity"]:
+        raise ValueError("Body-present context does not match manifest rows")
+    if subject is not None and not np.array_equal(np.asarray(subject), np.asarray(context["subjects"])):
+        raise ValueError("Body-present context subjects disagree")
+    rng = np.random.default_rng(seed)
+    sampled = []
+    for i, pool in enumerate(context["pools"]):
+        if len(pool) >= 3:
+            candidates = rng.permutation(np.concatenate([[i], rng.choice(pool, 3, replace=False)]))
+            sampled.append((i, candidates, int(np.flatnonzero(candidates == i)[0])))
+    return sampled
+
+
 @torch.no_grad()
-def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch=256, subject=None, trials=False):
+def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch=256, subject=None, trials=False, context=None):
     """4AFC with the word given and four candidate situations (image window + body), held-out subject only.
 
     `manifest` holds the held-out subject's named utterances with a visible referent; `ds` is the upstream
@@ -22,6 +104,9 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
     Foils use their own body, so the body must match the situation. `subject` [rows] restricts foils to the target's
     subject; `trials` adds `trial_rows` (manifest row of each scored trial) and per-trial 0/1 `trials` for the soft scores.
     """
+    sampled = _body_trials(manifest, context, seed, subject)
+    if len(ds) != len(manifest):
+        raise ValueError("Body-present dataset and manifest lengths disagree")
     model.eval()
     tokens, counts, regions, latents = [], [], [], []
     generator = torch.Generator().manual_seed(seed)
@@ -34,23 +119,13 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
             latents.append(model.latent_of(data.batch(np.array(rows), generator, training=False)))
     T, R = torch.cat(tokens), torch.cat(regions)
     Z = torch.cat(latents) if latents else None
-    rng = np.random.default_rng(seed)
-    referent = manifest.referent.to_numpy()
-    video = manifest.video_id.to_numpy()
-    held_all = manifest.held_referent.to_numpy().astype(bool)
+    held_all = np.asarray(context["held"], dtype=bool)
     held, rows_used = [], []
     correct = {"picture": [], "body": [], "fused": [], "picture_soft": [], "fused_soft": []}
     tau = getattr(model, "tau_p", None)
-    for i in range(len(manifest)):
-        same = np.ones(len(referent), bool) if subject is None else subject == subject[i]
-        pool = np.flatnonzero((referent != referent[i]) & (video != video[i]) & same)
-        if len(pool) < 3:
-            pool = np.flatnonzero((referent != referent[i]) & same)
-        if len(pool) < 3:
-            continue
+    for i, cand, answer in sampled:
         held.append(held_all[i])
         rows_used.append(i)
-        cand = np.concatenate([[i], rng.choice(pool, 3, replace=False)])
         pic = (R[cand].float() @ T[i]).max(1).values
         scores = {"picture": pic}
         if tau is not None:
@@ -62,7 +137,7 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
             if tau is not None:
                 scores["fused_soft"] = soft + model.beta * body
         for k, s in scores.items():
-            correct[k].append(float(s.argmax() == 0))
+            correct[k].append(float(s.argmax() == answer))
     held = np.array(held, bool)
     out = {"n_trials": len(next(iter(correct.values()))), "chance": 0.25}
     for k, c in correct.items():
@@ -72,7 +147,13 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
                       "acc_not_held": round(100 * float(c[~held].mean()), 3) if (~held).any() else None}
     if Z is not None:
         out["beta"] = round(float(model.beta), 4)
+    out["trial_definition"] = context["definition"]
+    out["trial_seed"] = int(seed)
+    out["n_insufficient_foils"] = context["definition"]["n_insufficient_foils"]
     if trials:
+        out["candidate_rows"] = [cand.tolist() for _, cand, _ in sampled]
+        out["correct_slots"] = [answer for _, _, answer in sampled]
+        out["candidate_identities"] = [[context["identity"][j] for j in cand] for _, cand, _ in sampled]
         out["trial_rows"] = rows_used
         out["trials"] = {k: [int(x) for x in correct[k]] for k in ("picture_soft", "fused_soft") if correct[k]}
     return out
@@ -100,32 +181,25 @@ def joint_reps(model, upstream, ds, data, layout, device, batch=256):
 
 
 @torch.no_grad()
-def joint_body_present_4afc(model, upstream, ds, data, manifest, layout, device, seed=0, batch=256, subject=None, trials=False):
+def joint_body_present_4afc(model, upstream, ds, data, manifest, layout, device, seed=0, batch=256, subject=None, trials=False, context=None):
     """`body_present_4afc` for the joint model, same trial sampling. `picture_soft`: each candidate's window scored with
     no body tokens; `fused_soft` (body model): with the candidate's own body tokens. Both use `model.score`, the
     training score. No body-only score exists for this model."""
+    sampled = _body_trials(manifest, context, seed, subject)
+    if len(ds) != len(manifest):
+        raise ValueError("Body-present dataset and manifest lengths disagree")
     T, R, Rb, ok = joint_reps(model, upstream, ds, data, layout, device, batch)
-    rng = np.random.default_rng(seed)
-    referent = manifest.referent.to_numpy()
-    video = manifest.video_id.to_numpy()
-    held_all = manifest.held_referent.to_numpy().astype(bool)
+    held_all = np.asarray(context["held"], dtype=bool)
     held, rows_used = [], []
     correct = {"picture_soft": [], "fused_soft": []}
-    for i in range(len(manifest)):
-        same = np.ones(len(referent), bool) if subject is None else subject == subject[i]
-        pool = np.flatnonzero((referent != referent[i]) & (video != video[i]) & same)
-        if len(pool) < 3:
-            pool = np.flatnonzero((referent != referent[i]) & same)
-        if len(pool) < 3:
-            continue
+    for i, cand, answer in sampled:
         held.append(held_all[i])
         rows_used.append(i)
-        cand = np.concatenate([[i], rng.choice(pool, 3, replace=False)])
         scores = {"picture_soft": model.score(R[cand], ok[cand], T[i:i + 1]).squeeze(1)}
         if Rb is not None:
             scores["fused_soft"] = model.score(Rb[cand], ok[cand], T[i:i + 1]).squeeze(1)
         for k, s in scores.items():
-            correct[k].append(float(s.argmax() == 0))
+            correct[k].append(float(s.argmax() == answer))
     held = np.array(held, bool)
     out = {"n_trials": len(correct["picture_soft"]), "chance": 0.25}
     for k, c in correct.items():
@@ -133,7 +207,13 @@ def joint_body_present_4afc(model, upstream, ds, data, manifest, layout, device,
             c = np.array(c)
             out[k] = {"acc": round(100 * float(c.mean()), 3), "acc_held": round(100 * float(c[held].mean()), 3) if held.any() else None,
                       "acc_not_held": round(100 * float(c[~held].mean()), 3) if (~held).any() else None}
+    out["trial_definition"] = context["definition"]
+    out["trial_seed"] = int(seed)
+    out["n_insufficient_foils"] = context["definition"]["n_insufficient_foils"]
     if trials:
+        out["candidate_rows"] = [cand.tolist() for _, cand, _ in sampled]
+        out["correct_slots"] = [answer for _, _, answer in sampled]
+        out["candidate_identities"] = [[context["identity"][j] for j in cand] for _, cand, _ in sampled]
         out["trial_rows"] = rows_used
         out["trials"] = {k: [int(x) for x in c] for k, c in correct.items() if c}
     return out

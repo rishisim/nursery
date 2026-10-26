@@ -328,6 +328,13 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         if len(test_rows) >= 8:
             held_ds = upstream.FramePairs(caches, lut, test_rows, vocab, window, False)
     teacher_held = make_data(test_rows) if teacher is not None and held_ds is not None else None
+    scoring_frames = pd.read_parquet(episode_root / "frames.parquet") if held_ds is not None or by_clips else None
+    def scoring_context(rows, subject=None):
+        return evaluate.body_present_context(rows, scoring_frames, lut, window, learner["window_s"], subject)
+    held_context = scoring_context(test_rows) if held_ds is not None else None
+    if held_context is not None and not any(len(p) >= 3 for p in held_context["pools"]):
+        raise ValueError("Body-present heldout: insufficient valid foils for every trial")
+    bp_contexts = {}
     bp_sets = {}
     if by_clips:  # body-present 4AFC sets: named, visible-referent pairs of each held-out partition (+ s8)
         def make_set(rows):
@@ -343,6 +350,10 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
             bp_sets[n] = make_set(all_manifest[pair_part == k])
         if held_ds is not None:
             bp_sets["s8"] = make_set(test_rows)
+        for n, (_, _, rows, subj, _) in bp_sets.items():
+            bp_contexts[n] = scoring_context(rows, subj)
+            if not any(len(p) >= 3 for p in bp_contexts[n]["pools"]):
+                raise ValueError(f"Body-present split {n}: insufficient valid foils for every trial (different session, same subject, target absent)")
         held_words = set(pd.read_parquet(episode_root / "frames.parquet", columns=["held_category"]).held_category.dropna())
         train_rows = manifest[manifest.named.astype(bool) & manifest.referent_visible.astype(bool)]
         words = {"train": set(train_rows.referent), **{n: set(v[2].referent) for n, v in bp_sets.items()}}
@@ -351,9 +362,9 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
 
     def bp_run(trials=False):
         if joint:
-            return {n: evaluate.joint_body_present_4afc(model, upstream, d, e, r, lay, device, seed, subject=subj, trials=trials)
+            return {n: evaluate.joint_body_present_4afc(model, upstream, d, e, r, lay, device, seed, subject=subj, trials=trials, context=bp_contexts[n])
                     for n, (d, e, r, subj, lay) in bp_sets.items()}
-        return {n: evaluate.body_present_4afc(model, upstream, d, e, r, device, seed, subject=subj, trials=trials)
+        return {n: evaluate.body_present_4afc(model, upstream, d, e, r, device, seed, subject=subj, trials=trials, context=bp_contexts[n])
                 for n, (d, e, r, subj, _) in bp_sets.items()}
 
     checkpoints = {}
@@ -470,9 +481,9 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
             eval_data = BodyData(real, ps, pt, win, None, None, None, None, device, learner["window_s"], 0.0, 0.0)
         if held_ds is not None and joint:
             lay = tuple(torch.as_tensor(a, device=device) for a in _window_layout(test_rows, lut, window))
-            metrics["body_present"] = evaluate.joint_body_present_4afc(model, upstream, held_ds, eval_data, test_rows, lay, device, seed)
+            metrics["body_present"] = evaluate.joint_body_present_4afc(model, upstream, held_ds, eval_data, test_rows, lay, device, seed, context=held_context)
         elif held_ds is not None:
-            metrics["body_present"] = evaluate.body_present_4afc(model, upstream, held_ds, eval_data, test_rows, device, seed)
+            metrics["body_present"] = evaluate.body_present_4afc(model, upstream, held_ds, eval_data, test_rows, device, seed, context=held_context)
     if eval_data is not None and len(eval_data.ps) and not joint:
         metrics["probe"] = evaluate.body_probe(model, eval_data, real, heldout, device)
     if split_info is not None:
@@ -487,7 +498,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     if teacher is not None:
         metrics["distill"] = {"from": str(Path(distill_from).resolve()), "weight": distill_weight, "temp": distill_temp}
         if held_ds is not None:  # ORACLE DIAGNOSTIC: the teacher's own body-present numbers (hard and soft pooling)
-            metrics["distill"]["teacher_body_present"] = evaluate.body_present_4afc(teacher, upstream, held_ds, teacher_held, test_rows, device, seed)
+            metrics["distill"]["teacher_body_present"] = evaluate.body_present_4afc(teacher, upstream, held_ds, teacher_held, test_rows, device, seed, context=held_context)
     if label_info is not None:  # fit of the selected model on its own training labels
         metrics["labels"] = {**label_info, "fit": evaluate.label_fit(model, upstream, ds, manifest, vocab, device, seed)}
     if checkpoints:

@@ -11,7 +11,7 @@ import pytest
 from conftest import synthetic_frames
 
 from nursery.common import _output_directory, load_config
-from nursery.speech.transcripts import cue_timelines, generate_transcripts, write_transcripts
+from nursery.speech.transcripts import clip_bounds, cue_timelines, generate_transcripts, session_scene, write_transcripts
 
 pytestmark = pytest.mark.usefixtures("offline")
 
@@ -28,8 +28,8 @@ def test_transcript_statistics_and_determinism():
     refs = manifest[manifest.referential]
     measured = {"utterances": len(manifest), "rate_hz": len(manifest) / len(frames),
                 "p_ref": float(manifest.referential.mean()), "p_held": float((refs.channel == "held").mean()),
-                "p_name": float(refs.named.mean()), "jitter_mean": float(manifest.jitter_frames.mean()),
-                "jitter_std": float(manifest.jitter_frames.std())}
+                "p_name": float(refs.named.mean()), "jitter_mean": float(manifest.jitter_draw_frames.mean()),
+                "jitter_std": float(manifest.jitter_draw_frames.std())}
     print("statistics:", json.dumps(measured, sort_keys=True))
     assert measured["rate_hz"] == pytest.approx(1 / 3, abs=0.01)
     # Always-held scene: no unseen channel, so held share is p_held after redraws.
@@ -41,7 +41,8 @@ def test_transcript_statistics_and_determinism():
     altered = load_config()
     altered["cues"]["noise_eps"] = [0, 1]
     changed_cues, _ = generate_transcripts(frames, altered, 1701)
-    pd.testing.assert_frame_equal(manifest.iloc[:, :12], changed_cues.iloc[:, :12])
+    speech_columns = [c for c in manifest if not c.startswith("weight_")]
+    pd.testing.assert_frame_equal(manifest[speech_columns], changed_cues[speech_columns])
 
 
 def test_mean_weights_and_oracle():
@@ -197,3 +198,74 @@ def test_transcript_writer_filters_train(episodes):
     assert record["n_frames"] == 240
     with pytest.raises(FileExistsError):
         write_transcripts(root, run, 4)
+
+
+def test_clip_local_windows_and_jitter_preserve_weak_speech():
+    frames = synthetic_frames(30, 2)
+    # Banana/juice cut, then the same ID again: it is a separate segment.
+    clips = ["banana"] * 9 + ["juice"] * 10 + ["banana"] * 10 + ["last"]
+    held = ["banana"] * 9 + ["juice"] * 10 + [None] * 11
+    for video in ("v0", "v1"):
+        mask = frames.video_id == video
+        frames.loc[mask, "clip"] = clips
+        frames.loc[mask, "held_category"] = held
+    config = load_config()
+    config["vocabulary"]["juice"] = "juice"
+    config["generator"].update(rate_hz=100, sigma=8, p_ref=1, p_name=1)
+    group = frames[frames.video_id == "v0"].reset_index(drop=True)
+    starts, ends = clip_bounds(group)
+    np.testing.assert_array_equal(starts, [0] * 9 + [9] * 10 + [19] * 10 + [29])
+    np.testing.assert_array_equal(ends, [8] * 9 + [18] * 10 + [28] * 10 + [29])
+    _, _, windows, _ = session_scene(group, config["vocabulary"], 5)
+    assert windows[8] == ["banana"] and windows[9] == ["juice"]
+    assert windows[19] == [] and windows[29] == []
+    # Within-clip delayed naming remains a valid held channel candidate.
+    delayed = group.copy()
+    delayed["held_category"] = None
+    delayed.loc[3, "held_category"] = "banana"
+    assert session_scene(delayed, config["vocabulary"], 5)[2][8] == ["banana"]
+    manifest, _ = generate_transcripts(frames, config, 7)
+    source = manifest.source_frame_idx.to_numpy()
+    aligned = manifest.frame_idx.to_numpy()
+    assert ((aligned >= starts[source]) & (aligned <= ends[source])).all()
+    np.testing.assert_array_equal(manifest.jitter_frames, aligned - source)
+    np.testing.assert_array_equal(aligned, np.clip(source + manifest.jitter_draw_frames, starts[source], ends[source]))
+    assert (manifest.jitter_frames > 0).any() and (manifest.jitter_frames < 0).any()
+    assert (manifest.jitter_frames != manifest.jitter_draw_frames).any()
+    assert set(manifest.channel) == {"held", "seen", "unseen"}
+    assert manifest.named.all() and (~manifest.held_referent).any()
+    for row in manifest.itertuples():
+        assert row.held_referent == (row.referent == held[row.frame_idx])
+        assert row.source_held_referent == (row.referent == held[row.source_frame_idx])
+        if row.channel == "held":
+            assert row.referent in windows[row.source_frame_idx]
+    assert (manifest.source_frame_idx == 29).any()
+    assert (manifest.loc[manifest.source_frame_idx == 29, "jitter_frames"] == 0).all()
+
+
+def test_delayed_names_and_aligned_holding_provenance():
+    frames = synthetic_frames(30, 2)
+    frames["held_category"] = None
+    frames.loc[frames.frame_idx == 10, "held_category"] = "banana"
+    config = load_config()
+    config["generator"].update(rate_hz=100, sigma=2, p_ref=1, p_name=1)
+    manifest, _ = generate_transcripts(frames, config, 12)
+    delayed = manifest[(manifest.channel == "held") & (manifest.source_frame_idx != 10)]
+    assert len(delayed) > 0 and (delayed.referent == "banana").all()
+    assert not delayed.source_held_referent.any()
+    assert (manifest.held_referent != manifest.source_held_referent).any()
+    np.testing.assert_array_equal(manifest.held_referent,
+                                  (manifest.referent == "banana") & (manifest.frame_idx == 10))
+    np.testing.assert_array_equal(manifest.source_held_referent,
+                                  (manifest.referent == "banana") & (manifest.source_frame_idx == 10))
+
+
+@pytest.mark.parametrize("invalid", [None, "", " ", 12])
+def test_reject_missing_or_invalid_clip_identity(invalid):
+    frames = synthetic_frames(30, 2)
+    frames["clip"] = frames["clip"].astype(object)
+    frames.loc[0, "clip"] = invalid
+    with pytest.raises(ValueError, match="clip identity"):
+        generate_transcripts(frames, load_config(), 4)
+    with pytest.raises(ValueError, match="clip identity"):
+        generate_transcripts(frames.drop(columns="clip"), load_config(), 4)

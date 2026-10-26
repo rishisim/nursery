@@ -22,6 +22,56 @@ vectors. The direct-label diagnostic demonstrated visual headroom; earlier
 claims that perfect naming capped improvement at about two points must not be
 treated as a general limit. Weak naming remains part of the scientific task.
 
+## Speech alignment and body-present scoring
+
+Speech remains intentionally weakly aligned. The generator chooses the
+referential channel and word from the source-time scene, including delayed and
+nonheld names; it does not filter examples to make a name held at the aligned
+frame. Rounded Gaussian jitter is clamped to the contiguous source-clip segment,
+so it cannot jump across a cut. `source_frame_idx` and `utterance_time_s` preserve
+the source time; `jitter_draw_frames` records the raw rounded draw and
+`jitter_frames` the effective aligned-minus-source offset. `held_referent` is
+recomputed at the aligned frame, while `source_held_referent` records source-time
+status. Clip-local held-window candidates also stop at clip boundaries. This
+does not guarantee that every held-channel referent remains held within the
+body encoder's aligned ±5-second window after jitter; this residual is retained
+as part of weak alignment, not filtered away.
+
+Body-present 4AFC uses shared renderer-grounded trial context for additive and
+joint learners. A target must be visible (`visible_px > 0`) at its aligned frame.
+Each foil comes from another session of the same subject, within the supplied
+evaluation partition, has a different referent, and excludes the target from
+its cached visual window and its accessible contiguous-clip body window. There
+is no fallback to a looser foil pool: rows with fewer than three eligible foils
+are skipped, and training rejects a requested split if it has no eligible trial.
+The correct candidate slot is seeded and randomized, and controls share the
+same sampled candidates. Held status is derived from `frames.parquet` at the
+aligned frame rather than trusting older manifest values. Trial metadata records
+the rule, windows, eligible/skipped counts and seed; detailed trial output also
+records candidate identities and correct slots.
+
+Visibility is renderer full-frame visibility, not proof that the object remains
+recognizable in the image encoder's center crop or after DINO preprocessing. The
+body-present scores therefore remain a conservative situation-matching
+diagnostic, not a direct measure of broad language acquisition. Picture-only
+metrics and existing runs are unchanged. Historical body-present trial metrics
+use a different candidate/answer protocol and are not directly comparable to
+metrics generated with this rule; do not rewrite archived results. This
+implementation update has not established a language gain or resolved step 1
+scientifically. See the [current step status](../PLAN.md#current-step-and-next-direction)
+and the canonical implementations in
+[`transcripts.py`](../nursery/speech/transcripts.py),
+[`evaluate.py`](../nursery/learner/evaluate.py), and
+[`train.py`](../nursery/learner/train.py).
+
+Verification: 76 focused speech, physical-feature and learner tests passed.
+In-memory QA over 856 saved sessions (102,720 frames) and 34,140 generated
+utterances found no cross-clip jitter or source-held support violations;
+scoring QA covered 1,626 trials (s8 705, clips-dev 449, clips-test 472), with
+zero invalid selected foils and zero skipped trials. The utterances were generated in memory; saved data,
+manifests and run metrics were not modified. These checks validate the repair
+and scoring protocol, not a language-learning outcome.
+
 ## Visual side (identical in every condition)
 
 Linear visual projection and word vectors (upstream `RegionMIL`), soft-MIL pooling (`--pool soft`, tau_p 0.1).

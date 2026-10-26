@@ -102,10 +102,30 @@ def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch, av
         embed_episodes(root, run)
 
 
+def _scoring_episodes(root):
+    """Four distinct scenes/sessions per subject, so strict 4AFC is identifiable."""
+    frames = pd.read_parquet(root / "frames.parquet")
+    sessions = pd.read_parquet(root / "sessions.parquet")
+    rows, metadata = [], []
+    for base in ("v0", "v1"):
+        for k, category in enumerate(("mug", "bowl", "apple", "banana")):
+            video = base if k == 0 else f"{base}_scene{k}"
+            group = frames[frames.video_id == base].copy()
+            group["video_id"] = video
+            group["objects"] = json.dumps([{"category": category, "visible_px": 40, "cells": [0]}])
+            group["held_category"] = np.where(group.contact_left, category, None)
+            rows.append(group)
+            session = sessions[sessions.video_id == base].copy()
+            session["video_id"] = video
+            metadata.append(session)
+    pd.concat([*rows, frames[~frames.video_id.isin(["v0", "v1"])]], ignore_index=True).to_parquet(root / "frames.parquet", index=False)
+    pd.concat([*metadata, sessions[~sessions.video_id.isin(["v0", "v1"])]], ignore_index=True).to_parquet(root / "sessions.parquet", index=False)
+
+
 def _fake_caches(root, run):
     rng = np.random.default_rng(12)
     frames = pd.read_parquet(root / "frames.parquet")
-    frames = frames[frames.video_id.isin(["v0", "v1"])].copy()
+    frames = frames[frames.room == "train_room"].copy()
     probes = probe_frames(pd.read_parquet(root / "probes.parquet"), load_config())
     probes.to_parquet(run / "probes_frames.parquet", index=False)
     for name, table in (("train", frames), ("probes", probes)):
@@ -244,7 +264,9 @@ def _body_session(seed, frames=120):
                 hand_contact=np.packbits(bits, axis=1), hand_contact_vertices=np.int32(1556))
 
 
-def _write_body(root, video_ids=("v0", "v1")):
+def _write_body(root, video_ids=None):
+    if video_ids is None:
+        video_ids = pd.read_parquet(root / "sessions.parquet").query("split == 'train'").video_id.tolist()
     (root / "body").mkdir(exist_ok=True)
     for k, video_id in enumerate(video_ids):
         np.savez(root / "body" / f"{video_id}.npz", **_body_session(k))
@@ -260,7 +282,9 @@ def _store(root, clips=None, physical=None):
     return body.load_store(root, frames, ["v0", "v1"], set(), physical=physical)
 
 
-def _write_physical(root, video_ids=("v0", "v1")):
+def _write_physical(root, video_ids=None):
+    if video_ids is None:
+        video_ids = pd.read_parquet(root / "sessions.parquet").query("split == 'train'").video_id.tolist()
     (root / "physical").mkdir(exist_ok=True)
     for k, video_id in enumerate(video_ids):
         rng = np.random.default_rng(100 + k)
@@ -586,6 +610,7 @@ def test_distill_run_with_weight_zero_equals_the_plain_run(episodes, upstream, m
     monkeypatch.setattr(torch.backends.mps, "is_available", lambda: False)  # CPU: exact repeatability
 
     root, run = episodes
+    _scoring_episodes(root)
     _write_body(root)
     write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
     _fake_caches(root, run)
@@ -637,6 +662,7 @@ def test_body_training_runs(episodes, upstream, options):
     from nursery.learner.train import train_run
 
     root, run = episodes
+    _scoring_episodes(root)
     _write_body(root)
     write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
     _fake_caches(root, run)
@@ -683,7 +709,7 @@ def test_label_training_runs_and_reports_fit(episodes, upstream):
     word = next(w for w in vocab if w != "<pad>")  # a category the vocabulary knows
     frames["objects"] = json.dumps([{"category": word, "visible_px": 40, "cells": []}])
     frames.to_parquet(root / "frames.parquet", index=False)
-    metrics = train_run(run, "none", 3, epochs=2, name="labels", pool="soft", heldout_subject="s2", labels=True)
+    metrics = train_run(run, "none", 3, epochs=2, name="labels", pool="soft", heldout_subject="none", labels=True)
     assert metrics["labels"]["n_words"] == 1 and metrics["labels"]["n_pairs"] <= metrics["labels"]["n_speech_pairs"]
     assert metrics["labels"]["fit"]["top1"] == 100 and metrics["n_pairs"] == metrics["labels"]["n_pairs"]
     with pytest.raises(ValueError, match="picture-only"):
@@ -728,6 +754,7 @@ def test_clip_split_training_runs_and_default_is_unchanged(episodes, upstream):
     from nursery.learner.train import train_run
 
     root, run = episodes
+    _scoring_episodes(root)
     _clip_frames(root)
     _write_body(root)
     write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
@@ -750,6 +777,7 @@ def test_physical_training_runs_and_records_flags(episodes, upstream):
     from nursery.learner.train import train_run
 
     root, run = episodes
+    _scoring_episodes(root)
     _clip_frames(root)
     _write_body(root)
     physical = _write_physical(root)
@@ -907,8 +935,11 @@ def test_joint_train_and_eval_scores_agree(episodes, upstream):
         probe = model.score(single, torch.ones(3, 17, dtype=torch.bool), model.enc_text(t[:3], n[:3]))
         assert torch.allclose(probe, model.pair_scores(x, t[:3], n[:3], vis), atol=1e-6)
     # body-present trials run on the same scores
-    manifest = pd.DataFrame({"referent": list("abcdef"), "video_id": ["v0"] * 3 + ["v1"] * 3, "held_referent": [True, False] * 3})
-    out = evaluate.joint_body_present_4afc(model, upstream, Pairs(), data, manifest, layout, "cpu", trials=True)
+    manifest = pd.DataFrame({"referent": list("abcdef"), "video_id": [f"v{i}" for i in range(6)], "frame_idx": 0})
+    frames = manifest.assign(subject="s1", clip="clip", held_category=None,
+                             objects=[json.dumps([{"category": c, "visible_px": 40}]) for c in "abcdef"])
+    context = evaluate.body_present_context(manifest, frames, {f"v{i}|0": i for i in range(6)}, 0, 0)
+    out = evaluate.joint_body_present_4afc(model, upstream, Pairs(), data, manifest, layout, "cpu", trials=True, context=context)
     assert out["n_trials"] == 6 and set(out["trials"]) == {"picture_soft", "fused_soft"} and "body" not in out
 
 
@@ -959,6 +990,7 @@ def test_joint_training_runs_and_rejections(episodes, upstream):
     from nursery.learner.train import train_run
 
     root, run = episodes
+    _scoring_episodes(root)
     _clip_frames(root)
     _write_body(root)
     write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
@@ -981,3 +1013,128 @@ def test_joint_training_runs_and_rejections(episodes, upstream):
                        ({"labels": True}, "--arch joint"), ({"weights": {"pred": 0.5}}, "auxiliary")):
         with pytest.raises(ValueError, match=match):
             train_run(run, "none", 5, **{**dict(epochs=1, pool="soft", arch="joint"), **bad})
+
+
+def _scoring_rows():
+    manifest = pd.DataFrame({"video_id": [f"s{i}" for i in range(10)], "frame_idx": 2,
+                             "referent": list("abcdefghij"), "held_referent": True})
+    frames = pd.DataFrame([{"video_id": f"s{i}", "frame_idx": f, "subject": "person" if i < 8 else "other",
+                            "clip": "scene", "held_category": None,
+                            "objects": json.dumps([{"category": word, "visible_px": 40}])}
+                           for i, word in enumerate("abcdefghij") for f in range(5)])
+    lut = {f"{r.video_id}|{r.frame_idx}": i for i, r in enumerate(frames.itertuples())}
+    return manifest, frames, lut
+
+
+@pytest.mark.parametrize("evidence,excluded", [("center", True), ("adjacent", True), ("body", True),
+                                              ("reset", False), ("uncached", False), ("outside", False)])
+def test_body_trial_truth_windows_and_clip_resets(evidence, excluded):
+    from nursery.learner import evaluate
+    manifest, frames, lut = _scoring_rows()
+    if evidence in ("center", "adjacent", "uncached"):
+        f = 2 if evidence == "center" else 3
+        loc = (frames.video_id == "s1") & (frames.frame_idx == f)
+        frames.loc[loc, "objects"] = json.dumps([{"category": c, "visible_px": 40} for c in ("a", "b")])
+        if evidence == "uncached":
+            del lut["s1|3"]
+    else:
+        f = 0 if evidence == "outside" else 4
+        frames.loc[(frames.video_id == "s1") & (frames.frame_idx == f), "held_category"] = "a"
+        if evidence == "reset":
+            frames.loc[(frames.video_id == "s1") & (frames.frame_idx == 3), "clip"] = "different"
+    context = evaluate.body_present_context(manifest, frames, lut, 1, 1 if evidence == "outside" else 2)
+    assert (1 not in context["pools"][0]) == excluded
+    assert not set(context["pools"][0]) & {0, 8, 9}  # subject/session restrictions never relax
+    assert not any(context["held"])  # ignore stale source-time held_referent=True
+
+
+def test_body_trial_validation_and_insufficient_foils(episodes, upstream):
+    from nursery.learner import evaluate
+    from nursery.learner.train import train_run
+    manifest, frames, lut = _scoring_rows()
+    with pytest.raises(ValueError, match="validated renderer context"):
+        evaluate.body_present_4afc(None, None, None, None, manifest, "cpu")
+    with pytest.raises(ValueError, match="renderer metadata"):
+        evaluate.body_present_context(manifest, frames.drop(columns="objects"), lut, 1, 2)
+    with pytest.raises(ValueError, match="supplied visual frame"):
+        evaluate.body_present_context(manifest, frames[~((frames.video_id == "s1") & (frames.frame_idx == 3))], lut, 1, 2)
+    for word in (None, "", np.nan, "absent"):
+        bad = manifest.copy()
+        bad.loc[0, "referent"] = word
+        with pytest.raises(ValueError, match="target referent|positive target absent"):
+            evaluate.body_present_context(bad, frames, lut, 1, 2)
+    small = manifest.iloc[:3].copy()
+    context = evaluate.body_present_context(small, frames, lut, 1, 2)
+    assert evaluate._body_trials(small, context, 5, None) == []
+    assert context["definition"]["n_insufficient_foils"] == 3
+    # An evaluation partition is exactly the provided rows: no widening to other rows.
+    assert all(set(p) <= {0, 1, 2} for p in context["pools"])
+    same_video = manifest.iloc[:4].copy()
+    same_video["video_id"], same_video["frame_idx"] = "single", np.arange(4)
+    same_frames = same_video.assign(subject="one", clip="clip", held_category=None,
+                                   objects=[json.dumps([{"category": c, "visible_px": 1}]) for c in "abcd"])
+    same_context = evaluate.body_present_context(same_video, same_frames, {f"single|{i}": i for i in range(4)}, 0, 0)
+    assert not any(len(p) for p in same_context["pools"])
+    # The original fixture has every target in every scene and one session per subject.
+    # Requested heldout scoring fails before optimizer steps rather than manufacturing trials.
+    root, run = episodes
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    with pytest.raises(ValueError, match="insufficient valid foils"):
+        train_run(run, "none", 3, epochs=1, pool="soft", heldout_subject="s2")
+
+
+def test_body_trial_controls_share_candidates_and_ties_are_unbiased(monkeypatch):
+    import torch
+    from types import SimpleNamespace
+    from nursery.learner import evaluate
+    manifest, frames, lut = _scoring_rows()
+    context = evaluate.body_present_context(manifest, frames, lut, 1, 2)
+
+    class Constant:
+        encoder = None
+        tau_p = 0.1
+        beta = 1.0
+        def eval(self):
+            return self
+        def enc_text(self, t, n):
+            return torch.ones(len(t), 2)
+        def enc_regions(self, v):
+            return torch.ones(len(v), 17, 2)
+        def latent_of(self, ctx):
+            return torch.ones(len(ctx), 2)
+        def body_similarity(self, z, t):
+            return torch.zeros(len(z), len(t))
+        def score(self, r, valid, t):
+            return torch.zeros(len(r), len(t))
+
+    class Pairs:
+        def __len__(self):
+            return len(manifest)
+        def __getitem__(self, i):
+            return i, torch.ones(17, 2), torch.ones(1, dtype=torch.long), 1
+
+    def collate(rows):
+        return (torch.tensor([r[0] for r in rows]), torch.stack([r[1] for r in rows]),
+                torch.stack([r[2] for r in rows]), torch.tensor([r[3] for r in rows]))
+    upstream = SimpleNamespace(collate=collate)
+    data = SimpleNamespace(batch=lambda rows, generator, training: rows)
+    reps = (torch.ones(10, 2), torch.ones(10, 17, 2), torch.ones(10, 17, 2), torch.ones(10, 17, dtype=torch.bool))
+    monkeypatch.setattr(evaluate, "joint_reps", lambda model, upstream, ds, d, layout, device, batch: (reps[0], reps[1], reps[2] if d else None, reps[3]))
+    results = []
+    for with_body in (False, True):
+        model = Constant()
+        model.encoder = object() if with_body else None
+        d = data if with_body else None
+        results.append(evaluate.body_present_4afc(model, upstream, Pairs(), d, manifest, "cpu", seed=8, trials=True, context=context))
+        results.append(evaluate.joint_body_present_4afc(model, upstream, Pairs(), d, manifest, None, "cpu", seed=8, trials=True, context=context))
+    for out in results:
+        assert out["candidate_rows"] == results[0]["candidate_rows"]
+        assert out["correct_slots"] == results[0]["correct_slots"]
+        assert out["trial_rows"] == list(range(8))
+        assert out["n_insufficient_foils"] == 2
+        assert out["trials"]["picture_soft"] == [int(x == 0) for x in out["correct_slots"]]
+        assert out["picture_soft"]["acc"] < 100
+        for row, cand, slot in zip(out["trial_rows"], out["candidate_rows"], out["correct_slots"]):
+            assert cand[slot] == row
+            assert set(cand) - {row} <= set(context["pools"][row])
