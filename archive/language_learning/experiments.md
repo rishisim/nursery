@@ -1,8 +1,9 @@
 # Language-learning experiment record
 
-Archived 26 October 2026 from `PLAN.md` at commit `4a3dd16d`.
-This preserves the protocol and results through step 4.13, including proposals
-that were never run. Historical “next” instructions below are not an active queue.
+Originally archived 26 October 2026 from `PLAN.md` at commit `4a3dd16d`,
+preserving the protocol and results through step 4.13, including proposals
+that were never run. The 4.14 record below was appended after the matched
+rerun. Historical “next” instructions below are not an active queue.
 Interpretations are recorded as written at the time; later diagnostics sometimes
 correct them. In particular, overfitting does not uniquely identify its cause.
 
@@ -468,6 +469,47 @@ a higher eventual plateau.
        signal this size.
      - Not yet tested: the new signals without the fingerprint channels
        (body = load + skin only), which removes the memorisation route.
+   - <a id="414-matched-corrected-exposure-rerun"></a>4.14 matched corrected-exposure rerun (run record:
+     `outputs/runs/step1_matched/`; code commit
+     `92ef83d4507676dea807f62b30f3be861e8acbb8`). The question was whether
+     full real body plus load/skin helps over video on the same corrected
+     weak speech and matched trials, retaining the 4.13 two-arm comparison.
+     - Exactly two additive runs, seed 0, 60 epochs each, sequential local
+       MPS; 512-d output over frozen 768-d visual features, clips split seed
+       0, s8 held out, soft pooling tau 0.1, batch 256, AdamW lr 3e-4 and
+       weight decay 0.1, visual/body windows ±2/±5 s, body dropout 0.5, all
+       auxiliary losses zero. Existing clean-body feature, probe and Konkle
+       caches were reused. Speech was regenerated with the clip-local repair
+       and shared renderer-grounded strict body-present scoring was applied.
+     - Input audit passed: 34,140 utterances, 29,826 pairs from s1–s7
+       (before clip splitting), 18,613 training pairs, 5,236 cross-partition
+       drops, and 159 vocabulary token types
+       (same word set, changed indexed order); no speech audit errors. Both
+       arms had identical candidate identities and slots. Original inputs
+       and prior runs were preserved. Full frozen protocol, audit, execution,
+       and comparison records are in the ignored run directory.
+     - Primary: at saved zero-based body-present-selected epoch indices
+       (video 45, body 43), clips_test (570 trials) video picture_soft
+       52.28% vs body fused_soft
+       47.54%, Δ −4.74 pp, paired-trial bootstrap 95% CI [−8.60, −0.88]
+       (10,000 replicates). s8 (787 trials): 48.03% vs 46.00%, Δ −2.03 pp
+       [−5.46, 1.53]. Clips-test held subset Δ −4.21 pp [−10.53, 2.63];
+       nonheld Δ −5.00 pp [−10.00, −0.26].
+     - Picture-only selected zero-based epoch indices were 30 (video) and
+       25 (body): rendered test
+       67.12% vs 66.22%; Konkle 64.60% vs 64.02% (body minus video −0.90
+       and −0.58 pp). These are secondary, separately dev-selected outcomes.
+     - Independent review passed: matched trial identities/slots, selected
+       epochs, configuration and bootstrap results were verified; 10 input
+       hashes and 1,718 source-file size/mtime records were unchanged. The
+       intervals are conditional on one seed and fixed trials; trial bootstrap
+       does not account for within-session/source-clip dependence or seed
+       uncertainty.
+       Historical 4.13 body-present scores use different candidate rules and
+       are not direct before/after comparisons. No body benefit was found in
+       this fixed-data comparison; it does not test a higher language ceiling
+       or establish a mechanism. Step 1 remains active; no follow-on run is
+       automatically queued. Any next step requires a separate decision.
 5. **Scaling.** Track both outcomes across smaller data sizes from the same
    render, fit Frank's
    free-asymptote logistic. Separate faster learning / better at limited data
