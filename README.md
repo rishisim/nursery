@@ -91,10 +91,13 @@ Use `python -m nursery.simulator --help` or
 
 ## Local data and verification
 
-`outputs/` holds retained datasets, features, runs and checkpoints.
-`.external/` holds environments and upstream checkouts. `data/`, `downloads/`,
-`output/` and `tmp/` are ignored local roots, not active source. Existing assets
-and saved runs stay at their recorded paths; see the [archive index](archive/README.md).
+`outputs/` is the destination for new generated files and runs; it also holds
+retained datasets, features and checkpoints. Databrary agreement/access PDFs
+are in `outputs/exports/databrary/`. Use system temporary storage for scratch work.
+`.external/` holds environments and upstream checkouts; `data/` and `downloads/`
+retain local assets. These roots are ignored, but their contents are not
+automatically disposable. Existing assets and saved runs stay at their recorded
+paths; see the [archive index](archive/README.md).
 Archived source snapshots are excluded from default test discovery.
 
 ```bash

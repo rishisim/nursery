@@ -10,7 +10,8 @@ __pycache__/
 .venv-*/
 .external/
 
-# Complete disposable and generated roots.
+# Use outputs/ for new generated files and runs; use system temp for scratch.
+# Retain legacy ignore rules. Ignored assets and saved runs are not disposable.
 artifacts/
 cache/
 checkpoints/
