@@ -17,10 +17,9 @@ learning examples with hidden referent identity.
 
 Before new training, fix the split and subset membership, paired training seeds,
 evaluation trials, training budget at each size, and dev-only checkpoint
-selection rule. Keep test experience outside every training subset. If
-pretraining is used, confine it to that size's training subset and match the
-visual experience and declared optimization budget across arms. Specify how
-pretraining cost enters that budget before comparing curves.
+selection rule. Keep test experience outside every training subset and match
+the visual experience and declared optimization opportunity across arms.
+These first two studies use direct language training without sensory pretraining.
 
 The primary outcome is understanding with body available: V+B versus the
 separately trained V learner on identical held-out situations and candidates.
@@ -30,11 +29,17 @@ eventual ceiling. A fixed-data epoch plateau or one favorable data size cannot
 establish the latter; insufficient saturation leaves it unresolved.
 
 The working 512-dimensional additive learner over frozen DINO features is the
-reference baseline. DINO supplies prior visual knowledge; these experiments do
-not start visual learning from scratch. Joint visual/body fusion with optional
-sensory pretraining is under research, not a chosen implementation or an
-approved training run. The old 128-dimensional joint pilot changed several
-factors and does not settle that choice.
+reference baseline. The proposed joint learner preserves direct visual–word and
+body–word paths and adds a learned interaction. DINO supplies prior visual
+knowledge; these experiments do not start visual learning from scratch. The
+first comparison excludes sensory pretraining. The old 128-dimensional joint
+pilot changed several factors and does not settle this design.
+
+The two design references are the [main acquisition comparison](docs/acquisition_curves.md)
+and [small cross-situational study](docs/cross_situational_learning.md). They can
+run in parallel after shared implementation verification, with separate models
+and artifacts. These documents describe intended outputs; implementation,
+dataset feasibility, frozen run settings and runtime limits precede training.
 
 ## Preserved starting points
 
