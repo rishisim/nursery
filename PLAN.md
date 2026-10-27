@@ -38,7 +38,11 @@ pilot changed several factors and does not settle this design.
 The two design references are the [main acquisition comparison](docs/acquisition_curves.md)
 and [small cross-situational study](docs/cross_situational_learning.md). They can
 run in parallel after shared implementation verification, with separate models
-and artifacts. These documents describe intended outputs; implementation,
+and artifacts. The small study compares video-only with additive video + body
+at one fixed data amount, reporting a two-row accuracy table and a supporting
+shuffled-body evaluation check; it has no joint arm or acquisition curves.
+The main study retains its three learners and acquisition curves.
+These documents describe intended outputs; implementation,
 dataset feasibility, frozen run settings and runtime limits precede training.
 
 ## Preserved starting points

@@ -1,6 +1,6 @@
 # Small experiment: learning words across ambiguous encounters
 
-Design reference for a smaller acquisition curve alongside the
+Design reference for a small fixed-data comparison alongside the
 [main study](acquisition_curves.md). No run has started.
 
 ## The idea
@@ -41,16 +41,16 @@ inputs. The vocabulary and language are deliberately simplified.
 
 ## How we run it
 
-Use the same three conditions as the main study: video only, additive video +
-body, and joint video + body. Their architecture is defined in the
+Use two conditions: video only and additive video + body. There is no joint
+learner in this small study. Their architecture is defined in the
 [main design](acquisition_curves.md#the-three-learners), not implemented separately here.
 
-Propose 25%, 50% and 100% of the small training set, with three paired seeds.
-Balance word exposure and report independent clips and utterances per word.
-Keep the word/category mapping and test panel fixed.
+Use one fixed small training set, with three paired seeds. Balance word exposure
+and report independent clips and utterances per word. Keep the word/category
+mapping and test panel fixed. There is no training-data sweep.
 
-Split by source clip so replays cannot cross partitions. Train fresh models at
-each point, select checkpoints on development data, and test on unfamiliar clips
+Split by source clip so replays cannot cross partitions. Train fresh models for
+each seed, select checkpoints on development data, and test on unfamiliar clips
 and varied views. New-instance testing requires genuinely held-out instances.
 
 Testing uses four candidate situations and one learned word, with the same
@@ -58,28 +58,24 @@ candidate choices for all learners. Exactly one candidate contains the target
 category within the permitted context. Body-enabled learners receive each
 candidate's own sensory history. Chance is 25%.
 
-At the largest point, also evaluate with complete body histories shuffled
-across situations. Keep channels together within each history and freeze the
+As a supporting check, evaluate the same trained additive models with complete
+body histories shuffled across situations. This is evaluation only, not another
+training condition. Keep channels together within each history and freeze the
 donor and missing-data rules before evaluation.
 
 ## The output we want
 
-**A miniature acquisition plot:** horizontal axis = independent experience per
-word; vertical axis = held-out word-understanding accuracy. Show the three
-learners and uncertainty across seeds. The desired result is that body-enabled
-learning reaches stronger accuracy with fewer ambiguous encounters. This is the
-hypothesis, not a promised curve.
-
-**A compact results table**, like the heavy/light presentation, at the largest
-small-data point:
+**A compact results table**, like the heavy/light presentation, reporting mean
+held-out accuracy and uncertainty across seeds. The desired result is stronger
+word understanding with body input after the same ambiguous encounters. This
+is the hypothesis, not a promised result. No acquisition curve is produced here.
 
 | Condition | Held-out accuracy |
 |---|---|
 | Video only | — |
 | Additive video + body | — |
-| Joint video + body | — |
-| Additive with shuffled test body | — |
-| Joint with shuffled test body | — |
+
+Report shuffled-body accuracy in one supporting sentence below the table.
 
 The blanks are future measurements. For reference, the earlier heavy/light
 table reported video 37.88%, video + load 92.42%, and shuffled load 46.21%.
@@ -87,8 +83,8 @@ Those were a different, two-choice task with 50% chance; they are a presentation
 example, not numerical targets for this experiment. See the
 [saved heavy/light record](../archive/language_learning/experiments.md#step-2-heavy-light-capability-test).
 
-Include a few example encounters beside the plot. The main study's natural-speech
-curve remains the central project output.
+Include a few example encounters beside the table. Acquisition curves and the
+joint-architecture comparison remain in the main study.
 
 ## Running in parallel
 
