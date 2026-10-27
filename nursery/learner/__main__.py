@@ -38,9 +38,26 @@ def main():
     train.add_argument("--physical", help="Directory of per-clip physical signals (load, skin temperature, contact area); adds two body-encoder groups (needs --body real)")
     train.add_argument("--physical-shuffle", action="store_true", help="CONTROL: load/skin taken from another source clip of the same subject and partition (needs --physical)")
     train.add_argument("--name", help="Output directory prefix (default: the condition)")
+    property_task = commands.add_parser("property", help="Bounded synthetic heavy/light word-grounding diagnostic")
+    property_task.add_argument("--phase", choices=("prepare", "train"), required=True,
+                               help="prepare freezes exposures/protocol without training; train runs the frozen six-model comparison once")
+    property_task.add_argument("--output", required=True, help="Ignored run root; prepare requires an empty directory")
+    property_task.add_argument("--episodes", help="Existing episode directory (prepare only; default: clean_856)")
+    property_task.add_argument("--cache", help="Existing region cache directory (prepare only; default: clean_body/train_cache)")
+    property_task.add_argument("--physical", help="Existing physical_by_clip directory (prepare only)")
     args = parser.parse_args()
     if args.command == "embed":
         embed_episodes(args.episodes, args.output, args.device, args.batch)
+    elif args.command == "property":
+        from .property import prepare, train_prepared
+
+        if args.phase == "prepare":
+            result = prepare(args.output, args.episodes, args.cache, args.physical)
+            print(result["audit"])
+        else:
+            if any((args.episodes, args.cache, args.physical)):
+                parser.error("property train reads paths from the prepared protocol; path options are prepare-only")
+            print(train_prepared(args.output))
     else:
         weights = {loss: getattr(args, f"w_{loss}") for loss in LOSSES}
         train_run(args.run, args.condition, args.seed, args.epochs, args.name, args.pool, args.tau_p, args.body,

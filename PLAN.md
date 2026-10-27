@@ -31,24 +31,43 @@ advances the build; neither is established by a supervised sensor diagnostic.
 
 ## Current step and next direction
 
-1. **Trustworthy experiences and tests — implementation repairs and matched rerun independently verified.**
-   Speech jitter stays within source clips while preserving weak, delayed and
-   nonheld naming. Shared body-present scoring uses strict matched foils and
-   aligned-frame renderer truth. This is not evidence of a language gain or
-   proof that step 1 is scientifically solved. See the [implementation details](docs/learner.md#speech-alignment-and-body-present-scoring).
-   The matched rerun kept the historical two arms and training settings while
-   correcting speech alignment and shared body-present trial scoring. It found
-   no body benefit on the primary or picture-only outcomes. The protocol uses
-   one training seed, so intervals are conditional on these models and trials;
-   the old 4.13 body-present scores use different trial rules and are not
-   directly comparable. No follow-on experiment is queued; any next step
-   needs a separate decision. See the [matched rerun record](archive/language_learning/experiments.md#414-matched-corrected-exposure-rerun).
-2. **Small diagnostic capability (conditional).** If the verified comparison
-   leaves a useful question, test whether relevant bodily information can
-   support language on unfamiliar objects, for example heavy/light during
-   lifting. Check that the sensory evidence is physically consistent and whether
-   video already reveals it. Success would establish a useful capability, not
-   broad noun learning or a higher language ceiling.
+1. **Trustworthy experiences and tests — closed.** Speech-alignment and
+   body-present scoring repairs and the matched comparison are complete and
+   independently verified. The comparison found no body benefit in its primary
+   or picture-only outcomes; its single-seed intervals are conditional on the
+   fixed models and trials, and the old 4.13 scores are not directly comparable.
+   This closes the repair-and-comparison task, not the broader scientific
+   question or a claim of benefit. See the [implementation details](docs/learner.md#speech-alignment-and-body-present-scoring) and [matched rerun record](archive/language_learning/experiments.md#414-matched-corrected-exposure-rerun).
+2. **Small diagnostic capability — active; protocol frozen and implementation validated.**
+   Test whether load supports binary heavy/light word learning on held-out
+   object categories excluded from diagnostic training images. Use existing
+   data split by independent clips (88 train, 18 dev,
+   22 test); categories are train: doll/rock/tube/bottle/trumpet/bowl, dev:
+   clock/train, test: pyramid/stapler. Heavy is ≥300 g, light ≤150 g; exclude
+   the middle, balance both labels per category, and use one eligible held/lifted
+   center per clip with five same-clip RGB frames at ±2 s. Exclude dev/test
+   categories from train windows and test categories from dev windows. Use
+   scaffolded heavy/light utterances paired with lifting, not ordinary weak
+   naming. Mass and metadata generate labels and audits only, never model input;
+   normalize from train-accessible frames only. Use the existing additive
+   512-d word/visual learner, 3 fixed seeds (0/1/2), 100 epochs, batch 16,
+   lr 3e-4, weight decay 0.1, soft tau 0.1,
+   body dropout 0.5 and auxiliary losses zero. Compare video plus 10-d load
+   against the same video without load. Evaluate a dev-selected binary word
+   test (chance 50%). Run six models total, capped at 30 minutes, with no
+   autotuning; compare body-present results with the independent video models
+   and report body-trained models' picture-only ablation separately. Pass
+   requires mean body accuracy ≥75%, mean paired gain ≥15 pp, positive gain in
+   all seeds, and a 10,000-replicate paired source-clip bootstrap of mean seed
+   gain (seed 0) with lower bound above zero; 10 fixed within-test-category
+   load derangements must reduce mean accuracy by ≥10 pp. Independent review
+   found no issues; all 72 tests passed (19 property, 53 existing learner).
+   Preflight confirmed the 88/18/22 clip split and 665 normalization seconds.
+   The protocol is ready for the bounded six-model run; no models have trained.
+   This is a narrow capability diagnostic: load is analytic F=m(g−a) on fixed GRAB
+   motions and does not change motion or RGB; pretrained DINO novelty and two
+   held-out categories limit interpretation. It cannot establish infant-like
+   weak noun acquisition or a higher language ceiling.
 3. **One embodied learning mechanism (conditional).** Test whether coherent
    sensory experience helps form reusable object representations before sparse
    speech names them.
