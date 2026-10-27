@@ -7,14 +7,13 @@ joint learners, and the proposed acquisition and cross-situational studies.
 with the plan-update confirmation for commit `20f1cc03`. The parent conversation
 and the later repository-cleanup discussion are excluded.
 
-**Source:** user-supplied chat copies, preserved below without rewriting the
-conversation; trailing whitespace is removed. The later clarification about
-simplifying the small study and its plan-update confirmation were supplied
-separately and are included at the end. The earlier exchange requesting and
-presenting the two study-design documents is still absent from the supplied
-copies; its position is marked below. Images, collapsed annotations and link
-destinations absent from the pasted text have not been reconstructed. UI labels
-and timestamps are retained as supplied.
+**Source:** user-supplied chat copies, combined in conversation order without
+rewriting the messages; trailing whitespace is removed. The design-document
+exchange, small-study clarification and final confirmation were supplied in
+separate pastes. Three short follow-up user messages about presentation are
+retained from the conversation context and identified below. Images, collapsed
+annotations and link destinations absent from the pasted text have not been
+reconstructed. UI labels and timestamps are retained as supplied.
 
 This is historical conversation, not current instructions or a queue of work.
 See [PLAN.md](../../PLAN.md) for the current direction.
@@ -2029,17 +2028,57 @@ A small dataset does not by itself guarantee a quick run, so the runtime budget 
 
 ---
 
-## Earlier design-document exchange not included in the supplied copies
+Great. So now we have the main design and a smaller experiment to do. We will do them both parallely. Can you in simple terms but in detail just show the design of both experiments. Basically exactly how you did in these responses in the way you formatted them so you talk about the conceptual idea of the experiment, the detaisl in simple terms and like an expected output and stuff. And then write them both to two different .md files and we'll use that as reference for starting them parallely.
 
-This is where the user asked for both experiment designs to be explained and
-saved as two separate Markdown files, beginning “Great. So now we have the main
-design and a smaller experiment to do.” The corresponding assistant replies
-were not included in the supplied copies and have not been reconstructed.
-The small-study clarification and plan update below are included in full from
-the user's later paste. This note identifies missing transcript text, not a
-missing implementation or an unfinished plan change.
+*The following three user follow-ups are retained from the conversation context; their timestamps were not supplied:*
 
----
+note: not what different results would mean. just what we want the output to be like.
+
+like how i showed you the plot for the langauge acquisition curve, and how the results from the heavy/light etc.
+
+yep. it doesn't have to be super long or anything. pretty reasonable sized and normal way of talking about it thats succint and readable, basically how you have been explaining and responding in this entier convos
+
+4:23 PM
+
+Worked for 6m 15s
+
+Saved both designs in readable documents, with conceptual explanations, training details, and the outputs we want.
+
+**1. [Main language-acquisition experiment](/Users/rishisim/Documents/research/nursery/docs/acquisition_curves.md)**
+
+Give learners progressively more independent experience, comparing:
+
+- Video only.
+- Video + body with additive scoring.
+- Video + body with direct language pathways **and** learned interaction.
+
+All receive the same video and weak speech. Body-enabled learners receive all five sensory streams.
+
+**Intended output:** your acquisition plot—training experience along the horizontal axis, held-out word understanding vertically, with three measured curves. The document includes a clearly labeled sketch of the desired body advantage.
+
+**2. [Small cross-situational experiment](/Users/rishisim/Documents/research/nursery/docs/cross_situational_learning.md)**
+
+Use four unfamiliar words in situations containing multiple possible referents. Distractors change across encounters, allowing the learner to accumulate evidence about each word.
+
+Compare the same three learners across smaller amounts of experience.
+
+**Intended output:** a miniature acquisition curve, a few example encounters, and a heavy/light-style table comparing video, additive body, joint body, and shuffled-body controls. Future measurements are left blank.
+
+Both studies share one verified implementation but use separate trained models and run directories, allowing parallel execution without one changing the other.
+
+I linked both from [PLAN.md](/Users/rishisim/Documents/research/nursery/PLAN.md), checked links and the diff, and pushed commit `2c14cfa1`. The working tree is clean. No training started.
+
+&#x20; Edited 3 files+230-9View changes
+
+UndoView changes
+
+PLAN.mdPLAN.md+14-9
+
+docs/acquisition_curves.mddocs/acquisition_curves.md+115-0
+
+docs/cross_situational_learning.mddocs/cross_situational_learning.md+101-0
+
+4:29 PM
 
 okay both look great. one note though, i feel like the small cross istuational experiment was just slightly overcomplicated. i think for the heavy/light we just did the video only and the additiive. lets keep it that way and the output shouldnt even be the curves we'll just do how we did with the heavy/light where its just a table at the end. between video and additive. (any reason we need shuffled? we didn't have it in heavy/light).
 
