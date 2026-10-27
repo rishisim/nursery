@@ -8,13 +8,13 @@ with the plan-update confirmation for commit `20f1cc03`. The parent conversation
 and the later repository-cleanup discussion are excluded.
 
 **Source:** user-supplied chat copies, preserved below without rewriting the
-conversation; trailing whitespace is removed. The larger copy skips the final experiment-design and plan-writing
-exchange before jumping to repository cleanup. That gap is marked below; the
-requested final confirmation is recovered from the earlier supplied copy.
-This is therefore an archive of the supplied side-chat text, not a verified
-complete transcript. Images, collapsed annotations and link destinations absent
-from the pasted text have not been reconstructed. UI labels and timestamps are
-retained as supplied.
+conversation; trailing whitespace is removed. The later clarification about
+simplifying the small study and its plan-update confirmation were supplied
+separately and are included at the end. The earlier exchange requesting and
+presenting the two study-design documents is still absent from the supplied
+copies; its position is marked below. Images, collapsed annotations and link
+destinations absent from the pasted text have not been reconstructed. UI labels
+and timestamps are retained as supplied.
 
 This is historical conversation, not current instructions or a queue of work.
 See [PLAN.md](../../PLAN.md) for the current direction.
@@ -2029,23 +2029,60 @@ A small dataset does not by itself guarantee a quick run, so the runtime budget 
 
 ---
 
-## Gap in the supplied chat copies
+## Earlier design-document exchange not included in the supplied copies
 
-The exchange requesting the two study-design documents, their presentation,
-and the subsequent clarification simplifying the small study is absent from
-the supplied copies. No missing assistant replies have been invented here.
-The next exchange is preserved from the earlier user-supplied paste and is the
-requested stopping point.
+This is where the user asked for both experiment designs to be explained and
+saved as two separate Markdown files, beginning “Great. So now we have the main
+design and a smaller experiment to do.” The corresponding assistant replies
+were not included in the supplied copies and have not been reconstructed.
+The small-study clarification and plan update below are included in full from
+the user's later paste. This note identifies missing transcript text, not a
+missing implementation or an unfinished plan change.
 
 ---
+
+okay both look great. one note though, i feel like the small cross istuational experiment was just slightly overcomplicated. i think for the heavy/light we just did the video only and the additiive. lets keep it that way and the output shouldnt even be the curves we'll just do how we did with the heavy/light where its just a table at the end. between video and additive. (any reason we need shuffled? we didn't have it in heavy/light).
+
+just need that clarification
+
+5:07 PM
+
+Agreed—the small experiment can be much simpler:
+
+- **Two learners:** video-only and additive video + body.
+- **One fixed training-data amount**, rather than acquisition curves.
+- **One final accuracy table**, like heavy/light.
+- Same ambiguous encounters for both, followed by testing on unfamiliar clips.
+
+The main experiment keeps the architectural comparison and acquisition curves.
+
+One correction: **heavy/light did include shuffled load**:
+
+| Condition                              | Accuracy |
+| -------------------------------------- | -------- |
+| Video-only                             | 37.88%   |
+| Video + load                           | 92.42%   |
+| Same trained model, shuffled test load | 46.21%   |
+
+Shuffling wasn’t another training run. We took the already-trained body model and gave situations the wrong load histories during evaluation.
+
+Its purpose was to check: **did the improvement depend on the correctly associated bodily information?** The drop supported that explanation.
+
+My recommendation: keep **only the two trained learners**, as you suggest, and retain shuffled-body evaluation as a small supporting check. The headline table can contain just video versus additive; the shuffled result can be one sentence underneath. No extra architecture or curves needed.
+
+5:08 PM
 
 okay update the plan for that accordingly
 
 5:08 PM
-Updated the small-study design and PLAN.md:
 
-Video-only versus additive video + body.
-One fixed training-data amount.
-Two-row results table; no curves or joint learner.
-Shuffled-body evaluation reported underneath as a supporting check, without additional training.
-The main study is unchanged. Links and diff checked; pushed as 20f1cc03. Working tree clean.
+Worked for 42s
+
+Updated [the small-study design](/Users/rishisim/Documents/research/nursery/docs/cross_situational_learning.md) and [PLAN.md](/Users/rishisim/Documents/research/nursery/PLAN.md):
+
+- Video-only versus additive video + body.
+- One fixed training-data amount.
+- Two-row results table; no curves or joint learner.
+- Shuffled-body evaluation reported underneath as a supporting check, without additional training.
+
+The main study is unchanged. Links and diff checked; pushed as `20f1cc03`. Working tree clean.
