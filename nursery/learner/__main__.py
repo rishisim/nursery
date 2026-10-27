@@ -45,9 +45,23 @@ def main():
     property_task.add_argument("--episodes", help="Existing episode directory (prepare only; default: clean_856)")
     property_task.add_argument("--cache", help="Existing region cache directory (prepare only; default: clean_body/train_cache)")
     property_task.add_argument("--physical", help="Existing physical_by_clip directory (prepare only)")
+    pretrain_task = commands.add_parser("pretrain", help="Frozen Step 3 sensory-pretraining transfer experiment")
+    pretrain_task.add_argument("--phase", choices=("prepare", "train"), required=True)
+    pretrain_task.add_argument("--output", required=True, help="Ignored run root; prepare requires an empty directory")
+    pretrain_task.add_argument("--run", help="Corrected speech/cache input run (prepare only; default: step1_matched)")
     args = parser.parse_args()
     if args.command == "embed":
         embed_episodes(args.episodes, args.output, args.device, args.batch)
+    elif args.command == "pretrain":
+        from .pretrain import prepare, train_prepared
+
+        if args.phase == "prepare":
+            result = prepare(args.output, args.run)
+            print(result["counts"])
+        else:
+            if args.run:
+                parser.error("pretrain train reads paths from the prepared protocol; --run is prepare-only")
+            print(train_prepared(args.output))
     elif args.command == "property":
         from .property import prepare, train_prepared
 
