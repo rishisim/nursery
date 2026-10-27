@@ -14,6 +14,9 @@ Use the [current plan](../../PLAN.md) for active work, the
 [historical synthesis](body_input_review.md) for the dated reassessment.
 [Past experiments](past_experiments.md) explains the completed interventions and their limits.
 Inline paths and commands below are relative to the repository root.
+They preserve historical locations; consult the
+[artifact relocation map](../README.md#local-artifact-relocation) for current
+locations of completed heavy/light, sensory-pretraining and review artifacts.
 The step 4.5 audit is now [here](body_signal_audit.md).
 
 ---

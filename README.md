@@ -96,9 +96,35 @@ retained datasets, features and checkpoints. Databrary agreement/access PDFs
 are in `outputs/exports/databrary/`. Use system temporary storage for scratch work.
 `.external/` holds environments and upstream checkouts; `data/` and `downloads/`
 retain local assets. These roots are ignored, but their contents are not
-automatically disposable. Existing assets and saved runs stay at their recorded
-paths; see the [archive index](archive/README.md).
+automatically disposable. Reusable inputs and mixed run/input folders retain
+their existing paths. Completed standalone runs and retired reviews/motion
+artifacts are under `outputs/legacy/`; see the
+[relocation map](archive/README.md#local-artifact-relocation).
 Archived source snapshots are excluded from default test discovery.
+
+```text
+outputs/
+  assets/                 Object assets and evaluation images
+  embodiedgen_scene/      Room bank and previews used by the simulator
+  renders/clean_856/       Retained source dataset
+  speech_data/            Source speech research data
+  runs/                   Reusable features plus existing baseline/run records
+  exports/                Documents and conversation exports
+  legacy/
+    motion/               Retired motion trials and previews
+    reviews/              Completed audits, literature and handoff material
+    runs/
+      heavy_light/        Completed property-word diagnostic
+      sensory_pretraining/ Completed sensory-pretraining comparison
+    …                       Earlier archives remain in place
+```
+
+`runs/clean_body/`, `runs/clean_video_only/`, `runs/clean_perfect_naming/` and
+`runs/step1_matched/` contain both saved inputs and experiment records; their
+presence does not queue new runs. For new studies, use descriptive roots such
+as `outputs/runs/acquisition_curves/` and `outputs/runs/cross_situational/`, with
+condition/seed names such as `video_only_s0` and `additive_s0`. These new study
+directories are naming examples, not created or launched experiments.
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python -m pytest -q -p no:cacheprovider tests/test_learner.py tests/test_speech.py tests/test_physical.py

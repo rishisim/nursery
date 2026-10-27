@@ -224,7 +224,7 @@ visibility and physical-coherence limits still matter.
 
 ## What was retained and why
 
-Artifact paths are unchanged. The subsequent source cleanup moved completed
+The source cleanup initially kept artifact paths unchanged and moved completed
 diagnostic runners and motion adapters into `archive/code/`, with their tests.
 The simulator now uses the common output guard; active video-only and additive
 models have explicit files and shared training/scoring utilities. The
@@ -237,13 +237,15 @@ does not recommend using it.
 | `outputs/renders/clean_856/` | Source renders/manifests and reusable data; not new independent experience per replay. |
 | `outputs/runs/clean_body/` | Earlier saved speech/features, models and noun comparisons; preserve historical hashes and path references. |
 | `outputs/runs/step1_matched/` | Corrected matched exposure, 4.14 runs and audits; also inputs reused by 4.16. |
-| `outputs/runs/step2_heavy_light/` | Narrow property-word diagnostic, six runs and verification. |
-| `outputs/runs/step3_pretrain/` | Frozen protocol, nine completed runs, comparison and audit records. |
+| `outputs/legacy/runs/heavy_light/` | Narrow property-word diagnostic, six runs and verification. |
+| `outputs/legacy/runs/sensory_pretraining/` | Frozen protocol, nine completed runs, comparison and audit records. |
 | `outputs/legacy/` | Earlier cue/gate work and superseded or invalidated artifacts; never pool invalid evidence with clean runs. |
 | `.external/` | Environments, upstream checkouts and licensed/external dependencies. |
 
-These roots remain ignored and were not uploaded, moved or deleted for this
-reset. Curated small records are versioned in the archive; local artifacts may
+These roots remain ignored and were not uploaded or deleted. The later output
+cleanup moved retired artifacts using the [relocation map](../README.md#local-artifact-relocation);
+reusable inputs and mixed run folders retain their paths. Curated small records
+are versioned in the archive; local artifacts may
 be absent from a fresh clone. The [historical literature/audit review](body_input_review.md)
 retains its dated recommendations as evidence, superseded as an active plan by
 [PLAN.md](../../PLAN.md). New joint fusion and optional pretraining remain

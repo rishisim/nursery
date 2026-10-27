@@ -40,18 +40,19 @@ to existing evidence, not new copies or a claim of fresh experiment validation.
 - `outputs/legacy/cue_experiment/`: full early cue-study report and artifacts.
   The small curated aggregates are versioned [here](language_learning/results/).
 - `outputs/legacy/step2/`, `outputs/legacy/step3/`: older speech and gate work.
-- `outputs/legacy/`: superseded patched renders/runs from the earlier cleanup;
+- `outputs/legacy/`: historical artifacts, including superseded patched renders
+  and completed valid experiments. Archiving does not imply invalidation;
   never pool invalidated or patched artifacts with the current clean render.
 - `outputs/renders/clean_856/`, `outputs/runs/clean_body/`: retained saved data,
   speech, embeddings, and completed learner comparisons. Kept in place because
   run metadata and analysis refer to these paths.
 - `outputs/runs/step1_matched/`: corrected matched speech/exposure, 4.14 models
   and audit records; also reused as inputs by 4.16.
-- `outputs/runs/step2_heavy_light/`: completed load-only property-word
+- `outputs/legacy/runs/heavy_light/`: completed load-only property-word
   diagnostic, six models and independent verification records.
-- `outputs/research/body_debate/`, `outputs/episode_review/`: October 26
+- `outputs/legacy/reviews/research/body_debate/`, `outputs/legacy/reviews/episodes/`: October 26
   read-only research/audit evidence, not new training results.
-- `outputs/runs/step3_pretrain/`: ignored artifacts for completed Step 3 / 4.16;
+- `outputs/legacy/runs/sensory_pretraining/`: ignored artifacts for completed Step 3 / 4.16;
   nine verified MPS runs and preparation, comparison, and independent-audit
   records. The complete protocol and results are in
   [the 4.16 archive entry](language_learning/experiments.md#step-3-transfer-focused-sensory-pretraining).
@@ -62,10 +63,49 @@ to existing evidence, not new copies or a claim of fresh experiment validation.
   other generated roots follow `.gitignore`; models, media and datasets are not
   added to this documentation archive.
 
-Existing datasets, runs, hashes and artifact paths are retained. The source
-cleanup on 27 October 2026 separated the current video-only and additive models
-and moved inactive code out of `nursery/`. The simulator now uses the common
+The source cleanup on 27 October 2026 preserved artifact paths, separated
+the current video-only and additive models, and moved inactive code out of
+`nursery/`. The simulator now uses the common
 output guard directly, so it no longer depends on the archived motion package.
+
+## Local artifact relocation
+
+The subsequent output cleanup on 27 October 2026 moved the following retired
+artifacts within the ignored `outputs/` root. All 185 relocated files were
+verified with SHA-256 before and after moving (175,831,415 bytes). File contents,
+including frozen manifests and historical path strings, were not rewritten.
+Use this map when following an older record; archived scripts with hard-coded
+old paths may require explicit path updates before reuse. No compatibility
+symlinks or new experiments were created. These local moves are not uploaded
+with the documentation commit.
+
+All locations in this table are relative to `outputs/`:
+
+| Previous location | Current location |
+|---|---|
+| `activity_pipeline/` | `legacy/motion/activity_pipeline/` |
+| `hoidini_intermimic/` | `legacy/motion/hoidini_intermimic/` |
+| `hoidini_official_example/` | `legacy/motion/hoidini_official_example/` |
+| `hoidini_scene/` | `legacy/motion/hoidini_scene/` |
+| `archive_review/` | `legacy/reviews/chat_history/` |
+| `audits/` | `legacy/reviews/audits/` |
+| `episode_review/` | `legacy/reviews/episodes/` |
+| `handoff/` | `legacy/reviews/handoffs/` |
+| `literature/` | `legacy/reviews/literature/` |
+| `research/` | `legacy/reviews/research/` |
+| `step1_verification/` | `legacy/reviews/connection_and_scoring/` |
+| `runs/step2_heavy_light/` | `legacy/runs/heavy_light/` |
+| `runs/step3_pretrain/` | `legacy/runs/sensory_pretraining/` |
+| `runs/step2_heavy_light.log` | `legacy/runs/heavy_light/training.log` |
+| `runs/step3_pretrain.prepare.log` | `legacy/runs/sensory_pretraining/preparation.log` |
+| `runs/step3_pretrain.train.log` | `legacy/runs/sensory_pretraining/training.log` |
+
+Reusable inputs and mixed folders stay in place: `assets/`, `embodiedgen_scene/`,
+`renders/clean_856/`, `speech_data/`, `runs/clean_body/`, `runs/clean_video_only/`,
+`runs/clean_perfect_naming/` and `runs/step1_matched/`. Exports and earlier
+`legacy/` contents are retained. The active source/configuration and these
+mixed run folders had no references to the retired locations in the inspected
+code, documentation and JSON/YAML metadata.
 
 ## Archived source
 

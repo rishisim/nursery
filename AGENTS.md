@@ -30,6 +30,7 @@ EgoBabyVLM line of work, and the simulator exists to supply those modalities.
 - Keep one canonical implementation, config, and protocol; use Git history instead of versioned copies.
 - Keep runs, generated artifacts, downloads, caches, logs, checkpoints, datasets, and temporary files out of Git and in ignored or temporary roots.
 - Write new generated files and runs under `outputs/`; use system temporary storage for scratch work. Keep existing dataset, asset and dependency paths unchanged.
+- Name new study roots descriptively (for example, `outputs/runs/acquisition_curves/`) and identify conditions and seeds explicitly. See the README for retained inputs and the archive index for relocated historical outputs.
 - Ignored does not mean disposable: preserve saved runs, datasets and licensed assets unless their removal is explicitly authorized.
 - Preserve unrelated and pre-existing user changes. Never delete user data or runs without approval.
 - Before finishing, run focused validation, inspect `git status --short`, and remove only task-created temporary files.

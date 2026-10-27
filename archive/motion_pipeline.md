@@ -9,9 +9,10 @@ The mug lifted kinematically, but generated body motion failed the floor gate.
 Format/FK conversion passed; physical execution failed to maintain the intended
 hand contact. These are separate outcomes, not a successful physical pipeline.
 See the [archive index](README.md) and [current plan](../PLAN.md).
-All commands below run from the repository root. Run artifacts and upstream
-dependencies remain at their recorded ignored/local or Juno paths; none were
-moved or freshly verified by this documentation archive.
+All commands below run from the repository root and preserve historical paths.
+Some local retired motion artifacts were subsequently relocated; see the
+[artifact relocation map](README.md#local-artifact-relocation). Upstream
+dependencies and Juno paths were not moved or freshly revalidated.
 
 ## Commands
 
