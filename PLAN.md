@@ -38,36 +38,16 @@ advances the build; neither is established by a supervised sensor diagnostic.
    fixed models and trials, and the old 4.13 scores are not directly comparable.
    This closes the repair-and-comparison task, not the broader scientific
    question or a claim of benefit. See the [implementation details](docs/learner.md#speech-alignment-and-body-present-scoring) and [matched rerun record](archive/language_learning/experiments.md#414-matched-corrected-exposure-rerun).
-2. **Small diagnostic capability — active; protocol frozen and implementation validated.**
-   Test whether load supports binary heavy/light word learning on held-out
-   object categories excluded from diagnostic training images. Use existing
-   data split by independent clips (88 train, 18 dev,
-   22 test); categories are train: doll/rock/tube/bottle/trumpet/bowl, dev:
-   clock/train, test: pyramid/stapler. Heavy is ≥300 g, light ≤150 g; exclude
-   the middle, balance both labels per category, and use one eligible held/lifted
-   center per clip with five same-clip RGB frames at ±2 s. Exclude dev/test
-   categories from train windows and test categories from dev windows. Use
-   scaffolded heavy/light utterances paired with lifting, not ordinary weak
-   naming. Mass and metadata generate labels and audits only, never model input;
-   normalize from train-accessible frames only. Use the existing additive
-   512-d word/visual learner, 3 fixed seeds (0/1/2), 100 epochs, batch 16,
-   lr 3e-4, weight decay 0.1, soft tau 0.1,
-   body dropout 0.5 and auxiliary losses zero. Compare video plus 10-d load
-   against the same video without load. Evaluate a dev-selected binary word
-   test (chance 50%). Run six models total, capped at 30 minutes, with no
-   autotuning; compare body-present results with the independent video models
-   and report body-trained models' picture-only ablation separately. Pass
-   requires mean body accuracy ≥75%, mean paired gain ≥15 pp, positive gain in
-   all seeds, and a 10,000-replicate paired source-clip bootstrap of mean seed
-   gain (seed 0) with lower bound above zero; 10 fixed within-test-category
-   load derangements must reduce mean accuracy by ≥10 pp. Independent review
-   found no issues; all 72 tests passed (19 property, 53 existing learner).
-   Preflight confirmed the 88/18/22 clip split and 665 normalization seconds.
-   The protocol is ready for the bounded six-model run; no models have trained.
-   This is a narrow capability diagnostic: load is analytic F=m(g−a) on fixed GRAB
-   motions and does not change motion or RGB; pretrained DINO novelty and two
-   held-out categories limit interpretation. It cannot establish infant-like
-   weak noun acquisition or a higher language ceiling.
+2. **Small diagnostic capability — complete; frozen gates and independent review passed.**
+   With scaffolded heavy/light words, video plus 10-d load scored 92.42% on the
+   two held-out categories versus 37.88% for video (Δ +54.55 pp, paired source-
+   clip 95% CI [+36.36, +71.21]); load derangements reduced accuracy 46.21 pp.
+   The video result is below 50% chance, so the gap does not show that video
+   cannot infer weight. Picture-only scores were 40.91% after load training and
+   37.88% for independent video, both below chance; no useful transfer was
+   established. This narrow synthetic diagnostic does not test ordinary weak
+   noun learning or a higher language ceiling. See the [step 2 record](archive/language_learning/experiments.md#step-2-heavy-light-capability-test).
+   Step 3 and later work remain conditional; this result does not auto-queue it.
 3. **One embodied learning mechanism (conditional).** Test whether coherent
    sensory experience helps form reusable object representations before sparse
    speech names them.
@@ -91,7 +71,7 @@ experiment queue.
 
 ## Where to look
 
-- [Completed language protocols and results, steps 1–4.14](archive/language_learning/experiments.md)
+- [Archived language protocols and results through 4.15, including the step 2 diagnostic](archive/language_learning/experiments.md)
 - [Earlier 90-run cue grid and 100-run confirmation](archive/language_learning/cue_experiments.md)
 - [Current research synthesis and alignment audit](docs/literature/body_input_review.md)
 - [Learner implementation and diagnostic flags](docs/learner.md)

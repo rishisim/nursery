@@ -3,7 +3,8 @@
 Originally archived 26 October 2026 from `PLAN.md` at commit `4a3dd16d`,
 preserving the protocol and results through step 4.13, including proposals
 that were never run. The 4.14 record below was appended after the matched
-rerun. Historical “next” instructions below are not an active queue.
+rerun; the step 2 capability record was appended after its run as 4.15.
+Historical “next” instructions below are not an active queue.
 Interpretations are recorded as written at the time; later diagnostics sometimes
 correct them. In particular, overfitting does not uniquely identify its cause.
 
@@ -616,3 +617,72 @@ Done 2026-10-15 (branch `cue/vocabulary`, commit cea4af3d):
   (held 69.3, seen-only 56.4, extras 89.9); Konkle 67.7%. Up from 45% mostly
   because names are ~3x more frequent. Still rising at epoch 20, so the
   plateau and remaining headroom are unknown; check before step 4.
+
+## Step 2: heavy/light capability test (4.15)
+
+<a id="step-2-heavy-light-capability-test"></a>
+
+Run artifacts: ignored `outputs/runs/step2_heavy_light/`; code revision
+`5a1b795ec2e7edfaa39e3478910200a9b0f0633d`. Six models completed on local MPS
+in 61.54 seconds. This tested whether load can support a tightly scaffolded
+heavy/light word diagnostic on categories held out from diagnostic training.
+
+- **Frozen data and task:** balanced independent source clips: 88 train, 18
+  dev and 22 test. Categories: train = doll, rock, tube, bottle, trumpet,
+  bowl; dev = clock, train; test = pyramid, stapler. The middle mass range is
+  excluded; light ≤0.15 kg and heavy ≥0.30 kg, balanced within each category.
+  Use the first eligible held/lifted, visible (≥100 px) center per clip in
+  lexicographic clip/video/frame order. Each has a five-frame RGB window
+  (±2 s) and clip-local body window (±5 s). Exclude
+  dev/test categories from train windows and test categories from dev windows.
+  Inputs carry one aligned heavy/light word with the lifting episode. This is
+  scaffolded property-word supervision, not ordinary weak caregiver speech.
+- **Models and selection:** compare video plus normalized 10-d wrist load with
+  the same video without load. Body input is only normalized load, missing mask
+  and clip-reset boundary; normalization uses 665 train-accessible seconds.
+  Mass and metadata create labels/audits only. Use frozen DINO visual features
+  and the additive 512-d word/visual learner; seeds 0/1/2, 100 epochs, batch 16,
+  AdamW lr 3e-4, weight decay 0.1, soft tau 0.1, body dropout 0.5, zero
+  auxiliary losses, visual/body windows ±2/±5 s. Frozen DINO visual features
+  use existing zero `center_mu`. All six runs completed within the 30-minute cap.
+  Per seed, arms shared common-parameter initialization and minibatch order. Score columns are
+  `heavy`/`light`; choose the first maximum dev word accuracy, with half credit
+  for exact ties, and never select on test.
+- **Frozen pass gate:** mean body test accuracy ≥75%; mean paired gain over
+  video ≥15 pp; positive gain in all three seeds; 10,000 paired source-clip
+  bootstrap draws (seed 0) on mean seed gain with lower bound >0; and mean
+  accuracy drop ≥10 pp across 10 fixed within-test-category load derangements.
+
+| Seed | Video test | Video + load test | Paired gain |
+|---:|---:|---:|---:|
+| 0 | 27.27% | 95.45% | +68.18 pp |
+| 1 | 40.91% | 95.45% | +54.55 pp |
+| 2 | 45.45% | 86.36% | +40.91 pp |
+| Mean | 37.88% | 92.42% | +54.55 pp |
+
+All frozen gates passed. The paired source-clip 95% CI was [+36.36, +71.21]
+pp (conditional on these three fitted seeds and the two test categories).
+Deranged-load accuracy was 46.21%, a 46.21 pp drop; the body result is well
+above chance while the deranged result is near chance. However, video alone
+scored below the 50% chance level, so this gap does not show that video cannot
+infer weight. Body-trained picture-only accuracy was 40.91% versus 37.88% for
+independently trained video; both are below chance, so no useful transfer was
+established.
+
+Independent review passed: all six 100-epoch runs selected the first dev
+maximum; same-seed initialization and minibatch orders matched; all 22 test
+prediction rows, score-column credits, 10 donor permutations and the 10,000-draw
+bootstrap were reproduced. Review verified 859 source hashes and six code hashes
+against the recorded commit, plus protocol/manifest/normalization hashes,
+finite checkpoint weights, the 512-d head and load-only 10-d body input. All
+five frozen criteria were reproduced.
+
+Limits: load is post-hoc analytic `F=m(g-a)`, not a contact-force solve;
+sampled per-clip mass does not change motion or RGB and is not a persistent
+visual-asset property. Novelty is only relative to diagnostic training images;
+the frozen DINO encoder has prior visual knowledge. The result covers two test
+categories and a fixed three-seed setup; full-frame visibility does not ensure
+recognizability in the DINO center crop. It demonstrates neither infant-like
+weak noun acquisition nor a higher language ceiling, and does not explain why
+ordinary noun learning failed. Step 3 remains conditional; this result does
+not queue it automatically.
