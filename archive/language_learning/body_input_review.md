@@ -1,11 +1,15 @@
 # Bodily inputs for language acquisition: evidence and next decision
 
+> Historical review from 26 October 2026. Its decisions and proposed next steps
+> are preserved as written, not an active queue. Later experiments are explained
+> in [Past experiments](past_experiments.md); active work follows [PLAN.md](../../PLAN.md).
+
 Updated 26 October 2026. Research synthesis, historical experiment review, and a new read-only dataset audit. No learner, generator, simulator, protocol, or training run was changed. This replaces stale descriptions in this canonical review; Git retains the earlier review.
 
 Historical intent clarified during the documentation archive: weak/delayed naming
 was deliberate, and clip-boundary resets were intended to prevent artificial
 transitions. The concern below is their interaction, not weak alignment itself.
-See [the checked Codex/Claude history](../../archive/language_learning/design_intent.md).
+See [the checked Codex/Claude history](design_intent.md).
 Any proposed repair must preserve that scientific distinction and matched exposure.
 
 **Decision:** repair a measured speech–interaction boundary mismatch first. Preserve the working visual learner. The most defensible subsequent noun-learning hypothesis is to learn reusable object representations from coherent sensory episodes before asking sparse speech to name them. This is a hypothesis to test, not an established solution. A physically grounded property-word component is a useful separate positive control; it does not replace the noun-learning goal.
@@ -45,7 +49,7 @@ These are different protocols and evaluation sets. Compare arms within each row;
 | 4.11–4.12 load and thermal probes | Per-clip load gave +2.7 points on familiar-subject clips and +6.6 on s8. Load plus revised skin channels gave +5.8/+10.8. Skin channels also include contact area. | There is a stronger modeled signal to investigate. Do not claim a unique temperature benefit or convert a 50-way probe gain into an expected four-choice language gain. |
 | 4.13 physical signals in language | Video 48.3 versus full body plus load/skin 42.4 on familiar-subject clips; s8 43.7 versus 40.9. | Adding channels alone did not teach the learner to use them. Load/skin without legacy features remains untested, but would be a diagnostic, not a demonstrated solution. |
 
-Sources: [archived protocols 4.1–4.13](../../archive/language_learning/experiments.md); local historical records [cue grid](../../outputs/legacy/cue_experiment/report.md), [gate design and implementation record](../../outputs/legacy/step3/body_input_design.md), [joint-learner reassessment](../../outputs/exports/joint-learner-results-explanation.md), and [earlier physical-interaction recommendation](../../outputs/literature/body_adapter_recommendation.md). Files under `outputs/` are local ignored evidence and are not distributed with this document on GitHub. The older cue experiment had a documented staging/render repair; invalidated artifacts must not be pooled with the current clean dataset.
+Sources: [archived protocols 4.1–4.13](experiments.md); local historical records [cue grid](../../outputs/legacy/cue_experiment/report.md), [gate design and implementation record](../../outputs/legacy/step3/body_input_design.md), [joint-learner reassessment](../../outputs/exports/joint-learner-results-explanation.md), and [earlier physical-interaction recommendation](../../outputs/literature/body_adapter_recommendation.md). Files under `outputs/` are local ignored evidence and are not distributed with this document on GitHub. The older cue experiment had a documented staging/render repair; invalidated artifacts must not be pooled with the current clean dataset.
 
 **Proposed is not tested.** Saved body-run `outputs/runs/clean_body/*/metrics.json` records have episode construction set to `none` and mask, consistency, and episode weights zero. Earlier reviews suggested sensory pretraining and episode objectives, but those suggestions were not evaluated in these canonical runs. The failed vision-to-body auxiliary loss is a different intervention. A temporal GRU alone is also not sensory pretraining.
 

@@ -57,8 +57,9 @@ diagnostic, not a direct measure of broad language acquisition. Picture-only
 metrics and existing runs are unchanged. Historical body-present trial metrics
 use a different candidate/answer protocol and are not directly comparable to
 metrics generated with this rule; do not rewrite archived results. This
-implementation update has not established a language gain or resolved step 1
-scientifically. See the [current step status](../PLAN.md#current-step-and-next-direction)
+implementation verification alone did not establish a language gain; the
+completed matched comparison is [recorded as 4.14](../archive/language_learning/experiments.md#414-matched-corrected-exposure-rerun).
+See the [current direction](../PLAN.md#current-step-and-next-direction)
 and the canonical implementations in
 [`transcripts.py`](../nursery/speech/transcripts.py),
 [`evaluate.py`](../nursery/learner/evaluate.py), and

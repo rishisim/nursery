@@ -4,8 +4,15 @@ This is the entry point for completed or inactive research. Start active work
 from [PLAN.md](../PLAN.md). An archived proposal, command or “next step” is not
 an instruction to resume it.
 
+Read [Past experiments](language_learning/past_experiments.md) for the
+architecture, training, results and limits of prior language work. The
+[detailed experiment record](language_learning/experiments.md) remains the
+canonical historical protocol; the [dated literature/audit review](language_learning/body_input_review.md)
+is historical evidence. Active work now centers on direct V versus V+B
+acquisition curves; no archived conditional follow-up is queued.
+
 Initially archived on 26 October 2026 from checkpoint `4a3dd16d`; Step 3 result
-4.16 was added on 27 October 2026. Documentation and the two small cue-result
+4.16 and the explanatory guide were added on 27 October 2026. Documentation and the two small cue-result
 JSON files were reorganized; source code, configurations, datasets, checkpoints
 and run directories were preserved. Git retains the exact implementations and
 original locations.
@@ -19,7 +26,7 @@ original locations.
 | Procedural embodied simulation, MIMo/MolmoSpaces and Unity/MuJoCo gates | Engineering, geometry, appearance and contact gates produced useful successes and failures. They did not establish a language-acquisition advantage. | [Phase reports](legacy_research/docs/embodied_simulation/phase_reports.md), [recovery status](legacy_research/docs/embodied_simulation/recovery_status.md), and the existing `legacy_research/` source/config/test archive. |
 | EmbodiedGen → HOIDiNi → InterMimic | Kinematic mug lifting and format conversion worked; floor validity and physical hand contact failed. The modular architecture proposal was a proposal, not a completed solution. | [Commands, runs and measurements](motion_pipeline.md); [September report](NURSERY_REPORT.md). |
 | Contact-cue weighting: 90-run grid, then 100-run confirmation | The grid was inconclusive. Confirmation beat shuffled/shifted cues but did not establish an improvement over the no-cue learner. This tested weighting examples, not rich bodily inputs. | [Plain-language record and exact aggregates](language_learning/cue_experiments.md). |
-| Hand-location gates, then actual body-input learners | Steps 4.1–4.13 found no confirmed gain. Step 4.15 showed a scaffolded heavy/light capability; Step 4.16 sensory pretraining learned aligned sensory prediction but did not pass the weak-noun transfer gate. The broader representation hypothesis remains open. | [Complete protocol/result record](language_learning/experiments.md#step-3-transfer-focused-sensory-pretraining), [step 4.5 signal audit](language_learning/body_signal_audit.md), [current reassessment](../docs/literature/body_input_review.md). |
+| Hand-location gates, then actual body-input learners | Steps 4.1–4.14 found no confirmed noun gain, including the corrected matched comparison. Step 4.15 showed a scaffolded heavy/light capability; Step 4.16 sensory-target pretraining did not pass its picture-only weak-noun transfer gate. The broader acquisition question remains open. | [Past experiments](language_learning/past_experiments.md), [complete protocol/result record](language_learning/experiments.md), [step 4.5 signal audit](language_learning/body_signal_audit.md), [historical reassessment](language_learning/body_input_review.md). |
 
 The September report and older phase documents contain historical schedules,
 recommendations and environment details. They are preserved evidence, not the
@@ -35,9 +42,13 @@ to existing evidence, not new copies or a claim of fresh experiment validation.
 - `outputs/legacy/step2/`, `outputs/legacy/step3/`: older speech and gate work.
 - `outputs/legacy/`: superseded patched renders/runs from the earlier cleanup;
   never pool invalidated or patched artifacts with the current clean render.
-- `outputs/renders/clean_856/`, `outputs/runs/clean_body/`: current saved data,
+- `outputs/renders/clean_856/`, `outputs/runs/clean_body/`: retained saved data,
   speech, embeddings, and completed learner comparisons. Kept in place because
   run metadata and analysis refer to these paths.
+- `outputs/runs/step1_matched/`: corrected matched speech/exposure, 4.14 models
+  and audit records; also reused as inputs by 4.16.
+- `outputs/runs/step2_heavy_light/`: completed load-only property-word
+  diagnostic, six models and independent verification records.
 - `outputs/research/body_debate/`, `outputs/episode_review/`: October 26
   read-only research/audit evidence, not new training results.
 - `outputs/runs/step3_pretrain/`: ignored artifacts for completed Step 3 / 4.16;
@@ -50,6 +61,12 @@ to existing evidence, not new copies or a claim of fresh experiment validation.
 - `.external/`: upstream repositories/environments. `runs/`, `outputs/` and
   other generated roots follow `.gitignore`; models, media and datasets are not
   added to this documentation archive.
+
+Archiving does not mean deleting code or moving these ignored roots. Existing
+datasets, runs, hashes and path references are retained. The simulator imports
+a shared helper from the historical motion package, and sensory pretraining
+imports helpers from the property diagnostic; those source modules remain
+live dependencies as well as reproducibility support.
 
 ## How to use the archive
 

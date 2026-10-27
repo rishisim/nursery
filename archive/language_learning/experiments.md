@@ -11,7 +11,8 @@ correct them. In particular, overfitting does not uniquely identify its cause.
 
 Use the [current plan](../../PLAN.md) for active work, the
 [archive index](../README.md) for earlier projects, and the
-[current synthesis](../../docs/literature/body_input_review.md) for reassessment.
+[historical synthesis](body_input_review.md) for the dated reassessment.
+[Past experiments](past_experiments.md) explains the completed interventions and their limits.
 Inline paths and commands below are relative to the repository root.
 The step 4.5 audit is now [here](body_signal_audit.md).
 
@@ -46,7 +47,7 @@ a higher eventual plateau.
    baby is doing, strength set from developmental studies (not chosen by us).
    Done 2026-10-15. See "Speech coupling".
 3. **Smallest learner that tests the question.** Design: `docs/learner.md`;
-   sources: `docs/literature/body_input_review.md`.
+   sources: `archive/language_learning/body_input_review.md`.
    - Body-input pathway: contact, finger pose and arm position encoded
      separately, then combined with vision during language training.
    - Random body dropout in training; evaluate both body-present understanding

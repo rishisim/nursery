@@ -6,13 +6,18 @@ replays GRAB grasps as egocentric head-camera sessions, a speech generator adds
 caregiver utterances tied to what the infant does, and a learner built on the
 pinned [vlm-headcam](https://github.com/mcfrank/vlm-headcam) compares video-only
 with video + body. Start with the [current plan](PLAN.md) and
-[learner reference](docs/learner.md). Completed work is in the
+[learner reference](docs/learner.md). The active objective is direct acquisition
+curves across independent training-data amounts. Read [Past experiments](archive/language_learning/past_experiments.md)
+for the prior results and their limits; detailed records are in the
 [research archive](archive/README.md).
 
 The EmbodiedGen room builder and HOIDiNi/InterMimic motion adapters
 (`nursery/embodiedgen_scene.py`, `nursery/humanoid/`) supply rooms to the
 simulator and retain the earlier physics work. The motion experiments are
 inactive; their commands and measured failures are preserved in the archive.
+The simulator still imports a shared output helper from the motion package, so
+that source remains in place. Retained diagnostic learner modules likewise
+support reproduction and shared helpers; their presence is not a run queue.
 
 Generated rooms, assets, scenes, and previews belong under the ignored
 `outputs/embodiedgen_scene/` root. External checkouts (EmbodiedGen, HOIDiNi,
@@ -29,13 +34,13 @@ nursery/
   common.py     Repo root, merged config loading, ignored-output guard
   humanoid/, embodiedgen_scene.py   EmbodiedGen rooms and HOIDiNi/InterMimic motion
 tests/          test_simulator.py (egocentric-env), test_speech.py and test_learner.py (cue-env)
-docs/           Current learner reference, speech evidence and research synthesis
+docs/           Current learner implementation reference and speech evidence
 archive/        Completed experiments, historical commands and curated aggregates
 scripts/        render.sh, pipeline.sh, train_seeds.sh, summarize.py, merge_render.py
 outputs/        Ignored data and runs
   assets/       objaverse, konkle
-  renders/      clean_856 (current dataset)
-  runs/         One directory per embedded dataset and its trained conditions
+  renders/      clean_856 (retained source dataset)
+  runs/         Retained speech, features, trained conditions and historical run evidence
   speech_data/  osf_254yq (research use only, never commit)
   legacy/       Earlier experiments, working directories and superseded runs (patched/)
 .external/      Ignored envs (cue-env, egocentric-env) and checkouts (vlm-headcam, HOIDiNi, ...)
@@ -119,14 +124,8 @@ all source frames. There is no sampled-bound displacement inflation. The unchang
 frames per clip, with exact triangle-surface distances. Whole-hand diagnostics
 continue to use the rendered frames.
 
-The s1/s9/s10, two-session-per-subject, seed-7 acceptance pilot rendered 720 frames
-and 816 probes in 164.05 s with six workers. It realized 3/4/5 distractors in
-24/23/29 clips, with no zero-fit clips, mean realized count 4.066 and mean visible
-categories 4.551. Labelled-contact median and p90 changed by -0.0154 mm and
-+0.0470 mm against the earlier pilot; the whole-hand median was unchanged.
-Each session's preparation time (17.83–29.04 s) was below its Blender time
-(30.06–45.34 s). The superseded global margin produced 1,155 zero-fit clips out
-of 1,177 and 1.011 mean visible categories; those train sessions are discarded.
-Limitations: adult motion is an infant proxy; source head turns can hide the
-table/held object, placement rejection biases realized categories, and replay
-provides kinematics rather than physics. Measurements remain in ignored run roots.
+The [archived replay acceptance record](archive/language_learning/past_experiments.md#replay-acceptance-record)
+preserves prior pilot measurements. Adult replay is an infant proxy; head turns
+can hide objects, placement rejection biases visible categories, and kinematic
+replay does not provide a physical contact-force solve. Data and measurements
+remain in ignored run roots.
