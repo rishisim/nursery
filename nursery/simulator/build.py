@@ -11,7 +11,7 @@ import time
 
 import numpy as np
 
-from ..humanoid.embodiedgen_hoidini.run_motion import _output_directory
+from ..common import _output_directory
 from .grab import (_body_model, _object_surface, contact_distances, contact_indices, hand_geometry,
                    load_clip, mesh_path, reconstruct, rigid_matrix)
 from .assets import MANIFEST, load_vocabulary
@@ -329,7 +329,7 @@ def build(config_path, rooms_path, output_path, sessions_per_subject=1, seed=7, 
         schedule = [schedule[session_index]]
     with Path(config["hand_vertex_ids"]).open("rb") as stream:
         hand_ids = pickle.load(stream)
-    output = _output_directory(output_path)
+    output = _output_directory(output_path, exist_ok=False)
     started = time.monotonic()
     probes, jobs = [], {}
     if session_index is None:

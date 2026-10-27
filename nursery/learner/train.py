@@ -8,7 +8,7 @@ import pandas as pd
 
 from nursery.common import _output_directory
 from nursery.learner import _upstream_module
-from nursery.learner.model import LOSSES
+from nursery.learner.losses import LOSSES
 
 CONFIG = Path(__file__).with_name("config.json")
 BODY_MODES = ("none", "real", "shuffled", "oracle")
@@ -109,7 +109,8 @@ def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_r
     import torch
 
     from . import body as bodylib
-    from .model import BodyData, LearnerMIL
+    from .windows import BodyData
+    from .additive import AdditiveMIL
 
     path = Path(path)
     info = json.loads((path / "metrics.json").read_text())
@@ -128,7 +129,7 @@ def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_r
 
     with torch.random.fork_rng(devices=[]):  # building the teacher must not move the student's RNG stream
         dims = {k: v.shape[-1] for k, v in store["groups"].items()}
-        model = LearnerMIL(len(vocab), info["emb_dim"], tau_p, dims, len(store["categories"]))
+        model = AdditiveMIL(len(vocab), info["emb_dim"], tau_p, dims, len(store["categories"]))
     model.load_state_dict(torch.load(path / "model.pt", map_location="cpu", weights_only=True))
     model = model.float().to(device).eval()
     for p in model.parameters():
@@ -143,7 +144,9 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
 
     from . import body as bodylib
     from . import evaluate
-    from .model import BodyData, JointMIL, LearnerMIL
+    from .windows import BodyData
+    from .additive import AdditiveMIL
+    from .video_only import VideoOnlyMIL
 
     device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     upstream = _upstream_module("train_frame_mil")
@@ -178,6 +181,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     if arch not in ("additive", "joint"):
         raise ValueError("--arch must be additive or joint")
     joint = arch == "joint"
+    if joint:  # Reproduction only; the proposed joint architecture is not implemented.
+        from archive.code.learner.joint_pilot import JointMIL
     if physical and body != "real":
         raise ValueError("--physical needs --body real")
     if physical_shuffle and not physical:
@@ -256,7 +261,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         offset, valid = (torch.as_tensor(a, device=device) for a in _window_layout(manifest, lut, window))
     if body == "none":
         model = (JointMIL(len(vocab), emb_dim, tau_p) if joint else
-                 LearnerMIL(len(vocab), emb_dim, tau_p) if pool == "soft" else upstream.RegionMIL(len(vocab), emb_dim=emb_dim))
+                 VideoOnlyMIL(len(vocab), emb_dim, tau_p, pool=pool))
     else:
         frames = pd.read_parquet(episode_root / "frames.parquet")
         video_ids = sorted(set(all_manifest.video_id) | set(heldout_manifest.video_id))
@@ -286,7 +291,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         data = BodyData(train_store, ps, pt, win, bags, episode_ids, cache, row_of, device, learner["window_s"],
                         learner["mask_prob"] if weights["mask"] > 0 else 0.0, dropout)
         oracle_classes = len(real["categories"]) if body == "oracle" else 0
-        model = JointMIL(len(vocab), emb_dim, tau_p, data.dims) if joint else LearnerMIL(len(vocab), emb_dim, tau_p, data.dims, oracle_classes)
+        model = JointMIL(len(vocab), emb_dim, tau_p, data.dims) if joint else AdditiveMIL(len(vocab), emb_dim, tau_p, data.dims, oracle_classes)
         body_info = {"mode": body, "dropout": dropout, "episodes": episodes, "weights": weights, "shuffle": shuffle_info,
                      "physical": physical, "physical_shuffle": physical_info if physical_shuffle else False,
                      "n_episodes": int(len(np.unique(episode_ids[episode_ids >= 0]))),

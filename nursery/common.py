@@ -19,7 +19,7 @@ def load_config():
             "konkle": learner["konkle"]}
 
 
-def _output_directory(path):
+def _output_directory(path, *, exist_ok=True):
     path = Path(path).expanduser().resolve()
     parent = path
     while not parent.exists():
@@ -29,5 +29,5 @@ def _output_directory(path):
     )
     if ignored.returncode != 0:
         raise ValueError("Cue outputs must be inside an ignored repository directory")
-    path.mkdir(parents=True, exist_ok=True)
+    path.mkdir(parents=True, exist_ok=exist_ok)
     return path

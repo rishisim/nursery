@@ -224,12 +224,13 @@ visibility and physical-coherence limits still matter.
 
 ## What was retained and why
 
-Archival here changes documentation and interpretation, not artifact paths.
-Existing source, tests, configs, datasets and runs remain in place. In
-particular, `nursery/simulator/build.py` still imports `_output_directory` from
-`nursery.humanoid.embodiedgen_hoidini.run_motion`, and `pretrain.py` imports
-helpers from `property.py`; deleting apparently historical modules would break
-live dependencies. Presence of a diagnostic flag does not recommend using it.
+Artifact paths are unchanged. The subsequent source cleanup moved completed
+diagnostic runners and motion adapters into `archive/code/`, with their tests.
+The simulator now uses the common output guard; active video-only and additive
+models have explicit files and shared training/scoring utilities. The
+[archive index](../README.md#archived-source) identifies the historical snapshots
+and exact Git layout for reproduction. Presence of a retained diagnostic flag
+does not recommend using it.
 
 | Ignored location | Retained role |
 |---|---|

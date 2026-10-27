@@ -28,7 +28,7 @@ There is no evidence here that video is universally unusable, that gradients nev
 
 The renderer recomputes geometric contact against the rendered mesh, but finger trajectories are replayed rather than adapting to each swapped shape. Modeled load and thermal traces add information without changing the recorded motion. This limits physical coherence; it does not establish that every swapped grasp or rendered video is invalid.
 
-Source: [PLAN](../../PLAN.md), [body encoder](../../nursery/learner/body.py), [model](../../nursery/learner/model.py), [training](../../nursery/learner/train.py), [speech generator](../../nursery/speech/transcripts.py).
+Source: [PLAN](../../PLAN.md), [body encoder](../../nursery/learner/body.py), [historical model](https://github.com/rishisim/nursery/blob/20f1cc03/nursery/learner/model.py), [training](../../nursery/learner/train.py), [speech generator](../../nursery/speech/transcripts.py).
 
 ## Previous experiments change the decision
 

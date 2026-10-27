@@ -7,7 +7,7 @@ import pandas as pd
 import torch
 import torch.nn.functional as F
 
-from .model import soft_pool
+from .losses import soft_pool
 
 
 def body_present_context(manifest, frames, lut, window, body_half, subject=None):

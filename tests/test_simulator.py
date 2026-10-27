@@ -10,6 +10,21 @@ from nursery.simulator.schema import FIELDS, table, visible_objects
 from nursery.simulator.sessions import chain_clips, contact_rule, sample_chain, subject_split
 
 
+def test_shared_output_guard_preserves_new_directory_requirement(tmp_path):
+    import subprocess
+    from nursery.common import _output_directory
+
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+    (tmp_path / ".gitignore").write_text("outputs/\n")
+    output = tmp_path / "outputs" / "render"
+    assert _output_directory(output, exist_ok=False) == output.resolve()
+    with pytest.raises(FileExistsError):
+        _output_directory(output, exist_ok=False)
+    assert _output_directory(output) == output.resolve()
+    with pytest.raises(ValueError, match="ignored"):
+        _output_directory(tmp_path / "unignored", exist_ok=False)
+
+
 def standin_rooms(output):
     import trimesh
 
@@ -143,7 +158,7 @@ def test_build_contract_with_fake_sessions_and_probes(tmp_path, monkeypatch):
         for name in ("train", "heldout")]}))
     monkeypatch.setattr(implementation, "_catalog", lambda config: (
         {subject: [("clip", 100, 10)] for subject in config["subjects"]}, ["mug", "apple"]))
-    monkeypatch.setattr(implementation, "_output_directory", lambda path: _new_directory(path))
+    monkeypatch.setattr(implementation, "_output_directory", lambda path, **kwargs: _new_directory(path))
     monkeypatch.setattr(implementation, "load_clip", lambda path: {"table": {"params": {
         "global_orient": [[0, 0, 0]], "transl": [[0, 0, 0]]}}})
 

@@ -1,4 +1,4 @@
-"""Training-only embodied cues for the pinned vlm-headcam learner."""
+"""Shared upstream loading for video-only and additive language learners."""
 
 import importlib
 from pathlib import Path

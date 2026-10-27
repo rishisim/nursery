@@ -393,10 +393,11 @@ def test_shuffled_keeps_marginals(episodes):
 
 def _tiny_model(store, device="cpu", weights=None):
     import torch
-    from nursery.learner.model import BodyData, LearnerMIL
+    from nursery.learner.windows import BodyData
+    from nursery.learner.additive import AdditiveMIL
 
     torch.manual_seed(0)
-    model = LearnerMIL(30, 8, 0.1, {k: v.shape[-1] for k, v in store["groups"].items()})
+    model = AdditiveMIL(30, 8, 0.1, {k: v.shape[-1] for k, v in store["groups"].items()})
     model.region_head[0] = torch.nn.Linear(model.region_head[0].in_features, 128)
     bags = np.full(store["clip"].shape + (4,), -1)
     ps, pt = np.zeros(6, int), np.arange(10, 16)
@@ -516,6 +517,7 @@ def test_physical_shuffle_keeps_partitions_and_avoids_own_clip(episodes):
 
 def test_body_dropout_one_equals_video_only_and_each_loss_switches_off(episodes):
     import torch
+    from nursery.learner.video_only import VideoOnlyMIL
 
     root, _ = episodes
     store = _store(root, clips=10)
@@ -526,6 +528,10 @@ def test_body_dropout_one_equals_video_only_and_each_loss_switches_off(episodes)
     off = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "bodymatch": 0.0}
     ctx["keep"] = torch.zeros(6)  # dropout 1.0
     baseline = model.forward_loss(v, t, n, w, None, off)
+    video = VideoOnlyMIL(30, 8).eval()
+    video.load_state_dict({key: model.state_dict()[key] for key in video.state_dict()})
+    assert video.encoder is None
+    assert torch.equal(video.forward_loss(v, t, n, w), baseline)
     assert torch.equal(model.forward_loss(v, t, n, w, ctx, off), baseline)
     assert set(model.losses(v, t, n, w, ctx, off)) == {"match"}
     ctx["keep"] = torch.ones(6)
@@ -563,13 +569,13 @@ def test_bodymatch_loss_is_body_only_and_reaches_the_body_encoder(episodes):
 
 def _distill_pair(episodes):
     import torch
-    from nursery.learner.model import LearnerMIL
+    from nursery.learner.additive import AdditiveMIL
 
     root, _ = episodes
     teacher, data = _tiny_model(_store(root, clips=10))
     teacher.eval()
     torch.manual_seed(2)
-    student = LearnerMIL(30, 8, 0.1).eval()
+    student = AdditiveMIL(30, 8, 0.1).eval()
     v, t, n, w = _batch(student, data)
     ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0), training=False)
     return teacher, student, (v, t, n, w), ctx
@@ -798,7 +804,7 @@ def test_physical_training_runs_and_records_flags(episodes, upstream):
 
 def _joint_model(store, with_body=True, seed=0):
     import torch
-    from nursery.learner.model import JointMIL
+    from archive.code.learner.joint_pilot import JointMIL
 
     torch.manual_seed(seed)
     dims = {k: v.shape[-1] for k, v in store["groups"].items()} if with_body else None
@@ -808,7 +814,7 @@ def _joint_model(store, with_body=True, seed=0):
 def _joint_batch(store, pt=(2, 3, 10, 11, 12, 13), device="cpu"):
     """Tiny window batch: frames at offsets -2..2, pair 0 has two padded frames; pt < 5 reach before the session."""
     import torch
-    from nursery.learner.model import BodyData
+    from nursery.learner.windows import BodyData
 
     n = len(pt)
     data = BodyData(store, np.zeros(n, int), np.array(pt), np.zeros((n, 5), int), None, None, None, None, device, 5, 0.0, 0.0)
@@ -964,7 +970,7 @@ def test_joint_probe_reproduces_upstream_trials(episodes, upstream):
 
 def test_joint_body_tokens_never_cross_clips_or_partitions(episodes):
     from nursery.learner import body
-    from nursery.learner.model import BodyData
+    from nursery.learner.windows import BodyData
     from nursery.learner.train import clip_partition
 
     root, _ = episodes

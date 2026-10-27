@@ -62,11 +62,28 @@ to existing evidence, not new copies or a claim of fresh experiment validation.
   other generated roots follow `.gitignore`; models, media and datasets are not
   added to this documentation archive.
 
-Archiving does not mean deleting code or moving these ignored roots. Existing
-datasets, runs, hashes and path references are retained. The simulator imports
-a shared helper from the historical motion package, and sensory pretraining
-imports helpers from the property diagnostic; those source modules remain
-live dependencies as well as reproducibility support.
+Existing datasets, runs, hashes and artifact paths are retained. The source
+cleanup on 27 October 2026 separated the current video-only and additive models
+and moved inactive code out of `nursery/`. The simulator now uses the common
+output guard directly, so it no longer depends on the archived motion package.
+
+## Archived source
+
+| Location | Contents and status |
+|---|---|
+| [code/learner/heavy_light.py](code/learner/heavy_light.py) | Completed property-word diagnostic snapshot. |
+| [code/learner/sensory_pretraining.py](code/learner/sensory_pretraining.py) | Completed sensory-pretraining/transfer snapshot. |
+| [code/learner/tests/](code/learner/tests/) | Tests accompanying those historical runners. |
+| [code/learner/joint_pilot.py](code/learner/joint_pilot.py) | Old width-128 Transformer. Still imported explicitly by `--arch joint` and covered by current compatibility tests; not the proposed joint design. |
+| [code/motion/](code/motion/) | Inactive motion adapters and their tests. |
+
+Except for the explicitly supported joint pilot, these are historical reading
+copies, excluded from current test discovery. They retain their original import
+and path assumptions. For reproduction, use the complete package layout at
+[pre-cleanup commit 20f1cc03](https://github.com/rishisim/nursery/tree/20f1cc03),
+rather than running isolated relocated files. The original monolithic learner
+and longer implementation reference also remain at that commit. Current source
+has one visual baseline and an additive subclass; no second active copy exists.
 
 ## How to use the archive
 

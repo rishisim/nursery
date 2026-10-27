@@ -1,10 +1,10 @@
-"""Embed episode images and train the cue learner on a speech run."""
+"""Embed images and train video-only or additive language learners (shared runner)."""
 
 import argparse
 
 from .embed import embed_episodes
 from .train import BODY_MODES, EPISODE_MODES, train_run
-from .model import LOSSES
+from .losses import LOSSES
 
 
 def main():
@@ -34,44 +34,13 @@ def main():
     train.add_argument("--inspect-epoch", type=int, help="Also record probe scores, word-group accuracy and teacher agreement after this many epochs")
     train.add_argument("--labels", action="store_true", help="LABEL DIAGNOSTIC: train on the word of an object visible in the frame instead of the speech (picture-only)")
     train.add_argument("--split", choices=("subject", "clips"), default="subject", help="subject: s8 held out (default). clips: also hold out dev/test source clips of s1-s7 and select epochs on body-present dev (needs --pool soft)")
-    train.add_argument("--arch", choices=("additive", "joint"), default="additive", help="additive: picture score + body-word cosine (default). joint: one transformer over visual and body tokens (needs --pool soft, --body none|real, --episodes none, no aux losses)")
+    train.add_argument("--arch", choices=("additive", "joint"), default="additive", help="additive: picture score + body-word cosine (default). joint: HISTORICAL width-128 pilot from archive/code, not the proposed joint learner; one transformer over visual and body tokens (needs --pool soft, --body none|real, --episodes none, no aux losses)")
     train.add_argument("--physical", help="Directory of per-clip physical signals (load, skin temperature, contact area); adds two body-encoder groups (needs --body real)")
     train.add_argument("--physical-shuffle", action="store_true", help="CONTROL: load/skin taken from another source clip of the same subject and partition (needs --physical)")
     train.add_argument("--name", help="Output directory prefix (default: the condition)")
-    property_task = commands.add_parser("property", help="Bounded synthetic heavy/light word-grounding diagnostic")
-    property_task.add_argument("--phase", choices=("prepare", "train"), required=True,
-                               help="prepare freezes exposures/protocol without training; train runs the frozen six-model comparison once")
-    property_task.add_argument("--output", required=True, help="Ignored run root; prepare requires an empty directory")
-    property_task.add_argument("--episodes", help="Existing episode directory (prepare only; default: clean_856)")
-    property_task.add_argument("--cache", help="Existing region cache directory (prepare only; default: clean_body/train_cache)")
-    property_task.add_argument("--physical", help="Existing physical_by_clip directory (prepare only)")
-    pretrain_task = commands.add_parser("pretrain", help="Frozen Step 3 sensory-pretraining transfer experiment")
-    pretrain_task.add_argument("--phase", choices=("prepare", "train"), required=True)
-    pretrain_task.add_argument("--output", required=True, help="Ignored run root; prepare requires an empty directory")
-    pretrain_task.add_argument("--run", help="Corrected speech/cache input run (prepare only; default: step1_matched)")
     args = parser.parse_args()
     if args.command == "embed":
         embed_episodes(args.episodes, args.output, args.device, args.batch)
-    elif args.command == "pretrain":
-        from .pretrain import prepare, train_prepared
-
-        if args.phase == "prepare":
-            result = prepare(args.output, args.run)
-            print(result["counts"])
-        else:
-            if args.run:
-                parser.error("pretrain train reads paths from the prepared protocol; --run is prepare-only")
-            print(train_prepared(args.output))
-    elif args.command == "property":
-        from .property import prepare, train_prepared
-
-        if args.phase == "prepare":
-            result = prepare(args.output, args.episodes, args.cache, args.physical)
-            print(result["audit"])
-        else:
-            if any((args.episodes, args.cache, args.physical)):
-                parser.error("property train reads paths from the prepared protocol; path options are prepare-only")
-            print(train_prepared(args.output))
     else:
         weights = {loss: getattr(args, f"w_{loss}") for loss in LOSSES}
         train_run(args.run, args.condition, args.seed, args.epochs, args.name, args.pool, args.tau_p, args.body,
