@@ -3,7 +3,8 @@
 Originally archived 26 October 2026 from `PLAN.md` at commit `4a3dd16d`,
 preserving the protocol and results through step 4.13, including proposals
 that were never run. The 4.14 record below was appended after the matched
-rerun; the step 2 capability record was appended after its run as 4.15.
+rerun; the step 2 capability record was appended after its run as 4.15; the
+completed Step 3 sensory-pretraining experiment is recorded as 4.16.
 Historical “next” instructions below are not an active queue.
 Interpretations are recorded as written at the time; later diagnostics sometimes
 correct them. In particular, overfitting does not uniquely identify its cause.
@@ -684,5 +685,121 @@ the frozen DINO encoder has prior visual knowledge. The result covers two test
 categories and a fixed three-seed setup; full-frame visibility does not ensure
 recognizability in the DINO center crop. It demonstrates neither infant-like
 weak noun acquisition nor a higher language ceiling, and does not explain why
-ordinary noun learning failed. Step 3 remains conditional; this result does
-not queue it automatically.
+ordinary noun learning failed. At that point in the record, Step 3 remained
+conditional; this result did not queue it automatically.
+
+
+## Step 3: transfer-focused sensory pretraining (4.16)
+
+<a id="step-3-transfer-focused-sensory-pretraining"></a>
+
+Completed 27 October 2026. Run artifacts remain in the ignored
+`outputs/runs/step3_pretrain/`; corrected speech and feature inputs remain in
+`outputs/runs/step1_matched`; rendered source data remain in
+`outputs/renders/clean_856/`. No raw data or generated model artifacts were
+added to Git, and no input runs were deleted. The nine local MPS runs completed
+in 3,023.98 seconds (50 min 24 s): each arm/seed received exactly 50
+pretraining passes (500 updates) and 30 language-transfer epochs. Code revision
+was `2df4efcfa4e2457f0606f065c855251dd0dbc47d`; prepared protocol SHA-256 was
+`89ec6f2f63c8db9c04b9972f706fc1028b69a2a6f59fde797b750a6ab83ebfdc`.
+
+### Frozen protocol and execution
+
+The pre-run protocol was frozen before training. The following preserves the
+protocol as used, including the predeclared descriptive sensor-prediction
+comparison and its 134-of-135 dev-source eligibility rule.
+
+**Question and arms.** Does aligned sensory prediction improve later picture-only language learning beyond matched visual temporal pretraining and a deranged-sensor control? Run exactly three arms:
+
+- **V:** visual temporal pretraining only.
+- **A:** the same visual pretraining plus aligned sensor prediction.
+- **S:** the same visual pretraining plus sensor prediction on deranged targets.
+
+All arms train on all five frames of each selected five-frame window. The shared visual objective has weight 1 and is the mean existing `consistency_loss` over all four adjacent frame pairs. In A and S, add 0.5 × existing `predict_loss`: 22 contact, 22 contact-change, 2 aperture and 2 view targets. Use only the four within-window change adjacencies; do not add a sixth-frame target. S swaps complete five-frame sensor-target windows across different training-source clips within the same subject/mask stratum, using a fixed seed-0 derangement with full coverage of all 631 source clips.
+
+**Frozen sampling and leakage controls.** Use the current clip seed-0 split (631 training clips). In sorted clip order, take the first eligible contiguous occurrence per clip and choose one valid five-frame window uniformly with seed 0; freeze the same windows across arms and seeds. Fit normalization only for the existing aperture target (a finger-flexion proxy), using selected training-window seconds. Keep contact/view BCE targets binary [0,1] and contact-change difference-MSE targets unstandardized, as defined by the existing loss. Clip metadata may define boundaries and splits only. Do not use mass, object ID, referent identity, words or speech labels to select pretraining examples or as inputs.
+
+**Phase 1: pretraining.** Use the existing learner/model and losses, with no added architecture, raw-finger input, skin or extra body load. Use existing zero `center_mu` and identical initial visual-projection weights across arms within each seed; match minibatch order and permutations too. Train exactly 50 passes (500 updates at batch 64) per arm and seed 0/1/2, with AdamW lr 3e-4, weight decay 0.1 and soft tau 0.1. Save and use each fixed final checkpoint; do not select on dev. Preserve a common visual objective and training opportunities across V/A/S.
+
+**Phase 2: language transfer.** Copy only the pretrained 512-d visual projection into identical VIDEO-ONLY language learners; discard the body branch and predictors. Keep the projection trainable. Initialize fresh word vectors and logit scale from the common initialization for each seed, use a fresh optimizer, and reset a shared per-seed minibatch-order stream across arms. Use corrected weak-noun speech outputs and cached features from `outputs/runs/step1_matched` (18,613 training pairs), without label-based filtering. Train 30 epochs, batch 256, AdamW lr 3e-4, weight decay 0.1, soft tau 0.1, language auxiliary weight zero; seeds 0/1/2 yield nine runs total.
+
+**Evaluation and frozen decision gate.** Primary outcome is trial-weighted accuracy on corrected `clips_test` (570 queries, 115 target-clip clusters), averaged equally across the three seeds. For each arm, select the first maximum `picture_soft` accuracy on corrected `clips_dev` (486 queries, 119 clips). Pass only if A−V and A−S are each at least +5 percentage points, both contrasts are positive in all three seeds, and each 95% target-clip bootstrap lower bound is above zero. Use 10,000 draws, seed 0: resample the 115 source clips as whole clusters, retain all their trials, compute trial-weighted accuracy per seed and average the three seed accuracies equally. This gate is exploratory because the test sets have been previously consulted; reused candidate foils also induce dependence that the target-clip bootstrap does not account for. The +5 pp threshold is a pilot threshold, not a power claim.
+
+Fix evaluation trial sampling to seed 0 for every arm and each of the three training seeds, reusing corrected step-1 candidate identities and answers. Training seeds 0/1/2 vary the learners only.
+
+Report s8 (787 queries, 158 clusters) secondarily. Report rendered held-out asset and Konkle picture transfer separately, each at the first maximum rendered-dev epoch. All language readouts are body-absent: this experiment does not test body-present understanding. Compare held-out prediction loss with mean/persistence descriptively only; it does not select checkpoints or add a gate. A clip-test gain alone does not prove object representation; reused picture probes are corroboration only.
+
+For this descriptive prediction comparison, use the 134 eligible corrected dev source clips out of 135, taking one eligible contiguous occurrence and one valid five-frame window per clip by the same sorted-clip/uniform-window rule, with a fresh independent seed 0. Explicitly exclude and record `s1/stamp_stamp_1.npz`, which has only three contiguous seconds (117–119); do not pad it or add frames. This descriptive-only exclusion does not change the 631-clip training split or weak-noun dev set (486 queries, 119 clips). Score A and S against the true aligned dev sensor targets, on the four within-window change adjacencies only. The mean baseline predicts each target channel's mean over selected training windows. The persistence baseline predicts the previous true contact, aperture and view values; at each window's first frame use the corresponding training mean, and predict zero for contact-change. Clamp BCE prediction probabilities to [1e-6, 1−1e-6]. Fit no normalization on dev: use the training-only aperture normalization. Persistence is a privileged sensory-history reference, not a same-input control. These losses are descriptive only; they do not select checkpoints, add a gate, or require any additional fit.
+
+**Execution boundary.** Implementation and validation are complete. The user has authorized training once run preparation and the final data audit pass. Run exactly the nine planned runs locally on MPS with a total budget of two hours; report timeout/incomplete runs as incomplete, and do not compare arms trained for unequal budgets. No sweeps, extensions, additional arms beyond the nine planned runs, new simulation, or architecture redesign. Run root: `outputs/runs/step3_pretrain/` (already ignored). Later work is not automatically queued.
+
+Canonical entrypoint commands (from the repository root with the project
+environment active; `outputs/runs/step3_pretrain/` is ignored):
+
+```sh
+python -m nursery.learner pretrain --phase prepare --output outputs/runs/step3_pretrain --run outputs/runs/step1_matched
+python -m nursery.learner pretrain --phase train --output outputs/runs/step3_pretrain
+```
+
+### Results
+
+Primary outcome: trial-weighted corrected `clips_test` accuracy on 570 queries
+and 115 target-clip clusters, averaged equally across seeds. Evaluation trial
+sampling used fixed seed 0 for all arms and all three training seeds, reusing
+corrected step-1 candidate identities and answers; training seeds 0/1/2 varied
+the learners only.
+
+| Arm | `clips_test` | s8 | Rendered held-out | Konkle |
+|---|---:|---:|---:|---:|
+| V | 52.6316% | 46.2092% | 68.8205% | 64.3111% |
+| A | 51.8713% | 46.2092% | 68.8419% | 64.2389% |
+| S | 52.8655% | 46.8446% | 68.9487% | 64.4722% |
+
+| Contrast | Mean gain | Seed gains | 95% target-clip CI | Gate criteria |
+|---|---:|---|---:|---|
+| A−V | −0.7602 pp | +1.0526, −2.8070, −0.5263 pp | [−1.9440, +0.4220] pp | 0/3 passed |
+| A−S | −0.9942 pp | +0.7018, −2.6316, −1.0526 pp | [−2.2946, +0.3584] pp | 0/3 passed |
+
+The overall frozen transfer gate failed: none of its six contrast criteria
+passed. The target-clip bootstrap used 10,000 draws with seed 0. This was an
+exploratory test because test sets had previously been consulted; the bootstrap
+does not account for dependence from reused candidate foils. The +5 pp pilot
+threshold was not a power claim.
+
+Descriptive sensory prediction supported learning aligned targets: A beat S
+and the training-mean reference on all four target components in each of the
+three seeds. Mean total losses were A 1.476827, S 2.150805, training-mean
+reference 2.102603, and privileged persistence reference 5.211833. Persistence
+uses previous true contact/aperture/view, training means at the first frame,
+and zero for contact-change; it is a privileged sensory-history reference, not
+a same-input control. This prediction result did not demonstrate weak-noun
+transfer.
+
+All language evaluations were body-absent; the experiment did not measure
+body-present understanding or a higher learning ceiling. The result does not
+establish harm and does not refute every sensory-pretraining approach. It
+provides a design signal: this aligned sensory-pretraining setup learned
+predictive sensory structure without demonstrating transfer to weak-noun
+learning. The broader representation hypothesis remains unresolved. Step 3 is
+complete; no rerun, sweep or step 4 is automatically queued.
+
+### Independent verification
+
+The final independent audit passed. It confirmed all nine runs completed with
+500 pretraining updates and 30 language epochs each; common per-seed initial
+weights and minibatch orders across arms; fresh language state and
+projection-only transfer; first-dev-maximum selection; exact corrected trial
+identities, answers and rows for all three splits and all nine runs; and exact
+regeneration of the paired trial-weighted 10,000-draw bootstrap. Final frozen
+code, input and prepared-artifact hash verification passed (15 code files, 869
+source artifacts, six prepared artifact hashes plus the protocol hash). All 27
+checkpoints were finite. The preflight short-clip exclusion was recorded before
+training.
+Validation covered 89 unique tests (17 new pretraining tests and 72 existing
+tests); two older singleton-probe warnings remained warnings only.
+
+### Run evidence
+
+The ignored run root contains the frozen `protocol.json`, completion metadata
+in `run.json`, primary and descriptive aggregates in `comparison.json`, and
+the independent checks in `analysis_audit.json`.
