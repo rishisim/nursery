@@ -17,7 +17,7 @@ def _upstream_module(name):
     pin = subprocess.check_output(["git", "-C", str(UPSTREAM), "rev-parse", "HEAD"], text=True).strip()
     if pin != load_config()["upstream"]["commit"]:
         raise ValueError(f"vlm-headcam checkout is not at the configured pin: {pin}")
-    src = str(UPSTREAM / "src")
+    src = str((UPSTREAM / "src").resolve())
     # Upstream uses sibling absolute imports; refuse unrelated modules with those names.
     for sibling in ("common", "train", "train_boot", "train_region_mil", "train_frame_mil", "embed_regions"):
         module = sys.modules.get(sibling)

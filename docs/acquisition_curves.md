@@ -1,6 +1,7 @@
 # Main experiment: language acquisition with video and body
 
-Design reference; no implementation or training has started. The
+Canonical design and execution protocol. Preparation is verified; scientific
+training has not started. The
 [smaller study](cross_situational_learning.md) uses the same learner.
 
 ## The idea
@@ -113,3 +114,84 @@ Both studies use the same frozen implementation, separate models and separate
 ignored run directories. Neither supplies pretrained weights or mid-run design
 changes to the other. Preserve the data and
 [past experiments](../archive/language_learning/past_experiments.md).
+
+## Frozen execution protocol
+
+Use the corrected `outputs/runs/step1_matched/` speech and frozen feature caches,
+`outputs/renders/clean_856/` episodes and their `physical_by_clip/` signals in
+the original checkout. New artifacts live only under this worktree's ignored
+`outputs/runs/acquisition_curves/`. `protocol.json`, `signal_hashes.json` and
+`audit.json` record the exact input hashes, preparation and checks. No rendering,
+speech regeneration, additional benchmark or smaller-study run is included.
+
+Keep source-clip split seed 0, 15% development and 15% test among the training
+subjects, and s8 held out. Use one seed-0 ordering of eligible training clips,
+nested prefixes rounded upward, and fresh training seeds 0, 1 and 2 at every
+point. All three learners share the ordering and examples. Exclude training
+examples whose accessible visual context reaches an unselected clip or another
+partition; preserve the natural speech without referent-based selection.
+
+| Fraction | Independent clips selected/exposed | Usable utterances | Available replay seconds |
+|---|---:|---:|---:|
+| 10% | 63 | 1,528 | 6,819 |
+| 25% | 158 | 3,859 | 16,312 |
+| 50% | 315 | 8,018 | 31,776 |
+| 75% | 473 | 12,925 | 47,334 |
+| 100% | 630 | 18,613 | 63,153 |
+
+Replay seconds describe available selected-clip exposure, not independent
+physical duration or epoch-repeated exposure. Independent source duration is
+not inferred from those repetitions. Build each vocabulary with minimum count
+5 on that subset's speech and fit normalization only on its selected clips.
+The preparation audit reconstructs the subsets, vocabularies, normalization,
+panels and donors from the retained inputs.
+
+Train 45 models: 5 data amounts × 3 seeds × 3 learners. Each gets 60 epochs,
+batch size 256, AdamW with learning rate 0.0003 and weight decay 0.1, soft pooling
+temperature 0.1, ±2-second visual and clip-bounded ±5-second body windows.
+Both body learners receive all five groups and 50% body dropout; every auxiliary
+loss is off. Independent random generators preserve paired initialization,
+example order and body-dropout masks. Larger datasets receive more updates;
+each example receives the same number of passes.
+
+The joint interaction uses a single 64-dimensional body-query/visual-key/value
+attention operation. Multiply attended visual values by the projected body
+state, average over observed time steps in the contiguous centre clip, and map
+to 512 dimensions using a bias-free zero-initialized output projection. Its
+dot product with the word vector adds to the unchanged direct scores. Invalid
+visual tokens are masked; absent body histories or body dropout disable both
+body-dependent terms. Do not normalize the initially zero interaction output.
+The output head gets gradients first, followed by its upstream parameters once
+the head moves away from zero. The old `--arch joint` remains historical.
+
+Freeze noun-only query panels, candidates and correct slots at trial seed 0
+before vocabulary filtering. Training retains full weak utterances. An unknown
+query receives 25% expected accuracy with the denominator unchanged; report
+trial-weighted coverage and known-query accuracy separately. Use each learner's
+best clips-dev accuracy for its primary checkpoint, earliest epoch on a tie.
+Use a separate picture-dev-selected checkpoint for picture-only rendered and
+Konkle transfer. Test scores do not select epochs.
+
+Shuffled-body evaluation uses a fixed seed-0 donor for each situation, sampled
+with replacement from the same subject and evaluation panel but a different
+source clip. Move all channels and validity masks together. The same mapping
+is used for both body learners at every size and seed. Missing valid donors
+are a preflight failure; no candidate rule is relaxed.
+
+Run a one-epoch, full-data timing check for each learner, discard those weights,
+then start every scientific model fresh. Execute sequentially on local MPS with
+no paid compute and a 24-hour cap starting at the timing check. Stop before the
+matrix if its conservative timing projection exceeds that cap. Preserve and
+report incomplete work if the cap is reached; never shrink the matrix to fit.
+
+Report mean ± sample standard deviation and all three seed values, with paired
+differences computed within seed. The main curve is new-clip body-present noun
+understanding; s8, shuffled-body controls and picture-only transfer stay separate.
+Reused panels are exploratory. A null result still completes the comparison;
+an unsaturated curve does not establish a language-learning ceiling.
+
+The smaller study's common video/additive/body/loss/window implementation traces
+to `bdcb1c7f5ffcabf99631136659a288502fe83d6b`. This work extracts the same scoring
+arithmetic for reuse and adds the joint extension; it does not borrow the smaller
+study's models or measurements. Shared baseline equivalence is tested before
+the acquisition implementation is frozen for training.
