@@ -34,7 +34,8 @@ def main():
     train.add_argument("--inspect-epoch", type=int, help="Also record probe scores, word-group accuracy and teacher agreement after this many epochs")
     train.add_argument("--labels", action="store_true", help="LABEL DIAGNOSTIC: train on the word of an object visible in the frame instead of the speech (picture-only)")
     train.add_argument("--split", choices=("subject", "clips"), default="subject", help="subject: s8 held out (default). clips: also hold out dev/test source clips of s1-s7 and select epochs on body-present dev (needs --pool soft)")
-    train.add_argument("--arch", choices=("additive", "joint"), default="additive", help="additive: picture score + body-word cosine (default). joint: HISTORICAL width-128 pilot from archive/code, not the proposed joint learner; one transformer over visual and body tokens (needs --pool soft, --body none|real, --episodes none, no aux losses)")
+    train.add_argument("--arch", choices=("additive", "interaction", "joint"), default="additive", help="additive: picture + body cosine; interaction: direct picture/body plus learned visual-body interaction; joint: HISTORICAL width-128 pilot")
+    train.add_argument("--device", help="Torch training device (default: cuda > mps > cpu)")
     train.add_argument("--physical", help="Directory of per-clip physical signals (load, skin temperature, contact area); adds two body-encoder groups (needs --body real)")
     train.add_argument("--physical-shuffle", action="store_true", help="CONTROL: load/skin taken from another source clip of the same subject and partition (needs --physical)")
     train.add_argument("--name", help="Output directory prefix (default: the condition)")
@@ -48,7 +49,7 @@ def main():
         train_run(args.run, args.condition, args.seed, args.epochs, args.name, args.pool, args.tau_p, args.body,
                   args.episodes, weights, args.heldout_subject, args.body_dropout, args.distill_from, args.distill_weight,
                   args.distill_temp, args.inspect_epoch, args.labels, args.split, args.arch, args.physical, args.physical_shuffle,
-                  study_protocol=args.cross_situational, study_timing=args.timing_only)
+                  study_protocol=args.cross_situational, study_timing=args.timing_only, device=args.device)
 
 
 if __name__ == "__main__":

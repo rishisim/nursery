@@ -9,7 +9,8 @@ Start with [PLAN.md](PLAN.md). The two proposed studies are
 [acquisition curves](docs/acquisition_curves.md) and the smaller
 [cross-situational comparison](docs/cross_situational_learning.md).
 [Past experiments](archive/language_learning/past_experiments.md) explains what
-we already tried. These plans do not imply that their runners are implemented.
+we already tried. The small study is implemented; its current execution and
+joint-interaction follow-up are recorded in its document.
 
 ## File map
 
@@ -19,6 +20,9 @@ nursery/
   learner/
     video_only.py               Video → word matching (visual baseline)
     additive.py                 Video score + learned body → word score
+    interaction.py              Direct visual/body scores + learned interaction
+    cross_situational.py        Frozen small-study preparation and reporting
+    heavy_light.py              Canonical load-only property-word diagnostic
     body.py                     Contact, fingers, arms, load/skin encoding
     windows.py                  Clip-bounded body windows and episode context
     losses.py                   Shared language and diagnostic loss functions
@@ -38,11 +42,11 @@ scripts/                        Render/pipeline/seed launchers and run summaries
 tests/                          Current learner, speech, physical and simulator tests
 docs/
   acquisition_curves.md          Main proposed study
-  cross_situational_learning.md  Small proposed study: video vs additive, table output
+  cross_situational_learning.md  Small-study protocol, results and joint follow-up
   learner.md                    Current implementation and scoring reference
   speech_coupling.md             Speech-generation evidence and assumptions
 archive/
-  code/learner/                 Completed heavy/light, pretraining and old joint pilot
+  code/learner/                 Completed pretraining and old joint pilot
   code/motion/                  Inactive HOIDiNi/InterMimic code and its tests
   language_learning/            Past experiments, protocols and curated results
   legacy_research/              Earlier simulation source/config/test archive
@@ -53,8 +57,10 @@ archive/
 The additive learner extends `video_only.py`; it does not carry a second copy
 of the visual implementation. Both use the pinned
 [vlm-headcam](https://github.com/mcfrank/vlm-headcam) upstream implementation.
-The revised joint interaction design is currently a plan in
-`docs/acquisition_curves.md`. The archived width-128 joint pilot is a different,
+The revised joint learner in `interaction.py` preserves both direct pathways
+and adds a zero-initialized learned interaction. It is reused from the
+acquisition-curves implementation at commit `08ebb82c`, selected through
+`--arch interaction`. The archived width-128 joint pilot is a different,
 completed implementation; `--arch joint` is retained only for compatibility.
 
 ## Existing entry points

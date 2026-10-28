@@ -10,7 +10,7 @@ import pandas as pd
 
 from nursery.common import _output_directory
 from nursery.learner import _upstream_module
-from nursery.learner.losses import LOSSES
+from nursery.learner.losses import LOSSES, REGIONS
 
 CONFIG = Path(__file__).with_name("config.json")
 BODY_MODES = ("none", "real", "shuffled", "oracle")
@@ -205,7 +205,7 @@ def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_r
 
 def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.1, body="none", episodes="none",
               weights=None, heldout_subject=None, body_dropout=None, distill_from=None, distill_weight=1.0,
-              distill_temp=2.0, inspect_epoch=None, labels=False, split="subject", arch="additive", physical=None, physical_shuffle=False, study_protocol=None, study_timing=False):
+              distill_temp=2.0, inspect_epoch=None, labels=False, split="subject", arch="additive", physical=None, physical_shuffle=False, study_protocol=None, study_timing=False, device=None):
     import torch
 
     from . import body as bodylib
@@ -217,7 +217,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     started = time.perf_counter()
     if study_timing and study_protocol is None:
         raise ValueError("Timing-only mode requires a cross-situational protocol")
-    device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+    device = device or ("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+    device = str(torch.device(device))
     upstream = _upstream_module("train_frame_mil")
     region = _upstream_module("train_region_mil")
     run = Path(run).resolve()
@@ -232,8 +233,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
                            for key, path in (("protocol", protocol_path),
                                              ("manifest", protocol_path.parent / "manifest.parquet"),
                                              ("panels", protocol_path.parent / "panels.json"))}
-        if arch != "additive" or body not in ("none", "real") or distill_from or labels or physical_shuffle or episodes != "none" or inspect_epoch:
-            raise ValueError("Cross-situational study requires additive architecture, body none/real and no diagnostics")
+        if arch not in ("additive", "interaction") or body not in ("none", "real") or distill_from or labels or physical_shuffle or episodes != "none" or inspect_epoch:
+            raise ValueError("Cross-situational study requires additive/interaction architecture, body none/real and no diagnostics")
         if seed not in (0, 1, 2) or epochs not in (None, 20):
             raise ValueError("Cross-situational study freezes seeds 0,1,2 and 20 epochs")
         if any(v is not None and v != 0 for v in (weights or {}).values()):
@@ -245,7 +246,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         body_dropout = 0.5
         physical = study["physical"] if body == "real" else None
         generator = {"config": load_config(), "episodes": study["episodes"], "seed": 0}
-        generator["config"]["training"] = {"epochs": 20, "batch": 32, "lr": 0.0003, "window": 2, "min_freq": 1}
+        generator["config"]["training"] = {"epochs": 20, "batch": 32, "lr": 0.0003, "weight_decay": 0.1, "window": 2, "min_freq": 1}
     else:
         generator = json.loads((run / "generator.json").read_text())
     config = generator["config"]
@@ -275,8 +276,15 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     by_clips = split == "clips"  # `split` is reused as a loop name below
     if distill_weight < 0 or distill_temp <= 0:
         raise ValueError("--distill-weight must be non-negative and --distill-temp positive")
-    if arch not in ("additive", "joint"):
-        raise ValueError("--arch must be additive or joint")
+    if arch not in ("additive", "joint", "interaction"):
+        raise ValueError("--arch must be additive, interaction or joint")
+    interaction = arch == "interaction"
+    if interaction:
+        if pool != "soft" or body != "real" or distill_from or labels or episodes != "none" or physical_shuffle:
+            raise ValueError("--arch interaction needs soft pooling, real body, no auxiliary/diagnostic modes")
+        if any(v is not None and v > 0 for v in (weights or {}).values()):
+            raise ValueError("--arch interaction has no auxiliary losses")
+        from .interaction import JointInteractionMIL
     joint = arch == "joint"
     if joint:  # Reproduction only; the proposed joint architecture is not implemented.
         from archive.code.learner.joint_pilot import JointMIL
@@ -294,7 +302,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         raise ValueError(f"Loss weights must be non-negative: {LOSSES}")
     if body == "none" and weights["bodymatch"] > 0:
         raise ValueError("--w-bodymatch needs --body")
-    if body == "none" or joint:
+    if body == "none" or joint or interaction:
         weights = {k: 0.0 for k in LOSSES}
     if episodes == "none":
         weights["episode"] = weights["consist"] = 0.0
@@ -361,7 +369,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     window = settings["window"]
     body_info = None
     data = eval_data = held_ds = held_pairs = None
-    if joint:  # window offsets and padding of every training pair, for control and body runs alike
+    if joint or interaction:  # The interaction masks synthetic padding only in its attention pathway.
         offset, valid = (torch.as_tensor(a, device=device) for a in _window_layout(manifest, lut, window))
     if body == "none":
         model = (JointMIL(len(vocab), emb_dim, tau_p) if joint else
@@ -397,7 +405,9 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         data = BodyData(train_store, ps, pt, win, bags, episode_ids, cache, row_of, device, learner["window_s"],
                         learner["mask_prob"] if weights["mask"] > 0 else 0.0, dropout)
         oracle_classes = len(real["categories"]) if body == "oracle" else 0
-        model = JointMIL(len(vocab), emb_dim, tau_p, data.dims) if joint else AdditiveMIL(len(vocab), emb_dim, tau_p, data.dims, oracle_classes)
+        model = (JointMIL(len(vocab), emb_dim, tau_p, data.dims) if joint else
+                 JointInteractionMIL(len(vocab), emb_dim, tau_p, data.dims) if interaction else
+                 AdditiveMIL(len(vocab), emb_dim, tau_p, data.dims, oracle_classes))
         body_info = {"mode": body, "dropout": dropout, "episodes": episodes, "weights": weights, "shuffle": shuffle_info,
                      "physical": physical, "physical_shuffle": physical_info if physical_shuffle else False,
                      "n_episodes": int(len(np.unique(episode_ids[episode_ids >= 0]))),
@@ -517,6 +527,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
                 if joint:
                     ix = idx.to(device)
                     ctx = {**(ctx or {}), "vis_offset": offset[ix], "vis_valid": valid[ix]}
+                elif interaction:
+                    ctx = dict(ctx, visual_valid=valid[idx.to(device)].repeat_interleave(REGIONS, dim=1))
                 target = None
                 if teacher is not None and distill_weight > 0:
                     target = teacher.teacher_logits(v.to(device), t.to(device), n.to(device), teacher_train.batch(idx.numpy(), None, training=False))
@@ -577,7 +589,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
             checkpoints[f"epoch_{inspect_epoch}"] = checkpoint(epoch, scores, details)
     if study_timing:
         timing = {"study_protocol": study["protocol_path"], **study["hashes"], "seed": seed, "condition": condition,
-                  "body": body, "device": device, "epochs": 1, "full_epochs": settings["epochs"],
+                  "body": body, "arch": arch, "device": device, "epochs": 1, "full_epochs": settings["epochs"],
                   "startup_seconds": loop_started - started,
                   "train_dev_seconds": time.perf_counter() - loop_started,
                   "total_seconds": time.perf_counter() - started,
@@ -597,7 +609,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
             shuffled = _study_score(model, upstream, (d, ShuffledBodyHistory(e, donors, rows), rows, context),
                                     study_panels["test"], device, trials=True)
         metrics = {"study_protocol": study["protocol_path"], **study["hashes"], "seed": seed, "condition": condition,
-                   "body": body, "selected_epoch": best_ep, "selection": "own_dev_situation_accuracy_earliest_tie",
+                   "body": body, "arch": arch, "selected_epoch": best_ep, "selection": "own_dev_situation_accuracy_earliest_tie",
                    "history": history, "test": test, "shuffled_test": shuffled, "n_pairs": len(ds),
                    "vocab": len(vocab), "emb_dim": int(model.word.embedding_dim), "settings": settings,
                    "pool": pool, "tau_p": tau_p, "body_dropout": dropout, "weights": weights,
@@ -654,6 +666,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         metrics["arch"], metrics["joint"] = arch, {**model.settings, "params": model.param_counts()}
         if epochs >= 30:
             metrics["readout_epoch_30"] = history[29]
+    if interaction:
+        metrics["arch"] = arch
     if teacher is not None:
         metrics["distill"] = {"from": str(Path(distill_from).resolve()), "weight": distill_weight, "temp": distill_temp}
         if held_ds is not None:  # ORACLE DIAGNOSTIC: the teacher's own body-present numbers (hard and soft pooling)

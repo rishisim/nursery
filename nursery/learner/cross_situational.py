@@ -304,14 +304,18 @@ def prepare(episodes, cache, output):
     return selected
 
 
-def report(protocol_path, metric_paths, output):
-    """Summarize the six completed, protocol-bound selected-checkpoint runs."""
-    protocol_path = Path(protocol_path).resolve()
-    root = protocol_path.parent
-    protocol = json.loads(protocol_path.read_text())
-    expected = {f'study_{name}_sha256': hashlib.sha256(path.read_bytes()).hexdigest()
-                for name, path in [('protocol', protocol_path), ('manifest', root / 'manifest.parquet'),
-                                   ('panels', root / 'panels.json')]}
+def _study_hashes(protocol_path, root):
+    return {f'study_{name}_sha256': hashlib.sha256(path.read_bytes()).hexdigest()
+            for name, path in [('protocol', protocol_path), ('manifest', root / 'manifest.parquet'),
+                               ('panels', root / 'panels.json')]}
+
+
+def _aggregate(values):
+    return {'mean': float(np.mean(values)), 'sample_sd': float(np.std(values, ddof=1))}
+
+
+def _report_six(protocol, protocol_path, expected, metric_paths, output):
+    """Keep the original two-arm report format for its six historical runs."""
     runs = {}
     for path in metric_paths:
         path = Path(path).resolve()
@@ -336,17 +340,111 @@ def report(protocol_path, metric_paths, output):
         runs[key] = row
     if set(runs) != {(body, seed) for body in ('none', 'real') for seed in (0, 1, 2)}:
         raise ValueError('Report requires all three paired seeds for both conditions')
-    def aggregate(values):
-        return {'mean': float(np.mean(values)), 'sample_sd': float(np.std(values, ddof=1))}
     video = [runs['none', seed] for seed in range(3)]
     additive = [runs['real', seed] for seed in range(3)]
     result = {'study_protocol': str(protocol_path), **expected,
-              'video_only': aggregate([r['accuracy'] for r in video]),
-              'additive': aggregate([r['accuracy'] for r in additive]),
-              'shuffled_additive': aggregate([r['shuffled_accuracy'] for r in additive]),
+              'video_only': _aggregate([r['accuracy'] for r in video]),
+              'additive': _aggregate([r['accuracy'] for r in additive]),
+              'shuffled_additive': _aggregate([r['shuffled_accuracy'] for r in additive]),
               'per_seed': {'video_only': video, 'additive': additive},
               'counts': protocol['counts'], 'foil_counts': protocol['foil_counts'],
               'example_encounters': protocol['example_encounters']}
+    return _write_report(result, output, three_conditions=False)
+
+
+def _score_record(metrics, score_key, label, path):
+    score = metrics.get('test', {}).get(score_key, {}).get('acc')
+    if (not isinstance(score, (int, float)) or not np.isfinite(score) or not 0 <= score <= 100
+            or metrics.get('reported_test_acc') != score or metrics.get('test', {}).get('n_trials') != 64):
+        raise ValueError(f'Invalid selected {label} test result: {path}')
+    flags = metrics['test'].get('trials', {}).get(score_key)
+    if not isinstance(flags, list) or len(flags) != 64 or round(100 * sum(flags) / 64, 3) != score:
+        raise ValueError(f'Selected {label} score does not match its 64 trial flags: {path}')
+    return score
+
+
+def _report_nine(protocol, protocol_path, expected, metric_paths, output):
+    """Summarize matched video, additive and interaction runs plus shuffled controls."""
+    required_settings = {'epochs': 20, 'batch': 32, 'lr': 0.0003, 'weight_decay': 0.1,
+                         'window': 2, 'min_freq': 1}
+    keys = {
+        ('none', 'additive'): 'video_only',
+        ('real', 'additive'): 'additive',
+        ('real', 'interaction'): 'interaction',
+    }
+    frozen_panel = json.loads((protocol_path.parent / 'panels.json').read_text())['test']
+    expected_panel = ([trial['candidates'] for trial in frozen_panel],
+                      [int(trial['correct']) for trial in frozen_panel])
+    if len(expected_panel[0]) != 64:
+        raise ValueError('Frozen test panel must contain 64 trials')
+    runs, common_settings = {}, None
+    for raw_path in metric_paths:
+        path = Path(raw_path).resolve()
+        metrics = json.loads(path.read_text())
+        if any(metrics.get(key) != value for key, value in expected.items()):
+            raise ValueError(f'Metrics do not match frozen study inputs: {path}')
+        if metrics.get('device') != 'cpu':
+            raise ValueError(f'Nine-run report requires CPU runs: {path}')
+        settings = metrics.get('settings')
+        if not isinstance(settings, dict) or any(settings.get(k) != v for k, v in required_settings.items()):
+            raise ValueError(f'Nine-run report requires the frozen training settings: {path}')
+        if common_settings is None:
+            common_settings = settings
+        elif settings != common_settings:
+            raise ValueError(f'Nine runs must use identical settings: {path}')
+        weights = metrics.get('weights')
+        if (metrics.get('condition') != 'none' or metrics.get('n_pairs') != 256 or metrics.get('emb_dim') != 512
+                or metrics.get('pool') != 'soft' or metrics.get('tau_p') != 0.1
+                or metrics.get('body_dropout') != 0.5 or not isinstance(weights, dict)
+                or set(weights) != {'pred', 'episode', 'consist', 'mask', 'bodymatch'}
+                or any(value != 0 for value in weights.values())):
+            raise ValueError(f'Nine-run report requires the frozen model and 256 training pairs: {path}')
+        body, arch, seed = metrics.get('body'), metrics.get('arch'), metrics.get('seed')
+        condition_key = (body, arch)
+        if condition_key not in keys or seed not in (0, 1, 2) or (condition_key, seed) in runs:
+            raise ValueError(f'Unexpected or duplicate architecture/seed: {condition_key}, {seed}')
+        if len(metrics.get('history', [])) != 20:
+            raise ValueError(f'Nine-run report requires 20 training epochs: {path}')
+        history = metrics['history']
+        best = max(float(row['dev']) for row in history)
+        earliest = next(i for i, row in enumerate(history) if float(row['dev']) == best)
+        if metrics.get('selected_epoch') != earliest:
+            raise ValueError(f'Checkpoint was not selected at earliest own-dev maximum: {path}')
+        score_key = 'picture_soft' if body == 'none' else 'fused_soft'
+        score = _score_record(metrics, score_key, keys[condition_key], path)
+        panel = (metrics['test'].get('candidate_rows'), metrics['test'].get('correct_slots'))
+        if panel != expected_panel:
+            raise ValueError(f'Nine runs must use identical fixed test candidates: {path}')
+        row = {'seed': seed, 'accuracy': score, 'metrics': str(path)}
+        if body == 'real':
+            shuffled = metrics.get('shuffled_test')
+            shuffled_score = shuffled.get('fused_soft', {}).get('acc') if isinstance(shuffled, dict) else None
+            flags = shuffled.get('trials', {}).get('fused_soft') if isinstance(shuffled, dict) else None
+            if (not isinstance(shuffled_score, (int, float)) or not np.isfinite(shuffled_score)
+                    or not 0 <= shuffled_score <= 100 or shuffled.get('n_trials') != 64
+                    or not isinstance(flags, list) or len(flags) != 64
+                    or round(100 * sum(flags) / 64, 3) != shuffled_score):
+                raise ValueError(f'Invalid shuffled-body score: {path}')
+            if (shuffled.get('candidate_rows') != panel[0] or shuffled.get('correct_slots') != panel[1]):
+                raise ValueError(f'Shuffled body must use the same fixed test trials: {path}')
+            row['shuffled_accuracy'] = shuffled_score
+        runs[condition_key, seed] = row
+    required = {(condition, seed) for condition in keys for seed in range(3)}
+    if set(runs) != required:
+        raise ValueError('Report requires all three paired seeds for video, additive and interaction')
+    by_name = {name: [runs[key, seed] for seed in range(3)] for key, name in keys.items()}
+    result = {'study_protocol': str(protocol_path), **expected,
+              'video_only': _aggregate([r['accuracy'] for r in by_name['video_only']]),
+              'additive': _aggregate([r['accuracy'] for r in by_name['additive']]),
+              'interaction': _aggregate([r['accuracy'] for r in by_name['interaction']]),
+              'shuffled_additive': _aggregate([r['shuffled_accuracy'] for r in by_name['additive']]),
+              'shuffled_interaction': _aggregate([r['shuffled_accuracy'] for r in by_name['interaction']]),
+              'per_seed': by_name, 'counts': protocol['counts'], 'foil_counts': protocol['foil_counts'],
+              'example_encounters': protocol['example_encounters']}
+    return _write_report(result, output, three_conditions=True)
+
+
+def _write_report(result, output, three_conditions):
     output = Path(output)
     if any((output / name).exists() for name in ('results.json', 'results.md')):
         raise FileExistsError(f'Refusing to overwrite report in {output}')
@@ -355,14 +453,28 @@ def report(protocol_path, metric_paths, output):
     def fmt(row):
         return f"{row['mean']:.2f}% ± {row['sample_sd']:.2f} percentage points"
     examples = ', '.join(f"{r['video_id']}:{r['frame_idx']} ({r['referent']})" for r in result['example_encounters'])
-    text = ('| Condition | Held-out accuracy (mean ± sample SD) |\n|---|---:|\n'
-            f"| Video only | {fmt(result['video_only'])} |\n"
-            f"| Additive video + body | {fmt(result['additive'])} |\n\n"
-            f"Shuffled-body additive accuracy: {fmt(result['shuffled_additive'])}.\n\n"
-            f'Example encounters: {examples}.\n')
-    text += '\n| Seed | Video | Additive | Shuffled additive |\n|---:|---:|---:|---:|\n'
-    for a, b in zip(video, additive):
-        text += f"| {a['seed']} | {a['accuracy']:.2f}% | {b['accuracy']:.2f}% | {b['shuffled_accuracy']:.2f}% |\n"
+    if three_conditions:
+        rows = [('Video only', 'video_only'), ('Additive video + body', 'additive'),
+                ('Interaction video + body', 'interaction')]
+        text = '| Condition | Held-out accuracy (mean ± sample SD) |\n|---|---:|\n'
+        text += ''.join(f'| {label} | {fmt(result[key])} |\n' for label, key in rows)
+        text += (f"\nShuffled additive accuracy: {fmt(result['shuffled_additive'])}.\n"
+                 f"Shuffled interaction accuracy: {fmt(result['shuffled_interaction'])}.\n\n")
+        text += f'Example encounters: {examples}.\n'
+        text += '\n| Seed | Video | Additive | Interaction | Shuffled additive | Shuffled interaction |\n'
+        text += '|---:|---:|---:|---:|---:|---:|\n'
+        for i in range(3):
+            a, b, c = (result['per_seed'][name][i] for name in ('video_only', 'additive', 'interaction'))
+            text += f"| {i} | {a['accuracy']:.2f}% | {b['accuracy']:.2f}% | {c['accuracy']:.2f}% | {b['shuffled_accuracy']:.2f}% | {c['shuffled_accuracy']:.2f}% |\n"
+    else:
+        text = ('| Condition | Held-out accuracy (mean ± sample SD) |\n|---|---:|\n'
+                f"| Video only | {fmt(result['video_only'])} |\n"
+                f"| Additive video + body | {fmt(result['additive'])} |\n\n"
+                f"Shuffled-body additive accuracy: {fmt(result['shuffled_additive'])}.\n\n"
+                f'Example encounters: {examples}.\n')
+        text += '\n| Seed | Video | Additive | Shuffled additive |\n|---:|---:|---:|---:|\n'
+        for a, b in zip(result['per_seed']['video_only'], result['per_seed']['additive']):
+            text += f"| {a['seed']} | {a['accuracy']:.2f}% | {b['accuracy']:.2f}% | {b['shuffled_accuracy']:.2f}% |\n"
     text += '\nTarget encounter and independent clip counts by partition, category and held status:\n\n'
     text += '| Partition | Category | Held | Encounters | Clips |\n|---|---|---|---:|---:|\n'
     for row in result['counts']:
@@ -371,13 +483,26 @@ def report(protocol_path, metric_paths, output):
     return result
 
 
+def report(protocol_path, metric_paths, output):
+    """Summarize either six legacy or nine matched protocol-bound runs."""
+    protocol_path = Path(protocol_path).resolve()
+    root = protocol_path.parent
+    protocol = json.loads(protocol_path.read_text())
+    metric_paths = list(metric_paths)
+    if len(metric_paths) not in (6, 9):
+        raise ValueError('Report requires all three paired seeds for either six legacy runs or nine matched runs')
+    expected = _study_hashes(protocol_path, root)
+    return (_report_nine(protocol, protocol_path, expected, metric_paths, output) if len(metric_paths) == 9
+            else _report_six(protocol, protocol_path, expected, metric_paths, output))
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--episodes')
     parser.add_argument('--cache')
     parser.add_argument('--output', required=True)
     parser.add_argument('--report-protocol', help='Frozen protocol.json to summarize')
-    parser.add_argument('--metrics', nargs=6, help='Six completed metrics.json files')
+    parser.add_argument('--metrics', nargs='+', help='Six legacy or nine matched completed metrics.json files')
     args = parser.parse_args()
     if args.report_protocol:
         if not args.metrics or args.episodes or args.cache:

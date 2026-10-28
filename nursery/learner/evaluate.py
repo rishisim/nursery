@@ -7,7 +7,7 @@ import pandas as pd
 import torch
 import torch.nn.functional as F
 
-from .losses import soft_pool
+from .losses import REGIONS, soft_pool
 
 
 class ShuffledBodyHistory:
@@ -135,6 +135,7 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
     referents. Scores per candidate: picture (hard max over the window's regions), body (fused-projection cosine to
     the word) and their sum (late fusion), plus `picture_soft` / `fused_soft`: the same with the training pooling
     (soft-MIL, uniform region prior, tau_p), which is the score the model was trained on and the one to read.
+    Interaction models use their complete shared score for `fused_soft`; `additive_soft` retains the direct-path diagnostic.
     Foils use their own body, so the body must match the situation. `subject` [rows] restricts foils to the target's
     subject; `trials` adds `trial_rows` (manifest row of each scored trial) and per-trial 0/1 `trials` for the soft scores.
     """
@@ -153,9 +154,21 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
             latents.append(model.latent_of(data.batch(np.array(rows), generator, training=False)))
     T, R = torch.cat(tokens), torch.cat(regions)
     Z = torch.cat(latents) if latents else None
+    interaction = hasattr(model, "interaction_enabled") and Z is not None
+    full_scores = None
+    if interaction:
+        # Use the model's complete training score; hand-added body cosine omits interaction.
+        # Keep repeated padding in the direct visual score, as in the controls;
+        # the interaction attention alone excludes these synthetic token repeats.
+        ctx = data.batch(np.arange(len(ds)), generator, training=False)
+        counts = torch.as_tensor([len(locs) for locs in ds.locs], device=R.device)
+        ctx["visual_valid"] = torch.arange(R.shape[1], device=R.device)[None, :] < counts[:, None] * REGIONS
+        full_scores = model.score_encoded(R.float(), T, ctx)
     held_all = np.asarray(context["held"], dtype=bool)
     held, rows_used = [], []
     correct = {"picture": [], "body": [], "fused": [], "picture_soft": [], "fused_soft": []}
+    if interaction:
+        correct["additive_soft"] = []
     tau = getattr(model, "tau_p", None)
     for i, cand, answer in sampled:
         held.append(held_all[i])
@@ -170,6 +183,9 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
             scores["body"], scores["fused"] = body, pic + model.beta * body
             if tau is not None:
                 scores["fused_soft"] = soft + model.beta * body
+                if interaction:
+                    scores["additive_soft"] = scores["fused_soft"]
+                    scores["fused_soft"] = full_scores[cand, i]
         for k, s in scores.items():
             correct[k].append(float(s.argmax() == answer))
     held = np.array(held, bool)
@@ -189,7 +205,7 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
         out["correct_slots"] = [answer for _, _, answer in sampled]
         out["candidate_identities"] = [[context["identity"][j] for j in cand] for _, cand, _ in sampled]
         out["trial_rows"] = rows_used
-        out["trials"] = {k: [int(x) for x in correct[k]] for k in ("picture_soft", "fused_soft") if correct[k]}
+        out["trials"] = {k: [int(x) for x in correct[k]] for k in ("picture_soft", "fused_soft", "additive_soft") if correct.get(k)}
     return out
 
 

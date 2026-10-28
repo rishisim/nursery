@@ -313,5 +313,55 @@ the five body streams did not improve held-out accuracy. The result is a design
 signal for the larger build: aligned sensory input is used here, yet that use
 does not establish a language-learning advantage. It does not measure an
 acquisition ceiling, establish new-instance generalization, or settle the
-separately planned acquisition-curve comparison. No follow-up experiment,
-architecture change, new rendering or parameter sweep was launched.
+separately planned acquisition-curve comparison. At completion of this original
+comparison, no follow-up experiment, architecture change, new rendering or
+parameter sweep had been launched.
+
+## Requested joint-interaction comparison
+
+The user subsequently requested testing the new joint design on both this task
+and the heavy/light capability task. This explicitly expands the original
+two-learner scope. Reuse the committed acquisition-curves model at `08ebb82c`:
+`interaction.py` preserves the direct visual/word and body/word scores, then adds
+a learned visual/body interaction with zero-initialized output. Its prerequisite
+`score_encoded` methods and tests are imported from the same commit. The old
+128-dimensional `--arch joint` pilot is not this design; use `--arch interaction`.
+Do not modify the other chat's active worktree or its models.
+
+Run fresh **video, additive and interaction** models for each of seeds 0, 1 and
+2 on CPU, with matched common initialization, data order, body dropout and
+training opportunity. Fresh CPU references avoid confounding a CPU joint run
+with the original MPS controls; the acquisition chat is using MPS independently.
+Keep the original results and artifacts intact and report the new matched table
+separately. There is no model-selection sweep or acquisition curve here.
+
+- **Cross-situational:** reuse the exact frozen manifest, word mapping, panels
+  and donor permutation above; retain all five body streams, 20 epochs, batch
+  32, 50% body dropout, training-only centering/normalization and the same
+  development checkpoint rule. Write new results to ignored
+  `outputs/runs/cross_situational_joint/`, referring to the original protocol
+  rather than resampling. Evaluate the full interaction score during both
+  development and test; the previous hand-written additive evaluator alone
+  would omit the interaction. Report aligned and shuffled results for both
+  body-enabled conditions. Mask repeated padding only in interaction attention,
+  identically in training and evaluation; preserve the inherited direct visual
+  pathway's padding convention across all three models.
+- **Heavy/light:** restore the one canonical runner to
+  `nursery/learner/heavy_light.py` and reuse the retained original manifest,
+  normalization and ten fixed donor permutations at the main checkout's
+  `outputs/legacy/runs/heavy_light/`. Preserve the 88/18/22 category-disjoint
+  split, **load-only** input, zero visual center, 100 epochs, batch 16, 50% body
+  dropout, first-best-development checkpoint and two-word test with 50% chance.
+  Write fresh results to ignored `outputs/runs/heavy_light_joint/`. Adding the
+  other four streams would change the original diagnostic and is outside this
+  comparison.
+
+Before launch, validate zero-initialization equivalence, interaction gradients,
+masking, full-score train/evaluation agreement, fixed input hashes and reporter
+coverage of all nine runs. Check short CPU training/development timing runs,
+including the joint architecture for both tasks, without retaining weights or
+consulting test outcomes. Retain
+the existing bounded limits: five minutes total for cross-situational training
+and thirty minutes total for heavy/light training, with no automatic extensions
+or retries. Interpret this as an exploratory architecture comparison on already
+consulted test panels, not a fresh confirmatory test or evidence of a ceiling.

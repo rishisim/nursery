@@ -10,8 +10,9 @@ import pytest
 import torch
 
 from nursery.common import _output_directory
-from nursery.learner import property as diagnostic
-from nursery.learner.model import LearnerMIL, weighted_nce
+from nursery.learner import heavy_light as diagnostic
+from nursery.learner.additive import AdditiveMIL as LearnerMIL
+from nursery.learner.losses import weighted_nce
 
 
 pytestmark = pytest.mark.usefixtures("offline")
@@ -279,7 +280,7 @@ def test_synthetic_comparison_smoke_preserves_predictions_and_refuses_retry(prop
     assert result["final_frozen_source_and_code_verification"] == "passed"
     assert result["n_test_source_clips"] == 12
     run = json.loads((output / "run.json").read_text())
-    assert run["status"] == "complete" and len(run["completed_models"]) == 6
+    assert run["status"] == "complete" and len(run["completed_models"]) == 9
     for seed in (0, 1, 2):
         video = json.loads((output / f"video_s{seed}/metrics.json").read_text())
         body = json.loads((output / f"load_s{seed}/metrics.json").read_text())
@@ -307,3 +308,30 @@ def test_partial_abort_never_reports_a_completed_comparison(property_data, upstr
     assert run["status"] == "aborted_partial"
     assert run["completed_models"] == []
     assert not (output / "comparison.json").exists()
+
+
+def test_joint_starts_additive_and_interaction_receives_gradient(property_data, upstream):
+    from nursery.learner.interaction import JointInteractionMIL
+
+    rows, datasets, data, _ = _prepared_inputs(property_data, upstream)
+    torch.manual_seed(7)
+    additive = LearnerMIL(len(diagnostic.VOCAB), 8, 0.1, {"load": 10}).float()
+    torch.manual_seed(7)
+    joint = JointInteractionMIL(len(diagnostic.VOCAB), 8, 0.1, {"load": 10}).float()
+    additive.eval()
+    joint.eval()
+    ids = np.array([0, 1, 3, 4])
+    _, visual, tokens, lengths = upstream.collate([datasets["train"][int(i)] for i in ids])
+    data["train"].dropout = 0
+    context = data["train"].batch(ids, torch.Generator().manual_seed(0))
+    torch.testing.assert_close(additive.pair_scores(visual, tokens, lengths, context)[2],
+                               joint.pair_scores(visual, tokens, lengths, context)[2])
+    scores = joint.pair_scores(visual, tokens, lengths, context)[2]
+    weighted_nce(joint.scale() * scores, torch.ones(len(ids))).backward()
+    assert joint.interaction_out.weight.grad is not None
+    assert joint.interaction_out.weight.grad.abs().sum() > 0
+    with torch.no_grad():
+        joint.interaction_out.weight.fill_(0.1)
+    assert not torch.allclose(additive.pair_scores(visual, tokens, lengths, context)[2],
+                              joint.pair_scores(visual, tokens, lengths, context)[2])
+    assert np.isfinite(diagnostic.score_words(joint, datasets['test'], data['test'], 'cpu', upstream)).all()

@@ -17,7 +17,10 @@ import torch
 from nursery.common import REPO, _output_directory
 from . import _upstream_module
 from .body import clip_index
-from .model import BodyData, LearnerMIL, weighted_nce
+from .windows import BodyData
+from .additive import AdditiveMIL as LearnerMIL
+from .interaction import JointInteractionMIL
+from .losses import weighted_nce
 from .train import _pair_meta
 
 
@@ -192,7 +195,8 @@ def donor_derangements(rows, draws=10, seed=0):
 def _code_hashes():
     return {str(path.relative_to(REPO)): _sha(path) for path in
             [Path(__file__), Path(__file__).with_name("__main__.py"),
-             Path(__file__).with_name("model.py"), Path(__file__).with_name("body.py"),
+             Path(__file__).with_name("additive.py"), Path(__file__).with_name("interaction.py"),
+             Path(__file__).with_name("video_only.py"), Path(__file__).with_name("windows.py"), Path(__file__).with_name("losses.py"), Path(__file__).with_name("body.py"),
              Path(__file__).with_name("train.py"), Path(__file__).with_name("config.json")]}
 
 
@@ -230,7 +234,7 @@ def prepare(output, episodes=None, cache=None, physical=None):
                 "body_inputs": "Only normalized 10-dimensional wrist load, missing mask and clip-reset boundaries.",
                 "exposure": "One five-frame RGB window and clip-local eleven-second body window per source clip; one aligned property word.",
                 "visual_centering": "None (existing zero center_mu). Frozen DINO features; no encoder fitting.",
-                "budget": "All six models share one 1800-second wall-clock deadline. Incomplete models abort the comparison; no automatic retry."}
+                "budget": "All nine models share one 1800-second wall-clock deadline. Incomplete models abort the comparison; no automatic retry."}
     manifest.to_parquet(output / "manifest.parquet", index=False)
     seconds.to_parquet(output / "normalization_seconds.parquet", index=False)
     protocol["manifest_sha256"] = _sha(output / "manifest.parquet")
@@ -263,7 +267,7 @@ def _common_hash(model):
     body_prefix = ("encoder.", "region_in.", "region_head.", "decoder.", "fuse.")
     digest = hashlib.sha256()
     for key, value in sorted(model.state_dict().items()):
-        if key != "beta" and not key.startswith(body_prefix):
+        if key != "beta" and not key.startswith(body_prefix + ("interaction_",)):
             digest.update(key.encode())
             digest.update(value.detach().cpu().numpy().tobytes())
     return digest.hexdigest()
@@ -297,16 +301,18 @@ def score_words(model, dataset, data, device, upstream, batch=16, donors=None):
 
 def _deadline(deadline):
     if time.monotonic() >= deadline:
-        raise TimeoutError("The fixed six-model training budget expired; comparison is incomplete")
+        raise TimeoutError("The fixed nine-model training budget expired; comparison is incomplete")
 
 
-def _train_arm(seed, body, datasets, rows, data, emb_dim, device, upstream, settings, output, deadline):
+def _train_arm(seed, body, datasets, rows, data, emb_dim, device, upstream, settings, output, deadline, arch="additive", timing=False):
     """One fixed run; common initialization and actual minibatch orders are fingerprinted."""
     _deadline(deadline)
-    output.mkdir()
+    if not timing:
+        output.mkdir()
     torch.manual_seed(seed)
     np.random.seed(seed)
-    model = LearnerMIL(len(VOCAB), emb_dim, settings["tau_p"], {"load": 10} if body else None).float().to(device)
+    factory = JointInteractionMIL if arch == "joint" else LearnerMIL
+    model = factory(len(VOCAB), emb_dim, settings["tau_p"], {"load": 10} if body else None).float().to(device)
     if model.word.embedding_dim != settings["dim"]:
         raise ValueError("The existing learner no longer matches the frozen 512-dimensional representation")
     common_hash = _common_hash(model)
@@ -341,10 +347,12 @@ def _train_arm(seed, body, datasets, rows, data, emb_dim, device, upstream, sett
         if dev > best:  # First maximum, identical for both arms.
             best, best_epoch = dev, epoch
             state = {key: value.detach().cpu().clone() for key, value in model.state_dict().items()}
-            torch.save(state, output / "model.pt")
-        _json(output / "history.json", history)
+            if not timing:
+                torch.save(state, output / "model.pt")
+        if not timing:
+            _json(output / "history.json", history)
     model.load_state_dict(state)
-    return model, {"seed": seed, "body": body, "selected_epoch": best_epoch,
+    return model, {"seed": seed, "body": body, "arch": arch, "selected_epoch": best_epoch,
                    "dev_accuracy": best, "epochs_completed": len(history),
                    "common_initialization_sha256": common_hash, "minibatch_order_sha256": order_hash.hexdigest()}
 
@@ -371,7 +379,7 @@ def paired_summary(video, body, shuffled, settings=SETTINGS, gate=GATE):
 
 
 def train_prepared(output):
-    """Run exactly the frozen six models once, preserving every completed/partial output."""
+    """Run exactly the frozen nine models once, preserving every completed/partial output."""
     output = Path(output).resolve()
     protocol = json.loads((output / "protocol.json").read_text())
     expected = {"protocol.json", "manifest.parquet", "normalization_seconds.parquet"}
@@ -386,7 +394,8 @@ def train_prepared(output):
         raise ValueError("Prepared training-only normalization does not reproduce")
     upstream = _upstream_module("train_frame_mil")
     caches, lut = upstream.load_multi([protocol["cache"]])
-    device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+    torch.set_num_threads(1)
+    device = "cpu"
     rows = {split: manifest[manifest.split == split].reset_index(drop=True) for split in CATEGORIES}
     datasets = {split: upstream.FramePairs(caches, lut, table, VOCAB, SETTINGS["visual_half_window"], False)
                 for split, table in rows.items()}
@@ -395,20 +404,21 @@ def train_prepared(output):
         raise ValueError("Property dataset dropped a frozen example")
     data = {split: _body_data(table, store, lut, device, SETTINGS) for split, table in rows.items()}
     metadata = {"code_revision": _revision(), "protocol_sha256": _sha(output / "protocol.json"),
-                "device": device, "status": "running", "completed_models": [],
+                "device": device, "cpu_threads": 1, "status": "running", "completed_models": [],
                 "settings": SETTINGS, "vocab": VOCAB, "word_score_columns": WORDS}
     _json(output / "run.json", metadata)
     started = time.monotonic()
     deadline = started + SETTINGS["budget_s"]
     all_video, all_body, all_shuffled, all_picture = [], [], [], []
+    all_joint, all_joint_shuffled = [], []
     try:
         for seed in SETTINGS["seeds"]:
             matched = []
-            for use_body in (False, True):
-                name = f"{'load' if use_body else 'video'}_s{seed}"
+            for use_body, arch in ((False, "additive"), (True, "additive"), (True, "joint")):
+                name = f"{'joint' if arch == 'joint' else 'load' if use_body else 'video'}_s{seed}"
                 arm_dir = output / name
                 model, metrics = _train_arm(seed, use_body, datasets, rows, data, caches[0].shape[-1], device,
-                                            upstream, SETTINGS, arm_dir, deadline)
+                                            upstream, SETTINGS, arm_dir, deadline, arch=arch)
                 scores = score_words(model, datasets["test"], data["test"] if use_body else None, device, upstream)
                 credit = word_credit(scores, rows["test"].text)
                 predictions = rows["test"].copy()
@@ -421,8 +431,11 @@ def train_prepared(output):
                     predictions["picture_score_heavy"], predictions["picture_score_light"] = picture.T
                     predictions["picture_credit"] = word_credit(picture, rows["test"].text)
                     predictions.to_parquet(arm_dir / "predictions.parquet", index=False)
-                    all_body.append(credit)
-                    all_picture.append(predictions.picture_credit.to_numpy())
+                    if arch == "joint":
+                        all_joint.append(credit)
+                    else:
+                        all_body.append(credit)
+                        all_picture.append(predictions.picture_credit.to_numpy())
                     shuffle_records, shuffle_credit = [], []
                     for draw, donor in enumerate(protocol["donor_indices"]):
                         _deadline(deadline)
@@ -434,7 +447,10 @@ def train_prepared(output):
                                                 "score_heavy": float(score[i, 0]), "score_light": float(score[i, 1]),
                                                 "credit": float(credit_draw[i])} for i, d in enumerate(donor))
                     pd.DataFrame(shuffle_records).to_parquet(arm_dir / "shuffled_predictions.parquet", index=False)
-                    all_shuffled.append(np.mean(shuffle_credit, axis=0))
+                    if arch == "joint":
+                        all_joint_shuffled.append(np.mean(shuffle_credit, axis=0))
+                    else:
+                        all_shuffled.append(np.mean(shuffle_credit, axis=0))
                     metrics["picture_only_accuracy"] = float(predictions.picture_credit.mean())
                     metrics["shuffled_accuracy"] = float(np.mean(shuffle_credit))
                 else:
@@ -445,11 +461,12 @@ def train_prepared(output):
                 _json(output / "run.json", metadata)
                 matched.append(metrics)
                 del model
-            if any(matched[0][key] != matched[1][key] for key in ("common_initialization_sha256", "minibatch_order_sha256")):
+            if any(matched[0][key] != m[key] for m in matched[1:] for key in ("common_initialization_sha256", "minibatch_order_sha256")):
                 raise ValueError(f"Common initialization or minibatch exposure differs for seed {seed}")
         _verify_frozen(output, protocol)
         _deadline(deadline)
         result = paired_summary(all_video, all_body, all_shuffled)
+        result["joint"] = paired_summary(all_video, all_joint, all_joint_shuffled)
         result.update({"completed": True, "n_test_source_clips": len(rows["test"]), "seeds": SETTINGS["seeds"],
                        "picture_only_load_model_accuracy": float(np.mean(all_picture)),
                        "picture_only_minus_independent_video": float(np.mean(all_picture) - np.mean(all_video)),
@@ -463,3 +480,94 @@ def train_prepared(output):
         metadata.update(status="aborted_partial", error=f"{type(error).__name__}: {error}", runtime_s=time.monotonic() - started)
         _json(output / "run.json", metadata)
         raise
+
+
+def prepare_existing(original, output):
+    """Copy the retained, previously frozen panel without resampling any encounter."""
+    import shutil
+
+    original, output = Path(original).resolve(), Path(output)
+    if output.exists() and any(output.iterdir()):
+        raise FileExistsError(f"Property preparation output must be empty: {output}")
+    old = json.loads((original / "protocol.json").read_text())
+    run = json.loads((original / "run.json").read_text())
+    if run["status"] != "complete" or _sha(original / "protocol.json") != run["protocol_sha256"]:
+        raise ValueError("Original heavy/light protocol does not match completed run")
+    for name, key in (("manifest.parquet", "manifest_sha256"),
+                      ("normalization_seconds.parquet", "normalization_seconds_sha256")):
+        if _sha(original / name) != old[key]:
+            raise ValueError(f"Original frozen artifact changed: {name}")
+    if old["settings"] != SETTINGS or old["categories"] != CATEGORIES or old["vocab"] != VOCAB:
+        raise ValueError("Original diagnostic settings differ")
+    for path, expected in old["source_sha256"].items():
+        if _sha(path) != expected:
+            raise ValueError(f"Original source changed: {path}")
+    output = _output_directory(output)
+    for name in ("manifest.parquet", "normalization_seconds.parquet"):
+        shutil.copyfile(original / name, output / name)
+    protocol = dict(old, code_sha256=_code_hashes(), prepared_code_revision=_revision(),
+                    original_protocol=str(original / "protocol.json"),
+                    original_protocol_sha256=run["protocol_sha256"],
+                    joint_interaction_source_commit="08ebb82c",
+                    joint_interaction_sha256=_sha(Path(__file__).with_name("interaction.py")),
+                    architecture_conditions=["video", "load", "joint"], device="cpu", cpu_threads=1,
+                    budget="Nine models share one 1800-second wall-clock deadline; incomplete comparison aborts.")
+    _json(output / "protocol.json", protocol)
+    _verify_frozen(output, protocol)
+    return protocol
+
+
+def timing_prepared(output, timing_output):
+    """One joint training/dev epoch on CPU; discard weights and never score test."""
+    output = Path(output).resolve()
+    protocol = json.loads((output / "protocol.json").read_text())
+    _verify_frozen(output, protocol)
+    manifest = pd.read_parquet(output / "manifest.parquet")
+    frames = pd.read_parquet(Path(protocol["episodes"]) / "frames.parquet")
+    store, stats, seconds = load_store(frames, manifest, protocol["physical"])
+    if stats != protocol["normalization"] or not seconds.equals(pd.read_parquet(output / "normalization_seconds.parquet")):
+        raise ValueError("Prepared training-only normalization does not reproduce")
+    torch.set_num_threads(1)
+    upstream = _upstream_module("train_frame_mil")
+    caches, lut = upstream.load_multi([protocol["cache"]])
+    rows = {split: manifest[manifest.split == split].reset_index(drop=True) for split in ("train", "dev")}
+    datasets = {split: upstream.FramePairs(caches, lut, table, VOCAB, 2, False) for split, table in rows.items()}
+    if any(len(datasets[split]) != len(rows[split]) for split in rows):
+        raise ValueError("Timing dataset dropped a frozen example")
+    data = {split: _body_data(table, store, lut, "cpu", SETTINGS) for split, table in rows.items()}
+    timing_output = Path(timing_output)
+    if timing_output.exists() and any(timing_output.iterdir()):
+        raise FileExistsError("Timing output must be empty")
+    timing_output = _output_directory(timing_output)
+    started = time.monotonic()
+    _, metrics = _train_arm(0, True, datasets, rows, data, caches[0].shape[-1], "cpu", upstream,
+                            {**SETTINGS, "epochs": 1}, timing_output, started + SETTINGS["budget_s"],
+                            arch="joint", timing=True)
+    result = {"seconds": time.monotonic() - started, "epochs": 1, "condition": "joint", "device": "cpu",
+              "cpu_threads": 1, "training_examples": len(rows["train"]), "dev_examples": len(rows["dev"]),
+              "protocol_sha256": _sha(output / "protocol.json"), "weights_saved": False,
+              "test_scored": False, "metrics": metrics}
+    _json(timing_output / "timing.json", result)
+    return result
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    commands = parser.add_subparsers(dest="command", required=True)
+    setup = commands.add_parser("prepare")
+    setup.add_argument("--original", required=True)
+    setup.add_argument("--output", required=True)
+    timing = commands.add_parser("timing")
+    timing.add_argument("--run", required=True)
+    timing.add_argument("--output", required=True)
+    run = commands.add_parser("run")
+    run.add_argument("--run", required=True)
+    args = parser.parse_args()
+    if args.command == "prepare":
+        prepare_existing(args.original, args.output)
+    elif args.command == "timing":
+        print(json.dumps(timing_prepared(args.run, args.output), indent=2))
+    else:
+        print(json.dumps(train_prepared(args.run), indent=2))

@@ -71,7 +71,7 @@ output guard directly, so it no longer depends on the archived motion package.
 
 | Location | Contents and status |
 |---|---|
-| [code/learner/heavy_light.py](code/learner/heavy_light.py) | Completed property-word diagnostic snapshot. |
+| [nursery/learner/heavy_light.py](../nursery/learner/heavy_light.py) | Completed property-word diagnostic snapshot. |
 | [code/learner/sensory_pretraining.py](code/learner/sensory_pretraining.py) | Completed sensory-pretraining/transfer snapshot. |
 | [code/learner/tests/](code/learner/tests/) | Tests accompanying those historical runners. |
 | [code/learner/joint_pilot.py](code/learner/joint_pilot.py) | Old width-128 Transformer. Still imported explicitly by `--arch joint` and covered by current compatibility tests; not the proposed joint design. |
