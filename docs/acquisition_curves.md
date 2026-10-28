@@ -1,7 +1,7 @@
 # Main experiment: language acquisition with video and body
 
-Canonical design and execution protocol. Preparation is verified; scientific
-training has not started. The
+Canonical design and execution protocol. Preparation and implementation are
+verified; scientific training has not started. The
 [smaller study](cross_situational_learning.md) uses the same learner.
 
 ## The idea
@@ -195,3 +195,37 @@ to `bdcb1c7f5ffcabf99631136659a288502fe83d6b`. This work extracts the same scori
 arithmetic for reuse and adds the joint extension; it does not borrow the smaller
 study's models or measurements. Shared baseline equivalence is tested before
 the acquisition implementation is frozen for training.
+
+## Commands and validation
+
+The existing learner CLI exposes `acquisition prepare`, `timing`, `run` and
+`report`. Preparation refuses a nonempty destination; timing binds the source
+revision and source/input hashes. Runs reject changed inputs or incomplete
+existing model directories rather than silently overwriting them.
+
+```bash
+# Preparation already completed in this worktree. For a fresh ignored root:
+.external/cue-env/bin/python -m nursery.learner acquisition prepare \
+  --root outputs/runs/acquisition_curves \
+  --inputs /Users/rishisim/Documents/research/nursery/outputs/runs/step1_matched \
+  --episodes /Users/rishisim/Documents/research/nursery/outputs/renders/clean_856
+.external/cue-env/bin/python -m nursery.learner acquisition timing
+.external/cue-env/bin/python -m nursery.learner acquisition run
+.external/cue-env/bin/python -m nursery.learner acquisition report \
+  --plot-python .external/acquisition-plot-env/bin/python
+```
+
+The plotting interpreter is an ignored isolated environment with Matplotlib;
+it does not modify the shared training environment. Timing uses development
+panels only, including shuffled development histories, and estimates final
+evaluation cost conservatively. Timing weights are removed. The cap includes
+timing and reserves 25% headroom in the matrix projection.
+
+Focused tests exercise actual models, data batches, fixed-panel scoring and
+backpropagation in a tiny CPU run. They cover baseline equivalence, all sensory
+group gradients, zero-output initialization, clip/padding/missing-data masks,
+paired initialization/order/dropout, unseen queries, complete shuffled histories,
+development-only selection, timing-only panel access, frozen input/source
+rejection, and complete-matrix report calculations. The historical learner
+tests remain regression checks; archived joint tests do not validate the new
+joint interaction by themselves.

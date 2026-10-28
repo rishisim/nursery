@@ -1,4 +1,4 @@
-"""Embed images and train video-only or additive language learners (shared runner)."""
+"""Embed images, train shared learners, and run the frozen acquisition comparison."""
 
 import argparse
 
@@ -38,9 +38,28 @@ def main():
     train.add_argument("--physical", help="Directory of per-clip physical signals (load, skin temperature, contact area); adds two body-encoder groups (needs --body real)")
     train.add_argument("--physical-shuffle", action="store_true", help="CONTROL: load/skin taken from another source clip of the same subject and partition (needs --physical)")
     train.add_argument("--name", help="Output directory prefix (default: the condition)")
+    acquisition = commands.add_parser("acquisition", help="Frozen three-learner acquisition curves")
+    acquisition.add_argument("action", choices=("prepare", "timing", "run", "report"))
+    acquisition.add_argument("--root", default="outputs/runs/acquisition_curves")
+    acquisition.add_argument("--inputs", help="Existing corrected speech and feature-cache run (prepare only)")
+    acquisition.add_argument("--episodes", help="Existing episodes with physical_by_clip (prepare only)")
+    acquisition.add_argument("--plot-python", help="Python with matplotlib for PNG/PDF output (report only)")
     args = parser.parse_args()
     if args.command == "embed":
         embed_episodes(args.episodes, args.output, args.device, args.batch)
+    elif args.command == "acquisition":
+        if args.action == "prepare":
+            if not args.inputs or not args.episodes:
+                parser.error("acquisition prepare requires --inputs and --episodes")
+            from .acquisition_data import prepare, audit
+            prepare(args.root, args.inputs, args.episodes)
+            audit(args.root)
+        elif args.action == "report":
+            from .acquisition_report import report
+            report(args.root, plot_python=args.plot_python)
+        else:
+            from .acquisition import run, timing
+            (timing if args.action == "timing" else run)(args.root)
     else:
         weights = {loss: getattr(args, f"w_{loss}") for loss in LOSSES}
         train_run(args.run, args.condition, args.seed, args.epochs, args.name, args.pool, args.tau_p, args.body,

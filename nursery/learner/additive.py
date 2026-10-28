@@ -118,13 +118,18 @@ def _model_class():
         def pair_scores(self, v, t, n, ctx=None):
             """Training score matrix [B,B] (image i against word bag j): soft-MIL picture score (uniform region prior,
             tau_p) plus, with a body and kept pairs, beta * body-word cosine (late fusion). Returns R, T, scores."""
-            R, T, pic = super().pair_scores(v, t, n)
+            R, T = self.enc_regions(v), self.enc_text(t, n)
+            return R, T, self.score_encoded(R, T, ctx)
+
+        def score_encoded(self, R, T, ctx=None):
+            """The same additive score for minibatches and fixed evaluation candidates."""
+            pic = super().score_encoded(R, T, ctx)
             if self.encoder is not None and ctx is not None and ctx["keep"].any():
                 # Body pathway: the body latent adds a similarity term to the score (late fusion), so the language
                 # loss depends on the body; gradients reach the regions, words and every body sub-encoder.
                 z = self.latent_of(ctx)
                 pic = pic + ctx["keep"].unsqueeze(1) * self.beta * self.body_similarity(z, T)
-            return R, T, pic
+            return pic
 
         @torch.no_grad()
         def teacher_logits(self, v, t, n, ctx):
