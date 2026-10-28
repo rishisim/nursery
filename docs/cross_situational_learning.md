@@ -143,3 +143,60 @@ New artifacts belong in the worktree's ignored
 `outputs/runs/cross_situational/`; retained inputs remain at their existing
 locations. Commit source and compact curated records, not checkpoints,
 predictions, logs, generated images or reproducible intermediates.
+
+## Step 1: frozen dataset
+
+The preparation and independent artifact checks passed with the agreed
+64/16/16 encounters per word and 50% held naming in every partition. The
+mapping is bell → dax, bottle → blicket, glass → wug, tube → fep. Turtle was
+screened out because the four-per-source-clip cap left only 29 eligible held
+training encounters; glass met the original counts. Selection used coverage
+and dataset constraints, never learner performance.
+
+| Named category | Training source clips | Development source clips | Test source clips |
+|---|---:|---:|---:|
+| bell | 39 | 13 | 10 |
+| bottle | 39 | 10 | 12 |
+| glass | 28 | 7 | 7 |
+| tube | 34 | 7 | 10 |
+
+These are unique clips within each word/partition, not additive dataset totals.
+There are 256 training targets and 64 targets in each evaluation partition.
+Development uses 11 additional candidate-only foil rows (six source clips);
+test uses three (one source clip). These are situations offered as candidate
+answers, not extra training exposures or scored target queries. Every trial
+has four distinct frame situations. The four-per-source-clip/word cap holds
+including foil rows. All replays stay in their source partition.
+
+The 64 development and 64 test trials passed the canonical strict foil checks.
+The test shuffle is a complete 67-history permutation within subject and across
+different source clips. Every subject and room represented among targets is
+associated with at least two words; no distractor category is present in every
+encounter of a word. These checks exclude deterministic shortcuts, not all
+possible statistical correlations.
+
+Visibility screening requires at least 100 full-frame pixels and overlap with
+the central four coarse grid cells for both target and a distractor. Sampled
+five-frame encoder-crop panels were reviewed for held/nonheld examples of each
+word and partition. Some center views are small or occluded; sampled review
+does not establish recognizability for every encounter. No new-instance claim
+is made. Three bottle/blicket encounters were selected before training for the
+eventual example panel: `s7_0038:2`, `s6_0102:48`, `s5_0020:118`.
+
+Frozen artifacts are `manifest.parquet`, `panels.json` and `protocol.json` in
+`outputs/runs/cross_situational/`. Their SHA-256 values are respectively:
+
+```text
+e25b6bca7f5816adebc873a85e2fa7b770455ec264a714fb8807e533f0a265d2
+9c75fc78131a345b61266158d9edd5bcae3b04715571f673f8d6110ae3f24bf2
+fee74841d7062c5db512f055053ef2b96a02d182b1214d3254d25f16d0e21bd7
+```
+
+Inputs remain in the main checkout's `outputs/renders/clean_856/`, with physical
+streams from `physical_by_clip/`. The selected `clean_body/train_cache` and
+`step1_matched/train_cache` are identical hardlinked caches with matching DINOv2
+metadata. The embedding metadata SHA-256 is
+`6cf0a5df2a4b4b63151b353cbdf603df71621f1d05de8fb585853d60577c6c7c`;
+the cache index SHA-256 is
+`9da1f5246c81a39490eb9cbf464b278cc3c6d92d36a4d91b3ea45e224ef910c2`.
+Five focused preparation tests passed. No experiment training has started.
