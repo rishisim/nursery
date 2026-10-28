@@ -1,7 +1,9 @@
 """Train the upstream two-tower with pair weights on the available accelerator, optionally with the body losses."""
 
+import hashlib
 import json
 from pathlib import Path
+import time
 
 import numpy as np
 import pandas as pd
@@ -13,6 +15,70 @@ from nursery.learner.losses import LOSSES
 CONFIG = Path(__file__).with_name("config.json")
 BODY_MODES = ("none", "real", "shuffled", "oracle")
 EPISODE_MODES = ("contact", "temporal", "none")
+
+
+def _study_center(ds):
+    """Fit the visual mean on precisely the selected training observations."""
+    total, count = None, 0
+    for i in range(len(ds)):
+        v = ds[i][1].numpy()
+        value = v.sum(axis=0, dtype=np.float64)
+        total = value if total is None else total + value
+        count += len(v)
+    return (total / count).astype(np.float32)
+
+
+def _study_body_exclusion(manifest, frames, video_ids, half, steps=120):
+    """Only seconds in selected, clip-local training histories fit body statistics."""
+    exclude = np.ones((len(video_ids), steps), bool)
+    row = {v: i for i, v in enumerate(video_ids)}
+    clips = {(r.video_id, int(r.frame_idx)): r.clip for r in frames.itertuples()}
+    for r in manifest.itertuples():
+        centre = int(r.frame_idx)
+        clip = clips[r.video_id, centre]
+        exclude[row[r.video_id], centre] = False
+        for direction in (-1, 1):
+            for delta in range(1, half + 1):
+                t = centre + direction * delta
+                if not 0 <= t < steps or clips.get((r.video_id, t)) != clip:
+                    break
+                exclude[row[r.video_id], t] = False
+    return exclude
+
+
+def _study_evaluation(study, manifest, caches, lut, vocab, upstream, store, device, window, half):
+    from . import evaluate
+    from .windows import BodyData
+
+    panels = json.loads((study["root"] / "panels.json").read_text())
+    frames = pd.read_parquet(Path(study["episodes"]) / "frames.parquet")
+    sets = {}
+    for partition in ("dev", "test"):
+        rows = manifest[manifest.partition == partition].reset_index(drop=True)
+        ds = upstream.FramePairs(caches, lut, rows, vocab, window, False)
+        if len(ds) != len(rows) or ds.n_novocab or ds.n_noframe:
+            raise ValueError("Frozen study encounters must all survive FramePairs")
+        context = evaluate.body_present_context(rows, frames, lut, window, half)
+        data = None
+        if store is not None:
+            ps, pt, win = _pair_meta(rows, store, lut, window)
+            data = BodyData(store, ps, pt, win, None, None, None, None, device, half, 0.0, 0.0)
+            if set(data.dims) != {"contact", "fingers", "arm", "load", "skin"}:
+                raise ValueError("Cross-situational body condition needs all five streams")
+            if partition == "test":
+                evaluate.ShuffledBodyHistory(data, panels["test_donors"], rows)
+        # Validate frozen candidate identities and foil eligibility before training.
+        evaluate._body_trials(rows, context, 0, None, panels[partition])
+        sets[partition] = ds, data, rows, context
+    return sets, panels
+
+
+def _study_score(model, upstream, data, panel, device, trials=False):
+    from .evaluate import body_present_4afc
+
+    ds, body, rows, context = data
+    return body_present_4afc(model, upstream, ds, body, rows, device, seed=0,
+                             trials=trials, context=context, fixed_trials=panel)
 
 
 def _groups(details):
@@ -139,7 +205,7 @@ def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_r
 
 def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.1, body="none", episodes="none",
               weights=None, heldout_subject=None, body_dropout=None, distill_from=None, distill_weight=1.0,
-              distill_temp=2.0, inspect_epoch=None, labels=False, split="subject", arch="additive", physical=None, physical_shuffle=False):
+              distill_temp=2.0, inspect_epoch=None, labels=False, split="subject", arch="additive", physical=None, physical_shuffle=False, study_protocol=None, study_timing=False):
     import torch
 
     from . import body as bodylib
@@ -148,15 +214,46 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     from .additive import AdditiveMIL
     from .video_only import VideoOnlyMIL
 
+    started = time.perf_counter()
+    if study_timing and study_protocol is None:
+        raise ValueError("Timing-only mode requires a cross-situational protocol")
     device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     upstream = _upstream_module("train_frame_mil")
     region = _upstream_module("train_region_mil")
     run = Path(run).resolve()
-    generator = json.loads((run / "generator.json").read_text())
+    study = None
+    if study_protocol is not None:
+        from nursery.common import load_config
+        protocol_path = Path(study_protocol).resolve()
+        study = json.loads(protocol_path.read_text())
+        study["protocol_path"] = str(protocol_path)
+        study["root"] = protocol_path.parent
+        study["hashes"] = {f"study_{key}_sha256": hashlib.sha256(path.read_bytes()).hexdigest()
+                           for key, path in (("protocol", protocol_path),
+                                             ("manifest", protocol_path.parent / "manifest.parquet"),
+                                             ("panels", protocol_path.parent / "panels.json"))}
+        if arch != "additive" or body not in ("none", "real") or distill_from or labels or physical_shuffle or episodes != "none" or inspect_epoch:
+            raise ValueError("Cross-situational study requires additive architecture, body none/real and no diagnostics")
+        if seed not in (0, 1, 2) or epochs not in (None, 20):
+            raise ValueError("Cross-situational study freezes seeds 0,1,2 and 20 epochs")
+        if any(v is not None and v != 0 for v in (weights or {}).values()):
+            raise ValueError("Cross-situational study has no auxiliary losses")
+        if body_dropout not in (None, 0.5):
+            raise ValueError("Cross-situational study freezes body dropout at 0.5")
+        pool, tau_p, split, heldout_subject = "soft", 0.1, "subject", "none"
+        weights = {k: 0.0 for k in LOSSES}
+        body_dropout = 0.5
+        physical = study["physical"] if body == "real" else None
+        generator = {"config": load_config(), "episodes": study["episodes"], "seed": 0}
+        generator["config"]["training"] = {"epochs": 20, "batch": 32, "lr": 0.0003, "window": 2, "min_freq": 1}
+    else:
+        generator = json.loads((run / "generator.json").read_text())
     config = generator["config"]
     settings = config["training"]
     learner = json.loads(CONFIG.read_text())["body"]
-    epochs = settings["epochs"] if epochs is None else epochs
+    if study:
+        learner["window_s"] = 5
+    epochs = 1 if study_timing else settings["epochs"] if epochs is None else epochs
     if epochs < 1:
         raise ValueError("epochs must be positive")
     if pool not in ("max", "soft"):
@@ -208,8 +305,14 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     heldout = None if heldout == "none" else heldout
     torch.manual_seed(seed)
     np.random.seed(seed)
-    manifest_path = run / "manifest.parquet"
+    manifest_path = (study["root"] if study else run) / "manifest.parquet"
     manifest = pd.read_parquet(manifest_path)
+    if study:
+        if not {"train", "dev", "test"} == set(manifest.partition):
+            raise ValueError("Cross-situational manifest needs train/dev/test partitions")
+        study_manifest = manifest.copy()
+        manifest = manifest[manifest.partition == "train"].reset_index(drop=True)
+        manifest["weight_" + condition] = 1.0
     column = f"weight_{condition}"
     if column not in manifest:
         raise ValueError(f"Unknown cue condition: {condition}")
@@ -224,7 +327,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     if labels:  # LABEL DIAGNOSTIC: replace the speech by the word of one object visible in the frame
         manifest, label_info = evaluate.label_manifest(manifest, episode_root, seed)
     clip_cfg = learner["clip_split"]
-    caches, lut = upstream.load_multi([run / "train_cache"])
+    caches, lut = upstream.load_multi([Path(study["cache"]) if study else run / "train_cache"])
     emb_dim = caches[0].shape[-1]
     if caches[0].ndim != 3 or caches[0].shape[1] != 17:
         raise ValueError("Expected CLS + 4x4 region caches")
@@ -253,6 +356,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     weight_values /= weight_values.mean()
     pair_weights = torch.from_numpy(weight_values)
     dl = torch.utils.data.DataLoader(ds, batch_size=settings["batch"], shuffle=True,
+                                     **({"generator": torch.Generator().manual_seed(seed)} if study else {}),
                                      drop_last=False, collate_fn=upstream.collate, num_workers=0)
     window = settings["window"]
     body_info = None
@@ -264,9 +368,11 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
                  VideoOnlyMIL(len(vocab), emb_dim, tau_p, pool=pool))
     else:
         frames = pd.read_parquet(episode_root / "frames.parquet")
-        video_ids = sorted(set(all_manifest.video_id) | set(heldout_manifest.video_id))
+        video_ids = sorted(set(study_manifest.video_id) if study else set(all_manifest.video_id) | set(heldout_manifest.video_id))
         heldout_videos = set(heldout_manifest.video_id)
         exclude = np.array([np.isin(part[v], (1, 2)) for v in video_ids]) if part else None  # dev/test clips stay out of the stats
+        if study:
+            exclude = _study_body_exclusion(manifest, frames, video_ids, learner["window_s"])
         real = bodylib.load_store(episode_root, frames, video_ids, heldout_videos, exclude=exclude, physical=physical)
         real["subject"] = np.array([subject_of[v] for v in video_ids])
         shuffle_info = physical_info = None
@@ -296,6 +402,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
                      "physical": physical, "physical_shuffle": physical_info if physical_shuffle else False,
                      "n_episodes": int(len(np.unique(episode_ids[episode_ids >= 0]))),
                      "episode_frames": float((episode_ids >= 0).sum() / max(real["present"].sum(), 1))}
+    if study:
+        model.center_mu.copy_(torch.from_numpy(_study_center(ds)).to(model.center_mu))
     if device == "mps":
         model = model.float()
     model = model.to(device)
@@ -305,84 +413,92 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
                                            window, learner, device, tau_p)
         teacher_train = make_data(manifest)
     opt = torch.optim.AdamW(model.parameters(), lr=settings["lr"], weight_decay=0.1)
-    probes = pd.read_parquet(run / "probes_frames.parquet")
-    probe_cache, probe_lut = region.load_region_cache(run / "probes_cache")
-    if probe_cache.shape[1:] != (17, emb_dim):
-        raise ValueError("Probe and training cache dimensions disagree")
-    if any(region.frame_key(r.video_id, r.frame_idx) not in probe_lut for r in probes.itertuples()):
-        raise ValueError("Probe cache does not cover all probes")
-    tables = {split: probes[probes.split == split] for split in ("dev", "test")}
-    konkle = None
-    if (run / "konkle_frames.parquet").exists():
-        konkle_cache, konkle_lut = region.load_region_cache(run / "konkle_cache")
-        konkle = (konkle_cache, konkle_lut, pd.read_parquet(run / "konkle_frames.parquet"))
-    for split, table in tables.items():
-        counts = table.groupby("category").size()
-        if len(counts) < 4 or (counts < 4).any():
-            raise ValueError(f"Upstream 4AFC requires at least four probes/category and four categories: {split}")
-        if sum(bool(upstream.encode(cat, vocab)) for cat in counts.index) < 4:
-            raise ValueError(f"Upstream 4AFC needs four in-vocabulary categories: {split}")
-    output = _output_directory(run / f"{name or condition}_s{seed}")
-    if any(output.iterdir()):
-        raise FileExistsError(f"Training output already contains files: {output}")
-    # Held-out subject: named utterances with a visible referent.
-    test_rows = None
-    if pool == "soft" and heldout and len(heldout_manifest):
-        test_rows = heldout_manifest[heldout_manifest.named.astype(bool) & heldout_manifest.referent_visible.astype(bool)]
-        test_rows = test_rows[test_rows.text.map(lambda text: bool(upstream.encode(text, vocab)))].reset_index(drop=True)
-        if len(test_rows) >= 8:
-            held_ds = upstream.FramePairs(caches, lut, test_rows, vocab, window, False)
-    teacher_held = make_data(test_rows) if teacher is not None and held_ds is not None else None
-    scoring_frames = pd.read_parquet(episode_root / "frames.parquet") if held_ds is not None or by_clips else None
-    def scoring_context(rows, subject=None):
-        return evaluate.body_present_context(rows, scoring_frames, lut, window, learner["window_s"], subject)
-    held_context = scoring_context(test_rows) if held_ds is not None else None
-    if held_context is not None and not any(len(p) >= 3 for p in held_context["pools"]):
-        raise ValueError("Body-present heldout: insufficient valid foils for every trial")
-    bp_contexts = {}
-    bp_sets = {}
-    if by_clips:  # body-present 4AFC sets: named, visible-referent pairs of each held-out partition (+ s8)
-        def make_set(rows):
-            rows = rows[rows.named.astype(bool) & rows.referent_visible.astype(bool)].reset_index(drop=True)
-            if len(rows) < 8:
-                raise ValueError("Too few body-present trials in a split")
-            ps, pt, win = _pair_meta(rows, real, lut, window) if body != "none" else (None,) * 3
-            edata = BodyData(real, ps, pt, win, None, None, None, None, device, learner["window_s"], 0.0, 0.0) if body != "none" else None
-            lay = tuple(torch.as_tensor(a, device=device) for a in _window_layout(rows, lut, window)) if joint else None
-            return upstream.FramePairs(caches, lut, rows, vocab, window, False), edata, rows, rows.video_id.map(subject_of).to_numpy(), lay
+    if study:
+        output = _output_directory(run / "timing" / (name or condition) if study_timing else run / f"{name or condition}_s{seed}")
+        if any(output.iterdir()):
+            raise FileExistsError(f"Training output already contains files: {output}")
+        study_sets, study_panels = _study_evaluation(study, study_manifest, caches, lut, vocab, upstream,
+                                                   real if body != "none" else None, device, settings["window"], learner["window_s"])
+        tables, konkle, bp_sets = {}, None, {}
+    else:
+        probes = pd.read_parquet(run / "probes_frames.parquet")
+        probe_cache, probe_lut = region.load_region_cache(run / "probes_cache")
+        if probe_cache.shape[1:] != (17, emb_dim):
+            raise ValueError("Probe and training cache dimensions disagree")
+        if any(region.frame_key(r.video_id, r.frame_idx) not in probe_lut for r in probes.itertuples()):
+            raise ValueError("Probe cache does not cover all probes")
+        tables = {split: probes[probes.split == split] for split in ("dev", "test")}
+        konkle = None
+        if (run / "konkle_frames.parquet").exists():
+            konkle_cache, konkle_lut = region.load_region_cache(run / "konkle_cache")
+            konkle = (konkle_cache, konkle_lut, pd.read_parquet(run / "konkle_frames.parquet"))
+        for split, table in tables.items():
+            counts = table.groupby("category").size()
+            if len(counts) < 4 or (counts < 4).any():
+                raise ValueError(f"Upstream 4AFC requires at least four probes/category and four categories: {split}")
+            if sum(bool(upstream.encode(cat, vocab)) for cat in counts.index) < 4:
+                raise ValueError(f"Upstream 4AFC needs four in-vocabulary categories: {split}")
+        output = _output_directory(run / f"{name or condition}_s{seed}")
+        if any(output.iterdir()):
+            raise FileExistsError(f"Training output already contains files: {output}")
+        # Held-out subject: named utterances with a visible referent.
+        test_rows = None
+        if pool == "soft" and heldout and len(heldout_manifest):
+            test_rows = heldout_manifest[heldout_manifest.named.astype(bool) & heldout_manifest.referent_visible.astype(bool)]
+            test_rows = test_rows[test_rows.text.map(lambda text: bool(upstream.encode(text, vocab)))].reset_index(drop=True)
+            if len(test_rows) >= 8:
+                held_ds = upstream.FramePairs(caches, lut, test_rows, vocab, window, False)
+        teacher_held = make_data(test_rows) if teacher is not None and held_ds is not None else None
+        scoring_frames = pd.read_parquet(episode_root / "frames.parquet") if held_ds is not None or by_clips else None
+        def scoring_context(rows, subject=None):
+            return evaluate.body_present_context(rows, scoring_frames, lut, window, learner["window_s"], subject)
+        held_context = scoring_context(test_rows) if held_ds is not None else None
+        if held_context is not None and not any(len(p) >= 3 for p in held_context["pools"]):
+            raise ValueError("Body-present heldout: insufficient valid foils for every trial")
+        bp_contexts = {}
+        bp_sets = {}
+        if by_clips:  # body-present 4AFC sets: named, visible-referent pairs of each held-out partition (+ s8)
+            def make_set(rows):
+                rows = rows[rows.named.astype(bool) & rows.referent_visible.astype(bool)].reset_index(drop=True)
+                if len(rows) < 8:
+                    raise ValueError("Too few body-present trials in a split")
+                ps, pt, win = _pair_meta(rows, real, lut, window) if body != "none" else (None,) * 3
+                edata = BodyData(real, ps, pt, win, None, None, None, None, device, learner["window_s"], 0.0, 0.0) if body != "none" else None
+                lay = tuple(torch.as_tensor(a, device=device) for a in _window_layout(rows, lut, window)) if joint else None
+                return upstream.FramePairs(caches, lut, rows, vocab, window, False), edata, rows, rows.video_id.map(subject_of).to_numpy(), lay
 
-        for k, n in ((1, "clips_dev"), (2, "clips_test")):
-            bp_sets[n] = make_set(all_manifest[pair_part == k])
-        if held_ds is not None:
-            bp_sets["s8"] = make_set(test_rows)
-        for n, (_, _, rows, subj, _) in bp_sets.items():
-            bp_contexts[n] = scoring_context(rows, subj)
-            if not any(len(p) >= 3 for p in bp_contexts[n]["pools"]):
-                raise ValueError(f"Body-present split {n}: insufficient valid foils for every trial (different session, same subject, target absent)")
-        held_words = set(pd.read_parquet(episode_root / "frames.parquet", columns=["held_category"]).held_category.dropna())
-        train_rows = manifest[manifest.named.astype(bool) & manifest.referent_visible.astype(bool)]
-        words = {"train": set(train_rows.referent), **{n: set(v[2].referent) for n, v in bp_sets.items()}}
-        split_info["trials"] = {n: {s: int((v[3] == s).sum()) for s in sorted(set(v[3]))} for n, v in bp_sets.items()}
-        split_info["coverage"] = {n: {"n_words": len(w), "words": sorted(w), "held_missing": sorted(held_words - w)} for n, w in words.items()}
+            for k, n in ((1, "clips_dev"), (2, "clips_test")):
+                bp_sets[n] = make_set(all_manifest[pair_part == k])
+            if held_ds is not None:
+                bp_sets["s8"] = make_set(test_rows)
+            for n, (_, _, rows, subj, _) in bp_sets.items():
+                bp_contexts[n] = scoring_context(rows, subj)
+                if not any(len(p) >= 3 for p in bp_contexts[n]["pools"]):
+                    raise ValueError(f"Body-present split {n}: insufficient valid foils for every trial (different session, same subject, target absent)")
+            held_words = set(pd.read_parquet(episode_root / "frames.parquet", columns=["held_category"]).held_category.dropna())
+            train_rows = manifest[manifest.named.astype(bool) & manifest.referent_visible.astype(bool)]
+            words = {"train": set(train_rows.referent), **{n: set(v[2].referent) for n, v in bp_sets.items()}}
+            split_info["trials"] = {n: {s: int((v[3] == s).sum()) for s in sorted(set(v[3]))} for n, v in bp_sets.items()}
+            split_info["coverage"] = {n: {"n_words": len(w), "words": sorted(w), "held_missing": sorted(held_words - w)} for n, w in words.items()}
 
-    def bp_run(trials=False):
-        if joint:
-            return {n: evaluate.joint_body_present_4afc(model, upstream, d, e, r, lay, device, seed, subject=subj, trials=trials, context=bp_contexts[n])
-                    for n, (d, e, r, subj, lay) in bp_sets.items()}
-        return {n: evaluate.body_present_4afc(model, upstream, d, e, r, device, seed, subject=subj, trials=trials, context=bp_contexts[n])
-                for n, (d, e, r, subj, _) in bp_sets.items()}
+        def bp_run(trials=False):
+            if joint:
+                return {n: evaluate.joint_body_present_4afc(model, upstream, d, e, r, lay, device, seed, subject=subj, trials=trials, context=bp_contexts[n])
+                        for n, (d, e, r, subj, lay) in bp_sets.items()}
+            return {n: evaluate.body_present_4afc(model, upstream, d, e, r, device, seed, subject=subj, trials=trials, context=bp_contexts[n])
+                    for n, (d, e, r, subj, _) in bp_sets.items()}
 
-    checkpoints = {}
+        checkpoints = {}
 
-    def checkpoint(ep, scores, details):
-        """Inspection record of the model as it is now: probe scores, word-group accuracy and teacher agreement."""
-        record = {"ep": ep, "dev": round(100 * scores["dev"], 3), "test": round(100 * scores["test"], 3),
-                  "konkle": round(100 * scores["konkle"], 3) if "konkle" in scores else None, "groups": _groups(details)}
-        if teacher is not None:
-            record["agreement"] = {"train": evaluate.distill_agreement(model, teacher, upstream, ds, teacher_train, device, distill_temp, seed)}
-            if teacher_held is not None:
-                record["agreement"]["heldout"] = evaluate.distill_agreement(model, teacher, upstream, held_ds, teacher_held, device, distill_temp, seed)
-        return record
+        def checkpoint(ep, scores, details):
+            """Inspection record of the model as it is now: probe scores, word-group accuracy and teacher agreement."""
+            record = {"ep": ep, "dev": round(100 * scores["dev"], 3), "test": round(100 * scores["test"], 3),
+                      "konkle": round(100 * scores["konkle"], 3) if "konkle" in scores else None, "groups": _groups(details)}
+            if teacher is not None:
+                record["agreement"] = {"train": evaluate.distill_agreement(model, teacher, upstream, ds, teacher_train, device, distill_temp, seed)}
+                if teacher_held is not None:
+                    record["agreement"]["heldout"] = evaluate.distill_agreement(model, teacher, upstream, held_ds, teacher_held, device, distill_temp, seed)
+            return record
 
     soft = pool == "soft"
     lw = {**weights, "distill": distill_weight}
@@ -390,6 +506,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     best_bp, best_bp_state, best_bp_ep = -1.0, None, -1
     bp_key = "fused_soft" if body != "none" else "picture_soft"
     mask_generator = torch.Generator().manual_seed(seed + 1000)  # keeps the default RNG stream identical to video-only
+    loop_started = time.perf_counter()
     for epoch in range(epochs):
         model.train()
         losses, terms_sum = [], {}
@@ -413,31 +530,35 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
             loss.backward()
             opt.step()
             losses.append(float(loss.detach()))
-        # Evaluation sees only image regions and word tokens; no body, cues or oracle labels.
-        scores, details = {}, {}
-        hard = {}
-        for split, table in tables.items():
-            if joint:  # soft score drives selection; upstream's hard max is logged for reference
-                scores[split], details[split] = evaluate.probe_4afc_soft(model, region, probe_cache, probe_lut, table, vocab, device)
-                hard[split] = region.eval_4afc_region(model, probe_cache, probe_lut, table, vocab, device)
-                continue
-            scores[split], details[split] = region.eval_4afc_region(
-                model, probe_cache, probe_lut, table, vocab, device, return_detail=True,
-            )
-        if konkle is not None:
-            # Frank's Konkle test-60 protocol: 100 trials/category, rng(0), macro mean, OOV at chance.
-            if joint:
-                scores["konkle"], details["konkle"] = evaluate.probe_4afc_soft(model, region, konkle[0], konkle[1], konkle[2], vocab, device)
-                hard["konkle"] = region.eval_4afc_region(model, konkle[0], konkle[1], konkle[2], vocab, device)
-            else:
-                scores["konkle"], details["konkle"] = region.eval_4afc_region(
-                    model, konkle[0], konkle[1], konkle[2], vocab, device, return_detail=True)
+        if study:
+            dev_result = _study_score(model, upstream, study_sets["dev"], study_panels["dev"], device)
+            scores, details = {"dev": dev_result[bp_key]["acc"] / 100}, {}
+        else:
+            # Evaluation sees only image regions and word tokens; no body, cues or oracle labels.
+            scores, details = {}, {}
+            hard = {}
+            for split, table in tables.items():
+                if joint:  # soft score drives selection; upstream's hard max is logged for reference
+                    scores[split], details[split] = evaluate.probe_4afc_soft(model, region, probe_cache, probe_lut, table, vocab, device)
+                    hard[split] = region.eval_4afc_region(model, probe_cache, probe_lut, table, vocab, device)
+                    continue
+                scores[split], details[split] = region.eval_4afc_region(
+                    model, probe_cache, probe_lut, table, vocab, device, return_detail=True,
+                )
+            if konkle is not None:
+                # Frank's Konkle test-60 protocol: 100 trials/category, rng(0), macro mean, OOV at chance.
+                if joint:
+                    scores["konkle"], details["konkle"] = evaluate.probe_4afc_soft(model, region, konkle[0], konkle[1], konkle[2], vocab, device)
+                    hard["konkle"] = region.eval_4afc_region(model, konkle[0], konkle[1], konkle[2], vocab, device)
+                else:
+                    scores["konkle"], details["konkle"] = region.eval_4afc_region(
+                        model, konkle[0], konkle[1], konkle[2], vocab, device, return_detail=True)
         if not all(np.isfinite(list(scores.values()))) or not np.isfinite(losses).all():
             raise ValueError("Non-finite training loss or probe score")
         if scores["dev"] > best_sel:
             best_sel, best_ep, best_details = scores["dev"], epoch, details
             best_state = {k: value.detach().cpu().clone() for k, value in model.state_dict().items()}
-        record = {"ep": epoch, "acc": round(scores["test"], 4), "dev": round(scores["dev"], 4),
+        record = {"ep": epoch, **({"acc": round(scores["test"], 4)} if not study else {}), "dev": round(scores["dev"], 4),
                   "train_loss": float(np.mean(losses))}
         if konkle is not None:
             record["konkle"] = round(scores["konkle"], 4)
@@ -454,7 +575,40 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         print(record, flush=True)
         if inspect_epoch == epoch + 1:
             checkpoints[f"epoch_{inspect_epoch}"] = checkpoint(epoch, scores, details)
+    if study_timing:
+        timing = {"study_protocol": study["protocol_path"], **study["hashes"], "seed": seed, "condition": condition,
+                  "body": body, "device": device, "epochs": 1, "full_epochs": settings["epochs"],
+                  "startup_seconds": loop_started - started,
+                  "train_dev_seconds": time.perf_counter() - loop_started,
+                  "total_seconds": time.perf_counter() - started,
+                  "n_pairs": len(ds), "history": history, "weights_discarded": True,
+                  "test_evaluated": False}
+        (output / "timing.json").write_text(json.dumps(timing, indent=2, allow_nan=False) + "\n")
+        print(f"TIMING {output} {timing['train_dev_seconds']:.3f}s train+dev; weights discarded", flush=True)
+        return timing
     model.load_state_dict(best_state)
+    if study:
+        test = _study_score(model, upstream, study_sets["test"], study_panels["test"], device, trials=True)
+        shuffled = None
+        if body != "none":
+            from .evaluate import ShuffledBodyHistory
+            d, e, rows, context = study_sets["test"]
+            donors = study_panels["test_donors"]
+            shuffled = _study_score(model, upstream, (d, ShuffledBodyHistory(e, donors, rows), rows, context),
+                                    study_panels["test"], device, trials=True)
+        metrics = {"study_protocol": study["protocol_path"], **study["hashes"], "seed": seed, "condition": condition,
+                   "body": body, "selected_epoch": best_ep, "selection": "own_dev_situation_accuracy_earliest_tie",
+                   "history": history, "test": test, "shuffled_test": shuffled, "n_pairs": len(ds),
+                   "vocab": len(vocab), "emb_dim": int(model.word.embedding_dim), "settings": settings,
+                   "pool": pool, "tau_p": tau_p, "body_dropout": dropout, "weights": weights,
+                   "center": True, "body_stats": real["stats"] if body != "none" else None,
+                   "evaluation_counts": {n: {"targets": len(study_panels[n]), "situations": len(study_sets[n][2])} for n in ("dev", "test")},
+                   "reported_test_acc": test[bp_key]["acc"], "device": device}
+        torch.save(model.state_dict(), output / "model.pt")
+        (output / "vocab.json").write_text(json.dumps(vocab, indent=2) + "\n")
+        (output / "metrics.json").write_text(json.dumps(_finite(metrics), indent=2, allow_nan=False) + "\n")
+        print(f"DONE {output} selected_ep {best_ep} reported_test_acc {metrics['reported_test_acc']}", flush=True)
+        return metrics
     if bp_sets:
         split_info["body_present_at_picture_epoch"] = bp_run(trials=True)
     if teacher is not None or inspect_epoch:

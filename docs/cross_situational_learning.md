@@ -200,3 +200,39 @@ metadata. The embedding metadata SHA-256 is
 the cache index SHA-256 is
 `9da1f5246c81a39490eb9cbf464b278cc3c6d92d36a4d91b3ea45e224ef910c2`.
 Five focused preparation tests passed. No experiment training has started.
+
+## Step 2: shared runner and reporting
+
+The study is implemented as a narrow `--cross-situational <protocol.json>`
+option on the existing learner `train` command. It uses the same models, loss
+and minibatch loop, fits vocabulary/centering/body statistics from selected
+training experience, and bypasses unrelated picture probes. Fixed development
+panels select checkpoints; test and shuffled-test scoring run only after the
+selected state is restored. Metrics bind the exact protocol, manifest and
+panels with SHA-256 hashes. `--timing-only` runs one training/development epoch,
+discards weights and skips test evaluation.
+
+```bash
+# Timing only; repeat with --body real --name additive for the second condition.
+PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python -m nursery.learner train \
+  --run outputs/runs/cross_situational --condition none --seed 0 \
+  --body none --name video_only \
+  --cross-situational outputs/runs/cross_situational/protocol.json --timing-only
+```
+
+After the runtime cap is agreed, the six fresh runs use the same command
+without `--timing-only`, with paired seeds 0, 1 and 2. The additive condition
+uses `--body real --name additive`; the protocol supplies the physical stream
+path. No timing weights are reused.
+
+The study-specific reporter is available through
+`python -m nursery.learner.cross_situational --report-protocol <protocol.json>
+--metrics <six metrics.json paths> --output <ignored report directory>`.
+It requires all six paired runs and matching input hashes, checks target/trial
+counts, and writes the two-row mean/sample-SD table, supporting shuffled score,
+per-seed results, exposure counts and the preselected example identifiers.
+
+Validation: all 53 existing learner tests and the three new runner tests passed;
+all six preparation/reporting tests passed. The final nine study tests also
+passed together. The existing tiny-probe standard-deviation warnings remain.
+No source-data training or timing has run at this checkpoint.

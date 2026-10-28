@@ -10,6 +10,27 @@ import torch.nn.functional as F
 from .losses import soft_pool
 
 
+class ShuffledBodyHistory:
+    """Evaluation-only donor histories, including every channel, mask and boundary."""
+
+    def __init__(self, data, donors, manifest):
+        self.data = data
+        self.donors = np.asarray(donors, dtype=int)
+        if self.donors.shape != (len(manifest),) or not (self.donors >= 0).all() or not (self.donors < len(manifest)).all():
+            raise ValueError("Frozen history donors must cover all test encounters")
+        if not np.array_equal(np.sort(self.donors), np.arange(len(manifest))):
+            raise ValueError("Frozen history donors must be a permutation")
+        donor = manifest.iloc[self.donors]
+        if not np.array_equal(manifest.subject.to_numpy(), donor.subject.to_numpy()) or (manifest["clip"].to_numpy() == donor["clip"].to_numpy()).any():
+            raise ValueError("History donors must share subject and use a different source clip")
+
+    def batch(self, idx, generator, training=False):
+        if training:
+            raise ValueError("Shuffled histories are evaluation only")
+        # Selecting the donor's whole context also preserves missing-data and segment resets.
+        return self.data.batch(self.donors[np.asarray(idx)], generator, training=False)
+
+
 def body_present_context(manifest, frames, lut, window, body_half, subject=None):
     """Renderer truth shared by all controls; full-frame visibility does not
     establish recognizability after the image encoder crop."""
@@ -75,7 +96,7 @@ def body_present_context(manifest, frames, lut, window, body_half, subject=None)
                            "n_insufficient_foils": sum(len(p) < 3 for p in pools)}}
 
 
-def _body_trials(manifest, context, seed, subject):
+def _body_trials(manifest, context, seed, subject, fixed_trials=None):
     if context is None:
         raise ValueError("Body-present scoring requires validated renderer context")
     identity = list(zip(manifest.video_id.tolist(), manifest.frame_idx.astype(int).tolist(), manifest.referent.tolist()))
@@ -83,6 +104,19 @@ def _body_trials(manifest, context, seed, subject):
         raise ValueError("Body-present context does not match manifest rows")
     if subject is not None and not np.array_equal(np.asarray(subject), np.asarray(context["subjects"])):
         raise ValueError("Body-present context subjects disagree")
+    if fixed_trials is not None:
+        sampled = []
+        for trial in fixed_trials:
+            i, cand, answer = int(trial["target"]), np.asarray(trial["candidates"], dtype=int), int(trial["correct"])
+            if not 0 <= i < len(manifest) or cand.shape != (4,) or len(set(cand)) != 4 or not (0 <= cand).all() or not (cand < len(manifest)).all() or not 0 <= answer < 4 or cand[answer] != i:
+                raise ValueError("Invalid frozen situation trial")
+            if any(j not in context["pools"][i] for j in cand if j != i):
+                raise ValueError("Frozen situation trial violates strict foil rules")
+            sampled.append((i, cand, answer))
+        expected = set(np.flatnonzero(manifest.role.eq("target"))) if "role" in manifest else set(range(len(manifest)))
+        if not sampled or len(sampled) != len(expected) or {i for i, _, _ in sampled} != expected:
+            raise ValueError("Frozen panel must score every target encounter exactly once")
+        return sampled
     rng = np.random.default_rng(seed)
     sampled = []
     for i, pool in enumerate(context["pools"]):
@@ -93,7 +127,7 @@ def _body_trials(manifest, context, seed, subject):
 
 
 @torch.no_grad()
-def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch=256, subject=None, trials=False, context=None):
+def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch=256, subject=None, trials=False, context=None, fixed_trials=None):
     """4AFC with the word given and four candidate situations (image window + body), held-out subject only.
 
     `manifest` holds the held-out subject's named utterances with a visible referent; `ds` is the upstream
@@ -104,7 +138,7 @@ def body_present_4afc(model, upstream, ds, data, manifest, device, seed=0, batch
     Foils use their own body, so the body must match the situation. `subject` [rows] restricts foils to the target's
     subject; `trials` adds `trial_rows` (manifest row of each scored trial) and per-trial 0/1 `trials` for the soft scores.
     """
-    sampled = _body_trials(manifest, context, seed, subject)
+    sampled = _body_trials(manifest, context, seed, subject, fixed_trials)
     if len(ds) != len(manifest):
         raise ValueError("Body-present dataset and manifest lengths disagree")
     model.eval()

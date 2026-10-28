@@ -38,6 +38,8 @@ def main():
     train.add_argument("--physical", help="Directory of per-clip physical signals (load, skin temperature, contact area); adds two body-encoder groups (needs --body real)")
     train.add_argument("--physical-shuffle", action="store_true", help="CONTROL: load/skin taken from another source clip of the same subject and partition (needs --physical)")
     train.add_argument("--name", help="Output directory prefix (default: the condition)")
+    train.add_argument("--cross-situational", help="Frozen cross-situational protocol.json; uses its fixed training and situation evaluation")
+    train.add_argument("--timing-only", action="store_true", help="Cross-situational readiness check: one train/dev epoch, discard weights, no test evaluation")
     args = parser.parse_args()
     if args.command == "embed":
         embed_episodes(args.episodes, args.output, args.device, args.batch)
@@ -45,7 +47,8 @@ def main():
         weights = {loss: getattr(args, f"w_{loss}") for loss in LOSSES}
         train_run(args.run, args.condition, args.seed, args.epochs, args.name, args.pool, args.tau_p, args.body,
                   args.episodes, weights, args.heldout_subject, args.body_dropout, args.distill_from, args.distill_weight,
-                  args.distill_temp, args.inspect_epoch, args.labels, args.split, args.arch, args.physical, args.physical_shuffle)
+                  args.distill_temp, args.inspect_epoch, args.labels, args.split, args.arch, args.physical, args.physical_shuffle,
+                  study_protocol=args.cross_situational, study_timing=args.timing_only)
 
 
 if __name__ == "__main__":

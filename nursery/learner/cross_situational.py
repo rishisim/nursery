@@ -206,7 +206,7 @@ def prepare(episodes, cache, output):
                 raise ValueError(f'{partition}: cannot remove subject/room shortcut by local swaps; subjects={bad_subject}, rooms={bad_room}; rows={bad[["referent", "held", "subject", "room", "clip"]].to_dict("records")}')
         else:
             raise ValueError(f'{partition}: nuisance repair exceeded 100 swaps')
-    selected['role'] = 'target' 
+    selected['role'] = 'target'
     panels, expanded = {}, []
     for partition in ('train', 'dev', 'test'):
         panel = selected[selected.partition == partition].reset_index(drop=True)
@@ -304,10 +304,86 @@ def prepare(episodes, cache, output):
     return selected
 
 
+def report(protocol_path, metric_paths, output):
+    """Summarize the six completed, protocol-bound selected-checkpoint runs."""
+    protocol_path = Path(protocol_path).resolve()
+    root = protocol_path.parent
+    protocol = json.loads(protocol_path.read_text())
+    expected = {f'study_{name}_sha256': hashlib.sha256(path.read_bytes()).hexdigest()
+                for name, path in [('protocol', protocol_path), ('manifest', root / 'manifest.parquet'),
+                                   ('panels', root / 'panels.json')]}
+    runs = {}
+    for path in metric_paths:
+        path = Path(path).resolve()
+        metrics = json.loads(path.read_text())
+        if any(metrics.get(key) != value for key, value in expected.items()):
+            raise ValueError(f'Metrics do not match frozen study inputs: {path}')
+        key = (metrics.get('body'), metrics.get('seed'))
+        if key[0] not in ('none', 'real') or key[1] not in (0, 1, 2) or key in runs:
+            raise ValueError(f'Unexpected or duplicate body condition/seed: {key}')
+        score_key = 'picture_soft' if key[0] == 'none' else 'fused_soft'
+        score = metrics['test'][score_key]['acc']
+        if (not isinstance(score, (int, float)) or not np.isfinite(score) or not 0 <= score <= 100
+                or metrics.get('reported_test_acc') != score or metrics['test']['n_trials'] != 64):
+            raise ValueError(f'Invalid selected test result: {path}')
+        row = {'seed': key[1], 'accuracy': score, 'metrics': str(path)}
+        if key[0] == 'real':
+            shuffled = metrics['shuffled_test']['fused_soft']['acc']
+            if (not isinstance(shuffled, (int, float)) or not np.isfinite(shuffled)
+                    or not 0 <= shuffled <= 100 or metrics['shuffled_test']['n_trials'] != 64):
+                raise ValueError(f'Invalid shuffled-body result: {path}')
+            row['shuffled_accuracy'] = shuffled
+        runs[key] = row
+    if set(runs) != {(body, seed) for body in ('none', 'real') for seed in (0, 1, 2)}:
+        raise ValueError('Report requires all three paired seeds for both conditions')
+    def aggregate(values):
+        return {'mean': float(np.mean(values)), 'sample_sd': float(np.std(values, ddof=1))}
+    video = [runs['none', seed] for seed in range(3)]
+    additive = [runs['real', seed] for seed in range(3)]
+    result = {'study_protocol': str(protocol_path), **expected,
+              'video_only': aggregate([r['accuracy'] for r in video]),
+              'additive': aggregate([r['accuracy'] for r in additive]),
+              'shuffled_additive': aggregate([r['shuffled_accuracy'] for r in additive]),
+              'per_seed': {'video_only': video, 'additive': additive},
+              'counts': protocol['counts'], 'foil_counts': protocol['foil_counts'],
+              'example_encounters': protocol['example_encounters']}
+    output = Path(output)
+    if any((output / name).exists() for name in ('results.json', 'results.md')):
+        raise FileExistsError(f'Refusing to overwrite report in {output}')
+    output = _output_directory(output)
+    (output / 'results.json').write_text(json.dumps(result, indent=2, allow_nan=False) + '\n')
+    def fmt(row):
+        return f"{row['mean']:.2f}% ± {row['sample_sd']:.2f} percentage points"
+    examples = ', '.join(f"{r['video_id']}:{r['frame_idx']} ({r['referent']})" for r in result['example_encounters'])
+    text = ('| Condition | Held-out accuracy (mean ± sample SD) |\n|---|---:|\n'
+            f"| Video only | {fmt(result['video_only'])} |\n"
+            f"| Additive video + body | {fmt(result['additive'])} |\n\n"
+            f"Shuffled-body additive accuracy: {fmt(result['shuffled_additive'])}.\n\n"
+            f'Example encounters: {examples}.\n')
+    text += '\n| Seed | Video | Additive | Shuffled additive |\n|---:|---:|---:|---:|\n'
+    for a, b in zip(video, additive):
+        text += f"| {a['seed']} | {a['accuracy']:.2f}% | {b['accuracy']:.2f}% | {b['shuffled_accuracy']:.2f}% |\n"
+    text += '\nTarget encounter and independent clip counts by partition, category and held status:\n\n'
+    text += '| Partition | Category | Held | Encounters | Clips |\n|---|---|---|---:|---:|\n'
+    for row in result['counts']:
+        text += f"| {row['partition']} | {row['referent']} | {row['held']} | {row['encounters']} | {row['clips']} |\n"
+    (output / 'results.md').write_text(text)
+    return result
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--episodes', required=True)
-    parser.add_argument('--cache', required=True)
+    parser.add_argument('--episodes')
+    parser.add_argument('--cache')
     parser.add_argument('--output', required=True)
+    parser.add_argument('--report-protocol', help='Frozen protocol.json to summarize')
+    parser.add_argument('--metrics', nargs=6, help='Six completed metrics.json files')
     args = parser.parse_args()
-    prepare(args.episodes, args.cache, args.output)
+    if args.report_protocol:
+        if not args.metrics or args.episodes or args.cache:
+            parser.error('Report requires --metrics and cannot be combined with preparation inputs')
+        report(args.report_protocol, args.metrics, args.output)
+    else:
+        if not args.episodes or not args.cache or args.metrics:
+            parser.error('Preparation requires --episodes and --cache')
+        prepare(args.episodes, args.cache, args.output)

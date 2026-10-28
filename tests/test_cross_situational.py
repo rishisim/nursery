@@ -54,3 +54,40 @@ def test_prepare_refuses_overwrite_before_reading_inputs(tmp_path):
     with pytest.raises(FileExistsError, match='Refusing to overwrite'):
         prepare('/missing/episodes', '/missing/cache', tmp_path)
     assert (tmp_path / 'panels.json').read_text() == 'frozen'
+
+
+def test_report_requires_complete_matching_runs_and_reports_sample_sd(tmp_path, monkeypatch):
+    import hashlib
+    from nursery.learner import cross_situational as cs
+
+    monkeypatch.setattr(cs, '_output_directory', lambda p: (p.mkdir(parents=True, exist_ok=True) or p))
+    protocol_path = tmp_path / 'protocol.json'
+    protocol_path.write_text(json.dumps({'counts': [], 'foil_counts': {}, 'example_encounters': [
+        {'video_id': 'a', 'frame_idx': 1, 'referent': 'bell'},
+        {'video_id': 'b', 'frame_idx': 2, 'referent': 'bell'},
+        {'video_id': 'c', 'frame_idx': 3, 'referent': 'bell'}]}))
+    (tmp_path / 'manifest.parquet').write_bytes(b'manifest')
+    (tmp_path / 'panels.json').write_text('{}')
+    hashes = {f'study_{name}_sha256': hashlib.sha256((tmp_path / filename).read_bytes()).hexdigest()
+              for name, filename in [('protocol', 'protocol.json'), ('manifest', 'manifest.parquet'), ('panels', 'panels.json')]}
+    paths = []
+    for body, scores in [('none', [20, 30, 40]), ('real', [40, 50, 60])]:
+        for seed, score in enumerate(scores):
+            key = 'picture_soft' if body == 'none' else 'fused_soft'
+            m = {**hashes, 'body': body, 'seed': seed, 'reported_test_acc': score,
+                 'test': {'n_trials': 64, key: {'acc': score}},
+                 'shuffled_test': {'n_trials': 64, 'fused_soft': {'acc': score - 10}} if body == 'real' else None}
+            path = tmp_path / f'{body}-{seed}.json'
+            path.write_text(json.dumps(m)); paths.append(path)
+    result = cs.report(protocol_path, paths, tmp_path / 'report')
+    assert result['video_only'] == {'mean': 30.0, 'sample_sd': 10.0}
+    assert result['additive'] == {'mean': 50.0, 'sample_sd': 10.0}
+    assert result['shuffled_additive'] == {'mean': 40.0, 'sample_sd': 10.0}
+    assert len(result['example_encounters']) == 3
+    with pytest.raises(ValueError, match='all three paired seeds'):
+        cs.report(protocol_path, paths[:-1], tmp_path / 'incomplete')
+    (tmp_path / 'panels.json').write_text('{"changed":true}')
+    with pytest.raises(ValueError, match='do not match'):
+        cs.report(protocol_path, paths, tmp_path / 'mismatch')
+    assert not (tmp_path / 'incomplete').exists()
+    assert not (tmp_path / 'mismatch').exists()
