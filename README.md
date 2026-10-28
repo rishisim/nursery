@@ -5,11 +5,12 @@ learning than video alone, as independent training experience increases.
 The simulator supplies egocentric video and body signals; caregiver speech
 provides intentionally uncertain language supervision.
 
-Start with [PLAN.md](PLAN.md). The two proposed studies are
+Start with [PLAN.md](PLAN.md). The two studies are
 [acquisition curves](docs/acquisition_curves.md) and the smaller
 [cross-situational comparison](docs/cross_situational_learning.md).
 [Past experiments](archive/language_learning/past_experiments.md) explains what
-we already tried. These plans do not imply that their runners are implemented.
+we already tried. The 45-run acquisition comparison is complete; its canonical
+document records the protocol, results and retained artifact paths.
 
 ## File map
 
@@ -19,6 +20,8 @@ nursery/
   learner/
     video_only.py               Video → word matching (visual baseline)
     additive.py                 Video score + learned body → word score
+    interaction.py              Additive pathways plus a visual–body interaction
+    acquisition*.py             Frozen subsets, matrix runner, scoring and report
     body.py                     Contact, fingers, arms, load/skin encoding
     windows.py                  Clip-bounded body windows and episode context
     losses.py                   Shared language and diagnostic loss functions
@@ -27,7 +30,7 @@ nursery/
     embed.py                    Frozen DINOv2 feature extraction
     config.json                 Upstream pin, training defaults, evaluation paths
     hand_patches.json           Contact-patch definitions
-    __main__.py                 One CLI: embed / train
+    __main__.py                 One CLI: embed / train / acquisition
     __init__.py                 Pinned upstream loading
   speech/                       Caregiver utterances, timing, vocabulary and cues
   simulator/                    GRAB replay, body signals, assets and rendering
@@ -37,7 +40,7 @@ configs/                        Room-generation configuration
 scripts/                        Render/pipeline/seed launchers and run summaries
 tests/                          Current learner, speech, physical and simulator tests
 docs/
-  acquisition_curves.md          Main proposed study
+  acquisition_curves.md          Main study: frozen protocol and completed results
   cross_situational_learning.md  Small proposed study: video vs additive, table output
   learner.md                    Current implementation and scoring reference
   speech_coupling.md             Speech-generation evidence and assumptions
@@ -53,7 +56,8 @@ archive/
 The additive learner extends `video_only.py`; it does not carry a second copy
 of the visual implementation. Both use the pinned
 [vlm-headcam](https://github.com/mcfrank/vlm-headcam) upstream implementation.
-The revised joint interaction design is currently a plan in
+The joint interaction in `interaction.py` extends the same additive learner;
+`acquisition` runs the frozen three-learner comparison described in
 `docs/acquisition_curves.md`. The archived width-128 joint pilot is a different,
 completed implementation; `--arch joint` is retained only for compatibility.
 
@@ -123,8 +127,9 @@ outputs/
 `runs/step1_matched/` contain both saved inputs and experiment records; their
 presence does not queue new runs. For new studies, use descriptive roots such
 as `outputs/runs/acquisition_curves/` and `outputs/runs/cross_situational/`, with
-condition/seed names such as `video_only_s0` and `additive_s0`. These new study
-directories are naming examples, not created or launched experiments.
+condition/seed names such as `video_only_s0` and `additive_s0`. The completed
+acquisition run uses `models/<fraction>/seed_<seed>/<condition>/` beneath its
+study root; the canonical document lists its reports and reproducible commands.
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python -m pytest -q -p no:cacheprovider tests/test_learner.py tests/test_speech.py tests/test_physical.py

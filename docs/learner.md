@@ -12,6 +12,7 @@ Completed comparisons and historical settings are in
 |---|---|
 | [video_only.py](../nursery/learner/video_only.py) | Frozen image features → trainable visual projection → word matching. |
 | [additive.py](../nursery/learner/additive.py) | Inherits the visual baseline; adds a learned body–word score. |
+| [interaction.py](../nursery/learner/interaction.py) | Extends additive matching with the zero-initialized visual–body interaction. |
 | [body.py](../nursery/learner/body.py), [windows.py](../nursery/learner/windows.py) | Body features, normalization, sequence encoding and bounded context. |
 | [losses.py](../nursery/learner/losses.py) | Shared pooling and loss functions. |
 | [embed.py](../nursery/learner/embed.py), [train.py](../nursery/learner/train.py), [evaluate.py](../nursery/learner/evaluate.py) | Shared feature extraction, training and evaluation. |
@@ -25,7 +26,13 @@ temperature 0.1) combines region evidence. The additive score is:
 The language objective trains the visual projection, word vectors, body encoder
 and body projection together. Body input is dropped on half the training pairs
 by default. This is simultaneous language learning with late score fusion.
-The proposed joint interaction module is not implemented here. The old
+The joint interaction preserves both direct pathways and adds a learned
+body-to-visual attention term, as specified in the
+[acquisition protocol](acquisition_curves.md#frozen-execution-protocol). All three
+learners expose `score_encoded` so acquisition training and fixed-panel evaluation
+use the same scoring arithmetic. The `acquisition` CLI prepares subsets, runs
+the matrix and reports the results with separate dev-selected checkpoints.
+The old
 [width-128 joint pilot](../archive/code/learner/joint_pilot.py) remains reachable
 through the explicitly historical `--arch joint` option for compatibility.
 

@@ -1,7 +1,7 @@
 # Main experiment: language acquisition with video and body
 
-Canonical design and execution protocol. Preparation and implementation are
-verified; scientific training has not started. The
+Canonical design, frozen execution protocol and completed results. All 45
+scientific runs and the final audit completed on 27 October 2026. The
 [smaller study](cross_situational_learning.md) uses the same learner.
 
 ## The idea
@@ -229,3 +229,71 @@ development-only selection, timing-only panel access, frozen input/source
 rejection, and complete-matrix report calculations. The historical learner
 tests remain regression checks; archived joint tests do not validate the new
 joint interaction by themselves.
+
+## Completed results — 27 October 2026
+
+All 45 models completed 60 epochs using execution revision
+`08ebb82c1bd1293091a5c2cea42435d248eb9964`. Summed model wall time was 3.25 hours,
+within the 24-hour limit. The independent final audit reconstructed every trial
+credit, vocabulary coverage, summary statistic and paired difference; verified
+earliest development-score maxima and all 90 selected checkpoints; and confirmed
+that timing checkpoints were removed. The final source, prepared-input and raw
+input hash check passed before this documentation update. Validation included
+53 existing learner regression tests and 26 focused acquisition tests.
+
+Mean accuracy ± sample standard deviation over the three paired seeds:
+
+| Independent clips | Video only | Additive video + body | Joint video + body |
+|---:|---:|---:|---:|
+| 63 | 30.0 ± 1.6 | 30.2 ± 0.7 | 30.5 ± 0.9 |
+| 158 | 39.5 ± 1.7 | 34.9 ± 1.1 | 34.1 ± 1.1 |
+| 315 | 49.6 ± 1.2 | 41.3 ± 0.3 | 41.0 ± 1.0 |
+| 473 | 56.4 ± 0.8 | 48.5 ± 0.8 | 47.8 ± 0.6 |
+| 630 | 60.1 ± 0.6 | 54.4 ± 1.1 | 54.3 ± 2.0 |
+
+Paired percentage-point differences (mean ± sample standard deviation):
+
+| Clips | Additive − video | Joint − video | Joint − additive |
+|---:|---:|---:|---:|
+| 63 | +0.2 ± 2.0 | +0.5 ± 1.5 | +0.4 ± 0.6 |
+| 158 | −4.6 ± 2.6 | −5.4 ± 1.0 | −0.8 ± 2.2 |
+| 315 | −8.2 ± 0.9 | −8.6 ± 1.6 | −0.4 ± 1.1 |
+| 473 | −7.9 ± 1.0 | −8.6 ± 1.3 | −0.7 ± 0.8 |
+| 630 | −5.7 ± 1.3 | −5.8 ± 2.0 | −0.2 ± 0.9 |
+
+At 630 clips, shuffled-body accuracy was 50.1 ± 0.8% for additive and
+49.5 ± 2.1% for joint, below their aligned-body scores. Thus the learned
+decisions use the aligned histories, but that dependence does not translate
+into a gain over video-only learning. On s8, video/additive/joint scored
+55.6 ± 0.3 / 52.9 ± 1.1 / 52.4 ± 1.3%. Picture-only rendered transfer was
+69.1 ± 0.1 / 68.3 ± 0.6 / 68.3 ± 0.4%; Konkle was
+63.8 ± 2.6 / 63.3 ± 2.7 / 63.6 ± 2.9%.
+
+The desired multimodal advantage was not observed from 25% through 100% of
+the tested data. The small 10% differences are not a demonstrated advantage
+given the seed variability. The joint interaction did not improve on the
+additive reference in this comparison. All curves still rise over the measured
+range; these results do not establish a ceiling. They also do not identify a
+unique cause of the multimodal deficit. In particular, comparisons with older
+absolute accuracies are not controlled: this study uses noun-only evaluation
+queries, subset-fitted vocabulary and frozen vocabulary-independent panels.
+
+For the next build decision, keep video-only as the performance reference and
+treat this interaction as an unsuccessful candidate for improving the current
+weak-noun task. A subsequent design needs to address useful generalization of
+body evidence, rather than assuming that adding an interaction is sufficient.
+This is a design signal for the continuing multimodal-learning goal; no new
+experiment is selected or launched by this result record.
+
+Retained ignored artifacts in this worktree:
+
+- `outputs/runs/acquisition_curves/report.md`: full primary, shuffled, s8,
+  transfer, known-word and vocabulary-coverage tables.
+- `summary.json` / `summary.csv` in that root: all seed values, aggregates and
+  paired differences; `final_audit.json`: independent audit result.
+- `acquisition_curves.png` / `.pdf` and `picture_transfer.png` / `.pdf`:
+  measured curves and separate transfer panels.
+- `models/<fraction>/seed_<seed>/<condition>/`: histories, trial-level scores,
+  metrics and the two selected checkpoints per model.
+- Frozen inputs, masks, panels, hashes and timing/execution records remain
+  alongside the results. Existing source datasets and prior runs are preserved.

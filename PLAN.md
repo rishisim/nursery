@@ -9,10 +9,17 @@ the existing experiments neither establish that benefit nor rule it out.
 
 ## Current step and next direction
 
-Prepare a matched acquisition-curve comparison. Count independent source clips,
-not replayed frames, as the training-data axis; use nested training subsets and
-give both arms exactly the same video, temporal history and weak speech at each
-size. Preserve natural weak/delayed/nonheld naming rather than selecting normal
+The matched 45-run acquisition comparison is complete. At full data, video-only,
+additive and joint learners scored 60.1%, 54.4% and 54.3% on new-clip noun
+understanding. The joint interaction did not deliver the desired gain, and no
+acquisition ceiling was established. The [canonical result record](docs/acquisition_curves.md#completed-results--27-october-2026)
+contains the full curves, controls, uncertainties and implications for the next
+build decision. No further experiment is queued by that record.
+
+The comparison counts independent source clips, not replayed frames, as the
+training-data axis. It uses nested training subsets and gives all three learners
+exactly the same video, temporal history and weak speech at each size. It
+preserves natural weak/delayed/nonheld naming rather than selecting normal
 learning examples with hidden referent identity.
 
 Before new training, fix the split and subset membership, paired training seeds,
@@ -29,7 +36,7 @@ eventual ceiling. A fixed-data epoch plateau or one favorable data size cannot
 establish the latter; insufficient saturation leaves it unresolved.
 
 The working 512-dimensional additive learner over frozen DINO features is the
-reference baseline. The proposed joint learner preserves direct visual–word and
+reference baseline. The implemented joint learner preserves direct visual–word and
 body–word paths and adds a learned interaction. DINO supplies prior visual
 knowledge; these experiments do not start visual learning from scratch. The
 first comparison excludes sensory pretraining. The old 128-dimensional joint
@@ -42,8 +49,8 @@ and artifacts. The small study compares video-only with additive video + body
 at one fixed data amount, reporting a two-row accuracy table and a supporting
 shuffled-body evaluation check; it has no joint arm or acquisition curves.
 The main study retains its three learners and acquisition curves.
-These documents describe intended outputs; implementation,
-dataset feasibility, frozen run settings and runtime limits precede training.
+The main document now includes completed results. Dataset feasibility, frozen
+run settings and runtime limits remain prerequisites for any subsequent study.
 
 ## Preserved starting points
 
