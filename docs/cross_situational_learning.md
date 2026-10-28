@@ -236,3 +236,27 @@ Validation: all 53 existing learner tests and the three new runner tests passed;
 all six preparation/reporting tests passed. The final nine study tests also
 passed together. The existing tiny-probe standard-deviation warnings remain.
 No source-data training or timing has run at this checkpoint.
+
+## Step 3: readiness and timing
+
+The active chat now owns the worktree at
+`/Users/rishisim/.codex/worktrees/cross-situational-study/nursery`, on
+`research/cross-situational`. The previous worktree and its artifacts remain
+preserved. Copied protocol/manifest/panels were byte-verified against the frozen
+hashes; the existing environment and retained input paths resolve successfully.
+
+One fresh training/development epoch per condition completed on local MPS:
+
+| Condition | Startup | Training + development epoch | Total timing check |
+|---|---:|---:|---:|
+| Video only | 1.028 s | 0.521 s | 1.550 s |
+| Additive video + body | 1.880 s | 0.499 s | 2.379 s |
+
+Both checks used all 256 training encounters, skipped test/shuffled scoring and
+discarded their weights. Only `timing/video_only/timing.json` and
+`timing/additive/timing.json` were retained, including the frozen input hashes.
+The six-run extrapolation is approximately 70 seconds before final test scoring
+and process overhead. A **five-minute total wall-clock cap** is proposed for the
+six fresh runs, with interruption and failure reporting rather than silently
+extending it. The launch awaits agreement on that cap. No final study models
+or held-out study measurements exist yet.
