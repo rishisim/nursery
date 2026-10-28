@@ -1,7 +1,8 @@
 # Small experiment: learning words across ambiguous encounters
 
-Design reference for a small fixed-data comparison alongside the
-[main study](acquisition_curves.md). No run has started.
+Protocol and completed result for a small fixed-data comparison alongside the
+[main study](acquisition_curves.md). The six planned runs completed on
+27 October 2026; see the results below and the Step 4 execution record.
 
 ## The idea
 
@@ -70,14 +71,33 @@ held-out accuracy and uncertainty across seeds. The desired result is stronger
 word understanding with body input after the same ambiguous encounters. This
 is the hypothesis, not a promised result. No acquisition curve is produced here.
 
-| Condition | Held-out accuracy |
+| Condition | Held-out accuracy, mean ± sample SD |
 |---|---|
-| Video only | — |
-| Additive video + body | — |
+| Video only | 74.48% ± 5.92 percentage points |
+| Additive video + body | 71.88% ± 4.69 percentage points |
 
-Report shuffled-body accuracy in one supporting sentence below the table.
+Shuffling complete body histories at evaluation gave the same additive models
+**68.23% ± 5.92 percentage points** across three seeds.
 
-The blanks are future measurements. For reference, the earlier heavy/light
+Chance is 25%; each run uses the same 64 held-out target trials. Standard
+deviation describes variability across three training seeds, not a confidence
+interval over all possible clips. Additive minus video was **−2.60 percentage
+points** on average: the body-enabled learner did not outperform video-only in
+this controlled study. Shuffling reduced additive accuracy by 3.65 points on
+average, consistent with use of aligned body history without an overall gain.
+
+Three encounters selected before training illustrate the word **blicket**
+(bottle) with changing distractors. They span partitions and were not selected
+for successful predictions. Actual encoder-center crops are retained locally
+at `outputs/runs/cross_situational/report/examples.jpg`.
+
+| Encounter | Partition | Named object held? | Example visible distractors |
+|---|---|---|---|
+| `s7_0038:2` — “Look, blicket.” | Training | Yes | Apple |
+| `s6_0102:48` — “Look, blicket.” | Development | No | Knife |
+| `s5_0020:118` — “Look, blicket.” | Test | Yes | Bowl, apple |
+
+For reference, the earlier heavy/light
 table reported video 37.88%, video + load 92.42%, and shuffled load 46.21%.
 Those were a different, two-choice task with 50% chance; they are a presentation
 example, not numerical targets for this experiment. See the
@@ -199,7 +219,8 @@ metadata. The embedding metadata SHA-256 is
 `6cf0a5df2a4b4b63151b353cbdf603df71621f1d05de8fb585853d60577c6c7c`;
 the cache index SHA-256 is
 `9da1f5246c81a39490eb9cbf464b278cc3c6d92d36a4d91b3ea45e224ef910c2`.
-Five focused preparation tests passed. No experiment training has started.
+Five focused preparation tests passed. No experiment training had started at
+the Step 1 checkpoint.
 
 ## Step 2: shared runner and reporting
 
@@ -235,7 +256,7 @@ per-seed results, exposure counts and the preselected example identifiers.
 Validation: all 53 existing learner tests and the three new runner tests passed;
 all six preparation/reporting tests passed. The final nine study tests also
 passed together. The existing tiny-probe standard-deviation warnings remain.
-No source-data training or timing has run at this checkpoint.
+No source-data training or timing had run at the Step 2 checkpoint.
 
 ## Step 3: readiness and timing
 
@@ -256,7 +277,41 @@ Both checks used all 256 training encounters, skipped test/shuffled scoring and
 discarded their weights. Only `timing/video_only/timing.json` and
 `timing/additive/timing.json` were retained, including the frozen input hashes.
 The six-run extrapolation is approximately 70 seconds before final test scoring
-and process overhead. A **five-minute total wall-clock cap** is proposed for the
-six fresh runs, with interruption and failure reporting rather than silently
-extending it. The launch awaits agreement on that cap. No final study models
-or held-out study measurements exist yet.
+and process overhead. The user approved a **five-minute total wall-clock cap**
+for the six fresh runs, with interruption and failure reporting rather than
+silently extending it. Launch was paused at the user's request and resumed only
+after the user explicitly asked to continue. No final study models or held-out
+measurements were created before that resume.
+
+## Step 4: completed execution and interpretation
+
+All six fresh 20-epoch runs completed in **39.60 seconds** under the approved
+300-second total cap, with zero nonzero exit codes, timeouts or retries. The
+source commit used was `06332d05bfcff6a9f2f3f0c6851d7f8fc9283ae0`.
+Exact commands, individual durations, return codes and input hashes are in
+`outputs/runs/cross_situational/execution.json`; logs, selected checkpoints,
+vocabularies and per-trial metrics remain in the corresponding ignored run
+directories. The canonical generated summary is in
+`outputs/runs/cross_situational/report/results.{json,md}`.
+
+| Seed | Video accuracy | Additive accuracy | Shuffled additive accuracy | Video / additive selected epoch (zero-based) |
+|---|---:|---:|---:|---|
+| 0 | 81.250% | 76.562% | 75.000% | 16 / 18 |
+| 1 | 71.875% | 71.875% | 64.062% | 11 / 13 |
+| 2 | 70.312% | 67.188% | 65.625% | 15 / 19 |
+
+Independent result verification confirmed all six frozen input hashes, 256
+training pairs, 20 epochs, earliest own-development-max checkpoint selection,
+identical fixed test candidates/correct slots, and reproduction of every
+reported accuracy from the 64 saved trial flags. Shuffled evaluations retained
+the same trials and the frozen complete-history donor permutation. The
+reported means and sample standard deviations were independently recomputed.
+
+This completes the requested fixed-data comparison. Both learners acquired
+above-chance word–situation associations in the scaffolded task, but adding
+the five body streams did not improve held-out accuracy. The result is a design
+signal for the larger build: aligned sensory input is used here, yet that use
+does not establish a language-learning advantage. It does not measure an
+acquisition ceiling, establish new-instance generalization, or settle the
+separately planned acquisition-curve comparison. No follow-up experiment,
+architecture change, new rendering or parameter sweep was launched.
