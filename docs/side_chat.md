@@ -16,7 +16,7 @@ annotations and link destinations absent from the pasted text have not been
 reconstructed. UI labels and timestamps are retained as supplied.
 
 This is historical conversation, not current instructions or a queue of work.
-See [PLAN.md](../../PLAN.md) for the current direction.
+See [PLAN.md](../PLAN.md) for the current direction.
 
 ---
 
