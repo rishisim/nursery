@@ -689,6 +689,14 @@ weak noun acquisition nor a higher language ceiling, and does not explain why
 ordinary noun learning failed. At that point in the record, Step 3 remained
 conditional; this result did not queue it automatically.
 
+A subsequent user-requested joint-interaction comparison reused these exact
+frozen inputs from their retained location, `outputs/legacy/runs/heavy_light/`,
+with fresh CPU controls. The canonical runner is now
+`nursery/learner/heavy_light.py`. The matched three-condition results and
+provenance are recorded in
+[the cross-situational protocol](../../docs/cross_situational_learning.md#joint-comparison-heavylight-results);
+the original MPS results above remain unchanged.
+
 
 ## Step 3: transfer-focused sensory pretraining (4.16)
 

@@ -365,3 +365,113 @@ the existing bounded limits: five minutes total for cross-situational training
 and thirty minutes total for heavy/light training, with no automatic extensions
 or retries. Interpret this as an exploratory architecture comparison on already
 consulted test panels, not a fresh confirmatory test or evidence of a ceiling.
+
+### Joint comparison: cross-situational results
+
+All nine fresh CPU runs completed at source commit
+`753a526f1781b524a0f83b3f2d1db304071689c1` in **57.48 seconds** under the
+300-second cap, with no failed runs or retries. Three preliminary one-epoch
+training/development timing checks discarded their weights and did not score
+test. The original frozen manifest, panels and protocol were reused unchanged.
+Exact commands, timing, hashes and exit codes are retained in
+`outputs/runs/cross_situational_joint/execution.json`; the canonical generated
+table is `outputs/runs/cross_situational_joint/report/results.md`.
+
+| Condition | Test accuracy, mean ± sample SD | Shuffled body accuracy, mean ± sample SD |
+|---|---:|---:|
+| Video only | 75.00% ± 6.81 pp | — |
+| Additive video + body | 71.88% ± 4.13 pp | 68.23% ± 2.39 pp |
+| Joint interaction video + body | 73.44% ± 4.13 pp | 69.27% ± 3.93 pp |
+
+| Seed | Video | Additive | Interaction | Selected epochs V/A/I, zero-based |
+|---|---:|---:|---:|---|
+| 0 | 82.8125% | 75.0000% | 78.1250% | 16 / 11 / 13 |
+| 1 | 71.8750% | 73.4375% | 71.8750% | 5 / 14 / 19 |
+| 2 | 70.3125% | 67.1875% | 70.3125% | 17 / 19 / 18 |
+
+Independent audit reproduced all saved trial accuracies, frozen input hashes,
+candidate arrays/correct slots, CPU settings, 256 training pairs, 20 epochs and
+earliest own-development-max checkpoint selection. These controls are fresh CPU
+models, so the earlier MPS table should not be substituted into this comparison.
+
+The joint model is **1.56 pp above additive but 1.56 pp below video**. Its body
+shuffle drop is 4.17 pp, consistent with use of aligned sensory histories, but
+this does not establish an advantage over the video learner.
+
+Saved same-checkpoint diagnostics sharpen the interpretation. Across the joint
+models, picture-only scoring is 72.40%, direct picture-plus-body scoring is
+74.48%, and full interaction scoring is 73.44%. The interaction term fixes one
+and hurts three correct/incorrect decisions across the three seeds (the same
+64 situations repeated, not 192 independent observations). Compared with the
+same checkpoint's picture-only scoring, full scoring fixes 12 and hurts 10.
+The small advantage over the independently trained additive control therefore
+cannot be attributed to a beneficial interaction term at inference: learned
+direct pathways and selected checkpoints also differ. This fixed-weight score
+ablation does not isolate the interaction's effect during training.
+
+### Joint comparison: heavy/light results
+
+The nine fresh CPU models completed at the same source commit in **64.82
+seconds** wall time (62.59 seconds inside the training/evaluation runner), under
+the 1,800-second cap. The manifest and normalization table are byte-identical
+to the retained original study, including 88/18/22 train/dev/test clips and
+the same ten within-test-category donor permutations. Every model trained
+for 100 epochs; checkpoint selection remained the first maximum development
+accuracy. The prepared protocol SHA256 is
+`2dc5201cc4e6bc46a7cdd48d2dd1d1ef26f535fad2cb7798f03b8d7a13739d9b`.
+
+| Condition | Test accuracy, mean ± sample SD | Shuffled load accuracy, mean ± sample SD |
+|---|---:|---:|
+| Video only | 34.85% ± 9.46 pp | — |
+| Additive video + load | 90.91% ± 4.55 pp | 46.06% ± 2.78 pp |
+| Joint interaction video + load | 90.91% ± 4.55 pp | 46.06% ± 2.78 pp |
+
+| Seed | Video | Additive | Interaction | Selected epochs V/A/I, zero-based |
+|---|---:|---:|---:|---|
+| 0 | 27.2727% | 90.9091% | 90.9091% | 33 / 1 / 1 |
+| 1 | 31.8182% | 95.4545% | 95.4545% | 1 / 3 / 3 |
+| 2 | 45.4545% | 86.3636% | 86.3636% | 47 / 1 / 1 |
+
+Both body conditions pass all original capability gates: +56.06 pp over video,
+positive gain in every seed, a paired source-clip 95% interval of
+[+34.85, +74.24] pp, and a 44.85 pp shuffled-load drop. This interval is
+conditional on the three fitted seeds and only two held-out categories.
+Joint and additive make identical test decisions at every seed, although
+their scores differ and the selected joint interaction weights are nonzero.
+Thus the interaction branch is learned, but adds no measured accuracy benefit
+over additive on this diagnostic. The body models select very early epochs
+(zero-based 1/3/1) under the frozen development rule; training ran the full
+100 epochs and no later test checkpoint was substituted.
+
+Run artifacts, predictions, histories and the generated comparison are under
+`outputs/runs/heavy_light_joint/`. Exact launch records are separately under
+`outputs/runs/heavy_light_joint_execution/`. An initial supervisor setup placed
+logs inside the prepared directory, so the overwrite guard rejected launch
+before any model started. Those failure records were preserved outside the
+prepared root, the three frozen files and their hashes were rechecked, and the
+corrected launch trained each model once. No started model was retried. The
+preliminary joint timing check discarded weights and did not score test.
+
+Independent review reproduced every test credit, all ten shuffle draws, the
+paired bootstrap and all five gates. It verified all 859 source-file hashes,
+ten implementation hashes, the frozen tables, identical same-seed common
+initialization/minibatch order, and every development-selected checkpoint.
+Implementation validation passed 61 shared learner tests before the attention
+mask refinement, then eight affected tests afterward, plus seven reporter tests
+and 20 heavy/light tests. Generated artifacts remain ignored; only the curated
+protocol/results record is committed.
+
+Across both tasks, the new design preserves the clear benefit of aligned load
+for explicitly supervised synthetic weight words, but does not yet improve
+cross-situational noun learning over video. This is consistent with a remaining
+signal-to-referent alignment problem; these runs do not identify that as the
+sole cause. The earlier noun-task audit found body histories often describing
+an object other than the named nonheld referent. Adding interaction capacity
+does not itself repair that training evidence. The next design decision should
+consider that mismatch alongside the separate acquisition-curve results, rather
+than treating this small architecture comparison as a ceiling measurement.
+These tests reuse already-consulted panels and are exploratory. The heavy/light
+signal remains analytic synthetic load whose sampled mass does not affect RGB
+or motion, with explicit aligned labels and only 22 test clips. No additional
+training, data generation, parameter sweep or acquisition-curve run was launched
+as part of this follow-up.
