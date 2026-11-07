@@ -23,6 +23,14 @@ temperature 0.1) combines region evidence. The additive score is:
 
 `visual–word score + learned weight × body–word score`
 
+New embeddings retain the full 16×16 patch grid plus CLS (257 tokens per
+frame), using the same image crop and frozen encoder. `embed --grid 4`
+reproduces the historical 17-token caches. Use a fresh ignored output root
+when changing grids; existing caches are never converted in place. Training,
+picture evaluation and acquisition interaction masks use the cache's region
+count. Training and picture caches must use the same grid. The archived
+width-128 joint pilot remains restricted to its original 4×4 caches.
+
 The language objective trains the visual projection, word vectors, body encoder
 and body projection together. Body input is dropped on half the training pairs
 by default. This is simultaneous language learning with late score fusion.

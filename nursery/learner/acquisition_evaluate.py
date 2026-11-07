@@ -96,7 +96,7 @@ class StudyEvaluation:
                     donors = np.asarray(trials["donor_rows"])[ids] if body_mode == "shuffled" else ids
                     ctx = data.batch(donors, None, training=False)
                     ctx["keep"] *= centre_clip_valid(ctx).any(1)
-                    ctx["visual_valid"] = torch.as_tensor(valid[ids], device=self.device).repeat_interleave(17, dim=1)
+                    ctx["visual_valid"] = torch.as_tensor(valid[ids], device=self.device).repeat_interleave(self.caches[0].shape[1], dim=1)
                 matrix[ids] = model.score_encoded(R, T, ctx).float().cpu().numpy()
             for i, word in enumerate(queries):
                 if word in word_index:
@@ -115,6 +115,8 @@ class StudyEvaluation:
             # Panels are resolved relative to the experiment so the root can move.
             trials = json.loads((self.root / "panels" / panel / "trials.json").read_text())["trials"]
             cache = np.load(Path(spec["cache"]) / "emb.f16.npy", mmap_mode="r")
+            if cache.shape[1:] != self.caches[0].shape[1:]:
+                raise ValueError("Picture and training cache dimensions disagree")
             self.pictures[panel] = (trials, cache)
         trials, cache = self.pictures[panel]
         queries = [t["query"] for t in trials]

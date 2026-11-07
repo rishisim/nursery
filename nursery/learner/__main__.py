@@ -15,6 +15,7 @@ def main():
     embed.add_argument("--output", required=True)
     embed.add_argument("--device", help="Torch device (default: cuda > mps > cpu)")
     embed.add_argument("--batch", type=int, default=64)
+    embed.add_argument("--grid", type=int, choices=(4, 16), default=16, help="DINO patch grid (default: full 16x16; 4 reproduces historical caches)")
     train = commands.add_parser("train")
     train.add_argument("--run", required=True)
     train.add_argument("--condition", required=True)
@@ -46,7 +47,7 @@ def main():
     acquisition.add_argument("--plot-python", help="Python with matplotlib for PNG/PDF output (report only)")
     args = parser.parse_args()
     if args.command == "embed":
-        embed_episodes(args.episodes, args.output, args.device, args.batch)
+        embed_episodes(args.episodes, args.output, args.device, args.batch, args.grid)
     elif args.command == "acquisition":
         if args.action == "prepare":
             if not args.inputs or not args.episodes:

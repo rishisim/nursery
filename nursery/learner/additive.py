@@ -24,9 +24,10 @@ def _model_class():
         vision -> body targets from body features to the held-object identity.
         """
 
-        def __init__(self, vocab, emb_dim, tau_p=0.1, dims=None, oracle_classes=0, **kwargs):
+        def __init__(self, vocab, emb_dim, tau_p=0.1, dims=None, oracle_classes=0, num_regions=REGIONS, **kwargs):
             super().__init__(vocab, emb_dim=emb_dim, **kwargs)
             self.tau_p, self.oracle_classes = tau_p, oracle_classes
+            self.num_regions = num_regions
             self.encoder = None
             if dims is not None:
                 dim = self.word.embedding_dim
@@ -36,7 +37,7 @@ def _model_class():
                     self.latent = 2 * self.encoder.hidden
                     self.region_in = nn.Linear(dim, 32)
                     out = oracle_classes + 1 if oracle_classes else 2 * N_PATCH + 4
-                    self.region_head = nn.Sequential(nn.Linear(REGIONS * 32, 128), nn.ReLU(), nn.Linear(128, out))
+                    self.region_head = nn.Sequential(nn.Linear(num_regions * 32, 128), nn.ReLU(), nn.Linear(128, out))
                     self.decoder = nn.Linear(self.latent, sum(dims.values()))
                     self.fuse = nn.Linear(self.latent, dim)
                     self.beta = nn.Parameter(torch.tensor(1.0))
@@ -60,9 +61,9 @@ def _model_class():
         # ---- losses ----
 
         def predict_loss(self, R, ctx):
-            """Vision -> body: the 17 projected regions of each window frame predict that second's body targets."""
+            """Vision -> body: each frame's projected regions predict that second's body targets."""
             B = R.shape[0]
-            frames = R.view(B, -1, REGIONS, R.shape[-1])
+            frames = R.view(B, -1, self.num_regions, R.shape[-1])
             h = F.relu(self.region_in(frames)).flatten(2)
             out = self.region_head(h)  # [B,F,out]
             valid = ctx["frame_valid"]
@@ -85,8 +86,8 @@ def _model_class():
             if sel is None or len(sel) < 2:
                 return None
             images = ctx["bag_images"]
-            Rb = self.enc_regions(images.flatten(1, 2))  # [Be, E*17, D]
-            valid = ctx["bag_valid"].repeat_interleave(REGIONS, dim=1)
+            Rb = self.enc_regions(images.flatten(1, 2))
+            valid = ctx["bag_valid"].repeat_interleave(self.num_regions, dim=1)
             log_prior = torch.full(valid.shape, -np.inf, device=Rb.device, dtype=Rb.dtype)
             log_prior = torch.where(valid, -torch.log(valid.sum(1, keepdim=True).to(Rb.dtype)), log_prior)
             s = torch.einsum("brd,md->brm", Rb, T[sel])
@@ -97,7 +98,7 @@ def _model_class():
             sel = ctx.get("bag_sel")
             if sel is None or len(sel) < 2:
                 return None
-            Rb = self.enc_regions(ctx["bag_images"].flatten(1, 2)).view(len(sel), -1, REGIONS, self.word.embedding_dim)
+            Rb = self.enc_regions(ctx["bag_images"].flatten(1, 2)).view(len(sel), -1, self.num_regions, self.word.embedding_dim)
             rows = torch.arange(len(sel), device=Rb.device)
             a, b = Rb[rows, ctx["bag_ab"][:, 0]], Rb[rows, ctx["bag_ab"][:, 1]]
             s = torch.einsum("ird,jqd->ijrq", a, b).flatten(2)
@@ -168,6 +169,6 @@ def _model_class():
     return Additive
 
 
-def AdditiveMIL(vocab, emb_dim, tau_p=0.1, dims=None, oracle_classes=0):
+def AdditiveMIL(vocab, emb_dim, tau_p=0.1, dims=None, oracle_classes=0, num_regions=REGIONS):
     """Build the model (the class subclasses the pinned upstream RegionMIL, imported lazily)."""
-    return _model_class()(vocab, emb_dim, tau_p, dims, oracle_classes)
+    return _model_class()(vocab, emb_dim, tau_p, dims, oracle_classes, num_regions)

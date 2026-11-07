@@ -92,7 +92,8 @@ def test_timing_over_budget_stops_before_scientific_work(tmp_path, monkeypatch):
     assert json.loads((tmp_path / 'execution.json').read_text())['status'] == 'stopped'
 
 
-def test_actual_train_one_pairs_models_order_masks_and_dev_only_selection(tmp_path, monkeypatch):
+@pytest.mark.parametrize("num_regions", [17, 257])
+def test_actual_train_one_pairs_models_order_masks_and_dev_only_selection(tmp_path, monkeypatch, num_regions):
     """Exercise real FramePairs, learners, gradients, BodyData and panel evaluator."""
     import numpy as np
     import pandas as pd
@@ -108,7 +109,7 @@ def test_actual_train_one_pairs_models_order_masks_and_dev_only_selection(tmp_pa
     words = ['apple', 'cup', 'book', 'ball']
     manifest = pd.DataFrame({'video_id': ['tiny'] * 4, 'frame_idx': list(range(4)), 'text': words, 'referent': words})
     rng = np.random.default_rng(0)
-    cache = rng.normal(size=(4, 17, 8)).astype(np.float32)
+    cache = rng.normal(size=(4, num_regions, 8)).astype(np.float32)
     lut = {f'tiny|{i}': (0, i) for i in range(4)}
     subset = tmp_path / 'subsets' / '1.0'
     subset.mkdir(parents=True)

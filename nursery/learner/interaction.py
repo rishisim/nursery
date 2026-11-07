@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 
 from .additive import _model_class as _additive_class
+from .losses import REGIONS
 
 
 def centre_clip_valid(ctx):
@@ -68,6 +69,6 @@ def _model_class():
     return JointInteraction
 
 
-def JointInteractionMIL(vocab, emb_dim, tau_p=0.1, dims=None, oracle_classes=0):
+def JointInteractionMIL(vocab, emb_dim, tau_p=0.1, dims=None, oracle_classes=0, num_regions=REGIONS):
     """Build the joint learner while retaining the additive model's direct pathways."""
-    return _model_class()(vocab, emb_dim, tau_p, dims, oracle_classes)
+    return _model_class()(vocab, emb_dim, tau_p, dims, oracle_classes, num_regions=num_regions)

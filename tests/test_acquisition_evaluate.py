@@ -18,8 +18,8 @@ pytestmark = pytest.mark.usefixtures("offline", "upstream")
 DIMS = {k: 2 for k in ("contact", "finger", "arm", "load", "skin")}
 
 
-@pytest.fixture
-def evaluation(tmp_path):
+@pytest.fixture(params=[17, 257])
+def evaluation(tmp_path, request):
     (tmp_path / "protocol.json").write_text(json.dumps({"picture_panels": {}}))
     panel = tmp_path / "panels" / "dev"
     panel.mkdir(parents=True)
@@ -30,7 +30,7 @@ def evaluation(tmp_path):
     trials = {"trial_rows": [0, 1], "candidate_rows": [[0, 1, 2, 3], [3, 2, 1, 0]],
               "correct_slots": [0, 3], "donor_rows": [2, 3, 0, 1]}
     (panel / "trials.json").write_text(json.dumps(trials))
-    cache = np.random.default_rng(9).normal(size=(4, 17, 8)).astype(np.float32)
+    cache = np.random.default_rng(9).normal(size=(4, request.param, 8)).astype(np.float32)
     lut = {f"v{i}|2": (0, i) for i in range(4)}
     ev = StudyEvaluation(tmp_path, tmp_path, [cache], lut, {"<pad>": 0, "mug": 1}, None, "cpu")
     rows, trials, ds, _, valid = ev._panel("dev")
@@ -57,7 +57,7 @@ def test_unknown_query_keeps_fixed_denominator():
 @pytest.mark.parametrize("factory", [VideoOnlyMIL, AdditiveMIL, JointInteractionMIL])
 def test_noun_query_placeholder_independence_and_score_identity(evaluation, factory):
     ev = evaluation
-    kwargs = {} if factory is VideoOnlyMIL else {"dims": DIMS}
+    kwargs = {} if factory is VideoOnlyMIL else {"dims": DIMS, "num_regions": ev.caches[0].shape[1]}
     model = factory(2, 8, **kwargs).eval()
     result = ev.evaluate(model, "dev")
     assert result["queries"] == ["mug", "unknown"] and result["n_known"] == 1
@@ -68,7 +68,7 @@ def test_noun_query_placeholder_independence_and_score_identity(evaluation, fact
     if ctx is not None:
         from nursery.learner.interaction import centre_clip_valid
         ctx["keep"] *= centre_clip_valid(ctx).any(1)
-        ctx["visual_valid"] = torch.as_tensor(valid).repeat_interleave(17, dim=1)
+        ctx["visual_valid"] = torch.as_tensor(valid).repeat_interleave(ev.caches[0].shape[1], dim=1)
     expected = model.pair_scores(images, query, torch.ones(1), ctx)[2][:, 0]
     np.testing.assert_allclose(result["scores"][0], expected.detach().numpy(), rtol=1e-6)
     # Dataset placeholder tokens and original sentence cannot become the noun query.
@@ -79,7 +79,7 @@ def test_noun_query_placeholder_independence_and_score_identity(evaluation, fact
 
 def test_shuffled_complete_histories_and_fixed_candidates(evaluation, monkeypatch):
     ev = evaluation
-    model = JointInteractionMIL(2, 8, dims=DIMS).eval()
+    model = JointInteractionMIL(2, 8, dims=DIMS, num_regions=ev.caches[0].shape[1]).eval()
     observed = []
     original = model.score_encoded
     def record(R, T, ctx=None):
@@ -100,7 +100,7 @@ def test_shuffled_complete_histories_and_fixed_candidates(evaluation, monkeypatc
 
 def test_repeated_dev_evaluation_preserves_model_and_rng(evaluation):
     # Training caller explicitly enters evaluation mode before invoking this API.
-    model = JointInteractionMIL(2, 8, dims=DIMS).eval()
+    model = JointInteractionMIL(2, 8, dims=DIMS, num_regions=evaluation.caches[0].shape[1]).eval()
     parameters = {k: v.clone() for k, v in model.state_dict().items()}
     torch_state, numpy_state, python_state = torch.random.get_rng_state(), np.random.get_state(), random.getstate()
     before_modes = [m.training for m in model.modules()]

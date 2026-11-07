@@ -153,16 +153,17 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
         np.random.seed(seed)
         dims = {k: v.shape[-1] for k, v in store['groups'].items()}
         emb_dim = int(caches[0].shape[-1])
-        if caches[0].ndim != 3 or caches[0].shape[1] != 17:
-            raise ValueError('Expected CLS plus 4x4 frozen region caches')
+        if caches[0].ndim != 3 or caches[0].shape[1] not in (17, 257):
+            raise ValueError('Expected CLS plus 4x4 or 16x16 frozen region caches')
+        num_regions = int(caches[0].shape[1])
         constructors = {'video_only': VideoOnlyMIL, 'additive': AdditiveMIL, 'joint_interaction': JointInteractionMIL}
-        kwargs = {} if condition == 'video_only' else {'dims': dims}
+        kwargs = {} if condition == 'video_only' else {'dims': dims, 'num_regions': num_regions}
         model = constructors[condition](len(vocab), emb_dim, protocol['tau'], **kwargs).float().to(device)
         ps, pt, win = _pair_meta(manifest, store, lut, protocol['window'])
         data = BodyData(store, ps, pt, win, None, None, None, None, device,
                         protocol['body_window'], 0.0, protocol['body_dropout']) if condition != 'video_only' else None
         _, visual_valid = _window_layout(manifest, lut, protocol['window'])
-        visual_valid = torch.as_tensor(visual_valid, device=device).repeat_interleave(17, dim=1)
+        visual_valid = torch.as_tensor(visual_valid, device=device).repeat_interleave(num_regions, dim=1)
         evaluator = StudyEvaluation(root, inputs, caches, lut, vocab, store, device)
         optimizer = torch.optim.AdamW(model.parameters(), lr=protocol['lr'], weight_decay=protocol['weight_decay'])
         setup_seconds = time.time() - started

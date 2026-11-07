@@ -40,15 +40,18 @@ def konkle_frames(config):
     return pd.DataFrame(rows)
 
 
-def embed_episodes(episodes, output, device=None, batch=64):
+def embed_episodes(episodes, output, device=None, batch=64, grid=16):
     from unittest.mock import patch
 
     import pandas as pd
+    import numpy as np
     import torch
 
     device = str(torch.device(device or ("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")))
     if batch < 1:
         raise ValueError("Embedding batch must be positive")
+    if grid not in (4, 16):
+        raise ValueError("Embedding grid must be 4 (historical) or 16 (full patch grid)")
     episodes = Path(episodes).resolve()
     output = _output_directory(output)
     record_path = output / "generator.json"
@@ -60,11 +63,17 @@ def embed_episodes(episodes, output, device=None, batch=64):
         config = record["config"]
     embedding_path = output / "embedding.json"
     provenance = {"episodes": str(episodes), "upstream": config["upstream"],
-                  "encoder": "facebook/dinov2-base", "grid": 4, "cls": True}
+                  "encoder": "facebook/dinov2-base", "grid": grid, "cls": True}
     if embedding_path.exists():
         saved = json.loads(embedding_path.read_text())
         if {k: v for k, v in saved.items() if k not in ("device", "batch")} != provenance:
-            raise ValueError("Embedding provenance disagrees with this episode root or encoder")
+            raise ValueError("Embedding provenance disagrees with this episode root, encoder or grid; use a fresh output root")
+    for name in ("train", "probes", "konkle"):
+        cache_path = output / f"{name}_cache" / "emb.f16.npy"
+        if cache_path.exists():
+            cache = np.load(cache_path, mmap_mode="r")
+            if cache.ndim != 3 or cache.shape[1] != 1 + grid * grid:
+                raise ValueError(f"Existing {name} cache disagrees with the requested grid; use a fresh output root")
     frames = pd.read_parquet(episodes / "frames.parquet")
     sessions = pd.read_parquet(episodes / "sessions.parquet")
     frames = frames[frames.video_id.isin(sessions.loc[sessions.split == "train", "video_id"])]
@@ -112,7 +121,7 @@ def embed_episodes(episodes, output, device=None, batch=64):
             table_path = output / f"{name}_frames.parquet"
             table.to_parquet(table_path, index=False)
             argv = ["embed_regions", "--frames", str(table_path), "--out", str(output / f"{name}_cache"),
-                    "--grid", "4", "--batch", str(batch)]
+                    "--grid", str(grid), "--batch", str(batch)]
             with patch.object(sys, "argv", argv), \
                     patch.object(upstream.AutoModel, "from_pretrained", side_effect=_load_model), \
                     patch.object(upstream.AutoImageProcessor, "from_pretrained", side_effect=_load_processor), \
