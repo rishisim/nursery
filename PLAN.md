@@ -15,14 +15,14 @@ present in the recordings and explicitly record sensations that require new
 physical modeling or measurements. Active exploration remains deferred.
 
 The documents below follow the earlier study format: the idea, the experience
-or comparison, how it would work, and the output we want. They are design
-references, not frozen execution protocols or authorization to launch runs.
-Concrete features, data amounts, seeds, budgets and runtime limits remain to
-be settled before their respective experiments.
+or comparison, how it works, and the output we want. Step 1 now includes its
+frozen protocol and completed results. Steps 2–5 remain design references;
+their features, data amounts, seeds, budgets and runtime limits remain to be
+settled before their respective experiments.
 
 | Step | Document | Question and current status |
 |---|---|---|
-| 1 | [Visual baseline](docs/visual_baseline.md) | Integrate the preserved 16×16 code and compare at 630 clips with the recorded 4×4 result. Preparation is in progress; new measurements are pending. |
+| 1 | [Visual baseline](docs/visual_baseline.md) | Complete and audited: at 630 clips, recorded 4×4 video scored 60.12%, 16×16 scored 61.93%; paired gain +1.81 points over three seeds. |
 | 2 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
 | 3 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
 | 4 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
@@ -31,6 +31,11 @@ be settled before their respective experiments.
 Steps 1 and 2 meet in Step 3. Step 4 settles the learning recipe before Step 5.
 A weak intermediate result is a design signal for the build, not a standalone
 paper framing or an automatic instruction to launch more conditions.
+
+Step 1 supports retaining 16×16 as the visual reference. Its modest gain on the
+broader task is separate from the small four-noun diagnostic's roughly 92%
+accuracy. Step 2 remains design work; no body change or subsequent run has
+been started by the visual comparison.
 
 ## Decisions to keep consistent
 

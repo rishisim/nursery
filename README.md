@@ -13,8 +13,11 @@ Start with [PLAN.md](PLAN.md). The current sequence is
 [language acquisition curves](docs/language_acquisition_curves.md).
 [Past experiments](archive/language_learning/past_experiments.md) explains what
 we tried earlier; the completed cross-situational and acquisition studies are
-indexed in the [archive](archive/README.md#completed-study-worktrees). These
-design documents do not launch experiments or imply all new code is implemented.
+indexed in the [archive](archive/README.md#completed-study-worktrees).
+Steps 2–5 remain design references and do not imply their code is implemented.
+The matched Step 1 comparison is complete: at 630 clips, video accuracy rose
+from the recorded 60.12% with 4×4 tokens to 61.93% with 16×16 tokens across
+three paired seeds. See [the results and limits](docs/visual_baseline.md#completed-results--7-november-2026).
 
 ## File map
 

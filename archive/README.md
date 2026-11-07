@@ -112,6 +112,11 @@ Its original scientific execution revision was `08ebb82c`; the November
 the new work is implemented rather than rebuilding it or assuming it is
 already merged into `research/embodied`.
 
+The subsequent [Step 1 comparison](../docs/visual_baseline.md) integrated that
+code into `research/embodied` at `6c868e23` and completed three new video-only
+runs at 630 clips on 7 November. Its new caches and runs are separate from
+these preserved historical results.
+
 Before/after SHA-256 inventories, symlink targets and Git identities are kept
 locally in ignored `outputs/legacy/worktree_records/completed_studies.json`.
 The archive move preserves 6,002 filesystem entries and 750,133,930 bytes of
