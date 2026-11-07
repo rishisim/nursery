@@ -24,10 +24,14 @@ def _video_class():
 
         def pair_scores(self, v, t, n, ctx=None):
             R, T = self.enc_regions(v), self.enc_text(t, n)
+            return R, T, self.score_encoded(R, T, ctx)
+
+        def score_encoded(self, R, T, ctx=None):
+            """Unscaled experience–language scores shared by training and evaluation."""
             similarities = torch.einsum("brd,md->brm", R, T)
             uniform = torch.full(similarities.shape[:2], -np.log(similarities.shape[1]),
                                  device=similarities.device, dtype=similarities.dtype)
-            return R, T, soft_pool(similarities, uniform, self.tau_p)
+            return soft_pool(similarities, uniform, self.tau_p)
 
         def losses(self, v, t, n, w, ctx=None, weights=None, target=None, temp=2.0):
             _, _, scores = self.pair_scores(v, t, n)

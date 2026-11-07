@@ -22,7 +22,7 @@ be settled before their respective experiments.
 
 | Step | Document | Question and current status |
 |---|---|---|
-| 1 | [Visual baseline](docs/visual_baseline.md) | Use 16×16 vision and retain recorded 4×4 results. Code support is preserved on the acquisition branch; new main-task measurements are pending. |
+| 1 | [Visual baseline](docs/visual_baseline.md) | Integrate the preserved 16×16 code and compare at 630 clips with the recorded 4×4 result. Preparation is in progress; new measurements are pending. |
 | 2 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
 | 3 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
 | 4 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
@@ -64,9 +64,10 @@ full local worktrees, runs and compatibility paths.
 
 The 16×16 implementation is commit
 [`edb6b1a4`](https://github.com/rishisim/nursery/commit/edb6b1a47474bc08cd72ebc795e782b7eed0675a)
-on `research/acquisition-curves`. It passed 83 software checks, not a new
-scientific experiment. It is preserved for reuse and has not been merged into
-this `research/embodied` checkout by the documentation/archive work.
+on `research/acquisition-curves`. That implementation and its acquisition
+runner are now integrated into this checkout for Step 1. Its original 83
+software checks were not a scientific experiment; the new comparison has its
+own protocol and retained output root.
 
 - Keep `outputs/renders/clean_856/`, saved speech/features and past run roots in
   place. They are retained inputs/evidence, not an active experiment queue.

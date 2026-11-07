@@ -19,7 +19,8 @@ pytestmark = pytest.mark.usefixtures("offline")
 
 
 @pytest.mark.parametrize("available,mps,device", [(False, False, None), (False, True, None), (True, True, None), (True, True, "cpu"), (False, False, "cuda:0")])
-def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch, available, mps, device):
+@pytest.mark.parametrize("grid", [4, 16])
+def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch, available, mps, device, grid):
     import torch
 
     root, run = episodes
@@ -61,7 +62,7 @@ def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch, av
             return self
 
         def __call__(self, batch):
-            tokens = torch.arange(65).reshape(1, 65, 1).expand(batch, 65, 8).float()
+            tokens = torch.arange(257).reshape(1, 257, 1).expand(batch, 257, 8).float()
             return type("Result", (), {"last_hidden_state": tokens})()
 
     monkeypatch.setattr(module, "AutoImageProcessor", Processor)
@@ -78,28 +79,87 @@ def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch, av
             Image.new("RGB", (8, 8), (10, 20, 30)).save(path)
             photos.append({"video_id": f"konkle/{category}", "frame_idx": index, "category": category, "path": str(path)})
     monkeypatch.setattr(embed_module, "konkle_frames", lambda config: pd.DataFrame(photos))
-    embed_episodes(root, run, device=device, batch=31)
+    embed_episodes(root, run, device=device, batch=31, grid=grid)
     assert max(batches) == 31
     assert "path" not in pd.read_parquet(run / "konkle_frames.parquet").columns
     for name, count in (("train", 240), ("probes", 32), ("konkle", 8)):
         emb = np.load(run / f"{name}_cache" / "emb.f16.npy")
         index = pd.read_parquet(run / f"{name}_cache" / "index.parquet")
-        assert emb.shape == (count, 17, 8) and emb.dtype == np.float16
+        assert emb.shape == (count, 1 + grid * grid, 8) and emb.dtype == np.float16
         assert set(index.columns) == {"video_id", "frame_idx", "row"}
-        expected = np.r_[0, np.array([[1 + 16 * y + 2 * x + 4.5 for x in range(4)] for y in range(4)]).ravel()]
+        patches = np.arange(1, 257).reshape(grid, 16 // grid, grid, 16 // grid).mean((1, 3))
+        expected = np.r_[0, patches.ravel()]
         np.testing.assert_array_equal(emb[0, :, 0], expected)
     assert requested == ["facebook/dinov2-base"] * 6
     assert set(pd.read_parquet(run / "train_frames.parquet").video_id) == {"v0", "v1"}
-    # Resume uses upstream's own cache logic and performs no additional model loads.
-    embed_episodes(root, run, device="cpu")
+    # Complete caches resume without loading the array into RAM or another model.
+    embed_episodes(root, run, device="cpu", grid=grid)
     assert len(requested) == 6
     assert json.loads((run / "embedding.json").read_text())["device"] == "cpu"
     assert json.loads((run / "embedding.json").read_text())["batch"] == 64
+    assert json.loads((run / "embedding.json").read_text())["grid"] == grid
+    before = (run / "embedding.json").read_bytes()
+    with pytest.raises(ValueError, match="provenance"):
+        embed_episodes(root, run, grid=4 if grid == 16 else 16)
+    assert (run / "embedding.json").read_bytes() == before
     provenance = json.loads((run / "embedding.json").read_text())
     provenance["episodes"] = "other"
     (run / "embedding.json").write_text(json.dumps(provenance))
     with pytest.raises(ValueError, match="provenance"):
+        embed_episodes(root, run, grid=grid)
+
+
+@pytest.mark.parametrize("missing_row", [False, True])
+def test_bounded_embedding_preserves_frame_order_and_rejects_missing_rows(tmp_path, missing_row):
+    import sys
+    from types import SimpleNamespace
+    from nursery.learner.embed import _encode_bounded
+
+    table = pd.DataFrame({"video_id": ["clip"] * 11, "frame_idx": np.arange(11) * 3})
+    cache = tmp_path / "cache"
+    calls = []
+
+    def encode():
+        args = sys.argv
+        shard = int(args[args.index("--shard") + 1])
+        count = int(args[args.index("--nshards") + 1])
+        rows = table.iloc[shard::count].reset_index(drop=True).copy()
+        calls.append(len(rows))
+        if missing_row and shard == 1:
+            rows = rows.iloc[:-1].copy()
+        out = Path(args[args.index("--out") + 1])
+        out.mkdir(parents=True)
+        np.save(out / "emb.f16.npy", rows.frame_idx.to_numpy(dtype=np.float16)[:, None, None])
+        rows["row"] = np.arange(len(rows))
+        rows.to_parquet(out / "index.parquet")
+
+    upstream = SimpleNamespace(main=encode)
+    args = ["embed_regions", "--out", str(cache)]
+    if missing_row:
+        with pytest.raises(AssertionError):
+            _encode_bounded(upstream, args, table, cache, shard_rows=4)
+        assert not (cache / "index.parquet").exists()
+        return
+    _encode_bounded(upstream, args, table, cache, shard_rows=4)
+    assert calls == [4, 4, 3]
+    values = np.load(cache / "emb.f16.npy", mmap_mode="r")
+    np.testing.assert_array_equal(values[:, 0, 0], table.frame_idx)
+    pd.testing.assert_frame_equal(pd.read_parquet(cache / "index.parquet")[list(table)], table)
+    assert not (cache / ".embedding_shards").exists()
+    _encode_bounded(upstream, args, table, cache, shard_rows=4)
+    assert calls == [4, 4, 3]
+
+
+def test_embedding_refuses_old_cache_even_without_provenance(episodes):
+    root, run = episodes
+    cache = run / "train_cache"
+    cache.mkdir(parents=True)
+    path = cache / "emb.f16.npy"
+    np.save(path, np.ones((1, 17, 8), np.float16))
+    before = path.read_bytes()
+    with pytest.raises(ValueError, match="cache disagrees"):
         embed_episodes(root, run)
+    assert path.read_bytes() == before and not (run / "embedding.json").exists()
 
 
 def _scoring_episodes(root):
@@ -122,7 +182,7 @@ def _scoring_episodes(root):
     pd.concat([*metadata, sessions[~sessions.video_id.isin(["v0", "v1"])]], ignore_index=True).to_parquet(root / "sessions.parquet", index=False)
 
 
-def _fake_caches(root, run):
+def _fake_caches(root, run, num_regions=17):
     rng = np.random.default_rng(12)
     frames = pd.read_parquet(root / "frames.parquet")
     frames = frames[frames.room == "train_room"].copy()
@@ -134,7 +194,7 @@ def _fake_caches(root, run):
         index = table[["video_id", "frame_idx"]].copy()
         index["row"] = np.arange(len(index))
         index.to_parquet(cache / "index.parquet", index=False)
-        np.save(cache / "emb.f16.npy", rng.normal(size=(len(index), 17, 8)).astype(np.float16))
+        np.save(cache / "emb.f16.npy", rng.normal(size=(len(index), num_regions, 8)).astype(np.float16))
 
 
 def test_cpu_train_cli_one_epoch(episodes, upstream):

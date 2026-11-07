@@ -61,9 +61,9 @@ archive/
 The additive learner extends `video_only.py`; it does not carry a second copy
 of the visual implementation. Both use the pinned
 [vlm-headcam](https://github.com/mcfrank/vlm-headcam) upstream implementation.
-The implemented joint interaction and 16×16 support are preserved on the
-archived study branches; see [source and worktree locations](archive/README.md#completed-study-worktrees).
-They have not been merged into this checkout by the documentation/archive work.
+The preserved acquisition runner, joint interaction and 16×16 support are
+integrated into this checkout; see [source and worktree locations](archive/README.md#completed-study-worktrees).
+Step 1 selects only video-only training at the full-data point.
 The archived width-128 joint pilot is a different implementation; `--arch joint`
 is retained only for compatibility. New representation comparisons start with
 additive fusion.
@@ -92,9 +92,9 @@ the examples above use the base contact/finger/arm streams. Historical defaults
 and diagnostic flags are documented in [the learner reference](docs/learner.md).
 No run is launched by this documentation.
 
-This checkout's embedding command still has its historical 4×4 implementation.
-Before preparing the new studies, reuse the preserved 16×16 change identified
-in [Step 1](docs/visual_baseline.md#implementation-and-retained-inputs).
+Embedding defaults to 16×16; `--grid 4` retains the historical option. Use a
+fresh output root when changing grids. The exact Step 1 commands and frozen
+comparison are in [the visual baseline](docs/visual_baseline.md#execution-protocol).
 
 `scripts/render.sh <output>` renders sessions; `scripts/pipeline.sh` chains
 speech, embedding and training. `scripts/train_seeds.sh` runs several seeds;

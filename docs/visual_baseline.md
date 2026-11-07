@@ -1,8 +1,8 @@
 # Step 1: retain visual detail and keep the historical comparison
 
-Design reference for [PLAN.md](../PLAN.md). Full 16×16 token support has been
-implemented and software-tested on the preserved acquisition branch. No new
-acquisition experiment is launched by this document.
+Step 1 of [PLAN.md](../PLAN.md), authorized for execution on 6 November 2026.
+The preserved 16×16 implementation is integrated. Feature preparation is in
+progress; the three new scientific runs have not yet completed.
 
 ## The idea
 
@@ -61,11 +61,12 @@ synthetic software checks establish code behavior, not learning performance.
 The full branch/worktree is preserved in the
 [worktree archive](../archive/README.md#completed-study-worktrees).
 
-When implementation resumes, reuse that change in the one working learner.
-Prepare new train and picture-evaluation caches under a fresh ignored output
-root; preserve old caches and provenance. The token count rises from 17 to 257
-per frame, so measure storage, memory and timing before choosing a budget.
-Do not silently shrink data or context to fit.
+That implementation and its original acquisition runner are reused in the
+working learner. New train and picture-evaluation caches live under
+`outputs/features/visual_grid16/`; old caches and provenance remain unchanged.
+The token count rises from 17 to 257 per frame. The complete new arrays need
+about 38.6 GiB; upstream encoding is sharded and merged with a disk-backed
+array to fit the 32-GiB machine without changing crops or model arithmetic.
 
 ## The output we want
 
@@ -77,9 +78,46 @@ Do not silently shrink data or context to fit.
 Identify each row's source and whether the difference is matched. Keep the
 four-noun result separate. This baseline feeds Steps 3 and 5.
 
-## Before execution
+## Execution protocol
 
-Confirm the archived change is integrated, compatible caches cover the chosen
-data and panels, and fixed data/seed/budget rules are recorded. New main-task
-16×16 scores and runtime remain unmeasured. This document does not queue a
-rendering, training or cache-generation job.
+Use the 100% point from the original acquisition study: 630 independent clips,
+18,613 utterances and 63,153 replay seconds. Train only video-only models, with
+paired seeds 0, 1 and 2, each fresh for 60 epochs. Match batch 256, AdamW learning
+rate 0.0003, weight decay 0.1, soft pooling temperature 0.1 and the five-frame
+window. Use the same speech, clip split, vocabulary, ordered examples, candidates,
+unknown-word rule and earliest development-maximum checkpoint selection.
+
+Reuse the original local DINO snapshot
+`f9e44c814b77203eaa57a6bdbbd535f21ede1415` offline, with its resize and centre crop.
+Verify CLS agreement and that pooling new patch tokens back to 4×4 reproduces
+the saved cache within floating-point/float16 rounding. Verify prepared subsets,
+panels and cache row mappings against the archived run before training. The
+intervention retains more tokens in the same readout; the relative contribution
+of CLS and patch tokens to soft pooling changes with token count.
+
+Use local MPS and the original timing gate: one development-only epoch, discard
+its weights, and project all three 60-epoch models with 25% headroom. The
+24-hour cap begins at the timing gate; feature preparation is recorded
+separately. Preserve partial work if the cap is exceeded. No paid compute,
+body training, pretraining or other data amounts are included.
+
+The new ignored scientific root is `outputs/runs/visual_baseline/`; preparation
+and cache validation records live in `outputs/validation/visual_baseline/`.
+The feature root retains exact copies of the original speech/provenance inputs.
+Commands after feature creation are:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python -m nursery.learner acquisition prepare \
+  --root outputs/runs/visual_baseline --inputs outputs/features/visual_grid16 \
+  --episodes outputs/renders/clean_856 --fractions 1.0 --conditions video_only
+PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python -m nursery.learner acquisition timing \
+  --root outputs/runs/visual_baseline
+PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python -m nursery.learner acquisition run \
+  --root outputs/runs/visual_baseline
+```
+
+Report all seed scores, means and sample standard deviations, and paired
+16×16-minus-recorded-4×4 differences. New-clip accuracy is primary; s8 and
+picture/Konkle transfer are separate supporting results. This reused-panel,
+fixed-data comparison does not establish an acquisition ceiling or replace
+the later curves.

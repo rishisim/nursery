@@ -129,7 +129,7 @@ def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_r
 
     with torch.random.fork_rng(devices=[]):  # building the teacher must not move the student's RNG stream
         dims = {k: v.shape[-1] for k, v in store["groups"].items()}
-        model = AdditiveMIL(len(vocab), info["emb_dim"], tau_p, dims, len(store["categories"]))
+        model = AdditiveMIL(len(vocab), info["emb_dim"], tau_p, dims, len(store["categories"]), info.get("num_regions", 17))
     model.load_state_dict(torch.load(path / "model.pt", map_location="cpu", weights_only=True))
     model = model.float().to(device).eval()
     for p in model.parameters():
@@ -226,8 +226,11 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     clip_cfg = learner["clip_split"]
     caches, lut = upstream.load_multi([run / "train_cache"])
     emb_dim = caches[0].shape[-1]
-    if caches[0].ndim != 3 or caches[0].shape[1] != 17:
-        raise ValueError("Expected CLS + 4x4 region caches")
+    if caches[0].ndim != 3 or caches[0].shape[1] not in (17, 257):
+        raise ValueError("Expected CLS + 4x4 or 16x16 region caches")
+    num_regions = int(caches[0].shape[1])
+    if joint and num_regions != 17:
+        raise ValueError("The archived --arch joint pilot requires historical 4x4 caches; use acquisition for the current joint interaction")
     # FramePairs drops vocab-empty rows, so filter first to keep w aligned with its indices.
     kept = manifest.text.map(lambda text: bool(upstream.encode(text, vocab)))
     manifest = manifest[kept].reset_index(drop=True)
@@ -291,7 +294,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         data = BodyData(train_store, ps, pt, win, bags, episode_ids, cache, row_of, device, learner["window_s"],
                         learner["mask_prob"] if weights["mask"] > 0 else 0.0, dropout)
         oracle_classes = len(real["categories"]) if body == "oracle" else 0
-        model = JointMIL(len(vocab), emb_dim, tau_p, data.dims) if joint else AdditiveMIL(len(vocab), emb_dim, tau_p, data.dims, oracle_classes)
+        model = JointMIL(len(vocab), emb_dim, tau_p, data.dims) if joint else AdditiveMIL(len(vocab), emb_dim, tau_p, data.dims, oracle_classes, num_regions)
         body_info = {"mode": body, "dropout": dropout, "episodes": episodes, "weights": weights, "shuffle": shuffle_info,
                      "physical": physical, "physical_shuffle": physical_info if physical_shuffle else False,
                      "n_episodes": int(len(np.unique(episode_ids[episode_ids >= 0]))),
@@ -307,7 +310,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     opt = torch.optim.AdamW(model.parameters(), lr=settings["lr"], weight_decay=0.1)
     probes = pd.read_parquet(run / "probes_frames.parquet")
     probe_cache, probe_lut = region.load_region_cache(run / "probes_cache")
-    if probe_cache.shape[1:] != (17, emb_dim):
+    if probe_cache.shape[1:] != (num_regions, emb_dim):
         raise ValueError("Probe and training cache dimensions disagree")
     if any(region.frame_key(r.video_id, r.frame_idx) not in probe_lut for r in probes.itertuples()):
         raise ValueError("Probe cache does not cover all probes")
@@ -315,6 +318,8 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     konkle = None
     if (run / "konkle_frames.parquet").exists():
         konkle_cache, konkle_lut = region.load_region_cache(run / "konkle_cache")
+        if konkle_cache.shape[1:] != (num_regions, emb_dim):
+            raise ValueError("Konkle and training cache dimensions disagree")
         konkle = (konkle_cache, konkle_lut, pd.read_parquet(run / "konkle_frames.parquet"))
     for split, table in tables.items():
         counts = table.groupby("category").size()
@@ -462,7 +467,7 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
     metrics = {
         "run": output.name, "seed": seed, "manifest": str(manifest_path),
         "caches": [str(run / "train_cache")], "eval_frames": str(run / "probes_frames.parquet"),
-        "window": settings["window"], "cls_only": False, "center": False, "emb_dim": int(emb_dim),
+        "window": settings["window"], "cls_only": False, "center": False, "emb_dim": int(emb_dim), "num_regions": num_regions,
         "epochs": epochs, "n_pairs": len(ds), "vocab": len(vocab), "selection": "dev",
         "selected_epoch": best_ep, "reported_test_acc": round(100 * history[best_ep]["acc"], 3),
         "best_test_acc": round(100 * max(h["acc"] for h in history), 3),

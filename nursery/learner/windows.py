@@ -3,7 +3,6 @@
 import numpy as np
 import torch
 
-from .losses import REGIONS
 
 
 class BodyData:
@@ -65,7 +64,7 @@ class BodyData:
             rows = self.row_of[s.cpu().numpy()[pick.numpy()][:, None], np.maximum(frames, 0)]
             images = torch.from_numpy(self.cache[rows.reshape(-1)].astype(np.float32)).to(self.device)
             ctx["bag_sel"] = pick.to(self.device)
-            ctx["bag_images"] = images.view(len(pick), frames.shape[1], REGIONS, -1)
+            ctx["bag_images"] = images.view(len(pick), frames.shape[1], self.cache.shape[1], -1)
             ctx["bag_valid"] = torch.from_numpy(frames >= 0).to(self.device)
             ctx["bag_episode"] = torch.as_tensor(self.bag_episode[s.cpu().numpy()[pick.numpy()], t.cpu().numpy()[pick.numpy()]]).to(self.device)
             # two distinct frames of each bag for the consistency loss
