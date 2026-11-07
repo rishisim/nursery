@@ -5,11 +5,16 @@ learning than video alone, as independent training experience increases.
 The simulator supplies egocentric video and body signals; caregiver speech
 provides intentionally uncertain language supervision.
 
-Start with [PLAN.md](PLAN.md). The two proposed studies are
-[acquisition curves](docs/acquisition_curves.md) and the smaller
-[cross-situational comparison](docs/cross_situational_learning.md).
+Start with [PLAN.md](PLAN.md). The current sequence is
+[16×16 vision](docs/visual_baseline.md),
+[richer body input](docs/body_representation.md),
+[a controlled representation comparison](docs/body_representation_comparison.md),
+[the body training recipe](docs/body_training_recipe.md), and
+[language acquisition curves](docs/language_acquisition_curves.md).
 [Past experiments](archive/language_learning/past_experiments.md) explains what
-we already tried. These plans do not imply that their runners are implemented.
+we tried earlier; the completed cross-situational and acquisition studies are
+indexed in the [archive](archive/README.md#completed-study-worktrees). These
+design documents do not launch experiments or imply all new code is implemented.
 
 ## File map
 
@@ -37,8 +42,11 @@ configs/                        Room-generation configuration
 scripts/                        Render/pipeline/seed launchers and run summaries
 tests/                          Current learner, speech, physical and simulator tests
 docs/
-  acquisition_curves.md          Main proposed study
-  cross_situational_learning.md  Small proposed study: video vs additive, table output
+  visual_baseline.md             Step 1: 16×16 vision and recorded 4×4 reference
+  body_representation.md         Step 2: recoverable sensory detail and missing signals
+  body_representation_comparison.md  Step 3: current versus richer body, additive
+  body_training_recipe.md        Step 4: decide wordless pretraining after representation
+  language_acquisition_curves.md Step 5: main video versus video + body curves
   learner.md                    Current implementation and scoring reference
   speech_coupling.md             Speech-generation evidence and assumptions
 archive/
@@ -53,9 +61,12 @@ archive/
 The additive learner extends `video_only.py`; it does not carry a second copy
 of the visual implementation. Both use the pinned
 [vlm-headcam](https://github.com/mcfrank/vlm-headcam) upstream implementation.
-The revised joint interaction design is currently a plan in
-`docs/acquisition_curves.md`. The archived width-128 joint pilot is a different,
-completed implementation; `--arch joint` is retained only for compatibility.
+The implemented joint interaction and 16×16 support are preserved on the
+archived study branches; see [source and worktree locations](archive/README.md#completed-study-worktrees).
+They have not been merged into this checkout by the documentation/archive work.
+The archived width-128 joint pilot is a different implementation; `--arch joint`
+is retained only for compatibility. New representation comparisons start with
+additive fusion.
 
 ## Existing entry points
 
@@ -80,6 +91,10 @@ budgets still come from the study plans.
 the examples above use the base contact/finger/arm streams. Historical defaults
 and diagnostic flags are documented in [the learner reference](docs/learner.md).
 No run is launched by this documentation.
+
+This checkout's embedding command still has its historical 4×4 implementation.
+Before preparing the new studies, reuse the preserved 16×16 change identified
+in [Step 1](docs/visual_baseline.md#implementation-and-retained-inputs).
 
 `scripts/render.sh <output>` renders sessions; `scripts/pipeline.sh` chains
 speech, embedding and training. `scripts/train_seeds.sh` runs several seeds;
@@ -119,12 +134,14 @@ outputs/
     …                       Earlier archives remain in place
 ```
 
-`runs/clean_body/`, `runs/clean_video_only/`, `runs/clean_perfect_naming/` and
-`runs/step1_matched/` contain both saved inputs and experiment records; their
+`outputs/runs/clean_body/`, `outputs/runs/clean_video_only/`,
+`outputs/runs/clean_perfect_naming/` and `outputs/runs/step1_matched/`
+contain both saved inputs and experiment records; their
 presence does not queue new runs. For new studies, use descriptive roots such
-as `outputs/runs/acquisition_curves/` and `outputs/runs/cross_situational/`, with
-condition/seed names such as `video_only_s0` and `additive_s0`. These new study
-directories are naming examples, not created or launched experiments.
+as `outputs/runs/body_representation_comparison/`, with explicit condition/seed
+names. This is a naming example, not a created run. Completed study worktrees,
+including their original run roots, live under `outputs/legacy/worktrees/` with
+compatibility links at their previous locations.
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python -m pytest -q -p no:cacheprovider tests/test_learner.py tests/test_speech.py tests/test_physical.py

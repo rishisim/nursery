@@ -27,6 +27,8 @@ original locations.
 | EmbodiedGen → HOIDiNi → InterMimic | Kinematic mug lifting and format conversion worked; floor validity and physical hand contact failed. The modular architecture proposal was a proposal, not a completed solution. | [Commands, runs and measurements](motion_pipeline.md); [September report](NURSERY_REPORT.md). |
 | Contact-cue weighting: 90-run grid, then 100-run confirmation | The grid was inconclusive. Confirmation beat shuffled/shifted cues but did not establish an improvement over the no-cue learner. This tested weighting examples, not rich bodily inputs. | [Plain-language record and exact aggregates](language_learning/cue_experiments.md). |
 | Hand-location gates, then actual body-input learners | Steps 4.1–4.14 found no confirmed noun gain, including the corrected matched comparison. Step 4.15 showed a scaffolded heavy/light capability; Step 4.16 sensory-target pretraining did not pass its picture-only weak-noun transfer gate. The broader acquisition question remains open. | [Past experiments](language_learning/past_experiments.md), [complete protocol/result record](language_learning/experiments.md), [step 4.5 signal audit](language_learning/body_signal_audit.md), [historical reassessment](language_learning/body_input_review.md). |
+| Cross-situational nouns and requested joint follow-up | The original six-run comparison and the matched joint follow-up completed. Body did not beat video on the noun task; the load-only heavy/light benefit survived the joint follow-up. | [Complete protocol and results](language_learning/cross_situational_learning.md). |
+| Original acquisition curves | All 45 models completed. At 630 clips, video/additive/joint scored 60.1/54.4/54.3%; all curves were still rising. | [Complete protocol and results](language_learning/acquisition_curves.md). |
 
 The September report and older phase documents contain historical schedules,
 recommendations and environment details. They are preserved evidence, not the
@@ -67,6 +69,77 @@ The source cleanup on 27 October 2026 preserved artifact paths, separated
 the current video-only and additive models, and moved inactive code out of
 `nursery/`. The simulator now uses the common
 output guard directly, so it no longer depends on the archived motion package.
+
+## Completed-study worktrees
+
+On 6 November 2026, the completed study documents were archived from their
+authoritative worktree revisions, including results missing from the older
+plans in the main checkout. The current five-step direction is in
+[PLAN.md](../PLAN.md). The original plans remain in Git history at `5a7f7c96`.
+
+The full two study worktrees were moved, including ignored runs, checkpoints,
+environments and any other existing files. They remain registered with Git
+and locked against accidental pruning/moving. Their branches and commits were
+retained and matched the corresponding GitHub heads before archiving.
+
+| Study | Branch and retained HEAD | Canonical local worktree, relative to the main checkout |
+|---|---|---|
+| Acquisition curves | `research/acquisition-curves`, `edb6b1a47474bc08cd72ebc795e782b7eed0675a` | `outputs/legacy/worktrees/acquisition_curves/` |
+| Cross-situational and joint/property follow-ups | `research/cross-situational`, `d834c254ce78c3208d5fdf6a3d5aa21f704137d1` | `outputs/legacy/worktrees/cross_situational/` |
+
+Compatibility symlinks retain the former paths:
+
+- `/Users/rishisim/.codex/worktrees/acquisition-curves/nursery`
+- `/Users/rishisim/.codex/worktrees/cross-situational-study/nursery`
+
+These are aliases to the archived directories, not second implementations.
+Existing absolute paths in reports and environments continue to resolve.
+Frozen historical manifests, commands and source hashes were not rewritten;
+archiving is not a claim that their old execution-freeze checks accept a new
+revision or canonical worktree path. Reproduction should use the recorded
+execution revision and preserve the saved run.
+
+Within the acquisition worktree, retain `outputs/runs/acquisition_curves/`,
+including all 45 runs, 90 selected checkpoints, summaries and the final audit.
+The cross-situational worktree retains `outputs/runs/cross_situational/`,
+`cross_situational_joint/`, `heavy_light_joint/` and their timing/execution records.
+Shared input datasets and dependencies outside these worktrees stay in place.
+
+The acquisition branch also retains the software-tested 16×16 support in
+[`edb6b1a4`](https://github.com/rishisim/nursery/commit/edb6b1a47474bc08cd72ebc795e782b7eed0675a).
+Its original scientific execution revision was `08ebb82c`; the November
+16×16 code change did not rerun those October curves. Reuse the newer code when
+the new work is implemented rather than rebuilding it or assuming it is
+already merged into `research/embodied`.
+
+Before/after SHA-256 inventories, symlink targets and Git identities are kept
+locally in ignored `outputs/legacy/worktree_records/completed_studies.json`.
+The archive move preserves 6,002 filesystem entries and 750,133,930 bytes of
+regular-file content, excluding the top-level Git administrative pointer.
+Shared symlink targets are retained in place rather than copied. Local runs
+and environments are not uploaded by the documentation commit; GitHub retains
+the code and curated records. Other worktrees were not moved or removed.
+
+### Body-diagnosis evidence
+
+The separate worktree `/Users/rishisim/Documents/research/nursery-body-diagnosis`
+remains in place. Its existing untracked `experiments/body_diagnosis/` contains
+the overview, source snapshots, patches and compact results; ignored full runs
+are under its `outputs/runs/body_diagnosis/`. This archival action does not
+commit or delete those pre-existing files.
+
+The new documents cite `vision/report.md` for the ten-seed 4×4/16×16 diagnostic
+and `bodyfirst/report.md` plus `bodyfirst/results/protocol_notes.md` for masked
+pretraining and its experience/uncertainty limits, all relative to that local
+`experiments/body_diagnosis/` root. These are local evidence pointers, not a
+claim that the diagnosis is available from a fresh GitHub clone.
+
+Interpret broad language in the original diagnosis cautiously: its classifier
+probes concern the information extractable from the recorded representation,
+not all possible touch. Its identity-oracle gain is specific to that panel and
+fusion rule, not a universal bound. The current
+[body representation document](../docs/body_representation.md) records the
+distinction between recoverable detail and genuinely new sensory information.
 
 ## Local artifact relocation
 
