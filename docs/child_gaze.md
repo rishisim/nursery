@@ -432,3 +432,64 @@ validation, based on observed throughput, with no additional rental cost.
 Only after exact 82,393-key coverage and the final cache audit pass is Phase A
 complete and the Phase B development comparison ready to proceed. No learner
 was selected or trained during this execution.
+
+### Local resumption attempt — 8 November 2026
+
+The Mac was connected to AC power, but the new restricted execution session
+could not run the saved local pipeline: PyTorch reported MPS built but
+unavailable, and all six Blender scene-render attempts exited `-11` before
+writing images. `blender --version` succeeded; the native scene startup
+failed with an `Arch_ValidateAssumptions` warning. This is an execution
+blocker; no scientific setting or renderer/encoder source was changed.
+
+The six failed claims produced only empty task-created directories. After
+independent inspection those directories were removed and the claims reset
+to pending. The original checkpoint remains 501 complete sessions, 48,137
+images and 46,863 encoded rows in 28 batches; 355 sessions / 34,256 images
+remain pending, with zero claimed or failed sessions. Stop markers were
+restored and all task processes exited. No rental was launched. Resume
+logs and reset evidence are in `hybrid/resume_blocker.json` under the ignored
+run root; preservation evidence is under `hybrid_audit/`.
+
+Phase A remains incomplete. Its prior approximately 40-minute local ETA
+applies only after restoring native Blender and MPS access. Phase B was
+paused before pilot, panel preparation or protocol freezing; provisional
+source edits were restored. The Phase B timing gate and qualified Phase C
+rental plan are still pending, rather than passed or frozen.
+
+
+### Completed Phase A local resume — 8 November 2026
+
+**Phase A is complete.** Native Blender and MPS access worked in this session.
+The same atomic done-manifest resumed only the 355 pending sessions, adding
+34,256 close-ups without re-rendering the original 501 complete sessions.
+The encoder reused the original 28 batches and added 35,530 missing rows with
+frozen DINO snapshot `f9e44c814b77203eaa57a6bdbbd535f21ede1415`.
+All 856 sessions now supply exactly 82,393 required images and feature rows;
+559 null-gaze envelope keys remain masked. No rental or Juno was launched.
+Despite the requested power connection, macOS continued to report battery
+power; the local supervisor checked power and would drain and stop at 15%.
+
+The 49 complete feature shards were losslessly merged into
+`outputs/features/child_gaze/hybrid/full/closeup_cache/`, preserving full
+float16 `[82,393, 257, 768]` features. Rendering finished in approximately
+31 minutes after resumption; the merge took 86.92 seconds. Independent final
+receipt and feature audits took 29.99 and 168.42 seconds respectively.
+
+The independent audit verified every image hash/dimension, exact required-key
+coverage, all shard and merged cache hashes, finite feature values, every
+merged row against its source, seven original input hashes and twelve frozen
+world/source hashes. Three fresh MPS encodings matched saved float16 values
+bit for bit. The original 501 receipts and frame tables are unchanged, and
+all original 28 cache hashes, ordered-image digests, row counts and recorded
+provenance match both earlier partial audits. Three new actual close-ups
+passed visual inspection. The focused source suite passed 74 tests, including
+the separately prepared learner/protocol checks.
+
+Retained evidence is `outputs/validation/child_gaze/hybrid_audit/`:
+`final_receipts.json`, `final_features.json`, `final_preservation.json` and
+`final_visual.json`; the merge marker is `hybrid/features_complete.json`
+under the run root. Earlier blocked attempts and battery checkpoints remain
+historical evidence. All outputs are ignored; original inputs and runs remain
+preserved. The completed sharp-view cache now permits the Phase B development
+comparison. It does not establish a language-acquisition benefit.

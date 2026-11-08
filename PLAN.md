@@ -20,14 +20,14 @@ physical modeling or measurements. Active exploration remains deferred.
 The documents below follow the earlier study format: the idea, the experience
 or comparison, how it works, and the output we want. Step 1 now includes its
 frozen protocol and completed results. Step 2's world generation is complete,
-and 48,137 production close-ups are saved. The hybrid run stopped safely at
-3% Mac battery; the remaining images/cache and learner comparison are pending.
+and all 82,393 production close-ups and frozen-DINO rows are independently
+validated. Phase B learner selection, protocol freezing and timing are next.
 Steps 3–6 remain design references, with settings still to be settled.
 
 | Step | Document | Question and current status |
 |---|---|---|
 | 1 | [Visual baseline](docs/visual_baseline.md) | Complete and audited: at 630 clips, recorded 4×4 video scored 60.12%, 16×16 scored 61.93%; paired gain +1.81 points over three seeds. |
-| 2 | [Child gaze](docs/child_gaze.md) | Phase A partial: world complete; 48,137/82,393 close-ups and 46,863 DINO rows verified. Hybrid execution stopped at 3% Mac battery; rental destroyed, checkpoint safe. Finish images/cache on AC power before Phase B. |
+| 2 | [Child gaze](docs/child_gaze.md) | Phase A complete: all 82,393 close-ups and full-token frozen-DINO rows merged and independently audited; original checkpoint preserved. Phase B development-only selection and timing pending. |
 | 3 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
 | 4 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
 | 5 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
@@ -41,8 +41,8 @@ paper framing or an automatic instruction to launch more conditions.
 
 Step 1 supports retaining 16×16 as the visual reference. Its modest gain on the
 broader task is separate from the small four-noun diagnostic's roughly 92%
-accuracy. Step 2 world generation was separately authorized; its close-ups and
-scientific comparison remain pending. Step 3 remains design work.
+accuracy. Step 2 world generation and sharp-view encoding are complete; its
+scientific comparison remains pending. Step 3 remains design work.
 
 ## Decisions to keep consistent
 
