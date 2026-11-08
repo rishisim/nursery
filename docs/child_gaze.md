@@ -620,3 +620,88 @@ four-hour wall budget; queue availability and throughput are unverified.
 The next build step remains the development-only readout choice, then a
 properly frozen matched comparison. Neither the completed world nor these
 timing measurements establish a language-acquisition gain.
+
+### Approved GPU preflight and transfer stop — 8 November 2026
+
+The user approved the rental plan, including both full **60-epoch** development
+pilots (630 clips, seed 0) before selection, followed by the twelve matched
+runs. The limits remained **$20** and **four hours from rental launch to results
+back**. Neither epochs nor seeds were shortened. One Vast instance, `59765261`,
+provided eight RTX 4090s and 160 GiB storage at $4.311111/hour. It launched at
+19:17:33 UTC using execution checkout `87e719b0`; the original prepared study,
+local timing pilots and sensory inputs were preserved.
+
+The trimmed payload contained 106,741 regular files, including all 1,712 frozen
+provenance signals: 1,736,507,993 content bytes, packaged into eight archives
+totalling 1,927,782,400 bytes. Transfers resumed partial files, checked archive
+hashes, extracted each completed archive and removed it remotely. An unstable
+uplink and the host's initial 20-second SSH client timeout interrupted transfer;
+the timeout was corrected and partial bytes retained. Only two archives were
+fully verified/extracted before the budget stop.
+
+The exact DINO snapshot and its three file hashes passed. Before full encoding,
+nine predetermined original-cache rows—first, middle and last in each cache—
+were tested against unchanged thresholds: maximum absolute error ≤0.05,
+relative L2 error ≤0.001 and cosine ≥0.99999. The rental's automatic processor
+initially selected Torchvision, whereas the original Mac environment selects
+PIL because Torchvision is absent. That attempt failed and was retained.
+Explicitly selecting **PIL** restored the original preprocessing; all nine
+processed input tensors then matched the Mac byte-for-byte. This corrected
+the execution implementation without changing the rule or tolerances.
+
+| Preflight check | Verified result |
+|---|---:|
+| Corrected fixed-sample CUDA feature parity | 9 / 9 passed |
+| Worst absolute feature error | 0.0078125 |
+| Worst relative L2 error | 0.000059321 |
+| Minimum cosine | 0.99999999824 |
+| Concurrent full-batch synthetic kernel/VRAM checks | 8 / 8 passed |
+| Synthetic measured step time / peak allocated VRAM | 0.09–0.19 s / about 5.92 GiB |
+| Full development pilots / matched Phase C runs completed | 0 / 0 |
+
+Synthetic checks used the full batch, five-frame window, 257 tokens and both
+readouts, but saved no weights. They exclude real cache gathering and
+development evaluation, so they are **not measured scientific epoch times**
+and cannot authorize runs or select a readout. No full CUDA cache was encoded;
+its complete coverage/finite-value/merge audit and the real epoch gate remain
+pending. The rental environment records PyTorch 2.7.1/CUDA 12.6, Transformers
+5.19.0 and Pillow 12.3.0, alongside the full package/device snapshot.
+
+**Stopped at the wall-time projection gate.** At the stop-trigger observation,
+the latest 189.54-second transfer window achieved 84,364 bytes/s. The remaining
+904,041,776 archive bytes projected another 178.60 minutes. Added to 63.72
+minutes already elapsed, **upload alone projected 242.32 minutes**, exceeding
+the 240-minute limit before encoding, either pilot, the twelve runs or result
+return. Independent review confirmed the calculation. A subsequent partial
+rate recovery did not establish a qualified complete-job projection.
+
+All **42 preflight result files** returned and passed their recorded hashes
+at 20:25:14 UTC, **67.68 minutes after launch**. The rental was destroyed at
+20:25:37 UTC, **68.06 minutes after launch**; a live provider query confirmed
+zero remaining instances. The provider usage ledger records **$4.90** for this
+attempt ($4.848 GPU, $0.052 disk, bandwidth rounded to $0.00). Prior rental charges
+and earlier credit funding are separate. The task-created private SSH key was
+removed after teardown.
+
+The independent execution audit passed: 42 returned hashes, all nine corrected
+parity samples and their original failure record, eight synthetic workers,
+19 original prepared files and 71 source hashes, the time gate and teardown
+order. The unchanged-source focused suite had 49 passing tests. This is a
+**preflight/stop audit, not Phase D**. No scientific pilot, learner held-out
+scoring, readout selection, final protocol freeze or matrix run occurred. The
+required `runs_complete.json` records `complete: false` and zero of twelve.
+
+Evidence remains ignored under `outputs/runs/child_gaze/phase_c/`, including
+the payload manifest, processor/parity records, rejected attempt, synthetic
+checks, `budget_gate.json`, returned-file manifest, billing and destruction
+receipts. The independent record is
+`outputs/validation/child_gaze/phase_c_execution_audit.json`; `STATUS.md` gives
+the current blocked state. Original renders, speech, features, prepared study
+and local timing pilots remain preserved.
+
+For the next build step, use a faster uplink and a fresh qualified rental
+window to complete the original full development-only pilots, then select,
+freeze and commit before the twelve matched runs. Recheck actual transfer and
+epoch throughput; the earlier 21.03-Mbps network test did not describe this
+attempt's sustained transfer. Phase D waits for all twelve results. These
+checks establish execution compatibility, not a language-acquisition gain.
