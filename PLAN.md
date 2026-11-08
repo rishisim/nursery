@@ -19,14 +19,15 @@ physical modeling or measurements. Active exploration remains deferred.
 
 The documents below follow the earlier study format: the idea, the experience
 or comparison, how it works, and the output we want. Step 1 now includes its
-frozen protocol and completed results. Steps 2–6 remain design references;
-their features, data amounts, seeds, budgets and runtime limits remain to be
-settled before their respective experiments.
+frozen protocol and completed results. Step 2's world generation is complete,
+but production close-ups are blocked by the approved rental's transfer-time
+limit; its learner comparison remains pending. Steps 3–6 remain design
+references, with their experiment settings still to be settled.
 
 | Step | Document | Question and current status |
 |---|---|---|
 | 1 | [Visual baseline](docs/visual_baseline.md) | Complete and audited: at 630 clips, recorded 4×4 video scored 60.12%, 16×16 scored 61.93%; paired gain +1.81 points over three seeds. |
-| 2 | [Child gaze](docs/child_gaze.md) | Does simulated gaze, driving naming at real-life strength and given to the learner with a sharp close-up, beat video alone, including with gaze removed at test? Design only. |
+| 2 | [Child gaze](docs/child_gaze.md) | Phase A partial: 856-session geometry and gaze-driven speech generated; close-ups/cache blocked before rental launch by the 90-minute transfer gate ($0 spent). Learner comparison pending. |
 | 3 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
 | 4 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
 | 5 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
@@ -40,8 +41,8 @@ paper framing or an automatic instruction to launch more conditions.
 
 Step 1 supports retaining 16×16 as the visual reference. Its modest gain on the
 broader task is separate from the small four-noun diagnostic's roughly 92%
-accuracy. Steps 2 and 3 remain design work; no gaze or body change or subsequent run has
-been started by the visual comparison.
+accuracy. Step 2 world generation was separately authorized; its close-ups and
+scientific comparison remain pending. Step 3 remains design work.
 
 ## Decisions to keep consistent
 

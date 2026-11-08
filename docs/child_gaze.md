@@ -271,3 +271,80 @@ unchanged. The actual close-ups were visually inspected. An 11-image offline
 DINO smoke test produced finite `[11, 257, 768]` float16 features in 0.95 s;
 the first image exactly matched direct encoding from the pinned snapshot.
 These checks validate the implementation, not a language-learning benefit.
+
+### Phase A takeover — 8 November 2026
+
+**World generation is complete; production close-ups and their DINO cache are
+blocked before rental launch. Phase A is not complete.** All 856 sessions
+finished geometry export with two local workers in 6,314.50 seconds (105.24
+minutes). Only after the complete 102,720-frame table and all session receipts
+were saved was the old Phase A Codex process stopped, at 15:23:29 UTC. No
+production local close-up render was started.
+
+The geometry job started from implementation revision `0c6f9be5`. Its completion
+manifest and subsequent gaze/speech generation record `84ce80f1`, the then-current
+HEAD; the Phase A simulator, speech and encoder source is unchanged between
+those commits. The later learner implementation remains separate from this
+world validation. No learner was selected or trained here.
+
+| Full-world measurement | Result |
+|---|---:|
+| Geometry sessions / frames | 856 / 102,720 |
+| Valid object gaze / null gaze frames | 102,022 / 698 |
+| Held share among valid gaze frames | 33.29% |
+| Held gaze when a held object is available | 60.51% |
+| Observed object-bout mean / median / 95th percentile | 1.888 / 1 / 5 seconds |
+| Frames with diversity-limited switching | 4,377 |
+| Preserved utterances / named utterances | 34,140 / 8,489 |
+| Named held / unseen / visible non-held channels | 34.54% / 24.43% / 41.03% |
+| Gazed share of named visible non-held channel, source time | 55.64% |
+| Same share at the jittered aligned frame | 40.48% |
+| Physically held referent among names, source / aligned time | 21.82% / 20.76% |
+| Required close-up images / masked null-gaze keys | 82,393 / 559 |
+
+The 60% gaze preference is conditional on an available held object, not a
+prediction that most frames show held-object gaze. Realized bouts include
+clip cuts and disappearance; the 1-Hz timeline also limits their resolution.
+Speech meets its source-time 50–60% gaze gate and held/unseen tolerances while
+preserving timing jitter. The lower aligned gaze agreement is retained weak
+alignment, not repaired by moving utterances or gaze. Held-channel and
+instantaneous physical holding remain different quantities.
+
+Independent world audit passed: all 822,168 instance records agree with saved
+visibility, 3,424 complete masks were independently checked, and all 102,022
+valid gaze points land on their own instance mask. Gaze regenerated exactly
+even with arbitrary speech columns added to the scene table. All 34,140 speech
+rows preserve timing, named/referential flags, cue weights and template form;
+referent flags and achieved shares were independently reconstructed. Seven
+frozen original input hashes remain unchanged. The 82,952-key envelope contains
+82,393 required valid-gaze close-ups and 559 null-gaze keys to mask, not render.
+The focused implementation suite passed 34 tests; the independent auditor also
+ran a 19-test subset. Output hashes are retained with the audit. Production
+image/cache coverage and frozen-DINO validation remain pending.
+
+The approved rental was one 8× RTX 4090 host, with a **$10 total and 90-minute
+launch-to-return hard cap**. Preflight found a 21.03-Mbps upload-only rate.
+The completed replay arrays, room trees, object library and pinned DINO alone
+total at least 20,928,119,418 bytes: **132.68 minutes to upload**, excluding
+jobs, metadata, source bundles, Blender, remote setup, rendering, encoding,
+download and verification. This fails the time gate before launch. **No
+instance was created, no assets were uploaded, and actual rental cost is $0.00.**
+There is no rental to tear down. The earlier approximately 56-minute/$5 plan
+assumed much faster transfer and is not a qualified estimate for this network.
+
+Resume close-up work only after a faster connection passes a fresh complete
+time/cost projection, or after an explicit instruction to render locally.
+The existing local two-worker estimate is about five hours for close-ups,
+with encoding separate; no fallback job was launched. Preserve the completed
+world, required-key envelope and full frozen-DINO feature design when resuming.
+For the next build step, this supplies the intended weak gaze-driven naming
+world. The missing sharp-view cache still prevents completing Phase A and
+moving to the Phase B development comparison; these checks say nothing yet
+about a language-acquisition gain.
+
+Retained ignored evidence includes `outputs/renders/child_gaze_closeup/`,
+`outputs/speech/child_gaze/`, and `outputs/validation/child_gaze/takeover.log`,
+`takeover.json`, `takeover_audit/`, `network_upload.json` and `rental_gate.json`.
+The rental plan and prepared scripts remain in `outputs/runs/child_gaze/`;
+`STATUS.md` identifies the blocked next action. Original renders, speech,
+features and runs remain preserved.
