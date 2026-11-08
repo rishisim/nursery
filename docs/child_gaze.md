@@ -493,3 +493,46 @@ under the run root. Earlier blocked attempts and battery checkpoints remain
 historical evidence. All outputs are ignored; original inputs and runs remain
 preserved. The completed sharp-view cache now permits the Phase B development
 comparison. It does not establish a language-acquisition benefit.
+
+## Phase B execution protocol
+
+`nursery.learner.child_gaze` prepares the new-speech input view, panels and
+630-clip subset without changing the retained video caches. It checks every
+accessible five-frame window against scene metadata, 16×16 video, gaze points
+and valid-gaze close-ups. Null gaze stays masked. Close-up input is the exact
+float32 mean of the 256 frozen patch features, excluding CLS; the full-token
+Phase A cache remains preserved. Semantic gaze/held labels never enter the
+learner. Point-only input does not load close-up features. The child-gaze
+loader gathers bounded float16 batches and casts on the accelerator to the
+same float32 model inputs; frame order, padding and shuffle RNG are unchanged.
+
+The selection rule is recorded before pilot training: compare additive and
+steering on 630 clips, seed 0, 60 epochs each, using the Step 1 batch size,
+optimizer, five-frame window and earliest development-maximum checkpoint
+selection. Gaze dropout is 0.5, the additive initial weight is 1.0, and steering
+width is 0.15 in cropped image coordinates; there is no parameter sweep. Choose
+the larger **gaze-removed clips_dev accuracy at the earliest maximum with-gaze
+clips_dev checkpoint**; ties choose additive. Picture development selects the
+separate picture checkpoint as before. Test panels never choose the readout.
+
+Two fresh development-only timing epochs precede the full pilot. The pilot's
+four-hour budget includes setup, timing and both complete candidates, with
+25% projection headroom. If that projection exceeds the cap, stop with no
+readout selected; do not shorten epochs or choose from timing-epoch scores.
+Timing weights are discarded and the full pilot starts fresh if it fits.
+
+After selection, freeze the chosen readout for video-only, video plus gaze,
+shuffled gaze and point-only, each at 630 clips with seeds 0–2 and 60 epochs.
+Keep Step 1 batch 256, AdamW learning rate 0.0003, weight decay 0.1, soft pooling
+temperature 0.1, vocabulary fitting, unknown-word rule and development checkpoint
+selection. Both gaze test modes use the same with-gaze-selected checkpoint;
+picture transfer removes gaze. The final development-only timing gate measures
+all four conditions, projects the twelve-run matrix with 25% headroom, records
+the Phase C transfer/compute plan, and stops without launching rentals.
+
+Run each action with `PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python
+-m nursery.learner.child_gaze`: `prepare`, `pilot`, then only after a complete
+pilot `freeze` and `timing`. Outputs remain in the existing ignored child-gaze
+roots. Commit source before preparation/training. Frozen inputs bind their
+execution revision; a later reporting commit does not authorize rebinding
+them or running a different source revision.

@@ -77,9 +77,13 @@ modes at the same selected checkpoint; picture transfer always removes gaze.
 option, point and partition-map paths, dropout and shuffle seed; full gaze also
 requires the close-up cache. Scientific execution requires those inputs to be
 hashed in the frozen run. Historical preparation, timing and matrix defaults
-are unchanged. The new-world preparation, development-only pilot, selection
-rule, frozen protocol and rental timing gate remain pending Phase A outputs;
-this code addition does not authorize or launch them.
+are unchanged. `child_gaze.py` now provides new-world preparation, a fixed development-only
+selection rule, a four-hour pilot gate, protocol freezing and matrix timing.
+It never launches rentals. Phase A outputs are validated; readout selection
+remains pending the pilot. Child-gaze training gathers bounded float16 batches
+and casts to the original float32 inputs on the accelerator, preserving frame
+order, padding, sampler order and optimizer settings. Historical loaders are
+unchanged. See [the Step 2 protocol](child_gaze.md#phase-b-execution-protocol).
 
 ## Body input and timing
 

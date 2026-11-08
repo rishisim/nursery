@@ -1,5 +1,6 @@
 """Fresh, paired acquisition runs with development-only checkpoint selection."""
 import hashlib
+from functools import partial
 import json
 import math
 from pathlib import Path
@@ -66,7 +67,16 @@ def matrix_selection(fractions, conditions):
 
 
 def protocol_matrix(protocol):
-    fractions, conditions = matrix_selection(protocol.get('fractions'), protocol.get('conditions', CONDITIONS))
+    conditions = protocol.get('conditions', CONDITIONS)
+    if 'gaze' in protocol:
+        _gaze_settings(protocol)
+        fractions, _ = matrix_selection(protocol.get('fractions'), ['video_only'])
+        if (not isinstance(conditions, (list, tuple)) or not conditions
+                or any(c not in ('video_only',) + GAZE_CONDITIONS for c in conditions)
+                or len(set(conditions)) != len(conditions)):
+            raise ValueError('Invalid child-gaze matrix')
+    else:
+        fractions, conditions = matrix_selection(protocol.get('fractions'), conditions)
     seeds = protocol.get('seeds')
     if (not isinstance(seeds, list) or not seeds or any(type(seed) is not int for seed in seeds)
             or len(set(seeds)) != len(seeds)):
@@ -157,7 +167,7 @@ def _select(score, best, model, path):
     return False
 
 
-def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadline=None, *, device='mps'):
+def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadline=None, *, device='mps', dev_only=False):
     """Train a fresh learner; CPU is an explicit tiny-test override only."""
     import numpy as np
     import pandas as pd
@@ -181,12 +191,16 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
         gaze_spec = _gaze_settings(protocol)
     if gaze_world and protocol.get('window') != 2:
         raise ValueError('Child gaze must retain the matched five-frame window')
-    if device not in ('cpu', 'mps') or (device == 'mps' and not torch.backends.mps.is_available()):
-        raise RuntimeError('Scientific acquisition training requires available MPS; no automatic fallback')
+    if protocol.get('development_only') and not (dev_only or smoke):
+        raise ValueError('A development-only protocol cannot evaluate held-out panels')
+    if (device not in ('cpu', 'mps', 'cuda')
+            or (device == 'mps' and not torch.backends.mps.is_available())
+            or (device == 'cuda' and not torch.cuda.is_available())):
+        raise RuntimeError('Scientific acquisition training requires an available requested accelerator; no automatic fallback')
     if smoke and epochs != 1:
         raise ValueError('Timing smoke is exactly one epoch')
     _check_deadline(deadline)
-    if device == 'mps':
+    if device != 'cpu':
         _verify_frozen(root, external=False)
         if gaze_condition:
             _verify_gaze_frozen(root, protocol, condition)
@@ -221,8 +235,12 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
             raise ValueError('Frozen manifest must contain at least two cached vocabulary-bearing pairs')
         order_generator = torch.Generator().manual_seed(seed)
         body_generator = torch.Generator().manual_seed(seed + 1000)
-        dl = torch.utils.data.DataLoader(ds, batch_size=protocol['batch'], shuffle=True, drop_last=False,
-                                        collate_fn=upstream.collate, num_workers=0, generator=order_generator)
+        training_items, collate = ds, upstream.collate
+        if gaze_world:
+            from .gaze_data import collate_frame_indices
+            training_items, collate = range(len(ds)), partial(collate_frame_indices, ds)
+        dl = torch.utils.data.DataLoader(training_items, batch_size=protocol['batch'], shuffle=True, drop_last=False,
+                                        collate_fn=collate, num_workers=0, generator=order_generator)
         torch.manual_seed(seed)
         np.random.seed(seed)
         dims = {k: v.shape[-1] for k, v in store['groups'].items()} if store is not None else None
@@ -276,7 +294,7 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
                 if ctx is not None and not gaze_condition:
                     ctx['keep'] = ctx['keep'] * centre_clip_valid(ctx).any(1)
                     ctx['visual_valid'] = visual_valid[idx.to(device)]
-                loss = model.forward_loss(v.to(device), t.to(device), n.to(device), torch.ones(len(idx), device=device), ctx)
+                loss = model.forward_loss(v.to(device).float(), t.to(device), n.to(device), torch.ones(len(idx), device=device), ctx)
                 if not torch.isfinite(loss):
                     raise ValueError('Non-finite training loss')
                 optimizer.zero_grad()
@@ -303,7 +321,7 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
         model.load_state_dict(torch.load(output / 'model_bodypresent.pt', map_location=device, weights_only=True))
         primary, shuffled, picture, timing_dev, gaze_removed = {}, {}, {}, {}, {}
         with torch.no_grad():
-            if smoke:
+            if smoke or dev_only:
                 # Timing never inspects held-out panels; charge four complete
                 # development passes as a conservative final-evaluation estimate.
                 _check_deadline(deadline)
@@ -335,7 +353,7 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
         _check_deadline(deadline)
         metrics = {**identity, 'status': 'complete', 'smoke': smoke, 'selection': selection, 'history': history,
                    'primary': primary, 'shuffled': shuffled, 'picture': picture, 'data': stats,
-                   'timing_dev': timing_dev,
+                   'timing_dev': timing_dev, 'development_only': bool(smoke or dev_only),
                    'runtime_seconds': time.time() - started, 'setup_seconds': setup_seconds,
                    'epoch_seconds': float(np.mean(epoch_durations)),
                    'final_evaluation_seconds': final_seconds * (4 if smoke else 1),

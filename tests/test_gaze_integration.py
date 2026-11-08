@@ -92,7 +92,8 @@ def test_panel_modes_use_same_candidates_and_removed_bypasses_adapter(tmp_path, 
 
 
 @pytest.mark.parametrize('option', ['additive', 'steering'])
-def test_tiny_gaze_train_dispatch_and_dev_only_checkpoint_modes(tmp_path, monkeypatch, upstream, option):
+@pytest.mark.parametrize('dev_only', [False, True])
+def test_tiny_gaze_train_dispatch_and_dev_only_checkpoint_modes(tmp_path, monkeypatch, upstream, option, dev_only):
     """Four synthetic pairs exercise dispatch; this is not a scientific run."""
     from nursery.learner import gaze, video_only
 
@@ -119,7 +120,9 @@ def test_tiny_gaze_train_dispatch_and_dev_only_checkpoint_modes(tmp_path, monkey
     picture = tmp_path / 'pictures'
     picture.mkdir()
     np.save(picture / 'emb.f16.npy', cache)
-    protocol = {'inputs': str(tmp_path), 'episodes': str(tmp_path), 'epochs': 1, 'window': 2,
+    epochs = 2 if dev_only else 1
+    protocol = {'inputs': str(tmp_path), 'episodes': str(tmp_path), 'epochs': epochs, 'window': 2,
+                'development_only': dev_only,
                 'batch': 2, 'tau': .1, 'lr': .0003, 'weight_decay': .1,
                 'picture_panels': {'picture_dev': {'cache': str(picture)}},
                 'gaze': {'option': option, 'points': str(tmp_path / 'points.parquet'),
@@ -160,9 +163,12 @@ def test_tiny_gaze_train_dispatch_and_dev_only_checkpoint_modes(tmp_path, monkey
     monkeypatch.setattr(StudyEvaluation, 'evaluate', evaluate)
     for condition in ('video_only',) + runner.GAZE_CONDITIONS:
         evaluation_states.clear()
-        metrics = runner.train_one(tmp_path, 1., 7, condition, smoke=True, device='cpu')
+        metrics = runner.train_one(tmp_path, 1., 7, condition, smoke=not dev_only,
+                                   dev_only=dev_only, device='cpu')
         assert metrics['status'] == 'complete'
-        assert metrics['selection']['body_present']['epoch'] == 1
+        assert 1 <= metrics['selection']['body_present']['epoch'] <= epochs
+        assert len(metrics['history']) == epochs
+        assert metrics['development_only']
         assert metrics['primary'] == metrics['picture'] == {}
         if condition != 'video_only':
             assert metrics['gaze_removed'] == {}

@@ -7,6 +7,35 @@ import pandas as pd
 import torch
 
 
+def collate_frame_indices(dataset, indices):
+    """Gather one bounded visual batch before casting on the accelerator.
+
+    FramePairs' metadata and sampler remain authoritative. Cached float16 values
+    retain their exact bits; the caller casts to float32 after device transfer.
+    Frame order, repeated-first-frame padding and text tensors match FramePairs.
+    """
+    shape = dataset.caches[0].shape[1:]
+    dtype = np.result_type(*(cache.dtype for cache in dataset.caches))
+    locations = []
+    for index in indices:
+        here = dataset.locs[index]
+        locations.append(here + [here[0]] * (dataset.Fmax - len(here)))
+    locations = np.asarray(locations, dtype=np.int64).reshape(-1, 2)
+    values = np.empty((len(locations), *shape), dtype=dtype)
+    for cache_index in np.unique(locations[:, 0]):
+        selected = locations[:, 0] == cache_index
+        values[selected] = dataset.caches[cache_index][locations[selected, 1]]
+    values = values.reshape(len(indices), dataset.Fmax, *shape)
+    if dataset.cls_only:
+        values = values[:, :, :1]
+    values = values.reshape(len(indices), -1, values.shape[-1])
+    text = torch.zeros((len(indices), dataset.max_len), dtype=torch.long)
+    for row, index in enumerate(indices):
+        text[row, :len(dataset.ids[index])] = torch.tensor(dataset.ids[index])
+    return (torch.tensor(indices, dtype=torch.long), torch.from_numpy(values), text,
+            torch.tensor([len(dataset.ids[index]) for index in indices], dtype=torch.long))
+
+
 def dino_crop_points(points, width=320, height=240):
     """Map normalized image coordinates through the pinned DINO 256/224 crop.
 
