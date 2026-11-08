@@ -20,14 +20,14 @@ physical modeling or measurements. Active exploration remains deferred.
 The documents below follow the earlier study format: the idea, the experience
 or comparison, how it works, and the output we want. Step 1 now includes its
 frozen protocol and completed results. Step 2's world generation is complete,
-but production close-ups are blocked by the approved rental's transfer-time
-limit; its learner comparison remains pending. Steps 3–6 remain design
-references, with their experiment settings still to be settled.
+and 48,137 production close-ups are saved. The hybrid run stopped safely at
+3% Mac battery; the remaining images/cache and learner comparison are pending.
+Steps 3–6 remain design references, with settings still to be settled.
 
 | Step | Document | Question and current status |
 |---|---|---|
 | 1 | [Visual baseline](docs/visual_baseline.md) | Complete and audited: at 630 clips, recorded 4×4 video scored 60.12%, 16×16 scored 61.93%; paired gain +1.81 points over three seeds. |
-| 2 | [Child gaze](docs/child_gaze.md) | Phase A partial: 856-session geometry and gaze-driven speech generated; close-ups/cache blocked before rental launch by the 90-minute transfer gate ($0 spent). Learner comparison pending. |
+| 2 | [Child gaze](docs/child_gaze.md) | Phase A partial: world complete; 48,137/82,393 close-ups and 46,863 DINO rows verified. Hybrid execution stopped at 3% Mac battery; rental destroyed, checkpoint safe. Finish images/cache on AC power before Phase B. |
 | 3 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
 | 4 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
 | 5 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |

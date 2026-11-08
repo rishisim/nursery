@@ -274,8 +274,9 @@ These checks validate the implementation, not a language-learning benefit.
 
 ### Phase A takeover — 8 November 2026
 
-**World generation is complete; production close-ups and their DINO cache are
-blocked before rental launch. Phase A is not complete.** All 856 sessions
+**At this earlier checkpoint, world generation was complete and production
+close-ups/cache were blocked before rental launch. The later hybrid checkpoint
+below supersedes that execution status; Phase A remains incomplete.** All 856 sessions
 finished geometry export with two local workers in 6,314.50 seconds (105.24
 minutes). Only after the complete 102,720-frame table and all session receipts
 were saved was the old Phase A Codex process stopped, at 15:23:29 UTC. No
@@ -332,8 +333,9 @@ instance was created, no assets were uploaded, and actual rental cost is $0.00.*
 There is no rental to tear down. The earlier approximately 56-minute/$5 plan
 assumed much faster transfer and is not a qualified estimate for this network.
 
-Resume close-up work only after a faster connection passes a fresh complete
-time/cost projection, or after an explicit instruction to render locally.
+That checkpoint required a faster connection passing a fresh complete
+time/cost projection, or an explicit instruction to render locally. The later
+hybrid authorization below superseded that gate.
 The existing local two-worker estimate is about five hours for close-ups,
 with encoding separate; no fallback job was launched. Preserve the completed
 world, required-key envelope and full frozen-DINO feature design when resuming.
@@ -348,3 +350,85 @@ Retained ignored evidence includes `outputs/renders/child_gaze_closeup/`,
 The rental plan and prepared scripts remain in `outputs/runs/child_gaze/`;
 `STATUS.md` identifies the blocked next action. Original renders, speech,
 features and runs remain preserved.
+
+
+### Hybrid close-up checkpoint — 8 November 2026
+
+**Phase A is partial, with a verified resumable checkpoint.** The user authorized
+local rendering plus up to eight rented RTX 4090 GPUs, with a $10 cap and
+three-hour wall cap. Execution began at 15:45:45 UTC. A four-RTX-4090 Vast host
+was created at 15:48:16 UTC at $1.96444/hour including 120 GB disk. The source
+renderer and encoder stayed unchanged at execution revision `4b7f1f38`.
+
+Sessions were claimed atomically from one local SQLite queue. Local workers
+preferred larger inputs; the uploader preferred the smallest missing asset
+sets, reusing already transferred room/object assets. Rendering preserved the
+complete candidate pools needed to reconstruct the original scenes. Public
+Blender and model files were downloaded on the rental. New per-session images
+were returned continuously, hash-checked, and encoded on the Mac with the same
+pinned DINO and all 257 tokens, avoiding a roughly 32.5-GB feature download.
+
+The measured two-minute local pilot improved from 14.05 images/s with four
+workers to 15.07 with six (+7.2%); concurrent encoding reached 43.4 images/s
+with 37% memory free. Six workers were retained. A remote session produced
+93 images in 34.67 seconds including reconstruction; a three-worker sample
+produced 280 images in approximately 43 seconds. These are execution samples,
+not a controlled hardware comparison. Transfer/setup dominated remote startup.
+The 1.358-GB first payload required resumed transfers; its complete original
+SHA256 and all 358 input-file hashes passed before rendering. A transfer-boundary
+corruption was detected and repaired before any affected bytes were used.
+
+At 16:37 UTC the Mac reported 3% battery and roughly seven minutes remaining.
+New claims and encoder batches were stopped, all in-flight work drained, and
+all finished remote shards retrieved before the rental was destroyed at
+16:39:42 UTC. The one remote claim that had never started was released only
+after destruction. No shard was rendered twice. No rental remains running;
+resumption requires AC power, not a new scientific design. The independent
+partial audit finished about 55 minutes after execution began. The provider's
+usage ledger records **$1.707 ($1.71 rounded)**: $1.662 GPU, $0.038 disk and
+$0.007 inbound transfer, with 0.866 billed hours. Separately, Vast automatically
+charged **$10.00 to add account credit** (`auto=true` in the invoice). That
+funding is not an additional $10 of compute usage. Charges and funding are
+retained separately in `rental_stream/billing_charges.json` and
+`billing_invoices.json`.
+
+| Verified checkpoint | Count |
+|---|---:|
+| Complete rendered sessions | 501 / 856 |
+| Required close-ups saved | 48,137 / 82,393 |
+| Local / rental images | 46,384 / 1,753 |
+| Rental sessions returned | 18 |
+| Complete full-token DINO feature rows | 46,863 |
+| Rendered images awaiting encoding | 1,274 |
+| Images still to render | 34,256 |
+| Pending / claimed / failed sessions | 355 / 0 / 0 |
+| Null-gaze envelope keys, still masked | 559 |
+
+Independent validation passed 19 focused tests and a 101-session, 16-client
+atomic-claim test with no duplicate claims. The partial completion audit checked
+every saved image hash, dimensions, exact required-frame subset, original job
+and source hashes, and agreement between receipts and queue. All 28 completed
+feature shards passed full byte hashes, row mapping, finite float16
+`[N, 257, 768]` values, pinned-model hashes and encoder provenance. The initial
+direct MPS re-encoding sample matched exactly. Nine local and six remote views
+were visually checked for sharp, centered gaze targets. All seven original
+input hashes and twelve previously audited world/source hashes are unchanged.
+These checks establish the saved partial artifacts, not full Phase A coverage.
+
+The canonical session outputs are under
+`outputs/renders/child_gaze_closeup/hybrid/sessions/`; complete feature batches
+are under `outputs/features/child_gaze/hybrid/local_batches/`. The atomic queue,
+stop markers, orchestration hashes and encoder state live in
+`outputs/runs/child_gaze/hybrid/`. Independent evidence is
+`outputs/validation/child_gaze/hybrid_audit/partial_completion.json` and
+`partial_features.json`; rental transfer/teardown evidence is retained under
+`outputs/runs/child_gaze/rental_stream/`. All are ignored. Original inputs and
+prior outputs remain intact. No full-cache completion marker was written.
+
+For the next build step, connect the Mac to power and resume the same queue and
+encoder, preserving completed session receipts and feature batches. The
+remaining local work is approximately 40 minutes including encoding/merge and
+validation, based on observed throughput, with no additional rental cost.
+Only after exact 82,393-key coverage and the final cache audit pass is Phase A
+complete and the Phase B development comparison ready to proceed. No learner
+was selected or trained during this execution.
