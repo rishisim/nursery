@@ -175,12 +175,11 @@ the curves; one data amount can't show it.
 
 ## Open choices
 
-- **How gaze enters the learner.** (a) A separate gaze branch added to the video
-  score, the same additive setup used for body. (b) Gaze steering which video
-  patches a word is matched to during training. With (a), the video path may
-  learn less because gaze carries the easy cases; earlier body results showed
-  this. With (b), the gaze-removed test is more natural. Decide on
-  development data, not test scores.
+- **How gaze enters the learner — decided: (a) additive.** (a) A separate gaze
+  branch added to the video score, the same additive setup used for body.
+  (b) Gaze steering which video patches a word is matched to during training.
+  The user chose (a) by design on 8 November 2026, without a pilot; see
+  [Readout decided by design](#readout-decided-by-design--8-november-2026).
 - Gaze model parameters, once sourced.
 - Close-up field of view and resolution.
 
@@ -705,3 +704,23 @@ freeze and commit before the twelve matched runs. Recheck actual transfer and
 epoch throughput; the earlier 21.03-Mbps network test did not describe this
 attempt's sustained transfer. Phase D waits for all twelve results. These
 checks establish execution compatibility, not a language-acquisition gain.
+
+## Readout decided by design — 8 November 2026
+
+The user chose the additive gaze branch, option (a), by design. No
+development pilot is run and steering is not trained. Reasons:
+
+- It is the test this step exists for: gaze added as one more input,
+  score = video + β·gaze, the same way body is added in later steps, so gaze
+  and body results stay comparable.
+- The video path is the same as the video-only learner, so any gain comes from
+  the added input. Steering changes how the video path reads the frame.
+- Gaze dropout 0.5 already guards against the video path learning less.
+- The gaze-removed test is a secondary question (does gaze improve video-only
+  learning?).
+
+This replaces the pilot selection rule above; its settings (dropout 0.5,
+additive initial weight 1.0) stay. Steering code stays in place, unused; it is
+the natural next variant if additive shows no lift. The next step is to freeze
+the four-condition additive matrix (seeds 0–2, 630 clips, 60 epochs, Step 1
+settings), time it, and plan Phase C compute without a pilot wave.
