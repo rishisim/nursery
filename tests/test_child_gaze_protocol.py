@@ -122,3 +122,50 @@ def test_vectorized_visual_batches_match_original_values_order_and_optimizer_ste
         loss.backward()
         optimizer.step()
     assert all(torch.equal(a, b) for a, b in zip(model.parameters(), alternate.parameters()))
+
+
+def test_design_freeze_preserves_preparation_and_needs_no_pilot(tmp_path, monkeypatch):
+    study = tmp_path / 'study'
+    study.mkdir()
+    for name in ('panels', 'subsets'):
+        (study / name).mkdir()
+        (study / name / 'input.json').write_text('{}')
+    for name in ('splits.json', 'signal_hashes.json', 'frame_partitions.json'):
+        (study / name).write_text('{}')
+    protocol = {'subsets': {'1.0': {'selected_clip_count': 630}},
+                'seeds': [0, 1, 2], 'epochs': 60, 'conditions': list(child_gaze.CONDITIONS),
+                'gaze': {'option': 'additive', 'dropout': .5, 'weight': 1.0},
+                'selection_status': 'pending development-only pilot'}
+    (study / 'protocol.json').write_text(json.dumps(protocol))
+    original = (study / 'protocol.json').read_bytes()
+    monkeypatch.setattr(child_gaze, '_output_directory', lambda p, **kw: p.mkdir(**kw) or p)
+    frozen = []
+    monkeypatch.setattr(runner, '_freeze_inputs', lambda root: frozen.append(root))
+    result = child_gaze.freeze(tmp_path, readout='additive')
+    assert frozen == [tmp_path / 'matrix']
+    assert result['selection_status'] == 'frozen by user design decision'
+    assert result['gaze'] == protocol['gaze']
+    assert (study / 'protocol.json').read_bytes() == original
+    assert not (tmp_path / 'pilot.json').exists()
+    assert (tmp_path / 'matrix' / 'panels' / 'input.json').read_bytes() == b'{}'
+    with pytest.raises(FileExistsError):
+        child_gaze.freeze(tmp_path, readout='additive')
+
+
+def test_matrix_timing_is_two_epochs_development_only_with_serial_headroom(tmp_path, monkeypatch):
+    matrix = tmp_path / 'matrix'
+    matrix.mkdir()
+    (matrix / 'protocol.json').write_text(json.dumps({'selection_status': 'frozen by user design decision'}))
+    monkeypatch.setattr(runner, '_verify_frozen', lambda root: None)
+    calls = []
+    def train(root, fraction, seed, condition, **kwargs):
+        calls.append((root, fraction, seed, condition, kwargs))
+        assert kwargs == {'epochs': 2, 'smoke': True, 'device': 'mps'}
+        return {'runtime_seconds': 25., 'setup_seconds': 1., 'epoch_seconds': 10.,
+                'epoch_durations_seconds': [9., 11.], 'final_evaluation_seconds': 4.}
+    monkeypatch.setattr(runner, 'train_one', train)
+    result = child_gaze.timing(tmp_path)
+    assert [c[3] for c in calls] == list(child_gaze.CONDITIONS)
+    assert all(c[:3] == (matrix, 1., 0) for c in calls)
+    assert result['projected_serial_matrix_seconds'] == 1.25 * 3 * 4 * (1 + 60 * 10 + 4)
+    assert result['status'] == 'blocked' and not result['rentals_launched']

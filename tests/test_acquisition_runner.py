@@ -221,6 +221,11 @@ def test_actual_train_one_pairs_models_order_masks_and_dev_only_selection(tmp_pa
     assert torch.equal(initial['additive'], initial['joint_interaction'])
     assert batches['video_only'] == batches['additive'] == batches['joint_interaction']
     assert masks['additive'] == masks['joint_interaction']
+    events.clear()
+    two_epochs = runner.train_one(tmp_path, 1.0, 7, 'video_only', epochs=2, smoke=True, device='cpu')
+    assert len(two_epochs['history']) == len(two_epochs['epoch_durations_seconds']) == 2
+    assert two_epochs['primary'] == two_epochs['picture'] == {}
+    assert {event[1] for event in events if event[0] == 'evaluate'} == {'clips_dev', 'picture_dev'}
 
 
 def test_frozen_preparation_and_code_changes_are_rejected(tmp_path, monkeypatch):

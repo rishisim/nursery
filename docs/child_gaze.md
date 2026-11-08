@@ -505,36 +505,35 @@ learner. Point-only input does not load close-up features. The child-gaze
 loader gathers bounded float16 batches and casts on the accelerator to the
 same float32 model inputs; frame order, padding and shuffle RNG are unchanged.
 
-The selection rule is recorded before pilot training: compare additive and
-steering on 630 clips, seed 0, 60 epochs each, using the Step 1 batch size,
-optimizer, five-frame window and earliest development-maximum checkpoint
-selection. Gaze dropout is 0.5, the additive initial weight is 1.0, and steering
-width is 0.15 in cropped image coordinates; there is no parameter sweep. Choose
-the larger **gaze-removed clips_dev accuracy at the earliest maximum with-gaze
-clips_dev checkpoint**; ties choose additive. Picture development selects the
-separate picture checkpoint as before. Test panels never choose the readout.
+The user chose the additive readout by design on 8 November 2026. This
+supersedes the earlier development-pilot selection rule; no development pilot
+or steering training is required. Gaze dropout stays 0.5 and the additive
+initial weight stays 1.0. Steering remains implemented but unused.
 
-Two fresh development-only timing epochs precede the full pilot. The pilot's
-four-hour budget includes setup, timing and both complete candidates, with
-25% projection headroom. If that projection exceeds the cap, stop with no
-readout selected; do not shorten epochs or choose from timing-epoch scores.
-Timing weights are discarded and the full pilot starts fresh if it fits.
+Freeze additive for video-only, video plus gaze, shuffled gaze and point-only,
+each at 630 clips with seeds 0–2 and 60 epochs. Keep Step 1 batch 256, AdamW
+learning rate 0.0003, weight decay 0.1, soft pooling temperature 0.1, five-frame
+window, vocabulary fitting, unknown-word rule and earliest development-maximum
+checkpoint selection. Both gaze test modes use the same with-gaze-selected
+checkpoint; picture transfer removes gaze and retains its separate
+picture-development checkpoint selection.
 
-After selection, freeze the chosen readout for video-only, video plus gaze,
-shuffled gaze and point-only, each at 630 clips with seeds 0–2 and 60 epochs.
-Keep Step 1 batch 256, AdamW learning rate 0.0003, weight decay 0.1, soft pooling
-temperature 0.1, vocabulary fitting, unknown-word rule and development checkpoint
-selection. Both gaze test modes use the same with-gaze-selected checkpoint;
-picture transfer removes gaze. The final development-only timing gate measures
-all four conditions, projects the twelve-run matrix with 25% headroom, records
-the Phase C transfer/compute plan, and stops without launching rentals.
+The original `study/` is retained preparation and pilot evidence. The canonical
+final protocol is `matrix/protocol.json`, sharing the unchanged prepared
+panels and subsets; `matrix/frozen_inputs.json` binds it to committed source,
+prepared inputs and source hashes. No new input preparation is performed.
+Run `PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python -m
+nursery.learner.child_gaze freeze --readout additive`, then `timing`. Source and
+this protocol must be committed and pushed before freeze or timing. A later
+reporting commit does not authorize rebinding or executing different source.
 
-Run each action with `PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python
--m nursery.learner.child_gaze`: `prepare`, `pilot`, then only after a complete
-pilot `freeze` and `timing`. Outputs remain in the existing ignored child-gaze
-roots. Commit source before preparation/training. Frozen inputs bind their
-execution revision; a later reporting commit does not authorize rebinding
-them or running a different source revision.
+The timing gate trains two fresh epochs per condition from seed 0 using only
+clips_dev and picture_dev. It records each epoch duration, discards only its
+new timing weights and projects the twelve-run matrix serially with 25%
+headroom. Development passes provide a conservative estimate of final
+evaluation time; no test panels are scored. Record the Phase C transfer and
+compute plan, then stop for rental approval. No rental is launched by these
+commands. Outputs stay in the existing ignored child-gaze roots.
 
 
 ### Phase B measured pilot gate — 8 November 2026

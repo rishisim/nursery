@@ -1,4 +1,4 @@
-"""Step 2 preparation, development-only readout selection and timing gate.
+"""Step 2 preparation, additive design freeze and development-only timing gate.
 
 The study directory is the canonical prepared experience. Pilot directories
 retain two explicitly requested alternatives, sharing its immutable panels and
@@ -215,8 +215,32 @@ def pilot(root, *, device='mps'):
     return state
 
 
-def freeze(root):
+def freeze(root, *, readout=None):
     root = Path(root).resolve()
+    if readout == 'additive':
+        # Keep the original prepared study and pilot snapshots as earlier evidence.
+        source = root / 'study'
+        destination = _output_directory(root / 'matrix', exist_ok=False)
+        for name in ('panels', 'subsets'):
+            shutil.copytree(source / name, destination / name, copy_function=os.link)
+        for name in ('splits.json', 'signal_hashes.json', 'frame_partitions.json'):
+            os.link(source / name, destination / name)
+        protocol = runner._read(source / 'protocol.json')
+        if (protocol['subsets']['1.0']['selected_clip_count'] != 630
+                or protocol['seeds'] != [0, 1, 2] or protocol['epochs'] != 60
+                or protocol['conditions'] != list(CONDITIONS)):
+            raise ValueError('Prepared study differs from the approved matched matrix')
+        protocol['gaze']['option'] = 'additive'
+        protocol['selection_status'] = 'frozen by user design decision'
+        protocol['selection'] = {
+            'method': 'user chose additive by design; no development pilot or steering training',
+            'prepared_protocol': str(source / 'protocol.json'),
+            'prepared_protocol_sha256': runner._sha(source / 'protocol.json'),
+            'test_panels_permitted': False,
+        }
+        _write(destination / 'protocol.json', protocol)
+        runner._freeze_inputs(destination)
+        return protocol
     state = runner._read(root / 'pilot.json')
     if state['status'] != 'complete' or state['selected'] != choose(state['scores']):
         raise ValueError('Complete development-only pilot required')
@@ -237,10 +261,10 @@ def freeze(root):
 def timing(root, *, device='mps'):
     """Measure development-only epochs and stop; never execute Phase C."""
     root = Path(root).resolve()
-    study = root / 'study'
+    study = root / 'matrix' if (root / 'matrix').exists() else root / 'study'
     protocol = runner._read(study / 'protocol.json')
-    if protocol.get('selection_status') != 'frozen from development-only pilot':
-        raise ValueError('Freeze the pilot-selected protocol before timing')
+    if protocol.get('selection_status') not in ('frozen from development-only pilot', 'frozen by user design decision'):
+        raise ValueError('Freeze the chosen protocol before timing')
     runner._verify_frozen(study)
     result = {'status': 'timing', 'device': device, 'started': time.time(), 'conditions': {}}
     path = root / 'timing_gate.json'
@@ -248,9 +272,9 @@ def timing(root, *, device='mps'):
         raise FileExistsError('Timing gate already started; inspect retained record')
     _write(path, result)
     for condition in CONDITIONS:
-        metric = runner.train_one(study, 1.0, 0, condition, smoke=True, device=device)
+        metric = runner.train_one(study, 1.0, 0, condition, epochs=2, smoke=True, device=device)
         result['conditions'][condition] = {k: metric[k] for k in
-            ('runtime_seconds', 'setup_seconds', 'epoch_seconds', 'final_evaluation_seconds')}
+            ('runtime_seconds', 'setup_seconds', 'epoch_seconds', 'epoch_durations_seconds', 'final_evaluation_seconds')}
         for name in ('model.pt', 'model_bodypresent.pt'):
             (study / 'timing' / condition / name).unlink(missing_ok=True)
         _write(path, result)
@@ -266,6 +290,7 @@ def timing(root, *, device='mps'):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('prepare', 'pilot', 'freeze', 'timing'))
+    parser.add_argument('--readout', choices=('additive',), help='Freeze additive by design without a pilot')
     parser.add_argument('--root', default='outputs/runs/child_gaze')
     parser.add_argument('--device', choices=('mps', 'cuda'), default='mps')
     parser.add_argument('--visual', default=str(REPO / 'outputs/features/visual_grid16'))
@@ -279,7 +304,7 @@ def main():
         result = prepare(args.root, **{k: getattr(args, k) for k in
                          ('visual', 'speech', 'episodes', 'points', 'closeups', 'features')})
     elif args.action == 'freeze':
-        result = freeze(args.root)
+        result = freeze(args.root, readout=args.readout)
     else:
         result = (pilot if args.action == 'pilot' else timing)(args.root, device=args.device)
     print(json.dumps(result, indent=2))

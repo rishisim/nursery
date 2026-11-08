@@ -197,8 +197,8 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
             or (device == 'mps' and not torch.backends.mps.is_available())
             or (device == 'cuda' and not torch.cuda.is_available())):
         raise RuntimeError('Scientific acquisition training requires an available requested accelerator; no automatic fallback')
-    if smoke and epochs != 1:
-        raise ValueError('Timing smoke is exactly one epoch')
+    if smoke and epochs not in (1, 2):
+        raise ValueError('Timing smoke requires one or two fresh epochs')
     _check_deadline(deadline)
     if device != 'cpu':
         _verify_frozen(root, external=False)
@@ -356,6 +356,7 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
                    'timing_dev': timing_dev, 'development_only': bool(smoke or dev_only),
                    'runtime_seconds': time.time() - started, 'setup_seconds': setup_seconds,
                    'epoch_seconds': float(np.mean(epoch_durations)),
+                   'epoch_durations_seconds': epoch_durations,
                    'final_evaluation_seconds': final_seconds * (4 if smoke else 1),
                    'final_evaluation_estimate_rule': '4x development real/shuffled/picture pass' if smoke else 'measured held-out evaluation'}
         if gaze_condition:
