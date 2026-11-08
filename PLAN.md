@@ -21,15 +21,16 @@ The documents below follow the earlier study format: the idea, the experience
 or comparison, how it works, and the output we want. Step 1 now includes its
 frozen protocol and completed results. Step 2's world generation is complete,
 and all 82,393 production close-ups and frozen-DINO rows are independently
-validated. Phase B preparation passed. An approved eight-GPU attempt passed
-fixed-sample CUDA parity but stopped at the transfer projection gate before
-scientific training; learner selection and matrix freezing remain blocked.
+validated. Phase B is frozen and locally timed with additive gaze chosen by
+design, without development pilots. A prior eight-GPU attempt passed CUDA
+parity but stopped at upload. The twelve-run comparison now awaits rental
+approval and a qualified transfer path.
 Steps 3–6 remain design references, with settings still to be settled.
 
 | Step | Document | Question and current status |
 |---|---|---|
 | 1 | [Visual baseline](docs/visual_baseline.md) | Complete and audited: at 630 clips, recorded 4×4 video scored 60.12%, 16×16 scored 61.93%; paired gain +1.81 points over three seeds. |
-| 2 | [Child gaze](docs/child_gaze.md) | Phase A complete and audited; Phase B prepared. Approved 8×4090 preflight passed CUDA parity, but measured upload alone projected 242.32 min, exceeding the 240-min launch-to-return cap. Results retrieved, rental destroyed, $4.90 used. No full pilot, readout selection, matrix freeze or Phase C runs; a faster uplink is needed. |
+| 2 | [Child gaze](docs/child_gaze.md) | Phase B frozen at `bfa470c6`: additive by design, four conditions × seeds 0–2 × 60 epochs, 630 clips. Two fresh development-only epochs per condition measured 147.63/158.10/156.18/153.47 s; serial matrix 38.52 h with 25% headroom. Prior upload already used four streams; current uplink is unqualified. Conditional 8×4090 plan: 165–215 min, $15.08–19.57, $20/four-hour caps. Await rental approval and faster network or separately approved pre-staging; Phase C 0/12. |
 | 3 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
 | 4 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
 | 5 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
@@ -44,9 +45,10 @@ paper framing or an automatic instruction to launch more conditions.
 Step 1 supports retaining 16×16 as the visual reference. Its modest gain on the
 broader task is separate from the small four-noun diagnostic's roughly 92%
 accuracy. Step 2 world generation and sharp-view encoding are complete; its
-scientific comparison remains pending. Restore a qualified transfer/time plan,
-then finish the full development-only readout pilots and freeze the matched
-comparison. Step 3 remains design work.
+scientific comparison remains pending. Additive was chosen by design and the
+matched protocol is frozen; no full development pilots are needed. After
+rental approval and transfer qualification, measure real concurrent CUDA
+epochs before the twelve full runs. Step 3 remains design work.
 
 ## Decisions to keep consistent
 

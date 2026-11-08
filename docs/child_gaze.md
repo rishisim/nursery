@@ -577,47 +577,100 @@ needed for long local training: macOS still reported discharging battery.
 
 ### Conditional Phase C compute plan
 
-The retained plan is
-`outputs/validation/child_gaze/phase_c_rental_plan.json`. It remains conditional
-because readout selection and final matrix timing are incomplete, and CUDA
-epoch/encoding throughput has not been measured. No rental or Juno was launched.
+#### Twelve-run plan after the design decision — 8 November 2026
 
-Uploading the existing 41,444,223,360-byte video/picture caches takes 4.38 hours
-alone at the measured 21.03-Mbps uplink. Instead upload original RGB, exact
-float32 compact close-ups, protocol/panels and all frozen provenance inputs.
-The measured payload minimum including 1,712 provenance-only body/physical
-files is 1.709 GB: about 10.83 minutes raw upload; reserve 20 minutes plus a
-final source/metadata inventory. Re-encode full 16×16 video and picture caches
-once from the pinned DINO snapshot on the rental. Preserve the original local
-protocol and require an explicitly approved, hashed CUDA derivation/binding
-manifest with predetermined parity checks; every matched arm uses the same
-new cache. Do not silently replace frozen hashes.
+The current plan is
+`outputs/validation/child_gaze/phase_b_design_rental_plan.json`. It replaces the
+earlier pilot-inclusive plan, which remains retained as historical evidence.
+Run only the four additive conditions × seeds 0–2 × 60 epochs. No pilot wave
+or steering training is included. No new rental, Juno access or project-data
+upload occurred while preparing this plan.
 
-Prefer one 8× RTX 4090 host with at least 384 GB host RAM and 160 GiB storage;
-run one model per GPU, eight then four runs. The current provider quote is
-approximately $4.31/hour. With 90 minutes reserved for setup, transfer, encoding,
-timing, return and contingency, 30–60-second concurrent epochs project
-150–210 minutes and about $11–15 for **Phase C alone**, with a proposed $20 cap.
-The maximum qualifying concurrent epoch is 75 seconds. A four-GPU alternative
-needs three runs per GPU, an epoch of at most 50 seconds and roughly a $10 cap.
-All quoted GPU times are assumptions requiring an actual gate after approval.
+The stopped upload was already four parallel rsync streams over direct SSH,
+with SSH compression enabled. Its final 84,364-byte/s aggregate rate was not
+a single-stream or SSH-proxy limit. Local uplink instability, congestion or
+loss on the route, and host ingress remain possible; the exact historical
+cause cannot be separated without testing that destination again. Fresh
+synthetic uploads to Cloudflare's neutral speed-test endpoint measured
+3.49/3.42 Mbps with one stream and 4.32/1.79 Mbps with four. Larger timed-out
+attempts are retained separately. These short tests show no reliable parallel
+gain and do not establish sustained throughput to a rental.
 
-If the rental must also finish the unresolved full Phase B pilots, add a
-concurrent two-candidate pilot wave before selecting/freezing the matrix.
-Then the eight-GPU plan requires epochs at most 50 seconds: 180–240 minutes
-at 30–50 seconds per epoch, approximately $13–17.25 plus transfer, with a
-proposed $20 cap. This extra work is not hidden inside the Phase C-only estimate.
-If measured launch-to-return projection exceeds four hours, stop and present
-options rather than reduce the scientific budget. Return and verify results,
-then destroy the rental immediately. Use the exact frozen execution checkout,
-not a later documentation-only HEAD.
+| Transfer option | Measured basis and expected time |
+|---|---|
+| Four parallel streams | Already used on the old host. Keep resumable independent archives and hash checks; more streams alone have no demonstrated benefit. |
+| Lossless compression | Count-only local zstd level-1 encoding of all eight archives reduced 1,927,782,400 bytes to 1,623,638,757 bytes in 0.90 s (15.8% smaller); originals unchanged. About 10.3 min at 21.03 Mbps, 50–121 min at the fresh neutral parallel rates, or 321 min at the historical stop rate. |
+| Different host/region | Prefer a nearer US host over the old Bulgarian host. At a measured 21 Mbps, compressed transfer would take about 10.3 min; reserve 15 min with verification. Advertised host bandwidth does not establish local-to-host throughput. |
+| Pre-stage before launch | Only with separate approval to upload project data: private Cloudflare R2 Standard storage, verified objects and short-lived download URLs. Local staging would take about 50–121 min on the current connection before the rental clock; GPU retrieval would take 1.1–10.8 min at an assumed 200–20 Mbps. Reserve 15 min and measure it. Nothing was staged or uploaded. |
+| Faster local network | Join UTD CometNet or a known faster wired connection and remeasure. At actual 100–21 Mbps upload, compressed transfer would take 2.2–10.3 min; reserve 5–15 min. Campus uplink speed is unmeasured. |
 
-Juno is an alternative only with user approval, VPN access and a prompt
-allocation of suitable GPUs. Include queue, setup and transfer in the same
-four-hour wall budget; queue availability and throughput are unverified.
-The next build step remains the development-only readout choice, then a
-properly frozen matched comparison. Neither the completed world nor these
-timing measurements establish a language-acquisition gain.
+The current connection is **not qualified** for the proposed 15-minute transfer
+reserve. The compressed base plus final-source allowance requires at least
+14.90 Mbps sustained before protocol and verification overhead; target at
+least 20 Mbps. Prefer the faster-network
+option, then verify the actual destination after approval. R2 pre-staging is
+an alternative requiring explicit data-upload permission, even if its unused
+free allowance covers the payload. [R2 pricing](https://developers.cloudflare.com/r2/pricing/)
+lists free egress; account usage is unknown.
+[CometNet access](https://atlas.utdallas.edu/TDClient/30/Portal/Requests/Service/170/CometNet-Wi-Fi)
+does not promise a particular upload rate.
+
+Prefer one **8× RTX 4090 24-GB** host, at least 384 GB host RAM and 160 GiB
+storage. Run eight learners, then four, one per GPU; run counts are
+2, 2, 2, 2, 1, 1, 1, 1. A read-only Florida offer at 21:54:57 UTC quoted
+**$5.39259/hour including disk**, with about 516 GB RAM; it is not reserved.
+Refresh availability and price before approval is executed. The old Bulgarian
+offer remains about $4.31/hour but its transfer path is unqualified.
+
+Keep the old payload unchanged; include the new committed source and frozen
+matrix in a separately hashed local transfer inventory. The local manifest
+`outputs/validation/child_gaze/phase_b_payload_delta.json` binds revision
+`bfa470c6`, all 122 required source/matrix/transport-reference files and
+42,129,377 content bytes. Allowing 50 MiB for the complete delta and headers
+gives a conservative 1,676,067,557-byte transfer ceiling: 10.6 minutes at
+21.03 Mbps. Target at least 20 Mbps and retain the 15-minute transfer reserve.
+Transfer compressed
+archives with resumable direct SSH streams, without redundant SSH compression,
+or fetch pre-staged objects if separately approved. Re-encode the common
+video/picture caches once using the pinned DINO snapshot and explicit original
+PIL preprocessing. Keep the nine predetermined parity rows and thresholds;
+validate full coverage, finite values and hashes, and bind the shared CUDA
+cache derivation explicitly to the original inputs and frozen revision. Do
+not silently replace local frozen hashes or execute the old payload checkout.
+
+Before any full run, measure two fresh development-only CUDA epochs per
+condition at intended eight-worker concurrency, then discard those weights.
+Start every final run fresh. Use condition-specific conservative epoch times,
+run setup and final-evaluation estimates to balance the two waves and project
+their maximum durations, with 25% headroom. Synthetic step times and local
+MPS timings do not qualify CUDA execution.
+
+Reserve **90 minutes** beyond full training epochs: setup 15, transfer/hashes
+15, encoding/parity/cache audit 30, CUDA timing 10, result return/verification
+and teardown 10, contingency 5, and 5 minutes for padded run setup/final
+evaluation across the two waves. With every condition bounded by E seconds
+per epoch and that last allowance sufficient, 90 + 2.5E gives **165–215 minutes
+at 30–50 s/epoch**. The exact gate is 85 minutes plus 1.25 times the sum of
+the two wave maxima, each including 60 epochs, measured run setup and final
+evaluation. Use actual elapsed time; tighten the qualifying epoch ceiling
+if final evaluation/setup exceeds its allowance. The quote gives about
+**$15.08–$19.57** over that range, including a $0.25
+transfer reserve. The **$20 cap** implies an earlier stop at about **219.75
+minutes**, rather than using the whole four hours; preserve time and cost for
+return and teardown. At four hours this host would cost about $21.82, so it
+does not qualify for a four-hour stay at this cap. Reproject before full
+training and on material delays; stop if either cap fails, without cutting
+epochs or seeds. The previous attempt's $4.90 is separate.
+
+[Juno](https://hpc.utdallas.edu/systems-resources/juno/) remains an alternative
+only with approval, an active allocation, campus/VPN access and prompt GPU
+availability. A suitable four-GPU H100/H200 node would run three learners per
+GPU in three waves. With the same 90-minute overhead, including queue time,
+90 + 3.75E minutes requires E ≤40 seconds before additional run overhead;
+measure real concurrent CUDA epochs first. Allocation, queue, memory,
+throughput and any quota charges are unverified. No Juno session was opened.
+The next build step is the approved twelve-run comparison, then Phase D;
+these execution checks do not establish a language-acquisition gain.
 
 ### Approved GPU preflight and transfer stop — 8 November 2026
 
@@ -723,3 +776,54 @@ additive initial weight 1.0) stay. Steering code stays in place, unused; it is
 the natural next variant if additive shows no lift. The next step is to freeze
 the four-condition additive matrix (seeds 0–2, 630 clips, 60 epochs, Step 1
 settings), time it, and plan Phase C compute without a pilot wave.
+
+### Phase B additive freeze and measured timing — 8 November 2026
+
+Source, focused tests and the execution protocol were committed and pushed
+as `bfa470c64e5ca2c531bd0ee520e378a1bd467d67` before freezing or training.
+The canonical final protocol is
+`outputs/runs/child_gaze/matrix/protocol.json`; its frozen-input record binds
+that revision, 71 source files, 16 prepared files and 1,730 external inputs.
+The original `study/`, pilot timing records and stopped-rental evidence remain
+preserved. The final matrix shares their unchanged prepared inputs; only the
+selection status and design-decision record differ from the prepared protocol.
+
+The freeze retains all four conditions, 630 clips, seeds 0–2, 60 epochs,
+Step 1 optimizer/batch/selection, gaze dropout 0.5 and initial additive weight
+1.0. Both gaze test modes use the with-gaze-selected checkpoint, and picture
+transfer removes gaze. No development pilot or steering training was run.
+
+Two fresh MPS timing epochs per condition used seed 0 and development panels
+only. Each timing learner started fresh; the two epochs within that learner
+were consecutive. All new timing weights were discarded after measurement.
+
+| Condition | Epoch 1 | Epoch 2 | Mean seconds/epoch |
+|---|---:|---:|---:|
+| Video only | 145.64 s | 149.62 s | 147.63 |
+| Video + gaze | 154.88 s | 161.31 s | 158.10 |
+| Video + shuffled gaze | 156.05 s | 156.31 s | 156.18 |
+| Video + gaze point only | 154.89 s | 152.06 s | 153.47 |
+
+The serial twelve-run projection is **138,658.91 seconds / 38.52 hours**:
+1.25 × 3 seeds × the sum over conditions of setup + 60 mean epochs + the
+conservative final-evaluation estimate. That estimate is four times a final
+development pass, not test scoring. Timing took 20.79 minutes after the initial
+full provenance verification. Evidence is `timing_gate.json`,
+`matrix/timing/*/{history,metrics,status}.json` and `timing_additive.log` in the
+run root. These are execution measurements, not acquisition results.
+
+The independent audit checks the complete frozen settings, committed source
+binding, two actual epochs per condition, empty held-out result maps, removed
+timing weights, unchanged earlier evidence, and projection arithmetic. The
+focused source validation passed **19 tests**. The independent audit **passed**:
+`outputs/validation/child_gaze/phase_b_additive_audit.json`. It verified all
+frozen hashes and all 78 earlier evidence files plus eight payload archives
+unchanged. The run-root `STATUS.md` records the
+handoff. A later reporting commit does not change the frozen execution revision.
+
+**Phase B is complete; Phase C is blocked pending rental approval and a
+qualified transfer path.** The current twelve-run rental plan above includes
+no pilot wave. No new rental, Juno access, project-data upload or test-panel
+scoring occurred. Phase C remains 0/12 and Phase D has not started. The next
+build step is to test whether the frozen additive gaze input improves language
+acquisition under matched training, after the transfer and real CUDA gates pass.
