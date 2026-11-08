@@ -536,3 +536,87 @@ pilot `freeze` and `timing`. Outputs remain in the existing ignored child-gaze
 roots. Commit source before preparation/training. Frozen inputs bind their
 execution revision; a later reporting commit does not authorize rebinding
 them or running a different source revision.
+
+
+### Phase B measured pilot gate — 8 November 2026
+
+Preparation and timing ran from committed revision `87e719b0`. The new world
+has the same 630 selected training clips and 18,613 vocabulary-bearing
+utterances. All 34,140 speech rows are covered; all 82,952 accessible window
+keys have 16×16 video and gaze, with 82,393 valid close-ups and 559 masked null
+keys. There are no cache gaps. New-world development, new-clip test, s8 and
+picture-transfer panels are prepared, with the same split and sampling rules.
+
+| Development-only timing candidate | Setup | Epoch including development selection | Conservative final evaluation estimate |
+|---|---:|---:|---:|
+| Additive gaze | 1.05 s | 155.39 s | 8.35 s |
+| Gaze steering | 0.64 s | 175.63 s | 12.70 s |
+
+**Blocked at the pilot timing gate.** Conservatively applying the brief's
+no-cut-epochs rule to the pilot retained both 60-epoch candidates. They project
+to 6.90 hours with 25% headroom, plus the 6.84-minute preflight already consumed
+(about 7.02 hours total), exceeding the four-hour pilot cap. The unpadded full
+training projection is already about 5.52 hours. The bounded float16 transfer
+path was included in these timings; these are measurements, not a projected
+speedup claim. No full pilot started, no readout was selected, and the final
+four-condition matrix was not frozen or timed. Timing checkpoints were removed.
+
+The independent timing audit verified that the rule predated both smokes,
+only development panels were scored, held-out result maps are empty, full
+pilot models do not exist and selection remains pending. Evidence:
+`outputs/validation/child_gaze/phase_b_timing_audit.json`, and `pilot.json`,
+`selection_rule.json`, `cache_coverage.json`, timing metrics and logs in the run
+root. Both frozen pilot snapshots retain execution revision `87e719b0`; later
+reporting commits do not change that binding.
+
+The brief fixes pilot clips, seed and wall cap but does not explicitly state
+pilot epochs. Clarifying that a fixed 20-epoch development pilot is permitted
+would project about 2.41 hours including the retained preflight and headroom;
+all twelve final runs would still retain 60 epochs. This change was presented
+for clarification and was not made without approval. Alternatively, approve
+GPU completion of the full candidates before selection. Real AC power is also
+needed for long local training: macOS still reported discharging battery.
+
+### Conditional Phase C compute plan
+
+The retained plan is
+`outputs/validation/child_gaze/phase_c_rental_plan.json`. It remains conditional
+because readout selection and final matrix timing are incomplete, and CUDA
+epoch/encoding throughput has not been measured. No rental or Juno was launched.
+
+Uploading the existing 41,444,223,360-byte video/picture caches takes 4.38 hours
+alone at the measured 21.03-Mbps uplink. Instead upload original RGB, exact
+float32 compact close-ups, protocol/panels and all frozen provenance inputs.
+The measured payload minimum including 1,712 provenance-only body/physical
+files is 1.709 GB: about 10.83 minutes raw upload; reserve 20 minutes plus a
+final source/metadata inventory. Re-encode full 16×16 video and picture caches
+once from the pinned DINO snapshot on the rental. Preserve the original local
+protocol and require an explicitly approved, hashed CUDA derivation/binding
+manifest with predetermined parity checks; every matched arm uses the same
+new cache. Do not silently replace frozen hashes.
+
+Prefer one 8× RTX 4090 host with at least 384 GB host RAM and 160 GiB storage;
+run one model per GPU, eight then four runs. The current provider quote is
+approximately $4.31/hour. With 90 minutes reserved for setup, transfer, encoding,
+timing, return and contingency, 30–60-second concurrent epochs project
+150–210 minutes and about $11–15 for **Phase C alone**, with a proposed $20 cap.
+The maximum qualifying concurrent epoch is 75 seconds. A four-GPU alternative
+needs three runs per GPU, an epoch of at most 50 seconds and roughly a $10 cap.
+All quoted GPU times are assumptions requiring an actual gate after approval.
+
+If the rental must also finish the unresolved full Phase B pilots, add a
+concurrent two-candidate pilot wave before selecting/freezing the matrix.
+Then the eight-GPU plan requires epochs at most 50 seconds: 180–240 minutes
+at 30–50 seconds per epoch, approximately $13–17.25 plus transfer, with a
+proposed $20 cap. This extra work is not hidden inside the Phase C-only estimate.
+If measured launch-to-return projection exceeds four hours, stop and present
+options rather than reduce the scientific budget. Return and verify results,
+then destroy the rental immediately. Use the exact frozen execution checkout,
+not a later documentation-only HEAD.
+
+Juno is an alternative only with user approval, VPN access and a prompt
+allocation of suitable GPUs. Include queue, setup and transfer in the same
+four-hour wall budget; queue availability and throughput are unverified.
+The next build step remains the development-only readout choice, then a
+properly frozen matched comparison. Neither the completed world nor these
+timing measurements establish a language-acquisition gain.

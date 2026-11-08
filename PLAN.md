@@ -21,13 +21,14 @@ The documents below follow the earlier study format: the idea, the experience
 or comparison, how it works, and the output we want. Step 1 now includes its
 frozen protocol and completed results. Step 2's world generation is complete,
 and all 82,393 production close-ups and frozen-DINO rows are independently
-validated. Phase B learner selection, protocol freezing and timing are next.
+validated. Phase B preparation passed, but the full development pilot exceeds
+its four-hour local gate; learner selection and matrix freezing remain blocked.
 Steps 3–6 remain design references, with settings still to be settled.
 
 | Step | Document | Question and current status |
 |---|---|---|
 | 1 | [Visual baseline](docs/visual_baseline.md) | Complete and audited: at 630 clips, recorded 4×4 video scored 60.12%, 16×16 scored 61.93%; paired gain +1.81 points over three seeds. |
-| 2 | [Child gaze](docs/child_gaze.md) | Phase A complete: all 82,393 close-ups and full-token frozen-DINO rows merged and independently audited; original checkpoint preserved. Phase B development-only selection and timing pending. |
+| 2 | [Child gaze](docs/child_gaze.md) | Phase A complete and audited: 82,393 images/rows. Phase B prepared with complete cache coverage; additive/steering timing projects 6.90 h for two full pilots, exceeding its 4 h cap. No readout selected or matrix frozen; resolve pilot budget/compute before Phase C. |
 | 3 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
 | 4 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
 | 5 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
