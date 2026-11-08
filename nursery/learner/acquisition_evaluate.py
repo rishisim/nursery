@@ -39,6 +39,8 @@ class StudyEvaluation:
         self.upstream = _upstream_module("train_frame_mil")
         self.protocol = json.loads((self.root / "protocol.json").read_text())
         self.panels, self.pictures = {}, {}
+        self.gaze_factory, self.gaze_condition = None, None
+        self.gaze_panels = {}
 
     def _query_vectors(self, model, queries):
         words = sorted(set(queries))
@@ -74,11 +76,22 @@ class StudyEvaluation:
         return self.panels[name]
 
     @torch.no_grad()
-    def evaluate(self, model, panel, body_mode="real"):
+    def evaluate(self, model, panel, body_mode="real", *, gaze_mode=None):
         if body_mode not in ("real", "shuffled", "none"):
             raise ValueError("Unknown body evaluation mode")
         model.eval()
         rows, trials, ds, data, valid = self._panel(panel)
+        gaze_data = None
+        if self.gaze_factory is not None:
+            gaze_mode = gaze_mode or ("shuffled" if self.gaze_condition == "video_shuffled_gaze" else "real")
+            if gaze_mode not in ("real", "shuffled", "removed"):
+                raise ValueError("Unknown gaze evaluation mode")
+            if gaze_mode != "removed":
+                if panel not in self.gaze_panels:
+                    self.gaze_panels[panel] = self.gaze_factory(rows)
+                gaze_data = self.gaze_panels[panel]
+        elif gaze_mode is not None:
+            raise ValueError("Gaze evaluation requires an explicit gaze data adapter")
         queries = rows.iloc[trials["trial_rows"]].referent.tolist()
         word_index, T = self._query_vectors(model, queries)
         candidates = np.asarray(trials["candidate_rows"], dtype=int)
@@ -90,7 +103,9 @@ class StudyEvaluation:
                 _, v, _, _ = self.upstream.collate([ds[int(i)] for i in ids])
                 R = model.enc_regions(v.to(self.device))
                 ctx = None
-                if model.encoder is not None and body_mode != "none":
+                if gaze_data is not None:
+                    ctx = gaze_data.batch(ids, mode=gaze_mode, device=self.device)
+                elif self.gaze_factory is None and model.encoder is not None and body_mode != "none":
                     if data is None:
                         raise ValueError("Body evaluation needs sensory histories")
                     donors = np.asarray(trials["donor_rows"])[ids] if body_mode == "shuffled" else ids
@@ -105,6 +120,10 @@ class StudyEvaluation:
         result["body_mode"] = body_mode if model.encoder is not None else "none"
         if body_mode == "shuffled":
             result["donor_rows"] = trials["donor_rows"]
+        if self.gaze_factory is not None:
+            result["gaze_mode"] = gaze_mode
+            if gaze_mode == "shuffled":
+                result["gaze_donor_rows"] = gaze_data.donor_indices.tolist()
         return result
 
     @torch.no_grad()

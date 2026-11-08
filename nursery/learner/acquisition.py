@@ -11,6 +11,46 @@ from . import _upstream_module
 
 FRACTIONS = (0.1, 0.25, 0.5, 0.75, 1.0)
 CONDITIONS = ('video_only', 'additive', 'joint_interaction')
+# Explicit hooks only: preparation, timing and the historical default matrix
+# are deliberately unchanged until the child-gaze protocol is frozen.
+GAZE_CONDITIONS = ('video_gaze', 'video_shuffled_gaze', 'video_gaze_point')
+
+
+def _gaze_settings(protocol):
+    """Require explicit inputs/options; do not select a scientific design here."""
+    spec = protocol.get('gaze')
+    if not isinstance(spec, dict) or spec.get('option') not in ('additive', 'steering'):
+        raise ValueError('Gaze training requires explicit protocol gaze option')
+    if any(not spec.get(k) for k in ('points', 'partitions')):
+        raise ValueError('Gaze training requires points and frame partition mapping paths')
+    if 'dropout' not in spec or not 0 <= spec['dropout'] <= 1:
+        raise ValueError('Gaze dropout must be explicitly specified in [0, 1]')
+    if type(spec.get('shuffle_seed')) is not int:
+        raise ValueError('Gaze shuffle_seed must be explicitly specified')
+    return spec
+
+
+def _gaze_data(protocol, manifest, lut, condition, *, allowed_keys=None):
+    from .gaze_data import GazeData
+    spec = _gaze_settings(protocol)
+    point_only = condition == 'video_gaze_point'
+    if not point_only and not spec.get('closeup_cache'):
+        raise ValueError('Full gaze training requires a close-up cache')
+    return GazeData(manifest, lut, spec['points'], window=protocol['window'],
+                    closeup_cache=None if point_only else spec['closeup_cache'], point_only=point_only,
+                    partitions=_read(spec['partitions']), allowed_keys=allowed_keys, seed=spec['shuffle_seed'])
+
+
+def _verify_gaze_frozen(root, protocol, condition):
+    """Scientific gaze execution cannot introduce unbound sensory inputs."""
+    spec = _gaze_settings(protocol)
+    paths = [Path(spec[k]).resolve() for k in ('points', 'partitions')]
+    if condition != 'video_gaze_point':
+        paths += [Path(spec['closeup_cache']).resolve() / name for name in ('index.parquet', 'emb.f16.npy')]
+    external = _read(root / 'frozen_inputs.json')['external_hashes']
+    for path in paths:
+        if str(path) not in external or _sha(path) != external[str(path)]:
+            raise ValueError(f'Gaze input absent from or changed since source freeze: {path}')
 
 
 def matrix_selection(fractions, conditions):
@@ -133,8 +173,14 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
     root = Path(root).resolve()
     protocol = _read(root / 'protocol.json')
     epochs = (1 if smoke else protocol['epochs']) if epochs is None else epochs
-    if condition not in CONDITIONS or epochs < 1:
+    gaze_condition = condition in GAZE_CONDITIONS
+    gaze_world = 'gaze' in protocol
+    if condition not in CONDITIONS + GAZE_CONDITIONS or epochs < 1:
         raise ValueError('Unknown condition or nonpositive epochs')
+    if gaze_condition:
+        gaze_spec = _gaze_settings(protocol)
+    if gaze_world and protocol.get('window') != 2:
+        raise ValueError('Child gaze must retain the matched five-frame window')
     if device not in ('cpu', 'mps') or (device == 'mps' and not torch.backends.mps.is_available()):
         raise RuntimeError('Scientific acquisition training requires available MPS; no automatic fallback')
     if smoke and epochs != 1:
@@ -142,6 +188,8 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
     _check_deadline(deadline)
     if device == 'mps':
         _verify_frozen(root, external=False)
+        if gaze_condition:
+            _verify_gaze_frozen(root, protocol, condition)
     identity = _identity(root, fraction, seed, condition, epochs, device)
     output = _output(root, fraction, seed, condition, smoke)
     if output.exists() and any(output.iterdir()):
@@ -158,12 +206,16 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
         caches, lut = upstream.load_multi([inputs / 'train_cache'])
         with np.load(subset / 'fit_mask.npz', allow_pickle=False) as fit:
             video_ids, include = fit['video_ids'].tolist(), fit['include']
-        store = body.load_store(episodes, pd.read_parquet(episodes / 'frames.parquet'), video_ids, set(),
+        store = None
+        if not gaze_world:
+            store = body.load_store(episodes, pd.read_parquet(episodes / 'frames.parquet'), video_ids, set(),
                                 steps=include.shape[1], exclude=~include, physical=Path(protocol['physical']))
-        if store['stats'] != stats['normalization']:
-            raise ValueError('Frozen subset normalization differs from current inputs')
-        if set(store['groups']) != {'contact', 'fingers', 'arm', 'load', 'skin'}:
-            raise ValueError('Acquisition requires all five body streams')
+            if store['stats'] != stats['normalization']:
+                raise ValueError('Frozen subset normalization differs from current inputs')
+            if set(store['groups']) != {'contact', 'fingers', 'arm', 'load', 'skin'}:
+                raise ValueError('Acquisition requires all five body streams')
+        elif condition not in ('video_only',) + GAZE_CONDITIONS:
+            raise ValueError('Gaze-world hooks support video-only and gaze conditions only')
         ds = upstream.FramePairs(caches, lut, manifest, vocab, protocol['window'], False)
         if len(ds) < 2 or ds.n_noframe or ds.n_novocab:
             raise ValueError('Frozen manifest must contain at least two cached vocabulary-bearing pairs')
@@ -173,20 +225,37 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
                                         collate_fn=upstream.collate, num_workers=0, generator=order_generator)
         torch.manual_seed(seed)
         np.random.seed(seed)
-        dims = {k: v.shape[-1] for k, v in store['groups'].items()}
+        dims = {k: v.shape[-1] for k, v in store['groups'].items()} if store is not None else None
         emb_dim = int(caches[0].shape[-1])
         if caches[0].ndim != 3 or caches[0].shape[1] not in (17, 257):
             raise ValueError('Expected CLS plus 4x4 or 16x16 frozen region caches')
         num_regions = int(caches[0].shape[1])
+        if gaze_world and num_regions != 257:
+            raise ValueError('Child gaze requires the matched 16x16 video cache')
         constructors = {'video_only': VideoOnlyMIL, 'additive': AdditiveMIL, 'joint_interaction': JointInteractionMIL}
         kwargs = {} if condition == 'video_only' else {'dims': dims, 'num_regions': num_regions}
-        model = constructors[condition](len(vocab), emb_dim, protocol['tau'], **kwargs).float().to(device)
-        ps, pt, win = _pair_meta(manifest, store, lut, protocol['window'])
-        data = BodyData(store, ps, pt, win, None, None, None, None, device,
-                        protocol['body_window'], 0.0, protocol['body_dropout']) if condition != 'video_only' else None
+        if gaze_condition:
+            from .gaze import GazeMIL
+            model = GazeMIL(len(vocab), emb_dim, protocol['tau'], option=gaze_spec['option'],
+                            point_only=condition == 'video_gaze_point', num_regions=num_regions,
+                            gaze_weight=gaze_spec.get('weight', 1.0),
+                            steering_sigma=gaze_spec.get('steering_sigma', .15)).float().to(device)
+            allowed_keys = {f'{video}|{frame}' for i, video in enumerate(video_ids)
+                            for frame in np.flatnonzero(include[i])}
+            data = _gaze_data(protocol, manifest, lut, condition, allowed_keys=allowed_keys)
+        else:
+            model = constructors[condition](len(vocab), emb_dim, protocol['tau'], **kwargs).float().to(device)
+            data = None
+            if condition != 'video_only':
+                ps, pt, win = _pair_meta(manifest, store, lut, protocol['window'])
+                data = BodyData(store, ps, pt, win, None, None, None, None, device,
+                                protocol['body_window'], 0.0, protocol['body_dropout'])
         _, visual_valid = _window_layout(manifest, lut, protocol['window'])
         visual_valid = torch.as_tensor(visual_valid, device=device).repeat_interleave(num_regions, dim=1)
         evaluator = StudyEvaluation(root, inputs, caches, lut, vocab, store, device)
+        if gaze_condition:
+            evaluator.gaze_condition = condition
+            evaluator.gaze_factory = lambda rows: _gaze_data(protocol, rows, lut, condition)
         optimizer = torch.optim.AdamW(model.parameters(), lr=protocol['lr'], weight_decay=protocol['weight_decay'])
         setup_seconds = time.time() - started
         epoch_durations = []
@@ -199,8 +268,12 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
             loss_sum, count = 0.0, 0
             for idx, v, t, n in dl:
                 _check_deadline(deadline)
-                ctx = data.batch(idx.numpy(), body_generator) if data is not None else None
-                if ctx is not None:
+                if gaze_condition:
+                    ctx = data.batch(idx.numpy(), body_generator, mode='shuffled' if condition == 'video_shuffled_gaze' else 'real',
+                                     dropout=gaze_spec['dropout'], device=device)
+                else:
+                    ctx = data.batch(idx.numpy(), body_generator) if data is not None else None
+                if ctx is not None and not gaze_condition:
                     ctx['keep'] = ctx['keep'] * centre_clip_valid(ctx).any(1)
                     ctx['visual_valid'] = visual_valid[idx.to(device)]
                 loss = model.forward_loss(v.to(device), t.to(device), n.to(device), torch.ones(len(idx), device=device), ctx)
@@ -228,14 +301,17 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
             epoch_durations.append(time.time() - epoch_started)
         final_started = time.time()
         model.load_state_dict(torch.load(output / 'model_bodypresent.pt', map_location=device, weights_only=True))
-        primary, shuffled, picture, timing_dev = {}, {}, {}, {}
+        primary, shuffled, picture, timing_dev, gaze_removed = {}, {}, {}, {}, {}
         with torch.no_grad():
             if smoke:
                 # Timing never inspects held-out panels; charge four complete
                 # development passes as a conservative final-evaluation estimate.
                 _check_deadline(deadline)
                 timing_dev['real'] = evaluator.evaluate(model, 'clips_dev')
-                if data is not None:
+                if gaze_condition:
+                    _check_deadline(deadline)
+                    timing_dev['gaze_removed'] = evaluator.evaluate(model, 'clips_dev', gaze_mode='removed')
+                elif data is not None:
                     _check_deadline(deadline)
                     timing_dev['shuffled'] = evaluator.evaluate(model, 'clips_dev', body_mode='shuffled')
                 model.load_state_dict(torch.load(output / 'model.pt', map_location=device, weights_only=True))
@@ -245,7 +321,10 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
                 for panel in ('clips_test', 's8'):
                     _check_deadline(deadline)
                     primary[panel] = evaluator.evaluate(model, panel)
-                    if data is not None:
+                    if gaze_condition:
+                        _check_deadline(deadline)
+                        gaze_removed[panel] = evaluator.evaluate(model, panel, gaze_mode='removed')
+                    elif data is not None:
                         _check_deadline(deadline)
                         shuffled[panel] = evaluator.evaluate(model, panel, body_mode='shuffled')
                 model.load_state_dict(torch.load(output / 'model.pt', map_location=device, weights_only=True))
@@ -261,6 +340,10 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
                    'epoch_seconds': float(np.mean(epoch_durations)),
                    'final_evaluation_seconds': final_seconds * (4 if smoke else 1),
                    'final_evaluation_estimate_rule': '4x development real/shuffled/picture pass' if smoke else 'measured held-out evaluation'}
+        if gaze_condition:
+            metrics['gaze_removed'] = gaze_removed
+            metrics['gaze'] = dict(gaze_spec, training_donor_rows=data.donor_indices.tolist()
+                                   if condition == 'video_shuffled_gaze' else None)
         _write(output / 'metrics.json', metrics)
         _write(output / 'status.json', {'status': 'complete', **identity})
         return metrics

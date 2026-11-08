@@ -13,6 +13,7 @@ Completed comparisons and historical settings are in
 | [video_only.py](../nursery/learner/video_only.py) | Frozen image features → trainable visual projection → word matching. |
 | [additive.py](../nursery/learner/additive.py) | Inherits the visual baseline; adds a learned body–word score. |
 | [body.py](../nursery/learner/body.py), [windows.py](../nursery/learner/windows.py) | Body features, normalization, sequence encoding and bounded context. |
+| [gaze.py](../nursery/learner/gaze.py), [gaze_data.py](../nursery/learner/gaze_data.py) | Step 2 gaze readouts and frame-aligned point/compact close-up inputs. |
 | [losses.py](../nursery/learner/losses.py) | Shared pooling and loss functions. |
 | [embed.py](../nursery/learner/embed.py), [train.py](../nursery/learner/train.py), [evaluate.py](../nursery/learner/evaluate.py) | Shared feature extraction, training and evaluation. |
 
@@ -44,6 +45,41 @@ by default. This is simultaneous language learning with late score fusion.
 The proposed joint interaction module is not implemented here. The old
 [width-128 joint pilot](../archive/code/learner/joint_pilot.py) remains reachable
 through the explicitly historical `--arch joint` option for compatibility.
+
+## Child gaze implementation (selection pending)
+
+Step 2 has two implemented, unselected readouts in `gaze.py`. `additive`
+adds a separate point/close-up word score with a learned scalar; `steering`
+uses the point as a Gaussian prior over video patches and adds one sharp-view
+candidate per frame through the shared visual projection. CLS keeps its
+relative mass within the video bank, and a point outside the DINO crop does
+not steer visible patches.
+The initial weight and spatial width are implementation defaults, not a
+development-selected protocol.
+
+`GazeData` reads frame keys, normalized image points and frozen image features.
+It maps points through the pinned 256-pixel resize and 224-pixel centre crop,
+aligns them to the existing five-frame visual window, and masks padding and
+missing gaze. A close-up is one 768-value mean of DINO's 256 patch features,
+excluding CLS, computed before the trainable projection. The adapter can read
+Phase A's full cache without modifying it; only selected compact features are
+retained in memory. Point-only input does not load a close-up cache.
+
+The shuffled control swaps point and close-up windows together with another
+centre moment from the same partition and selected experience. Donor rows
+are deterministic and recorded. Neither semantic object IDs nor gaze/held
+categories enter the adapter or model. With gaze removed (`ctx=None`), either
+readout uses exactly its visual score. Fixed-panel evaluation records both
+modes at the same selected checkpoint; picture transfer always removes gaze.
+
+`acquisition.train_one` has explicit `video_gaze`, `video_shuffled_gaze` and
+`video_gaze_point` hooks, alongside `video_only`. They require explicit gaze
+option, point and partition-map paths, dropout and shuffle seed; full gaze also
+requires the close-up cache. Scientific execution requires those inputs to be
+hashed in the frozen run. Historical preparation, timing and matrix defaults
+are unchanged. The new-world preparation, development-only pilot, selection
+rule, frozen protocol and rental timing gate remain pending Phase A outputs;
+this code addition does not authorize or launch them.
 
 ## Body input and timing
 
