@@ -1,6 +1,9 @@
 """Generate weakly aligned caregiver utterances and training-pair weights."""
 
 import json
+import hashlib
+import re
+import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -190,7 +193,110 @@ def generate_transcripts(frames, config, seed):
     return manifest, donors
 
 
-def write_transcripts(episodes, output, seed, **overrides):
+def couple_gaze(manifest, frames, gaze, config, seed, p_gazed_seen=0.55):
+    """Retarget an existing speech schedule after scene-only gaze is frozen.
+
+    Calibrate four channel weights against candidate availability at the fixed
+    source times. This allows naming-channel choice to respond to attention;
+    gaze and utterance times never respond to naming. The held channel retains
+    the original clip-local +/- hold_window_s semantics, not instant holding.
+    """
+    if not 0 <= p_gazed_seen <= 1:
+        raise ValueError("p_gazed_seen must be a probability")
+    if gaze.duplicated(["video_id", "frame_idx"]).any():
+        raise ValueError("Duplicate gaze keys")
+    scenes = {}
+    gazes = gaze.set_index(["video_id", "frame_idx"])
+    for video, group in frames.groupby("video_id", sort=True):
+        group = group.sort_values("frame_idx").reset_index(drop=True)
+        scenes[video] = session_scene(group, config["vocabulary"], config["generator"]["hold_window_s"])
+    result = manifest.copy(deep=True)
+    # A third independent seed stream cannot perturb either original speech or cues.
+    rng = np.random.default_rng(np.random.SeedSequence(seed).spawn(3)[2])
+    candidates, indices = [], []
+    for index, row in result.iterrows():
+        if not row.referential:
+            continue
+        visible, held, windows, categories = scenes[row.video_id]
+        source = int(row.source_frame_idx)
+        cand = channel_candidates(visible, windows, categories, source)
+        looked = gazes.loc[(row.video_id, source), "gaze_category"]
+        gazed = [looked] if pd.notna(looked) and looked in cand["seen"] else []
+        candidates.append([cand["held"], cand["unseen"], gazed,
+                           [c for c in cand["seen"] if c not in gazed]])
+        indices.append(index)
+    if not candidates:
+        raise ValueError("No referential utterances to couple")
+    available = np.asarray([[bool(c) for c in row] for row in candidates], dtype=bool)
+    parameters = config["generator"]
+    seen = 1 - parameters["p_held"] - parameters["p_unseen"]
+    target = np.array([parameters["p_held"], parameters["p_unseen"],
+                       seen * p_gazed_seen, seen * (1 - p_gazed_seen)])
+    if (target < 0).any() or not available.any(axis=1).all():
+        raise ValueError("Invalid gaze speech targets or empty candidate rows")
+    weights = target.copy()
+    for _ in range(2000):
+        probabilities = available * weights
+        totals = probabilities.sum(axis=1)
+        if (totals <= 0).any():
+            raise ValueError("Gaze speech shares are infeasible at fixed utterance times")
+        probabilities /= totals[:, None]
+        achieved = probabilities.mean(axis=0)
+        if np.max(np.abs(achieved - target)) < 1e-8:
+            break
+        if ((achieved == 0) & (target > 0)).any():
+            raise ValueError("Gaze speech target has no eligible source moments")
+        weights *= np.divide(target, achieved, out=np.ones(4), where=achieved > 0)
+        weights /= weights.sum()
+    else:
+        raise ValueError(f"Gaze speech shares infeasible: target {target.tolist()}, achieved {achieved.tolist()}")
+    choices = ["held", "unseen", "seen", "seen"]
+    for position, index in enumerate(indices):
+        row = result.loc[index]
+        draw = int(rng.choice(4, p=probabilities[position]))
+        referent = str(rng.choice(candidates[position][draw]))
+        if row.named:
+            old = config["vocabulary"][row.referent]
+            text, count = re.subn(r"\b" + re.escape(old) + r"\b", config["vocabulary"][referent], row.text, count=1)
+            if count != 1:
+                raise ValueError("Named speech template does not contain its recorded noun")
+            result.at[index, "text"] = text
+        result.at[index, "referent"] = referent
+        result.at[index, "channel"] = choices[draw]
+    source_matches, aligned_matches = [], []
+    for index, row in result.iterrows():
+        visible, held, _, _ = scenes[row.video_id]
+        source, aligned = int(row.source_frame_idx), int(row.frame_idx)
+        result.at[index, "referent_visible"] = row.referent in visible[aligned]
+        result.at[index, "held_referent"] = row.referent is not None and row.referent == held[aligned]
+        result.at[index, "source_held_referent"] = row.referent is not None and row.referent == held[source]
+        source_gaze = gazes.loc[(row.video_id, source), "gaze_category"]
+        aligned_gaze = gazes.loc[(row.video_id, aligned), "gaze_category"]
+        source_matches.append(bool(pd.notna(source_gaze) and row.referent == source_gaze))
+        aligned_matches.append(bool(pd.notna(aligned_gaze) and row.referent == aligned_gaze))
+    result["source_gazed_referent"] = source_matches
+    result["gazed_referent"] = aligned_matches
+    high = result.referential & result.named & result.referent_visible
+    oracle = np.where(high, config["cues"]["w_hi"], config["cues"]["w_lo"])
+    result["weight_oracle"] = oracle / oracle.mean()
+    report = {"p_gazed_seen_target": p_gazed_seen,
+              "four_channel_targets": dict(zip(["held", "unseen", "gazed_seen", "other_seen"], target.tolist())),
+              "four_channel_internal_weights": weights.tolist(),
+              "four_channel_expected_shares": achieved.tolist(),
+              "source_gazed_seen_opportunity": float(available[:, 2].mean()),
+              "schedule_and_named_flags_preserved": True}
+    for label, selected in (("referential", result[result.referential]), ("named", result[result.named])):
+        seen_rows = selected[selected.channel == "seen"]
+        report[label] = {"n": len(selected),
+                         "channel_shares": selected.channel.value_counts(normalize=True).to_dict(),
+                         "source_gazed_given_seen": float(seen_rows.source_gazed_referent.mean()),
+                         "aligned_gazed_given_seen": float(seen_rows.gazed_referent.mean()),
+                         "source_physically_held": float(selected.source_held_referent.mean()),
+                         "aligned_physically_held": float(selected.held_referent.mean())}
+    return result, report
+
+
+def write_transcripts(episodes, output, seed, gaze=None, source_manifest=None, **overrides):
     episodes = Path(episodes).resolve()
     config = load_config()
     config["generator"].update({k: v for k, v in overrides.items() if v is not None})
@@ -199,16 +305,43 @@ def write_transcripts(episodes, output, seed, **overrides):
     train_ids = sessions.loc[sessions.split == "train", "video_id"]
     frames = frames[frames.video_id.isin(train_ids)]
     manifest, donors = generate_transcripts(frames, config, seed)
+    coupling = None
+    if source_manifest is not None:
+        if gaze is None:
+            raise ValueError("A source manifest is only used for gaze coupling")
+        original = pd.read_parquet(source_manifest)
+        try:
+            pd.testing.assert_frame_equal(original[manifest.columns].reset_index(drop=True),
+                                          manifest.reset_index(drop=True), check_dtype=False)
+        except (AssertionError, KeyError) as exc:
+            raise ValueError("Source speech does not match this generator seed/config/frame input") from exc
+        # The supplied old speech is authoritative for the exact retained schedule.
+        manifest = original
+    if gaze is not None:
+        manifest, coupling = couple_gaze(manifest, frames, pd.read_parquet(gaze), config, seed)
+        achieved = coupling["named"]
+        if not .50 <= achieved["source_gazed_given_seen"] <= .60:
+            raise ValueError("Achieved named visible-channel gaze coupling misses 50-60% gate")
+        if any(abs(achieved["channel_shares"].get(channel, 0) - config["generator"][parameter]) > .02
+               for channel, parameter in (("held", "p_held"), ("unseen", "p_unseen"))):
+            raise ValueError("Achieved named held/unseen channel shares miss two-percentage-point gate")
     output = _output_directory(output)
     if (output / "manifest.parquet").exists():
         raise FileExistsError("Transcript manifest already exists; use a new ignored run directory")
     manifest.to_parquet(output / "manifest.parquet", index=False)
     record = {"episodes": str(episodes), "seed": seed, "config": config, "shuffled_donors": donors,
               "n_frames": len(frames), "n_utterances": len(manifest),
-              "p_held_internal": manifest.attrs["p_held_internal"]}
+              "p_held_internal": manifest.attrs.get("p_held_internal"), "gaze_coupling": coupling}
+    if gaze is not None:
+        record.update(execution_revision=subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+                      speech_code_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
+    for name, path in (("gaze", gaze), ("source_manifest", source_manifest)):
+        if path is not None:
+            record[name] = {"path": str(Path(path).resolve()),
+                            "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest()}
     (output / "generator.json").write_text(json.dumps(record, indent=2) + "\n")
     print(f"transcripts: {len(manifest)} utterances / {len(frames)} train frames; "
-          f"internal p_held {record['p_held_internal']:.4f}", flush=True)
+          f"internal p_held {record['p_held_internal']}", flush=True)
     names = manifest[manifest.named].referent.value_counts().reindex(sorted(config["vocabulary"]), fill_value=0)
     rare = names[names < 5]
     print(f"named mentions per vocabulary word: min {names.min()}; under 5: "

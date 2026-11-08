@@ -152,12 +152,14 @@ def open_area(vertices, objects, square, edge=0):
 
 
 def render_pair(image, mask):
-    image.parent.mkdir(parents=True, exist_ok=True)
+    mask.parent.mkdir(parents=True, exist_ok=True)
     scene.render.image_settings.file_format = "JPEG"
     scene.render.image_settings.color_mode = "RGB"
-    scene.render.filepath = str(image)
     scene.render.engine = "BLENDER_WORKBENCH"
-    bpy.ops.render.render(write_still=True)
+    if image is not None:
+        image.parent.mkdir(parents=True, exist_ok=True)
+        scene.render.filepath = str(image)
+        bpy.ops.render.render(write_still=True)
     original = []
     for obj in scene.objects:
         if obj.type != "MESH":
@@ -194,6 +196,58 @@ def render_pair(image, mask):
     scene.view_settings.view_transform = previous
     if world:
         world.inputs["Strength"].default_value = strength
+
+
+def mask_geometry(path, object_count):
+    """Return an actually visible pixel, not a possibly occluded box centre."""
+    image = bpy.data.images.load(str(path), check_existing=False)
+    width, height = image.size
+    pixels = np.empty(width * height * 4, dtype=np.float32)
+    image.pixels.foreach_get(pixels)
+    # Raw ID render is stored in an sRGB PNG; Blender image loading decodes it.
+    # Set Non-Color before reading, to retain the exact encoded byte IDs.
+    image.colorspace_settings.name = "Non-Color"
+    image.pixels.foreach_get(pixels)
+    ids = np.rint(pixels.reshape(height, width, 4)[::-1, :, 0] * 255).astype(int)
+    bpy.data.images.remove(image)
+    objects = []
+    for instance in range(1, object_count + 1):
+        y, x = np.nonzero(ids == instance)
+        point = None
+        if len(x):
+            chosen = np.argmin((x - x.mean()) ** 2 + (y - y.mean()) ** 2)
+            point = [float(x[chosen]) + 0.5, float(y[chosen]) + 0.5]
+        objects.append({"id": instance, "visible_px": len(x), "image_xy": point})
+    return objects
+
+
+def render_closeup(camera, point, path, fov=24.0, resolution=(224, 224), validation_mask=False):
+    """Re-render a narrow view from the unchanged eye along its gaze ray."""
+    old_matrix = camera.matrix_world.copy()
+    old_angle = camera.data.angle
+    old_resolution = (scene.render.resolution_x, scene.render.resolution_y)
+    width, height = old_resolution
+    direction = Vector(((2 * point[0] - 1) * math.tan(old_angle / 2),
+                        (1 - 2 * point[1]) * math.tan(old_angle / 2) * height / width, -1))
+    # Minimal local eye rotation preserves the original head's roll.
+    rotation = Vector((0, 0, -1)).rotation_difference(direction.normalized())
+    camera.matrix_world = old_matrix @ rotation.to_matrix().to_4x4()
+    camera.data.angle = math.radians(fov)
+    camera.data.dof.use_dof = False
+    scene.render.resolution_x, scene.render.resolution_y = resolution
+    scene.render.image_settings.file_format = "JPEG"
+    scene.render.image_settings.color_mode = "RGB"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    scene.render.filepath = str(path)
+    started = time.monotonic()
+    bpy.ops.render.render(write_still=True)
+    rgb_seconds = time.monotonic() - started
+    if validation_mask:
+        render_pair(None, path.with_suffix(".png"))
+    camera.matrix_world = old_matrix
+    camera.data.angle = old_angle
+    scene.render.resolution_x, scene.render.resolution_y = old_resolution
+    return rgb_seconds
 
 
 def _place_distractors(table, entries, count, occupied, rng):
@@ -359,6 +413,10 @@ def main():
     scene.camera = camera
     started = time.monotonic()
     image_seconds = []
+    geometry = {}
+    closeup_seconds = []
+    mode = job.get("mode", "original")
+    selected_images = set(job["frame_images"]) if "frame_images" in job else None
     realized = {}
     clip_counts = []
     rng = np.random.default_rng(job.get("seed", 0))
@@ -453,6 +511,8 @@ def main():
         realized.update({frame["image"]: categories for frame in segment["frames"]})
         relative_distractors = [table.matrix_world.inverted() @ obj.matrix_world for obj in distractors]
         for index, frame in enumerate(segment["frames"]):
+            if selected_images is not None and frame["image"] not in selected_images:
+                continue
             actor.data.vertices.foreach_set("co", (arrays["vertices"][index] + shift).ravel())
             actor.data.update()
             table.matrix_world = translation @ Matrix(arrays["table"][index].tolist())
@@ -461,11 +521,30 @@ def main():
                 obj.matrix_world = table.matrix_world @ relative
             camera.matrix_world = translation @ Matrix(arrays["camera"][index].tolist())
             before_render = time.monotonic()
-            render_pair(output / frame["image"], output / frame["mask"])
+            if mode != "closeup":
+                render_pair(None if mode == "geometry" else output / frame["image"], output / frame["mask"])
+            if mode in ("geometry", "sample"):
+                geometry[frame["image"]] = mask_geometry(output / frame["mask"], 1 + len(categories))
             image_seconds.append(time.monotonic() - before_render)
+            point = job.get("gaze", {}).get(frame["image"])
+            if mode == "sample":
+                visible = [obj for obj in geometry[frame["image"]] if obj["visible_px"]]
+                if visible:
+                    chosen = visible[len(closeup_seconds) % len(visible)]
+                    point = [chosen["image_xy"][0] / config["resolution"][0],
+                             chosen["image_xy"][1] / config["resolution"][1]]
+                    geometry[frame["image"] + "_sample_target"] = chosen["id"]
+            if point is not None and mode in ("closeup", "sample"):
+                before_closeup = time.monotonic()
+                closeup_seconds.append(render_closeup(
+                    camera, point, output / "closeups" / frame["image"],
+                    job.get("closeup_fov", 24.0), job.get("closeup_resolution", [224, 224]),
+                    validation_mask=mode == "sample"))
         for obj in [actor, table, active, *distractors, *floor_objects]:
             remove_object(obj)
     stats_path = output / f"render_stats_{job.get('job_id', 'job')}.json"
+    if geometry:
+        (output / f"geometry_{job.get('job_id', 'job')}.json").write_text(json.dumps(geometry))
     previous = json.loads(stats_path.read_text()) if stats_path.exists() else {}
     image_seconds = previous.get("image_seconds", []) + image_seconds
     stats_path.write_text(json.dumps({"seconds": previous.get("seconds", 0) + time.monotonic() - started,
@@ -474,6 +553,7 @@ def main():
                                                           "clip_counts": previous.get("clip_counts", []) + clip_counts,
                                                           "images": len(image_seconds),
                                                           "image_seconds": image_seconds,
+                                                          "closeup_seconds": closeup_seconds,
                                                           "blender_version": bpy.app.version_string}))
 
 

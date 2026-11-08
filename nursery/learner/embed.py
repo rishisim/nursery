@@ -189,3 +189,124 @@ def embed_episodes(episodes, output, device=None, batch=64, grid=16):
                     patch.object(upstream, "frame_path", side_effect=lambda v, f: paths[(v, int(f))]):
                 _encode_bounded(upstream, argv, table, output / f"{name}_cache")
     return output
+
+
+def embed_closeups(episodes, output, snapshot=None, device="mps", batch=64):
+    """Encode gaze-valid close-up frames with Step 1's exact offline DINO snapshot.
+
+    ``frames.parquet`` contains only requested, rendered close-ups, with relative
+    image paths. Missing gaze has no image/cache row; the learner must mask it.
+    Labels and simulator object identities are never passed to the encoder.
+    """
+    import hashlib
+    import subprocess
+    import time
+    from unittest.mock import patch
+
+    import numpy as np
+    import pandas as pd
+    import torch
+
+    revision = "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
+    snapshot = Path(snapshot or REPO / "outputs/features/visual_grid16/encoder_cache/hub"
+                    / "models--facebook--dinov2-base/snapshots" / revision).absolute()
+    if snapshot.name != revision:
+        raise ValueError("Close-up encoder requires the frozen Step 1 DINO snapshot")
+    if batch < 1:
+        raise ValueError("Embedding batch must be positive")
+    device = str(torch.device(device))
+    episodes = Path(episodes).resolve()
+    table_path = episodes / "frames.parquet"
+    table = pd.read_parquet(table_path)[["video_id", "frame_idx", "image"]].reset_index(drop=True)
+    if table.empty or table.isna().any().any() or table.duplicated(["video_id", "frame_idx"]).any():
+        raise ValueError("Close-up frames require nonempty, unique, nonmissing keys and images")
+    if not np.equal(table.frame_idx, table.frame_idx.astype(int)).all() or (table.frame_idx < 0).any():
+        raise ValueError("Close-up frame indices must be nonnegative integers")
+    table["frame_idx"] = table.frame_idx.astype(int)
+    paths = {(r.video_id, r.frame_idx): episodes / r.image for r in table.itertuples()}
+    if not all(not Path(r.image).is_absolute() for r in table.itertuples()) or not all(
+            p.is_file() and p.resolve().is_relative_to(episodes) for p in paths.values()):
+        raise ValueError("Missing close-up image or path outside close-up episode root")
+
+    def sha(path):
+        digest = hashlib.sha256()
+        with Path(path).open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+
+    model_hashes = {name: sha(snapshot / name) for name in
+                    ("config.json", "preprocessor_config.json", "model.safetensors")}
+    image_digest = hashlib.sha256()
+    for key, path in paths.items():
+        image_digest.update(json.dumps([*key, sha(path)], separators=(",", ":")).encode() + b"\n")
+    upstream = _upstream_module("embed_regions")
+    provenance = {"episodes": str(episodes), "encoder": "facebook/dinov2-base",
+                  "snapshot": str(snapshot), "snapshot_revision": revision,
+                  "snapshot_sha256": model_hashes, "frames_sha256": sha(table_path),
+                  "ordered_images_sha256": image_digest.hexdigest(), "grid": 16, "cls": True,
+                  "source_sha256": {str(p): sha(p) for p in
+                                    (Path(__file__).resolve(), Path(upstream.__file__).resolve())},
+                  "execution_revision": subprocess.check_output(
+                      ["git", "-C", str(REPO), "rev-parse", "HEAD"], text=True).strip()}
+    output = _output_directory(output)
+    record_path = output / "embedding_closeup.json"
+    cache = output / "closeup_cache"
+    previous_hashes = None
+    if record_path.exists():
+        saved = json.loads(record_path.read_text())
+        if saved["provenance"] != provenance:
+            raise ValueError("Close-up embedding provenance changed; refusing to reuse cache")
+        previous_hashes = saved.get("cache_sha256")
+    elif cache.exists() and any(cache.iterdir()):
+        raise ValueError("Close-up cache exists without provenance; refusing to reuse cache")
+    record = {"provenance": provenance, "device": device, "batch": batch, "complete": False}
+    if previous_hashes is not None:
+        record["cache_sha256"] = previous_hashes
+    record_path.write_text(json.dumps(record, indent=2) + "\n")
+    table.to_parquet(output / "closeup_frames.parquet", index=False)
+    model_loader = upstream.AutoModel.from_pretrained
+    processor_loader = upstream.AutoImageProcessor.from_pretrained
+
+    def load_model(_model_id):
+        model = model_loader(str(snapshot), local_files_only=True)
+        move = model.to
+        model.to = lambda _device: move(device)
+        return model
+
+    def load_processor(_model_id):
+        processor = processor_loader(str(snapshot), local_files_only=True)
+
+        def process(**kwargs):
+            inputs = processor(**kwargs)
+            move = inputs.to
+            inputs.to = lambda _device: move(device)
+            return inputs
+        return process
+
+    argv = ["embed_regions", "--frames", str(output / "closeup_frames.parquet"),
+            "--out", str(cache), "--grid", "16", "--batch", str(batch)]
+    started = time.monotonic()
+    with patch.dict("os.environ", {"HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"}), \
+            patch.object(upstream.AutoModel, "from_pretrained", side_effect=load_model), \
+            patch.object(upstream.AutoImageProcessor, "from_pretrained", side_effect=load_processor), \
+            patch.object(upstream, "frame_path", side_effect=lambda v, f: paths[(v, int(f))]):
+        _encode_bounded(upstream, argv, table, cache)
+    index = pd.read_parquet(cache / "index.parquet")
+    pd.testing.assert_frame_equal(index[["video_id", "frame_idx"]], table[["video_id", "frame_idx"]])
+    values = np.load(cache / "emb.f16.npy", mmap_mode="r")
+    if values.shape != (len(table), 257, 768) or values.dtype != np.float16:
+        raise ValueError("Close-up cache must contain 257 frozen DINO tokens of width 768")
+    if not np.array_equal(index.row, np.arange(len(table))):
+        raise ValueError("Close-up cache row mapping is not contiguous")
+    for start in range(0, len(values), 1024):
+        if not np.isfinite(values[start:start + 1024]).all():
+            raise ValueError("Nonfinite close-up features")
+    cache_hashes = {name: sha(cache / name) for name in ("index.parquet", "emb.f16.npy")}
+    if previous_hashes is not None and cache_hashes != previous_hashes:
+        raise ValueError("Close-up cache checksum changed since completion")
+    record.update(complete=True, rows=len(table), shape=list(values.shape),
+                  encoding_and_validation_seconds=time.monotonic() - started,
+                  cache_sha256=cache_hashes)
+    record_path.write_text(json.dumps(record, indent=2) + "\n")
+    return output

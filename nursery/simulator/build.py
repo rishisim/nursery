@@ -148,7 +148,8 @@ def _render_samples(data, samples, config, hand_ids):
     combined["contact"]["body"] = np.stack([data[clip]["contact"]["body"][frame] for clip, frame in samples])
     return reconstruct(combined, np.arange(len(samples)), config, hand_ids)
 
-def _session(config, root, hand_ids, subject, number, rooms, clips, pools, seed, output):
+def _session(config, root, hand_ids, subject, number, rooms, clips, pools, seed, output,
+             *, replay_only=False):
     from PIL import Image
     import trimesh
 
@@ -193,7 +194,8 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, pools, seed,
             transform = np.asarray(held["transform"])
             mesh_vertices, mesh_faces = geometry(config["library"], held["instance"])
             swapped = trimesh.Trimesh(mesh_vertices @ transform[:3, :3].T + transform[:3, 3], mesh_faces, process=False)
-            contact = _swapped_contact(vertices, poses, swapped, hand_ids)
+            contact = (np.zeros((len(vertices), len(ids)), dtype=bool) if replay_only else
+                       _swapped_contact(vertices, poses, swapped, hand_ids))
             left = contact[:, :len(hand_ids["left_hand"])].any(1)
             right = contact[:, len(hand_ids["left_hand"]):].any(1)
             rendered = poses @ transform
@@ -204,9 +206,11 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, pools, seed,
         hand_contact[seconds] = contact
         gate_indices = contact_indices(data, indices, hand_ids)
         gate_vertices, vertex_ids, hand_bounds, hand_margin = hand_geometry(data, hand_ids, gate_indices, config, hand_model)
-        surface = _object_surface(data, root)
-        distances, _ = contact_distances(data, gate_indices, gate_vertices, hand_ids, root, vertex_ids, labelled_only=True, surface=surface)
-        _, all_distances = contact_distances(data, indices, vertices, hand_ids, root, surface=surface)
+        distances, all_distances = [], []
+        if not replay_only:
+            surface = _object_surface(data, root)
+            distances, _ = contact_distances(data, gate_indices, gate_vertices, hand_ids, root, vertex_ids, labelled_only=True, surface=surface)
+            _, all_distances = contact_distances(data, indices, vertices, hand_ids, root, surface=surface)
         trajectory_bounds, object_margin = _trajectory(data, root)
         labelled.extend(distances)
         whole.extend(all_distances)
@@ -239,6 +243,10 @@ def _session(config, root, hand_ids, subject, number, rooms, clips, pools, seed,
             "distractors": [{**entry, "color": colors.get(entry["category"])} for entry in _distractors(pools["table"], category, rng)],
             "floor_count": int(rng.integers(floor_low, floor_high + 1)),
             "floor_objects": _distractors(pools["floor"], category, rng)})
+    if replay_only:
+        # Scene re-export uses saved contact/held annotations and verifies rendered
+        # instance pixels against that source. It does not recalculate body labels.
+        return job
     # Do not render geometry that has already failed the required contact construction gate.
     if not labelled or not whole or np.median(labelled) >= 0.01:
         for segment in job["segments"]:
