@@ -1,4 +1,4 @@
-# Step 2: preserve richer bodily information
+# Step 3: preserve richer bodily information
 
 Design reference in [PLAN.md](../PLAN.md). This step defines the sensory change
 before the [controlled learning comparison](body_representation_comparison.md).
@@ -85,4 +85,4 @@ be ordinary learner inputs or manufacture distinctive sensory signatures.
 
 Exact contact granularity, recovered sample rate, pose encoding and necessary
 encoder-size changes remain open. Resolve them from available data and
-training/development evidence before Step 3, without selecting on test scores.
+training/development evidence before Step 4, without selecting on test scores.

@@ -7,34 +7,40 @@ video plus bodily inputs (V+B), across amounts of independent training
 experience. The long-term hypothesis is a higher language-learning ceiling;
 the existing experiments neither establish that benefit nor rule it out.
 
-## Current direction and five steps
+## Current direction and six steps
 
-Improve the bodily information available to the learner before choosing how to
+First add simulated child gaze to the world: it drives what the parent names
+and is a new learner input. An error breakdown of Step 1 showed most errors
+come from naming small background objects the child isn't attending to.
+Then improve the bodily information available to the learner before choosing how to
 pretrain it or introducing another fusion design. Preserve useful detail already
 present in the recordings and explicitly record sensations that require new
 physical modeling or measurements. Active exploration remains deferred.
 
 The documents below follow the earlier study format: the idea, the experience
 or comparison, how it works, and the output we want. Step 1 now includes its
-frozen protocol and completed results. Steps 2–5 remain design references;
+frozen protocol and completed results. Steps 2–6 remain design references;
 their features, data amounts, seeds, budgets and runtime limits remain to be
 settled before their respective experiments.
 
 | Step | Document | Question and current status |
 |---|---|---|
 | 1 | [Visual baseline](docs/visual_baseline.md) | Complete and audited: at 630 clips, recorded 4×4 video scored 60.12%, 16×16 scored 61.93%; paired gain +1.81 points over three seeds. |
-| 2 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
-| 3 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
-| 4 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
-| 5 | [Language acquisition curves](docs/language_acquisition_curves.md) | Does the selected video-plus-body setup help across amounts of experience? This is the main outcome. |
+| 2 | [Child gaze](docs/child_gaze.md) | Does simulated gaze, driving naming at real-life strength and given to the learner with a sharp close-up, beat video alone, including with gaze removed at test? Design only. |
+| 3 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
+| 4 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
+| 5 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
+| 6 | [Language acquisition curves](docs/language_acquisition_curves.md) | Does the selected video-plus-body setup help across amounts of experience? This is the main outcome. |
 
-Steps 1 and 2 meet in Step 3. Step 4 settles the learning recipe before Step 5.
+Step 2 changes the world the later steps run in: speech becomes gaze-driven, so
+Steps 3–6 use it and re-establish their video baselines there. Steps 1 and 3
+meet in Step 4. Step 5 settles the learning recipe before Step 6.
 A weak intermediate result is a design signal for the build, not a standalone
 paper framing or an automatic instruction to launch more conditions.
 
 Step 1 supports retaining 16×16 as the visual reference. Its modest gain on the
 broader task is separate from the small four-noun diagnostic's roughly 92%
-accuracy. Step 2 remains design work; no body change or subsequent run has
+accuracy. Steps 2 and 3 remain design work; no gaze or body change or subsequent run has
 been started by the visual comparison.
 
 ## Decisions to keep consistent

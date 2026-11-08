@@ -46,10 +46,11 @@ scripts/                        Render/pipeline/seed launchers and run summaries
 tests/                          Current learner, speech, physical and simulator tests
 docs/
   visual_baseline.md             Step 1: 16×16 vision and recorded 4×4 reference
-  body_representation.md         Step 2: recoverable sensory detail and missing signals
-  body_representation_comparison.md  Step 3: current versus richer body, additive
-  body_training_recipe.md        Step 4: decide wordless pretraining after representation
-  language_acquisition_curves.md Step 5: main video versus video + body curves
+  child_gaze.md                  Step 2: simulated gaze drives naming and feeds the learner
+  body_representation.md         Step 3: recoverable sensory detail and missing signals
+  body_representation_comparison.md  Step 4: current versus richer body, additive
+  body_training_recipe.md        Step 5: decide wordless pretraining after representation
+  language_acquisition_curves.md Step 6: main video versus video + body curves
   learner.md                    Current implementation and scoring reference
   speech_coupling.md             Speech-generation evidence and assumptions
 archive/

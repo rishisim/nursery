@@ -1,4 +1,4 @@
-# Step 4: settle how the improved body input is learned
+# Step 5: settle how the improved body input is learned
 
 Design reference in [PLAN.md](../PLAN.md), following the
 [representation comparison](body_representation_comparison.md). No new
@@ -35,10 +35,10 @@ sensations.
 | Condition | Body representation | Fusion | Wordless pretraining |
 |---|---|---|---|
 | 16×16 video reference | None | Video only | None |
-| Video + body | Fixed candidate from Step 3 | Additive | None |
+| Video + body | Fixed candidate from Step 4 | Additive | None |
 | Video + pretrained body | Same candidate | Additive | Masked body reconstruction |
 
-Reuse Step 3 references when data, model and selection settings match. If the
+Reuse Step 4 references when data, model and selection settings match. If the
 question instead becomes whether pretraining changes the relative value of
 current versus richer body, apply it to both representations in a separately
 specified comparison rather than mixing questions.

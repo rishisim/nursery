@@ -1,4 +1,4 @@
-# Step 3: compare current and richer body representations
+# Step 4: compare current and richer body representations
 
 Design reference in [PLAN.md](../PLAN.md), following the
 [visual baseline](visual_baseline.md) and [body representation](body_representation.md).

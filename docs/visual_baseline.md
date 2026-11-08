@@ -76,7 +76,7 @@ array to fit the 32-GiB machine without changing crops or model arithmetic.
 | 16×16 video | 61.93 ± 0.93% | +1.81 ± 1.47 percentage points |
 
 This comparison is matched as specified below. The four-noun result above
-remains separate. This baseline feeds Steps 3 and 5.
+remains separate. This baseline feeds Steps 2, 4 and 6.
 
 ## Execution protocol
 

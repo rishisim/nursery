@@ -1,4 +1,4 @@
-# Step 5: language acquisition with richer bodily experience
+# Step 6: language acquisition with richer bodily experience
 
 The main outcome in [PLAN.md](../PLAN.md), following
 [representation work](body_representation.md), the
