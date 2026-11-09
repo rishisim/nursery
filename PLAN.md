@@ -23,14 +23,16 @@ frozen protocol and completed results. Step 2's world generation is complete,
 and all 82,393 production close-ups and frozen-DINO rows are independently
 validated. Phase B is frozen and locally timed with additive gaze chosen by
 design, without development pilots. A prior eight-GPU attempt passed CUDA
-parity but stopped at upload. The twelve-run comparison now awaits rental
-approval and a qualified transfer path.
+parity but stopped at upload. The approved US rental then passed transfer,
+complete CUDA cache checks and real concurrent timing, but its cost projection
+exceeded $20. It was destroyed after verified evidence return; the twelve-run
+comparison needs a newly authorized compute window.
 Steps 3–6 remain design references, with settings still to be settled.
 
 | Step | Document | Question and current status |
 |---|---|---|
 | 1 | [Visual baseline](docs/visual_baseline.md) | Complete and audited: at 630 clips, recorded 4×4 video scored 60.12%, 16×16 scored 61.93%; paired gain +1.81 points over three seeds. |
-| 2 | [Child gaze](docs/child_gaze.md) | Phase B frozen at `bfa470c6`: additive by design, four conditions × seeds 0–2 × 60 epochs, 630 clips. Two fresh development-only epochs per condition measured 147.63/158.10/156.18/153.47 s; serial matrix 38.52 h with 25% headroom. Prior upload already used four streams; current uplink is unqualified. Conditional 8×4090 plan: 165–215 min, $15.08–19.57, $20/four-hour caps. Await rental approval and faster network or separately approved pre-staging; Phase C 0/12. |
+| 2 | [Child gaze](docs/child_gaze.md) | Phase B frozen at `bfa470c6`: additive, four conditions × seeds 0–2 × 60 epochs, 630 clips. Approved US 8×4090 passed 89.84-Mbps transfer, complete cache parity and eight-worker CUDA timing; conservative epochs 53.75/78.37/71.94/67.62 s. Stopped at $21.41 projected cost versus $20 cap (235.95 min); even best eight/four grouping projected $20.20. Actual $1.499, evidence verified back in 20m10s, rental destroyed and zero instances confirmed; independent stop audit passed. Phase C 0/12; Phase D pending; new compute approval required. |
 | 3 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
 | 4 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
 | 5 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
@@ -46,9 +48,11 @@ Step 1 supports retaining 16×16 as the visual reference. Its modest gain on the
 broader task is separate from the small four-noun diagnostic's roughly 92%
 accuracy. Step 2 world generation and sharp-view encoding are complete; its
 scientific comparison remains pending. Additive was chosen by design and the
-matched protocol is frozen; no full development pilots are needed. After
-rental approval and transfer qualification, measure real concurrent CUDA
-epochs before the twelve full runs. Step 3 remains design work.
+matched protocol is frozen; no full development pilots are needed. Transfer,
+cache parity and real concurrent CUDA epochs were measured on the approved
+rental, which stopped at the cost gate before scientific training. The next
+authorized compute window must pass both caps before the twelve full runs.
+Step 3 remains design work.
 
 ## Decisions to keep consistent
 

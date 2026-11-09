@@ -827,3 +827,103 @@ no pilot wave. No new rental, Juno access, project-data upload or test-panel
 scoring occurred. Phase C remains 0/12 and Phase D has not started. The next
 build step is to test whether the frozen additive gaze input improves language
 acquisition under matched training, after the transfer and real CUDA gates pass.
+
+### Approved additive rental stopped at the cost gate — 8 November 2026
+
+The user approved one US 8× RTX 4090 host for the twelve frozen additive
+runs, with **$20 total** and **four hours from launch to verified results
+back**. No relaunch, extra machine, staging service or protocol change was
+authorized. AC power and caffeinate were confirmed before launch. The
+operator, monitor and independent auditor had separate roles.
+
+One Florida host, instance `59831415`, launched at **03:58:51.857 UTC on
+9 November** (8 November locally). It supplied eight standard 24-GB RTX
+4090s, 515,738 MB host RAM and 172 GB disk, enough for the 160-GiB minimum.
+The recorded GPU/disk quote was **$5.381111/hour**. Including the $0.25
+transfer reserve, the cost deadline was 220.215 minutes after launch,
+earlier than the four-hour limit.
+
+The new neutral upload measurements were **106.26 and 106.95 Mbps**, each
+using 100 MB. All eight retained archives and the separately hashed
+122-file source/matrix delta were verified and losslessly compressed. The
+**1,629,582,976-byte** payload reached this host in **145.115 seconds at
+89.837 Mbps**. Compressed hashes, original tar hashes, extracted input hashes
+and the pinned DINO snapshot passed. Original local files stayed unchanged.
+
+The retained PIL encoder was reused with its output-root adjustment. All
+nine predetermined early parity rows passed; complete encoding then passed
+coverage, finite-value, exact key/order and lossless-merge checks for all
+three shared caches. The final nine-row parity had worst absolute error
+**0.015625**, worst relative L2 **0.00006469393** and minimum cosine
+**0.999999997908**, within the unchanged thresholds. The environment records
+PyTorch 2.14.1/CUDA 13.2, Transformers 5.19.0, Pillow 12.3.0 and Python
+3.12.15; the new runtime was qualified by these checks.
+
+An explicit child binding preserves the canonical `bfa470c6` source,
+protocol, prepared files and non-derived inputs. Its only execution changes
+are CUDA device selection and the recorded shared derived-cache paths and
+hashes. The original frozen matrix was not rewritten. The superseded
+pilot-selection orchestration was adapted to the additive design decision;
+no pilot selection or steering training ran.
+
+Eight fresh workers each completed **two development-only CUDA epochs**,
+two workers per condition. The gate uses the largest actual epoch across
+both workers, plus the largest measured setup and four-times-development
+final-evaluation estimate:
+
+| Condition | Conservative seconds/epoch | Setup + 60 epochs + final evaluation |
+|---|---:|---:|
+| Video only | 53.7473 | 3,247.269 s |
+| Video + gaze | 78.3727 | 4,738.766 s |
+| Video + shuffled gaze | 71.9435 | 4,352.045 s |
+| Video + gaze point only | 67.6175 | 4,091.736 s |
+
+**The mandatory cost gate failed.** At 18.502 minutes elapsed, the recorded
+eight-then-four schedule put a gaze run in each wave. Its projection was
+1,110.135 + 1.25 × (4,738.766 + 4,738.766) + 900 seconds for return,
+verification and teardown + 300 seconds contingency = **14,157.051 seconds /
+235.951 minutes**, costing **$21.4113** including the transfer reserve.
+The wall-time check passed, but the $20 check failed. All timing weights
+were discarded, and **zero of twelve scientific runs started**.
+
+The monitor also enumerated all 495 possible eight/four partitions as a
+stop-decision check. The best grouping, with the same measured bounds,
+headroom and reserves, still projects **222.471 minutes / $20.2024**. Thus
+$21.4113 describes the recorded schedule, rather than a minimum possible
+cost; regrouping alone would still fail this attempt's cap. No schedule,
+reserve, epoch, seed or scientific setting was changed after the failed gate.
+
+All **219 returned files** passed their hashes at **04:19:01.918 UTC**,
+**20 minutes 10.061 seconds after launch**. All six final derived-cache
+hashes were rechecked remotely before teardown. Destruction and a live
+zero-instance confirmation completed at **04:19:03.125 UTC**, 20 minutes
+11.268 seconds after launch. The task-created provider SSH key and local
+private/public keys were removed. Provider usage for this attempt is
+**$1.499**: GPU $1.477, disk $0.016 and bandwidth $0.006. The initial
+$1.441 ledger snapshot was unsettled; the later operator and independent
+auditor queries agree on $1.499. The prior $4.90 attempt remains separate.
+
+The incomplete `runs_complete.json` records **0/12**. The independent
+execution/stop audit **passed** (`audit/execution_stop_audit.json`): all 219
+returned hashes, six final cache hashes, 71 source files, 16 prepared files,
+1,730 original external inputs and 78 earlier evidence files were checked.
+Timing weights were absent and teardown/key cleanup was verified.
+**Phase D has not started**. There are no matched
+video-versus-gaze accuracies, gaze-removed results, control results or
+per-seed acquisition statistics from this attempt. The Step 1 old-world
+16×16 reference remains unchanged and cannot fill these missing results.
+
+Evidence is retained, ignored, under
+`outputs/runs/child_gaze/phase_c/approved_rental/`: transport and runtime
+inventories, `preflight/`, `returned/`, cache binding, measured gate,
+`audit/`, `monitor/`, billing and teardown receipts. Original renders,
+features, speech, prepared studies, runs and earlier evidence were preserved.
+
+For the next build step, transfer and cache execution are now qualified;
+the matched language-acquisition comparison still needs a new authorized
+compute window. At the recorded speeds and reserves, the existing schedule
+would need a quote at or below **$5.0222/hour**, or a higher cost cap; the
+best eight/four grouping would need at or below **$5.3265/hour**. A future
+host's actual transfer and concurrent epochs must qualify again. No further
+rental or scientific change was made. This stop supplies execution timing,
+not evidence for or against a language-acquisition benefit from gaze.
