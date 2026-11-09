@@ -119,6 +119,8 @@ def run_connected(command, *, teardown=False, **kwargs):
             return run_transport(command, teardown=teardown, **kwargs)
         except ProlongedOutage:
             raise
+        except AmbiguousCreate:
+            raise
         except TransportUnavailable:
             deadline = float(os.environ.get('CHILD_GAZE_HARD_DEADLINE', 'inf'))
             if not teardown and time.time() >= deadline:

@@ -67,6 +67,17 @@ def test_ambiguous_create_waits_through_inventory_dns_outage():
     assert sum(args[1:3] == ['create', 'instance'] for args in calls) == 1
 
 
+def test_persistent_wrapper_never_repeats_uncertain_create(monkeypatch):
+    calls = []
+    def fail(args, **kwargs):
+        calls.append(args)
+        raise rental.AmbiguousCreate('response lost')
+    monkeypatch.setattr(rental, 'run_transport', fail)
+    with pytest.raises(rental.AmbiguousCreate):
+        rental.run_connected(['vastai', 'create', 'instance', '7'])
+    assert len(calls) == 1
+
+
 def test_early_auth_readiness_does_not_start_network_outage(tmp_path, monkeypatch):
     monkeypatch.setenv('CHILD_GAZE_SSH_STARTUP_DEADLINE', '1200')
     failed = lambda args, **kw: result(args, code=255, error='Permission denied (publickey)')
