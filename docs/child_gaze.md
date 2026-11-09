@@ -5,6 +5,12 @@ Design reference in [PLAN.md](../PLAN.md). It follows the
 implements and validates the simulated world; learner selection and scientific
 comparisons remain separate phases.
 
+**Step 2 is complete at 630 clips; Phase C and the independent Phase D audit
+are recorded in [Completed results](#completed-results--9-november-2026).**
+Video only scored 63.61%; additive video + gaze scored 63.25% with gaze and
+60.13% with gaze removed. The current additive input does not improve this
+matched comparison, so it is not selected for acquisition curves.
+
 ## The idea
 
 Add one gaze process to the simulated world. It does two jobs:
@@ -927,3 +933,237 @@ best eight/four grouping would need at or below **$5.3265/hour**. A future
 host's actual transfer and concurrent epochs must qualify again. No further
 rental or scientific change was made. This stop supplies execution timing,
 not evidence for or against a language-acquisition benefit from gaze.
+
+## Completed results — 9 November 2026
+
+All twelve matched scientific runs completed at frozen execution revision
+`bfa470c64e5ca2c531bd0ee520e378a1bd467d67`: four conditions, seeds 0–2,
+630 independent clips, 18,613 utterances, 63,153 replay seconds and 60 epochs
+per fresh learner. Additive gaze, dropout 0.5, initial gaze weight 1.0,
+optimizer, splits and checkpoint selection stayed frozen. No development
+pilot, steering, extra condition, curve point or scientific protocol change
+was introduced.
+
+**The current additive gaze input did not improve primary accuracy.**
+On the primary new-clip panel, video only scored **63.61 ± 1.53%**;
+video + gaze scored **63.25 ± 2.17%** with gaze and **60.13 ± 1.17%**
+with gaze removed. Paired gaze-minus-video differences were
+−0.72, +3.42 and −3.78 percentage points with gaze
+(**−0.36 ± 3.61 pp**), and −5.22, −1.80 and −3.42 points removed
+(**−3.48 ± 1.71 pp**). Gaze-removed performance declined in every seed.
+On s8, the paired differences were +0.04 ± 1.89 pp with gaze and
+−3.61 ± 0.48 pp removed. These are training-seed means and sample standard
+deviations on fixed panels, not confidence intervals over new test situations.
+
+All accuracy values below are percentages. Video only never receives gaze;
+its identical rows are repeated to make both mode comparisons explicit.
+The shuffled condition's “with gaze” mode supplies shuffled gaze at test time,
+consistent with its training control. Both modes for every gaze learner use
+the **same earliest with-gaze development-maximum checkpoint**. Picture-only
+transfer instead uses the earliest picture-development maximum, with gaze
+absent for every condition; it is not a rescoring of the primary checkpoint.
+
+Held and gazed splits use the referent category at the aligned centre frame,
+not the pre-jitter source frame. Size is the maximum category-summed visible
+pixel count across the same cached five-frame video window. These are
+**full-frame source pixels**, an upper bound on visible pixels retained by
+the encoder crop, not close-up pixels. Split tables show mean ± sample SD;
+all per-seed split values are retained in `analysis/summary.json`. The primary
+≤16-pixel group has only three questions and cannot support a stable claim.
+
+### Primary new-source-clip panel (556 questions)
+
+| Condition | Test mode | Seed 0 | Seed 1 | Seed 2 | Mean ± sample SD |
+|---|---|---:|---:|---:|---:|
+| Video only | With gaze | 64.21% | 61.87% | 64.75% | 63.61 ± 1.53% |
+| Video only | Gaze removed | 64.21% | 61.87% | 64.75% | 63.61 ± 1.53% |
+| Video + gaze | With gaze | 63.49% | 65.29% | 60.97% | 63.25 ± 2.17% |
+| Video + gaze | Gaze removed | 58.99% | 60.07% | 61.33% | 60.13 ± 1.17% |
+| Shuffled gaze | With gaze | 51.80% | 51.80% | 48.02% | 50.54 ± 2.18% |
+| Shuffled gaze | Gaze removed | 60.61% | 57.91% | 59.89% | 59.47 ± 1.40% |
+| Gaze point only | With gaze | 62.41% | 62.05% | 63.31% | 62.59 ± 0.65% |
+| Gaze point only | Gaze removed | 62.23% | 62.05% | 62.77% | 62.35 ± 0.37% |
+
+| Condition | Test mode | held (n=201) | not_held (n=355) | gazed (n=265) | not_gazed (n=291) |
+|---|---|---:|---:|---:|---:|
+| Video only | With gaze | 83.58 ± 1.32 | 52.30 ± 2.11 | 69.56 ± 1.74 | 58.19 ± 1.39 |
+| Video only | Gaze removed | 83.58 ± 1.32 | 52.30 ± 2.11 | 69.56 ± 1.74 | 58.19 ± 1.39 |
+| Video + gaze | With gaze | 80.60 ± 1.49 | 53.43 ± 2.99 | 73.21 ± 4.20 | 54.18 ± 1.05 |
+| Video + gaze | Gaze removed | 78.61 ± 1.49 | 49.67 ± 0.99 | 65.53 ± 0.79 | 55.21 ± 2.78 |
+| Shuffled gaze | With gaze | 67.99 ± 3.04 | 40.66 ± 1.88 | 55.85 ± 2.72 | 45.70 ± 1.91 |
+| Shuffled gaze | Gaze removed | 75.95 ± 3.00 | 50.14 ± 0.85 | 64.91 ± 2.47 | 54.52 ± 1.05 |
+| Gaze point only | With gaze | 81.76 ± 1.75 | 51.74 ± 1.81 | 68.68 ± 0.38 | 57.04 ± 1.03 |
+| Gaze point only | Gaze removed | 82.09 ± 2.17 | 51.17 ± 1.79 | 68.43 ± 0.58 | 56.82 ± 0.40 |
+
+| Condition | Test mode | <=16 (n=3) | 17-64 (n=31) | 65-256 (n=102) | 257-1024 (n=239) | >1024 (n=181) |
+|---|---|---:|---:|---:|---:|---:|
+| Video only | With gaze | 33.33 ± 0.00 | 39.78 ± 1.86 | 39.87 ± 2.04 | 65.27 ± 2.61 | 79.37 ± 0.64 |
+| Video only | Gaze removed | 33.33 ± 0.00 | 39.78 ± 1.86 | 39.87 ± 2.04 | 65.27 ± 2.61 | 79.37 ± 0.64 |
+| Video + gaze | With gaze | 11.11 ± 19.25 | 26.88 ± 6.72 | 40.85 ± 3.71 | 64.02 ± 3.42 | 81.95 ± 1.59 |
+| Video + gaze | Gaze removed | 33.33 ± 0.00 | 36.56 ± 1.86 | 38.89 ± 3.44 | 59.83 ± 2.55 | 76.98 ± 0.64 |
+| Shuffled gaze | With gaze | 33.33 ± 33.33 | 31.18 ± 4.93 | 32.35 ± 1.96 | 49.37 ± 1.92 | 65.93 ± 4.43 |
+| Shuffled gaze | Gaze removed | 33.33 ± 0.00 | 31.18 ± 1.86 | 39.87 ± 3.71 | 59.27 ± 3.14 | 76.06 ± 1.94 |
+| Gaze point only | With gaze | 33.33 ± 0.00 | 36.56 ± 3.72 | 39.22 ± 0.98 | 63.60 ± 2.21 | 79.37 ± 2.61 |
+| Gaze point only | Gaze removed | 33.33 ± 0.00 | 36.56 ± 3.72 | 39.22 ± 0.98 | 63.46 ± 1.58 | 78.82 ± 2.23 |
+
+### Held-out person, s8 (793 questions)
+
+| Condition | Test mode | Seed 0 | Seed 1 | Seed 2 | Mean ± sample SD |
+|---|---|---:|---:|---:|---:|
+| Video only | With gaze | 62.42% | 63.93% | 59.65% | 62.00 ± 2.17% |
+| Video only | Gaze removed | 62.42% | 63.93% | 59.65% | 62.00 ± 2.17% |
+| Video + gaze | With gaze | 62.55% | 62.04% | 61.54% | 62.04 ± 0.50% |
+| Video + gaze | Gaze removed | 59.02% | 59.77% | 56.37% | 58.39 ± 1.79% |
+| Shuffled gaze | With gaze | 45.90% | 49.31% | 44.64% | 46.62 ± 2.41% |
+| Shuffled gaze | Gaze removed | 60.40% | 59.39% | 57.25% | 59.02 ± 1.61% |
+| Gaze point only | With gaze | 61.79% | 64.19% | 60.28% | 62.08 ± 1.97% |
+| Gaze point only | Gaze removed | 62.17% | 64.19% | 60.15% | 62.17 ± 2.02% |
+
+| Condition | Test mode | held (n=219) | not_held (n=574) | gazed (n=349) | not_gazed (n=444) |
+|---|---|---:|---:|---:|---:|
+| Video only | With gaze | 79.30 ± 2.60 | 55.40 ± 2.57 | 67.81 ± 3.91 | 57.43 ± 0.81 |
+| Video only | Gaze removed | 79.30 ± 2.60 | 55.40 ± 2.57 | 67.81 ± 3.91 | 57.43 ± 0.81 |
+| Video + gaze | With gaze | 77.32 ± 3.04 | 56.21 ± 0.86 | 72.97 ± 1.68 | 53.45 ± 0.85 |
+| Video + gaze | Gaze removed | 73.82 ± 1.05 | 52.50 ± 2.08 | 63.42 ± 3.09 | 54.43 ± 0.79 |
+| Shuffled gaze | With gaze | 59.51 ± 5.41 | 41.70 ± 1.40 | 51.77 ± 2.15 | 42.57 ± 2.74 |
+| Shuffled gaze | Gaze removed | 74.58 ± 0.53 | 53.08 ± 2.27 | 64.37 ± 3.35 | 54.80 ± 0.26 |
+| Gaze point only | With gaze | 79.30 ± 2.16 | 55.52 ± 2.10 | 68.67 ± 3.74 | 56.91 ± 0.91 |
+| Gaze point only | Gaze removed | 79.60 ± 2.06 | 55.52 ± 2.44 | 69.05 ± 3.66 | 56.76 ± 0.98 |
+
+| Condition | Test mode | <=16 (n=16) | 17-64 (n=35) | 65-256 (n=211) | 257-1024 (n=358) | >1024 (n=173) |
+|---|---|---:|---:|---:|---:|---:|
+| Video only | With gaze | 27.08 ± 3.61 | 36.19 ± 3.30 | 44.23 ± 2.61 | 65.55 ± 2.71 | 84.78 ± 0.67 |
+| Video only | Gaze removed | 27.08 ± 3.61 | 36.19 ± 3.30 | 44.23 ± 2.61 | 65.55 ± 2.71 | 84.78 ± 0.67 |
+| Video + gaze | With gaze | 33.33 ± 13.01 | 34.29 ± 8.57 | 44.23 ± 3.16 | 67.13 ± 0.16 | 81.50 ± 4.94 |
+| Video + gaze | Gaze removed | 27.08 ± 3.61 | 30.48 ± 4.36 | 43.44 ± 2.86 | 60.34 ± 2.56 | 81.12 ± 1.33 |
+| Shuffled gaze | With gaze | 35.42 ± 3.61 | 23.81 ± 7.19 | 32.23 ± 4.99 | 46.37 ± 2.56 | 70.33 ± 2.41 |
+| Shuffled gaze | Gaze removed | 29.17 ± 7.22 | 30.48 ± 1.65 | 44.71 ± 1.66 | 60.89 ± 2.11 | 81.12 ± 2.34 |
+| Gaze point only | With gaze | 27.08 ± 3.61 | 37.14 ± 5.71 | 45.18 ± 2.19 | 65.08 ± 2.11 | 84.78 ± 2.03 |
+| Gaze point only | Gaze removed | 27.08 ± 3.61 | 35.24 ± 6.60 | 45.18 ± 2.61 | 65.36 ± 2.39 | 84.97 ± 0.58 |
+
+### Picture-only transfer
+
+| Panel | Condition | Seed 0 | Seed 1 | Seed 2 | Mean ± sample SD |
+|---|---|---:|---:|---:|---:|
+| Rendered pictures | Video only | 75.76% | 74.94% | 76.15% | 75.62 ± 0.62% |
+| Rendered pictures | Video + gaze | 72.81% | 72.69% | 72.97% | 72.82 ± 0.14% |
+| Rendered pictures | Shuffled gaze | 75.12% | 75.12% | 75.87% | 75.37 ± 0.44% |
+| Rendered pictures | Gaze point only | 75.65% | 74.94% | 76.29% | 75.63 ± 0.68% |
+| Konkle | Video only | 75.48% | 73.60% | 72.85% | 73.98 ± 1.36% |
+| Konkle | Video + gaze | 73.98% | 71.93% | 70.67% | 72.19 ± 1.67% |
+| Konkle | Shuffled gaze | 74.90% | 72.63% | 71.78% | 73.11 ± 1.61% |
+| Konkle | Gaze point only | 75.28% | 73.55% | 72.53% | 73.79 ± 1.39% |
+
+### What this means for the next build step
+
+With gaze available, the primary gazed-target split improves from 69.56% to
+73.21%, while the non-gazed split falls from 58.19% to 54.18%. Held targets
+fall from 83.58% to 80.60%; non-held targets change from 52.30% to 53.43%.
+The pattern does not produce an overall gain. Removing gaze leaves both held
+and non-held splits below video only. Target-size results vary by bin and
+panel rather than showing a consistent small-object improvement.
+
+Aligned gaze beats the shuffled control, but that does not establish a gain
+over video only. Point-only input is also near or below the video baseline.
+Rendered-picture transfer falls from 75.62% to 72.82%, and Konkle transfer
+from 73.98% to 72.19%, with declines in all three paired seeds on both panels.
+The stronger claim that gaze improved the learner's video-only word knowledge
+is therefore not supported by this comparison. The splits are descriptive;
+they do not isolate a cause of the loss.
+
+Keep the gaze-driven world and the new 16×16 video reference. The current
+additive close-up/point learner is **not selected for acquisition curves**.
+The next build decision is how to make gaze contribute to learning without
+the observed loss when it is removed. Revisit that integration before carrying
+it to the curves; this result does not end the extra-modality objective.
+No further architecture, steering run or curve is authorized by this readout.
+One data amount cannot establish a higher ceiling or show that gaze cannot help.
+
+### Historical Step 1 reference — non-matched
+
+| Old-world 16×16 video | Seed 0 | Seed 1 | Seed 2 | Mean ± sample SD |
+|---|---:|---:|---:|---:|
+| Step 1 reference | 61.23% | 62.98% | 61.58% | 61.93 ± 0.93% |
+
+This is the preserved [Step 1 result](visual_baseline.md#completed-results--7-november-2026),
+not a matched arm. Step 2 changes speech and the eligible test questions
+(556 new-clip questions here versus 570 in Step 1). Comparing 61.93% with the
+new-world video's 63.61% cannot isolate the world change or gaze-input effect.
+Only the four Step 2 conditions share the matched new-world comparison.
+
+### Approved overnight execution and retained evidence
+
+The 9 November chat approval allowed at most two sequential attempts, each
+capped at **$25 and five hours launch-to-verified-results**, total ≤$50;
+a second attempt was permitted only for host reasons. **One new attempt was
+used**, on one US 8× RTX 5090 host with 32 GB per GPU, 515,739 MB host RAM
+and 172 GB disk. No qualifying preferred US 8×4090 quote at ≤$5/hour was
+available in the fresh search; this was the approved ≥24-GB fallback.
+GPU plus disk cost $3.945926/hour. AC power and caffeinate were confirmed.
+A detached local watchdog was armed before launch, bound to the actual rental,
+and independently checked. Its hard-destroy path retries CLI timeouts and
+has a 60-second safety margin before the five-hour cap.
+
+Neutral upload measured 100.06 and 55.84 Mbps. The unchanged 1,629,582,976-byte
+payload reached the destination in 155.125 seconds at 84.040 Mbps; archive,
+original tar, extracted inputs and source-delta hashes passed. All three
+CUDA-derived caches passed complete coverage, finite-value, exact key/order
+and lossless-merge checks. The unchanged nine final parity checks had worst
+absolute error 0.0078125, relative L2 0.00005863013 and minimum cosine
+0.999999998281. An explicit child binding retains the original frozen source,
+prepared files and non-derived inputs; all twelve runs share the same derived
+cache bytes. Original local caches were not replaced.
+
+Eight fresh development-only timing workers completed two epochs each, with
+empty held-out result maps; their weights were discarded. Conservative
+seconds/epoch were 28.030 video, 28.395 gaze, 26.594 shuffled and 25.676 point.
+Enumerating all 495 eight/four partitions minimized the sum of wave maxima.
+The initial timing gate projected 105.475 minutes/$7.1866, including 25%
+compute headroom, 900 seconds for return/verification/teardown and 300 seconds
+contingency. The start gate projected 106.026 minutes/$7.223; the mandatory
+post-wave-one gate projected 95.916 minutes/$6.5579. Every gate passed both
+caps without shortening epochs or seeds.
+
+Retained orchestration was adapted only for the new output root/caps,
+optimal scheduling and an absent-condition timing guard, actual GPU-memory
+validation, provider status/direct-port fields, the explicit remote Python
+interpreter, this attempt's SSH key and timeout-hardened watchdog/teardown.
+These execution fixes are recorded in `execution_adaptations.json`; the
+scientific source and canonical protocol were unchanged.
+
+Instance `59845884` launched at **06:09:59.456 UTC**. All **295 returned files**,
+including twelve histories, per-trial results and **24 selected checkpoints**,
+were locally hash-verified by **07:16:51.274 UTC**: **66m51.818s** after launch.
+The six final remote cache hashes passed before teardown. Destruction and
+live zero-instance confirmation completed at **07:16:52.494 UTC**:
+**66m53.038s** after launch. The provider and local task-created SSH keys were
+removed; watchdog and monitor processes exited. Two independent live ledger
+queries agree on settled usage **$4.416**: GPU $4.232, disk $0.178, bandwidth
+$0.006. Earlier $4.90 and $1.499 rentals are separate from this approval.
+
+The independent Phase D audit **passed**. It rehashed all 295 returned files,
+strict-loaded all 24 finite checkpoint states into the correct models,
+reconstructed 193,929 trial credits
+across 66 saved result panels from scores and the frozen unknown-word rule,
+verified exact queries/candidates/correct slots and all 24 earliest-development
+maxima, and checked the shared cache binding. All 71 source, 16 prepared and
+1,730 original external hashes passed again after execution, and all 219
+returned files from the earlier approved attempt remained unchanged.
+It independently reconstructed the held/gazed/size strata and matched all
+172 reported statistic groups, including per-seed values, means, sample SDs
+and paired differences. Gaze generation remains scene-only and never reads
+speech; semantic labels are used for supervision/evaluation and metadata
+audits, never as sensory learner inputs. Checkpoint/mode wiring was checked
+against frozen source; the audit did not repeat neural forward evaluation.
+
+Complete local, ignored evidence remains under
+`outputs/runs/child_gaze/phase_c/overnight_rental_attempt1/`: original transport
+and runtime receipts, explicit execution binding, timing and wave gates,
+`returned/` with all scientific runs and checkpoints, locally verified
+`runs_complete.json`, `analysis/{summary.json,tables.md,summarize.py}`,
+`audit/phase_d_independent_audit.json`, `audit/report_statistics_verification.json`,
+`monitor/final_monitor_audit.json`, settled billing and teardown receipts.
+The canonical freeze remains in `outputs/runs/child_gaze/matrix/`.
+No pre-existing renders, speech, features, runs or earlier evidence were
+modified or deleted. Generated outputs remain untracked. No scientific
+expansion or unrelated cleanup was performed.

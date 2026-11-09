@@ -21,18 +21,17 @@ The documents below follow the earlier study format: the idea, the experience
 or comparison, how it works, and the output we want. Step 1 now includes its
 frozen protocol and completed results. Step 2's world generation is complete,
 and all 82,393 production close-ups and frozen-DINO rows are independently
-validated. Phase B is frozen and locally timed with additive gaze chosen by
-design, without development pilots. A prior eight-GPU attempt passed CUDA
-parity but stopped at upload. The approved US rental then passed transfer,
-complete CUDA cache checks and real concurrent timing, but its cost projection
-exceeded $20. It was destroyed after verified evidence return; the twelve-run
-comparison needs a newly authorized compute window.
+validated. All twelve frozen additive runs and the independent Phase D audit
+are complete at 630 clips. Video only scored 63.61%; video + gaze scored
+63.25% with gaze and 60.13% with gaze removed. Picture-only transfer also
+declined. This additive gaze input is not selected for the acquisition curves;
+the next build decision is how to improve its contribution to learning.
 Steps 3–6 remain design references, with settings still to be settled.
 
 | Step | Document | Question and current status |
 |---|---|---|
 | 1 | [Visual baseline](docs/visual_baseline.md) | Complete and audited: at 630 clips, recorded 4×4 video scored 60.12%, 16×16 scored 61.93%; paired gain +1.81 points over three seeds. |
-| 2 | [Child gaze](docs/child_gaze.md) | Phase B frozen at `bfa470c6`: additive, four conditions × seeds 0–2 × 60 epochs, 630 clips. Approved US 8×4090 passed 89.84-Mbps transfer, complete cache parity and eight-worker CUDA timing; conservative epochs 53.75/78.37/71.94/67.62 s. Stopped at $21.41 projected cost versus $20 cap (235.95 min); even best eight/four grouping projected $20.20. Actual $1.499, evidence verified back in 20m10s, rental destroyed and zero instances confirmed; independent stop audit passed. Phase C 0/12; Phase D pending; new compute approval required. |
+| 2 | [Child gaze](docs/child_gaze.md#completed-results--9-november-2026) | Complete and independently audited: 12/12 frozen runs, four conditions × seeds 0–2 × 60 epochs, 630 clips. New-world video 63.61%; video + gaze 63.25% with gaze (−0.36 pp), 60.13% removed (−3.48 pp). Shuffled 50.54%/59.47%; point-only 62.59%/62.35%. Picture transfer declined. One US 8×5090 attempt cost $4.416; verified results back in 66m51.818s, rental destroyed, zero instances and key removal confirmed. Current additive gaze is not selected for curves. |
 | 3 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
 | 4 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
 | 5 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
@@ -46,13 +45,12 @@ paper framing or an automatic instruction to launch more conditions.
 
 Step 1 supports retaining 16×16 as the visual reference. Its modest gain on the
 broader task is separate from the small four-noun diagnostic's roughly 92%
-accuracy. Step 2 world generation and sharp-view encoding are complete; its
-scientific comparison remains pending. Additive was chosen by design and the
-matched protocol is frozen; no full development pilots are needed. Transfer,
-cache parity and real concurrent CUDA epochs were measured on the approved
-rental, which stopped at the cost gate before scientific training. The next
-authorized compute window must pass both caps before the twelve full runs.
-Step 3 remains design work.
+accuracy. Step 2 retains the gaze-driven world and its new video baseline, but
+the current additive close-up/point input supplied no overall gain and reduced
+video-only performance after removal in every seed. Revisit how gaze helps the
+learner before selecting it for acquisition curves. This is a build decision,
+not evidence that extra modalities cannot help. No curves, steering or further
+conditions were run. Step 3 remains design work.
 
 ## Decisions to keep consistent
 
