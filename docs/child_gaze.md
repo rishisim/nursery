@@ -9,7 +9,10 @@ comparisons remain separate phases.
 are recorded in [Completed results](#completed-results--9-november-2026).**
 Video only scored 63.61%; additive video + gaze scored 63.25% with gaze and
 60.13% with gaze removed. The current additive input does not improve this
-matched comparison, so it is not selected for acquisition curves.
+matched comparison, so it is not selected for acquisition curves. A later
+no-training check that chose the gaze weight on development data raised
+with-gaze accuracy to 66.37% (+2.76 points, every seed); gaze-removed
+accuracy is unchanged. See [Dev-chosen gaze weight](#dev-chosen-gaze-weight--9-november-2026).
 
 ## The idea
 
@@ -1078,6 +1081,41 @@ the observed loss when it is removed. Revisit that integration before carrying
 it to the curves; this result does not end the extra-modality objective.
 No further architecture, steering run or curve is authorized by this readout.
 One data amount cannot establish a higher ceiling or show that gaze cannot help.
+
+### Dev-chosen gaze weight — 9 November 2026
+
+Training set the additive gaze weight β by fit, not usefulness: real gaze ended
+at 1.32–1.36, shuffled gaze at 1.24–1.26, point only at 0.44–0.50. This check
+rescored the nine saved gaze checkpoints (the same with-gaze-selected ones as
+above) with β swept over 0–1.5 in steps of 0.05, chose β per learner and seed
+on the with-gaze development panel only (ties to the smaller β), then scored
+the test panels once. No training. The learned-β accuracies and predictions
+were reproduced exactly first. Script:
+[child_gaze_weight_check.py](../scripts/child_gaze_weight_check.py); results in
+`outputs/analysis/child_gaze_weight_check/` (ignored).
+
+| With gaze, dev-chosen β | β (seeds 0–2) | Primary (556) | Δ vs video, per seed | s8 (793) | Δ vs video, per seed |
+|---|---|---:|---|---:|---|
+| Video only | — | 63.61 ± 1.53 | — | 62.00 ± 2.17 | — |
+| Video + gaze | 0.55 / 0.30 / 0.35 | **66.37 ± 0.82** | **+2.76** (+1.44 / +5.40 / +1.44) | **64.69 ± 0.95** | **+2.69** (+1.39 / +1.77 / +4.92) |
+| Shuffled gaze | 0 / 0 / 0.05 | 59.29 ± 1.35 | −4.32 | 58.89 ± 1.82 | −3.11 |
+| Gaze point only | 0.10 / 0.45 / 0.65 | 62.29 ± 0.27 | −1.32 | 62.21 ± 1.80 | +0.21 |
+
+Primary splits, video only → dev-chosen gaze: held 83.58 → 84.41, not held
+52.30 → 56.15, gazed 69.56 → 74.34, not gazed 58.19 → 59.11. Real-gaze test
+accuracy by fixed β (descriptive, primary): 0 → 60.13, 0.25 → 65.35,
+0.5 → 66.37, 0.75 → 65.71, 1.0 → 64.51, learned → 63.25.
+
+**Meaning.** The flat with-gaze result came mostly from overweighting. With β
+chosen on development data, additive gaze beats video only in every seed on
+both panels, and the shuffled control's β correctly drops to about zero. The
+check cannot change the gaze-removed or picture-transfer results, since β
+does not apply there: the video path itself still learned less (60.13%).
+Caveats: post-hoc rescoring of existing checkpoints on panels already
+reported; a development panel of about 510 questions; three seeds; and test
+targets come from naming moments, which follow gaze, so part of the with-gaze
+gain may come from that link. Any added-input branch should have its weight
+chosen on development data rather than by training.
 
 ### Historical Step 1 reference — non-matched
 
