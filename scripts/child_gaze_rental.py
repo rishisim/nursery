@@ -82,7 +82,22 @@ def run_transport(command, *, state_file=None, attempts=10, retry_seconds=300,
             if check:
                 raise subprocess.CalledProcessError(result.returncode, command, result.stdout, result.stderr)
             return result
-        _state(state_file, service, True, clock())
+        readiness_failure = service == 'ssh' and clock() < float(os.environ.get('CHILD_GAZE_SSH_STARTUP_DEADLINE', '0')) and any(
+            word in output.lower() for word in ('permission denied (publickey)', 'connection refused', 'connection closed'))
+        if service == 'ssh' and os.environ.get('CHILD_GAZE_INSTANCE_ID'):
+            # Provider logs must precede the first SSH recovery action.
+            try:
+                logs = run_transport(['vastai', 'logs', os.environ['CHILD_GAZE_INSTANCE_ID'],
+                                      '--tail', '100', '--raw'], state_file=state_file,
+                                     teardown=True)
+                if state_file:
+                    with Path(state_file).with_name('ssh_failure_logs.jsonl').open('a') as handle:
+                        handle.write(json.dumps(dict(utc=time.time(), code=logs.returncode,
+                                                     stdout=logs.stdout, stderr=logs.stderr)) + '\n')
+            except TransportUnavailable:
+                pass
+        if not readiness_failure:
+            _state(state_file, service, True, clock())
         if create:
             raise AmbiguousCreate('Create response uncertain; reconcile task label before another create')
         elapsed = clock() - started
@@ -102,13 +117,18 @@ def create_instance(command, *, label, state_file=None, runner=run_transport,
         value = json.loads(result.stdout)
         if value.get('success') and value.get('new_contract'):
             return value
-    except (AmbiguousCreate, subprocess.TimeoutExpired, json.JSONDecodeError):
+    except (TransportUnavailable, subprocess.TimeoutExpired, json.JSONDecodeError):
         pass
     # The official inventory is the authority even if create stdout was lost.
     started = clock()
-    for attempt in range(10):
-        inventory = runner(['vastai', 'show', 'instances', '--raw'], state_file=state_file,
-                           teardown=True, check=True)
+    attempt = 0
+    while attempt < 10:
+        try:
+            inventory = runner(['vastai', 'show', 'instances', '--raw'], state_file=state_file,
+                               teardown=True, check=True)
+        except TransportUnavailable:
+            # Never repeat POST merely because its reconciliation lookup is offline.
+            continue
         instances = json.loads(inventory.stdout)
         matches = [item for item in instances if item.get('label') == label]
         if len(matches) == 1:
@@ -116,6 +136,7 @@ def create_instance(command, *, label, state_file=None, runner=run_transport,
         if len(matches) > 1 or clock() - started >= 300:
             break
         sleep(min(40, 5 * 2 ** attempt))
+        attempt += 1
     raise AmbiguousCreate(f'Create unresolved: {len(matches)} matching instances; do not create again')
 
 
@@ -132,7 +153,8 @@ def wait_running(instance, *, started, state_file=None, receipt=None, timeout=12
                 safe = {key: value.get(key) for key in ('id', 'actual_status', 'cur_state',
                         'intended_status', 'next_state', 'status_msg', 'public_ipaddr',
                         'ports', 'machine_dir_ssh_port')}
-                Path(receipt).write_text(json.dumps(dict(utc=clock(), provider=safe), indent=2) + '\n')
+                Path(receipt).write_text(json.dumps(dict(utc=time.time(), elapsed_seconds=clock()-started,
+                                                        provider=safe), indent=2) + '\n')
             if status in ('exited', 'unknown', 'offline', 'error') or value.get('intended_status') == 'stopped' or value.get('next_state') == 'stopped':
                 raise RuntimeError('Provider reported a terminal startup error: ' + str(status))
             if status == 'running':

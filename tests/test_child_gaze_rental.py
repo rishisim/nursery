@@ -52,6 +52,31 @@ def test_ambiguous_create_reconciles_instead_of_creating_twice():
     assert sum(args[1:3] == ['create', 'instance'] for args in calls) == 1
 
 
+def test_ambiguous_create_waits_through_inventory_dns_outage():
+    calls = []
+    def runner(args, **kwargs):
+        calls.append(args)
+        if len(calls) == 1:
+            raise rental.AmbiguousCreate('create response lost')
+        if len(calls) == 2:
+            raise rental.TransportUnavailable('inventory DNS unavailable for retry cycle')
+        return result(args, json.dumps([{'id': 43, 'label': 'unique-task'}]))
+    out = rental.create_instance(['vastai', 'create', 'instance', '7', '--label', 'unique-task'],
+                                 label='unique-task', runner=runner)
+    assert out['new_contract'] == 43 and len(calls) == 3
+    assert sum(args[1:3] == ['create', 'instance'] for args in calls) == 1
+
+
+def test_early_auth_readiness_does_not_start_network_outage(tmp_path, monkeypatch):
+    monkeypatch.setenv('CHILD_GAZE_SSH_STARTUP_DEADLINE', '1200')
+    failed = lambda args, **kw: result(args, code=255, error='Permission denied (publickey)')
+    state = tmp_path / 'transport.json'
+    with pytest.raises(rental.TransportUnavailable):
+        rental.run_transport(['ssh', 'host'], state_file=state, attempts=1,
+                             clock=lambda: 100, invoke=failed)
+    assert not state.exists()
+
+
 def test_loading_and_transient_running_without_container_never_attempt_ssh():
     now = [0.]
     states = iter(['running', 'loading', 'running'])
