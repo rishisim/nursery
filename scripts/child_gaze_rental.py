@@ -1,0 +1,150 @@
+"""Bounded transport retries and provider readiness for child-gaze rentals."""
+import fcntl
+import json
+import os
+from pathlib import Path
+import subprocess
+import time
+
+
+class TransportUnavailable(RuntimeError):
+    pass
+
+
+class ProlongedOutage(TransportUnavailable):
+    pass
+
+
+class AmbiguousCreate(TransportUnavailable):
+    pass
+
+
+def _state(path, service, failed, now):
+    if path is None:
+        return False
+    path = Path(path)
+    with path.with_suffix('.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        value = json.loads(path.read_text()) if path.exists() else {'outages': {}}
+        outage = value['outages'].get(service)
+        if failed:
+            value['outages'].setdefault(service, {'started': now})['last_failed'] = now
+        elif outage:
+            duration = now - outage['started']
+            value.setdefault('recoveries', []).append(dict(service=service, seconds=duration, utc=now))
+            if duration > 600:
+                value['stop_requested'] = True
+            del value['outages'][service]
+        value['updated'] = now
+        path.write_text(json.dumps(value, indent=2) + '\n')
+        return value.get('stop_requested', False)
+
+
+def transient(text):
+    text = text.lower()
+    return any(word in text for word in (
+        'nameresolutionerror', 'failed to resolve', 'temporary failure in name resolution',
+        'nodename nor servname', 'could not resolve', 'connection refused',
+        'connection reset', 'connection timed out', 'connectionerror', 'timed out',
+        'network is unreachable', 'no route to host', 'connection closed',
+        'connection unexpectedly closed', 'permission denied (publickey)',
+        'remote host has closed', 'sslerror', 'remote end closed',
+    ))
+
+
+def run_transport(command, *, state_file=None, attempts=10, retry_seconds=300,
+                  teardown=False, clock=time.time, sleep=time.sleep,
+                  invoke=subprocess.run, **kwargs):
+    """Retry only transport failures; create requests are always reconciled."""
+    service = Path(str(command[0])).name
+    if service not in ('vastai', 'ssh', 'rsync'):
+        return invoke(command, **kwargs)
+    state_file = state_file or os.environ.get('CHILD_GAZE_TRANSPORT_STATE')
+    check = kwargs.pop('check', False)
+    kwargs.setdefault('capture_output', True)
+    kwargs.setdefault('text', True)
+    kwargs.setdefault('timeout', 30)
+    started = clock()
+    result = None
+    create = service == 'vastai' and list(command[1:3]) == ['create', 'instance']
+    for attempt in range(attempts):
+        try:
+            result = invoke(command, **kwargs)
+        except subprocess.TimeoutExpired as error:
+            result = subprocess.CompletedProcess(command, 124, '', str(error))
+        output = str(result.stdout or '') + '\n' + str(result.stderr or '')
+        if result.returncode == 0:
+            stop = _state(state_file, service, False, clock())
+            if stop and not teardown:
+                raise ProlongedOutage('Connectivity recovered after an outage over ten minutes; teardown required')
+            return result
+        if not transient(output) and result.returncode != 124:
+            if check:
+                raise subprocess.CalledProcessError(result.returncode, command, result.stdout, result.stderr)
+            return result
+        _state(state_file, service, True, clock())
+        if create:
+            raise AmbiguousCreate('Create response uncertain; reconcile task label before another create')
+        elapsed = clock() - started
+        if attempt + 1 >= attempts or elapsed >= retry_seconds:
+            break
+        sleep(min(40, 5 * 2 ** attempt, max(0, retry_seconds - elapsed)))
+    raise TransportUnavailable(f'{service} unavailable after {attempt + 1} tries: {output[-2000:]}')
+
+
+def create_instance(command, *, label, state_file=None, runner=run_transport,
+                    clock=time.time, sleep=time.sleep):
+    """Never repeat an uncertain create; first find its unique task label."""
+    if '--label' not in command or command[command.index('--label') + 1] != label:
+        raise ValueError('Unique task label is required for create reconciliation')
+    try:
+        result = runner(command, state_file=state_file, attempts=1, timeout=90, check=True)
+        value = json.loads(result.stdout)
+        if value.get('success') and value.get('new_contract'):
+            return value
+    except (AmbiguousCreate, subprocess.TimeoutExpired, json.JSONDecodeError):
+        pass
+    # The official inventory is the authority even if create stdout was lost.
+    started = clock()
+    for attempt in range(10):
+        inventory = runner(['vastai', 'show', 'instances', '--raw'], state_file=state_file,
+                           teardown=True, check=True)
+        instances = json.loads(inventory.stdout)
+        matches = [item for item in instances if item.get('label') == label]
+        if len(matches) == 1:
+            return {'success': True, 'new_contract': matches[0]['id'], 'reconciled': True}
+        if len(matches) > 1 or clock() - started >= 300:
+            break
+        sleep(min(40, 5 * 2 ** attempt))
+    raise AmbiguousCreate(f'Create unresolved: {len(matches)} matching instances; do not create again')
+
+
+def wait_running(instance, *, started, state_file=None, receipt=None, timeout=1200,
+                 runner=run_transport, clock=time.monotonic, sleep=time.sleep):
+    """Do not attempt SSH while the image/container is still loading."""
+    while clock() - started < timeout:
+        try:
+            result = runner(['vastai', 'show', 'instance', str(instance), '--raw'],
+                            state_file=state_file, check=True)
+            value = json.loads(result.stdout)
+            status = value.get('actual_status') or value.get('cur_state')
+            if receipt:
+                safe = {key: value.get(key) for key in ('id', 'actual_status', 'cur_state',
+                        'intended_status', 'next_state', 'status_msg', 'public_ipaddr',
+                        'ports', 'machine_dir_ssh_port')}
+                Path(receipt).write_text(json.dumps(dict(utc=clock(), provider=safe), indent=2) + '\n')
+            if status in ('exited', 'unknown', 'offline', 'error') or value.get('intended_status') == 'stopped' or value.get('next_state') == 'stopped':
+                raise RuntimeError('Provider reported a terminal startup error: ' + str(status))
+            if status == 'running':
+                logs = runner(['vastai', 'logs', str(instance), '--tail', '100', '--raw'],
+                              state_file=state_file, check=True)
+                if 'No such container' not in (logs.stdout or ''):
+                    return value
+        except ProlongedOutage:
+            raise
+        except TransportUnavailable:
+            # Preserve the cross-phase outage clock; another bounded retry cycle
+            # may recover without abandoning a healthy, still-loading rental.
+            continue
+        sleep(15)
+    raise TimeoutError('Provider did not finish startup within twenty minutes')
