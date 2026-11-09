@@ -103,6 +103,8 @@ def run_transport(command, *, state_file=None, attempts=10, retry_seconds=300,
                                                      stdout=logs.stdout, stderr=logs.stderr)) + '\n')
             except TransportUnavailable:
                 pass
+            if state_file and Path(state_file).exists() and json.loads(Path(state_file).read_text()).get('stop_requested') and not teardown:
+                raise ProlongedOutage('Provider recovered during SSH diagnostics after ten-minute outage; teardown required')
         if not readiness_failure:
             _state(state_file, service, True, clock())
         if create:
@@ -117,6 +119,9 @@ def run_transport(command, *, state_file=None, attempts=10, retry_seconds=300,
 def run_connected(command, *, teardown=False, **kwargs):
     """Continue bounded retry cycles; recovery after ten minutes stops science."""
     while True:
+        state_file = kwargs.get('state_file') or os.environ.get('CHILD_GAZE_TRANSPORT_STATE')
+        if not teardown and state_file and Path(state_file).exists() and json.loads(Path(state_file).read_text()).get('stop_requested'):
+            raise ProlongedOutage('Prolonged-outage stop is pending; teardown required')
         try:
             return run_transport(command, teardown=teardown, **kwargs)
         except ProlongedOutage:
