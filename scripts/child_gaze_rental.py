@@ -64,12 +64,15 @@ def run_transport(command, *, state_file=None, attempts=10, retry_seconds=300,
     kwargs.setdefault('capture_output', True)
     kwargs.setdefault('text', True)
     kwargs.setdefault('timeout', 30)
-    started = clock()
+    retry_started = None
     result = None
     create = service == 'vastai' and list(command[1:3]) == ['create', 'instance']
     for attempt in range(attempts):
         try:
-            result = invoke(command, **kwargs)
+            options = dict(kwargs)
+            if retry_started is not None:
+                options['timeout'] = min(options['timeout'], max(.1, retry_seconds - (clock()-retry_started)))
+            result = invoke(command, **options)
         except subprocess.TimeoutExpired as error:
             result = subprocess.CompletedProcess(command, 124, '', str(error))
         output = str(result.stdout or '') + '\n' + str(result.stderr or '')
@@ -82,6 +85,8 @@ def run_transport(command, *, state_file=None, attempts=10, retry_seconds=300,
             if check:
                 raise subprocess.CalledProcessError(result.returncode, command, result.stdout, result.stderr)
             return result
+        if retry_started is None:
+            retry_started = clock()
         readiness_failure = service == 'ssh' and clock() < float(os.environ.get('CHILD_GAZE_SSH_STARTUP_DEADLINE', '0')) and any(
             word in output.lower() for word in ('permission denied (publickey)', 'connection refused', 'connection closed'))
         if service == 'ssh' and os.environ.get('CHILD_GAZE_INSTANCE_ID'):
@@ -100,11 +105,25 @@ def run_transport(command, *, state_file=None, attempts=10, retry_seconds=300,
             _state(state_file, service, True, clock())
         if create:
             raise AmbiguousCreate('Create response uncertain; reconcile task label before another create')
-        elapsed = clock() - started
+        elapsed = clock() - retry_started
         if attempt + 1 >= attempts or elapsed >= retry_seconds:
             break
         sleep(min(40, 5 * 2 ** attempt, max(0, retry_seconds - elapsed)))
     raise TransportUnavailable(f'{service} unavailable after {attempt + 1} tries: {output[-2000:]}')
+
+
+def run_connected(command, *, teardown=False, **kwargs):
+    """Continue bounded retry cycles; recovery after ten minutes stops science."""
+    while True:
+        try:
+            return run_transport(command, teardown=teardown, **kwargs)
+        except ProlongedOutage:
+            raise
+        except TransportUnavailable:
+            deadline = float(os.environ.get('CHILD_GAZE_HARD_DEADLINE', 'inf'))
+            if not teardown and time.time() >= deadline:
+                raise
+            time.sleep(5)
 
 
 def create_instance(command, *, label, state_file=None, runner=run_transport,

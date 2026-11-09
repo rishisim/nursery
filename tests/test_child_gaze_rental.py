@@ -100,3 +100,18 @@ def test_loading_has_twenty_minute_bound():
         rental.wait_running(42, started=0, runner=runner, clock=lambda: now[0],
                             sleep=lambda duration: now.__setitem__(0, now[0] + duration))
     assert now[0] == 1200
+
+
+def test_long_initial_upload_failure_still_gets_resumable_retry():
+    now = [0.]
+    timeouts = []
+    def invoke(args, **kwargs):
+        timeouts.append(kwargs['timeout'])
+        if len(timeouts) == 1:
+            now[0] += 900
+            return result(args, code=255, error='Connection reset')
+        return result(args, 'resumed')
+    out = rental.run_transport(['rsync', 'source', 'host:dest'], timeout=1750,
+                                invoke=invoke, clock=lambda: now[0],
+                                sleep=lambda seconds: now.__setitem__(0, now[0]+seconds))
+    assert out.stdout == 'resumed' and timeouts == [1750, 295]
