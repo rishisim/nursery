@@ -36,7 +36,9 @@ def _state(path, service, failed, now):
                 value['stop_requested'] = True
             del value['outages'][service]
         value['updated'] = now
-        path.write_text(json.dumps(value, indent=2) + '\n')
+        pending = path.with_suffix('.pending')
+        pending.write_text(json.dumps(value, indent=2) + '\n')
+        pending.replace(path)
         return value.get('stop_requested', False)
 
 
