@@ -33,7 +33,10 @@ def _state(path, service, failed, now):
             duration = now - outage['started']
             value.setdefault('recoveries', []).append(dict(service=service, seconds=duration, utc=now))
             if duration > 600:
-                value['stop_requested'] = True
+                if os.environ.get('CHILD_GAZE_RECOVERY_POLICY') == 'fetch-first':
+                    value['recovery_fetch_required'] = True
+                else:
+                    value['stop_requested'] = True
             del value['outages'][service]
         value['updated'] = now
         pending = path.with_suffix('.pending')
@@ -119,6 +122,9 @@ def run_transport(command, *, state_file=None, attempts=10, retry_seconds=300,
 def run_connected(command, *, teardown=False, **kwargs):
     """Continue bounded retry cycles; recovery after ten minutes stops science."""
     while True:
+        deadline = float(os.environ.get('CHILD_GAZE_HARD_DEADLINE', 'inf'))
+        if not teardown and time.time() >= deadline:
+            raise TransportUnavailable('Approved hard deadline reached')
         state_file = kwargs.get('state_file') or os.environ.get('CHILD_GAZE_TRANSPORT_STATE')
         if not teardown and state_file and Path(state_file).exists() and json.loads(Path(state_file).read_text()).get('stop_requested'):
             raise ProlongedOutage('Prolonged-outage stop is pending; teardown required')
@@ -133,6 +139,24 @@ def run_connected(command, *, teardown=False, **kwargs):
             if not teardown and time.time() >= deadline:
                 raise
             time.sleep(5)
+
+
+def real_epoch_projection(*, epoch_seconds, setup_seconds, elapsed_seconds,
+                          hourly, hard_seconds=7200, transfer_reserve=.25,
+                          return_reserve=900, contingency=300):
+    """Conservative cap gate from the first epochs of the actual six runs."""
+    if len(epoch_seconds) != 6 or len(setup_seconds) != 6 or min(epoch_seconds) <= 0:
+        raise ValueError('All six real workers must supply a positive epoch duration')
+    remaining = 1.25 * (59 * max(epoch_seconds) + max(setup_seconds)) + return_reserve + contingency
+    total = elapsed_seconds + remaining
+    cost = total / 3600 * hourly + transfer_reserve
+    return dict(passes=total <= hard_seconds and cost <= 15,
+                projected_remaining_seconds=remaining,
+                projected_launch_to_verified_results_seconds=total,
+                projected_cost_usd=cost, max_epoch_seconds=max(epoch_seconds),
+                max_setup_seconds=max(setup_seconds), headroom=1.25,
+                remaining_epochs=59, return_reserve_seconds=return_reserve,
+                contingency_seconds=contingency)
 
 
 def create_instance(command, *, label, state_file=None, runner=run_transport,

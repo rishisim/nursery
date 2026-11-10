@@ -126,3 +126,33 @@ def test_long_initial_upload_failure_still_gets_resumable_retry():
                                 invoke=invoke, clock=lambda: now[0],
                                 sleep=lambda seconds: now.__setitem__(0, now[0]+seconds))
     assert out.stdout == 'resumed' and timeouts == [1750, 295]
+
+
+def test_fetch_first_recovery_preserves_contract_for_retrieval(tmp_path, monkeypatch):
+    monkeypatch.setenv('CHILD_GAZE_RECOVERY_POLICY', 'fetch-first')
+    state = tmp_path / 'state.json'
+    rental._state(state, 'ssh', True, 100.)
+    out = rental.run_transport(['ssh', 'host'], state_file=state, clock=lambda: 1000.,
+                               invoke=lambda args, **kw: result(args, 'available'))
+    value = json.loads(state.read_text())
+    assert out.stdout == 'available' and value['recovery_fetch_required']
+    assert not value.get('stop_requested')
+
+
+def test_non_teardown_never_starts_after_hard_cap(monkeypatch):
+    monkeypatch.setenv('CHILD_GAZE_HARD_DEADLINE', '1')
+    monkeypatch.setattr(rental, 'run_transport', lambda *args, **kw: pytest.fail('must not call transport'))
+    with pytest.raises(rental.TransportUnavailable, match='hard deadline'):
+        rental.run_connected(['ssh', 'host'])
+
+
+def test_real_six_worker_first_epoch_projection():
+    gate = rental.real_epoch_projection(epoch_seconds=[30.] * 6, setup_seconds=[20.] * 6,
+                                        elapsed_seconds=1200, hourly=4.)
+    assert gate['passes'] and gate['remaining_epochs'] == 59
+    assert gate['projected_launch_to_verified_results_seconds'] == 4637.5
+    assert not rental.real_epoch_projection(epoch_seconds=[80.] * 6, setup_seconds=[20.] * 6,
+                                            elapsed_seconds=1200, hourly=4.)['passes']
+    with pytest.raises(ValueError):
+        rental.real_epoch_projection(epoch_seconds=[30.] * 5, setup_seconds=[20.] * 6,
+                                      elapsed_seconds=1200, hourly=4.)
