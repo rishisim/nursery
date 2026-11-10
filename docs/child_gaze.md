@@ -13,6 +13,10 @@ matched comparison, so it is not selected for acquisition curves. A later
 no-training check that chose the gaze weight on development data raised
 with-gaze accuracy to 66.37% (+2.76 points, every seed); gaze-removed
 accuracy is unchanged. See [Dev-chosen gaze weight](#dev-chosen-gaze-weight--9-november-2026).
+**Steering gaze then beat video only in every seed:** 75.72% with gaze
+(+12.11) and 66.31% with gaze removed (+2.70), with picture transfer up
+6.5–10.6 points. Steering is the candidate for acquisition curves; see
+[Steering gaze](#steering-gaze--9-november-2026).
 
 ## The idea
 
@@ -1116,6 +1120,62 @@ reported; a development panel of about 510 questions; three seeds; and test
 targets come from naming moments, which follow gaze, so part of the with-gaze
 gain may come from that link. Any added-input branch should have its weight
 chosen on development data rather than by training.
+
+### Steering gaze — 9 November 2026
+
+Steering, the gaze wiring held back above, was then run with the user's
+approval. The gaze point sets a spatial prior over which video patches a word
+is matched to, and the close-up joins as one extra region through the same
+visual projection; there is no separate gaze score. Six fresh runs: steering
+with real gaze and with shuffled gaze, seeds 0–2. Everything else matched the
+frozen additive matrix (same study, 630 clips, 60 epochs, gaze dropout 0.5,
+steering σ 0.15, checkpoint rule); the Step 2 video-only runs are the
+comparison and were not rerun. Source under `nursery/` was unchanged since
+`bfa470c6` and all study hashes matched. An independent audit passed.
+Evidence and the full report: `outputs/runs/child_gaze/steering/` (ignored).
+
+| Panel and mode | Video only | Additive gaze | **Steering** | Steering, shuffled |
+|---|---:|---:|---:|---:|
+| Primary (556), with gaze | 63.61 ± 1.53 | 63.25 ± 2.17 | **75.72 ± 0.31** | 58.57 ± 0.91 |
+| Primary (556), gaze removed | 63.61 ± 1.53 | 60.13 ± 1.17 | **66.31 ± 0.63** | 62.77 ± 0.78 |
+| s8 (793), with gaze | 62.00 ± 2.17 | 62.04 ± 0.50 | **75.45 ± 0.32** | 60.74 ± 0.76 |
+| s8 (793), gaze removed | 62.00 ± 2.17 | 58.39 ± 1.79 | **64.90 ± 0.84** | 61.20 ± 1.46 |
+| Rendered pictures, no gaze | 75.62 ± 0.62 | 72.82 ± 0.14 | **82.09 ± 0.68** | 73.93 ± 0.24 |
+| Konkle pictures, no gaze | 73.98 ± 1.36 | 72.19 ± 1.67 | **84.58 ± 1.14** | 73.29 ± 1.95 |
+
+Paired steering-minus-video differences, per seed: primary with gaze
++11.33 / +14.21 / +10.79 (+12.11 ± 1.84); primary removed +2.16 / +3.78 /
++2.16 (+2.70 ± 0.93); s8 with gaze +13.45 ± 2.02; s8 removed
++1.51 / +1.39 / +5.80 (+2.90 ± 2.51). Every seed is positive on every panel
+and mode.
+
+Primary splits, video only → steering with gaze / removed: held 83.58 →
+89.05 / 82.75; not held 52.30 → 68.17 / 57.00; gazed 69.56 → 83.52 / 70.57;
+not gazed 58.19 → 68.61 / 62.43. By target size, gains are largest above
+64 px; the 17–64 px bin (31 questions) falls from 39.78 to 30.11 / 29.03, and
+the ≤16 px bin has only three questions.
+
+At a fixed development read at epoch 20 (no test), steering was already ahead
+on `clips_dev` (79.22 vs 64.05) and gaze-free `picture_dev` (81.34 vs 74.57) in
+every seed.
+
+**Meaning.** Steering is the first extra input in this project to beat video
+only under matched training, and it does so with gaze removed and on
+gaze-free picture tests. The video path itself learned more, which is the
+spec's stronger claim. The with-gaze gain is partly inflated because test
+targets come from naming moments that follow gaze; the gaze-removed and
+picture results do not have that link. Shuffled steering stays at or below
+video only, so the gain depends on real gaze. Some of the picture gain may
+reflect close-ups resembling object pictures, although shuffled steering also
+trains on close-ups without gaining. Small targets did not improve. This is
+one data amount, so it shows better learning at 630 clips, not a higher
+ceiling. Per the spec, **steering video + gaze is the candidate to carry to
+the acquisition curves**; no curve has been run or authorized.
+
+Rental: one US 8× RTX 5090 host, $3.37, verified results back in 54 minutes,
+zero instances confirmed. Two earlier steering launches the same day returned
+no results ($0.77, then $7.12 after a local network outage) and are recorded
+in the run root.
 
 ### Historical Step 1 reference — non-matched
 

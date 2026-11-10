@@ -24,14 +24,16 @@ and all 82,393 production close-ups and frozen-DINO rows are independently
 validated. All twelve frozen additive runs and the independent Phase D audit
 are complete at 630 clips. Video only scored 63.61%; video + gaze scored
 63.25% with gaze and 60.13% with gaze removed. Picture-only transfer also
-declined. This additive gaze input is not selected for the acquisition curves;
-the next build decision is how to improve its contribution to learning.
+declined. Steering, the alternative gaze wiring, was then run under the same
+frozen settings: 75.72% with gaze and 66.31% with gaze removed, beating video
+only in every seed, with picture transfer up 6.5–10.6 points. Steering video +
+gaze is the candidate to carry to the acquisition curves.
 Steps 3–6 remain design references, with settings still to be settled.
 
 | Step | Document | Question and current status |
 |---|---|---|
 | 1 | [Visual baseline](docs/visual_baseline.md) | Complete and audited: at 630 clips, recorded 4×4 video scored 60.12%, 16×16 scored 61.93%; paired gain +1.81 points over three seeds. |
-| 2 | [Child gaze](docs/child_gaze.md#completed-results--9-november-2026) | Complete and independently audited: 12/12 frozen runs, four conditions × seeds 0–2 × 60 epochs, 630 clips. New-world video 63.61%; video + gaze 63.25% with gaze (−0.36 pp), 60.13% removed (−3.48 pp). Shuffled 50.54%/59.47%; point-only 62.59%/62.35%. Picture transfer declined. One US 8×5090 attempt cost $4.416; verified results back in 66m51.818s, rental destroyed, zero instances and key removal confirmed. Current additive gaze is not selected for curves. |
+| 2 | [Child gaze](docs/child_gaze.md#completed-results--9-november-2026) | Complete and independently audited: 12/12 frozen runs, four conditions × seeds 0–2 × 60 epochs, 630 clips. New-world video 63.61%; video + gaze 63.25% with gaze (−0.36 pp), 60.13% removed (−3.48 pp). Shuffled 50.54%/59.47%; point-only 62.59%/62.35%. Picture transfer declined. One US 8×5090 attempt cost $4.416; verified results back in 66m51.818s, rental destroyed, zero instances and key removal confirmed. Current additive gaze is not selected for curves. [Steering](docs/child_gaze.md#steering-gaze--9-november-2026) (6 runs, audited): 75.72% with gaze (+12.11 pp), 66.31% removed (+2.70 pp), positive in every seed; s8 +13.45/+2.90 pp; pictures 82.09%/84.58% vs 75.62%/73.98%. Shuffled steering at or below video. Steering is the candidate for curves. |
 | 3 | [Body representation](docs/body_representation.md) | What contact, pose and temporal detail can existing information supply, and which sensations remain unavailable? Design only. |
 | 4 | [Representation comparison](docs/body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
 | 5 | [Body training recipe](docs/body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
@@ -47,10 +49,11 @@ Step 1 supports retaining 16×16 as the visual reference. Its modest gain on the
 broader task is separate from the small four-noun diagnostic's roughly 92%
 accuracy. Step 2 retains the gaze-driven world and its new video baseline, but
 the current additive close-up/point input supplied no overall gain and reduced
-video-only performance after removal in every seed. Revisit how gaze helps the
-learner before selecting it for acquisition curves. This is a build decision,
-not evidence that extra modalities cannot help. No curves, steering or further
-conditions were run. Step 3 remains design work.
+video-only performance after removal in every seed. Steering gaze, where gaze
+guides which patches a word is matched to, raised accuracy with gaze removed and
+on gaze-free pictures in every seed, so gaze improved what the video path
+learned. That is one data amount; whether gaze raises the ceiling needs the
+acquisition curves. No curves have been run. Step 3 remains design work.
 
 ## Decisions to keep consistent
 
