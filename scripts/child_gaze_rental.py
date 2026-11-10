@@ -165,11 +165,14 @@ def create_instance(command, *, label, state_file=None, runner=run_transport,
         raise ValueError('Unique task label is required for create reconciliation')
     try:
         result = runner(command, state_file=state_file, attempts=1, timeout=90, check=True)
+        value = json.loads(result.stdout)
+        # A create response includes a per-instance credential; retain only
+        # diagnostic fields needed to reconcile the paid contract.
+        value.pop('instance_api_key', None)
         if state_file:
             with Path(state_file).with_name('create_responses.jsonl').open('a') as handle:
                 handle.write(json.dumps(dict(utc=clock(), label=label, returncode=result.returncode,
-                                             stdout=result.stdout, stderr=result.stderr)) + '\n')
-        value = json.loads(result.stdout)
+                                             stdout=json.dumps(value), stderr=result.stderr)) + '\n')
         if value.get('success') and value.get('new_contract'):
             return value
     except (TransportUnavailable, subprocess.TimeoutExpired, json.JSONDecodeError):
