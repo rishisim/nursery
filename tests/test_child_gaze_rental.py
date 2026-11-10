@@ -67,6 +67,19 @@ def test_ambiguous_create_waits_through_inventory_dns_outage():
     assert sum(args[1:3] == ['create', 'instance'] for args in calls) == 1
 
 
+def test_create_response_is_retained_before_reconciliation(tmp_path):
+    state = tmp_path / 'transport.json'
+    def runner(args, **kwargs):
+        if args[1:3] == ['create', 'instance']:
+            return result(args, '{"success": true, "new_contract": 45}')
+        pytest.fail('Successful create needs no reconciliation')
+    value = rental.create_instance(['vastai', 'create', 'instance', '7', '--label', 'unique-task'],
+                                    label='unique-task', state_file=state, runner=runner)
+    receipt = json.loads((tmp_path / 'create_responses.jsonl').read_text())
+    assert value['new_contract'] == 45 and receipt['returncode'] == 0
+    assert json.loads(receipt['stdout']) == value and receipt['label'] == 'unique-task'
+
+
 def test_persistent_wrapper_never_repeats_uncertain_create(monkeypatch):
     calls = []
     def fail(args, **kwargs):

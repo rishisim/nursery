@@ -165,6 +165,10 @@ def create_instance(command, *, label, state_file=None, runner=run_transport,
         raise ValueError('Unique task label is required for create reconciliation')
     try:
         result = runner(command, state_file=state_file, attempts=1, timeout=90, check=True)
+        if state_file:
+            with Path(state_file).with_name('create_responses.jsonl').open('a') as handle:
+                handle.write(json.dumps(dict(utc=clock(), label=label, returncode=result.returncode,
+                                             stdout=result.stdout, stderr=result.stderr)) + '\n')
         value = json.loads(result.stdout)
         if value.get('success') and value.get('new_contract'):
             return value
