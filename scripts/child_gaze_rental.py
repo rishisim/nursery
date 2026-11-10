@@ -53,6 +53,7 @@ def transient(text):
         'network is unreachable', 'no route to host', 'connection closed',
         'connection unexpectedly closed', 'permission denied (publickey)',
         'remote host has closed', 'sslerror', 'remote end closed',
+        'broken pipe', 'unexpected end of file',
     ))
 
 

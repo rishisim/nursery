@@ -27,6 +27,19 @@ def test_dns_ssh_and_rsync_recover_without_single_failure_exit(tmp_path):
         assert out.stdout == 'ok' and len(calls) == 3 and sleeps == [5, 10]
 
 
+@pytest.mark.parametrize('error', ['client_loop: ssh_packet_write_poll: Broken pipe',
+                                  'rsync: error: unexpected end of file'])
+def test_rsync_broken_pipe_and_eof_resume(error, tmp_path):
+    calls = []
+    def invoke(args, **kwargs):
+        calls.append(args)
+        return result(args, code=255, error=error) if len(calls)==1 else result(args, 'resumed')
+    out = rental.run_transport(['rsync','--partial','source','host:dest'],
+                                state_file=tmp_path/'transport.json', invoke=invoke,
+                                sleep=lambda duration:None)
+    assert out.stdout=='resumed' and len(calls)==2
+
+
 def test_outage_age_persists_across_process_cycles_and_stops_on_recovery(tmp_path):
     state = tmp_path / 'state.json'
     failed = lambda args, **kw: result(args, code=1, error='Connection refused')
