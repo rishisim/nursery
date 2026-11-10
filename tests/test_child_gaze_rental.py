@@ -128,11 +128,12 @@ def test_long_initial_upload_failure_still_gets_resumable_retry():
     assert out.stdout == 'resumed' and timeouts == [1750, 295]
 
 
-def test_fetch_first_recovery_preserves_contract_for_retrieval(tmp_path, monkeypatch):
+@pytest.mark.parametrize('recovered', [101., 1000.])
+def test_fetch_first_recovery_preserves_contract_for_retrieval(tmp_path, monkeypatch, recovered):
     monkeypatch.setenv('CHILD_GAZE_RECOVERY_POLICY', 'fetch-first')
     state = tmp_path / 'state.json'
     rental._state(state, 'ssh', True, 100.)
-    out = rental.run_transport(['ssh', 'host'], state_file=state, clock=lambda: 1000.,
+    out = rental.run_transport(['ssh', 'host'], state_file=state, clock=lambda: recovered,
                                invoke=lambda args, **kw: result(args, 'available'))
     value = json.loads(state.read_text())
     assert out.stdout == 'available' and value['recovery_fetch_required']

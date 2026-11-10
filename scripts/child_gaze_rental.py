@@ -32,11 +32,10 @@ def _state(path, service, failed, now):
         elif outage:
             duration = now - outage['started']
             value.setdefault('recoveries', []).append(dict(service=service, seconds=duration, utc=now))
-            if duration > 600:
-                if os.environ.get('CHILD_GAZE_RECOVERY_POLICY') == 'fetch-first':
-                    value['recovery_fetch_required'] = True
-                else:
-                    value['stop_requested'] = True
+            if os.environ.get('CHILD_GAZE_RECOVERY_POLICY') == 'fetch-first':
+                value['recovery_fetch_required'] = True
+            elif duration > 600:
+                value['stop_requested'] = True
             del value['outages'][service]
         value['updated'] = now
         pending = path.with_suffix('.pending')
