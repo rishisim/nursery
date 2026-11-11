@@ -2,7 +2,8 @@
 
 Design reference in [PLAN.md](../PLAN.md), following the
 [visual baseline](step_1_visual_baseline.md) and [body representation](step_3_body_representation.md).
-No execution settings are frozen and no run has started.
+Implemented, with the [execution protocol](#frozen-execution-protocol--10-november-2026)
+frozen on 10 November 2026. No run has started.
 
 ## The idea
 
@@ -97,7 +98,34 @@ from-scratch learning does not prove richer input contains no information;
 dimensionality and optimization can matter. Follow-ups should address a specific
 unresolved issue rather than start a broad search.
 
-The fixed clip count, seed count, panels, budget, calibration rule and runtime
-cap remain to be frozen. Use one descriptive ignored run root when execution
-is requested. This step does not launch the
+This step does not launch the
 [training-recipe comparison](step_5_body_training_recipe.md) or [main curves](step_6_language_acquisition_curves.md).
+
+## Frozen execution protocol — 10 November 2026
+
+Freeze script: `scripts/step4_body_comparison.py`. Protocol and runs:
+`outputs/runs/step4_body_comparison/` (ignored).
+
+| Setting | Value |
+|---|---|
+| Data | 630 selected clips (18,613 utterances, 63,153 replay seconds), gaze-driven world, split seed 0 |
+| Arms | `video`, `video_gaze`, `video_gaze_body_current` (153 dims), `video_gaze_body_rich` (193 dims) |
+| Seeds | 0, 1, 2. All four arms are trained fresh at one code revision |
+| Training | 60 epochs, batch 256, AdamW lr 3e-4, weight decay 0.1, τ 0.1, no auxiliary losses |
+| Steering | As Step 2: gaze dropout 0.5, sigma 0.15 |
+| Body | Additive word score, Step 3 encoder (per-group MLP 64, bidirectional GRU 64), body dropout 0.5, ±5 s window, normalization fit on the selected training seconds only |
+| Pairing | Per seed, every arm shares example order, visual initialization and gaze-dropout draws. Body initialization (seed + 3000) and body dropout (seed + 2000) use their own random streams |
+| Body weight | Score = video-and-gaze score + w × body score, with w in 0, 0.05, …, 1.5 (w = 1 is as trained). After each epoch, `clips_dev` is scored at every w. The selected model is the (epoch, w) pair with the highest dev accuracy; ties go to the smaller w, then the earlier epoch. Arms without body keep Step 2's rule: earliest epoch at the dev maximum |
+| Evaluation | `clips_test` (556 questions) and s8 (793) reported separately, at the selected checkpoint: primary (all assigned inputs, selected w); all extra inputs removed; shuffled body (whole histories, channels and masks together, real gaze, selected w); as-trained w = 1 (secondary). Picture transfer uses Step 2's separate `picture_dev` checkpoint, with gaze and body absent |
+| Compute | CUDA, 4-hour runtime cap. Step 2 measured about 25 minutes per run on one RTX 5090 |
+
+Trainable parameters: video and video + gaze 476,673; with current body
+722,242; with rich body 724,802 (the rich input layer adds 2,560).
+
+All four arms are retrained, not reused from Step 2, so every arm shares one
+code revision and host. The new video and video + gaze runs also check
+Step 2's 63.61% and 75.72%.
+
+Choosing the epoch and body weight together avoids selecting the checkpoint
+while the body is still overweighted. In the earlier body diagnosis, that
+overweighting caused most of the body's harm.

@@ -76,7 +76,7 @@ class StudyEvaluation:
         return self.panels[name]
 
     @torch.no_grad()
-    def evaluate(self, model, panel, body_mode="real", *, gaze_mode=None):
+    def evaluate(self, model, panel, body_mode="real", *, gaze_mode=None, body_weights=None):
         if body_mode not in ("real", "shuffled", "none"):
             raise ValueError("Unknown body evaluation mode")
         model.eval()
@@ -98,6 +98,7 @@ class StudyEvaluation:
         scores = np.zeros((len(queries), 4), dtype=np.float32)
         if T is not None:
             matrix = np.empty((len(rows), len(word_index)), dtype=np.float32)
+            body_matrix = np.zeros_like(matrix) if body_weights is not None else None
             for start in range(0, len(rows), 128):
                 ids = np.arange(start, min(start + 128, len(rows)))
                 _, v, _, _ = self.upstream.collate([ds[int(i)] for i in ids])
@@ -105,19 +106,39 @@ class StudyEvaluation:
                 ctx = None
                 if gaze_data is not None:
                     ctx = gaze_data.batch(ids, mode=gaze_mode, device=self.device)
-                elif self.gaze_factory is None and model.encoder is not None and body_mode != "none":
+                if model.encoder is not None and body_mode != "none":
                     if data is None:
                         raise ValueError("Body evaluation needs sensory histories")
                     donors = np.asarray(trials["donor_rows"])[ids] if body_mode == "shuffled" else ids
-                    ctx = data.batch(donors, None, training=False)
-                    ctx["keep"] *= centre_clip_valid(ctx).any(1)
-                    ctx["visual_valid"] = torch.as_tensor(valid[ids], device=self.device).repeat_interleave(self.caches[0].shape[1], dim=1)
-                matrix[ids] = model.score_encoded(R, T, ctx).float().cpu().numpy()
+                    body_ctx = data.batch(donors, None, training=False)
+                    body_ctx["keep"] *= centre_clip_valid(body_ctx).any(1)
+                    body_ctx["visual_valid"] = torch.as_tensor(valid[ids], device=self.device).repeat_interleave(self.caches[0].shape[1], dim=1)
+                    ctx = dict(ctx or {}, body=body_ctx) if self.gaze_factory is not None else body_ctx
+                if body_weights is not None:
+                    base, contribution = model.score_components(R, T, ctx)
+                    matrix[ids] = base.float().cpu().numpy()
+                    body_matrix[ids] = contribution.float().cpu().numpy()
+                else:
+                    matrix[ids] = model.score_encoded(R, T, ctx).float().cpu().numpy()
             for i, word in enumerate(queries):
                 if word in word_index:
                     scores[i] = matrix[candidates[i], word_index[word]]
+        if body_weights is not None:
+            results = []
+            for weight in body_weights:
+                weighted = scores.copy()
+                if T is not None:
+                    for i, word in enumerate(queries):
+                        if word in word_index:
+                            col = word_index[word]
+                            weighted[i] = matrix[candidates[i], col] + weight * body_matrix[candidates[i], col]
+                results.append(dict(_metrics(weighted, [q in word_index for q in queries], candidates,
+                                             trials["correct_slots"], queries), body_weight=weight))
+            return results
         result = _metrics(scores, [q in word_index for q in queries], candidates, trials["correct_slots"], queries)
         result["body_mode"] = body_mode if model.encoder is not None else "none"
+        if model.encoder is not None and hasattr(model, "body_weight"):
+            result["body_weight"] = model.body_weight if body_mode != "none" else 0.0
         if body_mode == "shuffled":
             result["donor_rows"] = trials["donor_rows"]
         if self.gaze_factory is not None:

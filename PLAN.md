@@ -28,15 +28,16 @@ declined. Steering, the alternative gaze wiring, was then run under the same
 frozen settings: 75.72% with gaze and 66.31% with gaze removed, beating video
 only in every seed, with picture transfer up 6.5–10.6 points. Steering video +
 gaze is the candidate to carry to the acquisition curves.
-Step 3's richer body input is now built and frozen for Step 4. Steps 4–6 remain
-design references, with settings still to be settled.
+Step 3's richer body input is now built and frozen for Step 4. Step 4 is
+implemented and its protocol frozen; it has not run. Steps 5–6 remain design
+references, with settings still to be settled.
 
 | Step | Document | Question and current status |
 |---|---|---|
 | 1 | [Visual baseline](docs/step_1_visual_baseline.md) | Complete and audited: at 630 clips, recorded 4×4 video scored 60.12%, 16×16 scored 61.93%; paired gain +1.81 points over three seeds. |
 | 2 | [Child gaze](docs/step_2_child_gaze.md#completed-results--9-november-2026) | Complete and independently audited: 12/12 frozen runs, four conditions × seeds 0–2 × 60 epochs, 630 clips. New-world video 63.61%; video + gaze 63.25% with gaze (−0.36 pp), 60.13% removed (−3.48 pp). Shuffled 50.54%/59.47%; point-only 62.59%/62.35%. Picture transfer declined. One US 8×5090 attempt cost $4.416; verified results back in 66m51.818s, rental destroyed, zero instances and key removal confirmed. Current additive gaze is not selected for curves. [Steering](docs/step_2_child_gaze.md#steering-gaze--9-november-2026) (6 runs, audited): 75.72% with gaze (+12.11 pp), 66.31% removed (+2.70 pp), positive in every seed; s8 +13.45/+2.90 pp; pictures 82.09%/84.58% vs 75.62%/73.98%. Shuffled steering at or below video. Steering is the candidate for curves. |
 | 3 | [Body representation](docs/step_3_body_representation.md#frozen-candidate--10-november-2026) | Built and frozen (input only, no language result yet). Rich B keeps the ±5 s window but summarizes 30 Hz source frames per step, adds contact events and wrist-frame contact geometry, finger speed and 30 Hz arm motion: 193 dims vs 153. 22 contact patches kept by a fixed train→dev rule. All checks passed. On dev, held-category probe 23.7% → 31.7%; brief contacts visible 32% → 100%. Pressure, friction, texture, deformation and spatial heat stay deferred. |
-| 4 | [Representation comparison](docs/step_4_body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? Design only. |
+| 4 | [Representation comparison](docs/step_4_body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? [Implemented and frozen](docs/step_4_body_representation_comparison.md#frozen-execution-protocol--10-november-2026), not yet run: four arms (V, V+G, V+G+current B, V+G+rich B) × seeds 0–2 × 60 epochs at 630 clips; body weight and epoch chosen together on dev. |
 | 5 | [Body training recipe](docs/step_5_body_training_recipe.md) | After the representation is understood, does wordless pretraining help? Additive remains the default; joint interaction is deferred. |
 | 6 | [Language acquisition curves](docs/step_6_language_acquisition_curves.md) | Does the selected video-plus-body setup help across amounts of experience? This is the main outcome. |
 

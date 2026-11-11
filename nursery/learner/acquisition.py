@@ -14,7 +14,16 @@ FRACTIONS = (0.1, 0.25, 0.5, 0.75, 1.0)
 CONDITIONS = ('video_only', 'additive', 'joint_interaction')
 # Explicit hooks only: preparation, timing and the historical default matrix
 # are deliberately unchanged until the child-gaze protocol is frozen.
+BODY_GAZE_CONDITIONS = ('video_gaze_body_current', 'video_gaze_body_rich')
 GAZE_CONDITIONS = ('video_gaze', 'video_shuffled_gaze', 'video_gaze_point')
+BODY_WEIGHT_GRID = tuple(i / 20 for i in range(31))
+
+
+def calibration_better(score, weight, epoch, best):
+    """Maximum dev accuracy, then smaller weight, then earlier epoch."""
+    if not math.isfinite(score) or weight not in BODY_WEIGHT_GRID:
+        raise ValueError('Invalid body calibration result')
+    return best is None or (-score, weight, epoch) < (-best['dev_score'], best['weight'], best['epoch'])
 
 
 def _gaze_settings(protocol):
@@ -72,7 +81,7 @@ def protocol_matrix(protocol):
         _gaze_settings(protocol)
         fractions, _ = matrix_selection(protocol.get('fractions'), ['video_only'])
         if (not isinstance(conditions, (list, tuple)) or not conditions
-                or any(c not in ('video_only',) + GAZE_CONDITIONS for c in conditions)
+                or any(c not in ('video', 'video_only') + GAZE_CONDITIONS + BODY_GAZE_CONDITIONS for c in conditions)
                 or len(set(conditions)) != len(conditions)):
             raise ValueError('Invalid child-gaze matrix')
     else:
@@ -183,9 +192,12 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
     root = Path(root).resolve()
     protocol = _read(root / 'protocol.json')
     epochs = (1 if smoke else protocol['epochs']) if epochs is None else epochs
-    gaze_condition = condition in GAZE_CONDITIONS
+    arm_condition = condition
+    condition = 'video_only' if condition == 'video' else condition
+    body_gaze = condition in BODY_GAZE_CONDITIONS
+    gaze_condition = condition in GAZE_CONDITIONS + BODY_GAZE_CONDITIONS
     gaze_world = 'gaze' in protocol
-    if condition not in CONDITIONS + GAZE_CONDITIONS or epochs < 1:
+    if condition not in CONDITIONS + GAZE_CONDITIONS + BODY_GAZE_CONDITIONS or epochs < 1:
         raise ValueError('Unknown condition or nonpositive epochs')
     if gaze_condition:
         gaze_spec = _gaze_settings(protocol)
@@ -204,8 +216,8 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
         _verify_frozen(root, external=False)
         if gaze_condition:
             _verify_gaze_frozen(root, protocol, condition)
-    identity = _identity(root, fraction, seed, condition, epochs, device)
-    output = _output(root, fraction, seed, condition, smoke)
+    identity = _identity(root, fraction, seed, arm_condition, epochs, device)
+    output = _output(root, fraction, seed, arm_condition, smoke)
     if output.exists() and any(output.iterdir()):
         raise FileExistsError(f'Refusing to overwrite existing run: {output}')
     output = _output_directory(output)
@@ -221,20 +233,23 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
         with np.load(subset / 'fit_mask.npz', allow_pickle=False) as fit:
             video_ids, include = fit['video_ids'].tolist(), fit['include']
         store = None
-        if not gaze_world:
+        if not gaze_world or body_gaze:
+            representation = protocol['arms'][condition]['body_representation'] if body_gaze else 'current'
             store = body.load_store(episodes, pd.read_parquet(episodes / 'frames.parquet'), video_ids, set(),
-                                steps=include.shape[1], exclude=~include, physical=Path(protocol['physical']))
-            if store['stats'] != stats['normalization']:
+                                steps=include.shape[1], exclude=~include, physical=Path(protocol['physical']),
+                                representation=representation)
+            if not body_gaze and store['stats'] != stats['normalization']:
                 raise ValueError('Frozen subset normalization differs from current inputs')
             if set(store['groups']) != {'contact', 'fingers', 'arm', 'load', 'skin'}:
                 raise ValueError('Acquisition requires all five body streams')
-        elif condition not in ('video_only',) + GAZE_CONDITIONS:
+        elif condition not in ('video', 'video_only') + GAZE_CONDITIONS + BODY_GAZE_CONDITIONS:
             raise ValueError('Gaze-world hooks support video-only and gaze conditions only')
         ds = upstream.FramePairs(caches, lut, manifest, vocab, protocol['window'], False)
         if len(ds) < 2 or ds.n_noframe or ds.n_novocab:
             raise ValueError('Frozen manifest must contain at least two cached vocabulary-bearing pairs')
         order_generator = torch.Generator().manual_seed(seed)
-        body_generator = torch.Generator().manual_seed(seed + 1000)
+        gaze_generator = torch.Generator().manual_seed(seed + 1000)
+        body_generator = torch.Generator().manual_seed(seed + (2000 if body_gaze else 1000))
         training_items, collate = ds, upstream.collate
         if gaze_world:
             from .gaze_data import collate_frame_indices
@@ -257,7 +272,8 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
             model = GazeMIL(len(vocab), emb_dim, protocol['tau'], option=gaze_spec['option'],
                             point_only=condition == 'video_gaze_point', num_regions=num_regions,
                             gaze_weight=gaze_spec.get('weight', 1.0),
-                            steering_sigma=gaze_spec.get('steering_sigma', .15)).float().to(device)
+                            steering_sigma=gaze_spec.get('steering_sigma', .15),
+                            dims=dims if body_gaze else None, seed=seed).float().to(device)
             allowed_keys = {f'{video}|{frame}' for i, video in enumerate(video_ids)
                             for frame in np.flatnonzero(include[i])}
             data = _gaze_data(protocol, manifest, lut, condition, allowed_keys=allowed_keys)
@@ -268,6 +284,11 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
                 ps, pt, win = _pair_meta(manifest, store, lut, protocol['window'])
                 data = BodyData(store, ps, pt, win, None, None, None, None, device,
                                 protocol['body_window'], 0.0, protocol['body_dropout'])
+        body_data = None
+        if body_gaze:
+            ps, pt, win = _pair_meta(manifest, store, lut, protocol['window'])
+            body_data = BodyData(store, ps, pt, win, None, None, None, None, device,
+                                 protocol['body_window'], 0.0, protocol['body_dropout'])
         _, visual_valid = _window_layout(manifest, lut, protocol['window'])
         visual_valid = torch.as_tensor(visual_valid, device=device).repeat_interleave(num_regions, dim=1)
         evaluator = StudyEvaluation(root, inputs, caches, lut, vocab, store, device)
@@ -278,7 +299,7 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
         setup_seconds = time.time() - started
         epoch_durations = []
         history, best_body, best_picture = [], -float('inf'), -float('inf')
-        selection = {}
+        selection, dev_weight_table = {}, []
         for epoch in range(epochs):
             epoch_started = time.time()
             _check_deadline(deadline)
@@ -287,10 +308,14 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
             for idx, v, t, n in dl:
                 _check_deadline(deadline)
                 if gaze_condition:
-                    ctx = data.batch(idx.numpy(), body_generator, mode='shuffled' if condition == 'video_shuffled_gaze' else 'real',
+                    ctx = data.batch(idx.numpy(), gaze_generator, mode='shuffled' if condition == 'video_shuffled_gaze' else 'real',
                                      dropout=gaze_spec['dropout'], device=device)
                 else:
                     ctx = data.batch(idx.numpy(), body_generator) if data is not None else None
+                if body_gaze:
+                    bctx = body_data.batch(idx.numpy(), body_generator)
+                    bctx['keep'] *= centre_clip_valid(bctx).any(1)
+                    ctx['body'] = bctx
                 if ctx is not None and not gaze_condition:
                     ctx['keep'] = ctx['keep'] * centre_clip_valid(ctx).any(1)
                     ctx['visual_valid'] = visual_valid[idx.to(device)]
@@ -305,10 +330,22 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
             _check_deadline(deadline)
             model.eval()
             with torch.no_grad():
-                body_dev = evaluator.evaluate(model, 'clips_dev')['accuracy']
+                if body_gaze:
+                    sweep = evaluator.evaluate(model, 'clips_dev', body_weights=BODY_WEIGHT_GRID)
+                    dev_weight_table.extend({'epoch': epoch + 1, 'weight': r['body_weight'],
+                                             'accuracy': r['accuracy']} for r in sweep)
+                    chosen = min(sweep, key=lambda r: (-r['accuracy'], r['body_weight']))
+                    body_dev = chosen['accuracy']
+                else:
+                    body_dev = evaluator.evaluate(model, 'clips_dev')['accuracy']
                 _check_deadline(deadline)
                 picture_dev = evaluator.evaluate_picture(model, 'picture_dev')['accuracy']
-            if _select(body_dev, best_body, model, output / 'model_bodypresent.pt'):
+            if body_gaze and calibration_better(body_dev, chosen['body_weight'], epoch + 1, selection.get('body_present')):
+                torch.save(model.state_dict(), output / 'model_bodypresent.pt')
+                best_body = body_dev
+                selection['body_present'] = {'epoch': epoch + 1, 'weight': chosen['body_weight'],
+                                             'dev_score': body_dev, 'panel': 'clips_dev'}
+            if not body_gaze and _select(body_dev, best_body, model, output / 'model_bodypresent.pt'):
                 best_body = body_dev
                 selection['body_present'] = {'epoch': epoch + 1, 'dev_score': body_dev, 'panel': 'clips_dev'}
             if _select(picture_dev, best_picture, model, output / 'model.pt'):
@@ -319,9 +356,11 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
             epoch_durations.append(time.time() - epoch_started)
         final_started = time.time()
         model.load_state_dict(torch.load(output / 'model_bodypresent.pt', map_location=device, weights_only=True))
-        primary, shuffled, picture, timing_dev, gaze_removed = {}, {}, {}, {}, {}
+        primary, shuffled, picture, timing_dev, gaze_removed, as_trained = {}, {}, {}, {}, {}, {}
+        if body_gaze:
+            model.body_weight = selection['body_present']['weight']
         with torch.no_grad():
-            if smoke or dev_only:
+            if dev_only or (smoke and not protocol.get('smoke_evaluate_all_panels', False)):
                 # Timing never inspects held-out panels; charge four complete
                 # development passes as a conservative final-evaluation estimate.
                 _check_deadline(deadline)
@@ -341,7 +380,14 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
                     primary[panel] = evaluator.evaluate(model, panel)
                     if gaze_condition:
                         _check_deadline(deadline)
-                        gaze_removed[panel] = evaluator.evaluate(model, panel, gaze_mode='removed')
+                        gaze_removed[panel] = evaluator.evaluate(model, panel, gaze_mode='removed', body_mode='none')
+                        if body_gaze:
+                            shuffled[panel] = evaluator.evaluate(model, panel, body_mode='shuffled')
+                            model.body_weight = 1.0
+                            as_trained[panel] = evaluator.evaluate(model, panel)
+                            model.body_weight = selection['body_present']['weight']
+                    elif gaze_world:
+                        gaze_removed[panel] = evaluator.evaluate(model, panel, body_mode='none')
                     elif data is not None:
                         _check_deadline(deadline)
                         shuffled[panel] = evaluator.evaluate(model, panel, body_mode='shuffled')
@@ -353,12 +399,20 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
         _check_deadline(deadline)
         metrics = {**identity, 'status': 'complete', 'smoke': smoke, 'selection': selection, 'history': history,
                    'primary': primary, 'shuffled': shuffled, 'picture': picture, 'data': stats,
-                   'timing_dev': timing_dev, 'development_only': bool(smoke or dev_only),
+                   'timing_dev': timing_dev, 'development_only': bool(dev_only or (smoke and not protocol.get('smoke_evaluate_all_panels', False))),
+                   'dev_body_weight_table': dev_weight_table,
+                   'secondary_as_trained_body_weight': as_trained,
+                   'all_extra_inputs_removed': gaze_removed,
+                   'body_normalization': store['stats'] if body_gaze else None,
+                   'body_representation': representation if body_gaze else None,
+                   'body_input_dims': dims if body_gaze else {},
+                   'body_input_dim': sum(dims.values()) if body_gaze else 0,
+                   'trainable_parameters': sum(p.numel() for p in model.parameters() if p.requires_grad),
                    'runtime_seconds': time.time() - started, 'setup_seconds': setup_seconds,
                    'epoch_seconds': float(np.mean(epoch_durations)),
                    'epoch_durations_seconds': epoch_durations,
-                   'final_evaluation_seconds': final_seconds * (4 if smoke else 1),
-                   'final_evaluation_estimate_rule': '4x development real/shuffled/picture pass' if smoke else 'measured held-out evaluation'}
+                   'final_evaluation_seconds': final_seconds * (4 if smoke and not protocol.get('smoke_evaluate_all_panels', False) else 1),
+                   'final_evaluation_estimate_rule': '4x development real/shuffled/picture pass' if smoke and not protocol.get('smoke_evaluate_all_panels', False) else 'measured held-out evaluation'}
         if gaze_condition:
             metrics['gaze_removed'] = gaze_removed
             metrics['gaze'] = dict(gaze_spec, training_donor_rows=data.donor_indices.tolist()

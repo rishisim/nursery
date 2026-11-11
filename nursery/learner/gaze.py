@@ -33,7 +33,7 @@ def compact_closeup(tokens):
 def _gaze_class():
     class Gaze(_video_class()):
         def __init__(self, vocab, emb_dim, tau_p=0.1, option="additive", point_only=False,
-                     num_regions=257, gaze_weight=1.0, steering_sigma=0.15):
+                     num_regions=257, gaze_weight=1.0, steering_sigma=0.15, dims=None, seed=0):
             if option not in ("additive", "steering"):
                 raise ValueError("Gaze option must be additive or steering")
             grid = math.isqrt(num_regions - 1) if num_regions > 1 else 0
@@ -56,6 +56,16 @@ def _gaze_class():
                     width = 2 if point_only else 2 + emb_dim
                     self.gaze_encoder = nn.Sequential(nn.Linear(width, 128), nn.ReLU(),
                                                       nn.Linear(128, self.word.embedding_dim))
+            if dims is not None:
+                if option != "steering":
+                    raise ValueError("Combined body requires steering gaze")
+                from .body import BodyEncoder
+                with torch.random.fork_rng(devices=[]):
+                    torch.random.default_generator.manual_seed(seed + 3000)
+                    self.encoder = BodyEncoder(dims)
+                    self.fuse = nn.Linear(2 * self.encoder.hidden, self.word.embedding_dim)
+                    self.beta = nn.Parameter(torch.tensor(1.0))
+            self.body_weight = 1.0
             axis = (torch.arange(grid, dtype=torch.float32) + 0.5) / grid
             yy, xx = torch.meshgrid(axis, axis, indexing="ij")
             self.register_buffer("patch_centers", torch.stack((xx, yy), -1).reshape(-1, 2), persistent=False)
@@ -85,7 +95,7 @@ def _gaze_class():
                 closeup = torch.where(valid[..., None], closeup, torch.zeros_like(closeup))
             return point, valid, closeup
 
-        def score_encoded(self, R, T, ctx=None):
+        def gaze_score(self, R, T, ctx=None):
             """Same scoring for training and tests; ctx=None removes gaze exactly.
 
             Additive: a separate point/close-up branch adds word evidence.
@@ -94,7 +104,7 @@ def _gaze_class():
             Invalid/padded frames retain the original uniform video prior.
             """
             picture = super().score_encoded(R, T)
-            if ctx is None:
+            if ctx is None or "gaze_point" not in ctx:
                 return picture
             point, valid, closeup = self._inputs(R, ctx)
             active = valid.any(dim=1)
@@ -134,6 +144,26 @@ def _gaze_class():
             # removed/all-missing rows in mixed evaluation minibatches.
             return torch.where(active[:, None], steered, picture)
 
+        # Reuse the additive encoder readout, without unused auxiliary heads.
+        from .additive import _model_class
+        states = _model_class().states
+        latent_of = _model_class().latent_of
+        body_similarity = _model_class().body_similarity
+
+        def score_components(self, R, T, ctx=None):
+            gaze = self.gaze_score(R, T, ctx)
+            body = None if ctx is None else ctx.get("body")
+            if self.encoder is None or body is None or not body["keep"].any():
+                return gaze, torch.zeros_like(gaze)
+            return gaze, body["keep"][:, None] * self.beta * self.body_similarity(self.latent_of(body), T)
+
+        def score_encoded(self, R, T, ctx=None):
+            # Preserve the old gaze arithmetic exactly when body is absent.
+            if self.encoder is None or ctx is None or ctx.get("body") is None:
+                return self.gaze_score(R, T, ctx)
+            gaze, body = self.score_components(R, T, ctx)
+            return gaze + self.body_weight * body
+
         def losses(self, v, t, n, w, ctx=None, weights=None, target=None, temp=2.0):
             _, _, scores = self.pair_scores(v, t, n, ctx)
             logits = self.scale() * scores
@@ -146,11 +176,11 @@ def _gaze_class():
 
 
 def GazeMIL(vocab, emb_dim, tau_p=0.1, option="additive", point_only=False,
-            num_regions=257, gaze_weight=1.0, steering_sigma=0.15):
+            num_regions=257, gaze_weight=1.0, steering_sigma=0.15, dims=None, seed=0):
     """Build an unselected gaze option; no labels or speech metadata are inputs.
 
     gaze_weight initializes the learned additive scalar; steering uses a
     normalized spatial prior and does not have a separate additive weight.
     """
     return _gaze_class()(vocab, emb_dim, tau_p, option, point_only, num_regions,
-                         gaze_weight, steering_sigma)
+                         gaze_weight, steering_sigma, dims, seed)
