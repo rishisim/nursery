@@ -35,15 +35,18 @@ sensations.
 | Condition | Body representation | Fusion | Wordless pretraining |
 |---|---|---|---|
 | 16×16 video reference | None | Video only | None |
-| Video + body | Fixed candidate from Step 4 | Additive | None |
-| Video + pretrained body | Same candidate | Additive | Masked body reconstruction |
+| Video + steering gaze reference | None | Steering | None |
+| Video + steering gaze + body | Fixed candidate from Step 4 | Steering + additive body | None |
+| Video + steering gaze + pretrained body | Same candidate | Steering + additive body | Masked body reconstruction |
 
 Reuse Step 4 references when data, model and selection settings match. If the
 question instead becomes whether pretraining changes the relative value of
 current versus richer body, apply it to both representations in a separately
 specified comparison rather than mixing questions.
 
-Additive remains the default. Joint interaction and active exploration stay
+Gaze settings and gaze-driven speech remain matched across the relevant arms.
+Wordless pretraining applies to the non-gaze body encoder in this comparison.
+Additive remains the default for that body branch. Joint interaction and active exploration stay
 deferred unless a later explicit question requires them. This is not an
 open-ended fusion, loss or pretraining-method search.
 
@@ -57,7 +60,7 @@ at a larger point.
 
 Extra passes add computation, not independent experience. Record pretraining
 examples, steps, duration and compute separately from language-training updates.
-Both arms share DINO's visual prior; perception is not learned from scratch.
+All arms share DINO's visual prior; perception is not learned from scratch.
 A gain supports the declared recipe. Isolating the pretraining objective's
 value from extra compute would need an appropriate compute control.
 

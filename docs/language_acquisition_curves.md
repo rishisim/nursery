@@ -22,16 +22,21 @@ body alone is supporting evidence, not a replacement for word-learning curves.
 |---|---|
 | Recorded 4×4 video | Preserved historical reference; no automatic rerun |
 | 16×16 video | Matched current visual baseline |
-| 16×16 video + body | Representation and training recipe selected before this study |
+| 16×16 video + steering gaze | Intermediate embodied reference |
+| 16×16 video + steering gaze + selected body | Representation and training recipe selected before this study |
 
-Use additive unless the preceding decision explicitly changes it. No automatic
+Use steering for gaze and additive fusion for the other body channels unless
+the preceding decision explicitly changes it. The current-body representation
+remains a fixed-data control, not an automatic fourth live curve. If no body
+candidate is supported, video versus video + gaze remains a valid curve study;
+do not require a positive body result. No automatic
 joint condition or per-point architecture search is included. If wordless
 pretraining is selected, its experience and normalization are restricted to
 each point's own selected training clips.
 
 ## What the learner experiences
 
-Reuse corrected weak speech and existing source experiences. Names may be
+Reuse the same gaze-driven weak speech and existing source experiences. Names may be
 delayed, describe a nonheld object or lack a visible referent. Hidden identity
 does not select ordinary training samples. Video and speech, crop, visual
 history and source partitions are identical across arms.
@@ -56,9 +61,10 @@ claim new-instance generalization without genuinely disjoint instances.
 - Split by source clip, keeping replays, histories and pretraining samples in
   their partition. Use independent test situations and report held-out-person
   results separately. Ten seeds on one panel do not create ten new panels.
-- Use identical four-choice candidates for both learners; each body-enabled
+- Use identical four-choice candidates for all learners; each body-enabled
   candidate receives its own history. Keep a complete-history shuffle control
-  on the same selected models, trials and frozen donors.
+  on the same selected models, trials and frozen donors, retaining real gaze
+  when shuffling the other body channels.
 - Freeze development selection, uncertainty reporting and runtime limits
   before launch. A null result completes the comparison; it does not queue
   extra data amounts, conditions or retries.
@@ -72,9 +78,16 @@ require a fresh ignored run root and provenance; preserve the original runs.
 
 Plot independent experience against held-out word accuracy, with the 25% chance
 line and clearly identified uncertainty. Show recorded 4×4 video as historical
-reference alongside the two new live curves.
+reference alongside the three planned live curves. Primary curves use each
+learner's assigned inputs. Separately report all-extra-inputs-removed and
+picture-only transfer; these are stronger transfer questions, not requirements
+for every embodied benefit.
 
-| Independent clips | Recorded 4×4 video | 16×16 video | Selected 16×16 video + body | Body gain over 16×16 video |
+Report gaze gain (V+G minus V), additional body gain (V+G+B minus V+G),
+and total embodied gain (V+G+B minus V). Keep gaze settings consistent across
+gaze-enabled arms and data amounts, with one predeclared calibration rule.
+
+| Independent clips | Recorded 4×4 video | 16×16 video | Video + steering gaze | Video + steering gaze + selected body |
 |---:|---:|---:|---:|---:|
 | 63 | 30.0% | Pending | Pending | Pending |
 | 158 | 39.5% | Pending | Pending | Pending |
@@ -83,7 +96,9 @@ reference alongside the two new live curves.
 | 630 | 60.1% | Pending | Pending | Pending |
 
 These rows illustrate old clip counts, not a frozen new pool. The historical
-column is measured; all pending cells are unmeasured. Full uncertainty and
+column is measured; pending cells await the matched curve study. The completed Step 2 full-data
+V and V+G measurements may be reused only if protocol and selection settings
+match; the combined gaze-plus-body condition is unmeasured. Full uncertainty and
 seed values are in the [original record](../archive/language_learning/acquisition_curves.md#completed-results--27-october-2026).
 
 Report 16×16-minus-4×4 only with matching status established as in

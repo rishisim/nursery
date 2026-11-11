@@ -53,14 +53,24 @@ video-only performance after removal in every seed. Steering gaze, where gaze
 guides which patches a word is matched to, raised accuracy with gaze removed and
 on gaze-free pictures in every seed, so gaze improved what the video path
 learned. That is one data amount; whether gaze raises the ceiling needs the
-acquisition curves. No curves have been run. Step 3 remains design work.
+acquisition curves. No new gaze acquisition curves have been run. Step 3 remains design work.
 
 ## Decisions to keep consistent
 
-- Compare 16×16 video, 16×16 video plus current body, and 16×16 video plus richer
-  body at one fixed data amount. Keep the recorded 4×4 video result as a labeled
-  historical reference. Quantify a resolution effect only when task, data,
-  trials and training settings are comparable.
+- Count gaze as embodied experience. G denotes steering gaze location plus its
+  attended sharp close-up; B denotes the other body channels. All conditions
+  share gaze-driven speech and main video; V receives neither G nor B.
+- At fixed data compare V, V+G, V+G+current B and V+G+richer B, all at 16×16.
+  Measure gaze gain, additional body gain, representation gain and total gain.
+  Body effects here are conditional on gaze; no automatic body-without-gaze arm.
+  Preserve 4×4 results as explicitly historical references.
+- Plan three acquisition curves: V, V+G and V+G+selected B. Keep current B in
+  the fixed-data comparison. An unsupported body candidate does not prevent
+  a V versus V+G study or require a positive outcome.
+- Gaze steers visual matching; B adds a calibrated word score. Keep steering
+  settings matched and visual weights trainable. Primary evaluation uses each
+  learner's assigned inputs; report all-extra-inputs-removed and picture transfer
+  separately. Shuffle B with real gaze retained to test its alignment.
 - Use additive fusion and no wordless pretraining for the initial representation
   comparison. Apply the same development-only body-weight selection rule to
   both body conditions; test outcomes do not tune the design.

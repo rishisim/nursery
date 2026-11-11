@@ -4,6 +4,11 @@ Design reference in [PLAN.md](../PLAN.md). This step defines the sensory change
 before the [controlled learning comparison](body_representation_comparison.md).
 No richer representation or new sensor has been implemented by this document.
 
+Gaze counts as embodied experience. In Steps 3–6, B denotes the remaining
+contact, pose, motion, load and skin channels; G denotes steering gaze and its
+attended close-up. This step changes B while keeping G fixed in the subsequent
+comparison.
+
 ## The idea
 
 Give the learner a more faithful description of bodily experience using the

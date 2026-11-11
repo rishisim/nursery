@@ -1265,3 +1265,28 @@ The canonical freeze remains in `outputs/runs/child_gaze/matrix/`.
 No pre-existing renders, speech, features, runs or earlier evidence were
 modified or deleted. Generated outputs remain untracked. No scientific
 expansion or unrelated cleanup was performed.
+
+## Integration with body comparisons and curves — 10 November 2026
+
+Gaze is part of embodied experience. G includes gaze location and the sharp
+attended view, so its gain combines attention information and visual detail;
+it does not alone establish a unique nonvisual or tactile contribution.
+The [representation comparison](body_representation_comparison.md) uses V,
+V+G, V+G+current B and V+G+richer B. The [curves](language_acquisition_curves.md)
+retain V, V+G and V+G+selected B. All share gaze-driven speech and main video.
+
+Steering has no separate additive gaze-score weight. Its spatial width
+sigma=0.15, equal prior mass for the close-up and ordinary frame regions,
+and training gaze dropout=0.5 were fixed, not development-sweep selections.
+Equal prior mass is not a literal 50/50 average of final scores. Checkpoints
+were development-selected. The saved gaze_weight=1.0 belongs to the additive
+interface, not a tuned steering coefficient; the additive beta calibration
+above is a separate result.
+
+Keep these steering settings fixed for the initial body comparison. A small
+later development-only calibration of spatial width or close-up prior mass
+is an option, not a launched experiment. Freeze any chosen rule before curves
+and apply it consistently across gaze-enabled arms and data amounts. Test
+scores must not select settings. Evaluation-only calibration can change
+with-gaze answers but cannot improve already learned gaze-free weights;
+testing a learning benefit requires fresh training with the selected settings.
