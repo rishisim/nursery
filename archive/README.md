@@ -112,7 +112,7 @@ Its original scientific execution revision was `08ebb82c`; the November
 the new work is implemented rather than rebuilding it or assuming it is
 already merged into `research/embodied`.
 
-The subsequent [Step 1 comparison](../docs/visual_baseline.md) integrated that
+The subsequent [Step 1 comparison](../docs/step_1_visual_baseline.md) integrated that
 code into `research/embodied` at `6c868e23` and completed three new video-only
 runs at 630 clips on 7 November. Its new caches and runs are separate from
 these preserved historical results.
@@ -143,7 +143,7 @@ Interpret broad language in the original diagnosis cautiously: its classifier
 probes concern the information extractable from the recorded representation,
 not all possible touch. Its identity-oracle gain is specific to that panel and
 fusion rule, not a universal bound. The current
-[body representation document](../docs/body_representation.md) records the
+[body representation document](../docs/step_3_body_representation.md) records the
 distinction between recoverable detail and genuinely new sensory information.
 
 ## Local artifact relocation

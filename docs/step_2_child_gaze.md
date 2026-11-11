@@ -1,7 +1,7 @@
 # Step 2: simulated child gaze drives naming and feeds the learner
 
 Design reference in [PLAN.md](../PLAN.md). It follows the
-[visual baseline](visual_baseline.md) and comes before the body steps. Phase A
+[visual baseline](step_1_visual_baseline.md) and comes before the body steps. Phase A
 implements and validates the simulated world; learner selection and scientific
 comparisons remain separate phases.
 
@@ -168,7 +168,7 @@ speech differs.
 At one data amount, first 630 clips with seeds 0–2 to match Step 1: accuracy
 for each condition in both test modes, with the splits above. If video + gaze
 helps, especially with gaze removed, carry it to the
-[acquisition curves](language_acquisition_curves.md). A higher ceiling needs
+[acquisition curves](step_6_language_acquisition_curves.md). A higher ceiling needs
 the curves; one data amount can't show it.
 
 ## Before the comparison
@@ -1183,7 +1183,7 @@ in the run root.
 |---|---:|---:|---:|---:|
 | Step 1 reference | 61.23% | 62.98% | 61.58% | 61.93 ± 0.93% |
 
-This is the preserved [Step 1 result](visual_baseline.md#completed-results--7-november-2026),
+This is the preserved [Step 1 result](step_1_visual_baseline.md#completed-results--7-november-2026),
 not a matched arm. Step 2 changes speech and the eligible test questions
 (556 new-clip questions here versus 570 in Step 1). Comparing 61.93% with the
 new-world video's 63.61% cannot isolate the world change or gaze-input effect.
@@ -1271,8 +1271,8 @@ expansion or unrelated cleanup was performed.
 Gaze is part of embodied experience. G includes gaze location and the sharp
 attended view, so its gain combines attention information and visual detail;
 it does not alone establish a unique nonvisual or tactile contribution.
-The [representation comparison](body_representation_comparison.md) uses V,
-V+G, V+G+current B and V+G+richer B. The [curves](language_acquisition_curves.md)
+The [representation comparison](step_4_body_representation_comparison.md) uses V,
+V+G, V+G+current B and V+G+richer B. The [curves](step_6_language_acquisition_curves.md)
 retain V, V+G and V+G+selected B. All share gaze-driven speech and main video.
 
 Steering has no separate additive gaze-score weight. Its spatial width

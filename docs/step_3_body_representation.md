@@ -1,7 +1,7 @@
 # Step 3: preserve richer bodily information
 
 Design reference in [PLAN.md](../PLAN.md). This step defines the sensory change
-before the [controlled learning comparison](body_representation_comparison.md).
+before the [controlled learning comparison](step_4_body_representation_comparison.md).
 No richer representation or new sensor has been implemented by this document.
 
 Gaze counts as embodied experience. In Steps 3–6, B denotes the remaining

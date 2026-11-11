@@ -6,18 +6,18 @@ The simulator supplies egocentric video and body signals; caregiver speech
 provides intentionally uncertain language supervision.
 
 Start with [PLAN.md](PLAN.md). The current sequence is
-[16×16 vision](docs/visual_baseline.md),
-[richer body input](docs/body_representation.md),
-[a controlled representation comparison](docs/body_representation_comparison.md),
-[the body training recipe](docs/body_training_recipe.md), and
-[language acquisition curves](docs/language_acquisition_curves.md).
+[16×16 vision](docs/step_1_visual_baseline.md),
+[richer body input](docs/step_3_body_representation.md),
+[a controlled representation comparison](docs/step_4_body_representation_comparison.md),
+[the body training recipe](docs/step_5_body_training_recipe.md), and
+[language acquisition curves](docs/step_6_language_acquisition_curves.md).
 [Past experiments](archive/language_learning/past_experiments.md) explains what
 we tried earlier; the completed cross-situational and acquisition studies are
 indexed in the [archive](archive/README.md#completed-study-worktrees).
 Steps 2–5 remain design references and do not imply their code is implemented.
 The matched Step 1 comparison is complete: at 630 clips, video accuracy rose
 from the recorded 60.12% with 4×4 tokens to 61.93% with 16×16 tokens across
-three paired seeds. See [the results and limits](docs/visual_baseline.md#completed-results--7-november-2026).
+three paired seeds. See [the results and limits](docs/step_1_visual_baseline.md#completed-results--7-november-2026).
 
 ## File map
 
@@ -45,12 +45,12 @@ configs/                        Room-generation configuration
 scripts/                        Render/pipeline/seed launchers and run summaries
 tests/                          Current learner, speech, physical and simulator tests
 docs/
-  visual_baseline.md             Step 1: 16×16 vision and recorded 4×4 reference
-  child_gaze.md                  Step 2: simulated gaze drives naming and feeds the learner
-  body_representation.md         Step 3: recoverable sensory detail and missing signals
-  body_representation_comparison.md  Step 4: current versus richer body, additive
-  body_training_recipe.md        Step 5: decide wordless pretraining after representation
-  language_acquisition_curves.md Step 6: main video versus video + body curves
+  step_1_visual_baseline.md             Step 1: 16×16 vision and recorded 4×4 reference
+  step_2_child_gaze.md                  Step 2: simulated gaze drives naming and feeds the learner
+  step_3_body_representation.md         Step 3: recoverable sensory detail and missing signals
+  step_4_body_representation_comparison.md  Step 4: current versus richer body, additive
+  step_5_body_training_recipe.md        Step 5: decide wordless pretraining after representation
+  step_6_language_acquisition_curves.md Step 6: main video versus video + body curves
   learner.md                    Current implementation and scoring reference
   speech_coupling.md             Speech-generation evidence and assumptions
 archive/
@@ -98,7 +98,7 @@ No run is launched by this documentation.
 
 Embedding defaults to 16×16; `--grid 4` retains the historical option. Use a
 fresh output root when changing grids. The exact Step 1 commands and frozen
-comparison are in [the visual baseline](docs/visual_baseline.md#execution-protocol).
+comparison are in [the visual baseline](docs/step_1_visual_baseline.md#execution-protocol).
 
 `scripts/render.sh <output>` renders sessions; `scripts/pipeline.sh` chains
 speech, embedding and training. `scripts/train_seeds.sh` runs several seeds;

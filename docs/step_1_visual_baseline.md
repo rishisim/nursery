@@ -41,7 +41,7 @@ Keep its per-seed results and trial records; do not substitute the four-noun
 
 ## How we use the baseline
 
-All new live conditions in the [representation comparison](body_representation_comparison.md)
+All new live conditions in the [representation comparison](step_4_body_representation_comparison.md)
 use the same 16×16 features. Include the recorded 4×4 video row beside them,
 with its original data amount, task and protocol labeled. Reuse the historical
 measurement rather than automatically adding another training arm.
@@ -159,7 +159,7 @@ describe saturation of this benchmark. One data amount cannot establish a
 plateau or determine the gain at smaller experience amounts.
 
 For the next build step, keep 16×16 as the visual reference and proceed with
-the [body representation design](body_representation.md). The result supports
+the [body representation design](step_3_body_representation.md). The result supports
 retaining the available visual detail, while useful body representations and
 their acquisition benefit remain unresolved. No body comparison or new curve
 point was launched by this result.

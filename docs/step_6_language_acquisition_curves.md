@@ -1,9 +1,9 @@
 # Step 6: language acquisition with richer bodily experience
 
 The main outcome in [PLAN.md](../PLAN.md), following
-[representation work](body_representation.md), the
-[controlled comparison](body_representation_comparison.md) and the
-[training-recipe decision](body_training_recipe.md). The new protocol is not
+[representation work](step_3_body_representation.md), the
+[controlled comparison](step_4_body_representation_comparison.md) and the
+[training-recipe decision](step_5_body_training_recipe.md). The new protocol is not
 frozen and no new runs have started.
 
 ## The idea
@@ -102,7 +102,7 @@ match; the combined gaze-plus-body condition is unmeasured. Full uncertainty and
 seed values are in the [original record](../archive/language_learning/acquisition_curves.md#completed-results--27-october-2026).
 
 Report 16×16-minus-4×4 only with matching status established as in
-[Step 1](visual_baseline.md). If evaluation changes, keep historical context
+[Step 1](step_1_visual_baseline.md). If evaluation changes, keep historical context
 without calling the raw score difference a resolution effect. Separate seed
 variability from uncertainty across test clips; cluster dependent encounters
 by source clip. Keep shuffled-body, held-out-person and picture-only transfer

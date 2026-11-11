@@ -1,7 +1,7 @@
 # Step 5: settle how the improved body input is learned
 
 Design reference in [PLAN.md](../PLAN.md), following the
-[representation comparison](body_representation_comparison.md). No new
+[representation comparison](step_4_body_representation_comparison.md). No new
 pretraining or architecture experiment is launched by this document.
 
 ## The idea
@@ -77,7 +77,7 @@ criteria, including treatment of compute; test outcomes do not trigger
 retuning. Report ordinary and shuffled-body word accuracy, useful body-only
 diagnostics, and the additional pretraining budget.
 
-Freeze the recipe before the [main curves](language_acquisition_curves.md).
+Freeze the recipe before the [main curves](step_6_language_acquisition_curves.md).
 Use it at every point, with a fixed rule for scaling pretraining exposure and
 updates. Do not choose whichever recipe wins each test point. Retaining no
 pretraining is valid if the comparison does not support adding it.

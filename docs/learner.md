@@ -36,7 +36,7 @@ The preserved acquisition runner is integrated here. Its `prepare` command
 accepts `--fractions` and `--conditions` to freeze a selected comparison;
 `timing`, `run` and `report` require that complete selection. Without those
 options, the original five fractions and three learner conditions remain the
-default. [Step 1](visual_baseline.md#execution-protocol) uses full-data video
+default. [Step 1](step_1_visual_baseline.md#execution-protocol) uses full-data video
 only with the original three seeds.
 
 The language objective trains the visual projection, word vectors, body encoder
@@ -83,7 +83,7 @@ It never launches rentals. Phase A outputs are validated; readout selection
 remains pending the pilot. Child-gaze training gathers bounded float16 batches
 and casts to the original float32 inputs on the accelerator, preserving frame
 order, padding, sampler order and optimizer settings. Historical loaders are
-unchanged. See [the Step 2 protocol](child_gaze.md#phase-b-execution-protocol).
+unchanged. See [the Step 2 protocol](step_2_child_gaze.md#phase-b-execution-protocol).
 
 ## Body input and timing
 

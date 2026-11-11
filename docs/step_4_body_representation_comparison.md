@@ -1,7 +1,7 @@
 # Step 4: compare current and richer body representations
 
 Design reference in [PLAN.md](../PLAN.md), following the
-[visual baseline](visual_baseline.md) and [body representation](body_representation.md).
+[visual baseline](step_1_visual_baseline.md) and [body representation](step_3_body_representation.md).
 No execution settings are frozen and no run has started.
 
 ## The idea
@@ -23,7 +23,7 @@ the hypothesis, not a criterion for accepting the measurements.
 
 Keep the recorded 4×4 row to show the visual improvement. Use its matched clip
 count from the [original curves](../archive/language_learning/acquisition_curves.md#completed-results--27-october-2026).
-[Step 1](visual_baseline.md#how-we-use-the-baseline) defines when its difference
+[Step 1](step_1_visual_baseline.md#how-we-use-the-baseline) defines when its difference
 from 16×16 is a matched comparison. The old 4×4 additive model cannot substitute
 for a current-body control using 16×16 vision.
 
@@ -100,4 +100,4 @@ unresolved issue rather than start a broad search.
 The fixed clip count, seed count, panels, budget, calibration rule and runtime
 cap remain to be frozen. Use one descriptive ignored run root when execution
 is requested. This step does not launch the
-[training-recipe comparison](body_training_recipe.md) or [main curves](language_acquisition_curves.md).
+[training-recipe comparison](step_5_body_training_recipe.md) or [main curves](step_6_language_acquisition_curves.md).
