@@ -18,6 +18,9 @@ class BodyData:
         self.store, self.half, self.mask_prob, self.dropout, self.device = store, half, mask_prob, dropout, device
         t = lambda a, dtype=None: torch.as_tensor(a, dtype=dtype, device=device)
         self.groups = {k: t(v) for k, v in store["groups"].items()}
+        self.variants = {k: t(v) for k, v in store.get("variants", {}).items()}
+        if self.variants and half != 5:
+            raise ValueError("Rich body requires the fixed 11-step window (half=5)")
         self.targets = {k: t(v) for k, v in store["targets"].items()}
         self.clip, self.present, self.next_valid = t(store["clip"]), t(store["present"]), t(store["next_valid"])
         self.ps, self.pt, self.win_frames = t(ps), t(pt), t(win_frames)
@@ -33,6 +36,10 @@ class BodyData:
         seg = torch.where(inside & self.present[s[:, None], steps], self.clip[s[:, None], steps],
                           torch.full_like(steps, -2))
         groups = {k: g[s[:, None], steps] for k, g in self.groups.items()}
+        for key, variants in self.variants.items():
+            groups[key] = groups[key].clone()
+            groups[key][:, 0] = variants[s, steps[:, 0], 1]
+            groups[key][:, -1] = variants[s, steps[:, -1], 2]
         return groups, (seg == -2).float(), seg
 
     def batch(self, idx, generator, training=True, bag_frames=9):

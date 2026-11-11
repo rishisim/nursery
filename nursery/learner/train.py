@@ -139,7 +139,7 @@ def _load_teacher(path, vocab, manifest, heldout_manifest, subject_of, episode_r
 
 def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.1, body="none", episodes="none",
               weights=None, heldout_subject=None, body_dropout=None, distill_from=None, distill_weight=1.0,
-              distill_temp=2.0, inspect_epoch=None, labels=False, split="subject", arch="additive", physical=None, physical_shuffle=False):
+              distill_temp=2.0, inspect_epoch=None, labels=False, split="subject", arch="additive", physical=None, physical_shuffle=False, body_representation="current"):
     import torch
 
     from . import body as bodylib
@@ -180,6 +180,10 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         raise ValueError("--distill-weight must be non-negative and --distill-temp positive")
     if arch not in ("additive", "joint"):
         raise ValueError("--arch must be additive or joint")
+    if body_representation not in ("current", "rich"):
+        raise ValueError("Body representation must be current or rich")
+    if body_representation == "rich" and (body != "real" or arch != "additive" or physical_shuffle):
+        raise ValueError("Rich body needs real additive body without physical shuffling")
     joint = arch == "joint"
     if joint:  # Reproduction only; the proposed joint architecture is not implemented.
         from archive.code.learner.joint_pilot import JointMIL
@@ -270,7 +274,18 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
         video_ids = sorted(set(all_manifest.video_id) | set(heldout_manifest.video_id))
         heldout_videos = set(heldout_manifest.video_id)
         exclude = np.array([np.isin(part[v], (1, 2)) for v in video_ids]) if part else None  # dev/test clips stay out of the stats
-        real = bodylib.load_store(episode_root, frames, video_ids, heldout_videos, exclude=exclude, physical=physical)
+        if body_representation == "rich":
+            if physical is None:
+                physical = str(episode_root / "physical_by_clip")
+            frame_clip = frames.set_index(["video_id", "frame_idx"])["clip"]
+            selected = {frame_clip.loc[(r.video_id, int(r.frame_idx))] for r in manifest.itertuples()}
+            if exclude is None:
+                exclude = np.zeros((len(video_ids), 120), bool)
+            for i, video in enumerate(video_ids):
+                group = frames[frames.video_id == video]
+                exclude[i, group.frame_idx.to_numpy()] |= ~group["clip"].isin(selected).to_numpy()
+        real = bodylib.load_store(episode_root, frames, video_ids, heldout_videos, exclude=exclude, physical=physical,
+                                  representation=body_representation)
         real["subject"] = np.array([subject_of[v] for v in video_ids])
         shuffle_info = physical_info = None
         train_store = real
@@ -299,6 +314,9 @@ def train_run(run, condition, seed, epochs=None, name=None, pool="max", tau_p=0.
                      "physical": physical, "physical_shuffle": physical_info if physical_shuffle else False,
                      "n_episodes": int(len(np.unique(episode_ids[episode_ids >= 0]))),
                      "episode_frames": float((episode_ids >= 0).sum() / max(real["present"].sum(), 1))}
+    if body_info is not None and body_representation != "current":
+        body_info["representation"] = body_representation
+        body_info["granularity"] = real["granularity"]
     if device == "mps":
         model = model.float()
     model = model.to(device)

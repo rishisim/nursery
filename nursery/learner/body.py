@@ -174,7 +174,8 @@ def temporal_blocks(clip, lengths, rng, min_len=2, first_id=0):
     return out
 
 
-def load_store(episodes, frames, video_ids, heldout_videos, steps=120, exclude=None, physical=None):
+def load_store(episodes, frames, video_ids, heldout_videos, steps=120, exclude=None, physical=None,
+               representation="current", granularity=None):
     """Per-session body arrays [S,steps,...] indexed by frame_idx, normalised on sessions not in `heldout_videos`.
 
     heldout_videos: video ids whose sessions are excluded from the normalisation fit (the held-out subject).
@@ -184,7 +185,15 @@ def load_store(episodes, frames, video_ids, heldout_videos, steps=120, exclude=N
     physical: optional directory of per-clip `<video_id>.npz` (nursery/simulator/physical.py). Adds groups load [10]
     (per hand mean force xyz, |F|, spread) and skin [4] (per hand skin dT, contact area), standardised on the same
     training seconds as fingers/arm, zero on absent seconds.
+
+    representation="rich" reads body_rich/ and its frozen selection.json: contact G+26,
+    fingers 100, arm 31, load 10, skin 4. It retains full/outer-half variants for
+    BodyData's fixed 11-step window and uses the same caller-controlled fit mask.
     """
+    if representation not in ("current", "rich"):
+        raise ValueError("Body representation must be current or rich")
+    if representation == "rich" and physical is None:
+        physical = Path(episodes) / "physical_by_clip"
     video_ids = list(video_ids)
     matrix = patch_matrix()
     clip, held, names, categories = clip_index(frames, video_ids, steps)
@@ -242,6 +251,9 @@ def load_store(episodes, frames, video_ids, heldout_videos, steps=120, exclude=N
     }
     if physical is not None:
         store["groups"].update(phys)
+    if representation == "rich":
+        from .rich import enrich_store
+        return enrich_store(episodes, store, heldout_videos, exclude, granularity)
     return store
 
 

@@ -2,7 +2,8 @@
 
 Design reference in [PLAN.md](../PLAN.md). This step defines the sensory change
 before the [controlled learning comparison](step_4_body_representation_comparison.md).
-No richer representation or new sensor has been implemented by this document.
+The richer candidate is now implemented, exported and frozen; see
+[Frozen candidate](#frozen-candidate--10-november-2026). No new sensor was added.
 
 Gaze counts as embodied experience. In Steps 3–6, B denotes the remaining
 contact, pose, motion, load and skin channels; G denotes steering gaze and its
@@ -89,5 +90,104 @@ information survives the encoding. Labels can score diagnostics but cannot
 be ordinary learner inputs or manufacture distinctive sensory signatures.
 
 Exact contact granularity, recovered sample rate, pose encoding and necessary
-encoder-size changes remain open. Resolve them from available data and
-training/development evidence before Step 4, without selecting on test scores.
+encoder-size changes were open. They are resolved below from available data and
+training/development evidence, without test scores.
+
+## Frozen candidate — 10 November 2026
+
+Rich B is frozen for Step 4. It changes how existing recordings are summarized;
+it adds no new sensation. Choices were made from data audits and one
+pre-declared train→dev rule. No test or s8 data were used.
+
+### What the audit found
+
+- The retargeted GRAB source is 120 Hz for all 1,063 export clips (100%
+  coverage). All 102,720 exported seconds map back to an exact source frame.
+- Timing loss is large. In 28 sampled training clips, 99% of contact onsets
+  and offsets fall between the 1 Hz samples. Brief contacts last a median 92 ms.
+- Spatial loss is small by exact count. Only 6.8% of contacting training
+  samples share a 22-patch vector with a different vertex pattern.
+- 632 clips use substituted objects. Their contact is recomputed against the
+  substituted mesh (5 mm rule). All 105 substituted meshes are on disk.
+
+### Channel specification
+
+Window: the same 11 steps over [t − 5 s, t + 5 s], bounded by the clip. Each
+step summarizes the 30 Hz source frames (every 4th 120 Hz frame) in the 1 s
+bin centred on its existing 1 Hz frame, within its own clip. The two outer steps
+use only the half-bin inside the span, so the body window does not grow.
+
+| Group | Dims | Content | Units / normalization |
+|---|---:|---|---|
+| Contact | 48 | 22 patch fractions, time-averaged over the bin (same map as current B) | raw [0, 1] |
+| | | Per hand: share of bin frames with any contact; contact onsets in the bin | standardized |
+| | | Per hand, wrist frame, over contacting frames: contact centroid (3), principal extents (3), mean surface normal (3), opposition = 1 − \|mean normal\| (1), span = largest distance between touching points (1) | metres; standardized on contact bins; 0 when no contact |
+| Fingers | 100 | Bin-mean 90 axis-angle values; mean joint angular speed per finger (10) | rad, rad/s; standardized |
+| Arm | 31 | Bin-mean elbow/wrist positions (12) and velocity from 30 Hz central differences (12), head-camera frame; speed std per joint (4); gravity in camera frame (3) | m, m/s; standardized |
+| Load | 10 | Unchanged from current B (already from 120 Hz, ±0.5 s) | standardized |
+| Skin | 4 | Unchanged from current B | standardized |
+| **Total** | **193** | Current B: 153 | |
+
+- Sources: native clips use GRAB contact labels; swapped clips use contact
+  recomputed at every 30 Hz frame. Geometry uses only the hand's own touching
+  vertices; no object geometry, pose or identity enters any feature.
+- Normalization statistics come from the selected training clips only (630
+  clips, 63,153 rows), through the same fit mask as current B.
+- Missing seconds are handled as in current B.
+- Encoder: unchanged family and width (per-group MLP 64, bidirectional GRU 64).
+  Only first-layer input sizes change: encoder parameters 179,520 → 182,080;
+  full additive learner 1,817,387 → 1,825,107; encoder compute 1.96M → 1.99M
+  multiply-adds per example.
+- Export: `nursery/simulator/body_rich.py`, 83 min on 8 CPU workers, 595 MB in
+  `outputs/renders/clean_856/body_rich/` (ignored). Learner option:
+  `representation="rich"` in `load_store`, `--body-representation rich` in the
+  learner CLI. The current representation stays the default. Gaze-world wiring is
+  Step 4's work.
+
+### Open choices, resolved
+
+- **Sample rate:** 30 Hz summaries per 1 s step, not a longer sequence. This
+  catches brief contacts while keeping sequence length and encoder size fixed.
+- **Contact granularity:** 22 patches. Rule fixed in advance: contact-only
+  logistic probe for held category, train → dev; choose the smallest
+  granularity within 1 point of the best. Dev accuracy: 22 patches 24.2%,
+  32 phalanx regions 24.8%, 64 phalanx × palm/back regions 23.9%. A secondary
+  leave-one-subject-out check within training favoured 64 (26.6% vs 24.3%);
+  it did not select.
+- **Pose encoding:** axis-angle kept, averaged over the bin, plus finger speed.
+  Contact geometry carries the hand-shape information around contact.
+
+### What became distinguishable
+
+Five pairs of training seconds have identical current 22-patch vectors but
+different contact (`outputs/analysis/step3_body/build/contact_examples.csv`).
+For example, a water-bottle lift and a duck lift both read as "right thumb tip
+22%" in current B. Rich B separates them: the bottle is a whole-hand grasp in
+contact 70% of the second with an 8.2 cm span; the duck is a light thumb–index
+touch with three onsets and a 4.9 cm span.
+
+### Checks before Step 4 (all passed)
+
+- Alignment: 0 of 102,720 centre frames differ from the existing contact export
+  (native and swapped); hand pose and joints match exactly.
+- Isolation: no bin uses frames outside its clip; outer half-bins and clip
+  resets are unit-tested.
+- All values finite. Coverage: 1,063 clips, 856 sessions, 102,720 rows.
+- Original body and physical exports unchanged (1,712 files hash-verified).
+- Information survives encoding (train → dev, diagnostic labels only):
+  - All-body held-category probe: current B 23.7%, rich B 31.7% (9,517 dev
+    contact seconds).
+  - Brief contacts (under 1 s) visible in the step input: current B 32%,
+    rich B 100% (1,005 per-hand episodes).
+- Three CPU training steps through the additive learner ran with finite,
+  nonzero encoder gradients. Full test suite: 258 passed.
+
+These are input diagnostics, not language results. Whether rich B helps word
+learning is Step 4's question. Evidence: `outputs/analysis/step3_body/`.
+
+### Still unavailable (deferred)
+
+Pressure and its spatial distribution, friction, texture, stiffness and
+deformation, and spatial heat transfer. All need a contact-force or material
+model, or measurements. Load and skin remain the existing proxies. Active
+exploration remains deferred.
