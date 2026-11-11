@@ -184,3 +184,39 @@ def test_real_six_worker_first_epoch_projection():
     with pytest.raises(ValueError):
         rental.real_epoch_projection(epoch_seconds=[30.] * 5, setup_seconds=[20.] * 6,
                                       elapsed_seconds=1200, hourly=4.)
+
+
+def test_step4_queue_projection_uses_explicit_workers_waves_and_caps():
+    gate = rental.real_epoch_projection(epoch_seconds=[30.] * 8, setup_seconds=[20.] * 8,
+        elapsed_seconds=1200, hourly=4., hard_seconds=14400, workers=8, waves=2,
+        remaining_epochs=59, cost_cap=15)
+    assert gate['projected_remaining_seconds'] == 5675
+    assert gate['passes']
+    assert not rental.real_epoch_projection(epoch_seconds=[30.] * 8,
+        setup_seconds=[20.] * 8, elapsed_seconds=1200, hourly=4., workers=8,
+        waves=2, cost_cap=5)['passes']
+
+
+def test_step4_heterogeneous_queue_uses_measured_arm_durations():
+    rows = [dict(condition='body', epoch=1, epoch_seconds=45., setup_seconds=10.)] * 6
+    rows += [dict(condition=arm, epoch=1, epoch_seconds=25., setup_seconds=10.)
+             for arm in ('video', 'gaze')]
+    gate = rental.queued_epoch_projection(observations=rows,
+        pending_conditions=['video', 'gaze', 'video', 'gaze'], epochs=60,
+        elapsed_seconds=3600, hourly=4.8, hard_seconds=10800, cost_cap=14.16)
+    assert gate['passes']
+    assert max(gate['projected_worker_finish_seconds']) == 4175
+    assert gate['projected_remaining_seconds'] == 6118.75
+    with pytest.raises(ValueError, match='Every pending arm'):
+        rental.queued_epoch_projection(observations=rows, pending_conditions=['unmeasured'],
+            epochs=60, elapsed_seconds=0, hourly=4.8, hard_seconds=10800, cost_cap=15)
+
+
+def test_step4_first_workers_cover_all_arms_after_body_priority():
+    from scripts.step4_rental import jobs
+    protocol = dict(conditions=['video', 'video_gaze', 'video_gaze_body_current',
+                               'video_gaze_body_rich'], seeds=[0, 1, 2], fractions=[1.])
+    queue = jobs(protocol)
+    assert len(queue) == len(set(queue)) == 12
+    assert all('body' in job[2] for job in queue[:6])
+    assert {job[2] for job in queue[:8]} == set(protocol['conditions'])

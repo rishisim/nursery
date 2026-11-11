@@ -1,5 +1,6 @@
 """Bounded transport retries and provider readiness for child-gaze rentals."""
 import fcntl
+import heapq
 import json
 import os
 from pathlib import Path
@@ -143,20 +144,55 @@ def run_connected(command, *, teardown=False, **kwargs):
 
 def real_epoch_projection(*, epoch_seconds, setup_seconds, elapsed_seconds,
                           hourly, hard_seconds=7200, transfer_reserve=.25,
-                          return_reserve=900, contingency=300):
-    """Conservative cap gate from the first epochs of the actual six runs."""
-    if len(epoch_seconds) != 6 or len(setup_seconds) != 6 or min(epoch_seconds) <= 0:
-        raise ValueError('All six real workers must supply a positive epoch duration')
-    remaining = 1.25 * (59 * max(epoch_seconds) + max(setup_seconds)) + return_reserve + contingency
+                          return_reserve=900, contingency=300, workers=6,
+                          remaining_epochs=59, waves=1, cost_cap=15):
+    """Conservative cap gate; defaults preserve the Step 2 six-worker gate."""
+    if (workers < 1 or waves < 1 or remaining_epochs < 0 or
+            len(epoch_seconds) != workers or len(setup_seconds) != workers or min(epoch_seconds) <= 0):
+        raise ValueError('All real workers must supply a positive epoch duration')
+    remaining = 1.25 * waves * (remaining_epochs * max(epoch_seconds) + max(setup_seconds)) + return_reserve + contingency
     total = elapsed_seconds + remaining
     cost = total / 3600 * hourly + transfer_reserve
-    return dict(passes=total <= hard_seconds and cost <= 15,
+    return dict(passes=total <= hard_seconds and cost <= cost_cap,
                 projected_remaining_seconds=remaining,
                 projected_launch_to_verified_results_seconds=total,
                 projected_cost_usd=cost, max_epoch_seconds=max(epoch_seconds),
                 max_setup_seconds=max(setup_seconds), headroom=1.25,
-                remaining_epochs=59, return_reserve_seconds=return_reserve,
+                remaining_epochs=remaining_epochs, return_reserve_seconds=return_reserve,
                 contingency_seconds=contingency)
+
+
+def queued_epoch_projection(*, observations, pending_conditions, epochs,
+                            elapsed_seconds, hourly, hard_seconds, cost_cap,
+                            transfer_reserve=.6, return_reserve=600, contingency=300):
+    """Project a heterogeneous queue from real timings for every queued arm."""
+    if not observations or any(x['epoch_seconds'] <= 0 for x in observations):
+        raise ValueError('Positive real epoch observations are required')
+    bounds = {}
+    for row in observations:
+        arm = row['condition']
+        previous = bounds.get(arm, (0, 0))
+        bounds[arm] = (max(previous[0], row['epoch_seconds']),
+                       max(previous[1], row['setup_seconds']))
+    if set(pending_conditions) - bounds.keys():
+        raise ValueError('Every pending arm must have a measured worker')
+    # Setup is retained as a conservative final-evaluation allowance for active
+    # jobs, and charged again for queued jobs. Global reserves are separate.
+    available = [max(0, epochs-x['epoch'])*x['epoch_seconds']+x['setup_seconds']
+                 for x in observations]
+    heapq.heapify(available)
+    for arm in pending_conditions:
+        seconds, setup = bounds[arm]
+        heapq.heappush(available, heapq.heappop(available)+epochs*seconds+setup)
+    remaining = 1.25*max(available)+return_reserve+contingency
+    total = elapsed_seconds+remaining
+    cost = total/3600*hourly+transfer_reserve
+    return dict(passes=total <= hard_seconds and cost <= cost_cap,
+                projected_remaining_seconds=remaining,
+                projected_launch_to_verified_results_seconds=total,
+                projected_cost_usd=cost, arm_timing_bounds=bounds,
+                projected_worker_finish_seconds=sorted(available), headroom=1.25,
+                return_reserve_seconds=return_reserve, contingency_seconds=contingency)
 
 
 def create_instance(command, *, label, state_file=None, runner=run_transport,

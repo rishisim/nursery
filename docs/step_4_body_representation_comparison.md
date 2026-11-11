@@ -2,8 +2,9 @@
 
 Design reference in [PLAN.md](../PLAN.md), following the
 [visual baseline](step_1_visual_baseline.md) and [body representation](step_3_body_representation.md).
-Implemented, with the [execution protocol](#frozen-execution-protocol--10-november-2026)
-frozen on 10 November 2026. No run has started.
+Complete: [results](#completed-results--11-november-2026) from the
+[frozen protocol](#frozen-execution-protocol--10-november-2026). Neither body
+representation adds to gaze; rich body is carried to Step 5.
 
 ## The idea
 
@@ -129,3 +130,57 @@ Step 2's 63.61% and 75.72%.
 Choosing the epoch and body weight together avoids selecting the checkpoint
 while the body is still overweighted. In the earlier body diagnosis, that
 overweighting caused most of the body's harm.
+
+## Completed results — 11 November 2026
+
+12/12 runs verified at commit `3241d987`: 60 epochs each, frozen hashes
+matched. Results and full tables: `outputs/runs/step4_body_comparison/analysis/`.
+
+| Condition (630 clips) | New-clip test (556) | s8 (793) | Difference from 16×16 video, test |
+|---|---:|---:|---:|
+| Recorded 4×4 video (old world, 570 questions) | 60.12 | — | Historical; not matched |
+| 16×16 video | 63.67 ± 1.18 | 61.96 ± 2.04 | — |
+| + steering gaze | 75.60 ± 1.08 | 75.83 ± 0.51 | +11.93 |
+| + steering gaze + current body | 76.26 ± 0.48 | 75.16 ± 0.38 | +12.59 |
+| + steering gaze + rich body | 76.14 ± 0.37 | 75.49 ± 0.72 | +12.47 |
+
+Accuracy in %, mean ± SD over seeds 0–2.
+
+Paired differences in points: mean ± seed SD, then 95% bootstrap over test
+source clips, pooled over seeds.
+
+| Comparison | New-clip test | s8 |
+|---|---:|---:|
+| Gaze − video | +11.93 ± 1.98 [8.67, 15.40] | +13.87 ± 2.03 [11.04, 16.98] |
+| Current body − gaze | +0.66 ± 0.63 [0.00, 1.33] | −0.67 ± 0.63 [−1.52, 0.16] |
+| Rich body − gaze | +0.54 ± 1.09 [−0.06, 1.21] | −0.34 ± 0.26 [−1.16, 0.50] |
+| Rich − current | −0.12 ± 0.63 [−0.86, 0.60] | +0.34 ± 0.72 [−0.44, 1.13] |
+| Total: rich body + gaze − video | +12.47 ± 1.53 [9.32, 15.83] | +13.54 ± 1.87 [10.68, 16.71] |
+
+- **Dev turned the body off.** Selected weights, seeds 0/1/2: current 0, 0.05,
+  0; rich 0.10, 0, 0. At the as-trained weight (w = 1), test accuracy falls to
+  67.45 (current) and 69.06 (rich), 8.2 and 6.5 points below gaze alone. The body
+  score learned with words from scratch hurts held-out clips, as in the earlier
+  body diagnosis, and richer input does not change that.
+- **So the small body-arm differences are not body evidence.** They come from
+  a video-and-gaze pathway trained alongside body. Shuffled body equals the
+  primary score wherever w = 0; rich seed 0 (w = 0.10) drops from 76.26 to 75.00.
+- **All extra inputs removed (test):** video 63.67, gaze 65.77, current 65.65,
+  rich 65.71. **Picture transfer**, rendered / Konkle: video 75.65 / 74.02,
+  gaze 81.76 / 84.22, current 81.67 / 84.11, rich 81.64 / 83.99.
+- **Step 2 reproduced:** rerun video 63.67 vs 63.61; gaze 75.60 vs 75.72.
+- **Compute:** about 24 minutes per video or gaze run and 29 per body run on
+  RTX 4090s. Total rental spend $10.48 over three hosts: the first had a slow
+  link and was stopped during upload, the second failed SSH startup, and an
+  8×4090 host ran all 12 jobs. The successful attempt took 2 h 02 min, nearly
+  half of it uploading 43.8 GB at 13 MB/s.
+
+**Decision.** Word accuracy supports neither representation over the other:
+dev selection switches body off in both, so this setup cannot tell them apart.
+The limit is how the body pathway learns, not what it receives. Rich body is
+the fixed candidate for [Step 5](step_5_body_training_recipe.md). It is no
+worse here, costs 2,560 extra parameters, and Step 3 showed it carries more
+category information (dev probe 23.7% → 31.7%), which wordless pretraining may
+be able to use. Step 5 can reuse this step's video, gaze and rich-body runs as
+references, since their data, model and selection settings match. All body
+results here are conditional on gaze.
