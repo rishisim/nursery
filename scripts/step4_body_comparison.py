@@ -62,7 +62,8 @@ def freeze(parent=DEFAULT_PARENT, destination=DEFAULT_ROOT / 'frozen', *, overwr
     return run._freeze_inputs(destination)
 
 
-def smoke(frozen=DEFAULT_ROOT / 'frozen', destination=DEFAULT_ROOT / 'smoke', *, device='cpu', clips=8, epochs=1):
+def smoke(frozen=DEFAULT_ROOT / 'frozen', destination=DEFAULT_ROOT / 'smoke', *, device='cpu', clips=8, epochs=1,
+          fraction=1.0, arms=ARMS):
     """Use selected real clips; retain the full real dev/test and picture panels."""
     import numpy as np
     import pandas as pd
@@ -77,7 +78,7 @@ def smoke(frozen=DEFAULT_ROOT / 'frozen', destination=DEFAULT_ROOT / 'smoke', *,
     destination.mkdir(parents=True, exist_ok=False)
     for name in ('panels', 'subsets'):
         shutil.copytree(frozen / name, destination / name)
-    subset = destination / 'subsets/1.0'
+    subset = destination / 'subsets' / str(float(fraction))
     stats = run._read(subset / 'stats.json')
     selected = set(stats['selected_clips'][:clips])
     frames = pd.read_parquet(Path(protocol['episodes']) / 'frames.parquet')
@@ -97,14 +98,14 @@ def smoke(frozen=DEFAULT_ROOT / 'frozen', destination=DEFAULT_ROOT / 'smoke', *,
     stats.update(selected_clips=sorted(selected), smoke_utterances=len(manifest),
                  normalization_note='Smoke body normalization refit only on selected smoke clips')
     run._write(subset / 'stats.json', stats)
-    protocol.update(epochs=epochs, seeds=[0], smoke_evaluate_all_panels=True,
+    protocol.update(epochs=epochs, seeds=[0], fractions=[float(fraction)], conditions=list(arms), smoke_evaluate_all_panels=True,
                     smoke_selected_clips=sorted(selected), smoke_parent=str(frozen))
     run._write(destination / 'protocol.json', protocol)
     # Bind smoke inputs/source too, allowing the same runner on CPU or MPS.
     prepared = {str(p): run._sha(p) for p in sorted(destination.rglob('*')) if p.is_file()}
     run._write(destination / 'frozen_inputs.json', dict(run._source_snapshot(), prepared_hashes=prepared,
                 external_hashes=protocol['hashes']))
-    return {arm: run.train_one(destination, 1., 0, arm, smoke=True, epochs=epochs, device=device) for arm in ARMS}
+    return {arm: run.train_one(destination, fraction, 0, arm, smoke=True, epochs=epochs, device=device) for arm in arms}
 
 
 if __name__ == '__main__':

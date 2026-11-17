@@ -83,7 +83,7 @@ def matrix(args):
             while available and pending:
                 gpu, job = available.pop(0), pending.pop(0)
                 fraction, seed, arm = job
-                log = args.rental / f'{arm}_seed_{seed}.log'
+                log = args.rental / f'{arm}_fraction_{fraction}_seed_{seed}.log'
                 handle = log.open('w')
                 command = [sys.executable, str(Path(__file__).resolve()), 'worker',
                            '--frozen', str(args.frozen), '--rental', str(args.rental),
