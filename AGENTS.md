@@ -17,6 +17,12 @@ EgoBabyVLM line of work, and the simulator exists to supply those modalities.
   stopping point unless the user asks. A null or weak result is a design
   signal, not an ending.
 
+## Experiments using controlled BabyView data
+
+- Before a run that reads Databrary recordings or participant-level derivatives, flag the controlled inputs in the run plan. Verify personnel and storage against the project 15815 Data Management and Sharing Plan in `outputs/exports/databrary/`. Use access-restricted UTD Juno storage for controlled files, including manifests and per-clip outputs.
+- Use scratch only for active processing. Verify required outputs in restricted persistent storage before clearing temporary copies, and verify backup and restore coverage before relying on that storage for unique records. Follow the repository's approval rule before deleting existing data.
+- Rishi reviews access and storage quarterly during active processing, at onboarding or departure, before release, and at closeout. Record the review in restricted project storage. Check releases for identifying material, file manifests and credentials.
+
 ## Scope
 
 - The immediate user request is the full scope. Background, long-term goals, and discovered problems do not authorize additional work.
