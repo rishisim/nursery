@@ -4,9 +4,37 @@ from functools import lru_cache
 
 import numpy as np
 import torch
+from torch import nn
+from torch.nn import functional as F
 
 from . import _upstream_module
 from .losses import distill_kl, soft_pool, weighted_nce
+
+
+class TemporalVideoEncoder(nn.Module):
+    """Project each frame, then read a one-layer bidirectional GRU at the center."""
+
+    def __init__(self, emb_dim):
+        super().__init__()
+        self.project = nn.Linear(emb_dim, 128)
+        self.forward_cell = nn.GRUCell(128, 64)
+        self.backward_cell = nn.GRUCell(128, 64)
+
+    def forward(self, frames, same):
+        if frames.ndim != 3 or frames.shape[1] != 11 or same.shape != frames.shape[:2]:
+            raise ValueError("Temporal video requires 11 frame vectors and an aligned mask")
+        x = self.project(frames.masked_fill(~same[..., None], 0))
+
+        def read(cell, steps):
+            state = x.new_zeros(len(x), cell.hidden_size)
+            for step in steps:
+                state = torch.where(same[:, step, None], cell(x[:, step], state), state)
+            return state
+
+        # Each direction needs only the steps up to its center readout.
+        forward = read(self.forward_cell, range(6))
+        backward = read(self.backward_cell, range(10, 4, -1))
+        return torch.cat((forward, backward), dim=-1)
 
 
 @lru_cache(maxsize=None)
@@ -14,10 +42,13 @@ def _video_class():
     region = _upstream_module("train_region_mil")
 
     class VideoOnly(region.RegionMIL):
-        def __init__(self, vocab, emb_dim, tau_p=0.1, **kwargs):
+        def __init__(self, vocab, emb_dim, tau_p=0.1, temporal_video=False, **kwargs):
             super().__init__(vocab, emb_dim=emb_dim, **kwargs)
             self.tau_p = tau_p
             self.encoder = None
+            self.temporal_video = TemporalVideoEncoder(emb_dim) if temporal_video else None
+            if temporal_video:
+                self.temporal_weight = nn.Parameter(torch.tensor(1.0))
 
         def scale(self):
             return self.logit_scale.clamp(max=np.log(100)).exp()
@@ -31,10 +62,24 @@ def _video_class():
             similarities = torch.einsum("brd,md->brm", R, T)
             uniform = torch.full(similarities.shape[:2], -np.log(similarities.shape[1]),
                                  device=similarities.device, dtype=similarities.dtype)
-            return soft_pool(similarities, uniform, self.tau_p)
+            return self.add_temporal(soft_pool(similarities, uniform, self.tau_p), T, ctx)
+
+        def temporal_frames(self, tokens, ctx):
+            return tokens.mean(dim=-2)
+
+        def temporal_score(self, T, ctx):
+            latent = self.temporal_video(ctx["frames"], ctx["same"])
+            # Share a 128-d slice of the existing word embeddings.
+            word = F.normalize(T[:, :latent.shape[-1]], dim=-1)
+            return F.normalize(latent, dim=-1) @ word.t()
+
+        def add_temporal(self, score, T, ctx):
+            if self.temporal_video is None or ctx is None or "temporal" not in ctx:
+                return score
+            return score + self.temporal_weight * self.temporal_score(T, ctx["temporal"])
 
         def losses(self, v, t, n, w, ctx=None, weights=None, target=None, temp=2.0):
-            _, _, scores = self.pair_scores(v, t, n)
+            _, _, scores = self.pair_scores(v, t, n, ctx if self.temporal_video is not None else None)
             logits = self.scale() * scores
             out = {"match": weighted_nce(logits, w)}
             if (weights or {}).get("distill", 0) > 0 and target is not None:
@@ -48,10 +93,12 @@ def _video_class():
     return VideoOnly
 
 
-def VideoOnlyMIL(vocab, emb_dim, tau_p=0.1, pool="soft"):
+def VideoOnlyMIL(vocab, emb_dim, tau_p=0.1, pool="soft", *, temporal_video=False):
     """Construct the baseline without any body modules; preserve historical max pooling."""
     if pool == "max":
+        if temporal_video:
+            raise ValueError("Temporal video requires soft pooling")
         return _upstream_module("train_frame_mil").RegionMIL(vocab, emb_dim=emb_dim)
     if pool != "soft":
         raise ValueError("pool must be max or soft")
-    return _video_class()(vocab, emb_dim, tau_p)
+    return _video_class()(vocab, emb_dim, tau_p, temporal_video=temporal_video)

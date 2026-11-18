@@ -36,6 +36,66 @@ def collate_frame_indices(dataset, indices):
             torch.tensor([len(dataset.ids[index]) for index in indices], dtype=torch.long))
 
 
+def partition_window_keys(rows, lut, partitions, window):
+    """Keep evaluation frames in the target's partition, in FramePairs order."""
+    result = []
+    for row in rows.itertuples():
+        center = f"{row.video_id}|{row.frame_idx}"
+        keys = [f"{row.video_id}|{frame}" for frame in range(row.frame_idx - window, row.frame_idx + window + 1)]
+        result.append([key for key in keys if key in lut and partitions[key] == partitions[center]])
+    return result
+
+
+class TemporalVideoData:
+    """Gather the existing cache at the same aligned seconds as BodyData."""
+
+    def __init__(self, manifest, caches, lut, timeline, *, allowed_keys=None):
+        from .body import window_steps
+
+        session, clip = timeline
+        s = manifest.video_id.map(session).to_numpy(dtype=np.int64)
+        t = manifest.frame_idx.to_numpy(dtype=np.int64)
+        steps, seg = window_steps(clip, s, t, 5)
+        self.same = (seg == seg[:, 5:6]) & (seg >= 0)
+        if not self.same[:, 5].all():
+            raise ValueError("Temporal center must be a recorded body timestamp")
+        self.caches = caches
+        self.locations = np.full((*steps.shape, 2), -1, dtype=np.int64)
+        self.frame_keys = [[None] * steps.shape[1] for _ in t]
+        videos = manifest.video_id.to_numpy()
+        for i, j in zip(*np.where(self.same)):
+            key = f"{videos[i]}|{steps[i, j]}"
+            if allowed_keys is not None and key not in allowed_keys:
+                raise ValueError("Temporal video window exceeds selected experience")
+            if key not in lut:
+                raise ValueError(f"Missing same-clip temporal video frame: {key}")
+            self.locations[i, j] = lut[key]
+            self.frame_keys[i][j] = key
+        self.gaze = None
+
+    @torch.no_grad()
+    def batch(self, model, indices, *, device, gaze_mode="removed", keep=None):
+        indices = np.asarray(indices, dtype=np.int64)
+        gaze = (self.gaze.batch(indices, mode=gaze_mode, device=device, keep=keep)
+                if self.gaze is not None else None)
+        vectors = []
+        # Pool frozen tokens before retaining the batch for backpropagation.
+        dtype = np.result_type(*(cache.dtype for cache in self.caches))
+        for start in range(0, len(indices), 16):
+            batch = slice(start, start + 16)
+            here = indices[batch]
+            locations = self.locations[here]
+            values = np.zeros((*locations.shape[:2], *self.caches[0].shape[1:]), dtype=dtype)
+            for cache_index, cache in enumerate(self.caches):
+                selected = locations[..., 0] == cache_index
+                values[selected] = cache[locations[..., 1][selected]]
+            tokens = torch.as_tensor(values, device=device).float()
+            ctx = {key: value[batch] for key, value in (gaze or {}).items()}
+            ctx["same"] = torch.as_tensor(self.same[here], device=device)
+            vectors.append(model.temporal_frames(tokens, ctx))
+        return {"frames": torch.cat(vectors), "same": torch.as_tensor(self.same[indices], device=device)}
+
+
 def dino_crop_points(points, width=320, height=240):
     """Map normalized image coordinates through the pinned DINO 256/224 crop.
 
@@ -103,7 +163,7 @@ class GazeData:
     """
 
     def __init__(self, manifest, lut, gaze, *, partitions, window=2,
-                 closeup_cache=None, point_only=False, allowed_keys=None, seed=0):
+                 closeup_cache=None, point_only=False, allowed_keys=None, seed=0, frame_keys=None):
         if window < 0 or int(window) != window:
             raise ValueError("Window must be a nonnegative integer")
         if len(manifest) == 0:
@@ -113,17 +173,18 @@ class GazeData:
         self.partitions = []
         self.frame_keys = []
         allowed = None if allowed_keys is None else set(allowed_keys)
-        for center, (video, frame) in zip(self.centers, zip(manifest.video_id, manifest.frame_idx)):
+        for i, (center, (video, frame)) in enumerate(zip(self.centers, zip(manifest.video_id, manifest.frame_idx))):
             if center not in partitions:
                 raise ValueError(f"Missing center partition: {center}")
             part = partitions[center]
-            here = [f"{video}|{f}" for f in range(int(frame) - window, int(frame) + window + 1)
-                    if f"{video}|{f}" in lut]
-            if not here:
+            here = ([f"{video}|{f}" for f in range(int(frame) - window, int(frame) + window + 1)
+                     if f"{video}|{f}" in lut] if frame_keys is None else frame_keys[i])
+            keys = [key for key in here if key is not None]
+            if not keys:
                 raise ValueError(f"Missing visual window: {center}")
-            if any(k not in partitions or partitions[k] != part for k in here):
+            if any(k not in partitions or partitions[k] != part for k in keys):
                 raise ValueError("Gaze window crosses or lacks a source-clip partition")
-            if allowed is not None and any(k not in allowed for k in here):
+            if allowed is not None and any(k not in allowed for k in keys):
                 raise ValueError("Gaze window exceeds selected experience")
             self.frame_keys.append(here)
             self.partitions.append(part)
@@ -139,7 +200,7 @@ class GazeData:
         if ((coordinates[valid] < 0) | (coordinates[valid] >= 1)).any():
             raise ValueError("Raw gaze coordinates must lie in [0, 1)")
         lookup = dict(zip(keys, range(len(keys))))
-        needed = set(k for here in self.frame_keys for k in here)
+        needed = {key for here in self.frame_keys for key in here if key is not None}
         if needed - lookup.keys():
             raise ValueError("Gaze table does not cover every accessible visual frame")
         valid_keys = sorted(k for k in needed if valid[lookup[k]])
@@ -154,6 +215,8 @@ class GazeData:
         cropped = dino_crop_points(coordinates)
         for i, here in enumerate(self.frame_keys):
             for j, key in enumerate(here):
+                if key is None:
+                    continue
                 self.frame_valid[i, j] = True
                 row = lookup[key]
                 if valid[row]:
@@ -175,7 +238,7 @@ class GazeData:
                 other = moments[part][choice]
                 self.donor_indices[i] = rng.choice(groups[part][other])
 
-    def batch(self, indices, generator=None, *, mode="real", dropout=0.0, device="cpu"):
+    def batch(self, indices, generator=None, *, mode="real", dropout=0.0, device="cpu", keep=None):
         """Return with-gaze or exact removed context; padding contributes no gaze."""
         if mode not in ("real", "shuffled", "removed"):
             raise ValueError("Gaze mode must be real, shuffled or removed")
@@ -189,9 +252,10 @@ class GazeData:
         donors = self.donor_indices[indices] if mode == "shuffled" else indices
         if (donors < 0).any():
             raise ValueError("Shuffled gaze needs another moment in the same partition")
-        keep = torch.ones(len(indices), dtype=torch.bool)
-        if dropout:
-            keep = torch.rand(len(indices), generator=generator) >= dropout
+        if keep is None:
+            keep = torch.ones(len(indices), dtype=torch.bool)
+            if dropout:
+                keep = torch.rand(len(indices), generator=generator) >= dropout
         ctx = {"gaze_point": torch.as_tensor(self.points[donors], device=device),
                "gaze_valid": torch.as_tensor(self.valid[donors] & self.frame_valid[indices], device=device),
                "keep": keep.to(device)}

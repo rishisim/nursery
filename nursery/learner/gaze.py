@@ -33,7 +33,8 @@ def compact_closeup(tokens):
 def _gaze_class():
     class Gaze(_video_class()):
         def __init__(self, vocab, emb_dim, tau_p=0.1, option="additive", point_only=False,
-                     num_regions=257, gaze_weight=1.0, steering_sigma=0.15, dims=None, seed=0):
+                     num_regions=257, gaze_weight=1.0, steering_sigma=0.15, dims=None, seed=0,
+                     temporal_video=False):
             if option not in ("additive", "steering"):
                 raise ValueError("Gaze option must be additive or steering")
             grid = math.isqrt(num_regions - 1) if num_regions > 1 else 0
@@ -45,7 +46,9 @@ def _gaze_class():
                 raise ValueError("gaze_weight must be non-negative and finite")
             if option == "steering" and gaze_weight != 1.0:
                 raise ValueError("gaze_weight initializes the additive branch only")
-            super().__init__(vocab, emb_dim, tau_p)
+            if temporal_video and option != "steering":
+                raise ValueError("Temporal video requires steering gaze")
+            super().__init__(vocab, emb_dim, tau_p, temporal_video=temporal_video)
             self.option, self.point_only = option, point_only
             self.num_regions, self.steering_sigma = num_regions, steering_sigma
             # Do not consume the baseline's initialization/dropout RNG stream.
@@ -96,6 +99,9 @@ def _gaze_class():
             return point, valid, closeup
 
         def gaze_score(self, R, T, ctx=None):
+            return self.add_temporal(self._gaze_score(R, T, ctx), T, ctx)
+
+        def _gaze_score(self, R, T, ctx):
             """Same scoring for training and tests; ctx=None removes gaze exactly.
 
             Additive: a separate point/close-up branch adds word evidence.
@@ -117,16 +123,7 @@ def _gaze_class():
                 score = F.normalize(pooled, dim=-1) @ T.t()
                 return picture + active[:, None] * self.beta * score
 
-            # Each frame keeps equal mass; CLS keeps its 1/num_regions mass.
-            # A point outside DINO's center crop cannot select a visible patch.
-            in_crop = valid & ((point >= 0) & (point <= 1)).all(-1)
-            distance = (point[:, :, None, :] - self.patch_centers).square().sum(-1)
-            patch_prior = torch.log_softmax(-distance / (2 * self.steering_sigma ** 2), -1)
-            patch_prior = torch.where(in_crop[..., None], patch_prior,
-                                      torch.full_like(patch_prior, -math.log(len(self.patch_centers))))
-            cls = torch.full_like(patch_prior[..., :1], -math.log(self.num_regions))
-            prior = torch.cat((cls, patch_prior + math.log(1 - 1 / self.num_regions)), -1)
-            prior = prior - math.log(point.shape[1])
+            prior = self._frame_prior(point, valid) - math.log(point.shape[1])
             similarities = torch.einsum("brd,md->brm", R, T)
             if closeup is not None:
                 # Equal mass for the selected sharp view and that frame's bank;
@@ -143,6 +140,27 @@ def _gaze_class():
             # Exact baseline, including its floating-point arithmetic, for
             # removed/all-missing rows in mixed evaluation minibatches.
             return torch.where(active[:, None], steered, picture)
+
+        def _frame_prior(self, point, valid):
+            # CLS keeps its uniform mass. Out-of-crop points cannot steer patches.
+            in_crop = valid & ((point >= 0) & (point <= 1)).all(-1)
+            distance = (point[:, :, None, :] - self.patch_centers).square().sum(-1)
+            patch_prior = torch.log_softmax(-distance / (2 * self.steering_sigma ** 2), -1)
+            patch_prior = torch.where(in_crop[..., None], patch_prior,
+                                      torch.full_like(patch_prior, -math.log(len(self.patch_centers))))
+            cls = torch.full_like(patch_prior[..., :1], -math.log(self.num_regions))
+            return torch.cat((cls, patch_prior + math.log(1 - 1 / self.num_regions)), -1)
+
+        def temporal_frames(self, tokens, ctx):
+            if "gaze_point" not in ctx:
+                return super().temporal_frames(tokens, ctx)
+            gaze = dict(ctx, gaze_valid=ctx["gaze_valid"] & ctx["same"])
+            point, valid, closeup = self._inputs(tokens.flatten(1, 2), gaze)
+            prior = self._frame_prior(point, valid)
+            main = torch.einsum("bfk,bfkd->bfd", prior.exp(), tokens)
+            if closeup is not None:
+                main = torch.where(valid[..., None], (main + closeup) * .5, main)
+            return torch.where(valid[..., None], main, super().temporal_frames(tokens, ctx))
 
         # Reuse the additive encoder readout, without unused auxiliary heads.
         from .additive import _model_class
@@ -176,11 +194,12 @@ def _gaze_class():
 
 
 def GazeMIL(vocab, emb_dim, tau_p=0.1, option="additive", point_only=False,
-            num_regions=257, gaze_weight=1.0, steering_sigma=0.15, dims=None, seed=0):
+            num_regions=257, gaze_weight=1.0, steering_sigma=0.15, dims=None, seed=0,
+            *, temporal_video=False):
     """Build an unselected gaze option; no labels or speech metadata are inputs.
 
     gaze_weight initializes the learned additive scalar; steering uses a
     normalized spatial prior and does not have a separate additive weight.
     """
     return _gaze_class()(vocab, emb_dim, tau_p, option, point_only, num_regions,
-                         gaze_weight, steering_sigma, dims, seed)
+                         gaze_weight, steering_sigma, dims, seed, temporal_video)

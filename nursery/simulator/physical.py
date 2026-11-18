@@ -208,7 +208,8 @@ def session_signals(video_id, group, body, clips, table):
                 clip_run=run.astype(np.int16), match_error_m=np.array(errors, np.float32)), errors
 
 
-def build_physical(episodes, config_path=None, swaps_path="outputs/assets/objaverse/swaps_v2.json", key_by="instance"):
+def build_physical(episodes, config_path=None, swaps_path="outputs/assets/objaverse/swaps_v2.json",
+                   key_by="instance", *, output=None):
     """key_by 'clip' draws material and mass per GRAB clip (every clip a new object) into physical_by_clip/."""
     import pandas as pd
 
@@ -221,8 +222,12 @@ def build_physical(episodes, config_path=None, swaps_path="outputs/assets/objave
     swaps = json.loads(Path(swaps_path).read_text())
     clips = _Clips(config["grab_root"], swaps, table, load_vocabulary(), key_by)
     frames = pd.read_parquet(episodes / "frames.parquet")
-    output = episodes / ("physical" if key_by == "instance" else "physical_by_clip")
-    output.mkdir(exist_ok=True)
+    if output is None:
+        output = episodes / ("physical" if key_by == "instance" else "physical_by_clip")
+        output.mkdir(exist_ok=True)
+    else:
+        output = Path(output)
+        output.mkdir()
     started, worst = time.monotonic(), 0.0
     groups = list(frames.groupby("video_id", sort=True))
     for number, (video_id, group) in enumerate(groups):

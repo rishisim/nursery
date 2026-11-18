@@ -45,18 +45,30 @@ def _panel(rows, frames, lut):
         raise ValueError('No feasible body-present trials')
     frame_key = frames.set_index(['video_id', 'frame_idx'])['clip']
     clips = [frame_key.loc[(r.video_id, int(r.frame_idx))] for r in rows.itertuples()]
-    rng = np.random.default_rng(0)
-    donors = []
-    for i, subject in enumerate(context['subjects']):
-        choices = [j for j, (s, c) in enumerate(zip(context['subjects'], clips)) if s == subject and c != clips[i]]
-        if not choices:
-            raise ValueError(f'No same-subject, different-source donor for row {i}')
-        donors.append(int(rng.choice(choices)))
     return rows, {'trial_rows': [int(i) for i, _, _ in trials],
                   'candidate_rows': [c.tolist() for _, c, _ in trials],
-                  'correct_slots': [a for _, _, a in trials], 'donor_rows': donors,
+                  'correct_slots': [a for _, _, a in trials],
+                  'donor_rows': _panel_donors(context['subjects'], clips),
                   'donor_rule': 'seed 0, same panel and subject, different source clip, sampled with replacement',
                   'definition': context['definition']}
+
+
+def _panel_donors(subjects, clips, *, seed=0):
+    rng = np.random.default_rng(seed)
+    by_subject = {}
+    for i, subject in enumerate(subjects):
+        by_subject.setdefault(subject, []).append(i)
+    pools = {}
+    donors = []
+    for i, subject in enumerate(subjects):
+        key = subject, clips[i]
+        if key not in pools:
+            pools[key] = np.array([j for j in by_subject[subject] if clips[j] != clips[i]])
+        choices = pools[key]
+        if not len(choices):
+            raise ValueError(f'No same-subject, different-source donor for row {i}')
+        donors.append(int(rng.choice(choices)))
+    return donors
 
 
 
@@ -83,7 +95,7 @@ def _picture_panel(rows, index):
     return {'seed': 0, 'cache_index_rows': True, 'trials': result,
             'sampling': '100 per category; three distinct foil categories; candidates frozen before vocabulary'}
 
-def prepare(root, inputs, episodes, *, fractions=FRACTIONS, conditions=CONDITIONS):
+def prepare(root, inputs, episodes, *, fractions=FRACTIONS, conditions=CONDITIONS, physical=None):
     """Save fixed panels, clip-disjoint nested subsets, vocabularies and fit masks.
 
     fit_mask.npz contains video_ids and include; pass ~include as load_store's exclude.
@@ -91,6 +103,7 @@ def prepare(root, inputs, episodes, *, fractions=FRACTIONS, conditions=CONDITION
     """
     fractions, conditions = matrix_selection(fractions, conditions)
     root, inputs, episodes = map(lambda x: Path(x).resolve(), (root, inputs, episodes))
+    physical = Path(physical).resolve() if physical is not None else episodes / 'physical_by_clip'
     if root.exists() and any(root.iterdir()):
         raise ValueError(f'Refusing to overwrite nonempty preparation root: {root}')
     frames = pd.read_parquet(episodes / 'frames.parquet')
@@ -148,8 +161,8 @@ def prepare(root, inputs, episodes, *, fractions=FRACTIONS, conditions=CONDITION
             raise ValueError(f'Preserved source file metadata mismatch: {path}')
     signal_hashes = {}
     for video in sorted(frames.video_id.unique()):
-        for directory in ('body', 'physical_by_clip'):
-            path = episodes / directory / f'{video}.npz'
+        for directory in (episodes / 'body', physical):
+            path = directory / f'{video}.npz'
             signal_hashes[str(path)] = _sha(path)
     root = _output_directory(root)
     _write(root / 'signal_hashes.json', signal_hashes)
@@ -187,7 +200,7 @@ def prepare(root, inputs, episodes, *, fractions=FRACTIONS, conditions=CONDITION
         for r in frames.itertuples():
             if r.clip in selected:
                 include[video_rows[r.video_id], int(r.frame_idx)] = True
-        store = body.load_store(episodes, frames, video_ids, set(), steps=steps, exclude=~include, physical=episodes / 'physical_by_clip')
+        store = body.load_store(episodes, frames, video_ids, set(), steps=steps, exclude=~include, physical=physical)
         centre = {source_map.loc[(r.video_id, int(r.frame_idx))] for r in used.itertuples()}
         used_indices = np.flatnonzero(keep)[usable.to_numpy()]
         exposed = set().union(*(windows[i] for i in used_indices))
@@ -206,7 +219,7 @@ def prepare(root, inputs, episodes, *, fractions=FRACTIONS, conditions=CONDITION
         _write(directory / 'vocab.json', vocab)
         _write(directory / 'stats.json', summary)
         subset_summary[str(fraction)] = {k: summary[k] for k in ('selected_clip_count', 'exposed_clip_count', 'utterances', 'replay_exposure_seconds')}
-    protocol = {'inputs': str(inputs), 'episodes': str(episodes), 'physical': str(episodes / 'physical_by_clip'),
+    protocol = {'inputs': str(inputs), 'episodes': str(episodes), 'physical': str(physical),
                 'hashes': {str(p): _sha(p) for p in provenance_files}, 'split_seed': 0, 'subset_seed': 0,
                 'seeds': [0, 1, 2], 'fractions': fractions, 'conditions': conditions, 'window': 2, 'body_window': 5,
                 'epochs': 60, 'batch': 256, 'optimizer': 'AdamW', 'lr': 0.0003, 'weight_decay': 0.1,
@@ -277,7 +290,7 @@ def audit(root):
         if not np.array_equal(include, expected_mask):
             raise ValueError('Fit mask mismatch')
         store = body.load_store(episodes, frames, ids, set(), steps=include.shape[1],
-                                exclude=~include, physical=episodes / 'physical_by_clip')
+                                exclude=~include, physical=protocol['physical'])
         if store['stats'] != stats['normalization']:
             raise ValueError('Normalization does not match fit mask')
         summary[str(fraction)] = {'clips': len(selected), 'utterances': len(expected_rows),

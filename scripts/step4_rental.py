@@ -35,6 +35,19 @@ def jobs(protocol):
              for fraction in protocol['fractions']])
 
 
+def read_queue(path, protocol):
+    queue = [tuple(job) for job in json.loads(path.read_text())]
+    if sorted(queue) != sorted(jobs(protocol)):
+        raise ValueError('Queue must contain each frozen matrix job exactly once')
+    return queue
+
+
+def require_ready(protocol):
+    coverage = protocol.get('gaze_coverage')
+    if 'word_type_panels' in protocol and (not coverage or not coverage['ready']):
+        raise ValueError('Step 7 sharp-view cache coverage is incomplete; see closeup_coverage.json')
+
+
 def verify(frozen):
     from nursery.learner import acquisition as run
     snapshot = run._verify_frozen(frozen)
@@ -51,6 +64,7 @@ def worker(args):
     import torch
     from nursery.learner import acquisition as run
     torch.set_num_threads(args.threads)
+    require_ready(run._read(args.frozen / 'protocol.json'))
     original = run._write
     def observed(path, value):
         original(path, value)
@@ -68,12 +82,21 @@ def matrix(args):
     from nursery.learner import acquisition as run
     from scripts.child_gaze_rental import queued_epoch_projection
     protocol = run._read(args.frozen / 'protocol.json')
+    require_ready(protocol)
+    queue = getattr(args, 'queue', None)
+    pending = read_queue(queue, protocol) if queue else jobs(protocol)
+    if queue and set(protocol['conditions']) != {job[2] for job in pending[:args.workers]}:
+        raise ValueError('The first worker wave must include every queued arm')
+    if queue:
+        if args.rental.exists() and any(args.rental.iterdir()):
+            raise FileExistsError(f'Refusing to overwrite rental state: {args.rental}')
+        run._output_directory(args.rental)
     receipt = verify(args.frozen)
     write(args.rental / 'host_input_verification.json', receipt)
     hard = min(args.launched + protocol['runtime_cap_hours']*3600,
                args.launched + (args.cost_cap-args.transfer_reserve)/args.hourly*3600)
     deadline = hard - args.return_reserve
-    pending, active, completed = jobs(protocol), {}, []
+    active, completed = {}, []
     available = list(range(args.workers))
     gate_written = False
     try:
@@ -143,6 +166,7 @@ if __name__ == '__main__':
     p.add_argument('action', choices=['verify', 'worker', 'matrix'])
     p.add_argument('--frozen', type=Path, required=True)
     p.add_argument('--rental', type=Path, required=True)
+    p.add_argument('--queue', type=Path)
     p.add_argument('--workers', type=int, default=8)
     p.add_argument('--threads', type=int, default=4)
     p.add_argument('--hourly', type=float)

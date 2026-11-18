@@ -30,6 +30,22 @@ def _metrics(scores, known, candidates, correct, queries):
             "unknown_rule": "25% expected accuracy; retained in fixed denominator"}
 
 
+def _combine_trials(parts):
+    """Pool or subset already scored trials, keeping panel-local row indices."""
+    fields = ("queries", "candidate_rows", "correct_slots", "scores", "trial_panels", "trial_indices", "clusters")
+    joined = {key: [] for key in fields}
+    for score, selection in parts:
+        for key in fields:
+            joined[key].extend(np.asarray(score[key], dtype=object)[selection].tolist())
+    known = [s is not None for s in joined["scores"]]
+    scores = [s if s is not None else [0.] * 4 for s in joined["scores"]]
+    result = _metrics(scores, known, joined["candidate_rows"], joined["correct_slots"], joined["queries"])
+    result.update({key: joined[key] for key in ("trial_panels", "trial_indices", "clusters")})
+    first = parts[0][0]
+    result.update({key: first[key] for key in ("gaze_mode", "body_mode", "body_weight") if key in first})
+    return result
+
+
 class StudyEvaluation:
     """Scores the saved panels without filtering candidates by training vocabulary."""
 
@@ -41,6 +57,11 @@ class StudyEvaluation:
         self.panels, self.pictures = {}, {}
         self.gaze_factory, self.gaze_condition = None, None
         self.gaze_panels = {}
+        self.temporal_factory, self.temporal_panels = None, {}
+        self.word_types = self.protocol.get("word_type_panels")
+        self.panel_frame_keys = {}
+        if self.word_types:
+            self.partitions = json.loads(Path(self.protocol["gaze"]["partitions"]).read_text())
 
     def _query_vectors(self, model, queries):
         words = sorted(set(queries))
@@ -67,6 +88,13 @@ class StudyEvaluation:
             if len(ds) != len(rows) or ds.n_noframe:
                 raise ValueError("Fixed candidate panel lost rows")
             _, valid = _window_layout(rows, self.lut, 2)
+            if self.word_types:
+                # Event targets can sit near a replay boundary. Keep the
+                # frozen target and foils, with only in-partition input frames.
+                from .gaze_data import partition_window_keys
+                frame_keys = partition_window_keys(rows, self.lut, self.partitions, 2)
+                ds.locs = [[self.lut[k] for k in keys] for keys in frame_keys]
+                self.panel_frame_keys[name] = frame_keys
             data = None
             if self.store is not None:
                 ps, pt, win = _pair_meta(rows, self.store, self.lut, 2)
@@ -88,10 +116,16 @@ class StudyEvaluation:
                 raise ValueError("Unknown gaze evaluation mode")
             if gaze_mode != "removed":
                 if panel not in self.gaze_panels:
-                    self.gaze_panels[panel] = self.gaze_factory(rows)
+                    kw = {"frame_keys": self.panel_frame_keys[panel], "window": 2} if self.word_types else {}
+                    self.gaze_panels[panel] = self.gaze_factory(rows, **kw)
                 gaze_data = self.gaze_panels[panel]
         elif gaze_mode is not None:
             raise ValueError("Gaze evaluation requires an explicit gaze data adapter")
+        temporal_data = None
+        if self.temporal_factory is not None:
+            if panel not in self.temporal_panels:
+                self.temporal_panels[panel] = self.temporal_factory(rows)
+            temporal_data = self.temporal_panels[panel]
         queries = rows.iloc[trials["trial_rows"]].referent.tolist()
         word_index, T = self._query_vectors(model, queries)
         candidates = np.asarray(trials["candidate_rows"], dtype=int)
@@ -101,8 +135,12 @@ class StudyEvaluation:
             body_matrix = np.zeros_like(matrix) if body_weights is not None else None
             for start in range(0, len(rows), 128):
                 ids = np.arange(start, min(start + 128, len(rows)))
-                _, v, _, _ = self.upstream.collate([ds[int(i)] for i in ids])
-                R = model.enc_regions(v.to(self.device))
+                if self.word_types:
+                    from .gaze_data import collate_frame_indices
+                    _, v, _, _ = collate_frame_indices(ds, ids)
+                else:
+                    _, v, _, _ = self.upstream.collate([ds[int(i)] for i in ids])
+                R = model.enc_regions(v.to(self.device).float())
                 ctx = None
                 if gaze_data is not None:
                     ctx = gaze_data.batch(ids, mode=gaze_mode, device=self.device)
@@ -114,6 +152,9 @@ class StudyEvaluation:
                     body_ctx["keep"] *= centre_clip_valid(body_ctx).any(1)
                     body_ctx["visual_valid"] = torch.as_tensor(valid[ids], device=self.device).repeat_interleave(self.caches[0].shape[1], dim=1)
                     ctx = dict(ctx or {}, body=body_ctx) if self.gaze_factory is not None else body_ctx
+                if temporal_data is not None:
+                    temporal = temporal_data.batch(model, ids, device=self.device, gaze_mode=gaze_mode or "removed")
+                    ctx = dict(ctx or {}, temporal=temporal)
                 if body_weights is not None:
                     base, contribution = model.score_components(R, T, ctx)
                     matrix[ids] = base.float().cpu().numpy()
@@ -146,6 +187,46 @@ class StudyEvaluation:
             if gaze_mode == "shuffled":
                 result["gaze_donor_rows"] = gaze_data.donor_indices.tolist()
         return result
+
+    def word_type_dev(self, model, body_mode, body_weights):
+        panels = {rung: self.evaluate(model, spec["dev"], body_mode=body_mode, body_weights=body_weights)
+                  for rung, spec in self.word_types.items()}
+        if body_weights is None:
+            panels = {rung: [score] for rung, score in panels.items()}
+        results = []
+        for scores in zip(*panels.values()):
+            by_rung = {rung: result["accuracy"] for rung, result in zip(panels, scores)}
+            row = {"accuracy": sum(by_rung.values()) / len(by_rung), "accuracy_by_rung": by_rung}
+            if body_weights is not None:
+                row["body_weight"] = scores[0]["body_weight"]
+            results.append(row)
+        return results
+
+    def word_type_test(self, model, body_mode, *, gaze_mode=None, deadline=None):
+        from .acquisition import _check_deadline
+        output = {}
+        for rung, spec in self.word_types.items():
+            result = {}
+            for split, panel in spec["held_out"].items():
+                _check_deadline(deadline)
+                score = self.evaluate(model, panel, body_mode=body_mode, gaze_mode=gaze_mode)
+                rows, trials, *_ = self._panel(panel)
+                targets = rows.iloc[trials["trial_rows"]]
+                score["trial_panels"] = [panel] * len(targets)
+                score["trial_indices"] = list(range(len(targets)))
+                if "cluster" in spec:
+                    score["clusters"] = targets[spec["cluster"]].tolist()
+                result[split] = score
+                if "subset" in spec:
+                    subset = spec["subset"]
+                    result[subset + "_" + split] = _combine_trials([(score, targets[subset].to_numpy())])
+            if len(spec["held_out"]) > 1:
+                result["pooled"] = _combine_trials([(result[split], slice(None)) for split in spec["held_out"]])
+            if "subset" in spec:
+                result[subset] = _combine_trials([(result[subset + "_" + split], slice(None))
+                                                   for split in spec["held_out"]])
+            output[rung] = result
+        return output
 
     @torch.no_grad()
     def evaluate_picture(self, model, panel):

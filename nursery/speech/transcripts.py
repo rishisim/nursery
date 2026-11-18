@@ -296,6 +296,65 @@ def couple_gaze(manifest, frames, gaze, config, seed, p_gazed_seen=0.55):
     return result, report
 
 
+def add_event_words(manifest, context, vocabulary, seed, own_name_rate):
+    """Extend fixed gaze-coupled noun speech with words about the replayed event.
+
+    Context is indexed like the manifest and supplies each row's source split,
+    clip, rendered noun, and eligible word/alignment bucket for each rung.
+    """
+    rng = np.random.default_rng(seed)
+    result = manifest.copy()
+    counts = {}
+    alignment = ("matching", "other_visible", "no_referent")
+    shares = np.array([.35, .41, .24])
+    for rung in ("action", "property"):
+        result[rung] = None
+        result[f"{rung}_alignment"] = None
+        for split, partition in context.groupby("split"):
+            report = counts.setdefault(split, {})
+            quotas = {}
+            for word, group in partition.groupby(rung):
+                n = round(group["clip"].nunique() * own_name_rate)
+                exact = shares * n
+                rounded = np.floor(exact).astype(int)
+                rounded[np.argsort(-(exact - rounded))[:n - rounded.sum()]] += 1
+                quotas[word] = dict(zip(alignment, rounded))
+                report[word] = {}
+            named = partition.loc[manifest.loc[partition.index, "named"]]
+            for bucket in alignment:
+                for word, by_bucket in quotas.items():
+                    quota = int(by_bucket[bucket])
+                    eligible = named.loc[result.loc[named.index, rung].isna()]
+                    local = eligible.index[eligible[rung].eq(word) & eligible[f"{rung}_alignment"].eq(bucket)]
+                    selected = rng.choice(local, min(len(local), quota), replace=False)
+                    elsewhere = []
+                    if bucket == "no_referent" and len(selected) < quota:
+                        # The unseen channel can talk about an absent event from
+                        # another clip of this split, just as nouns can be absent.
+                        unseen = eligible.index[eligible[rung].ne(word)
+                                                & manifest.loc[eligible.index, "channel"].eq("unseen")]
+                        elsewhere = rng.choice(unseen, min(len(unseen), quota - len(selected)), replace=False)
+                    indices = [*selected, *elsewhere]
+                    result.loc[indices, rung] = word
+                    result.loc[indices, f"{rung}_alignment"] = bucket
+                    report[word][bucket] = {"target": quota, "actual": len(indices),
+                                            "elsewhere": len(elsewhere)}
+    for i in result.index[result.property.notna() | result.action.notna()]:
+        row = result.loc[i]
+        text = row.text
+        if row.property is not None:
+            if row.referent == context.at[i, "rendered_noun"]:
+                noun = vocabulary[row.referent]
+                text = re.sub(r"\b" + re.escape(noun) + r"\b", f"{row.property} {noun}", text, count=1)
+            else:
+                text = f"{text} That one feels {row.property}."
+        if row.action is not None:
+            prompt = "Try offhand." if row.action == "offhand" else f"Let's {row.action}."
+            text = f"{prompt} {text}"
+        result.at[i, "text"] = text
+    return result, counts
+
+
 def write_transcripts(episodes, output, seed, gaze=None, source_manifest=None, **overrides):
     episodes = Path(episodes).resolve()
     config = load_config()
