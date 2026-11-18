@@ -3,7 +3,7 @@
 The main outcome in [PLAN.md](../PLAN.md), following
 [representation work](step_3_body_representation.md), the
 [controlled comparison](step_4_body_representation_comparison.md) and the
-[training-recipe decision](step_5_body_training_recipe.md). Complete: [results](#completed-results--17-november-2026) from the
+[training-recipe decision](step_8_body_training_recipe.md) (Step 5, skipped; now Step 8). Complete: [results](#completed-results--17-november-2026) from the
 [frozen protocol](#frozen-execution-protocol--16-november-2026). Gaze lifts the
 whole curve; current body adds nothing measurable over gaze at any amount.
 
@@ -213,6 +213,7 @@ pooled over seeds:
 every data amount and the largest one found so far. The body pathway, trained
 additively from scratch with words, is not used at any data amount, so curves
 cannot yet show what body adds. The next body step has to change how body
-learns (Step 5's wordless pretraining is the planned candidate), not add more
-data points. Extending the video curve past 630 clips is what would test a
-ceiling.
+learns (wordless pretraining, now [Step 8](step_8_body_training_recipe.md), is the planned candidate), not add more
+data points. Nouns also leave the body little to add, so
+[Step 7](step_7_word_types.md) first builds property and action word tests.
+Extending the video curve past 630 clips is what would test a ceiling.

@@ -4,7 +4,7 @@ Design reference in [PLAN.md](../PLAN.md), following the
 [visual baseline](step_1_visual_baseline.md) and [body representation](step_3_body_representation.md).
 Complete: [results](#completed-results--11-november-2026) from the
 [frozen protocol](#frozen-execution-protocol--10-november-2026). Neither body
-representation adds to gaze; rich body is carried to Step 5.
+representation adds to gaze; rich body is carried to Step 5 (now Step 8).
 
 ## The idea
 
@@ -100,7 +100,7 @@ dimensionality and optimization can matter. Follow-ups should address a specific
 unresolved issue rather than start a broad search.
 
 This step does not launch the
-[training-recipe comparison](step_5_body_training_recipe.md) or [main curves](step_6_language_acquisition_curves.md).
+[training-recipe comparison](step_8_body_training_recipe.md) or [main curves](step_6_language_acquisition_curves.md).
 
 ## Frozen execution protocol — 10 November 2026
 
@@ -178,7 +178,7 @@ source clips, pooled over seeds.
 **Decision.** Word accuracy supports neither representation over the other:
 dev selection switches body off in both, so this setup cannot tell them apart.
 The limit is how the body pathway learns, not what it receives. Rich body is
-the fixed candidate for [Step 5](step_5_body_training_recipe.md). It is no
+the fixed candidate for [Step 5 (now Step 8)](step_8_body_training_recipe.md). It is no
 worse here, costs 2,560 extra parameters, and Step 3 showed it carries more
 category information (dev probe 23.7% → 31.7%), which wordless pretraining may
 be able to use. Step 5 can reuse this step's video, gaze and rich-body runs as

@@ -9,12 +9,13 @@ Start with [PLAN.md](PLAN.md). The current sequence is
 [16×16 vision](docs/step_1_visual_baseline.md),
 [richer body input](docs/step_3_body_representation.md),
 [a controlled representation comparison](docs/step_4_body_representation_comparison.md),
-[the body training recipe](docs/step_5_body_training_recipe.md), and
-[language acquisition curves](docs/step_6_language_acquisition_curves.md).
+[noun acquisition curves](docs/step_6_language_acquisition_curves.md),
+[property and action words](docs/step_7_word_types.md), and
+[the body training recipe](docs/step_8_body_training_recipe.md).
 [Past experiments](archive/language_learning/past_experiments.md) explains what
 we tried earlier; the completed cross-situational and acquisition studies are
 indexed in the [archive](archive/README.md#completed-study-worktrees).
-Steps 2–5 remain design references and do not imply their code is implemented.
+Steps 7–8 are design references and do not imply their code is implemented.
 The matched Step 1 comparison is complete: at 630 clips, video accuracy rose
 from the recorded 60.12% with 4×4 tokens to 61.93% with 16×16 tokens across
 three paired seeds. See [the results and limits](docs/step_1_visual_baseline.md#completed-results--7-november-2026).
@@ -49,8 +50,9 @@ docs/
   step_2_child_gaze.md                  Step 2: simulated gaze drives naming and feeds the learner
   step_3_body_representation.md         Step 3: recoverable sensory detail and missing signals
   step_4_body_representation_comparison.md  Step 4: current versus richer body, additive
-  step_5_body_training_recipe.md        Step 5: decide wordless pretraining after representation
-  step_6_language_acquisition_curves.md Step 6: main video versus video + body curves
+  step_6_language_acquisition_curves.md Step 6: noun curves, video versus gaze and body
+  step_7_word_types.md                  Step 7: property and action word tests
+  step_8_body_training_recipe.md        Step 8: decide wordless body pretraining
   learner.md                    Current implementation and scoring reference
   speech_coupling.md             Speech-generation evidence and assumptions
 archive/
