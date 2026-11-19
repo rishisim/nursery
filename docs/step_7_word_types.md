@@ -249,3 +249,59 @@ exceeds the body gain on nouns.
 3. Temporal video encoder. Run the dev probe check (section 3).
 4. Learner switched to the instance mass store. Run a short smoke run per arm.
 5. Freeze the protocol, then launch the 20 models.
+
+## Completed results — 19 November 2026
+
+All 20 models (V, V+G, V+G+B and V+G+B with shuffled body; seeds 0–4; 630
+clips) ran on Juno (Slurm array 521876, A30/H100/H200), were fetched and
+verified against the frozen protocol. Analysis:
+`outputs/runs/step7_word_types/analysis/` (`analyze.py`, `results.md`).
+
+Changes from the approved protocol, made before launch:
+- 13,878 sharp close-ups that the 11-frame window and the new panels needed
+  were rendered and embedded locally with the existing path (min cosine to
+  cached views 0.995) into a new cache, `outputs/features/child_gaze/step7_compact/`.
+- The frozen runtime cap was raised from 4 to 5.5 hours (operational only).
+- Final panels: actions 223 clips / 1,925 trials (4 clips had no cached frame
+  inside the event); heavy/light 192 clips / 70 instances / 1,628 trials.
+- Rental attempts failed on slow uploads to most Vast.ai hosts; spend $7.29,
+  no runs. The runs used Juno instead.
+
+Held-out accuracy (%, mean of 5 seeds) and gains (pp) with joint 95% intervals
+over seeds and source clips (heavy/light: rendered instances):
+
+| Rung | V | V+G | V+G+B | Shuffled B | Gaze gain | Body gain | Total gain |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Nouns (test) | 50.65 | 65.65 | 66.55 | 65.65 | +15.00 [11.11, 19.05] | +0.90 [−2.11, 3.85] | +15.90 [11.73, 20.44] |
+| Actions (test + s8) | 65.64 | 66.45 | 77.87 | 65.79 | +0.81 [−2.34, 3.83] | +11.42 [8.57, 14.62] | +12.23 [8.96, 15.61] |
+| Heavy/light (test + s8) | 40.01 | 52.38 | 98.43 | 52.17 | +12.37 [7.29, 17.16] | +46.04 [39.26, 53.29] | +58.42 [53.63, 63.42] |
+
+- Shuffled body adds nothing on any rung (−0.66 to 0.00 pp), so the gain needs
+  body input aligned with the moment.
+- Object-matched actions (637 trials): body gain +13.69 [8.42, 19.15].
+  Straddling-noun heavy/light (235 trials): +60.43 [43.66, 73.23].
+- Halves: actions test +7.80, s8 +15.75; heavy/light test +46.38, s8 +45.67.
+- By action word, body gain: lift +17.09, offhand +17.48, pass +12.47,
+  inspect +3.37, drink +0.47.
+- Selected body weights: real body 1.10, 0.70, 0.95, 1.40, 1.35; shuffled
+  0.05, 0.10, 0.20, 0.10, 0.05. The dev rule turns the body on without
+  wordless pretraining.
+- All extra inputs removed (V / V+G / V+G+B / shuffled): nouns 50.65 / 55.50 /
+  56.44 / 55.58; actions 65.64 / 67.82 / 66.78 / 67.57; heavy/light 40.01 /
+  40.11 / 37.48 / 40.47.
+
+Reading: the body gain grows from nouns (+0.9, null) to actions (+11.4) to
+heavy/light (+46.0), as predicted.
+
+What it means for the next step:
+- Nouns fell under the new shared learner (temporal encoder plus new speech):
+  on the same panel V 63.67 → 50.65, V+G 75.60 → 65.65, V+G+B 76.26 → 66.55.
+  Every rung must use one learner, so this needs diagnosing before Step 9.
+- Heavy/light is close to a direct reading of the load channel (98%). A
+  harder property test, for example with the middle third of masses, would be
+  more informative.
+- Frozen temporal-video features decode the action at 96% on dev, but the
+  trained V arm reaches 66% on actions: video is limited by learning from
+  weak speech, not by what the frames contain.
+- The learner already uses the body here without pretraining, which changes
+  the premise of Step 8.
