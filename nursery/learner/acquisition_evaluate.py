@@ -194,9 +194,11 @@ class StudyEvaluation:
         if body_weights is None:
             panels = {rung: [score] for rung, score in panels.items()}
         results = []
+        selection_rungs = self.protocol.get("selection", {}).get("word_type_rungs", panels)
         for scores in zip(*panels.values()):
             by_rung = {rung: result["accuracy"] for rung, result in zip(panels, scores)}
-            row = {"accuracy": sum(by_rung.values()) / len(by_rung), "accuracy_by_rung": by_rung}
+            row = {"accuracy": sum(by_rung[rung] for rung in selection_rungs) / len(selection_rungs),
+                   "accuracy_by_rung": by_rung}
             if body_weights is not None:
                 row["body_weight"] = scores[0]["body_weight"]
             results.append(row)

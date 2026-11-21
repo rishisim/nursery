@@ -45,6 +45,10 @@ run.
 - **Seeds 0–4 at every point**, so the 630 point is directly the clean
   fixed-learner Step 7 table (same 5 seeds, same panels, same arms), and low
   points get the same seed count as the top one.
+- **Speech: the Step 7 transcripts as-is.** Each amount trains on the nested
+  prefix of the frozen Step 7 speech (noun, action and property words already
+  inserted); nothing is regenerated. With the same seeds and panels, the 630
+  row is an exact like-for-like fixed-learner Step 7 table.
 - Per-amount fitting as in Step 6: vocabulary (min count 5) and body
   normalization use only that amount's clips.
 
@@ -82,7 +86,10 @@ panel.
 Per rung (nouns, actions) and per clip count: `V`, `V+G`, `V+G+B` accuracy
 (mean ± SD over seeds); gaze, body and total gain with joint 95% intervals over
 seeds and test source clips; selected body weights; test and s8 halves; shuffled
-body at 158 and 630; per-action-word body gain. The 630 row also stands as the
+body at 158 and 630; per-action-word body gain; the object-matched action
+subset; all-extra-inputs-removed scores; and picture transfer (rendered /
+Konkle), as in Step 6 and `PLAN.md`. These are evaluation-only readouts from
+the trained models; they add no training. The 630 row also stands as the
 fixed-learner Step 7 table and is compared against the original Step 7 numbers.
 
 Key reading: the body gain on actions across amounts, and whether `V` on
@@ -122,3 +129,19 @@ run; if any do, flag them in the run plan per the repository rules.
 2. Action-word count check at each amount.
 3. One-epoch smoke per arm at 63 clips.
 4. Freeze the protocol, then launch the 85-model array on Juno.
+
+## Pre-launch checks — 21 November 2026
+
+- **Runner:** `scripts/step9_acquisition_curves.py` and `.sbatch` (85 tasks,
+  8 at a time). The clip ladder matches Step 6, and the 630-clip subset is
+  byte-identical to Step 7. Shared learner changes are opt-in through the
+  protocol, so earlier runs score as before.
+- **Action-word counts** (training utterances; the word is in the vocabulary at
+  ≥5): at 63 clips `drink` has 3 and is out of the vocabulary, so its 170
+  trials score at chance. All five words are in the vocabulary from 158 clips
+  up. Nouns in the vocabulary: 28 / 65 / 77 / 78 / 78.
+- **One-epoch CPU smoke at 63 clips, seed 0:** 29–36 s per epoch across the
+  four arms. Every panel and readout was finite: object-matched actions, all
+  extra inputs removed, rendered and Konkle pictures.
+- **Noun s8 is not scored.** The frozen cache lacks 56 close-up embeddings
+  for that panel, so nouns use `clips_test` only, as in Step 7.

@@ -437,6 +437,10 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
                     primary = evaluator.word_type_test(model, body_mode, deadline=deadline)
                     gaze_removed = (evaluator.word_type_test(model, 'none', gaze_mode='removed', deadline=deadline)
                                     if gaze_condition else primary)
+                    for panel in ('picture_test', 'konkle_test'):
+                        if panel in protocol.get('picture_panels', {}):
+                            _check_deadline(deadline)
+                            picture[panel] = evaluator.evaluate_picture(model, panel)
             elif dev_only or (smoke and not protocol.get('smoke_evaluate_all_panels', False)):
                 # Timing never inspects held-out panels; charge four complete
                 # development passes as a conservative final-evaluation estimate.
