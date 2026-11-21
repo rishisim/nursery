@@ -206,6 +206,7 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
     gaze_condition = condition in GAZE_CONDITIONS + BODY_GAZE_CONDITIONS
     gaze_world = 'gaze' in protocol
     temporal_video = protocol.get('temporal_video', False)
+    temporal_weight_init = protocol.get('temporal_weight_init', 'one')
     word_types = protocol.get('word_type_panels')
     shuffled_body = condition == SHUFFLED_BODY
     body_mode = 'shuffled' if shuffled_body else 'real'
@@ -219,6 +220,8 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
             condition not in ('video_only', 'video_gaze', 'video_gaze_body_current', SHUFFLED_BODY)
             or protocol.get('window') != 2 or protocol.get('body_window', 5) != 5)):
         raise ValueError('Temporal video requires the Step 7 arms and matched 11-step body window')
+    if temporal_weight_init != 'one' and not temporal_video:
+        raise ValueError('Temporal weight initialization requires temporal video')
     if shuffled_body and not word_types:
         raise ValueError('Shuffled body requires the Step 7 word-type panels')
     if protocol.get('development_only') and not (dev_only or smoke):
@@ -286,7 +289,8 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
         if temporal_video and (num_regions, emb_dim) != (257, 768):
             raise ValueError('Temporal video requires the 16x16 DINOv2-Base cache')
         constructors = {'video_only': VideoOnlyMIL, 'additive': AdditiveMIL, 'joint_interaction': JointInteractionMIL}
-        kwargs = ({'temporal_video': temporal_video} if condition == 'video_only'
+        kwargs = ({'temporal_video': temporal_video, 'temporal_weight_init': temporal_weight_init}
+                  if condition == 'video_only'
                   else {'dims': dims, 'num_regions': num_regions})
         if gaze_condition or temporal_video:
             allowed_keys = {f'{video}|{frame}' for i, video in enumerate(video_ids)
@@ -297,7 +301,8 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
                             point_only=condition == 'video_gaze_point', num_regions=num_regions,
                             gaze_weight=gaze_spec.get('weight', 1.0),
                             steering_sigma=gaze_spec.get('steering_sigma', .15),
-                            dims=dims if body_gaze else None, seed=seed, temporal_video=temporal_video).float().to(device)
+                            dims=dims if body_gaze else None, seed=seed, temporal_video=temporal_video,
+                            temporal_weight_init=temporal_weight_init).float().to(device)
             data = _gaze_data(protocol, manifest, lut, condition, allowed_keys=allowed_keys)
         else:
             model = constructors[condition](len(vocab), emb_dim, protocol['tau'], **kwargs).float().to(device)
@@ -491,6 +496,18 @@ def train_one(root, fraction, seed, condition, epochs=None, smoke=False, deadlin
                                    if condition == 'video_shuffled_gaze' else None)
         if shuffled_body:
             metrics['training_body_donor_rows'] = training_donors.tolist()
+        if temporal_weight_init == 'zero':
+            metrics['temporal_weight'] = model.temporal_weight.item()
+        if temporal_weight_init == 'per_word':
+            weights = model.temporal_weight.detach().cpu().tolist()
+            by_word = {word: weights[i] for word, i in vocab.items()}
+            _write(output / 'temporal_weights.json', by_word)
+            if primary:
+                for rung, split in (('noun', 'test'), ('action', 'pooled')):
+                    tokens = {i for query in primary[rung][split]['queries']
+                              for i in upstream.encode(query, vocab)}
+                    metrics[f'mean_{rung}_temporal_weight'] = (
+                        float(np.mean([weights[i] for i in sorted(tokens)])) if tokens else None)
         _write(output / 'metrics.json', metrics)
         _write(output / 'status.json', {'status': 'complete', **identity})
         return metrics

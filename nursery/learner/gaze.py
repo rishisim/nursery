@@ -34,7 +34,7 @@ def _gaze_class():
     class Gaze(_video_class()):
         def __init__(self, vocab, emb_dim, tau_p=0.1, option="additive", point_only=False,
                      num_regions=257, gaze_weight=1.0, steering_sigma=0.15, dims=None, seed=0,
-                     temporal_video=False):
+                     temporal_video=False, temporal_weight_init="one"):
             if option not in ("additive", "steering"):
                 raise ValueError("Gaze option must be additive or steering")
             grid = math.isqrt(num_regions - 1) if num_regions > 1 else 0
@@ -48,7 +48,8 @@ def _gaze_class():
                 raise ValueError("gaze_weight initializes the additive branch only")
             if temporal_video and option != "steering":
                 raise ValueError("Temporal video requires steering gaze")
-            super().__init__(vocab, emb_dim, tau_p, temporal_video=temporal_video)
+            super().__init__(vocab, emb_dim, tau_p, temporal_video=temporal_video,
+                             temporal_weight_init=temporal_weight_init)
             self.option, self.point_only = option, point_only
             self.num_regions, self.steering_sigma = num_regions, steering_sigma
             # Do not consume the baseline's initialization/dropout RNG stream.
@@ -195,11 +196,11 @@ def _gaze_class():
 
 def GazeMIL(vocab, emb_dim, tau_p=0.1, option="additive", point_only=False,
             num_regions=257, gaze_weight=1.0, steering_sigma=0.15, dims=None, seed=0,
-            *, temporal_video=False):
+            *, temporal_video=False, temporal_weight_init="one"):
     """Build an unselected gaze option; no labels or speech metadata are inputs.
 
     gaze_weight initializes the learned additive scalar; steering uses a
     normalized spatial prior and does not have a separate additive weight.
     """
     return _gaze_class()(vocab, emb_dim, tau_p, option, point_only, num_regions,
-                         gaze_weight, steering_sigma, dims, seed, temporal_video)
+                         gaze_weight, steering_sigma, dims, seed, temporal_video, temporal_weight_init)

@@ -68,12 +68,12 @@ class StudyEvaluation:
         tokens = {word: self.upstream.encode(word, self.vocab) for word in words}
         known_words = [word for word in words if tokens[word]]
         if not known_words:
-            return {}, None
+            return {}, None, None
         counts = torch.tensor([len(tokens[w]) for w in known_words], device=self.device)
         text = torch.zeros(len(known_words), int(counts.max()), dtype=torch.long, device=self.device)
         for i, word in enumerate(known_words):
             text[i, :len(tokens[word])] = torch.tensor(tokens[word], device=self.device)
-        return {w: i for i, w in enumerate(known_words)}, model.enc_text(text, counts)
+        return {w: i for i, w in enumerate(known_words)}, model.enc_text(text, counts), text
 
     def _panel(self, name):
         if name not in self.panels:
@@ -127,7 +127,7 @@ class StudyEvaluation:
                 self.temporal_panels[panel] = self.temporal_factory(rows)
             temporal_data = self.temporal_panels[panel]
         queries = rows.iloc[trials["trial_rows"]].referent.tolist()
-        word_index, T = self._query_vectors(model, queries)
+        word_index, T, query_tokens = self._query_vectors(model, queries)
         candidates = np.asarray(trials["candidate_rows"], dtype=int)
         scores = np.zeros((len(queries), 4), dtype=np.float32)
         if T is not None:
@@ -154,7 +154,7 @@ class StudyEvaluation:
                     ctx = dict(ctx or {}, body=body_ctx) if self.gaze_factory is not None else body_ctx
                 if temporal_data is not None:
                     temporal = temporal_data.batch(model, ids, device=self.device, gaze_mode=gaze_mode or "removed")
-                    ctx = dict(ctx or {}, temporal=temporal)
+                    ctx = dict(ctx or {}, temporal=temporal, temporal_tokens=query_tokens)
                 if body_weights is not None:
                     base, contribution = model.score_components(R, T, ctx)
                     matrix[ids] = base.float().cpu().numpy()
@@ -242,7 +242,7 @@ class StudyEvaluation:
         trials, cache = self.pictures[panel]
         queries = [t["query"] for t in trials]
         candidates = np.asarray([t["candidate_rows"] for t in trials], dtype=int)
-        word_index, T = self._query_vectors(model, queries)
+        word_index, T, _ = self._query_vectors(model, queries)
         scores = np.zeros((len(trials), 4), dtype=np.float32)
         if T is not None:
             images = np.unique(candidates)

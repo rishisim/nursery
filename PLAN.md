@@ -31,10 +31,19 @@ selection keeps their weight at 0–0.15. Video and gaze are both still rising a
 
 Nouns are the one test where vision has the advantage: an earlier diagnosis
 found about 80% of what the body knows about the test nouns is already in
-vision. The next steps therefore build the tests where the body has something
-to add (Step 7), settle how the body is trained on them (Step 8), then measure
-curves per rung (Step 9). Sentences need a larger learner change and follow
-(Step 10). Comparison with children's learning comes last (Step 11).
+vision. Step 7 therefore built the action and property tests where the body
+has something to add, and confirmed the ladder prediction at 630 clips: body
+gain grows from +0.90 pp on nouns (null) to +11.42 pp on actions and +46.04 pp
+on heavy/light, with shuffled body near zero and dev selection turning the body
+weight on (0.70–1.40) without wordless pretraining.
+
+Two diagnostics came before Step 9 curves and are done: the saved Step 7
+training curves show every arm peaks by epoch 22, and the 10–13 pp noun drop
+came from the temporal weight starting at 1.0; a per-word weight starting at 0
+fixes it and is now the shared learner for every rung. Because Step 7 already showed the learner uses the
+body without pretraining, Step 8 is now optional—either skipped or narrowed to
+a low-data sample-efficiency test (63–158 clips) on actions. Sentences follow
+(Step 10), and comparison with children's learning comes last (Step 11).
 
 | Step | Document | Question and current status |
 |---|---|---|
@@ -44,11 +53,17 @@ curves per rung (Step 9). Sentences need a larger learner change and follow
 | 4 | [Representation comparison](docs/step_4_body_representation_comparison.md) | Does richer body help under the same additive setup, without wordless pretraining? [Complete](docs/step_4_body_representation_comparison.md#completed-results--11-november-2026), 12/12 verified runs at 630 clips. New-clip test: video 63.67%, + gaze 75.60%, + gaze + current body 76.26%, + gaze + rich body 76.14%. Body − gaze +0.66 / +0.54 pp; on s8 −0.67 / −0.34 pp; rich − current −0.12 pp. Dev chose body weight ≈ 0 in all six body runs; at the as-trained weight body costs 6.5–8.2 pp. Spend $10.48. |
 | 5 | — | Skipped: Step 6 used additive fusion without wordless pretraining. The training-recipe question moves to Step 8, after the new tests exist. |
 | 6 | [Noun acquisition curves](docs/step_6_language_acquisition_curves.md#completed-results--17-november-2026) | Complete, 45/45 models, 63–630 clips, seeds 0–2. Gaze above video at every amount (+9.95 to +18.41 pp). Current body − gaze between −0.66 and +0.72 pp, every interval touching zero; body weight kept at 0–0.15. No plateau yet. Spend $29.96. |
-| 7 | [Property and action words](docs/step_7_word_types.md#completed-results--19-november-2026) | Complete, 20/20 models at 630 clips, seeds 0–4, temporal video in every arm. Body gain over gaze: nouns +0.90 pp [−2.11, 3.85], actions +11.42 [8.57, 14.62], heavy/light +46.04 [39.26, 53.29]; shuffled body ≈ 0. Dev selected body weights 0.70–1.40. Nouns fell about 10–13 pp under the new shared learner, to be diagnosed before Step 9. Rental spend $7.29 (no runs); runs on Juno. |
-| 8 | [Body training recipe](docs/step_8_body_training_recipe.md) | Does wordless body pretraining make the learner use the body? Chosen on Step 7's development panels, not on nouns alone. |
-| 9 | Curves by word type | Acquisition curves for nouns, property words and action words with the Step 8 recipe; gaze and body gain reported per rung. Not yet designed. |
+| 7 | [Property and action words](docs/step_7_word_types.md#completed-results--19-november-2026) | Complete, 20/20 models at 630 clips, seeds 0–4, temporal video in every arm. Body gain over gaze: nouns +0.90 pp [−2.11, 3.85], actions +11.42 [8.57, 14.62], heavy/light +46.04 [39.26, 53.29]; shuffled body ≈ 0. Dev selected body weights 0.70–1.40. Nouns fell about 10–13 pp under the new shared learner; fixed by per-word zero-init of the temporal weight (21 Nov). Rental spend $7.29 (no runs); runs on Juno. |
+| 8 | [Body training recipe](docs/step_8_body_training_recipe.md) | Reframed / optional post-Step 7: Step 7 already showed the learner turns the body on without pretraining (weights 0.70–1.40). Either skip to Step 9 or test whether wordless pretraining speeds up low-data action learning (63–158 clips) now that the noun drop is fixed. |
+| 9 | Curves by word type | Acquisition curves across clip counts with the fixed shared learner; gaze and body gain reported per rung. Decide before launch whether curves cover nouns + actions (keeping heavy/light as a completed Step 7 proof of concept) or also include a harder property rung. Not yet designed. |
 | 10 | Sentence comprehension | Structured caregiver speech from GRAB events, a text encoder that reads word order (for example a small transformer trained from scratch), and a scene representation that can express relations and roles. Not yet designed. |
 | 11 | Comparison with children | Order in which words are learned against Wordbank age of acquisition, and DevBench-style word and sentence tasks. Not yet designed. |
+
+### Immediate next steps (post-Step 7)
+
+1. ~~**Inspect saved Step 7 training curves (done 20 Nov 2026):**~~ Confirmed `V` on actions peaks early (epoch 8, 72.7% dev) and overfits to 59.2% by epoch 60 (not under-trained), and the 3-rung dev stopping rule only costs ~0.9–1.0 pp on nouns across all arms. All arms peak between epochs 8 and 22, so diagnostics only need ~30 epochs.
+2. ~~**Diagnose the 10–13 pp noun drop (done 21 Nov 2026):**~~ The temporal encoder's scalar weight starting at 1.0 caused it. A per-word temporal weight starting at 0 restores nouns to the static level (V+G test 73.3% vs 73.6%) and raises actions (V+G pooled 68.6% vs 65.2% static); forcing the weights to 0 at inference removes 2.5–6.0 pp of actions and leaves nouns unchanged. Per-word zero-init is now the default temporal video learner ([details](docs/step_7_word_types.md#noun-drop-fix-per-word-zero-init-temporal-weight--21-november-2026)).
+3. **Make two design calls before Step 9:** (a) skip Step 8 or run it as a focused low-data (63–158 clip) pretraining check on actions; (b) keep heavy/light as a completed Step 7 proof of concept (running Step 9 curves on nouns + actions) or harden it with middle weights and realistic load noise for a property curve.
 
 A weak intermediate result is a design signal for the build, not a standalone
 paper framing or an automatic instruction to launch more conditions.

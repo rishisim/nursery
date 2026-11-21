@@ -101,6 +101,30 @@ def check():
         assert all(p.grad is not None and p.grad.abs().sum() > 0 for p in enabled.temporal_video.parameters())
         assert enabled.temporal_weight.grad.abs() > 0
 
+        for mode in ("zero", "per_word"):
+            zero = current(5, 768, **kwargs, temporal_video=True, temporal_weight_init=mode).eval()
+            shared = {name: value for name, value in enabled.state_dict().items()
+                      if name != "temporal_weight"}
+            assert zero.load_state_dict(shared, strict=False).missing_keys == ["temporal_weight"]
+            V, U, scores = zero.pair_scores(v, t, n, full_ctx)
+            torch.testing.assert_close(scores, base, rtol=0, atol=0)
+            zero.forward_loss(v, t, n, w, full_ctx).backward()
+            assert zero.temporal_weight.grad.abs().sum() > 0
+            if mode == "per_word":
+                assert not zero.temporal_weight.grad[[0, 3, 4]].any()
+                with torch.no_grad():
+                    zero.temporal_weight[1], zero.temporal_weight[2] = 0.5, -0.25
+                panel_ctx = dict(full_ctx, temporal_tokens=t.flip(0))
+                actual = zero.score_encoded(V, U.flip(0), panel_ctx)
+                expected = base.flip(1) + score.flip(1) * torch.tensor([-0.25, 0.5])
+                torch.testing.assert_close(actual, expected)
+                phrase = torch.tensor([[1, 2, 0]])
+                phrase_score = zero.temporal_score(zero.enc_text(phrase, torch.tensor([2])), temporal, phrase)
+                vectors = zero.word.weight[1:3, :128]
+                weighted = (0.5 * vectors[0] - 0.25 * vectors[1]) / vectors.sum(dim=0).norm()
+                latent = torch.nn.functional.normalize(zero.temporal_video(frames, same), dim=-1)
+                torch.testing.assert_close(phrase_score[:, 0], latent @ weighted)
+
     # Two adjacent clips in the same partition. Align to the last second of
     # the first clip and first second of the second clip without crossing a cut.
     clip = np.array([[0, 0, 0, 1, 1]])
@@ -131,6 +155,7 @@ def check():
     print("PASS: flag-off scores and training loss bit-identical to bb368b9e in all three arms")
     print("PASS: same mask as body, masked frames invariant, gaze and sharp readout, frame-order sensitivity")
     print("PASS: temporal score and weight connected to loss, 172929 added parameters in every arm")
+    print("PASS: both zero initializations, gradient routing, reordered queries and multi-token weighting")
 
 
 if __name__ == "__main__":

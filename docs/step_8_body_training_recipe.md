@@ -5,11 +5,36 @@ Design reference in [PLAN.md](../PLAN.md), following the
 was skipped before the [noun curves](step_6_language_acquisition_curves.md).
 No new pretraining or architecture experiment is launched by this document.
 
+## Status update — 20 November 2026 (post-Step 7)
+
+Step 7 resolved the original premise of this document. Once words have genuine
+bodily meaning (actions and heavy/light), the additive learner **already turns
+the body on without wordless pretraining**: development selection chose body
+weights of 0.70–1.40 across all five seeds (vs. 0.05–0.20 for shuffled body),
+yielding +11.42 pp on actions and +46.04 pp on heavy/light at 630 clips.
+
+Because the learner no longer ignores the body, Step 8 is now **optional**
+and reframed into a narrower question:
+
+- **Option A (skip to Step 9):** Carry the fixed Step 7 additive recipe (no
+  wordless pretraining) straight into Step 9 acquisition curves once the
+  10–13 pp Step 7 noun drop is diagnosed and resolved.
+- **Option B (narrowed Step 8):** Test whether wordless masked-body
+  pretraining improves **low-data sample efficiency** on actions (e.g., at
+  63–158 clips) or lifts harder action words (`inspect`, `offhand`). Testing
+  at 630 clips on heavy/light is no longer informative because `V+G+B` is
+  already at 98.4%.
+
+**Prerequisite before either option:** Diagnose and fix the Step 6 → Step 7
+noun regression and check the saved Step 7 `V` action training curves (see
+[Step 7 completed results](step_7_word_types.md#completed-results--19-november-2026)).
+
 ## The idea
 
 Decide whether learning the body signal's structure before word learning
-makes the video-plus-body learner use the body. Keep the representation and
-the Step 7 learner fixed while changing this training choice.
+improves how fast or how well the video-plus-body learner acquires bodily
+words (especially in the low-data regime). Keep the representation and the
+fixed Step 7 learner constant while changing only this training choice.
 
 Wordless pretraining hides parts of body sequences and trains the encoder to
 reconstruct them from surrounding bodily context, without words or category
@@ -17,12 +42,13 @@ targets. The encoder then enters word learning with video and body. This is
 different from body-first word training, which learns word associations from
 body before introducing video.
 
-## Why consider it
+## Historical motivation (pre-Step 7)
 
-In Steps 4 and 6, the body pathway trained from scratch with words is not used
-at any data amount: development selection keeps its weight at 0–0.15, and at
-the as-trained weight it lowers accuracy. The limit is how the body learns, not
-only what it receives.
+In Steps 4 and 6 (nouns only), the body pathway trained from scratch with
+words was not used at any data amount: development selection kept its weight
+at 0–0.15, and at the as-trained weight it lowered accuracy. Step 7 showed
+that was largely because nouns are mostly visual rather than because the body
+encoder cannot train from scratch with words.
 
 The exploratory diagnosis found masked-body pretraining followed by additive
 word learning reached 81.56% against 76.88% video-only on the four-noun test,

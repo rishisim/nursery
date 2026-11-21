@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 from pathlib import Path
 import pickle
 import shutil
@@ -23,6 +24,8 @@ PHYSICAL = RENDER / "physical_instance"
 FROZEN = Path("outputs/runs/step6_acquisition_curves/frozen")
 MASS_CSV = Path("outputs/step7_scouting/instance_draw_mass.csv")
 OUTPUT = Path("outputs/runs/step7_word_types")
+DIAGNOSIS = OUTPUT.with_name("step7_noun_drop_diagnosis")
+TEMPORAL_INIT = OUTPUT.with_name("step7_temporal_init")
 ACTIONS = ("pass", "lift", "inspect", "offhand", "drink")
 PROPERTIES = ("heavy", "light")
 SPLITS = ("train", "dev", "test", "s8")
@@ -116,7 +119,8 @@ def prepare_learner(destination, *, clips=None, baseline=False):
     else:
         protocol = {k: v for k, v in parent.items() if k not in
                     ("rich_body_manifest", "picture_panels", "revision", "code_hashes")}
-        protocol.update(physical=str(PHYSICAL.resolve()), temporal_video=True, word_type_panels=WORD_TYPE_PANELS,
+        protocol.update(physical=str(PHYSICAL.resolve()), temporal_video=True, temporal_weight_init="per_word",
+                        word_type_panels=WORD_TYPE_PANELS,
                         arms=ARMS, conditions=list(ARMS), seeds=list(range(5)), fractions=[1.0], source_commit=None,
                         transcripts=str(transcript.resolve()), expected_trial_counts=EXPECTED_TRIALS,
                         body_input_dims={"current": 153}, approval="Draft protocol — 17 November 2026")
@@ -361,12 +365,88 @@ def event_panel(timeline, rung, split):
            .groupby(keys).ngroups - len(trials))
 
 
+def prepare_cell(cell, *, temporal_weight_init=None):
+    """Prepare a noun-drop cell or a temporal initialization diagnostic."""
+    step7 = (OUTPUT / "frozen").resolve()
+    speech = FROZEN.resolve() if cell == "A" else step7
+    destination = (DIAGNOSIS / f"cell_{cell}" if temporal_weight_init is None
+                   else TEMPORAL_INIT / temporal_weight_init)
+    root = _output_directory(destination / "frozen", exist_ok=False)
+    for source, names in [(speech, ["subsets/1.0"]), (step7, ["panels", "splits.json"])]:
+        expected = run._read(source / "frozen_inputs.json")["prepared_hashes"]
+        for name in names:
+            origin = source / name
+            for path in (sorted(origin.rglob("*")) if origin.is_dir() else [origin]):
+                if path.is_file():
+                    target = root / path.relative_to(source)
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(path, target)
+                    if _sha(target) != expected[str(path)]:
+                        raise ValueError(f"Changed frozen input: {path}")
+
+    protocol = run._read(step7 / "protocol.json")
+    stats = run._read(root / "subsets/1.0/stats.json")
+    if stats["selected_clips"] != protocol["subsets"]["1.0"]["selected_clips"] or stats["selected_clip_count"] != 630:
+        raise ValueError("Diagnostic requires the identical 630 training clips")
+    protocol.update(temporal_video=cell == "A", speech_subset=str(speech / "subsets/1.0"),
+                    epochs=30, seeds=[0, 1], arms={"video_gaze": ARMS["video_gaze"]},
+                    conditions=["video_gaze"], subsets={"1.0": stats})
+    if temporal_weight_init is not None:
+        protocol.update(temporal_video=True, temporal_weight_init=temporal_weight_init,
+                        arms={arm: ARMS[arm] for arm in ("video", "video_gaze")},
+                        conditions=["video", "video_gaze"])
+    protocol["transcripts"] = str(Path(protocol["inputs"]) / "manifest.parquet") if cell == "A" else protocol["transcripts"]
+    # These V+G jobs consume the prepared transcript and no physical/body signals.
+    gaze = protocol["gaze"]
+    required = [Path(protocol["episodes"]) / "frames.parquet", Path(gaze["points"]), Path(gaze["partitions"])]
+    for cache in (Path(protocol["inputs"]) / "train_cache", Path(gaze["closeup_cache"])):
+        required.extend(cache / name for name in ("index.parquet", "emb.f16.npy"))
+    protocol["hashes"] = {str(p): protocol["hashes"][str(p)] for p in required}
+    protocol["code_hashes"][str(Path(__file__).resolve())] = _sha(Path(__file__))
+    run._write(root / "protocol.json", protocol)
+    run._write(root / "signal_hashes.json", {})
+    run._write(root / "queue.json", [[1.0, seed, arm] for seed in protocol["seeds"]
+                                    for arm in protocol["conditions"]])
+    run._freeze_inputs(root, audit_preparation=False)
+    if temporal_weight_init is not None:
+        return
+    for seed in protocol["seeds"]:
+        # Keep the canonical trainer's layout while writing directly to cell_X/seed_N.
+        native = run._output(root, 1.0, seed, "video_gaze")
+        native.parent.mkdir(parents=True, exist_ok=True)
+        native.symlink_to(os.path.relpath(root.parent / f"seed_{seed}", native.parent), target_is_directory=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", nargs="?", choices=("build", "freeze", "smoke", "baseline-smoke"), default="build")
+    parser.add_argument("action", nargs="?", choices=("build", "freeze", "smoke", "baseline-smoke",
+                                                      "prepare-cell", "run-cell",
+                                                      "prepare-temporal-init", "run-temporal-init"), default="build")
+    parser.add_argument("--cell", choices=("A", "B"), help="A: Step 6 speech + temporal; B: Step 7 speech + static")
+    parser.add_argument("--seed", type=int, choices=(0, 1))
+    parser.add_argument("--temporal-weight-init", choices=("zero", "per_word"))
+    parser.add_argument("--arm", choices=("video", "video_gaze"))
     parser.add_argument("--clips", type=int, default=40)
     parser.add_argument("--use-existing-physical", action="store_true", help="Verify and reuse a completed Step 7 store")
     args = parser.parse_args()
+    if args.action in ("prepare-temporal-init", "run-temporal-init"):
+        if args.temporal_weight_init is None:
+            parser.error("temporal initialization diagnostics require --temporal-weight-init")
+        if args.action == "prepare-temporal-init":
+            return prepare_cell("B", temporal_weight_init=args.temporal_weight_init)
+        if args.seed is None or args.arm is None:
+            parser.error("run-temporal-init also requires --seed and --arm")
+        root = TEMPORAL_INIT / args.temporal_weight_init / "frozen"
+        return run.train_one(root, 1.0, args.seed, args.arm, device="cuda")
+    if args.action in ("prepare-cell", "run-cell"):
+        if args.cell is None or (args.action == "run-cell" and args.seed is None):
+            parser.error("cells require --cell; run-cell also requires --seed")
+        if args.action == "prepare-cell":
+            return prepare_cell(args.cell)
+        root = DIAGNOSIS / f"cell_{args.cell}" / "frozen"
+        if not run._output(root, 1.0, args.seed, "video_gaze").is_symlink():
+            raise ValueError("Missing prepared cell output link")
+        return run.train_one(root, 1.0, args.seed, "video_gaze", device="cuda")
     if args.action == "freeze":
         return freeze_learner()
     if args.action in ("smoke", "baseline-smoke"):

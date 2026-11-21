@@ -294,14 +294,78 @@ Reading: the body gain grows from nouns (+0.9, null) to actions (+11.4) to
 heavy/light (+46.0), as predicted.
 
 What it means for the next step:
-- Nouns fell under the new shared learner (temporal encoder plus new speech):
-  on the same panel V 63.67 → 50.65, V+G 75.60 → 65.65, V+G+B 76.26 → 66.55.
-  Every rung must use one learner, so this needs diagnosing before Step 9.
-- Heavy/light is close to a direct reading of the load channel (98%). A
-  harder property test, for example with the middle third of masses, would be
-  more informative.
-- Frozen temporal-video features decode the action at 96% on dev, but the
-  trained V arm reaches 66% on actions: video is limited by learning from
-  weak speech, not by what the frames contain.
-- The learner already uses the body here without pretraining, which changes
-  the premise of Step 8.
+- **Epoch-curve audit (completed 20 November 2026, zero GPU cost):**
+  Inspection of all 20 saved `history.json` files rules out two hypotheses:
+  1. *The 3-rung dev stopping rule did not cause the noun drop.* Across all
+     four arms, selecting the best noun-only epoch instead of the best
+     3-rung mean epoch recovers only +0.90 to +1.02 pp on dev (`V` 53.18% →
+     54.20%, `V+G` 69.57% → 70.47%, `V+G+B` 68.51% → 69.53%).
+  2. *`V` on actions is not under-trained.* `V` peaks on dev actions at
+     epoch 8 (72.68%; avg single-seed peak epoch 11.2) and overfits steadily
+     down to 59.18% by epoch 60. All arms peak between epochs 8 and 22 and
+     overfit after epoch 25–30. This confirms the 96% supervised probe vs.
+     65.6% test `V` gap reflects rapid overfitting under weak caregiver
+     speech rather than too few training epochs, and means diagnostic runs
+     only need ~30 epochs.
+- **Diagnose the noun drop before Step 9 (priority #1).** With the 3-rung
+  stopping rule ruled out, the 10–13 pp noun drop (`V` 63.67 → 50.65, `V+G`
+  75.60 → 65.65) comes from the **11-frame temporal video encoder**, the
+  **new multi-word action/property speech**, or their interaction. Next: run
+  a small 2×2 ablation on `V+G` (Step 6 vs. Step 7 speech × static vs.
+  temporal encoder, 1–2 seeds, 30 epochs) to isolate and fix the regression
+  so all rungs share one clean learner.
+- **Treat heavy/light as a completed proof of concept unless hardened for
+  curves.** At 98.4% (and +60.4 pp on straddling nouns), heavy/light proves
+  weak speech can ground a physical property in wrist load, but its clean
+  load channel and dropped middle third would saturate too early on Step 9
+  curves. Either leave heavy/light out of Step 9 (running curves on nouns +
+  actions) or restore the middle third of masses and add realistic load noise
+  if a property curve is wanted.
+- **Reframe [Step 8](step_8_body_training_recipe.md).** Because dev selection
+  already turns the body on in every seed (weights 0.70–1.40) without
+  pretraining, Step 8 is no longer needed to "wake the body up." It is now
+  either skipped or narrowed to testing whether wordless pretraining speeds
+  up low-data action learning (e.g., 63–158 clips).
+
+## Noun-drop fix: per-word zero-init temporal weight — 21 November 2026
+
+The temporal video encoder caused the noun drop: its single scalar weight
+starts at 1.0, so the temporal score enters every word, nouns included, from
+the first step. Diagnostic on Step 7 speech and panels (630 clips, seeds 0–1,
+30-epoch cap, best-dev checkpoint, Juno job 525910) compared two starting
+values against static `cell_B` and the original Step 7 learner. Mean of the
+two seeds, accuracy in %:
+
+| Learner / arm | Nouns dev / test | Actions dev / test / s8 / pooled | Heavy / light | Temporal weight |
+|---|---|---|---|---|
+| Static `cell_B`, V+G | 78.6 / 73.6 | 70.1 / 72.3 / 56.8 / 65.2 | 60.5 / 56.1 | — |
+| Scalar 1.0 (Step 7), V | 52.3 / 51.2 | 70.7 / 72.0 / 58.3 / 65.7 | 44.6 / 39.8 | 1.07 |
+| Scalar 1.0 (Step 7), V+G | 69.3 / 66.2 | 70.9 / 71.9 / 63.4 / 68.0 | 55.0 / 53.2 | 0.98 |
+| Scalar 0.0, V | 57.7 / 55.0 | 71.0 / 72.5 / 56.7 / 65.3 | 43.2 / 42.8 | −0.43 |
+| Scalar 0.0, V+G | 73.7 / 70.0 | 71.3 / 72.9 / 58.5 / 66.3 | 57.3 / 55.8 | +0.32 / −0.32 by seed |
+| Per-word 0.0, V | 58.3 / 57.6 | 76.4 / 76.2 / 63.3 / 70.3 | 48.7 / 44.2 | see below |
+| Per-word 0.0, V+G | 79.0 / 73.3 | 74.1 / 75.7 / 60.1 / 68.6 | 57.4 / 58.5 | see below |
+
+The Step 7 scalar 1.0 rows used a 60-epoch cap; `cell_B` has no V arm at 30
+epochs.
+
+Per-word zero-init gives each vocabulary word its own temporal weight,
+starting at 0. It restores nouns to the static level (V+G test 73.3 vs 73.6)
+and gives the best action dev and test scores in both arms.
+
+**Forced-zero readout (CPU, no GPU).** Re-scoring the four per-word
+checkpoints reproduced all 16,436 saved test choices. Setting every temporal
+weight to 0 at inference then lowers pooled actions by 2.5–6.0 pp in every
+checkpoint, back to about the static level (64–67%), while noun test moves
+by −0.7 to +1.6 pp. The temporal path therefore supplies the action gain and
+leaves nouns alone. Action-word weights are ±0.2–0.3 with mixed signs
+(their mean, near zero, hides this); `lift` is negative in all four
+checkpoints and `pass` positive in three. `pass` gains 6–11 pp test accuracy
+from the path in every checkpoint; the other words vary by seed.
+
+**Decision.** Per-word zero-init (`temporal_weight_init="per_word"`) is the
+default temporal video learner from here on; the Step 7 protocol builder now
+writes it. The recorded Step 7 results above used scalar 1.0, and saved
+protocols without the key still load as scalar 1.0. Runs are under
+`outputs/runs/step7_temporal_init/` (`results.md`, `zero_readout.md`).
+
