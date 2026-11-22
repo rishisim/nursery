@@ -145,3 +145,34 @@ run; if any do, flag them in the run plan per the repository rules.
   extra inputs removed, rendered and Konkle pictures.
 - **Noun s8 is not scored.** The frozen cache lacks 56 close-up embeddings
   for that panel, so nouns use `clips_test` only, as in Step 7.
+
+## Completed results — 22 November 2026
+
+All 85 models ran on Juno (array 526222; tasks 24–84 repacked three per GPU
+as array 526351 via `scripts/step9_acquisition_curves_packed.sbatch`). They
+were fetched and verified against the frozen protocol. Analysis:
+`outputs/runs/step9_acquisition_curves/analysis/` (`analyze.py`, `results.md`).
+Mean of 5 seeds; gains in pp with joint 95% intervals over seeds and source clips.
+
+| Clips | Nouns V / V+G / V+G+B | Noun gaze gain | Noun body gain | Actions V / V+G / V+G+B | Action gaze gain | Action body gain |
+|---:|---|---:|---:|---|---:|---:|
+| 63 | 28.6 / 38.1 / 37.3 | +9.5 [6.2, 12.7] | −0.8 [−3.2, 1.5] | 37.0 / 36.1 / 45.6 | −1.0 [−4.4, 2.4] | +9.5 [5.5, 13.7] |
+| 158 | 37.8 / 53.3 / 53.0 | +15.5 [10.8, 20.0] | −0.3 [−3.2, 2.5] | 51.3 / 48.8 / 55.9 | −2.5 [−6.0, 0.9] | +7.1 [3.8, 10.8] |
+| 315 | 45.2 / 65.3 / 63.6 | +20.0 [15.1, 25.3] | −1.7 [−5.5, 1.5] | 59.1 / 59.3 / 68.6 | +0.2 [−2.8, 3.3] | +9.3 [6.1, 12.7] |
+| 473 | 54.0 / 69.8 / 70.1 | +15.9 [11.9, 20.0] | +0.3 [−1.9, 2.8] | 64.3 / 65.3 / 74.4 | +1.0 [−2.7, 4.6] | +9.1 [6.3, 12.2] |
+| 630 | 56.9 / 73.0 / 72.5 | +16.0 [11.8, 20.3] | −0.5 [−2.7, 1.8] | 69.9 / 70.1 / 76.5 | +0.2 [−3.5, 3.6] | +6.4 [4.2, 9.0] |
+
+- Shuffled body ≈ 0 at 158 and 630 on both rungs (−0.83 to +0.83 pp).
+- Selected real-body weights: 0.70–0.90 at 63 clips, falling to 0.15–0.65 at 630
+  (Step 7: 0.70–1.40). Shuffled 0–0.40.
+- No run selected an epoch in the last 5 of 60; the latest selected epochs were
+  49 / 55 / 34 / 26 / 20 from 63 to 630 clips. The 60-epoch cap was enough.
+- 630 vs Step 7: nouns up 5.9–7.3 pp in every arm (per-word init fix). Action
+  body gain +6.4 vs +11.4 pp, with lower selected body weights; heavy/light
+  is no longer in the dev score. Nouns are still 2.7–6.8 pp below Step 6's
+  static learner.
+
+Reading: gaze helps nouns and not actions; body helps actions and not
+nouns. The action body gain is about +6–10 pp at every amount, and `V+G+B` with
+315 clips (68.6) nearly matches `V` with 630 (69.9). `V` on actions is still
+rising (+5.6 pp from 473 to 630), so these curves don't show a video plateau yet.
