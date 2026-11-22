@@ -7,20 +7,52 @@ provides intentionally uncertain language supervision.
 
 ## Current milestone: noun and action acquisition curves
 
-Gaze and body each help a different kind of word (a double dissociation),
-measured on 85 models across 63–630 training clips, 5 seeds each, comparing
-video (V), video + gaze (V+G) and video + gaze + body (V+G+B):
+![Noun and action acquisition curves](docs/results/noun_action_acquisition_curves/acquisition_curves.png)
 
-- **Gaze lifts nouns** by +9.5 to +20.0 points at every amount; body adds ≈ 0.
-- **Body lifts actions** by +6.4 to +9.5 points at every amount; gaze adds ≈ 0.
-  V+G+B at 315 clips roughly matches V at 630 (about 2× data efficiency).
-- **Shuffled body ≈ 0**, so the action gain comes from aligned body signals.
-- Video-only is still rising at 630 clips: no plateau yet.
-- Earlier proof of concept: on heavy/light, body added +46 points at 630 clips
+**Setup.** Three learners see the same simulated child experience and hear the
+same weak, noisy caregiver speech (naming is often delayed or about an object
+not in hand). They differ only in their inputs:
+
+- **V**: egocentric video, including temporal motion.
+- **V+G**: V plus child gaze, which steers attention and adds a sharp close-up
+  of where the child looks.
+- **V+G+B**: V+G plus body signals: touch, hand pose, arm motion and wrist load.
+
+Each is tested on four-choice word matching (chance 25%), trained on 63–630
+clips with 5 seeds each (85 models). Accuracy is the 5-seed mean (%). Body gain
+is V+G+B − V+G and gaze gain is V+G − V, in percentage points.
+
+| Clips | Actions V | Actions V+G+B | Body gain | Nouns V | Nouns V+G | Gaze gain |
+|---|---|---|---|---|---|---|
+| 63 | 37.0 | 45.6 | **+9.5** | 28.6 | 38.1 | **+9.5** |
+| 158 | 51.3 | 55.9 | **+7.1** | 37.8 | 53.3 | **+15.5** |
+| 315 | 59.1 | 68.6 | **+9.3** | 45.2 | 65.3 | **+20.0** |
+| 473 | 64.3 | 74.4 | **+9.1** | 54.0 | 69.8 | **+15.9** |
+| 630 | 69.9 | 76.5 | **+6.4** | 56.9 | 72.9 | **+16.0** |
+
+**What it shows: a double dissociation.**
+
+- Gaze lifts nouns at every amount and adds ≈ 0 on actions: it settles
+  *which object* a word refers to.
+- Body lifts actions at every amount and adds ≈ 0 on nouns: it grounds
+  *physical actions*. V+G+B at 315 clips (68.6%) about matches V at 630 (69.9%),
+  roughly 2× sample efficiency.
+- Shuffled body adds ≈ 0 pp, so the gain comes from body signals aligned with
+  the speech, not from extra parameters.
+- On object-matched actions, where the object can't give the answer away, body
+  still adds +7.8 to +12.4 pp.
+- The earlier heavy/light proof of concept gained +46 pp from body
   ([Step 7](docs/step_7_word_types.md)).
+- Video is still climbing at 630 clips, so whether it plateaus is still open.
 
-Protocol and results: [docs/step_9_acquisition_curves.md](docs/step_9_acquisition_curves.md).
-Archived per-run data and analysis script:
+**What's next.** The next phase builds one unified learner: an
+utterance-conditioned gate that picks which modalities to trust per word, and a
+word-order text encoder with cross-modal interaction for simple sentences. It
+will be compared against stronger baselines, including BabyView-pretrained
+DINOv2 and fair VLMs.
+
+Full protocol and intervals: [docs/step_9_acquisition_curves.md](docs/step_9_acquisition_curves.md).
+Archived data, analysis and plotting script:
 [docs/results/noun_action_acquisition_curves/](docs/results/noun_action_acquisition_curves/).
 
 Start with [PLAN.md](PLAN.md). Study documents:
