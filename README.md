@@ -5,7 +5,7 @@ learning than video alone, as independent training experience increases.
 The simulator supplies egocentric video and body signals; caregiver speech
 provides intentionally uncertain language supervision.
 
-## Current milestone: noun and action acquisition curves
+## Phase 1 milestone: noun and action acquisition curves
 
 ![Noun and action acquisition curves](docs/results/noun_action_acquisition_curves/acquisition_curves.png)
 
@@ -42,175 +42,74 @@ is V+G+B − V+G and gaze gain is V+G − V, in percentage points.
 - On object-matched actions, where the object can't give the answer away, body
   still adds +7.8 to +12.4 pp.
 - The earlier heavy/light proof of concept gained +46 pp from body
-  ([Step 7](docs/step_7_word_types.md)).
+  ([archived Step 7](archive/phase1_embodied/docs/step_7_word_types.md)).
 - Video is still climbing at 630 clips, so whether it plateaus is still open.
 
-**What's next.** The next phase builds one unified learner: an
-utterance-conditioned gate that picks which modalities to trust per word, and a
-word-order text encoder with cross-modal interaction for simple sentences. It
-will be compared against stronger baselines, including BabyView-pretrained
-DINOv2 and fair VLMs.
-
-Full protocol and intervals: [docs/step_9_acquisition_curves.md](docs/step_9_acquisition_curves.md).
+Full Step 9 protocol:
+[archive/phase1_embodied/docs/step_9_acquisition_curves.md](archive/phase1_embodied/docs/step_9_acquisition_curves.md).
 Archived data, analysis and plotting script:
 [docs/results/noun_action_acquisition_curves/](docs/results/noun_action_acquisition_curves/).
 
-Start with [PLAN.md](PLAN.md). Study documents:
-[16×16 vision](docs/step_1_visual_baseline.md),
-[child gaze](docs/step_2_child_gaze.md),
-[richer body input](docs/step_3_body_representation.md),
-[a controlled representation comparison](docs/step_4_body_representation_comparison.md),
-[noun acquisition curves](docs/step_6_language_acquisition_curves.md),
-[property and action words](docs/step_7_word_types.md),
-[the body training recipe](docs/step_8_body_training_recipe.md) (skipped), and
-[noun and action curves](docs/step_9_acquisition_curves.md).
-[Past experiments](archive/language_learning/past_experiments.md) explains what
-we tried earlier; the completed cross-situational and acquisition studies are
-indexed in the [archive](archive/README.md#completed-study-worktrees).
+## Phase 2 (active on `research/unified-architecture`): Unified Embodied Learner
+
+Start with [docs/unified/CONTEXT.md](docs/unified/CONTEXT.md) and
+[PLAN.md](PLAN.md). Phase 2 replaces Phase 1's per-word temporal weight and
+post-hoc body-weight sweep with one clean **Embodied Baby-CoCa** architecture
+(`nursery/unified/`):
+
+- **Three aligned 512-d sensory streams** (Static Vision+Gaze, Temporal Video,
+  Body) + **zero-init cross-modal MHSA**.
+- **Compact 2-layer Causal Text Transformer** trained from scratch +
+  utterance-conditioned **Modality Gate `g(T)`** on the 2-simplex + dual
+  contrastive & generative heads.
+- **Step-by-step blueprints:**
+  [U1 Unified learner](docs/unified/step_u1_unified_learner.md) ·
+  [U2 Compositional sentences & VP-Swap](docs/unified/step_u2_compositional_sentences.md) ·
+  [U3 Fair VLM baselines](docs/unified/step_u3_fair_baselines.md) ·
+  [U4 Grammar, fluency & shaping](docs/unified/step_u4_generative_and_grammar.md) ·
+  [U5 BabyView DINO backbone](docs/unified/step_u5_babyview_backbone.md) ·
+  [U6 Wordbank AoA & DevBench](docs/unified/step_u6_developmental_comparison.md).
 
 ## File map
 
 ```text
-PLAN.md                         Current direction and study links
+PLAN.md                         Phase 2 roadmap (U1–U6) and locked rules
+AGENTS.md                       Repository hygiene and BabyView/Databrary rules
+docs/
+  unified/
+    CONTEXT.md                  Phase 2 master context and architecture brief
+    step_u1_unified_learner.md  U1: Embodied Baby-CoCa + Modality Gate g(T)
+    step_u2_compositional_sentences.md  U2: Tier A sentences + Embodied VP-Swap
+    step_u3_fair_baselines.md   U3: CLIP-Global & BabyLLaVA-Nursery baselines
+    step_u4_generative_and_grammar.md   U4: Grammar, fluency & visual shaping
+    step_u5_babyview_backbone.md        U5: mcxfrank/babyview-dino-vitb16 eye
+    step_u6_developmental_comparison.md U6: Wordbank AoA & DevBench transfer
+  results/noun_action_acquisition_curves/  Phase 1 Step 9 curves, data & plot script
+  learner.md                    Phase 1 learner & feature-store reference
+  speech_coupling.md            Speech-generation evidence and assumptions
+  literature/                   Literature notes
 nursery/
-  learner/
-    video_only.py               Video → word matching (visual baseline)
-    additive.py                 Video score + learned body → word score
-    interaction.py              Additive matching with zero-init visual–body interaction
-    body.py                     Contact, fingers, arms, load/skin encoding
-    rich.py                     Step 3 rich body summaries, train-only statistics
-    windows.py                  Clip-bounded body windows and episode context
-    gaze.py                     Gaze readouts over the visual word learner
-    gaze_data.py                Gaze windows aligned to visual windows
-    child_gaze.py               Step 2 preparation and timing gate
-    losses.py                   Shared language and diagnostic loss functions
-    train.py                    Shared data splits, training and checkpoints
-    evaluate.py                 Shared picture-only and body-present scoring
-    acquisition.py              Paired acquisition runs, dev-only selection
-    acquisition_data.py         Frozen clip subsets and evaluation panels
-    acquisition_evaluate.py     Fixed word-query panels for curves
-    acquisition_report.py       Aggregate and plot the curve matrix
-    embed.py                    Frozen DINOv2 feature extraction
-    config.json                 Upstream pin, training defaults, evaluation paths
-    hand_patches.json           Contact-patch definitions
-    __main__.py                 One CLI: embed / train / acquisition
-    __init__.py                 Pinned upstream loading
+  unified/                      Phase 2 unified learner & baselines (Step U1+)
+  learner/                      Reusable Phase 1 data, body, gaze & embed modules
   speech/                       Caregiver utterances, timing, vocabulary and cues
   simulator/                    GRAB replay, body signals, assets and rendering
   embodiedgen_scene.py          Room builder; also used by the renderer
   common.py                     Paths, configuration and ignored-output guard
 configs/                        Room-generation configuration
-scripts/                        Render/pipeline/seed launchers and run summaries
-tests/                          Current learner, speech, physical and simulator tests
-docs/
-  step_1_visual_baseline.md             Step 1: 16×16 vision and recorded 4×4 reference
-  step_2_child_gaze.md                  Step 2: simulated gaze drives naming and feeds the learner
-  step_3_body_representation.md         Step 3: recoverable sensory detail and missing signals
-  step_4_body_representation_comparison.md  Step 4: current versus richer body, additive
-  step_6_language_acquisition_curves.md Step 6: noun curves, video versus gaze and body
-  step_7_word_types.md                  Step 7: property and action word tests
-  step_8_body_training_recipe.md        Step 8: wordless body pretraining (skipped)
-  step_9_acquisition_curves.md          Step 9: noun and action curves, V / V+G / V+G+B
-  results/noun_action_acquisition_curves/  Archived Step 9 results, analysis, word counts
-  literature/                   Literature notes
-  side_chat.md                  Side discussion notes
-  learner.md                    Current implementation and scoring reference
-  speech_coupling.md             Speech-generation evidence and assumptions
+scripts/                        Reusable render/pipeline/seed/summary scripts
+tests/                          Core learner, speech, physical, simulator & unified tests
 archive/
-  code/learner/                 Completed heavy/light, pretraining and old joint pilot
+  phase1_embodied/              Archived Phase 1 Steps 1–9 docs, scripts & script tests
+  code/learner/                 Earlier heavy/light, pretraining and old joint pilot
   code/motion/                  Inactive HOIDiNi/InterMimic code and its tests
-  language_learning/            Past experiments, protocols and curated results
+  language_learning/            Earlier cross-situational & acquisition studies
   legacy_research/              Earlier simulation source/config/test archive
   README.md                     Historical evidence and artifact locations
 ```
 
-**Video-only and additive share the same visual base, training and evaluation.**
-The additive learner extends `video_only.py`; it does not carry a second copy
-of the visual implementation. Both use the pinned
-[vlm-headcam](https://github.com/mcfrank/vlm-headcam) upstream implementation.
-The preserved acquisition runner, joint interaction and 16×16 support are
-integrated into this checkout; see [source and worktree locations](archive/README.md#completed-study-worktrees).
-Step 1 selects only video-only training at the full-data point.
-The archived width-128 joint pilot is a different implementation; `--arch joint`
-is retained only for compatibility. New representation comparisons start with
-additive fusion.
-
-## Existing entry points
-
-Run these from the repository root with the existing `.external/cue-env/` and
-upstream checkout pinned in `nursery/learner/config.json`.
-These examples explain the existing runner; study-specific data amounts and
-budgets still come from the study plans.
+## Verification
 
 ```bash
-# Shared preparation, using an existing episode dataset.
-.external/cue-env/bin/python -m nursery.speech transcripts --episodes outputs/renders/clean_856 --output outputs/runs/study --seed 0
-.external/cue-env/bin/python -m nursery.learner embed --episodes outputs/renders/clean_856 --output outputs/runs/study
-
-# Video-only; direct language objective with soft pooling.
-.external/cue-env/bin/python -m nursery.learner train --run outputs/runs/study --condition none --seed 0 --pool soft --body none --w-pred 0 --name video_only
-
-# Additive; same visual/speech data, with body inputs and the same objective.
-.external/cue-env/bin/python -m nursery.learner train --run outputs/runs/study --condition none --seed 0 --pool soft --body real --w-pred 0 --name additive
-```
-
-`--physical <directory>` adds saved load/skin streams to the additive learner;
-the examples above use the base contact/finger/arm streams. Historical defaults
-and diagnostic flags are documented in [the learner reference](docs/learner.md).
-No run is launched by this documentation.
-
-Embedding defaults to 16×16; `--grid 4` retains the historical option. Use a
-fresh output root when changing grids. The exact Step 1 commands and frozen
-comparison are in [the visual baseline](docs/step_1_visual_baseline.md#execution-protocol).
-
-`scripts/render.sh <output>` renders sessions; `scripts/pipeline.sh` chains
-speech, embedding and training. `scripts/train_seeds.sh` runs several seeds;
-`scripts/summarize.py` reads saved metrics; `scripts/merge_render.py` combines
-per-session renders. The simulator needs licensed GRAB/SMPL-X assets, Blender,
-`.external/egocentric-env/`, and the room bank specified by its configuration.
-Use `python -m nursery.simulator --help` or
-`python -m nursery.embodiedgen_scene --help` for those entry points.
-
-## Local data and verification
-
-`outputs/` is the destination for new generated files and runs; it also holds
-retained datasets, features and checkpoints. Databrary agreement/access PDFs
-are in `outputs/exports/databrary/`. Use system temporary storage for scratch work.
-`.external/` holds environments and upstream checkouts; `data/` and `downloads/`
-retain local assets. These roots are ignored, but their contents are not
-automatically disposable. Reusable inputs and mixed run/input folders retain
-their existing paths. Completed standalone runs and retired reviews/motion
-artifacts are under `outputs/legacy/`; see the
-[relocation map](archive/README.md#local-artifact-relocation).
-Archived source snapshots are excluded from default test discovery.
-
-```text
-outputs/
-  assets/                 Object assets and evaluation images
-  embodiedgen_scene/      Room bank and previews used by the simulator
-  renders/clean_856/       Retained source dataset
-  speech_data/            Source speech research data
-  runs/                   Reusable features plus existing baseline/run records
-  exports/                Documents and conversation exports
-  legacy/
-    motion/               Retired motion trials and previews
-    reviews/              Completed audits, literature and handoff material
-    runs/
-      heavy_light/        Completed property-word diagnostic
-      sensory_pretraining/ Completed sensory-pretraining comparison
-    …                       Earlier archives remain in place
-```
-
-`outputs/runs/clean_body/`, `outputs/runs/clean_video_only/`,
-`outputs/runs/clean_perfect_naming/` and `outputs/runs/step1_matched/`
-contain both saved inputs and experiment records; their
-presence does not queue new runs. For new studies, use descriptive roots such
-as `outputs/runs/body_representation_comparison/`, with explicit condition/seed
-names. This is a naming example, not a created run. Completed study worktrees,
-including their original run roots, live under `outputs/legacy/worktrees/` with
-compatibility links at their previous locations.
-
-```bash
-PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python -m pytest -q -p no:cacheprovider tests/test_learner.py tests/test_speech.py tests/test_physical.py
+PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python -m pytest -q -p no:cacheprovider tests/ --ignore=tests/test_simulator.py
 PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python -m pytest -q -p no:cacheprovider tests/test_simulator.py
 ```
