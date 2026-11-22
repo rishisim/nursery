@@ -22,28 +22,27 @@ mixed across rungs.
 
 ## Where we are
 
-Steps 1–4 and 6 are complete. Steering gaze, where gaze guides which video
-patches a word is matched to, lifts the noun curve at every data amount:
-+9.95 points at 63 clips, about +18 at 158–315, +11.93 at 630 (63.67% → 75.60%).
-The other body channels add nothing over gaze at any amount; development
-selection keeps their weight at 0–0.15. Video and gaze are both still rising at
-630 clips, so the ceiling question is open.
+Steps 1–4, 6, 7 and 9 are complete; Step 5 and Step 8 were skipped.
 
-Nouns are the one test where vision has the advantage: an earlier diagnosis
-found about 80% of what the body knows about the test nouns is already in
-vision. Step 7 therefore built the action and property tests where the body
-has something to add, and confirmed the ladder prediction at 630 clips: body
-gain grows from +0.90 pp on nouns (null) to +11.42 pp on actions and +46.04 pp
-on heavy/light, with shuffled body near zero and dev selection turning the body
-weight on (0.70–1.40) without wordless pretraining.
+**Milestone: noun and action acquisition curves (Step 9, 22 Nov 2026).**
+85 models, 63–630 clips, seeds 0–4, one fixed learner. The result is a double
+dissociation: gaze lifts nouns +9.5 to +20.0 pp at every amount while body adds
+≈ 0; body lifts actions +6.4 to +9.5 pp at every amount while gaze adds ≈ 0.
+V+G+B at 315 clips roughly matches V at 630 on actions (about 2× data
+efficiency). Shuffled body ≈ 0. Video-only is still rising at 630 clips, so
+the ceiling question is open. Step 7's heavy/light test (+46 pp body gain) is
+kept as the earlier proof of concept. Archived data:
+[docs/results/noun_action_acquisition_curves/](docs/results/noun_action_acquisition_curves/).
 
-Two diagnostics came before Step 9 curves and are done: the saved Step 7
-training curves show every arm peaks by epoch 22, and the 10–13 pp noun drop
-came from the temporal weight starting at 1.0; a per-word weight starting at 0
-fixes it and is now the shared learner for every rung. Because Step 7 already showed the learner uses the
-body without pretraining, Step 8 is now optional—either skipped or narrowed to
-a low-data sample-efficiency test (63–158 clips) on actions. Sentences follow
-(Step 10), and comparison with children's learning comes last (Step 11).
+**Next phase: a unified architecture.** One learner that handles every rung
+instead of fixed per-condition fusion:
+
+- A learned, utterance-conditioned modality gate that decides per word how
+  much to rely on video, gaze and body.
+- Cross-modal interaction plus a text encoder that reads word order, so the
+  learner can be tested on simple sentences (Step 10).
+- Stronger, fairer baselines: DINOv2 pretrained on BabyView video and fair
+  VLM baselines, so video-only gets its best chance before claiming a ceiling.
 
 | Step | Document | Question and current status |
 |---|---|---|
@@ -58,13 +57,6 @@ a low-data sample-efficiency test (63–158 clips) on actions. Sentences follow
 | 9 | [Curves by word type](docs/step_9_acquisition_curves.md#completed-results--22-november-2026) | Complete, 85/85 models, 63–630 clips, seeds 0–4, nouns + actions, fixed learner. Body gain on actions +6.4 to +9.5 pp at every amount, nouns ≈ 0; gaze gain on nouns +9.5 to +20.0, actions ≈ 0. Shuffled body ≈ 0. V+G+B at 315 clips ≈ V at 630 on actions. V still rising at 630: no plateau yet. Juno only, $0. |
 | 10 | Sentence comprehension | Structured caregiver speech from GRAB events, a text encoder that reads word order (for example a small transformer trained from scratch), and a scene representation that can express relations and roles. Not yet designed. |
 | 11 | Comparison with children | Order in which words are learned against Wordbank age of acquisition, and DevBench-style word and sentence tasks. Not yet designed. |
-
-### Immediate next steps (post-Step 7)
-
-1. ~~**Inspect saved Step 7 training curves (done 20 Nov 2026):**~~ Confirmed `V` on actions peaks early (epoch 8, 72.7% dev) and overfits to 59.2% by epoch 60 (not under-trained), and the 3-rung dev stopping rule only costs ~0.9–1.0 pp on nouns across all arms. All arms peak between epochs 8 and 22, so diagnostics only need ~30 epochs.
-2. ~~**Diagnose the 10–13 pp noun drop (done 21 Nov 2026):**~~ The temporal encoder's scalar weight starting at 1.0 caused it. A per-word temporal weight starting at 0 restores nouns to the static level (V+G test 73.3% vs 73.6%) and raises actions (V+G pooled 68.6% vs 65.2% static); forcing the weights to 0 at inference removes 2.5–6.0 pp of actions and leaves nouns unchanged. Per-word zero-init is now the default temporal video learner ([details](docs/step_7_word_types.md#noun-drop-fix-per-word-zero-init-temporal-weight--21-november-2026)).
-3. ~~**Two design calls before Step 9 (decided 21 Nov 2026):**~~ Step 8 skipped (revisit only if `V+G+B` lags at low data); heavy/light kept as a completed Step 7 proof of concept, so Step 9 curves cover nouns + actions.
-4. **Review the [Step 9 protocol](docs/step_9_acquisition_curves.md), then build and launch on Juno.**
 
 A weak intermediate result is a design signal for the build, not a standalone
 paper framing or an automatic instruction to launch more conditions.

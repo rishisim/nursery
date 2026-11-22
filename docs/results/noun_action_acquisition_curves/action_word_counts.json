@@ -1,0 +1,127 @@
+{
+  "63": {
+    "noun_vocab_count": 28,
+    "action_words": {
+      "pass": {
+        "utterances": 18,
+        "in_vocab": true
+      },
+      "lift": {
+        "utterances": 38,
+        "in_vocab": true
+      },
+      "inspect": {
+        "utterances": 9,
+        "in_vocab": true
+      },
+      "offhand": {
+        "utterances": 7,
+        "in_vocab": true
+      },
+      "drink": {
+        "utterances": 3,
+        "in_vocab": false
+      }
+    }
+  },
+  "158": {
+    "noun_vocab_count": 65,
+    "action_words": {
+      "pass": {
+        "utterances": 66,
+        "in_vocab": true
+      },
+      "lift": {
+        "utterances": 78,
+        "in_vocab": true
+      },
+      "inspect": {
+        "utterances": 24,
+        "in_vocab": true
+      },
+      "offhand": {
+        "utterances": 20,
+        "in_vocab": true
+      },
+      "drink": {
+        "utterances": 9,
+        "in_vocab": true
+      }
+    }
+  },
+  "315": {
+    "noun_vocab_count": 77,
+    "action_words": {
+      "pass": {
+        "utterances": 158,
+        "in_vocab": true
+      },
+      "lift": {
+        "utterances": 136,
+        "in_vocab": true
+      },
+      "inspect": {
+        "utterances": 65,
+        "in_vocab": true
+      },
+      "offhand": {
+        "utterances": 41,
+        "in_vocab": true
+      },
+      "drink": {
+        "utterances": 34,
+        "in_vocab": true
+      }
+    }
+  },
+  "473": {
+    "noun_vocab_count": 78,
+    "action_words": {
+      "pass": {
+        "utterances": 287,
+        "in_vocab": true
+      },
+      "lift": {
+        "utterances": 233,
+        "in_vocab": true
+      },
+      "inspect": {
+        "utterances": 121,
+        "in_vocab": true
+      },
+      "offhand": {
+        "utterances": 71,
+        "in_vocab": true
+      },
+      "drink": {
+        "utterances": 63,
+        "in_vocab": true
+      }
+    }
+  },
+  "630": {
+    "noun_vocab_count": 78,
+    "action_words": {
+      "pass": {
+        "utterances": 454,
+        "in_vocab": true
+      },
+      "lift": {
+        "utterances": 341,
+        "in_vocab": true
+      },
+      "inspect": {
+        "utterances": 168,
+        "in_vocab": true
+      },
+      "offhand": {
+        "utterances": 96,
+        "in_vocab": true
+      },
+      "drink": {
+        "utterances": 77,
+        "in_vocab": true
+      }
+    }
+  }
+}

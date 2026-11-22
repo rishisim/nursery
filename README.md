@@ -5,20 +5,36 @@ learning than video alone, as independent training experience increases.
 The simulator supplies egocentric video and body signals; caregiver speech
 provides intentionally uncertain language supervision.
 
-Start with [PLAN.md](PLAN.md). The current sequence is
+## Current milestone: noun and action acquisition curves
+
+Gaze and body each help a different kind of word (a double dissociation),
+measured on 85 models across 63–630 training clips, 5 seeds each, comparing
+video (V), video + gaze (V+G) and video + gaze + body (V+G+B):
+
+- **Gaze lifts nouns** by +9.5 to +20.0 points at every amount; body adds ≈ 0.
+- **Body lifts actions** by +6.4 to +9.5 points at every amount; gaze adds ≈ 0.
+  V+G+B at 315 clips roughly matches V at 630 (about 2× data efficiency).
+- **Shuffled body ≈ 0**, so the action gain comes from aligned body signals.
+- Video-only is still rising at 630 clips: no plateau yet.
+- Earlier proof of concept: on heavy/light, body added +46 points at 630 clips
+  ([Step 7](docs/step_7_word_types.md)).
+
+Protocol and results: [docs/step_9_acquisition_curves.md](docs/step_9_acquisition_curves.md).
+Archived per-run data and analysis script:
+[docs/results/noun_action_acquisition_curves/](docs/results/noun_action_acquisition_curves/).
+
+Start with [PLAN.md](PLAN.md). Study documents:
 [16×16 vision](docs/step_1_visual_baseline.md),
+[child gaze](docs/step_2_child_gaze.md),
 [richer body input](docs/step_3_body_representation.md),
 [a controlled representation comparison](docs/step_4_body_representation_comparison.md),
 [noun acquisition curves](docs/step_6_language_acquisition_curves.md),
-[property and action words](docs/step_7_word_types.md), and
-[the body training recipe](docs/step_8_body_training_recipe.md).
+[property and action words](docs/step_7_word_types.md),
+[the body training recipe](docs/step_8_body_training_recipe.md) (skipped), and
+[noun and action curves](docs/step_9_acquisition_curves.md).
 [Past experiments](archive/language_learning/past_experiments.md) explains what
 we tried earlier; the completed cross-situational and acquisition studies are
 indexed in the [archive](archive/README.md#completed-study-worktrees).
-Steps 7–8 are design references and do not imply their code is implemented.
-The matched Step 1 comparison is complete: at 630 clips, video accuracy rose
-from the recorded 60.12% with 4×4 tokens to 61.93% with 16×16 tokens across
-three paired seeds. See [the results and limits](docs/step_1_visual_baseline.md#completed-results--7-november-2026).
 
 ## File map
 
@@ -28,15 +44,24 @@ nursery/
   learner/
     video_only.py               Video → word matching (visual baseline)
     additive.py                 Video score + learned body → word score
+    interaction.py              Additive matching with zero-init visual–body interaction
     body.py                     Contact, fingers, arms, load/skin encoding
+    rich.py                     Step 3 rich body summaries, train-only statistics
     windows.py                  Clip-bounded body windows and episode context
+    gaze.py                     Gaze readouts over the visual word learner
+    gaze_data.py                Gaze windows aligned to visual windows
+    child_gaze.py               Step 2 preparation and timing gate
     losses.py                   Shared language and diagnostic loss functions
     train.py                    Shared data splits, training and checkpoints
     evaluate.py                 Shared picture-only and body-present scoring
+    acquisition.py              Paired acquisition runs, dev-only selection
+    acquisition_data.py         Frozen clip subsets and evaluation panels
+    acquisition_evaluate.py     Fixed word-query panels for curves
+    acquisition_report.py       Aggregate and plot the curve matrix
     embed.py                    Frozen DINOv2 feature extraction
     config.json                 Upstream pin, training defaults, evaluation paths
     hand_patches.json           Contact-patch definitions
-    __main__.py                 One CLI: embed / train
+    __main__.py                 One CLI: embed / train / acquisition
     __init__.py                 Pinned upstream loading
   speech/                       Caregiver utterances, timing, vocabulary and cues
   simulator/                    GRAB replay, body signals, assets and rendering
@@ -52,7 +77,11 @@ docs/
   step_4_body_representation_comparison.md  Step 4: current versus richer body, additive
   step_6_language_acquisition_curves.md Step 6: noun curves, video versus gaze and body
   step_7_word_types.md                  Step 7: property and action word tests
-  step_8_body_training_recipe.md        Step 8: decide wordless body pretraining
+  step_8_body_training_recipe.md        Step 8: wordless body pretraining (skipped)
+  step_9_acquisition_curves.md          Step 9: noun and action curves, V / V+G / V+G+B
+  results/noun_action_acquisition_curves/  Archived Step 9 results, analysis, word counts
+  literature/                   Literature notes
+  side_chat.md                  Side discussion notes
   learner.md                    Current implementation and scoring reference
   speech_coupling.md             Speech-generation evidence and assumptions
 archive/
