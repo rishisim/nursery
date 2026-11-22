@@ -1,0 +1,222 @@
+#!/usr/bin/env bash
+# Prepare the isolated public/synthetic Phase 3 environment on Juno.
+
+set -euo pipefail
+
+work_root="${1:-/work/dal503972/embodied_phase3}"
+if [[ "${work_root}" != /work/dal503972/embodied_phase3 ]]; then
+    echo "refusing unexpected work root: ${work_root}" >&2
+    exit 2
+fi
+
+umask 077
+mkdir -p \
+    "${work_root}/bin" \
+    "${work_root}/cache/huggingface" \
+    "${work_root}/cache/uv" \
+    "${work_root}/envs" \
+    "${work_root}/inputs" \
+    "${work_root}/logs" \
+    "${work_root}/models" \
+    "${work_root}/runs/appearance" \
+    "${work_root}/source"
+chmod 700 "${work_root}"
+
+uv_bin="${work_root}/bin/uv"
+if [[ ! -x "${uv_bin}" ]]; then
+    curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="${work_root}/bin" sh
+fi
+"${uv_bin}" --version
+
+export HF_HOME="${work_root}/cache/huggingface"
+export UV_CACHE_DIR="${work_root}/cache/uv"
+export UV_PYTHON_INSTALL_DIR="${work_root}/python"
+
+verify_checkout() {
+    local repository="$1"
+    local revision="$2"
+    local destination="$3"
+    if [[ ! -d "${destination}/.git" ]]; then
+        git clone --filter=blob:none "${repository}" "${destination}"
+    fi
+    git -C "${destination}" fetch --filter=blob:none origin "${revision}"
+    git -C "${destination}" checkout --detach "${revision}"
+    local actual_revision
+    actual_revision="$(git -C "${destination}" rev-parse HEAD)"
+    if [[ "${actual_revision}" != "${revision}" ]]; then
+        echo "revision mismatch for ${destination}: ${actual_revision}" >&2
+        exit 3
+    fi
+}
+
+verify_checkout \
+    https://github.com/NVIDIA/cosmos.git \
+    404b9bf2144640834c63ae7d9e7269e0f4ea02cb \
+    "${work_root}/source/cosmos"
+verify_checkout \
+    https://github.com/NVIDIA/cosmos-framework.git \
+    5e67049cd94acb667786f1e6dd0dab821cb90c97 \
+    "${work_root}/source/cosmos-framework"
+verify_checkout \
+    https://github.com/wuzy2115/oscar-public.git \
+    4dea2f657e221b0ff24c895fcc8ab4d46d5a9adb \
+    "${work_root}/source/oscar-public"
+
+cosmos_env="${work_root}/envs/cosmos"
+(
+    cd "${work_root}/source/cosmos-framework"
+    env LD_LIBRARY_PATH= UV_PROJECT_ENVIRONMENT="${cosmos_env}" \
+        "${uv_bin}" sync \
+        --python 3.13 \
+        --no-dev \
+        --group=cu128
+)
+env LD_LIBRARY_PATH= "${uv_bin}" pip install \
+    --python "${cosmos_env}/bin/python" \
+    'boto3==1.43.62' \
+    'fvcore==0.1.5.post20221221' \
+    'iopath==0.1.10' \
+    'multi-storage-client==0.44.0' \
+    'qwen-vl-utils==0.0.14'
+cosmos_site_packages="$(${cosmos_env}/bin/python - <<'PY'
+import site
+
+print(site.getsitepackages()[0])
+PY
+)"
+"${cosmos_env}/bin/python" - "${cosmos_site_packages}/av.libs" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+library_dir = Path(sys.argv[1])
+for library in sorted(library_dir.glob("*.so.*")):
+    match = re.fullmatch(
+        r"(?P<stem>lib(?:av|sw)[^-]+)-[^.]+\.so\.(?P<major>\d+).*",
+        library.name,
+    )
+    if match is None:
+        continue
+    alias = library_dir / f"{match.group('stem')}.so.{match.group('major')}"
+    alias.unlink(missing_ok=True)
+    alias.symlink_to(library.name)
+PY
+
+oscar_env="${work_root}/envs/oscar"
+if [[ ! -x "${oscar_env}/bin/python" ]]; then
+    env LD_LIBRARY_PATH= "${uv_bin}" venv --python 3.13 "${oscar_env}"
+fi
+env LD_LIBRARY_PATH= "${uv_bin}" pip install \
+    --python "${oscar_env}/bin/python" \
+    torch==2.10.0 torchvision==0.25.0 \
+    --index-url https://download.pytorch.org/whl/cu128
+env LD_LIBRARY_PATH= "${uv_bin}" pip install \
+    --python "${oscar_env}/bin/python" \
+    -r "${work_root}/source/oscar-public/requirements_minimal.txt" \
+    'pytest==9.0.2'
+env LD_LIBRARY_PATH= "${uv_bin}" pip install \
+    --python "${oscar_env}/bin/python" \
+    'transformer-engine==2.12.0+cu128.torch210' \
+    --find-links https://nvidia-cosmos.github.io/cosmos-dependencies/v1.5.0/transformer-engine
+oscar_site_packages="$(${oscar_env}/bin/python - <<'PY'
+import site
+
+print(site.getsitepackages()[0])
+PY
+)"
+cuda_runtime_alias="${oscar_site_packages}/nvidia/cuda_cudart"
+if [[ ! -e "${cuda_runtime_alias}" ]]; then
+    ln -s cuda_runtime "${cuda_runtime_alias}"
+fi
+cuda_runtime_library="${oscar_site_packages}/nvidia/cuda_runtime/lib/libcudart.so"
+if [[ ! -e "${cuda_runtime_library}" ]]; then
+    ln -s libcudart.so.12 "${cuda_runtime_library}"
+fi
+
+"${cosmos_env}/bin/python" - "${work_root}" <<'PY'
+import sys
+from pathlib import Path
+
+from huggingface_hub import hf_hub_download, snapshot_download
+
+root = Path(sys.argv[1])
+models = (
+    (
+        "nvidia/Cosmos3-Nano",
+        "411f42a8fdfb8c5b2583cb8786e0938f49796eaa",
+        root / "models/cosmos3_nano",
+    ),
+    (
+        "zywu2115/OSCAR-2B",
+        "c9781ffa7dd8556d862d7d9f338a2ea008a58ca6",
+        root / "models/oscar_2b",
+    ),
+    (
+        "nvidia/Cosmos-Reason1-7B",
+        "375e24000b24baed78f4618d3dd779e47cd96323",
+        root / "models/cosmos_reason1_7b",
+    ),
+)
+for repository, revision, destination in models:
+    snapshot_download(
+        repo_id=repository,
+        revision=revision,
+        local_dir=destination,
+    )
+snapshot_download(
+    repo_id="Qwen/Qwen3-VL-8B-Instruct",
+    revision="0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
+    allow_patterns=("*.json", "*.txt"),
+)
+snapshot_download(
+    repo_id="nvidia/Cosmos-Reason1-7B",
+    revision="3210bec0495fdc7a8d3dbb8d58da5711eab4b423",
+    allow_patterns=("*.json", "*.txt", "*.jinja", "*.model", "*.tiktoken"),
+)
+hf_hub_download(
+    repo_id="Wan-AI/Wan2.2-TI2V-5B",
+    revision="921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+    filename="Wan2.2_VAE.pth",
+)
+hf_hub_download(
+    repo_id="Wan-AI/Wan2.1-T2V-1.3B",
+    revision="37ec512624d61f7aa208f7ea8140a131f93afc9a",
+    filename="Wan2.1_VAE.pth",
+    local_dir=root / "models/wan2_1_vae",
+)
+PY
+
+"${cosmos_env}/bin/python" - "${work_root}" <<'PY'
+import json
+import platform
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+root = Path(sys.argv[1])
+receipt = {
+    "schema": "EmbodiedAppearanceJunoSetup.v1",
+    "completed_at_utc": datetime.now(timezone.utc).isoformat(),
+    "host": platform.node(),
+    "python": platform.python_version(),
+    "public_synthetic_only": True,
+    "source_revisions": {
+        "cosmos": "404b9bf2144640834c63ae7d9e7269e0f4ea02cb",
+        "cosmos_framework": "5e67049cd94acb667786f1e6dd0dab821cb90c97",
+        "oscar_public": "4dea2f657e221b0ff24c895fcc8ab4d46d5a9adb",
+    },
+    "model_revisions": {
+        "cosmos3_nano": "411f42a8fdfb8c5b2583cb8786e0938f49796eaa",
+        "oscar_2b": "c9781ffa7dd8556d862d7d9f338a2ea008a58ca6",
+        "cosmos_reason1_7b": "375e24000b24baed78f4618d3dd779e47cd96323",
+        "cosmos_reason1_7b_processor": "3210bec0495fdc7a8d3dbb8d58da5711eab4b423",
+        "qwen3_vl_tokenizer": "0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
+        "wan2_2_vae": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+        "wan2_1_vae": "37ec512624d61f7aa208f7ea8140a131f93afc9a",
+    },
+}
+path = root / "runs/appearance/setup_receipt.json"
+path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
+PY
+
+du -sh "${work_root}/envs" "${work_root}/models" "${work_root}/source"

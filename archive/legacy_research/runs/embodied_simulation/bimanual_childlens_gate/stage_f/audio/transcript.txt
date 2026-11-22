@@ -1,0 +1,6 @@
+4.200000	5.255833	There is the red toy.
+15.000000	15.771167	You picked it up.
+24.000000	25.247729	Both hands are turning it.
+33.000000	33.763958	It is in the bin.
+45.300000	46.300146	The blue cup moved.
+49.000000	50.296062	Now look toward the window.

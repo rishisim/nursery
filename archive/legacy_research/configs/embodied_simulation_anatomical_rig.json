@@ -1,0 +1,83 @@
+{
+  "schema": "embodied.anatomical_rig.v1",
+  "decision_question": "Can one deliberately authored Unity ArticulationBody arm/hand drive the weighted MPFB child skin through a registered unassisted grasp episode?",
+  "source": {
+    "asset_id": "mpfb_child_cc0",
+    "fbx_sha256": "b766981d9d3504cea220c0d72ad8aa56cbd80453e910fc76dc8c8814fbd980de",
+    "license": "CC0",
+    "scale": 1.9,
+    "measurement_record": "embodied.mpfb_rest_manifest.v1 from the preserved Unity 6000.0.80f1 import"
+  },
+  "authority": {
+    "physics": "Unity 6000.0.80f1 ArticulationBody/PhysX",
+    "appearance": "one weighted MPFB child SkinnedMeshRenderer following the physical state",
+    "independent_animation": false,
+    "object_attachment": false,
+    "object_pose_writes_after_initialization": false,
+    "assistance_ledger_expected_entries": 0
+  },
+  "clock": {"physics_hz": 240, "render_hz": 30, "steps_per_frame": 8},
+  "camera": {"profile_id": "child_head_neutral_fov68_v1", "vertical_fov_deg": 68, "near_clip_m": 0.03, "target_dependent_mount": false},
+  "target": {
+    "persistent_id": "red_rounded_target_001",
+    "semantic_id": 41,
+    "instance_id": 41001,
+    "geometry": "rounded_box",
+    "dimensions_m": [0.045, 0.055, 0.045],
+    "mass_kg": 0.035,
+    "static_friction": 1.0,
+    "dynamic_friction": 0.9,
+    "support_pose_m": [0.365, 0.6185, 0.285]
+  },
+  "landmarks_m": {
+    "shoulder": [0.121491954, 0.907749772, -0.001653603],
+    "elbow": [0.239353821, 0.775545478, -0.000803217],
+    "wrist": [0.337200135, 0.683848798, 0.136296764],
+    "thumb_1": [0.336546421, 0.678062856, 0.171813354],
+    "thumb_2": [0.320663214, 0.672410131, 0.189229101],
+    "thumb_3": [0.310691893, 0.662085414, 0.214591265],
+    "index_1": [0.359503835, 0.653733373, 0.213968530],
+    "index_2": [0.361861885, 0.642147601, 0.231038526],
+    "index_3": [0.361329228, 0.629466176, 0.244673654],
+    "middle_1": [0.372458071, 0.644273221, 0.199899971],
+    "middle_2": [0.378018558, 0.623999119, 0.217099980],
+    "middle_3": [0.380339175, 0.607102692, 0.231512651],
+    "ring_1": [0.378321677, 0.637537777, 0.186227158],
+    "ring_2": [0.386241972, 0.618374467, 0.198434532],
+    "ring_3": [0.389436871, 0.601791501, 0.209247336],
+    "little_1": [0.379701734, 0.629896283, 0.170878485],
+    "little_2": [0.384918988, 0.614983261, 0.177592218],
+    "little_3": [0.386101037, 0.603473902, 0.182564780]
+  },
+  "joints": [
+    {"id":"shoulder_flex","parent":"torso","child":"upper_arm","anchor":"shoulder","axis_parent":[0.745355992,0.666666667,-0.018633900],"limits_deg":[-75,85],"mass_kg":0.28,"damping":18,"stiffness":320,"force_limit":35},
+    {"id":"shoulder_abduct","parent":"shoulder_flex","child":"shoulder_roll","anchor":"shoulder","axis_parent":[0.666368,-0.745589,-0.012504],"limits_deg":[-55,95],"mass_kg":0.02,"damping":18,"stiffness":320,"force_limit":35},
+    {"id":"shoulder_rotate","parent":"shoulder_abduct","child":"upper_arm","anchor":"shoulder","axis_parent":[0.0118,0.0195,0.9997],"limits_deg":[-70,70],"mass_kg":0.02,"damping":14,"stiffness":260,"force_limit":28},
+    {"id":"elbow_flex","parent":"upper_arm","child":"forearm","anchor":"elbow","axis_parent":[-0.634, -0.567, 0.526],"limits_deg":[0,145],"mass_kg":0.18,"damping":14,"stiffness":260,"force_limit":28},
+    {"id":"forearm_pronate","parent":"forearm","child":"wrist_base","anchor":"wrist","axis_parent":[0.505,-0.474,0.721],"limits_deg":[-75,75],"mass_kg":0.03,"damping":9,"stiffness":150,"force_limit":12},
+    {"id":"wrist_flex","parent":"wrist_base","child":"wrist_deviate","anchor":"wrist","axis_parent":[0.684,0.729,0.000],"limits_deg":[-55,60],"mass_kg":0.05,"damping":8,"stiffness":140,"force_limit":10},
+    {"id":"wrist_deviate","parent":"wrist_flex","child":"palm","anchor":"wrist","axis_parent":[-0.526,0.493,0.693],"limits_deg":[-25,35],"mass_kg":0.09,"damping":8,"stiffness":140,"force_limit":10}
+  ],
+  "digits": {
+    "thumb":{"landmarks":["thumb_1","thumb_2","thumb_3"],"limits_deg":[[-35,45],[0,80],[0,75]],"collider_radii_m":[0.0085,0.0075,0.0065]},
+    "index":{"landmarks":["index_1","index_2","index_3"],"limits_deg":[[0,85],[0,100],[0,80]],"collider_radii_m":[0.0085,0.0075,0.0065]},
+    "middle":{"landmarks":["middle_1","middle_2","middle_3"],"limits_deg":[[0,85],[0,100],[0,80]],"collider_radii_m":[0.0085,0.0075,0.0065]},
+    "ring":{"landmarks":["ring_1","ring_2","ring_3"],"limits_deg":[[0,85],[0,100],[0,80]],"collider_radii_m":[0.0085,0.0075,0.0065]},
+    "little":{"landmarks":["little_1","little_2","little_3"],"limits_deg":[[0,85],[0,100],[0,80]],"collider_radii_m":[0.0085,0.0075,0.0065]}
+  },
+  "frozen_tolerances": {
+    "coordinate_roundtrip_max_m": 1e-6,
+    "collider_skin_max_m": 0.0075,
+    "jacobian_column_relative_magnitude_max": 0.03,
+    "jacobian_column_direction_max_deg": 2.0,
+    "palm_position_max_m": 0.010,
+    "palm_orientation_max_deg": 7.0,
+    "fingertip_prediction_max_m": 0.006,
+    "finger_object_penetration_max_m": 0.003,
+    "support_penetration_max_m": 0.002,
+    "minimum_opposition_s": 0.25,
+    "minimum_lift_m": 0.08,
+    "minimum_rotation_deg": 20,
+    "rerender_min_psnr_db": 60
+  }
+}

@@ -1,0 +1,132 @@
+# Bodily inputs for language acquisition: evidence and next decision
+
+> Historical review from 26 October 2026. Its decisions and proposed next steps
+> are preserved as written, not an active queue. Later experiments are explained
+> in [Past experiments](past_experiments.md); active work follows [PLAN.md](../../PLAN.md).
+
+Updated 26 October 2026. Research synthesis, historical experiment review, and a new read-only dataset audit. No learner, generator, simulator, protocol, or training run was changed. This replaces stale descriptions in this canonical review; Git retains the earlier review.
+
+Historical intent clarified during the documentation archive: weak/delayed naming
+was deliberate, and clip-boundary resets were intended to prevent artificial
+transitions. The concern below is their interaction, not weak alignment itself.
+See [the checked Codex/Claude history](design_intent.md).
+Any proposed repair must preserve that scientific distinction and matched exposure.
+
+**Decision:** repair a measured speech–interaction boundary mismatch first. Preserve the working visual learner. The most defensible subsequent noun-learning hypothesis is to learn reusable object representations from coherent sensory episodes before asking sparse speech to name them. This is a hypothesis to test, not an established solution. A physically grounded property-word component is a useful separate positive control; it does not replace the noun-learning goal.
+
+## What is actually failing
+
+The active linear model already has an information-bearing body pathway: contact, finger configuration, and arm features pass through group MLPs and a bidirectional GRU. A body–word similarity is added to the image–word similarity. The physical condition adds modeled load and skin channels. The older scalar hand-location gate is historical. The failed joint Transformer is another tested architecture, not the current recommended baseline.
+
+The evidence supports three different problems:
+
+1. **Data association:** some utterances assigned to the held channel refer to contact in a different, hard-cut source clip. Independent utterance sampling also lacks sustained conversational topics, although its marginal probabilities were literature-informed.
+2. **Generalization:** body representations fit training clips much better than new clips, including new clips from familiar subjects. This supports overfitting; the exact nuisance variables memorized have not all been identified.
+3. **Fusion and supervision:** an uncertain body–word vote can overturn a correct visual decision. A supervised sensor probe can succeed while sparse, ambiguous language fails to teach the relevant mapping. More sensors and an additional word loss have already failed to solve that problem.
+
+There is no evidence here that video is universally unusable, that gradients never reach the body, or that multimodality cannot help nouns. The correct-label experiment showed considerable headroom with the same frozen visual features. Frozen DINO features still feed a trainable visual projection and trainable word embeddings.
+
+The renderer recomputes geometric contact against the rendered mesh, but finger trajectories are replayed rather than adapting to each swapped shape. Modeled load and thermal traces add information without changing the recorded motion. This limits physical coherence; it does not establish that every swapped grasp or rendered video is invalid.
+
+Source: [PLAN](../../PLAN.md), [body encoder](../../nursery/learner/body.py), [historical model](https://github.com/rishisim/nursery/blob/20f1cc03/nursery/learner/model.py), [training](../../nursery/learner/train.py), [speech generator](../../nursery/speech/transcripts.py).
+
+## Previous experiments change the decision
+
+These are different protocols and evaluation sets. Compare arms within each row; do not compare their absolute accuracies across rows. Most recent language comparisons use one seed, so their intervals do not capture full training-seed variability. Historical uncertainty intervals are reproduced as reported, not upgraded to independent confirmations.
+
+| Completed work | What the record shows | Consequence for the next step |
+|---|---|---|
+| Legacy contact-weighting grid, 90 runs | Main held-share 0.6 contrast: +2.27 points, 95% interval −9.34 to +13.89; preregistered verdict inconclusive. Higher held-share 0.9 helped some contrasts. | Do not repeat a large cue-weight sweep or increase naming contingency simply to obtain a positive result. |
+| Legacy hand-location gate | Hand projection was useful geometrically, but the learned gate collapsed. The early design also deliberately coarsened/noised category-predictive body features under an overly broad leakage rule. | Preserve legitimate sensory category information. Another hand-attention scalar is not a new representation-learning test. |
+| 4.1 real body plus prediction | Picture-only rendered/Konkle: control 76.4/69.1, body 75.4/69.7; s8 body-only 25.5, chance 25. | This particular prediction/fusion setup did not help. It does not reject all sensory self-supervision. |
+| 4.2 held-identity oracle | Held-trial body accuracy 94.3; combined 76.6 versus picture 61.7 under that scoring setup. | The pipeline can exploit a very informative input. Real sensors are much weaker than this privileged oracle. |
+| 4.3–4.4 distillation and supervision | Oracle distillation did not improve pictures. Direct correct labels reached 90.0 rendered / 84.3 Konkle versus 76.4/69.1. Removing prediction and changing scoring did not rescue real body. | Do not blame exhausted visual features or immediately add another distillation loss. Better supervision can change the mapping substantially. |
+| 4.5 contact audit | Contact existed and was geometrically meaningful. Broad grasp-sharing explained only a small fraction of held frames. Body category information existed, but was far below a source-grasp lookup. | Neither “contact is empty” nor “all words share grasps” explains the null. Motion-to-word shortcuts and limited independent variation remain concerns. |
+| 4.6–4.7 extra body-language loss | Body-only training accuracy rose from 57.1 to 74.6, while s8 remained 26.2 to 27.9. Combined s8 performance worsened. | An extra body-to-word objective mostly strengthened fit to training data. Do not repeat it as the missing ingredient. |
+| 4.8 source-clip split | New clips from familiar people: video 48.3, real body 45.6; s8 43.7 versus 40.6. Dev never showed a substantial early advantage. | The problem is not only unfamiliar subjects or an early benefit erased by excess training. Subject normalization and checkpoint tuning have weak priority. |
+| 4.9 joint Transformer | Joint video 36.9, joint body 36.0 on familiar-subject new clips, versus 48.3 for the previous linear video learner. Representation shrank from 512 to 128 and region interactions changed. | Preserve visual competence and dimension. This does not prove joint processing is intrinsically wrong; several changes were bundled. |
+| 4.10 supervised beyond-video probe | 50-way balanced accuracy: V 56.6, V+B 57.6; gain +1.0 [−2.5,+6.1]. s8 gain −5.1. Hidden/tiny subset gain did not transfer to s8. | Current sensors have not shown robust incremental category information in this probe. This is not a universal impossibility theorem for representation assistance. |
+| 4.11–4.12 load and thermal probes | Per-clip load gave +2.7 points on familiar-subject clips and +6.6 on s8. Load plus revised skin channels gave +5.8/+10.8. Skin channels also include contact area. | There is a stronger modeled signal to investigate. Do not claim a unique temperature benefit or convert a 50-way probe gain into an expected four-choice language gain. |
+| 4.13 physical signals in language | Video 48.3 versus full body plus load/skin 42.4 on familiar-subject clips; s8 43.7 versus 40.9. | Adding channels alone did not teach the learner to use them. Load/skin without legacy features remains untested, but would be a diagnostic, not a demonstrated solution. |
+
+Sources: [archived protocols 4.1–4.13](experiments.md); local historical records [cue grid](../../outputs/legacy/cue_experiment/report.md), [gate design and implementation record](../../outputs/legacy/step3/body_input_design.md), [joint-learner reassessment](../../outputs/exports/joint-learner-results-explanation.md), and [earlier physical-interaction recommendation](../../outputs/literature/body_adapter_recommendation.md). Files under `outputs/` are local ignored evidence and are not distributed with this document on GitHub. The older cue experiment had a documented staging/render repair; invalidated artifacts must not be pooled with the current clean dataset.
+
+**Proposed is not tested.** Saved body-run `outputs/runs/clean_body/*/metrics.json` records have episode construction set to `none` and mask, consistency, and episode weights zero. Earlier reviews suggested sensory pretraining and episode objectives, but those suggestions were not evaluated in these canonical runs. The failed vision-to-body auxiliary loss is a different intervention. A temporal GRU alone is also not sensory pretraining.
+
+Two earlier recommendations remain binding design lessons: retain the working 512-dimensional visual/word representation, and keep the shared visual projection and language parameters trainable. A permanently frozen visual-language model with a removable adapter cannot improve its unchanged picture-only pathway.
+
+## New dataset finding: hard cuts contaminate held-channel speech
+
+The generator's `session_scene` collects held categories over ±5 seconds of the concatenated session without respecting source-clip boundaries. `channel_candidates` can therefore choose a held referent from a different source clip. Separately, timestamp jitter can cross a hard cut. The body encoder correctly resets recurrence at each source-clip boundary, so it cannot access that neighboring interaction. The image-window filter drops partition crossings, but permits hard cuts between clips in the same partition.
+
+A read-only audit reproduced the canonical vocabulary filtering and clip partition. Its 18,716 retained training pairs, 472 familiar-subject test trials, and 705 s8 trials match the recorded protocol.
+
+| Measured condition | Count | Denominator and interpretation |
+|---|---:|---|
+| Held-channel naming events whose supporting contact occurs only in a neighboring clip | 390 / 1,593 = **24.5%** | Retained training events that are both named and assigned to the held channel. This is **8.2% of named training events**, not 24.5% of all training data. |
+| Held-channel names unavailable anywhere in the aligned, clip-internal ±5-second body window | 397 / 1,593 = 24.9% | Measures what the current body encoder can observe. |
+| Timestamp jitter crosses a source-clip boundary | 1,062 / 18,716 = 5.7% | All retained training pairs. |
+| Source-time held flag differs from held status at the aligned frame | 209 / 1,593 = 13.1% | Held-channel named training events. This is a metadata-definition mismatch; intentional jitter alone is not automatically a scoring bug. |
+
+Example, retained training session `s1_0002`: at source/aligned frame 102 the utterance is “can you show me your juice?” and the generator labels its channel `held`. The current clip is `s1/banana_offhand_1.npz`, with banana held at frames 101–107. Juice was held at frame 97 in the preceding `s1/cubemedium_pass_1.npz`; the cut occurs at frame 100. Another checked event anticipates juice contact in the next clip. These are verified construction mismatches, not fabricated examples. The utterance could still mention another visible object; the problem is its claimed connection to the held sensory episode.
+
+This audit does **not** establish how much of the accuracy loss the mismatch causes. Nonheld and unseen naming are legitimate parts of weak alignment and must not all be removed. The appropriate intervention isolates discontinuous clip association while preserving ambiguity inside valid episodes, and gives both comparison arms exactly the same revised speech.
+
+The dataset contains 102,720 frames but only 1,063 unique source clips. Across 50 held categories, unique clips range from 3 to 63, median 21; spoon has 3, bulb 4, pen 6. Replayed frames do not supply equivalent independent motor experience. Clip count is not unique object-instance count: the frame manifest does not expose an explicit asset-instance column, and the earlier physical audit found only 126 held-object instances. Per-clip property resampling creates fresh property assignments, not new meshes, trajectories, or people.
+
+Reproducibility: local [audit script](../../outputs/research/body_debate/audit_alignment.py) and [aggregate JSON](../../outputs/research/body_debate/alignment_audit.json). Run from the repository root with `PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python outputs/research/body_debate/audit_alignment.py`. It reads saved manifests and the canonical partition functions; it does not regenerate data or train a model.
+
+## Why the body vote can make predictions worse
+
+At the selected plain-body checkpoint, adding its body score fixes 39 but breaks 48 of the 472 test decisions. Within that same model, held-trial accuracy increases from 90/145 to 95/145, while nonheld accuracy falls from 134/327 to 120/327. With the physical channels, the body score fixes 46 and breaks 72 decisions. These within-checkpoint comparisons isolate the immediate scoring contribution; the separate video-only baseline comparison also includes differences learned during training and checkpoint selection.
+
+This fits a plausible mechanism: body often describes what is being handled, while speech can concern something else; a global additive vote can contribute the wrong semantic evidence. Sparse independent utterances and limited clip diversity make memorization easier than learning when that evidence is relevant. The observed train/test gap supports the generalization part. The boundary audit supplies one concrete association defect. Their relative causal contributions remain unmeasured.
+
+A perfect held/nonheld routing rule on the saved plain-body predictions would yield (95+134)/472 = 48.5%, barely above the separate video baseline's 48.3%. Thus routing those existing scores alone offers little gain. This is not an upper bound on jointly relearned representations, and held metadata is not an available oracle to feed to the learner.
+
+## What the literature adds
+
+Targeted search through alphaXiv and primary papers, checked through 26 October 2026. This is not an exhaustive systematic review. Recent preprints are provisional; robotics, supervised probes, and annotation-based semantic proxies are not treated as demonstrations of infant-like weak noun acquisition.
+
+| Primary source | Relevant finding and transfer limit |
+|---|---|
+| [EgoBabyVLM, 2026](https://arxiv.org/abs/2605.19130) | Weak semantic alignment in natural child experience is a substantial learning difficulty. Architecture success on curated vision-language pairs does not establish success here. |
+| [Scaling cross-situational word learning on children's naturalistic experiences, October 2026 preprint](https://arxiv.org/abs/2610.31842) | An aligned subset substantially outperformed the full weakly aligned corpus on the reported vocabulary test, despite far fewer pairs. A broader temporal MIL window gave limited benefit. Alignment filtering used a pretrained semantic model, so copying it would import supervision. The usable lesson is to inspect how training events are constructed, not simply increase the window. |
+| [Karmazyn-Raz & Smith, Discourse with Few Words](https://pmc.ncbi.nlm.nih.gov/articles/PMC10513098/) | Naming is nested within sustained object activity, with repetitions and returns. Matching marginal held/seen probabilities does not reproduce this sequential organization. Nursery already drew on this literature; the missing feature is its temporal structure in the generator. |
+| [Schroer & Yu, Looking is not enough, 2023](https://www.la.utexas.edu/users/dil/papers/2023_Schroer_DevSci.pdf) | Coordinated looking and holding predicted learning better than looking alone. This observational evidence does not isolate touch from attention or the visual views created by manipulation. Both experimental arms should receive the same action-shaped video. |
+| [Seidl, Indarjit & Borovsky, Touch to learn, 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC10704002/) | Brief object exploration before naming suggests touch can prepare representations rather than simply identify the referent at the naming instant. Evidence is limited: the relevant experiment had 30 participants, a nonsignificant paired condition test, and a significant mixed-model condition effect. It motivates a mechanism, not a robust effect-size prediction. |
+| [Zambelli et al., Learning rich touch representations through cross-modal self-supervision, CoRL 2020](https://proceedings.mlr.press/v155/zambelli21a/zambelli21a.pdf) | Temporal force and joint observations support sensory representation learning before downstream object recognition. Their 30 Hz physically simulated exploration is richer than Nursery's 1 Hz geometric contact. This supports sensory pretraining as a candidate, not a proven noun-learning recipe. |
+| [Touch and Go, NeurIPS 2022](https://arxiv.org/abs/2211.12498) | Paired real visual/tactile experience supports transferable sensory features and physical-property tasks. Pairing touch with an observed surface is different from assuming a simultaneous utterance names it. |
+| [Thomason et al., I Spy, IJCAI 2016](https://www.cs.utexas.edu/~jsinapov/papers/thomason_ijcai16.pdf) | Multimodal exploratory experience improved grounded predicates on held-out objects. Human descriptions and feedback provide stronger supervision, and sensory experience remains accessible at inference. This supports property-grounding and body-present evaluation, not guaranteed picture-only transfer. |
+| [TVL, ICML 2024](https://arxiv.org/abs/2402.13232) | Approximately 44K touch/vision pairs use human and GPT-4V descriptions plus pretrained visual/language structure. It is useful engineering evidence but does not isolate acquisition from raw sensory streams and ambiguous caregiver speech. |
+| [Making Sense of Touch from the Child’s View, June 2026 preprint](https://arxiv.org/abs/2606.31943) | Its touch codes originate in descriptions containing nouns, actions, body parts, and context, embedded with CLIP text and clustered. Renaming clusters as IDs does not remove the semantic annotation. Reported vocabulary probe improvements are not proof that raw contact/fingers/arms solve Nursery's problem. |
+| [FactorCL, NeurIPS 2023](https://arxiv.org/abs/2306.05268) | Task-relevant information can be shared or modality-specific. Making the entire body embedding imitate vision can discard unique information. Preserve a body-specific route; whether such loss caused Nursery's failures remains untested. |
+| [What Makes Training Multi-Modal Classification Networks Hard?, CVPR 2020](https://openaccess.thecvf.com/content_CVPR_2020/papers/Wang_What_Makes_Training_Multi-Modal_Classification_Networks_Hard_CVPR_2020_paper.pdf) | Modalities can overfit at different rates, and multimodal training can underperform a single modality. This makes Nursery's regression plausible without a disconnected gradient path. It does not identify the remedy for this dataset. |
+
+The central inference is that a body stream can help **form an object representation across interaction**, after which speech names that representation. Asking a weak body encoder to produce a second noun vote at each utterance is a narrower mechanism. A grasp sequence can potentially bind views, contact transitions, and posture changes to one persistent object even when a name arrives later. This mechanism must be tested against a video learner with the same temporal history; otherwise temporal context is confounded with added senses.
+
+There are three distinct routes to benefit: extra physical information at inference; extra training signals that improve shared representations; and actions that improve the video itself. The present matched video comparison already controls for the third. The first two remain valid objectives. Even partly redundant signals can help finite-data learning; only a genuine information limit rules out recovery of a hidden, independently varying physical property from a new picture alone.
+
+## Recommended next decision, without repeating old work
+
+**First, a bounded data repair.** Change the canonical speech/window construction to respect source episodes; audit timestamp jitter and explicitly distinguish source-time, aligned-time, and window-held metadata. Keep within-episode reference ambiguity. Recheck retained coverage and splits. Compare video and body on identical corrected exposure using the existing linear learner and existing selection rules. This tests the measured data defect without simultaneously changing the architecture. Candidate affected files are `nursery/speech/transcripts.py`, the relevant alignment handling in `nursery/learner/train.py`/evaluation, focused speech/window tests, and a preregistered update to `PLAN.md`. Exact changes require implementation inspection; none are made by this review.
+
+**Then, one new learning mechanism.** Preserve the 512-dimensional visual projection and word embeddings. Use coherent, physically valid interaction episodes to learn sensory structure before weak word mapping. Give the matched visual control the same episode history and optimization budget. Keep body-specific content usable, and keep the shared visual/language parameters trainable. A small conditional residual connection starting at zero is a defensible way to preserve visual competence; it is not a literature-proven optimum. Compare sensory pretraining with its absence separately from the data repair. Do not bundle a larger Transformer, several auxiliary losses, and a new vocabulary into the same causal comparison.
+
+This proposal differs from the old hand gate only if it learns temporal object features from actual sensory content. Merely using contact to reweight utterances or select a hand crop repeats the old mechanism. Simulator object IDs and true correspondence may define evaluation and oracle diagnostics; they must not silently become ordinary learner inputs. Prediction success must beat persistence/mean baselines and generalize beyond source clips before it is described as useful sensory learning.
+
+**Keep a physical positive control explicit.** A small lift–hold–lower component with force/effort and proprioception, masses varied within noun/appearance groups, and identical property-word speech in both arms can test whether physical evidence supports language. Existing mass/material tables are modeled priors, not intrinsically invalid leakage, but mass currently does not feed back into the replayed motion. A realistic dynamic component would be a simulator/data/vocabulary scope expansion requiring a concrete proposal. Start with load rather than adding compliant-object physics by default. New property assignments alone do not establish new-instance generalization. Report property comprehension separately from nouns and body-present performance separately from picture-only transfer.
+
+A failed property positive control would still require checking whether the sensors contain learnable signal, the supervision is usable, and optimization succeeds. It would not uniquely diagnose fusion. Conversely, passing it would establish a useful pathway, not guarantee broad noun gains.
+
+**Evaluation commitments:** matched speech/video and pretrained components; partition-preserving whole-episode body shuffles; independent object/motion-family confirmation; held/nonheld breakdowns; paired seeds and uncertainty respecting source-episode dependence. New seeds do not create new independent examples. Repeatedly consulted test sets become exploratory. Report sample-efficiency and eventual learning-curve differences separately; a fixed-data optimization plateau is not proof of a fundamental language ceiling. Do not infer the causal effect of handling by comparing count-matched held and merely visible episodes, because geometry, visibility, motion, and naming selection also differ.
+
+## Claude debate and remaining uncertainty
+
+Two successful terminal critique turns were used, with tools disabled and no additional research delegated to Claude, to conserve the user's Pro usage. The second prompt challenged the first response using local evidence and primary-paper limitations. Local prompts and responses are retained in `outputs/research/body_debate/round1*` and `round2*`.
+
+We converged on preserving body as an information-bearing input, improving coherent experience, retaining the matched video comparison, separating fusion from transfer, and not changing data and architecture together. Claude retracted claims that the current scores impose a universal upper bound, that holding benefits must be visual, and that supervised 50-way gains can be converted into four-choice language gains.
+
+We did not reach identical priorities. Claude favored a property positive control before another noun experiment. I favored a bounded noun-preserving sensory-representation test on valid interactions, while retaining the property control as a separate build decision. The newly quantified boundary mismatch was established after the debate and was not reviewed by Claude; it gives the concrete immediate priority above. Neither model's agreement establishes scientific validity, and no method has yet demonstrated the required language improvement.
+
+Validation for this review: source/config/result inspection, reproduction of canonical audit sample counts, manual checking of two boundary examples, and consistency checks on the curated tables. Raw research extracts, debate records, and the reproducible read-only audit remain in the ignored `outputs/research/body_debate/` root. Implementation and new training are deferred; the research result is a specific diagnosis and a constrained next decision.

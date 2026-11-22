@@ -1,0 +1,56 @@
+{
+  "schema": "embodied.bimanual_child_episode.v1",
+  "scientific_scope": "public_synthetic_engineering_and_visual_feasibility_only",
+  "prompt": "You are playing at a low table in a warm family playroom. Look around for the red toy near the picture book. Reach for it with your right hand and touch it. Pick it up, bring your left hand over to help, turn it slowly while looking closely, stabilize it with both hands, and place it into the shallow bin. Then reach toward the blue cup, touch and move it gently, withdraw both hands, and look toward the window while an adult comments on what happened.",
+  "seed": 20260803,
+  "activity": {
+    "duration_s": 56.0,
+    "continuous_trace_required": true,
+    "hidden_world_resets_permitted": false,
+    "phases": [
+      {"id":"scan_reorient","start_s":0,"end_s":6},
+      {"id":"right_reach_capture","start_s":6,"end_s":14},
+      {"id":"lift_left_assist","start_s":14,"end_s":23},
+      {"id":"bimanual_inspect_turn","start_s":23,"end_s":31},
+      {"id":"lower_open_free_release","start_s":31,"end_s":39},
+      {"id":"blue_cup_touch_push","start_s":39,"end_s":48},
+      {"id":"final_withdrawal_window_gaze","start_s":48,"end_s":56}
+    ]
+  },
+  "authority": {
+    "physics": "Unity 6000.0.80f1 PhysX",
+    "renderer": "Unity built-in baseline",
+    "physics_hz": 240,
+    "render_hz": 30,
+    "steps_per_frame": 8,
+    "controller": "kinematic body/palms/contact-aware digits with free non-kinematic objects",
+    "object_pose_writes_after_initialization": false,
+    "attachments_joints_external_forces": false
+  },
+  "language": {
+    "source": "repository-authored synthetic English from actual event times",
+    "developmental_status": "synthetic; not age-matched, human-validated, ChildLens-calibrated, or voice-cloned",
+    "utterances": [
+      {"id":"u01","text":"There is the red toy.","start_s":4.2,"event":"red_fixation","must_end_by_s":6.0},
+      {"id":"u02","text":"You picked it up.","start_s":15.0,"event":"physical_lift","must_end_by_s":18.0},
+      {"id":"u03","text":"Both hands are turning it.","start_s":24.0,"event":"bimanual_turn","must_end_by_s":27.5},
+      {"id":"u04","text":"It is in the bin.","start_s":33.0,"event":"free_release","must_end_by_s":36.0},
+      {"id":"u05","text":"The blue cup moved.","start_s":45.3,"event":"blue_cup_motion","must_end_by_s":48.0},
+      {"id":"u06","text":"Now look toward the window.","start_s":49.0,"event":"final_attention_shift","must_end_by_s":53.0}
+    ],
+    "speech": {
+      "engine": "macOS say",
+      "voice": "Samantha",
+      "locale": "en_US",
+      "rate_words_per_minute": 185,
+      "sample_rate_hz": 48000,
+      "channels": 1,
+      "sample_format": "pcm_s16le",
+      "say_executable_sha256": "e439493ea79bdf79c12ae3b3294e2c46cc494d5a45a41d6d483904f84672eb20",
+      "ffmpeg_executable_sha256": "0a96da2735695308d964e25fa6f4a0db2e9d24031390360f4c5ff96a4f8938e5",
+      "neural_render_audio_permitted": false
+    }
+  },
+  "privacy": {"public_synthetic_inputs_only":true,"restricted_childlens_access_permitted":false},
+  "claims_forbidden": ["infant-trained","age-matched","ChildLens-calibrated","human-validated","biologically torque-valid"]
+}

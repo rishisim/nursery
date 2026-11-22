@@ -2,34 +2,46 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+/MUJOCO_LOG.TXT
+
 .venv/
-.venv-aria/
+.venv-*/
 .external/
+
+# Use outputs/ for new generated files and runs; use system temp for scratch.
+# Retain legacy ignore rules. Ignored assets and saved runs are not disposable.
+artifacts/
+cache/
+checkpoints/
 data/
-
-# Local scratch space and rendered working copies.
+downloads/
+logs/
+media/
+models/
+output/
+outputs/
+rendered/
 tmp/
-babyworld-lite/
 
-# Access-request forms can contain personal or institutional details.
-output/pdf/*.pdf
+# Embodied experiment and recovery runs are disposable/generated. Existing
+# historical files already tracked under this root remain versioned by Git.
+runs/embodied_simulation/
+runs/**/Library/
+runs/**/Logs/
+runs/**/UserSettings/
+runs/**/Temp/
+runs/**/obj/
+runs/**/*.log
+runs/**/speech_segments/
+runs/**/stage_d/render/head_frames/
+runs/**/stage_d/render/external_frames/
+runs/**/qualification/frames/
 
-# Keep compact research decisions, manifests, audits, and receipts in Git, but
-# exclude heavyweight reproducible experiment material and copied source trees.
-output/synthetic_*/**/raw/
-output/synthetic_*/**/persisted_inputs/
-output/synthetic_*/**/*persisted_inputs*/
-output/synthetic_*/**/frozen_source_snapshot/
-output/synthetic_*/**/fixture*/
-output/synthetic_*/**/qualification_run/
-output/synthetic_*/**/negative_recompute_cases/
-output/synthetic_*/**/excluded_rehearsal/
-output/synthetic_*/**/independent_recompute/
-output/synthetic_*/**/recomputable/
-output/synthetic_*/**/isolated_reproduction/
-output/synthetic_*/**/preservation/
-output/synthetic_*/**/construction_qualification/
-output/synthetic_*/**/*_jobs_*/
-output/synthetic_*/**/*.stdout
-output/synthetic_*/**/*.stderr
-output/synthetic_confirmation_adversarial_audit_v1/preservation_proof.json
+# Local environment and editor state.
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/

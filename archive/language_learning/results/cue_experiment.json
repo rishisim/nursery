@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "primary_metric": "test-probe 4AFC accuracy at dev-selected epoch, percent",
+  "code_commit": "f3b2ca8826097fd786ea631f9759fbcd5efbae4f",
+  "gates": {
+    "G1": {
+      "G1": "pass",
+      "tables": {
+        "train": {
+          "frames": 90240,
+          "coverage": 1.0
+        },
+        "probes": {
+          "frames": 816,
+          "coverage": 1.0
+        }
+      },
+      "seconds": 59.7486880319193
+    },
+    "G2": {
+      "frames": 90240,
+      "sessions": 752,
+      "probes": 816,
+      "train_seconds": 90240,
+      "held_visible_fraction": 0.9381920794006033,
+      "mean_visible_categories": 4.418572695035461,
+      "realized_distractor_counts": {
+        "0": 0,
+        "1": 0,
+        "2": 17,
+        "3": 3126,
+        "4": 3120,
+        "5": 2963
+      },
+      "labelled_contact_median_m": 0.0026025909580713294,
+      "labelled_contact_p90_m": 0.006458814933925384
+    },
+    "G3_early": "pass",
+    "G3": "pass"
+  },
+  "frozen_parameters": {
+    "p_ref": 0.05,
+    "q_held_calibration": 0.6,
+    "p_name": 0.5,
+    "sigma": 1.0,
+    "rate_hz": 0.3333333333333333
+  },
+  "cells": [
+    {
+      "q_held": 0.3,
+      "condition": "none",
+      "mean": 42.982000000000006,
+      "sd": 2.8730941509111743,
+      "n": 5
+    },
+    {
+      "q_held": 0.3,
+      "condition": "contact",
+      "mean": 42.726,
+      "sd": 5.815009028367884,
+      "n": 5
+    },
+    {
+      "q_held": 0.3,
+      "condition": "shuffled",
+      "mean": 40.178,
+      "sd": 2.2559410453289783,
+      "n": 5
+    },
+    {
+      "q_held": 0.3,
+      "condition": "shifted",
+      "mean": 38.647999999999996,
+      "sd": 3.351480269970271,
+      "n": 5
+    },
+    {
+      "q_held": 0.3,
+      "condition": "oracle",
+      "mean": 50.976,
+      "sd": 2.1977556734086696,
+      "n": 5
+    },
+    {
+      "q_held": 0.6,
+      "condition": "none",
+      "mean": 43.418,
+      "sd": 4.924578154522475,
+      "n": 5
+    },
+    {
+      "q_held": 0.6,
+      "condition": "contact",
+      "mean": 45.692,
+      "sd": 6.825582026464849,
+      "n": 5
+    },
+    {
+      "q_held": 0.6,
+      "condition": "shuffled",
+      "mean": 39.160000000000004,
+      "sd": 4.533966254836928,
+      "n": 5
+    },
+    {
+      "q_held": 0.6,
+      "condition": "shifted",
+      "mean": 41.134,
+      "sd": 3.85971242452077,
+      "n": 5
+    },
+    {
+      "q_held": 0.6,
+      "condition": "oracle",
+      "mean": 50.932,
+      "sd": 0.9790914155481071,
+      "n": 5
+    },
+    {
+      "q_held": 0.6,
+      "condition": "noisy_0.1",
+      "mean": 46.67,
+      "sd": 2.1457632674645173,
+      "n": 5
+    },
+    {
+      "q_held": 0.6,
+      "condition": "noisy_0.25",
+      "mean": 44.129999999999995,
+      "sd": 4.199517829465664,
+      "n": 5
+    },
+    {
+      "q_held": 0.6,
+      "condition": "noisy_0.5",
+      "mean": 41.072,
+      "sd": 3.4054617895375086,
+      "n": 5
+    },
+    {
+      "q_held": 0.9,
+      "condition": "none",
+      "mean": 45.483999999999995,
+      "sd": 3.595779470434749,
+      "n": 5
+    },
+    {
+      "q_held": 0.9,
+      "condition": "contact",
+      "mean": 49.85799999999999,
+      "sd": 3.4118426106724207,
+      "n": 5
+    },
+    {
+      "q_held": 0.9,
+      "condition": "shuffled",
+      "mean": 44.532000000000004,
+      "sd": 2.226683632669894,
+      "n": 5
+    },
+    {
+      "q_held": 0.9,
+      "condition": "shifted",
+      "mean": 46.19,
+      "sd": 3.1166889482269493,
+      "n": 5
+    },
+    {
+      "q_held": 0.9,
+      "condition": "oracle",
+      "mean": 54.391999999999996,
+      "sd": 7.0133244613378585,
+      "n": 5
+    }
+  ],
+  "primary_contrasts": [
+    {
+      "q_held": 0.3,
+      "contrast": "contact - none",
+      "mean_difference_pp": -0.2559999999999974,
+      "sd_difference_pp": 7.967165744479024,
+      "ci95_pp": [
+        -10.14854287264189,
+        9.636542872641897
+      ],
+      "interval_width_pp": 19.785085745283787,
+      "n": 5
+    },
+    {
+      "q_held": 0.3,
+      "contrast": "contact - shuffled",
+      "mean_difference_pp": 2.5480000000000005,
+      "sd_difference_pp": 5.581000806307056,
+      "ci95_pp": [
+        -4.38172777513765,
+        9.477727775137652
+      ],
+      "interval_width_pp": 13.859455550275301,
+      "n": 5
+    },
+    {
+      "q_held": 0.3,
+      "contrast": "contact - shifted",
+      "mean_difference_pp": 4.078,
+      "sd_difference_pp": 7.750746415668623,
+      "ci95_pp": [
+        -5.545822783542596,
+        13.701822783542596
+      ],
+      "interval_width_pp": 19.247645567085193,
+      "n": 5
+    },
+    {
+      "q_held": 0.6,
+      "contrast": "contact - none",
+      "mean_difference_pp": 2.2739999999999996,
+      "sd_difference_pp": 9.35450853866733,
+      "ci95_pp": [
+        -9.341156473352928,
+        13.889156473352926
+      ],
+      "interval_width_pp": 23.230312946705855,
+      "n": 5
+    },
+    {
+      "q_held": 0.6,
+      "contrast": "contact - shuffled",
+      "mean_difference_pp": 6.532000000000002,
+      "sd_difference_pp": 9.494633747543926,
+      "ci95_pp": [
+        -5.257144900455776,
+        18.321144900455778
+      ],
+      "interval_width_pp": 23.578289800911556,
+      "n": 5
+    },
+    {
+      "q_held": 0.6,
+      "contrast": "contact - shifted",
+      "mean_difference_pp": 4.5580000000000025,
+      "sd_difference_pp": 8.159624378609594,
+      "ci95_pp": [
+        -5.57351182978529,
+        14.689511829785296
+      ],
+      "interval_width_pp": 20.263023659570585,
+      "n": 5
+    },
+    {
+      "q_held": 0.9,
+      "contrast": "contact - none",
+      "mean_difference_pp": 4.374,
+      "sd_difference_pp": 3.5069260043519597,
+      "ci95_pp": [
+        0.019576236031594973,
+        8.728423763968404
+      ],
+      "interval_width_pp": 8.70884752793681,
+      "n": 5
+    },
+    {
+      "q_held": 0.9,
+      "contrast": "contact - shuffled",
+      "mean_difference_pp": 5.325999999999999,
+      "sd_difference_pp": 2.6026390452769284,
+      "ci95_pp": [
+        2.0943967971602206,
+        8.557603202839777
+      ],
+      "interval_width_pp": 6.463206405679556,
+      "n": 5
+    },
+    {
+      "q_held": 0.9,
+      "contrast": "contact - shifted",
+      "mean_difference_pp": 3.6679999999999993,
+      "sd_difference_pp": 4.417354411862377,
+      "ci95_pp": [
+        -1.8168699405160762,
+        9.152869940516075
+      ],
+      "interval_width_pp": 10.969739881032151,
+      "n": 5
+    }
+  ],
+  "criteria": {
+    "positive": false,
+    "negative": false
+  },
+  "verdict": "inconclusive",
+  "oracle_gain_recovered": [
+    {
+      "q_held": 0.3,
+      "fraction": -0.03202401801351108,
+      "definition": "(mean contact - mean none)/(mean oracle - mean none)"
+    },
+    {
+      "q_held": 0.6,
+      "fraction": 0.302635081181794,
+      "definition": "(mean contact - mean none)/(mean oracle - mean none)"
+    },
+    {
+      "q_held": 0.9,
+      "fraction": 0.49101930848675285,
+      "definition": "(mean contact - mean none)/(mean oracle - mean none)"
+    }
+  ],
+  "noise_contrasts": [
+    {
+      "epsilon": 0,
+      "q_held": 0.6,
+      "contrast": "contact - shuffled",
+      "mean_difference_pp": 6.532000000000002,
+      "sd_difference_pp": 9.494633747543926,
+      "ci95_pp": [
+        -5.257144900455776,
+        18.321144900455778
+      ],
+      "interval_width_pp": 23.578289800911556,
+      "n": 5
+    },
+    {
+      "epsilon": 0.1,
+      "q_held": 0.6,
+      "contrast": "noisy_0.1 - shuffled",
+      "mean_difference_pp": 7.5100000000000025,
+      "sd_difference_pp": 3.5510491407469997,
+      "ci95_pp": [
+        3.1007901260820416,
+        11.919209873917964
+      ],
+      "interval_width_pp": 8.818419747835922,
+      "n": 5
+    },
+    {
+      "epsilon": 0.25,
+      "q_held": 0.6,
+      "contrast": "noisy_0.25 - shuffled",
+      "mean_difference_pp": 4.97,
+      "sd_difference_pp": 7.617752293163648,
+      "ci95_pp": [
+        -4.488688769655467,
+        14.428688769655466
+      ],
+      "interval_width_pp": 18.917377539310934,
+      "n": 5
+    },
+    {
+      "epsilon": 0.5,
+      "q_held": 0.6,
+      "contrast": "noisy_0.5 - shuffled",
+      "mean_difference_pp": 1.9120000000000013,
+      "sd_difference_pp": 4.039618793896275,
+      "ci95_pp": [
+        -3.1038492228483148,
+        6.927849222848318
+      ],
+      "interval_width_pp": 10.031698445696632,
+      "n": 5
+    }
+  ],
+  "first_noise_interval_including_zero": 0,
+  "data_statistics": {
+    "frames": 90240,
+    "sessions": 752,
+    "probes": 816,
+    "train_seconds": 90240,
+    "held_visible_fraction": 0.9381920794006033,
+    "mean_visible_categories": 4.418572695035461,
+    "realized_distractor_counts": {
+      "0": 0,
+      "1": 0,
+      "2": 17,
+      "3": 3126,
+      "4": 3120,
+      "5": 2963
+    },
+    "labelled_contact_median_m": 0.0026025909580713294,
+    "labelled_contact_p90_m": 0.006458814933925384
+  },
+  "provenance": {
+    "run_root": "outputs/cue_experiment",
+    "upstream": {
+      "url": "https://github.com/mcfrank/vlm-headcam",
+      "commit": "07244f5af7093dcd3392a741db3e7a299bdbb031"
+    }
+  }
+}

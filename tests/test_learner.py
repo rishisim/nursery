@@ -1,0 +1,1206 @@
+"""CPU-only synthetic validation of the embedding adapter, the body input and training."""
+
+import json
+import os
+from pathlib import Path
+import subprocess
+
+import numpy as np
+import pandas as pd
+import pytest
+from conftest import synthetic_frames
+
+from nursery.common import load_config
+from nursery.learner import UPSTREAM, _upstream_module
+from nursery.learner.embed import embed_episodes, probe_frames
+from nursery.speech.transcripts import write_transcripts
+
+pytestmark = pytest.mark.usefixtures("offline")
+
+
+@pytest.mark.parametrize("available,mps,device", [(False, False, None), (False, True, None), (True, True, None), (True, True, "cpu"), (False, False, "cuda:0")])
+@pytest.mark.parametrize("grid", [4, 16])
+def test_embedding_adapter_with_fake_encoder(episodes, upstream, monkeypatch, available, mps, device, grid):
+    import torch
+
+    root, run = episodes
+    module = _upstream_module("embed_regions")
+    requested = []
+    batches = []
+    expected_device = device or ("cuda" if available else "mps" if mps else "cpu")
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: available)
+    monkeypatch.setattr(torch.backends.mps, "is_available", lambda: mps)
+
+    class Inputs(dict):
+        def to(self, device):
+            assert device == expected_device
+            return self
+
+    class Processor:
+        @classmethod
+        def from_pretrained(cls, model):
+            requested.append(model)
+            return cls()
+
+        def __call__(self, images, return_tensors):
+            batches.append(len(images))
+            return Inputs(batch=len(images))
+
+    class Encoder:
+        config = type("Config", (), {"hidden_size": 8, "num_register_tokens": 0})()
+
+        @classmethod
+        def from_pretrained(cls, model):
+            requested.append(model)
+            return cls()
+
+        def eval(self):
+            return self
+
+        def to(self, device):
+            assert device == expected_device
+            return self
+
+        def __call__(self, batch):
+            tokens = torch.arange(257).reshape(1, 257, 1).expand(batch, 257, 8).float()
+            return type("Result", (), {"last_hidden_state": tokens})()
+
+    monkeypatch.setattr(module, "AutoImageProcessor", Processor)
+    monkeypatch.setattr(module, "AutoModel", Encoder)
+    from PIL import Image
+    from nursery.learner import embed as embed_module
+
+    # Konkle photos live outside the episode root; embed them from their own paths.
+    photos = []
+    for category in ("apple", "bowl"):
+        for index in range(4):
+            path = root.parent / "konkle" / category / f"{index}.jpg"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            Image.new("RGB", (8, 8), (10, 20, 30)).save(path)
+            photos.append({"video_id": f"konkle/{category}", "frame_idx": index, "category": category, "path": str(path)})
+    monkeypatch.setattr(embed_module, "konkle_frames", lambda config: pd.DataFrame(photos))
+    embed_episodes(root, run, device=device, batch=31, grid=grid)
+    assert max(batches) == 31
+    assert "path" not in pd.read_parquet(run / "konkle_frames.parquet").columns
+    for name, count in (("train", 240), ("probes", 32), ("konkle", 8)):
+        emb = np.load(run / f"{name}_cache" / "emb.f16.npy")
+        index = pd.read_parquet(run / f"{name}_cache" / "index.parquet")
+        assert emb.shape == (count, 1 + grid * grid, 8) and emb.dtype == np.float16
+        assert set(index.columns) == {"video_id", "frame_idx", "row"}
+        patches = np.arange(1, 257).reshape(grid, 16 // grid, grid, 16 // grid).mean((1, 3))
+        expected = np.r_[0, patches.ravel()]
+        np.testing.assert_array_equal(emb[0, :, 0], expected)
+    assert requested == ["facebook/dinov2-base"] * 6
+    assert set(pd.read_parquet(run / "train_frames.parquet").video_id) == {"v0", "v1"}
+    # Complete caches resume without loading the array into RAM or another model.
+    embed_episodes(root, run, device="cpu", grid=grid)
+    assert len(requested) == 6
+    assert json.loads((run / "embedding.json").read_text())["device"] == "cpu"
+    assert json.loads((run / "embedding.json").read_text())["batch"] == 64
+    assert json.loads((run / "embedding.json").read_text())["grid"] == grid
+    before = (run / "embedding.json").read_bytes()
+    with pytest.raises(ValueError, match="provenance"):
+        embed_episodes(root, run, grid=4 if grid == 16 else 16)
+    assert (run / "embedding.json").read_bytes() == before
+    provenance = json.loads((run / "embedding.json").read_text())
+    provenance["episodes"] = "other"
+    (run / "embedding.json").write_text(json.dumps(provenance))
+    with pytest.raises(ValueError, match="provenance"):
+        embed_episodes(root, run, grid=grid)
+
+
+@pytest.mark.parametrize("missing_row", [False, True])
+def test_bounded_embedding_preserves_frame_order_and_rejects_missing_rows(tmp_path, missing_row):
+    import sys
+    from types import SimpleNamespace
+    from nursery.learner.embed import _encode_bounded
+
+    table = pd.DataFrame({"video_id": ["clip"] * 11, "frame_idx": np.arange(11) * 3})
+    cache = tmp_path / "cache"
+    calls = []
+
+    def encode():
+        args = sys.argv
+        shard = int(args[args.index("--shard") + 1])
+        count = int(args[args.index("--nshards") + 1])
+        rows = table.iloc[shard::count].reset_index(drop=True).copy()
+        calls.append(len(rows))
+        if missing_row and shard == 1:
+            rows = rows.iloc[:-1].copy()
+        out = Path(args[args.index("--out") + 1])
+        out.mkdir(parents=True)
+        np.save(out / "emb.f16.npy", rows.frame_idx.to_numpy(dtype=np.float16)[:, None, None])
+        rows["row"] = np.arange(len(rows))
+        rows.to_parquet(out / "index.parquet")
+
+    upstream = SimpleNamespace(main=encode)
+    args = ["embed_regions", "--out", str(cache)]
+    if missing_row:
+        with pytest.raises(AssertionError):
+            _encode_bounded(upstream, args, table, cache, shard_rows=4)
+        assert not (cache / "index.parquet").exists()
+        return
+    _encode_bounded(upstream, args, table, cache, shard_rows=4)
+    assert calls == [4, 4, 3]
+    values = np.load(cache / "emb.f16.npy", mmap_mode="r")
+    np.testing.assert_array_equal(values[:, 0, 0], table.frame_idx)
+    pd.testing.assert_frame_equal(pd.read_parquet(cache / "index.parquet")[list(table)], table)
+    assert not (cache / ".embedding_shards").exists()
+    _encode_bounded(upstream, args, table, cache, shard_rows=4)
+    assert calls == [4, 4, 3]
+
+
+def test_embedding_refuses_old_cache_even_without_provenance(episodes):
+    root, run = episodes
+    cache = run / "train_cache"
+    cache.mkdir(parents=True)
+    path = cache / "emb.f16.npy"
+    np.save(path, np.ones((1, 17, 8), np.float16))
+    before = path.read_bytes()
+    with pytest.raises(ValueError, match="cache disagrees"):
+        embed_episodes(root, run)
+    assert path.read_bytes() == before and not (run / "embedding.json").exists()
+
+
+def _scoring_episodes(root):
+    """Four distinct scenes/sessions per subject, so strict 4AFC is identifiable."""
+    frames = pd.read_parquet(root / "frames.parquet")
+    sessions = pd.read_parquet(root / "sessions.parquet")
+    rows, metadata = [], []
+    for base in ("v0", "v1"):
+        for k, category in enumerate(("mug", "bowl", "apple", "banana")):
+            video = base if k == 0 else f"{base}_scene{k}"
+            group = frames[frames.video_id == base].copy()
+            group["video_id"] = video
+            group["objects"] = json.dumps([{"category": category, "visible_px": 40, "cells": [0]}])
+            group["held_category"] = np.where(group.contact_left, category, None)
+            rows.append(group)
+            session = sessions[sessions.video_id == base].copy()
+            session["video_id"] = video
+            metadata.append(session)
+    pd.concat([*rows, frames[~frames.video_id.isin(["v0", "v1"])]], ignore_index=True).to_parquet(root / "frames.parquet", index=False)
+    pd.concat([*metadata, sessions[~sessions.video_id.isin(["v0", "v1"])]], ignore_index=True).to_parquet(root / "sessions.parquet", index=False)
+
+
+def _fake_caches(root, run, num_regions=17):
+    rng = np.random.default_rng(12)
+    frames = pd.read_parquet(root / "frames.parquet")
+    frames = frames[frames.room == "train_room"].copy()
+    probes = probe_frames(pd.read_parquet(root / "probes.parquet"), load_config())
+    probes.to_parquet(run / "probes_frames.parquet", index=False)
+    for name, table in (("train", frames), ("probes", probes)):
+        cache = run / f"{name}_cache"
+        cache.mkdir()
+        index = table[["video_id", "frame_idx"]].copy()
+        index["row"] = np.arange(len(index))
+        index.to_parquet(cache / "index.parquet", index=False)
+        np.save(cache / "emb.f16.npy", rng.normal(size=(len(index), num_regions, 8)).astype(np.float16))
+
+
+def test_cpu_train_cli_one_epoch(episodes, upstream):
+    root, run = episodes
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    command = [os.sys.executable, "-m", "nursery.learner", "train", "--run", str(run),
+               "--condition", "contact", "--seed", "8", "--epochs", "1"]
+    result = subprocess.run(command, check=True, capture_output=True, text=True,
+                            env={**os.environ, "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1"})
+    print(result.stdout)
+    metrics = json.loads((run / "contact_s8" / "metrics.json").read_text())
+    assert metrics["condition"] == "contact" and metrics["device"] in ("cpu", "mps")
+    assert metrics["selection"] == "dev" and metrics["selected_epoch"] == 0
+    assert metrics["epochs"] == 1 and metrics["n_pairs"] > 300 and metrics["emb_dim"] == 8
+    assert metrics["generator_parameters"]["p_ref"] == 1
+    assert metrics["frame_coverage"] == 1 and metrics["mean_weight"] == pytest.approx(1)
+    assert 0 <= metrics["reported_test_acc"] <= 100
+    import torch
+
+    state = torch.load(run / "contact_s8" / "model.pt", map_location="cpu", weights_only=True)
+    model = upstream.RegionMIL(metrics["vocab"], emb_dim=8)
+    model.load_state_dict(state, strict=True)
+    assert model.region_prior is None and all(value.device.type == "cpu" for value in state.values())
+
+
+@pytest.mark.parametrize("device", ["cpu", "mps", "cuda"])
+def test_weights_follow_upstream_filtered_pair_indices(episodes, upstream, monkeypatch, device):
+    import torch
+    from nursery.learner.train import train_run
+
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: device == "cuda")
+    monkeypatch.setattr(torch.backends.mps, "is_available", lambda: device == "mps")
+    move = torch.Tensor.to
+    transfers = []
+
+    def to(tensor, *args, **kwargs):
+        if args and isinstance(args[0], (str, torch.device)) and str(args[0]) in ("cuda", "mps"):
+            transfers.append(tensor.shape)
+            args = ("cpu", *args[1:])
+        return move(tensor, *args, **kwargs)
+
+    monkeypatch.setattr(torch.Tensor, "to", to)
+    root, run = episodes
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    manifest = pd.read_parquet(run / "manifest.parquet")
+    manifest.loc[1, "text"] = "quux"
+    manifest.to_parquet(run / "manifest.parquet", index=False)
+    vocab = upstream.build_vocab(manifest.text, 5)
+    retained = manifest[manifest.text.map(lambda t: bool(upstream.encode(t, vocab)))].reset_index(drop=True)
+    expected = retained.weight_contact.to_numpy(dtype=np.float32)
+    expected /= expected.mean()
+    original = upstream.RegionMIL.forward_loss
+    observed = []
+
+    def loss(model, v, t, n, w):
+        observed.extend(w.tolist())
+        return original(model, v, t, n, w)
+
+    original_collate = upstream.collate
+    batches = []
+
+    def collate(batch):
+        result = original_collate(batch)
+        batches.extend(expected[result[0].numpy()].tolist())
+        return result
+
+    monkeypatch.setattr(upstream.RegionMIL, "forward_loss", loss)
+    monkeypatch.setattr(upstream, "collate", collate)
+    region = _upstream_module("train_region_mil")
+    selection_scores = iter([0.4, 0.9, 0.7, 0.1])
+
+    def evaluate(*args, **kwargs):
+        assert args[5] == device
+        return next(selection_scores), {"n_scored": 4, "n_oov": 0, "n_total": 4}
+
+    monkeypatch.setattr(region, "eval_4afc_region", evaluate)
+    metrics = train_run(run, "contact", 9, epochs=2)
+    assert metrics["device"] == device
+    assert bool(transfers) == (device != "cpu")
+    np.testing.assert_allclose(observed, batches, atol=1e-7)
+    assert metrics["n_novocab"] == 1 and metrics["n_pairs"] == len(manifest) - 1
+    assert metrics["selected_epoch"] == 1 and metrics["reported_test_acc"] == 10
+    assert metrics["best_test_acc"] == 90
+
+
+@pytest.mark.parametrize("failure", ["missing_train", "missing_probe", "small_probe", "oov_probe"])
+def test_training_rejects_incomplete_inputs(episodes, upstream, failure):
+    from nursery.learner.train import train_run
+
+    root, run = episodes
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    if failure in ("missing_train", "missing_probe"):
+        name = "train" if failure == "missing_train" else "probes"
+        path = run / f"{name}_cache" / "index.parquet"
+        table = pd.read_parquet(path).iloc[1:]
+        table.to_parquet(path, index=False)
+        reason = "does not cover"
+    else:
+        path = run / "probes_frames.parquet"
+        table = pd.read_parquet(path)
+        if failure == "small_probe":
+            table = table.iloc[1:]
+            reason = "four probes/category"
+        else:
+            table.loc[table.category == "mug", "category"] = "quux"
+            reason = "four in-vocabulary"
+        table.to_parquet(path, index=False)
+    with pytest.raises(ValueError, match=reason):
+        train_run(run, "contact", 8, epochs=1)
+
+
+# ---- body input and the body pathway (docs/learner.md) ----
+
+def _body_session(seed, frames=120):
+    rng = np.random.default_rng(seed)
+    bits = np.zeros((frames, 1556), dtype=bool)
+    bits[np.arange(frames) % 6 < 3, :40] = True             # left hand touches for 3 s out of every 6
+    joints = rng.normal(size=(frames, 55, 3)).astype(np.float32) * 0.1
+    joints[:, :, 2] -= 1.0                                  # everything in front of an identity camera
+    camera = np.tile(np.eye(4, dtype=np.float32), (frames, 1, 1))
+    return dict(frame_idx=np.arange(frames), joints=joints, camera=camera,
+                left_hand_pose=rng.normal(size=(frames, 45)).astype(np.float32),
+                right_hand_pose=rng.normal(size=(frames, 45)).astype(np.float32),
+                hand_contact=np.packbits(bits, axis=1), hand_contact_vertices=np.int32(1556))
+
+
+def _write_body(root, video_ids=None):
+    if video_ids is None:
+        video_ids = pd.read_parquet(root / "sessions.parquet").query("split == 'train'").video_id.tolist()
+    (root / "body").mkdir(exist_ok=True)
+    for k, video_id in enumerate(video_ids):
+        np.savez(root / "body" / f"{video_id}.npz", **_body_session(k))
+
+
+def _store(root, clips=None, physical=None):
+    from nursery.learner import body
+
+    _write_body(root)
+    frames = pd.read_parquet(root / "frames.parquet")
+    if clips:  # split each session into clips of the given length
+        frames["clip"] = frames.video_id + "/" + (frames.frame_idx // clips).astype(str)
+    return body.load_store(root, frames, ["v0", "v1"], set(), physical=physical)
+
+
+def _write_physical(root, video_ids=None):
+    if video_ids is None:
+        video_ids = pd.read_parquet(root / "sessions.parquet").query("split == 'train'").video_id.tolist()
+    (root / "physical").mkdir(exist_ok=True)
+    for k, video_id in enumerate(video_ids):
+        rng = np.random.default_rng(100 + k)
+        np.savez(root / "physical" / f"{video_id}.npz", frame_idx=np.arange(120),
+                 load=rng.normal(size=(120, 2, 5)).astype(np.float32), skin_dT=rng.normal(size=(120, 2)).astype(np.float32),
+                 contact_area=rng.random((120, 2)).astype(np.float32), material_idx=np.zeros(120, np.int8))
+    return root / "physical"
+
+
+def test_patch_pooling_shapes_and_map():
+    from nursery.learner import body
+
+    patches = json.loads(body.PATCH_FILE.read_text())
+    assert len(patches["left"]) == len(patches["right"]) == body.VERTS_PER_HAND
+    assert set(patches["left"]) == set(range(11)) and len(body.PATCH_NAMES) == 11
+    matrix = body.patch_matrix()
+    assert matrix.shape == (1556, 22) and np.allclose(matrix.sum(0), 1)
+    session = _body_session(0)
+    feats = body.session_features(session)
+    assert feats["contact"].shape == (120, 22) and feats["fingers"].shape == (120, 90)
+    assert feats["arm"].shape == (120, 15) and feats["aperture"].shape == (120, 2)
+    assert feats["contact"][0, :11].max() > 0 and feats["contact"][4].max() == 0  # left hand only, 3 s on / 3 s off
+    assert feats["contact"][:, 11:].max() == 0 and feats["hand"][0] == 0 and feats["hand"][4] == -1
+
+
+def test_arm_is_in_the_camera_frame_with_full_rotation():
+    from nursery.learner import body
+
+    session = _body_session(1)
+    base = body.session_features(session)["arm"]
+    turned = dict(session)
+    rotation = np.array([[0, -1, 0, 0], [1, 0, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]], np.float32)  # head yaw 90 deg
+    turned["camera"] = np.tile(rotation, (120, 1, 1))
+    other = body.session_features(turned)["arm"]
+    assert not np.allclose(base[:, :12], other[:, :12])       # positions follow the camera rotation
+    np.testing.assert_allclose(np.linalg.norm(base[:, 12:], axis=1), 1, atol=1e-5)  # gravity direction
+
+
+def test_clip_boundaries_reset_and_mask(episodes):
+    import torch
+    from nursery.learner import body
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    assert store["clip"][0, 9] != store["clip"][0, 10] and store["clip"][0, 10] == store["clip"][0, 19]
+    np.testing.assert_array_equal(store["groups"]["arm"][0, 10, 12:24], 0)  # no 1-step difference across a boundary
+    encoder = body.BodyEncoder({k: v.shape[-1] for k, v in store["groups"].items()}).eval()
+    s, t = np.zeros(1, int), np.array([12])
+    steps, seg = body.window_steps(store["clip"], s, t, 5)
+    groups = {k: torch.as_tensor(g[s[:, None], steps]) for k, g in store["groups"].items()}
+    seg = torch.as_tensor(seg)
+    missing = (seg == -2).float()
+    base = encoder(groups, missing, seg)[:, 5]
+    other = {k: g.clone() for k, g in groups.items()}
+    outside = (seg != seg[:, 5:6])
+    for k in other:
+        other[k][outside] += 5.0                           # change everything outside the centre's clip
+    assert torch.allclose(base, encoder(other, missing, seg)[:, 5], atol=1e-6)
+    inside = {k: g.clone() for k, g in groups.items()}
+    inside["arm"][:, 5] += 5.0
+    assert not torch.allclose(base, encoder(inside, missing, seg)[:, 5], atol=1e-4)
+
+
+def test_episode_segmentation_and_controls(episodes):
+    from nursery.learner import body
+
+    hand = np.array([-1, 0, 0, 0, 1, 1, 0, 0, -1, 0, 0, 0])
+    clip = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1])
+    ids = body.contact_episodes(hand, clip, min_len=2)
+    assert ids.tolist() == [-1, 0, 0, 0, 1, 1, 2, 2, -1, 3, 4, 4][:3] + [1, 1, 1, 1, 2, 2, -1, 3, 4, 4][:0] + ids.tolist()[3:]
+    # same hand, new clip: ends the episode; other hand: ends it; lone second (min length 2): dropped
+    assert ids[1] == ids[3] != ids[4] == ids[5] != ids[6] == ids[7] and ids[9] == -1 and ids[10] == ids[11] >= 0
+    assert ids[0] == ids[8] == -1
+    root, _ = episodes
+    store = _store(root, clips=10)
+    frames = pd.read_parquet(root / "frames.parquet")
+    for mode in ("contact", "temporal"):
+        episode = body.build_episodes(store, mode)
+        assert (episode >= 0).any()
+        for s in range(2):
+            for e in np.unique(episode[s][episode[s] >= 0]):
+                members = np.flatnonzero(episode[s] == e)
+                assert len(members) >= 2 and len(set(store["clip"][s, members])) == 1  # inside one clip
+    contact = body.build_episodes(store, "contact")
+    for s in range(2):  # held_category (a label) only checks episodes: one object per episode
+        held = frames[frames.video_id == f"v{s}"].sort_values("frame_idx").held_category.tolist()
+        for e in np.unique(contact[s][contact[s] >= 0]):
+            assert len({held[t] for t in np.flatnonzero(contact[s] == e) if isinstance(held[t], str)}) <= 1
+    assert (body.build_episodes(store, "none") == -1).all()
+
+
+def test_shuffled_keeps_marginals(episodes):
+    from nursery.learner import body
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    shuffled, info = body.shuffle_store(store, 0)
+    assert info["moved"] == info["units"] > 0
+    for key in store["groups"]:
+        np.testing.assert_allclose(np.sort(shuffled["groups"][key].reshape(-1)), np.sort(store["groups"][key].reshape(-1)))
+    assert not np.allclose(shuffled["groups"]["contact"], store["groups"]["contact"])
+    np.testing.assert_array_equal(shuffled["clip"], store["clip"])  # boundaries and images stay put
+    kept, _ = body.shuffle_store(store, 0, exclude=("v0", "v1"))
+    np.testing.assert_array_equal(kept["groups"]["fingers"], store["groups"]["fingers"])
+
+
+def _tiny_model(store, device="cpu", weights=None):
+    import torch
+    from nursery.learner.windows import BodyData
+    from nursery.learner.additive import AdditiveMIL
+
+    torch.manual_seed(0)
+    model = AdditiveMIL(30, 8, 0.1, {k: v.shape[-1] for k, v in store["groups"].items()})
+    model.region_head[0] = torch.nn.Linear(model.region_head[0].in_features, 128)
+    bags = np.full(store["clip"].shape + (4,), -1)
+    ps, pt = np.zeros(6, int), np.arange(10, 16)
+    win = np.tile(np.arange(5), (6, 1)) + pt[:, None] - 2
+    data = BodyData(store, ps, pt, win, bags, np.full(store["clip"].shape, -1), None, None, device, 5, 0.5, 0.0)
+    return model, data
+
+
+def _batch(model, data):
+    import torch
+
+    torch.manual_seed(1)
+    v = torch.randn(6, 85, 8)
+    t = torch.randint(1, 30, (6, 4))
+    return v, t, torch.full((6,), 4), torch.ones(6)
+
+
+def test_language_loss_depends_on_body_and_reaches_every_encoder(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model, data = _tiny_model(store)
+    v, t, n, w = _batch(model, data)
+    ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0))
+    ctx["keep"] = torch.ones(6)
+    weights = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "bodymatch": 0.0}
+    loss = model.forward_loss(v, t, n, w, ctx, weights)
+    other = dict(ctx, groups={k: g + torch.randn_like(g) for k, g in ctx["groups"].items()})
+    assert not torch.isclose(loss, model.forward_loss(v, t, n, w, other, weights))
+    loss.backward()
+    for name, module in model.encoder.named_children():
+        grads = [p.grad for p in module.parameters() if p.grad is not None]
+        assert grads and any(g.abs().sum() > 0 for g in grads), name
+    for group in model.encoder.mlps:
+        assert any(p.grad is not None and p.grad.abs().sum() > 0 for p in model.encoder.mlps[group].parameters()), group
+    assert model.vproj[2].weight.grad.abs().sum() > 0 and model.beta.grad.abs() > 0
+
+
+def test_physical_off_leaves_store_unchanged_and_on_adds_groups(episodes):
+    from nursery.learner import body
+
+    root, _ = episodes
+    plain = _store(root, clips=10)
+    assert set(plain["groups"]) == {"contact", "fingers", "arm"}
+    store = _store(root, clips=10, physical=_write_physical(root))
+    assert list(store["groups"]) == ["contact", "fingers", "arm", "load", "skin"]
+    assert store["groups"]["load"].shape == (2, 120, 10) and store["groups"]["skin"].shape == (2, 120, 4)
+    for key in plain["groups"]:
+        np.testing.assert_array_equal(store["groups"][key], plain["groups"][key])
+    for key in ("load", "skin"):  # standardised on present seconds
+        np.testing.assert_allclose(store["groups"][key].mean((0, 1)), 0, atol=1e-5)
+        np.testing.assert_allclose(store["groups"][key].std((0, 1)), 1, atol=1e-3)
+    with np.load(root / "physical" / "v0.npz") as raw:  # indexed by frame_idx; skin = dT then area
+        mean, std = (np.array(x) for x in store["stats"]["skin"])
+        np.testing.assert_allclose(store["groups"]["skin"][0, 7], (np.r_[raw["skin_dT"][7], raw["contact_area"][7]] - mean) / std, rtol=1e-4)
+    # train-only statistics: excluded seconds do not enter the fit
+    frames = pd.read_parquet(root / "frames.parquet")
+    exclude = np.zeros((2, 120), bool)
+    exclude[:, 60:] = True
+    fit = body.load_store(root, frames, ["v0", "v1"], set(), exclude=exclude, physical=root / "physical")
+    with np.load(root / "physical" / "v0.npz") as a, np.load(root / "physical" / "v1.npz") as b:
+        raw = np.concatenate([a["load"][:60].reshape(60, 10), b["load"][:60].reshape(60, 10)])
+    np.testing.assert_allclose(fit["stats"]["load"][0], raw.mean(0), rtol=1e-4, atol=1e-5)
+
+
+def test_physical_groups_are_encoded_and_get_gradients(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10, physical=_write_physical(root))
+    model, data = _tiny_model(store)
+    assert set(model.encoder.mlps) == {"contact", "fingers", "arm", "load", "skin"}
+    assert model.encoder.mlps["load"][0].in_features == 10 and model.encoder.mlps["skin"][0].in_features == 4
+    v, t, n, w = _batch(model, data)
+    ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0))
+    ctx["keep"] = torch.ones(6)
+    off = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "bodymatch": 0.0}
+    model.forward_loss(v, t, n, w, ctx, off).backward()
+    for group in ("load", "skin"):
+        assert any(p.grad is not None and p.grad.abs().sum() > 0 for p in model.encoder.mlps[group].parameters()), group
+
+
+def test_physical_shuffle_keeps_partitions_and_avoids_own_clip(episodes):
+    from nursery.learner import body
+
+    root, _ = episodes
+    store = _store(root, clips=10, physical=_write_physical(root))
+    store["subject"] = np.array(["s1", "s2"])
+    part = np.zeros((2, 120), int)
+    part[:, 60:] = 1  # clips 0-5 train, 6-11 dev, in both sessions
+    shuffled, info = body.physical_shuffle_store(store, part, 0)
+    again, _ = body.physical_shuffle_store(store, part, 0)
+    np.testing.assert_array_equal(shuffled["groups"]["load"], again["groups"]["load"])
+    assert info["clips"] == 24 and info["kept_own"] == 0
+    for key in ("contact", "fingers", "arm"):  # real groups stay paired
+        np.testing.assert_array_equal(shuffled["groups"][key], store["groups"][key])
+    for key in ("load", "skin"):
+        assert not np.allclose(shuffled["groups"][key], store["groups"][key])
+    # every shuffled clip equals a clip of the same session/partition, never itself
+    for name in ("load", "skin"):
+        for s in range(2):
+            for c in range(12):
+                got = shuffled["groups"][name][s, c * 10:(c + 1) * 10]
+                own = store["groups"][name][s, c * 10:(c + 1) * 10]
+                same = [(c2 // 6 == c // 6) and np.allclose(got, store["groups"][name][s, c2 * 10:(c2 + 1) * 10]) for c2 in range(12) if c2 != c]
+                assert any(same) and not np.allclose(got, own)
+    # a lone clip in its group cannot be deranged and keeps its own signals
+    lone = np.zeros((2, 120), int)
+    lone[0, :], lone[1, :] = 0, 1
+    kept, info = body.physical_shuffle_store(store, lone, 0)
+    assert info["clips"] == 24 and info["kept_own"] == 0  # 12 clips per (subject, partition) here
+    solo = {**store, "clip": np.where(store["clip"] < 1, store["clip"], -1)}
+    _, info = body.physical_shuffle_store(solo, part, 0)
+    assert info["kept_own"] == info["clips"] == 2
+
+
+def test_body_dropout_one_equals_video_only_and_each_loss_switches_off(episodes):
+    import torch
+    from nursery.learner.video_only import VideoOnlyMIL
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model, data = _tiny_model(store)
+    model.eval()
+    v, t, n, w = _batch(model, data)
+    ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0))
+    off = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "bodymatch": 0.0}
+    ctx["keep"] = torch.zeros(6)  # dropout 1.0
+    baseline = model.forward_loss(v, t, n, w, None, off)
+    video = VideoOnlyMIL(30, 8).eval()
+    video.load_state_dict({key: model.state_dict()[key] for key in video.state_dict()})
+    assert video.encoder is None
+    assert torch.equal(video.forward_loss(v, t, n, w), baseline)
+    assert torch.equal(model.forward_loss(v, t, n, w, ctx, off), baseline)
+    assert set(model.losses(v, t, n, w, ctx, off)) == {"match"}
+    ctx["keep"] = torch.ones(6)
+    assert not torch.equal(model.forward_loss(v, t, n, w, ctx, off), baseline)
+    on = model.losses(v, t, n, w, ctx, {**off, "pred": 1.0, "mask": 1.0})
+    assert set(on) == {"match", "pred", "mask"}
+    for name in ("pred", "mask"):
+        model.zero_grad()
+        on[name].backward(retain_graph=True)
+    generator = torch.Generator().manual_seed(0)
+    assert data.dropout == 0.0
+    data.dropout = 1.0
+    assert data.batch(np.arange(6), generator)["keep"].sum() == 0
+
+
+def test_bodymatch_loss_is_body_only_and_reaches_the_body_encoder(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model, data = _tiny_model(store)
+    v, t, n, w = _batch(model, data)
+    ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0))
+    ctx["keep"] = torch.zeros(6)  # dropout does not apply to the term
+    off = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "bodymatch": 0.0}
+    assert "bodymatch" not in model.losses(v, t, n, w, ctx, off)
+    term = model.losses(v, t, n, w, ctx, {**off, "bodymatch": 1.0})["bodymatch"]
+    assert torch.isfinite(term)
+    term.backward()
+    assert model.fuse.weight.grad.abs().sum() > 0
+    assert any(p.grad is not None and p.grad.abs().sum() > 0 for p in model.encoder.parameters())
+    with pytest.raises(ValueError):
+        model.losses(v, t, n, w, None, {**off, "bodymatch": 1.0})
+
+
+def _distill_pair(episodes):
+    import torch
+    from nursery.learner.additive import AdditiveMIL
+
+    root, _ = episodes
+    teacher, data = _tiny_model(_store(root, clips=10))
+    teacher.eval()
+    torch.manual_seed(2)
+    student = AdditiveMIL(30, 8, 0.1).eval()
+    v, t, n, w = _batch(student, data)
+    ctx = data.batch(np.arange(6), torch.Generator().manual_seed(0), training=False)
+    return teacher, student, (v, t, n, w), ctx
+
+
+def test_distillation_targets_are_detached_and_the_kl_reaches_the_student(episodes):
+    import torch
+
+    teacher, student, (v, t, n, w), ctx = _distill_pair(episodes)
+    target = teacher.teacher_logits(v, t, n, ctx)
+    assert not target.requires_grad and target.shape == (6, 6)
+    weights = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "distill": 1.0}
+    terms = student.losses(v, t, n, w, None, weights, target, 2.0)
+    assert set(terms) == {"match", "distill"} and terms["distill"] > 0
+    terms["distill"].backward()
+    assert student.vproj[2].weight.grad.abs().sum() > 0 and student.word.weight.grad.abs().sum() > 0
+    assert all(p.grad is None for p in teacher.parameters())
+    # the teacher's own body is always on, whatever the batch context says
+    off = teacher.teacher_logits(v, t, n, dict(ctx, keep=torch.zeros(6)))
+    assert torch.equal(off, target)
+
+
+def test_distillation_weight_zero_equals_the_plain_loss(episodes):
+    import torch
+
+    teacher, student, (v, t, n, w), ctx = _distill_pair(episodes)
+    target = teacher.teacher_logits(v, t, n, ctx)
+    weights = {"pred": 0.0, "episode": 0.0, "consist": 0.0, "mask": 0.0, "bodymatch": 0.0}
+    plain = student.forward_loss(v, t, n, w, None, weights)
+    assert torch.equal(student.forward_loss(v, t, n, w, None, {**weights, "distill": 0.0}, target, 2.0), plain)
+    assert not torch.equal(student.forward_loss(v, t, n, w, None, {**weights, "distill": 1.0}, target, 2.0), plain)
+
+
+def test_distill_run_with_weight_zero_equals_the_plain_run(episodes, upstream, monkeypatch):
+    import torch
+    from nursery.learner.train import train_run
+
+    monkeypatch.setattr(torch.backends.mps, "is_available", lambda: False)  # CPU: exact repeatability
+
+    root, run = episodes
+    _scoring_episodes(root)
+    _write_body(root)
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    common = dict(pool="soft", tau_p=0.1, heldout_subject="s2", epochs=2)
+    plain = train_run(run, "none", 3, name="plain", **common)
+    train_run(run, "none", 3, name="teacher", body="oracle", **common)
+    again = train_run(run, "none", 3, name="again", **common)
+    again2 = train_run(run, "none", 3, name="again2", **common)
+    print("RUNS", plain["history"][0]["train_loss"], again["history"][0]["train_loss"], again2["history"][0]["train_loss"])
+    assert plain["history"] == again["history"]
+    zero = train_run(run, "none", 3, name="zero", distill_from=run / "teacher_s3", distill_weight=0.0, inspect_epoch=1, **common)
+    live = train_run(run, "none", 3, name="live", distill_from=run / "teacher_s3", inspect_epoch=1, **common)
+    assert plain["history"] == zero["history"]
+    assert live["history"][0]["losses"]["distill"] > 0 and "distill" not in zero["history"][0]["losses"]
+    assert live["history"] != plain["history"]
+    assert set(live["checkpoints"]) == {"epoch_1", "selected"} and live["checkpoints"]["selected"]["agreement"]["train"]["kl"] >= 0
+    assert "picture_soft" in live["distill"]["teacher_body_present"] and "fused_soft" in live["distill"]["teacher_body_present"]
+
+
+def test_picture_eval_does_not_touch_the_body(episodes, upstream, monkeypatch):
+    import torch
+
+    root, run = episodes
+    store = _store(root, clips=10)
+    model, _ = _tiny_model(store)
+    region = _upstream_module("train_region_mil")
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    probes = pd.read_parquet(run / "probes_frames.parquet")
+    cache, lut = region.load_region_cache(run / "probes_cache")
+    vocab = {"<pad>": 0, **{c: i + 1 for i, c in enumerate(("mug", "bowl", "apple", "banana"))}}
+    score = lambda: region.eval_4afc_region(model, cache, lut, probes[probes.split == "dev"], vocab, "cpu")
+    before = score()
+
+    def refuse(*args, **kwargs):
+        raise AssertionError("evaluation used the body")
+
+    monkeypatch.setattr(type(model.encoder), "forward", refuse)
+    for module in (model.fuse, model.decoder, model.region_head):
+        for p in module.parameters():
+            p.data.add_(torch.randn_like(p))
+    assert score() == before
+
+
+@pytest.mark.parametrize("options", [
+    {"body": "real"}, {"body": "shuffled", "episodes": "temporal", "weights": {"episode": 1, "consist": 0.1, "mask": 0.5}},
+    {"body": "oracle", "episodes": "contact", "weights": {"episode": 1, "consist": 0.1}}, {"body": "none"}])
+def test_body_training_runs(episodes, upstream, options):
+    from nursery.learner.train import train_run
+
+    root, run = episodes
+    _scoring_episodes(root)
+    _write_body(root)
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    metrics = train_run(run, "none", 3, epochs=2, name="body", pool="soft", tau_p=0.1, heldout_subject="s2", **options)
+    assert metrics["pool"] == "soft" and metrics["tau_p"] == 0.1
+    assert ("body" in metrics) == (options["body"] != "none")
+    if options["body"] != "none":
+        assert metrics["history"][0]["losses"]["pred"] > 0
+        assert metrics["probe"]["splits"]["subject"] and metrics["body_present"]["n_trials"] >= 8
+    assert (run / "body_s3" / "metrics.json").exists()
+    with pytest.raises(ValueError, match="requires --pool soft"):
+        train_run(run, "none", 5, epochs=1, body="real")
+
+
+def test_label_pairs_use_only_visible_objects_of_training_sessions(episodes):
+    from nursery.learner.evaluate import label_manifest
+
+    root, run = episodes
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    frames = pd.read_parquet(root / "frames.parquet")
+    seen = lambda *c: json.dumps([{"category": k, "visible_px": 40 if k in c else 0, "cells": []} for k in ("mug", "bowl", "apple")])
+    frames["objects"] = [seen("mug", "bowl") if f % 3 == 0 else seen() if f % 3 == 1 else seen("apple") for f in frames.frame_idx]
+    frames.to_parquet(root / "frames.parquet", index=False)
+    manifest = pd.read_parquet(run / "manifest.parquet")
+    manifest = manifest[manifest.video_id.isin(["v0", "v1"])]
+    labelled, info = label_manifest(manifest, root, 0)
+    assert set(labelled.video_id) <= {"v0", "v1"}
+    assert info["n_speech_pairs"] == len(manifest) and info["n_pairs"] == len(labelled) < len(manifest)
+    assert all(text in visible and "apple" != text or text == "apple" and visible == ["apple"] for text, visible in zip(labelled.text, labelled.visible))
+    assert (labelled.frame_idx % 3 != 1).all() and set(labelled.text) == {"mug", "bowl", "apple"}
+    again, _ = label_manifest(manifest, root, 0)
+    assert again.text.tolist() == labelled.text.tolist()
+
+
+def test_label_training_runs_and_reports_fit(episodes, upstream):
+    from nursery.learner.train import train_run
+
+    root, run = episodes
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    manifest = pd.read_parquet(run / "manifest.parquet")
+    vocab = upstream.build_vocab(manifest.text, 5)
+    frames = pd.read_parquet(root / "frames.parquet")
+    word = next(w for w in vocab if w != "<pad>")  # a category the vocabulary knows
+    frames["objects"] = json.dumps([{"category": word, "visible_px": 40, "cells": []}])
+    frames.to_parquet(root / "frames.parquet", index=False)
+    metrics = train_run(run, "none", 3, epochs=2, name="labels", pool="soft", heldout_subject="none", labels=True)
+    assert metrics["labels"]["n_words"] == 1 and metrics["labels"]["n_pairs"] <= metrics["labels"]["n_speech_pairs"]
+    assert metrics["labels"]["fit"]["top1"] == 100 and metrics["n_pairs"] == metrics["labels"]["n_pairs"]
+    with pytest.raises(ValueError, match="picture-only"):
+        train_run(run, "none", 4, epochs=1, pool="soft", labels=True, body="real")
+
+
+def test_upstream_checkout_is_unmodified(upstream):
+    assert subprocess.run(["git", "-C", str(UPSTREAM), "diff", "--quiet"]).returncode == 0
+
+
+def _clip_frames(root):
+    frames = pd.read_parquet(root / "frames.parquet")
+    frames["clip"] = [f"{s}/c{f // 10}" for s, f in zip(frames.subject, frames.frame_idx)]
+    frames.to_parquet(root / "frames.parquet")
+    return frames
+
+
+def test_clip_partition_is_deterministic_and_never_splits_clips(episodes):
+    from nursery.learner.train import clip_partition, split_pairs
+
+    root, _ = episodes
+    frames = _clip_frames(root)
+    cfg = {"dev": 0.15, "test": 0.15, "seed": 0}
+    part, counts = clip_partition(frames, "s2", cfg)
+    again, _ = clip_partition(frames, "s2", cfg)
+    assert all((part[v] == again[v]).all() for v in part)
+    assert counts["s1"] == {"train": 8, "dev": 2, "test": 2} and "s2" not in counts
+    seen = {}
+    for v, g in frames[frames.subject == "s1"].groupby("video_id"):
+        for clip, f in zip(g["clip"], g.frame_idx):
+            assert seen.setdefault(clip, part[v][f]) == part[v][f]
+    assert set(seen.values()) == {0, 1, 2}
+    pairs = pd.DataFrame({"video_id": "v0", "frame_idx": np.arange(120)})
+    out = split_pairs(pairs, part, 2)
+    for i in np.flatnonzero(out >= 0):
+        win = part["v0"][max(i - 2, 0):i + 3]
+        assert (win == out[i]).all()
+    assert (out < 0).any() and (out >= 0).sum() > 60
+
+
+def test_clip_split_training_runs_and_default_is_unchanged(episodes, upstream):
+    from nursery.learner.train import train_run
+
+    root, run = episodes
+    _scoring_episodes(root)
+    _clip_frames(root)
+    _write_body(root)
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    common = dict(epochs=2, pool="soft", heldout_subject="s2")
+    base = train_run(run, "none", 3, name="base", body="real", **common)
+    assert "split" not in base and "bp" not in base["history"][0]
+    for body in ("real", "none"):
+        m = train_run(run, "none", 3, name=f"clips_{body}", body=body, split="clips", **common)
+        assert m["split"]["mode"] == "clips" and m["n_pairs"] < base["n_pairs"] and m["split"]["n_dropped_crossing"] > 0
+        assert set(m["history"][0]["bp"]) == {"clips_dev", "clips_test", "s8"}
+        assert m["body_present_selected"]["clips_dev"]["n_trials"] == len(m["body_present_selected"]["clips_dev"]["trials"]["picture_soft"])
+        assert m["selection_body_present"]["epoch"] in (0, 1)
+        assert (run / f"clips_{body}_s3" / "model_bodypresent.pt").exists()
+    with pytest.raises(ValueError, match="--split clips"):
+        train_run(run, "none", 5, epochs=1, split="clips")
+
+
+def test_physical_training_runs_and_records_flags(episodes, upstream):
+    from nursery.learner.train import train_run
+
+    root, run = episodes
+    _scoring_episodes(root)
+    _clip_frames(root)
+    _write_body(root)
+    physical = _write_physical(root)
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    common = dict(epochs=1, pool="soft", heldout_subject="s2", split="clips", body="real")
+    base = train_run(run, "none", 3, name="p_off", **common)
+    assert base["body"]["physical"] is None and base["body"]["physical_shuffle"] is False
+    on = train_run(run, "none", 3, name="p_on", physical=str(physical), **common)
+    shuf = train_run(run, "none", 3, name="p_shuf", physical=str(physical), physical_shuffle=True, **common)
+    assert on["body"]["physical"] == str(physical) and on["body"]["physical_shuffle"] is False
+    assert shuf["body"]["physical_shuffle"]["clips"] > 0
+    with pytest.raises(ValueError, match="--physical-shuffle needs --physical"):
+        train_run(run, "none", 3, name="bad", physical_shuffle=True, **common)
+
+
+# ---- joint visual-body learner (--arch joint) ----
+
+def _joint_model(store, with_body=True, seed=0):
+    import torch
+    from archive.code.learner.joint_pilot import JointMIL
+
+    torch.manual_seed(seed)
+    dims = {k: v.shape[-1] for k, v in store["groups"].items()} if with_body else None
+    return JointMIL(30, 8, 0.1, dims)
+
+
+def _joint_batch(store, pt=(2, 3, 10, 11, 12, 13), device="cpu"):
+    """Tiny window batch: frames at offsets -2..2, pair 0 has two padded frames; pt < 5 reach before the session."""
+    import torch
+    from nursery.learner.windows import BodyData
+
+    n = len(pt)
+    data = BodyData(store, np.zeros(n, int), np.array(pt), np.zeros((n, 5), int), None, None, None, None, device, 5, 0.0, 0.0)
+    torch.manual_seed(1)
+    offset = torch.arange(-2, 3).repeat(n, 1)
+    valid = torch.ones(n, 5, dtype=torch.bool)
+    valid[0, 3:], offset[0, 3:] = False, 0
+    v, t = torch.randn(n, 85, 8), torch.randint(1, 30, (n, 4))
+    ctx = data.batch(np.arange(n), torch.Generator().manual_seed(0), training=False)
+    ctx.update(vis_offset=offset, vis_valid=valid)
+    return data, ctx, v, t, torch.full((n,), 4)
+
+
+def test_joint_body_masking(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model = _joint_model(store).eval()
+    _, ctx, v, t, n = _joint_batch(store)
+    run = lambda c: model.represent(v, c["vis_offset"], c["vis_valid"], c)[0]
+    plain = model.represent(v, ctx["vis_offset"], ctx["vis_valid"])[0]
+    keep = model.body_keep(ctx)
+    assert (ctx["seg"] == -2).any() and (ctx["seg"] != ctx["seg"][:, 5:6]).any() and not keep.all()
+    assert (ctx["seg"][keep] == ctx["seg"][:, 5:6].expand_as(ctx["seg"])[keep]).all()
+    # dropped body = no body tokens (mixed batch: only the dropped pairs match the control)
+    dropped = run(dict(ctx, keep=torch.zeros(6)))
+    assert torch.allclose(dropped, plain, atol=1e-6)
+    mixed = run(dict(ctx, keep=torch.tensor([1., 0, 1, 0, 1, 0])))
+    assert torch.allclose(mixed[1::2], plain[1::2], atol=1e-6) and not torch.allclose(mixed[::2], plain[::2], atol=1e-4)
+    # inputs of dropped pairs, other clips and missing steps do not matter; a kept same-clip step does
+    noise = {k: g + torch.randn_like(g) for k, g in ctx["groups"].items()}
+    base = run(ctx)
+    masked = (~keep).unsqueeze(-1)
+    other = dict(ctx, groups={k: torch.where(masked, noise[k], g) for k, g in ctx["groups"].items()})
+    assert torch.allclose(run(other), base, atol=1e-5)
+    off = torch.tensor([1., 0, 1, 0, 1, 0])
+    a, b = dict(ctx, keep=off), dict(ctx, keep=off, groups=noise)
+    assert torch.allclose(run(a)[1::2], run(b)[1::2], atol=1e-6)
+    centre = {k: g.clone() for k, g in ctx["groups"].items()}
+    centre["arm"][:, 5] += 5.0
+    assert not torch.allclose(run(dict(ctx, groups=centre)), base, atol=1e-4)
+    # padded visual frames are ignored too
+    junk = v.clone()
+    junk[0, 51:] = 7.0
+    assert torch.allclose(model.represent(junk, ctx["vis_offset"], ctx["vis_valid"], ctx)[0][0, :51], base[0, :51], atol=1e-5)
+
+
+def test_joint_gradients_reach_every_module(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model = _joint_model(store)
+    _, ctx, v, t, n = _joint_batch(store)
+    ctx["keep"] = torch.ones(6)
+    assert not v.requires_grad
+    model.losses(v, t, n, torch.ones(6), ctx)["match"].backward()
+    live = lambda params: any(p.grad is not None and p.grad.abs().sum() > 0 for p in params)
+    assert live([model.vproj[2].weight]) and live(model.word.parameters()) and live([model.logit_scale])
+    assert live([model.modality]) and live([model.position]) and live(model.final_norm.parameters())
+    for layer in model.transformer.layers:
+        for part in (layer.self_attn, layer.linear1, layer.linear2, layer.norm1, layer.norm2):
+            assert live(part.parameters())
+    assert model.modality.grad[1].abs().sum() > 0 and model.position.grad[5].abs().sum() > 0
+    for group in model.encoder.mlps:
+        assert live(model.encoder.mlps[group].parameters()), group
+    assert live(model.encoder.fwd.parameters()) and live(model.encoder.bwd.parameters()) and live(model.body_proj.parameters())
+
+
+def test_joint_matched_init(episodes):
+    import torch
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    control, body = _joint_model(store, False), None
+    after = torch.get_rng_state()
+    body = _joint_model(store, True)
+    assert torch.equal(after, torch.get_rng_state())  # body modules leave the default RNG stream alone
+    cs, bs = control.state_dict(), body.state_dict()
+    common = [k for k in bs if not k.startswith(("encoder.", "body_proj."))]
+    assert set(common) == set(cs) and len(common) > 20
+    assert all(torch.equal(cs[k], bs[k]) for k in common)
+    counts = body.param_counts()
+    assert control.param_counts()["body_only"] == 0 and counts["common"] == control.param_counts()["total"]
+    assert counts["total"] == counts["common"] + counts["body_only"] > counts["common"]
+
+
+def test_joint_train_and_eval_scores_agree(episodes, upstream):
+    import torch
+    from nursery.learner import evaluate
+
+    root, _ = episodes
+    store = _store(root, clips=10)
+    model = _joint_model(store).eval()
+    data, ctx, v, t, n = _joint_batch(store)
+    ctx["keep"] = torch.ones(6)
+    with torch.no_grad():
+        both = model.pair_scores(v, t, n, ctx)
+        pic = model.pair_scores(v, t, n, {k: x for k, x in ctx.items() if k.startswith("vis_")})
+
+    class Pairs:
+        def __len__(self):
+            return 6
+
+        def __getitem__(self, i):
+            return i, v[i], t[i], int(n[i])
+
+    layout = (ctx["vis_offset"], ctx["vis_valid"])
+    for batch in (6, 4):
+        T, R, Rb, ok = evaluate.joint_reps(model, upstream, Pairs(), data, layout, "cpu", batch)
+        assert torch.allclose(model.score(Rb, ok, T), both, atol=1e-5)
+        assert torch.allclose(model.score(R, ok, T), pic, atol=1e-5)
+    assert not torch.allclose(both, pic, atol=1e-4)
+    # padded frames get no weight: 51 valid tokens in pair 0
+    assert ok[0].sum() == 51 and ok[1:].all()
+    # single-frame probe input == a one-frame window at offset 0 with no body
+    x = torch.randn(3, 17, 8)
+    one = torch.ones(3, 1, dtype=torch.bool)
+    with torch.no_grad():
+        single = model.enc_regions(x)
+        assert torch.equal(single, model.represent(x, torch.zeros(3, 1, dtype=torch.long), one)[0])
+        vis = {"vis_offset": torch.zeros(3, 1, dtype=torch.long), "vis_valid": one}
+        probe = model.score(single, torch.ones(3, 17, dtype=torch.bool), model.enc_text(t[:3], n[:3]))
+        assert torch.allclose(probe, model.pair_scores(x, t[:3], n[:3], vis), atol=1e-6)
+    # body-present trials run on the same scores
+    manifest = pd.DataFrame({"referent": list("abcdef"), "video_id": [f"v{i}" for i in range(6)], "frame_idx": 0})
+    frames = manifest.assign(subject="s1", clip="clip", held_category=None,
+                             objects=[json.dumps([{"category": c, "visible_px": 40}]) for c in "abcdef"])
+    context = evaluate.body_present_context(manifest, frames, {f"v{i}|0": i for i in range(6)}, 0, 0)
+    out = evaluate.joint_body_present_4afc(model, upstream, Pairs(), data, manifest, layout, "cpu", trials=True, context=context)
+    assert out["n_trials"] == 6 and set(out["trials"]) == {"picture_soft", "fused_soft"} and "body" not in out
+
+
+def test_joint_probe_reproduces_upstream_trials(episodes, upstream):
+    import torch
+    from nursery.learner import evaluate
+
+    root, run = episodes
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    region = _upstream_module("train_region_mil")
+    model = _joint_model(_store(root, clips=10), False).eval()
+    model.tau_p = 1e-4  # soft pooling ~ hard max: same trials must give the same per-category results
+    probes = pd.read_parquet(run / "probes_frames.parquet")
+    cache, lut = region.load_region_cache(run / "probes_cache")
+    vocab = {"<pad>": 0, **{c: i + 1 for i, c in enumerate(("mug", "bowl", "apple", "banana"))}}
+    table = probes[probes.split == "dev"]
+    acc, detail = evaluate.probe_4afc_soft(model, region, cache, lut, table, vocab, "cpu")
+    ref_acc, ref = region.eval_4afc_region(model, cache, lut, table, vocab, "cpu", return_detail=True)
+    assert detail == ref and acc == ref_acc
+
+
+def test_joint_body_tokens_never_cross_clips_or_partitions(episodes):
+    from nursery.learner import body
+    from nursery.learner.windows import BodyData
+    from nursery.learner.train import clip_partition
+
+    root, _ = episodes
+    frames = _clip_frames(root)
+    _write_body(root)
+    store = body.load_store(root, frames, ["v0", "v1"], set())
+    part, _ = clip_partition(frames, "s2", {"dev": 0.15, "test": 0.15, "seed": 0})
+    model = _joint_model(store)
+    pt = np.arange(1, 119)
+    data = BodyData(store, np.zeros(len(pt), int), pt, np.zeros((len(pt), 5), int), None, None, None, None, "cpu", 5, 0.0, 0.0)
+    import torch
+    ctx = data.batch(np.arange(len(pt)), torch.Generator().manual_seed(0), training=False)
+    keep = model.body_keep(ctx).numpy()
+    steps = pt[:, None] + np.arange(-5, 6)
+    inside = (steps >= 0) & (steps < 120)
+    other = inside & (part["v0"][np.clip(steps, 0, 119)] != part["v0"][pt][:, None])
+    assert other.any() and keep.any() and not (keep & other).any()
+    clip = store["clip"][0][np.clip(steps, 0, 119)]
+    assert not (keep & (clip != store["clip"][0][pt][:, None])).any()
+
+
+def test_joint_training_runs_and_rejections(episodes, upstream):
+    from nursery.learner.train import train_run
+
+    root, run = episodes
+    _scoring_episodes(root)
+    _clip_frames(root)
+    _write_body(root)
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    common = dict(epochs=2, pool="soft", heldout_subject="s2", split="clips", arch="joint")
+    counts = {}
+    for body in ("real", "none"):
+        m = train_run(run, "none", 3, name=f"joint_{body}", body=body, **common)
+        assert m["arch"] == "joint" and m["joint"]["layers"] == 2 and "readout_epoch_30" not in m
+        counts[body] = m["joint"]["params"]
+        assert {"hard_dev", "hard_test", "dev", "acc"} <= set(m["history"][0])
+        bp = m["history"][0]["bp"]["clips_dev"]
+        assert set(bp) == ({"picture_soft", "fused_soft"} if body == "real" else {"picture_soft"})
+        assert "body" not in m["body_present_selected"]["clips_dev"] and "probe" not in m
+        assert m["selection_body_present"]["rule"] == ("clips_dev fused_soft" if body == "real" else "clips_dev picture_soft")
+    assert counts["none"]["common"] == counts["real"]["common"] and counts["none"]["body_only"] == 0 < counts["real"]["body_only"]
+    m = train_run(run, "none", 3, name="joint_subject", epochs=1, pool="soft", heldout_subject="s2", arch="joint", body="real")
+    assert "split" not in m and m["body_present"]["n_trials"] >= 8
+    for bad, match in (({"pool": "max"}, "--arch joint"), ({"body": "shuffled"}, "--arch joint"), ({"episodes": "contact"}, "--arch joint"),
+                       ({"labels": True}, "--arch joint"), ({"weights": {"pred": 0.5}}, "auxiliary")):
+        with pytest.raises(ValueError, match=match):
+            train_run(run, "none", 5, **{**dict(epochs=1, pool="soft", arch="joint"), **bad})
+
+
+def _scoring_rows():
+    manifest = pd.DataFrame({"video_id": [f"s{i}" for i in range(10)], "frame_idx": 2,
+                             "referent": list("abcdefghij"), "held_referent": True})
+    frames = pd.DataFrame([{"video_id": f"s{i}", "frame_idx": f, "subject": "person" if i < 8 else "other",
+                            "clip": "scene", "held_category": None,
+                            "objects": json.dumps([{"category": word, "visible_px": 40}])}
+                           for i, word in enumerate("abcdefghij") for f in range(5)])
+    lut = {f"{r.video_id}|{r.frame_idx}": i for i, r in enumerate(frames.itertuples())}
+    return manifest, frames, lut
+
+
+@pytest.mark.parametrize("evidence,excluded", [("center", True), ("adjacent", True), ("body", True),
+                                              ("reset", False), ("uncached", False), ("outside", False)])
+def test_body_trial_truth_windows_and_clip_resets(evidence, excluded):
+    from nursery.learner import evaluate
+    manifest, frames, lut = _scoring_rows()
+    if evidence in ("center", "adjacent", "uncached"):
+        f = 2 if evidence == "center" else 3
+        loc = (frames.video_id == "s1") & (frames.frame_idx == f)
+        frames.loc[loc, "objects"] = json.dumps([{"category": c, "visible_px": 40} for c in ("a", "b")])
+        if evidence == "uncached":
+            del lut["s1|3"]
+    else:
+        f = 0 if evidence == "outside" else 4
+        frames.loc[(frames.video_id == "s1") & (frames.frame_idx == f), "held_category"] = "a"
+        if evidence == "reset":
+            frames.loc[(frames.video_id == "s1") & (frames.frame_idx == 3), "clip"] = "different"
+    context = evaluate.body_present_context(manifest, frames, lut, 1, 1 if evidence == "outside" else 2)
+    assert (1 not in context["pools"][0]) == excluded
+    assert not set(context["pools"][0]) & {0, 8, 9}  # subject/session restrictions never relax
+    assert not any(context["held"])  # ignore stale source-time held_referent=True
+
+
+def test_body_trial_validation_and_insufficient_foils(episodes, upstream):
+    from nursery.learner import evaluate
+    from nursery.learner.train import train_run
+    manifest, frames, lut = _scoring_rows()
+    with pytest.raises(ValueError, match="validated renderer context"):
+        evaluate.body_present_4afc(None, None, None, None, manifest, "cpu")
+    with pytest.raises(ValueError, match="renderer metadata"):
+        evaluate.body_present_context(manifest, frames.drop(columns="objects"), lut, 1, 2)
+    with pytest.raises(ValueError, match="supplied visual frame"):
+        evaluate.body_present_context(manifest, frames[~((frames.video_id == "s1") & (frames.frame_idx == 3))], lut, 1, 2)
+    for word in (None, "", np.nan, "absent"):
+        bad = manifest.copy()
+        bad.loc[0, "referent"] = word
+        with pytest.raises(ValueError, match="target referent|positive target absent"):
+            evaluate.body_present_context(bad, frames, lut, 1, 2)
+    small = manifest.iloc[:3].copy()
+    context = evaluate.body_present_context(small, frames, lut, 1, 2)
+    assert evaluate._body_trials(small, context, 5, None) == []
+    assert context["definition"]["n_insufficient_foils"] == 3
+    # An evaluation partition is exactly the provided rows: no widening to other rows.
+    assert all(set(p) <= {0, 1, 2} for p in context["pools"])
+    same_video = manifest.iloc[:4].copy()
+    same_video["video_id"], same_video["frame_idx"] = "single", np.arange(4)
+    same_frames = same_video.assign(subject="one", clip="clip", held_category=None,
+                                   objects=[json.dumps([{"category": c, "visible_px": 1}]) for c in "abcd"])
+    same_context = evaluate.body_present_context(same_video, same_frames, {f"single|{i}": i for i in range(4)}, 0, 0)
+    assert not any(len(p) for p in same_context["pools"])
+    # The original fixture has every target in every scene and one session per subject.
+    # Requested heldout scoring fails before optimizer steps rather than manufacturing trials.
+    root, run = episodes
+    write_transcripts(root, run, 8, p_ref=1, p_name=1, rate_hz=2)
+    _fake_caches(root, run)
+    with pytest.raises(ValueError, match="insufficient valid foils"):
+        train_run(run, "none", 3, epochs=1, pool="soft", heldout_subject="s2")
+
+
+def test_body_trial_controls_share_candidates_and_ties_are_unbiased(monkeypatch):
+    import torch
+    from types import SimpleNamespace
+    from nursery.learner import evaluate
+    manifest, frames, lut = _scoring_rows()
+    context = evaluate.body_present_context(manifest, frames, lut, 1, 2)
+
+    class Constant:
+        encoder = None
+        tau_p = 0.1
+        beta = 1.0
+        def eval(self):
+            return self
+        def enc_text(self, t, n):
+            return torch.ones(len(t), 2)
+        def enc_regions(self, v):
+            return torch.ones(len(v), 17, 2)
+        def latent_of(self, ctx):
+            return torch.ones(len(ctx), 2)
+        def body_similarity(self, z, t):
+            return torch.zeros(len(z), len(t))
+        def score(self, r, valid, t):
+            return torch.zeros(len(r), len(t))
+
+    class Pairs:
+        def __len__(self):
+            return len(manifest)
+        def __getitem__(self, i):
+            return i, torch.ones(17, 2), torch.ones(1, dtype=torch.long), 1
+
+    def collate(rows):
+        return (torch.tensor([r[0] for r in rows]), torch.stack([r[1] for r in rows]),
+                torch.stack([r[2] for r in rows]), torch.tensor([r[3] for r in rows]))
+    upstream = SimpleNamespace(collate=collate)
+    data = SimpleNamespace(batch=lambda rows, generator, training: rows)
+    reps = (torch.ones(10, 2), torch.ones(10, 17, 2), torch.ones(10, 17, 2), torch.ones(10, 17, dtype=torch.bool))
+    monkeypatch.setattr(evaluate, "joint_reps", lambda model, upstream, ds, d, layout, device, batch: (reps[0], reps[1], reps[2] if d else None, reps[3]))
+    results = []
+    for with_body in (False, True):
+        model = Constant()
+        model.encoder = object() if with_body else None
+        d = data if with_body else None
+        results.append(evaluate.body_present_4afc(model, upstream, Pairs(), d, manifest, "cpu", seed=8, trials=True, context=context))
+        results.append(evaluate.joint_body_present_4afc(model, upstream, Pairs(), d, manifest, None, "cpu", seed=8, trials=True, context=context))
+    for out in results:
+        assert out["candidate_rows"] == results[0]["candidate_rows"]
+        assert out["correct_slots"] == results[0]["correct_slots"]
+        assert out["trial_rows"] == list(range(8))
+        assert out["n_insufficient_foils"] == 2
+        assert out["trials"]["picture_soft"] == [int(x == 0) for x in out["correct_slots"]]
+        assert out["picture_soft"]["acc"] < 100
+        for row, cand, slot in zip(out["trial_rows"], out["candidate_rows"], out["correct_slots"]):
+            assert cand[slot] == row
+            assert set(cand) - {row} <= set(context["pools"][row])

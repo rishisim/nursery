@@ -1,259 +1,184 @@
-# BabyWorld-Lite
+# Nursery
 
-A tiny working prototype for **synthetic developmental multimodal data**.
+Nursery asks whether video plus bodily experience supports better language
+learning than video alone, as independent training experience increases.
+The simulator supplies egocentric video and body signals; caregiver speech
+provides intentionally uncertain language supervision.
 
-The point is not photorealism. The point is to show that a synthetic infant-like world can be deeply instrumented in ways real baby datasets usually cannot be: synchronized egocentric frames, child-directed language, action/proprioception traces, touch/contact signals, object state, causal event labels, and counterfactuals.
+## Current milestone: noun and action acquisition curves
 
-## What this demonstrates
+Gaze and body each help a different kind of word (a double dissociation),
+measured on 85 models across 63–630 training clips, 5 seeds each, comparing
+video (V), video + gaze (V+G) and video + gaze + body (V+G+B):
 
-Each generated episode contains:
+- **Gaze lifts nouns** by +9.5 to +20.0 points at every amount; body adds ≈ 0.
+- **Body lifts actions** by +6.4 to +9.5 points at every amount; gaze adds ≈ 0.
+  V+G+B at 315 clips roughly matches V at 630 (about 2× data efficiency).
+- **Shuffled body ≈ 0**, so the action gain comes from aligned body signals.
+- Video-only is still rising at 630 clips: no plateau yet.
+- Earlier proof of concept: on heavy/light, body added +46 points at 630 clips
+  ([Step 7](docs/step_7_word_types.md)).
 
-- **RGB frames / GIF** from a toy egocentric scene.
-- **Caregiver language** before and after the action.
-- **Action command**: `tap`, `push`, `poke`, or `grasp`.
-- **Proprioception**: hand position and velocity per frame.
-- **Touch/contact**: contact binary, force, normal, slip/vibration proxies.
-- **Object states**: position, velocity, angle per frame.
-- **Causal event label**: e.g. `rolls_far`, `topples`, `slides`, `grasp_success`.
-- **Causal graph and counterfactuals**: e.g. action/contact/material/impulse -> event.
+Protocol and results: [docs/step_9_acquisition_curves.md](docs/step_9_acquisition_curves.md).
+Archived per-run data and analysis script:
+[docs/results/noun_action_acquisition_curves/](docs/results/noun_action_acquisition_curves/).
 
-It also includes a mini-benchmark that trains the same classifier under different input conditions:
+Start with [PLAN.md](PLAN.md). Study documents:
+[16×16 vision](docs/step_1_visual_baseline.md),
+[child gaze](docs/step_2_child_gaze.md),
+[richer body input](docs/step_3_body_representation.md),
+[a controlled representation comparison](docs/step_4_body_representation_comparison.md),
+[noun acquisition curves](docs/step_6_language_acquisition_curves.md),
+[property and action words](docs/step_7_word_types.md),
+[the body training recipe](docs/step_8_body_training_recipe.md) (skipped), and
+[noun and action curves](docs/step_9_acquisition_curves.md).
+[Past experiments](archive/language_learning/past_experiments.md) explains what
+we tried earlier; the completed cross-situational and acquisition studies are
+indexed in the [archive](archive/README.md#completed-study-worktrees).
 
-1. vision + language proxy
-2. plus action
-3. plus sensorimotor/touch
-4. oracle physical state
+## File map
 
-This gives a quick **data-usability** story: richer synthetic modalities can be evaluated by whether they improve action-effect prediction under fixed model/training conditions.
-
-## Quickstart
-
-```bash
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-
-python generate_dataset.py --n 1200 --out data/sample --render-first 12
-python train_benchmark.py --data data/sample/manifest.csv --out data/sample
-python make_demo_html.py --data data/sample --out demo.html
-open demo.html  # or double-click it
+```text
+PLAN.md                         Current direction and study links
+nursery/
+  learner/
+    video_only.py               Video → word matching (visual baseline)
+    additive.py                 Video score + learned body → word score
+    interaction.py              Additive matching with zero-init visual–body interaction
+    body.py                     Contact, fingers, arms, load/skin encoding
+    rich.py                     Step 3 rich body summaries, train-only statistics
+    windows.py                  Clip-bounded body windows and episode context
+    gaze.py                     Gaze readouts over the visual word learner
+    gaze_data.py                Gaze windows aligned to visual windows
+    child_gaze.py               Step 2 preparation and timing gate
+    losses.py                   Shared language and diagnostic loss functions
+    train.py                    Shared data splits, training and checkpoints
+    evaluate.py                 Shared picture-only and body-present scoring
+    acquisition.py              Paired acquisition runs, dev-only selection
+    acquisition_data.py         Frozen clip subsets and evaluation panels
+    acquisition_evaluate.py     Fixed word-query panels for curves
+    acquisition_report.py       Aggregate and plot the curve matrix
+    embed.py                    Frozen DINOv2 feature extraction
+    config.json                 Upstream pin, training defaults, evaluation paths
+    hand_patches.json           Contact-patch definitions
+    __main__.py                 One CLI: embed / train / acquisition
+    __init__.py                 Pinned upstream loading
+  speech/                       Caregiver utterances, timing, vocabulary and cues
+  simulator/                    GRAB replay, body signals, assets and rendering
+  embodiedgen_scene.py          Room builder; also used by the renderer
+  common.py                     Paths, configuration and ignored-output guard
+configs/                        Room-generation configuration
+scripts/                        Render/pipeline/seed launchers and run summaries
+tests/                          Current learner, speech, physical and simulator tests
+docs/
+  step_1_visual_baseline.md             Step 1: 16×16 vision and recorded 4×4 reference
+  step_2_child_gaze.md                  Step 2: simulated gaze drives naming and feeds the learner
+  step_3_body_representation.md         Step 3: recoverable sensory detail and missing signals
+  step_4_body_representation_comparison.md  Step 4: current versus richer body, additive
+  step_6_language_acquisition_curves.md Step 6: noun curves, video versus gaze and body
+  step_7_word_types.md                  Step 7: property and action word tests
+  step_8_body_training_recipe.md        Step 8: wordless body pretraining (skipped)
+  step_9_acquisition_curves.md          Step 9: noun and action curves, V / V+G / V+G+B
+  results/noun_action_acquisition_curves/  Archived Step 9 results, analysis, word counts
+  literature/                   Literature notes
+  side_chat.md                  Side discussion notes
+  learner.md                    Current implementation and scoring reference
+  speech_coupling.md             Speech-generation evidence and assumptions
+archive/
+  code/learner/                 Completed heavy/light, pretraining and old joint pilot
+  code/motion/                  Inactive HOIDiNi/InterMimic code and its tests
+  language_learning/            Past experiments, protocols and curated results
+  legacy_research/              Earlier simulation source/config/test archive
+  README.md                     Historical evidence and artifact locations
 ```
 
-## Leakage-aware forward-prediction eval
+**Video-only and additive share the same visual base, training and evaluation.**
+The additive learner extends `video_only.py`; it does not carry a second copy
+of the visual implementation. Both use the pinned
+[vlm-headcam](https://github.com/mcfrank/vlm-headcam) upstream implementation.
+The preserved acquisition runner, joint interaction and 16×16 support are
+integrated into this checkout; see [source and worktree locations](archive/README.md#completed-study-worktrees).
+Step 1 selects only video-only training at the full-data point.
+The archived width-128 joint pilot is a different implementation; `--arch joint`
+is retained only for compatibility. New representation comparisons start with
+additive fusion.
 
-The honest eval reads `episodes.jsonl` directly and recomputes all features from
-frames `[0, k]`, where `k` is the contact/prediction frame. It does not use the
-legacy manifest summaries (`max_force`, `contact_count`, `slip_estimate`,
-`vibration_energy`) or `hardness_proxy` as inputs. The training objective is
-continuous rollout prediction: post-contact displacement, x/y delta, final x/y
-position, and topple angle. Event labels are used only for coverage/diversity
-reporting, not as model targets.
+## Existing entry points
 
-```bash
-python3 generate_dataset.py --n 6000 --out data/honest --render-first 12
-python3 run_honest_eval.py --episodes data/honest/episodes.jsonl --out data/honest/eval
-```
-
-By default the full run evaluates mechanism splits: held-out material,
-held-out high impulse x high mass region, and held-out object/action
-composition. A random split is still available explicitly as a contrast.
-
-Outputs:
-
-- `results.json`
-- `forward_prediction_report.txt`
-- `coverage_report.txt`
-- `coverage_report.json`
-- `{split}_displacement_mae.png`
-- `k_sweep_error_vs_k.png`
-
-For quick smoke tests on the bundled 800-episode sample, lower the exploratory
-support threshold or run a subset of splits:
+Run these from the repository root with the existing `.external/cue-env/` and
+upstream checkout pinned in `nursery/learner/config.json`.
+These examples explain the existing runner; study-specific data amounts and
+budgets still come from the study plans.
 
 ```bash
-python3 run_honest_eval.py --episodes data/sample/episodes.jsonl --out data/sample/eval --splits random held_out_material --min-test-cell-size 1 --bootstrap 100 --skip-k-sweep
-python3 -m pytest
+# Shared preparation, using an existing episode dataset.
+.external/cue-env/bin/python -m nursery.speech transcripts --episodes outputs/renders/clean_856 --output outputs/runs/study --seed 0
+.external/cue-env/bin/python -m nursery.learner embed --episodes outputs/renders/clean_856 --output outputs/runs/study
+
+# Video-only; direct language objective with soft pooling.
+.external/cue-env/bin/python -m nursery.learner train --run outputs/runs/study --condition none --seed 0 --pool soft --body none --w-pred 0 --name video_only
+
+# Additive; same visual/speech data, with body inputs and the same objective.
+.external/cue-env/bin/python -m nursery.learner train --run outputs/runs/study --condition none --seed 0 --pool soft --body real --w-pred 0 --name additive
 ```
 
-## Pre-access grounded-language pilot
+`--physical <directory>` adds saved load/skin streams to the additive learner;
+the examples above use the base contact/finger/arm streams. Historical defaults
+and diagnostic flags are documented in [the learner reference](docs/learner.md).
+No run is launched by this documentation.
 
-The grounding pipeline is deliberately labeled
-`provisional_not_babyview_matched`. It creates the experimental infrastructure
-needed before restricted BabyView access without claiming that its provisional
-rates are empirical estimates.
+Embedding defaults to 16×16; `--grid 4` retains the historical option. Use a
+fresh output root when changing grids. The exact Step 1 commands and frozen
+comparison are in [the visual baseline](docs/step_1_visual_baseline.md#execution-protocol).
 
-It generates the same base episodes under three language-alignment conditions
-(`strong`, `weak`, and episode-shuffled) and four whole-trajectory motor
-conditions (`null`, synchronized, split-local episode-shuffled, and
-time-shifted). Model-visible records contain only raw frame paths, timestamped
-utterances, and low-level hand trajectories. Oracle state and causal labels are
-written to a physically separate file. The persistent audit checks allowlisted
-inputs, no-self and no-cross-split donors, composition/hash-disjoint splits,
-equal inventories across alignment arms, and a caption/contact-marker-free
-renderer.
+`scripts/render.sh <output>` renders sessions; `scripts/pipeline.sh` chains
+speech, embedding and training. `scripts/train_seeds.sh` runs several seeds;
+`scripts/summarize.py` reads saved metrics; `scripts/merge_render.py` combines
+per-session renders. The simulator needs licensed GRAB/SMPL-X assets, Blender,
+`.external/egocentric-env/`, and the room bank specified by its configuration.
+Use `python -m nursery.simulator --help` or
+`python -m nursery.embodiedgen_scene --help` for those entry points.
 
-The same config also drives provisional utterance rate/count/length/timing,
-activity-window duration, visibility/occlusion, camera motion, and distractor
-density. The audit records both configured and realized distributions,
-including target-word frequencies and silent-frame fraction, so measured
-BabyView aggregates can later replace the provisional values through the same
-schema.
+## Local data and verification
+
+`outputs/` is the destination for new generated files and runs; it also holds
+retained datasets, features and checkpoints. Databrary agreement/access PDFs
+are in `outputs/exports/databrary/`. Use system temporary storage for scratch work.
+`.external/` holds environments and upstream checkouts; `data/` and `downloads/`
+retain local assets. These roots are ignored, but their contents are not
+automatically disposable. Reusable inputs and mixed run/input folders retain
+their existing paths. Completed standalone runs and retired reviews/motion
+artifacts are under `outputs/legacy/`; see the
+[relocation map](archive/README.md#local-artifact-relocation).
+Archived source snapshots are excluded from default test discovery.
+
+```text
+outputs/
+  assets/                 Object assets and evaluation images
+  embodiedgen_scene/      Room bank and previews used by the simulator
+  renders/clean_856/       Retained source dataset
+  speech_data/            Source speech research data
+  runs/                   Reusable features plus existing baseline/run records
+  exports/                Documents and conversation exports
+  legacy/
+    motion/               Retired motion trials and previews
+    reviews/              Completed audits, literature and handoff material
+    runs/
+      heavy_light/        Completed property-word diagnostic
+      sensory_pretraining/ Completed sensory-pretraining comparison
+    …                       Earlier archives remain in place
+```
+
+`outputs/runs/clean_body/`, `outputs/runs/clean_video_only/`,
+`outputs/runs/clean_perfect_naming/` and `outputs/runs/step1_matched/`
+contain both saved inputs and experiment records; their
+presence does not queue new runs. For new studies, use descriptive roots such
+as `outputs/runs/body_representation_comparison/`, with explicit condition/seed
+names. This is a naming example, not a created run. Completed study worktrees,
+including their original run roots, live under `outputs/legacy/worktrees/` with
+compatibility links at their previous locations.
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-python -m babyworld_lite.grounding \
-  --config configs/grounding_provisional.yaml \
-  --out data/grounding_provisional
-
-python train_grounding_pilot.py \
-  --episodes data/grounding_provisional/examples.jsonl \
-  --out data/grounding_pilot \
-  --seeds 11 22 33 \
-  --alignment weak \
-  --device auto
+PYTHONDONTWRITEBYTECODE=1 .external/cue-env/bin/python -m pytest -q -p no:cacheprovider tests/test_learner.py tests/test_speech.py tests/test_physical.py
+PYTHONDONTWRITEBYTECODE=1 .external/egocentric-env/bin/python -m pytest -q -p no:cacheprovider tests/test_simulator.py
 ```
-
-The learner uses actual rendered RGB frames, utterance text, and continuous
-hand `x/y/vx/vy` sequences. All arms share the same video, text, and motor
-encoders, initialization, data order, and optimizer schedule. The locked
-primary evaluation is a balanced held-out-composition action contrast; it
-calls only the video and text encoders, with motor omitted at test. Results are
-written to `pilot_results.json` with paired lift intervals, manipulation
-checks, shortcut diagnostics, and an explicit claim gate. The small default
-run is an infrastructure validation, not evidence that synchronized motor cues
-improve language grounding.
-
-### Official Machine-DevBench integration
-
-The learner can now be saved as a standalone checkpoint and evaluated through
-the public EgoBabyVLM Machine-DevBench protocol. The local runner imports the
-official dataset discovery, task metadata, frequency-balanced aggregator, and
-feature-extractor protocol from a pinned EgoBabyVLM checkout. It changes only
-the Slurm/CUDA launcher so the same trial equations can run on Apple MPS.
-
-```bash
-git clone https://github.com/facebookresearch/egobabyvlm .external/egobabyvlm
-PYTHONPATH=.external/egobabyvlm python -m scripts.eval_data.download_machine_devbench \
-  --cache-dir .external/cache/machine_devbench
-
-python scripts/train_nursery_checkpoint.py \
-  --episodes data/grounding_provisional/examples.jsonl \
-  --out output/machine_devbench/nursery_sync_seed11.pt \
-  --arm synchronized --seed 11 --alignment weak --epochs 8 --device auto
-
-python scripts/run_machine_devbench.py \
-  --model nursery \
-  --checkpoint output/machine_devbench/nursery_sync_seed11.pt \
-  --out output/machine_devbench/nursery_full.json \
-  --device auto
-
-python scripts/audit_machine_devbench_coverage.py \
-  --checkpoint output/machine_devbench/nursery_sync_seed11.pt
-```
-
-The public archive has 20 manifests and 3,721 trials across realistic and
-cartoon styles. The provisional learner completes all of them, but only 13 of
-1,414 unique target words are in its training vocabulary. Its current score is
-therefore an integration diagnostic, not evidence about developmental language
-learning. The post-access corpus must expand and calibrate the vocabulary before
-Machine-DevBench becomes a substantive secondary outcome.
-
-As an external correctness check, the full OpenAI CLIP ViT-L/14 run yields
-86.27 lexical, 70.29 grammatical, and 78.28 overall, versus the published
-CLIP-L row of 87.3 / 70.4 / 78.8. The 0.52-point overall difference provides a
-close macOS/MPS reproduction of the public reference.
-
-The optional two-page pre-access research attachment can be rebuilt with:
-
-```bash
-python scripts/build_frank_attachment.py
-pdftoppm -png output/pdf/frank_preaccess_experimental_plan.pdf tmp/pdfs/frank-plan
-```
-
-## Aria Everyday Activities real-data phase
-
-The real-data adapter uses Meta's Aria Everyday Activities (AEA) release as an
-**adult, partly scripted sensor-format analogue**. It is not developmental
-evidence and is not represented as BabyView-matched. The locked question is
-whether synchronized six-axis head accelerometer+gyroscope input during
-training improves motor-withheld video/ASR action grounding relative to a
-split-local, whole-sequence-shuffled IMU control.
-
-The initial plan selects 40 recordings: eight from each location and eight
-from each script, using only predeclared ASR action-anchor counts and safe
-manifest metadata before VRS inspection. The selected raw VRS budget is about
-106.3 GiB. Annotations and raw VRS are acquired initially; all MPS outputs are
-excluded.
-
-```bash
-# The user must personally accept the AEA license and obtain the expiring JSON.
-python scripts/plan_aea_subset.py \
-  --links "$HOME/Downloads/AriaEverydayActivities_download_urls.json" \
-  --annotations-root data/aea_raw \
-  --out configs/aea_subset_40.yaml
-
-# This flag acknowledges an acceptance already completed by the user; the
-# script never accepts a license. Signed URLs are never printed or copied.
-python scripts/download_aea_subset.py \
-  --links "$HOME/Downloads/AriaEverydayActivities_download_urls.json" \
-  --plan configs/aea_subset_40.yaml \
-  --out data/aea_raw \
-  --components annotations main_vrs \
-  --confirm-license-accepted-by-user
-
-# VRS preprocessing uses a separate Project Aria environment. The existing
-# project venv is Python 3.12, so use its interpreter to create it.
-.venv/bin/python -m venv .venv-aria
-.venv-aria/bin/python -m pip install 'projectaria-tools[all]'
-.venv-aria/bin/python scripts/preprocess_aea.py \
-  --config configs/aea_real.yaml --out data/aea_processed
-
-# Training remains in the existing project environment.
-.venv/bin/python scripts/run_aea_experiment.py \
-  --examples data/aea_processed/examples.jsonl \
-  --config configs/aea_real.yaml --out output/aea_real
-
-# Build the canonical, source-backed technical-report payload. The Codex
-# portable report builder can package this as a self-contained HTML report.
-.venv/bin/python scripts/build_aea_report_artifact.py \
-  --results output/aea_real/aea_results.json \
-  --preprocess data/aea_processed/preprocess_summary.json \
-  --out output/aea_real/artifact.json
-```
-
-The pipeline resamples the three accelerometer and three gyroscope axes together
-at 50 Hz in SI units, keeps every window from a sequence together, groups or
-purges concurrent recordings, uses paired seeds and a hierarchical bootstrap,
-and omits IMU from the primary test code path. Held-out location,
-wearer-session-proxy, and action-object-composition evaluations are reported
-separately. The wearer field is explicitly a release-visible
-location+script+recording proxy, not persistent person identity.
-
-A restricted-data-free end-to-end smoke is available:
-
-```bash
-.venv/bin/python scripts/run_aea_smoke.py
-```
-
-Its outputs are labeled `infrastructure_smoke_test_not_a_real_data_finding`.
-The report artifact records source provenance, metric definitions, the chart
-contract, and the technical-report section mapping alongside the results.
-See [the AEA phase protocol](docs/aea_real_data_phase.md) for acquisition,
-audit, positive-control, inference, and reporting details.
-
-## Why this is deliberately small
-
-The full idea is huge. This pilot isolates the core claim:
-
-> Synthetic developmental data can be cheap, scalable, perfectly instrumented, and benchmarked for usefulness even before it is photorealistic.
-
-Next extensions:
-
-- replace 2D physics with PyBullet, TDW, Habitat, or OmniGibson;
-- add depth, segmentation masks, richer audio, and object IDs;
-- train a small VLM/world-model instead of a classifier;
-- test transfer to real egocentric data or held-out simulated worlds;
-- add a cost-normalized leaderboard: performance per generated hour, per dollar, or per causal event.

@@ -1,0 +1,231 @@
+{
+  "clock": "episode_seconds",
+  "schema": "AuthoritativeSpeechAlignment.v1",
+  "utterances": [
+    {
+      "duration_s": 1.0558333333333334,
+      "end_s": 5.255833333333333,
+      "end_sample": 252280,
+      "event": "red_fixation",
+      "id": "u01",
+      "must_end_by_s": 6.0,
+      "segment_sha256": "cabf071e880d14bf69e4fc66bf044e1e86a4394302ac4a70c4604a9e4b6b97b8",
+      "start_s": 4.2,
+      "start_sample": 201600,
+      "text": "There is the red toy.",
+      "words": [
+        {
+          "end_s": 4.529947916666667,
+          "start_s": 4.2,
+          "word": "There"
+        },
+        {
+          "end_s": 4.6619270833333335,
+          "start_s": 4.529947916666667,
+          "word": "is"
+        },
+        {
+          "end_s": 4.859895833333334,
+          "start_s": 4.6619270833333335,
+          "word": "the"
+        },
+        {
+          "end_s": 5.057864583333333,
+          "start_s": 4.859895833333334,
+          "word": "red"
+        },
+        {
+          "end_s": 5.255833333333333,
+          "start_s": 5.057864583333333,
+          "word": "toy"
+        }
+      ]
+    },
+    {
+      "duration_s": 0.7711666666666667,
+      "end_s": 15.771166666666666,
+      "end_sample": 757016,
+      "event": "physical_lift",
+      "id": "u02",
+      "must_end_by_s": 18.0,
+      "segment_sha256": "7627b2a168d5db262c5e1d7d404fd8b66e48e9a347cfc7b5acea1741471b3797",
+      "start_s": 15.0,
+      "start_sample": 720000,
+      "text": "You picked it up.",
+      "words": [
+        {
+          "end_s": 15.177961538461538,
+          "start_s": 15.0,
+          "word": "You"
+        },
+        {
+          "end_s": 15.533884615384615,
+          "start_s": 15.177961538461538,
+          "word": "picked"
+        },
+        {
+          "end_s": 15.65252564102564,
+          "start_s": 15.533884615384615,
+          "word": "it"
+        },
+        {
+          "end_s": 15.771166666666666,
+          "start_s": 15.65252564102564,
+          "word": "up"
+        }
+      ]
+    },
+    {
+      "duration_s": 1.2477291666666666,
+      "end_s": 25.247729166666666,
+      "end_sample": 1211891,
+      "event": "bimanual_turn",
+      "id": "u03",
+      "must_end_by_s": 27.5,
+      "segment_sha256": "a4eecf8e18a7261f051336bea42185f1f3d397ba01d896363f40bdd41ac807a1",
+      "start_s": 24.0,
+      "start_sample": 1152000,
+      "text": "Both hands are turning it.",
+      "words": [
+        {
+          "end_s": 24.2376626984127,
+          "start_s": 24.0,
+          "word": "Both"
+        },
+        {
+          "end_s": 24.53474107142857,
+          "start_s": 24.2376626984127,
+          "word": "hands"
+        },
+        {
+          "end_s": 24.712988095238096,
+          "start_s": 24.53474107142857,
+          "word": "are"
+        },
+        {
+          "end_s": 25.128897817460317,
+          "start_s": 24.712988095238096,
+          "word": "turning"
+        },
+        {
+          "end_s": 25.247729166666666,
+          "start_s": 25.128897817460317,
+          "word": "it"
+        }
+      ]
+    },
+    {
+      "duration_s": 0.7639583333333333,
+      "end_s": 33.763958333333335,
+      "end_sample": 1620670,
+      "event": "free_release",
+      "id": "u04",
+      "must_end_by_s": 36.0,
+      "segment_sha256": "9c51afa42df58837898fe9544c0cdf3bff981f6f7cf093af7316a2d752722af5",
+      "start_s": 33.0,
+      "start_sample": 1584000,
+      "text": "It is in the bin.",
+      "words": [
+        {
+          "end_s": 33.12732638888889,
+          "start_s": 33.0,
+          "word": "It"
+        },
+        {
+          "end_s": 33.25465277777778,
+          "start_s": 33.12732638888889,
+          "word": "is"
+        },
+        {
+          "end_s": 33.38197916666667,
+          "start_s": 33.25465277777778,
+          "word": "in"
+        },
+        {
+          "end_s": 33.57296875,
+          "start_s": 33.38197916666667,
+          "word": "the"
+        },
+        {
+          "end_s": 33.763958333333335,
+          "start_s": 33.57296875,
+          "word": "bin"
+        }
+      ]
+    },
+    {
+      "duration_s": 1.0001458333333333,
+      "end_s": 46.30014583333333,
+      "end_sample": 2222407,
+      "event": "blue_cup_motion",
+      "id": "u05",
+      "must_end_by_s": 48.0,
+      "segment_sha256": "ddb48c9d35b8196791e6a0e7b28e3908cc4768b2a7c2f2e9a5f6161a047d1bc2",
+      "start_s": 45.3,
+      "start_sample": 2174400,
+      "text": "The blue cup moved.",
+      "words": [
+        {
+          "end_s": 45.500029166666664,
+          "start_s": 45.3,
+          "word": "The"
+        },
+        {
+          "end_s": 45.76673472222222,
+          "start_s": 45.500029166666664,
+          "word": "blue"
+        },
+        {
+          "end_s": 45.966763888888885,
+          "start_s": 45.76673472222222,
+          "word": "cup"
+        },
+        {
+          "end_s": 46.30014583333333,
+          "start_s": 45.966763888888885,
+          "word": "moved"
+        }
+      ]
+    },
+    {
+      "duration_s": 1.2960625,
+      "end_s": 50.2960625,
+      "end_sample": 2414211,
+      "event": "final_attention_shift",
+      "id": "u06",
+      "must_end_by_s": 53.0,
+      "segment_sha256": "3c1b8ddd303163e7e425ca6e5d933ba31863215ed8b68edcb2337e0c1a6fd7e2",
+      "start_s": 49.0,
+      "start_sample": 2352000,
+      "text": "Now look toward the window.",
+      "words": [
+        {
+          "end_s": 49.17673579545455,
+          "start_s": 49.0,
+          "word": "Now"
+        },
+        {
+          "end_s": 49.412383522727275,
+          "start_s": 49.17673579545455,
+          "word": "look"
+        },
+        {
+          "end_s": 49.76585511363636,
+          "start_s": 49.412383522727275,
+          "word": "toward"
+        },
+        {
+          "end_s": 49.94259090909091,
+          "start_s": 49.76585511363636,
+          "word": "the"
+        },
+        {
+          "end_s": 50.2960625,
+          "start_s": 49.94259090909091,
+          "word": "window"
+        }
+      ]
+    }
+  ],
+  "word_alignment_method": "deterministic character-proportional subdivision within each synthesized utterance; not acoustic forced alignment"
+}

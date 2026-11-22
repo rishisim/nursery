@@ -1,0 +1,17 @@
+{
+  "embodiedgen_root": ".external/EmbodiedGen",
+  "output_root": "outputs/embodiedgen_scene",
+  "dataset_index": "outputs/EmbodiedGenData/dataset/dataset_index.csv",
+  "room_complexity": "simple",
+  "room_types": [
+    "Bedroom",
+    "LivingRoom",
+    "Kitchen",
+    "Bathroom",
+    "DiningRoom",
+    "Office"
+  ],
+  "room_seeds": [11, 23, 47],
+  "distractor_count": 2,
+  "generate_usd": false
+}
