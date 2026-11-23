@@ -61,7 +61,7 @@ class StaticVisionGaze(nn.Module):
         video = video.masked_fill(~frame_valid[..., None, None], 0)
         tokens = torch.cat((video, closeup.unsqueeze(-2)), dim=-2).flatten(1, 2)
         regions = F.normalize(self.project(tokens), dim=-1)
-        # A query-independent summary is the token supplied to fusion and the LM.
+        # A query-independent summary is the static prefix token for the LM.
         summary = torch.bmm(log_prior.exp().unsqueeze(1), regions).squeeze(1)
         return summary, regions, log_prior
 
@@ -98,21 +98,3 @@ class BodyStream(nn.Module):
                   for name, values in body["groups"].items()}
         states = self.encoder(groups, (~same).float(), body["seg"].masked_fill(~same, -2))
         return self.project(states[:, 5]), same[:, 5]
-
-
-class SensoryFusion(nn.Module):
-    """Update each active summary through one zero-initialized residual."""
-
-    def __init__(self):
-        super().__init__()
-        self.norm = nn.LayerNorm(512)
-        self.attention = nn.MultiheadAttention(512, 4, batch_first=True)
-        self.out_proj = nn.Linear(512, 512)
-        nn.init.zeros_(self.out_proj.weight)
-        nn.init.zeros_(self.out_proj.bias)
-
-    def forward(self, tokens, active):
-        tokens = tokens.masked_fill(~active[..., None], 0)
-        x = self.norm(tokens)
-        attended, _ = self.attention(x, x, x, key_padding_mask=~active, need_weights=False)
-        return (tokens + self.out_proj(attended)).masked_fill(~active[..., None], 0)

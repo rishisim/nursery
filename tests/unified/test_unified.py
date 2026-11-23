@@ -5,9 +5,7 @@ from torch.nn import functional as F
 from nursery.learner.gaze import _gaze_class
 from nursery.learner.losses import soft_pool, weighted_nce
 from nursery.unified import model as unified_model
-from nursery.unified.gate import ModalityGate
 from nursery.unified.model import UnifiedEmbodiedLearner
-from nursery.unified.sensory import SensoryFusion
 
 
 DIMS = dict(contact=2, fingers=3, arm=4, load=2, skin=1)
@@ -45,9 +43,6 @@ def learner(condition="V+G+B", **kwargs):
 @torch.no_grad()
 def test_masking_equivalence(inputs):
     full, gaze_only, reduced = [learner(c).eval() for c in ("V+G+B", "V+G", "V")]
-    # Check masking after attention has started mixing modalities.
-    for model in (full, gaze_only, reduced):
-        model.fusion.out_proj.weight.copy_(torch.eye(512))
     base = dict(inputs, gaze=None, body=None)
     expected = reduced(**base)
 
@@ -60,57 +55,36 @@ def test_masking_equivalence(inputs):
     for actual in (reduced(**inputs), gaze_only(**dict(inputs, gaze=gaze_masked)),
                    full(**base), full(**dict(inputs, gaze=gaze_masked, body=body_masked))):
         for key in expected:
-            assert torch.equal(actual[key], expected[key]), key
+            torch.testing.assert_close(actual[key], expected[key], atol=0, rtol=0)
 
     expected_gaze = gaze_only(**inputs)
     actual_gaze = full(**dict(inputs, body=body_masked))
     for key in expected_gaze:
-        assert torch.equal(actual_gaze[key], expected_gaze[key]), key
+        torch.testing.assert_close(actual_gaze[key], expected_gaze[key], atol=0, rtol=0)
 
     args = [inputs[key] for key in ("video", "frame_valid", "temporal", "gaze", "body")]
     removed = full.score(full.encode_sensory(*args, remove_extras=True), expected["text"])
     assert torch.equal(removed, reduced.score(reduced.encode_sensory(*args), expected["text"]))
 
 
-def test_fusion_starts_as_exact_identity():
-    fusion = SensoryFusion()
-    tokens = torch.randn(2, 3, 512)
-    active = torch.tensor([[True, True, True], [True, False, True]])
-    expected = tokens.masked_fill(~active[..., None], 0)
-    assert torch.equal(fusion(tokens, active), expected)
-
-    with torch.no_grad():
-        fusion.out_proj.weight.copy_(torch.eye(512))
-    garbage = tokens.masked_fill(~active[..., None], torch.nan)
-    assert torch.equal(fusion(garbage, active), fusion(tokens, active))
-
-
 @torch.no_grad()
-def test_static_score_is_pure_soft_pool_independent_of_fusion(inputs):
+def test_static_score_is_pure_soft_pool(inputs):
     model = learner().eval()
     args = [inputs[key] for key in ("video", "frame_valid", "temporal", "gaze", "body")]
     text = model.enc_text(inputs["words"], inputs["counts"])
     sensory = model.encode_sensory(*args)
-    fused, _, regions, log_prior = sensory
-    expected = soft_pool(regions @ text.T, log_prior, model.static.tau)
+    _, _, regions, log_prior = sensory
+    expected = soft_pool(regions @ text.T, log_prior, 0.1)
     assert torch.equal(model._scores(sensory, text)[1][..., 0], expected)
-
-    model.fusion.out_proj.bias.copy_(text[0])
-    mixed_sensory = model.encode_sensory(*args)
-    assert not torch.equal(mixed_sensory[0][:, 0], fused[:, 0])
-    assert torch.equal(model._scores(mixed_sensory, text)[1][..., 0], expected)
 
 
 @torch.no_grad()
-def test_fusion_receives_unit_tokens_only_for_active_rows(inputs):
+def test_sensory_tokens_are_masked_and_unit_normalized(inputs):
     model = learner().eval()
     inputs["temporal"]["same"][1] = False
     inputs["body"]["keep"][0] = 0
     args = [inputs[key] for key in ("video", "frame_valid", "temporal", "gaze", "body")]
-    fusion_inputs = []
-    with model.fusion.register_forward_pre_hook(lambda _fusion, args: fusion_inputs.append(args)):
-        model.encode_sensory(*args)
-    (tokens, active), = fusion_inputs
+    tokens, active, *_ = model.encode_sensory(*args)
     assert active.tolist() == [[True, True, False], [True, False, True]]
     torch.testing.assert_close(tokens.norm(dim=-1), active.to(tokens.dtype))
     assert tokens[~active].count_nonzero() == 0
@@ -119,10 +93,16 @@ def test_fusion_receives_unit_tokens_only_for_active_rows(inputs):
 @torch.no_grad()
 def test_infonce_has_no_sensory_prefix(inputs):
     model = learner().eval()
+    model.language.ctx_proj.weight.copy_(torch.eye(256))
     original = model(**inputs)
+    model.language.prefix_position.normal_()
+    changed_prefix = model(**inputs)
+    assert torch.equal(original["logits"], changed_prefix["logits"])
+    assert not torch.equal(original["loss"], changed_prefix["loss"])
     altered = model(**dict(inputs, video=-inputs["video"], gaze=None, body=None))
-    assert torch.equal(original["text"], altered["text"])
-    assert torch.equal(original["text"], model.enc_text(inputs["words"], inputs["counts"]))
+    torch.testing.assert_close(original["text"], altered["text"], rtol=0, atol=0)
+    torch.testing.assert_close(original["text"], model.language.encode_tokens(
+        inputs["words"], inputs["counts"]), rtol=0, atol=0)
     assert not torch.equal(original["logits"], altered["logits"])
 
 
@@ -165,14 +145,15 @@ def test_temporal_stream_stays_active_in_training(inputs, monkeypatch):
     model = learner()
     args = [inputs[key] for key in ("video", "frame_valid", "temporal", "gaze", "body")]
     monkeypatch.setattr(torch, "rand", lambda n, *, device: torch.tensor([0.2, 0.8], device=device))
-    fused, active, *_ = model.train().encode_sensory(*args)
+    tokens, active, *_ = model.train().encode_sensory(*args)
     assert active[:, 1].all()
-    torch.testing.assert_close(fused[:, 1].norm(dim=-1), torch.ones(2))
+    torch.testing.assert_close(tokens[:, 1].norm(dim=-1), torch.ones(2))
 
 
 def test_infonce_gradients_reach_all_active_streams(inputs):
     model = learner(lambda_gen=0.0).eval()
     model(**inputs)["loss"].backward()
+    assert model.language.ctx_proj.weight.grad.count_nonzero() > 0
     for projection in (model.static.project[-1], model.temporal.project, model.body.project):
         grad = projection.weight.grad
         assert torch.isfinite(grad).all() and grad.count_nonzero() > 0
@@ -181,37 +162,62 @@ def test_infonce_gradients_reach_all_active_streams(inputs):
         assert any(p.grad is not None and p.grad.count_nonzero() > 0 for p in encoder.parameters())
 
 
-def test_gate_simplex_and_initial_bias():
-    gate = ModalityGate()
-    assert isinstance(gate.mlp[0], torch.nn.LayerNorm)
-    assert gate.mlp[0].normalized_shape == (512,)
-    assert all(param.count_nonzero() == 0 for param in gate.mlp[-1].parameters())
-    text = torch.randn(3, 512)
-    active = torch.tensor([[True, True, True], [True, True, False], [True, False, False]])
-    values = gate(text, active)
-    torch.testing.assert_close(values.sum(-1), torch.ones(3))
-    assert (values >= 0).all()
-    assert torch.equal(values[~active], torch.zeros(3))
-    bias = torch.tensor([1.5, -1.0, -0.5])
-    assert torch.equal(gate.b_init, bias)
-    expected = bias.expand_as(active)
-    torch.testing.assert_close(values, expected.masked_fill(~active, -torch.inf).softmax(-1))
+def test_uniform_active_prior_and_routing_simplex():
+    model = learner()
+    text = F.one_hot(torch.tensor([0, 1]), num_classes=512).float()
+    # The first query sees equal active scores for every clip. The second
+    # query sees different scores and must route to them in proportion.
+    vectors = torch.tensor([[0.4, 0.1], [0.4, 0.3], [0.4, -0.2]])
+    vectors = F.pad(vectors, (0, 510))
+    tokens = vectors.expand(3, -1, -1)
+    active = torch.arange(3)[None, :] <= torch.arange(3)[:, None]
+    sensory = tokens, active, tokens[:, :1], torch.zeros(3, 1)
+    scores, streams = model._scores(sensory, text)
+    torch.testing.assert_close(scores[:, 0], torch.full((3,), 0.4), atol=1e-6, rtol=0)
+
+    posterior = model.posterior_routing(sensory, text)
+    torch.testing.assert_close(posterior.sum(-1), torch.ones(3, 2))
+    assert (posterior >= 0).all()
+    assert posterior.masked_select(~active[:, None, :]).count_nonzero() == 0
+    torch.testing.assert_close(posterior[:, 0], active.float() / active.sum(1, keepdim=True))
+    expected = (streams[:, 1] / model.tau_m).masked_fill(~active, -torch.inf).softmax(-1)
+    torch.testing.assert_close(posterior[:, 1], expected)
 
 
-def test_gate_path_does_not_backpropagate_to_text_encoder(inputs):
+@torch.no_grad()
+def test_single_word_2d_queries_equal_content_token_queries(inputs):
     model = learner().eval()
-    with torch.no_grad():
-        model.gate.mlp[-1].weight[0, 0] = 1.0
-    text = model.enc_text(inputs["words"], inputs["counts"])
+    model.language.ctx_proj.weight.copy_(torch.eye(256))
+    words, counts = torch.tensor([[1, 0], [2, 0]]), torch.ones(2, dtype=torch.long)
+    text = model.enc_text(words, counts)
+    tokens, content = model.language.encode_tokens(words, counts)
+    assert content.tolist() == [[False, True, False, False]] * 2
+    torch.testing.assert_close(tokens[content], text)
     sensory = model.encode_sensory(*(inputs[key] for key in
                                      ("video", "frame_valid", "temporal", "gaze", "body")))
-    gate_outputs = []
-    with model.gate.register_forward_hook(lambda _gate, _args, output: gate_outputs.append(output)):
-        model.score(sensory, text)
+    actual = model._scores(sensory, (tokens, content))
+    torch.testing.assert_close(actual, model._scores(sensory, text))
 
-    gate_outputs[0][0, 0, 0].backward()
-    assert model.gate.mlp[0].weight.grad.count_nonzero() > 0
-    assert all(param.grad is None for param in model.language.parameters())
+
+@torch.no_grad()
+def test_contextual_tokens_are_pooled_before_averaging(inputs):
+    model = learner().eval()
+    model.language.ctx_proj.weight.copy_(torch.eye(256))
+    words, counts = inputs["words"], inputs["counts"]
+    language = model.language
+    tokens, content = language.encode_tokens(words, counts)
+    assert content.tolist() == [[False, True, True, True, False], [False, True, True, False, False]]
+    ids = language._tokens(words, counts)
+    expected = F.normalize(language.project(language.word(ids) + language._hidden(ids)), dim=-1)
+    torch.testing.assert_close(tokens, expected)
+    sensory = model.encode_sensory(*(inputs[key] for key in
+                                     ("video", "frame_valid", "temporal", "gaze", "body")))
+    tokens = tokens.masked_fill(~content[..., None], torch.nan)
+    scores, streams = model._scores(sensory, (tokens, content))
+    for q in range(len(words)):
+        token_scores, token_streams = model._scores(sensory, tokens[q, content[q]])
+        torch.testing.assert_close(scores[:, q], token_scores.mean(1))
+        torch.testing.assert_close(streams[:, q], token_streams.mean(1))
 
 
 @pytest.mark.parametrize("body_rows", [[True, False, True], [False, False, False]])
@@ -256,17 +262,16 @@ def test_aux_nce_uses_only_active_pairs(body_rows, monkeypatch):
 @torch.no_grad()
 def test_zero_aux_weight_preserves_base_loss(inputs):
     model = learner(aux_weight=0)
-    model.fusion.out_proj.bias.fill_(0.1)
     with torch.random.fork_rng(devices=[]):
         torch.manual_seed(7)
         actual = model(**inputs)
         torch.manual_seed(7)
         words, counts = inputs["words"], inputs["counts"]
-        text = model.enc_text(words, counts)
+        text = model.language.encode_tokens(words, counts)
         sensory = model.encode_sensory(*(inputs[key] for key in
                                          ("video", "frame_valid", "temporal", "gaze", "body")))
         logits = model.logit_scale.exp() * model.score(sensory, text)
-        fused, active, *_ = sensory
+        tokens, active, *_ = sensory
         expected = weighted_nce(logits, logits.new_ones(len(logits)))
-        expected += model.lambda_gen * model.language.lm_loss(words, counts, fused, active)
+        expected += model.lambda_gen * model.language.lm_loss(words, counts, tokens, active)
     torch.testing.assert_close(actual["loss"], expected, atol=0, rtol=0)

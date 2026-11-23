@@ -11,7 +11,7 @@ import torch
 from nursery.common import _output_directory
 from nursery.learner.gaze_data import collate_frame_indices
 
-from .evaluate import UnifiedEvaluation, accuracy_summary, load_checkpoint, log_gate, write_json
+from .evaluate import UnifiedEvaluation, accuracy_summary, load_checkpoint, log_routing, write_json
 from .model import CONDITIONS, UnifiedEmbodiedLearner
 
 
@@ -29,16 +29,16 @@ def train(args):
     run = dict(name="V+G+B_shuffled_body" if args.shuffle_body else args.condition,
                condition=args.condition, shuffle_body=args.shuffle_body,
                training_body_shuffle=study.shuffle_info, seed=args.seed, n_clips=args.n_clips,
-               epochs=args.epochs, lambda_gen=args.lambda_gen, mhsa=args.mhsa,
-               aux_weight=args.aux_weight)
+               epochs=args.epochs, lambda_gen=args.lambda_gen, aux_weight=args.aux_weight,
+               tau_m=args.tau_m)
 
     torch.manual_seed(args.seed)
     order_rng = torch.Generator().manual_seed(args.seed)
     gaze_rng = torch.Generator().manual_seed(args.seed + 1000)
     body_rng = torch.Generator().manual_seed(args.seed + 2000)
     model_args = dict(vocab_size=len(study.vocab), body_dims=study.body_dims,
-                      condition=args.condition, lambda_gen=args.lambda_gen, mhsa=args.mhsa,
-                      aux_weight=args.aux_weight)
+                      condition=args.condition, lambda_gen=args.lambda_gen,
+                      aux_weight=args.aux_weight, tau_m=args.tau_m)
     model = UnifiedEmbodiedLearner(**model_args).to(args.device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=study.protocol["lr"],
                                   weight_decay=study.protocol["weight_decay"])
@@ -84,7 +84,7 @@ def train(args):
     if study.development(model) != best_dev:
         raise RuntimeError("Checkpoint reload changed development trial scores")
     results = study.held_out(model)
-    log_gate(model, study.vocab, args.device, out_dir)
+    log_routing(model, study, out_dir)
     summary = dict(best_epoch=checkpoint["epoch"], dev=history[checkpoint["epoch"] - 1]["dev"],
                    reload_identical=True, wall_seconds=time.perf_counter() - started,
                    accuracy=accuracy_summary(results))
@@ -103,7 +103,7 @@ def main():
     parser.add_argument("--epochs", type=int, default=60)
     parser.add_argument("--aux-weight", type=float, default=0.25)
     parser.add_argument("--lambda-gen", type=float, default=0.2)
-    parser.add_argument("--mhsa", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--tau-m", type=float, default=0.2)
     parser.add_argument("--shuffle-body", action="store_true", help="Train and evaluate with shuffled body")
     parser.add_argument("--device", choices=("cpu", "mps", "cuda"), default="cpu")
     parser.add_argument("--out-dir", type=Path, required=True)

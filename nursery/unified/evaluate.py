@@ -1,4 +1,4 @@
-"""Evaluate the frozen Step 9 noun and action panels with one learned gate."""
+"""Evaluate the frozen Step 9 noun and action panels with per-word Soft-MIL."""
 
 import argparse
 import csv
@@ -26,6 +26,7 @@ from .model import UnifiedEmbodiedLearner
 
 
 STUDY = REPO / "outputs/runs/step9_acquisition_curves/frozen"
+ROUTING_COLUMNS = ["p_vis", "p_temp", "p_body"]
 
 
 def read_json(path):
@@ -59,6 +60,7 @@ class UnifiedEvaluation(StudyEvaluation):
             videos, include = fit["video_ids"].tolist(), fit["include"]
         frames = pd.read_parquet(episodes / "frames.parquet",
                                  columns=["video_id", "frame_idx", "clip", "held_category"])
+        self.source_clips = frames.set_index(["video_id", "frame_idx"])["clip"]
         store = None
         if condition == "V+G+B":
             store = load_store(episodes, frames, videos, set(), steps=include.shape[1],
@@ -144,7 +146,8 @@ class UnifiedEvaluation(StudyEvaluation):
         return video, valid, temporal_ctx, gaze_ctx, body_ctx
 
     @torch.no_grad()
-    def evaluate(self, model, panel, body_mode="real", *, gaze_mode=None, body_weights=None):
+    def evaluate(self, model, panel, body_mode="real", *, gaze_mode=None, body_weights=None,
+                 routing=False):
         # The inherited dev/test aggregators call this hook on each frozen panel.
         if body_weights is not None or body_mode not in ("real", "shuffled", "none") or gaze_mode not in (None, "removed"):
             raise ValueError("Unsupported U1 evaluation mode")
@@ -161,17 +164,39 @@ class UnifiedEvaluation(StudyEvaluation):
 
         queries = rows.iloc[trials["trial_rows"]].referent.tolist()
         word_index, text, _ = self._query_vectors(model, queries)
+        if routing:
+            row_ids = np.unique(trials["trial_rows"])
+            row_ids = row_ids[rows.iloc[row_ids].referent.isin(word_index).to_numpy()]
+            targets = rows.iloc[row_ids]
+            query_ids = targets.referent.map(word_index).to_numpy(dtype=int)
+            probabilities = np.empty((len(targets), 3), dtype=np.float32)
+        else:
+            row_ids = np.arange(len(rows)) if text is not None else np.array([], dtype=int)
+            matrix = np.empty((len(rows), len(word_index)), dtype=np.float32)
+
+        for start in range(0, len(row_ids), 64):
+            ids = row_ids[start:start + 64]
+            _, video, _, _ = collate_frame_indices(ds, ids)
+            args = self.sensory_batch(model, ds, ids, video, gaze, self.temporal_panels[panel],
+                                      body if body_mode != "none" else None,
+                                      body_ids=donors[ids] if donors is not None else None)
+            sensory = model.encode_sensory(*args)
+            if routing:
+                batch = slice(start, start + len(ids))
+                posterior = model.posterior_routing(sensory, text).cpu().numpy()
+                probabilities[batch] = posterior[np.arange(len(ids)), query_ids[batch]]
+            else:
+                matrix[ids] = model.score(sensory, text).cpu().numpy()
+        if routing:
+            matched = pd.DataFrame(probabilities, columns=ROUTING_COLUMNS)
+            matched["word"] = targets.referent.to_numpy()
+            keys = pd.MultiIndex.from_frame(targets[["video_id", "frame_idx"]])
+            matched["clip"] = self.source_clips.loc[keys].to_numpy()
+            return matched
+
         candidates = np.asarray(trials["candidate_rows"], dtype=int)
         scores = np.zeros(candidates.shape, dtype=np.float32)
         if text is not None:
-            matrix = np.empty((len(rows), len(word_index)), dtype=np.float32)
-            for start in range(0, len(rows), 64):
-                ids = np.arange(start, min(start + 64, len(rows)))
-                _, video, _, _ = collate_frame_indices(ds, ids)
-                args = self.sensory_batch(model, ds, ids, video, gaze, self.temporal_panels[panel],
-                                          body if body_mode != "none" else None,
-                                          body_ids=donors[ids] if donors is not None else None)
-                matrix[ids] = model.score(model.encode_sensory(*args), text).cpu().numpy()
             for i, word in enumerate(queries):
                 if word in word_index:
                     scores[i] = matrix[candidates[i], word_index[word]]
@@ -193,19 +218,20 @@ class UnifiedEvaluation(StudyEvaluation):
         return result
 
 
-@torch.no_grad()
-def log_gate(model, vocab, device, out_dir):
-    model.eval()
-    entries = [(word, idx) for word, idx in sorted(vocab.items()) if idx != 0]
-    tokens = torch.tensor([[idx] for _, idx in entries], device=device)
-    text = model.enc_text(tokens, torch.ones_like(tokens[:, 0]))
-    active = torch.tensor([True, True, model.condition == "V+G+B"], device=device)
-    values = model.gate(text, active).cpu().tolist()
-    rows = [dict(word=word, g_vis=g[0], g_temp=g[1], g_body=g[2])
-            for (word, _), g in zip(entries, values)]
-    write_json(out_dir / "gate.json", rows)
-    with (out_dir / "gate.csv").open("w", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=rows[0])
+def log_routing(model, study, out_dir):
+    rows = []
+    for kind, spec in study.word_types.items():
+        matched = pd.concat([
+            study.evaluate(model, panel, body_mode=study.body_mode, routing=True)
+            for panel in dict.fromkeys(spec["held_out"].values())
+        ])
+        # Each source clip contributes once per word, even with multiple target frames.
+        clips = matched.groupby(["word", "clip"])[ROUTING_COLUMNS].mean()
+        for word, values in clips.groupby(level="word"):
+            rows.append(dict(word=word, kind=kind, n_clips=len(values), **values.mean().to_dict()))
+    write_json(out_dir / "routing.json", rows)
+    with (out_dir / "routing.csv").open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=["word", "kind", "n_clips", *ROUTING_COLUMNS])
         writer.writeheader()
         writer.writerows(rows)
 

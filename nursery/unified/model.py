@@ -6,11 +6,10 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from nursery.learner.losses import weighted_nce
+from nursery.learner.losses import soft_pool, weighted_nce
 
-from .gate import ModalityGate
 from .language import CausalLanguage
-from .sensory import BodyStream, SensoryFusion, StaticVisionGaze, TemporalVideoStream
+from .sensory import BodyStream, StaticVisionGaze, TemporalVideoStream
 
 
 CONDITIONS = ("V", "V+G", "V+G+B")
@@ -18,7 +17,7 @@ CONDITIONS = ("V", "V+G", "V+G+B")
 
 class UnifiedEmbodiedLearner(nn.Module):
     def __init__(self, vocab_size, *, input_dim=768, grid=16, body_dims=None,
-                 condition="V", lambda_gen=0.2, mhsa=True, aux_weight=0.25):
+                 condition="V", lambda_gen=0.2, aux_weight=0.25, tau_m=0.2):
         super().__init__()
         if condition not in CONDITIONS or not math.isfinite(lambda_gen) or lambda_gen < 0:
             raise ValueError("Unknown condition or invalid generative loss weight")
@@ -26,13 +25,13 @@ class UnifiedEmbodiedLearner(nn.Module):
             raise ValueError("V+G+B requires body group dimensions")
         if not math.isfinite(aux_weight) or aux_weight < 0:
             raise ValueError("Invalid auxiliary loss weight")
+        if not math.isfinite(tau_m) or tau_m <= 0:
+            raise ValueError("Expected a positive modality pooling temperature")
         self.condition, self.lambda_gen = condition, lambda_gen
-        self.aux_weight = aux_weight
+        self.aux_weight, self.tau_m = aux_weight, tau_m
         self.static = StaticVisionGaze(input_dim, grid)
         self.temporal = TemporalVideoStream(input_dim)
-        self.fusion = SensoryFusion() if mhsa else None
         self.language = CausalLanguage(vocab_size)
-        self.gate = ModalityGate()
         self.logit_scale = nn.Parameter(torch.tensor(math.log(1 / 0.07)))
         self.body = BodyStream(body_dims) if body_dims is not None else None
 
@@ -74,32 +73,57 @@ class UnifiedEmbodiedLearner(nn.Module):
         tokens = torch.stack((F.normalize(static, dim=-1), F.normalize(motion, dim=-1),
                               F.normalize(embodiment, dim=-1)), dim=1)
         tokens = tokens.masked_fill(~active[..., None], 0)
-        fused = self.fusion(tokens, active) if self.fusion is not None else tokens
-        return fused, active, regions, log_prior
+        return tokens, active, regions, log_prior
 
     def score(self, sensory, text):
         return self._scores(sensory, text)[0]
 
-    def _scores(self, sensory, text):
-        fused, active, regions, log_prior = sensory
-        static = self.static.score(regions, log_prior, text)
-        motion, body = (F.normalize(fused[:, 1:], dim=-1) @ text.T).unbind(1)
+    def _token_streams(self, sensory, flat_h):
+        tokens, active, regions, log_prior = sensory
+        static = self.static.score(regions, log_prior, flat_h)
+        motion, body = (tokens[:, 1:] @ flat_h.T).unbind(1)
         streams = torch.stack((static, motion, body), dim=-1)
-        gate = self.gate(text.detach(), active[:, None, :])
-        return (gate * streams).sum(-1), streams
+        active_prior = -active.sum(-1, keepdim=True).float().log()
+        return streams, active_prior.expand_as(active).masked_fill(~active, -torch.inf)
+
+    def _scores(self, sensory, text):
+        per_word = isinstance(text, tuple)
+        if per_word:
+            tokens, content = text
+            query_ids, token_ids = content.nonzero(as_tuple=True)
+            flat_h = tokens[query_ids, token_ids]
+        else:
+            flat_h = text
+        streams, active_prior = self._token_streams(sensory, flat_h)
+        # soft_pool reduces axis 1, so streams are the regions and tokens
+        # are the independent queries.
+        pooled = soft_pool(streams.transpose(1, 2), active_prior, self.tau_m)
+        if not per_word:
+            return pooled, streams
+
+        lengths = content.sum(1).clamp_min(1)
+        scores = pooled.new_zeros(pooled.shape[0], len(content))
+        per_stream = streams.new_zeros(streams.shape[0], len(content), 3)
+        return (scores.index_add(1, query_ids, pooled) / lengths,
+                per_stream.index_add(1, query_ids, streams) / lengths[:, None])
+
+    def posterior_routing(self, sensory, text):
+        """Posterior stream probabilities for each word vector and clip."""
+        streams, active_prior = self._token_streams(sensory, text)
+        return (streams / self.tau_m + active_prior[:, None, :]).softmax(dim=-1)
 
     def forward(self, words, counts, video, frame_valid, temporal=None, gaze=None, body=None):
         # InfoNCE queries use the unconditional text pass. The sensory prefix
         # only enters the separate LM loss, with the same text encoder weights.
-        text = self.enc_text(words, counts)
+        text = self.language.encode_tokens(words, counts)
         sensory = self.encode_sensory(video, frame_valid, temporal, gaze, body)
-        fused, active, *_ = sensory
+        tokens, active, *_ = sensory
         scale = self.logit_scale.clamp(max=math.log(100)).exp()
         scores, streams = self._scores(sensory, text)
         logits = scale * scores
         loss = weighted_nce(logits, logits.new_ones(len(logits)))
         if self.lambda_gen:
-            loss = loss + self.lambda_gen * self.language.lm_loss(words, counts, fused, active)
+            loss = loss + self.lambda_gen * self.language.lm_loss(words, counts, tokens, active)
         if self.training and self.aux_weight:
             terms = []
             for stream, valid in zip(streams.unbind(-1), active.unbind(-1)):

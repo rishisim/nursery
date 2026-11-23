@@ -47,6 +47,13 @@ class CausalLanguage(nn.Module):
             x = layer(x, src_mask=causal, src_key_padding_mask=padding)
         return self.norm(x[:, prefix_len:])
 
+    def encode_tokens(self, words, counts):
+        tokens = self._tokens(words, counts)
+        positions = torch.arange(tokens.shape[1], device=tokens.device)
+        content = (positions > 0) & (positions <= counts[:, None]) & tokens.ne(0)
+        h = self.word(tokens) + self.ctx_proj(self._hidden(tokens))
+        return F.normalize(self.project(h), dim=-1), content
+
     def encode(self, words, counts):
         tokens = self._tokens(words, counts)
         positions = torch.arange(tokens.shape[1], device=tokens.device)

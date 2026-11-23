@@ -1,4 +1,4 @@
-"""Run the six U1 parity and ablation arms on the frozen 630-clip subset."""
+"""Run the five U1 parity and ablation arms on the frozen 630-clip subset."""
 
 import argparse
 from pathlib import Path
@@ -15,7 +15,6 @@ ARMS = (
     ("V+G+B", "V+G+B", ()),
     ("V+G+B_shuffled_body", "V+G+B", ("--shuffle-body",)),
     ("V+G+B_lambda_gen_0", "V+G+B", ("--lambda-gen", "0.0")),
-    ("V+G+B_no_mhsa", "V+G+B", ("--no-mhsa",)),
 )
 
 
