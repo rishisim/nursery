@@ -72,5 +72,5 @@ time**:
    unimodal LM vs. `V` vs. `V+G` vs. `V+G+B` (testing whether embodied training
    breaks EgoBabyVLM's zero-unimodal-transfer finding).
 3. **Updated 3D Sensory Routing Simplex:** Showing where multi-word sentences
-   sit in `(g_vis, g_temp, g_body)` space relative to standalone nouns and
-   actions.
+   (and their constituent nouns, verbs, and properties) sit in posterior
+   Soft-MIL routing space `(p_vis, p_temp, p_body)`.

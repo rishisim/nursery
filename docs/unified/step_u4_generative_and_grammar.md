@@ -19,9 +19,10 @@ U1–U3 (zero new training sweeps unless ablating cross-modal interaction):
    active action, and physical property, plus perplexity on held-out caregiver
    transcripts.
 3. **Cross-modal visual shaping (all-extra-inputs-removed):** Test whether
-   Step U1's zero-init cross-modal MHSA allows body signals during training to
-   improve **video-only** action accuracy at test time (fixing Phase 1's pure
-   online-readout limitation where removing body dropped `V+G+B` back to `V+G`).
+   joint training through the shared 512-d concept space and prefix-conditioned
+   LM allows body signals during training to improve **video-only** action
+   accuracy at test time (note: explicit `SensoryFusion` MHSA was ablated and
+   dropped in U1 after hurting nouns without improving extras-removed actions).
 
 ## Metrics & Stop / Go Gate
 
@@ -30,7 +31,8 @@ U1–U3 (zero new training sweeps unless ablating cross-modal interaction):
 - **Grounded generation:** Object / action / property F1 in generated scene
   descriptions + held-out perplexity.
 - **Cross-modal shaping:** `V+G+B (body removed)` minus `V+G (gaze removed)`
-  on actions and compositional sentences, comparing MHSA-on vs. MHSA-off.
+  on actions and compositional sentences (with optional U4 ablation if testing
+  an explicit temporal-to-body alignment term).
 - **Go:** Every evaluation runs deterministically from saved checkpoints with
   paired bootstrap CIs across test clips and seeds.
 
@@ -43,6 +45,6 @@ U1–U3 (zero new training sweeps unless ablating cross-modal interaction):
    Visualizing how `V+G+B` separates action concepts (`lift`, `pass`, `offhand`,
    `drink`, `inspect`) in shared embedding space by 158–315 clips while `V` and
    `CLIP-Global` remain entangled.
-3. **Body-Removed Transfer Bar Plot:** Showing whether cross-modal MHSA lets
-   `V+G+B` retain a visual action advantage even when body is turned off at test
-   time.
+3. **Body-Removed Transfer Bar Plot:** Showing whether embodied training
+   through the shared concept space and LM prefix lets `V+G+B` retain a visual
+   action advantage even when body is turned off at test time.

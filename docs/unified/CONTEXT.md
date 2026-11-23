@@ -44,43 +44,56 @@ language acquisition and fair VLM comparisons:
    carries web-scale visual priors rather than strictly infant visual
    experience (unlike [EgoBabyVLM](https://arxiv.org/html/2605.19130v1)).
 
-## 3. Locked Architecture: Embodied Baby-CoCa (`nursery/unified/`)
+## 3. Locked Architecture: Embodied Baby-CoCa with Per-Word Unified Soft-MIL (`nursery/unified/`)
 
 One clean, unified model class runs `V`, `V+G`, and `V+G+B` (unavailable
-modalities are simply masked out):
+modalities are simply masked out) with **no separate modality-gate MLP, no
+`b_init`, and no `SensoryFusion` MHSA block**:
 
 1. **Three Aligned 512-d Sensory Streams:**
    - **Static Vision + Steering Gaze:** Frozen DINO patch grid + CLS projected
-     to 512-d, Soft-MIL pooling (`tau = 0.1`), 2D Gaussian gaze spatial prior
-     (`sigma = 0.15`), and shared-projection foveal close-up token.
+     to 512-d (`LayerNorm → Dropout(0.1) → Linear`), Soft-MIL pooling
+     (`tau = 0.1`), 2D Gaussian gaze spatial prior (`sigma = 0.15`), and
+     shared-projection foveal close-up token.
    - **Temporal Vision:** 11-second (±5 s) clip-bounded BiGRU (`128d`) with a
-     clean `Linear(128→512)` projection (eliminates the `T[:, :128]` slice).
+     clean `Linear(128→512)` projection (eliminates the `T[:, :128]` slice),
+     L2-normalized to the unit sphere (0% training dropout; video is always
+     present).
    - **Body Stream:** 5 anatomical/physical groups (contact, fingers, arm,
      load, skin) → per-group MLPs → clip-reset 11-second BiGRU (`128d`) →
-     `Linear(128→512)`.
-2. **Zero-Init Cross-Modal Sensory Fusion:** Packs active sensory summaries
-   `[z_vis, z_temp, z_body]` and applies 1 lightweight Multi-Head Self-Attention
-   block with a zero-initialized output residual (`z' = z + 0 · MHSA(LN(z))`),
-   starting as exact identity at epoch 0 while allowing body and vision to
-   shape each other during training.
-3. **Compact Causal Text Transformer (from scratch):** A **2-layer, 4-head,
+     `Linear(128→512)`, L2-normalized to the unit sphere (50% training dropout
+     for extras-removed transfer).
+2. **Compact Causal Text Transformer (from scratch):** A **2-layer, 4-head,
    256-d Causal Transformer** trained from scratch on each clip-count's
-   Nursery utterances, projecting `[EOS]` to a normalized 512-d utterance
-   embedding `T`.
-4. **Utterance-Conditioned Modality Gate `g(T)`:** A small 2-layer MLP maps
-   `T` to a masked softmax over active modalities initialized near
-   `[0.96, 0.02, 0.02]` (`b_init = [2.0, -2.0, -2.0]`):
-   `g(T) = softmax(MLP(T) + b_init)` on the 2-simplex `(static, temporal, body)`.
-   Replaces both `temporal_weight[vocab]` and post-hoc `body_weight`, keeps
-   weights non-negative and interpretable, and directly yields the **3D Sensory
-   Routing Simplex**.
-5. **Dual Contrastive + Generative Objective (Embodied Baby-CoCa):**
-   `L = L_InfoNCE(scale * sum_m g_m(T) * s_m) + lambda_gen * L_LM(utterance | z'_vis, z'_temp, z'_body)`.
+   Nursery utterances. Produces normalized 512-d **per-word contextualized
+   embeddings** `h_j = F.normalize(project(word_j + ctx_proj(hidden_j)))`
+   for each content token `j` (zero-init `ctx_proj` preserves clean single-word
+   anchoring in U1 while enabling word order and negation in U2).
+3. **Hierarchical Per-Word Unified Soft-MIL (Zero Gate MLP, Zero MHSA):**
+   Uses one single cross-situational pooling primitive (`soft_pool`) at two
+   scales—first *where in vision*, then *which active sense*—for each word
+   token `h_j`, then averages across content words in the utterance:
+   - Within vision: `s_vis(h_j) = soft_pool(regions @ h_j, gaze_log_prior, tau=0.1)`
+   - Across active senses: `s(h_j) = soft_pool([s_vis, s_temp, s_body], uniform_active_log_prior, tau_m=0.1)`
+   - Across utterance words: `S(x, U) = mean_j s(h_j)`
+   This replaces `temporal_weight[vocab]`, post-hoc `body_weight`,
+   `ModalityGate`, `b_init`, and `SensoryFusion` (which hurt nouns in early U1
+   ablations). For single-word queries (`L = 1`) it routes directly by
+   similarity; for compositional sentences (`L > 1`) each word binds to its own
+   matching sense (`"lift"` → body, `"cup"` → vision), naturally forming a
+   sentence-level conjunction. Logging the posterior Soft-MIL attention mass
+   `p_m = softmax(s_m / tau_m)` on matched clips directly yields the **3D
+   Sensory Routing Simplex**.
+4. **Dual Contrastive + Generative Objective (Embodied Baby-CoCa):**
+   `L = L_InfoNCE(scale * S(x, U)) + lambda_gen * L_LM(utterance | z_vis, z_temp, z_body) + aux_weight * L_aux`.
    - Contrastive branch runs the Text Transformer unconditionally (zero leakage)
      for 4-choice comprehension curves.
    - Generative branch runs the exact same Transformer weights conditioned on
-     the fused sensory prefix tokens for minimal-pair syntax, Embodied VP-Swap,
-     and generative caption fluency.
+     the unit-normalized sensory prefix tokens `[z_vis, z_temp, z_body]` (with
+     bidirectional self-attention across the prefix inside `CausalLanguage`)
+     for minimal-pair syntax, Embodied VP-Swap, and generative caption fluency.
+   - Optional per-stream auxiliary InfoNCE (`aux_weight = 0.25`) keeps slower
+     from-scratch streams (`temporal`, `body`) aligned from epoch 1.
 
 ## 4. Locked Evaluation, Simulator & Fairness Contract
 

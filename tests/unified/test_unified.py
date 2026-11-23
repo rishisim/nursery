@@ -164,6 +164,7 @@ def test_infonce_gradients_reach_all_active_streams(inputs):
 
 def test_uniform_active_prior_and_routing_simplex():
     model = learner()
+    assert model.tau_m == model.static.tau == 0.1
     text = F.one_hot(torch.tensor([0, 1]), num_classes=512).float()
     # The first query sees equal active scores for every clip. The second
     # query sees different scores and must route to them in proportion.

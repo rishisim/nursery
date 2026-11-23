@@ -103,7 +103,7 @@ def main():
     parser.add_argument("--epochs", type=int, default=60)
     parser.add_argument("--aux-weight", type=float, default=0.25)
     parser.add_argument("--lambda-gen", type=float, default=0.2)
-    parser.add_argument("--tau-m", type=float, default=0.2)
+    parser.add_argument("--tau-m", type=float, default=0.1)
     parser.add_argument("--shuffle-body", action="store_true", help="Train and evaluate with shuffled body")
     parser.add_argument("--device", choices=("cpu", "mps", "cuda"), default="cpu")
     parser.add_argument("--out-dir", type=Path, required=True)

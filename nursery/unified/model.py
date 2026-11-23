@@ -17,7 +17,7 @@ CONDITIONS = ("V", "V+G", "V+G+B")
 
 class UnifiedEmbodiedLearner(nn.Module):
     def __init__(self, vocab_size, *, input_dim=768, grid=16, body_dims=None,
-                 condition="V", lambda_gen=0.2, aux_weight=0.25, tau_m=0.2):
+                 condition="V", lambda_gen=0.2, aux_weight=0.25, tau_m=0.1):
         super().__init__()
         if condition not in CONDITIONS or not math.isfinite(lambda_gen) or lambda_gen < 0:
             raise ValueError("Unknown condition or invalid generative loss weight")
