@@ -75,17 +75,14 @@ class UnifiedEmbodiedLearner(nn.Module):
                               F.normalize(embodiment, dim=-1)), dim=1)
         tokens = tokens.masked_fill(~active[..., None], 0)
         fused = self.fusion(tokens, active) if self.fusion is not None else tokens
-        # Apply the same normalization on both sides for exact zero at identity.
-        static_unit = F.normalize(tokens[:, 0], dim=-1)
-        residual = F.normalize(fused[:, 0], dim=-1) - static_unit
-        return fused, active, regions, log_prior, residual
+        return fused, active, regions, log_prior
 
     def score(self, sensory, text):
         return self._scores(sensory, text)[0]
 
     def _scores(self, sensory, text):
-        fused, active, regions, log_prior, residual = sensory
-        static = self.static.score(regions, log_prior, text, residual)
+        fused, active, regions, log_prior = sensory
+        static = self.static.score(regions, log_prior, text)
         motion, body = (F.normalize(fused[:, 1:], dim=-1) @ text.T).unbind(1)
         streams = torch.stack((static, motion, body), dim=-1)
         gate = self.gate(text.detach(), active[:, None, :])

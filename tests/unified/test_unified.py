@@ -3,7 +3,7 @@ import torch
 from torch.nn import functional as F
 
 from nursery.learner.gaze import _gaze_class
-from nursery.learner.losses import weighted_nce
+from nursery.learner.losses import soft_pool, weighted_nce
 from nursery.unified import model as unified_model
 from nursery.unified.gate import ModalityGate
 from nursery.unified.model import UnifiedEmbodiedLearner
@@ -85,13 +85,20 @@ def test_fusion_starts_as_exact_identity():
     assert torch.equal(fusion(garbage, active), fusion(tokens, active))
 
 
-@pytest.mark.parametrize("mhsa", [True, False])
 @torch.no_grad()
-def test_static_fusion_residual_starts_at_exact_zero(inputs, mhsa):
-    model = learner(mhsa=mhsa).eval()
+def test_static_score_is_pure_soft_pool_independent_of_fusion(inputs):
+    model = learner().eval()
     args = [inputs[key] for key in ("video", "frame_valid", "temporal", "gaze", "body")]
-    *_, residual = model.encode_sensory(*args)
-    assert torch.equal(residual, torch.zeros_like(residual))
+    text = model.enc_text(inputs["words"], inputs["counts"])
+    sensory = model.encode_sensory(*args)
+    fused, _, regions, log_prior = sensory
+    expected = soft_pool(regions @ text.T, log_prior, model.static.tau)
+    assert torch.equal(model._scores(sensory, text)[1][..., 0], expected)
+
+    model.fusion.out_proj.bias.copy_(text[0])
+    mixed_sensory = model.encode_sensory(*args)
+    assert not torch.equal(mixed_sensory[0][:, 0], fused[:, 0])
+    assert torch.equal(model._scores(mixed_sensory, text)[1][..., 0], expected)
 
 
 @torch.no_grad()
@@ -185,7 +192,7 @@ def test_gate_simplex_and_initial_bias():
     torch.testing.assert_close(values.sum(-1), torch.ones(3))
     assert (values >= 0).all()
     assert torch.equal(values[~active], torch.zeros(3))
-    bias = torch.tensor([1.0, -0.5, -0.5])
+    bias = torch.tensor([1.5, -1.0, -0.5])
     assert torch.equal(gate.b_init, bias)
     expected = bias.expand_as(active)
     torch.testing.assert_close(values, expected.masked_fill(~active, -torch.inf).softmax(-1))
@@ -215,7 +222,7 @@ def test_aux_nce_uses_only_active_pairs(body_rows, monkeypatch):
     active = torch.tensor([[True, True, body] for body in body_rows])
     streams = torch.randn(3, 3, 3, generator=torch.Generator().manual_seed(3))
     scores = torch.randn(3, 3, generator=torch.Generator().manual_seed(4))
-    monkeypatch.setattr(model, "encode_sensory", lambda *args: (None, active))
+    monkeypatch.setattr(model, "encode_sensory", lambda *args: (None, active, None, None))
     monkeypatch.setattr(model, "_scores", lambda *args: (scores, streams))
 
     calls = []
@@ -249,6 +256,7 @@ def test_aux_nce_uses_only_active_pairs(body_rows, monkeypatch):
 @torch.no_grad()
 def test_zero_aux_weight_preserves_base_loss(inputs):
     model = learner(aux_weight=0)
+    model.fusion.out_proj.bias.fill_(0.1)
     with torch.random.fork_rng(devices=[]):
         torch.manual_seed(7)
         actual = model(**inputs)

@@ -65,11 +65,8 @@ class StaticVisionGaze(nn.Module):
         summary = torch.bmm(log_prior.exp().unsqueeze(1), regions).squeeze(1)
         return summary, regions, log_prior
 
-    def score(self, regions, log_prior, text, residual):
-        similarities = regions @ text.T
-        # The fusion residual shifts every region score equally, so apply it
-        # after Soft-MIL without expanding it across all regions.
-        return soft_pool(similarities, log_prior, self.tau) + residual @ text.T
+    def score(self, regions, log_prior, text):
+        return soft_pool(regions @ text.T, log_prior, self.tau)
 
 
 class TemporalVideoStream(nn.Module):
