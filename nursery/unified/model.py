@@ -65,18 +65,20 @@ class UnifiedEmbodiedLearner(nn.Module):
         motion, motion_active = torch.zeros_like(static), no_input
         if temporal is not None:
             same = temporal["same"]
-            if self.training:
-                keep = torch.rand(len(video), device=video.device) >= 0.5
-                same = same & keep[:, None]
             motion = self.temporal(temporal["frames"], same)
             motion_active = same.any(dim=1)
         embodiment, body_active = torch.zeros_like(static), no_input
         if body is not None:
             embodiment, body_active = self.body(body)
         active = torch.stack((torch.ones_like(no_input), motion_active, body_active), dim=1)
-        tokens = torch.stack((static, motion, embodiment), dim=1).masked_fill(~active[..., None], 0)
+        tokens = torch.stack((F.normalize(static, dim=-1), F.normalize(motion, dim=-1),
+                              F.normalize(embodiment, dim=-1)), dim=1)
+        tokens = tokens.masked_fill(~active[..., None], 0)
         fused = self.fusion(tokens, active) if self.fusion is not None else tokens
-        return fused, active, regions, log_prior, fused[:, 0] - static
+        # Apply the same normalization on both sides for exact zero at identity.
+        static_unit = F.normalize(tokens[:, 0], dim=-1)
+        residual = F.normalize(fused[:, 0], dim=-1) - static_unit
+        return fused, active, regions, log_prior, residual
 
     def score(self, sensory, text):
         return self._scores(sensory, text)[0]

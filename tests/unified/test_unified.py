@@ -85,6 +85,30 @@ def test_fusion_starts_as_exact_identity():
     assert torch.equal(fusion(garbage, active), fusion(tokens, active))
 
 
+@pytest.mark.parametrize("mhsa", [True, False])
+@torch.no_grad()
+def test_static_fusion_residual_starts_at_exact_zero(inputs, mhsa):
+    model = learner(mhsa=mhsa).eval()
+    args = [inputs[key] for key in ("video", "frame_valid", "temporal", "gaze", "body")]
+    *_, residual = model.encode_sensory(*args)
+    assert torch.equal(residual, torch.zeros_like(residual))
+
+
+@torch.no_grad()
+def test_fusion_receives_unit_tokens_only_for_active_rows(inputs):
+    model = learner().eval()
+    inputs["temporal"]["same"][1] = False
+    inputs["body"]["keep"][0] = 0
+    args = [inputs[key] for key in ("video", "frame_valid", "temporal", "gaze", "body")]
+    fusion_inputs = []
+    with model.fusion.register_forward_pre_hook(lambda _fusion, args: fusion_inputs.append(args)):
+        model.encode_sensory(*args)
+    (tokens, active), = fusion_inputs
+    assert active.tolist() == [[True, True, False], [True, False, True]]
+    torch.testing.assert_close(tokens.norm(dim=-1), active.to(tokens.dtype))
+    assert tokens[~active].count_nonzero() == 0
+
+
 @torch.no_grad()
 def test_infonce_has_no_sensory_prefix(inputs):
     model = learner().eval()
@@ -130,18 +154,13 @@ def test_temporal_frames_match_phase_one_gaze_pooling(inputs):
 
 
 @torch.no_grad()
-def test_temporal_dropout_masks_whole_stream_only_in_training(inputs, monkeypatch):
+def test_temporal_stream_stays_active_in_training(inputs, monkeypatch):
     model = learner()
     args = [inputs[key] for key in ("video", "frame_valid", "temporal", "gaze", "body")]
     monkeypatch.setattr(torch, "rand", lambda n, *, device: torch.tensor([0.2, 0.8], device=device))
     fused, active, *_ = model.train().encode_sensory(*args)
-    assert active.tolist() == [[True, False, True], [True, True, True]]
-    assert fused[0, 1].count_nonzero() == 0
-    weights = model.gate(model.enc_text(inputs["words"], inputs["counts"]), active)
-    assert weights[0, 1] == 0
-    torch.testing.assert_close(weights.sum(-1), torch.ones(2))
-    _, active, *_ = model.eval().encode_sensory(*args)
-    assert active.all()
+    assert active[:, 1].all()
+    torch.testing.assert_close(fused[:, 1].norm(dim=-1), torch.ones(2))
 
 
 def test_infonce_gradients_reach_all_active_streams(inputs):
@@ -166,7 +185,9 @@ def test_gate_simplex_and_initial_bias():
     torch.testing.assert_close(values.sum(-1), torch.ones(3))
     assert (values >= 0).all()
     assert torch.equal(values[~active], torch.zeros(3))
-    expected = torch.tensor([1.5, -1.5, -0.5]).expand_as(active)
+    bias = torch.tensor([1.0, -0.5, -0.5])
+    assert torch.equal(gate.b_init, bias)
+    expected = bias.expand_as(active)
     torch.testing.assert_close(values, expected.masked_fill(~active, -torch.inf).softmax(-1))
 
 
