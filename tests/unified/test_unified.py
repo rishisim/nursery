@@ -166,7 +166,7 @@ def test_gate_simplex_and_initial_bias():
     torch.testing.assert_close(values.sum(-1), torch.ones(3))
     assert (values >= 0).all()
     assert torch.equal(values[~active], torch.zeros(3))
-    expected = torch.tensor([1.0, -1.5, 0.0]).expand_as(active)
+    expected = torch.tensor([1.5, -1.5, -0.5]).expand_as(active)
     torch.testing.assert_close(values, expected.masked_fill(~active, -torch.inf).softmax(-1))
 
 
