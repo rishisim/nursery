@@ -33,6 +33,7 @@ def test_shuffled_body_training_and_evaluation(tmp_path, monkeypatch):
     gradients = []
     gate_trainable, gate_gradients = [], []
     make_model = training.UnifiedEmbodiedLearner
+    make_optimizer = torch.optim.AdamW
 
     def model_with_gradient_hook(**kwargs):
         model = make_model(**kwargs)
@@ -45,6 +46,20 @@ def test_shuffled_body_training_and_evaluation(tmp_path, monkeypatch):
                 assert all(p.count_nonzero() == 0 for p in gate.mlp[-1].parameters())
 
         model.gate.register_forward_pre_hook(check_gate)
+
+        def optimizer_with_group_checks(*args, **kwargs):
+            optimizer = make_optimizer(*args, **kwargs)
+            gate_group, other_group = optimizer.param_groups
+            assert (gate_group["lr"], gate_group["weight_decay"]) == (10 * 0.0003, 0.0)
+            assert (other_group["lr"], other_group["weight_decay"]) == (0.0003, 0.1)
+            gate_ids = {id(p) for p in model.gate.parameters()}
+            all_ids = {id(p) for p in model.parameters()}
+            for group, expected_ids in ((gate_group, gate_ids), (other_group, all_ids - gate_ids)):
+                assert {id(p) for p in group["params"]} == expected_ids
+                assert len(group["params"]) == len(expected_ids)
+            return optimizer
+
+        monkeypatch.setattr(torch.optim, "AdamW", optimizer_with_group_checks)
         return model
 
     def study_factory(n_clips, condition, device, *, shuffle_body):
@@ -97,7 +112,7 @@ def test_shuffled_body_training_and_evaluation(tmp_path, monkeypatch):
                                        condition="V+G+B", seed=7, lambda_gen=0.2, mhsa=True,
                                        shuffle_body=shuffle_body))
 
-    assert gate_trainable == [(True,) * 4] * 2
+    assert gate_trainable == [(True,) * 6] * 2
     assert len(gate_gradients) == 2 and all(grad.count_nonzero() for grad in gate_gradients)
     assert len(gradients) == 2
     assert all(torch.isfinite(grad).all() and grad.count_nonzero() for grad in gradients)

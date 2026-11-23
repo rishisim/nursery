@@ -86,7 +86,7 @@ class UnifiedEmbodiedLearner(nn.Module):
         static = self.static.score(regions, log_prior, text, residual)
         motion, body = (F.normalize(fused[:, 1:], dim=-1) @ text.T).unbind(1)
         streams = torch.stack((static, motion, body), dim=-1)
-        gate = self.gate(text, active[:, None, :])
+        gate = self.gate(text.detach(), active[:, None, :])
         return (gate * streams).sum(-1), streams
 
     def forward(self, words, counts, video, frame_valid, temporal=None, gaze=None, body=None):

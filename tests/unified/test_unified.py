@@ -157,14 +157,33 @@ def test_infonce_gradients_reach_all_active_streams(inputs):
 
 def test_gate_simplex_and_initial_bias():
     gate = ModalityGate()
+    assert isinstance(gate.mlp[0], torch.nn.LayerNorm)
+    assert gate.mlp[0].normalized_shape == (512,)
+    assert all(param.count_nonzero() == 0 for param in gate.mlp[-1].parameters())
     text = torch.randn(3, 512)
     active = torch.tensor([[True, True, True], [True, True, False], [True, False, False]])
     values = gate(text, active)
     torch.testing.assert_close(values.sum(-1), torch.ones(3))
     assert (values >= 0).all()
     assert torch.equal(values[~active], torch.zeros(3))
-    expected = torch.tensor([0.5, -0.5, 0.0]).expand_as(active)
+    expected = torch.tensor([1.0, -1.5, 0.0]).expand_as(active)
     torch.testing.assert_close(values, expected.masked_fill(~active, -torch.inf).softmax(-1))
+
+
+def test_gate_path_does_not_backpropagate_to_text_encoder(inputs):
+    model = learner().eval()
+    with torch.no_grad():
+        model.gate.mlp[-1].weight[0, 0] = 1.0
+    text = model.enc_text(inputs["words"], inputs["counts"])
+    sensory = model.encode_sensory(*(inputs[key] for key in
+                                     ("video", "frame_valid", "temporal", "gaze", "body")))
+    gate_outputs = []
+    with model.gate.register_forward_hook(lambda _gate, _args, output: gate_outputs.append(output)):
+        model.score(sensory, text)
+
+    gate_outputs[0][0, 0, 0].backward()
+    assert model.gate.mlp[0].weight.grad.count_nonzero() > 0
+    assert all(param.grad is None for param in model.language.parameters())
 
 
 @pytest.mark.parametrize("body_rows", [[True, False, True], [False, False, False]])

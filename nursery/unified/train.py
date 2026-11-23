@@ -40,8 +40,13 @@ def train(args):
                       condition=args.condition, lambda_gen=args.lambda_gen, mhsa=args.mhsa,
                       aux_weight=args.aux_weight)
     model = UnifiedEmbodiedLearner(**model_args).to(args.device)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=study.protocol["lr"],
-                                  weight_decay=study.protocol["weight_decay"])
+    gate_params = list(model.gate.parameters())
+    gate_param_ids = {id(param) for param in gate_params}
+    other_params = [param for param in model.parameters() if id(param) not in gate_param_ids]
+    optimizer = torch.optim.AdamW([
+        dict(params=gate_params, lr=10 * study.protocol["lr"], weight_decay=0.0),
+        dict(params=other_params),
+    ], lr=study.protocol["lr"], weight_decay=study.protocol["weight_decay"])
     batches = torch.utils.data.BatchSampler(
         torch.utils.data.RandomSampler(range(len(ds)), generator=order_rng),
         batch_size=study.protocol["batch"], drop_last=False,
