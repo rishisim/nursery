@@ -25,15 +25,24 @@ def readable_file(path):
 
 
 def local_free():
-    if not LOCAL.is_dir() or not os.access(LOCAL, os.W_OK | os.X_OK):
-        raise OSError(f"{LOCAL} is missing or unwritable")
-    source = subprocess.check_output(
-        ["findmnt", "--noheadings", "--first-only", "--output", "SOURCE", "--target", str(LOCAL)],
-        text=True,
-    ).strip()
-    if not source.startswith("/dev/") or not stat.S_ISBLK(Path(source).stat().st_mode):
-        raise OSError(f"{LOCAL} is not backed by a local block device ({source})")
-    return shutil.disk_usage(LOCAL).free
+    # Prefer node-local NVMe (/lwork); some H200 nodes only have RAM-backed /tmp,
+    # whose pages count toward the job's --mem.
+    global LOCAL
+    errors = []
+    for candidate, kinds in ((Path("/lwork"), ("block",)), (Path("/tmp"), ("tmpfs",))):
+        if not candidate.is_dir() or not os.access(candidate, os.W_OK | os.X_OK):
+            errors.append(f"{candidate} is missing or unwritable")
+            continue
+        source, fstype = subprocess.check_output(
+            ["findmnt", "--noheadings", "--first-only", "--output", "SOURCE,FSTYPE",
+             "--target", str(candidate)], text=True,
+        ).split()[:2]
+        is_block = source.startswith("/dev/") and stat.S_ISBLK(Path(source).stat().st_mode)
+        if ("block" in kinds and is_block) or fstype in kinds:
+            LOCAL = candidate
+            return shutil.disk_usage(LOCAL).free
+        errors.append(f"{candidate} is not local ({source} {fstype})")
+    raise OSError("; ".join(errors))
 
 
 def stage(study, protocol, caches, destination):

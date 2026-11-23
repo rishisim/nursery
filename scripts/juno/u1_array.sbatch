@@ -3,7 +3,7 @@
 #SBATCH -p h200
 #SBATCH --gres=gpu:1
 #SBATCH -c 8
-#SBATCH --mem=64G
+#SBATCH --mem=128G
 #SBATCH -t 02:30:00
 #SBATCH -a 0-2
 #SBATCH -o outputs/runs/u1-%A_%a.out
