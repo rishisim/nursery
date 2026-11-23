@@ -21,6 +21,9 @@ class CausalLanguage(nn.Module):
         self.prefix = nn.Linear(512, 256)
         self.prefix_position = nn.Parameter(torch.zeros(3, 256))
         self.lm_head = nn.Linear(256, vocab_size + 2)
+        self.ctx_proj = nn.Linear(256, 256)
+        nn.init.zeros_(self.ctx_proj.weight)
+        nn.init.zeros_(self.ctx_proj.bias)
 
     def _tokens(self, words, counts):
         words = F.pad(words, (1, 1))
@@ -46,11 +49,13 @@ class CausalLanguage(nn.Module):
 
     def encode(self, words, counts):
         tokens = self._tokens(words, counts)
-        hidden = self._hidden(tokens)
         positions = torch.arange(tokens.shape[1], device=tokens.device)
         content = (positions > 0) & (positions <= counts[:, None]) & tokens.ne(0)
-        pooled = hidden.masked_fill(~content[..., None], 0).sum(1)
-        pooled = pooled / content.sum(1, keepdim=True).clamp_min(1)
+        length = content.sum(1, keepdim=True).clamp_min(1)
+        mask = ~content[..., None]
+        lexical_mean = self.word(tokens).masked_fill(mask, 0).sum(1) / length
+        ctx_mean = self._hidden(tokens).masked_fill(mask, 0).sum(1) / length
+        pooled = lexical_mean + self.ctx_proj(ctx_mean)
         return F.normalize(self.project(pooled), dim=-1)
 
     def lm_loss(self, words, counts, sensory, active):

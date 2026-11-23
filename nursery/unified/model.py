@@ -18,13 +18,16 @@ CONDITIONS = ("V", "V+G", "V+G+B")
 
 class UnifiedEmbodiedLearner(nn.Module):
     def __init__(self, vocab_size, *, input_dim=768, grid=16, body_dims=None,
-                 condition="V", lambda_gen=0.2, mhsa=True):
+                 condition="V", lambda_gen=0.2, mhsa=True, aux_weight=0.25):
         super().__init__()
         if condition not in CONDITIONS or not math.isfinite(lambda_gen) or lambda_gen < 0:
             raise ValueError("Unknown condition or invalid generative loss weight")
         if condition == "V+G+B" and body_dims is None:
             raise ValueError("V+G+B requires body group dimensions")
+        if not math.isfinite(aux_weight) or aux_weight < 0:
+            raise ValueError("Invalid auxiliary loss weight")
         self.condition, self.lambda_gen = condition, lambda_gen
+        self.aux_weight = aux_weight
         self.static = StaticVisionGaze(input_dim, grid)
         self.temporal = TemporalVideoStream(input_dim)
         self.fusion = SensoryFusion() if mhsa else None
@@ -76,21 +79,35 @@ class UnifiedEmbodiedLearner(nn.Module):
         return fused, active, regions, log_prior, fused[:, 0] - static
 
     def score(self, sensory, text):
+        return self._scores(sensory, text)[0]
+
+    def _scores(self, sensory, text):
         fused, active, regions, log_prior, residual = sensory
         static = self.static.score(regions, log_prior, text, residual)
         motion, body = (F.normalize(fused[:, 1:], dim=-1) @ text.T).unbind(1)
+        streams = torch.stack((static, motion, body), dim=-1)
         gate = self.gate(text, active[:, None, :])
-        return (gate * torch.stack((static, motion, body), dim=-1)).sum(-1)
+        return (gate * streams).sum(-1), streams
 
     def forward(self, words, counts, video, frame_valid, temporal=None, gaze=None, body=None):
         # InfoNCE queries use the unconditional text pass. The sensory prefix
         # only enters the separate LM loss, with the same text encoder weights.
         text = self.enc_text(words, counts)
         sensory = self.encode_sensory(video, frame_valid, temporal, gaze, body)
-        logits = self.logit_scale.clamp(max=math.log(100)).exp() * self.score(sensory, text)
-        nce = weighted_nce(logits, logits.new_ones(len(logits)))
-        loss = nce
+        fused, active, *_ = sensory
+        scale = self.logit_scale.clamp(max=math.log(100)).exp()
+        scores, streams = self._scores(sensory, text)
+        logits = scale * scores
+        loss = weighted_nce(logits, logits.new_ones(len(logits)))
         if self.lambda_gen:
-            fused, active, *_ = sensory
             loss = loss + self.lambda_gen * self.language.lm_loss(words, counts, fused, active)
+        if self.training and self.aux_weight:
+            terms = []
+            for stream, valid in zip(streams.unbind(-1), active.unbind(-1)):
+                # Keep matched pairs on the diagonal in both NCE directions.
+                stream_logits = scale * stream[valid][:, valid]
+                if len(stream_logits):
+                    terms.append(weighted_nce(stream_logits, logits.new_ones(len(stream_logits))))
+            if terms:
+                loss = loss + self.aux_weight * torch.stack(terms).mean()
         return {"loss": loss, "logits": logits, "text": text}

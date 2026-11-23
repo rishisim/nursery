@@ -10,7 +10,7 @@ class ModalityGate(nn.Module):
         self.mlp = nn.Sequential(nn.Linear(512, 128), nn.GELU(), nn.Linear(128, 3))
         nn.init.zeros_(self.mlp[-1].weight)
         nn.init.zeros_(self.mlp[-1].bias)
-        self.register_buffer("b_init", torch.tensor([2.0, -2.0, -2.0]))
+        self.register_buffer("b_init", torch.tensor([0.5, -0.5, 0.0]))
 
     def forward(self, text, active):
         logits = self.mlp(text) + self.b_init

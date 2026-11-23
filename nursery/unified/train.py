@@ -19,8 +19,6 @@ def train(args):
     started = time.perf_counter()
     if args.epochs < 1:
         raise ValueError("Expected at least one epoch")
-    if args.gate_warmup_epochs < 0:
-        raise ValueError("Gate warmup must be nonnegative")
     if args.shuffle_body and args.condition != "V+G+B":
         raise ValueError("Shuffled body requires V+G+B")
     if args.device == "mps" and not torch.backends.mps.is_available():
@@ -32,14 +30,15 @@ def train(args):
                condition=args.condition, shuffle_body=args.shuffle_body,
                training_body_shuffle=study.shuffle_info, seed=args.seed, n_clips=args.n_clips,
                epochs=args.epochs, lambda_gen=args.lambda_gen, mhsa=args.mhsa,
-               gate_warmup_epochs=args.gate_warmup_epochs)
+               aux_weight=args.aux_weight)
 
     torch.manual_seed(args.seed)
     order_rng = torch.Generator().manual_seed(args.seed)
     gaze_rng = torch.Generator().manual_seed(args.seed + 1000)
     body_rng = torch.Generator().manual_seed(args.seed + 2000)
     model_args = dict(vocab_size=len(study.vocab), body_dims=study.body_dims,
-                      condition=args.condition, lambda_gen=args.lambda_gen, mhsa=args.mhsa)
+                      condition=args.condition, lambda_gen=args.lambda_gen, mhsa=args.mhsa,
+                      aux_weight=args.aux_weight)
     model = UnifiedEmbodiedLearner(**model_args).to(args.device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=study.protocol["lr"],
                                   weight_decay=study.protocol["weight_decay"])
@@ -54,7 +53,6 @@ def train(args):
     for epoch in range(1, args.epochs + 1):
         epoch_started = time.perf_counter()
         model.train()
-        model.gate.requires_grad_(epoch > args.gate_warmup_epochs)
         total = 0.0
         for indices in batches:
             ids, video, words, counts = collate_frame_indices(ds, indices)
@@ -103,7 +101,7 @@ def main():
     parser.add_argument("--n-clips", type=int, required=True)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--epochs", type=int, default=60)
-    parser.add_argument("--gate-warmup-epochs", type=int, default=5)
+    parser.add_argument("--aux-weight", type=float, default=0.25)
     parser.add_argument("--lambda-gen", type=float, default=0.2)
     parser.add_argument("--mhsa", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--shuffle-body", action="store_true", help="Train and evaluate with shuffled body")

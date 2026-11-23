@@ -92,20 +92,21 @@ def test_shuffled_body_training_and_evaluation(tmp_path, monkeypatch):
 
     normal, shuffled = (tmp_path / name for name in ("V+G+B", "V+G+B_shuffled_body"))
     for path, shuffle_body in ((normal, False), (shuffled, True)):
-        training.train(SimpleNamespace(epochs=1 if shuffle_body else 6, gate_warmup_epochs=5,
+        training.train(SimpleNamespace(epochs=1, aux_weight=0.25,
                                        device="cpu", out_dir=path, n_clips=2,
                                        condition="V+G+B", seed=7, lambda_gen=0.2, mhsa=True,
                                        shuffle_body=shuffle_body))
 
-    assert gate_trainable == [(False,) * 4] * 5 + [(True,) * 4, (False,) * 4]
-    assert len(gate_gradients) == 1 and gate_gradients[0].count_nonzero() > 0
-    assert len(gradients) == 7
+    assert gate_trainable == [(True,) * 4] * 2
+    assert len(gate_gradients) == 2 and all(grad.count_nonzero() for grad in gate_gradients)
+    assert len(gradients) == 2
     assert all(torch.isfinite(grad).all() and grad.count_nonzero() for grad in gradients)
     for path, mode in ((normal, "real"), (shuffled, "shuffled")):
         metrics = json.loads((path / "metrics.json").read_text())
         checkpoint = torch.load(path / "best.pt", weights_only=True)
         run = metrics["run"]
         assert run == checkpoint["run"]
+        assert run["aux_weight"] == checkpoint["model_args"]["aux_weight"] == 0.25
         assert run["name"] == path.name and run["condition"] == "V+G+B"
         assert run["shuffle_body"] == (mode == "shuffled") and run["seed"] == 7
         result = metrics["held_out"]["as_trained"]["noun"]["test"]

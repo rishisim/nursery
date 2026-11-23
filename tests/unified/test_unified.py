@@ -3,6 +3,8 @@ import torch
 from torch.nn import functional as F
 
 from nursery.learner.gaze import _gaze_class
+from nursery.learner.losses import weighted_nce
+from nursery.unified import model as unified_model
 from nursery.unified.gate import ModalityGate
 from nursery.unified.model import UnifiedEmbodiedLearner
 from nursery.unified.sensory import SensoryFusion
@@ -94,13 +96,21 @@ def test_infonce_has_no_sensory_prefix(inputs):
 
 
 @torch.no_grad()
-def test_single_word_query_pools_only_its_content_token():
+def test_text_encoding_starts_at_lexical_mean():
     language = learner().eval().language
-    words, counts = torch.tensor([[2, 0, 0]]), torch.tensor([1])
+    words, counts = torch.tensor([[2, 0, 0], [3, 4, 0]]), torch.tensor([1, 2])
+    lexical_mean = torch.stack((language.word.weight[2], language.word.weight[[3, 4]].mean(0)))
+    assert language.ctx_proj.weight.count_nonzero() == 0
+    assert language.ctx_proj.bias.count_nonzero() == 0
+    expected = F.normalize(language.project(lexical_mean), dim=-1)
+    torch.testing.assert_close(language.encode(words, counts), expected, atol=0, rtol=0)
+
+    language.ctx_proj.weight.copy_(torch.eye(256))
     hidden = language._hidden(language._tokens(words, counts))
-    expected = F.normalize(language.project(hidden[:, 1]), dim=-1)
+    ctx_mean = torch.stack((hidden[0, 1], hidden[1, 1:3].mean(0)))
+    expected = F.normalize(language.project(lexical_mean + ctx_mean), dim=-1)
     torch.testing.assert_close(language.encode(words, counts), expected)
-    torch.testing.assert_close(language.encode(words[:, :1], counts), expected)
+    torch.testing.assert_close(language.encode(words[:, :2], counts), expected)
 
 
 @torch.no_grad()
@@ -153,4 +163,62 @@ def test_gate_simplex_and_initial_bias():
     torch.testing.assert_close(values.sum(-1), torch.ones(3))
     assert (values >= 0).all()
     assert torch.equal(values[~active], torch.zeros(3))
-    torch.testing.assert_close(values[0], torch.tensor([0.96, 0.02, 0.02]), atol=0.005, rtol=0)
+    expected = torch.tensor([0.5, -0.5, 0.0]).expand_as(active)
+    torch.testing.assert_close(values, expected.masked_fill(~active, -torch.inf).softmax(-1))
+
+
+@pytest.mark.parametrize("body_rows", [[True, False, True], [False, False, False]])
+@torch.no_grad()
+def test_aux_nce_uses_only_active_pairs(body_rows, monkeypatch):
+    model = learner(lambda_gen=0.0)
+    model.logit_scale.fill_(10)  # Exercise the same clamp for all logits.
+    active = torch.tensor([[True, True, body] for body in body_rows])
+    streams = torch.randn(3, 3, 3, generator=torch.Generator().manual_seed(3))
+    scores = torch.randn(3, 3, generator=torch.Generator().manual_seed(4))
+    monkeypatch.setattr(model, "encode_sensory", lambda *args: (None, active))
+    monkeypatch.setattr(model, "_scores", lambda *args: (scores, streams))
+
+    calls = []
+
+    def record_nce(logits, weights):
+        calls.append(logits)
+        return weighted_nce(logits, weights)
+
+    monkeypatch.setattr(unified_model, "weighted_nce", record_nce)
+    words = torch.tensor([[1], [2], [3]])
+    output = model(words, torch.ones(3, dtype=torch.long), None, None)
+    main_logits = 100 * scores
+    expected_aux = [100 * streams[:, :, stream] for stream in (0, 1)]
+    if any(body_rows):
+        expected_aux.append(100 * streams[:, :, 2][[0, 2]][:, [0, 2]])
+    assert len(calls) == 1 + len(expected_aux)
+    for actual, expected in zip(calls, [main_logits, *expected_aux]):
+        torch.testing.assert_close(actual, expected)
+    base = weighted_nce(main_logits, torch.ones(3))
+    aux = torch.stack([weighted_nce(term, torch.ones(len(term))) for term in expected_aux]).mean()
+    torch.testing.assert_close(output["loss"], base + 0.25 * aux)
+    assert torch.isfinite(output["loss"])
+    torch.testing.assert_close(output["logits"], main_logits)
+
+    calls.clear()
+    evaluation = model.eval()(words, torch.ones(3, dtype=torch.long), None, None)
+    assert len(calls) == 1
+    torch.testing.assert_close(evaluation["loss"], base)
+
+
+@torch.no_grad()
+def test_zero_aux_weight_preserves_base_loss(inputs):
+    model = learner(aux_weight=0)
+    with torch.random.fork_rng(devices=[]):
+        torch.manual_seed(7)
+        actual = model(**inputs)
+        torch.manual_seed(7)
+        words, counts = inputs["words"], inputs["counts"]
+        text = model.enc_text(words, counts)
+        sensory = model.encode_sensory(*(inputs[key] for key in
+                                         ("video", "frame_valid", "temporal", "gaze", "body")))
+        logits = model.logit_scale.exp() * model.score(sensory, text)
+        fused, active, *_ = sensory
+        expected = weighted_nce(logits, logits.new_ones(len(logits)))
+        expected += model.lambda_gen * model.language.lm_loss(words, counts, fused, active)
+    torch.testing.assert_close(actual["loss"], expected, atol=0, rtol=0)
