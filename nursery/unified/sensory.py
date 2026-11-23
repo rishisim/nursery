@@ -20,11 +20,24 @@ class StaticVisionGaze(nn.Module):
 
     def __init__(self, input_dim, grid):
         super().__init__()
-        self.project = nn.Linear(input_dim, 512)
+        self.project = nn.Sequential(nn.LayerNorm(input_dim), nn.Dropout(0.1),
+                                     nn.Linear(input_dim, 512))
         axis = (torch.arange(grid, dtype=torch.float32) + 0.5) / grid
         yy, xx = torch.meshgrid(axis, axis, indexing="ij")
         self.register_buffer("patch_centers", torch.stack((xx, yy), -1).flatten(0, 1))
         self.regions = grid ** 2 + 1
+
+    def frame_prior(self, point, valid):
+        in_crop = valid & ((point >= 0) & (point <= 1)).all(-1)
+        distance = (point[:, :, None] - self.patch_centers).square().sum(-1)
+        patch_prior = torch.log_softmax(-distance / (2 * self.sigma ** 2), -1)
+        # CLS retains its uniform share, while gaze redistributes the patch mass.
+        uniform = -math.log(self.regions)
+        patch_prior = torch.where(
+            in_crop[..., None], patch_prior + math.log1p(-1 / self.regions), uniform
+        )
+        cls_prior = torch.full_like(patch_prior[..., :1], uniform)
+        return torch.cat((cls_prior, patch_prior), -1)
 
     def forward(self, video, frame_valid, gaze=None):
         # Keep the same token layout with or without gaze for exact ablations.
@@ -37,19 +50,10 @@ class StaticVisionGaze(nn.Module):
             point = gaze["gaze_point"].masked_fill(~valid[..., None], 0)
             closeup = gaze["closeup"].masked_fill(~valid[..., None], 0)
 
-        in_crop = valid & ((point >= 0) & (point <= 1)).all(-1)
-        distance = (point[:, :, None] - self.patch_centers).square().sum(-1)
-        patch_prior = torch.log_softmax(-distance / (2 * self.sigma ** 2), -1)
-        # CLS retains its uniform share, while gaze redistributes the patch mass.
-        uniform = -math.log(self.regions)
-        patch_prior = torch.where(
-            in_crop[..., None], patch_prior + math.log1p(-1 / self.regions), uniform
-        )
-        cls_prior = torch.full_like(patch_prior[..., :1], uniform)
         frame_mass = -frame_valid.sum(1, keepdim=True).log()
         sharp_mass = frame_mass - math.log(2)
         main_mass = torch.where(valid, sharp_mass, frame_mass)
-        main_prior = torch.cat((cls_prior, patch_prior), -1) + main_mass[..., None]
+        main_prior = self.frame_prior(point, valid) + main_mass[..., None]
         main_prior = main_prior.masked_fill(~frame_valid[..., None], -torch.inf)
         sharp_prior = sharp_mass.expand_as(valid).masked_fill(~valid, -torch.inf)
         log_prior = torch.cat((main_prior, sharp_prior[..., None]), -1).flatten(1)

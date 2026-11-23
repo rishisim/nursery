@@ -12,7 +12,7 @@ class CausalLanguage(nn.Module):
         self.word = nn.Embedding(vocab_size + 2, 256, padding_idx=0)
         self.position = nn.Embedding(max_words + 2, 256)
         self.layers = nn.ModuleList([
-            nn.TransformerEncoderLayer(256, 4, dim_feedforward=1024, dropout=0.0,
+            nn.TransformerEncoderLayer(256, 4, dim_feedforward=1024, dropout=0.1,
                                        activation="gelu", batch_first=True, norm_first=True)
             for _ in range(2)
         ])
@@ -45,9 +45,13 @@ class CausalLanguage(nn.Module):
         return self.norm(x[:, prefix_len:])
 
     def encode(self, words, counts):
-        hidden = self._hidden(self._tokens(words, counts))
-        eos = hidden[torch.arange(len(words), device=words.device), counts + 1]
-        return F.normalize(self.project(eos), dim=-1)
+        tokens = self._tokens(words, counts)
+        hidden = self._hidden(tokens)
+        positions = torch.arange(tokens.shape[1], device=tokens.device)
+        content = (positions > 0) & (positions <= counts[:, None]) & tokens.ne(0)
+        pooled = hidden.masked_fill(~content[..., None], 0).sum(1)
+        pooled = pooled / content.sum(1, keepdim=True).clamp_min(1)
+        return F.normalize(self.project(pooled), dim=-1)
 
     def lm_loss(self, words, counts, sensory, active):
         tokens = self._tokens(words, counts)

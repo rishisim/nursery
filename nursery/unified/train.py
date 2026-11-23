@@ -3,6 +3,7 @@
 import argparse
 import json
 from pathlib import Path
+import sys
 import time
 
 import torch
@@ -18,6 +19,8 @@ def train(args):
     started = time.perf_counter()
     if args.epochs < 1:
         raise ValueError("Expected at least one epoch")
+    if args.gate_warmup_epochs < 0:
+        raise ValueError("Gate warmup must be nonnegative")
     if args.shuffle_body and args.condition != "V+G+B":
         raise ValueError("Shuffled body requires V+G+B")
     if args.device == "mps" and not torch.backends.mps.is_available():
@@ -28,7 +31,8 @@ def train(args):
     run = dict(name="V+G+B_shuffled_body" if args.shuffle_body else args.condition,
                condition=args.condition, shuffle_body=args.shuffle_body,
                training_body_shuffle=study.shuffle_info, seed=args.seed, n_clips=args.n_clips,
-               epochs=args.epochs, lambda_gen=args.lambda_gen, mhsa=args.mhsa)
+               epochs=args.epochs, lambda_gen=args.lambda_gen, mhsa=args.mhsa,
+               gate_warmup_epochs=args.gate_warmup_epochs)
 
     torch.manual_seed(args.seed)
     order_rng = torch.Generator().manual_seed(args.seed)
@@ -48,7 +52,9 @@ def train(args):
     best_score, best_dev = -float("inf"), None
     checkpoint_path = out_dir / "best.pt"
     for epoch in range(1, args.epochs + 1):
+        epoch_started = time.perf_counter()
         model.train()
+        model.gate.requires_grad_(epoch > args.gate_warmup_epochs)
         total = 0.0
         for indices in batches:
             ids, video, words, counts = collate_frame_indices(ds, indices)
@@ -72,6 +78,9 @@ def train(args):
             best_score, best_dev = score, dev
             torch.save(dict(state_dict=model.state_dict(), model_args=model_args,
                             n_clips=args.n_clips, seed=args.seed, epoch=epoch, run=run), checkpoint_path)
+        elapsed = time.perf_counter() - epoch_started
+        print(f"Epoch {epoch}/{args.epochs} {elapsed:.2f}s loss={history[-1]['loss']:.4f} "
+              f"dev={by_rung}", file=sys.stderr, flush=True)
 
     model, checkpoint = load_checkpoint(checkpoint_path, args.device)
     if study.development(model) != best_dev:
@@ -94,10 +103,11 @@ def main():
     parser.add_argument("--n-clips", type=int, required=True)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--epochs", type=int, default=60)
+    parser.add_argument("--gate-warmup-epochs", type=int, default=5)
     parser.add_argument("--lambda-gen", type=float, default=0.2)
     parser.add_argument("--mhsa", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--shuffle-body", action="store_true", help="Train and evaluate with shuffled body")
-    parser.add_argument("--device", choices=("cpu", "mps"), default="cpu")
+    parser.add_argument("--device", choices=("cpu", "mps", "cuda"), default="cpu")
     parser.add_argument("--out-dir", type=Path, required=True)
     print(json.dumps(train(parser.parse_args()), indent=2))
 

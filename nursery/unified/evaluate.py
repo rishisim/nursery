@@ -78,6 +78,14 @@ class UnifiedEvaluation(StudyEvaluation):
     def gaze_data(self, rows, **kwargs):
         return _gaze_data(self.protocol, rows, self.lut, "video_gaze", **kwargs)
 
+    def temporal_data(self, rows, *, allowed_keys=None):
+        adapter = TemporalVideoData(rows, self.caches, self.lut, self.timeline,
+                                    allowed_keys=allowed_keys)
+        if self.condition != "V":
+            adapter.gaze = self.gaze_data(rows, frame_keys=adapter.frame_keys,
+                                          window=5, allowed_keys=allowed_keys)
+        return adapter
+
     @property
     def body_dims(self):
         if self.store is not None:
@@ -98,8 +106,7 @@ class UnifiedEvaluation(StudyEvaluation):
         gaze = None
         if self.condition != "V":
             gaze = self.gaze_data(rows, frame_keys=keys, allowed_keys=self.allowed_keys)
-        temporal = TemporalVideoData(rows, self.caches, self.lut, self.timeline,
-                                     allowed_keys=self.allowed_keys)
+        temporal = self.temporal_data(rows, allowed_keys=self.allowed_keys)
         return ds, gaze, temporal, self._training_body(rows, window, seed)
 
     def _training_body(self, rows, window, seed):
@@ -127,7 +134,9 @@ class UnifiedEvaluation(StudyEvaluation):
         if gaze is not None:
             dropout = self.protocol["gaze"]["dropout"] if gaze_rng is not None else 0.0
             gaze_ctx = gaze.batch(ids, gaze_rng, device=device, dropout=dropout)
-        temporal_ctx = temporal.batch(model, ids, device=device)
+        temporal_ctx = temporal.batch(model, ids, device=device,
+                                      gaze_mode="real" if gaze_ctx is not None else "removed",
+                                      keep=gaze_ctx["keep"] if gaze_ctx is not None else None)
         body_ctx = None
         if body is not None:
             body_ctx = body.batch(ids if body_ids is None else body_ids, body_rng,
@@ -148,7 +157,7 @@ class UnifiedEvaluation(StudyEvaluation):
             self.gaze_panels[panel] = self.gaze_data(rows, frame_keys=self.panel_frame_keys[panel])
         gaze = self.gaze_panels.get(panel) if gaze_mode != "removed" else None
         if panel not in self.temporal_panels:
-            self.temporal_panels[panel] = TemporalVideoData(rows, self.caches, self.lut, self.timeline)
+            self.temporal_panels[panel] = self.temporal_data(rows)
 
         queries = rows.iloc[trials["trial_rows"]].referent.tolist()
         word_index, text, _ = self._query_vectors(model, queries)

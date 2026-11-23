@@ -1,6 +1,8 @@
 import pytest
 import torch
+from torch.nn import functional as F
 
+from nursery.learner.gaze import _gaze_class
 from nursery.unified.gate import ModalityGate
 from nursery.unified.model import UnifiedEmbodiedLearner
 from nursery.unified.sensory import SensoryFusion
@@ -91,11 +93,52 @@ def test_infonce_has_no_sensory_prefix(inputs):
     assert not torch.equal(original["logits"], altered["logits"])
 
 
+@torch.no_grad()
+def test_single_word_query_pools_only_its_content_token():
+    language = learner().eval().language
+    words, counts = torch.tensor([[2, 0, 0]]), torch.tensor([1])
+    hidden = language._hidden(language._tokens(words, counts))
+    expected = F.normalize(language.project(hidden[:, 1]), dim=-1)
+    torch.testing.assert_close(language.encode(words, counts), expected)
+    torch.testing.assert_close(language.encode(words[:, :1], counts), expected)
+
+
+@torch.no_grad()
+def test_temporal_frames_match_phase_one_gaze_pooling(inputs):
+    phase_one = _gaze_class()(8, 8, option="steering", num_regions=5, temporal_video=True)
+    video = inputs["video"]
+    ctx = dict(inputs["gaze"], same=inputs["frame_valid"].clone())
+    ctx["keep"][1] = False
+    ctx["gaze_point"][0, 1] = torch.tensor([2., 2.])
+    expected = phase_one.temporal_frames(video, ctx)
+    assert not torch.equal(expected[0], video.mean(dim=-2)[0])
+    for condition in ("V+G", "V+G+B"):
+        model = learner(condition)
+        torch.testing.assert_close(model.temporal_frames(video, ctx), expected)
+        assert torch.equal(model.temporal_frames(video, {"same": ctx["same"]}), video.mean(dim=-2))
+    assert torch.equal(learner("V").temporal_frames(video, ctx), video.mean(dim=-2))
+
+
+@torch.no_grad()
+def test_temporal_dropout_masks_whole_stream_only_in_training(inputs, monkeypatch):
+    model = learner()
+    args = [inputs[key] for key in ("video", "frame_valid", "temporal", "gaze", "body")]
+    monkeypatch.setattr(torch, "rand", lambda n, *, device: torch.tensor([0.2, 0.8], device=device))
+    fused, active, *_ = model.train().encode_sensory(*args)
+    assert active.tolist() == [[True, False, True], [True, True, True]]
+    assert fused[0, 1].count_nonzero() == 0
+    weights = model.gate(model.enc_text(inputs["words"], inputs["counts"]), active)
+    assert weights[0, 1] == 0
+    torch.testing.assert_close(weights.sum(-1), torch.ones(2))
+    _, active, *_ = model.eval().encode_sensory(*args)
+    assert active.all()
+
+
 def test_infonce_gradients_reach_all_active_streams(inputs):
-    model = learner(lambda_gen=0.0)
+    model = learner(lambda_gen=0.0).eval()
     model(**inputs)["loss"].backward()
-    for stream in (model.static, model.temporal, model.body):
-        grad = stream.project.weight.grad
+    for projection in (model.static.project[-1], model.temporal.project, model.body.project):
+        grad = projection.weight.grad
         assert torch.isfinite(grad).all() and grad.count_nonzero() > 0
     for encoder in (model.temporal.encoder, *model.body.encoder.mlps.values(),
                     model.body.encoder.fwd, model.body.encoder.bwd):

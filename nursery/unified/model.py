@@ -36,10 +36,20 @@ class UnifiedEmbodiedLearner(nn.Module):
     def enc_text(self, words, counts):
         return self.language.encode(words, counts)
 
-    @staticmethod
-    def temporal_frames(tokens, ctx):
+    def temporal_frames(self, tokens, ctx):
         """Pool each frozen frame for the Phase 1 temporal window adapter."""
-        return tokens.mean(dim=-2)
+        mean = tokens.mean(dim=-2)
+        if self.condition == "V" or "gaze_point" not in ctx:
+            return mean
+        # Match Phase 1 steering: CLS keeps its share, and the close-up
+        # receives half the frame mass when gaze is valid.
+        valid = ctx["gaze_valid"] & ctx["same"] & ctx["keep"][:, None]
+        point = ctx["gaze_point"].masked_fill(~valid[..., None], 0)
+        prior = self.static.frame_prior(point, valid)
+        pooled = torch.einsum("bfk,bfkd->bfd", prior.exp(), tokens)
+        if "closeup" in ctx:
+            pooled = (pooled + ctx["closeup"].masked_fill(~valid[..., None], 0)) * 0.5
+        return torch.where(valid[..., None], pooled, mean)
 
     def encode_sensory(self, video, frame_valid, temporal=None, gaze=None, body=None,
                        *, remove_extras=False):
@@ -51,8 +61,12 @@ class UnifiedEmbodiedLearner(nn.Module):
         no_input = torch.zeros(len(video), device=video.device, dtype=torch.bool)
         motion, motion_active = torch.zeros_like(static), no_input
         if temporal is not None:
-            motion = self.temporal(temporal["frames"], temporal["same"])
-            motion_active = temporal["same"].any(dim=1)
+            same = temporal["same"]
+            if self.training:
+                keep = torch.rand(len(video), device=video.device) >= 0.5
+                same = same & keep[:, None]
+            motion = self.temporal(temporal["frames"], same)
+            motion_active = same.any(dim=1)
         embodiment, body_active = torch.zeros_like(static), no_input
         if body is not None:
             embodiment, body_active = self.body(body)

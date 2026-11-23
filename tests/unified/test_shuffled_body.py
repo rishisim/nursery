@@ -31,11 +31,20 @@ def test_shuffled_body_training_and_evaluation(tmp_path, monkeypatch):
                   correct_slots=list(range(4)), donor_rows=[2, 3, 0, 1])
     temporal = SimpleNamespace(batch=lambda *args, **kwargs: None)
     gradients = []
+    gate_trainable, gate_gradients = [], []
     make_model = training.UnifiedEmbodiedLearner
 
     def model_with_gradient_hook(**kwargs):
         model = make_model(**kwargs)
         model.body.project.weight.register_hook(lambda grad: gradients.append(grad.detach()))
+        model.gate.mlp[-1].weight.register_hook(lambda grad: gate_gradients.append(grad.detach()))
+
+        def check_gate(gate, _):
+            if gate.training:
+                gate_trainable.append(tuple(p.requires_grad for p in gate.parameters()))
+                assert all(p.count_nonzero() == 0 for p in gate.mlp[-1].parameters())
+
+        model.gate.register_forward_pre_hook(check_gate)
         return model
 
     def study_factory(n_clips, condition, device, *, shuffle_body):
@@ -83,11 +92,14 @@ def test_shuffled_body_training_and_evaluation(tmp_path, monkeypatch):
 
     normal, shuffled = (tmp_path / name for name in ("V+G+B", "V+G+B_shuffled_body"))
     for path, shuffle_body in ((normal, False), (shuffled, True)):
-        training.train(SimpleNamespace(epochs=1, device="cpu", out_dir=path, n_clips=2,
+        training.train(SimpleNamespace(epochs=1 if shuffle_body else 6, gate_warmup_epochs=5,
+                                       device="cpu", out_dir=path, n_clips=2,
                                        condition="V+G+B", seed=7, lambda_gen=0.2, mhsa=True,
                                        shuffle_body=shuffle_body))
 
-    assert len(gradients) == 2
+    assert gate_trainable == [(False,) * 4] * 5 + [(True,) * 4, (False,) * 4]
+    assert len(gate_gradients) == 1 and gate_gradients[0].count_nonzero() > 0
+    assert len(gradients) == 7
     assert all(torch.isfinite(grad).all() and grad.count_nonzero() for grad in gradients)
     for path, mode in ((normal, "real"), (shuffled, "shuffled")):
         metrics = json.loads((path / "metrics.json").read_text())
