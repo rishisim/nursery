@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH -c 8
 #SBATCH --mem=64G
-#SBATCH -t 01:30:00
+#SBATCH -t 02:30:00
 #SBATCH -a 0-2
 #SBATCH -o outputs/runs/u1-%A_%a.out
 set -euo pipefail
@@ -30,21 +30,34 @@ if [[ $# != 1 || ! $1 =~ ^[[:alnum:]_][[:alnum:]_.-]*$ ]]; then
     exit 2
 fi
 
-arms=("V+G|V+G|" "V+G+B|V+G+B|" "V+G+B_shuffled_body|V+G+B|--shuffle-body" "V|V|")
+arms=("V+G|V+G|" "V+G+B|V+G+B|" "V+G+B_shuffled_body|V+G+B|--shuffle-body" "V|V|"
+      "V+G+B_lambda_gen_0|V+G+B|--lambda-gen 0.0" "V+G+B_no_mhsa|V+G+B|--no-mhsa")
+# With SEEDS_PER_ARM=n, index i runs arm i/n with seed i%n (parity: --array=0-17%4, n=3).
 task=${SLURM_ARRAY_TASK_ID:-0}
-if [[ ! $task =~ ^[0-3]$ ]]; then
-    echo "Expected a U1 array index from 0 through 3." >&2
+seed=${SEED:-0}
+if [[ -n ${SEEDS_PER_ARM:-} ]]; then
+    seed=$((task % SEEDS_PER_ARM))
+    task=$((task / SEEDS_PER_ARM))
+fi
+if [[ ! $task =~ ^[0-5]$ ]]; then
+    echo "Expected a U1 arm index from 0 through 5." >&2
     exit 2
 fi
 IFS="|" read -r arm condition flag <<< "${arms[$task]}"
+out_dir="outputs/runs/$1/$arm/seed$seed"
+if [[ -f $out_dir/metrics.json ]]; then
+    echo "Skipping completed run $out_dir"
+    exit 0
+fi
 train_args=(--condition "$condition" --n-clips "${N_CLIPS:-630}"
-            --seed "${SEED:-0}" --epochs "${EPOCHS:-35}" --device cuda
-            --out-dir "outputs/runs/$1/$arm/seed${SEED:-0}")
+            --seed "$seed" --epochs "${EPOCHS:-35}" --device cuda
+            --out-dir "$out_dir")
 if [[ $dry_run == 1 ]]; then
     train_args+=(--dry-run)
 fi
 if [[ -n $flag ]]; then
-    train_args+=("$flag")
+    read -r -a flag_args <<< "$flag"
+    train_args+=("${flag_args[@]}")
 fi
 
 child=
