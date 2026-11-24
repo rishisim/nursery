@@ -18,6 +18,14 @@ from nursery.unified.u2_data import (
 )
 
 
+def test_choice_credits_split_ties_from_float_addition_order():
+    forward = 0.1 + 0.2 + 0.3
+    backward = 0.3 + 0.2 + 0.1
+    assert forward != backward
+    scores = np.array([[forward, backward], [forward, backward]])
+    assert choice_credits(scores, [True, True], correct=[0, 1]).tolist() == [.5, .5]
+
+
 def test_negation_bow_gets_exactly_chance():
     sentences = [
         TEST_NEGATION.format(noun="cup", other="bowl"),
@@ -33,7 +41,8 @@ def test_negation_bow_gets_exactly_chance():
         sensory = model.encode_sensory(torch.randn(1, 3, 5, 8), torch.ones(1, 3, dtype=torch.bool))
         scores, _ = score_sentence_choices(model, sensory, words, counts, 2)
     assert scores[0, 0].item() == scores[0, 1].item()
-    assert choice_credits(scores.numpy(), [known.all()]).tolist() == [.5]
+    assert known.all()
+    assert 100 * choice_credits(scores.numpy(), [known.all()]).mean() == 50.0
 
 
 def test_u1_single_word_byte_parity_with_legacy_checkpoint(tmp_path):

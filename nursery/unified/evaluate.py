@@ -62,10 +62,21 @@ def sentence_inputs(sentences, vocab, device, *, tokenize=None):
     return words, counts, np.array(known)
 
 
-def choice_credits(scores, known):
-    """Column zero is true. Split exact ties uniformly across top choices."""
-    top = scores == scores.max(axis=1, keepdims=True)
-    return np.where(known, top[:, 0] / top.sum(axis=1), 1 / scores.shape[1])
+def choice_credits(scores, known, correct=0):
+    """Split credit among choices within 1e-6 of the maximum."""
+    scores = np.asarray(scores, dtype=float)
+    top = np.isclose(scores, scores.max(axis=1, keepdims=True), rtol=0, atol=1e-6)
+    return np.where(known, top[np.arange(len(scores)), correct] / top.sum(axis=1),
+                    1 / scores.shape[1])
+
+
+def _apply_clip_choice_credits(result):
+    known = np.array([scores is not None for scores in result["scores"]])
+    unknown_scores = [0.] * len(result["candidate_rows"][0])
+    scores = [s if s is not None else unknown_scores for s in result["scores"]]
+    credits = choice_credits(scores, known, result["correct_slots"])
+    result.update(credits=credits.tolist(), accuracy=float(100 * credits.mean()),
+                  known_accuracy=float(100 * credits[known].mean()) if known.any() else None)
 
 
 def score_sentence_choices(model, sensory, words, counts, n_choices):
@@ -273,6 +284,7 @@ class UnifiedEvaluation(StudyEvaluation):
                     scores[i] = matrix[candidates[i], word_index[word]]
         result = _metrics(scores, [q in word_index for q in queries], candidates,
                           trials["correct_slots"], queries)
+        _apply_clip_choice_credits(result)
         result["body_mode"] = body_mode if body is not None else "none"
         if donors is not None:
             result["donor_rows"] = donors.tolist()
@@ -281,6 +293,15 @@ class UnifiedEvaluation(StudyEvaluation):
     def development(self, model):
         return {rung: self.evaluate(model, spec["dev"], body_mode=self.body_mode)
                 for rung, spec in self.word_types.items()}
+
+    def word_type_test(self, model, body_mode, *, gaze_mode=None, deadline=None):
+        results = super().word_type_test(model, body_mode, gaze_mode=gaze_mode, deadline=deadline)
+        # The inherited pooling and subsetting code recomputes credit via _metrics.
+        for rung, panels in results.items():
+            for name, panel in panels.items():
+                if name not in self.word_types[rung]["held_out"]:
+                    _apply_clip_choice_credits(panel)
+        return results
 
     @torch.no_grad()
     def compositional(self, model, path):
