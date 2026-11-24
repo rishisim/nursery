@@ -1,15 +1,21 @@
+import json
+
 import numpy as np
 import pandas as pd
 import pytest
 import torch
 
+from nursery.learner import _upstream_module
 from nursery.unified.evaluate import (
     UnifiedEvaluation, choice_credits, evaluate_vp_swap, load_checkpoint, score_sentence_choices,
     sentence_inputs,
 )
 from nursery.unified.language import CausalLanguage
 from nursery.unified.model import UnifiedEmbodiedLearner
-from nursery.unified.u2_data import TEST_NEGATION, vp_swap
+from nursery.unified.u2_data import (
+    FROZEN, STEP9, TEST_NEGATION, TEST_VP, TRAIN_PROPERTY, TRAIN_PROPERTY_CHAT,
+    TRAIN_PROPERTY_COPULA, _speech_alignment, vp_swap,
+)
 
 
 def test_negation_bow_gets_exactly_chance():
@@ -31,8 +37,6 @@ def test_negation_bow_gets_exactly_chance():
 
 
 def test_u1_single_word_byte_parity_with_legacy_checkpoint(tmp_path):
-    from nursery.learner import _upstream_module
-
     study = UnifiedEvaluation.__new__(UnifiedEvaluation)
     study.vocab = {"<pad>": 0, "lift": 1, "cup": 2}
     study.device = "cpu"
@@ -88,6 +92,60 @@ def test_vp_swap_split_is_disjoint_and_cartesian():
     assert set(sum(seen.values(), [])).isdisjoint(sum(held.values(), []))
     assert not quads.duplicated(["heavy_noun", "light_noun"]).any()
     assert all(quads.true_heavy.str.endswith(" heavy")) and all(quads.swap_heavy.str.endswith(" light"))
+
+
+def test_vp_training_and_test_carriers_are_disjoint(upstream):
+    tokenize = _upstream_module("train").tokenize
+    slots = dict(noun="noun", mass="mass")
+    test = tokenize(TEST_VP.format(**slots))
+    training = (*TRAIN_PROPERTY, *TRAIN_PROPERTY_COPULA.values(), *TRAIN_PROPERTY_CHAT)
+    assert all(tokenize(template.format(**slots)) != test for template in training)
+
+
+def test_frozen_u2_speech_matches_step9_alignment_and_has_no_vp_leakage(upstream):
+    step9_path = STEP9 / "subsets/1.0/manifest.parquet"
+    u2_path = FROZEN / "manifest.parquet"
+    if not (step9_path.is_file() and u2_path.is_file()):
+        pytest.skip("Local Step 9 and U2 freezes are required")
+
+    step9, speech = pd.read_parquet(step9_path), pd.read_parquet(u2_path)
+    stats = json.loads((FROZEN / "speech_stats.json").read_text())
+    overall = speech.noun_alignment.value_counts(normalize=True).to_dict()
+    named = speech.loc[speech.named, "noun_alignment"].value_counts(normalize=True).to_dict()
+    step9_named = pd.Series(_speech_alignment(step9[step9.named])).value_counts(normalize=True).to_dict()
+    assert overall == pytest.approx(dict(matching=.16, other_visible=.19, absent=.65), abs=.02)
+    assert named == pytest.approx(step9_named, abs=.02)
+    assert stats["noun_alignment"] == overall
+    assert stats["noun_alignment_named"] == named
+
+    held_out = set(sum(stats["vp_nouns"]["held_out"].values(), []))
+    assert len(held_out) == 8
+    collisions = step9.named & (
+        (step9.property.notna() & step9.referent.isin(held_out))
+        | (step9.action.eq("drink") & step9.referent.eq("bell"))
+    )
+    unchanged = step9.named & ~collisions
+    pd.testing.assert_series_equal(speech.loc[unchanged, "referent"], step9.loc[unchanged, "referent"])
+    np.testing.assert_array_equal(speech.noun_alignment, _speech_alignment(step9))
+    pd.testing.assert_series_equal(speech.referent_visible, step9.referent_visible)
+    fallback = step9.named & ~speech.named
+    assert not (fallback & ~collisions).any()
+    assert stats["pronoun_fallback_utterances"] == fallback.sum() == 6
+    pd.testing.assert_series_equal(speech.loc[fallback, "referent"], step9.loc[fallback, "referent"])
+
+    tokenize = _upstream_module("train").tokenize
+    assert all("it" in tokenize(text) and noun not in tokenize(text)
+               for text, noun in zip(speech.loc[fallback, "text"], step9.loc[fallback, "referent"]))
+    assert not speech.loc[speech.named & speech.action.eq("drink"), "referent"].eq("bell").any()
+    train = {tuple(tokenize(text)) for text in speech.text}
+    assert all(not (held_out.intersection(words) and {"heavy", "light"}.intersection(words)) for words in train)
+    assert stats["vp_held_out_mass_cooccurrences"] == 0
+    quads = pd.read_parquet(FROZEN / "vp_swap.parquet")
+    test = quads[["true_heavy", "true_light", "swap_heavy", "swap_light"]].to_numpy().ravel().tolist()
+    for name in ("action_object", "property_object", "negation"):
+        panel = pd.read_parquet(FROZEN / f"{name}.parquet")
+        test.extend(choice for choices in panel.choices for choice in choices)
+    assert train.isdisjoint(tuple(tokenize(text)) for text in test)
 
 
 @pytest.mark.parametrize(

@@ -75,9 +75,15 @@ TRAIN_ACTION = {
     "offhand": ("Try {obj} in your other hand.", "Can your other hand hold {obj}?"),
     "drink": ("Let's drink from {obj}.", "Can you drink from {obj}?", "Want to drink from {obj}?"),
 }
+TRAIN_PROPERTY_COPULA = {
+    "That {noun} is {mass}.": "Those {noun} are {mass}.",
+    "Oh, this {noun} is {mass}!": "Oh, these {noun} are {mass}!",
+}
+PLURAL_MASS_NOUNS = {"binoculars", "glasses", "headphones", "scissors"}
 TRAIN_PROPERTY = (
     "Look at this {mass} {noun}.", "What a {mass} thing, that {noun}!",
     "Oh, the {mass} {noun}!", "See that {mass} {noun} there?",
+    *TRAIN_PROPERTY_COPULA,
 )
 TRAIN_PROPERTY_CHAT = (
     "That feels {mass}. See the {noun}?", "Oh, {mass}! Where's the {noun}?",
@@ -107,89 +113,79 @@ def vp_swap(rng):
     return pd.DataFrame(rows), splits
 
 
-def _speech_alignment(candidates, rng):
-    # Step 9 estimates available channels before sampling. Fit the channel
-    # probabilities again for U2's aligned-frame targets and eligible nouns.
-    target = np.array([.16, .19, .65])
-    available = np.array([[bool(pool) for pool in row] for row in candidates])
-    weights = target.copy()
-    for _ in range(100):
-        prob = available * weights
-        prob /= prob.sum(1, keepdims=True)
-        achieved = prob.mean(0)
-        if np.max(abs(achieved - target)) < 1e-8:
-            break
-        weights *= target / achieved
-    return [rng.choice(3, p=p) for p in prob]
+def _speech_alignment(schedule):
+    # Step 9 samples the channel at the source time and measures visibility
+    # after jitter. Pronoun rows also have latent referents in this schedule.
+    return np.select(
+        [schedule.referent_visible & schedule.channel.eq("held"), schedule.referent_visible],
+        ["matching", "other_visible"], default="absent",
+    )
 
 
 def generate_speech(schedule, frames, noun_splits, rng):
     """Reuse Step 9 times, jitter, cue weights and source-event annotations."""
     upstream = _upstream_module("train")
     result = schedule.copy()
-    vocabulary = load_config()["vocabulary"]
+    vocabulary = set(load_config()["vocabulary"])
     forbidden = set(sum(noun_splits["held_out"].values(), []))
-    matching_mass = {noun: mass for mass, nouns in noun_splits["seen"].items() for noun in nouns}
 
     timeline = frames.set_index(KEY)
     scenes = frames.groupby("video_id", sort=False).visible.agg(lambda v: set().union(*v))
-    named = result[result.named]
-    pools = []
-    for row in named.itertuples():
-        moment = timeline.loc[row.video_id, row.frame_idx]
-        visible = moment.visible
-        held = {moment.held_category} & visible
-        other = visible - held
-        absent = scenes[row.video_id] - visible - {moment.held_category}
-        eligible = set(vocabulary)
-        if pd.notna(row.property):
-            eligible -= forbidden
-        if row.action == "drink":
-            eligible.discard("bell")
-        pools.append(tuple(sorted(p & eligible) for p in (held, other, absent or set(vocabulary) - visible)))
-
-    assignments = {}
-    for row, pool, bucket in zip(named.itertuples(), pools, _speech_alignment(pools, rng)):
-        choices = pool[bucket]
-        # Retain the original noun when it belongs to the selected channel.
-        # Prefer plausible mass wording if a seen VP noun is available.
-        plausible = [noun for noun in choices if matching_mass.get(noun) == row.property]
-        if plausible and bucket != 1:
-            choices = plausible
-        noun = row.referent if row.referent in choices else str(rng.choice(choices))
-        assignments[row.Index] = noun, ("matching", "other_visible", "absent")[bucket]
-
-    result["noun_alignment"] = None
+    result["noun_alignment"] = _speech_alignment(schedule)
     result["negated_noun"] = None
     for row in result.itertuples():
         i = row.Index
         if not row.named:
             result.at[i, "text"] = rng.choice(TRAIN_PRONOUN if row.referential else TRAIN_CHAT)
             continue
-        noun, alignment = assignments[i]
         moment = timeline.loc[row.video_id, row.frame_idx]
-        source = timeline.loc[row.video_id, row.source_frame_idx]
-        result.at[i, "referent"] = noun
-        result.at[i, "noun_alignment"] = alignment
-        result.at[i, "channel"] = dict(matching="held", other_visible="seen", absent="unseen")[alignment]
-        result.at[i, "referent_visible"] = noun in moment.visible
-        result.at[i, "held_referent"] = noun == moment.held_category
-        result.at[i, "source_held_referent"] = noun == source.held_category
-        result.at[i, "gazed_referent"] = noun == moment.gaze_category
-        result.at[i, "source_gazed_referent"] = noun == source.gaze_category
-
         has_action, has_mass = pd.notna(row.action), pd.notna(row.property)
+        noun = row.referent
+        excluded = forbidden if has_mass else set()
+        if row.action == "drink":
+            excluded = excluded | {"bell"}
+        if noun in excluded:
+            if row.referent_visible:
+                # Preserve the scheduled channel and aligned-frame visibility.
+                choices = moment.visible - excluded
+                if row.noun_alignment == "other_visible":
+                    choices -= {moment.held_category}
+            else:
+                choices = scenes[row.video_id] - moment.visible - excluded
+                if not choices:
+                    choices = vocabulary - moment.visible - excluded
+            if not choices:
+                # Keep the latent Step 9 referent and render it as a pronoun.
+                result.at[i, "named"] = False
+                noun = None
+            else:
+                noun = str(rng.choice(sorted(choices)))
+                source = timeline.loc[row.video_id, row.source_frame_idx]
+                result.at[i, "referent"] = noun
+                result.at[i, "held_referent"] = noun == moment.held_category
+                result.at[i, "source_held_referent"] = noun == source.held_category
+                result.at[i, "gazed_referent"] = noun == moment.gaze_category
+                result.at[i, "source_gazed_referent"] = noun == source.gaze_category
+
         distractors = sorted(moment.visible - {noun})
-        names_mass = has_mass and noun == moment.rendered_noun
+        names_mass = has_mass and noun is not None and noun == moment.rendered_noun
         if has_action:
-            obj = f"the {row.property} {noun}" if names_mass else f"the {noun}"
+            if noun is None:
+                obj = "it"
+            else:
+                obj = f"the {row.property} {noun}" if names_mass else f"the {noun}"
             text = rng.choice(TRAIN_ACTION[row.action]).format(obj=obj)
             if has_mass and not names_mass:
                 text += f" It feels {row.property}."
+        elif noun is None:
+            text = f"It feels {row.property}."
         elif has_mass:
             frames_for_mass = TRAIN_PROPERTY if names_mass else TRAIN_PROPERTY_CHAT
-            text = rng.choice(frames_for_mass).format(mass=row.property, noun=noun)
-        elif alignment == "matching" and distractors and rng.random() < .5:
+            template = rng.choice(frames_for_mass)
+            if noun in PLURAL_MASS_NOUNS:
+                template = TRAIN_PROPERTY_COPULA.get(template, template)
+            text = template.format(mass=row.property, noun=noun)
+        elif row.noun_alignment == "matching" and distractors and rng.random() < .5:
             other = rng.choice(distractors)
             result.at[i, "negated_noun"] = other
             text = rng.choice(TRAIN_NEGATION).format(noun=noun, other=other)
@@ -360,7 +356,8 @@ def freeze(out, seed):
 
     streams = [np.random.default_rng(s) for s in np.random.SeedSequence(seed).spawn(5)]
     quads, noun_splits = vp_swap(streams[0])
-    speech = generate_speech(pd.read_parquet(manifest_path), frames, noun_splits, streams[1])
+    schedule = pd.read_parquet(manifest_path)
+    speech = generate_speech(schedule, frames, noun_splits, streams[1])
     covered, cache_indices = cached_replays(frames, protocol, gaze)
     property_events = _read_events("property").merge(covered[KEY], on=KEY).drop_duplicates("clip")
     panels = {"action_object": action_trials(_read_events("action"), covered, streams[2]),
@@ -392,21 +389,37 @@ def freeze(out, seed):
     counts["vp_swap"] = {split: dict(quads=len(part), pairs=2 * len(part))
                          for split, part in quads.groupby("split")}
     tokens = speech.text.map(upstream.tokenize)
+    speech_clips = speech["clip"].unique()
+    training_seconds = int(frames["clip"].isin(speech_clips).sum())
     stats = dict(seed=seed, split_clips={k: len(v) for k, v in splits.items()},
-                 clips=speech["clip"].nunique(), utterances=len(speech),
-                 utterances_per_clip=len(speech) / speech["clip"].nunique(),
+                 clips=len(speech_clips), utterances=len(speech),
+                 utterances_per_clip=len(speech) / len(speech_clips),
+                 utterances_per_minute=60 * len(speech) / training_seconds,
+                 named_utterances=int(speech.named.sum()),
+                 pronoun_fallback_utterances=int((schedule.named & ~speech.named).sum()),
                  tokens_mean=float(tokens.map(len).mean()),
                  jitter_sigma_s=load_config()["generator"]["sigma"],
                  jitter_rounded_sd_s=float(speech.jitter_draw_frames.std(ddof=0)),
                  jitter_effective_sd_s=float(speech.jitter_frames.std(ddof=0)),
                  noun_alignment=speech.noun_alignment.value_counts(normalize=True).to_dict(),
+                 noun_alignment_named=speech.loc[speech.named, "noun_alignment"].value_counts(normalize=True).to_dict(),
                  action_alignment=speech.action_alignment.value_counts(normalize=True).to_dict(),
                  property_alignment=speech.property_alignment.value_counts(normalize=True).to_dict(),
                  negation_utterances=int(speech.negated_noun.notna().sum()), vp_nouns=noun_splits)
+    text_counts = speech.text.value_counts()
+    stats["copula_template_counts"] = {
+        template: sum(int(text_counts.get(template.format(noun=noun, mass=mass), 0))
+                      for noun in vocabulary for mass in MASS_NOUNS)
+        for template in (*TRAIN_PROPERTY_COPULA, *TRAIN_PROPERTY_COPULA.values())
+    }
     stats["vp_training_cooccurrences"] = {
         noun: {mass: sum(noun in words and mass in words for words in tokens) for mass in MASS_NOUNS}
         for group in noun_splits.values() for nouns in group.values() for noun in nouns
     }
+    stats["vp_held_out_mass_cooccurrences"] = sum(
+        sum(stats["vp_training_cooccurrences"][noun].values())
+        for nouns in noun_splits["held_out"].values() for noun in nouns
+    )
     if any(stats["vp_training_cooccurrences"][noun][mass] == 0
            for mass, nouns in noun_splits["seen"].items() for noun in nouns):
         raise ValueError("A seen VP noun has no correct mass co-occurrence in training")
