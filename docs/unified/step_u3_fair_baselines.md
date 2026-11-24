@@ -1,6 +1,6 @@
 # Step U3: Fair "Other Architectures" Baselines & Flagship Curves
 
-Status: **design blueprint, blocked on Step U1–U2 go-gates.**
+Status: **ready to build (Steps U1–U2 locked at `79c77f05` and `b69091fb`).**
 Context: [CONTEXT.md](CONTEXT.md).
 
 ## Objective
