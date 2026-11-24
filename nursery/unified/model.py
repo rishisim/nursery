@@ -38,6 +38,10 @@ class UnifiedEmbodiedLearner(nn.Module):
         self.body = BodyStream(body_dims) if body_dims is not None else None
 
     def enc_text(self, words, counts):
+        if self.bow_only:
+            ordered = words.sort(dim=1, descending=True).values
+            vectors, content = self.language.encode_tokens(ordered, counts, bow_only=True)
+            return F.normalize(vectors.masked_fill(~content[..., None], 0).sum(1), dim=-1)
         return self.language.encode(words, counts)
 
     def temporal_frames(self, tokens, ctx):

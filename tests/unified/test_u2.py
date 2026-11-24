@@ -52,6 +52,15 @@ def test_u1_single_word_byte_parity_with_legacy_checkpoint(tmp_path):
     assert scores.numpy().tobytes() == expected.numpy().tobytes()
 
 
+def test_bow_word_queries_use_lexical_vectors():
+    model = UnifiedEmbodiedLearner(3, input_dim=8, grid=2, bow_only=True).eval()
+    words, counts = torch.tensor([[1], [2]]), torch.tensor([1, 1])
+    with torch.no_grad():
+        model.language.ctx_proj.weight.normal_()
+        vectors, content = model.language.encode_tokens(words, counts, bow_only=True)
+        torch.testing.assert_close(model.enc_text(words, counts), vectors[content])
+
+
 def test_unconditional_logprob_matches_token_loss_and_prefix_dropout():
     language = CausalLanguage(6).eval()
     words = torch.tensor([[1, 2, 3], [4, 0, 0]])

@@ -39,6 +39,7 @@ def train_text_only(args, out_dir, u2_path):
     )
     history = []
     for epoch in range(1, args.epochs + 1):
+        epoch_started = time.perf_counter()
         model.train()
         token_loss, tokens = 0.0, 0
         for indices in batches:
@@ -53,6 +54,9 @@ def train_text_only(args, out_dir, u2_path):
             token_loss += float(loss.detach()) * n_tokens
             tokens += n_tokens
         history.append(dict(epoch=epoch, loss=token_loss / tokens))
+        elapsed = time.perf_counter() - epoch_started
+        print(f"Epoch {epoch}/{args.epochs} {elapsed:.2f}s loss={history[-1]['loss']:.4f}",
+              file=sys.stderr, flush=True)
     write_json(out_dir / "history.json", history)
     run = dict(condition=TEXT_ONLY, seed=args.seed, n_clips=args.n_clips, epochs=args.epochs,
                batch_size=batch_size, utterances=len(rows), u2_path=str(u2_path))
