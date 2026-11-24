@@ -1,6 +1,6 @@
 # Step U2: Compositional Sentences & Embodied VP-Swap
 
-Status: **design blueprint, blocked on Step U1 go-gate.**
+Status: **ready to build (Step U1 locked at `79c77f05`).**
 Context: [CONTEXT.md](CONTEXT.md).
 
 ## Objective

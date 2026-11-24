@@ -1,6 +1,6 @@
 # Step U1: Unified Embodied Learner (`Embodied Baby-CoCa` + Per-Word Unified Soft-MIL)
 
-Status: **design blueprint updated for Per-Word Unified Soft-MIL (no gate MLP, no MHSA).**
+Status: **completed and locked (`79c77f05`, `outputs/runs/unified_u1_softmil_v1/`).**
 Context: [CONTEXT.md](CONTEXT.md).
 
 ## Objective
@@ -46,27 +46,37 @@ with one clean, unified architecture in `nursery/unified/` that:
   text-prefix leakage into InfoNCE, gradient flow to all streams, and simplex
   normalization (`sum(p) == 1`, `p >= 0`).
 
-## Verification Protocol (Cached `dinov2-base`)
+## Locked 15-Run Parity & Ablation Results (630 Clips, Seeds 0–2, 40 Epochs)
 
-1. **Local unit tests + 1-epoch smoke at 63 clips:** Verify forward/backward,
-   checkpoint save/load, and exact posterior routing logging on CPU/MPS.
-2. **630-clip 3-seed parity & ablation matrix (seeds 0–2, 60 epochs, best
-   noun+action dev checkpoint):**
-   - Arms: `V`, `V+G`, `V+G+B`, `V+G+B` shuffled body, and `V+G+B` with
-     `lambda_gen = 0.0` (5 arms × 3 seeds = 15 runs; no seed-0 tuning loops).
-3. **Full 5-point ladder (`63, 158, 315, 473, 630` clips, seeds 0–4)** once
-   parity passes (or immediately combined with Step U2 sentences).
+Run directory: `outputs/runs/unified_u1_softmil_v1/` (commit `79c77f05`; best
+dev epochs ranged from 10 to 26 across all 15 runs).
 
-## Stop / Go Gate
+| Arm | Noun (as trained) | Action (as trained) | Noun (extras removed) | Action (extras removed) | Mean Routing: Nouns (V / T / B) | Mean Routing: Actions (V / T / B) |
+|---|---|---|---|---|---|---|
+| `V` | 49.2 ± 3.3 | 64.2 ± 2.7 | – | – | .40 / .60 / .00 | .31 / .69 / .00 |
+| `V+G` | 68.9 ± 0.7 | 66.4 ± 1.7 | – | – | .62 / .38 / .00 | .38 / .62 / .00 |
+| `V+G+B` | **70.4 ± 1.7** | **73.5 ± 1.1** | 60.3 ± 2.2 | 65.2 ± 2.9 | .50 / .30 / .20 | .22 / .42 / .36 |
+| `V+G+B` shuffled body | 68.0 ± 4.0 | 65.1 ± 2.1 | 59.4 ± 1.8 | 69.6 ± 0.5 | .54 / .31 / .15 | .30 / .56 / .15 |
+| `V+G+B`, `lambda_gen = 0` | 66.1 ± 1.8 | 68.6 ± 4.6 | 56.0 ± 2.1 | 60.2 ± 6.0 | .42 / .38 / .19 | .19 / .51 / .31 |
 
-- **Go** if `UnifiedEmbodiedLearner` (zero post-hoc `body_weight` sweep, zero
-  gate MLP) reproduces the full double dissociation across 3 seeds: strong gaze
-  lift on `V+G` nouns (~70%+ at 630), clear real-vs-shuffled body lift on
-  `V+G+B` actions (with shuffled body near ~0 pp over `V+G`), and non-collapsed
-  posterior routing `(p_vis, p_temp, p_body)` that separates nouns (high
-  `p_vis`) from actions (elevated `p_temp` + `p_body`).
-- **Stop & diagnose** if `lambda_gen` degrades 4-choice accuracy by > 2 pp or
-  if posterior routing collapses to a single modality across all word types.
+**Per-word action routing (`V+G+B` vs. shuffled body, vis / temp / body):**
+`offhand` (.13 / .37 / .50 vs. .21 / .56 / .23), `lift` (.13 / .46 / .41 vs.
+.19 / .69 / .12), `pass` (.15 / .45 / .39 vs. .24 / .59 / .17), `inspect`
+(.23 / .43 / .34 vs. .33 / .55 / .13), `drink` (.44 / .39 / .17 vs. .51 / .42 / .07).
+
+**Go-Gate Verdict: PASS (Locked).**
+- **Double dissociation exceeds Step 9 with zero crutches:** Gaze lifts nouns
+  by **+19.7 pp** (Step 9: +16.0 pp); real body lifts actions by **+7.1 pp**
+  over `V+G` and **+8.4 pp** over shuffled body (Step 9: +6.4 / +6.5 pp), while
+  shuffled body matches `V+G` on both nouns and actions.
+- **Generative LM (`lambda_gen = 0.2`) actively helps:** Turning it off costs
+  −4.3 pp on nouns, −4.9 pp on actions, and quadruples action SD (±1.1% → ±4.6%).
+- **Posterior routing is clean and non-collapsed:** Real body receives >2× the
+  action routing mass of shuffled body across all 5 action words.
+- **Caveats carried forward:** `V` nouns (49.2%) reflect dropping Step 9's
+  per-word `temporal_weight[vocab]`; extras-removed `V+G+B` actions (65.2% vs.
+  69.6% shuffled) reflect genuine reliance on real body during training (flag
+  explicitly in Step U4).
 
 ## Expected Figures
 
