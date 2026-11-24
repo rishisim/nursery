@@ -32,7 +32,7 @@ case ${SLURM_ARRAY_TASK_ID:-0} in
     *) echo "Expected a U2 arm index from 0 through 2." >&2; exit 2 ;;
 esac
 
-out_dir="outputs/runs/unified_u2_canary/$arm/seed0"
+out_dir="${RUN_ROOT:-outputs/runs/unified_u2_canary}/$arm/seed0"
 if [[ -f $out_dir/metrics.json ]]; then
     echo "Skipping completed run $out_dir"
     exit 0
