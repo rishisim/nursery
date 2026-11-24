@@ -9,7 +9,8 @@
 #SBATCH -o outputs/runs/u2-%A_%a.out
 set -euo pipefail
 
-# Submit from the Juno repo root.
+# Submit from the Juno repo root. The default array keeps the seed-0 canary.
+# For the full matrix, set SEEDS_PER_ARM=3 and submit with --array=0-17%6.
 cd -- "${SLURM_SUBMIT_DIR:-$PWD}"
 export TRITON_CACHE_DIR=/work/dal503972/.cache/triton
 export XDG_CACHE_HOME=/work/dal503972/.cache
@@ -25,21 +26,33 @@ if [[ $# != 0 || ( -z ${SLURM_JOB_ID:-} && $dry_run != 1 ) ]]; then
     exit 2
 fi
 
-case ${SLURM_ARRAY_TASK_ID:-0} in
+task=${SLURM_ARRAY_TASK_ID:-0}
+seed=0
+default_run_root=outputs/runs/unified_u2_canary
+if [[ -n ${SEEDS_PER_ARM:-} ]]; then
+    seed=$((task % SEEDS_PER_ARM))
+    task=$((task / SEEDS_PER_ARM))
+    default_run_root=outputs/runs/unified_u2_v1
+fi
+
+case $task in
     0) arm=V+G+B; condition=V+G+B; flags=() ;;
     1) arm=V+G+B_bow_only; condition=V+G+B; flags=(--bow-only) ;;
     2) arm=text_only; condition="Text-Only LM"; flags=() ;;
-    *) echo "Expected a U2 arm index from 0 through 2." >&2; exit 2 ;;
+    3) arm=V; condition=V; flags=() ;;
+    4) arm=V+G; condition=V+G; flags=() ;;
+    5) arm=V+G+B_shuffled_body; condition=V+G+B; flags=(--shuffle-body) ;;
+    *) echo "Expected a U2 arm index from 0 through 5." >&2; exit 2 ;;
 esac
 
-out_dir="${RUN_ROOT:-outputs/runs/unified_u2_canary}/$arm/seed0"
+out_dir="${RUN_ROOT:-$default_run_root}/$arm/seed$seed"
 if [[ -f $out_dir/metrics.json ]]; then
     echo "Skipping completed run $out_dir"
     exit 0
 fi
 u2="$PWD/outputs/runs/unified_u2_data/frozen"
 test -r "$u2/manifest.parquet"
-train_args=(--condition "$condition" --n-clips 630 --seed 0 --epochs 40
+train_args=(--condition "$condition" --n-clips "${N_CLIPS:-630}" --seed "$seed" --epochs "${EPOCHS:-40}"
             --device cuda --u2 "$u2" --out-dir "$out_dir" "${flags[@]}")
 printf 'U2 arm %s:' "$arm"
 printf ' %q' "${train_args[@]}"
