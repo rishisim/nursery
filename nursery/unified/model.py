@@ -17,7 +17,8 @@ CONDITIONS = ("V", "V+G", "V+G+B")
 
 class UnifiedEmbodiedLearner(nn.Module):
     def __init__(self, vocab_size, *, input_dim=768, grid=16, body_dims=None,
-                 condition="V", lambda_gen=0.2, aux_weight=0.25, tau_m=0.1):
+                 condition="V", lambda_gen=0.2, aux_weight=0.25, tau_m=0.1,
+                 max_words=32, bow_only=False):
         super().__init__()
         if condition not in CONDITIONS or not math.isfinite(lambda_gen) or lambda_gen < 0:
             raise ValueError("Unknown condition or invalid generative loss weight")
@@ -31,7 +32,8 @@ class UnifiedEmbodiedLearner(nn.Module):
         self.aux_weight, self.tau_m = aux_weight, tau_m
         self.static = StaticVisionGaze(input_dim, grid)
         self.temporal = TemporalVideoStream(input_dim)
-        self.language = CausalLanguage(vocab_size)
+        self.language = CausalLanguage(vocab_size, max_words)
+        self.bow_only = bow_only
         self.logit_scale = nn.Parameter(torch.tensor(math.log(1 / 0.07)))
         self.body = BodyStream(body_dims) if body_dims is not None else None
 
@@ -115,7 +117,12 @@ class UnifiedEmbodiedLearner(nn.Module):
     def forward(self, words, counts, video, frame_valid, temporal=None, gaze=None, body=None):
         # InfoNCE queries use the unconditional text pass. The sensory prefix
         # only enters the separate LM loss, with the same text encoder weights.
-        text = self.language.encode_tokens(words, counts)
+        if self.bow_only:
+            # Keep floating-point reduction order identical for permutations.
+            words_for_retrieval = words.sort(dim=1, descending=True).values
+            text = self.language.encode_tokens(words_for_retrieval, counts, bow_only=True)
+        else:
+            text = self.language.encode_tokens(words, counts)
         sensory = self.encode_sensory(video, frame_valid, temporal, gaze, body)
         tokens, active, *_ = sensory
         scale = self.logit_scale.clamp(max=math.log(100)).exp()

@@ -6,7 +6,7 @@ from torch.nn import functional as F
 
 
 class CausalLanguage(nn.Module):
-    def __init__(self, vocab_size, max_words=16):
+    def __init__(self, vocab_size, max_words=32):
         super().__init__()
         self.bos, self.eos = vocab_size, vocab_size + 1
         self.word = nn.Embedding(vocab_size + 2, 256, padding_idx=0)
@@ -47,11 +47,13 @@ class CausalLanguage(nn.Module):
             x = layer(x, src_mask=causal, src_key_padding_mask=padding)
         return self.norm(x[:, prefix_len:])
 
-    def encode_tokens(self, words, counts):
+    def encode_tokens(self, words, counts, bow_only: bool = False):
         tokens = self._tokens(words, counts)
         positions = torch.arange(tokens.shape[1], device=tokens.device)
         content = (positions > 0) & (positions <= counts[:, None]) & tokens.ne(0)
-        h = self.word(tokens) + self.ctx_proj(self._hidden(tokens))
+        h = self.word(tokens)
+        if not bow_only:
+            h = h + self.ctx_proj(self._hidden(tokens))
         return F.normalize(self.project(h), dim=-1), content
 
     def encode(self, words, counts):
@@ -65,7 +67,25 @@ class CausalLanguage(nn.Module):
         pooled = lexical_mean + self.ctx_proj(ctx_mean)
         return F.normalize(self.project(pooled), dim=-1)
 
-    def lm_loss(self, words, counts, sensory, active):
+    def lm_loss(self, words, counts, sensory=None, active=None, p_uncond: float = 0.25):
         tokens = self._tokens(words, counts)
-        logits = self.lm_head(self._hidden(tokens[:, :-1], sensory, active))
-        return F.cross_entropy(logits.flatten(0, 1), tokens[:, 1:].flatten(), ignore_index=0)
+        inputs, targets = tokens[:, :-1], tokens[:, 1:]
+        if self.training and sensory is not None and p_uncond:
+            keep = torch.rand(len(words), device=words.device) >= p_uncond
+            hidden = self.word.weight.new_empty((*inputs.shape, self.word.embedding_dim))
+            if keep.any():
+                hidden[keep] = self._hidden(inputs[keep], sensory[keep], active[keep])
+            if (~keep).any():
+                hidden[~keep] = self._hidden(inputs[~keep])
+        else:
+            hidden = self._hidden(inputs, sensory, active)
+        logits = self.lm_head(hidden)
+        return F.cross_entropy(logits.flatten(0, 1), targets.flatten(), ignore_index=0)
+
+    def sentence_logprob(self, words, counts):
+        """Unconditional log P(words, EOS | BOS) for each sentence."""
+        tokens = self._tokens(words, counts)
+        logits = self.lm_head(self._hidden(tokens[:, :-1]))
+        targets = tokens[:, 1:]
+        logprob = logits.log_softmax(-1).gather(-1, targets[..., None]).squeeze(-1)
+        return logprob.masked_fill(targets.eq(0), 0).sum(1)
