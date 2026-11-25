@@ -8,10 +8,11 @@ import torch
 from nursery.learner import _upstream_module
 from nursery.unified import evaluate
 from nursery.unified.baselines import BabyLLaVANursery, CLIPGlobal
+from nursery.unified.language import CausalLanguage
 from nursery.unified.model import UnifiedEmbodiedLearner
 from nursery.unified.u4_eval import (
     CATEGORIES, FAMILIAR, UNSEEN, build_blimp, greedy_decode, lm_logits,
-    perplexity_batch, sensory_prefix,
+    perplexity_batch, prompted_logprobs, sensory_prefix,
 )
 from nursery.unified.u2_data import FROZEN
 
@@ -77,6 +78,34 @@ def test_greedy_decode_is_deterministic_and_matches_training_prefix(cls):
     model.language.lm_head.weight.zero_()
     model.language.lm_head.bias[model.language.eos] = 100
     assert greedy_decode(model, sensory) == [[], []]
+
+
+@pytest.mark.parametrize("cls", [UnifiedEmbodiedLearner, CLIPGlobal, BabyLLaVANursery, CausalLanguage])
+@torch.no_grad()
+def test_prompted_completion_is_deterministic_and_scores_the_next_token(cls):
+    torch.manual_seed(4)
+    text_only = cls is CausalLanguage
+    model = cls(8) if text_only else cls(8, input_dim=8)
+    language = model if text_only else model.language
+    sensory = prefix = None
+    if not text_only:
+        model.eval()
+        video = torch.randn(2, 2, 257, 8)
+        valid = torch.tensor([[True, True], [True, False]])
+        sensory = model.encode_sensory(video, valid)
+        prefix = sensory_prefix(model, sensory)
+
+    prompt = [1, 2]
+    model.train()
+    logp = prompted_logprobs(model, prompt, sensory)
+    torch.testing.assert_close(logp, prompted_logprobs(model, prompt, sensory), atol=0, rtol=0)
+    torch.testing.assert_close(logp.exp().sum(dim=-1), torch.ones(len(logp)))
+    # In the teacher-forced sequence the logits at the final prompt token
+    # predict the held word, independent of the following word's identity.
+    words = torch.tensor([[*prompt, 3], [*prompt, 4]])[:len(logp)]
+    inputs = language._tokens(words, torch.full((len(logp),), 3))[:, :-1]
+    logits = lm_logits(language, inputs, prefix, embedded=cls is BabyLLaVANursery)
+    torch.testing.assert_close(logp, logits[:, len(prompt)].log_softmax(-1))
 
 
 @torch.no_grad()

@@ -11,17 +11,18 @@ import numpy as np
 import pandas as pd
 import torch
 
-from nursery.common import REPO, _output_directory
+from nursery.common import REPO, _output_directory, load_config
 from nursery.learner import _upstream_module
 from nursery.learner.gaze_data import collate_frame_indices
 
 from .baselines import BASELINE_CONDITIONS, BabyLLaVANursery, CLIPGlobal
+from . import evaluate
 from .evaluate import (
     TEXT_ONLY, U2_FROZEN, U2_PANELS, UnifiedEvaluation, choice_credits,
     load_checkpoint, sentence_inputs, write_json,
 )
 from .model import CONDITIONS
-from .u2_data import HELD_OUT, MASS_NOUNS, PLURAL_MASS_NOUNS
+from .u2_data import HELD_OUT, MASS_NOUNS, PLURAL_MASS_NOUNS, STRADDLING, training_rows
 
 
 FAMILIAR = "familiar_frame_novel_pair"
@@ -34,6 +35,91 @@ ACTIONS = {
     "drink": (("drink",),), "lift": (("lift",),), "pass": (("pass",),),
     "inspect": (("inspect",), ("look",)), "offhand": (("switch", "hands"),),
 }
+PROMPTED_ACTIONS = ("lift", "pass", "inspect", "drink", "offhand")
+PROMPTED_METRICS = ("open_vocab_accuracy", "in_category_accuracy")
+
+
+def prompted_inputs(u2_path):
+    """Freeze prompts from training text and pick one sensory moment per task and clip."""
+    protocol = evaluate.read_json(evaluate.STUDY / "protocol.json")
+    train = training_rows(u2_path, evaluate.step9_subset(protocol, 630))
+    assert train["clip"].nunique() == 630 and set(train.split) == {"train"}
+    upstream = _upstream_module("train")
+    vocab = upstream.build_vocab(train.text, min_freq=1)
+    sentences = [upstream.tokenize(text) + ["<eos>"] for text in train.text]
+    nouns = sorted(load_config()["vocabulary"].values())
+    candidates = {}
+    for prompt in ("look at the", "the", "let's", "that feels"):
+        tokens = upstream.tokenize(prompt)
+        assert tokens and all(vocab.get(word, 0) > 0 for word in tokens), prompt
+        n = len(tokens)
+        counts = Counter(words[i + n] for words in sentences
+                         for i in range(len(words) - n) if words[i:i + n] == tokens)
+        assert counts, prompt
+        noun_count = sum(counts[word] for word in nouns)
+        candidates[prompt] = dict(tokens=tokens, occurrences=counts.total(),
+                                  noun_continuations=noun_count,
+                                  continuation_counts=dict(sorted(counts.items())))
+
+    object_prompt = max(("look at the", "the"), key=lambda p: (
+        candidates[p]["noun_continuations"] / candidates[p]["occurrences"]))
+    action_counts = candidates["let's"]["continuation_counts"]
+    verbs = sorted(word for word in PROMPTED_ACTIONS if action_counts.get(word, 0))
+    tasks = {
+        "object": dict(prompt=object_prompt, category=nouns),
+        "action": dict(prompt="let's", category=verbs),
+        "property": dict(prompt="that feels", category=["heavy", "light"]),
+        "property_straddling": dict(prompt="that feels", category=["heavy", "light"]),
+    }
+    for task in tasks.values():
+        task["tokens"] = candidates[task["prompt"]]["tokens"]
+        assert all(vocab.get(word, 0) > 0 for word in task["category"]), task
+
+    panels = {}
+    seen_nouns = {}
+    for panel in U2_PANELS:
+        rows = pd.read_parquet(u2_path / f"{panel}.parquet")
+        rows = rows[rows.split.isin(HELD_OUT)].sort_values(
+            ["clip", "video_id", "frame_idx"]).reset_index(drop=True)
+        # Use U2 panel order when multiple panels supply the same held noun.
+        keep = []
+        for clip, noun in zip(rows["clip"], rows.noun):
+            keep.append(clip not in seen_nouns)
+            assert seen_nouns.setdefault(clip, noun) == noun, clip
+        targets = {"object": rows.noun.where(keep)}
+        if panel == "property_object":
+            targets.update(property=rows.mass, property_straddling=rows.mass.where(rows.straddling))
+        panels[panel] = (rows, targets)
+
+    excluded = Counter()
+    for split, panel in protocol["word_type_panels"]["action"]["held_out"].items():
+        root = evaluate.STUDY / "panels" / panel
+        trials = evaluate.read_json(root / "trials.json")
+        rows = pd.read_parquet(root / "manifest.parquet").iloc[np.unique(trials["trial_rows"])]
+        rows = rows.sort_values(["clip", "video_id", "frame_idx"]).drop_duplicates("clip")
+        rows = rows.assign(split=split).reset_index(drop=True)
+        excluded.update(rows.loc[~rows.referent.isin(verbs), "referent"])
+        panels[panel] = (rows, {"action": rows.referent.where(rows.referent.isin(verbs))})
+
+    for kind, task in tasks.items():
+        targets = [(clip, target) for rows, labels in panels.values() if kind in labels
+                   for clip, target in zip(rows["clip"], labels[kind]) if pd.notna(target)]
+        assert targets and set(word for _, word in targets) <= set(task["category"]), kind
+        assert len({clip for clip, _ in targets}) == len(targets), kind
+        assert set(clip for clip, _ in targets).isdisjoint(train["clip"]), kind
+        task["n_clips"] = len(targets)
+
+    metadata = dict(
+        training_clips=630, training_utterances=len(train), candidates=candidates, tasks=tasks,
+        counting="Immediate next tokens after every prompt occurrence, including mid-utterance matches and EOS.",
+        object_source="Union of held-out U2 panels, deduplicated in action_object, property_object, negation order.",
+        action_source="U1 held-out action trial targets, earliest (video_id, frame_idx) per clip.",
+        excluded_action_clips=dict(sorted(excluded.items())),
+        offhand_follows_lets=action_counts.get("offhand", 0),
+        straddling=dict(source="Frozen U2 property_object.straddling", nouns=sorted(STRADDLING)),
+        ranking="Open vocabulary includes EOS and excludes padding/BOS. Exact ties favor lower token IDs.",
+    )
+    return vocab, metadata, panels
 
 
 def build_blimp(path=U2_FROZEN):
@@ -147,6 +233,82 @@ def lm_logits(language, inputs, prefix=None, *, embedded=False):
     else:
         hidden = language._hidden(inputs, *prefix)
     return language.lm_head(hidden)
+
+
+@torch.no_grad()
+def prompted_logprobs(model, prompt_ids, sensory=None):
+    """Score the next token from BOS and the prompt, with the greedy decoder's prefix."""
+    model.eval()
+    language = model if sensory is None else model.language
+    prefix = None if sensory is None else sensory_prefix(model, sensory)
+    inputs = language.word.weight.new_tensor([language.bos, *prompt_ids], dtype=torch.long)
+    inputs = inputs.expand(1 if prefix is None else len(prefix[0]), -1)
+    return lm_logits(language, inputs, prefix,
+                     embedded=isinstance(model, BabyLLaVANursery))[:, -1].log_softmax(-1)
+
+
+@torch.no_grad()
+def evaluate_prompted(model, vocab, protocol, panels, study=None):
+    model.eval()
+    tasks = protocol["tasks"]
+    language = model if study is None else model.language
+    inverse = {idx: word for word, idx in vocab.items()}
+    inverse[language.eos] = "<eos>"
+    open_ids = sorted(idx for idx in inverse if idx not in (0, language.bos))
+    categories = {kind: sorted(vocab[word] for word in task["category"]) for kind, task in tasks.items()}
+    prompts = {task["prompt"]: [vocab[word] for word in task["tokens"]] for task in tasks.values()}
+    text_scores = {prompt: prompted_logprobs(model, ids) for prompt, ids in prompts.items()} if study is None else {}
+    metrics = {kind: Counter() for kind in tasks}
+    examples = {kind: [] for kind in tasks}
+
+    for panel, (rows, labels) in panels.items():
+        ids = np.flatnonzero(pd.DataFrame(labels).notna().any(axis=1))
+        if not len(ids):
+            continue
+        if study is not None:
+            ds, gaze, temporal, body, donors = study._compositional_inputs(rows, panel, study.body_mode, None)
+        batch_size = 128 if study is None else 8
+        for start in range(0, len(ids), batch_size):
+            batch = ids[start:start + batch_size]
+            scores = text_scores
+            if study is not None:
+                _, video, _, _ = collate_frame_indices(ds, batch)
+                sensory = model.encode_sensory(*study.sensory_batch(
+                    model, ds, batch, video, gaze, temporal, body,
+                    body_ids=donors[batch] if donors is not None else None))
+                scores = {}
+            for kind, targets in labels.items():
+                prompt = tasks[kind]["prompt"]
+                targets = targets.iloc[batch].dropna()
+                if targets.empty:
+                    continue
+                if prompt not in scores:
+                    scores[prompt] = prompted_logprobs(model, prompts[prompt], sensory)
+                logp = scores[prompt].expand(len(batch), -1) if study is None else scores[prompt]
+                logp = logp[np.searchsorted(batch, targets.index)]
+                ranked = logp[:, open_ids].argsort(dim=-1, descending=True, stable=True)[:, :3]
+                best = logp[:, categories[kind]].argmax(dim=-1)
+                top_ids = logp.new_tensor(open_ids, dtype=torch.long)[ranked]
+                top_logp = logp.gather(1, top_ids).tolist()
+                for (idx, target), token_ids, values, category_idx in zip(
+                        targets.items(), top_ids.tolist(), top_logp, best.tolist()):
+                    top_three = [dict(token=inverse[token], logprob=value)
+                                 for token, value in zip(token_ids, values)]
+                    category_top = inverse[categories[kind][category_idx]]
+                    metrics[kind].update(n_clips=1, open_vocab_accuracy=int(top_three[0]["token"] == target),
+                                         in_category_accuracy=int(category_top == target))
+                    if len(examples[kind]) < 5:
+                        row = rows.iloc[idx]
+                        examples[kind].append(dict(clip=row["clip"], split=row.split, panel=panel, target=target,
+                                                   top_3=top_three, in_category_top_1=category_top))
+
+    result = {}
+    for kind, counts in metrics.items():
+        n = counts["n_clips"]
+        assert n == tasks[kind]["n_clips"], kind
+        result[kind] = dict(n_clips=n, examples=examples[kind],
+                            **{metric: 100 * counts[metric] / n for metric in PROMPTED_METRICS})
+    return dict(protocol=protocol, tasks=result)
 
 
 @torch.no_grad()
@@ -304,7 +466,7 @@ def action_embeddings(model, study):
 
 
 def evaluate_checkpoint(path, requested_arm, u2_path, pairs, vocab, nouns, device, *,
-                        embeddings_only=False):
+                        prompted, prompted_only=False, embeddings_only=False):
     if path.is_dir():
         path = path / ("last.pt" if requested_arm == TEXT_ONLY or
                        not (path / "best.pt").exists() else "best.pt")
@@ -332,6 +494,10 @@ def evaluate_checkpoint(path, requested_arm, u2_path, pairs, vocab, nouns, devic
 
     result = dict(arm=arm, seed=run["seed"], epoch=checkpoint["epoch"], checkpoint=str(path),
                   n_clips=n_clips)
+    if not embeddings_only:
+        result["prompted"] = evaluate_prompted(model, vocab, *prompted, study)
+    if prompted_only:
+        return result
     if arm in EMBEDDING_ARMS:
         result["action_embeddings"] = action_embeddings(model, study)
     if embeddings_only:
@@ -350,10 +516,20 @@ def evaluate_checkpoint(path, requested_arm, u2_path, pairs, vocab, nouns, devic
     return result
 
 
-def summarize(results):
-    def stats(values):
-        return dict(mean=mean(values), sd=stdev(values) if len(values) > 1 else None)
+def stats(values):
+    return dict(mean=mean(values), sd=stdev(values) if len(values) > 1 else None)
 
+
+def summarize_prompted(runs):
+    return {
+        kind: dict(n_clips=task["n_clips"], **{
+            metric: stats([run["prompted"]["tasks"][kind][metric] for run in runs])
+            for metric in PROMPTED_METRICS})
+        for kind, task in runs[0]["prompted"]["tasks"].items()
+    }
+
+
+def summarize(results):
     def transfer_stats(runs, mode, panel, split):
         return {metric: stats([r["ablations"][mode][panel][split][metric] for r in runs])
                 for metric in ("accuracy", "coverage")}
@@ -364,6 +540,7 @@ def summarize(results):
         grammar = [r["blimp"] for r in runs]
         summary[arm] = dict(
             seeds=[r["seed"] for r in runs],
+            prompted=summarize_prompted(runs),
             blimp=dict(overall=stats([g["overall"] for g in grammar]),
                        by_category={name: stats([g["by_category"][name] for g in grammar])
                                     for name in CATEGORIES},
@@ -393,19 +570,23 @@ def main():
     parser.add_argument("--arm", choices=ARMS, help="Require this arm for every input checkpoint")
     parser.add_argument("--device", choices=("cpu", "mps", "cuda"), default="cpu")
     parser.add_argument("--u2", type=Path, default=U2_FROZEN)
+    parser.add_argument("--only", choices=("prompted",), help="Run prompted completion only")
     parser.add_argument("--embedding-checkpoint", type=Path, action="append", default=[],
                         help="Additional U2 checkpoint to export action embeddings only (repeatable)")
-    parser.add_argument("--text-only-summary", type=Path, help="Optional U4 text-only reference summary")
+    parser.add_argument("--text-only-summary", type=Path, help="Optional text-only reference for the selected mode")
     parser.add_argument("--out-dir", type=Path, required=True)
     args = parser.parse_args()
     if not args.out_dir.resolve().is_relative_to(REPO / "outputs"):
         parser.error("--out-dir must be under outputs/")
-    pairs, vocab = build_blimp(args.u2)
-    manifest = pd.read_parquet(args.u2 / "manifest.parquet", columns=["named", "referent"])
-    nouns = set(manifest.loc[manifest.named, "referent"])
-    for panel in U2_PANELS:
-        rows = pd.read_parquet(args.u2 / f"{panel}.parquet", columns=["noun", "noun_foil"])
-        nouns.update(rows.to_numpy().ravel())
+    prompted_only = args.only == "prompted"
+    if prompted_only and args.embedding_checkpoint:
+        parser.error("--embedding-checkpoint requires the full evaluation")
+    vocab, protocol, panels = prompted_inputs(args.u2)
+    nouns = set(protocol["tasks"]["object"]["category"])
+    pairs = []
+    if not prompted_only:
+        pairs, blimp_vocab = build_blimp(args.u2)
+        assert blimp_vocab == vocab
     out = args.out_dir.resolve()
     if (REPO / ".git").exists():
         out = _output_directory(out)
@@ -418,6 +599,7 @@ def main():
         for path in paths:
             print(f"Evaluating {path}", flush=True)
             result = evaluate_checkpoint(path, args.arm, args.u2, pairs, vocab, nouns, args.device,
+                                         prompted=(protocol, panels), prompted_only=prompted_only,
                                          embeddings_only=embeddings_only)
             arm, n_clips, seed = (result[k] for k in ("arm", "n_clips", "seed"))
             key = (arm, n_clips, seed)
@@ -430,10 +612,14 @@ def main():
                 metadata = {k: result[k] for k in ("arm", "n_clips", "seed", "epoch", "checkpoint")}
                 write_json(out / embeddings, dict(metadata, action_embeddings=result.pop("action_embeddings")))
                 result["action_embeddings_file"] = embeddings
-            if embeddings_only:
+            if prompted_only:
+                stem += "_prompted"
+            elif embeddings_only:
                 stem += f"_n{n_clips}"
             write_json(out / f"{stem}.json", result)
-            if not embeddings_only:
+            if prompted_only:
+                totals.append(result)
+            elif not embeddings_only:
                 result["blimp"].pop("trials")
                 for panels in result.get("ablations", {}).values():
                     for splits in panels.values():
@@ -441,14 +627,37 @@ def main():
                         for split, metrics in splits.items():
                             splits[split] = {k: metrics[k] for k in ("accuracy", "coverage")}
                 totals.append(result)
+    if prompted_only:
+        summary_path = out / "summary_prompted.json"
+        summary = dict(prompted_protocol=protocol, arms={})
+        for path in (summary_path, args.text_only_summary):
+            if path is not None and path.is_file():
+                reference = evaluate.read_json(path)
+                if reference["prompted_protocol"] != protocol:
+                    raise ValueError(f"Prompted reference protocol differs: {path}")
+                if path == summary_path:
+                    summary["arms"].update(reference["arms"])
+                else:
+                    summary["arms"][TEXT_ONLY] = reference["arms"][TEXT_ONLY]
+        for arm in sorted({r["arm"] for r in totals}):
+            runs = sorted((r for r in totals if r["arm"] == arm), key=lambda r: r["seed"])
+            summary["arms"][arm] = dict(seeds=[r["seed"] for r in runs], prompted=summarize_prompted(runs))
+        write_json(summary_path, summary)
+        return
+
     counts = Counter((p["category"], p["tier"]) for p in pairs)
     pair_counts = {c: {tier: counts[c, tier] for tier in (FAMILIAR, UNSEEN)} for c in CATEGORIES}
-    summary = dict(pair_counts=pair_counts, arms=summarize(totals))
+    summary = dict(pair_counts=pair_counts, prompted_protocol=protocol, arms=summarize(totals))
     if args.text_only_summary is not None and args.text_only_summary.is_file():
         reference = json.loads(args.text_only_summary.read_text())
         if reference["pair_counts"] != pair_counts:
             raise ValueError("Text-only reference pair counts differ from frozen U2")
         summary["arms"][TEXT_ONLY] = reference["arms"][TEXT_ONLY]
+    prompted_reference = out / "summary_prompted.json"
+    if TEXT_ONLY in summary["arms"] and prompted_reference.is_file():
+        reference = evaluate.read_json(prompted_reference)
+        if reference["prompted_protocol"] == protocol and TEXT_ONLY in reference["arms"]:
+            summary["arms"][TEXT_ONLY].setdefault("prompted", reference["arms"][TEXT_ONLY]["prompted"])
     write_json(out / "summary.json", summary)
 
 

@@ -22,6 +22,11 @@ arms=(V+G+B V+G+B_shuffled_body V+G V CLIP-Global BabyLLaVA-Nursery)
 seeds=(0 1 2 3 4)
 checkpoints=()
 embedding_args=()
+only=${ONLY:-}
+case "$only" in
+    ""|prompted) ;;
+    *) echo "Unsupported ONLY=$only" >&2; exit 2 ;;
+esac
 if [[ ${DRY_RUN:-0} == 1 ]]; then
     out=outputs/runs/unified_u4_eval_dryrun
     checkpoints=("$root/V+G+B/n630/seed0/best.pt")
@@ -31,17 +36,26 @@ else
             checkpoints+=("$root/$arm/n630/seed$seed/best.pt")
         done
     done
-    # All five n630 seeds already export embeddings in the scoring pass.
-    # Use seed 0 at smaller counts to bound repeated sensory data setup.
-    for arm in V+G+B V CLIP-Global; do
-        for n in 63 158 315; do
-            embedding_args+=(--embedding-checkpoint "$root/$arm/n$n/seed0/best.pt")
+    if [[ -z $only ]]; then
+        # All five n630 seeds already export embeddings in the scoring pass.
+        # Use seed 0 at smaller counts to bound repeated sensory data setup.
+        for arm in V+G+B V CLIP-Global; do
+            for n in 63 158 315; do
+                embedding_args+=(--embedding-checkpoint "$root/$arm/n$n/seed0/best.pt")
+            done
         done
-    done
+    fi
 fi
 
-args=(--device cuda --out-dir "$out"
-      --text-only-summary outputs/runs/unified_u4_text_only/u4_eval/summary.json)
+args=(--device cuda --out-dir "$out")
+if [[ $only == prompted ]]; then
+    args+=(--only prompted)
+    if [[ -n ${TEXT_ONLY_SUMMARY:-} ]]; then
+        args+=(--text-only-summary "$TEXT_ONLY_SUMMARY")
+    fi
+else
+    args+=(--text-only-summary outputs/runs/unified_u4_text_only/u4_eval/summary.json)
+fi
 
 # Reuse U3's cache copy, mount detection, fallback and cleanup in the evaluator process.
 exec .external/cue-env/bin/python -B -u - "${args[@]}" \
