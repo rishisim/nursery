@@ -23,6 +23,7 @@ from nursery.learner.gaze_data import (
 from nursery.learner.train import _pair_meta
 from nursery.learner.windows import BodyData
 
+from .baselines import BASELINE_CONDITIONS, BASELINE_MODELS, BabyLLaVANursery, CLIPGlobal
 from .language import CausalLanguage
 from .model import UnifiedEmbodiedLearner
 from .u2_data import FROZEN as U2_FROZEN, training_rows
@@ -79,7 +80,13 @@ def _apply_clip_choice_credits(result):
                   known_accuracy=float(100 * credits[known].mean()) if known.any() else None)
 
 
-def score_sentence_choices(model, sensory, words, counts, n_choices):
+def score_sentence_choices(model, sensory, words, counts, n_choices, *, pmi=False):
+    if isinstance(model, BabyLLaVANursery):
+        return model.score_sentences(sensory, words, counts, n_choices, pmi=pmi), None
+    if isinstance(model, CLIPGlobal):
+        matrix = model.score(sensory, model.enc_text(words, counts))
+        slots = torch.arange(len(words), device=words.device).reshape(-1, n_choices)
+        return matrix.gather(1, slots), None
     ordered = words.sort(dim=1, descending=True).values if model.bow_only else words
     vectors = model.language.encode_tokens(ordered, counts, bow_only=model.bow_only)
     matrix = model.score(sensory, vectors)
@@ -134,6 +141,9 @@ class UnifiedEvaluation(StudyEvaluation):
         if caches[0].shape[1:] != (257, 768):
             raise ValueError("U1 requires the cached DINOv2-Base 16x16 patch grid and CLS")
 
+        if condition == CLIPGlobal.condition:
+            caches = [cache[:, :1] for cache in caches]
+
         with np.load(subset / "fit_mask.npz", allow_pickle=False) as fit:
             videos, include = fit["video_ids"].tolist(), fit["include"]
         frames = pd.read_parquet(episodes / "frames.parquet",
@@ -155,6 +165,8 @@ class UnifiedEvaluation(StudyEvaluation):
         self.shuffle_info = None
         self.allowed_keys = {f"{video}|{frame}" for i, video in enumerate(videos)
                              for frame in np.flatnonzero(include[i])}
+        if condition in BASELINE_CONDITIONS:
+            return
         clip = store["clip"] if store is not None else clip_index(frames, videos, include.shape[1])[0]
         self.timeline = {video: i for i, video in enumerate(videos)}, clip
 
@@ -187,6 +199,8 @@ class UnifiedEvaluation(StudyEvaluation):
         if any(not here for here in keys):
             raise ValueError("Training utterance has no in-subset visual frames")
         ds.locs = [[self.lut[key] for key in here] for here in keys]
+        if self.condition in BASELINE_CONDITIONS:
+            return ds, None, None, None
         gaze = None
         if self.condition != "V":
             gaze = self.gaze_data(rows, frame_keys=keys, allowed_keys=self.allowed_keys)
@@ -211,9 +225,11 @@ class UnifiedEvaluation(StudyEvaluation):
     def sensory_batch(self, model, ds, ids, video, gaze, temporal, body,
                       *, gaze_rng=None, body_rng=None, body_ids=None):
         device = self.device
-        video = video.to(device=device, dtype=torch.float32).reshape(len(ids), ds.Fmax, 257, 768)
+        video = video.to(device=device, dtype=torch.float32).reshape(len(ids), ds.Fmax, -1, 768)
         lengths = torch.tensor([len(ds.locs[int(i)]) for i in ids], device=device)
         valid = torch.arange(ds.Fmax, device=device) < lengths[:, None]
+        if self.condition in BASELINE_CONDITIONS:
+            return video, valid
         gaze_ctx = None
         if gaze is not None:
             dropout = self.protocol["gaze"]["dropout"] if gaze_rng is not None else 0.0
@@ -229,7 +245,7 @@ class UnifiedEvaluation(StudyEvaluation):
 
     @torch.no_grad()
     def evaluate(self, model, panel, body_mode="real", *, gaze_mode=None, body_weights=None,
-                 routing=False):
+                 routing=False, bare_u1=False):
         # The inherited dev/test aggregators call this hook on each frozen panel.
         if body_weights is not None or body_mode not in ("real", "shuffled", "none") or gaze_mode not in (None, "removed"):
             raise ValueError("Unsupported U1 evaluation mode")
@@ -238,14 +254,26 @@ class UnifiedEvaluation(StudyEvaluation):
         if body_mode == "shuffled" and body is None:
             raise ValueError("Shuffled evaluation requires body histories")
         donors = np.asarray(trials["donor_rows"]) if body_mode == "shuffled" else None
-        if gaze_mode != "removed" and self.condition != "V" and panel not in self.gaze_panels:
+        baseline = self.condition in BASELINE_CONDITIONS
+        if not baseline and gaze_mode != "removed" and self.condition != "V" and panel not in self.gaze_panels:
             self.gaze_panels[panel] = self.gaze_data(rows, frame_keys=self.panel_frame_keys[panel])
         gaze = self.gaze_panels.get(panel) if gaze_mode != "removed" else None
-        if panel not in self.temporal_panels:
+        if not baseline and panel not in self.temporal_panels:
             self.temporal_panels[panel] = self.temporal_data(rows)
 
         queries = rows.iloc[trials["trial_rows"]].referent.tolist()
-        word_index, text, _ = self._query_vectors(model, queries)
+        if isinstance(model, BabyLLaVANursery):
+            noun = self.word_types["noun"]
+            prompt = "the" if panel in (noun["dev"], *noun["held_out"].values()) else "let's"
+            prompt_tokens = [] if bare_u1 else _upstream_module("train").tokenize(prompt)
+            # A missing prompt makes the prompted trial uncovered, just like an OOV query.
+            known = sorted(set(queries).intersection(self.vocab)) if all(
+                token in self.vocab for token in prompt_tokens) else []
+            prompt_ids = [self.vocab[token] for token in prompt_tokens] if known else []
+            word_index = {word: i for i, word in enumerate(known)}
+            text = torch.tensor([self.vocab[w] for w in known], device=self.device) if known else None
+        else:
+            word_index, text, _ = self._query_vectors(model, queries)
         if routing:
             row_ids = np.unique(trials["trial_rows"])
             row_ids = row_ids[rows.iloc[row_ids].referent.isin(word_index).to_numpy()]
@@ -259,7 +287,7 @@ class UnifiedEvaluation(StudyEvaluation):
         for start in range(0, len(row_ids), 64):
             ids = row_ids[start:start + 64]
             _, video, _, _ = collate_frame_indices(ds, ids)
-            args = self.sensory_batch(model, ds, ids, video, gaze, self.temporal_panels[panel],
+            args = self.sensory_batch(model, ds, ids, video, gaze, self.temporal_panels.get(panel),
                                       body if body_mode != "none" else None,
                                       body_ids=donors[ids] if donors is not None else None)
             sensory = model.encode_sensory(*args)
@@ -267,6 +295,8 @@ class UnifiedEvaluation(StudyEvaluation):
                 batch = slice(start, start + len(ids))
                 posterior = model.posterior_routing(sensory, text).cpu().numpy()
                 probabilities[batch] = posterior[np.arange(len(ids)), query_ids[batch]]
+            elif isinstance(model, BabyLLaVANursery):
+                matrix[ids] = model.score_words(sensory, text, prompt_ids).cpu().numpy()
             else:
                 matrix[ids] = model.score(sensory, text).cpu().numpy()
         if routing:
@@ -304,7 +334,7 @@ class UnifiedEvaluation(StudyEvaluation):
         return results
 
     @torch.no_grad()
-    def compositional(self, model, path):
+    def compositional(self, model, path, *, pmi=True):
         model.eval()
         results, routing = {}, []
         tokenize = _upstream_module("train").tokenize
@@ -316,8 +346,9 @@ class UnifiedEvaluation(StudyEvaluation):
             if len(ds) != len(rows) or any(not k for k in keys):
                 raise ValueError(f"Missing visual input for U2 panel {panel}")
             ds.locs = [[self.lut[k] for k in here] for here in keys]
-            gaze = self.gaze_data(rows, frame_keys=keys) if self.condition != "V" else None
-            temporal = self.temporal_data(rows)
+            baseline = self.condition in BASELINE_CONDITIONS
+            gaze = self.gaze_data(rows, frame_keys=keys) if self.condition in ("V+G", "V+G+B") else None
+            temporal = None if baseline else self.temporal_data(rows)
             body, donors = None, None
             if self.store is not None:
                 ps, pt, win = _pair_meta(rows, self.store, self.lut, 2)
@@ -338,10 +369,12 @@ class UnifiedEvaluation(StudyEvaluation):
                 sentences = batch.choices.tolist()
                 words, counts, covered = sentence_inputs([s for trial in sentences for s in trial],
                                                          self.vocab, self.device, tokenize=tokenize)
-                batch_scores, vectors = score_sentence_choices(model, sensory, words, counts, n_choices)
+                batch_scores, vectors = score_sentence_choices(model, sensory, words, counts, n_choices, pmi=pmi)
                 scores.extend(batch_scores.cpu().numpy())
                 known.extend(covered.reshape(-1, n_choices).all(axis=1))
 
+                if baseline:
+                    continue
                 if model.bow_only:
                     vectors = model.language.encode_tokens(words, counts, bow_only=True)
                 vectors, content = (v[::n_choices] for v in vectors)
@@ -371,6 +404,15 @@ class UnifiedEvaluation(StudyEvaluation):
             ]
         return results, routing
 
+    def bare_diagnostic(self, model):
+        accuracy = {}
+        for rung, spec in self.word_types.items():
+            credits = []
+            for panel in spec["held_out"].values():
+                credits.extend(self.evaluate(model, panel, bare_u1=True)["credits"])
+            accuracy[rung] = float(100 * np.mean(credits))
+        return accuracy
+
     def held_out(self, model):
         result = {"as_trained": self.word_type_test(model, self.body_mode)}
         if self.condition == "V+G+B":
@@ -399,7 +441,10 @@ def log_routing(model, study, out_dir):
 def load_checkpoint(path, device):
     checkpoint = torch.load(path, map_location=device, weights_only=True)
     model_args = dict(checkpoint["model_args"])
-    if checkpoint.get("run", {}).get("condition") == TEXT_ONLY:
+    condition = checkpoint.get("run", {}).get("condition")
+    if condition in BASELINE_CONDITIONS:
+        model = BASELINE_MODELS[condition](**model_args).to(device)
+    elif condition == TEXT_ONLY:
         model = CausalLanguage(**model_args).to(device)
     else:
         # U1 checkpoints predating U2 have 16-word position tables.
@@ -442,7 +487,9 @@ def main():
         summary["body_mode"] = "shuffled"
     if u2 is not None:
         panels, routing = study.compositional(model, u2)
-        summary.update(compositional=panels, sentence_routing=routing,
+        if model.condition not in BASELINE_CONDITIONS:
+            summary["sentence_routing"] = routing
+        summary.update(compositional=panels,
                        vp_swap=evaluate_vp_swap(model.language, study.vocab, u2, args.device))
     print(json.dumps(summary, indent=2))
 

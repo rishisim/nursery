@@ -12,6 +12,7 @@ from nursery.common import _output_directory
 from nursery.learner import _upstream_module
 from nursery.learner.gaze_data import collate_frame_indices
 
+from .baselines import BASELINE_CONDITIONS, BASELINE_MODELS, BabyLLaVANursery, CLIPGlobal
 from .evaluate import (
     STUDY, TEXT_ONLY, U2_FROZEN, UnifiedEvaluation, accuracy_summary, evaluate_vp_swap,
     load_checkpoint, log_routing, read_json, sentence_inputs, step9_subset, write_json,
@@ -81,6 +82,9 @@ def train(args):
         raise ValueError("Expected at least one epoch")
     u2_path = getattr(args, "u2", None)
     bow_only = getattr(args, "bow_only", False)
+    baseline = args.condition in BASELINE_CONDITIONS
+    if baseline and bow_only:
+        raise ValueError("Video-only baselines have no bag-of-words ablation")
     if args.condition == TEXT_ONLY and (u2_path is None or bow_only):
         raise ValueError("Text-Only LM requires U2 and has no retrieval ablation")
     if args.shuffle_body and args.condition != "V+G+B":
@@ -98,8 +102,11 @@ def train(args):
     run = dict(name="V+G+B_shuffled_body" if args.shuffle_body else args.condition,
                condition=args.condition, shuffle_body=args.shuffle_body,
                training_body_shuffle=study.shuffle_info, seed=args.seed, n_clips=args.n_clips,
-               epochs=args.epochs, lambda_gen=args.lambda_gen, aux_weight=args.aux_weight,
-               tau_m=args.tau_m)
+               epochs=args.epochs)
+    if not baseline or args.condition == CLIPGlobal.condition:
+        run["lambda_gen"] = args.lambda_gen
+    if not baseline:
+        run.update(aux_weight=args.aux_weight, tau_m=args.tau_m)
     batch_size = getattr(args, "batch_size", None) or study.protocol["batch"]
     if u2_path is not None:
         run.update(u2_path=str(u2_path), batch_size=batch_size, utterances=len(ds))
@@ -108,10 +115,18 @@ def train(args):
     order_rng = torch.Generator().manual_seed(args.seed)
     gaze_rng = torch.Generator().manual_seed(args.seed + 1000)
     body_rng = torch.Generator().manual_seed(args.seed + 2000)
-    model_args = dict(vocab_size=len(study.vocab), body_dims=study.body_dims,
-                      condition=args.condition, lambda_gen=args.lambda_gen,
-                      aux_weight=args.aux_weight, tau_m=args.tau_m, bow_only=bow_only)
-    model = UnifiedEmbodiedLearner(**model_args).to(args.device)
+    if baseline:
+        model_args = dict(vocab_size=len(study.vocab))
+        if args.condition == CLIPGlobal.condition:
+            model_args["lambda_gen"] = args.lambda_gen
+        model = BASELINE_MODELS[args.condition](**model_args).to(args.device)
+        if isinstance(model, BabyLLaVANursery):
+            model_args["p_uncond"] = model.p_uncond
+    else:
+        model_args = dict(vocab_size=len(study.vocab), body_dims=study.body_dims,
+                          condition=args.condition, lambda_gen=args.lambda_gen,
+                          aux_weight=args.aux_weight, tau_m=args.tau_m, bow_only=bow_only)
+        model = UnifiedEmbodiedLearner(**model_args).to(args.device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=study.protocol["lr"],
                                   weight_decay=study.protocol["weight_decay"])
     batches = torch.utils.data.BatchSampler(
@@ -156,18 +171,28 @@ def train(args):
     if study.development(model) != best_dev:
         raise RuntimeError("Checkpoint reload changed development trial scores")
     results = study.held_out(model)
-    log_routing(model, study, out_dir)
+    if not baseline:
+        log_routing(model, study, out_dir)
     summary = dict(best_epoch=checkpoint["epoch"], dev=history[checkpoint["epoch"] - 1]["dev"],
                    reload_identical=True, wall_seconds=time.perf_counter() - started,
                    accuracy=accuracy_summary(results))
+    if isinstance(model, BabyLLaVANursery):
+        summary["u1_bare_diagnostic"] = study.bare_diagnostic(model)
     if u2_path is not None:
         results["compositional"], routing = study.compositional(model, u2_path)
         results["vp_swap"] = evaluate_vp_swap(model.language, study.vocab, u2_path, args.device)
-        write_json(out_dir / "sentence_routing.json", routing)
+        if not baseline:
+            write_json(out_dir / "sentence_routing.json", routing)
         summary["compositional"] = {
             panel: {k: v for k, v in metrics.items() if k != "trials"}
             for panel, metrics in results["compositional"].items()
         }
+        if isinstance(model, BabyLLaVANursery):
+            raw_panels, _ = study.compositional(model, u2_path, pmi=False)
+            summary["compositional_raw_ll"] = {
+                panel: {k: v for k, v in metrics.items() if k != "trials"}
+                for panel, metrics in raw_panels.items()
+            }
         summary["vp_swap"] = {
             split: {k: v for k, v in metrics.items() if k != "trials"}
             for split, metrics in results["vp_swap"].items()
@@ -183,7 +208,7 @@ def train(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--condition", choices=(*CONDITIONS, TEXT_ONLY), required=True)
+    parser.add_argument("--condition", choices=(*CONDITIONS, *BASELINE_CONDITIONS, TEXT_ONLY), required=True)
     parser.add_argument("--n-clips", type=int, required=True)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--epochs", type=int, default=60)

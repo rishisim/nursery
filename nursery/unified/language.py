@@ -89,3 +89,20 @@ class CausalLanguage(nn.Module):
         targets = tokens[:, 1:]
         logprob = logits.log_softmax(-1).gather(-1, targets[..., None]).squeeze(-1)
         return logprob.masked_fill(targets.eq(0), 0).sum(1)
+
+    def encode_eos(self, words, counts):
+        hidden = self._hidden(self._tokens(words, counts))
+        eos = hidden[torch.arange(len(words), device=words.device), counts + 1]
+        return F.normalize(self.project(eos), dim=-1)
+
+    def hidden_with_prefix(self, words, prefix_emb, prefix_active):
+        positions = torch.arange(words.shape[1], device=words.device)
+        prefix_len = prefix_emb.shape[1]
+        x = torch.cat((prefix_emb.masked_fill(~prefix_active[..., None], 0),
+                       self.word(words) + self.position(positions)), dim=1)
+        padding = torch.cat((~prefix_active, words.eq(0)), dim=1)
+        causal = torch.ones(x.shape[1], x.shape[1], device=x.device, dtype=torch.bool).triu(1)
+        causal[:prefix_len, :prefix_len] = False
+        for layer in self.layers:
+            x = layer(x, src_mask=causal, src_key_padding_mask=padding)
+        return self.norm(x[:, prefix_len:])

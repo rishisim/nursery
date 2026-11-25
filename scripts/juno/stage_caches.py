@@ -86,7 +86,8 @@ def stop(signum, _frame):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--condition", required=True, choices=("V", "V+G", "V+G+B"))
+    parser.add_argument("--condition", required=True,
+                        choices=("V", "V+G", "V+G+B", "CLIP-Global", "BabyLLaVA-Nursery"))
     args, train_args = parser.parse_known_args()
     dry_run = args.dry_run or os.environ.get("STAGE_DRY_RUN") == "1"
     if not dry_run and not os.environ.get("SLURM_JOB_ID"):
@@ -95,7 +96,7 @@ def main():
     study = STUDY.resolve(strict=True)
     protocol = json.loads((study / "protocol.json").read_text())
     cache_dirs = [(Path(protocol["inputs"]) / "train_cache", Path("inputs/train_cache"))]
-    if args.condition != "V":
+    if args.condition in ("V+G", "V+G+B"):
         cache_dirs.append((Path(protocol["gaze"]["closeup_cache"]), Path("closeup_cache")))
         readable_file(Path(protocol["gaze"]["points"]))
     readable_file(Path(protocol["gaze"]["partitions"]))
