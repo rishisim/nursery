@@ -333,29 +333,39 @@ class UnifiedEvaluation(StudyEvaluation):
                     _apply_clip_choice_credits(panel)
         return results
 
+    def _compositional_inputs(self, rows, panel, body_mode, gaze_mode):
+        images = rows.assign(text=next(w for w in self.vocab if self.upstream.encode(w, self.vocab)))
+        ds = self.upstream.FramePairs(self.caches, self.lut, images, self.vocab, 2, False)
+        keys = partition_window_keys(rows, self.lut, self.partitions, 2)
+        if len(ds) != len(rows) or any(not k for k in keys):
+            raise ValueError(f"Missing visual input for U2 panel {panel}")
+        ds.locs = [[self.lut[k] for k in here] for here in keys]
+        gaze = None
+        if gaze_mode != "removed" and self.condition in ("V+G", "V+G+B"):
+            gaze = self.gaze_data(rows, frame_keys=keys)
+        temporal = None if self.condition in BASELINE_CONDITIONS else self.temporal_data(rows)
+        body, donors = None, None
+        if self.store is not None and body_mode != "none":
+            ps, pt, win = _pair_meta(rows, self.store, self.lut, 2)
+            body = BodyData(self.store, ps, pt, win, None, None, None, None,
+                            self.device, 5, 0., 0.)
+            if body_mode == "shuffled":
+                donors = np.asarray(_panel_donors(rows.subject.tolist(), rows["clip"].tolist()))
+        return ds, gaze, temporal, body, donors
+
     @torch.no_grad()
-    def compositional(self, model, path, *, pmi=True):
+    def compositional(self, model, path, *, pmi=True, body_mode=None, gaze_mode=None):
+        body_mode = self.body_mode if body_mode is None else body_mode
+        if body_mode not in ("real", "shuffled", "none") or gaze_mode not in (None, "removed"):
+            raise ValueError("Unsupported U2 evaluation mode")
         model.eval()
         results, routing = {}, []
         tokenize = _upstream_module("train").tokenize
         for panel in U2_PANELS:
             rows = pd.read_parquet(path / f"{panel}.parquet")
-            images = rows.assign(text=next(w for w in self.vocab if self.upstream.encode(w, self.vocab)))
-            ds = self.upstream.FramePairs(self.caches, self.lut, images, self.vocab, 2, False)
-            keys = partition_window_keys(rows, self.lut, self.partitions, 2)
-            if len(ds) != len(rows) or any(not k for k in keys):
-                raise ValueError(f"Missing visual input for U2 panel {panel}")
-            ds.locs = [[self.lut[k] for k in here] for here in keys]
+            ds, gaze, temporal, body, donors = self._compositional_inputs(
+                rows, panel, body_mode, gaze_mode)
             baseline = self.condition in BASELINE_CONDITIONS
-            gaze = self.gaze_data(rows, frame_keys=keys) if self.condition in ("V+G", "V+G+B") else None
-            temporal = None if baseline else self.temporal_data(rows)
-            body, donors = None, None
-            if self.store is not None:
-                ps, pt, win = _pair_meta(rows, self.store, self.lut, 2)
-                body = BodyData(self.store, ps, pt, win, None, None, None, None,
-                                self.device, 5, 0., 0.)
-                if self.body_mode == "shuffled":
-                    donors = np.asarray(_panel_donors(rows.subject.tolist(), rows["clip"].tolist()))
 
             scores, known = [], []
             n_choices = len(rows.choices.iloc[0])
